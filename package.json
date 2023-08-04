@@ -1,7 +1,14 @@
 {
   "name": "buildel-frontend",
   "private": true,
-  "packageManager": "pnpm@8.6.10",
+  "version": "0.0.1",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=19",
+    "npm": "please-use-pnpm",
+    "yarn": "please-use-pnpm",
+    "pnpm": "8"
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
