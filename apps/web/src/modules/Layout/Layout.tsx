@@ -1,17 +1,33 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import classNames from 'classnames';
-import { Avatar } from '@elpassion/taco';
+import { Avatar, Icon } from '@elpassion/taco';
 import { APP_NAME } from '~/modules/Config';
-import { ROUTES } from '../Config/routes.config';
+import { ROUTES } from '~/modules/Config';
+import { Sidebar } from './Sidebar';
+
+// const Sidebar = dynamic(
+//   () => import('~/modules/Layout/Sidebar').then((c) => c.Sidebar),
+//   {
+//     ssr: false,
+//   },
+// );
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export const Layout = ({ children }: LayoutProps) => {
+  return (
+    <div className="grid h-full grid-cols-[auto_1fr] gap-3">
+      <Sidebar />
+      <main className="p-4">{children}</main>
+    </div>
+  );
+
   return (
     <div>
       <header
@@ -22,7 +38,9 @@ export const Layout = ({ children }: LayoutProps) => {
         ])}
       >
         <div className="flex flex-none flex-row items-center">
-          <strong className="flex-1 capitalize">{APP_NAME}</strong>
+          <strong className="flex-1 capitalize">
+            <Link href={ROUTES.HOME}>{APP_NAME}</Link>
+          </strong>
         </div>
 
         <div>
@@ -51,6 +69,12 @@ export const Layout = ({ children }: LayoutProps) => {
             >
               Home
             </Link>
+            <Link
+              href={ROUTES.TALK_TO_ME}
+              className="mb-3 text-sm font-medium capitalize transition duration-500 ease-in-out hover:text-teal-600"
+            >
+              Talk to me
+            </Link>
           </div>
         </div>
 
@@ -61,3 +85,12 @@ export const Layout = ({ children }: LayoutProps) => {
     </div>
   );
 };
+
+export default dynamic(() => Promise.resolve(Layout), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-screen w-screen items-center justify-center text-center">
+      <Icon size="lg" iconName="loader" className="animate-spin" />
+    </div>
+  ),
+});
