@@ -8,7 +8,7 @@ interface ProvidersProps {
   children: React.ReactNode;
 }
 
-export default function Providers({ children }: ProvidersProps) {
+export function AppProviders({ children }: ProvidersProps) {
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
@@ -31,6 +31,7 @@ export default function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
+
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );

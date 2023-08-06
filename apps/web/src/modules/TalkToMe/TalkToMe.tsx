@@ -9,6 +9,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from 'react-speech-recognition';
 import { Button, Icon, IconButton, Input } from '@elpassion/taco';
+import { SpeechPlayer } from '~/modules/TalkToMe/SpeechPlayer';
 import { useEffectOnce } from '~/utils/hooks';
 import { SSE, SSEOptionsMethod } from '~/utils/SSE';
 
@@ -23,6 +24,8 @@ export const TalkToMe = () => {
   } = useSpeechRecognition();
 
   const [isLoading, setIsLoading] = React.useState(false);
+  // Is ready for text to speech
+  const [isReady, setIsReady] = React.useState(false);
   // User prompt text
   const [promptText, setPromptText] = React.useState('');
   // Response from OpenAI
@@ -94,6 +97,8 @@ export const TalkToMe = () => {
     });
 
     source.stream();
+
+    setIsReady(true);
   };
   const handleReset = () => {
     setPromptText('');
@@ -138,7 +143,7 @@ export const TalkToMe = () => {
                 setPromptText('');
                 resetTranscript();
                 await SpeechRecognition.startListening({
-                  // continuous: true,
+                  continuous: true,
                   language: 'pl-PL',
                 });
               }
@@ -154,6 +159,7 @@ export const TalkToMe = () => {
               id="prompt"
               placeholder="What do you want to know?"
               value={promptText}
+              disabled={isLoading}
               onChange={(e) => {
                 setPromptText(e.target.value);
               }}
@@ -163,7 +169,7 @@ export const TalkToMe = () => {
           <Button
             text="Send"
             hierarchy="tertiary"
-            disabled={true || promptText.trim() === ''}
+            disabled={promptText.trim() === ''}
             isLoading={isLoading}
             onClick={handleSend}
           />
@@ -191,6 +197,8 @@ export const TalkToMe = () => {
             console.log('read text demo');
           }}
         />
+
+        {isReady && <SpeechPlayer text={promptText} />}
       </div>
 
       {resultText && (
