@@ -1,14 +1,7 @@
-@tailwind base;
+/*@tailwind base;*/
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'icons';
-  src: url('https://elpassion-design-system.s3.eu-west-1.amazonaws.com/fonticon.ttf')
-    format('opentype');
-}
-
 body {
-  @apply dark:bg-slate-800 dark:text-slate-100;
   overscroll-behavior: none;
 }

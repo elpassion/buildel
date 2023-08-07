@@ -1,0 +1,3 @@
+const useAudioToText = () => {
+  return null;
+};

@@ -1,96 +1,126 @@
 'use client';
 
 import React from 'react';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { AppShell, Avatar, Burger, Button, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { IconStar } from '@tabler/icons-react';
 import classNames from 'classnames';
-import { Avatar, Icon } from '@elpassion/taco';
-import { APP_NAME } from '~/modules/Config';
-import { ROUTES } from '~/modules/Config';
-import { Sidebar } from './Sidebar';
+import { APP_NAME, ROUTES } from '~/modules/Config';
 
-// const Sidebar = dynamic(
-//   () => import('~/modules/Layout/Sidebar').then((c) => c.Sidebar),
-//   {
-//     ssr: false,
-//   },
-// );
+type NavigationElementsType = {
+  label: string;
+  href: string;
+  disabled?: boolean;
+};
+const navigationElements: NavigationElementsType[] = [
+  {
+    label: 'Home',
+    href: ROUTES.HOME,
+  },
+  {
+    label: 'Talk to me',
+    href: ROUTES.TALK_TO_ME,
+  },
+  {
+    label: 'Example',
+    href: ROUTES.EXAMPLES,
+  },
+  {
+    label: 'Upload audio',
+    href: ROUTES.EXAMPLES_UPLOAD_AUDIO,
+  },
+];
+
+const NAVBAR_HEIGHT = 60;
+const SIDEBAR_WIDTH = 250;
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export const Layout = ({ children }: LayoutProps) => {
-  return (
-    <div className="grid h-full grid-cols-[auto_1fr] gap-3">
-      <Sidebar />
-      <main className="p-4">{children}</main>
-    </div>
-  );
+  const [opened, { toggle }] = useDisclosure();
 
   return (
-    <div>
-      <header
-        className={classNames([
-          'fixed top-0 z-50 h-16 w-full px-6',
-          'flex flex-row flex-wrap items-center justify-between',
-          'border-b border-gray-300 bg-white',
-        ])}
+    <>
+      <AppShell
+        layout="alt"
+        header={{
+          height: NAVBAR_HEIGHT,
+        }}
+        navbar={{
+          width: SIDEBAR_WIDTH,
+          breakpoint: 'sm',
+          collapsed: { mobile: !opened },
+        }}
+        padding="md"
       >
-        <div className="flex flex-none flex-row items-center">
-          <strong className="flex-1 capitalize">
-            <Link href={ROUTES.HOME}>{APP_NAME}</Link>
-          </strong>
-        </div>
+        <AppShell.Header>
+          <div className="flex h-full items-center px-4">
+            <div>
+              <Burger
+                opened={opened}
+                onClick={toggle}
+                hiddenFrom="sm"
+                size="sm"
+                className="mr-4"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Avatar
+                color="blue"
+                radius="sm"
+                component={Link}
+                href={ROUTES.HOME}
+              >
+                <IconStar size="1.5rem" />
+              </Avatar>
 
-        <div>
-          <ul className="relative z-10 flex items-center justify-end gap-4 px-4 sm:px-6 lg:px-8">
-            <li>
-              <Avatar />
-            </li>
-          </ul>
-        </div>
-      </header>
-
-      <div className="flex h-screen flex-row flex-wrap">
-        <div
-          className={classNames([
-            'fixed top-0 z-30 h-screen w-64 p-6',
-            'flex flex-none flex-col flex-wrap',
-            'border-r border-gray-300 bg-white',
-            'shadow-xl',
-          ])}
-        >
-          <div className="mt-16" />
-          <div className="flex flex-col">
-            <Link
-              href={ROUTES.HOME}
-              className="mb-3 text-sm font-medium capitalize transition duration-500 ease-in-out hover:text-teal-600"
-            >
-              Home
-            </Link>
-            <Link
-              href={ROUTES.TALK_TO_ME}
-              className="mb-3 text-sm font-medium capitalize transition duration-500 ease-in-out hover:text-teal-600"
-            >
-              Talk to me
-            </Link>
+              <Text className="text-xl" component={Link} href={ROUTES.HOME}>
+                {APP_NAME}
+              </Text>
+            </div>
           </div>
-        </div>
+        </AppShell.Header>
 
-        <main className="ml-64 mt-16 flex-1 bg-gray-100 p-6">
-          <div className="mx-auto max-w-7xl">{children}</div>
-        </main>
-      </div>
-    </div>
+        <AppShell.Navbar p="md">
+          <div className="flex h-full w-full flex-col">
+            <div>
+              <Burger
+                opened={opened}
+                onClick={toggle}
+                hiddenFrom="sm"
+                size="sm"
+                className="mb-4"
+              />
+            </div>
+
+            <div className="flex w-full flex-col gap-4">
+              {navigationElements.map((el) => {
+                if (el.disabled) {
+                  return null;
+                }
+                return (
+                  <Button
+                    key={el.href}
+                    variant="outline"
+                    component={Link}
+                    href={el.href}
+                    className="w-full"
+                  >
+                    {el.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        </AppShell.Navbar>
+
+        <AppShell.Main>{children}</AppShell.Main>
+      </AppShell>
+    </>
   );
 };
 
-export default dynamic(() => Promise.resolve(Layout), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-screen w-screen items-center justify-center text-center">
-      <Icon size="lg" iconName="loader" className="animate-spin" />
-    </div>
-  ),
-});
+export default Layout;
