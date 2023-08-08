@@ -1,24 +1,25 @@
 'use client';
 
 import React from 'react';
-import { Accordion, Code, Input, Select, Text } from '@mantine/core';
+import { Accordion, Code, Input, Text } from '@mantine/core';
 import {
   BlockBase,
   BlockWrapper,
-  IBlock,
-  SpeechToTextBlock,
+  ChatBlock,
   TextToSpeechBlock,
   useBlocks,
 } from '~/modules/Blocks';
 
-interface TextToAudioBlockProps extends BlockBase {}
+interface ChatGPTBlockProps extends BlockBase {}
 
-export const TextToAudioBlock = ({ enabled }: TextToAudioBlockProps) => {
-  const [input, setInput] = React.useState('chat_sentences_output');
+export const ChatGPTBlock = ({ enabled }: ChatGPTBlockProps) => {
+  const [input, setInput] = React.useState('speech_to_text_output');
+  const [context, setContext] = React.useState('');
   const [data, setData] = React.useState({
-    name: 'text_to_speech',
-    type: 'TextToSpeech',
+    name: 'chat',
+    type: 'Chat',
     input,
+    messages: [{ role: 'system', content: 'message content' }],
   });
 
   const [state] = useBlocks();
@@ -29,9 +30,15 @@ export const TextToAudioBlock = ({ enabled }: TextToAudioBlockProps) => {
   React.useEffect(() => {
     setData((prevState) => ({ ...prevState, input }));
   }, [input]);
+  React.useEffect(() => {
+    setData((prevState) => ({
+      ...prevState,
+      messages: [{ role: 'system', content: context }],
+    }));
+  }, [context]);
 
   return (
-    <BlockWrapper enabled={enabled} name="Text to audio">
+    <BlockWrapper enabled={enabled} name="Chat">
       <Accordion>
         <Accordion.Item value="cfg">
           <Accordion.Control>Cfg</Accordion.Control>
@@ -51,19 +58,13 @@ export const TextToAudioBlock = ({ enabled }: TextToAudioBlockProps) => {
 
       <div className="mb-4" />
 
-      <Select
-        label="Provider"
-        placeholder="Pick provider"
-        data={['Elevenlabs', 'OtherProvider', 'Example']}
-        defaultValue="Elevenlabs"
-      />
-      <div className="mb-2" />
-      <Select
-        label="Voice"
-        placeholder="Pick voice"
-        data={['male1', 'male2', 'female1', 'female2']}
-        defaultValue="male2"
-      />
+      <Input.Wrapper label="Context">
+        <Input
+          placeholder="Give me some context"
+          value={context}
+          onChange={(e) => setContext(e.target.value)}
+        />
+      </Input.Wrapper>
     </BlockWrapper>
   );
 };

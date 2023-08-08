@@ -1,7 +1,6 @@
 'use client';
 
 import { Text } from '@mantine/core';
-import { useToggle } from '@mantine/hooks';
 import {
   AudioToTextBlock,
   BlocksProvider,
@@ -14,7 +13,7 @@ export const UploadAudioClient = () => {
     <BlocksProvider>
       <Text>Upload audio</Text>
 
-      <div className="mb-4" />
+      <div className="mb-8" />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <FileAudioInput enabled={true} />

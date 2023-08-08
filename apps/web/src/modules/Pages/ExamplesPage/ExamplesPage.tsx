@@ -1,9 +1,10 @@
-import { ExampleClient } from '~/modules/Examples';
+import { BlocksProvider } from '~/modules/Blocks';
+import { ExampleWrapper } from '~/modules/Examples';
 
 export const ExamplesPage = () => {
   return (
     <>
-      <ExampleClient />
+      <ExampleWrapper />
     </>
   );
 };

@@ -19,13 +19,13 @@ export const BlockWrapper = ({
       <header className="flex items-center justify-between">
         <Text>{name}</Text>
 
-        <ActionIcon
-          variant="outline"
-          aria-label="Status"
-          color={enabled ? 'green' : 'red'}
-        >
-          {enabled ? 'On' : 'Off'}
-        </ActionIcon>
+        {/*<ActionIcon*/}
+        {/*  variant="outline"*/}
+        {/*  aria-label="Status"*/}
+        {/*  color={enabled ? 'green' : 'red'}*/}
+        {/*>*/}
+        {/*  {enabled ? 'On' : 'Off'}*/}
+        {/*</ActionIcon>*/}
       </header>
 
       <div className="mb-4" />

@@ -21,6 +21,7 @@ const navigationElements: NavigationElementsType[] = [
   {
     label: 'Talk to me',
     href: ROUTES.TALK_TO_ME,
+    disabled: true,
   },
   {
     label: 'Example',
