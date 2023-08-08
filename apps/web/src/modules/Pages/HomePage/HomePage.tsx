@@ -1,13 +1,11 @@
-import { Example } from './Example';
+import { Button, Text } from '@mantine/core';
 
 export const HomePage = () => {
   return (
     <>
-      <h1 className="text-2xl">Home page</h1>
-
+      <Text className="text-2xl">Home page</Text>
       <div className="mb-4" />
-
-      <Example />
+      <Button>Test</Button>
     </>
   );
 };
