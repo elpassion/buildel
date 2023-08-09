@@ -9,6 +9,7 @@ import {
   TextToSpeechBlock,
   useBlocks,
 } from '~/modules/Blocks';
+import { useEffectOnce } from '~/utils/hooks';
 
 interface ChatGPTBlockProps extends BlockBase {}
 
@@ -23,9 +24,41 @@ export const ChatGPTBlock = ({ enabled }: ChatGPTBlockProps) => {
   });
 
   const [state] = useBlocks();
-  const { audioFile } = state;
+  const { channel, audioFile } = state;
 
   const dataCode = `${JSON.stringify(data, null, 2)}`;
+
+  useEffectOnce(() => {
+    // console.log('add_block, audio_input');
+    // ppush(channel, 'get_blocks', {}).then(console.log);
+    // console.log(channel);
+
+    const res = channel.push('add_block', {
+      name: 'chat',
+      opts: {
+        input: 'speech_to_text_output',
+        messages: [
+          {
+            role: 'system',
+            content: 'you are a pirate',
+          },
+        ],
+      },
+      forward_outputs: ['sentences_output'],
+    });
+    // console.log('add_block - audio_input res');
+    console.log(res);
+
+    const listenerOutput = (event: any) => {
+      console.log(event);
+    };
+
+    const listenerID = channel.on('chat_sentences_output', listenerOutput);
+
+    return () => {
+      channel.off('chat_sentences_output', listenerID);
+    };
+  });
 
   React.useEffect(() => {
     setData((prevState) => ({ ...prevState, input }));

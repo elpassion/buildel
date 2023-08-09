@@ -59,6 +59,9 @@ importers:
       next:
         specifier: 13.4.12
         version: 13.4.12(react-dom@18.2.0)(react@18.2.0)
+      phoenix:
+        specifier: ^1.7.7
+        version: 1.7.7
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -84,6 +87,9 @@ importers:
       '@types/node':
         specifier: 20.4.7
         version: 20.4.7
+      '@types/phoenix':
+        specifier: ^1.6.0
+        version: 1.6.0
       '@types/react':
         specifier: 18.2.18
         version: 18.2.18
@@ -827,6 +833,10 @@ packages:
   /@types/parse-json@4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
     dev: false
+
+  /@types/phoenix@1.6.0:
+    resolution: {integrity: sha512-qwfpsHmFuhAS/dVd4uBIraMxRd56vwBUYQGZ6GpXnFuM2XMRFJbIyruFKKlW2daQliuYZwe0qfn/UjFCDKic5g==}
+    dev: true
 
   /@types/prop-types@15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
@@ -3531,6 +3541,10 @@ packages:
   /path-type@4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
+
+  /phoenix@1.7.7:
+    resolution: {integrity: sha512-moAN6e4Z16x/x1nswUpnTR2v5gm7HsI7eluZ2YnYUUsBNzi3cY/5frmiJfXIEi877IQAafzTfp8hd6vEUMme+w==}
+    dev: false
 
   /picocolors@1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}

@@ -6,3 +6,5 @@ export * from './TextToAudioBlock';
 
 export * from './types.blocks';
 export * from './BlocksContext';
+
+export * from './utils';

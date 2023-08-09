@@ -2,14 +2,16 @@
 
 import React from 'react';
 import { Button, Group, Text } from '@mantine/core';
-import { useListState } from '@mantine/hooks';
+import { Socket } from 'phoenix';
 import {
   AudioToTextBlock,
   FileAudioInput,
   TextToAudioBlock,
+  ppush,
   useBlocks,
 } from '~/modules/Blocks';
 import { ChatGPTBlock } from '~/modules/Blocks/ChatGPTBlock';
+import { useEffectOnce } from '~/utils/hooks';
 
 interface BlockItem {
   name: string;
@@ -21,7 +23,21 @@ export const ExampleClient = () => {
   // https://v7.mantine.dev/hooks/use-list-state
   const [blocks, setBlocks] = React.useState<BlockItem[]>([]);
 
+  const [textOutput, setTextOutput] = React.useState<string[]>([]);
+
   const [state, dispatch] = useBlocks();
+  const { socket, channel, speechToTextOutput } = state;
+
+  useEffectOnce(() => {
+    console.log({ socket, channel });
+  });
+
+  React.useEffect(() => {
+    if (speechToTextOutput) {
+      console.log(speechToTextOutput);
+      setTextOutput((prevState) => [...prevState, speechToTextOutput.message]);
+    }
+  }, [speechToTextOutput]);
 
   return (
     <>
@@ -33,7 +49,13 @@ export const ExampleClient = () => {
         <Button
           color="red"
           onClick={() => {
+            channel.push('remove_block', { name: 'audio_input' });
+            channel.push('remove_block', { name: 'speech_to_text' });
+            channel.push('remove_block', { name: 'chat' });
+            channel.push('remove_block', { name: 'text_to_speech' });
+
             setBlocks([]);
+            setTextOutput([]);
             // blocksHandlers.setState([]);
             // dispatch({ type: 'setAudioFile', audioFile: null });
           }}
@@ -43,9 +65,17 @@ export const ExampleClient = () => {
         <Button
           onClick={() => {
             console.log('play');
+            // console.log({ socket, channel });
           }}
         >
           Play
+        </Button>
+        <Button
+          onClick={() => {
+            ppush(channel, 'get_blocks', {}).then(console.log);
+          }}
+        >
+          Get blocks
         </Button>
       </Group>
 
@@ -128,6 +158,16 @@ export const ExampleClient = () => {
         {blocks.map((block, index) => {
           return <div key={`${block.name}-${index}`}>{block.component}</div>;
         })}
+      </div>
+
+      <div className="mb-4" />
+
+      <div className="border p-4">
+        {textOutput.map((text) => (
+          <div className="flex" key={Math.random()}>
+            {text}
+          </div>
+        ))}
       </div>
     </>
   );

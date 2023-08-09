@@ -23,6 +23,7 @@
     "axios": "^1.4.0",
     "lodash": "^4.17.21",
     "next": "13.4.12",
+    "phoenix": "^1.7.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.45.2",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.4",
     "@types/node": "20.4.7",
+    "@types/phoenix": "^1.6.0",
     "@types/react": "18.2.18",
     "@types/react-dom": "18.2.7",
     "@types/react-speech-recognition": "^3.9.2",

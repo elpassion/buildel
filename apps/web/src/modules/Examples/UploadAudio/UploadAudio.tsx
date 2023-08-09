@@ -1,9 +1,9 @@
-import { UploadAudioClient } from './UploadAudioClient';
+import { UploadAudioWrapper } from './UploadAudioWrapper';
 
 export const UploadAudio = async () => {
   return (
     <>
-      <UploadAudioClient />
+      <UploadAudioWrapper />
     </>
   );
 };

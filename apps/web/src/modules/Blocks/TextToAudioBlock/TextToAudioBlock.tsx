@@ -10,6 +10,7 @@ import {
   TextToSpeechBlock,
   useBlocks,
 } from '~/modules/Blocks';
+import { useEffectOnce } from '~/utils/hooks';
 
 interface TextToAudioBlockProps extends BlockBase {}
 
@@ -22,9 +23,24 @@ export const TextToAudioBlock = ({ enabled }: TextToAudioBlockProps) => {
   });
 
   const [state] = useBlocks();
-  const { audioFile } = state;
+  const { channel, audioFile } = state;
 
   const dataCode = `${JSON.stringify(data, null, 2)}`;
+
+  useEffectOnce(() => {
+    console.log('add_block, audio_input');
+
+    // ppush(channel, 'get_blocks', {}).then(console.log);
+    // console.log(channel);
+    channel.push('add_block', {
+      name: 'text_to_speech',
+      opts: { input: 'chat_sentences_output' },
+      forward_outputs: ['output'],
+    });
+    channel.on('text_to_speech_output', (payload) => {
+      console.log('text_to_speech_output', payload);
+    });
+  });
 
   React.useEffect(() => {
     setData((prevState) => ({ ...prevState, input }));

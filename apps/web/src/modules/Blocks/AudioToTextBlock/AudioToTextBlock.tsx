@@ -2,12 +2,14 @@
 
 import React from 'react';
 import { Accordion, Code, Input, Select, Text } from '@mantine/core';
+import { Channel } from 'phoenix';
 import {
   BlockBase,
   BlockWrapper,
   SpeechToTextBlock,
   useBlocks,
 } from '~/modules/Blocks';
+import { useEffectOnce } from '~/utils/hooks';
 
 const codeForPreviousDemo = `import React from 'react';
 import { Code } from '@mantine/core';
@@ -27,9 +29,45 @@ export const AudioToTextBlock = ({ enabled }: AudioToTextBlockProps) => {
   });
 
   const [state] = useBlocks();
-  const { audioFile } = state;
+  const { channel, audioFile } = state;
 
   const dataCode = `${JSON.stringify(data, null, 2)}`;
+
+  useEffectOnce(() => {
+    // console.log('add_block, audio_input');
+    // ppush(channel, 'get_blocks', {}).then(console.log);
+    // console.log(channel);
+
+    const res = channel.push('add_block', {
+      name: 'speech_to_text',
+      opts: {
+        input: 'audio_input_output',
+      },
+      forward_outputs: ['output'],
+    });
+    console.log('add_block - audio_input res');
+    console.log(res);
+
+    const listenerOutput = (event: any) => {
+      console.log(event);
+    };
+
+    const listenerID = channel.on('speech_to_text_output', listenerOutput);
+
+    return () => {
+      channel.off('speech_to_text_output', listenerID);
+    };
+  });
+
+  // function listenForBlockOutputs(
+  //   channel: Channel,
+  //   block: { name: string; outputName: string },
+  // ) {
+  //
+  //   // block.forwardOutputs.map((output) =>
+  //   //   channel.on(`${block.name}_${output}`, () => {}),
+  //   // );
+  // }
 
   React.useEffect(() => {
     if (state.audioFile) {
