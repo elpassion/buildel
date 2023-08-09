@@ -54,7 +54,7 @@ type BlocksProviderProps = {
   children: React.ReactNode;
 };
 function BlocksProvider({ children }: BlocksProviderProps) {
-  let socket = new Socket('ws://192.168.0.12:4000/socket');
+  let socket = new Socket(`ws://${process.env.API_URL}/socket`);
   socket.connect();
 
   let channel = socket.channel(`audio_conversations:${Math.random()}`, {});
