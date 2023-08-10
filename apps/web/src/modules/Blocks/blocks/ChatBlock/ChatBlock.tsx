@@ -1,19 +1,22 @@
 'use client';
 
 import React from 'react';
-import { Code } from '@mantine/core';
+import { Code, Input } from '@mantine/core';
 import { BlockWrapper, useBlocks } from '~/modules/Blocks';
 import { useEffectOnce } from '~/utils/hooks';
 
+// TODO (hub33k): edit block data, on focus lost update block - `channel.push('update_block', {name: 'chat})`
+
 export const ChatBlock = () => {
   const [{ channel }] = useBlocks();
+
+  const [content, setContent] = React.useState('You are a helpful assistant.');
 
   // Debugging
   const [data, setData] = React.useState({
     name: 'chat',
     input: 'speech_to_text_output',
-    content:
-      "You are a helpful assistant. Always answer in not more than 1 sentences! It's very important!",
+    content,
   });
   const dataCode = `${JSON.stringify(data, null, 2)}`;
 
@@ -25,7 +28,7 @@ export const ChatBlock = () => {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant.',
+            content,
           },
         ],
       },
@@ -45,9 +48,41 @@ export const ChatBlock = () => {
     };
   });
 
+  React.useEffect(() => {
+    setData((prevState) => ({
+      ...prevState,
+      content,
+    }));
+  }, [content]);
+
   return (
     <BlockWrapper name="Chat">
       <Code block>{dataCode}</Code>
+
+      <div className="mb-4" />
+
+      <Input.Wrapper label="Context">
+        <Input
+          placeholder="Give me some context"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          onBlur={() => {
+            // channel.push('update_block', {
+            //   name: 'chat',
+            //   opts: {
+            //     input: 'speech_to_text_output',
+            //     messages: [
+            //       {
+            //         role: 'system',
+            //         content,
+            //       },
+            //     ],
+            //   },
+            //   forward_outputs: ['sentences_output'],
+            // });
+          }}
+        />
+      </Input.Wrapper>
     </BlockWrapper>
   );
 };
