@@ -19,17 +19,8 @@ const navigationElements: NavigationElementsType[] = [
     href: ROUTES.HOME,
   },
   {
-    label: 'Talk to me',
-    href: ROUTES.TALK_TO_ME,
-    disabled: true,
-  },
-  {
     label: 'Example',
-    href: ROUTES.EXAMPLES,
-  },
-  {
-    label: 'Upload audio',
-    href: ROUTES.EXAMPLES_UPLOAD_AUDIO,
+    href: ROUTES.EXAMPLE,
   },
 ];
 
@@ -50,11 +41,11 @@ export const Layout = ({ children }: LayoutProps) => {
         header={{
           height: NAVBAR_HEIGHT,
         }}
-        navbar={{
-          width: SIDEBAR_WIDTH,
-          breakpoint: 'sm',
-          collapsed: { mobile: !opened },
-        }}
+        // navbar={{
+        //   width: SIDEBAR_WIDTH,
+        //   breakpoint: 'sm',
+        //   collapsed: { mobile: !opened },
+        // }}
         padding="md"
       >
         <AppShell.Header>
@@ -85,38 +76,38 @@ export const Layout = ({ children }: LayoutProps) => {
           </div>
         </AppShell.Header>
 
-        <AppShell.Navbar p="md">
-          <div className="flex h-full w-full flex-col">
-            <div>
-              <Burger
-                opened={opened}
-                onClick={toggle}
-                hiddenFrom="sm"
-                size="sm"
-                className="mb-4"
-              />
-            </div>
+        {/*<AppShell.Navbar p="md">*/}
+        {/*  <div className="flex h-full w-full flex-col">*/}
+        {/*    <div>*/}
+        {/*      <Burger*/}
+        {/*        opened={opened}*/}
+        {/*        onClick={toggle}*/}
+        {/*        hiddenFrom="sm"*/}
+        {/*        size="sm"*/}
+        {/*        className="mb-4"*/}
+        {/*      />*/}
+        {/*    </div>*/}
 
-            <div className="flex w-full flex-col gap-4">
-              {navigationElements.map((el) => {
-                if (el.disabled) {
-                  return null;
-                }
-                return (
-                  <Button
-                    key={el.href}
-                    variant="outline"
-                    component={Link}
-                    href={el.href}
-                    className="w-full"
-                  >
-                    {el.label}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
-        </AppShell.Navbar>
+        {/*    <div className="flex w-full flex-col gap-4">*/}
+        {/*      {navigationElements.map((el) => {*/}
+        {/*        if (el.disabled) {*/}
+        {/*          return null;*/}
+        {/*        }*/}
+        {/*        return (*/}
+        {/*          <Button*/}
+        {/*            key={el.href}*/}
+        {/*            variant="outline"*/}
+        {/*            component={Link}*/}
+        {/*            href={el.href}*/}
+        {/*            className="w-full"*/}
+        {/*          >*/}
+        {/*            {el.label}*/}
+        {/*          </Button>*/}
+        {/*        );*/}
+        {/*      })}*/}
+        {/*    </div>*/}
+        {/*  </div>*/}
+        {/*</AppShell.Navbar>*/}
 
         <AppShell.Main>{children}</AppShell.Main>
       </AppShell>
