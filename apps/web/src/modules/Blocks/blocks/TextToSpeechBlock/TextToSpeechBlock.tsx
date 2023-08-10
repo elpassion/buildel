@@ -8,7 +8,7 @@ import { useEffectOnce } from '~/utils/hooks';
 export const TextToSpeechBlock = () => {
   const [{ channel }] = useBlocks();
 
-  const [isPlaying, setIsPlaying] = React.useState(false);
+  const isPlaying = React.useRef(false);
   const [audioBuffers, setAudioBuffers] = React.useState<any>([]);
 
   // Debugging
@@ -19,23 +19,22 @@ export const TextToSpeechBlock = () => {
   const dataCode = `${JSON.stringify(data, null, 2)}`;
 
   async function playBuffer() {
-    if (isPlaying) return;
+    if (isPlaying.current) return;
     if (audioBuffers.length > 0) {
-      console.log(audioBuffers);
-      setIsPlaying(true);
+      isPlaying.current = true;
       const ctx = new AudioContext();
       const buffer = audioBuffers.shift();
-      const audioBuffer = await ctx.decodeAudioData(audioBuffers);
+      const audioBuffer = await ctx.decodeAudioData(buffer);
       const source = ctx.createBufferSource();
       source.addEventListener('ended', () => {
-        setIsPlaying(false);
+        isPlaying.current = false;
         playBuffer();
       });
       source.connect(ctx.destination);
       source.buffer = audioBuffer;
       source.start();
     } else {
-      setIsPlaying(false);
+      isPlaying.current = false;
     }
   }
 

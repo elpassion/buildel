@@ -78,6 +78,9 @@ export const AudioRecorder = () => {
     mediaRecorder.current.stop();
     mediaRecorder.current.onstop = (event) => {
       // console.log(event);
+      setTimeout(() => {
+        channel.push('reset_blocks', {});
+      }, 1000);
     };
   };
 

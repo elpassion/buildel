@@ -28,16 +28,16 @@ export const ExampleClient = () => {
         Component: AudioInputBlock,
       },
       {
-        name: chatBlock.name,
-        img: 'https://images.unsplash.com/photo-1684487747720-1ba29cda82f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1332&q=80',
-        data: chatBlock,
-        Component: ChatBlock,
-      },
-      {
         name: speechToTextBlock.name,
         img: 'https://nordicapis.com/wp-content/uploads/5-Best-Speech-to-Text-APIs-2-e1615383933700-1024x573.png',
         data: speechToTextBlock,
         Component: SpeechToTextBlock,
+      },
+      {
+        name: chatBlock.name,
+        img: 'https://images.unsplash.com/photo-1684487747720-1ba29cda82f8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1332&q=80',
+        data: chatBlock,
+        Component: ChatBlock,
       },
       {
         name: textToSpeechBlock.name,
@@ -59,6 +59,8 @@ export const ExampleClient = () => {
               channel.push('remove_block', { name: 'speech_to_text' });
               channel.push('remove_block', { name: 'chat' });
               channel.push('remove_block', { name: 'text_to_speech' });
+
+              channel.push('reset_blocks', {});
 
               setBlocks([]);
             }}

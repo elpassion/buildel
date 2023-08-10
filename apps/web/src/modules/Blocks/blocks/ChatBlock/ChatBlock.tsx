@@ -25,8 +25,7 @@ export const ChatBlock = () => {
         messages: [
           {
             role: 'system',
-            content:
-              "You are a helpful assistant. Always answer in not more than 1 sentences! It's very important!",
+            content: 'You are a helpful assistant.',
           },
         ],
       },
