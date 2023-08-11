@@ -1,17 +1,11 @@
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
-const API_URL = process.env.API_URL;
-const PAGE_URL = process.env.PAGE_URL;
+import { ENV } from './src/env.mjs';
 
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
   trailingSlash: true,
   env: {
-    OPENAI_API_KEY,
-    ELEVENLABS_API_KEY,
-    API_URL,
-    PAGE_URL,
+    ...ENV,
   },
 };
 

@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { Channel, Socket } from 'phoenix';
+import { ENV } from '~/env.mjs';
 import { useEffectOnce } from '~/utils/hooks';
 
 type Action = {
@@ -34,7 +35,7 @@ type BlocksProviderProps = {
   children: React.ReactNode;
 };
 function BlocksProvider({ children }: BlocksProviderProps) {
-  const socket = new Socket(`ws://${process.env.API_URL}/socket`);
+  const socket = new Socket(ENV.WEBSOCKET_URL);
   socket.connect();
 
   const channel = socket.channel(`audio_conversations:${Math.random()}`, {});
