@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Button, Card, Image, Text } from '@mantine/core';
+import Image from 'next/image';
+import { Button } from '@elpassion/taco';
 import {
   AudioInputBlock,
   ChatBlock,
@@ -53,7 +54,7 @@ export const ExampleClient = () => {
       <div className="">
         <div className="flex gap-4">
           <Button
-            color="red"
+            text="Reset"
             onClick={() => {
               channel.push('remove_block', { name: 'audio_input' });
               channel.push('remove_block', { name: 'speech_to_text' });
@@ -64,42 +65,37 @@ export const ExampleClient = () => {
 
               setBlocks([]);
             }}
-          >
-            Reset
-          </Button>
+          />
+
           <Button
+            text="Get blocks"
             onClick={() => {
               ppush(channel, 'get_blocks', {}).then(console.log);
             }}
-          >
-            Get blocks
-          </Button>
+          />
         </div>
 
         <div className="mb-8" />
 
-        <Text className="text-2xl">Add block</Text>
+        <p className="text-2xl">Add block</p>
 
         <div className="mb-4" />
 
         <div className="grid cursor-pointer grid-cols-4 gap-4">
           {blockList.map((block) => (
-            <Card
+            <div
               key={block.name}
-              shadow="sm"
-              padding="sm"
               onClick={() => {
                 setBlocks((prevState: any) => [...prevState, block]);
               }}
             >
-              <Card.Section>
-                <Image src={block.img} h={160} alt="Audio input" />
-              </Card.Section>
+              <div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={block.img} height={160} alt="Audio input" />
+              </div>
 
-              <Text fw={500} size="lg" mt="md">
-                {block.name.replaceAll('_', ' ').toUpperCase()}
-              </Text>
-            </Card>
+              <p>{block.name.replaceAll('_', ' ').toUpperCase()}</p>
+            </div>
           ))}
         </div>
 

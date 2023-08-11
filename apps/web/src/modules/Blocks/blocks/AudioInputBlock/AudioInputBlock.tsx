@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Code } from '@mantine/core';
 import { BlockWrapper } from '~/modules/Blocks';
 import { AudioRecorder } from '.';
 
@@ -16,7 +15,7 @@ export const AudioInputBlock = () => {
     <BlockWrapper name="AudioInput">
       <AudioRecorder />
       <div className="mb-4" />
-      <Code block>{dataCode}</Code>
+      <pre>{dataCode}</pre>
     </BlockWrapper>
   );
 };

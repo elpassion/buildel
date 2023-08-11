@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Button, Code } from '@mantine/core';
 import { BlockWrapper, useBlocks } from '~/modules/Blocks';
 import { useEffectOnce } from '~/utils/hooks';
 
@@ -63,7 +62,7 @@ export const TextToSpeechBlock = () => {
 
   return (
     <BlockWrapper name="TextToSpeech">
-      <Code block>{dataCode}</Code>
+      <pre>{dataCode}</pre>
     </BlockWrapper>
   );
 };

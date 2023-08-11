@@ -1,6 +1,7 @@
+'use client';
+
 import React from 'react';
-import { ActionIcon, Button } from '@mantine/core';
-import { IconMicrophone, IconMicrophoneOff } from '@tabler/icons-react';
+import { Icon } from '@elpassion/taco';
 import { useBlocks } from '~/modules/Blocks';
 import { useEffectOnce } from '~/utils/hooks';
 
@@ -87,22 +88,10 @@ export const AudioRecorder = () => {
   return (
     <div>
       {isPermitted && recordingStatus === 'inactive' ? (
-        <ActionIcon
-          onClick={startRecording}
-          variant="filled"
-          aria-label="Settings"
-        >
-          <IconMicrophone />
-        </ActionIcon>
+        <Icon iconName="mic" onClick={startRecording} />
       ) : null}
       {recordingStatus === 'recording' ? (
-        <ActionIcon
-          onClick={stopRecording}
-          variant="filled"
-          aria-label="Settings"
-        >
-          <IconMicrophoneOff />
-        </ActionIcon>
+        <Icon iconName="mic-off" onClick={stopRecording} />
       ) : null}
     </div>
   );

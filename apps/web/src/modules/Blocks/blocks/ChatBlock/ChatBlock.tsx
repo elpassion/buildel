@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Code, Input } from '@mantine/core';
+import { Input } from '@elpassion/taco';
 import { BlockWrapper, useBlocks } from '~/modules/Blocks';
 import { useEffectOnce } from '~/utils/hooks';
 
@@ -57,32 +57,31 @@ export const ChatBlock = () => {
 
   return (
     <BlockWrapper name="Chat">
-      <Code block>{dataCode}</Code>
+      <pre>{dataCode}</pre>
 
       <div className="mb-4" />
 
-      <Input.Wrapper label="Context">
-        <Input
-          placeholder="Give me some context"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          onBlur={() => {
-            // channel.push('update_block', {
-            //   name: 'chat',
-            //   opts: {
-            //     input: 'speech_to_text_output',
-            //     messages: [
-            //       {
-            //         role: 'system',
-            //         content,
-            //       },
-            //     ],
-            //   },
-            //   forward_outputs: ['sentences_output'],
-            // });
-          }}
-        />
-      </Input.Wrapper>
+      <Input
+        id="content"
+        placeholder="Give me some context"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        onBlur={() => {
+          // channel.push('update_block', {
+          //   name: 'chat',
+          //   opts: {
+          //     input: 'speech_to_text_output',
+          //     messages: [
+          //       {
+          //         role: 'system',
+          //         content,
+          //       },
+          //     ],
+          //   },
+          //   forward_outputs: ['sentences_output'],
+          // });
+        }}
+      />
     </BlockWrapper>
   );
 };
