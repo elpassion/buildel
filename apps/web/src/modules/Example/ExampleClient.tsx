@@ -1,8 +1,8 @@
 'use client';
 
-import { Card } from '@elpassion/taco';
 import React from 'react';
 import z from 'zod';
+import { Card } from '@elpassion/taco';
 import { ENV } from '~/env.mjs';
 import { ppush, useBlocks } from '~/modules/Blocks';
 import { useEffectOnce } from '~/utils/hooks';
@@ -67,7 +67,7 @@ export const ExampleClient = () => {
   >([]);
   useEffectOnce(() => {
     const getBlockTypes = async () => {
-      const response = await fetch(`http://${ENV.API_URL}/api/block_types`);
+      const response = await fetch(`${ENV.API_URL}/api/block_types`);
       const data = await response.json();
       const blockTypesResponse = BlockTypesResponse.parse(data);
       setBlockTypes(blockTypesResponse.data);

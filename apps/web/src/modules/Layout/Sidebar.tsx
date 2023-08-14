@@ -1,7 +1,18 @@
 'use client';
 
 import React from 'react';
-import { ResponsiveSidebar } from '@elpassion/taco';
+import Link from 'next/link';
+import {
+  Avatar,
+  Button,
+  Divider,
+  Icon,
+  IconButton,
+  LinearProgressBar,
+  MenuItem,
+  ResponsiveSidebar,
+} from '@elpassion/taco';
+import { ROUTES } from '~/modules/Config';
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -13,7 +24,6 @@ export const Sidebar = () => {
         setIsOpen(!isOpen);
       }}
       sidebarClassName="sticky top-0 bg-white border-r border-gray-200"
-      drawerClassName="pt-[68px]"
       collapseBtnClassName="absolute top-14 -right-2"
       topContent={<SidebarTopContent />}
       bottomContent={<SidebarBottomContent />}
@@ -26,16 +36,36 @@ export const Sidebar = () => {
 function SidebarMainContent() {
   return (
     <div>
-      <div>Main</div>
+      <div className="mt-1" />
+      <MenuItem text="Dashboard" leftIcon={<Icon iconName="home" />} />
+      <div>
+        <MenuItem
+          text="Projects"
+          leftIcon={<Icon iconName="three-layers" />}
+          rightIcon={<Icon iconName="chevron-up" />}
+        />
+        <div className="ml-9">
+          <MenuItem text="Project 1" />
+          <MenuItem text="Project 2" />
+          <MenuItem text="Project 3" />
+        </div>
+      </div>
+      <MenuItem
+        text="My local repos"
+        leftIcon={<Icon iconName="briefcase" />}
+        rightIcon={<Icon iconName="chevron-down" />}
+      />
     </div>
   );
 }
 
 function SidebarTopContent() {
   return (
-    <div className="">
-      <div className="p-2">
-        <h1 className="text-sm font-medium text-neutral-500">ACME inc.</h1>
+    <div className="min-h-smNavbar border-b">
+      <div className="flex h-full w-full items-center">
+        <h1 className="font-medium text-neutral-500">
+          <Link href={ROUTES.HOME}>ACME inc.</Link>
+        </h1>
       </div>
     </div>
   );
@@ -44,7 +74,40 @@ function SidebarTopContent() {
 function SidebarBottomContent() {
   return (
     <div>
-      <h2>Bottom</h2>
+      <div className="border-b pb-4">
+        <p className="text-sm font-medium text-neutral-500">Credit usage</p>
+        <div className="mb-2" />
+        <LinearProgressBar progress={49.8} label="none" />
+        <div className="mb-2" />
+        <p className="text-xs font-medium text-neutral-500">
+          $2.49 / $5.00 this month
+        </p>
+        <div className="mb-3" />
+        <Button text="Top up" isFluid />
+      </div>
+
+      <div className="mt-4 flex flex-col gap-4 border-b pb-4">
+        <MenuItem text="Support" leftIcon={<Icon iconName="life-buoy" />} />
+        <MenuItem text="Settings" leftIcon={<Icon iconName="settings" />} />
+      </div>
+
+      <div className="mt-4 flex items-center justify-between pb-4">
+        <Link href="#profile">
+          <Avatar
+            alt="Anna Kapusta"
+            caption="anna@kapusta.pl"
+            contentType="text"
+            label="Anna Kapusta"
+            name="Anna Kapusta"
+            shape="circle"
+            size="md"
+          />
+        </Link>
+
+        <Link href="#log-out">
+          <Icon iconName="log-out" />
+        </Link>
+      </div>
     </div>
   );
 }

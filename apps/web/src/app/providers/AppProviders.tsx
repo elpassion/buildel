@@ -32,7 +32,7 @@ export function AppProviders({ children }: ProvidersProps) {
     <QueryClientProvider client={queryClient}>
       {children}
 
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools position="bottom-right" initialIsOpen={false} />
     </QueryClientProvider>
   );
 }
