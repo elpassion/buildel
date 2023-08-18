@@ -31,7 +31,7 @@ export const Layout = ({ children }: LayoutProps) => {
           <Navbar />
 
           <main className="h-fit w-full min-w-0 flex-grow bg-neutral-50 p-8">
-            <div className="mx-auto max-w-5xl">{children}</div>
+            <div className="mx-auto">{children}</div>
           </main>
         </div>
       </div>

@@ -15,10 +15,10 @@ export function AppProviders({ children }: ProvidersProps) {
         defaultOptions: {
           queries: {
             retry: (failureCount, error: any) => {
-              if (error?.response.status == 502 && failureCount > 3) {
+              if (error?.response?.status == 502 && failureCount > 3) {
                 return false;
               }
-              if (error?.response.status >= 400) {
+              if (error?.response?.status >= 400) {
                 return false;
               }
               return true;
