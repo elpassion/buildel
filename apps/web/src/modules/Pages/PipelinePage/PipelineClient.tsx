@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { startCase } from 'lodash';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
@@ -19,16 +19,25 @@ import { assert } from '~/utils/assert';
 import { useModal } from '~/utils/hooks/useModal';
 import { AddBlockForm } from './AddBlockForm';
 import { FieldProps, Schema } from './Schema';
+import { EditBlockForm } from './EditBlockForm';
 
 export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
   const { data: blockTypes } = useBlockTypes();
   const { isModalOpen, openModal, closeModal } = useModal();
+  const [currentlyEditedBlock, setCurrentlyEditedBlock] =
+    useState<z.TypeOf<typeof BlockConfig>>();
   const updatePipeline = useUpdatePipeline(params.pipelineId, {
     onSuccess: () => {
+      setCurrentlyEditedBlock(undefined);
       closeModal();
     },
   });
+  function editBlock(block: z.TypeOf<typeof BlockConfig>) {
+    setCurrentlyEditedBlock(block);
+    openModal();
+  }
+
   const { config } = pipeline;
 
   const methods = useForm({
@@ -59,6 +68,7 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
         name: block.name,
         type: blockType.type,
         opts: block.opts,
+        forward_outputs: block.forward_outputs,
         blockType,
       };
     })
@@ -66,6 +76,7 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
     name: string;
     type: string;
     opts: {};
+    forward_outputs: string[];
     blockType: z.TypeOf<typeof BlockType>;
   }[];
 
@@ -90,18 +101,39 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
             </div>
           </div>
           <div className="mt-8">
-            <AddBlockForm
-              onSubmit={(data) => {
-                assert(pipeline);
-                updatePipeline.mutate({
-                  name: 'test',
-                  config: {
-                    version: pipeline.config.version,
-                    blocks: [...pipeline.config.blocks, data],
-                  },
-                });
-              }}
-            />
+            {currentlyEditedBlock ? (
+              <EditBlockForm
+                blockConfig={currentlyEditedBlock}
+                onSubmit={(data) => {
+                  assert(pipeline);
+                  updatePipeline.mutate({
+                    name: 'test',
+                    config: {
+                      version: pipeline.config.version,
+                      blocks: pipeline.config.blocks.map((block) => {
+                        if (block.name === currentlyEditedBlock.name) {
+                          return data;
+                        }
+                        return block;
+                      }),
+                    },
+                  });
+                }}
+              />
+            ) : (
+              <AddBlockForm
+                onSubmit={(data) => {
+                  assert(pipeline);
+                  updatePipeline.mutate({
+                    name: 'test',
+                    config: {
+                      version: pipeline.config.version,
+                      blocks: [...pipeline.config.blocks, data],
+                    },
+                  });
+                }}
+              />
+            )}
           </div>
         </div>
       </Modal>
@@ -145,19 +177,21 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
             <div className="mt-2 space-y-2 border p-2">
               {blocks.map((block, index) => (
                 <Card className="bg-white p-4" key={block.name}>
-                  <div className="text-xs font-bold">
-                    {startCase(block.type)}
-                  </div>
-                  <div className="text-xxs">{block.name}</div>
-                  <div className="mt-2 border bg-neutral-50 p-2">
-                    <Schema
-                      schema={block.blockType.schema}
-                      name={`blocks.${index}`}
-                      fields={{
-                        string: StringSummaryField,
-                        number: NumberSummaryField,
-                      }}
-                    />
+                  <div onClick={() => editBlock(block)}>
+                    <div className="text-xs font-bold">
+                      {startCase(block.type)}
+                    </div>
+                    <div className="text-xxs">{block.name}</div>
+                    <div className="mt-2 border bg-neutral-50 p-2">
+                      <Schema
+                        schema={block.blockType.schema}
+                        name={`blocks.${index}`}
+                        fields={{
+                          string: StringSummaryField,
+                          number: NumberSummaryField,
+                        }}
+                      />
+                    </div>
                   </div>
                 </Card>
               ))}
