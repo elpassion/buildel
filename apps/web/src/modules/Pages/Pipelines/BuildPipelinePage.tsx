@@ -15,6 +15,7 @@ import {
 import { assert } from '~/utils/assert';
 import { AddBlockForm } from './AddBlockForm';
 import { FieldProps, Schema } from './Schema';
+import { useModal } from '~/utils/hooks/useModal';
 
 export function BuildPipelinePage({
   params,
@@ -23,12 +24,12 @@ export function BuildPipelinePage({
 }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
   const { data: blockTypes } = useBlockTypes();
+  const { isModalOpen, openModal, closeModal } = useModal();
   const updatePipeline = useUpdatePipeline(params.pipelineId, {
     onSuccess: () => {
       closeModal();
     },
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const config = pipeline ? pipeline.config : { version: '0', blocks: [] };
 
   const methods = useForm({
@@ -89,14 +90,6 @@ export function BuildPipelinePage({
     opts: {};
     blockType: z.TypeOf<typeof BlockType>;
   }[];
-
-  function openModal(): void {
-    setIsModalOpen(true);
-  }
-
-  function closeModal(): void {
-    setIsModalOpen(false);
-  }
 
   return (
     <>
