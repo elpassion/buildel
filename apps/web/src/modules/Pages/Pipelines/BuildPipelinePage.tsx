@@ -76,7 +76,7 @@ export function BuildPipelinePage({
             <div className="text-xs font-bold">{trigger.name}</div>
             <div className="text-xxs">{trigger.url}</div>
             <div className="mt-2">
-              <p className="text-xxs font-medium text-neutral-400">Inputs:</p>
+              <p className="text-xxs font-medium text-neutral-400">Inputs</p>
               <div className="space-x-2">
                 {trigger.inputs.map((input) => (
                   <Badge text={input.name} size="sm" variant="outline" />
@@ -100,7 +100,23 @@ export function BuildPipelinePage({
           ))}
         </div>
       </div>
-      <Card>dupa</Card>
+      <div>
+        <div className="flex">Output</div>
+        <div className="mt-2">
+          <Card className="bg-white p-4">
+            <div className="text-xs font-bold">{trigger.name}</div>
+            <div className="text-xxs">{trigger.url}</div>
+            <div className="mt-2">
+              <p className="text-xxs font-medium text-neutral-400">Outputs</p>
+              <div className="space-x-2">
+                {trigger.outputs.map((output) => (
+                  <Badge text={output.name} size="sm" variant="outline" />
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
