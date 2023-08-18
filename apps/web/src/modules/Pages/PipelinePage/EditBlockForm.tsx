@@ -14,9 +14,11 @@ import { FieldProps, Schema } from './Schema';
 
 export function EditBlockForm({
   onSubmit,
+  onDelete,
   blockConfig,
 }: {
   onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
+  onDelete: (data: z.TypeOf<typeof BlockConfig>) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
 }) {
   const { data: blockTypes } = useBlockTypes();
@@ -71,12 +73,17 @@ export function EditBlockForm({
             />
           )}
         </div>
-        <Button
-          text="Confirm"
-          type="submit"
-          variant="filled"
-          className="mt-6"
-        />
+        <div className="mt-6 flex">
+          <Button text="Confirm" type="submit" variant="filled" />
+          <Button
+            onClick={() => onDelete(blockConfig)}
+            text="Delete"
+            type="button"
+            variant="filled"
+            hierarchy="destructive"
+            className="ml-auto"
+          />
+        </div>
       </form>
     </FormProvider>
   );

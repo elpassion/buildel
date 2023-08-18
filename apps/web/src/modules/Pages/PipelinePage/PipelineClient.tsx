@@ -24,15 +24,18 @@ import { EditBlockForm } from './EditBlockForm';
 export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
   const { data: blockTypes } = useBlockTypes();
-  const { isModalOpen, openModal, closeModal } = useModal();
+  const { isModalOpen, openModal, closeModal: closeModalBase } = useModal();
   const [currentlyEditedBlock, setCurrentlyEditedBlock] =
     useState<z.TypeOf<typeof BlockConfig>>();
   const updatePipeline = useUpdatePipeline(params.pipelineId, {
     onSuccess: () => {
-      setCurrentlyEditedBlock(undefined);
       closeModal();
     },
   });
+  function closeModal() {
+    setCurrentlyEditedBlock(undefined);
+    closeModalBase();
+  }
   function editBlock(block: z.TypeOf<typeof BlockConfig>) {
     setCurrentlyEditedBlock(block);
     openModal();
@@ -86,7 +89,9 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
         <div className="p-8">
           <div className="flex space-x-6">
             <div>
-              <div className="text-xl font-medium">Add block</div>
+              <div className="text-xl font-medium">
+                {currentlyEditedBlock ? 'Edit block' : 'Add block'}
+              </div>
               <div className="mt-4 text-sm text-neutral-400">
                 Blocks are modules within your app that can work simultaneously.
               </div>
@@ -116,6 +121,18 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
                         }
                         return block;
                       }),
+                    },
+                  });
+                }}
+                onDelete={() => {
+                  assert(pipeline);
+                  updatePipeline.mutate({
+                    name: 'test',
+                    config: {
+                      version: pipeline.config.version,
+                      blocks: pipeline.config.blocks.filter(
+                        (block) => block.name !== currentlyEditedBlock.name,
+                      ),
                     },
                   });
                 }}
