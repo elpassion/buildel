@@ -1,5 +1,5 @@
 'use client';
-import { Badge, Card } from '@elpassion/taco';
+import { Badge, Button, Card, Icon } from '@elpassion/taco';
 import { z } from 'zod';
 import {
   BlockType,
@@ -87,7 +87,17 @@ export function BuildPipelinePage({
         </div>
       </div>
       <div>
-        <div className="flex">Blocks</div>
+        <div className="flex items-center">
+          Blocks
+          <Button
+            text="Add"
+            variant="ghost"
+            hierarchy="primary"
+            size="xs"
+            className="ml-auto"
+            leftIcon={<Icon iconName="plus" />}
+          />
+        </div>
         <div className="mt-2 space-y-2 border p-2">
           {blocks.map((block) => (
             <Card className="bg-white p-4">
