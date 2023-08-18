@@ -22,9 +22,8 @@ import {
 } from '~/modules/Pipelines/hooks';
 import { startCase } from 'lodash';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { assert } from '~/utils/assert';
-import { useMutation } from '@tanstack/react-query';
 
 export function BuildPipelinePage({
   params,
@@ -40,27 +39,25 @@ export function BuildPipelinePage({
 
   const { data: blockTypes } = useBlockTypes();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const config = pipeline ? pipeline.data.config : { version: '0', blocks: [] };
+  const config = pipeline ? pipeline.config : { version: '0', blocks: [] };
 
   const methods = useForm({
     defaultValues: config,
   });
 
-  const { handleSubmit, watch, setValue } = methods;
+  const { setValue } = methods;
 
   useEffect(() => {
     setValue('blocks', config.blocks);
   }, [config.blocks]);
-
-  const onSubmit = (data: any) => console.log(data);
 
   if (!pipeline || !blockTypes) return null;
 
   const trigger = {
     name: 'Websocket',
     url: `ws://localhost:4000/pipelines/${params.pipelineId}`,
-    inputs: pipeline.data.config.blocks.reduce((inputs, block) => {
-      const blockType = blockTypes.data.find(
+    inputs: pipeline.config.blocks.reduce((inputs, block) => {
+      const blockType = blockTypes.find(
         (blockType) => blockType.type === block.type,
       );
       if (!blockType) return inputs;
@@ -70,8 +67,8 @@ export function BuildPipelinePage({
       }));
       return [...inputs, ...blockInputs];
     }, [] as z.TypeOf<typeof IOType>[]),
-    outputs: pipeline.data.config.blocks.reduce((outputs, block) => {
-      const blockType = blockTypes.data.find(
+    outputs: pipeline.config.blocks.reduce((outputs, block) => {
+      const blockType = blockTypes.find(
         (blockType) => blockType.type === block.type,
       );
       if (!blockType) return outputs;
@@ -83,9 +80,9 @@ export function BuildPipelinePage({
     }, [] as z.TypeOf<typeof IOType>[]),
   };
 
-  const blocks = pipeline.data.config.blocks
+  const blocks = pipeline.config.blocks
     .map((block) => {
-      const blockType = blockTypes.data.find(
+      const blockType = blockTypes.find(
         (blockType) => blockType.type === block.type,
       );
       if (!blockType) return null;
@@ -133,13 +130,14 @@ export function BuildPipelinePage({
           </div>
           <div className="mt-8">
             <AddBlockForm
-              blockTypes={blockTypes.data}
+              blockTypes={blockTypes}
               onSubmit={(data) => {
+                assert(pipeline);
                 updatePipeline.mutate({
                   name: 'test',
                   config: {
-                    version: pipeline!.data.config.version,
-                    blocks: [...pipeline!.data.config.blocks, data],
+                    version: pipeline.config.version,
+                    blocks: [...pipeline.config.blocks, data],
                   },
                 });
               }}
@@ -172,36 +170,34 @@ export function BuildPipelinePage({
         </div>
         <div>
           <FormProvider {...methods}>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="flex items-center">
-                Blocks
-                <Button
-                  onClick={openModal}
-                  text="Add"
-                  variant="ghost"
-                  hierarchy="primary"
-                  size="xs"
-                  className="ml-auto"
-                  leftIcon={<Icon iconName="plus" />}
-                />
-              </div>
-              <div className="mt-2 space-y-2 border p-2">
-                {blocks.map((block, index) => (
-                  <Card className="bg-white p-4" key={block.name}>
-                    <div className="text-xs font-bold">
-                      {startCase(block.type)}
-                    </div>
-                    <div className="text-xxs">{block.name}</div>
-                    <div className="mt-2 border bg-neutral-50 p-2">
-                      <Schema
-                        schema={block.blockType.schema}
-                        name={`blocks.${index}`}
-                      />
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </form>
+            <div className="flex items-center">
+              Blocks
+              <Button
+                onClick={openModal}
+                text="Add"
+                variant="ghost"
+                hierarchy="primary"
+                size="xs"
+                className="ml-auto"
+                leftIcon={<Icon iconName="plus" />}
+              />
+            </div>
+            <div className="mt-2 space-y-2 border p-2">
+              {blocks.map((block, index) => (
+                <Card className="bg-white p-4" key={block.name}>
+                  <div className="text-xs font-bold">
+                    {startCase(block.type)}
+                  </div>
+                  <div className="text-xxs">{block.name}</div>
+                  <div className="mt-2 border bg-neutral-50 p-2">
+                    <Schema
+                      schema={block.blockType.schema}
+                      name={`blocks.${index}`}
+                    />
+                  </div>
+                </Card>
+              ))}
+            </div>
           </FormProvider>
         </div>
         <div>

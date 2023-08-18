@@ -6,7 +6,7 @@ export function usePipelines() {
   return useQuery(['pipelines'], async () => {
     const response = await fetch(`${ENV.API_URL}/pipelines`);
     const json = response.json();
-    return PipelinesResponse.parse(json);
+    return PipelinesResponse.parse(json).data;
   });
 }
 
@@ -14,7 +14,7 @@ export function usePipeline(pipelineId: string) {
   return useQuery(['pipelines', pipelineId], async () => {
     const response = await fetch(`${ENV.API_URL}/pipelines/${pipelineId}`);
     const json = await response.json();
-    return PipelineResponse.parse(json);
+    return PipelineResponse.parse(json).data;
   });
 }
 
@@ -22,7 +22,9 @@ export function useUpdatePipeline(
   pipelineId: string,
   {
     onSuccess,
-  }: { onSuccess?: (response: z.TypeOf<typeof PipelineResponse>) => void } = {},
+  }: {
+    onSuccess?: (response: z.TypeOf<typeof PipelineResponse>['data']) => void;
+  } = {},
 ) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -35,7 +37,7 @@ export function useUpdatePipeline(
         body: JSON.stringify({ pipeline }),
       });
       const json = await response.json();
-      const pipelineResponse = PipelineResponse.parse(json);
+      const pipelineResponse = PipelineResponse.parse(json).data;
       queryClient.setQueryData(['pipelines', pipelineId], pipelineResponse);
       onSuccess?.(pipelineResponse);
     },
@@ -46,7 +48,7 @@ export function useBlockTypes() {
   return useQuery(['blockTypes'], async () => {
     const response = await fetch(`${ENV.API_URL}/block_types`);
     const json = await response.json();
-    return BlockTypesResponse.parse(json);
+    return BlockTypesResponse.parse(json).data;
   });
 }
 
