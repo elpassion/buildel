@@ -8,6 +8,7 @@ import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import { ENV } from '~/env.mjs';
 import {
+  BlockConfig,
   BlockType,
   IOType,
   useBlockTypes,
@@ -45,28 +46,7 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const trigger = {
     name: 'Websocket',
     url: `${ENV.WEBSOCKET_URL}/pipelines/${params.pipelineId}`,
-    inputs: pipeline.config.blocks.reduce((inputs, block) => {
-      const blockType = blockTypes.find(
-        (blockType) => blockType.type === block.type,
-      );
-      if (!blockType) return inputs;
-      const blockInputs = blockType.inputs.map((input) => ({
-        name: `${block.name}:${input.name}`,
-        type: input.type,
-      }));
-      return [...inputs, ...blockInputs];
-    }, [] as z.TypeOf<typeof IOType>[]),
-    outputs: pipeline.config.blocks.reduce((outputs, block) => {
-      const blockType = blockTypes.find(
-        (blockType) => blockType.type === block.type,
-      );
-      if (!blockType) return outputs;
-      const blockOutputs = blockType.outputs.map((output) => ({
-        name: `${block.name}:${output.name}`,
-        type: output.type,
-      }));
-      return [...outputs, ...blockOutputs];
-    }, [] as z.TypeOf<typeof IOType>[]),
+    ...getBlocksIO(config.blocks, blockTypes),
   };
 
   const blocks = pipeline.config.blocks
@@ -209,6 +189,41 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
       </div>
     </>
   );
+}
+
+function getBlocksIO(
+  blocks: z.TypeOf<typeof BlockConfig>[],
+  blockTypes: z.TypeOf<typeof BlockType>[],
+) {
+  return blocks.reduce(
+    ({ inputs, outputs }, block) => {
+      const blockType = (blockTypes || []).find(
+        (blockType) => blockType.type === block.type,
+      );
+      if (!blockType) return { inputs, outputs };
+      const forwardedOutputs = block.forward_outputs
+        .map((output) =>
+          blockType.outputs.find((outputType) => outputType.name === output),
+        )
+        .filter(Boolean) as z.TypeOf<typeof IOType>[];
+
+      return {
+        inputs: [...inputs, ...nameIO(block.name, blockType.inputs)],
+        outputs: [...outputs, ...nameIO(block.name, forwardedOutputs)],
+      };
+    },
+    {
+      inputs: [] as z.TypeOf<typeof IOType>[],
+      outputs: [] as z.TypeOf<typeof IOType>[],
+    },
+  );
+}
+
+function nameIO(name: string, io: z.TypeOf<typeof IOType>[]) {
+  return io.map((input) => ({
+    ...input,
+    name: `${name}:${input.name}`,
+  }));
 }
 
 function StringSummaryField({ field, name }: FieldProps) {
