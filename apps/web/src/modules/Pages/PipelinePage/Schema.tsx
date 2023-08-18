@@ -1,3 +1,4 @@
+import React from 'react';
 import { JSONSchemaField } from '~/modules/Pipelines/pipelines.hooks';
 
 export function Schema({
@@ -34,7 +35,7 @@ function Field({
     return Object.entries(field.properties).map(([propertyKey, value]) => {
       const fieldKey = name === null ? propertyKey : `${name}.${propertyKey}`;
       return (
-        <div key={name}>
+        <div key={fieldKey}>
           <Field
             field={value}
             name={fieldKey}
