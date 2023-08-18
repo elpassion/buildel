@@ -11,6 +11,7 @@ import {
 } from '~/modules/Pipelines/pipelines.hooks';
 import { assert } from '~/utils/assert';
 import { FieldProps, Schema } from './Schema';
+import { useEffect } from 'react';
 
 export function AddBlockForm({
   onSubmit,
@@ -28,6 +29,15 @@ export function AddBlockForm({
   const { handleSubmit, register, setValue, watch } = methods;
   const blockType = register('type');
   const blockTypeValue = watch('type');
+  const blockNameValue = watch('name');
+  useEffect(() => {
+    methods.reset({
+      name: blockNameValue,
+      type: blockTypeValue,
+      opts: {},
+      forward_outputs: [],
+    });
+  }, [blockTypeValue]);
 
   if (!blockTypes) return null;
 
