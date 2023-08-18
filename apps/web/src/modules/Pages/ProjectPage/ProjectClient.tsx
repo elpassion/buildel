@@ -1,14 +1,25 @@
 'use client';
 
-import { TApp, TBlockType } from '~/contracts';
+import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { AppsApi } from '~/modules/Api';
+import { ROUTES } from '~/modules/Config';
 import { CreateAppForm } from './components';
+
+const appsApi = new AppsApi();
 
 interface ProjectClientProps {
   id: string;
-  apps: TApp[];
 }
 
-export const ProjectClient = ({ id, apps }: ProjectClientProps) => {
+export const ProjectClient = ({ id }: ProjectClientProps) => {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['apps'],
+    queryFn: () => appsApi.getAll(),
+  });
+
+  const apps = data?.data ?? [];
+
   return (
     <>
       <h1 className="text-2xl">Project page {id}</h1>
@@ -18,27 +29,30 @@ export const ProjectClient = ({ id, apps }: ProjectClientProps) => {
       <div>
         <h2>Apps</h2>
 
+        <div className="mb-4" />
+
         <div>
           <CreateAppForm />
         </div>
 
-        {apps.length > 0 && (
+        {/* TODO (hub33k): extract to separate component */}
+        {isLoading ? (
+          <p className="animate-spins my-4">Loading apps. Please stand by</p>
+        ) : (
           <>
             <div className="mb-4" />
 
             <ul>
               {apps.map((app) => {
-                return <li key={app.id}>{app.name}</li>;
+                return (
+                  <li key={app.id}>
+                    <Link href={ROUTES.APP(app.id)}>{app.name}</Link>
+                  </li>
+                );
               })}
             </ul>
           </>
         )}
-
-        {/*<ul>*/}
-        {/*  <li>*/}
-        {/*    <Link href={ROUTES.APP('1')}>App One</Link>*/}
-        {/*  </li>*/}
-        {/*</ul>*/}
       </div>
     </>
   );

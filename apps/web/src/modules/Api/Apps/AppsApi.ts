@@ -20,8 +20,6 @@ export class AppsApi {
   }
 
   create(payload: TCreateApp) {
-    return this.client.post(`${this.baseUrl}`, {
-      ...payload,
-    });
+    return this.client.post<TCreateApp>(`${this.baseUrl}`, payload);
   }
 }

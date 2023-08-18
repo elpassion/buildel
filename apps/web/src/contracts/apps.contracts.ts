@@ -16,10 +16,14 @@ export const appSchema = z.object({
 export type TApp = z.infer<typeof appSchema>;
 
 export const createAppSchema = z.object({
-  name: z.string({
-    invalid_type_error: 'Name must be a string',
+  pipeline: z.object({
+    name: z.string({
+      invalid_type_error: 'Name must be a string',
+    }),
+    config: z.object({
+      version: z.number(),
+      blocks: z.object({}).array(),
+    }),
   }),
-  version: z.number(),
-  blocks: z.object({}).array(),
 });
 export type TCreateApp = z.infer<typeof createAppSchema>;
