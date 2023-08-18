@@ -3,7 +3,7 @@
 import { startCase } from 'lodash';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
-import { Button, Input, InputNumber } from '@elpassion/taco';
+import { Button, Checkbox, Input, InputNumber } from '@elpassion/taco';
 import { IDropdownOption, SelectDropdown } from '@elpassion/taco/Dropdown';
 import {
   BlockConfig,
@@ -27,7 +27,7 @@ export function EditBlockForm({
     defaultValues: blockConfig,
   });
   const { handleSubmit, register, setValue, watch } = methods;
-  const blockType = register('type');
+  const blockTypeField = register('type');
   const blockTypeValue = watch('type');
   const blockNameValue = watch('name');
   useEffect(() => {
@@ -41,13 +41,19 @@ export function EditBlockForm({
 
   if (!blockTypes) return null;
 
+  const blockType = blockTypes.find(
+    (blockType) => blockType.type === blockTypeValue,
+  );
+
+  const forwardOutputsField = register('forward_outputs');
+
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <SelectDropdown
-          id={blockType.name}
-          name={blockType.name}
-          ref={blockType.ref}
+          id={blockTypeField.name}
+          name={blockTypeField.name}
+          ref={blockTypeField.ref}
           defaultValue={{
             label: startCase(blockTypeValue),
             value: blockTypeValue,
@@ -55,7 +61,7 @@ export function EditBlockForm({
           }}
           onSelect={(item) => {
             setValue(
-              blockType.name,
+              blockTypeField.name,
               item ? (item as IDropdownOption).value : null!,
             );
           }}
@@ -68,19 +74,33 @@ export function EditBlockForm({
           isClearable
         />
         <div className="mt-6 space-y-4">
-          {blockTypeValue && (
-            <Schema
-              schema={
-                blockTypes.find(
-                  (blockType) => blockType.type === blockTypeValue,
-                )!.schema
-              }
-              name={null}
-              fields={{
-                string: StringField,
-                number: NumberField,
-              }}
-            />
+          {blockType && (
+            <>
+              <Schema
+                schema={blockType.schema}
+                name={null}
+                fields={{
+                  string: StringField,
+                  number: NumberField,
+                }}
+              />
+              <div className="mt-6">
+                Forwarded Outputs
+                <div>
+                  {blockType.outputs.map((output, index) => {
+                    return (
+                      <Checkbox
+                        key={output.name}
+                        labelText={output.name}
+                        id={`${output.name}.${index}`}
+                        value={output.name}
+                        {...forwardOutputsField}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </>
           )}
         </div>
         <div className="mt-6 flex">
