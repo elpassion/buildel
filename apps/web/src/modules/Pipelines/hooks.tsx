@@ -26,19 +26,19 @@ export function useBlockTypes() {
   });
 }
 
+export const BlockConfig = z.object({
+  name: z.string(),
+  forward_outputs: z.array(z.string()),
+  opts: z.object({}),
+  type: z.string(),
+});
+
 export const Pipeline = z.object({
   id: z.number(),
   name: z.string(),
   config: z.object({
     version: z.string(),
-    blocks: z.array(
-      z.object({
-        name: z.string(),
-        forward_outputs: z.array(z.string()),
-        opts: z.object({}),
-        type: z.string(),
-      }),
-    ),
+    blocks: z.array(BlockConfig),
   }),
 });
 
@@ -64,13 +64,6 @@ const BlockTypes = z.array(BlockType);
 
 const BlockTypesResponse = z.object({
   data: BlockTypes,
-});
-
-const Block = z.object({
-  name: z.string(),
-  forward_outputs: z.array(z.string()),
-  opts: z.object({}),
-  config: BlockType,
 });
 
 export type JSONSchemaField =

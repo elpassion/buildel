@@ -24,8 +24,8 @@ importers:
   apps/web:
     dependencies:
       '@elpassion/taco':
-        specifier: ^0.1.71
-        version: 0.1.71(@tanstack/react-table@8.9.3)(@types/react-dom@18.2.7)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0)
+        specifier: ^0.1.73
+        version: 0.1.73(@tanstack/react-table@8.9.3)(@types/react-dom@18.2.7)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0)
       '@hookform/resolvers':
         specifier: ^3.2.0
         version: 3.2.0(react-hook-form@7.45.2)
@@ -182,8 +182,8 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@elpassion/taco@0.1.71(@tanstack/react-table@8.9.3)(@types/react-dom@18.2.7)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0):
-    resolution: {integrity: sha512-56fusSHEZ+JCMh3oP5TosF1IyvvyoRyiUVpsi/UUBLCD8U1esjbLkMDKNtOlAUhSiEiL/YcYBOfw0glyeYSxcQ==}
+  /@elpassion/taco@0.1.73(@tanstack/react-table@8.9.3)(@types/react-dom@18.2.7)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0):
+    resolution: {integrity: sha512-W6X+0EXACq1f/XQ+LuGdgwhvWnyVWd8I0DqMwGs580BEb/QlAaCvYcykKG2ldC2Q+yFZ6PDTQ5R9vLSjD7d7FQ==}
     engines: {node: '>=16'}
     peerDependencies:
       '@tanstack/react-table': ^8.8.5
