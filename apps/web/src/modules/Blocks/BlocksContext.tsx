@@ -13,7 +13,7 @@ type Action = {
 type Dispatch = (action: Action) => void;
 type State = {
   socket: Socket;
-  channel: Channel;
+  channel?: Channel;
 };
 type Value = [state: State, dispatch: Dispatch];
 
@@ -38,25 +38,26 @@ function BlocksProvider({ children }: BlocksProviderProps) {
   const socket = new Socket(ENV.WEBSOCKET_URL);
   socket.connect();
 
-  const channel = socket.channel(`audio_conversations:${Math.random()}`, {});
+  // const channel = socket.channel(`pipeline_runs:test`, {});
 
   useEffectOnce(() => {
-    channel
-      .join()
-      .receive('ok', (resp) => {
-        console.log('Joined successfully', resp);
-      })
-      .receive('error', (resp) => {
-        console.log('Unable to join', resp);
-      });
-
-    // @ts-ignore
-    window.channel = channel;
+    // channel
+    //   .join()
+    //   .receive('ok', (resp) => {
+    //     console.log('Joined successfully', resp);
+    //   })
+    //   .receive('error', (resp) => {
+    //     console.log('Unable to join', resp);
+    //     // channel.leave();
+    //   });
+    //
+    // // @ts-ignore
+    // window.channel = channel;
   });
 
   const [state, dispatch] = React.useReducer(blocksReducer, {
     socket,
-    channel,
+    channel: undefined,
   });
   const value: Value = [state, dispatch];
   return (

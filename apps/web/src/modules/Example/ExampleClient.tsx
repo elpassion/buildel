@@ -65,6 +65,7 @@ export const ExampleClient = () => {
   const [blockTypes, setBlockTypes] = React.useState<
     z.infer<typeof BlockTypes>
   >([]);
+
   useEffectOnce(() => {
     const getBlockTypes = async () => {
       const response = await fetch(`${ENV.API_URL}/api/block_types`);
@@ -76,7 +77,7 @@ export const ExampleClient = () => {
   });
 
   const addBlock = async (blockType: string) => {
-    channel.push('add_block', {
+    channel?.push('add_block', {
       name: blockType,
       type: blockType,
       opts: {
@@ -85,7 +86,7 @@ export const ExampleClient = () => {
       },
       forward_outputs: [],
     });
-    const blocks = await ppush(channel, 'get_blocks', {});
+    const blocks = await ppush(channel!, 'get_blocks', {});
     const validatedBlocks = BlocksResponse.parse(blocks);
     setBlocks(validatedBlocks.blocks);
   };
@@ -139,7 +140,7 @@ export const ExampleClient = () => {
         <div className="mb-4" />
         <div className="grid cursor-pointer grid-cols-4 gap-4">
           {blockTypes.map((blockType) => (
-            <Card key={blockType.type}>
+            <Card key={blockType.type} className="p-4 font-medium">
               {blockType.type.replaceAll('_', ' ').toUpperCase()}
             </Card>
           ))}

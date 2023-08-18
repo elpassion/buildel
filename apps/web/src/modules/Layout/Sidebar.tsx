@@ -5,9 +5,7 @@ import Link from 'next/link';
 import {
   Avatar,
   Button,
-  Divider,
   Icon,
-  IconButton,
   LinearProgressBar,
   MenuItem,
   ResponsiveSidebar,
@@ -37,17 +35,27 @@ function SidebarMainContent() {
   return (
     <div>
       <div className="mt-1" />
-      <MenuItem text="Dashboard" leftIcon={<Icon iconName="home" />} />
+      <Link href={ROUTES.HOME}>
+        <MenuItem text="Dashboard" leftIcon={<Icon iconName="home" />} />
+      </Link>
       <div>
-        <MenuItem
-          text="Projects"
-          leftIcon={<Icon iconName="three-layers" />}
-          rightIcon={<Icon iconName="chevron-up" />}
-        />
-        <div className="ml-9">
-          <MenuItem text="Project 1" />
-          <MenuItem text="Project 2" />
-          <MenuItem text="Project 3" />
+        <Link href={ROUTES.PROJECTS}>
+          <MenuItem
+            text="Projects"
+            leftIcon={<Icon iconName="three-layers" />}
+            rightIcon={<Icon iconName="chevron-up" />}
+          />
+        </Link>
+        <div className="ml-4">
+          <Link href={ROUTES.PROJECT('1')}>
+            <MenuItem text="Project 1" />
+          </Link>
+          <Link href={ROUTES.PROJECT('2')}>
+            <MenuItem text="Project 2" />
+          </Link>
+          <Link href={ROUTES.PROJECT('3')}>
+            <MenuItem text="Project 3" />
+          </Link>
         </div>
       </div>
       <MenuItem
