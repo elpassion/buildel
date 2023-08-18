@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 import { ENV } from '~/env.mjs';
 
@@ -15,6 +15,30 @@ export function usePipeline(pipelineId: string) {
     const response = await fetch(`${ENV.API_URL}/pipelines/${pipelineId}`);
     const json = await response.json();
     return PipelineResponse.parse(json);
+  });
+}
+
+export function useUpdatePipeline(
+  pipelineId: string,
+  {
+    onSuccess,
+  }: { onSuccess?: (response: z.TypeOf<typeof PipelineResponse>) => void } = {},
+) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (pipeline: Omit<z.TypeOf<typeof Pipeline>, 'id'>) => {
+      const response = await fetch(`${ENV.API_URL}/pipelines/${pipelineId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pipeline }),
+      });
+      const json = await response.json();
+      const pipelineResponse = PipelineResponse.parse(json);
+      queryClient.setQueryData(['pipelines', pipelineId], pipelineResponse);
+      onSuccess?.(pipelineResponse);
+    },
   });
 }
 

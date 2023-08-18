@@ -18,11 +18,13 @@ import {
   JSONSchemaField,
   useBlockTypes,
   usePipeline,
+  useUpdatePipeline,
 } from '~/modules/Pipelines/hooks';
 import { startCase } from 'lodash';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { assert } from '~/utils/assert';
+import { useMutation } from '@tanstack/react-query';
 
 export function BuildPipelinePage({
   params,
@@ -30,9 +32,14 @@ export function BuildPipelinePage({
   params: { pipelineId: string };
 }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
+  const updatePipeline = useUpdatePipeline(params.pipelineId, {
+    onSuccess: () => {
+      closeModal();
+    },
+  });
+
   const { data: blockTypes } = useBlockTypes();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const config = pipeline ? pipeline.data.config : { version: '0', blocks: [] };
 
   const methods = useForm({
@@ -128,8 +135,13 @@ export function BuildPipelinePage({
             <AddBlockForm
               blockTypes={blockTypes.data}
               onSubmit={(data) => {
-                setValue('blocks', [...watch('blocks'), data]);
-                closeModal();
+                updatePipeline.mutate({
+                  name: 'test',
+                  config: {
+                    version: pipeline!.data.config.version,
+                    blocks: [...pipeline!.data.config.blocks, data],
+                  },
+                });
               }}
             />
           </div>
@@ -144,7 +156,7 @@ export function BuildPipelinePage({
               <div className="text-xxs">{trigger.url}</div>
               <div className="mt-2">
                 <p className="text-xxs font-medium text-neutral-400">Inputs</p>
-                <div className="space-x-2">
+                <div className="flex flex-wrap gap-2">
                   {trigger.inputs.map((input) => (
                     <Badge
                       key={input.name}
@@ -200,7 +212,7 @@ export function BuildPipelinePage({
               <div className="text-xxs">{trigger.url}</div>
               <div className="mt-2">
                 <p className="text-xxs font-medium text-neutral-400">Outputs</p>
-                <div className="space-x-2">
+                <div className="flex flex-wrap gap-2">
                   {trigger.outputs.map((output) => (
                     <Badge
                       key={output.name}
@@ -226,7 +238,13 @@ function AddBlockForm({
   blockTypes: z.TypeOf<typeof BlockType>[];
   onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
 }) {
-  const methods = useForm<z.TypeOf<typeof BlockConfig>>();
+  const methods = useForm<z.TypeOf<typeof BlockConfig>>({
+    defaultValues: {
+      name: '',
+      forward_outputs: [],
+      opts: {},
+    },
+  });
   const { handleSubmit, register, setValue, watch } = methods;
   const blockType = register('type');
   const blockTypeValue = watch('type');
