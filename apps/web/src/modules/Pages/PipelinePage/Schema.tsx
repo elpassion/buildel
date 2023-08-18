@@ -1,4 +1,4 @@
-import { JSONSchemaField } from '~/modules/Pipelines/hooks';
+import { JSONSchemaField } from '~/modules/Pipelines/pipelines.hooks';
 
 export function Schema({
   schema,

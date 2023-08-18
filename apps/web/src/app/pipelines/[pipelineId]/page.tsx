@@ -1,5 +1,3 @@
-import { BuildPipelinePage } from '~/modules/Pages/Pipelines/BuildPipelinePage';
+import { PipelinePage } from '~/modules/Pages';
 
-export default (params: any) => {
-  return <BuildPipelinePage {...params} />;
-};
+export default PipelinePage;

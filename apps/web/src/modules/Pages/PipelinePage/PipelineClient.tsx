@@ -1,27 +1,25 @@
 'use client';
-import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
-import { Modal } from '@elpassion/taco/Modal';
+
+import { useEffect } from 'react';
 import { startCase } from 'lodash';
-import { useEffect, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
+import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
+import { Modal } from '@elpassion/taco/Modal';
+import { ENV } from '~/env.mjs';
 import {
   BlockType,
   IOType,
   useBlockTypes,
   usePipeline,
   useUpdatePipeline,
-} from '~/modules/Pipelines/hooks';
+} from '~/modules/Pipelines/pipelines.hooks';
 import { assert } from '~/utils/assert';
+import { useModal } from '~/utils/hooks/useModal';
 import { AddBlockForm } from './AddBlockForm';
 import { FieldProps, Schema } from './Schema';
-import { useModal } from '~/utils/hooks/useModal';
 
-export function BuildPipelinePage({
-  params,
-}: {
-  params: { pipelineId: string };
-}) {
+export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
   const { data: blockTypes } = useBlockTypes();
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -40,13 +38,13 @@ export function BuildPipelinePage({
 
   useEffect(() => {
     setValue('blocks', config.blocks);
-  }, [config.blocks]);
+  }, [setValue, config.blocks]);
 
   if (!pipeline || !blockTypes) return null;
 
   const trigger = {
     name: 'Websocket',
-    url: `ws://localhost:4000/pipelines/${params.pipelineId}`,
+    url: `${ENV.WEBSOCKET_URL}/pipelines/${params.pipelineId}`,
     inputs: pipeline.config.blocks.reduce((inputs, block) => {
       const blockType = blockTypes.find(
         (blockType) => blockType.type === block.type,
