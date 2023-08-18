@@ -11,11 +11,24 @@ export function usePipelines() {
 }
 
 export function usePipeline(pipelineId: string) {
-  return useQuery(['pipelines', pipelineId], async () => {
-    const response = await fetch(`${ENV.API_URL}/pipelines/${pipelineId}`);
-    const json = await response.json();
-    return PipelineResponse.parse(json).data;
-  });
+  return useQuery(
+    ['pipelines', pipelineId],
+    async () => {
+      const response = await fetch(`${ENV.API_URL}/pipelines/${pipelineId}`);
+      const json = await response.json();
+      return PipelineResponse.parse(json).data;
+    },
+    {
+      initialData: {
+        id: parseInt(pipelineId),
+        name: '',
+        config: {
+          version: '0',
+          blocks: [],
+        },
+      },
+    },
+  );
 }
 
 export function useUpdatePipeline(

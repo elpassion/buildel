@@ -30,7 +30,7 @@ export function BuildPipelinePage({
       closeModal();
     },
   });
-  const config = pipeline ? pipeline.config : { version: '0', blocks: [] };
+  const { config } = pipeline;
 
   const methods = useForm({
     defaultValues: config,
