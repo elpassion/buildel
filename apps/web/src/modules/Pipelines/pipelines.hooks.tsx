@@ -118,6 +118,14 @@ export type JSONSchemaField =
       minLength?: number;
     }
   | {
+      type: 'string';
+      title: string;
+      description: string;
+      minLength?: number;
+      enum: string[];
+      enumPresentAs: 'checkbox' | 'radio';
+    }
+  | {
       type: 'number';
       title: string;
       description: string;

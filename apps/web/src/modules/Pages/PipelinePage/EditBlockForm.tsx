@@ -12,6 +12,7 @@ import {
 import { assert } from '~/utils/assert';
 import { FieldProps, Schema } from './Schema';
 import { useEffect } from 'react';
+import { NumberField, StringField } from './SchemaFormFields';
 
 export function EditBlockForm({
   onSubmit,
@@ -116,33 +117,5 @@ export function EditBlockForm({
         </div>
       </form>
     </FormProvider>
-  );
-}
-
-function StringField({ field, name }: FieldProps) {
-  const { register } = useFormContext();
-  assert(field.type === 'string');
-  return (
-    <Input
-      id={name!}
-      {...register(name!)}
-      label={field.title}
-      supportingText={field.description}
-    />
-  );
-}
-
-function NumberField({ field, name }: FieldProps) {
-  const { register, setValue } = useFormContext();
-  const { onChange, ...methods } = register(name!);
-  assert(field.type === 'number');
-  return (
-    <InputNumber
-      id={name!}
-      onChange={(value) => setValue(name!, value)}
-      {...methods}
-      label={field.title}
-      supportingText={field.description}
-    />
   );
 }
