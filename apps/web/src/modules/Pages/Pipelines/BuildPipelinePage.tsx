@@ -9,6 +9,8 @@ import {
   usePipeline,
 } from '~/modules/Pipelines/hooks';
 import { startCase } from 'lodash';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { useEffect } from 'react';
 
 export function BuildPipelinePage({
   params,
@@ -17,6 +19,34 @@ export function BuildPipelinePage({
 }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
   const { data: blockTypes } = useBlockTypes();
+
+  const blockFields = pipeline ? pipeline.data.config.blocks : [];
+
+  const methods = useForm({
+    defaultValues: {
+      blocks: [
+        {
+          name: 'test',
+        },
+        {
+          name: 'test2',
+        },
+      ],
+    },
+  });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    setValue,
+  } = methods;
+
+  useEffect(() => {
+    setValue('blocks', blockFields);
+  }, [blockFields]);
+
+  const onSubmit = (data: any) => console.log(data);
 
   if (!pipeline || !blockTypes) return null;
 
@@ -68,104 +98,128 @@ export function BuildPipelinePage({
   }[];
 
   return (
-    <div className="grid grid-cols-3 gap-12">
-      <div>
-        <div className="flex">Trigger</div>
-        <div className="mt-2">
-          <Card className="bg-white p-4">
-            <div className="text-xs font-bold">{trigger.name}</div>
-            <div className="text-xxs">{trigger.url}</div>
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="grid grid-cols-3 gap-12">
+          <div>
+            <div className="flex">Trigger</div>
             <div className="mt-2">
-              <p className="text-xxs font-medium text-neutral-400">Inputs</p>
-              <div className="space-x-2">
-                {trigger.inputs.map((input) => (
-                  <Badge text={input.name} size="sm" variant="outline" />
-                ))}
-              </div>
+              <Card className="bg-white p-4">
+                <div className="text-xs font-bold">{trigger.name}</div>
+                <div className="text-xxs">{trigger.url}</div>
+                <div className="mt-2">
+                  <p className="text-xxs font-medium text-neutral-400">
+                    Inputs
+                  </p>
+                  <div className="space-x-2">
+                    {trigger.inputs.map((input) => (
+                      <Badge text={input.name} size="sm" variant="outline" />
+                    ))}
+                  </div>
+                </div>
+              </Card>
             </div>
-          </Card>
-        </div>
-      </div>
-      <div>
-        <div className="flex items-center">
-          Blocks
-          <Button
-            text="Add"
-            variant="ghost"
-            hierarchy="primary"
-            size="xs"
-            className="ml-auto"
-            leftIcon={<Icon iconName="plus" />}
-          />
-        </div>
-        <div className="mt-2 space-y-2 border p-2">
-          {blocks.map((block) => (
-            <Card className="bg-white p-4">
-              <div className="text-xs font-bold">{startCase(block.type)}</div>
-              <div className="text-xxs">{block.name}</div>
-              <div className="mt-2 border bg-neutral-50 p-2">
-                {renderSchema(block.blockType.schema)}
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-      <div>
-        <div className="flex">Output</div>
-        <div className="mt-2">
-          <Card className="bg-white p-4">
-            <div className="text-xs font-bold">{trigger.name}</div>
-            <div className="text-xxs">{trigger.url}</div>
+          </div>
+          <div>
+            <div className="flex items-center">
+              Blocks
+              <Button
+                text="Add"
+                variant="ghost"
+                hierarchy="primary"
+                size="xs"
+                className="ml-auto"
+                leftIcon={<Icon iconName="plus" />}
+              />
+            </div>
+            <div className="mt-2 space-y-2 border p-2">
+              {blocks.map((block, index) => (
+                <Card className="bg-white p-4">
+                  <div className="text-xs font-bold">
+                    {startCase(block.type)}
+                  </div>
+                  <div className="text-xxs">{block.name}</div>
+                  <div className="mt-2 border bg-neutral-50 p-2">
+                    <Schema
+                      schema={block.blockType.schema}
+                      name={`blocks.${index}`}
+                    />
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="flex">Output</div>
             <div className="mt-2">
-              <p className="text-xxs font-medium text-neutral-400">Outputs</p>
-              <div className="space-x-2">
-                {trigger.outputs.map((output) => (
-                  <Badge text={output.name} size="sm" variant="outline" />
-                ))}
-              </div>
+              <Card className="bg-white p-4">
+                <div className="text-xs font-bold">{trigger.name}</div>
+                <div className="text-xxs">{trigger.url}</div>
+                <div className="mt-2">
+                  <p className="text-xxs font-medium text-neutral-400">
+                    Outputs
+                  </p>
+                  <div className="space-x-2">
+                    {trigger.outputs.map((output) => (
+                      <Badge text={output.name} size="sm" variant="outline" />
+                    ))}
+                  </div>
+                </div>
+              </Card>
             </div>
-          </Card>
+          </div>
         </div>
-      </div>
-    </div>
+      </form>
+    </FormProvider>
   );
 }
 
-function renderSchema(schema: string) {
+function Schema({ schema, name }: { schema: string; name: string | null }) {
   const schemaObj = JSON.parse(schema);
-  return renderField(schemaObj, null, schemaObj);
+  return <Field field={schemaObj} name={name} schema={schemaObj} />;
 }
 
-function renderField(
-  field: JSONSchemaField,
-  key: string | null,
-  schema: JSONSchemaField,
-) {
+function Field({
+  field,
+  name,
+  schema,
+}: {
+  field: JSONSchemaField;
+  name: string | null;
+  schema: JSONSchemaField;
+}) {
+  const { watch } = useFormContext();
+  const value = watch(name!);
   if (field.type === 'string') {
     return (
       <div>
         <p className="text-xxs font-medium text-neutral-400">{field.title}</p>
-        <p className="text-xxs text-neutral-700">{field.description}</p>
+        <p className="text-xxs font-medium text-neutral-700">{value}</p>
       </div>
     );
   } else if (field.type === 'number') {
     return (
       <div>
         <p className="text-xxs font-medium">{field.title}</p>
+        <input name={name!} />
         <p className="text-xxs">{field.description}</p>
       </div>
     );
   } else if (field.type === 'object') {
     return Object.entries(field.properties).map(([propertyKey, value]) => {
-      const fieldKey = key === null ? propertyKey : `${key}.${propertyKey}`;
-      return <div key={key}>{renderField(value, fieldKey, schema)}</div>;
+      const fieldKey = name === null ? propertyKey : `${name}.${propertyKey}`;
+      return (
+        <div key={name}>
+          <Field field={value} name={fieldKey} schema={schema} />
+        </div>
+      );
     });
   } else if (field.type === 'array') {
-    const fieldKey = key === null ? '0' : `${key}.0`;
+    const fieldKey = name === null ? '0' : `${name}.0`;
     return (
       <div>
         {field.title} - {field.description}
-        {renderField(field.items, fieldKey, schema)}
+        <Field field={field.items} name={fieldKey} schema={schema} />
       </div>
     );
   }
