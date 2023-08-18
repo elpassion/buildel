@@ -1,17 +1,16 @@
 'use client';
 
-import { startCase } from 'lodash';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { z } from 'zod';
-import { Button, Checkbox, Input, InputNumber } from '@elpassion/taco';
+import { Button } from '@elpassion/taco';
 import { IDropdownOption, SelectDropdown } from '@elpassion/taco/Dropdown';
+import { startCase } from 'lodash';
+import { useEffect } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { z } from 'zod';
 import {
   BlockConfig,
   useBlockTypes,
 } from '~/modules/Pipelines/pipelines.hooks';
-import { assert } from '~/utils/assert';
-import { FieldProps, Schema } from './Schema';
-import { useEffect } from 'react';
+import { Schema } from './Schema';
 import { NumberField, StringField } from './SchemaFormFields';
 
 export function EditBlockForm({
@@ -76,32 +75,14 @@ export function EditBlockForm({
         />
         <div className="mt-6 space-y-4">
           {blockType && (
-            <>
-              <Schema
-                schema={blockType.schema}
-                name={null}
-                fields={{
-                  string: StringField,
-                  number: NumberField,
-                }}
-              />
-              <div className="mt-6">
-                Forwarded Outputs
-                <div>
-                  {blockType.outputs.map((output, index) => {
-                    return (
-                      <Checkbox
-                        key={output.name}
-                        labelText={output.name}
-                        id={`${output.name}.${index}`}
-                        value={output.name}
-                        {...forwardOutputsField}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            </>
+            <Schema
+              schema={blockType.schema}
+              name={null}
+              fields={{
+                string: StringField,
+                number: NumberField,
+              }}
+            />
           )}
         </div>
         <div className="mt-6 flex">

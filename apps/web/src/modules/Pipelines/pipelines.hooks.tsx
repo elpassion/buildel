@@ -68,7 +68,7 @@ export function useBlockTypes() {
 export const BlockConfig = z.object({
   name: z.string(),
   forward_outputs: z.array(z.string()),
-  opts: z.object({}),
+  opts: z.record(z.string(), z.any()),
   type: z.string(),
 });
 

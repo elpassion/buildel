@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { startCase } from 'lodash';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { z } from 'zod';
 import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
+import { startCase } from 'lodash';
+import { useEffect, useState } from 'react';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { z } from 'zod';
 import { ENV } from '~/env.mjs';
 import {
   BlockConfig,
@@ -18,8 +18,8 @@ import {
 import { assert } from '~/utils/assert';
 import { useModal } from '~/utils/hooks/useModal';
 import { AddBlockForm } from './AddBlockForm';
-import { FieldProps, Schema } from './Schema';
 import { EditBlockForm } from './EditBlockForm';
+import { FieldProps, Schema } from './Schema';
 
 export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
@@ -78,7 +78,7 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
     .filter(Boolean) as {
     name: string;
     type: string;
-    opts: {};
+    opts: Record<string, unknown>;
     forward_outputs: string[];
     blockType: z.TypeOf<typeof BlockType>;
   }[];
