@@ -91,7 +91,7 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
 
   return (
     <>
-      <Modal isOpen={isModalOpen} closeModal={closeModal}>
+      <Modal isOpen={isModalOpen} closeModal={closeModal} ariaHideApp={false}>
         <div className="p-8">
           <div className="flex space-x-6">
             <div>
