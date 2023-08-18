@@ -1,13 +1,5 @@
 'use client';
-import {
-  Badge,
-  Button,
-  Card,
-  Icon,
-  IconButton,
-  Input,
-  InputNumber,
-} from '@elpassion/taco';
+import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import { startCase } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -16,7 +8,6 @@ import { z } from 'zod';
 import {
   BlockType,
   IOType,
-  JSONSchemaField,
   useBlockTypes,
   usePipeline,
   useUpdatePipeline,
