@@ -33,7 +33,7 @@ export function StringField({ field, name }: FieldProps) {
       <RadioCardGroup
         mainLabel={field.title}
         options={field.enum.map((value) => ({
-          id: value,
+          id: `${name}.${value}`,
           labelText: value,
           value: value,
         }))}
@@ -132,16 +132,15 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
             fields={fields}
             schema={schema}
           />
-          {rhfFields.length > 1 && (
-            <IconButton
-              variant="ghost"
-              icon={<Icon iconName="trash" />}
-              onClick={(e) => {
-                e.preventDefault();
-                remove(index);
-              }}
-            />
-          )}
+          <IconButton
+            variant="ghost"
+            icon={<Icon iconName="trash" />}
+            disabled={rhfFields.length === 1}
+            onClick={(e) => {
+              e.preventDefault();
+              remove(index);
+            }}
+          />
         </div>
       ))}
       <Button
