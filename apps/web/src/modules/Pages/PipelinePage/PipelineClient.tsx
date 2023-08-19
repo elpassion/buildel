@@ -19,7 +19,7 @@ import { assert } from '~/utils/assert';
 import { useModal } from '~/utils/hooks/useModal';
 import { AddBlockForm } from './AddBlockForm';
 import { EditBlockForm } from './EditBlockForm';
-import { FieldProps, Schema } from './Schema';
+import { Field, FieldProps, Schema } from './Schema';
 
 export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
@@ -206,6 +206,7 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
                         fields={{
                           string: StringSummaryField,
                           number: NumberSummaryField,
+                          array: ArraySummaryField,
                         }}
                       />
                     </div>
@@ -299,6 +300,34 @@ function NumberSummaryField({ field, name }: FieldProps) {
     <div>
       <p className="text-xxs font-medium text-neutral-400">{field.title}</p>
       <p className="text-xxs font-medium text-neutral-700">{value}</p>
+    </div>
+  );
+}
+
+function ArraySummaryField({ field, name, fields, schema }: FieldProps) {
+  const { watch } = useFormContext();
+  const value: any[] = watch(name!, []);
+  assert(field.type === 'array');
+
+  return (
+    <div className="mt-2 bg-white">
+      <p className="text-xxs font-medium text-neutral-400">{field.title}</p>
+      <p className="text-xxs font-medium text-neutral-700">
+        {value.map((_item, index) => {
+          const fieldKey =
+            name === null ? index.toString() : `${name}.${index}`;
+
+          return (
+            <Field
+              key={index}
+              field={field.items}
+              fields={fields}
+              name={fieldKey}
+              schema={schema}
+            />
+          );
+        })}
+      </p>
     </div>
   );
 }

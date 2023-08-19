@@ -1,7 +1,16 @@
-import { Checkbox, Input, InputNumber, RadioCardGroup } from '@elpassion/taco';
-import { useFormContext } from 'react-hook-form';
+import {
+  Button,
+  Checkbox,
+  Icon,
+  IconButton,
+  Input,
+  InputNumber,
+  RadioCardGroup,
+} from '@elpassion/taco';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import { assert } from '~/utils/assert';
-import { FieldProps } from './Schema';
+import { Field, FieldProps } from './Schema';
+import { useEffect } from 'react';
 
 export function StringField({ field, name }: FieldProps) {
   const { register, setValue, watch } = useFormContext();
@@ -42,14 +51,13 @@ export function StringField({ field, name }: FieldProps) {
     );
   }
   if (field.enumPresentAs === 'checkbox') {
-    const key = name.split('.').slice(0, -1).join('.');
-    const methods = register(key);
+    const methods = register(name);
 
     return field.enum.map((value, index) => (
       <Checkbox
-        key={key}
+        key={name}
         labelText={value}
-        id={`${key}.${index}`}
+        id={`${name}.${index}`}
         value={value}
         {...methods}
       />
@@ -71,5 +79,79 @@ export function NumberField({ field, name }: FieldProps) {
       label={field.title}
       supportingText={field.description}
     />
+  );
+}
+
+export function ArrayField({ field, name, fields, schema }: FieldProps) {
+  assert(field.type === 'array');
+  if ('enum' in field.items && field.items.enumPresentAs === 'checkbox') {
+    return (
+      <fields.string
+        field={field.items}
+        name={name}
+        schema={schema}
+        fields={fields}
+      />
+    );
+  } else {
+    return (
+      <RealArrayField
+        field={field}
+        name={name}
+        fields={fields}
+        schema={schema}
+      />
+    );
+  }
+}
+
+function RealArrayField({ field, name, fields, schema }: FieldProps) {
+  assert(field.type === 'array');
+  const {
+    fields: rhfFields,
+    append,
+    remove,
+  } = useFieldArray({
+    name: name!,
+  });
+
+  useEffect(() => {
+    if (rhfFields.length !== 0) return;
+    append({}, { shouldFocus: false });
+  }, [rhfFields.length]);
+
+  return (
+    <div>
+      <p>{field.title}</p>
+      {rhfFields.map((item, index) => (
+        <div className="mt-2 flex items-end gap-2">
+          <Field
+            key={item.id}
+            field={field.items}
+            name={`${name}.${index}`}
+            fields={fields}
+            schema={schema}
+          />
+          {rhfFields.length > 1 && (
+            <IconButton
+              variant="ghost"
+              icon={<Icon iconName="trash" />}
+              onClick={(e) => {
+                e.preventDefault();
+                remove(index);
+              }}
+            />
+          )}
+        </div>
+      ))}
+      <Button
+        type="button"
+        text={`Add item`}
+        size="xs"
+        hierarchy="secondary"
+        onClick={() => append({})}
+        className="mt-2"
+      />
+    </div>
   );
 }

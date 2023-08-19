@@ -8,7 +8,11 @@ export function Schema({
 }: {
   schema: string;
   name: string | null;
-  fields: { string: React.FC<FieldProps>; number: React.FC<FieldProps> };
+  fields: {
+    string: React.FC<FieldProps>;
+    number: React.FC<FieldProps>;
+    array: React.FC<FieldProps>;
+  };
 }) {
   const schemaObj = JSON.parse(schema);
   return (
@@ -16,21 +20,25 @@ export function Schema({
   );
 }
 
-function Field({
-  field,
-  name,
-  schema,
-  fields,
-}: {
-  field: JSONSchemaField;
-  name: string | null;
-  schema: JSONSchemaField;
-  fields: { string: React.FC<FieldProps>; number: React.FC<FieldProps> };
-}) {
+export function Field({ field, name, schema, fields }: FieldProps) {
   if (field.type === 'string') {
-    return <fields.string field={field} name={name} schema={schema} />;
+    return (
+      <fields.string
+        field={field}
+        name={name}
+        schema={schema}
+        fields={fields}
+      />
+    );
   } else if (field.type === 'number') {
-    return <fields.number field={field} name={name} schema={schema} />;
+    return (
+      <fields.number
+        field={field}
+        name={name}
+        schema={schema}
+        fields={fields}
+      />
+    );
   } else if (field.type === 'object') {
     return Object.entries(field.properties).map(([propertyKey, value]) => {
       const fieldKey = name === null ? propertyKey : `${name}.${propertyKey}`;
@@ -46,17 +54,8 @@ function Field({
       );
     });
   } else if (field.type === 'array') {
-    const fieldKey = name === null ? '0' : `${name}.0`;
     return (
-      <div>
-        {field.title} - {field.description}
-        <Field
-          field={field.items}
-          name={fieldKey}
-          schema={schema}
-          fields={fields}
-        />
-      </div>
+      <fields.array field={field} name={name} schema={schema} fields={fields} />
     );
   }
   console.warn('Unknown field type', field);
@@ -67,4 +66,9 @@ export interface FieldProps {
   field: JSONSchemaField;
   name: string | null;
   schema: JSONSchemaField;
+  fields: {
+    string: React.FC<FieldProps>;
+    number: React.FC<FieldProps>;
+    array: React.FC<FieldProps>;
+  };
 }

@@ -11,7 +11,7 @@ import {
   useBlockTypes,
 } from '~/modules/Pipelines/pipelines.hooks';
 import { Schema } from './Schema';
-import { NumberField, StringField } from './SchemaFormFields';
+import { ArrayField, NumberField, StringField } from './SchemaFormFields';
 
 export function AddBlockForm({
   onSubmit,
@@ -45,8 +45,6 @@ export function AddBlockForm({
     (blockType) => blockType.type === blockTypeValue,
   );
 
-  const { onChange, ...forwardOutputsField } = register('forward_outputs');
-
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -76,6 +74,7 @@ export function AddBlockForm({
               fields={{
                 string: StringField,
                 number: NumberField,
+                array: ArrayField,
               }}
             />
           )}
