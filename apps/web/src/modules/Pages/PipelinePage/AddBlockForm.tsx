@@ -1,11 +1,11 @@
 'use client';
 
-import { Button } from '@elpassion/taco';
-import { IDropdownOption, SelectDropdown } from '@elpassion/taco/Dropdown';
-import { startCase } from 'lodash';
 import { useEffect } from 'react';
+import { startCase } from 'lodash';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { Button } from '@elpassion/taco';
+import { IDropdownOption, SelectDropdown } from '@elpassion/taco/Dropdown';
 import {
   BlockConfig,
   useBlockTypes,
@@ -37,7 +37,7 @@ export function AddBlockForm({
       opts: {},
       forward_outputs: [],
     });
-  }, [blockTypeValue]);
+  }, [blockTypeValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!blockTypes) return null;
 

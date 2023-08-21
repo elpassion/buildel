@@ -2,7 +2,7 @@ import { TApp, TCreateApp } from '~/contracts';
 import { HttpClient, createHttpClient } from '~/utils';
 
 export class AppsApi {
-  public baseUrl = `/api/pipelines`;
+  public baseUrl = `/pipelines`;
   private client: HttpClient;
 
   constructor(client: HttpClient = createHttpClient()) {

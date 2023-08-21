@@ -46,7 +46,7 @@ export const ProjectClient = ({ id }: ProjectClientProps) => {
               {apps.map((app) => {
                 return (
                   <li key={app.id}>
-                    <Link href={ROUTES.APP(app.id)}>{app.name}</Link>
+                    <Link href={ROUTES.PIPELINE(app.id)}>{app.name}</Link>
                   </li>
                 );
               })}

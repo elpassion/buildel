@@ -1,11 +1,11 @@
 'use client';
 
-import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
-import { Modal } from '@elpassion/taco/Modal';
-import { startCase } from 'lodash';
 import { useEffect, useState } from 'react';
+import { startCase } from 'lodash';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
+import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
+import { Modal } from '@elpassion/taco/Modal';
 import { ENV } from '~/env.mjs';
 import {
   BlockConfig,
@@ -163,6 +163,7 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
               <div className="text-xxs">{trigger.url}</div>
               <div className="mt-2">
                 <p className="text-xxs font-medium text-neutral-400">Inputs</p>
+                <div className="mb-0.5" />
                 <div className="flex flex-wrap gap-2">
                   {trigger.inputs.map((input) => (
                     <Badge
@@ -310,7 +311,7 @@ function ArraySummaryField({ field, name, fields, schema }: FieldProps) {
   assert(field.type === 'array');
 
   return (
-    <div className="mt-2 bg-white">
+    <div className="mt-2 bg-white p-2">
       <p className="text-xxs font-medium text-neutral-400">{field.title}</p>
       <p className="text-xxs font-medium text-neutral-700">
         {value.map((_item, index) => {

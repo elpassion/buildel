@@ -1,7 +1,7 @@
 import { HttpClient, createHttpClient } from '~/utils';
 
 export class RunsApi {
-  public baseUrl = `/api/runs`;
+  public baseUrl = `/runs`;
   private client: HttpClient;
 
   constructor(client: HttpClient = createHttpClient()) {

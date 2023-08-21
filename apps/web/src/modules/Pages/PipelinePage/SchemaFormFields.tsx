@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import {
   Button,
   Checkbox,
@@ -7,10 +9,8 @@ import {
   InputNumber,
   RadioCardGroup,
 } from '@elpassion/taco';
-import { useFieldArray, useFormContext } from 'react-hook-form';
 import { assert } from '~/utils/assert';
 import { Field, FieldProps } from './Schema';
-import { useEffect } from 'react';
 
 export function StringField({ field, name }: FieldProps) {
   const { register, setValue, watch } = useFormContext();
@@ -55,7 +55,7 @@ export function StringField({ field, name }: FieldProps) {
 
     return field.enum.map((value, index) => (
       <Checkbox
-        key={name}
+        key={value}
         labelText={value}
         id={`${name}.${index}`}
         value={value}
@@ -118,13 +118,13 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
   useEffect(() => {
     if (rhfFields.length !== 0) return;
     append({}, { shouldFocus: false });
-  }, [rhfFields.length]);
+  }, [rhfFields.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
       <p>{field.title}</p>
       {rhfFields.map((item, index) => (
-        <div className="mt-2 flex items-end gap-2">
+        <div key={item.id} className="mt-2 flex items-end gap-2">
           <Field
             key={item.id}
             field={field.items}

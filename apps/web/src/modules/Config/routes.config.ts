@@ -5,8 +5,8 @@ export const ROUTES = {
   PROJECT: (id: string) => {
     return `/projects/${id}`;
   },
-  APPS: '/apps',
-  APP: (id: string) => {
-    return `/apps/${id}`;
+  PIPELINES: '/pipelines',
+  PIPELINE: (id: string) => {
+    return `/pipelines/${id}`;
   },
 };

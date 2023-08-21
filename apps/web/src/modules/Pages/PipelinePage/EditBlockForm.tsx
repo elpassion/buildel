@@ -1,15 +1,12 @@
 'use client';
 
+import { useEffect } from 'react';
+import { startCase } from 'lodash';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { z } from 'zod';
 import { Button } from '@elpassion/taco';
 import { IDropdownOption, SelectDropdown } from '@elpassion/taco/Dropdown';
-import { startCase } from 'lodash';
-import { useEffect } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
-import { z } from 'zod';
-import {
-  BlockConfig,
-  useBlockTypes,
-} from '~/modules/Pipelines/pipelines.hooks';
+import { BlockConfig, useBlockTypes } from '~/modules/Pipelines';
 import { Schema } from './Schema';
 import { ArrayField, NumberField, StringField } from './SchemaFormFields';
 
@@ -37,7 +34,7 @@ export function EditBlockForm({
       opts: blockConfig.opts,
       forward_outputs: blockConfig.forward_outputs,
     });
-  }, [blockTypeValue]);
+  }, [blockTypeValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!blockTypes) return null;
 

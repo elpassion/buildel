@@ -2,7 +2,7 @@ import { TBlockType } from '~/contracts';
 import { HttpClient, createHttpClient } from '~/utils';
 
 export class BlocksApi {
-  public baseUrl = `/api/block_types`;
+  public baseUrl = `/block_types`;
   private client: HttpClient;
 
   constructor(client: HttpClient = createHttpClient()) {
