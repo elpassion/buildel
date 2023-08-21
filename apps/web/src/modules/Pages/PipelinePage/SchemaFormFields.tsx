@@ -86,12 +86,15 @@ export function ArrayField({ field, name, fields, schema }: FieldProps) {
   assert(field.type === 'array');
   if ('enum' in field.items && field.items.enumPresentAs === 'checkbox') {
     return (
-      <fields.string
-        field={field.items}
-        name={name}
-        schema={schema}
-        fields={fields}
-      />
+      <>
+        <p>{field.title}</p>
+        <fields.string
+          field={field.items}
+          name={name}
+          schema={schema}
+          fields={fields}
+        />
+      </>
     );
   } else {
     return (
