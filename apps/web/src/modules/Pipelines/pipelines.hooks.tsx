@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Channel, Socket } from 'phoenix';
+import { useRef, useState } from 'react';
 import { z } from 'zod';
 import { ENV } from '~/env.mjs';
+import { assert } from '~/utils/assert';
 
 export function usePipelines() {
   return useQuery(['pipelines'], async () => {
@@ -63,6 +66,64 @@ export function useBlockTypes() {
     const json = await response.json();
     return BlockTypesResponse.parse(json).data;
   });
+}
+
+export function usePipelineRun(pipelineId: string) {
+  const socket = useRef<Socket>();
+  const channel = useRef<Channel>();
+  socket.current = new Socket(`${ENV.WEBSOCKET_URL}`, {
+    logger: (kind, msg, data) => {
+      console.log(`${kind}: ${msg}`, data);
+    },
+  });
+
+  const [status, setStatus] = useState<'idle' | 'starting' | 'running'>('idle');
+
+  function startRun() {
+    assert(socket.current);
+
+    setStatus('starting');
+    const newChannel = socket.current.channel(`pipelines:${pipelineId}`, {});
+    channel.current = newChannel;
+
+    if (!socket.current.isConnected()) {
+      socket.current.connect();
+      socket.current.onOpen(() => {
+        assert(socket.current);
+        newChannel.join().receive('ok', (response) => {
+          console.log('Joined successfully', response);
+          setStatus('running');
+        });
+      });
+      socket.current.onError(() => {
+        setStatus('idle');
+      });
+    } else if (newChannel.state !== 'joined') {
+      newChannel.join().receive('ok', (response) => {
+        console.log('Joined successfully', response);
+        setStatus('running');
+      });
+    }
+  }
+
+  function stopRun() {
+    console.log('stop');
+    assert(channel.current);
+    channel.current.leave();
+    setStatus('idle');
+  }
+
+  function push(topic: string, payload: any) {
+    assert(channel.current);
+    channel.current.push(topic, payload);
+  }
+
+  return {
+    status,
+    startRun,
+    stopRun,
+    push,
+  };
 }
 
 export const BlockConfig = z.object({

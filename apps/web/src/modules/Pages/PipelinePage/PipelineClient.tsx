@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { startCase } from 'lodash';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { z } from 'zod';
 import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
+import { startCase } from 'lodash';
+import { Channel } from 'phoenix';
+import { useEffect, useState } from 'react';
+import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { z } from 'zod';
 import { ENV } from '~/env.mjs';
 import {
   BlockConfig,
@@ -13,6 +14,7 @@ import {
   IOType,
   useBlockTypes,
   usePipeline,
+  usePipelineRun,
   useUpdatePipeline,
 } from '~/modules/Pipelines/pipelines.hooks';
 import { assert } from '~/utils/assert';
@@ -20,13 +22,11 @@ import { useModal } from '~/utils/hooks/useModal';
 import { AddBlockForm } from './AddBlockForm';
 import { EditBlockForm } from './EditBlockForm';
 import { Field, FieldProps, Schema } from './Schema';
-import { Channel, Socket } from 'phoenix';
 
 export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
   const { data: blockTypes } = useBlockTypes();
   const { isModalOpen, openModal, closeModal: closeModalBase } = useModal();
-  const [channel, setChannel] = useState<Channel>();
   const [currentlyEditedBlock, setCurrentlyEditedBlock] =
     useState<z.TypeOf<typeof BlockConfig>>();
   const updatePipeline = useUpdatePipeline(params.pipelineId, {
@@ -54,6 +54,13 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   useEffect(() => {
     setValue('blocks', config.blocks);
   }, [setValue, config.blocks]);
+
+  const {
+    status: runStatus,
+    startRun,
+    stopRun,
+    push,
+  } = usePipelineRun(params.pipelineId);
 
   if (!pipeline || !blockTypes) return null;
 
@@ -84,30 +91,6 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
     forward_outputs: string[];
     blockType: z.TypeOf<typeof BlockType>;
   }[];
-
-  const runPipeline = () => {
-    if (channel) {
-      channel.leave();
-    }
-
-    const socket = new Socket(`${ENV.WEBSOCKET_URL}`, {
-      logger: (kind, msg, data) => {
-        console.log(`${kind}: ${msg}`, data);
-      },
-    });
-    socket.connect();
-    socket.onOpen(() => {
-      const channel = socket.channel(`pipelines:${params.pipelineId}`, {});
-      // @ts-ignore
-      window.channel = channel;
-      const join = channel.join();
-      join.receive('ok', (response) => {
-        console.log('Joined successfully', response);
-        setChannel(channel);
-      });
-      console.log('Socket connected');
-    });
-  };
 
   return (
     <>
@@ -180,7 +163,11 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
           </div>
         </div>
       </Modal>
-      <Button onClick={runPipeline} text="Run" />
+      <Button
+        onClick={runStatus === 'idle' ? startRun : stopRun}
+        text={runStatus === 'idle' ? 'Start' : 'Stop'}
+        disabled={runStatus === 'starting'}
+      />
       <div className="grid grid-cols-3 gap-12">
         <div>
           <div className="flex">Trigger</div>
