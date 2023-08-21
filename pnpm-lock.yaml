@@ -30,8 +30,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0(react-hook-form@7.45.2)
       '@mantine/hooks':
-        specifier: ^7.0.0-alpha.21
-        version: 7.0.0-alpha.21(react@18.2.0)
+        specifier: ^7.0.0-beta.0
+        version: 7.0.0-beta.0(react@18.2.0)
       '@tanstack/react-query':
         specifier: ^4.32.5
         version: 4.32.5(react-dom@18.2.0)(react@18.2.0)
@@ -449,8 +449,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@mantine/hooks@7.0.0-alpha.21(react@18.2.0):
-    resolution: {integrity: sha512-D8qUD2a2xXIQbOCAY70VVTs0v8elO9UsNa9AJ8ocmtk6VKHK0vbvSoF7b9dvjbQmkgcR9N6GBBCB2mV3n0wv3w==}
+  /@mantine/hooks@7.0.0-beta.0(react@18.2.0):
+    resolution: {integrity: sha512-1/9D6astxgD5W1cEPB+of7ETViCn2MPy4DR9URqdSld827OA1HeLh405HWwlQCvrWfpoiNqeMjo/a4gj+11d/w==}
     peerDependencies:
       react: ^18.2.0
     dependencies:

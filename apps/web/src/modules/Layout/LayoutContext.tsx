@@ -3,11 +3,19 @@
 // https://kentcdodds.com/blog/how-to-use-react-context-effectively
 
 import React from 'react';
+import { useToggle } from '@mantine/hooks';
 
-type Action = {
-  type: 'toggleSidebar';
-  toggleSidebar: () => void;
-};
+type Action =
+  | {
+      type: 'toggleSidebar';
+      value?: boolean;
+    }
+  | {
+      type: 'closeSidebar';
+    }
+  | {
+      type: 'openSidebar';
+    };
 type Dispatch = (action: Action) => void;
 type State = {
   isSidebarOpen: boolean;
@@ -19,7 +27,13 @@ const LayoutStateContext = React.createContext<Value | undefined>(undefined);
 function layoutReducer(state: State, action: Action) {
   switch (action.type) {
     case 'toggleSidebar': {
-      return state;
+      return { ...state, isSidebarOpen: !state.isSidebarOpen };
+    }
+    case 'closeSidebar': {
+      return { ...state, isSidebarOpen: false };
+    }
+    case 'openSidebar': {
+      return { ...state, isSidebarOpen: true };
     }
     default: {
       // @ts-ignore
@@ -32,13 +46,11 @@ type LayoutProviderProps = {
   children: React.ReactNode;
 };
 function LayoutProvider({ children }: LayoutProviderProps) {
-  // Sidebar
-  const [isSidebarOpen, setSidebarOpen] = React.useState<boolean>(false);
-
   const [state, dispatch] = React.useReducer(layoutReducer, {
-    isSidebarOpen,
+    isSidebarOpen: false,
   });
   const value: Value = [state, dispatch];
+
   return (
     <LayoutStateContext.Provider value={value}>
       {children}

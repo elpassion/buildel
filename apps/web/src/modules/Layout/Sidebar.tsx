@@ -11,21 +11,31 @@ import {
   ResponsiveSidebar,
 } from '@elpassion/taco';
 import { ROUTES } from '~/modules/Config';
+import { useLayout } from '~/modules/Layout/LayoutContext';
 
 export const Sidebar = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [{ isSidebarOpen }, layoutDispatch] = useLayout();
 
   return (
     <ResponsiveSidebar
-      isOpen={isOpen}
+      isOpen={isSidebarOpen}
       close={() => {
-        setIsOpen(!isOpen);
+        layoutDispatch({ type: 'closeSidebar' });
       }}
+      // TODO (hub33k): implement this, add to state
+      // collapsed={true}
+      // defaultCollapsed={true}
       sidebarClassName="sticky top-0 bg-white border-r border-gray-200"
       collapseBtnClassName="absolute top-14 -right-2"
       topContent={<SidebarTopContent />}
       bottomContent={<SidebarBottomContent />}
     >
+      <Button
+        onClick={() => {
+          layoutDispatch({ type: 'toggleSidebar' });
+        }}
+        text={isSidebarOpen ? 'opened' : 'closed'}
+      />
       <SidebarMainContent />
     </ResponsiveSidebar>
   );

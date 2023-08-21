@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ROUTES } from '~/modules/Config';
+import { LayoutProvider } from '~/modules/Layout/LayoutContext';
 import { Navbar } from './Navbar';
 import { Sidebar } from './Sidebar';
 
@@ -23,7 +24,7 @@ interface LayoutProps {
 
 export const Layout = ({ children }: LayoutProps) => {
   return (
-    <>
+    <LayoutProvider>
       <div className="grid h-screen grid-cols-[auto_1fr]">
         <Sidebar />
 
@@ -35,6 +36,6 @@ export const Layout = ({ children }: LayoutProps) => {
           </main>
         </div>
       </div>
-    </>
+    </LayoutProvider>
   );
 };
