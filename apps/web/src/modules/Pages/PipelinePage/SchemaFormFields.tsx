@@ -31,6 +31,8 @@ export function StringField({ field, name }: FieldProps) {
     const { disabled } = register(name);
     return (
       <RadioCardGroup
+        isRadioVisible={true}
+        radioPosition="left"
         mainLabel={field.title}
         options={field.enum.map((value) => ({
           id: `${name}.${value}`,
@@ -46,7 +48,6 @@ export function StringField({ field, name }: FieldProps) {
         value={fieldValue}
         layout="horizontal"
         cardsSize="sm"
-        isRadioVisible
       />
     );
   }

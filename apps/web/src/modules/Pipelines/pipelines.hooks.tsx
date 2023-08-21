@@ -68,7 +68,19 @@ export function useBlockTypes() {
   });
 }
 
-export function usePipelineRun(pipelineId: string) {
+export function usePipelineRun(
+  pipelineId: string,
+  onOutput: (
+    blockId: string,
+    outputName: string,
+    payload: unknown,
+  ) => void = () => {},
+) {
+  const { data: pipeline } = usePipeline(pipelineId);
+  const { data: blockTypes } = useBlockTypes();
+  const { config } = pipeline;
+  const io = getBlocksIO(config.blocks, blockTypes || []);
+
   const socket = useRef<Socket>();
   const channel = useRef<Channel>();
   socket.current = new Socket(`${ENV.WEBSOCKET_URL}`, {
@@ -84,6 +96,13 @@ export function usePipelineRun(pipelineId: string) {
 
     setStatus('starting');
     const newChannel = socket.current.channel(`pipelines:${pipelineId}`, {});
+    newChannel.onMessage = (event: string, payload: any) => {
+      if (event.startsWith('output:')) {
+        const [_, blockId, outputName] = event.split(':');
+        onOutput(blockId, outputName, payload);
+      }
+      return payload;
+    };
     channel.current = newChannel;
 
     if (!socket.current.isConnected()) {
@@ -115,7 +134,7 @@ export function usePipelineRun(pipelineId: string) {
 
   function push(topic: string, payload: any) {
     assert(channel.current);
-    channel.current.push(topic, payload);
+    channel.current.push(`input:${topic}`, payload);
   }
 
   return {
@@ -123,7 +142,50 @@ export function usePipelineRun(pipelineId: string) {
     startRun,
     stopRun,
     push,
+    io,
   };
+}
+
+export type IO = z.TypeOf<typeof IOType>;
+
+export type BlocksIO = {
+  inputs: IO[];
+  outputs: IO[];
+};
+
+export function getBlocksIO(
+  blocks: z.TypeOf<typeof BlockConfig>[],
+  blockTypes: z.TypeOf<typeof BlockType>[],
+): BlocksIO {
+  return blocks.reduce(
+    ({ inputs, outputs }, block) => {
+      const blockType = (blockTypes || []).find(
+        (blockType) => blockType.type === block.type,
+      );
+      if (!blockType) return { inputs, outputs };
+      const forwardedOutputs = block.forward_outputs
+        .map((output) =>
+          blockType.outputs.find((outputType) => outputType.name === output),
+        )
+        .filter(Boolean) as z.TypeOf<typeof IOType>[];
+
+      return {
+        inputs: [...inputs, ...nameIO(block.name, blockType.inputs)],
+        outputs: [...outputs, ...nameIO(block.name, forwardedOutputs)],
+      };
+    },
+    {
+      inputs: [] as z.TypeOf<typeof IOType>[],
+      outputs: [] as z.TypeOf<typeof IOType>[],
+    },
+  );
+}
+
+function nameIO(name: string, io: z.TypeOf<typeof IOType>[]) {
+  return io.map((input) => ({
+    ...input,
+    name: `${name}:${input.name}`,
+  }));
 }
 
 export const BlockConfig = z.object({

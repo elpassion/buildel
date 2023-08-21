@@ -3,7 +3,6 @@
 import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import { startCase } from 'lodash';
-import { Channel } from 'phoenix';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
@@ -11,7 +10,7 @@ import { ENV } from '~/env.mjs';
 import {
   BlockConfig,
   BlockType,
-  IOType,
+  getBlocksIO,
   useBlockTypes,
   usePipeline,
   usePipelineRun,
@@ -20,6 +19,7 @@ import {
 import { assert } from '~/utils/assert';
 import { useModal } from '~/utils/hooks/useModal';
 import { AddBlockForm } from './AddBlockForm';
+import { ChannelForm } from './ChannelForm';
 import { EditBlockForm } from './EditBlockForm';
 import { Field, FieldProps, Schema } from './Schema';
 
@@ -34,6 +34,8 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
       closeModal();
     },
   });
+  const [events, setEvents] = useState<any[]>([]);
+
   function closeModal() {
     setCurrentlyEditedBlock(undefined);
     closeModalBase();
@@ -58,9 +60,19 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const {
     status: runStatus,
     startRun,
-    stopRun,
+    stopRun: stopRunBase,
     push,
-  } = usePipelineRun(params.pipelineId);
+    io,
+  } = usePipelineRun(params.pipelineId, (block, output, payload) => {
+    setEvents((events) => [...events, { block, output, payload }]);
+  });
+  // @ts-ignore
+  window.push = push;
+
+  const stopRun = () => {
+    setEvents([]);
+    stopRunBase();
+  };
 
   if (!pipeline || !blockTypes) return null;
 
@@ -92,8 +104,62 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
     blockType: z.TypeOf<typeof BlockType>;
   }[];
 
+  function formatEvents(events: any[]) {
+    let text = '';
+    const sentences: string[] = [];
+    for (const event of events) {
+      if (event.block === 'chat' && event.output === 'sentences_output') {
+        text = '';
+        sentences.push(event.payload.message);
+      } else if (event.block === 'chat' && event.output === 'output') {
+        console.log(event.payload);
+        text = text.concat(event.payload.message);
+      }
+    }
+    return { text, sentences };
+  }
+
+  const { sentences, text } = formatEvents(events);
+
   return (
     <>
+      <Modal
+        isOpen={['running', 'starting'].includes(runStatus)}
+        closeModal={stopRun}
+      >
+        <div className="p-8">
+          <div className="text-xl font-medium">Pipeline is running</div>
+          <div className="flex flex-col gap-2">
+            <div>
+              {sentences.map((sentence) => (
+                <div key={sentence}>
+                  <div className="text-sm font-medium">{sentence}</div>
+                </div>
+              ))}
+              {text}
+            </div>
+            <ChannelForm
+              io={io}
+              onSubmit={(a) => {
+                push(a.io.name, a.message);
+                console.log(a);
+              }}
+            />
+          </div>
+
+          <div className="flex gap-2"></div>
+          <div className="mt-8">
+            <Button
+              onClick={stopRun}
+              text="Stop"
+              variant="ghost"
+              hierarchy="primary"
+              size="xs"
+              leftIcon={<Icon iconName="x" />}
+            />
+          </div>
+        </div>
+      </Modal>
       <Modal isOpen={isModalOpen} closeModal={closeModal} ariaHideApp={false}>
         <div className="p-8">
           <div className="flex space-x-6">
@@ -256,41 +322,6 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
       </div>
     </>
   );
-}
-
-function getBlocksIO(
-  blocks: z.TypeOf<typeof BlockConfig>[],
-  blockTypes: z.TypeOf<typeof BlockType>[],
-) {
-  return blocks.reduce(
-    ({ inputs, outputs }, block) => {
-      const blockType = (blockTypes || []).find(
-        (blockType) => blockType.type === block.type,
-      );
-      if (!blockType) return { inputs, outputs };
-      const forwardedOutputs = block.forward_outputs
-        .map((output) =>
-          blockType.outputs.find((outputType) => outputType.name === output),
-        )
-        .filter(Boolean) as z.TypeOf<typeof IOType>[];
-
-      return {
-        inputs: [...inputs, ...nameIO(block.name, blockType.inputs)],
-        outputs: [...outputs, ...nameIO(block.name, forwardedOutputs)],
-      };
-    },
-    {
-      inputs: [] as z.TypeOf<typeof IOType>[],
-      outputs: [] as z.TypeOf<typeof IOType>[],
-    },
-  );
-}
-
-function nameIO(name: string, io: z.TypeOf<typeof IOType>[]) {
-  return io.map((input) => ({
-    ...input,
-    name: `${name}:${input.name}`,
-  }));
 }
 
 function StringSummaryField({ field, name }: FieldProps) {
