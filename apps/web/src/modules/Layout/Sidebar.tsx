@@ -2,6 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
+import classNames from 'classnames';
+import { twMerge } from 'tailwind-merge';
 import {
   Avatar,
   Button,
@@ -11,18 +13,53 @@ import {
   ResponsiveSidebar,
 } from '@elpassion/taco';
 import { ROUTES } from '~/modules/Config';
+import { useLayout } from '~/modules/Layout/LayoutContext';
+import { useBreakpoints } from '~/utils/hooks';
+
+const mainNavItems = [
+  {
+    text: 'Dashboard',
+    href: ROUTES.HOME,
+    leftIcon: 'home',
+  },
+  {
+    text: 'Pipelines',
+    href: ROUTES.PIPELINES,
+    leftIcon: 'three-layers',
+  },
+] as const;
 
 export const Sidebar = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const { desktop } = useBreakpoints();
+  const [{ isSidebarOpen, isSidebarCollapsed }, layoutDispatch] = useLayout();
+
+  React.useEffect(() => {
+    if (desktop) {
+      layoutDispatch({
+        type: 'toggleSidebarCollapse',
+        isSidebarCollapsed: false,
+      });
+    } else {
+      layoutDispatch({
+        type: 'toggleSidebarCollapse',
+        isSidebarCollapsed: true,
+      });
+    }
+  }, [desktop, layoutDispatch]);
 
   return (
     <ResponsiveSidebar
-      isOpen={isOpen}
+      isOpen={isSidebarOpen}
       close={() => {
-        setIsOpen(!isOpen);
+        layoutDispatch({ type: 'toggleSidebar', isSidebarOpen: false });
+      }}
+      collapsed={isSidebarCollapsed}
+      defaultCollapsed={true}
+      onCollapse={() => {
+        layoutDispatch({ type: 'toggleSidebarCollapse' });
       }}
       sidebarClassName="sticky top-0 bg-white border-r border-gray-200"
-      collapseBtnClassName="absolute top-14 -right-2"
+      collapseBtnClassName="absolute top-11 -right-2"
       topContent={<SidebarTopContent />}
       bottomContent={<SidebarBottomContent />}
     >
@@ -32,47 +69,60 @@ export const Sidebar = () => {
 };
 
 function SidebarMainContent() {
+  const [{ isSidebarOpen, isSidebarCollapsed }] = useLayout();
+  const isCollapsed = isSidebarCollapsed && !isSidebarOpen;
+
   return (
     <div>
       <div className="mt-1" />
-      <Link href={ROUTES.HOME}>
-        <MenuItem text="Dashboard" leftIcon={<Icon iconName="home" />} />
-      </Link>
-      <div>
-        <Link href={ROUTES.PROJECTS}>
-          <MenuItem
-            text="Projects"
-            leftIcon={<Icon iconName="three-layers" />}
-            rightIcon={<Icon iconName="chevron-up" />}
-          />
-        </Link>
-        <div className="ml-4">
-          <Link href={ROUTES.PROJECT('1')}>
-            <MenuItem text="Project 1" />
-          </Link>
-          <Link href={ROUTES.PROJECT('2')}>
-            <MenuItem text="Project 2" />
-          </Link>
-          <Link href={ROUTES.PROJECT('3')}>
-            <MenuItem text="Project 3" />
-          </Link>
-        </div>
+
+      <div
+        className={classNames([
+          'flex flex-col',
+          isCollapsed && 'items-center justify-center',
+        ])}
+      >
+        {mainNavItems.map((item) => {
+          return (
+            <Link key={item.text} href={item.href}>
+              <MenuItem
+                text={item.text}
+                leftIcon={<Icon iconName="life-buoy" />}
+                middleIcon={
+                  isCollapsed && (
+                    <Icon
+                      iconName={item.leftIcon}
+                      size={'md'}
+                      title={item.text}
+                    />
+                  )
+                }
+                variant={isCollapsed ? 'onlyIcon' : 'fitWidth'}
+              />
+            </Link>
+          );
+        })}
       </div>
-      <MenuItem
-        text="My local repos"
-        leftIcon={<Icon iconName="briefcase" />}
-        rightIcon={<Icon iconName="chevron-down" />}
-      />
     </div>
   );
 }
 
 function SidebarTopContent() {
+  const [{ isSidebarOpen, isSidebarCollapsed }] = useLayout();
+  const isCollapsed = isSidebarCollapsed && !isSidebarOpen;
+
+  const name = 'ACME inc.';
+
   return (
     <div className="min-h-smNavbar border-b">
-      <div className="flex h-full w-full items-center">
+      <div
+        className={classNames([
+          'flex h-full w-full items-center',
+          isCollapsed && 'justify-center text-2xl',
+        ])}
+      >
         <h1 className="font-medium text-neutral-500">
-          <Link href={ROUTES.HOME}>ACME inc.</Link>
+          <Link href={ROUTES.HOME}>{isCollapsed ? name.at(0) : name}</Link>
         </h1>
       </div>
     </div>
@@ -80,41 +130,76 @@ function SidebarTopContent() {
 }
 
 function SidebarBottomContent() {
+  const [{ isSidebarOpen, isSidebarCollapsed }] = useLayout();
+  const isCollapsed = isSidebarCollapsed && !isSidebarOpen;
+
   return (
     <div>
-      <div className="border-b pb-4">
-        <p className="text-sm font-medium text-neutral-500">Credit usage</p>
-        <div className="mb-2" />
-        <LinearProgressBar progress={49.8} label="none" />
-        <div className="mb-2" />
-        <p className="text-xs font-medium text-neutral-500">
-          $2.49 / $5.00 this month
-        </p>
-        <div className="mb-3" />
-        <Button text="Top up" isFluid />
+      {!isCollapsed && (
+        <div className="border-b pb-4">
+          <p className="text-sm font-medium text-neutral-500">Credit usage</p>
+          <div className="mb-2" />
+          <LinearProgressBar progress={49.8} label="none" />
+          <div className="mb-2" />
+          <p className="text-xs font-medium text-neutral-500">
+            $2.49 / $5.00 this month
+          </p>
+          <div className="mb-3" />
+          <Button text="Top up" isFluid />
+        </div>
+      )}
+
+      <div
+        className={classNames([
+          'mt-4 flex flex-col gap-4 border-b pb-4',
+          isCollapsed && 'items-center justify-center',
+        ])}
+      >
+        <MenuItem
+          text="Support"
+          leftIcon={<Icon iconName="life-buoy" />}
+          middleIcon={
+            isCollapsed && (
+              <Icon iconName="life-buoy" size={'md'} title="Support" />
+            )
+          }
+          variant={isCollapsed ? 'onlyIcon' : 'fitWidth'}
+        />
+        <MenuItem
+          text="Settings"
+          leftIcon={<Icon iconName="settings" />}
+          middleIcon={
+            isCollapsed && (
+              <Icon iconName="settings" size={'md'} title="Settings" />
+            )
+          }
+          variant={isCollapsed ? 'onlyIcon' : 'fitWidth'}
+        />
       </div>
 
-      <div className="mt-4 flex flex-col gap-4 border-b pb-4">
-        <MenuItem text="Support" leftIcon={<Icon iconName="life-buoy" />} />
-        <MenuItem text="Settings" leftIcon={<Icon iconName="settings" />} />
-      </div>
-
-      <div className="mt-4 flex items-center justify-between pb-4">
+      <div
+        className={twMerge(
+          'mt-4 flex items-center justify-between pb-4',
+          isCollapsed && 'justify-center',
+        )}
+      >
         <Link href="#profile">
           <Avatar
             alt="Anna Kapusta"
-            caption="anna@kapusta.pl"
+            caption={!isCollapsed && 'anna@kapusta.pl'}
             contentType="text"
-            label="Anna Kapusta"
+            label={!isCollapsed && 'Anna Kapusta'}
             name="Anna Kapusta"
             shape="circle"
             size="md"
           />
         </Link>
 
-        <Link href="#log-out">
-          <Icon iconName="log-out" />
-        </Link>
+        {!isCollapsed && (
+          <Link href="#log-out">
+            <Icon iconName="log-out" />
+          </Link>
+        )}
       </div>
     </div>
   );

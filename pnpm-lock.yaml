@@ -30,8 +30,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0(react-hook-form@7.45.2)
       '@mantine/hooks':
-        specifier: ^7.0.0-alpha.21
-        version: 7.0.0-alpha.21(react@18.2.0)
+        specifier: ^7.0.0-beta.0
+        version: 7.0.0-beta.0(react@18.2.0)
       '@tanstack/react-query':
         specifier: ^4.32.5
         version: 4.32.5(react-dom@18.2.0)(react@18.2.0)
@@ -59,6 +59,9 @@ importers:
       react-hook-form:
         specifier: ^7.45.2
         version: 7.45.2(react@18.2.0)
+      tailwind-merge:
+        specifier: ^1.14.0
+        version: 1.14.0
       zod:
         specifier: ^3.21.4
         version: 3.21.4
@@ -449,8 +452,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@mantine/hooks@7.0.0-alpha.21(react@18.2.0):
-    resolution: {integrity: sha512-D8qUD2a2xXIQbOCAY70VVTs0v8elO9UsNa9AJ8ocmtk6VKHK0vbvSoF7b9dvjbQmkgcR9N6GBBCB2mV3n0wv3w==}
+  /@mantine/hooks@7.0.0-beta.0(react@18.2.0):
+    resolution: {integrity: sha512-1/9D6astxgD5W1cEPB+of7ETViCn2MPy4DR9URqdSld827OA1HeLh405HWwlQCvrWfpoiNqeMjo/a4gj+11d/w==}
     peerDependencies:
       react: ^18.2.0
     dependencies:
@@ -4210,6 +4213,10 @@ packages:
       string-width: 4.2.3
       strip-ansi: 6.0.1
     dev: true
+
+  /tailwind-merge@1.14.0:
+    resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
+    dev: false
 
   /tailwindcss@3.3.3:
     resolution: {integrity: sha512-A0KgSkef7eE4Mf+nKJ83i75TMyq8HqY3qmFIJSWy8bNt0v1lG7jUcpGpoTFxAwYcWOphcTBLPPJg+bDfhDf52w==}
