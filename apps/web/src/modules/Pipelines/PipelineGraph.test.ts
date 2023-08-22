@@ -1,7 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import { IBlockConfig } from '.';
 import * as PipelineGraph from './PipelineGraph';
-import { text } from 'stream/consumers';
+import { IBlockConfig } from './pipelines.types';
 
 test(PipelineGraph.getBlocks, () => {
   const pipeline: PipelineGraph.IPipelineConfig = {

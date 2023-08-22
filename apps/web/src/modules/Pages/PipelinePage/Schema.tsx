@@ -1,5 +1,5 @@
 import React from 'react';
-import { JSONSchemaField } from '~/modules/Pipelines/pipelines.hooks';
+import { JSONSchemaField } from '~/modules/Pipelines/pipelines.types';
 
 export function Schema({
   schema,
@@ -39,20 +39,20 @@ export function Field({ field, name, schema, fields }: FieldProps) {
         fields={fields}
       />
     );
-  } else if (field.type === 'object') {
-    return Object.entries(field.properties).map(([propertyKey, value]) => {
-      const fieldKey = name === null ? propertyKey : `${name}.${propertyKey}`;
-      return (
-        <div key={fieldKey}>
-          <Field
-            field={value}
-            name={fieldKey}
-            schema={schema}
-            fields={fields}
-          />
-        </div>
-      );
-    });
+    // } else if (field.type === 'object') {
+    //   return Object.entries(field.properties).map(([propertyKey, value]) => {
+    //     const fieldKey = name === null ? propertyKey : `${name}.${propertyKey}`;
+    //     return (
+    //       <div key={fieldKey}>
+    //         <Field
+    //           field={value}
+    //           name={fieldKey}
+    //           schema={schema}
+    //           fields={fields}
+    //         />
+    //       </div>
+    //     );
+    //   });
   } else if (field.type === 'array') {
     return (
       <fields.array field={field} name={name} schema={schema} fields={fields} />

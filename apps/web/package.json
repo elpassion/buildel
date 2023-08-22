@@ -19,12 +19,15 @@
     "@tanstack/react-query-devtools": "^4.32.5",
     "axios": "^1.4.0",
     "lodash": "^4.17.21",
+    "lodash.isequal": "^4.5.0",
     "next": "13.4.12",
     "phoenix": "^1.7.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.45.2",
+    "reactflow": "^11.8.3",
     "tailwind-merge": "^1.14.0",
+    "usehooks-ts": "^2.9.1",
     "zod": "^3.21.4"
   },
   "devDependencies": {

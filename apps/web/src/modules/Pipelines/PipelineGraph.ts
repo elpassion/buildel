@@ -1,5 +1,5 @@
 import { produce } from 'immer';
-import { IBlockConfig, IIO } from './pipelines.hooks';
+import { IBlockConfig, IIO } from '~/modules/Pipelines/pipelines.types';
 
 export interface IPipelineConfig {
   blocks: IBlock[];
@@ -39,8 +39,12 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
     id: block.name,
     type: block.block_type.type,
-    position: { x: 0, y: 0 },
-    data: block,
+    // type: 'default',
+    position: {
+      x: Math.floor(Math.random() * 301),
+      y: Math.floor(Math.random() * 301),
+    },
+    data: { ...block, label: 'test' },
   }));
 }
 
