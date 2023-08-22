@@ -14,7 +14,22 @@ export interface Connection {
   targetHandle: string;
 }
 
-export function getNodes(pipeline: IPipelineConfig) {
+export interface INode {
+  id: string;
+  type: string;
+  position: { x: number; y: number };
+  data: IBlock;
+}
+
+export interface IEdge {
+  id: string;
+  source: string;
+  sourceHandle: string;
+  target: string;
+  targetHandle: string;
+}
+
+export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
     id: block.name,
     type: block.block_type.type,
@@ -23,7 +38,7 @@ export function getNodes(pipeline: IPipelineConfig) {
   }));
 }
 
-export function getEdges(pipeline: IPipelineConfig) {
+export function getEdges(pipeline: IPipelineConfig): IEdge[] {
   return pipeline.blocks
     .filter((block) => block.opts.input)
     .map((block) => ({
@@ -58,6 +73,15 @@ export function isValidConnection(
   )
     return false;
   return true;
+}
+
+export function toPipelineConfig(
+  nodes: INode[],
+  _edges: IEdge[],
+): IPipelineConfig {
+  return {
+    blocks: nodes.map((node) => node.data),
+  };
 }
 
 export function getBlocks(pipeline: IPipelineConfig): IBlock[] {

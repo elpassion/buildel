@@ -209,6 +209,17 @@ describe(PipelineGraph.isValidConnection, () => {
   });
 });
 
+describe(PipelineGraph.toPipelineConfig, () => {
+  test('converts graph to pipeline config', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [textInputBlockConfig],
+    };
+    const nodes = PipelineGraph.getNodes(pipeline);
+    const edges = PipelineGraph.getEdges(pipeline);
+    expect(PipelineGraph.toPipelineConfig(nodes, edges)).toEqual(pipeline);
+  });
+});
+
 const textInputBlockConfig: IBlockConfig = {
   opts: {},
   type: 'text_input',
