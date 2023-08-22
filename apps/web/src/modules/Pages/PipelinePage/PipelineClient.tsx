@@ -21,10 +21,14 @@ import { AddBlockForm } from './AddBlockForm';
 import { ChannelForm } from './ChannelForm';
 import { EditBlockForm } from './EditBlockForm';
 import { Field, FieldProps, Schema } from './Schema';
+import {
+  getEdges,
+  getNodes,
+  toPipelineConfig,
+} from '~/modules/Pipelines/PipelineGraph';
 
 export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const { data: pipeline } = usePipeline(params.pipelineId);
-  const { data: blockTypes } = useBlockTypes();
   const { isModalOpen, openModal, closeModal: closeModalBase } = useModal();
   const [currentlyEditedBlock, setCurrentlyEditedBlock] =
     useState<z.TypeOf<typeof BlockConfig>>();
@@ -34,6 +38,19 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
     },
   });
   const [events, setEvents] = useState<any[]>([]);
+  // console.log(getNodes(pipeline.config), getEdges(pipeline.config));
+  // console.log(
+  //   updatePipeline.mutate({
+  //     name: pipeline.name,
+  //     config: {
+  //       version: pipeline.config.version,
+  //       ...toPipelineConfig(
+  //         getNodes(pipeline.config),
+  //         getEdges(pipeline.config),
+  //       ),
+  //     },
+  //   }),
+  // );
 
   function closeModal() {
     setCurrentlyEditedBlock(undefined);

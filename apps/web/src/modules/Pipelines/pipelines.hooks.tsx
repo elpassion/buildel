@@ -233,6 +233,8 @@ export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
 
 const BlockTypes = z.array(BlockType);
 
+export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
+
 const BlockTypesResponse = z.object({
   data: BlockTypes,
 });
