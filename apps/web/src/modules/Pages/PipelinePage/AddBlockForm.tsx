@@ -22,7 +22,6 @@ export function AddBlockForm({
   const methods = useForm<z.TypeOf<typeof BlockConfig>>({
     defaultValues: {
       name: '',
-      forward_outputs: [],
       opts: {},
     },
   });
@@ -35,15 +34,10 @@ export function AddBlockForm({
       name: blockNameValue,
       type: blockTypeValue,
       opts: {},
-      forward_outputs: [],
     });
   }, [blockTypeValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!blockTypes) return null;
-
-  const blockType = blockTypes.find(
-    (blockType) => blockType.type === blockTypeValue,
-  );
+  const blockType = blockTypes[blockTypeValue];
 
   return (
     <FormProvider {...methods}>
@@ -58,7 +52,7 @@ export function AddBlockForm({
               item ? (item as IDropdownOption).value : null!,
             );
           }}
-          options={blockTypes.map((blockType) => ({
+          options={Object.values(blockTypes).map((blockType) => ({
             id: blockType.type,
             label: startCase(blockType.type),
             value: blockType.type,

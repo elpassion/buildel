@@ -32,15 +32,10 @@ export function EditBlockForm({
       name: blockNameValue,
       type: blockTypeValue,
       opts: blockConfig.opts,
-      forward_outputs: blockConfig.forward_outputs,
     });
   }, [blockTypeValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!blockTypes) return null;
-
-  const blockType = blockTypes.find(
-    (blockType) => blockType.type === blockTypeValue,
-  );
+  const blockType = blockTypes[blockTypeValue];
 
   return (
     <FormProvider {...methods}>
@@ -60,7 +55,7 @@ export function EditBlockForm({
               item ? (item as IDropdownOption).value : null!,
             );
           }}
-          options={blockTypes.map((blockType) => ({
+          options={Object.values(blockTypes).map((blockType) => ({
             id: blockType.type,
             label: startCase(blockType.type),
             value: blockType.type,

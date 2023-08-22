@@ -19,7 +19,7 @@ export function usePipeline(pipelineId: string) {
     async () => {
       const response = await fetch(`${ENV.API_URL}/pipelines/${pipelineId}`);
       const json = await response.json();
-      return PipelineResponse.parse(json).data;
+      return PipelineResponse.parse(json);
     },
     {
       initialData: {
@@ -39,7 +39,7 @@ export function useUpdatePipeline(
   {
     onSuccess,
   }: {
-    onSuccess?: (response: z.TypeOf<typeof PipelineResponse>['data']) => void;
+    onSuccess?: (response: z.TypeOf<typeof PipelineResponse>) => void;
   } = {},
 ) {
   const queryClient = useQueryClient();
@@ -53,7 +53,7 @@ export function useUpdatePipeline(
         body: JSON.stringify({ pipeline }),
       });
       const json = await response.json();
-      const pipelineResponse = PipelineResponse.parse(json).data;
+      const pipelineResponse = PipelineResponse.parse(json);
       queryClient.setQueryData(['pipelines', pipelineId], pipelineResponse);
       onSuccess?.(pipelineResponse);
     },
@@ -61,11 +61,20 @@ export function useUpdatePipeline(
 }
 
 export function useBlockTypes() {
-  return useQuery(['blockTypes'], async () => {
-    const response = await fetch(`${ENV.API_URL}/block_types`);
-    const json = await response.json();
-    return BlockTypesResponse.parse(json).data;
-  });
+  return useQuery(
+    ['blockTypes'],
+    async () => {
+      const response = await fetch(`${ENV.API_URL}/block_types`);
+      const json = await response.json();
+      return BlockTypesResponse.parse(json).data.reduce((acc, blockType) => {
+        acc[blockType.type] = blockType;
+        return acc;
+      }, {} as Record<string, z.TypeOf<typeof BlockType>>);
+    },
+    {
+      initialData: {},
+    },
+  );
 }
 
 export function usePipelineRun(
@@ -77,9 +86,8 @@ export function usePipelineRun(
   ) => void = () => {},
 ) {
   const { data: pipeline } = usePipeline(pipelineId);
-  const { data: blockTypes } = useBlockTypes();
   const { config } = pipeline;
-  const io = getBlocksIO(config.blocks, blockTypes || []);
+  const io = getBlocksIO(config.blocks);
 
   const socket = useRef<Socket>();
   const channel = useRef<Channel>();
@@ -146,6 +154,12 @@ export function usePipelineRun(
   };
 }
 
+export const IOType = z.object({
+  name: z.string(),
+  type: z.enum(['audio', 'text']),
+  public: z.boolean(),
+});
+
 export type IO = z.TypeOf<typeof IOType>;
 
 export type BlocksIO = {
@@ -153,25 +167,19 @@ export type BlocksIO = {
   outputs: IO[];
 };
 
-export function getBlocksIO(
-  blocks: z.TypeOf<typeof BlockConfig>[],
-  blockTypes: z.TypeOf<typeof BlockType>[],
-): BlocksIO {
+export function getBlocksIO(blocks: z.TypeOf<typeof BlockConfig>[]): BlocksIO {
   return blocks.reduce(
     ({ inputs, outputs }, block) => {
-      const blockType = (blockTypes || []).find(
-        (blockType) => blockType.type === block.type,
+      const publicInputs = block.block_type.inputs.filter(
+        (input) => input.public,
       );
-      if (!blockType) return { inputs, outputs };
-      const forwardedOutputs = block.forward_outputs
-        .map((output) =>
-          blockType.outputs.find((outputType) => outputType.name === output),
-        )
-        .filter(Boolean) as z.TypeOf<typeof IOType>[];
+      const publicOutputs = block.block_type.outputs.filter(
+        (output) => output.public,
+      );
 
       return {
-        inputs: [...inputs, ...nameIO(block.name, blockType.inputs)],
-        outputs: [...outputs, ...nameIO(block.name, forwardedOutputs)],
+        inputs: [...inputs, ...nameIO(block.name, publicInputs)],
+        outputs: [...outputs, ...nameIO(block.name, publicOutputs)],
       };
     },
     {
@@ -188,11 +196,18 @@ function nameIO(name: string, io: z.TypeOf<typeof IOType>[]) {
   }));
 }
 
+export const BlockType = z.object({
+  type: z.string(),
+  inputs: z.array(IOType),
+  outputs: z.array(IOType),
+  schema: z.string(),
+});
+
 export const BlockConfig = z.object({
   name: z.string(),
-  forward_outputs: z.array(z.string()),
   opts: z.record(z.string(), z.any()),
   type: z.string(),
+  block_type: BlockType,
 });
 
 export const Pipeline = z.object({
@@ -204,23 +219,15 @@ export const Pipeline = z.object({
   }),
 });
 
-export const PipelineResponse = z.object({
-  data: Pipeline,
-});
+export const PipelineResponse = z
+  .object({
+    data: Pipeline,
+  })
+  .transform((response) => {
+    return response.data;
+  });
 
 export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
-
-export const IOType = z.object({
-  name: z.string(),
-  type: z.enum(['audio', 'text']),
-});
-
-export const BlockType = z.object({
-  type: z.string(),
-  inputs: z.array(IOType),
-  outputs: z.array(IOType),
-  schema: z.string(),
-});
 
 const BlockTypes = z.array(BlockType);
 

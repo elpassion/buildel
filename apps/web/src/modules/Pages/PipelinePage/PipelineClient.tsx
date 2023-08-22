@@ -9,7 +9,6 @@ import { Modal } from '@elpassion/taco/Modal';
 import { ENV } from '~/env.mjs';
 import {
   BlockConfig,
-  BlockType,
   getBlocksIO,
   useBlockTypes,
   usePipeline,
@@ -74,35 +73,13 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
     stopRunBase();
   };
 
-  if (!pipeline || !blockTypes) return null;
-
   const trigger = {
     name: 'Websocket',
     url: `${ENV.WEBSOCKET_URL}/pipelines/${params.pipelineId}`,
-    ...getBlocksIO(config.blocks, blockTypes),
+    ...getBlocksIO(config.blocks),
   };
 
-  const blocks = pipeline.config.blocks
-    .map((block) => {
-      const blockType = blockTypes.find(
-        (blockType) => blockType.type === block.type,
-      );
-      if (!blockType) return null;
-      return {
-        name: block.name,
-        type: blockType.type,
-        opts: block.opts,
-        forward_outputs: block.forward_outputs,
-        blockType,
-      };
-    })
-    .filter(Boolean) as {
-    name: string;
-    type: string;
-    opts: Record<string, unknown>;
-    forward_outputs: string[];
-    blockType: z.TypeOf<typeof BlockType>;
-  }[];
+  const blocks = pipeline.config.blocks;
 
   function formatEvents(events: any[]) {
     let text = '';
@@ -282,7 +259,7 @@ export function PipelineClient({ params }: { params: { pipelineId: string } }) {
                     <div className="text-xxs">{block.name}</div>
                     <div className="mt-2 border bg-neutral-50 p-2">
                       <Schema
-                        schema={block.blockType.schema}
+                        schema={block.block_type.schema}
                         name={`blocks.${index}`}
                         fields={{
                           string: StringSummaryField,
