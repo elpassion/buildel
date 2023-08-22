@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { CloseIcon } from 'next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon';
 import { Handle, Position } from 'reactflow';
-import { IconButton } from '@elpassion/taco';
+import { Badge, IconButton } from '@elpassion/taco';
 import { Schema } from '~/modules/Pages';
 import {
   ArrayField,
@@ -35,13 +35,18 @@ export function CustomNode({ data }: CustomNodeProps) {
       ref={ref}
       className="min-h-[100px] min-w-[250px] rounded border border-neutral-100 bg-white drop-shadow-sm"
     >
-      <header className="flex justify-between bg-green-200 p-2">
-        <h3>{data.name}</h3>
+      <header className="flex items-center justify-between bg-green-200 p-2">
+        <div className="flex gap-2">
+          <h3 className="font-bold capitalize text-neutral-800">
+            {data.type.split('_')[1]}
+          </h3>
+          <Badge size="xs" text={data.name} />
+        </div>
 
         <IconButton
           icon={<CloseIcon />}
           size="xs"
-          variant="filled"
+          variant="basic"
           className="!h-6 !w-6 !p-1"
           onClick={handleDelete}
         />
@@ -50,15 +55,15 @@ export function CustomNode({ data }: CustomNodeProps) {
       <div className="p-2">
         <Handle type="target" position={Position.Top} />
 
-        <Schema
-          schema={data.block_type.schema}
-          name={null}
-          fields={{
-            string: StringField,
-            number: NumberField,
-            array: ArrayField,
-          }}
-        />
+        {/*<Schema*/}
+        {/*  schema={data.block_type.schema}*/}
+        {/*  name={null}*/}
+        {/*  fields={{*/}
+        {/*    string: StringField,*/}
+        {/*    number: NumberField,*/}
+        {/*    array: ArrayField,*/}
+        {/*  }}*/}
+        {/*/>*/}
 
         <Handle type="source" position={Position.Bottom} id="b" />
       </div>
