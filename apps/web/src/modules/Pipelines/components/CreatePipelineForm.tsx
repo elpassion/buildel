@@ -1,12 +1,14 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, Input } from '@elpassion/taco';
 import { TCreatePipeline } from '~/contracts';
 import { PipelinesApi } from '~/modules/Api';
+import { ROUTES } from '~/modules/Config';
 
-const appsApi = new PipelinesApi();
+const pipelinesApi = new PipelinesApi();
 
 // TODO (hub33k): use zod here instead
 type Inputs = {
@@ -14,6 +16,7 @@ type Inputs = {
 };
 
 export const CreatePipelineForm = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -24,10 +27,11 @@ export const CreatePipelineForm = () => {
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async (payload: TCreatePipeline) => {
-      return await appsApi.create(payload);
+      return await pipelinesApi.create(payload);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pipelines'] });
+    onSuccess: async (data: any) => {
+      await queryClient.invalidateQueries({ queryKey: ['pipelines'] });
+      router.push(ROUTES.PIPELINE(data.data.id));
     },
     onError: (error) => {
       console.error('Oops! Something went wrong!');
@@ -44,18 +48,16 @@ export const CreatePipelineForm = () => {
       },
     };
     try {
-      // TODO (hub33k): this should return pipeline data
       mutate(
         {
           pipeline: payload,
         },
         {
-          onSuccess: () => {
+          onSuccess: (data) => {
             reset();
           },
         },
       );
-      // TODO (hub33k): redirect to pipeliens/{pipelineId}
     } catch (e) {}
   };
 
@@ -80,7 +82,6 @@ export const CreatePipelineForm = () => {
               required: 'Name must be a string!',
             })}
           />
-          {/*{errors.name && <span>This field is required</span>}*/}
 
           <div className="mb-4" />
 

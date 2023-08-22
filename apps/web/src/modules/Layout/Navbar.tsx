@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Navbar as NavbarTaco } from '@elpassion/taco';
+import { Button, Icon, Navbar as NavbarTaco } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import { useLayout } from '~/modules/Layout/LayoutContext';
 import { CreatePipelineForm } from '~/modules/Pipelines';
@@ -47,7 +47,11 @@ function LeftContent() {
   // TODO (hub33k): change it based on route
   return (
     <>
-      <h2 className="text-2xl font-bold text-neutral-500">Pipelines</h2>
+      <div className="flex items-center justify-center gap-2">
+        <h2 className="text-2xl font-bold text-neutral-500">Workflows</h2>
+
+        <Icon iconName="help-circle" className="font-bold text-primary-500" />
+      </div>
     </>
   );
 }

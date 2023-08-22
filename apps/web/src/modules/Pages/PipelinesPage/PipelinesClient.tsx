@@ -1,14 +1,12 @@
 'use client';
 
-import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
+import { Loader } from '~/components';
 import { PipelinesApi } from '~/modules/Api';
-import { ROUTES } from '~/modules/Config';
+import { CreatePipelineForm } from '~/modules/Pipelines';
 import { PipelinesTable } from './PipelinesTable';
 
 const pipelinesApi = new PipelinesApi();
-
-// TODO (hub33k): add breadcrumbs
 
 export const PipelinesClient = () => {
   const { data, isLoading, isError } = useQuery({
@@ -16,21 +14,37 @@ export const PipelinesClient = () => {
     queryFn: () => pipelinesApi.getAll(),
   });
 
+  if (isLoading) {
+    return (
+      <>
+        <Loader />
+      </>
+    );
+  }
+
+  if (isError) {
+    return (
+      <>
+        <p className="text-center font-bold text-red-500">
+          Oops! Something went wrong!
+        </p>
+      </>
+    );
+  }
+
   const pipelines = data?.data ?? [];
+
+  if (!pipelines.length) {
+    return (
+      <>
+        <CreatePipelineForm />
+      </>
+    );
+  }
 
   return (
     <>
-      <p>Pipelines</p>
-
-      {isLoading ? (
-        <p className="animate-spins my-4">Loading apps. Please stand by...</p>
-      ) : (
-        <>
-          <div className="mb-4" />
-
-          <PipelinesTable pipelines={pipelines} />
-        </>
-      )}
+      <PipelinesTable pipelines={pipelines} />
     </>
   );
 };
