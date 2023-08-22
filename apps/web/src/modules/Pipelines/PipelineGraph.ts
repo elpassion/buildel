@@ -7,6 +7,59 @@ export interface IPipelineConfig {
 
 type IBlock = IBlockConfig;
 
+export interface Connection {
+  source: string;
+  sourceHandle: string;
+  target: string;
+  targetHandle: string;
+}
+
+export function getNodes(pipeline: IPipelineConfig) {
+  return pipeline.blocks.map((block) => ({
+    id: block.name,
+    type: block.block_type.type,
+    position: { x: 0, y: 0 },
+    data: block,
+  }));
+}
+
+export function getEdges(pipeline: IPipelineConfig) {
+  return pipeline.blocks
+    .filter((block) => block.opts.input)
+    .map((block) => ({
+      id: `${block.opts.input}-${block.name}:input`,
+      source: block.opts.input.split(':')[0],
+      sourceHandle: block.opts.input.split(':')[1],
+      target: block.name,
+      targetHandle: 'input',
+    }));
+}
+
+export function isValidConnection(
+  pipeline: IPipelineConfig,
+  connection: Connection,
+) {
+  const sourceBlock = pipeline.blocks.find(
+    (block) => block.name === connection.source,
+  );
+  const targetBlock = pipeline.blocks.find(
+    (block) => block.name === connection.target,
+  );
+
+  if (
+    !sourceBlock ||
+    !targetBlock ||
+    sourceBlock.block_type.outputs.find(
+      (output) => output.name === connection.sourceHandle,
+    )?.type !==
+      targetBlock.block_type.inputs.find(
+        (input) => input.name === connection.targetHandle,
+      )?.type
+  )
+    return false;
+  return true;
+}
+
 export function getBlocks(pipeline: IPipelineConfig): IBlock[] {
   return pipeline.blocks;
 }
@@ -40,27 +93,6 @@ export function disconnectIO(
     if (inputBlockIndex === -1) return;
     delete draft.blocks[inputBlockIndex].opts.input;
   });
-}
-
-export function getNodes(pipeline: IPipelineConfig) {
-  return pipeline.blocks.map((block) => ({
-    id: block.name,
-    type: block.block_type.type,
-    position: { x: 0, y: 0 },
-    data: block,
-  }));
-}
-
-export function getEdges(pipeline: IPipelineConfig) {
-  return pipeline.blocks
-    .filter((block) => block.opts.input)
-    .map((block) => ({
-      id: `${block.opts.input}-${block.name}:input`,
-      source: block.opts.input.split(':')[0],
-      sourceHandle: block.opts.input.split(':')[1],
-      target: block.name,
-      targetHandle: 'input',
-    }));
 }
 
 export function removeBlock(pipeline: IPipelineConfig, block: IBlock) {

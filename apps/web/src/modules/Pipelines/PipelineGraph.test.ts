@@ -179,6 +179,36 @@ describe(PipelineGraph.updateBlock, () => {
   });
 });
 
+describe(PipelineGraph.isValidConnection, () => {
+  test('returns true for valid connection', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [textInputBlockConfig, textOutputBlockConfig],
+    };
+    expect(
+      PipelineGraph.isValidConnection(pipeline, {
+        source: textInputBlockConfig.name,
+        sourceHandle: textInputBlockConfig.block_type.outputs.at(0)!.name,
+        target: textOutputBlockConfig.name,
+        targetHandle: textOutputBlockConfig.block_type.inputs.at(0)!.name,
+      }),
+    ).toEqual(true);
+  });
+
+  test('returns false for different types connection', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [audioInputBlockConfig, textOutputBlockConfig],
+    };
+    expect(
+      PipelineGraph.isValidConnection(pipeline, {
+        source: audioInputBlockConfig.name,
+        sourceHandle: audioInputBlockConfig.block_type.outputs.at(0)!.name,
+        target: textOutputBlockConfig.name,
+        targetHandle: textOutputBlockConfig.block_type.inputs.at(0)!.name,
+      }),
+    ).toEqual(false);
+  });
+});
+
 const textInputBlockConfig: IBlockConfig = {
   opts: {},
   type: 'text_input',
