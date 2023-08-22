@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import { IBlockConfig, IIO } from './pipelines.hooks';
 
 export interface IPipelineConfig {
@@ -10,8 +11,21 @@ export function getBlocks(pipeline: IPipelineConfig): IBlock[] {
   return pipeline.blocks;
 }
 
-export function connectIO(pipeline: IPipelineConfig, output: IIO, input: IIO) {
-  return pipeline;
+export function connectIO(
+  pipeline: IPipelineConfig,
+  output: { block: IBlock; output: IIO },
+  input: { block: IBlock; input: IIO },
+) {
+  return produce(pipeline, (draft) => {
+    if (output.output.type !== input.input.type) return;
+
+    const inputBlockIndex = draft.blocks.findIndex(
+      (block) => block.name === input.block.name,
+    );
+    draft.blocks[
+      inputBlockIndex
+    ].opts.input = `${output.block.name}:${output.output.name}`;
+  });
 }
 
 export function disconnectIO(
