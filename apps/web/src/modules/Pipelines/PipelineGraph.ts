@@ -64,7 +64,16 @@ export function getEdges(pipeline: IPipelineConfig) {
 }
 
 export function removeBlock(pipeline: IPipelineConfig, block: IBlock) {
-  return pipeline;
+  return produce(pipeline, (draft) => {
+    const blockIndex = draft.blocks.findIndex((b) => b.name === block.name);
+    if (blockIndex === -1) return;
+    draft.blocks.splice(blockIndex, 1);
+    draft.blocks
+      .filter((b) => b.opts.input === `${block.name}:output`)
+      .forEach((b) => {
+        delete b.opts.input;
+      });
+  });
 }
 
 export function addBlock(pipeline: IPipelineConfig, block: IBlock) {

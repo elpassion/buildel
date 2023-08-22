@@ -80,3 +80,5 @@ exports[`getNodes > returns all nodes 1`] = `
   },
 ]
 `;
+
+exports[`removeBlock > removes existing block 1`] = `[]`;

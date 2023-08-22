@@ -1,7 +1,6 @@
-import { expect, test, describe } from 'vitest';
+import { describe, expect, test } from 'vitest';
+import { IBlockConfig } from '.';
 import * as PipelineGraph from './PipelineGraph';
-import { IBlockConfig, IIO } from '.';
-import { text } from 'stream/consumers';
 
 test(PipelineGraph.getBlocks, () => {
   const pipeline: PipelineGraph.IPipelineConfig = {
@@ -114,6 +113,32 @@ describe(PipelineGraph.getEdges, () => {
       ],
     };
     expect(PipelineGraph.getEdges(pipeline)).toMatchSnapshot();
+  });
+});
+
+describe(PipelineGraph.removeBlock, () => {
+  test('removes existing block', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [textInputBlockConfig],
+    };
+    expect(PipelineGraph.removeBlock(pipeline, textInputBlockConfig)).toEqual({
+      blocks: [],
+    });
+  });
+
+  test('removes inputs connected to block', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [
+        textInputBlockConfig,
+        {
+          ...textOutputBlockConfig,
+          opts: { input: `${textInputBlockConfig.name}:output` },
+        },
+      ],
+    };
+    expect(PipelineGraph.removeBlock(pipeline, textInputBlockConfig)).toEqual({
+      blocks: [textOutputBlockConfig],
+    });
   });
 });
 
