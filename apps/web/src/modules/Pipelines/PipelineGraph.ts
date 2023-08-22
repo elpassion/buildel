@@ -13,27 +13,33 @@ export function getBlocks(pipeline: IPipelineConfig): IBlock[] {
 
 export function connectIO(
   pipeline: IPipelineConfig,
-  output: { block: IBlock; output: IIO },
-  input: { block: IBlock; input: IIO },
+  source: { block: IBlock; output: IIO },
+  destination: { block: IBlock; input: IIO },
 ) {
   return produce(pipeline, (draft) => {
-    if (output.output.type !== input.input.type) return;
-
+    if (source.output.type !== destination.input.type) return;
     const inputBlockIndex = draft.blocks.findIndex(
-      (block) => block.name === input.block.name,
+      (block) => block.name === destination.block.name,
     );
+    if (inputBlockIndex === -1) return;
     draft.blocks[
       inputBlockIndex
-    ].opts.input = `${output.block.name}:${output.output.name}`;
+    ].opts.input = `${source.block.name}:${source.output.name}`;
   });
 }
 
 export function disconnectIO(
   pipeline: IPipelineConfig,
-  output: IIO,
-  input: IIO,
+  _source: { block: IBlock; output: IIO },
+  destination: { block: IBlock; input: IIO },
 ) {
-  return pipeline;
+  return produce(pipeline, (draft) => {
+    const inputBlockIndex = draft.blocks.findIndex(
+      (block) => block.name === destination.block.name,
+    );
+    if (inputBlockIndex === -1) return;
+    delete draft.blocks[inputBlockIndex].opts.input;
+  });
 }
 
 export function getBlockInputs(pipeline: IPipelineConfig, block: IBlock) {

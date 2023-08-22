@@ -1,6 +1,7 @@
 import { expect, test, describe } from 'vitest';
 import * as PipelineGraph from './PipelineGraph';
 import { IBlockConfig, IIO } from '.';
+import { text } from 'stream/consumers';
 
 test(PipelineGraph.getBlocks, () => {
   const pipeline: PipelineGraph.IPipelineConfig = {
@@ -54,6 +55,35 @@ describe(PipelineGraph.connectIO, () => {
         },
       ),
     ).toEqual(pipeline);
+  });
+});
+
+describe(PipelineGraph.disconnectIO, () => {
+  test('disconnecting nodes works', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [
+        textInputBlockConfig,
+        {
+          ...textOutputBlockConfig,
+          opts: { input: `${textInputBlockConfig.name}:output` },
+        },
+      ],
+    };
+    expect(
+      PipelineGraph.disconnectIO(
+        pipeline,
+        {
+          block: textInputBlockConfig,
+          output: textInputBlockConfig.block_type.outputs.at(0)!,
+        },
+        {
+          block: textOutputBlockConfig,
+          input: textOutputBlockConfig.block_type.inputs.at(0)!,
+        },
+      ),
+    ).toEqual({
+      blocks: [textInputBlockConfig, textOutputBlockConfig],
+    });
   });
 });
 
