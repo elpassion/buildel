@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-// app == pipeline
-
 export const appConfigSchema = z.object({
-  version: z.number(),
+  version: z.string(),
   blocks: z.any(),
 });
 export type TAppConfig = z.infer<typeof appConfigSchema>;
@@ -21,7 +19,7 @@ export const createAppSchema = z.object({
       invalid_type_error: 'Name must be a string',
     }),
     config: z.object({
-      version: z.number(),
+      version: z.string(),
       blocks: z.object({}).array(),
     }),
   }),

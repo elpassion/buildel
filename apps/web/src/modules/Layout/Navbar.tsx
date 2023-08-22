@@ -2,10 +2,18 @@
 
 import React from 'react';
 import { Button, Navbar as NavbarTaco } from '@elpassion/taco';
+import { Modal } from '@elpassion/taco/Modal';
 import { useLayout } from '~/modules/Layout/LayoutContext';
+import { CreatePipelineForm } from '~/modules/Pipelines';
+import { useModal } from '~/utils/hooks';
 
 export const Navbar = () => {
   const [{ isSidebarOpen }, layoutDispatch] = useLayout();
+  const { isModalOpen, openModal, closeModal: closeModalBase } = useModal();
+
+  function closeModal() {
+    closeModalBase();
+  }
 
   return (
     <NavbarTaco
@@ -18,8 +26,18 @@ export const Navbar = () => {
         layoutDispatch({ type: 'toggleSidebar' });
       }}
     >
+      <Modal
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        ariaHideApp={false}
+        closeIcon="x"
+        className="w-[600px]"
+      >
+        <CreatePipelineForm />
+      </Modal>
+
       <div className="flex justify-end gap-2">
-        <Button size="sm" text="New project" />
+        <Button size="sm" text="New pipeline" onClick={openModal} />
       </div>
     </NavbarTaco>
   );
