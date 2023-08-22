@@ -77,9 +77,15 @@ export function removeBlock(pipeline: IPipelineConfig, block: IBlock) {
 }
 
 export function addBlock(pipeline: IPipelineConfig, block: IBlock) {
-  return pipeline;
+  return produce(pipeline, (draft) => {
+    draft.blocks.push(block);
+  });
 }
 
 export function updateBlock(pipeline: IPipelineConfig, block: IBlock) {
-  return pipeline;
+  return produce(pipeline, (draft) => {
+    const blockIndex = draft.blocks.findIndex((b) => b.name === block.name);
+    if (blockIndex === -1) return;
+    draft.blocks[blockIndex] = block;
+  });
 }

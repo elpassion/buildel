@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { IBlockConfig } from '.';
 import * as PipelineGraph from './PipelineGraph';
+import { text } from 'stream/consumers';
 
 test(PipelineGraph.getBlocks, () => {
   const pipeline: PipelineGraph.IPipelineConfig = {
@@ -138,6 +139,42 @@ describe(PipelineGraph.removeBlock, () => {
     };
     expect(PipelineGraph.removeBlock(pipeline, textInputBlockConfig)).toEqual({
       blocks: [textOutputBlockConfig],
+    });
+  });
+});
+
+describe(PipelineGraph.addBlock, () => {
+  test('adds new block', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [],
+    };
+    expect(PipelineGraph.addBlock(pipeline, textInputBlockConfig)).toEqual({
+      blocks: [textInputBlockConfig],
+    });
+  });
+});
+
+describe(PipelineGraph.updateBlock, () => {
+  test('updates existing block', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [textInputBlockConfig],
+    };
+    expect(
+      PipelineGraph.updateBlock(pipeline, {
+        ...textInputBlockConfig,
+        opts: {
+          example: 'test',
+        },
+      }),
+    ).toEqual({
+      blocks: [
+        {
+          ...textInputBlockConfig,
+          opts: {
+            example: 'test',
+          },
+        },
+      ],
     });
   });
 });
