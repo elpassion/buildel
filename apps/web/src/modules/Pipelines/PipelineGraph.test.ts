@@ -220,6 +220,25 @@ describe(PipelineGraph.toPipelineConfig, () => {
   });
 });
 
+describe(PipelineGraph.getBlockHandles, () => {
+  test('returns handles for block', () => {
+    expect(PipelineGraph.getBlockHandles(textInputBlockConfig)).toEqual([
+      {
+        type: 'source',
+        id: 'output',
+        data: textInputBlockConfig.block_type.outputs.at(0)!,
+      },
+    ]);
+    expect(PipelineGraph.getBlockHandles(textOutputBlockConfig)).toEqual([
+      {
+        type: 'target',
+        id: 'input',
+        data: textOutputBlockConfig.block_type.inputs.at(0)!,
+      },
+    ]);
+  });
+});
+
 const textInputBlockConfig: IBlockConfig = {
   opts: {},
   type: 'text_input',

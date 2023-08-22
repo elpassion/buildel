@@ -29,6 +29,12 @@ export interface IEdge {
   targetHandle: string;
 }
 
+export interface IHandle {
+  type: 'source' | 'target';
+  id: string;
+  data: IIO;
+}
+
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
     id: block.name,
@@ -144,4 +150,24 @@ export function updateBlock(pipeline: IPipelineConfig, block: IBlock) {
     if (blockIndex === -1) return;
     draft.blocks[blockIndex] = block;
   });
+}
+
+export function getBlockHandles(block: IBlock): IHandle[] {
+  const blockType = block.block_type;
+  return [
+    ...blockType.inputs
+      .filter((input) => !input.public)
+      .map((input) => ({
+        type: 'target' as const,
+        id: input.name,
+        data: input,
+      })),
+    ...blockType.outputs
+      .filter((output) => !output.public)
+      .map((output) => ({
+        type: 'source' as const,
+        id: output.name,
+        data: output,
+      })),
+  ];
 }
