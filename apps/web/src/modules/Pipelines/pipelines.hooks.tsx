@@ -160,11 +160,11 @@ export const IOType = z.object({
   public: z.boolean(),
 });
 
-export type IO = z.TypeOf<typeof IOType>;
+export type IIO = z.TypeOf<typeof IOType>;
 
 export type BlocksIO = {
-  inputs: IO[];
-  outputs: IO[];
+  inputs: IIO[];
+  outputs: IIO[];
 };
 
 export function getBlocksIO(blocks: z.TypeOf<typeof BlockConfig>[]): BlocksIO {
@@ -209,6 +209,8 @@ export const BlockConfig = z.object({
   type: z.string(),
   block_type: BlockType,
 });
+
+export type IBlockConfig = z.TypeOf<typeof BlockConfig>;
 
 export const Pipeline = z.object({
   id: z.number(),

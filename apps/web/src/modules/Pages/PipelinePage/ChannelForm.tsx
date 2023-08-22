@@ -2,19 +2,19 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@elpassion/taco';
 import { SelectDropdown } from '@elpassion/taco/Dropdown';
-import { BlocksIO, IO } from '~/modules/Pipelines';
+import { BlocksIO, IIO } from '~/modules/Pipelines';
 
 export function ChannelForm({
   onSubmit,
   io,
 }: {
-  onSubmit: (data: { message: string; io: IO }) => void;
+  onSubmit: (data: { message: string; io: IIO }) => void;
   io: BlocksIO;
 }) {
   const textInputs = io.inputs.filter((input) => input.type === 'text');
   const { handleSubmit, register, setValue } = useForm<{
     message: string;
-    io: IO;
+    io: IIO;
   }>({
     defaultValues: {
       message: '',
