@@ -1,3 +1,3 @@
-import { ProjectsPage } from '~/modules/Pages';
+import { PipelinesPage } from '~/modules/Pages';
 
-export default ProjectsPage;
+export default PipelinesPage;

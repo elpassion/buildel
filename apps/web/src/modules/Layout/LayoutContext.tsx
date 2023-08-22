@@ -8,17 +8,16 @@ import { useToggle } from '@mantine/hooks';
 type Action =
   | {
       type: 'toggleSidebar';
-      value?: boolean;
+      isSidebarOpen?: boolean;
     }
   | {
-      type: 'closeSidebar';
-    }
-  | {
-      type: 'openSidebar';
+      type: 'toggleSidebarCollapse';
+      isSidebarCollapsed?: boolean;
     };
 type Dispatch = (action: Action) => void;
 type State = {
   isSidebarOpen: boolean;
+  isSidebarCollapsed: boolean;
 };
 type Value = [state: State, dispatch: Dispatch];
 
@@ -27,13 +26,15 @@ const LayoutStateContext = React.createContext<Value | undefined>(undefined);
 function layoutReducer(state: State, action: Action) {
   switch (action.type) {
     case 'toggleSidebar': {
-      return { ...state, isSidebarOpen: !state.isSidebarOpen };
+      const value = action.isSidebarOpen;
+      return { ...state, isSidebarOpen: value ?? !state.isSidebarOpen };
     }
-    case 'closeSidebar': {
-      return { ...state, isSidebarOpen: false };
-    }
-    case 'openSidebar': {
-      return { ...state, isSidebarOpen: true };
+    case 'toggleSidebarCollapse': {
+      const value = action.isSidebarCollapsed;
+      return {
+        ...state,
+        isSidebarCollapsed: value ?? !state.isSidebarCollapsed,
+      };
     }
     default: {
       // @ts-ignore
@@ -48,6 +49,7 @@ type LayoutProviderProps = {
 function LayoutProvider({ children }: LayoutProviderProps) {
   const [state, dispatch] = React.useReducer(layoutReducer, {
     isSidebarOpen: false,
+    isSidebarCollapsed: true,
   });
   const value: Value = [state, dispatch];
 

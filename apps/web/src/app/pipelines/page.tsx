@@ -1,5 +1,3 @@
-// TODO (hub33k): add pipelines page
+import { PipelinesPage } from '~/modules/Pages';
 
-import { PipelinePage } from '~/modules/Pages';
-
-export default PipelinePage;
+export default PipelinesPage;

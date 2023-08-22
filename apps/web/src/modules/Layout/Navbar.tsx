@@ -26,9 +26,10 @@ export const Navbar = () => {
 };
 
 function LeftContent() {
+  // TODO (hub33k): change it based on route
   return (
     <>
-      <h2 className="text-2xl font-bold text-neutral-500">Projects</h2>
+      <h2 className="text-2xl font-bold text-neutral-500">Pipelines</h2>
     </>
   );
 }
