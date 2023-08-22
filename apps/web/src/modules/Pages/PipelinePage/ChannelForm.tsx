@@ -1,7 +1,7 @@
-import { Input } from '@elpassion/taco';
-import { SelectDropdown } from '@elpassion/taco/Dropdown';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { Input } from '@elpassion/taco';
+import { SelectDropdown } from '@elpassion/taco/Dropdown';
 import { BlocksIO, IO } from '~/modules/Pipelines';
 
 export function ChannelForm({

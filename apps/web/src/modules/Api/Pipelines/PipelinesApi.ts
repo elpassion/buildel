@@ -1,7 +1,7 @@
-import { TApp, TCreateApp } from '~/contracts';
+import { TCreatePipeline, TPipeline } from '~/contracts';
 import { HttpClient, createHttpClient } from '~/utils';
 
-export class AppsApi {
+export class PipelinesApi {
   public baseUrl = `/pipelines`;
   private client: HttpClient;
 
@@ -12,14 +12,14 @@ export class AppsApi {
   // TODO (hub33k): return from backend just array?
   //   how to type this?
   getAll() {
-    return this.client.get<{ data: TApp[] }>(`${this.baseUrl}`);
+    return this.client.get<{ data: TPipeline[] }>(`${this.baseUrl}`);
   }
 
   get(id: string) {
-    return this.client.get<TApp>(`${this.baseUrl}/${id}`);
+    return this.client.get<TPipeline>(`${this.baseUrl}/${id}`);
   }
 
-  create(payload: TCreateApp) {
-    return this.client.post<TCreateApp>(`${this.baseUrl}`, payload);
+  create(payload: TCreatePipeline) {
+    return this.client.post<TCreatePipeline>(`${this.baseUrl}`, payload);
   }
 }

@@ -13,7 +13,7 @@ export const appSchema = z.object({
   name: z.number(),
   config: appConfigSchema,
 });
-export type TApp = z.infer<typeof appSchema>;
+export type TPipeline = z.infer<typeof appSchema>;
 
 export const createAppSchema = z.object({
   pipeline: z.object({
@@ -26,4 +26,4 @@ export const createAppSchema = z.object({
     }),
   }),
 });
-export type TCreateApp = z.infer<typeof createAppSchema>;
+export type TCreatePipeline = z.infer<typeof createAppSchema>;
