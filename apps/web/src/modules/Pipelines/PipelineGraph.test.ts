@@ -87,6 +87,36 @@ describe(PipelineGraph.disconnectIO, () => {
   });
 });
 
+describe(PipelineGraph.getNodes, () => {
+  test('returns all nodes', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [
+        textInputBlockConfig,
+        {
+          ...textOutputBlockConfig,
+          opts: { input: `${textInputBlockConfig.name}:output` },
+        },
+      ],
+    };
+    expect(PipelineGraph.getNodes(pipeline)).toMatchSnapshot();
+  });
+});
+
+describe(PipelineGraph.getEdges, () => {
+  test('returns all edges', () => {
+    const pipeline: PipelineGraph.IPipelineConfig = {
+      blocks: [
+        textInputBlockConfig,
+        {
+          ...textOutputBlockConfig,
+          opts: { input: `${textInputBlockConfig.name}:output` },
+        },
+      ],
+    };
+    expect(PipelineGraph.getEdges(pipeline)).toMatchSnapshot();
+  });
+});
+
 const textInputBlockConfig: IBlockConfig = {
   opts: {},
   type: 'text_input',

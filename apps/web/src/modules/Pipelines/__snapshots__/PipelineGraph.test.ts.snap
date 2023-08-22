@@ -1,0 +1,82 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getEdges > returns all edges 1`] = `
+[
+  {
+    "id": "text_input:output-text_output:input",
+    "source": "text_input",
+    "sourceHandle": "output",
+    "target": "text_output",
+    "targetHandle": "input",
+  },
+]
+`;
+
+exports[`getNodes > returns all nodes 1`] = `
+[
+  {
+    "data": {
+      "block_type": {
+        "inputs": [
+          {
+            "name": "input",
+            "public": true,
+            "type": "text",
+          },
+        ],
+        "outputs": [
+          {
+            "name": "output",
+            "public": false,
+            "type": "text",
+          },
+        ],
+        "schema": "",
+        "type": "text_input",
+      },
+      "name": "text_input",
+      "opts": {},
+      "type": "text_input",
+    },
+    "id": "text_input",
+    "position": {
+      "x": 0,
+      "y": 0,
+    },
+    "type": "text_input",
+  },
+  {
+    "data": {
+      "block_type": {
+        "inputs": [
+          {
+            "name": "input",
+            "public": false,
+            "type": "text",
+          },
+        ],
+        "outputs": [
+          {
+            "name": "output",
+            "public": true,
+            "type": "text",
+          },
+        ],
+        "schema": "",
+        "type": "text_output",
+      },
+      "name": "text_output",
+      "opts": {
+        "input": "text_input:output",
+      },
+      "type": "text_output",
+    },
+    "id": "text_output",
+    "position": {
+      "x": 0,
+      "y": 0,
+    },
+    "type": "text_output",
+  },
+]
+`;
