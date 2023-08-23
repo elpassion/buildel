@@ -27,6 +27,7 @@ import { EditBlockForm } from '~/modules/Pages/PipelinePage/EditBlockForm';
 import {
   getEdges,
   getNodes,
+  isValidConnection,
   toPipelineConfig,
 } from '~/modules/Pipelines/PipelineGraph';
 import {
@@ -163,6 +164,9 @@ export function PipelineFlow({
         onDrop={onDrop}
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
+        isValidConnection={(connection) =>
+          isValidConnection(pipeline.config, connection)
+        }
         fitView
       >
         <Background variant={BackgroundVariant.Lines} />
