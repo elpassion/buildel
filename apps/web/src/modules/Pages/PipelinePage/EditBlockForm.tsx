@@ -18,7 +18,6 @@ export function EditBlockForm({
   onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
 }) {
-  console.log(blockConfig);
   const methods = useForm<z.TypeOf<typeof BlockConfig>>({
     defaultValues: blockConfig,
   });

@@ -77,24 +77,25 @@ export function PipelineBoard({
   const handleUpdateBlock = useCallback(
     (data: IBlockConfig) => {
       assert(pipeline);
-      assert(editableBlock);
-      console.log(data);
+
+      const updatedBlocks = pipeline.config.blocks.map((block) => {
+        if (block.name === data.name) {
+          return data;
+        }
+        return block;
+      });
+
       updatePipeline({
         ...pipeline,
         config: {
           ...pipeline.config,
-          blocks: pipeline.config.blocks.map((block) => {
-            if (block.name === editableBlock.name) {
-              return data;
-            }
-            return block;
-          }),
+          blocks: updatedBlocks,
         },
       });
 
       handleCloseModal();
     },
-    [pipeline, editableBlock],
+    [pipeline, updatePipeline],
   );
 
   const handleAddBlock = useCallback(
