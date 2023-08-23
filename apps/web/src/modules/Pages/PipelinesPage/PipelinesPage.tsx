@@ -1,9 +1,14 @@
 import { PipelinesClient } from './PipelinesClient';
+import { PipelinesNavbar } from './PipelinesNavbar';
 
 export const PipelinesPage = () => {
   return (
-    <div className="p-8">
-      <PipelinesClient />
-    </div>
+    <>
+      <PipelinesNavbar />
+
+      <div className="p-8">
+        <PipelinesClient />
+      </div>
+    </>
   );
 };

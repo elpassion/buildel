@@ -7,7 +7,12 @@ import { useLayout } from '~/modules/Layout/LayoutContext';
 import { CreatePipelineForm } from '~/modules/Pipelines';
 import { useModal } from '~/utils/hooks';
 
-export const Navbar = () => {
+interface NavbarProps {
+  leftContent?: React.ReactNode;
+  rightContent?: React.ReactNode;
+}
+
+export const Navbar = ({ leftContent, rightContent }: NavbarProps) => {
   const [{ isSidebarOpen }, layoutDispatch] = useLayout();
   const { isModalOpen, openModal, closeModal: closeModalBase } = useModal();
 
@@ -17,28 +22,29 @@ export const Navbar = () => {
 
   return (
     <NavbarTaco
-      leftContent={<LeftContent />}
+      leftContent={leftContent}
       menuClassName="md:hidden"
       isMenuOpen={isSidebarOpen}
       menuPosition="right"
-      className=""
       onMenuClick={function noRefCheck() {
         layoutDispatch({ type: 'toggleSidebar' });
       }}
     >
-      <Modal
-        isOpen={isModalOpen}
-        closeModal={closeModal}
-        ariaHideApp={false}
-        closeIcon="x"
-        className="w-[600px]"
-      >
-        <CreatePipelineForm />
-      </Modal>
+      {rightContent}
 
-      <div className="flex justify-end gap-2">
-        <Button size="sm" text="New pipeline" onClick={openModal} />
-      </div>
+      {/*<Modal*/}
+      {/*  isOpen={isModalOpen}*/}
+      {/*  closeModal={closeModal}*/}
+      {/*  ariaHideApp={false}*/}
+      {/*  closeIcon="x"*/}
+      {/*  className="w-[600px]"*/}
+      {/*>*/}
+      {/*  <CreatePipelineForm />*/}
+      {/*</Modal>*/}
+
+      {/*<div className="flex justify-end gap-2">*/}
+      {/*  <Button size="sm" text="New pipeline" onClick={openModal} />*/}
+      {/*</div>*/}
     </NavbarTaco>
   );
 };

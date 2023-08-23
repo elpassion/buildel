@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Loader } from '~/components';
 import { PipelinesApi } from '~/modules/Api';
@@ -9,6 +10,7 @@ import { PipelinesTable } from './PipelinesTable';
 const pipelinesApi = new PipelinesApi();
 
 export const PipelinesClient = () => {
+  // TODO (hub33k): extract all useQuery and useMutation to hooks
   const { data, isLoading, isError } = useQuery({
     queryKey: ['pipelines'],
     queryFn: () => pipelinesApi.getAll(),

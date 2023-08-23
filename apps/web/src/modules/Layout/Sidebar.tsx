@@ -23,7 +23,7 @@ const mainNavItems = [
     leftIcon: 'home',
   },
   {
-    text: 'Pipelines',
+    text: 'Workflows',
     href: ROUTES.PIPELINES,
     leftIcon: 'three-layers',
   },
@@ -87,7 +87,7 @@ function SidebarMainContent() {
             <Link key={item.text} href={item.href}>
               <MenuItem
                 text={item.text}
-                leftIcon={<Icon iconName="life-buoy" />}
+                leftIcon={<Icon iconName={item.leftIcon} />}
                 middleIcon={
                   isCollapsed && (
                     <Icon
