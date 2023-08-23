@@ -1,59 +1,37 @@
 import { produce } from 'immer';
-import { IBlockConfig, IIO } from './pipelines.hooks';
-
-export interface IPipelineConfig {
-  blocks: IBlock[];
-}
-
-type IBlock = IBlockConfig;
-
-export interface Connection {
-  source: string;
-  sourceHandle: string;
-  target: string;
-  targetHandle: string;
-}
-
-export interface INode {
-  id: string;
-  type: string;
-  position: { x: number; y: number };
-  data: IBlock;
-}
-
-export interface IEdge {
-  id: string;
-  source: string;
-  sourceHandle: string;
-  target: string;
-  targetHandle: string;
-}
-
-export interface IHandle {
-  type: 'source' | 'target';
-  id: string;
-  data: IIO;
-}
+import { cloneDeep } from 'lodash';
+import { Connection } from 'reactflow';
+import {
+  IBlock,
+  IEdge,
+  IHandle,
+  IIO,
+  INode,
+  IPipelineConfig,
+} from '~/modules/Pipelines/pipelines.types';
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
     id: block.name,
     type: block.block_type.type,
-    position: { x: 0, y: 0 },
+    position: block.position ?? {
+      x: 100,
+      y: 100,
+    },
     data: block,
   }));
 }
 
 export function getEdges(pipeline: IPipelineConfig): IEdge[] {
-  return pipeline.blocks
-    .filter((block) => block.opts.input)
-    .map((block) => ({
-      id: `${block.opts.input}-${block.name}:input`,
-      source: block.opts.input.split(':')[0],
-      sourceHandle: block.opts.input.split(':')[1],
+  return pipeline.blocks.flatMap((block) =>
+    block.inputs.map((input) => ({
+      id: `${input}-${block.name}:input`,
+      source: input.split(':')[0],
+      sourceHandle: input.split(':')[1],
       target: block.name,
       targetHandle: 'input',
-    }));
+    })),
+  );
 }
 
 export function isValidConnection(
@@ -83,10 +61,23 @@ export function isValidConnection(
 
 export function toPipelineConfig(
   nodes: INode[],
-  _edges: IEdge[],
+  edges: IEdge[],
 ): IPipelineConfig {
+  const tmpNodes = cloneDeep(nodes);
+
+  tmpNodes.forEach((node) => {
+    node.data.inputs = [];
+  });
+
+  edges.forEach((edge) => {
+    const targetNode = tmpNodes.find((node) => node.id === edge.target);
+    if (!targetNode) return;
+
+    targetNode.data.inputs.push(`${edge.source}:${edge.sourceHandle}`);
+  });
+
   return {
-    blocks: nodes.map((node) => node.data),
+    blocks: tmpNodes.map((node) => ({ ...node.data, position: node.position })),
   };
 }
 

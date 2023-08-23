@@ -1,10 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import { IBlockConfig } from '.';
 import * as PipelineGraph from './PipelineGraph';
-import { text } from 'stream/consumers';
+import { IBlockConfig, IPipelineConfig } from './pipelines.types';
 
 test(PipelineGraph.getBlocks, () => {
-  const pipeline: PipelineGraph.IPipelineConfig = {
+  const pipeline: IPipelineConfig = {
     blocks: [textInputBlockConfig],
   };
   expect(PipelineGraph.getBlocks(pipeline)).toEqual([textInputBlockConfig]);
@@ -12,7 +11,7 @@ test(PipelineGraph.getBlocks, () => {
 
 describe(PipelineGraph.connectIO, () => {
   test('connecting nodes of the same type works', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [textInputBlockConfig, textOutputBlockConfig],
     };
     expect(
@@ -39,7 +38,7 @@ describe(PipelineGraph.connectIO, () => {
   });
 
   test('connecting nodes of different types does not work', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [textInputBlockConfig, textOutputBlockConfig],
     };
     expect(
@@ -60,7 +59,7 @@ describe(PipelineGraph.connectIO, () => {
 
 describe(PipelineGraph.disconnectIO, () => {
   test('disconnecting nodes works', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [
         textInputBlockConfig,
         {
@@ -89,7 +88,7 @@ describe(PipelineGraph.disconnectIO, () => {
 
 describe(PipelineGraph.getNodes, () => {
   test('returns all nodes', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [
         textInputBlockConfig,
         {
@@ -104,12 +103,13 @@ describe(PipelineGraph.getNodes, () => {
 
 describe(PipelineGraph.getEdges, () => {
   test('returns all edges', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [
         textInputBlockConfig,
         {
           ...textOutputBlockConfig,
-          opts: { input: `${textInputBlockConfig.name}:output` },
+          opts: {},
+          inputs: [`${textInputBlockConfig.name}:output`],
         },
       ],
     };
@@ -119,7 +119,7 @@ describe(PipelineGraph.getEdges, () => {
 
 describe(PipelineGraph.removeBlock, () => {
   test('removes existing block', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [textInputBlockConfig],
     };
     expect(PipelineGraph.removeBlock(pipeline, textInputBlockConfig)).toEqual({
@@ -128,7 +128,7 @@ describe(PipelineGraph.removeBlock, () => {
   });
 
   test('removes inputs connected to block', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [
         textInputBlockConfig,
         {
@@ -145,7 +145,7 @@ describe(PipelineGraph.removeBlock, () => {
 
 describe(PipelineGraph.addBlock, () => {
   test('adds new block', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [],
     };
     expect(PipelineGraph.addBlock(pipeline, textInputBlockConfig)).toEqual({
@@ -156,7 +156,7 @@ describe(PipelineGraph.addBlock, () => {
 
 describe(PipelineGraph.updateBlock, () => {
   test('updates existing block', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [textInputBlockConfig],
     };
     expect(
@@ -181,7 +181,7 @@ describe(PipelineGraph.updateBlock, () => {
 
 describe(PipelineGraph.isValidConnection, () => {
   test('returns true for valid connection', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [textInputBlockConfig, textOutputBlockConfig],
     };
     expect(
@@ -195,7 +195,7 @@ describe(PipelineGraph.isValidConnection, () => {
   });
 
   test('returns false for different types connection', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
+    const pipeline: IPipelineConfig = {
       blocks: [audioInputBlockConfig, textOutputBlockConfig],
     };
     expect(
@@ -211,8 +211,15 @@ describe(PipelineGraph.isValidConnection, () => {
 
 describe(PipelineGraph.toPipelineConfig, () => {
   test('converts graph to pipeline config', () => {
-    const pipeline: PipelineGraph.IPipelineConfig = {
-      blocks: [textInputBlockConfig],
+    const pipeline: IPipelineConfig = {
+      blocks: [
+        textInputBlockConfig,
+        {
+          ...textOutputBlockConfig,
+          opts: {},
+          inputs: [`${textInputBlockConfig.name}:output`],
+        },
+      ],
     };
     const nodes = PipelineGraph.getNodes(pipeline);
     const edges = PipelineGraph.getEdges(pipeline);
@@ -241,6 +248,8 @@ describe(PipelineGraph.getBlockHandles, () => {
 
 const textInputBlockConfig: IBlockConfig = {
   opts: {},
+  inputs: [],
+  position: { x: 100, y: 100 },
   type: 'text_input',
   name: 'text_input',
   block_type: {
@@ -253,6 +262,8 @@ const textInputBlockConfig: IBlockConfig = {
 
 const textOutputBlockConfig: IBlockConfig = {
   opts: {},
+  inputs: [],
+  position: { x: 100, y: 100 },
   type: 'text_output',
   name: 'text_output',
   block_type: {
@@ -265,6 +276,7 @@ const textOutputBlockConfig: IBlockConfig = {
 
 const audioInputBlockConfig: IBlockConfig = {
   opts: {},
+  inputs: [],
   type: 'audio_input',
   name: 'audio_input',
   block_type: {

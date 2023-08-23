@@ -1,8 +1,26 @@
+'use client';
 import { useRef, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  UseQueryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { Channel, Socket } from 'phoenix';
 import { z } from 'zod';
 import { ENV } from '~/env.mjs';
+import { blockTypesApi } from '~/modules/Pipelines/BlockTypesApi';
+import { pipelineApi } from '~/modules/Pipelines/PipelineApi';
+import {
+  BlockConfig,
+  BlocksIO,
+  IBlockTypesObj,
+  IOType,
+  IPipeline,
+  Pipeline,
+  PipelineResponse,
+  PipelinesResponse,
+} from '~/modules/Pipelines/pipelines.types';
 import { assert } from '~/utils/assert';
 
 export function usePipelines() {
@@ -13,23 +31,15 @@ export function usePipelines() {
   });
 }
 
-export function usePipeline(pipelineId: string) {
-  return useQuery(
+export function usePipeline(
+  pipelineId: string,
+  options?: UseQueryOptions<IPipeline>,
+) {
+  return useQuery<IPipeline>(
     ['pipelines', pipelineId],
-    async () => {
-      const response = await fetch(`${ENV.API_URL}/pipelines/${pipelineId}`);
-      const json = await response.json();
-      return PipelineResponse.parse(json);
-    },
+    () => pipelineApi.getPipeline(pipelineId),
     {
-      initialData: {
-        id: parseInt(pipelineId),
-        name: '',
-        config: {
-          version: '0',
-          blocks: [],
-        },
-      },
+      ...options,
     },
   );
 }
@@ -56,25 +66,15 @@ export function useUpdatePipeline(
       const pipelineResponse = PipelineResponse.parse(json);
       queryClient.setQueryData(['pipelines', pipelineId], pipelineResponse);
       onSuccess?.(pipelineResponse);
+      return pipelineResponse;
     },
   });
 }
 
 export function useBlockTypes() {
-  return useQuery(
-    ['blockTypes'],
-    async () => {
-      const response = await fetch(`${ENV.API_URL}/block_types`);
-      const json = await response.json();
-      return BlockTypesResponse.parse(json).data.reduce((acc, blockType) => {
-        acc[blockType.type] = blockType;
-        return acc;
-      }, {} as Record<string, z.TypeOf<typeof BlockType>>);
-    },
-    {
-      initialData: {},
-    },
-  );
+  return useQuery<IBlockTypesObj>(['blockTypes'], blockTypesApi.getBlockTypes, {
+    initialData: {},
+  });
 }
 
 export function usePipelineRun(
@@ -86,7 +86,11 @@ export function usePipelineRun(
   ) => void = () => {},
 ) {
   const { data: pipeline } = usePipeline(pipelineId);
+
+  if (!pipeline) throw new Error('FIX THIS');
+
   const { config } = pipeline;
+
   const io = getBlocksIO(config.blocks);
 
   const socket = useRef<Socket>();
@@ -154,19 +158,6 @@ export function usePipelineRun(
   };
 }
 
-export const IOType = z.object({
-  name: z.string(),
-  type: z.enum(['audio', 'text']),
-  public: z.boolean(),
-});
-
-export type IIO = z.TypeOf<typeof IOType>;
-
-export type BlocksIO = {
-  inputs: IIO[];
-  outputs: IIO[];
-};
-
 export function getBlocksIO(blocks: z.TypeOf<typeof BlockConfig>[]): BlocksIO {
   return blocks.reduce(
     ({ inputs, outputs }, block) => {
@@ -195,80 +186,3 @@ function nameIO(name: string, io: z.TypeOf<typeof IOType>[]) {
     name: `${name}:${input.name}`,
   }));
 }
-
-export const BlockType = z.object({
-  type: z.string(),
-  inputs: z.array(IOType),
-  outputs: z.array(IOType),
-  schema: z.string(),
-});
-
-export const BlockConfig = z.object({
-  name: z.string(),
-  opts: z.record(z.string(), z.any()),
-  type: z.string(),
-  block_type: BlockType,
-});
-
-export type IBlockConfig = z.TypeOf<typeof BlockConfig>;
-
-export const Pipeline = z.object({
-  id: z.number(),
-  name: z.string(),
-  config: z.object({
-    version: z.string(),
-    blocks: z.array(BlockConfig),
-  }),
-});
-
-export const PipelineResponse = z
-  .object({
-    data: Pipeline,
-  })
-  .transform((response) => {
-    return response.data;
-  });
-
-export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
-
-const BlockTypes = z.array(BlockType);
-
-export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
-
-const BlockTypesResponse = z.object({
-  data: BlockTypes,
-});
-
-export type JSONSchemaField =
-  | {
-      type: 'object';
-      properties: { [key: string]: JSONSchemaField };
-      required?: string[];
-    }
-  | {
-      type: 'string';
-      title: string;
-      description: string;
-      minLength?: number;
-    }
-  | {
-      type: 'string';
-      title: string;
-      description: string;
-      minLength?: number;
-      enum: string[];
-      enumPresentAs: 'checkbox' | 'radio';
-    }
-  | {
-      type: 'number';
-      title: string;
-      description: string;
-      minimum?: number;
-      maximum?: number;
-    }
-  | {
-      type: 'array';
-      title: string;
-      description: string;
-      items: JSONSchemaField;
-    };

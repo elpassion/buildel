@@ -8,24 +8,19 @@ import { Badge, Button, Card, Icon, IconButton } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import { ENV } from '~/env.mjs';
 import {
-  BlockConfig,
   getBlocksIO,
   useBlockTypes,
   usePipeline,
   usePipelineRun,
   useUpdatePipeline,
 } from '~/modules/Pipelines/pipelines.hooks';
+import { BlockConfig } from '~/modules/Pipelines/pipelines.types';
 import { assert } from '~/utils/assert';
 import { useModal } from '~/utils/hooks/useModal';
 import { AddBlockForm } from './AddBlockForm';
 import { ChannelForm } from './ChannelForm';
 import { EditBlockForm } from './EditBlockForm';
 import { Field, FieldProps, Schema } from './Schema';
-import {
-  getEdges,
-  getNodes,
-  toPipelineConfig,
-} from '~/modules/Pipelines/PipelineGraph';
 
 export function PipelineClient({ params }: { params: { pipelineId: string } }) {
   const { data: pipeline } = usePipeline(params.pipelineId);

@@ -1,9 +1,16 @@
-import { PipelineClient } from './PipelineClient';
+import { blockTypesApi } from '~/modules/Pipelines/BlockTypesApi';
+import { pipelineApi } from '~/modules/Pipelines/PipelineApi';
+import { PipelineBoard } from './PipelineBoard';
+import { PipelineHeader } from './PipelineHeader';
 
-export const PipelinePage = (props: { params: { pipelineId: string } }) => {
+export async function PipelinePage(props: { params: { pipelineId: string } }) {
+  // const pipeline = await pipelineApi.getPipeline(props.params.pipelineId);
+  // const blockTypes = await blockTypesApi.getBlockTypes();
+
   return (
-    <>
-      <PipelineClient {...props} />
-    </>
+    <PipelineBoard
+      // initialData={pipeline}
+      pipelineId={props.params.pipelineId}
+    />
   );
-};
+}

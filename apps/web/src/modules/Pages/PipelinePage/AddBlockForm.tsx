@@ -6,10 +6,8 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@elpassion/taco';
 import { IDropdownOption, SelectDropdown } from '@elpassion/taco/Dropdown';
-import {
-  BlockConfig,
-  useBlockTypes,
-} from '~/modules/Pipelines/pipelines.hooks';
+import { useBlockTypes } from '~/modules/Pipelines/pipelines.hooks';
+import { BlockConfig } from '~/modules/Pipelines/pipelines.types';
 import { Schema } from './Schema';
 import { ArrayField, NumberField, StringField } from './SchemaFormFields';
 
@@ -23,6 +21,7 @@ export function AddBlockForm({
     defaultValues: {
       name: '',
       opts: {},
+      inputs: [],
     },
   });
   const { handleSubmit, register, setValue, watch } = methods;
@@ -34,6 +33,7 @@ export function AddBlockForm({
       name: blockNameValue,
       type: blockTypeValue,
       opts: {},
+      inputs: [],
     });
   }, [blockTypeValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -64,7 +64,7 @@ export function AddBlockForm({
           {blockType && (
             <Schema
               schema={blockType.schema}
-              name={null}
+              name="opts"
               fields={{
                 string: StringField,
                 number: NumberField,

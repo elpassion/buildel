@@ -1,5 +1,5 @@
 import React from 'react';
-import { JSONSchemaField } from '~/modules/Pipelines/pipelines.hooks';
+import { JSONSchemaField } from '~/modules/Pipelines/pipelines.types';
 
 export function Schema({
   schema,
@@ -15,8 +15,14 @@ export function Schema({
   };
 }) {
   const schemaObj = JSON.parse(schema);
+
   return (
-    <Field field={schemaObj} name={name} schema={schemaObj} fields={fields} />
+    <Field
+      field={schemaObj.properties.opts}
+      name={name}
+      schema={schemaObj}
+      fields={fields}
+    />
   );
 }
 
@@ -30,7 +36,8 @@ export function Field({ field, name, schema, fields }: FieldProps) {
         fields={fields}
       />
     );
-  } else if (field.type === 'number') {
+  }
+  if (field.type === 'number') {
     return (
       <fields.number
         field={field}

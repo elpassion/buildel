@@ -34,14 +34,19 @@ exports[`getNodes > returns all nodes 1`] = `
         "schema": "",
         "type": "text_input",
       },
+      "inputs": [],
       "name": "text_input",
       "opts": {},
+      "position": {
+        "x": 100,
+        "y": 100,
+      },
       "type": "text_input",
     },
     "id": "text_input",
     "position": {
-      "x": 0,
-      "y": 0,
+      "x": 100,
+      "y": 100,
     },
     "type": "text_input",
   },
@@ -65,20 +70,23 @@ exports[`getNodes > returns all nodes 1`] = `
         "schema": "",
         "type": "text_output",
       },
+      "inputs": [],
       "name": "text_output",
       "opts": {
         "input": "text_input:output",
+      },
+      "position": {
+        "x": 100,
+        "y": 100,
       },
       "type": "text_output",
     },
     "id": "text_output",
     "position": {
-      "x": 0,
-      "y": 0,
+      "x": 100,
+      "y": 100,
     },
     "type": "text_output",
   },
 ]
 `;
-
-exports[`removeBlock > removes existing block 1`] = `[]`;
