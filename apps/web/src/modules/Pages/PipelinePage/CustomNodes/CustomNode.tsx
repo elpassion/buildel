@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Badge, Icon, IconButton } from '@elpassion/taco';
 import { getBlockHandles } from '~/modules/Pipelines/PipelineGraph';
 import { BlockConfig, IBlockConfig } from '~/modules/Pipelines/pipelines.types';
+import { startCase } from 'lodash';
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -93,23 +94,39 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
         {/*</FormProvider>*/}
 
         {inputs.map((handle, index) => (
-          <Handle
-            key={handle.id}
-            type={handle.type}
-            position={Position.Left}
-            style={{ top: (index + 1) * 20 }}
-            id={handle.id}
-          />
+          <>
+            <div
+              className={`absolute right-[102%] translate-y-[-80%] text-xxs`}
+              style={{ top: (index + 1) * 30 }}
+            >
+              {startCase(handle.data.name.replace(/_output/g, ' '))}
+            </div>
+            <Handle
+              key={handle.id}
+              type={handle.type}
+              position={Position.Left}
+              style={{ top: (index + 1) * 30 }}
+              id={handle.id}
+            />
+          </>
         ))}
         {outputs.map((handle, index) => (
-          <Handle
-            key={handle.id}
-            type={handle.type}
-            position={Position.Right}
-            style={{ top: (index + 1) * 30 }}
-            id={handle.id}
-            data-name={handle.data.name}
-          />
+          <>
+            <div
+              className={`absolute left-[102%] translate-y-[-80%] text-xxs`}
+              style={{ top: (index + 1) * 30 }}
+            >
+              {startCase(handle.data.name.replace(/_output/g, ' '))}
+            </div>
+            <Handle
+              key={handle.id}
+              type={handle.type}
+              position={Position.Right}
+              style={{ top: (index + 1) * 30 }}
+              id={handle.id}
+              data-name={handle.data.name}
+            />
+          </>
         ))}
       </div>
     </section>
