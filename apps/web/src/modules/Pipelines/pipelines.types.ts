@@ -23,6 +23,7 @@ export const BlockConfig = z.object({
   name: z.string(),
   opts: z.record(z.string(), z.any()),
   inputs: z.array(z.string()),
+  position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
   block_type: BlockType,
 });

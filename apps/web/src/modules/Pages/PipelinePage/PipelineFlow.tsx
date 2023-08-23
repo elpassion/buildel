@@ -1,11 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { isEqual } from 'lodash';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactFlow, {
   Background,
   Connection,
@@ -45,7 +38,6 @@ export function PipelineFlow({
   onUpdate,
   onEditBlock,
 }: PipelineFlowProps) {
-  const prevPipelineRef = useRef<IPipeline | null>(null);
   const [nodes, setNodes] = useState<INode[]>(getNodes(pipeline.config));
   const [edges, setEdges] = useState<IEdge[]>(getEdges(pipeline.config));
   const debouncedNodes = useDebounce(nodes, 1000);
@@ -89,7 +81,6 @@ export function PipelineFlow({
       {},
     );
   }, [blockTypes]);
-
   //Think about better solution
   useEffect(() => {
     setNodes(getNodes(pipeline.config));

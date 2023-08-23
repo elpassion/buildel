@@ -37,6 +37,10 @@ exports[`getNodes > returns all nodes 1`] = `
       "inputs": [],
       "name": "text_input",
       "opts": {},
+      "position": {
+        "x": 100,
+        "y": 100,
+      },
       "type": "text_input",
     },
     "id": "text_input",
@@ -70,6 +74,10 @@ exports[`getNodes > returns all nodes 1`] = `
       "name": "text_output",
       "opts": {
         "input": "text_input:output",
+      },
+      "position": {
+        "x": 100,
+        "y": 100,
       },
       "type": "text_output",
     },

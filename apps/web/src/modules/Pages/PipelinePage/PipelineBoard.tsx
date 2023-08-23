@@ -80,7 +80,7 @@ export function PipelineBoard({
 
       const updatedBlocks = pipeline.config.blocks.map((block) => {
         if (block.name === data.name) {
-          return data;
+          return { ...data, position: block.position };
         }
         return block;
       });

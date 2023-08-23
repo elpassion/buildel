@@ -14,7 +14,7 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
     id: block.name,
     type: block.block_type.type,
-    position: {
+    position: block.position ?? {
       x: 100,
       y: 100,
     },
@@ -76,7 +76,9 @@ export function toPipelineConfig(
     targetNode.data.inputs.push(`${edge.source}:${edge.sourceHandle}`);
   });
 
-  return { blocks: tmpNodes.map((node) => node.data) };
+  return {
+    blocks: tmpNodes.map((node) => ({ ...node.data, position: node.position })),
+  };
 }
 
 export function getBlocks(pipeline: IPipelineConfig): IBlock[] {

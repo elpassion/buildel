@@ -249,6 +249,7 @@ describe(PipelineGraph.getBlockHandles, () => {
 const textInputBlockConfig: IBlockConfig = {
   opts: {},
   inputs: [],
+  position: { x: 100, y: 100 },
   type: 'text_input',
   name: 'text_input',
   block_type: {
@@ -262,6 +263,7 @@ const textInputBlockConfig: IBlockConfig = {
 const textOutputBlockConfig: IBlockConfig = {
   opts: {},
   inputs: [],
+  position: { x: 100, y: 100 },
   type: 'text_output',
   name: 'text_output',
   block_type: {
