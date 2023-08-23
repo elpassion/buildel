@@ -66,6 +66,7 @@ export function useUpdatePipeline(
       const pipelineResponse = PipelineResponse.parse(json);
       queryClient.setQueryData(['pipelines', pipelineId], pipelineResponse);
       onSuccess?.(pipelineResponse);
+      return pipelineResponse;
     },
   });
 }

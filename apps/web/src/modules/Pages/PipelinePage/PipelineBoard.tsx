@@ -1,13 +1,6 @@
 'use client';
 
 import React, { PropsWithChildren, useCallback, useState } from 'react';
-import { z } from 'zod';
-import { AddBlockForm } from '~/modules/Pages';
-import {
-  BlockModal,
-  BlockModalHeader,
-} from '~/modules/Pages/PipelinePage/BlockModal';
-import { EditBlockForm } from '~/modules/Pages/PipelinePage/EditBlockForm';
 import { PipelineFlow } from '~/modules/Pages/PipelinePage/PipelineFlow';
 import {
   useBlockTypes,
@@ -15,13 +8,11 @@ import {
   useUpdatePipeline,
 } from '~/modules/Pipelines';
 import {
-  BlockConfig,
   IBlockConfig,
   IPipeline,
   IPipelineConfig,
 } from '~/modules/Pipelines/pipelines.types';
 import { assert } from '~/utils/assert';
-import { useModal } from '~/utils/hooks';
 import { PipelineHeader } from './PipelineHeader';
 import 'reactflow/dist/style.css';
 
@@ -35,32 +26,19 @@ export function PipelineBoard({
   initialData,
   children,
 }: PipelineBoardProps) {
-  const { isModalOpen, openModal, closeModal } = useModal();
-  const [editableBlock, setEditableBlock] = useState<IBlockConfig | null>(null);
-
   const { data: blockTypes } = useBlockTypes();
   const { data: pipeline, isLoading } = usePipeline(pipelineId, {
     initialData,
   });
 
-  const { mutate: updatePipeline, isLoading: isUpdating } =
+  const { mutateAsync: updatePipeline, isLoading: isUpdating } =
     useUpdatePipeline(pipelineId);
 
-  const handleEditBlock = useCallback((block: IBlockConfig) => {
-    setEditableBlock(block);
-    openModal();
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setEditableBlock(null);
-    closeModal();
-  }, []);
-
   const handleUpdate = useCallback(
-    (updated: IPipelineConfig) => {
+    async (updated: IPipelineConfig) => {
       assert(pipeline);
 
-      updatePipeline({
+      await updatePipeline({
         config: { version: pipeline.config.version, ...updated },
         name: pipeline.name,
       });
@@ -74,46 +52,22 @@ export function PipelineBoard({
     updatePipeline(pipeline);
   }, [pipeline]);
 
-  const handleUpdateBlock = useCallback(
-    (data: IBlockConfig) => {
-      assert(pipeline);
-
-      const updatedBlocks = pipeline.config.blocks.map((block) => {
-        if (block.name === data.name) {
-          return { ...data, position: block.position };
-        }
-        return block;
-      });
-
-      updatePipeline({
-        ...pipeline,
-        config: {
-          ...pipeline.config,
-          blocks: updatedBlocks,
-        },
-      });
-
-      handleCloseModal();
-    },
-    [pipeline, updatePipeline],
-  );
-
   const handleAddBlock = useCallback(
-    (data: z.TypeOf<typeof BlockConfig>) => {
+    async (data: IBlockConfig) => {
       assert(pipeline);
 
       const sameBlockTypes = getAllBlockTypes(pipeline, data.type);
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${data.type.toLowerCase()}_${nameNum}`;
-
-      updatePipeline({
+      console.log(pipeline);
+      const res = await updatePipeline({
         name: pipeline.name,
         config: {
           version: pipeline.config.version,
           blocks: [...pipeline.config.blocks, { ...data, name }],
         },
       });
-      handleCloseModal();
+      return res.config;
     },
 
     [pipeline],
@@ -127,34 +81,13 @@ export function PipelineBoard({
         pipeline={pipeline}
         blockTypes={blockTypes}
         onUpdate={handleUpdate}
-        onEditBlock={handleEditBlock}
+        onCreate={handleAddBlock}
       />
       {children}
 
       <div className="absolute right-0 top-0 flex gap-2">
-        <button onClick={openModal}>TMP ADD</button>
         <PipelineHeader isUpdating={isUpdating} onSave={handleSave} />
       </div>
-
-      <BlockModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        header={
-          <BlockModalHeader
-            heading={editableBlock ? 'Edit Block' : 'Add Block'}
-            description="Blocks are modules within your app that can work simultaneously."
-          />
-        }
-      >
-        {editableBlock ? (
-          <EditBlockForm
-            onSubmit={handleUpdateBlock}
-            blockConfig={editableBlock}
-          />
-        ) : (
-          <AddBlockForm onSubmit={handleAddBlock} />
-        )}
-      </BlockModal>
     </div>
   );
 }
