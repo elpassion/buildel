@@ -1,50 +1,23 @@
 import { produce } from 'immer';
-import { IBlockConfig, IIO } from '~/modules/Pipelines/pipelines.types';
-
-export interface IPipelineConfig {
-  blocks: IBlock[];
-}
-
-type IBlock = IBlockConfig;
-
-export interface Connection {
-  source: string;
-  sourceHandle: string;
-  target: string;
-  targetHandle: string;
-}
-
-export interface INode {
-  id: string;
-  type: string;
-  position: { x: number; y: number };
-  data: IBlock;
-}
-
-export interface IEdge {
-  id: string;
-  source: string;
-  sourceHandle: string;
-  target: string;
-  targetHandle: string;
-}
-
-export interface IHandle {
-  type: 'source' | 'target';
-  id: string;
-  data: IIO;
-}
+import { Connection } from 'reactflow';
+import {
+  IBlock,
+  IEdge,
+  IHandle,
+  IIO,
+  INode,
+  IPipelineConfig,
+} from '~/modules/Pipelines/pipelines.types';
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
     id: block.name,
     type: block.block_type.type,
-    // type: 'default',
     position: {
       x: Math.floor(Math.random() * 301),
       y: Math.floor(Math.random() * 301),
     },
-    data: { ...block, label: 'test' },
+    data: block,
   }));
 }
 
@@ -87,11 +60,21 @@ export function isValidConnection(
 
 export function toPipelineConfig(
   nodes: INode[],
-  _edges: IEdge[],
+  edges: IEdge[],
 ): IPipelineConfig {
-  return {
-    blocks: nodes.map((node) => node.data),
-  };
+  const updatedNodes = [...nodes];
+  edges.forEach((edge) => {
+    const targetNode = updatedNodes.find((node) => node.id === edge.target);
+    if (targetNode) {
+      if (!targetNode.data.opts) {
+        targetNode.data.opts = {};
+      }
+
+      targetNode.data.opts.input = `${edge.source}:${edge.sourceHandle}`;
+    }
+  });
+
+  return { blocks: updatedNodes.map((node) => node.data) };
 }
 
 export function getBlocks(pipeline: IPipelineConfig): IBlock[] {

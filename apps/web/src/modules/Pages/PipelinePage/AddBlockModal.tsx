@@ -1,7 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { Modal } from '@elpassion/taco/Modal';
 import { Icon, IconButton } from '@elpassion/taco';
-import { AddBlockForm } from '~/modules/Pages';
 
 interface AddBlockModalProps extends PropsWithChildren {
   isOpen: boolean;

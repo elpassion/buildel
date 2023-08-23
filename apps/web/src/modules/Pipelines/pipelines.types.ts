@@ -26,6 +26,33 @@ export const BlockConfig = z.object({
   block_type: BlockType,
 });
 
+export interface IPipelineConfig {
+  blocks: IBlock[];
+}
+
+export type IBlock = IBlockConfig;
+
+export interface INode {
+  id: string;
+  type: string;
+  position: { x: number; y: number };
+  data: IBlock;
+}
+
+export interface IEdge {
+  id: string;
+  source: string;
+  sourceHandle: string;
+  target: string;
+  targetHandle: string;
+}
+
+export interface IHandle {
+  type: 'source' | 'target';
+  id: string;
+  data: IIO;
+}
+
 export type IBlockConfig = z.TypeOf<typeof BlockConfig>;
 export const Pipeline = z.object({
   id: z.number(),

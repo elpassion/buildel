@@ -6,7 +6,8 @@ import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@elpassion/taco';
 import { IDropdownOption, SelectDropdown } from '@elpassion/taco/Dropdown';
-import { BlockConfig, useBlockTypes } from '~/modules/Pipelines';
+import { useBlockTypes } from '~/modules/Pipelines';
+import { BlockConfig } from '~/modules/Pipelines/pipelines.types';
 import { Schema } from './Schema';
 import { ArrayField, NumberField, StringField } from './SchemaFormFields';
 

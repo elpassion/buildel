@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@elpassion/taco';
 import { SelectDropdown } from '@elpassion/taco/Dropdown';
-import { BlocksIO, IIO } from '~/modules/Pipelines';
+import { BlocksIO, IIO } from '~/modules/Pipelines/pipelines.types';
 
 export function ChannelForm({
   onSubmit,

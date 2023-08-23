@@ -17,6 +17,7 @@ export function StringField({ field, name }: FieldProps) {
   assert(name);
   const fieldValue = watch(name);
   assert(field.type === 'string');
+
   if (!('enum' in field)) {
     return (
       <Input
