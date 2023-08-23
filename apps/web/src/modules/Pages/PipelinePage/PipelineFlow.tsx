@@ -57,8 +57,9 @@ export function PipelineFlow({
     [setNodes],
   );
   const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) =>
-      setEdges((eds) => applyEdgeChanges(changes, eds) as IEdge[]),
+    (changes: EdgeChange[]) => {
+      setEdges((eds) => applyEdgeChanges(changes, eds) as IEdge[]);
+    },
     [setEdges],
   );
 
@@ -89,22 +90,15 @@ export function PipelineFlow({
     );
   }, [blockTypes]);
 
-  // useEffect(() => {
-  //   if (
-  //     !isEqual(
-  //       { blocks: pipeline.config.blocks },
-  //       {
-  //         blocks: debouncedNodes.map((node) => node.data),
-  //       },
-  //     )
-  //   ) {
-  //     setNodes(getNodes(pipeline.config));
-  //     setEdges(getEdges(pipeline.config));
-  //   }
-  // }, [pipeline]);
+  //Think about better solution
+  useEffect(() => {
+    setNodes(getNodes(pipeline.config));
+    setEdges(getEdges(pipeline.config));
+  }, [pipeline.config]);
 
   useEffect(() => {
-    onUpdate?.(toPipelineConfig(debouncedNodes, debouncedEdges));
+    if (!onUpdate) return;
+    onUpdate(toPipelineConfig(debouncedNodes, debouncedEdges));
   }, [debouncedEdges, debouncedNodes]);
 
   return (
