@@ -46,10 +46,9 @@ export function PipelineBoard({
     [pipeline],
   );
 
+  //handle saving on click
   const handleSave = useCallback(() => {
     assert(pipeline);
-
-    updatePipeline(pipeline);
   }, [pipeline]);
 
   const handleAddBlock = useCallback(
@@ -59,7 +58,7 @@ export function PipelineBoard({
       const sameBlockTypes = getAllBlockTypes(pipeline, data.type);
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${data.type.toLowerCase()}_${nameNum}`;
-      console.log(pipeline);
+
       const res = await updatePipeline({
         name: pipeline.name,
         config: {
