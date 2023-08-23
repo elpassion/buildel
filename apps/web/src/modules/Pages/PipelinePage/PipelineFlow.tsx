@@ -49,6 +49,7 @@ export function PipelineFlow({
       setEdges((eds) => applyEdgeChanges(changes, eds) as IEdge[]),
     [setEdges],
   );
+
   const onConnect = useCallback((params: Connection) => {
     setEdges((eds) => addEdge(params, eds) as IEdge[]);
   }, []);

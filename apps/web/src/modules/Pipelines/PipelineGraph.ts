@@ -1,4 +1,5 @@
 import { produce } from 'immer';
+import { cloneDeep } from 'lodash';
 import { Connection } from 'reactflow';
 import {
   IBlock,
@@ -62,9 +63,16 @@ export function toPipelineConfig(
   nodes: INode[],
   edges: IEdge[],
 ): IPipelineConfig {
-  const updatedNodes = [...nodes];
+  const tmpNodes = cloneDeep(nodes);
+
+  tmpNodes.forEach((node) => {
+    if (node.data.opts?.input) {
+      delete node.data.opts.input;
+    }
+  });
+
   edges.forEach((edge) => {
-    const targetNode = updatedNodes.find((node) => node.id === edge.target);
+    const targetNode = tmpNodes.find((node) => node.id === edge.target);
     if (targetNode) {
       if (!targetNode.data.opts) {
         targetNode.data.opts = {};
@@ -74,7 +82,7 @@ export function toPipelineConfig(
     }
   });
 
-  return { blocks: updatedNodes.map((node) => node.data) };
+  return { blocks: tmpNodes.map((node) => node.data) };
 }
 
 export function getBlocks(pipeline: IPipelineConfig): IBlock[] {
