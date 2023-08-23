@@ -15,8 +15,8 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
     id: block.name,
     type: block.block_type.type,
     position: {
-      x: Math.floor(Math.random() * 301),
-      y: Math.floor(Math.random() * 301),
+      x: 100,
+      y: 100,
     },
     data: block,
   }));
