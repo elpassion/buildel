@@ -17,8 +17,6 @@ import ReactFlow, {
   applyNodeChanges,
 } from 'reactflow';
 import { useDebounce } from 'usehooks-ts';
-import { Button } from '@elpassion/taco';
-import { AddBlockForm } from '~/modules/Pages';
 import {
   BlockModal,
   BlockModalHeader,
@@ -175,12 +173,6 @@ export function PipelineFlow({
 
       <PipelineSidebar />
 
-      <Button
-        text="CREATE"
-        className="!absolute !left-3 !top-3"
-        onClick={openModal}
-      />
-
       <BlockModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -191,10 +183,8 @@ export function PipelineFlow({
           />
         }
       >
-        {editableBlock ? (
+        {editableBlock && (
           <EditBlockForm onSubmit={onBlockUpdate} blockConfig={editableBlock} />
-        ) : (
-          <AddBlockForm onSubmit={onBlockCreate} />
         )}
       </BlockModal>
     </div>

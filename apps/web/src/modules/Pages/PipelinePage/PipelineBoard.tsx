@@ -78,7 +78,7 @@ export function PipelineBoard({
 
   return (
     <ReactFlowProvider>
-      <div className="relative h-[95vh] w-full">
+      <div className="relative h-[93vh] w-full">
         <PipelineFlow
           pipeline={pipeline}
           blockTypes={blockTypes}
