@@ -12,9 +12,13 @@ import {
   MenuItem,
   ResponsiveSidebar,
 } from '@elpassion/taco';
-import { ROUTES } from '~/modules/Config';
+import { ROUTES, defaultCSSBreakpoints } from '~/modules/Config';
 import { useLayout } from '~/modules/Layout/LayoutContext';
-import { useBreakpoints } from '~/utils/hooks';
+import {
+  useBreakpoints,
+  useIsomorphicLayoutEffect,
+  useMediaQuery,
+} from '~/utils/hooks';
 
 const mainNavItems = [
   {
@@ -23,29 +27,31 @@ const mainNavItems = [
     leftIcon: 'home',
   },
   {
-    text: 'Pipelines',
+    text: 'Workflows',
     href: ROUTES.PIPELINES,
     leftIcon: 'three-layers',
   },
 ] as const;
 
 export const Sidebar = () => {
-  const { desktop } = useBreakpoints();
+  const { matchesDesktop, matchesTablet } = useBreakpoints();
+
   const [{ isSidebarOpen, isSidebarCollapsed }, layoutDispatch] = useLayout();
 
-  React.useEffect(() => {
-    if (desktop) {
+  useIsomorphicLayoutEffect(() => {
+    if (matchesDesktop) {
       layoutDispatch({
         type: 'toggleSidebarCollapse',
         isSidebarCollapsed: false,
       });
-    } else {
+    }
+    if (matchesTablet) {
       layoutDispatch({
         type: 'toggleSidebarCollapse',
         isSidebarCollapsed: true,
       });
     }
-  }, [desktop, layoutDispatch]);
+  }, [matchesDesktop, matchesTablet]);
 
   return (
     <ResponsiveSidebar
@@ -54,7 +60,7 @@ export const Sidebar = () => {
         layoutDispatch({ type: 'toggleSidebar', isSidebarOpen: false });
       }}
       collapsed={isSidebarCollapsed}
-      defaultCollapsed={true}
+      defaultCollapsed={isSidebarCollapsed}
       onCollapse={() => {
         layoutDispatch({ type: 'toggleSidebarCollapse' });
       }}
@@ -87,7 +93,7 @@ function SidebarMainContent() {
             <Link key={item.text} href={item.href}>
               <MenuItem
                 text={item.text}
-                leftIcon={<Icon iconName="life-buoy" />}
+                leftIcon={<Icon iconName={item.leftIcon} />}
                 middleIcon={
                   isCollapsed && (
                     <Icon

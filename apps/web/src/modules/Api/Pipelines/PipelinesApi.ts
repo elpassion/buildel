@@ -22,4 +22,8 @@ export class PipelinesApi {
   create(payload: TCreatePipeline) {
     return this.client.post<TCreatePipeline>(`${this.baseUrl}`, payload);
   }
+
+  delete(id: string) {
+    return this.client.delete(`${this.baseUrl}/${id}`);
+  }
 }

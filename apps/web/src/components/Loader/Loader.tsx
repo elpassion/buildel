@@ -1,9 +1,11 @@
 'use client';
 
+import { Spinner } from '@elpassion/taco';
+
 export const Loader = () => {
   return (
-    <>
-      <p>Loading...</p>
-    </>
+    <div className="flex items-center justify-center">
+      <Spinner />
+    </div>
   );
 };
