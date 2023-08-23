@@ -66,13 +66,23 @@ export function PipelineFlow({
     setEdges((eds) => addEdge(params, eds) as IEdge[]);
   }, []);
 
-  //todo Do not define customNode during render!
+  const handleDelete = useCallback(
+    (node: IBlockConfig) =>
+      setNodes((nds) => nds.filter((nd) => nd.id !== node.name)),
+    [setNodes],
+  );
+
+  //todo Do not define customNode during render
   const nodeTypes = useMemo(() => {
     return Object.keys(blockTypes).reduce(
       (acc, curr) => ({
         ...acc,
         [curr]: (props: CustomNodeProps) => (
-          <CustomNode {...props} onUpdate={onEditBlock} />
+          <CustomNode
+            {...props}
+            onUpdate={onEditBlock}
+            onDelete={handleDelete}
+          />
         ),
       }),
       {},

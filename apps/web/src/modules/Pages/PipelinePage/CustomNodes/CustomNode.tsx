@@ -9,24 +9,15 @@ import { BlockConfig, IBlockConfig } from '~/modules/Pipelines/pipelines.types';
 export interface CustomNodeProps {
   data: IBlockConfig;
   onUpdate?: (block: IBlockConfig) => void;
+  onDelete?: (block: IBlockConfig) => void;
 }
-export function CustomNode({ data, onUpdate }: CustomNodeProps) {
+export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const handles = useMemo(() => getBlockHandles(data), [data]);
 
-  //Trigger onDelete cb on ReactFlow
   const handleDelete = useCallback(() => {
-    if (!ref.current) return;
-
-    const event = new KeyboardEvent('keydown', {
-      bubbles: true,
-      cancelable: true,
-      key: 'Backspace',
-      code: 'Backspace',
-    });
-
-    ref.current.dispatchEvent(event);
+    onDelete?.(data);
   }, []);
 
   const handleEdit = useCallback(() => {
