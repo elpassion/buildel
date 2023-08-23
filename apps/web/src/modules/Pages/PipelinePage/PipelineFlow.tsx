@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactFlow, {
   Background,
+  BackgroundVariant,
   Connection,
   Controls,
   EdgeChange,
@@ -145,14 +146,15 @@ export function PipelineFlow({
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
+        fitView
       >
-        <Background />
+        <Background variant={BackgroundVariant.Lines} />
         <Controls />
       </ReactFlow>
 
       <Button
         text="CREATE"
-        className="!absolute !left-0 !top-0"
+        className="!absolute !left-3 !top-3"
         onClick={openModal}
       />
 

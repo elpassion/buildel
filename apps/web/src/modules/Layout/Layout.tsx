@@ -31,7 +31,7 @@ export const Layout = ({ children }: LayoutProps) => {
         <div className="col-span-2 flex min-h-screen flex-col overflow-x-auto md:col-auto">
           <Navbar />
 
-          <main className="h-fit w-full min-w-0 flex-grow bg-neutral-50 p-8">
+          <main className="h-fit w-full min-w-0 flex-grow bg-neutral-50">
             <div className="mx-auto">{children}</div>
           </main>
         </div>

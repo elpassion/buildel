@@ -75,7 +75,7 @@ export function PipelineBoard({
   if (!pipeline || !blockTypes) return;
 
   return (
-    <div className="relative h-[90vh] w-full">
+    <div className="relative h-[95vh] w-full">
       <PipelineFlow
         pipeline={pipeline}
         blockTypes={blockTypes}
@@ -84,7 +84,7 @@ export function PipelineBoard({
       />
       {children}
 
-      <div className="absolute right-0 top-0 flex gap-2">
+      <div className="absolute right-3 top-3 flex gap-2">
         <PipelineHeader isUpdating={isUpdating} onSave={handleSave} />
       </div>
     </div>
