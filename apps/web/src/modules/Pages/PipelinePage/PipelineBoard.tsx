@@ -1,6 +1,7 @@
 'use client';
 
-import React, { PropsWithChildren, useCallback, useState } from 'react';
+import React, { PropsWithChildren, useCallback } from 'react';
+import { ReactFlowProvider } from 'reactflow';
 import { PipelineFlow } from '~/modules/Pages/PipelinePage/PipelineFlow';
 import {
   useBlockTypes,
@@ -71,23 +72,27 @@ export function PipelineBoard({
 
     [pipeline],
   );
+
   if (isLoading) return <p>Loading...</p>;
   if (!pipeline || !blockTypes) return;
 
   return (
-    <div className="relative h-[95vh] w-full">
-      <PipelineFlow
-        pipeline={pipeline}
-        blockTypes={blockTypes}
-        onUpdate={handleUpdate}
-        onCreate={handleAddBlock}
-      />
-      {children}
+    <ReactFlowProvider>
+      <div className="relative h-[95vh] w-full">
+        <PipelineFlow
+          pipeline={pipeline}
+          blockTypes={blockTypes}
+          onUpdate={handleUpdate}
+          onCreate={handleAddBlock}
+        />
 
-      <div className="absolute right-3 top-3 flex gap-2">
-        <PipelineHeader isUpdating={isUpdating} onSave={handleSave} />
+        {children}
+
+        <div className="absolute right-3 top-3 flex gap-2">
+          <PipelineHeader isUpdating={isUpdating} onSave={handleSave} />
+        </div>
       </div>
-    </div>
+    </ReactFlowProvider>
   );
 }
 

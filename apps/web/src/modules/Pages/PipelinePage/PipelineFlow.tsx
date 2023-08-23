@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import ReactFlow, {
   Background,
   BackgroundVariant,
@@ -34,6 +40,8 @@ import {
 import { assert } from '~/utils/assert';
 import { useModal } from '~/utils/hooks';
 import { CustomNode, CustomNodeProps } from './CustomNodes/CustomNode';
+import { PipelineSidebar } from './PipelineSidebar/PipelineSidebar';
+import { useDraggableNodes } from './PipelineSidebar/useDraggableNodes';
 
 interface PipelineFlowProps {
   pipeline: IPipeline;
@@ -48,6 +56,7 @@ export function PipelineFlow({
   onUpdate,
   onCreate,
 }: PipelineFlowProps) {
+  const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const { isModalOpen, openModal, closeModal } = useModal();
   const [editableBlock, setEditableBlock] = useState<IBlockConfig | null>(null);
   const [nodes, setNodes] = useState<INode[]>(getNodes(pipeline.config));
@@ -137,20 +146,30 @@ export function PipelineFlow({
     onUpdate(toPipelineConfig(debouncedNodes, debouncedEdges));
   }, [debouncedEdges, debouncedNodes]);
 
+  const { onDragOver, onDrop, onInit } = useDraggableNodes({
+    wrapper: reactFlowWrapper,
+    onDrop: onBlockCreate,
+  });
+
   return (
-    <>
+    <div className="h-full w-full" ref={reactFlowWrapper}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onInit={onInit}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
         nodeTypes={nodeTypes}
         fitView
       >
         <Background variant={BackgroundVariant.Lines} />
         <Controls />
       </ReactFlow>
+
+      <PipelineSidebar />
 
       <Button
         text="CREATE"
@@ -174,6 +193,6 @@ export function PipelineFlow({
           <AddBlockForm onSubmit={onBlockCreate} />
         )}
       </BlockModal>
-    </>
+    </div>
   );
 }
