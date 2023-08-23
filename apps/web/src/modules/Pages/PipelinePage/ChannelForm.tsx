@@ -26,7 +26,7 @@ export function ChannelForm({
     if (textInputs.length === 0) return;
 
     setValue('io', textInputs.at(0)!);
-  }, [textInputs]);
+  }, [textInputs]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ioField = register('io');
 

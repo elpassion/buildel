@@ -3,7 +3,8 @@
 // https://kentcdodds.com/blog/how-to-use-react-context-effectively
 
 import React from 'react';
-import { useToggle } from '@mantine/hooks';
+import { useLocalStorage } from '@mantine/hooks';
+import { useBreakpoints, useIsomorphicLayoutEffect } from '~/utils/hooks';
 
 type Action =
   | {
@@ -47,9 +48,22 @@ type LayoutProviderProps = {
   children: React.ReactNode;
 };
 function LayoutProvider({ children }: LayoutProviderProps) {
+  const { matchesDesktop, matchesTablet, matchesMobile } = useBreakpoints();
+  const [isSidebarOpen, setSidebarOpen] = React.useState(false);
+  const [isSidebarCollapsed, setSidebarCollapsed] = React.useState(false);
+
+  useIsomorphicLayoutEffect(() => {
+    if (matchesDesktop) {
+      setSidebarCollapsed(false);
+    }
+    if (matchesTablet || matchesMobile) {
+      setSidebarCollapsed(true);
+    }
+  }, [matchesDesktop, matchesTablet, matchesMobile]);
+
   const [state, dispatch] = React.useReducer(layoutReducer, {
-    isSidebarOpen: false,
-    isSidebarCollapsed: true,
+    isSidebarOpen,
+    isSidebarCollapsed,
   });
   const value: Value = [state, dispatch];
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Button, Icon } from '@elpassion/taco';
+import { Icon } from '@elpassion/taco';
 import { Navbar } from '~/modules/Layout';
 
 export const PipelinesNavbar = () => {
@@ -23,9 +23,5 @@ function LeftContent() {
 }
 
 function RightContent() {
-  return (
-    <div className="flex items-center justify-end gap-4">
-      <Button text="Click me" size={'sm'} />
-    </div>
-  );
+  return <div className="flex items-center justify-end gap-4"></div>;
 }

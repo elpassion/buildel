@@ -1,14 +1,20 @@
+import { PipelinesApi } from '~/modules/Api';
+import { MainContainer } from '~/modules/Layout';
 import { PipelinesClient } from './PipelinesClient';
 import { PipelinesNavbar } from './PipelinesNavbar';
 
-export const PipelinesPage = () => {
+const pipelinesApi = new PipelinesApi();
+
+export const PipelinesPage = async () => {
+  const pipelines = await pipelinesApi.getAll();
+
   return (
     <>
       <PipelinesNavbar />
 
-      <div className="p-8">
-        <PipelinesClient />
-      </div>
+      <MainContainer>
+        <PipelinesClient pipelines={pipelines.data} />
+      </MainContainer>
     </>
   );
 };
