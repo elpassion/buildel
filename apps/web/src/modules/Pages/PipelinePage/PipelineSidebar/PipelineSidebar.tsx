@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useBlockTypes } from '~/modules/Pipelines';
-import { assert } from '~/utils/assert';
 interface PipelineSidebarProps {}
 
 export const PipelineSidebar: React.FC<PipelineSidebarProps> = () => {
@@ -11,8 +10,6 @@ export const PipelineSidebar: React.FC<PipelineSidebarProps> = () => {
   };
 
   const draggableNodes = useMemo(() => {
-    assert(blockTypes);
-
     return Object.keys(blockTypes).map((key) => (
       <div
         key={key}
@@ -24,8 +21,6 @@ export const PipelineSidebar: React.FC<PipelineSidebarProps> = () => {
       </div>
     ));
   }, [blockTypes]);
-
-  if (!blockTypes) return;
 
   return (
     <footer className="absolute bottom-3 right-3 top-14 flex flex-col gap-2 rounded bg-neutral-300 p-2">

@@ -16,6 +16,14 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
     defaultValues: data,
   });
   const handles = useMemo(() => getBlockHandles(data), [data]);
+  const inputs = useMemo(
+    () => handles.filter((h) => h.type === 'target'),
+    [handles],
+  );
+  const outputs = useMemo(
+    () => handles.filter((h) => h.type === 'source'),
+    [handles],
+  );
 
   const handleDelete = useCallback(() => {
     onDelete?.(data);
@@ -84,12 +92,23 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
         {/*  />*/}
         {/*</FormProvider>*/}
 
-        {handles.map((handle) => (
+        {inputs.map((handle, index) => (
           <Handle
             key={handle.id}
             type={handle.type}
-            position={handle.type === 'source' ? Position.Right : Position.Left}
+            position={Position.Left}
+            style={{ top: (index + 1) * 20 }}
             id={handle.id}
+          />
+        ))}
+        {outputs.map((handle, index) => (
+          <Handle
+            key={handle.id}
+            type={handle.type}
+            position={Position.Right}
+            style={{ top: (index + 1) * 30 }}
+            id={handle.id}
+            data-name={handle.data.name}
           />
         ))}
       </div>
