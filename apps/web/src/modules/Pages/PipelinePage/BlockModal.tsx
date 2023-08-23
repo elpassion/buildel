@@ -12,17 +12,13 @@ export const BlockModal: React.FC<BlockModalProps> = ({
   isOpen,
   onClose,
   children,
+  header,
 }) => {
   return (
     <Modal isOpen={isOpen} closeModal={onClose} ariaHideApp={false}>
       <div className="p-8">
         <div className="flex space-x-6">
-          <div>
-            <div className="text-xl font-medium">Add block</div>
-            <div className="mt-4 text-sm text-neutral-400">
-              Blocks are modules within your app that can work simultaneously.
-            </div>
-          </div>
+          {header}
           <div>
             <IconButton
               onClick={onClose}

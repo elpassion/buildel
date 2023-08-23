@@ -19,7 +19,7 @@ export function AddBlockForm({
   const { data: blockTypes } = useBlockTypes();
   const methods = useForm<z.TypeOf<typeof BlockConfig>>({
     defaultValues: {
-      name: Math.random().toString(),
+      name: '',
       opts: {},
       inputs: [],
     },

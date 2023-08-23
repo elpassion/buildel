@@ -78,7 +78,7 @@ export function PipelineBoard({
     (data: IBlockConfig) => {
       assert(pipeline);
       assert(editableBlock);
-
+      console.log(data);
       updatePipeline({
         ...pipeline,
         config: {
@@ -100,11 +100,16 @@ export function PipelineBoard({
   const handleAddBlock = useCallback(
     (data: z.TypeOf<typeof BlockConfig>) => {
       assert(pipeline);
+
+      const sameBlockTypes = getAllBlockTypes(pipeline, data.type);
+      const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
+      const name = `${data.type.toLowerCase()}_${nameNum}`;
+
       updatePipeline({
         name: pipeline.name,
         config: {
           version: pipeline.config.version,
-          blocks: [...pipeline.config.blocks, data],
+          blocks: [...pipeline.config.blocks, { ...data, name }],
         },
       });
       handleCloseModal();
@@ -112,7 +117,6 @@ export function PipelineBoard({
 
     [pipeline],
   );
-
   if (isLoading) return <p>Loading...</p>;
   if (!pipeline || !blockTypes) return;
 
@@ -152,4 +156,17 @@ export function PipelineBoard({
       </BlockModal>
     </div>
   );
+}
+
+function getAllBlockTypes(pipeline: IPipeline, type: string): IBlockConfig[] {
+  return pipeline.config.blocks.filter((block) => block.type === type);
+}
+
+function getLastBlockNumber(blocks: IBlockConfig[]) {
+  const nrs = blocks
+    .map((block) => block.name.split('_'))
+    .map((part) => Number.parseInt(part[part.length - 1]))
+    .filter((n) => !isNaN(n));
+
+  return Math.max(...nrs, 0);
 }

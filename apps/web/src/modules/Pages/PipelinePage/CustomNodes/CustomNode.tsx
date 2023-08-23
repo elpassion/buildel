@@ -1,20 +1,11 @@
 import { useCallback, useMemo, useRef } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Handle, Position } from 'reactflow';
 import { z } from 'zod';
 import { Badge, Icon, IconButton } from '@elpassion/taco';
-import {
-  ArrayField,
-  NumberField,
-  StringField,
-} from '~/modules/Pages/PipelinePage/SchemaFormFields';
 import { getBlockHandles } from '~/modules/Pipelines/PipelineGraph';
 import { BlockConfig, IBlockConfig } from '~/modules/Pipelines/pipelines.types';
-import { Schema } from '../Schema';
-import { TextInputNode } from '~/modules/Pages/PipelinePage/CustomNodes/TextInputNode';
-import { TextOutputNode } from '~/modules/Pages/PipelinePage/CustomNodes/TextOutputNode';
-import { ChatGptNode } from '~/modules/Pages/PipelinePage/CustomNodes/ChatGptNode';
-import { AudioInputNode } from '~/modules/Pages/PipelinePage/CustomNodes/AudioInputNode';
+
 export interface CustomNodeProps {
   data: IBlockConfig;
   onUpdate?: (block: IBlockConfig) => void;
@@ -46,30 +37,6 @@ export function CustomNode({ data, onUpdate }: CustomNodeProps) {
     defaultValues: data,
   });
 
-  const renderedNode = useMemo(() => {
-    switch (data.type) {
-      case 'text_input':
-        return <TextInputNode />;
-      case 'text_output':
-        return <TextOutputNode />;
-      case 'audio_input':
-        return <AudioInputNode />;
-      case 'chat':
-        return <ChatGptNode />;
-      default:
-        return <p>Not supported node type</p>;
-    }
-  }, [data]);
-
-  const isEditable = useMemo(() => {
-    switch (data.type) {
-      case 'chat':
-        return true;
-      default:
-        return false;
-    }
-  }, [data]);
-
   return (
     <section
       ref={ref}
@@ -91,6 +58,7 @@ export function CustomNode({ data, onUpdate }: CustomNodeProps) {
             className="!h-6 !w-6 !p-1"
             onClick={handleEdit}
           />
+
           <IconButton
             icon={<Icon iconName="x" />}
             size="xs"
@@ -102,7 +70,7 @@ export function CustomNode({ data, onUpdate }: CustomNodeProps) {
       </header>
 
       <div className="nodrag p-2">
-        {renderedNode}
+        <p>Node</p>
         {/*<FormProvider {...methods}>*/}
         {/*  <Schema*/}
         {/*    schema={data.block_type.schema}*/}

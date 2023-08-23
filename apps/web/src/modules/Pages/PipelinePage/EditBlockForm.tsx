@@ -18,6 +18,7 @@ export function EditBlockForm({
   onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
 }) {
+  console.log(blockConfig);
   const methods = useForm<z.TypeOf<typeof BlockConfig>>({
     defaultValues: blockConfig,
   });
@@ -29,7 +30,7 @@ export function EditBlockForm({
         <div className="mt-6 space-y-4">
           <Schema
             schema={blockConfig.block_type.schema}
-            name={null}
+            name="opts"
             fields={{
               string: StringField,
               number: NumberField,
