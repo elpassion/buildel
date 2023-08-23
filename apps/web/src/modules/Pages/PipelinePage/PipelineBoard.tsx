@@ -18,6 +18,7 @@ import {
 import { assert } from '~/utils/assert';
 import { useModal } from '~/utils/hooks';
 import 'reactflow/dist/style.css';
+import { PipelineHeader } from '~/modules/Pages/PipelinePage/PipelineHeader';
 
 interface PipelineBoardProps extends PropsWithChildren {
   pipelineId: string;
@@ -34,13 +35,14 @@ export function PipelineBoard({
   const { data: pipeline, isLoading } = usePipeline(pipelineId, {
     initialData,
   });
-  const updatePipeline = useUpdatePipeline(pipelineId);
+  const { mutate: updatePipeline, isLoading: isUpdating } =
+    useUpdatePipeline(pipelineId);
 
   const handleUpdate = useCallback(
     (updated: IPipelineConfig) => {
       assert(pipeline);
 
-      updatePipeline.mutate({
+      updatePipeline({
         config: { version: pipeline.config.version, ...updated },
         name: pipeline.name,
       });
@@ -48,11 +50,16 @@ export function PipelineBoard({
     [pipeline],
   );
 
+  const handleSave = useCallback(() => {
+    assert(pipeline);
+
+    updatePipeline(pipeline);
+  }, [pipeline]);
+
   const handleAddBlock = useCallback(
     (data: z.TypeOf<typeof BlockConfig>) => {
       assert(pipeline);
-      console.log(data);
-      updatePipeline.mutate({
+      updatePipeline({
         name: pipeline.name,
         config: {
           version: pipeline.config.version,
@@ -74,7 +81,9 @@ export function PipelineBoard({
         onUpdate={handleUpdate}
       />
       {children}
-      <div className="absolute left-0 top-0">
+
+      <div className="absolute right-0 top-0 flex gap-2">
+        <PipelineHeader isUpdating={isUpdating} onSave={handleSave} />
         <button onClick={openModal}>TMP ADD</button>
       </div>
 

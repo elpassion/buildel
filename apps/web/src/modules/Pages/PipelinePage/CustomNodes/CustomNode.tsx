@@ -10,7 +10,11 @@ import {
 } from '~/modules/Pages/PipelinePage/SchemaFormFields';
 import { getBlockHandles } from '~/modules/Pipelines/PipelineGraph';
 import { BlockConfig, IBlockConfig } from '~/modules/Pipelines/pipelines.types';
-import { Schema } from './Schema';
+import { Schema } from '../Schema';
+import { TextInputNode } from '~/modules/Pages/PipelinePage/CustomNodes/TextInputNode';
+import { TextOutputNode } from '~/modules/Pages/PipelinePage/CustomNodes/TextOutputNode';
+import { ChatGptNode } from '~/modules/Pages/PipelinePage/CustomNodes/ChatGptNode';
+import { AudioInputNode } from '~/modules/Pages/PipelinePage/CustomNodes/AudioInputNode';
 export interface CustomNodeProps {
   data: IBlockConfig;
 }
@@ -37,16 +41,29 @@ export function CustomNode({ data }: CustomNodeProps) {
     defaultValues: data,
   });
 
+  const renderedNode = useMemo(() => {
+    switch (data.type) {
+      case 'text_input':
+        return <TextInputNode />;
+      case 'text_output':
+        return <TextOutputNode />;
+      case 'audio_input':
+        return <AudioInputNode />;
+      case 'chat':
+        return <ChatGptNode />;
+      default:
+        return <p>Not supported node type</p>;
+    }
+  }, [data]);
+
   return (
     <section
       ref={ref}
-      className="min-h-[100px] min-w-[250px] rounded border border-neutral-100 bg-white drop-shadow-sm"
+      className="min-h-[100px] min-w-[250px] max-w-[350px] rounded border border-neutral-100 bg-white drop-shadow-sm"
     >
       <header className="flex items-center justify-between bg-green-200 p-2">
         <div className="flex gap-2">
-          <h3 className="font-bold capitalize text-neutral-800">
-            {data.type.split('_')[1]}
-          </h3>
+          <h3 className="font-bold capitalize text-neutral-800">{data.type}</h3>
           <Badge size="xs" text={data.name} />
         </div>
 
@@ -60,17 +77,18 @@ export function CustomNode({ data }: CustomNodeProps) {
       </header>
 
       <div className="nodrag p-2">
-        <FormProvider {...methods}>
-          <Schema
-            schema={data.block_type.schema}
-            name={null}
-            fields={{
-              string: StringField,
-              number: NumberField,
-              array: ArrayField,
-            }}
-          />
-        </FormProvider>
+        {renderedNode}
+        {/*<FormProvider {...methods}>*/}
+        {/*  <Schema*/}
+        {/*    schema={data.block_type.schema}*/}
+        {/*    name={null}*/}
+        {/*    fields={{*/}
+        {/*      string: StringField,*/}
+        {/*      number: NumberField,*/}
+        {/*      array: ArrayField,*/}
+        {/*    }}*/}
+        {/*  />*/}
+        {/*</FormProvider>*/}
 
         {handles.map((handle) => (
           <Handle

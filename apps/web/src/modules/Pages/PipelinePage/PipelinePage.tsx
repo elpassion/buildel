@@ -11,10 +11,6 @@ export async function PipelinePage(props: { params: { pipelineId: string } }) {
     <PipelineBoard
       // initialData={pipeline}
       pipelineId={props.params.pipelineId}
-    >
-      <div className="absolute right-0 top-0">
-        <PipelineHeader />
-      </div>
-    </PipelineBoard>
+    />
   );
 }

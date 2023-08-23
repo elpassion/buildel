@@ -10,7 +10,6 @@ import ReactFlow, {
   applyNodeChanges,
 } from 'reactflow';
 import { useDebounce } from 'usehooks-ts';
-import { CustomNode } from '~/modules/Pages/PipelinePage/CustomNode';
 import {
   getEdges,
   getNodes,
@@ -23,6 +22,7 @@ import {
   IPipeline,
   IPipelineConfig,
 } from '~/modules/Pipelines/pipelines.types';
+import { CustomNode } from './CustomNodes/CustomNode';
 interface PipelineFlowProps {
   pipeline: IPipeline;
   blockTypes: IBlockTypesObj;
