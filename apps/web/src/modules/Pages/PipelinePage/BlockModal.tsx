@@ -1,13 +1,14 @@
-import React, { PropsWithChildren } from 'react';
-import { Modal } from '@elpassion/taco/Modal';
+import React, { PropsWithChildren, ReactNode } from 'react';
 import { Icon, IconButton } from '@elpassion/taco';
+import { Modal } from '@elpassion/taco/Modal';
 
-interface AddBlockModalProps extends PropsWithChildren {
+interface BlockModalProps extends PropsWithChildren {
   isOpen: boolean;
   onClose: () => void;
+  header: ReactNode;
 }
 
-export const AddBlockModal: React.FC<AddBlockModalProps> = ({
+export const BlockModal: React.FC<BlockModalProps> = ({
   isOpen,
   onClose,
   children,
@@ -36,3 +37,19 @@ export const AddBlockModal: React.FC<AddBlockModalProps> = ({
     </Modal>
   );
 };
+
+interface BlockModalHeaderProps {
+  heading: string;
+  description: string;
+}
+export function BlockModalHeader({
+  heading,
+  description,
+}: BlockModalHeaderProps) {
+  return (
+    <div>
+      <div className="text-xl font-medium">{heading}</div>
+      <div className="mt-4 text-sm text-neutral-400">{description}</div>
+    </div>
+  );
+}

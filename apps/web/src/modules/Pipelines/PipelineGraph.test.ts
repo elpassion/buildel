@@ -108,7 +108,8 @@ describe(PipelineGraph.getEdges, () => {
         textInputBlockConfig,
         {
           ...textOutputBlockConfig,
-          opts: { input: `${textInputBlockConfig.name}:output` },
+          opts: {},
+          inputs: [`${textInputBlockConfig.name}:output`],
         },
       ],
     };
@@ -211,7 +212,14 @@ describe(PipelineGraph.isValidConnection, () => {
 describe(PipelineGraph.toPipelineConfig, () => {
   test('converts graph to pipeline config', () => {
     const pipeline: IPipelineConfig = {
-      blocks: [textInputBlockConfig],
+      blocks: [
+        textInputBlockConfig,
+        {
+          ...textOutputBlockConfig,
+          opts: {},
+          inputs: [`${textInputBlockConfig.name}:output`],
+        },
+      ],
     };
     const nodes = PipelineGraph.getNodes(pipeline);
     const edges = PipelineGraph.getEdges(pipeline);
@@ -240,6 +248,7 @@ describe(PipelineGraph.getBlockHandles, () => {
 
 const textInputBlockConfig: IBlockConfig = {
   opts: {},
+  inputs: [],
   type: 'text_input',
   name: 'text_input',
   block_type: {
@@ -252,6 +261,7 @@ const textInputBlockConfig: IBlockConfig = {
 
 const textOutputBlockConfig: IBlockConfig = {
   opts: {},
+  inputs: [],
   type: 'text_output',
   name: 'text_output',
   block_type: {
@@ -264,6 +274,7 @@ const textOutputBlockConfig: IBlockConfig = {
 
 const audioInputBlockConfig: IBlockConfig = {
   opts: {},
+  inputs: [],
   type: 'audio_input',
   name: 'audio_input',
   block_type: {

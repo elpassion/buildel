@@ -15,8 +15,14 @@ export function Schema({
   };
 }) {
   const schemaObj = JSON.parse(schema);
+
   return (
-    <Field field={schemaObj} name={name} schema={schemaObj} fields={fields} />
+    <Field
+      field={schemaObj.properties.opts}
+      name={name}
+      schema={schemaObj}
+      fields={fields}
+    />
   );
 }
 

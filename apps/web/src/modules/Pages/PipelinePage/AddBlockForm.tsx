@@ -19,8 +19,9 @@ export function AddBlockForm({
   const { data: blockTypes } = useBlockTypes();
   const methods = useForm<z.TypeOf<typeof BlockConfig>>({
     defaultValues: {
-      name: '',
+      name: Math.random().toString(),
       opts: {},
+      inputs: [],
     },
   });
   const { handleSubmit, register, setValue, watch } = methods;
@@ -32,6 +33,7 @@ export function AddBlockForm({
       name: blockNameValue,
       type: blockTypeValue,
       opts: {},
+      inputs: [],
     });
   }, [blockTypeValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -62,7 +64,7 @@ export function AddBlockForm({
           {blockType && (
             <Schema
               schema={blockType.schema}
-              name={null}
+              name="opts"
               fields={{
                 string: StringField,
                 number: NumberField,

@@ -23,15 +23,15 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
 }
 
 export function getEdges(pipeline: IPipelineConfig): IEdge[] {
-  return pipeline.blocks
-    .filter((block) => block.opts.input)
-    .map((block) => ({
-      id: `${block.opts.input}-${block.name}:input`,
-      source: block.opts.input.split(':')[0],
-      sourceHandle: block.opts.input.split(':')[1],
+  return pipeline.blocks.flatMap((block) =>
+    block.inputs.map((input) => ({
+      id: `${input}-${block.name}:input`,
+      source: input.split(':')[0],
+      sourceHandle: input.split(':')[1],
       target: block.name,
       targetHandle: 'input',
-    }));
+    })),
+  );
 }
 
 export function isValidConnection(
@@ -66,20 +66,14 @@ export function toPipelineConfig(
   const tmpNodes = cloneDeep(nodes);
 
   tmpNodes.forEach((node) => {
-    if (node.data.opts?.input) {
-      delete node.data.opts.input;
-    }
+    node.data.inputs = [];
   });
 
   edges.forEach((edge) => {
     const targetNode = tmpNodes.find((node) => node.id === edge.target);
-    if (targetNode) {
-      if (!targetNode.data.opts) {
-        targetNode.data.opts = {};
-      }
+    if (!targetNode) return;
 
-      targetNode.data.opts.input = `${edge.source}:${edge.sourceHandle}`;
-    }
+    targetNode.data.inputs.push(`${edge.source}:${edge.sourceHandle}`);
   });
 
   return { blocks: tmpNodes.map((node) => node.data) };

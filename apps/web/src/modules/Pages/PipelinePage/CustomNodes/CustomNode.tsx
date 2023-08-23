@@ -17,8 +17,9 @@ import { ChatGptNode } from '~/modules/Pages/PipelinePage/CustomNodes/ChatGptNod
 import { AudioInputNode } from '~/modules/Pages/PipelinePage/CustomNodes/AudioInputNode';
 export interface CustomNodeProps {
   data: IBlockConfig;
+  onUpdate?: (block: IBlockConfig) => void;
 }
-export function CustomNode({ data }: CustomNodeProps) {
+export function CustomNode({ data, onUpdate }: CustomNodeProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   const handles = useMemo(() => getBlockHandles(data), [data]);
@@ -36,6 +37,10 @@ export function CustomNode({ data }: CustomNodeProps) {
 
     ref.current.dispatchEvent(event);
   }, []);
+
+  const handleEdit = useCallback(() => {
+    onUpdate?.(data);
+  }, [data]);
 
   const methods = useForm<z.TypeOf<typeof BlockConfig>>({
     defaultValues: data,
@@ -56,24 +61,44 @@ export function CustomNode({ data }: CustomNodeProps) {
     }
   }, [data]);
 
+  const isEditable = useMemo(() => {
+    switch (data.type) {
+      case 'chat':
+        return true;
+      default:
+        return false;
+    }
+  }, [data]);
+
   return (
     <section
       ref={ref}
       className="min-h-[100px] min-w-[250px] max-w-[350px] rounded border border-neutral-100 bg-white drop-shadow-sm"
     >
       <header className="flex items-center justify-between bg-green-200 p-2">
-        <div className="flex gap-2">
-          <h3 className="font-bold capitalize text-neutral-800">{data.type}</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-bold capitalize text-neutral-800">
+            {data.type}
+          </h3>
           <Badge size="xs" text={data.name} />
         </div>
 
-        <IconButton
-          icon={<Icon iconName="x" />}
-          size="xs"
-          variant="basic"
-          className="!h-6 !w-6 !p-1"
-          onClick={handleDelete}
-        />
+        <div className="flex gap-1">
+          <IconButton
+            icon={<Icon iconName="settings" />}
+            size="xs"
+            variant="basic"
+            className="!h-6 !w-6 !p-1"
+            onClick={handleEdit}
+          />
+          <IconButton
+            icon={<Icon iconName="x" />}
+            size="xs"
+            variant="basic"
+            className="!h-6 !w-6 !p-1"
+            onClick={handleDelete}
+          />
+        </div>
       </header>
 
       <div className="nodrag p-2">

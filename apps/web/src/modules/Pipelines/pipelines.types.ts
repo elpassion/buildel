@@ -22,6 +22,7 @@ export const BlockType = z.object({
 export const BlockConfig = z.object({
   name: z.string(),
   opts: z.record(z.string(), z.any()),
+  inputs: z.array(z.string()),
   type: z.string(),
   block_type: BlockType,
 });
