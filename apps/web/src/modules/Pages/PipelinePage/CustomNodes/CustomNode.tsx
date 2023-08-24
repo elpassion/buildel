@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
+import { startCase } from 'lodash';
 import { useForm } from 'react-hook-form';
 import { Handle, Position } from 'reactflow';
 import { z } from 'zod';
@@ -9,7 +10,6 @@ import {
   IBlockConfig,
   IHandle,
 } from '~/modules/Pipelines/pipelines.types';
-import { startCase } from 'lodash';
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -98,10 +98,10 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
         {/*</FormProvider>*/}
 
         {inputs.map((handle, index) => (
-          <InputHandle handle={handle} index={index} />
+          <InputHandle key={handle.id} handle={handle} index={index} />
         ))}
         {outputs.map((handle, index) => (
-          <OutputHandle handle={handle} index={index} />
+          <OutputHandle key={handle.id} handle={handle} index={index} />
         ))}
       </div>
     </section>

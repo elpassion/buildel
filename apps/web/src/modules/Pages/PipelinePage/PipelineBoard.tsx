@@ -6,6 +6,7 @@ import { PipelineFlow } from '~/modules/Pages/PipelinePage/PipelineFlow';
 import {
   useBlockTypes,
   usePipeline,
+  usePipelineRun,
   useUpdatePipeline,
 } from '~/modules/Pipelines';
 import {
@@ -16,6 +17,7 @@ import {
 } from '~/modules/Pipelines/pipelines.types';
 import { assert } from '~/utils/assert';
 import { PipelineHeader } from './PipelineHeader';
+import { Button } from '@elpassion/taco';
 import 'reactflow/dist/style.css';
 
 interface PipelineBoardProps extends PropsWithChildren {
@@ -36,6 +38,20 @@ export function PipelineBoard({
   const { data: pipeline, isLoading } = usePipeline(pipelineId, {
     initialData: initialPipeline,
   });
+
+  const {
+    status: runStatus,
+    startRun,
+    stopRun: stopRunBase,
+    push,
+    io,
+  } = usePipelineRun(pipelineId, (block, output, payload) => {
+    console.log(block, output, payload);
+    // setEvents((events) => [...events, { block, output, payload }]);
+  });
+
+  // @ts-ignore
+  window.push = push;
 
   const { mutateAsync: updatePipeline, isLoading: isUpdating } =
     useUpdatePipeline(pipelineId);
@@ -84,6 +100,11 @@ export function PipelineBoard({
   return (
     <ReactFlowProvider>
       <div className="relative h-[93vh] w-full">
+        <Button
+          onClick={runStatus === 'idle' ? startRun : stopRunBase}
+          text={runStatus === 'idle' ? 'Start' : 'Stop'}
+          disabled={runStatus === 'starting'}
+        />
         <PipelineFlow
           pipeline={pipeline}
           blockTypes={blockTypes}
