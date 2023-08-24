@@ -123,6 +123,11 @@ export function PipelineFlow({
     closeModal();
   }, []);
 
+  const handleIsValidConnection = useCallback(
+    (connection: Connection) => isValidConnection(pipeline.config, connection),
+    [pipeline.config],
+  );
+
   const PipelineNode = useCallback(
     (props: CustomNodeProps) => (
       <CustomNode
@@ -166,9 +171,7 @@ export function PipelineFlow({
         onDrop={onDrop}
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
-        isValidConnection={(connection) =>
-          isValidConnection(pipeline.config, connection)
-        }
+        isValidConnection={handleIsValidConnection}
         fitView
       >
         <Background variant={BackgroundVariant.Lines} />
