@@ -18,6 +18,7 @@ export interface IEvent {
 }
 interface IRunPipelineContext {
   events: IEvent[];
+  blockStatuses: Record<string, boolean>;
   startRun: () => void;
   stopRun: () => void;
   push: (topic: string, payload: any) => void;
@@ -37,6 +38,9 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   pipelineId,
 }) => {
   const [events, setEvents] = useState<any[]>([]);
+  const [blockStatuses, setBlockStatuses] = useState<Record<string, boolean>>(
+    {},
+  );
 
   const onMessage = useCallback(
     (block: string, output: string, payload: any) =>
@@ -44,9 +48,14 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     [],
   );
 
+  const onStatusChange = useCallback((block: string, status: boolean) => {
+    setBlockStatuses((prev) => ({ ...prev, [block]: status }));
+  }, []);
+
   const { status, startRun, stopRun, push } = usePipelineRun(
     pipelineId,
     onMessage,
+    onStatusChange,
   );
 
   const clearEvents = useCallback((blockName: string) => {
@@ -57,8 +66,16 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   window.push = push;
 
   const value = useMemo(
-    () => ({ events, status, startRun, stopRun, push, clearEvents }),
-    [events, push, startRun, status, stopRun, clearEvents],
+    () => ({
+      events,
+      status,
+      startRun,
+      stopRun,
+      push,
+      clearEvents,
+      blockStatuses,
+    }),
+    [events, push, startRun, status, stopRun, clearEvents, blockStatuses],
   );
   return (
     <RunPipelineContext.Provider value={value}>
@@ -91,12 +108,18 @@ export const useRunPipelineNode = (blockName: string) => {
     [blockName, ctx.events],
   );
 
+  const status = useMemo(
+    () => ctx.blockStatuses[blockName] ?? false,
+    [blockName, ctx.blockStatuses],
+  );
+
   return useMemo(
     () => ({
+      status,
       events: filteredEvents,
       push: ctx.push,
       clearEvents: ctx.clearEvents,
     }),
-    [filteredEvents, ctx.push, ctx.clearEvents],
+    [filteredEvents, ctx.push, ctx.clearEvents, status],
   );
 };

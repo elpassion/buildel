@@ -85,6 +85,7 @@ export function usePipelineRun(
     outputName: string,
     payload: unknown,
   ) => void = () => {},
+  onStatusChange: (blockId: string, isWorking: boolean) => void = () => {},
 ) {
   // const { data: pipeline } = usePipeline(pipelineId);
   //
@@ -113,6 +114,14 @@ export function usePipelineRun(
       if (event.startsWith('output:')) {
         const [_, blockId, outputName] = event.split(':');
         onOutput(blockId, outputName, payload);
+      }
+      if (event.startsWith('start:')) {
+        const [_, blockId] = event.split(':');
+        onStatusChange(blockId, true);
+      }
+      if (event.startsWith('stop:')) {
+        const [_, blockId] = event.split(':');
+        onStatusChange(blockId, false);
       }
       return payload;
     };

@@ -8,6 +8,7 @@ import { IBlockConfig } from '~/modules/Pipelines/pipelines.types';
 import { NodeFieldsForm, NodeFieldsOutput } from './NodeFields';
 import { InputHandle, OutputHandle } from './NodeHandles';
 import { startCase } from 'lodash';
+import { useRunPipelineNode } from '../RunPipelineProvider';
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -15,6 +16,7 @@ export interface CustomNodeProps {
   onDelete?: (block: IBlockConfig) => void;
 }
 export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
+  const { status } = useRunPipelineNode(data.name);
   const handles = useMemo(() => getBlockHandles(data), [data]);
   const inputsHandles = useMemo(
     () => handles.filter((h) => h.type === 'target'),
@@ -56,7 +58,11 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   }, [data]);
 
   return (
-    <section className="min-h-[100px] min-w-[250px] max-w-[350px] break-words rounded border border-neutral-100 bg-white drop-shadow-sm">
+    <section
+      className={`min-h-[100px] min-w-[250px] max-w-[350px] break-words rounded border border-neutral-100 bg-white drop-shadow-sm ${
+        status ? 'scale-110' : ''
+      }`}
+    >
       <header className="flex items-center justify-between bg-green-200 p-2">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold capitalize text-neutral-800">
