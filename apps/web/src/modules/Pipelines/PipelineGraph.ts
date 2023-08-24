@@ -4,6 +4,7 @@ import { Connection } from 'reactflow';
 import {
   IBlock,
   IEdge,
+  IField,
   IHandle,
   IIO,
   INode,
@@ -158,6 +159,24 @@ export function getBlockHandles(block: IBlock): IHandle[] {
       .map((output) => ({
         type: 'source' as const,
         id: output.name,
+        data: output,
+      })),
+  ];
+}
+
+export function getBlockFields(block: IBlock): IField[] {
+  const blockType = block.block_type;
+  return [
+    ...blockType.inputs
+      .filter((input) => input.public)
+      .map((input) => ({
+        type: 'input' as const,
+        data: input,
+      })),
+    ...blockType.outputs
+      .filter((output) => output.public)
+      .map((output) => ({
+        type: 'output' as const,
         data: output,
       })),
   ];

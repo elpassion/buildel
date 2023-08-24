@@ -49,6 +49,15 @@ export interface IEdge {
   targetHandle: string;
 }
 
+export interface IField {
+  type: 'input' | 'output';
+  data: {
+    name: string;
+    public: boolean;
+    type: string;
+  };
+}
+
 export interface IHandle {
   type: 'source' | 'target';
   id: string;

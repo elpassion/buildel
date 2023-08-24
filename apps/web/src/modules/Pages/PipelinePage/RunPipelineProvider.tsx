@@ -13,7 +13,7 @@ interface IEvent {
   output: string;
   payload: {
     //Fix it - other response types
-    message: string;
+    message: any;
   };
 }
 interface IRunPipelineContext {

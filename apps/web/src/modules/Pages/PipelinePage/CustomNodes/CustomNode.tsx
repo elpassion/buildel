@@ -4,7 +4,10 @@ import { useForm } from 'react-hook-form';
 import { Handle, Position } from 'reactflow';
 import { z } from 'zod';
 import { Badge, Icon, IconButton } from '@elpassion/taco';
-import { getBlockHandles } from '~/modules/Pipelines/PipelineGraph';
+import {
+  getBlockFields,
+  getBlockHandles,
+} from '~/modules/Pipelines/PipelineGraph';
 import {
   BlockConfig,
   IBlockConfig,
@@ -22,14 +25,18 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
     defaultValues: data,
   });
   const handles = useMemo(() => getBlockHandles(data), [data]);
-  const inputs = useMemo(
+  const inputsHandles = useMemo(
     () => handles.filter((h) => h.type === 'target'),
     [handles],
   );
-  const outputs = useMemo(
+  const outputsHandles = useMemo(
     () => handles.filter((h) => h.type === 'source'),
     [handles],
   );
+
+  const fields = useMemo(() => getBlockFields(data), [data]);
+
+  console.log(fields);
 
   const handleDelete = useCallback(() => {
     onDelete?.(data);
@@ -114,10 +121,10 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
         {/*  />*/}
         {/*</FormProvider>*/}
 
-        {inputs.map((handle, index) => (
+        {inputsHandles.map((handle, index) => (
           <InputHandle key={handle.id} handle={handle} index={index} />
         ))}
-        {outputs.map((handle, index) => (
+        {outputsHandles.map((handle, index) => (
           <OutputHandle key={handle.id} handle={handle} index={index} />
         ))}
       </div>
