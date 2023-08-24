@@ -51,6 +51,38 @@ describe(generateZODSchema.name, () => {
       `);
   });
 
+  test('correctly parses string enum field', () => {
+    const schema: JSONSchemaField = {
+      type: 'string',
+      title: 'test',
+      description: 'test',
+      enum: ['test1', 'test2'],
+      enumPresentAs: 'radio',
+    };
+    const zodSchema = generateZODSchema(schema);
+    expect(zodSchema.safeParse('test1')).toEqual({
+      success: true,
+      data: 'test1',
+    });
+    expect(zodSchema.safeParse('test')).toMatchInlineSnapshot(`
+      {
+        "error": [ZodError: [
+        {
+          "received": "test",
+          "code": "invalid_enum_value",
+          "options": [
+            "test1",
+            "test2"
+          ],
+          "path": [],
+          "message": "Invalid enum value. Expected 'test1' | 'test2', received 'test'"
+        }
+      ]],
+        "success": false,
+      }
+    `);
+  });
+
   test('correctly parses number field', () => {
     const schema: JSONSchemaField = {
       type: 'number',
@@ -200,6 +232,11 @@ function generateZODSchema(
   isOptional = false,
 ): z.ZodSchema<unknown> {
   if (schema.type === 'string') {
+    if ('enum' in schema) {
+      const nestedSchema = z.enum(schema.enum as any);
+      return isOptional ? nestedSchema.optional() : nestedSchema;
+    }
+
     let nestedSchema: z.ZodString | z.ZodOptional<z.ZodString> = z.string();
 
     if (schema.minLength !== undefined) {
