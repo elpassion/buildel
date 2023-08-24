@@ -1,6 +1,6 @@
 'use client';
 
-import React, { PropsWithChildren, useCallback } from 'react';
+import React, { PropsWithChildren, useCallback, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 import { PipelineFlow } from '~/modules/Pages/PipelinePage/PipelineFlow';
 import {
@@ -16,9 +16,10 @@ import {
   IPipelineConfig,
 } from '~/modules/Pipelines/pipelines.types';
 import { assert } from '~/utils/assert';
-import { PipelineHeader } from './PipelineHeader';
 import { Button } from '@elpassion/taco';
+import { RunPipelineProvider } from './RunPipelineProvider';
 import 'reactflow/dist/style.css';
+import { RunPipelineButton } from '~/modules/Pages/PipelinePage/RunPipelineButton';
 
 interface PipelineBoardProps extends PropsWithChildren {
   pipelineId: string;
@@ -38,20 +39,6 @@ export function PipelineBoard({
   const { data: pipeline, isLoading } = usePipeline(pipelineId, {
     initialData: initialPipeline,
   });
-
-  const {
-    status: runStatus,
-    startRun,
-    stopRun: stopRunBase,
-    push,
-    io,
-  } = usePipelineRun(pipelineId, (block, output, payload) => {
-    console.log(block, output, payload);
-    // setEvents((events) => [...events, { block, output, payload }]);
-  });
-
-  // @ts-ignore
-  window.push = push;
 
   const { mutateAsync: updatePipeline, isLoading: isUpdating } =
     useUpdatePipeline(pipelineId);
@@ -98,27 +85,30 @@ export function PipelineBoard({
   if (!pipeline || !blockTypes) return;
 
   return (
-    <ReactFlowProvider>
-      <div className="relative h-[93vh] w-full">
-        <Button
-          onClick={runStatus === 'idle' ? startRun : stopRunBase}
-          text={runStatus === 'idle' ? 'Start' : 'Stop'}
-          disabled={runStatus === 'starting'}
-        />
-        <PipelineFlow
-          pipeline={pipeline}
-          blockTypes={blockTypes}
-          onUpdate={handleUpdate}
-          onCreate={handleAddBlock}
-        />
+    <RunPipelineProvider pipelineId={pipelineId}>
+      <ReactFlowProvider>
+        <div className="relative h-[93vh] w-full">
+          <PipelineFlow
+            pipeline={pipeline}
+            blockTypes={blockTypes}
+            onUpdate={handleUpdate}
+            onCreate={handleAddBlock}
+          />
 
-        {children}
+          {children}
 
-        <div className="absolute right-3 top-3 flex gap-2">
-          <PipelineHeader isUpdating={isUpdating} onSave={handleSave} />
+          <div className="absolute left-0 right-0 top-3 flex justify-between gap-2 px-4">
+            <RunPipelineButton />
+            <Button
+              variant="outlined"
+              onClick={handleSave}
+              text={isUpdating ? 'Saving' : 'Save'}
+              size="sm"
+            />
+          </div>
         </div>
-      </div>
-    </ReactFlowProvider>
+      </ReactFlowProvider>
+    </RunPipelineProvider>
   );
 }
 

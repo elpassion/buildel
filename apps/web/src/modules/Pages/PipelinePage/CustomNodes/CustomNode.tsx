@@ -10,6 +10,7 @@ import {
   IBlockConfig,
   IHandle,
 } from '~/modules/Pipelines/pipelines.types';
+import { useRunPipelineNode } from '../RunPipelineProvider';
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -50,6 +51,8 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
     }
   }, [data]);
 
+  const { events } = useRunPipelineNode(data.name);
+
   return (
     <section className="min-h-[100px] min-w-[250px] max-w-[350px] rounded border border-neutral-100 bg-white drop-shadow-sm">
       <header className="flex items-center justify-between bg-green-200 p-2">
@@ -85,6 +88,15 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
 
       <div className="nodrag p-2">
         <p>Node</p>
+        {/*tmp - run and execute push on console*/}
+        {events.length > 0 ? (
+          <textarea
+            value={events.reduce(
+              (acc, curr) => acc + ' ' + curr.payload.message,
+              '',
+            )}
+          />
+        ) : null}
         {/*<FormProvider {...methods}>*/}
         {/*  <Schema*/}
         {/*    schema={data.block_type.schema}*/}
