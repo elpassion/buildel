@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { IField } from '~/modules/Pipelines/pipelines.types';
 import { IEvent, useRunPipelineNode } from '../RunPipelineProvider';
+import { Button, Input, Textarea } from '@elpassion/taco';
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -32,12 +33,17 @@ export function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
   );
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
       {fields.map((field) => (
-        //todo handle types different than input
-        <input type={field.data.type} name={field.data.name} />
+        <Input
+          id={field.data.name}
+          key={field.data.name}
+          type={field.data.type}
+          name={field.data.name}
+          placeholder="Start writing..."
+        />
       ))}
-      <button type="submit">Send</button>
+      <Button type="submit" text="Send" size="xs" />
     </form>
   );
 }
@@ -45,18 +51,33 @@ export function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
 export function NodeFieldsOutput({ fields, blockName }: NodeFieldsProps) {
   const { events } = useRunPipelineNode(blockName);
 
-  return (
-    <div>
-      {fields.map((field) => (
-        <p key={field.data.name}>
-          {getFieldsMessages(events, field.data.name)}
-        </p>
-      ))}
-    </div>
+  const renderOutput = useCallback(
+    (field: IField) => {
+      const { type } = field.data;
+
+      if (type === 'text') {
+        return (
+          <Textarea
+            key={field.data.name}
+            id={field.data.name}
+            label=""
+            value={getTextFieldsMessages(events, field.data.name)}
+            className="w-full"
+            rows={5}
+            disabled
+          />
+        );
+      }
+
+      return <span>Unsupported output type - {type}</span>;
+    },
+    [events],
   );
+
+  return <div>{fields.map((field) => renderOutput(field))}</div>;
 }
 
-const getFieldsMessages = (events: IEvent[], outputName: string) => {
+const getTextFieldsMessages = (events: IEvent[], outputName: string) => {
   const fieldEvents = events.filter((ev) => ev.output === outputName);
 
   return fieldEvents.map((ev) => ev.payload.message).join(' ');
