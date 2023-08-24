@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
-import { startCase } from 'lodash';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { z } from 'zod';
 import { Button } from '@elpassion/taco';
+import { FormProvider, useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { BlockConfig } from '~/modules/Pipelines/pipelines.types';
 import { Schema } from './Schema';
 import { ArrayField, NumberField, StringField } from './SchemaFormFields';

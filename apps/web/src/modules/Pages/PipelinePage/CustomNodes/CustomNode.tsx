@@ -7,6 +7,7 @@ import {
 import { IBlockConfig } from '~/modules/Pipelines/pipelines.types';
 import { NodeFieldsForm, NodeFieldsOutput } from './NodeFields';
 import { InputHandle, OutputHandle } from './NodeHandles';
+import { startCase } from 'lodash';
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -59,7 +60,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
       <header className="flex items-center justify-between bg-green-200 p-2">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold capitalize text-neutral-800">
-            {data.type}
+            {startCase(data.type)}
           </h3>
           <Badge size="xs" text={data.name} />
         </div>

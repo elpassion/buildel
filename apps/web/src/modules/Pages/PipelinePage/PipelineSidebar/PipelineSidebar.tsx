@@ -1,3 +1,4 @@
+import { startCase } from 'lodash';
 import React, { DragEvent, useMemo } from 'react';
 import { useBlockTypes } from '~/modules/Pipelines';
 
@@ -16,7 +17,7 @@ export const PipelineSidebar: React.FC = () => {
         onDragStart={(event) => onDragStart(event, blockTypes[key].type)}
         draggable
       >
-        <span>{blockTypes[key].type}</span>
+        <span>{startCase(blockTypes[key].type)}</span>
       </div>
     ));
   }, [blockTypes]);
