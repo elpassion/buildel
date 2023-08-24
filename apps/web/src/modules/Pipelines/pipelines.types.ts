@@ -106,12 +106,14 @@ export type JSONSchemaField =
       title: string;
       description: string;
       minLength?: number;
+      maxLength?: number;
     }
   | {
       type: 'string';
       title: string;
       description: string;
       minLength?: number;
+      maxLength?: number;
       enum: string[];
       enumPresentAs: 'checkbox' | 'radio';
     }
