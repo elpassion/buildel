@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { z } from 'zod';
 import { JSONSchemaField } from '~/modules/Pipelines/pipelines.types';
+import { generateZODSchema } from './SchemaParser';
 
 describe(generateZODSchema.name, () => {
   test('correctly parses string field', () => {
@@ -226,73 +227,3 @@ describe(generateZODSchema.name, () => {
     `);
   });
 });
-
-function generateZODSchema(
-  schema: JSONSchemaField,
-  isOptional = false,
-): z.ZodSchema<unknown> {
-  if (schema.type === 'string') {
-    if ('enum' in schema) {
-      const nestedSchema = z.enum(schema.enum as any);
-      return isOptional ? nestedSchema.optional() : nestedSchema;
-    }
-
-    let nestedSchema: z.ZodString | z.ZodOptional<z.ZodString> = z.string();
-
-    if (schema.minLength !== undefined) {
-      nestedSchema = nestedSchema.min(schema.minLength);
-    }
-    if (schema.maxLength !== undefined) {
-      nestedSchema = nestedSchema.max(schema.maxLength);
-    }
-    if (isOptional) {
-      nestedSchema = nestedSchema.optional();
-    }
-    return nestedSchema;
-  }
-
-  if (schema.type === 'number') {
-    let nestedSchema: z.ZodNumber | z.ZodOptional<z.ZodNumber> = z.number();
-
-    if (schema.minimum !== undefined) {
-      nestedSchema = nestedSchema.min(schema.minimum);
-    }
-    if (schema.maximum !== undefined) {
-      nestedSchema = nestedSchema.max(schema.maximum);
-    }
-    if (isOptional) {
-      nestedSchema = nestedSchema.optional();
-    }
-    return nestedSchema;
-  }
-
-  if (schema.type === 'array') {
-    let nestedSchema:
-      | z.ZodArray<z.ZodTypeAny>
-      | z.ZodOptional<z.ZodArray<z.ZodTypeAny>> = z.array(
-      generateZODSchema(schema.items) as z.ZodTypeAny,
-    );
-
-    if (isOptional) {
-      nestedSchema = nestedSchema.optional();
-    }
-
-    return nestedSchema;
-  }
-
-  if (schema.type === 'object') {
-    const propertySchemas: z.ZodRawShape = Object.entries(
-      schema.properties,
-    ).reduce((acc, [key, value]) => {
-      return {
-        ...acc,
-        [key]: generateZODSchema(value, !(schema.required || []).includes(key)),
-      };
-    }, {});
-    let nestedSchema: z.ZodSchema | z.ZodOptional<z.ZodSchema> =
-      z.object(propertySchemas);
-    return nestedSchema;
-  }
-
-  return z.any();
-}
