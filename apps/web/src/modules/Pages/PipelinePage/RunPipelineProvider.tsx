@@ -1,5 +1,11 @@
 'use client';
-import React, { PropsWithChildren, useContext, useMemo, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import { usePipelineRun } from '~/modules/Pipelines';
 
 interface IEvent {
@@ -13,6 +19,7 @@ interface IRunPipelineContext {
   events: IEvent[];
   startRun: () => void;
   stopRun: () => void;
+  push: (topic: string, payload: any) => void;
   status: 'idle' | 'starting' | 'running';
 }
 
@@ -29,18 +36,23 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
 }) => {
   const [events, setEvents] = useState<any[]>([]);
 
+  const onMessage = useCallback(
+    (block: string, output: string, payload: any) =>
+      setEvents((events) => [...events, { block, output, payload }]),
+    [],
+  );
+
   const { status, startRun, stopRun, push, io } = usePipelineRun(
     pipelineId,
-    (block, output, payload) =>
-      setEvents((events) => [...events, { block, output, payload }]),
+    onMessage,
   );
 
   // @ts-ignore
   window.push = push;
 
   const value = useMemo(
-    () => ({ events, status, startRun, stopRun }),
-    [events, startRun, status, stopRun],
+    () => ({ events, status, startRun, stopRun, push }),
+    [events, push, startRun, status, stopRun],
   );
   return (
     <RunPipelineContext.Provider value={value}>
@@ -71,7 +83,8 @@ export const useRunPipelineNode = (blockName: string) => {
   return useMemo(
     () => ({
       events: ctx.events.filter((ev) => ev.block === blockName),
+      push: ctx.push,
     }),
-    [blockName, ctx.events],
+    [blockName, ctx.events, ctx.push],
   );
 };

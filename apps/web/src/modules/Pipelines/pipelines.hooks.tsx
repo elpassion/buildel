@@ -1,5 +1,5 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   UseQueryOptions,
   useMutation,
@@ -104,7 +104,7 @@ export function usePipelineRun(
 
   const [status, setStatus] = useState<'idle' | 'starting' | 'running'>('idle');
 
-  function startRun() {
+  const startRun = useCallback(() => {
     assert(socket.current);
 
     setStatus('starting');
@@ -136,19 +136,19 @@ export function usePipelineRun(
         setStatus('running');
       });
     }
-  }
+  }, [onOutput, pipelineId]);
 
-  function stopRun() {
+  const stopRun = useCallback(() => {
     console.log('stop');
     assert(channel.current);
     channel.current.leave();
     setStatus('idle');
-  }
+  }, []);
 
-  function push(topic: string, payload: any) {
+  const push = useCallback((topic: string, payload: any) => {
     assert(channel.current);
     channel.current.push(`input:${topic}`, payload);
-  }
+  }, []);
 
   return {
     status,
