@@ -1,15 +1,12 @@
 import { useCallback, useMemo } from 'react';
 import { startCase } from 'lodash';
-import { Field, useForm } from 'react-hook-form';
 import { Handle, Position } from 'reactflow';
-import { z } from 'zod';
 import { Badge, Icon, IconButton } from '@elpassion/taco';
 import {
   getBlockFields,
   getBlockHandles,
 } from '~/modules/Pipelines/PipelineGraph';
 import {
-  BlockConfig,
   IBlockConfig,
   IField,
   IHandle,
@@ -22,9 +19,6 @@ export interface CustomNodeProps {
   onDelete?: (block: IBlockConfig) => void;
 }
 export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
-  const methods = useForm<z.TypeOf<typeof BlockConfig>>({
-    defaultValues: data,
-  });
   const handles = useMemo(() => getBlockHandles(data), [data]);
   const inputsHandles = useMemo(
     () => handles.filter((h) => h.type === 'target'),
@@ -100,43 +94,12 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
 
       <div className="nodrag p-2">
         {inputsFields.length > 0 ? (
-          <InputsForm blockName={data.name} fields={inputsFields} />
+          <NodeFieldsForm blockName={data.name} fields={inputsFields} />
         ) : null}
 
-        {outputFields.map((field, index) => (
-          <input
-            key={index}
-            type={field.data.type}
-            name={field.data.name}
-            disabled
-          />
-        ))}
-        {/*tmp - FOR TESTS!*/}
-        {/*{data.type === 'text_input' && (*/}
-        {/*  <textarea*/}
-        {/*    onChange={(e) => push(data.name + ':input', e.target.value)}*/}
-        {/*  />*/}
-        {/*)}*/}
-        {/*{data.type === 'text_output' && (*/}
-        {/*  <textarea*/}
-        {/*    disabled*/}
-        {/*    value={*/}
-        {/*      events.length > 0 ? events[events.length - 1].payload.message : ''*/}
-        {/*    }*/}
-        {/*  />*/}
-        {/*)}*/}
-
-        {/*<FormProvider {...methods}>*/}
-        {/*  <Schema*/}
-        {/*    schema={data.block_type.schema}*/}
-        {/*    name={null}*/}
-        {/*    fields={{*/}
-        {/*      string: StringField,*/}
-        {/*      number: NumberField,*/}
-        {/*      array: ArrayField,*/}
-        {/*    }}*/}
-        {/*  />*/}
-        {/*</FormProvider>*/}
+        {outputFields.length > 0 ? (
+          <NodeFieldsOutput fields={outputFields} blockName={data.name} />
+        ) : null}
 
         {inputsHandles.map((handle, index) => (
           <InputHandle key={handle.id} handle={handle} index={index} />
@@ -149,13 +112,12 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   );
 }
 
-function InputsForm({
-  fields,
-  blockName,
-}: {
+interface NodeFieldsProps {
   fields: IField[];
   blockName: string;
-}) {
+}
+
+function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
   const { push } = useRunPipelineNode(blockName);
 
   const handleSubmit = useCallback(
@@ -169,7 +131,6 @@ function InputsForm({
         fieldsData[key] = value;
       }
 
-      console.log(fieldsData);
       Object.keys(fieldsData).forEach((key) => {
         push(`${blockName}:${key}`, fieldsData[key]);
       });
@@ -179,12 +140,38 @@ function InputsForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      {fields.map((field, index) => (
+      {fields.map((field) => (
         //todo handle types different than input
-        <input key={index} type={field.data.type} name={field.data.name} />
+        <input type={field.data.type} name={field.data.name} />
       ))}
       <button type="submit">Send</button>
     </form>
+  );
+}
+
+function NodeFieldsOutput({ fields, blockName }: NodeFieldsProps) {
+  const { events } = useRunPipelineNode(blockName);
+
+  //todo just for testing
+  const getFieldValue = (name: string) => {
+    const fieldEvents = events.filter((ev) => ev.output === name);
+
+    if (fieldEvents.length <= 0) return '';
+
+    return fieldEvents[fieldEvents.length - 1].payload.message;
+  };
+  return (
+    <div>
+      {fields.map((field) => (
+        //todo handle types different than input
+        <input
+          type={field.data.type}
+          name={field.data.name}
+          value={getFieldValue(field.data.name)}
+          disabled
+        />
+      ))}
+    </div>
   );
 }
 
