@@ -96,10 +96,9 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
         {data.type === 'text_output' && (
           <textarea
             disabled
-            value={events.reduce(
-              (acc, curr) => acc + ' ' + curr.payload.message,
-              '',
-            )}
+            value={
+              events.length > 0 ? events[events.length - 1].payload.message : ''
+            }
           />
         )}
 

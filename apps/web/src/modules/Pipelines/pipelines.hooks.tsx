@@ -86,13 +86,13 @@ export function usePipelineRun(
     payload: unknown,
   ) => void = () => {},
 ) {
-  const { data: pipeline } = usePipeline(pipelineId);
-
-  if (!pipeline) throw new Error('FIX THIS');
-
-  const { config } = pipeline;
-
-  const io = getBlocksIO(config.blocks);
+  // const { data: pipeline } = usePipeline(pipelineId);
+  //
+  // if (!pipeline) throw new Error('FIX THIS');
+  //
+  // const { config } = pipeline;
+  //
+  // const io = getBlocksIO(config.blocks);
 
   const socket = useRef<Socket>();
   const channel = useRef<Channel>();
@@ -163,7 +163,7 @@ export function usePipelineRun(
     startRun,
     stopRun,
     push,
-    io,
+    // io,
   };
 }
 

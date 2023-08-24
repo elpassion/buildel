@@ -43,7 +43,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     [],
   );
 
-  const { status, startRun, stopRun, push, io } = usePipelineRun(
+  const { status, startRun, stopRun, push } = usePipelineRun(
     pipelineId,
     onMessage,
   );
