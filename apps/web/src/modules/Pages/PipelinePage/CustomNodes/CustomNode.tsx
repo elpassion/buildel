@@ -60,7 +60,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   }, [data]);
 
   return (
-    <section className="min-h-[100px] min-w-[250px] max-w-[350px] rounded border border-neutral-100 bg-white drop-shadow-sm">
+    <section className="min-h-[100px] min-w-[250px] max-w-[300px] break-words rounded border border-neutral-100 bg-white drop-shadow-sm">
       <header className="flex items-center justify-between bg-green-200 p-2">
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold capitalize text-neutral-800">
@@ -163,13 +163,7 @@ function NodeFieldsOutput({ fields, blockName }: NodeFieldsProps) {
   return (
     <div>
       {fields.map((field) => (
-        //todo handle types different than input
-        <input
-          type={field.data.type}
-          name={field.data.name}
-          value={getFieldValue(field.data.name)}
-          disabled
-        />
+        <p>{getFieldValue(field.data.name)}</p>
       ))}
     </div>
   );
