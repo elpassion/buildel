@@ -2,7 +2,9 @@
 
 import React, { PropsWithChildren, useCallback, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
+import { Button } from '@elpassion/taco';
 import { PipelineFlow } from '~/modules/Pages/PipelinePage/PipelineFlow';
+import { RunPipelineButton } from '~/modules/Pages/PipelinePage/RunPipelineButton';
 import {
   useBlockTypes,
   usePipeline,
@@ -16,10 +18,8 @@ import {
   IPipelineConfig,
 } from '~/modules/Pipelines/pipelines.types';
 import { assert } from '~/utils/assert';
-import { Button } from '@elpassion/taco';
 import { RunPipelineProvider } from './RunPipelineProvider';
 import 'reactflow/dist/style.css';
-import { RunPipelineButton } from '~/modules/Pages/PipelinePage/RunPipelineButton';
 
 interface PipelineBoardProps extends PropsWithChildren {
   pipelineId: string;
