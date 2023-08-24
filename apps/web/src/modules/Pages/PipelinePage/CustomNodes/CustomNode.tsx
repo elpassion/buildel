@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { startCase } from 'lodash';
-import { useForm } from 'react-hook-form';
+import { Field, useForm } from 'react-hook-form';
 import { Handle, Position } from 'reactflow';
 import { z } from 'zod';
 import { Badge, Icon, IconButton } from '@elpassion/taco';
@@ -11,6 +11,7 @@ import {
 import {
   BlockConfig,
   IBlockConfig,
+  IField,
   IHandle,
 } from '~/modules/Pipelines/pipelines.types';
 import { useRunPipelineNode } from '../RunPipelineProvider';
@@ -35,8 +36,14 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   );
 
   const fields = useMemo(() => getBlockFields(data), [data]);
-
-  console.log(fields);
+  const inputsFields = useMemo(
+    () => fields.filter((field) => field.type === 'input'),
+    [fields],
+  );
+  const outputFields = useMemo(
+    () => fields.filter((field) => field.type === 'output'),
+    [fields],
+  );
 
   const handleDelete = useCallback(() => {
     onDelete?.(data);
@@ -57,8 +64,6 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
       return false;
     }
   }, [data]);
-
-  const { events, push } = useRunPipelineNode(data.name);
 
   return (
     <section className="min-h-[100px] min-w-[250px] max-w-[350px] rounded border border-neutral-100 bg-white drop-shadow-sm">
@@ -94,20 +99,32 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
       </header>
 
       <div className="nodrag p-2">
-        {/*tmp - FOR TESTS!*/}
-        {data.type === 'text_input' && (
-          <textarea
-            onChange={(e) => push(data.name + ':input', e.target.value)}
-          />
-        )}
-        {data.type === 'text_output' && (
-          <textarea
+        {inputsFields.length > 0 ? (
+          <InputsForm blockName={data.name} fields={inputsFields} />
+        ) : null}
+
+        {outputFields.map((field, index) => (
+          <input
+            key={index}
+            type={field.data.type}
+            name={field.data.name}
             disabled
-            value={
-              events.length > 0 ? events[events.length - 1].payload.message : ''
-            }
           />
-        )}
+        ))}
+        {/*tmp - FOR TESTS!*/}
+        {/*{data.type === 'text_input' && (*/}
+        {/*  <textarea*/}
+        {/*    onChange={(e) => push(data.name + ':input', e.target.value)}*/}
+        {/*  />*/}
+        {/*)}*/}
+        {/*{data.type === 'text_output' && (*/}
+        {/*  <textarea*/}
+        {/*    disabled*/}
+        {/*    value={*/}
+        {/*      events.length > 0 ? events[events.length - 1].payload.message : ''*/}
+        {/*    }*/}
+        {/*  />*/}
+        {/*)}*/}
 
         {/*<FormProvider {...methods}>*/}
         {/*  <Schema*/}
@@ -129,6 +146,45 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
         ))}
       </div>
     </section>
+  );
+}
+
+function InputsForm({
+  fields,
+  blockName,
+}: {
+  fields: IField[];
+  blockName: string;
+}) {
+  const { push } = useRunPipelineNode(blockName);
+
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
+      const formData = new FormData(e.currentTarget);
+      const fieldsData: Record<string, any> = {};
+      // @ts-ignore
+      for (let [key, value] of formData.entries()) {
+        fieldsData[key] = value;
+      }
+
+      console.log(fieldsData);
+      Object.keys(fieldsData).forEach((key) => {
+        push(`${blockName}:${key}`, fieldsData[key]);
+      });
+    },
+    [blockName, push],
+  );
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {fields.map((field, index) => (
+        //todo handle types different than input
+        <input key={index} type={field.data.type} name={field.data.name} />
+      ))}
+      <button type="submit">Send</button>
+    </form>
   );
 }
 
