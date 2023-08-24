@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import { usePipelineRun } from '~/modules/Pipelines';
 
-interface IEvent {
+export interface IEvent {
   block: string;
   output: string;
   payload: {
@@ -81,11 +81,16 @@ export const useRunPipelineNode = (blockName: string) => {
     );
   }
 
+  const filteredEvents = useMemo(
+    () => ctx.events.filter((ev) => ev.block === blockName),
+    [blockName, ctx.events],
+  );
+
   return useMemo(
     () => ({
-      events: ctx.events.filter((ev) => ev.block === blockName),
+      events: filteredEvents,
       push: ctx.push,
     }),
-    [blockName, ctx.events, ctx.push],
+    [filteredEvents, ctx.push],
   );
 };

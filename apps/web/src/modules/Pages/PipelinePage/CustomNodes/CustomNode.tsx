@@ -11,7 +11,7 @@ import {
   IField,
   IHandle,
 } from '~/modules/Pipelines/pipelines.types';
-import { useRunPipelineNode } from '../RunPipelineProvider';
+import { IEvent, useRunPipelineNode } from '../RunPipelineProvider';
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -152,22 +152,22 @@ function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
 function NodeFieldsOutput({ fields, blockName }: NodeFieldsProps) {
   const { events } = useRunPipelineNode(blockName);
 
-  //todo just for testing
-  const getFieldValue = (name: string) => {
-    const fieldEvents = events.filter((ev) => ev.output === name);
-
-    if (fieldEvents.length <= 0) return '';
-
-    return fieldEvents[fieldEvents.length - 1].payload.message;
-  };
   return (
     <div>
       {fields.map((field) => (
-        <p>{getFieldValue(field.data.name)}</p>
+        <p key={field.data.name}>{getOutputValue(events, field.data.name)}</p>
       ))}
     </div>
   );
 }
+
+const getOutputValue = (events: IEvent[], outputName: string) => {
+  const fieldEvents = events.filter((ev) => ev.output === outputName);
+
+  if (fieldEvents.length <= 0) return '';
+
+  return fieldEvents[fieldEvents.length - 1].payload.message;
+};
 
 function InputHandle({ handle, index }: { handle: IHandle; index: number }) {
   const handleTypeClassName = useMemo(() => {
