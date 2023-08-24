@@ -118,7 +118,7 @@ interface NodeFieldsProps {
 }
 
 function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
-  const { push } = useRunPipelineNode(blockName);
+  const { push, clearEvents } = useRunPipelineNode(blockName);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -130,7 +130,10 @@ function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
       for (let [key, value] of formData.entries()) {
         fieldsData[key] = value;
       }
+      //todo should we clear block events after push click?
+      clearEvents(blockName);
 
+      // what to do here?
       Object.keys(fieldsData).forEach((key) => {
         push(`${blockName}:${key}`, fieldsData[key]);
       });
@@ -155,18 +158,18 @@ function NodeFieldsOutput({ fields, blockName }: NodeFieldsProps) {
   return (
     <div>
       {fields.map((field) => (
-        <p key={field.data.name}>{getOutputValue(events, field.data.name)}</p>
+        <p key={field.data.name}>
+          {getFieldsMessages(events, field.data.name)}
+        </p>
       ))}
     </div>
   );
 }
 
-const getOutputValue = (events: IEvent[], outputName: string) => {
+const getFieldsMessages = (events: IEvent[], outputName: string) => {
   const fieldEvents = events.filter((ev) => ev.output === outputName);
 
-  if (fieldEvents.length <= 0) return '';
-
-  return fieldEvents[fieldEvents.length - 1].payload.message;
+  return fieldEvents.map((ev) => ev.payload.message).join(' ');
 };
 
 function InputHandle({ handle, index }: { handle: IHandle; index: number }) {

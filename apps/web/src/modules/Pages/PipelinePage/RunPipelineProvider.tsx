@@ -21,6 +21,7 @@ interface IRunPipelineContext {
   startRun: () => void;
   stopRun: () => void;
   push: (topic: string, payload: any) => void;
+  clearEvents: (blockName: string) => void;
   status: 'idle' | 'starting' | 'running';
 }
 
@@ -48,12 +49,16 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     onMessage,
   );
 
+  const clearEvents = useCallback((blockName: string) => {
+    setEvents((prev) => prev.filter((ev) => ev.block === blockName));
+  }, []);
+
   // @ts-ignore
   window.push = push;
 
   const value = useMemo(
-    () => ({ events, status, startRun, stopRun, push }),
-    [events, push, startRun, status, stopRun],
+    () => ({ events, status, startRun, stopRun, push, clearEvents }),
+    [events, push, startRun, status, stopRun, clearEvents],
   );
   return (
     <RunPipelineContext.Provider value={value}>
@@ -90,7 +95,8 @@ export const useRunPipelineNode = (blockName: string) => {
     () => ({
       events: filteredEvents,
       push: ctx.push,
+      clearEvents: ctx.clearEvents,
     }),
-    [filteredEvents, ctx.push],
+    [filteredEvents, ctx.push, ctx.clearEvents],
   );
 };
