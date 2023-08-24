@@ -105,10 +105,19 @@ export const PipelinesClient = ({ pipelines }: PipelinesClientProps) => {
         closeModal={closeModal}
         ariaHideApp={false}
         closeIcon="x"
+        className="absolute top-[10%] w-[640px] !p-8"
+        // TODO (hub33k): wait for Taco to remove align center
+        modalHeader={
+          <div className="flex flex-col justify-start text-left">
+            <p className="text-3xl">Create a new workflow</p>
+            <div className="mb-4" />
+            <p className="text-sm text-neutral-400">
+              Any workflow can contain many Blocks and use your Knowledge Base.
+            </p>
+          </div>
+        }
       >
-        <div className="w-[400px]">
-          <CreatePipelineForm />
-        </div>
+        <CreatePipelineForm />
       </Modal>
     </>
   );

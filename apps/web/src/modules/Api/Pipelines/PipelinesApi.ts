@@ -27,3 +27,5 @@ export class PipelinesApi {
     return this.client.delete(`${this.baseUrl}/${id}`);
   }
 }
+
+export const pipelinesApi = new PipelinesApi();
