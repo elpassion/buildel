@@ -51,7 +51,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
     }
   }, [data]);
 
-  const { events } = useRunPipelineNode(data.name);
+  const { events, push } = useRunPipelineNode(data.name);
 
   return (
     <section className="min-h-[100px] min-w-[250px] max-w-[350px] rounded border border-neutral-100 bg-white drop-shadow-sm">
@@ -87,16 +87,22 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
       </header>
 
       <div className="nodrag p-2">
-        <p>Node</p>
-        {/*tmp - run and execute push on console*/}
-        {events.length > 0 ? (
+        {/*tmp - FOR TESTS!*/}
+        {data.type === 'text_input' && (
           <textarea
+            onChange={(e) => push(data.name + ':input', e.target.value)}
+          />
+        )}
+        {data.type === 'text_output' && (
+          <textarea
+            disabled
             value={events.reduce(
               (acc, curr) => acc + ' ' + curr.payload.message,
               '',
             )}
           />
-        ) : null}
+        )}
+
         {/*<FormProvider {...methods}>*/}
         {/*  <Schema*/}
         {/*    schema={data.block_type.schema}*/}

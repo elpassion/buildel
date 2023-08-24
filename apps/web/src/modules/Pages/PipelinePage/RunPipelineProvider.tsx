@@ -12,6 +12,7 @@ interface IEvent {
   block: string;
   output: string;
   payload: {
+    //Fix it - other response types
     message: string;
   };
 }
