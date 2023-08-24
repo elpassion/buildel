@@ -1,17 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { startCase } from 'lodash';
-import { Handle, Position } from 'reactflow';
 import { Badge, Icon, IconButton } from '@elpassion/taco';
 import {
   getBlockFields,
   getBlockHandles,
 } from '~/modules/Pipelines/PipelineGraph';
-import {
-  IBlockConfig,
-  IField,
-  IHandle,
-} from '~/modules/Pipelines/pipelines.types';
-import { IEvent, useRunPipelineNode } from '../RunPipelineProvider';
+import { IBlockConfig } from '~/modules/Pipelines/pipelines.types';
+import { NodeFieldsForm, NodeFieldsOutput } from './NodeFields';
+import { InputHandle, OutputHandle } from './NodeHandles';
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -109,126 +104,5 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
         ))}
       </div>
     </section>
-  );
-}
-
-interface NodeFieldsProps {
-  fields: IField[];
-  blockName: string;
-}
-
-function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
-  const { push, clearEvents } = useRunPipelineNode(blockName);
-
-  const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      const formData = new FormData(e.currentTarget);
-      const fieldsData: Record<string, any> = {};
-      // @ts-ignore
-      for (let [key, value] of formData.entries()) {
-        fieldsData[key] = value;
-      }
-      //todo should we clear block events after push click?
-      clearEvents(blockName);
-
-      // what to do here?
-      Object.keys(fieldsData).forEach((key) => {
-        push(`${blockName}:${key}`, fieldsData[key]);
-      });
-    },
-    [blockName, push],
-  );
-
-  return (
-    <form onSubmit={handleSubmit}>
-      {fields.map((field) => (
-        //todo handle types different than input
-        <input type={field.data.type} name={field.data.name} />
-      ))}
-      <button type="submit">Send</button>
-    </form>
-  );
-}
-
-function NodeFieldsOutput({ fields, blockName }: NodeFieldsProps) {
-  const { events } = useRunPipelineNode(blockName);
-
-  return (
-    <div>
-      {fields.map((field) => (
-        <p key={field.data.name}>
-          {getFieldsMessages(events, field.data.name)}
-        </p>
-      ))}
-    </div>
-  );
-}
-
-const getFieldsMessages = (events: IEvent[], outputName: string) => {
-  const fieldEvents = events.filter((ev) => ev.output === outputName);
-
-  return fieldEvents.map((ev) => ev.payload.message).join(' ');
-};
-
-function InputHandle({ handle, index }: { handle: IHandle; index: number }) {
-  const handleTypeClassName = useMemo(() => {
-    switch (handle.data.type) {
-      case 'text':
-        return '!rounded-none !bg-transparent !border-1 !border-black';
-      case 'audio':
-        return '!rounded-full !bg-transparent !border-1 !border-black';
-    }
-  }, [handle.data.type]);
-
-  return (
-    <>
-      <div
-        className={`absolute right-[102%] translate-y-[-80%] text-xxs`}
-        style={{ top: (index + 1) * 30 }}
-      >
-        {startCase(handle.data.name.replace(/_input/g, ' '))}
-      </div>
-      <Handle
-        key={handle.id}
-        type={handle.type}
-        position={Position.Left}
-        style={{ top: (index + 1) * 30 }}
-        id={handle.id}
-        className={handleTypeClassName}
-      />
-    </>
-  );
-}
-
-function OutputHandle({ handle, index }: { handle: IHandle; index: number }) {
-  const handleTypeClassName = useMemo(() => {
-    switch (handle.data.type) {
-      case 'text':
-        return '!rounded-none !bg-black !border-1 !border-black';
-      case 'audio':
-        return '!rounded-full !bg-black !border-1 !border-black';
-    }
-  }, [handle.data.type]);
-
-  return (
-    <>
-      <div
-        className={`absolute left-[102%] translate-y-[-80%] text-xxs`}
-        style={{ top: (index + 1) * 30 }}
-      >
-        {startCase(handle.data.name.replace(/_output/g, ' '))}
-      </div>
-      <Handle
-        key={handle.id}
-        type={handle.type}
-        position={Position.Right}
-        style={{ top: (index + 1) * 30 }}
-        id={handle.id}
-        data-name={handle.data.name}
-        className={handleTypeClassName}
-      />
-    </>
   );
 }
