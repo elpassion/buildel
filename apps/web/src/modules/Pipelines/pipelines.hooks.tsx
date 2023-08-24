@@ -71,9 +71,10 @@ export function useUpdatePipeline(
   });
 }
 
-export function useBlockTypes() {
+export function useBlockTypes(options?: UseQueryOptions<IBlockTypesObj>) {
   return useQuery<IBlockTypesObj>(['blockTypes'], blockTypesApi.getBlockTypes, {
-    initialData: {},
+    ...options,
+    initialData: options?.initialData ?? {},
   });
 }
 

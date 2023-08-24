@@ -123,22 +123,26 @@ export function PipelineFlow({
     closeModal();
   }, []);
 
-  //todo Do not define customNode during render
+  const PipelineNode = useCallback(
+    (props: CustomNodeProps) => (
+      <CustomNode
+        {...props}
+        onUpdate={handleEditBlock}
+        onDelete={handleDelete}
+      />
+    ),
+    [handleDelete, handleEditBlock],
+  );
+
   const nodeTypes = useMemo(() => {
     return Object.keys(blockTypes).reduce(
       (acc, curr) => ({
         ...acc,
-        [curr]: (props: CustomNodeProps) => (
-          <CustomNode
-            {...props}
-            onUpdate={handleEditBlock}
-            onDelete={handleDelete}
-          />
-        ),
+        [curr]: PipelineNode,
       }),
       {},
     );
-  }, [blockTypes]);
+  }, [PipelineNode, blockTypes]);
 
   useEffect(() => {
     if (!onUpdate) return;

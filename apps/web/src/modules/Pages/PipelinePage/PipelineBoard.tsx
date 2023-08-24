@@ -10,6 +10,7 @@ import {
 } from '~/modules/Pipelines';
 import {
   IBlockConfig,
+  IBlockTypesObj,
   IPipeline,
   IPipelineConfig,
 } from '~/modules/Pipelines/pipelines.types';
@@ -19,17 +20,21 @@ import 'reactflow/dist/style.css';
 
 interface PipelineBoardProps extends PropsWithChildren {
   pipelineId: string;
-  initialData?: IPipeline;
+  initialPipeline?: IPipeline;
+  initialBlockTypes?: IBlockTypesObj;
 }
 
 export function PipelineBoard({
   pipelineId,
-  initialData,
+  initialPipeline,
+  initialBlockTypes,
   children,
 }: PipelineBoardProps) {
-  const { data: blockTypes } = useBlockTypes();
+  const { data: blockTypes } = useBlockTypes({
+    initialData: initialBlockTypes,
+  });
   const { data: pipeline, isLoading } = usePipeline(pipelineId, {
-    initialData,
+    initialData: initialPipeline,
   });
 
   const { mutateAsync: updatePipeline, isLoading: isUpdating } =

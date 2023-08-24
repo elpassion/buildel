@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { DragEvent, useMemo } from 'react';
 import { useBlockTypes } from '~/modules/Pipelines';
-interface PipelineSidebarProps {}
 
-export const PipelineSidebar: React.FC<PipelineSidebarProps> = () => {
+export const PipelineSidebar: React.FC = () => {
   const { data: blockTypes } = useBlockTypes();
-  const onDragStart = (event: any, nodeType: any) => {
+  const onDragStart = (event: DragEvent<HTMLDivElement>, nodeType: string) => {
     event.dataTransfer.setData('application/reactflow', nodeType);
     event.dataTransfer.effectAllowed = 'move';
   };
@@ -23,8 +22,8 @@ export const PipelineSidebar: React.FC<PipelineSidebarProps> = () => {
   }, [blockTypes]);
 
   return (
-    <footer className="absolute bottom-3 right-3 top-14 flex flex-col gap-2 rounded bg-neutral-300 p-2">
+    <aside className="absolute bottom-3 right-3 top-14 flex flex-col gap-2 rounded bg-neutral-300 p-2">
       {draggableNodes}
-    </footer>
+    </aside>
   );
 };
