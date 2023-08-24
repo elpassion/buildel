@@ -1,7 +1,7 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
+import { Button, Input, Textarea } from '@elpassion/taco';
 import { IField } from '~/modules/Pipelines/pipelines.types';
 import { IEvent, useRunPipelineNode } from '../RunPipelineProvider';
-import { Button, Input, Textarea } from '@elpassion/taco';
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -21,7 +21,7 @@ export function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
       for (let [key, value] of formData.entries()) {
         fieldsData[key] = value;
       }
-      //todo should we clear block events after push click?
+      //todo should we clear block events after push click? if so we need an information about output block
       clearEvents(blockName);
 
       // what to do here?
@@ -29,12 +29,14 @@ export function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
         push(`${blockName}:${key}`, fieldsData[key]);
       });
     },
-    [blockName, push],
+    [blockName, clearEvents, push],
   );
 
-  return (
-    <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
-      {fields.map((field) => (
+  const renderInput = useCallback((field: IField) => {
+    const { type } = field.data;
+
+    if (type === 'text' || type === 'file') {
+      return (
         <Input
           id={field.data.name}
           key={field.data.name}
@@ -42,7 +44,17 @@ export function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
           name={field.data.name}
           placeholder="Start writing..."
         />
-      ))}
+      );
+    } else if (field.data.type === 'audio') {
+      return <span>Record audio - not implemented</span>;
+    }
+
+    return <span>Unsupported input type - {type}</span>;
+  }, []);
+
+  return (
+    <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+      {fields.map((field) => renderInput(field))}
       <Button type="submit" text="Send" size="xs" />
     </form>
   );
