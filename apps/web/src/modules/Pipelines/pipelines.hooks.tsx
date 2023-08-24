@@ -145,10 +145,18 @@ export function usePipelineRun(
     setStatus('idle');
   }, []);
 
-  const push = useCallback((topic: string, payload: any) => {
-    assert(channel.current);
-    channel.current.push(`input:${topic}`, payload);
-  }, []);
+  const push = useCallback(
+    (topic: string, payload: any) => {
+      if (status !== 'running') {
+        alert('Start process first');
+      }
+
+      assert(channel.current);
+
+      channel.current.push(`input:${topic}`, payload);
+    },
+    [status],
+  );
 
   return {
     status,
