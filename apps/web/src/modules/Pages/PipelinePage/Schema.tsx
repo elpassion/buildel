@@ -1,12 +1,13 @@
 import React from 'react';
 import { JSONSchemaField } from '~/modules/Pipelines/pipelines.types';
+import { assert } from '~/utils/assert';
 
 export function Schema({
   schema,
   name,
   fields,
 }: {
-  schema: string;
+  schema: JSONSchemaField;
   name: string | null;
   fields: {
     string: React.FC<FieldProps>;
@@ -14,13 +15,13 @@ export function Schema({
     array: React.FC<FieldProps>;
   };
 }) {
-  const schemaObj = JSON.parse(schema);
+  assert(schema.type === 'object');
 
   return (
     <Field
-      field={schemaObj.properties.opts}
+      field={schema.properties.opts}
       name={name}
-      schema={schemaObj}
+      schema={schema}
       fields={fields}
     />
   );

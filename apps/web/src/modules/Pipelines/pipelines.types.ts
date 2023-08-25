@@ -16,7 +16,7 @@ export const BlockType = z.object({
   type: z.string(),
   inputs: z.array(IOType),
   outputs: z.array(IOType),
-  schema: z.string(),
+  schema: z.record(z.string(), z.any()),
 });
 
 export const BlockConfig = z.object({

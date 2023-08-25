@@ -16,10 +16,9 @@ export function EditBlockForm({
   onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
 }) {
+  const schema = generateZODSchema(blockConfig.block_type.schema as any);
   const methods = useForm<z.TypeOf<typeof BlockConfig>>({
-    resolver: zodResolver(
-      generateZODSchema(JSON.parse(blockConfig.block_type.schema)),
-    ),
+    resolver: zodResolver(schema),
     defaultValues: blockConfig,
   });
   const { handleSubmit } = methods;
@@ -33,7 +32,7 @@ export function EditBlockForm({
       <form onSubmit={handleSubmit(handleUpdate)}>
         <div className="mt-6 space-y-4">
           <Schema
-            schema={blockConfig.block_type.schema}
+            schema={blockConfig.block_type.schema as any}
             name="opts"
             fields={{
               string: StringField,
