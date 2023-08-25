@@ -1,15 +1,16 @@
 import { useCallback } from 'react';
 import { Button, Input, Textarea } from '@elpassion/taco';
-import { IField } from '~/modules/Pipelines/pipelines.types';
+import { IBlockConfig, IField } from '~/modules/Pipelines/pipelines.types';
 import { IEvent, useRunPipelineNode } from '../RunPipelineProvider';
 
 interface NodeFieldsProps {
   fields: IField[];
-  blockName: string;
+  block: IBlockConfig;
 }
 
-export function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
-  const { push, clearEvents } = useRunPipelineNode(blockName);
+export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
+  const blockName = block.name;
+  const { push, clearEvents } = useRunPipelineNode(block);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -60,8 +61,8 @@ export function NodeFieldsForm({ fields, blockName }: NodeFieldsProps) {
   );
 }
 
-export function NodeFieldsOutput({ fields, blockName }: NodeFieldsProps) {
-  const { events } = useRunPipelineNode(blockName);
+export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
+  const { events } = useRunPipelineNode(block);
 
   const renderOutput = useCallback(
     (field: IField) => {

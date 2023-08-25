@@ -6,7 +6,9 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { usePipelineRun } from '~/modules/Pipelines';
+import { usePipeline, usePipelineRun } from '~/modules/Pipelines';
+import { IBlockConfig } from '~/modules/Pipelines/pipelines.types';
+import { generateZODSchema } from './SchemaParser';
 
 export interface IEvent {
   block: string;
@@ -19,11 +21,13 @@ export interface IEvent {
 interface IRunPipelineContext {
   events: IEvent[];
   blockStatuses: Record<string, boolean>;
+  blockValidations: Record<string, boolean>;
   startRun: () => void;
   stopRun: () => void;
   push: (topic: string, payload: any) => void;
   clearEvents: (blockName: string) => void;
   status: 'idle' | 'starting' | 'running';
+  isValid: boolean;
 }
 
 const RunPipelineContext = React.createContext<IRunPipelineContext | undefined>(
@@ -37,6 +41,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   children,
   pipelineId,
 }) => {
+  const { data: pipeline } = usePipeline(pipelineId);
   const [events, setEvents] = useState<any[]>([]);
   const [blockStatuses, setBlockStatuses] = useState<Record<string, boolean>>(
     {},
@@ -62,6 +67,27 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     setEvents((prev) => prev.filter((ev) => ev.block === blockName));
   }, []);
 
+  const blockValidations = useMemo(() => {
+    if (!pipeline) return {};
+
+    return pipeline.config.blocks.reduce((acc, block) => {
+      return {
+        ...acc,
+        [block.name]: generateZODSchema(
+          block.block_type.schema as any,
+        ).safeParse({
+          name: block.name,
+          opts: block.opts,
+          inputs: block.inputs,
+        }).success,
+      };
+    }, {});
+  }, [pipeline]);
+
+  const isValid = useMemo(() => {
+    return Object.values(blockValidations).every((v) => v);
+  }, [blockValidations]);
+
   // @ts-ignore
   window.push = push;
 
@@ -74,8 +100,20 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       push,
       clearEvents,
       blockStatuses,
+      blockValidations,
+      isValid,
     }),
-    [events, push, startRun, status, stopRun, clearEvents, blockStatuses],
+    [
+      events,
+      push,
+      startRun,
+      status,
+      stopRun,
+      clearEvents,
+      blockStatuses,
+      blockValidations,
+      isValid,
+    ],
   );
   return (
     <RunPipelineContext.Provider value={value}>
@@ -94,7 +132,8 @@ export const useRunPipeline = () => {
   return ctx;
 };
 
-export const useRunPipelineNode = (blockName: string) => {
+export const useRunPipelineNode = (block: IBlockConfig) => {
+  const blockName = block.name;
   const ctx = useContext(RunPipelineContext);
 
   if (!ctx) {
@@ -113,13 +152,18 @@ export const useRunPipelineNode = (blockName: string) => {
     [blockName, ctx.blockStatuses],
   );
 
+  const isValid = useMemo(() => {
+    return ctx.blockValidations[blockName] ?? false;
+  }, [blockName, ctx.blockValidations]);
+
   return useMemo(
     () => ({
       status,
       events: filteredEvents,
       push: ctx.push,
       clearEvents: ctx.clearEvents,
+      isValid,
     }),
-    [filteredEvents, ctx.push, ctx.clearEvents, status],
+    [filteredEvents, ctx.push, ctx.clearEvents, status, isValid],
   );
 };

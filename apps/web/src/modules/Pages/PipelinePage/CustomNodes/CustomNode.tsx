@@ -17,7 +17,7 @@ export interface CustomNodeProps {
   onDelete?: (block: IBlockConfig) => void;
 }
 export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
-  const { status } = useRunPipelineNode(data.name);
+  const { status, isValid } = useRunPipelineNode(data);
   const handles = useMemo(() => getBlockHandles(data), [data]);
   const inputsHandles = useMemo(
     () => handles.filter((h) => h.type === 'target'),
@@ -66,7 +66,12 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
         { 'scale-110': status },
       )}
     >
-      <header className="flex items-center justify-between bg-green-200 p-2">
+      <header
+        className={classNames('flex items-center justify-between p-2', {
+          'bg-green-200': isValid,
+          'bg-red-200': !isValid,
+        })}
+      >
         <div className="flex items-center gap-2">
           <h3 className="text-sm font-bold capitalize text-neutral-800">
             {startCase(data.type)}
@@ -99,11 +104,11 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
 
       <div className="nodrag p-2">
         {inputsFields.length > 0 ? (
-          <NodeFieldsForm blockName={data.name} fields={inputsFields} />
+          <NodeFieldsForm block={data} fields={inputsFields} />
         ) : null}
 
         {outputFields.length > 0 ? (
-          <NodeFieldsOutput fields={outputFields} blockName={data.name} />
+          <NodeFieldsOutput fields={outputFields} block={data} />
         ) : null}
 
         {inputsHandles.map((handle, index) => (
