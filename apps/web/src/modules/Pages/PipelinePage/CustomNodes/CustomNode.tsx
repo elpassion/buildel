@@ -53,7 +53,8 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
       const propKeys = Object.keys(schemaObj.properties.opts.properties);
 
       return propKeys.length > 0 && !!onUpdate;
-    } catch {
+    } catch (err) {
+      console.error(err);
       return false;
     }
   }, [data]);
