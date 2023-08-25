@@ -41,6 +41,7 @@ import { useModal } from '~/utils/hooks';
 import { CustomNode, CustomNodeProps } from './CustomNodes/CustomNode';
 import { PipelineSidebar } from './PipelineSidebar/PipelineSidebar';
 import { useDraggableNodes } from './PipelineSidebar/useDraggableNodes';
+import { remove } from 'lodash';
 
 interface PipelineFlowProps {
   pipeline: IPipeline;
@@ -60,8 +61,8 @@ export function PipelineFlow({
   const [editableBlock, setEditableBlock] = useState<IBlockConfig | null>(null);
   const [nodes, setNodes] = useState<INode[]>(getNodes(pipeline.config));
   const [edges, setEdges] = useState<IEdge[]>(getEdges(pipeline.config));
-  const debouncedNodes = useDebounce(nodes, 1000);
-  const debouncedEdges = useDebounce(edges, 1000);
+  const debouncedNodes = useDebounce(nodes, 500);
+  const debouncedEdges = useDebounce(edges, 500);
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) =>
@@ -106,6 +107,10 @@ export function PipelineFlow({
     },
     [setNodes, onCreate],
   );
+
+  const onReload = useCallback(() => {
+    onUpdate?.(toPipelineConfig(debouncedNodes, debouncedEdges));
+  }, [debouncedEdges, debouncedNodes]);
 
   const handleDelete = useCallback(
     (node: IBlockConfig) =>
@@ -152,7 +157,13 @@ export function PipelineFlow({
   useEffect(() => {
     if (!onUpdate) return;
     onUpdate(toPipelineConfig(debouncedNodes, debouncedEdges));
-  }, [debouncedEdges, debouncedNodes]);
+
+    window.addEventListener('beforeunload', onReload);
+
+    return () => {
+      window.removeEventListener('beforeunload', onReload);
+    };
+  }, [debouncedEdges, debouncedNodes, onReload]);
 
   const { onDragOver, onDrop, onInit } = useDraggableNodes({
     wrapper: reactFlowWrapper,
