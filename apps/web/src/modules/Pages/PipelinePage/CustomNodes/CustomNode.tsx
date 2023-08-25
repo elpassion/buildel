@@ -7,7 +7,7 @@ import {
   getBlockHandles,
 } from '~/modules/Pipelines/PipelineGraph';
 import { IBlockConfig } from '~/modules/Pipelines/pipelines.types';
-import { useRunPipelineNode } from '../RunPipelineProvider';
+import { useRunPipeline, useRunPipelineNode } from '../RunPipelineProvider';
 import { NodeFieldsForm, NodeFieldsOutput } from './NodeFields';
 import { InputHandle, OutputHandle } from './NodeHandles';
 
@@ -17,6 +17,7 @@ export interface CustomNodeProps {
   onDelete?: (block: IBlockConfig) => void;
 }
 export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
+  const { status: runStatus } = useRunPipeline();
   const { status, isValid } = useRunPipelineNode(data);
   const handles = useMemo(() => getBlockHandles(data), [data]);
   const inputsHandles = useMemo(
@@ -87,6 +88,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
               variant="basic"
               className="!h-6 !w-6 !p-1"
               onClick={handleEdit}
+              disabled={runStatus !== 'idle'}
             />
           )}
 
@@ -97,6 +99,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
               variant="basic"
               className="!h-6 !w-6 !p-1"
               onClick={handleDelete}
+              disabled={runStatus !== 'idle'}
             />
           )}
         </div>

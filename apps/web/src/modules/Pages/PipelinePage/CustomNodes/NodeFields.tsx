@@ -1,7 +1,12 @@
 import { useCallback } from 'react';
 import { Button, Input, Textarea } from '@elpassion/taco';
 import { IBlockConfig, IField } from '~/modules/Pipelines/pipelines.types';
-import { IEvent, useRunPipelineNode } from '../RunPipelineProvider';
+import {
+  IEvent,
+  useRunPipeline,
+  useRunPipelineNode,
+} from '../RunPipelineProvider';
+import { usePipelineRun } from '~/modules/Pipelines';
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -10,6 +15,7 @@ interface NodeFieldsProps {
 
 export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   const blockName = block.name;
+  const { status } = useRunPipeline();
   const { push, clearEvents } = useRunPipelineNode(block);
 
   const handleSubmit = useCallback(
@@ -56,7 +62,12 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
       {fields.map((field) => renderInput(field))}
-      <Button type="submit" text="Send" size="xs" />
+      <Button
+        type="submit"
+        text={status === 'running' ? 'Send' : 'Start pipeline'}
+        size="xs"
+        disabled={status !== 'running'}
+      />
     </form>
   );
 }
