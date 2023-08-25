@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { useLocalStorage } from '@mantine/hooks';
+import { useSidebarCollapsedStorage } from '~/modules/Layout/layout.utils';
 import { useBreakpoints, useIsomorphicLayoutEffect } from '~/utils/hooks';
 
 type Action =
@@ -18,7 +19,7 @@ type Action =
 type Dispatch = (action: Action) => void;
 type State = {
   isSidebarOpen: boolean;
-  isSidebarCollapsed: boolean;
+  isSidebarCollapsed: boolean | undefined;
 };
 type Value = [state: State, dispatch: Dispatch];
 
@@ -49,7 +50,7 @@ type LayoutProviderProps = {
 };
 function LayoutProvider({ children }: LayoutProviderProps) {
   const { matchesDesktop, matchesTablet, matchesMobile } = useBreakpoints();
-  const [isSidebarOpen, setSidebarOpen] = React.useState(false);
+  const [isSidebarOpen] = React.useState(false);
   const [isSidebarCollapsed, setSidebarCollapsed] = React.useState(false);
 
   useIsomorphicLayoutEffect(() => {

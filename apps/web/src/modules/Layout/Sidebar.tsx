@@ -12,24 +12,20 @@ import {
   MenuItem,
   ResponsiveSidebar,
 } from '@elpassion/taco';
-import { ROUTES, defaultCSSBreakpoints } from '~/modules/Config';
+import { ROUTES } from '~/modules/Config';
 import { useLayout } from '~/modules/Layout/LayoutContext';
-import {
-  useBreakpoints,
-  useIsomorphicLayoutEffect,
-  useMediaQuery,
-} from '~/utils/hooks';
+import { useBreakpoints, useIsomorphicLayoutEffect } from '~/utils/hooks';
 
 const mainNavItems = [
   {
     text: 'Dashboard',
     href: ROUTES.HOME,
-    leftIcon: 'home',
+    icon: 'home',
   },
   {
     text: 'Workflows',
     href: ROUTES.PIPELINES,
-    leftIcon: 'three-layers',
+    icon: 'three-layers',
   },
 ] as const;
 
@@ -93,15 +89,8 @@ function SidebarMainContent() {
             <Link key={item.text} href={item.href}>
               <MenuItem
                 text={item.text}
-                leftIcon={<Icon iconName={item.leftIcon} />}
                 middleIcon={
-                  isCollapsed && (
-                    <Icon
-                      iconName={item.leftIcon}
-                      size={'md'}
-                      title={item.text}
-                    />
-                  )
+                  <Icon iconName={item.icon} size={'md'} title={item.text} />
                 }
                 variant={isCollapsed ? 'onlyIcon' : 'fitWidth'}
               />
@@ -163,22 +152,12 @@ function SidebarBottomContent() {
       >
         <MenuItem
           text="Support"
-          leftIcon={<Icon iconName="life-buoy" />}
-          middleIcon={
-            isCollapsed && (
-              <Icon iconName="life-buoy" size={'md'} title="Support" />
-            )
-          }
+          middleIcon={<Icon iconName="life-buoy" size={'md'} title="Support" />}
           variant={isCollapsed ? 'onlyIcon' : 'fitWidth'}
         />
         <MenuItem
           text="Settings"
-          leftIcon={<Icon iconName="settings" />}
-          middleIcon={
-            isCollapsed && (
-              <Icon iconName="settings" size={'md'} title="Settings" />
-            )
-          }
+          middleIcon={<Icon iconName="settings" size={'md'} title="Settings" />}
           variant={isCollapsed ? 'onlyIcon' : 'fitWidth'}
         />
       </div>
