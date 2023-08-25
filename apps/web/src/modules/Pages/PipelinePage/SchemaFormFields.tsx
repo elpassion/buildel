@@ -13,10 +13,17 @@ import { assert } from '~/utils/assert';
 import { Field, FieldProps } from './Schema';
 
 export function StringField({ field, name }: FieldProps) {
-  const { register, setValue, watch } = useFormContext();
+  const {
+    register,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useFormContext();
   assert(name);
   const fieldValue = watch(name);
   assert(field.type === 'string');
+
+  const error = getValueFromPath(errors, name);
 
   if (!('enum' in field)) {
     return (
@@ -25,6 +32,7 @@ export function StringField({ field, name }: FieldProps) {
         {...register(name)}
         label={field.title}
         supportingText={field.description}
+        errorMessage={error?.message ?? undefined}
       />
     );
   }
@@ -49,6 +57,7 @@ export function StringField({ field, name }: FieldProps) {
         value={fieldValue}
         layout="horizontal"
         cardsSize="sm"
+        errorMessage={error?.message ?? undefined}
       />
     );
   }
@@ -61,6 +70,7 @@ export function StringField({ field, name }: FieldProps) {
         labelText={value}
         id={`${name}.${index}`}
         value={value}
+        error={!!error}
         {...methods}
       />
     ));
@@ -68,17 +78,22 @@ export function StringField({ field, name }: FieldProps) {
 }
 
 export function NumberField({ field, name }: FieldProps) {
-  const { register, setValue } = useFormContext();
+  const {
+    register,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
   assert(name);
   const { onChange, ...methods } = register(name);
   assert(field.type === 'number');
-
+  const error = getValueFromPath(errors, name);
   return (
     <InputNumber
       id={name}
       onChange={(value) => setValue(name, value)}
       {...methods}
       label={field.title}
+      errorMessage={error?.message ?? undefined}
       supportingText={field.description}
     />
   );
@@ -158,4 +173,16 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
       />
     </div>
   );
+}
+
+function getValueFromPath(obj: Record<string, any>, path: string) {
+  const keys = path.split('.');
+  let current = obj;
+
+  keys.forEach((key) => {
+    if (!current || current[key] === undefined) return null;
+    current = current[key];
+  }, current);
+
+  return current;
 }
