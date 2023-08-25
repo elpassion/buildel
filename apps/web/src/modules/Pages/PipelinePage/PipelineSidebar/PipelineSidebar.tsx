@@ -30,7 +30,7 @@ export const PipelineSidebar: React.FC = () => {
           if (runStatus !== 'idle') return;
           onDragStart(event, blockTypes[key].type);
         }}
-        draggable={runStatus === 'idle'}
+        draggable
       >
         <span>{startCase(blockTypes[key].type)}</span>
       </div>
