@@ -1,14 +1,15 @@
 import { useCallback, useMemo } from 'react';
+import classNames from 'classnames';
+import { startCase } from 'lodash';
 import { Badge, Icon, IconButton } from '@elpassion/taco';
 import {
   getBlockFields,
   getBlockHandles,
 } from '~/modules/Pipelines/PipelineGraph';
 import { IBlockConfig } from '~/modules/Pipelines/pipelines.types';
+import { useRunPipelineNode } from '../RunPipelineProvider';
 import { NodeFieldsForm, NodeFieldsOutput } from './NodeFields';
 import { InputHandle, OutputHandle } from './NodeHandles';
-import { startCase } from 'lodash';
-import { useRunPipelineNode } from '../RunPipelineProvider';
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -59,9 +60,10 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
 
   return (
     <section
-      className={`min-h-[100px] min-w-[250px] max-w-[350px] break-words rounded border border-neutral-100 bg-white drop-shadow-sm ${
-        status ? 'scale-110' : ''
-      }`}
+      className={classNames(
+        'min-h-[100px] min-w-[250px] max-w-[350px] break-words rounded border border-neutral-100 bg-white drop-shadow-sm transition',
+        { 'scale-110': status },
+      )}
     >
       <header className="flex items-center justify-between bg-green-200 p-2">
         <div className="flex items-center gap-2">
