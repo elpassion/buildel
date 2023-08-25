@@ -84,7 +84,7 @@ export function NumberField({ field, name }: FieldProps) {
     formState: { errors },
   } = useFormContext();
   assert(name);
-  const { onChange, ...methods } = register(name);
+  const { onChange, ...methods } = register(name, { valueAsNumber: true });
   assert(field.type === 'number');
   const error = getValueFromPath(errors, name);
   return (
