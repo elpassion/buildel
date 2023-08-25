@@ -12,7 +12,7 @@ export const PipelinePage = async (props: {
 
   return (
     <>
-      <PipelineNavbar />
+      <PipelineNavbar name={pipeline.name} />
 
       <MainContainer className="!p-0">
         <PipelineBoard
