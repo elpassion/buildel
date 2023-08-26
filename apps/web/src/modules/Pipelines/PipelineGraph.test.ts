@@ -255,7 +255,7 @@ const textInputBlockConfig: IBlockConfig = {
   block_type: {
     inputs: [{ name: 'input', public: true, type: 'text' }],
     outputs: [{ name: 'output', public: false, type: 'text' }],
-    schema: '',
+    schema: {},
     type: 'text_input',
   },
 };
@@ -269,7 +269,7 @@ const textOutputBlockConfig: IBlockConfig = {
   block_type: {
     inputs: [{ name: 'input', public: false, type: 'text' }],
     outputs: [{ name: 'output', public: true, type: 'text' }],
-    schema: '',
+    schema: {},
     type: 'text_output',
   },
 };
@@ -282,7 +282,7 @@ const audioInputBlockConfig: IBlockConfig = {
   block_type: {
     inputs: [{ name: 'input', public: true, type: 'audio' }],
     outputs: [{ name: 'output', public: false, type: 'audio' }],
-    schema: '',
+    schema: {},
     type: 'audio_input',
   },
 };
