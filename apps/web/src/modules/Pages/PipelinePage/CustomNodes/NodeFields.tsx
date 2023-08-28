@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
-import { Button, Input, Textarea } from '@elpassion/taco';
+import { Button, Input, SmallFileUpload, Textarea } from '@elpassion/taco';
 import { IBlockConfig, IField } from '~/modules/Pipelines/pipelines.types';
 import {
   IEvent,
   useRunPipeline,
   useRunPipelineNode,
 } from '../RunPipelineProvider';
-import { usePipelineRun } from '~/modules/Pipelines';
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -53,7 +52,22 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         />
       );
     } else if (field.data.type === 'audio') {
-      return <span>Record audio - not implemented</span>;
+      return (
+        <>
+          <Input
+            id={field.data.name}
+            type={'file'}
+            name={field.data.name}
+            accept="audio/*"
+            required
+            // onChange={(e) => {
+            //   if (e.target.files) {
+            //     // console.log(e.target.files[0]);
+            //   }
+            // }}
+          />
+        </>
+      );
     }
 
     return <span>Unsupported input type - {type}</span>;
@@ -90,6 +104,12 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
             rows={5}
             disabled
           />
+        );
+      } else if (type === 'audio') {
+        return (
+          <>
+            <p>Audio output</p>
+          </>
         );
       }
 
