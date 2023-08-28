@@ -162,7 +162,14 @@ export function usePipelineRun(
 
       assert(channel.current);
 
-      channel.current.push(`input:${topic}`, payload);
+      if (payload instanceof File && payload.type.startsWith('audio')) {
+        payload.arrayBuffer().then((arrayBuffer) => {
+          assert(channel.current);
+          channel.current.push(`input:${topic}`, arrayBuffer);
+        });
+      } else {
+        channel.current.push(`input:${topic}`, payload);
+      }
     },
     [status],
   );

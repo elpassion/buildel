@@ -1,5 +1,6 @@
-import { useCallback } from 'react';
-import { Button, Input, SmallFileUpload, Textarea } from '@elpassion/taco';
+import React, { useCallback } from 'react';
+import { Button, Input, Textarea } from '@elpassion/taco';
+import { MicrophoneRecorder } from '~/components/MicrophoneRecorder';
 import { IBlockConfig, IField } from '~/modules/Pipelines/pipelines.types';
 import {
   IEvent,
@@ -39,27 +40,39 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   );
 
   const renderInput = useCallback((field: IField) => {
-    const { type } = field.data;
+    const { type, name } = field.data;
 
     if (type === 'text' || type === 'file') {
       return (
         <Input
-          id={field.data.name}
-          key={field.data.name}
+          id={name}
           type={field.data.type}
-          name={field.data.name}
+          name={name}
           placeholder="Start writing..."
         />
       );
     } else if (field.data.type === 'audio') {
       return (
         <>
+          <div>
+            <MicrophoneRecorder
+              name={name}
+              onStartCallback={async (event) => {
+                // TODO (hub33k): handle mic
+                // console.log(await event.data.arrayBuffer());
+              }}
+              onStopCallback={() => {}}
+            />
+          </div>
+          <div className="mb-4" />
           <Input
-            id={field.data.name}
+            id={name}
             type={'file'}
-            name={field.data.name}
+            name={name}
             accept="audio/*"
+            placeholder="Upload audio file..."
             required
+            // disabled
             // onChange={(e) => {
             //   if (e.target.files) {
             //     // console.log(e.target.files[0]);
@@ -75,7 +88,9 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
 
   return (
     <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
-      {fields.map((field) => renderInput(field))}
+      {fields.map((field) => (
+        <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
+      ))}
       <Button
         type="submit"
         text={status === 'running' ? 'Send' : 'Start pipeline'}
