@@ -31,7 +31,7 @@ describe(PipelineGraph.connectIO, () => {
         textInputBlockConfig,
         {
           ...textOutputBlockConfig,
-          opts: { input: `${textInputBlockConfig.name}:output` },
+          opts: { input: `${textInputBlockConfig.name}:output->input` },
         },
       ],
     });
@@ -109,7 +109,7 @@ describe(PipelineGraph.getEdges, () => {
         {
           ...textOutputBlockConfig,
           opts: {},
-          inputs: [`${textInputBlockConfig.name}:output`],
+          inputs: [`${textInputBlockConfig.name}:output->input`],
         },
       ],
     };
@@ -217,7 +217,7 @@ describe(PipelineGraph.toPipelineConfig, () => {
         {
           ...textOutputBlockConfig,
           opts: {},
-          inputs: [`${textInputBlockConfig.name}:output`],
+          inputs: [`${textInputBlockConfig.name}:output->input`],
         },
       ],
     };

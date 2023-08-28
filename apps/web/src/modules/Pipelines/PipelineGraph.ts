@@ -25,13 +25,20 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
 
 export function getEdges(pipeline: IPipelineConfig): IEdge[] {
   return pipeline.blocks.flatMap((block) =>
-    block.inputs.map((input) => ({
-      id: `${input}-${block.name}:input`,
-      source: input.split(':')[0],
-      sourceHandle: input.split(':')[1],
-      target: block.name,
-      targetHandle: 'input',
-    })),
+    block.inputs.map((input) => {
+      let targetHandle = 'input';
+      let [source, sourceHandle] = input.split(':');
+      if (sourceHandle.includes('->')) {
+        [sourceHandle, targetHandle] = sourceHandle.split('->');
+      }
+      return {
+        id: `${source}:${sourceHandle}-${block.name}:${targetHandle}`,
+        source: source,
+        sourceHandle: sourceHandle,
+        target: block.name,
+        targetHandle: targetHandle,
+      };
+    }),
   );
 }
 
@@ -74,7 +81,9 @@ export function toPipelineConfig(
     const targetNode = tmpNodes.find((node) => node.id === edge.target);
     if (!targetNode) return;
 
-    targetNode.data.inputs.push(`${edge.source}:${edge.sourceHandle}`);
+    targetNode.data.inputs.push(
+      `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}`,
+    );
   });
 
   return {
@@ -99,7 +108,7 @@ export function connectIO(
     if (inputBlockIndex === -1) return;
     draft.blocks[
       inputBlockIndex
-    ].opts.input = `${source.block.name}:${source.output.name}`;
+    ].opts.input = `${source.block.name}:${source.output.name}->${target.input.name}`;
   });
 }
 
