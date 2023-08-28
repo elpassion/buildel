@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { Button, Input, Textarea } from '@elpassion/taco';
-import { MicrophoneRecorder } from '~/components/MicrophoneRecorder';
+import { AudioInput } from '~/modules/Pages/PipelinePage/AudioInput';
 import { IBlockConfig, IField } from '~/modules/Pipelines/pipelines.types';
 import {
   IEvent,
@@ -14,6 +15,13 @@ interface NodeFieldsProps {
 }
 
 export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
+  const formMethods = useForm();
+  const { control, register } = formMethods;
+  const fieldArray = useFieldArray({
+    control,
+    name: 'fields',
+  });
+
   const blockName = block.name;
   const { status } = useRunPipeline();
   const { push, clearEvents } = useRunPipelineNode(block);
@@ -47,38 +55,14 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         <Input
           id={name}
           type={field.data.type}
-          name={name}
           placeholder="Start writing..."
+          {...register(name)}
         />
       );
     } else if (field.data.type === 'audio') {
       return (
         <>
-          <div>
-            <MicrophoneRecorder
-              name={name}
-              onStartCallback={async (event) => {
-                // TODO (hub33k): handle mic
-                // console.log(await event.data.arrayBuffer());
-              }}
-              onStopCallback={() => {}}
-            />
-          </div>
-          <div className="mb-4" />
-          <Input
-            id={name}
-            type={'file'}
-            name={name}
-            accept="audio/*"
-            placeholder="Upload audio file..."
-            required
-            // disabled
-            // onChange={(e) => {
-            //   if (e.target.files) {
-            //     // console.log(e.target.files[0]);
-            //   }
-            // }}
-          />
+          <AudioInput name={name} />
         </>
       );
     }
@@ -87,17 +71,19 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   }, []);
 
   return (
-    <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
-      {fields.map((field) => (
-        <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
-      ))}
-      <Button
-        type="submit"
-        text={status === 'running' ? 'Send' : 'Start pipeline'}
-        size="xs"
-        disabled={status !== 'running'}
-      />
-    </form>
+    <FormProvider {...formMethods}>
+      <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+        {fields.map((field) => (
+          <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
+        ))}
+        <Button
+          type="submit"
+          text={status === 'running' ? 'Send' : 'Start pipeline'}
+          size="xs"
+          disabled={status !== 'running'}
+        />
+      </form>
+    </FormProvider>
   );
 }
 

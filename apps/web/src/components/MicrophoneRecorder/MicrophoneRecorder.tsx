@@ -57,7 +57,7 @@ export const MicrophoneRecorder = ({
 
     // const localAudioChunks: any[] = [];
 
-    mediaRecorder.current.ondataavailable = (event) => {
+    mediaRecorder.current.ondataavailable = async (event) => {
       if (typeof event.data === 'undefined') return;
       if (event.data.size === 0) return;
       onStartCallback(event);
@@ -103,8 +103,6 @@ export const MicrophoneRecorder = ({
           className="cursor-pointer"
         />
       ) : null}
-
-      <input name={name} hidden />
 
       {audioUrl ? (
         <div>
