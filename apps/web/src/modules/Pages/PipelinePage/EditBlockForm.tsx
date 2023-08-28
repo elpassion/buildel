@@ -7,7 +7,12 @@ import { Button } from '@elpassion/taco';
 import { generateZODSchema } from '~/modules/Pages/PipelinePage/SchemaParser';
 import { BlockConfig, IBlockConfig } from '~/modules/Pipelines/pipelines.types';
 import { Schema } from './Schema';
-import { ArrayField, NumberField, StringField } from './SchemaFormFields';
+import {
+  ArrayField,
+  BooleanField,
+  NumberField,
+  StringField,
+} from './SchemaFormFields';
 
 export function EditBlockForm({
   onSubmit,
@@ -38,6 +43,7 @@ export function EditBlockForm({
               string: StringField,
               number: NumberField,
               array: ArrayField,
+              boolean: BooleanField,
             }}
           />
         </div>

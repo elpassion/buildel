@@ -125,6 +125,26 @@ export function ArrayField({ field, name, fields, schema }: FieldProps) {
   }
 }
 
+export function BooleanField({ field, name }: FieldProps) {
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useFormContext();
+  assert(name);
+  assert(field.type === 'boolean');
+  const value = watch(name);
+  return (
+    <Checkbox
+      id={name}
+      labelText={field.title}
+      defaultValue={'false'}
+      checked={value}
+      {...register(name)}
+    />
+  );
+}
+
 function RealArrayField({ field, name, fields, schema }: FieldProps) {
   assert(field.type === 'array');
   const {

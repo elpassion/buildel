@@ -129,4 +129,9 @@ export type JSONSchemaField =
       title: string;
       description: string;
       items: JSONSchemaField;
+    }
+  | {
+      type: 'boolean';
+      title: string;
+      description: string;
     };

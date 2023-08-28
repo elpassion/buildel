@@ -13,6 +13,7 @@ export function Schema({
     string: React.FC<FieldProps>;
     number: React.FC<FieldProps>;
     array: React.FC<FieldProps>;
+    boolean: React.FC<FieldProps>;
   };
 }) {
   assert(schema.type === 'object');
@@ -61,6 +62,15 @@ export function Field({ field, name, schema, fields }: FieldProps) {
         </div>
       );
     });
+  } else if (field.type === 'boolean') {
+    return (
+      <fields.boolean
+        field={field}
+        name={name}
+        schema={schema}
+        fields={fields}
+      />
+    );
   } else if (field.type === 'array') {
     return (
       <fields.array field={field} name={name} schema={schema} fields={fields} />
@@ -78,5 +88,6 @@ export interface FieldProps {
     string: React.FC<FieldProps>;
     number: React.FC<FieldProps>;
     array: React.FC<FieldProps>;
+    boolean: React.FC<FieldProps>;
   };
 }
