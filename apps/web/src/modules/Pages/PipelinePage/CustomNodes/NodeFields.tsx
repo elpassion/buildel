@@ -16,11 +16,7 @@ interface NodeFieldsProps {
 
 export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   const formMethods = useForm();
-  const { control, register } = formMethods;
-  const fieldArray = useFieldArray({
-    control,
-    name: 'fields',
-  });
+  const { register } = formMethods;
 
   const blockName = block.name;
   const { status } = useRunPipeline();
@@ -39,9 +35,16 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
       //todo should we clear block events after push click? if so we need an information about output block
       clearEvents(blockName);
 
+      console.log(fieldsData);
       // what to do here?
       Object.keys(fieldsData).forEach((key) => {
-        push(`${blockName}:${key}`, fieldsData[key]);
+        if (Array.isArray(fieldsData[key])) {
+          fieldsData[key].forEach((value: any) => {
+            push(`${blockName}:${key}`, value);
+          });
+        } else {
+          push(`${blockName}:${key}`, fieldsData[key]);
+        }
       });
     },
     [blockName, clearEvents, push],
@@ -55,6 +58,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         <Input
           id={name}
           type={field.data.type}
+          multiple={field.data.type === 'file'}
           placeholder="Start writing..."
           {...register(name)}
         />

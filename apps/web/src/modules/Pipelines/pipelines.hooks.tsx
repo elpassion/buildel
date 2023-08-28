@@ -162,7 +162,7 @@ export function usePipelineRun(
 
       assert(channel.current);
 
-      if (payload instanceof File && payload.type.startsWith('audio')) {
+      if (payload instanceof File) {
         payload.arrayBuffer().then((arrayBuffer) => {
           assert(channel.current);
           channel.current.push(`input:${topic}`, arrayBuffer);

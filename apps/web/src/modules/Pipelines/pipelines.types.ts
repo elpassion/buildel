@@ -54,7 +54,7 @@ export interface IField {
   data: {
     name: string;
     public: boolean;
-    type: string;
+    type: 'audio' | 'text' | 'file';
   };
 }
 

@@ -16,6 +16,8 @@ export function InputHandle({
         return '!rounded-none !bg-transparent !border-1 !border-black';
       case 'audio':
         return '!rounded-full !bg-transparent !border-1 !border-black';
+      case 'file':
+        return '!rounded-none !bg-transparent !border-1 !border-black rotate-45';
     }
   }, [handle.data.type]);
 
@@ -52,6 +54,8 @@ export function OutputHandle({
         return '!rounded-none !bg-black !border-1 !border-black';
       case 'audio':
         return '!rounded-full !bg-black !border-1 !border-black';
+      case 'file':
+        return '!rounded-none !bg-black !border-1 !border-black rotate-45';
     }
   }, [handle.data.type]);
 
