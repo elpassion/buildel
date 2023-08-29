@@ -21,6 +21,8 @@ importers:
         specifier: ^1.10.13
         version: 1.10.13
 
+  apps/api: {}
+
   apps/web:
     dependencies:
       '@elpassion/taco':
