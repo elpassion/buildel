@@ -69,7 +69,10 @@ defmodule Buildel.Blocks.TakeLatest do
     subscribe_to_inputs(context_id, opts.inputs)
 
     messages =
-      Enum.reduce(opts.inputs, %{}, fn input, messages -> messages |> Map.put(input, nil) end)
+      Enum.reduce(opts.inputs, %{}, fn input, messages ->
+        [input | _] = input |> String.split("->")
+        messages |> Map.put(input, nil)
+      end)
 
     {:ok, state |> assign_stream_state |> Keyword.put(:messages, messages)}
   end
@@ -78,6 +81,7 @@ defmodule Buildel.Blocks.TakeLatest do
   def handle_cast({:combine, {topic, {:text, text}}}, state) do
     state = state |> send_stream_start("output")
     ["context", _context, "block", block, "io", output] = String.split(topic, ":")
+    [output | _] = output |> String.split("->")
 
     state = put_in(state, [:messages, "#{block}:#{output}"], text)
 
@@ -89,7 +93,11 @@ defmodule Buildel.Blocks.TakeLatest do
       end)
 
     state =
-      if String.contains?(message, state[:opts].inputs) do
+      if String.contains?(
+           message,
+           state[:opts].inputs
+           |> Enum.map(fn input -> input |> String.split("->") |> List.first() end)
+         ) do
         state
       else
         Buildel.BlockPubSub.broadcast_to_io(

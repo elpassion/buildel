@@ -8,6 +8,7 @@ import {
   Input,
   InputNumber,
   RadioCardGroup,
+  Textarea,
 } from '@elpassion/taco';
 import { assert } from '~/utils/assert';
 import { Field, FieldProps } from './Schema';
@@ -27,7 +28,7 @@ export function StringField({ field, name }: FieldProps) {
 
   if (!('enum' in field)) {
     return (
-      <Input
+      <Textarea
         id={name}
         {...register(name)}
         label={field.title}

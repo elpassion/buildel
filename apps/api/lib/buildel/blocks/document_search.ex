@@ -80,7 +80,6 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   def handle_cast({:add_file, {:binary, file}}, state) do
-    IO.puts("KUPAAAAA #{inspect(file)}")
     state = send_stream_start(state)
     Buildel.VectorDB.add_text(state[:collection], file)
     state = send_stream_stop(state)
