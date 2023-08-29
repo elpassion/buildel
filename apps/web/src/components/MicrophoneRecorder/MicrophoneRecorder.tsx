@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useFormContext } from 'react-hook-form';
 import { Icon } from '@elpassion/taco';
 import { assert } from '~/utils/assert';
 
@@ -17,6 +18,8 @@ export const MicrophoneRecorder = ({
   onStartCallback,
   onStopCallback,
 }: MicrophoneRecorderProps) => {
+  const formMethods = useFormContext();
+
   const [permission, setPermission] = React.useState(false);
   const [recordingStatus, setRecordingStatus] = React.useState<
     'inactive' | 'recording'
@@ -26,8 +29,15 @@ export const MicrophoneRecorder = ({
   );
   const [audioUrl, setAudioUrl] = React.useState<string | null>(null);
   const [audioChunks, setAudioChunks] = React.useState<any[]>([]);
+  const [chunk, setChunk] = React.useState<any>();
 
   const mediaRecorder = React.useRef<MediaRecorder | null>(null);
+
+  React.useEffect(() => {
+    // register new input
+    formMethods.register(name);
+    console.log(formMethods.watch());
+  }, []);
 
   const getMicrophonePermission = async () => {
     if ('MediaRecorder' in window) {
@@ -53,7 +63,8 @@ export const MicrophoneRecorder = ({
     const media = new MediaRecorder(mediaStream);
 
     mediaRecorder.current = media;
-    mediaRecorder.current.start(250);
+    // TODO (hub33k): change it to 250
+    mediaRecorder.current.start();
 
     // const localAudioChunks: any[] = [];
 
@@ -61,6 +72,11 @@ export const MicrophoneRecorder = ({
       if (typeof event.data === 'undefined') return;
       if (event.data.size === 0) return;
       onStartCallback(event);
+      const buffer = await event.data.arrayBuffer();
+      formMethods.setValue(name, buffer);
+      setChunk(buffer.toString());
+      // console.log(await event.data.arrayBuffer());
+      // setValue('input', await event.data.arrayBuffer());
       // localAudioChunks.push(event.data);
     };
 

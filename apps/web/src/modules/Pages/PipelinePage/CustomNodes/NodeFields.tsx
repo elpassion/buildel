@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import { Button, Input, Textarea } from '@elpassion/taco';
 import { AudioInput } from '~/modules/Pages/PipelinePage/AudioInput';
 import { IBlockConfig, IField } from '~/modules/Pipelines/pipelines.types';
@@ -16,36 +16,49 @@ interface NodeFieldsProps {
 
 export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   const formMethods = useForm();
-  const { register } = formMethods;
+  const { register, handleSubmit } = formMethods;
 
   const blockName = block.name;
   const { status } = useRunPipeline();
   const { push, clearEvents } = useRunPipelineNode(block);
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      const formData = new FormData(e.currentTarget);
-      const fieldsData: Record<string, any> = {};
-      // @ts-ignore
-      for (let [key, value] of formData.entries()) {
-        fieldsData[key] = value;
-      }
-      //todo should we clear block events after push click? if so we need an information about output block
+  const onSubmit = useCallback(
+    (data: Record<string, any>) => {
       clearEvents(blockName);
 
-      console.log(fieldsData);
-      // what to do here?
-      Object.keys(fieldsData).forEach((key) => {
-        if (Array.isArray(fieldsData[key])) {
-          fieldsData[key].forEach((value: any) => {
-            push(`${blockName}:${key}`, value);
+      Object.keys(data).forEach((key) => {
+        const topic = `${blockName}:${key}`;
+        if (Array.isArray(data[key])) {
+          data[key].forEach((value: any) => {
+            push(topic, value);
           });
         } else {
-          push(`${blockName}:${key}`, fieldsData[key]);
+          push(topic, data[key]);
         }
       });
+
+      // e.preventDefault();
+      //
+      // const formData = new FormData(e.currentTarget);
+      // const fieldsData: Record<string, any> = {};
+      // // @ts-ignore
+      // for (let [key, value] of formData.entries()) {
+      //   fieldsData[key] = value;
+      // }
+      // //todo should we clear block events after push click? if so we need an information about output block
+      // clearEvents(blockName);
+      //
+      // console.log(fieldsData);
+      // // what to do here?
+      // Object.keys(fieldsData).forEach((key) => {
+      //   if (Array.isArray(fieldsData[key])) {
+      //     fieldsData[key].forEach((value: any) => {
+      //       push(`${blockName}:${key}`, value);
+      //     });
+      //   } else {
+      //     push(`${blockName}:${key}`, fieldsData[key]);
+      //   }
+      // });
     },
     [blockName, clearEvents, push],
   );
@@ -84,7 +97,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
 
   return (
     <FormProvider {...formMethods}>
-      <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-2" onSubmit={handleSubmit(onSubmit)}>
         {fields.map((field) => (
           <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
         ))}

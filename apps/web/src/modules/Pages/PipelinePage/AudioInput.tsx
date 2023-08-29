@@ -12,19 +12,17 @@ interface AudioInputProps {
 
 export const AudioInput = ({ name }: AudioInputProps) => {
   const [isToggled, toggle] = useToggle();
-
   const { register } = useFormContext(); // retrieve all hook methods
 
   return (
     <>
       <div>
         <Toggle
-          labelText=""
-          onChange={function noRefCheck() {
-            toggle();
-          }}
+          labelText={isToggled ? 'file' : 'mic'}
+          onChange={toggle}
           size="md"
-          value="value"
+          // @ts-ignore
+          value={isToggled}
           checked={isToggled}
         />
 
@@ -46,17 +44,16 @@ export const AudioInput = ({ name }: AudioInputProps) => {
             // }}
           />
         ) : (
-          <>MicrophoneRecorder goes here</>
-          // <MicrophoneRecorder
-          //   name={name}
-          //   onStartCallback={async (event) => {
-          //     console.log(await event.data.arrayBuffer());
-          //     // push(
-          //     //   `${blockName}:audio_input_1`,
-          //     //   await event.data.arrayBuffer(),
-          //     // );
-          //   }}
-          // />
+          <MicrophoneRecorder
+            name={name}
+            onStartCallback={async (event) => {
+              // console.log(await event.data.arrayBuffer());
+              // push(
+              //   `${blockName}:audio_input_1`,
+              //   await event.data.arrayBuffer(),
+              // );
+            }}
+          />
         )}
       </div>
     </>
