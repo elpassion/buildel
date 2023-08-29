@@ -53,7 +53,16 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   const renderInput = useCallback((field: IField) => {
     const { type, name } = field.data;
 
-    if (type === 'text' || type === 'file') {
+    if (type === 'text') {
+      return (
+        <Textarea
+          label=""
+          id={name}
+          placeholder="Start writing..."
+          {...register(name)}
+        />
+      );
+    } else if (type === 'file') {
       return (
         <Input
           id={name}

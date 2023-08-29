@@ -1,0 +1,7 @@
+{
+  "name": "api",
+  "scripts": {
+    "dev": "mix phx.server",
+    "test": "mix test"
+  }
+}
