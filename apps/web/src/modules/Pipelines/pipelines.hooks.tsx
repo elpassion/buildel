@@ -167,6 +167,13 @@ export function usePipelineRun(
           assert(channel.current);
           channel.current.push(`input:${topic}`, arrayBuffer);
         });
+      } else if (payload instanceof FileList) {
+        [...payload].forEach((file) => {
+          file.arrayBuffer().then((arrayBuffer) => {
+            assert(channel.current);
+            channel.current.push(`input:${topic}`, arrayBuffer);
+          });
+        });
       } else {
         channel.current.push(`input:${topic}`, payload);
       }
