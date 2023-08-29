@@ -1,0 +1,55 @@
+defmodule Buildel.Pipelines.Runner do
+  use DynamicSupervisor
+  require Logger
+  alias Buildel.Pipelines
+  alias Buildel.Pipelines.Run
+
+  def start_link(_args) do
+    DynamicSupervisor.start_link(__MODULE__, %{}, name: __MODULE__)
+  end
+
+  def start_run(%Run{} = run) do
+    spec = {Buildel.Pipelines.Worker, [run]}
+    {:ok, _pid} = DynamicSupervisor.start_child(__MODULE__, spec)
+    {:ok, run |> Buildel.Repo.reload() |> Buildel.Repo.preload(:pipeline)}
+  end
+
+  def stop_run(%Run{} = run) do
+    case Process.whereis(Buildel.Pipelines.Worker.context_id(run) |> String.to_atom()) do
+      nil ->
+        Logger.debug("No worker found for #{inspect(run)}")
+
+      pid ->
+        DynamicSupervisor.terminate_child(__MODULE__, pid)
+        run |> Pipelines.finish()
+    end
+  end
+
+  def get_run_blocks(%Run{} = run) do
+    case Process.whereis(
+           (context_id = Buildel.Pipelines.Worker.context_id(run))
+           |> String.to_atom()
+         ) do
+      nil ->
+        Logger.debug("No worker found for #{inspect(run)}")
+        []
+
+      pid ->
+        Supervisor.which_children(pid)
+        |> Enum.map(fn {_name, pid, _, [type]} ->
+          %{
+            pid: pid,
+            type: type,
+            name: type.name(pid),
+            block_name: type.block_name(pid),
+            context_id: context_id
+          }
+        end)
+    end
+  end
+
+  @impl true
+  def init(_init) do
+    DynamicSupervisor.init(strategy: :one_for_one)
+  end
+end

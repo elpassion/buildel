@@ -1,0 +1,35 @@
+<.header>
+  Listing Memberships
+  <:actions>
+    <.link patch={~p"/organizations/#{@organization}/memberships/new"}>
+      <.button>New Membership</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="memberships"
+  rows={@streams.memberships}
+>
+  <:col :let={{_id, membership}} label="User"><%= membership.user.email %></:col>
+  <:action :let={{id, membership}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: membership.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new]} id="membership-modal" show on_cancel={JS.patch(~p"/organizations/#{@organization}/memberships")}>
+  <.live_component
+    module={BuildelWeb.MembershipLive.FormComponent}
+    id={:new}
+    title={@page_title}
+    action={@live_action}
+    membership={@membership}
+    organization={@organization}
+    patch={~p"/organizations/#{@organization}/memberships"}
+  />
+</.modal>

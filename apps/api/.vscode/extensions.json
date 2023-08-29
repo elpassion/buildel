@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "jakebecker.elixir-ls",
+    "phoenixframework.phoenix",
+    "samuel-pordeus.elixir-test"
+  ]
+}

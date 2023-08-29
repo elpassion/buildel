@@ -1,0 +1,27 @@
+<.header>
+  Organization <%= @organization.id %>
+  <:subtitle>This is a organization record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/organizations/#{@organization}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit organization</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Name"><%= @organization.name %></:item>
+</.list>
+
+<.back navigate={~p"/organizations"}>Back to organizations</.back>
+
+<.modal :if={@live_action == :edit} id="organization-modal" show on_cancel={JS.patch(~p"/organizations/#{@organization}")}>
+  <.live_component
+    module={BuildelWeb.OrganizationLive.FormComponent}
+    id={@organization.id}
+    title={@page_title}
+    action={@live_action}
+    organization={@organization}
+    patch={~p"/organizations/#{@organization}"}
+    current_user={@current_user}
+  />
+</.modal>

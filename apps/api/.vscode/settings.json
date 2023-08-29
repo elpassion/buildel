@@ -1,0 +1,10 @@
+{
+  "emmet.includeLanguages": {
+    "phoenix-heex": "html",
+    "html-eex": "html"
+  },
+  "tailwindCSS.includeLanguages": {
+    "elixir": "html",
+    "phoenix-heex": "html"
+  }
+}
