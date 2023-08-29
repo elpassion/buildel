@@ -150,5 +150,5 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
 const getTextFieldsMessages = (events: IEvent[], outputName: string) => {
   const fieldEvents = events.filter((ev) => ev.output === outputName);
 
-  return fieldEvents.map((ev) => ev.payload.message).join(' ');
+  return fieldEvents.map((ev) => ev.payload.message).join('');
 };
