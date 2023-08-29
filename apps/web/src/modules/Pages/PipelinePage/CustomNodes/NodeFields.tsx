@@ -80,6 +80,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         <Input
           id={name}
           type={field.data.type}
+          multiple
           placeholder="Start writing..."
           {...register(name)}
         />

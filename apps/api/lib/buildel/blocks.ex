@@ -14,7 +14,8 @@ defmodule Buildel.Blocks do
     TextOutput,
     BlockValidator,
     TakeLatest,
-    VectorDB
+    VectorDB,
+    DocumentSearch
   }
 
   @names_to_blocks_map %{
@@ -29,7 +30,8 @@ defmodule Buildel.Blocks do
     "collect_all_text" => CollectAllText,
     "take_latest" => TakeLatest,
     "vector_db" => VectorDB,
-    "file_input" => FileInput
+    "file_input" => FileInput,
+    "document_search" => DocumentSearch
   }
 
   @blocks_to_names_map %{
@@ -44,7 +46,8 @@ defmodule Buildel.Blocks do
     CollectAllText => "collect_all_text",
     TakeLatest => "take_latest",
     VectorDB => "vector_db",
-    FileInput => "file_input"
+    FileInput => "file_input",
+    DocumentSearch => "document_search"
   }
 
   def list_types() do
