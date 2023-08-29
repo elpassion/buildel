@@ -15,6 +15,10 @@
       "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
+    },
+    "dependencies:up": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

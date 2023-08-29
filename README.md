@@ -25,6 +25,8 @@ pnpm build
 To develop all apps and packages, run the following command:
 
 ```
-cd my-turborepo
+cd buildel
+
+pnpm dependencies:up
 pnpm dev
 ```

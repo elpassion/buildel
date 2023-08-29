@@ -2,6 +2,7 @@
   "name": "api",
   "scripts": {
     "dev": "mix phx.server",
-    "test": "mix test"
+    "test": "mix test",
+    "dependencies:up": "mix dependencies.up"
   }
 }
