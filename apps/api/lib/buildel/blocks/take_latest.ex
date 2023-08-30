@@ -51,7 +51,7 @@ defmodule Buildel.Blocks.TakeLatest do
 
   # Client
 
-  def combine(pid, {_name, {:text, _text}} = input_data) do
+  def combine(pid, {:text, _text} = input_data) do
     GenServer.cast(pid, {:combine, input_data})
   end
 
@@ -73,8 +73,8 @@ defmodule Buildel.Blocks.TakeLatest do
   end
 
   @impl true
-  def handle_cast({:combine, {topic, {:text, text}}}, state) do
-    state = state |> send_stream_start("output") |> save_take_latest_message(topic, text)
+  def handle_cast({:combine, {:text, _text}}, state) do
+    state = state |> send_stream_start("output")
 
     {state, message} =
       state |> interpolate_template_with_take_latest_messages(state[:opts].template)
@@ -91,8 +91,9 @@ defmodule Buildel.Blocks.TakeLatest do
   end
 
   @impl true
-  def handle_info({name, :text, message}, state) do
-    input(self(), {name, {:text, message}})
+  def handle_info({topic, :text, message}, state) do
+    input(self(), {:text, message})
+    state = state |> save_take_latest_message(topic, message)
     {:noreply, state}
   end
 end

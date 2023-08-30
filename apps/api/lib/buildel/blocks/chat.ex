@@ -1,6 +1,7 @@
 defmodule Buildel.Blocks.Chat do
   require Logger
   use Buildel.Blocks.Block
+  use Buildel.Blocks.Utils.TakeLatest
 
   # Config
 
@@ -116,6 +117,7 @@ defmodule Buildel.Blocks.Chat do
     {:ok,
      state
      |> assign_stream_state
+     |> assign_take_latest(true)
      |> Keyword.put(:messages, opts[:messages])
      |> Keyword.put(:api_key, opts |> Map.get(:api_key))
      |> Keyword.put(:sentences, [])
@@ -233,7 +235,8 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_info({_name, :text, message}, state) do
+  def handle_info({name, :text, message}, state) do
+    state = save_take_latest_message(state, name, message)
     send_message(self(), {:text, message})
     {:noreply, state}
   end

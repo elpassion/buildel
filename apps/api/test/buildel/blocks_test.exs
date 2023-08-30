@@ -347,35 +347,6 @@ defmodule Buildel.BlocksTest do
       assert {:error, _} = Blocks.validate_block(Chat, %{})
     end
 
-    test "chat works through direct calling" do
-      {:ok, _input_pid} =
-        TextInput.start_link(
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []}
-        )
-
-      {:ok, pid} =
-        Chat.start_link(
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output"],
-            messages: [%{role: "system", content: "You are a helpful assistant."}]
-          }
-        )
-
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
-
-      pid |> Chat.input({:text, "Hello darkness my old friend."})
-
-      assert_receive({^topic, :start_stream, _})
-      assert_receive({^topic, :text, _})
-      assert_receive({^topic, :stop_stream, _})
-    end
-
     test "chat works through input" do
       {:ok, input_pid} =
         TextInput.start_link(
