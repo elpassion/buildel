@@ -1,6 +1,10 @@
 defmodule Buildel.Blocks.Utils.TakeLatest do
+  alias Buildel.Blocks.Utils.TakeLatest
+
   defmacro __using__(_opts) do
     quote do
+      import TakeLatest
+
       defp assign_take_latest(state, reset \\ false) do
         messages =
           Enum.reduce(state[:opts].inputs, %{}, fn input, messages ->
@@ -8,32 +12,35 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
             messages |> Map.put(input, nil)
           end)
 
-        state |> Keyword.put(:messages, messages) |> Keyword.put(:reset, reset)
+        state |> Keyword.put(tl_keyword(), messages) |> Keyword.put(tl_reset_keyword(), reset)
       end
 
       defp save_take_latest_message(state, topic, text) do
         ["context", _context, "block", block, "io", output] = String.split(topic, ":")
         [output | _] = output |> String.split("->")
 
-        put_in(state, [:messages, "#{block}:#{output}"], text)
+        put_in(state, [tl_keyword(), "#{block}:#{output}"], text)
       end
 
       defp interpolate_template_with_take_latest_messages(state, template) do
         message =
-          state[:messages]
+          state[tl_keyword()]
           |> Enum.reduce(template, fn
             {_input, nil}, template -> template
             {input, text}, template -> String.replace(template, "{#{input}}", text)
           end)
 
-        if Buildel.Blocks.Utils.TakeLatest.message_filled?(message, state[:opts].inputs) do
-          {state |> Buildel.Blocks.Utils.TakeLatest.cleanup_messages(), message}
+        if message_filled?(message, state[:opts].inputs) do
+          {state |> cleanup_messages(), message}
         else
           {state, nil}
         end
       end
     end
   end
+
+  def tl_keyword(), do: :take_latest_messages
+  def tl_reset_keyword(), do: :take_latest_reset
 
   def message_filled?(message, inputs) do
     !String.contains?(
@@ -43,13 +50,13 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
   end
 
   def cleanup_messages(state) do
-    if state[:reset] do
+    if state[tl_reset_keyword()] do
       messages =
         Enum.reduce(state[:opts].inputs, %{}, fn input, messages ->
           messages |> Map.put(input, nil)
         end)
 
-      Keyword.put(state, :messages, messages)
+      Keyword.put(state, tl_keyword(), messages)
     else
       state
     end
