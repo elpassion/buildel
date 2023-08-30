@@ -1,6 +1,7 @@
 defmodule Buildel.Blocks.TakeLatest do
   require Logger
   use Buildel.Blocks.Block
+  use Buildel.Blocks.Utils.TakeLatest
 
   # Config
 
@@ -68,13 +69,7 @@ defmodule Buildel.Blocks.TakeLatest do
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
-    messages =
-      Enum.reduce(opts.inputs, %{}, fn input, messages ->
-        [input | _] = input |> String.split("->")
-        messages |> Map.put(input, nil)
-      end)
-
-    {:ok, state |> assign_stream_state |> Keyword.put(:messages, messages)}
+    {:ok, state |> assign_stream_state |> assign_take_latest(opts.reset)}
   end
 
   @impl true
@@ -108,7 +103,7 @@ defmodule Buildel.Blocks.TakeLatest do
         )
 
         state =
-          if state[:opts].reset do
+          if state[:reset] do
             messages =
               Enum.reduce(state[:opts].inputs, %{}, fn input, messages ->
                 messages |> Map.put(input, nil)
