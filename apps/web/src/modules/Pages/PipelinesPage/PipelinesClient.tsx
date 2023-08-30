@@ -29,10 +29,10 @@ export const PipelinesClient = () => {
         closeModal={closeModal}
         ariaHideApp={false}
         closeIcon="x"
-        className="absolute top-[10%] !max-w-[640px] !p-8"
-        // TODO (hub33k): wait for Taco to remove align center
+        className="!max-w-[640px] !p-8"
+        align="left"
         modalHeader={
-          <div className="flex flex-col justify-start text-left">
+          <div>
             <p className="text-3xl">Create a new workflow</p>
             <div className="mb-4" />
             <p className="text-sm text-neutral-400">
@@ -41,7 +41,9 @@ export const PipelinesClient = () => {
           </div>
         }
       >
-        <CreatePipelineForm />
+        <div className="h-full !max-h-[640px] overflow-auto">
+          <CreatePipelineForm />
+        </div>
       </Modal>
     </>
   );
