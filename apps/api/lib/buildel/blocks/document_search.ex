@@ -87,13 +87,13 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   @impl true
-  def handle_info({name, :binary, binary}, state) do
+  def handle_info({_name, :binary, binary}, state) do
     add_file(self(), {:binary, binary})
     {:noreply, state}
   end
 
   @impl true
-  def handle_info({name, :text, text}, state) do
+  def handle_info({_name, :text, text}, state) do
     input(self(), {:text, text})
 
     {:noreply, state}
