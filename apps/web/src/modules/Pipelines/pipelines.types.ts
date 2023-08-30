@@ -107,6 +107,7 @@ export type JSONSchemaField =
       description: string;
       minLength?: number;
       maxLength?: number;
+      presentAs?: 'password';
     }
   | {
       type: 'string';

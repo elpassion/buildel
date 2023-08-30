@@ -37,7 +37,8 @@ defmodule Buildel.Blocks.Chat do
                 "type" => "string",
                 "title" => "API Key",
                 "description" => "OpenAI Api key",
-                "minLength" => 1
+                "minLength" => 1,
+                "presentAs" => "password"
               },
               "model" => %{
                 "type" => "string",
@@ -136,29 +137,47 @@ defmodule Buildel.Blocks.Chat do
       {:text, text}
     )
 
-    pid = self()
+    messages =
+      state[:messages]
+      |> Enum.map(fn message ->
+        %{
+          message
+          | content: state |> replace_inputs_with_take_latest_messages(message.content)
+        }
+      end)
 
-    Task.start(fn ->
-      chat_gpt().stream_chat(
-        context: %{messages: state[:messages]},
-        on_content: fn text_chunk ->
-          Buildel.BlockPubSub.broadcast_to_io(
-            state[:context_id],
-            state[:block_name],
-            "output",
-            {:text, text_chunk}
-          )
+    if(
+      Enum.all?(messages, fn message ->
+        message.content |> message_filled?(state[:opts].inputs)
+      end)
+    ) do
+      state = cleanup_messages(state)
+      pid = self()
 
-          save_text_chunk(pid, text_chunk)
-        end,
-        on_end: fn ->
-          finish_chat_message(pid)
-        end,
-        api_key: state[:api_key]
-      )
-    end)
+      Task.start(fn ->
+        chat_gpt().stream_chat(
+          context: %{messages: messages},
+          on_content: fn text_chunk ->
+            Buildel.BlockPubSub.broadcast_to_io(
+              state[:context_id],
+              state[:block_name],
+              "output",
+              {:text, text_chunk}
+            )
 
-    {:noreply, state}
+            save_text_chunk(pid, text_chunk)
+          end,
+          on_end: fn ->
+            finish_chat_message(pid)
+          end,
+          api_key: state[:api_key]
+        )
+      end)
+
+      {:noreply, state}
+    else
+      {:noreply, state}
+    end
   end
 
   def handle_cast({:save_text_chunk, chunk}, state) do

@@ -380,6 +380,35 @@ defmodule Buildel.BlocksTest do
       assert_receive({^topic, :text, "o!"})
       assert_receive({^topic, :text, " How are you?"})
     end
+
+    test "interpolates inputs" do
+      {:ok, input_pid} =
+        TextInput.start_link(
+          name: "text_test",
+          block_name: "text_test",
+          context_id: "run1",
+          opts: %{inputs: []}
+        )
+
+      {:ok, _pid} =
+        Chat.start_link(
+          name: "test",
+          block_name: "test",
+          context_id: "run1",
+          opts: %{
+            inputs: ["text_test:output"],
+            messages: [
+              %{role: "system", content: "You are a helpful assistant. {text_test:output}"}
+            ]
+          }
+        )
+
+      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+
+      input_pid |> TextInput.input({:text, "Hello darkness my old friend."})
+
+      assert_receive({^topic, :text, " How are you?"})
+    end
   end
 
   describe "TakeLatest" do

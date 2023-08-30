@@ -27,6 +27,18 @@ export function StringField({ field, name }: FieldProps) {
   const error = getValueFromPath(errors, name);
 
   if (!('enum' in field)) {
+    if (field.presentAs === 'password') {
+      return (
+        <Input
+          id={name}
+          {...register(name)}
+          label={field.title}
+          type="password"
+          errorMessage={error?.message ?? undefined}
+          supportingText={field.description}
+        />
+      );
+    }
     return (
       <Textarea
         id={name}

@@ -22,13 +22,16 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
         put_in(state, [tl_keyword(), "#{block}:#{output}"], text)
       end
 
+      defp replace_inputs_with_take_latest_messages(state, template) do
+        state[tl_keyword()]
+        |> Enum.reduce(template, fn
+          {_input, nil}, template -> template
+          {input, text}, template -> String.replace(template, "{#{input}}", text)
+        end)
+      end
+
       defp interpolate_template_with_take_latest_messages(state, template) do
-        message =
-          state[tl_keyword()]
-          |> Enum.reduce(template, fn
-            {_input, nil}, template -> template
-            {input, text}, template -> String.replace(template, "{#{input}}", text)
-          end)
+        message = replace_inputs_with_take_latest_messages(state, template)
 
         if message_filled?(message, state[:opts].inputs) do
           {state |> cleanup_messages(), message}
