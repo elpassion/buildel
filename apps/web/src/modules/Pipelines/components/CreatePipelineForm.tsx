@@ -123,7 +123,7 @@ export const CreatePipelineForm = () => {
 
           <div className="mb-6" />
 
-          <div>
+          <div className="flex justify-end">
             <Button text="Create workflow" type="submit" />
           </div>
         </div>

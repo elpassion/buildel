@@ -47,7 +47,7 @@ export function EditBlockForm({
             }}
           />
         </div>
-        <div className="mt-6 flex">
+        <div className="mt-6 flex justify-end">
           <Button text="Confirm" type="submit" variant="filled" />
         </div>
       </form>
