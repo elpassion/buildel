@@ -74,27 +74,16 @@ defmodule Buildel.Blocks.TakeLatest do
 
   @impl true
   def handle_cast({:combine, {topic, {:text, text}}}, state) do
-    state = state |> send_stream_start("output")
-    ["context", _context, "block", block, "io", output] = String.split(topic, ":")
-    [output | _] = output |> String.split("->")
+    state = state |> send_stream_start("output") |> save_take_latest_message(topic, text)
 
-    state = put_in(state, [:messages, "#{block}:#{output}"], text)
+    {state, message} =
+      state |> interpolate_template_with_take_latest_messages(state[:opts].template)
 
-    message =
-      state[:messages]
-      |> Enum.reduce(state[:opts].template, fn
-        {_input, nil}, template -> template
-        {input, text}, template -> String.replace(template, "{#{input}}", text)
-      end)
+    case message do
+      nil ->
+        {:noreply, state}
 
-    state =
-      if String.contains?(
-           message,
-           state[:opts].inputs
-           |> Enum.map(fn input -> input |> String.split("->") |> List.first() end)
-         ) do
-        state
-      else
+      message ->
         Buildel.BlockPubSub.broadcast_to_io(
           state[:context_id],
           state[:block_name],
@@ -102,22 +91,10 @@ defmodule Buildel.Blocks.TakeLatest do
           {:text, message}
         )
 
-        state =
-          if state[:reset] do
-            messages =
-              Enum.reduce(state[:opts].inputs, %{}, fn input, messages ->
-                messages |> Map.put(input, nil)
-              end)
-
-            Keyword.put(state, :messages, messages)
-          else
-            state
-          end
-
         state |> send_stream_stop("output")
-      end
 
-    {:noreply, state}
+        {:noreply, state}
+    end
   end
 
   @impl true
