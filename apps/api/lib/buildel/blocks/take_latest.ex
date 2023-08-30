@@ -84,14 +84,7 @@ defmodule Buildel.Blocks.TakeLatest do
         {:noreply, state}
 
       message ->
-        Buildel.BlockPubSub.broadcast_to_io(
-          state[:context_id],
-          state[:block_name],
-          "output",
-          {:text, message}
-        )
-
-        state |> send_stream_stop("output")
+        state |> broadcast_to_output("output", {:text, message}) |> send_stream_stop("output")
 
         {:noreply, state}
     end

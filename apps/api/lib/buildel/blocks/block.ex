@@ -156,6 +156,17 @@ defmodule Buildel.Blocks.Block do
           _ -> "input"
         end
       end
+
+      defp broadcast_to_output(state, output_name, message) do
+        BlockPubSub.broadcast_to_io(
+          state[:context_id],
+          state[:block_name],
+          output_name,
+          message
+        )
+
+        state
+      end
     end
   end
 end
