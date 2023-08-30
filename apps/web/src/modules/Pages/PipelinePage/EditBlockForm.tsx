@@ -35,7 +35,7 @@ export function EditBlockForm({
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(handleUpdate)}>
-        <div className="mt-6 space-y-4">
+        <div className="space-y-4">
           <Schema
             schema={blockConfig.block_type.schema as any}
             name="opts"
