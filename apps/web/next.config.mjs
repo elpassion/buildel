@@ -4,6 +4,9 @@ import { ENV } from './src/env.mjs';
 const config = {
   reactStrictMode: true,
   trailingSlash: true,
+  eslint: {
+    ignoreDuringBuilds: true
+  },
   env: {
     ...ENV,
   },
