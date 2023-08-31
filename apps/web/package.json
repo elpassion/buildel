@@ -6,6 +6,7 @@
     "workerDirectory": "public"
   },
   "scripts": {
+    "postinstall": "pnpm bootstrap",
     "bootstrap": "npx msw init public",
     "dev": "next dev",
     "build": "next build",
