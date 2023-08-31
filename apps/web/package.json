@@ -2,7 +2,11 @@
   "name": "web",
   "version": "0.1.0",
   "private": true,
+  "msw": {
+    "workerDirectory": "public"
+  },
   "scripts": {
+    "bootstrap": "npx msw init public",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -42,6 +46,7 @@
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.12",
     "immer": "^10.0.2",
+    "msw": "^1.2.5",
     "postcss": "8.4.27",
     "prettier-plugin-tailwindcss": "^0.4.1",
     "tailwindcss": "3.3.3",

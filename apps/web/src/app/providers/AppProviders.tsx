@@ -9,6 +9,11 @@ interface ProvidersProps {
 }
 
 export function AppProviders({ children }: ProvidersProps) {
+  if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
+    // console.log('[Layout] Mocking enabled.');
+    require('../../utils/mocks');
+  }
+
   const [queryClient] = React.useState(
     () =>
       new QueryClient({
