@@ -1,6 +1,6 @@
 defmodule Buildel.VectorDB do
   def init(collection_name) do
-    {:ok, _collection} = Buildel.VectorDB.QdrantAdapter.create_collection(collection_name)
+    {:ok, _collection} = adapter().create_collection(collection_name)
   end
 
   def add_text(collection_name, text) do
@@ -13,9 +13,9 @@ defmodule Buildel.VectorDB do
     {:ok, %{data: gpt_embeddings}} = Buildel.Clients.ChatGPT.get_embeddings(inputs: documents)
     embeddings = gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)
 
-    {:ok, collection} = Buildel.VectorDB.QdrantAdapter.get_collection(collection_name)
+    {:ok, collection} = adapter().get_collection(collection_name)
 
-    Buildel.VectorDB.QdrantAdapter.add(collection, %{
+    adapter().add(collection, %{
       embeddings: embeddings,
       documents: documents,
       ids: Enum.map(1..Enum.count(documents), fn _ -> UUID.uuid4() end)
@@ -28,10 +28,10 @@ defmodule Buildel.VectorDB do
     documents = Buildel.Splitters.recursive_character_text_split(query, %{})
     {:ok, %{data: gpt_embeddings}} = Buildel.Clients.ChatGPT.get_embeddings(inputs: documents)
     embeddings = gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)
-    {:ok, collection} = Buildel.VectorDB.QdrantAdapter.get_collection(collection_name)
+    {:ok, collection} = adapter().get_collection(collection_name)
 
     {:ok, results} =
-      Buildel.VectorDB.QdrantAdapter.query(collection, %{
+      adapter().query(collection, %{
         query_embeddings: embeddings |> Enum.at(0)
       })
 
@@ -39,6 +39,7 @@ defmodule Buildel.VectorDB do
   end
 
   def adapter do
+    Buildel.VectorDB.QdrantAdapter
   end
 end
 
@@ -88,6 +89,6 @@ defmodule Buildel.VectorDB.QdrantAdapter do
   end
 
   def list(collection) do
-    res = Qdrant.Api.Http.Points.scroll_points(collection.name, %{})
+    Qdrant.Api.Http.Points.scroll_points(collection.name, %{})
   end
 end
