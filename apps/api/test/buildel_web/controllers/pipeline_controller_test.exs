@@ -1,6 +1,6 @@
 defmodule BuildelWeb.PipelineControllerTest do
   use BuildelWeb.ConnCase
-
+  import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
 
   alias Buildel.Pipelines.Pipeline
@@ -28,7 +28,11 @@ defmodule BuildelWeb.PipelineControllerTest do
 
   describe "create pipeline" do
     test "renders pipeline when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/pipelines", pipeline: @create_attrs)
+      conn =
+        post(conn, ~p"/api/pipelines",
+          pipeline: @create_attrs |> Enum.into(%{organization_id: organization_fixture().id})
+        )
+
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
       conn = get(conn, ~p"/api/pipelines/#{id}")
@@ -49,7 +53,10 @@ defmodule BuildelWeb.PipelineControllerTest do
   describe "update pipeline" do
     setup [:create_pipeline]
 
-    test "renders pipeline when data is valid", %{conn: conn, pipeline: %Pipeline{id: id} = pipeline} do
+    test "renders pipeline when data is valid", %{
+      conn: conn,
+      pipeline: %Pipeline{id: id} = pipeline
+    } do
       conn = put(conn, ~p"/api/pipelines/#{pipeline}", pipeline: @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
@@ -75,9 +82,9 @@ defmodule BuildelWeb.PipelineControllerTest do
       conn = delete(conn, ~p"/api/pipelines/#{pipeline}")
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
+      assert_error_sent(404, fn ->
         get(conn, ~p"/api/pipelines/#{pipeline}")
-      end
+      end)
     end
   end
 

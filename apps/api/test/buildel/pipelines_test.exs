@@ -1,5 +1,6 @@
 defmodule Buildel.PipelinesTest do
   use Buildel.DataCase
+  import Buildel.OrganizationsFixtures
 
   alias Buildel.Pipelines
 
@@ -21,7 +22,7 @@ defmodule Buildel.PipelinesTest do
     end
 
     test "create_pipeline/1 with valid data creates a pipeline" do
-      valid_attrs = %{name: "some name", config: %{}}
+      valid_attrs = %{name: "some name", config: %{}, organization_id: organization_fixture().id}
 
       assert {:ok, %Pipeline{} = pipeline} = Pipelines.create_pipeline(valid_attrs)
       assert pipeline.name == "some name"
