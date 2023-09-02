@@ -8,6 +8,10 @@ primary_region = "waw"
 
 [build]
 
+[env]
+  API_URL = "https://buildel-api.fly.dev/api"
+  WEBSOCKET_URL = "wss://buildel-api.fly.dev/socket"
+
 [http_service]
   internal_port = 8080
   force_https = true

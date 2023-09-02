@@ -16,6 +16,7 @@ swap_size_mb = 512
 [env]
   PHX_HOST = "buildel-api.fly.dev"
   PORT = "8080"
+  QDRANT_DATABASE_URL = "http://buildel-vectordb.internal"
 
 [http_service]
   internal_port = 8080

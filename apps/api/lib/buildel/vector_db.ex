@@ -1,16 +1,22 @@
 defmodule Buildel.VectorDB do
   def init(collection_name) do
-    {:ok, _collection} = adapter().create_collection(collection_name)
+    with {:ok, _collection} <- adapter().create_collection(collection_name) do
+      {:ok, %{name: collection_name}}
+    else
+      {:error, error} -> {:error, error}
+    end
   end
 
-  def add_text(collection_name, text) do
+  def add_text(collection_name, text, api_key: api_key) do
     documents =
       Buildel.Splitters.recursive_character_text_split(text, %{
         chunk_size: 1000,
         chunk_overlap: 200
       })
 
-    {:ok, %{data: gpt_embeddings}} = Buildel.Clients.ChatGPT.get_embeddings(inputs: documents)
+    {:ok, %{data: gpt_embeddings}} =
+      Buildel.Clients.ChatGPT.get_embeddings(inputs: documents, api_key: api_key)
+
     embeddings = gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)
 
     {:ok, collection} = adapter().get_collection(collection_name)
@@ -24,9 +30,12 @@ defmodule Buildel.VectorDB do
     {:ok, collection}
   end
 
-  def query(collection_name, query) do
+  def query(collection_name, query, api_key: api_key) do
     documents = Buildel.Splitters.recursive_character_text_split(query, %{})
-    {:ok, %{data: gpt_embeddings}} = Buildel.Clients.ChatGPT.get_embeddings(inputs: documents)
+
+    {:ok, %{data: gpt_embeddings}} =
+      Buildel.Clients.ChatGPT.get_embeddings(inputs: documents, api_key: api_key)
+
     embeddings = gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)
     {:ok, collection} = adapter().get_collection(collection_name)
 
@@ -38,7 +47,7 @@ defmodule Buildel.VectorDB do
     results
   end
 
-  def adapter do
+  defp adapter do
     Buildel.VectorDB.QdrantAdapter
   end
 end
@@ -51,10 +60,15 @@ defmodule Buildel.VectorDB.QdrantAdapter do
   end
 
   def create_collection(collection_name) do
-    {:ok, _} =
-      Qdrant.create_collection(collection_name, %{vectors: %{size: 1536, distance: "Cosine"}})
+    with {:ok, _} <-
+           Qdrant.create_collection(collection_name, %{vectors: %{size: 1536, distance: "Cosine"}}) do
+      {:ok, %{name: collection_name}}
+    else
+      error ->
+        IO.inspect("QDRANT URL: #{inspect(System.get_env("QDRANT_DATABASE_URL"))}")
 
-    {:ok, %{name: collection_name}}
+        {:error, error}
+    end
   end
 
   def add(collection, %{embeddings: embeddings, documents: documents, ids: ids}) do

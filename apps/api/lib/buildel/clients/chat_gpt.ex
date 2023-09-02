@@ -31,8 +31,8 @@ defmodule Buildel.Clients.ChatGPT do
   end
 
   @impl ChatGPTBehaviour
-  def get_embeddings(inputs: inputs) do
-    OpenAI.embeddings([model: "text-embedding-ada-002", input: inputs], config())
+  def get_embeddings(inputs: inputs, api_key: api_key) do
+    OpenAI.embeddings([model: "text-embedding-ada-002", input: inputs], config(false, api_key))
   end
 
   def config(stream \\ false, api_key \\ nil) do
