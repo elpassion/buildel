@@ -17,7 +17,7 @@ defmodule BuildelWeb.PipelineChannel do
     end
   end
 
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     if socket.assigns |> Map.has_key?(:run) do
       Pipelines.Runner.stop_run(socket.assigns.run)
     end

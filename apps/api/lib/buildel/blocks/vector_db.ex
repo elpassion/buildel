@@ -27,7 +27,19 @@ defmodule Buildel.Blocks.VectorDB do
       "properties" => %{
         "name" => name_schema(),
         "inputs" => inputs_schema(),
-        "opts" => options_schema()
+        "opts" =>
+          options_schema(%{
+            "required" => ["api_key"],
+            "properties" => %{
+              "api_key" => %{
+                "type" => "string",
+                "title" => "API Key",
+                "description" => "OpenAI Api key",
+                "minLength" => 1,
+                "presentAs" => "password"
+              }
+            }
+          })
       }
     }
   end
@@ -58,13 +70,17 @@ defmodule Buildel.Blocks.VectorDB do
 
     {:ok, collection} = Buildel.VectorDB.init(name)
 
-    {:ok, state |> assign_stream_state |> Keyword.put(:collection, collection.name)}
+    {:ok,
+     state
+     |> assign_stream_state
+     |> Keyword.put(:collection, collection.name)
+     |> Keyword.put(:api_key, opts |> Map.get(:api_key))}
   end
 
   @impl true
   def handle_cast({:query, {:text, query}}, state) do
     state = send_stream_start(state)
-    results = Buildel.VectorDB.query(state[:collection], query)
+    results = Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
     result = get_in(results, ["documents"]) |> Enum.at(0) |> Enum.at(0)
 
     Buildel.BlockPubSub.broadcast_to_io(
@@ -81,7 +97,7 @@ defmodule Buildel.Blocks.VectorDB do
 
   def handle_cast({:add_file, {:binary, file}}, state) do
     state = send_stream_start(state)
-    Buildel.VectorDB.add_text(state[:collection], file)
+    Buildel.VectorDB.add_text(state[:collection], file, api_key: state[:api_key])
     state = send_stream_stop(state)
     {:noreply, state}
   end
