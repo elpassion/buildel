@@ -63,19 +63,19 @@ defmodule Buildel.BlockPubSub do
   end
 
   defp broadcast(topic, {message_type, content} = message) do
-    Logger.debug("Broadcasting to topic: #{topic}, message: #{inspect(message)}")
+    # Logger.debug("Broadcasting to topic: #{topic}, message: #{inspect(message)}")
 
     Buildel.PubSub
     |> PubSub.broadcast!(topic, {topic, message_type, content})
   end
 
   defp subscribe(topic) do
-    Logger.debug("Subscribing to topic: #{topic}")
+    # Logger.debug("Subscribing to topic: #{topic}")
     Buildel.PubSub |> PubSub.subscribe(topic)
   end
 
   defp unsubscribe(topic) do
-    Logger.debug("Unsubscribing from topic: #{topic}")
+    # Logger.debug("Unsubscribing from topic: #{topic}")
     Buildel.PubSub |> PubSub.unsubscribe(topic)
   end
 end

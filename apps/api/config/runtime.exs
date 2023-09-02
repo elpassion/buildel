@@ -38,6 +38,12 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base,
     check_origin: ["https://#{host}", "https://buildel-web.fly.dev"]
+
+  config :qdrant,
+    port: 6333,
+    interface: "rest",
+    database_url: System.get_env("QDRANT_DATABASE_URL"),
+    api_key: "doesntmatter"
 end
 
 # Dotenv.load()

@@ -65,7 +65,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   def handle_cast({:query, {:text, query}}, state) do
     state = send_stream_start(state)
     results = Buildel.VectorDB.query(state[:collection], query)
-    result = get_in(results, ["documents"]) |> Enum.at(0) |> Enum.at(0)
+    result = results |> Enum.at(0)
 
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
