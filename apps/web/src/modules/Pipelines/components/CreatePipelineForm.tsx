@@ -13,6 +13,7 @@ import { ROUTES } from '~/modules/Config';
 type Inputs = {
   name: string;
   type: 'stream' | 'sequential';
+  organization_id: string;
 };
 
 export const CreatePipelineForm = () => {
@@ -44,6 +45,7 @@ export const CreatePipelineForm = () => {
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     const payload = {
       name: data.name,
+      organization_id: 1,
       config: {
         version: '1',
         blocks: [],

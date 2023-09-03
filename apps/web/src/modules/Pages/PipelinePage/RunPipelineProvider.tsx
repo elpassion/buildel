@@ -34,14 +34,16 @@ const RunPipelineContext = React.createContext<IRunPipelineContext | undefined>(
   undefined,
 );
 interface RunPipelineProviderProps extends PropsWithChildren {
+  organizationId: string;
   pipelineId: string;
 }
 
 export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   children,
+  organizationId,
   pipelineId,
 }) => {
-  const { data: pipeline } = usePipeline(pipelineId);
+  const { data: pipeline } = usePipeline(organizationId, pipelineId);
   const [events, setEvents] = useState<any[]>([]);
   const [blockStatuses, setBlockStatuses] = useState<Record<string, boolean>>(
     {},

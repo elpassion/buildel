@@ -32,12 +32,13 @@ export function usePipelines() {
 }
 
 export function usePipeline(
+  organizationId: string,
   pipelineId: string,
   options?: UseQueryOptions<IPipeline>,
 ) {
   return useQuery<IPipeline>(
-    ['pipelines', pipelineId],
-    () => pipelineApi.getPipeline(pipelineId),
+    ['pipelines', organizationId, pipelineId],
+    () => pipelineApi.getPipeline(organizationId, pipelineId),
     {
       ...options,
     },
