@@ -53,7 +53,7 @@ defmodule BuildelWeb.Router do
     resources("/block_types", BlockTypesController, only: [:index])
 
     resources("/organizations/:organization_id/pipelines", OrganizationPipelineController,
-      only: [:index, :delete, :create, :show]
+      only: [:index, :delete, :create, :show, :update]
     )
 
     resources("/pipelines", PipelineController, only: [:index, :create, :show, :update, :delete])

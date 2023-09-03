@@ -57,30 +57,38 @@ defmodule BuildelWeb.PipelineControllerTest do
     end
   end
 
-  # describe "update pipeline" do
-  #   setup [:create_pipeline]
+  describe "update pipeline" do
+    setup [:create_pipeline]
 
-  #   test "renders pipeline when data is valid", %{
-  #     conn: conn,
-  #     pipeline: %Pipeline{id: id} = pipeline
-  #   } do
-  #     conn = put(conn, ~p"/api/pipelines/#{pipeline}", pipeline: @update_attrs)
-  #     assert %{"id" => ^id} = json_response(conn, 200)["data"]
+    test "renders pipeline when data is valid", %{
+      conn: conn,
+      pipeline: %Pipeline{id: id} = pipeline
+    } do
+      conn =
+        put(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}",
+          pipeline: @update_attrs
+        )
 
-  #     conn = get(conn, ~p"/api/pipelines/#{id}")
+      assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
-  #     assert %{
-  #              "id" => ^id,
-  #              "config" => %{},
-  #              "name" => "some updated name"
-  #            } = json_response(conn, 200)["data"]
-  #   end
+      conn = get(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{id}")
 
-  #   test "renders errors when data is invalid", %{conn: conn, pipeline: pipeline} do
-  #     conn = put(conn, ~p"/api/pipelines/#{pipeline}", pipeline: @invalid_attrs)
-  #     assert json_response(conn, 422)["errors"] != %{}
-  #   end
-  # end
+      assert %{
+               "id" => ^id,
+               "config" => %{},
+               "name" => "some updated name"
+             } = json_response(conn, 200)["data"]
+    end
+
+    test "renders errors when data is invalid", %{conn: conn, pipeline: pipeline} do
+      conn =
+        put(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}",
+          pipeline: @invalid_attrs
+        )
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+  end
 
   describe "delete pipeline" do
     setup [:create_pipeline]

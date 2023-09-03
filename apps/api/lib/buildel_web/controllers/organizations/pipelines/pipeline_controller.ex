@@ -35,6 +35,19 @@ defmodule BuildelWeb.OrganizationPipelineController do
     end
   end
 
+  def update(conn, %{
+        "organization_id" => organization_id,
+        "id" => id,
+        "pipeline" => pipeline_params
+      }) do
+    organization = Organizations.get_organization!(organization_id)
+    pipeline = Pipelines.get_organization_pipeline!(organization, id)
+
+    with {:ok, %Pipeline{} = pipeline} <- Pipelines.update_pipeline(pipeline, pipeline_params) do
+      render(conn, :show, pipeline: pipeline)
+    end
+  end
+
   def delete(conn, %{"organization_id" => organization_id, "id" => id}) do
     organization = Organizations.get_organization!(organization_id)
     pipeline = Pipelines.get_organization_pipeline!(organization, id)
