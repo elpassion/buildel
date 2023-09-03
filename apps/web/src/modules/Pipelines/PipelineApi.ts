@@ -7,7 +7,7 @@ export class PipelineApi {
     pipelineId: string,
   ): Promise<IPipeline> {
     const response = await fetch(
-      `${ENV.API_URL}/${organizationId}/pipelines/${pipelineId}`,
+      `${ENV.API_URL}/organizations/${organizationId}/pipelines/${pipelineId}`,
       {
         cache: 'no-cache',
       },
