@@ -13,13 +13,16 @@ export const PipelinesList = () => {
   const params = useParams();
   const { data, isLoading, isError } = useQuery(
     ['pipelines'],
-    async () => await pipelinesApi.getAll(),
+    async () => await pipelinesApi.getAll(params.organizationId as string),
     {},
   );
 
   const { mutate } = useMutation({
     mutationFn: async (payload: string) => {
-      return await pipelinesApi.delete(payload);
+      return await pipelinesApi.delete(
+        params.organizationId as string,
+        payload,
+      );
     },
     onSuccess: async (data: any) => {
       await queryClient.invalidateQueries({ queryKey: ['pipelines'] });

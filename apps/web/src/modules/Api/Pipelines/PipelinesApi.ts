@@ -2,7 +2,8 @@ import { TCreatePipeline, TPipeline } from '~/contracts';
 import { HttpClient, createHttpClient } from '~/utils';
 
 export class PipelinesApi {
-  public baseUrl = `/pipelines`;
+  public baseUrl = (organizationId: string) =>
+    `/organizations/${organizationId}/pipelines`;
   private client: HttpClient;
 
   constructor(client: HttpClient = createHttpClient()) {
@@ -11,20 +12,25 @@ export class PipelinesApi {
 
   // TODO (hub33k): return from backend just array?
   //   how to type this?
-  getAll() {
-    return this.client.get<{ data: TPipeline[] }>(`${this.baseUrl}`);
+  getAll(organizationId: string) {
+    return this.client.get<{ data: TPipeline[] }>(
+      `${this.baseUrl(organizationId)}`,
+    );
   }
 
-  get(id: string) {
-    return this.client.get<TPipeline>(`${this.baseUrl}/${id}`);
+  get(organizationId: string, id: string) {
+    return this.client.get<TPipeline>(`${this.baseUrl(organizationId)}/${id}`);
   }
 
-  create(payload: TCreatePipeline) {
-    return this.client.post<TCreatePipeline>(`${this.baseUrl}`, payload);
+  create(organizationId: string, payload: TCreatePipeline) {
+    return this.client.post<TCreatePipeline>(
+      `${this.baseUrl(organizationId)}`,
+      payload,
+    );
   }
 
-  delete(id: string) {
-    return this.client.delete(`${this.baseUrl}/${id}`);
+  delete(organizationId: string, id: string) {
+    return this.client.delete(`${this.baseUrl(organizationId)}/${id}`);
   }
 }
 
