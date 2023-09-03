@@ -3,6 +3,7 @@ defmodule Buildel.Pipelines do
   alias Buildel.Repo
 
   alias Buildel.Pipelines.Pipeline
+  alias Buildel.Organizations.Organization
 
   def list_pipelines do
     Repo.all(Pipeline)
@@ -29,6 +30,11 @@ defmodule Buildel.Pipelines do
 
   def change_pipeline(%Pipeline{} = pipeline, attrs \\ %{}) do
     Pipeline.changeset(pipeline, attrs)
+  end
+
+  def list_organization_pipelines(%Organization{} = organization) do
+    from(p in Pipeline, where: p.organization_id == ^organization.id, order_by: [desc: p.id])
+    |> Repo.all()
   end
 
   alias Buildel.Pipelines.Run
