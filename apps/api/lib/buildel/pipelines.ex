@@ -37,6 +37,11 @@ defmodule Buildel.Pipelines do
     |> Repo.all()
   end
 
+  def get_organization_pipeline!(%Organization{} = organization, id) do
+    from(p in Pipeline, where: p.organization_id == ^organization.id, where: p.id == ^id)
+    |> Repo.one!()
+  end
+
   alias Buildel.Pipelines.Run
 
   def list_runs do

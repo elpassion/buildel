@@ -76,21 +76,21 @@ defmodule BuildelWeb.PipelineControllerTest do
   #   end
   # end
 
-  # describe "delete pipeline" do
-  #   setup [:create_pipeline]
+  describe "delete pipeline" do
+    setup [:create_pipeline]
 
-  #   test "deletes chosen pipeline", %{conn: conn, pipeline: pipeline} do
-  #     conn = delete(conn, ~p"/api/pipelines/#{pipeline}")
-  #     assert response(conn, 204)
+    test "deletes chosen pipeline", %{conn: conn, pipeline: pipeline} do
+      conn = delete(conn, ~p"/api/#{pipeline.organization_id}/pipelines/#{pipeline}")
+      assert response(conn, 204)
 
-  #     assert_error_sent(404, fn ->
-  #       get(conn, ~p"/api/pipelines/#{pipeline}")
-  #     end)
-  #   end
-  # end
+      assert_error_sent(404, fn ->
+        get(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}")
+      end)
+    end
+  end
 
-  # defp create_pipeline(_) do
-  #   pipeline = pipeline_fixture()
-  #   %{pipeline: pipeline}
-  # end
+  defp create_pipeline(_) do
+    pipeline = pipeline_fixture()
+    %{pipeline: pipeline}
+  end
 end
