@@ -46,6 +46,7 @@ export function usePipeline(
 }
 
 export function useUpdatePipeline(
+  organizationId: string,
   pipelineId: string,
   {
     onSuccess,
@@ -56,16 +57,22 @@ export function useUpdatePipeline(
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (pipeline: Omit<z.TypeOf<typeof Pipeline>, 'id'>) => {
-      const response = await fetch(`${ENV.API_URL}/pipelines/${pipelineId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${ENV.API_URL}/organizations/${organizationId}/pipelines/${pipelineId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ pipeline }),
         },
-        body: JSON.stringify({ pipeline }),
-      });
+      );
       const json = await response.json();
       const pipelineResponse = PipelineResponse.parse(json);
-      queryClient.setQueryData(['pipelines', pipelineId], pipelineResponse);
+      queryClient.setQueryData(
+        ['pipelines', organizationId, pipelineId],
+        pipelineResponse,
+      );
       onSuccess?.(pipelineResponse);
       return pipelineResponse;
     },

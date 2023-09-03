@@ -47,7 +47,7 @@ export function PipelineBoard({
   );
 
   const { mutateAsync: updatePipeline, isLoading: isUpdating } =
-    useUpdatePipeline(pipelineId);
+    useUpdatePipeline(organizationId, pipelineId);
 
   const handleUpdate = useCallback(
     async (updated: IPipelineConfig) => {
@@ -91,7 +91,10 @@ export function PipelineBoard({
   if (!pipeline || !blockTypes) return;
 
   return (
-    <RunPipelineProvider pipelineId={pipelineId}>
+    <RunPipelineProvider
+      organizationId={organizationId}
+      pipelineId={pipelineId}
+    >
       <ReactFlowProvider>
         <div className="relative h-[93vh] w-full">
           <PipelineFlow
