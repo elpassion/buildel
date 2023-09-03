@@ -27,29 +27,35 @@ defmodule BuildelWeb.PipelineControllerTest do
     end
   end
 
-  # describe "create pipeline" do
-  #   test "renders pipeline when data is valid", %{conn: conn} do
-  #     conn =
-  #       post(conn, ~p"/api/pipelines",
-  #         pipeline: @create_attrs |> Enum.into(%{organization_id: organization_fixture().id})
-  #       )
+  describe "create pipeline" do
+    test "renders pipeline when data is valid", %{conn: conn} do
+      organization_id = organization_fixture().id
 
-  #     assert %{"id" => id} = json_response(conn, 201)["data"]
+      conn =
+        post(conn, ~p"/api/organizations/#{organization_id}/pipelines",
+          pipeline: @create_attrs |> Enum.into(%{organization_id: organization_id})
+        )
 
-  #     conn = get(conn, ~p"/api/pipelines/#{id}")
+      assert %{"id" => id} = json_response(conn, 201)["data"]
 
-  #     assert %{
-  #              "id" => ^id,
-  #              "config" => %{},
-  #              "name" => "some name"
-  #            } = json_response(conn, 200)["data"]
-  #   end
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines/#{id}")
 
-  #   test "renders errors when data is invalid", %{conn: conn} do
-  #     conn = post(conn, ~p"/api/pipelines", pipeline: @invalid_attrs)
-  #     assert json_response(conn, 422)["errors"] != %{}
-  #   end
-  # end
+      assert %{
+               "id" => ^id,
+               "config" => %{},
+               "name" => "some name"
+             } = json_response(conn, 200)["data"]
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      organization_id = organization_fixture().id
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization_id}/pipelines", pipeline: @invalid_attrs)
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+  end
 
   # describe "update pipeline" do
   #   setup [:create_pipeline]
@@ -80,11 +86,13 @@ defmodule BuildelWeb.PipelineControllerTest do
     setup [:create_pipeline]
 
     test "deletes chosen pipeline", %{conn: conn, pipeline: pipeline} do
-      conn = delete(conn, ~p"/api/#{pipeline.organization_id}/pipelines/#{pipeline}")
+      conn =
+        delete(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline.id}")
+
       assert response(conn, 204)
 
       assert_error_sent(404, fn ->
-        get(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}")
+        get(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline.id}")
       end)
     end
   end
