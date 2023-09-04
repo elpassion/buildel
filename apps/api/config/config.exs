@@ -64,6 +64,8 @@ config :chroma,
   api_base: "api",
   api_version: "v1"
 
+config :tesla, adapter: Tesla.Adapter.Hackney
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

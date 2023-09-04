@@ -5,9 +5,12 @@ import { PipelineBoard } from './PipelineBoard';
 import { PipelineNavbar } from './PipelineNavbar';
 
 export const PipelinePage = async (props: {
-  params: { pipelineId: string };
+  params: { organizationId: string; pipelineId: string };
 }) => {
-  const pipeline = await pipelineApi.getPipeline(props.params.pipelineId);
+  const pipeline = await pipelineApi.getPipeline(
+    props.params.organizationId,
+    props.params.pipelineId,
+  );
   const blockTypes = await blockTypesApi.getBlockTypes();
 
   return (
@@ -18,6 +21,7 @@ export const PipelinePage = async (props: {
         <PipelineBoard
           initialPipeline={pipeline}
           initialBlockTypes={blockTypes}
+          organizationId={props.params.organizationId}
           pipelineId={props.params.pipelineId}
         />
       </MainContainer>

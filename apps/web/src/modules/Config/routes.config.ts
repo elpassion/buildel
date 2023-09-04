@@ -1,7 +1,7 @@
 export const ROUTES = {
   HOME: '/',
   PIPELINES: '/pipelines',
-  PIPELINE: (id: string) => {
-    return `/pipelines/${id}`;
+  PIPELINE: (organizationId: string, pipelineId: string) => {
+    return `/organizations/${organizationId}/pipelines/${pipelineId}`;
   },
 };

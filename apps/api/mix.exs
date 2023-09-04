@@ -47,6 +47,7 @@ defmodule Buildel.MixProject do
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.3"},
       {:finch, "~> 0.13"},
+      {:hackney, "~> 1.17"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.20"},
@@ -58,12 +59,13 @@ defmodule Buildel.MixProject do
       {:websockex, "~> 0.4.3"},
       {:essence, "~> 0.3.0"},
       {:httpoison, "~> 2.0"},
-      {:mox, "~> 1.0", only: :test},
+      {:mox, "~> 1.0"},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
       {:cors_plug, "~> 3.0"},
       {:ex_json_schema, "~> 0.10.1"},
       {:chroma, "~> 0.1.2"},
-      {:uuid, "~> 1.1"}
+      {:uuid, "~> 1.1"},
+      {:qdrant, "~> 0.0.8"}
     ]
   end
 

@@ -1,9 +1,12 @@
 defmodule Buildel.PipelinesFixtures do
+  import Buildel.OrganizationsFixtures
+
   def pipeline_fixture(attrs \\ %{}) do
     {:ok, pipeline} =
       attrs
       |> Enum.into(%{
         name: "some name",
+        organization_id: organization_fixture().id,
         config: %{
           "version" => "1",
           "blocks" => [

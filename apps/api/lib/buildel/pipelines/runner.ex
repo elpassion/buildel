@@ -10,8 +10,14 @@ defmodule Buildel.Pipelines.Runner do
 
   def start_run(%Run{} = run) do
     spec = {Buildel.Pipelines.Worker, [run]}
-    {:ok, _pid} = DynamicSupervisor.start_child(__MODULE__, spec)
-    {:ok, run |> Buildel.Repo.reload() |> Buildel.Repo.preload(:pipeline)}
+
+    with {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec) do
+      {:ok, run |> Buildel.Repo.reload() |> Buildel.Repo.preload(:pipeline)}
+    else
+      {:error, reason} ->
+        Logger.error("Failed to start worker with reason: #{inspect(reason)}")
+        {:error, reason}
+    end
   end
 
   def stop_run(%Run{} = run) do

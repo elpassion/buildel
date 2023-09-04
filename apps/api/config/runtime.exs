@@ -36,8 +36,15 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
-    secret_key_base: secret_key_base
+    secret_key_base: secret_key_base,
+    check_origin: ["https://#{host}", "https://buildel-web.fly.dev"]
+
+  config :qdrant,
+    port: 6333,
+    interface: "rest",
+    database_url: System.get_env("QDRANT_DATABASE_URL"),
+    api_key: "doesntmatter"
 end
 
-Dotenv.load
-Mix.Task.run("loadconfig")
+# Dotenv.load()
+# Mix.Task.run("loadconfig")

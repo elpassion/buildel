@@ -1,5 +1,6 @@
 defmodule Buildel.PipelinesTest do
   use Buildel.DataCase
+  import Buildel.OrganizationsFixtures
 
   alias Buildel.Pipelines
 
@@ -21,7 +22,7 @@ defmodule Buildel.PipelinesTest do
     end
 
     test "create_pipeline/1 with valid data creates a pipeline" do
-      valid_attrs = %{name: "some name", config: %{}}
+      valid_attrs = %{name: "some name", config: %{}, organization_id: organization_fixture().id}
 
       assert {:ok, %Pipeline{} = pipeline} = Pipelines.create_pipeline(valid_attrs)
       assert pipeline.name == "some name"
@@ -56,6 +57,13 @@ defmodule Buildel.PipelinesTest do
     test "change_pipeline/1 returns a pipeline changeset" do
       pipeline = pipeline_fixture()
       assert %Ecto.Changeset{} = Pipelines.change_pipeline(pipeline)
+    end
+
+    test "list_organization_pipelines/1 returns all pipelines for given organization" do
+      organization = organization_fixture()
+      pipeline = pipeline_fixture(organization_id: organization.id)
+      _another_pipeline = pipeline_fixture()
+      assert Pipelines.list_organization_pipelines(organization) == [pipeline]
     end
   end
 

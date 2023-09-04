@@ -1,0 +1,21 @@
+# fly.toml app configuration file generated for buildel-web on 2023-09-01T11:49:09+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "buildel-web"
+primary_region = "waw"
+
+[build]
+
+[env]
+  API_URL = "https://buildel-api.fly.dev/api"
+  WEBSOCKET_URL = "wss://buildel-api.fly.dev/socket"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]

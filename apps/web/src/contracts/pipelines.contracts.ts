@@ -15,6 +15,7 @@ export type TPipeline = z.infer<typeof appSchema>;
 
 export const createAppSchema = z.object({
   pipeline: z.object({
+    organization_id: z.number(),
     name: z.string({
       invalid_type_error: 'Name must be a string',
     }),

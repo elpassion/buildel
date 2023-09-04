@@ -22,12 +22,14 @@ import { RunPipelineProvider } from './RunPipelineProvider';
 import 'reactflow/dist/style.css';
 
 interface PipelineBoardProps extends PropsWithChildren {
+  organizationId: string;
   pipelineId: string;
   initialPipeline?: IPipeline;
   initialBlockTypes?: IBlockTypesObj;
 }
 
 export function PipelineBoard({
+  organizationId,
   pipelineId,
   initialPipeline,
   initialBlockTypes,
@@ -36,12 +38,16 @@ export function PipelineBoard({
   const { data: blockTypes } = useBlockTypes({
     initialData: initialBlockTypes,
   });
-  const { data: pipeline, isLoading } = usePipeline(pipelineId, {
-    initialData: initialPipeline,
-  });
+  const { data: pipeline, isLoading } = usePipeline(
+    organizationId,
+    pipelineId,
+    {
+      initialData: initialPipeline,
+    },
+  );
 
   const { mutateAsync: updatePipeline, isLoading: isUpdating } =
-    useUpdatePipeline(pipelineId);
+    useUpdatePipeline(organizationId, pipelineId);
 
   const handleUpdate = useCallback(
     async (updated: IPipelineConfig) => {
@@ -85,7 +91,10 @@ export function PipelineBoard({
   if (!pipeline || !blockTypes) return;
 
   return (
-    <RunPipelineProvider pipelineId={pipelineId}>
+    <RunPipelineProvider
+      organizationId={organizationId}
+      pipelineId={pipelineId}
+    >
       <ReactFlowProvider>
         <div className="relative h-[93vh] w-full">
           <PipelineFlow

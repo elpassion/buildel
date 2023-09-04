@@ -1,24 +1,28 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import { Icon, IconButton, Indicator } from '@elpassion/taco';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Icon, IconButton, Indicator } from '@elpassion/taco';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { Loader } from '~/components';
 import { pipelinesApi } from '~/modules/Api';
 import { ROUTES } from '~/modules/Config';
 
 export const PipelinesList = () => {
   const queryClient = useQueryClient();
+  const params = useParams();
   const { data, isLoading, isError } = useQuery(
     ['pipelines'],
-    async () => await pipelinesApi.getAll(),
+    async () => await pipelinesApi.getAll(params.organizationId as string),
     {},
   );
 
   const { mutate } = useMutation({
     mutationFn: async (payload: string) => {
-      return await pipelinesApi.delete(payload);
+      return await pipelinesApi.delete(
+        params.organizationId as string,
+        payload,
+      );
     },
     onSuccess: async (data: any) => {
       await queryClient.invalidateQueries({ queryKey: ['pipelines'] });
@@ -74,7 +78,12 @@ export const PipelinesList = () => {
             <div>
               <div className="flex items-center text-neutral-700">
                 <div className="flex flex-grow">
-                  <Link href={ROUTES.PIPELINE(pipeline.id)}>
+                  <Link
+                    href={ROUTES.PIPELINE(
+                      params.organizationId as string,
+                      pipeline.id,
+                    )}
+                  >
                     <p className="text-lg font-semibold hover:underline">
                       {pipeline.name}
                     </p>

@@ -18,7 +18,11 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   def terminate(_reason, socket) do
-    Pipelines.Runner.stop_run(socket.assigns.run)
+    if socket.assigns |> Map.has_key?(:run) do
+      Pipelines.Runner.stop_run(socket.assigns.run)
+    end
+
+    :ok
   end
 
   def handle_in("input:" <> input, data, socket) do

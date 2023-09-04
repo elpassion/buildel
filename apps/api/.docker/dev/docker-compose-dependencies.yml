@@ -11,13 +11,20 @@ services:
     volumes:
       - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
       - pg_data:/var/lib/postgresql/data
-  chroma:
-    image: ghcr.io/chroma-core/chroma:latest
-    volumes:
-      - index_data:/chroma/.chroma/index
+  # chroma:
+  #   image: ghcr.io/chroma-core/chroma:latest
+  #   volumes:
+  #     - index_data:/chroma/.chroma/index
+  #   ports:
+  #     - 8000:8000
+  qdrant:
+    image: qdrant/qdrant:latest
     ports:
-      - 8000:8000
+      - 6333:6333
+    volumes:
+      - qdrant_storage:/qdrant/storage
 
 volumes:
   pg_data:
   index_data:
+  qdrant_storage:
