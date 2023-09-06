@@ -10,8 +10,6 @@ export class PipelinesApi {
     this.client = client;
   }
 
-  // TODO (hub33k): return from backend just array?
-  //   how to type this?
   getAll(organizationId: string) {
     return this.client.get<{ data: TPipeline[] }>(
       `${this.baseUrl(organizationId)}`,

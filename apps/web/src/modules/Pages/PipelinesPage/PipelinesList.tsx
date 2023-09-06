@@ -1,9 +1,9 @@
 'use client';
 
-import { Icon, IconButton, Indicator } from '@elpassion/taco';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Icon, IconButton, Indicator } from '@elpassion/taco';
 import { Loader } from '~/components';
 import { pipelinesApi } from '~/modules/Api';
 import { ROUTES } from '~/modules/Config';

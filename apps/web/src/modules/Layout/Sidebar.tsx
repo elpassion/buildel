@@ -23,8 +23,8 @@ const mainNavItems = [
     icon: 'home',
   },
   {
-    text: 'Workflows',
-    href: ROUTES.PIPELINES,
+    text: 'Organizations',
+    href: ROUTES.ORGANIZATIONS,
     icon: 'three-layers',
   },
 ] as const;

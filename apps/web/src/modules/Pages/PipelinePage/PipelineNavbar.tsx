@@ -20,7 +20,8 @@ export const PipelineNavbar = ({ name }: PipelineNavbarProps) => {
                 breadcrumbs={[
                   {
                     label: 'Workflows',
-                    href: ROUTES.PIPELINES,
+                    // TODO (hub33k): get proper org id
+                    href: ROUTES.ORGANIZATION_PIPELINES('1'),
                   },
                   {
                     label: name,
