@@ -27,7 +27,8 @@
       "~/*": [
         "./src/*"
       ],
-      "~pages/*": ["./src/modules/Pages/*"]
+      "~pages/*": ["./src/modules/Pages/*"],
+      "~api/*": ["./src/modules/Api/*"]
     }
   },
   "include": [
