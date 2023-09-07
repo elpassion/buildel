@@ -83,19 +83,19 @@ function SidebarMainContent() {
           isCollapsed && 'items-center justify-center',
         ])}
       >
-        {mainNavItems.map((item) => {
-          return (
-            <Link key={item.text} href={item.href}>
-              <MenuItem
-                text={item.text}
-                middleIcon={
-                  <Icon iconName={item.icon} size={'md'} title={item.text} />
-                }
-                variant={isCollapsed ? 'onlyIcon' : 'fitWidth'}
-              />
-            </Link>
-          );
-        })}
+        {/*{mainNavItems.map((item) => {*/}
+        {/*  return (*/}
+        {/*    <Link key={item.text} href={item.href}>*/}
+        {/*      <MenuItem*/}
+        {/*        text={item.text}*/}
+        {/*        middleIcon={*/}
+        {/*          <Icon iconName={item.icon} size={'md'} title={item.text} />*/}
+        {/*        }*/}
+        {/*        variant={isCollapsed ? 'onlyIcon' : 'fitWidth'}*/}
+        {/*      />*/}
+        {/*    </Link>*/}
+        {/*  );*/}
+        {/*})}*/}
       </div>
     </div>
   );

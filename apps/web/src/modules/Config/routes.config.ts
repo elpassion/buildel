@@ -3,13 +3,13 @@ export const ROUTES = {
   SIGN_IN: '/sign-in',
   SIGN_UP: '/sign-up',
   ORGANIZATION: (organizationId: string) => {
-    return `/organizations/${organizationId}`;
+    return `/${organizationId}`;
   },
   ORGANIZATION_PIPELINES: (organizationId: string) => {
-    return `/organizations/${organizationId}/pipelines`;
+    return `/${organizationId}/pipelines`;
   },
   ORGANIZATIONS: '/organizations',
   PIPELINE: (organizationId: string, pipelineId: string) => {
-    return `/organizations/${organizationId}/pipelines/${pipelineId}`;
+    return `/${organizationId}/pipelines/${pipelineId}`;
   },
 };

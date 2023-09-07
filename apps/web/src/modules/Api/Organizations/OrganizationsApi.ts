@@ -10,11 +10,13 @@ export class OrganizationsApi {
   }
 
   getAll() {
-    return this.client.get<{ data: any[] }>(`${this.baseUrl()}`);
+    // return this.client.get<{ data: any[] }>(`${this.baseUrl()}`);
+    return Promise.resolve(['1']);
   }
 
   get(organizationId: string) {
-    return this.client.get<any>(`${this.baseUrl()}/${organizationId}`);
+    // return this.client.get<any>(`${this.baseUrl()}/${organizationId}`);
+    return Promise.resolve({});
   }
 
   create(organizationId: string, payload: any) {

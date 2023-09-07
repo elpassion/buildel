@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { ISignIn } from '~/contracts/auth.contracts';
 import { SignInForm } from '~/modules/Auth/SignInForm';
 import { ROUTES } from '~/modules/Config';
