@@ -7,6 +7,9 @@ const config = {
   eslint: {
     ignoreDuringBuilds: true
   },
+  experimental: {
+    serverActions: true,
+  },
   env: {
     ...ENV,
   },

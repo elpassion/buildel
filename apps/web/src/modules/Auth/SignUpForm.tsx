@@ -3,14 +3,12 @@ import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, Input } from '@elpassion/taco';
 import { ISignUp } from '~/contracts/auth.contracts';
-import { AuthApi } from '~/modules/Api/Auth/AuthApi';
+
 interface SignUpFormProps {
-  onSignUp?: (data: ISignUp) => void;
+  onSignUp?: (data: ISignUp) => Promise<void>;
 }
 
-export const SignUpForm: React.FC<SignUpFormProps> = () => {
-  const authApi = new AuthApi();
-
+export const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp }) => {
   const {
     register,
     handleSubmit,
@@ -18,12 +16,7 @@ export const SignUpForm: React.FC<SignUpFormProps> = () => {
   } = useForm<ISignUp>();
 
   const onSubmit: SubmitHandler<ISignUp> = async (formData) => {
-    try {
-      console.log(formData);
-      // await authApi.signUp(formData);
-    } catch (err) {
-      console.error(err);
-    }
+    onSignUp?.(formData);
   };
 
   return (

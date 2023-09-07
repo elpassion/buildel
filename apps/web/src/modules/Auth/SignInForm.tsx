@@ -3,14 +3,11 @@ import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, Input } from '@elpassion/taco';
 import { ISignIn } from '~/contracts/auth.contracts';
-import { AuthApi } from '~/modules/Api/Auth/AuthApi';
 interface SignInFormProps {
-  onSignIn?: (data: ISignIn) => void;
+  onSignIn?: (data: ISignIn) => Promise<void>;
 }
 
-export const SignInForm: React.FC<SignInFormProps> = () => {
-  const authApi = new AuthApi();
-
+export const SignInForm: React.FC<SignInFormProps> = ({ onSignIn }) => {
   const {
     register,
     handleSubmit,
@@ -18,12 +15,7 @@ export const SignInForm: React.FC<SignInFormProps> = () => {
   } = useForm<ISignIn>();
 
   const onSubmit: SubmitHandler<ISignIn> = async (formData) => {
-    try {
-      console.log(formData);
-      // await authApi.signIn(formData);
-    } catch (err) {
-      console.error(err);
-    }
+    onSignIn?.(formData);
   };
 
   return (
