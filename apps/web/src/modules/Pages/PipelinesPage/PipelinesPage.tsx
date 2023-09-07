@@ -12,7 +12,7 @@ export const PipelinesPage = async () => {
         <PipelinesClient />
 
         {/*to improve*/}
-        <Suspense fallback={<p>Loading feed...</p>}>
+        <Suspense fallback={<p>Loading...</p>}>
           <PipelinesListWrapper />
         </Suspense>
       </MainContainer>
