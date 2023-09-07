@@ -22,8 +22,6 @@ export const PipelinesClient = () => {
 
       <div className="mb-6" />
 
-      <PipelinesList />
-
       <Modal
         isOpen={isModalOpen}
         closeModal={closeModal}

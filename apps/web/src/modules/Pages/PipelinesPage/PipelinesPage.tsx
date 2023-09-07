@@ -1,7 +1,8 @@
+import { Suspense } from 'react';
 import { MainContainer } from '~/modules/Layout';
 import { PipelinesClient } from './PipelinesClient';
 import { PipelinesNavbar } from './PipelinesNavbar';
-
+import { PipelinesListWrapper } from '~pages/PipelinesPage/PipelinesListWrapper';
 export const PipelinesPage = async () => {
   return (
     <>
@@ -9,6 +10,11 @@ export const PipelinesPage = async () => {
 
       <MainContainer>
         <PipelinesClient />
+
+        {/*to improve*/}
+        <Suspense fallback={<p>Loading feed...</p>}>
+          <PipelinesListWrapper />
+        </Suspense>
       </MainContainer>
     </>
   );
