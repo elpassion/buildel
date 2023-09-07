@@ -63,7 +63,6 @@ export const Sidebar = () => {
       sidebarClassName="sticky top-0 bg-white border-r border-gray-200"
       collapseBtnClassName="absolute top-11 -right-2"
       topContent={<SidebarTopContent />}
-      bottomContent={<SidebarBottomContent />}
     >
       <SidebarMainContent />
     </ResponsiveSidebar>
