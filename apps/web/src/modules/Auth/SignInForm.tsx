@@ -1,8 +1,9 @@
 'use client';
 import React from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, Input } from '@elpassion/taco';
-import { ISignIn } from '~/contracts/auth.contracts';
+import { ISignIn, signInSchema } from '~/contracts/auth.contracts';
 interface SignInFormProps {
   onSignIn?: (data: ISignIn) => Promise<void>;
 }
@@ -12,7 +13,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSignIn }) => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ISignIn>();
+  } = useForm<ISignIn>({ resolver: zodResolver(signInSchema) });
 
   const onSubmit: SubmitHandler<ISignIn> = async (formData) => {
     onSignIn?.(formData);
