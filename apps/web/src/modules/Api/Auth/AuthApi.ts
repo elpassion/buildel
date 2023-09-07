@@ -1,4 +1,4 @@
-import { ISignIn } from '~/contracts/auth.contracts';
+import { ISignIn, ISignUp } from '~/contracts/auth.contracts';
 import { HttpClient, createHttpClient } from '~/utils';
 
 export class AuthApi {
@@ -12,7 +12,7 @@ export class AuthApi {
   signIn(data: ISignIn) {
     return this.client.post(`${this.baseUrl}`, data);
   }
-  signUp() {
-    return this.client.post(`${this.baseUrl}`, {});
+  signUp(data: ISignUp) {
+    return this.client.post(`${this.baseUrl}`, data);
   }
 }

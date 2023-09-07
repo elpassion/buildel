@@ -1,3 +1,3 @@
-import { SignInPage } from '~/modules/Pages';
+import { SignInPage } from '~pages/AuthPages/SignInPage';
 
 export default SignInPage;

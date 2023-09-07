@@ -2,25 +2,25 @@
 import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, Input } from '@elpassion/taco';
-import { ISignIn } from '~/contracts/auth.contracts';
+import { ISignUp } from '~/contracts/auth.contracts';
 import { AuthApi } from '~/modules/Api/Auth/AuthApi';
-interface SignInFormProps {
-  onSignIn?: (data: ISignIn) => void;
+interface SignUpFormProps {
+  onSignUp?: (data: ISignUp) => void;
 }
 
-export const SignInForm: React.FC<SignInFormProps> = () => {
+export const SignUpForm: React.FC<SignUpFormProps> = () => {
   const authApi = new AuthApi();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ISignIn>();
+  } = useForm<ISignUp>();
 
-  const onSubmit: SubmitHandler<ISignIn> = async (formData) => {
+  const onSubmit: SubmitHandler<ISignUp> = async (formData) => {
     try {
       console.log(formData);
-      // await authApi.signIn(formData);
+      // await authApi.signUp(formData);
     } catch (err) {
       console.error(err);
     }
@@ -44,7 +44,7 @@ export const SignInForm: React.FC<SignInFormProps> = () => {
         {...register('password')}
       />
 
-      <Button text="Sign in" type="submit" isFluid />
+      <Button text="Sign up" type="submit" isFluid />
     </form>
   );
 };
