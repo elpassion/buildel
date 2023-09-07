@@ -1,7 +1,5 @@
 import { redirect } from 'next/navigation';
 import { ROUTES } from '~/modules/Config';
-import { MainContainer } from '~/modules/Layout';
-import { DashboardNavbar } from './DashboardNavbar';
 import { OrganizationsApi } from '~api/Organizations';
 
 export const DashboardPage = async () => {
@@ -9,15 +7,7 @@ export const DashboardPage = async () => {
 
   const organizations = await organizationApi.getAll();
 
-  redirect(ROUTES.ORGANIZATION_PIPELINES(organizations[0]));
+  if (!organizations) redirect(ROUTES.SIGN_IN);
 
-  // return (
-  //   <>
-  //     <DashboardNavbar />
-  //
-  //     <MainContainer>
-  //       <p className="text-2xl">Dashboard page</p>
-  //     </MainContainer>
-  //   </>
-  // );
+  redirect(ROUTES.ORGANIZATION_PIPELINES(organizations[0]));
 };
