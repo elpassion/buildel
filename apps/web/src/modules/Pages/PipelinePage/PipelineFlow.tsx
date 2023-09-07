@@ -41,7 +41,6 @@ import { useModal } from '~/utils/hooks';
 import { CustomNode, CustomNodeProps } from './CustomNodes/CustomNode';
 import { PipelineSidebar } from './PipelineSidebar/PipelineSidebar';
 import { useDraggableNodes } from './PipelineSidebar/useDraggableNodes';
-import { remove } from 'lodash';
 
 interface PipelineFlowProps {
   pipeline: IPipeline;
@@ -183,6 +182,10 @@ export function PipelineFlow({
         onDragOver={onDragOver}
         nodeTypes={nodeTypes}
         isValidConnection={handleIsValidConnection}
+        fitViewOptions={{
+          minZoom: 0.5,
+          maxZoom: 1,
+        }}
         fitView
       >
         <Background variant={BackgroundVariant.Lines} />
