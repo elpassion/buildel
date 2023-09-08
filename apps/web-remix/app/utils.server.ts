@@ -78,11 +78,13 @@ export class ValidationError<T> extends Error {
 
 declare type allKeys<T> = T extends any ? keyof T : never;
 
+type ParsedResponse<T> = Response & { data: T };
+
 export async function fetchTyped<T extends ZodType>(
   schema: T,
   url: string,
   options?: RequestInit | undefined
-): Promise<z.infer<T>> {
+): Promise<ParsedResponse<z.infer<T>>> {
   const response = await fetch(url, options);
 
   if (!response.ok) {
@@ -91,9 +93,9 @@ export async function fetchTyped<T extends ZodType>(
 
   const jsonResponse = await response.json();
 
-  const pipelines = schema.parse(jsonResponse);
+  const data = schema.parse(jsonResponse);
 
-  return pipelines;
+  return { ...response, data };
 }
 
 function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {

@@ -18,7 +18,7 @@ export async function loader(args: LoaderArgs) {
     );
 
     return json({
-      pipeline,
+      pipeline: pipeline.data,
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
       blockTypes,

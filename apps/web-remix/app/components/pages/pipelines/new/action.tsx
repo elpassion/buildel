@@ -29,7 +29,9 @@ export async function action(actionArgs: ActionArgs) {
         }
       );
 
-      return redirect(`/${params.organizationId}/pipelines/${pipeline.id}`);
+      return redirect(
+        `/${params.organizationId}/pipelines/${pipeline.data.id}`
+      );
     },
   })(actionArgs);
 }

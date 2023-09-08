@@ -14,6 +14,9 @@ export async function loader(args: LoaderArgs) {
       `/organizations/${params.organizationId}/pipelines`
     );
 
-    return json({ pipelines, organizationId: params.organizationId });
+    return json({
+      pipelines: pipelines.data,
+      organizationId: params.organizationId,
+    });
   })(args);
 }
