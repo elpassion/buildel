@@ -35,3 +35,13 @@ export const useAuth = () => {
 
   return ctx;
 };
+
+export const useAuthUser = () => {
+  const { user, ...rest } = useAuth();
+
+  if (!user) {
+    throw new Error('User dont exist!');
+  }
+
+  return { user, ...rest };
+};

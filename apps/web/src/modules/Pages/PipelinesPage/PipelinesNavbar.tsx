@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Icon } from '@elpassion/taco';
+import { useAuth, useAuthUser } from '~/app/(protected)/AuthProvider';
 import { Navbar } from '~/modules/Layout';
-import { useAuth } from '~/app/(protected)/AuthProvider';
 
 export const PipelinesNavbar = () => {
   return (
@@ -14,7 +14,7 @@ export const PipelinesNavbar = () => {
 };
 
 function LeftContent() {
-  const { user } = useAuth();
+  const { user } = useAuthUser();
   console.log(user);
   return (
     <div className="flex items-center justify-center gap-2">
@@ -22,7 +22,7 @@ function LeftContent() {
 
       <Icon iconName="help-circle" className="font-bold text-primary-500" />
 
-      <p>User id: {user?.id}</p>
+      <p>User id: {user.id}</p>
     </div>
   );
 }
