@@ -1,5 +1,5 @@
-import { ActionArgs, json } from "@remix-run/node";
-import { ZodEffects, ZodObject, ZodRawShape } from "zod";
+import { ActionArgs, json, redirect } from "@remix-run/node";
+import { ZodEffects, ZodObject, ZodRawShape, ZodType, z } from "zod";
 
 export const actionBuilder =
   (handlers: {
@@ -67,3 +67,19 @@ export class ValidationError<T> extends Error {
 }
 
 declare type allKeys<T> = T extends any ? keyof T : never;
+
+export async function fetchTyped<T extends ZodType>(
+  schema: T,
+  url: string,
+  options: RequestInit | undefined
+): Promise<z.infer<T>> {
+  const response = await fetch(url, options);
+
+  if (!response.ok) throw redirect("/login");
+
+  const jsonResponse = await response.json();
+
+  const pipelines = schema.parse(jsonResponse);
+
+  return pipelines;
+}
