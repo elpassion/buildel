@@ -24,10 +24,10 @@ export default async function RootLayout({
       authCookie: cookies().get('_buildel_key')?.value,
     }),
   );
-  const data = await authApi.me();
+  const { data: user } = await authApi.me();
 
   return (
-    <AuthProvider initialUser={data.data}>
+    <AuthProvider initialUser={user}>
       <Layout>{children}</Layout>
     </AuthProvider>
   );
