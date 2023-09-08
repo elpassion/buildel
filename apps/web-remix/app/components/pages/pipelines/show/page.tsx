@@ -1,4 +1,4 @@
-import { useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { loader } from "./loader";
 import ReactFlow, {
   Background,
@@ -16,13 +16,22 @@ import ReactFlow, {
 import { LinksFunction, V2_MetaFunction } from "@remix-run/node";
 
 import flowStyles from "reactflow/dist/style.css";
-import { getEdges, getNodes } from "./PipelineFlow";
+import {
+  getEdges,
+  getNodes,
+  isValidConnection,
+  toPipelineConfig,
+} from "./PipelineFlow";
+import { useCallback, useEffect, useMemo } from "react";
+import { useDebounce } from "usehooks-ts";
+import { action } from "./action";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
 ];
 
 export function ShowPipelinePage() {
+  const fetcher = useFetcher<typeof action>();
   const { pipeline } = useLoaderData<typeof loader>();
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config)
@@ -30,6 +39,22 @@ export function ShowPipelinePage() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(
     getEdges(pipeline.config)
   );
+  const state = useMemo(() => ({ nodes, edges }), [nodes, edges]);
+  const debouncedState = useDebounce(state, 500);
+
+  const handleIsValidConnection = useCallback(
+    (connection: Connection) => isValidConnection(pipeline.config, connection),
+    [pipeline.config]
+  );
+
+  useEffect(() => {
+    // @ts-ignore
+    const config = toPipelineConfig(debouncedState.nodes, debouncedState.edges);
+    fetcher.submit(
+      { ...pipeline, config: { ...config, version: "1" } },
+      { method: "PUT", encType: "application/json" }
+    );
+  }, [debouncedState]);
 
   return (
     <div className="h-screen w-full">
@@ -37,6 +62,8 @@ export function ShowPipelinePage() {
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        isValidConnection={handleIsValidConnection}
         fitViewOptions={{
           minZoom: 0.5,
           maxZoom: 1,

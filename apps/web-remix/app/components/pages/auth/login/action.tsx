@@ -1,11 +1,9 @@
 import { ActionArgs, json, redirect } from "@remix-run/node";
 import { actionBuilder } from "~/utils.server";
-// import { User } from "@prisma/client";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
-import { schema } from "./schema";
 import { signIn } from "~/models/user.server";
-// import { createUserSession } from "~/session.server";
+import { schema } from "./schema";
 
 export async function action(actionArgs: ActionArgs) {
   return actionBuilder({
