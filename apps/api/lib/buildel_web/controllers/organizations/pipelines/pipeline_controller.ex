@@ -1,12 +1,17 @@
 defmodule BuildelWeb.OrganizationPipelineController do
   use BuildelWeb, :controller
 
+  import BuildelWeb.UserAuth
+
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
 
   alias Buildel.Organizations
 
   action_fallback(BuildelWeb.FallbackController)
+
+  plug(:fetch_current_user)
+  plug(:require_authenticated_user)
 
   def index(conn, %{"organization_id" => organization_id}) do
     organization = Organizations.get_organization!(organization_id)

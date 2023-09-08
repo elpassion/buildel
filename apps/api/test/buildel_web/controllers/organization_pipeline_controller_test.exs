@@ -19,7 +19,16 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
+  setup [:register_and_log_in_user]
+
   describe "index" do
+    test "requires authentication", %{conn: conn} do
+      conn = conn |> log_out_user()
+      organization_id = organization_fixture().id
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines")
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
     test "lists all organization pipelines", %{conn: conn} do
       organization_id = organization_fixture().id
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines")
@@ -28,6 +37,18 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
   end
 
   describe "create pipeline" do
+    test "requires authentication", %{conn: conn} do
+      conn = conn |> log_out_user()
+      organization_id = organization_fixture().id
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization_id}/pipelines",
+          pipeline: @create_attrs |> Enum.into(%{organization_id: organization_id})
+        )
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
     test "renders pipeline when data is valid", %{conn: conn} do
       organization_id = organization_fixture().id
 
@@ -59,6 +80,17 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
 
   describe "update pipeline" do
     setup [:create_pipeline]
+
+    test "requires authentication", %{conn: conn, pipeline: %Pipeline{id: _id} = pipeline} do
+      conn = conn |> log_out_user()
+
+      conn =
+        put(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}",
+          pipeline: @update_attrs
+        )
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
 
     test "renders pipeline when data is valid", %{
       conn: conn,
@@ -92,6 +124,15 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
 
   describe "delete pipeline" do
     setup [:create_pipeline]
+
+    test "requires authentication", %{conn: conn, pipeline: %Pipeline{id: id} = pipeline} do
+      conn = conn |> log_out_user()
+
+      conn =
+        delete(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{id}")
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
 
     test "deletes chosen pipeline", %{conn: conn, pipeline: pipeline} do
       conn =
