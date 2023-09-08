@@ -1,6 +1,11 @@
-import { ActionArgs, json, redirect } from "@remix-run/node";
+import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { merge } from "lodash";
-import { ZodEffects, ZodObject, ZodRawShape, ZodType, z } from "zod";
+import { ZodType, z } from "zod";
+
+export const loaderBuilder =
+  (fn: (args: LoaderArgs, helpers: { fetch: typeof fetchTyped }) => unknown) =>
+  (args: LoaderArgs) =>
+    fn(args, { fetch: requestFetchTyped(args) });
 
 export const actionBuilder =
   (handlers: {
@@ -76,7 +81,7 @@ declare type allKeys<T> = T extends any ? keyof T : never;
 export async function fetchTyped<T extends ZodType>(
   schema: T,
   url: string,
-  options: RequestInit | undefined
+  options?: RequestInit | undefined
 ): Promise<z.infer<T>> {
   const response = await fetch(url, options);
 
@@ -95,8 +100,8 @@ function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {
   return (schema, url, options) => {
     return fetchTyped(
       schema,
-      "http://127.0.0.1:4000/api/organizations" + url,
-      merge(options, {
+      "http://127.0.0.1:4000/api" + url,
+      merge(options || {}, {
         headers: {
           "Content-Type": "application/json",
           Cookie: actionArgs.request.headers.get("cookie")!,

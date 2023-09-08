@@ -22,7 +22,7 @@ export async function action(actionArgs: ActionArgs) {
 
       await fetch(
         PipelineResponse,
-        `/${params.organizationId}/pipelines/${params.pipelineId}`,
+        `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`,
         {
           method: "PUT",
           body: JSON.stringify({
