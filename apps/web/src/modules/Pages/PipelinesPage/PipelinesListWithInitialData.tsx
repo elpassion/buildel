@@ -1,6 +1,6 @@
 import React from 'react';
-import { withSSRSession } from '~/app/(protected)/layout';
 import { PipelinesApi } from '~/modules/Api';
+import { withSSRSession } from '~/utils/withSSRSession';
 import { PipelinesList } from './PipelinesList';
 
 interface PipelinesListWrapperProps {}
