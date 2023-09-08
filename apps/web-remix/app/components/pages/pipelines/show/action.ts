@@ -1,15 +1,15 @@
 import { ActionArgs, redirect } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
+import { validationError } from "remix-validated-form";
 import invariant from "tiny-invariant";
 import { requireLogin } from "~/session.server";
-import { actionBuilder, fetchTyped } from "~/utils.server";
-import { schema } from "./schema";
-import { validationError } from "remix-validated-form";
+import { actionBuilder } from "~/utils.server";
 import { PipelineResponse } from "../list/contracts";
+import { schema } from "./schema";
 
 export async function action(actionArgs: ActionArgs) {
   return actionBuilder({
-    put: async ({ params, request }) => {
+    put: async ({ params, request }, { fetch }) => {
       requireLogin(request);
       invariant(params.organizationId, "Missing organizationId");
       invariant(params.pipelineId, "Missing pipelineId");
@@ -20,14 +20,10 @@ export async function action(actionArgs: ActionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      await fetchTyped(
+      await fetch(
         PipelineResponse,
-        `http://127.0.0.1:4000/api/organizations/${params.organizationId}/pipelines/${params.pipelineId}`,
+        `/${params.organizationId}/pipelines/${params.pipelineId}`,
         {
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: request.headers.get("cookie")!,
-          },
           method: "PUT",
           body: JSON.stringify({
             pipeline: result.data,
@@ -35,9 +31,7 @@ export async function action(actionArgs: ActionArgs) {
         }
       );
 
-      return redirect(
-        `/${params.organizationId}/pipelines/${params.pipelineId}`
-      );
+      return {};
     },
   })(actionArgs);
 }

@@ -79,5 +79,6 @@ export function toPipelineConfig(
 
   return {
     blocks: tmpNodes.map((node) => ({ ...node.data, position: node.position })),
+    version: "1",
   };
 }

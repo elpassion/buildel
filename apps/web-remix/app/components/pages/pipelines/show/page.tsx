@@ -25,6 +25,7 @@ import {
 import { useCallback, useEffect, useMemo } from "react";
 import { useDebounce } from "usehooks-ts";
 import { action } from "./action";
+import { isEqual } from "lodash";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
@@ -50,9 +51,10 @@ export function ShowPipelinePage() {
   useEffect(() => {
     // @ts-ignore
     const config = toPipelineConfig(debouncedState.nodes, debouncedState.edges);
+    if (isEqual(config, pipeline.config)) return;
     fetcher.submit(
-      { ...pipeline, config: { ...config, version: "1" } },
-      { method: "PUT", encType: "application/json" }
+      { ...pipeline, config: { ...config } },
+      { method: "PUT", encType: "application/json", replace: true }
     );
   }, [debouncedState]);
 

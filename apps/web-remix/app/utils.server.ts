@@ -1,30 +1,55 @@
 import { ActionArgs, json, redirect } from "@remix-run/node";
+import { merge } from "lodash";
 import { ZodEffects, ZodObject, ZodRawShape, ZodType, z } from "zod";
 
 export const actionBuilder =
   (handlers: {
-    post?: (args: ActionArgs) => unknown;
-    delete?: (args: ActionArgs) => unknown;
-    patch?: (args: ActionArgs) => unknown;
-    put?: (args: ActionArgs) => unknown;
-    get?: (args: ActionArgs) => unknown;
+    post?: (args: ActionArgs, helpers: { fetch: typeof fetchTyped }) => unknown;
+    delete?: (
+      args: ActionArgs,
+      helpers: { fetch: typeof fetchTyped }
+    ) => unknown;
+    patch?: (
+      args: ActionArgs,
+      helpers: { fetch: typeof fetchTyped }
+    ) => unknown;
+    put?: (args: ActionArgs, helpers: { fetch: typeof fetchTyped }) => unknown;
+    get?: (args: ActionArgs, helpers: { fetch: typeof fetchTyped }) => unknown;
   }) =>
   async (actionArgs: ActionArgs) => {
     const notFound = () => json(null, { status: 404 });
     try {
       switch (actionArgs.request.method) {
         case "POST":
-          return handlers.post ? await handlers.post(actionArgs) : notFound();
+          return handlers.post
+            ? await handlers.post(actionArgs, {
+                fetch: requestFetchTyped(actionArgs),
+              })
+            : notFound();
         case "DELETE":
           return handlers.delete
-            ? await handlers.delete(actionArgs)
+            ? await handlers.delete(actionArgs, {
+                fetch: requestFetchTyped(actionArgs),
+              })
             : notFound();
         case "PATCH":
-          return handlers.patch ? await handlers.patch(actionArgs) : notFound();
+          return handlers.patch
+            ? await handlers.patch(actionArgs, {
+                fetch: requestFetchTyped(actionArgs),
+              })
+            : notFound();
         case "PUT":
-          return handlers.put ? await handlers.put(actionArgs) : notFound();
+          return handlers.put
+            ? await handlers.put(actionArgs, {
+                fetch: requestFetchTyped(actionArgs),
+              })
+            : notFound();
         case "GET":
-          return handlers.get ? await handlers.get(actionArgs) : notFound();
+          return handlers.get
+            ? await handlers.get(actionArgs, {
+                fetch: requestFetchTyped(actionArgs),
+              })
+            : notFound();
       }
     } catch (e) {
       if (e instanceof ValidationError) {
@@ -65,4 +90,28 @@ export async function fetchTyped<T extends ZodType>(
   const pipelines = schema.parse(jsonResponse);
 
   return pipelines;
+}
+
+function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {
+  return (schema, url, options) => {
+    console.log(
+      url,
+      merge(options, {
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: actionArgs.request.headers.get("cookie")!,
+        },
+      })
+    );
+    return fetchTyped(
+      schema,
+      "http://127.0.0.1:4000/api/organizations" + url,
+      merge(options, {
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: actionArgs.request.headers.get("cookie")!,
+        },
+      })
+    );
+  };
 }

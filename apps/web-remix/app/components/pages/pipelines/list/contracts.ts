@@ -30,6 +30,7 @@ export const BlockConfig = z.object({
 
 export interface IPipelineConfig {
   blocks: IBlock[];
+  version: string;
 }
 
 export type IBlock = IBlockConfig;
