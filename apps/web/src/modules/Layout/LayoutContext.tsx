@@ -3,8 +3,6 @@
 // https://kentcdodds.com/blog/how-to-use-react-context-effectively
 
 import React from 'react';
-import { useLocalStorage } from '@mantine/hooks';
-import { useSidebarCollapsedStorage } from '~/modules/Layout/layout.utils';
 import { useBreakpoints, useIsomorphicLayoutEffect } from '~/utils/hooks';
 
 type Action =
