@@ -4,6 +4,7 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
+  isAxiosError,
 } from 'axios';
 import { ENV } from '~/env.mjs';
 
@@ -39,9 +40,11 @@ export class HttpClient {
     this.client.interceptors.response.use(
       (response: AxiosResponse) => response,
       (error) => {
-        return this.options.onErrorInterceptor
-          ? Promise.reject(this.options.onErrorInterceptor(error))
-          : Promise.reject(error);
+        if (isAxiosError(error)) {
+          if (error.response?.status === 401) throw new Error('Unauthorized');
+        }
+
+        return Promise.reject(error);
       },
     );
   }

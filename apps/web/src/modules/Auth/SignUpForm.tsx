@@ -22,9 +22,8 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp }) => {
   const router = useRouter();
   const onSubmit: SubmitHandler<ISignUp> = async (formData) => {
     try {
-      console.log(formData);
       await authApi.signUp(formData);
-      router.push(ROUTES.HOME);
+      router.push(ROUTES.REDIRECT(ROUTES.HOME));
     } catch (err) {
       console.error(err);
     }

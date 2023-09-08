@@ -1,6 +1,6 @@
-'use client'; // Error components must be Client Components
-
-import { useEffect } from 'react';
+'use client';
+import { useRouter } from 'next/navigation';
+import { ROUTES } from '~/modules/Config';
 
 export default function Error({
   error,
@@ -9,10 +9,12 @@ export default function Error({
   error: Error;
   reset: () => void;
 }) {
-  useEffect(() => {
-    // Log the error to an error reporting service
-    console.error(error);
-  }, [error]);
+  const router = useRouter();
+  if (error.message === 'Unauthorized') {
+    router.push(ROUTES.SIGN_IN);
+
+    return null;
+  }
 
   return (
     <div>

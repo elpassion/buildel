@@ -21,9 +21,8 @@ export const SignInForm: React.FC<SignInFormProps> = ({ onSignIn }) => {
   const authApi = new AuthApi();
   const handleSignIn = async (formData: ISignIn) => {
     try {
-      console.log(formData);
       await authApi.signIn(formData);
-      router.push(ROUTES.HOME);
+      router.push(ROUTES.REDIRECT(ROUTES.HOME));
     } catch (err) {
       console.error(err);
     }

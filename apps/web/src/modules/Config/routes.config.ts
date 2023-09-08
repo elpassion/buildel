@@ -12,4 +12,5 @@ export const ROUTES = {
   PIPELINE: (organizationId: string, pipelineId: string) => {
     return `/${organizationId}/pipelines/${pipelineId}`;
   },
+  REDIRECT: (destination: string) => `/redirect?destination=${destination}`,
 };
