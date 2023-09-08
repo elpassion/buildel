@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: APP_DESCRIPTION,
 };
 
-const withSSRSession = (
+export const withSSRSession = (
   Component: (props: any) => Promise<React.JSX.Element>,
 ) => {
   const WrappedComponent = (props: any) => {

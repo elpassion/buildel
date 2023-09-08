@@ -7,17 +7,6 @@ import { ROUTES } from '~/modules/Config';
 import { AuthApi } from '~api/Auth/AuthApi';
 
 export const SignInPage: React.FC = () => {
-  const authApi = new AuthApi();
-  const handleSignIn = async (formData: ISignIn) => {
-    'use server';
-    try {
-      console.log(formData);
-      // await authApi.signIn(formData);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   return (
     <div className="flex flex-col items-center px-4 py-6 ">
       <h1 className="mb-1 text-center text-2xl font-bold text-neutral-900">
@@ -32,7 +21,7 @@ export const SignInPage: React.FC = () => {
       </p>
 
       <div className="mt-6 w-full max-w-sm">
-        <SignInForm onSignIn={handleSignIn} />
+        <SignInForm />
       </div>
     </div>
   );
