@@ -1,13 +1,12 @@
 'use client';
 
 import React from 'react';
-import { Button, Icon } from '@elpassion/taco';
+import { Button } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
-import { PipelinesList } from '~/modules/Pages/PipelinesPage/PipelinesList';
 import { CreatePipelineForm } from '~/modules/Pipelines';
 import { useModal } from '~/utils/hooks';
 
-export const PipelinesClient = () => {
+export const PipelinesHeader = () => {
   const { isModalOpen, openModal, closeModal: closeModalBase } = useModal();
 
   function closeModal() {

@@ -1,6 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
-import { ROUTES } from '~/modules/Config';
 import { OrganizationsApi } from '~api/Organizations';
+import { ROUTES } from '~/modules/Config';
 
 interface OrganizationPageProps {
   params: {

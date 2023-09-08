@@ -1,19 +1,18 @@
 import { Suspense } from 'react';
 import { MainContainer } from '~/modules/Layout';
-import { PipelinesClient } from './PipelinesClient';
+import { PipelinesHeader } from './PipelinesHeader';
+import { PipelinesListWithInitialData } from './PipelinesListWithInitialData';
 import { PipelinesNavbar } from './PipelinesNavbar';
-import { PipelinesListWrapper } from '~pages/PipelinesPage/PipelinesListWrapper';
 export const PipelinesPage = async () => {
   return (
     <>
       <PipelinesNavbar />
 
       <MainContainer>
-        <PipelinesClient />
+        <PipelinesHeader />
 
-        {/*to improve*/}
         <Suspense fallback={<p>Loading...</p>}>
-          <PipelinesListWrapper />
+          <PipelinesListWithInitialData />
         </Suspense>
       </MainContainer>
     </>

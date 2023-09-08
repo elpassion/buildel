@@ -1,10 +1,10 @@
 import React from 'react';
 import { pipelinesApi } from '~/modules/Api';
-import { PipelinesList } from '~pages/PipelinesPage/PipelinesList';
+import { PipelinesList } from './PipelinesList';
 
 interface PipelinesListWrapperProps {}
 
-export const PipelinesListWrapper: React.FC<
+export const PipelinesListWithInitialData: React.FC<
   PipelinesListWrapperProps
 > = async () => {
   const pipelines = await pipelinesApi.getAll('1');

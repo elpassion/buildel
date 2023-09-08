@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { ROUTES } from '~/modules/Config';
 import { OrganizationsApi } from '~api/Organizations';
+import { ROUTES } from '~/modules/Config';
 
 export const DashboardPage = async () => {
   const organizationApi = new OrganizationsApi();
