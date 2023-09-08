@@ -3,7 +3,7 @@ import { merge } from "lodash";
 import { ZodType, z } from "zod";
 
 export const loaderBuilder =
-  (fn: (args: LoaderArgs, helpers: { fetch: typeof fetchTyped }) => unknown) =>
+  <T>(fn: (args: LoaderArgs, helpers: { fetch: typeof fetchTyped }) => T) =>
   (args: LoaderArgs) =>
     fn(args, { fetch: requestFetchTyped(args) });
 
