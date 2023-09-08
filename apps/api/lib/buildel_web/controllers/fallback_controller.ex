@@ -22,4 +22,11 @@ defmodule BuildelWeb.FallbackController do
     |> put_view(html: BuildelWeb.ErrorHTML, json: BuildelWeb.ErrorJSON)
     |> render(:"401")
   end
+
+  def call(conn, error) do
+    conn
+    |> put_status(:internal_server_error)
+    |> put_view(html: BuildelWeb.ErrorHTML, json: BuildelWeb.ErrorJSON)
+    |> render(:"500")
+  end
 end

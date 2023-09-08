@@ -27,7 +27,6 @@ defmodule BuildelWeb.UserAuth do
   """
   def log_in_user(conn, user, params \\ %{}) do
     token = Accounts.generate_user_session_token(user)
-    user_return_to = get_session(conn, :user_return_to)
 
     conn
     |> renew_session()
@@ -204,6 +203,9 @@ defmodule BuildelWeb.UserAuth do
     else
       conn
       |> maybe_store_return_to()
+      |> put_status(:unauthorized)
+      |> put_view(BuildelWeb.ErrorJSON)
+      |> render("401.json")
       |> halt()
     end
   end

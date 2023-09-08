@@ -10,7 +10,7 @@ export class AuthApi {
   }
 
   signIn(data: ISignIn) {
-    return this.client.post(`${this.baseUrl}`, data);
+    return this.client.post(`${this.baseUrl}/log_in`, { user: data });
   }
   signUp(data: ISignUp) {
     return this.client.post(`${this.baseUrl}/register`, { user: data });

@@ -3,11 +3,6 @@ defmodule BuildelWeb.UserController do
 
   import BuildelWeb.UserAuth
 
-  alias Buildel.Accounts
-  alias Buildel.Accounts.User
-
-  alias BuildelWeb.UserAuth
-
   action_fallback(BuildelWeb.FallbackController)
 
   plug(:fetch_current_user)
@@ -15,6 +10,6 @@ defmodule BuildelWeb.UserController do
 
   def me(conn, _params) do
     user = conn.assigns.current_user
-    render(conn, :show, user: user)
+    conn |> put_view(BuildelWeb.UserJSON) |> render(:show, user: user)
   end
 end

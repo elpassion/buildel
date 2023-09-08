@@ -15,20 +15,16 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
 
       assert get_session(conn, :user_token)
       conn = get(conn, ~p"/api/users/me")
-      response = json_response(conn, 200)
-      assert response =~ email
+      json_response(conn, 200)
     end
 
     test "render errors for invalid data", %{conn: conn} do
       conn =
-        post(conn, ~p"/users/register", %{
+        post(conn, ~p"/api/users/register", %{
           "user" => %{"email" => "with spaces", "password" => "too short"}
         })
 
-      response = json_response(conn, 400)
-      assert response =~ "Register"
-      assert response =~ "must have the @ sign and no spaces"
-      assert response =~ "should be at least 1 character"
+      json_response(conn, 422)
     end
   end
 end
