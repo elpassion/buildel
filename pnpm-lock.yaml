@@ -146,6 +146,9 @@ importers:
       '@remix-run/serve':
         specifier: ^1.19.3
         version: 1.19.3
+      '@remix-validated-form/with-zod':
+        specifier: ^2.0.6
+        version: 2.0.6(remix-validated-form@5.1.0)(zod@3.21.4)
       '@tailwindcss/forms':
         specifier: ^0.5.4
         version: 0.5.4(tailwindcss@3.3.3)
@@ -161,6 +164,12 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      remix-validated-form:
+        specifier: ^5.1.0
+        version: 5.1.0(@remix-run/react@1.19.3)(@remix-run/server-runtime@1.19.3)(@types/react@18.2.18)(react@18.2.0)
+      zod:
+        specifier: ^3.21.4
+        version: 3.21.4
     devDependencies:
       '@remix-run/dev':
         specifier: ^1.19.3
@@ -2774,6 +2783,16 @@ packages:
     resolution: {integrity: sha512-SVO42pH21I1sAhksGEM8ZBV/jc1mz6knZSg6Qo/2HPy9JTvtUykm3QMHtF2OMCTUXxdRW+4E/rphkPRyGc8WKw==}
     dependencies:
       web-streams-polyfill: 3.2.1
+
+  /@remix-validated-form/with-zod@2.0.6(remix-validated-form@5.1.0)(zod@3.21.4):
+    resolution: {integrity: sha512-i8H0PPFSSKIMGPVO/8cUMO1QoGa2bBQZb6RH3DoXGVE1heu52d1vwrFVsYYQB8Vc8lp5BGQk1kbxZuN9RzH1OA==}
+    peerDependencies:
+      remix-validated-form: ^4.x || ^5.x
+      zod: ^3.11.x
+    dependencies:
+      remix-validated-form: 5.1.0(@remix-run/react@1.19.3)(@remix-run/server-runtime@1.19.3)(@types/react@18.2.18)(react@18.2.0)
+      zod: 3.21.4
+    dev: false
 
   /@rollup/pluginutils@4.2.1:
     resolution: {integrity: sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==}
@@ -6522,6 +6541,10 @@ packages:
   /immer@10.0.2:
     resolution: {integrity: sha512-Rx3CqeqQ19sxUtYV9CU911Vhy8/721wRFnJv3REVGWUmoAcIwzifTsdmJte/MV+0/XpM35LZdQMBGkRIoLPwQA==}
 
+  /immer@9.0.21:
+    resolution: {integrity: sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==}
+    dev: false
+
   /import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -7112,7 +7135,6 @@ packages:
 
   /lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
-    dev: true
 
   /lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
@@ -9083,6 +9105,30 @@ packages:
       unified: 10.1.2
     dev: true
 
+  /remeda@1.26.0:
+    resolution: {integrity: sha512-v+Qbi2krvXknCvG60gviLUSBJQPxXUVBAvi64m3Awoua3X+ygAmPYPrbFgqwPpiM1tBHNBVrHPBKtza7if+HyQ==}
+    dev: false
+
+  /remix-validated-form@5.1.0(@remix-run/react@1.19.3)(@remix-run/server-runtime@1.19.3)(@types/react@18.2.18)(react@18.2.0):
+    resolution: {integrity: sha512-+yN/tlitv9gemDDvFs28ROmP0pw6A8SH9o4dOxaLpd4x4dwtPWsaXYPThOBKMw2PcfHqfvoQ+PulyjP/G6csHA==}
+    peerDependencies:
+      '@remix-run/react': '>= 1.15.0'
+      '@remix-run/server-runtime': 1.x
+      react: ^17.0.2 || ^18.0.0
+    dependencies:
+      '@remix-run/react': 1.19.3(react-dom@18.2.0)(react@18.2.0)
+      '@remix-run/server-runtime': 1.19.3
+      immer: 9.0.21
+      lodash.get: 4.4.2
+      nanoid: 3.3.6
+      react: 18.2.0
+      remeda: 1.26.0
+      tiny-invariant: 1.3.1
+      zustand: 4.4.1(@types/react@18.2.18)(immer@9.0.21)(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+    dev: false
+
   /remove-accents@0.4.2:
     resolution: {integrity: sha512-7pXIJqJOq5tFgG1A2Zxti3Ht8jJF337m4sowbuHsW30ZnkQFnDzy9qBNhgzX8ZLW4+UBcXiiR7SwR6pokHsxiA==}
     dev: false
@@ -9772,6 +9818,10 @@ packages:
   /through@2.3.8:
     resolution: {integrity: sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg==}
     dev: true
+
+  /tiny-invariant@1.3.1:
+    resolution: {integrity: sha512-AD5ih2NlSssTCwsMznbvwMZpJ1cbhkGd2uueNxzv2jDlEeZdU04JQfRnggJQ8DrcVBGjAsCKwFBbDlVNtEMlzw==}
+    dev: false
 
   /tinybench@2.5.0:
     resolution: {integrity: sha512-kRwSG8Zx4tjF9ZiyH4bhaebu+EDz1BOx9hOigYHlUW4xxI/wKIUQUqo018UlU4ar6ATPBsaMrdbKZ+tmPdohFA==}
@@ -10689,6 +10739,27 @@ packages:
     dependencies:
       '@types/react': 18.2.18
       immer: 10.0.2
+      react: 18.2.0
+      use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
+
+  /zustand@4.4.1(@types/react@18.2.18)(immer@9.0.21)(react@18.2.0):
+    resolution: {integrity: sha512-QCPfstAS4EBiTQzlaGP1gmorkh/UL1Leaj2tdj+zZCZ/9bm0WS7sI2wnfD5lpOszFqWJ1DcPnGoY8RDL61uokw==}
+    engines: {node: '>=12.7.0'}
+    peerDependencies:
+      '@types/react': '>=16.8'
+      immer: '>=9.0'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      immer:
+        optional: true
+      react:
+        optional: true
+    dependencies:
+      '@types/react': 18.2.18
+      immer: 9.0.21
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false

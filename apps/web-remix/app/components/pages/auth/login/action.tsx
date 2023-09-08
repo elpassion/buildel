@@ -1,5 +1,29 @@
-import { ActionArgs } from "@remix-run/node";
+import { ActionArgs, json, redirect } from "@remix-run/node";
+import { actionBuilder } from "~/utils.server";
+// import { User } from "@prisma/client";
+import { withZod } from "@remix-validated-form/with-zod";
+import { validationError } from "remix-validated-form";
+import { schema } from "./schema";
+import { signIn } from "~/models/user.server";
+// import { createUserSession } from "~/session.server";
 
 export async function action(actionArgs: ActionArgs) {
-  return {};
+  return actionBuilder({
+    post: async (actionArgs) => {
+      const validator = withZod(schema);
+
+      const result = await validator.validate(
+        await actionArgs.request.formData()
+      );
+
+      if (result.error) return validationError(result.error);
+
+      try {
+        const { cookie } = await signIn(result.data);
+        return redirect("/", { headers: { "Set-Cookie": cookie! } });
+      } catch (error) {
+        return json({ errors: { email: "dupa" } }, { status: 401 });
+      }
+    },
+  })(actionArgs);
 }
