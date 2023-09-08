@@ -8,7 +8,7 @@ import invariant from "tiny-invariant";
 
 export async function action(actionArgs: ActionArgs) {
   return actionBuilder({
-    post: async ({ request, params }) => {
+    post: async ({ request, params }, { fetch }) => {
       const validator = withZod(schema);
       invariant(params.organizationId, "organizationId not found");
 
@@ -18,14 +18,10 @@ export async function action(actionArgs: ActionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      const pipeline = await fetchTyped(
+      const pipeline = await fetch(
         PipelineResponse,
-        `http://127.0.0.1:4000/api/organizations/${params.organizationId}/pipelines`,
+        `/organizations/${params.organizationId}/pipelines`,
         {
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: request.headers.get("cookie")!,
-          },
           method: "POST",
           body: JSON.stringify({
             pipeline: { ...result.data, config: { version: "1", blocks: [] } },
