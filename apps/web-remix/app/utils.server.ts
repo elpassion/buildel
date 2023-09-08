@@ -81,7 +81,6 @@ export async function fetchTyped<T extends ZodType>(
   const response = await fetch(url, options);
 
   if (!response.ok) {
-    console.log(await response.text());
     throw redirect("/login");
   }
 
@@ -94,15 +93,6 @@ export async function fetchTyped<T extends ZodType>(
 
 function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {
   return (schema, url, options) => {
-    console.log(
-      url,
-      merge(options, {
-        headers: {
-          "Content-Type": "application/json",
-          Cookie: actionArgs.request.headers.get("cookie")!,
-        },
-      })
-    );
     return fetchTyped(
       schema,
       "http://127.0.0.1:4000/api/organizations" + url,
