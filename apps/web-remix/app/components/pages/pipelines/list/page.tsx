@@ -28,7 +28,11 @@ export function PipelinesPage() {
       <Link to={`/${organizationId}/pipelines/new`}>New Pipeline</Link>
 
       {pipelines.data.map((pipeline) => (
-        <div key={pipeline.id}>{pipeline.name}</div>
+        <div key={pipeline.id}>
+          <Link to={`/${organizationId}/pipelines/${pipeline.id}`}>
+            {pipeline.name}
+          </Link>
+        </div>
       ))}
     </div>
   );
