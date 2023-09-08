@@ -11,7 +11,7 @@ export type TAxiosErrorInterceptor = (error: AxiosError) => AxiosError;
 
 export interface IHttpClientOptions {
   url: string;
-  accessToken?: string;
+  authCookie?: string;
   useRequestConfig?: (
     requestConfig: InternalAxiosRequestConfig,
   ) => Promise<InternalAxiosRequestConfig>;
@@ -57,7 +57,9 @@ export class HttpClient {
     url: string,
     { params }: { params?: Record<string, unknown> } = {},
   ): Promise<TReturnType> {
-    const { data } = await this.client.get<TReturnType>(url, { params });
+    const { data } = await this.client.get<TReturnType>(url, {
+      params,
+    });
     return data;
   }
 
@@ -114,13 +116,13 @@ export class HttpClient {
     return {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      ...(this.options.accessToken
-        ? { Authorization: `Bearer ${this.options.accessToken}` }
+      ...(this.options.authCookie
+        ? { Cookie: `_buildel_key=${this.options.authCookie}` }
         : {}),
     };
   }
 }
 
 export const createHttpClient = () => {
-  return HttpClient.getInstance({ url: 'http://localhost:3000/api' });
+  return HttpClient.getInstance({ url: `${ENV.PAGE_URL}/api` });
 };

@@ -1,9 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { ISignUp } from '~/contracts/auth.contracts';
 import { SignUpForm } from '~/modules/Auth/SignUpForm';
 import { ROUTES } from '~/modules/Config';
-import { AuthApi } from '~api/Auth/AuthApi';
 
 export const SignUpPage: React.FC = () => {
   return (
