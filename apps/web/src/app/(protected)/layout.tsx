@@ -17,9 +17,11 @@ const withSSRSession = (
   Component: (props: any) => Promise<React.JSX.Element>,
 ) => {
   const WrappedComponent = (props: any) => {
+    const authCookie = cookies().get('_buildel_key')?.value;
+
     const httpClient = new HttpClient({
       url: `${ENV.PAGE_URL}/api`,
-      authCookie: cookies().get('_buildel_key')?.value,
+      authCookie,
     });
 
     return <Component {...props} serverHttpClient={httpClient} />;
