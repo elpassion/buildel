@@ -1,5 +1,5 @@
-import React from 'react';
-import type { Metadata } from 'next';
+import React, { PropsWithChildren, ReactNode } from 'react';
+import type { Metadata, NextComponentType, NextPageContext } from 'next';
 import { cookies } from 'next/headers';
 import { AuthApi } from '~api/Auth/AuthApi';
 import { ENV } from '~/env.mjs';
@@ -13,17 +13,29 @@ export const metadata: Metadata = {
   description: APP_DESCRIPTION,
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const authApi = new AuthApi(
-    new HttpClient({
+const withSSRSession = (
+  Component: (props: any) => Promise<React.JSX.Element>,
+) => {
+  const WrappedComponent = (props: any) => {
+    const httpClient = new HttpClient({
       url: `${ENV.PAGE_URL}/api`,
       authCookie: cookies().get('_buildel_key')?.value,
-    }),
-  );
+    });
+
+    return <Component {...props} serverHttpClient={httpClient} />;
+  };
+
+  return WrappedComponent;
+};
+
+interface ProtectedLayoutProps extends PropsWithChildren {
+  serverHttpClient: HttpClient;
+}
+async function ProtectedLayout({
+  children,
+  serverHttpClient,
+}: ProtectedLayoutProps) {
+  const authApi = new AuthApi(serverHttpClient);
   const { data: user } = await authApi.me();
 
   return (
@@ -32,3 +44,5 @@ export default async function RootLayout({
     </AuthProvider>
   );
 }
+
+export default withSSRSession(ProtectedLayout);
