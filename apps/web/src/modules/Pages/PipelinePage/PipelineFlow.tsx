@@ -15,6 +15,7 @@ import ReactFlow, {
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
+  useNodesState,
 } from 'reactflow';
 import { useDebounce } from 'usehooks-ts';
 import {
@@ -58,16 +59,13 @@ export function PipelineFlow({
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const { isModalOpen, openModal, closeModal } = useModal();
   const [editableBlock, setEditableBlock] = useState<IBlockConfig | null>(null);
-  const [nodes, setNodes] = useState<INode[]>(getNodes(pipeline.config));
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    getNodes(pipeline.config),
+  );
   const [edges, setEdges] = useState<IEdge[]>(getEdges(pipeline.config));
   const debouncedNodes = useDebounce(nodes, 500);
   const debouncedEdges = useDebounce(edges, 500);
 
-  const onNodesChange = useCallback(
-    (changes: NodeChange[]) =>
-      setNodes((nds) => applyNodeChanges(changes, nds) as INode[]),
-    [setNodes],
-  );
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       setEdges((eds) => applyEdgeChanges(changes, eds) as IEdge[]);
