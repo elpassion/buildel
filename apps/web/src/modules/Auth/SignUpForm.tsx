@@ -1,10 +1,12 @@
 'use client';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { Button, Input } from '@elpassion/taco';
 import { AuthApi } from '~api/Auth/AuthApi';
 import { ISignUp, signUpSchema } from '~/contracts/auth.contracts';
+import { ROUTES } from '~/modules/Config';
 
 interface SignUpFormProps {
   onSignUp?: (data: ISignUp) => Promise<void>;
@@ -17,11 +19,12 @@ export const SignUpForm: React.FC<SignUpFormProps> = ({ onSignUp }) => {
     formState: { errors },
   } = useForm<ISignUp>({ resolver: zodResolver(signUpSchema) });
   const authApi = new AuthApi();
-
+  const router = useRouter();
   const onSubmit: SubmitHandler<ISignUp> = async (formData) => {
     try {
       console.log(formData);
       await authApi.signUp(formData);
+      router.push(ROUTES.HOME);
     } catch (err) {
       console.error(err);
     }
