@@ -33,7 +33,7 @@ export const links: LinksFunction = () => [
 
 export function ShowPipelinePage() {
   const fetcher = useFetcher<typeof action>();
-  const { pipeline } = useLoaderData<typeof loader>();
+  const { pipeline, blockTypes } = useLoaderData<typeof loader>();
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config)
   );
@@ -57,6 +57,17 @@ export function ShowPipelinePage() {
       { method: "PUT", encType: "application/json", replace: true }
     );
   }, [debouncedState]);
+
+  const nodeTypes = useMemo(() => {
+    return Object.keys(blockTypes).reduce(
+      (acc, curr) => ({
+        ...acc,
+        // [curr]: PipelineNode,
+      }),
+      {}
+    );
+    //}, [PipelineNode, blockTypes]);
+  }, [blockTypes]);
 
   return (
     <div className="h-screen w-full">
