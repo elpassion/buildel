@@ -2,12 +2,13 @@
 
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Icon, IconButton, Indicator } from '@elpassion/taco';
 import { Loader } from '~/components';
 import { TPipeline } from '~/contracts';
 import { pipelinesApi } from '~/modules/Api';
 import { ROUTES } from '~/modules/Config';
+import { pipelinesKeys, usePipelines } from '~/modules/Pipelines';
 
 interface PipelinesListProps {
   initialData?: { data: TPipeline[] };
@@ -15,9 +16,9 @@ interface PipelinesListProps {
 export const PipelinesList = ({ initialData }: PipelinesListProps) => {
   const queryClient = useQueryClient();
   const params = useParams();
-  const { data, isLoading, isError } = useQuery(
-    ['pipelines'],
-    async () => await pipelinesApi.getAll(params.organizationId as string),
+
+  const { data, isLoading, isError } = usePipelines(
+    params.organizationId as string,
     { initialData },
   );
 
@@ -29,7 +30,9 @@ export const PipelinesList = ({ initialData }: PipelinesListProps) => {
       );
     },
     onSuccess: async (data: any) => {
-      await queryClient.invalidateQueries({ queryKey: ['pipelines'] });
+      await queryClient.invalidateQueries({
+        queryKey: pipelinesKeys().pipelines,
+      });
     },
     onError: (error) => {
       console.error('Oops! Something went wrong!');

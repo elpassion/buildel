@@ -8,7 +8,9 @@ import {
 } from '@tanstack/react-query';
 import { Channel, Socket } from 'phoenix';
 import { z } from 'zod';
+import { TPipeline } from '~/contracts';
 import { ENV } from '~/env.mjs';
+import { pipelinesApi } from '~/modules/Api';
 import { blockTypesApi } from '~/modules/Pipelines/BlockTypesApi';
 import { pipelineApi } from '~/modules/Pipelines/PipelineApi';
 import {
@@ -19,16 +21,26 @@ import {
   IPipeline,
   Pipeline,
   PipelineResponse,
-  PipelinesResponse,
 } from '~/modules/Pipelines/pipelines.types';
 import { assert } from '~/utils/assert';
 
-export function usePipelines() {
-  return useQuery(['pipelines'], async () => {
-    const response = await fetch(`${ENV.API_URL}/pipelines`);
-    const json = response.json();
-    return PipelinesResponse.parse(json).data;
-  });
+export const pipelinesKeys = () => {
+  return {
+    pipelines: ['pipelines'] as const,
+    pipeline: (organizationId: string, pipelineId: string) =>
+      [pipelinesKeys().pipelines, organizationId, pipelineId] as const,
+  };
+};
+
+export function usePipelines(
+  organizationId: string,
+  options?: UseQueryOptions<{ data: TPipeline[] }>,
+) {
+  return useQuery<{ data: TPipeline[] }>(
+    pipelinesKeys().pipelines,
+    () => pipelinesApi.getAll(organizationId),
+    { ...options },
+  );
 }
 
 export function usePipeline(
@@ -37,7 +49,7 @@ export function usePipeline(
   options?: UseQueryOptions<IPipeline>,
 ) {
   return useQuery<IPipeline>(
-    ['pipelines', organizationId, pipelineId],
+    pipelinesKeys().pipeline(organizationId, pipelineId),
     () => pipelineApi.getPipeline(organizationId, pipelineId),
     {
       ...options,
@@ -70,7 +82,7 @@ export function useUpdatePipeline(
       const json = await response.json();
       const pipelineResponse = PipelineResponse.parse(json);
       queryClient.setQueryData(
-        ['pipelines', organizationId, pipelineId],
+        pipelinesKeys().pipeline(organizationId, pipelineId),
         pipelineResponse,
       );
       onSuccess?.(pipelineResponse);
@@ -79,11 +91,20 @@ export function useUpdatePipeline(
   });
 }
 
+export const blockTypesKeys = () => {
+  return {
+    blockTypes: ['blockTypes'],
+  };
+};
 export function useBlockTypes(options?: UseQueryOptions<IBlockTypesObj>) {
-  return useQuery<IBlockTypesObj>(['blockTypes'], blockTypesApi.getBlockTypes, {
-    ...options,
-    initialData: options?.initialData ?? {},
-  });
+  return useQuery<IBlockTypesObj>(
+    blockTypesKeys().blockTypes,
+    blockTypesApi.getBlockTypes,
+    {
+      ...options,
+      initialData: options?.initialData ?? {},
+    },
+  );
 }
 
 export function usePipelineRun(
@@ -95,14 +116,6 @@ export function usePipelineRun(
   ) => void = () => {},
   onStatusChange: (blockId: string, isWorking: boolean) => void = () => {},
 ) {
-  // const { data: pipeline } = usePipeline(pipelineId);
-  //
-  // if (!pipeline) throw new Error('FIX THIS');
-  //
-  // const { config } = pipeline;
-  //
-  // const io = getBlocksIO(config.blocks);
-
   const socket = useRef<Socket>();
   const channel = useRef<Channel>();
   socket.current = new Socket(`${ENV.WEBSOCKET_URL}`, {
