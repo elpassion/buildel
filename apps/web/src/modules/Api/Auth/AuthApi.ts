@@ -2,7 +2,7 @@ import { ISignIn, ISignUp } from '~/contracts/auth.contracts';
 import { HttpClient, createHttpClient } from '~/utils';
 
 export class AuthApi {
-  public baseUrl = '/auth';
+  public baseUrl = '/users';
   private client: HttpClient;
 
   constructor(client: HttpClient = createHttpClient()) {
@@ -13,6 +13,6 @@ export class AuthApi {
     return this.client.post(`${this.baseUrl}`, data);
   }
   signUp(data: ISignUp) {
-    return this.client.post(`${this.baseUrl}`, data);
+    return this.client.post(`${this.baseUrl}/register`, { user: data });
   }
 }

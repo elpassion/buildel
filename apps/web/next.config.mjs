@@ -13,6 +13,16 @@ const config = {
   env: {
     ...ENV,
   },
+  rewrites: async () => [
+    {
+      source: '/api/:path*',
+      destination: `${ENV.API_URL}/:path*`,
+    },
+    {
+      source: '/socket/:path*',
+      destination: `${ENV.API_URL}/socket/:path*`,
+    }
+  ],
 };
 
 export default config;

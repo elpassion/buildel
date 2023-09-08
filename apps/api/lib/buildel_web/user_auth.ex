@@ -33,7 +33,6 @@ defmodule BuildelWeb.UserAuth do
     |> renew_session()
     |> put_token_in_session(token)
     |> maybe_write_remember_me_cookie(token, params)
-    |> redirect(to: user_return_to || signed_in_path(conn))
   end
 
   defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
@@ -204,9 +203,7 @@ defmodule BuildelWeb.UserAuth do
       conn
     else
       conn
-      |> put_flash(:error, "You must log in to access this page.")
       |> maybe_store_return_to()
-      |> redirect(to: ~p"/users/log_in")
       |> halt()
     end
   end

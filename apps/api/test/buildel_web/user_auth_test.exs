@@ -22,18 +22,12 @@ defmodule BuildelWeb.UserAuthTest do
       conn = UserAuth.log_in_user(conn, user)
       assert token = get_session(conn, :user_token)
       assert get_session(conn, :live_socket_id) == "users_sessions:#{Base.url_encode64(token)}"
-      assert redirected_to(conn) == ~p"/"
       assert Accounts.get_user_by_session_token(token)
     end
 
     test "clears everything previously stored in the session", %{conn: conn, user: user} do
       conn = conn |> put_session(:to_be_removed, "value") |> UserAuth.log_in_user(user)
       refute get_session(conn, :to_be_removed)
-    end
-
-    test "redirects to the configured path", %{conn: conn, user: user} do
-      conn = conn |> put_session(:user_return_to, "/hello") |> UserAuth.log_in_user(user)
-      assert redirected_to(conn) == "/hello"
     end
 
     test "writes a cookie if remember_me is configured", %{conn: conn, user: user} do

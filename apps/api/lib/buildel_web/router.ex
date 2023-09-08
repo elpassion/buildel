@@ -15,6 +15,7 @@ defmodule BuildelWeb.Router do
 
   pipeline :api do
     plug(:accepts, ["json"])
+    plug(:fetch_session)
   end
 
   scope "/", BuildelWeb do
@@ -61,6 +62,9 @@ defmodule BuildelWeb.Router do
 
     put("/runs/:id/start", RunController, :start)
     put("/runs/:id/stop", RunController, :stop)
+
+    post("/users/register", UserRegistrationController, :create)
+    get("/users/me", UserController, :me)
   end
 
   ## Authentication routes
@@ -110,4 +114,33 @@ defmodule BuildelWeb.Router do
       live("/users/confirm", UserConfirmationInstructionsLive, :new)
     end
   end
+
+  # ## Authentication routes
+
+  # scope "/", BuildelWeb do
+  #   pipe_through([:browser, :redirect_if_user2_is_authenticated])
+
+  #   post("/users2/register", User2RegistrationController, :create)
+  #   post("/users2/log_in", User2SessionController, :create)
+  #   post("/users2/reset_password", User2ResetPasswordController, :create)
+  #   put("/users2/reset_password/:token", User2ResetPasswordController, :update)
+  # end
+
+  # scope "/", BuildelWeb do
+  #   pipe_through([:browser, :require_authenticated_user2])
+
+  #   get("/users2/settings", User2SettingsController, :edit)
+  #   put("/users2/settings", User2SettingsController, :update)
+  #   get("/users2/settings/confirm_email/:token", User2SettingsController, :confirm_email)
+  # end
+
+  # scope "/", BuildelWeb do
+  #   pipe_through([:browser])
+
+  #   delete("/users2/log_out", User2SessionController, :delete)
+  #   get("/users2/confirm", User2ConfirmationController, :new)
+  #   post("/users2/confirm", User2ConfirmationController, :create)
+  #   get("/users2/confirm/:token", User2ConfirmationController, :edit)
+  #   post("/users2/confirm/:token", User2ConfirmationController, :update)
+  # end
 end

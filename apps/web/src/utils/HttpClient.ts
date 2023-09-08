@@ -122,5 +122,5 @@ export class HttpClient {
 }
 
 export const createHttpClient = () => {
-  return HttpClient.getInstance({ url: ENV.API_URL });
+  return HttpClient.getInstance({ url: 'http://localhost:3000/api' });
 };

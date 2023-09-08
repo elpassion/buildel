@@ -1,4 +1,4 @@
-defmodule BuildelWeb.PipelineControllerTest do
+defmodule BuildelWeb.OrganizationPipelineControllerTest do
   use BuildelWeb.ConnCase
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
