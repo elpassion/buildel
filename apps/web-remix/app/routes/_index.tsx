@@ -1,1 +1,1 @@
-export { loader, meta } from "~/components/pages/home";
+export { loader } from "~/components/pages/home";
