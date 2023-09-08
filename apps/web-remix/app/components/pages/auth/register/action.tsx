@@ -17,10 +17,11 @@ export async function action(actionArgs: ActionArgs) {
       if (result.error) return validationError(result.error);
 
       try {
-        const response = await fetch(z.any(), "/users/log_in", {
+        const response = await fetch(z.any(), "/users/register", {
           method: "POST",
           body: JSON.stringify({ user: result.data }),
         });
+        console.log(response.headers);
         return redirect("/", {
           headers: { "Set-Cookie": response.headers.get("Set-Cookie")! },
         });

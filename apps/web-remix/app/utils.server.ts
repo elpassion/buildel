@@ -88,6 +88,7 @@ export async function fetchTyped<T extends ZodType>(
   const response = await fetch(url, options);
 
   if (!response.ok) {
+    // TODO: HANDLE ERRORS
     throw redirect("/login");
   }
 
@@ -95,7 +96,7 @@ export async function fetchTyped<T extends ZodType>(
 
   const data = schema.parse(jsonResponse);
 
-  return { ...response, data };
+  return Object.assign(response, { data });
 }
 
 function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {

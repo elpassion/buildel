@@ -12,10 +12,9 @@ import {
 } from "~/components/form/fields/text.field";
 import { FieldError } from "~/components/form/fields/field.error";
 
-export function LoginPage() {
+export function RegisterPage() {
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/stories";
   const actionData = useActionData();
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
@@ -51,20 +50,19 @@ export function LoginPage() {
               <FieldError />
             </Field>
           </div>
-          <input type="hidden" name="redirectTo" value={redirectTo} />
           <button type="submit" className="btn btn-block mt-6">
-            Log in
+            Register
           </button>
           <div className="mt-4">
-            Don't have an account?{" "}
+            Already have an account?{" "}
             <Link
               className="link link-primary"
               to={{
-                pathname: "/register",
+                pathname: "/login",
                 search: searchParams.toString(),
               }}
             >
-              Register
+              Log in
             </Link>
           </div>
         </ValidatedForm>
@@ -76,7 +74,7 @@ export function LoginPage() {
 export const meta: V2_MetaFunction = () => {
   return [
     {
-      title: "Login",
+      title: "Register",
     },
   ];
 };
