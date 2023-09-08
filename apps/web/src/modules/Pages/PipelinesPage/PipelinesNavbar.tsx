@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Icon } from '@elpassion/taco';
-import { useAuth, useAuthUser } from '~/app/(protected)/AuthProvider';
+import { useAuthUser } from '~/app/(protected)/AuthProvider';
 import { Navbar } from '~/modules/Layout';
 
 export const PipelinesNavbar = () => {

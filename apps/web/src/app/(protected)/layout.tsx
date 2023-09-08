@@ -1,12 +1,12 @@
 import React from 'react';
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
+import { AuthApi } from '~api/Auth/AuthApi';
+import { ENV } from '~/env.mjs';
 import { APP_DESCRIPTION, APP_NAME } from '~/modules/Config';
 import { Layout } from '~/modules/Layout';
-import { AuthProvider } from './AuthProvider';
-import { AuthApi } from '~api/Auth/AuthApi';
-import { cookies } from 'next/headers';
 import { HttpClient } from '~/utils';
-import { ENV } from '~/env.mjs';
+import { AuthProvider } from './AuthProvider';
 
 export const metadata: Metadata = {
   title: APP_NAME,
