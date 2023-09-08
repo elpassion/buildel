@@ -16,7 +16,7 @@ defmodule BuildelWeb.UserRegistrationController do
              &url(~p"/api/users/confirm/#{&1}")
            ) do
       conn
-      |> UserAuth.log_in_user(user)
+      |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
       |> put_view(BuildelWeb.UserJSON)
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/users/me")

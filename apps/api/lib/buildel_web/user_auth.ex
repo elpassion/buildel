@@ -79,7 +79,6 @@ defmodule BuildelWeb.UserAuth do
     conn
     |> renew_session()
     |> delete_resp_cookie(@remember_me_cookie)
-    |> redirect(to: ~p"/")
   end
 
   @doc """
@@ -191,12 +190,6 @@ defmodule BuildelWeb.UserAuth do
     end
   end
 
-  @doc """
-  Used for routes that require the user to be authenticated.
-
-  If you want to enforce the user email is confirmed before
-  they use the application at all, here would be a good place.
-  """
   def require_authenticated_user(conn, _opts) do
     if conn.assigns[:current_user] do
       conn
