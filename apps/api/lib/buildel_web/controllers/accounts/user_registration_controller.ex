@@ -1,5 +1,6 @@
 defmodule BuildelWeb.UserRegistrationController do
   use BuildelWeb, :controller
+  use BuildelWeb.ControllerValidator
 
   alias Buildel.Accounts
   alias Buildel.Accounts.User
@@ -8,8 +9,16 @@ defmodule BuildelWeb.UserRegistrationController do
 
   action_fallback(BuildelWeb.FallbackController)
 
-  def create(conn, %{"user" => user_params}) do
-    with {:ok, %User{} = user} <- Accounts.register_user(user_params),
+  defparams :create do
+    required(:user, :map) do
+      required(:email, :string, format: :email)
+      required(:password, :string, min: 12)
+    end
+  end
+
+  def create(conn, params) do
+    with {:ok, %{user: user_params}} <- validate(:create, params),
+         {:ok, %User{} = user} <- Accounts.register_user(user_params),
          {:ok, _} =
            Accounts.deliver_user_confirmation_instructions(
              user,
