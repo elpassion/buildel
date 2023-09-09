@@ -26,6 +26,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { useDebounce } from "usehooks-ts";
 import { action } from "./action";
 import { isEqual } from "lodash";
+import { RunPipelineProvider } from "./RunPipelineProvider";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
@@ -71,21 +72,23 @@ export function ShowPipelinePage() {
 
   return (
     <div className="h-screen w-full">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        isValidConnection={handleIsValidConnection}
-        fitViewOptions={{
-          minZoom: 0.5,
-          maxZoom: 1,
-        }}
-        fitView
-      >
-        <Background variant={BackgroundVariant.Lines} />
-        <Controls />
-      </ReactFlow>
+      <RunPipelineProvider pipeline={pipeline}>
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          isValidConnection={handleIsValidConnection}
+          fitViewOptions={{
+            minZoom: 0.5,
+            maxZoom: 1,
+          }}
+          fitView
+        >
+          <Background variant={BackgroundVariant.Lines} />
+          <Controls />
+        </ReactFlow>
+      </RunPipelineProvider>
     </div>
   );
 }
