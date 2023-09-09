@@ -16,6 +16,15 @@ defmodule BuildelWeb.OrganizationController do
     render(conn, :index, organizations: organizations)
   end
 
+  def show(conn, %{"id" => organization_id}) do
+    user = conn.assigns.current_user
+
+    with {organization_id, _} when is_number(organization_id) <- Integer.parse(organization_id),
+         {:ok, organization} <- Organizations.get_user_organization(user, organization_id) do
+      render(conn, :show, organization: organization)
+    end
+  end
+
   defparams :create do
     required(:organization, :map) do
       required(:name, :string)

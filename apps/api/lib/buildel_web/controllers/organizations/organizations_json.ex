@@ -11,7 +11,8 @@ defmodule BuildelWeb.OrganizationJSON do
 
   defp data(%Organization{} = organization) do
     %{
-      id: organization.id
+      id: organization.id,
+      name: organization.name
     }
   end
 end

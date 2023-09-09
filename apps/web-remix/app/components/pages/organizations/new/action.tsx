@@ -19,7 +19,7 @@ export async function action(actionArgs: ActionArgs) {
         body: JSON.stringify(result.data),
       });
 
-      return redirect(`/${response.data.data.id}/pipelines`);
+      throw redirect(`/${response.data.data.id}`);
     },
   })(actionArgs);
 }
@@ -27,5 +27,6 @@ export async function action(actionArgs: ActionArgs) {
 const OrganizationsResponse = z.object({
   data: z.object({
     id: z.number(),
+    name: z.string(),
   }),
 });

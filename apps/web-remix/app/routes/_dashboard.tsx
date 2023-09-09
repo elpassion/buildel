@@ -4,14 +4,24 @@ import { Outlet, useLoaderData } from "@remix-run/react";
 import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
 import Modal from "react-modal";
+import invariant from "tiny-invariant";
+import { z } from "zod";
+import { requireLogin } from "~/session.server";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
-  return loaderBuilder(async ({ request }) => {
+  return loaderBuilder(async ({ request, params }, { fetch }) => {
+    await requireLogin(request);
+    invariant(params.organizationId, "organizationId not found");
     const { cookie, error } = await getToastError(request);
 
+    const response = await fetch(
+      OrganizationsResponse,
+      `/organizations/${params.organizationId}`
+    );
+
     return json(
-      { error },
+      { error, organization: response.data.data },
       {
         headers: {
           "Set-Cookie": cookie,
@@ -20,6 +30,13 @@ export async function loader(loaderArgs: LoaderArgs) {
     );
   })(loaderArgs);
 }
+
+const OrganizationsResponse = z.object({
+  data: z.object({
+    id: z.number(),
+    name: z.string(),
+  }),
+});
 
 export default function Layout() {
   return (
@@ -39,8 +56,8 @@ export default function Layout() {
 }
 
 function SidebarTopContent() {
-  const name = "ACME inc.";
-  const { error } = useLoaderData<typeof loader>();
+  const { error, organization } = useLoaderData<typeof loader>();
+  const name = organization.name;
 
   return (
     <div className="min-h-smNavbar border-b">

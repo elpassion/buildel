@@ -68,7 +68,7 @@ defmodule BuildelWeb.Router do
     post("/users/log_in", UserSessionController, :create)
     delete("/users/log_out", UserSessionController, :delete)
 
-    resources("/organizations", OrganizationController, only: [:index, :create])
+    resources("/organizations", OrganizationController, only: [:index, :create, :show])
   end
 
   ## Authentication routes

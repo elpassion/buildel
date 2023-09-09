@@ -36,6 +36,7 @@ export const loaderBuilder =
       } else if (e instanceof UnauthorizedError) {
         throw redirect("/login");
       }
+
       throw e;
     }
   };

@@ -4,7 +4,7 @@ import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
 
 export async function loader(args: LoaderArgs) {
-  return loaderBuilder(async ({ request, params }, { fetch }) => {
+  return loaderBuilder(async ({ request }, { fetch }) => {
     await requireLogin(request);
 
     const { data: organizations } = await fetch(
@@ -12,9 +12,13 @@ export async function loader(args: LoaderArgs) {
       `/organizations`
     );
 
-    if (organizations.data.length === 0) return redirect(`/organizations/new`);
+    const organization = organizations.data.at(0);
 
-    return redirect(`/${organizations.data.at(0)!.id}/pipelines`);
+    if (organization) {
+      return redirect(`/${organization.id}/pipelines`);
+    } else {
+      return redirect(`/organizations/new`);
+    }
   })(args);
 }
 
