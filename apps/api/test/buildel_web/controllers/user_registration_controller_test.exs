@@ -33,5 +33,29 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
                }
              }
     end
+
+    test "fails to create already created account", %{conn: conn} do
+      email = unique_user_email()
+
+      conn =
+        post(conn, ~p"/api/users/register", %{
+          "user" => valid_user_attributes(email: email)
+        })
+
+      assert get_session(conn, :user_token)
+      conn = get(conn, ~p"/api/users/me")
+      json_response(conn, 200)
+
+      conn =
+        post(conn, ~p"/api/users/register", %{
+          "user" => valid_user_attributes(email: email)
+        })
+
+      assert json_response(conn, 422) == %{
+               "errors" => %{
+                 "global" => ["email has already been taken"]
+               }
+             }
+    end
   end
 end

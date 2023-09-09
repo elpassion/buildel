@@ -30,6 +30,12 @@ defmodule BuildelWeb.UserRegistrationController do
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/users/me")
       |> render(:show, user: user)
+    else
+      {:error, %Ecto.Changeset{action: :insert}} ->
+        {:error, changeset_error(global: "email has already been taken")}
+
+      e ->
+        e
     end
   end
 end

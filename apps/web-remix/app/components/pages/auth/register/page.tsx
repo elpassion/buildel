@@ -1,31 +1,20 @@
 import { V2_MetaFunction } from "@remix-run/node";
-import { useActionData, useSearchParams, Link } from "@remix-run/react";
+import { Link, useSearchParams } from "@remix-run/react";
+import { withZod } from "@remix-validated-form/with-zod";
 import * as React from "react";
 import { ValidatedForm } from "remix-validated-form";
-import { withZod } from "@remix-validated-form/with-zod";
-import { schema } from "./schema";
 import { Field } from "~/components/form/fields/field.context";
+import { FieldError } from "~/components/form/fields/field.error";
 import { FieldLabel } from "~/components/form/fields/field.label";
 import {
   PasswordInputField,
   TextInputField,
 } from "~/components/form/fields/text.field";
-import { FieldError } from "~/components/form/fields/field.error";
+import { schema } from "./schema";
 
 export function RegisterPage() {
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
-  const actionData = useActionData();
-  const emailRef = React.useRef<HTMLInputElement>(null);
-  const passwordRef = React.useRef<HTMLInputElement>(null);
-
-  React.useEffect(() => {
-    if (actionData?.errors.email) {
-      emailRef.current?.focus();
-    } else if (actionData?.errors.password) {
-      passwordRef.current?.focus();
-    }
-  }, [actionData]);
 
   return (
     <div className="container flex h-screen">
@@ -36,17 +25,21 @@ export function RegisterPage() {
           noValidate
           className="w-[80%]"
         >
+          <Field name="global">
+            <FieldError />
+          </Field>
+
           <div className="form-control w-full">
-            <Field name="email">
+            <Field name="user.email">
               <FieldLabel>Email address</FieldLabel>
-              <TextInputField ref={emailRef} type="email" autoFocus />
+              <TextInputField type="email" autoFocus />
               <FieldError />
             </Field>
           </div>
           <div className="max-w-s form-control w-full">
-            <Field name="password">
+            <Field name="user.password">
               <FieldLabel>Password</FieldLabel>
-              <PasswordInputField ref={passwordRef} />
+              <PasswordInputField />
               <FieldError />
             </Field>
           </div>
