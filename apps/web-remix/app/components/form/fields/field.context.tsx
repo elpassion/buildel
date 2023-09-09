@@ -18,7 +18,7 @@ export function HiddenField({
   value,
 }: {
   name: string;
-  value: string | string[];
+  value: number | string | string[];
 }) {
   return <input type="hidden" name={name} value={value} />;
 }

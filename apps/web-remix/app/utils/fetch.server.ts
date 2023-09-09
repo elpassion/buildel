@@ -25,6 +25,10 @@ export async function fetchTyped<T extends ZodType>(
     }
   }
 
+  if (response.status === 204) {
+    return Object.assign(response, { data: {}, error: null });
+  }
+
   const jsonResponse = await response.json();
 
   const data = schema.parse(jsonResponse);

@@ -1,6 +1,7 @@
+import { Link, Form } from "@remix-run/react";
 import { Icon, IconButton, Indicator } from "@elpassion/taco";
 import { IPipeline } from "./contracts";
-import { Link } from "@remix-run/react";
+import { HiddenField } from "~/components/form/fields/field.context";
 
 interface PipelinesListItemProps {
   pipeline: IPipeline;
@@ -43,60 +44,18 @@ export const PipelinesListItem = ({ pipeline }: PipelinesListItemProps) => {
             <p className="text-xs">Sequence</p>
           </div>
         </div>
-        <div>
+        <Form method="delete">
           <IconButton
-            ariaLabel=""
-            icon={<Icon iconName="x" />}
-            onClick={function noRefCheck() {
-              // mutate(pipeline.id);
-            }}
             size="xs"
+            type="submit"
             variant="outlined"
+            ariaLabel="Delete"
             title={`Remove workflow: ${pipeline.name}`}
+            icon={<Icon iconName="x" />}
           />
-        </div>
+          <HiddenField name="pipelineId" value={pipeline.id} />
+        </Form>
       </div>
     </article>
   );
 };
-
-// interface PipelinesListProps {
-//   initialData?: { data: TPipeline[] };
-// }
-// export const PipelinesListItem = ({ initialData }: PipelinesListProps) => {
-//   return (
-//     <div className="flex flex-col gap-2">
-//       <div className="flex items-center justify-between">
-//         <div className="flex items-center gap-8 text-xs font-medium">
-//           <div className="flex items-center justify-center gap-2">
-//             <p>Usage</p>
-//             {/* TODO (hub33k): find sort icon */}
-//             <Icon
-//               iconName="bar-chart"
-//               size="sm"
-//               className="-rotate-90 transform-gpu text-neutral-500"
-//             />
-//           </div>
-//
-//           <div className="flex items-center justify-center gap-2">
-//             <p>Monthly</p>
-//             <Icon
-//               iconName="chevron-down"
-//               size="sm"
-//               className="flex items-center justify-center"
-//             />
-//           </div>
-//         </div>
-//       </div>
-//
-//       <div className="mb-2" />
-//       {pipelines.map((pipeline) => {
-//         return (
-//           <div key={pipeline.id} className="bg-white px-6 py-4">
-//
-//           </div>
-//         );
-//       })}
-//     </div>
-//   );
-// };
