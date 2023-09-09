@@ -10,7 +10,7 @@ import { schema } from "./schema";
 export async function action(actionArgs: ActionArgs) {
   return actionBuilder({
     put: async ({ params, request }, { fetch }) => {
-      requireLogin(request);
+      await requireLogin(request);
       invariant(params.organizationId, "Missing organizationId");
       invariant(params.pipelineId, "Missing pipelineId");
 

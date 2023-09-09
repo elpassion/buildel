@@ -6,7 +6,7 @@ import { PipelinesResponse } from "./contracts";
 
 export async function loader(args: LoaderArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
-    requireLogin(request);
+    await requireLogin(request);
     invariant(params.organizationId, "organizationId not found");
 
     const pipelines = await fetch(

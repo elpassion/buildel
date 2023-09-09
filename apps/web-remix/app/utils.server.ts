@@ -1,7 +1,6 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { merge } from "lodash";
 import { validationError } from "remix-validated-form";
-import { commitSession, getRemixSession } from "./session.server";
 import {
   UnauthorizedError,
   UnknownAPIError,
@@ -9,12 +8,13 @@ import {
 } from "./utils/errors.server";
 import { fetchTyped } from "./utils/fetch.server";
 import { setToastError } from "./utils/toast.error.server";
+import { getSession } from "./session.server";
 
 export const loaderBuilder =
   <T>(fn: (args: LoaderArgs, helpers: { fetch: typeof fetchTyped }) => T) =>
   async (args: LoaderArgs) => {
     try {
-      return await fn(args, { fetch: requestFetchTyped(args) });
+      return await fn(args, { fetch: await requestFetchTyped(args) });
     } catch (e) {
       if (e instanceof UnknownAPIError) {
         return json(
@@ -29,6 +29,8 @@ export const loaderBuilder =
             },
           }
         );
+      } else if (e instanceof UnauthorizedError) {
+        return redirect("/login");
       }
       throw e;
     }
@@ -55,31 +57,31 @@ export const actionBuilder =
         case "POST":
           return handlers.post
             ? await handlers.post(actionArgs, {
-                fetch: requestFetchTyped(actionArgs),
+                fetch: await requestFetchTyped(actionArgs),
               })
             : notFound();
         case "DELETE":
           return handlers.delete
             ? await handlers.delete(actionArgs, {
-                fetch: requestFetchTyped(actionArgs),
+                fetch: await requestFetchTyped(actionArgs),
               })
             : notFound();
         case "PATCH":
           return handlers.patch
             ? await handlers.patch(actionArgs, {
-                fetch: requestFetchTyped(actionArgs),
+                fetch: await requestFetchTyped(actionArgs),
               })
             : notFound();
         case "PUT":
           return handlers.put
             ? await handlers.put(actionArgs, {
-                fetch: requestFetchTyped(actionArgs),
+                fetch: await requestFetchTyped(actionArgs),
               })
             : notFound();
         case "GET":
           return handlers.get
             ? await handlers.get(actionArgs, {
-                fetch: requestFetchTyped(actionArgs),
+                fetch: await requestFetchTyped(actionArgs),
               })
             : notFound();
       }
@@ -108,7 +110,12 @@ export const actionBuilder =
     return notFound();
   };
 
-function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {
+async function requestFetchTyped(
+  actionArgs: ActionArgs
+): Promise<typeof fetchTyped> {
+  const session = await getSession(actionArgs.request.headers.get("cookie"));
+  const token = session.get("apiToken");
+
   return (schema, url, options) => {
     return fetchTyped(
       schema,
@@ -116,7 +123,7 @@ function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {
       merge(options || {}, {
         headers: {
           "Content-Type": "application/json",
-          Cookie: actionArgs.request.headers.get("cookie")!,
+          Cookie: `_buildel_key=${token}`,
         },
       })
     );

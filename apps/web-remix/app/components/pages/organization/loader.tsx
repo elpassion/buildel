@@ -5,7 +5,7 @@ import invariant from "tiny-invariant";
 
 export async function loader(args: LoaderArgs) {
   return loaderBuilder(async ({ request, params }) => {
-    requireLogin(request);
+    await requireLogin(request);
     invariant(params.organizationId, "organizationId not found");
 
     //fetch organization and return 404 if not exist

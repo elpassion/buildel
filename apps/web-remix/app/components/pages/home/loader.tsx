@@ -4,7 +4,7 @@ import { loaderBuilder } from "~/utils.server";
 
 export async function loader(args: LoaderArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
-    requireLogin(request);
+    await requireLogin(request);
 
     // const pipelines = await fetch(
     //   PipelinesResponse,
