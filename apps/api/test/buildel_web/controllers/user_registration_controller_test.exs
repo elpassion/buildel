@@ -24,7 +24,12 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
           "user" => %{"email" => "with spaces", "password" => "too short"}
         })
 
-      json_response(conn, 422)
+      assert json_response(conn, 422) == %{
+               "errors" => %{
+                 "email" => ["must have the @ sign and no spaces"],
+                 "password" => ["should be at least 12 character(s)"]
+               }
+             }
     end
   end
 end
