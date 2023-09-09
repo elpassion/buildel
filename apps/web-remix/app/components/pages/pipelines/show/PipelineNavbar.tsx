@@ -1,11 +1,14 @@
 import React from "react";
 import { Breadcrumbs, Navbar } from "@elpassion/taco";
+import { useLoaderData } from "@remix-run/react";
+import { loader } from "./loader";
 
 interface PipelineNavbarProps {
   name: string;
 }
 
 export const PipelineNavbar = ({ name }: PipelineNavbarProps) => {
+  const { organizationId } = useLoaderData<typeof loader>();
   return (
     <Navbar
       leftContent={
@@ -14,8 +17,7 @@ export const PipelineNavbar = ({ name }: PipelineNavbarProps) => {
             breadcrumbs={[
               {
                 label: "Workflows",
-                // TODO (hub33k): get proper org id
-                href: "/",
+                href: `/${organizationId}/pipelines`,
               },
               {
                 label: name,

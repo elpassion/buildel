@@ -17,7 +17,7 @@ export const loaderBuilder =
       return await fn(args, { fetch: await requestFetchTyped(args) });
     } catch (e) {
       if (e instanceof UnknownAPIError) {
-        return json(
+        throw json(
           { error: "Unknown API error" },
           {
             status: 500,
@@ -30,7 +30,7 @@ export const loaderBuilder =
           }
         );
       } else if (e instanceof UnauthorizedError) {
-        return redirect("/login");
+        throw redirect("/login");
       }
       throw e;
     }
