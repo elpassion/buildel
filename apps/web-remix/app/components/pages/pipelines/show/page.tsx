@@ -122,11 +122,11 @@ export function ShowPipelinePage() {
 
   useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data !== null) {
-      const updatedConfig = fetcher.data;
-      if (!updatedConfig) return;
+      const config = fetcher.data;
+      if (!config || isEqual(config, pipeline.config)) return;
 
-      setNodes(getNodes(updatedConfig.config));
-      setEdges(getEdges(updatedConfig.config));
+      setNodes(getNodes(config.config));
+      setEdges(getEdges(config.config));
     }
   }, [fetcher]);
 
