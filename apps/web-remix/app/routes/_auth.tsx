@@ -1,22 +1,21 @@
 import { LoaderArgs, json } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
-import { commitSession, getRemixSession } from "~/session.server";
+import { loaderBuilder } from "~/utils.server";
+import { getToastError } from "~/utils/toast.error.server";
 
 export async function loader(loaderArgs: LoaderArgs) {
-  const session = await getRemixSession(
-    loaderArgs.request.headers.get("Cookie")
-  );
+  return loaderBuilder(async ({ request }) => {
+    const { cookie, error } = await getToastError(request);
 
-  return json(
-    {
-      error: session.get("error"),
-    },
-    {
-      headers: {
-        "Set-Cookie": await commitSession(session),
-      },
-    }
-  );
+    return json(
+      { error },
+      {
+        headers: {
+          "Set-Cookie": cookie,
+        },
+      }
+    );
+  })(loaderArgs);
 }
 
 export default function Layout() {

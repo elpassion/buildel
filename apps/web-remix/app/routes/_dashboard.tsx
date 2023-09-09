@@ -1,5 +1,23 @@
 import { ResponsiveSidebar } from "@elpassion/taco";
-import { Outlet } from "@remix-run/react";
+import { LoaderArgs, json } from "@remix-run/node";
+import { Outlet, useLoaderData } from "@remix-run/react";
+import { loaderBuilder } from "~/utils.server";
+import { getToastError } from "~/utils/toast.error.server";
+
+export async function loader(loaderArgs: LoaderArgs) {
+  return loaderBuilder(async ({ request }) => {
+    const { cookie, error } = await getToastError(request);
+
+    return json(
+      { error },
+      {
+        headers: {
+          "Set-Cookie": cookie,
+        },
+      }
+    );
+  })(loaderArgs);
+}
 
 export default function Layout() {
   return (
@@ -20,11 +38,13 @@ export default function Layout() {
 
 function SidebarTopContent() {
   const name = "ACME inc.";
+  const { error } = useLoaderData<typeof loader>();
 
   return (
     <div className="min-h-smNavbar border-b">
       <div className={"flex h-full w-full items-center"}>
         <h1 className="font-medium text-neutral-500">{name}</h1>
+        {error && <div>{error}</div>}
       </div>
     </div>
   );

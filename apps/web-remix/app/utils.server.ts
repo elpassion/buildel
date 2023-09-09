@@ -1,7 +1,6 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { merge } from "lodash";
 import { validationError } from "remix-validated-form";
-import { ZodType, z } from "zod";
 import { commitSession, getRemixSession } from "./session.server";
 import {
   UnauthorizedError,
@@ -9,11 +8,31 @@ import {
   ValidationError,
 } from "./utils/errors.server";
 import { fetchTyped } from "./utils/fetch.server";
+import { setToastError } from "./utils/toast.error.server";
 
 export const loaderBuilder =
   <T>(fn: (args: LoaderArgs, helpers: { fetch: typeof fetchTyped }) => T) =>
-  (args: LoaderArgs) =>
-    fn(args, { fetch: requestFetchTyped(args) });
+  async (args: LoaderArgs) => {
+    try {
+      return await fn(args, { fetch: requestFetchTyped(args) });
+    } catch (e) {
+      if (e instanceof UnknownAPIError) {
+        return json(
+          { error: "Unknown API error" },
+          {
+            status: 500,
+            headers: {
+              "Set-Cookie": await setToastError(
+                args.request,
+                "Unknown API error"
+              ),
+            },
+          }
+        );
+      }
+      throw e;
+    }
+  };
 
 export const actionBuilder =
   (handlers: {
@@ -70,15 +89,16 @@ export const actionBuilder =
       } else if (e instanceof UnauthorizedError) {
         redirect("/login");
       } else if (e instanceof UnknownAPIError) {
-        const session = await getRemixSession(
-          actionArgs.request.headers.get("Cookie")!
-        );
-        session.flash("error", "Unknown API error");
         return json(
           { error: "Unknown API error" },
           {
             status: 500,
-            headers: { "Set-Cookie": await commitSession(session) },
+            headers: {
+              "Set-Cookie": await setToastError(
+                actionArgs.request,
+                "Unknown API error"
+              ),
+            },
           }
         );
       }
