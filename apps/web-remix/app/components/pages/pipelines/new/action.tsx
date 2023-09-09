@@ -1,10 +1,11 @@
 import { ActionArgs, redirect } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
-import { actionBuilder, fetchTyped } from "~/utils.server";
-import { schema } from "./schema";
+import { merge } from "lodash";
 import { validationError } from "remix-validated-form";
-import { PipelineResponse } from "../list/contracts";
 import invariant from "tiny-invariant";
+import { actionBuilder } from "~/utils.server";
+import { PipelineResponse } from "../list/contracts";
+import { schema } from "./schema";
 
 export async function action(actionArgs: ActionArgs) {
   return actionBuilder({
@@ -21,9 +22,7 @@ export async function action(actionArgs: ActionArgs) {
         `/organizations/${params.organizationId}/pipelines`,
         {
           method: "POST",
-          body: JSON.stringify({
-            pipeline: { ...result.data, config: { version: "1", blocks: [] } },
-          }),
+          body: JSON.stringify(result.data),
         }
       );
 

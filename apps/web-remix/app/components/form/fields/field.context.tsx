@@ -13,6 +13,16 @@ export function Field({
   );
 }
 
+export function HiddenField({
+  name,
+  value,
+}: {
+  name: string;
+  value: string | string[];
+}) {
+  return <input type="hidden" name={name} value={value} />;
+}
+
 export const FieldContext = React.createContext<{
   name: string;
   error?: string[] | null;
