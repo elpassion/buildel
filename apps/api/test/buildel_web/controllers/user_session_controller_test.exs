@@ -34,13 +34,26 @@ defmodule BuildelWeb.UserSessionControllerTest do
       assert get_session(conn, :user_token)
     end
 
-    test "redirects to login page with invalid credentials", %{conn: conn} do
+    test "returns error with invalid credentials", %{conn: conn} do
       conn =
         post(conn, ~p"/api/users/log_in", %{
           "user" => %{"email" => "invalid@email.com", "password" => "invalid_password"}
         })
 
-      assert json_response(conn, 404)
+      assert json_response(conn, 422) == %{
+               "errors" => %{"global" => ["Invalid username or password"]}
+             }
+    end
+
+    test "returns error with bad request", %{conn: conn} do
+      conn =
+        post(conn, ~p"/api/users/log_in", %{
+          "user" => %{"email" => "invalid", "password" => "invalid_password"}
+        })
+
+      assert json_response(conn, 422) == %{
+               "errors" => %{"user" => %{"email" => ["has invalid format"]}}
+             }
     end
   end
 

@@ -10,8 +10,8 @@ defmodule BuildelWeb.UserSessionController do
 
   defparams :create do
     required(:user, :map) do
-      required(:email, :string)
-      required(:password, :string, min: 20)
+      required(:email, :string, format: :email)
+      required(:password, :string)
     end
   end
 
