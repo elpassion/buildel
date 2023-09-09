@@ -65,8 +65,6 @@ defmodule Buildel.VectorDB.QdrantAdapter do
       {:ok, %{name: collection_name}}
     else
       error ->
-        IO.inspect("QDRANT URL: #{inspect(System.get_env("QDRANT_DATABASE_URL"))}")
-
         {:error, error}
     end
   end

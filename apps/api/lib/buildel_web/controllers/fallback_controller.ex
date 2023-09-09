@@ -23,6 +23,13 @@ defmodule BuildelWeb.FallbackController do
     |> render(:"401")
   end
 
+  def call(conn, {:error, :forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> put_view(html: BuildelWeb.ErrorHTML, json: BuildelWeb.ErrorJSON)
+    |> render(:"403")
+  end
+
   def call(conn, _error) do
     conn
     |> put_status(:internal_server_error)

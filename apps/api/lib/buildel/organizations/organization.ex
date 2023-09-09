@@ -3,10 +3,10 @@ defmodule Buildel.Organizations.Organization do
   import Ecto.Changeset
 
   schema "organizations" do
-    field :name, :string
+    field(:name, :string)
 
-    has_many :memberships, Buildel.Organizations.Membership
-    many_to_many :members, Buildel.Accounts.User, join_through: Buildel.Organizations.Membership
+    has_many(:memberships, Buildel.Organizations.Membership)
+    many_to_many(:members, Buildel.Accounts.User, join_through: Buildel.Organizations.Membership)
     timestamps()
   end
 

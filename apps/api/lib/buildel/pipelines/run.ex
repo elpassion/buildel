@@ -4,8 +4,8 @@ defmodule Buildel.Pipelines.Run do
   alias Buildel.Pipelines.Pipeline
 
   schema "runs" do
-    belongs_to :pipeline, Pipeline
-    field :status, Ecto.Enum, values: [created: 0, running: 1, finished: 2], default: :created
+    belongs_to(:pipeline, Pipeline)
+    field(:status, Ecto.Enum, values: [created: 0, running: 1, finished: 2], default: :created)
 
     timestamps()
   end

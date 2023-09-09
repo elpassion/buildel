@@ -3,9 +3,8 @@ defmodule Buildel.Organizations.Membership do
   import Ecto.Changeset
 
   schema "memberships" do
-
-    belongs_to :organization, Buildel.Organizations.Organization
-    belongs_to :user, Buildel.Accounts.User
+    belongs_to(:organization, Buildel.Organizations.Organization)
+    belongs_to(:user, Buildel.Accounts.User)
 
     timestamps()
   end

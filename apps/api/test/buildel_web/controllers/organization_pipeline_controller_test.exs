@@ -4,6 +4,7 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
   import Buildel.PipelinesFixtures
 
   alias Buildel.Pipelines.Pipeline
+  alias Buildel.Organizations
 
   @create_attrs %{
     name: "some name",
@@ -19,38 +20,37 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  setup [:register_and_log_in_user]
+  setup [:register_and_log_in_user, :create_user_organization]
 
   describe "index" do
-    test "requires authentication", %{conn: conn} do
+    test "requires authentication", %{conn: conn, organization: organization} do
       conn = conn |> log_out_user()
-      organization_id = organization_fixture().id
+      organization_id = organization.id
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines")
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "lists all organization pipelines", %{conn: conn} do
-      organization_id = organization_fixture().id
+    test "lists all organization pipelines", %{conn: conn, organization: organization} do
+      organization_id = organization.id
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines")
       assert json_response(conn, 200)["data"] == []
     end
   end
 
   describe "create pipeline" do
-    test "requires authentication", %{conn: conn} do
+    test "requires authentication", %{conn: conn, organization: organization} do
       conn = conn |> log_out_user()
-      organization_id = organization_fixture().id
 
       conn =
-        post(conn, ~p"/api/organizations/#{organization_id}/pipelines",
-          pipeline: @create_attrs |> Enum.into(%{organization_id: organization_id})
+        post(conn, ~p"/api/organizations/#{organization.id}/pipelines",
+          pipeline: @create_attrs |> Enum.into(%{organization_id: organization.id})
         )
 
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "renders pipeline when data is valid", %{conn: conn} do
-      organization_id = organization_fixture().id
+    test "renders pipeline when data is valid", %{conn: conn, organization: organization} do
+      organization_id = organization.id
 
       conn =
         post(conn, ~p"/api/organizations/#{organization_id}/pipelines",
@@ -68,8 +68,8 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
              } = json_response(conn, 200)["data"]
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      organization_id = organization_fixture().id
+    test "renders errors when data is invalid", %{conn: conn, organization: organization} do
+      organization_id = organization.id
 
       conn =
         post(conn, ~p"/api/organizations/#{organization_id}/pipelines", pipeline: @invalid_attrs)
@@ -146,8 +146,14 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
     end
   end
 
-  defp create_pipeline(_) do
-    pipeline = pipeline_fixture()
+  defp create_pipeline(%{organization: organization}) do
+    pipeline = pipeline_fixture(%{organization_id: organization.id})
     %{pipeline: pipeline}
+  end
+
+  defp create_user_organization(%{user: user}) do
+    membership = membership_fixture(%{user_id: user.id})
+    organization = membership |> Map.get(:organization_id) |> Organizations.get_organization!()
+    %{organization: organization}
   end
 end

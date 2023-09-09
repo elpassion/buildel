@@ -76,7 +76,6 @@ defmodule Buildel.Blocks.DocumentSearch do
        |> Keyword.put(:api_key, opts |> Map.get(:api_key))}
     else
       {:error, error} ->
-        IO.inspect("TEST")
         {:stop, "Failed to create collection #{inspect(name)} Error: #{inspect(error)}"}
     end
   end

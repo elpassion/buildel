@@ -5,8 +5,16 @@ defmodule Buildel.Organizations do
   alias Buildel.Organizations.{Organization, Membership}
   alias Buildel.Accounts.User
 
-  def list_user_organizations(%User{id: user_id}) do
-    User |> Repo.get(user_id) |> Repo.preload(:organizations) |> Map.get(:organizations)
+  def list_user_organizations(%User{} = user) do
+    user |> Repo.preload(:organizations) |> Map.get(:organizations)
+  end
+
+  def get_user_organization(%User{} = user, organization_id) do
+    case list_user_organizations(user)
+         |> Enum.find(fn organization -> organization.id == organization_id end) do
+      nil -> {:error, :not_found}
+      organization -> {:ok, organization}
+    end
   end
 
   def get_organization!(id), do: Repo.get!(Organization, id)
