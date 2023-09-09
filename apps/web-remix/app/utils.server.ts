@@ -1,5 +1,6 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { merge } from "lodash";
+import { validationError } from "remix-validated-form";
 import { ZodType, z } from "zod";
 
 export const loaderBuilder =
@@ -58,9 +59,8 @@ export const actionBuilder =
       }
     } catch (e) {
       if (e instanceof ValidationError) {
-        return json({ fieldErrors: e.fieldErrors }, { status: 422 });
+        return validationError({ fieldErrors: e.fieldErrors });
       }
-      console.error({ error: e });
       throw e;
     }
 
@@ -70,7 +70,7 @@ export const actionBuilder =
 export class ValidationError<T> extends Error {
   constructor(
     public readonly fieldErrors: {
-      [P in allKeys<T>]?: string;
+      [P in allKeys<T>]: string;
     }
   ) {
     super();
@@ -124,19 +124,23 @@ type APIErrorField =
   | APIErrorField[]
   | { [key: string]: APIErrorField };
 
-type ErrorField = string | ErrorField[] | { [key: string]: ErrorField };
+type ErrorField = string;
 
 function deepMergeAPIErrors(
-  errors: Record<string, APIErrorField>
+  errors: Record<string, APIErrorField>,
+  contextKey = ""
 ): Record<string, ErrorField> {
   const result: Record<string, ErrorField> = {};
 
   for (const [key, value] of Object.entries(errors)) {
+    const newContextKey = contextKey ? `${contextKey}.${key}` : key;
+
     if (Array.isArray(value)) {
-      if (typeof value[0] === "string") result[key] = value.join(" ");
-      else result[key] = (value as any).map(deepMergeAPIErrors);
-    } else if (typeof value === "object") {
-      result[key] = deepMergeAPIErrors(value);
+      result[newContextKey] = value.join(", ");
+    } else if (typeof value === "string") {
+      result[newContextKey] = value;
+    } else {
+      Object.assign(result, deepMergeAPIErrors(value, newContextKey));
     }
   }
 

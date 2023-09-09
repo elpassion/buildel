@@ -7,12 +7,10 @@ import { schema } from "./schema";
 
 export async function action(actionArgs: ActionArgs) {
   return actionBuilder({
-    post: async (actionArgs, { fetch }) => {
+    post: async ({ request }, { fetch }) => {
       const validator = withZod(schema);
 
-      const result = await validator.validate(
-        await actionArgs.request.formData()
-      );
+      const result = await validator.validate(await request.formData());
 
       if (result.error) return validationError(result.error);
 
