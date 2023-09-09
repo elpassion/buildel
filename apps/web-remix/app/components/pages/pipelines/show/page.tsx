@@ -22,12 +22,13 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow";
-import { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useDebounce } from "usehooks-ts";
 import { action } from "./action";
 import { isEqual } from "lodash";
 import { RunPipelineProvider } from "./RunPipelineProvider";
-
+import { CustomNodeProps, CustomNode } from "./CustomNodes/CustomNode";
+import { PipelineSidebar } from "./PipelineSidebar/PipelineSidebar";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
 ];
@@ -49,6 +50,27 @@ export function ShowPipelinePage() {
     [pipeline.config]
   );
 
+  const PipelineNode = useCallback(
+    (props: CustomNodeProps) => (
+      <CustomNode
+        {...props}
+        // onUpdate={handleEditBlock}
+        // onDelete={handleDelete}
+      />
+    ),
+    []
+  );
+
+  const nodeTypes = useMemo(() => {
+    return blockTypes.reduce(
+      (acc, curr) => ({
+        ...acc,
+        [curr.type]: PipelineNode,
+      }),
+      {}
+    );
+  }, [PipelineNode, blockTypes]);
+
   useEffect(() => {
     // @ts-ignore
     const config = toPipelineConfig(debouncedState.nodes, debouncedState.edges);
@@ -59,17 +81,6 @@ export function ShowPipelinePage() {
     );
   }, [debouncedState]);
 
-  const nodeTypes = useMemo(() => {
-    return Object.keys(blockTypes).reduce(
-      (acc, curr) => ({
-        ...acc,
-        // [curr]: PipelineNode,
-      }),
-      {}
-    );
-    //}, [PipelineNode, blockTypes]);
-  }, [blockTypes]);
-
   return (
     <div className="h-screen w-full">
       <RunPipelineProvider pipeline={pipeline}>
@@ -78,6 +89,7 @@ export function ShowPipelinePage() {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
           isValidConnection={handleIsValidConnection}
           fitViewOptions={{
             minZoom: 0.5,
@@ -88,6 +100,8 @@ export function ShowPipelinePage() {
           <Background variant={BackgroundVariant.Lines} />
           <Controls />
         </ReactFlow>
+
+        <PipelineSidebar blockTypes={blockTypes} />
       </RunPipelineProvider>
     </div>
   );

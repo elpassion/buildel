@@ -21,7 +21,7 @@ export async function loader(args: LoaderArgs) {
       pipeline: pipeline.data,
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
-      blockTypes,
+      blockTypes: blockTypes.data.data,
     });
   })(args);
 }

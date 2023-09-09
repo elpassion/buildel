@@ -152,6 +152,9 @@ importers:
       '@tailwindcss/forms':
         specifier: ^0.5.4
         version: 0.5.4(tailwindcss@3.3.3)
+      classnames:
+        specifier: ^2.3.2
+        version: 2.3.2
       isbot:
         specifier: ^3.6.8
         version: 3.6.8

@@ -1,6 +1,13 @@
 import { cloneDeep } from "lodash";
 import { Connection } from "reactflow";
-import { IPipelineConfig, INode, IEdge } from "../list/contracts";
+import {
+  IPipelineConfig,
+  INode,
+  IEdge,
+  IField,
+  IBlock,
+  IHandle,
+} from "../list/contracts";
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
@@ -81,4 +88,42 @@ export function toPipelineConfig(
     blocks: tmpNodes.map((node) => ({ ...node.data, position: node.position })),
     version: "1",
   };
+}
+
+export function getBlockHandles(block: IBlock): IHandle[] {
+  const blockType = block.block_type;
+  return [
+    ...blockType.inputs
+      .filter((input) => !input.public)
+      .map((input) => ({
+        type: "target" as const,
+        id: input.name,
+        data: input,
+      })),
+    ...blockType.outputs
+      .filter((output) => !output.public)
+      .map((output) => ({
+        type: "source" as const,
+        id: output.name,
+        data: output,
+      })),
+  ];
+}
+
+export function getBlockFields(block: IBlock): IField[] {
+  const blockType = block.block_type;
+  return [
+    ...blockType.inputs
+      .filter((input) => input.public)
+      .map((input) => ({
+        type: "input" as const,
+        data: input,
+      })),
+    ...blockType.outputs
+      .filter((output) => output.public)
+      .map((output) => ({
+        type: "output" as const,
+        data: output,
+      })),
+  ];
 }
