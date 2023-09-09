@@ -12,6 +12,7 @@ import {
 } from "~/components/form/fields/text.field";
 import { FieldError } from "~/components/form/fields/field.error";
 import { action } from "./action";
+import { Button } from "@elpassion/taco";
 
 export function LoginPage() {
   const validator = React.useMemo(() => withZod(schema), []);
@@ -30,49 +31,48 @@ export function LoginPage() {
   }, [actionData]);
 
   return (
-    <div className="container flex h-screen">
-      <div className="my-auto flex w-full justify-center">
-        <ValidatedForm
-          validator={validator}
-          method="post"
-          noValidate
-          className="w-[80%]"
+    <div className="my-auto flex flex-col w-full justify-center items-center">
+      <h1 className="text-center text-3xl font-bold">Sign in to account</h1>
+      <p className="text-center">
+        Don't have an account?{" "}
+        <Link
+          to={{
+            pathname: "/register",
+            search: searchParams.toString(),
+          }}
+          className="text-primary-500"
         >
-          <Field name="global">
+          Sign up
+        </Link>{" "}
+        for an account now.
+      </p>
+
+      <ValidatedForm
+        validator={validator}
+        method="post"
+        noValidate
+        className="w-full max-w-md"
+      >
+        <Field name="global">
+          <FieldError />
+        </Field>
+        <div className="form-control w-full">
+          <Field name="user.email">
+            <FieldLabel>Email address</FieldLabel>
+            <TextInputField ref={emailRef} type="email" autoFocus />
             <FieldError />
           </Field>
-          <div className="form-control w-full">
-            <Field name="user.email">
-              <FieldLabel>Email address</FieldLabel>
-              <TextInputField ref={emailRef} type="email" autoFocus />
-              <FieldError />
-            </Field>
-          </div>
-          <div className="max-w-s form-control w-full">
-            <Field name="user.password">
-              <FieldLabel>Password</FieldLabel>
-              <PasswordInputField ref={passwordRef} />
-              <FieldError />
-            </Field>
-          </div>
-          <input type="hidden" name="redirectTo" value={redirectTo} />
-          <button type="submit" className="btn btn-block mt-6">
-            Log in
-          </button>
-          <div className="mt-4">
-            Don't have an account?{" "}
-            <Link
-              className="link link-primary"
-              to={{
-                pathname: "/register",
-                search: searchParams.toString(),
-              }}
-            >
-              Register
-            </Link>
-          </div>
-        </ValidatedForm>
-      </div>
+        </div>
+        <div className="max-w-s form-control w-full">
+          <Field name="user.password">
+            <FieldLabel>Password</FieldLabel>
+            <PasswordInputField ref={passwordRef} />
+            <FieldError />
+          </Field>
+        </div>
+        <input type="hidden" name="redirectTo" value={redirectTo} />
+        <Button type="submit" text="Log in" isFluid />
+      </ValidatedForm>
     </div>
   );
 }

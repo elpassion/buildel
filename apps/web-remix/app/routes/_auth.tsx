@@ -22,10 +22,11 @@ export default function Layout() {
   const { error } = useLoaderData<typeof loader>();
 
   return (
-    <div>
+    <main className="w-full min-h-screen flex justify-center items-center bg-neutral-50 p-2">
       {error && <div>{error}</div>}
-      LOGIN
-      <Outlet />
-    </div>
+      <div className="w-full max-w-xl px-6 py-8 bg-white rounded-xl">
+        <Outlet />
+      </div>
+    </main>
   );
 }
