@@ -38,15 +38,18 @@ export function LoginPage() {
           noValidate
           className="w-[80%]"
         >
+          <Field name="global">
+            <FieldError />
+          </Field>
           <div className="form-control w-full">
-            <Field name="email">
+            <Field name="user.email">
               <FieldLabel>Email address</FieldLabel>
               <TextInputField ref={emailRef} type="email" autoFocus />
               <FieldError />
             </Field>
           </div>
           <div className="max-w-s form-control w-full">
-            <Field name="password">
+            <Field name="user.password">
               <FieldLabel>Password</FieldLabel>
               <PasswordInputField ref={passwordRef} />
               <FieldError />

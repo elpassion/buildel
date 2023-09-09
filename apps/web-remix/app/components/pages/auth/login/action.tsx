@@ -18,7 +18,7 @@ export async function action(actionArgs: ActionArgs) {
 
       const response = await fetch(z.any(), "/users/log_in", {
         method: "POST",
-        body: JSON.stringify({ user: result.data }),
+        body: JSON.stringify(result.data),
       });
 
       return redirect("/", {

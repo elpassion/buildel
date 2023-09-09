@@ -12,13 +12,11 @@ export async function action(actionArgs: ActionArgs) {
       const validator = withZod(schema);
       invariant(params.organizationId, "organizationId not found");
 
-      const result = await validator.validate(
-        await actionArgs.request.formData()
-      );
+      const result = await validator.validate(await request.formData());
 
       if (result.error) return validationError(result.error);
 
-      const pipeline = await fetch(
+      const { data } = await fetch(
         PipelineResponse,
         `/organizations/${params.organizationId}/pipelines`,
         {
@@ -29,9 +27,7 @@ export async function action(actionArgs: ActionArgs) {
         }
       );
 
-      return redirect(
-        `/${params.organizationId}/pipelines/${pipeline.data.id}`
-      );
+      return redirect(`/${params.organizationId}/pipelines/${data.id}`);
     },
   })(actionArgs);
 }

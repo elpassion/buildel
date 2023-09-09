@@ -57,9 +57,9 @@ export const actionBuilder =
             : notFound();
       }
     } catch (e) {
-      // if (e instanceof ValidationError) {
-      //   return json({ errors: e.fieldErrors }, { status: 400 });
-      // }
+      if (e instanceof ValidationError) {
+        return json({ fieldErrors: e.fieldErrors }, { status: 422 });
+      }
       console.error({ error: e });
       throw e;
     }
@@ -70,7 +70,7 @@ export const actionBuilder =
 export class ValidationError<T> extends Error {
   constructor(
     public readonly fieldErrors: {
-      [P in allKeys<T>]?: string[];
+      [P in allKeys<T>]?: string;
     }
   ) {
     super();
@@ -91,18 +91,17 @@ export async function fetchTyped<T extends ZodType>(
   if (!response.ok) {
     if (response.status === 422) {
       const jsonResponse = await response.json();
-      console.log("response", jsonResponse);
+      throw new ValidationError(deepMergeAPIErrors(jsonResponse.errors));
+    } else if (response.status === 401) {
+      throw redirect("/login");
     }
-
-    // TODO: HANDLE ERRORS
-    throw redirect("/login");
   }
 
   const jsonResponse = await response.json();
 
   const data = schema.parse(jsonResponse);
 
-  return Object.assign(response, { data });
+  return Object.assign(response, { data, error: null });
 }
 
 function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {
@@ -118,4 +117,28 @@ function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {
       })
     );
   };
+}
+
+type APIErrorField =
+  | string[]
+  | APIErrorField[]
+  | { [key: string]: APIErrorField };
+
+type ErrorField = string | ErrorField[] | { [key: string]: ErrorField };
+
+function deepMergeAPIErrors(
+  errors: Record<string, APIErrorField>
+): Record<string, ErrorField> {
+  const result: Record<string, ErrorField> = {};
+
+  for (const [key, value] of Object.entries(errors)) {
+    if (Array.isArray(value)) {
+      if (typeof value[0] === "string") result[key] = value.join(" ");
+      else result[key] = (value as any).map(deepMergeAPIErrors);
+    } else if (typeof value === "object") {
+      result[key] = deepMergeAPIErrors(value);
+    }
+  }
+
+  return result;
 }
