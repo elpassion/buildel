@@ -1,4 +1,4 @@
-import { ActionArgs, redirect } from "@remix-run/node";
+import { ActionArgs } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
 import invariant from "tiny-invariant";
@@ -20,18 +20,21 @@ export async function action(actionArgs: ActionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      await fetch(
+      const res = await fetch(
         PipelineResponse,
         `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`,
         {
           method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             pipeline: result.data,
           }),
         }
       );
 
-      return {};
+      return res.data;
     },
   })(actionArgs);
 }

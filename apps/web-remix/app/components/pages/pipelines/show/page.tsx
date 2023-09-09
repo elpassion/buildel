@@ -13,8 +13,7 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
 } from "reactflow";
-import { LinksFunction, V2_MetaFunction } from "@remix-run/node";
-
+import type { LinksFunction, V2_MetaFunction } from "@remix-run/node";
 import flowStyles from "reactflow/dist/style.css";
 import {
   getEdges,
@@ -22,19 +21,27 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow";
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDebounce } from "usehooks-ts";
-import { action } from "./action";
 import { isEqual } from "lodash";
 import { RunPipelineProvider } from "./RunPipelineProvider";
-import { CustomNodeProps, CustomNode } from "./CustomNodes/CustomNode";
+import type { CustomNodeProps } from "./CustomNodes/CustomNode";
+import { CustomNode } from "./CustomNodes/CustomNode";
 import { PipelineSidebar } from "./PipelineSidebar/PipelineSidebar";
+import { useDraggableNodes } from "./PipelineSidebar/useDraggableNodes";
+import type {
+  IBlockConfig,
+  IPipelineConfig,
+  IPipeline,
+} from "~/components/pages/pipelines/list/contracts";
+import { assert } from "./usePipelineRun";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
 ];
 
 export function ShowPipelinePage() {
-  const fetcher = useFetcher<typeof action>();
+  const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
+  const fetcher = useFetcher<IPipeline>();
   const { pipeline, blockTypes } = useLoaderData<typeof loader>();
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config)
@@ -48,6 +55,32 @@ export function ShowPipelinePage() {
   const handleIsValidConnection = useCallback(
     (connection: Connection) => isValidConnection(pipeline.config, connection),
     [pipeline.config]
+  );
+
+  const handleUpdate = useCallback(
+    (config: IPipelineConfig) => {
+      fetcher.submit(
+        { ...pipeline, config: { ...config } },
+        { method: "PUT", encType: "application/json", replace: true }
+      );
+    },
+    [fetcher, pipeline]
+  );
+
+  const onBlockCreate = useCallback(
+    async (created: IBlockConfig) => {
+      assert(pipeline);
+
+      const sameBlockTypes = getAllBlockTypes(pipeline, created.type);
+      const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
+      const name = `${created.type.toLowerCase()}_${nameNum}`;
+
+      handleUpdate({
+        version: pipeline.config.version,
+        blocks: [...pipeline.config.blocks, { ...created, name }],
+      });
+    },
+    [pipeline, handleUpdate]
   );
 
   const PipelineNode = useCallback(
@@ -75,14 +108,27 @@ export function ShowPipelinePage() {
     // @ts-ignore
     const config = toPipelineConfig(debouncedState.nodes, debouncedState.edges);
     if (isEqual(config, pipeline.config)) return;
-    fetcher.submit(
-      { ...pipeline, config: { ...config } },
-      { method: "PUT", encType: "application/json", replace: true }
-    );
+
+    handleUpdate(config);
   }, [debouncedState]);
 
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data !== null) {
+      const updatedConfig = fetcher.data;
+      if (!updatedConfig) return;
+
+      setNodes(getNodes(updatedConfig.config));
+      setEdges(getEdges(updatedConfig.config));
+    }
+  }, [fetcher]);
+
+  const { onDragOver, onDrop, onInit } = useDraggableNodes({
+    wrapper: reactFlowWrapper,
+    onDrop: onBlockCreate,
+  });
+
   return (
-    <div className="h-screen w-full">
+    <div className="h-screen w-full" ref={reactFlowWrapper}>
       <RunPipelineProvider pipeline={pipeline}>
         <ReactFlow
           nodes={nodes}
@@ -90,6 +136,9 @@ export function ShowPipelinePage() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
+          onInit={onInit}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
           isValidConnection={handleIsValidConnection}
           fitViewOptions={{
             minZoom: 0.5,
@@ -114,3 +163,16 @@ export const meta: V2_MetaFunction = () => {
     },
   ];
 };
+
+function getAllBlockTypes(pipeline: IPipeline, type: string): IBlockConfig[] {
+  return pipeline.config.blocks.filter((block) => block.type === type);
+}
+
+function getLastBlockNumber(blocks: IBlockConfig[]) {
+  const nrs = blocks
+    .map((block) => block.name.split("_"))
+    .map((part) => Number.parseInt(part[part.length - 1]))
+    .filter((n) => !isNaN(n));
+
+  return Math.max(...nrs, 0);
+}

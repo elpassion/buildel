@@ -25,7 +25,7 @@ export const BlockConfig = z.object({
   inputs: z.array(z.string()),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
-  block_type: BlockType,
+  block_type: BlockType.optional(),
 });
 
 export interface IPipelineConfig {
