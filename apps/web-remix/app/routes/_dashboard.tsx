@@ -11,9 +11,9 @@ export default function Layout() {
       >
         TEST
       </ResponsiveSidebar>
-      <div className="col-span-2 flex min-h-screen flex-col overflow-x-auto md:col-auto">
+      <main className="col-span-2 flex min-h-screen flex-col overflow-x-auto md:col-auto">
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 }

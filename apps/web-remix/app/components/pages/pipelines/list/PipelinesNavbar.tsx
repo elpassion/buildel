@@ -3,7 +3,11 @@ import { Icon, Navbar } from "@elpassion/taco";
 
 export const PipelinesNavbar = () => {
   return (
-    <Navbar menuClassName="md:hidden" leftContent={<LeftContent />}>
+    <Navbar
+      menuClassName="md:hidden"
+      className="border border-b-neutral-100"
+      leftContent={<LeftContent />}
+    >
       <Content />
     </Navbar>
   );
