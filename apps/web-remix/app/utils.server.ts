@@ -2,6 +2,13 @@ import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { merge } from "lodash";
 import { validationError } from "remix-validated-form";
 import { ZodType, z } from "zod";
+import { commitSession, getRemixSession } from "./session.server";
+import {
+  UnauthorizedError,
+  UnknownAPIError,
+  ValidationError,
+} from "./utils/errors.server";
+import { fetchTyped } from "./utils/fetch.server";
 
 export const loaderBuilder =
   <T>(fn: (args: LoaderArgs, helpers: { fetch: typeof fetchTyped }) => T) =>
@@ -60,49 +67,26 @@ export const actionBuilder =
     } catch (e) {
       if (e instanceof ValidationError) {
         return validationError({ fieldErrors: e.fieldErrors });
+      } else if (e instanceof UnauthorizedError) {
+        redirect("/login");
+      } else if (e instanceof UnknownAPIError) {
+        const session = await getRemixSession(
+          actionArgs.request.headers.get("Cookie")!
+        );
+        session.flash("error", "Unknown API error");
+        return json(
+          { error: "Unknown API error" },
+          {
+            status: 500,
+            headers: { "Set-Cookie": await commitSession(session) },
+          }
+        );
       }
       throw e;
     }
 
     return notFound();
   };
-
-export class ValidationError<T> extends Error {
-  constructor(
-    public readonly fieldErrors: {
-      [P in allKeys<T>]: string;
-    }
-  ) {
-    super();
-  }
-}
-
-declare type allKeys<T> = T extends any ? keyof T : never;
-
-type ParsedResponse<T> = Response & { data: T };
-
-export async function fetchTyped<T extends ZodType>(
-  schema: T,
-  url: string,
-  options?: RequestInit | undefined
-): Promise<ParsedResponse<z.infer<T>>> {
-  const response = await fetch(url, options);
-
-  if (!response.ok) {
-    if (response.status === 422) {
-      const jsonResponse = await response.json();
-      throw new ValidationError(deepMergeAPIErrors(jsonResponse.errors));
-    } else if (response.status === 401) {
-      throw redirect("/login");
-    }
-  }
-
-  const jsonResponse = await response.json();
-
-  const data = schema.parse(jsonResponse);
-
-  return Object.assign(response, { data, error: null });
-}
 
 function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {
   return (schema, url, options) => {
@@ -117,32 +101,4 @@ function requestFetchTyped(actionArgs: ActionArgs): typeof fetchTyped {
       })
     );
   };
-}
-
-type APIErrorField =
-  | string[]
-  | APIErrorField[]
-  | { [key: string]: APIErrorField };
-
-type ErrorField = string;
-
-function deepMergeAPIErrors(
-  errors: Record<string, APIErrorField>,
-  contextKey = ""
-): Record<string, ErrorField> {
-  const result: Record<string, ErrorField> = {};
-
-  for (const [key, value] of Object.entries(errors)) {
-    const newContextKey = contextKey ? `${contextKey}.${key}` : key;
-
-    if (Array.isArray(value)) {
-      result[newContextKey] = value.join(", ");
-    } else if (typeof value === "string") {
-      result[newContextKey] = value;
-    } else {
-      Object.assign(result, deepMergeAPIErrors(value, newContextKey));
-    }
-  }
-
-  return result;
 }

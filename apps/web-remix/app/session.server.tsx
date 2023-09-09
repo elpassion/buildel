@@ -1,4 +1,24 @@
-import { redirect } from "@remix-run/node";
+import { redirect, createCookieSessionStorage } from "@remix-run/node";
+
+type SessionData = {
+  userId: string;
+};
+
+type SessionFlashData = {
+  error: string;
+};
+
+const {
+  getSession: getRemixSession,
+  commitSession,
+  destroySession,
+} = createCookieSessionStorage<SessionData, SessionFlashData>({
+  cookie: {
+    name: "__session",
+  },
+});
+
+export { getRemixSession, commitSession, destroySession };
 
 export function requireLogin(request: Request) {
   const userId = getSession(request);
