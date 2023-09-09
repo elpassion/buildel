@@ -3,7 +3,9 @@ import { LoaderArgs, json } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
+import Modal from "react-modal";
 
+Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
   return loaderBuilder(async ({ request }) => {
     const { cookie, error } = await getToastError(request);
@@ -21,7 +23,7 @@ export async function loader(loaderArgs: LoaderArgs) {
 
 export default function Layout() {
   return (
-    <div className="grid h-screen grid-cols-[auto_1fr]">
+    <div id="_root" className="grid h-screen grid-cols-[auto_1fr]">
       <ResponsiveSidebar
         sidebarClassName="sticky top-0 bg-white border-r border-gray-200"
         collapseBtnClassName="absolute top-11 -right-2"

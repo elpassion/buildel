@@ -23,9 +23,7 @@ export function PipelinesPage() {
 
       <Modal
         isOpen={isModalOpened}
-        closeModal={() => {
-          navigate(`/${organizationId}/pipelines`);
-        }}
+        closeModal={() => navigate(`/${organizationId}/pipelines`)}
       >
         <Outlet />
       </Modal>
