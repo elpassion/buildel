@@ -3,7 +3,7 @@ import React, { DragEvent, useMemo } from "react";
 import { useRunPipeline } from "../RunPipelineProvider";
 import classNames from "classnames";
 import { assert } from "../usePipelineRun";
-import { IBlockTypes } from "~/components/pages/pipelines/list/contracts";
+import { IBlockTypes } from "../../list/contracts";
 
 interface PipelineSidebarProps {
   blockTypes: IBlockTypes;
@@ -42,7 +42,7 @@ export const PipelineSidebar: React.FC<PipelineSidebarProps> = ({
   }, [blockTypes, runStatus]);
 
   return (
-    <aside className="absolute bottom-3 right-3 top-14 flex flex-col gap-2 rounded bg-neutral-300 p-2">
+    <aside className="absolute bottom-6 right-4 top-20 flex flex-col gap-2 rounded bg-neutral-300 p-2">
       {draggableNodes}
     </aside>
   );

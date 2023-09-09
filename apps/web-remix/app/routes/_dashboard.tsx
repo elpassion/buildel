@@ -1,4 +1,4 @@
-import { Navbar, ResponsiveSidebar } from "@elpassion/taco";
+import { ResponsiveSidebar } from "@elpassion/taco";
 import { Outlet } from "@remix-run/react";
 
 export default function Layout() {
@@ -12,7 +12,6 @@ export default function Layout() {
         TEST
       </ResponsiveSidebar>
       <div className="col-span-2 flex min-h-screen flex-col overflow-x-auto md:col-auto">
-        <Navbar />
         <Outlet />
       </div>
     </div>

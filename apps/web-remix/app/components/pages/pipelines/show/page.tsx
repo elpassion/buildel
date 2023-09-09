@@ -38,6 +38,7 @@ import type {
   IEdge,
 } from "~/components/pages/pipelines/list/contracts";
 import { assert } from "./usePipelineRun";
+import { PipelineNavbar } from "~/components/pages/pipelines/show/PipelineNavbar";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
 ];
@@ -141,32 +142,35 @@ export function ShowPipelinePage() {
   });
 
   return (
-    <div className="h-screen w-full" ref={reactFlowWrapper}>
-      <RunPipelineProvider pipeline={pipeline}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          nodeTypes={nodeTypes}
-          onInit={onInit}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          isValidConnection={handleIsValidConnection}
-          fitViewOptions={{
-            minZoom: 0.5,
-            maxZoom: 1,
-          }}
-          fitView
-        >
-          <Background variant={BackgroundVariant.Lines} />
-          <Controls />
-        </ReactFlow>
+    <>
+      <PipelineNavbar name={pipeline.name} />
+      <div className="h-[calc(100vh_-_65px)] w-full" ref={reactFlowWrapper}>
+        <RunPipelineProvider pipeline={pipeline}>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            nodeTypes={nodeTypes}
+            onInit={onInit}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            isValidConnection={handleIsValidConnection}
+            fitViewOptions={{
+              minZoom: 0.5,
+              maxZoom: 1,
+            }}
+            fitView
+          >
+            <Background variant={BackgroundVariant.Lines} />
+            <Controls />
+          </ReactFlow>
 
-        <PipelineSidebar blockTypes={blockTypes} />
-      </RunPipelineProvider>
-    </div>
+          <PipelineSidebar blockTypes={blockTypes} />
+        </RunPipelineProvider>
+      </div>
+    </>
   );
 }
 

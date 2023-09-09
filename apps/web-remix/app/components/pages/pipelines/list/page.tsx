@@ -8,6 +8,7 @@ import {
 } from "@remix-run/react";
 import { loader } from "./loader";
 import { Modal } from "@elpassion/taco/Modal";
+import { PipelinesNavbar } from "./PipelinesNavbar";
 
 export function PipelinesPage() {
   const { pipelines, organizationId } = useLoaderData<typeof loader>();
@@ -16,7 +17,9 @@ export function PipelinesPage() {
   const isModalOpened = !!match;
 
   return (
-    <div>
+    <>
+      <PipelinesNavbar />
+
       <Modal
         isOpen={isModalOpened}
         closeModal={() => {
@@ -25,6 +28,7 @@ export function PipelinesPage() {
       >
         <Outlet />
       </Modal>
+
       <Link to={`/${organizationId}/pipelines/new`}>New Pipeline</Link>
 
       {pipelines.data.map((pipeline) => (
@@ -34,7 +38,7 @@ export function PipelinesPage() {
           </Link>
         </div>
       ))}
-    </div>
+    </>
   );
 }
 
