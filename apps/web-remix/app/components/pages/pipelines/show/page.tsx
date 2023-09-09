@@ -59,6 +59,12 @@ export function ShowPipelinePage() {
     [pipeline.config]
   );
 
+  const handleDelete = useCallback(
+    (node: IBlockConfig) =>
+      setNodes((nds) => nds.filter((nd) => nd.id !== node.name)),
+    [setNodes]
+  );
+
   const handleUpdate = useCallback(
     (config: IPipelineConfig) => {
       fetcher.submit(
@@ -90,10 +96,10 @@ export function ShowPipelinePage() {
       <CustomNode
         {...props}
         // onUpdate={handleEditBlock}
-        // onDelete={handleDelete}
+        onDelete={handleDelete}
       />
     ),
-    []
+    [handleDelete]
   );
 
   const nodeTypes = useMemo(() => {
