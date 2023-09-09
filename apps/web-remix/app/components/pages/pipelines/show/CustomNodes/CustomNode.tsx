@@ -5,6 +5,7 @@ import { getBlockFields, getBlockHandles } from "../PipelineFlow.utils";
 import { IBlockConfig } from "../../list/contracts";
 import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
 import { InputHandle, OutputHandle } from "./NodeHandles";
+import { NodeFieldsForm, NodeFieldsOutput } from "./NodeFields";
 import classNames from "classnames";
 
 export interface CustomNodeProps {
@@ -102,13 +103,13 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
       </header>
 
       <div className="nodrag p-2">
-        {/*{inputsFields.length > 0 ? (*/}
-        {/*  <NodeFieldsForm block={data} fields={inputsFields} />*/}
-        {/*) : null}*/}
+        {inputsFields.length > 0 ? (
+          <NodeFieldsForm block={data} fields={inputsFields} />
+        ) : null}
 
-        {/*{outputFields.length > 0 ? (*/}
-        {/*  <NodeFieldsOutput fields={outputFields} block={data} />*/}
-        {/*) : null}*/}
+        {outputFields.length > 0 ? (
+          <NodeFieldsOutput fields={outputFields} block={data} />
+        ) : null}
 
         {inputsHandles.map((handle, index) => (
           <InputHandle key={handle.id} handle={handle} index={index} />
