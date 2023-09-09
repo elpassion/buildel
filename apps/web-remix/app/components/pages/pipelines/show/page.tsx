@@ -20,7 +20,7 @@ import {
   getNodes,
   isValidConnection,
   toPipelineConfig,
-} from "./PipelineFlow";
+} from "./PipelineFlow.utils";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useDebounce } from "usehooks-ts";
 import { isEqual } from "lodash";

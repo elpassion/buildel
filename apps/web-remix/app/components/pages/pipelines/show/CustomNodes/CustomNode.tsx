@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { startCase } from "lodash";
 import { Badge, Icon, IconButton } from "@elpassion/taco";
-import { getBlockFields, getBlockHandles } from "../PipelineFlow";
+import { getBlockFields, getBlockHandles } from "../PipelineFlow.utils";
 import { IBlockConfig } from "../../list/contracts";
 import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
 import { InputHandle, OutputHandle } from "./NodeHandles";
