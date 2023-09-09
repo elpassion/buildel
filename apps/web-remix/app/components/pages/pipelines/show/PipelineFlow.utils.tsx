@@ -7,6 +7,8 @@ import {
   IField,
   IBlock,
   IHandle,
+  IPipeline,
+  IBlockConfig,
 } from "../list/contracts";
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
@@ -126,4 +128,20 @@ export function getBlockFields(block: IBlock): IField[] {
         data: output,
       })),
   ];
+}
+
+export function getAllBlockTypes(
+  pipeline: IPipeline,
+  type: string
+): IBlockConfig[] {
+  return pipeline.config.blocks.filter((block) => block.type === type);
+}
+
+export function getLastBlockNumber(blocks: IBlockConfig[]) {
+  const nrs = blocks
+    .map((block) => block.name.split("_"))
+    .map((part) => Number.parseInt(part[part.length - 1]))
+    .filter((n) => !isNaN(n));
+
+  return Math.max(...nrs, 0);
 }

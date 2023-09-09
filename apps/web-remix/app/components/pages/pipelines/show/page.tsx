@@ -16,7 +16,9 @@ import ReactFlow, {
 import type { LinksFunction, V2_MetaFunction } from "@remix-run/node";
 import flowStyles from "reactflow/dist/style.css";
 import {
+  getAllBlockTypes,
   getEdges,
+  getLastBlockNumber,
   getNodes,
   isValidConnection,
   toPipelineConfig,
@@ -163,16 +165,3 @@ export const meta: V2_MetaFunction = () => {
     },
   ];
 };
-
-function getAllBlockTypes(pipeline: IPipeline, type: string): IBlockConfig[] {
-  return pipeline.config.blocks.filter((block) => block.type === type);
-}
-
-function getLastBlockNumber(blocks: IBlockConfig[]) {
-  const nrs = blocks
-    .map((block) => block.name.split("_"))
-    .map((part) => Number.parseInt(part[part.length - 1]))
-    .filter((n) => !isNaN(n));
-
-  return Math.max(...nrs, 0);
-}
