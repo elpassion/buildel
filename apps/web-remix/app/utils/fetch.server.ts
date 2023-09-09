@@ -1,5 +1,6 @@
 import { ZodType, z } from "zod";
 import {
+  NotFoundError,
   UnauthorizedError,
   UnknownAPIError,
   ValidationError,
@@ -20,6 +21,8 @@ export async function fetchTyped<T extends ZodType>(
       throw new ValidationError(deepMergeAPIErrors(jsonResponse.errors));
     } else if (response.status === 401) {
       throw new UnauthorizedError();
+    } else if (response.status === 404) {
+      throw new NotFoundError();
     } else {
       throw new UnknownAPIError();
     }

@@ -20,4 +20,10 @@ export class UnauthorizedError extends Error {
   }
 }
 
+export class NotFoundError extends Error {
+  constructor() {
+    super("Not found");
+  }
+}
+
 type allKeys<T> = T extends any ? keyof T : never;

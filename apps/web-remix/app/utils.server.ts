@@ -2,6 +2,7 @@ import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { merge } from "lodash";
 import { validationError } from "remix-validated-form";
 import {
+  NotFoundError,
   UnauthorizedError,
   UnknownAPIError,
   ValidationError,
@@ -13,6 +14,7 @@ import { getSession } from "./session.server";
 export const loaderBuilder =
   <T>(fn: (args: LoaderArgs, helpers: { fetch: typeof fetchTyped }) => T) =>
   async (args: LoaderArgs) => {
+    const notFound = () => json(null, { status: 404 });
     try {
       return await fn(args, { fetch: await requestFetchTyped(args) });
     } catch (e) {
@@ -29,6 +31,8 @@ export const loaderBuilder =
             },
           }
         );
+      } else if (e instanceof NotFoundError) {
+        throw notFound();
       } else if (e instanceof UnauthorizedError) {
         throw redirect("/login");
       }
@@ -89,7 +93,9 @@ export const actionBuilder =
       if (e instanceof ValidationError) {
         return validationError({ fieldErrors: e.fieldErrors });
       } else if (e instanceof UnauthorizedError) {
-        redirect("/login");
+        throw redirect("/login");
+      } else if (e instanceof NotFoundError) {
+        throw notFound();
       } else if (e instanceof UnknownAPIError) {
         return json(
           { error: "Unknown API error" },
