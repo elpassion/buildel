@@ -35,6 +35,7 @@ import type {
   IBlockConfig,
   IPipelineConfig,
   IPipeline,
+  IEdge,
 } from "~/components/pages/pipelines/list/contracts";
 import { assert } from "./usePipelineRun";
 export const links: LinksFunction = () => [
@@ -91,6 +92,10 @@ export function ShowPipelinePage() {
     [pipeline, handleUpdate]
   );
 
+  const onConnect = useCallback((params: Connection) => {
+    setEdges((eds) => addEdge(params, eds) as IEdge[]);
+  }, []);
+
   const PipelineNode = useCallback(
     (props: CustomNodeProps) => (
       <CustomNode
@@ -143,6 +148,7 @@ export function ShowPipelinePage() {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
           nodeTypes={nodeTypes}
           onInit={onInit}
           onDrop={onDrop}
