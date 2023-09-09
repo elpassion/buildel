@@ -57,7 +57,6 @@ defmodule BuildelWeb.Router do
       only: [:index, :delete, :create, :show, :update]
     )
 
-    resources("/pipelines", PipelineController, only: [:index, :create, :show, :update, :delete])
     resources("/runs", RunController, only: [:index, :create, :show])
 
     put("/runs/:id/start", RunController, :start)
