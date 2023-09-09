@@ -59,11 +59,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :chroma,
-  host: "http://localhost:8000",
-  api_base: "api",
-  api_version: "v1"
-
 config :tesla, adapter: Tesla.Adapter.Hackney
 
 # Import environment specific config. This must remain at the bottom

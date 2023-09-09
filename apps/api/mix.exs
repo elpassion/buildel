@@ -60,10 +60,9 @@ defmodule Buildel.MixProject do
       {:essence, "~> 0.3.0"},
       {:httpoison, "~> 2.0"},
       {:mox, "~> 1.0"},
-      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:mix_test_watch, "~> 1.0", only: [:test], runtime: false},
       {:cors_plug, "~> 3.0"},
       {:ex_json_schema, "~> 0.10.1"},
-      {:chroma, "~> 0.1.2"},
       {:uuid, "~> 1.1"},
       {:qdrant, "~> 0.0.8"},
       {:goal, "~> 0.3"}
