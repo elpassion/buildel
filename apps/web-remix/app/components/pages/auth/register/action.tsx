@@ -21,7 +21,6 @@ export async function action(actionArgs: ActionArgs) {
           method: "POST",
           body: JSON.stringify({ user: result.data }),
         });
-        console.log(response.headers);
         return redirect("/", {
           headers: { "Set-Cookie": response.headers.get("Set-Cookie")! },
         });

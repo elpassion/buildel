@@ -57,9 +57,10 @@ export const actionBuilder =
             : notFound();
       }
     } catch (e) {
-      if (e instanceof ValidationError) {
-        return json({ errors: e.fieldErrors }, { status: 400 });
-      }
+      // if (e instanceof ValidationError) {
+      //   return json({ errors: e.fieldErrors }, { status: 400 });
+      // }
+      console.error({ error: e });
       throw e;
     }
 
@@ -88,6 +89,11 @@ export async function fetchTyped<T extends ZodType>(
   const response = await fetch(url, options);
 
   if (!response.ok) {
+    if (response.status === 422) {
+      const jsonResponse = await response.json();
+      console.log("response", jsonResponse);
+    }
+
     // TODO: HANDLE ERRORS
     throw redirect("/login");
   }

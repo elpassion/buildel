@@ -16,17 +16,14 @@ export async function action(actionArgs: ActionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      try {
-        const response = await fetch(z.any(), "/users/log_in", {
-          method: "POST",
-          body: JSON.stringify({ user: result.data }),
-        });
-        return redirect("/", {
-          headers: { "Set-Cookie": response.headers.get("Set-Cookie")! },
-        });
-      } catch (error) {
-        return json({ errors: { email: "dupa" } }, { status: 401 });
-      }
+      const response = await fetch(z.any(), "/users/log_in", {
+        method: "POST",
+        body: JSON.stringify({ user: result.data }),
+      });
+
+      return redirect("/", {
+        headers: { "Set-Cookie": response.headers.get("Set-Cookie")! },
+      });
     },
   })(actionArgs);
 }

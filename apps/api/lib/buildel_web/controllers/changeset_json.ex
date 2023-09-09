@@ -1,6 +1,6 @@
 defmodule BuildelWeb.ChangesetJSON do
   def error(%{changeset: changeset}) do
-    %{errors: Ecto.Changeset.traverse_errors(changeset, &translate_error/1)}
+    %{errors: Goal.Changeset.traverse_errors(changeset, &translate_error/1)}
   end
 
   defp translate_error({msg, opts}) do

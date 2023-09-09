@@ -11,21 +11,22 @@ import {
   TextInputField,
 } from "~/components/form/fields/text.field";
 import { FieldError } from "~/components/form/fields/field.error";
+import { action } from "./action";
 
 export function LoginPage() {
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/stories";
-  const actionData = useActionData();
+  const actionData = useActionData<typeof action>();
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (actionData?.errors.email) {
-      emailRef.current?.focus();
-    } else if (actionData?.errors.password) {
-      passwordRef.current?.focus();
-    }
+    // if (actionData?) {
+    // emailRef.current?.focus();
+    // } else if (actionData?.errors.password) {
+    // passwordRef.current?.focus();
+    // }
   }, [actionData]);
 
   return (
