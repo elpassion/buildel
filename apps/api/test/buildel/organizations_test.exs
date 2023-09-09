@@ -2,6 +2,7 @@ defmodule Buildel.OrganizationsTest do
   use Buildel.DataCase
 
   alias Buildel.Organizations
+  alias Buildel.Accounts
 
   describe "organizations" do
     alias Buildel.Organizations.Organization
@@ -14,9 +15,13 @@ defmodule Buildel.OrganizationsTest do
     test "list_user_organizations/1 returns all organizations a user is member of" do
       _organization = organization_fixture()
       membership = membership_fixture()
-      user_organization = membership |> Map.get(:organization_id) |> Organizations.get_organization!
+
+      user_organization =
+        membership |> Map.get(:organization_id) |> Organizations.get_organization!()
+
       user_id = membership |> Map.get(:user_id)
-      assert Organizations.list_user_organizations(user_id) == [user_organization]
+      user = user_id |> Accounts.get_user!()
+      assert Organizations.list_user_organizations(user) == [user_organization]
     end
 
     test "get_organization!/1 returns the organization with given id" do
@@ -28,7 +33,9 @@ defmodule Buildel.OrganizationsTest do
       user = user_fixture()
       valid_attrs = %{name: "some name", user_id: user.id}
 
-      assert {:ok, %Organization{} = organization} = Organizations.create_organization(valid_attrs)
+      assert {:ok, %Organization{} = organization} =
+               Organizations.create_organization(valid_attrs)
+
       assert organization.name == "some name"
     end
 
@@ -40,13 +47,18 @@ defmodule Buildel.OrganizationsTest do
       organization = organization_fixture()
       update_attrs = %{name: "some updated name"}
 
-      assert {:ok, %Organization{} = organization} = Organizations.update_organization(organization, update_attrs)
+      assert {:ok, %Organization{} = organization} =
+               Organizations.update_organization(organization, update_attrs)
+
       assert organization.name == "some updated name"
     end
 
     test "update_organization/2 with invalid data returns error changeset" do
       organization = organization_fixture()
-      assert {:error, %Ecto.Changeset{}} = Organizations.update_organization(organization, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Organizations.update_organization(organization, @invalid_attrs)
+
       assert organization == Organizations.get_organization!(organization.id)
     end
 
@@ -79,7 +91,11 @@ defmodule Buildel.OrganizationsTest do
 
     test "list_organization_members/1 returns all organization members" do
       membership = membership_fixture()
-      assert (membership |> Map.get(:user)) in Organizations.list_organization_members(membership |> Map.get(:organization_id))
+
+      assert (membership |> Map.get(:user)) in Organizations.list_organization_members(
+               membership
+               |> Map.get(:organization_id)
+             )
     end
 
     test "get_membership!/1 returns the membership with given id" do
@@ -102,15 +118,20 @@ defmodule Buildel.OrganizationsTest do
     test "update_membership/2 with valid data updates the membership" do
       membership = membership_fixture()
       another_organization = organization_fixture()
-      update_attrs = %{ organization_id: another_organization.id }
+      update_attrs = %{organization_id: another_organization.id}
 
-      assert {:ok, %Membership{} = membership} = Organizations.update_membership(membership, update_attrs)
+      assert {:ok, %Membership{} = membership} =
+               Organizations.update_membership(membership, update_attrs)
+
       assert membership.organization_id == update_attrs.organization_id
     end
 
     test "update_membership/2 with invalid data returns error changeset" do
       membership = membership_fixture()
-      assert {:error, %Ecto.Changeset{}} = Organizations.update_membership(membership, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Organizations.update_membership(membership, @invalid_attrs)
+
       assert membership == Organizations.get_membership!(membership.id)
     end
 

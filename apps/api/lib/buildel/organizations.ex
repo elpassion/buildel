@@ -5,19 +5,20 @@ defmodule Buildel.Organizations do
   alias Buildel.Organizations.{Organization, Membership}
   alias Buildel.Accounts.User
 
-  def list_user_organizations(user_id) do
+  def list_user_organizations(%User{id: user_id}) do
     User |> Repo.get(user_id) |> Repo.preload(:organizations) |> Map.get(:organizations)
   end
 
   def get_organization!(id), do: Repo.get!(Organization, id)
+
   def create_organization(attrs \\ %{}) do
     case Ecto.Multi.new()
-      |> Ecto.Multi.insert(:organization, Organization.changeset(%Organization{}, attrs))
-      |> Ecto.Multi.insert(:membership, fn %{organization: %{ id: organization_id }} ->
-        %Membership{}
-        |> Membership.changeset(%{organization_id: organization_id, user_id: attrs.user_id})
-      end)
-      |> Repo.transaction() do
+         |> Ecto.Multi.insert(:organization, Organization.changeset(%Organization{}, attrs))
+         |> Ecto.Multi.insert(:membership, fn %{organization: %{id: organization_id}} ->
+           %Membership{}
+           |> Membership.changeset(%{organization_id: organization_id, user_id: attrs.user_id})
+         end)
+         |> Repo.transaction() do
       {:ok, %{organization: organization}} -> {:ok, organization}
       {:error, :organization, changeset, _actions} -> {:error, changeset}
     end
@@ -46,16 +47,18 @@ defmodule Buildel.Organizations do
   end
 
   def list_organization_memberships(organization_id) do
-    Organization |> Repo.get(organization_id) |> Repo.preload([memberships: [:user]]) |> Map.get(:memberships)
+    Organization
+    |> Repo.get(organization_id)
+    |> Repo.preload(memberships: [:user])
+    |> Map.get(:memberships)
   end
 
   def get_membership!(id), do: Repo.get!(Membership, id) |> Repo.preload([:organization, :user])
 
   def create_membership(attrs \\ %{}) do
     case %Membership{}
-    |> Membership.changeset(attrs)
-    |> Repo.insert()
-    do
+         |> Membership.changeset(attrs)
+         |> Repo.insert() do
       {:ok, membership} -> {:ok, membership |> Repo.preload([:organization, :user])}
       {:error, changeset} -> {:error, changeset}
     end
@@ -63,9 +66,8 @@ defmodule Buildel.Organizations do
 
   def update_membership(%Membership{} = membership, attrs) do
     case membership
-    |> Membership.changeset(attrs)
-    |> Repo.update()
-    do
+         |> Membership.changeset(attrs)
+         |> Repo.update() do
       {:ok, membership} -> {:ok, membership |> Repo.preload([:organization, :user])}
       {:error, changeset} -> {:error, changeset}
     end
