@@ -1,18 +1,16 @@
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { loader } from "./loader";
+import type { LinksFunction, V2_MetaFunction } from "@remix-run/node";
 import ReactFlow, {
   Background,
   BackgroundVariant,
   Connection,
   Controls,
-  EdgeChange,
-  NodeChange,
   addEdge,
   useEdgesState,
   useNodesState,
 } from "reactflow";
-import type { LinksFunction, V2_MetaFunction } from "@remix-run/node";
-import flowStyles from "reactflow/dist/style.css";
 import {
   getAllBlockTypes,
   getEdges,
@@ -21,7 +19,7 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import { Button } from "@elpassion/taco";
 import { useDebounce } from "usehooks-ts";
 import { isEqual } from "lodash";
 import { RunPipelineProvider } from "./RunPipelineProvider";
@@ -29,22 +27,24 @@ import type { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { CustomNode } from "./CustomNodes/CustomNode";
 import { PipelineSidebar } from "./PipelineSidebar/PipelineSidebar";
 import { useDraggableNodes } from "./PipelineSidebar/useDraggableNodes";
+import { assert } from "./usePipelineRun";
+import { PipelineNavbar } from "./PipelineNavbar";
+import { RunPipelineButton } from "./RunPipelineButton";
 import type {
   IBlockConfig,
   IPipelineConfig,
   IPipeline,
   IEdge,
 } from "~/components/pages/pipelines/list/contracts";
-import { assert } from "./usePipelineRun";
-import { PipelineNavbar } from "~/components/pages/pipelines/show/PipelineNavbar";
-import { RunPipelineButton } from "~/components/pages/pipelines/show/RunPipelineButton";
+import flowStyles from "reactflow/dist/style.css";
+
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
 ];
 
 export function ShowPipelinePage() {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
-  const fetcher = useFetcher<IPipeline>();
+  const updateFetcher = useFetcher<IPipeline>();
   const { pipeline, blockTypes } = useLoaderData<typeof loader>();
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config)
@@ -68,12 +68,12 @@ export function ShowPipelinePage() {
 
   const handleUpdate = useCallback(
     (config: IPipelineConfig) => {
-      fetcher.submit(
+      updateFetcher.submit(
         { ...pipeline, config: { ...config } },
         { method: "PUT", encType: "application/json", replace: true }
       );
     },
-    [fetcher, pipeline]
+    [updateFetcher, pipeline]
   );
 
   const onBlockCreate = useCallback(
@@ -126,14 +126,14 @@ export function ShowPipelinePage() {
   }, [debouncedState]);
 
   useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data !== null) {
-      const config = fetcher.data;
+    if (updateFetcher.state === "idle" && updateFetcher.data !== null) {
+      const config = updateFetcher.data;
       if (!config || isEqual(config, pipeline.config)) return;
 
       setNodes(getNodes(config.config));
       setEdges(getEdges(config.config));
     }
-  }, [fetcher]);
+  }, [updateFetcher]);
 
   const { onDragOver, onDrop, onInit } = useDraggableNodes({
     wrapper: reactFlowWrapper,
@@ -148,8 +148,16 @@ export function ShowPipelinePage() {
         ref={reactFlowWrapper}
       >
         <RunPipelineProvider pipeline={pipeline}>
-          <header className="absolute top-2 left-2 z-10">
+          <header className="absolute top-2 left-4 right-4 z-10 flex justify-between">
             <RunPipelineButton />
+            <Button
+              variant="filled"
+              text={
+                updateFetcher.state === "submitting" ? "Saving" : "Up-to-date"
+              }
+              size="sm"
+              disabled
+            />
           </header>
 
           <ReactFlow
