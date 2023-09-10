@@ -18,11 +18,11 @@ const { getSession, commitSession, destroySession } =
 export { getSession, commitSession, destroySession };
 
 export async function requireLogin(request: Request) {
-  const session = await getSession(request.headers.get("Cookie"));
-  if (!session.get("apiToken")) throw redirect("/login");
+  const cookie = request.headers.get("Cookie");
+  if (!cookie?.includes("_buildel_key")) throw redirect("/login");
 }
 
 export async function requireNotLogin(request: Request) {
-  const session = await getSession(request.headers.get("Cookie"));
-  if (session.get("apiToken")) throw redirect("/");
+  const cookie = request.headers.get("Cookie");
+  if (cookie?.includes("_buildel_key")) throw redirect("/");
 }

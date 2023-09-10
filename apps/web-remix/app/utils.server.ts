@@ -9,7 +9,6 @@ import {
 } from "./utils/errors.server";
 import { fetchTyped } from "./utils/fetch.server";
 import { setToastError } from "./utils/toast.error.server";
-import { getSession } from "./session.server";
 
 export const loaderBuilder =
   <T>(fn: (args: LoaderArgs, helpers: { fetch: typeof fetchTyped }) => T) =>
@@ -120,17 +119,14 @@ export const actionBuilder =
 async function requestFetchTyped(
   actionArgs: ActionArgs
 ): Promise<typeof fetchTyped> {
-  const session = await getSession(actionArgs.request.headers.get("cookie"));
-  const token = session.get("apiToken");
-
   return (schema, url, options) => {
     return fetchTyped(
       schema,
-      "http://127.0.0.1:4000/api" + url,
+      "http://127.0.0.1:3000/super-api" + url,
       merge(options || {}, {
         headers: {
           "Content-Type": "application/json",
-          Cookie: `_buildel_key=${token}`,
+          Cookie: actionArgs.request.headers.get("cookie"),
         },
       })
     );

@@ -12,6 +12,7 @@ import type { RequestHandler } from "express";
 import express from "express";
 import morgan from "morgan";
 import sourceMapSupport from "source-map-support";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 sourceMapSupport.install();
 installGlobals();
@@ -89,6 +90,18 @@ async function run() {
   app.use(express.static("public", { maxAge: "1h" }));
 
   app.use(morgan("tiny"));
+
+  app.use(
+    "/super-api",
+    createProxyMiddleware({
+      pathRewrite: function (path, req) {
+        console.log("path", path);
+        return path.replace("/super-api", "/api");
+      },
+      ws: true,
+      target: "http://127.0.0.1:4000",
+    })
+  );
 
   app.all(
     "*",
