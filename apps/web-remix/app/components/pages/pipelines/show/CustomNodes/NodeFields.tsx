@@ -13,49 +13,46 @@ interface NodeFieldsProps {
 }
 
 export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
-  // const formMethods = useForm();
-
   const blockName = block.name;
   const { status } = useRunPipeline();
   const { push, clearEvents } = useRunPipelineNode(block);
 
   const onSubmit = useCallback(
-    (data: Record<string, any>) => {
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
       clearEvents(blockName);
 
-      Object.keys(data).forEach((key) => {
-        const topic = `${blockName}:${key}`;
-        if (Array.isArray(data[key])) {
-          data[key].forEach((value: any) => {
-            push(topic, value);
-          });
-        } else {
-          push(topic, data[key]);
-        }
-      });
+      // Object.keys(data).forEach((key) => {
+      //   const topic = `${blockName}:${key}`;
+      //   if (Array.isArray(data[key])) {
+      //     data[key].forEach((value: any) => {
+      //       push(topic, value);
+      //     });
+      //   } else {
+      //     push(topic, data[key]);
+      //   }
+      // });
 
       // e.preventDefault();
       //
-      // const formData = new FormData(e.currentTarget);
-      // const fieldsData: Record<string, any> = {};
-      // // @ts-ignore
-      // for (let [key, value] of formData.entries()) {
-      //   fieldsData[key] = value;
-      // }
-      // //todo should we clear block events after push click? if so we need an information about output block
-      // clearEvents(blockName);
-      //
-      // console.log(fieldsData);
-      // // what to do here?
-      // Object.keys(fieldsData).forEach((key) => {
-      //   if (Array.isArray(fieldsData[key])) {
-      //     fieldsData[key].forEach((value: any) => {
-      //       push(`${blockName}:${key}`, value);
-      //     });
-      //   } else {
-      //     push(`${blockName}:${key}`, fieldsData[key]);
-      //   }
-      // });
+      const formData = new FormData(e.currentTarget);
+      const fieldsData: Record<string, any> = {};
+
+      for (let [key, value] of formData.entries()) {
+        fieldsData[key] = value;
+      }
+
+      // what to do here?
+      Object.keys(fieldsData).forEach((key) => {
+        const topic = `${blockName}:${key}`;
+        if (Array.isArray(fieldsData[key])) {
+          fieldsData[key].forEach((value: any) => {
+            push(topic, value);
+          });
+        } else {
+          push(topic, fieldsData[key]);
+        }
+      });
     },
     [blockName, clearEvents, push]
   );
@@ -64,14 +61,22 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     const { type, name } = field.data;
 
     if (type === "text") {
-      return <Textarea label="" id={name} placeholder="Start writing..." />;
+      return (
+        <Textarea
+          label=""
+          id={name}
+          name={name}
+          placeholder="Start writing..."
+        />
+      );
     } else if (type === "file") {
       return (
         <Input
           id={name}
+          name={name}
           type={field.data.type}
-          multiple
           placeholder="Start writing..."
+          multiple
         />
       );
     } else if (field.data.type === "audio") {
@@ -87,15 +92,18 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   }, []);
 
   return (
-    <form className="flex flex-col gap-2">
+    <form onSubmit={onSubmit}>
       {fields.map((field) => (
         <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
       ))}
+
       <Button
         type="submit"
-        text={status === "running" ? "Send" : "Start pipeline"}
         size="xs"
+        text={status === "running" ? "Send" : "Start pipeline"}
         disabled={status !== "running"}
+        className="mt-2"
+        isFluid
       />
     </form>
   );
