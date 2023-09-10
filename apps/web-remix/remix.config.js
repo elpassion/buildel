@@ -5,6 +5,7 @@ module.exports = {
   // assetsBuildDirectory: "public/build",
   // serverBuildPath: "build/index.js",
   // publicPath: "/build/",
+  cacheDirectory: "./node_modules/.cache/remix",
   serverModuleFormat: "cjs",
   future: {
     v2_dev: true,
