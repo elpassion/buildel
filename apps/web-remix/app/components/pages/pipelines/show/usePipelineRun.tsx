@@ -91,7 +91,7 @@ export function usePipelineRun(
   );
 
   useEffect(() => {
-    socket.current = new Socket("ws://127.0.0.1:4000/socket", {
+    socket.current = new Socket("ws://127.0.0.1:3000/super-api/socket", {
       logger: (kind, msg, data) => {
         console.log(`${kind}: ${msg}`, data);
       },

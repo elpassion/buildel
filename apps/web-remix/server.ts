@@ -95,8 +95,9 @@ async function run() {
     "/super-api",
     createProxyMiddleware({
       pathRewrite: function (path, req) {
-        console.log("path", path);
-        return path.replace("/super-api", "/api");
+        return path
+          .replace("/super-api", "/api")
+          .replace("/api/socket", "/socket");
       },
       ws: true,
       target: "http://127.0.0.1:4000",
