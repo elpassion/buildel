@@ -8,8 +8,6 @@ import ReactFlow, {
   EdgeChange,
   NodeChange,
   addEdge,
-  applyEdgeChanges,
-  applyNodeChanges,
   useEdgesState,
   useNodesState,
 } from "reactflow";
@@ -39,6 +37,7 @@ import type {
 } from "~/components/pages/pipelines/list/contracts";
 import { assert } from "./usePipelineRun";
 import { PipelineNavbar } from "~/components/pages/pipelines/show/PipelineNavbar";
+import { RunPipelineButton } from "~/components/pages/pipelines/show/RunPipelineButton";
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
 ];
@@ -144,8 +143,15 @@ export function ShowPipelinePage() {
   return (
     <>
       <PipelineNavbar name={pipeline.name} />
-      <div className="h-[calc(100vh_-_65px)] w-full" ref={reactFlowWrapper}>
+      <div
+        className="relative h-[calc(100vh_-_65px)] w-full"
+        ref={reactFlowWrapper}
+      >
         <RunPipelineProvider pipeline={pipeline}>
+          <header className="absolute top-2 left-2 z-10">
+            <RunPipelineButton />
+          </header>
+
           <ReactFlow
             nodes={nodes}
             edges={edges}
