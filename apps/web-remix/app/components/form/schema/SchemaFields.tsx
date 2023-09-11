@@ -1,19 +1,21 @@
 import React from "react";
-import { Button } from "@elpassion/taco";
-import { FieldProps } from "./Schema";
+import { Button, Icon, IconButton } from "@elpassion/taco";
+import { Field, FieldProps } from "./Schema";
 import { Field as FormField } from "~/components/form/fields/field.context";
 import { assert } from "~/utils/assert";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { CheckboxInput } from "~/components/form/inputs/checkbox.input";
 import { NumberInputField } from "~/components/form/fields/number.field";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
+import { useFormContext } from "remix-validated-form";
 
 export function StringField({ field, name }: FieldProps) {
   assert(name);
 
   assert(field.type === "string");
+  const { fieldErrors } = useFormContext();
 
-  // const error = getValueFromPath(errors, name);
+  const error = fieldErrors[name] ?? undefined;
 
   if (!("enum" in field)) {
     if (field.presentAs === "password") {
@@ -24,7 +26,7 @@ export function StringField({ field, name }: FieldProps) {
             type="password"
             supportingText={field.description}
             label={field.title}
-            // errorMessage={error?.message ?? undefined}
+            errorMessage={error}
           />
         </FormField>
       );
@@ -36,7 +38,7 @@ export function StringField({ field, name }: FieldProps) {
           type="password"
           supportingText={field.description}
           label={field.title}
-          // errorMessage={error?.message ?? undefined}
+          errorMessage={error}
         />
       </FormField>
     );
@@ -76,8 +78,7 @@ export function StringField({ field, name }: FieldProps) {
           labelText={value}
           id={`${name}.${index}`}
           value={value}
-          // error={!!error}
-          // errorMessage={error?.message ?? undefined}
+          error={!!error}
         />
       </FormField>
     ));
@@ -93,15 +94,17 @@ export function NumberField({ field, name }: FieldProps) {
   assert(name);
   // const { onChange, ...methods } = register(name, { valueAsNumber: true });
   assert(field.type === "number");
-  // const error = getValueFromPath(errors, name);
+  const { fieldErrors } = useFormContext();
+
+  const error = fieldErrors[name] ?? undefined;
   return (
     <FormField name={name}>
       <NumberInputField
         id={name}
         // onChange={(value) => setValue(name, value)}
 
+        errorMessage={error}
         label={field.title}
-        // errorMessage={error?.message ?? undefined}
         supportingText={field.description}
       />
     </FormField>
@@ -135,22 +138,19 @@ export function ArrayField({ field, name, fields, schema }: FieldProps) {
 }
 
 export function BooleanField({ field, name }: FieldProps) {
-  // const {
-  //   register,
-  //   watch,
-  //   formState: { errors },
-  // } = useFormContext();
   assert(name);
   assert(field.type === "boolean");
-  // const value = watch(name);
+  const { fieldErrors } = useFormContext();
+
+  const error = fieldErrors[name] ?? undefined;
+
   return (
     <FormField name={name}>
       <CheckboxInputField
         id={name}
         labelText={field.title}
         defaultValue={"false"}
-        // error={!!error}
-        // errorMessage={error?.message ?? undefined}
+        error={!!error}
       />
     </FormField>
   );
@@ -173,7 +173,7 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
 
   return (
     <div>
-      <p>{field.title}</p>
+      <p>Field array</p>
       {/*{rhfFields.map((item, index) => (*/}
       {/*  <div key={item.id} className="mt-2 flex items-end gap-2">*/}
       {/*    <Field*/}
@@ -204,16 +204,4 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
       />
     </div>
   );
-}
-
-function getValueFromPath(obj: Record<string, any>, path: string) {
-  const keys = path.split(".");
-  let current = obj;
-
-  keys.forEach((key) => {
-    if (!current || current[key] === undefined) return null;
-    current = current[key];
-  }, current);
-
-  return current;
 }

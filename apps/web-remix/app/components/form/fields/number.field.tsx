@@ -16,7 +16,6 @@ export const NumberInputField = forwardRef<
       aria-describedby={`${name}-error`}
       aria-errormessage={error ? `${name}-error` : undefined}
       autoComplete={name}
-      step={1}
       {...props}
       {...getInputProps()}
     />
