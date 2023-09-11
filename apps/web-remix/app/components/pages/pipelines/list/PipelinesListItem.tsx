@@ -8,7 +8,7 @@ interface PipelinesListItemProps {
 }
 export const PipelinesListItem = ({ pipeline }: PipelinesListItemProps) => {
   return (
-    <article className="bg-white px-6 py-4">
+    <article className="bg-white px-6 py-4 rounded">
       <header className="flex items-center text-neutral-700">
         <div className="flex flex-grow">
           <Link
