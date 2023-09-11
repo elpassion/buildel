@@ -11,7 +11,7 @@ defmodule BuildelWeb.PipelineSocket do
     required(:organization_id, :integer)
   end
 
-  def connect(params, socket, connect_info) do
+  def connect(params, socket, _connect_info) do
     with {:ok, %{api_key: api_key, organization_id: organization_id}} <-
            validate(:connect, params),
          {:ok, organization} <-
