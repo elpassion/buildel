@@ -1,8 +1,10 @@
 defmodule BuildelWeb.PipelineRunChannelTest do
+  alias Buildel.Organizations.Organization
   alias Buildel.Pipelines
   use BuildelWeb.ChannelCase
 
   import Buildel.PipelinesFixtures
+  import Buildel.OrganizationsFixtures
 
   describe "connect" do
     test "fails when trying to connect without correct params" do
@@ -16,7 +18,27 @@ defmodule BuildelWeb.PipelineRunChannelTest do
     test "fails when trying to connect to non existant organization" do
       assert {:error, %{errors: %{detail: "Not Found"}}} =
                BuildelWeb.PipelineSocket
-               |> connect(%{organization_id: "non-existent", api_key: "api_key"})
+               |> connect(%{organization_id: 123, api_key: "api_key"})
+    end
+
+    test "fails when trying to connect to existant org with wrong key" do
+      organization = organization_fixture()
+
+      assert {:error, %{errors: %{detail: "Not Found"}}} =
+               BuildelWeb.PipelineSocket
+               |> connect(%{organization_id: organization.id, api_key: "wrong_key"})
+    end
+
+    test "connects with correct data" do
+      organization = organization_fixture()
+      organization_id = organization.id
+
+      assert {:ok, %Phoenix.Socket{assigns: %{organization: %Organization{id: ^organization_id}}}} =
+               BuildelWeb.PipelineSocket
+               |> connect(%{
+                 organization_id: organization.id,
+                 api_key: organization.api_keys |> List.first() |> Map.get(:key)
+               })
     end
   end
 

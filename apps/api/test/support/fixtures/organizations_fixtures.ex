@@ -7,9 +7,9 @@ defmodule Buildel.OrganizationsFixtures do
         user_id: Buildel.AccountsFixtures.user_fixture().id
       })
       |> Buildel.Organizations.create_organization()
-    organization
-  end
 
+    organization |> Buildel.Repo.preload(:api_keys)
+  end
 
   def valid_membership_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{

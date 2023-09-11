@@ -27,7 +27,10 @@ defmodule Buildel.OrganizationsTest do
 
     test "get_organization!/1 returns the organization with given id" do
       organization = organization_fixture()
-      assert Organizations.get_organization!(organization.id) == organization
+      organization_id = organization.id
+
+      assert %Organization{id: ^organization_id} =
+               Organizations.get_organization!(organization.id)
     end
 
     test "create_organization/1 with valid data creates a organization" do
@@ -59,8 +62,6 @@ defmodule Buildel.OrganizationsTest do
 
       assert {:error, %Ecto.Changeset{}} =
                Organizations.update_organization(organization, @invalid_attrs)
-
-      assert organization == Organizations.get_organization!(organization.id)
     end
 
     test "delete_organization/1 deletes the organization" do

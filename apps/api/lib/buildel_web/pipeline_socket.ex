@@ -8,7 +8,7 @@ defmodule BuildelWeb.PipelineSocket do
 
   defparams :connect do
     required(:api_key, :string)
-    required(:organization_id, :string)
+    required(:organization_id, :integer)
   end
 
   def connect(params, socket, _connect_info) do
@@ -16,7 +16,7 @@ defmodule BuildelWeb.PipelineSocket do
            validate(:connect, params),
          {:ok, organization} <-
            Organizations.get_organization_by_id_and_api_key(organization_id, api_key) do
-      {:ok, socket}
+      {:ok, socket |> assign(:organization, organization)}
     else
       {:error, %Ecto.Changeset{} = changeset} ->
         {:error, BuildelWeb.ChangesetJSON.error(%{changeset: changeset})}
