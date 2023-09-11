@@ -4,8 +4,9 @@ defmodule BuildelWeb.PipelineChannel do
   require Logger
   alias Buildel.Pipelines
 
-  def join("pipelines:" <> pipeline_id, _params, socket) do
-    with {pipeline_id, _} when is_number(pipeline_id) <- Integer.parse(pipeline_id),
+  def join("pipelines:" <> organization_pipeline_id, _params, socket) do
+    with [_organization_id, pipeline_id] <- String.split(organization_pipeline_id, ":"),
+         {pipeline_id, _} when is_number(pipeline_id) <- Integer.parse(pipeline_id),
          %Pipelines.Pipeline{id: pipeline_id} <- Pipelines.get_pipeline(pipeline_id),
          {:ok, run} <- Pipelines.create_run(%{pipeline_id: pipeline_id}),
          {:ok, run} <- Pipelines.Runner.start_run(run) do

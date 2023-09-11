@@ -7,7 +7,7 @@ defmodule BuildelWeb.PipelineChannelTest do
     test "fails when starting a pipeline that does not exist", %{socket: socket} do
       assert {:error, %{reason: "not_found", pipeline_id: "non-existent"}} =
                socket
-               |> subscribe_and_join(BuildelWeb.PipelineChannel, "pipelines:non-existent")
+               |> subscribe_and_join(BuildelWeb.PipelineChannel, "pipelines:org:non-existent")
     end
 
     test "succeeds when trying to join a run that exists", %{socket: socket} do
@@ -15,7 +15,10 @@ defmodule BuildelWeb.PipelineChannelTest do
 
       assert {:ok, %{}, %Phoenix.Socket{assigns: %{run: %{}}}} =
                socket
-               |> subscribe_and_join(BuildelWeb.PipelineChannel, "pipelines:#{pipeline.id}")
+               |> subscribe_and_join(
+                 BuildelWeb.PipelineChannel,
+                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}"
+               )
     end
 
     setup do
@@ -30,7 +33,11 @@ defmodule BuildelWeb.PipelineChannelTest do
       pipeline = pipeline_fixture()
 
       {:ok, %{run: _run}, socket} =
-        socket |> subscribe_and_join(BuildelWeb.PipelineChannel, "pipelines:#{pipeline.id}")
+        socket
+        |> subscribe_and_join(
+          BuildelWeb.PipelineChannel,
+          "pipelines:#{pipeline.organization_id}:#{pipeline.id}"
+        )
 
       payload = {:binary, File.read!("test/support/fixtures/real.mp3")}
 
