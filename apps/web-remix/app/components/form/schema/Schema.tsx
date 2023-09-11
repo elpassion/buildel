@@ -50,6 +50,7 @@ export function Field({ field, name, schema, fields }: FieldProps) {
   } else if (field.type === "object") {
     return Object.entries(field.properties).map(([propertyKey, value]) => {
       const fieldKey = name === null ? propertyKey : `${name}.${propertyKey}`;
+
       return (
         <div key={fieldKey}>
           <Field

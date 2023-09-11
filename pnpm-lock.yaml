@@ -132,8 +132,8 @@ importers:
   apps/web-remix:
     dependencies:
       '@elpassion/taco':
-        specifier: ^0.1.76-1
-        version: 0.1.76-1(@tanstack/react-table@8.9.3)(@types/react-dom@18.0.11)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0)
+        specifier: ^0.1.77
+        version: 0.1.77(@tanstack/react-table@8.9.3)(@types/react-dom@18.0.11)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0)
       '@isaacs/express-prometheus-middleware':
         specifier: ^1.2.1
         version: 1.2.1(express@4.18.2)(prom-client@13.2.0)
@@ -202,7 +202,7 @@ importers:
         version: 3.16.1(react-dom@18.2.0)(react@18.2.0)
       reactflow:
         specifier: ^11.8.3
-        version: 11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
+        version: 11.8.3(@types/react@18.2.18)(immer@10.0.2)(react-dom@18.2.0)(react@18.2.0)
       remix-validated-form:
         specifier: ^5.1.0
         version: 5.1.0(@remix-run/react@1.19.3)(@remix-run/server-runtime@1.19.3)(@types/react@18.2.18)(react@18.2.0)
@@ -218,6 +218,9 @@ importers:
       zod:
         specifier: ^3.21.4
         version: 3.21.4
+      zod-form-data:
+        specifier: ^2.0.1
+        version: 2.0.1(zod@3.21.4)
     devDependencies:
       '@remix-run/dev':
         specifier: ^1.19.3
@@ -1615,41 +1618,6 @@ packages:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
 
-  /@elpassion/taco@0.1.76-1(@tanstack/react-table@8.9.3)(@types/react-dom@18.0.11)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0):
-    resolution: {integrity: sha512-Ce4Kpaw6iBMMP80Xrhu8pKTLR3ToO1xHYCgI5V5BdUbS0wPvdxibVe3fmr1ZV+emEWIz3wlkkBK+dZ0v3we/zQ==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      '@tanstack/react-table': ^8.8.5
-      '@types/react': ^18
-      '@types/react-dom': ^18
-      '@types/react-modal': ^3.13.1
-      classnames: ^2.3.2
-      date-fns: ^2.29.3
-      embla-carousel-react: ^7.1.0
-      lodash.merge: ^4.6.2
-      react: ^18
-      react-datepicker: ^4.10.0
-      react-dom: ^18
-      react-modal: ^3.16.1
-      react-quill: ^2.0.0
-      react-select: ^5.7.0
-    dependencies:
-      '@tanstack/react-table': 8.9.3(react-dom@18.2.0)(react@18.2.0)
-      '@types/react': 18.2.18
-      '@types/react-dom': 18.0.11
-      '@types/react-modal': 3.16.0
-      classnames: 2.3.2
-      date-fns: 2.30.0
-      embla-carousel-react: 7.1.0(react@18.2.0)
-      lodash.merge: 4.6.2
-      react: 18.2.0
-      react-datepicker: 4.16.0(react-dom@18.2.0)(react@18.2.0)
-      react-dom: 18.2.0(react@18.2.0)
-      react-modal: 3.16.1(react-dom@18.2.0)(react@18.2.0)
-      react-quill: 2.0.0(react-dom@18.2.0)(react@18.2.0)
-      react-select: 5.7.4(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-    dev: false
-
   /@elpassion/taco@0.1.76-1(@tanstack/react-table@8.9.3)(@types/react-dom@18.2.7)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0):
     resolution: {integrity: sha512-Ce4Kpaw6iBMMP80Xrhu8pKTLR3ToO1xHYCgI5V5BdUbS0wPvdxibVe3fmr1ZV+emEWIz3wlkkBK+dZ0v3we/zQ==}
     engines: {node: '>=16'}
@@ -1672,6 +1640,41 @@ packages:
       '@tanstack/react-table': 8.9.3(react-dom@18.2.0)(react@18.2.0)
       '@types/react': 18.2.18
       '@types/react-dom': 18.2.7
+      '@types/react-modal': 3.16.0
+      classnames: 2.3.2
+      date-fns: 2.30.0
+      embla-carousel-react: 7.1.0(react@18.2.0)
+      lodash.merge: 4.6.2
+      react: 18.2.0
+      react-datepicker: 4.16.0(react-dom@18.2.0)(react@18.2.0)
+      react-dom: 18.2.0(react@18.2.0)
+      react-modal: 3.16.1(react-dom@18.2.0)(react@18.2.0)
+      react-quill: 2.0.0(react-dom@18.2.0)(react@18.2.0)
+      react-select: 5.7.4(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
+    dev: false
+
+  /@elpassion/taco@0.1.77(@tanstack/react-table@8.9.3)(@types/react-dom@18.0.11)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0):
+    resolution: {integrity: sha512-qNgrdyMOK5jIOMzeEV4JK995BB83FsuHCpuaGn/2uI+xwZf5LCdaMCA0Wgv2CkLX09HIRBUn3ORzAEzBLzdDGA==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      '@tanstack/react-table': ^8.8.5
+      '@types/react': ^18
+      '@types/react-dom': ^18
+      '@types/react-modal': ^3.13.1
+      classnames: ^2.3.2
+      date-fns: ^2.29.3
+      embla-carousel-react: ^7.1.0
+      lodash.merge: ^4.6.2
+      react: ^18
+      react-datepicker: ^4.10.0
+      react-dom: ^18
+      react-modal: ^3.16.1
+      react-quill: ^2.0.0
+      react-select: ^5.7.0
+    dependencies:
+      '@tanstack/react-table': 8.9.3(react-dom@18.2.0)(react@18.2.0)
+      '@types/react': 18.2.18
+      '@types/react-dom': 18.0.11
       '@types/react-modal': 3.16.0
       classnames: 2.3.2
       date-fns: 2.30.0
@@ -2757,22 +2760,6 @@ packages:
       - immer
     dev: false
 
-  /@reactflow/background@11.2.8(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-5o41N2LygiNC2/Pk8Ak2rIJjXbKHfQ23/Y9LFsnAlufqwdzFqKA8txExpsMoPVHHlbAdA/xpQaMuoChGPqmyDw==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-    dependencies:
-      '@reactflow/core': 11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      classcat: 5.0.4
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      zustand: 4.4.1(@types/react@18.2.18)(immer@9.0.21)(react@18.2.0)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-    dev: false
-
   /@reactflow/controls@11.1.19(@types/react@18.2.18)(immer@10.0.2)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-Vo0LFfAYjiSRMLEII/aeBo+1MT2a0Yc7iLVnkuRTLzChC0EX+A2Fa+JlzeOEYKxXlN4qcDxckRNGR7092v1HOQ==}
     peerDependencies:
@@ -2784,22 +2771,6 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       zustand: 4.4.1(@types/react@18.2.18)(immer@10.0.2)(react@18.2.0)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-    dev: false
-
-  /@reactflow/controls@11.1.19(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-Vo0LFfAYjiSRMLEII/aeBo+1MT2a0Yc7iLVnkuRTLzChC0EX+A2Fa+JlzeOEYKxXlN4qcDxckRNGR7092v1HOQ==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-    dependencies:
-      '@reactflow/core': 11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      classcat: 5.0.4
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      zustand: 4.4.1(@types/react@18.2.18)(immer@9.0.21)(react@18.2.0)
     transitivePeerDependencies:
       - '@types/react'
       - immer
@@ -2827,28 +2798,6 @@ packages:
       - immer
     dev: false
 
-  /@reactflow/core@11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-y6DN8Wy4V4KQBGHFqlj9zWRjLJU6CgdnVwWaEA/PdDg/YUkFBMpZnXqTs60czinoA2rAcvsz50syLTPsj5e+Wg==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-    dependencies:
-      '@types/d3': 7.4.0
-      '@types/d3-drag': 3.0.2
-      '@types/d3-selection': 3.0.5
-      '@types/d3-zoom': 3.0.3
-      classcat: 5.0.4
-      d3-drag: 3.0.0
-      d3-selection: 3.0.0
-      d3-zoom: 3.0.0
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      zustand: 4.4.1(@types/react@18.2.18)(immer@9.0.21)(react@18.2.0)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-    dev: false
-
   /@reactflow/minimap@11.6.3(@types/react@18.2.18)(immer@10.0.2)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-PSA28dk09RnBHOA1zb45fjQXz3UozSJZmsIpgq49O3trfVFlSgRapxNdGsughWLs7/emg2M5jmi6Vc+ejcfjvQ==}
     peerDependencies:
@@ -2864,26 +2813,6 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       zustand: 4.4.1(@types/react@18.2.18)(immer@10.0.2)(react@18.2.0)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-    dev: false
-
-  /@reactflow/minimap@11.6.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-PSA28dk09RnBHOA1zb45fjQXz3UozSJZmsIpgq49O3trfVFlSgRapxNdGsughWLs7/emg2M5jmi6Vc+ejcfjvQ==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-    dependencies:
-      '@reactflow/core': 11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      '@types/d3-selection': 3.0.5
-      '@types/d3-zoom': 3.0.3
-      classcat: 5.0.4
-      d3-selection: 3.0.0
-      d3-zoom: 3.0.0
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      zustand: 4.4.1(@types/react@18.2.18)(immer@9.0.21)(react@18.2.0)
     transitivePeerDependencies:
       - '@types/react'
       - immer
@@ -2907,24 +2836,6 @@ packages:
       - immer
     dev: false
 
-  /@reactflow/node-resizer@2.1.5(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-z/hJlsptd2vTx13wKouqvN/Kln08qbkA+YTJLohc2aJ6rx3oGn9yX4E4IqNxhA7zNqYEdrnc1JTEA//ifh9z3w==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-    dependencies:
-      '@reactflow/core': 11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      classcat: 5.0.4
-      d3-drag: 3.0.0
-      d3-selection: 3.0.0
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      zustand: 4.4.1(@types/react@18.2.18)(immer@9.0.21)(react@18.2.0)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-    dev: false
-
   /@reactflow/node-toolbar@1.2.7(@types/react@18.2.18)(immer@10.0.2)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-vs+Wg1tjy3SuD7eoeTqEtscBfE9RY+APqC28urVvftkrtsN7KlnoQjqDG6aE45jWP4z+8bvFizRWjAhxysNLkg==}
     peerDependencies:
@@ -2936,22 +2847,6 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       zustand: 4.4.1(@types/react@18.2.18)(immer@10.0.2)(react@18.2.0)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-    dev: false
-
-  /@reactflow/node-toolbar@1.2.7(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-vs+Wg1tjy3SuD7eoeTqEtscBfE9RY+APqC28urVvftkrtsN7KlnoQjqDG6aE45jWP4z+8bvFizRWjAhxysNLkg==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-    dependencies:
-      '@reactflow/core': 11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      classcat: 5.0.4
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      zustand: 4.4.1(@types/react@18.2.18)(immer@9.0.21)(react@18.2.0)
     transitivePeerDependencies:
       - '@types/react'
       - immer
@@ -9605,25 +9500,6 @@ packages:
       - immer
     dev: false
 
-  /reactflow@11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-wuVxJOFqi1vhA4WAEJLK0JWx2TsTiWpxTXTRp/wvpqKInQgQcB49I2QNyNYsKJCQ6jjXektS7H+LXoaVK/pG4A==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
-    dependencies:
-      '@reactflow/background': 11.2.8(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/controls': 11.1.19(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/core': 11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/minimap': 11.6.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/node-resizer': 2.1.5(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      '@reactflow/node-toolbar': 1.2.7(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-    transitivePeerDependencies:
-      - '@types/react'
-      - immer
-    dev: false
-
   /read-cache@1.0.0:
     resolution: {integrity: sha512-Owdv/Ft7IjOgm/i0xvNDZ1LrRANRfew4b2prF3OWMQLxLfu3bS8FVhCsrSCMK4lR56Y9ya+AThoTpDCTxCmpRA==}
     dependencies:
@@ -11481,6 +11357,14 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
     dev: true
+
+  /zod-form-data@2.0.1(zod@3.21.4):
+    resolution: {integrity: sha512-4jcsj3vFyFGINLLHEmehfOPKdcw+HqV65RwsV2IdyLHp9wpvGJRVXWg1yY8sq0ASEbQfTVBRtI7LcDGv3Qpj8g==}
+    peerDependencies:
+      zod: ^3.11.x
+    dependencies:
+      zod: 3.21.4
+    dev: false
 
   /zod@3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}

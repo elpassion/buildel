@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { zfd } from "zod-form-data";
 
 export function generateZODSchema(
   schema: JSONSchemaField,
@@ -36,7 +37,7 @@ export function generateZODSchema(
     if (isOptional) {
       nestedSchema = nestedSchema.optional();
     }
-    return nestedSchema;
+    return zfd.numeric(nestedSchema);
   }
 
   if (schema.type === "array") {

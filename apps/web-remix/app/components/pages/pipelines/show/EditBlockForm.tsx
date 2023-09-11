@@ -12,6 +12,7 @@ import {
 import { ValidatedForm } from "remix-validated-form";
 import * as React from "react";
 import { withZod } from "@remix-validated-form/with-zod";
+import { HiddenField } from "~/components/form/fields/field.context";
 
 export function EditBlockForm({
   onSubmit,
@@ -32,10 +33,10 @@ export function EditBlockForm({
     <ValidatedForm
       // @ts-ignore
       validator={validator}
+      defaultValues={{ name: "Test", inputs: [] }}
       className="w-full max-w-md"
       method="post"
       onSubmit={(e) => console.log(e)}
-      noValidate
     >
       <div className="space-y-4">
         <Schema
@@ -50,7 +51,9 @@ export function EditBlockForm({
         />
       </div>
       <div className="mt-6 flex justify-end">
-        <Button text="Confirm" type="submit" variant="filled" />
+        <Button type="submit" variant="filled">
+          Confirm
+        </Button>
       </div>
     </ValidatedForm>
   );

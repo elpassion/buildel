@@ -59,7 +59,9 @@ export function RegisterPage() {
             <FieldError />
           </Field>
         </div>
-        <Button type="submit" text="Register" isFluid />
+        <Button type="submit" isFluid>
+          Register
+        </Button>
       </ValidatedForm>
     </div>
   );

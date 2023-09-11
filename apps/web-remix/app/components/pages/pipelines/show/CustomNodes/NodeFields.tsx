@@ -74,6 +74,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         <Input
           id={name}
           name={name}
+          aria-label={name}
           type={field.data.type}
           placeholder="Start writing..."
           multiple
@@ -100,11 +101,12 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
       <Button
         type="submit"
         size="xs"
-        text={status === "running" ? "Send" : "Start pipeline"}
         disabled={status !== "running"}
         className="mt-2"
         isFluid
-      />
+      >
+        {status === "running" ? "Send" : "Start pipeline"}
+      </Button>
     </form>
   );
 }

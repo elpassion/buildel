@@ -1,19 +1,19 @@
 import React, { useEffect } from "react";
+import { useFieldArray, useFormContext } from "remix-validated-form";
 import { Button, Icon, IconButton } from "@elpassion/taco";
-import { Field, FieldProps } from "./Schema";
 import { Field as FormField } from "~/components/form/fields/field.context";
-import { assert } from "~/utils/assert";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { CheckboxInput } from "~/components/form/inputs/checkbox.input";
 import { NumberInputField } from "~/components/form/fields/number.field";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
-import { useFieldArray, useFormContext } from "remix-validated-form";
-import { string } from "zod";
+import { RadioGroupField } from "~/components/form/fields/radioGroup.field";
+import { assert } from "~/utils/assert";
+import { Field, FieldProps } from "./Schema";
 
 export function StringField({ field, name }: FieldProps) {
   assert(name);
-
   assert(field.type === "string");
+
   const { fieldErrors } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
@@ -45,29 +45,23 @@ export function StringField({ field, name }: FieldProps) {
     );
   }
   if (field.enumPresentAs === "radio") {
-    // const { disabled } = register(name);
     return (
-      <p>RadioCardGroup</p>
-      // <RadioCardGroup
-      //   isRadioVisible={true}
-      //   radioPosition="left"
-      //   mainLabel={field.title}
-      //   options={field.enum.map((value) => ({
-      //     id: `${name}.${value}`,
-      //     labelText: value,
-      //     value: value,
-      //   }))}
-      //   id={name}
-      //   name={name}
-      //   onChange={(value) => {
-      //     setValue(name, value);
-      //   }}
-      //   disabled={disabled}
-      //   value={fieldValue}
-      //   layout="horizontal"
-      //   cardsSize="sm"
-      //   errorMessage={error?.message ?? undefined}
-      // />
+      <FormField name={name}>
+        <RadioGroupField
+          id={name}
+          cardsSize="sm"
+          layout="horizontal"
+          mainLabel={field.title}
+          radioPosition="left"
+          isRadioVisible={true}
+          errorMessage={error ?? undefined}
+          options={field.enum.map((value) => ({
+            id: `${name}.${value}`,
+            labelText: value,
+            value: value,
+          }))}
+        />
+      </FormField>
     );
   }
   if (field.enumPresentAs === "checkbox") {
@@ -96,8 +90,6 @@ export function NumberField({ field, name }: FieldProps) {
     <FormField name={name}>
       <NumberInputField
         id={name}
-        // onChange={(value) => setValue(name, value)}
-
         errorMessage={error}
         label={field.title}
         supportingText={field.description}
@@ -154,10 +146,12 @@ export function BooleanField({ field, name }: FieldProps) {
 function RealArrayField({ field, name, fields, schema }: FieldProps) {
   assert(field.type === "array");
   const [rhfFields, { push, remove }] = useFieldArray(name!);
+
   useEffect(() => {
     if (rhfFields.length !== 0) return;
-    push({});
-  }, [rhfFields.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    push({ key: Math.random() });
+  }, [push, rhfFields.length]);
 
   return (
     <div>
@@ -166,7 +160,7 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
           <Field
             key={item.key}
             field={field.items}
-            name={`${name}.${index}`}
+            name={`${name}[${index}]`}
             fields={fields}
             schema={schema}
           />
@@ -183,12 +177,13 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
       ))}
       <Button
         type="button"
-        text="Add item"
         size="xs"
         hierarchy="secondary"
         onClick={() => push({})}
         className="mt-2"
-      />
+      >
+        Add item
+      </Button>
     </div>
   );
 }

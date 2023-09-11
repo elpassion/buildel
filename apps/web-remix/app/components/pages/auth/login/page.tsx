@@ -71,7 +71,9 @@ export function LoginPage() {
           </Field>
         </div>
         <input type="hidden" name="redirectTo" value={redirectTo} />
-        <Button type="submit" text="Log in" isFluid />
+        <Button type="submit" isFluid>
+          Log in
+        </Button>
       </ValidatedForm>
     </div>
   );

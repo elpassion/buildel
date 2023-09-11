@@ -186,15 +186,9 @@ export function ShowPipelinePage() {
         <RunPipelineProvider pipeline={pipeline}>
           <header className="absolute top-2 left-4 right-4 z-10 flex justify-between">
             <RunPipelineButton />
-            <Button
-              variant="filled"
-              text={
-                updateFetcher.state === "submitting" ? "Saving" : "Up-to-date"
-              }
-              size="sm"
-              disabled
-            />
-
+            <Button variant="filled" size="sm" disabled>
+              {updateFetcher.state === "submitting" ? "Saving" : "Up-to-date"}
+            </Button>
             <BlockModal
               isOpen={isModalOpen}
               onClose={handleCloseModal}

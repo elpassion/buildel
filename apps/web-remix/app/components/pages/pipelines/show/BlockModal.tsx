@@ -16,14 +16,13 @@ export const BlockModal: React.FC<BlockModalProps> = ({
   return (
     <Modal
       isOpen={isOpen}
-      closeModal={onClose}
+      onClose={onClose}
       ariaHideApp={false}
       closeIcon="x"
       className="!max-w-[640px] !p-8"
-      align="left"
-      modalHeader={header}
+      header={header}
     >
-      <div className="h-full !max-h-[640px] overflow-auto">{children}</div>
+      {children}
     </Modal>
   );
 };

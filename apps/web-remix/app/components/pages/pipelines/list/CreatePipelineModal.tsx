@@ -15,8 +15,8 @@ export const CreatePipelineModal: React.FC<CreatePipelineModalProps> = ({
   return (
     <Modal
       isOpen={isOpen}
-      closeModal={() => navigate(`/${organizationId}/pipelines`)}
-      modalHeader={
+      onClose={() => navigate(`/${organizationId}/pipelines`)}
+      header={
         <div>
           <p className="text-3xl">Create a new workflow</p>
           <div className="mb-4" />
