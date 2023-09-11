@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Icon, IconButton } from "@elpassion/taco";
 import { Field, FieldProps } from "./Schema";
 import { Field as FormField } from "~/components/form/fields/field.context";
@@ -7,7 +7,8 @@ import { TextInputField } from "~/components/form/fields/text.field";
 import { CheckboxInput } from "~/components/form/inputs/checkbox.input";
 import { NumberInputField } from "~/components/form/fields/number.field";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
-import { useFormContext } from "remix-validated-form";
+import { useFieldArray, useFormContext } from "remix-validated-form";
+import { string } from "zod";
 
 export function StringField({ field, name }: FieldProps) {
   assert(name);
@@ -86,13 +87,7 @@ export function StringField({ field, name }: FieldProps) {
 }
 
 export function NumberField({ field, name }: FieldProps) {
-  // const {
-  //   register,
-  //   setValue,
-  //   formState: { errors },
-  // } = useFormContext();
   assert(name);
-  // const { onChange, ...methods } = register(name, { valueAsNumber: true });
   assert(field.type === "number");
   const { fieldErrors } = useFormContext();
 
@@ -158,48 +153,40 @@ export function BooleanField({ field, name }: FieldProps) {
 
 function RealArrayField({ field, name, fields, schema }: FieldProps) {
   assert(field.type === "array");
-  // const {
-  //   fields: rhfFields,
-  //   append,
-  //   remove,
-  // } = useFieldArray({
-  //   name: name!,
-  // });
-
-  // useEffect(() => {
-  //   if (rhfFields.length !== 0) return;
-  //   append({}, { shouldFocus: false });
-  // }, [rhfFields.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [rhfFields, { push, remove }] = useFieldArray(name!);
+  useEffect(() => {
+    if (rhfFields.length !== 0) return;
+    push({});
+  }, [rhfFields.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div>
-      <p>Field array</p>
-      {/*{rhfFields.map((item, index) => (*/}
-      {/*  <div key={item.id} className="mt-2 flex items-end gap-2">*/}
-      {/*    <Field*/}
-      {/*      key={item.id}*/}
-      {/*      field={field.items}*/}
-      {/*      name={`${name}.${index}`}*/}
-      {/*      fields={fields}*/}
-      {/*      schema={schema}*/}
-      {/*    />*/}
-      {/*    <IconButton*/}
-      {/*      variant="ghost"*/}
-      {/*      icon={<Icon iconName="trash" />}*/}
-      {/*      disabled={rhfFields.length === 1}*/}
-      {/*      onClick={(e) => {*/}
-      {/*        e.preventDefault();*/}
-      {/*        remove(index);*/}
-      {/*      }}*/}
-      {/*    />*/}
-      {/*  </div>*/}
-      {/*))}*/}
+      {rhfFields.map((item, index) => (
+        <div key={item.key} className="mt-2 flex items-end gap-2">
+          <Field
+            key={item.key}
+            field={field.items}
+            name={`${name}.${index}`}
+            fields={fields}
+            schema={schema}
+          />
+          <IconButton
+            variant="ghost"
+            icon={<Icon iconName="trash" />}
+            disabled={rhfFields.length === 1}
+            onClick={(e) => {
+              e.preventDefault();
+              remove(index);
+            }}
+          />
+        </div>
+      ))}
       <Button
         type="button"
-        text={`Add item`}
+        text="Add item"
         size="xs"
         hierarchy="secondary"
-        // onClick={() => append({})}
+        onClick={() => push({})}
         className="mt-2"
       />
     </div>
