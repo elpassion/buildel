@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { JSONSchemaField } from "../list/contracts";
 
 export function generateZODSchema(
   schema: JSONSchemaField,
@@ -70,3 +69,45 @@ export function generateZODSchema(
 
   return z.any();
 }
+
+export type JSONSchemaField =
+  | {
+      type: "object";
+      properties: { [key: string]: JSONSchemaField };
+      required?: string[];
+    }
+  | {
+      type: "string";
+      title: string;
+      description: string;
+      minLength?: number;
+      maxLength?: number;
+      presentAs?: "password";
+    }
+  | {
+      type: "string";
+      title: string;
+      description: string;
+      minLength?: number;
+      maxLength?: number;
+      enum: string[];
+      enumPresentAs: "checkbox" | "radio";
+    }
+  | {
+      type: "number";
+      title: string;
+      description: string;
+      minimum?: number;
+      maximum?: number;
+    }
+  | {
+      type: "array";
+      title: string;
+      description: string;
+      items: JSONSchemaField;
+    }
+  | {
+      type: "boolean";
+      title: string;
+      description: string;
+    };

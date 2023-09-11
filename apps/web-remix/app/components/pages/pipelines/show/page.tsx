@@ -1,6 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { loader } from "./loader";
 import type { LinksFunction, V2_MetaFunction } from "@remix-run/node";
 import ReactFlow, {
   Background,
@@ -11,6 +16,28 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
 } from "reactflow";
+import { isEqual } from "lodash";
+import { Button } from "@elpassion/taco";
+import { Modal } from "@elpassion/taco/Modal";
+import { useDebounce } from "usehooks-ts";
+import { useModal } from "~/hooks/useModal";
+import { EditBlockForm } from "~/components/pages/pipelines/show/EditBlockForm";
+import { assert } from "~/utils/assert";
+import type {
+  IBlockConfig,
+  IPipelineConfig,
+  IPipeline,
+  IEdge,
+} from "~/components/pages/pipelines/list/contracts";
+import flowStyles from "reactflow/dist/style.css";
+import { RunPipelineProvider } from "./RunPipelineProvider";
+import type { CustomNodeProps } from "./CustomNodes/CustomNode";
+import { CustomNode } from "./CustomNodes/CustomNode";
+import { PipelineSidebar } from "./PipelineSidebar/PipelineSidebar";
+import { useDraggableNodes } from "./PipelineSidebar/useDraggableNodes";
+import { PipelineNavbar } from "./PipelineNavbar";
+import { RunPipelineButton } from "./RunPipelineButton";
+import { loader } from "./loader";
 import {
   getAllBlockTypes,
   getEdges,
@@ -19,24 +46,6 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
-import { Button } from "@elpassion/taco";
-import { useDebounce } from "usehooks-ts";
-import { isEqual } from "lodash";
-import { RunPipelineProvider } from "./RunPipelineProvider";
-import type { CustomNodeProps } from "./CustomNodes/CustomNode";
-import { CustomNode } from "./CustomNodes/CustomNode";
-import { PipelineSidebar } from "./PipelineSidebar/PipelineSidebar";
-import { useDraggableNodes } from "./PipelineSidebar/useDraggableNodes";
-import { assert } from "./usePipelineRun";
-import { PipelineNavbar } from "./PipelineNavbar";
-import { RunPipelineButton } from "./RunPipelineButton";
-import type {
-  IBlockConfig,
-  IPipelineConfig,
-  IPipeline,
-  IEdge,
-} from "~/components/pages/pipelines/list/contracts";
-import flowStyles from "reactflow/dist/style.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
@@ -45,6 +54,8 @@ export const links: LinksFunction = () => [
 export function ShowPipelinePage() {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const updateFetcher = useFetcher<IPipeline>();
+  const { isModalOpen, openModal, closeModal } = useModal();
+  const [editableBlock, setEditableBlock] = useState<IBlockConfig | null>(null);
   const { pipeline, blockTypes } = useLoaderData<typeof loader>();
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config)
@@ -65,6 +76,16 @@ export function ShowPipelinePage() {
       setNodes((nds) => nds.filter((nd) => nd.id !== node.name)),
     [setNodes]
   );
+
+  const handleEditBlock = useCallback((block: IBlockConfig) => {
+    setEditableBlock(block);
+    openModal();
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setEditableBlock(null);
+    closeModal();
+  }, []);
 
   const handleUpdate = useCallback(
     (config: IPipelineConfig) => {
@@ -100,7 +121,7 @@ export function ShowPipelinePage() {
     (props: CustomNodeProps) => (
       <CustomNode
         {...props}
-        // onUpdate={handleEditBlock}
+        onUpdate={handleEditBlock}
         onDelete={handleDelete}
       />
     ),
@@ -158,6 +179,17 @@ export function ShowPipelinePage() {
               size="sm"
               disabled
             />
+
+            <Modal isOpen={isModalOpen} closeModal={handleCloseModal}>
+              {editableBlock && (
+                <EditBlockForm
+                  onSubmit={(e) => {
+                    console.log(e);
+                  }}
+                  blockConfig={editableBlock}
+                />
+              )}
+            </Modal>
           </header>
 
           <ReactFlow

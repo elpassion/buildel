@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Channel, Socket } from "phoenix";
+import { assert } from "~/utils/assert";
 export function usePipelineRun(
   pipelineId: number,
   onOutput: (
@@ -104,10 +105,4 @@ export function usePipelineRun(
     stopRun,
     push,
   };
-}
-
-export function assert(condition: any, msg?: string): asserts condition {
-  if (!condition) {
-    throw new Error(msg);
-  }
 }

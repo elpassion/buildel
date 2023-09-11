@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { usePipelineRun } from "./usePipelineRun";
 import { IBlockConfig, IPipeline } from "../list/contracts";
-import { generateZODSchema } from "./SchemaParser";
+import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 
 export interface IEvent {
   block: string;
