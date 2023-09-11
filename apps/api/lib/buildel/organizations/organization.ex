@@ -6,6 +6,7 @@ defmodule Buildel.Organizations.Organization do
     field(:name, :string)
 
     has_many(:memberships, Buildel.Organizations.Membership)
+    has_many(:api_keys, Buildel.ApiKeys.ApiKey)
     many_to_many(:members, Buildel.Accounts.User, join_through: Buildel.Organizations.Membership)
     timestamps()
   end

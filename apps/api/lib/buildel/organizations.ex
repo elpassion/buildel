@@ -32,8 +32,11 @@ defmodule Buildel.Organizations do
            |> ApiKey.changeset(%{organization_id: organization_id})
          end)
          |> Repo.transaction() do
-      {:ok, %{organization: organization}} -> {:ok, organization}
-      {:error, :organization, changeset, _actions} -> {:error, changeset}
+      {:ok, %{organization: organization}} ->
+        {:ok, organization}
+
+      {:error, :organization, changeset, _actions} ->
+        {:error, changeset}
     end
   end
 
@@ -92,5 +95,9 @@ defmodule Buildel.Organizations do
 
   def change_membership(%Membership{} = membership, attrs \\ %{}) do
     Membership.changeset(membership, attrs)
+  end
+
+  def list_organization_api_keys(%Organization{} = organization) do
+    organization |> Repo.preload(:api_keys) |> Map.get(:api_keys)
   end
 end
