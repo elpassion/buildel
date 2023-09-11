@@ -2,8 +2,8 @@ import { startCase } from "lodash";
 import React, { DragEvent, useMemo } from "react";
 import { useRunPipeline } from "../RunPipelineProvider";
 import classNames from "classnames";
-import { assert } from "../usePipelineRun";
 import { IBlockTypes } from "../../list/contracts";
+import { assert } from "~/utils/assert";
 
 interface PipelineSidebarProps {
   blockTypes: IBlockTypes;
