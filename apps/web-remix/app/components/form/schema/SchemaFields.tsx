@@ -17,7 +17,7 @@ export function StringField({ field, name }: FieldProps) {
   const { fieldErrors } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
-
+  console.log(fieldErrors);
   if (!("enum" in field)) {
     if (field.presentAs === "password") {
       return (
@@ -150,7 +150,7 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
   useEffect(() => {
     if (rhfFields.length !== 0) return;
 
-    push({ key: Math.random() });
+    push({});
   }, [push, rhfFields.length]);
 
   return (

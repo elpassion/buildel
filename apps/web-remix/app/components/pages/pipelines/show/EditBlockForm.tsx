@@ -12,7 +12,6 @@ import {
 import { ValidatedForm } from "remix-validated-form";
 import * as React from "react";
 import { withZod } from "@remix-validated-form/with-zod";
-import { HiddenField } from "~/components/form/fields/field.context";
 
 export function EditBlockForm({
   onSubmit,
@@ -28,12 +27,13 @@ export function EditBlockForm({
     console.log(data);
     // onSubmit({ ...blockConfig, ...data });
   };
+  console.log(blockConfig);
 
   return (
     <ValidatedForm
       // @ts-ignore
       validator={validator}
-      defaultValues={{ name: "Test", inputs: [] }}
+      defaultValues={blockConfig}
       className="w-full max-w-md"
       method="post"
       onSubmit={(e) => console.log(e)}
