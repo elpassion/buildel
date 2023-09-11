@@ -6,15 +6,22 @@ defmodule BuildelWeb.PipelineChannel do
 
   def join("pipelines:" <> organization_pipeline_id, _params, socket) do
     with [_organization_id, pipeline_id] <- String.split(organization_pipeline_id, ":"),
-         {pipeline_id, _} when is_number(pipeline_id) <- Integer.parse(pipeline_id),
-         %Pipelines.Pipeline{id: pipeline_id} <- Pipelines.get_pipeline(pipeline_id),
+         {:ok, pipeline_id} <- Buildel.Utils.parse_id(pipeline_id),
+         {:ok, %Pipelines.Pipeline{id: pipeline_id}} <-
+           Pipelines.get_organization_pipeline(socket.assigns.organization, pipeline_id),
          {:ok, run} <- Pipelines.create_run(%{pipeline_id: pipeline_id}),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
       listen_to_outputs(run)
       {:ok, %{run: %{}}, socket |> assign(:run, run)}
     else
+      {:error, :invalid_id} ->
+        {:error, %{reason: "not_found"}}
+
+      {:error, :not_found} ->
+        {:error, %{reason: "not_found"}}
+
       _err ->
-        {:error, %{reason: "not_found", pipeline_id: "non-existent"}}
+        {:error, %{reason: "unknown"}}
     end
   end
 

@@ -140,9 +140,10 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
 
       assert response(conn, 204)
 
-      assert_error_sent(404, fn ->
+      conn =
         get(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline.id}")
-      end)
+
+      assert json_response(conn, 404)["errors"] != %{}
     end
   end
 

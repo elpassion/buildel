@@ -6,8 +6,8 @@ defmodule BuildelWeb.PipelineRunChannel do
   alias Buildel.Blocks.Block
 
   def join("pipeline_runs:" <> run_id, _params, socket) do
-    with {int_run_id, _} when is_number(int_run_id) <- Integer.parse(run_id),
-         %Buildel.Pipelines.Run{} = run <- Buildel.Pipelines.get_run(int_run_id) do
+    with {:ok, run_id} <- Buildel.Utils.parse_id(run_id),
+         %Buildel.Pipelines.Run{} = run <- Buildel.Pipelines.get_run(run_id) do
       socket =
         socket
         |> assign(:run, run)

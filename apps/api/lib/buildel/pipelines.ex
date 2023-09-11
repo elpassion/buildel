@@ -37,9 +37,12 @@ defmodule Buildel.Pipelines do
     |> Repo.all()
   end
 
-  def get_organization_pipeline!(%Organization{} = organization, id) do
-    from(p in Pipeline, where: p.organization_id == ^organization.id, where: p.id == ^id)
-    |> Repo.one!()
+  def get_organization_pipeline(%Organization{} = organization, id) do
+    case from(p in Pipeline, where: p.organization_id == ^organization.id, where: p.id == ^id)
+         |> Repo.one() do
+      nil -> {:error, :not_found}
+      pipeline -> {:ok, pipeline}
+    end
   end
 
   alias Buildel.Pipelines.Run

@@ -11,12 +11,9 @@ defmodule Buildel.Organizations do
   end
 
   def get_user_organization(%User{} = user, organization_id) when is_binary(organization_id) do
-    case Integer.parse(organization_id) do
-      {organization_id, _} when is_number(organization_id) ->
-        get_user_organization(user, organization_id)
-
-      :error ->
-        {:error, :bad_request}
+    case Buildel.Utils.parse_id(organization_id) do
+      {:ok, organization_id} -> get_user_organization(user, organization_id)
+      error -> error
     end
   end
 
@@ -32,12 +29,9 @@ defmodule Buildel.Organizations do
 
   def get_organization_by_id_and_api_key(organization_id, api_key)
       when is_binary(organization_id) do
-    case Integer.parse(organization_id) do
-      {organization_id, _} when is_number(organization_id) ->
-        get_organization_by_id_and_api_key(organization_id, api_key)
-
-      :error ->
-        {:error, :bad_request}
+    case Buildel.Utils.parse_id(organization_id) do
+      {:ok, organization_id} -> get_organization_by_id_and_api_key(organization_id, api_key)
+      error -> error
     end
   end
 

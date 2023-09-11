@@ -2,16 +2,33 @@ defmodule BuildelWeb.PipelineChannelTest do
   use BuildelWeb.ChannelCase
 
   import Buildel.PipelinesFixtures
+  import Buildel.OrganizationsFixtures
 
   describe "join" do
     test "fails when starting a pipeline that does not exist", %{socket: socket} do
-      assert {:error, %{reason: "not_found", pipeline_id: "non-existent"}} =
+      assert {:error, %{reason: "not_found"}} =
                socket
                |> subscribe_and_join(BuildelWeb.PipelineChannel, "pipelines:org:non-existent")
     end
 
-    test "succeeds when trying to join a run that exists", %{socket: socket} do
+    test "fails when trying to join a pipeline that is from another organization", %{
+      socket: socket
+    } do
       pipeline = pipeline_fixture()
+
+      assert {:error, %{reason: "not_found"}} =
+               socket
+               |> subscribe_and_join(
+                 BuildelWeb.PipelineChannel,
+                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}"
+               )
+    end
+
+    test "succeeds when trying to join a run that exists", %{
+      socket: socket,
+      organization: organization
+    } do
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
 
       assert {:ok, %{}, %Phoenix.Socket{assigns: %{run: %{}}}} =
                socket
@@ -20,17 +37,14 @@ defmodule BuildelWeb.PipelineChannelTest do
                  "pipelines:#{pipeline.organization_id}:#{pipeline.id}"
                )
     end
-
-    setup do
-      socket = BuildelWeb.PipelineSocket |> socket()
-
-      %{socket: socket}
-    end
   end
 
   describe "IO" do
-    test "outputs all outputs to socket", %{socket: socket} do
-      pipeline = pipeline_fixture()
+    test "outputs all outputs to socket", %{socket: socket, organization: organization} do
+      pipeline =
+        pipeline_fixture(%{
+          organization_id: organization.id
+        })
 
       {:ok, %{run: _run}, socket} =
         socket
@@ -58,11 +72,13 @@ defmodule BuildelWeb.PipelineChannelTest do
         payload: ^payload
       }
     end
+  end
 
-    setup do
-      socket = BuildelWeb.PipelineSocket |> socket()
+  setup do
+    organization = organization_fixture()
 
-      %{socket: socket}
-    end
+    socket = BuildelWeb.PipelineSocket |> socket(nil, %{organization: organization})
+
+    %{socket: socket, organization: organization}
   end
 end

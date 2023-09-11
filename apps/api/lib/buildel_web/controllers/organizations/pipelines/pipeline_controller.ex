@@ -26,7 +26,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         pipeline <- Pipelines.get_organization_pipeline!(organization, id) do
+         {:ok, %Pipeline{} = pipeline} <- Pipelines.get_organization_pipeline(organization, id) do
       render(conn, :show, pipeline: pipeline)
     end
   end
@@ -55,7 +55,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         pipeline <- Pipelines.get_organization_pipeline!(organization, id),
+         {:ok, %Pipeline{} = pipeline} <- Pipelines.get_organization_pipeline(organization, id),
          {:ok, %Pipeline{} = pipeline} <- Pipelines.update_pipeline(pipeline, pipeline_params) do
       render(conn, :show, pipeline: pipeline)
     end
@@ -65,7 +65,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         pipeline <- Pipelines.get_organization_pipeline!(organization, id),
+         {:ok, %Pipeline{} = pipeline} <- Pipelines.get_organization_pipeline(organization, id),
          {:ok, %Pipeline{}} <- Pipelines.delete_pipeline(pipeline) do
       send_resp(conn, :no_content, "")
     end
