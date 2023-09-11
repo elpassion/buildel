@@ -16,8 +16,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
   def index(conn, %{"organization_id" => organization_id}) do
     user = conn.assigns.current_user
 
-    with {organization_id, _} when is_number(organization_id) <- Integer.parse(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          pipelines <- Pipelines.list_organization_pipelines(organization) do
       render(conn, :index, pipelines: pipelines)
     end
@@ -26,8 +25,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
   def show(conn, %{"organization_id" => organization_id, "id" => id}) do
     user = conn.assigns.current_user
 
-    with {organization_id, _} when is_number(organization_id) <- Integer.parse(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          pipeline <- Pipelines.get_organization_pipeline!(organization, id) do
       render(conn, :show, pipeline: pipeline)
     end
@@ -36,8 +34,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
   def create(conn, %{"organization_id" => organization_id, "pipeline" => pipeline_params}) do
     user = conn.assigns.current_user
 
-    with {organization_id, _} when is_number(organization_id) <- Integer.parse(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.create_pipeline(Map.put(pipeline_params, "organization_id", organization.id)) do
       conn
@@ -57,8 +54,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
       }) do
     user = conn.assigns.current_user
 
-    with {organization_id, _} when is_number(organization_id) <- Integer.parse(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          pipeline <- Pipelines.get_organization_pipeline!(organization, id),
          {:ok, %Pipeline{} = pipeline} <- Pipelines.update_pipeline(pipeline, pipeline_params) do
       render(conn, :show, pipeline: pipeline)
@@ -68,8 +64,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
   def delete(conn, %{"organization_id" => organization_id, "id" => id}) do
     user = conn.assigns.current_user
 
-    with {organization_id, _} when is_number(organization_id) <- Integer.parse(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          pipeline <- Pipelines.get_organization_pipeline!(organization, id),
          {:ok, %Pipeline{}} <- Pipelines.delete_pipeline(pipeline) do
       send_resp(conn, :no_content, "")

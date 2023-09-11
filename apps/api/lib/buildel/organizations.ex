@@ -10,6 +10,16 @@ defmodule Buildel.Organizations do
     user |> Repo.preload(:organizations) |> Map.get(:organizations)
   end
 
+  def get_user_organization(%User{} = user, organization_id) when is_binary(organization_id) do
+    case Integer.parse(organization_id) do
+      {organization_id, _} when is_number(organization_id) ->
+        get_user_organization(user, organization_id)
+
+      :error ->
+        {:error, :bad_request}
+    end
+  end
+
   def get_user_organization(%User{} = user, organization_id) do
     case list_user_organizations(user)
          |> Enum.find(fn organization -> organization.id == organization_id end) do
