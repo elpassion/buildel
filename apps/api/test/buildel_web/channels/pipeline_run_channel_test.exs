@@ -4,6 +4,22 @@ defmodule BuildelWeb.PipelineRunChannelTest do
 
   import Buildel.PipelinesFixtures
 
+  describe "connect" do
+    test "fails when trying to connect without correct params" do
+      assert {:error,
+              %{
+                errors: %{api_key: ["can't be blank"], organization_id: ["can't be blank"]}
+              }} =
+               BuildelWeb.PipelineSocket |> connect(%{})
+    end
+
+    test "fails when trying to connect to non existant organization" do
+      assert {:error, %{errors: %{detail: "Not Found"}}} =
+               BuildelWeb.PipelineSocket
+               |> connect(%{organization_id: "non-existent", api_key: "api_key"})
+    end
+  end
+
   describe "join" do
     test "fails when trying to join a run that does not exist", %{socket: socket} do
       assert {:error, %{reason: "not_found", run_id: "non-existent"}} =

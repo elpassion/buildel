@@ -30,6 +30,27 @@ defmodule Buildel.Organizations do
 
   def get_organization!(id), do: Repo.get!(Organization, id)
 
+  def get_organization_by_id_and_api_key(organization_id, api_key)
+      when is_binary(organization_id) do
+    case Integer.parse(organization_id) do
+      {organization_id, _} when is_number(organization_id) ->
+        get_organization_by_id_and_api_key(organization_id, api_key)
+
+      :error ->
+        {:error, :bad_request}
+    end
+  end
+
+  def get_organization_by_id_and_api_key(organization_id, api_key) do
+    case Repo.get_by(ApiKey, %{key: api_key, organization_id: organization_id}) do
+      nil ->
+        {:error, :not_found}
+
+      %ApiKey{} = api_key ->
+        {:ok, api_key |> Repo.preload(:organization) |> Map.get(:organization)}
+    end
+  end
+
   def create_organization(attrs \\ %{}) do
     case Ecto.Multi.new()
          |> Ecto.Multi.insert(:organization, Organization.changeset(%Organization{}, attrs))

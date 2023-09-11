@@ -1,6 +1,6 @@
 defmodule BuildelWeb.OrganizationController do
   use BuildelWeb, :controller
-  use BuildelWeb.ControllerValidator
+  use BuildelWeb.Validator
 
   import BuildelWeb.UserAuth
 

@@ -1,6 +1,6 @@
 defmodule BuildelWeb.UserRegistrationController do
   use BuildelWeb, :controller
-  use BuildelWeb.ControllerValidator
+  use BuildelWeb.Validator
 
   alias Buildel.Accounts
   alias Buildel.Accounts.User
