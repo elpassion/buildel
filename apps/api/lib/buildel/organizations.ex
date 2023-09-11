@@ -4,6 +4,7 @@ defmodule Buildel.Organizations do
 
   alias Buildel.Organizations.{Organization, Membership}
   alias Buildel.Accounts.User
+  alias Buildel.ApiKeys.ApiKey
 
   def list_user_organizations(%User{} = user) do
     user |> Repo.preload(:organizations) |> Map.get(:organizations)
@@ -25,6 +26,10 @@ defmodule Buildel.Organizations do
          |> Ecto.Multi.insert(:membership, fn %{organization: %{id: organization_id}} ->
            %Membership{}
            |> Membership.changeset(%{organization_id: organization_id, user_id: attrs.user_id})
+         end)
+         |> Ecto.Multi.insert(:api_key, fn %{organization: %{id: organization_id}} ->
+           ApiKey.with_random_key()
+           |> ApiKey.changeset(%{organization_id: organization_id})
          end)
          |> Repo.transaction() do
       {:ok, %{organization: organization}} -> {:ok, organization}
