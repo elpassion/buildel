@@ -13,6 +13,7 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
     %{
       id: pipeline.id,
       name: pipeline.name,
+      organization_id: pipeline.organization_id,
       config:
         Map.update(pipeline.config, "blocks", [], fn blocks ->
           Enum.map(blocks, fn block ->

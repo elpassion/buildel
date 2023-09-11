@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Channel, Socket } from "phoenix";
 import { assert } from "~/utils/assert";
 export function usePipelineRun(
+  organizationId: number,
   pipelineId: number,
   onOutput: (
     blockId: string,
@@ -19,7 +20,10 @@ export function usePipelineRun(
     assert(socket.current);
 
     setStatus("starting");
-    const newChannel = socket.current.channel(`pipelines:${pipelineId}`, {});
+    const newChannel = socket.current.channel(
+      `pipelines:${organizationId}:${pipelineId}`,
+      {}
+    );
     newChannel.onMessage = (event: string, payload: any) => {
       if (event.startsWith("output:")) {
         const [_, blockId, outputName] = event.split(":");
