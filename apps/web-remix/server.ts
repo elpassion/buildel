@@ -13,6 +13,7 @@ import express from "express";
 import morgan from "morgan";
 import sourceMapSupport from "source-map-support";
 import { createProxyMiddleware } from "http-proxy-middleware";
+import { get } from "lodash";
 
 sourceMapSupport.install();
 installGlobals();
@@ -94,10 +95,30 @@ async function run() {
   app.use(
     "/super-api",
     createProxyMiddleware({
-      pathRewrite: function (path, req) {
-        return path
+      pathRewrite: async function (path, req) {
+        const newPath = path
           .replace("/super-api", "/api")
           .replace("/api/socket", "/socket");
+        if (!newPath.startsWith("/socket/websocket")) return newPath;
+        const url = new URL(newPath, "http://byleco.com");
+        const organizationId = url.searchParams.get("organization_id");
+        if (!organizationId) return newPath;
+
+        const response = await fetch(
+          `http://127.0.0.1:4000/api/organizations/${organizationId}/keys`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Cookie: req.headers.cookie!,
+            },
+          }
+        ).then((res) => res.json());
+        const apiKey = get(response, "data.0.key");
+        if (!apiKey) return newPath;
+
+        url.searchParams.append("api_key", apiKey);
+        const newestPath = url.pathname + url.search;
+        return newestPath;
       },
       ws: true,
       target: "http://127.0.0.1:4000",

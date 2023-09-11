@@ -68,6 +68,7 @@ defmodule BuildelWeb.Router do
     delete("/users/log_out", UserSessionController, :delete)
 
     resources("/organizations", OrganizationController, only: [:index, :create, :show])
+    get("/organizations/:id/keys", OrganizationController, :get_api_keys)
   end
 
   ## Authentication routes

@@ -44,4 +44,14 @@ defmodule BuildelWeb.OrganizationController do
       |> render(:show, organization: organization)
     end
   end
+
+  def get_api_keys(conn, %{"id" => organization_id}) do
+    user = conn.assigns.current_user
+
+    with {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
+         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         keys <- Organizations.list_organization_api_keys(organization) do
+      render(conn, :keys, keys: keys)
+    end
+  end
 end

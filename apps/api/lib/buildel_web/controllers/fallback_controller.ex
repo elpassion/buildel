@@ -30,6 +30,13 @@ defmodule BuildelWeb.FallbackController do
     |> render(:"403")
   end
 
+  def call(conn, {:error, :invalid_id}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> put_view(html: BuildelWeb.ErrorHTML, json: BuildelWeb.ErrorJSON)
+    |> render(:"422")
+  end
+
   def call(conn, _error) do
     conn
     |> put_status(:internal_server_error)
