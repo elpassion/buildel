@@ -18,7 +18,6 @@ import ReactFlow, {
 } from "reactflow";
 import { isEqual } from "lodash";
 import { Button } from "@elpassion/taco";
-import { Modal } from "@elpassion/taco/Modal";
 import { useDebounce } from "usehooks-ts";
 import { useModal } from "~/hooks/useModal";
 import { EditBlockForm } from "~/components/pages/pipelines/show/EditBlockForm";
@@ -46,6 +45,7 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
+import { BlockModal, BlockModalHeader } from "./BlockModal";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
@@ -111,6 +111,21 @@ export function ShowPipelinePage() {
       });
     },
     [pipeline, handleUpdate]
+  );
+
+  const onBlockUpdate = useCallback(
+    (updated: IBlockConfig) => {
+      setNodes((prev) => {
+        return prev.map((node) => {
+          if (node.id === updated.name) {
+            node.data = updated;
+          }
+          return node;
+        });
+      });
+      handleCloseModal();
+    },
+    [setNodes]
   );
 
   const onConnect = useCallback((params: Connection) => {
@@ -180,16 +195,23 @@ export function ShowPipelinePage() {
               disabled
             />
 
-            <Modal isOpen={isModalOpen} closeModal={handleCloseModal}>
+            <BlockModal
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+              header={
+                <BlockModalHeader
+                  heading={editableBlock ? "Edit Block" : "Add Block"}
+                  description="Blocks are modules within your app that can work simultaneously."
+                />
+              }
+            >
               {editableBlock && (
                 <EditBlockForm
-                  onSubmit={(e) => {
-                    console.log(e);
-                  }}
+                  onSubmit={onBlockUpdate}
                   blockConfig={editableBlock}
                 />
               )}
-            </Modal>
+            </BlockModal>
           </header>
 
           <ReactFlow

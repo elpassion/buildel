@@ -5,7 +5,8 @@ import { Field as FormField } from "~/components/form/fields/field.context";
 import { assert } from "~/utils/assert";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { CheckboxInput } from "~/components/form/inputs/checkbox.input";
-import { NumberInput } from "~/components/form/inputs/number.input";
+import { NumberInputField } from "~/components/form/fields/number.field";
+import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
 
 export function StringField({ field, name }: FieldProps) {
   assert(name);
@@ -95,7 +96,7 @@ export function NumberField({ field, name }: FieldProps) {
   // const error = getValueFromPath(errors, name);
   return (
     <FormField name={name}>
-      <NumberInput
+      <NumberInputField
         id={name}
         // onChange={(value) => setValue(name, value)}
 
@@ -144,9 +145,8 @@ export function BooleanField({ field, name }: FieldProps) {
   // const value = watch(name);
   return (
     <FormField name={name}>
-      <CheckboxInput
+      <CheckboxInputField
         id={name}
-        name={name}
         labelText={field.title}
         defaultValue={"false"}
         // error={!!error}

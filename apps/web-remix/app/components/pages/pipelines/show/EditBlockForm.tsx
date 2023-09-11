@@ -24,16 +24,18 @@ export function EditBlockForm({
   const validator = React.useMemo(() => withZod(schema), []);
 
   const handleUpdate = (data: IBlockConfig) => {
-    onSubmit({ ...blockConfig, ...data });
+    console.log(data);
+    // onSubmit({ ...blockConfig, ...data });
   };
 
   return (
     <ValidatedForm
       // @ts-ignore
       validator={validator}
-      method="post"
-      noValidate
       className="w-full max-w-md"
+      method="post"
+      onSubmit={(e) => console.log(e)}
+      noValidate
     >
       <div className="space-y-4">
         <Schema

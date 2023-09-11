@@ -1,4 +1,3 @@
-"use client";
 import { DragEvent, RefObject, useCallback, useState } from "react";
 import { ReactFlowInstance } from "reactflow";
 import { IBlockConfig } from "../../list/contracts";
