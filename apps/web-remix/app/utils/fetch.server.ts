@@ -14,7 +14,7 @@ export async function fetchTyped<T extends ZodType>(
   const response = await fetch(url, options).catch((e) => {
     throw new UnknownAPIError();
   });
-  console.log(response);
+
   if (!response.ok) {
     if (response.status === 422) {
       const jsonResponse = await response.json();

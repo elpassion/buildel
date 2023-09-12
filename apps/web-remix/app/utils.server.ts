@@ -132,7 +132,7 @@ async function requestFetchTyped(
   return (schema, url, options) => {
     return fetchTyped(
       schema,
-      "http://127.0.0.1:3000/super-api" + url,
+      `${process.env.PAGE_URL}/super-api` + url,
       merge(options || {}, {
         headers: {
           "Content-Type": "application/json",
