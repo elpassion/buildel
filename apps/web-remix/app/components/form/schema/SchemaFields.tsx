@@ -2,13 +2,16 @@ import React, { useEffect } from "react";
 import { useFieldArray, useFormContext } from "remix-validated-form";
 import { Button, Icon, IconButton } from "@elpassion/taco";
 import { Field as FormField } from "~/components/form/fields/field.context";
-import { TextInputField } from "~/components/form/fields/text.field";
+import {
+  PasswordInputField,
+  TextInputField,
+} from "~/components/form/fields/text.field";
 import { CheckboxInput } from "~/components/form/inputs/checkbox.input";
-import { NumberInputField } from "~/components/form/fields/number.field";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
 import { RadioGroupField } from "~/components/form/fields/radioGroup.field";
 import { assert } from "~/utils/assert";
 import { Field, FieldProps } from "./Schema";
+import { QuantityInputField } from "~/components/form/fields/quantity.field";
 
 export function StringField({ field, name }: FieldProps) {
   assert(name);
@@ -17,14 +20,13 @@ export function StringField({ field, name }: FieldProps) {
   const { fieldErrors } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
-  console.log(fieldErrors);
+
   if (!("enum" in field)) {
     if (field.presentAs === "password") {
       return (
         <FormField name={name}>
-          <TextInputField
+          <PasswordInputField
             id={name}
-            type="password"
             supportingText={field.description}
             label={field.title}
             errorMessage={error}
@@ -36,7 +38,6 @@ export function StringField({ field, name }: FieldProps) {
       <FormField name={name}>
         <TextInputField
           id={name}
-          type="password"
           supportingText={field.description}
           label={field.title}
           errorMessage={error}
@@ -88,11 +89,14 @@ export function NumberField({ field, name }: FieldProps) {
   const error = fieldErrors[name] ?? undefined;
   return (
     <FormField name={name}>
-      <NumberInputField
+      <QuantityInputField
         id={name}
         errorMessage={error}
         label={field.title}
         supportingText={field.description}
+        minValue={field.minimum}
+        maxValue={field.maximum}
+        step={field.step}
       />
     </FormField>
   );

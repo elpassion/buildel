@@ -12,6 +12,7 @@ import {
 import { ValidatedForm } from "remix-validated-form";
 import * as React from "react";
 import { withZod } from "@remix-validated-form/with-zod";
+import { HiddenField } from "~/components/form/fields/field.context";
 
 export function EditBlockForm({
   onSubmit,
@@ -23,22 +24,27 @@ export function EditBlockForm({
   const schema = generateZODSchema(blockConfig.block_type.schema as any);
   const validator = React.useMemo(() => withZod(schema), []);
 
-  const handleUpdate = (data: IBlockConfig) => {
-    console.log(data);
-    // onSubmit({ ...blockConfig, ...data });
+  const handleUpdate = (
+    data: Record<string, any>,
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+
+    onSubmit({ ...blockConfig, ...data });
   };
-  console.log(blockConfig);
 
   return (
     <ValidatedForm
       // @ts-ignore
       validator={validator}
       defaultValues={blockConfig}
+      onSubmit={handleUpdate}
       className="w-full max-w-md"
-      method="post"
-      onSubmit={(e) => console.log(e)}
+      noValidate
     >
       <div className="space-y-4">
+        <HiddenField name="name" value={blockConfig.name} />
+        <HiddenField name="inputs" value={JSON.stringify(blockConfig.inputs)} />
         <Schema
           schema={blockConfig.block_type.schema as any}
           name="opts"

@@ -12,7 +12,7 @@ export const RadioGroupField = forwardRef<
 >((props, ref) => {
   const { name, getInputProps, validate } = useFieldContext();
   const [value, setValue] = useControlField<string>(name);
-  // console.log(name);
+
   return (
     <RadioCardGroupInput
       // @ts-ignore

@@ -34,6 +34,9 @@ export function generateZODSchema(
     if (schema.maximum !== undefined) {
       nestedSchema = nestedSchema.max(schema.maximum);
     }
+    if (schema.step !== undefined) {
+      nestedSchema = nestedSchema.multipleOf(schema.step);
+    }
     if (isOptional) {
       nestedSchema = nestedSchema.optional();
     }
@@ -51,7 +54,7 @@ export function generateZODSchema(
       nestedSchema = nestedSchema.optional();
     }
 
-    return nestedSchema;
+    return zfd.json(nestedSchema);
   }
 
   if (schema.type === "object") {
@@ -100,6 +103,7 @@ export type JSONSchemaField =
       description: string;
       minimum?: number;
       maximum?: number;
+      step?: number;
     }
   | {
       type: "array";
