@@ -2,6 +2,7 @@ import { Link, Form } from "@remix-run/react";
 import { Icon, IconButton, Indicator } from "@elpassion/taco";
 import { IPipeline } from "./contracts";
 import { HiddenField } from "~/components/form/fields/field.context";
+import { routes } from "~/utils/routes.utils";
 
 interface PipelinesListItemProps {
   pipeline: IPipeline;
@@ -12,7 +13,7 @@ export const PipelinesListItem = ({ pipeline }: PipelinesListItemProps) => {
       <header className="flex items-center text-neutral-700">
         <div className="flex flex-grow">
           <Link
-            to={`${pipeline.id}`}
+            to={routes.pipeline(pipeline.organization_id, pipeline.id)}
             className="text-lg font-semibold hover:underline"
           >
             {pipeline.name}

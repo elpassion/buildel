@@ -1,12 +1,14 @@
 import { Button, ResponsiveSidebar } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
-import { Outlet, useFetcher, useLoaderData } from "@remix-run/react";
+import { NavLink, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
 import Modal from "react-modal";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 import { requireLogin } from "~/session.server";
+import { routes } from "~/utils/routes.utils";
+import classNames from "classnames";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
@@ -15,13 +17,28 @@ export async function loader(loaderArgs: LoaderArgs) {
     invariant(params.organizationId, "organizationId not found");
     const { cookie, error } = await getToastError(request);
 
-    const response = await fetch(
+    const organizationsResponse = await fetch(
       OrganizationsResponse,
-      `/organizations/${params.organizationId}`
+      `/organizations`
     );
 
+    const organization = organizationsResponse.data.data.find(
+      (org) => org.id === Number(params.organizationId)
+    );
+
+    if (!organization) {
+      throw new Response(null, {
+        status: 404,
+        statusText: "Not Found",
+      });
+    }
+
     return json(
-      { error, organization: response.data.data },
+      {
+        error,
+        organization: organization,
+        organizations: organizationsResponse.data.data,
+      },
       {
         headers: {
           "Set-Cookie": cookie,
@@ -32,33 +49,26 @@ export async function loader(loaderArgs: LoaderArgs) {
 }
 
 const OrganizationsResponse = z.object({
-  data: z.object({
-    id: z.number(),
-    name: z.string(),
-  }),
+  data: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+    })
+  ),
 });
 
 export default function Layout() {
-  const logout = useFetcher();
   return (
     <div id="_root" className="grid h-screen grid-cols-[auto_1fr]">
       <ResponsiveSidebar
         sidebarClassName="sticky top-0 bg-white border-r border-gray-200"
         collapseBtnClassName="absolute top-11 -right-2"
         topContent={<SidebarTopContent />}
-        bottomContent={
-          <Button
-            variant="outlined"
-            onClick={() => {
-              logout.submit({}, { method: "DELETE", action: "/logout" });
-            }}
-          >
-            Logout
-          </Button>
-        }
+        bottomContent={<LogoutButton />}
       >
-        TEST
+        <OrganizationsLinks />
       </ResponsiveSidebar>
+
       <main className="col-span-2 flex min-h-screen flex-col overflow-x-auto md:col-auto">
         <Outlet />
       </main>
@@ -78,4 +88,36 @@ function SidebarTopContent() {
       </div>
     </div>
   );
+}
+
+function LogoutButton() {
+  const logout = useFetcher();
+
+  return (
+    <Button
+      variant="outlined"
+      onClick={() => {
+        logout.submit({}, { method: "DELETE", action: "/logout" });
+      }}
+    >
+      Logout
+    </Button>
+  );
+}
+function OrganizationsLinks() {
+  const { organizations } = useLoaderData<typeof loader>();
+
+  return organizations.map((org) => (
+    <NavLink
+      key={org.id}
+      to={routes.organization(org.id)}
+      className={({ isActive }) =>
+        classNames({
+          "text-red-500": isActive,
+        })
+      }
+    >
+      <p>{org.name}</p>
+    </NavLink>
+  ));
 }
