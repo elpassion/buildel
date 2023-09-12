@@ -1,12 +1,6 @@
 import React from "react";
 import { V2_MetaFunction } from "@remix-run/node";
-import {
-  Link,
-  Outlet,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-} from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useMatch } from "@remix-run/react";
 import { loader } from "./loader";
 import { PipelinesNavbar } from "./PipelinesNavbar";
 import { PipelinesList } from "./PipelinesList";

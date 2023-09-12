@@ -12,7 +12,7 @@ export async function loader(args: LoaderArgs) {
       OrganizationsResponse,
       `/organizations`
     );
-    console.log(organizations);
+
     const organization = organizations.data.at(0);
 
     if (organization) {
