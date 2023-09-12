@@ -53,7 +53,8 @@ defmodule Buildel.Blocks.Chat do
                 "description" => "The temperature of the chat.",
                 "default" => 0.7,
                 "minimum" => 0.0,
-                "maximum" => 1.0
+                "maximum" => 1.0,
+                "step"    => 0.1
               },
               "messages" => %{
                 "type" => "array",
