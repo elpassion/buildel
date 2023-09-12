@@ -33,7 +33,12 @@ export const loaderBuilder =
       } else if (e instanceof NotFoundError) {
         throw notFound();
       } else if (e instanceof UnauthorizedError) {
-        throw redirect("/login");
+        throw redirect("/login", {
+          headers: {
+            "Set-Cookie":
+              "_buildel_key=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+          },
+        });
       }
 
       throw e;
@@ -93,7 +98,12 @@ export const actionBuilder =
       if (e instanceof ValidationError) {
         return validationError({ fieldErrors: e.fieldErrors });
       } else if (e instanceof UnauthorizedError) {
-        throw redirect("/login");
+        throw redirect("/login", {
+          headers: {
+            "Set-Cookie":
+              "_buildel_key=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+          },
+        });
       } else if (e instanceof NotFoundError) {
         throw notFound();
       } else if (e instanceof UnknownAPIError) {

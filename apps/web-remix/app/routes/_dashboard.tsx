@@ -1,6 +1,6 @@
-import { ResponsiveSidebar } from "@elpassion/taco";
+import { Button, ResponsiveSidebar } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { Outlet, useFetcher, useLoaderData } from "@remix-run/react";
 import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
 import Modal from "react-modal";
@@ -39,12 +39,23 @@ const OrganizationsResponse = z.object({
 });
 
 export default function Layout() {
+  const logout = useFetcher();
   return (
     <div id="_root" className="grid h-screen grid-cols-[auto_1fr]">
       <ResponsiveSidebar
         sidebarClassName="sticky top-0 bg-white border-r border-gray-200"
         collapseBtnClassName="absolute top-11 -right-2"
         topContent={<SidebarTopContent />}
+        bottomContent={
+          <Button
+            variant="outlined"
+            onClick={() => {
+              logout.submit({}, { method: "DELETE", action: "/logout" });
+            }}
+          >
+            Logout
+          </Button>
+        }
       >
         TEST
       </ResponsiveSidebar>
