@@ -36,6 +36,6 @@ defmodule BuildelWeb.UserSessionController do
   def delete(conn, _params) do
     conn
     |> UserAuth.log_out_user()
-    |> put_status(:no_content)
+    |> send_resp(:no_content, "")
   end
 end
