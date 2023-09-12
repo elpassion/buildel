@@ -2,6 +2,7 @@ import { LoaderArgs, redirect } from "@remix-run/node";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
 import invariant from "tiny-invariant";
+import { routes } from "~/utils/routes.utils";
 
 export async function loader(args: LoaderArgs) {
   return loaderBuilder(async ({ request, params }) => {
@@ -10,6 +11,6 @@ export async function loader(args: LoaderArgs) {
 
     //fetch organization and return 404 if not exist
 
-    return redirect(`/${params.organizationId}/pipelines`);
+    return redirect(routes.pipelines(params.organizationId));
   })(args);
 }

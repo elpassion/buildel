@@ -4,6 +4,7 @@ import { validationError } from "remix-validated-form";
 import { z } from "zod";
 import { actionBuilder } from "~/utils.server";
 import { schema } from "./schema";
+import { routes } from "~/utils/routes.utils";
 
 export async function action(actionArgs: ActionArgs) {
   return actionBuilder({
@@ -19,7 +20,7 @@ export async function action(actionArgs: ActionArgs) {
         body: JSON.stringify(result.data),
       });
 
-      throw redirect(`/${response.data.data.id}`);
+      throw redirect(routes.organization(response.data.data.id));
     },
   })(actionArgs);
 }

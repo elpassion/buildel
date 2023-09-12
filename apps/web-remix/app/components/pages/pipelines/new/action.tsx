@@ -6,6 +6,7 @@ import invariant from "tiny-invariant";
 import { actionBuilder } from "~/utils.server";
 import { PipelineResponse } from "../list/contracts";
 import { schema } from "./schema";
+import { routes } from "~/utils/routes.utils";
 
 export async function action(actionArgs: ActionArgs) {
   return actionBuilder({
@@ -26,7 +27,7 @@ export async function action(actionArgs: ActionArgs) {
         }
       );
 
-      return redirect(`/${params.organizationId}/pipelines/${data.id}`);
+      return redirect(routes.pipeline(params.organizationId, data.id));
     },
   })(actionArgs);
 }

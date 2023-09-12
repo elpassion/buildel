@@ -2,6 +2,7 @@ import { LoaderArgs, redirect } from "@remix-run/node";
 import { z } from "zod";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
+import { routes } from "~/utils/routes.utils";
 
 export async function loader(args: LoaderArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {
@@ -15,9 +16,9 @@ export async function loader(args: LoaderArgs) {
     const organization = organizations.data.at(0);
 
     if (organization) {
-      return redirect(`/${organization.id}/pipelines`);
+      return redirect(routes.pipelines(organization.id));
     } else {
-      return redirect(`/organizations/new`);
+      return redirect(routes.newOrganization());
     }
   })(args);
 }
