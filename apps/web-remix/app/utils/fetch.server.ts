@@ -5,13 +5,20 @@ import {
   UnknownAPIError,
   ValidationError,
 } from "./errors.server";
+import { merge } from "lodash";
 
 export async function fetchTyped<T extends ZodType>(
   schema: T,
   url: string,
   options?: RequestInit | undefined
 ): Promise<ParsedResponse<z.infer<T>>> {
-  const response = await fetch(url, options).catch((e) => {
+  const response = await fetch(
+    url,
+    merge(options, { headers: { connection: "keep-alive" } })
+  ).catch((e) => {
+    console.error(
+      `Failed to connect to API error: ${e} during request to ${url}`
+    );
     throw new UnknownAPIError();
   });
 
@@ -24,6 +31,7 @@ export async function fetchTyped<T extends ZodType>(
     } else if (response.status === 404) {
       throw new NotFoundError();
     } else {
+      console.error(`Unknown API error ${response.status} for ${url}`);
       throw new UnknownAPIError();
     }
   }

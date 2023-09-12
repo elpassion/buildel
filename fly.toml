@@ -12,7 +12,7 @@ processes = []
 [build]
 
 [env]
-  API_URL = "https://buildel-api.fly.dev/api"
+  API_URL = "https://buildel-api.fly.dev"
   PAGE_URL = "https://buildel-web.fly.dev"
 
 [http_service]
@@ -34,9 +34,8 @@ processes = []
   script_checks = []
 
   [services.concurrency]
-    hard_limit = 25
-    soft_limit = 20
-    type = "connections"
+    hard_limit = 50
+    soft_limit = 25
 
   [[services.ports]]
     handlers = ["http"]
@@ -46,19 +45,3 @@ processes = []
   [[services.ports]]
     handlers = ["tls", "http"]
     port = 443
-
-  [[services.tcp_checks]]
-    grace_period = "1s"
-    interval = "15s"
-    restart_limit = 0
-    timeout = "2s"
-
-  [[services.http_checks]]
-    interval = "10s"
-    grace_period = "5s"
-    method = "get"
-    path = "/healthcheck"
-    protocol = "http"
-    timeout = "2s"
-    tls_skip_verify = false
-    [services.http_checks.headers]

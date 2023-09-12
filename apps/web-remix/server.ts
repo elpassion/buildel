@@ -105,7 +105,7 @@ async function run() {
         if (!organizationId) return newPath;
 
         const response = await fetch(
-          `http://127.0.0.1:4000/api/organizations/${organizationId}/keys`,
+          `${process.env.API_URL}/api/organizations/${organizationId}/keys`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -121,7 +121,8 @@ async function run() {
         return newestPath;
       },
       ws: true,
-      target: "http://127.0.0.1:4000",
+      target: process.env.API_URL,
+      changeOrigin: true,
     })
   );
 
