@@ -46,6 +46,7 @@ import {
   toPipelineConfig,
 } from "./PipelineFlow.utils";
 import { BlockModal, BlockModalHeader } from "./BlockModal";
+import { BlockInputList } from "./BlockInputList";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
@@ -175,7 +176,7 @@ export function ShowPipelinePage() {
     wrapper: reactFlowWrapper,
     onDrop: onBlockCreate,
   });
-
+  console.log(editableBlock);
   return (
     <>
       <PipelineNavbar name={pipeline.name} />
@@ -200,10 +201,13 @@ export function ShowPipelinePage() {
               }
             >
               {editableBlock && (
-                <EditBlockForm
-                  onSubmit={onBlockUpdate}
-                  blockConfig={editableBlock}
-                />
+                <>
+                  <EditBlockForm
+                    onSubmit={onBlockUpdate}
+                    blockConfig={editableBlock}
+                  />
+                  <BlockInputList inputs={editableBlock.inputs} />
+                </>
               )}
             </BlockModal>
           </header>
