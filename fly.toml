@@ -5,12 +5,15 @@
 
 app = "buildel-web"
 primary_region = "waw"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
 
 [build]
 
 [env]
   API_URL = "https://buildel-api.fly.dev/api"
-  WEBSOCKET_URL = "wss://buildel-api.fly.dev/socket"
+  PAGE_URL = "https://buildel-web.fly.dev"
 
 [http_service]
   internal_port = 8080
@@ -19,3 +22,43 @@ primary_region = "waw"
   auto_start_machines = true
   min_machines_running = 0
   processes = ["app"]
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
+
+[[services]]
+  internal_port = 8080
+  processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
+
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+    force_https = true
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"
+
+  [[services.http_checks]]
+    interval = "10s"
+    grace_period = "5s"
+    method = "get"
+    path = "/healthcheck"
+    protocol = "http"
+    timeout = "2s"
+    tls_skip_verify = false
+    [services.http_checks.headers]
