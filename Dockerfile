@@ -42,4 +42,5 @@ RUN adduser --system --uid 1001 web
 USER web
 
 
+RUN rm -rf apps/web-remix/.env
 CMD pnpm run -C apps/web-remix start

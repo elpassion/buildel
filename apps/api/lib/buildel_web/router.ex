@@ -71,6 +71,8 @@ defmodule BuildelWeb.Router do
     get("/organizations/:id/keys", OrganizationController, :get_api_keys)
 
     post("/channel_auth", ChannelAuthController, :create)
+
+    post("/memories", MemoryController, :create)
   end
 
   ## Authentication routes

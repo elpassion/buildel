@@ -85,3 +85,5 @@ config :qdrant,
   api_key: "doesntmatter"
 
 config :buildel, :secret_key_base, "secret_key_base"
+
+config :logger, level: :info
