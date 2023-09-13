@@ -3,44 +3,57 @@ defmodule BuildelWeb.PipelineChannelTest do
 
   import Buildel.PipelinesFixtures
   import Buildel.OrganizationsFixtures
+  import Buildel.AccountsFixtures
 
   describe "join" do
-    test "fails when starting a pipeline that does not exist", %{socket: socket} do
-      assert {:error, %{reason: "not_found"}} =
+    test "fails when starting a pipeline without token", %{socket: socket} do
+      assert {:error, %{reason: "invalid", errors: %{ token: ["can't be blank"], user_data: ["can't be blank"] }}} =
                socket
-               |> subscribe_and_join(BuildelWeb.PipelineChannel, "pipelines:org:non-existent")
+               |> subscribe_and_join(BuildelWeb.PipelineChannel, "pipelines:org:non-existent", %{})
     end
 
-    test "fails when trying to join a pipeline that is from another organization", %{
-      socket: socket
-    } do
-      pipeline = pipeline_fixture()
+    test "fails when starting a pipeline with invalid token", %{socket: socket, organization: organization} do
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
 
-      assert {:error, %{reason: "not_found"}} =
+      assert {:error, %{reason: "unauthorized" }} =
                socket
                |> subscribe_and_join(
                  BuildelWeb.PipelineChannel,
-                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}"
+                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                 %{ token: "invalid-token", user_data: "{}" }
                )
     end
 
     test "succeeds when trying to join a run that exists", %{
       socket: socket,
-      organization: organization
+      organization: organization,
+      user: user
     } do
       pipeline = pipeline_fixture(%{organization_id: organization.id})
+
+      user_data = Jason.encode!(%{user_id: user.id})
 
       assert {:ok, %{}, %Phoenix.Socket{assigns: %{run: %{}}}} =
                socket
                |> subscribe_and_join(
                  BuildelWeb.PipelineChannel,
-                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}"
+                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                 %{
+                  token: BuildelWeb.ChannelAuth.create_auth_token(
+                    "socket_id",
+                    "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                    user_data
+                  ),
+                  user_data: user_data
+                 }
                )
     end
   end
 
   describe "IO" do
-    test "outputs all outputs to socket", %{socket: socket, organization: organization} do
+    test "outputs all outputs to socket", %{socket: socket, organization: organization, user: user} do
+      user_data = Jason.encode!(%{user_id: user.id})
+
       pipeline =
         pipeline_fixture(%{
           organization_id: organization.id
@@ -50,7 +63,15 @@ defmodule BuildelWeb.PipelineChannelTest do
         socket
         |> subscribe_and_join(
           BuildelWeb.PipelineChannel,
-          "pipelines:#{pipeline.organization_id}:#{pipeline.id}"
+          "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+          %{
+            token: BuildelWeb.ChannelAuth.create_auth_token(
+              "socket_id",
+              "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+              user_data
+            ),
+            user_data: user_data
+           }
         )
 
       payload = {:binary, File.read!("test/support/fixtures/real.mp3")}
@@ -75,10 +96,10 @@ defmodule BuildelWeb.PipelineChannelTest do
   end
 
   setup do
-    organization = organization_fixture()
+    user = user_fixture()
+    organization = organization_fixture(%{ user_id: user.id })
+    socket = BuildelWeb.PipelineSocket |> socket("socket_id", %{})
 
-    socket = BuildelWeb.PipelineSocket |> socket(nil, %{organization: organization})
-
-    %{socket: socket, organization: organization}
+    %{socket: socket, user: user, organization: organization}
   end
 end
