@@ -12,8 +12,7 @@ import {
 import { ValidatedForm } from "remix-validated-form";
 import * as React from "react";
 import { withZod } from "@remix-validated-form/with-zod";
-import { Field, HiddenField } from "~/components/form/fields/field.context";
-import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
+import { HiddenField } from "~/components/form/fields/field.context";
 
 export function EditBlockForm({
   onSubmit,
@@ -47,9 +46,9 @@ export function EditBlockForm({
         <HiddenField name="name" value={blockConfig.name} />
         <HiddenField name="inputs" value={JSON.stringify(blockConfig.inputs)} />
 
-        <Field name="opts.messages[0].content">
-          <MonacoEditorField suggestions={blockConfig.inputs} />
-        </Field>
+        {/*<Field name="opts.messages[0].content">*/}
+        {/*  <MonacoEditorField suggestions={blockConfig.inputs} />*/}
+        {/*</Field>*/}
 
         <Schema
           schema={blockConfig.block_type.schema as any}
