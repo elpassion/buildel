@@ -12,6 +12,8 @@ coverage
 .next/
 out/
 build
+.idea
+.pnpm-debug.log
 
 # misc
 .DS_Store
