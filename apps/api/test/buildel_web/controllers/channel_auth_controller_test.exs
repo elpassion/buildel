@@ -10,9 +10,19 @@ defmodule BuildelWeb.ChannelAuthControllerTest do
   setup [:register_and_log_in_user, :create_user_organization]
 
   describe "create" do
+    test "fails for unauthenticated user", %{ conn: conn } do
+      conn = conn |> log_out_user() |> post(~p"/api/channel_auth", %{ channel_name: "pipelines:1:1", socket_id: "1" })
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
     test "validates required params", %{conn: conn} do
       conn = post(conn, ~p"/api/channel_auth", %{})
       assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "fails to authenticate for other orgs pipeline channel", %{conn: conn} do
+      conn = post(conn, ~p"/api/channel_auth", %{ channel_name: "pipelines:1:1", socket_id: "1" })
+      assert json_response(conn, 401)["errors"] != %{}
     end
   end
 
