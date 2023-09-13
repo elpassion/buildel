@@ -9,15 +9,15 @@ defmodule BuildelWeb.MemoryController do
   plug(:require_authenticated_user)
 
   defparams :create do
-    required(:files, :array)
+    required(:files, {:array, :map})
   end
 
   def create(conn, params) do
     with {:ok, %{files: files}} <- validate(:create, params) do
+
       conn
       |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/memories/123")
-      |> render(:show, memory: %{})
+      |> json(%{})
     end
   end
 end

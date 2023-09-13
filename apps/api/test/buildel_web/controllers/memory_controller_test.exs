@@ -31,6 +31,13 @@ defmodule BuildelWeb.MemoryControllerTest do
 
       assert json_response(conn, 422)["errors"] != %{}
     end
+
+    test "returns :created when valid", %{conn: conn, files: files} do
+      conn =
+        post(conn, ~p"/api/memories", %{ files: files })
+
+      assert json_response(conn, 201) == %{}
+    end
   end
 
   defp read_file(_) do
