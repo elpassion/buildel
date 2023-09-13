@@ -47,7 +47,7 @@ export function EditBlockForm({
         <HiddenField name="name" value={blockConfig.name} />
         <HiddenField name="inputs" value={JSON.stringify(blockConfig.inputs)} />
 
-        <Field name="editor-test">
+        <Field name="opts.messages[0].content">
           <MonacoEditorField suggestions={blockConfig.inputs} />
         </Field>
 

@@ -14,6 +14,7 @@ export interface MonacoEditorProps
 export const MonacoEditor: React.FC<MonacoEditorProps> = ({
   suggestions,
   onChange,
+  options,
   ...props
 }) => {
   const editorRef = useRef<IEditor | null>(null);
@@ -85,7 +86,7 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
 
       onChange?.(value);
     },
-    [applyDecorations, clearDecorations]
+    [applyDecorations, clearDecorations, onChange]
   );
 
   const preparedSuggestions = useMemo(() => {
@@ -143,9 +144,11 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
         folding: false,
         lineDecorationsWidth: 0,
         minimap: { enabled: false },
+        wordWrap: "on",
         scrollbar: {
           verticalScrollbarSize: 7,
         },
+        ...options,
       }}
       {...props}
     />

@@ -20,6 +20,7 @@ export const MonacoEditorField = forwardRef<
       {...getInputProps()}
       value={value}
       onChange={(v) => {
+        //not working right now
         setValue(v);
         validate();
       }}
