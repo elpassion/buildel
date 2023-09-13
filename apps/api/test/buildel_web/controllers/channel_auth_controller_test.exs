@@ -1,6 +1,7 @@
 defmodule BuildelWeb.ChannelAuthControllerTest do
   use BuildelWeb.ConnCase
   import Buildel.OrganizationsFixtures
+  import Buildel.PipelinesFixtures
   alias Buildel.Organizations
 
   setup %{conn: conn} do
@@ -23,6 +24,15 @@ defmodule BuildelWeb.ChannelAuthControllerTest do
     test "fails to authenticate for other orgs pipeline channel", %{conn: conn} do
       conn = post(conn, ~p"/api/channel_auth", %{ channel_name: "pipelines:1:1", socket_id: "1" })
       assert json_response(conn, 401)["errors"] != %{}
+    end
+
+    test "authenticates if pipeline exists in org", %{conn: conn, organization: organization} do
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+      channel_name = "pipelines:#{organization.id}:#{pipeline.id}"
+      socket_id = "1"
+      conn = post(conn, ~p"/api/channel_auth", %{ channel_name: channel_name, socket_id: socket_id })
+      assert %{ "user_data" => user_data, "auth" => auth } = json_response(conn, 200)
+      assert BuildelWeb.ChannelAuth.verify_auth_token(socket_id, channel_name, user_data, auth)
     end
   end
 

@@ -21,13 +21,17 @@ defmodule BuildelWeb.ChannelAuthController do
   def create(conn, params) do
     user = conn.assigns.current_user
 
-    with {:ok, %{channel_name: "pipelines:" <> organization_pipeline_id, socket_id: socket_id}} <- validate(:create, params),
+    with {:ok, %{channel_name: "pipelines:" <> organization_pipeline_id = channel_name, socket_id: socket_id}} <- validate(:create, params),
          [organization_id, pipeline_id] <- String.split(organization_pipeline_id, ":"),
          {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         {:ok, %Pipeline{} = pipeline} <- Pipelines.get_organization_pipeline(organization, pipeline_id) do
+         {:ok, %Pipeline{} = _pipeline} <- Pipelines.get_organization_pipeline(organization, pipeline_id) do
+      user_json = Jason.encode!(%{ id: user.id })
       conn
       |> put_status(200)
-      |> json(%{})
+      |> json(%{
+        auth: BuildelWeb.ChannelAuth.create_auth_token(socket_id, channel_name, user_json),
+        user_data: user_json
+      })
     else
       {:error, :not_found} ->
         {:error, :unauthorized}
