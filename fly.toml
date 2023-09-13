@@ -45,3 +45,7 @@ processes = []
   [[services.ports]]
     handlers = ["tls", "http"]
     port = 443
+
+[metrics]
+  port = 8081
+  path = "/metrics"

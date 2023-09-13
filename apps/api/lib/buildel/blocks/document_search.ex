@@ -29,7 +29,7 @@ defmodule Buildel.Blocks.DocumentSearch do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["api_key"],
+            "required" => ["api_key", "persist_in"],
             "properties" => %{
               "api_key" => %{
                 "type" => "string",
@@ -37,7 +37,15 @@ defmodule Buildel.Blocks.DocumentSearch do
                 "description" => "OpenAI Api key",
                 "minLength" => 1,
                 "presentAs" => "password"
-              }
+              },
+              "persist_in" => %{
+                "type" => "string",
+                "title" => "Persist in",
+                "enum" => ["run", "workflow"],
+                "enumPresentAs" => "radio",
+                "description" => "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
+                "default" => "run"
+              },
             }
           })
       }
@@ -68,7 +76,14 @@ defmodule Buildel.Blocks.DocumentSearch do
       ) do
     subscribe_to_inputs(context_id, opts.inputs ++ ["#{block_name}:files"])
 
-    with {:ok, collection} <- Buildel.VectorDB.init(name) do
+    [parent_context, parent_context_name, _context, _context_name] = String.split(context_id, ":")
+
+    collection_name = case opts.persist_in do
+      "run" -> context_id |> String.replace(":", ".")
+      "workflow" -> "#{parent_context}.#{parent_context_name}"
+    end
+
+    with {:ok, collection} <- Buildel.VectorDB.init(collection_name) do
       {:ok,
        state
        |> assign_stream_state

@@ -72,7 +72,7 @@ defmodule BuildelWeb.PipelineChannel do
   def handle_info({output_name, :binary, chunk}, socket) do
     Logger.debug("Channel Sending binary chunk to #{output_name}")
 
-    ["context", _context_name, "block", block_name, "io", output_name] =
+    ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", block_name, "io", output_name] =
       output_name |> String.split(":")
 
     socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
@@ -82,7 +82,7 @@ defmodule BuildelWeb.PipelineChannel do
   def handle_info({output_name, :text, message}, socket) do
     Logger.debug("Channel Sending text chunk to #{output_name}")
 
-    ["context", _context_name, "block", block_name, "io", output_name] =
+    ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", block_name, "io", output_name] =
       output_name |> String.split(":")
 
     socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
@@ -91,10 +91,10 @@ defmodule BuildelWeb.PipelineChannel do
 
   def handle_info({output_name, :start_stream, _}, socket) do
     case output_name |> String.split(":") do
-      ["context", _context_name, "block", _block_name, "io", _output_name] ->
+      ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", _block_name, "io", _output_name] ->
         "skip"
 
-      ["context", _context_name, "block", block_name] ->
+      ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", block_name] ->
         socket |> Phoenix.Channel.push("start:#{block_name}", %{})
     end
 
@@ -103,10 +103,10 @@ defmodule BuildelWeb.PipelineChannel do
 
   def handle_info({output_name, :stop_stream, _}, socket) do
     case output_name |> String.split(":") do
-      ["context", _context_name, "block", _block_name, "io", _output_name] ->
+      ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", _block_name, "io", _output_name] ->
         "skip"
 
-      ["context", _context_name, "block", block_name] ->
+      ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", block_name] ->
         socket |> Phoenix.Channel.push("stop:#{block_name}", %{})
     end
 

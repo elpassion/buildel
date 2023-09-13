@@ -29,7 +29,7 @@ defmodule Buildel.Blocks.VectorDB do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["api_key"],
+            "required" => ["api_key", "persist_in"],
             "properties" => %{
               "api_key" => %{
                 "type" => "string",
@@ -37,9 +37,16 @@ defmodule Buildel.Blocks.VectorDB do
                 "description" => "OpenAI Api key",
                 "minLength" => 1,
                 "presentAs" => "password"
-              }
-            }
-          })
+              },
+              "persist_in" => %{
+                "type" => "string",
+                "title" => "Persist in",
+                "enum" => ["run", "workflow"],
+                "enumPresentAs" => "radio",
+                "description" => "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
+                "default" => "run"
+              },
+          }})
       }
     }
   end

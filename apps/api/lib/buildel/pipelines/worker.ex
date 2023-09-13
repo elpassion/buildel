@@ -11,7 +11,7 @@ defmodule Buildel.Pipelines.Worker do
   end
 
   def context_id(%Run{} = run) do
-    "pipeline_runs.#{run.id}"
+    "pipelines:#{run.pipeline_id}:runs:#{run.id}"
   end
 
   def block_id(%Run{} = run, %Blocks.Block{name: name}) do

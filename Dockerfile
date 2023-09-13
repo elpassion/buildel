@@ -18,6 +18,7 @@ RUN turbo prune --scope=web-remix --docker
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
 ENV PORT="8080"
+ENV METRICS_PORT="8081"
 
 RUN apk add --no-cache libc6-compat
 RUN apk update
