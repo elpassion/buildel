@@ -10,34 +10,35 @@ defmodule BuildelWeb.MemoryControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  setup [:register_and_log_in_user, :create_user_organization, :read_file]
+  setup [:register_and_log_in_user, :create_user_organization, :create_pipeline, :read_file]
 
   describe "create" do
-    test "requires authentication", %{conn: conn} do
+    test "requires authentication", %{conn: conn, organization: organization} do
       conn = conn |> log_out_user()
 
       file = %Plug.Upload{path: "test/support/fixtures/example.txt", filename: "example.txt"}
       files = [file]
 
       conn =
-        post(conn, ~p"/api/memories", files: files)
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", files: files)
 
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "validates files are present", %{conn: conn, files: files} do
+    test "validates files are present", %{conn: conn, files: files, organization: organization} do
       conn =
-        post(conn, ~p"/api/memories", %{})
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{})
 
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "returns :created when valid", %{conn: conn, files: files} do
+    test "returns :created when valid", %{conn: conn, files: files, pipeline: pipeline, organization: organization} do
       conn =
-        post(conn, ~p"/api/memories", %{ files: files })
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ files: files, collection_name: "pipelines:#{pipeline.id}" })
 
       assert json_response(conn, 201) == %{}
     end
+
   end
 
   defp read_file(_) do

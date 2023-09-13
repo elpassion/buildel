@@ -57,6 +57,8 @@ defmodule BuildelWeb.Router do
       only: [:index, :delete, :create, :show, :update]
     )
 
+    post("/organizations/:organization_id/memories", MemoryController, :create)
+
     resources("/runs", RunController, only: [:index, :create, :show])
 
     put("/runs/:id/start", RunController, :start)
@@ -72,7 +74,6 @@ defmodule BuildelWeb.Router do
 
     post("/channel_auth", ChannelAuthController, :create)
 
-    post("/memories", MemoryController, :create)
   end
 
   ## Authentication routes

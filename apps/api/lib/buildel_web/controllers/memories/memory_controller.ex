@@ -10,6 +10,7 @@ defmodule BuildelWeb.MemoryController do
 
   defparams :create do
     required(:files, {:array, :map})
+    required(:collection_name, :string)
   end
 
   def create(conn, params) do
