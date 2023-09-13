@@ -15,16 +15,13 @@ defmodule BuildelWeb.MemoryControllerTest do
     test "requires authentication", %{conn: conn, organization: organization} do
       conn = conn |> log_out_user()
 
-      file = %Plug.Upload{path: "test/support/fixtures/example.txt", filename: "example.txt"}
-      files = [file]
-
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", files: files)
+        post(conn, ~p"/api/organizations/#{organization.id}/memories")
 
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "validates files are present", %{conn: conn, organization: organization} do
+    test "validates file is present", %{conn: conn, organization: organization} do
       conn =
         post(conn, ~p"/api/organizations/#{organization.id}/memories", %{})
 
@@ -32,26 +29,39 @@ defmodule BuildelWeb.MemoryControllerTest do
     end
 
 
-    test "does not upload in other org", %{conn: conn, files: files} do
+    test "does not upload in other org", %{conn: conn, upload_file: file} do
       organization = organization_fixture()
 
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ files: files, collection_name: "topic" })
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ file: file, collection_name: "topic" })
 
       assert json_response(conn, 404)["errors"] != %{}
     end
 
 
-    test "returns :created when valid", %{conn: conn, files: files, pipeline: pipeline, organization: organization} do
+    test "returns :created when valid", %{conn: conn, upload_file: file, pipeline: pipeline, organization: organization} do
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ files: files, collection_name: "pipelines:#{pipeline.id}" })
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ file: file, collection_name: "pipelines:#{pipeline.id}" })
 
-      assert json_response(conn, 201) == %{}
+      assert %{"data" => %{"file_name" => "example.txt", "file_size" => 24, "file_type" => "text/plain", "id" => _}} = json_response(conn, 201)
+    end
+
+    test "saves metadata", %{conn: conn, upload_file: file, pipeline: pipeline, organization: organization} do
+      collection_name = "pipelines:#{pipeline.id}"
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ file: file, collection_name: collection_name })
+
+      assert %{"data" => %{"file_name" => "example.txt", "file_size" => 24, "file_type" => "text/plain", "id" => _}} = json_response(conn, 201)
+
+      conn = get(conn, ~p"/api/organizations/#{organization.id}/memories?collection_name=#{collection_name}")
+
+      assert %{"data" => [%{"file_name" => "example.txt", "file_size" => 24, "file_type" => "text/plain", "id" => _}]} = json_response(conn, 200)
     end
   end
 
   defp read_file(_) do
-    %{ files: [%Plug.Upload{path: "test/support/fixtures/example.txt", filename: "example.txt"}] }
+    %{ upload_file: %Plug.Upload{path: "test/support/fixtures/example.txt", filename: "example.txt"} }
   end
 
   defp create_pipeline(%{organization: organization}) do
