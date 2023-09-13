@@ -36,10 +36,7 @@ export function usePipelineRun(
     setStatus("starting");
     const newChannel = socket.current.channel(
       `pipelines:${organizationId}:${pipelineId}`,
-      {
-        token: token.auth,
-        user_data: token.user_data,
-      }
+      token
     );
     newChannel.onMessage = (event: string, payload: any) => {
       if (event.startsWith("output:")) {
