@@ -32,7 +32,7 @@ defmodule BuildelWeb.ChannelAuthControllerTest do
       socket_id = "1"
       conn = post(conn, ~p"/api/channel_auth", %{ channel_name: channel_name, socket_id: socket_id })
       assert %{ "user_data" => user_data, "auth" => auth } = json_response(conn, 200)
-      assert BuildelWeb.ChannelAuth.verify_auth_token(socket_id, channel_name, user_data, auth)
+      assert :ok == BuildelWeb.ChannelAuth.verify_auth_token(socket_id, channel_name, user_data, auth)
     end
   end
 

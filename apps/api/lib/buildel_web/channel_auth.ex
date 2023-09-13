@@ -4,7 +4,10 @@ defmodule BuildelWeb.ChannelAuth do
   end
 
   def verify_auth_token(socket_id, channel_name, user_json, auth_token) do
-    auth_token == create_auth_token(socket_id, channel_name, user_json)
+    case auth_token == create_auth_token(socket_id, channel_name, user_json) do
+      true -> :ok
+      false -> {:error, :failed_to_verify_token}
+    end
   end
 
   defp secret do
