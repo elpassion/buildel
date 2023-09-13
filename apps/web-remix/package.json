@@ -16,6 +16,7 @@
   "dependencies": {
     "@elpassion/taco": "^0.1.77",
     "@isaacs/express-prometheus-middleware": "^1.2.1",
+    "@monaco-editor/react": "^4.5.2",
     "@remix-run/css-bundle": "^1.19.3",
     "@remix-run/express": "^1.19.3",
     "@remix-run/node": "^1.19.3",

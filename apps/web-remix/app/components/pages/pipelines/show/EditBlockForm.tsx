@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Button } from "@elpassion/taco";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
-import { BlockConfig, IBlockConfig } from "../list/contracts";
+import { BlockConfig } from "../list/contracts";
 import { Schema } from "~/components/form/schema/Schema";
 import {
   ArrayField,
@@ -12,7 +12,8 @@ import {
 import { ValidatedForm } from "remix-validated-form";
 import * as React from "react";
 import { withZod } from "@remix-validated-form/with-zod";
-import { HiddenField } from "~/components/form/fields/field.context";
+import { Field, HiddenField } from "~/components/form/fields/field.context";
+import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 
 export function EditBlockForm({
   onSubmit,
@@ -45,6 +46,11 @@ export function EditBlockForm({
       <div className="space-y-4">
         <HiddenField name="name" value={blockConfig.name} />
         <HiddenField name="inputs" value={JSON.stringify(blockConfig.inputs)} />
+
+        <Field name="editor-test">
+          <MonacoEditorField suggestions={blockConfig.inputs} />
+        </Field>
+
         <Schema
           schema={blockConfig.block_type.schema as any}
           name="opts"

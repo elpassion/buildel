@@ -28,7 +28,6 @@ import type {
   IPipeline,
   IEdge,
 } from "~/components/pages/pipelines/list/contracts";
-import flowStyles from "reactflow/dist/style.css";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import type { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { CustomNode } from "./CustomNodes/CustomNode";
@@ -47,9 +46,12 @@ import {
 } from "./PipelineFlow.utils";
 import { BlockModal, BlockModalHeader } from "./BlockModal";
 import { BlockInputList } from "./BlockInputList";
+import flowStyles from "reactflow/dist/style.css";
+import editorStyles from "~/components/editor/editor.styles.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
+  { rel: "stylesheet", href: editorStyles },
 ];
 
 export function ShowPipelinePage() {

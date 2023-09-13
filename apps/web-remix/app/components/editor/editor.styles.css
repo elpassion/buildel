@@ -1,0 +1,6 @@
+.editor-inputs-suggestions-valid{
+    color: green !important;
+}
+.editor-inputs-suggestions-invalid{
+    color: red !important;
+}
