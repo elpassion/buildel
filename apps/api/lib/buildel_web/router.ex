@@ -69,6 +69,8 @@ defmodule BuildelWeb.Router do
 
     resources("/organizations", OrganizationController, only: [:index, :create, :show])
     get("/organizations/:id/keys", OrganizationController, :get_api_keys)
+
+    post("/channel_auth", ChannelAuthController, :create)
   end
 
   ## Authentication routes
