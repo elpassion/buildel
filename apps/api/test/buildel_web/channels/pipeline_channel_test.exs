@@ -7,7 +7,7 @@ defmodule BuildelWeb.PipelineChannelTest do
 
   describe "join" do
     test "fails when starting a pipeline without token", %{socket: socket} do
-      assert {:error, %{reason: "invalid", errors: %{ token: ["can't be blank"], user_data: ["can't be blank"] }}} =
+      assert {:error, %{reason: "invalid", errors: %{ auth: ["can't be blank"], user_data: ["can't be blank"] }}} =
                socket
                |> subscribe_and_join(BuildelWeb.PipelineChannel, "pipelines:org:non-existent", %{})
     end
@@ -20,7 +20,7 @@ defmodule BuildelWeb.PipelineChannelTest do
                |> subscribe_and_join(
                  BuildelWeb.PipelineChannel,
                  "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
-                 %{ token: "invalid-token", user_data: "{}" }
+                 %{ auth: "invalid-token", user_data: "{}" }
                )
     end
 
@@ -39,7 +39,7 @@ defmodule BuildelWeb.PipelineChannelTest do
                  BuildelWeb.PipelineChannel,
                  "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
                  %{
-                  token: BuildelWeb.ChannelAuth.create_auth_token(
+                  auth: BuildelWeb.ChannelAuth.create_auth_token(
                     "socket_id",
                     "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
                     user_data
@@ -65,7 +65,7 @@ defmodule BuildelWeb.PipelineChannelTest do
           BuildelWeb.PipelineChannel,
           "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
           %{
-            token: BuildelWeb.ChannelAuth.create_auth_token(
+            auth: BuildelWeb.ChannelAuth.create_auth_token(
               "socket_id",
               "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
               user_data

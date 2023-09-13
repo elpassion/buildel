@@ -6,13 +6,13 @@ defmodule BuildelWeb.PipelineChannel do
   alias Buildel.Pipelines
 
   defparams :join do
-    required :token, :string
+    required :auth, :string
     required :user_data, :string
   end
 
   def join("pipelines:" <> organization_pipeline_id = channel_name, params, socket) do
-    with {:ok, %{token: token, user_data: user_data}} <- validate(:join, params),
-         :ok <- BuildelWeb.ChannelAuth.verify_auth_token(socket.id, channel_name, user_data, token),
+    with {:ok, %{auth: auth, user_data: user_data}} <- validate(:join, params),
+         :ok <- BuildelWeb.ChannelAuth.verify_auth_token(socket.id, channel_name, user_data, auth),
          [organization_id, pipeline_id] <- String.split(organization_pipeline_id, ":"),
          {:ok, pipeline_id} <- Buildel.Utils.parse_id(pipeline_id),
          {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),

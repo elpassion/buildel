@@ -3,8 +3,8 @@ defmodule BuildelWeb.PipelineSocketTest do
 
   describe "connect" do
     test "connects and assigns id to user" do
-      {:ok, %Phoenix.Socket{id: id}} = BuildelWeb.PipelineSocket |> connect(%{})
-      assert id != nil
+      id = UUID.uuid4()
+      {:ok, %Phoenix.Socket{id: ^id}} = BuildelWeb.PipelineSocket |> connect(%{ id: id })
     end
   end
 end

@@ -176,7 +176,6 @@ export function ShowPipelinePage() {
     wrapper: reactFlowWrapper,
     onDrop: onBlockCreate,
   });
-  console.log(editableBlock);
   return (
     <>
       <PipelineNavbar name={pipeline.name} />

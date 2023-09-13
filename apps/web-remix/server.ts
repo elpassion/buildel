@@ -95,30 +95,10 @@ async function run() {
   app.use(
     "/super-api",
     createProxyMiddleware({
-      pathRewrite: async function (path, req) {
-        const newPath = path
+      pathRewrite: async function (path) {
+        return path
           .replace("/super-api", "/api")
           .replace("/api/socket", "/socket");
-        if (!newPath.startsWith("/socket/websocket")) return newPath;
-        const url = new URL(newPath, "http://byleco.com");
-        const organizationId = url.searchParams.get("organization_id");
-        if (!organizationId) return newPath;
-
-        const response = await fetch(
-          `${process.env.API_URL}/api/organizations/${organizationId}/keys`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Cookie: req.headers.cookie!,
-            },
-          }
-        ).then((res) => res.json());
-        const apiKey = get(response, "data.0.key");
-        if (!apiKey) return newPath;
-
-        url.searchParams.append("api_key", apiKey);
-        const newestPath = url.pathname + url.search;
-        return newestPath;
       },
       ws: true,
       target: process.env.API_URL,

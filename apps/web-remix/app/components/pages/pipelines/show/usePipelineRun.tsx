@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Channel, Socket } from "phoenix";
 import { assert } from "~/utils/assert";
+import { uniqueId } from "lodash";
+import { v4 } from "uuid";
 export function usePipelineRun(
   organizationId: number,
   pipelineId: number,
@@ -12,17 +14,32 @@ export function usePipelineRun(
   onStatusChange: (blockId: string, isWorking: boolean) => void = () => {}
 ) {
   const socket = useRef<Socket>();
+  const id = useRef<string>();
   const channel = useRef<Channel>();
 
   const [status, setStatus] = useState<"idle" | "starting" | "running">("idle");
 
-  const startRun = useCallback(() => {
+  const startRun = useCallback(async () => {
     assert(socket.current);
+
+    const token = await fetch("/super-api/channel_auth", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({
+        socket_id: id.current,
+        channel_name: `pipelines:${organizationId}:${pipelineId}`,
+      }),
+    }).then((response) => response.json());
 
     setStatus("starting");
     const newChannel = socket.current.channel(
       `pipelines:${organizationId}:${pipelineId}`,
-      {}
+      {
+        token: token.auth,
+        user_data: token.user_data,
+      }
     );
     newChannel.onMessage = (event: string, payload: any) => {
       if (event.startsWith("output:")) {
@@ -96,12 +113,13 @@ export function usePipelineRun(
   );
 
   useEffect(() => {
+    id.current = v4();
     socket.current = new Socket("/super-api/socket", {
       logger: (kind, msg, data) => {
         console.log(`${kind}: ${msg}`, data);
       },
       params: {
-        organization_id: organizationId,
+        id: id.current,
       },
     });
   }, []);
