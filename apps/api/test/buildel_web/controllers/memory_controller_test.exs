@@ -10,7 +10,7 @@ defmodule BuildelWeb.MemoryControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  setup [:register_and_log_in_user, :create_user_organization]
+  setup [:register_and_log_in_user, :create_user_organization, :read_file]
 
   describe "create" do
     test "requires authentication", %{conn: conn} do
@@ -24,6 +24,17 @@ defmodule BuildelWeb.MemoryControllerTest do
 
       assert json_response(conn, 401)["errors"] != %{}
     end
+
+    test "validates files are present", %{conn: conn, files: files} do
+      conn =
+        post(conn, ~p"/api/memories", %{})
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+  end
+
+  defp read_file(_) do
+    %{ files: [%Plug.Upload{path: "test/support/fixtures/example.txt", filename: "example.txt"}] }
   end
 
   defp create_pipeline(%{organization: organization}) do
