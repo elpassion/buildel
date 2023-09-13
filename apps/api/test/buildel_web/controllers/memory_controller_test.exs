@@ -3,7 +3,6 @@ defmodule BuildelWeb.MemoryControllerTest do
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
 
-  alias Buildel.Pipelines.Pipeline
   alias Buildel.Organizations
 
   setup %{conn: conn} do
@@ -25,12 +24,23 @@ defmodule BuildelWeb.MemoryControllerTest do
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "validates files are present", %{conn: conn, files: files, organization: organization} do
+    test "validates files are present", %{conn: conn, organization: organization} do
       conn =
         post(conn, ~p"/api/organizations/#{organization.id}/memories", %{})
 
       assert json_response(conn, 422)["errors"] != %{}
     end
+
+
+    test "does not upload in other org", %{conn: conn, files: files} do
+      organization = organization_fixture()
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ files: files, collection_name: "topic" })
+
+      assert json_response(conn, 404)["errors"] != %{}
+    end
+
 
     test "returns :created when valid", %{conn: conn, files: files, pipeline: pipeline, organization: organization} do
       conn =
@@ -38,7 +48,6 @@ defmodule BuildelWeb.MemoryControllerTest do
 
       assert json_response(conn, 201) == %{}
     end
-
   end
 
   defp read_file(_) do

@@ -13,8 +13,11 @@ defmodule BuildelWeb.MemoryController do
     required(:collection_name, :string)
   end
 
-  def create(conn, params) do
-    with {:ok, %{files: files}} <- validate(:create, params) do
+  def create(conn, %{ "organization_id" => organization_id } = params) do
+    user = conn.assigns.current_user
+
+    with {:ok, %{files: _files}} <- validate(:create, params),
+      {:ok, _organization} <- Buildel.Organizations.get_user_organization(user, organization_id) do
 
       conn
       |> put_status(:created)
