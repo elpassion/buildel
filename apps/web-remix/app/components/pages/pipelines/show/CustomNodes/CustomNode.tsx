@@ -16,6 +16,7 @@ export interface CustomNodeProps {
 export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   const { status: runStatus } = useRunPipeline();
   const { status, isValid } = useRunPipelineNode(data);
+
   const handles = useMemo(() => getBlockHandles(data), [data]);
   const inputsHandles = useMemo(
     () => handles.filter((h) => h.type === "target"),

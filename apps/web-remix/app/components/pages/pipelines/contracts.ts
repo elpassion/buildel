@@ -41,6 +41,12 @@ export const Pipeline = z.object({
   }),
 });
 
+export const File = z.object({
+  id: z.number(),
+  file_name: z.string(),
+  file_size: z.number(),
+  file_type: z.string(),
+});
 export const PipelineResponse = z
   .object({
     data: Pipeline,
@@ -56,3 +62,10 @@ export const BlockTypes = z.array(BlockType);
 export const BlockTypesResponse = z.object({
   data: BlockTypes,
 });
+
+export const FileList = z.array(File);
+export const FileListResponse = z
+  .object({
+    data: FileList,
+  })
+  .transform((res) => res.data);

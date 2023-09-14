@@ -1,6 +1,9 @@
 import React, { useCallback } from "react";
-import { Button, Input, Textarea } from "@elpassion/taco";
+import { Button, Textarea } from "@elpassion/taco";
 import { IBlockConfig, IField } from "../pipeline.types";
+import { FileListResponse } from "~/components/pages/pipelines/contracts";
+import { FileUpload } from "~/components/fileUpload/FileUpload";
+import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import {
   IEvent,
   useRunPipeline,
@@ -14,7 +17,7 @@ interface NodeFieldsProps {
 
 export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   const blockName = block.name;
-  const { status } = useRunPipeline();
+  const { status, organizationId } = useRunPipeline();
   const { push, clearEvents } = useRunPipelineNode(block);
 
   const onSubmit = useCallback(
@@ -22,19 +25,6 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
       e.preventDefault();
       clearEvents(blockName);
 
-      // Object.keys(data).forEach((key) => {
-      //   const topic = `${blockName}:${key}`;
-      //   if (Array.isArray(data[key])) {
-      //     data[key].forEach((value: any) => {
-      //       push(topic, value);
-      //     });
-      //   } else {
-      //     push(topic, data[key]);
-      //   }
-      // });
-
-      // e.preventDefault();
-      //
       const formData = new FormData(e.currentTarget);
       const fieldsData: Record<string, any> = {};
 
@@ -56,6 +46,25 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     [blockName, clearEvents, push]
   );
 
+  const upload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("collection_name", "test1");
+
+    await fetch(`/super-api/organizations/${organizationId}/memories`, {
+      body: formData,
+      method: "POST",
+    });
+  };
+
+  const fetchDocuments = async () => {
+    const response = await fetch(
+      `/super-api/organizations/${organizationId}/memories?collection_name=test1`
+    ).then((res) => res.json());
+
+    return FileListResponse.parse(response);
+  };
+
   const renderInput = useCallback((field: IField) => {
     const { type, name } = field.data;
 
@@ -70,13 +79,11 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
       );
     } else if (type === "file") {
       return (
-        <Input
-          id={name}
+        <FileUpload
           name={name}
-          aria-label={name}
-          type={field.data.type}
-          placeholder="Start writing..."
-          multiple
+          uploadFile={upload}
+          fetchFiles={fetchDocuments}
+          preview={(fileList) => <FileUploadListPreview fileList={fileList} />}
         />
       );
     } else if (field.data.type === "audio") {
