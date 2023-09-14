@@ -13,18 +13,18 @@ export function InputHandle({
   const handleTypeClassName = useMemo(() => {
     switch (handle.data.type) {
       case "text":
-        return "!rounded-none !bg-transparent !border-1 !border-black";
+        return "!rounded-none !bg-transparent !border-1 !border-white";
       case "audio":
-        return "!rounded-full !bg-transparent !border-1 !border-black";
+        return "!rounded-full !bg-transparent !border-1 !border-white";
       case "file":
-        return "!rounded-none !bg-transparent !border-1 !border-black rotate-45";
+        return "!rounded-none !bg-transparent !border-1 !border-white rotate-45";
     }
   }, [handle.data.type]);
 
   return (
     <>
       <div
-        className={`absolute right-[102%] translate-y-[-80%] text-xxs`}
+        className="absolute right-[102%] translate-y-[-80%] text-xxs text-white"
         style={{ top: (index + 1) * 30 }}
       >
         {startCase(handle.data.name.replace(/_input/g, " "))}
@@ -51,18 +51,18 @@ export function OutputHandle({
   const handleTypeClassName = useMemo(() => {
     switch (handle.data.type) {
       case "text":
-        return "!rounded-none !bg-black !border-1 !border-black";
+        return "!rounded-none !bg-white !border-1 !border-white ";
       case "audio":
-        return "!rounded-full !bg-black !border-1 !border-black";
+        return "!rounded-full !bg-white !border-1 !border-white";
       case "file":
-        return "!rounded-none !bg-black !border-1 !border-black rotate-45";
+        return "!rounded-none !bg-white !border-1 !border-white rotate-45";
     }
   }, [handle.data.type]);
 
   return (
     <>
       <div
-        className="absolute left-[102%] translate-y-[-80%] text-xxs"
+        className="absolute left-[102%] translate-y-[-80%] text-xxs text-white"
         style={{ top: (index + 1) * 30 }}
       >
         {startCase(handle.data.name.replace(/_output/g, " "))}

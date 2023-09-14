@@ -25,7 +25,7 @@ export const PipelineSidebar: React.FC<PipelineSidebarProps> = ({
       <div
         key={block.type}
         className={classNames(
-          "dndnode min-w-[150px] cursor-grab rounded bg-white p-2",
+          "min-w-[150px] cursor-grab rounded bg-white p-2",
           {
             "opacity-50": runStatus !== "idle",
           }
@@ -42,7 +42,7 @@ export const PipelineSidebar: React.FC<PipelineSidebarProps> = ({
   }, [blockTypes, runStatus]);
 
   return (
-    <aside className="absolute bottom-6 right-4 top-20 flex flex-col gap-2 rounded bg-neutral-300 p-2">
+    <aside className="absolute bottom-8 right-8 top-24 flex flex-col gap-2 rounded bg-neutral-300 p-2">
       {draggableNodes}
     </aside>
   );

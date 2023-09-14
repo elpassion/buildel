@@ -182,11 +182,11 @@ export function ShowPipelinePage() {
     <>
       <PipelineNavbar name={pipeline.name} />
       <div
-        className="relative h-[calc(100vh_-_65px)] w-full"
+        className="relative px-6 py-4 h-[calc(100vh_-_65px)] w-full"
         ref={reactFlowWrapper}
       >
         <RunPipelineProvider pipeline={pipeline}>
-          <header className="absolute top-2 left-4 right-4 z-10 flex justify-between">
+          <header className="absolute top-6 left-8 right-8 z-10 flex justify-between">
             <RunPipelineButton />
             <Button variant="filled" size="sm" disabled>
               {updateFetcher.state === "submitting" ? "Saving" : "Up-to-date"}
@@ -230,7 +230,12 @@ export function ShowPipelinePage() {
             }}
             fitView
           >
-            <Background variant={BackgroundVariant.Lines} />
+            <Background
+              variant={BackgroundVariant.Dots}
+              gap={40}
+              color="#fff"
+              className="bg-[#0D0D0D] rounded-2xl"
+            />
             <Controls />
           </ReactFlow>
 

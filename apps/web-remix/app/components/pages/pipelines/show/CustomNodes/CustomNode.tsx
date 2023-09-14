@@ -60,18 +60,18 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   return (
     <section
       className={classNames(
-        "min-h-[100px] min-w-[250px] max-w-[350px] break-words rounded border border-neutral-100 bg-white drop-shadow-sm transition",
+        "min-h-[100px] min-w-[250px] max-w-[350px] break-words rounded border border-neutral-800 bg-neutral-700 drop-shadow-sm transition",
         { "scale-110": status }
       )}
     >
       <header
         className={classNames("flex items-center justify-between p-2", {
-          "bg-green-200": isValid,
-          "bg-red-200": !isValid,
+          "bg-neutral-800": isValid,
+          "bg-red-800": !isValid,
         })}
       >
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-bold capitalize text-neutral-800">
+          <h3 className="text-sm font-bold capitalize text-white">
             {startCase(data.type)}
           </h3>
           <Badge size="xs" text={data.name} />
