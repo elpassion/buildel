@@ -18,7 +18,6 @@ defmodule Buildel.Memories.Memory do
     memory
     |> cast(attrs, [:organization_id, :file_name, :file_size, :file_type, :collection_name])
     |> validate_required([:organization_id, :file_name, :file_size, :file_type, :collection_name])
-    |> unique_constraint([:collection_name, :organization_id])
     |> assoc_constraint(:organization)
   end
 end

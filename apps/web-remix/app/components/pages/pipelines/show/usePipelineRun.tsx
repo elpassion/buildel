@@ -99,10 +99,9 @@ export function usePipelineRun(
         formData.append("file", payload);
         formData.append("collection_name", "test");
 
-        fetch("http://localhost:4000/api/organizations/5/memories", {
+        fetch("/super-api/organizations/2/memories", {
           body: formData,
           method: "POST",
-          headers: { "Content-Type": "multipart/form-data" },
         }).then((res) => console.log(res));
         // uploadFetcher.submit(formData, { method: "POST" });
         // payload.arrayBuffer().then((arrayBuffer) => {

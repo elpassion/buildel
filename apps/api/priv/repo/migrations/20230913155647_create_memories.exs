@@ -14,6 +14,5 @@ defmodule Buildel.Repo.Migrations.CreateMemories do
     end
 
     create index(:memories, [:organization_id])
-    create unique_index(:memories, [:collection_name, :organization_id])
   end
 end

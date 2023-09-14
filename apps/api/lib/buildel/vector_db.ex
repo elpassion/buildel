@@ -23,7 +23,8 @@ defmodule Buildel.VectorDB do
 
     adapter().add(collection, %{
       embeddings: embeddings,
-      documents: documents |> Enum.map(fn document -> %{ document: document, metadata: metadata } end),
+      documents:
+        documents |> Enum.map(fn document -> %{document: document, metadata: metadata} end),
       ids: Enum.map(1..Enum.count(documents), fn _ -> UUID.uuid4() end)
     })
 
@@ -47,9 +48,8 @@ defmodule Buildel.VectorDB do
     results
   end
 
-
   defp adapter do
-    Application.get_env(:bound, :vector_db, Buildel.VectorDB.VectorDBAdapter)
+    Application.get_env(:bound, :vector_db, Buildel.VectorDB.QdrantAdapter)
   end
 end
 

@@ -6,7 +6,11 @@ defmodule BuildelWeb.MemoryControllerTest do
   alias Buildel.Organizations
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok,
+     conn:
+       conn
+       |> put_req_header("accept", "application/json")
+       |> put_req_header("content-type", "multipart/form-data")}
   end
 
   setup [:register_and_log_in_user, :create_user_organization, :create_pipeline, :read_file]
@@ -28,40 +32,89 @@ defmodule BuildelWeb.MemoryControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-
     test "does not upload in other org", %{conn: conn, upload_file: file} do
       organization = organization_fixture()
 
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ file: file, collection_name: "topic" })
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{
+          file: file,
+          collection_name: "topic"
+        })
 
       assert json_response(conn, 404)["errors"] != %{}
     end
 
-
-    test "returns :created when valid", %{conn: conn, upload_file: file, pipeline: pipeline, organization: organization} do
+    test "returns :created when valid", %{
+      conn: conn,
+      upload_file: file,
+      pipeline: pipeline,
+      organization: organization
+    } do
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ file: file, collection_name: "pipelines:#{pipeline.id}" })
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{
+          file: file,
+          collection_name: "pipelines:#{pipeline.id}"
+        })
 
-      assert %{"data" => %{"file_name" => "example.txt", "file_size" => 24, "file_type" => "text/plain", "id" => _}} = json_response(conn, 201)
+      assert %{
+               "data" => %{
+                 "file_name" => "example.txt",
+                 "file_size" => 24,
+                 "file_type" => "text/plain",
+                 "id" => _
+               }
+             } = json_response(conn, 201)
     end
 
-    test "saves metadata", %{conn: conn, upload_file: file, pipeline: pipeline, organization: organization} do
+    test "saves metadata", %{
+      conn: conn,
+      upload_file: file,
+      pipeline: pipeline,
+      organization: organization
+    } do
       collection_name = "pipelines:#{pipeline.id}"
 
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{ file: file, collection_name: collection_name })
+        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{
+          file: file,
+          collection_name: collection_name
+        })
 
-      assert %{"data" => %{"file_name" => "example.txt", "file_size" => 24, "file_type" => "text/plain", "id" => _}} = json_response(conn, 201)
+      assert %{
+               "data" => %{
+                 "file_name" => "example.txt",
+                 "file_size" => 24,
+                 "file_type" => "text/plain",
+                 "id" => _
+               }
+             } = json_response(conn, 201)
 
-      conn = get(conn, ~p"/api/organizations/#{organization.id}/memories?collection_name=#{collection_name}")
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memories?collection_name=#{collection_name}"
+        )
 
-      assert %{"data" => [%{"file_name" => "example.txt", "file_size" => 24, "file_type" => "text/plain", "id" => _}]} = json_response(conn, 200)
+      assert %{
+               "data" => [
+                 %{
+                   "file_name" => "example.txt",
+                   "file_size" => 24,
+                   "file_type" => "text/plain",
+                   "id" => _
+                 }
+               ]
+             } = json_response(conn, 200)
     end
   end
 
   defp read_file(_) do
-    %{ upload_file: %Plug.Upload{path: "test/support/fixtures/example.txt", filename: "example.txt"} }
+    %{
+      upload_file: %Plug.Upload{
+        path: "test/support/fixtures/example.txt",
+        filename: "example.txt"
+      }
+    }
   end
 
   defp create_pipeline(%{organization: organization}) do
