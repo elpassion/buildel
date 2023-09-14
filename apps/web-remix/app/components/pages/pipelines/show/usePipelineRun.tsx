@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Channel, Socket } from "phoenix";
 import { assert } from "~/utils/assert";
 import { v4 } from "uuid";
+import { useFetcher } from "@remix-run/react";
+import { uploadSchema } from "~/components/pages/pipelines/show/schema";
+
 export function usePipelineRun(
   organizationId: number,
   pipelineId: number,
@@ -15,6 +18,7 @@ export function usePipelineRun(
   const socket = useRef<Socket>();
   const id = useRef<string>();
   const channel = useRef<Channel>();
+  const uploadFetcher = useFetcher<typeof uploadSchema>();
 
   const [status, setStatus] = useState<"idle" | "starting" | "running">("idle");
 
@@ -80,7 +84,7 @@ export function usePipelineRun(
     channel.current.leave();
     setStatus("idle");
   }, []);
-
+  console.log(uploadFetcher.data);
   const push = useCallback(
     (topic: string, payload: any) => {
       if (status !== "running") {
@@ -90,17 +94,29 @@ export function usePipelineRun(
       assert(channel.current);
 
       if (payload instanceof File) {
-        payload.arrayBuffer().then((arrayBuffer) => {
-          assert(channel.current);
-          channel.current.push(`input:${topic}`, arrayBuffer);
-        });
+        console.log(payload);
+        const formData = new FormData();
+        formData.append("file", payload);
+        formData.append("collection_name", "test");
+
+        fetch("http://localhost:4000/api/organizations/5/memories", {
+          body: formData,
+          method: "POST",
+          headers: { "Content-Type": "multipart/form-data" },
+        }).then((res) => console.log(res));
+        // uploadFetcher.submit(formData, { method: "POST" });
+        // payload.arrayBuffer().then((arrayBuffer) => {
+        //   assert(channel.current);
+        //   // channel.current.push(`input:${topic}`, arrayBuffer);
+        // });
       } else if (payload instanceof FileList) {
-        [...payload].forEach((file) => {
-          file.arrayBuffer().then((arrayBuffer) => {
-            assert(channel.current);
-            channel.current.push(`input:${topic}`, arrayBuffer);
-          });
-        });
+        console.log([...payload]);
+        // [...payload].forEach((file) => {
+        //   file.arrayBuffer().then((arrayBuffer) => {
+        //     assert(channel.current);
+        //     // channel.current.push(`input:${topic}`, arrayBuffer);
+        //   });
+        // });
       } else {
         channel.current.push(`input:${topic}`, payload);
       }

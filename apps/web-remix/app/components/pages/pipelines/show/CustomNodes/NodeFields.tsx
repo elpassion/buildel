@@ -42,7 +42,6 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         fieldsData[key] = value;
       }
 
-      // what to do here?
       Object.keys(fieldsData).forEach((key) => {
         const topic = `${blockName}:${key}`;
         if (Array.isArray(fieldsData[key])) {
