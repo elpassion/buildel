@@ -8,10 +8,6 @@ export const IOType = z.object({
 
 export type IIO = z.TypeOf<typeof IOType>;
 
-export type BlocksIO = {
-  inputs: IIO[];
-  outputs: IIO[];
-};
 export const BlockType = z.object({
   type: z.string(),
   inputs: z.array(IOType),
@@ -38,17 +34,15 @@ export const UpdateBlockConfig = z.object({
 });
 
 export interface IPipelineConfig {
-  blocks: IBlock[];
+  blocks: IBlockConfig[];
   version: string;
 }
-
-export type IBlock = IBlockConfig;
 
 export interface INode {
   id: string;
   type: string;
   position: { x: number; y: number };
-  data: IBlock;
+  data: IBlockConfig;
 }
 
 export interface IEdge {
@@ -101,7 +95,6 @@ export const BlockTypes = z.array(BlockType);
 
 export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
 
-export type IBlockTypesObj = Record<string, z.TypeOf<typeof BlockType>>;
 export const BlockTypesResponse = z.object({
   data: BlockTypes,
 });

@@ -1,4 +1,3 @@
-"use client";
 import React, {
   PropsWithChildren,
   useCallback,
@@ -7,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { usePipelineRun } from "./usePipelineRun";
-import { IBlockConfig, IPipeline } from "../list/contracts";
+import { IBlockConfig, IPipeline } from "../contracts";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 
 export interface IEvent {

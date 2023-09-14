@@ -5,11 +5,10 @@ import {
   INode,
   IEdge,
   IField,
-  IBlock,
+  IBlockConfig,
   IHandle,
   IPipeline,
-  IBlockConfig,
-} from "../list/contracts";
+} from "../contracts";
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
@@ -92,7 +91,7 @@ export function toPipelineConfig(
   };
 }
 
-export function getBlockHandles(block: IBlock): IHandle[] {
+export function getBlockHandles(block: IBlockConfig): IHandle[] {
   const blockType = block.block_type;
   return [
     ...blockType.inputs
@@ -112,7 +111,7 @@ export function getBlockHandles(block: IBlock): IHandle[] {
   ];
 }
 
-export function getBlockFields(block: IBlock): IField[] {
+export function getBlockFields(block: IBlockConfig): IField[] {
   const blockType = block.block_type;
   return [
     ...blockType.inputs

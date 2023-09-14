@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Channel, Socket } from "phoenix";
 import { assert } from "~/utils/assert";
-import { uniqueId } from "lodash";
 import { v4 } from "uuid";
 export function usePipelineRun(
   organizationId: number,

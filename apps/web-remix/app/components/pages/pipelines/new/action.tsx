@@ -1,10 +1,9 @@
 import { ActionArgs, redirect } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
-import { merge } from "lodash";
 import { validationError } from "remix-validated-form";
 import invariant from "tiny-invariant";
 import { actionBuilder } from "~/utils.server";
-import { PipelineResponse } from "../list/contracts";
+import { PipelineResponse } from "../contracts";
 import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
 

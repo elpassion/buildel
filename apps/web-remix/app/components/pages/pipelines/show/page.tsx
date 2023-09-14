@@ -27,7 +27,7 @@ import type {
   IPipelineConfig,
   IPipeline,
   IEdge,
-} from "~/components/pages/pipelines/list/contracts";
+} from "../contracts";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import type { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { CustomNode } from "./CustomNodes/CustomNode";

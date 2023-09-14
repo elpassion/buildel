@@ -4,7 +4,7 @@ import { validationError } from "remix-validated-form";
 import invariant from "tiny-invariant";
 import { requireLogin } from "~/session.server";
 import { actionBuilder } from "~/utils.server";
-import { PipelineResponse } from "../list/contracts";
+import { PipelineResponse } from "../contracts";
 import { schema } from "./schema";
 
 export async function action(actionArgs: ActionArgs) {

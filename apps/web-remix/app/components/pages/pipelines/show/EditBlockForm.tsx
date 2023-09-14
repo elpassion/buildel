@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Button } from "@elpassion/taco";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
-import { BlockConfig } from "../list/contracts";
+import { BlockConfig } from "../contracts";
 import { Schema } from "~/components/form/schema/Schema";
 import {
   ArrayField,

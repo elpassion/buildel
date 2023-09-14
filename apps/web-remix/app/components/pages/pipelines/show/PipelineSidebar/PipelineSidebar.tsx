@@ -2,7 +2,7 @@ import { startCase } from "lodash";
 import React, { DragEvent, useMemo } from "react";
 import { useRunPipeline } from "../RunPipelineProvider";
 import classNames from "classnames";
-import { IBlockTypes } from "../../list/contracts";
+import { IBlockTypes } from "../../contracts";
 import { assert } from "~/utils/assert";
 
 interface PipelineSidebarProps {

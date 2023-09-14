@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UpdateBlockConfig } from "../list/contracts";
+import { UpdateBlockConfig } from "../contracts";
 
 export const schema = z.object({
   id: z.number(),

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { startCase } from "lodash";
 import { Handle, Position } from "reactflow";
-import { IHandle } from "../../list/contracts";
+import { IHandle } from "../../contracts";
 
 export function InputHandle({
   handle,

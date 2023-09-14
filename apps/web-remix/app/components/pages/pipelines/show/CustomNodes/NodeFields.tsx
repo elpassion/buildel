@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { Button, Input, Textarea } from "@elpassion/taco";
-import { IBlockConfig, IField } from "../../list/contracts";
+import { IBlockConfig, IField } from "../../contracts";
 import {
   IEvent,
   useRunPipeline,

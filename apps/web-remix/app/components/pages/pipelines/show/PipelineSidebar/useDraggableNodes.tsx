@@ -1,6 +1,6 @@
 import { DragEvent, RefObject, useCallback, useState } from "react";
 import { ReactFlowInstance } from "reactflow";
-import { IBlockConfig } from "../../list/contracts";
+import { IBlockConfig } from "../../contracts";
 import { assert } from "~/utils/assert";
 
 interface IUseDraggableNodes {
