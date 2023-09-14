@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { startCase } from "lodash";
 import { Handle, Position } from "reactflow";
-import { IHandle } from "../../contracts";
+import { IHandle } from "../pipeline.types";
 
 export function InputHandle({
   handle,

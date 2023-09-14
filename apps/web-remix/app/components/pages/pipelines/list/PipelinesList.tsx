@@ -1,7 +1,7 @@
 import React from "react";
 import { ItemList } from "~/components/list/ItemList";
 import { PipelinesListItem } from "./PipelinesListItem";
-import { IPipeline } from "../contracts";
+import { IPipeline } from "./pipelines.types";
 interface PipelinesListProps {
   pipelines: IPipeline[];
 }

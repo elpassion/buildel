@@ -6,8 +6,6 @@ export const IOType = z.object({
   public: z.boolean(),
 });
 
-export type IIO = z.TypeOf<typeof IOType>;
-
 export const BlockType = z.object({
   type: z.string(),
   inputs: z.array(IOType),
@@ -33,42 +31,6 @@ export const UpdateBlockConfig = z.object({
   block_type: BlockType.optional(),
 });
 
-export interface IPipelineConfig {
-  blocks: IBlockConfig[];
-  version: string;
-}
-
-export interface INode {
-  id: string;
-  type: string;
-  position: { x: number; y: number };
-  data: IBlockConfig;
-}
-
-export interface IEdge {
-  id: string;
-  source: string;
-  sourceHandle: string;
-  target: string;
-  targetHandle: string;
-}
-
-export interface IField {
-  type: "input" | "output";
-  data: {
-    name: string;
-    public: boolean;
-    type: "audio" | "text" | "file";
-  };
-}
-
-export interface IHandle {
-  type: "source" | "target";
-  id: string;
-  data: IIO;
-}
-
-export type IBlockConfig = z.TypeOf<typeof BlockConfig>;
 export const Pipeline = z.object({
   id: z.number(),
   name: z.string(),
@@ -78,8 +40,6 @@ export const Pipeline = z.object({
     blocks: z.array(BlockConfig),
   }),
 });
-
-export type IPipeline = z.infer<typeof Pipeline>;
 
 export const PipelineResponse = z
   .object({
@@ -92,8 +52,6 @@ export const PipelineResponse = z
 export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
 
 export const BlockTypes = z.array(BlockType);
-
-export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
 
 export const BlockTypesResponse = z.object({
   data: BlockTypes,

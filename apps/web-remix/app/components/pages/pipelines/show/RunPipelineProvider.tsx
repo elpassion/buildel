@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { usePipelineRun } from "./usePipelineRun";
-import { IBlockConfig, IPipeline } from "../contracts";
+import { IBlockConfig, IPipeline } from "./pipeline.types";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 
 export interface IEvent {

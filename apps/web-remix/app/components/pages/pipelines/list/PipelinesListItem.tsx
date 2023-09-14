@@ -1,6 +1,6 @@
 import { Link, Form } from "@remix-run/react";
 import { Icon, IconButton, Indicator } from "@elpassion/taco";
-import { IPipeline } from "../contracts";
+import { IPipeline } from "./pipelines.types";
 import { HiddenField } from "~/components/form/fields/field.context";
 import { routes } from "~/utils/routes.utils";
 
