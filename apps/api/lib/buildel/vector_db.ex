@@ -7,7 +7,7 @@ defmodule Buildel.VectorDB do
     end
   end
 
-  def add_text(collection_name, text, api_key: api_key) do
+  def add(collection_name, text, metadata: metadata, api_key: api_key) do
     documents =
       Buildel.Splitters.recursive_character_text_split(text, %{
         chunk_size: 1000,
@@ -23,7 +23,7 @@ defmodule Buildel.VectorDB do
 
     adapter().add(collection, %{
       embeddings: embeddings,
-      documents: documents,
+      documents: documents |> Enum.map(fn document -> %{ document: document, metadata: metadata } end),
       ids: Enum.map(1..Enum.count(documents), fn _ -> UUID.uuid4() end)
     })
 
@@ -47,18 +47,29 @@ defmodule Buildel.VectorDB do
     results
   end
 
+
   defp adapter do
-    Buildel.VectorDB.QdrantAdapter
+    Application.get_env(:bound, :vector_db, Buildel.VectorDB.VectorDBAdapter)
   end
 end
 
+defmodule Buildel.VectorDB.VectorDBAdapter do
+  @callback get_collection(collection_name: String.t()) :: {:ok, map()}
+  @callback create_collection(collection_name: String.t()) :: {:ok, map()}
+  @callback add(map(), map()) :: :ok
+end
+
 defmodule Buildel.VectorDB.QdrantAdapter do
+  @behaviour Buildel.VectorDB.VectorDBAdapter
+
+  @impl Buildel.VectorDB.VectorDBAdapter
   def get_collection(collection_name) do
     {:ok, _} = Qdrant.collection_info(collection_name)
 
     {:ok, %{name: collection_name}}
   end
 
+  @impl Buildel.VectorDB.VectorDBAdapter
   def create_collection(collection_name) do
     with {:ok, _} <-
            Qdrant.create_collection(collection_name, %{vectors: %{size: 1536, distance: "Cosine"}}) do
@@ -69,13 +80,14 @@ defmodule Buildel.VectorDB.QdrantAdapter do
     end
   end
 
+  @impl Buildel.VectorDB.VectorDBAdapter
   def add(collection, %{embeddings: embeddings, documents: documents, ids: ids}) do
     with {:ok, %{status: 200}} <-
            Qdrant.upsert_point(collection.name, %{
              batch: %{
                ids: ids,
                vectors: embeddings,
-               payloads: documents |> Enum.map(fn document -> %{document: document} end)
+               payloads: documents
              }
            }) do
       :ok

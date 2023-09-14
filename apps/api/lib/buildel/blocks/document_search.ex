@@ -115,7 +115,7 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   def handle_cast({:add_file, {:binary, file}}, state) do
     state = send_stream_start(state)
-    Buildel.VectorDB.add_text(state[:collection], file, api_key: state[:api_key])
+    Buildel.VectorDB.add(state[:collection], file, metadata: %{}, api_key: state[:api_key])
     state = send_stream_stop(state)
     {:noreply, state}
   end
