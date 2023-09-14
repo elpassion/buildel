@@ -18,12 +18,12 @@ defmodule Buildel.Memories do
   def create_organization_memory(
         %Buildel.Organizations.Organization{} = organization,
         collection_name,
-        file_path
+        %{path: path, type: type, name: name}
       ) do
-    file_name = Path.basename(file_path)
-    file_size = File.stat!(file_path).size
-    file_type = MIME.from_path(file_path)
-    file = File.read!(file_path)
+    file_name = name || Path.basename(path)
+    file_size = File.stat!(path).size
+    file_type = type || MIME.from_path(path)
+    file = File.read!(path)
 
     metadata = %{file_name: file_name, file_size: file_size, file_type: file_type}
 
