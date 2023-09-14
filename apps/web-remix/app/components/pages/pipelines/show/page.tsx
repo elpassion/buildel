@@ -154,7 +154,7 @@ export function ShowPipelinePage() {
       }),
       {}
     );
-  }, [PipelineNode, blockTypes]);
+  }, [PipelineNode, blockTypes.length]);
 
   useEffect(() => {
     // @ts-ignore
