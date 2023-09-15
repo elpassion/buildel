@@ -54,7 +54,7 @@ defmodule BuildelWeb.MemoryController do
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, _} <- Buildel.Memories.delete_organization_memory(organization, id) do
-      conn |> put_status(:no_content) |> json(%{})
+      conn |> put_status(:ok) |> json(%{})
     end
   end
 end

@@ -65,7 +65,6 @@ defmodule Buildel.Memories do
     memory = get_organization_memory!(organization, id)
 
     collection_name = organization_collection_name(organization, memory.collection_name)
-
     with :ok <-
            Buildel.VectorDB.delete_all_with_metadata(collection_name, %{memory_id: memory.id}),
          {:ok, _} <- Buildel.Repo.delete(memory) do
