@@ -24,7 +24,7 @@ export const PipelinesListItem = ({ pipeline }: PipelinesListItemProps) => {
             <p className="text-sm">$2.45</p>
           </div>
           <div>
-            <p className="text-sm">113 runs</p>
+            <p className="text-sm">{pipeline.runs_count} runs</p>
           </div>
           <div>
             <Indicator variant="badge" type="success" text="Active" />

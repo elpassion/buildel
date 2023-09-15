@@ -35,6 +35,7 @@ export const Pipeline = z.object({
   id: z.number(),
   name: z.string(),
   organization_id: z.number(),
+  runs_count: z.number(),
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),
