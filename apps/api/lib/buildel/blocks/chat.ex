@@ -54,7 +54,7 @@ defmodule Buildel.Blocks.Chat do
                 "default" => 0.7,
                 "minimum" => 0.0,
                 "maximum" => 1.0,
-                "step"    => 0.1
+                "step" => 0.1
               },
               "messages" => %{
                 "type" => "array",
@@ -73,7 +73,8 @@ defmodule Buildel.Blocks.Chat do
                     },
                     "content" => %{
                       "type" => "string",
-                      "title" => "Content"
+                      "title" => "Content",
+                      "presentAs" => "editor"
                     }
                   }
                 }

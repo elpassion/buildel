@@ -86,7 +86,20 @@ export type JSONSchemaField =
       description: string;
       minLength?: number;
       maxLength?: number;
-      presentAs?: "password";
+    }
+  | {
+      type: "string";
+      title: string;
+      description: string;
+      minLength?: number;
+      maxLength?: number;
+      presentAs: "password";
+    }
+  | {
+      type: "string";
+      title: string;
+      description: string;
+      presentAs: "editor";
     }
   | {
       type: "string";
