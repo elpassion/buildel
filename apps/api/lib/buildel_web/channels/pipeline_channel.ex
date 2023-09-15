@@ -117,43 +117,17 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   defp parse_topic(topic) do
-    case topic |> String.split(":") do
-      [
-        "context",
-        "organizations",
-        organization_id,
-        "pipelines",
-        pipeline_id,
-        "runs",
-        run_id,
-        "block",
-        block_name,
-        "io",
-        output_name
-      ] ->
+    case topic |> String.split("::") do
+      ["context", context_id, "block", block_name, "io", output_name] ->
         %{
-          organization_id: organization_id,
-          pipeline_id: pipeline_id,
-          run_id: run_id,
+          context_id: context_id,
           block_name: block_name,
           output_name: output_name
         }
 
-      [
-        "context",
-        "organizations",
-        organization_id,
-        "pipelines",
-        pipeline_id,
-        "runs",
-        run_id,
-        "block",
-        block_name
-      ] ->
+      ["context", context_id, "block", block_name] ->
         %{
-          organization_id: organization_id,
-          pipeline_id: pipeline_id,
-          run_id: run_id,
+          context_id: context_id,
           block_name: block_name,
           output_name: nil
         }

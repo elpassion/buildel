@@ -71,7 +71,11 @@ defmodule BuildelWeb.PipelineRunChannelTest do
       topic = "pipeline_runs:#{run.id}"
 
       event =
-        "context:#{Buildel.Pipelines.Worker.context_id(run)}:block:#{audio_output_block.name}:io:output"
+        Buildel.BlockPubSub.io_topic(
+          Buildel.Pipelines.Worker.context_id(run),
+          audio_output_block.name,
+          "output"
+        )
 
       assert_receive %Phoenix.Socket.Broadcast{
         topic: ^topic,
@@ -80,7 +84,11 @@ defmodule BuildelWeb.PipelineRunChannelTest do
       }
 
       event =
-        "context:#{Buildel.Pipelines.Worker.context_id(run)}:block:#{text_output_block.name}:io:output"
+        Buildel.BlockPubSub.io_topic(
+          Buildel.Pipelines.Worker.context_id(run),
+          text_output_block.name,
+          "output"
+        )
 
       payload = %{message: "Hello"}
 

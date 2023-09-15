@@ -22,13 +22,17 @@ defmodule Buildel.BlockPubSub do
         output_name -> output_name
       end
 
-    subscribe("context:#{context_id}:block:#{block_name}:io:#{output_name}")
+    subscribe(io_topic(context_id, block_name, output_name))
   end
 
   def io_from_topic(topic) do
-    ["context", _context, "block", block, "io", output_name] = String.split(topic, ":")
+    ["context", context, "block", block, "io", output_name] = String.split(topic, "::")
 
-    [block, output_name]
+    %{
+      context: context,
+      block: block,
+      io: output_name
+    }
   end
 
   def unsubscribe_from_io(context_id, block_name, io_name) do
@@ -36,11 +40,7 @@ defmodule Buildel.BlockPubSub do
   end
 
   def unsubscribe_from_io(context_id, block_output) do
-    unsubscribe("context:#{context_id}:#{block_output}")
-  end
-
-  def io_topic(context_id, block_name, io_name) do
-    "context:#{context_id}:block:#{block_name}:io:#{io_name}"
+    unsubscribe(block_topic(context_id, block_output))
   end
 
   def broadcast_to_block(context_id, block_name, message) do
@@ -59,7 +59,11 @@ defmodule Buildel.BlockPubSub do
   end
 
   def block_topic(context_id, block_name) do
-    "context:#{context_id}:block:#{block_name}"
+    "context::#{context_id}::block::#{block_name}"
+  end
+
+  def io_topic(context_id, block_name, io_name) do
+    block_topic(context_id, block_name) <> "::io::#{io_name}"
   end
 
   defp broadcast(topic, {message_type, content} = message) do

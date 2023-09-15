@@ -16,7 +16,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
       end
 
       defp save_take_latest_message(state, topic, text) do
-        ["context", _context, "block", block, "io", output] = String.split(topic, ":")
+        %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
         [output | _] = output |> String.split("->")
 
         put_in(state, [tl_keyword(), "#{block}:#{output}"], text)

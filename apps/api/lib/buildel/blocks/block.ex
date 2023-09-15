@@ -144,7 +144,7 @@ defmodule Buildel.Blocks.Block do
       end
 
       defp get_input(inputs, name) do
-        [block, output_name] = BlockPubSub.io_from_topic(name)
+        %{block: block, io: output_name} = BlockPubSub.io_from_topic(name)
 
         input_name =
           Enum.find(inputs, fn input ->
