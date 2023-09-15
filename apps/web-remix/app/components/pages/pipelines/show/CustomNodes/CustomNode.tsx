@@ -61,7 +61,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   return (
     <section
       className={classNames(
-        "min-h-[100px] min-w-[250px] max-w-[350px] break-words rounded border border-neutral-800 bg-neutral-700 drop-shadow-sm transition",
+        "min-h-[100px] min-w-[250px] max-w-[300px] break-words rounded border border-neutral-800 bg-neutral-700 drop-shadow-sm transition",
         { "scale-110": status }
       )}
     >

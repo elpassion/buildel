@@ -65,6 +65,12 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     return FileResponse.parse(response);
   }, []);
 
+  const removeField = useCallback(async (id: number) => {
+    return fetch(`/super-api/organizations/${organizationId}/memories/${id}`, {
+      method: "DELETE",
+    });
+  }, []);
+
   const fetchFiles = useCallback(async () => {
     const response = await fetch(
       `/super-api/organizations/${organizationId}/memories?collection_name=${pipelineId}_${blockName}`
@@ -91,6 +97,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
           name={name}
           onUpload={uploadFile}
           onFetch={fetchFiles}
+          onRemove={removeField}
           preview={(props) => <FileUploadListPreview {...props} />}
         />
       );

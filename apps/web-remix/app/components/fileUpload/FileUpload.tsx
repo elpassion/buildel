@@ -15,7 +15,7 @@ interface FileUploadProps
   preview?: (props: IPreviewProps) => ReactNode;
   onUpload: (file: File) => Promise<IFile>;
   onFetch: () => Promise<IFile[]>;
-  onRemove?: (id: number) => Promise<void>;
+  onRemove?: (id: number) => Promise<any>;
   onUploadError?: (e: unknown) => void;
   onUploadSuccess?: () => void;
 }

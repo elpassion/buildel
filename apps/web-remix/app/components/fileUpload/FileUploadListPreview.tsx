@@ -38,18 +38,25 @@ export function FileUploadListItem({
   return (
     <article
       className={classNames(
-        "flex justify-between gap-2 w-full pl-1 pr-2 text-sm hover:bg-neutral-600 transition rounded-sm",
+        "flex justify-between items-center gap-2 w-full px-1 text-sm hover:bg-neutral-600 transition rounded-sm",
         {
           "text-white": !isUploadError(file),
           "text-red-500": isUploadError(file),
         }
       )}
     >
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 grow max-w-[90%]">
         <Icon size="xs" iconName="file" className="mt-0.5" />
         <h6 className="line-clamp-1">{file.file_name}</h6>
       </div>
-      {onRemove && <button onClick={handleRemove}>x</button>}
+      {onRemove && (
+        <button
+          onClick={handleRemove}
+          className="w-4 h-4 flex items-center justify-center hover:bg-neutral-400 rounded-sm"
+        >
+          <Icon iconName="x" size="xs" />
+        </button>
+      )}
     </article>
   );
 }
