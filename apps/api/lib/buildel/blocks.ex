@@ -14,7 +14,7 @@ defmodule Buildel.Blocks do
     TextOutput,
     BlockValidator,
     TakeLatest,
-    VectorDB,
+    # VectorDB,
     DocumentSearch
   }
 
@@ -29,7 +29,7 @@ defmodule Buildel.Blocks do
     "collect_sentences" => CollectSentences,
     "collect_all_text" => CollectAllText,
     "take_latest" => TakeLatest,
-    "vector_db" => VectorDB,
+    # "vector_db" => VectorDB,
     "file_input" => FileInput,
     "document_search" => DocumentSearch
   }
@@ -45,7 +45,7 @@ defmodule Buildel.Blocks do
     CollectSentences => "collect_sentences",
     CollectAllText => "collect_all_text",
     TakeLatest => "take_latest",
-    VectorDB => "vector_db",
+    # VectorDB => "vector_db",
     FileInput => "file_input",
     DocumentSearch => "document_search"
   }
