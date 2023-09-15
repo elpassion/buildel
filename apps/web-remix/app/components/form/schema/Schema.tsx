@@ -13,6 +13,7 @@ export function Schema({
     number: React.FC<FieldProps>;
     array: React.FC<FieldProps>;
     boolean: React.FC<FieldProps>;
+    editor: React.FC<FieldProps>;
   };
 }) {
   assert(schema.type === "object");
@@ -89,5 +90,6 @@ export interface FieldProps {
     number: React.FC<FieldProps>;
     array: React.FC<FieldProps>;
     boolean: React.FC<FieldProps>;
+    editor: React.FC<FieldProps>;
   };
 }

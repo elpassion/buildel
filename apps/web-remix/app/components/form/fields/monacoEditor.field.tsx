@@ -1,6 +1,9 @@
 import React, { forwardRef } from "react";
 import { useControlField } from "remix-validated-form";
-import { useFieldContext } from "~/components/form/fields/field.context";
+import {
+  HiddenField,
+  useFieldContext,
+} from "~/components/form/fields/field.context";
 import {
   MonacoEditor,
   MonacoEditorProps,
@@ -14,17 +17,19 @@ export const MonacoEditorField = forwardRef<
   const [value, setValue] = useControlField<string | undefined>(name);
 
   return (
-    <MonacoEditor
-      loading={<div className="w-full h-[20vh] border border-neutral-200" />}
-      height="20vh"
-      {...getInputProps()}
-      value={value}
-      onChange={(v) => {
-        //not working right now
-        setValue(v);
-        validate();
-      }}
-      {...props}
-    />
+    <>
+      <HiddenField value={value} {...getInputProps()} />
+      <MonacoEditor
+        loading={<div className="w-full h-[20vh] border border-neutral-200" />}
+        height="20vh"
+        value={value}
+        onChange={(v) => {
+          //not working right now
+          setValue(v);
+          validate();
+        }}
+        {...props}
+      />
+    </>
   );
 });

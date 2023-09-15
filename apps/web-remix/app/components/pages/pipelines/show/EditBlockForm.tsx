@@ -1,3 +1,4 @@
+import * as React from "react";
 import { z } from "zod";
 import { Button } from "@elpassion/taco";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
@@ -10,9 +11,12 @@ import {
   StringField,
 } from "~/components/form/schema/SchemaFields";
 import { ValidatedForm } from "remix-validated-form";
-import * as React from "react";
 import { withZod } from "@remix-validated-form/with-zod";
-import { HiddenField } from "~/components/form/fields/field.context";
+import {
+  Field as FormField,
+  HiddenField,
+} from "~/components/form/fields/field.context";
+import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 
 export function EditBlockForm({
   onSubmit,
@@ -58,6 +62,15 @@ export function EditBlockForm({
             number: NumberField,
             array: ArrayField,
             boolean: BooleanField,
+            editor: (props) => (
+              <FormField name={props.name!}>
+                <MonacoEditorField
+                  suggestions={blockConfig.inputs.map(
+                    (suggestion) => suggestion.split("->").at(0) ?? ""
+                  )}
+                />
+              </FormField>
+            ),
           }}
         />
       </div>

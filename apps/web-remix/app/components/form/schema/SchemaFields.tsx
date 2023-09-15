@@ -13,7 +13,7 @@ import { assert } from "~/utils/assert";
 import { Field, FieldProps } from "./Schema";
 import { QuantityInputField } from "~/components/form/fields/quantity.field";
 
-export function StringField({ field, name }: FieldProps) {
+export function StringField({ field, name, fields, ...rest }: FieldProps) {
   assert(name);
   assert(field.type === "string");
 
@@ -22,7 +22,7 @@ export function StringField({ field, name }: FieldProps) {
   const error = fieldErrors[name] ?? undefined;
 
   if (!("enum" in field)) {
-    if (field.presentAs === "password") {
+    if ("presentAs" in field && field.presentAs === "password") {
       return (
         <FormField name={name}>
           <PasswordInputField
@@ -34,6 +34,13 @@ export function StringField({ field, name }: FieldProps) {
         </FormField>
       );
     }
+
+    if ("presentAs" in field && field.presentAs === "editor") {
+      return (
+        <fields.editor field={field} name={name} fields={fields} {...rest} />
+      );
+    }
+
     return (
       <FormField name={name}>
         <TextInputField
@@ -160,7 +167,7 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
   return (
     <div>
       {rhfFields.map((item, index) => (
-        <div key={item.key} className="mt-2 flex items-end gap-2">
+        <div key={item.key} className="mt-2 flex flex-col gap-2">
           <Field
             key={item.key}
             field={field.items}
