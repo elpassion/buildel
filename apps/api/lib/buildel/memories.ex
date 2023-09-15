@@ -5,8 +5,6 @@ defmodule Buildel.Memories do
         %Buildel.Organizations.Organization{} = organization,
         collection_name
       ) do
-    collection_name = organization_collection_name(organization, collection_name)
-
     Buildel.Memories.Memory
     |> where(
       [m],
