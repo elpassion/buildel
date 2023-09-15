@@ -12,6 +12,7 @@ import {
   useRunPipeline,
   useRunPipelineNode,
 } from "../RunPipelineProvider";
+import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -103,12 +104,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
           />
         );
       } else if (field.data.type === "audio") {
-        return (
-          <>
-            <p>Audio input</p>
-            {/*<AudioInput name={name} />*/}
-          </>
-        );
+        return <AudioRecorder />;
       }
 
       return <span>Unsupported input type - {type}</span>;
