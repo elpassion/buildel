@@ -48,6 +48,12 @@ defmodule Buildel.VectorDB do
     results
   end
 
+  def delete_all_with_metadata(collection_name, metadata) do
+    {:ok, collection} = adapter().get_collection(collection_name)
+
+    adapter().delete_all_with_metadata(collection, metadata)
+  end
+
   defp adapter do
     Application.get_env(:bound, :vector_db, Buildel.VectorDB.QdrantAdapter)
   end
@@ -56,6 +62,7 @@ end
 defmodule Buildel.VectorDB.VectorDBAdapter do
   @callback get_collection(collection_name: String.t()) :: {:ok, map()}
   @callback create_collection(collection_name: String.t()) :: {:ok, map()}
+  @callback delete_all_with_metadata(map(), map()) :: :ok
   @callback add(map(), map()) :: :ok
 end
 
@@ -90,6 +97,20 @@ defmodule Buildel.VectorDB.QdrantAdapter do
                payloads: documents
              }
            }) do
+      :ok
+    else
+      {:error, %{status: status}} -> {:error, status}
+    end
+  end
+
+  @impl Buildel.VectorDB.VectorDBAdapter
+  def delete_all_with_metadata(collection, metadata) do
+    filter = %{
+      must: metadata |> Enum.map(fn {key, value} -> %{key: "metadata.#{key}", match: %{value: value}} end)
+    }
+
+    with {:ok, %{status: 200}} <-
+           Qdrant.Api.Http.Points.delete_points(collection.name, %{ filter: filter }) do
       :ok
     else
       {:error, %{status: status}} -> {:error, status}

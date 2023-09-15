@@ -16,4 +16,9 @@ defmodule Buildel.ClientMocks.VectorDB.QdrantAdapter do
   def add(_collection, %{embeddings: _embeddings, documents: _documents, ids: _ids}) do
     :ok
   end
+
+  @impl Buildel.VectorDB.VectorDBAdapter
+  def delete_all_with_metadata(_collection, _metadata) do
+    :ok
+  end
 end

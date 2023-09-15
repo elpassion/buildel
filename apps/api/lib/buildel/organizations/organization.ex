@@ -7,6 +7,7 @@ defmodule Buildel.Organizations.Organization do
 
     has_many(:memberships, Buildel.Organizations.Membership)
     has_many(:api_keys, Buildel.ApiKeys.ApiKey)
+    has_many(:memories, Buildel.Memories.Memory)
     many_to_many(:members, Buildel.Accounts.User, join_through: Buildel.Organizations.Membership)
     timestamps()
   end
