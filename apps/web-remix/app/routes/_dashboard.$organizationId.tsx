@@ -1,10 +1,10 @@
 import invariant from "tiny-invariant";
 import classNames from "classnames";
 import Modal from "react-modal";
-import { z } from "zod";
 import { Button, ResponsiveSidebar } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
 import { NavLink, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
+import { OrganizationsResponse } from "~/components/pages/organizations/contracts";
 import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
 import { requireLogin } from "~/session.server";
@@ -47,15 +47,6 @@ export async function loader(loaderArgs: LoaderArgs) {
     );
   })(loaderArgs);
 }
-
-const OrganizationsResponse = z.object({
-  data: z.array(
-    z.object({
-      id: z.number(),
-      name: z.string(),
-    })
-  ),
-});
 
 export default function Layout() {
   return (

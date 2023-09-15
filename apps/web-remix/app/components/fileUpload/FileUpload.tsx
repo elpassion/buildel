@@ -101,7 +101,7 @@ export function FileUpload({
 
   useEffect(() => {
     handleFetchFiles();
-  }, [handleFetchFiles]);
+  }, []);
 
   return (
     <div className="flex flex-col gap-2">

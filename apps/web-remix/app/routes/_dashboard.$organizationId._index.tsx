@@ -1,1 +1,1 @@
-export { loader } from "~/components/pages/organization";
+export { loader } from "~/components/pages/organizations/show";

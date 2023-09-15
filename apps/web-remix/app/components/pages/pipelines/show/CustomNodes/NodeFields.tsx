@@ -79,39 +79,42 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     return FileListResponse.parse(response);
   }, []);
 
-  const renderInput = useCallback((field: IField) => {
-    const { type, name } = field.data;
+  const renderInput = useCallback(
+    (field: IField) => {
+      const { type, name } = field.data;
 
-    if (type === "text") {
-      return (
-        <Textarea
-          label=""
-          id={name}
-          name={name}
-          placeholder="Start writing..."
-        />
-      );
-    } else if (type === "file") {
-      return (
-        <FileUpload
-          name={name}
-          onUpload={uploadFile}
-          onFetch={fetchFiles}
-          onRemove={removeField}
-          preview={(props) => <FileUploadListPreview {...props} />}
-        />
-      );
-    } else if (field.data.type === "audio") {
-      return (
-        <>
-          <p>Audio input</p>
-          {/*<AudioInput name={name} />*/}
-        </>
-      );
-    }
+      if (type === "text") {
+        return (
+          <Textarea
+            label=""
+            id={name}
+            name={name}
+            placeholder="Start writing..."
+          />
+        );
+      } else if (type === "file") {
+        return (
+          <FileUpload
+            name={name}
+            onUpload={uploadFile}
+            onFetch={fetchFiles}
+            onRemove={removeField}
+            preview={(props) => <FileUploadListPreview {...props} />}
+          />
+        );
+      } else if (field.data.type === "audio") {
+        return (
+          <>
+            <p>Audio input</p>
+            {/*<AudioInput name={name} />*/}
+          </>
+        );
+      }
 
-    return <span>Unsupported input type - {type}</span>;
-  }, []);
+      return <span>Unsupported input type - {type}</span>;
+    },
+    [fetchFiles, removeField, uploadFile]
+  );
 
   return (
     <form onSubmit={onSubmit}>
