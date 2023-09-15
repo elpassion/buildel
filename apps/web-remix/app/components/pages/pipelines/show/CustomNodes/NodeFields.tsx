@@ -20,7 +20,7 @@ interface NodeFieldsProps {
 
 export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   const blockName = block.name;
-  const { status, organizationId } = useRunPipeline();
+  const { status, organizationId, pipelineId } = useRunPipeline();
   const { push, clearEvents } = useRunPipelineNode(block);
 
   const onSubmit = useCallback(
@@ -52,7 +52,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
   const uploadFile = useCallback(async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("collection_name", "test1");
+    formData.append("collection_name", `${pipelineId}_${blockName}`);
 
     const response = await fetch(
       `/super-api/organizations/${organizationId}/memories`,
@@ -67,7 +67,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
 
   const fetchFiles = useCallback(async () => {
     const response = await fetch(
-      `/super-api/organizations/${organizationId}/memories?collection_name=test1`
+      `/super-api/organizations/${organizationId}/memories?collection_name=${pipelineId}_${blockName}`
     ).then((res) => res.json());
 
     return FileListResponse.parse(response);

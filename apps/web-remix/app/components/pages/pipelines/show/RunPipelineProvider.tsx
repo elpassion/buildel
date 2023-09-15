@@ -28,6 +28,7 @@ interface IRunPipelineContext {
   status: "idle" | "starting" | "running";
   isValid: boolean;
   organizationId: number;
+  pipelineId: number;
 }
 
 const RunPipelineContext = React.createContext<IRunPipelineContext | undefined>(
@@ -103,6 +104,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       blockValidations,
       isValid,
       organizationId: pipeline.organization_id,
+      pipelineId: pipeline.id,
     }),
     [
       events,
