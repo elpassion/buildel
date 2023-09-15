@@ -3,7 +3,7 @@ import { z } from "zod";
 import { Button } from "@elpassion/taco";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 import { BlockConfig } from "../contracts";
-import { Schema } from "~/components/form/schema/Schema";
+import { FieldProps, Schema } from "~/components/form/schema/Schema";
 import {
   ArrayField,
   BooleanField,
@@ -17,6 +17,7 @@ import {
   HiddenField,
 } from "~/components/form/fields/field.context";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
+import { useCallback } from "react";
 
 export function EditBlockForm({
   onSubmit,
@@ -37,6 +38,17 @@ export function EditBlockForm({
     onSubmit({ ...blockConfig, ...data });
   };
 
+  const EditorField = useCallback(
+    (props: FieldProps) => (
+      <FormField name={props.name!}>
+        <MonacoEditorField
+          suggestions={generateSuggestions(blockConfig.inputs)}
+        />
+      </FormField>
+    ),
+    [blockConfig.inputs]
+  );
+
   return (
     <ValidatedForm
       // @ts-ignore
@@ -50,10 +62,6 @@ export function EditBlockForm({
         <HiddenField name="name" value={blockConfig.name} />
         <HiddenField name="inputs" value={JSON.stringify(blockConfig.inputs)} />
 
-        {/*<Field name="opts.messages[0].content">*/}
-        {/*  <MonacoEditorField suggestions={blockConfig.inputs} />*/}
-        {/*</Field>*/}
-
         <Schema
           schema={blockConfig.block_type.schema as any}
           name="opts"
@@ -62,15 +70,7 @@ export function EditBlockForm({
             number: NumberField,
             array: ArrayField,
             boolean: BooleanField,
-            editor: (props) => (
-              <FormField name={props.name!}>
-                <MonacoEditorField
-                  suggestions={blockConfig.inputs.map(
-                    (suggestion) => suggestion.split("->").at(0) ?? ""
-                  )}
-                />
-              </FormField>
-            ),
+            editor: EditorField,
           }}
         />
       </div>
@@ -81,4 +81,8 @@ export function EditBlockForm({
       </div>
     </ValidatedForm>
   );
+}
+
+function generateSuggestions(inputs: string[]) {
+  return inputs.map((suggestion) => suggestion.split("->").at(0) ?? "");
 }

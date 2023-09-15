@@ -13,6 +13,10 @@ export function generateZODSchema(
 
     let nestedSchema: z.ZodString | z.ZodOptional<z.ZodString> = z.string();
 
+    if ("presentAs" in schema && schema.presentAs === "editor") {
+      return nestedSchema;
+    }
+
     if (schema.minLength !== undefined) {
       nestedSchema = nestedSchema.min(schema.minLength);
     }
