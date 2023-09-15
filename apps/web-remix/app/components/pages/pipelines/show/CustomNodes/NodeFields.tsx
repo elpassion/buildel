@@ -49,7 +49,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     [blockName, clearEvents, push]
   );
 
-  const upload = async (file: File) => {
+  const upload = useCallback(async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("collection_name", "test1");
@@ -63,15 +63,15 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     ).then((res) => res.json());
 
     return FileResponse.parse(response);
-  };
+  }, []);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = useCallback(async () => {
     const response = await fetch(
       `/super-api/organizations/${organizationId}/memories?collection_name=test1`
     ).then((res) => res.json());
 
     return FileListResponse.parse(response);
-  };
+  }, []);
 
   const renderInput = useCallback((field: IField) => {
     const { type, name } = field.data;

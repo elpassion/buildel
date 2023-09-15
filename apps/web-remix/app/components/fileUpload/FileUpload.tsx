@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import {
   SmallFileInput,
   SmallFileInputProps,
@@ -26,7 +26,7 @@ export function FileUpload({
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState<IFileUpload[]>([]);
 
-  const handleFetchFiles = async () => {
+  const handleFetchFiles = useCallback(async () => {
     try {
       const files = await fetchFiles();
 
@@ -34,49 +34,52 @@ export function FileUpload({
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [fetchFiles]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLoading(true);
-    try {
-      const { files } = e.target;
+  const handleUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      setLoading(true);
+      try {
+        const { files } = e.target;
 
-      if (!files) return;
+        if (!files) return;
 
-      const promises = [...files].map((file) => uploadFile(file));
+        const promises = [...files].map((file) => uploadFile(file));
 
-      const settledResult = await Promise.allSettled(promises);
+        const settledResult = await Promise.allSettled(promises);
 
-      const uploaded = settledResult.reduce((acc, curr, currentIndex) => {
-        if (isUploadRejected(curr)) {
-          return [
-            ...acc,
-            {
-              id: Math.random(),
-              file_name: files[currentIndex].name,
-              file_size: files[currentIndex].size,
-              file_type: files[currentIndex].type,
-              error: curr.reason?.message || "Unknown upload error",
-            },
-          ];
-        }
-        return [...acc, curr.value];
-      }, [] as IFileUpload[]);
+        const uploaded = settledResult.reduce((acc, curr, currentIndex) => {
+          if (isUploadRejected(curr)) {
+            return [
+              ...acc,
+              {
+                id: Math.random(),
+                file_name: files[currentIndex].name,
+                file_size: files[currentIndex].size,
+                file_type: files[currentIndex].type,
+                error: curr.reason?.message || "Unknown upload error",
+              },
+            ];
+          }
+          return [...acc, curr.value];
+        }, [] as IFileUpload[]);
 
-      setFileList((prev) => [...uploaded, ...prev]);
+        setFileList((prev) => [...uploaded, ...prev]);
 
-      onUploadSuccess?.();
+        onUploadSuccess?.();
 
-      setLoading(false);
-    } catch (e) {
-      onUploadError?.(e);
-      setLoading(false);
-    }
-  };
+        setLoading(false);
+      } catch (e) {
+        onUploadError?.(e);
+        setLoading(false);
+      }
+    },
+    [onUploadError, onUploadSuccess, uploadFile]
+  );
 
   useEffect(() => {
     handleFetchFiles();
-  }, []);
+  }, [handleFetchFiles]);
 
   return (
     <div className="flex flex-col gap-2">
