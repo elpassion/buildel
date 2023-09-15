@@ -11,6 +11,10 @@ export interface IUploadError extends IFile {
 
 export type IFileUpload = IFile | IUploadError;
 
+export interface IPreviewProps {
+  fileList: IFileUpload[];
+  remove: (id: number) => Promise<void>;
+}
 export function isUploadRejected(
   upload: PromiseFulfilledResult<unknown> | PromiseRejectedResult
 ): upload is PromiseRejectedResult {

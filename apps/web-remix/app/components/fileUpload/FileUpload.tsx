@@ -3,13 +3,19 @@ import {
   SmallFileInput,
   SmallFileInputProps,
 } from "~/components/form/inputs/file.input";
-import { IFile, IFileUpload, isUploadRejected } from "./fileUpload.types";
+import {
+  IFile,
+  IFileUpload,
+  IPreviewProps,
+  isUploadRejected,
+} from "./fileUpload.types";
 
 interface FileUploadProps
   extends Partial<Omit<SmallFileInputProps, "onChange">> {
-  preview?: (fileList: IFile[]) => ReactNode;
-  uploadFile: (file: File) => Promise<IFile>;
-  fetchFiles: () => Promise<IFile[]>;
+  preview?: (props: IPreviewProps) => ReactNode;
+  onUpload: (file: File) => Promise<IFile>;
+  onFetch: () => Promise<IFile[]>;
+  onRemove?: (id: number) => Promise<void>;
   onUploadError?: (e: unknown) => void;
   onUploadSuccess?: () => void;
 }
@@ -17,10 +23,11 @@ interface FileUploadProps
 export function FileUpload({
   name,
   preview,
-  uploadFile,
-  fetchFiles,
+  onUpload,
+  onFetch,
   onUploadError,
   onUploadSuccess,
+  onRemove,
   ...rest
 }: FileUploadProps) {
   const [loading, setLoading] = useState(false);
@@ -28,13 +35,13 @@ export function FileUpload({
 
   const handleFetchFiles = useCallback(async () => {
     try {
-      const files = await fetchFiles();
+      const files = await onFetch();
 
       setFileList(files);
     } catch (e) {
       console.error(e);
     }
-  }, [fetchFiles]);
+  }, [onFetch]);
 
   const handleUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +51,7 @@ export function FileUpload({
 
         if (!files) return;
 
-        const promises = [...files].map((file) => uploadFile(file));
+        const promises = [...files].map((file) => onUpload(file));
 
         const settledResult = await Promise.allSettled(promises);
 
@@ -74,7 +81,22 @@ export function FileUpload({
         setLoading(false);
       }
     },
-    [onUploadError, onUploadSuccess, uploadFile]
+    [onUploadError, onUploadSuccess, onUpload]
+  );
+
+  const handleRemove = useCallback(
+    async (id: number) => {
+      try {
+        if (!onRemove) return;
+
+        await onRemove(id);
+
+        setFileList((prev) => prev.filter((file) => file.id !== id));
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [onRemove]
   );
 
   useEffect(() => {
@@ -98,7 +120,7 @@ export function FileUpload({
         )}
       </div>
 
-      {preview?.(fileList)}
+      {preview?.({ fileList, remove: handleRemove })}
     </div>
   );
 }

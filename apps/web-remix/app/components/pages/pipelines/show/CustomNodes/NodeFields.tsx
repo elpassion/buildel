@@ -49,7 +49,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     [blockName, clearEvents, push]
   );
 
-  const upload = useCallback(async (file: File) => {
+  const uploadFile = useCallback(async (file: File) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("collection_name", "test1");
@@ -65,7 +65,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     return FileResponse.parse(response);
   }, []);
 
-  const fetchDocuments = useCallback(async () => {
+  const fetchFiles = useCallback(async () => {
     const response = await fetch(
       `/super-api/organizations/${organizationId}/memories?collection_name=test1`
     ).then((res) => res.json());
@@ -89,9 +89,9 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
       return (
         <FileUpload
           name={name}
-          uploadFile={upload}
-          fetchFiles={fetchDocuments}
-          preview={(fileList) => <FileUploadListPreview fileList={fileList} />}
+          onUpload={uploadFile}
+          onFetch={fetchFiles}
+          preview={(props) => <FileUploadListPreview {...props} />}
         />
       );
     } else if (field.data.type === "audio") {
