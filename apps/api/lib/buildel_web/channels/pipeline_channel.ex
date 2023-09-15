@@ -6,13 +6,14 @@ defmodule BuildelWeb.PipelineChannel do
   alias Buildel.Pipelines
 
   defparams :join do
-    required :auth, :string
-    required :user_data, :string
+    required(:auth, :string)
+    required(:user_data, :string)
   end
 
   def join("pipelines:" <> organization_pipeline_id = channel_name, params, socket) do
     with {:ok, %{auth: auth, user_data: user_data}} <- validate(:join, params),
-         :ok <- BuildelWeb.ChannelAuth.verify_auth_token(socket.id, channel_name, user_data, auth),
+         :ok <-
+           BuildelWeb.ChannelAuth.verify_auth_token(socket.id, channel_name, user_data, auth),
          [organization_id, pipeline_id] <- String.split(organization_pipeline_id, ":"),
          {:ok, pipeline_id} <- Buildel.Utils.parse_id(pipeline_id),
          {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
@@ -34,7 +35,11 @@ defmodule BuildelWeb.PipelineChannel do
         {:error, %{reason: "unauthorized"}}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:error, %{reason: "invalid", errors: BuildelWeb.ChangesetJSON.error(%{changeset: changeset}).errors}}
+        {:error,
+         %{
+           reason: "invalid",
+           errors: BuildelWeb.ChangesetJSON.error(%{changeset: changeset}).errors
+         }}
 
       err ->
         IO.inspect(err)
@@ -72,8 +77,7 @@ defmodule BuildelWeb.PipelineChannel do
   def handle_info({output_name, :binary, chunk}, socket) do
     Logger.debug("Channel Sending binary chunk to #{output_name}")
 
-    ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", block_name, "io", output_name] =
-      output_name |> String.split(":")
+    %{block_name: block_name, output_name: output_name} = parse_topic(output_name)
 
     socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
     {:noreply, socket}
@@ -82,35 +86,78 @@ defmodule BuildelWeb.PipelineChannel do
   def handle_info({output_name, :text, message}, socket) do
     Logger.debug("Channel Sending text chunk to #{output_name}")
 
-    ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", block_name, "io", output_name] =
-      output_name |> String.split(":")
+    %{block_name: block_name, output_name: output_name} = parse_topic(output_name)
 
     socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
     {:noreply, socket}
   end
 
   def handle_info({output_name, :start_stream, _}, socket) do
-    case output_name |> String.split(":") do
-      ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", _block_name, "io", _output_name] ->
-        "skip"
-
-      ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", block_name] ->
+    case parse_topic(output_name) do
+      %{output_name: nil, block_name: block_name} ->
         socket |> Phoenix.Channel.push("start:#{block_name}", %{})
+
+      _ ->
+        "skip"
     end
 
     {:noreply, socket}
   end
 
   def handle_info({output_name, :stop_stream, _}, socket) do
-    case output_name |> String.split(":") do
-      ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", _block_name, "io", _output_name] ->
-        "skip"
-
-      ["context", "pipelines", _pipeline_id, "runs", _run_id, "block", block_name] ->
+    case parse_topic(output_name) do
+      %{output_name: nil, block_name: block_name} ->
         socket |> Phoenix.Channel.push("stop:#{block_name}", %{})
+
+      _ ->
+        "skip"
     end
 
     {:noreply, socket}
+  end
+
+  defp parse_topic(topic) do
+    case topic |> String.split(":") do
+      [
+        "context",
+        "organizations",
+        organization_id,
+        "pipelines",
+        pipeline_id,
+        "runs",
+        run_id,
+        "block",
+        block_name,
+        "io",
+        output_name
+      ] ->
+        %{
+          organization_id: organization_id,
+          pipeline_id: pipeline_id,
+          run_id: run_id,
+          block_name: block_name,
+          output_name: output_name
+        }
+
+      [
+        "context",
+        "organizations",
+        organization_id,
+        "pipelines",
+        pipeline_id,
+        "runs",
+        run_id,
+        "block",
+        block_name
+      ] ->
+        %{
+          organization_id: organization_id,
+          pipeline_id: pipeline_id,
+          run_id: run_id,
+          block_name: block_name,
+          output_name: nil
+        }
+    end
   end
 
   defp listen_to_outputs(run) do

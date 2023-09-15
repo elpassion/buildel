@@ -11,7 +11,21 @@ defmodule Buildel.Pipelines.Worker do
   end
 
   def context_id(%Run{} = run) do
-    "pipelines:#{run.pipeline_id}:runs:#{run.id}"
+    organization_id =
+      run |> Buildel.Repo.preload(:pipeline) |> Map.get(:pipeline) |> Map.get(:organization_id)
+
+    "organizations:#{organization_id}:pipelines:#{run.pipeline_id}:runs:#{run.id}"
+  end
+
+  def context_from_context_id(context_id) do
+    ["organizations", organization_id, "pipelines", pipeline_id, "runs", run_id] =
+      String.split(context_id, ":")
+
+    %{
+      global: organization_id,
+      parent: pipeline_id,
+      local: run_id
+    }
   end
 
   def block_id(%Run{} = run, %Blocks.Block{name: name}) do

@@ -43,9 +43,10 @@ defmodule Buildel.Blocks.DocumentSearch do
                 "title" => "Persist in",
                 "enum" => ["run", "workflow"],
                 "enumPresentAs" => "radio",
-                "description" => "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
+                "description" =>
+                  "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
                 "default" => "run"
-              },
+              }
             }
           })
       }
@@ -76,12 +77,14 @@ defmodule Buildel.Blocks.DocumentSearch do
       ) do
     subscribe_to_inputs(context_id, opts.inputs ++ ["#{block_name}:files"])
 
-    [parent_context, parent_context_name, _context, _context_name] = String.split(context_id, ":")
+    %{global: global, parent: parent, local: local} =
+      Buildel.Pipelines.Worker.context_from_context_id(context_id)
 
-    collection_name = case opts.persist_in do
-      "run" -> context_id |> String.replace(":", ".")
-      "workflow" -> "#{parent_context}.#{parent_context_name}"
-    end
+    collection_name =
+      case opts.persist_in do
+        "run" -> "#{global}_#{parent}_#{local}"
+        "workflow" -> "#{global}_#{parent}"
+      end
 
     with {:ok, collection} <- Buildel.VectorDB.init(collection_name) do
       {:ok,
