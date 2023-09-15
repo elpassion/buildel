@@ -398,7 +398,7 @@ defmodule Buildel.BlocksTest do
           opts: %{
             inputs: ["text_test:output"],
             messages: [
-              %{role: "system", content: "You are a helpful assistant. {text_test:output}"}
+              %{role: "system", content: "You are a helpful assistant. {{text_test:output}}"}
             ]
           }
         )
@@ -426,7 +426,7 @@ defmodule Buildel.BlocksTest do
                Blocks.validate_block(TakeLatest, %{
                  "name" => "test",
                  "opts" => %{
-                   "template" => "{text_output:output}",
+                   "template" => "{{text_output:output}}",
                    "reset" => false
                  },
                  "inputs" => []
@@ -481,7 +481,7 @@ defmodule Buildel.BlocksTest do
           context_id: "run1",
           opts: %{
             inputs: ["text_test:output"],
-            template: "dupa {text_test:output}",
+            template: "dupa {{text_test:output}}",
             reset: false
           }
         )
@@ -519,7 +519,7 @@ defmodule Buildel.BlocksTest do
           context_id: "run1",
           opts: %{
             inputs: ["text_test:output", "text_test_2:output"],
-            template: "dupa {text_test:output} {text_test_2:output}",
+            template: "dupa {{text_test:output}} {{text_test_2:output}}",
             reset: false
           }
         )
@@ -562,7 +562,7 @@ defmodule Buildel.BlocksTest do
           context_id: "run1",
           opts: %{
             inputs: ["text_test:output", "text_test_2:output"],
-            template: "dupa {text_test:output} {text_test_2:output}",
+            template: "dupa {{text_test:output}} {{text_test_2:output}}",
             reset: true
           }
         )

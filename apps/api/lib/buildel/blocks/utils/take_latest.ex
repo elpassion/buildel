@@ -26,7 +26,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
         state[tl_keyword()]
         |> Enum.reduce(template, fn
           {_input, nil}, template -> template
-          {input, text}, template -> String.replace(template, "{#{input}}", text)
+          {input, text}, template -> String.replace(template, "{{#{input}}}", text)
         end)
       end
 
