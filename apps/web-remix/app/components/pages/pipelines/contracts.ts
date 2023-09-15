@@ -47,6 +47,10 @@ export const File = z.object({
   file_size: z.number(),
   file_type: z.string(),
 });
+
+export const FileResponse = z
+  .object({ data: File })
+  .transform((res) => res.data);
 export const PipelineResponse = z
   .object({
     data: Pipeline,

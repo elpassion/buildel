@@ -1,7 +1,10 @@
 import React, { useCallback } from "react";
 import { Button, Textarea } from "@elpassion/taco";
 import { IBlockConfig, IField } from "../pipeline.types";
-import { FileListResponse } from "~/components/pages/pipelines/contracts";
+import {
+  FileListResponse,
+  FileResponse,
+} from "~/components/pages/pipelines/contracts";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import {
@@ -51,10 +54,15 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     formData.append("file", file);
     formData.append("collection_name", "test1");
 
-    await fetch(`/super-api/organizations/${organizationId}/memories`, {
-      body: formData,
-      method: "POST",
-    });
+    const response = await fetch(
+      `/super-api/organizations/${organizationId}/memories`,
+      {
+        body: formData,
+        method: "POST",
+      }
+    ).then((res) => res.json());
+
+    return FileResponse.parse(response);
   };
 
   const fetchDocuments = async () => {

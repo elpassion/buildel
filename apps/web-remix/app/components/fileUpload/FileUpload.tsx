@@ -3,16 +3,17 @@ import {
   SmallFileInput,
   SmallFileInputProps,
 } from "~/components/form/inputs/file.input";
-import { IFile } from "./fileUpload.types";
+import { IFile, IFileUpload, isUploadRejected } from "./fileUpload.types";
 
 interface FileUploadProps
   extends Partial<Omit<SmallFileInputProps, "onChange">> {
   preview?: (fileList: IFile[]) => ReactNode;
-  uploadFile: (file: File) => Promise<void>;
+  uploadFile: (file: File) => Promise<IFile>;
   fetchFiles: () => Promise<IFile[]>;
   onUploadError?: (e: unknown) => void;
   onUploadSuccess?: () => void;
 }
+
 export function FileUpload({
   name,
   preview,
@@ -23,7 +24,7 @@ export function FileUpload({
   ...rest
 }: FileUploadProps) {
   const [loading, setLoading] = useState(false);
-  const [fileList, setFileList] = useState<IFile[]>([]);
+  const [fileList, setFileList] = useState<IFileUpload[]>([]);
 
   const handleFetchFiles = async () => {
     try {
@@ -38,19 +39,35 @@ export function FileUpload({
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoading(true);
     try {
-      //todo handle errors
       const { files } = e.target;
+
       if (!files) return;
 
       const promises = [...files].map((file) => uploadFile(file));
 
-      await Promise.allSettled(promises);
+      const settledResult = await Promise.allSettled(promises);
+
+      const uploaded = settledResult.reduce((acc, curr, currentIndex) => {
+        if (isUploadRejected(curr)) {
+          return [
+            ...acc,
+            {
+              id: Math.random(),
+              file_name: files[currentIndex].name,
+              file_size: files[currentIndex].size,
+              file_type: files[currentIndex].type,
+              error: curr.reason?.message || "Unknown upload error",
+            },
+          ];
+        }
+        return [...acc, curr.value];
+      }, [] as IFileUpload[]);
+
+      setFileList((prev) => [...uploaded, ...prev]);
 
       onUploadSuccess?.();
 
       setLoading(false);
-
-      await handleFetchFiles();
     } catch (e) {
       onUploadError?.(e);
       setLoading(false);
@@ -68,6 +85,7 @@ export function FileUpload({
           <p className="text-white">loading...</p>
         ) : (
           <SmallFileInput
+            multiple
             buttonText="Browse files"
             label="Upload"
             supportingText="SVG, PNG, JPG or GIF. Max size of 2MB"
