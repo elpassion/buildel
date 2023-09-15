@@ -92,6 +92,14 @@ defmodule Buildel.PipelinesTest do
       assert run.pipeline_id == pipeline.id
     end
 
+    test "create_run/1 increases pipeline runs_count" do
+      pipeline = pipeline_fixture()
+      valid_attrs = %{pipeline_id: pipeline.id}
+
+      assert {:ok, %Run{}} = Pipelines.create_run(valid_attrs)
+      assert pipeline |> Buildel.Repo.reload() |> Map.get(:runs_count) == 1
+    end
+
     test "create_run/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Pipelines.create_run(@invalid_attrs)
     end

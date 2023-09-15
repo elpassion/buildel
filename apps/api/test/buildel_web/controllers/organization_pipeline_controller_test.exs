@@ -64,7 +64,8 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
       assert %{
                "id" => ^id,
                "config" => %{},
-               "name" => "some name"
+               "name" => "some name",
+               "runs_count" => 0
              } = json_response(conn, 200)["data"]
     end
 
@@ -108,7 +109,8 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
       assert %{
                "id" => ^id,
                "config" => %{},
-               "name" => "some updated name"
+               "name" => "some updated name",
+               "runs_count" => 0
              } = json_response(conn, 200)["data"]
     end
 

@@ -5,7 +5,10 @@ defmodule Buildel.Pipelines.Pipeline do
   schema "pipelines" do
     field(:name, :string)
     field(:config, :map)
+
     has_many(:runs, Buildel.Pipelines.Run, on_delete: :delete_all)
+    field(:runs_count, :integer, default: 0)
+
     belongs_to(:organization, Buildel.Organizations.Organization)
 
     timestamps()
