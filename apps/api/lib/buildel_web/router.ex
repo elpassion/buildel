@@ -59,6 +59,7 @@ defmodule BuildelWeb.Router do
 
     post("/organizations/:organization_id/memories", MemoryController, :create)
     get("/organizations/:organization_id/memories", MemoryController, :index)
+    delete("/organizations/:organization_id/memories/:id", MemoryController, :delete)
 
     resources("/runs", RunController, only: [:index, :create, :show])
 

@@ -46,6 +46,20 @@ defmodule Buildel.Memories do
     end
   end
 
+  def create_organization_memory(organization_id, collection_name, %{
+        path: path,
+        type: type,
+        name: name
+      }) do
+    organization = Buildel.Organizations.get_organization!(organization_id)
+
+    create_organization_memory(organization, collection_name, %{
+      path: path,
+      type: type,
+      name: name
+    })
+  end
+
   defp organization_collection_name(
          %Buildel.Organizations.Organization{} = organization,
          collection_name

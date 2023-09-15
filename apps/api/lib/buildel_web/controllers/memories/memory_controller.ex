@@ -47,4 +47,14 @@ defmodule BuildelWeb.MemoryController do
       |> render(:show, memory: memory)
     end
   end
+
+  def delete(conn, %{"organization_id" => organization_id, "id" => id}) do
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, _} <- Buildel.Memories.delete_organization_memory(organization, id) do
+      conn |> put_status(:no_content) |> render(:delete)
+    end
+  end
 end

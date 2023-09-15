@@ -2,6 +2,7 @@ defmodule BuildelWeb.MemoryControllerTest do
   use BuildelWeb.ConnCase
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
+  import Buildel.MemoriesFixtures
 
   alias Buildel.Organizations
 
@@ -106,6 +107,24 @@ defmodule BuildelWeb.MemoryControllerTest do
                ]
              } = json_response(conn, 200)
     end
+  end
+
+  describe "delete" do
+    setup [:create_memory]
+
+    test "requires authentication", %{conn: conn, organization: organization, memory: memory} do
+      conn = conn |> log_out_user()
+
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization.id}/memories/#{memory.id}")
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+  end
+
+  defp create_memory(%{organization: organization}) do
+    memory = memory_fixture(organization.id, "collection")
+    %{memory: memory}
   end
 
   defp read_file(_) do
