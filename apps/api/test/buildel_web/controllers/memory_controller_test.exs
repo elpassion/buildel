@@ -130,6 +130,17 @@ defmodule BuildelWeb.MemoryControllerTest do
 
       assert json_response(conn, 404)["errors"] != %{}
     end
+
+    test "returns :no_content when valid", %{
+      conn: conn,
+      organization: organization,
+      memory: memory
+    } do
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization.id}/memories/#{memory.id}")
+
+      assert json_response(conn, 204) == %{}
+    end
   end
 
   defp create_memory(%{organization: organization}) do

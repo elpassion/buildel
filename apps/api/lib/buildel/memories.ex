@@ -60,6 +60,28 @@ defmodule Buildel.Memories do
     })
   end
 
+  def delete_organization_memory(
+        %Buildel.Organizations.Organization{} = organization,
+        id
+      ) do
+    memory = get_organization_memory!(organization, id)
+
+    collection_name = organization_collection_name(organization, memory.collection_name)
+
+    with {:ok, _} <- Buildel.Repo.delete(memory) do
+      {:ok, memory}
+    end
+  end
+
+  defp get_organization_memory!(
+         %Buildel.Organizations.Organization{} = organization,
+         id
+       ) do
+    Buildel.Memories.Memory
+    |> where([m], m.id == ^id and m.organization_id == ^organization.id)
+    |> Buildel.Repo.one!()
+  end
+
   defp organization_collection_name(
          %Buildel.Organizations.Organization{} = organization,
          collection_name
