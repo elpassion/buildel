@@ -120,6 +120,16 @@ defmodule BuildelWeb.MemoryControllerTest do
 
       assert json_response(conn, 401)["errors"] != %{}
     end
+
+    test "does not delete in other org", %{conn: conn} do
+      organization = organization_fixture()
+      memory = memory_fixture(organization.id, "collection")
+
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization.id}/memories/#{memory.id}")
+
+      assert json_response(conn, 404)["errors"] != %{}
+    end
   end
 
   defp create_memory(%{organization: organization}) do
