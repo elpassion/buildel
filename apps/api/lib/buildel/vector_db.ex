@@ -15,7 +15,7 @@ defmodule Buildel.VectorDB do
       })
 
     {:ok, %{data: gpt_embeddings}} =
-      Buildel.Clients.ChatGPT.get_embeddings(inputs: documents, api_key: api_key)
+      embeddings().get_embeddings(inputs: documents, api_key: api_key)
 
     embeddings = gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)
 
@@ -35,7 +35,7 @@ defmodule Buildel.VectorDB do
     documents = Buildel.Splitters.recursive_character_text_split(query, %{})
 
     {:ok, %{data: gpt_embeddings}} =
-      Buildel.Clients.ChatGPT.get_embeddings(inputs: documents, api_key: api_key)
+      embeddings().get_embeddings(inputs: documents, api_key: api_key)
 
     embeddings = gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)
     {:ok, collection} = adapter().get_collection(collection_name)
@@ -56,6 +56,10 @@ defmodule Buildel.VectorDB do
 
   defp adapter do
     Application.get_env(:bound, :vector_db, Buildel.VectorDB.QdrantAdapter)
+  end
+
+  defp embeddings do
+    Application.get_env(:bound, :embeddings, Buildel.Clients.OpenAIEmbeddings)
   end
 end
 
