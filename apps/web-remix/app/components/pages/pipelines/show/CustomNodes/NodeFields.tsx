@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { Button, Textarea } from "@elpassion/taco";
 import { IBlockConfig, IField } from "../pipeline.types";
 import {
@@ -104,7 +104,9 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
           />
         );
       } else if (field.data.type === "audio") {
-        return <AudioRecorder />;
+        return (
+          <AudioRecorder onStatusChange={(status) => console.log(status)} />
+        );
       }
 
       return <span>Unsupported input type - {type}</span>;

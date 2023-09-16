@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef } from "react";
 import { isEqual } from "lodash";
 import { assert } from "~/utils/assert";
 
@@ -6,24 +6,24 @@ export interface OptionsType {
   barHeightFactor: number;
   barWidth: number;
   barPositionFactor: number;
+  fftSize: number;
+  onError?: (err: unknown) => void;
 }
 
 const BASE_OPTIONS: OptionsType = {
   barWidth: 3,
   barHeightFactor: 1,
   barPositionFactor: 4,
+  fftSize: 1024,
 };
-interface UseAudioVisualizeProps {
-  canvas: RefObject<HTMLCanvasElement>;
-  options?: Partial<OptionsType>;
-}
-export const useAudioVisualize = ({
-  canvas,
-  options = {},
-}: UseAudioVisualizeProps) => {
-  const { barHeightFactor, barPositionFactor, ...rest } = {
+
+export const useAudioVisualize = (
+  canvas: RefObject<HTMLCanvasElement>,
+  args?: Partial<OptionsType>
+) => {
+  const { barHeightFactor, barPositionFactor, fftSize, onError, ...rest } = {
     ...BASE_OPTIONS,
-    ...options,
+    ...args,
   };
 
   const animationFrameRef = useRef<number | null>(null);
@@ -35,7 +35,6 @@ export const useAudioVisualize = ({
   const audioSourceOriginal = useRef<HTMLAudioElement | MediaStream | null>(
     null
   );
-  const [status, setStatus] = useState<"playing" | "paused">("paused");
 
   const handleClearFrame = useCallback(() => {
     if (animationFrameRef.current) {
@@ -43,9 +42,10 @@ export const useAudioVisualize = ({
     }
   }, []);
 
-  const visualizeAudio = useCallback(() => {
-    if (!canvas.current) return console.warn("canvas not provided");
-    const canvasContext = canvas.current.getContext("2d");
+  const drawAudio = useCallback(() => {
+    const canvasContext = canvas.current?.getContext("2d");
+    assert(canvasContext, "Failed to get canvas context");
+
     function draw() {
       assert(audioAnalyzerRef.current);
       assert(canvas.current);
@@ -88,7 +88,7 @@ export const useAudioVisualize = ({
     draw();
   }, [barHeightFactor, barPositionFactor, canvas, rest.barWidth]);
 
-  const clear = useCallback(async () => {
+  const disconnectSources = useCallback(async () => {
     handleClearFrame();
 
     audioSourceRef.current?.disconnect();
@@ -103,9 +103,14 @@ export const useAudioVisualize = ({
 
   const createMediaAnalyzer = useCallback(
     (source: HTMLAudioElement | MediaStream) => {
+      assert(
+        window.AudioContext,
+        "Web Audio API is not supported in this browser"
+      );
+
       audioContextRef.current = new window.AudioContext();
       audioAnalyzerRef.current = audioContextRef.current.createAnalyser();
-      audioAnalyzerRef.current.fftSize = 2048;
+      audioAnalyzerRef.current.fftSize = fftSize;
 
       if (isSourceNode(source)) {
         audioSourceRef.current =
@@ -118,28 +123,27 @@ export const useAudioVisualize = ({
 
       audioSourceRef.current.connect(audioAnalyzerRef.current);
     },
-    []
+    [fftSize]
   );
-  const onAudioListen = useCallback(
+  const visualizeAudio = useCallback(
     async (source: HTMLAudioElement | MediaStream) => {
       if (typeof window === "undefined") return;
+      try {
+        if (!isEqual(source, audioSourceOriginal.current)) {
+          await disconnectSources();
+          createMediaAnalyzer(source);
+        }
 
-      if (!isEqual(source, audioSourceOriginal.current)) {
-        await clear();
-        createMediaAnalyzer(source);
+        audioSourceOriginal.current = source;
+
+        drawAudio();
+      } catch (err) {
+        console.error(err);
+        onError?.(err);
       }
-
-      audioSourceOriginal.current = source;
-      setStatus("playing");
-      visualizeAudio();
     },
-    [clear, createMediaAnalyzer, visualizeAudio]
+    [drawAudio, disconnectSources, createMediaAnalyzer, onError]
   );
-
-  const onAudioStop = useCallback(() => {
-    setStatus("paused");
-    handleClearFrame();
-  }, [handleClearFrame]);
 
   useEffect(() => {
     return () => {
@@ -147,7 +151,11 @@ export const useAudioVisualize = ({
     };
   }, [handleClearFrame]);
 
-  return { onAudioListen, onAudioStop, status, clear };
+  return {
+    visualizeAudio,
+    stopVisualization: handleClearFrame,
+    disconnectSources,
+  };
 };
 
 function isSourceNode(

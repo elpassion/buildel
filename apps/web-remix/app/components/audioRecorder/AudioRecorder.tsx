@@ -1,124 +1,154 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Icon } from "@elpassion/taco";
 import classNames from "classnames";
 import { useAudioVisualize } from "~/components/audioRecorder/useAudioVisualize";
 import {
   useAudioRecorder,
-  UseAudioRecorderCbOptions,
+  UseAudioRecorderCb,
   UseAudioRecorderProps,
 } from "~/components/audioRecorder/useAudioRecorder";
-interface AudioRecorderProps extends UseAudioRecorderProps {}
+
+export type MediaRecorderState =
+  | "inactive"
+  | "recording"
+  | "paused"
+  | "playing";
+interface AudioRecorderProps extends UseAudioRecorderProps {
+  audioUrl?: string;
+  onClear?: () => void;
+  onStatusChange?: (status: MediaRecorderState) => void;
+  audioOptions?: BlobPropertyBag;
+}
 
 export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   onStart,
   onPause,
   onChunk,
   onStop,
+  onClear,
+  onError,
+  onResume,
+  onStatusChange,
+  audioOptions,
+  audioUrl: audioFromProps,
 }) => {
+  const [status, setStatus] = useState<MediaRecorderState>("inactive");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const chunks = useRef<Blob[]>([]);
+
   const [audioUrl, setAudioUrl] = useState<string | undefined>(undefined);
 
-  const {
-    onAudioListen,
-    onAudioStop,
-    status: playingStatus,
-    clear: clearVisualization,
-  } = useAudioVisualize({ canvas: canvasRef });
+  const isControlled = typeof audioFromProps !== "undefined";
 
-  const handleRemove = useCallback(async () => {
+  const audioValue = useMemo(() => {
+    return isControlled ? audioFromProps : audioUrl;
+  }, [audioFromProps, audioUrl, isControlled]);
+
+  const { visualizeAudio, stopVisualization, disconnectSources } =
+    useAudioVisualize(canvasRef);
+
+  const handleOnStop: UseAudioRecorderCb = useCallback(
+    (e, chunks, args) => {
+      onStop?.(e, chunks, args);
+
+      if (!isControlled) {
+        const blob = new Blob(chunks, { type: "audio/mp3;", ...audioOptions });
+        setAudioUrl(URL.createObjectURL(blob));
+      }
+
+      stopVisualization();
+      setStatus("paused");
+    },
+    [isControlled, stopVisualization, onStop]
+  );
+
+  const handleClear = useCallback(async () => {
+    onClear?.();
+    setStatus("inactive");
     setAudioUrl(undefined);
-    onAudioStop();
-    await clearVisualization();
-    chunks.current = [];
-  }, [clearVisualization, onAudioStop]);
 
-  const handleOnChunk = useCallback(
-    (chunk: Blob, options: UseAudioRecorderCbOptions) => {
-      chunks.current.push(chunk);
-      onChunk?.(chunk, options);
+    await disconnectSources();
+    stopVisualization();
+  }, [disconnectSources, stopVisualization, onClear]);
+
+  const handleOnStart: UseAudioRecorderCb = useCallback(
+    async (e, chunks, args) => {
+      onStart?.(e, chunks, args);
+
+      await handleClear();
+      if (!args.mediaStream) return;
+
+      await visualizeAudio(args.mediaStream);
+      setStatus("recording");
     },
-    [onChunk]
+    [handleClear, visualizeAudio, onStart]
   );
 
-  const handleOnStop = useCallback(
-    (e: Event, options: UseAudioRecorderCbOptions) => {
-      const blob = new Blob(chunks.current, { type: "audio/mp3;" });
-      setAudioUrl(URL.createObjectURL(blob));
-      onAudioStop();
-
-      onStop?.(e, options);
-    },
-    [onAudioStop, onStop]
-  );
-
-  const handleOnStart = useCallback(
-    async (e: Event, options: UseAudioRecorderCbOptions) => {
-      await handleRemove();
-
-      if (!options.mediaStream) return;
-      await onAudioListen(options.mediaStream);
-
-      onStart?.(e, options);
-    },
-    [handleRemove, onAudioListen, onStart]
-  );
-
-  const {
-    stop,
-    start,
-    status: recordingStatus,
-  } = useAudioRecorder({
-    onChunk: handleOnChunk,
+  const { stop, start } = useAudioRecorder({
     onStop: handleOnStop,
     onStart: handleOnStart,
+    onChunk,
     onPause,
+    onError,
+    onResume,
   });
 
-  const handleRecord = useCallback(async () => {
-    if (recordingStatus === "recording") {
-      await stop();
-    } else {
-      await start();
-    }
-  }, [recordingStatus, start, stop]);
-
   const ButtonIcon = useCallback(() => {
-    if (audioUrl && playingStatus === "playing")
+    if (audioValue && status === "playing")
       return <Icon iconName="pause" size="xs" />;
-    if (audioUrl && playingStatus === "paused")
+    if (audioValue && status === "paused")
       return <Icon iconName="play" size="xs" />;
 
     return <Icon iconName="mic" size="xs" />;
-  }, [audioUrl, playingStatus]);
+  }, [audioValue, status]);
 
   const playAudio = useCallback(async () => {
     if (!canvasRef.current || !audioRef.current) return;
-    await onAudioListen(audioRef.current);
+    await visualizeAudio(audioRef.current);
     audioRef.current.play();
-  }, [onAudioListen]);
+    setStatus("playing");
+  }, [visualizeAudio]);
 
   const pauseAudio = useCallback(() => {
     audioRef.current?.pause();
-    onAudioStop();
-  }, [onAudioStop]);
+    stopVisualization();
+    setStatus("paused");
+  }, [stopVisualization]);
 
   const handlePlay = useCallback(async () => {
-    if (playingStatus === "playing") {
+    if (status === "playing" || !audioValue) {
       pauseAudio();
     } else {
       await playAudio();
     }
-  }, [pauseAudio, playAudio, playingStatus]);
+  }, [pauseAudio, playAudio, status, audioValue]);
+
+  const handleRecord = useCallback(async () => {
+    if (status === "recording") {
+      await stop();
+    } else {
+      await start();
+    }
+  }, [status, start, stop]);
+
+  useEffect(() => {
+    onStatusChange?.(status);
+  }, [status]);
 
   return (
     <div className="flex gap-2 items-center bg-neutral-800 rounded-lg w-fit px-2 py-1">
       <audio
-        key={audioUrl}
+        key={audioValue}
+        src={audioValue}
         ref={audioRef}
-        src={audioUrl}
         onEnded={pauseAudio}
+        controls
         hidden
       />
 
@@ -126,11 +156,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         className={classNames(
           "w-6 h-6 flex items-center justify-center bg-neutral-500 rounded-md hover:bg-neutral-400",
           {
-            "text-neutral-50": recordingStatus !== "recording",
-            "text-red-400": recordingStatus === "recording",
+            "text-neutral-50": status !== "recording",
+            "text-red-400": status === "recording",
           }
         )}
-        onClick={audioUrl ? handlePlay : handleRecord}
+        onClick={audioValue ? handlePlay : handleRecord}
       >
         <ButtonIcon />
       </button>
@@ -140,12 +170,12 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
           "relative after:absolute after:w-full after:content-[''] after:h-[1px] after:bg-neutral-400 after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2"
         )}
       >
-        <canvas ref={canvasRef} width={audioUrl ? 180 : 210} height={36} />
+        <canvas ref={canvasRef} width={audioUrl ? 178 : 210} height={36} />
       </div>
 
-      {audioUrl && (
+      {audioValue && (
         <button
-          onClick={handleRemove}
+          onClick={handleClear}
           className={classNames(
             "w-6 h-6 flex items-center justify-center bg-neutral-500 rounded-md text-red-400 hover:bg-neutral-400"
           )}
