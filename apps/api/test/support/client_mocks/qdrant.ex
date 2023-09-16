@@ -1,4 +1,3 @@
-
 defmodule Buildel.ClientMocks.VectorDB.QdrantAdapter do
   @behaviour Buildel.VectorDB.VectorDBAdapter
 
@@ -8,7 +7,7 @@ defmodule Buildel.ClientMocks.VectorDB.QdrantAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapter
-  def create_collection(collection_name) do
+  def create_collection(collection_name, _opts \\ %{}) do
     {:ok, %{name: collection_name}}
   end
 

@@ -60,8 +60,8 @@ defmodule Buildel.VectorDB do
 end
 
 defmodule Buildel.VectorDB.VectorDBAdapter do
-  @callback get_collection(collection_name: String.t()) :: {:ok, map()}
-  @callback create_collection(collection_name: String.t()) :: {:ok, map()}
+  @callback get_collection(String.t()) :: {:ok, map()}
+  @callback create_collection(String.t(), map()) :: {:ok, map()}
   @callback delete_all_with_metadata(map(), map()) :: :ok
   @callback add(map(), map()) :: :ok
 end
@@ -77,9 +77,11 @@ defmodule Buildel.VectorDB.QdrantAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapter
-  def create_collection(collection_name) do
+  def create_collection(collection_name, opts \\ %{}) do
+    opts = Map.merge(opts, %{vectors: %{size: 1536, distance: "Cosine"}})
+
     with {:ok, _} <-
-           Qdrant.create_collection(collection_name, %{vectors: %{size: 1536, distance: "Cosine"}}) do
+           Qdrant.create_collection(collection_name, opts) do
       {:ok, %{name: collection_name}}
     else
       error ->
@@ -106,11 +108,13 @@ defmodule Buildel.VectorDB.QdrantAdapter do
   @impl Buildel.VectorDB.VectorDBAdapter
   def delete_all_with_metadata(collection, metadata) do
     filter = %{
-      must: metadata |> Enum.map(fn {key, value} -> %{key: "metadata.#{key}", match: %{value: value}} end)
+      must:
+        metadata
+        |> Enum.map(fn {key, value} -> %{key: "metadata.#{key}", match: %{value: value}} end)
     }
 
     with {:ok, %{status: 200}} <-
-           Qdrant.Api.Http.Points.delete_points(collection.name, %{ filter: filter }) do
+           Qdrant.Api.Http.Points.delete_points(collection.name, %{filter: filter}) do
       :ok
     else
       {:error, %{status: status}} -> {:error, status}
