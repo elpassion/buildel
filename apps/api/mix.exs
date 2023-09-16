@@ -65,7 +65,10 @@ defmodule Buildel.MixProject do
       {:ex_json_schema, "~> 0.10.1"},
       {:uuid, "~> 1.1"},
       {:qdrant, "~> 0.0.8"},
-      {:goal, "~> 0.3"}
+      {:goal, "~> 0.3"},
+      {:bumblebee, "~> 0.4"},
+      {:nx, "~> 0.5"},
+      {:exla, "~> 0.5"}
     ]
   end
 
