@@ -1,6 +1,7 @@
 defmodule Buildel.VectorDB do
   def init(collection_name) do
-    with {:ok, _collection} <- adapter().create_collection(collection_name) do
+    with {:ok, _collection} <-
+           adapter().create_collection(collection_name, embeddings().collection_config()) do
       {:ok, %{name: collection_name}}
     else
       {:error, error} -> {:error, error}
@@ -14,15 +15,13 @@ defmodule Buildel.VectorDB do
         chunk_overlap: 200
       })
 
-    {:ok, %{data: gpt_embeddings}} =
+    {:ok, embeddings_list} =
       embeddings().get_embeddings(inputs: documents, api_key: api_key)
-
-    embeddings = gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)
 
     {:ok, collection} = adapter().get_collection(collection_name)
 
     adapter().add(collection, %{
-      embeddings: embeddings,
+      embeddings: embeddings_list,
       documents:
         documents |> Enum.map(fn document -> %{document: document, metadata: metadata} end),
       ids: Enum.map(1..Enum.count(documents), fn _ -> UUID.uuid4() end)
@@ -32,17 +31,13 @@ defmodule Buildel.VectorDB do
   end
 
   def query(collection_name, query, api_key: api_key) do
-    documents = Buildel.Splitters.recursive_character_text_split(query, %{})
+    {:ok, embeddings_list} = embeddings().get_embeddings(inputs: [query], api_key: api_key)
 
-    {:ok, %{data: gpt_embeddings}} =
-      embeddings().get_embeddings(inputs: documents, api_key: api_key)
-
-    embeddings = gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)
     {:ok, collection} = adapter().get_collection(collection_name)
 
     {:ok, results} =
       adapter().query(collection, %{
-        query_embeddings: embeddings |> Enum.at(0)
+        query_embeddings: embeddings_list |> List.first()
       })
 
     results
@@ -82,10 +77,10 @@ defmodule Buildel.VectorDB.QdrantAdapter do
 
   @impl Buildel.VectorDB.VectorDBAdapter
   def create_collection(collection_name, opts \\ %{}) do
-    opts = Map.merge(opts, %{vectors: %{size: 1536, distance: "Cosine"}})
+    opts = Map.merge(%{size: 1536, distance: "Cosine"}, opts)
 
     with {:ok, _} <-
-           Qdrant.create_collection(collection_name, opts) do
+           Qdrant.create_collection(collection_name, %{vectors: opts}) do
       {:ok, %{name: collection_name}}
     else
       error ->

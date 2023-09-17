@@ -19,7 +19,13 @@ defmodule Buildel.Application do
       # Start the Endpoint (http/https)
       BuildelWeb.Endpoint,
       # Start a worker by calling: Buildel.Worker.start_link(arg)
-      Buildel.Pipelines.Runner
+      Buildel.Pipelines.Runner,
+      # Nx.Serving
+      {Nx.Serving,
+       serving: Buildel.Clients.BumblebeeEmbeddings.serving(),
+       name: Buildel.Clients.BumblebeeEmbeddings,
+       batch_size: 8,
+       batch_timeout: 100}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
