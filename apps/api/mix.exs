@@ -68,7 +68,9 @@ defmodule Buildel.MixProject do
       {:goal, "~> 0.3"},
       {:bumblebee, "~> 0.4"},
       {:nx, "~> 0.5"},
-      {:exla, "~> 0.5"}
+      {:exla, "~> 0.5"},
+      {:erlport, "~>0.11"},
+      {:poolboy, "~> 1.5"}
     ]
   end
 
