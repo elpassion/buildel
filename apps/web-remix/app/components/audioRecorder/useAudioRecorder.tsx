@@ -1,4 +1,6 @@
 import { useCallback, useRef } from "react";
+import { assert } from "~/utils/assert";
+import { isError } from "lodash";
 
 export interface UseAudioRecorderCbOptions {
   mediaStream: MediaStream | null;
@@ -41,101 +43,152 @@ export const useAudioRecorder = (props?: UseAudioRecorderProps) => {
 
   const requestPermissions = useCallback(async () => {
     if (typeof window === "undefined") return;
-    if (!navigator.mediaDevices) {
-      console.error("MediaDevices not supported");
-      props?.onError?.(new Event("MediaDevices not supported"), {
-        error: new Error("MediaDevices not supported"),
+    assert(navigator.mediaDevices, "MediaDevices not supported");
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false,
+    });
+
+    mediaStream.current = stream;
+
+    const recorder = new MediaRecorder(stream);
+
+    recorder.onstart = async (e) => {
+      props?.onStart?.(e, chunks.current, {
+        mediaStream: stream,
+        mediaRecorder: recorder,
+      });
+    };
+
+    recorder.onstop = (e) => {
+      props?.onStop?.(e, chunks.current, {
+        mediaStream: stream,
+        mediaRecorder: recorder,
+      });
+    };
+
+    recorder.onpause = (e) => {
+      props?.onPause?.(e, chunks.current, {
+        mediaStream: stream,
+        mediaRecorder: recorder,
+      });
+    };
+
+    recorder.onerror = (e) => {
+      props?.onError?.(e, {
+        mediaStream: stream,
+        mediaRecorder: recorder,
+        error: new Error("An error occurred while recording"),
+      });
+    };
+
+    recorder.onresume = (e) => {
+      props?.onResume?.(e, chunks.current, {
+        mediaStream: stream,
+        mediaRecorder: recorder,
+      });
+    };
+
+    recorder.ondataavailable = async (e) => {
+      chunks.current.push(e.data);
+      props?.onChunk?.(e, {
+        mediaStream: stream,
+        mediaRecorder: recorder,
+      });
+    };
+
+    mediaRecorder.current = recorder;
+  }, [props]);
+
+  const startRecording = useCallback(async () => {
+    try {
+      chunks.current = [];
+
+      await requestPermissions();
+
+      assert(mediaRecorder.current, "MediaRecorder not created");
+      mediaRecorder.current.start(500);
+    } catch (err) {
+      console.error(err);
+
+      const errMsg = isError(err)
+        ? err.message
+        : "Something went wrong during recording";
+
+      props?.onError?.(new Event(errMsg), {
+        error: err,
         mediaStream: mediaStream.current,
         mediaRecorder: mediaRecorder.current,
       });
-      return;
     }
+  }, [props, requestPermissions]);
 
+  const stopRecording = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: false,
-      });
+      assert(mediaRecorder.current, "MediaRecorder not created");
 
-      mediaStream.current = stream;
-
-      const recorder = new MediaRecorder(stream);
-
-      recorder.onstart = async (e) => {
-        props?.onStart?.(e, chunks.current, {
-          mediaStream: stream,
-          mediaRecorder: recorder,
-        });
-      };
-
-      recorder.onstop = (e) => {
-        props?.onStop?.(e, chunks.current, {
-          mediaStream: stream,
-          mediaRecorder: recorder,
-        });
-      };
-
-      recorder.onpause = (e) => {
-        props?.onPause?.(e, chunks.current, {
-          mediaStream: stream,
-          mediaRecorder: recorder,
-        });
-      };
-
-      recorder.onerror = (e) => {
-        props?.onError?.(e, {
-          mediaStream: stream,
-          mediaRecorder: recorder,
-          error: new Error("An error occurred while recording"),
-        });
-      };
-
-      recorder.onresume = (e) => {
-        props?.onResume?.(e, chunks.current, {
-          mediaStream: stream,
-          mediaRecorder: recorder,
-        });
-      };
-
-      recorder.ondataavailable = async (e) => {
-        chunks.current.push(e.data);
-        props?.onChunk?.(e, {
-          mediaStream: stream,
-          mediaRecorder: recorder,
-        });
-      };
-
-      mediaRecorder.current = recorder;
+      mediaRecorder.current.stop();
+      mediaStream.current?.getAudioTracks().forEach((track) => track.stop());
     } catch (err) {
       console.error(err);
-      props?.onError?.(new Event("error occurred"), {
+
+      const errMsg = isError(err)
+        ? err.message
+        : "Something went wrong during stopping recording";
+
+      props?.onError?.(new Event(errMsg), {
+        error: err,
         mediaStream: mediaStream.current,
         mediaRecorder: mediaRecorder.current,
       });
     }
   }, [props]);
 
-  const startRecording = useCallback(async () => {
-    chunks.current = [];
+  const pauseRecording = useCallback(async () => {
+    try {
+      assert(mediaRecorder.current, "MediaRecorder not created");
 
-    await requestPermissions();
+      mediaRecorder.current.pause();
+    } catch (err) {
+      console.error(err);
 
-    if (!mediaRecorder.current) return;
+      const errMsg = isError(err)
+        ? err.message
+        : "Something went wrong during pausing recording";
 
-    mediaRecorder.current.start(500);
-  }, [requestPermissions]);
+      props?.onError?.(new Event(errMsg), {
+        error: err,
+        mediaStream: mediaStream.current,
+        mediaRecorder: mediaRecorder.current,
+      });
+    }
+  }, [props]);
 
-  const stopRecording = useCallback(async () => {
-    if (!mediaRecorder.current) return;
+  const resumeRecording = useCallback(async () => {
+    try {
+      assert(mediaRecorder.current, "MediaRecorder not created");
 
-    mediaRecorder.current.stop();
+      mediaRecorder.current.resume();
+    } catch (err) {
+      console.error(err);
 
-    mediaStream.current?.getAudioTracks().forEach((track) => track.stop());
-  }, []);
+      const errMsg = isError(err)
+        ? err.message
+        : "Something went wrong during resuming recording";
+
+      props?.onError?.(new Event(errMsg), {
+        error: err,
+        mediaStream: mediaStream.current,
+        mediaRecorder: mediaRecorder.current,
+      });
+    }
+  }, [props]);
 
   return {
     start: startRecording,
     stop: stopRecording,
-    stream: mediaStream.current,
+    pause: pauseRecording,
+    resume: resumeRecording,
   };
 };
