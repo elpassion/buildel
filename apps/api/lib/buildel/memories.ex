@@ -21,14 +21,7 @@ defmodule Buildel.Memories do
     file_name = name || Path.basename(path)
     file_size = File.stat!(path).size
     file_type = type || MIME.from_path(path)
-
-    {:ok, partitioned_file} =
-      Buildel.PythonWorker.partition_file(path)
-
-    file =
-      partitioned_file
-      |> Enum.map(&Map.get(&1, "text"))
-      |> Enum.join("\n\n")
+    {:ok, file} = Buildel.FileLoader.load_file(path, %{type: file_type})
 
     metadata = %{file_name: file_name, file_size: file_size, file_type: file_type}
 
