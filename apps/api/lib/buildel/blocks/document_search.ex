@@ -46,6 +46,15 @@ defmodule Buildel.Blocks.DocumentSearch do
                 "description" =>
                   "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
                 "default" => "run"
+              },
+              "forwarded_results_count" => %{
+                "type" => "number",
+                "title" => "Forwarded results count",
+                "description" => "Up to how many results to forward to the output.",
+                "default" => 2,
+                "minimum" => 1,
+                "maximum" => 5,
+                "step" => 1
               }
             }
           })
@@ -104,7 +113,7 @@ defmodule Buildel.Blocks.DocumentSearch do
 
     results = Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
 
-    result = results |> Enum.take(2) |> Enum.join("\n\n")
+    result = results |> Enum.take(state[:opts].forwarded_results_count) |> Enum.join("\n\n---\n\n")
 
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
