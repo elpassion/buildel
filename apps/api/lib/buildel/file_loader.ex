@@ -43,27 +43,10 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
 
   @impl true
   def load_file(path, file_metadata \\ %{}) do
-    headers = [{"unstructured-api-key", token()}, {"Content-Type", "multipart/form-data"}]
-
-    options =
-      case file_metadata |> Map.get(:type) do
-        nil -> []
-        type -> ["Content-Type": type]
-      end
-
-    {:ok, %{body: result}} =
-      HTTPoison.post(
-        "https://api.unstructured.io/general/v0/general",
-        {:multipart,
-         [
-           {:file, path, {"form-data", [name: "files[]", filename: Path.basename(path)]},
-            options},
-           {"chunking_strategy", "by_title"}
-         ]},
-        headers,
-        timeout: 60_000,
-        recv_timeout: 60_000
-      )
+    {:ok, result} = case request(path, file_metadata) do
+      {:ok, result} -> {:ok, result}
+      :error -> request(path, file_metadata |> Map.put(:encoding, "utf_8"))
+    end
 
     partitioned_file = Jason.decode!(result)
 
@@ -73,6 +56,41 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
       |> Enum.join("\n\n")
 
     {:ok, file}
+  end
+
+  defp request(path, file_metadata) do
+    headers = [{"unstructured-api-key", token()}, {"Content-Type", "multipart/form-data"}]
+
+    options =
+      case file_metadata |> Map.get(:type) do
+        nil -> []
+        type -> ["Content-Type": type]
+      end
+
+    file_data = {:file, path, {"form-data", [name: "files[]", filename: Path.basename(path)]}, options}
+    chunking_data = {"chunking_strategy", "by_title"}
+
+    form_data = [file_data, chunking_data]
+    form_data = if file_metadata |> Map.has_key?(:encoding) do
+      [{"encoding", file_metadata.encoding} | form_data]
+    else
+      form_data
+    end
+
+    with {:ok, %{body: result, status_code: 200}} <-
+      HTTPoison.post(
+        "https://api.unstructured.io/general/v0/general",
+        {:multipart, form_data},
+        headers,
+        timeout: 60_000,
+        recv_timeout: 60_000
+      ) do
+        {:ok, result}
+    else
+      status ->
+        IO.inspect(status)
+        :error
+    end
   end
 
   defp token do
