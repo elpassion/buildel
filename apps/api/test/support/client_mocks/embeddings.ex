@@ -113,4 +113,9 @@ defmodule Buildel.ClientMocks.Embeddings do
        object: "list"
      }}
   end
+
+  @impl true
+  def collection_config() do
+    %{size: 100, distance: "cosine"}
+  end
 end

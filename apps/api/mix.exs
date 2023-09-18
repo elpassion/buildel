@@ -54,7 +54,7 @@ defmodule Buildel.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:bodyguard, "~> 2.4"},
-      {:openai, "~> 0.5.2"},
+      {:openai, "~> 0.5.4"},
       {:dotenv, "~> 3.0.0"},
       {:websockex, "~> 0.4.3"},
       {:essence, "~> 0.3.0"},
@@ -68,7 +68,9 @@ defmodule Buildel.MixProject do
       {:goal, "~> 0.3"},
       {:bumblebee, "~> 0.4"},
       {:nx, "~> 0.5"},
-      {:exla, "~> 0.5"}
+      {:exla, "~> 0.5"},
+      {:erlport, "~>0.11"},
+      {:poolboy, "~> 1.5"}
     ]
   end
 
