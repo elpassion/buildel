@@ -130,7 +130,7 @@ defmodule Buildel.VectorDB.QdrantAdapter do
       {:ok,
        body
        |> get_in(["result"])
-       |> Enum.map(fn %{"payload" => %{"document" => document}} -> document end)}
+       |> Enum.map(fn %{"payload" => %{"document" => document, "metadata" => %{ "file_name" => filename }}} -> "File: #{filename}\n\n#{document |> String.trim()}" end)}
     else
       {:error, %{status: status}} -> {:error, status}
     end
