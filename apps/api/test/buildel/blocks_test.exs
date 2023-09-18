@@ -363,7 +363,9 @@ defmodule Buildel.BlocksTest do
           context_id: "run1",
           opts: %{
             inputs: ["text_test:output"],
-            messages: [%{role: "system", content: "You are a helpful assistant."}]
+            messages: [%{role: "system", content: "You are a helpful assistant."}],
+            model: "gpt-3.5",
+            temperature: 0.7
           }
         )
 
@@ -399,7 +401,9 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output"],
             messages: [
               %{role: "system", content: "You are a helpful assistant. {{text_test:output}}"}
-            ]
+            ],
+            model: "gpt-3.5",
+            temperature: 0.7
           }
         )
 

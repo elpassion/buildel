@@ -48,6 +48,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
           supportingText={field.description}
           label={field.title}
           errorMessage={error}
+          defaultValue={field.default}
         />
       </FormField>
     );
@@ -63,6 +64,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
           radioPosition="left"
           isRadioVisible={true}
           errorMessage={error ?? undefined}
+          defaultValue={field.default}
           options={field.enum.map((value) => ({
             id: `${name}.${value}`,
             labelText: value,
@@ -103,6 +105,7 @@ export function NumberField({ field, name }: FieldProps) {
         supportingText={field.description}
         minValue={field.minimum}
         maxValue={field.maximum}
+        defaultValue={field.default}
         step={field.step}
       />
     </FormField>

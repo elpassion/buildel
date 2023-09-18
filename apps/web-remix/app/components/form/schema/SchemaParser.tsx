@@ -90,6 +90,7 @@ export type JSONSchemaField =
       description: string;
       minLength?: number;
       maxLength?: number;
+      default?: string;
     }
   | {
       type: "string";
@@ -113,6 +114,7 @@ export type JSONSchemaField =
       maxLength?: number;
       enum: string[];
       enumPresentAs: "checkbox" | "radio";
+      default?: string;
     }
   | {
       type: "number";
@@ -121,6 +123,7 @@ export type JSONSchemaField =
       minimum?: number;
       maximum?: number;
       step?: number;
+      default?: number;
     }
   | {
       type: "array";
@@ -132,4 +135,5 @@ export type JSONSchemaField =
       type: "boolean";
       title: string;
       description: string;
+      default?: boolean;
     };

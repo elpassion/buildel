@@ -1,5 +1,5 @@
 defmodule Buildel.Clients.ChatGPTBehaviour do
-  @callback stream_chat(context: map(), on_content: any(), on_end: any()) :: :ok
+  @callback stream_chat(context: map(), on_content: any(), on_end: any(), api_key: String.t(), model: String.t(), temperature: number()) :: :ok
 end
 
 defmodule Buildel.Clients.ChatGPT do
@@ -8,11 +8,12 @@ defmodule Buildel.Clients.ChatGPT do
   @behaviour ChatGPTBehaviour
 
   @impl ChatGPTBehaviour
-  def stream_chat(context: context, on_content: on_content, on_end: on_end, api_key: api_key) do
+  def stream_chat(context: context, on_content: on_content, on_end: on_end, api_key: api_key, model: model, temperature: temperature) do
     OpenAI.chat_completion(
       [
-        model: "gpt-3.5-turbo",
+        model: model,
         messages: context.messages,
+        temperature: temperature,
         stream: true
       ],
       config(true, api_key)

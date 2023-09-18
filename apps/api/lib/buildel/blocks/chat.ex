@@ -45,7 +45,8 @@ defmodule Buildel.Blocks.Chat do
                 "title" => "Model",
                 "description" => "The model to use for the chat.",
                 "enum" => ["gpt-3.5-turbo", "gpt-4"],
-                "enumPresentAs" => "radio"
+                "enumPresentAs" => "radio",
+                "default" => "gpt-3.5-turbo"
               },
               "temperature" => %{
                 "type" => "number",
@@ -68,8 +69,9 @@ defmodule Buildel.Blocks.Chat do
                     "role" => %{
                       "type" => "string",
                       "title" => "Role",
-                      "enum" => ["user", "assistant", "system"],
-                      "enumPresentAs" => "radio"
+                      "enum" => ["system", "user", "assistant"],
+                      "enumPresentAs" => "radio",
+                      "default" => "system"
                     },
                     "content" => %{
                       "type" => "string",
@@ -172,7 +174,9 @@ defmodule Buildel.Blocks.Chat do
           on_end: fn ->
             finish_chat_message(pid)
           end,
-          api_key: state[:api_key]
+          api_key: state[:api_key],
+          model: state[:opts].model,
+          temperature: state[:opts].temperature
         )
       end)
 
