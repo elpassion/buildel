@@ -25,7 +25,7 @@ defmodule Buildel.Clients.ChatGPT do
         on_content.(content)
 
       message ->
-        Logger.debug("Unknown message #{inspect(message)}")
+        Logger.error("Unknown message #{inspect(message)}")
     end)
   end
 

@@ -104,7 +104,7 @@ defmodule Buildel.Blocks.DocumentSearch do
 
     results = Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
 
-    result = results |> Enum.take(3) |> Enum.join("\n\n - #{String.duplicate("-", 10)}")
+    result = results |> Enum.take(2) |> Enum.join("\n\n")
 
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
