@@ -232,9 +232,9 @@ export function ShowPipelinePage() {
           >
             <Background
               variant={BackgroundVariant.Dots}
-              gap={40}
+              gap={25}
               color="#fff"
-              className="bg-[#0D0D0D] rounded-lg"
+              className="bg-black rounded-lg"
             />
             <Controls />
           </ReactFlow>

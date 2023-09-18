@@ -1,5 +1,5 @@
-import React, { useCallback, useRef, useState } from "react";
-import { Button, Textarea } from "@elpassion/taco";
+import React, { useCallback } from "react";
+import { Textarea } from "@elpassion/taco";
 import { IBlockConfig, IField } from "../pipeline.types";
 import {
   FileListResponse,
@@ -13,6 +13,7 @@ import {
   useRunPipelineNode,
 } from "../RunPipelineProvider";
 import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
+import { Button } from "~/components/button";
 
 interface NodeFieldsProps {
   fields: IField[];
