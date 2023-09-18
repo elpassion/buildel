@@ -7,7 +7,23 @@ def partition_file(filename):
   if isinstance(filename, bytes):
     filename = filename.decode("utf-8")
 
-  elements = partition(filename=filename, encoding="utf_8")
+  try:
+    elements = partition(filename=filename, encoding="utf_8", chunking_strategy="by_title")
+  except:
+    elements = partition(filename=filename, chunking_strategy="by_title")
+
+  elements_json = elements_to_json(elements)
+
+  return elements_json
+
+def partition_url(url):
+  if isinstance(url, bytes):
+    url = url.decode("utf-8")
+
+  try:
+    elements = partition(url=url, encoding="utf_8", chunking_strategy="by_title")
+  except:
+    elements = partition(url=url, chunking_strategy="by_title")
   elements_json = elements_to_json(elements)
 
   return elements_json

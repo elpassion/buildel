@@ -3,7 +3,7 @@ defmodule Buildel.PythonWorker do
 
   require Logger
 
-  @timeout 10_000
+  @timeout 60_000
 
   def start_link() do
     GenServer.start_link(__MODULE__, nil)
@@ -18,7 +18,20 @@ defmodule Buildel.PythonWorker do
       :poolboy.transaction(
         :python_worker,
         fn pid ->
-          GenServer.call(pid, {:partition_file, filename})
+          GenServer.call(pid, {:partition_file, filename}, @timeout)
+        end,
+        @timeout
+      )
+    end)
+    |> Task.await(@timeout)
+  end
+
+  def partition_url(url) do
+    Task.async(fn ->
+      :poolboy.transaction(
+        :python_worker,
+        fn pid ->
+          GenServer.call(pid, {:partition_url, url}, @timeout)
         end,
         @timeout
       )
@@ -37,7 +50,7 @@ defmodule Buildel.PythonWorker do
       |> Path.join()
 
     with {:ok, pid} <- :python.start([{:python_path, to_charlist(path)}, {:python, ~c"python3"}]) do
-      Logger.info("[#{__MODULE__}] Started python worker")
+      Logger.debug("[#{__MODULE__}] Started python worker")
       {:ok, pid}
     end
   end
@@ -46,7 +59,14 @@ defmodule Buildel.PythonWorker do
   def handle_call({:partition_file, filename}, _from, pid) do
     result = :python.call(pid, :parse_document, :partition_file, [filename])
     result = Jason.decode!(result)
-    Logger.info("[#{__MODULE__}] Handled call")
+    Logger.debug("[#{__MODULE__}] Handled call")
+    {:reply, {:ok, result}, pid}
+  end
+
+  def handle_call({:partition_url, url}, _from, pid) do
+    result = :python.call(pid, :parse_document, :partition_url, [url])
+    result = Jason.decode!(result)
+    Logger.debug("[#{__MODULE__}] Handled call")
     {:reply, {:ok, result}, pid}
   end
 end

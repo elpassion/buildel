@@ -21,13 +21,13 @@ defmodule Buildel.Application do
       # Start a worker by calling: Buildel.Worker.start_link(arg)
       Buildel.Pipelines.Runner,
       # Start the python poolboy
-      :poolboy.child_spec(:worker, python_poolboy_config()),
+      :poolboy.child_spec(:worker, python_poolboy_config())
       # Nx.Serving
-      {Nx.Serving,
-       serving: Buildel.Clients.BumblebeeEmbeddings.serving(),
-       name: Buildel.Clients.BumblebeeEmbeddings,
-       batch_size: 8,
-       batch_timeout: 100}
+      # {Nx.Serving,
+      #  serving: Buildel.Clients.BumblebeeEmbeddings.serving(),
+      #  name: Buildel.Clients.BumblebeeEmbeddings,
+      #  batch_size: 8,
+      #  batch_timeout: 100}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -48,7 +48,7 @@ defmodule Buildel.Application do
     [
       {:name, {:local, :python_worker}},
       {:worker_module, Buildel.PythonWorker},
-      {:size, 5},
+      {:size, 2},
       {:max_overflow, 0}
     ]
   end
