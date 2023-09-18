@@ -11,22 +11,20 @@ export const PipelineNavbar = ({ name }: PipelineNavbarProps) => {
   const { organizationId } = useLoaderData<typeof loader>();
   return (
     <Navbar
-      leftContent={
-        <div className="flex items-center justify-center gap-2 px-1 py-1">
-          <Breadcrumbs
-            breadcrumbs={[
-              {
-                label: "Workflows",
-                href: `/${organizationId}/pipelines`,
-              },
-              {
-                label: name,
-                href: "#",
-              },
-            ]}
-          />
-        </div>
-      }
+      wrapperClassName="md:px-2 md:py-2"
+      leftContent={<h1 className="text-2xl font-medium text-white">{name}</h1>}
     />
   );
 };
+// <Breadcrumbs
+//   breadcrumbs={[
+//     {
+//       label: "Workflows",
+//       href: `/${organizationId}/pipelines`,
+//     },
+//     {
+//       label: name,
+//       href: "#",
+//     },
+//   ]}
+// />

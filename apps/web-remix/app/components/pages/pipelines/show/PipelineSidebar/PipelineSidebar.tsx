@@ -42,7 +42,7 @@ export const PipelineSidebar: React.FC<PipelineSidebarProps> = ({
   }, [blockTypes, runStatus]);
 
   return (
-    <aside className="absolute bottom-8 right-8 top-24 flex flex-col gap-2 rounded bg-neutral-300 p-2">
+    <aside className="absolute bottom-10 right-14 top-24 flex flex-col gap-2 rounded bg-neutral-300 p-2">
       {draggableNodes}
     </aside>
   );

@@ -61,18 +61,21 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   return (
     <section
       className={classNames(
-        "min-h-[100px] min-w-[250px] max-w-[300px] break-words rounded border border-neutral-800 bg-neutral-700 drop-shadow-sm transition",
+        "min-h-[100px] min-w-[250px] max-w-[300px] break-words rounded bg-neutral-800 drop-shadow-sm transition",
         { "scale-110": status }
       )}
     >
       <header
-        className={classNames("flex items-center justify-between p-2", {
-          "bg-neutral-800": isValid,
-          "bg-red-800": !isValid,
-        })}
+        className={classNames(
+          "flex items-center justify-between p-2 rounded-t",
+          {
+            "bg-neutral-900": isValid,
+            "bg-red-800": !isValid,
+          }
+        )}
       >
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-bold capitalize text-white">
+          <h3 className="text-xs font-medium capitalize text-neutral-50">
             {startCase(data.type)}
           </h3>
           <Badge size="xs" text={data.name} />
@@ -80,25 +83,23 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
 
         <div className="flex gap-1">
           {isEditable && (
-            <IconButton
-              icon={<Icon iconName="settings" />}
-              size="xs"
-              variant="basic"
-              className="!h-6 !w-6 !p-1"
+            <button
               onClick={handleEdit}
               disabled={runStatus !== "idle"}
-            />
+              className="h-6 w-6 p-1 hover:bg-neutral-700 rounded-md"
+            >
+              <Icon iconName="settings" className="text-neutral-200" />
+            </button>
           )}
 
           {onDelete && (
-            <IconButton
-              icon={<Icon iconName="x" />}
-              size="xs"
-              variant="basic"
-              className="!h-6 !w-6 !p-1"
+            <button
               onClick={handleDelete}
               disabled={runStatus !== "idle"}
-            />
+              className="h-6 w-6 p-1 hover:bg-neutral-700 rounded-md"
+            >
+              <Icon iconName="trash" className="text-neutral-200" />
+            </button>
           )}
         </div>
       </header>

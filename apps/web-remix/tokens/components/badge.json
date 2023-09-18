@@ -3,7 +3,7 @@
     "color": {
       "background": {
         "default": {
-          "value": "{neutral.50}",
+          "value": "{neutral.800}",
           "type": "color"
         },
         "blue": {
@@ -13,13 +13,13 @@
       },
       "text": {
         "default": {
-          "value": "{neutral.500}",
+          "value": "{primary.500}",
           "type": "color"
         }
       },
       "border": {
         "default": {
-          "value": "{neutral.200}",
+          "value": "{neutral.800}",
           "type": "color"
         },
         "blue": {
