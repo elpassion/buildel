@@ -13,10 +13,6 @@ defmodule Buildel.PythonWorker do
     GenServer.start_link(__MODULE__, nil)
   end
 
-  def message(pid, my_string) do
-    GenServer.call(pid, {:hello, my_string})
-  end
-
   def partition_file(filename) do
     Task.async(fn ->
       :poolboy.transaction(
@@ -48,7 +44,8 @@ defmodule Buildel.PythonWorker do
 
   @impl true
   def handle_call({:partition_file, filename}, _from, pid) do
-    result = :python.call(pid, :python_message, :partition_file, [filename])
+    result = :python.call(pid, :parse_document, :partition_file, [filename])
+    result = Jason.decode!(result)
     Logger.info("[#{__MODULE__}] Handled call")
     {:reply, {:ok, result}, pid}
   end

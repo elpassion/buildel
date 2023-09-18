@@ -8,13 +8,12 @@ def partition_file(filename):
     filename = filename.decode("utf-8")
 
   elements = partition(filename=filename, encoding="utf_8")
-  chunks = chunk_by_title(elements)
+  elements_json = elements_to_json(elements)
 
-  for chunk in chunks:
-    print(chunk)
-    print("\n\n" + "-"*80)
-
-  return []
+  return elements_json
 
 if __name__ == '__main__':
-  print(partition_file("/home/michal/Rozpoczęcie pracy.txt"))
+  import sys
+  filename = sys.argv[1]
+  elements_json = partition_file(filename)
+  print(elements_json)

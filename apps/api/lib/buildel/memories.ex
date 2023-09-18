@@ -21,7 +21,14 @@ defmodule Buildel.Memories do
     file_name = name || Path.basename(path)
     file_size = File.stat!(path).size
     file_type = type || MIME.from_path(path)
-    file = File.read!(path)
+
+    {:ok, partitioned_file} =
+      Buildel.PythonWorker.partition_file(path)
+
+    file =
+      partitioned_file
+      |> Enum.map(&Map.get(&1, "text"))
+      |> Enum.join("\n\n")
 
     metadata = %{file_name: file_name, file_size: file_size, file_type: file_type}
 
@@ -65,6 +72,7 @@ defmodule Buildel.Memories do
     memory = get_organization_memory!(organization, id)
 
     collection_name = organization_collection_name(organization, memory.collection_name)
+
     with :ok <-
            Buildel.VectorDB.delete_all_with_metadata(collection_name, %{memory_id: memory.id}),
          {:ok, _} <- Buildel.Repo.delete(memory) do
