@@ -60,7 +60,9 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
             options},
            {"chunking_strategy", "by_title"}
          ]},
-        headers
+        headers,
+        timeout: 60_000,
+        recv_timeout: 60_000
       )
 
     partitioned_file = Jason.decode!(result)
