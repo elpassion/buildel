@@ -23,17 +23,15 @@ export function PipelinesPage() {
         <Outlet />
       </CreatePipelineModal>
 
-      <div className="bg-neutral-50 p-4 md:p-8 flex-grow">
+      <div className="p-4 md:p-8 flex-grow">
         <Link
           to={`/${organizationId}/pipelines/new`}
           className="mb-6 block w-fit"
         >
-          <Button>
-            <span>New Workflow</span>
-          </Button>
+          <Button size="sm">New Workflow</Button>
         </Link>
 
-        <PipelinesList pipelines={pipelines.data} />
+        <PipelinesList pipelines={pipelines.data} className="max-w-[80rem]" />
       </div>
     </>
   );

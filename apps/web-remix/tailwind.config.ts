@@ -15,6 +15,8 @@ const customConfig = {
       //@ts-ignore
       ...getComponentsColorConfig(
         [
+          "navbar",
+          "sidebar",
           "accordion",
           "inlineMessage",
           "badge",

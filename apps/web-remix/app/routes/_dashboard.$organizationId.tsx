@@ -50,9 +50,12 @@ export async function loader(loaderArgs: LoaderArgs) {
 
 export default function Layout() {
   return (
-    <div id="_root" className="grid h-screen grid-cols-[auto_1fr]">
+    <div
+      id="_root"
+      className="grid h-screen grid-cols-[auto_1fr] bg-neutral-950"
+    >
       <ResponsiveSidebar
-        sidebarClassName="sticky top-0 bg-white border-r border-gray-200"
+        sidebarClassName="sticky top-0"
         collapseBtnClassName="absolute top-11 -right-2"
         topContent={<SidebarTopContent />}
         bottomContent={<LogoutButton />}

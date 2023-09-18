@@ -1,0 +1,46 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{neutral.850}",
+          "type": "color"
+        },
+        "toggleButton": {
+          "value": "{secondary.200}",
+          "type": "color"
+        },
+        "mask": {
+          "value": "{basic.black}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "toggleButton": {
+          "value": "{secondary.200}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "paddingBaseHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingBaseVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

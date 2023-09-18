@@ -3,7 +3,7 @@
     "color": {
       "background": {
         "default": {
-          "value": "{neutral.50}",
+          "value": "{neutral.700}",
           "type": "color"
         },
         "dot": {
@@ -101,17 +101,17 @@
     "color": {
       "background": {
         "default": {
-          "value": "{green.100}",
+          "value": "{green.900}",
           "type": "color"
         },
         "dot": {
-          "value": "{green.500}",
+          "value": "{green.300}",
           "type": "color"
         }
       },
       "text": {
         "default": {
-          "value": "{green.900}",
+          "value": "{green.300}",
           "type": "color"
         },
         "dot": {

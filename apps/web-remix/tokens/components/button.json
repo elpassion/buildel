@@ -21,19 +21,19 @@
       },
       "text": {
         "default": {
-          "value": "{basic.white}",
+          "value": "{basic.black}",
           "type": "color"
         },
         "hover": {
-          "value": "{basic.white}",
+          "value": "{basic.black}",
           "type": "color"
         },
         "active": {
-          "value": "{basic.white}",
+          "value": "{basic.black}",
           "type": "color"
         },
         "disabled": {
-          "value": "{basic.white}",
+          "value": "{basic.black}",
           "type": "color"
         }
       },
