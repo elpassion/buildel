@@ -2,6 +2,8 @@ import { join } from "path";
 import { initDefaultTheme, colorsTokenHelpers } from "@elpassion/taco";
 import merge from "lodash.merge";
 import colorsJson from "./tokens/colors.json";
+const defaultTheme = require("tailwindcss/defaultTheme");
+
 const { getColorsConfig, getComponentsColorConfig } = colorsTokenHelpers;
 
 const palette = getColorsConfig(colorsJson);
@@ -11,6 +13,9 @@ const importJson = (component: string) =>
 
 const customConfig = {
   extend: {
+    fontFamily: {
+      sans: ["DM Sans", ...defaultTheme.fontFamily.sans],
+    },
     ...merge(
       //@ts-ignore
       ...getComponentsColorConfig(
