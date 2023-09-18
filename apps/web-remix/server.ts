@@ -13,7 +13,7 @@ import express from "express";
 import morgan from "morgan";
 import sourceMapSupport from "source-map-support";
 import { createProxyMiddleware } from "http-proxy-middleware";
-import { get } from "lodash";
+import get from "lodash.get";
 
 sourceMapSupport.install();
 installGlobals();

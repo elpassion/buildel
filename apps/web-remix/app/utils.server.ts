@@ -1,5 +1,5 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
-import { merge } from "lodash";
+import merge from "lodash.merge";
 import { validationError } from "remix-validated-form";
 import {
   NotFoundError,

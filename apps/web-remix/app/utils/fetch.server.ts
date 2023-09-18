@@ -5,7 +5,7 @@ import {
   UnknownAPIError,
   ValidationError,
 } from "./errors.server";
-import { merge } from "lodash";
+import merge from "lodash.merge";
 
 export async function fetchTyped<T extends ZodType>(
   schema: T,
