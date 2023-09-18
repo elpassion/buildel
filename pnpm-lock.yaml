@@ -79,9 +79,18 @@ importers:
       isbot:
         specifier: ^3.6.8
         version: 3.6.8
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+      lodash.clonedeep:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.isequal:
+        specifier: ^4.5.0
+        version: 4.5.0
+      lodash.iserror:
+        specifier: ^3.1.1
+        version: 3.1.1
+      lodash.startcase:
+        specifier: ^4.4.0
+        version: 4.4.0
       morgan:
         specifier: ^1.10.0
         version: 1.10.0
@@ -140,9 +149,18 @@ importers:
       '@types/express':
         specifier: ^4.17.17
         version: 4.17.17
-      '@types/lodash':
-        specifier: ^4.14.197
-        version: 4.14.197
+      '@types/lodash.clonedeep':
+        specifier: ^4.5.7
+        version: 4.5.7
+      '@types/lodash.isequal':
+        specifier: ^4.5.6
+        version: 4.5.6
+      '@types/lodash.iserror':
+        specifier: ^3.1.7
+        version: 3.1.7
+      '@types/lodash.startcase':
+        specifier: ^4.4.7
+        version: 4.4.7
       '@types/morgan':
         specifier: ^1.9.5
         version: 1.9.5
@@ -3220,8 +3238,32 @@ packages:
       '@types/node': 20.4.7
     dev: true
 
-  /@types/lodash@4.14.197:
-    resolution: {integrity: sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==}
+  /@types/lodash.clonedeep@4.5.7:
+    resolution: {integrity: sha512-ccNqkPptFIXrpVqUECi60/DFxjNKsfoQxSQsgcBJCX/fuX1wgyQieojkcWH/KpE3xzLoWN/2k+ZeGqIN3paSvw==}
+    dependencies:
+      '@types/lodash': 4.14.198
+    dev: true
+
+  /@types/lodash.isequal@4.5.6:
+    resolution: {integrity: sha512-Ww4UGSe3DmtvLLJm2F16hDwEQSv7U0Rr8SujLUA2wHI2D2dm8kPu6Et+/y303LfjTIwSBKXB/YTUcAKpem/XEg==}
+    dependencies:
+      '@types/lodash': 4.14.198
+    dev: true
+
+  /@types/lodash.iserror@3.1.7:
+    resolution: {integrity: sha512-bOzUZPPeTnuBpCIkZylF36TdaHYjO1wiqc5j9k8REr6VEaykuYDxcMwD+p4SyXQzSkaIRd6sMNAzwHoevGxsJA==}
+    dependencies:
+      '@types/lodash': 4.14.198
+    dev: true
+
+  /@types/lodash.startcase@4.4.7:
+    resolution: {integrity: sha512-6v8FVOcfxdomO1Vammc1Zsah7/4aif/Lx16oQQ0WZmKVGF/Yf5c5m68LqI/ELOhKaKUr8KfnDdKrytdrThoRQw==}
+    dependencies:
+      '@types/lodash': 4.14.198
+    dev: true
+
+  /@types/lodash@4.14.198:
+    resolution: {integrity: sha512-trNJ/vtMZYMLhfN45uLq4ShQSw0/S7xCTLLVM+WM1rmFpba/VS42jVUgaO3w/NOLiWR/09lnYk0yMaA/atdIsg==}
     dev: true
 
   /@types/mdast@3.0.12:
@@ -6800,6 +6842,10 @@ packages:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
     dev: true
 
+  /lodash.clonedeep@4.5.0:
+    resolution: {integrity: sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==}
+    dev: false
+
   /lodash.debounce@4.0.8:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
     dev: true
@@ -6807,8 +6853,20 @@ packages:
   /lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
 
+  /lodash.isequal@4.5.0:
+    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    dev: false
+
+  /lodash.iserror@3.1.1:
+    resolution: {integrity: sha512-eT/VeNns9hS7vAj1NKW/rRX6b+C3UX3/IAAqEE7aC4Oo2C0iD82NaP5IS4bSlQsammTii4qBJ8G1zd1LTL8hCw==}
+    dev: false
+
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
+
+  /lodash.startcase@4.4.0:
+    resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
+    dev: false
 
   /lodash.truncate@4.4.2:
     resolution: {integrity: sha512-jttmRe7bRse52OsWIMDLaXxWqRAmtIUccAQ3garviCqJjafXOfNMO0yMfNpdD6zbGaTU0P5Nz7e7gAT6cKmJRw==}

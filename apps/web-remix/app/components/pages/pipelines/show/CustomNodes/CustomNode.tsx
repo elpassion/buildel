@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { startCase } from "lodash";
+import startCase from "lodash.startcase";
 import { Badge, Icon, IconButton } from "@elpassion/taco";
 import { getBlockFields, getBlockHandles } from "../PipelineFlow.utils";
 import { IBlockConfig } from "../pipeline.types";

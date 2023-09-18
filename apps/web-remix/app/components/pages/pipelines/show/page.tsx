@@ -16,7 +16,7 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
 } from "reactflow";
-import { isEqual } from "lodash";
+import isEqual from "lodash.isequal";
 import { Button } from "@elpassion/taco";
 import { useDebounce } from "usehooks-ts";
 import { useModal } from "~/hooks/useModal";

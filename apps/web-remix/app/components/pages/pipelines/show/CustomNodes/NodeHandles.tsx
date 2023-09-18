@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { startCase } from "lodash";
+import startCase from "lodash.startcase";
 import { Handle, Position } from "reactflow";
 import { IHandle } from "../pipeline.types";
 

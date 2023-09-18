@@ -1,4 +1,4 @@
-import { startCase } from "lodash";
+import startCase from "lodash.startcase";
 import React, { DragEvent, useMemo } from "react";
 import { useRunPipeline } from "../RunPipelineProvider";
 import classNames from "classnames";
