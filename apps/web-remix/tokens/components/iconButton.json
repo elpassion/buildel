@@ -1,0 +1,52 @@
+{
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-lg}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "paddingExtraSmall": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingSmall": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingMedium": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingLarge": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}
