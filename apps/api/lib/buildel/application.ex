@@ -21,7 +21,7 @@ defmodule Buildel.Application do
       # Start a worker by calling: Buildel.Worker.start_link(arg)
       Buildel.Pipelines.Runner,
       # Start the python poolboy
-      :poolboy.child_spec(:worker, python_poolboy_config())
+      # :poolboy.child_spec(:worker, python_poolboy_config())
       # Nx.Serving
       # {Nx.Serving,
       #  serving: Buildel.Clients.BumblebeeEmbeddings.serving(),
