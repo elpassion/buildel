@@ -16,7 +16,7 @@ defmodule Buildel.FileLoaderRawAdapter do
   @behaviour Buildel.FileLoaderBehaviour
 
   @impl true
-  def load_file(path, file_metadata \\ %{}) do
+  def load_file(path, _file_metadata \\ %{}) do
     File.read(path)
   end
 end
@@ -25,7 +25,7 @@ defmodule Buildel.FileLoaderUnstructuredLocalAdapter do
   @behaviour Buildel.FileLoaderBehaviour
 
   @impl true
-  def load_file(path, file_metadata \\ %{}) do
+  def load_file(path, _file_metadata \\ %{}) do
     {:ok, partitioned_file} =
       Buildel.PythonWorker.partition_file(path)
 
