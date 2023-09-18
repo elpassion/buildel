@@ -1,14 +1,21 @@
 import invariant from "tiny-invariant";
 import classNames from "classnames";
 import Modal from "react-modal";
-import { Button, ResponsiveSidebar } from "@elpassion/taco";
+import { Button, Sidebar, WorkspaceItem } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
-import { NavLink, Outlet, useFetcher, useLoaderData } from "@remix-run/react";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useFetcher,
+  useLoaderData,
+} from "@remix-run/react";
 import { OrganizationsResponse } from "~/components/pages/organizations/contracts";
 import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
 import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
+import { useCallback, useState } from "react";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
@@ -49,19 +56,29 @@ export async function loader(loaderArgs: LoaderArgs) {
 }
 
 export default function Layout() {
+  const [collapsed, setCollapsed] = useState(true);
+
+  const toggleCollapse = useCallback(() => {
+    setCollapsed((prev) => !prev);
+  }, []);
+
   return (
     <div
       id="_root"
       className="grid h-screen grid-cols-[auto_1fr] bg-neutral-950"
     >
-      <ResponsiveSidebar
-        sidebarClassName="sticky top-0"
-        collapseBtnClassName="absolute top-11 -right-2"
-        topContent={<SidebarTopContent />}
-        bottomContent={<LogoutButton />}
-      >
-        <OrganizationsLinks />
-      </ResponsiveSidebar>
+      <div className="hidden md:block md:p-4">
+        <Sidebar
+          className="sticky top-0 !h-[calc(100vh-32px)] min-w-[80px] rounded-[1.25rem]"
+          collapseBtnClassName="absolute top-[60px] -right-2"
+          topContent={<SidebarTopContent isCollapsed={collapsed} />}
+          bottomContent={<LogoutButton />}
+          onCollapse={toggleCollapse}
+          collapsed={collapsed}
+        >
+          <OrganizationsLinks />
+        </Sidebar>
+      </div>
 
       <main className="col-span-2 flex min-h-screen flex-col overflow-x-auto md:col-auto">
         <Outlet />
@@ -70,16 +87,23 @@ export default function Layout() {
   );
 }
 
-function SidebarTopContent() {
-  const { error, organization } = useLoaderData<typeof loader>();
+interface SidebarTopContentProps {
+  isCollapsed: boolean;
+}
+function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
+  const { organization } = useLoaderData<typeof loader>();
   const name = organization.name;
 
   return (
-    <div className="min-h-smNavbar border-b">
-      <div className={"flex h-full w-full items-center"}>
-        <h1 className="font-medium text-neutral-500">{name}</h1>
-        {error && <div>{error}</div>}
-      </div>
+    <div className="border-b border-neutral-400 py-2">
+      <Link to={routes.pipelines(organization.id)}>
+        <WorkspaceItem
+          name={name}
+          variant={isCollapsed ? "onlyIcon" : "fitWidth"}
+          shape="square"
+          size="md"
+        />
+      </Link>
     </div>
   );
 }

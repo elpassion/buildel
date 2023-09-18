@@ -15,7 +15,7 @@
           "type": "color"
         },
         "avatar": {
-          "value": "{neutral.300}",
+          "value": "{neutral.100}",
           "type": "color"
         }
       },

@@ -27,7 +27,7 @@
     "padding": {
       "spacings": {
         "default": {
-          "value": "{3}",
+          "value": "{2}",
           "type": "spacings"
         }
       }
