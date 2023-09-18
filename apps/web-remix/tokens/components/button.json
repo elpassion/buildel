@@ -441,7 +441,7 @@
     "border": {
       "borderRadius": {
         "default": {
-          "value": "{rounded-lg}",
+          "value": "{rounded-base}",
           "type": "borderRadius"
         }
       }

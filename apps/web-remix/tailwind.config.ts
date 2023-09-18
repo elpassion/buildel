@@ -1,12 +1,19 @@
 import { join } from "path";
-import { initDefaultTheme, colorsTokenHelpers } from "@elpassion/taco";
+import {
+  initDefaultTheme,
+  colorsTokenHelpers,
+  radiusTokenHelpers,
+} from "@elpassion/taco";
 import merge from "lodash.merge";
 import colorsJson from "./tokens/colors.json";
+import radiusJson from "./tokens/borderRadius.json";
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 const { getColorsConfig, getComponentsColorConfig } = colorsTokenHelpers;
+const { getRadiusConfig, getComponentsRadiusConfig } = radiusTokenHelpers;
 
-const palette = getColorsConfig(colorsJson);
+const colorsPalette = getColorsConfig(colorsJson);
+const radiusPalette = getRadiusConfig(radiusJson);
 
 const importJson = (component: string) =>
   require(`./tokens/components/${component}.json`);
@@ -65,9 +72,59 @@ const customConfig = {
         colorsJson
       ),
       {
-        colors: {
-          ...palette,
-        },
+        colors: colorsPalette,
+      }
+    ),
+    ...merge(
+      //@ts-ignore
+      ...getComponentsRadiusConfig(
+        [
+          "navbar",
+          "sidebar",
+          "accordion",
+          "inlineMessage",
+          "badge",
+          "checkbox",
+          "chips",
+          "tooltip",
+          "card",
+          "anchor",
+          "avatar",
+          "avatarGroup",
+          "buttonGroup",
+          "smallFileUpload",
+          "dragAndDropFileUpload",
+          "button",
+          "breadcrumbs",
+          "iconButton",
+          "indicator",
+          "inputAutocomplete",
+          "inputCode",
+          "inputQuantity",
+          "inputNumber",
+          "inputText",
+          "notification",
+          "items",
+          "radio",
+          "navTabs",
+          "toast",
+          "inputText",
+          "label",
+          "rangeSlider",
+          "progressBar",
+          "modal",
+          "toggle",
+          "dropdown",
+          "textArea",
+          "input",
+          "rating",
+          "radioCard",
+        ],
+        importJson,
+        radiusJson
+      ),
+      {
+        borderRadius: radiusPalette,
       }
     ),
   },
