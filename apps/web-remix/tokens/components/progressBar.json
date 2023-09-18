@@ -1,0 +1,124 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "label": {
+          "value": "{basic.white}",
+          "type": "color"
+        },
+        "circle": {
+          "value": "{neutral.100}",
+          "type": "color"
+        },
+        "progress": {
+          "value": "{primary.500}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{neutral.500}",
+          "type": "color"
+        },
+        "circle": {
+          "value": "{neutral.100}",
+          "type": "color"
+        },
+        "progress": {
+          "value": "{primary.500}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-base}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "radiusCircle": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-full}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "topFloatingVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "topFloatingHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "bottomFloatingVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "bottomFloatingHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingLabel": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "topFloatingTop": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{6}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "bottomFloatingBottom": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{6}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

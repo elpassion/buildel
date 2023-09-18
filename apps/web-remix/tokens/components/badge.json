@@ -1,0 +1,144 @@
+{
+  "filled": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{neutral.50}",
+          "type": "color"
+        },
+        "blue": {
+          "value": "{blue.50}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{neutral.500}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "default": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "blue": {
+          "value": "{blue.200}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "outline": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "transparent",
+          "type": "color"
+        }
+      },
+      "border": {
+        "default": {
+          "value": "{neutral.200}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{neutral.500}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-base}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "paddingHorizontalExtraSmall": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingVerticalExtraSmall": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingHorizontalSmall": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingVerticalSmall": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingHorizontalMedium": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingVerticalMedium": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingHorizontalLarge": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingVerticalLarge": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

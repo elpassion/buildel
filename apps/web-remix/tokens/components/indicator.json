@@ -1,0 +1,154 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{neutral.50}",
+          "type": "color"
+        },
+        "dot": {
+          "value": "{neutral.100}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "dot": {
+          "value": "{neutral.900}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "dot": {
+          "value": "{basic.white}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "error": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{error.100}",
+          "type": "color"
+        },
+        "dot": {
+          "value": "{error.500}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{error.900}",
+          "type": "color"
+        },
+        "dot": {
+          "value": "{basic.white}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "warning": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{orange.100}",
+          "type": "color"
+        },
+        "dot": {
+          "value": "{orange.500}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{orange.900}",
+          "type": "color"
+        },
+        "dot": {
+          "value": "{basic.white}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "processing": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{blue.50}",
+          "type": "color"
+        },
+        "dot": {
+          "value": "{blue.500}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{blue.900}",
+          "type": "color"
+        },
+        "dot": {
+          "value": "{basic.white}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "success": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{green.100}",
+          "type": "color"
+        },
+        "dot": {
+          "value": "{green.500}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{green.900}",
+          "type": "color"
+        },
+        "dot": {
+          "value": "{basic.white}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "paddingBadgeHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingBadgeVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingCountHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{}",
+          "type": "color"
+        },
+        "starFocus": {
+          "value": "{basic.white}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "supportingText": {
+          "value": "{neutral.400}",
+          "type": "color"
+        },
+        "starRate": {
+          "value": "{yellow.400}",
+          "type": "color"
+        },
+        "starRateDisabled": {
+          "value": "{yellow.200}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{neutral.50}",
+          "type": "color"
+        },
+        "title": {
+          "value": "{basic.black}",
+          "type": "color"
+        },
+        "rateText": {
+          "value": "{basic.black}",
+          "type": "color"
+        },
+        "star": {
+          "value": "{neutral.100}",
+          "type": "color"
+        }
+      },
+      "ring": {
+        "starFocus": {
+          "value": "{secondary.50}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-base}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "marginTitle": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "marginSupportingText": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{1.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "fontTitle": {
+    "text": {
+      "fontSize": {
+        "default": {
+          "value": "{md}",
+          "type": "fontSizes"
+        }
+      }
+    }
+  },
+  "fontRate": {
+    "text": {
+      "fontSize": {
+        "default": {
+          "value": "{md}",
+          "type": "fontSizes"
+        }
+      }
+    }
+  },
+  "fontSupportingText": {
+    "text": {
+      "fontSize": {
+        "default": {
+          "value": "{sm}",
+          "type": "fontSizes"
+        }
+      }
+    }
+  }
+}
+

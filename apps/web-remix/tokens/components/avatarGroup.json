@@ -1,0 +1,12 @@
+{
+  "base": {
+    "color": {
+      "border": {
+        "default": {
+          "value": "{basic.white}",
+          "type": "color"
+        }
+      }
+    }
+  }
+}

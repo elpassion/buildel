@@ -1,0 +1,276 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{basic.white}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{neutral.50}",
+          "type": "color"
+        },
+        "prefix": {
+          "value": "{basic.white}",
+          "type": "color"
+        },
+        "textAddon": {
+          "value": "{neutral.50}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{neutral.900}",
+          "type": "color"
+        },
+        "placeholder": {
+          "value": "{neutral.400}",
+          "type": "color"
+        },
+        "placeholderFocus": {
+          "value": "{basic.white}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "placeHolderDisabled": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "addon": {
+          "value": "{neutral.400}",
+          "type": "color"
+        },
+        "dropdown": {
+          "value": "{neutral.900}",
+          "type": "color"
+        },
+        "icon": {
+          "value": "{neutral.300}",
+          "type": "color"
+        },
+        "error": {
+          "value": "{error.500}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "default": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "focus": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "error": {
+          "value": "{error.500}",
+          "type": "color"
+        }
+      },
+      "shadow": {
+        "focus": {
+          "value": "{secondary.50}",
+          "type": "color"
+        },
+        "error": {
+          "value": "{error.100}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-lg}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "radiusBaseSuffix": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-lg}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "radiusBasePrefix": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-lg}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "radiusNoneSuffix": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-none}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "radiusNonePrefix": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-none}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "radiusNoneSuffixAndPrefix": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-none}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "paddingBaseHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingBaseVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingBaseLeft": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingInputWithSuffixLeft": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingInputWithSuffixRight": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingInputWithPrefix": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingDropdownVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingDropdownHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingIconVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingDropDownWithIconBetween": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingSide": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingIconInternal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{1}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingAddonTextHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

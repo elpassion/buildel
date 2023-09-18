@@ -1,0 +1,80 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "disabled": {
+          "value": "{neutral.50}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "placeholder": {
+          "value": "{neutral.400}",
+          "type": "color"
+        },
+        "placeholderDisabled": {
+          "value": "{neutral.200}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "default": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "focus": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "error": {
+          "value": "{error.500}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{neutral.200}",
+          "type": "color"
+        }
+      },
+      "ring": {
+        "focus": {
+          "value": "{secondary.50}",
+          "type": "color"
+        },
+        "error": {
+          "value": "{error.100}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-lg}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "paddingHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

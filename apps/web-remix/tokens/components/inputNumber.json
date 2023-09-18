@@ -1,0 +1,54 @@
+{
+  "button": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{neutral.100}",
+          "type": "color"
+        },
+        "hover": {
+          "value": "{neutral.300}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{neutral.100}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{neutral.700}",
+          "type": "color"
+        },
+        "hover": {
+          "value": "{basic.white}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{neutral.200}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-base}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "paddingBase": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{8}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

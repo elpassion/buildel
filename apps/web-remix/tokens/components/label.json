@@ -1,0 +1,26 @@
+{
+  "base": {
+    "color": {
+      "text": {
+        "default": {
+          "value": "{neutral.700}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{neutral.200}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "marginBottom": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{1.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

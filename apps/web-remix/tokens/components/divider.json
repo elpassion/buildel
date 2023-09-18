@@ -1,0 +1,18 @@
+{
+  "base": {
+    "color": {
+      "text": {
+        "default": {
+          "value": "{neutral.500}",
+          "type": "color"
+        }
+      },
+      "background": {
+        "default": {
+          "value": "{neutral.100}",
+          "type": "color"
+        }
+      }
+    }
+  }
+}

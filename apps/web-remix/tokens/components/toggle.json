@@ -1,0 +1,82 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{neutral.100}",
+          "type": "color"
+        },
+        "hover": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "switch": {
+          "value": "{basic.white}",
+          "type": "color"
+        },
+        "checked": {
+          "value": "{primary.500}",
+          "type": "color"
+        },
+        "disabled": {
+          "value": "{neutral.100}",
+          "type": "color"
+        },
+        "disabledSwitch": {
+          "value": "{neutral.50}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-md}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "radiusMovingElement": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-full}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "paddingBase": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{0.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "marginLabel": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "marginSupportingText": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{0.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

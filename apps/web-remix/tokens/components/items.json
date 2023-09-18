@@ -1,0 +1,88 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "containerHover": {
+          "value": "{neutral.100}",
+          "type": "color"
+        },
+        "containerActive": {
+          "value": "{neutral.50}",
+          "type": "color"
+        },
+        "containerDisabled": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "avatar": {
+          "value": "{neutral.300}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "container": {
+          "value": "{neutral.500}",
+          "type": "color"
+        },
+        "avatar": {
+          "value": "{neutral.700}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "containerHover": {
+          "value": "{neutral.100}",
+          "type": "color"
+        },
+        "containerActive": {
+          "value": "{neutral.200}",
+          "type": "color"
+        },
+        "containerDisabled": {
+          "value": "{neutral.200}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-lg}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "paddingContainer": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "marginRightIcon": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "marginSuffixIcon": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

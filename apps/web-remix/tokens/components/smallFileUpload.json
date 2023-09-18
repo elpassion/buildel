@@ -1,0 +1,50 @@
+{
+    "base": {
+      "color": {
+        "text": {
+          "label": {
+            "value": "{neutral.700}",
+            "type": "color"
+          },
+          "supportingText": {
+            "value": "{neutral.400}",
+            "type": "color"
+          },
+          "disabled": {
+            "value": "{neutral.200}",
+            "type": "color"
+          },
+          "error": {
+            "value": "{error.500}",
+            "type": "color"
+          }
+        }, 
+        "shadow": {
+          "active": {
+            "value": "{seconadary.50}",
+            "type": "color"
+          }}
+      }
+    },
+    "marginLabel": {
+      "margin": {
+        "spacings": {
+          "default": {
+            "value": "{2}",
+            "type": "spacings"
+          }
+        }
+      }
+    },
+    "marginSupportingText": {
+      "margin": {
+        "spacings": {
+          "default": {
+            "value": "{2}",
+            "type": "spacings"
+          }
+        }
+      }
+    }
+  }
+  

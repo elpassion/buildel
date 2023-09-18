@@ -1,0 +1,67 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{basic.white}",
+          "type": "color"
+        },
+        "imgBackground": {
+          "value": "{neutral.100}",
+          "type": "color"
+        }
+
+      }
+    }
+  },
+  "outline": {
+    "color": {
+      "border": {
+        "default": {
+          "value": "{neutral.200}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-2xl}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "paddingBaseSmall": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingBottomSmall": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{8}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingHeaderBottom": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{6}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "bigToast": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{basic.white}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "title": {
+          "value": "{primary.500}",
+          "type": "color"
+        },
+        "description": {
+          "value": "{neutral.500}",
+          "type": "color"
+        },
+        "firstAction": {
+          "value": "{primary.500}",
+          "type": "color"
+        },
+        "firstActionHover": {
+          "value": "{primary.600}",
+          "type": "color"
+        },
+        "secondActionHover": {
+          "value": "{neutral.600}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "default": {
+          "value": "{neutral.100}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "smallToast": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "default": {
+          "value": "{basic.white}",
+          "type": "color"
+        },
+        "firstActionHover": {
+          "value": "{}",
+          "type": "color"
+        }
+      },
+      "border": {
+        "default": {
+          "value": "{}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-lg}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "paddingActionsSection": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{6}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingCloseButtonSection": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingSmallToastVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingSmallToastLeft": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingSmallToastRight": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingSmallToastWithCloseButtonRight": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{2}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingBaseVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "paddingBaseHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "marginIconContainer": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{0.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

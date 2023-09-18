@@ -1,0 +1,78 @@
+{
+  "base": {
+    "color": {
+      "background": {
+        "default": {
+          "value": "{basic.white}",
+          "type": "color"
+        }
+      },
+      "text": {
+        "dot": {
+          "value": "{blue.400}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "radiusBase": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-lg}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "radiusEmpty": {
+    "border": {
+      "borderRadius": {
+        "default": {
+          "value": "{rounded-full}",
+          "type": "borderRadius"
+        }
+      }
+    }
+  },
+  "itemVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{3}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "itemHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "emptyStateVertical": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{6}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "emptyStateHorizontal": {
+    "padding": {
+      "spacings": {
+        "default": {
+          "value": "{4}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}

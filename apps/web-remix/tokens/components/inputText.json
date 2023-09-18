@@ -1,0 +1,62 @@
+{
+  "label": {
+    "color": {
+      "text": {
+        "default": {
+          "value": "{neutral.700}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "supporting": {
+    "color": {
+      "text": {
+        "default": {
+          "value": "{neutral.400}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "error": {
+    "color": {
+      "text": {
+        "default": {
+          "value": "{error.500}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "disabled": {
+    "color": {
+      "text": {
+        "default": {
+          "value": "{neutral.200}",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "marginTop": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{1.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  },
+  "marginLabel": {
+    "margin": {
+      "spacings": {
+        "default": {
+          "value": "{1.5}",
+          "type": "spacings"
+        }
+      }
+    }
+  }
+}
