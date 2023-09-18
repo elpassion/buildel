@@ -23,15 +23,20 @@ export function PipelinesPage() {
         <Outlet />
       </CreatePipelineModal>
 
-      <div className="p-4 md:p-8 flex-grow">
-        <Link
-          to={`/${organizationId}/pipelines/new`}
-          className="mb-6 block w-fit"
-        >
-          <Button size="sm">New Workflow</Button>
-        </Link>
+      <div className="px-4 md:px-10 flex items-start gap-8">
+        <div className="max-w-[80rem] flex-grow">
+          <Link
+            to={`/${organizationId}/pipelines/new`}
+            className="mb-6 block w-fit ml-auto mr-0"
+          >
+            <Button size="sm">New Workflow</Button>
+          </Link>
 
-        <PipelinesList pipelines={pipelines.data} className="max-w-[80rem]" />
+          <PipelinesList pipelines={pipelines.data} />
+        </div>
+        <div className="flex-grow max-w-[25rem] text-white">
+          Tempaltes here...
+        </div>
       </div>
     </>
   );
