@@ -26,7 +26,7 @@ export function ShowPipelinePage() {
         }
       />
       <div className="md:px-10">
-        <TabGroup defaultActiveTab="1">
+        <TabGroup defaultActiveTab="build">
           <div className="bg-neutral-800 flex gap-2 rounded-xl w-fit p-1">
             <TabButton
               className="text-xs rounded-lg text-neutral-100 py-2 px-3"
