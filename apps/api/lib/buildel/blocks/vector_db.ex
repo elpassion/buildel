@@ -43,10 +43,12 @@ defmodule Buildel.Blocks.VectorDB do
                 "title" => "Persist in",
                 "enum" => ["run", "workflow"],
                 "enumPresentAs" => "radio",
-                "description" => "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
+                "description" =>
+                  "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
                 "default" => "run"
-              },
-          }})
+              }
+            }
+          })
       }
     }
   end
@@ -104,7 +106,14 @@ defmodule Buildel.Blocks.VectorDB do
 
   def handle_cast({:add_file, {:binary, file}}, state) do
     state = send_stream_start(state)
-    Buildel.VectorDB.add(state[:collection], file, metadata: %{}, api_key: state[:api_key])
+
+    documents =
+      Buildel.Splitters.recursive_character_text_split(file, %{
+        chunk_size: 1000,
+        chunk_overlap: 200
+      })
+
+    Buildel.VectorDB.add(state[:collection], documents, metadata: %{}, api_key: state[:api_key])
     state = send_stream_stop(state)
     {:noreply, state}
   end

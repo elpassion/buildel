@@ -8,13 +8,7 @@ defmodule Buildel.VectorDB do
     end
   end
 
-  def add(collection_name, text, metadata: metadata, api_key: api_key) do
-    documents =
-      Buildel.Splitters.recursive_character_text_split(text, %{
-        chunk_size: 1000,
-        chunk_overlap: 200
-      })
-
+  def add(collection_name, documents, metadata: metadata, api_key: api_key) do
     {:ok, embeddings_list} =
       embeddings().get_embeddings(inputs: documents, api_key: api_key)
 
@@ -130,7 +124,14 @@ defmodule Buildel.VectorDB.QdrantAdapter do
       {:ok,
        body
        |> get_in(["result"])
-       |> Enum.map(fn %{"payload" => %{"document" => document, "metadata" => %{ "file_name" => filename }}} -> "File: #{filename}\n\n#{document |> String.trim()}" end)}
+       |> Enum.map(fn %{
+                        "payload" => %{
+                          "document" => document,
+                          "metadata" => %{"file_name" => filename}
+                        }
+                      } ->
+         "File: #{filename}\n\n#{document |> String.trim()}"
+       end)}
     else
       {:error, %{status: status}} -> {:error, status}
     end

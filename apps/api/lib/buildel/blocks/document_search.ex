@@ -113,7 +113,8 @@ defmodule Buildel.Blocks.DocumentSearch do
 
     results = Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
 
-    result = results |> Enum.take(state[:opts].forwarded_results_count) |> Enum.join("\n\n---\n\n")
+    result =
+      results |> Enum.take(state[:opts].forwarded_results_count) |> Enum.join("\n\n---\n\n")
 
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
@@ -129,7 +130,14 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   def handle_cast({:add_file, {:binary, file}}, state) do
     state = send_stream_start(state)
-    Buildel.VectorDB.add(state[:collection], file, metadata: %{}, api_key: state[:api_key])
+
+    documents =
+      Buildel.Splitters.recursive_character_text_split(file, %{
+        chunk_size: 1000,
+        chunk_overlap: 200
+      })
+
+    Buildel.VectorDB.add(state[:collection], documents, metadata: %{}, api_key: state[:api_key])
     state = send_stream_stop(state)
     {:noreply, state}
   end
