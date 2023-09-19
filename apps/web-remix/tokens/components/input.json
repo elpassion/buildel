@@ -3,7 +3,7 @@
     "color": {
       "background": {
         "default": {
-          "value": "{basic.white}",
+          "value": "{neutral.800}",
           "type": "color"
         },
         "disabled": {
@@ -21,11 +21,11 @@
       },
       "text": {
         "default": {
-          "value": "{neutral.900}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "placeholder": {
-          "value": "{neutral.400}",
+          "value": "{neutral.300}",
           "type": "color"
         },
         "placeholderFocus": {
@@ -63,7 +63,7 @@
           "type": "color"
         },
         "focus": {
-          "value": "{neutral.200}",
+          "value": "{primary.800}",
           "type": "color"
         },
         "error": {
@@ -73,11 +73,11 @@
       },
       "shadow": {
         "focus": {
-          "value": "{secondary.50}",
+          "value": "{primary.800}",
           "type": "color"
         },
         "error": {
-          "value": "{error.100}",
+          "value": "{error.800}",
           "type": "color"
         }
       }

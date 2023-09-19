@@ -3,7 +3,7 @@
     "color": {
       "background": {
         "default": {
-          "value": "{basic.white}",
+          "value": "transparent",
           "type": "color"
         },
         "disabled": {
@@ -13,7 +13,7 @@
       },
       "text": {
         "default": {
-          "value": "{neutral.900}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "disabled": {
@@ -23,21 +23,21 @@
       },
       "border": {
         "default": {
-          "value": "{neutral.100}",
+          "value": "transparent",
           "type": "color"
         },
         "disabled": {
-          "value": "{neutral.200}",
+          "value": "transparent",
           "type": "color"
         },
         "checked": {
-          "value": "{primary.500}",
+          "value": "transparent",
           "type": "color"
         }
       },
       "ring": {
         "focused": {
-          "value": "{neutral.100}",
+          "value": "transparent",
           "type": "color"
         }
       }

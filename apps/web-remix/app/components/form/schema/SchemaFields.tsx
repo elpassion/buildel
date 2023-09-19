@@ -56,21 +56,35 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
   if (field.enumPresentAs === "radio") {
     return (
       <FormField name={name}>
-        <RadioGroupField
-          id={name}
-          cardsSize="sm"
-          layout="horizontal"
-          mainLabel={field.title}
-          radioPosition="left"
-          isRadioVisible={true}
-          errorMessage={error ?? undefined}
-          defaultValue={field.default}
-          options={field.enum.map((value) => ({
-            id: `${name}.${value}`,
-            labelText: value,
-            value: value,
-          }))}
-        />
+        {/*<div className="space-y-3">*/}
+        {/*  {field.enum.map((value, index) => (*/}
+        {/*    <RadioField*/}
+        {/*      key={value}*/}
+        {/*      id={name + index}*/}
+        {/*      name={name}*/}
+        {/*      errorMessage={error ?? undefined}*/}
+        {/*      labelText={value}*/}
+        {/*      defaultValue={value}*/}
+        {/*    />*/}
+        {/*  ))}*/}
+        {/*</div>*/}
+        <div className="text-white">
+          <RadioGroupField
+            id={name}
+            cardsSize="sm"
+            layout="vertical"
+            mainLabel={field.title}
+            radioPosition="left"
+            isRadioVisible={true}
+            errorMessage={error ?? undefined}
+            defaultValue={field.default}
+            options={field.enum.map((value) => ({
+              id: `${name}.${value}`,
+              labelText: value,
+              value: value,
+            }))}
+          />
+        </div>
       </FormField>
     );
   }
@@ -102,7 +116,7 @@ export function NumberField({ field, name }: FieldProps) {
         id={name}
         errorMessage={error}
         label={field.title}
-        supportingText={field.description}
+        // supportingText={field.description}
         minValue={field.minimum}
         maxValue={field.maximum}
         defaultValue={field.default}

@@ -75,6 +75,7 @@ export default function Layout() {
           bottomContent={<LogoutButton />}
           onCollapse={toggleCollapse}
           collapsed={collapsed}
+          collapseButton={false}
         >
           <OrganizationsLinks />
         </Sidebar>

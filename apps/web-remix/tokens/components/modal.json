@@ -3,7 +3,7 @@
     "color": {
       "background": {
         "default": {
-          "value": "{basic.white}",
+          "value": "{neutral.950}",
           "type": "color"
         },
         "imgBackground": {

@@ -21,14 +21,12 @@ export function NewPipelinePage() {
     >
       <div className="max-w-s form-control w-full">
         <Field name="pipeline.name">
-          <FieldLabel>Name</FieldLabel>
-          <TextInputField type="text" autoFocus />
-          <FieldError />
+          <TextInputField type="text" autoFocus label="Name" />
         </Field>
         <HiddenField name="pipeline.config.version" value="1" />
         <HiddenField name="pipeline.config.blocks" value={"[]"} />
       </div>
-      <Button hierarchy="secondary" type="submit">
+      <Button hierarchy="primary" type="submit" className="mt-4">
         Create workflow
       </Button>
     </ValidatedForm>

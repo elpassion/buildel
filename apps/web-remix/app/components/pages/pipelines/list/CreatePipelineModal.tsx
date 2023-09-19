@@ -17,16 +17,17 @@ export const CreatePipelineModal: React.FC<CreatePipelineModalProps> = ({
       isOpen={isOpen}
       onClose={() => navigate(`/${organizationId}/pipelines`)}
       header={
-        <div>
+        <header className="p-1 text-white">
           <p className="text-3xl">Create a new workflow</p>
           <div className="mb-4" />
           <p className="text-sm text-neutral-400">
             Any workflow can contain many Blocks and use your Knowledge Base.
           </p>
-        </div>
+        </header>
       }
+      className="!overflow-auto"
     >
-      {children}
+      <div className="p-1">{children}</div>
     </Modal>
   );
 };
