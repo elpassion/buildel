@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { Textarea } from "@elpassion/taco";
-import { IBlockConfig, IField } from "../pipeline.types";
+import { IBlockConfig, IField } from "../../pipeline.types";
 import {
   FileListResponse,
   FileResponse,

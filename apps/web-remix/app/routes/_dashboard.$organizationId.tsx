@@ -7,7 +7,6 @@ import { MenuInfo } from "rc-menu/es/interface";
 import { Avatar, Icon, IconButton, Sidebar } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
 import {
-  NavLink,
   Outlet,
   useFetcher,
   useLoaderData,
@@ -23,7 +22,6 @@ import { MenuItem } from "~/components/menu/MenuItem";
 import { SidebarContentWrapper } from "~/components/sidebar/SidebarContentWrapper";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
 import { SidebarLink } from "~/components/sidebar/SidebarLink";
-import { SidebarMenuItem } from "~/components/sidebar/SidebarMenuItem";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
@@ -102,14 +100,14 @@ export default function Layout() {
               />
 
               <SidebarLink
-                to={routes.dashboard}
+                to={routes.pipelines(organization.id)}
                 icon={<Icon iconName="briefcase" className="w-5 h-5" />}
                 text="Knowledge Base"
                 onlyIcon={collapsed}
               />
 
               <SidebarLink
-                to={routes.dashboard}
+                to={routes.pipelines(organization.id)}
                 icon={<Icon iconName="key" className="w-5 h-5" />}
                 text="API Keys"
                 onlyIcon={collapsed}

@@ -1,6 +1,6 @@
 import startCase from "lodash.startcase";
 import React, { DragEvent, useMemo } from "react";
-import { useRunPipeline } from "../RunPipelineProvider";
+import { useRunPipeline } from "./RunPipelineProvider";
 import classNames from "classnames";
 import { IBlockTypes } from "../pipeline.types";
 import { assert } from "~/utils/assert";
@@ -42,7 +42,7 @@ export const PipelineSidebar: React.FC<PipelineSidebarProps> = ({
   }, [blockTypes, runStatus]);
 
   return (
-    <aside className="absolute bottom-10 right-14 top-24 flex flex-col gap-1 rounded-xl bg-neutral-850 p-2">
+    <aside className="absolute bottom-12 right-4 top-24 flex flex-col gap-1 rounded-xl bg-neutral-850 p-2">
       {draggableNodes}
     </aside>
   );
