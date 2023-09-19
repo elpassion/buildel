@@ -19,10 +19,10 @@ export function RegisterPage() {
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
-      <h1 className="text-center text-3xl font-bold">
+      <h1 className="text-center text-3xl font-bold text-neutral-100">
         Register for an account
       </h1>
-      <p className="text-center">
+      <p className="text-center text-neutral-100">
         Already registered?{" "}
         <Link
           to={{
@@ -45,18 +45,14 @@ export function RegisterPage() {
           <FieldError />
         </Field>
 
-        <div className="form-control w-full">
+        <div className="form-control w-full mb-4">
           <Field name="user.email">
-            <FieldLabel>Email address</FieldLabel>
-            <TextInputField type="email" autoFocus />
-            <FieldError />
+            <TextInputField type="email" autoFocus label="Email address" />
           </Field>
         </div>
-        <div className="max-w-s form-control w-full">
+        <div className="max-w-s form-control w-full mb-6">
           <Field name="user.password">
-            <FieldLabel>Password</FieldLabel>
-            <PasswordInputField />
-            <FieldError />
+            <PasswordInputField label="Password" />
           </Field>
         </div>
         <Button type="submit" isFluid>

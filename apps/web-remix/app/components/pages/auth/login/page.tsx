@@ -32,8 +32,10 @@ export function LoginPage() {
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
-      <h1 className="text-center text-3xl font-bold">Sign in to account</h1>
-      <p className="text-center">
+      <h1 className="text-center text-3xl font-bold text-neutral-100">
+        Sign in to account
+      </h1>
+      <p className="text-center text-neutral-100">
         Don't have an account?{" "}
         <Link
           to={{
@@ -56,18 +58,19 @@ export function LoginPage() {
         <Field name="global">
           <FieldError />
         </Field>
-        <div className="form-control w-full">
+        <div className="form-control w-full mb-4">
           <Field name="user.email">
-            <FieldLabel>Email address</FieldLabel>
-            <TextInputField ref={emailRef} type="email" autoFocus />
-            <FieldError />
+            <TextInputField
+              ref={emailRef}
+              type="email"
+              label="Email address"
+              autoFocus
+            />
           </Field>
         </div>
-        <div className="max-w-s form-control w-full">
+        <div className="max-w-s form-control w-full mb-6">
           <Field name="user.password">
-            <FieldLabel>Password</FieldLabel>
-            <PasswordInputField ref={passwordRef} />
-            <FieldError />
+            <PasswordInputField ref={passwordRef} label="Password" />
           </Field>
         </div>
         <input type="hidden" name="redirectTo" value={redirectTo} />
