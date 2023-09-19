@@ -86,30 +86,50 @@ export default function Layout() {
           collapsed={collapsed}
         >
           <SidebarContentWrapper
-            className={classNames("gap-2 mt-2 transition-all", {
-              "px-0": !collapsed,
-            })}
+            className={classNames(
+              "gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]",
+              {
+                "px-0": !collapsed,
+              }
+            )}
           >
-            <SidebarLink
-              to={routes.pipelines(organization.id)}
-              icon={<Icon iconName="home" className="w-5 h-5" />}
-              text="Home"
-              onlyIcon={collapsed}
-            />
+            <div>
+              <SidebarLink
+                to={routes.pipelines(organization.id)}
+                icon={<Icon iconName="home" className="w-5 h-5" />}
+                text="Home"
+                onlyIcon={collapsed}
+              />
 
-            <SidebarLink
-              to={routes.dashboard}
-              icon={<Icon iconName="briefcase" className="w-5 h-5" />}
-              text="Knowledge Base"
-              onlyIcon={collapsed}
-            />
+              <SidebarLink
+                to={routes.dashboard}
+                icon={<Icon iconName="briefcase" className="w-5 h-5" />}
+                text="Knowledge Base"
+                onlyIcon={collapsed}
+              />
 
-            <SidebarLink
-              to={routes.dashboard}
-              icon={<Icon iconName="key" className="w-5 h-5" />}
-              text="API Keys"
-              onlyIcon={collapsed}
-            />
+              <SidebarLink
+                to={routes.dashboard}
+                icon={<Icon iconName="key" className="w-5 h-5" />}
+                text="API Keys"
+                onlyIcon={collapsed}
+              />
+            </div>
+            <div>
+              <SidebarLink
+                to={routes.dashboard}
+                icon={<Icon iconName="life-buoy" className="w-5 h-5" />}
+                text="Support"
+                onlyIcon={collapsed}
+              />
+
+              <SidebarLink
+                to={routes.dashboard}
+                icon={<Icon iconName="settings" className="w-5 h-5" />}
+                text="Settings"
+                onlyIcon={collapsed}
+              />
+            </div>
           </SidebarContentWrapper>
         </Sidebar>
       </div>
