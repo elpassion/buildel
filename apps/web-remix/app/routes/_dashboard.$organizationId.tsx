@@ -15,11 +15,19 @@ import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
 import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
-import { PropsWithChildren, useCallback, useRef, useState } from "react";
+import {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { RemixNavLinkProps } from "@remix-run/react/dist/components";
 import { Menu } from "~/components/menu/Menu";
 import { MenuItem } from "~/components/menu/MenuItem";
 import { useOnClickOutside } from "usehooks-ts";
+import { createPortal } from "react-dom";
+import { MenuInfo } from "rc-menu/es/interface";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
@@ -111,7 +119,7 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const { organization, organizations } = useLoaderData<typeof loader>();
-  const { name, id } = organization;
+  const { name } = organization;
   const navigate = useNavigate();
 
   const handleClose = useCallback(() => {
@@ -124,6 +132,11 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
 
   useOnClickOutside(menuRef, handleClose);
 
+  const handleChangeRoute = useCallback((menu: MenuInfo) => {
+    navigate(routes.pipelines(menu.key));
+    handleClose();
+  }, []);
+
   return (
     <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 ">
       <div ref={menuRef}>
@@ -135,14 +148,43 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
           hidden={!showMenu}
           activeKey={`${organization.id}`}
           className="min-w-[248px] absolute top-[60px] left-[85%] max-h-[400px] overflow-y-auto"
-          onClick={(menu) => navigate(routes.pipelines(menu.key))}
+          onClick={handleChangeRoute}
         >
           {organizations.map((org) => {
             return <MenuItem key={`${org.id}`}>{org.name}</MenuItem>;
           })}
         </Menu>
       </div>
+
+      <PageOverlay
+        className={classNames("transition", {
+          "opacity-0 pointer-events-none -z-100": !showMenu,
+          "opacity-1 pointer-events-auto z-100": showMenu,
+        })}
+      />
     </SidebarContentWrapper>
+  );
+}
+interface PageOverlayProps {
+  className?: string;
+}
+function PageOverlay({ className }: PageOverlayProps) {
+  const [root, setRoot] = useState<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!document) return;
+    setRoot(document.querySelector("#_root") as HTMLDivElement);
+  }, []);
+
+  if (!root) return null;
+  return createPortal(
+    <div
+      className={classNames(
+        "absolute top-0 left-0 right-0 bottom-0 bg-black/80",
+        className
+      )}
+    />,
+    root
   );
 }
 
