@@ -1,7 +1,7 @@
 import invariant from "tiny-invariant";
 import classNames from "classnames";
 import Modal from "react-modal";
-import { Button, Sidebar, WorkspaceItem } from "@elpassion/taco";
+import { Avatar, Icon, IconButton, Sidebar } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
 import {
   Link,
@@ -15,7 +15,8 @@ import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
 import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
-import { useCallback, useState } from "react";
+import { PropsWithChildren, useCallback, useState } from "react";
+import { RemixNavLinkProps } from "@remix-run/react/dist/components";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
@@ -69,15 +70,26 @@ export default function Layout() {
     >
       <div className="hidden md:block md:p-4">
         <Sidebar
-          className="sticky top-0 !h-[calc(100vh-32px)] min-w-[80px] rounded-[1.25rem]"
+          className="sticky top-0 !h-[calc(100vh-32px)] rounded-[1.25rem]"
           collapseBtnClassName="absolute top-[60px] -right-2"
           topContent={<SidebarTopContent isCollapsed={collapsed} />}
-          bottomContent={<LogoutButton />}
+          bottomContent={<SidebarBottomContent />}
           onCollapse={toggleCollapse}
           collapsed={collapsed}
           collapseButton={false}
         >
-          <OrganizationsLinks />
+          <SidebarContentWrapper className="gap-2 mt-2">
+            <SidebarLink to={routes.dashboard}>
+              <Icon iconName="home" />
+            </SidebarLink>
+
+            <SidebarLink to={routes.dashboard}>
+              <Icon iconName="briefcase" />
+            </SidebarLink>
+            <SidebarLink to={routes.dashboard}>
+              <Icon iconName="key" />
+            </SidebarLink>
+          </SidebarContentWrapper>
         </Sidebar>
       </div>
 
@@ -96,16 +108,19 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
   const name = organization.name;
 
   return (
-    <div className="border-b border-neutral-400 py-2">
+    <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 ">
       <Link to={routes.pipelines(organization.id)}>
-        <WorkspaceItem
-          name={name}
-          variant={isCollapsed ? "onlyIcon" : "fitWidth"}
-          shape="square"
-          size="md"
-        />
+        <Avatar name={name} contentType="text" shape="square" size="md" />
       </Link>
-    </div>
+    </SidebarContentWrapper>
+  );
+}
+
+function SidebarBottomContent() {
+  return (
+    <SidebarContentWrapper className="border-t border-neutral-400 py-2">
+      <LogoutButton />
+    </SidebarContentWrapper>
   );
 }
 
@@ -113,30 +128,48 @@ function LogoutButton() {
   const logout = useFetcher();
 
   return (
-    <Button
-      variant="outlined"
+    <IconButton
+      size="sm"
+      icon={<Icon iconName="log-out" />}
+      variant="basic"
+      className="!text-neutral-100 hover:!bg-neutral-700"
       onClick={() => {
         logout.submit({}, { method: "DELETE", action: "/logout" });
       }}
-    >
-      Logout
-    </Button>
+    />
   );
 }
-function OrganizationsLinks() {
-  const { organizations } = useLoaderData<typeof loader>();
 
-  return organizations.map((org) => (
+function SidebarLink(props: RemixNavLinkProps) {
+  return (
     <NavLink
-      key={org.id}
-      to={routes.organization(org.id)}
       className={({ isActive }) =>
-        classNames({
-          "text-red-500": isActive,
-        })
+        classNames(
+          "w-8 h-8 rounded-lg bg-transparent text-neutral-100 hover:bg-neutral-700 flex justify-center items-center",
+          {
+            "bg-neutral-700": isActive,
+          }
+        )
       }
+      {...props}
+    />
+  );
+}
+interface SidebarContentWrapperProps extends PropsWithChildren {
+  className?: string;
+}
+function SidebarContentWrapper({
+  children,
+  className,
+}: SidebarContentWrapperProps) {
+  return (
+    <div
+      className={classNames(
+        "flex justify-center items-center flex-col",
+        className
+      )}
     >
-      <p>{org.name}</p>
-    </NavLink>
-  ));
+      {children}
+    </div>
+  );
 }
