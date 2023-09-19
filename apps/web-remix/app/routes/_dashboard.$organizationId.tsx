@@ -7,6 +7,7 @@ import { MenuInfo } from "rc-menu/es/interface";
 import { Avatar, Icon, IconButton, Sidebar } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
 import {
+  NavLink,
   Outlet,
   useFetcher,
   useLoaderData,
@@ -22,6 +23,7 @@ import { MenuItem } from "~/components/menu/MenuItem";
 import { SidebarContentWrapper } from "~/components/sidebar/SidebarContentWrapper";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
 import { SidebarLink } from "~/components/sidebar/SidebarLink";
+import { SidebarMenuItem } from "~/components/sidebar/SidebarMenuItem";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
@@ -77,24 +79,37 @@ export default function Layout() {
       <div className="hidden md:block md:p-4">
         <Sidebar
           className="sticky top-0 !h-[calc(100vh-32px)] rounded-[1.25rem]"
-          collapseBtnClassName="absolute top-[60px] -right-2"
+          collapseBtnClassName="absolute top-[60px] !z-10 -right-2"
           topContent={<SidebarTopContent isCollapsed={collapsed} />}
-          bottomContent={<SidebarBottomContent />}
+          bottomContent={<SidebarBottomContent isCollapsed={collapsed} />}
           onCollapse={toggleCollapse}
           collapsed={collapsed}
-          collapseButton={false}
         >
-          <SidebarContentWrapper className="gap-2 mt-2">
-            <SidebarLink to={routes.pipelines(organization.id)}>
-              <Icon iconName="home" />
-            </SidebarLink>
+          <SidebarContentWrapper
+            className={classNames("gap-2 mt-2 transition-all", {
+              "px-0": !collapsed,
+            })}
+          >
+            <SidebarLink
+              to={routes.pipelines(organization.id)}
+              icon={<Icon iconName="home" className="w-5 h-5" />}
+              text="Home"
+              onlyIcon={collapsed}
+            />
 
-            <SidebarLink to={routes.dashboard}>
-              <Icon iconName="briefcase" />
-            </SidebarLink>
-            <SidebarLink to={routes.dashboard}>
-              <Icon iconName="key" />
-            </SidebarLink>
+            <SidebarLink
+              to={routes.dashboard}
+              icon={<Icon iconName="briefcase" className="w-5 h-5" />}
+              text="Knowledge Base"
+              onlyIcon={collapsed}
+            />
+
+            <SidebarLink
+              to={routes.dashboard}
+              icon={<Icon iconName="key" className="w-5 h-5" />}
+              text="API Keys"
+              onlyIcon={collapsed}
+            />
           </SidebarContentWrapper>
         </Sidebar>
       </div>
@@ -132,16 +147,32 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
   }, []);
 
   return (
-    <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 ">
+    <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 pl-2 pr-1">
       <div ref={menuRef}>
-        <button onClick={handleOpen}>
-          <Avatar name={name} contentType="text" shape="square" size="md" />
+        <button
+          onClick={handleOpen}
+          className="w-full h-10 overflow-hidden flex justify-between items-center text-neutral-100 rounded-lg"
+        >
+          {isCollapsed && (
+            <Avatar name={name} contentType="text" shape="square" size="md" />
+          )}
+          {!isCollapsed && (
+            <>
+              <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">
+                {organization.name}
+              </span>
+              <Icon
+                iconName={showMenu ? "chevron-up" : "chevron-down"}
+                className="text-xl"
+              />
+            </>
+          )}
         </button>
 
         <Menu
           hidden={!showMenu}
           activeKey={`${organization.id}`}
-          className="min-w-[248px] absolute top-[60px] left-[85%] max-h-[400px] overflow-y-auto"
+          className="min-w-[248px] absolute z-[20] top-[60px] left-[85%] max-h-[400px] overflow-y-auto"
           onClick={handleChangeRoute}
         >
           {organizations.map((org) => {
@@ -160,9 +191,15 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
   );
 }
 
-function SidebarBottomContent() {
+function SidebarBottomContent({ isCollapsed }: SidebarTopContentProps) {
   return (
-    <SidebarContentWrapper className="border-t border-neutral-400 py-2">
+    <SidebarContentWrapper className="border-t border-neutral-400 py-3 !flex-row justify-between">
+      {!isCollapsed && (
+        <div className="flex flex-col text-xs text-white">
+          <p>Majkel Ward</p>
+          <p>elp@elp.com</p>
+        </div>
+      )}
       <LogoutButton />
     </SidebarContentWrapper>
   );

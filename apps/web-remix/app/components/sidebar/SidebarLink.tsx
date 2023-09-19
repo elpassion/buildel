@@ -1,19 +1,28 @@
 import { RemixNavLinkProps } from "@remix-run/react/dist/components";
 import { NavLink } from "@remix-run/react";
-import classNames from "classnames";
+import {
+  SidebarMenuItem,
+  SidebarMenuItemProps,
+} from "~/components/sidebar/SidebarMenuItem";
 
-export function SidebarLink(props: RemixNavLinkProps) {
+type SidebarLinkProps = RemixNavLinkProps &
+  Omit<SidebarMenuItemProps, "isActive">;
+export function SidebarLink({
+  icon,
+  text,
+  onlyIcon,
+  ...props
+}: SidebarLinkProps) {
   return (
-    <NavLink
-      className={({ isActive }) =>
-        classNames(
-          "w-8 h-8 rounded-lg bg-transparent text-neutral-100 hover:bg-neutral-700 flex justify-center items-center",
-          {
-            "bg-neutral-700": isActive,
-          }
-        )
-      }
-      {...props}
-    />
+    <NavLink {...props}>
+      {({ isActive }) => (
+        <SidebarMenuItem
+          icon={icon}
+          text={text}
+          isActive={isActive}
+          onlyIcon={onlyIcon}
+        />
+      )}
+    </NavLink>
   );
 }

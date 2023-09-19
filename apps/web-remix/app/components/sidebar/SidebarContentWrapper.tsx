@@ -9,12 +9,7 @@ export function SidebarContentWrapper({
   className,
 }: SidebarContentWrapperProps) {
   return (
-    <div
-      className={classNames(
-        "flex justify-center items-center flex-col",
-        className
-      )}
-    >
+    <div className={classNames("flex flex-col px-[10px]", className)}>
       {children}
     </div>
   );
