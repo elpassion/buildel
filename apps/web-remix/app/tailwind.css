@@ -8,3 +8,8 @@
     src: url('https://elpassion-design-system.s3.eu-west-1.amazonaws.com/fonticon.ttf')
     format('opentype');
 }
+
+
+.rc-menu-item-active{
+    @apply !bg-neutral-950
+}

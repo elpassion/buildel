@@ -8,13 +8,19 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-
+import menuStyle from "rc-menu/assets/index.css";
 import styles from "./tailwind.css";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref
-    ? [{ rel: "stylesheet", href: cssBundleHref }]
-    : [{ rel: "stylesheet", href: styles }]),
+    ? [
+        { rel: "stylesheet", href: cssBundleHref },
+        { rel: "stylesheet", href: menuStyle },
+      ]
+    : [
+        { rel: "stylesheet", href: styles },
+        { rel: "stylesheet", href: menuStyle },
+      ]),
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",

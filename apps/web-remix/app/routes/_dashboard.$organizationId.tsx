@@ -4,19 +4,22 @@ import Modal from "react-modal";
 import { Avatar, Icon, IconButton, Sidebar } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
 import {
-  Link,
   NavLink,
   Outlet,
   useFetcher,
   useLoaderData,
+  useNavigate,
 } from "@remix-run/react";
 import { OrganizationsResponse } from "~/components/pages/organizations/contracts";
 import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
 import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
-import { PropsWithChildren, useCallback, useState } from "react";
+import { PropsWithChildren, useCallback, useRef, useState } from "react";
 import { RemixNavLinkProps } from "@remix-run/react/dist/components";
+import { Menu } from "~/components/menu/Menu";
+import { MenuItem } from "~/components/menu/MenuItem";
+import { useOnClickOutside } from "usehooks-ts";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
@@ -105,14 +108,40 @@ interface SidebarTopContentProps {
   isCollapsed: boolean;
 }
 function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
-  const { organization } = useLoaderData<typeof loader>();
-  const name = organization.name;
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const { organization, organizations } = useLoaderData<typeof loader>();
+  const { name, id } = organization;
+  const navigate = useNavigate();
+
+  const handleClose = useCallback(() => {
+    setShowMenu(false);
+  }, []);
+
+  const handleOpen = useCallback(() => {
+    setShowMenu(true);
+  }, []);
+
+  useOnClickOutside(menuRef, handleClose);
 
   return (
     <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 ">
-      <Link to={routes.pipelines(organization.id)}>
-        <Avatar name={name} contentType="text" shape="square" size="md" />
-      </Link>
+      <div ref={menuRef}>
+        <button onClick={handleOpen}>
+          <Avatar name={name} contentType="text" shape="square" size="md" />
+        </button>
+
+        <Menu
+          hidden={!showMenu}
+          activeKey={`${organization.id}`}
+          className="min-w-[248px] absolute top-[60px] left-[85%] max-h-[400px] overflow-y-auto"
+          onClick={(menu) => navigate(routes.pipelines(menu.key))}
+        >
+          {organizations.map((org) => {
+            return <MenuItem key={`${org.id}`}>{org.name}</MenuItem>;
+          })}
+        </Menu>
+      </div>
     </SidebarContentWrapper>
   );
 }
