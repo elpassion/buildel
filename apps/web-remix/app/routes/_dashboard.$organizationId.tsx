@@ -57,6 +57,7 @@ export async function loader(loaderArgs: LoaderArgs) {
 }
 
 export default function Layout() {
+  const { organization } = useLoaderData<typeof loader>();
   const [collapsed, setCollapsed] = useState(true);
 
   const toggleCollapse = useCallback(() => {
@@ -79,7 +80,7 @@ export default function Layout() {
           collapseButton={false}
         >
           <SidebarContentWrapper className="gap-2 mt-2">
-            <SidebarLink to={routes.dashboard}>
+            <SidebarLink to={routes.pipelines(organization.id)}>
               <Icon iconName="home" />
             </SidebarLink>
 
