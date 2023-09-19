@@ -1,10 +1,12 @@
+import { useCallback, useRef, useState } from "react";
 import invariant from "tiny-invariant";
 import classNames from "classnames";
 import Modal from "react-modal";
+import { useOnClickOutside } from "usehooks-ts";
+import { MenuInfo } from "rc-menu/es/interface";
 import { Avatar, Icon, IconButton, Sidebar } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
 import {
-  NavLink,
   Outlet,
   useFetcher,
   useLoaderData,
@@ -15,19 +17,11 @@ import { loaderBuilder } from "~/utils.server";
 import { getToastError } from "~/utils/toast.error.server";
 import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
-import {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { RemixNavLinkProps } from "@remix-run/react/dist/components";
 import { Menu } from "~/components/menu/Menu";
 import { MenuItem } from "~/components/menu/MenuItem";
-import { useOnClickOutside } from "usehooks-ts";
-import { createPortal } from "react-dom";
-import { MenuInfo } from "rc-menu/es/interface";
+import { SidebarContentWrapper } from "~/components/sidebar/SidebarContentWrapper";
+import { PageOverlay } from "~/components/overlay/PageOverlay";
+import { SidebarLink } from "~/components/sidebar/SidebarLink";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
@@ -165,28 +159,6 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
     </SidebarContentWrapper>
   );
 }
-interface PageOverlayProps {
-  className?: string;
-}
-function PageOverlay({ className }: PageOverlayProps) {
-  const [root, setRoot] = useState<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!document) return;
-    setRoot(document.querySelector("#_root") as HTMLDivElement);
-  }, []);
-
-  if (!root) return null;
-  return createPortal(
-    <div
-      className={classNames(
-        "absolute top-0 left-0 right-0 bottom-0 bg-black/80",
-        className
-      )}
-    />,
-    root
-  );
-}
 
 function SidebarBottomContent() {
   return (
@@ -209,39 +181,5 @@ function LogoutButton() {
         logout.submit({}, { method: "DELETE", action: "/logout" });
       }}
     />
-  );
-}
-
-function SidebarLink(props: RemixNavLinkProps) {
-  return (
-    <NavLink
-      className={({ isActive }) =>
-        classNames(
-          "w-8 h-8 rounded-lg bg-transparent text-neutral-100 hover:bg-neutral-700 flex justify-center items-center",
-          {
-            "bg-neutral-700": isActive,
-          }
-        )
-      }
-      {...props}
-    />
-  );
-}
-interface SidebarContentWrapperProps extends PropsWithChildren {
-  className?: string;
-}
-function SidebarContentWrapper({
-  children,
-  className,
-}: SidebarContentWrapperProps) {
-  return (
-    <div
-      className={classNames(
-        "flex justify-center items-center flex-col",
-        className
-      )}
-    >
-      {children}
-    </div>
   );
 }
