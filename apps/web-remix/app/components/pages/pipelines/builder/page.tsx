@@ -238,7 +238,7 @@ export function PipelineBuilder() {
 export const meta: V2_MetaFunction = () => {
   return [
     {
-      title: "Pipeline builder",
+      title: "Builder",
     },
   ];
 };

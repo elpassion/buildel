@@ -1,1 +1,5 @@
-export { page as default, loader } from "~/components/pages/pipelines/settings";
+export {
+  page as default,
+  loader,
+  meta,
+} from "~/components/pages/pipelines/settings";
