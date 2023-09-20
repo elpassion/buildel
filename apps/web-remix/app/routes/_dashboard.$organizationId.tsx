@@ -87,7 +87,7 @@ export default function Layout() {
             className={classNames(
               "gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]",
               {
-                "px-0": !collapsed,
+                "!px-0": !collapsed,
               }
             )}
           >
