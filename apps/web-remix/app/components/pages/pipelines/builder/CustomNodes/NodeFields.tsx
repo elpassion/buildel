@@ -14,6 +14,7 @@ import {
 } from "../RunPipelineProvider";
 import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
 import { Button } from "~/components/button";
+import { TextareaInput } from "~/components/form/inputs/textarea.input";
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -87,7 +88,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
 
       if (type === "text") {
         return (
-          <Textarea
+          <TextareaInput
             label=""
             id={name}
             name={name}
@@ -143,12 +144,12 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
 
       if (type === "text") {
         return (
-          <Textarea
+          <TextareaInput
             key={field.data.name}
             id={field.data.name}
             label=""
+            // className="w-full"
             value={getTextFieldsMessages(events, field.data.name)}
-            className="w-full"
             rows={5}
             disabled
           />

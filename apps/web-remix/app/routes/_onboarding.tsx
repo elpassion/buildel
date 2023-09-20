@@ -9,8 +9,7 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function Layout() {
   return (
-    <div id="_root" className="grid h-screen grid-cols-[auto_1fr]">
-      ONBOARDING
+    <div id="_root" className="bg-neutral-950 min-h-screen w-full">
       <Outlet />
     </div>
   );
