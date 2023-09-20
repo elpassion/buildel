@@ -56,7 +56,16 @@ export function PipelineLayout() {
             >
               Interface
             </FilledTabLink>
-            <FilledTabLink to="/" tabId="settings">
+            <FilledTabLink
+              tabId={routes.pipelineSettings(
+                pipeline.organization_id,
+                pipeline.id
+              )}
+              to={routes.pipelineSettings(
+                pipeline.organization_id,
+                pipeline.id
+              )}
+            >
               Settings
             </FilledTabLink>
           </div>
