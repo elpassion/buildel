@@ -11,9 +11,10 @@ export const Tab: React.FC<TabProps> = ({ children, tabId }) => {
   return <div>{children}</div>;
 };
 
-interface TabButtonProps extends PropsWithChildren {
+export interface TabButtonProps extends PropsWithChildren {
   tabId: string;
   className?: string;
+  component?: "link" | "button";
 }
 export const TabButton: React.FC<TabButtonProps> = ({
   children,
