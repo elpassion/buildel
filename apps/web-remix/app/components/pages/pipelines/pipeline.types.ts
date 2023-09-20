@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BlockConfig, BlockTypes, IOType, Pipeline } from "../contracts";
+import { BlockConfig, BlockTypes, IOType, Pipeline } from "./contracts";
 
 export type IBlockConfig = z.TypeOf<typeof BlockConfig>;
 export interface IPipelineConfig {

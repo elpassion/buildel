@@ -8,7 +8,7 @@ import {
   IBlockConfig,
   IHandle,
   IPipeline,
-} from "./pipeline.types";
+} from "../pipeline.types";
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({

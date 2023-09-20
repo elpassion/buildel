@@ -1,3 +1,5 @@
+import { V2_MetaFunction } from "@remix-run/node";
+
 import React, {
   useCallback,
   useEffect,
@@ -5,13 +7,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import isEqual from "lodash.isequal";
-import { RunPipelineProvider } from "./RunPipelineProvider";
-import { RunPipelineButton } from "./RunPipelineButton";
-import { Button } from "@elpassion/taco";
-import { BlockModal, BlockModalHeader } from "./BlockModal";
-import { EditBlockForm } from "./EditBlockForm";
-import { BlockInputList } from "./BlockInputList";
+import { useFetcher, useLoaderData } from "@remix-run/react";
+import {
+  IBlockConfig,
+  IEdge,
+  IPipeline,
+  IPipelineConfig,
+} from "../pipeline.types";
+import { useModal } from "~/hooks/useModal";
 import ReactFlow, {
   addEdge,
   Background,
@@ -21,16 +24,6 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
 } from "reactflow";
-import { PipelineSidebar } from "./PipelineSidebar";
-import { useFetcher } from "@remix-run/react";
-import {
-  IBlockConfig,
-  IBlockTypes,
-  IEdge,
-  IPipeline,
-  IPipelineConfig,
-} from "~/components/pages/pipelines/show/pipeline.types";
-import { useModal } from "~/hooks/useModal";
 import {
   getAllBlockTypes,
   getEdges,
@@ -42,14 +35,19 @@ import {
 import { useDebounce } from "usehooks-ts";
 import { assert } from "~/utils/assert";
 import { CustomNode, CustomNodeProps } from "./CustomNodes/CustomNode";
-
+import isEqual from "lodash.isequal";
 import { useDraggableNodes } from "./useDraggableNodes";
-interface BuilderProps {
-  pipeline: IPipeline;
-  blockTypes: IBlockTypes;
-}
+import { RunPipelineProvider } from "./RunPipelineProvider";
+import { RunPipelineButton } from "./RunPipelineButton";
+import { Button } from "@elpassion/taco";
+import { BlockModal, BlockModalHeader } from ".//BlockModal";
+import { EditBlockForm } from "./EditBlockForm";
+import { BlockInputList } from "./BlockInputList";
+import { PipelineSidebar } from "./PipelineSidebar";
+import { loader } from "./loader";
 
-export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
+export function PipelineBuilder() {
+  const { pipeline, blockTypes } = useLoaderData<typeof loader>();
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const updateFetcher = useFetcher<IPipeline>();
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -174,7 +172,7 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
   });
   return (
     <div
-      className="relative py-5 h-[calc(100vh_-_104px)] w-full"
+      className="relative py-5 h-[calc(100vh_-_108px)] w-full"
       ref={reactFlowWrapper}
     >
       <RunPipelineProvider pipeline={pipeline}>
@@ -235,4 +233,12 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
       </RunPipelineProvider>
     </div>
   );
+}
+
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      title: "Pipeline builder",
+    },
+  ];
 };
