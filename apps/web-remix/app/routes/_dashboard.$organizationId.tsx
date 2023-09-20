@@ -91,7 +91,7 @@ export default function Layout() {
               }
             )}
           >
-            <div>
+            <div className="flex flex-col gap-1">
               <SidebarLink
                 to={routes.pipelines(organization.id)}
                 icon={<Icon iconName="home" className="w-5 h-5" />}
