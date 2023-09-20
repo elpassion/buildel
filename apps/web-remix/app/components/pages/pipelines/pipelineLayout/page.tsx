@@ -17,7 +17,7 @@ export const links: LinksFunction = () => [
 export function PipelineLayout() {
   const location = useLocation();
   const { pipeline } = useLoaderData<typeof loader>();
-  console.log(location);
+
   return (
     <>
       <Navbar
@@ -44,7 +44,16 @@ export function PipelineLayout() {
             >
               Builder
             </FilledTabLink>
-            <FilledTabLink to="/" tabId="interface">
+            <FilledTabLink
+              tabId={routes.pipelineInterface(
+                pipeline.organization_id,
+                pipeline.id
+              )}
+              to={routes.pipelineInterface(
+                pipeline.organization_id,
+                pipeline.id
+              )}
+            >
               Interface
             </FilledTabLink>
             <FilledTabLink to="/" tabId="settings">

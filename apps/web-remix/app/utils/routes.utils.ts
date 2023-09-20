@@ -11,6 +11,10 @@ export const routes = {
     `${routes.pipelines(organizationId)}/${pipelineId}`,
   pipelineBuilder: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipeline(organizationId, pipelineId)}/builder`,
+  pipelineInterface: (organizationId: OrganizationId, pipelineId: PipelineId) =>
+    `${routes.pipeline(organizationId, pipelineId)}/interface`,
+  pipelineSettings: (organizationId: OrganizationId, pipelineId: PipelineId) =>
+    `${routes.pipeline(organizationId, pipelineId)}/settings`,
 };
 
 type OrganizationId = string | number;
