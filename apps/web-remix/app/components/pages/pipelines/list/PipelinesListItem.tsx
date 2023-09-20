@@ -1,10 +1,7 @@
-import { Link, Form } from "@remix-run/react";
-import { Icon, Indicator, IconButton } from "@elpassion/taco";
+import { Icon, Indicator } from "@elpassion/taco";
 import { IPipeline } from "./pipelines.types";
-import { routes } from "~/utils/routes.utils";
 import { PropsWithChildren } from "react";
 import classNames from "classnames";
-import { HiddenField } from "~/components/form/fields/field.context";
 
 interface PipelinesListItemProps extends PropsWithChildren {
   className?: string;
@@ -16,7 +13,7 @@ export const PipelinesListItem = ({
   return (
     <article
       className={classNames(
-        "bg-neutral-800 px-6 py-4 rounded-lg text-basic-white",
+        "bg-neutral-800 px-6 py-4 rounded-lg text-basic-white hover:bg-neutral-850 transition cursor-pointer",
         className
       )}
     >
@@ -33,12 +30,7 @@ export const PipelineListItemHeader = ({
 }: PipelineListItemHeaderProps) => {
   return (
     <header className="flex items-start">
-      <Link
-        to={routes.pipeline(pipeline.organization_id, pipeline.id)}
-        className="flex basis-1/2 text-lg font-medium hover:underline"
-      >
-        {pipeline.name}
-      </Link>
+      <h2 className="flex basis-1/2 text-lg font-medium">{pipeline.name}</h2>
 
       <div className="flex items-center basis-1/2 justify-between">
         <p className="text-sm">$2.45</p>
