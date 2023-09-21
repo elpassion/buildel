@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import startCase from "lodash.startcase";
 import { Handle, Position } from "reactflow";
 import { IHandle } from "../../pipeline.types";
+import classNames from "classnames";
 
 export function InputHandle({
   handle,
@@ -13,29 +14,31 @@ export function InputHandle({
   const handleTypeClassName = useMemo(() => {
     switch (handle.data.type) {
       case "text":
-        return "!rounded-none !bg-transparent !border-1 !border-white";
+        return "!rounded-[1px] !bg-primary-500";
       case "audio":
-        return "!rounded-full !bg-transparent !border-1 !border-white";
       case "file":
-        return "!rounded-none !bg-transparent !border-1 !border-white rotate-45";
+        return "!rounded-full !bg-primary-500";
     }
   }, [handle.data.type]);
 
   return (
     <>
-      <div
-        className="absolute right-[102%] translate-y-[-80%] text-xxs text-white"
-        style={{ top: (index + 1) * 30 }}
+      <span
+        className="absolute right-[105%] -translate-y-[15%] text-[10px] text-white"
+        style={{ top: (index + 1) * 25 }}
       >
         {startCase(handle.data.name.replace(/_input/g, " "))}
-      </div>
+      </span>
       <Handle
         key={handle.id}
         type={handle.type}
         position={Position.Left}
-        style={{ top: (index + 1) * 30 }}
+        style={{ top: (index + 1) * 25 }}
         id={handle.id}
-        className={handleTypeClassName}
+        className={classNames(
+          "!border-1 !border-primary-500 !w-[10px] !h-[10px] !-translate-x-[50%]",
+          handleTypeClassName
+        )}
       />
     </>
   );
@@ -51,19 +54,18 @@ export function OutputHandle({
   const handleTypeClassName = useMemo(() => {
     switch (handle.data.type) {
       case "text":
-        return "!rounded-none !bg-white !border-1 !border-white ";
+        return "!rounded-[1px] !bg-secondary-500";
       case "audio":
-        return "!rounded-full !bg-white !border-1 !border-white";
       case "file":
-        return "!rounded-none !bg-white !border-1 !border-white rotate-45";
+        return "!rounded-full !bg-secondary-500";
     }
   }, [handle.data.type]);
 
   return (
     <>
       <div
-        className="absolute left-[102%] translate-y-[-80%] text-xxs text-white"
-        style={{ top: (index + 1) * 30 }}
+        className="absolute left-[105%] -translate-y-[15%] text-xxs text-white"
+        style={{ top: (index + 1) * 25 }}
       >
         {startCase(handle.data.name.replace(/_output/g, " "))}
       </div>
@@ -71,10 +73,13 @@ export function OutputHandle({
         key={handle.id}
         type={handle.type}
         position={Position.Right}
-        style={{ top: (index + 1) * 30 }}
+        style={{ top: (index + 1) * 25 }}
         id={handle.id}
         data-name={handle.data.name}
-        className={handleTypeClassName}
+        className={classNames(
+          "!border-1 !border-secondary-500 !w-[10px] !h-[10px] !translate-x-[40%]",
+          handleTypeClassName
+        )}
       />
     </>
   );
