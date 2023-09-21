@@ -46,6 +46,7 @@ export function CustomEdge({
 
   return (
     <BaseEdge
+      id={id}
       path={edgePath}
       markerEnd={markerEnd}
       style={{
