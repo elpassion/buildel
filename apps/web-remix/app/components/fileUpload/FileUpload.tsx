@@ -1,17 +1,21 @@
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
-import {
-  SmallFileInput,
-  SmallFileInputProps,
-} from "~/components/form/inputs/file.input";
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { Button } from "@elpassion/taco";
 import {
   IFile,
   IFileUpload,
   IPreviewProps,
+  isUploadError,
   isUploadRejected,
 } from "./fileUpload.types";
 
 interface FileUploadProps
-  extends Partial<Omit<SmallFileInputProps, "onChange">> {
+  extends React.HTMLProps<Omit<HTMLInputElement, "onChange">> {
   preview?: (props: IPreviewProps) => ReactNode;
   onUpload: (file: File) => Promise<IFile>;
   onFetch: () => Promise<IFile[]>;
@@ -30,6 +34,7 @@ export function FileUpload({
   onRemove,
   ...rest
 }: FileUploadProps) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState<IFileUpload[]>([]);
 
@@ -89,7 +94,11 @@ export function FileUpload({
       try {
         if (!onRemove) return;
 
-        await onRemove(id);
+        const item = fileList.find((file) => file.id === id);
+
+        if (item && !isUploadError(item)) {
+          await onRemove(id);
+        }
 
         setFileList((prev) => prev.filter((file) => file.id !== id));
       } catch (err) {
@@ -99,26 +108,37 @@ export function FileUpload({
     [onRemove]
   );
 
+  const handleSelectFiles = useCallback(() => {
+    inputRef.current?.click();
+  }, []);
+
   useEffect(() => {
     handleFetchFiles();
   }, []);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex justify-center items-center w-full p-2 border-dashed border border-neutral-300 rounded min-h-[120px] bg-neutral-600">
-        {loading ? (
-          <p className="text-white">loading...</p>
-        ) : (
-          <SmallFileInput
-            multiple
-            buttonText="Browse files"
-            label="Upload"
-            supportingText="SVG, PNG, JPG or GIF. Max size of 2MB"
-            onChange={handleUpload}
-            {...rest}
-          />
-        )}
-      </div>
+    <div className="flex flex-col gap-3">
+      <label htmlFor={rest.id}>
+        <span className="text-white text-xs font-medium">Upload files</span>
+        <input
+          type="file"
+          ref={inputRef}
+          {...rest}
+          onChange={handleUpload}
+          disabled={loading}
+          hidden
+        />
+        <Button
+          onClick={handleSelectFiles}
+          size="xs"
+          variant="outlined"
+          className="!text-xs"
+          disabled={loading}
+          isFluid
+        >
+          Browse files to upload
+        </Button>
+      </label>
 
       {preview?.({ fileList, remove: handleRemove })}
     </div>

@@ -13,7 +13,7 @@ export function FileUploadListPreview({
 }: FileUploadListPreviewProps) {
   return (
     <ItemList
-      className="flex flex-col items-center gap-1 max-h-[85px] overflow-y-auto"
+      className="flex flex-col items-center gap-1 max-h-[110px] overflow-y-auto"
       itemClassName="w-full"
       items={fileList}
       renderItem={(file) => (
@@ -38,25 +38,41 @@ export function FileUploadListItem({
   return (
     <article
       className={classNames(
-        "flex justify-between items-center gap-2 w-full px-1 text-sm hover:bg-neutral-600 transition rounded-sm",
+        "flex justify-between gap-2 w-full p-1 bg-neutral-600 hover:bg-neutral-700 transition rounded-md",
         {
           "text-white": !isUploadError(file),
           "text-red-500": isUploadError(file),
         }
       )}
     >
-      <div className="flex items-center gap-1 grow max-w-[90%]">
-        <Icon size="xs" iconName="file" className="mt-0.5" />
-        <h6 className="line-clamp-1">{file.file_name}</h6>
+      <div className="flex gap-1 grow max-w-[90%]">
+        <Icon size="xs" iconName="file" className="mt-0.5 w-4 h-4 !text-sm" />
+        <div className="flex flex-col text-xs w-full max-w-[95%]">
+          <h6 className="whitespace-nowrap truncate">{file.file_name}</h6>
+          <span
+            className={classNames({
+              "text-neutral-100": !isUploadError(file),
+              "text-red-500": isUploadError(file),
+            })}
+          >
+            {renderSize(file.file_size)}
+          </span>
+        </div>
       </div>
       {onRemove && (
         <button
           onClick={handleRemove}
-          className="w-4 h-4 flex items-center justify-center hover:bg-neutral-400 rounded-sm"
+          className="w-4 h-4 flex items-center justify-center hover:bg-neutral-500 rounded-sm"
         >
           <Icon iconName="x" size="xs" />
         </button>
       )}
     </article>
   );
+}
+function renderSize(size: number) {
+  if (size < 1000) return `${size.toFixed(0)}B`;
+  else if (size < 1000 * 1000) {
+    return `${(size / 1000).toFixed(0)}KB`;
+  } else return `${(size / (1000 * 1000)).toFixed(0)}MB`;
 }

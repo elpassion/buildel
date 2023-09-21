@@ -98,6 +98,8 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
       } else if (type === "file") {
         return (
           <FileUpload
+            multiple
+            id={name}
             name={name}
             onUpload={uploadFile}
             onFetch={fetchFiles}
