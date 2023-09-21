@@ -1,49 +1,68 @@
+import React, { PropsWithChildren } from "react";
 import startCase from "lodash.startcase";
-import React, { DragEvent, useMemo } from "react";
-import { useRunPipeline } from "./RunPipelineProvider";
 import classNames from "classnames";
-import { IBlockTypes } from "../pipeline.types";
-import { assert } from "~/utils/assert";
+import { Icon, IconButton } from "@elpassion/taco";
 
-interface PipelineSidebarProps {
-  blockTypes: IBlockTypes;
+interface PipelineSidebarProps extends PropsWithChildren {
+  className?: string;
+  isOpen: boolean;
+  onClose?: () => void;
 }
 export const PipelineSidebar: React.FC<PipelineSidebarProps> = ({
-  blockTypes,
+  className,
+  children,
+  isOpen,
+  onClose,
 }) => {
-  const { status: runStatus } = useRunPipeline();
-
-  const onDragStart = (event: DragEvent<HTMLDivElement>, nodeType: string) => {
-    event.dataTransfer.setData("application/reactflow", nodeType);
-    event.dataTransfer.effectAllowed = "move";
-  };
-
-  assert(blockTypes);
-
-  const draggableNodes = useMemo(() => {
-    return blockTypes.map((block) => (
-      <div
-        key={block.type}
-        className={classNames(
-          "min-w-[150px] cursor-grab rounded bg-neutral-800 hover:bg-neutral-700 p-2 text-neutral-100",
-          {
-            "opacity-50": runStatus !== "idle",
-          }
-        )}
-        onDragStart={(event) => {
-          if (runStatus !== "idle") return;
-          onDragStart(event, block.type);
-        }}
-        draggable
-      >
-        <span>{startCase(block.type)}</span>
-      </div>
-    ));
-  }, [blockTypes, runStatus]);
-
   return (
-    <aside className="absolute bottom-12 right-4 top-24 flex flex-col gap-1 rounded-xl bg-neutral-850 p-2">
-      {draggableNodes}
+    <aside
+      className={classNames(
+        "fixed z-50 bottom-4 right-4 top-4 rounded-xl bg-neutral-850 px-4 py-8 w-[360px] transition flex flex-col",
+        {
+          "translate-x-0 opacity-100 pointer-events-auto": isOpen,
+          "translate-x-[150%] opacity-0 pointer-events-none": !isOpen,
+        },
+        className
+      )}
+    >
+      {children}
     </aside>
   );
 };
+
+interface PipelineSidebarHeaderProps {
+  heading: string;
+  subheading?: string;
+  onClose: () => void;
+  className?: string;
+}
+export function PipelineSidebarHeader({
+  subheading,
+  heading,
+  onClose,
+  className,
+}: PipelineSidebarHeaderProps) {
+  return (
+    <header
+      className={classNames(
+        "flex justify-between gap-1 mb-6 pb-6 border-b border-neutral-100",
+        className
+      )}
+    >
+      <div className="grow-1">
+        <h3 className="mb-2 text-xl font-medium  text-white">
+          {startCase(heading)}
+        </h3>
+        {subheading ? (
+          <p className="text-neutral-100 text-xs">{subheading}</p>
+        ) : null}
+      </div>
+      <IconButton
+        size="sm"
+        variant="outlined"
+        onClick={onClose}
+        icon={<Icon iconName="x" />}
+      />
+    </header>
+  );
+}

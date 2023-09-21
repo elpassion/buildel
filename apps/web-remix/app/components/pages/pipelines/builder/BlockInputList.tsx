@@ -17,11 +17,17 @@ export const BlockInputList: React.FC<BlockInputListProps> = ({ inputs }) => {
     [inputs]
   );
 
+  if (inputs.length === 0) return null;
+
   return (
-    <ItemList
-      items={formattedInputs}
-      renderItem={(item) => <BlockInputItem {...item} />}
-    />
+    <div>
+      <h4 className="mb-1 font-medium text-white text-xs">Inputs</h4>
+      <ItemList
+        className="flex flex-wrap gap-2"
+        items={formattedInputs}
+        renderItem={(item) => <BlockInputItem {...item} />}
+      />
+    </div>
   );
 };
 

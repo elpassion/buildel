@@ -14,6 +14,7 @@ export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {
   const handleOnDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
+    console.log(event);
   }, []);
 
   const handleOnDrop = useCallback(

@@ -17,12 +17,14 @@ import {
   HiddenField,
 } from "~/components/form/fields/field.context";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
-import { useCallback } from "react";
+import { ReactNode, useCallback } from "react";
 
 export function EditBlockForm({
   onSubmit,
   blockConfig,
+  children,
 }: {
+  children?: ReactNode;
   onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
 }) {
@@ -55,10 +57,10 @@ export function EditBlockForm({
       validator={validator}
       defaultValues={blockConfig}
       onSubmit={handleUpdate}
-      className="w-full max-w-md"
+      className="w-full grow flex flex-col h-[60%]"
       noValidate
     >
-      <div className="space-y-4">
+      <div className="space-y-4 grow max-h-full overflow-y-auto">
         <HiddenField name="name" value={blockConfig.name} />
         <HiddenField name="inputs" value={JSON.stringify(blockConfig.inputs)} />
 
@@ -73,12 +75,13 @@ export function EditBlockForm({
             editor: EditorField,
           }}
         />
+
+        {children}
       </div>
-      <div className="mt-6 flex justify-end">
-        <Button type="submit" variant="filled">
-          Confirm
-        </Button>
-      </div>
+
+      <Button size="sm" type="submit" variant="filled" className="mt-6" isFluid>
+        Save changes
+      </Button>
     </ValidatedForm>
   );
 }

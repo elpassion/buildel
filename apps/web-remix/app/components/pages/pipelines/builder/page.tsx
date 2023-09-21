@@ -38,19 +38,23 @@ import { CustomNode, CustomNodeProps } from "./CustomNodes/CustomNode";
 import isEqual from "lodash.isequal";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
-import { RunPipelineButton } from "./RunPipelineButton";
-import { Button } from "@elpassion/taco";
-import { BlockModal, BlockModalHeader } from ".//BlockModal";
 import { EditBlockForm } from "./EditBlockForm";
-import { BlockInputList } from "./BlockInputList";
-import { PipelineSidebar } from "./PipelineSidebar";
+import { PipelineSidebar, PipelineSidebarHeader } from "./PipelineSidebar";
 import { loader } from "./loader";
+import { CreateBlockList } from "./CreateBlockList";
+import { BuilderHeader } from "~/components/pages/pipelines/builder/BuilderHeader";
+import { Button } from "@elpassion/taco";
+import { BlockInputList } from "~/components/pages/pipelines/builder/BlockInputList";
 
 export function PipelineBuilder() {
   const { pipeline, blockTypes } = useLoaderData<typeof loader>();
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const updateFetcher = useFetcher<IPipeline>();
-  const { isModalOpen, openModal, closeModal } = useModal();
+  const {
+    isModalOpen: isSidebarOpen,
+    openModal: openSidebar,
+    closeModal: closeSidebar,
+  } = useModal();
   const [editableBlock, setEditableBlock] = useState<IBlockConfig | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config)
@@ -72,15 +76,18 @@ export function PipelineBuilder() {
     [setNodes]
   );
 
-  const handleEditBlock = useCallback((block: IBlockConfig) => {
-    setEditableBlock(block);
-    openModal();
-  }, []);
+  const handleEditBlock = useCallback(
+    (block: IBlockConfig) => {
+      setEditableBlock(block);
+      openSidebar();
+    },
+    [openSidebar]
+  );
 
   const handleCloseModal = useCallback(() => {
     setEditableBlock(null);
-    closeModal();
-  }, []);
+    closeSidebar();
+  }, [closeSidebar]);
 
   const handleUpdate = useCallback(
     (config: IPipelineConfig) => {
@@ -170,38 +177,14 @@ export function PipelineBuilder() {
     wrapper: reactFlowWrapper,
     onDrop: onBlockCreate,
   });
+
   return (
     <div
       className="relative py-5 h-[calc(100vh_-_100px)] w-full"
       ref={reactFlowWrapper}
     >
       <RunPipelineProvider pipeline={pipeline}>
-        <header className="absolute top-8 left-4 right-4 z-10 flex justify-between">
-          <RunPipelineButton />
-          <Button variant="filled" size="sm" disabled>
-            {updateFetcher.state === "submitting" ? "Saving" : "Up-to-date"}
-          </Button>
-          <BlockModal
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-            header={
-              <BlockModalHeader
-                heading={editableBlock ? "Edit Block" : "Add Block"}
-                description="Blocks are modules within your app that can work simultaneously."
-              />
-            }
-          >
-            {editableBlock && (
-              <>
-                <EditBlockForm
-                  onSubmit={onBlockUpdate}
-                  blockConfig={editableBlock}
-                />
-                <BlockInputList inputs={editableBlock.inputs} />
-              </>
-            )}
-          </BlockModal>
-        </header>
+        <BuilderHeader updateStatus={updateFetcher.state} />
 
         <ReactFlow
           nodes={nodes}
@@ -229,8 +212,36 @@ export function PipelineBuilder() {
           <Controls />
         </ReactFlow>
 
-        <PipelineSidebar blockTypes={blockTypes} />
+        <PipelineSidebar
+          isOpen={!!editableBlock || isSidebarOpen}
+          onClose={handleCloseModal}
+        >
+          {editableBlock ? (
+            <>
+              <PipelineSidebarHeader
+                heading={editableBlock.type}
+                subheading="Open AI’s Large Language Model chat block."
+                onClose={handleCloseModal}
+              />
+              <EditBlockForm
+                onSubmit={onBlockUpdate}
+                blockConfig={editableBlock}
+              >
+                <BlockInputList inputs={editableBlock.inputs} />
+              </EditBlockForm>
+            </>
+          ) : (
+            <CreateBlockList blockTypes={blockTypes} />
+          )}
+        </PipelineSidebar>
       </RunPipelineProvider>
+      <Button
+        size="xs"
+        className="!absolute bottom-10 right-4"
+        onClick={openSidebar}
+      >
+        Create block
+      </Button>
     </div>
   );
 }

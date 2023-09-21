@@ -26,7 +26,7 @@ export function PipelineLayout() {
           <h1 className="text-2xl font-medium text-white">{pipeline.name}</h1>
         }
       />
-      <div className="md:px-10">
+      <div className="px-4 md:px-10">
         <TabGroup activeTab={location.pathname}>
           <div className="bg-neutral-800 flex gap-2 rounded-lg w-fit p-1">
             <FilledTabLink

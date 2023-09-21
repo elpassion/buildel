@@ -166,6 +166,8 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
 
   return (
     <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 pl-2 pr-1">
+      <PageOverlay isShow={showMenu} />
+
       <div ref={menuRef}>
         <button
           onClick={handleOpen}
@@ -190,7 +192,7 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
         <Menu
           hidden={!showMenu}
           activeKey={`${organization.id}`}
-          className="min-w-[248px] absolute z-[20] top-[60px] left-[85%] max-h-[400px] overflow-y-auto"
+          className="min-w-[248px] absolute z-[51] top-[60px] left-[85%] max-h-[400px] overflow-y-auto"
           onClick={handleChangeRoute}
         >
           {organizations.map((org) => {
@@ -198,13 +200,6 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
           })}
         </Menu>
       </div>
-
-      <PageOverlay
-        className={classNames("transition", {
-          "opacity-0 pointer-events-none -z-100": !showMenu,
-          "opacity-1 pointer-events-auto z-100": showMenu,
-        })}
-      />
     </SidebarContentWrapper>
   );
 }
