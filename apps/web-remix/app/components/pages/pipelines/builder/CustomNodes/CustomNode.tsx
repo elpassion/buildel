@@ -15,7 +15,7 @@ export interface CustomNodeProps {
 }
 export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   const { status: runStatus } = useRunPipeline();
-  const { status, isValid } = useRunPipelineNode(data);
+  const { status, isValid, errors } = useRunPipelineNode(data);
 
   const handles = useMemo(() => getBlockHandles(data), [data]);
   const inputsHandles = useMemo(
@@ -59,67 +59,79 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
   }, [data]);
 
   return (
-    <section
-      className={classNames(
-        "min-h-[100px] min-w-[250px] max-w-[300px] break-words rounded bg-neutral-800 drop-shadow-sm transition",
-        { "scale-110": status }
-      )}
-    >
-      <header
+    <>
+      <section
         className={classNames(
-          "flex items-center justify-between p-2 rounded-t",
+          "min-h-[100px] min-w-[250px] max-w-[300px] break-words rounded bg-neutral-800 drop-shadow-sm transition border",
           {
-            "bg-neutral-900": isValid,
-            "bg-red-800": !isValid,
+            "scale-110": status,
+            "border-red-500": !isValid,
+            "border-neutral-900": isValid,
           }
         )}
       >
-        <div className="flex items-center gap-2">
-          <h3 className="text-xs font-medium capitalize text-neutral-50">
-            {startCase(data.type)}
-          </h3>
-          <Badge size="xs" text={data.name} />
-        </div>
-
-        <div className="flex gap-1">
-          {isEditable && (
-            <button
-              onClick={handleEdit}
-              disabled={runStatus !== "idle"}
-              className="h-6 w-6 p-1 hover:bg-neutral-700 rounded-md"
-            >
-              <Icon iconName="settings" className="text-neutral-200" />
-            </button>
+        <header
+          className={classNames(
+            "flex items-center justify-between p-2 rounded-t bg-neutral-900"
           )}
+        >
+          <div className="flex items-center gap-2">
+            <h3 className="text-xs font-medium capitalize text-neutral-50">
+              {startCase(data.type)}
+            </h3>
+            <Badge size="xs" text={data.name} />
+          </div>
 
-          {onDelete && (
-            <button
-              onClick={handleDelete}
-              disabled={runStatus !== "idle"}
-              className="h-6 w-6 p-1 hover:bg-neutral-700 rounded-md"
-            >
-              <Icon iconName="trash" className="text-neutral-200" />
-            </button>
-          )}
+          <div className="flex gap-1">
+            {isEditable && (
+              <button
+                onClick={handleEdit}
+                disabled={runStatus !== "idle"}
+                className="h-6 w-6 p-1 hover:bg-neutral-700 rounded-md"
+              >
+                <Icon iconName="settings" className="text-neutral-200" />
+              </button>
+            )}
+
+            {onDelete && (
+              <button
+                onClick={handleDelete}
+                disabled={runStatus !== "idle"}
+                className="h-6 w-6 p-1 hover:bg-neutral-700 rounded-md"
+              >
+                <Icon iconName="trash" className="text-neutral-200" />
+              </button>
+            )}
+          </div>
+        </header>
+
+        <div className="nodrag p-2">
+          {inputsFields.length > 0 ? (
+            <NodeFieldsForm block={data} fields={inputsFields} />
+          ) : null}
+
+          {outputFields.length > 0 ? (
+            <NodeFieldsOutput fields={outputFields} block={data} />
+          ) : null}
+
+          {inputsHandles.map((handle, index) => (
+            <InputHandle key={handle.id} handle={handle} index={index} />
+          ))}
+          {outputsHandles.map((handle, index) => (
+            <OutputHandle key={handle.id} handle={handle} index={index} />
+          ))}
         </div>
-      </header>
-
-      <div className="nodrag p-2">
-        {inputsFields.length > 0 ? (
-          <NodeFieldsForm block={data} fields={inputsFields} />
-        ) : null}
-
-        {outputFields.length > 0 ? (
-          <NodeFieldsOutput fields={outputFields} block={data} />
-        ) : null}
-
-        {inputsHandles.map((handle, index) => (
-          <InputHandle key={handle.id} handle={handle} index={index} />
-        ))}
-        {outputsHandles.map((handle, index) => (
-          <OutputHandle key={handle.id} handle={handle} index={index} />
-        ))}
-      </div>
-    </section>
+      </section>
+      {errors.length === 0 ? null : (
+        <p className="text-red-500 flex gap-1 items-center mt-2">
+          <Icon iconName="alert-circle" className="text-sm" />
+          <span className="text-xs">
+            {errors.length === 1
+              ? errors[0]
+              : "This block contains problems to fix."}
+          </span>
+        </p>
+      )}
+    </>
   );
 }

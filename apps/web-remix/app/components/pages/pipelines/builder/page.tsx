@@ -207,8 +207,8 @@ export function PipelineBuilder() {
           >
             <Background
               variant={BackgroundVariant.Dots}
-              gap={25}
-              color="#fff"
+              gap={35}
+              color="#aaa"
               className="bg-black rounded-lg"
             />
             <Controls />

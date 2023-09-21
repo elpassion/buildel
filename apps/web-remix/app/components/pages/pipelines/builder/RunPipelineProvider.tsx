@@ -8,6 +8,7 @@ import React, {
 import { usePipelineRun } from "./usePipelineRun";
 import { IBlockConfig, IPipeline } from "../pipeline.types";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
+import { SafeParseReturnType, ZodError } from "zod";
 
 export interface IEvent {
   block: string;
@@ -20,7 +21,10 @@ export interface IEvent {
 interface IRunPipelineContext {
   events: IEvent[];
   blockStatuses: Record<string, boolean>;
-  blockValidations: Record<string, boolean>;
+  blockValidations: Record<
+    string,
+    { success: true } | { success: false; error: ZodError }
+  >;
   startRun: () => void;
   stopRun: () => void;
   push: (topic: string, payload: any) => void;
@@ -80,13 +84,14 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
           name: block.name,
           opts: block.opts,
           inputs: block.inputs,
-        }).success,
+        }),
       };
-    }, {});
+    }, {} as Record<string, SafeParseReturnType<unknown, unknown>>);
   }, [pipeline]);
 
   const isValid = useMemo(() => {
-    return Object.values(blockValidations).every((v) => v);
+    //@ts-ignore
+    return Object.values(blockValidations).every((v) => v.success);
   }, [blockValidations]);
 
   // // @ts-ignore
@@ -156,17 +161,35 @@ export const useRunPipelineNode = (block: IBlockConfig) => {
   );
 
   const isValid = useMemo(() => {
-    return ctx.blockValidations[blockName] ?? false;
+    return ctx.blockValidations[blockName].success ?? false;
+  }, [blockName, ctx.blockValidations]);
+
+  const errors = useMemo(() => {
+    const validation = ctx.blockValidations[blockName];
+    if (validation.success) {
+      return [];
+    } else {
+      return validation.error.errors.map((err) => err.message);
+    }
   }, [blockName, ctx.blockValidations]);
 
   return useMemo(
     () => ({
       status,
+      isValid,
       events: filteredEvents,
       push: ctx.push,
       clearEvents: ctx.clearEvents,
-      isValid,
+      errors,
     }),
-    [filteredEvents, ctx.push, ctx.clearEvents, status, isValid]
+    [
+      status,
+      isValid,
+      filteredEvents,
+      ctx.push,
+      ctx.clearEvents,
+      ctx.blockValidations,
+      blockName,
+    ]
   );
 };
