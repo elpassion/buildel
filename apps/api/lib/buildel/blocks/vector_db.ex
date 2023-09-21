@@ -113,8 +113,14 @@ defmodule Buildel.Blocks.VectorDB do
         chunk_size: 1000,
         chunk_overlap: 200
       })
+      |> Enum.map(fn document ->
+        %{
+          document: document,
+          metadata: %{memory_id: "TODO: FIX", chunk_id: UUID.uuid4()}
+        }
+      end)
 
-    Buildel.VectorDB.add(state[:collection], documents, metadata: %{}, api_key: state[:api_key])
+    Buildel.VectorDB.add(state[:collection], documents, api_key: state[:api_key])
     state = send_stream_stop(state)
     {:noreply, state}
   end

@@ -8,17 +8,25 @@ defmodule Buildel.VectorDB do
     end
   end
 
-  def add(collection_name, documents, metadata: metadata, api_key: api_key) do
+  def add(collection_name, documents, api_key: api_key) do
+    inputs = documents |> Enum.map(&Map.get(&1, :document))
+
+    ids =
+      documents
+      |> Enum.map(&get_in(&1, [:metadata, :chunk_id]))
+
     {:ok, embeddings_list} =
-      embeddings().get_embeddings(inputs: documents, api_key: api_key)
+      embeddings().get_embeddings(
+        inputs: inputs,
+        api_key: api_key
+      )
 
     {:ok, collection} = adapter().get_collection(collection_name)
 
     adapter().add(collection, %{
       embeddings: embeddings_list,
-      documents:
-        documents |> Enum.map(fn document -> %{document: document, metadata: metadata} end),
-      ids: Enum.map(1..Enum.count(documents), fn _ -> UUID.uuid4() end)
+      documents: documents,
+      ids: ids
     })
 
     {:ok, collection}

@@ -105,7 +105,7 @@ export function FileUpload({
         console.error(err);
       }
     },
-    [onRemove]
+    [onRemove, fileList]
   );
 
   const handleSelectFiles = useCallback(() => {

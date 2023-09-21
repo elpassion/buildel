@@ -61,6 +61,14 @@ config :phoenix, :json_library, Jason
 
 config :tesla, adapter: Tesla.Adapter.Hackney
 
+config :exla, :clients,
+  tpu: [platform: :tpu],
+  cuda: [platform: :cuda],
+  rocm: [platform: :rocm],
+  host: [platform: :host]
+
+config :nx, :default_backend, {EXLA.Backend, client: :host}
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

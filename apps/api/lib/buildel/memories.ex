@@ -38,18 +38,24 @@ defmodule Buildel.Memories do
          {:ok, _} <- Buildel.SearchDB.init(organization_collection_name),
          documents <-
            Buildel.Splitters.recursive_character_text_split(file, %{
-             chunk_size: 1000,
-             chunk_overlap: 200
+             chunk_size: 1500,
+             chunk_overlap: 500
            }),
+         documents <-
+           documents
+           |> Enum.map(fn document ->
+             %{
+               document: document,
+               metadata:
+                 metadata |> Map.put(:memory_id, memory.id) |> Map.put(:chunk_id, UUID.uuid4())
+             }
+           end),
          {:ok, _} <-
            Buildel.VectorDB.add(organization_collection_name, documents,
-             metadata: metadata |> Map.put(:memory_id, memory.id),
              api_key: System.get_env("OPENAI_API_KEY", "key")
            ),
          {:ok, _} <-
-           Buildel.SearchDB.add(organization_collection_name, documents,
-             metadata: metadata |> Map.put(:memory_id, memory.id)
-           ) do
+           Buildel.SearchDB.add(organization_collection_name, documents) do
       {:ok, memory}
     end
   end

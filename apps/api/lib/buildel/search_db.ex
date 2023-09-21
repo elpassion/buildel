@@ -7,10 +7,10 @@ defmodule Buildel.SearchDB do
     end
   end
 
-  def add(collection_name, documents, metadata: metadata) do
+  def add(collection_name, documents) do
     {:ok, collection} = adapter().get_collection(collection_name)
 
-    adapter().add(collection, %{documents: documents, metadata: metadata})
+    adapter().add(collection, documents)
 
     {:ok, collection}
   end
@@ -66,7 +66,8 @@ defmodule Buildel.SearchDB.LNXAdapter do
               text: %{type: "text"},
               collection_name: %{type: "string"},
               file_name: %{type: "string"},
-              memory_id: %{type: "i64"}
+              memory_id: %{type: "string"},
+              chunk_id: %{type: "string"}
             }
           }
         }),
@@ -86,17 +87,18 @@ defmodule Buildel.SearchDB.LNXAdapter do
   end
 
   @impl true
-  def add(collection, %{documents: documents, metadata: metadata}) do
+  def add(collection, documents) do
     HTTPoison.post!(
       "#{url()}/indexes/#{@index_name}/documents",
       Jason.encode!(
         documents
         |> Enum.map(fn document ->
           %{
-            text: document,
+            text: document.document,
             collection_name: collection.name,
-            file_name: metadata.file_name,
-            memory_id: metadata.memory_id
+            file_name: document.metadata.file_name,
+            memory_id: document.metadata.memory_id |> Integer.to_string(),
+            chunk_id: document.metadata.chunk_id
           }
         end)
       ),
@@ -116,8 +118,12 @@ defmodule Buildel.SearchDB.LNXAdapter do
   def delete_all_with_metadata(collection, metadata) do
     filters =
       metadata
-      |> Enum.map(fn {key, value} ->
-        %{term: %{ctx: value, fields: [key]}, occur: "must"}
+      |> Enum.map(fn
+        {key, value} when is_integer(value) ->
+          %{term: %{ctx: value |> Integer.to_string(), fields: [key]}, occur: "must"}
+
+        {key, value} ->
+          %{term: %{ctx: value, fields: [key]}, occur: "must"}
       end)
 
     HTTPoison.request!(
@@ -148,16 +154,29 @@ defmodule Buildel.SearchDB.LNXAdapter do
         "#{url()}/indexes/#{@index_name}/search",
         Jason.encode!(%{
           query: [
-            %{normal: %{ctx: query}},
+            %{normal: %{ctx: query, fields: ["text"]}},
             %{term: %{ctx: collection.name, fields: ["collection_name"]}, occur: "must"}
-          ]
+          ],
+          limit: 5
         }),
         headers()
       )
 
     response = Jason.decode!(body)
 
-    {:ok, response["data"]["hits"]}
+    {:ok,
+     response["data"]["hits"]
+     |> Enum.map(fn %{"doc" => doc} ->
+       %{
+         "document" => doc["text"],
+         "metadata" => %{
+           "file_name" => doc["file_name"],
+           "memory_id" => doc["memory_id"],
+           "chunk_id" => doc["chunk_id"],
+           "collection_name" => doc["collection_name"]
+         }
+       }
+     end)}
   end
 
   defp url() do
