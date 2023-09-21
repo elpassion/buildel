@@ -92,7 +92,7 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
            ) do
       {:ok, result}
     else
-      status ->
+      _status ->
         :error
     end
   end

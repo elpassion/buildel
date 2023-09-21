@@ -15,6 +15,7 @@ defmodule Buildel.Blocks.Chat do
   def options() do
     %{
       type: "chat",
+      groups: ["text", "llms"],
       inputs: [text_input()],
       outputs: [text_output("output"), sentences_output(), text_output("message_output")],
       schema: schema()

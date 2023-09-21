@@ -12,6 +12,7 @@ defmodule Buildel.Blocks.TextOutput do
   def options() do
     %{
       type: "text_output",
+      groups: ["text", "inputs / outputs"],
       inputs: [text_input()],
       outputs: [text_output("output", true)],
       schema: schema()

@@ -19,7 +19,7 @@ defmodule Buildel.Application do
       # Start the Endpoint (http/https)
       BuildelWeb.Endpoint,
       # Start a worker by calling: Buildel.Worker.start_link(arg)
-      Buildel.Pipelines.Runner,
+      Buildel.Pipelines.Runner
       # Start the python poolboy
       # :poolboy.child_spec(:worker, python_poolboy_config())
       # Nx.Serving
@@ -44,12 +44,12 @@ defmodule Buildel.Application do
     :ok
   end
 
-  defp python_poolboy_config() do
-    [
-      {:name, {:local, :python_worker}},
-      {:worker_module, Buildel.PythonWorker},
-      {:size, 2},
-      {:max_overflow, 0}
-    ]
-  end
+  # defp python_poolboy_config() do
+  #   [
+  #     {:name, {:local, :python_worker}},
+  #     {:worker_module, Buildel.PythonWorker},
+  #     {:size, 2},
+  #     {:max_overflow, 0}
+  #   ]
+  # end
 end

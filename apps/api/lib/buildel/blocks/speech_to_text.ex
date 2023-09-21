@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.SpeechToText do
   def options() do
     %{
       type: "speech_to_text",
+      groups: ["audio", "text"],
       inputs: [audio_input()],
       outputs: [text_output()],
       schema: schema()

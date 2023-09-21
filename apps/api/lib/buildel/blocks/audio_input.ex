@@ -12,6 +12,7 @@ defmodule Buildel.Blocks.AudioInput do
   def options() do
     %{
       type: "audio_input",
+      groups: ["audio", "inputs / outputs"],
       inputs: [audio_input("input", true)],
       outputs: [audio_output()],
       schema: schema()

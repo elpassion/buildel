@@ -13,6 +13,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   def options() do
     %{
       type: "document_search",
+      groups: ["file", "memory"],
       inputs: [file_input("files", true), text_input("query")],
       outputs: [text_output()],
       schema: schema()

@@ -12,6 +12,7 @@ defmodule Buildel.Blocks.FileInput do
   def options() do
     %{
       type: "file_input",
+      groups: ["file", "inputs / outputs"],
       inputs: [file_input("input", true)],
       outputs: [file_output()],
       schema: schema()

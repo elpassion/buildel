@@ -13,6 +13,7 @@ defmodule Buildel.Blocks.CollectAllText do
   def options() do
     %{
       type: "collect_all_text",
+      groups: ["text", "utils"],
       inputs: [text_input()],
       outputs: [text_output()],
       schema: schema()

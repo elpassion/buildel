@@ -1,0 +1,49 @@
+# fly.toml app configuration file generated for buildel-vectordb on 2023-09-01T17:36:51+02:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "buildel-searchdb"
+primary_region = "waw"
+kill_signal = "SIGTERM"
+kill_timeout = "5m0s"
+
+[build]
+
+[env]
+
+[[mounts]]
+  source = "search_data"
+  destination = "/data"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 6333
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 3
+
+  [[services.ports]]
+    port = 6333
+    handlers = ["http"]
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    grace_period = "10s"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 6334
+
+  [[services.ports]]
+    port = 6334
+    [services.ports.tls_options]
+      alpn = ["h2"]
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    grace_period = "10s"
+
+[metrics]
+  port = 6333
+  path = "/metrics"

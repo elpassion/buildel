@@ -13,6 +13,7 @@ defmodule Buildel.Blocks.VectorDB do
   def options() do
     %{
       type: "vector_db",
+      groups: ["file", "memory"],
       inputs: [file_input("files"), text_input("query")],
       outputs: [text_output()],
       schema: schema()

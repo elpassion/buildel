@@ -14,6 +14,7 @@ defmodule Buildel.Blocks.TakeLatest do
   def options() do
     %{
       type: "take_latest",
+      groups: ["text", "utils"],
       inputs: [text_input()],
       outputs: [text_output()],
       schema: schema()

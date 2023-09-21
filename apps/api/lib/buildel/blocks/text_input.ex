@@ -12,6 +12,7 @@ defmodule Buildel.Blocks.TextInput do
   def options() do
     %{
       type: "text_input",
+      groups: ["text", "inputs / outputs"],
       inputs: [text_input("input", true)],
       outputs: [text_output()],
       schema: schema()

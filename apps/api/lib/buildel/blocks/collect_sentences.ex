@@ -14,6 +14,7 @@ defmodule Buildel.Blocks.CollectSentences do
   def options() do
     %{
       type: "collect_sentences",
+      groups: ["text", "utils"],
       inputs: [text_input()],
       outputs: [sentences_output()],
       schema: schema()

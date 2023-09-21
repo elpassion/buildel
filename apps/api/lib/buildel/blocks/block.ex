@@ -174,6 +174,7 @@ end
 defmodule Buildel.Blocks.BlockBehaviour do
   @callback options() :: %{
               type: String.t(),
+              groups: list(String.t()),
               inputs: [%{name: String.t(), type: String.t(), public: boolean()}],
               outputs: [%{name: String.t(), type: String.t(), public: boolean()}],
               schema: map()
