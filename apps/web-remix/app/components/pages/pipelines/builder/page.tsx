@@ -44,7 +44,7 @@ import { PipelineSidebar, PipelineSidebarHeader } from "./PipelineSidebar";
 import { loader } from "./loader";
 import { CreateBlockList } from "./CreateBlockList";
 import { BuilderHeader } from "~/components/pages/pipelines/builder/BuilderHeader";
-import { Button } from "@elpassion/taco";
+import { Button, Icon } from "@elpassion/taco";
 import { BlockInputList } from "~/components/pages/pipelines/builder/BlockInputList";
 
 export function PipelineBuilder() {
@@ -248,11 +248,12 @@ export function PipelineBuilder() {
         </ReactFlowProvider>
       </RunPipelineProvider>
       <Button
-        size="xs"
-        className="!absolute bottom-10 right-4"
+        size="sm"
+        className="!absolute bottom-8 right-4 gap-2"
         onClick={openSidebar}
+        rightIcon={<Icon iconName="plus-circle" />}
       >
-        Create block
+        Add block
       </Button>
     </div>
   );

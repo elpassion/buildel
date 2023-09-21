@@ -1,6 +1,7 @@
 import React from "react";
-import { Button } from "@elpassion/taco";
+import { Button, Icon } from "@elpassion/taco";
 import { useRunPipeline } from "./RunPipelineProvider";
+import { PlayFilled } from "~/icons/PlayFilled";
 
 export const RunPipelineButton: React.FC = () => {
   const { status, stopRun, startRun, isValid } = useRunPipeline();
@@ -11,8 +12,11 @@ export const RunPipelineButton: React.FC = () => {
         onClick={status === "idle" ? startRun : stopRun}
         disabled={status === "starting" || !isValid}
         size="sm"
+        rightIcon={
+          status === "idle" ? <PlayFilled /> : <Icon iconName="stop-circle" />
+        }
       >
-        {status === "idle" ? "Start" : "Stop"}
+        {status === "idle" ? "Run" : "Stop"}
       </Button>
       {!isValid && (
         <span className="text-xs text-red-500">Invalid pipeline</span>
