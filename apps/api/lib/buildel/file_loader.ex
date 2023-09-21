@@ -43,10 +43,11 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
 
   @impl true
   def load_file(path, file_metadata \\ %{}) do
-    {:ok, result} = case request(path, file_metadata) do
-      {:ok, result} -> {:ok, result}
-      :error -> request(path, file_metadata |> Map.put(:encoding, "utf_8"))
-    end
+    {:ok, result} =
+      case request(path, file_metadata) do
+        {:ok, result} -> {:ok, result}
+        :error -> request(path, file_metadata |> Map.put(:encoding, "utf_8"))
+      end
 
     partitioned_file = Jason.decode!(result)
 
@@ -67,28 +68,31 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
         type -> ["Content-Type": type]
       end
 
-    file_data = {:file, path, {"form-data", [name: "files[]", filename: Path.basename(path)]}, options}
+    file_data =
+      {:file, path, {"form-data", [name: "files[]", filename: Path.basename(path)]}, options}
+
     chunking_data = {"chunking_strategy", "by_title"}
 
     form_data = [file_data, chunking_data]
-    form_data = if file_metadata |> Map.has_key?(:encoding) do
-      [{"encoding", file_metadata.encoding} | form_data]
-    else
-      form_data
-    end
+
+    form_data =
+      if file_metadata |> Map.has_key?(:encoding) do
+        [{"encoding", file_metadata.encoding} | form_data]
+      else
+        form_data
+      end
 
     with {:ok, %{body: result, status_code: 200}} <-
-      HTTPoison.post(
-        "https://api.unstructured.io/general/v0/general",
-        {:multipart, form_data},
-        headers,
-        timeout: 60_000,
-        recv_timeout: 60_000
-      ) do
-        {:ok, result}
+           HTTPoison.post(
+             "https://api.unstructured.io/general/v0/general",
+             {:multipart, form_data},
+             headers,
+             timeout: 60_000,
+             recv_timeout: 60_000
+           ) do
+      {:ok, result}
     else
       status ->
-        IO.inspect(status)
         :error
     end
   end

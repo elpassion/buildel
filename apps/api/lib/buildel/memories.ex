@@ -35,6 +35,7 @@ defmodule Buildel.Memories do
            )
            |> Buildel.Repo.insert(),
          {:ok, _} <- Buildel.VectorDB.init(organization_collection_name),
+         {:ok, _} <- Buildel.SearchDB.init(organization_collection_name),
          documents <-
            Buildel.Splitters.recursive_character_text_split(file, %{
              chunk_size: 1000,
@@ -44,6 +45,10 @@ defmodule Buildel.Memories do
            Buildel.VectorDB.add(organization_collection_name, documents,
              metadata: metadata |> Map.put(:memory_id, memory.id),
              api_key: System.get_env("OPENAI_API_KEY", "key")
+           ),
+         {:ok, _} <-
+           Buildel.SearchDB.add(organization_collection_name, documents,
+             metadata: metadata |> Map.put(:memory_id, memory.id)
            ) do
       {:ok, memory}
     end
@@ -73,6 +78,8 @@ defmodule Buildel.Memories do
 
     with :ok <-
            Buildel.VectorDB.delete_all_with_metadata(collection_name, %{memory_id: memory.id}),
+         :ok <-
+           Buildel.SearchDB.delete_all_with_metadata(collection_name, %{memory_id: memory.id}),
          {:ok, _} <- Buildel.Repo.delete(memory) do
       {:ok, memory}
     end
