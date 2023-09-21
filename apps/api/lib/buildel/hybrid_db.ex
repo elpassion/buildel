@@ -1,13 +1,24 @@
 defmodule Buildel.HybridDB do
+  require Logger
+
   def query(collection_name, query) do
-    search_results =
-      search_db().query(collection_name, query)
+    {time, search_results} = :timer.tc(fn -> search_db().query(collection_name, query) end)
+    Logger.debug("Search took #{time / 1_000_000} seconds")
 
-    vector_results =
-      vector_db().query(collection_name, query, api_key: api_key())
+    {time, vector_results} =
+      :timer.tc(fn -> vector_db().query(collection_name, query, api_key: api_key()) end)
 
-    join_results(search_results, vector_results)
-    |> sort_results_by_query(query)
+    Logger.debug("Vector search took #{time / 1_000_000} seconds")
+
+    {time, sort_results} =
+      :timer.tc(fn ->
+        join_results(search_results, vector_results)
+        |> sort_results_by_query(query)
+      end)
+
+    Logger.debug("Sorting took #{time / 1_000_000} seconds")
+
+    sort_results
   end
 
   defp sort_results_by_query(results, query) do

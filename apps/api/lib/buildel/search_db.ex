@@ -171,7 +171,7 @@ defmodule Buildel.SearchDB.LNXAdapter do
          "document" => doc["text"],
          "metadata" => %{
            "file_name" => doc["file_name"],
-           "memory_id" => doc["memory_id"],
+           "memory_id" => doc["memory_id"] |> String.to_integer(),
            "chunk_id" => doc["chunk_id"],
            "collection_name" => doc["collection_name"]
          }
