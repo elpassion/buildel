@@ -15,7 +15,7 @@ export const FilledTabLink: React.FC<TabButtonProps & RemixLinkProps> = ({
   return (
     <Link
       className={classNames(
-        "text-xs rounded-lg text-neutral-100 py-1 px-3",
+        "text-xs rounded-lg text-neutral-100 py-1 px-3 hover:bg-neutral-900",
         { "bg-neutral-900": activeTabId === tabId },
         className
       )}

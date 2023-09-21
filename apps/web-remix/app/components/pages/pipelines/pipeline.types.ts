@@ -20,6 +20,7 @@ export interface IEdge {
   sourceHandle: string;
   target: string;
   targetHandle: string;
+  type: "base";
 }
 
 export interface IField {

@@ -36,6 +36,7 @@ export function getEdges(pipeline: IPipelineConfig): IEdge[] {
         sourceHandle: sourceHandle,
         target: block.name,
         targetHandle: targetHandle,
+        type: "base",
       };
     })
   );

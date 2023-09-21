@@ -140,6 +140,20 @@ export const useRunPipeline = () => {
   return ctx;
 };
 
+export const useRunPipelineEdge = () => {
+  const ctx = useContext(RunPipelineContext);
+
+  if (!ctx) {
+    throw new Error("useRunPipeline must be used within RunPipelineProvider");
+  }
+
+  const value = useMemo(() => {
+    return { status: ctx.status };
+  }, [ctx.status]);
+
+  return value;
+};
+
 export const useRunPipelineNode = (block: IBlockConfig) => {
   const blockName = block.name;
   const ctx = useContext(RunPipelineContext);

@@ -46,6 +46,7 @@ import { CreateBlockList } from "./CreateBlockList";
 import { BuilderHeader } from "~/components/pages/pipelines/builder/BuilderHeader";
 import { Button, Icon } from "@elpassion/taco";
 import { BlockInputList } from "~/components/pages/pipelines/builder/BlockInputList";
+import { CustomEdge } from "~/components/pages/pipelines/builder/CustomEdges/CustomEdge";
 
 export function PipelineBuilder() {
   const { pipeline, blockTypes } = useLoaderData<typeof loader>();
@@ -156,6 +157,10 @@ export function PipelineBuilder() {
     );
   }, [PipelineNode, blockTypes.length]);
 
+  const edgeTypes = useMemo(() => {
+    return { base: CustomEdge };
+  }, []);
+
   useEffect(() => {
     // @ts-ignore
     const config = toPipelineConfig(debouncedState.nodes, debouncedState.edges);
@@ -195,6 +200,7 @@ export function PipelineBuilder() {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             onInit={onInit}
             onDrop={onDrop}
             onDragOver={onDragOver}
