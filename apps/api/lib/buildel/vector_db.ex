@@ -52,24 +52,25 @@ defmodule Buildel.VectorDB do
   end
 end
 
-defmodule Buildel.VectorDB.VectorDBAdapter do
+defmodule Buildel.VectorDB.VectorDBAdapterBehaviour do
   @callback get_collection(String.t()) :: {:ok, map()}
   @callback create_collection(String.t(), map()) :: {:ok, map()}
   @callback delete_all_with_metadata(map(), map()) :: :ok
   @callback add(map(), map()) :: :ok
+  @callback query(map(), map()) :: {:ok, list()}
 end
 
 defmodule Buildel.VectorDB.QdrantAdapter do
-  @behaviour Buildel.VectorDB.VectorDBAdapter
+  @behaviour Buildel.VectorDB.VectorDBAdapterBehaviour
 
-  @impl Buildel.VectorDB.VectorDBAdapter
+  @impl Buildel.VectorDB.VectorDBAdapterBehaviour
   def get_collection(collection_name) do
     {:ok, _} = Qdrant.collection_info(collection_name)
 
     {:ok, %{name: collection_name}}
   end
 
-  @impl Buildel.VectorDB.VectorDBAdapter
+  @impl Buildel.VectorDB.VectorDBAdapterBehaviour
   def create_collection(collection_name, opts \\ %{}) do
     opts = Map.merge(%{size: 1536, distance: "Cosine"}, opts)
 
@@ -82,7 +83,7 @@ defmodule Buildel.VectorDB.QdrantAdapter do
     end
   end
 
-  @impl Buildel.VectorDB.VectorDBAdapter
+  @impl Buildel.VectorDB.VectorDBAdapterBehaviour
   def add(collection, %{embeddings: embeddings, documents: documents, ids: ids}) do
     with {:ok, %{status: 200}} <-
            Qdrant.upsert_point(collection.name, %{
@@ -98,7 +99,7 @@ defmodule Buildel.VectorDB.QdrantAdapter do
     end
   end
 
-  @impl Buildel.VectorDB.VectorDBAdapter
+  @impl Buildel.VectorDB.VectorDBAdapterBehaviour
   def delete_all_with_metadata(collection, metadata) do
     filter = %{
       must:
@@ -114,6 +115,7 @@ defmodule Buildel.VectorDB.QdrantAdapter do
     end
   end
 
+  @impl Buildel.VectorDB.VectorDBAdapterBehaviour
   def query(collection, %{query_embeddings: query_embeddings}) do
     with {:ok, %{status: 200, body: body}} <-
            Qdrant.search_points(collection.name, %{
@@ -124,14 +126,7 @@ defmodule Buildel.VectorDB.QdrantAdapter do
       {:ok,
        body
        |> get_in(["result"])
-       |> Enum.map(fn %{
-                        "payload" => %{
-                          "document" => document,
-                          "metadata" => %{"file_name" => filename}
-                        }
-                      } ->
-         "File: #{filename}\n\n#{document |> String.trim()}"
-       end)}
+       |> Enum.map(& &1["payload"])}
     else
       {:error, %{status: status}} -> {:error, status}
     end
