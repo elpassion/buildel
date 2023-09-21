@@ -21,6 +21,7 @@ import ReactFlow, {
   BackgroundVariant,
   Connection,
   Controls,
+  ReactFlowProvider,
   useEdgesState,
   useNodesState,
 } from "reactflow";
@@ -184,56 +185,67 @@ export function PipelineBuilder() {
       ref={reactFlowWrapper}
     >
       <RunPipelineProvider pipeline={pipeline}>
-        <BuilderHeader updateStatus={updateFetcher.state} />
+        <ReactFlowProvider>
+          <BuilderHeader updateStatus={updateFetcher.state} />
 
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          nodeTypes={nodeTypes}
-          onInit={onInit}
-          onDrop={onDrop}
-          onDragOver={onDragOver}
-          isValidConnection={handleIsValidConnection}
-          fitViewOptions={{
-            minZoom: 0.5,
-            maxZoom: 1,
-          }}
-          fitView
-        >
-          <Background
-            variant={BackgroundVariant.Dots}
-            gap={25}
-            color="#fff"
-            className="bg-black rounded-lg"
-          />
-          <Controls />
-        </ReactFlow>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            nodeTypes={nodeTypes}
+            onInit={onInit}
+            onDrop={onDrop}
+            onDragOver={onDragOver}
+            isValidConnection={handleIsValidConnection}
+            fitViewOptions={{
+              minZoom: 0.5,
+              maxZoom: 1,
+            }}
+            fitView
+          >
+            <Background
+              variant={BackgroundVariant.Dots}
+              gap={25}
+              color="#fff"
+              className="bg-black rounded-lg"
+            />
+            <Controls />
+          </ReactFlow>
 
-        <PipelineSidebar
-          isOpen={!!editableBlock || isSidebarOpen}
-          onClose={handleCloseModal}
-        >
-          {editableBlock ? (
-            <>
-              <PipelineSidebarHeader
-                heading={editableBlock.type}
-                subheading="Open AI’s Large Language Model chat block."
-                onClose={handleCloseModal}
-              />
-              <EditBlockForm
-                onSubmit={onBlockUpdate}
-                blockConfig={editableBlock}
-              >
-                <BlockInputList inputs={editableBlock.inputs} />
-              </EditBlockForm>
-            </>
-          ) : (
-            <CreateBlockList blockTypes={blockTypes} />
-          )}
-        </PipelineSidebar>
+          <PipelineSidebar
+            isOpen={!!editableBlock || isSidebarOpen}
+            onClose={handleCloseModal}
+          >
+            {editableBlock ? (
+              <>
+                <PipelineSidebarHeader
+                  heading={editableBlock.type}
+                  subheading="Open AI’s Large Language Model chat block."
+                  onClose={handleCloseModal}
+                />
+                <EditBlockForm
+                  onSubmit={onBlockUpdate}
+                  blockConfig={editableBlock}
+                >
+                  <BlockInputList inputs={editableBlock.inputs} />
+                </EditBlockForm>
+              </>
+            ) : (
+              <>
+                <PipelineSidebarHeader
+                  heading="Add a new block"
+                  onClose={handleCloseModal}
+                />
+                <CreateBlockList
+                  blockTypes={blockTypes}
+                  onCreate={onBlockCreate}
+                />
+              </>
+            )}
+          </PipelineSidebar>
+        </ReactFlowProvider>
       </RunPipelineProvider>
       <Button
         size="xs"

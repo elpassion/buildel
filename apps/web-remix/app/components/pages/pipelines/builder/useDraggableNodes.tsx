@@ -14,7 +14,6 @@ export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {
   const handleOnDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
-    console.log(event);
   }, []);
 
   const handleOnDrop = useCallback(
@@ -33,7 +32,7 @@ export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
-
+      console.log(position);
       //name is set higher
       const newNode = {
         name: "",
