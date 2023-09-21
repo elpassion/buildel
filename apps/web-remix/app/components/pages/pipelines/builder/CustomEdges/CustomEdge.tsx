@@ -51,8 +51,8 @@ export function CustomEdge({
       markerEnd={markerEnd}
       style={{
         ...style,
-        strokeWidth: "1.5",
-        stroke: selected ? "#DE8411" : "#bdbdbc",
+        strokeWidth: "1",
+        stroke: selected ? "#DE8411" : "#fff",
         ...statusStyles,
       }}
     />
