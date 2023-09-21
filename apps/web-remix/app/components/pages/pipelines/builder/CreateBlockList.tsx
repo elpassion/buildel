@@ -49,7 +49,7 @@ export const CreateBlockList: React.FC<CreateBlockListProps> = ({
         <li
           key={block.type}
           className={classNames(
-            "group min-w-[150px] cursor-grab rounded-lg bg-neutral-800 py-2 pl-4 pr-2 text-neutral-100 flex justify-between items-center",
+            "group min-w-[150px] cursor-grab rounded-lg bg-neutral-800 py-2 pl-4 pr-2 text-white flex justify-between items-center",
             {
               "opacity-50": runStatus !== "idle",
             }
