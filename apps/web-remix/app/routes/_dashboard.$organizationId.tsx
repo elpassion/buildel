@@ -1,4 +1,10 @@
-import { useCallback, useRef, useState } from "react";
+import {
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useRef,
+  useState,
+} from "react";
 import invariant from "tiny-invariant";
 import classNames from "classnames";
 import Modal from "react-modal";
@@ -7,6 +13,7 @@ import { MenuInfo } from "rc-menu/es/interface";
 import { Avatar, Icon, IconButton, Sidebar } from "@elpassion/taco";
 import { LoaderArgs, json } from "@remix-run/node";
 import {
+  NavLink,
   Outlet,
   useFetcher,
   useLoaderData,
@@ -19,9 +26,8 @@ import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
 import { Menu } from "~/components/menu/Menu";
 import { MenuItem } from "~/components/menu/MenuItem";
-import { SidebarContentWrapper } from "~/components/sidebar/SidebarContentWrapper";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
-import { SidebarLink } from "~/components/sidebar/SidebarLink";
+import { RemixNavLinkProps } from "@remix-run/react/dist/components";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: LoaderArgs) {
@@ -166,7 +172,10 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
 
   return (
     <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 pl-2 pr-1">
-      <PageOverlay isShow={showMenu} />
+      <PageOverlay
+        isShow={showMenu}
+        className={classNames({ "!z-[20]": showMenu })}
+      />
 
       <div ref={menuRef}>
         <button
@@ -231,5 +240,75 @@ function LogoutButton() {
         logout.submit({}, { method: "DELETE", action: "/logout" });
       }}
     />
+  );
+}
+
+type SidebarLinkProps = RemixNavLinkProps &
+  Omit<SidebarMenuItemProps, "isActive">;
+export function SidebarLink({
+  icon,
+  text,
+  onlyIcon,
+  ...props
+}: SidebarLinkProps) {
+  return (
+    <NavLink {...props}>
+      {({ isActive }) => (
+        <SidebarMenuItem
+          icon={icon}
+          text={text}
+          isActive={isActive}
+          onlyIcon={onlyIcon}
+        />
+      )}
+    </NavLink>
+  );
+}
+
+export interface SidebarMenuItemProps {
+  text?: string;
+  isActive?: boolean;
+  onlyIcon?: boolean;
+  icon: ReactNode;
+}
+export function SidebarMenuItem({
+  text,
+  icon,
+  isActive,
+  onlyIcon,
+}: SidebarMenuItemProps) {
+  return (
+    <div
+      className={classNames(
+        "flex items-center space-x-2 p-2  rounded-lg bg-transparent text-neutral-100 hover:bg-neutral-700",
+        {
+          "bg-neutral-700": isActive,
+          "w-full": !onlyIcon,
+          "w-9 h-9": onlyIcon,
+        }
+      )}
+    >
+      {icon}
+
+      {text && !onlyIcon && (
+        <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">
+          {text}
+        </span>
+      )}
+    </div>
+  );
+}
+
+interface SidebarContentWrapperProps extends PropsWithChildren {
+  className?: string;
+}
+export function SidebarContentWrapper({
+  children,
+  className,
+}: SidebarContentWrapperProps) {
+  return (
+    <div className={classNames("flex flex-col px-[10px]", className)}>
+      {children}
+    </div>
   );
 }

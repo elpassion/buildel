@@ -34,8 +34,8 @@ export function PageOverlay({
       className={classNames(
         "fixed top-0 left-0 right-0 bottom-0 bg-black/80 transition",
         {
-          "opacity-0 pointer-events-none -z-[20]": !isShow,
-          "opacity-1 pointer-events-auto z-[20]": isShow,
+          "opacity-0 pointer-events-none -z-[40]": !isShow,
+          "opacity-1 pointer-events-auto z-[40]": isShow,
         },
         className
       )}

@@ -40,13 +40,16 @@ import isEqual from "lodash.isequal";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { EditBlockForm } from "./EditBlockForm";
-import { PipelineSidebar, PipelineSidebarHeader } from "./PipelineSidebar";
 import { loader } from "./loader";
 import { CreateBlockList } from "./CreateBlockList";
-import { BuilderHeader } from "~/components/pages/pipelines/builder/BuilderHeader";
+import { BuilderHeader } from "./BuilderHeader";
 import { Button, Icon } from "@elpassion/taco";
-import { BlockInputList } from "~/components/pages/pipelines/builder/BlockInputList";
-import { CustomEdge } from "~/components/pages/pipelines/builder/CustomEdges/CustomEdge";
+import { BlockInputList } from "./BlockInputList";
+import { CustomEdge } from "./CustomEdges/CustomEdge";
+import {
+  ActionSidebar,
+  ActionSidebarHeader,
+} from "~/components/sidebar/ActionSidebar";
 
 export function PipelineBuilder() {
   const { pipeline, blockTypes } = useLoaderData<typeof loader>();
@@ -220,13 +223,13 @@ export function PipelineBuilder() {
             <Controls />
           </ReactFlow>
 
-          <PipelineSidebar
+          <ActionSidebar
             isOpen={!!editableBlock || isSidebarOpen}
             onClose={handleCloseModal}
           >
             {editableBlock ? (
               <>
-                <PipelineSidebarHeader
+                <ActionSidebarHeader
                   heading={editableBlock.type}
                   subheading="Open AI’s Large Language Model chat block."
                   onClose={handleCloseModal}
@@ -240,7 +243,7 @@ export function PipelineBuilder() {
               </>
             ) : (
               <>
-                <PipelineSidebarHeader
+                <ActionSidebarHeader
                   heading="Add a new block"
                   onClose={handleCloseModal}
                 />
@@ -250,7 +253,7 @@ export function PipelineBuilder() {
                 />
               </>
             )}
-          </PipelineSidebar>
+          </ActionSidebar>
         </ReactFlowProvider>
       </RunPipelineProvider>
       <Button
