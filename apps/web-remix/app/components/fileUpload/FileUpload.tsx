@@ -117,7 +117,7 @@ export function FileUpload({
   }, []);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <label htmlFor={rest.id}>
         <span className="text-white text-xs font-medium">Upload files</span>
         <input

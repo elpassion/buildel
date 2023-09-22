@@ -131,15 +131,17 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         ))}
       </div>
 
-      <Button
-        type="submit"
-        size="xs"
-        disabled={status !== "running"}
-        className="!text-xs"
-        isFluid
-      >
-        {status === "running" ? "Send" : "Start pipeline"}
-      </Button>
+      {status === "running" && (
+        <Button
+          type="submit"
+          size="xs"
+          disabled={status !== "running"}
+          className="!text-xs"
+          isFluid
+        >
+          Send
+        </Button>
+      )}
     </form>
   );
 }

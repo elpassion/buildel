@@ -33,16 +33,13 @@ export function PipelineLayout() {
               tabId={routes.pipeline(pipeline.organization_id, pipeline.id)}
               to={routes.pipeline(pipeline.organization_id, pipeline.id)}
             >
-              Overview
+              Builder
             </FilledTabLink>
             <FilledTabLink
-              tabId={routes.pipelineBuilder(
-                pipeline.organization_id,
-                pipeline.id
-              )}
-              to={routes.pipelineBuilder(pipeline.organization_id, pipeline.id)}
+              tabId={routes.pipelineRuns(pipeline.organization_id, pipeline.id)}
+              to={routes.pipelineRuns(pipeline.organization_id, pipeline.id)}
             >
-              Builder
+              Overview
             </FilledTabLink>
             <FilledTabLink
               tabId={routes.pipelineInterface(
