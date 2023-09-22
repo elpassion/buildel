@@ -87,7 +87,7 @@
     "border": {
       "borderRadius": {
         "default": {
-          "value": "{rounded-lg}",
+          "value": "{rounded-md}",
           "type": "borderRadius"
         }
       }

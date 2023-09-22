@@ -7,11 +7,11 @@
           "type": "color"
         },
         "hover": {
-          "value": "{primary.50}",
+          "value": "{neutral.600}",
           "type": "color"
         },
         "checked": {
-          "value": "{primary.50}",
+          "value": "{primary.900}",
           "type": "color"
         },
         "checkedDot": {
@@ -73,7 +73,7 @@
       },
       "ring": {
         "focus": {
-          "value": "{primary.50}",
+          "value": "{primary.300}",
           "type": "color"
         }
       }

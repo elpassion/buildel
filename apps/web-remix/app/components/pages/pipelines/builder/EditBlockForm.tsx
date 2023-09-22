@@ -60,7 +60,7 @@ export function EditBlockForm({
       className="w-full grow flex flex-col h-[60%]"
       noValidate
     >
-      <div className="space-y-4 grow max-h-full overflow-y-auto">
+      <div className="space-y-4 grow max-h-full overflow-y-auto px-1">
         <HiddenField name="name" value={blockConfig.name} />
         <HiddenField name="inputs" value={JSON.stringify(blockConfig.inputs)} />
 

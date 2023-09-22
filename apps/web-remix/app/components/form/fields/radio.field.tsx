@@ -1,32 +1,32 @@
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useEffect } from "react";
 import { useFieldContext } from "~/components/form/fields/field.context";
 import {
   RadioInput,
   RadioInputProps,
 } from "~/components/form/inputs/radio.input";
-import { useControlField, useFormContext } from "remix-validated-form";
+import { useControlField } from "remix-validated-form";
 
 export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
-  (props, ref) => {
-    const { getValues } = useFormContext();
+  ({ defaultValue, ...props }, ref) => {
     const { name, getInputProps, validate } = useFieldContext();
-    const [value, setValue] = useControlField<string>(name);
-    const [myValue, setMyValue] = useState<string | undefined>(undefined);
+    const [formValue, setFormValue] = useControlField<string>(name);
 
-    console.log(getInputProps(), value);
-    console.log([...getValues().entries()]);
+    useEffect(() => {
+      if (!formValue && defaultValue) {
+        setFormValue(defaultValue as string);
+      }
+    }, [defaultValue, formValue, setFormValue]);
+
     return (
       <RadioInput
-        {...getInputProps({ type: "radio", id: props.id })}
         {...props}
-        value={value ?? myValue}
+        {...getInputProps({ type: "radio", id: props.id })}
+        defaultValue={defaultValue}
+        checked={formValue === props.value}
         onChange={(e) => {
-          setMyValue(e.target.value);
-          setValue(e.target.value);
+          setFormValue(e.target.value);
           validate();
         }}
-
-        // onChange={(e) => setValue(e.target.value)}
       />
     );
   }

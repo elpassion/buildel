@@ -8,10 +8,10 @@ import {
 } from "~/components/form/fields/text.field";
 import { CheckboxInput } from "~/components/form/inputs/checkbox.input";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
-import { RadioGroupField } from "~/components/form/fields/radioGroup.field";
 import { assert } from "~/utils/assert";
 import { Field, FieldProps } from "./Schema";
 import { QuantityInputField } from "~/components/form/fields/quantity.field";
+import { RadioField } from "~/components/form/fields/radio.field";
 
 export function StringField({ field, name, fields, ...rest }: FieldProps) {
   assert(name);
@@ -56,34 +56,18 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
   if (field.enumPresentAs === "radio") {
     return (
       <FormField name={name}>
-        {/*<div className="space-y-3">*/}
-        {/*  {field.enum.map((value, index) => (*/}
-        {/*    <RadioField*/}
-        {/*      key={value}*/}
-        {/*      id={name + index}*/}
-        {/*      name={name}*/}
-        {/*      errorMessage={error ?? undefined}*/}
-        {/*      labelText={value}*/}
-        {/*      defaultValue={value}*/}
-        {/*    />*/}
-        {/*  ))}*/}
-        {/*</div>*/}
-        <div className="text-white">
-          <RadioGroupField
-            id={name}
-            cardsSize="sm"
-            layout="vertical"
-            mainLabel={field.title}
-            radioPosition="left"
-            isRadioVisible={true}
-            errorMessage={error ?? undefined}
-            defaultValue={field.default}
-            options={field.enum.map((value) => ({
-              id: `${name}.${value}`,
-              labelText: value,
-              value: value,
-            }))}
-          />
+        <div className="space-y-3">
+          {field.enum.map((value, index) => (
+            <RadioField
+              key={value}
+              id={name + index}
+              name={name}
+              errorMessage={error ?? undefined}
+              labelText={value}
+              value={value}
+              defaultValue={field.default}
+            />
+          ))}
         </div>
       </FormField>
     );

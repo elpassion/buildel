@@ -3,25 +3,25 @@
     "color": {
       "background": {
         "default": {
-          "value": "{basic.white}",
+          "value": "{neutral.800}",
           "type": "color"
         },
         "hover": {
-          "value": "{primary.50}",
+          "value": "{neutral.850}",
           "type": "color"
         },
         "active": {
-          "value": "{primary.200}",
+          "value": "{neutral.850}",
           "type": "color"
         },
         "disabled": {
-          "value": "{neutral.50}",
+          "value": "{neutral.200}",
           "type": "color"
         }
       },
       "text": {
         "default": {
-          "value": "{neutral.400}",
+          "value": "{neutral.100}",
           "type": "color"
         },
         "disabled": {
@@ -51,7 +51,7 @@
     "border": {
       "borderRadius": {
         "default": {
-          "value": "{rounded-lg}",
+          "value": "{rounded-md}",
           "type": "borderRadius"
         }
       }
