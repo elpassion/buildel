@@ -134,19 +134,25 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
   //DOCS here - https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IStandaloneEditorConstructionOptions.html#minimap
   return (
     <Editor
-      className="overflow-hidden border border-neutral-200 rounded p-1"
+      className=""
       defaultLanguage={BUILDEL_LANGUAGE}
       onChange={handleOnChange}
       onMount={handleOnMount}
       options={{
+        padding: {
+          top: 8,
+          bottom: 8,
+        },
         lineNumbers: "off",
         glyphMargin: false,
         folding: false,
         lineDecorationsWidth: 0,
         minimap: { enabled: false },
         wordWrap: "on",
+        renderLineHighlight: "none",
         scrollbar: {
           verticalScrollbarSize: 7,
+          useShadows: false,
         },
         ...options,
       }}

@@ -1,6 +1,38 @@
-.editor-inputs-suggestions-valid{
-    color: green !important;
+.mtk1{
+  @apply !text-white
 }
-.editor-inputs-suggestions-invalid{
-    color: red !important;
+
+.mtk1 .editor-inputs-suggestions-valid,.editor-inputs-suggestions-valid{
+  @apply !text-green-500;
+}
+
+.mtk1 .editor-inputs-suggestions-invalid,.editor-inputs-suggestions-invalid{
+  @apply !text-red-500;
+}
+
+.monaco-editor-background{
+  @apply !bg-neutral-800
+}
+
+.monaco-editor {
+  @apply !overflow-hidden !bg-neutral-800 !border !border-neutral-200 !rounded
+}
+.monaco-editor.focused   {
+  @apply !border-primary-800 !ring-4 !ring-primary-800
+}
+
+.lines-content{
+  @apply !px-2
+}
+
+.monaco-editor .cursors-layer .cursor{
+  @apply !bg-white
+}
+
+.monaco-editor .suggest-widget{
+  @apply !bg-secondary-500 !border-secondary-600 !max-w-full !left-0 !rounded
+}
+
+.monaco-list .element-focused, .monaco-list .monaco-list-rows  *{
+  @apply !bg-secondary-500
 }
