@@ -35,7 +35,7 @@ defmodule Buildel.Blocks.DocumentSearch do
               "api_key" => %{
                 "type" => "string",
                 "title" => "API Key",
-                "description" => "OpenAI Api key",
+                "description" => "Select from your API keys or enter a new one.",
                 "minLength" => 1,
                 "presentAs" => "password"
               },
