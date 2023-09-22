@@ -7,6 +7,7 @@ import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
 import { InputHandle, OutputHandle } from "./NodeHandles";
 import { NodeFieldsForm, NodeFieldsOutput } from "./NodeFields";
 import classNames from "classnames";
+import { IconButton } from "~/components/iconButton";
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -72,7 +73,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
       >
         <header
           className={classNames(
-            "flex items-center justify-between p-2 rounded-t bg-neutral-900"
+            "flex items-center justify-between p-2 rounded-t bg-neutral-900 gap-2"
           )}
         >
           <div className="flex items-center gap-2">
@@ -82,25 +83,23 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
             <Badge size="xs" text={data.name} />
           </div>
 
-          <div className="flex gap-1">
+          <div className="flex gap-2 items-center">
             {isEditable && (
-              <button
+              <IconButton
+                onlyIcon
+                icon={<Icon iconName="settings" />}
                 onClick={handleEdit}
                 disabled={runStatus !== "idle"}
-                className="h-6 w-6 p-1 hover:bg-neutral-700 rounded-md"
-              >
-                <Icon iconName="settings" className="text-neutral-200" />
-              </button>
+              />
             )}
 
             {onDelete && (
-              <button
+              <IconButton
+                onlyIcon
+                icon={<Icon iconName="trash" />}
                 onClick={handleDelete}
                 disabled={runStatus !== "idle"}
-                className="h-6 w-6 p-1 hover:bg-neutral-700 rounded-md"
-              >
-                <Icon iconName="trash" className="text-neutral-200" />
-              </button>
+              />
             )}
           </div>
         </header>

@@ -47,10 +47,12 @@ export function FileUploadListItem({
     >
       <div className="flex gap-1 grow max-w-[90%]">
         <Icon size="xs" iconName="file" className="mt-0.5 w-4 h-4 !text-sm" />
-        <div className="flex flex-col text-xs w-full max-w-[95%]">
-          <h6 className="whitespace-nowrap truncate">{file.file_name}</h6>
+        <div className="flex flex-col w-full max-w-[95%]">
+          <h6 className="whitespace-nowrap text-xs truncate">
+            {file.file_name}
+          </h6>
           <span
-            className={classNames({
+            className={classNames("text-[10px]", {
               "text-neutral-100": !isUploadError(file),
               "text-red-500": isUploadError(file),
             })}
@@ -71,8 +73,8 @@ export function FileUploadListItem({
   );
 }
 function renderSize(size: number) {
-  if (size < 1000) return `${size.toFixed(0)}B`;
+  if (size < 1000) return `${size.toFixed(0)} B`;
   else if (size < 1000 * 1000) {
-    return `${(size / 1000).toFixed(0)}KB`;
-  } else return `${(size / (1000 * 1000)).toFixed(0)}MB`;
+    return `${(size / 1000).toFixed(0)} KB`;
+  } else return `${(size / (1000 * 1000)).toFixed(0)} MB`;
 }

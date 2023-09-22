@@ -15,7 +15,7 @@
           "type": "color"
         },
         "disabled": {
-          "value": "{neutral.200}",
+          "value": "{neutral.300}",
           "type": "color"
         }
       },
@@ -33,7 +33,7 @@
           "type": "color"
         },
         "disabled": {
-          "value": "{basic.black}",
+          "value": "{basic.white}",
           "type": "color"
         }
       },

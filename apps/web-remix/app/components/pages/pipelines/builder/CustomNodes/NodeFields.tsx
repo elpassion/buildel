@@ -12,8 +12,8 @@ import {
   useRunPipelineNode,
 } from "../RunPipelineProvider";
 import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
-import { Button } from "~/components/button";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
+import { Button } from "@elpassion/taco";
 
 interface NodeFieldsProps {
   fields: IField[];
