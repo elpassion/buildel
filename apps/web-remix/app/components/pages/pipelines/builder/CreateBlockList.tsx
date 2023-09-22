@@ -5,7 +5,7 @@ import startCase from "lodash.startcase";
 import classNames from "classnames";
 import { useRunPipeline } from "./RunPipelineProvider";
 import { IBlockConfig, IBlockTypes } from "../pipeline.types";
-import { Button } from "@elpassion/taco";
+import { Button, Icon, IconButton } from "@elpassion/taco";
 import { BlockType } from "~/components/pages/pipelines/contracts";
 interface CreateBlockListProps {
   blockTypes: IBlockTypes;
@@ -61,7 +61,7 @@ export const CreateBlockList: React.FC<CreateBlockListProps> = ({
   return (
     <div className="space-y-3 overflow-y-auto">
       {Object.entries(blockGroups).map(([group, blocks]) => (
-        <div>
+        <div key={group}>
           <p className="text-xs text-white">{startCase(group)}</p>
 
           <ul className="flex flex-col gap-2 mt-2">
@@ -69,7 +69,7 @@ export const CreateBlockList: React.FC<CreateBlockListProps> = ({
               <li
                 key={block.type}
                 className={classNames(
-                  "group min-w-[150px] cursor-grab rounded-lg bg-neutral-800 py-2 pl-4 pr-2 text-white flex justify-between items-center",
+                  "min-w-[150px] cursor-grab rounded-lg bg-neutral-800 py-2 pl-4 pr-2 text-white flex justify-between items-center hover:bg-neutral-950 transition",
                   {
                     "opacity-50": runStatus !== "idle",
                   }
@@ -81,13 +81,11 @@ export const CreateBlockList: React.FC<CreateBlockListProps> = ({
                 draggable
               >
                 <span>{startCase(block.type)}</span>
-                <Button
-                  className="opacity-0 group-hover:opacity-100"
-                  size="xs"
+                <IconButton
+                  size="sm"
                   onClick={() => onClickAdd(block)}
-                >
-                  Add
-                </Button>
+                  icon={<Icon iconName="plus" />}
+                />
               </li>
             ))}
           </ul>
