@@ -57,6 +57,9 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
     return (
       <FormField name={name}>
         <div className="space-y-3">
+          <label htmlFor={name} className="text-white text-sm font-medium">
+            {field.title}
+          </label>
           {field.enum.map((value, index) => (
             <RadioField
               key={value}
@@ -66,6 +69,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
               labelText={value}
               value={value}
               defaultValue={field.default}
+              className="!mt-3"
             />
           ))}
         </div>

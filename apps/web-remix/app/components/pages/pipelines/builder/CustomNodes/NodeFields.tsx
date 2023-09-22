@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import { Textarea } from "@elpassion/taco";
 import { IBlockConfig, IField } from "../../pipeline.types";
 import {
   FileListResponse,
@@ -92,7 +91,8 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
             label=""
             id={name}
             name={name}
-            placeholder="Start writing..."
+            placeholder="Input text to test the workflow"
+            rows={5}
           />
         );
       } else if (type === "file") {
@@ -128,7 +128,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         type="submit"
         size="xs"
         disabled={status !== "running"}
-        className="mt-2"
+        className="mt-2 !text-xs"
         isFluid
       >
         {status === "running" ? "Send" : "Start pipeline"}
@@ -147,12 +147,12 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
       if (type === "text") {
         return (
           <TextareaInput
+            label=""
+            placeholder="Output"
             key={field.data.name}
             id={field.data.name}
-            label=""
-            // className="w-full"
             value={getTextFieldsMessages(events, field.data.name)}
-            rows={5}
+            rows={6}
             disabled
           />
         );

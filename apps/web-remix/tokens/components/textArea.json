@@ -9,7 +9,7 @@
       },
       "text": {
         "placeholder": {
-          "value": "{neutral.400}",
+          "value": "{neutral.300}",
           "type": "color"
         },
         "placeholderDisabled": {
@@ -23,7 +23,7 @@
           "type": "color"
         },
         "focus": {
-          "value": "{neutral.200}",
+          "value": "{primary.800}",
           "type": "color"
         },
         "error": {
@@ -37,11 +37,11 @@
       },
       "ring": {
         "focus": {
-          "value": "{secondary.50}",
+          "value": "{primary.800}",
           "type": "color"
         },
         "error": {
-          "value": "{error.100}",
+          "value": "{error.800}",
           "type": "color"
         }
       }
@@ -51,7 +51,7 @@
     "border": {
       "borderRadius": {
         "default": {
-          "value": "{rounded-lg}",
+          "value": "{rounded-md}",
           "type": "borderRadius"
         }
       }
