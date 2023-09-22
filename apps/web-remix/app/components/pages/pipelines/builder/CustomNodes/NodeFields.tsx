@@ -104,7 +104,12 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
             onUpload={uploadFile}
             onFetch={fetchFiles}
             onRemove={removeField}
-            preview={(props) => <FileUploadListPreview {...props} />}
+            preview={(props) => (
+              <FileUploadListPreview
+                {...props}
+                disabled={status === "running" || status === "starting"}
+              />
+            )}
           />
         );
       } else if (field.data.type === "audio") {
@@ -115,20 +120,22 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
 
       return <span>Unsupported input type - {type}</span>;
     },
-    [fetchFiles, removeField, uploadFile]
+    [fetchFiles, removeField, uploadFile, status]
   );
 
   return (
     <form onSubmit={onSubmit}>
-      {fields.map((field) => (
-        <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
-      ))}
+      <div className="mb-2">
+        {fields.map((field) => (
+          <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
+        ))}
+      </div>
 
       <Button
         type="submit"
         size="xs"
         disabled={status !== "running"}
-        className="mt-2 !text-xs"
+        className="!text-xs"
         isFluid
       >
         {status === "running" ? "Send" : "Start pipeline"}

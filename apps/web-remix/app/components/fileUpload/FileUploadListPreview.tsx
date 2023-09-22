@@ -3,21 +3,29 @@ import { ItemList } from "~/components/list/ItemList";
 import { IFileUpload, IPreviewProps, isUploadError } from "./fileUpload.types";
 import { Icon } from "@elpassion/taco";
 import classNames from "classnames";
+import { IconButton } from "~/components/iconButton";
 
 interface FileUploadListPreviewProps extends Omit<IPreviewProps, "remove"> {
   remove?: (id: number) => Promise<void>;
+  disabled?: boolean;
+  className?: string;
 }
 export function FileUploadListPreview({
   fileList = [],
   remove,
+  disabled,
+  className,
 }: FileUploadListPreviewProps) {
   return (
     <ItemList
-      className="flex flex-col items-center gap-1 max-h-[110px] overflow-y-auto"
+      className={classNames(
+        "flex flex-col items-center gap-1 max-h-[110px] overflow-y-auto",
+        className
+      )}
       itemClassName="w-full"
       items={fileList}
       renderItem={(file) => (
-        <FileUploadListItem file={file} onRemove={remove} />
+        <FileUploadListItem file={file} onRemove={remove} disabled={disabled} />
       )}
     />
   );
@@ -26,10 +34,12 @@ export function FileUploadListPreview({
 interface FileUploadListItemProps {
   file: IFileUpload;
   onRemove?: (id: number) => Promise<void>;
+  disabled?: boolean;
 }
 export function FileUploadListItem({
   file,
   onRemove,
+  disabled,
 }: FileUploadListItemProps) {
   const handleRemove = useCallback(() => {
     onRemove?.(file.id);
@@ -62,12 +72,12 @@ export function FileUploadListItem({
         </div>
       </div>
       {onRemove && (
-        <button
+        <IconButton
+          onlyIcon
+          icon={<Icon iconName="x" className="tex-[10px]" />}
+          disabled={disabled}
           onClick={handleRemove}
-          className="w-4 h-4 flex items-center justify-center hover:bg-neutral-500 rounded-sm"
-        >
-          <Icon iconName="x" size="xs" />
-        </button>
+        />
       )}
     </article>
   );

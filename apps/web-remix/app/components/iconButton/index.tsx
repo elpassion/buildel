@@ -13,7 +13,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
 }) => {
   const additionalClassNames = useMemo(() => {
     if (onlyIcon) {
-      return "!p-0 !bg-transparent !w-fit !h-fit !border-none !text-neutral-200 hover:!text-primary-500 disabled:!text-neutral-400";
+      return "!p-0 !bg-transparent !w-fit !h-fit !border-none !text-neutral-200 hover:!text-primary-500 disabled:!text-neutral-400 transition";
     }
     return "";
   }, [onlyIcon]);
