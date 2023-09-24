@@ -52,11 +52,11 @@ defmodule Buildel.VectorDB do
   end
 
   defp adapter do
-    Application.get_env(:bound, :vector_db, Buildel.VectorDB.QdrantAdapter)
+    Application.fetch_env!(:buildel, :vector_db)
   end
 
   defp embeddings do
-    Application.get_env(:bound, :embeddings, Buildel.Clients.BumblebeeEmbeddings)
+    Application.fetch_env!(:buildel, :embeddings)
   end
 end
 

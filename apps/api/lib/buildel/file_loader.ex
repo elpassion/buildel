@@ -8,7 +8,7 @@ defmodule Buildel.FileLoader do
   end
 
   def adapter do
-    Application.get_env(:bound, :file_loader, Buildel.FileLoaderUnstructuredApiAdapter)
+    Application.fetch_env!(:buildel, :file_loader)
   end
 end
 
@@ -98,6 +98,6 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
   end
 
   defp token do
-    System.get_env("UNSTRUCTURED_API_KEY")
+    System.fetch_env!("UNSTRUCTURED_API_KEY")
   end
 end

@@ -2,11 +2,11 @@ defmodule Buildel.HybridDB do
   require Logger
 
   def query(collection_name, query) do
-    {time, search_results} = :timer.tc(fn -> search_db().query(collection_name, query) end)
+    {time, search_results} = :timer.tc(fn -> Buildel.SearchDB.query(collection_name, query) end)
     Logger.info("Search took #{time / 1_000_000} seconds")
 
     {time, vector_results} =
-      :timer.tc(fn -> vector_db().query(collection_name, query, api_key: api_key()) end)
+      :timer.tc(fn -> Buildel.VectorDB.query(collection_name, query, api_key: api_key()) end)
 
     Logger.info("Vector search took #{time / 1_000_000} seconds")
 
@@ -76,13 +76,5 @@ defmodule Buildel.HybridDB do
 
   defp api_key do
     System.fetch_env!("OPENAI_API_KEY")
-  end
-
-  defp search_db do
-    Application.get_env(:bound, :search_db, Buildel.SearchDB)
-  end
-
-  defp vector_db do
-    Application.get_env(:bound, :vector_db, Buildel.VectorDB)
   end
 end

@@ -30,7 +30,7 @@ defmodule Buildel.SearchDB do
   end
 
   defp adapter do
-    Application.get_env(:bound, :search_db, Buildel.SearchDB.LNXAdapter)
+    Application.fetch_env!(:buildel, :search_db)
   end
 end
 

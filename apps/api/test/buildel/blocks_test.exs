@@ -24,7 +24,8 @@ defmodule Buildel.BlocksTest do
                type: "text_input",
                inputs: [Block.text_input("input", true)],
                outputs: [Block.text_output("output")],
-               schema: TextInput.schema()
+               schema: TextInput.schema(),
+               groups: ["text", "inputs / outputs"]
              }
     end
 
@@ -59,7 +60,8 @@ defmodule Buildel.BlocksTest do
                type: "audio_input",
                inputs: [Block.audio_input("input", true)],
                outputs: [Block.audio_output("output")],
-               schema: AudioInput.schema()
+               schema: AudioInput.schema(),
+               groups: ["audio", "inputs / outputs"]
              }
     end
 
@@ -89,7 +91,8 @@ defmodule Buildel.BlocksTest do
                type: "text_output",
                inputs: [Block.text_input("input")],
                outputs: [Block.text_output("output", true)],
-               schema: TextOutput.schema()
+               schema: TextOutput.schema(),
+               groups: ["text", "inputs / outputs"]
              }
     end
 
@@ -130,7 +133,8 @@ defmodule Buildel.BlocksTest do
                type: "audio_output",
                inputs: [Block.audio_output("input")],
                outputs: [Block.audio_output("output", true)],
-               schema: AudioOutput.schema()
+               schema: AudioOutput.schema(),
+               groups: ["audio", "inputs / outputs"]
              }
     end
 
@@ -171,7 +175,8 @@ defmodule Buildel.BlocksTest do
                type: "speech_to_text",
                inputs: [Block.audio_input("input")],
                outputs: [Block.text_output("output")],
-               schema: SpeechToText.schema()
+               schema: SpeechToText.schema(),
+               groups: ["audio", "text"]
              }
     end
 
@@ -247,7 +252,8 @@ defmodule Buildel.BlocksTest do
                type: "text_to_speech",
                inputs: [Block.text_input("input")],
                outputs: [Block.audio_output("output")],
-               schema: TextToSpeech.schema()
+               schema: TextToSpeech.schema(),
+               groups: ["text", "audio"]
              }
     end
 
@@ -325,7 +331,8 @@ defmodule Buildel.BlocksTest do
                  Block.text_output("sentences_output"),
                  Block.text_output("message_output")
                ],
-               schema: Chat.schema()
+               schema: Chat.schema(),
+               groups: ["text", "llms"]
              }
     end
 
@@ -421,7 +428,8 @@ defmodule Buildel.BlocksTest do
                type: "take_latest",
                inputs: [Block.text_input("input")],
                outputs: [Block.text_output("output")],
-               schema: TakeLatest.schema()
+               schema: TakeLatest.schema(),
+               groups: ["text", "utils"]
              }
     end
 
@@ -590,7 +598,8 @@ defmodule Buildel.BlocksTest do
                type: "collect_sentences",
                inputs: [Block.text_input("input")],
                outputs: [Block.text_output("sentences_output")],
-               schema: CollectSentences.schema()
+               schema: CollectSentences.schema(),
+               groups: ["text", "utils"]
              }
     end
 
@@ -720,7 +729,8 @@ defmodule Buildel.BlocksTest do
                type: "collect_all_text",
                inputs: [Block.text_input("input")],
                outputs: [Block.text_output("output")],
-               schema: CollectAllText.schema()
+               schema: CollectAllText.schema(),
+               groups: ["text", "utils"]
              }
     end
 

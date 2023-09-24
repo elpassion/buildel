@@ -104,6 +104,6 @@ defmodule Buildel.Blocks.SpeechToText do
   end
 
   defp deepgram() do
-    Application.get_env(:bound, :deepgram, Buildel.Clients.Deepgram)
+    Application.fetch_env!(:buildel, :deepgram)
   end
 end

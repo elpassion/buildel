@@ -268,6 +268,6 @@ defmodule Buildel.Blocks.Chat do
   end
 
   defp chat_gpt() do
-    Application.get_env(:bound, :chat_gpt, Buildel.Clients.ChatGPT)
+    Application.fetch_env!(:buildel, :chat_gpt)
   end
 end

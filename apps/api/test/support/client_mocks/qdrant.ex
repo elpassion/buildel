@@ -17,6 +17,11 @@ defmodule Buildel.ClientMocks.VectorDB.QdrantAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
+  def query(_, _) do
+    {:ok, []}
+  end
+
+  @impl Buildel.VectorDB.VectorDBAdapterBehaviour
   def delete_all_with_metadata(_collection, _metadata) do
     :ok
   end

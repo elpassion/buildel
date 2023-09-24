@@ -99,7 +99,7 @@ defmodule Buildel.Blocks.Block do
       end
 
       defp stream_timeout() do
-        Application.get_env(:bound, :stream_timeout, 500)
+        Application.get_env(:buildel, :stream_timeout, 500)
       end
 
       defp name_schema() do

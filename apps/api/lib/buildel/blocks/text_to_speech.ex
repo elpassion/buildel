@@ -145,6 +145,6 @@ defmodule Buildel.Blocks.TextToSpeech do
   end
 
   defp elevenlabs() do
-    Application.get_env(:bound, :elevenlabs, Buildel.Clients.Elevenlabs)
+    Application.fetch_env!(:buildel, :elevenlabs)
   end
 end

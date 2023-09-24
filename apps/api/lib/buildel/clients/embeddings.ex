@@ -34,8 +34,6 @@ end
 defmodule Buildel.Clients.BumblebeeEmbeddings do
   @behaviour Buildel.Clients.EmbeddingsBehaviour
 
-  @sequence_length 128
-
   @impl true
   def get_embeddings(inputs: texts, api_key: _api_key) do
     results =

@@ -22,7 +22,8 @@ defmodule BuildelWeb.UserRegistrationController do
          {:ok, _} =
            Accounts.deliver_user_confirmation_instructions(
              user,
-             &url(~p"/api/users/confirm/#{&1}")
+             # TODO: Fix confirmation url :D
+             &url(~p"/api/organizations/#{&1}")
            ) do
       conn
       |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
