@@ -38,8 +38,8 @@ defmodule Buildel.Memories do
          {:ok, _} <- Buildel.SearchDB.init(organization_collection_name),
          documents <-
            Buildel.Splitters.recursive_character_text_split(file, %{
-             chunk_size: 1500,
-             chunk_overlap: 500
+             chunk_size: 500,
+             chunk_overlap: 150
            }),
          documents <-
            documents

@@ -34,12 +34,16 @@ end
 defmodule Buildel.Clients.BumblebeeEmbeddings do
   @behaviour Buildel.Clients.EmbeddingsBehaviour
 
-  @batch_size 8
-  @sequence_length 500
+  @sequence_length 128
 
   @impl true
   def get_embeddings(inputs: texts, api_key: _api_key) do
-    {:ok, Nx.Serving.batched_run(__MODULE__, texts) |> Nx.to_list()}
+    results =
+      Nx.Serving.batched_run(__MODULE__, texts)
+      |> Enum.map(& &1[:embedding])
+      |> Enum.map(&Nx.to_list/1)
+
+    {:ok, results}
   end
 
   @impl true
@@ -48,28 +52,15 @@ defmodule Buildel.Clients.BumblebeeEmbeddings do
   end
 
   def serving() do
-    {:ok, %{model: model, params: params}} =
-      Bumblebee.load_model({:hf, "sentence-transformers/paraphrase-MiniLM-L6-v2"})
+    {:ok, model_info} =
+      Bumblebee.load_model({:hf, "sentence-transformers/all-MiniLM-L6-v2"})
 
     {:ok, tokenizer} =
-      Bumblebee.load_tokenizer({:hf, "sentence-transformers/paraphrase-MiniLM-L6-v2"})
+      Bumblebee.load_tokenizer({:hf, "sentence-transformers/all-MiniLM-L6-v2"})
 
-    {_init_fn, predict_fn} = Axon.build(model, compiler: EXLA)
-
-    Nx.Serving.new(fn _config ->
-      fn %{size: size} = inputs ->
-        inputs = Nx.Batch.pad(inputs, @batch_size - size)
-        predict_fn.(params, inputs)[:pooled_state]
-      end
-    end)
-    |> Nx.Serving.client_preprocessing(fn input ->
-      inputs =
-        Bumblebee.apply_tokenizer(tokenizer, input,
-          length: @sequence_length,
-          return_token_type_ids: false
-        )
-
-      {Nx.Batch.concatenate([inputs]), :ok}
-    end)
+    Bumblebee.Text.TextEmbedding.text_embedding(model_info, tokenizer,
+      compile: [batch_size: 32, sequence_length: [16, 32, 64, 128, 512]],
+      defn_options: [compiler: EXLA]
+    )
   end
 end

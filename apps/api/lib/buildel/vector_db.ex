@@ -56,7 +56,7 @@ defmodule Buildel.VectorDB do
   end
 
   defp embeddings do
-    Application.get_env(:bound, :embeddings, Buildel.Clients.OpenAIEmbeddings)
+    Application.get_env(:bound, :embeddings, Buildel.Clients.BumblebeeEmbeddings)
   end
 end
 

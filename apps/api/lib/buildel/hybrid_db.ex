@@ -3,12 +3,12 @@ defmodule Buildel.HybridDB do
 
   def query(collection_name, query) do
     {time, search_results} = :timer.tc(fn -> search_db().query(collection_name, query) end)
-    Logger.debug("Search took #{time / 1_000_000} seconds")
+    Logger.info("Search took #{time / 1_000_000} seconds")
 
     {time, vector_results} =
       :timer.tc(fn -> vector_db().query(collection_name, query, api_key: api_key()) end)
 
-    Logger.debug("Vector search took #{time / 1_000_000} seconds")
+    Logger.info("Vector search took #{time / 1_000_000} seconds")
 
     {time, sort_results} =
       :timer.tc(fn ->
@@ -16,30 +16,58 @@ defmodule Buildel.HybridDB do
         |> sort_results_by_query(query)
       end)
 
-    Logger.debug("Sorting took #{time / 1_000_000} seconds")
+    Logger.info("Sorting took #{time / 1_000_000} seconds")
 
     sort_results
   end
 
   defp sort_results_by_query(results, query) do
-    {:ok, %{model: model, params: params}} =
-      Bumblebee.load_model({:hf, "cross-encoder/ms-marco-TinyBERT-L-2-v2"})
-
-    {:ok, tokenizer} = Bumblebee.load_tokenizer({:hf, "bert-base-uncased"})
-
-    inputs =
-      Bumblebee.apply_tokenizer(
-        tokenizer,
-        results |> Enum.map(fn %{"document" => document} -> {query, document} end)
+    sorted_results =
+      Nx.Serving.batched_run(
+        __MODULE__,
+        results |> Enum.map(fn result -> {result["document"], query} end)
       )
+      |> Map.get(:logits)
+      |> Nx.to_list()
+      |> Enum.zip(results)
+      |> Enum.sort_by(fn {[score], _result} -> score end, &>=/2)
+      |> Enum.map(fn {_score, result} -> result end)
 
-    %{logits: tensor} = Axon.predict(model, params, inputs)
+    """
+    results without sorting
+    #{results |> Enum.map(fn result -> result["metadata"]["chunk_id"] end) |> Enum.join("\n")}
 
-    tensor
-    |> Nx.to_list()
-    |> Enum.zip(results)
-    |> Enum.sort(fn {a, _}, {b, _} -> a > b end)
-    |> Enum.map(fn {_, result} -> result end)
+    results with sorting
+    #{sorted_results |> Enum.map(fn result -> result["metadata"]["chunk_id"] end) |> Enum.join("\n")}
+    """
+    |> Logger.debug()
+
+    sorted_results
+  end
+
+  def serving() do
+    {:ok, model_info} = Bumblebee.load_model({:hf, "cross-encoder/ms-marco-TinyBERT-L-2-v2"})
+    {:ok, tokenizer} = Bumblebee.load_tokenizer({:hf, "bert-base-uncased"})
+    batch_size = 4
+
+    Nx.Serving.new(
+      fn _ ->
+        {_init_fn, predict_fn} = Axon.build(model_info.model, compiler: EXLA)
+
+        fn %{size: size} = inputs ->
+          inputs = Nx.Batch.pad(inputs, batch_size - size)
+          {time, prediction_result} = :timer.tc(fn -> predict_fn.(model_info.params, inputs) end)
+          Logger.info("Prediction took #{time / 1_000_000} seconds")
+          prediction_result
+        end
+      end,
+      batch_size: batch_size
+    )
+    |> Nx.Serving.client_preprocessing(fn input ->
+      inputs = Bumblebee.apply_tokenizer(tokenizer, input)
+
+      {Nx.Batch.concatenate([inputs]), :ok}
+    end)
   end
 
   defp join_results(search_results, vector_results) do

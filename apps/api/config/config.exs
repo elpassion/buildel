@@ -67,7 +67,8 @@ config :exla, :clients,
   rocm: [platform: :rocm],
   host: [platform: :host]
 
-config :nx, :default_backend, {EXLA.Backend, client: :host}
+config :nx, :default_defn_options, compiler: EXLA
+config :nx, :default_backend, EXLA.Backend
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
