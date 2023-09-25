@@ -53,18 +53,6 @@ defmodule Buildel.Splitters do
           })
   end
 
-  def character_text_split(
-        text,
-        %{
-          separator: separator,
-          chunk_size: _chunk_size,
-          chunk_overlap: _chunk_overlap
-        } = opts
-      ) do
-    opts = Map.merge(%{chunk_size: 1000, chunk_overlap: 0, separator: "\n\n"}, opts)
-    text |> String.split(separator, trim: true) |> merge_splits(opts)
-  end
-
   defp merge_splits(splits, opts) do
     {docs, current_doc, _total} =
       Enum.reduce(splits, {[], [], 0}, fn split, {docs, current_doc, total} ->
