@@ -198,7 +198,6 @@ export function PipelineBuilder() {
       <RunPipelineProvider pipeline={pipeline}>
         <ReactFlowProvider>
           <BuilderHeader
-            updateStatus={updateFetcher.state}
             isUpToDate={hasUnsavedChanges}
             onSave={handleSaveUnsavedChanges}
           />

@@ -4,13 +4,11 @@ import { RunPipelineButton } from "./RunPipelineButton";
 import { useRunPipeline } from "~/components/pages/pipelines/builder/RunPipelineProvider";
 
 interface BuilderHeaderProps {
-  updateStatus: "submitting" | "idle" | "loading";
   isUpToDate: boolean;
   onSave?: () => void;
 }
 
 export const BuilderHeader: React.FC<BuilderHeaderProps> = ({
-  updateStatus,
   isUpToDate,
   onSave,
 }) => {
@@ -27,9 +25,7 @@ export const BuilderHeader: React.FC<BuilderHeaderProps> = ({
         )}
 
         <Button
-          disabled={
-            updateStatus === "submitting" || runStatus !== "idle" || isUpToDate
-          }
+          disabled={runStatus !== "idle" || isUpToDate}
           onClick={onSave}
           variant="filled"
           size="sm"
