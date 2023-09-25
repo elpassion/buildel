@@ -27,7 +27,9 @@ export const BuilderHeader: React.FC<BuilderHeaderProps> = ({
         )}
 
         <Button
-          disabled={updateStatus === "submitting" || runStatus !== "idle"}
+          disabled={
+            updateStatus === "submitting" || runStatus !== "idle" || isUpToDate
+          }
           onClick={onSave}
           variant="filled"
           size="sm"
