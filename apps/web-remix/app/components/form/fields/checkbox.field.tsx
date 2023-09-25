@@ -15,6 +15,7 @@ export const CheckboxInputField = forwardRef<
 
   return (
     <CheckboxInput
+      ref={ref}
       {...props}
       {...getInputProps({ type: "checkbox", id: props.id })}
       checked={formValue}

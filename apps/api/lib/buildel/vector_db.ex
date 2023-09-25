@@ -1,4 +1,7 @@
 defmodule Buildel.VectorDB do
+  alias Buildel.Utils.TelemetryWrapper
+  use TelemetryWrapper
+
   def init(collection_name) do
     with {:ok, _collection} <-
            adapter().create_collection(collection_name, embeddings().collection_config()) do
@@ -32,7 +35,7 @@ defmodule Buildel.VectorDB do
     {:ok, collection}
   end
 
-  def query(collection_name, query, api_key: api_key) do
+  deftimed query(collection_name, query, api_key: api_key), [:buildel, :vector_db, :query] do
     {:ok, embeddings_list} = embeddings().get_embeddings(inputs: [query], api_key: api_key)
 
     {:ok, collection} = adapter().get_collection(collection_name)

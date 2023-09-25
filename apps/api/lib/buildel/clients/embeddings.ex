@@ -4,6 +4,8 @@ defmodule Buildel.Clients.EmbeddingsBehaviour do
 end
 
 defmodule Buildel.Clients.OpenAIEmbeddings do
+  use Buildel.Utils.TelemetryWrapper
+
   @behaviour Buildel.Clients.EmbeddingsBehaviour
 
   @impl true
@@ -12,7 +14,7 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
   end
 
   @impl true
-  def get_embeddings(inputs: inputs, api_key: api_key) do
+  deftimed get_embeddings(inputs: inputs, api_key: api_key), [:buildel, :embeddings, :generation] do
     {:ok, %{data: gpt_embeddings}} =
       OpenAI.embeddings([model: "text-embedding-ada-002", input: inputs], config(false, api_key))
 
@@ -33,9 +35,10 @@ end
 
 defmodule Buildel.Clients.BumblebeeEmbeddings do
   @behaviour Buildel.Clients.EmbeddingsBehaviour
+  use Buildel.Utils.TelemetryWrapper
 
   @impl true
-  def get_embeddings(inputs: texts, api_key: _api_key) do
+  deftimed get_embeddings(inputs: texts, api_key: _api_key), [:buildel, :embeddings, :generation] do
     results =
       Nx.Serving.batched_run(__MODULE__, texts)
       |> Enum.map(& &1[:embedding])

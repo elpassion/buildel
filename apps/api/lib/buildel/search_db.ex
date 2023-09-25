@@ -1,4 +1,7 @@
 defmodule Buildel.SearchDB do
+  alias Buildel.Utils.TelemetryWrapper
+  use TelemetryWrapper
+
   def init(collection_name) do
     with {:ok, _collection} <- adapter().create_collection(collection_name) do
       {:ok, %{name: collection_name}}
@@ -15,7 +18,7 @@ defmodule Buildel.SearchDB do
     {:ok, collection}
   end
 
-  def query(collection_name, query) do
+  deftimed query(collection_name, query), [:buildel, :search_db, :query] do
     {:ok, collection} = adapter().get_collection(collection_name)
 
     {:ok, results} = adapter().query(collection, %{query: query})

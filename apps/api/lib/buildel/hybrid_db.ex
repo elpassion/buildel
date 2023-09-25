@@ -1,27 +1,17 @@
 defmodule Buildel.HybridDB do
   require Logger
+  use Buildel.Utils.TelemetryWrapper
 
-  def query(collection_name, query) do
-    {time, search_results} = :timer.tc(fn -> Buildel.SearchDB.query(collection_name, query) end)
-    Logger.info("Search took #{time / 1_000_000} seconds")
+  deftimed query(collection_name, query), [:buildel, :hybrid_db, :query] do
+    search_results = Buildel.SearchDB.query(collection_name, query)
 
-    {time, vector_results} =
-      :timer.tc(fn -> Buildel.VectorDB.query(collection_name, query, api_key: api_key()) end)
+    vector_results = Buildel.VectorDB.query(collection_name, query, api_key: api_key())
 
-    Logger.info("Vector search took #{time / 1_000_000} seconds")
-
-    {time, sort_results} =
-      :timer.tc(fn ->
-        join_results(search_results, vector_results)
-        |> sort_results_by_query(query)
-      end)
-
-    Logger.info("Sorting took #{time / 1_000_000} seconds")
-
-    sort_results
+    join_results(search_results, vector_results)
+    |> sort_results_by_query(query)
   end
 
-  defp sort_results_by_query(results, query) do
+  deftimedp sort_results_by_query(results, query), [:buildel, :hybrid_db, :sorting] do
     sorted_results =
       Nx.Serving.batched_run(
         __MODULE__,
@@ -57,7 +47,12 @@ defmodule Buildel.HybridDB do
         fn %{size: size} = inputs ->
           inputs = Nx.Batch.pad(inputs, batch_size - size)
           {time, prediction_result} = :timer.tc(fn -> predict_fn.(model_info.params, inputs) end)
-          Logger.info("Prediction took #{time / 1_000_000} seconds")
+
+          :telemetry.execute(
+            [:buildel, :hybrid_db, :sorting, :batch_processing],
+            %{duration: time * 1000}
+          )
+
           prediction_result
         end
       end,
