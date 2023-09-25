@@ -32,13 +32,13 @@ defmodule Buildel.Blocks.DocumentSearch do
           options_schema(%{
             "required" => ["api_key", "persist_in", "forwarded_results_count", "hybrid_reranking"],
             "properties" => %{
-              "api_key" => %{
-                "type" => "string",
-                "title" => "API Key",
-                "description" => "Select from your API keys or enter a new one.",
-                "minLength" => 1,
-                "presentAs" => "password"
-              },
+              # "api_key" => %{
+              #   "type" => "string",
+              #   "title" => "API Key",
+              #   "description" => "Select from your API keys or enter a new one.",
+              #   "minLength" => 1,
+              #   "presentAs" => "password"
+              # },
               "persist_in" => %{
                 "type" => "string",
                 "title" => "Persist in",
