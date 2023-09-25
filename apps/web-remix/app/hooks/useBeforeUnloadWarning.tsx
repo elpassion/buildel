@@ -1,4 +1,5 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
+import { useBeforeUnload } from "@remix-run/react";
 
 export const useBeforeUnloadWarning = (showWarning: boolean) => {
   const onBeforeUnload = useCallback(
@@ -11,12 +12,5 @@ export const useBeforeUnloadWarning = (showWarning: boolean) => {
     [showWarning]
   );
 
-  useEffect(() => {
-    if (!window) return;
-    window.addEventListener("beforeunload", onBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", onBeforeUnload);
-    };
-  }, [onBeforeUnload]);
+  useBeforeUnload(onBeforeUnload);
 };
