@@ -49,6 +49,7 @@ import {
   ActionSidebar,
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
+import { useBeforeUnloadWarning } from "~/hooks/useBeforeUnloadWarning";
 
 export function PipelineBuilder() {
   const { pipeline, blockTypes } = useLoaderData<typeof loader>();
@@ -66,11 +67,13 @@ export function PipelineBuilder() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(
     getEdges(pipeline.config)
   );
-  const hasUnsavedChanges = isEqual(
+  const isUpToDate = isEqual(
     //@ts-ignore
     toPipelineConfig(nodes, edges),
     pipeline.config
   );
+
+  useBeforeUnloadWarning(!isUpToDate);
 
   const handleIsValidConnection = useCallback(
     (connection: Connection) => isValidConnection(pipeline.config, connection),
@@ -198,7 +201,7 @@ export function PipelineBuilder() {
       <RunPipelineProvider pipeline={pipeline}>
         <ReactFlowProvider>
           <BuilderHeader
-            isUpToDate={hasUnsavedChanges}
+            isUpToDate={isUpToDate}
             onSave={handleSaveUnsavedChanges}
           />
 
