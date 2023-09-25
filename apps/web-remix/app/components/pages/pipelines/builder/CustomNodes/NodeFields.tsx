@@ -155,7 +155,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
 
       if (type === "text") {
         return (
-          <div className="w-full min-w-full max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-100 rounded py-2 px-[10px]">
+          <div className="w-full min-w-full max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded py-2 px-[10px]">
             <p className="text-xs text-white">
               {getTextFieldsMessages(events, field.data.name)}
             </p>
