@@ -155,15 +155,11 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
 
       if (type === "text") {
         return (
-          <TextareaInput
-            label=""
-            placeholder="Output"
-            key={field.data.name}
-            id={field.data.name}
-            value={getTextFieldsMessages(events, field.data.name)}
-            rows={6}
-            disabled
-          />
+          <div className="w-full min-w-full max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-100 rounded py-2 px-[10px]">
+            <p className="text-xs text-white">
+              {getTextFieldsMessages(events, field.data.name)}
+            </p>
+          </div>
         );
       } else if (type === "audio") {
         return (
