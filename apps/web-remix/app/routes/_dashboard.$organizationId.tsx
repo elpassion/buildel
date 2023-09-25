@@ -138,7 +138,7 @@ export default function Layout() {
         </Sidebar>
       </div>
 
-      <main className="col-span-2 flex min-h-screen flex-col overflow-x-auto md:col-auto">
+      <main className="col-span-2 flex min-h-screen flex-col overflow-x-auto pb-5 md:col-auto">
         <Outlet />
       </main>
     </div>

@@ -67,7 +67,7 @@ export const useAudioVisualize = (
       );
       const centerY = canvas.current.height / 2;
 
-      canvasContext.fillStyle = "orange";
+      canvasContext.fillStyle = "#F5C07A";
 
       for (let i = 0; i < barCount; i++) {
         const barPosition = i * barPositionFactor;

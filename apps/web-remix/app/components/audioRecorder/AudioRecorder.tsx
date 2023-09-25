@@ -142,7 +142,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   }, [status]);
 
   return (
-    <div className="flex gap-2 items-center bg-neutral-800 rounded-lg w-fit px-2 py-1">
+    <div className="flex gap-2 items-center bg-neutral-850 rounded-lg w-fit px-2 py-1">
       <audio
         key={audioValue}
         src={audioValue}
