@@ -3,23 +3,23 @@
     "color": {
       "background": {
         "default": {
-          "value": "{basic.white}",
+          "value": "{neutral.800}",
           "type": "color"
         },
         "hover": {
-          "value": "{primary.50}",
+          "value": "{primary.900}",
           "type": "color"
         },
         "checked": {
-          "value": "{primary.50}",
+          "value": "{primary.900}",
           "type": "color"
         },
         "focused": {
-          "value": "{basic.white}",
+          "value": "{neutral.800}",
           "type": "color"
         },
         "indeterminate": {
-          "value": "{primary.50}",
+          "value": "{primary.500}",
           "type": "color"
         }
       },
@@ -47,19 +47,19 @@
       },
       "text": {
         "default": {
-          "value": "{neutral.600}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "hover": {
-          "value": "{neutral.600}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "checked": {
-          "value": "{primary.500}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "focused": {
-          "value": "{neutral.600}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "indeterminate": {
@@ -67,19 +67,19 @@
           "type": "color"
         },
         "supporting": {
-          "value": "{neutral.500}",
+          "value": "{neutral.100}",
           "type": "color"
         },
         "supporting-hover": {
-          "value": "{neutral.500}",
+          "value": "{neutral.100}",
           "type": "color"
         },
         "supporting-focused": {
-          "value": "{neutral.500}",
+          "value": "{neutral.100}",
           "type": "color"
         },
         "optional": {
-          "value": "{neutral.400}",
+          "value": "{neutral.100}",
           "type": "color"
         }
       }
@@ -115,15 +115,15 @@
     "color": {
       "background": {
         "default": {
-          "value": "{basic.white}",
+          "value": "{neutral.800}",
           "type": "color"
         },
         "checked": {
-          "value": "{red.50}",
+          "value": "{red.900}",
           "type": "color"
         },
         "indeterminate": {
-          "value": "{red.50}",
+          "value": "{red.900}",
           "type": "color"
         }
       },

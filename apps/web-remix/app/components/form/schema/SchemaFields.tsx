@@ -152,7 +152,7 @@ export function BooleanField({ field, name }: FieldProps) {
       <CheckboxInputField
         id={name}
         labelText={field.title}
-        defaultValue={"false"}
+        defaultChecked={field.default}
         error={!!error}
       />
     </FormField>

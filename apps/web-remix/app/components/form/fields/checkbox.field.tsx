@@ -4,24 +4,24 @@ import {
   CheckboxInput,
   CheckboxInputProps,
 } from "~/components/form/inputs/checkbox.input";
+import { useControlField } from "remix-validated-form";
 
 export const CheckboxInputField = forwardRef<
   HTMLInputElement,
   Partial<CheckboxInputProps>
 >((props, ref) => {
-  const { name, getInputProps, error } = useFieldContext();
+  const { name, getInputProps, validate } = useFieldContext();
+  const [formValue, setFormValue] = useControlField<boolean>(name);
+
   return (
     <CheckboxInput
-      // @ts-ignore
-      name={name}
-      ref={ref}
-      aria-invalid={error ? true : undefined}
-      aria-describedby={`${name}-error`}
-      aria-errormessage={error ? `${name}-error` : undefined}
-      autoComplete={name}
-      step={1}
       {...props}
-      {...getInputProps()}
+      {...getInputProps({ type: "checkbox", id: props.id })}
+      checked={formValue}
+      onChange={(e) => {
+        setFormValue(e.target.checked);
+        validate();
+      }}
     />
   );
 });
