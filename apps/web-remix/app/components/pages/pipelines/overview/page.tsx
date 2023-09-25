@@ -7,7 +7,7 @@ export function OverviewPage() {
 export const meta: V2_MetaFunction = () => {
   return [
     {
-      title: "Pipeline runs",
+      title: "Pipeline overview",
     },
   ];
 };

@@ -8,6 +8,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { Toaster } from "~/components/toasts/Toaster";
 import menuStyle from "rc-menu/assets/index.css";
 import styles from "./tailwind.css";
 
@@ -43,6 +44,7 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <Toaster />
         <Outlet />
         <ScrollRestoration />
         <Scripts />

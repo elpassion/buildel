@@ -10,7 +10,7 @@ export const routes = {
   pipeline: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipelines(organizationId)}/${pipelineId}`,
   pipelineRuns: (organizationId: OrganizationId, pipelineId: PipelineId) =>
-    `${routes.pipeline(organizationId, pipelineId)}/runs`,
+    `${routes.pipeline(organizationId, pipelineId)}/overview`,
   pipelineInterface: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipeline(organizationId, pipelineId)}/interface`,
   pipelineSettings: (organizationId: OrganizationId, pipelineId: PipelineId) =>
