@@ -264,10 +264,10 @@ export function PipelineBuilder() {
         </ReactFlowProvider>
       </RunPipelineProvider>
       <Button
-        size="sm"
-        className="!absolute bottom-8 right-4 gap-2"
+        size="lg"
+        className="!absolute bottom-8 right-4"
         onClick={openSidebar}
-        rightIcon={<Icon iconName="plus-circle" />}
+        rightIcon={<Icon iconName="plus-circle" className="text-xl" />}
       >
         Add block
       </Button>
