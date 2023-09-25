@@ -36,11 +36,13 @@ defmodule Buildel.Memories do
            |> Buildel.Repo.insert(),
          {:ok, _} <- Buildel.VectorDB.init(organization_collection_name),
          {:ok, _} <- Buildel.SearchDB.init(organization_collection_name),
-         documents <-
-           Buildel.Splitters.recursive_character_text_split(file, %{
-             chunk_size: 1000,
-             chunk_overlap: 250
-           }),
+         {time, documents} <-
+           :timer.tc(fn ->
+             Buildel.Splitters.recursive_character_text_split(file, %{
+               chunk_size: 1000,
+               chunk_overlap: 250
+             })
+           end),
          documents <-
            documents
            |> Enum.map(fn document ->
@@ -56,6 +58,11 @@ defmodule Buildel.Memories do
            ),
          {:ok, _} <-
            Buildel.SearchDB.add(organization_collection_name, documents) do
+      :telemetry.execute(
+        [:buildel, :recursive_splitter, :split],
+        %{duration: time * 1000}
+      )
+
       {:ok, memory}
     end
   end

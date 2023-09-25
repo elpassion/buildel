@@ -105,7 +105,7 @@ defmodule BuildelWeb.Telemetry do
         unit: {:native, :millisecond},
         description: "The time spent generating embeddings"
       ),
-      summary("buildel.splitters.text_split.duration",
+      summary("buildel.recursive_splitter.split.duration",
         unit: {:native, :millisecond},
         description: "The time spent splitting text"
       )
