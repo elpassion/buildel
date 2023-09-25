@@ -4,16 +4,13 @@ import url from "node:url";
 
 import prom from "@isaacs/express-prometheus-middleware";
 import { createRequestHandler } from "@remix-run/express";
-import type { ServerBuild } from "@remix-run/node";
 import { broadcastDevReady, installGlobals } from "@remix-run/node";
 import chokidar from "chokidar";
 import compression from "compression";
-import type { RequestHandler } from "express";
 import express from "express";
 import morgan from "morgan";
 import sourceMapSupport from "source-map-support";
 import { createProxyMiddleware } from "http-proxy-middleware";
-import get from "lodash.get";
 
 sourceMapSupport.install();
 installGlobals();
@@ -131,13 +128,13 @@ async function run() {
     console.log(`✅ metrics ready: http://localhost:${metricsPort}/metrics`);
   });
 
-  async function reimportServer(): Promise<ServerBuild> {
+  async function reimportServer() {
     // cjs: manually remove the server build from the require cache
-    Object.keys(require.cache).forEach((key) => {
-      if (key.startsWith(BUILD_PATH)) {
-        delete require.cache[key];
-      }
-    });
+    // Object.keys(require.cache).forEach((key) => {
+      // if (key.startsWith(BUILD_PATH)) {
+        // delete require.cache[key];
+      // }
+    // });
 
     const stat = fs.statSync(BUILD_PATH);
 
@@ -148,7 +145,7 @@ async function run() {
     return import(BUILD_URL + "?t=" + stat.mtimeMs);
   }
 
-  function createDevRequestHandler(initialBuild: ServerBuild): RequestHandler {
+  function createDevRequestHandler(initialBuild) {
     let build = initialBuild;
     async function handleServerUpdate() {
       // 1. re-import the server build
