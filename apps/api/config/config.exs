@@ -77,6 +77,7 @@ config :buildel, :vector_db, Buildel.VectorDB.QdrantAdapter
 config :buildel, :embeddings, Buildel.Clients.BumblebeeEmbeddings
 config :buildel, :file_loader, Buildel.FileLoaderUnstructuredApiAdapter
 config :buildel, :search_db, Buildel.SearchDB.LNXAdapter
+config :buildel, :hybrid_db, true
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -33,6 +33,7 @@ RUN mix local.hex --force && \
 
 # set build ENV
 ENV MIX_ENV="prod"
+ENV BUMBLEBEE_CACHE_DIR=/app/.bumblebee
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
@@ -63,6 +64,8 @@ COPY config/runtime.exs config/
 COPY rel rel
 RUN mix release
 
+RUN DATABASE_URL="ecto://USER:PASS@HOST/DATABASE" SECRET_KEY_BASE="doesnotmatter" SKIP_DB="true" mix run -e 'Buildel.Application.load_servings()'
+
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
@@ -84,8 +87,12 @@ RUN chown nobody /app
 ENV MIX_ENV="prod"
 
 # Only copy the final release from the build stage
+COPY --from=builder --chown=nobody:root /app/.bumblebee/ ./.bumblebee
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/buildel ./
 
 USER nobody
+
+ENV BUMBLEBEE_CACHE_DIR=/app/.bumblebee
+ENV BUMBLEBEE_OFFLINE=true
 
 CMD ["/app/bin/server"]

@@ -74,45 +74,50 @@ defmodule Buildel.SearchDB.LNXAdapter do
             }
           }
         }),
-        [{"Content-Type", "application/json"}]
+        [{"Content-Type", "application/json"}],
+        follow_redirect: true
       )
 
     {:ok, %{name: collection_name}}
   end
 
   def delete_collection(collection_name) do
-    HTTPoison.delete!(
-      "#{url()}/indexes/#{@index_name}",
-      headers()
-    )
+    {:ok, _} =
+      follow_redirect_delete(
+        "#{url()}/indexes/#{@index_name}",
+        "{}",
+        headers()
+      )
 
     {:ok, %{name: collection_name}}
   end
 
   @impl true
   def add(collection, documents) do
-    HTTPoison.post!(
-      "#{url()}/indexes/#{@index_name}/documents",
-      Jason.encode!(
-        documents
-        |> Enum.map(fn document ->
-          %{
-            text: document.document,
-            collection_name: collection.name,
-            file_name: document.metadata.file_name,
-            memory_id: document.metadata.memory_id |> Integer.to_string(),
-            chunk_id: document.metadata.chunk_id
-          }
-        end)
-      ),
-      headers()
-    )
+    {:ok, _} =
+      follow_redirect_post(
+        "#{url()}/indexes/#{@index_name}/documents",
+        Jason.encode!(
+          documents
+          |> Enum.map(fn document ->
+            %{
+              text: document.document,
+              collection_name: collection.name,
+              file_name: document.metadata.file_name,
+              memory_id: document.metadata.memory_id |> Integer.to_string(),
+              chunk_id: document.metadata.chunk_id
+            }
+          end)
+        ),
+        headers()
+      )
 
-    HTTPoison.post!(
-      "#{url()}/indexes/#{@index_name}/commit",
-      Jason.encode!(%{}),
-      headers()
-    )
+    {:ok, _} =
+      follow_redirect_post(
+        "#{url()}/indexes/#{@index_name}/commit",
+        Jason.encode!(%{}),
+        headers()
+      )
 
     :ok
   end
@@ -129,31 +134,32 @@ defmodule Buildel.SearchDB.LNXAdapter do
           %{term: %{ctx: value, fields: [key]}, occur: "must"}
       end)
 
-    HTTPoison.request!(
-      :delete,
-      "#{url()}/indexes/#{@index_name}/documents/query",
-      Jason.encode!(%{
-        query:
-          [
-            %{term: %{ctx: collection.name, fields: ["collection_name"]}, occur: "must"}
-          ] ++ filters
-      }),
-      headers()
-    )
+    {:ok, _} =
+      follow_redirect_delete(
+        "#{url()}/indexes/#{@index_name}/documents/query",
+        Jason.encode!(%{
+          query:
+            [
+              %{term: %{ctx: collection.name, fields: ["collection_name"]}, occur: "must"}
+            ] ++ filters
+        }),
+        headers()
+      )
 
-    HTTPoison.post!(
-      "#{url()}/indexes/#{@index_name}/commit",
-      Jason.encode!(%{}),
-      headers()
-    )
+    {:ok, _} =
+      follow_redirect_post(
+        "#{url()}/indexes/#{@index_name}/commit",
+        Jason.encode!(%{}),
+        headers()
+      )
 
     :ok
   end
 
   @impl true
   def query(collection, %{query: query}) do
-    %{status_code: 200, body: body} =
-      HTTPoison.post!(
+    {:ok, %{status_code: 200, body: body}} =
+      follow_redirect_post(
         "#{url()}/indexes/#{@index_name}/search",
         Jason.encode!(%{
           query: [
@@ -180,6 +186,31 @@ defmodule Buildel.SearchDB.LNXAdapter do
          }
        }
      end)}
+  end
+
+  defp follow_redirect_post(url, body, headers, opts \\ []) do
+    case HTTPoison.post(
+           url,
+           body,
+           headers,
+           opts ++ [follow_redirect: true]
+         ) do
+      {:ok, %HTTPoison.MaybeRedirect{redirect_url: redirect_url}} ->
+        HTTPoison.post(redirect_url, body, headers, opts ++ [follow_redirect: true])
+
+      response ->
+        response
+    end
+  end
+
+  defp follow_redirect_delete(url, body, headers, opts \\ []) do
+    case HTTPoison.request(:delete, url, body, headers, opts) do
+      {:ok, %HTTPoison.MaybeRedirect{redirect_url: redirect_url}} ->
+        HTTPoison.request(:delete, redirect_url, body, headers, opts)
+
+      response ->
+        response
+    end
   end
 
   defp url() do

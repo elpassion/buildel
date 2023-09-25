@@ -11,8 +11,6 @@ defmodule Buildel.Application do
       [
         # Start the Telemetry supervisor
         BuildelWeb.Telemetry,
-        # Start the Ecto repository
-        Buildel.Repo,
         # Start the PubSub system
         {Phoenix.PubSub, name: Buildel.PubSub},
         # Start Finch
@@ -24,6 +22,7 @@ defmodule Buildel.Application do
         # Start document cache
         Buildel.DocumentCache
       ]
+      |> maybe_add_db()
       |> maybe_add_bumblebee_embedding()
       |> maybe_add_hybrid_db_embedding()
       |> maybe_add_python_workers()
@@ -42,6 +41,26 @@ defmodule Buildel.Application do
     :ok
   end
 
+  def load_servings() do
+    if Application.get_env(:buildel, :embeddings) == Buildel.Clients.BumblebeeEmbeddings do
+      Buildel.Clients.BumblebeeEmbeddings.serving()
+    end
+
+    Buildel.HybridDB.serving()
+  end
+
+  defp maybe_add_db(children) do
+    if System.get_env("SKIP_DB") do
+      children
+    else
+      children ++
+        [
+          # Start the Ecto repository
+          Buildel.Repo
+        ]
+    end
+  end
+
   defp maybe_add_bumblebee_embedding(children) do
     if Application.get_env(:buildel, :embeddings) == Buildel.Clients.BumblebeeEmbeddings do
       children ++
@@ -57,7 +76,7 @@ defmodule Buildel.Application do
   end
 
   defp maybe_add_hybrid_db_embedding(children) do
-    if Mix.env() != :test do
+    if Application.get_env(:buildel, :hybrid_db) do
       children ++
         [
           {Nx.Serving,
