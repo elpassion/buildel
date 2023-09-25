@@ -174,7 +174,15 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
     [events]
   );
 
-  return <div>{fields.map((field) => renderOutput(field))}</div>;
+  return (
+    <div>
+      {fields.map((field) => (
+        <React.Fragment key={field.data.name}>
+          {renderOutput(field)}
+        </React.Fragment>
+      ))}
+    </div>
+  );
 }
 
 const getTextFieldsMessages = (events: IEvent[], outputName: string) => {
