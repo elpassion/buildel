@@ -33,7 +33,6 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
-import { useDebounce } from "usehooks-ts";
 import { assert } from "~/utils/assert";
 import { CustomNode, CustomNodeProps } from "./CustomNodes/CustomNode";
 import isEqual from "lodash.isequal";
@@ -67,8 +66,11 @@ export function PipelineBuilder() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(
     getEdges(pipeline.config)
   );
-  const state = useMemo(() => ({ nodes, edges }), [nodes, edges]);
-  const debouncedState = useDebounce(state, 500);
+  const hasUnsavedChanges = isEqual(
+    //@ts-ignore
+    toPipelineConfig(nodes, edges),
+    pipeline.config
+  );
 
   const handleIsValidConnection = useCallback(
     (connection: Connection) => isValidConnection(pipeline.config, connection),
@@ -122,17 +124,18 @@ export function PipelineBuilder() {
 
   const onBlockUpdate = useCallback(
     (updated: IBlockConfig) => {
-      setNodes((prev) => {
-        return prev.map((node) => {
-          if (node.id === updated.name) {
-            node.data = updated;
-          }
-          return node;
-        });
+      const updatedNodes = nodes.map((node) => {
+        if (node.id === updated.name) {
+          node.data = updated;
+        }
+        return node;
       });
+      setNodes(updatedNodes);
+      //@ts-ignore
+      handleUpdate(toPipelineConfig(updatedNodes, edges));
       handleCloseModal();
     },
-    [setNodes]
+    [edges, handleUpdate, nodes, setNodes]
   );
 
   const onConnect = useCallback((params: Connection) => {
@@ -164,13 +167,13 @@ export function PipelineBuilder() {
     return { base: CustomEdge };
   }, []);
 
-  useEffect(() => {
+  const handleSaveUnsavedChanges = useCallback(() => {
     // @ts-ignore
-    const config = toPipelineConfig(debouncedState.nodes, debouncedState.edges);
+    const config = toPipelineConfig(nodes, edges);
     if (isEqual(config, pipeline.config)) return;
 
     handleUpdate(config);
-  }, [debouncedState]);
+  }, [edges, handleUpdate, nodes, pipeline.config]);
 
   useEffect(() => {
     if (updateFetcher.state === "idle" && updateFetcher.data !== null) {
@@ -180,7 +183,7 @@ export function PipelineBuilder() {
       setNodes(getNodes(config.config));
       setEdges(getEdges(config.config));
     }
-  }, [updateFetcher]);
+  }, [pipeline.config, updateFetcher]);
 
   const { onDragOver, onDrop, onInit } = useDraggableNodes({
     wrapper: reactFlowWrapper,
@@ -194,7 +197,11 @@ export function PipelineBuilder() {
     >
       <RunPipelineProvider pipeline={pipeline}>
         <ReactFlowProvider>
-          <BuilderHeader updateStatus={updateFetcher.state} />
+          <BuilderHeader
+            updateStatus={updateFetcher.state}
+            isUpToDate={hasUnsavedChanges}
+            onSave={handleSaveUnsavedChanges}
+          />
 
           <ReactFlow
             nodes={nodes}
