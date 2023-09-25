@@ -23,7 +23,7 @@ export const PipelinesList: React.FC<PipelinesListProps> = ({
       items={pipelines}
       renderItem={(item) => (
         <Link to={routes.pipeline(item.organization_id, item.id)}>
-          <PipelinesListItem className="flex flex-col gap-3">
+          <PipelinesListItem className="flex flex-col gap-1">
             <PipelineListItemHeader pipeline={item} />
             <PipelineListItemFooter pipeline={item} />
           </PipelinesListItem>
