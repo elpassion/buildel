@@ -58,7 +58,7 @@ defmodule Buildel.SearchDB.LNXAdapter do
   @impl true
   def create_collection(collection_name, _opts \\ %{}) do
     {:ok, _} =
-      HTTPoison.post(
+      follow_redirect_post(
         "#{url()}/indexes",
         Jason.encode!(%{
           index: %{
@@ -74,8 +74,7 @@ defmodule Buildel.SearchDB.LNXAdapter do
             }
           }
         }),
-        [{"Content-Type", "application/json"}],
-        follow_redirect: true
+        headers()
       )
 
     {:ok, %{name: collection_name}}

@@ -6,6 +6,7 @@
   "scripts": {
     "build": "remix build",
     "dev": "remix dev --manual -c 'node ./server.mjs'",
+    "start": "node ./server.mjs",
     "typecheck": "tsc"
   },
   "dependencies": {
