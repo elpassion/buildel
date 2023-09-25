@@ -21,8 +21,6 @@ defmodule Buildel.Application do
         BuildelWeb.Endpoint,
         # Start a worker by calling: Buildel.Worker.start_link(arg)
         Buildel.Pipelines.Runner
-        # Start the python poolboy
-        # :poolboy.child_spec(:worker, python_poolboy_config())
       ]
       |> maybe_add_bumblebee_embedding()
       |> maybe_add_hybrid_db_embedding()

@@ -30,7 +30,7 @@ defmodule Buildel.Blocks.DocumentSearch do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["api_key", "persist_in"],
+            "required" => ["api_key", "persist_in", "forwarded_results_count", "hybrid_reranking"],
             "properties" => %{
               "api_key" => %{
                 "type" => "string",
@@ -56,6 +56,13 @@ defmodule Buildel.Blocks.DocumentSearch do
                 "minimum" => 1,
                 "maximum" => 5,
                 "step" => 1
+              },
+              "hybrid_reranking" => %{
+                "type" => "boolean",
+                "title" => "Hybrid reranking",
+                "description" =>
+                  "Whether to rerank results using hybrid encoding model. This will increase the latency of the query.",
+                "default" => false
               }
             }
           })
@@ -112,8 +119,15 @@ defmodule Buildel.Blocks.DocumentSearch do
   def handle_cast({:query, {:text, query}}, state) do
     state = send_stream_start(state)
 
+    results =
+      if state[:opts][:hybrid_reranking] do
+        Buildel.HybridDB.query(state[:collection], query)
+      else
+        Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
+      end
+
     result =
-      Buildel.HybridDB.query(state[:collection], query)
+      results
       |> Enum.take(state[:opts].forwarded_results_count)
       |> Enum.map(fn %{
                        "document" => document,
