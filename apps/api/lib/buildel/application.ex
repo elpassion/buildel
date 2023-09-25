@@ -20,7 +20,9 @@ defmodule Buildel.Application do
         # Start the Endpoint (http/https)
         BuildelWeb.Endpoint,
         # Start a worker by calling: Buildel.Worker.start_link(arg)
-        Buildel.Pipelines.Runner
+        Buildel.Pipelines.Runner,
+        # Start document cache
+        Buildel.DocumentCache
       ]
       |> maybe_add_bumblebee_embedding()
       |> maybe_add_hybrid_db_embedding()
@@ -47,7 +49,7 @@ defmodule Buildel.Application do
           {Nx.Serving,
            serving: Buildel.Clients.BumblebeeEmbeddings.serving(),
            name: Buildel.Clients.BumblebeeEmbeddings,
-           batch_timeout: 100}
+           batch_timeout: 50}
         ]
     else
       children
@@ -59,10 +61,7 @@ defmodule Buildel.Application do
       children ++
         [
           {Nx.Serving,
-           serving: Buildel.HybridDB.serving(),
-           name: Buildel.HybridDB,
-           batch_timeout: 100,
-           batch_size: 4}
+           serving: Buildel.HybridDB.serving(), name: Buildel.HybridDB, batch_timeout: 50}
         ]
     else
       children

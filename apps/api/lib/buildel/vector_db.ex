@@ -36,7 +36,17 @@ defmodule Buildel.VectorDB do
   end
 
   deftimed query(collection_name, query, api_key: api_key), [:buildel, :vector_db, :query] do
-    {:ok, embeddings_list} = embeddings().get_embeddings(inputs: [query], api_key: api_key)
+    {:ok, embeddings_list} =
+      case Buildel.DocumentCache.get("embeddings::#{query}") do
+        nil ->
+          Buildel.DocumentCache.put(
+            "embeddings::#{query}",
+            embeddings().get_embeddings(inputs: [query], api_key: api_key)
+          )
+
+        res ->
+          res
+      end
 
     {:ok, collection} = adapter().get_collection(collection_name)
 
