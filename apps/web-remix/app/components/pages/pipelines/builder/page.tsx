@@ -119,10 +119,14 @@ export function PipelineBuilder() {
 
       handleUpdate({
         version: pipeline.config.version,
-        blocks: [...pipeline.config.blocks, { ...created, name }],
+        blocks: [
+          //@ts-ignore
+          ...toPipelineConfig(nodes, edges).blocks,
+          { ...created, name },
+        ],
       });
     },
-    [pipeline, handleUpdate]
+    [pipeline, handleUpdate, nodes, edges]
   );
 
   const onBlockUpdate = useCallback(
