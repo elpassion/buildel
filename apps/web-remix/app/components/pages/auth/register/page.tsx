@@ -1,11 +1,10 @@
-import { V2_MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "@remix-run/node";
 import { Link, useSearchParams } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
 import * as React from "react";
 import { ValidatedForm } from "remix-validated-form";
 import { Field } from "~/components/form/fields/field.context";
 import { FieldError } from "~/components/form/fields/field.error";
-import { FieldLabel } from "~/components/form/fields/field.label";
 import {
   PasswordInputField,
   TextInputField,
@@ -63,7 +62,7 @@ export function RegisterPage() {
   );
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Register",

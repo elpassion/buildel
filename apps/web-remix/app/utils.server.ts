@@ -1,4 +1,9 @@
-import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
+import {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  json,
+  redirect,
+} from "@remix-run/node";
 import merge from "lodash.merge";
 import { validationError } from "remix-validated-form";
 import {
@@ -11,8 +16,10 @@ import { fetchTyped } from "./utils/fetch.server";
 import { setToastError } from "./utils/toast.error.server";
 
 export const loaderBuilder =
-  <T>(fn: (args: LoaderArgs, helpers: { fetch: typeof fetchTyped }) => T) =>
-  async (args: LoaderArgs) => {
+  <T>(
+    fn: (args: LoaderFunctionArgs, helpers: { fetch: typeof fetchTyped }) => T
+  ) =>
+  async (args: LoaderFunctionArgs) => {
     const notFound = () => json(null, { status: 404 });
     try {
       return await fn(args, { fetch: await requestFetchTyped(args) });
@@ -47,19 +54,28 @@ export const loaderBuilder =
 
 export const actionBuilder =
   (handlers: {
-    post?: (args: ActionArgs, helpers: { fetch: typeof fetchTyped }) => unknown;
+    post?: (
+      args: ActionFunctionArgs,
+      helpers: { fetch: typeof fetchTyped }
+    ) => unknown;
     delete?: (
-      args: ActionArgs,
+      args: ActionFunctionArgs,
       helpers: { fetch: typeof fetchTyped }
     ) => unknown;
     patch?: (
-      args: ActionArgs,
+      args: ActionFunctionArgs,
       helpers: { fetch: typeof fetchTyped }
     ) => unknown;
-    put?: (args: ActionArgs, helpers: { fetch: typeof fetchTyped }) => unknown;
-    get?: (args: ActionArgs, helpers: { fetch: typeof fetchTyped }) => unknown;
+    put?: (
+      args: ActionFunctionArgs,
+      helpers: { fetch: typeof fetchTyped }
+    ) => unknown;
+    get?: (
+      args: ActionFunctionArgs,
+      helpers: { fetch: typeof fetchTyped }
+    ) => unknown;
   }) =>
-  async (actionArgs: ActionArgs) => {
+  async (actionArgs: ActionFunctionArgs) => {
     const notFound = () => json(null, { status: 404 });
     try {
       switch (actionArgs.request.method) {
@@ -127,7 +143,7 @@ export const actionBuilder =
   };
 
 async function requestFetchTyped(
-  actionArgs: ActionArgs
+  actionArgs: ActionFunctionArgs
 ): Promise<typeof fetchTyped> {
   return (schema, url, options) => {
     return fetchTyped(

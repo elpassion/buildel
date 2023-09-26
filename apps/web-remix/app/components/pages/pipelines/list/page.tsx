@@ -1,5 +1,5 @@
 import React from "react";
-import { V2_MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useMatch } from "@remix-run/react";
 import { loader } from "./loader";
 import { PipelinesNavbar } from "./PipelinesNavbar";
@@ -54,7 +54,7 @@ export function PipelinesPage() {
   );
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Workflows",

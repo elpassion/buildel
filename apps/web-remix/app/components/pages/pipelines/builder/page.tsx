@@ -1,4 +1,4 @@
-import { V2_MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "@remix-run/node";
 
 import React, {
   useCallback,
@@ -281,7 +281,7 @@ export function PipelineBuilder() {
   );
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Builder",

@@ -1,4 +1,4 @@
-import { V2_MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useMemo } from "react";
 import { ValidatedForm } from "remix-validated-form";
@@ -42,7 +42,7 @@ export function NewOrganizationPage() {
   );
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "New Organization",

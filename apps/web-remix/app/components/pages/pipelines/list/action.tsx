@@ -1,10 +1,10 @@
-import { ActionArgs, json } from "@remix-run/node";
+import { ActionFunctionArgs, json } from "@remix-run/node";
 import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { z } from "zod";
 
-export async function action(actionArgs: ActionArgs) {
+export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
     delete: async ({ params, request }, { fetch }) => {
       await requireLogin(request);

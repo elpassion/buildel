@@ -1,10 +1,10 @@
-import { LoaderArgs, redirect } from "@remix-run/node";
+import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { z } from "zod";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
 import { routes } from "~/utils/routes.utils";
 
-export async function loader(args: LoaderArgs) {
+export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {
     await requireLogin(request);
 

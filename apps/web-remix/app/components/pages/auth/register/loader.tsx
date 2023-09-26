@@ -1,7 +1,7 @@
-import { json, LoaderArgs } from "@remix-run/node";
+import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { requireNotLogin } from "~/session.server";
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   await requireNotLogin(request);
   return json({});
 }

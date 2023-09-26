@@ -1,11 +1,10 @@
-import { V2_MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "@remix-run/node";
 import { useActionData, useSearchParams, Link } from "@remix-run/react";
 import * as React from "react";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { schema } from "./schema";
 import { Field } from "~/components/form/fields/field.context";
-import { FieldLabel } from "~/components/form/fields/field.label";
 import {
   PasswordInputField,
   TextInputField,
@@ -82,7 +81,7 @@ export function LoginPage() {
   );
 }
 
-export const meta: V2_MetaFunction = () => {
+export const meta: MetaFunction = () => {
   return [
     {
       title: "Login",

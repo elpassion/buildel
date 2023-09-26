@@ -1,4 +1,4 @@
-import { ActionArgs, redirect } from "@remix-run/node";
+import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
 import invariant from "tiny-invariant";
@@ -7,7 +7,7 @@ import { PipelineResponse } from "../contracts";
 import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
 
-export async function action(actionArgs: ActionArgs) {
+export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
     post: async ({ request, params }, { fetch }) => {
       const validator = withZod(schema);

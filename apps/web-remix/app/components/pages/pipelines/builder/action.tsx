@@ -1,4 +1,4 @@
-import { ActionArgs } from "@remix-run/node";
+import { ActionFunctionArgs } from "@remix-run/node";
 import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
@@ -7,7 +7,7 @@ import { updateSchema } from "~/components/pages/pipelines/pipelineLayout/schema
 import { validationError } from "remix-validated-form";
 import { PipelineResponse } from "~/components/pages/pipelines/contracts";
 
-export async function action(actionArgs: ActionArgs) {
+export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
     put: async ({ params, request }, { fetch }) => {
       await requireLogin(request);
