@@ -1,23 +1,20 @@
-import React, { useCallback, useState } from "react";
-import { IBlockConfig, IField } from "../../pipeline.types";
+import React, { useCallback } from "react";
+import { Button } from "@elpassion/taco";
 import {
   FileListResponse,
   FileResponse,
 } from "~/components/pages/pipelines/contracts";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
+import { TextareaInput } from "~/components/form/inputs/textarea.input";
+import { IFile } from "~/components/fileUpload/fileUpload.types";
+import { IBlockConfig, IField } from "../../pipeline.types";
 import {
   IEvent,
   useRunPipeline,
   useRunPipelineNode,
 } from "../RunPipelineProvider";
-import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
-import { TextareaInput } from "~/components/form/inputs/textarea.input";
-import { Button } from "@elpassion/taco";
-import { IFile } from "~/components/fileUpload/fileUpload.types";
-import { TabGroup } from "~/components/tabs/TabGroup";
-import { Tab, TabButton } from "~/components/tabs/Tab";
-import { RadioInput } from "~/components/form/inputs/radio.input";
+import { AudioField } from "./AudioField";
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -55,14 +52,6 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     [blockName, clearEvents, push]
   );
 
-  const uploadAudioChunk = useCallback(
-    (chunk: Blob, fieldName: string) => {
-      const topic = `${blockName}:${fieldName}`;
-      push(topic, chunk);
-    },
-    [blockName, push]
-  );
-
   const uploadFile = useCallback(async (file: File): Promise<IFile> => {
     const formData = new FormData();
     formData.append("file", file);
@@ -96,6 +85,46 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     }));
   }, []);
 
+  const uploadAudioChunk = useCallback(
+    (chunk: Blob, fieldName: string) => {
+      const topic = `${blockName}:${fieldName}`;
+      push(topic, chunk);
+    },
+    [blockName, push]
+  );
+
+  const convertToBlobAndUpload = useCallback(
+    async (file: File, fieldName: string) => {
+      try {
+        const blob = await file.arrayBuffer().then((arrayBuffer) => {
+          return new Blob([new Uint8Array(arrayBuffer)], {
+            type: file.type,
+          });
+        });
+
+        uploadAudioChunk(blob, fieldName);
+
+        return {
+          id: Math.random(),
+          status: "done" as const,
+          file_type: file.type,
+          file_name: file.name,
+          file_size: file.size,
+        };
+      } catch (err) {
+        console.error(err);
+        return {
+          id: Math.random(),
+          status: "error" as const,
+          file_type: file.type,
+          file_name: file.name,
+          file_size: file.size,
+        };
+      }
+    },
+    [uploadAudioChunk]
+  );
+
   const renderInput = useCallback(
     (field: IField) => {
       const { type, name } = field.data;
@@ -119,15 +148,14 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
             onUpload={uploadFile}
             onFetch={fetchFiles}
             onRemove={removeFile}
-            preview={(props) => <FileUploadListPreview {...props} />}
+            preview={FileUploadListPreview}
           />
         );
       } else if (field.data.type === "audio") {
         return (
           <AudioField
             name={field.data.name}
-            onUpload={uploadFile}
-            onFetch={fetchFiles}
+            onUpload={convertToBlobAndUpload}
             onChunk={uploadAudioChunk}
           />
         );
@@ -140,78 +168,22 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
 
   return (
     <form onSubmit={onSubmit}>
-      <div className="mb-2">
-        {fields.map((field) => (
-          <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
-        ))}
-      </div>
+      {fields.map((field) => (
+        <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
+      ))}
 
-      {status === "running" && (
+      {fields.length > 0 && fields[0].data.type === "text" ? (
         <Button
           type="submit"
           size="xs"
           disabled={status !== "running"}
-          className="!text-xs"
+          className="!text-xs mt-2"
           isFluid
         >
           Send
         </Button>
-      )}
+      ) : null}
     </form>
-  );
-}
-
-interface AudioFieldProps {
-  onChunk: (chunk: Blob, name: string) => void;
-  onUpload: (file: File) => Promise<IFile>;
-  onFetch: () => Promise<IFile[]>;
-  name: string;
-}
-
-function AudioField({ onChunk, onFetch, onUpload, name }: AudioFieldProps) {
-  const [activeTab, setActiveTab] = useState("microphone");
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setActiveTab(e.target.value);
-  };
-  return (
-    <TabGroup activeTab={activeTab}>
-      <div className="flex gap-2 mb-3 mt-1 w-[260px]">
-        <RadioInput
-          size="sm"
-          value="microphone"
-          id="audio-upload-mic"
-          name="audio-upload"
-          labelText="Microphone"
-          checked={activeTab === "microphone"}
-          onChange={onChange}
-        />
-
-        <RadioInput
-          size="sm"
-          value="upload"
-          id="audio-upload-upload"
-          name="audio-upload"
-          labelText="File upload"
-          checked={activeTab === "upload"}
-          onChange={onChange}
-        />
-      </div>
-
-      <Tab tabId="microphone">
-        <AudioRecorder onChunk={(e) => onChunk(e.data, name)} />
-      </Tab>
-
-      <Tab tabId="upload">
-        <FileUpload
-          multiple
-          name={name}
-          onFetch={onFetch}
-          onUpload={onUpload}
-        />
-      </Tab>
-    </TabGroup>
   );
 }
 

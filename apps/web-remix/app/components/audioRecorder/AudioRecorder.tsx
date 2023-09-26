@@ -171,7 +171,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
           "relative after:absolute after:w-full after:content-[''] after:h-[1px] after:bg-neutral-400 after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2"
         )}
       >
-        <canvas ref={canvasRef} width={audioUrl ? 178 : 210} height={36} />
+        <canvas ref={canvasRef} width={audioUrl ? 203 : 235} height={36} />
       </div>
 
       {audioValue && (

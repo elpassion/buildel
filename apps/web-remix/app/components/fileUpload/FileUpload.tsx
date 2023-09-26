@@ -12,12 +12,13 @@ import {
   IPreviewProps,
   isUploadError,
 } from "./fileUpload.types";
+import { assert } from "~/utils/assert";
 
 interface FileUploadProps
   extends React.HTMLProps<Omit<HTMLInputElement, "onChange">> {
   preview?: (props: IPreviewProps) => ReactNode;
   onUpload: (file: File) => Promise<IFile>;
-  onFetch: () => Promise<IFile[]>;
+  onFetch?: () => Promise<IFile[]>;
   onRemove?: (id: number) => Promise<any>;
 }
 
@@ -33,6 +34,7 @@ export function FileUpload({
   const [fileList, setFileList] = useState<IFileUpload[]>([]);
 
   const handleFetchFiles = useCallback(async () => {
+    assert(onFetch);
     try {
       const files = await onFetch();
 
@@ -110,6 +112,7 @@ export function FileUpload({
   }, []);
 
   useEffect(() => {
+    if (!onFetch) return;
     handleFetchFiles();
   }, []);
 
