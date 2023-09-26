@@ -67,7 +67,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     return FileResponse.parse(response);
   }, []);
 
-  const removeField = useCallback(async (id: number) => {
+  const removeFile = useCallback(async (id: number) => {
     return fetch(`/super-api/organizations/${organizationId}/memories/${id}`, {
       method: "DELETE",
     });
@@ -103,7 +103,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
             name={name}
             onUpload={uploadFile}
             onFetch={fetchFiles}
-            onRemove={removeField}
+            onRemove={removeFile}
             preview={(props) => (
               <FileUploadListPreview
                 {...props}
@@ -120,7 +120,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
 
       return <span>Unsupported input type - {type}</span>;
     },
-    [fetchFiles, removeField, uploadFile, status]
+    [fetchFiles, removeFile, uploadFile, status]
   );
 
   return (
