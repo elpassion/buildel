@@ -124,7 +124,12 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         );
       } else if (field.data.type === "audio") {
         return (
-          <AudioField onChunk={(chunk) => uploadAudioChunk(chunk, name)} />
+          <AudioField
+            name={field.data.name}
+            onUpload={uploadFile}
+            onFetch={fetchFiles}
+            onChunk={uploadAudioChunk}
+          />
         );
       }
 
@@ -157,10 +162,13 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
 }
 
 interface AudioFieldProps {
-  onChunk: (chunk: Blob) => void;
+  onChunk: (chunk: Blob, name: string) => void;
+  onUpload: (file: File) => Promise<IFile>;
+  onFetch: () => Promise<IFile[]>;
+  name: string;
 }
 
-function AudioField({ onChunk }: AudioFieldProps) {
+function AudioField({ onChunk, onFetch, onUpload, name }: AudioFieldProps) {
   const [activeTab, setActiveTab] = useState("microphone");
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
@@ -192,13 +200,16 @@ function AudioField({ onChunk }: AudioFieldProps) {
       </div>
 
       <Tab tabId="microphone">
-        <AudioRecorder
-          onChunk={(e) => onChunk(e.data)}
-          // onStop={(_e, chunks) => console.log(chunks)}
-        />
+        <AudioRecorder onChunk={(e) => onChunk(e.data, name)} />
       </Tab>
+
       <Tab tabId="upload">
-        <FileUpload multiple id={"name"} name={"name"} />
+        <FileUpload
+          multiple
+          name={name}
+          onFetch={onFetch}
+          onUpload={onUpload}
+        />
       </Tab>
     </TabGroup>
   );
