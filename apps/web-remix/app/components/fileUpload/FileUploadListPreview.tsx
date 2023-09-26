@@ -47,10 +47,9 @@ export function FileUploadListItem({
   return (
     <article
       className={classNames(
-        "flex justify-between gap-2 w-full py-1 px-2 transition rounded-md",
+        "flex justify-between gap-2 w-full py-1 px-2 bg-neutral-600 hover:bg-neutral-700 transition rounded-md",
         {
-          "text-white bg-neutral-600 hover:bg-neutral-700 ":
-            file.status !== "error",
+          "text-white": file.status !== "error",
           "text-red-500": file.status === "error",
         }
       )}
@@ -63,8 +62,8 @@ export function FileUploadListItem({
           </h6>
           <span
             className={classNames("text-[10px]", {
-              "text-neutral-100": !isUploadError(file),
-              "text-red-500": isUploadError(file),
+              "text-white": file.status !== "error",
+              "text-red-500": file.status === "error",
             })}
           >
             {renderSize(file.file_size)}

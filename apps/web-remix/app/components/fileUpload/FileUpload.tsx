@@ -48,7 +48,7 @@ export function FileUpload({
 
       if (!files) return;
 
-      [...files].map(async (file) => {
+      [...files].forEach(async (file) => {
         const id = Math.random();
         setFileList((prev) => [
           {
