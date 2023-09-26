@@ -57,7 +57,7 @@ export function PipelinesPage() {
 export const meta: V2_MetaFunction = () => {
   return [
     {
-      title: "Pipelines",
+      title: "Workflows",
     },
   ];
 };
@@ -119,9 +119,11 @@ function TemplatesWithoutPipelines({
 }) {
   return (
     <WorkflowTemplates className="max-w-[38rem] md:p-8">
-      <Button size="sm" className="mx-auto mb-[30px]">
-        Build a new AI workflow
-      </Button>
+      <Link to={routes.pipelinesNew(organizationId)}>
+        <Button size="sm" className="mx-auto mb-[30px]">
+          Build a new AI workflow
+        </Button>
+      </Link>
       <WorkflowTemplatesHeader
         heading="Or build upon one of our workflow templates"
         subheading="Pick a starting point for your next AI workflow."
