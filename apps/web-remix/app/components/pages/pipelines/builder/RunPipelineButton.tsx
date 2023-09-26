@@ -35,7 +35,7 @@ export const RunPipelineButton: React.FC<RunPipelineButtonProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 pointer-events-auto">
       <Button
         onClick={handleRun}
         size="sm"
