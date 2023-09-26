@@ -3,6 +3,7 @@ export interface IFile {
   file_name: string;
   file_size: number;
   file_type: string;
+  status: "uploading" | "done" | "error";
 }
 
 export interface IUploadError extends IFile {

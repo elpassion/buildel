@@ -14,6 +14,7 @@ import {
 import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
 import { Button } from "@elpassion/taco";
+import { IFile } from "~/components/fileUpload/fileUpload.types";
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -51,7 +52,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     [blockName, clearEvents, push]
   );
 
-  const uploadFile = useCallback(async (file: File) => {
+  const uploadFile = useCallback(async (file: File): Promise<IFile> => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("collection_name", `${pipelineId}_${blockName}`);
@@ -64,7 +65,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
       }
     ).then((res) => res.json());
 
-    return FileResponse.parse(response);
+    return { ...FileResponse.parse(response), status: "done" };
   }, []);
 
   const removeFile = useCallback(async (id: number) => {
@@ -73,12 +74,15 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     });
   }, []);
 
-  const fetchFiles = useCallback(async () => {
+  const fetchFiles = useCallback(async (): Promise<IFile[]> => {
     const response = await fetch(
       `/super-api/organizations/${organizationId}/memories?collection_name=${pipelineId}_${blockName}`
     ).then((res) => res.json());
 
-    return FileListResponse.parse(response);
+    return FileListResponse.parse(response).map((file) => ({
+      ...file,
+      status: "done",
+    }));
   }, []);
 
   const renderInput = useCallback(
@@ -104,12 +108,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
             onUpload={uploadFile}
             onFetch={fetchFiles}
             onRemove={removeFile}
-            preview={(props) => (
-              <FileUploadListPreview
-                {...props}
-                disabled={status === "running" || status === "starting"}
-              />
-            )}
+            preview={(props) => <FileUploadListPreview {...props} />}
           />
         );
       } else if (field.data.type === "audio") {

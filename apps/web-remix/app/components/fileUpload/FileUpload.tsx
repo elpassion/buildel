@@ -1,3 +1,4 @@
+import { Button } from "@elpassion/taco";
 import React, {
   ReactNode,
   useCallback,
@@ -5,13 +6,11 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Button } from "@elpassion/taco";
 import {
   IFile,
   IFileUpload,
   IPreviewProps,
   isUploadError,
-  isUploadRejected,
 } from "./fileUpload.types";
 
 interface FileUploadProps
@@ -20,8 +19,6 @@ interface FileUploadProps
   onUpload: (file: File) => Promise<IFile>;
   onFetch: () => Promise<IFile[]>;
   onRemove?: (id: number) => Promise<any>;
-  onUploadError?: (e: unknown) => void;
-  onUploadSuccess?: () => void;
 }
 
 export function FileUpload({
@@ -29,13 +26,10 @@ export function FileUpload({
   preview,
   onUpload,
   onFetch,
-  onUploadError,
-  onUploadSuccess,
   onRemove,
   ...rest
 }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [loading, setLoading] = useState(false);
   const [fileList, setFileList] = useState<IFileUpload[]>([]);
 
   const handleFetchFiles = useCallback(async () => {
@@ -50,43 +44,46 @@ export function FileUpload({
 
   const handleUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
-      setLoading(true);
-      try {
-        const { files } = e.target;
+      const { files } = e.target;
 
-        if (!files) return;
+      if (!files) return;
 
-        const promises = [...files].map((file) => onUpload(file));
-
-        const settledResult = await Promise.allSettled(promises);
-
-        const uploaded = settledResult.reduce((acc, curr, currentIndex) => {
-          if (isUploadRejected(curr)) {
-            return [
-              ...acc,
-              {
-                id: Math.random(),
-                file_name: files[currentIndex].name,
-                file_size: files[currentIndex].size,
-                file_type: files[currentIndex].type,
-                error: curr.reason?.message || "Unknown upload error",
-              },
-            ];
-          }
-          return [...acc, curr.value];
-        }, [] as IFileUpload[]);
-
-        setFileList((prev) => [...uploaded, ...prev]);
-
-        onUploadSuccess?.();
-
-        setLoading(false);
-      } catch (e) {
-        onUploadError?.(e);
-        setLoading(false);
-      }
+      [...files].map(async (file) => {
+        const id = Math.random();
+        setFileList((prev) => [
+          {
+            id: id,
+            file_name: file.name,
+            file_size: file.size,
+            file_type: file.type,
+            status: "uploading",
+          },
+          ...prev,
+        ]);
+        await onUpload(file)
+          .then((res) => {
+            setFileList((prev) =>
+              prev.map((file) => {
+                if (file.id === id) {
+                  return { ...res, status: "done" };
+                }
+                return file;
+              })
+            );
+          })
+          .catch((e) => {
+            setFileList((prev) =>
+              prev.map((file) => {
+                if (file.id === id) {
+                  return { ...file, status: "error" };
+                }
+                return file;
+              })
+            );
+          });
+      });
     },
-    [onUploadError, onUploadSuccess, onUpload]
+    [onUpload]
   );
 
   const handleRemove = useCallback(
@@ -125,7 +122,6 @@ export function FileUpload({
           ref={inputRef}
           {...rest}
           onChange={handleUpload}
-          disabled={loading}
           hidden
         />
         <Button
@@ -133,7 +129,6 @@ export function FileUpload({
           size="xs"
           variant="outlined"
           className="!text-xs"
-          disabled={loading}
           isFluid
         >
           Browse files to upload

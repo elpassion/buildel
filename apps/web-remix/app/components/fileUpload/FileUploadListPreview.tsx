@@ -13,7 +13,6 @@ interface FileUploadListPreviewProps extends Omit<IPreviewProps, "remove"> {
 export function FileUploadListPreview({
   fileList = [],
   remove,
-  disabled,
   className,
 }: FileUploadListPreviewProps) {
   return (
@@ -25,7 +24,7 @@ export function FileUploadListPreview({
       itemClassName="w-full"
       items={fileList}
       renderItem={(file) => (
-        <FileUploadListItem file={file} onRemove={remove} disabled={disabled} />
+        <FileUploadListItem file={file} onRemove={remove} />
       )}
     />
   );
@@ -34,13 +33,13 @@ export function FileUploadListPreview({
 interface FileUploadListItemProps {
   file: IFileUpload;
   onRemove?: (id: number) => Promise<void>;
-  disabled?: boolean;
 }
 export function FileUploadListItem({
   file,
   onRemove,
-  disabled,
 }: FileUploadListItemProps) {
+  const disabled = file.status === "uploading";
+
   const handleRemove = useCallback(() => {
     onRemove?.(file.id);
   }, [onRemove]);
@@ -48,10 +47,11 @@ export function FileUploadListItem({
   return (
     <article
       className={classNames(
-        "flex justify-between gap-2 w-full p-1 bg-neutral-600 hover:bg-neutral-700 transition rounded-md",
+        "flex justify-between gap-2 w-full py-1 px-2 transition rounded-md",
         {
-          "text-white": !isUploadError(file),
-          "text-red-500": isUploadError(file),
+          "text-white bg-neutral-600 hover:bg-neutral-700 ":
+            file.status !== "error",
+          "text-red-500": file.status === "error",
         }
       )}
     >
@@ -73,8 +73,16 @@ export function FileUploadListItem({
       </div>
       {onRemove && (
         <IconButton
+          className={classNames("origin-center w-4 h-4", {
+            "animate-spin": file.status === "uploading",
+          })}
           onlyIcon
-          icon={<Icon iconName="x" className="tex-[10px]" />}
+          icon={
+            <Icon
+              className="w-4 h-4"
+              iconName={file.status === "uploading" ? "loader" : "x"}
+            />
+          }
           disabled={disabled}
           onClick={handleRemove}
         />
