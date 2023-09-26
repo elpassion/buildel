@@ -1,4 +1,4 @@
-import { Channel, Socket } from "phoenix";
+import { Channel, ConnectionState, Socket } from "phoenix";
 import { v4 } from "uuid";
 import { assert } from "./assert";
 
@@ -38,14 +38,24 @@ export class BuildelSocket {
     });
   }
 
+  public status(): ConnectionState {
+    return this.socket.connectionState();
+  }
+
   public run(
     pipelineId: number,
     handlers?: {
-      onOutput: (blockId: string, outputName: string, payload: unknown) => void;
-      onStatusChange: (blockId: string, isWorking: boolean) => void;
+      onBlockOutput: (
+        blockId: string,
+        outputName: string,
+        payload: unknown
+      ) => void;
+      onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
+      onStatusChange: (status: BuildelRunStatus) => void;
     }
   ) {
-    const onOutput = handlers?.onOutput ?? (() => {});
+    const onBlockOutput = handlers?.onBlockOutput ?? (() => {});
+    const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => {});
     const onStatusChange = handlers?.onStatusChange ?? (() => {});
 
     return new BuildelRun(
@@ -53,7 +63,7 @@ export class BuildelSocket {
       this.id,
       this.organizationId,
       pipelineId,
-      { onOutput, onStatusChange }
+      { onBlockOutput, onBlockStatusChange, onStatusChange }
     );
   }
 }
@@ -67,8 +77,13 @@ export class BuildelRun {
     private readonly organizationId: number,
     private readonly pipelineId: number,
     private readonly handlers: {
-      onOutput: (blockId: string, outputName: string, payload: unknown) => void;
-      onStatusChange: (blockId: string, isWorking: boolean) => void;
+      onBlockOutput: (
+        blockId: string,
+        outputName: string,
+        payload: unknown
+      ) => void;
+      onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
+      onStatusChange: (status: BuildelRunStatus) => void;
     }
   ) {}
 
@@ -85,15 +100,15 @@ export class BuildelRun {
     this.channel.onMessage = (event: string, payload: any) => {
       if (event.startsWith("output:")) {
         const [_, blockId, outputName] = event.split(":");
-        this.handlers.onOutput(blockId, outputName, payload);
+        this.handlers.onBlockOutput(blockId, outputName, payload);
       }
       if (event.startsWith("start:")) {
         const [_, blockId] = event.split(":");
-        this.handlers.onStatusChange(blockId, true);
+        this.handlers.onBlockStatusChange(blockId, true);
       }
       if (event.startsWith("stop:")) {
         const [_, blockId] = event.split(":");
-        this.handlers.onStatusChange(blockId, false);
+        this.handlers.onBlockStatusChange(blockId, false);
       }
       return payload;
     };
@@ -102,9 +117,11 @@ export class BuildelRun {
       assert(this.channel);
       this.channel.join().receive("ok", (response) => {
         resolve(this);
+        this.handlers.onStatusChange("running");
       });
       this.channel.onError((error) => {
         reject(error);
+        this.handlers.onStatusChange("idle");
       });
     });
   }
@@ -117,6 +134,7 @@ export class BuildelRun {
       this.channel.leave().receive("ok", (response) => {
         this.channel = null;
         resolve(this);
+        this.handlers.onStatusChange("idle");
       });
       this.channel.onError((error) => {
         reject(error);
@@ -137,8 +155,9 @@ export class BuildelRun {
     }
   }
 
-  public get status() {
-    if (this.channel === null) return "idle";
+  public get status(): BuildelRunStatus {
+    if (this.socket.connectionState() !== "open" || this.channel === null)
+      return "idle";
     return this.channel.state === "joined" ? "running" : "starting";
   }
 
@@ -155,3 +174,5 @@ export class BuildelRun {
     }).then((response) => response.json());
   }
 }
+
+export type BuildelRunStatus = "idle" | "starting" | "running";
