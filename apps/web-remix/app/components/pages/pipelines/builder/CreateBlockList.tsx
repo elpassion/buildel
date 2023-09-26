@@ -1,12 +1,13 @@
 import { z } from "zod";
-import { useReactFlow, useViewport } from "reactflow";
+import { useReactFlow } from "reactflow";
 import React, { DragEvent, useCallback, useMemo } from "react";
 import startCase from "lodash.startcase";
 import classNames from "classnames";
 import { useRunPipeline } from "./RunPipelineProvider";
 import { IBlockConfig, IBlockTypes } from "../pipeline.types";
-import { Button, Icon, IconButton } from "@elpassion/taco";
+import { Icon, IconButton } from "@elpassion/taco";
 import { BlockType } from "~/components/pages/pipelines/contracts";
+
 interface CreateBlockListProps {
   blockTypes: IBlockTypes;
   onCreate: (node: IBlockConfig) => void;
@@ -19,8 +20,11 @@ export const CreateBlockList: React.FC<CreateBlockListProps> = ({
   const reactFlowInstance = useReactFlow();
   const { status: runStatus } = useRunPipeline();
 
-  const onDragStart = (event: DragEvent<HTMLLIElement>, nodeType: string) => {
-    event.dataTransfer.setData("application/reactflow", nodeType);
+  const onDragStart = (
+    event: DragEvent<HTMLLIElement>,
+    block: z.TypeOf<typeof BlockType>
+  ) => {
+    event.dataTransfer.setData("application/reactflow", JSON.stringify(block));
     event.dataTransfer.effectAllowed = "move";
   };
 
@@ -77,7 +81,7 @@ export const CreateBlockList: React.FC<CreateBlockListProps> = ({
                 )}
                 onDragStart={(event) => {
                   if (runStatus !== "idle") return;
-                  onDragStart(event, block.type);
+                  onDragStart(event, block);
                 }}
                 draggable
               >

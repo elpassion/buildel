@@ -2,6 +2,8 @@ import { DragEvent, RefObject, useCallback, useState } from "react";
 import { ReactFlowInstance } from "reactflow";
 import { IBlockConfig } from "../pipeline.types";
 import { assert } from "~/utils/assert";
+import { z } from "zod";
+import { BlockType } from "~/components/pages/pipelines/contracts";
 
 interface IUseDraggableNodes {
   wrapper: RefObject<HTMLDivElement>;
@@ -18,32 +20,36 @@ export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {
 
   const handleOnDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
+      try {
+        event.preventDefault();
 
-      assert(wrapper.current);
-      assert(reactFlowInstance);
+        assert(wrapper.current);
+        assert(reactFlowInstance);
 
-      const reactFlowBounds = wrapper.current.getBoundingClientRect();
-      const type = event.dataTransfer.getData("application/reactflow");
+        const reactFlowBounds = wrapper.current.getBoundingClientRect();
 
-      if (typeof type === "undefined" || !type) return;
+        const block = JSON.parse(
+          event.dataTransfer.getData("application/reactflow")
+        ) as z.TypeOf<typeof BlockType>;
 
-      const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
-      });
+        if (!block) return;
 
-      //name is set higher
-      const newNode = {
-        name: "",
-        type: type,
-        position,
-        opts: {},
-        inputs: [],
-      };
+        const position = reactFlowInstance.project({
+          x: event.clientX - reactFlowBounds.left,
+          y: event.clientY - reactFlowBounds.top,
+        });
 
-      // @ts-ignore
-      onDrop(newNode);
+        onDrop({
+          name: "",
+          opts: {},
+          block_type: block,
+          ...block,
+          inputs: [],
+          position: position,
+        });
+      } catch (err) {
+        console.error(err);
+      }
     },
     [onDrop, reactFlowInstance, wrapper]
   );

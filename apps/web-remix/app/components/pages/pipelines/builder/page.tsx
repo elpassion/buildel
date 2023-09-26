@@ -158,7 +158,7 @@ export function PipelineBuilder() {
         onDelete={handleDelete}
       />
     ),
-    [handleDelete, handleEditBlock]
+    [handleDelete]
   );
 
   const nodeTypes = useMemo(() => {
@@ -169,7 +169,7 @@ export function PipelineBuilder() {
       }),
       {}
     );
-  }, [PipelineNode, blockTypes]);
+  }, [PipelineNode, blockTypes.length]);
 
   const edgeTypes = useMemo(() => {
     return { base: CustomEdge };
