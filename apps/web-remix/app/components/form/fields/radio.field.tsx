@@ -14,14 +14,14 @@ export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
     useEffect(() => {
       if (!formValue && defaultValue) {
         setFormValue(defaultValue as string);
+        validate();
       }
-    }, [defaultValue, formValue, setFormValue]);
+    }, [defaultValue, formValue, setFormValue, validate]);
 
     return (
       <RadioInput
         {...props}
         {...getInputProps({ type: "radio", id: props.id })}
-        defaultValue={defaultValue}
         checked={formValue === props.value}
         onChange={(e) => {
           setFormValue(e.target.value);

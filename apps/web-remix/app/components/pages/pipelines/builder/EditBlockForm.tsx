@@ -10,14 +10,14 @@ import {
   NumberField,
   StringField,
 } from "~/components/form/schema/SchemaFields";
-import { ValidatedForm } from "remix-validated-form";
+import { ValidatedForm, useFormContext } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import {
   Field as FormField,
   HiddenField,
 } from "~/components/form/fields/field.context";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
-import { ReactNode, useCallback } from "react";
+import { ReactNode, useCallback, useEffect } from "react";
 
 export function EditBlockForm({
   onSubmit,
@@ -82,8 +82,19 @@ export function EditBlockForm({
       <Button size="sm" type="submit" variant="filled" className="mt-6" isFluid>
         Save changes
       </Button>
+
+      <TriggerValidation />
     </ValidatedForm>
   );
+}
+
+function TriggerValidation() {
+  const { validate } = useFormContext();
+
+  useEffect(() => {
+    validate();
+  }, [validate]);
+  return null;
 }
 
 function generateSuggestions(inputs: string[]) {
