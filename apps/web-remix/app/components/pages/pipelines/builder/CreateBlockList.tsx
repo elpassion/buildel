@@ -31,13 +31,14 @@ export const CreateBlockList: React.FC<CreateBlockListProps> = ({
         x: (x / 2) * Math.random(),
         y: (y / 2) * Math.random(),
       });
-      //@ts-ignore
+
       onCreate({
         name: "",
-        type: block.type,
-        position,
         opts: {},
+        block_type: block,
+        ...block,
         inputs: [],
+        position: position,
       });
     },
     [onCreate, reactFlowInstance]

@@ -117,16 +117,17 @@ export function PipelineBuilder() {
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${created.type.toLowerCase()}_${nameNum}`;
 
-      handleUpdate({
-        version: pipeline.config.version,
-        blocks: [
-          //@ts-ignore
-          ...toPipelineConfig(nodes, edges).blocks,
-          { ...created, name },
-        ],
-      });
+      setNodes((prev) => [
+        ...prev,
+        {
+          id: name,
+          type: created.type,
+          position: created.position!,
+          data: { ...created, name },
+        },
+      ]);
     },
-    [pipeline, handleUpdate, nodes, edges]
+    [pipeline, setNodes]
   );
 
   const onBlockUpdate = useCallback(
@@ -157,7 +158,7 @@ export function PipelineBuilder() {
         onDelete={handleDelete}
       />
     ),
-    [handleDelete]
+    [handleDelete, handleEditBlock]
   );
 
   const nodeTypes = useMemo(() => {
@@ -168,7 +169,7 @@ export function PipelineBuilder() {
       }),
       {}
     );
-  }, [PipelineNode, blockTypes.length]);
+  }, [PipelineNode, blockTypes]);
 
   const edgeTypes = useMemo(() => {
     return { base: CustomEdge };
@@ -202,7 +203,10 @@ export function PipelineBuilder() {
       className="relative py-5 h-[calc(100vh_-_100px)] w-full"
       ref={reactFlowWrapper}
     >
-      <RunPipelineProvider pipeline={pipeline}>
+      <RunPipelineProvider
+        //@ts-ignore
+        pipeline={{ ...pipeline, config: toPipelineConfig(nodes, edges) }}
+      >
         <ReactFlowProvider>
           <BuilderHeader
             isUpToDate={isUpToDate}

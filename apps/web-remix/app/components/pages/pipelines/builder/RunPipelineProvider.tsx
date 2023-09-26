@@ -90,7 +90,6 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   }, [pipeline]);
 
   const isValid = useMemo(() => {
-    //@ts-ignore
     return Object.values(blockValidations).every((v) => v.success);
   }, [blockValidations]);
 
@@ -175,12 +174,12 @@ export const useRunPipelineNode = (block: IBlockConfig) => {
   );
 
   const isValid = useMemo(() => {
-    return ctx.blockValidations[blockName].success ?? false;
+    return ctx.blockValidations[blockName]?.success ?? false;
   }, [blockName, ctx.blockValidations]);
 
   const errors = useMemo(() => {
-    const validation = ctx.blockValidations[blockName];
-    if (validation.success) {
+    const validation = ctx.blockValidations[blockName] || { success: true };
+    if (validation?.success) {
       return [];
     } else {
       return validation.error.errors.map((err) => err.message);
