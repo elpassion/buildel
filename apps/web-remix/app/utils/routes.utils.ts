@@ -17,6 +17,8 @@ export const routes = {
     `${routes.pipeline(organizationId, pipelineId)}/settings`,
   pipelinesNew: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/pipelines/new`,
+  knowledgeBase: (organizationId: OrganizationId) =>
+    `${routes.organization(organizationId)}/knowledge-base`,
 };
 
 type OrganizationId = string | number;

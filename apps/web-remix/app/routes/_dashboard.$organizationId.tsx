@@ -11,7 +11,7 @@ import Modal from "react-modal";
 import { useOnClickOutside } from "usehooks-ts";
 import { MenuInfo } from "rc-menu/es/interface";
 import { Avatar, Icon, IconButton, Sidebar } from "@elpassion/taco";
-import { LoaderArgs, json } from "@remix-run/node";
+import { DataFunctionArgs, json } from "@remix-run/node";
 import {
   NavLink,
   Outlet,
@@ -30,7 +30,7 @@ import { PageOverlay } from "~/components/overlay/PageOverlay";
 import { RemixNavLinkProps } from "@remix-run/react/dist/components";
 
 Modal.setAppElement("#_root");
-export async function loader(loaderArgs: LoaderArgs) {
+export async function loader(loaderArgs: DataFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
     invariant(params.organizationId, "organizationId not found");
@@ -106,7 +106,7 @@ export default function Layout() {
               />
 
               <SidebarLink
-                to={routes.pipelines(organization.id)}
+                to={routes.knowledgeBase(organization.id)}
                 icon={<Icon iconName="briefcase" className="w-5 h-5" />}
                 text="Knowledge Base"
                 onlyIcon={collapsed}
@@ -280,8 +280,9 @@ export function SidebarMenuItem({
   return (
     <div
       className={classNames(
-        "flex items-center space-x-2 p-2  rounded-lg bg-transparent text-neutral-100 hover:bg-neutral-700",
+        "flex items-center space-x-2 p-2 rounded-lg text-neutral-100 hover:bg-neutral-700",
         {
+          "bg-transparent": !isActive,
           "bg-neutral-700": isActive,
           "w-full": !onlyIcon,
           "w-9 h-9": onlyIcon,
