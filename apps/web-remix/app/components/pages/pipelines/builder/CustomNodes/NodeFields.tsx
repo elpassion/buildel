@@ -52,6 +52,14 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     [blockName, clearEvents, push]
   );
 
+  const uploadAudioChunk = useCallback(
+    (chunk: Blob, fieldName: string) => {
+      const topic = `${blockName}:${fieldName}`;
+      push(topic, chunk);
+    },
+    [blockName, push]
+  );
+
   const uploadFile = useCallback(async (file: File): Promise<IFile> => {
     const formData = new FormData();
     formData.append("file", file);
@@ -113,7 +121,10 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         );
       } else if (field.data.type === "audio") {
         return (
-          <AudioRecorder onStatusChange={(status) => console.log(status)} />
+          <AudioRecorder
+            onChunk={(blobEvent) => uploadAudioChunk(blobEvent.data, name)}
+            onStop={(_e, chunks) => console.log(chunks)}
+          />
         );
       }
 
