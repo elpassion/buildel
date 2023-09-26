@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { IBlockConfig, IField } from "../../pipeline.types";
 import {
   FileListResponse,
@@ -15,6 +15,9 @@ import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
 import { Button } from "@elpassion/taco";
 import { IFile } from "~/components/fileUpload/fileUpload.types";
+import { TabGroup } from "~/components/tabs/TabGroup";
+import { Tab, TabButton } from "~/components/tabs/Tab";
+import { RadioInput } from "~/components/form/inputs/radio.input";
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -121,10 +124,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         );
       } else if (field.data.type === "audio") {
         return (
-          <AudioRecorder
-            onChunk={(blobEvent) => uploadAudioChunk(blobEvent.data, name)}
-            onStop={(_e, chunks) => console.log(chunks)}
-          />
+          <AudioField onChunk={(chunk) => uploadAudioChunk(chunk, name)} />
         );
       }
 
@@ -153,6 +153,54 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
         </Button>
       )}
     </form>
+  );
+}
+
+interface AudioFieldProps {
+  onChunk: (chunk: Blob) => void;
+}
+
+function AudioField({ onChunk }: AudioFieldProps) {
+  const [activeTab, setActiveTab] = useState("microphone");
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setActiveTab(e.target.value);
+  };
+  return (
+    <TabGroup activeTab={activeTab}>
+      <div className="flex gap-2 mb-3 mt-1 w-[260px]">
+        <RadioInput
+          size="sm"
+          value="microphone"
+          id="audio-upload-mic"
+          name="audio-upload"
+          labelText="Microphone"
+          checked={activeTab === "microphone"}
+          onChange={onChange}
+        />
+
+        <RadioInput
+          size="sm"
+          value="upload"
+          id="audio-upload-upload"
+          name="audio-upload"
+          labelText="File upload"
+          checked={activeTab === "upload"}
+          onChange={onChange}
+        />
+      </div>
+
+      <Tab tabId="microphone">
+        <AudioRecorder
+          onChunk={(e) => onChunk(e.data)}
+          // onStop={(_e, chunks) => console.log(chunks)}
+        />
+      </Tab>
+      <Tab tabId="upload">
+        <FileUpload multiple id={"name"} name={"name"} />
+      </Tab>
+    </TabGroup>
   );
 }
 

@@ -153,6 +153,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       />
 
       <button
+        type="button"
         className={classNames(
           "w-6 h-6 flex items-center justify-center bg-neutral-500 rounded-md hover:bg-neutral-400",
           {
@@ -175,6 +176,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
       {audioValue && (
         <button
+          type="button"
           onClick={handleClear}
           className={classNames(
             "w-6 h-6 flex items-center justify-center bg-neutral-500 rounded-md text-red-400 hover:bg-neutral-400"

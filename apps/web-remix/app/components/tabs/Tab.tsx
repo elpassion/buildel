@@ -28,7 +28,7 @@ export const TabButton: React.FC<TabButtonProps> = ({
   }, [setActiveTab, tabId]);
 
   return (
-    <button className={className} onClick={handleSetActiveTab}>
+    <button type="button" className={className} onClick={handleSetActiveTab}>
       {children}
     </button>
   );
