@@ -39,7 +39,7 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base,
-    check_origin: ["https://#{host}", "https://buildel-web.fly.dev"]
+    check_origin: false
 
   config :qdrant,
     port: 6333,
