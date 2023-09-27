@@ -28,7 +28,7 @@ defmodule Buildel.Clients.Deepgram do
     WebSockex.send_frame(pid, {:binary, audio})
   end
 
-  @url "wss://api.deepgram.com/v1/listen?model=general&smart_format=true&punctuate=true&language=en"
+  @url "wss://api.deepgram.com/v1/listen?model=general&smart_format=true&punctuate=true&language=en&diarize=true"
   def start_link(state \\ %{}, opts \\ []) do
     WebSockex.start_link(@url, __MODULE__, state, opts)
   end
@@ -41,7 +41,7 @@ defmodule Buildel.Clients.Deepgram do
 
     message =
       case alternatives do
-        [first_alternative | _] -> first_alternative |> get_in(["transcript"])
+        [first_alternative | _] -> first_alternative |> get_in(["paragraphs", "transcript"])
         _ -> nil
       end
 
