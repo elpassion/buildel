@@ -63,7 +63,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
     <>
       <section
         className={classNames(
-          "min-h-[100px] min-w-[250px] max-w-[500px] break-words rounded bg-neutral-800 drop-shadow-sm transition border",
+          "min-h-[100px] min-w-[250px] max-w-[500px] break-words rounded bg-neutral-800 drop-shadow-sm transition border nowheel",
           {
             "scale-110": status,
             "border-red-500": !isValid,
@@ -104,7 +104,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
           </div>
         </header>
 
-        <div className="nodrag p-2">
+        <div className="p-2 nodrag">
           {inputsFields.length > 0 ? (
             <NodeFieldsForm block={data} fields={inputsFields} />
           ) : null}

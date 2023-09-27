@@ -200,7 +200,7 @@ export function PipelineBuilder() {
 
   return (
     <div
-      className="relative py-5 h-[calc(100vh_-_100px)] w-full"
+      className="relative pt-5 h-[calc(100vh_-_120px)] w-full"
       ref={reactFlowWrapper}
     >
       <RunPipelineProvider
