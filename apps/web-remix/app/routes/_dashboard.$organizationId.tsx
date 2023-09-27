@@ -113,7 +113,7 @@ export default function Layout() {
               />
 
               <SidebarLink
-                to={routes.pipelines(organization.id)}
+                to={routes.apiKeys(organization.id)}
                 icon={<Icon iconName="key" className="w-5 h-5" />}
                 text="API Keys"
                 onlyIcon={collapsed}
