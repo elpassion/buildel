@@ -149,6 +149,9 @@ export class BuildelRun {
       throw new Error("Please send files through REST API");
     } else if (payload instanceof FileList) {
       throw new Error("Please send files through REST API");
+    } else if (payload instanceof Blob) {
+      assert(this.channel);
+      this.channel.push(`input:${topic}`, await payload.arrayBuffer());
     } else {
       assert(this.channel);
       this.channel.push(`input:${topic}`, payload);
