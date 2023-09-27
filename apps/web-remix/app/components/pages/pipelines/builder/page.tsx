@@ -76,8 +76,10 @@ export function PipelineBuilder() {
   useBeforeUnloadWarning(!isUpToDate);
 
   const handleIsValidConnection = useCallback(
-    (connection: Connection) => isValidConnection(pipeline.config, connection),
-    [pipeline.config]
+    (connection: Connection) =>
+      //@ts-ignore
+      isValidConnection(toPipelineConfig(nodes, edges), connection),
+    [edges, nodes]
   );
 
   const handleDelete = useCallback(
