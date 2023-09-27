@@ -174,7 +174,7 @@ defmodule Buildel.BlocksTest do
       assert SpeechToText.options() == %{
                type: "speech_to_text",
                inputs: [Block.audio_input("input")],
-               outputs: [Block.text_output("output")],
+               outputs: [Block.text_output("output"), Block.text_output("json_output")],
                schema: SpeechToText.schema(),
                groups: ["audio", "text"]
              }

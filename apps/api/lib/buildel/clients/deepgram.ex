@@ -36,16 +36,14 @@ defmodule Buildel.Clients.Deepgram do
   @impl true
   def handle_frame({:text, text}, state) do
     message = Jason.decode!(text)
+    send(state.stream_to, {:raw_transcript, message})
     alternatives = message |> get_in(["channel", "alternatives"])
     is_final = message |> get_in(["is_final"])
 
     message =
       case alternatives do
-        [first_alternative | _] ->
-          "Speaker #{get_in(first_alternative, ["speaker"])}: #{get_in(first_alternative, ["transcript"])}"
-
-        _ ->
-          nil
+        [first_alternative | _] -> first_alternative |> get_in(["transcript"])
+        _ -> nil
       end
 
     if message, do: send(state.stream_to, {:transcript, %{message: message, is_final: is_final}})

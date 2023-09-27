@@ -3,7 +3,7 @@ defmodule Buildel.Blocks.SpeechToText do
 
   @impl true
   defdelegate input(pid, chunk), to: __MODULE__, as: :transcript
-  defdelegate text_output(), to: Buildel.Blocks.Block
+  defdelegate text_output(name \\ "output"), to: Buildel.Blocks.Block
   defdelegate audio_input(), to: Buildel.Blocks.Block
 
   @impl true
@@ -12,7 +12,7 @@ defmodule Buildel.Blocks.SpeechToText do
       type: "speech_to_text",
       groups: ["audio", "text"],
       inputs: [audio_input()],
-      outputs: [text_output()],
+      outputs: [text_output(), text_output("json_output")],
       schema: schema()
     }
   end
@@ -94,6 +94,17 @@ defmodule Buildel.Blocks.SpeechToText do
     )
 
     state = state |> send_stream_stop()
+
+    {:noreply, state}
+  end
+
+  def handle_info({:raw_transcript, message}, state) do
+    Buildel.BlockPubSub.broadcast_to_io(
+      state[:context_id],
+      state[:block_name],
+      "json_output",
+      {:text, message}
+    )
 
     {:noreply, state}
   end
