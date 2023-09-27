@@ -45,13 +45,13 @@ export class BuildelSocket {
   public run(
     pipelineId: number,
     handlers?: {
-      onBlockOutput: (
+      onBlockOutput?: (
         blockId: string,
         outputName: string,
         payload: unknown
       ) => void;
-      onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
-      onStatusChange: (status: BuildelRunStatus) => void;
+      onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
+      onStatusChange?: (status: BuildelRunStatus) => void;
     }
   ) {
     const onBlockOutput = handlers?.onBlockOutput ?? (() => {});
