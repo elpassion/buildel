@@ -6,6 +6,7 @@ import { Tab } from "~/components/tabs/Tab";
 import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
+import { useRunPipeline } from "~/components/pages/pipelines/builder/RunPipelineProvider";
 
 interface AudioFieldProps {
   onChunk: (chunk: Blob, name: string) => void;
@@ -14,6 +15,7 @@ interface AudioFieldProps {
 }
 
 export function AudioField({ onChunk, onUpload, name }: AudioFieldProps) {
+  const { status } = useRunPipeline();
   const [activeTab, setActiveTab] = useState("microphone");
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
@@ -49,15 +51,23 @@ export function AudioField({ onChunk, onUpload, name }: AudioFieldProps) {
           You need to start the workflow first in order to stream audio.
         </p>
         <p className="text-xs font-bold text-white mb-1">Audio stream</p>
-        <AudioRecorder onChunk={(e) => onChunk(e.data, name)} />
+        <AudioRecorder
+          onChunk={(e) => onChunk(e.data, name)}
+          disabled={status !== "running"}
+        />
       </Tab>
 
       <Tab tabId="upload">
+        <p className="text-[10px] text-white mb-2">
+          You need to start the workflow first in order to upload audio.
+        </p>
         <FileUpload
           multiple
           name={name}
           onUpload={(file) => onUpload(file, name)}
           preview={FileUploadListPreview}
+          disabled={status !== "running"}
+          accept="audio/*"
         />
       </Tab>
     </TabGroup>

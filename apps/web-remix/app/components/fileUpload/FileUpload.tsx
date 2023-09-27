@@ -28,6 +28,7 @@ export function FileUpload({
   onUpload,
   onFetch,
   onRemove,
+  disabled,
   ...rest
 }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -124,6 +125,7 @@ export function FileUpload({
           type="file"
           ref={inputRef}
           {...rest}
+          disabled={disabled}
           onChange={handleUpload}
           hidden
         />
@@ -132,13 +134,14 @@ export function FileUpload({
           size="xs"
           variant="outlined"
           className="!text-xs"
+          disabled={disabled}
           isFluid
         >
           Browse files to upload
         </Button>
       </label>
 
-      {preview?.({ fileList, remove: handleRemove })}
+      {preview?.({ fileList, remove: onRemove ? handleRemove : undefined })}
     </div>
   );
 }

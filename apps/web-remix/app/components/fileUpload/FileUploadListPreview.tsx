@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { ItemList } from "~/components/list/ItemList";
-import { IFileUpload, IPreviewProps, isUploadError } from "./fileUpload.types";
+import { IFileUpload, IPreviewProps } from "./fileUpload.types";
 import { Icon } from "@elpassion/taco";
 import classNames from "classnames";
 import { IconButton } from "~/components/iconButton";
@@ -55,7 +55,11 @@ export function FileUploadListItem({
       )}
     >
       <div className="flex gap-1 grow max-w-[90%]">
-        <Icon size="xs" iconName="file" className="mt-0.5 w-4 h-4 !text-sm" />
+        <Icon
+          size="xs"
+          iconName={renderTypeIcon(file.file_type)}
+          className="mt-0.5 w-4 h-4 !text-sm"
+        />
         <div className="flex flex-col w-full max-w-[95%]">
           <h6 className="whitespace-nowrap text-xs truncate">
             {file.file_name}
@@ -88,6 +92,11 @@ export function FileUploadListItem({
       )}
     </article>
   );
+}
+
+function renderTypeIcon(fileType: string) {
+  if (fileType.startsWith("audio/")) return "file" as const;
+  return "file-text" as const;
 }
 function renderSize(size: number) {
   if (size < 1000) return `${size.toFixed(0)} B`;

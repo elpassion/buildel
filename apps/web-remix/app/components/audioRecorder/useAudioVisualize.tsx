@@ -36,6 +36,12 @@ export const useAudioVisualize = (
     null
   );
 
+  const handleClearCanvas = () => {
+    if (!canvas.current) return;
+    const canvasContext = canvas.current?.getContext("2d");
+    canvasContext?.clearRect(0, 0, canvas.current.width, canvas.current.height);
+  };
+
   const handleClearFrame = useCallback(() => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -59,12 +65,8 @@ export const useAudioVisualize = (
 
       audioAnalyzerRef.current.getByteFrequencyData(frequencyBinCountArray);
 
-      canvasContext.clearRect(
-        0,
-        0,
-        canvas.current.width,
-        canvas.current.height
-      );
+      handleClearCanvas();
+
       const centerY = canvas.current.height / 2;
 
       canvasContext.fillStyle = "#F5C07A";
@@ -86,7 +88,13 @@ export const useAudioVisualize = (
       animationFrameRef.current = requestAnimationFrame(draw);
     }
     draw();
-  }, [barHeightFactor, barPositionFactor, canvas, rest.barWidth]);
+  }, [
+    barHeightFactor,
+    barPositionFactor,
+    canvas,
+    handleClearCanvas,
+    rest.barWidth,
+  ]);
 
   const disconnectSources = useCallback(async () => {
     handleClearFrame();
@@ -99,7 +107,9 @@ export const useAudioVisualize = (
 
     audioAnalyzerRef.current?.disconnect();
     audioAnalyzerRef.current = null;
-  }, [handleClearFrame]);
+
+    handleClearCanvas();
+  }, [handleClearCanvas, handleClearFrame]);
 
   const createMediaAnalyzer = useCallback(
     (source: HTMLAudioElement | MediaStream) => {
