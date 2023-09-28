@@ -1,6 +1,6 @@
 import { Channel, ConnectionState, Socket } from "phoenix";
 import { v4 } from "uuid";
-import { assert } from "./assert";
+import { assert } from "./utils/assert";
 
 export class BuildelSocket {
   private readonly socket: Socket;
@@ -115,7 +115,7 @@ export class BuildelRun {
 
     return new Promise<BuildelRun>((resolve, reject) => {
       assert(this.channel);
-      this.channel.join().receive("ok", (response) => {
+      this.channel.join().receive("ok", () => {
         resolve(this);
         this.handlers.onStatusChange("running");
       });
@@ -131,7 +131,7 @@ export class BuildelRun {
 
     return new Promise<BuildelRun>((resolve, reject) => {
       assert(this.channel);
-      this.channel.leave().receive("ok", (response) => {
+      this.channel.leave().receive("ok", () => {
         this.channel = null;
         resolve(this);
         this.handlers.onStatusChange("idle");
