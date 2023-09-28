@@ -33,7 +33,7 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
-import { assert } from "~/utils/assert";
+import { assert } from "ts-utils";
 import { CustomNode, CustomNodeProps } from "./CustomNodes/CustomNode";
 import isEqual from "lodash.isequal";
 import { useDraggableNodes } from "./useDraggableNodes";

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import classNames from "classnames";
-import { assert } from "~/utils/assert";
+import { assert } from "ts-utils";
 
 interface PageOverlayProps {
   className?: string;

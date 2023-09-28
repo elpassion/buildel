@@ -7,8 +7,8 @@ module.exports = {
   // publicPath: "/build/",
   cacheDirectory: "./node_modules/.cache/remix",
   serverModuleFormat: "cjs",
-  future: {
-  },
+  serverDependenciesToBundle: ["ts-utils"],
+  future: {},
 
-  tailwind: true
+  tailwind: true,
 };

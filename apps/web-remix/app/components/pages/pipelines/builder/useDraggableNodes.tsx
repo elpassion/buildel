@@ -1,7 +1,7 @@
 import { DragEvent, RefObject, useCallback, useState } from "react";
 import { ReactFlowInstance } from "reactflow";
 import { IBlockConfig } from "../pipeline.types";
-import { assert } from "~/utils/assert";
+import { assert } from "ts-utils";
 import { z } from "zod";
 import { BlockType } from "~/components/pages/pipelines/contracts";
 

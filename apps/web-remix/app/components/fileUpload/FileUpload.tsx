@@ -12,7 +12,7 @@ import {
   IPreviewProps,
   isUploadError,
 } from "./fileUpload.types";
-import { assert } from "~/utils/assert";
+import { assert } from "ts-utils";
 
 interface FileUploadProps
   extends React.HTMLProps<Omit<HTMLInputElement, "onChange">> {

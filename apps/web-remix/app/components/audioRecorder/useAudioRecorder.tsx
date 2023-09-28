@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { assert } from "~/utils/assert";
+import { assert } from "ts-utils";
 import isError from "lodash.iserror";
 
 export interface UseAudioRecorderCbOptions {

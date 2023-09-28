@@ -1,5 +1,5 @@
 import { JSONSchemaField } from "./SchemaParser";
-import { assert } from "~/utils/assert";
+import { assert } from "ts-utils";
 
 export function Schema({
   schema,

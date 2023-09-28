@@ -8,7 +8,7 @@ import {
 } from "~/components/form/fields/text.field";
 import { CheckboxInput } from "~/components/form/inputs/checkbox.input";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
-import { assert } from "~/utils/assert";
+import { assert } from "ts-utils";
 import { Field, FieldProps } from "./Schema";
 import { QuantityInputField } from "~/components/form/fields/quantity.field";
 import { RadioField } from "~/components/form/fields/radio.field";
