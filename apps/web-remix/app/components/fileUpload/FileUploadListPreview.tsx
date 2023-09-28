@@ -76,13 +76,15 @@ export function FileUploadListItem({
       </div>
       {onRemove && (
         <IconButton
-          className={classNames("origin-center w-4 h-4", {
-            "animate-spin": file.status === "uploading",
-          })}
           onlyIcon
           icon={
             <Icon
-              className="w-4 h-4"
+              className={classNames(
+                "flex items-center justify-center origin-center w-5 h-5 !leading-5",
+                {
+                  "animate-spin": file.status === "uploading",
+                }
+              )}
               iconName={file.status === "uploading" ? "loader" : "x"}
             />
           }
