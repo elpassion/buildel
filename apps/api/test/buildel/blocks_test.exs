@@ -100,7 +100,9 @@ defmodule Buildel.BlocksTest do
       assert :ok =
                Blocks.validate_block(TextOutput, %{
                  "name" => "test",
-                 "opts" => %{},
+                 "opts" => %{
+                   "stream_timeout" => 500
+                 },
                  "inputs" => []
                })
 

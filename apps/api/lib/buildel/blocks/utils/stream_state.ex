@@ -3,10 +3,11 @@ defmodule Buildel.Blocks.Utils.StreamState do
     quote do
       alias Buildel.BlockPubSub
 
-      defp assign_stream_state(state) do
+      defp assign_stream_state(state, opts \\ %{}) do
         state
         |> Keyword.put(:stream_state, :idle)
         |> Keyword.put(:stream_timer, nil)
+        |> Keyword.put(:stream_timeout, Map.get(opts, :stream_timeout, stream_timeout()))
       end
 
       defp send_stream_start(state, output \\ "output") do
@@ -64,7 +65,9 @@ defmodule Buildel.Blocks.Utils.StreamState do
           Process.cancel_timer(state[:stream_timer])
         end
 
-        timer = Process.send_after(self(), {:stop_stream, output}, stream_timeout())
+        timeout = state |> Keyword.get(:stream_timeout, stream_timeout())
+
+        timer = Process.send_after(self(), {:stop_stream, output}, timeout)
         put_in(state[:stream_timer], timer)
       end
     end

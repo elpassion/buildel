@@ -27,7 +27,20 @@ defmodule Buildel.Blocks.TextOutput do
       "properties" => %{
         "name" => name_schema(),
         "inputs" => inputs_schema(),
-        "opts" => options_schema()
+        "opts" =>
+          options_schema(%{
+            "required" => ["stream_timeout"],
+            "properties" => %{
+              "stream_timeout" => %{
+                "type" => "integer",
+                "title" => "Stop after (ms)",
+                "description" =>
+                  "Wait this many milliseconds after receiving the last chunk before stopping the stream.",
+                "minimum" => 500,
+                "default" => 500
+              }
+            }
+          })
       }
     }
   end
@@ -52,7 +65,7 @@ defmodule Buildel.Blocks.TextOutput do
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
-    {:ok, state |> assign_stream_state}
+    {:ok, state |> assign_stream_state(opts)}
   end
 
   @impl true
