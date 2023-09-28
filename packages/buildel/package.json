@@ -3,6 +3,7 @@
   "private": false,
   "version": "0.0.0",
   "type": "module",
+  "license": "MIT",
   "source": "src/index.ts",
   "types": "./dist/index.d.ts",
   "main": "./dist/index.cjs",
@@ -26,5 +27,8 @@
   "peerDependencies": {
     "phoenix": "^1.7.7",
     "uuid": "^9.0.1"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
