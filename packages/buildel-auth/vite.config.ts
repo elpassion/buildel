@@ -15,7 +15,7 @@ export default defineConfig({
       fileName: "index",
     },
     rollupOptions: {
-      external: ["js-sha256"],
+      external: ["crypto-js"],
     },
   },
 

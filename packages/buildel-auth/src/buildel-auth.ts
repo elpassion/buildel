@@ -1,4 +1,5 @@
-import { sha256 } from "js-sha256";
+import hmacSHA256 from "crypto-js/hmac-sha256";
+import Base64 from "crypto-js/enc-base64";
 export class BuildelAuth {
   constructor(private readonly secret: string) {}
 
@@ -8,10 +9,10 @@ export class BuildelAuth {
     userData: Record<string, any> = {}
   ) {
     const userJSON = JSON.stringify(userData);
-    const auth = btoa(
-      sha256.hmac(
-        this.secret,
-        this.createAuthMessage(socketId, channelName, userJSON)
+    const auth = Base64.stringify(
+      hmacSHA256(
+        this.createAuthMessage(socketId, channelName, userJSON),
+        this.secret
       )
     );
 

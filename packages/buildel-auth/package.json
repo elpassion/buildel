@@ -1,7 +1,7 @@
 {
   "name": "@buildel/buildel-auth",
   "private": false,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "description": "A library that generates authentication data for socket connection with the Buildel service.",
   "keywords": [
@@ -25,9 +25,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "js-sha256": "0.10.1"
+    "crypto-js": "^4.1.1"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.1.2",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-plugin-dts": "^3.6.0",
