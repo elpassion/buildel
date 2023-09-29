@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { ItemList } from "~/components/list/ItemList";
 import { Button, Icon } from "@elpassion/taco";
 import { Link } from "@remix-run/react";
+import { INode } from "../pipeline.types";
 interface WorkflowTemplatesProps extends PropsWithChildren {
   className?: string;
 }
@@ -25,9 +26,10 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = ({
 
 interface ITemplate {
   id: string | number;
-  name: string;
-  icon?: ReactNode;
   to: string;
+  name: string;
+  blocks: Partial<INode>[];
+  icon?: ReactNode;
 }
 
 interface WorkflowTemplatesListProps {
@@ -42,10 +44,14 @@ export function WorkflowTemplatesList({ items }: WorkflowTemplatesListProps) {
     />
   );
 }
-function WorkflowTemplatesListItem({ icon, name, to }: ITemplate) {
+function WorkflowTemplatesListItem({ icon, name, to, blocks }: ITemplate) {
+  const combineUrl = () => {
+    return `${to}?blocks=${encodeURIComponent(JSON.stringify(blocks))}`;
+  };
+
   return (
     <Link
-      to={to}
+      to={combineUrl()}
       className="group p-4 flex items-center justify-between gap-2 bg-neutral-900 hover:bg-neutral-950 rounded-lg text-white h-[60px] transition"
     >
       <div className="flex items-center gap-3">

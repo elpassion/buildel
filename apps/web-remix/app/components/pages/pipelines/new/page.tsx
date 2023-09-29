@@ -6,9 +6,11 @@ import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { Button } from "@elpassion/taco";
 import { schema } from "./schema";
+import { useSearchParams } from "@remix-run/react";
 
 export function NewPipelinePage() {
   const validator = useMemo(() => withZod(schema), []);
+  const [searchParams] = useSearchParams();
 
   return (
     <ValidatedForm
@@ -22,7 +24,11 @@ export function NewPipelinePage() {
           <TextInputField type="text" autoFocus label="Name" />
         </Field>
         <HiddenField name="pipeline.config.version" value="1" />
-        <HiddenField name="pipeline.config.blocks" value={"[]"} />
+
+        <HiddenField
+          name="pipeline.config.blocks"
+          value={searchParams.get("blocks") ?? "[]"}
+        />
       </div>
       <Button hierarchy="primary" type="submit" className="mt-4">
         Create workflow

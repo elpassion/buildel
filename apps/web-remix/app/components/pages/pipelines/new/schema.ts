@@ -1,4 +1,5 @@
 import z from "zod";
+import { UpdateBlockConfig } from "../contracts";
 
 export const schema = z.object({
   pipeline: z.object({
@@ -7,7 +8,7 @@ export const schema = z.object({
       version: z.string(),
       blocks: z.union([
         z.string().transform((value) => JSON.parse(value)),
-        z.array(z.unknown()),
+        z.array(UpdateBlockConfig),
       ]),
     }),
   }),
