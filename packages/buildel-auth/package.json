@@ -1,20 +1,17 @@
 {
-  "name": "@buildel/buildel",
+  "name": "@buildel/buildel-auth",
   "private": false,
-  "version": "0.0.8",
+  "version": "0.0.1",
   "license": "MIT",
-  "description": "A flexible library for integrating with the Buildel service via WebSockets. Enables easy connection, authentication, and real-time event handling within the context of organizations and pipelines.",
+  "description": "A library that generates authentication data for socket connection with the Buildel service.",
   "keywords": [
     "javascript",
     "buildel",
-    "websocket",
     "integration",
-    "real-time",
-    "event-handling",
+    "authentication",
     "pipelines",
     "organizations",
-    "typescript",
-    "connection"
+    "typescript"
   ],
   "type": "module",
   "source": "src/index.ts",
@@ -27,17 +24,14 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "js-sha256": "0.10.1"
+  },
   "devDependencies": {
-    "@types/phoenix": "^1.6.0",
-    "@types/uuid": "^9.0.3",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-plugin-dts": "^3.6.0",
     "vite-tsconfig-paths": "^4.2.1"
-  },
-  "peerDependencies": {
-    "phoenix": "^1.7.7",
-    "uuid": "^9.0.1"
   },
   "files": [
     "dist"
