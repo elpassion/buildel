@@ -269,12 +269,6 @@ importers:
         specifier: ^4.2.1
         version: 4.2.1(typescript@5.1.6)(vite@4.4.9)
 
-  packages/ts-utils:
-    devDependencies:
-      typescript:
-        specifier: ^5.0.4
-        version: 5.0.4
-
 packages:
 
   /@aashutoshrathi/word-wrap@1.2.6:
