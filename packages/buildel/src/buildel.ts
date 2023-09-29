@@ -2,13 +2,24 @@ import { Channel, ConnectionState, Socket } from "phoenix";
 import { assert } from "ts-utils";
 import { v4 } from "uuid";
 
+interface BuildelSocketOptions {
+  socketUrl?: string;
+  authUrl?: string;
+}
 export class BuildelSocket {
   private readonly socket: Socket;
   private readonly id: string;
+  private readonly authUrl: string;
+  private readonly socketUrl: string;
 
-  constructor(private readonly organizationId: number) {
+  constructor(
+    private readonly organizationId: number,
+    options: BuildelSocketOptions = {}
+  ) {
+    this.authUrl = options.authUrl ?? "/super-api/channel_auth";
+    this.socketUrl = options.socketUrl ?? "/super-api/socket";
     this.id = v4();
-    this.socket = new Socket("/super-api/socket", {
+    this.socket = new Socket(this.socketUrl, {
       params: {
         id: this.id,
       },
@@ -63,6 +74,7 @@ export class BuildelSocket {
       this.id,
       this.organizationId,
       pipelineId,
+      this.authUrl,
       { onBlockOutput, onBlockStatusChange, onStatusChange }
     );
   }
@@ -76,6 +88,7 @@ export class BuildelRun {
     private readonly id: string,
     private readonly organizationId: number,
     private readonly pipelineId: number,
+    private readonly authUrl: string,
     private readonly handlers: {
       onBlockOutput: (
         blockId: string,
@@ -90,7 +103,7 @@ export class BuildelRun {
   public async start() {
     if (this.status !== "idle") return;
 
-    const token = await this.authenticateChannel(this.pipelineId);
+    const token = await this.authenticateChannel(this.pipelineId, this.authUrl);
 
     this.channel = this.socket.channel(
       `pipelines:${this.organizationId}:${this.pipelineId}`,
@@ -164,8 +177,8 @@ export class BuildelRun {
     return this.channel.state === "joined" ? "running" : "starting";
   }
 
-  private async authenticateChannel(pipelineId: number) {
-    return await fetch("/super-api/channel_auth", {
+  private async authenticateChannel(pipelineId: number, authUrl: string) {
+    return await fetch(authUrl, {
       headers: {
         "Content-Type": "application/json",
       },
