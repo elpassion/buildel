@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { assert } from "ts-utils";
-import { BuildelRun, BuildelRunStatus, BuildelSocket } from "buildel";
+import { assert } from "~/utils/assert";
+import { BuildelRun, BuildelRunStatus, BuildelSocket } from "@buildel/buildel";
 
 export function usePipelineRun(
   organizationId: number,

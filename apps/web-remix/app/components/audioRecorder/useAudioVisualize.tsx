@@ -1,6 +1,6 @@
 import { RefObject, useCallback, useEffect, useRef } from "react";
 import isEqual from "lodash.isequal";
-import { assert } from "ts-utils";
+import { assert } from "~/utils/assert";
 
 export interface OptionsType {
   barHeightFactor: number;

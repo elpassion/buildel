@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
-import { assert } from "ts-utils";
 import isError from "lodash.iserror";
+import { assert } from "~/utils/assert";
 
 export interface UseAudioRecorderCbOptions {
   mediaStream: MediaStream | null;
