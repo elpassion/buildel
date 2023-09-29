@@ -31,7 +31,9 @@ export function usePipelineRun(
   };
 
   useEffect(() => {
-    buildel.current = new BuildelSocket(organizationId);
+    buildel.current = new BuildelSocket(organizationId, {
+      socketUrl: "/super-api/socket",
+    });
     buildel.current.connect().then((buildel) => {
       run.current = buildel.run(pipelineId, {
         onBlockOutput,

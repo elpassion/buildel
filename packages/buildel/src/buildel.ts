@@ -17,7 +17,7 @@ export class BuildelSocket {
     options: BuildelSocketOptions = {}
   ) {
     this.authUrl = options.authUrl ?? "/super-api/channel_auth";
-    this.socketUrl = options.socketUrl ?? "/super-api/socket";
+    this.socketUrl = options.socketUrl ?? "wss://buildel-api.fly.dev/socket";
     this.id = v4();
     this.socket = new Socket(this.socketUrl, {
       params: {
