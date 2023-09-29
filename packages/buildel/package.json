@@ -1,7 +1,7 @@
 {
   "name": "@buildel/buildel",
   "private": false,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "description": "A flexible library for integrating with the Buildel service via WebSockets. Enables easy connection, authentication, and real-time event handling within the context of organizations and pipelines.",
   "type": "module",
@@ -10,11 +10,11 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "scripts": {
+    "npm:publish": "npm publish --access public",
     "dev": "npm run build",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
-
   "devDependencies": {
     "@types/phoenix": "^1.6.0",
     "@types/uuid": "^9.0.3",
