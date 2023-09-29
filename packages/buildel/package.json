@@ -1,7 +1,7 @@
 {
   "name": "@buildel/buildel",
   "private": false,
-  "version": "0.0.8",
+  "version": "0.1.0",
   "license": "MIT",
   "description": "A flexible library for integrating with the Buildel service via WebSockets. Enables easy connection, authentication, and real-time event handling within the context of organizations and pipelines.",
   "keywords": [
@@ -35,7 +35,7 @@
     "vite-plugin-dts": "^3.6.0",
     "vite-tsconfig-paths": "^4.2.1"
   },
-  "peerDependencies": {
+  "dependencies": {
     "phoenix": "^1.7.7",
     "uuid": "^9.0.1"
   },

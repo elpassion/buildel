@@ -1,4 +1,4 @@
-## Buildel
+## 🚀 Buildel
 A flexible library for integrating with the Buildel service via WebSockets.
 Enables easy connection, and real-time event handling within the context of organizations and pipelines.
 
@@ -13,6 +13,8 @@ npm install @buildel/buildel
 ### Usage
 
 #### Initialization
+❗Before proceeding, ensure you have set up an authentication endpoint that will return authentication data for your websocket connection. 
+The **Buildel team** has provided the  [@buildel/buildel-auth](https://www.npmjs.com/package/@buildel/buildel-auth) package to assist you in this process.
 ```ts
 import { BuildelSocket } from "@buildel/buildel";
 

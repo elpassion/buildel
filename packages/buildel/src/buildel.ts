@@ -1,6 +1,6 @@
 import { Channel, ConnectionState, Socket } from "phoenix";
-import { assert } from "ts-utils";
 import { v4 } from "uuid";
+import { assert } from "./utils/assert.ts";
 
 interface BuildelSocketOptions {
   socketUrl?: string;
