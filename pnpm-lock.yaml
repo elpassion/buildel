@@ -25,6 +25,9 @@ importers:
 
   apps/web-remix:
     dependencies:
+      '@buildel/buildel':
+        specifier: workspace:*
+        version: link:../../packages/buildel
       '@elpassion/taco':
         specifier: ^0.1.77
         version: 0.1.77(@tanstack/react-table@8.9.3)(@types/react-dom@18.0.11)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0)
@@ -55,9 +58,6 @@ importers:
       '@tailwindcss/forms':
         specifier: ^0.5.4
         version: 0.5.4(tailwindcss@3.3.3)
-      buildel:
-        specifier: workspace:*
-        version: link:../../packages/buildel
       chokidar:
         specifier: ^3.5.3
         version: 3.5.3
@@ -136,9 +136,6 @@ importers:
       tiny-invariant:
         specifier: ^1.3.1
         version: 1.3.1
-      ts-utils:
-        specifier: workspace:*
-        version: link:../../packages/ts-utils
       usehooks-ts:
         specifier: ^2.9.1
         version: 2.9.1(react-dom@18.2.0)(react@18.2.0)
@@ -227,9 +224,6 @@ importers:
       phoenix:
         specifier: ^1.7.7
         version: 1.7.7
-      ts-utils:
-        specifier: workspace:*
-        version: link:../ts-utils
       uuid:
         specifier: ^9.0.1
         version: 9.0.1
