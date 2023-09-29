@@ -20,7 +20,6 @@
   "module": "./dist/index.js",
   "scripts": {
     "npm:publish": "npm publish --access public",
-    "dev": "npm run build -- --watch",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
