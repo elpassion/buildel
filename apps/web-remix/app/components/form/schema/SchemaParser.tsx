@@ -117,7 +117,7 @@ export type JSONSchemaField =
       default?: string;
     }
   | {
-      type: "number";
+      type: "number" | "integer";
       title: string;
       description: string;
       minimum?: number;

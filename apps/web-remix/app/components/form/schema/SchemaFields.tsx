@@ -94,7 +94,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
 
 export function NumberField({ field, name }: FieldProps) {
   assert(name);
-  assert(field.type === "number");
+  assert(field.type === "number" || field.type === "integer");
   const { fieldErrors } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;

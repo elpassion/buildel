@@ -39,7 +39,7 @@ export function Field({ field, name, schema, fields }: FieldProps) {
       />
     );
   }
-  if (field.type === "number") {
+  if (field.type === "number" || field.type === "integer") {
     return (
       <fields.number
         field={field}

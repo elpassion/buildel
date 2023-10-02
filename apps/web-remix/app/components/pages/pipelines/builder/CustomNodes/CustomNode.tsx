@@ -48,6 +48,7 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
 
   const isEditable = useMemo(() => {
     try {
+      console.log(data);
       const propKeys = Object.keys(
         data.block_type.schema.properties.opts.properties
       );
