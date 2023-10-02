@@ -11,6 +11,18 @@ const dummyFiles = [
     file_size: 2539,
     file_type: "text/plain",
   },
+  {
+    id: 3,
+    file_name: "test.txt",
+    file_size: 2539,
+    file_type: "text/plain",
+  },
+  {
+    id: 2,
+    file_name: "test.txt",
+    file_size: 2539,
+    file_type: "text/plain",
+  },
 ];
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {

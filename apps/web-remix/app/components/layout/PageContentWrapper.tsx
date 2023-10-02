@@ -10,7 +10,10 @@ export const PageContentWrapper: React.FC<PageContentWrapperProps> = ({
 }) => {
   return (
     <div
-      className={classNames("px-4 mx-auto w-full md:px-6 lg:px-10", className)}
+      className={classNames(
+        "max-w-[1344px] px-4 mx-auto w-full md:px-6 lg:px-10",
+        className
+      )}
     >
       {children}
     </div>

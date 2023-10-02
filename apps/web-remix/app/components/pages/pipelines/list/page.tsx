@@ -29,7 +29,7 @@ export function PipelinesPage() {
       >
         <Outlet />
       </CreatePipelineModal>
-      <PageContentWrapper className="grid grid-cols-1 gap-8 max-w-[100rem] lg:grid-cols-[1fr_400px]">
+      <PageContentWrapper className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px]">
         {pipelines.data.length > 0 ? (
           <>
             <div className="flex-grow order-2 lg:order-1">
