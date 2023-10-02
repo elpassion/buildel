@@ -4,6 +4,7 @@ import React from "react";
 import { KnowledgeBaseList } from "./KnowledgeBaseList";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "./loader";
+import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 
 export function KnowledgeBasePage() {
   const { fileList } = useLoaderData<typeof loader>();
@@ -14,7 +15,9 @@ export function KnowledgeBasePage() {
           <h1 className="text-2xl font-medium text-white">Knowledge base</h1>
         }
       />
-      <KnowledgeBaseList items={fileList} />
+      <PageContentWrapper>
+        <KnowledgeBaseList items={fileList} />
+      </PageContentWrapper>
     </div>
   );
 }
