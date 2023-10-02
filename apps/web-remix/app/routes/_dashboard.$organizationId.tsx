@@ -10,7 +10,7 @@ import classNames from "classnames";
 import Modal from "react-modal";
 import { useOnClickOutside } from "usehooks-ts";
 import { MenuInfo } from "rc-menu/es/interface";
-import { Avatar, Icon, IconButton, Sidebar } from "@elpassion/taco";
+import { Avatar, Icon, IconButton } from "@elpassion/taco";
 import { DataFunctionArgs, json } from "@remix-run/node";
 import {
   NavLink,
@@ -28,6 +28,12 @@ import { Menu } from "~/components/menu/Menu";
 import { MenuItem } from "~/components/menu/MenuItem";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
 import { RemixNavLinkProps } from "@remix-run/react/dist/components";
+import {
+  NavMobileSidebar,
+  NavSidebar,
+  NavSidebarContext,
+  useNavSidebarContext,
+} from "~/components/sidebar/NavSidebar";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: DataFunctionArgs) {
@@ -68,8 +74,16 @@ export async function loader(loaderArgs: DataFunctionArgs) {
 }
 
 export default function Layout() {
-  const { organization } = useLoaderData<typeof loader>();
   const [collapsed, setCollapsed] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openSidebar = useCallback(() => {
+    setIsOpen(true);
+  }, []);
+
+  const closeSidebar = useCallback(() => {
+    setIsOpen(false);
+  }, []);
 
   const toggleCollapse = useCallback(() => {
     setCollapsed((prev) => !prev);
@@ -80,75 +94,95 @@ export default function Layout() {
       id="_root"
       className="grid h-screen grid-cols-[auto_1fr] bg-neutral-950"
     >
-      <div className="hidden md:block md:p-4">
-        <Sidebar
-          className="sticky top-0 !h-[calc(100vh-32px)] rounded-[1.25rem]"
-          collapseBtnClassName="absolute top-[60px] !z-10 -right-2"
+      <NavSidebarContext.Provider
+        value={{
+          collapsed,
+          toggleCollapse,
+          isOpen,
+          openSidebar,
+          closeSidebar,
+        }}
+      >
+        <NavSidebar
           topContent={<SidebarTopContent isCollapsed={collapsed} />}
           bottomContent={<SidebarBottomContent isCollapsed={collapsed} />}
-          onCollapse={toggleCollapse}
-          collapsed={collapsed}
         >
-          <SidebarContentWrapper
-            className={classNames(
-              "gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]",
-              {
-                "!px-0": !collapsed,
-              }
-            )}
-          >
-            <div className="flex flex-col gap-1">
-              <SidebarLink
-                to={routes.pipelines(organization.id)}
-                icon={<Icon iconName="home" className="w-5 h-5" />}
-                text="Home"
-                onlyIcon={collapsed}
-              />
+          <SidebarMainContent isCollapsed={collapsed} />
+        </NavSidebar>
 
-              <SidebarLink
-                to={routes.knowledgeBase(organization.id)}
-                icon={<Icon iconName="briefcase" className="w-5 h-5" />}
-                text="Knowledge Base"
-                onlyIcon={collapsed}
-              />
+        <NavMobileSidebar
+          topContent={<SidebarTopContent />}
+          bottomContent={<SidebarBottomContent />}
+        >
+          <SidebarMainContent />
+        </NavMobileSidebar>
 
-              <SidebarLink
-                to={routes.apiKeys(organization.id)}
-                icon={<Icon iconName="key" className="w-5 h-5" />}
-                text="API Keys"
-                onlyIcon={collapsed}
-              />
-            </div>
-            <div>
-              <SidebarLink
-                to={routes.dashboard}
-                icon={<Icon iconName="life-buoy" className="w-5 h-5" />}
-                text="Support"
-                onlyIcon={collapsed}
-              />
-
-              <SidebarLink
-                to={routes.dashboard}
-                icon={<Icon iconName="settings" className="w-5 h-5" />}
-                text="Settings"
-                onlyIcon={collapsed}
-              />
-            </div>
-          </SidebarContentWrapper>
-        </Sidebar>
-      </div>
-
-      <main className="col-span-2 flex min-h-screen flex-col overflow-x-auto pb-5 md:col-auto">
-        <Outlet />
-      </main>
+        <main className="col-span-2 flex min-h-screen flex-col overflow-x-auto pb-5 lg:col-auto">
+          <Outlet />
+        </main>
+      </NavSidebarContext.Provider>
     </div>
   );
 }
 
-interface SidebarTopContentProps {
-  isCollapsed: boolean;
+interface SidebarContentProps {
+  isCollapsed?: boolean;
 }
-function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
+
+function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
+  const { organization } = useLoaderData<typeof loader>();
+
+  return (
+    <SidebarContentWrapper
+      className={classNames(
+        "gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]",
+        {
+          "!px-0": !isCollapsed,
+        }
+      )}
+    >
+      <div className="flex flex-col gap-1">
+        <SidebarLink
+          to={routes.pipelines(organization.id)}
+          icon={<Icon iconName="home" className="w-5 h-5" />}
+          text="Home"
+          onlyIcon={isCollapsed}
+        />
+
+        <SidebarLink
+          to={routes.knowledgeBase(organization.id)}
+          icon={<Icon iconName="briefcase" className="w-5 h-5" />}
+          text="Knowledge Base"
+          onlyIcon={isCollapsed}
+        />
+
+        <SidebarLink
+          to={routes.apiKeys(organization.id)}
+          icon={<Icon iconName="key" className="w-5 h-5" />}
+          text="API Keys"
+          onlyIcon={isCollapsed}
+        />
+      </div>
+      <div>
+        <SidebarLink
+          to={routes.dashboard}
+          icon={<Icon iconName="life-buoy" className="w-5 h-5" />}
+          text="Support"
+          onlyIcon={isCollapsed}
+        />
+
+        <SidebarLink
+          to={routes.dashboard}
+          icon={<Icon iconName="settings" className="w-5 h-5" />}
+          text="Settings"
+          onlyIcon={isCollapsed}
+        />
+      </div>
+    </SidebarContentWrapper>
+  );
+}
+
+function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
   const menuRef = useRef<HTMLDivElement | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const { organization, organizations } = useLoaderData<typeof loader>();
@@ -213,7 +247,7 @@ function SidebarTopContent({ isCollapsed }: SidebarTopContentProps) {
   );
 }
 
-function SidebarBottomContent({ isCollapsed }: SidebarTopContentProps) {
+function SidebarBottomContent({ isCollapsed }: SidebarContentProps) {
   return (
     <SidebarContentWrapper className="border-t border-neutral-400 py-3 !flex-row justify-between">
       {!isCollapsed && (

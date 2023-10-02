@@ -1,13 +1,13 @@
 import React from "react";
 import { Outlet, useLoaderData, useLocation } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
-import { Navbar } from "@elpassion/taco";
 import { loader } from "./loader";
 import flowStyles from "reactflow/dist/style.css";
 import editorStyles from "~/components/editor/editor.styles.css";
 import { TabGroup } from "~/components/tabs/TabGroup";
 import { routes } from "~/utils/routes.utils";
 import { FilledTabLink } from "~/components/tabs/FilledTabLink";
+import { AppNavbar } from "~/components/navbar/AppNavbar";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
@@ -20,13 +20,12 @@ export function PipelineLayout() {
 
   return (
     <>
-      <Navbar
-        wrapperClassName="md:px-2 md:pt-2"
+      <AppNavbar
         leftContent={
           <h1 className="text-2xl font-medium text-white">{pipeline.name}</h1>
         }
       />
-      <div className="px-4 md:px-10">
+      <div className="px-4 md:px-6 lg:px-10">
         <TabGroup activeTab={location.pathname}>
           <div className="bg-neutral-800 flex gap-2 rounded-lg w-fit p-1">
             <FilledTabLink

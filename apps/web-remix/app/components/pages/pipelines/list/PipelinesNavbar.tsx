@@ -1,15 +1,12 @@
 import React from "react";
-import { Icon, Navbar } from "@elpassion/taco";
+import { Icon } from "@elpassion/taco";
+import { AppNavbar } from "~/components/navbar/AppNavbar";
 
 export const PipelinesNavbar = () => {
   return (
-    <Navbar
-      menuClassName="md:hidden"
-      leftContent={<LeftContent />}
-      wrapperClassName="md:px-2 md:py-2"
-    >
+    <AppNavbar leftContent={<LeftContent />}>
       <Content />
-    </Navbar>
+    </AppNavbar>
   );
 };
 
