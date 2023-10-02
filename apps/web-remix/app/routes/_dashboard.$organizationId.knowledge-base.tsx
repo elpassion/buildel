@@ -2,4 +2,4 @@ export {
   page as default,
   loader,
   meta,
-} from "~/components/pages/knowledgeBase";
+} from "~/components/pages/knowledgeBase/list";

@@ -1,20 +1,20 @@
 import React, { useCallback } from "react";
 import { Button } from "@elpassion/taco";
-import {
-  FileListResponse,
-  FileResponse,
-} from "~/components/pages/pipelines/contracts";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
 import { IFile } from "~/components/fileUpload/fileUpload.types";
+import {
+  KnowledgeBaseFileListResponse,
+  KnowledgeBaseFileResponse,
+} from "~/components/pages/knowledgeBase/contracts";
 import { IBlockConfig, IField } from "../../pipeline.types";
+import { AudioField } from "./AudioField";
 import {
   IEvent,
   useRunPipeline,
   useRunPipelineNode,
 } from "../RunPipelineProvider";
-import { AudioField } from "./AudioField";
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -65,7 +65,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
       }
     ).then((res) => res.json());
 
-    return { ...FileResponse.parse(response), status: "done" };
+    return { ...KnowledgeBaseFileResponse.parse(response), status: "done" };
   }, []);
 
   const removeFile = useCallback(async (id: number) => {
@@ -79,7 +79,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
       `/super-api/organizations/${organizationId}/memories?collection_name=${pipelineId}_${blockName}`
     ).then((res) => res.json());
 
-    return FileListResponse.parse(response).map((file) => ({
+    return KnowledgeBaseFileListResponse.parse(response).map((file) => ({
       ...file,
       status: "done",
     }));

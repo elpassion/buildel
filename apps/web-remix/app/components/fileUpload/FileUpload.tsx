@@ -74,7 +74,7 @@ export function FileUpload({
               })
             );
           })
-          .catch((e) => {
+          .catch(() => {
             setFileList((prev) =>
               prev.map((file) => {
                 if (file.id === id) {
