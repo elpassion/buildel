@@ -37,7 +37,9 @@ export function PipelinesPage() {
                 to={routes.pipelinesNew(organizationId)}
                 className="mb-6 block w-fit ml-auto mr-0"
               >
-                <Button size="sm">New Workflow</Button>
+                <Button tabIndex={0} size="sm">
+                  New Workflow
+                </Button>
               </Link>
 
               <PipelinesList pipelines={pipelines.data} />

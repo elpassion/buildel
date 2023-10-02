@@ -20,6 +20,8 @@ interface FileUploadProps
   onUpload: (file: File) => Promise<IFile>;
   onFetch?: () => Promise<IFile[]>;
   onRemove?: (id: number) => Promise<any>;
+  uploadText?: ReactNode;
+  labelText?: ReactNode;
 }
 
 export function FileUpload({
@@ -29,6 +31,8 @@ export function FileUpload({
   onFetch,
   onRemove,
   disabled,
+  uploadText = "Browse files to upload",
+  labelText = "Upload files",
   ...rest
 }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -120,7 +124,7 @@ export function FileUpload({
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor={rest.id}>
-        <span className="text-white text-xs font-medium">Upload files</span>
+        <span className="text-white text-xs font-medium">{labelText}</span>
         <input
           type="file"
           ref={inputRef}
@@ -137,7 +141,7 @@ export function FileUpload({
           disabled={disabled}
           isFluid
         >
-          Browse files to upload
+          {uploadText}
         </Button>
       </label>
 

@@ -34,6 +34,9 @@ export async function loader(args: LoaderFunctionArgs) {
     //   `/organizations/${params.organizationId}/memories`
     // );
 
-    return json({ fileList: dummyFiles });
+    return json({
+      fileList: dummyFiles,
+      organizationId: params.organizationId,
+    });
   })(args);
 }
