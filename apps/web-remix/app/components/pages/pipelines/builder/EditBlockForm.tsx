@@ -18,6 +18,7 @@ import {
 } from "~/components/form/fields/field.context";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import { ReactNode, useCallback, useEffect } from "react";
+import { assert } from "~/utils/assert";
 
 export function EditBlockForm({
   onSubmit,
@@ -41,13 +42,18 @@ export function EditBlockForm({
   };
 
   const EditorField = useCallback(
-    (props: FieldProps) => (
-      <FormField name={props.name!}>
-        <MonacoEditorField
-          suggestions={generateSuggestions(blockConfig.inputs)}
-        />
-      </FormField>
-    ),
+    (props: FieldProps) => {
+      assert(props.field.type === "string");
+      return (
+        <FormField name={props.name!}>
+          <MonacoEditorField
+            supportingText={props.field.description}
+            label={props.field.title}
+            suggestions={generateSuggestions(blockConfig.inputs)}
+          />
+        </FormField>
+      );
+    },
     [blockConfig.inputs]
   );
 
