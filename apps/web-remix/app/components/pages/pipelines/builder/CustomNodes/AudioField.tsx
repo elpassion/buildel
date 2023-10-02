@@ -65,7 +65,9 @@ export function AudioField({ onChunk, onUpload, name }: AudioFieldProps) {
           multiple
           name={name}
           onUpload={(file) => onUpload(file, name)}
-          preview={FileUploadListPreview}
+          preview={(props) => (
+            <FileUploadListPreview {...props} className="max-h-[110px]" />
+          )}
           disabled={status !== "running"}
           accept="audio/*"
         />

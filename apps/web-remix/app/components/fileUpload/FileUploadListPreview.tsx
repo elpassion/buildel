@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
+import classNames from "classnames";
+import { Icon } from "@elpassion/taco";
 import { ItemList } from "~/components/list/ItemList";
 import { IFileUpload, IPreviewProps } from "./fileUpload.types";
-import { Icon } from "@elpassion/taco";
-import classNames from "classnames";
 import { IconButton } from "~/components/iconButton";
 
 interface FileUploadListPreviewProps extends Omit<IPreviewProps, "remove"> {
@@ -18,7 +18,7 @@ export function FileUploadListPreview({
   return (
     <ItemList
       className={classNames(
-        "flex flex-col items-center gap-1 max-h-[110px] overflow-y-auto",
+        "flex flex-col items-center gap-1 overflow-y-auto",
         className
       )}
       itemClassName="w-full"

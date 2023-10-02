@@ -24,6 +24,9 @@ export function KnowledgeBasePage() {
   const match = useMatch(`${organizationId}/knowledge-base/new`);
   const isSidebarOpen = !!match;
 
+  const handleCloseSidebar = () => {
+    navigate(routes.knowledgeBase(organizationId));
+  };
   return (
     <>
       <AppNavbar
@@ -47,13 +50,13 @@ export function KnowledgeBasePage() {
       <ActionSidebar
         className="!bg-neutral-950"
         isOpen={isSidebarOpen}
-        onClose={() => navigate(routes.knowledgeBase(organizationId))}
+        onClose={handleCloseSidebar}
         overlay
       >
         <ActionSidebarHeader
           heading="New knowledge items"
           subheading="Upload files to add to Project X Database."
-          onClose={() => navigate(routes.knowledgeBase(organizationId))}
+          onClose={handleCloseSidebar}
         />
         <Outlet />
       </ActionSidebar>

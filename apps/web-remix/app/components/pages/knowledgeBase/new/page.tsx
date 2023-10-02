@@ -1,37 +1,35 @@
-import React, { useCallback } from "react";
+import React, { useMemo } from "react";
 import { MetaFunction } from "@remix-run/node";
-import { FileUpload } from "~/components/fileUpload/FileUpload";
+import { Button } from "@elpassion/taco";
+import { withZod } from "@remix-validated-form/with-zod";
+import { ValidatedForm } from "remix-validated-form";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
-import { IFile } from "~/components/fileUpload/fileUpload.types";
-import { KnowledgeBaseFileResponse } from "~/components/pages/knowledgeBase/contracts";
-import { useLoaderData } from "@remix-run/react";
-import { loader } from "./loader";
+import { FileUploadField } from "~/components/form/fields/fileUpload.field";
+import { Field } from "~/components/form/fields/field.context";
+import { schema } from "~/components/pages/pipelines/new/schema";
 
 export function NewKnowledgeBasePage() {
-  const { organizationId } = useLoaderData<typeof loader>();
-  const uploadFile = useCallback(async (file: File): Promise<IFile> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("collection_name", ``);
-
-    // const response = await fetch(
-    //   `/super-api/organizations/${organizationId}/memories`,
-    //   {
-    //     body: formData,
-    //     method: "POST",
-    //   }
-    // ).then((res) => res.json());
-
-    return { ...KnowledgeBaseFileResponse.parse({}), status: "done" };
-  }, []);
+  const validator = useMemo(() => withZod(schema), []);
 
   return (
-    <FileUpload
-      multiple
-      onUpload={uploadFile}
-      preview={FileUploadListPreview}
-      labelText="Browse files to upload"
-    />
+    <ValidatedForm
+      validator={validator}
+      className="grow flex flex-col gap-2 h-[70%]"
+    >
+      <div className="grow overflow-y-auto">
+        <Field name="knowledgeFiles">
+          <FileUploadField
+            multiple
+            className="!gap-6"
+            labelText="Browse files to upload"
+            preview={FileUploadListPreview}
+          />
+        </Field>
+      </div>
+      <Button isFluid size="sm">
+        Add knowledge items
+      </Button>
+    </ValidatedForm>
   );
 }
 

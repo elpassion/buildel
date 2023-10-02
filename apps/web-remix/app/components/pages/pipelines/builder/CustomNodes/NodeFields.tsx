@@ -148,7 +148,9 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
             onUpload={uploadFile}
             onFetch={fetchFiles}
             onRemove={removeFile}
-            preview={FileUploadListPreview}
+            preview={(props) => (
+              <FileUploadListPreview {...props} className="max-h-[110px]" />
+            )}
           />
         );
       } else if (field.data.type === "audio") {

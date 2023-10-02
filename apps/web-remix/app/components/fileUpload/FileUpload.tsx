@@ -6,22 +6,18 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  IFile,
-  IFileUpload,
-  IPreviewProps,
-  isUploadError,
-} from "./fileUpload.types";
+import { IFile, IFileUpload, IPreviewProps } from "./fileUpload.types";
 import { assert } from "~/utils/assert";
+import classNames from "classnames";
 
-interface FileUploadProps
-  extends React.HTMLProps<Omit<HTMLInputElement, "onChange">> {
+export interface FileUploadProps extends React.HTMLProps<HTMLInputElement> {
   preview?: (props: IPreviewProps) => ReactNode;
   onUpload: (file: File) => Promise<IFile>;
   onFetch?: () => Promise<IFile[]>;
   onRemove?: (id: number) => Promise<any>;
   uploadText?: ReactNode;
   labelText?: ReactNode;
+  fileList?: IFileUpload[];
 }
 
 export function FileUpload({
@@ -33,6 +29,9 @@ export function FileUpload({
   disabled,
   uploadText = "Browse files to upload",
   labelText = "Upload files",
+  className,
+  onChange,
+  fileList: propsFileList,
   ...rest
 }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -51,8 +50,11 @@ export function FileUpload({
 
   const handleUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { files } = e.target;
+      if (onChange) {
+        return onChange(e);
+      }
 
+      const { files } = e.target;
       if (!files) return;
 
       [...files].forEach(async (file) => {
@@ -67,7 +69,7 @@ export function FileUpload({
           },
           ...prev,
         ]);
-        await onUpload(file)
+        onUpload(file)
           .then((res) => {
             setFileList((prev) =>
               prev.map((file) => {
@@ -90,7 +92,7 @@ export function FileUpload({
           });
       });
     },
-    [onUpload]
+    [onUpload, onChange]
   );
 
   const handleRemove = useCallback(
@@ -98,18 +100,14 @@ export function FileUpload({
       try {
         if (!onRemove) return;
 
-        const item = fileList.find((file) => file.id === id);
-
-        if (item && !isUploadError(item)) {
-          await onRemove(id);
-        }
+        await onRemove(id);
 
         setFileList((prev) => prev.filter((file) => file.id !== id));
       } catch (err) {
         console.error(err);
       }
     },
-    [onRemove, fileList]
+    [onRemove]
   );
 
   const handleSelectFiles = useCallback(() => {
@@ -122,7 +120,7 @@ export function FileUpload({
   }, []);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={classNames("flex flex-col gap-2", className)}>
       <label htmlFor={rest.id}>
         <span className="text-white text-xs font-medium">{labelText}</span>
         <input
@@ -145,7 +143,10 @@ export function FileUpload({
         </Button>
       </label>
 
-      {preview?.({ fileList, remove: onRemove ? handleRemove : undefined })}
+      {preview?.({
+        fileList: propsFileList ?? fileList,
+        remove: onRemove ? handleRemove : undefined,
+      })}
     </div>
   );
 }
