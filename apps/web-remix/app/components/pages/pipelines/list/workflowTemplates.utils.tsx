@@ -1,19 +1,14 @@
 import { Icon } from "@elpassion/taco";
 import React from "react";
-import { routes } from "~/utils/routes.utils";
 import { IBlockConfig } from "../pipeline.types";
 import { AiChatSpark } from "~/icons/AiChatSpark";
 import { SoundRecognition } from "~/icons/SoundRecognition";
 import { VoiceMailBubble } from "~/icons/VoiceMailBubble";
 
-export const generateTemplates = (
-  templates: typeof sampleTemplates,
-  organizationId: string
-) =>
+export const generateTemplates = (templates: typeof sampleTemplates) =>
   templates.map((template, index) => ({
     ...template,
     id: index + 1,
-    to: routes.pipelinesNew(organizationId),
   }));
 export const sampleTemplates = [
   {
@@ -84,14 +79,18 @@ export const sampleTemplates = [
   },
 ];
 
-function generateAudioOutput(overrides?: Partial<IBlockConfig>) {
+function generateAudioOutput(
+  overrides?: Partial<Omit<IBlockConfig, "block_type">>
+) {
   return generateBlockConfig({
     name: "audio_output_1",
     type: "audio_output",
     ...overrides,
   });
 }
-function generateAudioInput(overrides?: Partial<IBlockConfig>) {
+function generateAudioInput(
+  overrides?: Partial<Omit<IBlockConfig, "block_type">>
+) {
   return generateBlockConfig({
     name: "audio_input_1",
     type: "audio_input",
@@ -99,14 +98,18 @@ function generateAudioInput(overrides?: Partial<IBlockConfig>) {
   });
 }
 
-function generateTextToSpeech(overrides?: Partial<IBlockConfig>) {
+function generateTextToSpeech(
+  overrides?: Partial<Omit<IBlockConfig, "block_type">>
+) {
   return generateBlockConfig({
     name: "text_to_speech_1",
     type: "text_to_speech",
     ...overrides,
   });
 }
-function generateSpeechToText(overrides?: Partial<IBlockConfig>) {
+function generateSpeechToText(
+  overrides?: Partial<Omit<IBlockConfig, "block_type">>
+) {
   return generateBlockConfig({
     name: "speech_to_text_1",
     type: "speech_to_text",
@@ -115,7 +118,7 @@ function generateSpeechToText(overrides?: Partial<IBlockConfig>) {
 }
 
 function generateTextOutput(
-  overrides?: Partial<IBlockConfig>
+  overrides?: Partial<Omit<IBlockConfig, "block_type">>
 ): Partial<IBlockConfig> {
   return generateBlockConfig({
     name: "text_output_1",
@@ -125,7 +128,7 @@ function generateTextOutput(
 }
 
 function generateTextInput(
-  overrides?: Partial<IBlockConfig>
+  overrides?: Partial<Omit<IBlockConfig, "block_type">>
 ): Partial<IBlockConfig> {
   return generateBlockConfig({
     name: "text_input_1",
@@ -135,7 +138,7 @@ function generateTextInput(
 }
 
 function generateChat(
-  overrides?: Partial<IBlockConfig>
+  overrides?: Partial<Omit<IBlockConfig, "block_type">>
 ): Partial<IBlockConfig> {
   return generateBlockConfig({
     name: "chat_1",
@@ -145,7 +148,7 @@ function generateChat(
 }
 
 function generateDocumentSearch(
-  overrides?: Partial<IBlockConfig>
+  overrides?: Partial<Omit<IBlockConfig, "block_type">>
 ): Partial<IBlockConfig> {
   return generateBlockConfig({
     name: "document_search_1",
@@ -153,7 +156,9 @@ function generateDocumentSearch(
     ...overrides,
   });
 }
-function generateBlockConfig(overrides?: Partial<IBlockConfig>) {
+function generateBlockConfig(
+  overrides?: Partial<Omit<IBlockConfig, "block_type">>
+) {
   return {
     position: { x: 800, y: -500 },
     inputs: [],

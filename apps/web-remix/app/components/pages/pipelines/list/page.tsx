@@ -67,10 +67,7 @@ function TemplatesWithPipelines({
 }: {
   organizationId: string;
 }) {
-  const templates = useMemo(
-    () => generateTemplates(sampleTemplates, organizationId),
-    [organizationId]
-  );
+  const templates = useMemo(() => generateTemplates(sampleTemplates), []);
   return (
     <WorkflowTemplates className="order-1 lg:order-2 h-fit">
       <WorkflowTemplatesHeader
@@ -78,7 +75,10 @@ function TemplatesWithPipelines({
         subheading="Pick a starting point for your next AI workflow."
       />
 
-      <WorkflowTemplatesList items={templates} />
+      <WorkflowTemplatesList
+        items={templates}
+        organizationId={organizationId}
+      />
     </WorkflowTemplates>
   );
 }
@@ -88,10 +88,7 @@ function TemplatesWithoutPipelines({
 }: {
   organizationId: string;
 }) {
-  const templates = useMemo(
-    () => generateTemplates(sampleTemplates, organizationId),
-    [organizationId]
-  );
+  const templates = useMemo(() => generateTemplates(sampleTemplates), []);
   return (
     <WorkflowTemplates className="max-w-[38rem] mx-auto w-full md:p-8 col-span-2">
       <Link to={routes.pipelinesNew(organizationId)}>
@@ -105,7 +102,10 @@ function TemplatesWithoutPipelines({
         className="text-center gap-2 md:mb-8"
       />
 
-      <WorkflowTemplatesList items={templates} />
+      <WorkflowTemplatesList
+        items={templates}
+        organizationId={organizationId}
+      />
     </WorkflowTemplates>
   );
 }

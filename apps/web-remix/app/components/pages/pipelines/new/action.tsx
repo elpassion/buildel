@@ -14,7 +14,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       invariant(params.organizationId, "organizationId not found");
 
       const result = await validator.validate(await request.formData());
-
+      console.log(result);
       if (result.error) return validationError(result.error);
 
       const { data } = await fetch(

@@ -1,9 +1,14 @@
-import React, { PropsWithChildren, ReactNode } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
+import React, { useMemo } from "react";
+import { ValidatedForm } from "remix-validated-form";
+import { withZod } from "@remix-validated-form/with-zod";
 import classNames from "classnames";
-import { ItemList } from "~/components/list/ItemList";
 import { Button, Icon } from "@elpassion/taco";
-import { Link } from "@remix-run/react";
-import { INode } from "../pipeline.types";
+import { ItemList } from "~/components/list/ItemList";
+import { HiddenField } from "~/components/form/fields/field.context";
+import type { IBlockConfig } from "../pipeline.types";
+import { schema } from "./schema";
+
 interface WorkflowTemplatesProps extends PropsWithChildren {
   className?: string;
 }
@@ -26,32 +31,45 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = ({
 
 interface ITemplate {
   id: string | number;
-  to: string;
   name: string;
-  blocks: Partial<INode>[];
   icon?: ReactNode;
+  blocks: Partial<Omit<IBlockConfig, "block_type">>[];
 }
 
 interface WorkflowTemplatesListProps {
   items: ITemplate[];
+  organizationId: string;
 }
-export function WorkflowTemplatesList({ items }: WorkflowTemplatesListProps) {
+export function WorkflowTemplatesList({
+  items,
+  organizationId,
+}: WorkflowTemplatesListProps) {
   return (
     <ItemList
       className="flex flex-col gap-2"
       items={items}
-      renderItem={(item) => <WorkflowTemplatesListItem {...item} />}
+      renderItem={(item) => (
+        <WorkflowTemplatesListItem {...item} organizationId={organizationId} />
+      )}
     />
   );
 }
-function WorkflowTemplatesListItem({ icon, name, to, blocks }: ITemplate) {
-  const combineUrl = () => {
-    return `${to}?blocks=${encodeURIComponent(JSON.stringify(blocks))}`;
-  };
 
+interface ITemplateItem extends ITemplate {
+  organizationId: string;
+}
+function WorkflowTemplatesListItem({
+  icon,
+  name,
+  blocks,
+  organizationId,
+}: ITemplateItem) {
+  const validator = useMemo(() => withZod(schema), []);
   return (
-    <Link
-      to={combineUrl()}
+    <ValidatedForm
+      method="POST"
+      validator={validator}
+      action={`/${organizationId}/pipelines/new`}
       className="group p-4 flex items-center justify-between gap-2 bg-neutral-900 hover:bg-neutral-950 rounded-lg text-white h-[60px] transition"
     >
       <div className="flex items-center gap-3">
@@ -59,13 +77,22 @@ function WorkflowTemplatesListItem({ icon, name, to, blocks }: ITemplate) {
         <h4 className="text-sm font-medium">{name}</h4>
       </div>
 
-      <Button tabIndex={0} size="xs" className="hidden group-hover:block">
+      <HiddenField name="pipeline.name" value={name} />
+
+      <HiddenField name="pipeline.config.version" value="1" />
+
+      <HiddenField
+        name="pipeline.config.blocks"
+        value={JSON.stringify(blocks)}
+      />
+
+      <Button type="submit" size="xs" className="hidden group-hover:block">
         <div className="flex gap-1 items-center">
           <span className="text-xs">Build</span>
           <Icon iconName="arrow-right" className="text-sm" />
         </div>
       </Button>
-    </Link>
+    </ValidatedForm>
   );
 }
 
