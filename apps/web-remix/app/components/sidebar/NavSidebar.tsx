@@ -96,7 +96,7 @@ export function SidebarMenuItem({
   return (
     <div
       className={classNames(
-        "flex items-center space-x-2 p-2 rounded-lg text-neutral-100 hover:bg-neutral-700",
+        "flex items-center space-x-2 p-2 rounded-lg text-neutral-100 hover:bg-neutral-700 transition",
         {
           "bg-transparent": !isActive,
           "bg-neutral-700": isActive,
