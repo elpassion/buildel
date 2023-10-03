@@ -7,9 +7,11 @@ export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
     invariant(params.organizationId, "organizationId not found");
+    invariant(params.collectionName, "collectionName not found");
 
     return json({
       organizationId: params.organizationId,
+      collectionName: params.collectionName,
     });
   })(args);
 }

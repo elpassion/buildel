@@ -12,7 +12,7 @@ import classNames from "classnames";
 
 export interface FileUploadProps extends React.HTMLProps<HTMLInputElement> {
   preview?: (props: IPreviewProps) => ReactNode;
-  onUpload: (file: File) => Promise<IFile>;
+  onUpload?: (file: File) => Promise<IFile>;
   onFetch?: () => Promise<IFile[]>;
   onRemove?: (id: number) => Promise<any>;
   uploadText?: ReactNode;
@@ -69,7 +69,7 @@ export function FileUpload({
           },
           ...prev,
         ]);
-        onUpload(file)
+        onUpload?.(file)
           .then((res) => {
             setFileList((prev) =>
               prev.map((file) => {

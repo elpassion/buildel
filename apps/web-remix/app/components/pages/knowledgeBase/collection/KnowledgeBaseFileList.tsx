@@ -7,6 +7,7 @@ import {
 import { Icon } from "@elpassion/taco";
 import { IconButton } from "~/components/iconButton";
 import { confirm } from "~/components/modal/confirm";
+import { useFetcher } from "@remix-run/react";
 interface KnowledgeBaseFileListProps {
   items: IKnowledgeBaseFileList;
 }
@@ -14,9 +15,11 @@ interface KnowledgeBaseFileListProps {
 export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
   items,
 }) => {
+  const fetcher = useFetcher();
   const handleDelete = (file: IKnowledgeBaseFile) => {
     confirm({
-      // onConfirm: ()=>fetcher()
+      onConfirm: async () =>
+        fetcher.submit({ memoryId: file.id }, { method: "delete" }),
       confirmText: "Delete item",
       children: (
         <p className="text-neutral-100 text-sm">
@@ -33,28 +36,27 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
       className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3"
       items={items}
       renderItem={(item) => (
-        <KnowledgeBaseListItem data={item} onDelete={handleDelete} />
+        <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
       )}
     />
   );
 };
 
-interface KnowledgeBaseListItemProps {
+interface KnowledgeBaseFileListItemProps {
   data: IKnowledgeBaseFile;
   onDelete: (file: IKnowledgeBaseFile) => void;
 }
 
-export const KnowledgeBaseListItem: React.FC<KnowledgeBaseListItemProps> = ({
-  data,
-  onDelete,
-}) => {
+export const KnowledgeBaseFileListItem: React.FC<
+  KnowledgeBaseFileListItemProps
+> = ({ data, onDelete }) => {
   const handleDelete = () => {
     onDelete(data);
   };
   return (
     <article className="relative group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6">
       <header className="mb-4">
-        <h3 className="text-lg font-medium text-white mb-1">
+        <h3 className="text-lg font-medium text-white mb-1 max-w-[90%] truncate">
           {data.file_name}
         </h3>
 
