@@ -1,7 +1,9 @@
-import React from "react";
+import React, { ReactNode, useEffect } from "react";
 import { SidebarProps, Sidebar } from "@elpassion/taco";
 import classNames from "classnames";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
+import { RemixNavLinkProps } from "@remix-run/react/dist/components";
+import { NavLink, useLocation } from "@remix-run/react";
 
 export const NavSidebar: React.FC<
   Omit<SidebarProps, "collapsed" | "onCollapse">
@@ -26,6 +28,11 @@ export const NavMobileSidebar: React.FC<
   Omit<SidebarProps, "collapsed" | "onCollapse">
 > = ({ children, ...props }) => {
   const { isOpen, closeSidebar } = useNavSidebarContext();
+  const location = useLocation();
+
+  useEffect(() => {
+    closeSidebar();
+  }, [location.pathname]);
   return (
     <>
       <PageOverlay
@@ -51,6 +58,63 @@ export const NavMobileSidebar: React.FC<
     </>
   );
 };
+
+type SidebarLinkProps = RemixNavLinkProps &
+  Omit<SidebarMenuItemProps, "isActive">;
+export function SidebarLink({
+  icon,
+  text,
+  onlyIcon,
+  ...props
+}: SidebarLinkProps) {
+  return (
+    <NavLink {...props}>
+      {({ isActive }) => (
+        <SidebarMenuItem
+          icon={icon}
+          text={text}
+          isActive={isActive}
+          onlyIcon={onlyIcon}
+        />
+      )}
+    </NavLink>
+  );
+}
+
+export interface SidebarMenuItemProps {
+  text?: string;
+  isActive?: boolean;
+  onlyIcon?: boolean;
+  icon: ReactNode;
+}
+export function SidebarMenuItem({
+  text,
+  icon,
+  isActive,
+  onlyIcon,
+}: SidebarMenuItemProps) {
+  return (
+    <div
+      className={classNames(
+        "flex items-center space-x-2 p-2 rounded-lg text-neutral-100 hover:bg-neutral-700",
+        {
+          "bg-transparent": !isActive,
+          "bg-neutral-700": isActive,
+          "w-full": !onlyIcon,
+          "w-9 h-9": onlyIcon,
+        }
+      )}
+    >
+      {icon}
+
+      {text && !onlyIcon && (
+        <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">
+          {text}
+        </span>
+      )}
+    </div>
+  );
+}
 
 interface INavSidebarContext {
   collapsed: boolean;

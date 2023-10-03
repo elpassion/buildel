@@ -1,10 +1,4 @@
-import {
-  PropsWithChildren,
-  ReactNode,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import { PropsWithChildren, useCallback, useRef, useState } from "react";
 import invariant from "tiny-invariant";
 import classNames from "classnames";
 import Modal from "react-modal";
@@ -13,7 +7,6 @@ import { MenuInfo } from "rc-menu/es/interface";
 import { Avatar, Icon, IconButton } from "@elpassion/taco";
 import { DataFunctionArgs, json } from "@remix-run/node";
 import {
-  NavLink,
   Outlet,
   useFetcher,
   useLoaderData,
@@ -27,12 +20,11 @@ import { routes } from "~/utils/routes.utils";
 import { Menu } from "~/components/menu/Menu";
 import { MenuItem } from "~/components/menu/MenuItem";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
-import { RemixNavLinkProps } from "@remix-run/react/dist/components";
 import {
   NavMobileSidebar,
   NavSidebar,
   NavSidebarContext,
-  useNavSidebarContext,
+  SidebarLink,
 } from "~/components/sidebar/NavSidebar";
 
 Modal.setAppElement("#_root");
@@ -274,63 +266,6 @@ function LogoutButton() {
         logout.submit({}, { method: "DELETE", action: "/logout" });
       }}
     />
-  );
-}
-
-type SidebarLinkProps = RemixNavLinkProps &
-  Omit<SidebarMenuItemProps, "isActive">;
-export function SidebarLink({
-  icon,
-  text,
-  onlyIcon,
-  ...props
-}: SidebarLinkProps) {
-  return (
-    <NavLink {...props}>
-      {({ isActive }) => (
-        <SidebarMenuItem
-          icon={icon}
-          text={text}
-          isActive={isActive}
-          onlyIcon={onlyIcon}
-        />
-      )}
-    </NavLink>
-  );
-}
-
-export interface SidebarMenuItemProps {
-  text?: string;
-  isActive?: boolean;
-  onlyIcon?: boolean;
-  icon: ReactNode;
-}
-export function SidebarMenuItem({
-  text,
-  icon,
-  isActive,
-  onlyIcon,
-}: SidebarMenuItemProps) {
-  return (
-    <div
-      className={classNames(
-        "flex items-center space-x-2 p-2 rounded-lg text-neutral-100 hover:bg-neutral-700",
-        {
-          "bg-transparent": !isActive,
-          "bg-neutral-700": isActive,
-          "w-full": !onlyIcon,
-          "w-9 h-9": onlyIcon,
-        }
-      )}
-    >
-      {icon}
-
-      {text && !onlyIcon && (
-        <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">
-          {text}
-        </span>
-      )}
-    </div>
   );
 }
 
