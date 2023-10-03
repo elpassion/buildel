@@ -7,15 +7,24 @@ export const AsyncSelectInput: React.FC<AsyncSelectInputProps> = (props) => {
     <AsyncSelect
       customStyles={{
         control: {
-          "background-color": "#454545 !important",
+          backgroundColor: "#454545 !important",
         },
         menu: {
-          "background-color": "#454545 !important",
+          backgroundColor: "#454545 !important",
           overflow: "hidden",
+          zIndex: 100,
         },
+
         option: {
-          "background-color": "#454545 !important",
+          backgroundColor: "#454545 !important",
         },
+      }}
+      //@ts-ignore
+      styles={{
+        //@ts-ignore
+        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+        //@ts-ignore
+        menu: (base) => ({ ...base, backgroundColor: "#454545" }),
       }}
       {...props}
     />

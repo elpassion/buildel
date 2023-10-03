@@ -33,6 +33,7 @@ export const AsyncSelectField = forwardRef<
   ) => {
     asyncSelectApi.getData(url).then((res) => {
       setOptions(res);
+      console.log(res.map(toSelectOption));
       callback(res.map(toSelectOption));
     });
   };
@@ -53,17 +54,17 @@ export const AsyncSelectField = forwardRef<
     <>
       <HiddenField value={selectedId} {...getInputProps()} />
       <AsyncSelectInput
-        defaultOptions
-        value={selectedOption && toSelectOption(selectedOption)}
-        options={[]} // ?
+        cacheOptions
         id={name}
+        value={selectedOption && toSelectOption(selectedOption)}
         loadOptions={loadOptions}
-        onSelect={(option) => {
-          // wrrr
-          if (option && isSingleValue(option)) {
+        onSelect={(option: SingleValue<IDropdownOption>) => {
+          if (option) {
             setSelectedId(option.id);
           }
         }}
+        //@ts-ignore
+        defaultOptions={true}
       />
     </>
   );

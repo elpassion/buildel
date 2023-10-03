@@ -93,7 +93,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
         <CheckboxInput
           name={name}
           key={value}
-          labelText={value}
+          label={value}
           id={`${name}.${index}`}
           value={value}
           error={!!error}
@@ -162,7 +162,7 @@ export function BooleanField({ field, name }: FieldProps) {
     <FormField name={name}>
       <CheckboxInputField
         id={name}
-        labelText={field.title}
+        label={field.title}
         defaultChecked={field.default}
         error={!!error}
       />
