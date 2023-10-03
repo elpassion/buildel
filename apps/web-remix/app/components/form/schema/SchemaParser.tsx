@@ -17,6 +17,10 @@ export function generateZODSchema(
       return nestedSchema;
     }
 
+    if ("presentAs" in schema && schema.presentAs === "async-select") {
+      return nestedSchema;
+    }
+
     if (schema.minLength !== undefined) {
       nestedSchema = nestedSchema.min(schema.minLength);
     }
@@ -114,6 +118,14 @@ export type JSONSchemaField =
       maxLength?: number;
       enum: string[];
       enumPresentAs: "checkbox" | "radio";
+      default?: string;
+    }
+  | {
+      type: "string";
+      title: string;
+      description: string;
+      presentAs: "async-select";
+      url: string;
       default?: string;
     }
   | {
