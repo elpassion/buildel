@@ -27,7 +27,6 @@ export const AsyncSelectField = forwardRef<
   const [selectedId, setSelectedId] = useControlField<string>(name);
   const [options, setOptions] = useState<IAsyncSelectItemList>([]);
 
-  console.log(selectedId);
   const loadOptions = (
     _input: string,
     callback: (options: IDropdownOption[]) => void
