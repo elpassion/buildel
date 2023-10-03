@@ -51,10 +51,12 @@ defmodule BuildelWeb.MemoryControllerTest do
       pipeline: pipeline,
       organization: organization
     } do
+      collection_name = "pipelines:#{pipeline.id}"
+
       conn =
         post(conn, ~p"/api/organizations/#{organization.id}/memories", %{
           file: file,
-          collection_name: "pipelines:#{pipeline.id}"
+          collection_name: collection_name
         })
 
       assert %{
@@ -62,6 +64,7 @@ defmodule BuildelWeb.MemoryControllerTest do
                  "file_name" => "example.txt",
                  "file_size" => 24,
                  "file_type" => "text/plain",
+                 "collection_name" => ^collection_name,
                  "id" => _
                }
              } = json_response(conn, 201)
@@ -86,6 +89,7 @@ defmodule BuildelWeb.MemoryControllerTest do
                  "file_name" => "example.txt",
                  "file_size" => 24,
                  "file_type" => "text/plain",
+                 "collection_name" => ^collection_name,
                  "id" => _
                }
              } = json_response(conn, 201)

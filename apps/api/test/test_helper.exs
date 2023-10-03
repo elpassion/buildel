@@ -1,12 +1,3 @@
 ExUnit.start()
 Ecto.Adapters.SQL.Sandbox.mode(Buildel.Repo, :manual)
 
-Application.put_env(:buildel, :deepgram, Buildel.ClientMocks.Deepgram)
-Application.put_env(:buildel, :elevenlabs, Buildel.ClientMocks.Elevenlabs)
-Application.put_env(:buildel, :chat_gpt, Buildel.ClientMocks.ChatGPT)
-Application.put_env(:buildel, :stream_timeout, 10)
-Application.put_env(:buildel, :vector_db, Buildel.ClientMocks.VectorDB.QdrantAdapter)
-Application.put_env(:buildel, :embeddings, Buildel.ClientMocks.Embeddings)
-Application.put_env(:buildel, :file_loader, Buildel.FileLoaderRawAdapter)
-Application.put_env(:buildel, :search_db, Buildel.ClientMocks.SearchDB.LNXAdapter)
-Application.put_env(:buildel, :hybrid_db, true)

@@ -14,7 +14,8 @@ defmodule BuildelWeb.MemoryJSON do
       id: memory.id,
       file_name: memory.file_name,
       file_size: memory.file_size,
-      file_type: memory.file_type
+      file_type: memory.file_type,
+      collection_name: memory.collection_name
     }
   end
 end

@@ -36,3 +36,13 @@ config :logger, level: :warning
 config :phoenix, :plug_init_mode, :runtime
 
 config :buildel, :secret_key_base, "secret_key_base"
+
+config :buildel, :deepgram, Buildel.ClientMocks.Deepgram
+config :buildel, :elevenlabs, Buildel.ClientMocks.Elevenlabs
+config :buildel, :chat_gpt, Buildel.ClientMocks.ChatGPT
+config :buildel, :stream_timeout, 10
+config :buildel, :vector_db, Buildel.ClientMocks.VectorDB.QdrantAdapter
+config :buildel, :embeddings, Buildel.ClientMocks.Embeddings
+config :buildel, :file_loader, Buildel.FileLoaderRawAdapter
+config :buildel, :search_db, Buildel.ClientMocks.SearchDB.LNXAdapter
+config :buildel, :hybrid_db, false
