@@ -20,7 +20,7 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = ({
   return (
     <article
       className={classNames(
-        "flex-grow bg-neutral-800 p-4 text-white rounded-lg",
+        "flex-grow bg-neutral-900 p-4 text-white rounded-lg",
         className
       )}
     >
@@ -70,7 +70,7 @@ function WorkflowTemplatesListItem({
       method="POST"
       validator={validator}
       action={`/${organizationId}/pipelines/new`}
-      className="group p-4 flex items-center justify-between gap-2 bg-neutral-900 hover:bg-neutral-950 rounded-lg text-white h-[60px] transition"
+      className="group p-4 flex items-center justify-between gap-2 bg-neutral-800 hover:bg-neutral-950 rounded-lg text-white h-[60px] transition"
     >
       <div className="flex items-center gap-3">
         {icon ? icon : null}
