@@ -1,6 +1,6 @@
-import { MetaFunction } from "@remix-run/node";
-import { useActionData, useSearchParams, Link } from "@remix-run/react";
 import * as React from "react";
+import { MetaFunction } from "@remix-run/node";
+import { useSearchParams, Link } from "@remix-run/react";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { schema } from "./schema";
@@ -10,24 +10,14 @@ import {
   TextInputField,
 } from "~/components/form/fields/text.field";
 import { FieldError } from "~/components/form/fields/field.error";
-import { action } from "./action";
 import { Button } from "@elpassion/taco";
 
 export function LoginPage() {
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/stories";
-  const actionData = useActionData<typeof action>();
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
-
-  React.useEffect(() => {
-    // if (actionData?) {
-    // emailRef.current?.focus();
-    // } else if (actionData?.errors.password) {
-    // passwordRef.current?.focus();
-    // }
-  }, [actionData]);
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">

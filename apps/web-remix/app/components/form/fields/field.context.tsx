@@ -32,6 +32,8 @@ export const useFieldContext = () => {
   const context = useContext(FieldContext);
   if (!context)
     throw new Error("You tried to use a field without using <Field />");
-  const fieldProps = useField(context.name);
+  const fieldProps = useField(context.name, {
+    validationBehavior: { initial: "onSubmit" },
+  });
   return { ...context, ...fieldProps };
 };
