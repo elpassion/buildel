@@ -19,12 +19,15 @@ import {
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import { ReactNode, useCallback, useEffect } from "react";
 import { assert } from "~/utils/assert";
+import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
 
 export function EditBlockForm({
   onSubmit,
   blockConfig,
   children,
+  organizationId,
 }: {
+  organizationId: number;
   children?: ReactNode;
   onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
@@ -57,6 +60,33 @@ export function EditBlockForm({
     [blockConfig.inputs]
   );
 
+  const SelectField = useCallback(
+    (props: FieldProps) => {
+      assert(props.field.type === "string");
+      if (
+        !("presentAs" in props.field) ||
+        props.field.presentAs !== "async-select"
+      ) {
+        return;
+      }
+
+      return (
+        <FormField name={props.name!}>
+          <AsyncSelectField
+            url={props.field.url.replace(
+              ":organization_id",
+              organizationId.toString()
+            )}
+            label={props.field.title}
+            supportingText={props.field.description}
+            defaultValue={props.field.default}
+          />
+        </FormField>
+      );
+    },
+    [organizationId]
+  );
+
   return (
     <ValidatedForm
       // @ts-ignore
@@ -79,6 +109,7 @@ export function EditBlockForm({
             array: ArrayField,
             boolean: BooleanField,
             editor: EditorField,
+            asyncSelect: SelectField,
           }}
         />
 

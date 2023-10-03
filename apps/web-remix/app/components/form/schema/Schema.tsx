@@ -14,6 +14,7 @@ export function Schema({
     array: React.FC<FieldProps>;
     boolean: React.FC<FieldProps>;
     editor: React.FC<FieldProps>;
+    asyncSelect: React.FC<FieldProps>;
   };
 }) {
   assert(schema.type === "object");
@@ -91,5 +92,6 @@ export interface FieldProps {
     array: React.FC<FieldProps>;
     boolean: React.FC<FieldProps>;
     editor: React.FC<FieldProps>;
+    asyncSelect: React.FC<FieldProps>;
   };
 }
