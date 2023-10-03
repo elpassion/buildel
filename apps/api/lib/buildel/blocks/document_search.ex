@@ -42,7 +42,7 @@ defmodule Buildel.Blocks.DocumentSearch do
               "persist_in" => %{
                 "type" => "string",
                 "title" => "Persist in",
-                "url" => "/api/organizations/:organization_id/collections"
+                "url" => "/api/organizations/:organization_id/collections",
                 "presentAs" => "async-select",
                 "description" =>
                   "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
