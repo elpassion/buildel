@@ -3,21 +3,21 @@
     "color": {
       "background": {
         "optionHover": {
-          "value": "{neutral.100}",
+          "value": "{neutral.800}",
           "type": "color"
         },
         "optionActive": {
-          "value": "{neutral.50}",
+          "value": "{neutral.800}",
           "type": "color"
         }
       },
       "text": {
         "option": {
-          "value": "{neutral.900}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "optionLabel": {
-          "value": "{neutral.700}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "optionLabelSupportingText": {
@@ -51,11 +51,11 @@
     "color": {
       "background": {
         "optionSelected": {
-          "value": "{neutral.50}",
+          "value": "{neutral.800}",
           "type": "color"
         },
         "list": {
-          "value": "{basic.white}",
+          "value": "{neutral.700}",
           "type": "color"
         }
       },
@@ -99,11 +99,11 @@
       },
       "text": {
         "valueContainer": {
-          "value": "{neutral.500}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "indicator": {
-          "value": "{basic.black}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "multiValueRemoveButton": {
@@ -111,7 +111,7 @@
           "type": "color"
         },
         "control": {
-          "value": "{neutral.400}",
+          "value": "{basic.white}",
           "type": "color"
         },
         "controlDisabled": {
@@ -139,7 +139,7 @@
       },
       "shadow": {
         "control": {
-          "value": "{secondary.50}",
+          "value": "{primary.700}",
           "type": "color"
         },
         "controlError": {
