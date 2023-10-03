@@ -1,32 +1,14 @@
 import React from "react";
 import { MetaFunction } from "@remix-run/node";
-import {
-  Link,
-  Outlet,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-} from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
-import { KnowledgeBaseList } from "./KnowledgeBaseList";
 import { loader } from "./loader";
 import { Button } from "@elpassion/taco";
-import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
 
 export function KnowledgeBasePage() {
-  const { fileList, organizationId } = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
-  const match = useMatch(`${organizationId}/knowledge-base/new`);
-  const isSidebarOpen = !!match;
+  const { organizationId } = useLoaderData<typeof loader>();
 
-  const handleCloseSidebar = () => {
-    navigate(routes.knowledgeBase(organizationId));
-  };
   return (
     <>
       <AppNavbar
@@ -38,28 +20,13 @@ export function KnowledgeBasePage() {
       <PageContentWrapper>
         <div className="mt-5 mb-6 flex gap-2 justify-between items-center">
           <span>Search</span>
-          <Link to={routes.knowledgeBaseNew(organizationId)}>
-            <Button size="sm" tabIndex={0}>
-              New knowledge item
-            </Button>
-          </Link>
-        </div>
-        <KnowledgeBaseList items={fileList} />
-      </PageContentWrapper>
 
-      <ActionSidebar
-        className="!bg-neutral-950"
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
-      >
-        <ActionSidebarHeader
-          heading="New knowledge items"
-          subheading="Upload files to add to Project X Database."
-          onClose={handleCloseSidebar}
-        />
-        <Outlet />
-      </ActionSidebar>
+          <Button size="sm" tabIndex={0}>
+            New collection
+          </Button>
+        </div>
+        <h2>Collection list</h2>
+      </PageContentWrapper>
     </>
   );
 }

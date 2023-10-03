@@ -7,11 +7,11 @@ import {
 import { Icon } from "@elpassion/taco";
 import { IconButton } from "~/components/iconButton";
 import { confirm } from "~/components/modal/confirm";
-interface KnowledgeBaseListProps {
+interface KnowledgeBaseFileListProps {
   items: IKnowledgeBaseFileList;
 }
 
-export const KnowledgeBaseList: React.FC<KnowledgeBaseListProps> = ({
+export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
   items,
 }) => {
   const handleDelete = (file: IKnowledgeBaseFile) => {
