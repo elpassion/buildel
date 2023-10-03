@@ -136,21 +136,21 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
       <div className="flex flex-col gap-1">
         <SidebarLink
           to={routes.pipelines(organization.id)}
-          icon={<Icon iconName="home" className="w-5 h-5" />}
+          icon={<Icon iconName="home" className="w-5 h-5 text-center" />}
           text="Home"
           onlyIcon={isCollapsed}
         />
 
         <SidebarLink
           to={routes.knowledgeBase(organization.id)}
-          icon={<Icon iconName="briefcase" className="w-5 h-5" />}
+          icon={<Icon iconName="briefcase" className="w-5 h-5 text-center" />}
           text="Knowledge Base"
           onlyIcon={isCollapsed}
         />
 
         <SidebarLink
           to={routes.apiKeys(organization.id)}
-          icon={<Icon iconName="key" className="w-5 h-5" />}
+          icon={<Icon iconName="key" className="w-5 h-5 text-center" />}
           text="API Keys"
           onlyIcon={isCollapsed}
         />
@@ -158,14 +158,14 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
       <div>
         <SidebarLink
           to={routes.dashboard}
-          icon={<Icon iconName="life-buoy" className="w-5 h-5" />}
+          icon={<Icon iconName="life-buoy" className="w-5 h-5 text-center" />}
           text="Support"
           onlyIcon={isCollapsed}
         />
 
         <SidebarLink
           to={routes.dashboard}
-          icon={<Icon iconName="settings" className="w-5 h-5" />}
+          icon={<Icon iconName="settings" className="w-5 h-5 text-center" />}
           text="Settings"
           onlyIcon={isCollapsed}
         />
