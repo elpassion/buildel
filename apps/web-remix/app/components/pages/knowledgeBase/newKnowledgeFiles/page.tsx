@@ -8,7 +8,7 @@ import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { loader } from "./loader";
 
 type IExtendedFileUpload = IFileUpload & { file: File };
-export function NewKnowledgeBasePage() {
+export function NewKnowledgeFilesPage() {
   const revalidator = useRevalidator();
   const { organizationId, collectionName } = useLoaderData<typeof loader>();
   const [items, setItems] = useState<IExtendedFileUpload[]>([]);
@@ -64,7 +64,7 @@ export function NewKnowledgeBasePage() {
       await fetch(`/super-api/organizations/${organizationId}/memories`, {
         body: formData,
         method: "POST",
-      });
+      }).then((res) => res.json());
 
       handleUpdateStatus(fileUpload.id, "done");
       revalidator.revalidate();
@@ -108,7 +108,7 @@ export function NewKnowledgeBasePage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "New knowledge base",
+      title: "New knowledge files",
     },
   ];
 };
