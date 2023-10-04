@@ -1,5 +1,5 @@
 import React from "react";
-import { ItemList } from "~/components/list/ItemList";
+import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import {
   IKnowledgeBaseFile,
   IKnowledgeBaseFileList,
@@ -24,8 +24,10 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
       children: (
         <p className="text-neutral-100 text-sm">
           You are about to delete the{" "}
-          <span className="font-bold">"{file.file_name}”</span> file from your
-          knowledge base. This action is irreversible.
+          <span className="block font-bold max-w-full truncate">
+            "{file.file_name}”
+          </span>{" "}
+          file from your knowledge base. This action is irreversible.
         </p>
       ),
     });
@@ -35,6 +37,9 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
     <ItemList
       className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3"
       items={items}
+      emptyText={
+        <EmptyMessage>There is not files in collection yet...</EmptyMessage>
+      }
       renderItem={(item) => (
         <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
       )}

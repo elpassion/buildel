@@ -1,10 +1,11 @@
-import React, { ReactNode } from "react";
+import React, { PropsWithChildren, ReactNode } from "react";
 
 interface ItemListProps<T> {
   items: T[];
   renderItem: (item: T) => ReactNode;
   className?: string;
   itemClassName?: string;
+  emptyText?: ReactNode;
 }
 
 export const ItemList = <T extends { id: number | string }>({
@@ -12,9 +13,11 @@ export const ItemList = <T extends { id: number | string }>({
   renderItem,
   className,
   itemClassName,
+  emptyText,
 }: ItemListProps<T>) => {
   return (
     <ul className={className}>
+      {emptyText && <li className="hidden last:block">{emptyText}</li>}
       {items.map((item) => (
         <li className={itemClassName} key={item.id}>
           {renderItem(item)}
@@ -22,4 +25,8 @@ export const ItemList = <T extends { id: number | string }>({
       ))}
     </ul>
   );
+};
+
+export const EmptyMessage: React.FC<PropsWithChildren> = ({ children }) => {
+  return <span className="text-sm text-white">{children}</span>;
 };

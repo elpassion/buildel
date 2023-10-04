@@ -6,7 +6,6 @@ import {
   useLoaderData,
   useMatch,
   useNavigate,
-  useRevalidator,
 } from "@remix-run/react";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
@@ -20,7 +19,6 @@ import {
 import { routes } from "~/utils/routes.utils";
 
 export function KnowledgeBaseCollectionPage() {
-  const revalidator = useRevalidator();
   const { fileList, organizationId, collectionName } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
@@ -31,7 +29,6 @@ export function KnowledgeBaseCollectionPage() {
 
   const handleCloseSidebar = () => {
     navigate(routes.collectionKnowledgeBase(organizationId, collectionName));
-    revalidator.revalidate();
   };
   return (
     <>
@@ -44,8 +41,7 @@ export function KnowledgeBaseCollectionPage() {
       />
 
       <PageContentWrapper>
-        <div className="mt-5 mb-6 flex gap-2 justify-between items-center">
-          <span>Search</span>
+        <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
           <Link
             to={routes.collectionKnowledgeBaseNew(
               organizationId,

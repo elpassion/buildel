@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MetaFunction } from "@remix-run/node";
 import { Button } from "@elpassion/taco";
-import { Form, useLoaderData } from "@remix-run/react";
+import { Form, useLoaderData, useRevalidator } from "@remix-run/react";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import { IFileUpload } from "~/components/fileUpload/fileUpload.types";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
@@ -9,6 +9,7 @@ import { loader } from "./loader";
 
 type IExtendedFileUpload = IFileUpload & { file: File };
 export function NewKnowledgeBasePage() {
+  const revalidator = useRevalidator();
   const { organizationId, collectionName } = useLoaderData<typeof loader>();
   const [items, setItems] = useState<IExtendedFileUpload[]>([]);
 
@@ -66,6 +67,7 @@ export function NewKnowledgeBasePage() {
       });
 
       handleUpdateStatus(fileUpload.id, "done");
+      revalidator.revalidate();
 
       removeFile(fileUpload.id);
     } catch {
