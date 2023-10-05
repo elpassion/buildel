@@ -13,6 +13,24 @@ defmodule Buildel.Memories do
     |> Buildel.Repo.all()
   end
 
+  def list_organization_collections(%Buildel.Organizations.Organization{} = organization) do
+    Buildel.Memories.Memory
+    |> where(
+      [m],
+      m.organization_id == ^organization.id
+    )
+    |> Buildel.Repo.all()
+  end
+
+  def get_organization_collection(%Buildel.Organizations.Organization{} = organization, collection_id) do
+    Buildel.Memories.MemoryCollection
+    |> where(
+      [c],
+      c.id == ^collection_id and c.organization_id == ^organization.id
+    )
+    |> Buildel.Repo.one()
+  end
+
   def create_organization_memory(
         %Buildel.Organizations.Organization{} = organization,
         collection_name,
