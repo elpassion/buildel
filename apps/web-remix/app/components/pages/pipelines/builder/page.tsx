@@ -33,7 +33,6 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
-import { assert } from "~/utils/assert";
 import { CustomNode, CustomNodeProps } from "./CustomNodes/CustomNode";
 import isEqual from "lodash.isequal";
 import { useDraggableNodes } from "./useDraggableNodes";
@@ -107,7 +106,7 @@ export function PipelineBuilder() {
     (config: IPipelineConfig) => {
       updateFetcher.submit(
         { ...pipeline, config: { ...config } },
-        { method: "PUT", encType: "application/json", replace: true }
+        { method: "PUT", encType: "application/json" }
       );
     },
     [updateFetcher, pipeline]
