@@ -1,4 +1,4 @@
-import React from "react";
+import React, { PropsWithChildren } from "react";
 import { Navbar, NavbarProps } from "@elpassion/taco";
 import { useNavSidebarContext } from "~/components/sidebar/NavSidebar";
 
@@ -9,11 +9,15 @@ export const AppNavbar: React.FC<
   return (
     <Navbar
       menuClassName="lg:hidden !text-white"
-      wrapperClassName="md:px-2 md:py-2"
+      wrapperClassName="py-2 md:px-2"
       onMenuClick={openSidebar}
       {...rest}
     >
       {children}
     </Navbar>
   );
+};
+
+export const AppNavbarHeading = ({ children }: PropsWithChildren) => {
+  return <h1 className="text-2xl font-medium text-white">{children}</h1>;
 };

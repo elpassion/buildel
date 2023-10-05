@@ -2,7 +2,7 @@ import React from "react";
 import { MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useMatch } from "@remix-run/react";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
-import { AppNavbar } from "~/components/navbar/AppNavbar";
+import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
 import { loader } from "./loader";
 import { Button } from "@elpassion/taco";
 import { KnowledgeBaseCollectionList } from "./KnowledgeBaseCollectionList";
@@ -17,9 +17,7 @@ export function KnowledgeBasePage() {
   return (
     <>
       <AppNavbar
-        leftContent={
-          <h1 className="text-2xl font-medium text-white">Knowledge base</h1>
-        }
+        leftContent={<AppNavbarHeading>Knowledge base</AppNavbarHeading>}
       />
 
       <CreateCollectionModal
