@@ -9,8 +9,6 @@ export async function loader(args: LoaderFunctionArgs) {
     await requireLogin(request);
     invariant(params.organizationId, "organizationId not found");
 
-    //fetch organization and return 404 if not exist
-
     return redirect(routes.pipelines(params.organizationId));
   })(args);
 }
