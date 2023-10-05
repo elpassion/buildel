@@ -59,7 +59,7 @@ export function KnowledgeBaseCollectionPage() {
       >
         <ActionSidebarHeader
           heading="New knowledge items"
-          subheading="Upload files to add to Project X Database."
+          subheading={`Upload files to add to ${collectionName} Database.`}
           onClose={handleCloseSidebar}
         />
         <Outlet />
