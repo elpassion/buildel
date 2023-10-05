@@ -14,7 +14,7 @@ import {
 } from "~/api/AsyncSelectApi";
 import { useControlField } from "remix-validated-form";
 import { IDropdownOption } from "@elpassion/taco/Dropdown";
-import { MultiValue, SingleValue } from "react-select";
+import { SingleValue } from "react-select";
 
 export const AsyncSelectField = forwardRef<
   HTMLSelectElement,
@@ -33,7 +33,6 @@ export const AsyncSelectField = forwardRef<
   ) => {
     asyncSelectApi.getData(url).then((res) => {
       setOptions(res);
-      console.log(res.map(toSelectOption));
       callback(res.map(toSelectOption));
     });
   };
@@ -69,13 +68,6 @@ export const AsyncSelectField = forwardRef<
     </>
   );
 });
-
-function isSingleValue(
-  value: SingleValue<IDropdownOption> | MultiValue<IDropdownOption>
-): value is SingleValue<IDropdownOption> {
-  return (value as SingleValue<IDropdownOption>)?.id !== undefined;
-}
-
 function toSelectOption(item: IAsyncSelectItem) {
   return {
     id: item.id.toString(),

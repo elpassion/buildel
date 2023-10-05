@@ -17,7 +17,7 @@ export function ApiKeysPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Api keys",
+      title: "API keys",
     },
   ];
 };
