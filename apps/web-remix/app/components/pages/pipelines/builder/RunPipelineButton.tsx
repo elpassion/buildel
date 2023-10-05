@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Icon } from "@elpassion/taco";
+import { Button } from "@elpassion/taco";
 import { useRunPipeline } from "./RunPipelineProvider";
 import { PlayFilled } from "~/icons/PlayFilled";
 import { errorToast } from "~/components/toasts/errorToast";
@@ -39,9 +39,7 @@ export const RunPipelineButton: React.FC<RunPipelineButtonProps> = ({
       <Button
         onClick={handleRun}
         size="sm"
-        rightIcon={
-          status === "idle" ? <PlayFilled /> : <Icon iconName="stop-circle" />
-        }
+        rightIcon={status === "idle" && <PlayFilled />}
       >
         {status === "idle" ? "Run" : "Stop"}
       </Button>
