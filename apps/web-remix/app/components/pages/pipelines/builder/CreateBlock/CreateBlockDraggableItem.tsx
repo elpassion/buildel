@@ -49,16 +49,17 @@ export const CreateBlockDraggableItem: React.FC<
     <div
       key={data.type}
       className={classNames(
-        "min-w-[100px] cursor-grab bg-neutral-800 py-2 pl-3 pr-2 text-white flex justify-between items-center transition text-xs hover:bg-neutral-950 hover:drop-shadow-md",
+        "min-w-[100px] bg-neutral-800 py-2 pl-3 pr-2 text-white flex justify-between items-center transition text-xs",
         {
-          "opacity-50": runStatus !== "idle",
+          "opacity-70": runStatus !== "idle",
+          "cursor-grab hover:bg-neutral-950 hover:drop-shadow-md":
+            runStatus === "idle",
         }
       )}
+      draggable={runStatus === "idle"}
       onDragStart={(event) => {
-        if (runStatus !== "idle") return;
         onDragStart(event, data);
       }}
-      draggable
     >
       <span>{startCase(data.type)}</span>
       <IconButton
@@ -66,6 +67,7 @@ export const CreateBlockDraggableItem: React.FC<
         className="!w-5 !h-5 !rounded"
         onClick={() => onClickAdd(data)}
         icon={<Icon iconName="plus" />}
+        disabled={runStatus !== "idle"}
       />
     </div>
   );
