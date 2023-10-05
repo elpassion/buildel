@@ -19,6 +19,8 @@ export const routes = {
     `${routes.organization(organizationId)}/pipelines/new`,
   knowledgeBase: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/knowledge-base`,
+  knowledgeBaseNew: (organizationId: OrganizationId) =>
+    `${routes.knowledgeBase(organizationId)}/new`,
   collectionFiles: (organizationId: OrganizationId, collectionName: string) =>
     `${routes.knowledgeBase(organizationId)}/${collectionName}`,
   collectionFilesNew: (
