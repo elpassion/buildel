@@ -47,7 +47,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-neutral-950">
         <Toaster />
         <Outlet />
         <ScrollRestoration />

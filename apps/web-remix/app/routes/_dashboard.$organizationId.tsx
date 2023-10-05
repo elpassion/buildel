@@ -82,10 +82,7 @@ export default function Layout() {
   }, []);
 
   return (
-    <div
-      id="_root"
-      className="grid h-screen grid-cols-[auto_1fr] bg-neutral-950"
-    >
+    <div id="_root" className="grid h-screen grid-cols-[auto_1fr]">
       <NavSidebarContext.Provider
         value={{
           collapsed,
