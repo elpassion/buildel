@@ -28,7 +28,7 @@ export function KnowledgeBaseCollectionPage() {
   const isSidebarOpen = !!match;
 
   const handleCloseSidebar = () => {
-    navigate(routes.collectionKnowledgeBase(organizationId, collectionName));
+    navigate(routes.collectionFiles(organizationId, collectionName));
   };
   return (
     <>
@@ -42,12 +42,7 @@ export function KnowledgeBaseCollectionPage() {
 
       <PageContentWrapper>
         <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
-          <Link
-            to={routes.collectionKnowledgeBaseNew(
-              organizationId,
-              collectionName
-            )}
-          >
+          <Link to={routes.collectionFilesNew(organizationId, collectionName)}>
             <Button size="sm" tabIndex={0}>
               New knowledge item
             </Button>

@@ -21,7 +21,7 @@ export const KnowledgeBaseCollectionList: React.FC<
       items={items}
       emptyText={<EmptyMessage>There is no collections yet...</EmptyMessage>}
       renderItem={(item) => (
-        <Link to={routes.collectionKnowledgeBase(organizationId, item.name)}>
+        <Link to={routes.collectionFiles(organizationId, item.name)}>
           <KnowledgeBaseCollectionListItem data={item} />
         </Link>
       )}

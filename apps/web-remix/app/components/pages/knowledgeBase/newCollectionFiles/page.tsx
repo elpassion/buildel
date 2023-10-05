@@ -8,7 +8,7 @@ import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { loader } from "./loader";
 
 type IExtendedFileUpload = IFileUpload & { file: File };
-export function NewKnowledgeFilesPage() {
+export function NewCollectionFilesPage() {
   const revalidator = useRevalidator();
   const { organizationId, collectionName } = useLoaderData<typeof loader>();
   const [items, setItems] = useState<IExtendedFileUpload[]>([]);
@@ -108,7 +108,7 @@ export function NewKnowledgeFilesPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "New knowledge files",
+      title: "New collection files",
     },
   ];
 };
