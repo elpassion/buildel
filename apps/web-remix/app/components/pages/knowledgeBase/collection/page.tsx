@@ -35,7 +35,7 @@ export function KnowledgeBaseCollectionPage() {
       <AppNavbar
         leftContent={
           <h1 className="text-2xl font-medium text-white">
-            Collection X database
+            {collectionName} Database
           </h1>
         }
       />

@@ -5,6 +5,7 @@ import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { loader } from "./loader";
 import { Button } from "@elpassion/taco";
+import { KnowledgeBaseCollectionList } from "./KnowledgeBaseCollectionList";
 
 export function KnowledgeBasePage() {
   const { organizationId } = useLoaderData<typeof loader>();
@@ -25,7 +26,11 @@ export function KnowledgeBasePage() {
             New collection
           </Button>
         </div>
-        <h2>Collection list</h2>
+
+        <KnowledgeBaseCollectionList
+          organizationId={organizationId}
+          items={[{ id: "1", name: "72_document_search_1" }]}
+        />
       </PageContentWrapper>
     </>
   );

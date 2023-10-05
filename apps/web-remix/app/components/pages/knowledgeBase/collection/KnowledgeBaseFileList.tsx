@@ -38,7 +38,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
       className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3"
       items={items}
       emptyText={
-        <EmptyMessage>There is not files in collection yet...</EmptyMessage>
+        <EmptyMessage>There is no files in collection yet...</EmptyMessage>
       }
       renderItem={(item) => (
         <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
