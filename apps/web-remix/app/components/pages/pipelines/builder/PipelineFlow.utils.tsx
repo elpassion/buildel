@@ -131,10 +131,10 @@ export function getBlockFields(block: IBlockConfig): IField[] {
 }
 
 export function getAllBlockTypes(
-  pipeline: IPipeline,
+  config: IPipelineConfig,
   type: string
 ): IBlockConfig[] {
-  return pipeline.config.blocks.filter((block) => block.type === type);
+  return config.blocks.filter((block) => block.type === type);
 }
 
 export function getLastBlockNumber(blocks: IBlockConfig[]) {

@@ -1,4 +1,4 @@
-import { MetaFunction } from "@remix-run/node";
+import { LinksFunction, MetaFunction } from "@remix-run/node";
 
 import React, {
   useCallback,
@@ -40,9 +40,7 @@ import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { EditBlockForm } from "./EditBlockForm";
 import { loader } from "./loader";
-import { CreateBlockList } from "./CreateBlockList";
 import { BuilderHeader } from "./BuilderHeader";
-import { Button, Icon } from "@elpassion/taco";
 import { BlockInputList } from "./BlockInputList";
 import { CustomEdge } from "./CustomEdges/CustomEdge";
 import {
@@ -50,6 +48,10 @@ import {
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
 import { useBeforeUnloadWarning } from "~/hooks/useBeforeUnloadWarning";
+import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
+import { links as SubMenuLinks } from "./CreateBlock/GroupSubMenu";
+
+export const links: LinksFunction = () => [...SubMenuLinks()];
 
 export function PipelineBuilder() {
   const { pipeline, blockTypes } = useLoaderData<typeof loader>();
@@ -113,9 +115,12 @@ export function PipelineBuilder() {
 
   const onBlockCreate = useCallback(
     async (created: IBlockConfig) => {
-      assert(pipeline);
-
-      const sameBlockTypes = getAllBlockTypes(pipeline, created.type);
+      //@ts-ignore
+      const sameBlockTypes = getAllBlockTypes(
+        //@ts-ignore
+        toPipelineConfig(nodes, edges),
+        created.type
+      );
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${created.type.toLowerCase()}_${nameNum}`;
 
@@ -129,7 +134,7 @@ export function PipelineBuilder() {
         },
       ]);
     },
-    [pipeline, setNodes]
+    [setNodes, nodes, edges]
   );
 
   const onBlockUpdate = useCallback(
@@ -261,29 +266,12 @@ export function PipelineBuilder() {
                   <BlockInputList inputs={editableBlock.inputs} />
                 </EditBlockForm>
               </>
-            ) : (
-              <>
-                <ActionSidebarHeader
-                  heading="Add a new block"
-                  onClose={handleCloseModal}
-                />
-                <CreateBlockList
-                  blockTypes={blockTypes}
-                  onCreate={onBlockCreate}
-                />
-              </>
-            )}
+            ) : null}
           </ActionSidebar>
+
+          <CreateBlockFloatingMenu onCreate={onBlockCreate} />
         </ReactFlowProvider>
       </RunPipelineProvider>
-      <Button
-        size="lg"
-        className="!absolute bottom-8 right-4"
-        onClick={openSidebar}
-        rightIcon={<Icon iconName="plus-circle" className="text-xl" />}
-      >
-        Add block
-      </Button>
     </div>
   );
 }

@@ -22,6 +22,7 @@
 .react-flow__controls-button{
   @apply !bg-neutral-600 !border-none hover:!bg-neutral-800
 }
+
 .react-flow__controls-button svg{
   @apply !text-white fill-neutral-300
 }

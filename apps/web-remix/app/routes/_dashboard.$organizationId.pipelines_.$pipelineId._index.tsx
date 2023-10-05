@@ -3,4 +3,5 @@ export {
   action,
   loader,
   meta,
+  links,
 } from "~/components/pages/pipelines/builder";
