@@ -2,7 +2,6 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
   use BuildelWeb.ConnCase
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
-  import Buildel.MemoriesFixtures
 
   alias Buildel.Organizations
 
@@ -10,8 +9,7 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
     {:ok,
      conn:
        conn
-       |> put_req_header("accept", "application/json")
-       |> put_req_header("content-type", "multipart/form-data")}
+       |> put_req_header("accept", "application/json")}
   end
 
   setup [:register_and_log_in_user, :create_user_organization, :create_pipeline, :read_file]
@@ -58,7 +56,7 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
 
       assert %{
                "data" => %{
-                 "collection_name" => ^collection_name,
+                 "name" => ^collection_name,
                  "id" => _
                }
              } = json_response(conn, 201)
@@ -78,7 +76,7 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
 
       assert %{
                "data" => %{
-                 "collection_name" => ^collection_name,
+                 "name" => ^collection_name,
                  "id" => id
                }
              } = json_response(conn, 201)
@@ -93,7 +91,7 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
                "data" => 
                  %{
                    "id" => ^id,
-                   "collection_name" => ^collection_name,
+                   "name" => ^collection_name,
                  }
                
              } = json_response(conn, 200)
