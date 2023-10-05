@@ -27,11 +27,12 @@ defmodule Buildel.Memories do
 
     organization_collection_name = organization_collection_name(organization, collection_name)
 
-    with {:ok, memory} <-
+    with {:ok, collection} <- upsert_collection(%{organization_id: organization.id, collection_name: collection_name}),
+         {:ok, memory} <-
            %Buildel.Memories.Memory{}
            |> Buildel.Memories.Memory.changeset(
              metadata
-             |> Map.merge(%{organization_id: organization.id, collection_name: collection_name})
+             |> Map.merge(%{organization_id: organization.id, collection_name: collection_name, memory_collection_id: collection.id})
            )
            |> Buildel.Repo.insert(),
          {:ok, _} <- Buildel.VectorDB.init(organization_collection_name),
@@ -95,6 +96,21 @@ defmodule Buildel.Memories do
            Buildel.SearchDB.delete_all_with_metadata(collection_name, %{memory_id: memory.id}),
          {:ok, _} <- Buildel.Repo.delete(memory) do
       {:ok, memory}
+    end
+  end
+
+  def upsert_collection(%{organization_id: organization_id, collection_name: collection_name}) do
+    Buildel.Memories.MemoryCollection
+    |> where([c], c.collection_name == ^collection_name and c.organization_id == ^organization_id)
+    |> Buildel.Repo.one()
+    |> case do
+      nil ->
+        %Buildel.Memories.MemoryCollection{}
+        |> Buildel.Memories.MemoryCollection.changeset(%{collection_name: collection_name, organization_id: organization_id})
+        |> Buildel.Repo.insert()
+
+      collection ->
+        {:ok, collection}
     end
   end
 

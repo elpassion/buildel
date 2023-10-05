@@ -10,14 +10,16 @@ defmodule Buildel.Memories.Memory do
     field(:collection_name, :string)
 
     belongs_to(:organization, Buildel.Organizations.Organization)
+    belongs_to(:memory_collection, Buildel.Memories.MemoryCollection)
 
     timestamps()
   end
 
   def changeset(memory, attrs) do
     memory
-    |> cast(attrs, [:organization_id, :file_name, :file_size, :file_type, :collection_name])
-    |> validate_required([:organization_id, :file_name, :file_size, :file_type, :collection_name])
+    |> cast(attrs, [:organization_id, :file_name, :file_size, :file_type, :collection_name, :memory_collection_id])
+    |> validate_required([:organization_id, :file_name, :file_size, :file_type, :collection_name, :memory_collection_id])
     |> assoc_constraint(:organization)
+    |> assoc_constraint(:memory_collection)
   end
 end
