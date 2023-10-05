@@ -1,16 +1,20 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import {
+  isRouteErrorResponse,
   Links,
   LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  useRouteError,
 } from "@remix-run/react";
 import { Toaster } from "~/components/toasts/Toaster";
 import menuStyle from "rc-menu/assets/index.css";
 import styles from "./tailwind.css";
+import { GlobalNotFound } from "~/components/errorBoundaries/GlobalNotFound";
+import { GlobalRuntime } from "~/components/errorBoundaries/GlobalRuntime";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref
@@ -49,6 +53,32 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+      </body>
+    </html>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  const renderErrorUi = () => {
+    if (isRouteErrorResponse(error)) {
+      if (error.status === 404) return <GlobalNotFound error={error} />;
+    }
+
+    return <GlobalRuntime error={error} />;
+  };
+
+  return (
+    <html>
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body className="bg-neutral-950 text-white">
+        {renderErrorUi()}
+        <Scripts />
       </body>
     </html>
   );
