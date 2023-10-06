@@ -116,8 +116,8 @@ export function NumberField({ field, name }: FieldProps) {
         errorMessage={error}
         label={field.title}
         // supportingText={field.description}
-        minValue={field.minimum}
-        maxValue={field.maximum}
+        min={field.minimum}
+        max={field.maximum}
         defaultValue={field.default}
         step={field.step}
       />

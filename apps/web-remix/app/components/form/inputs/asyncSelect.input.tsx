@@ -5,27 +5,37 @@ export type AsyncSelectInputProps = IAsyncSelectProps;
 export const AsyncSelectInput: React.FC<AsyncSelectInputProps> = (props) => {
   return (
     <AsyncSelect
-      customStyles={{
-        control: {
-          backgroundColor: "#454545 !important",
-        },
-        menu: {
-          backgroundColor: "#454545 !important",
-          overflow: "hidden",
-          zIndex: 100,
-        },
-
-        option: {
-          backgroundColor: "#454545 !important",
-        },
-      }}
-      //@ts-ignore
-      styles={{
-        //@ts-ignore
+      customStylesOverrides={() => ({
         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-        //@ts-ignore
-        menu: (base) => ({ ...base, backgroundColor: "#454545" }),
-      }}
+        menu: (base) => ({
+          ...base,
+          ...base,
+          marginTop: 8,
+          marginLeft: 1,
+          border: "1px solid #DAE2EB",
+          boxShadow: "0px 8px 16px rgba(27, 36, 44, 0.12)",
+          borderRadius: "8px",
+          overflow: "hidden",
+          backgroundColor: "#454545",
+        }),
+        option: (base, state) => ({
+          ...base,
+          padding: 0,
+          backgroundColor:
+            state.isSelected || state.isFocused ? "#454545" : "transparent",
+        }),
+        control: (base) => ({
+          ...base,
+          borderRadius: "8px",
+          paddingTop: "8px",
+          paddingBottom: "8px",
+          minHeight: "48px",
+          "input:focus": {
+            boxShadow: "none",
+          },
+          backgroundColor: "#454545",
+        }),
+      })}
       {...props}
     />
   );

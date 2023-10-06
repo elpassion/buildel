@@ -54,6 +54,7 @@ export const AsyncSelectField = forwardRef<
       <HiddenField value={selectedId} {...getInputProps()} />
       <AsyncSelectInput
         cacheOptions
+        defaultOptions
         id={name}
         value={selectedOption && toSelectOption(selectedOption)}
         loadOptions={loadOptions}
@@ -62,8 +63,6 @@ export const AsyncSelectField = forwardRef<
             setSelectedId(option.id);
           }
         }}
-        //@ts-ignore
-        defaultOptions={true}
       />
     </>
   );
