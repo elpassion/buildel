@@ -49,7 +49,7 @@ export const CreateBlockDraggableItem: React.FC<
     <div
       key={data.type}
       className={classNames(
-        "min-w-[100px] bg-neutral-800 py-2 pl-3 pr-2 text-white flex justify-between items-center transition text-xs",
+        "min-w-[100px] bg-neutral-850 py-2 pl-3 pr-2 text-white flex justify-between items-center transition text-xs",
         {
           "opacity-70": runStatus !== "idle",
           "cursor-grab hover:bg-neutral-950 hover:drop-shadow-md":

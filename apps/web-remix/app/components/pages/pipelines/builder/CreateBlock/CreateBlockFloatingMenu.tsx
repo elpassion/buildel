@@ -36,7 +36,7 @@ export const CreateBlockFloatingMenu: React.FC<
   );
 
   return (
-    <div className="absolute top-1/2 -translate-y-1/2 right-4 h-auto bg-neutral-900">
+    <div className="absolute top-1/2 -translate-y-1/2 right-4 h-auto">
       <Menu expandIcon={null}>
         {Object.keys(blockGroups).map((group) => (
           <GroupSubMenu

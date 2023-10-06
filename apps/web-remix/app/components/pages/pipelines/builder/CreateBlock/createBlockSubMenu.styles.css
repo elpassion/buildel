@@ -1,5 +1,5 @@
 .rc-menu-submenu-title{
-    @apply !p-2 !bg-neutral-800 hover:!bg-neutral-950 focus:!bg-neutral-950 active:!bg-neutral-950 !w-[70px] !h-[50px] flex justify-center items-center
+    @apply !p-2 !bg-neutral-850 hover:!bg-neutral-950 focus:!bg-neutral-950 active:!bg-neutral-950 !w-[70px] !h-[50px] flex justify-center items-center
 }
 
 .rc-menu-submenu > .rc-menu{
