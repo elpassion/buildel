@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 import { MetaFunction } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
-import { schema } from "~/components/pages/pipelines/new/schema";
 import { ValidatedForm } from "remix-validated-form";
+import { withZod } from "@remix-validated-form/with-zod";
+import { Button } from "@elpassion/taco";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { Button } from "@elpassion/taco";
+import { schema } from "./schema";
 
 export function NewKnowledgeBasePage() {
   const validator = useMemo(() => withZod(schema), []);
@@ -18,7 +18,7 @@ export function NewKnowledgeBasePage() {
       className="w-full max-w-2xl"
     >
       <div className="max-w-s form-control w-full">
-        <Field name="collection.name">
+        <Field name="collection_name">
           <TextInputField type="text" autoFocus label="Name" />
         </Field>
       </div>

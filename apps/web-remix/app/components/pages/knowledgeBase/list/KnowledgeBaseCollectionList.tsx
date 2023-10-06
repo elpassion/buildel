@@ -2,13 +2,10 @@ import React from "react";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { Link } from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
+import { IKnowledgeBaseCollection } from "../knowledgeBase.types";
 
-interface ICollection {
-  id: string;
-  name: string;
-}
 interface KnowledgeBaseCollectionListProps {
-  items: ICollection[];
+  items: IKnowledgeBaseCollection[];
   organizationId: string;
 }
 
@@ -30,7 +27,7 @@ export const KnowledgeBaseCollectionList: React.FC<
 };
 
 interface KnowledgeBaseCollectionListItemProps {
-  data: ICollection;
+  data: IKnowledgeBaseCollection;
 }
 
 export const KnowledgeBaseCollectionListItem: React.FC<

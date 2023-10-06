@@ -1,15 +1,15 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
-import { validationError } from "remix-validated-form";
+import { z } from "zod";
 import invariant from "tiny-invariant";
+import { validationError } from "remix-validated-form";
+import { withZod } from "@remix-validated-form/with-zod";
 import { actionBuilder } from "~/utils.server";
-import { PipelineResponse } from "../contracts";
-import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
+import { schema } from "./schema";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
-    post: async ({ request, params }, { fetch }) => {
+    post: async ({ params, request }, { fetch }) => {
       const validator = withZod(schema);
       invariant(params.organizationId, "organizationId not found");
 
@@ -17,16 +17,17 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      const { data } = await fetch(
-        PipelineResponse,
-        `/organizations/${params.organizationId}/pipelines`,
-        {
-          method: "POST",
-          body: JSON.stringify(result.data),
-        }
+      await fetch(
+        z.any(),
+        `/organizations/${params.organizationId}/memory_collections`,
+        { method: "POST", body: JSON.stringify(result.data) }
       );
-
-      return redirect(routes.pipeline(params.organizationId, data.id));
+      return redirect(
+        routes.collectionFiles(
+          params.organizationId,
+          result.data.collection_name
+        )
+      );
     },
   })(actionArgs);
 }

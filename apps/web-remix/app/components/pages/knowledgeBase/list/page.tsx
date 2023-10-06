@@ -10,7 +10,7 @@ import { CreateCollectionModal } from "./CreateCollectionModal";
 import { routes } from "~/utils/routes.utils";
 
 export function KnowledgeBasePage() {
-  const { organizationId } = useLoaderData<typeof loader>();
+  const { organizationId, collections } = useLoaderData<typeof loader>();
   const match = useMatch(routes.knowledgeBaseNew(organizationId));
   const isModalOpened = !!match;
 
@@ -40,7 +40,7 @@ export function KnowledgeBasePage() {
 
         <KnowledgeBaseCollectionList
           organizationId={organizationId}
-          items={[{ id: "1", name: "72_document_search_1" }]}
+          items={collections}
         />
       </PageContentWrapper>
     </>
