@@ -14,7 +14,7 @@ defmodule Buildel.Memories do
   end
 
   def list_organization_collections(%Buildel.Organizations.Organization{} = organization) do
-    Buildel.Memories.Memory
+    Buildel.Memories.MemoryCollection
     |> where(
       [m],
       m.organization_id == ^organization.id
