@@ -28,9 +28,7 @@ export function KnowledgeBasePage() {
       </CreateCollectionModal>
 
       <PageContentWrapper>
-        <div className="mt-5 mb-6 flex gap-2 justify-between items-center">
-          <span>Search</span>
-
+        <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
           <Link to={routes.knowledgeBaseNew(organizationId)}>
             <Button size="sm" tabIndex={0}>
               New collection
