@@ -84,7 +84,7 @@ export function CustomNode({
       >
         <header
           className={classNames(
-            "flex items-center justify-between p-2 rounded-t bg-neutral-900 gap-2"
+            "relative flex items-center justify-between p-2 rounded-t bg-neutral-900 gap-2"
           )}
         >
           <div className="flex items-center gap-2">
@@ -113,6 +113,10 @@ export function CustomNode({
               />
             )}
           </div>
+
+          {!isValid && (
+            <div className="w-3 h-3 bg-red-700 rounded-full absolute -top-[6px] -right-[6px] animate-ping" />
+          )}
         </header>
 
         <div className="p-2 nodrag">
