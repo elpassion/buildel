@@ -52,31 +52,45 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     [blockName, clearEvents, push]
   );
 
-  const uploadFile = useCallback(async (file: File): Promise<IFile> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("collection_name", `${pipelineId}_${blockName}`);
+  const uploadFile = useCallback(
+    async (file: File): Promise<IFile> => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append(
+        "collection_name",
+        block.opts.persist_in || `${pipelineId}_${blockName}`
+      );
 
-    const response = await fetch(
-      `/super-api/organizations/${organizationId}/memories`,
-      {
-        body: formData,
-        method: "POST",
-      }
-    ).then((res) => res.json());
+      const response = await fetch(
+        `/super-api/organizations/${organizationId}/memories`,
+        {
+          body: formData,
+          method: "POST",
+        }
+      ).then((res) => res.json());
 
-    return { ...KnowledgeBaseFileResponse.parse(response), status: "done" };
-  }, []);
+      return { ...KnowledgeBaseFileResponse.parse(response), status: "done" };
+    },
+    [block.opts]
+  );
 
-  const removeFile = useCallback(async (id: number) => {
-    return fetch(`/super-api/organizations/${organizationId}/memories/${id}`, {
-      method: "DELETE",
-    });
-  }, []);
+  const removeFile = useCallback(
+    async (id: number) => {
+      return fetch(
+        `/super-api/organizations/${organizationId}/memories/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+    },
+    [block.opts]
+  );
 
   const fetchFiles = useCallback(async (): Promise<IFile[]> => {
     const response = await fetch(
-      `/super-api/organizations/${organizationId}/memories?collection_name=${block.opts.persist_in || `${pipelineId}_${blockName}`}`
+      `/super-api/organizations/${organizationId}/memories?collection_name=${
+        block.opts.persist_in || `${pipelineId}_${blockName}`
+      }`
     ).then((res) => res.json());
 
     return KnowledgeBaseFileListResponse.parse(response).map((file) => ({
