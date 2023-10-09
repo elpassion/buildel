@@ -247,13 +247,7 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
           className="min-w-[248px] absolute z-[51] top-[60px] left-[85%] max-h-[400px] overflow-y-auto"
           onClick={handleChangeRoute}
         >
-          <div className="w-full pl-6 py-2">
-            <Link to={routes.newOrganization()}>
-              <Button tabIndex={0} size="xs">
-                Create new
-              </Button>
-            </Link>
-          </div>
+          <NewOrganizationLink />
 
           {organizations.map((org) => {
             return <MenuItem key={`${org.id}`}>{org.name}</MenuItem>;
@@ -261,6 +255,18 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
         </Menu>
       </div>
     </SidebarContentWrapper>
+  );
+}
+
+function NewOrganizationLink() {
+  return (
+    <div className="w-full pl-6 py-2">
+      <Link to={routes.newOrganization()}>
+        <Button tabIndex={0} size="xs">
+          Create new
+        </Button>
+      </Link>
+    </div>
   );
 }
 

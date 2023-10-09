@@ -35,6 +35,20 @@ export const CreateBlockFloatingMenu: React.FC<
     [blockTypes]
   );
 
+  const SubMenuItems = ({ group }: { group: string }) => {
+    return (
+      <div className="rounded-lg overflow-hidden drop-shadow-md border border-neutral-100 divide-y divide-solid">
+        {blockGroups[group].map((block) => (
+          <CreateBlockDraggableItem
+            key={block.type}
+            data={block}
+            onCreate={onCreate}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="absolute top-1/2 -translate-y-1/2 right-4 h-auto">
       <Menu expandIcon={null}>
@@ -47,15 +61,7 @@ export const CreateBlockFloatingMenu: React.FC<
               </span>
             }
           >
-            <div className="rounded-lg overflow-hidden drop-shadow-md border border-neutral-100 divide-y divide-solid">
-              {blockGroups[group].map((block) => (
-                <CreateBlockDraggableItem
-                  key={block.type}
-                  data={block}
-                  onCreate={onCreate}
-                />
-              ))}
-            </div>
+            <SubMenuItems group={group} />
           </GroupSubMenu>
         ))}
       </Menu>
