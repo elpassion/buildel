@@ -72,8 +72,6 @@ export function EditBlockForm({
         return;
       }
 
-      const baseMemoryCollection = `${pipelineId}_${blockConfig.name}`;
-
       return (
         <FormField name={props.name!}>
           <AsyncSelectField
@@ -83,13 +81,7 @@ export function EditBlockForm({
             )}
             label={props.field.title}
             supportingText={props.field.description}
-            defaultValue={props.field.default}
-            additionalOptions={[
-              {
-                name: baseMemoryCollection,
-                id: baseMemoryCollection,
-              },
-            ]}
+            defaultValue={props.field.default?.replace(":pipeline_id", pipelineId.toString())?.replace(":block_name", blockConfig.name)}
           />
         </FormField>
       );

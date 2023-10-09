@@ -76,14 +76,14 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
 
   const fetchFiles = useCallback(async (): Promise<IFile[]> => {
     const response = await fetch(
-      `/super-api/organizations/${organizationId}/memories?collection_name=${pipelineId}_${blockName}`
+      `/super-api/organizations/${organizationId}/memories?collection_name=${block.opts.persist_in || `${pipelineId}_${blockName}`}`
     ).then((res) => res.json());
 
     return KnowledgeBaseFileListResponse.parse(response).map((file) => ({
       ...file,
       status: "done",
     }));
-  }, []);
+  }, [block.opts]);
 
   const uploadAudioChunk = useCallback(
     (chunk: Blob, fieldName: string) => {

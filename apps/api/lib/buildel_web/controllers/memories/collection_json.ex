@@ -11,7 +11,7 @@ defmodule BuildelWeb.CollectionJSON do
 
   defp data(%MemoryCollection{} = collection) do
     %{
-      id: collection.id,
+      id: collection.collection_name,
       name: collection.collection_name,
     }
   end

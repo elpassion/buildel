@@ -22,13 +22,6 @@ export class AsyncSelectApi {
     return fetch(url.replace("/api", "/super-api"))
       .then((res) => res.json())
       .then((data) => AsyncSelectItemListResponse.parse(data));
-
-    return AsyncSelectItemListResponse.parse({
-      data: [
-        { id: "0", name: "Workflow" },
-        { id: "3", name: "Jakies collection" },
-      ],
-    });
   }
 }
 

@@ -8,7 +8,7 @@ export const KnowledgeBaseFile = z.object({
 });
 
 export const KnowledgeBaseCollection = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z.string(),
 });
 

@@ -46,7 +46,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                 "presentAs" => "async-select",
                 "description" =>
                   "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
-                "default" => "0"
+                "default" => ":pipeline_id_:block_name"
               },
               "forwarded_results_count" => %{
                 "type" => "number",
