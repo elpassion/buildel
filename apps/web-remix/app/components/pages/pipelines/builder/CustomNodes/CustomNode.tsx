@@ -13,8 +13,14 @@ export interface CustomNodeProps {
   data: IBlockConfig;
   onUpdate?: (block: IBlockConfig) => void;
   onDelete?: (block: IBlockConfig) => void;
+  selected: boolean;
 }
-export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
+export function CustomNode({
+  data,
+  selected,
+  onUpdate,
+  onDelete,
+}: CustomNodeProps) {
   const { status: runStatus } = useRunPipeline();
   const { status, isValid, errors } = useRunPipelineNode(data);
 
@@ -59,15 +65,20 @@ export function CustomNode({ data, onUpdate, onDelete }: CustomNodeProps) {
     }
   }, [data]);
 
+  const borderStyles = useCallback(() => {
+    if (!isValid) return "border-red-500";
+    if (selected) return "border-primary-700";
+    return "border-neutral-900";
+  }, [isValid, selected]);
+
   return (
     <>
       <section
         className={classNames(
           "min-h-[100px] min-w-[250px] max-w-[500px] break-words rounded bg-neutral-800 drop-shadow-sm transition border nowheel",
+          borderStyles(),
           {
             "scale-110": status,
-            "border-red-500": !isValid,
-            "border-neutral-900": isValid,
           }
         )}
       >
