@@ -19,10 +19,10 @@ export type IAsyncSelectItemList = z.TypeOf<typeof AsyncSelectItemList>;
 
 export class AsyncSelectApi {
   async getData(url: string) {
-    // return fetch(url)
-    //   .then((res) => res.json())
-    //   .then((data) => AsyncSelectItemListResponse.parse(data));
-    //
+    return fetch(url.replace("/api", "/super-api"))
+      .then((res) => res.json())
+      .then((data) => AsyncSelectItemListResponse.parse(data));
+
     return AsyncSelectItemListResponse.parse({
       data: [
         { id: "0", name: "Workflow" },
