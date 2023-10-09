@@ -26,8 +26,10 @@ export function EditBlockForm({
   blockConfig,
   children,
   organizationId,
+  pipelineId,
 }: {
   organizationId: number;
+  pipelineId: number;
   children?: ReactNode;
   onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
@@ -70,6 +72,8 @@ export function EditBlockForm({
         return;
       }
 
+      const baseMemoryCollection = `${pipelineId}_${blockConfig.name}`;
+
       return (
         <FormField name={props.name!}>
           <AsyncSelectField
@@ -80,11 +84,17 @@ export function EditBlockForm({
             label={props.field.title}
             supportingText={props.field.description}
             defaultValue={props.field.default}
+            additionalOptions={[
+              {
+                name: baseMemoryCollection,
+                id: baseMemoryCollection,
+              },
+            ]}
           />
         </FormField>
       );
     },
-    [organizationId]
+    [blockConfig.name, organizationId, pipelineId]
   );
 
   return (

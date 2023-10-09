@@ -21,8 +21,9 @@ export const AsyncSelectField = forwardRef<
   Partial<Omit<AsyncSelectInputProps, "defaultValue">> & {
     url: string;
     defaultValue?: string;
+    additionalOptions: { name: string; id: string }[];
   }
->(({ url, defaultValue, ...props }, ref) => {
+>(({ url, defaultValue, additionalOptions, ...props }, ref) => {
   const { name, getInputProps } = useFieldContext();
   const [selectedId, setSelectedId] = useControlField<string>(name);
   const [options, setOptions] = useState<IAsyncSelectItemList>([]);
@@ -32,8 +33,15 @@ export const AsyncSelectField = forwardRef<
     callback: (options: IDropdownOption[]) => void
   ) => {
     asyncSelectApi.getData(url).then((res) => {
-      setOptions(res);
-      callback(res.map(toSelectOption));
+      const uniqueOptions = [
+        ...new Map(
+          [...additionalOptions, ...res].map((option) => [option.name, option])
+        ).values(),
+      ];
+
+      setOptions(uniqueOptions);
+
+      callback(uniqueOptions.map(toSelectOption));
     });
   };
 

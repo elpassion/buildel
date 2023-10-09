@@ -261,6 +261,7 @@ export function PipelineBuilder() {
                   onSubmit={onBlockUpdate}
                   blockConfig={editableBlock}
                   organizationId={pipeline.organization_id}
+                  pipelineId={pipeline.id}
                 >
                   <BlockInputList inputs={editableBlock.inputs} />
                 </EditBlockForm>
