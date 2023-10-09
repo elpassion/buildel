@@ -21,7 +21,7 @@ export const KnowledgeBaseCollectionList: React.FC<
       onConfirm: async () =>
         fetcher.submit(
           { collectionName: collection.name },
-          { method: "delete" }
+          { method: "DELETE" }
         ),
       confirmText: "Delete collection",
       children: (
