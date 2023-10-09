@@ -7,7 +7,6 @@ import {
   IField,
   IBlockConfig,
   IHandle,
-  IPipeline,
 } from "../pipeline.types";
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
@@ -36,7 +35,7 @@ export function getEdges(pipeline: IPipelineConfig): IEdge[] {
         sourceHandle: sourceHandle,
         target: block.name,
         targetHandle: targetHandle,
-        type: "base",
+        type: "default",
       };
     })
   );

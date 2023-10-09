@@ -21,6 +21,7 @@ import ReactFlow, {
   BackgroundVariant,
   Connection,
   Controls,
+  EdgeProps,
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
@@ -156,6 +157,10 @@ export function PipelineBuilder() {
     setEdges((eds) => addEdge(params, eds) as IEdge[]);
   }, []);
 
+  const handleDeleteEdge = useCallback((id: string) => {
+    setEdges((eds) => eds.filter((edge) => edge.id !== id) as IEdge[]);
+  }, []);
+
   const PipelineNode = useCallback(
     (props: CustomNodeProps) => (
       <CustomNode
@@ -177,9 +182,14 @@ export function PipelineBuilder() {
     );
   }, [PipelineNode, blockTypes.length]);
 
+  const PipelineEdge = useCallback(
+    (props: EdgeProps) => <CustomEdge {...props} onDelete={handleDeleteEdge} />,
+    [handleDeleteEdge]
+  );
+
   const edgeTypes = useMemo(() => {
-    return { base: CustomEdge };
-  }, []);
+    return { default: PipelineEdge };
+  }, [PipelineEdge]);
 
   const handleSaveUnsavedChanges = useCallback(() => {
     // @ts-ignore

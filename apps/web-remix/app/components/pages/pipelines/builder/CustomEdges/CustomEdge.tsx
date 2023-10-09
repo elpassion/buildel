@@ -1,18 +1,14 @@
-import { IBlockConfig } from "../../pipeline.types";
-import {
-  BaseEdge,
-  EdgeLabelRenderer,
-  EdgeProps,
-  getBezierPath,
-} from "reactflow";
-import { useRunPipelineEdge } from "~/components/pages/pipelines/builder/RunPipelineProvider";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { EdgeProps, getBezierPath } from "reactflow";
+import { Icon } from "@elpassion/taco";
+import { useRunPipelineEdge } from "../RunPipelineProvider";
+import classNames from "classnames";
 
-export interface CustomNodeProps {
-  data: IBlockConfig;
-  onUpdate?: (block: IBlockConfig) => void;
-  onDelete?: (block: IBlockConfig) => void;
+export interface CustomEdgeProps extends EdgeProps {
+  onDelete: (id: string) => void;
 }
+
+const foreignObjectSize = 24;
 export function CustomEdge({
   id,
   sourceX,
@@ -24,9 +20,10 @@ export function CustomEdge({
   selected,
   style = {},
   markerEnd,
-}: EdgeProps) {
+  onDelete,
+}: CustomEdgeProps) {
   const { status } = useRunPipelineEdge();
-  const [edgePath] = getBezierPath({
+  const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
     sourcePosition,
@@ -44,17 +41,57 @@ export function CustomEdge({
       : {};
   }, [status]);
 
+  const handleDelete = useCallback(() => {
+    onDelete(id);
+  }, []);
+
   return (
-    <BaseEdge
-      id={id}
-      path={edgePath}
-      markerEnd={markerEnd}
-      style={{
-        ...style,
-        strokeWidth: "1",
-        stroke: selected ? "#DE8411" : "#fff",
-        ...statusStyles,
-      }}
-    />
+    <>
+      <path
+        id={id}
+        className="react-flow__edge-path"
+        d={edgePath}
+        markerEnd={markerEnd}
+        fill="none"
+        style={{
+          ...style,
+          strokeWidth: "1",
+          stroke: selected ? "#DE8411" : "#fff",
+          ...statusStyles,
+        }}
+      />
+
+      <path
+        id={`${id}-invisible`}
+        className="peer react-flow__edge-interaction"
+        d={edgePath}
+        fill="none"
+        markerEnd={markerEnd}
+        strokeWidth={20}
+        strokeOpacity={0}
+      />
+
+      <foreignObject
+        width={foreignObjectSize}
+        height={foreignObjectSize}
+        x={labelX - foreignObjectSize / 2}
+        y={labelY - foreignObjectSize / 2}
+        className="relative transition opacity-0 peer-hover:opacity-100 hover:opacity-100"
+        requiredExtensions="http://www.w3.org/1999/xhtml"
+      >
+        <button
+          disabled={status !== "idle"}
+          onClick={handleDelete}
+          className={classNames(
+            "absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-white text-xs flex justify-center items-center bg-red-700 w-4 h-4 rounded-full outline outline-3 outline-red-500/30",
+            {
+              "opacity-0": status !== "idle",
+            }
+          )}
+        >
+          <Icon iconName="x" />
+        </button>
+      </foreignObject>
+    </>
   );
 }
