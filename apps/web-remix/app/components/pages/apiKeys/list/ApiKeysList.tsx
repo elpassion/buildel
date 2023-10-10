@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Icon } from "@elpassion/taco";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { confirm } from "~/components/modal/confirm";
 import { IconButton } from "~/components/iconButton";
 import { IApiKey, IApiKeyList } from "../apiKeys.types";
+import { EditApiKeyModal } from "~/components/pages/apiKeys/list/EditApiKeyModal";
 
 interface ApiKeysListProps {
   items: IApiKeyList;
@@ -14,6 +15,7 @@ export const ApiKeysList: React.FC<ApiKeysListProps> = ({
   items,
   organizationId,
 }) => {
+  const [editableKey, setEditableKey] = useState<IApiKey | null>(null);
   const handleDelete = async (apiKey: IApiKey) => {
     confirm({
       // onConfirm: async () =>
@@ -31,17 +33,33 @@ export const ApiKeysList: React.FC<ApiKeysListProps> = ({
     });
   };
 
-  const handleEdit = (apiKey: IApiKey) => {};
+  const handleEdit = (apiKey: IApiKey) => {
+    setEditableKey(apiKey);
+  };
+
+  const handleCloseEditing = () => {
+    setEditableKey(null);
+  };
 
   return (
-    <ItemList
-      className="grid grid-cols-1 gap-2"
-      items={items}
-      emptyText={<EmptyMessage>There is no API Keys yet...</EmptyMessage>}
-      renderItem={(item) => (
-        <ApiKeyItem data={item} onDelete={handleDelete} onEdit={handleEdit} />
+    <>
+      <ItemList
+        className="grid grid-cols-1 gap-2"
+        items={items}
+        emptyText={<EmptyMessage>There is no API Keys yet...</EmptyMessage>}
+        renderItem={(item) => (
+          <ApiKeyItem data={item} onDelete={handleDelete} onEdit={handleEdit} />
+        )}
+      />
+
+      {editableKey && (
+        <EditApiKeyModal
+          isOpen={!!editableKey}
+          onClose={handleCloseEditing}
+          initialData={editableKey}
+        />
       )}
-    />
+    </>
   );
 };
 
