@@ -36,8 +36,6 @@ export const PipelineListItemHeader = ({
       <h2 className="flex basis-1/2 text-lg font-medium">{pipeline.name}</h2>
 
       <div className="flex items-center basis-1/2 justify-between">
-        <p className="text-sm">$2.45</p>
-
         <p className="text-sm">{pipeline.runs_count} runs</p>
 
         <Indicator variant="badge" type="success" text="Active" />
@@ -68,10 +66,6 @@ export const PipelineListItemFooter = ({
   return (
     <footer className="flex justify-between text-basic-white">
       <div className="flex gap-6 items-center">
-        <div className="flex gap-2">
-          <Icon iconName="zap" size="xs" />
-          <p className="text-xs">Zapier API</p>
-        </div>
         <div className="flex gap-2">
           <Icon iconName="arrow-right" size="xs" />
           <p className="text-xs">Sequence</p>
