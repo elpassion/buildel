@@ -244,7 +244,7 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
         <Menu
           hidden={!showMenu}
           activeKey={`${organization.id}`}
-          className="min-w-[248px] absolute z-[51] top-[60px] left-[85%] max-h-[400px] overflow-y-auto"
+          className="min-w-[248px] absolute z-[51] top-[60px] left-[30%] max-h-[400px] overflow-y-auto md:left-[85%]"
           onClick={handleChangeRoute}
         >
           <NewOrganizationLink />
