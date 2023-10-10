@@ -16,12 +16,15 @@ import { useControlField } from "remix-validated-form";
 import { IDropdownOption } from "@elpassion/taco/Dropdown";
 import { SingleValue } from "react-select";
 
+export interface AsyncSelectFieldProps
+  extends Partial<Omit<AsyncSelectInputProps, "defaultValue">> {
+  url: string;
+  defaultValue?: string;
+}
+
 export const AsyncSelectField = forwardRef<
   HTMLSelectElement,
-  Partial<Omit<AsyncSelectInputProps, "defaultValue">> & {
-    url: string;
-    defaultValue?: string;
-  }
+  AsyncSelectFieldProps
 >(({ url, defaultValue, ...props }, _ref) => {
   const { name, getInputProps } = useFieldContext();
   const [selectedId, setSelectedId] = useControlField<string>(name);

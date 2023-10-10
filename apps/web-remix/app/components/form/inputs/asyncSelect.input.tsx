@@ -29,10 +29,11 @@ export const AsyncSelectInput: React.FC<AsyncSelectInputProps> = (props) => {
           borderRadius: "8px",
           paddingTop: "8px",
           paddingBottom: "8px",
-          minHeight: "48px",
+          minHeight: "44px",
           "input:focus": {
             boxShadow: "none",
           },
+          fontSize: "14px",
           backgroundColor: "#454545",
         }),
       })}
