@@ -22,7 +22,7 @@ export const AsyncSelectField = forwardRef<
     url: string;
     defaultValue?: string;
   }
->(({ url, defaultValue }, _ref) => {
+>(({ url, defaultValue, ...props }, _ref) => {
   const { name, getInputProps } = useFieldContext();
   const [selectedId, setSelectedId] = useControlField<string>(name);
   const [options, setOptions] = useState<IAsyncSelectItemList>([]);
@@ -31,13 +31,16 @@ export const AsyncSelectField = forwardRef<
     _input: string,
     callback: (options: IDropdownOption[]) => void
   ) => {
-    asyncSelectApi.getData(url).then(options => {
-      if (defaultValue && !options.find(option => option.id === defaultValue)) {
-        options = [{ id: defaultValue, name: defaultValue }, ...options]
+    asyncSelectApi.getData(url).then((options) => {
+      if (
+        defaultValue &&
+        !options.find((option) => option.id === defaultValue)
+      ) {
+        options = [{ id: defaultValue, name: defaultValue }, ...options];
       }
       setOptions(options);
       callback(options.map(toSelectOption));
-    })
+    });
   };
 
   useEffect(() => {
@@ -66,6 +69,7 @@ export const AsyncSelectField = forwardRef<
             setSelectedId(option.id);
           }
         }}
+        {...props}
       />
     </>
   );

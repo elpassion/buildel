@@ -45,7 +45,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                 "url" => "/api/organizations/:organization_id/memory_collections",
                 "presentAs" => "async-select",
                 "description" =>
-                  "Where to hold data from inputs. Can be 'run' - resetting for every run of workflow, 'workflow' - persisted across runs.",
+                  "Where to hold data from inputs.",
                 "default" => ":pipeline_id_:block_name"
               },
               "forwarded_results_count" => %{
