@@ -60,7 +60,7 @@ export const KnowledgeBaseFileListItem: React.FC<
   };
   return (
     <article className="relative group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6">
-      <header className="mb-4">
+      <header>
         <h3 className="text-lg font-medium text-white mb-1 max-w-[90%] truncate">
           {data.file_name}
         </h3>
@@ -70,8 +70,6 @@ export const KnowledgeBaseFileListItem: React.FC<
           <span className="uppercase">{data.file_type}</span>
         </p>
       </header>
-
-      <p className="text-sm text-white">Used in 3 workflows</p>
 
       <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition">
         <IconButton

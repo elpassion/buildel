@@ -65,15 +65,12 @@ export const KnowledgeBaseCollectionListItem: React.FC<
   };
 
   return (
-    <article className="group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 grid grid-cols-1 gap-1 max-w-full items-center md:gap-2 md:grid-cols-[1fr_140px_100px_30px] lg:grid-cols-[1fr_185px_180px_30px]">
+    <article className="group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 grid grid-cols-1 gap-1 max-w-full items-center md:gap-2 md:grid-cols-[1fr_30px] ">
       <header className="max-w-full truncate">
         <h3 className="text-lg font-medium text-white truncate max-w-full">
           {data.name}
         </h3>
       </header>
-
-      <p className="text-sm text-white">Used in 5 workflows</p>
-      <p className="text-sm text-white">6 items</p>
 
       <IconButton
         size="xs"
