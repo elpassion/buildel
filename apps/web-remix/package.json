@@ -10,7 +10,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@buildel/buildel": "workspace:*",
+    "@buildel/buildel": "^0.1.0",
     "@elpassion/taco": "^0.2.0",
     "@isaacs/express-prometheus-middleware": "^1.2.1",
     "@monaco-editor/react": "^4.5.2",
