@@ -1,1 +1,1 @@
-export { page as default, loader, meta } from "~/components/pages/apiKeys";
+export { page as default, loader, meta } from "~/components/pages/apiKeys/list";

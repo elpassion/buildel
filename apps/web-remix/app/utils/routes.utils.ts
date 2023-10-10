@@ -29,6 +29,8 @@ export const routes = {
   ) => `${routes.collectionFiles(organizationId, collectionName)}/new`,
   apiKeys: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/api-keys`,
+  apiKeysNew: (organizationId: OrganizationId) =>
+    `${routes.organization(organizationId)}/api-keys/new`,
 };
 
 type OrganizationId = string | number;
