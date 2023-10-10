@@ -29,7 +29,7 @@
           "type": "color"
         },
         "placeholderFocus": {
-          "value": "{basic.white}",
+          "value": "{neutral.200}",
           "type": "color"
         },
         "disabled": {

@@ -24,8 +24,8 @@ export const ApiKeysList: React.FC<ApiKeysListProps> = ({
       confirmText: "Delete Key",
       children: (
         <p className="text-neutral-100 text-sm">
-          You are about to delete the "API KEY” API Key from your. This action
-          is irreversible.
+          You are about to delete the "{apiKey.name}” API Key. This action is
+          irreversible.
         </p>
       ),
     });
