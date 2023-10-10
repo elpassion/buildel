@@ -23,13 +23,13 @@ defmodule BuildelWeb.CollectionController do
     end
   end
 
-  def show(conn, %{"organization_id" => organization_id, "id" => collection_id}) do
+  def show(conn, %{"organization_id" => organization_id, "name" => collection_name}) do
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
       Buildel.Organizations.get_user_organization(user, organization_id),
     collection <-
-      Buildel.Memories.get_organization_collection(organization, collection_id) do
+      Buildel.Memories.get_organization_collection(organization, collection_name) do
       render(conn, :show, collection: collection)
     end
   end

@@ -22,11 +22,11 @@ defmodule Buildel.Memories do
     |> Buildel.Repo.all()
   end
 
-  def get_organization_collection(%Buildel.Organizations.Organization{} = organization, collection_id) do
+  def get_organization_collection(%Buildel.Organizations.Organization{} = organization, collection_name) do
     Buildel.Memories.MemoryCollection
     |> where(
       [c],
-      c.id == ^collection_id and c.organization_id == ^organization.id
+      c.collection_name == ^collection_name and c.organization_id == ^organization.id
     )
     |> Buildel.Repo.one()
   end
