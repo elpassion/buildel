@@ -267,6 +267,14 @@
     "900": {
       "value": "#1e3a8a",
       "type": "color"
+    },
+    "googleButton": {
+      "value": "#4285F4",
+      "type": "color"
+    },
+    "facebookButton": {
+      "value": "#1877F2",
+      "type": "color"
     }
   },
   "red": {

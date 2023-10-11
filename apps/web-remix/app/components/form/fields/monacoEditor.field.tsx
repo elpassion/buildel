@@ -31,7 +31,7 @@ export const MonacoEditorField = forwardRef<
         }}
         {...props}
       />
-      <InputText type="supportingText" text={supportingText} />
+      <InputText text={supportingText} />
     </>
   );
 });
