@@ -77,7 +77,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
               id={name + index}
               name={name}
               errorMessage={error ?? undefined}
-              labelText={value}
+              label={value}
               value={value}
               defaultValue={field.default}
               className="!mt-3"

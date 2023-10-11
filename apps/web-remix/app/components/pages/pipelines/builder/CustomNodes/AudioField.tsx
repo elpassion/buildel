@@ -30,7 +30,7 @@ export function AudioField({ onChunk, onUpload, name }: AudioFieldProps) {
           value="microphone"
           id="audio-upload-mic"
           name="audio-upload"
-          labelText="Microphone"
+          label="Microphone"
           checked={activeTab === "microphone"}
           onChange={onChange}
         />
@@ -40,7 +40,7 @@ export function AudioField({ onChunk, onUpload, name }: AudioFieldProps) {
           value="upload"
           id="audio-upload-upload"
           name="audio-upload"
-          labelText="File upload"
+          label="File upload"
           checked={activeTab === "upload"}
           onChange={onChange}
         />
