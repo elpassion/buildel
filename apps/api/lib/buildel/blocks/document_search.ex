@@ -101,7 +101,7 @@ defmodule Buildel.Blocks.DocumentSearch do
       case opts.persist_in do
         "run" -> "#{global}_#{parent}_#{local}_#{block_name}"
         "workflow" -> "#{global}_#{parent}_#{block_name}"
-        collection_name -> collection_name
+        collection_name -> "#{global}_#{collection_name}"
       end
 
     with {:ok, collection} <- Buildel.VectorDB.init(collection_name) do

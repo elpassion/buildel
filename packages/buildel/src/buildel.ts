@@ -61,6 +61,12 @@ export class BuildelSocket {
         outputName: string,
         payload: unknown
       ) => void;
+      onBlockError?: (
+        blockId: string,
+        error: {
+          message: string;
+        }
+      ) => void;
       onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
       onStatusChange?: (status: BuildelRunStatus) => void;
     }
@@ -68,6 +74,7 @@ export class BuildelSocket {
     const onBlockOutput = handlers?.onBlockOutput ?? (() => {});
     const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => {});
     const onStatusChange = handlers?.onStatusChange ?? (() => {});
+    const onBlockError = handlers?.onBlockError ?? (() => {});
 
     return new BuildelRun(
       this.socket,
@@ -75,7 +82,7 @@ export class BuildelSocket {
       this.organizationId,
       pipelineId,
       this.authUrl,
-      { onBlockOutput, onBlockStatusChange, onStatusChange }
+      { onBlockOutput, onBlockStatusChange, onStatusChange, onBlockError }
     );
   }
 }
@@ -97,6 +104,12 @@ export class BuildelRun {
       ) => void;
       onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
       onStatusChange: (status: BuildelRunStatus) => void;
+      onBlockError: (
+        blockId: string,
+        error: {
+          message: string;
+        }
+      ) => void;
     }
   ) {}
 
@@ -122,6 +135,10 @@ export class BuildelRun {
       if (event.startsWith("stop:")) {
         const [_, blockId] = event.split(":");
         this.handlers.onBlockStatusChange(blockId, false);
+      }
+      if (event.startsWith("error:")) {
+        const [_, blockId] = event.split(":");
+        this.handlers.onBlockError(blockId, payload);
       }
       return payload;
     };

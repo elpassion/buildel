@@ -4,6 +4,7 @@ defmodule Buildel.Blocks do
   alias Buildel.Blocks.{
     AudioInput,
     Chat,
+    HuggingFaceChat,
     SpeechToText,
     TextToSpeech,
     TextInput,
@@ -23,6 +24,7 @@ defmodule Buildel.Blocks do
     "audio_input" => AudioInput,
     "speech_to_text" => SpeechToText,
     "chat" => Chat,
+    "hugging_face_chat" => HuggingFaceChat,
     "text_to_speech" => TextToSpeech,
     "text_output" => TextOutput,
     "audio_output" => AudioOutput,
@@ -39,6 +41,7 @@ defmodule Buildel.Blocks do
     AudioInput => "audio_input",
     SpeechToText => "speech_to_text",
     Chat => "chat",
+    HuggingFaceChat => "hugging_face_chat",
     TextToSpeech => "text_to_speech",
     TextOutput => "text_output",
     AudioOutput => "audio_output",
