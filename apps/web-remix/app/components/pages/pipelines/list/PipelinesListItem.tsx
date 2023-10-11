@@ -65,11 +65,9 @@ export const PipelineListItemFooter = ({
 
   return (
     <footer className="flex justify-between text-basic-white">
-      <div className="flex gap-6 items-center">
-        <div className="flex gap-2">
-          <Icon iconName="arrow-right" size="xs" />
-          <p className="text-xs">Sequence</p>
-        </div>
+      <div className="flex gap-2 items-center">
+        <Icon iconName="arrow-right" size="xs" />
+        <p className="text-xs">Sequence</p>
       </div>
 
       <IconButton
