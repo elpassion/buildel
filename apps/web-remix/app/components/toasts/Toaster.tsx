@@ -5,7 +5,7 @@ export const Toaster = () => (
     position="top-right"
     gutter={4}
     toastOptions={{
-      duration: 3000,
+      duration: 4000,
       className: "!bg-transparent !p-0 !shadow-none",
     }}
     containerClassName="-mt-1"

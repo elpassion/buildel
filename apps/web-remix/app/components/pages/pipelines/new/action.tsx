@@ -6,6 +6,7 @@ import { actionBuilder } from "~/utils.server";
 import { PipelineResponse } from "../contracts";
 import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
+import { setServerToast } from "~/utils/toast.server";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -26,7 +27,16 @@ export async function action(actionArgs: ActionFunctionArgs) {
         }
       );
 
-      return redirect(routes.pipeline(params.organizationId, data.id));
+      return redirect(routes.pipeline(params.organizationId, data.id), {
+        headers: {
+          "Set-Cookie": await setServerToast(request, {
+            success: {
+              title: "Workflow created",
+              description: `You've created ${data.name} workflow`,
+            },
+          }),
+        },
+      });
     },
   })(actionArgs);
 }
