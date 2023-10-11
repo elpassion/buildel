@@ -4,8 +4,15 @@ type SessionData = {
   apiToken?: string;
 };
 
-type SessionFlashData = {
-  error: string;
+export type SessionToast = {
+  title: string;
+  description: string;
+};
+
+export type SessionFlashData = {
+  error: SessionToast | string;
+  success: SessionToast | string;
+  warning: SessionToast | string;
 };
 
 const { getSession, commitSession, destroySession } =

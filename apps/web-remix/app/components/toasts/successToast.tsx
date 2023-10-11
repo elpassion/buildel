@@ -1,12 +1,14 @@
-import { toast, ToastOptions } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { ToastProps } from "./Toast.interface";
 import { SuccessToast } from "./ui/SuccessToast";
 
-type IToastProps = {
-  options?: Pick<ToastOptions, "duration" | "position">;
-} & Partial<ToastProps>;
+export const successToast = (props?: ToastProps | string) => {
+  if (typeof props === "string") {
+    return toast((t) => (
+      <SuccessToast title="Success" onClose={() => toast.dismiss(t.id)} />
+    ));
+  }
 
-export const successToast = (props?: IToastProps) => {
   const { title, options, ...rest } = {
     title: "Success",
     ...props,

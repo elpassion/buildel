@@ -13,7 +13,7 @@ import {
   ValidationError,
 } from "./utils/errors.server";
 import { fetchTyped } from "./utils/fetch.server";
-import { setToastError } from "./utils/toast.error.server";
+import { setServerToast } from "./utils/toast.server";
 
 export const loaderBuilder =
   <T>(
@@ -30,10 +30,9 @@ export const loaderBuilder =
           {
             status: 500,
             headers: {
-              "Set-Cookie": await setToastError(
-                args.request,
-                "Unknown API error"
-              ),
+              "Set-Cookie": await setServerToast(args.request, {
+                error: "Unknown API error",
+              }),
             },
           }
         );
@@ -128,10 +127,9 @@ export const actionBuilder =
           {
             status: 500,
             headers: {
-              "Set-Cookie": await setToastError(
-                actionArgs.request,
-                "Unknown API error"
-              ),
+              "Set-Cookie": await setServerToast(actionArgs.request, {
+                error: "Unknown API error",
+              }),
             },
           }
         );

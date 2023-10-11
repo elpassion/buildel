@@ -15,12 +15,13 @@ import {
 } from "@remix-run/react";
 import { OrganizationsResponse } from "~/components/pages/organizations/contracts";
 import { loaderBuilder } from "~/utils.server";
-import { getToastError } from "~/utils/toast.error.server";
 import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
 import { Menu } from "~/components/menu/Menu";
 import { MenuItem } from "~/components/menu/MenuItem";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
+import { getServerToast } from "~/utils/toast.server";
+import { useServerToasts } from "~/hooks/useServerToasts";
 import {
   NavMobileSidebar,
   NavSidebar,
@@ -33,7 +34,7 @@ export async function loader(loaderArgs: DataFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
     invariant(params.organizationId, "organizationId not found");
-    const { cookie, error } = await getToastError(request);
+    const { cookie, ...toasts } = await getServerToast(request);
 
     const organizationsResponse = await fetch(
       OrganizationsResponse,
@@ -53,7 +54,7 @@ export async function loader(loaderArgs: DataFunctionArgs) {
 
     return json(
       {
-        error,
+        toasts,
         organization: organization,
         organizations: organizationsResponse.data.data,
       },
@@ -67,8 +68,11 @@ export async function loader(loaderArgs: DataFunctionArgs) {
 }
 
 export default function Layout() {
+  const { toasts } = useLoaderData<typeof loader>();
   const [collapsed, setCollapsed] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+
+  useServerToasts(toasts);
 
   const openSidebar = useCallback(() => {
     setIsOpen(true);

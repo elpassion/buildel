@@ -1,12 +1,14 @@
-import { toast, ToastOptions } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { ToastProps } from "./Toast.interface";
 import { ErrorToast } from "./ui/ErrorToast";
 
-type IToastProps = {
-  options?: Pick<ToastOptions, "duration" | "position">;
-} & Partial<ToastProps>;
+export const errorToast = (props?: ToastProps | string) => {
+  if (typeof props === "string") {
+    return toast((t) => (
+      <ErrorToast title="Error" onClose={() => toast.dismiss(t.id)} />
+    ));
+  }
 
-export const errorToast = (props?: IToastProps) => {
   const { title, options, ...rest } = {
     title: "Error",
     ...props,
