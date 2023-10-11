@@ -12,11 +12,11 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const collectionName = (await request.formData()).get("collectionName");
 
-      // await fetch(
-      //   z.any(),
-      //   `/organizations/${params.organizationId}/memories/${memoryId}`,
-      //   { method: "DELETE" }
-      // );
+      await fetch(
+        z.any(),
+        `/organizations/${params.organizationId}/memory_collections/${collectionName}`,
+        { method: "DELETE" }
+      );
       return json({});
     },
   })(actionArgs);

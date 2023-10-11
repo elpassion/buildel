@@ -49,7 +49,7 @@ defmodule BuildelWeb.Router do
       only: [:index, :delete, :create, :show, :update]
     )
 
-    resources("/organizations/:organization_id/memory_collections", CollectionController, only: [:index, :create, :show], param: "name")
+    resources("/organizations/:organization_id/memory_collections", CollectionController, only: [:index, :create, :show, :delete], param: "name")
     
     post("/organizations/:organization_id/memories", MemoryController, :create)
     get("/organizations/:organization_id/memories", MemoryController, :index)

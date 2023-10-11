@@ -53,4 +53,14 @@ defmodule BuildelWeb.CollectionController do
       |> render(:show, collection: collection)
     end
   end
+
+  def delete(conn, %{"organization_id" => organization_id, "name" => name}) do
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         :ok <- Buildel.Memories.delete_organization_memory_collection(organization, name) do
+      conn |> put_status(:ok) |> json(%{})
+    end
+  end
 end

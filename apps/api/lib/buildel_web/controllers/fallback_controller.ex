@@ -1,5 +1,6 @@
 defmodule BuildelWeb.FallbackController do
   use BuildelWeb, :controller
+  require Logger
 
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
@@ -37,7 +38,8 @@ defmodule BuildelWeb.FallbackController do
     |> render(:"422")
   end
 
-  def call(conn, _error) do
+  def call(conn, error) do
+    Logger.error("Unhandled error: #{inspect(error)}")
     conn
     |> put_status(:internal_server_error)
     |> put_view(html: BuildelWeb.ErrorHTML, json: BuildelWeb.ErrorJSON)

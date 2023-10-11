@@ -117,6 +117,22 @@ defmodule Buildel.Memories do
     end
   end
 
+  def delete_organization_memory_collection(
+    %Buildel.Organizations.Organization{} = organization,
+    id
+  ) do
+    collection = get_organization_collection(organization, id)
+    memories = collection |> Buildel.Repo.preload(:memories) |> Map.get(:memories)
+
+    memories |> Enum.map(fn memory ->
+      delete_organization_memory(organization, memory.id)
+    end)
+
+    Buildel.Repo.delete(collection)
+
+    :ok
+  end
+
   def upsert_collection(%{organization_id: organization_id, collection_name: collection_name}) do
     Buildel.Memories.MemoryCollection
     |> where([c], c.collection_name == ^collection_name and c.organization_id == ^organization_id)

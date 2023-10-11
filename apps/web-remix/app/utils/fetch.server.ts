@@ -31,7 +31,6 @@ export async function fetchTyped<T extends ZodType>(
     } else if (response.status === 404) {
       throw new NotFoundError();
     } else {
-      console.log(await response.text());
       console.error(`Unknown API error ${response.status} for ${url}`);
       throw new UnknownAPIError();
     }
