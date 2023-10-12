@@ -1,12 +1,17 @@
 import React, { useMemo } from "react";
 import { MetaFunction } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useMatch } from "@remix-run/react";
+import {
+  Link,
+  Outlet,
+  useLoaderData,
+  useMatch,
+  useNavigate,
+} from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
 import { Button } from "@elpassion/taco";
 import { loader } from "./loader";
 import { PipelinesNavbar } from "./PipelinesNavbar";
 import { PipelinesList } from "./PipelinesList";
-import { CreatePipelineModal } from "./CreatePipelineModal";
 import { generateTemplates, sampleTemplates } from "./workflowTemplates.utils";
 import {
   WorkflowTemplates,
@@ -14,21 +19,38 @@ import {
   WorkflowTemplatesList,
 } from "./WorkflowTemplates";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
+import {
+  ActionSidebar,
+  ActionSidebarHeader,
+} from "~/components/sidebar/ActionSidebar";
 export function PipelinesPage() {
   const { pipelines, organizationId } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
   const match = useMatch(`${organizationId}/pipelines/new`);
-  const isModalOpened = !!match;
+  const isSidebarOpen = !!match;
+
+  const handleCloseSidebar = () => {
+    navigate(routes.pipelines(organizationId));
+  };
 
   return (
     <>
       <PipelinesNavbar />
 
-      <CreatePipelineModal
-        isOpen={isModalOpened}
-        organizationId={organizationId}
+      <ActionSidebar
+        className="!bg-neutral-950"
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        overlay
       >
+        <ActionSidebarHeader
+          heading="Create a new workflow"
+          subheading="Any workflow can contain many Blocks and use your Knowledge Base."
+          onClose={handleCloseSidebar}
+        />
         <Outlet />
-      </CreatePipelineModal>
+      </ActionSidebar>
+
       <PageContentWrapper className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px]">
         {pipelines.data.length > 0 ? (
           <>

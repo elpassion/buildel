@@ -15,17 +15,23 @@ export function NewPipelinePage() {
       validator={validator}
       method="post"
       noValidate
-      className="w-full max-w-2xl"
+      className="w-full grow flex flex-col gap-2 h-[70%]"
     >
-      <div className="max-w-s form-control w-full">
+      <div className="max-w-s w-full grow overflow-y-auto p-1">
         <Field name="pipeline.name">
-          <TextInputField type="text" autoFocus label="Name" />
+          <TextInputField
+            type="text"
+            autoFocus
+            placeholder="eg. Text To Speech"
+            supportingText="It will help you identify the workflow in BUILDEL"
+            label="Name"
+          />
         </Field>
         <HiddenField name="pipeline.config.version" value="1" />
 
         <HiddenField name="pipeline.config.blocks" value={"[]"} />
       </div>
-      <Button hierarchy="primary" type="submit" className="mt-4">
+      <Button type="submit" size="sm" hierarchy="primary">
         Create workflow
       </Button>
     </ValidatedForm>
