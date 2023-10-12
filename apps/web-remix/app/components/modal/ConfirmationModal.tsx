@@ -1,7 +1,6 @@
 import React from "react";
 import { Modal } from "@elpassion/taco/Modal";
-import { Button, Icon, ModalProps } from "@elpassion/taco";
-import { IconButton } from "~/components/iconButton";
+import { Button, ModalProps } from "@elpassion/taco";
 import classNames from "classnames";
 export interface ConfirmationModalProps extends ModalProps {
   onConfirm?: () => Promise<void>;
@@ -17,23 +16,24 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onCancel,
   cancelText = "Cancel",
   confirmText = "Confirm",
+  onClose,
   ...props
 }) => {
   const handleConfirm = async () => {
     await onConfirm?.();
-    props.onClose();
+    onClose();
   };
   const handleCancel = async () => {
     await onCancel?.();
-    props.onClose();
+    onClose();
   };
 
   return (
     <Modal
-      header={
-        props.header ?? <ConfirmationModalHeader onClose={props.onClose} />
-      }
+      header={props.header ?? <ConfirmationModalHeader />}
+      closeButtonProps={{ iconName: "x", "aria-label": "Close" }}
       className={classNames("max-w-[500px] min-w-[300px] mx-2", className)}
+      onClose={onClose}
       {...props}
     >
       {children}
@@ -56,23 +56,10 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   );
 };
 
-interface ConfirmationModalHeaderProps {
-  onClose: () => void;
-}
-
-export function ConfirmationModalHeader({
-  onClose,
-}: ConfirmationModalHeaderProps) {
+export function ConfirmationModalHeader() {
   return (
     <header className="flex justify-between gap-2 items-center">
       <h3 className="text-white font-medium text-xl">Are you sure?</h3>
-      <IconButton
-        aria-label="Close"
-        size="sm"
-        variant="outlined"
-        icon={<Icon iconName="x" />}
-        onClick={onClose}
-      />
     </header>
   );
 }
