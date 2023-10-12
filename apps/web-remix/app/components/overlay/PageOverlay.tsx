@@ -28,11 +28,9 @@ export function PageOverlay({
   if (!root) return null;
   return createPortal(
     <div
-      onDragEnter={(e) => console.log("start")}
-      onDragExitCapture={(e) => console.log("end", e)}
       onClick={onClick}
       className={classNames(
-        "fixed top-0 left-0 right-0 bottom-0 bg-black/80 transition",
+        "fixed top-0 left-0 right-0 bottom-0 bg-black/80 transition ease-[cubic-bezier(0.25, 1, 0.5, 1)]",
         {
           "opacity-0 pointer-events-none -z-[40]": !isShow,
           "opacity-1 pointer-events-auto z-[40]": isShow,
