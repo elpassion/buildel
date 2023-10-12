@@ -1,18 +1,32 @@
 import React from "react";
 import { MetaFunction } from "@remix-run/node";
-import { Link, Outlet, useLoaderData, useMatch } from "@remix-run/react";
+import {
+  Link,
+  Outlet,
+  useLoaderData,
+  useMatch,
+  useNavigate,
+} from "@remix-run/react";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
 import { loader } from "./loader";
 import { Button } from "@elpassion/taco";
 import { KnowledgeBaseCollectionList } from "./KnowledgeBaseCollectionList";
-import { CreateCollectionModal } from "./CreateCollectionModal";
 import { routes } from "~/utils/routes.utils";
+import {
+  ActionSidebar,
+  ActionSidebarHeader,
+} from "~/components/sidebar/ActionSidebar";
 
 export function KnowledgeBasePage() {
   const { organizationId, collections } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
   const match = useMatch(routes.knowledgeBaseNew(organizationId));
-  const isModalOpened = !!match;
+  const isSidebarOpen = !!match;
+
+  const handleCloseSidebar = () => {
+    navigate(routes.knowledgeBase(organizationId));
+  };
 
   return (
     <>
@@ -20,12 +34,19 @@ export function KnowledgeBasePage() {
         leftContent={<AppNavbarHeading>Knowledge base</AppNavbarHeading>}
       />
 
-      <CreateCollectionModal
-        isOpen={isModalOpened}
-        organizationId={organizationId}
+      <ActionSidebar
+        className="!bg-neutral-950"
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        overlay
       >
+        <ActionSidebarHeader
+          heading="Create a new collection"
+          subheading="Any collection can contain many files and be used in your workflows"
+          onClose={handleCloseSidebar}
+        />
         <Outlet />
-      </CreateCollectionModal>
+      </ActionSidebar>
 
       <PageContentWrapper>
         <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
