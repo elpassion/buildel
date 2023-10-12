@@ -98,6 +98,7 @@ export function NewCollectionFilesPage() {
         size="sm"
         disabled={!items.length || isUploading}
         onClick={handleUploadFiles}
+        isLoading={isUploading}
       >
         Add {items.length > 0 ? items.length : ""} knowledge items
       </Button>

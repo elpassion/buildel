@@ -27,6 +27,7 @@ const customConfig = {
       //@ts-ignore
       ...getComponentsColorConfig(
         [
+          "spinner",
           "navbar",
           "sidebar",
           "accordion",
@@ -79,6 +80,7 @@ const customConfig = {
       //@ts-ignore
       ...getComponentsRadiusConfig(
         [
+          "spinner",
           "navbar",
           "sidebar",
           "accordion",
