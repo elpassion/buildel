@@ -3,20 +3,20 @@ import { Icon } from "@elpassion/taco";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { confirm } from "~/components/modal/confirm";
 import { IconButton } from "~/components/iconButton";
-import { IApiKey, IApiKeyList } from "../apiKeys.types";
-import { EditApiKeyModal } from "~/components/pages/apiKeys/list/EditApiKeyModal";
+import { EditSecretKeyModal } from "./EditSecretKeyModal";
+import { ISecretKeyList, ISecretKey } from "../secrets.types";
 
-interface ApiKeysListProps {
-  items: IApiKeyList;
+interface SecretKeyListProps {
+  items: ISecretKeyList;
   organizationId: string;
 }
 
-export const ApiKeysList: React.FC<ApiKeysListProps> = ({
+export const SecretKeyList: React.FC<SecretKeyListProps> = ({
   items,
   organizationId,
 }) => {
-  const [editableKey, setEditableKey] = useState<IApiKey | null>(null);
-  const handleDelete = async (apiKey: IApiKey) => {
+  const [editableKey, setEditableKey] = useState<ISecretKey | null>(null);
+  const handleDelete = async (secretKey: ISecretKey) => {
     confirm({
       // onConfirm: async () =>
       //   fetcher.submit(
@@ -26,15 +26,15 @@ export const ApiKeysList: React.FC<ApiKeysListProps> = ({
       confirmText: "Delete Key",
       children: (
         <p className="text-neutral-100 text-sm">
-          You are about to delete the "{apiKey.name}” API Key. This action is
+          You are about to delete the "{secretKey.name}” API Key. This action is
           irreversible.
         </p>
       ),
     });
   };
 
-  const handleEdit = (apiKey: IApiKey) => {
-    setEditableKey(apiKey);
+  const handleEdit = (secretKey: ISecretKey) => {
+    setEditableKey(secretKey);
   };
 
   const handleCloseEditing = () => {
@@ -46,14 +46,18 @@ export const ApiKeysList: React.FC<ApiKeysListProps> = ({
       <ItemList
         className="grid grid-cols-1 gap-2"
         items={items}
-        emptyText={<EmptyMessage>There is no API Keys yet...</EmptyMessage>}
+        emptyText={<EmptyMessage>There is no Secrets yet...</EmptyMessage>}
         renderItem={(item) => (
-          <ApiKeyItem data={item} onDelete={handleDelete} onEdit={handleEdit} />
+          <SecretKeyItem
+            data={item}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+          />
         )}
       />
 
       {editableKey && (
-        <EditApiKeyModal
+        <EditSecretKeyModal
           isOpen={!!editableKey}
           onClose={handleCloseEditing}
           initialData={editableKey}
@@ -63,13 +67,13 @@ export const ApiKeysList: React.FC<ApiKeysListProps> = ({
   );
 };
 
-interface ApiKeyItemProps {
-  data: IApiKey;
-  onDelete: (apiKey: IApiKey) => void;
-  onEdit: (apiKey: IApiKey) => void;
+interface SecretKeyItemProps {
+  data: ISecretKey;
+  onDelete: (secretKey: ISecretKey) => void;
+  onEdit: (secretKey: ISecretKey) => void;
 }
 
-export const ApiKeyItem: React.FC<ApiKeyItemProps> = ({
+export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
   data,
   onDelete,
   onEdit,
@@ -90,7 +94,7 @@ export const ApiKeyItem: React.FC<ApiKeyItemProps> = ({
     <article className="group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 grid grid-cols-1 gap-1 max-w-full items-center md:gap-2 md:grid-cols-[1fr_300px_60px] ">
       <header className="max-w-full truncate">
         <h3 className="text-lg font-medium text-white truncate max-w-full">
-          SAMPLE KEY
+          {data.name}
         </h3>
       </header>
 
@@ -102,7 +106,7 @@ export const ApiKeyItem: React.FC<ApiKeyItemProps> = ({
           type="button"
           variant="ghost"
           className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500 lg:opacity-0"
-          title={`Edit API Key: ${data.name}`}
+          title={`Edit Secret: ${data.name}`}
           icon={<Icon iconName="edit" />}
           onClick={handleEdit}
         />
@@ -112,7 +116,7 @@ export const ApiKeyItem: React.FC<ApiKeyItemProps> = ({
           type="button"
           variant="ghost"
           className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
-          title={`Remove API Key: ${data.name}`}
+          title={`Remove Secret: ${data.name}`}
           icon={<Icon iconName="trash" />}
           onClick={handleDelete}
         />

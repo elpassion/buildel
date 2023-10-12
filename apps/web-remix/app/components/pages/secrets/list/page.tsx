@@ -11,26 +11,26 @@ import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
 import { loader } from "./loader";
 import { Button } from "@elpassion/taco";
-import { ApiKeysList } from "./ApiKeysList";
+import { SecretKeyList } from "./SecretKeyList";
 import { routes } from "~/utils/routes.utils";
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
 
-export function ApiKeysPage() {
+export function SecretPage() {
   const navigate = useNavigate();
   const { organizationId, apiKeys } = useLoaderData<typeof loader>();
-  const match = useMatch(routes.apiKeysNew(organizationId));
+  const match = useMatch(routes.secretsNew(organizationId));
   const isSidebarOpen = !!match;
 
   const handleCloseSidebar = () => {
-    navigate(routes.apiKeys(organizationId));
+    navigate(routes.secrets(organizationId));
   };
 
   return (
     <>
-      <AppNavbar leftContent={<AppNavbarHeading>API keys</AppNavbarHeading>} />
+      <AppNavbar leftContent={<AppNavbarHeading>Secrets</AppNavbarHeading>} />
 
       <ActionSidebar
         className="!bg-neutral-950"
@@ -39,8 +39,8 @@ export function ApiKeysPage() {
         overlay
       >
         <ActionSidebarHeader
-          heading="New API Key"
-          subheading="Enter your API keys to use them in multiple workflows."
+          heading="New Secret"
+          subheading="Enter your Secret to use them in multiple workflows."
           onClose={handleCloseSidebar}
         />
         <Outlet />
@@ -48,14 +48,14 @@ export function ApiKeysPage() {
 
       <PageContentWrapper>
         <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
-          <Link to={routes.apiKeysNew(organizationId)}>
+          <Link to={routes.secretsNew(organizationId)}>
             <Button size="sm" tabIndex={0}>
-              New API key
+              New Secret
             </Button>
           </Link>
         </div>
 
-        <ApiKeysList organizationId={organizationId} items={apiKeys} />
+        <SecretKeyList organizationId={organizationId} items={apiKeys} />
       </PageContentWrapper>
     </>
   );
@@ -64,7 +64,7 @@ export function ApiKeysPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "API keys",
+      title: "Secrets",
     },
   ];
 };

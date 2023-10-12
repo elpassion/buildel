@@ -27,10 +27,10 @@ export const routes = {
     organizationId: OrganizationId,
     collectionName: string
   ) => `${routes.collectionFiles(organizationId, collectionName)}/new`,
-  apiKeys: (organizationId: OrganizationId) =>
-    `${routes.organization(organizationId)}/api-keys`,
-  apiKeysNew: (organizationId: OrganizationId) =>
-    `${routes.organization(organizationId)}/api-keys/new`,
+  secrets: (organizationId: OrganizationId) =>
+    `${routes.organization(organizationId)}/secrets`,
+  secretsNew: (organizationId: OrganizationId) =>
+    `${routes.organization(organizationId)}/secrets/new`,
 };
 
 type OrganizationId = string | number;

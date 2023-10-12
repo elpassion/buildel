@@ -23,7 +23,7 @@ export function NewApiKey() {
             autoFocus
             placeholder="e.g. my open ai key"
             type="text"
-            label="Name your API key"
+            label="Name your Secret"
             supportingText="It will help you identify the key in BUILDEL"
           />
         </Field>
@@ -31,14 +31,14 @@ export function NewApiKey() {
         <Field name="key">
           <TextInputField
             type="text"
-            label="Enter the API token key"
+            label="Enter the Secret key"
             placeholder="Type or paste in your token key"
             supportingText="The actual token key that will authorise you in the external system, such as Open AI."
           />
         </Field>
       </div>
       <Button size="sm" hierarchy="primary" type="submit">
-        Save the API key
+        Save the Secret
       </Button>
     </ValidatedForm>
   );
@@ -47,7 +47,7 @@ export function NewApiKey() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "New API Key",
+      title: "New Secret",
     },
   ];
 };

@@ -158,7 +158,7 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
         />
 
         <SidebarLink
-          to={routes.apiKeys(organization.id)}
+          to={routes.secrets(organization.id)}
           icon={
             <Icon iconName="key" className="w-5 h-5 text-center leading-5" />
           }

@@ -2,7 +2,7 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
-import { ApiKeyListResponse } from "~/components/pages/apiKeys/contracts";
+import { SecretKeyListResponse } from "../contracts";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -11,7 +11,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
     return json({
       organizationId: params.organizationId,
-      apiKeys: ApiKeyListResponse.parse({
+      apiKeys: SecretKeyListResponse.parse({
         data: [{ id: 0, name: "Test", key: "123" }],
       }),
     });
