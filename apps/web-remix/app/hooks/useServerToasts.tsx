@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { SessionFlashData } from "~/session.server";
 import { errorToast } from "~/components/toasts/errorToast";
 import { successToast } from "~/components/toasts/successToast";
+import { warningToast } from "~/components/toasts/warningToast";
 
 export function useServerToasts(toasts: Partial<SessionFlashData>) {
   useEffect(() => {
@@ -12,7 +13,7 @@ export function useServerToasts(toasts: Partial<SessionFlashData>) {
       successToast(toasts.success);
     }
     if (toasts.warning) {
-      //@todo implement warning toasts
+      warningToast(toasts.warning);
     }
   }, [toasts]);
 }
