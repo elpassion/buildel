@@ -74,8 +74,8 @@ export const KnowledgeBaseFileListItem: React.FC<
       <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition">
         <IconButton
           size="xs"
-          type="button"
           variant="ghost"
+          aria-label="Remove file"
           className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500"
           icon={<Icon iconName="trash" />}
           onClick={handleDelete}

@@ -88,6 +88,7 @@ export function FileUploadListItem({
               iconName={file.status === "uploading" ? "loader" : "x"}
             />
           }
+          aria-label="Remove file"
           disabled={disabled}
           onClick={handleRemove}
         />

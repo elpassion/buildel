@@ -74,8 +74,8 @@ export const KnowledgeBaseCollectionListItem: React.FC<
 
       <IconButton
         size="xs"
-        type="button"
         variant="ghost"
+        aria-label="Remove collection"
         className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
         title={`Remove collection: ${data.name}`}
         icon={<Icon iconName="trash" />}

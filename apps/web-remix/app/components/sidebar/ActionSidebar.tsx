@@ -76,6 +76,7 @@ export function ActionSidebarHeader({
         size="sm"
         variant="outlined"
         onClick={onClose}
+        aria-label="Close sidebar"
         icon={<Icon iconName="x" />}
       />
     </header>

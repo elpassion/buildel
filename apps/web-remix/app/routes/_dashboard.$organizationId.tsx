@@ -294,8 +294,9 @@ function LogoutButton() {
   return (
     <IconButton
       size="sm"
-      icon={<Icon iconName="log-out" />}
       variant="basic"
+      aria-label="Logout"
+      icon={<Icon iconName="log-out" />}
       className="!text-neutral-100 hover:!bg-neutral-700"
       onClick={() => {
         logout.submit({}, { method: "DELETE", action: "/logout" });

@@ -99,6 +99,7 @@ export function CustomNode({
               <IconButton
                 onlyIcon
                 icon={<Icon iconName="settings" />}
+                aria-label="Edit block"
                 onClick={handleEdit}
                 disabled={runStatus !== "idle"}
               />
@@ -107,6 +108,7 @@ export function CustomNode({
             {onDelete && (
               <IconButton
                 onlyIcon
+                aria-label="Delete block"
                 icon={<Icon iconName="trash" />}
                 onClick={handleDelete}
                 disabled={runStatus !== "idle"}

@@ -193,6 +193,7 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
           />
           <IconButton
             variant="ghost"
+            aria-label="Remove field"
             icon={<Icon iconName="trash" />}
             disabled={rhfFields.length === 1}
             onClick={(e) => {

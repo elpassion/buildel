@@ -67,10 +67,11 @@ export function ConfirmationModalHeader({
     <header className="flex justify-between gap-2 items-center">
       <h3 className="text-white font-medium text-xl">Are you sure?</h3>
       <IconButton
-        onClick={onClose}
-        variant="outlined"
+        aria-label="Close"
         size="sm"
+        variant="outlined"
         icon={<Icon iconName="x" />}
+        onClick={onClose}
       />
     </header>
   );

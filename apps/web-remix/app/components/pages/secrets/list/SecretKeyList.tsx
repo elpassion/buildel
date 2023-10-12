@@ -26,7 +26,7 @@ export const SecretKeyList: React.FC<SecretKeyListProps> = ({
       confirmText: "Delete Key",
       children: (
         <p className="text-neutral-100 text-sm">
-          You are about to delete the "{secretKey.name}” API Key. This action is
+          You are about to delete the "{secretKey.name}” Secret. This action is
           irreversible.
         </p>
       ),
@@ -103,8 +103,8 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
       <div className="flex gap-1 items-center">
         <IconButton
           size="xs"
-          type="button"
           variant="ghost"
+          aria-label="Edit secret"
           className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500 lg:opacity-0"
           title={`Edit Secret: ${data.name}`}
           icon={<Icon iconName="edit" />}
@@ -113,8 +113,8 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
 
         <IconButton
           size="xs"
-          type="button"
           variant="ghost"
+          aria-label="Remove secret"
           className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
           title={`Remove Secret: ${data.name}`}
           icon={<Icon iconName="trash" />}

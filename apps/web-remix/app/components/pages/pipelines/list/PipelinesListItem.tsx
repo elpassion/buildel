@@ -72,8 +72,8 @@ export const PipelineListItemFooter = ({
 
       <IconButton
         size="xs"
-        type="button"
         variant="ghost"
+        aria-label="Remove workflow"
         className="opacity-0 group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500"
         title={`Remove workflow: ${pipeline.name}`}
         icon={<Icon iconName="trash" />}

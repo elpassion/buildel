@@ -64,6 +64,7 @@ export const CreateBlockDraggableItem: React.FC<
       <span>{startCase(data.type)}</span>
       <IconButton
         size="xs"
+        aria-label="Add block"
         className="!w-5 !h-5 !rounded"
         onClick={() => onClickAdd(data)}
         icon={<Icon iconName="plus" />}
