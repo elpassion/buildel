@@ -162,7 +162,7 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
           icon={
             <Icon iconName="key" className="w-5 h-5 text-center leading-5" />
           }
-          text="API Keys"
+          text="Secrets"
           onlyIcon={isCollapsed}
         />
       </div>
