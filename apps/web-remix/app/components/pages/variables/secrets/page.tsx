@@ -7,8 +7,6 @@ import {
   useMatch,
   useNavigate,
 } from "@remix-run/react";
-import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
-import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
 import { loader } from "./loader";
 import { Button } from "@elpassion/taco";
 import { SecretKeyList } from "./SecretKeyList";
@@ -20,7 +18,7 @@ import {
 
 export function SecretPage() {
   const navigate = useNavigate();
-  const { organizationId, apiKeys } = useLoaderData<typeof loader>();
+  const { organizationId, secrets } = useLoaderData<typeof loader>();
   const match = useMatch(routes.secretsNew(organizationId));
   const isSidebarOpen = !!match;
 
@@ -30,8 +28,6 @@ export function SecretPage() {
 
   return (
     <>
-      <AppNavbar leftContent={<AppNavbarHeading>Secrets</AppNavbarHeading>} />
-
       <ActionSidebar
         className="!bg-neutral-950"
         isOpen={isSidebarOpen}
@@ -46,17 +42,15 @@ export function SecretPage() {
         <Outlet />
       </ActionSidebar>
 
-      <PageContentWrapper>
-        <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
-          <Link to={routes.secretsNew(organizationId)}>
-            <Button size="sm" tabIndex={0}>
-              New Secret
-            </Button>
-          </Link>
-        </div>
+      <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
+        <Link to={routes.secretsNew(organizationId)}>
+          <Button size="sm" tabIndex={0}>
+            New Secret
+          </Button>
+        </Link>
+      </div>
 
-        <SecretKeyList organizationId={organizationId} items={apiKeys} />
-      </PageContentWrapper>
+      <SecretKeyList organizationId={organizationId} items={secrets} />
     </>
   );
 }

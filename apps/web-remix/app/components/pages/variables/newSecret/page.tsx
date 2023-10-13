@@ -7,7 +7,7 @@ import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { schema } from "./schema";
 
-export function NewApiKey() {
+export function NewSecret() {
   const validator = useMemo(() => withZod(schema), []);
 
   return (

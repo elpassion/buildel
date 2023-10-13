@@ -3,4 +3,4 @@ export {
   loader,
   meta,
   action,
-} from "~/components/pages/secrets/new";
+} from "~/components/pages/variables/newSecret";

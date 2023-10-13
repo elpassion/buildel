@@ -4,7 +4,7 @@ import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { confirm } from "~/components/modal/confirm";
 import { IconButton } from "~/components/iconButton";
 import { EditSecretKeyModal } from "./EditSecretKeyModal";
-import { ISecretKeyList, ISecretKey } from "../secrets.types";
+import { ISecretKeyList, ISecretKey } from "../variables.types";
 
 interface SecretKeyListProps {
   items: ISecretKeyList;

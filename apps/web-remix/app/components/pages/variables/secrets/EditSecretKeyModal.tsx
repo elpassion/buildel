@@ -5,7 +5,7 @@ import { withZod } from "@remix-validated-form/with-zod";
 import { Button } from "@elpassion/taco";
 import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { ISecretKey } from "../secrets.types";
+import { ISecretKey } from "../variables.types";
 import { schema } from "./schema";
 interface EditSecretModalProps {
   isOpen: boolean;
