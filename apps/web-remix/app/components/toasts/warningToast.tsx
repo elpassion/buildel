@@ -5,7 +5,7 @@ import { WarningToast } from "./ui/WarningToast";
 export const warningToast = (props?: ToastProps | string) => {
   if (typeof props === "string") {
     return toast((t) => (
-      <WarningToast title="Warning" onClose={() => toast.dismiss(t.id)} />
+      <WarningToast title={props} onClose={() => toast.dismiss(t.id)} />
     ));
   }
 

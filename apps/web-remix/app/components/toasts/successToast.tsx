@@ -5,7 +5,7 @@ import { SuccessToast } from "./ui/SuccessToast";
 export const successToast = (props?: ToastProps | string) => {
   if (typeof props === "string") {
     return toast((t) => (
-      <SuccessToast title="Success" onClose={() => toast.dismiss(t.id)} />
+      <SuccessToast title={props} onClose={() => toast.dismiss(t.id)} />
     ));
   }
 

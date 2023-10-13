@@ -21,6 +21,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 
 export default function Layout() {
   const { toasts } = useLoaderData<typeof loader>();
+
   useServerToasts(toasts);
 
   return (

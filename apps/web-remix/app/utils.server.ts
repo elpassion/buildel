@@ -41,7 +41,9 @@ export const loaderBuilder =
         throw notFound();
       } else if (e instanceof UnauthorizedError) {
         throw redirect("/login", {
-          headers: await logout(args.request),
+          headers: await logout(args.request, {
+            error: { title: "Unauthorized", description: "Session expired" },
+          }),
         });
       }
 
@@ -112,7 +114,9 @@ export const actionBuilder =
         return validationError({ fieldErrors: e.fieldErrors });
       } else if (e instanceof UnauthorizedError) {
         throw redirect("/login", {
-          headers: await logout(actionArgs.request),
+          headers: await logout(actionArgs.request, {
+            error: { title: "Unauthorized", description: "Session expired" },
+          }),
         });
       } else if (e instanceof NotFoundError) {
         throw notFound();

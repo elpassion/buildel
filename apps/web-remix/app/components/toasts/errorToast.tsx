@@ -5,7 +5,7 @@ import { ErrorToast } from "./ui/ErrorToast";
 export const errorToast = (props?: ToastProps | string) => {
   if (typeof props === "string") {
     return toast((t) => (
-      <ErrorToast title="Error" onClose={() => toast.dismiss(t.id)} />
+      <ErrorToast title={props} onClose={() => toast.dismiss(t.id)} />
     ));
   }
 

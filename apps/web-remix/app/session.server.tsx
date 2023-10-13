@@ -1,5 +1,6 @@
 import { redirect, createCookieSessionStorage } from "@remix-run/node";
 import { ICurrentUser } from "~/api/CurrentUserApi";
+import { setServerToast } from "~/utils/toast.server";
 
 type SessionData = {
   apiToken?: string;
@@ -38,15 +39,26 @@ export async function requireNotLogin(request: Request) {
   if (cookie?.includes("_buildel_key")) throw redirect("/");
 }
 
-export async function logout(request: Request) {
+export async function logout(
+  request: Request,
+  args?: {
+    error?: SessionToast | string;
+    success?: SessionToast | string;
+    warning?: SessionToast | string;
+  }
+) {
   const session = await getSession(request.headers.get("Cookie"));
 
   const headers = new Headers();
+  headers.append("Set-Cookie", await destroySession(session));
   headers.append(
     "Set-Cookie",
     "_buildel_key=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
   );
-  headers.append("Set-Cookie", await destroySession(session));
+
+  if (args) {
+    headers.append("Set-Cookie", await setServerToast(request, args));
+  }
 
   return headers;
 }

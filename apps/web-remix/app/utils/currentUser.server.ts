@@ -21,7 +21,9 @@ export async function getCurrentUser(request: Request): Promise<{
 
   if (!user) {
     throw redirect("/login", {
-      headers: await logout(request),
+      headers: await logout(request, {
+        error: { title: "Unauthorized", description: "Session expired" },
+      }),
     });
   }
 
