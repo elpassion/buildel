@@ -47,6 +47,6 @@ export async function logout(request: Request) {
     "_buildel_key=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
   );
   headers.append("Set-Cookie", await destroySession(session));
-  console.log(headers);
+
   return headers;
 }
