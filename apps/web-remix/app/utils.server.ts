@@ -14,6 +14,7 @@ import {
 } from "./utils/errors.server";
 import { fetchTyped } from "./utils/fetch.server";
 import { setServerToast } from "./utils/toast.server";
+import { logout } from "~/session.server";
 
 export const loaderBuilder =
   <T>(
@@ -40,10 +41,7 @@ export const loaderBuilder =
         throw notFound();
       } else if (e instanceof UnauthorizedError) {
         throw redirect("/login", {
-          headers: {
-            "Set-Cookie":
-              "_buildel_key=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
-          },
+          headers: await logout(args.request),
         });
       }
 
@@ -114,10 +112,7 @@ export const actionBuilder =
         return validationError({ fieldErrors: e.fieldErrors });
       } else if (e instanceof UnauthorizedError) {
         throw redirect("/login", {
-          headers: {
-            "Set-Cookie":
-              "_buildel_key=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
-          },
+          headers: await logout(actionArgs.request),
         });
       } else if (e instanceof NotFoundError) {
         throw notFound();

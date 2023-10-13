@@ -28,22 +28,25 @@ import {
   NavSidebarContext,
   SidebarLink,
 } from "~/components/sidebar/NavSidebar";
+import { getCurrentUser } from "~/utils/currentUser.server";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: DataFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
+
     invariant(params.organizationId, "organizationId not found");
-    const { cookie, ...toasts } = await getServerToast(request);
 
     const organizationsResponse = await fetch(
       OrganizationsResponse,
-      `/organizations`
+      "/organizations"
     );
 
     const organization = organizationsResponse.data.data.find(
       (org) => org.id === Number(params.organizationId)
     );
+
+    const { cookie, ...toasts } = await getServerToast(request);
 
     if (!organization) {
       throw new Response(null, {
@@ -52,8 +55,11 @@ export async function loader(loaderArgs: DataFunctionArgs) {
       });
     }
 
+    const { user } = await getCurrentUser(request);
+
     return json(
       {
+        user,
         toasts,
         organization: organization,
         organizations: organizationsResponse.data.data,
@@ -68,7 +74,7 @@ export async function loader(loaderArgs: DataFunctionArgs) {
 }
 
 export default function Layout() {
-  const { toasts } = useLoaderData<typeof loader>();
+  const { toasts, user } = useLoaderData<typeof loader>();
   const [collapsed, setCollapsed] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
 

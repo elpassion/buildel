@@ -5,6 +5,8 @@ import { z } from "zod";
 import { actionBuilder } from "~/utils.server";
 import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
+import { setCurrentUser } from "~/utils/currentUser.server";
+import { CurrentUserResponse } from "~/api/CurrentUserApi";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -20,8 +22,22 @@ export async function action(actionArgs: ActionFunctionArgs) {
         body: JSON.stringify(result.data),
       });
 
+      const authCookie = response.headers.get("Set-Cookie")!;
+
+      const meResponse = await fetch(CurrentUserResponse, "/users/me", {
+        headers: {
+          Cookie: authCookie,
+        },
+      });
+
+      const sessionCookie = await setCurrentUser(request, meResponse.data);
+
+      const headers = new Headers();
+      headers.append("Set-Cookie", authCookie);
+      headers.append("Set-Cookie", sessionCookie);
+
       return redirect(routes.dashboard, {
-        headers: { "Set-Cookie": response.headers.get("Set-Cookie")! },
+        headers,
       });
     },
   })(actionArgs);
