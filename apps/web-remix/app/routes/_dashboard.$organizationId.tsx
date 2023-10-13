@@ -74,7 +74,7 @@ export async function loader(loaderArgs: DataFunctionArgs) {
 }
 
 export default function Layout() {
-  const { toasts, user } = useLoaderData<typeof loader>();
+  const { toasts } = useLoaderData<typeof loader>();
   const [collapsed, setCollapsed] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -172,31 +172,15 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
           onlyIcon={isCollapsed}
         />
       </div>
-      {/*<div>*/}
-      {/*  <SidebarLink*/}
-      {/*    to={routes.dashboard}*/}
-      {/*    icon={*/}
-      {/*      <Icon*/}
-      {/*        iconName="life-buoy"*/}
-      {/*        className="w-5 h-5 text-center leading-5"*/}
-      {/*      />*/}
-      {/*    }*/}
-      {/*    text="Support"*/}
-      {/*    onlyIcon={isCollapsed}*/}
-      {/*  />*/}
 
-      {/*  <SidebarLink*/}
-      {/*    to={routes.dashboard}*/}
-      {/*    icon={*/}
-      {/*      <Icon*/}
-      {/*        iconName="settings"*/}
-      {/*        className="w-5 h-5 text-center leading-5"*/}
-      {/*      />*/}
-      {/*    }*/}
-      {/*    text="Settings"*/}
-      {/*    onlyIcon={isCollapsed}*/}
-      {/*  />*/}
-      {/*</div>*/}
+      <SidebarLink
+        to={routes.settings}
+        icon={
+          <Icon iconName="settings" className="w-5 h-5 text-center leading-5" />
+        }
+        text="Settings"
+        onlyIcon={isCollapsed}
+      />
     </SidebarContentWrapper>
   );
 }
