@@ -1,5 +1,5 @@
-import React, { useCallback } from "react";
-import { Button } from "@elpassion/taco";
+import React, { useCallback, useEffect, useState } from "react";
+import { Button, Icon } from "@elpassion/taco";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
@@ -15,6 +15,8 @@ import {
   useRunPipeline,
   useRunPipelineNode,
 } from "../RunPipelineProvider";
+import { useCopyToClipboard } from "usehooks-ts";
+import classNames from "classnames";
 
 interface NodeFieldsProps {
   fields: IField[];
@@ -211,13 +213,8 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
       const { type } = field.data;
 
       if (type === "text") {
-        return (
-          <div className="w-full min-w-full max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-            <p className="text-xs text-white">
-              {getTextFieldsMessages(events, field.data.name)}
-            </p>
-          </div>
-        );
+        const text = getTextFieldsMessages(events, field.data.name);
+        return <NodeTextOutput text={text} />;
       } else if (type === "audio") {
         return (
           <>
@@ -239,6 +236,48 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
         </React.Fragment>
       ))}
     </div>
+  );
+}
+
+interface NodeTextOutputProps {
+  text: string;
+}
+function NodeTextOutput({ text }: NodeTextOutputProps) {
+  const [_value, copy] = useCopyToClipboard();
+  const [isCopied, setIsCopied] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+
+  const handleCopy = useCallback(async () => {
+    await copy(text);
+    setIsCopied(true);
+    setTimeoutId(setTimeout(() => setIsCopied(false), 2000));
+  }, [text, copy]);
+
+  useEffect(() => {
+    if (!timeoutId) return;
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [timeoutId]);
+
+  return (
+    <>
+      <div className="mb-1 flex gap-1">
+        <button
+          onClick={handleCopy}
+          className="text-xs text-neutral-100  rounded px-1 py-[2px] flex items-center gap-1 w-[54px]"
+        >
+          {isCopied ? null : <Icon iconName="copy" />}
+          <span className={classNames({ "text-green-600": isCopied })}>
+            {isCopied ? "Copied!" : "Copy"}
+          </span>
+        </button>
+      </div>
+
+      <div className="w-full min-w-full max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+        <p className="text-xs text-white">{text}</p>
+      </div>
+    </>
   );
 }
 
