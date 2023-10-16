@@ -11,20 +11,19 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import { Toaster } from "~/components/toasts/Toaster";
-import menuStyle from "rc-menu/assets/index.css";
+import menuStyles from "rc-menu/assets/index.css";
 import styles from "./tailwind.css";
 import { GlobalNotFound } from "~/components/errorBoundaries/GlobalNotFound";
 import { GlobalRuntime } from "~/components/errorBoundaries/GlobalRuntime";
-
 export const links: LinksFunction = () => [
   ...(cssBundleHref
     ? [
         { rel: "stylesheet", href: cssBundleHref },
-        { rel: "stylesheet", href: menuStyle },
+        { rel: "stylesheet", href: menuStyles },
       ]
     : [
         { rel: "stylesheet", href: styles },
-        { rel: "stylesheet", href: menuStyle },
+        { rel: "stylesheet", href: menuStyles },
       ]),
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {

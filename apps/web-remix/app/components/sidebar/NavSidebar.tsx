@@ -1,9 +1,11 @@
 import React, { ReactNode, useEffect } from "react";
 import classNames from "classnames";
+import kebabCase from "lodash.kebabcase";
 import { RemixNavLinkProps } from "@remix-run/react/dist/components";
 import { NavLink, useLocation } from "@remix-run/react";
 import { SidebarProps, Sidebar } from "@elpassion/taco";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
+import { Tooltip } from "~/components/tooltip/Tooltip";
 
 export const NavSidebar: React.FC<
   Omit<SidebarProps, "collapsed" | "onCollapse">
@@ -71,12 +73,21 @@ export function SidebarLink({
   return (
     <NavLink {...props}>
       {({ isActive }) => (
-        <SidebarMenuItem
-          icon={icon}
-          text={text}
-          isActive={propsIsActive ?? isActive}
-          onlyIcon={onlyIcon}
-        />
+        <>
+          <SidebarMenuItem
+            id={`${kebabCase(text)}-nav-item`}
+            icon={icon}
+            text={text}
+            isActive={propsIsActive ?? isActive}
+            onlyIcon={onlyIcon}
+          />
+          {onlyIcon && (
+            <Tooltip
+              anchorSelect={`#${kebabCase(text)}-nav-item`}
+              content={text}
+            />
+          )}
+        </>
       )}
     </NavLink>
   );
@@ -87,15 +98,18 @@ export interface SidebarMenuItemProps {
   isActive?: boolean;
   onlyIcon?: boolean;
   icon: ReactNode;
+  id?: string;
 }
 export function SidebarMenuItem({
   text,
   icon,
   isActive,
   onlyIcon,
+  id,
 }: SidebarMenuItemProps) {
   return (
     <div
+      id={id}
       className={classNames(
         "flex items-center space-x-2 p-2 rounded-lg text-neutral-100 hover:bg-neutral-700 transition",
         {
