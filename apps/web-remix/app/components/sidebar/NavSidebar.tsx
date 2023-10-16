@@ -1,9 +1,9 @@
 import React, { ReactNode, useEffect } from "react";
-import { SidebarProps, Sidebar } from "@elpassion/taco";
 import classNames from "classnames";
-import { PageOverlay } from "~/components/overlay/PageOverlay";
 import { RemixNavLinkProps } from "@remix-run/react/dist/components";
 import { NavLink, useLocation } from "@remix-run/react";
+import { SidebarProps, Sidebar } from "@elpassion/taco";
+import { PageOverlay } from "~/components/overlay/PageOverlay";
 
 export const NavSidebar: React.FC<
   Omit<SidebarProps, "collapsed" | "onCollapse">
@@ -60,12 +60,12 @@ export const NavMobileSidebar: React.FC<
   );
 };
 
-type SidebarLinkProps = RemixNavLinkProps &
-  Omit<SidebarMenuItemProps, "isActive">;
+type SidebarLinkProps = RemixNavLinkProps & SidebarMenuItemProps;
 export function SidebarLink({
   icon,
   text,
   onlyIcon,
+  isActive: propsIsActive,
   ...props
 }: SidebarLinkProps) {
   return (
@@ -74,7 +74,7 @@ export function SidebarLink({
         <SidebarMenuItem
           icon={icon}
           text={text}
-          isActive={isActive}
+          isActive={propsIsActive ?? isActive}
           onlyIcon={onlyIcon}
         />
       )}

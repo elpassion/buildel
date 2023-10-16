@@ -11,6 +11,7 @@ import {
   Outlet,
   useFetcher,
   useLoaderData,
+  useLocation,
   useNavigate,
 } from "@remix-run/react";
 import { OrganizationsResponse } from "~/components/pages/organizations/contracts";
@@ -131,6 +132,7 @@ interface SidebarContentProps {
 
 function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
   const { organization } = useLoaderData<typeof loader>();
+  const location = useLocation();
 
   return (
     <SidebarContentWrapper
@@ -168,7 +170,11 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
           icon={
             <Icon iconName="key" className="w-5 h-5 text-center leading-5" />
           }
-          text="Secrets"
+          text="Secrets and Keys"
+          isActive={
+            location.pathname === routes.secrets(organization.id) ||
+            location.pathname === routes.apiKeys(organization.id)
+          }
           onlyIcon={isCollapsed}
         />
       </div>
