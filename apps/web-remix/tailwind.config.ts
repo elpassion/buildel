@@ -140,5 +140,5 @@ export default {
     join(__dirname, "./node_modules/@elpassion/taco/**/*.{js,jsx}"),
   ],
   theme: merge({}, initDefaultTheme(), customConfig),
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],
 };

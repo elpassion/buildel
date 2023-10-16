@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { HTMLProps, useCallback, useEffect, useState } from "react";
 import { Button, Icon } from "@elpassion/taco";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
@@ -214,7 +214,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
 
       if (type === "text") {
         const text = getTextFieldsMessages(events, field.data.name);
-        return <NodeTextOutput text={text} />;
+        return <NodeTextOutput text={text} blockName={block.name} />;
       } else if (type === "audio") {
         return (
           <>
@@ -241,8 +241,44 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
 
 interface NodeTextOutputProps {
   text: string;
+  blockName: string;
 }
-function NodeTextOutput({ text }: NodeTextOutputProps) {
+function NodeTextOutput({ text, blockName }: NodeTextOutputProps) {
+  return (
+    <>
+      <div className="mb-1 flex gap-1">
+        <NodeCopyButton text={text} />
+
+        <NodeDownloadButton blockName={blockName} text={text} />
+      </div>
+
+      <div className="prose break-words text-xs text-white w-full min-w-full max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+        <p>{text}</p>
+      </div>
+    </>
+  );
+}
+
+function NodeActionButton({
+  children,
+  className,
+  type,
+  ...rest
+}: HTMLProps<HTMLButtonElement>) {
+  return (
+    <button
+      className={classNames(
+        "text-xs text-neutral-100 rounded px-1 py-[2px] flex items-center gap-1",
+        className
+      )}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+}
+
+function NodeCopyButton({ text }: { text: string }) {
   const [_value, copy] = useCopyToClipboard();
   const [isCopied, setIsCopied] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
@@ -261,23 +297,40 @@ function NodeTextOutput({ text }: NodeTextOutputProps) {
   }, [timeoutId]);
 
   return (
-    <>
-      <div className="mb-1 flex gap-1">
-        <button
-          onClick={handleCopy}
-          className="text-xs text-neutral-100  rounded px-1 py-[2px] flex items-center gap-1 w-[54px]"
-        >
-          {isCopied ? null : <Icon iconName="copy" />}
-          <span className={classNames({ "text-green-600": isCopied })}>
-            {isCopied ? "Copied!" : "Copy"}
-          </span>
-        </button>
-      </div>
+    <NodeActionButton className="w-[52px]" onClick={handleCopy}>
+      {isCopied ? null : <Icon iconName="copy" />}
+      <span className={classNames({ "text-green-600": isCopied })}>
+        {isCopied ? "Copied!" : "Copy"}
+      </span>
+    </NodeActionButton>
+  );
+}
 
-      <div className="w-full min-w-full max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-        <p className="text-xs text-white">{text}</p>
-      </div>
-    </>
+function NodeDownloadButton({
+  text,
+  blockName,
+}: {
+  text: string;
+  blockName: string;
+}) {
+  const handleDownload = useCallback(() => {
+    const filename = `${blockName}.txt`;
+    const textBlob = new Blob([text], { type: "text/plain" });
+
+    const downloadLink = document.createElement("a");
+    downloadLink.href = window.URL.createObjectURL(textBlob);
+    downloadLink.download = filename;
+
+    downloadLink.click();
+
+    window.URL.revokeObjectURL(downloadLink.href);
+  }, [blockName, text]);
+
+  return (
+    <NodeActionButton onClick={handleDownload}>
+      <Icon iconName="download" />
+      <span>Download</span>
+    </NodeActionButton>
   );
 }
 
