@@ -252,7 +252,7 @@ function NodeTextOutput({ text, blockName }: NodeTextOutputProps) {
         <NodeDownloadButton blockName={blockName} text={text} />
       </div>
 
-      <div className="prose break-words text-xs text-white w-full min-w-full max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+      <div className="prose break-words text-xs text-white w-full min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
         <p>{text}</p>
       </div>
     </>
