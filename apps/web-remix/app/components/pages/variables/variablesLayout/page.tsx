@@ -6,6 +6,7 @@ import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
 import { loader } from "./loader";
 import { routes } from "~/utils/routes.utils";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
+import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
 
 export function VariablesLayout() {
   const { organizationId } = useLoaderData<typeof loader>();
@@ -19,7 +20,7 @@ export function VariablesLayout() {
 
       <PageContentWrapper>
         <TabGroup activeTab={location.pathname}>
-          <div className="bg-neutral-800 flex gap-2 rounded-lg w-fit p-1">
+          <FilledTabsWrapper>
             <FilledTabLink
               tabId={routes.secrets(organizationId)}
               to={routes.secrets(organizationId)}
@@ -32,7 +33,7 @@ export function VariablesLayout() {
             >
               API Keys
             </FilledTabLink>
-          </div>
+          </FilledTabsWrapper>
 
           <Outlet />
         </TabGroup>

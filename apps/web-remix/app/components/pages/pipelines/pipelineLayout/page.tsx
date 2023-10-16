@@ -8,6 +8,7 @@ import { TabGroup } from "~/components/tabs/TabGroup";
 import { routes } from "~/utils/routes.utils";
 import { FilledTabLink } from "~/components/tabs/FilledTabLink";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
+import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
@@ -27,7 +28,7 @@ export function PipelineLayout() {
       />
       <div className="px-4 md:px-6 lg:px-10">
         <TabGroup activeTab={location.pathname}>
-          <div className="bg-neutral-800 flex gap-2 rounded-lg w-fit p-1">
+          <FilledTabsWrapper>
             <FilledTabLink
               tabId={routes.pipeline(pipeline.organization_id, pipeline.id)}
               to={routes.pipeline(pipeline.organization_id, pipeline.id)}
@@ -64,7 +65,7 @@ export function PipelineLayout() {
             >
               Settings
             </FilledTabLink>
-          </div>
+          </FilledTabsWrapper>
 
           <Outlet />
         </TabGroup>

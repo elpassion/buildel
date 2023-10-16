@@ -78,8 +78,9 @@ export function SidebarLink({
             id={`${kebabCase(text)}-nav-item`}
             icon={icon}
             text={text}
-            isActive={propsIsActive ?? isActive}
             onlyIcon={onlyIcon}
+            isActive={propsIsActive ?? isActive}
+            data-tooltip-delay-show={500}
           />
           {onlyIcon && (
             <Tooltip
@@ -106,6 +107,7 @@ export function SidebarMenuItem({
   isActive,
   onlyIcon,
   id,
+  ...rest
 }: SidebarMenuItemProps) {
   return (
     <div
@@ -119,6 +121,7 @@ export function SidebarMenuItem({
           "w-9 h-9": onlyIcon,
         }
       )}
+      {...rest}
     >
       {icon}
 
