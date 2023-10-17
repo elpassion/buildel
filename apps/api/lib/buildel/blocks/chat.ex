@@ -126,7 +126,7 @@ defmodule Buildel.Blocks.Chat do
      |> assign_stream_state
      |> assign_take_latest(true)
      |> Keyword.put(:messages, opts[:messages])
-     |> Keyword.put(:api_key, opts |> Map.get(:api_key))
+     |> Keyword.put(:api_key, Buildel.BlockSecrets.get_secret_from_context(context_id, opts |> Map.get(:api_key)))
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
   end

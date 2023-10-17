@@ -144,6 +144,13 @@ defmodule Buildel.Organizations do
     end
   end
 
+  def get_organization_secret(%Organization{} = organization, secret_name) do
+    case Repo.get_by(Secret, name: secret_name, organization_id: organization.id) do
+      nil -> {:error, :not_found}
+      %Secret{} = secret -> {:ok, secret}
+    end
+  end
+
   def list_organization_secrets(%Organization{} = organization) do
     organization |> Repo.preload(:secrets) |> Map.get(:secrets)
   end
