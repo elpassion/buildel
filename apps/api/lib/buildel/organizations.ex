@@ -132,7 +132,7 @@ defmodule Buildel.Organizations do
     |> Repo.insert()
   end
 
-  def delete_api_key(%Organization{} = organization, key_id) do
+  def delete_organization_api_key(%Organization{} = organization, key_id) do
     case Repo.get(ApiKey, key_id) do
       nil -> {:error, :not_found}
       %ApiKey{} = api_key ->

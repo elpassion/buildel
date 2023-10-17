@@ -59,7 +59,7 @@ defmodule BuildelWeb.OrganizationController do
     user = conn.assigns.current_user
     with {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
          {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         {:ok, key} <- Organizations.create_api_key(organization) do
+         {:ok, key} <- Organizations.create_organization_api_key(organization) do
       render(conn, :key, key: key, hidden: false)
     end
   end
@@ -68,7 +68,7 @@ defmodule BuildelWeb.OrganizationController do
     user = conn.assigns.current_user
     with {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
          {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         {:ok, key} <- Organizations.delete_api_key(organization, key_id) do
+         {:ok, key} <- Organizations.delete_organization_api_key(organization, key_id) do
       conn |> put_status(:ok) |> json(%{})
     end
   end
