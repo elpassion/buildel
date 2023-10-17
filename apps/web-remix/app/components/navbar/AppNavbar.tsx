@@ -1,6 +1,7 @@
 import React, { PropsWithChildren } from "react";
 import { Navbar, NavbarProps } from "@elpassion/taco";
 import { useNavSidebarContext } from "~/components/sidebar/NavSidebar";
+import classNames from "classnames";
 
 export const AppNavbar: React.FC<
   Omit<NavbarProps, "wrapperClassName" | "menuClassName" | "onMenuClick">
@@ -18,6 +19,16 @@ export const AppNavbar: React.FC<
   );
 };
 
-export const AppNavbarHeading = ({ children }: PropsWithChildren) => {
-  return <h1 className="text-2xl font-medium text-white">{children}</h1>;
+interface AppNavbarHeadingProps extends PropsWithChildren {
+  className?: string;
+}
+export const AppNavbarHeading = ({
+  children,
+  className,
+}: AppNavbarHeadingProps) => {
+  return (
+    <h1 className={classNames("text-2xl font-medium text-white", className)}>
+      {children}
+    </h1>
+  );
 };

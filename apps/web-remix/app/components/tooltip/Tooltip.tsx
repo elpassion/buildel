@@ -11,8 +11,7 @@ export const Tooltip: React.FC<ITooltip> = ({
     <ReactTooltip
       place="right"
       openOnClick={false}
-      className={classNames("!text-primary-500 !py-1 !px-2", className)}
-      offset={17}
+      className={classNames("!text-white !py-1 !px-2 !z-[30]", className)}
       {...props}
     >
       {children}

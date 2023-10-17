@@ -84,6 +84,7 @@ export function SidebarLink({
           />
           {onlyIcon && (
             <Tooltip
+              offset={17}
               anchorSelect={`#${kebabCase(text)}-nav-item`}
               content={text}
             />
