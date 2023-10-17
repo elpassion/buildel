@@ -125,4 +125,21 @@ defmodule Buildel.Organizations do
   def list_organization_api_keys(%Organization{} = organization) do
     organization |> Repo.preload(:api_keys) |> Map.get(:api_keys)
   end
+
+  def create_organization_api_key(%Organization{} = organization) do
+    ApiKey.with_random_key()
+    |> ApiKey.changeset(%{organization_id: organization.id})
+    |> Repo.insert()
+  end
+
+  def delete_api_key(%Organization{} = organization, key_id) do
+    case Repo.get(ApiKey, key_id) do
+      nil -> {:error, :not_found}
+      %ApiKey{} = api_key ->
+        case api_key.organization_id == organization.id do
+          true -> {:ok, api_key |> Repo.delete()}
+          false -> {:error, :not_found}
+        end
+    end
+  end
 end
