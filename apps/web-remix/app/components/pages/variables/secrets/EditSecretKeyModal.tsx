@@ -3,7 +3,7 @@ import { ValidatedForm } from "remix-validated-form";
 import { Modal } from "@elpassion/taco/Modal";
 import { withZod } from "@remix-validated-form/with-zod";
 import { Button } from "@elpassion/taco";
-import { Field, HiddenField } from "~/components/form/fields/field.context";
+import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { ISecretKey } from "../variables.types";
 import { schema } from "./schema";
@@ -29,20 +29,22 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
           <p className="text-3xl mb-4">Edit Secret</p>
 
           <p className="text-sm text-neutral-400">
-            Edit your {initialData.name} secret.
+            Edit your <span className="font-bold">{initialData.name}</span>{" "}
+            secret.
           </p>
         </header>
       }
     >
-      <div className="p-1">
+      <div className="p-1 min-w-[350px] max-w-[450px]">
         <ValidatedForm
           noValidate
-          method="post"
+          method="put"
           validator={validator}
           defaultValues={initialData}
         >
-          <HiddenField name="id" />
-          <HiddenField name="name" />
+          <Field name="name">
+            <TextInputField type="hidden" />
+          </Field>
 
           <Field name="value">
             <TextInputField
