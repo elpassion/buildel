@@ -159,10 +159,9 @@ defmodule Buildel.Organizations do
 
   def update_organization_secret(%Organization{} = organization, attrs \\ %{}) do
     with %Secret{} = secret <- Repo.get_by(Secret, name: attrs.name, organization_id: organization.id),
-         secret |> Secret.changeset(attrs) |> Repo.update()
+         {:ok, secret} <- secret |> Secret.changeset(attrs) |> Repo.update()
     do
-      {:ok, secret} -> {:ok, secret |> Repo.preload(:organization)}
-      {:error, changeset} -> {:error, changeset}
+      {:ok, secret |> Repo.preload(:organization)}
     end
   end
 
