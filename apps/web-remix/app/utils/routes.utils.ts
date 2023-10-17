@@ -31,9 +31,11 @@ export const routes = {
   secrets: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/secrets`,
   secretsNew: (organizationId: OrganizationId) =>
-    `${routes.organization(organizationId)}/secrets/new`,
+    `${routes.secrets(organizationId)}/new`,
   apiKeys: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/api-keys`,
+  apiKeysNew: (organizationId: OrganizationId) =>
+    `${routes.apiKeys(organizationId)}/new`,
 };
 
 type OrganizationId = string | number;
