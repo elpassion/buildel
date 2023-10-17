@@ -48,7 +48,7 @@ defmodule BuildelWeb.SecretController do
 
     with {:ok, organization} <-
             Buildel.Organizations.get_user_organization(user, organization_id),
-          :ok <- Buildel.Organizations.delete_organization_secret(organization, name) do
+          {:ok, _} <- Buildel.Organizations.delete_organization_secret(organization, name) do
       conn |> put_status(:ok) |> json(%{})
     end
   end
