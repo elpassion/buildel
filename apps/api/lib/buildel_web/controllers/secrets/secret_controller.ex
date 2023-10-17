@@ -36,7 +36,7 @@ defmodule BuildelWeb.SecretController do
       {:ok, organization} <-
         Buildel.Organizations.get_user_organization(user, organization_id),
       {:ok, secret} <-
-        Buildel.Organizations.create_organization_secret(params) do
+        Buildel.Organizations.create_organization_secret(organization, params) do
       conn
       |> put_status(:created)
       |> render(:show, secret: secret)
