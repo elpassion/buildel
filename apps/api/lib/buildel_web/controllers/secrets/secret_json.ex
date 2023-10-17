@@ -13,7 +13,8 @@ defmodule BuildelWeb.SecretJSON do
     %{
       id: secret.id,
       name: secret.name,
-      created_at: secret.inserted_at
+      created_at: secret.inserted_at,
+      updated_at: secret.updated_at
     }
   end
 end
