@@ -1,29 +1,29 @@
-import React, { HTMLProps, useCallback, useEffect, useState } from "react";
-import { Button, Icon } from "@elpassion/taco";
-import { FileUpload } from "~/components/fileUpload/FileUpload";
-import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
-import { TextareaInput } from "~/components/form/inputs/textarea.input";
+import React, { useCallback } from "react";
+import { Button } from "@elpassion/taco";
+import {
+  IBlockConfig,
+  IField,
+} from "~/components/pages/pipelines/pipeline.types";
 import { IFile } from "~/components/fileUpload/fileUpload.types";
+import {
+  useRunPipeline,
+  useRunPipelineNode,
+} from "~/components/pages/pipelines/builder/RunPipelineProvider";
 import {
   KnowledgeBaseFileListResponse,
   KnowledgeBaseFileResponse,
 } from "~/components/pages/knowledgeBase/contracts";
-import { IBlockConfig, IField } from "../../pipeline.types";
-import { AudioField } from "./AudioField";
-import {
-  IEvent,
-  useRunPipeline,
-  useRunPipelineNode,
-} from "../RunPipelineProvider";
-import { useCopyToClipboard } from "usehooks-ts";
-import classNames from "classnames";
+import { TextareaInput } from "~/components/form/inputs/textarea.input";
+import { FileUpload } from "~/components/fileUpload/FileUpload";
+import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
+import { AudioField } from "~/components/pages/pipelines/builder/CustomNodes/AudioField";
 
-interface NodeFieldsProps {
+interface NodeFieldsFormProps {
   fields: IField[];
   block: IBlockConfig;
 }
 
-export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
+export function NodeFieldsForm({ fields, block }: NodeFieldsFormProps) {
   const blockName = block.name;
   const { status, organizationId, pipelineId } = useRunPipeline();
   const { push, clearEvents } = useRunPipelineNode(block);
@@ -204,138 +204,3 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsProps) {
     </form>
   );
 }
-
-export function NodeFieldsOutput({ fields, block }: NodeFieldsProps) {
-  const { events } = useRunPipelineNode(block);
-
-  const renderOutput = useCallback(
-    (field: IField) => {
-      const { type } = field.data;
-
-      if (type === "text") {
-        const text = getTextFieldsMessages(events, field.data.name);
-        return <NodeTextOutput text={text} blockName={block.name} />;
-      } else if (type === "audio") {
-        return (
-          <>
-            <p>Audio output</p>
-          </>
-        );
-      }
-
-      return <span>Unsupported output type - {type}</span>;
-    },
-    [events]
-  );
-
-  return (
-    <div>
-      {fields.map((field) => (
-        <React.Fragment key={field.data.name}>
-          {renderOutput(field)}
-        </React.Fragment>
-      ))}
-    </div>
-  );
-}
-
-interface NodeTextOutputProps {
-  text: string;
-  blockName: string;
-}
-function NodeTextOutput({ text, blockName }: NodeTextOutputProps) {
-  return (
-    <>
-      <div className="mb-1 flex gap-1">
-        <NodeCopyButton text={text} />
-
-        <NodeDownloadButton blockName={blockName} text={text} />
-      </div>
-
-      <div className="prose break-words text-xs text-white w-full min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-        <p>{text}</p>
-      </div>
-    </>
-  );
-}
-
-function NodeActionButton({
-  children,
-  className,
-  type,
-  ...rest
-}: HTMLProps<HTMLButtonElement>) {
-  return (
-    <button
-      className={classNames(
-        "text-xs text-neutral-100 rounded px-1 py-[2px] flex items-center gap-1 hover:text-primary-500",
-        className
-      )}
-      {...rest}
-    >
-      {children}
-    </button>
-  );
-}
-
-function NodeCopyButton({ text }: { text: string }) {
-  const [_value, copy] = useCopyToClipboard();
-  const [isCopied, setIsCopied] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-
-  const handleCopy = useCallback(async () => {
-    await copy(text);
-    setIsCopied(true);
-    setTimeoutId(setTimeout(() => setIsCopied(false), 2000));
-  }, [text, copy]);
-
-  useEffect(() => {
-    if (!timeoutId) return;
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [timeoutId]);
-
-  return (
-    <NodeActionButton className="w-[52px]" onClick={handleCopy}>
-      {isCopied ? null : <Icon iconName="copy" />}
-      <span className={classNames({ "text-green-600": isCopied })}>
-        {isCopied ? "Copied!" : "Copy"}
-      </span>
-    </NodeActionButton>
-  );
-}
-
-function NodeDownloadButton({
-  text,
-  blockName,
-}: {
-  text: string;
-  blockName: string;
-}) {
-  const handleDownload = useCallback(() => {
-    const filename = `${blockName}.txt`;
-    const textBlob = new Blob([text], { type: "text/plain" });
-
-    const downloadLink = document.createElement("a");
-    downloadLink.href = window.URL.createObjectURL(textBlob);
-    downloadLink.download = filename;
-
-    downloadLink.click();
-
-    window.URL.revokeObjectURL(downloadLink.href);
-  }, [blockName, text]);
-
-  return (
-    <NodeActionButton onClick={handleDownload}>
-      <Icon iconName="download" />
-      <span>Download</span>
-    </NodeActionButton>
-  );
-}
-
-const getTextFieldsMessages = (events: IEvent[], outputName: string) => {
-  const fieldEvents = events.filter((ev) => ev.output === outputName);
-
-  return fieldEvents.map((ev) => ev.payload.message).join("");
-};
