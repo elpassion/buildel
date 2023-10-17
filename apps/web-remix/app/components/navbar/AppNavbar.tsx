@@ -9,7 +9,7 @@ export const AppNavbar: React.FC<
   const { openSidebar } = useNavSidebarContext();
   return (
     <Navbar
-      menuClassName="lg:hidden !text-white"
+      menuClassName="lg:hidden !text-white min-w-[24px]"
       wrapperClassName="py-2 md:px-2"
       onMenuClick={openSidebar}
       {...rest}

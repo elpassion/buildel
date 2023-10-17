@@ -98,7 +98,7 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
         </h3>
       </header>
 
-      <p className="text-white">*************123456</p>
+      <p className="text-white">**********{data.key}</p>
 
       <div className="flex gap-1 items-center">
         <IconButton
