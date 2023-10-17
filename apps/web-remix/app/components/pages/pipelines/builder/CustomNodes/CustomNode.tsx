@@ -1,13 +1,14 @@
 import { useCallback, useMemo } from "react";
 import startCase from "lodash.startcase";
+import classNames from "classnames";
 import { Badge, Icon } from "@elpassion/taco";
+import { IconButton } from "~/components/iconButton";
 import { getBlockFields, getBlockHandles } from "../PipelineFlow.utils";
 import { IBlockConfig } from "../../pipeline.types";
 import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
 import { InputHandle, OutputHandle } from "./NodeHandles";
-import { NodeFieldsForm, NodeFieldsOutput } from "./NodeFields";
-import classNames from "classnames";
-import { IconButton } from "~/components/iconButton";
+import { NodeFieldsForm } from "./NodeFieldsForm";
+import { NodeFieldsOutput } from "./NodeFieldsOutput";
 
 export interface CustomNodeProps {
   data: IBlockConfig;
@@ -115,10 +116,6 @@ export function CustomNode({
               />
             )}
           </div>
-
-          {!isValid && (
-            <div className="w-3 h-3 bg-red-700 rounded-full absolute -top-[6px] -right-[6px] animate-ping" />
-          )}
         </header>
 
         <div className="p-2 nodrag">
