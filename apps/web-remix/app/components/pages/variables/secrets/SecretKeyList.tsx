@@ -93,7 +93,7 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
         </h3>
       </header>
 
-      <p className="text-white">{data.created_at}</p>
+      <p className="text-white">{data.updated_at}</p>
 
       <div className="flex gap-1 items-center">
         <IconButton

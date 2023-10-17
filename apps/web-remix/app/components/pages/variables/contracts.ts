@@ -4,6 +4,7 @@ export const SecretKey = z.object({
   id: z.string(),
   name: z.string(),
   created_at: z.string(),
+  updated_at: z.string(),
 });
 
 export const SecretKeyList = z.array(SecretKey);
