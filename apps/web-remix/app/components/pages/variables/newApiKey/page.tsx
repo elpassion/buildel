@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 import { MetaFunction } from "@remix-run/node";
-import { ValidatedForm } from "remix-validated-form";
+import { useActionData } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { Button } from "@elpassion/taco";
+import { ValidatedForm } from "remix-validated-form";
 import { schema } from "./schema";
 import { action } from "./action";
-import { useActionData } from "@remix-run/react";
 
 export function NewSecret() {
   const validator = useMemo(() => withZod(schema), []);
@@ -15,13 +15,14 @@ export function NewSecret() {
     <ValidatedForm
       method="post"
       validator={validator}
-      className="grow flex flex-col h-[70%]"
+      className="grow flex flex-col gap-1 h-[70%]"
     >
-      <div className="p-1 w-full grow overflow-y-auto flex items-end">
-        <Button size="sm" hierarchy="primary" type="submit" isFluid>
-          Create Api Key
-        </Button>
+      <div className="p-1 w-full grow overflow-y-auto">
+        {isTypeOf("key", data) ? <p>Your new key: {data.key.key}</p> : null}
       </div>
+      <Button size="sm" hierarchy="primary" type="submit" isFluid>
+        Create Api Key
+      </Button>
     </ValidatedForm>
   );
 }
@@ -33,3 +34,7 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
+
+function isTypeOf<T>(property: keyof T, value: any): value is T {
+  return value !== undefined && (value as T)[property] !== undefined;
+}
