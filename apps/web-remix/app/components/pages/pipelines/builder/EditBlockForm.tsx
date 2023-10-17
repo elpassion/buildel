@@ -20,6 +20,7 @@ import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import { ReactNode, useCallback, useEffect } from "react";
 import { assert } from "~/utils/assert";
 import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
+import { CreatableSelectField } from "~/components/form/fields/creatableSelect.field";
 
 export function EditBlockForm({
   onSubmit,
@@ -74,14 +75,18 @@ export function EditBlockForm({
 
       return (
         <FormField name={props.name!}>
-          <AsyncSelectField
-            url={props.field.url.replace(
+          <CreatableSelectField
+            fetchUrl={props.field.url.replace(
               ":organization_id",
               organizationId.toString()
             )}
+            createUrl=""
+            onCreate={() => {}}
             label={props.field.title}
             supportingText={props.field.description}
-            defaultValue={props.field.default?.replace(":pipeline_id", pipelineId.toString())?.replace(":block_name", blockConfig.name)}
+            defaultValue={props.field.default
+              ?.replace(":pipeline_id", pipelineId.toString())
+              ?.replace(":block_name", blockConfig.name)}
           />
         </FormField>
       );

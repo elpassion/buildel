@@ -1,4 +1,4 @@
-import React, { forwardRef, PropsWithChildren } from "react";
+import React, { forwardRef, PropsWithChildren, useState } from "react";
 import { Label } from "@elpassion/taco";
 import {
   AsyncSelectField,
@@ -19,8 +19,8 @@ export const CreatableSelectField = forwardRef<
   HTMLSelectElement,
   CreatableSelectFieldProps
 >(({ onCreate, label, createUrl, fetchUrl, children, ...props }, ref) => {
-  const { isModalOpen, closeModal, openModal } = useModal();
   const { name } = useFieldContext();
+  const { isModalOpen, openModal, closeModal } = useModal();
 
   const handleCreate = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -56,7 +56,9 @@ export const CreatableSelectField = forwardRef<
           </header>
         }
       >
-        <div className="p-1">{children}</div>
+        <div className="p-1">
+          <p>DUPA</p>
+        </div>
       </Modal>
     </>
   );
