@@ -75,13 +75,41 @@ export function EditBlockForm({
 
       return (
         <FormField name={props.name!}>
-          <CreatableSelectField
-            fetchUrl={props.field.url.replace(
+          <AsyncSelectField
+            url={props.field.url.replace(
               ":organization_id",
               organizationId.toString()
             )}
-            createUrl=""
-            onCreate={() => {}}
+            label={props.field.title}
+            supportingText={props.field.description}
+            defaultValue={props.field.default
+              ?.replace(":pipeline_id", pipelineId.toString())
+              ?.replace(":block_name", blockConfig.name)}
+          />
+        </FormField>
+      );
+    },
+    [blockConfig.name, organizationId, pipelineId]
+  );
+
+  const AsyncCreatableField = useCallback(
+    (props: FieldProps) => {
+      assert(props.field.type === "string");
+      if (
+        !("presentAs" in props.field) ||
+        props.field.presentAs !== "async-creatable-select"
+      ) {
+        return;
+      }
+
+      return (
+        <FormField name={props.name!}>
+          <CreatableSelectField
+            url={props.field.url.replace(
+              ":organization_id",
+              organizationId.toString()
+            )}
+            schema={props.field.schema}
             label={props.field.title}
             supportingText={props.field.description}
             defaultValue={props.field.default
@@ -108,7 +136,7 @@ export function EditBlockForm({
         <HiddenField name="inputs" value={JSON.stringify(blockConfig.inputs)} />
 
         <Schema
-          schema={blockConfig.block_type.schema as any}
+          schema={blockConfig.block_type.schema.properties.opts}
           name="opts"
           fields={{
             string: StringField,
@@ -117,6 +145,7 @@ export function EditBlockForm({
             boolean: BooleanField,
             editor: EditorField,
             asyncSelect: SelectField,
+            asyncCreatableSelect: AsyncCreatableField,
           }}
         />
 

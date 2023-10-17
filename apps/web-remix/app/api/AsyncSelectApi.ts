@@ -23,6 +23,18 @@ export class AsyncSelectApi {
       .then((res) => res.json())
       .then((data) => AsyncSelectItemListResponse.parse(data));
   }
+
+  async createData(url: string, item: IAsyncSelectItem) {
+    return fetch(url.replace("/api", "/super-api"), {
+      method: "POST",
+      body: JSON.stringify(item),
+      headers: {
+        "Content-type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => AsyncSelectItemListResponse.parse(data));
+  }
 }
 
 export const asyncSelectApi = new AsyncSelectApi();

@@ -52,6 +52,17 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       );
     }
 
+    if ("presentAs" in field && field.presentAs === "async-creatable-select") {
+      return (
+        <fields.asyncCreatableSelect
+          field={field}
+          name={name}
+          fields={fields}
+          {...rest}
+        />
+      );
+    }
+
     return (
       <FormField name={name}>
         <TextInputField

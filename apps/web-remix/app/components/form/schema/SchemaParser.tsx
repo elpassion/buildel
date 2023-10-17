@@ -21,6 +21,13 @@ export function generateZODSchema(
       return nestedSchema;
     }
 
+    if (
+      "presentAs" in schema &&
+      schema.presentAs === "async-creatable-select"
+    ) {
+      return nestedSchema;
+    }
+
     if (schema.minLength !== undefined) {
       nestedSchema = nestedSchema.min(schema.minLength);
     }
@@ -127,6 +134,15 @@ export type JSONSchemaField =
       presentAs: "async-select";
       url: string;
       default?: string;
+    }
+  | {
+      type: "string";
+      title: string;
+      description: string;
+      presentAs: "async-creatable-select";
+      url: string;
+      default?: string;
+      schema: JSONSchemaField;
     }
   | {
       type: "number" | "integer";

@@ -15,18 +15,12 @@ export function Schema({
     boolean: React.FC<FieldProps>;
     editor: React.FC<FieldProps>;
     asyncSelect: React.FC<FieldProps>;
+    asyncCreatableSelect: React.FC<FieldProps>;
   };
 }) {
   assert(schema.type === "object");
 
-  return (
-    <Field
-      field={schema.properties.opts}
-      name={name}
-      schema={schema}
-      fields={fields}
-    />
-  );
+  return <Field field={schema} name={name} schema={schema} fields={fields} />;
 }
 
 export function Field({ field, name, schema, fields }: FieldProps) {
@@ -51,7 +45,8 @@ export function Field({ field, name, schema, fields }: FieldProps) {
     );
   } else if (field.type === "object") {
     return Object.entries(field.properties).map(([propertyKey, value]) => {
-      const fieldKey = name === null ? propertyKey : `${name}.${propertyKey}`;
+      const fieldKey =
+        name === null || name === "" ? propertyKey : `${name}.${propertyKey}`;
 
       return (
         <div key={fieldKey}>
@@ -93,5 +88,6 @@ export interface FieldProps {
     boolean: React.FC<FieldProps>;
     editor: React.FC<FieldProps>;
     asyncSelect: React.FC<FieldProps>;
+    asyncCreatableSelect: React.FC<FieldProps>;
   };
 }

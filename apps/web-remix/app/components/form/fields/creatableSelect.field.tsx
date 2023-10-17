@@ -1,33 +1,45 @@
-import React, { forwardRef, PropsWithChildren, useState } from "react";
-import { Label } from "@elpassion/taco";
+import React, { forwardRef } from "react";
+import { Button, Label } from "@elpassion/taco";
 import {
   AsyncSelectField,
   AsyncSelectFieldProps,
 } from "~/components/form/fields/asyncSelect.field";
 import { useFieldContext } from "~/components/form/fields/field.context";
 import { Modal } from "@elpassion/taco/Modal";
+import {
+  generateZODSchema,
+  JSONSchemaField,
+} from "~/components/form/schema/SchemaParser";
 import { useModal } from "~/hooks/useModal";
+import { Schema } from "~/components/form/schema/Schema";
+import {
+  ArrayField,
+  BooleanField,
+  NumberField,
+  StringField,
+} from "~/components/form/schema/SchemaFields";
+import { withZod } from "@remix-validated-form/with-zod";
+import { ValidatedForm } from "remix-validated-form";
+import { useFetcher } from "@remix-run/react";
+import { asyncSelectApi } from "~/api/AsyncSelectApi";
 
-interface CreatableSelectFieldProps
-  extends Omit<AsyncSelectFieldProps, "url">,
-    PropsWithChildren {
-  onCreate: () => void;
-  fetchUrl: string;
-  createUrl: string;
+interface CreatableSelectField extends AsyncSelectFieldProps {
+  schema: JSONSchemaField;
 }
 export const CreatableSelectField = forwardRef<
   HTMLSelectElement,
-  CreatableSelectFieldProps
->(({ onCreate, label, createUrl, fetchUrl, children, ...props }, ref) => {
+  CreatableSelectField
+>(({ label, supportingText, url, schema: JSONSchema, ...props }, ref) => {
   const { name } = useFieldContext();
   const { isModalOpen, openModal, closeModal } = useModal();
+  const schema = generateZODSchema(JSONSchema as any);
+  const validator = React.useMemo(() => withZod(schema), []);
 
-  const handleCreate = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    openModal();
+  const fetcher = useFetcher();
+
+  const handleCreate = (data: Record<string, any>) => {
+    asyncSelectApi.createData(url, data as any);
   };
-
   return (
     <>
       <div className="flex justify-between items-end">
@@ -35,29 +47,72 @@ export const CreatableSelectField = forwardRef<
 
         <button
           className="text-primary-500 text-sm mb-[6px] bg-transparent"
-          onClick={handleCreate}
+          onClick={openModal}
+          type="button"
         >
           Add new
         </button>
       </div>
 
-      <AsyncSelectField ref={ref} url={fetchUrl} {...props} />
+      <AsyncSelectField
+        ref={ref}
+        url={url}
+        supportingText={supportingText}
+        {...props}
+      />
 
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
         overlayClassName="!z-[60]"
+        className="w-[90%] max-w-[500px]"
         header={
           <header className="p-1 text-white">
-            <p className="text-2xl mb-2">Create a new API Key</p>
-            <p className="text-sm text-neutral-400">
-              Any API Key can be used in many blocks.
-            </p>
+            <p className="text-2xl mb-2">{label}</p>
+            <p className="text-sm text-neutral-400">{supportingText}</p>
           </header>
         }
       >
-        <div className="p-1">
-          <p>DUPA</p>
+        <div
+          className="p-1"
+          onSubmit={(e) => {
+            e.stopPropagation();
+            console.log(e);
+          }}
+        >
+          <ValidatedForm
+            // @ts-ignore
+            validator={validator}
+            className="w-full grow flex flex-col"
+            noValidate
+            onSubmit={async (data, e) => {
+              handleCreate(data);
+            }}
+          >
+            <Schema
+              schema={JSONSchema as any}
+              name={null}
+              fields={{
+                string: StringField,
+                number: NumberField,
+                array: ArrayField,
+                boolean: BooleanField,
+                editor: () => <></>,
+                asyncSelect: () => <></>,
+                asyncCreatableSelect: () => <></>,
+              }}
+            />
+
+            <Button
+              size="sm"
+              type="submit"
+              variant="filled"
+              className="mt-6"
+              isFluid
+            >
+              Create new
+            </Button>
+          </ValidatedForm>
         </div>
       </Modal>
     </>
