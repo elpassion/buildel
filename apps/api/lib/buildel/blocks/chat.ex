@@ -38,7 +38,26 @@ defmodule Buildel.Blocks.Chat do
                 "type" => "string",
                 "title" => "API key",
                 "url" => "/api/organizations/:organization_id/secrets",
-                "presentAs" => "async-select",
+                "presentAs" => "async-creatable-select",
+                "schema" => %{
+                  "type" => "object",
+                  "required" => ["name", "value"],
+                  "properties" => %{
+                    "name" => %{
+                      "type" => "string",
+                      "title" => "Name",
+                      "description" => "The name for the secret.",
+                      "minLength" => 1
+                    },
+                    "value" => %{
+                      "type" => "string",
+                      "title" => "Value",
+                      "description" => "The value of the secret.",
+                      "presentAs" => "password",
+                      "minLength" => 1
+                    }
+                  }
+                },
                 "description" =>
                   "OpenAI API key to use for the chat."
               },
