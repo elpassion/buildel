@@ -2,6 +2,7 @@ import React, { HTMLProps, useCallback, useEffect, useState } from "react";
 import classNames from "classnames";
 import { useCopyToClipboard } from "usehooks-ts";
 import { Icon } from "@elpassion/taco";
+import { useDownloadFile } from "~/hooks/useDownloadFile";
 
 export function NodeCopyButton({ text }: { text: string }) {
   const [_value, copy] = useCopyToClipboard();
@@ -38,18 +39,7 @@ export function NodeDownloadButton({
   text: string;
   blockName: string;
 }) {
-  const handleDownload = useCallback(() => {
-    const filename = `${blockName}.txt`;
-    const textBlob = new Blob([text], { type: "text/plain" });
-
-    const downloadLink = document.createElement("a");
-    downloadLink.href = window.URL.createObjectURL(textBlob);
-    downloadLink.download = filename;
-
-    downloadLink.click();
-
-    window.URL.revokeObjectURL(downloadLink.href);
-  }, [blockName, text]);
+  const handleDownload = useDownloadFile(text, `${blockName}.txt`);
 
   return (
     <NodeActionButton onClick={handleDownload}>
