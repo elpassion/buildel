@@ -46,7 +46,10 @@ if config_env() == :prod do
     interface: "rest",
     database_url: System.get_env("QDRANT_DATABASE_URL"),
     api_key: "doesntmatter"
-end
 
-# Dotenv.load()
-# Mix.Task.run("loadconfig")
+  
+  config :buildel, Buildel.Vault,
+    ciphers: [
+      default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: System.get_env("ENCRYPTION_KEY") |> Base.decode64!()}
+    ]
+end

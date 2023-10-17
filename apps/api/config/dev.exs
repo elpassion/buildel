@@ -87,3 +87,8 @@ config :qdrant,
 config :buildel, :secret_key_base, "secret_key_base"
 
 config :logger, level: :info
+
+config :buildel, Buildel.Vault,
+  ciphers: [
+    default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Base.decode64!("SXgbxNqc73TsknZpgmCNS51pJAinwb4EA3dnd8kYdup=")}
+  ]

@@ -20,7 +20,9 @@ defmodule Buildel.Application do
         # Start a worker by calling: Buildel.Worker.start_link(arg)
         Buildel.Pipelines.Runner,
         # Start document cache
-        Buildel.DocumentCache
+        Buildel.DocumentCache,
+        # Start the vault used for encryption
+        Buildel.Vault
       ]
       |> maybe_add_db()
       |> maybe_add_bumblebee_embedding()

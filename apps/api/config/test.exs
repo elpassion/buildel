@@ -46,3 +46,8 @@ config :buildel, :embeddings, Buildel.ClientMocks.Embeddings
 config :buildel, :file_loader, Buildel.FileLoaderRawAdapter
 config :buildel, :search_db, Buildel.ClientMocks.SearchDB.LNXAdapter
 config :buildel, :hybrid_db, false
+
+config :buildel, Buildel.Vault,
+  ciphers: [
+    default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Base.decode64!("SXgbxNqc73TsknZpgmCNS51pJAinwb4EA3dnd8kYdup=")}
+  ]
