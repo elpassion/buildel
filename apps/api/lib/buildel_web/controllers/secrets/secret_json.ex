@@ -11,7 +11,7 @@ defmodule BuildelWeb.SecretJSON do
 
   defp data(%Secret{} = secret) do
     %{
-      id: secret.id,
+      id: secret.name,
       name: secret.name,
       created_at: secret.inserted_at,
       updated_at: secret.updated_at

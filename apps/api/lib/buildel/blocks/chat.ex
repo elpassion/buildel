@@ -36,10 +36,11 @@ defmodule Buildel.Blocks.Chat do
             "properties" => %{
               "api_key" => %{
                 "type" => "string",
-                "title" => "API Key",
-                "description" => "Select from your API keys or enter a new one.",
-                "minLength" => 1,
-                "presentAs" => "password"
+                "title" => "API key",
+                "url" => "/api/organizations/:organization_id/secrets",
+                "presentAs" => "async-select",
+                "description" =>
+                  "OpenAI API key to use for the chat."
               },
               "model" => %{
                 "type" => "string",
