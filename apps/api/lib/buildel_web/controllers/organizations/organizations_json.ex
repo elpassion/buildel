@@ -35,6 +35,7 @@ defmodule BuildelWeb.OrganizationJSON do
     %{
       id: key.id,
       key: key_string,
+      created_at: key.inserted_at
     }
   end
 
