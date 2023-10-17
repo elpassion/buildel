@@ -3,6 +3,7 @@ import {
   LoaderFunctionArgs,
   json,
   redirect,
+  TypedResponse,
 } from "@remix-run/node";
 import merge from "lodash.merge";
 import { validationError } from "remix-validated-form";
@@ -51,28 +52,18 @@ export const loaderBuilder =
     }
   };
 
+type ActionHandler<T> = (
+  args: ActionFunctionArgs,
+  helpers: { fetch: typeof fetchTyped }
+) => Promise<T>;
+
 export const actionBuilder =
-  (handlers: {
-    post?: (
-      args: ActionFunctionArgs,
-      helpers: { fetch: typeof fetchTyped }
-    ) => unknown;
-    delete?: (
-      args: ActionFunctionArgs,
-      helpers: { fetch: typeof fetchTyped }
-    ) => unknown;
-    patch?: (
-      args: ActionFunctionArgs,
-      helpers: { fetch: typeof fetchTyped }
-    ) => unknown;
-    put?: (
-      args: ActionFunctionArgs,
-      helpers: { fetch: typeof fetchTyped }
-    ) => unknown;
-    get?: (
-      args: ActionFunctionArgs,
-      helpers: { fetch: typeof fetchTyped }
-    ) => unknown;
+  <T>(handlers: {
+    post?: ActionHandler<TypedResponse<T>>;
+    delete?: ActionHandler<TypedResponse<T>>;
+    patch?: ActionHandler<TypedResponse<T>>;
+    put?: ActionHandler<TypedResponse<T>>;
+    get?: ActionHandler<TypedResponse<T>>;
   }) =>
   async (actionArgs: ActionFunctionArgs) => {
     const notFound = () => json(null, { status: 404 });
