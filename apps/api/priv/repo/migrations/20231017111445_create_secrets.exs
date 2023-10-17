@@ -10,5 +10,7 @@ defmodule Buildel.Repo.Migrations.CreateSecrets do
 
       timestamps()
     end
+
+    create unique_index(:secrets, [:organization_id, :name])
   end
 end

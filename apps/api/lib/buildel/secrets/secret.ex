@@ -18,6 +18,7 @@ defmodule Buildel.Secrets.Secret do
     |> cast(attrs, [:organization_id, :name, :value])
     |> validate_required([:organization_id, :name, :value])
     |> assoc_constraint(:organization)
+    |> unique_constraint([:organization_id, :name])
     |> put_hashed_fields()
   end
 

@@ -5,6 +5,7 @@ defmodule Buildel.Organizations do
   alias Buildel.Organizations.{Organization, Membership}
   alias Buildel.Accounts.User
   alias Buildel.ApiKeys.ApiKey
+  alias Buildel.Secrets.Secret
 
   def list_user_organizations(%User{} = user) do
     user |> Repo.preload(:organizations) |> Map.get(:organizations)
@@ -138,6 +139,30 @@ defmodule Buildel.Organizations do
       %ApiKey{} = api_key ->
         case api_key.organization_id == organization.id do
           true -> {:ok, api_key |> Repo.delete()}
+          false -> {:error, :not_found}
+        end
+    end
+  end
+
+  def list_organization_secrets(%Organization{} = organization) do
+    organization |> Repo.preload(:secrets) |> Map.get(:secrets)
+  end
+
+  def create_organization_secret(%Organization{} = organization, attrs \\ %{}) do
+    case %Secret{}
+         |> Secret.changeset(attrs)
+         |> Repo.insert() do
+      {:ok, secret} -> {:ok, secret |> Repo.preload(:organization)}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  def delete_organization_secret(%Organization{} = organization, secret_name) do
+    case Repo.get_by(Secret, name: secret_name) do
+      nil -> {:error, :not_found}
+      %Secret{} = secret ->
+        case secret.organization_id == organization.id do
+          true -> {:ok, secret |> Repo.delete()}
           false -> {:error, :not_found}
         end
     end

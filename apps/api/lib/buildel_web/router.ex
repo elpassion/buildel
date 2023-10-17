@@ -70,6 +70,8 @@ defmodule BuildelWeb.Router do
     post("/organizations/:id/keys", OrganizationController, :create_api_key)
     delete("/organizations/:id/keys/:key_id", OrganizationController, :delete_api_key)
 
+    resources("/organizations/:organization_id/secrets", SecretController, only: [:index, :create, :delete], param: "name")
+
     post("/channel_auth", ChannelAuthController, :create)
   end
 
