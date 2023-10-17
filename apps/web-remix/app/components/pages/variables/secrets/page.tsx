@@ -50,7 +50,7 @@ export function SecretPage() {
         </Link>
       </div>
 
-      <SecretKeyList organizationId={organizationId} items={secrets} />
+      <SecretKeyList items={secrets} />
     </>
   );
 }

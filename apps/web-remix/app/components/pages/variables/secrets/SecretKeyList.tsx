@@ -5,24 +5,19 @@ import { confirm } from "~/components/modal/confirm";
 import { IconButton } from "~/components/iconButton";
 import { EditSecretKeyModal } from "./EditSecretKeyModal";
 import { ISecretKeyList, ISecretKey } from "../variables.types";
+import { useFetcher } from "@remix-run/react";
 
 interface SecretKeyListProps {
   items: ISecretKeyList;
-  organizationId: string;
 }
 
-export const SecretKeyList: React.FC<SecretKeyListProps> = ({
-  items,
-  organizationId,
-}) => {
+export const SecretKeyList: React.FC<SecretKeyListProps> = ({ items }) => {
+  const fetcher = useFetcher();
   const [editableKey, setEditableKey] = useState<ISecretKey | null>(null);
   const handleDelete = async (secretKey: ISecretKey) => {
     confirm({
-      // onConfirm: async () =>
-      //   fetcher.submit(
-      //     { collectionName: collection.name },
-      //     { method: "DELETE" }
-      //   ),
+      onConfirm: async () =>
+        fetcher.submit({ name: secretKey.name }, { method: "DELETE" }),
       confirmText: "Delete Key",
       children: (
         <p className="text-neutral-100 text-sm">
@@ -98,7 +93,7 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
         </h3>
       </header>
 
-      <p className="text-white">**********{data.key}</p>
+      <p className="text-white">{data.created_at}</p>
 
       <div className="flex gap-1 items-center">
         <IconButton

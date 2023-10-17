@@ -9,11 +9,13 @@ export async function loader(args: LoaderFunctionArgs) {
     await requireLogin(request);
     invariant(params.organizationId, "organizationId not found");
 
+    const secrets = await fetch(
+      SecretKeyListResponse,
+      `/organizations/${params.organizationId}/secrets`
+    );
     return json({
       organizationId: params.organizationId,
-      secrets: SecretKeyListResponse.parse({
-        data: [{ id: 0, name: "Test", key: "123" }],
-      }),
+      secrets: secrets.data,
     });
   })(args);
 }

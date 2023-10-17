@@ -28,7 +28,7 @@ export function NewSecret() {
           />
         </Field>
 
-        <Field name="key">
+        <Field name="value">
           <TextInputField
             type="text"
             label="Enter the Secret key"

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const SecretKey = z.object({
   id: z.number(),
   name: z.string(),
-  key: z.string(),
+  created_at: z.string(),
 });
 
 export const SecretKeyList = z.array(SecretKey);

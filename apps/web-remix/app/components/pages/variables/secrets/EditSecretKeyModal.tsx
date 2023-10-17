@@ -16,7 +16,7 @@ interface EditSecretModalProps {
 export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
   isOpen,
   onClose,
-  initialData: { key, ...initialData },
+  initialData,
 }) => {
   const validator = useMemo(() => withZod(schema), []);
 
@@ -44,7 +44,7 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
           <HiddenField name="id" />
           <HiddenField name="name" />
 
-          <Field name="key">
+          <Field name="value">
             <TextInputField
               autoFocus
               type="text"
