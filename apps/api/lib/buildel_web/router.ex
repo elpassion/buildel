@@ -49,7 +49,7 @@ defmodule BuildelWeb.Router do
       only: [:index, :delete, :create, :show, :update]
     )
 
-    resources("/organizations/:organization_id/memory_collections", CollectionController, only: [:index, :create, :show,], param: "name")
+    resources("/organizations/:organization_id/memory_collections", CollectionController, only: [:index, :create, :show], param: "name")
     
     post("/organizations/:organization_id/memories", MemoryController, :create)
     get("/organizations/:organization_id/memories", MemoryController, :index)
@@ -70,7 +70,7 @@ defmodule BuildelWeb.Router do
     post("/organizations/:id/keys", OrganizationController, :create_api_key)
     delete("/organizations/:id/keys/:key_id", OrganizationController, :delete_api_key)
 
-    resources("/organizations/:organization_id/secrets", SecretController, only: [:index, :create, :delete], param: "name")
+    resources("/organizations/:organization_id/secrets", SecretController, only: [:index, :create, :show, :update, :delete], param: "name")
 
     post("/channel_auth", ChannelAuthController, :create)
   end

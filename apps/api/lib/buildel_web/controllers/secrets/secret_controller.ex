@@ -52,4 +52,25 @@ defmodule BuildelWeb.SecretController do
       conn |> put_status(:ok) |> json(%{})
     end
   end
+
+
+  defparams :update do
+    required(:organization_id, :string)
+    required(:name, :string)
+    required(:value, :string)
+  end
+
+  def update(conn, %{"organization_id" => organization_id} = params) do
+    user = conn.assigns.current_user
+
+    with {:ok, params} <- validate(:update, params),
+      {:ok, organization} <-
+        Buildel.Organizations.get_user_organization(user, organization_id),
+      {:ok, secret} <-
+        Buildel.Organizations.update_organization_secret(organization, params) do
+      conn
+      |> put_status(:ok)
+      |> render(:show, secret: secret)
+    end
+  end
 end

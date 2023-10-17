@@ -150,21 +150,25 @@ defmodule Buildel.Organizations do
 
   def create_organization_secret(%Organization{} = organization, attrs \\ %{}) do
     case %Secret{}
-         |> Secret.changeset(attrs)
+         |> Secret.changeset(attrs |> Map.put(:organization_id, organization.id))
          |> Repo.insert() do
       {:ok, secret} -> {:ok, secret |> Repo.preload(:organization)}
       {:error, changeset} -> {:error, changeset}
     end
   end
 
+  def update_organization_secret(%Organization{} = organization, attrs \\ %{}) do
+    with %Secret{} = secret <- Repo.get_by(Secret, name: attrs.name, organization_id: organization.id),
+         secret = secret |> Secret.changeset(attrs) |> Repo.update() |> Repo.preload(:organization)
+    do
+      {:ok, secret}
+    end
+  end
+
   def delete_organization_secret(%Organization{} = organization, secret_name) do
-    case Repo.get_by(Secret, name: secret_name) do
+    case Repo.get_by(Secret, name: secret_name, organization_id: organization.id) do
       nil -> {:error, :not_found}
-      %Secret{} = secret ->
-        case secret.organization_id == organization.id do
-          true -> {:ok, secret |> Repo.delete()}
-          false -> {:error, :not_found}
-        end
+      %Secret{} = secret -> {:ok, secret |> Repo.delete()}
     end
   end
 end
