@@ -6,9 +6,13 @@ import { Button } from "@elpassion/taco";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { schema } from "./schema";
+import { useNavigation } from "@remix-run/react";
 
 export function NewSecret() {
+  const navigation = useNavigation();
   const validator = useMemo(() => withZod(schema), []);
+
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <ValidatedForm
@@ -37,7 +41,13 @@ export function NewSecret() {
           />
         </Field>
       </div>
-      <Button size="sm" hierarchy="primary" type="submit">
+      <Button
+        size="sm"
+        hierarchy="primary"
+        type="submit"
+        isLoading={isSubmitting}
+        disabled={isSubmitting}
+      >
         Save the Secret
       </Button>
     </ValidatedForm>
