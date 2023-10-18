@@ -1,8 +1,7 @@
-import * as React from "react";
+import React, { ReactNode, useCallback, useEffect } from "react";
 import { z } from "zod";
 import { Button } from "@elpassion/taco";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
-import { BlockConfig } from "../contracts";
 import { FieldProps, Schema } from "~/components/form/schema/Schema";
 import {
   ArrayField,
@@ -12,15 +11,15 @@ import {
 } from "~/components/form/schema/SchemaFields";
 import { ValidatedForm, useFormContext } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
+import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
+import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
+import { CreatableAsyncSelectField } from "~/components/form/fields/creatableAsyncSelect.field";
+import { assert } from "~/utils/assert";
 import {
   Field as FormField,
   HiddenField,
 } from "~/components/form/fields/field.context";
-import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
-import { ReactNode, useCallback, useEffect } from "react";
-import { assert } from "~/utils/assert";
-import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
-import { CreatableSelectField } from "~/components/form/fields/creatableSelect.field";
+import { BlockConfig } from "../contracts";
 
 export function EditBlockForm({
   onSubmit,
@@ -104,7 +103,7 @@ export function EditBlockForm({
 
       return (
         <FormField name={props.name!}>
-          <CreatableSelectField
+          <CreatableAsyncSelectField
             url={props.field.url.replace(
               ":organization_id",
               organizationId.toString()

@@ -77,7 +77,7 @@ export const AsyncSelectField = forwardRef<
     </>
   );
 });
-function toSelectOption(item: IAsyncSelectItem) {
+export function toSelectOption(item: IAsyncSelectItem) {
   return {
     id: item.id.toString(),
     value: item.id.toString(),

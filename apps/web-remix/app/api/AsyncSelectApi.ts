@@ -7,6 +7,12 @@ export const AsyncSelectItem = z.object({
 
 export const AsyncSelectItemList = z.array(AsyncSelectItem);
 
+export const AsyncSelectItemResponse = z
+  .object({
+    data: AsyncSelectItem,
+  })
+  .transform((res) => res.data);
+
 export const AsyncSelectItemListResponse = z
   .object({
     data: AsyncSelectItemList,
@@ -33,7 +39,7 @@ export class AsyncSelectApi {
       },
     })
       .then((res) => res.json())
-      .then((data) => AsyncSelectItemListResponse.parse(data));
+      .then((data) => AsyncSelectItemResponse.parse(data));
   }
 }
 
