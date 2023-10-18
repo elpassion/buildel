@@ -36,7 +36,7 @@ export function ApiKeysPage() {
       >
         <ActionSidebarHeader
           heading="New API Key"
-          subheading="Enter your API Keys to use them in multiple workflows."
+          subheading="Generate API Keys to authorize communication with our API."
           onClose={handleCloseSidebar}
         />
         <Outlet />

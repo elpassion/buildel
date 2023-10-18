@@ -6,6 +6,7 @@ import { Button } from "@elpassion/taco";
 import { ValidatedForm } from "remix-validated-form";
 import { schema } from "./schema";
 import { action } from "./action";
+import { isTypeOf } from "~/utils/guards";
 
 export function NewSecret() {
   const validator = useMemo(() => withZod(schema), []);
@@ -21,7 +22,7 @@ export function NewSecret() {
         {isTypeOf("key", data) ? <p>Your new key: {data.key.key}</p> : null}
       </div>
       <Button size="sm" hierarchy="primary" type="submit" isFluid>
-        Create Api Key
+        Generate Api Key
       </Button>
     </ValidatedForm>
   );
@@ -34,7 +35,3 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
-
-function isTypeOf<T>(property: keyof T, value: any): value is T {
-  return value !== undefined && (value as T)[property] !== undefined;
-}
