@@ -44,6 +44,9 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
           method="put"
           validator={validator}
           defaultValues={initialData}
+          onSubmit={() => {
+            onClose();
+          }}
         >
           <Field name="name">
             <TextInputField type="hidden" />
