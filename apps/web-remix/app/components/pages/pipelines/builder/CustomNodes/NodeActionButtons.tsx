@@ -1,29 +1,14 @@
-import React, { HTMLProps, useCallback, useEffect, useState } from "react";
+import React, { HTMLProps } from "react";
 import classNames from "classnames";
-import { useCopyToClipboard } from "usehooks-ts";
 import { Icon } from "@elpassion/taco";
+import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
 import { useDownloadFile } from "~/hooks/useDownloadFile";
 
 export function NodeCopyButton({ text }: { text: string }) {
-  const [_value, copy] = useCopyToClipboard();
-  const [isCopied, setIsCopied] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-
-  const handleCopy = useCallback(async () => {
-    await copy(text);
-    setIsCopied(true);
-    setTimeoutId(setTimeout(() => setIsCopied(false), 2000));
-  }, [text, copy]);
-
-  useEffect(() => {
-    if (!timeoutId) return;
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [timeoutId]);
+  const { copy, isCopied } = useCopyToClipboard(text);
 
   return (
-    <NodeActionButton className="w-[52px]" onClick={handleCopy}>
+    <NodeActionButton className="w-[52px]" onClick={copy}>
       {isCopied ? null : <Icon iconName="copy" />}
       <span className={classNames({ "text-green-600": isCopied })}>
         {isCopied ? "Copied!" : "Copy"}
