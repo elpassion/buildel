@@ -32,7 +32,7 @@ defmodule Buildel.Blocks.Chat do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["model", "temperature", "messages", "api_key"],
+            "required" => ["model", "temperature", "system_message", "messages", "api_key"],
             "properties" => %{
               "api_key" => %{
                 "type" => "string",
@@ -78,6 +78,13 @@ defmodule Buildel.Blocks.Chat do
                 "maximum" => 1.0,
                 "step" => 0.1
               },
+              "system_message" => %{
+                "type" => "string",
+                "title" => "System message",
+                "description" => "The message to start the conversation with.",
+                "default" => "Hello, how are you?",
+                "presentAs" => "editor"
+              },
               "messages" => %{
                 "type" => "array",
                 "title" => "Messages",
@@ -90,9 +97,9 @@ defmodule Buildel.Blocks.Chat do
                     "role" => %{
                       "type" => "string",
                       "title" => "Role",
-                      "enum" => ["system", "user", "assistant"],
+                      "enum" => ["user", "assistant"],
                       "enumPresentAs" => "radio",
-                      "default" => "system"
+                      "default" => "user"
                     },
                     "content" => %{
                       "type" => "string",
