@@ -32,7 +32,13 @@ export const ApiKeyList: React.FC<ApiKeyListProps> = ({ items }) => {
       className="grid grid-cols-1 gap-2"
       items={items}
       emptyText={<EmptyMessage>There is no API Keys yet...</EmptyMessage>}
-      renderItem={(item) => <ApiKeyItem data={item} onDelete={handleDelete} />}
+      renderItem={(item) => (
+        <ApiKeyItem
+          data={item}
+          onDelete={handleDelete}
+          isLoading={fetcher.state !== "idle"}
+        />
+      )}
     />
   );
 };
@@ -40,11 +46,13 @@ export const ApiKeyList: React.FC<ApiKeyListProps> = ({ items }) => {
 interface SecretKeyItemProps {
   data: IApiKey;
   onDelete: (apiKey: IApiKey) => void;
+  isLoading?: boolean;
 }
 
 export const ApiKeyItem: React.FC<SecretKeyItemProps> = ({
   data,
   onDelete,
+  isLoading,
 }) => {
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -70,6 +78,7 @@ export const ApiKeyItem: React.FC<SecretKeyItemProps> = ({
         title={`Remove API Key: ${data.id}`}
         icon={<Icon iconName="trash" />}
         onClick={handleDelete}
+        disabled={isLoading}
       />
     </article>
   );

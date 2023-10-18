@@ -9,7 +9,6 @@ import { isTypeOf } from "~/utils/guards";
 import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
 import classNames from "classnames";
 import { MetaFunction } from "@remix-run/node";
-import { TextInput } from "~/components/form/inputs/text.input";
 
 export function NewSecret() {
   const navigation = useNavigation();
@@ -20,6 +19,7 @@ export function NewSecret() {
   );
 
   const isSubmitting = navigation.state === "submitting";
+
   return (
     <ValidatedForm
       method="post"

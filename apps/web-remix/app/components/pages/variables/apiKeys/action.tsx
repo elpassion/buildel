@@ -3,6 +3,7 @@ import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { z } from "zod";
+import { setServerToast } from "~/utils/toast.server";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -17,7 +18,19 @@ export async function action(actionArgs: ActionFunctionArgs) {
         { method: "DELETE" }
       );
 
-      return json({});
+      return json(
+        {},
+        {
+          headers: {
+            "Set-Cookie": await setServerToast(request, {
+              success: {
+                title: "API Key deleted",
+                description: `You've successfully deleted API Key`,
+              },
+            }),
+          },
+        }
+      );
     },
   })(actionArgs);
 }
