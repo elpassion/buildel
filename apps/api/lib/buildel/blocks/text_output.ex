@@ -32,12 +32,13 @@ defmodule Buildel.Blocks.TextOutput do
             "required" => ["stream_timeout"],
             "properties" => %{
               "stream_timeout" => %{
-                "type" => "integer",
+                "type" => "number",
                 "title" => "Stop after (ms)",
                 "description" =>
                   "Wait this many milliseconds after receiving the last chunk before stopping the stream.",
                 "minimum" => 500,
-                "default" => 500
+                "default" => 500,
+                "step" => 1
               }
             }
           })

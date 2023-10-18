@@ -37,6 +37,10 @@ export function generateZODSchema(
     if (isOptional) {
       nestedSchema = nestedSchema.optional();
     }
+    if ("default" in schema && schema.default !== undefined) {
+      // @ts-ignore
+      nestedSchema = nestedSchema.default(schema.default);
+    }
     return nestedSchema;
   }
 
@@ -54,6 +58,10 @@ export function generateZODSchema(
     }
     if (isOptional) {
       nestedSchema = nestedSchema.optional();
+    }
+    if ("default" in schema && schema.default !== undefined) {
+      // @ts-ignore
+      nestedSchema = nestedSchema.default(schema.default);
     }
     return zfd.numeric(nestedSchema);
   }
@@ -83,6 +91,19 @@ export function generateZODSchema(
     }, {});
     let nestedSchema: z.ZodSchema | z.ZodOptional<z.ZodSchema> =
       z.object(propertySchemas);
+    return nestedSchema;
+  }
+
+  if (schema.type === "boolean") {
+    let nestedSchema: z.ZodBoolean | z.ZodOptional<z.ZodBoolean> = z.boolean();
+
+    if (isOptional) {
+      nestedSchema = nestedSchema.optional();
+    }
+    if ("default" in schema && schema.default !== undefined) {
+      // @ts-ignore
+      nestedSchema = nestedSchema.default(schema.default);
+    }
     return nestedSchema;
   }
 
