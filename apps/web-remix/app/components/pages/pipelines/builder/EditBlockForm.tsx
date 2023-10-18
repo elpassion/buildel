@@ -76,14 +76,14 @@ export function EditBlockForm({
         <FormField name={props.name!}>
           <AsyncSelectField
             url={props.field.url.replace(
-              ":organization_id",
+              "{{organization_id}}",
               organizationId.toString()
             )}
             label={props.field.title}
             supportingText={props.field.description}
             defaultValue={props.field.default
-              ?.replace(":pipeline_id", pipelineId.toString())
-              ?.replace(":block_name", blockConfig.name)}
+              ?.replace("{{pipeline_id}}", pipelineId.toString())
+              ?.replace("{{block_name}}", blockConfig.name)}
           />
         </FormField>
       );
@@ -105,7 +105,7 @@ export function EditBlockForm({
         <FormField name={props.name!}>
           <CreatableAsyncSelectField
             url={props.field.url.replace(
-              ":organization_id",
+              "{{organization_id}}",
               organizationId.toString()
             )}
             schema={props.field.schema}

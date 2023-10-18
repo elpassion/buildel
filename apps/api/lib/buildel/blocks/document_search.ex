@@ -32,21 +32,14 @@ defmodule Buildel.Blocks.DocumentSearch do
           options_schema(%{
             "required" => ["api_key", "persist_in", "forwarded_results_count", "hybrid_reranking"],
             "properties" => %{
-              # "api_key" => %{
-              #   "type" => "string",
-              #   "title" => "API Key",
-              #   "description" => "Select from your API keys or enter a new one.",
-              #   "minLength" => 1,
-              #   "presentAs" => "password"
-              # },
               "persist_in" => %{
                 "type" => "string",
                 "title" => "Persist in",
-                "url" => "/api/organizations/:organization_id/memory_collections",
+                "url" => "/api/organizations/{{organization_id}}/memory_collections",
                 "presentAs" => "async-select",
                 "description" =>
                   "Where to hold data from inputs.",
-                "default" => ":pipeline_id_:block_name"
+                "default" => "{{pipeline_id}}_{{block_name}}"
               },
               "forwarded_results_count" => %{
                 "type" => "number",

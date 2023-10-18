@@ -37,7 +37,7 @@ defmodule Buildel.Blocks.Chat do
               "api_key" => %{
                 "type" => "string",
                 "title" => "API key",
-                "url" => "/api/organizations/:organization_id/secrets",
+                "url" => "/api/organizations/{{organization_id}}/secrets",
                 "presentAs" => "async-creatable-select",
                 "schema" => %{
                   "type" => "object",
