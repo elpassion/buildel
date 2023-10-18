@@ -6,6 +6,10 @@ import { withZod } from "@remix-validated-form/with-zod";
 import { updateSchema } from "~/components/pages/pipelines/pipelineLayout/schema";
 import { validationError } from "remix-validated-form";
 import { PipelineResponse } from "~/components/pages/pipelines/contracts";
+import {
+  JSONSchemaField,
+  generateZODSchema,
+} from "~/components/form/schema/SchemaParser";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -19,6 +23,27 @@ export async function action(actionArgs: ActionFunctionArgs) {
       const result = await validator.validate(await actionArgs.request.json());
 
       if (result.error) return validationError(result.error);
+
+      const validatedBlocks = (await Promise.all(
+        result.data.config.blocks.map(async (block) => {
+          const schema = generateZODSchema(
+            block.block_type!.schema as JSONSchemaField
+          );
+          const validator = withZod(schema);
+          const validatedBlock = await validator.validate(block);
+          if (validatedBlock) {
+            return validatedBlock.data;
+          }
+          return block;
+        })
+      )) as any[];
+
+      result.data.config.blocks = result.data.config.blocks.map((block, i) => {
+        return {
+          ...block,
+          ...validatedBlocks[i],
+        };
+      });
 
       const res = await fetch(
         PipelineResponse,

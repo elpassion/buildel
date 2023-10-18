@@ -12,7 +12,13 @@ export function generateZODSchema(
     }
 
     let nestedSchema: z.ZodString | z.ZodOptional<z.ZodString> = z.string();
-
+    if (isOptional) {
+      nestedSchema = nestedSchema.optional();
+    }
+    if ("default" in schema && schema.default !== undefined) {
+      // @ts-ignore
+      nestedSchema = nestedSchema.default(schema.default);
+    }
     if ("presentAs" in schema && schema.presentAs === "editor") {
       return nestedSchema;
     }
@@ -34,13 +40,7 @@ export function generateZODSchema(
     if (schema.maxLength !== undefined) {
       nestedSchema = nestedSchema.max(schema.maxLength);
     }
-    if (isOptional) {
-      nestedSchema = nestedSchema.optional();
-    }
-    if ("default" in schema && schema.default !== undefined) {
-      // @ts-ignore
-      nestedSchema = nestedSchema.default(schema.default);
-    }
+
     return nestedSchema;
   }
 
