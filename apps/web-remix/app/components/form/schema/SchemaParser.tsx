@@ -3,7 +3,8 @@ import { zfd } from "zod-form-data";
 
 export function generateZODSchema(
   schema: JSONSchemaField,
-  isOptional = false
+  isOptional = false,
+  context: Record<string, string> = {}
 ): z.ZodSchema<unknown> {
   if (schema.type === "string") {
     if ("enum" in schema) {
@@ -16,8 +17,12 @@ export function generateZODSchema(
       nestedSchema = nestedSchema.optional();
     }
     if ("default" in schema && schema.default !== undefined) {
+      let defaultValue = schema.default;
+      Object.entries(context).forEach(([key, value]) => {
+        defaultValue = defaultValue.replace(`{{${key}}}`, value);
+      });
       // @ts-ignore
-      nestedSchema = nestedSchema.default(schema.default);
+      nestedSchema = nestedSchema.default(defaultValue);
     }
     if ("presentAs" in schema && schema.presentAs === "editor") {
       return nestedSchema;
@@ -70,7 +75,7 @@ export function generateZODSchema(
     let nestedSchema:
       | z.ZodArray<z.ZodTypeAny>
       | z.ZodOptional<z.ZodArray<z.ZodTypeAny>> = z.array(
-      generateZODSchema(schema.items) as z.ZodTypeAny
+      generateZODSchema(schema.items, false, context) as z.ZodTypeAny
     );
 
     if (isOptional) {
@@ -86,7 +91,11 @@ export function generateZODSchema(
     ).reduce((acc, [key, value]) => {
       return {
         ...acc,
-        [key]: generateZODSchema(value, !(schema.required || []).includes(key)),
+        [key]: generateZODSchema(
+          value,
+          !(schema.required || []).includes(key),
+          context
+        ),
       };
     }, {});
     let nestedSchema: z.ZodSchema | z.ZodOptional<z.ZodSchema> =

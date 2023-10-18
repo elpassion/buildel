@@ -27,7 +27,13 @@ export async function action(actionArgs: ActionFunctionArgs) {
       const validatedBlocks = (await Promise.all(
         result.data.config.blocks.map(async (block) => {
           const schema = generateZODSchema(
-            block.block_type!.schema as JSONSchemaField
+            block.block_type!.schema as JSONSchemaField,
+            false,
+            {
+              organization_id: params.organizationId!,
+              pipeline_id: params.pipelineId!,
+              block_name: block.name,
+            }
           );
           const validator = withZod(schema);
           const validatedBlock = await validator.validate(block);

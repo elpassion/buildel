@@ -50,7 +50,7 @@ export const AsyncSelectField = forwardRef<
     if (!selectedId && defaultValue) {
       setSelectedId(defaultValue);
     }
-  }, [selectedId, setSelectedId]);
+  }, [selectedId, setSelectedId, defaultValue]);
 
   const getSelectedOption = () => {
     return options.find((option) => option.id === selectedId);
