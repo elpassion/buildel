@@ -4,7 +4,10 @@ import { Modal } from "@elpassion/taco/Modal";
 import { withZod } from "@remix-validated-form/with-zod";
 import { Button } from "@elpassion/taco";
 import { Field } from "~/components/form/fields/field.context";
-import { TextInputField } from "~/components/form/fields/text.field";
+import {
+  PasswordInputField,
+  TextInputField,
+} from "~/components/form/fields/text.field";
 import { ISecretKey } from "../variables.types";
 import { schema } from "./schema";
 interface EditSecretModalProps {
@@ -35,7 +38,7 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
         </header>
       }
     >
-      <div className="p-1 min-w-[350px] max-w-[450px]">
+      <div className="p-1 w-[330px] md:w-[450px] ">
         <ValidatedForm
           noValidate
           method="put"
@@ -47,9 +50,8 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
           </Field>
 
           <Field name="value">
-            <TextInputField
+            <PasswordInputField
               autoFocus
-              type="text"
               label="Enter Secret"
               placeholder="Type or paste in your secret key"
               supportingText="The actual token key that will authorise you in the external system, such as Open AI."

@@ -6,6 +6,7 @@ import { IconButton } from "~/components/iconButton";
 import { EditSecretKeyModal } from "./EditSecretKeyModal";
 import { ISecretKeyList, ISecretKey } from "../variables.types";
 import { useFetcher } from "@remix-run/react";
+import dayjs from "dayjs";
 
 interface SecretKeyListProps {
   items: ISecretKeyList;
@@ -93,7 +94,9 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
         </h3>
       </header>
 
-      <p className="text-white">{data.updated_at}</p>
+      <p className="text-white">
+        {dayjs(data.updated_at).format("DD/MM/YYYY HH:mm")}
+      </p>
 
       <div className="flex gap-1 items-center">
         <IconButton

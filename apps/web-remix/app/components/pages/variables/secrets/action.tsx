@@ -7,6 +7,7 @@ import { validationError } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { schema } from "~/components/pages/variables/newSecret/schema";
 import { routes } from "~/utils/routes.utils";
+import { setServerToast } from "~/utils/toast.server";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -21,7 +22,19 @@ export async function action(actionArgs: ActionFunctionArgs) {
         { method: "DELETE" }
       );
 
-      return json({});
+      return json(
+        {},
+        {
+          headers: {
+            "Set-Cookie": await setServerToast(request, {
+              success: {
+                title: "Secret deleted",
+                description: `You've successfully deleted the secret`,
+              },
+            }),
+          },
+        }
+      );
     },
     put: async ({ params, request }, { fetch }) => {
       await requireLogin(request);
@@ -39,7 +52,16 @@ export async function action(actionArgs: ActionFunctionArgs) {
         { method: "PUT", body: JSON.stringify({ value: result.data.value }) }
       );
 
-      return redirect(routes.secrets(params.organizationId));
+      return redirect(routes.secrets(params.organizationId), {
+        headers: {
+          "Set-Cookie": await setServerToast(request, {
+            success: {
+              title: "Secret updated",
+              description: `You've successfully updated secret`,
+            },
+          }),
+        },
+      });
     },
   })(actionArgs);
 }

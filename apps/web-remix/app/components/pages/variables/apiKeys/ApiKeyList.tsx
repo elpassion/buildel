@@ -5,6 +5,7 @@ import { confirm } from "~/components/modal/confirm";
 import { IconButton } from "~/components/iconButton";
 import { IApiKeyList, IApiKey } from "../variables.types";
 import { useFetcher } from "@remix-run/react";
+import dayjs from "dayjs";
 
 interface ApiKeyListProps {
   items: IApiKeyList;
@@ -55,7 +56,7 @@ export const ApiKeyItem: React.FC<SecretKeyItemProps> = ({
     <article className="group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 grid grid-cols-1 gap-1 max-w-full items-center md:gap-2 md:grid-cols-[1fr_300px_40px] ">
       <header className="max-w-full truncate">
         <h3 className="text-lg font-medium text-white truncate max-w-full">
-          {data.created_at}
+          {dayjs(data.created_at).format("DD/MM/YYYY HH:mm")}
         </h3>
       </header>
 
