@@ -4,7 +4,10 @@ import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { Button } from "@elpassion/taco";
 import { Field } from "~/components/form/fields/field.context";
-import { TextInputField } from "~/components/form/fields/text.field";
+import {
+  PasswordInputField,
+  TextInputField,
+} from "~/components/form/fields/text.field";
 import { schema } from "./schema";
 import { useNavigation } from "@remix-run/react";
 
@@ -33,8 +36,7 @@ export function NewSecret() {
         </Field>
 
         <Field name="value">
-          <TextInputField
-            type="text"
+          <PasswordInputField
             label="Enter the Secret key"
             placeholder="Type or paste in your token key"
             supportingText="The actual token key that will authorise you in the external system, such as Open AI."
