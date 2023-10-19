@@ -57,7 +57,7 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
         disabled={isDisabled}
         onClick={handleReset}
         className={classNames("text-xs", {
-          "text-neutral-200 hover:text-white": !isDisabled,
+          "text-neutral-200 hover:text-primary-500": !isDisabled,
           "text-neutral-400": isDisabled,
         })}
       >
