@@ -54,16 +54,18 @@ export function NewSecret() {
           <p className="text-neutral-200 italic">Generate new API Key...</p>
         )}
       </div>
-      <Button
-        isFluid
-        size="sm"
-        type="submit"
-        hierarchy="primary"
-        disabled={isSubmitting}
-        isLoading={isSubmitting}
-      >
-        Generate API Key
-      </Button>
+      {isTypeOf("key", data) ? null : (
+        <Button
+          isFluid
+          size="sm"
+          type="submit"
+          hierarchy="primary"
+          disabled={isSubmitting}
+          isLoading={isSubmitting}
+        >
+          Generate API Key
+        </Button>
+      )}
     </ValidatedForm>
   );
 }
