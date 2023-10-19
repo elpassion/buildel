@@ -8,13 +8,17 @@ import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import { useRunPipeline } from "~/components/pages/pipelines/builder/RunPipelineProvider";
 
-interface AudioFieldProps {
+interface AudioFieldTabsProps {
   onChunk: (chunk: Blob, name: string) => void;
   onUpload: (file: File, name: string) => Promise<IFile>;
   name: string;
 }
 
-export function AudioField({ onChunk, onUpload, name }: AudioFieldProps) {
+export function AudioFieldTabs({
+  onChunk,
+  onUpload,
+  name,
+}: AudioFieldTabsProps) {
   const { status } = useRunPipeline();
   const [activeTab, setActiveTab] = useState("microphone");
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

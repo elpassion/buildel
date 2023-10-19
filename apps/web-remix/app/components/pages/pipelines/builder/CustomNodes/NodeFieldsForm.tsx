@@ -14,9 +14,9 @@ import {
   KnowledgeBaseFileResponse,
 } from "~/components/pages/knowledgeBase/contracts";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
+import { AudioFieldTabs } from "./AudioFieldTabs";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
-import { AudioField } from "~/components/pages/pipelines/builder/CustomNodes/AudioField";
 
 interface NodeFieldsFormProps {
   fields: IField[];
@@ -156,6 +156,15 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsFormProps) {
           />
         );
       } else if (type === "file") {
+        // return (
+        //   <DocumentSearchTabs
+        //     name={name}
+        //     onUpload={uploadFile}
+        //     onFetch={fetchFiles}
+        //     onRemove={removeFile}
+        //   />
+        // );
+
         return (
           <FileUpload
             multiple
@@ -171,7 +180,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsFormProps) {
         );
       } else if (field.data.type === "audio") {
         return (
-          <AudioField
+          <AudioFieldTabs
             name={field.data.name}
             onUpload={convertToBlobAndUpload}
             onChunk={uploadAudioChunk}
