@@ -2,10 +2,11 @@ export const routes = {
   dashboard: "/",
   login: "/login",
   register: "/register",
-  settings: "/settings",
   organizations: "/organizations",
   organization: (organizationId: OrganizationId) => `/${organizationId}`,
   newOrganization: () => `${routes.organizations}/new`,
+  settings: (organizationId: OrganizationId) =>
+    `${routes.organization(organizationId)}/settings`,
   pipelines: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/pipelines`,
   pipeline: (organizationId: OrganizationId, pipelineId: PipelineId) =>

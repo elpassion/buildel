@@ -180,7 +180,7 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
       </div>
 
       <SidebarLink
-        to={routes.settings}
+        to={routes.settings(organization.id)}
         icon={
           <Icon iconName="settings" className="w-5 h-5 text-center leading-5" />
         }
