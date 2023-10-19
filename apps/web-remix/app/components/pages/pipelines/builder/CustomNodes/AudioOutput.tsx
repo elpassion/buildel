@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import { Icon } from "@elpassion/taco";
 import { useAudioVisualize } from "~/components/audioRecorder/useAudioVisualize";
+import { errorToast } from "~/components/toasts/errorToast";
 interface AudioOutputProps {
   audio?: Blob | string;
 }
@@ -15,14 +16,17 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
 
   const handlePlay = async () => {
     if (!audioRef.current) return;
-
-    if (audioRef.current.paused) {
-      await audioRef.current.play();
-      await visualizeAudio(audioRef.current);
-      setIsPlaying(true);
-    } else {
-      audioRef.current.pause();
-      setIsPlaying(false);
+    try {
+      if (audioRef.current.paused) {
+        await audioRef.current.play();
+        await visualizeAudio(audioRef.current);
+        setIsPlaying(true);
+      } else {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    } catch {
+      errorToast({ description: "The element has no supported sources." });
     }
   };
 
