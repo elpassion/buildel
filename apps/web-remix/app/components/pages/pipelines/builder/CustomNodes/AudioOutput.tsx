@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import classNames from "classnames";
 import { Icon } from "@elpassion/taco";
 import { useAudioVisualize } from "~/components/audioRecorder/useAudioVisualize";
@@ -22,9 +22,12 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
       setIsPlaying(true);
     } else {
       audioRef.current.pause();
-      stopVisualization();
       setIsPlaying(false);
     }
+  };
+
+  const handleEnd = () => {
+    setIsPlaying(false);
   };
 
   const handleReset = async () => {
@@ -49,6 +52,13 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
     return URL.createObjectURL(audio);
   }, [audio]);
 
+  useEffect(() => {
+    if (!audioUrl) return;
+    return () => {
+      URL.revokeObjectURL(audioUrl);
+    };
+  }, [audioUrl]);
+
   const isDisabled = !audioUrl;
 
   return (
@@ -65,7 +75,13 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
       </button>
 
       <div className="bg-neutral-850 rounded-lg flex gap-2 items-center px-2 py-1">
-        <audio key={audioUrl} src={audioUrl} ref={audioRef} controls hidden />
+        <audio
+          src={audioUrl}
+          ref={audioRef}
+          onEnded={handleEnd}
+          controls
+          hidden
+        />
         <button
           type="button"
           className={classNames(

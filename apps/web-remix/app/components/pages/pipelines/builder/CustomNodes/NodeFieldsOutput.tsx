@@ -30,7 +30,9 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
           </>
         );
       } else if (type === "audio") {
-        return <AudioOutput />;
+        const audio = getAudioOutput(events, field.data.name);
+
+        return <AudioOutput audio={audio} />;
       }
 
       return <span>Unsupported output type - {type}</span>;
@@ -60,8 +62,20 @@ function NodeTextOutput({ text }: NodeTextOutputProps) {
   );
 }
 
-const getTextFieldsMessages = (events: IEvent[], outputName: string) => {
-  const fieldEvents = events.filter((ev) => ev.output === outputName);
+function getFieldEvents(events: IEvent[], outputName: string) {
+  return events.filter((ev) => ev.output === outputName);
+}
 
-  return fieldEvents.map((ev) => ev.payload.message).join("");
-};
+function getTextFieldsMessages(events: IEvent[], outputName: string) {
+  return getFieldEvents(events, outputName)
+    .map((ev) => ev.payload.message)
+    .join("");
+}
+
+function getAudioOutput(events: IEvent[], outputName: string) {
+  const event = getFieldEvents(events, outputName).at(-1);
+
+  if (!event) return;
+
+  return new Blob([event.payload], { type: "audio/mp3" });
+}

@@ -13,10 +13,7 @@ import { SafeParseReturnType, ZodError } from "zod";
 export interface IEvent {
   block: string;
   output: string;
-  payload: {
-    //Fix it - other response types
-    message: any;
-  };
+  payload: any;
 }
 interface IRunPipelineContext {
   events: IEvent[];
