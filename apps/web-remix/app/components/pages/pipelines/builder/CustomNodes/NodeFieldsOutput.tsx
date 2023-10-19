@@ -73,9 +73,10 @@ function getTextFieldsMessages(events: IEvent[], outputName: string) {
 }
 
 function getAudioOutput(events: IEvent[], outputName: string) {
-  const event = getFieldEvents(events, outputName).at(-1);
+  const fieldEvents = getFieldEvents(events, outputName);
 
-  if (!event) return;
-
-  return new Blob([event.payload], { type: "audio/mp3" });
+  return new Blob(
+    fieldEvents.map((event) => event.payload),
+    { type: "audio/mp3" }
+  );
 }

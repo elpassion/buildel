@@ -80,6 +80,7 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
 
       <div className="bg-neutral-850 rounded-lg flex gap-2 items-center px-2 py-1">
         <audio
+          key={audioUrl}
           src={audioUrl}
           ref={audioRef}
           onEnded={handleEnd}
