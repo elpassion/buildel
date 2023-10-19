@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { IBlockConfig, IField } from "../../pipeline.types";
 import { IEvent, useRunPipelineNode } from "../RunPipelineProvider";
 import { NodeCopyButton, NodeDownloadButton } from "./NodeActionButtons";
+import { AudioOutput } from "~/components/pages/pipelines/builder/CustomNodes/AudioOutput";
 
 interface NodeFieldsOutputProps {
   fields: IField[];
@@ -29,11 +30,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
           </>
         );
       } else if (type === "audio") {
-        return (
-          <>
-            <p>Audio output</p>
-          </>
-        );
+        return <AudioOutput />;
       }
 
       return <span>Unsupported output type - {type}</span>;

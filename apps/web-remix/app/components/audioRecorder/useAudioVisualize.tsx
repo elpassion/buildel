@@ -165,6 +165,7 @@ export const useAudioVisualize = (
     visualizeAudio,
     stopVisualization: handleClearFrame,
     disconnectSources,
+    clearCanvas: handleClearCanvas,
   };
 };
 
