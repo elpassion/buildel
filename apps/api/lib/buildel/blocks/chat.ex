@@ -33,8 +33,8 @@ defmodule Buildel.Blocks.Chat do
         "opts" =>
           options_schema(%{
             "required" => ["model", "temperature", "system_message", "messages", "api_key"],
-            "properties" => %{
-              "api_key" => %{
+            "properties" => Jason.OrderedObject.new(
+              api_key: %{
                 "type" => "string",
                 "title" => "API key",
                 "url" => "/api/organizations/{{organization_id}}/secrets",
@@ -61,7 +61,7 @@ defmodule Buildel.Blocks.Chat do
                 "description" =>
                   "OpenAI API key to use for the chat."
               },
-              "model" => %{
+              model: %{
                 "type" => "string",
                 "title" => "Model",
                 "description" => "The model to use for the chat.",
@@ -69,7 +69,7 @@ defmodule Buildel.Blocks.Chat do
                 "enumPresentAs" => "radio",
                 "default" => "gpt-3.5-turbo"
               },
-              "temperature" => %{
+              temperature: %{
                 "type" => "number",
                 "title" => "Temperature",
                 "description" => "The temperature of the chat.",
@@ -78,14 +78,14 @@ defmodule Buildel.Blocks.Chat do
                 "maximum" => 1.0,
                 "step" => 0.1
               },
-              "system_message" => %{
+              system_message: %{
                 "type" => "string",
                 "title" => "System message",
                 "description" => "The message to start the conversation with.",
                 "default" => "Hello, how are you?",
                 "presentAs" => "editor"
               },
-              "messages" => %{
+              messages: %{
                 "type" => "array",
                 "title" => "Messages",
                 "description" => "The messages to start the conversation with.",
@@ -109,7 +109,7 @@ defmodule Buildel.Blocks.Chat do
                   }
                 }
               }
-            }
+            )
           })
       }
     }
