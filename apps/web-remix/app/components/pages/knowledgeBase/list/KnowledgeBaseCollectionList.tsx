@@ -37,7 +37,7 @@ export const KnowledgeBaseCollectionList: React.FC<
     <ItemList
       className="grid grid-cols-1 gap-2"
       items={items}
-      emptyText={<EmptyMessage>There is no collections yet...</EmptyMessage>}
+      emptyText={<EmptyMessage>There is no Collections yet...</EmptyMessage>}
       renderItem={(item) => (
         <Link to={routes.collectionFiles(organizationId, item.name)}>
           <KnowledgeBaseCollectionListItem
