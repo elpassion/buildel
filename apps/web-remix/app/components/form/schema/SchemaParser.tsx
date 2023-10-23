@@ -104,15 +104,17 @@ export function generateZODSchema(
   }
 
   if (schema.type === "boolean") {
-    let nestedSchema: z.ZodBoolean | z.ZodOptional<z.ZodBoolean> = z.boolean();
+    let nestedSchema = z.union([z.boolean(), z.string()]);
 
     if (isOptional) {
+      // @ts-ignore
       nestedSchema = nestedSchema.optional();
     }
     if ("default" in schema && schema.default !== undefined) {
       // @ts-ignore
       nestedSchema = nestedSchema.default(schema.default);
     }
+
     return nestedSchema;
   }
 
