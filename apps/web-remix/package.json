@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@buildel/buildel": "^0.1.0",
+    "@conform-to/react": "^0.9.0",
+    "@conform-to/zod": "^0.9.0",
     "@elpassion/taco": "^0.6.0",
     "@isaacs/express-prometheus-middleware": "^1.2.1",
     "@monaco-editor/react": "^4.5.2",

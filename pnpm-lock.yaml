@@ -28,6 +28,12 @@ importers:
       '@buildel/buildel':
         specifier: ^0.1.0
         version: link:../../packages/buildel
+      '@conform-to/react':
+        specifier: ^0.9.0
+        version: 0.9.0(react@18.2.0)
+      '@conform-to/zod':
+        specifier: ^0.9.0
+        version: 0.9.0(@conform-to/dom@0.9.0)(zod@3.21.4)
       '@elpassion/taco':
         specifier: ^0.6.0
         version: 0.6.0(@tanstack/react-table@8.9.3)(@types/react-dom@18.0.11)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0)
@@ -732,6 +738,29 @@ packages:
       '@babel/helper-string-parser': 7.22.5
       '@babel/helper-validator-identifier': 7.22.15
       to-fast-properties: 2.0.0
+
+  /@conform-to/dom@0.9.0:
+    resolution: {integrity: sha512-kaYP7jKeWWnBY+M0+Rttj5atWm9Tt9Uyts49lU4hoz9p/X8v5GuGas6YOilovyE5/vJUsnuYzN97upxIvlYg4g==}
+    dev: false
+
+  /@conform-to/react@0.9.0(react@18.2.0):
+    resolution: {integrity: sha512-ZxfzK+L4b3Z9SPGCyo8GqLjfSFDp4upiwpjJHxDLPwMDVsF8EvkifSHyzUkjaiIny407qN9zbdtoItQCTaaZeg==}
+    peerDependencies:
+      react: '>=16.8'
+    dependencies:
+      '@conform-to/dom': 0.9.0
+      react: 18.2.0
+    dev: false
+
+  /@conform-to/zod@0.9.0(@conform-to/dom@0.9.0)(zod@3.21.4):
+    resolution: {integrity: sha512-Eq19/U6inDlCB1GNrvfTJBxyRVFesHVgkB5piWqLmhRYFHL8ooQGvmhVaOqeqqm+e+zNCjsIe3jip5ZW7uiBIw==}
+    peerDependencies:
+      '@conform-to/dom': 0.9.0
+      zod: ^3.21.0
+    dependencies:
+      '@conform-to/dom': 0.9.0
+      zod: 3.21.4
+    dev: false
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
