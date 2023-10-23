@@ -4,7 +4,7 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build --sourcemap && sentry-upload-sourcemaps --org buildel --project buildel-web",
+    "build": "remix build",
     "dev": "remix dev -c 'node ./server.mjs'",
     "start": "node ./server.mjs",
     "typecheck": "tsc"
