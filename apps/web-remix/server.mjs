@@ -3,7 +3,7 @@ import path from "node:path";
 import url from "node:url";
 
 import prom from "@isaacs/express-prometheus-middleware";
-import { createRequestHandler } from "@remix-run/express";
+import { createRequestHandler as createExpressRequestHandler } from "@remix-run/express";
 import { broadcastDevReady, installGlobals } from "@remix-run/node";
 import chokidar from "chokidar";
 import compression from "compression";
@@ -11,6 +11,12 @@ import express from "express";
 import morgan from "morgan";
 import sourceMapSupport from "source-map-support";
 import { createProxyMiddleware } from "http-proxy-middleware";
+import { wrapExpressCreateRequestHandler } from "@sentry/remix";
+
+
+const createRequestHandler =
+  wrapExpressCreateRequestHandler(createExpressRequestHandler);
+
 
 sourceMapSupport.install();
 installGlobals();

@@ -1,3 +1,4 @@
+import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import {
@@ -37,7 +38,7 @@ export const links: LinksFunction = () => [
   },
 ];
 
-export default function App() {
+function App() {
   return (
     <html lang="en">
       <head>
@@ -57,6 +58,8 @@ export default function App() {
   );
 }
 
+export default withSentry(App);
+
 export function ErrorBoundary() {
   const error = useRouteError();
 
@@ -67,6 +70,8 @@ export function ErrorBoundary() {
 
     return <GlobalRuntime error={error} />;
   };
+
+  captureRemixErrorBoundaryError(error);
 
   return (
     <html>
