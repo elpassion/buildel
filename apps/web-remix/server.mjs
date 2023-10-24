@@ -3,7 +3,7 @@ import path from "node:path";
 import url from "node:url";
 
 import prom from "@isaacs/express-prometheus-middleware";
-import { createRequestHandler as createExpressRequestHandler } from "@remix-run/express";
+import { createRequestHandler } from "@remix-run/express";
 import { broadcastDevReady, installGlobals } from "@remix-run/node";
 import chokidar from "chokidar";
 import compression from "compression";
@@ -14,8 +14,8 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 import { wrapExpressCreateRequestHandler } from "@sentry/remix";
 
 
-const createRequestHandler =
-  wrapExpressCreateRequestHandler(createExpressRequestHandler);
+const createRequestHandlerWithSentry =
+  wrapExpressCreateRequestHandler(createRequestHandler);
 
 
 sourceMapSupport.install();
@@ -113,7 +113,7 @@ async function run() {
     "*",
     process.env.NODE_ENV === "development"
       ? createDevRequestHandler(initialBuild)
-      : createRequestHandler({
+      : createRequestHandlerWithSentry({
           build: initialBuild,
           mode: process.env.NODE_ENV,
         })
