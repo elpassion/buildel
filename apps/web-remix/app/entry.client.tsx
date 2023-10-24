@@ -10,15 +10,34 @@ import { startTransition, StrictMode, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
 
 Sentry.init({
-    dsn: "https://32fbd6c6ce1546a0d38e05cad1b2b702@o4506099301351424.ingest.sentry.io/4506099301482496",
-    tracesSampleRate: 1,
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1,
+  dsn: "https://32fbd6c6ce1546a0d38e05cad1b2b702@o4506099301351424.ingest.sentry.io/4506099301482496",
+  tracesSampleRate: 1,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  ignoreErrors: [
+    "Event `Event` (type=error) captured as promise rejection",
+    "Validate called before form was initialized.",
+    "Object captured as promise rejection with keys: msg, type",
+  ],
+  beforeSend(event, hint) {
+    if (event.level === "warning") {
+      return null;
+    }
 
-    integrations: [new Sentry.BrowserTracing({
-        routingInstrumentation: Sentry.remixRouterInstrumentation(useEffect, useLocation, useMatches)
-    }), new Sentry.Replay()]
-})
+    return event;
+  },
+
+  integrations: [
+    new Sentry.BrowserTracing({
+      routingInstrumentation: Sentry.remixRouterInstrumentation(
+        useEffect,
+        useLocation,
+        useMatches
+      ),
+    }),
+    new Sentry.Replay(),
+  ],
+});
 
 startTransition(() => {
   hydrateRoot(
