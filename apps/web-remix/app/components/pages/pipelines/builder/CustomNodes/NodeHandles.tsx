@@ -24,7 +24,7 @@ export function InputHandle({
   return (
     <>
       <span
-        className="absolute right-[105%] -translate-y-[15%] text-[10px] text-white"
+        className="absolute right-full -translate-y-[15%] -translate-x-[12px] text-[10px] text-white"
         style={{ top: (index + 1) * 25 }}
       >
         {startCase(handle.data.name.replace(/_input/g, " "))}
@@ -64,7 +64,7 @@ export function OutputHandle({
   return (
     <>
       <div
-        className="absolute left-[105%] -translate-y-[15%] text-xxs text-white"
+        className="absolute left-full -translate-y-[15%] translate-x-[12px] text-xxs text-white"
         style={{ top: (index + 1) * 25 }}
       >
         {startCase(handle.data.name.replace(/_output/g, " "))}
