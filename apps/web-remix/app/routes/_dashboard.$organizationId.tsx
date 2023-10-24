@@ -147,9 +147,12 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
         <SidebarLink
           to={routes.pipelines(organization.id)}
           icon={
-            <Icon iconName="home" className="w-5 h-5 text-center leading-5" />
+            <Icon
+              iconName="three-layers"
+              className="w-5 h-5 text-center leading-5"
+            />
           }
-          text="Home"
+          text="Workflows"
           onlyIcon={isCollapsed}
         />
 
