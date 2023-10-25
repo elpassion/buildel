@@ -2,7 +2,7 @@ import React, { PropsWithChildren, ReactNode } from "react";
 
 interface ItemListProps<T> {
   items: T[];
-  renderItem: (item: T) => ReactNode;
+  renderItem: (item: T, index: number) => ReactNode;
   className?: string;
   itemClassName?: string;
   emptyText?: ReactNode;
@@ -18,9 +18,9 @@ export const ItemList = <T extends { id: number | string }>({
   return (
     <ul className={className}>
       {emptyText && <li className="hidden last:block">{emptyText}</li>}
-      {items.map((item) => (
+      {items.map((item, index) => (
         <li className={itemClassName} key={item.id}>
-          {renderItem(item)}
+          {renderItem(item, index)}
         </li>
       ))}
     </ul>

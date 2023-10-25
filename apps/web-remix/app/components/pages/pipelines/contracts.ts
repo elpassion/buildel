@@ -1,4 +1,5 @@
-import { z } from "zod";
+import { number, z } from "zod";
+import { KnowledgeBaseFile } from "~/components/pages/knowledgeBase/contracts";
 
 export const IOType = z.object({
   name: z.string(),
@@ -43,10 +44,28 @@ export const Pipeline = z.object({
   }),
 });
 
+export const PipelineRun = z.object({
+  created_at: z.string(),
+  id: z.number(),
+  name: z.string(),
+  config: z.object({
+    version: z.string(),
+    blocks: z.array(BlockConfig),
+  }),
+});
+
+export const PipelineRuns = z.array(PipelineRun);
+
 export const PipelineResponse = z
   .object({
     data: Pipeline,
   })
+  .transform((response) => {
+    return response.data;
+  });
+
+export const PipelineRunsResponse = z
+  .object({ data: PipelineRuns })
   .transform((response) => {
     return response.data;
   });
