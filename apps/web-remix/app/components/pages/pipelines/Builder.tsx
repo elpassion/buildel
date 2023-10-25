@@ -2,6 +2,7 @@ import React, {
   ComponentType,
   ReactNode,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -187,6 +188,14 @@ export const Builder = ({
     wrapper: reactFlowWrapper,
     onDrop: onBlockCreate,
   });
+
+  useEffect(() => {
+    const currentConfig = toPipelineConfig(nodes, edges);
+    if (!isEqual(currentConfig, pipeline.config)) {
+      setNodes(getNodes(pipeline.config));
+      setEdges(getEdges(pipeline.config));
+    }
+  }, [pipeline]);
 
   return (
     <div
