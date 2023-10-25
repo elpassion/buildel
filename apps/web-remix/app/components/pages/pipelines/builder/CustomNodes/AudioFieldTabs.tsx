@@ -12,12 +12,14 @@ interface AudioFieldTabsProps {
   onChunk: (chunk: Blob, name: string) => void;
   onUpload: (file: File, name: string) => Promise<IFile>;
   name: string;
+  disabled?: boolean;
 }
 
 export function AudioFieldTabs({
   onChunk,
   onUpload,
   name,
+  disabled = false,
 }: AudioFieldTabsProps) {
   const { status } = useRunPipeline();
   const [activeTab, setActiveTab] = useState("microphone");
@@ -57,7 +59,7 @@ export function AudioFieldTabs({
         <p className="text-xs font-bold text-white mb-1">Audio stream</p>
         <AudioRecorder
           onChunk={(e) => onChunk(e.data, name)}
-          disabled={status !== "running"}
+          disabled={status !== "running" || disabled}
         />
       </Tab>
 
@@ -72,7 +74,7 @@ export function AudioFieldTabs({
           preview={(props) => (
             <FileUploadListPreview {...props} className="max-h-[110px]" />
           )}
-          disabled={status !== "running"}
+          disabled={status !== "running" || disabled}
           accept="audio/*"
         />
       </Tab>

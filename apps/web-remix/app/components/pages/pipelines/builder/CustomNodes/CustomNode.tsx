@@ -15,12 +15,16 @@ export interface CustomNodeProps {
   onUpdate?: (block: IBlockConfig) => void;
   onDelete?: (block: IBlockConfig) => void;
   selected: boolean;
+  isConnectable: boolean;
+  disabled?: boolean;
 }
 export function CustomNode({
   data,
   selected,
   onUpdate,
   onDelete,
+  isConnectable,
+  disabled = false,
 }: CustomNodeProps) {
   const { status: runStatus } = useRunPipeline();
   const { status, isValid, errors } = useRunPipelineNode(data);
@@ -112,7 +116,7 @@ export function CustomNode({
                 aria-label="Delete block"
                 icon={<Icon iconName="trash" />}
                 onClick={handleDelete}
-                disabled={runStatus !== "idle"}
+                disabled={runStatus !== "idle" || disabled}
               />
             )}
           </div>
@@ -120,7 +124,11 @@ export function CustomNode({
 
         <div className="p-2 nodrag">
           {inputsFields.length > 0 ? (
-            <NodeFieldsForm block={data} fields={inputsFields} />
+            <NodeFieldsForm
+              block={data}
+              fields={inputsFields}
+              disabled={disabled}
+            />
           ) : null}
 
           {outputFields.length > 0 ? (
@@ -128,10 +136,20 @@ export function CustomNode({
           ) : null}
 
           {inputsHandles.map((handle, index) => (
-            <InputHandle key={handle.id} handle={handle} index={index} />
+            <InputHandle
+              key={handle.id}
+              handle={handle}
+              index={index}
+              isConnectable={isConnectable}
+            />
           ))}
           {outputsHandles.map((handle, index) => (
-            <OutputHandle key={handle.id} handle={handle} index={index} />
+            <OutputHandle
+              key={handle.id}
+              handle={handle}
+              index={index}
+              isConnectable={isConnectable}
+            />
           ))}
         </div>
       </section>

@@ -21,9 +21,14 @@ import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPre
 interface NodeFieldsFormProps {
   fields: IField[];
   block: IBlockConfig;
+  disabled?: boolean;
 }
 
-export function NodeFieldsForm({ fields, block }: NodeFieldsFormProps) {
+export function NodeFieldsForm({
+  fields,
+  block,
+  disabled = false,
+}: NodeFieldsFormProps) {
   const blockName = block.name;
   const { status, organizationId, pipelineId } = useRunPipeline();
   const { push, clearEvents } = useRunPipelineNode(block);
@@ -153,6 +158,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsFormProps) {
             name={name}
             placeholder="Input text to test the workflow"
             rows={5}
+            disabled={disabled}
           />
         );
       } else if (type === "file") {
@@ -173,6 +179,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsFormProps) {
             onUpload={uploadFile}
             onFetch={fetchFiles}
             onRemove={removeFile}
+            disabled={disabled}
             preview={(props) => (
               <FileUploadListPreview {...props} className="max-h-[110px]" />
             )}
@@ -181,6 +188,7 @@ export function NodeFieldsForm({ fields, block }: NodeFieldsFormProps) {
       } else if (field.data.type === "audio") {
         return (
           <AudioFieldTabs
+            disabled={disabled}
             name={field.data.name}
             onUpload={convertToBlobAndUpload}
             onChunk={uploadAudioChunk}

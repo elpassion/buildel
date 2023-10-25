@@ -6,6 +6,7 @@ import classNames from "classnames";
 
 export interface CustomEdgeProps extends EdgeProps {
   onDelete: (id: string) => void;
+  disabled?: boolean;
 }
 
 const foreignObjectSize = 24;
@@ -21,6 +22,7 @@ export function CustomEdge({
   style = {},
   markerEnd,
   onDelete,
+  disabled = false,
 }: CustomEdgeProps) {
   const { status } = useRunPipelineEdge();
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -45,6 +47,12 @@ export function CustomEdge({
     onDelete(id);
   }, []);
 
+  const handlePathClick = (e: React.MouseEvent<SVGPathElement, MouseEvent>) => {
+    if (!disabled) return;
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   return (
     <>
       <path
@@ -53,6 +61,8 @@ export function CustomEdge({
         d={edgePath}
         markerEnd={markerEnd}
         fill="none"
+        pointerEvents={!disabled ? "auto" : "none"}
+        onClick={handlePathClick}
         style={{
           ...style,
           strokeWidth: "1",
@@ -69,6 +79,8 @@ export function CustomEdge({
         markerEnd={markerEnd}
         strokeWidth={20}
         strokeOpacity={0}
+        pointerEvents={!disabled ? "auto" : "none"}
+        onClick={handlePathClick}
       />
 
       <foreignObject
@@ -80,12 +92,12 @@ export function CustomEdge({
         requiredExtensions="http://www.w3.org/1999/xhtml"
       >
         <button
-          disabled={status !== "idle"}
+          disabled={status !== "idle" || disabled}
           onClick={handleDelete}
           className={classNames(
             "absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-white text-xs flex justify-center items-center bg-red-700 w-4 h-4 rounded-full outline outline-3 outline-red-500/30",
             {
-              "opacity-0": status !== "idle",
+              "opacity-0": status !== "idle" || disabled,
             }
           )}
         >

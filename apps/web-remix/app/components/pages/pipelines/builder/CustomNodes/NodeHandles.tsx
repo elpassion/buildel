@@ -4,13 +4,17 @@ import { Handle, Position } from "reactflow";
 import { IHandle } from "../../pipeline.types";
 import classNames from "classnames";
 
+interface HandleProps {
+  handle: IHandle;
+  index: number;
+  isConnectable?: boolean;
+}
+
 export function InputHandle({
   handle,
   index,
-}: {
-  handle: IHandle;
-  index: number;
-}) {
+  isConnectable = true,
+}: HandleProps) {
   const handleTypeClassName = useMemo(() => {
     switch (handle.data.type) {
       case "text":
@@ -34,6 +38,7 @@ export function InputHandle({
         type={handle.type}
         position={Position.Left}
         style={{ top: (index + 1) * 25 }}
+        isConnectable={isConnectable}
         id={handle.id}
         className={classNames(
           "!border-1 !border-primary-500 !w-[10px] !h-[10px] !-translate-x-[50%]",
@@ -44,13 +49,7 @@ export function InputHandle({
   );
 }
 
-export function OutputHandle({
-  handle,
-  index,
-}: {
-  handle: IHandle;
-  index: number;
-}) {
+export function OutputHandle({ handle, index, isConnectable }: HandleProps) {
   const handleTypeClassName = useMemo(() => {
     switch (handle.data.type) {
       case "text":
@@ -73,6 +72,7 @@ export function OutputHandle({
         key={handle.id}
         type={handle.type}
         position={Position.Right}
+        isConnectable={isConnectable}
         style={{ top: (index + 1) * 25 }}
         id={handle.id}
         data-name={handle.data.name}

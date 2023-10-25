@@ -34,7 +34,10 @@ export function PipelineRun() {
         }
       />
       <div className="px-4 md:px-6 lg:px-10">
-        <Builder pipeline={{ ...pipeline, config: pipelineRun.config }} />
+        <Builder
+          pipeline={{ ...pipeline, config: pipelineRun.config }}
+          type="readOnly"
+        />
       </div>
     </div>
   );

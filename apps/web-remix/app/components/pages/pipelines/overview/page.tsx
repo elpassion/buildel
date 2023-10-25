@@ -8,7 +8,7 @@ export function OverviewPage() {
 
   return (
     <section className="pt-5">
-      <PipelineRunsListHeader />
+      {pipelineRuns.length > 0 ? <PipelineRunsListHeader /> : null}
       <PipelineRunsList
         items={pipelineRuns}
         pipelineId={pipelineId}

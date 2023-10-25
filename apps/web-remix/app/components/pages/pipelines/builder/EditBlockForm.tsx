@@ -27,12 +27,14 @@ export function EditBlockForm({
   children,
   organizationId,
   pipelineId,
+  disabled = false,
 }: {
   organizationId: number;
   pipelineId: number;
   children?: ReactNode;
   onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
+  disabled?: boolean;
 }) {
   const schema = generateZODSchema(blockConfig.block_type.schema as any);
   const validator = React.useMemo(() => withZod(schema), []);
@@ -151,7 +153,14 @@ export function EditBlockForm({
         {children}
       </div>
 
-      <Button size="sm" type="submit" variant="filled" className="mt-6" isFluid>
+      <Button
+        isFluid
+        size="sm"
+        type="submit"
+        variant="filled"
+        className="mt-6"
+        disabled={disabled}
+      >
         Save changes
       </Button>
 

@@ -46,6 +46,7 @@ import {
 import { useBeforeUnloadWarning } from "~/hooks/useBeforeUnloadWarning";
 
 interface BuilderProps {
+  type?: "readOnly" | "editable";
   pipeline: IPipeline;
   onUpdate?: (config: IPipelineConfig) => void;
   children?: ({
@@ -61,7 +62,12 @@ interface BuilderProps {
   }) => ReactNode;
 }
 
-export const Builder = ({ pipeline, children, onUpdate }: BuilderProps) => {
+export const Builder = ({
+  pipeline,
+  children,
+  onUpdate,
+  type = "editable",
+}: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const {
     isModalOpen: isSidebarOpen,
@@ -156,6 +162,7 @@ export const Builder = ({ pipeline, children, onUpdate }: BuilderProps) => {
         {...props}
         onUpdate={handleEditBlock}
         onDelete={handleDelete}
+        disabled={type === "readOnly"}
       />
     ),
     [handleDelete]
@@ -166,8 +173,14 @@ export const Builder = ({ pipeline, children, onUpdate }: BuilderProps) => {
   }, [PipelineNode]);
 
   const PipelineEdge = useCallback(
-    (props: EdgeProps) => <CustomEdge {...props} onDelete={handleDeleteEdge} />,
-    [handleDeleteEdge]
+    (props: EdgeProps) => (
+      <CustomEdge
+        {...props}
+        onDelete={handleDeleteEdge}
+        disabled={type === "readOnly"}
+      />
+    ),
+    [handleDeleteEdge, type]
   );
 
   const edgeTypes = useMemo(() => {
@@ -189,6 +202,11 @@ export const Builder = ({ pipeline, children, onUpdate }: BuilderProps) => {
       >
         <ReactFlowProvider>
           <ReactFlow
+            edgesUpdatable={type !== "readOnly"}
+            edgesFocusable={type !== "readOnly"}
+            nodesDraggable={type !== "readOnly"}
+            nodesConnectable={type !== "readOnly"}
+            nodesFocusable={type !== "readOnly"}
             nodes={nodes}
             edges={edges}
             onNodesChange={onNodesChange}
@@ -227,6 +245,7 @@ export const Builder = ({ pipeline, children, onUpdate }: BuilderProps) => {
                   onClose={handleCloseModal}
                 />
                 <EditBlockForm
+                  disabled={type === "readOnly"}
                   onSubmit={onBlockUpdate}
                   blockConfig={editableBlock}
                   organizationId={pipeline.organization_id}
