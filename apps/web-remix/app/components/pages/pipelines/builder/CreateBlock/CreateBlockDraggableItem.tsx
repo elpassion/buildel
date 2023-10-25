@@ -7,6 +7,11 @@ import { Icon, IconButton } from "@elpassion/taco";
 import { BlockType } from "../../contracts";
 import { useRunPipeline } from "../RunPipelineProvider";
 import { IBlockConfig, IBlockType } from "../../pipeline.types";
+import {
+  generateZODSchema,
+  JSONSchemaField,
+} from "~/components/form/schema/SchemaParser";
+import { withZod } from "@remix-validated-form/with-zod";
 interface CreateBlockDraggableItemProps {
   onCreate: (node: IBlockConfig) => void;
   data: IBlockType;
@@ -36,9 +41,9 @@ export const CreateBlockDraggableItem: React.FC<
       onCreate({
         name: "",
         opts: {},
-        block_type: block,
-        ...block,
         inputs: [],
+        type: block.type,
+        block_type: block,
         position: position,
       });
     },

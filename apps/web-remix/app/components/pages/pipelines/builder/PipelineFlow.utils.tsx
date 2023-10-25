@@ -12,7 +12,7 @@ import {
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
     id: block.name,
-    type: block.block_type.type,
+    type: "custom",
     position: block.position ?? {
       x: 100,
       y: 100,

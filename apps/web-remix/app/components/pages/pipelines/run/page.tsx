@@ -1,14 +1,20 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
+import { LinksFunction, MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { Builder } from "~/components/pages/pipelines/builder/Builder";
 import { loader } from "./loader";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { routes } from "~/utils/routes.utils";
 import { Icon } from "@elpassion/taco";
+import editorStyles from "~/components/editor/editor.styles.css";
+import flowStyles from "reactflow/dist/style.css";
 
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: flowStyles },
+  { rel: "stylesheet", href: editorStyles },
+];
 export function PipelineRun() {
-  const { pipeline, blockTypes, pipelineRun } = useLoaderData<typeof loader>();
+  const { pipeline, pipelineRun } = useLoaderData<typeof loader>();
 
   return (
     <div>
@@ -28,10 +34,7 @@ export function PipelineRun() {
         }
       />
       <div className="px-4 md:px-6 lg:px-10">
-        <Builder
-          pipeline={{ ...pipeline, config: pipelineRun.config }}
-          blockTypes={blockTypes}
-        />
+        <Builder pipeline={{ ...pipeline, config: pipelineRun.config }} />
       </div>
     </div>
   );

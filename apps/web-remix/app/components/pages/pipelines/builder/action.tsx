@@ -37,6 +37,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
           );
           const validator = withZod(schema);
           const validatedBlock = await validator.validate(block);
+
           if (validatedBlock) {
             return validatedBlock.data;
           }

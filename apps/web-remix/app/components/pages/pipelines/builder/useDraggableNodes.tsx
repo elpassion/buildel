@@ -43,7 +43,7 @@ export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {
           name: "",
           opts: {},
           block_type: block,
-          ...block,
+          type: block.type,
           inputs: [],
           position: position,
         });

@@ -17,7 +17,7 @@ export interface IPipelineConfig {
 
 export interface INode {
   id: string;
-  type: string;
+  type?: string;
   position: { x: number; y: number };
   data: IBlockConfig;
 }
@@ -25,10 +25,10 @@ export interface INode {
 export interface IEdge {
   id: string;
   source: string;
-  sourceHandle: string;
+  sourceHandle?: string | null;
   target: string;
-  targetHandle: string;
-  type: "default";
+  targetHandle?: string | null;
+  type?: string;
 }
 
 export interface IField {

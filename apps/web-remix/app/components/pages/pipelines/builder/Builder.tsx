@@ -1,15 +1,14 @@
 import React, {
+  ReactNode,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import { useFetcher } from "@remix-run/react";
 import {
   IBlockConfig,
-  IBlockTypes,
   IEdge,
+  INode,
   IPipeline,
   IPipelineConfig,
 } from "../pipeline.types";
@@ -38,7 +37,6 @@ import isEqual from "lodash.isequal";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { EditBlockForm } from "./EditBlockForm";
-import { BuilderHeader } from "./BuilderHeader";
 import { BlockInputList } from "./BlockInputList";
 import { CustomEdge } from "./CustomEdges/CustomEdge";
 import {
@@ -46,15 +44,25 @@ import {
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
 import { useBeforeUnloadWarning } from "~/hooks/useBeforeUnloadWarning";
-import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
+
 interface BuilderProps {
   pipeline: IPipeline;
-  blockTypes: IBlockTypes;
+  onUpdate?: (config: IPipelineConfig) => void;
+  children?: ({
+    nodes,
+    edges,
+    isUpToDate,
+    onBlockCreate,
+  }: {
+    nodes: INode[];
+    edges: IEdge[];
+    isUpToDate: boolean;
+    onBlockCreate: (created: IBlockConfig) => Promise<void>;
+  }) => ReactNode;
 }
 
-export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
+export const Builder = ({ pipeline, children, onUpdate }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
-  const updateFetcher = useFetcher<IPipeline>();
   const {
     isModalOpen: isSidebarOpen,
     openModal: openSidebar,
@@ -68,18 +76,12 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
     getEdges(pipeline.config)
   );
 
-  console.log(nodes);
-  const isUpToDate = isEqual(
-    //@ts-ignore
-    toPipelineConfig(nodes, edges),
-    pipeline.config
-  );
+  const isUpToDate = isEqual(toPipelineConfig(nodes, edges), pipeline.config);
 
   useBeforeUnloadWarning(!isUpToDate);
 
   const handleIsValidConnection = useCallback(
     (connection: Connection) =>
-      //@ts-ignore
       isValidConnection(toPipelineConfig(nodes, edges), connection),
     [edges, nodes]
   );
@@ -103,36 +105,23 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
     closeSidebar();
   }, [closeSidebar]);
 
-  const handleUpdate = useCallback(
-    (config: IPipelineConfig) => {
-      updateFetcher.submit(
-        { ...pipeline, config: { ...config } },
-        { method: "PUT", encType: "application/json" }
-      );
-    },
-    [updateFetcher, pipeline]
-  );
-
   const onBlockCreate = useCallback(
     async (created: IBlockConfig) => {
-      //@ts-ignore
       const sameBlockTypes = getAllBlockTypes(
-        //@ts-ignore
         toPipelineConfig(nodes, edges),
         created.type
       );
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${created.type.toLowerCase()}_${nameNum}`;
 
-      setNodes((prev) => [
-        ...prev,
-        {
-          id: name,
-          type: created.type,
-          position: created.position!,
-          data: { ...created, name },
-        },
-      ]);
+      const newBlock = {
+        id: name,
+        type: "custom",
+        position: created.position ?? { x: 100, y: 100 },
+        data: { ...created, name },
+      };
+
+      setNodes((prev) => [...prev, newBlock]);
     },
     [setNodes, nodes, edges]
   );
@@ -146,19 +135,19 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
         return node;
       });
       setNodes(updatedNodes);
-      //@ts-ignore
-      handleUpdate(toPipelineConfig(updatedNodes, edges));
+
+      onUpdate?.(toPipelineConfig(updatedNodes, edges));
       handleCloseModal();
     },
-    [edges, handleUpdate, nodes, setNodes]
+    [edges, onUpdate, nodes, setNodes]
   );
 
   const onConnect = useCallback((params: Connection) => {
-    setEdges((eds) => addEdge(params, eds) as IEdge[]);
+    setEdges((eds) => addEdge(params, eds));
   }, []);
 
   const handleDeleteEdge = useCallback((id: string) => {
-    setEdges((eds) => eds.filter((edge) => edge.id !== id) as IEdge[]);
+    setEdges((eds) => eds.filter((edge) => edge.id !== id));
   }, []);
 
   const PipelineNode = useCallback(
@@ -173,14 +162,8 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
   );
 
   const nodeTypes = useMemo(() => {
-    return blockTypes.reduce(
-      (acc, curr) => ({
-        ...acc,
-        [curr.type]: PipelineNode,
-      }),
-      {}
-    );
-  }, [PipelineNode, blockTypes.length]);
+    return { custom: PipelineNode };
+  }, [PipelineNode]);
 
   const PipelineEdge = useCallback(
     (props: EdgeProps) => <CustomEdge {...props} onDelete={handleDeleteEdge} />,
@@ -190,24 +173,6 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
   const edgeTypes = useMemo(() => {
     return { default: PipelineEdge };
   }, [PipelineEdge]);
-
-  const handleSaveUnsavedChanges = useCallback(() => {
-    // @ts-ignore
-    const config = toPipelineConfig(nodes, edges);
-    if (isEqual(config, pipeline.config)) return;
-
-    handleUpdate(config);
-  }, [edges, handleUpdate, nodes, pipeline.config]);
-
-  useEffect(() => {
-    if (updateFetcher.state === "idle" && updateFetcher.data !== null) {
-      const config = updateFetcher.data;
-      if (!config || isEqual(config, pipeline.config)) return;
-
-      setNodes(getNodes(config.config));
-      setEdges(getEdges(config.config));
-    }
-  }, [pipeline.config, updateFetcher]);
 
   const { onDragOver, onDrop, onInit } = useDraggableNodes({
     wrapper: reactFlowWrapper,
@@ -220,15 +185,9 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
       ref={reactFlowWrapper}
     >
       <RunPipelineProvider
-        //@ts-ignore
         pipeline={{ ...pipeline, config: toPipelineConfig(nodes, edges) }}
       >
         <ReactFlowProvider>
-          <BuilderHeader
-            isUpToDate={isUpToDate}
-            onSave={handleSaveUnsavedChanges}
-          />
-
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -279,7 +238,7 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
             ) : null}
           </ActionSidebar>
 
-          <CreateBlockFloatingMenu onCreate={onBlockCreate} />
+          {children?.({ nodes, edges, isUpToDate, onBlockCreate })}
         </ReactFlowProvider>
       </RunPipelineProvider>
     </div>
