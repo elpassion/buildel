@@ -6,11 +6,13 @@ import { useRunPipeline } from "../RunPipelineProvider";
 interface BuilderHeaderProps {
   isUpToDate: boolean;
   onSave?: () => void;
+  isSaving?: boolean;
 }
 
 export const BuilderHeader: React.FC<BuilderHeaderProps> = ({
   isUpToDate,
   onSave,
+  isSaving,
 }) => {
   const { status: runStatus } = useRunPipeline();
 
@@ -29,6 +31,7 @@ export const BuilderHeader: React.FC<BuilderHeaderProps> = ({
           onClick={onSave}
           variant="filled"
           size="sm"
+          isLoading={isSaving}
         >
           Save changes
         </Button>

@@ -52,6 +52,7 @@ export function PipelineBuilder() {
         <>
           <BuilderHeader
             isUpToDate={isUpToDate}
+            isSaving={updateFetcher.state !== "idle"}
             onSave={() => {
               handleUpdatePipeline(toPipelineConfig(nodes, edges));
             }}
