@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { dayjs } from "~/utils/Dayjs";
 import { IPipelineRun, IPipelineRuns } from "../pipeline.types";
-import { array } from "zod";
 
 interface PipelineRunsListProps {
   items: IPipelineRuns;
