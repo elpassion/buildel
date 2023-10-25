@@ -23,4 +23,15 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       render(conn, :index, runs: runs)
     end
   end
+
+  def show(conn, %{"organization_id" => organization_id, "pipeline_id" => pipeline_id, "id" => id}) do
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Pipeline{} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, run} <- Pipelines.get_pipeline_run(pipeline, id) do
+      render(conn, :show, run: run)
+    end
+  end
 end

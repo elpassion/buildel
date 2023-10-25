@@ -56,6 +56,14 @@ defmodule Buildel.Pipelines do
     |> Repo.all()
   end
 
+  def get_pipeline_run(%Pipeline{} = pipeline, run_id) do
+    case from(r in Run, where: r.pipeline_id == ^pipeline.id, where: r.id == ^run_id)
+         |> Repo.one() do
+      nil -> {:error, :not_found}
+      run -> {:ok, run}
+    end
+  end
+
   def get_run(id), do: Repo.get(Run, id) |> Repo.preload(:pipeline)
 
   def create_run(attrs \\ %{}) do

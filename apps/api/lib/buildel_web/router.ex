@@ -52,7 +52,7 @@ defmodule BuildelWeb.Router do
     resources(
       "/organizations/:organization_id/pipelines/:pipeline_id/runs",
       OrganizationPipelineRunController,
-      only: [:index]
+      only: [:index, :show]
     )
 
     resources("/organizations/:organization_id/memory_collections", CollectionController,
