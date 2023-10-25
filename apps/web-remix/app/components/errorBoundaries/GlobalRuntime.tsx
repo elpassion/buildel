@@ -6,7 +6,6 @@ interface GlobalRuntimeProps {
   error: unknown;
 }
 
-//@todo setup sentry
 export const GlobalRuntime: React.FC<GlobalRuntimeProps> = ({ error }) => {
   const status = isRouteErrorResponse(error) ? error.status : 500;
 
