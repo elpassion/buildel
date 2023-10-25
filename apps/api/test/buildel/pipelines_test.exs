@@ -86,7 +86,7 @@ defmodule Buildel.PipelinesTest do
 
     test "create_run/1 with valid data creates a run" do
       pipeline = pipeline_fixture()
-      valid_attrs = %{pipeline_id: pipeline.id}
+      valid_attrs = %{pipeline_id: pipeline.id, config: pipeline.config}
 
       assert {:ok, %Run{} = run} = Pipelines.create_run(valid_attrs)
       assert run.pipeline_id == pipeline.id
@@ -94,7 +94,7 @@ defmodule Buildel.PipelinesTest do
 
     test "create_run/1 increases pipeline runs_count" do
       pipeline = pipeline_fixture()
-      valid_attrs = %{pipeline_id: pipeline.id}
+      valid_attrs = %{pipeline_id: pipeline.id, config: pipeline.config}
 
       assert {:ok, %Run{}} = Pipelines.create_run(valid_attrs)
       assert pipeline |> Buildel.Repo.reload() |> Map.get(:runs_count) == 1

@@ -42,10 +42,13 @@ defmodule Buildel.PipelinesFixtures do
   end
 
   def run_fixture(attrs \\ %{}) do
+    pipeline = pipeline_fixture()
+
     {:ok, run} =
       attrs
       |> Enum.into(%{
-        pipeline_id: pipeline_fixture().id
+        pipeline_id: pipeline.id,
+        config: pipeline.config
       })
       |> Buildel.Pipelines.create_run()
 

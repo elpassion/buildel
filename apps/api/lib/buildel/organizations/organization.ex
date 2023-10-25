@@ -5,6 +5,9 @@ defmodule Buildel.Organizations.Organization do
   schema "organizations" do
     field(:name, :string)
 
+    field(:api_key, Buildel.Encrypted.Binary)
+    field(:api_key_hash, Cloak.Ecto.SHA256)
+
     has_many(:memberships, Buildel.Organizations.Membership)
     has_many(:api_keys, Buildel.ApiKeys.ApiKey)
     has_many(:secrets, Buildel.Secrets.Secret)
@@ -16,8 +19,14 @@ defmodule Buildel.Organizations.Organization do
   @doc false
   def changeset(organization, attrs) do
     organization
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:name, :api_key])
     |> cast_assoc(:memberships)
-    |> validate_required([:name])
+    |> validate_required([:name, :api_key])
+    |> put_hashed_fields()
+  end
+
+  defp put_hashed_fields(changeset) do
+    changeset
+    |> put_change(:api_key_hash, get_field(changeset, :api_key))
   end
 end

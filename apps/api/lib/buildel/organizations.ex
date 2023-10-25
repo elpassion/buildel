@@ -47,6 +47,8 @@ defmodule Buildel.Organizations do
   end
 
   def create_organization(attrs \\ %{}) do
+    attrs = attrs |> Map.put(:api_key, :crypto.strong_rand_bytes(32) |> Base.encode64())
+
     case Ecto.Multi.new()
          |> Ecto.Multi.insert(:organization, Organization.changeset(%Organization{}, attrs))
          |> Ecto.Multi.insert(:membership, fn %{organization: %{id: organization_id}} ->
@@ -135,7 +137,9 @@ defmodule Buildel.Organizations do
 
   def delete_organization_api_key(%Organization{} = organization, key_id) do
     case Repo.get(ApiKey, key_id) do
-      nil -> {:error, :not_found}
+      nil ->
+        {:error, :not_found}
+
       %ApiKey{} = api_key ->
         case api_key.organization_id == organization.id do
           true -> {:ok, api_key |> Repo.delete()}
@@ -165,9 +169,9 @@ defmodule Buildel.Organizations do
   end
 
   def update_organization_secret(%Organization{} = organization, attrs \\ %{}) do
-    with %Secret{} = secret <- Repo.get_by(Secret, name: attrs.name, organization_id: organization.id),
-         {:ok, secret} <- secret |> Secret.changeset(attrs) |> Repo.update()
-    do
+    with %Secret{} = secret <-
+           Repo.get_by(Secret, name: attrs.name, organization_id: organization.id),
+         {:ok, secret} <- secret |> Secret.changeset(attrs) |> Repo.update() do
       {:ok, secret |> Repo.preload(:organization)}
     end
   end
