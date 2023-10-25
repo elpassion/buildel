@@ -12,7 +12,12 @@ export const routes = {
   pipeline: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipelines(organizationId)}/${pipelineId}`,
   pipelineRuns: (organizationId: OrganizationId, pipelineId: PipelineId) =>
-    `${routes.pipeline(organizationId, pipelineId)}/overview`,
+    `${routes.pipeline(organizationId, pipelineId)}/runs`,
+  pipelineRun: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    runId: RunId
+  ) => `${routes.pipelineRuns(organizationId, pipelineId)}/${runId}`,
   pipelineInterface: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipeline(organizationId, pipelineId)}/interface`,
   pipelineSettings: (organizationId: OrganizationId, pipelineId: PipelineId) =>
@@ -41,3 +46,4 @@ export const routes = {
 
 type OrganizationId = string | number;
 type PipelineId = string | number;
+type RunId = string | number;

@@ -67,6 +67,8 @@ export const Builder: React.FC<BuilderProps> = ({ pipeline, blockTypes }) => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(
     getEdges(pipeline.config)
   );
+
+  console.log(nodes);
   const isUpToDate = isEqual(
     //@ts-ignore
     toPipelineConfig(nodes, edges),

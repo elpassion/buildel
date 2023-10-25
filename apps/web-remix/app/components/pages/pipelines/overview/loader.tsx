@@ -15,6 +15,10 @@ export async function loader(args: LoaderFunctionArgs) {
       `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/runs`
     );
 
-    return json({ pipelineRuns: pipelineRuns.data });
+    return json({
+      pipelineRuns: pipelineRuns.data,
+      organizationId: params.organizationId,
+      pipelineId: params.pipelineId,
+    });
   })(args);
 }

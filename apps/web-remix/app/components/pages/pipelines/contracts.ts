@@ -47,7 +47,7 @@ export const Pipeline = z.object({
 export const PipelineRun = z.object({
   created_at: z.string(),
   id: z.number(),
-  name: z.string(),
+  status: z.string(),
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),
@@ -64,14 +64,18 @@ export const PipelineResponse = z
     return response.data;
   });
 
+export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
+
 export const PipelineRunsResponse = z
   .object({ data: PipelineRuns })
   .transform((response) => {
     return response.data;
   });
-
-export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
-
+export const PipelineRunResponse = z
+  .object({ data: PipelineRun })
+  .transform((response) => {
+    return response.data;
+  });
 export const BlockTypes = z.array(BlockType);
 
 export const BlockTypesResponse = z.object({

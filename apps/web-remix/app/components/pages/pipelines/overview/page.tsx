@@ -3,13 +3,17 @@ import { useLoaderData } from "@remix-run/react";
 import { loader } from "./loader";
 import { PipelineRunsList, PipelineRunsListHeader } from "./PipelineRunsList";
 export function OverviewPage() {
-  const { pipelineRuns } = useLoaderData<typeof loader>();
+  const { pipelineRuns, pipelineId, organizationId } =
+    useLoaderData<typeof loader>();
 
-  console.log(pipelineRuns);
   return (
     <section className="pt-5">
       <PipelineRunsListHeader />
-      <PipelineRunsList items={pipelineRuns} />
+      <PipelineRunsList
+        items={pipelineRuns}
+        pipelineId={pipelineId}
+        organizationId={organizationId}
+      />
     </section>
   );
 }

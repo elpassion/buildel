@@ -2,13 +2,19 @@ import React, { useMemo } from "react";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { dayjs } from "~/utils/Dayjs";
 import { IPipelineRun, IPipelineRuns } from "../pipeline.types";
+import { Link } from "@remix-run/react";
+import { routes } from "~/utils/routes.utils";
 
 interface PipelineRunsListProps {
   items: IPipelineRuns;
+  pipelineId: string;
+  organizationId: string;
 }
 
 export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
   items,
+  pipelineId,
+  organizationId,
 }) => {
   const reversed = useMemo(() => {
     return [...items].reverse();
@@ -20,7 +26,9 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
       items={reversed}
       emptyText={<EmptyMessage>There is no runs yet...</EmptyMessage>}
       renderItem={(item, index) => (
-        <PipelineRunsItem data={item} index={index} />
+        <Link to={routes.pipelineRun(organizationId, pipelineId, item.id)}>
+          <PipelineRunsItem data={item} index={index} />
+        </Link>
       )}
     />
   );
@@ -56,7 +64,7 @@ export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({
       <p className="text-white text-sm">
         {dayjs(data.created_at).format("DD MMM HH:mm")}
       </p>
-      <p className="text-white text-sm">{data.name}</p>
+      <p className="text-white text-sm">{data.status}</p>
     </article>
   );
 };
