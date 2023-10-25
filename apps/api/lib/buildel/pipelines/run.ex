@@ -7,6 +7,7 @@ defmodule Buildel.Pipelines.Run do
   schema "runs" do
     belongs_to(:pipeline, Pipeline)
     field(:status, Ecto.Enum, values: [created: 0, running: 1, finished: 2], default: :created)
+    field(:config, :map)
 
     timestamps()
   end
@@ -14,8 +15,8 @@ defmodule Buildel.Pipelines.Run do
   @doc false
   def changeset(run, attrs) do
     run
-    |> cast(attrs, [:pipeline_id])
-    |> validate_required([:pipeline_id])
+    |> cast(attrs, [:pipeline_id, :config])
+    |> validate_required([:pipeline_id, :config])
     |> assoc_constraint(:pipeline)
     |> prepare_changes(fn changeset ->
       if pipeline_id = get_change(changeset, :pipeline_id) do

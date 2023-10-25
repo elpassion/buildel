@@ -13,7 +13,8 @@ defmodule BuildelWeb.OrganizationPipelineRunJSON do
     %{
       id: run.id,
       name: run.status,
-      created_at: run.inserted_at
+      created_at: run.inserted_at,
+      config: run.config
     }
   end
 end

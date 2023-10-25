@@ -346,6 +346,7 @@ defmodule Buildel.BlocksTest do
                    "api_key" => "test",
                    "model" => "gpt-4",
                    "temperature" => 0.5,
+                   "system_message" => "You are a helpful assistant.",
                    "messages" => [
                      %{"role" => "system", "content" => "You are a helpful assistant."}
                    ]

@@ -18,9 +18,9 @@ defmodule BuildelWeb.PipelineChannel do
          {:ok, pipeline_id} <- Buildel.Utils.parse_id(pipeline_id),
          {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
          organization <- Buildel.Organizations.get_organization!(organization_id),
-         {:ok, %Pipelines.Pipeline{id: pipeline_id}} <-
+         {:ok, %Pipelines.Pipeline{id: pipeline_id, config: config}} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, run} <- Pipelines.create_run(%{pipeline_id: pipeline_id}),
+         {:ok, run} <- Pipelines.create_run(%{pipeline_id: pipeline_id, config: config}),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
       listen_to_outputs(run)
       {:ok, %{run: %{}}, socket |> assign(:run, run)}

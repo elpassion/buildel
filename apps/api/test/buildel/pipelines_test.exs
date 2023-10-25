@@ -104,11 +104,6 @@ defmodule Buildel.PipelinesTest do
       assert {:error, %Ecto.Changeset{}} = Pipelines.create_run(@invalid_attrs)
     end
 
-    test "change_run/1 returns a run changeset" do
-      run = run_fixture()
-      assert %Ecto.Changeset{} = Pipelines.change_run(run)
-    end
-
     test "start changes the status to running" do
       run = run_fixture()
       assert {:ok, %Run{} = run} = Pipelines.start(run)

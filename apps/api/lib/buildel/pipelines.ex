@@ -67,10 +67,6 @@ defmodule Buildel.Pipelines do
     end
   end
 
-  def change_run(%Run{} = run, attrs \\ %{}) do
-    Run.changeset(run, attrs)
-  end
-
   def start(%Run{} = run) do
     run |> Run.start()
   end
