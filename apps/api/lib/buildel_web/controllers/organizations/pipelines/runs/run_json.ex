@@ -12,7 +12,7 @@ defmodule BuildelWeb.OrganizationPipelineRunJSON do
   defp data(%Run{} = run) do
     %{
       id: run.id,
-      name: run.status,
+      status: run.status,
       created_at: run.inserted_at,
       config: run.config
     }

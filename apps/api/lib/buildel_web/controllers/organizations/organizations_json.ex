@@ -13,6 +13,10 @@ defmodule BuildelWeb.OrganizationJSON do
     %{data: for(key <- keys, do: key_data(key))}
   end
 
+  def organization_key(%{key: key}) do
+    %{data: %{key: key}}
+  end
+
   def key(%{key: key, hidden: hidden}) do
     %{data: key_data(key, hidden)}
   end
@@ -25,13 +29,13 @@ defmodule BuildelWeb.OrganizationJSON do
   end
 
   defp key_data(%Buildel.ApiKeys.ApiKey{} = key, hidden \\ true) do
-    key_string = 
+    key_string =
       if hidden do
         hidden_key(key)
       else
         key.key
       end
-  
+
     %{
       id: key.id,
       key: key_string,

@@ -46,6 +46,14 @@ defmodule Buildel.Organizations do
     end
   end
 
+  def reset_organization_api_key(%Organization{} = organization) do
+    organization
+    |> Ecto.Changeset.change(%{
+      api_key: :crypto.strong_rand_bytes(32) |> Base.encode64(),
+    })
+    |> Buildel.Repo.update()
+  end
+
   def create_organization(attrs \\ %{}) do
     attrs = attrs |> Map.put(:api_key, :crypto.strong_rand_bytes(32) |> Base.encode64())
 

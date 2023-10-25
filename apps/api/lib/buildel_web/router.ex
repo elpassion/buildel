@@ -70,6 +70,9 @@ defmodule BuildelWeb.Router do
     delete("/users/log_out", UserSessionController, :delete)
 
     resources("/organizations", OrganizationController, only: [:index, :create, :show])
+    get("/organizations/:id/api_key", OrganizationController, :get_api_key)
+    post("/organizations/:id/api_key", OrganizationController, :reset_api_key)
+
     get("/organizations/:id/keys", OrganizationController, :get_api_keys)
     post("/organizations/:id/keys", OrganizationController, :create_api_key)
     delete("/organizations/:id/keys/:key_id", OrganizationController, :delete_api_key)
