@@ -1,13 +1,15 @@
 import React from "react";
+import flowStyles from "reactflow/dist/style.css";
 import { LinksFunction, MetaFunction } from "@remix-run/node";
+import { Icon } from "@elpassion/taco";
 import { Link, useLoaderData } from "@remix-run/react";
-import { Builder } from "~/components/pages/pipelines/builder/Builder";
-import { loader } from "./loader";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { routes } from "~/utils/routes.utils";
-import { Icon } from "@elpassion/taco";
 import editorStyles from "~/components/editor/editor.styles.css";
-import flowStyles from "reactflow/dist/style.css";
+import { CustomEdge } from "../CustomEdges/CustomEdge";
+import { Builder } from "../Builder";
+import { ReadOnlyNode } from "./ReadOnlyNode";
+import { loader } from "./loader";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: flowStyles },
@@ -35,8 +37,10 @@ export function PipelineRun() {
       />
       <div className="px-4 md:px-6 lg:px-10">
         <Builder
-          pipeline={{ ...pipeline, config: pipelineRun.config }}
           type="readOnly"
+          pipeline={{ ...pipeline, config: pipelineRun.config }}
+          CustomNode={ReadOnlyNode}
+          CustomEdge={CustomEdge}
         />
       </div>
     </div>

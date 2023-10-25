@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@elpassion/taco";
-import { useRunPipeline } from "./RunPipelineProvider";
+import { useRunPipeline } from "../RunPipelineProvider";
 import { PlayFilled } from "~/icons/PlayFilled";
 import { errorToast } from "~/components/toasts/errorToast";
 

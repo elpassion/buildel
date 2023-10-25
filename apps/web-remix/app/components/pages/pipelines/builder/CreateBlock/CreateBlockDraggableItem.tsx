@@ -5,13 +5,9 @@ import { useReactFlow } from "reactflow";
 import { z } from "zod";
 import { Icon, IconButton } from "@elpassion/taco";
 import { BlockType } from "../../contracts";
-import { useRunPipeline } from "../RunPipelineProvider";
+import { useRunPipeline } from "../../RunPipelineProvider";
 import { IBlockConfig, IBlockType } from "../../pipeline.types";
-import {
-  generateZODSchema,
-  JSONSchemaField,
-} from "~/components/form/schema/SchemaParser";
-import { withZod } from "@remix-validated-form/with-zod";
+
 interface CreateBlockDraggableItemProps {
   onCreate: (node: IBlockConfig) => void;
   data: IBlockType;

@@ -6,17 +6,14 @@ import {
 } from "~/components/pages/pipelines/pipeline.types";
 import { IFile } from "~/components/fileUpload/fileUpload.types";
 import {
-  useRunPipeline,
-  useRunPipelineNode,
-} from "~/components/pages/pipelines/builder/RunPipelineProvider";
-import {
   KnowledgeBaseFileListResponse,
   KnowledgeBaseFileResponse,
 } from "~/components/pages/knowledgeBase/contracts";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
-import { AudioFieldTabs } from "./AudioFieldTabs";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
+import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
+import { AudioFieldTabs } from "./AudioFieldTabs";
 
 interface NodeFieldsFormProps {
   fields: IField[];
@@ -162,15 +159,6 @@ export function NodeFieldsForm({
           />
         );
       } else if (type === "file") {
-        // return (
-        //   <DocumentSearchTabs
-        //     name={name}
-        //     onUpload={uploadFile}
-        //     onFetch={fetchFiles}
-        //     onRemove={removeFile}
-        //   />
-        // );
-
         return (
           <FileUpload
             multiple

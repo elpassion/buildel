@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
-import { IBlockConfig, IField } from "../../pipeline.types";
 import { IEvent, useRunPipelineNode } from "../RunPipelineProvider";
+import { IBlockConfig, IField } from "../pipeline.types";
 import { NodeCopyButton, NodeDownloadButton } from "./NodeActionButtons";
-import { AudioOutput } from "~/components/pages/pipelines/builder/CustomNodes/AudioOutput";
+import { AudioOutput } from "./AudioOutput";
 
 interface NodeFieldsOutputProps {
   fields: IField[];

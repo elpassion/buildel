@@ -5,10 +5,10 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { usePipelineRun } from "./usePipelineRun";
-import { IBlockConfig, IPipeline } from "../pipeline.types";
-import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 import { SafeParseReturnType, ZodError } from "zod";
+import { generateZODSchema } from "~/components/form/schema/SchemaParser";
+import { usePipelineRun } from "./usePipelineRun";
+import { IBlockConfig, IPipeline } from "./pipeline.types";
 
 export interface IEvent {
   block: string;

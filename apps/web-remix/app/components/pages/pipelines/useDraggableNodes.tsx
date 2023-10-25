@@ -1,9 +1,9 @@
 import { DragEvent, RefObject, useCallback, useState } from "react";
 import { ReactFlowInstance } from "reactflow";
-import { IBlockConfig } from "../pipeline.types";
-import { assert } from "~/utils/assert";
 import { z } from "zod";
-import { BlockType } from "~/components/pages/pipelines/contracts";
+import { assert } from "~/utils/assert";
+import { IBlockConfig } from "./pipeline.types";
+import { BlockType } from "./contracts";
 
 interface IUseDraggableNodes {
   wrapper: RefObject<HTMLDivElement>;

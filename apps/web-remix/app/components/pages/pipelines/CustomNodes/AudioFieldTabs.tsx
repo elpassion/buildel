@@ -1,12 +1,12 @@
-import { IFile } from "~/components/fileUpload/fileUpload.types";
 import React, { useState } from "react";
+import { IFile } from "~/components/fileUpload/fileUpload.types";
 import { TabGroup } from "~/components/tabs/TabGroup";
 import { RadioInput } from "~/components/form/inputs/radio.input";
 import { Tab } from "~/components/tabs/Tab";
 import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
-import { useRunPipeline } from "~/components/pages/pipelines/builder/RunPipelineProvider";
+import { useRunPipeline } from "../RunPipelineProvider";
 
 interface AudioFieldTabsProps {
   onChunk: (chunk: Blob, name: string) => void;

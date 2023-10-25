@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { useLoaderData } from "@remix-run/react";
 import startCase from "lodash.startcase";
-import { loader } from "~/components/pages/pipelines/builder";
+import { loader } from "../loader";
 import {
   IBlockConfig,
   IBlockType,

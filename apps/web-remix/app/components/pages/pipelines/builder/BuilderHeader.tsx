@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@elpassion/taco";
 import { RunPipelineButton } from "./RunPipelineButton";
-import { useRunPipeline } from "~/components/pages/pipelines/builder/RunPipelineProvider";
+import { useRunPipeline } from "../RunPipelineProvider";
 
 interface BuilderHeaderProps {
   isUpToDate: boolean;

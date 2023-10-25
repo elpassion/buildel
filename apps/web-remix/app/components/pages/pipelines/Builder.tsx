@@ -1,18 +1,13 @@
 import React, {
+  ComponentType,
   ReactNode,
   useCallback,
   useMemo,
   useRef,
   useState,
 } from "react";
-import {
-  IBlockConfig,
-  IEdge,
-  INode,
-  IPipeline,
-  IPipelineConfig,
-} from "../pipeline.types";
-import { useModal } from "~/hooks/useModal";
+import { z } from "zod";
+import isEqual from "lodash.isequal";
 import ReactFlow, {
   addEdge,
   Background,
@@ -24,6 +19,7 @@ import ReactFlow, {
   useEdgesState,
   useNodesState,
 } from "reactflow";
+import { useBeforeUnloadWarning } from "~/hooks/useBeforeUnloadWarning";
 import {
   getAllBlockTypes,
   getEdges,
@@ -32,32 +28,40 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
-import { CustomNode, CustomNodeProps } from "./CustomNodes/CustomNode";
-import isEqual from "lodash.isequal";
+import {
+  IBlockConfig,
+  IEdge,
+  INode,
+  IPipeline,
+  IPipelineConfig,
+} from "./pipeline.types";
+import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
-import { EditBlockForm } from "./EditBlockForm";
-import { BlockInputList } from "./BlockInputList";
-import { CustomEdge } from "./CustomEdges/CustomEdge";
-import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
-import { useBeforeUnloadWarning } from "~/hooks/useBeforeUnloadWarning";
+import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
+import { BlockConfig } from "./contracts";
 
 interface BuilderProps {
   type?: "readOnly" | "editable";
   pipeline: IPipeline;
   onUpdate?: (config: IPipelineConfig) => void;
+  CustomNode: ComponentType<CustomNodeProps>;
+  CustomEdge: ComponentType<CustomEdgeProps>;
   children?: ({
     nodes,
     edges,
     isUpToDate,
     onBlockCreate,
+    editableBlock,
+    onSidebarClose,
+    onEdit,
   }: {
     nodes: INode[];
     edges: IEdge[];
     isUpToDate: boolean;
+    editableBlock: IBlockConfig | null;
+    onSidebarClose: () => void;
+    onEdit: (data: z.TypeOf<typeof BlockConfig>) => void;
     onBlockCreate: (created: IBlockConfig) => Promise<void>;
   }) => ReactNode;
 }
@@ -67,13 +71,10 @@ export const Builder = ({
   children,
   onUpdate,
   type = "editable",
+  CustomNode,
+  CustomEdge,
 }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
-  const {
-    isModalOpen: isSidebarOpen,
-    openModal: openSidebar,
-    closeModal: closeSidebar,
-  } = useModal();
   const [editableBlock, setEditableBlock] = useState<IBlockConfig | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config)
@@ -98,18 +99,13 @@ export const Builder = ({
     [setNodes]
   );
 
-  const handleEditBlock = useCallback(
-    (block: IBlockConfig) => {
-      setEditableBlock(block);
-      openSidebar();
-    },
-    [openSidebar]
-  );
+  const handleEditBlock = useCallback((block: IBlockConfig) => {
+    setEditableBlock(block);
+  }, []);
 
   const handleCloseModal = useCallback(() => {
     setEditableBlock(null);
-    closeSidebar();
-  }, [closeSidebar]);
+  }, []);
 
   const onBlockCreate = useCallback(
     async (created: IBlockConfig) => {
@@ -233,31 +229,15 @@ export const Builder = ({
             <Controls />
           </ReactFlow>
 
-          <ActionSidebar
-            isOpen={!!editableBlock || isSidebarOpen}
-            onClose={handleCloseModal}
-          >
-            {editableBlock ? (
-              <>
-                <ActionSidebarHeader
-                  heading={editableBlock.type}
-                  subheading="Open AI’s Large Language Model chat block."
-                  onClose={handleCloseModal}
-                />
-                <EditBlockForm
-                  disabled={type === "readOnly"}
-                  onSubmit={onBlockUpdate}
-                  blockConfig={editableBlock}
-                  organizationId={pipeline.organization_id}
-                  pipelineId={pipeline.id}
-                >
-                  <BlockInputList inputs={editableBlock.inputs} />
-                </EditBlockForm>
-              </>
-            ) : null}
-          </ActionSidebar>
-
-          {children?.({ nodes, edges, isUpToDate, onBlockCreate })}
+          {children?.({
+            nodes,
+            edges,
+            isUpToDate,
+            onBlockCreate,
+            editableBlock,
+            onSidebarClose: handleCloseModal,
+            onEdit: onBlockUpdate,
+          })}
         </ReactFlowProvider>
       </RunPipelineProvider>
     </div>
