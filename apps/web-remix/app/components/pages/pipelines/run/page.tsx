@@ -27,7 +27,7 @@ export function PipelineRun() {
               <Icon iconName="arrow-left" className="text-2xl" />
             </Link>
             <div>
-              <h2 className="text-2xl font-medium">Run {pipelineRun.id}</h2>
+              <h2 className="text-2xl font-medium">Run history</h2>
               <h1 className="text-sm font-medium">{pipeline.name}</h1>
             </div>
           </div>
@@ -43,10 +43,10 @@ export function PipelineRun() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
+export const meta: MetaFunction = () => {
   return [
     {
-      title: `Run ${data?.pipelineRun.id}`,
+      title: `Run history`,
     },
   ];
 };
