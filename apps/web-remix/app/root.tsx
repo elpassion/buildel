@@ -1,4 +1,4 @@
-import { captureRemixErrorBoundaryError, withSentry } from "@sentry/remix";
+import { withSentry } from "@sentry/remix";
 import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import {
@@ -70,8 +70,6 @@ export function ErrorBoundary() {
 
     return <GlobalRuntime error={error} />;
   };
-
-  captureRemixErrorBoundaryError(error);
 
   return (
     <html>

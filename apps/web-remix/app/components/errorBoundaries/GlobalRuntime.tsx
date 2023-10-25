@@ -1,5 +1,6 @@
 import React from "react";
 import { isRouteErrorResponse } from "@remix-run/react";
+import { captureRemixErrorBoundaryError } from "@sentry/remix";
 
 interface GlobalRuntimeProps {
   error: unknown;
@@ -8,6 +9,8 @@ interface GlobalRuntimeProps {
 //@todo setup sentry
 export const GlobalRuntime: React.FC<GlobalRuntimeProps> = ({ error }) => {
   const status = isRouteErrorResponse(error) ? error.status : 500;
+
+  captureRemixErrorBoundaryError(error);
   return (
     <section className="w-full min-h-screen flex items-center justify-center flex-col">
       <h2 className="text-6xl font-bold">{status}</h2>
