@@ -6,16 +6,12 @@ import { toPipelineConfig } from "../PipelineFlow.utils";
 import { CustomEdge } from "../CustomEdges/CustomEdge";
 import { Builder } from "../Builder";
 import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
+import { EditBlockSidebarProvider } from "./EditBlockSidebarProvider";
 import { links as SubMenuLinks } from "./CreateBlock/GroupSubMenu";
-import { BlockInputList } from "./BlockInputList";
-import { EditBlockForm } from "./EditBlockForm";
+import { EditBlockSidebar } from "./EditBlockSidebar";
 import { BuilderHeader } from "./BuilderHeader";
 import { BuilderNode } from "./BuilderNode";
 import { loader } from "./loader";
-import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
 
 export const links: LinksFunction = () => [...SubMenuLinks()];
 
@@ -34,53 +30,35 @@ export function PipelineBuilder() {
   );
 
   return (
-    <Builder
-      pipeline={pipeline}
-      onUpdate={handleUpdatePipeline}
-      CustomNode={BuilderNode}
-      CustomEdge={CustomEdge}
-    >
-      {({
-        edges,
-        nodes,
-        isUpToDate,
-        onBlockCreate,
-        editableBlock,
-        onSidebarClose,
-        onEdit,
-      }) => (
-        <>
-          <BuilderHeader
-            isUpToDate={isUpToDate}
-            isSaving={updateFetcher.state !== "idle"}
-            onSave={() => {
-              handleUpdatePipeline(toPipelineConfig(nodes, edges));
-            }}
-          />
-          <CreateBlockFloatingMenu onCreate={onBlockCreate} />
+    <EditBlockSidebarProvider>
+      <Builder
+        pipeline={pipeline}
+        CustomNode={BuilderNode}
+        CustomEdge={CustomEdge}
+      >
+        {({ edges, nodes, isUpToDate, onBlockCreate }) => (
+          <>
+            <BuilderHeader
+              isUpToDate={isUpToDate}
+              isSaving={updateFetcher.state !== "idle"}
+              onSave={() => {
+                handleUpdatePipeline(toPipelineConfig(nodes, edges));
+              }}
+            />
 
-          <ActionSidebar isOpen={!!editableBlock} onClose={onSidebarClose}>
-            {editableBlock ? (
-              <>
-                <ActionSidebarHeader
-                  heading={editableBlock.type}
-                  subheading="Open AI’s Large Language Model chat block."
-                  onClose={onSidebarClose}
-                />
-                <EditBlockForm
-                  onSubmit={onEdit}
-                  blockConfig={editableBlock}
-                  organizationId={pipeline.organization_id}
-                  pipelineId={pipeline.id}
-                >
-                  <BlockInputList inputs={editableBlock.inputs} />
-                </EditBlockForm>
-              </>
-            ) : null}
-          </ActionSidebar>
-        </>
-      )}
-    </Builder>
+            <CreateBlockFloatingMenu onCreate={onBlockCreate} />
+
+            <EditBlockSidebar
+              nodes={nodes}
+              edges={edges}
+              pipelineId={pipeline.id}
+              onSubmit={handleUpdatePipeline}
+              organizationId={pipeline.organization_id}
+            />
+          </>
+        )}
+      </Builder>
+    </EditBlockSidebarProvider>
   );
 }
 

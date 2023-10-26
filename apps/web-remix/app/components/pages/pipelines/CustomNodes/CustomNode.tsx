@@ -2,8 +2,7 @@ import { PropsWithChildren, useCallback, useMemo } from "react";
 import startCase from "lodash.startcase";
 import classNames from "classnames";
 import { Badge, Icon } from "@elpassion/taco";
-import { IconButton } from "~/components/iconButton";
-import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
+import { useRunPipelineNode } from "../RunPipelineProvider";
 import { getBlockFields, getBlockHandles } from "../PipelineFlow.utils";
 import { IBlockConfig } from "../pipeline.types";
 import { InputHandle, OutputHandle } from "./NodeHandles";
@@ -74,64 +73,6 @@ export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
 
       {children}
     </header>
-  );
-}
-
-interface CustomNodeHeaderActionsProps {
-  data: IBlockConfig;
-  disabled?: boolean;
-  onUpdate: (block: IBlockConfig) => void;
-  onDelete: (block: IBlockConfig) => void;
-}
-export function CustomNodeHeaderActions({
-  data,
-  disabled,
-  onUpdate,
-  onDelete,
-}: CustomNodeHeaderActionsProps) {
-  const { status: runStatus } = useRunPipeline();
-
-  const handleDelete = useCallback(() => {
-    onDelete(data);
-  }, []);
-
-  const handleEdit = useCallback(() => {
-    onUpdate(data);
-  }, [data]);
-
-  const isEditable = useMemo(() => {
-    try {
-      const propKeys = Object.keys(
-        data.block_type.schema.properties.opts.properties
-      );
-
-      return propKeys.length > 0;
-    } catch (err) {
-      console.error(err);
-      return false;
-    }
-  }, [data]);
-
-  return (
-    <div className="flex gap-2 items-center">
-      {isEditable && (
-        <IconButton
-          onlyIcon
-          icon={<Icon iconName="settings" />}
-          aria-label="Edit block"
-          onClick={handleEdit}
-          disabled={runStatus !== "idle"}
-        />
-      )}
-
-      <IconButton
-        onlyIcon
-        aria-label="Delete block"
-        icon={<Icon iconName="trash" />}
-        onClick={handleDelete}
-        disabled={runStatus !== "idle" || disabled}
-      />
-    </div>
   );
 }
 

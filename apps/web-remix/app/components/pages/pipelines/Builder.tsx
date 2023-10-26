@@ -5,9 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from "react";
-import { z } from "zod";
 import isEqual from "lodash.isequal";
 import ReactFlow, {
   addEdge,
@@ -29,23 +27,15 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
-import {
-  IBlockConfig,
-  IEdge,
-  INode,
-  IPipeline,
-  IPipelineConfig,
-} from "./pipeline.types";
+import { IBlockConfig, IEdge, INode, IPipeline } from "./pipeline.types";
 import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
-import { BlockConfig } from "./contracts";
 
 interface BuilderProps {
   type?: "readOnly" | "editable";
   pipeline: IPipeline;
-  onUpdate?: (config: IPipelineConfig) => void;
   CustomNode: ComponentType<CustomNodeProps>;
   CustomEdge: ComponentType<CustomEdgeProps>;
   children?: ({
@@ -53,16 +43,10 @@ interface BuilderProps {
     edges,
     isUpToDate,
     onBlockCreate,
-    editableBlock,
-    onSidebarClose,
-    onEdit,
   }: {
     nodes: INode[];
     edges: IEdge[];
     isUpToDate: boolean;
-    editableBlock: IBlockConfig | null;
-    onSidebarClose: () => void;
-    onEdit: (data: z.TypeOf<typeof BlockConfig>) => void;
     onBlockCreate: (created: IBlockConfig) => Promise<void>;
   }) => ReactNode;
 }
@@ -70,13 +54,11 @@ interface BuilderProps {
 export const Builder = ({
   pipeline,
   children,
-  onUpdate,
   type = "editable",
   CustomNode,
   CustomEdge,
 }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
-  const [editableBlock, setEditableBlock] = useState<IBlockConfig | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config)
   );
@@ -100,14 +82,6 @@ export const Builder = ({
     [setNodes]
   );
 
-  const handleEditBlock = useCallback((block: IBlockConfig) => {
-    setEditableBlock(block);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setEditableBlock(null);
-  }, []);
-
   const onBlockCreate = useCallback(
     async (created: IBlockConfig) => {
       const sameBlockTypes = getAllBlockTypes(
@@ -129,22 +103,6 @@ export const Builder = ({
     [setNodes, nodes, edges]
   );
 
-  const onBlockUpdate = useCallback(
-    (updated: IBlockConfig) => {
-      const updatedNodes = nodes.map((node) => {
-        if (node.id === updated.name) {
-          node.data = updated;
-        }
-        return node;
-      });
-      setNodes(updatedNodes);
-
-      onUpdate?.(toPipelineConfig(updatedNodes, edges));
-      handleCloseModal();
-    },
-    [edges, onUpdate, nodes, setNodes]
-  );
-
   const onConnect = useCallback((params: Connection) => {
     setEdges((eds) => addEdge(params, eds));
   }, []);
@@ -157,7 +115,6 @@ export const Builder = ({
     (props: CustomNodeProps) => (
       <CustomNode
         {...props}
-        onUpdate={handleEditBlock}
         onDelete={handleDelete}
         disabled={type === "readOnly"}
       />
@@ -243,9 +200,6 @@ export const Builder = ({
             edges,
             isUpToDate,
             onBlockCreate,
-            editableBlock,
-            onSidebarClose: handleCloseModal,
-            onEdit: onBlockUpdate,
           })}
         </ReactFlowProvider>
       </RunPipelineProvider>
