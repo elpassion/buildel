@@ -1,14 +1,18 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
-import { getCurrentUser } from "~/utils/currentUser.server";
+import invariant from "tiny-invariant";
+import { APIKeyResponse } from "./contracts";
 
 export async function loader(args: LoaderFunctionArgs) {
-  return loaderBuilder(async ({ request }, { fetch }) => {
+  return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
+    invariant(params.organizationId, "organizationId not found");
 
-    const { user } = await getCurrentUser(request);
-
-    return json({ user });
+    const apiKey = await fetch(
+      APIKeyResponse,
+      `/organizations/${params.organizationId}/api_key`
+    );
+    return json({ apiKey: apiKey.data });
   })(args);
 }

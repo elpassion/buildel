@@ -24,7 +24,7 @@ export function SettingsLayout() {
         }
       />
 
-      <PageContentWrapper>
+      <PageContentWrapper className="!ml-0">
         <TabGroup activeTab={location.pathname}>
           <FilledTabsWrapper>
             <FilledTabLink
@@ -41,7 +41,9 @@ export function SettingsLayout() {
             </FilledTabLink>
           </FilledTabsWrapper>
 
-          <Outlet />
+          <div className="pt-10">
+            <Outlet />
+          </div>
         </TabGroup>
       </PageContentWrapper>
     </>

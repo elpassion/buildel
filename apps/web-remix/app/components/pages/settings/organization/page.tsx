@@ -1,12 +1,13 @@
 import { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { loader } from "./loader";
 import React from "react";
-import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
+import { ApiKey } from "./ApiKey";
 
 export function OrganizationSettingsPage() {
-  const { user } = useLoaderData<typeof loader>();
-  return <PageContentWrapper>Organization</PageContentWrapper>;
+  return (
+    <>
+      <ApiKey />
+    </>
+  );
 }
 
 export const meta: MetaFunction = () => {
