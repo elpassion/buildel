@@ -15,7 +15,7 @@ export function BuilderNode(props: CustomNodeProps) {
   return (
     <CustomNode {...props}>
       <CustomNodeHeader data={props.data}>
-        <CustomNodeHeaderActions
+        <BuilderNodeHeaderActions
           data={props.data}
           disabled={props.disabled}
           onDelete={props.onDelete}
@@ -31,16 +31,16 @@ export function BuilderNode(props: CustomNodeProps) {
   );
 }
 
-interface CustomNodeHeaderActionsProps {
+interface BuilderNodeHeaderActionsProps {
   data: IBlockConfig;
   disabled?: boolean;
   onDelete: (block: IBlockConfig) => void;
 }
-function CustomNodeHeaderActions({
+function BuilderNodeHeaderActions({
   data,
   disabled,
   onDelete,
-}: CustomNodeHeaderActionsProps) {
+}: BuilderNodeHeaderActionsProps) {
   const { openSidebar } = useEditBlockSidebar();
   const { status: runStatus } = useRunPipeline();
 

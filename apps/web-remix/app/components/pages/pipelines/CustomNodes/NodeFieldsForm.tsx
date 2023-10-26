@@ -169,7 +169,11 @@ export function NodeFieldsForm({
             onRemove={removeFile}
             disabled={disabled}
             preview={(props) => (
-              <FileUploadListPreview {...props} className="max-h-[110px]" />
+              <FileUploadListPreview
+                {...props}
+                className="max-h-[110px]"
+                disabled={disabled}
+              />
             )}
           />
         );

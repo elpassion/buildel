@@ -14,6 +14,7 @@ export function FileUploadListPreview({
   fileList = [],
   remove,
   className,
+  disabled,
 }: FileUploadListPreviewProps) {
   return (
     <ItemList
@@ -24,7 +25,7 @@ export function FileUploadListPreview({
       itemClassName="w-full"
       items={fileList}
       renderItem={(file) => (
-        <FileUploadListItem file={file} onRemove={remove} />
+        <FileUploadListItem file={file} onRemove={remove} disabled={disabled} />
       )}
     />
   );
@@ -33,12 +34,14 @@ export function FileUploadListPreview({
 interface FileUploadListItemProps {
   file: IFileUpload;
   onRemove?: (id: number) => Promise<void>;
+  disabled?: boolean;
 }
 export function FileUploadListItem({
   file,
   onRemove,
+  disabled,
 }: FileUploadListItemProps) {
-  const disabled = file.status === "uploading";
+  const isDisabled = file.status === "uploading" || disabled;
 
   const handleRemove = useCallback(() => {
     onRemove?.(file.id);
@@ -89,7 +92,7 @@ export function FileUploadListItem({
             />
           }
           aria-label="Remove file"
-          disabled={disabled}
+          disabled={isDisabled}
           onClick={handleRemove}
         />
       )}
