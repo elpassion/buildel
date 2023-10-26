@@ -48,7 +48,7 @@ export const ApiKey: React.FC<ApiKeyProps> = () => {
         <Button
           size="xs"
           variant="outlined"
-          className="!h-[42px]"
+          className="!h-[42px] !w-fit"
           isLoading={fetcher.state !== "idle"}
           onClick={() => fetcher.submit({}, { method: "post" })}
         >
