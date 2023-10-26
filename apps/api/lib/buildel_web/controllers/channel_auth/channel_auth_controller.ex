@@ -29,7 +29,7 @@ defmodule BuildelWeb.ChannelAuthController do
       conn
       |> put_status(200)
       |> json(%{
-        auth: BuildelWeb.ChannelAuth.create_auth_token(socket_id, channel_name, user_json),
+        auth: BuildelWeb.ChannelAuth.create_auth_token(socket_id, channel_name, user_json, organization.api_key),
         user_data: user_json
       })
     else
