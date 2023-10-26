@@ -1,1 +1,4 @@
-export { page as default, loader, meta } from "~/components/pages/settings";
+export {
+  page as default,
+  loader,
+} from "~/components/pages/settings/settingsLayout";

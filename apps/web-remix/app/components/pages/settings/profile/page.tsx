@@ -1,26 +1,18 @@
 import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "./loader";
-import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
 import React from "react";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 
-export function SettingsPage() {
+export function ProfileSettingsPage() {
   const { user } = useLoaderData<typeof loader>();
-  return (
-    <>
-      <AppNavbar leftContent={<AppNavbarHeading>Settings</AppNavbarHeading>} />
-      <PageContentWrapper>
-        <p>user: {user.id}</p>
-      </PageContentWrapper>
-    </>
-  );
+  return <PageContentWrapper>{user.id}</PageContentWrapper>;
 }
 
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Settings",
+      title: "Profile settings",
     },
   ];
 };
