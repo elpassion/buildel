@@ -1,4 +1,5 @@
 import React from "react";
+import cloneDeep from "lodash.clonedeep";
 import {
   ActionSidebar,
   ActionSidebarHeader,
@@ -26,7 +27,8 @@ export const EditBlockSidebar: React.FC<EditBlockSidebarProps> = ({
   const { editableBlock, closeSidebar } = useEditBlockSidebar();
 
   const handleSubmit = (updated: IBlockConfig) => {
-    const updatedNodes = nodes.map((node) => {
+    const tmpNodes = cloneDeep(nodes);
+    const updatedNodes = tmpNodes.map((node) => {
       if (node.id === updated.name) {
         node.data = updated;
       }
