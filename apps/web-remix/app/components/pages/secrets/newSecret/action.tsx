@@ -1,7 +1,7 @@
 import { ActionFunctionArgs, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { actionBuilder } from "~/utils.server";
-import { SecretKeyResponse } from "~/components/pages/variables/contracts";
+import { SecretKeyResponse } from "../contracts";
 import { validationError } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { schema } from "./schema";

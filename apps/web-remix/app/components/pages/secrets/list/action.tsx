@@ -5,7 +5,7 @@ import invariant from "tiny-invariant";
 import { z } from "zod";
 import { validationError } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
-import { schema } from "~/components/pages/variables/newSecret/schema";
+import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
 import { setServerToast } from "~/utils/toast.server";
 

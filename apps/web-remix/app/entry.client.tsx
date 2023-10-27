@@ -14,6 +14,7 @@ Sentry.init({
   tracesSampleRate: 1,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
+  enabled: false,
   ignoreErrors: [
     "Event `Event` (type=error) captured as promise rejection",
     "Validate called before form was initialized.",

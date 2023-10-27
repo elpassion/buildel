@@ -173,12 +173,8 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
           icon={
             <Icon iconName="key" className="w-5 h-5 text-center leading-5" />
           }
-          text="Secrets and Keys"
-          isActive={
-            location.pathname === routes.secrets(organization.id) ||
-            location.pathname === routes.apiKeys(organization.id)
-          }
           onlyIcon={isCollapsed}
+          text="Secrets"
         />
       </div>
 
