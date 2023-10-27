@@ -108,9 +108,23 @@ export const Builder = ({
     [setNodes, nodes, edges]
   );
 
-  const onConnect = useCallback((params: Connection) => {
-    setEdges((eds) => addEdge(params, eds));
-  }, []);
+  const onConnect = useCallback(
+    (params: Connection) => {
+      setEdges((eds) => addEdge(params, eds));
+
+      setNodes((nds) => {
+        return nds.map((nd) => {
+          if (nd.id !== params.target) return nd;
+          const newInput = `${params.source}:${params.sourceHandle}->${params.targetHandle}`;
+          return {
+            ...nd,
+            data: { ...nd.data, inputs: [...nd.data.inputs, newInput] },
+          };
+        });
+      });
+    },
+    [setEdges, setNodes]
+  );
 
   const handleDeleteEdge = useCallback((id: string) => {
     setEdges((eds) => eds.filter((edge) => edge.id !== id));
