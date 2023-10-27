@@ -121,7 +121,8 @@ defmodule Buildel.Blocks.Block do
             "title" => "Name",
             "description" => "The name of the input.",
             "minLength" => 2
-          }
+          },
+          "minItems" => 0
         }
       end
 

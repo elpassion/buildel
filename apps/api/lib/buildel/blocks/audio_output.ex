@@ -26,17 +26,7 @@ defmodule Buildel.Blocks.AudioOutput do
       "required" => ["name", "inputs", "opts"],
       "properties" => %{
         "name" => name_schema(),
-        "inputs" => %{
-          "type" => "array",
-          "title" => "Inputs",
-          "description" => "The inputs to the block.",
-          "items" => %{
-            "type" => "string",
-            "title" => "Name",
-            "description" => "The name of the input.",
-            "minLength" => 2
-          }
-        },
+        "inputs" => inputs_schema(),
         "opts" => options_schema()
       }
     }

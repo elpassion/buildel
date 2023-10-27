@@ -186,7 +186,7 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
   const [rhfFields, { push, remove }] = useFieldArray(name!);
 
   useEffect(() => {
-    if (rhfFields.length !== 0) return;
+    if (rhfFields.length >= field.minItems) return;
 
     push({});
   }, [push, rhfFields.length]);
@@ -206,7 +206,7 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
             variant="ghost"
             aria-label="Remove field"
             icon={<Icon iconName="trash" />}
-            disabled={rhfFields.length === 1}
+            disabled={rhfFields.length <= field.minItems}
             onClick={(e) => {
               e.preventDefault();
               remove(index);

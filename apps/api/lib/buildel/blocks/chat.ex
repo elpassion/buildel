@@ -89,7 +89,7 @@ defmodule Buildel.Blocks.Chat do
                 "type" => "array",
                 "title" => "Messages",
                 "description" => "The messages to start the conversation with.",
-                "minItems" => 1,
+                "minItems" => 0,
                 "items" => %{
                   "type" => "object",
                   "required" => ["role", "content"],
@@ -107,7 +107,8 @@ defmodule Buildel.Blocks.Chat do
                       "presentAs" => "editor"
                     }
                   }
-                }
+                },
+                "default" => []
               }
             )
           })
@@ -161,7 +162,7 @@ defmodule Buildel.Blocks.Chat do
   def handle_cast({:send_message, {:text, text}}, state) do
     state = send_stream_start(state)
     state = put_in(state[:messages], state[:messages] ++ [%{role: "user", content: text}])
-
+    IO.inspect(state[:messages])
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
       state[:block_name],

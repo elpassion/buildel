@@ -78,7 +78,17 @@ export function generateZODSchema(
       generateZODSchema(schema.items, false, context) as z.ZodTypeAny
     );
 
+    if (schema.minItems !== undefined) {
+      nestedSchema = nestedSchema.min(schema.minItems);
+    }
+
+    if ("default" in schema && schema.default !== undefined) {
+      // @ts-ignore
+      nestedSchema = nestedSchema.default(schema.default);
+    }
+
     if (isOptional) {
+      // @ts-ignore
       nestedSchema = nestedSchema.optional();
     }
 
@@ -190,6 +200,8 @@ export type JSONSchemaField =
       title: string;
       description: string;
       items: JSONSchemaField;
+      minItems: number;
+      default?: unknown[];
     }
   | {
       type: "boolean";
