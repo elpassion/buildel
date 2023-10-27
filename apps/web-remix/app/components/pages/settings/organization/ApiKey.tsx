@@ -36,6 +36,7 @@ export const ApiKey: React.FC<ApiKeyProps> = () => {
             className="w-[300px]"
             onFocus={onFocus}
             onBlur={onBlur}
+            onChange={() => {}}
             type={isFocused ? "text" : "password"}
           />
           <CopyButton
