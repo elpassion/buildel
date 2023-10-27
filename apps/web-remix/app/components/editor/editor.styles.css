@@ -15,10 +15,10 @@
 }
 
 .monaco-editor {
-  @apply !overflow-hidden !bg-neutral-800 !border !border-neutral-200 !rounded
+  @apply !overflow-hidden !bg-neutral-800 !border !border-neutral-200 !rounded-lg
 }
 .monaco-editor.focused   {
-  @apply !border-primary-800 !ring-4 !ring-primary-800
+  @apply !border-primary-800 !ring-4 !ring-primary-700 !ring-offset-1
 }
 
 .lines-content{
@@ -30,9 +30,10 @@
 }
 
 .monaco-editor .suggest-widget{
-  @apply !bg-secondary-500 !border-secondary-600 !max-w-full !left-0 !rounded
+  @apply !bg-secondary-800 !border-secondary-900 !left-2 !rounded !w-[90%]
 }
 
 .monaco-list .element-focused, .monaco-list .monaco-list-rows  *{
   @apply !bg-secondary-500
 }
+

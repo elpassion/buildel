@@ -39,7 +39,11 @@ export const EditBlockSidebar: React.FC<EditBlockSidebarProps> = ({
   };
 
   return (
-    <ActionSidebar isOpen={!!editableBlock} onClose={closeSidebar}>
+    <ActionSidebar
+      isOpen={!!editableBlock}
+      onClose={closeSidebar}
+      className="md:w-[460px] lg:w-[500px]"
+    >
       {editableBlock ? (
         <>
           <ActionSidebarHeader

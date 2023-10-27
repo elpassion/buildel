@@ -22,8 +22,9 @@ export const MonacoEditorField = forwardRef<
       <HiddenField value={value} {...getInputProps()} />
       <Label text={label} />
       <MonacoEditor
-        loading={<div className="w-full h-[20vh] border border-neutral-200" />}
-        height="20vh"
+        path={name}
+        height="130px"
+        loading={<div className="w-full h-[130px] border border-neutral-200" />}
         value={value}
         onChange={(v) => {
           setValue(v);

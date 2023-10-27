@@ -2,14 +2,14 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import type { EditorProps, OnMount, OnChange } from "@monaco-editor/react";
 import { Editor, useMonaco } from "@monaco-editor/react";
 
-export const BUILDEL_LANGUAGE = "buildel";
 export const SUGGESTION_REGEX = "\\{\\{[^\\s]+\\}\\}";
 
 export type IEditor = Parameters<OnMount>[0];
 export interface MonacoEditorProps
-  extends Partial<Omit<EditorProps, "onMount" | "onChange">> {
+  extends Partial<Omit<EditorProps, "onMount" | "onChange" | "path">> {
   suggestions?: string[];
   onChange?: (value?: string) => void;
+  path: string;
 }
 export const MonacoEditor: React.FC<MonacoEditorProps> = ({
   suggestions,
@@ -102,11 +102,11 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
   useEffect(() => {
     if (!monaco) return;
     //register language
-    monaco.languages.register({ id: BUILDEL_LANGUAGE });
+    monaco.languages.register({ id: props.path });
 
     //register suggestions
     const completionProvider = monaco.languages.registerCompletionItemProvider(
-      BUILDEL_LANGUAGE,
+      props.path,
       {
         provideCompletionItems: function (model, position) {
           const word = model.getWordUntilPosition(position);
@@ -135,7 +135,7 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
   return (
     <Editor
       className=""
-      defaultLanguage={BUILDEL_LANGUAGE}
+      language={props.path}
       onChange={handleOnChange}
       onMount={handleOnMount}
       options={{
