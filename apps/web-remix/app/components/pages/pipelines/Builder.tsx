@@ -192,7 +192,7 @@ export const Builder = ({
               color="#aaa"
               className="bg-black rounded-lg"
             />
-            <Controls />
+            <Controls showInteractive={false} />
           </ReactFlow>
 
           {children?.({
