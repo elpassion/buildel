@@ -16,7 +16,8 @@ defmodule Buildel.Blocks do
     BlockValidator,
     TakeLatest,
     # VectorDB,
-    DocumentSearch
+    DocumentSearch,
+    IF
   }
 
   @names_to_blocks_map %{
@@ -33,7 +34,8 @@ defmodule Buildel.Blocks do
     "take_latest" => TakeLatest,
     # "vector_db" => VectorDB,
     "file_input" => FileInput,
-    "document_search" => DocumentSearch
+    "document_search" => DocumentSearch,
+    "if" => IF
   }
 
   @blocks_to_names_map %{
@@ -50,7 +52,8 @@ defmodule Buildel.Blocks do
     TakeLatest => "take_latest",
     # VectorDB => "vector_db",
     FileInput => "file_input",
-    DocumentSearch => "document_search"
+    DocumentSearch => "document_search",
+    IF => "if"
   }
 
   def list_types() do

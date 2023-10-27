@@ -109,7 +109,14 @@ defmodule Buildel.Blocks.Chat do
                   }
                 },
                 "default" => []
-              }
+              },
+              prompt_template: %{
+                "type" => "string",
+                "title" => "Prompt template",
+                "description" => "The template to use for the prompt.",
+                "default" => "{{text_input_1:output}}",
+                "presentAs" => "editor"
+              },
             )
           })
       }
@@ -152,7 +159,9 @@ defmodule Buildel.Blocks.Chat do
      state
      |> assign_stream_state
      |> assign_take_latest(true)
-     |> Keyword.put(:messages, opts[:messages])
+     |> Keyword.put(:system_message, opts[:system_message])
+     |> Keyword.put(:prompt_template, opts[:prompt_template])
+     |> Keyword.put(:messages, [%{role: "system", content: opts[:system_message]}] ++ opts[:messages])
      |> Keyword.put(:api_key, Buildel.BlockSecrets.get_secret_from_context(context_id, opts |> Map.get(:api_key)))
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
@@ -161,8 +170,12 @@ defmodule Buildel.Blocks.Chat do
   @impl true
   def handle_cast({:send_message, {:text, text}}, state) do
     state = send_stream_start(state)
-    state = put_in(state[:messages], state[:messages] ++ [%{role: "user", content: text}])
-    IO.inspect(state[:messages])
+    messages = if List.last(state[:messages])[:role] in ["assistant", "system"] do
+      state[:messages] ++ [%{role: "user", content: state[:prompt_template]}]
+    else
+      state[:messages]
+    end
+    state = put_in(state[:messages], messages)
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
       state[:block_name],
