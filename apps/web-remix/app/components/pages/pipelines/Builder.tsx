@@ -80,9 +80,11 @@ export const Builder = ({
   );
 
   const handleDelete = useCallback(
-    (node: IBlockConfig) =>
-      setNodes((nds) => nds.filter((nd) => nd.id !== node.name)),
-    [setNodes]
+    (node: IBlockConfig) => {
+      setNodes((nds) => nds.filter((nd) => nd.id !== node.name));
+      setEdges((eds) => eds.filter((ed) => ed.source !== node.name));
+    },
+    [setNodes, setEdges]
   );
 
   const onBlockCreate = useCallback(
