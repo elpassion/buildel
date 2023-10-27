@@ -33,7 +33,7 @@ export function PipelineLayout() {
               tabId={routes.pipeline(pipeline.organization_id, pipeline.id)}
               to={routes.pipeline(pipeline.organization_id, pipeline.id)}
             >
-              Builder
+              Build
             </FilledTabLink>
             <FilledTabLink
               tabId={routes.pipelineRuns(pipeline.organization_id, pipeline.id)}

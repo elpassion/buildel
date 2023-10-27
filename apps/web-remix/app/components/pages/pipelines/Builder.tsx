@@ -32,9 +32,11 @@ import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
+import classNames from "classnames";
 
 interface BuilderProps {
   type?: "readOnly" | "editable";
+  className?: string;
   pipeline: IPipeline;
   CustomNode: ComponentType<CustomNodeProps>;
   CustomEdge: ComponentType<CustomEdgeProps>;
@@ -57,6 +59,7 @@ export const Builder = ({
   type = "editable",
   CustomNode,
   CustomEdge,
+  className,
 }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
@@ -156,7 +159,7 @@ export const Builder = ({
 
   return (
     <div
-      className="relative pt-5 h-[calc(100vh_-_128px)] w-full"
+      className={classNames("relative pt-5 w-full", className)}
       ref={reactFlowWrapper}
     >
       <RunPipelineProvider

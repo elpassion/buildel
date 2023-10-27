@@ -4,4 +4,4 @@ export {
   loader,
   meta,
   links,
-} from "~/components/pages/pipelines/builder/index";
+} from "~/components/pages/pipelines/build/index";
