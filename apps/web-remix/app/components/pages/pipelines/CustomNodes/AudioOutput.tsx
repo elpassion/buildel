@@ -4,7 +4,7 @@ import { Icon } from "@elpassion/taco";
 import { useAudioVisualize } from "~/components/audioRecorder/useAudioVisualize";
 import { errorToast } from "~/components/toasts/errorToast";
 interface AudioOutputProps {
-  audio?: Blob | string;
+  audio?: Blob | string | null;
 }
 
 export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
@@ -79,14 +79,17 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
       </button>
 
       <div className="bg-neutral-850 rounded-lg flex gap-2 items-center px-2 py-1">
-        <audio
-          key={audioUrl}
-          src={audioUrl}
-          ref={audioRef}
-          onEnded={handleEnd}
-          controls
-          hidden
-        />
+        {audioUrl && (
+          <audio
+            key={audioUrl}
+            src={audioUrl}
+            ref={audioRef}
+            onEnded={handleEnd}
+            controls
+            hidden
+          />
+        )}
+
         <button
           type="button"
           className={classNames(
