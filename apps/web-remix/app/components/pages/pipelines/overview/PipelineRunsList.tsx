@@ -4,6 +4,7 @@ import { dayjs } from "~/utils/Dayjs";
 import { IPipelineRun, IPipelineRuns } from "../pipeline.types";
 import { Link } from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
+import { Indicator } from "@elpassion/taco";
 
 interface PipelineRunsListProps {
   items: IPipelineRuns;
@@ -64,7 +65,14 @@ export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({
       <p className="text-white text-sm">
         {dayjs(data.created_at).format("DD MMM HH:mm")}
       </p>
-      <p className="text-white text-sm">{data.status}</p>
+
+      <div className="w-fit">
+        <Indicator
+          type={data.status !== "finished" ? "warning" : "success"}
+          variant="badge"
+          text={data.status}
+        />
+      </div>
     </article>
   );
 };
