@@ -61,7 +61,6 @@ export function CustomEdge({
         d={edgePath}
         markerEnd={markerEnd}
         fill="none"
-        pointerEvents={!disabled ? "auto" : "none"}
         onClick={handlePathClick}
         style={{
           ...style,
@@ -79,7 +78,6 @@ export function CustomEdge({
         markerEnd={markerEnd}
         strokeWidth={20}
         strokeOpacity={0}
-        pointerEvents={!disabled ? "auto" : "none"}
         onClick={handlePathClick}
       />
 
