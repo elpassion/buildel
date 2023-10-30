@@ -11,7 +11,6 @@ import {
   Outlet,
   useFetcher,
   useLoaderData,
-  useLocation,
   useNavigate,
 } from "@remix-run/react";
 import { OrganizationsResponse } from "~/components/pages/organizations/contracts";
@@ -132,7 +131,6 @@ interface SidebarContentProps {
 
 function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
   const { organization } = useLoaderData<typeof loader>();
-  const location = useLocation();
 
   return (
     <SidebarContentWrapper

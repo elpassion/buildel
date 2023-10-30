@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { useFetcher, useLoaderData } from "@remix-run/react";
-import { loader } from "./loader";
+import { useFetcher } from "@remix-run/react";
 import { Button } from "@elpassion/taco";
 import classNames from "classnames";
 import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
 import { TextInput } from "~/components/form/inputs/text.input";
 import { confirm } from "~/components/modal/confirm";
+import { IAPIKey } from "./organization.types";
 
-export const ApiKey: React.FC = () => {
+interface ApiKeyProps {
+  apiKey: IAPIKey;
+}
+export const ApiKey: React.FC<ApiKeyProps> = ({ apiKey }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const { apiKey } = useLoaderData<typeof loader>();
   const { copy, isCopied } = useCopyToClipboard(apiKey.key ?? "");
   const fetcher = useFetcher();
 

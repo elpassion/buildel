@@ -7,3 +7,11 @@ export const APIKey = z.object({
 export const APIKeyResponse = z
   .object({ data: APIKey })
   .transform((res) => res.data);
+
+export const Organization = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+export const OrganizationResponse = z.object({
+  data: Organization,
+});
