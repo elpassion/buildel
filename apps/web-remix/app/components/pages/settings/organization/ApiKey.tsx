@@ -5,9 +5,9 @@ import { Button } from "@elpassion/taco";
 import classNames from "classnames";
 import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
 import { TextInput } from "~/components/form/inputs/text.input";
-interface ApiKeyProps {}
+import { confirm } from "~/components/modal/confirm";
 
-export const ApiKey: React.FC<ApiKeyProps> = () => {
+export const ApiKey: React.FC = () => {
   const [isFocused, setIsFocused] = useState(false);
   const { apiKey } = useLoaderData<typeof loader>();
   const { copy, isCopied } = useCopyToClipboard(apiKey.key ?? "");
@@ -18,6 +18,19 @@ export const ApiKey: React.FC<ApiKeyProps> = () => {
   };
   const onBlur = () => {
     setIsFocused(false);
+  };
+
+  const handleGenerate = () => {
+    if (!apiKey.key) return fetcher.submit({}, { method: "post" });
+
+    confirm({
+      onConfirm: async () => fetcher.submit({}, { method: "post" }),
+      children: (
+        <p className="text-neutral-100 text-sm">
+          You are about to regenerate the API Key. This action is irreversible.
+        </p>
+      ),
+    });
   };
 
   return (
@@ -51,7 +64,7 @@ export const ApiKey: React.FC<ApiKeyProps> = () => {
           variant="outlined"
           className="!h-[42px] !w-fit"
           isLoading={fetcher.state !== "idle"}
-          onClick={() => fetcher.submit({}, { method: "post" })}
+          onClick={handleGenerate}
         >
           {apiKey.key ? "Regenerate" : "Generate"}
         </Button>

@@ -1,13 +1,9 @@
-import { MetaFunction } from "@remix-run/node";
 import React from "react";
+import { MetaFunction } from "@remix-run/node";
 import { ApiKey } from "./ApiKey";
 
 export function OrganizationSettingsPage() {
-  return (
-    <>
-      <ApiKey />
-    </>
-  );
+  return <ApiKey />;
 }
 
 export const meta: MetaFunction = () => {
