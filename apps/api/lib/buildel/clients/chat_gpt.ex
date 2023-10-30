@@ -4,7 +4,15 @@ defmodule Buildel.Clients.ChatGPT do
   @behaviour ChatBehaviour
 
   @impl ChatBehaviour
-  def stream_chat(context: context, on_content: on_content, on_end: on_end, api_key: api_key, model: model, temperature: temperature) do
+  def stream_chat(
+        context: context,
+        on_content: on_content,
+        on_end: on_end,
+        on_error: on_error,
+        api_key: api_key,
+        model: model,
+        temperature: temperature
+      ) do
     OpenAI.chat_completion(
       [
         model: model,
@@ -20,6 +28,9 @@ defmodule Buildel.Clients.ChatGPT do
 
       %{"choices" => [%{"delta" => %{"content" => content}}]} ->
         on_content.(content)
+
+      %{"choices" => [], "code" => 401, "status" => :error} ->
+        on_error.("Invalid API key")
 
       message ->
         Logger.error("Unknown message #{inspect(message)}")

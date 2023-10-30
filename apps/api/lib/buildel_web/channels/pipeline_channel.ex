@@ -125,10 +125,10 @@ defmodule BuildelWeb.PipelineChannel do
     {:noreply, socket}
   end
 
-  def handle_info({output_name, :error, _}, socket) do
+  def handle_info({output_name, :error, errors}, socket) do
     case parse_topic(output_name) do
       %{output_name: nil, block_name: block_name} ->
-        socket |> Phoenix.Channel.push("error:#{block_name}", %{})
+        socket |> Phoenix.Channel.push("error:#{block_name}", %{errors: errors})
 
       _ ->
         "skip"

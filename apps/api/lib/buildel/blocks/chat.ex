@@ -205,6 +205,10 @@ defmodule Buildel.Blocks.Chat do
           on_end: fn ->
             finish_chat_message(pid)
           end,
+          on_error: fn error ->
+            send_error(state, error)
+            finish_chat_message(pid)
+          end,
           api_key: state[:api_key],
           model: state[:opts].model,
           temperature: state[:opts].temperature

@@ -3,11 +3,11 @@ defmodule Buildel.Blocks.Utils.Error do
     quote do
       alias Buildel.BlockPubSub
 
-      defp send_error(state) do
+      defp send_error(state, error_message) do
         BlockPubSub.broadcast_to_block(
           state[:context_id],
           state[:block_name],
-          {:error, nil}
+          {:error, [error_message]}
         )
 
         state

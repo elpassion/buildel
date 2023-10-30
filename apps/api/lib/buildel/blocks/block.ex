@@ -36,6 +36,7 @@ defmodule Buildel.Blocks.Block do
     quote do
       use GenServer
       use Buildel.Blocks.Utils.StreamState
+      use Buildel.Blocks.Utils.Error
       alias Buildel.Blocks.Block
       alias Buildel.BlockPubSub
       defstruct [:name, :type, opts: %{}]
