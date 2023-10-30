@@ -45,6 +45,29 @@ defmodule BuildelWeb.OrganizationController do
     end
   end
 
+  defparams :update do
+    required(:organization, :map) do
+      required(:name, :string)
+    end
+  end
+
+
+  def update(conn, %{"id" => organization_id} = params) do
+    user = conn.assigns.current_user
+
+    with {:ok, %{organization: organization_params}} <- validate(:update, params),
+         {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
+         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Organizations.Organization{} = organization} <-
+           Organizations.update_organization(organization, organization_params) do
+
+      conn
+        |> put_status(:ok)
+        |> put_resp_header("location", ~p"/api/organizations/#{organization.id}")
+        |> render(:show, organization: organization)
+    end
+  end
+
   def get_api_key(conn, %{"id" => organization_id}) do
     user = conn.assigns.current_user
 

@@ -42,11 +42,14 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const result = await validator.validate(await request.formData());
 
-      // const res = await fetch(
-      //   OrganizationResponse,
-      //   `/organizations/${params.organizationId}`,
-      //   { method: "PUT" }
-      // );
+      await fetch(
+        OrganizationResponse,
+        `/organizations/${params.organizationId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(result.data),
+        }
+      );
 
       return json(
         {},

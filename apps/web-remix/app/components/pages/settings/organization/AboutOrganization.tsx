@@ -87,8 +87,13 @@ function EditOrganizationName({ organization }: EditOrganizationNameProps) {
         }
       >
         <div className="p-1 w-[330px] md:w-[450px]">
-          <ValidatedForm method="put" noValidate validator={validator}>
-            <Field name="name">
+          <ValidatedForm
+            method="put"
+            noValidate
+            validator={validator}
+            onSubmit={closeModal}
+          >
+            <Field name="organization.name">
               <TextInputField
                 label="Organization name"
                 placeholder="Acme"
