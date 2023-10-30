@@ -17,6 +17,8 @@ import ReactFlow, {
   ReactFlowProvider,
   useEdgesState,
   useNodesState,
+  NodeChange,
+  EdgeChange,
 } from "reactflow";
 import { useBeforeUnloadWarning } from "~/hooks/useBeforeUnloadWarning";
 import {
@@ -72,6 +74,22 @@ export const Builder = ({
   const isUpToDate = isEqual(toPipelineConfig(nodes, edges), pipeline.config);
 
   useBeforeUnloadWarning(!isUpToDate);
+
+  const handleOnNodesChange = useCallback(
+    (changes: NodeChange[]) => {
+      if (type === "readOnly") return;
+      return onNodesChange(changes);
+    },
+    [onNodesChange, type]
+  );
+
+  const handleOnEdgesChange = useCallback(
+    (changes: EdgeChange[]) => {
+      if (type === "readOnly") return;
+      return onEdgesChange(changes);
+    },
+    [onEdgesChange, type]
+  );
 
   const handleIsValidConnection = useCallback(
     (connection: Connection) =>
@@ -204,8 +222,8 @@ export const Builder = ({
             nodesFocusable={type !== "readOnly"}
             nodes={nodes}
             edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
+            onNodesChange={handleOnNodesChange}
+            onEdgesChange={handleOnEdgesChange}
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
