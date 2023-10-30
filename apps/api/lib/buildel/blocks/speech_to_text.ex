@@ -29,12 +29,11 @@ defmodule Buildel.Blocks.SpeechToText do
           options_schema(%{
             "required" => ["api_key"],
             "properties" => %{
-              "api_key" => %{
-                "type" => "string",
-                "title" => "API Key",
-                "description" => "Deepgram API key",
-                "minLength" => 1
-              }
+              "api_key" =>
+                secret_schema(%{
+                  "title" => "API key",
+                  "description" => "Deepgram API key"
+                })
             }
           })
       }
@@ -52,19 +51,23 @@ defmodule Buildel.Blocks.SpeechToText do
   def init(
         [
           name: _name,
-          block_name: _block_name,
+          block_name: block_name,
           context_id: context_id,
           type: __MODULE__,
           opts: opts
         ] = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
-    api_key = opts |> Map.get(:api_key, System.get_env("DEEPGRAM_API_KEY"))
 
-    deepgram_pid =
-      deepgram().connect!(api_key, %{stream_to: self()})
+    api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
 
-    {:ok, state |> Keyword.put(:deepgram_pid, deepgram_pid) |> assign_stream_state}
+    case deepgram().connect!(api_key, %{stream_to: self()}) do
+      {:ok, deepgram_pid} ->
+        {:ok, state |> Keyword.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
+
+      {:error, _reason} ->
+        {:stop, {:error, block_name, :incorrect_api_key}}
+    end
   end
 
   @impl true
@@ -116,5 +119,9 @@ defmodule Buildel.Blocks.SpeechToText do
 
   defp deepgram() do
     Application.fetch_env!(:buildel, :deepgram)
+  end
+
+  defp block_secrets_resolver() do
+    Application.fetch_env!(:buildel, :block_secrets_resolver)
   end
 end

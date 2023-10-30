@@ -144,6 +144,35 @@ defmodule Buildel.Blocks.Block do
         )
       end
 
+      defp secret_schema(%{"title" => title, "description" => description}) do
+        %{
+          "type" => "string",
+          "title" => title,
+          "description" => description,
+          "url" => "/api/organizations/{{organization_id}}/secrets",
+          "presentAs" => "async-creatable-select",
+          "schema" => %{
+            "type" => "object",
+            "required" => ["name", "value"],
+            "properties" => %{
+              "name" => %{
+                "type" => "string",
+                "title" => "Name",
+                "description" => "The name for the secret.",
+                "minLength" => 1
+              },
+              "value" => %{
+                "type" => "string",
+                "title" => "Value",
+                "description" => "The value of the secret.",
+                "presentAs" => "password",
+                "minLength" => 1
+              }
+            }
+          }
+        }
+      end
+
       defp get_input(inputs, name) do
         %{block: block, io: output_name} = BlockPubSub.io_from_topic(name)
 

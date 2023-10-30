@@ -209,7 +209,10 @@ defmodule Buildel.BlocksTest do
           name: "test",
           block_name: "test",
           context_id: "run1",
-          opts: %{inputs: ["audio_test:output"]}
+          opts: %{
+            inputs: ["audio_test:output"],
+            api_key: "test"
+          }
         )
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -236,7 +239,10 @@ defmodule Buildel.BlocksTest do
           name: "test",
           block_name: "test",
           context_id: "run1",
-          opts: %{inputs: ["text_test:output->input"]}
+          opts: %{
+            inputs: ["text_test:output->input"],
+            api_key: "test"
+          }
         )
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")

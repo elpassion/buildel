@@ -1,5 +1,5 @@
 defmodule Buildel.Clients.DeepgramBehaviour do
-  @callback connect!(String.t(), %{stream_to: pid}) :: pid
+  @callback connect!(String.t(), %{stream_to: pid}) :: {:ok, pid} | {:error, term}
   @callback disconnect(pid) :: :ok
   @callback transcribe_audio(pid, {:binary, binary}) :: :ok
 end
@@ -12,10 +12,7 @@ defmodule Buildel.Clients.Deepgram do
 
   @impl DeepgramBehaviour
   def connect!(token, state \\ %{}) do
-    {:ok, pid} =
-      start_link(state, extra_headers: [{"Authorization", "token #{token}"}], debug: [:trace])
-
-    pid
+    start_link(state, extra_headers: [{"Authorization", "token #{token}"}], debug: [:trace])
   end
 
   @impl DeepgramBehaviour

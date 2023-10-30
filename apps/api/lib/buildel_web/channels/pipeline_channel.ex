@@ -17,7 +17,13 @@ defmodule BuildelWeb.PipelineChannel do
          {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
          organization <- Buildel.Organizations.get_organization!(organization_id),
          :ok <-
-          BuildelWeb.ChannelAuth.verify_auth_token(socket.id, channel_name, user_data, auth, organization.api_key),
+           BuildelWeb.ChannelAuth.verify_auth_token(
+             socket.id,
+             channel_name,
+             user_data,
+             auth,
+             organization.api_key
+           ),
          {:ok, %Pipelines.Pipeline{id: pipeline_id, config: config}} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.create_run(%{pipeline_id: pipeline_id, config: config}),
@@ -40,6 +46,9 @@ defmodule BuildelWeb.PipelineChannel do
            reason: "invalid",
            errors: BuildelWeb.ChangesetJSON.error(%{changeset: changeset}).errors
          }}
+
+      {:error, {:shutdown, {:failed_to_start_child, _, {:error, block_name, reason}}}} ->
+        {:error, %{errors: %{[block_name] => [reason]}}}
 
       err ->
         IO.inspect(err)

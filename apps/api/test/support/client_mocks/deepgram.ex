@@ -4,8 +4,7 @@ defmodule Buildel.ClientMocks.Deepgram do
 
   @impl DeepgramBehaviour
   def connect!(_token, state \\ %{}) do
-    {:ok, pid} = GenServer.start_link(__MODULE__, state, [])
-    pid
+    GenServer.start_link(__MODULE__, state, [])
   end
 
   @impl DeepgramBehaviour

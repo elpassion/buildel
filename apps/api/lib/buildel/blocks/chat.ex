@@ -35,32 +35,11 @@ defmodule Buildel.Blocks.Chat do
             "required" => ["model", "temperature", "system_message", "messages", "api_key"],
             "properties" =>
               Jason.OrderedObject.new(
-                api_key: %{
-                  "type" => "string",
-                  "title" => "API key",
-                  "url" => "/api/organizations/{{organization_id}}/secrets",
-                  "presentAs" => "async-creatable-select",
-                  "schema" => %{
-                    "type" => "object",
-                    "required" => ["name", "value"],
-                    "properties" => %{
-                      "name" => %{
-                        "type" => "string",
-                        "title" => "Name",
-                        "description" => "The name for the secret.",
-                        "minLength" => 1
-                      },
-                      "value" => %{
-                        "type" => "string",
-                        "title" => "Value",
-                        "description" => "The value of the secret.",
-                        "presentAs" => "password",
-                        "minLength" => 1
-                      }
-                    }
-                  },
-                  "description" => "OpenAI API key to use for the chat."
-                },
+                api_key:
+                  secret_schema(%{
+                    "title" => "API key",
+                    "description" => "OpenAI API key to use for the chat."
+                  }),
                 model: %{
                   "type" => "string",
                   "title" => "Model",

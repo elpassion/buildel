@@ -15,6 +15,7 @@ defmodule Buildel.Pipelines.Runner do
       {:ok, run |> Buildel.Repo.reload() |> Buildel.Repo.preload(:pipeline)}
     else
       {:error, reason} ->
+        run |> Pipelines.finish()
         Logger.error("Failed to start worker with reason: #{inspect(reason)}")
         {:error, reason}
     end
@@ -24,6 +25,7 @@ defmodule Buildel.Pipelines.Runner do
     case Process.whereis(Buildel.Pipelines.Worker.context_id(run) |> String.to_atom()) do
       nil ->
         Logger.debug("No worker found for #{inspect(run)}")
+        run |> Pipelines.finish()
 
       pid ->
         DynamicSupervisor.terminate_child(__MODULE__, pid)

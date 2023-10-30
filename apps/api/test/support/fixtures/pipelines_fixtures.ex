@@ -18,7 +18,9 @@ defmodule Buildel.PipelinesFixtures do
             %{
               "name" => "random_block_2",
               "type" => "speech_to_text",
-              "opts" => %{},
+              "opts" => %{
+                "api_key" => "some_api_key"
+              },
               "inputs" => ["random_block:output"]
             },
             %{
