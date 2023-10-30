@@ -27,6 +27,7 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      closeButtonProps={{ iconName: "x", "aria-label": "Close" }}
       header={
         <header className="p-1 text-white">
           <p className="text-3xl mb-4">Edit Secret</p>
