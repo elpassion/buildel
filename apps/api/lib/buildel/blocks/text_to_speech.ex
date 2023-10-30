@@ -30,32 +30,10 @@ defmodule Buildel.Blocks.TextToSpeech do
           options_schema(%{
             "required" => ["api_key"],
             "properties" => %{
-              api_key: %{
-                "type" => "string",
+              api_key: secret_schema(%{
                 "title" => "API key",
-                "url" => "/api/organizations/{{organization_id}}/secrets",
-                "presentAs" => "async-creatable-select",
-                "schema" => %{
-                  "type" => "object",
-                  "required" => ["name", "value"],
-                  "properties" => %{
-                    "name" => %{
-                      "type" => "string",
-                      "title" => "Name",
-                      "description" => "The name for the secret.",
-                      "minLength" => 1
-                    },
-                    "value" => %{
-                      "type" => "string",
-                      "title" => "Value",
-                      "description" => "The value of the secret.",
-                      "presentAs" => "password",
-                      "minLength" => 1
-                    }
-                  }
-                },
                 "description" => "ElevenLabs API Key."
-              }
+              })
             }
           })
       }
@@ -169,9 +147,5 @@ defmodule Buildel.Blocks.TextToSpeech do
 
   defp elevenlabs() do
     Application.fetch_env!(:buildel, :elevenlabs)
-  end
-
-  defp block_secrets_resolver() do
-    Application.fetch_env!(:buildel, :block_secrets_resolver)
   end
 end

@@ -30,7 +30,7 @@ defmodule Buildel.Blocks.DocumentSearch do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["api_key", "persist_in", "forwarded_results_count", "hybrid_reranking"],
+            "required" => ["persist_in", "forwarded_results_count", "hybrid_reranking"],
             "properties" => %{
               "persist_in" => %{
                 "type" => "string",

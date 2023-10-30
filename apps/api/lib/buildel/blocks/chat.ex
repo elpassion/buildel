@@ -304,8 +304,4 @@ defmodule Buildel.Blocks.Chat do
   defp chat_gpt() do
     Application.fetch_env!(:buildel, :chat_gpt)
   end
-
-  defp block_secrets_resolver() do
-    Application.fetch_env!(:buildel, :block_secrets_resolver)
-  end
 end

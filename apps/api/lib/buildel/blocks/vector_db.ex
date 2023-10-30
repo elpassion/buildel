@@ -32,13 +32,10 @@ defmodule Buildel.Blocks.VectorDB do
           options_schema(%{
             "required" => ["api_key", "persist_in"],
             "properties" => %{
-              "api_key" => %{
-                "type" => "string",
+              "api_key" => secret_schema(%{
                 "title" => "API Key",
                 "description" => "Select from your API keys or enter a new one.",
-                "minLength" => 1,
-                "presentAs" => "password"
-              },
+              }),
               "persist_in" => %{
                 "type" => "string",
                 "title" => "Persist in",
@@ -84,7 +81,10 @@ defmodule Buildel.Blocks.VectorDB do
      state
      |> assign_stream_state
      |> Keyword.put(:collection, collection.name)
-     |> Keyword.put(:api_key, opts |> Map.get(:api_key))}
+     |> Keyword.put(
+       :api_key,
+       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
+     )}
   end
 
   @impl true

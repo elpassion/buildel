@@ -120,8 +120,4 @@ defmodule Buildel.Blocks.SpeechToText do
   defp deepgram() do
     Application.fetch_env!(:buildel, :deepgram)
   end
-
-  defp block_secrets_resolver() do
-    Application.fetch_env!(:buildel, :block_secrets_resolver)
-  end
 end

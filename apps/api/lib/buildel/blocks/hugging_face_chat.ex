@@ -34,13 +34,10 @@ defmodule Buildel.Blocks.HuggingFaceChat do
           options_schema(%{
             "required" => ["model", "temperature", "messages", "api_key"],
             "properties" => %{
-              "api_key" => %{
-                "type" => "string",
+              "api_key" => secret_schema(%{
                 "title" => "API Key",
-                "description" => "Select from your API keys or enter a new one.",
-                "minLength" => 1,
-                "presentAs" => "password"
-              },
+                "description" => "Select from your API keys or enter a new one."
+              }),
               "model" => %{
                 "type" => "string",
                 "title" => "Model",
@@ -123,7 +120,10 @@ defmodule Buildel.Blocks.HuggingFaceChat do
      |> assign_stream_state
      |> assign_take_latest(true)
      |> Keyword.put(:messages, opts[:messages])
-     |> Keyword.put(:api_key, opts |> Map.get(:api_key))
+     |> Keyword.put(
+       :api_key,
+       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
+     )
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
   end

@@ -198,6 +198,10 @@ defmodule Buildel.Blocks.Block do
 
         state
       end
+
+      defp block_secrets_resolver() do
+        Application.fetch_env!(:buildel, :block_secrets_resolver)
+      end
     end
   end
 end
