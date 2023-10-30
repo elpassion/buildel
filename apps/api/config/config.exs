@@ -78,6 +78,7 @@ config :buildel, :embeddings, Buildel.Clients.BumblebeeEmbeddings
 config :buildel, :file_loader, Buildel.FileLoaderUnstructuredApiAdapter
 config :buildel, :search_db, Buildel.SearchDB.LNXAdapter
 config :buildel, :hybrid_db, true
+config :buildel, :block_secrets_resolver, Buildel.BlockSecrets
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

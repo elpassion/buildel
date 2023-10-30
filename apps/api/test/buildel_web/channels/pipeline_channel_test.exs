@@ -7,20 +7,31 @@ defmodule BuildelWeb.PipelineChannelTest do
 
   describe "join" do
     test "fails when starting a pipeline without token", %{socket: socket} do
-      assert {:error, %{reason: "invalid", errors: %{ auth: ["can't be blank"], user_data: ["can't be blank"] }}} =
+      assert {:error,
+              %{
+                reason: "invalid",
+                errors: %{auth: ["can't be blank"], user_data: ["can't be blank"]}
+              }} =
                socket
-               |> subscribe_and_join(BuildelWeb.PipelineChannel, "pipelines:org:non-existent", %{})
+               |> subscribe_and_join(
+                 BuildelWeb.PipelineChannel,
+                 "pipelines:org:non-existent",
+                 %{}
+               )
     end
 
-    test "fails when starting a pipeline with invalid token", %{socket: socket, organization: organization} do
+    test "fails when starting a pipeline with invalid token", %{
+      socket: socket,
+      organization: organization
+    } do
       pipeline = pipeline_fixture(%{organization_id: organization.id})
 
-      assert {:error, %{reason: "unauthorized" }} =
+      assert {:error, %{reason: "unauthorized"}} =
                socket
                |> subscribe_and_join(
                  BuildelWeb.PipelineChannel,
                  "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
-                 %{ auth: "invalid-token", user_data: "{}" }
+                 %{auth: "invalid-token", user_data: "{}"}
                )
     end
 
@@ -39,19 +50,25 @@ defmodule BuildelWeb.PipelineChannelTest do
                  BuildelWeb.PipelineChannel,
                  "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
                  %{
-                  auth: BuildelWeb.ChannelAuth.create_auth_token(
-                    "socket_id",
-                    "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
-                    user_data
-                  ),
-                  user_data: user_data
+                   auth:
+                     BuildelWeb.ChannelAuth.create_auth_token(
+                       "socket_id",
+                       "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                       user_data,
+                       organization.api_key
+                     ),
+                   user_data: user_data
                  }
                )
     end
   end
 
   describe "IO" do
-    test "outputs all outputs to socket", %{socket: socket, organization: organization, user: user} do
+    test "outputs all outputs to socket", %{
+      socket: socket,
+      organization: organization,
+      user: user
+    } do
       user_data = Jason.encode!(%{user_id: user.id})
 
       pipeline =
@@ -65,13 +82,15 @@ defmodule BuildelWeb.PipelineChannelTest do
           BuildelWeb.PipelineChannel,
           "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
           %{
-            auth: BuildelWeb.ChannelAuth.create_auth_token(
-              "socket_id",
-              "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
-              user_data
-            ),
+            auth:
+              BuildelWeb.ChannelAuth.create_auth_token(
+                "socket_id",
+                "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                user_data,
+                organization.api_key
+              ),
             user_data: user_data
-           }
+          }
         )
 
       payload = {:binary, File.read!("test/support/fixtures/real.mp3")}
@@ -97,7 +116,7 @@ defmodule BuildelWeb.PipelineChannelTest do
 
   setup do
     user = user_fixture()
-    organization = organization_fixture(%{ user_id: user.id })
+    organization = organization_fixture(%{user_id: user.id})
     socket = BuildelWeb.PipelineSocket |> socket("socket_id", %{})
 
     %{socket: socket, user: user, organization: organization}

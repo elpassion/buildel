@@ -59,6 +59,7 @@ defmodule BuildelWeb.OrganizationControllerTest do
       assert %{"id" => _id, "name" => "some name"} = json_response(conn, 201)["data"]
     end
   end
+
   describe "update" do
     test "requires authentication", %{conn: conn, organization: organization} do
       conn = conn |> log_out_user()
@@ -70,7 +71,7 @@ defmodule BuildelWeb.OrganizationControllerTest do
     end
 
     test "returns the organization", %{conn: conn, organization: organization} do
-      conn = put(conn, ~p"/api/organizations/#{organization.id}", organization: %{name: "new name"})
+      put(conn, ~p"/api/organizations/#{organization.id}", organization: %{name: "new name"})
 
       assert Organizations.get_organization!(organization.id).name == "new name"
     end

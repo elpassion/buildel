@@ -8,7 +8,7 @@ defmodule BuildelWeb.BlockTypeControllerTest do
   describe "index" do
     test "lists all block_types", %{conn: conn} do
       conn = get(conn, ~p"/api/block_types")
-      assert json_response(conn, 200)["data"] |> Enum.count() == 13
+      assert json_response(conn, 200)["data"] |> Enum.count() == 14
     end
   end
 end

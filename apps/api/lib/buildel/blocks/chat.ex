@@ -167,7 +167,7 @@ defmodule Buildel.Blocks.Chat do
      )
      |> Keyword.put(
        :api_key,
-       Buildel.BlockSecrets.get_secret_from_context(context_id, opts |> Map.get(:api_key))
+       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
      )
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
@@ -320,5 +320,9 @@ defmodule Buildel.Blocks.Chat do
 
   defp chat_gpt() do
     Application.fetch_env!(:buildel, :chat_gpt)
+  end
+
+  defp block_secrets_resolver() do
+    Application.fetch_env!(:buildel, :block_secrets_resolver)
   end
 end

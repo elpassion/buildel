@@ -11,8 +11,12 @@ defmodule BuildelWeb.ChannelAuthControllerTest do
   setup [:register_and_log_in_user, :create_user_organization]
 
   describe "create" do
-    test "fails for unauthenticated user", %{ conn: conn } do
-      conn = conn |> log_out_user() |> post(~p"/api/channel_auth", %{ channel_name: "pipelines:1:1", socket_id: "1" })
+    test "fails for unauthenticated user", %{conn: conn} do
+      conn =
+        conn
+        |> log_out_user()
+        |> post(~p"/api/channel_auth", %{channel_name: "pipelines:1:1", socket_id: "1"})
+
       assert json_response(conn, 401)["errors"] != %{}
     end
 
@@ -22,7 +26,7 @@ defmodule BuildelWeb.ChannelAuthControllerTest do
     end
 
     test "fails to authenticate for other orgs pipeline channel", %{conn: conn} do
-      conn = post(conn, ~p"/api/channel_auth", %{ channel_name: "pipelines:1:1", socket_id: "1" })
+      conn = post(conn, ~p"/api/channel_auth", %{channel_name: "pipelines:1:1", socket_id: "1"})
       assert json_response(conn, 401)["errors"] != %{}
     end
 
@@ -30,9 +34,20 @@ defmodule BuildelWeb.ChannelAuthControllerTest do
       pipeline = pipeline_fixture(%{organization_id: organization.id})
       channel_name = "pipelines:#{organization.id}:#{pipeline.id}"
       socket_id = "1"
-      conn = post(conn, ~p"/api/channel_auth", %{ channel_name: channel_name, socket_id: socket_id })
-      assert %{ "user_data" => user_data, "auth" => auth } = json_response(conn, 200)
-      assert :ok == BuildelWeb.ChannelAuth.verify_auth_token(socket_id, channel_name, user_data, auth)
+
+      conn =
+        post(conn, ~p"/api/channel_auth", %{channel_name: channel_name, socket_id: socket_id})
+
+      assert %{"user_data" => user_data, "auth" => auth} = json_response(conn, 200)
+
+      assert :ok ==
+               BuildelWeb.ChannelAuth.verify_auth_token(
+                 socket_id,
+                 channel_name,
+                 user_data,
+                 auth,
+                 organization.api_key
+               )
     end
   end
 

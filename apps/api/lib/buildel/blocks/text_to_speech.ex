@@ -86,7 +86,7 @@ defmodule Buildel.Blocks.TextToSpeech do
      state
      |> Keyword.put(
        :api_key,
-       Buildel.BlockSecrets.get_secret_from_context(context_id, opts |> Map.get(:api_key))
+       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
      )
      |> Keyword.put(:clips, %{})
      |> assign_stream_state()}
@@ -169,5 +169,9 @@ defmodule Buildel.Blocks.TextToSpeech do
 
   defp elevenlabs() do
     Application.fetch_env!(:buildel, :elevenlabs)
+  end
+
+  defp block_secrets_resolver() do
+    Application.fetch_env!(:buildel, :block_secrets_resolver)
   end
 end
