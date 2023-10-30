@@ -54,8 +54,7 @@ defmodule Buildel.Blocks.TextToSpeech do
                     }
                   }
                 },
-                "description" =>
-                  "ElevenLabs API Key."
+                "description" => "ElevenLabs API Key."
               }
             }
           })
@@ -85,7 +84,10 @@ defmodule Buildel.Blocks.TextToSpeech do
 
     {:ok,
      state
-     |> Keyword.put(:api_key, Buildel.BlockSecrets.get_secret_from_context(context_id, opts |> Map.get(:api_key)))
+     |> Keyword.put(
+       :api_key,
+       Buildel.BlockSecrets.get_secret_from_context(context_id, opts |> Map.get(:api_key))
+     )
      |> Keyword.put(:clips, %{})
      |> assign_stream_state()}
   end

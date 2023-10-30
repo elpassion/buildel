@@ -33,91 +33,91 @@ defmodule Buildel.Blocks.Chat do
         "opts" =>
           options_schema(%{
             "required" => ["model", "temperature", "system_message", "messages", "api_key"],
-            "properties" => Jason.OrderedObject.new(
-              api_key: %{
-                "type" => "string",
-                "title" => "API key",
-                "url" => "/api/organizations/{{organization_id}}/secrets",
-                "presentAs" => "async-creatable-select",
-                "schema" => %{
-                  "type" => "object",
-                  "required" => ["name", "value"],
-                  "properties" => %{
-                    "name" => %{
-                      "type" => "string",
-                      "title" => "Name",
-                      "description" => "The name for the secret.",
-                      "minLength" => 1
-                    },
-                    "value" => %{
-                      "type" => "string",
-                      "title" => "Value",
-                      "description" => "The value of the secret.",
-                      "presentAs" => "password",
-                      "minLength" => 1
+            "properties" =>
+              Jason.OrderedObject.new(
+                api_key: %{
+                  "type" => "string",
+                  "title" => "API key",
+                  "url" => "/api/organizations/{{organization_id}}/secrets",
+                  "presentAs" => "async-creatable-select",
+                  "schema" => %{
+                    "type" => "object",
+                    "required" => ["name", "value"],
+                    "properties" => %{
+                      "name" => %{
+                        "type" => "string",
+                        "title" => "Name",
+                        "description" => "The name for the secret.",
+                        "minLength" => 1
+                      },
+                      "value" => %{
+                        "type" => "string",
+                        "title" => "Value",
+                        "description" => "The value of the secret.",
+                        "presentAs" => "password",
+                        "minLength" => 1
+                      }
                     }
-                  }
+                  },
+                  "description" => "OpenAI API key to use for the chat."
                 },
-                "description" =>
-                  "OpenAI API key to use for the chat."
-              },
-              model: %{
-                "type" => "string",
-                "title" => "Model",
-                "description" => "The model to use for the chat.",
-                "enum" => ["gpt-3.5-turbo", "gpt-4"],
-                "enumPresentAs" => "radio",
-                "default" => "gpt-3.5-turbo"
-              },
-              temperature: %{
-                "type" => "number",
-                "title" => "Temperature",
-                "description" => "The temperature of the chat.",
-                "default" => 0.7,
-                "minimum" => 0.0,
-                "maximum" => 1.0,
-                "step" => 0.1
-              },
-              system_message: %{
-                "type" => "string",
-                "title" => "System message",
-                "description" => "The message to start the conversation with.",
-                "default" => "Hello, how are you?",
-                "presentAs" => "editor"
-              },
-              messages: %{
-                "type" => "array",
-                "title" => "Messages",
-                "description" => "The messages to start the conversation with.",
-                "minItems" => 0,
-                "items" => %{
-                  "type" => "object",
-                  "required" => ["role", "content"],
-                  "properties" => %{
-                    "role" => %{
-                      "type" => "string",
-                      "title" => "Role",
-                      "enum" => ["user", "assistant"],
-                      "enumPresentAs" => "radio",
-                      "default" => "user"
-                    },
-                    "content" => %{
-                      "type" => "string",
-                      "title" => "Content",
-                      "presentAs" => "editor"
+                model: %{
+                  "type" => "string",
+                  "title" => "Model",
+                  "description" => "The model to use for the chat.",
+                  "enum" => ["gpt-3.5-turbo", "gpt-4"],
+                  "enumPresentAs" => "radio",
+                  "default" => "gpt-3.5-turbo"
+                },
+                temperature: %{
+                  "type" => "number",
+                  "title" => "Temperature",
+                  "description" => "The temperature of the chat.",
+                  "default" => 0.7,
+                  "minimum" => 0.0,
+                  "maximum" => 1.0,
+                  "step" => 0.1
+                },
+                system_message: %{
+                  "type" => "string",
+                  "title" => "System message",
+                  "description" => "The message to start the conversation with.",
+                  "default" => "Hello, how are you?",
+                  "presentAs" => "editor"
+                },
+                messages: %{
+                  "type" => "array",
+                  "title" => "Messages",
+                  "description" => "The messages to start the conversation with.",
+                  "minItems" => 0,
+                  "items" => %{
+                    "type" => "object",
+                    "required" => ["role", "content"],
+                    "properties" => %{
+                      "role" => %{
+                        "type" => "string",
+                        "title" => "Role",
+                        "enum" => ["user", "assistant"],
+                        "enumPresentAs" => "radio",
+                        "default" => "user"
+                      },
+                      "content" => %{
+                        "type" => "string",
+                        "title" => "Content",
+                        "presentAs" => "editor"
+                      }
                     }
-                  }
+                  },
+                  "default" => []
                 },
-                "default" => []
-              },
-              prompt_template: %{
-                "type" => "string",
-                "title" => "Prompt template",
-                "description" => "The template to use for the prompt.",
-                "default" => "{{text_input_1:output}}",
-                "presentAs" => "editor"
-              },
-            )
+                prompt_template: %{
+                  "type" => "string",
+                  "title" => "Prompt template",
+                  "description" => "The template to use for the prompt.",
+                  "default" => "{{text_input_1:output}}",
+                  "presentAs" => "editor"
+                }
+              )
           })
       }
     }
@@ -161,8 +161,14 @@ defmodule Buildel.Blocks.Chat do
      |> assign_take_latest(true)
      |> Keyword.put(:system_message, opts[:system_message])
      |> Keyword.put(:prompt_template, opts[:prompt_template])
-     |> Keyword.put(:messages, [%{role: "system", content: opts[:system_message]}] ++ opts[:messages])
-     |> Keyword.put(:api_key, Buildel.BlockSecrets.get_secret_from_context(context_id, opts |> Map.get(:api_key)))
+     |> Keyword.put(
+       :messages,
+       [%{role: "system", content: opts[:system_message]}] ++ opts[:messages]
+     )
+     |> Keyword.put(
+       :api_key,
+       Buildel.BlockSecrets.get_secret_from_context(context_id, opts |> Map.get(:api_key))
+     )
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
   end
@@ -170,12 +176,16 @@ defmodule Buildel.Blocks.Chat do
   @impl true
   def handle_cast({:send_message, {:text, text}}, state) do
     state = send_stream_start(state)
-    messages = if List.last(state[:messages])[:role] in ["assistant", "system"] do
-      state[:messages] ++ [%{role: "user", content: state[:prompt_template]}]
-    else
-      state[:messages]
-    end
+
+    messages =
+      if List.last(state[:messages])[:role] in ["assistant", "system"] do
+        state[:messages] ++ [%{role: "user", content: state[:prompt_template]}]
+      else
+        state[:messages]
+      end
+
     state = put_in(state[:messages], messages)
+
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
       state[:block_name],

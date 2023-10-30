@@ -27,17 +27,18 @@ defmodule Buildel.Blocks.IF do
       "properties" => %{
         "name" => name_schema(),
         "inputs" => inputs_schema(),
-        "opts" => options_schema(%{
-          "required" => ["condition"],
-          "properties" => %{
-            condition: %{
-              "type" => "string",
-              "title" => "Condition",
-              "description" => "The value to compare the input to",
-              "minLength" => 1
+        "opts" =>
+          options_schema(%{
+            "required" => ["condition"],
+            "properties" => %{
+              condition: %{
+                "type" => "string",
+                "title" => "Condition",
+                "description" => "The value to compare the input to",
+                "minLength" => 1
+              }
             }
-          }
-        })
+          })
       }
     }
   end
@@ -67,12 +68,12 @@ defmodule Buildel.Blocks.IF do
 
   @impl true
   def handle_cast({:compare, {:text, text_value} = text}, state) do
-    
-    output = if text_value == state[:condition] do
-      "true"
-    else
-      "false"
-    end
+    output =
+      if text_value == state[:condition] do
+        "true"
+      else
+        "false"
+      end
 
     state = state |> send_stream_start(output)
 

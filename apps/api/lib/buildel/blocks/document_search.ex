@@ -37,8 +37,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                 "title" => "Persist in",
                 "url" => "/api/organizations/{{organization_id}}/memory_collections",
                 "presentAs" => "async-select",
-                "description" =>
-                  "Where to hold data from inputs.",
+                "description" => "Where to hold data from inputs.",
                 "default" => "{{pipeline_id}}_{{block_name}}"
               },
               "forwarded_results_count" => %{
