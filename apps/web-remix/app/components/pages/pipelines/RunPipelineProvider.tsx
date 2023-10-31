@@ -9,6 +9,7 @@ import { SafeParseReturnType, ZodError } from "zod";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 import { usePipelineRun } from "./usePipelineRun";
 import { IBlockConfig, IPipeline } from "./pipeline.types";
+import { errorToast } from "~/components/toasts/errorToast";
 
 export interface IEvent {
   block: string;
@@ -22,6 +23,7 @@ interface IRunPipelineContext {
     string,
     { success: true } | { success: false; error: ZodError }
   >;
+  errors: Record<string, string[]>;
   startRun: () => void;
   stopRun: () => void;
   push: (topic: string, payload: any) => void;
@@ -43,6 +45,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   children,
   pipeline,
 }) => {
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [events, setEvents] = useState<any[]>([]);
   const [blockStatuses, setBlockStatuses] = useState<Record<string, boolean>>(
     {}
@@ -54,10 +57,23 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     []
   );
 
-  const onError = useCallback(
-    (blockId: string, errors: string[]) => console.log(blockId, errors),
-    []
-  );
+  const onError = useCallback((blockId: string, errors: string[]) => {
+    setErrors((prev) => {
+      const blockErrors = prev[blockId] || [];
+
+      return {
+        ...prev,
+        [blockId]: [...blockErrors, ...errors],
+      };
+    });
+
+    errors.forEach((err) => {
+      errorToast({
+        title: "Run failed!",
+        description: `The workflow run failed due to an error (${err}) in block ${blockId}.`,
+      });
+    });
+  }, []);
 
   const onStatusChange = useCallback((block: string, status: boolean) => {
     setBlockStatuses((prev) => ({ ...prev, [block]: status }));
@@ -69,6 +85,19 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     onMessage,
     onStatusChange,
     onError
+  );
+
+  const handleStartRun = useCallback(async () => {
+    setErrors({});
+    await startRun();
+  }, [startRun]);
+
+  const handlePush = useCallback(
+    (topic: string, payload: any) => {
+      push(topic, payload);
+      setErrors({});
+    },
+    [push]
   );
 
   const clearEvents = useCallback((blockName: string) => {
@@ -96,27 +125,26 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     return Object.values(blockValidations).every((v) => v.success);
   }, [blockValidations]);
 
-  // // @ts-ignore
-  // window.push = push;
-
   const value = useMemo(
     () => ({
       events,
       status,
-      startRun,
+      startRun: handleStartRun,
+      push: handlePush,
       stopRun,
-      push,
       clearEvents,
       blockStatuses,
       blockValidations,
       isValid,
       organizationId: pipeline.organization_id,
       pipelineId: pipeline.id,
+      errors,
     }),
     [
+      errors,
       events,
-      push,
-      startRun,
+      handlePush,
+      handleStartRun,
       status,
       stopRun,
       clearEvents,
@@ -177,8 +205,8 @@ export const useRunPipelineNode = (block: IBlockConfig) => {
   );
 
   const isValid = useMemo(() => {
-    return ctx.blockValidations[blockName]?.success ?? false;
-  }, [blockName, ctx.blockValidations]);
+    return !ctx.errors[blockName] && ctx.blockValidations[blockName]?.success;
+  }, [blockName, ctx.blockValidations, ctx.errors]);
 
   const errors = useMemo(() => {
     const validation = ctx.blockValidations[blockName] || { success: true };
