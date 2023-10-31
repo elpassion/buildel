@@ -26,7 +26,7 @@ importers:
   apps/web-remix:
     dependencies:
       '@buildel/buildel':
-        specifier: ^0.1.0
+        specifier: ^0.1.1
         version: link:../../packages/buildel
       '@elpassion/taco':
         specifier: ^0.6.0
