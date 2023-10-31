@@ -5,14 +5,14 @@ import {
   useFieldContext,
 } from "~/components/form/fields/field.context";
 import {
-  MonacoEditor,
-  MonacoEditorProps,
-} from "~/components/editor/MonacoEditor";
+  MonacoEditorInput,
+  MonacoEditorInputProps,
+} from "~/components/editor/MonacoEditorInput";
 import { InputText, Label } from "@elpassion/taco";
 
 export const MonacoEditorField = forwardRef<
   HTMLInputElement,
-  Partial<MonacoEditorProps & { label: string; supportingText: ReactNode }>
+  Partial<MonacoEditorInputProps & { label: string; supportingText: ReactNode }>
 >(({ label, supportingText, ...props }) => {
   const { name, getInputProps, validate } = useFieldContext();
   const [value, setValue] = useControlField<string | undefined>(name);
@@ -21,7 +21,7 @@ export const MonacoEditorField = forwardRef<
     <>
       <HiddenField value={value} {...getInputProps()} />
       <Label text={label} />
-      <MonacoEditor
+      <MonacoEditorInput
         path={name}
         height="130px"
         loading={<div className="w-full h-[130px] border border-neutral-200" />}

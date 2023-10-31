@@ -5,13 +5,13 @@ import { Editor, useMonaco } from "@monaco-editor/react";
 export const SUGGESTION_REGEX = "\\{\\{[^\\s]+\\}\\}";
 
 export type IEditor = Parameters<OnMount>[0];
-export interface MonacoEditorProps
+export interface MonacoEditorInputProps
   extends Partial<Omit<EditorProps, "onMount" | "onChange" | "path">> {
   suggestions?: string[];
   onChange?: (value?: string) => void;
   path: string;
 }
-export const MonacoEditor: React.FC<MonacoEditorProps> = ({
+export const MonacoEditorInput: React.FC<MonacoEditorInputProps> = ({
   suggestions,
   onChange,
   options,
@@ -134,7 +134,7 @@ export const MonacoEditor: React.FC<MonacoEditorProps> = ({
   //DOCS here - https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IStandaloneEditorConstructionOptions.html#minimap
   return (
     <Editor
-      className=""
+      className="monaco-editor-input"
       language={props.path}
       onChange={handleOnChange}
       onMount={handleOnMount}

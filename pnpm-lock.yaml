@@ -136,6 +136,9 @@ importers:
       react-tooltip:
         specifier: ^5.21.5
         version: 5.21.5(react-dom@18.2.0)(react@18.2.0)
+      react-wrap-balancer:
+        specifier: ^1.1.0
+        version: 1.1.0(react@18.2.0)
       reactflow:
         specifier: ^11.8.3
         version: 11.8.3(@types/react@18.2.18)(react-dom@18.2.0)(react@18.2.0)
@@ -8122,6 +8125,14 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /react-wrap-balancer@1.1.0(react@18.2.0):
+    resolution: {integrity: sha512-EhF3jOZm5Fjx+Cx41e423qOv2c2aOvXAtym2OHqrGeMUnwERIyNsRBgnfT3plB170JmuYvts8K2KSPEIerKr5A==}
+    peerDependencies:
+      react: '>=16.8.0 || ^17.0.0 || ^18'
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /react@18.2.0:
