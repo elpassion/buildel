@@ -61,12 +61,7 @@ export class BuildelSocket {
         outputName: string,
         payload: unknown
       ) => void;
-      onBlockError?: (
-        blockId: string,
-        error: {
-          message: string;
-        }
-      ) => void;
+      onBlockError?: (blockId: string, errors: string[]) => void;
       onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
       onStatusChange?: (status: BuildelRunStatus) => void;
     }
@@ -104,12 +99,7 @@ export class BuildelRun {
       ) => void;
       onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
       onStatusChange: (status: BuildelRunStatus) => void;
-      onBlockError: (
-        blockId: string,
-        error: {
-          message: string;
-        }
-      ) => void;
+      onBlockError: (blockId: string, errors: string[]) => void;
     }
   ) {}
 
@@ -124,6 +114,13 @@ export class BuildelRun {
     );
 
     this.channel.onMessage = (event: string, payload: any) => {
+      if (event === "phx_reply" && payload.status === "error") {
+        Object.keys(payload.response.errors).forEach((blockId) => {
+          this.handlers.onBlockError(blockId, payload.response.errors[blockId]);
+        });
+
+        return this.stop();
+      }
       if (event.startsWith("output:")) {
         const [_, blockId, outputName] = event.split(":");
         this.handlers.onBlockOutput(blockId, outputName, payload);
@@ -138,7 +135,7 @@ export class BuildelRun {
       }
       if (event.startsWith("error:")) {
         const [_, blockId] = event.split(":");
-        this.handlers.onBlockError(blockId, payload);
+        this.handlers.onBlockError(blockId, payload.errors);
       }
       return payload;
     };
@@ -157,7 +154,7 @@ export class BuildelRun {
   }
 
   public async stop() {
-    if (this.status !== "running") return;
+    if (this.status !== "running" && this.status !== "starting") return;
 
     return new Promise<BuildelRun>((resolve, reject) => {
       assert(this.channel);
