@@ -3,6 +3,7 @@ import { routes } from "~/utils/routes.utils";
 import { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import {
+  PreviewConnector,
   PreviewSection,
   PreviewSectionContent,
   PreviewSectionHeader,
@@ -25,21 +26,21 @@ export function InterfacePage() {
       </p>
 
       <PreviewSection>
+        <PreviewConnector />
         <PreviewSectionHeader>
           <PreviewSectionStep>1</PreviewSectionStep>
+
           <PreviewSectionHeading>
             Install Buildel packages
           </PreviewSectionHeading>
         </PreviewSectionHeader>
 
         <PreviewSectionContent>
-          <div className="space-y-2">
-            <PreviewSectionText>
-              Begin by installing the necessary Buildel packages using npm. This
-              initial step equips you with the tools required for seamless
-              integration with our API.
-            </PreviewSectionText>
-          </div>
+          <PreviewSectionText>
+            Begin by installing the necessary Buildel packages using npm. This
+            initial step equips you with the tools required for seamless
+            integration with our API.
+          </PreviewSectionText>
 
           <CodePreviewWrapper
             value="npm install @buildel/buildel @buildel/buildel-auth"
@@ -52,6 +53,7 @@ export function InterfacePage() {
       </PreviewSection>
 
       <PreviewSection>
+        <PreviewConnector />
         <PreviewSectionHeader>
           <PreviewSectionStep>2</PreviewSectionStep>
           <PreviewSectionHeading>
@@ -121,6 +123,7 @@ export async function action({ request }: ActionFunctionArgs) {
       </PreviewSection>
 
       <PreviewSection>
+        <PreviewConnector />
         <PreviewSectionHeader>
           <PreviewSectionStep>3</PreviewSectionStep>
           <PreviewSectionHeading>Initialize client SDK</PreviewSectionHeading>
@@ -154,19 +157,18 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
       </PreviewSection>
 
       <PreviewSection>
+        <PreviewConnector />
         <PreviewSectionHeader>
           <PreviewSectionStep>4</PreviewSectionStep>
           <PreviewSectionHeading>Connect websockets</PreviewSectionHeading>
         </PreviewSectionHeader>
 
         <PreviewSectionContent>
-          <div className="space-y-2">
-            <PreviewSectionText>
-              Establish a connection to our websocket server to engage in
-              real-time bidirectional communication. This connection is vital
-              for real-time messaging and data interchange.
-            </PreviewSectionText>
-          </div>
+          <PreviewSectionText>
+            Establish a connection to our websocket server to engage in
+            real-time bidirectional communication. This connection is vital for
+            real-time messaging and data interchange.
+          </PreviewSectionText>
 
           <CodePreviewWrapper
             value="await buildel.connect();"
@@ -179,19 +181,18 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
       </PreviewSection>
 
       <PreviewSection>
+        <PreviewConnector />
         <PreviewSectionHeader>
           <PreviewSectionStep>5</PreviewSectionStep>
           <PreviewSectionHeading>Initialize run instance</PreviewSectionHeading>
         </PreviewSectionHeader>
 
         <PreviewSectionContent>
-          <div className="space-y-2">
-            <PreviewSectionText>
-              Initialize a run instance with your workflow ID to manage events
-              for specific blocks, handle errors, and perform other workflow
-              operations.
-            </PreviewSectionText>
-          </div>
+          <PreviewSectionText>
+            Initialize a run instance with your workflow ID to manage events for
+            specific blocks, handle errors, and perform other workflow
+            operations.
+          </PreviewSectionText>
 
           <CodePreviewWrapper
             value={`const run = buildel.run(${pipelineId}, {
@@ -217,30 +218,27 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
       </PreviewSection>
 
       <PreviewSection>
+        <PreviewConnector />
         <PreviewSectionHeader>
           <PreviewSectionStep>6</PreviewSectionStep>
           <PreviewSectionHeading>Send data to channel</PreviewSectionHeading>
         </PreviewSectionHeader>
 
         <PreviewSectionContent>
-          <div className="space-y-2">
-            <PreviewSectionText>
-              After starting your run instance, send data payloads to a
-              specified block in your channel. This action triggers the
-              processing within your run.
-            </PreviewSectionText>
-          </div>
+          <PreviewSectionText>
+            After starting your run instance, send data payloads to a specified
+            block in your channel. This action triggers the processing within
+            your run.
+          </PreviewSectionText>
 
-          <div>
-            <CodePreviewWrapper
-              value={`await run.start()
+          <CodePreviewWrapper
+            value={`await run.start()
 run.push("your_block_name:input", 'sample payload');`}
-              language="typescript"
-              height={55}
-            >
-              {(value) => <CopyCodeButton value={value} />}
-            </CodePreviewWrapper>
-          </div>
+            language="typescript"
+            height={55}
+          >
+            {(value) => <CopyCodeButton value={value} />}
+          </CodePreviewWrapper>
         </PreviewSectionContent>
       </PreviewSection>
 
@@ -251,13 +249,11 @@ run.push("your_block_name:input", 'sample payload');`}
         </PreviewSectionHeader>
 
         <PreviewSectionContent>
-          <div className="space-y-2">
-            <PreviewSectionText>
-              When your interactions with the API conclude, ensure you properly
-              close the socket connection. This step is critical for releasing
-              resources and securely disconnecting from the server.
-            </PreviewSectionText>
-          </div>
+          <PreviewSectionText>
+            When your interactions with the API conclude, ensure you properly
+            close the socket connection. This step is critical for releasing
+            resources and securely disconnecting from the server.
+          </PreviewSectionText>
 
           <div>
             <CodePreviewWrapper

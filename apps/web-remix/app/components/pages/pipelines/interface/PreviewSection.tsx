@@ -1,10 +1,12 @@
 import React, { PropsWithChildren } from "react";
 
 export const PreviewSection: React.FC<PropsWithChildren> = ({ children }) => {
+  return <section className="relative py-4">{children}</section>;
+};
+
+export const PreviewConnector = () => {
   return (
-    <section className="border-t border-neutral-600  pt-6 pb-10">
-      {children}
-    </section>
+    <div className="w-[1px] bg-neutral-600 h-[calc(100%-36px)] absolute top-12 left-[14px]" />
   );
 };
 
@@ -28,7 +30,7 @@ export const PreviewSectionStep: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   return (
-    <div className="bg-transparent border-2 border-secondary-400 rounded-lg w-7 h-7 flex justify-center items-center text-secondary-400 text-xs">
+    <div className="bg-neutral-950 border-2 border-secondary-400 rounded-lg w-7 h-7 flex justify-center items-center text-secondary-400 text-xs">
       {children}
     </div>
   );
@@ -38,12 +40,14 @@ export const PreviewSectionContent: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">{children}</div>
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 xl:gap-6">
+      {children}
+    </div>
   );
 };
 
 export const PreviewSectionText: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  return <p className="text-white text-sm">{children}</p>;
+  return <p className="text-white text-sm pl-[37px]">{children}</p>;
 };

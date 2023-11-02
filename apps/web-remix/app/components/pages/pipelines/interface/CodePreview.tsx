@@ -50,7 +50,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
         glyphMargin: true,
         folding: true,
         minimap: { enabled: false },
-        wordWrap: "on",
+        wordWrap: "off",
         readOnly: true,
         domReadOnly: true,
         scrollBeyondLastLine: false,
@@ -58,6 +58,8 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
         contextmenu: false,
         scrollbar: {
           vertical: "hidden",
+          horizontal: "auto",
+          horizontalSliderSize: 5,
           verticalScrollbarSize: 7,
           useShadows: true,
         },
