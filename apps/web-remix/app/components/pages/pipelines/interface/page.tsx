@@ -12,6 +12,7 @@ import {
 } from "./PreviewSection";
 import { CodePreview } from "./CodePreview";
 import { loader } from "./loader";
+import { CodeTabs } from "./CodeTabs";
 
 export function InterfacePage() {
   const { organizationId, pipelineId } = useLoaderData<typeof loader>();
@@ -78,20 +79,43 @@ export function InterfacePage() {
           </div>
 
           <div>
-            <CodePreview
-              value={`import { BuildelAuth } from "@buildel/buildel-auth";
+            <CodeTabs
+              options={[
+                {
+                  id: 0,
+                  framework: "Next.js",
+                  value: `import { BuildelAuth } from "@buildel/buildel-auth";
 
 export async function POST(request: Request) {
-    const { socket_id: socketId, channel_name: channelName } = await request.json();
+  const { socket_id: socketId, channel_name: channelName } = await request.json();
 
-    const buildelAuth = new BuildelAuth(process.env.BUILDEL_API_KEY);
+  const buildelAuth = new BuildelAuth(process.env.BUILDEL_API_KEY);
 
-    const authData = buildelAuth.generateAuth(socketId, channelName);
+  const authData = buildelAuth.generateAuth(socketId, channelName);
 
-    return NextResponse.json(authData);
-}`}
-              language="typescript"
-              height={215}
+  return NextResponse.json(authData);
+}`,
+                  height: 215,
+                },
+                {
+                  id: 1,
+                  framework: "Remix",
+                  value: `import { BuildelAuth } from "@buildel/buildel-auth"
+
+export async function action({ request }: ActionFunctionArgs) {
+  const body = await request.formData();
+  const socketId = body.get("socketId") as string;
+  const channelName = body.get("channelName") as string;
+
+  const buildelAuth = new BuildelAuth(process.env.BUILDEL_API_KEY);
+
+  const authData = buildelAuth.generateAuth(socketId, channelName);
+
+  return json({ authData });
+}`,
+                  height: 250,
+                },
+              ]}
             />
           </div>
         </PreviewSectionContent>
