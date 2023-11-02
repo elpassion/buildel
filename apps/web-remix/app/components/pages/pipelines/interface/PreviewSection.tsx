@@ -1,5 +1,4 @@
 import React, { PropsWithChildren } from "react";
-import Balancer from "react-wrap-balancer";
 
 export const PreviewSection: React.FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -46,9 +45,5 @@ export const PreviewSectionContent: React.FC<PropsWithChildren> = ({
 export const PreviewSectionText: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  return (
-    <p className="text-white text-sm">
-      <Balancer>{children}</Balancer>
-    </p>
-  );
+  return <p className="text-white text-sm">{children}</p>;
 };
