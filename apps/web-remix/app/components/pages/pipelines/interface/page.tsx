@@ -21,7 +21,7 @@ export function InterfacePage() {
     <div className="pt-5">
       <h2 className="text-lg text-white font-medium">Client SDK</h2>
       <p className="text-white text-xs mb-6">
-        Access out Buildel API easily with our client SDK.
+        Access our Buildel API easily with our client SDK.
       </p>
 
       <PreviewSection>
