@@ -130,9 +130,14 @@ export async function action({ request }: ActionFunctionArgs) {
           <div className="space-y-2">
             <PreviewSectionText>
               Initiate the client SDK with your organization's identifier to
-              validate your credentials and enable authorized requests to our
-              API. This establishes your organization's identity within the
-              SDK's scope.
+              validate your credentials. This establishes your organization's
+              identity within the SDK's scope.
+            </PreviewSectionText>
+
+            <PreviewSectionText>
+              Behind the scenes, the SDK will query an endpoint at the specified
+              address (step 2) to retrieve the hashed credentials required for a
+              secure websocket connection.
             </PreviewSectionText>
           </div>
 
