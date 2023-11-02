@@ -220,9 +220,9 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
         <PreviewSectionContent>
           <div className="space-y-2">
             <PreviewSectionText>
-              After starting your run instance, proceed to dispatch data
-              payloads to a specified block in your channel. This action
-              triggers the processing within your workflow.
+              After starting your run instance, send data payloads to a
+              specified block in your channel. This action triggers the
+              processing within your run.
             </PreviewSectionText>
           </div>
 
