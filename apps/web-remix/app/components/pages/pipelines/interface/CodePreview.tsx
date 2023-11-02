@@ -1,6 +1,27 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { Editor, EditorProps } from "@monaco-editor/react";
-interface CodePreviewProps extends Omit<EditorProps, "height" | "value"> {
+
+interface CodePreviewWrapperProps extends CodePreviewProps {
+  children?: (value: string) => ReactNode;
+}
+
+export const CodePreviewWrapper: React.FC<CodePreviewWrapperProps> = ({
+  children,
+  ...props
+}) => {
+  return (
+    <div>
+      <div className="flex gap-2 justify-end px-1">
+        {children?.(props.value)}
+      </div>
+
+      <CodePreview {...props} />
+    </div>
+  );
+};
+
+export interface CodePreviewProps
+  extends Omit<EditorProps, "height" | "value"> {
   value: string;
   height: number;
 }

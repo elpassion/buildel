@@ -10,9 +10,10 @@ import {
   PreviewSectionStep,
   PreviewSectionText,
 } from "./PreviewSection";
-import { CodePreview } from "./CodePreview";
+import { CodePreviewWrapper } from "./CodePreview";
+import { CodePreviewOptions } from "./CodePreviewOptions";
+import { CopyCodeButton } from "./CopyCodeButton";
 import { loader } from "./loader";
-import { CodeTabs } from "./CodeTabs";
 
 export function InterfacePage() {
   const { organizationId, pipelineId } = useLoaderData<typeof loader>();
@@ -40,13 +41,13 @@ export function InterfacePage() {
             </PreviewSectionText>
           </div>
 
-          <div>
-            <CodePreview
-              value="npm install @buildel/buildel @buildel/buildel-auth"
-              language="bash"
-              height={35}
-            />
-          </div>
+          <CodePreviewWrapper
+            value="npm install @buildel/buildel @buildel/buildel-auth"
+            language="bash"
+            height={35}
+          >
+            {(value) => <CopyCodeButton value={value} />}
+          </CodePreviewWrapper>
         </PreviewSectionContent>
       </PreviewSection>
 
@@ -78,13 +79,12 @@ export function InterfacePage() {
             </PreviewSectionText>
           </div>
 
-          <div>
-            <CodeTabs
-              options={[
-                {
-                  id: 0,
-                  framework: "Next.js",
-                  value: `import { BuildelAuth } from "@buildel/buildel-auth";
+          <CodePreviewOptions
+            options={[
+              {
+                id: 0,
+                framework: "Next.js",
+                value: `import { BuildelAuth } from "@buildel/buildel-auth";
 
 export async function POST(request: Request) {
   const { socket_id: socketId, channel_name: channelName } = await request.json();
@@ -95,12 +95,12 @@ export async function POST(request: Request) {
 
   return NextResponse.json(authData);
 }`,
-                  height: 215,
-                },
-                {
-                  id: 1,
-                  framework: "Remix",
-                  value: `import { BuildelAuth } from "@buildel/buildel-auth"
+                height: 215,
+              },
+              {
+                id: 1,
+                framework: "Remix",
+                value: `import { BuildelAuth } from "@buildel/buildel-auth"
 
 export async function action({ request }: ActionFunctionArgs) {
   const body = await request.formData();
@@ -113,11 +113,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return json({ authData });
 }`,
-                  height: 250,
-                },
-              ]}
-            />
-          </div>
+                height: 250,
+              },
+            ]}
+          />
         </PreviewSectionContent>
       </PreviewSection>
 
@@ -137,15 +136,15 @@ export async function action({ request }: ActionFunctionArgs) {
             </PreviewSectionText>
           </div>
 
-          <div>
-            <CodePreview
-              value={`import { BuildelSocket } from "@buildel/buildel";
+          <CodePreviewWrapper
+            value={`import { BuildelSocket } from "@buildel/buildel";
 
 const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-endpoint' });`}
-              language="typescript"
-              height={70}
-            />
-          </div>
+            language="typescript"
+            height={70}
+          >
+            {(value) => <CopyCodeButton value={value} />}
+          </CodePreviewWrapper>
         </PreviewSectionContent>
       </PreviewSection>
 
@@ -164,13 +163,13 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
             </PreviewSectionText>
           </div>
 
-          <div>
-            <CodePreview
-              value={`await buildel.connect();`}
-              language="typescript"
-              height={35}
-            />
-          </div>
+          <CodePreviewWrapper
+            value="await buildel.connect();"
+            language="typescript"
+            height={35}
+          >
+            {(value) => <CopyCodeButton value={value} />}
+          </CodePreviewWrapper>
         </PreviewSectionContent>
       </PreviewSection>
 
@@ -189,9 +188,8 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
             </PreviewSectionText>
           </div>
 
-          <div>
-            <CodePreview
-              value={`const run = buildel.run(${pipelineId}, {
+          <CodePreviewWrapper
+            value={`const run = buildel.run(${pipelineId}, {
   onBlockOutput: ( blockId: string, outputName: string, payload: unknown) => {
     console.log(\`Output from block \${blockId}, output \${outputName}:\`, payload);
   },
@@ -205,10 +203,11 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
     console.log(\`Block \${blockId} errors: \${errors}\`);
   }
 })`}
-              language="typescript"
-              height={270}
-            />
-          </div>
+            language="typescript"
+            height={270}
+          >
+            {(value) => <CopyCodeButton value={value} />}
+          </CodePreviewWrapper>
         </PreviewSectionContent>
       </PreviewSection>
 
@@ -228,12 +227,14 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
           </div>
 
           <div>
-            <CodePreview
+            <CodePreviewWrapper
               value={`await run.start()
 run.push("your_block_name:input", 'sample payload');`}
               language="typescript"
               height={55}
-            />
+            >
+              {(value) => <CopyCodeButton value={value} />}
+            </CodePreviewWrapper>
           </div>
         </PreviewSectionContent>
       </PreviewSection>
@@ -254,11 +255,13 @@ run.push("your_block_name:input", 'sample payload');`}
           </div>
 
           <div>
-            <CodePreview
+            <CodePreviewWrapper
               value={`await buildel.disconnect();`}
               language="typescript"
               height={35}
-            />
+            >
+              {(value) => <CopyCodeButton value={value} />}
+            </CodePreviewWrapper>
           </div>
         </PreviewSectionContent>
       </PreviewSection>
