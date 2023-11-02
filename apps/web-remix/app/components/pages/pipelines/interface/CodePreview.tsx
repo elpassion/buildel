@@ -55,6 +55,7 @@ export const CodePreview: React.FC<CodePreviewProps> = ({
         domReadOnly: true,
         scrollBeyondLastLine: false,
         lineDecorationsWidth: 0,
+        contextmenu: false,
         scrollbar: {
           vertical: "hidden",
           verticalScrollbarSize: 7,
