@@ -74,6 +74,7 @@ export function InterfacePage() {
               <Link
                 to={routes.organizationSettings(organizationId)}
                 className="text-primary-500 hover:underline"
+                target="_blank"
               >
                 API key
               </Link>{" "}
@@ -147,9 +148,10 @@ export async function action({ request }: ActionFunctionArgs) {
           <CodePreviewWrapper
             value={`import { BuildelSocket } from "@buildel/buildel";
 
+// ${organizationId} is an identifier of your organization
 const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-endpoint' });`}
             language="typescript"
-            height={70}
+            height={90}
           >
             {(value) => <CopyCodeButton value={value} />}
           </CodePreviewWrapper>
@@ -195,7 +197,9 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
           </PreviewSectionText>
 
           <CodePreviewWrapper
-            value={`const run = buildel.run(${pipelineId}, {
+            value={`// ${pipelineId} is an identifier of your workflow
+
+const run = buildel.run(${pipelineId}, {
   onBlockOutput: ( blockId: string, outputName: string, payload: unknown) => {
     console.log(\`Output from block \${blockId}, output \${outputName}:\`, payload);
   },
@@ -210,7 +214,7 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
   }
 })`}
             language="typescript"
-            height={270}
+            height={305}
           >
             {(value) => <CopyCodeButton value={value} />}
           </CodePreviewWrapper>
