@@ -71,7 +71,8 @@ defmodule Buildel.MixProject do
       {:exla, "~> 0.5"},
       {:erlport, "~>0.11"},
       {:poolboy, "~> 1.5"},
-      {:cloak_ecto, "~> 1.2.0"}
+      {:cloak_ecto, "~> 1.2.0"},
+      {:langchain, "~> 0.1.0"}
     ]
   end
 
