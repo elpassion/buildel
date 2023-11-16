@@ -74,7 +74,7 @@ config :buildel, :deepgram, Buildel.Clients.Deepgram
 config :buildel, :elevenlabs, Buildel.Clients.Elevenlabs
 config :buildel, :chat_gpt, Buildel.Clients.ChatGPT
 config :buildel, :vector_db, Buildel.VectorDB.QdrantAdapter
-config :buildel, :embeddings, Buildel.Clients.BumblebeeEmbeddings
+config :buildel, :embeddings, Buildel.Clients.OpenAIEmbeddings
 config :buildel, :file_loader, Buildel.FileLoaderUnstructuredApiAdapter
 config :buildel, :search_db, Buildel.SearchDB.LNXAdapter
 config :buildel, :hybrid_db, true
