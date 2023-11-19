@@ -22,7 +22,10 @@ defmodule Buildel.Memories do
     |> Buildel.Repo.all()
   end
 
-  def get_organization_collection(%Buildel.Organizations.Organization{} = organization, collection_name) do
+  def get_organization_collection(
+        %Buildel.Organizations.Organization{} = organization,
+        collection_name
+      ) do
     Buildel.Memories.MemoryCollection
     |> where(
       [c],
@@ -45,12 +48,17 @@ defmodule Buildel.Memories do
 
     organization_collection_name = organization_collection_name(organization, collection_name)
 
-    with {:ok, collection} <- upsert_collection(%{organization_id: organization.id, collection_name: collection_name}),
+    with {:ok, collection} <-
+           upsert_collection(%{organization_id: organization.id, collection_name: collection_name}),
          {:ok, memory} <-
            %Buildel.Memories.Memory{}
            |> Buildel.Memories.Memory.changeset(
              metadata
-             |> Map.merge(%{organization_id: organization.id, collection_name: collection_name, memory_collection_id: collection.id})
+             |> Map.merge(%{
+               organization_id: organization.id,
+               collection_name: collection_name,
+               memory_collection_id: collection.id
+             })
            )
            |> Buildel.Repo.insert(),
          {:ok, _} <- Buildel.VectorDB.init(organization_collection_name),
@@ -58,8 +66,8 @@ defmodule Buildel.Memories do
          {time, documents} <-
            :timer.tc(fn ->
              Buildel.Splitters.recursive_character_text_split(file, %{
-               chunk_size: 1000,
-               chunk_overlap: 250
+               chunk_size: 2000,
+               chunk_overlap: 500
              })
            end),
          documents <-
@@ -85,6 +93,9 @@ defmodule Buildel.Memories do
       {:ok, memory}
     end
   end
+
+  # text -> split -> chunks (VDB, SDB)
+  # text -> split -> chunks (VDB, SDB) + summary() + full_text()
 
   def create_organization_memory(organization_id, collection_name, %{
         path: path,
@@ -118,13 +129,14 @@ defmodule Buildel.Memories do
   end
 
   def delete_organization_memory_collection(
-    %Buildel.Organizations.Organization{} = organization,
-    id
-  ) do
+        %Buildel.Organizations.Organization{} = organization,
+        id
+      ) do
     collection = get_organization_collection(organization, id)
     memories = collection |> Buildel.Repo.preload(:memories) |> Map.get(:memories)
 
-    memories |> Enum.map(fn memory ->
+    memories
+    |> Enum.map(fn memory ->
       delete_organization_memory(organization, memory.id)
     end)
 
@@ -140,7 +152,10 @@ defmodule Buildel.Memories do
     |> case do
       nil ->
         %Buildel.Memories.MemoryCollection{}
-        |> Buildel.Memories.MemoryCollection.changeset(%{collection_name: collection_name, organization_id: organization_id})
+        |> Buildel.Memories.MemoryCollection.changeset(%{
+          collection_name: collection_name,
+          organization_id: organization_id
+        })
         |> Buildel.Repo.insert()
 
       collection ->

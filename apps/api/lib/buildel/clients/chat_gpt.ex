@@ -1,6 +1,11 @@
 defmodule Buildel.Clients.ChatGPT do
   require Logger
   alias Buildel.Clients.ChatBehaviour
+  alias LangChain.Chains.LLMChain
+  alias LangChain.ChatModels.ChatOpenAI
+  alias LangChain.Message
+  alias LangChain.MessageDelta
+
   @behaviour ChatBehaviour
 
   @impl ChatBehaviour
@@ -11,30 +16,45 @@ defmodule Buildel.Clients.ChatGPT do
         on_error: on_error,
         api_key: api_key,
         model: model,
-        temperature: temperature
-      ) do
-    OpenAI.chat_completion(
-      [
-        model: model,
-        messages: context.messages,
         temperature: temperature,
-        stream: true
-      ],
-      config(true, api_key)
+        tools: tools
+      ) do
+    messages =
+      context.messages
+      |> Enum.map(fn
+        %{role: "assistant"} = message -> Message.new_assistant!(message.content)
+        %{role: "system"} = message -> Message.new_system!(message.content)
+        %{role: "user"} = message -> Message.new_user!(message.content)
+      end)
+
+    functions = functions_from_tools(tools)
+
+    LLMChain.new!(%{
+      llm: ChatOpenAI.new!(%{model: model, temperature: temperature, stream: true}),
+      custom_context: context
+    })
+    |> LLMChain.add_functions(functions)
+    |> LLMChain.add_messages(messages)
+    |> LLMChain.run(
+      while_needs_response: true,
+      callback_fn: fn
+        %MessageDelta{content: nil} ->
+          nil
+
+        %MessageDelta{} = data ->
+          IO.inspect("now")
+          on_content.(data.content)
+
+        %Message{function_name: nil} ->
+          on_end.()
+
+        %Message{} = message ->
+          IO.inspect(message)
+          nil
+      end
     )
-    |> Enum.each(fn
-      %{"choices" => [%{"finish_reason" => "stop"}]} ->
-        on_end.()
 
-      %{"choices" => [%{"delta" => %{"content" => content}}]} ->
-        on_content.(content)
-
-      %{"choices" => [], "code" => 401, "status" => :error} ->
-        on_error.("Invalid API key")
-
-      message ->
-        Logger.error("Unknown message #{inspect(message)}")
-    end)
+    :ok
   end
 
   def config(stream \\ false, api_key \\ nil) do
@@ -46,5 +66,20 @@ defmodule Buildel.Clients.ChatGPT do
       http_options: http_options,
       api_url: "http://localhost/"
     }
+  end
+
+  defp functions_from_tools(tools) do
+    tools_to_functions = %{
+      knowledge: fn -> Buildel.Clients.Functions.HybridDB.new!() end,
+      calculator: fn -> LangChain.Tools.Calculator.new!() end
+    }
+
+    tools
+    |> Enum.reduce([], fn tool, functions ->
+      case Map.get(tools_to_functions, tool) do
+        nil -> functions
+        function -> [function.() | functions]
+      end
+    end)
   end
 end

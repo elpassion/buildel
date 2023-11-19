@@ -32,14 +32,7 @@ defmodule Buildel.Blocks.DocumentSearch do
           options_schema(%{
             "required" => ["persist_in", "forwarded_results_count", "hybrid_reranking"],
             "properties" => %{
-              "persist_in" => %{
-                "type" => "string",
-                "title" => "Persist in",
-                "url" => "/api/organizations/{{organization_id}}/memory_collections",
-                "presentAs" => "async-select",
-                "description" => "Where to hold data from inputs.",
-                "default" => "{{pipeline_id}}_{{block_name}}"
-              },
+              "persist_in" => memory_schema(),
               "forwarded_results_count" => %{
                 "type" => "number",
                 "title" => "Forwarded results count",

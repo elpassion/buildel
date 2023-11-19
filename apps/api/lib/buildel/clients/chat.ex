@@ -6,6 +6,7 @@ defmodule Buildel.Clients.ChatBehaviour do
               on_error: any(),
               api_key: String.t(),
               model: String.t(),
-              temperature: number()
+              temperature: number(),
+              tools: list(atom())
             ) :: :ok
 end

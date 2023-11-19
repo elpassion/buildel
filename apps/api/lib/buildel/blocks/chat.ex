@@ -44,7 +44,7 @@ defmodule Buildel.Blocks.Chat do
                   "type" => "string",
                   "title" => "Model",
                   "description" => "The model to use for the chat.",
-                  "enum" => ["gpt-3.5-turbo", "gpt-4"],
+                  "enum" => ["gpt-3.5-turbo", "gpt-4", "gpt-4-1106-preview"],
                   "enumPresentAs" => "radio",
                   "default" => "gpt-3.5-turbo"
                 },
@@ -57,6 +57,7 @@ defmodule Buildel.Blocks.Chat do
                   "maximum" => 1.0,
                   "step" => 0.1
                 },
+                knowledge: memory_schema(%{"default" => ""}),
                 system_message: %{
                   "type" => "string",
                   "title" => "System message",
@@ -134,6 +135,14 @@ defmodule Buildel.Blocks.Chat do
 
     Logger.debug("Chat block subscribed to input")
 
+    %{global: global} =
+      Buildel.Pipelines.Worker.context_from_context_id(context_id)
+
+    knowledge_source =
+      if opts.knowledge != nil && opts.knowledge != "",
+        do: "#{global}_#{opts.knowledge}",
+        else: nil
+
     {:ok,
      state
      |> assign_stream_state
@@ -148,6 +157,7 @@ defmodule Buildel.Blocks.Chat do
        :api_key,
        block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
      )
+     |> Keyword.put(:knowledge, knowledge_source)
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
   end
@@ -189,9 +199,11 @@ defmodule Buildel.Blocks.Chat do
       state = cleanup_messages(state)
       pid = self()
 
+      tools = if state[:knowledge], do: [:knowledge, :calculator], else: []
+
       Task.start(fn ->
         chat_gpt().stream_chat(
-          context: %{messages: messages},
+          context: %{messages: messages, knowledge: state[:knowledge]},
           on_content: fn text_chunk ->
             Buildel.BlockPubSub.broadcast_to_io(
               state[:context_id],
@@ -211,7 +223,8 @@ defmodule Buildel.Blocks.Chat do
           end,
           api_key: state[:api_key],
           model: state[:opts].model,
-          temperature: state[:opts].temperature
+          temperature: state[:opts].temperature,
+          tools: tools
         )
       end)
 

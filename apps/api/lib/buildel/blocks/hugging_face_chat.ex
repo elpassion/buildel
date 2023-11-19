@@ -34,10 +34,11 @@ defmodule Buildel.Blocks.HuggingFaceChat do
           options_schema(%{
             "required" => ["model", "temperature", "messages", "api_key"],
             "properties" => %{
-              "api_key" => secret_schema(%{
-                "title" => "API Key",
-                "description" => "Select from your API keys or enter a new one."
-              }),
+              "api_key" =>
+                secret_schema(%{
+                  "title" => "API Key",
+                  "description" => "Select from your API keys or enter a new one."
+                }),
               "model" => %{
                 "type" => "string",
                 "title" => "Model",
@@ -175,7 +176,8 @@ defmodule Buildel.Blocks.HuggingFaceChat do
           end,
           api_key: state[:api_key],
           model: state[:opts].model,
-          temperature: state[:opts].temperature
+          temperature: state[:opts].temperature,
+          tools: []
         )
       end)
 

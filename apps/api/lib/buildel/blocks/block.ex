@@ -174,6 +174,19 @@ defmodule Buildel.Blocks.Block do
         }
       end
 
+      def memory_schema(
+            %{"default" => default} \\ %{"default" => "{{pipeline_id}}_{{block_name}}"}
+          ) do
+        %{
+          "type" => "string",
+          "title" => "Persist in",
+          "url" => "/api/organizations/{{organization_id}}/memory_collections",
+          "presentAs" => "async-select",
+          "description" => "Where to hold data from inputs.",
+          "default" => default
+        }
+      end
+
       defp get_input(inputs, name) do
         %{block: block, io: output_name} = BlockPubSub.io_from_topic(name)
 
