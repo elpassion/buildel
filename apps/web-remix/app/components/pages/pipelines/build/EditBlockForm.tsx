@@ -83,6 +83,7 @@ export function EditBlockForm({
             )}
             label={props.field.title}
             supportingText={props.field.description}
+            isClearable
             defaultValue={props.field.default
               ?.replace("{{pipeline_id}}", pipelineId.toString())
               ?.replace("{{block_name}}", blockConfig.name)}
