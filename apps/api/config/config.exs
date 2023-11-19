@@ -10,6 +10,8 @@ import Config
 config :buildel,
   ecto_repos: [Buildel.Repo]
 
+config :buildel, Buildel.Repo, types: Buildel.PostgrexTypes
+
 # Configures the endpoint
 config :buildel, BuildelWeb.Endpoint,
   url: [host: "localhost"],
