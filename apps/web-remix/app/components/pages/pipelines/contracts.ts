@@ -3,7 +3,7 @@ import { KnowledgeBaseFile } from "~/components/pages/knowledgeBase/contracts";
 
 export const IOType = z.object({
   name: z.string(),
-  type: z.enum(["audio", "text", "file"]),
+  type: z.enum(["audio", "text", "file", "worker", "controller"]),
   public: z.boolean(),
 });
 
@@ -12,6 +12,7 @@ export const BlockType = z.object({
   groups: z.array(z.string()),
   inputs: z.array(IOType),
   outputs: z.array(IOType),
+  ios: z.array(IOType),
   schema: z.record(z.string(), z.any()),
 });
 

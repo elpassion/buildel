@@ -36,7 +36,7 @@ export interface IField {
   data: {
     name: string;
     public: boolean;
-    type: "audio" | "text" | "file";
+    type: "audio" | "text" | "file" | "worker" | "controller";
   };
 }
 
