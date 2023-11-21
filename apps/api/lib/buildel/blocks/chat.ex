@@ -9,6 +9,7 @@ defmodule Buildel.Blocks.Chat do
   defdelegate input(pid, chunk), to: __MODULE__, as: :send_message
   defdelegate text_output(name), to: Block
   defdelegate text_input(), to: Block
+  defdelegate io(name, role), to: Block
   def sentences_output(), do: text_output("sentences_output")
 
   @impl true
@@ -18,6 +19,7 @@ defmodule Buildel.Blocks.Chat do
       groups: ["text", "llms"],
       inputs: [text_input()],
       outputs: [text_output("output"), sentences_output(), text_output("message_output")],
+      ios: [io("tool", "controller")],
       schema: schema()
     }
   end
@@ -135,13 +137,7 @@ defmodule Buildel.Blocks.Chat do
 
     Logger.debug("Chat block subscribed to input")
 
-    %{global: global} =
-      block_context().context_from_context_id(context_id)
-
-    knowledge_source =
-      if opts.knowledge != nil && opts.knowledge != "",
-        do: "#{global}_#{opts.knowledge}",
-        else: nil
+    tools = Map.get(opts, :tools, [])
 
     {:ok,
      state
@@ -157,7 +153,7 @@ defmodule Buildel.Blocks.Chat do
        :api_key,
        block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
      )
-     |> Keyword.put(:knowledge, knowledge_source)
+     |> Keyword.put(:tools, tools)
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
   end

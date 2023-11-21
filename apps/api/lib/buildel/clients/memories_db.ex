@@ -3,7 +3,7 @@ defmodule Buildel.Clients.Functions.MemoriesDB do
 
   def new() do
     Function.new(%{
-      name: "documaents",
+      name: "documents",
       description: "Retrieve full document by id.",
       parameters_schema: %{
         type: "object",

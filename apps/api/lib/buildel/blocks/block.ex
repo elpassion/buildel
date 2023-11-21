@@ -20,6 +20,9 @@ defmodule Buildel.Blocks.Block do
   def file_input(name \\ "input", public \\ false),
     do: %{name: name, type: "file", public: public}
 
+  def io(name \\ "tool", role \\ "controller"),
+    do: %{name: name, type: role, public: false}
+
   def name(pid) do
     GenServer.call(pid, :name)
   end
@@ -122,6 +125,35 @@ defmodule Buildel.Blocks.Block do
             "title" => "Name",
             "description" => "The name of the input.",
             "minLength" => 2
+          },
+          "minItems" => 0
+        }
+      end
+
+      defp tools_schema() do
+        %{
+          "type" => "array",
+          "title" => "Tools",
+          "description" => "The tools used in the block.",
+          "items" => %{
+            "type" => "object",
+            "title" => "Tool information",
+            "description" => "Information about the tool.",
+            "required" => ["name", "type"],
+            "properties" => %{
+              "name" => %{
+                "type" => "string",
+                "title" => "Name",
+                "description" => "The name of the tool.",
+                "minLength" => 2
+              },
+              "type" => %{
+                "type" => "string",
+                "title" => "Type",
+                "description" => "The type of the tool.",
+                "minLength" => 2
+              }
+            }
           },
           "minItems" => 0
         }

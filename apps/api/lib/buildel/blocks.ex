@@ -35,7 +35,8 @@ defmodule Buildel.Blocks do
     # "vector_db" => VectorDB,
     "file_input" => FileInput,
     "document_search" => DocumentSearch,
-    "if" => IF
+    "if" => IF,
+    "memory_search_tool" => Buildel.Blocks.MemorySearchTool
   }
 
   @blocks_to_names_map %{
@@ -53,7 +54,8 @@ defmodule Buildel.Blocks do
     # VectorDB => "vector_db",
     FileInput => "file_input",
     DocumentSearch => "document_search",
-    IF => "if"
+    IF => "if",
+    Buildel.Blocks.MemorySearchTool => "memory_search_tool"
   }
 
   def list_types() do
