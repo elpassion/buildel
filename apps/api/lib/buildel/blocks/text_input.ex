@@ -15,6 +15,7 @@ defmodule Buildel.Blocks.TextInput do
       groups: ["text", "inputs / outputs"],
       inputs: [text_input("input", true)],
       outputs: [text_output()],
+      ios: [],
       schema: schema()
     }
   end

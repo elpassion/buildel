@@ -15,6 +15,7 @@ defmodule Buildel.Blocks.IF do
       groups: ["utils"],
       inputs: [text_input()],
       outputs: [text_output("true"), text_output("false")],
+      ios: [],
       schema: schema()
     }
   end

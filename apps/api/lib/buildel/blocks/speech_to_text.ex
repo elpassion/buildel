@@ -13,6 +13,7 @@ defmodule Buildel.Blocks.SpeechToText do
       groups: ["audio", "text"],
       inputs: [audio_input()],
       outputs: [text_output(), text_output("json_output")],
+      ios: [],
       schema: schema()
     }
   end

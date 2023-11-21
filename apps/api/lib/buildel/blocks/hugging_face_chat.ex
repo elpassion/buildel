@@ -18,6 +18,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
       groups: ["text", "llms"],
       inputs: [text_input()],
       outputs: [text_output("output"), sentences_output(), text_output("message_output")],
+      ios: [],
       schema: schema()
     }
   end

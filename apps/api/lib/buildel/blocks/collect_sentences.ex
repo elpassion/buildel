@@ -17,6 +17,7 @@ defmodule Buildel.Blocks.CollectSentences do
       groups: ["text", "utils"],
       inputs: [text_input()],
       outputs: [sentences_output()],
+      ios: [],
       schema: schema()
     }
   end

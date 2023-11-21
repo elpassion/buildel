@@ -14,6 +14,7 @@ defmodule Buildel.Blocks.TextToSpeech do
       groups: ["text", "audio"],
       inputs: [text_input()],
       outputs: [audio_output()],
+      ios: [],
       schema: schema()
     }
   end
@@ -30,10 +31,11 @@ defmodule Buildel.Blocks.TextToSpeech do
           options_schema(%{
             "required" => ["api_key"],
             "properties" => %{
-              api_key: secret_schema(%{
-                "title" => "API key",
-                "description" => "ElevenLabs API Key."
-              })
+              api_key:
+                secret_schema(%{
+                  "title" => "API key",
+                  "description" => "ElevenLabs API Key."
+                })
             }
           })
       }

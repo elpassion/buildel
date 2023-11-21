@@ -15,6 +15,7 @@ defmodule Buildel.Blocks.AudioInput do
       groups: ["audio", "inputs / outputs"],
       inputs: [audio_input("input", true)],
       outputs: [audio_output()],
+      ios: [],
       schema: schema()
     }
   end

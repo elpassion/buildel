@@ -15,6 +15,7 @@ defmodule Buildel.Blocks.FileInput do
       groups: ["file", "inputs / outputs"],
       inputs: [file_input("input", true)],
       outputs: [file_output()],
+      ios: [],
       schema: schema()
     }
   end

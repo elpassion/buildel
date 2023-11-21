@@ -16,6 +16,7 @@ defmodule Buildel.Blocks.DocumentSearch do
       groups: ["file", "memory"],
       inputs: [file_input("files", true), text_input("query")],
       outputs: [text_output()],
+      ios: [],
       schema: schema()
     }
   end

@@ -16,6 +16,7 @@ defmodule Buildel.Blocks.CollectAllText do
       groups: ["text", "utils"],
       inputs: [text_input()],
       outputs: [text_output()],
+      ios: [],
       schema: schema()
     }
   end

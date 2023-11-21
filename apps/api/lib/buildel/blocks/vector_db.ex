@@ -16,6 +16,7 @@ defmodule Buildel.Blocks.VectorDB do
       groups: ["file", "memory"],
       inputs: [file_input("files"), text_input("query")],
       outputs: [text_output()],
+      ios: [],
       schema: schema()
     }
   end
@@ -32,10 +33,11 @@ defmodule Buildel.Blocks.VectorDB do
           options_schema(%{
             "required" => ["api_key", "persist_in"],
             "properties" => %{
-              "api_key" => secret_schema(%{
-                "title" => "API Key",
-                "description" => "Select from your API keys or enter a new one.",
-              }),
+              "api_key" =>
+                secret_schema(%{
+                  "title" => "API Key",
+                  "description" => "Select from your API keys or enter a new one."
+                }),
               "persist_in" => %{
                 "type" => "string",
                 "title" => "Persist in",
