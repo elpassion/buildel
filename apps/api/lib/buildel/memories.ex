@@ -57,7 +57,8 @@ defmodule Buildel.Memories do
              |> Map.merge(%{
                organization_id: organization.id,
                collection_name: collection_name,
-               memory_collection_id: collection.id
+               memory_collection_id: collection.id,
+               content: file
              })
            )
            |> Buildel.Repo.insert(),
@@ -66,8 +67,8 @@ defmodule Buildel.Memories do
          {time, documents} <-
            :timer.tc(fn ->
              Buildel.Splitters.recursive_character_text_split(file, %{
-               chunk_size: 2000,
-               chunk_overlap: 500
+               chunk_size: 1000,
+               chunk_overlap: 250
              })
            end),
          documents <-
@@ -93,9 +94,6 @@ defmodule Buildel.Memories do
       {:ok, memory}
     end
   end
-
-  # text -> split -> chunks (VDB, SDB)
-  # text -> split -> chunks (VDB, SDB) + summary() + full_text()
 
   def create_organization_memory(organization_id, collection_name, %{
         path: path,
@@ -163,10 +161,14 @@ defmodule Buildel.Memories do
     end
   end
 
-  defp get_organization_memory!(
-         %Buildel.Organizations.Organization{} = organization,
-         id
-       ) do
+  def get_memory!(id) do
+    Buildel.Repo.get!(Buildel.Memories.Memory, id)
+  end
+
+  def get_organization_memory!(
+        %Buildel.Organizations.Organization{} = organization,
+        id
+      ) do
     Buildel.Memories.Memory
     |> where([m], m.id == ^id and m.organization_id == ^organization.id)
     |> Buildel.Repo.one!()

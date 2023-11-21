@@ -58,8 +58,8 @@ interface NodeTextOutputProps {
 }
 function NodeTextOutput({ text }: NodeTextOutputProps) {
   return (
-    <div className="prose break-words text-xs text-white w-full min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-      <p>{text}</p>
+    <div className="prose break-words whitespace-pre-wrap text-xs text-white w-full min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+      {text}
     </div>
   );
 }

@@ -42,14 +42,12 @@ defmodule Buildel.Clients.ChatGPT do
           nil
 
         %MessageDelta{} = data ->
-          IO.inspect("now")
           on_content.(data.content)
 
         %Message{function_name: nil} ->
           on_end.()
 
         %Message{} = message ->
-          IO.inspect(message)
           nil
       end
     )
@@ -71,6 +69,7 @@ defmodule Buildel.Clients.ChatGPT do
   defp functions_from_tools(tools) do
     tools_to_functions = %{
       knowledge: fn -> Buildel.Clients.Functions.HybridDB.new!() end,
+      documents: fn -> Buildel.Clients.Functions.MemoriesDB.new!() end,
       calculator: fn -> LangChain.Tools.Calculator.new!() end
     }
 

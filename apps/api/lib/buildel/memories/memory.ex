@@ -7,6 +7,8 @@ defmodule Buildel.Memories.Memory do
     field(:file_size, :integer)
     field(:file_type, :string)
 
+    field(:content, :string)
+
     field(:collection_name, :string)
 
     field(:summary, :string)
@@ -26,7 +28,8 @@ defmodule Buildel.Memories.Memory do
       :file_size,
       :file_type,
       :collection_name,
-      :memory_collection_id
+      :memory_collection_id,
+      :content
     ])
     |> validate_required([
       :organization_id,
@@ -34,7 +37,8 @@ defmodule Buildel.Memories.Memory do
       :file_size,
       :file_type,
       :collection_name,
-      :memory_collection_id
+      :memory_collection_id,
+      :content
     ])
     |> assoc_constraint(:organization)
     |> assoc_constraint(:memory_collection)
