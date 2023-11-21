@@ -199,7 +199,7 @@ defmodule Buildel.Blocks.Chat do
       state = cleanup_messages(state)
       pid = self()
 
-      tools = if state[:knowledge], do: [:knowledge, :calculator], else: []
+      tools = if state[:knowledge], do: [:knowledge, :documents], else: []
 
       Task.start(fn ->
         chat_gpt().stream_chat(

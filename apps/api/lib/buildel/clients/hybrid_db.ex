@@ -5,7 +5,7 @@ defmodule Buildel.Clients.Functions.HybridDB do
     Function.new(%{
       name: "query",
       description:
-        "Accepts search query. Break down complex questions into sub-questions. Split queries if ResponseTooLargeError occurs.",
+        "Search through documents and find text chunks from related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.",
       parameters_schema: %{
         type: "object",
         properties: %{
@@ -31,14 +31,22 @@ defmodule Buildel.Clients.Functions.HybridDB do
   end
 
   defp execute(%{"query" => query} = _args, context) do
-    Buildel.HybridDB.query(context.knowledge, query)
-    |> Enum.take(5)
+    Buildel.VectorDB.query(context.knowledge, query, api_key: api_key())
+    |> Enum.take(3)
     |> Enum.map(fn %{
                      "document" => document,
-                     "metadata" => %{"file_name" => filename}
+                     "metadata" => %{"file_name" => filename, "memory_id" => memory_id}
                    } ->
-      "File: #{filename}\n\n#{document |> String.trim()}"
+      %{
+        document_id: memory_id,
+        document_name: filename,
+        chunk: document |> String.trim()
+      }
     end)
-    |> Enum.join("\n\n---\n\n")
+    |> Jason.encode!()
+  end
+
+  defp api_key do
+    System.fetch_env!("OPENAI_API_KEY")
   end
 end
