@@ -5,8 +5,6 @@ defmodule Buildel.Blocks.MemorySearchTool do
 
   @impl true
   defdelegate input(pid, chunk), to: __MODULE__, as: :query
-  defdelegate tool_output(), to: Buildel.Blocks.Block
-  defdelegate text_input(), to: Buildel.Blocks.Block
   defdelegate io(name, role), to: Block
 
   @impl true
@@ -15,7 +13,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
       type: "memory_search_tool",
       groups: ["text", "tools"],
       inputs: [],
-      outputs: [tool_output()],
+      outputs: [],
       ios: [io("tool", "worker")],
       schema: schema()
     }
