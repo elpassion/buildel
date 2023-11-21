@@ -136,7 +136,7 @@ defmodule Buildel.Blocks.Chat do
     Logger.debug("Chat block subscribed to input")
 
     %{global: global} =
-      Buildel.Pipelines.Worker.context_from_context_id(context_id)
+      block_context().context_from_context_id(context_id)
 
     knowledge_source =
       if opts.knowledge != nil && opts.knowledge != "",
@@ -316,5 +316,9 @@ defmodule Buildel.Blocks.Chat do
 
   defp chat_gpt() do
     Application.fetch_env!(:buildel, :chat_gpt)
+  end
+
+  defp block_context() do
+    Application.fetch_env!(:buildel, :block_context_resolver)
   end
 end

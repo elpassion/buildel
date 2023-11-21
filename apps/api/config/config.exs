@@ -81,6 +81,7 @@ config :buildel, :file_loader, Buildel.FileLoaderUnstructuredApiAdapter
 config :buildel, :search_db, Buildel.SearchDB.LNXAdapter
 config :buildel, :hybrid_db, true
 config :buildel, :block_secrets_resolver, Buildel.BlockSecrets
+config :buildel, :block_context_resolver, Buildel.BlockContext
 
 config :langchain, openai_key: fn -> System.get_env("OPENAI_API_KEY") end
 

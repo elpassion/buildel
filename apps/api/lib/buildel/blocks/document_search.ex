@@ -80,7 +80,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     subscribe_to_inputs(context_id, opts.inputs ++ ["#{block_name}:files"])
 
     %{global: global, parent: parent, local: local} =
-      Buildel.Pipelines.Worker.context_from_context_id(context_id)
+      block_context().context_from_context_id(context_id)
 
     collection_name =
       case opts.persist_in do
@@ -166,5 +166,9 @@ defmodule Buildel.Blocks.DocumentSearch do
     input(self(), {:text, text})
 
     {:noreply, state}
+  end
+
+  defp block_context() do
+    Application.fetch_env!(:buildel, :block_context_resolver)
   end
 end

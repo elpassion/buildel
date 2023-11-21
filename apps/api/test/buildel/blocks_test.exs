@@ -383,7 +383,8 @@ defmodule Buildel.BlocksTest do
             messages: [],
             prompt_template: "{{text_test:output}}",
             model: "gpt-3.5",
-            temperature: 0.7
+            temperature: 0.7,
+            knowledge: nil
           }
         )
 
@@ -421,7 +422,8 @@ defmodule Buildel.BlocksTest do
             messages: [],
             prompt_template: "{{text_test:output}}",
             model: "gpt-3.5",
-            temperature: 0.7
+            temperature: 0.7,
+            knowledge: nil
           }
         )
 
