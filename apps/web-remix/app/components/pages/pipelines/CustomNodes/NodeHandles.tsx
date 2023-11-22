@@ -105,7 +105,7 @@ export function ToolHandle({
     <>
       <span
         className={classNames(
-          "absolute text-[10px] -translate-x-1/2  text-white -rotate-90 left-1/2 -translate-x-1/2"
+          "absolute text-[10px] -translate-x-1/2  text-white left-1/2 -translate-x-1/2"
         )}
         style={{
           top: isWorker ? -26 : "auto",
