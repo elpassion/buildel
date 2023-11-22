@@ -51,7 +51,7 @@ export function isValidConnection(
   const targetBlock = pipeline.blocks.find(
     (block) => block.name === connection.target
   );
-  console.log(connection);
+
   if (
     !sourceBlock ||
     !targetBlock ||

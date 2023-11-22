@@ -94,9 +94,10 @@ export function ToolHandle({
   const handleTypeClassName = useMemo(() => {
     switch (handle.data.type) {
       case "worker":
-        return "!rounded-[1px] !bg-yellow-500 !border-yellow-500";
+        return "!rounded-[1px] !bg-secondary-500 !border-secondary-500 -translate-y-[3px]";
+
       case "controller":
-        return "!rounded-[1px] !bg-green-500 !border-green-500";
+        return "!rounded-[1px] !bg-primary-500 !border-primary-500 translate-y-[3px]";
     }
   }, [handle.data.type]);
 
@@ -104,12 +105,11 @@ export function ToolHandle({
     <>
       <span
         className={classNames(
-          "absolute text-[10px] -translate-x-1/2  text-white -rotate-90"
+          "absolute text-[10px] -translate-x-1/2  text-white -rotate-90 left-1/2 -translate-x-1/2"
         )}
         style={{
-          left: (index + 1) * 25,
-          top: isWorker ? -22 : "auto",
-          bottom: !isWorker ? -22 : "auto",
+          top: isWorker ? -26 : "auto",
+          bottom: !isWorker ? -26 : "auto",
         }}
       >
         I/O
@@ -118,11 +118,10 @@ export function ToolHandle({
         key={handle.id}
         type={handle.type}
         position={isWorker ? Position.Top : Position.Bottom}
-        style={{ left: (index + 1) * 25 }}
         isConnectable={isConnectable}
         id={handle.id}
         className={classNames(
-          "!border-1 !w-[10px] !h-[10px]",
+          "!border-1 !w-[10px] !h-[10px] !rotate-45 !-translate-x-1/2",
           handleTypeClassName
         )}
       />
