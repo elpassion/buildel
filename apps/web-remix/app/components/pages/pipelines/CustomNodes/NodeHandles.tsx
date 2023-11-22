@@ -84,3 +84,48 @@ export function OutputHandle({ handle, index, isConnectable }: HandleProps) {
     </>
   );
 }
+
+export function ToolHandle({
+  handle,
+  index,
+  isConnectable = true,
+}: HandleProps) {
+  const isWorker = handle.data.type === "worker";
+  const handleTypeClassName = useMemo(() => {
+    switch (handle.data.type) {
+      case "worker":
+        return "!rounded-[1px] !bg-yellow-500 !border-yellow-500";
+      case "controller":
+        return "!rounded-[1px] !bg-green-500 !border-green-500";
+    }
+  }, [handle.data.type]);
+
+  return (
+    <>
+      <span
+        className={classNames(
+          "absolute text-[10px] -translate-x-1/2  text-white -rotate-90"
+        )}
+        style={{
+          left: (index + 1) * 25,
+          top: isWorker ? -22 : "auto",
+          bottom: !isWorker ? -22 : "auto",
+        }}
+      >
+        I/O
+      </span>
+      <Handle
+        key={handle.id}
+        type={handle.type}
+        position={isWorker ? Position.Top : Position.Bottom}
+        style={{ left: (index + 1) * 25 }}
+        isConnectable={isConnectable}
+        id={handle.id}
+        className={classNames(
+          "!border-1 !w-[10px] !h-[10px]",
+          handleTypeClassName
+        )}
+      />
+    </>
+  );
+}

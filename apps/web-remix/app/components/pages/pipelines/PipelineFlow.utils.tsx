@@ -51,7 +51,7 @@ export function isValidConnection(
   const targetBlock = pipeline.blocks.find(
     (block) => block.name === connection.target
   );
-
+  console.log(connection);
   if (
     !sourceBlock ||
     !targetBlock ||
@@ -93,6 +93,7 @@ export function toPipelineConfig(
 
 export function getBlockHandles(block: IBlockConfig): IHandle[] {
   const blockType = block.block_type;
+
   return [
     ...blockType.inputs
       .filter((input) => !input.public)
@@ -105,6 +106,22 @@ export function getBlockHandles(block: IBlockConfig): IHandle[] {
       .filter((output) => !output.public)
       .map((output) => ({
         type: "source" as const,
+        id: output.name,
+        data: output,
+      })),
+    ...blockType.ios
+      .filter((output) => !output.public)
+      .filter((output) => output.type === "worker")
+      .map((output) => ({
+        type: "source" as const,
+        id: output.name,
+        data: output,
+      })),
+    ...blockType.ios
+      .filter((output) => !output.public)
+      .filter((output) => output.type === "controller")
+      .map((output) => ({
+        type: "target" as const,
         id: output.name,
         data: output,
       })),

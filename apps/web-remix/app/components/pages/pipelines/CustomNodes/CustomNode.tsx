@@ -5,7 +5,7 @@ import { Badge, Icon } from "@elpassion/taco";
 import { useRunPipelineNode } from "../RunPipelineProvider";
 import { getBlockFields, getBlockHandles } from "../PipelineFlow.utils";
 import { IBlockConfig } from "../pipeline.types";
-import { InputHandle, OutputHandle } from "./NodeHandles";
+import { InputHandle, OutputHandle, ToolHandle } from "./NodeHandles";
 import { NodeFieldsForm } from "./NodeFieldsForm";
 import { NodeFieldsOutput } from "./NodeFieldsOutput";
 
@@ -87,12 +87,26 @@ export function CustomNodeBody({
   disabled,
 }: CustomNodeBodyProps) {
   const handles = useMemo(() => getBlockHandles(data), [data]);
+
   const inputsHandles = useMemo(
-    () => handles.filter((h) => h.type === "target"),
+    () =>
+      handles
+        .filter((h) => h.data.type !== "controller" && h.data.type !== "worker")
+        .filter((h) => h.type === "target"),
     [handles]
   );
   const outputsHandles = useMemo(
-    () => handles.filter((h) => h.type === "source"),
+    () =>
+      handles
+        .filter((h) => h.data.type !== "controller" && h.data.type !== "worker")
+        .filter((h) => h.type === "source"),
+    [handles]
+  );
+  const ioHandles = useMemo(
+    () =>
+      handles.filter(
+        (h) => h.data.type === "controller" || h.data.type === "worker"
+      ),
     [handles]
   );
 
@@ -105,6 +119,7 @@ export function CustomNodeBody({
     () => fields.filter((field) => field.type === "output"),
     [fields]
   );
+
   return (
     <div className="p-2 nodrag">
       {inputsFields.length > 0 ? (
@@ -129,6 +144,15 @@ export function CustomNodeBody({
       ))}
       {outputsHandles.map((handle, index) => (
         <OutputHandle
+          key={handle.id}
+          handle={handle}
+          index={index}
+          isConnectable={isConnectable}
+        />
+      ))}
+
+      {ioHandles.map((handle, index) => (
+        <ToolHandle
           key={handle.id}
           handle={handle}
           index={index}
