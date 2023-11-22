@@ -29,6 +29,7 @@ export function getEdges(pipeline: IPipelineConfig): IEdge[] {
       if (sourceHandle.includes("->")) {
         [sourceHandle, targetHandle] = sourceHandle.split("->");
       }
+
       return {
         id: `${source}:${sourceHandle}-${block.name}:${targetHandle}`,
         source: source,
@@ -161,6 +162,3 @@ export function getLastBlockNumber(blocks: IBlockConfig[]) {
 
   return Math.max(...nrs, 0);
 }
-
-// ios: Type = worker -> display handle on top attachable only to type = controller
-// ios: Type = controller -> display handle on bottom attachable only to type = worker

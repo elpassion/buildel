@@ -4,13 +4,13 @@ import { Icon } from "@elpassion/taco";
 import { useRunPipelineEdge } from "../RunPipelineProvider";
 import classNames from "classnames";
 
-export interface CustomEdgeProps extends EdgeProps {
+export interface IOEdgeProps extends EdgeProps {
   onDelete: (id: string) => void;
   disabled?: boolean;
 }
 
 const foreignObjectSize = 24;
-export function CustomEdge({
+export function IOEdge({
   id,
   sourceX,
   sourceY,
@@ -20,9 +20,11 @@ export function CustomEdge({
   targetPosition,
   selected,
   style = {},
+  markerEnd,
+  markerStart,
   onDelete,
   disabled = false,
-}: CustomEdgeProps) {
+}: IOEdgeProps) {
   const { status } = useRunPipelineEdge();
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
@@ -36,7 +38,6 @@ export function CustomEdge({
   const statusStyles = useMemo(() => {
     return status === "running"
       ? {
-          strokeDasharray: 5,
           animation: "dashdraw 0.2s linear infinite",
         }
       : {};
@@ -58,12 +59,14 @@ export function CustomEdge({
         id={id}
         className="react-flow__edge-path"
         d={edgePath}
+        markerEnd={markerEnd}
         fill="none"
         onClick={handlePathClick}
         style={{
           ...style,
           strokeWidth: "1",
           stroke: selected ? "#DE8411" : "#fff",
+          strokeDasharray: 5,
           ...statusStyles,
         }}
       />
@@ -73,6 +76,8 @@ export function CustomEdge({
         className="peer react-flow__edge-interaction"
         d={edgePath}
         fill="none"
+        markerEnd={markerEnd}
+        markerStart={markerStart}
         strokeWidth={20}
         strokeOpacity={0}
         onClick={handlePathClick}

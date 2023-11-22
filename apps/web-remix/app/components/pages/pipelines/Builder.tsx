@@ -177,7 +177,7 @@ export const Builder = ({
     return { custom: PipelineNode };
   }, [PipelineNode]);
 
-  const PipelineEdge = useCallback(
+  const DefaultEdge = useCallback(
     (props: EdgeProps) => (
       <CustomEdge
         {...props}
@@ -189,8 +189,8 @@ export const Builder = ({
   );
 
   const edgeTypes = useMemo(() => {
-    return { default: PipelineEdge };
-  }, [PipelineEdge]);
+    return { default: DefaultEdge };
+  }, [DefaultEdge]);
 
   const { onDragOver, onDrop, onInit } = useDraggableNodes({
     wrapper: reactFlowWrapper,
