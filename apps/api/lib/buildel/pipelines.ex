@@ -91,10 +91,24 @@ defmodule Buildel.Pipelines do
       blocks ->
         blocks
         |> Enum.map(fn block ->
+          inputs_blocks =
+            block["inputs"]
+            |> Enum.map(fn input -> Buildel.BlockPubSub.block_from_block_output(input) end)
+            |> Enum.map(fn %{block_name: block_name} ->
+              blocks |> Enum.find(fn b -> b["name"] == block_name end)
+            end)
+
           %Buildel.Blocks.Block{
             name: block["name"],
             type: block["type"],
-            opts: block["opts"] |> keys_to_atoms() |> Map.put(:inputs, block["inputs"])
+            opts:
+              block["opts"]
+              |> keys_to_atoms()
+              |> Map.put(:inputs, block["inputs"])
+              |> Map.put(
+                :inputs_blocks,
+                inputs_blocks
+              )
           }
         end)
     end

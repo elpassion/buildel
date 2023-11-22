@@ -14,6 +14,12 @@ defmodule Buildel.BlockPubSub do
   end
 
   def subscribe_to_io(context_id, block_output) do
+    %{block_name: block_name, output_name: output_name} = block_from_block_output(block_output)
+
+    subscribe(io_topic(context_id, block_name, output_name))
+  end
+
+  def block_from_block_output(block_output) do
     [block_name, io_name] = block_output |> String.split(":")
 
     output_name =
@@ -22,7 +28,10 @@ defmodule Buildel.BlockPubSub do
         output_name -> output_name
       end
 
-    subscribe(io_topic(context_id, block_name, output_name))
+    %{
+      block_name: block_name,
+      output_name: output_name
+    }
   end
 
   def io_from_topic(topic) do

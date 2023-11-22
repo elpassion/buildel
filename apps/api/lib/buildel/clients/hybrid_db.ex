@@ -5,7 +5,7 @@ defmodule Buildel.Clients.Functions.HybridDB do
     Function.new(%{
       name: "query",
       description:
-        "Search through documents and find text chunks from related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.",
+        "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.",
       parameters_schema: %{
         type: "object",
         properties: %{

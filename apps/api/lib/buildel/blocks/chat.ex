@@ -139,6 +139,14 @@ defmodule Buildel.Blocks.Chat do
 
     tools = Map.get(opts, :tools, [])
 
+    %{global: global} =
+      Buildel.Pipelines.Worker.context_from_context_id(context_id)
+
+    knowledge_source =
+      if opts.knowledge != nil && opts.knowledge != "",
+        do: "#{global}_#{opts.knowledge}",
+        else: nil
+
     {:ok,
      state
      |> assign_stream_state
@@ -154,6 +162,7 @@ defmodule Buildel.Blocks.Chat do
        block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
      )
      |> Keyword.put(:tools, tools)
+     |> Keyword.put(:knowledge, knowledge_source)
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
   end
@@ -196,6 +205,8 @@ defmodule Buildel.Blocks.Chat do
       pid = self()
 
       tools = if state[:knowledge], do: [:knowledge, :documents], else: []
+
+      IO.inspect(tools)
 
       Task.start(fn ->
         chat_gpt().stream_chat(
