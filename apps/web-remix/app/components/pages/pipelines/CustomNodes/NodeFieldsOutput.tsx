@@ -16,8 +16,13 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
     (field: IField) => {
       const { type } = field.data;
 
+      const fieldEvents = getFieldEvents(events, field.data.name);
+
       if (type === "text") {
-        const text = getTextFieldsMessages(events, field.data.name);
+        const text = checkIfStringPayloads(fieldEvents)
+          ? concatStringFieldsOutputs(fieldEvents)
+          : concatJsonFieldsOutputs(fieldEvents);
+
         return (
           <>
             <div className="mb-1 flex gap-1">
@@ -30,7 +35,6 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
           </>
         );
       } else if (type === "audio") {
-        const fieldEvents = getFieldEvents(events, field.data.name);
         const audio =
           fieldEvents.length > 0 ? getAudioOutput(fieldEvents) : null;
 
@@ -68,10 +72,20 @@ function getFieldEvents(events: IEvent[], outputName: string) {
   return events.filter((ev) => ev.output === outputName);
 }
 
-function getTextFieldsMessages(events: IEvent[], outputName: string) {
-  return getFieldEvents(events, outputName)
-    .map((ev) => ev.payload.message)
-    .join("");
+function concatStringFieldsOutputs(events: IEvent[]) {
+  return events.map((ev) => ev.payload.message).join(" ");
+}
+
+function concatJsonFieldsOutputs(events: IEvent[]) {
+  try {
+    return JSON.stringify(events);
+  } catch (err) {
+    return "Something went wrong...";
+  }
+}
+
+function checkIfStringPayloads(events: IEvent[]) {
+  return events.every((ev) => typeof ev.payload.message === "string");
 }
 
 function getAudioOutput(events: IEvent[]) {
