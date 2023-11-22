@@ -1,4 +1,4 @@
-import React, { forwardRef, HTMLAttributes, LabelHTMLAttributes } from "react";
+import React, { forwardRef, HTMLAttributes } from "react";
 import { useFieldContext } from "~/components/form/fields/field.context";
 
 export const FieldError = forwardRef<

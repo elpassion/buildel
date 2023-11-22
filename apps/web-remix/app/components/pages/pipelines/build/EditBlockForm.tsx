@@ -44,7 +44,6 @@ export function EditBlockForm({
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-
     onSubmit({ ...blockConfig, ...data });
   };
 
@@ -73,7 +72,8 @@ export function EditBlockForm({
       ) {
         return;
       }
-
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { fieldErrors } = useFormContext();
       return (
         <FormField name={props.name!}>
           <AsyncSelectField
@@ -83,6 +83,7 @@ export function EditBlockForm({
             )}
             label={props.field.title}
             supportingText={props.field.description}
+            errorMessage={fieldErrors[props.name!]}
             isClearable
             defaultValue={props.field.default
               ?.replace("{{pipeline_id}}", pipelineId.toString())
@@ -103,6 +104,8 @@ export function EditBlockForm({
       ) {
         return;
       }
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { fieldErrors } = useFormContext();
 
       return (
         <FormField name={props.name!}>
@@ -114,6 +117,7 @@ export function EditBlockForm({
             schema={props.field.schema}
             label={props.field.title}
             supportingText={props.field.description}
+            errorMessage={fieldErrors[props.name!]}
             defaultValue={props.field.default
               ?.replace(":pipeline_id", pipelineId.toString())
               ?.replace(":block_name", blockConfig.name)}

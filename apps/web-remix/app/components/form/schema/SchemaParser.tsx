@@ -24,6 +24,14 @@ export function generateZODSchema(
       // @ts-ignore
       nestedSchema = nestedSchema.default(defaultValue);
     }
+
+    if (schema.minLength !== undefined && "min" in nestedSchema) {
+      nestedSchema = nestedSchema?.min(schema.minLength);
+    }
+    if (schema.maxLength !== undefined && "max" in nestedSchema) {
+      nestedSchema = nestedSchema.max(schema.maxLength);
+    }
+
     if ("presentAs" in schema && schema.presentAs === "editor") {
       return nestedSchema;
     }
@@ -37,13 +45,6 @@ export function generateZODSchema(
       schema.presentAs === "async-creatable-select"
     ) {
       return nestedSchema;
-    }
-
-    if (schema.minLength !== undefined) {
-      nestedSchema = nestedSchema.min(schema.minLength);
-    }
-    if (schema.maxLength !== undefined) {
-      nestedSchema = nestedSchema.max(schema.maxLength);
     }
 
     return nestedSchema;

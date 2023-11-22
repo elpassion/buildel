@@ -184,6 +184,7 @@ defmodule Buildel.Blocks.Block do
           "description" => description,
           "url" => "/api/organizations/{{organization_id}}/secrets",
           "presentAs" => "async-creatable-select",
+          "minLength" => 1,
           "schema" => %{
             "type" => "object",
             "required" => ["name", "value"],
