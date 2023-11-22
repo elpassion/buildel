@@ -50,12 +50,16 @@ export function EditBlockForm({
   const EditorField = useCallback(
     (props: FieldProps) => {
       assert(props.field.type === "string");
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const { fieldErrors } = useFormContext();
+
       return (
         <FormField name={props.name!}>
           <MonacoEditorField
             supportingText={props.field.description}
             label={props.field.title}
             suggestions={generateSuggestions(blockConfig.inputs)}
+            error={fieldErrors[props.name!]}
           />
         </FormField>
       );

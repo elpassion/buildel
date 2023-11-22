@@ -12,8 +12,14 @@ import { InputText, Label } from "@elpassion/taco";
 
 export const MonacoEditorField = forwardRef<
   HTMLInputElement,
-  Partial<MonacoEditorInputProps & { label: string; supportingText: ReactNode }>
->(({ label, supportingText, ...props }) => {
+  Partial<
+    MonacoEditorInputProps & {
+      label: string;
+      supportingText: ReactNode;
+      error?: string;
+    }
+  >
+>(({ label, error, supportingText, ...props }) => {
   const { name, getInputProps, validate } = useFieldContext();
   const [value, setValue] = useControlField<string | undefined>(name);
 
@@ -32,7 +38,7 @@ export const MonacoEditorField = forwardRef<
         }}
         {...props}
       />
-      <InputText text={supportingText} />
+      <InputText text={error ?? supportingText} error={!!error} />
     </>
   );
 });
