@@ -47,7 +47,7 @@ export const CreatableAsyncSelectField = forwardRef<
     { label, supportingText, url, defaultValue, schema: JSONSchema, ...props },
     ref
   ) => {
-    const { name, getInputProps } = useFieldContext();
+    const { name, getInputProps, validate } = useFieldContext();
     const { isModalOpen, openModal, closeModal } = useModal();
     const schema = generateZODSchema(JSONSchema as any);
     const validator = React.useMemo(() => withZod(schema), []);
@@ -59,6 +59,11 @@ export const CreatableAsyncSelectField = forwardRef<
     };
 
     const selectedOption = getSelectedOption();
+
+    const handleSetSelectedId = (id: string) => {
+      setSelectedId(id);
+      validate();
+    };
 
     const handleCreate = async (
       data: Record<string, any>,
@@ -72,7 +77,7 @@ export const CreatableAsyncSelectField = forwardRef<
         );
 
         setOptions((prev) => [...prev, newItem]);
-        setSelectedId(newItem.id.toString());
+        handleSetSelectedId(newItem.id.toString());
         closeModal();
         successToast({ title: "Success", description: "Item created!" });
       } catch (e) {
@@ -98,9 +103,9 @@ export const CreatableAsyncSelectField = forwardRef<
 
     useEffect(() => {
       if (!selectedId && defaultValue) {
-        setSelectedId(defaultValue);
+        handleSetSelectedId(defaultValue);
       }
-    }, [selectedId, setSelectedId]);
+    }, [selectedId, handleSetSelectedId]);
 
     return (
       <>
@@ -126,7 +131,7 @@ export const CreatableAsyncSelectField = forwardRef<
           loadOptions={loadOptions}
           onSelect={(option: SingleValue<IDropdownOption>) => {
             if (option) {
-              setSelectedId(option.id);
+              handleSetSelectedId(option.id);
             }
           }}
           {...props}
