@@ -206,8 +206,6 @@ defmodule Buildel.Blocks.Chat do
 
       tools = if state[:knowledge], do: [:knowledge, :documents], else: []
 
-      IO.inspect(tools)
-
       Task.start(fn ->
         chat_gpt().stream_chat(
           context: %{messages: messages, knowledge: state[:knowledge]},
