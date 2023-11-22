@@ -114,13 +114,9 @@ export function NodeFieldsForm({
   const convertToBlobAndUpload = useCallback(
     async (file: File, fieldName: string) => {
       try {
-        const blob = await file.arrayBuffer().then((arrayBuffer) => {
-          return new Blob([new Uint8Array(arrayBuffer)], {
-            type: file.type,
-          });
-        });
+        const chunks = await splitIntoSmallerChunks(file);
 
-        uploadAudioChunk(blob, fieldName);
+        chunks.forEach((chunk) => uploadAudioChunk(chunk, fieldName));
 
         return {
           id: Math.random(),
@@ -212,4 +208,25 @@ export function NodeFieldsForm({
       ) : null}
     </form>
   );
+}
+
+async function splitIntoSmallerChunks(file: File, size = 10000) {
+  const arrayBuffer = await file.arrayBuffer();
+  const byteArray = new Uint8Array(arrayBuffer);
+  let start = 0;
+
+  const chunks: Blob[] = [];
+
+  while (start < byteArray.length) {
+    const chunkSize = Math.min(size, byteArray.length - start);
+    const chunk = new Blob([byteArray.slice(start, start + chunkSize)], {
+      type: file.type,
+    });
+
+    chunks.push(chunk);
+
+    start += chunkSize;
+  }
+
+  return chunks;
 }
