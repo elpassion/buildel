@@ -48,6 +48,7 @@ config :buildel, :search_db, Buildel.ClientMocks.SearchDB.LNXAdapter
 config :buildel, :hybrid_db, false
 config :buildel, :block_secrets_resolver, Buildel.BlockSecrets.Mock
 config :buildel, :block_context_resolver, Buildel.BlockContext.Mock
+config :langchain, openai_key: fn -> System.get_env("OPENAI_API_KEY") end
 
 config :buildel, Buildel.Vault,
   ciphers: [

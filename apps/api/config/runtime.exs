@@ -47,9 +47,12 @@ if config_env() == :prod do
     database_url: System.get_env("QDRANT_DATABASE_URL"),
     api_key: "doesntmatter"
 
-  
   config :buildel, Buildel.Vault,
     ciphers: [
-      default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: System.get_env("ENCRYPTION_KEY") |> Base.decode64!()}
+      default:
+        {Cloak.Ciphers.AES.GCM,
+         tag: "AES.GCM.V1", key: System.get_env("ENCRYPTION_KEY") |> Base.decode64!()}
     ]
+
+  config :langchain, openai_key: System.get_env("OPENAI_API_KEY")
 end

@@ -83,8 +83,6 @@ config :buildel, :hybrid_db, true
 config :buildel, :block_secrets_resolver, Buildel.BlockSecrets
 config :buildel, :block_context_resolver, Buildel.BlockContext
 
-config :langchain, openai_key: fn -> System.get_env("OPENAI_API_KEY") end
-
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
