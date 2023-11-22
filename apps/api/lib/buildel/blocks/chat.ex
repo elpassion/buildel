@@ -64,7 +64,6 @@ defmodule Buildel.Blocks.Chat do
                   "type" => "string",
                   "title" => "System message",
                   "description" => "The message to start the conversation with.",
-                  "default" => "Hello, how are you?",
                   "presentAs" => "editor",
                   "minLength" => 1
                 },
@@ -97,7 +96,6 @@ defmodule Buildel.Blocks.Chat do
                   "type" => "string",
                   "title" => "Prompt template",
                   "description" => "The template to use for the prompt.",
-                  "default" => "{{text_input_1:output}}",
                   "presentAs" => "editor",
                   "minLength" => 1
                 }
