@@ -25,8 +25,18 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
       defp replace_inputs_with_take_latest_messages(state, template) do
         state[tl_keyword()]
         |> Enum.reduce(template, fn
-          {_input, nil}, template -> template
-          {input, text}, template -> String.replace(template, "{{#{input}}}", text)
+          {_input, nil}, template ->
+            template
+
+          {input, text}, template ->
+            text_string =
+              if is_map(text) do
+                Jason.encode!(text)
+              else
+                text
+              end
+
+            String.replace(template, "{{#{input}}}", text_string)
         end)
       end
 

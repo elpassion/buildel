@@ -2,6 +2,7 @@ defmodule Buildel.Clients.DeepgramBehaviour do
   @callback connect!(String.t(), %{stream_to: pid}) :: {:ok, pid} | {:error, term}
   @callback disconnect(pid) :: :ok
   @callback transcribe_audio(pid, {:binary, binary}) :: :ok
+  @callback transcribe(String.t(), {:binary, binary}) :: :ok
 end
 
 defmodule Buildel.Clients.Deepgram do
@@ -25,11 +26,46 @@ defmodule Buildel.Clients.Deepgram do
     WebSockex.send_frame(pid, {:binary, audio})
   end
 
-  @base_url "wss://api.deepgram.com/v1/listen?model=general&smart_format=true&punctuate=true&diarize=true"
+  @http_url "https://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true&model=general"
+  def transcribe(token \\ nil, file, opts \\ %{language: "en", timeout: 10000}) do
+    %{language: lang, timeout: timeout} = opts
+
+    url = build_url(@http_url, [{:language, lang}])
+
+    headers = [
+      {"Authorization", "Token #{token || System.get_env("DEEPGRAM_API_KEY")}"}
+    ]
+
+    options = [timeout: timeout, recv_timeout: timeout]
+
+    HTTPoison.post!(url, file, headers, options)
+    |> handle_response
+  end
+
+  def handle_response(response) do
+    result = Jason.decode!(response.body)
+    send(self(), {:raw_transcript, result})
+
+    channels = result |> get_in(["results", "channels"])
+
+    transcript =
+      Enum.map(channels, fn %{"alternatives" => alternatives} ->
+        alternatives
+        |> List.first()
+        |> Map.get("transcript")
+      end)
+      |> Enum.join("")
+
+    if transcript, do: send(self(), {:transcript, %{message: transcript, is_final: true}})
+
+    {:ok}
+  end
+
+  @wss_url "wss://api.deepgram.com/v1/listen?model=general&smart_format=true&punctuate=true&diarize=true"
   def start_link(state \\ %{language: "en"}, opts \\ []) do
     %{language: lang} = state
 
-    url = build_url(@base_url, [{:language, lang}])
+    url = build_url(@wss_url, [{:language, lang}])
 
     WebSockex.start_link(url, __MODULE__, state, opts)
   end

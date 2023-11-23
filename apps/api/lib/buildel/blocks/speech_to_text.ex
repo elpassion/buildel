@@ -28,7 +28,7 @@ defmodule Buildel.Blocks.SpeechToText do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["api_key"],
+            "required" => ["api_key", "language"],
             "properties" => %{
               "api_key" =>
                 secret_schema(%{
@@ -42,6 +42,14 @@ defmodule Buildel.Blocks.SpeechToText do
                 "enum" => ["en", "pl", "es"],
                 "enumPresentAs" => "radio",
                 "default" => "en"
+              },
+              timeout: %{
+                "type" => "number",
+                "title" => "Timeout",
+                "description" =>
+                  "The temperature specifies the maximum duration (in ms.) for an operation to complete before the system terminates it due to inactivity or delay.",
+                "default" => 10000,
+                "minimum" => 0
               }
             }
           })
@@ -70,15 +78,26 @@ defmodule Buildel.Blocks.SpeechToText do
 
     api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
 
-    %{language: lang} = opts
+    {:ok,
+     state
+     |> Keyword.put(
+       :api_key,
+       api_key
+     )
+     |> Keyword.put(:clips, %{})
+     |> assign_stream_state()}
 
-    case deepgram().connect!(api_key, %{stream_to: self(), language: lang}) do
-      {:ok, deepgram_pid} ->
-        {:ok, state |> Keyword.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
+    # api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
 
-      {:error, _reason} ->
-        {:stop, {:error, block_name, :incorrect_api_key}}
-    end
+    # %{language: lang} = opts
+
+    # case deepgram().connect!(api_key, %{stream_to: self(), language: lang}) do
+    #   {:ok, deepgram_pid} ->
+    #     {:ok, state |> Keyword.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
+
+    #   {:error, _reason} ->
+    #     {:stop, {:error, block_name, :incorrect_api_key}}
+    # end
   end
 
   @impl true
@@ -87,10 +106,22 @@ defmodule Buildel.Blocks.SpeechToText do
     state
   end
 
+  # @impl true
+  # def handle_cast({:transcript, {:binary, chunk}}, state) do
+  #   state = state |> send_stream_start()
+  #   state |> Keyword.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
+  #   {:noreply, state}
+  # end
+
   @impl true
   def handle_cast({:transcript, {:binary, chunk}}, state) do
     state = state |> send_stream_start()
-    state |> Keyword.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
+
+    language = state |> get_in([:opts, :language])
+    timeout = state |> get_in([:opts, :timeout])
+
+    deepgram().transcribe(state[:api_key], chunk, %{language: language, timeout: timeout})
+
     {:noreply, state}
   end
 

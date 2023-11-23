@@ -73,12 +73,12 @@ function getFieldEvents(events: IEvent[], outputName: string) {
 }
 
 function concatStringFieldsOutputs(events: IEvent[]) {
-  return events.map((ev) => ev.payload.message).join(" ");
+  return events.map((ev) => ev.payload.message).join("");
 }
 
 function concatJsonFieldsOutputs(events: IEvent[]) {
   try {
-    return JSON.stringify(events);
+    return JSON.stringify(events.map((ev) => ev.payload.message));
   } catch (err) {
     return "Something went wrong...";
   }

@@ -114,9 +114,16 @@ export function NodeFieldsForm({
   const convertToBlobAndUpload = useCallback(
     async (file: File, fieldName: string) => {
       try {
-        const chunks = await splitIntoSmallerChunks(file);
+        // const chunks = await splitIntoSmallerChunks(file);
 
-        chunks.forEach((chunk) => uploadAudioChunk(chunk, fieldName));
+        const blob = await file.arrayBuffer().then((arrayBuffer) => {
+          return new Blob([new Uint8Array(arrayBuffer)], {
+            type: file.type,
+          });
+        });
+
+        uploadAudioChunk(blob, fieldName);
+        // chunks.forEach((chunk) => uploadAudioChunk(chunk, fieldName));
 
         return {
           id: Math.random(),
