@@ -34,7 +34,15 @@ defmodule Buildel.Blocks.SpeechToText do
                 secret_schema(%{
                   "title" => "API key",
                   "description" => "Deepgram API key"
-                })
+                }),
+              language: %{
+                "type" => "string",
+                "title" => "Language",
+                "description" => "Language of the transcription.",
+                "enum" => ["en", "pl", "es"],
+                "enumPresentAs" => "radio",
+                "default" => "en"
+              }
             }
           })
       }
@@ -62,7 +70,9 @@ defmodule Buildel.Blocks.SpeechToText do
 
     api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
 
-    case deepgram().connect!(api_key, %{stream_to: self()}) do
+    %{language: lang} = opts
+
+    case deepgram().connect!(api_key, %{stream_to: self(), language: lang}) do
       {:ok, deepgram_pid} ->
         {:ok, state |> Keyword.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
 

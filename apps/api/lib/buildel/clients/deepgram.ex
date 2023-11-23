@@ -25,9 +25,13 @@ defmodule Buildel.Clients.Deepgram do
     WebSockex.send_frame(pid, {:binary, audio})
   end
 
-  @url "wss://api.deepgram.com/v1/listen?model=general&smart_format=true&punctuate=true&language=en&diarize=true"
-  def start_link(state \\ %{}, opts \\ []) do
-    WebSockex.start_link(@url, __MODULE__, state, opts)
+  @base_url "wss://api.deepgram.com/v1/listen?model=general&smart_format=true&punctuate=true&diarize=true"
+  def start_link(state \\ %{language: "en"}, opts \\ []) do
+    %{language: lang} = state
+
+    url = build_url(@base_url, [{:language, lang}])
+
+    WebSockex.start_link(url, __MODULE__, state, opts)
   end
 
   @impl true
@@ -51,5 +55,15 @@ defmodule Buildel.Clients.Deepgram do
   @impl true
   def handle_disconnect(_connection_status_map, state) do
     {:reconnect, state}
+  end
+
+  defp build_url(url, opts \\ []) do
+    query = Enum.map(opts, fn {key, value} -> "#{key}=#{URI.encode(value)}" end) |> Enum.join("&")
+
+    if query !== "" do
+      "#{url}&#{query}"
+    else
+      url
+    end
   end
 end
