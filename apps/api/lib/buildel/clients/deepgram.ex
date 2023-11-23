@@ -117,7 +117,7 @@ defmodule Buildel.Clients.Deepgram do
   end
 
   defp format_sentence({%{"start" => start, "end" => finish, "text" => text}, index}) do
-    "#{index}\n#{start} --> #{finish}\n#{text}"
+    "#{index}\n#{format_srt_time(start)} --> #{format_srt_time(finish)}\n#{text}"
   end
 
   defp get_sentences(data) do
@@ -135,5 +135,21 @@ defmodule Buildel.Clients.Deepgram do
     |> Enum.flat_map(fn %{"sentences" => sentences} ->
       sentences
     end)
+  end
+
+  defp format_srt_time(seconds) do
+    total_milliseconds = round(seconds * 1000)
+    hours = div(total_milliseconds, 3_600_000)
+    minutes = div(rem(total_milliseconds, 3_600_000), 60_000)
+    secs = div(rem(total_milliseconds, 60_000), 1000)
+    millisecs = rem(total_milliseconds, 1000)
+
+    String.pad_leading(Integer.to_string(hours), 2, "0") <>
+      ":" <>
+      String.pad_leading(Integer.to_string(minutes), 2, "0") <>
+      ":" <>
+      String.pad_leading(Integer.to_string(secs), 2, "0") <>
+      "," <>
+      String.pad_leading(Integer.to_string(millisecs), 3, "0")
   end
 end
