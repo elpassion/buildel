@@ -46,6 +46,11 @@ defmodule Buildel.Clients.Deepgram do
     result = Jason.decode!(response.body)
     send(self(), {:raw_transcript, result})
 
+    srt_transcript = convert_to_srt(result)
+
+    if srt_transcript,
+      do: send(self(), {:srt_transcript, %{message: srt_transcript, is_final: true}})
+
     channels = result |> get_in(["results", "channels"])
 
     transcript =
@@ -101,5 +106,34 @@ defmodule Buildel.Clients.Deepgram do
     else
       url
     end
+  end
+
+  defp convert_to_srt(data) do
+    data
+    |> get_sentences()
+    |> Enum.with_index(1)
+    |> Enum.map(&format_sentence(&1))
+    |> Enum.join("\n\n")
+  end
+
+  defp format_sentence({%{"start" => start, "end" => finish, "text" => text}, index}) do
+    "#{index}\n#{start} --> #{finish}\n#{text}"
+  end
+
+  defp get_sentences(data) do
+    data
+    |> get_in(["results", "channels"])
+    |> Enum.flat_map(fn %{"alternatives" => alternatives} ->
+      alternatives
+    end)
+    |> Enum.flat_map(fn %{
+                          "transcript" => _,
+                          "paragraphs" => %{"paragraphs" => paragraphs}
+                        } ->
+      paragraphs
+    end)
+    |> Enum.flat_map(fn %{"sentences" => sentences} ->
+      sentences
+    end)
   end
 end

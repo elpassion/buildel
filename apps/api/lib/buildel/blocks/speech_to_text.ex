@@ -12,7 +12,7 @@ defmodule Buildel.Blocks.SpeechToText do
       type: "speech_to_text",
       groups: ["audio", "text"],
       inputs: [audio_input()],
-      outputs: [text_output(), text_output("json_output")],
+      outputs: [text_output(), text_output("json_output"), text_output("srt_output")],
       ios: [],
       schema: schema()
     }
@@ -135,6 +135,19 @@ defmodule Buildel.Blocks.SpeechToText do
       state[:context_id],
       state[:block_name],
       "output",
+      {:text, text}
+    )
+
+    state = state |> send_stream_stop()
+
+    {:noreply, state}
+  end
+
+  def handle_info({:srt_transcript, %{message: text, is_final: true}}, state) do
+    Buildel.BlockPubSub.broadcast_to_io(
+      state[:context_id],
+      state[:block_name],
+      "srt_output",
       {:text, text}
     )
 
