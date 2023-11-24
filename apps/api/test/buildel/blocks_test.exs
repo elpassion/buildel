@@ -8,6 +8,7 @@ defmodule Buildel.BlocksTest do
     AudioInput,
     TextInput,
     SpeechToText,
+    FileSpeechToText,
     TextToSpeech,
     Chat,
     Block,
@@ -192,7 +193,8 @@ defmodule Buildel.BlocksTest do
                Blocks.validate_block(SpeechToText, %{
                  "name" => "test",
                  "opts" => %{
-                   "api_key" => "test"
+                   "api_key" => "test",
+                   "language" => "en"
                  },
                  "inputs" => []
                })
