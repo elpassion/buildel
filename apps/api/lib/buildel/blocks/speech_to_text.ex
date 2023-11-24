@@ -43,9 +43,27 @@ defmodule Buildel.Blocks.SpeechToText do
                 "enumPresentAs" => "radio",
                 "default" => "en"
               },
+              variant: %{
+                "type" => "string",
+                "title" => "Speech to text variant",
+                "description" =>
+                  "Streaming for live-streaming audio, Pre-Recorder for pre-recorded audio files",
+                "enum" => ["streaming", "pre-recorded"],
+                "enumPresentAs" => "radio",
+                "default" => "streaming"
+              },
+              model: %{
+                "type" => "string",
+                "title" => "Model",
+                "description" =>
+                  "Model allows you to supply a model to use to process submitted audio.",
+                "enum" => ["base", "enhanced"],
+                "enumPresentAs" => "radio",
+                "default" => "base"
+              },
               timeout: %{
                 "type" => "number",
-                "title" => "Timeout",
+                "title" => "Stop after (ms)",
                 "description" =>
                   "The temperature specifies the maximum duration (in ms.) for an operation to complete before the system terminates it due to inactivity or delay.",
                 "default" => 10000,
@@ -78,26 +96,25 @@ defmodule Buildel.Blocks.SpeechToText do
 
     api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
 
-    {:ok,
-     state
-     |> Keyword.put(
-       :api_key,
-       api_key
-     )
-     |> Keyword.put(:clips, %{})
-     |> assign_stream_state()}
+    %{language: lang, model: model, variant: variant} = opts
 
-    # api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
+    if variant == "pre-recorded" do
+      {:ok,
+       state
+       |> Keyword.put(
+         :api_key,
+         api_key
+       )
+       |> assign_stream_state()}
+    else
+      case deepgram().connect!(api_key, %{stream_to: self(), language: lang, model: model}) do
+        {:ok, deepgram_pid} ->
+          {:ok, state |> Keyword.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
 
-    # %{language: lang} = opts
-
-    # case deepgram().connect!(api_key, %{stream_to: self(), language: lang}) do
-    #   {:ok, deepgram_pid} ->
-    #     {:ok, state |> Keyword.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
-
-    #   {:error, _reason} ->
-    #     {:stop, {:error, block_name, :incorrect_api_key}}
-    # end
+        {:error, _reason} ->
+          {:stop, {:error, block_name, :incorrect_api_key}}
+      end
+    end
   end
 
   @impl true
@@ -106,21 +123,25 @@ defmodule Buildel.Blocks.SpeechToText do
     state
   end
 
-  # @impl true
-  # def handle_cast({:transcript, {:binary, chunk}}, state) do
-  #   state = state |> send_stream_start()
-  #   state |> Keyword.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
-  #   {:noreply, state}
-  # end
-
   @impl true
   def handle_cast({:transcript, {:binary, chunk}}, state) do
     state = state |> send_stream_start()
 
-    language = state |> get_in([:opts, :language])
-    timeout = state |> get_in([:opts, :timeout])
+    variant = state |> get_in([:opts, :variant])
 
-    deepgram().transcribe(state[:api_key], chunk, %{language: language, timeout: timeout})
+    if variant == "pre-recorded" do
+      language = state |> get_in([:opts, :language])
+      timeout = state |> get_in([:opts, :timeout])
+      model = state |> get_in([:opts, :model])
+
+      deepgram().transcribe(state[:api_key], chunk, %{
+        language: language,
+        timeout: timeout,
+        model: model
+      })
+    else
+      state |> Keyword.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
+    end
 
     {:noreply, state}
   end

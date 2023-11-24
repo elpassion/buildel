@@ -26,11 +26,11 @@ defmodule Buildel.Clients.Deepgram do
     WebSockex.send_frame(pid, {:binary, audio})
   end
 
-  @http_url "https://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true&model=general"
-  def transcribe(token \\ nil, file, opts \\ %{language: "en", timeout: 10000}) do
-    %{language: lang, timeout: timeout} = opts
+  @http_url "https://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true"
+  def transcribe(token \\ nil, file, opts \\ %{language: "en", timeout: 10000, model: "base"}) do
+    %{language: lang, timeout: timeout, model: model} = opts
 
-    url = build_url(@http_url, [{:language, lang}])
+    url = build_url(@http_url, [{:language, lang}, {:model, model}])
 
     headers = [
       {"Authorization", "Token #{token || System.get_env("DEEPGRAM_API_KEY")}"}
@@ -66,11 +66,11 @@ defmodule Buildel.Clients.Deepgram do
     {:ok}
   end
 
-  @wss_url "wss://api.deepgram.com/v1/listen?model=general&smart_format=true&punctuate=true&diarize=true"
-  def start_link(state \\ %{language: "en"}, opts \\ []) do
-    %{language: lang} = state
+  @wss_url "wss://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true"
+  def start_link(state \\ %{language: "en", model: "base"}, opts \\ []) do
+    %{language: lang, model: model} = state
 
-    url = build_url(@wss_url, [{:language, lang}])
+    url = build_url(@wss_url, [{:language, lang}, {:model, model}])
 
     WebSockex.start_link(url, __MODULE__, state, opts)
   end
@@ -79,6 +79,7 @@ defmodule Buildel.Clients.Deepgram do
   def handle_frame({:text, text}, state) do
     message = Jason.decode!(text)
     send(state.stream_to, {:raw_transcript, message})
+
     alternatives = message |> get_in(["channel", "alternatives"])
     is_final = message |> get_in(["is_final"])
 
