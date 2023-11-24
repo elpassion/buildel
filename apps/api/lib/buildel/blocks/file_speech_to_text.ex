@@ -1,4 +1,4 @@
-defmodule Buildel.Blocks.SpeechToText do
+defmodule Buildel.Blocks.FileSpeechToText do
   use Buildel.Blocks.Block
 
   @impl true
@@ -9,10 +9,10 @@ defmodule Buildel.Blocks.SpeechToText do
   @impl true
   def options() do
     %{
-      type: "speech_to_text",
+      type: "file_speech_to_text",
       groups: ["audio", "text"],
       inputs: [audio_input()],
-      outputs: [text_output(), text_output("json_output")],
+      outputs: [text_output(), text_output("json_output"), text_output("srt_output")],
       ios: [],
       schema: schema()
     }
@@ -89,13 +89,13 @@ defmodule Buildel.Blocks.SpeechToText do
 
     %{language: lang, model: model} = opts
 
-    case deepgram().connect!(api_key, %{stream_to: self(), language: lang, model: model}) do
-      {:ok, deepgram_pid} ->
-        {:ok, state |> Keyword.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
-
-      {:error, _reason} ->
-        {:stop, {:error, block_name, :incorrect_api_key}}
-    end
+    {:ok,
+     state
+     |> Keyword.put(
+       :api_key,
+       api_key
+     )
+     |> assign_stream_state()}
   end
 
   @impl true
@@ -108,7 +108,15 @@ defmodule Buildel.Blocks.SpeechToText do
   def handle_cast({:transcript, {:binary, chunk}}, state) do
     state = state |> send_stream_start()
 
-    state |> Keyword.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
+    language = state |> get_in([:opts, :language])
+    timeout = state |> get_in([:opts, :timeout])
+    model = state |> get_in([:opts, :model])
+
+    deepgram().transcribe_file(state[:api_key], chunk, %{
+      language: language,
+      timeout: timeout,
+      model: model
+    })
 
     {:noreply, state}
   end
@@ -123,6 +131,19 @@ defmodule Buildel.Blocks.SpeechToText do
       state[:context_id],
       state[:block_name],
       "output",
+      {:text, text}
+    )
+
+    state = state |> send_stream_stop()
+
+    {:noreply, state}
+  end
+
+  def handle_info({:srt_transcript, %{message: text, is_final: true}}, state) do
+    Buildel.BlockPubSub.broadcast_to_io(
+      state[:context_id],
+      state[:block_name],
+      "srt_output",
       {:text, text}
     )
 

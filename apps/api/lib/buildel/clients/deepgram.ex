@@ -2,7 +2,7 @@ defmodule Buildel.Clients.DeepgramBehaviour do
   @callback connect!(String.t(), %{stream_to: pid}) :: {:ok, pid} | {:error, term}
   @callback disconnect(pid) :: :ok
   @callback transcribe_audio(pid, {:binary, binary}) :: :ok
-  @callback transcribe(String.t(), {:binary, binary}) :: :ok
+  @callback transcribe_file(String.t(), {:binary, binary}) :: :ok
 end
 
 defmodule Buildel.Clients.Deepgram do
@@ -26,8 +26,45 @@ defmodule Buildel.Clients.Deepgram do
     WebSockex.send_frame(pid, {:binary, audio})
   end
 
+  @wss_url "wss://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true"
+  def start_link(state \\ %{language: "en", model: "base"}, opts \\ []) do
+    %{language: lang, model: model} = state
+
+    url = build_url(@wss_url, [{:language, lang}, {:model, model}])
+
+    WebSockex.start_link(url, __MODULE__, state, opts)
+  end
+
+  @impl true
+  def handle_frame({:text, text}, state) do
+    message = Jason.decode!(text)
+    send(state.stream_to, {:raw_transcript, message})
+
+    alternatives = message |> get_in(["channel", "alternatives"])
+    is_final = message |> get_in(["is_final"])
+
+    message =
+      case alternatives do
+        [first_alternative | _] -> first_alternative |> get_in(["transcript"])
+        _ -> nil
+      end
+
+    if message, do: send(state.stream_to, {:transcript, %{message: message, is_final: is_final}})
+
+    {:ok, state}
+  end
+
+  @impl true
+  def handle_disconnect(_connection_status_map, state) do
+    {:reconnect, state}
+  end
+
   @http_url "https://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true"
-  def transcribe(token \\ nil, file, opts \\ %{language: "en", timeout: 10000, model: "base"}) do
+  def transcribe_file(
+        token \\ nil,
+        file,
+        opts \\ %{language: "en", timeout: 10000, model: "base"}
+      ) do
     %{language: lang, timeout: timeout, model: model} = opts
 
     url = build_url(@http_url, [{:language, lang}, {:model, model}])
@@ -64,39 +101,6 @@ defmodule Buildel.Clients.Deepgram do
     if transcript, do: send(self(), {:transcript, %{message: transcript, is_final: true}})
 
     {:ok}
-  end
-
-  @wss_url "wss://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true"
-  def start_link(state \\ %{language: "en", model: "base"}, opts \\ []) do
-    %{language: lang, model: model} = state
-
-    url = build_url(@wss_url, [{:language, lang}, {:model, model}])
-
-    WebSockex.start_link(url, __MODULE__, state, opts)
-  end
-
-  @impl true
-  def handle_frame({:text, text}, state) do
-    message = Jason.decode!(text)
-    send(state.stream_to, {:raw_transcript, message})
-
-    alternatives = message |> get_in(["channel", "alternatives"])
-    is_final = message |> get_in(["is_final"])
-
-    message =
-      case alternatives do
-        [first_alternative | _] -> first_alternative |> get_in(["transcript"])
-        _ -> nil
-      end
-
-    if message, do: send(state.stream_to, {:transcript, %{message: message, is_final: is_final}})
-
-    {:ok, state}
-  end
-
-  @impl true
-  def handle_disconnect(_connection_status_map, state) do
-    {:reconnect, state}
   end
 
   defp build_url(url, opts \\ []) do
