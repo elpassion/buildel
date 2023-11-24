@@ -177,7 +177,7 @@ export function NodeFieldsForm({
             )}
           />
         );
-      } else if (field.data.type === "audio") {
+      } else if (type === "audio") {
         return (
           <AudioFieldTabs
             disabled={disabled}
