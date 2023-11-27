@@ -28,6 +28,7 @@ interface IRunPipelineContext {
   stopRun: () => void;
   push: (topic: string, payload: any) => void;
   clearEvents: (blockName: string) => void;
+  clearBlockEvents: (blockName: string) => void;
   status: "idle" | "starting" | "running";
   isValid: boolean;
   organizationId: number;
@@ -104,6 +105,10 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     setEvents((prev) => prev.filter((ev) => ev.block === blockName));
   }, []);
 
+  const clearBlockEvents = useCallback((blockName: string) => {
+    setEvents((prev) => prev.filter((ev) => ev.block !== blockName));
+  }, []);
+
   const blockValidations = useMemo(() => {
     if (!pipeline) return {};
 
@@ -133,6 +138,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       push: handlePush,
       stopRun,
       clearEvents,
+      clearBlockEvents,
       blockStatuses,
       blockValidations,
       isValid,
@@ -148,6 +154,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       status,
       stopRun,
       clearEvents,
+      clearBlockEvents,
       blockStatuses,
       blockValidations,
       isValid,
@@ -224,6 +231,7 @@ export const useRunPipelineNode = (block: IBlockConfig) => {
       events: filteredEvents,
       push: ctx.push,
       clearEvents: ctx.clearEvents,
+      clearBlockEvents: ctx.clearBlockEvents,
       errors,
     }),
     [
@@ -232,6 +240,7 @@ export const useRunPipelineNode = (block: IBlockConfig) => {
       filteredEvents,
       ctx.push,
       ctx.clearEvents,
+      ctx.clearBlockEvents,
       ctx.blockValidations,
       blockName,
     ]

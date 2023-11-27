@@ -1,7 +1,11 @@
 import React, { useCallback } from "react";
 import { IEvent, useRunPipelineNode } from "../RunPipelineProvider";
 import { IBlockConfig, IField } from "../pipeline.types";
-import { NodeCopyButton, NodeDownloadButton } from "./NodeActionButtons";
+import {
+  NodeClearButton,
+  NodeCopyButton,
+  NodeDownloadButton,
+} from "./NodeActionButtons";
 import { AudioOutput } from "./AudioOutput";
 
 interface NodeFieldsOutputProps {
@@ -10,7 +14,7 @@ interface NodeFieldsOutputProps {
 }
 
 export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
-  const { events } = useRunPipelineNode(block);
+  const { events, clearBlockEvents } = useRunPipelineNode(block);
 
   const renderOutput = useCallback(
     (field: IField) => {
@@ -29,6 +33,8 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
               <NodeCopyButton text={text} />
 
               <NodeDownloadButton blockName={block.name} text={text} />
+
+              <NodeClearButton onClear={() => clearBlockEvents(block.name)} />
             </div>
 
             <NodeTextOutput text={text} />

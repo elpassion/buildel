@@ -34,6 +34,15 @@ export function NodeDownloadButton({
   );
 }
 
+export function NodeClearButton({ onClear }: { onClear: () => void }) {
+  return (
+    <NodeActionButton onClick={onClear}>
+      <Icon iconName="trash" />
+      <span>Clear</span>
+    </NodeActionButton>
+  );
+}
+
 export function NodeActionButton({
   children,
   className,
