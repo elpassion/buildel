@@ -34,9 +34,11 @@ export function CustomNode({ data, selected, children }: CustomNodeProps) {
           borderStyles(),
           {
             "scale-110": status,
+            "border-primary-700": status,
           }
         )}
       >
+        <NodeWorkingIcon isWorking={status} />
         {children}
       </section>
       {errors.length === 0 ? null : (
@@ -160,5 +162,19 @@ export function CustomNodeBody({
         />
       ))}
     </div>
+  );
+}
+
+function NodeWorkingIcon({ isWorking }: { isWorking: boolean }) {
+  return (
+    <div
+      className={classNames(
+        "animate-ping w-2 h-2 rounded-full bg-primary-500 flex justify-center items-center absolute z-10 -top-1 -right-1",
+        {
+          hidden: !isWorking,
+          block: isWorking,
+        }
+      )}
+    />
   );
 }
