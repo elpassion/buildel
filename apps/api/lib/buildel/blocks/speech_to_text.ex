@@ -28,7 +28,7 @@ defmodule Buildel.Blocks.SpeechToText do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["api_key", "language"],
+            "required" => ["api_key"],
             "properties" => %{
               "api_key" =>
                 secret_schema(%{
@@ -87,7 +87,8 @@ defmodule Buildel.Blocks.SpeechToText do
 
     api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
 
-    %{language: lang, model: model} = opts
+    lang = Map.get(opts, :language, "en")
+    model = Map.get(opts, :model, "base")
 
     case deepgram().connect!(api_key, %{stream_to: self(), language: lang, model: model}) do
       {:ok, deepgram_pid} ->
