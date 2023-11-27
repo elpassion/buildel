@@ -123,17 +123,17 @@ defmodule Buildel.Clients.Deepgram do
   defp get_sentences(data) do
     data
     |> get_in(["results", "channels"])
-    |> Enum.flat_map(fn %{"alternatives" => alternatives} ->
-      alternatives
-    end)
-    |> Enum.flat_map(fn %{
-                          "transcript" => _,
-                          "paragraphs" => %{"paragraphs" => paragraphs}
-                        } ->
-      paragraphs
-    end)
-    |> Enum.flat_map(fn %{"sentences" => sentences} ->
-      sentences
-    end)
+    |> Enum.flat_map(&get_alternatives(&1))
+    |> Enum.flat_map(&get_paragraphs(&1))
+    |> Enum.flat_map(&get_sentences_from_paragraph(&1))
   end
+
+  defp get_alternatives(%{"alternatives" => alternatives}), do: alternatives
+  defp get_alternatives(_), do: []
+
+  defp get_paragraphs(%{"paragraphs" => %{"paragraphs" => paragraphs}}), do: paragraphs
+  defp get_paragraphs(_), do: []
+
+  defp get_sentences_from_paragraph(%{"sentences" => sentences}), do: sentences
+  defp get_sentences_from_paragraph(_), do: []
 end
