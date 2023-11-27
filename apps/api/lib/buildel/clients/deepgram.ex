@@ -116,16 +116,11 @@ defmodule Buildel.Clients.Deepgram do
 
   defp convert_to_srt(data) do
     data
-    |> get_sentences()
-    |> Buildel.Clients.Utils.Srt.main()
-  end
-
-  defp get_sentences(data) do
-    data
     |> get_in(["results", "channels"])
     |> Enum.flat_map(&get_alternatives(&1))
     |> Enum.flat_map(&get_paragraphs(&1))
     |> Enum.flat_map(&get_sentences_from_paragraph(&1))
+    |> Buildel.Clients.Utils.Srt.main()
   end
 
   defp get_alternatives(%{"alternatives" => alternatives}), do: alternatives
