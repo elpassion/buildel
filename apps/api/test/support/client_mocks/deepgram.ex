@@ -17,6 +17,14 @@ defmodule Buildel.ClientMocks.Deepgram do
     GenServer.cast(pid, {:transcribe_audio, audio})
   end
 
+  @impl DeepgramBehaviour
+  def transcribe_file(_token, _file, _opts) do
+    send(
+      self(),
+      {:transcript, %{message: "Hello", is_final: true}}
+    )
+  end
+
   def init(state) do
     {:ok, state}
   end

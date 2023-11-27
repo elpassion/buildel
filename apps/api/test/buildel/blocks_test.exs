@@ -9,6 +9,7 @@ defmodule Buildel.BlocksTest do
     TextInput,
     SpeechToText,
     FileSpeechToText,
+    FileSpeechToText,
     TextToSpeech,
     Chat,
     Block,
@@ -243,6 +244,93 @@ defmodule Buildel.BlocksTest do
 
       {:ok, _pid} =
         SpeechToText.start_link(
+          name: "test",
+          block_name: "test",
+          context_id: "run1",
+          opts: %{
+            inputs: ["text_test:output->input"],
+            api_key: "test"
+          }
+        )
+
+      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+
+      file = File.read!("test/support/fixtures/real.mp3")
+      input_pid |> AudioInput.send_audio({:binary, file})
+
+      assert_receive {^topic, :text, "Hello"}
+    end
+  end
+
+  describe "FileSpeechToText" do
+    test "exposes options" do
+      assert FileSpeechToText.options() == %{
+               type: "file_speech_to_text",
+               inputs: [Block.audio_input("input")],
+               outputs: [
+                 Block.text_output("output"),
+                 Block.text_output("json_output"),
+                 Block.text_output("srt_output")
+               ],
+               schema: SpeechToText.schema(),
+               groups: ["audio", "text"],
+               ios: []
+             }
+    end
+
+    test "validates schema correctly" do
+      assert :ok =
+               Blocks.validate_block(FileSpeechToText, %{
+                 "name" => "test",
+                 "opts" => %{
+                   "api_key" => "test",
+                   "language" => "en"
+                 },
+                 "inputs" => []
+               })
+
+      assert {:error, _} = Blocks.validate_block(FileSpeechToText, %{})
+    end
+
+    test "audio to text works through direct calling" do
+      {:ok, _input_pid} =
+        AudioInput.start_link(
+          name: "audio_test",
+          block_name: "audio_test",
+          context_id: "run1",
+          opts: %{inputs: []}
+        )
+
+      {:ok, pid} =
+        FileSpeechToText.start_link(
+          name: "test",
+          block_name: "test",
+          context_id: "run1",
+          opts: %{
+            inputs: ["audio_test:output"],
+            api_key: "test"
+          }
+        )
+
+      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+
+      file = File.read!("test/support/fixtures/real.mp3")
+      pid |> FileSpeechToText.input({:binary, file})
+
+      assert_receive {^topic, :text, "Hello"}
+    end
+
+    test "audio to text works through broadcasting through input" do
+      {:ok, input_pid} =
+        AudioInput.start_link(
+          name: "audio_test",
+          block_name: "text_test",
+          context_id: "run1",
+          opts: %{inputs: []}
+        )
+
+      {:ok, _pid} =
+        FileSpeechToText.start_link(
           name: "test",
           block_name: "test",
           context_id: "run1",
