@@ -34,4 +34,62 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       render(conn, :show, run: run)
     end
   end
+
+  def create(conn, %{"organization_id" => organization_id, "pipeline_id" => pipeline_id}) do
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Pipeline{} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, run} <- Pipelines.create_run(pipeline) do
+      render(conn, :show, run: run)
+    end
+  end
+
+  def start(conn, %{
+        "organization_id" => organization_id,
+        "pipeline_id" => pipeline_id,
+        "id" => id
+      }) do
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Pipeline{} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, run} <- Pipelines.get_pipeline_run(pipeline, id),
+         {:ok, run} <- Pipelines.Runner.start_run(run) do
+      render(conn, :show, run: run)
+    end
+  end
+
+  def stop(conn, %{"organization_id" => organization_id, "pipeline_id" => pipeline_id, "id" => id}) do
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Pipeline{} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, run} <- Pipelines.get_pipeline_run(pipeline, id),
+         {:ok, run} <- Pipelines.Runner.stop_run(run) do
+      render(conn, :show, run: run)
+    end
+  end
+
+  def input(conn, %{
+        "organization_id" => organization_id,
+        "pipeline_id" => pipeline_id,
+        "id" => id,
+        "block_name" => block_name,
+        "input_name" => input_name,
+        "data" => data
+      }) do
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Pipeline{} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, run} <- Pipelines.get_pipeline_run(pipeline, id),
+         {:ok, run} <- Pipelines.Runner.input_run(run, block_name, input_name, data) do
+      render(conn, :show, run: run)
+    end
+  end
 end

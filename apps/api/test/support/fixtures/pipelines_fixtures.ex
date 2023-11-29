@@ -13,7 +13,8 @@ defmodule Buildel.PipelinesFixtures do
             %{
               "name" => "random_block",
               "type" => "audio_input",
-              "opts" => %{}
+              "opts" => %{},
+              "inputs" => []
             },
             %{
               "name" => "random_block_2",

@@ -56,6 +56,12 @@ defmodule Buildel.Pipelines.Runner do
     end
   end
 
+  def input_run(%Run{} = run, block_name, input_name, data) do
+    context_id = Buildel.Pipelines.Worker.context_id(run)
+    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
+    {:ok, run}
+  end
+
   @impl true
   def init(_init) do
     DynamicSupervisor.init(strategy: :one_for_one)

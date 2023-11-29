@@ -140,7 +140,7 @@ defmodule Buildel.Blocks.Chat do
     tools = Map.get(opts, :tools, [])
 
     %{global: global} =
-      Buildel.Pipelines.Worker.context_from_context_id(context_id)
+      block_context().context_from_context_id(context_id)
 
     knowledge_source =
       if opts.knowledge != nil && opts.knowledge != "",
