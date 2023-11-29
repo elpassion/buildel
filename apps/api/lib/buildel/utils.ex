@@ -10,5 +10,9 @@ defmodule Buildel.Utils do
     end
   end
 
+  def parse_id(string) when is_nil(string) do
+    {:ok, nil}
+  end
+
   def parse_id(_), do: {:error, :invalid_id}
 end

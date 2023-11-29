@@ -35,7 +35,7 @@ defmodule BuildelWeb.PipelineChannelTest do
                )
     end
 
-    test "succeeds when trying to join a run that exists", %{
+    test "succeeds when trying to join a run for pipeline that exists", %{
       socket: socket,
       organization: organization,
       user: user
@@ -60,6 +60,38 @@ defmodule BuildelWeb.PipelineChannelTest do
                    user_data: user_data
                  }
                )
+    end
+
+    test "succeeds when trying to join a run that is already started", %{
+      socket: socket,
+      organization: organization,
+      user: user
+    } do
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+
+      {:ok, run} =
+        run_fixture(%{pipeline_id: pipeline.id}) |> Buildel.Pipelines.Runner.start_run()
+
+      user_data = Jason.encode!(%{user_id: user.id})
+
+      {:ok, %{run: joined_run}, socket} =
+        socket
+        |> subscribe_and_join(
+          BuildelWeb.PipelineChannel,
+          "pipelines:#{pipeline.organization_id}:#{pipeline.id}:#{run.id}",
+          %{
+            auth:
+              BuildelWeb.ChannelAuth.create_auth_token(
+                "socket_id",
+                "pipelines:#{pipeline.organization_id}:#{pipeline.id}:#{run.id}",
+                user_data,
+                organization.api_key
+              ),
+            user_data: user_data
+          }
+        )
+
+      assert %{id: run.id} == %{id: joined_run.id}
     end
   end
 

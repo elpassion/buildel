@@ -75,6 +75,17 @@ defmodule Buildel.Pipelines do
     end
   end
 
+  def upsert_run(attrs \\ %{}) do
+    if attrs[:id] do
+      case get_run(attrs[:id]) do
+        nil -> create_run(attrs |> Map.delete(:id))
+        run -> {:ok, run}
+      end
+    else
+      create_run(attrs |> Map.delete(:id))
+    end
+  end
+
   def start(%Run{} = run) do
     run |> Run.start()
   end

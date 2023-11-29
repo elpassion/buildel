@@ -10,11 +10,13 @@ defmodule BuildelWeb.PipelineChannel do
     required(:user_data, :string)
   end
 
-  def join("pipelines:" <> organization_pipeline_id = channel_name, params, socket) do
-    with {:ok, %{auth: auth, user_data: user_data}} <- validate(:join, params),
-         [organization_id, pipeline_id] <- String.split(organization_pipeline_id, ":"),
+  def join(channel_name, params, socket) do
+    with {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id}} <-
+           parse_channel_name(channel_name),
+         {:ok, %{auth: auth, user_data: user_data}} <- validate(:join, params),
          {:ok, pipeline_id} <- Buildel.Utils.parse_id(pipeline_id),
          {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
+         {:ok, run_id} <- Buildel.Utils.parse_id(run_id),
          organization <- Buildel.Organizations.get_organization!(organization_id),
          :ok <-
            BuildelWeb.ChannelAuth.verify_auth_token(
@@ -26,10 +28,13 @@ defmodule BuildelWeb.PipelineChannel do
            ),
          {:ok, %Pipelines.Pipeline{id: pipeline_id, config: config}} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, run} <- Pipelines.create_run(%{pipeline_id: pipeline_id, config: config}),
+         {:ok, run} <-
+           Pipelines.upsert_run(%{id: run_id, pipeline_id: pipeline_id, config: config}),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
       listen_to_outputs(run)
-      {:ok, %{run: %{}}, socket |> assign(:run, run)}
+
+      {:ok, %{run: %{id: run.id}},
+       socket |> assign(:run, run) |> assign(:joined_existing, run_id != nil)}
     else
       {:error, :invalid_id} ->
         {:error, %{reason: "not_found"}}
@@ -57,7 +62,7 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   def terminate(_reason, socket) do
-    if socket.assigns |> Map.has_key?(:run) do
+    if socket.assigns |> Map.has_key?(:run) && !socket.assigns.joined_existing do
       Pipelines.Runner.stop_run(socket.assigns.run)
     end
 
@@ -152,6 +157,19 @@ defmodule BuildelWeb.PipelineChannel do
           block_name: block_name,
           output_name: nil
         }
+    end
+  end
+
+  defp parse_channel_name(channel_name) do
+    case channel_name |> String.split(":") do
+      ["pipelines", organization_id, pipeline_id, run_id] ->
+        {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id}}
+
+      ["pipelines", organization_id, pipeline_id] ->
+        {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: nil}}
+
+      _ ->
+        {:error, :not_found}
     end
   end
 
