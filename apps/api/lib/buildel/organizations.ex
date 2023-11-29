@@ -28,6 +28,16 @@ defmodule Buildel.Organizations do
 
   def get_organization!(id), do: Repo.get!(Organization, id)
 
+  def get_organization_by_api_key(api_key) do
+    case Repo.get_by(Organization, api_key_hash: api_key) do
+      nil ->
+        {:error, :not_found}
+
+      %Organization{} = organization ->
+        {:ok, organization}
+    end
+  end
+
   def get_organization_by_id_and_api_key(organization_id, api_key)
       when is_binary(organization_id) do
     case Buildel.Utils.parse_id(organization_id) do
@@ -49,7 +59,7 @@ defmodule Buildel.Organizations do
   def reset_organization_api_key(%Organization{} = organization) do
     organization
     |> Ecto.Changeset.change(%{
-      api_key: :crypto.strong_rand_bytes(32) |> Base.encode64(),
+      api_key: :crypto.strong_rand_bytes(32) |> Base.encode64()
     })
     |> Buildel.Repo.update()
   end
@@ -88,6 +98,13 @@ defmodule Buildel.Organizations do
 
   def change_organization(%Organization{} = organization, attrs \\ %{}) do
     Organization.changeset(organization, attrs)
+  end
+
+  def get_member(%Organization{} = organization) do
+    case Repo.get_by(Membership, organization_id: organization.id) do
+      nil -> {:error, :not_found}
+      %Membership{} = membership -> {:ok, membership |> Repo.preload(:user) |> Map.get(:user)}
+    end
   end
 
   def list_memberships do

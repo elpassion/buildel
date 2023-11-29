@@ -4,6 +4,7 @@ defmodule BuildelWeb.UserAuth do
   import Plug.Conn
   import Phoenix.Controller
 
+  alias Buildel.Organizations
   alias Buildel.Accounts
 
   # Make the remember me cookie valid for 60 days.
@@ -82,13 +83,26 @@ defmodule BuildelWeb.UserAuth do
   end
 
   @doc """
-  Authenticates the user by looking into the session
-  and remember me token.
+  Authenticates the user by looking into the session,
+  remember me token and authorization header.
   """
   def fetch_current_user(conn, _opts) do
-    {user_token, conn} = ensure_user_token(conn)
-    user = user_token && Accounts.get_user_by_session_token(user_token)
-    assign(conn, :current_user, user)
+    case ensure_user_token(conn) do
+      {nil, conn} ->
+        case ensure_api_token(conn) do
+          {nil, conn} ->
+            conn
+
+          {token, conn} ->
+            {:ok, organization} = Organizations.get_organization_by_api_key(token)
+            {:ok, user} = Organizations.get_member(organization)
+            assign(conn, :current_user, user)
+        end
+
+      {token, conn} ->
+        user = Accounts.get_user_by_session_token(token)
+        assign(conn, :current_user, user)
+    end
   end
 
   defp ensure_user_token(conn) do
@@ -102,6 +116,13 @@ defmodule BuildelWeb.UserAuth do
       else
         {nil, conn}
       end
+    end
+  end
+
+  defp ensure_api_token(conn) do
+    case get_req_header(conn, "authorization") do
+      ["Bearer " <> token] -> {token, conn}
+      _ -> {nil, conn}
     end
   end
 

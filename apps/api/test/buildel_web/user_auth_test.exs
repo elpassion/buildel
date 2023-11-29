@@ -1,6 +1,7 @@
 defmodule BuildelWeb.UserAuthTest do
   use BuildelWeb.ConnCase, async: true
 
+  alias Buildel.OrganizationsFixtures
   alias Phoenix.LiveView
   alias Buildel.Accounts
   alias BuildelWeb.UserAuth
@@ -106,6 +107,18 @@ defmodule BuildelWeb.UserAuthTest do
       conn = UserAuth.fetch_current_user(conn, [])
       refute get_session(conn, :user_token)
       refute conn.assigns.current_user
+    end
+
+    test "authenticates user from api token", %{conn: conn, user: user} do
+      organization = OrganizationsFixtures.organization_fixture(%{user_id: user.id})
+      api_token = organization.api_key
+
+      conn =
+        conn
+        |> put_req_header("authorization", "Bearer #{api_token}")
+        |> UserAuth.fetch_current_user([])
+
+      assert conn.assigns.current_user.id == user.id
     end
   end
 
