@@ -19,6 +19,7 @@ defmodule Buildel.Blocks do
     SplitText,
     # VectorDB,
     DocumentSearch,
+    WebhookOutput,
     IF
   }
 
@@ -38,6 +39,7 @@ defmodule Buildel.Blocks do
     # "vector_db" => VectorDB,
     "split_text" => SplitText,
     "file_input" => FileInput,
+    "webhook_output" => WebhookOutput,
     "document_search" => DocumentSearch,
     "if" => IF,
     "memory_search_tool" => Buildel.Blocks.MemorySearchTool
@@ -60,6 +62,7 @@ defmodule Buildel.Blocks do
     FileInput => "file_input",
     SplitText => "split_text",
     DocumentSearch => "document_search",
+    WebhookOutput => "webhook_output",
     IF => "if",
     Buildel.Blocks.MemorySearchTool => "memory_search_tool"
   }
