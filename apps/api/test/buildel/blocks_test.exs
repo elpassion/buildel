@@ -14,6 +14,7 @@ defmodule Buildel.BlocksTest do
     Chat,
     Block,
     TextOutput,
+    WebhookOutput,
     AudioOutput,
     CollectSentences,
     CollectAllText,
@@ -130,6 +131,54 @@ defmodule Buildel.BlocksTest do
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :text, ^text}
+      assert_receive {^topic, :stop_stream, nil}
+    end
+  end
+
+  describe "WebhookOutput" do
+    test "exposes options" do
+      assert WebhookOutput.options() == %{
+               type: "webhook_output",
+               inputs: [Block.text_input("input")],
+               outputs: [],
+               schema: WebhookOutput.schema(),
+               groups: ["inputs / outputs"],
+               ios: []
+             }
+    end
+
+    test "validates schema correctly" do
+      assert :ok =
+               Blocks.validate_block(WebhookOutput, %{
+                 "name" => "test",
+                 "opts" => %{
+                   "url" => "http://localhost:3002/cats"
+                 },
+                 "inputs" => []
+               })
+
+      assert {:error, _} = Blocks.validate_block(WebhookOutput, %{})
+    end
+
+    test "send data to specific url" do
+      url = "http://localhost:3002/cats"
+      pid = self()
+
+      {:ok, webhook_pid} =
+        WebhookOutput.start_link(
+          name: "test",
+          block_name: "test",
+          context_id: "run1",
+          opts: %{inputs: [], url: url, pid: pid}
+        )
+
+      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+
+      text = "HAHAAH"
+      WebhookOutput.input(webhook_pid, {:text, text})
+
+      assert_receive {^topic, :start_stream, nil}
+      assert_receive {:webhook_called, ^url}
       assert_receive {^topic, :stop_stream, nil}
     end
   end
@@ -272,7 +321,7 @@ defmodule Buildel.BlocksTest do
                  Block.text_output("json_output"),
                  Block.text_output("srt_output")
                ],
-               schema: SpeechToText.schema(),
+               schema: FileSpeechToText.schema(),
                groups: ["audio", "text"],
                ios: []
              }

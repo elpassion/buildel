@@ -39,6 +39,7 @@ config :buildel, :secret_key_base, "secret_key_base"
 
 config :buildel, :deepgram, Buildel.ClientMocks.Deepgram
 config :buildel, :elevenlabs, Buildel.ClientMocks.Elevenlabs
+config :buildel, :webhook, Buildel.ClientMocks.Webhook
 config :buildel, :chat_gpt, Buildel.ClientMocks.ChatGPT
 config :buildel, :stream_timeout, 10
 config :buildel, :vector_db, Buildel.ClientMocks.VectorDB.QdrantAdapter

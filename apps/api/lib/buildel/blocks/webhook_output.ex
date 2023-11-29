@@ -63,7 +63,9 @@ defmodule Buildel.Blocks.WebhookOutput do
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
-    {:ok, state |> assign_stream_state}
+    pid = opts[:pid] || self()
+
+    {:ok, state |> Keyword.put(:pid, pid) |> assign_stream_state}
   end
 
   @impl true
@@ -79,10 +81,9 @@ defmodule Buildel.Blocks.WebhookOutput do
         "output"
       )
 
-    payload = Jason.encode!(%{"content" => content, "topic" => topic})
-    headers = [{"Accept", "application/json"}, {"Content-Type", "application/json"}]
+    payload = %{"content" => content, "topic" => topic}
 
-    HTTPoison.post!(url, payload, headers)
+    webhook().send_content(state[:pid], url, payload)
 
     state = state |> schedule_stream_stop()
 
@@ -93,5 +94,9 @@ defmodule Buildel.Blocks.WebhookOutput do
   def handle_info({_name, :text, text}, state) do
     input(self(), {:text, text})
     {:noreply, state}
+  end
+
+  defp webhook() do
+    Application.fetch_env!(:buildel, :webhook)
   end
 end
