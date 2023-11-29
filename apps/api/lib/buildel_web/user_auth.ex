@@ -91,7 +91,7 @@ defmodule BuildelWeb.UserAuth do
       {nil, conn} ->
         case ensure_api_token(conn) do
           {nil, conn} ->
-            conn
+            assign(conn, :current_user, nil)
 
           {token, conn} ->
             {:ok, organization} = Organizations.get_organization_by_api_key(token)
