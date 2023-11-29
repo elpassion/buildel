@@ -16,6 +16,7 @@ defmodule Buildel.Blocks do
     TextOutput,
     BlockValidator,
     TakeLatest,
+    SplitText,
     # VectorDB,
     DocumentSearch,
     IF
@@ -35,6 +36,7 @@ defmodule Buildel.Blocks do
     "collect_all_text" => CollectAllText,
     "take_latest" => TakeLatest,
     # "vector_db" => VectorDB,
+    "split_text" => SplitText,
     "file_input" => FileInput,
     "document_search" => DocumentSearch,
     "if" => IF,
@@ -56,6 +58,7 @@ defmodule Buildel.Blocks do
     TakeLatest => "take_latest",
     # VectorDB => "vector_db",
     FileInput => "file_input",
+    SplitText => "split_text",
     DocumentSearch => "document_search",
     IF => "if",
     Buildel.Blocks.MemorySearchTool => "memory_search_tool"
