@@ -178,7 +178,10 @@ defmodule Buildel.BlocksTest do
       WebhookOutput.input(webhook_pid, {:text, text})
 
       assert_receive {^topic, :start_stream, nil}
-      assert_receive {:webhook_called, ^url}
+
+      assert_receive {:webhook_called, ^url,
+                      "{\"content\":\"HAHAAH\",\"topic\":\"context::run1::block::test::io::output\"}"}
+
       assert_receive {^topic, :stop_stream, nil}
     end
   end

@@ -4,6 +4,6 @@ defmodule Buildel.ClientMocks.Webhook do
 
   @impl WebhookBehaviour
   def send_content(pid, url, payload \\ nil) do
-    send(pid, {:webhook_called, url})
+    send(pid, {:webhook_called, url, Jason.encode!(payload)})
   end
 end
