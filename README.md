@@ -28,5 +28,6 @@ To develop all apps and packages, run the following command:
 cd buildel
 
 pnpm dependencies:up
+pnpm i
 pnpm dev
 ```
