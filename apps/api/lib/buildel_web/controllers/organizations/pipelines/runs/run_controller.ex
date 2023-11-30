@@ -1,5 +1,6 @@
 defmodule BuildelWeb.OrganizationPipelineRunController do
   use BuildelWeb, :controller
+  use BuildelWeb.Validator
 
   import BuildelWeb.UserAuth
 
@@ -41,7 +42,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, run} <- Pipelines.create_run(pipeline) do
+         {:ok, run} <- Pipelines.create_run(%{pipeline_id: pipeline_id, config: pipeline.config}) do
       render(conn, :show, run: run)
     end
   end
@@ -74,21 +75,32 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     end
   end
 
-  def input(conn, %{
-        "organization_id" => organization_id,
-        "pipeline_id" => pipeline_id,
-        "id" => id,
-        "block_name" => block_name,
-        "input_name" => input_name,
-        "data" => data
-      }) do
+  defparams :input do
+    required(:organization_id, :string)
+    required(:pipeline_id, :string)
+    required(:id, :string)
+    required(:block_name, :string)
+    required(:input_name, :string)
+    required(:data, :string)
+  end
+
+  def input(conn, params) do
     user = conn.assigns.current_user
 
-    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok,
+          %{
+            organization_id: organization_id,
+            pipeline_id: pipeline_id,
+            id: id,
+            block_name: block_name,
+            input_name: input_name,
+            data: data
+          }} <- validate(:input, params),
+         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_pipeline_run(pipeline, id),
-         {:ok, run} <- Pipelines.Runner.input_run(run, block_name, input_name, data) do
+         {:ok, run} <- Pipelines.Runner.input_run(run, block_name, input_name, {:text, data}) do
       render(conn, :show, run: run)
     end
   end

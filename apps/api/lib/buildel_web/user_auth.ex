@@ -89,14 +89,13 @@ defmodule BuildelWeb.UserAuth do
   def fetch_current_user(conn, _opts) do
     case ensure_user_token(conn) do
       {nil, conn} ->
-        case ensure_api_token(conn) do
-          {nil, conn} ->
+        with {token, conn} when is_binary(token) <- ensure_api_token(conn),
+             {:ok, organization} <- Organizations.get_organization_by_api_key(token),
+             {:ok, user} <- Organizations.get_member(organization) do
+          assign(conn, :current_user, user)
+        else
+          _ ->
             assign(conn, :current_user, nil)
-
-          {token, conn} ->
-            {:ok, organization} = Organizations.get_organization_by_api_key(token)
-            {:ok, user} = Organizations.get_member(organization)
-            assign(conn, :current_user, user)
         end
 
       {token, conn} ->

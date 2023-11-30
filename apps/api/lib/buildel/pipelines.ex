@@ -60,7 +60,7 @@ defmodule Buildel.Pipelines do
     case from(r in Run, where: r.pipeline_id == ^pipeline.id, where: r.id == ^run_id)
          |> Repo.one() do
       nil -> {:error, :not_found}
-      run -> {:ok, run}
+      run -> {:ok, run |> Repo.preload(:pipeline)}
     end
   end
 
