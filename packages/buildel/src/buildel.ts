@@ -203,7 +203,7 @@ export class BuildelRun {
         ...this.headers,
       },
       method: "POST",
-      credentials: "same-origin",
+      credentials: "include",
       body: JSON.stringify({
         socket_id: this.id,
         channel_name: `pipelines:${this.organizationId}:${this.pipelineId}`,
