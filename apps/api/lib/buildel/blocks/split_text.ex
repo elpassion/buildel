@@ -69,7 +69,7 @@ defmodule Buildel.Blocks.SplitText do
   end
 
   @impl true
-  def handle_cast({:split, {:text, text_value} = text}, state) do
+  def handle_cast({:split, {:text, text_value}}, state) do
     state = state |> send_stream_start("output")
 
     text_value

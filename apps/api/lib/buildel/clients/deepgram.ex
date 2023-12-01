@@ -60,6 +60,7 @@ defmodule Buildel.Clients.Deepgram do
     {:reconnect, state}
   end
 
+  @impl true
   @http_url "https://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true"
   def transcribe_file(
         token \\ nil,
@@ -80,13 +81,13 @@ defmodule Buildel.Clients.Deepgram do
     |> handle_response
   end
 
-  def handle_response(response) do
+  defp handle_response(response) do
     result = Jason.decode!(response.body)
     send(self(), {:raw_transcript, result})
 
     srt_transcript = convert_to_srt(result)
 
-    if srt_transcript,
+    if is_binary(srt_transcript),
       do: send(self(), {:srt_transcript, %{message: srt_transcript, is_final: true}})
 
     channels = result |> get_in(["results", "channels"])
@@ -99,12 +100,13 @@ defmodule Buildel.Clients.Deepgram do
       end)
       |> Enum.join("")
 
-    if transcript, do: send(self(), {:transcript, %{message: transcript, is_final: true}})
+    if is_binary(transcript),
+      do: send(self(), {:transcript, %{message: transcript, is_final: true}})
 
-    {:ok}
+    :ok
   end
 
-  defp build_url(url, opts \\ []) do
+  defp build_url(url, opts) do
     query = Enum.map(opts, fn {key, value} -> "#{key}=#{URI.encode(value)}" end) |> Enum.join("&")
 
     if query !== "" do

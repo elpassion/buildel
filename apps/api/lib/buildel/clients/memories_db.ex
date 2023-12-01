@@ -29,7 +29,7 @@ defmodule Buildel.Clients.Functions.MemoriesDB do
     end
   end
 
-  defp execute(%{"document_id" => document_id} = _args, context) do
+  defp execute(%{"document_id" => document_id} = _args, _context) do
     memory = Buildel.Memories.get_memory!(document_id)
     "Document name: #{memory.file_name}\n\n#{memory.content |> String.trim()}"
   end

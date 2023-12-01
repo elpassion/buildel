@@ -74,7 +74,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
   end
 
   @impl true
-  def handle_cast({:query, {:text, query}}, state) do
+  def handle_cast({:query, {:text, _query}}, state) do
     state = state |> send_stream_start()
 
     state = state |> schedule_stream_stop()

@@ -77,7 +77,7 @@ defmodule Buildel.Blocks.FileSpeechToText do
   def init(
         [
           name: _name,
-          block_name: block_name,
+          block_name: _block_name,
           context_id: context_id,
           type: __MODULE__,
           opts: opts
@@ -86,9 +86,6 @@ defmodule Buildel.Blocks.FileSpeechToText do
     subscribe_to_inputs(context_id, opts.inputs)
 
     api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
-
-    lang = Map.get(opts, :language, "en")
-    model = Map.get(opts, :model, "base")
 
     {:ok,
      state

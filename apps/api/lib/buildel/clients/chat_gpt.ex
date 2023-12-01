@@ -13,8 +13,8 @@ defmodule Buildel.Clients.ChatGPT do
         context: context,
         on_content: on_content,
         on_end: on_end,
-        on_error: on_error,
-        api_key: api_key,
+        on_error: _on_error,
+        api_key: _api_key,
         model: model,
         temperature: temperature,
         tools: tools
@@ -47,7 +47,7 @@ defmodule Buildel.Clients.ChatGPT do
         %Message{function_name: nil} ->
           on_end.()
 
-        %Message{} = message ->
+        %Message{} ->
           nil
       end
     )
