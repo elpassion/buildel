@@ -27,7 +27,15 @@ To develop all apps and packages, run the following command:
 ```
 cd buildel
 
-pnpm dependencies:up
 pnpm i
+pnpm dependencies:up
 pnpm dev
 ```
+
+### Migrations 
+
+To run migrations, go to the apps/api and run `mix ecto.migrate`
+
+### Tips
+
+If you get 431 error, try to clear your cookies
