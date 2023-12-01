@@ -195,6 +195,7 @@ export class BuildelRun {
     return await fetch(authUrl, {
       headers: {
         "Content-Type": "application/json",
+        credentials: "same-origin",
       },
       method: "POST",
       body: JSON.stringify({
