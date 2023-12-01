@@ -5,12 +5,14 @@ import { assert } from "./utils/assert.ts";
 interface BuildelSocketOptions {
   socketUrl?: string;
   authUrl?: string;
+  headers?: Record<string, string>;
 }
 export class BuildelSocket {
   private readonly socket: Socket;
   private readonly id: string;
   private readonly authUrl: string;
   private readonly socketUrl: string;
+  private readonly headers: Record<string, string>;
 
   constructor(
     private readonly organizationId: number,
@@ -18,6 +20,7 @@ export class BuildelSocket {
   ) {
     this.authUrl = options.authUrl ?? "/super-api/channel_auth";
     this.socketUrl = options.socketUrl ?? "wss://buildel-api.fly.dev/socket";
+    this.headers = options.headers ?? {};
     this.id = v4();
     this.socket = new Socket(this.socketUrl, {
       params: {
@@ -77,6 +80,7 @@ export class BuildelSocket {
       this.organizationId,
       pipelineId,
       this.authUrl,
+      this.headers,
       { onBlockOutput, onBlockStatusChange, onStatusChange, onBlockError }
     );
   }
@@ -91,6 +95,7 @@ export class BuildelRun {
     private readonly organizationId: number,
     private readonly pipelineId: number,
     private readonly authUrl: string,
+    private readonly headers: Record<string, string>,
     private readonly handlers: {
       onBlockOutput: (
         blockId: string,
@@ -106,7 +111,7 @@ export class BuildelRun {
   public async start() {
     if (this.status !== "idle") return;
 
-    const token = await this.authenticateChannel(this.pipelineId, this.authUrl);
+    const token = await this.authenticateChannel();
 
     this.channel = this.socket.channel(
       `pipelines:${this.organizationId}:${this.pipelineId}`,
@@ -191,16 +196,17 @@ export class BuildelRun {
     return this.channel.state === "joined" ? "running" : "starting";
   }
 
-  private async authenticateChannel(pipelineId: number, authUrl: string) {
-    return await fetch(authUrl, {
+  private async authenticateChannel() {
+    return await fetch(this.authUrl, {
       headers: {
         "Content-Type": "application/json",
-        credentials: "same-origin",
+        ...this.headers,
       },
       method: "POST",
+      credentials: "same-origin",
       body: JSON.stringify({
         socket_id: this.id,
-        channel_name: `pipelines:${this.organizationId}:${pipelineId}`,
+        channel_name: `pipelines:${this.organizationId}:${this.pipelineId}`,
       }),
     }).then((response) => response.json());
   }
