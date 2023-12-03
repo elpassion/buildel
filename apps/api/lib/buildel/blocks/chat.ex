@@ -140,13 +140,10 @@ defmodule Buildel.Blocks.Chat do
     api_key =
       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
 
-    tools =
+    tool_blocks =
       opts.inputs_blocks
       |> Enum.filter(fn block ->
         block["block_type"]["ios"] |> Enum.any?(fn io -> io["type"] == "worker" end)
-      end)
-      |> Enum.map(fn block ->
-        Buildel.Blocks.type(block["type"]).function(context_id, block["name"])
       end)
 
     {:ok,
@@ -160,7 +157,7 @@ defmodule Buildel.Blocks.Chat do
        [%{role: "system", content: opts[:system_message]}] ++ opts[:messages]
      )
      |> Keyword.put(:api_key, api_key)
-     |> Keyword.put(:tools, tools)
+     |> Keyword.put(:tool_blocks, tool_blocks)
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
   end
@@ -202,6 +199,13 @@ defmodule Buildel.Blocks.Chat do
       state = cleanup_messages(state)
       pid = self()
 
+      tools =
+        state[:tool_blocks]
+        |> Enum.map(fn block ->
+          pid = block_context().block_pid(state[:context_id], block["name"])
+          Buildel.Blocks.Block.function(pid)
+        end)
+
       Task.start(fn ->
         chat_gpt().stream_chat(
           context: %{messages: messages},
@@ -225,7 +229,7 @@ defmodule Buildel.Blocks.Chat do
           api_key: state[:api_key],
           model: state[:opts].model,
           temperature: state[:opts].temperature,
-          tools: state[:tools]
+          tools: tools
         )
       end)
 

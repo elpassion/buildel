@@ -165,8 +165,4 @@ defmodule Buildel.Blocks.DocumentSearch do
 
     {:noreply, state}
   end
-
-  defp block_context() do
-    Application.fetch_env!(:buildel, :block_context_resolver)
-  end
 end

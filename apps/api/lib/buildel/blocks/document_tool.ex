@@ -44,28 +44,6 @@ defmodule Buildel.Blocks.DocumentTool do
     }
   end
 
-  def function(context_id, block_name) do
-    Function.new!(%{
-      name: "documents",
-      description: "Retrieve full document by id.",
-      parameters_schema: %{
-        type: "object",
-        properties: %{
-          document_id: %{
-            type: "number",
-            description: "Document id"
-          }
-        },
-        required: ["document_id"]
-      },
-      function: fn %{"document_id" => document_id} = _args, _context ->
-        pid = block_context().block_pid(context_id, block_name)
-
-        query_sync(pid, {:text, document_id})
-      end
-    })
-  end
-
   # Client
 
   def query(pid, {:text, _text} = text) do
@@ -125,12 +103,34 @@ defmodule Buildel.Blocks.DocumentTool do
   end
 
   @impl true
+  def handle_call(:function, _from, state) do
+    pid = self()
+
+    function =
+      Function.new!(%{
+        name: "documents",
+        description: "Retrieve full document by id.",
+        parameters_schema: %{
+          type: "object",
+          properties: %{
+            document_id: %{
+              type: "number",
+              description: "Document id"
+            }
+          },
+          required: ["document_id"]
+        },
+        function: fn %{"document_id" => document_id} = _args, _context ->
+          query_sync(pid, {:text, document_id})
+        end
+      })
+
+    {:reply, function, state}
+  end
+
+  @impl true
   def handle_info({_name, :text, text}, state) do
     cast(self(), {:text, text})
     {:noreply, state}
-  end
-
-  defp block_context() do
-    Application.fetch_env!(:buildel, :block_context_resolver)
   end
 end

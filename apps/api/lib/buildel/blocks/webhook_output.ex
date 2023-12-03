@@ -99,8 +99,4 @@ defmodule Buildel.Blocks.WebhookOutput do
   defp webhook() do
     Application.fetch_env!(:buildel, :webhook)
   end
-
-  defp block_context() do
-    Application.fetch_env!(:buildel, :block_context_resolver)
-  end
 end

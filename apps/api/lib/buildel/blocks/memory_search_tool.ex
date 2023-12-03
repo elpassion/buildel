@@ -49,29 +49,6 @@ defmodule Buildel.Blocks.MemorySearchTool do
     }
   end
 
-  def function(context_id, block_name) do
-    Function.new!(%{
-      name: "query",
-      description:
-        "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.",
-      parameters_schema: %{
-        type: "object",
-        properties: %{
-          query: %{
-            type: "string",
-            description: "The query to search for."
-          }
-        },
-        required: ["query"]
-      },
-      function: fn %{"query" => query} = _args, _context ->
-        pid = block_context().block_pid(context_id, block_name)
-
-        query_sync(pid, {:text, query})
-      end
-    })
-  end
-
   # Client
 
   def query(pid, {:text, _text} = text) do
@@ -159,12 +136,35 @@ defmodule Buildel.Blocks.MemorySearchTool do
   end
 
   @impl true
+  def handle_call(:function, _from, state) do
+    pid = self()
+
+    function =
+      Function.new!(%{
+        name: "query",
+        description:
+          "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.",
+        parameters_schema: %{
+          type: "object",
+          properties: %{
+            query: %{
+              type: "string",
+              description: "The query to search for."
+            }
+          },
+          required: ["query"]
+        },
+        function: fn %{"query" => query} = _args, _context ->
+          query_sync(pid, {:text, query})
+        end
+      })
+
+    {:reply, function, state}
+  end
+
+  @impl true
   def handle_info({_name, :text, text}, state) do
     cast(self(), {:text, text})
     {:noreply, state}
-  end
-
-  defp block_context() do
-    Application.fetch_env!(:buildel, :block_context_resolver)
   end
 end

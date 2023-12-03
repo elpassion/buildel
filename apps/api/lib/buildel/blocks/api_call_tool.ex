@@ -29,7 +29,7 @@ defmodule Buildel.Blocks.ApiCallTool do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["method", "url"],
+            "required" => ["method", "url", "name", "description", "parameters"],
             "properties" =>
               Jason.OrderedObject.new(
                 method: %{
@@ -44,37 +44,28 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "type" => "string",
                   "title" => "URL",
                   "description" => "The URL to send the request to."
+                },
+                name: %{
+                  "type" => "string",
+                  "title" => "Name",
+                  "description" => "The name of the API call."
+                },
+                description: %{
+                  "type" => "string",
+                  "title" => "Description",
+                  "description" => "The description of the API call."
+                },
+                parameters: %{
+                  "type" => "string",
+                  "title" => "Parameters",
+                  "description" =>
+                    "Valid JSONSchema definition of the parameters passed to api call.",
+                  "presentAs" => "editor"
                 }
               )
           })
       }
     }
-  end
-
-  def function(context_id, block_name) do
-    Function.new!(%{
-      name: "addition",
-      description: "Adds two numbers",
-      parameters_schema: %{
-        type: "object",
-        properties: %{
-          left: %{
-            type: "number",
-            description: "Left number"
-          },
-          right: %{
-            type: "number",
-            description: "Right number"
-          }
-        },
-        required: ["left", "right"]
-      },
-      function: fn args, _context ->
-        pid = block_context().block_pid(context_id, block_name)
-
-        call_api_sync(pid, args)
-      end
-    })
   end
 
   # Client
@@ -103,6 +94,7 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     {:ok,
      state
+     |> Keyword.put(:parameters, Jason.decode!(opts[:parameters]))
      |> assign_stream_state(opts)}
   end
 
@@ -129,12 +121,25 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   @impl true
+  def handle_call(:function, _from, state) do
+    pid = self()
+
+    function =
+      Function.new!(%{
+        name: state[:opts].name,
+        description: state[:opts].description,
+        parameters_schema: state[:parameters],
+        function: fn args, _context ->
+          call_api_sync(pid, args)
+        end
+      })
+
+    {:reply, function, state}
+  end
+
+  @impl true
   def handle_info({_name, :text, text}, state) do
     cast(self(), {:text, text})
     {:noreply, state}
-  end
-
-  defp block_context() do
-    Application.fetch_env!(:buildel, :block_context_resolver)
   end
 end

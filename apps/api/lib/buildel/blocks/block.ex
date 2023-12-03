@@ -39,6 +39,10 @@ defmodule Buildel.Blocks.Block do
     GenServer.call(pid, :type)
   end
 
+  def function(pid) do
+    GenServer.call(pid, :function)
+  end
+
   defmacro __using__(_opts) do
     quote do
       use GenServer
@@ -263,6 +267,10 @@ defmodule Buildel.Blocks.Block do
 
       defp block_secrets_resolver() do
         Application.fetch_env!(:buildel, :block_secrets_resolver)
+      end
+
+      defp block_context() do
+        Application.fetch_env!(:buildel, :block_context_resolver)
       end
     end
   end
