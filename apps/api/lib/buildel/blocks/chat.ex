@@ -60,7 +60,6 @@ defmodule Buildel.Blocks.Chat do
                   "maximum" => 1.0,
                   "step" => 0.1
                 },
-                knowledge: memory_schema(%{"default" => ""}),
                 system_message: %{
                   "type" => "string",
                   "title" => "System message",
@@ -138,15 +137,17 @@ defmodule Buildel.Blocks.Chat do
 
     Logger.debug("Chat block subscribed to input")
 
-    tools = Map.get(opts, :tools, [])
+    api_key =
+      block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
 
-    %{global: global} =
-      block_context().context_from_context_id(context_id)
-
-    knowledge_source =
-      if opts.knowledge != nil && opts.knowledge != "",
-        do: "#{global}_#{opts.knowledge}",
-        else: nil
+    tools =
+      opts.inputs_blocks
+      |> Enum.filter(fn block ->
+        block["block_type"]["ios"] |> Enum.any?(fn io -> io["type"] == "worker" end)
+      end)
+      |> Enum.map(fn block ->
+        Buildel.Blocks.type(block["type"]).function(context_id, block["name"])
+      end)
 
     {:ok,
      state
@@ -158,12 +159,8 @@ defmodule Buildel.Blocks.Chat do
        :messages,
        [%{role: "system", content: opts[:system_message]}] ++ opts[:messages]
      )
-     |> Keyword.put(
-       :api_key,
-       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
-     )
+     |> Keyword.put(:api_key, api_key)
      |> Keyword.put(:tools, tools)
-     |> Keyword.put(:knowledge, knowledge_source)
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
   end
@@ -171,6 +168,13 @@ defmodule Buildel.Blocks.Chat do
   @impl true
   def handle_cast({:send_message, {:text, text}}, state) do
     state = send_stream_start(state)
+
+    Buildel.BlockPubSub.broadcast_to_io(
+      state[:context_id],
+      state[:block_name],
+      "message_output",
+      {:text, text}
+    )
 
     messages =
       if List.last(state[:messages])[:role] in ["assistant", "system"] do
@@ -180,13 +184,6 @@ defmodule Buildel.Blocks.Chat do
       end
 
     state = put_in(state[:messages], messages)
-
-    Buildel.BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "message_output",
-      {:text, text}
-    )
 
     messages =
       state[:messages]
@@ -205,11 +202,9 @@ defmodule Buildel.Blocks.Chat do
       state = cleanup_messages(state)
       pid = self()
 
-      tools = if state[:knowledge], do: [:knowledge, :documents], else: []
-
       Task.start(fn ->
         chat_gpt().stream_chat(
-          context: %{messages: messages, knowledge: state[:knowledge]},
+          context: %{messages: messages},
           on_content: fn text_chunk ->
             Buildel.BlockPubSub.broadcast_to_io(
               state[:context_id],
@@ -230,7 +225,7 @@ defmodule Buildel.Blocks.Chat do
           api_key: state[:api_key],
           model: state[:opts].model,
           temperature: state[:opts].temperature,
-          tools: tools
+          tools: state[:tools]
         )
       end)
 
@@ -322,9 +317,5 @@ defmodule Buildel.Blocks.Chat do
 
   defp chat_gpt() do
     Application.fetch_env!(:buildel, :chat_gpt)
-  end
-
-  defp block_context() do
-    Application.fetch_env!(:buildel, :block_context_resolver)
   end
 end

@@ -65,17 +65,11 @@ defmodule Buildel.Pipelines.Runner do
     {:ok, run}
   end
 
-  def call_run(%Run{} = run, block_name, data) do
-    with _run_pid <-
-           Process.whereis(Buildel.Pipelines.Worker.context_id(run) |> String.to_atom()),
-         block_pid <-
-           Process.whereis(
-             Buildel.Pipelines.Worker.block_id(run, %Buildel.Blocks.Block{name: block_name})
-             |> String.to_atom()
-           ),
-         type <- Buildel.Blocks.Block.type(block_pid) do
-      type.cast(block_pid, data)
-    end
+  def block_pid(%Run{} = run, block_name) do
+    Process.whereis(
+      Buildel.Pipelines.Worker.block_id(run, %Buildel.Blocks.Block{name: block_name})
+      |> String.to_atom()
+    )
   end
 
   @impl true

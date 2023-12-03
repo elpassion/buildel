@@ -27,13 +27,11 @@ defmodule Buildel.Clients.ChatGPT do
         %{role: "user"} = message -> Message.new_user!(message.content)
       end)
 
-    functions = functions_from_tools(tools)
-
     LLMChain.new!(%{
       llm: ChatOpenAI.new!(%{model: model, temperature: temperature, stream: true}),
       custom_context: context
     })
-    |> LLMChain.add_functions(functions)
+    |> LLMChain.add_functions(tools)
     |> LLMChain.add_messages(messages)
     |> LLMChain.run(
       while_needs_response: true,
@@ -64,21 +62,5 @@ defmodule Buildel.Clients.ChatGPT do
       http_options: http_options,
       api_url: "http://localhost/"
     }
-  end
-
-  defp functions_from_tools(tools) do
-    tools_to_functions = %{
-      knowledge: fn -> Buildel.Clients.Functions.HybridDB.new!() end,
-      documents: fn -> Buildel.Clients.Functions.MemoriesDB.new!() end,
-      calculator: fn -> LangChain.Tools.Calculator.new!() end
-    }
-
-    tools
-    |> Enum.reduce([], fn tool, functions ->
-      case Map.get(tools_to_functions, tool) do
-        nil -> functions
-        function -> [function.() | functions]
-      end
-    end)
   end
 end

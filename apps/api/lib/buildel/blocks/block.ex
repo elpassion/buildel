@@ -220,14 +220,18 @@ defmodule Buildel.Blocks.Block do
       end
 
       def memory_schema(
-            %{"default" => default} \\ %{"default" => "{{pipeline_id}}_{{block_name}}"}
+            %{"default" => default, "title" => title, "description" => description} \\ %{
+              "default" => "{{pipeline_id}}_{{block_name}}",
+              "title" => "Persist in",
+              "description" => "Where to hold data from inputs."
+            }
           ) do
         %{
           "type" => "string",
-          "title" => "Persist in",
+          "title" => title,
           "url" => "/api/organizations/{{organization_id}}/memory_collections",
           "presentAs" => "async-select",
-          "description" => "Where to hold data from inputs.",
+          "description" => description,
           "default" => default
         }
       end
