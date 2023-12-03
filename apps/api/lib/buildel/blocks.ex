@@ -22,7 +22,8 @@ defmodule Buildel.Blocks do
     WebhookOutput,
     IF,
     MemorySearchTool,
-    DocumentTool
+    DocumentTool,
+    ApiCallTool
   }
 
   @names_to_blocks_map %{
@@ -44,8 +45,9 @@ defmodule Buildel.Blocks do
     "webhook_output" => WebhookOutput,
     "document_search" => DocumentSearch,
     "if" => IF,
-    "memory_search_tool" => Buildel.Blocks.MemorySearchTool,
-    "document_tool" => Buildel.Blocks.DocumentTool
+    "memory_search_tool" => MemorySearchTool,
+    "document_tool" => DocumentTool,
+    "api_call_tool" => ApiCallTool
   }
 
   @blocks_to_names_map %{
@@ -68,7 +70,8 @@ defmodule Buildel.Blocks do
     WebhookOutput => "webhook_output",
     IF => "if",
     MemorySearchTool => "memory_search_tool",
-    DocumentTool => "document_tool"
+    DocumentTool => "document_tool",
+    ApiCallTool => "api_call_tool"
   }
 
   def list_types() do

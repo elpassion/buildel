@@ -83,7 +83,7 @@ defmodule Buildel.Blocks.WebhookOutput do
 
     payload = %{"content" => content, "topic" => topic, "context" => context}
 
-    webhook().send_content(state[:pid], url, payload)
+    webhook().send_content(url, payload)
 
     state = state |> schedule_stream_stop()
 

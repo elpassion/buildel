@@ -43,6 +43,8 @@ defmodule BuildelWeb.Router do
   scope "/api", BuildelWeb do
     pipe_through(:api)
 
+    post("/add", CalculatorController, :add)
+
     resources("/block_types", BlockTypesController, only: [:index])
 
     resources("/organizations/:organization_id/pipelines", OrganizationPipelineController,
