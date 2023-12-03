@@ -59,10 +59,23 @@ defmodule Buildel.Pipelines.Runner do
     end
   end
 
-  def input_run(%Run{} = run, block_name, input_name, data) do
+  def cast_run(%Run{} = run, block_name, input_name, data) do
     context_id = Buildel.Pipelines.Worker.context_id(run)
     Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
     {:ok, run}
+  end
+
+  def call_run(%Run{} = run, block_name, data) do
+    with _run_pid <-
+           Process.whereis(Buildel.Pipelines.Worker.context_id(run) |> String.to_atom()),
+         block_pid <-
+           Process.whereis(
+             Buildel.Pipelines.Worker.block_id(run, %Buildel.Blocks.Block{name: block_name})
+             |> String.to_atom()
+           ),
+         type <- Buildel.Blocks.Block.type(block_pid) do
+      type.cast(block_pid, data)
+    end
   end
 
   @impl true

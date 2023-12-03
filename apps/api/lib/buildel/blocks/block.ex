@@ -35,6 +35,10 @@ defmodule Buildel.Blocks.Block do
     GenServer.call(pid, :context_id)
   end
 
+  def type(pid) do
+    GenServer.call(pid, :type)
+  end
+
   defmacro __using__(_opts) do
     quote do
       use GenServer
@@ -46,12 +50,16 @@ defmodule Buildel.Blocks.Block do
       @behaviour Buildel.Blocks.BlockBehaviour
 
       def start_link(name: name, block_name: block_name, context_id: context_id, opts: opts) do
-        GenServer.start_link(__MODULE__,
-          name: name,
-          block_name: block_name,
-          context_id: context_id,
-          type: __MODULE__,
-          opts: opts
+        GenServer.start_link(
+          __MODULE__,
+          [
+            name: name,
+            block_name: block_name,
+            context_id: context_id,
+            type: __MODULE__,
+            opts: opts
+          ],
+          name: name |> String.to_atom()
         )
       end
 
@@ -74,6 +82,10 @@ defmodule Buildel.Blocks.Block do
 
       def handle_call(:context_id, _from, state) do
         {:reply, state[:context_id], state}
+      end
+
+      def handle_call(:type, _from, state) do
+        {:reply, state[:type], state}
       end
 
       def handle_info({_topic, :start_stream, _} = message, state) do

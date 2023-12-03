@@ -100,7 +100,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_pipeline_run(pipeline, id),
-         {:ok, run} <- Pipelines.Runner.input_run(run, block_name, input_name, {:text, data}) do
+         {:ok, run} <- Pipelines.Runner.cast_run(run, block_name, input_name, {:text, data}) do
       render(conn, :show, run: run)
     end
   end
