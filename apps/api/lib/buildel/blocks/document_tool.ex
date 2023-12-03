@@ -90,9 +90,6 @@ defmodule Buildel.Blocks.DocumentTool do
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
-    %{global: global} =
-      block_context().context_from_context_id(context_id)
-
     {:ok,
      state
      |> Keyword.put(:collection, opts[:knowledge])
@@ -100,7 +97,7 @@ defmodule Buildel.Blocks.DocumentTool do
   end
 
   @impl true
-  def handle_cast({:query, {:text, query}}, state) do
+  def handle_cast({:query, {:text, _query}}, state) do
     state = state |> send_stream_start()
 
     # TODO: Add support for async calling
