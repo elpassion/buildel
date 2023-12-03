@@ -258,6 +258,7 @@ defmodule Buildel.Blocks.BlockBehaviour do
               groups: list(String.t()),
               inputs: [%{name: String.t(), type: String.t(), public: boolean()}],
               outputs: [%{name: String.t(), type: String.t(), public: boolean()}],
+              ios: [%{name: String.t(), type: String.t(), public: boolean()}],
               schema: map()
             }
   @callback schema() :: map()
