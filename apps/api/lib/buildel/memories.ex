@@ -174,6 +174,20 @@ defmodule Buildel.Memories do
     |> Buildel.Repo.one!()
   end
 
+  def get_collection_memory!(
+        %Buildel.Organizations.Organization{} = organization,
+        collection_name,
+        id
+      ) do
+    Buildel.Memories.Memory
+    |> where(
+      [m],
+      m.id == ^id and m.collection_name == ^collection_name and
+        m.organization_id == ^organization.id
+    )
+    |> Buildel.Repo.one!()
+  end
+
   defp organization_collection_name(
          %Buildel.Organizations.Organization{} = organization,
          collection_name
