@@ -104,9 +104,15 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     headers = [{"Accept", "application/json"}, {"Content-Type", "application/json"}]
 
+    url =
+      args
+      |> Enum.reduce(state[:opts][:url], fn {key, value}, acc ->
+        String.replace(acc, "{{#{key}}}", value)
+      end)
+
     case HTTPoison.request(
            state[:opts][:method],
-           state[:opts][:url],
+           url,
            args |> Jason.encode!(),
            headers
          ) do
