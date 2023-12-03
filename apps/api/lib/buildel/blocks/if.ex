@@ -4,17 +4,15 @@ defmodule Buildel.Blocks.IF do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :compare
-  defdelegate text_input(), to: Buildel.Blocks.Block
-  defdelegate text_output(name), to: Buildel.Blocks.Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :compare
 
   @impl true
   def options() do
     %{
       type: "if",
       groups: ["utils"],
-      inputs: [text_input()],
-      outputs: [text_output("true"), text_output("false")],
+      inputs: [Block.text_input()],
+      outputs: [Block.text_output("true"), Block.text_output("false")],
       ios: [],
       schema: schema()
     }
@@ -92,7 +90,7 @@ defmodule Buildel.Blocks.IF do
 
   @impl true
   def handle_info({_name, :text, text}, state) do
-    input(self(), {:text, text})
+    cast(self(), {:text, text})
     {:noreply, state}
   end
 end

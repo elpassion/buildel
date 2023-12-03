@@ -5,17 +5,15 @@ defmodule Buildel.Blocks.CollectSentences do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :save_text_chunk
-  defdelegate text_output(name), to: Block
-  defdelegate text_input(), to: Block
-  def sentences_output(), do: text_output("sentences_output")
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :save_text_chunk
+  def sentences_output(), do: Block.text_output("sentences_output")
 
   @impl true
   def options() do
     %{
       type: "collect_sentences",
       groups: ["text", "utils"],
-      inputs: [text_input()],
+      inputs: [Block.text_input()],
       outputs: [sentences_output()],
       ios: [],
       schema: schema()
@@ -90,7 +88,7 @@ defmodule Buildel.Blocks.CollectSentences do
 
   @impl true
   def handle_info({_name, :text, message}, state) do
-    input(self(), {:text, message})
+    cast(self(), {:text, message})
     {:noreply, state}
   end
 

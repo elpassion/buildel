@@ -50,7 +50,7 @@ defmodule Buildel.BlocksTest do
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
       text = "text"
-      pid |> TextInput.input({:text, text})
+      pid |> TextInput.cast({:text, text})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :text, ^text}
@@ -82,7 +82,7 @@ defmodule Buildel.BlocksTest do
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
       file = File.read!("test/support/fixtures/real.mp3")
-      pid |> AudioInput.input({:binary, file})
+      pid |> AudioInput.cast({:binary, file})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :binary, ^file}
@@ -127,7 +127,7 @@ defmodule Buildel.BlocksTest do
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
       text = "text"
-      pid |> TextOutput.input({:text, text})
+      pid |> TextOutput.cast({:text, text})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :text, ^text}
@@ -175,7 +175,7 @@ defmodule Buildel.BlocksTest do
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
       text = "HAHAAH"
-      WebhookOutput.input(webhook_pid, {:text, text})
+      WebhookOutput.cast(webhook_pid, {:text, text})
 
       assert_receive {^topic, :start_stream, nil}
 
@@ -221,7 +221,7 @@ defmodule Buildel.BlocksTest do
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
       file = File.read!("test/support/fixtures/real.mp3")
-      pid |> AudioOutput.input({:binary, file})
+      pid |> AudioOutput.cast({:binary, file})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :binary, ^file}
@@ -278,7 +278,7 @@ defmodule Buildel.BlocksTest do
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
       file = File.read!("test/support/fixtures/real.mp3")
-      pid |> SpeechToText.input({:binary, file})
+      pid |> SpeechToText.cast({:binary, file})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :text, "Hello"}
@@ -367,7 +367,7 @@ defmodule Buildel.BlocksTest do
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
       file = File.read!("test/support/fixtures/real.mp3")
-      pid |> FileSpeechToText.input({:binary, file})
+      pid |> FileSpeechToText.cast({:binary, file})
 
       assert_receive {^topic, :text, "Hello"}
     end
@@ -445,7 +445,7 @@ defmodule Buildel.BlocksTest do
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
-      pid |> TextToSpeech.input({:text, "Hello darkness my old friend."})
+      pid |> TextToSpeech.cast({:text, "Hello darkness my old friend."})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :binary, _}
@@ -471,7 +471,7 @@ defmodule Buildel.BlocksTest do
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
-      input_pid |> TextInput.input({:text, "Hello darkness my old friend."})
+      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
 
       assert_receive({^topic, :binary, _})
     end
@@ -541,7 +541,7 @@ defmodule Buildel.BlocksTest do
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
       {:ok, messages_topic} = BlockPubSub.subscribe_to_io("run1", "test", "message_output")
 
-      input_pid |> TextInput.input({:text, "Hello darkness my old friend."})
+      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
 
       assert_receive({^messages_topic, :text, "Hello darkness my old friend."})
       assert_receive({^sentences_topic, :text, "Hello!"})
@@ -578,7 +578,7 @@ defmodule Buildel.BlocksTest do
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
-      input_pid |> TextInput.input({:text, "Hello darkness my old friend."})
+      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
 
       assert_receive({^topic, :text, " How are you?"})
     end
@@ -633,7 +633,7 @@ defmodule Buildel.BlocksTest do
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
-      input_pid |> TextInput.input({:text, "Hello darkness my old friend."})
+      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
 
       assert_receive({^topic, :start_stream, nil})
       assert_receive({^topic, :text, "dupa"})
@@ -663,7 +663,7 @@ defmodule Buildel.BlocksTest do
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
-      input_pid |> TextInput.input({:text, "Hello darkness my old friend."})
+      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
 
       assert_receive({^topic, :start_stream, nil})
       assert_receive({^topic, :text, "dupa Hello darkness my old friend."})
@@ -701,14 +701,14 @@ defmodule Buildel.BlocksTest do
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
-      input_pid |> TextInput.input({:text, "Hello"})
+      input_pid |> TextInput.cast({:text, "Hello"})
       assert_receive({^topic, :start_stream, nil})
       refute_received({^topic, :text, _message})
       refute_received({^topic, :stop_stream, nil})
-      input_2_pid |> TextInput.input({:text, "World"})
+      input_2_pid |> TextInput.cast({:text, "World"})
       assert_receive({^topic, :text, "dupa Hello World"})
       assert_receive({^topic, :stop_stream, nil})
-      input_2_pid |> TextInput.input({:text, "World 2"})
+      input_2_pid |> TextInput.cast({:text, "World 2"})
       assert_receive({^topic, :text, "dupa Hello World 2"})
       assert_receive({^topic, :stop_stream, nil})
     end
@@ -744,13 +744,13 @@ defmodule Buildel.BlocksTest do
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
-      input_pid |> TextInput.input({:text, "Hello"})
-      input_2_pid |> TextInput.input({:text, "World"})
+      input_pid |> TextInput.cast({:text, "Hello"})
+      input_2_pid |> TextInput.cast({:text, "World"})
       assert_receive({^topic, :text, "dupa Hello World"})
       assert_receive({^topic, :stop_stream, nil})
-      input_2_pid |> TextInput.input({:text, "World 2"})
+      input_2_pid |> TextInput.cast({:text, "World 2"})
       refute_receive({^topic, :text, "dupa Hello World 2"})
-      input_pid |> TextInput.input({:text, "Hello 2"})
+      input_pid |> TextInput.cast({:text, "Hello 2"})
       assert_receive({^topic, :text, "dupa Hello 2 World 2"})
     end
   end
@@ -799,7 +799,7 @@ defmodule Buildel.BlocksTest do
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
-      input_pid |> TextInput.input({:text, "Hello darkness my old friend."})
+      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
 
       assert_receive({^sentences_topic, :start_stream, nil})
       assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
@@ -819,8 +819,8 @@ defmodule Buildel.BlocksTest do
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
-      pid |> CollectSentences.input({:text, "Hello darkness my"})
-      pid |> CollectSentences.input({:text, " old friend."})
+      pid |> CollectSentences.cast({:text, "Hello darkness my"})
+      pid |> CollectSentences.cast({:text, " old friend."})
       send(pid, {"", :stop_stream, "sentences_output"})
 
       assert_receive({^sentences_topic, :start_stream, nil})
@@ -843,11 +843,11 @@ defmodule Buildel.BlocksTest do
 
     {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
-    pid |> CollectSentences.input({:text, "Hello darkness my"})
-    pid |> CollectSentences.input({:text, " old friend."})
+    pid |> CollectSentences.cast({:text, "Hello darkness my"})
+    pid |> CollectSentences.cast({:text, " old friend."})
     BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
-    pid |> CollectSentences.input({:text, "I've come to talk"})
-    pid |> CollectSentences.input({:text, " with you again."})
+    pid |> CollectSentences.cast({:text, "I've come to talk"})
+    pid |> CollectSentences.cast({:text, " with you again."})
     BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
 
     assert_receive({^sentences_topic, :start_stream, nil})
@@ -875,7 +875,7 @@ defmodule Buildel.BlocksTest do
     {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
     pid
-    |> CollectSentences.input(
+    |> CollectSentences.cast(
       {:text, "Hello darkness my old friend. I've come to talk with you again."}
     )
 
@@ -923,14 +923,14 @@ defmodule Buildel.BlocksTest do
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
-      pid |> CollectSentences.input({:text, "Hello darkness my"})
-      pid |> CollectSentences.input({:text, " old friend."})
-      pid |> CollectSentences.input({:text, "Another sentence."})
-      pid |> CollectSentences.input({:text, "And another!"})
+      pid |> CollectSentences.cast({:text, "Hello darkness my"})
+      pid |> CollectSentences.cast({:text, " old friend."})
+      pid |> CollectSentences.cast({:text, "Another sentence."})
+      pid |> CollectSentences.cast({:text, "And another!"})
       BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
 
-      pid |> CollectSentences.input({:text, "I've come to talk"})
-      pid |> CollectSentences.input({:text, " with you again."})
+      pid |> CollectSentences.cast({:text, "I've come to talk"})
+      pid |> CollectSentences.cast({:text, " with you again."})
       BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
 
       assert_receive({^sentences_topic, :start_stream, nil})

@@ -4,17 +4,15 @@ defmodule Buildel.Blocks.TextInput do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :send_text
-  defdelegate text_output(), to: Buildel.Blocks.Block
-  defdelegate text_input(name, public), to: Buildel.Blocks.Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :send_text
 
   @impl true
   def options() do
     %{
       type: "text_input",
       groups: ["text", "inputs / outputs"],
-      inputs: [text_input("input", true)],
-      outputs: [text_output()],
+      inputs: [Block.text_input("input", true)],
+      outputs: [Block.text_output()],
       ios: [],
       schema: schema()
     }
@@ -73,7 +71,7 @@ defmodule Buildel.Blocks.TextInput do
 
   @impl true
   def handle_info({_name, :text, text}, state) do
-    input(self(), {:text, text})
+    cast(self(), {:text, text})
     {:noreply, state}
   end
 end

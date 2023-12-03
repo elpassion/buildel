@@ -4,8 +4,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :query
-  defdelegate io(name, role), to: Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :query
 
   @impl true
   def options() do
@@ -14,7 +13,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
       groups: ["text", "tools"],
       inputs: [],
       outputs: [],
-      ios: [io("tool", "worker")],
+      ios: [Block.io("tool", "worker")],
       schema: schema()
     }
   end
@@ -84,7 +83,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
 
   @impl true
   def handle_info({_name, :text, text}, state) do
-    input(self(), {:text, text})
+    cast(self(), {:text, text})
     {:noreply, state}
   end
 end

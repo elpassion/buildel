@@ -4,17 +4,15 @@ defmodule Buildel.Blocks.AudioOutput do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :send_audio
-  defdelegate audio_output(name, public), to: Buildel.Blocks.Block
-  defdelegate audio_input(), to: Buildel.Blocks.Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :send_audio
 
   @impl true
   def options() do
     %{
       type: "audio_output",
       groups: ["audio", "inputs / outputs"],
-      inputs: [audio_input()],
-      outputs: [audio_output("output", true)],
+      inputs: [Block.audio_input()],
+      outputs: [Block.audio_output("output", true)],
       ios: [],
       schema: schema()
     }
@@ -74,7 +72,7 @@ defmodule Buildel.Blocks.AudioOutput do
 
   @impl true
   def handle_info({_name, :binary, chunk}, state) do
-    input(self(), {:binary, chunk})
+    cast(self(), {:binary, chunk})
     {:noreply, state}
   end
 end

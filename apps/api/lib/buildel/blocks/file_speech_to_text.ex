@@ -2,17 +2,19 @@ defmodule Buildel.Blocks.FileSpeechToText do
   use Buildel.Blocks.Block
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :transcript
-  defdelegate text_output(name \\ "output"), to: Buildel.Blocks.Block
-  defdelegate audio_input(), to: Buildel.Blocks.Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :transcript
 
   @impl true
   def options() do
     %{
       type: "file_speech_to_text",
       groups: ["audio", "text"],
-      inputs: [audio_input()],
-      outputs: [text_output(), text_output("json_output"), text_output("srt_output")],
+      inputs: [Block.audio_input()],
+      outputs: [
+        Block.text_output(),
+        Block.text_output("json_output"),
+        Block.text_output("srt_output")
+      ],
       ios: [],
       schema: schema()
     }

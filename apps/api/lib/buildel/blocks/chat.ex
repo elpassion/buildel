@@ -6,20 +6,21 @@ defmodule Buildel.Blocks.Chat do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :send_message
-  defdelegate text_output(name), to: Block
-  defdelegate text_input(), to: Block
-  defdelegate io(name, role), to: Block
-  def sentences_output(), do: text_output("sentences_output")
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :send_message
+  def sentences_output(), do: Block.text_output("sentences_output")
 
   @impl true
   def options() do
     %{
       type: "chat",
       groups: ["text", "llms"],
-      inputs: [text_input()],
-      outputs: [text_output("output"), sentences_output(), text_output("message_output")],
-      ios: [io("tool", "controller")],
+      inputs: [Block.text_input()],
+      outputs: [
+        Block.text_output("output"),
+        sentences_output(),
+        Block.text_output("message_output")
+      ],
+      ios: [Block.io("tool", "controller")],
       schema: schema()
     }
   end

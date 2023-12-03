@@ -4,18 +4,15 @@ defmodule Buildel.Blocks.DocumentSearch do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :query
-  defdelegate text_output(), to: Buildel.Blocks.Block
-  defdelegate text_input(name), to: Buildel.Blocks.Block
-  defdelegate file_input(name, public), to: Buildel.Blocks.Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :query
 
   @impl true
   def options() do
     %{
       type: "document_search",
       groups: ["file", "memory"],
-      inputs: [file_input("files", true), text_input("query")],
-      outputs: [text_output()],
+      inputs: [Block.file_input("files", true), Block.text_input("query")],
+      outputs: [Block.text_output()],
       ios: [],
       schema: schema()
     }
@@ -164,7 +161,7 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   @impl true
   def handle_info({_name, :text, text}, state) do
-    input(self(), {:text, text})
+    cast(self(), {:text, text})
 
     {:noreply, state}
   end

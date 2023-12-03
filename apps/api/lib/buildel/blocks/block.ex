@@ -261,5 +261,5 @@ defmodule Buildel.Blocks.BlockBehaviour do
               schema: map()
             }
   @callback schema() :: map()
-  @callback input(pid, any()) :: :ok
+  @callback cast(pid, any()) :: :ok
 end

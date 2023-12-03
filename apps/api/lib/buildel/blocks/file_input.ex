@@ -4,17 +4,15 @@ defmodule Buildel.Blocks.FileInput do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :send_file
-  defdelegate file_output(), to: Buildel.Blocks.Block
-  defdelegate file_input(name, public), to: Buildel.Blocks.Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :send_file
 
   @impl true
   def options() do
     %{
       type: "file_input",
       groups: ["file", "inputs / outputs"],
-      inputs: [file_input("input", true)],
-      outputs: [file_output()],
+      inputs: [Block.file_input("input", true)],
+      outputs: [Block.file_output()],
       ios: [],
       schema: schema()
     }
@@ -73,7 +71,7 @@ defmodule Buildel.Blocks.FileInput do
 
   @impl true
   def handle_info({_name, :binary, chunk}, state) do
-    input(self(), {:binary, chunk})
+    cast(self(), {:binary, chunk})
     {:noreply, state}
   end
 end

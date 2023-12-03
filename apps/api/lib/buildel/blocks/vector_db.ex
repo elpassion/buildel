@@ -4,18 +4,15 @@ defmodule Buildel.Blocks.VectorDB do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :query
-  defdelegate text_output(), to: Buildel.Blocks.Block
-  defdelegate text_input(name), to: Buildel.Blocks.Block
-  defdelegate file_input(name), to: Buildel.Blocks.Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :query
 
   @impl true
   def options() do
     %{
       type: "vector_db",
       groups: ["file", "memory"],
-      inputs: [file_input("files"), text_input("query")],
-      outputs: [text_output()],
+      inputs: [Block.file_input("files"), Block.text_input("query")],
+      outputs: [Block.text_output()],
       ios: [],
       schema: schema()
     }
@@ -140,7 +137,7 @@ defmodule Buildel.Blocks.VectorDB do
   @impl true
   def handle_info({name, :text, text}, state) do
     case get_input(state[:opts].inputs, name) do
-      "query" -> input(self(), {:text, text})
+      "query" -> cast(self(), {:text, text})
       _ -> {:noreply, state}
     end
 

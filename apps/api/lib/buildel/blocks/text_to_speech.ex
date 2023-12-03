@@ -2,9 +2,7 @@ defmodule Buildel.Blocks.TextToSpeech do
   use Buildel.Blocks.Block
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :synthesize
-  defdelegate audio_output(), to: Buildel.Blocks.Block
-  defdelegate text_input(), to: Buildel.Blocks.Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :synthesize
 
   # Config
   @impl true
@@ -12,8 +10,8 @@ defmodule Buildel.Blocks.TextToSpeech do
     %{
       type: "text_to_speech",
       groups: ["text", "audio"],
-      inputs: [text_input()],
-      outputs: [audio_output()],
+      inputs: [Block.text_input()],
+      outputs: [Block.audio_output()],
       ios: [],
       schema: schema()
     }

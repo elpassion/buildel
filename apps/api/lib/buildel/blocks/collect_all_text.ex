@@ -5,17 +5,15 @@ defmodule Buildel.Blocks.CollectAllText do
   # Config
 
   @impl true
-  defdelegate input(pid, chunk), to: __MODULE__, as: :save_text_chunk
-  defdelegate text_output(), to: Block
-  defdelegate text_input(), to: Block
+  defdelegate cast(pid, chunk), to: __MODULE__, as: :save_text_chunk
 
   @impl true
   def options() do
     %{
       type: "collect_all_text",
       groups: ["text", "utils"],
-      inputs: [text_input()],
-      outputs: [text_output()],
+      inputs: [Block.text_input()],
+      outputs: [Block.text_output()],
       ios: [],
       schema: schema()
     }
@@ -68,7 +66,7 @@ defmodule Buildel.Blocks.CollectAllText do
 
   @impl true
   def handle_info({_name, :text, message}, state) do
-    input(self(), {:text, message})
+    cast(self(), {:text, message})
     {:noreply, state}
   end
 

@@ -6,17 +6,15 @@ defmodule Buildel.Blocks.TakeLatest do
   # Config
 
   @impl true
-  defdelegate input(pid, input_data), to: __MODULE__, as: :combine
-  defdelegate text_output(), to: Block
-  defdelegate text_input(), to: Block
+  defdelegate cast(pid, input_data), to: __MODULE__, as: :combine
 
   @impl true
   def options() do
     %{
       type: "take_latest",
       groups: ["text", "utils"],
-      inputs: [text_input()],
-      outputs: [text_output()],
+      inputs: [Block.text_input()],
+      outputs: [Block.text_output()],
       ios: [],
       schema: schema()
     }
@@ -94,7 +92,7 @@ defmodule Buildel.Blocks.TakeLatest do
 
   @impl true
   def handle_info({topic, :text, message}, state) do
-    input(self(), {:text, message})
+    cast(self(), {:text, message})
     state = state |> save_take_latest_message(topic, message)
     {:noreply, state}
   end
