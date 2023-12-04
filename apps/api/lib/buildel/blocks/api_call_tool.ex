@@ -107,7 +107,7 @@ defmodule Buildel.Blocks.ApiCallTool do
     url =
       args
       |> Enum.reduce(state[:opts][:url], fn {key, value}, acc ->
-        String.replace(acc, "{{#{key}}}", value)
+        String.replace(acc, "{{#{key}}}", value |> to_string())
       end)
 
     case HTTPoison.request(
