@@ -2,6 +2,7 @@ import React, {
   PropsWithChildren,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -129,6 +130,12 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   const isValid = useMemo(() => {
     return Object.values(blockValidations).every((v) => v.success);
   }, [blockValidations]);
+
+  useEffect(() => {
+    if (status === "idle") {
+      setBlockStatuses({});
+    }
+  }, [status]);
 
   const value = useMemo(
     () => ({
