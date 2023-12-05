@@ -81,7 +81,7 @@ defmodule Buildel.Blocks.WebhookOutput do
 
     context = block_context().context_from_context_id(state[:context_id])
 
-    payload = %{"content" => content, "topic" => topic, "context" => context}
+    payload = %{"content" => content, "topic" => topic, "context" => context |> Map.put("metadata", state[:opts][:metadata])}
 
     webhook().send_content(url, payload)
 

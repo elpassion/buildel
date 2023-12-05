@@ -120,6 +120,7 @@ defmodule Buildel.Pipelines do
                 :inputs_blocks,
                 inputs_blocks
               )
+              |> Map.put(:metadata, get_in(run.config, ["metadata"]) || %{})
           }
         end)
     end
