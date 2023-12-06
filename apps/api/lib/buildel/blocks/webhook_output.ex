@@ -83,7 +83,7 @@ defmodule Buildel.Blocks.WebhookOutput do
 
     payload = %{"content" => content, "topic" => topic, "context" => state[:context]}
 
-    {:ok, token} = Buildel.BlockContext.create_run_auth_token(state[:context_id], "#{state[:context] |> Jason.encode!()}::#{content}" |> IO.inspect())
+    {:ok, token} = Buildel.BlockContext.create_run_auth_token(state[:context_id], "#{state[:context] |> Jason.encode!()}::#{content}")
 
     webhook().send_content(url, payload, ["Authorization": "Bearer #{token}"])
 
