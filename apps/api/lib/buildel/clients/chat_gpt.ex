@@ -12,6 +12,7 @@ defmodule Buildel.Clients.ChatGPT do
   def stream_chat(
         context: context,
         on_content: on_content,
+        on_tool_content: on_tool_content,
         on_end: on_end,
         on_error: _on_error,
         api_key: _api_key,
@@ -25,6 +26,7 @@ defmodule Buildel.Clients.ChatGPT do
         %{role: "assistant"} = message -> Message.new_assistant!(message.content)
         %{role: "system"} = message -> Message.new_system!(message.content)
         %{role: "user"} = message -> Message.new_user!(message.content)
+        %{role: "tool"} = message -> Message.new_function!(message.tool_name, message.content)
       end)
 
     LLMChain.new!(%{
@@ -45,7 +47,10 @@ defmodule Buildel.Clients.ChatGPT do
         %Message{function_name: nil} ->
           on_end.()
 
-        %Message{} ->
+        %Message{function_name: function_name, content: content} when is_binary(function_name) and is_binary(content) ->
+          on_tool_content.(function_name, content)
+
+        %Message{} = message ->
           nil
       end
     )

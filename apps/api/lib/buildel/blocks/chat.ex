@@ -119,6 +119,10 @@ defmodule Buildel.Blocks.Chat do
     GenServer.cast(pid, {:finish_chat_message})
   end
 
+  defp save_tool_result(pid, tool_name, content) do
+    GenServer.cast(pid, {:save_tool_result, tool_name, content})
+  end
+
   # Server
 
   @impl true
@@ -219,6 +223,9 @@ defmodule Buildel.Blocks.Chat do
 
             save_text_chunk(pid, text_chunk)
           end,
+          on_tool_content: fn tool_name, content ->
+            save_tool_result(pid, tool_name, content)
+          end,
           on_end: fn ->
             finish_chat_message(pid)
           end,
@@ -285,6 +292,12 @@ defmodule Buildel.Blocks.Chat do
         state
       end
 
+    {:noreply, state}
+  end
+
+  def handle_cast({:save_tool_result, tool_name, content}, state) do
+    messages = state[:messages] ++ [%{role: "tool", content: content, tool_name: tool_name}]
+    state = put_in(state[:messages], messages)
     {:noreply, state}
   end
 

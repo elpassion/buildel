@@ -27,8 +27,4 @@ defmodule Buildel.BlockContext do
       _ -> {:error, :not_found}
     end
   end
-
-  defp app_secret do
-    Application.fetch_env!(:buildel, :secret_key_base)
-  end
 end
