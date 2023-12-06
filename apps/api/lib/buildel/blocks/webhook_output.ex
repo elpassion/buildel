@@ -63,7 +63,11 @@ defmodule Buildel.Blocks.WebhookOutput do
 
     pid = opts[:pid] || self()
 
-    {:ok, state |> Keyword.put(:pid, pid) |> assign_stream_state}
+    context = block_context().context_from_context_id(context_id) |> Map.put("metadata", state[:opts][:metadata])
+
+    {:ok, token} = Buildel.BlockContext.create_run_auth_token(context_id, context |> Jason.encode!())
+
+    {:ok, state |> Keyword.put(:pid, pid) |> Keyword.put(:context, context) |> Keyword.put(:token, token) |> assign_stream_state}
   end
 
   @impl true
@@ -79,11 +83,9 @@ defmodule Buildel.Blocks.WebhookOutput do
         "output"
       )
 
-    context = block_context().context_from_context_id(state[:context_id])
+    payload = %{"content" => content, "topic" => topic, "context" => state[:context]}
 
-    payload = %{"content" => content, "topic" => topic, "context" => context |> Map.put("metadata", state[:opts][:metadata])}
-
-    webhook().send_content(url, payload)
+    webhook().send_content(url, payload, ["Authorization": "Bearer #{state[:token]}"])
 
     state = state |> schedule_stream_stop()
 

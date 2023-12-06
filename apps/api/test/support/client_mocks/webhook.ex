@@ -3,7 +3,7 @@ defmodule Buildel.ClientMocks.Webhook do
   @behaviour WebhookBehaviour
 
   @impl WebhookBehaviour
-  def send_content(_url, _payload \\ nil) do
+  def send_content(_url, _payload, _headers \\ nil) do
     :ok
   end
 end
