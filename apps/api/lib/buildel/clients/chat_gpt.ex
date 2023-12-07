@@ -50,7 +50,7 @@ defmodule Buildel.Clients.ChatGPT do
         %Message{function_name: function_name, content: content} when is_binary(function_name) and is_binary(content) ->
           on_tool_content.(function_name, content)
 
-        %Message{} = message ->
+        %Message{} ->
           nil
       end
     )

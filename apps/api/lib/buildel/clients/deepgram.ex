@@ -2,7 +2,7 @@ defmodule Buildel.Clients.DeepgramBehaviour do
   @callback connect!(String.t(), %{stream_to: pid}) :: {:ok, pid} | {:error, term}
   @callback disconnect(pid) :: :ok
   @callback transcribe_audio(pid, {:binary, binary}) :: :ok
-  @callback transcribe_file(String.t(), {:binary, binary}) :: :ok
+  @callback transcribe_file(String.t(), any(), map()) :: :ok
 end
 
 defmodule Buildel.Clients.Deepgram do

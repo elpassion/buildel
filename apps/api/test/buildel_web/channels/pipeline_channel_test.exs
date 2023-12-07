@@ -74,7 +74,7 @@ defmodule BuildelWeb.PipelineChannelTest do
 
       user_data = Jason.encode!(%{user_id: user.id})
 
-      {:ok, %{run: joined_run}, socket} =
+      {:ok, %{run: joined_run}, _socket} =
         socket
         |> subscribe_and_join(
           BuildelWeb.PipelineChannel,

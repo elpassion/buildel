@@ -6,6 +6,7 @@ defmodule Buildel.ClientMocks.ChatGPT do
   def stream_chat(
         context: _,
         on_content: on_content,
+        on_tool_content: _on_tool_content,
         on_end: on_end,
         on_error: _on_error,
         api_key: _,
