@@ -76,7 +76,7 @@ config :buildel, :deepgram, Buildel.Clients.Deepgram
 config :buildel, :elevenlabs, Buildel.Clients.Elevenlabs
 config :buildel, :webhook, Buildel.Clients.Webhook
 config :buildel, :chat_gpt, Buildel.Clients.ChatGPT
-config :buildel, :vector_db, Buildel.VectorDB.QdrantAdapter
+config :buildel, :vector_db, Buildel.VectorDB.EctoAdapter
 config :buildel, :embeddings, Buildel.Clients.OpenAIEmbeddings
 config :buildel, :file_loader, Buildel.FileLoaderUnstructuredApiAdapter
 config :buildel, :search_db, Buildel.SearchDB.LNXAdapter
