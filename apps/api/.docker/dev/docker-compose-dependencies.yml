@@ -11,21 +11,21 @@ services:
     volumes:
       - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
       - pg_data:/var/lib/postgresql/data
-  qdrant:
-    image: qdrant/qdrant:latest
-    ports:
-      - 6333:6333
-    volumes:
-      - qdrant_storage:/qdrant/storage
-  lnx:
-    image: chillfish8/lnx:latest
-    ports:
-      - "8000:8000"
-    volumes:
-      - "lnx_storage:/etc/lnx/index" 
-    environment:
-      - AUTHORIZATION_KEY=hello
-      - LOG_LEVEL=info
+  # qdrant:
+  #   image: qdrant/qdrant:latest
+  #   ports:
+  #     - 6333:6333
+  #   volumes:
+  #     - qdrant_storage:/qdrant/storage
+  # lnx:
+  #   image: chillfish8/lnx:latest
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - "lnx_storage:/etc/lnx/index" 
+  #   environment:
+  #     - AUTHORIZATION_KEY=hello
+  #     - LOG_LEVEL=info
 
 volumes:
   pg_data:
