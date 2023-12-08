@@ -1,5 +1,4 @@
 defmodule Buildel.OrganizationsTest do
-  alias Buildel.ApiKeys.ApiKey
   use Buildel.DataCase
 
   alias Buildel.Organizations
@@ -146,19 +145,6 @@ defmodule Buildel.OrganizationsTest do
     test "change_membership/1 returns a membership changeset" do
       membership = membership_fixture()
       assert %Ecto.Changeset{} = Organizations.change_membership(membership)
-    end
-  end
-
-  describe "api_keys" do
-    import Buildel.OrganizationsFixtures
-
-    test "list_organization_api_keys/1 returns all organization api keys" do
-      organization = organization_fixture()
-      organization_id = organization.id
-      _another_organization = organization_fixture()
-
-      assert [%ApiKey{organization_id: ^organization_id}] =
-               Organizations.list_organization_api_keys(organization)
     end
   end
 end

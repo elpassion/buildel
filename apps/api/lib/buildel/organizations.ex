@@ -38,24 +38,6 @@ defmodule Buildel.Organizations do
     end
   end
 
-  def get_organization_by_id_and_api_key(organization_id, api_key)
-      when is_binary(organization_id) do
-    case Buildel.Utils.parse_id(organization_id) do
-      {:ok, organization_id} -> get_organization_by_id_and_api_key(organization_id, api_key)
-      error -> error
-    end
-  end
-
-  def get_organization_by_id_and_api_key(organization_id, api_key) do
-    case Repo.get_by(ApiKey, %{key: api_key, organization_id: organization_id}) do
-      nil ->
-        {:error, :not_found}
-
-      %ApiKey{} = api_key ->
-        {:ok, api_key |> Repo.preload(:organization) |> Map.get(:organization)}
-    end
-  end
-
   def reset_organization_api_key(%Organization{} = organization) do
     organization
     |> Organization.changeset(%{
@@ -148,29 +130,6 @@ defmodule Buildel.Organizations do
 
   def change_membership(%Membership{} = membership, attrs \\ %{}) do
     Membership.changeset(membership, attrs)
-  end
-
-  def list_organization_api_keys(%Organization{} = organization) do
-    organization |> Repo.preload(:api_keys) |> Map.get(:api_keys)
-  end
-
-  def create_organization_api_key(%Organization{} = organization) do
-    ApiKey.with_random_key()
-    |> ApiKey.changeset(%{organization_id: organization.id})
-    |> Repo.insert()
-  end
-
-  def delete_organization_api_key(%Organization{} = organization, key_id) do
-    case Repo.get(ApiKey, key_id) do
-      nil ->
-        {:error, :not_found}
-
-      %ApiKey{} = api_key ->
-        case api_key.organization_id == organization.id do
-          true -> {:ok, api_key |> Repo.delete()}
-          false -> {:error, :not_found}
-        end
-    end
   end
 
   def get_organization_secret(%Organization{} = organization, secret_name) do

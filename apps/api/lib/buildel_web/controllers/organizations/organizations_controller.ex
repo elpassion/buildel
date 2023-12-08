@@ -86,34 +86,4 @@ defmodule BuildelWeb.OrganizationController do
       render(conn, :organization_key, key: organization.api_key, hidden: true)
     end
   end
-
-  def get_api_keys(conn, %{"id" => organization_id}) do
-    user = conn.assigns.current_user
-
-    with {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         keys <- Organizations.list_organization_api_keys(organization) do
-      render(conn, :keys, keys: keys)
-    end
-  end
-
-  def create_api_key(conn, %{"id" => organization_id}) do
-    user = conn.assigns.current_user
-
-    with {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         {:ok, key} <- Organizations.create_organization_api_key(organization) do
-      render(conn, :key, key: key, hidden: false)
-    end
-  end
-
-  def delete_api_key(conn, %{"id" => organization_id, "key_id" => key_id}) do
-    user = conn.assigns.current_user
-
-    with {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         _ <- Organizations.delete_organization_api_key(organization, key_id) do
-      conn |> put_status(:ok) |> json(%{})
-    end
-  end
 end
