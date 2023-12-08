@@ -31,28 +31,6 @@ config :buildel, BuildelWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :buildel, Buildel.Mailer, adapter: Swoosh.Adapters.Local
 
-# Configure esbuild (the version is required)
-config :esbuild,
-  version: "0.17.11",
-  default: [
-    args:
-      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-  ]
-
-# Configure tailwind (the version is required)
-config :tailwind,
-  version: "3.3.2",
-  default: [
-    args: ~w(
-      --config=tailwind.config.js
-      --input=css/app.css
-      --output=../priv/static/assets/app.css
-    ),
-    cd: Path.expand("../assets", __DIR__)
-  ]
-
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
@@ -78,9 +56,9 @@ config :buildel, :webhook, Buildel.Clients.Webhook
 config :buildel, :chat_gpt, Buildel.Clients.ChatGPT
 config :buildel, :vector_db, Buildel.VectorDB.EctoAdapter
 config :buildel, :embeddings, Buildel.Clients.OpenAIEmbeddings
-config :buildel, :file_loader, Buildel.FileLoaderUnstructuredApiAdapter
+config :buildel, :file_loader, Buildel.FileLoaderUnstructuredLocalAdapter
 config :buildel, :search_db, Buildel.SearchDB.LNXAdapter
-config :buildel, :hybrid_db, true
+config :buildel, :hybrid_db, false
 config :buildel, :block_secrets_resolver, Buildel.BlockSecrets
 config :buildel, :block_context_resolver, Buildel.BlockContext
 

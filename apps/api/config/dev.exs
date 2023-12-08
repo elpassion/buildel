@@ -24,10 +24,7 @@ config :buildel, BuildelWeb.Endpoint,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: "PaafDvUuWck9JFCo7x4kCA99Zarse36TmQvoZe/iW6L1ohmH31luAd4q2RI4mlU4",
-  watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
-  ]
+  watchers: []
 
 # ## SSL Support
 #
@@ -51,16 +48,6 @@ config :buildel, BuildelWeb.Endpoint,
 # If desired, both `http:` and `https:` keys can be
 # configured to run both http and https servers on
 # different ports.
-
-# Watch static and templates for browser reloading.
-config :buildel, BuildelWeb.Endpoint,
-  live_reload: [
-    patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
-      ~r"priv/gettext/.*(po)$",
-      ~r"lib/buildel_web/(controllers|live|components)/.*(ex|heex)$"
-    ]
-  ]
 
 # Enable dev routes for dashboard and mailbox
 config :buildel, dev_routes: true

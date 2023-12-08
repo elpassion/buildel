@@ -50,11 +50,6 @@ COPY priv priv
 
 COPY lib lib
 
-COPY assets assets
-
-# compile assets
-RUN mix assets.deploy
-
 # Compile the release
 RUN mix compile
 
