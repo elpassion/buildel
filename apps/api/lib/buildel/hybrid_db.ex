@@ -11,8 +11,12 @@ defmodule Buildel.HybridDB do
 
     vector_results = Buildel.VectorDB.query(collection_name, query, api_key: api_key())
 
-    join_results(search_results, vector_results)
-    |> sort_results_by_query(query)
+    if Enum.empty?(vector_results) || Enum.empty?(search_results) do
+      join_results(search_results, vector_results)
+    else
+      join_results(search_results, vector_results)
+      |> sort_results_by_query(query)
+    end
   end
 
   deftimedp sort_results_by_query(results, query), [:buildel, :hybrid_db, :sorting] do

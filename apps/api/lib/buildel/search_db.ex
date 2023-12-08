@@ -220,3 +220,37 @@ defmodule Buildel.SearchDB.LNXAdapter do
     [{"Content-Type", "application/json"}]
   end
 end
+
+
+defmodule Buildel.SearchDB.EctoAdapter do
+  @behaviour Buildel.SearchDB.SearchAdapterBehaviour
+
+  @impl true
+  def get_collection(collection_name) do
+    {:ok, %{name: collection_name}}
+  end
+
+  @impl true
+  def create_collection(collection_name, _opts \\ %{}) do
+    {:ok, %{name: collection_name}}
+  end
+
+  def delete_collection(collection_name) do
+    {:ok, %{name: collection_name}}
+  end
+
+  @impl true
+  def add(collection, documents) do
+    :ok
+  end
+
+  @impl true
+  def delete_all_with_metadata(collection, metadata) do
+    :ok
+  end
+
+  @impl true
+  def query(collection, %{query: query}) do
+    {:ok, []}
+  end
+end
