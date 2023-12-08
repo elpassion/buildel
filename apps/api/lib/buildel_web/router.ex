@@ -2,7 +2,7 @@ defmodule BuildelWeb.Router do
   use BuildelWeb, :router
 
   import BuildelWeb.UserAuth
-  import Plug.BasicAuth
+  import BuildelWeb.BasicAuth
   import Phoenix.LiveDashboard.Router
 
   pipeline :browser do
@@ -16,7 +16,7 @@ defmodule BuildelWeb.Router do
   end
 
   pipeline :require_basic_auth do
-    plug :basic_auth, username: "michalmichal", password: "rzadzirzadzi"
+    plug :basic_auth
   end
 
   pipeline :api do

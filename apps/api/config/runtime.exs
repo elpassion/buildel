@@ -55,4 +55,8 @@ if config_env() == :prod do
     ]
 
   config :langchain, openai_key: System.get_env("OPENAI_API_KEY")
+
+  config :buildel, :basic_auth,
+    username: System.get_env("BASIC_AUTH_USERNAME"),
+    password: System.get_env("BASIC_AUTH_PASSWORD")
 end
