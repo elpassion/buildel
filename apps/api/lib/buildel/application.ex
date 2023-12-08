@@ -48,7 +48,9 @@ defmodule Buildel.Application do
       Buildel.Clients.BumblebeeEmbeddings.serving()
     end
 
-    Buildel.HybridDB.serving()
+    if Application.get_env(:buildel, :hybrid_db) do
+      Buildel.HybridDB.serving()
+    end
   end
 
   defp maybe_add_db(children) do

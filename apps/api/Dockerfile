@@ -61,6 +61,8 @@ RUN mix release
 
 RUN DATABASE_URL="ecto://USER:PASS@HOST/DATABASE" SECRET_KEY_BASE="doesnotmatter" ENCRYPTION_KEY="ZG9lc25vdG1hdHRlcg==" SKIP_DB="true" mix run -e 'Buildel.Application.load_servings()'
 
+RUN mkdir -p /app/.bumblebee
+
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
