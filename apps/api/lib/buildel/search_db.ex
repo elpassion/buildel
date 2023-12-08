@@ -240,17 +240,17 @@ defmodule Buildel.SearchDB.EctoAdapter do
   end
 
   @impl true
-  def add(collection, documents) do
+  def add(_collection, _documents) do
     :ok
   end
 
   @impl true
-  def delete_all_with_metadata(collection, metadata) do
+  def delete_all_with_metadata(_collection, _metadata) do
     :ok
   end
 
   @impl true
-  def query(collection, %{query: query}) do
+  def query(_collection, %{query: _query}) do
     {:ok, []}
   end
 end
