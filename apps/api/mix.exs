@@ -63,7 +63,8 @@ defmodule Buildel.MixProject do
       {:poolboy, "~> 1.5"},
       {:cloak_ecto, "~> 1.2.0"},
       {:langchain, "~> 0.1.0"},
-      {:pgvector, "~> 0.2.0"}
+      {:pgvector, "~> 0.2.0"},
+      {:dotenv, "~> 3.0.0"}
     ]
   end
 
