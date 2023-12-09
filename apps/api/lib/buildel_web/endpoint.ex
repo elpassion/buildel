@@ -4,13 +4,15 @@ defmodule BuildelWeb.Endpoint do
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
+  @secure_cookie Application.compile_env(:buildel, :secure_cookie)
   @session_options [
     store: :cookie,
     key: "_buildel_key",
     signing_salt: "PQ/dWRMh",
-    same_site: "Lax"
+    same_site: "Lax",
+    http_only: true,
+    secure: @secure_cookie
   ]
-
   socket "/socket", BuildelWeb.PipelineSocket, websocket: true, longpoll: false
 
   plug Phoenix.LiveDashboard.RequestLogger,

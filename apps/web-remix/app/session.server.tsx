@@ -23,6 +23,8 @@ const { getSession, commitSession, destroySession } =
     cookie: {
       name: "__session",
       secrets: [process.env.SESSION_SECRET as string],
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
     },
   });
 

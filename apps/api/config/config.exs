@@ -62,6 +62,8 @@ config :buildel, :hybrid_db, false
 config :buildel, :block_secrets_resolver, Buildel.BlockSecrets
 config :buildel, :block_context_resolver, Buildel.BlockContext
 
+config :buildel, :secure_cookie, false
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

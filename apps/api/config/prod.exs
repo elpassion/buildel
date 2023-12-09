@@ -23,3 +23,4 @@ config :logger, level: :info
 # of environment variables, is done on config/runtime.exs.
 
 config :buildel, :vector_db, Buildel.VectorDB.QdrantAdapter
+config :buildel, :secure_cookie, true
