@@ -22,6 +22,7 @@ const { getSession, commitSession, destroySession } =
   createCookieSessionStorage<SessionData, SessionFlashData>({
     cookie: {
       name: "__session",
+      secrets: [process.env.SESSION_SECRET as string],
     },
   });
 
