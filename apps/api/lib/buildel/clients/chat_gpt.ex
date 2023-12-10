@@ -2,7 +2,7 @@ defmodule Buildel.Clients.ChatGPT do
   require Logger
   alias Buildel.Clients.ChatBehaviour
   alias LangChain.Chains.LLMChain
-  alias LangChain.ChatModels.ChatOpenAI
+  alias Buildel.LangChain.ChatModels.ChatOpenAI
   alias LangChain.Message
   alias LangChain.MessageDelta
 
@@ -15,7 +15,7 @@ defmodule Buildel.Clients.ChatGPT do
         on_tool_content: on_tool_content,
         on_end: on_end,
         on_error: _on_error,
-        api_key: _api_key,
+        api_key: api_key,
         model: model,
         temperature: temperature,
         tools: tools
@@ -30,7 +30,7 @@ defmodule Buildel.Clients.ChatGPT do
       end)
 
     LLMChain.new!(%{
-      llm: ChatOpenAI.new!(%{model: model, temperature: temperature, stream: true}),
+      llm: ChatOpenAI.new!(%{model: model, temperature: temperature, stream: true, api_key: api_key}),
       custom_context: context
     })
     |> LLMChain.add_functions(tools)
@@ -56,16 +56,5 @@ defmodule Buildel.Clients.ChatGPT do
     )
 
     :ok
-  end
-
-  def config(stream \\ false, api_key \\ nil) do
-    http_options =
-      if stream, do: [recv_timeout: :infinity, stream_to: self(), async: :once], else: []
-
-    %OpenAI.Config{
-      api_key: api_key || System.get_env("OPENAI_API_KEY"),
-      http_options: http_options,
-      api_url: "http://localhost/"
-    }
   end
 end
