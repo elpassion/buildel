@@ -9,6 +9,7 @@ kill_signal = "SIGTERM"
 swap_size_mb = 512
 
 [build]
+  dockerfile = "../../.docker/Dockerfile.api"
 
 [deploy]
   release_command = "/app/bin/migrate"
