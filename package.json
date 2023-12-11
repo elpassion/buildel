@@ -15,7 +15,9 @@
     "dependencies:up": "turbo run dependencies:up",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "build:docker:api": "DOCKER_BUILDKIT=1 docker build -f .docker/Dockerfile.api ./apps/api -t buildel/api",
+    "build:docker:web": "DOCKER_BUILDKIT=1 docker build -f .docker/Dockerfile.web-remix . -t buildel/web"
   },
   "devDependencies": {
     "@turbo/gen": "^1.9.7",
