@@ -41,6 +41,9 @@ config :phoenix, :json_library, Jason
 
 config :tesla, adapter: Tesla.Adapter.Hackney
 
+config :money,
+  default_currency: :USD
+
 config :exla, :clients,
   tpu: [platform: :tpu],
   cuda: [platform: :cuda],

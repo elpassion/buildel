@@ -47,7 +47,7 @@ defmodule Buildel.Blocks.Chat do
                   "type" => "string",
                   "title" => "Model",
                   "description" => "The model to use for the chat.",
-                  "enum" => ["gpt-3.5-turbo", "gpt-4", "gpt-4-1106-preview"],
+                  "enum" => ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-1106", "gpt-4-1106-preview"],
                   "enumPresentAs" => "radio",
                   "default" => "gpt-3.5-turbo"
                 },
@@ -226,8 +226,16 @@ defmodule Buildel.Blocks.Chat do
           on_tool_content: fn tool_name, content ->
             save_tool_result(pid, tool_name, content)
           end,
-          on_end: fn statistics ->
-            IO.inspect(statistics)
+          on_end: fn chat_token_summary ->
+            cost =
+              Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
+
+            block_context().create_run_cost(
+              state[:context_id],
+              state[:block_name],
+              cost
+            )
+
             finish_chat_message(pid)
           end,
           on_error: fn error ->

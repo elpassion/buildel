@@ -1,5 +1,7 @@
 defmodule Buildel.Pipelines do
   import Ecto.Query, warn: false
+  alias Buildel.Costs.Cost
+  alias Buildel.Pipelines.RunCost
   alias Buildel.Repo
 
   alias Buildel.Pipelines.Pipeline
@@ -123,6 +125,15 @@ defmodule Buildel.Pipelines do
               |> Map.put(:metadata, get_in(run.config, ["metadata"]) || %{})
           }
         end)
+    end
+  end
+
+  def create_run_cost(%Run{} = run, %Cost{} = cost, attrs \\ %{}) do
+    case %RunCost{}
+         |> RunCost.changeset(attrs |> Map.put(:run_id, run.id) |> Map.put(:cost_id, cost.id))
+         |> Repo.insert() do
+      {:ok, struct} -> {:ok, struct}
+      {:error, changeset} -> {:error, changeset}
     end
   end
 

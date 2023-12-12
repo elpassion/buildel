@@ -64,7 +64,8 @@ defmodule Buildel.MixProject do
       {:cloak_ecto, "~> 1.2.0"},
       {:langchain, "~> 0.1.3"},
       {:pgvector, "~> 0.2.0"},
-      {:dotenv, "~> 3.0.0"}
+      {:dotenv, "~> 3.0.0"},
+      {:money, "~> 1.12"}
     ]
   end
 

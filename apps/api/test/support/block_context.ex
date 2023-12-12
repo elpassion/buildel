@@ -15,4 +15,9 @@ defmodule Buildel.BlockContext.Mock do
   def create_run_auth_token(_context_id, _content) do
     {:ok, "token"}
   end
+
+  @impl true
+  def create_run_cost(_context_id, _block_name, _amount) do
+    {:ok, %{}}
+  end
 end

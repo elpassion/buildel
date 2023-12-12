@@ -1,5 +1,6 @@
 defmodule Buildel.Organizations do
   import Ecto.Query, warn: false
+  alias Buildel.Costs.Cost
   alias Buildel.Repo
 
   alias Buildel.Organizations.{Organization, Membership}
@@ -164,6 +165,15 @@ defmodule Buildel.Organizations do
     case Repo.get_by(Secret, name: secret_name, organization_id: organization.id) do
       nil -> {:error, :not_found}
       %Secret{} = secret -> {:ok, secret |> Repo.delete()}
+    end
+  end
+
+  def create_organization_cost(%Organization{} = organization, attrs \\ %{}) do
+    case %Cost{}
+         |> Cost.changeset(attrs |> Map.put(:organization_id, organization.id))
+         |> Repo.insert() do
+      {:ok, cost} -> {:ok, cost |> Repo.preload(:organization)}
+      {:error, changeset} -> {:error, changeset}
     end
   end
 end
