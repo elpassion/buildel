@@ -15,11 +15,16 @@ defmodule BuildelWeb.OrganizationPipelineRunJSON do
       status: run.status,
       created_at: run.inserted_at,
       config: run.config,
-      costs:
-        for(
-          run_cost <- run.run_costs,
-          do: BuildelWeb.OrganizationPipelineRunCostJSON.show(%{run_cost: run_cost})
-        )
+      costs: costs(run)
     }
+  end
+
+  defp costs(%Run{run_costs: %Ecto.Association.NotLoaded{}}), do: nil
+
+  defp costs(%Run{run_costs: run_costs}) do
+    for(
+      run_cost <- run_costs,
+      do: BuildelWeb.OrganizationPipelineRunCostJSON.show(%{run_cost: run_cost})
+    )
   end
 end
