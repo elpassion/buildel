@@ -17,6 +17,6 @@ defmodule Buildel.ClientMocks.ChatGPT do
     on_content.("Hell")
     on_content.("o!")
     on_content.(" How are you?")
-    on_end.()
+    on_end.(%{})
   end
 end

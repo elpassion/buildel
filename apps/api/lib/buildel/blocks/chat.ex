@@ -226,7 +226,8 @@ defmodule Buildel.Blocks.Chat do
           on_tool_content: fn tool_name, content ->
             save_tool_result(pid, tool_name, content)
           end,
-          on_end: fn ->
+          on_end: fn statistics ->
+            IO.inspect(statistics)
             finish_chat_message(pid)
           end,
           on_error: fn error ->

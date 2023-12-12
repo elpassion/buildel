@@ -95,9 +95,7 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
   @spec new(attrs :: map()) :: {:ok, t} | {:error, Ecto.Changeset.t()}
   def new(%{} = attrs \\ %{}) do
     %ChatOpenAI{}
-    |> IO.inspect()
     |> cast(attrs, @create_fields)
-    |> IO.inspect()
     |> common_validation()
     |> apply_action(:insert)
   end
@@ -535,6 +533,7 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
         "message" => message,
         "index" => index
       }) do
+
     status =
       case finish_reason do
         "stop" ->

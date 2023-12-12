@@ -174,7 +174,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
 
             save_text_chunk(pid, text_chunk)
           end,
-          on_end: fn ->
+          on_end: fn _statistics ->
             finish_chat_message(pid)
           end,
           api_key: state[:api_key],
