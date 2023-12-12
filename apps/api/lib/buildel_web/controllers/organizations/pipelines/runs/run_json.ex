@@ -14,7 +14,12 @@ defmodule BuildelWeb.OrganizationPipelineRunJSON do
       id: run.id,
       status: run.status,
       created_at: run.inserted_at,
-      config: run.config
+      config: run.config,
+      costs:
+        for(
+          run_cost <- run.run_costs,
+          do: BuildelWeb.OrganizationPipelineRunCostJSON.show(%{run_cost: run_cost})
+        )
     }
   end
 end
