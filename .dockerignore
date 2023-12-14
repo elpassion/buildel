@@ -8,4 +8,3 @@ apps/web-remix/.env
 apps/web-remix/.sentryclirc
 fly.toml
 **/fly.toml
-apps/api

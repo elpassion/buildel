@@ -36,27 +36,27 @@ ENV MIX_ENV="prod"
 ENV BUMBLEBEE_CACHE_DIR=/app/.bumblebee
 
 # install mix dependencies
-COPY mix.exs mix.lock ./
+COPY ./apps/api/mix.exs ./apps/api/mix.lock ./
 RUN mix deps.get --only $MIX_ENV
 RUN mkdir config
 
 # copy compile-time config files before we compile dependencies
 # to ensure any relevant config change will trigger the dependencies
 # to be re-compiled.
-COPY config/config.exs config/${MIX_ENV}.exs config/
+COPY ./apps/api/config/config.exs ./apps/api/config/${MIX_ENV}.exs config/
 RUN mix deps.compile
 
-COPY priv priv
+COPY ./apps/api/priv priv
 
-COPY lib lib
+COPY ./apps/api/lib lib
 
 # Compile the release
 RUN mix compile
 
 # Changes to config/runtime.exs don't require recompiling the code
-COPY config/runtime.exs config/
+COPY ./apps/api/config/runtime.exs config/
 
-COPY rel rel
+COPY ./apps/api/rel rel
 RUN mix release
 
 RUN DATABASE_URL="ecto://USER:PASS@HOST/DATABASE" SECRET_KEY_BASE="doesnotmatter" ENCRYPTION_KEY="ZG9lc25vdG1hdTEstg==" SKIP_DB="true" mix run -e 'Buildel.Application.load_servings()'

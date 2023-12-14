@@ -16,7 +16,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "build:docker:api": "DOCKER_BUILDKIT=1 docker build -f .docker/Dockerfile.api ./apps/api -t buildel/api",
+    "build:docker:api": "DOCKER_BUILDKIT=1 docker build -f .docker/Dockerfile.api . -t buildel/api",
     "build:docker:web": "DOCKER_BUILDKIT=1 docker build -f .docker/Dockerfile.web . -t buildel/web"
   },
   "devDependencies": {
