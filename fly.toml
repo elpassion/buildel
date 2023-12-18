@@ -10,6 +10,7 @@ kill_timeout = 5
 processes = []
 
 [build]
+  dockerfile = ".docker/Dockerfile.web"
 
 [env]
   API_URL = "https://buildel-api.fly.dev"
