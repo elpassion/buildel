@@ -16,7 +16,7 @@ config :buildel, Buildel.Repo, types: Buildel.PostgrexTypes
 config :buildel, BuildelWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [
-    formats: [html: BuildelWeb.ErrorHTML, json: BuildelWeb.ErrorJSON],
+    formats: [json: BuildelWeb.ErrorJSON],
     layout: false
   ],
   pubsub_server: Buildel.PubSub,

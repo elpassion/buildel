@@ -13,6 +13,7 @@ import sourceMapSupport from "source-map-support";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { wrapExpressCreateRequestHandler } from "@sentry/remix";
 
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
 const createRequestHandlerWithSentry =
   wrapExpressCreateRequestHandler(createRequestHandler);

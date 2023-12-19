@@ -17,8 +17,6 @@ defmodule BuildelWeb do
   those modules here.
   """
 
-  def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
-
   def router do
     quote do
       use Phoenix.Router, helpers: false
@@ -39,8 +37,8 @@ defmodule BuildelWeb do
   def controller do
     quote do
       use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: BuildelWeb.Layouts]
+        formats: [:json],
+        layouts: []
 
       import Plug.Conn
       import BuildelWeb.Gettext
@@ -100,7 +98,7 @@ defmodule BuildelWeb do
       use Phoenix.VerifiedRoutes,
         endpoint: BuildelWeb.Endpoint,
         router: BuildelWeb.Router,
-        statics: BuildelWeb.static_paths()
+        statics: []
     end
   end
 
