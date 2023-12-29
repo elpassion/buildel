@@ -19,6 +19,7 @@ swap_size_mb = 512
   PORT = "8080"
   QDRANT_DATABASE_URL = "http://buildel-vectordb.internal"
   SEARCH_DB_URL = "http://buildel-searchdb.fly.dev"
+  ECTO_IPV6 = true
 
 [http_service]
   internal_port = 8080
