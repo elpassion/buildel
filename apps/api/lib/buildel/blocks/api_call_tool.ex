@@ -61,6 +61,12 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "description" =>
                     "Valid JSONSchema definition of the parameters passed to api call.",
                   "presentAs" => "editor"
+                },
+                authorize: %{
+                  "type" => "boolean",
+                  "title" => "Authorize",
+                  "description" => "Whether to authorize the request with organization secret.",
+                  "default" => false
                 }
               )
           })
@@ -92,9 +98,14 @@ defmodule Buildel.Blocks.ApiCallTool do
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
+    context =
+      block_context().context_from_context_id(context_id)
+      |> Map.put("metadata", state[:opts][:metadata])
+
     {:ok,
      state
      |> Keyword.put(:parameters, Jason.decode!(opts[:parameters]))
+     |> Keyword.put(:context, context)
      |> assign_stream_state(opts)}
   end
 
@@ -102,18 +113,48 @@ defmodule Buildel.Blocks.ApiCallTool do
   def handle_call({:call_api, args}, _caller, state) do
     state = state |> send_stream_start()
 
-    headers = [{"Accept", "application/json"}, {"Content-Type", "application/json"}]
-
     url =
       args
       |> Enum.reduce(state[:opts][:url], fn {key, value}, acc ->
         String.replace(acc, "{{#{key}}}", value |> to_string())
       end)
 
+    payload = args |> Jason.encode!()
+
+    topic =
+      Buildel.BlockPubSub.io_topic(
+        state[:context_id],
+        state[:block_name],
+        "output"
+      )
+
+    {:ok, token} =
+      block_context().create_run_auth_token(
+        state[:context_id],
+        "#{state[:context] |> Jason.encode!()}::#{payload}"
+      )
+
+    headers = [
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "X-Buildel-Topic": topic,
+      "X-Buildel-Context": state[:context] |> Jason.encode!()
+    ]
+
+    headers =
+      if state[:opts][:authorize] do
+        headers ++
+          [
+            Authorization: "Bearer #{token}"
+          ]
+      else
+        headers
+      end
+
     case HTTPoison.request(
            state[:opts][:method],
            url,
-           args |> Jason.encode!(),
+           payload,
            headers
          ) do
       {:ok, %{status_code: _status_code, body: body}} ->

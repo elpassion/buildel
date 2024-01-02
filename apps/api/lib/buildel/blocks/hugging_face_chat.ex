@@ -35,53 +35,82 @@ defmodule Buildel.Blocks.HuggingFaceChat do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["model", "temperature", "messages", "api_key"],
-            "properties" => %{
-              "api_key" =>
-                secret_schema(%{
-                  "title" => "API Key",
-                  "description" => "Select from your API keys or enter a new one."
-                }),
-              "model" => %{
-                "type" => "string",
-                "title" => "Model",
-                "description" => "The model to use for the chat.",
-                "default" => "gpt-3.5-turbo"
-              },
-              "temperature" => %{
-                "type" => "number",
-                "title" => "Temperature",
-                "description" => "The temperature of the chat.",
-                "default" => 0.7,
-                "minimum" => 0.0,
-                "maximum" => 1.0,
-                "step" => 0.1
-              },
-              "messages" => %{
-                "type" => "array",
-                "title" => "Messages",
-                "description" => "The messages to start the conversation with.",
-                "minItems" => 1,
-                "items" => %{
-                  "type" => "object",
-                  "required" => ["role", "content"],
-                  "properties" => %{
-                    "role" => %{
-                      "type" => "string",
-                      "title" => "Role",
-                      "enum" => ["system", "user", "assistant"],
-                      "enumPresentAs" => "radio",
-                      "default" => "system"
-                    },
-                    "content" => %{
-                      "type" => "string",
-                      "title" => "Content",
-                      "presentAs" => "editor"
+            "required" => [
+              "model",
+              "temperature",
+              "system_message",
+              "messages",
+              "api_key",
+              "stream"
+            ],
+            "properties" =>
+              Jason.OrderedObject.new(
+                api_key:
+                  secret_schema(%{
+                    "title" => "API Key",
+                    "description" => "Select from your API keys or enter a new one."
+                  }),
+                model: %{
+                  "type" => "string",
+                  "title" => "Model",
+                  "description" => "The model to use for the chat.",
+                  "default" => "gpt-2"
+                },
+                stream: %{
+                  "type" => "boolean",
+                  "title" => "Stream",
+                  "description" => "Whether to stream the chat.",
+                  "default" => false
+                },
+                temperature: %{
+                  "type" => "number",
+                  "title" => "Temperature",
+                  "description" => "The temperature of the chat.",
+                  "default" => 0.7,
+                  "minimum" => 0.0,
+                  "maximum" => 2.0,
+                  "step" => 0.1
+                },
+                system_message: %{
+                  "type" => "string",
+                  "title" => "System message",
+                  "description" => "The message to start the conversation with.",
+                  "presentAs" => "editor",
+                  "minLength" => 1
+                },
+                messages: %{
+                  "type" => "array",
+                  "title" => "Messages",
+                  "description" => "The messages to start the conversation with.",
+                  "minItems" => 0,
+                  "items" => %{
+                    "type" => "object",
+                    "required" => ["role", "content"],
+                    "properties" => %{
+                      "role" => %{
+                        "type" => "string",
+                        "title" => "Role",
+                        "enum" => ["user", "assistant"],
+                        "enumPresentAs" => "radio",
+                        "default" => "user"
+                      },
+                      "content" => %{
+                        "type" => "string",
+                        "title" => "Content",
+                        "presentAs" => "editor"
+                      }
                     }
-                  }
+                  },
+                  "default" => []
+                },
+                prompt_template: %{
+                  "type" => "string",
+                  "title" => "Prompt template",
+                  "description" => "The template to use for the prompt.",
+                  "presentAs" => "editor",
+                  "minLength" => 1
                 }
-              }
-            }
+              )
           })
       }
     }
@@ -99,6 +128,10 @@ defmodule Buildel.Blocks.HuggingFaceChat do
 
   defp finish_chat_message(pid) do
     GenServer.cast(pid, {:finish_chat_message})
+  end
+
+  defp save_tool_result(pid, tool_name, content) do
+    GenServer.cast(pid, {:save_tool_result, tool_name, content})
   end
 
   # Server
@@ -119,15 +152,23 @@ defmodule Buildel.Blocks.HuggingFaceChat do
 
     Logger.debug("Chat block subscribed to input")
 
+    api_key =
+      block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
+
+    tool_blocks = []
+
     {:ok,
      state
      |> assign_stream_state
      |> assign_take_latest(true)
-     |> Keyword.put(:messages, opts[:messages])
+     |> Keyword.put(:system_message, opts[:system_message])
+     |> Keyword.put(:prompt_template, opts[:prompt_template])
      |> Keyword.put(
-       :api_key,
-       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
+       :messages,
+       [%{role: "system", content: opts[:system_message]}] ++ opts[:messages]
      )
+     |> Keyword.put(:api_key, api_key)
+     |> Keyword.put(:tool_blocks, tool_blocks)
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
   end
@@ -135,7 +176,6 @@ defmodule Buildel.Blocks.HuggingFaceChat do
   @impl true
   def handle_cast({:send_message, {:text, text}}, state) do
     state = send_stream_start(state)
-    state = put_in(state[:messages], state[:messages] ++ [%{role: "user", content: text}])
 
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
@@ -143,6 +183,15 @@ defmodule Buildel.Blocks.HuggingFaceChat do
       "message_output",
       {:text, text}
     )
+
+    messages =
+      if List.last(state[:messages])[:role] in ["assistant", "system"] do
+        state[:messages] ++ [%{role: "user", content: state[:prompt_template]}]
+      else
+        state[:messages]
+      end
+
+    state = put_in(state[:messages], messages)
 
     messages =
       state[:messages]
@@ -161,9 +210,16 @@ defmodule Buildel.Blocks.HuggingFaceChat do
       state = cleanup_messages(state)
       pid = self()
 
+      tools =
+        state[:tool_blocks]
+        |> Enum.map(fn block ->
+          pid = block_context().block_pid(state[:context_id], block["name"])
+          Buildel.Blocks.Block.function(pid)
+        end)
+
       Task.start(fn ->
         hugging_face_chat().stream_chat(
-          context: %{messages: messages},
+          context: %{messages: messages, stream: state[:opts].stream != false},
           on_content: fn text_chunk ->
             Buildel.BlockPubSub.broadcast_to_io(
               state[:context_id],
@@ -174,13 +230,20 @@ defmodule Buildel.Blocks.HuggingFaceChat do
 
             save_text_chunk(pid, text_chunk)
           end,
-          on_end: fn _statistics ->
+          on_tool_content: fn tool_name, content ->
+            save_tool_result(pid, tool_name, content)
+          end,
+          on_end: fn chat_token_summary ->
+            finish_chat_message(pid)
+          end,
+          on_error: fn error ->
+            send_error(state, error)
             finish_chat_message(pid)
           end,
           api_key: state[:api_key],
           model: state[:opts].model,
           temperature: state[:opts].temperature,
-          tools: []
+          tools: tools
         )
       end)
 
@@ -201,7 +264,10 @@ defmodule Buildel.Blocks.HuggingFaceChat do
             [
               %{
                 role: "assistant",
-                content: (last_message.content <> chunk) |> String.replace("\n", " ")
+                content:
+                  (last_message.content <> chunk)
+                  |> String.trim_leading()
+                  |> String.replace("\n", " ")
               }
             ]
 

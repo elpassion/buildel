@@ -19,7 +19,8 @@ defmodule Buildel.Clients.HuggingFace do
         {"Authorization", "Bearer #{options |> Map.get(:api_key) || System.get_env("HUGGING_FACE_API_TOKEN")}"},
         {"Content-Type", "application/json"}
     ]
-    stream = false
+    stream = options |> Map.get(:stream, false) 
+
     body = %{
         inputs: prompt,
         parameters: %{
@@ -36,7 +37,7 @@ end
 
 defmodule HuggingFace.Stream do
     @moduledoc false
-  
+
     def new(stream, start_fun) do
       Stream.resource(
         start_fun,
@@ -51,16 +52,16 @@ defmodule HuggingFace.Stream do
               ],
               error
             }
-  
+
           %HTTPoison.Error{} = error ->
             {:halt, error}
-  
+
           res ->
             {res, id} = case res do
               {:ok, res = %HTTPoison.AsyncResponse{id: id}} -> {res, id}
               res = %HTTPoison.AsyncResponse{id: id} -> {res, id}
             end
-  
+
             receive do
               %HTTPoison.AsyncStatus{id: ^id, code: code} ->
                 HTTPoison.stream_next(res)
@@ -98,7 +99,7 @@ defmodule HuggingFace.Stream do
                   else
                     chunk |> Jason.decode!()
                   end
-  
+
                 HTTPoison.stream_next(res)
                 {data, res}
               %HTTPoison.AsyncEnd{}->

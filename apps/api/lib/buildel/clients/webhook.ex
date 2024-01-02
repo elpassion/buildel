@@ -10,8 +10,6 @@ defmodule Buildel.Clients.Webhook do
   def send_content(url, payload, headers \\ []) do
     headers = [{"Accept", "application/json"}, {"Content-Type", "application/json"}] ++ headers
 
-    payload = Jason.encode!(payload)
-
     HTTPoison.post!(url, payload, headers)
     :ok
   end

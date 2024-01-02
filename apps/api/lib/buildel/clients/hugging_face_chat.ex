@@ -7,11 +7,13 @@ defmodule Buildel.Clients.HuggingFaceChat do
   def stream_chat(
         context: context,
         on_content: on_content,
+        on_tool_content: _on_tool_content,
         on_end: on_end,
+        on_error: _on_error,
         api_key: api_key,
         model: model,
         temperature: _temperature,
-        tools: _
+        tools: _tools
       ) do
     messages =
       ((context.messages |> Enum.map(fn %{role: role, content: text} -> "#{role}: #{text}" end)) ++
@@ -21,7 +23,7 @@ defmodule Buildel.Clients.HuggingFaceChat do
     Buildel.Clients.HuggingFace.text_generation(
       model,
       messages,
-      %{api_key: api_key}
+      %{api_key: api_key, stream: context |> Map.get(:stream, false)}
     )
     |> Enum.each(fn
       %{"token" => %{"text" => content}, "generated_text" => nil} ->
