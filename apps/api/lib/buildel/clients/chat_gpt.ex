@@ -15,7 +15,7 @@ defmodule Buildel.Clients.ChatGPT do
         on_content: on_content,
         on_tool_content: on_tool_content,
         on_end: on_end,
-        on_error: _on_error,
+        on_error: on_error,
         api_key: api_key,
         model: model,
         temperature: temperature,
@@ -30,50 +30,58 @@ defmodule Buildel.Clients.ChatGPT do
         %{role: "tool"} = message -> Message.new_function!(message.tool_name, message.content)
       end)
 
-    {:ok, chain, _} =
-      LLMChain.new!(%{
-        llm:
-          ChatOpenAI.new!(%{
-            model: model,
-            temperature: temperature,
-            stream: true,
-            api_key: api_key
-          }),
-        custom_context: context
-      })
-      |> LLMChain.add_functions(tools)
-      |> LLMChain.add_messages(messages)
-      |> LLMChain.run(
-        while_needs_response: true,
-        callback_fn: fn
-          %MessageDelta{content: nil} ->
-            nil
+    with {:ok, chain, _} <-
+           LLMChain.new!(%{
+             llm:
+               ChatOpenAI.new!(%{
+                 model: model,
+                 temperature: temperature,
+                 stream: true,
+                 api_key: api_key
+               }),
+             custom_context: context
+           })
+           |> LLMChain.add_functions(tools)
+           |> LLMChain.add_messages(messages)
+           |> LLMChain.run(
+             while_needs_response: true,
+             callback_fn: fn
+               %MessageDelta{content: nil} ->
+                 nil
 
-          %MessageDelta{} = data ->
-            on_content.(data.content)
+               %MessageDelta{} = data ->
+                 on_content.(data.content)
 
-          %Message{function_name: nil} ->
-            nil
+               %Message{function_name: nil} ->
+                 nil
 
-          %Message{function_name: function_name, content: content}
-          when is_binary(function_name) and is_binary(content) ->
-            on_tool_content.(function_name, content)
+               %Message{function_name: function_name, content: content}
+               when is_binary(function_name) and is_binary(content) ->
+                 on_tool_content.(function_name, content)
 
-          %Message{} ->
-            nil
-        end
-      )
+               %Message{} ->
+                 nil
+             end
+           ) do
+      statistics =
+        ChatGptTokenizer.init(model)
+        |> ChatGptTokenizer.count_chain_tokens(%{
+          functions: chain.functions,
+          messages: chain.messages,
+          input_messages: chain.custom_context.messages
+        })
 
-    statistics =
-      ChatGptTokenizer.init(model)
-      |> ChatGptTokenizer.count_chain_tokens(%{
-        functions: chain.functions,
-        messages: chain.messages,
-        input_messages: chain.custom_context.messages
-      })
+      on_end.(statistics)
 
-    on_end.(statistics)
+      :ok
+    else
+      {:error, "context_length_exceeded"} ->
+        on_error.(:context_length_exceeded)
+        {:error, :context_length_exceeded}
 
-    :ok
+      {:error, reason} ->
+        on_error.(reason)
+        {:error, reason}
+    end
   end
 end

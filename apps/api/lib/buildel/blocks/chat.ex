@@ -156,14 +156,15 @@ defmodule Buildel.Blocks.Chat do
      |> assign_take_latest(true)
      |> Keyword.put(:system_message, opts[:system_message])
      |> Keyword.put(:prompt_template, opts[:prompt_template])
-     |> Keyword.put(
-       :messages,
-       [%{role: "system", content: opts[:system_message]}] ++ opts[:messages]
-     )
+     |> Keyword.put(:messages, initial_messages(state))
      |> Keyword.put(:api_key, api_key)
      |> Keyword.put(:tool_blocks, tool_blocks)
      |> Keyword.put(:sentences, [])
      |> Keyword.put(:sent_sentences, [])}
+  end
+
+  defp initial_messages(state) do
+    [%{role: "system", content: state[:opts][:system_message]}] ++ state[:opts][:messages]
   end
 
   @impl true
@@ -211,42 +212,10 @@ defmodule Buildel.Blocks.Chat do
         end)
 
       Task.start(fn ->
-        chat_gpt().stream_chat(
-          context: %{messages: messages},
-          on_content: fn text_chunk ->
-            Buildel.BlockPubSub.broadcast_to_io(
-              state[:context_id],
-              state[:block_name],
-              "output",
-              {:text, text_chunk}
-            )
-
-            save_text_chunk(pid, text_chunk)
-          end,
-          on_tool_content: fn tool_name, content ->
-            save_tool_result(pid, tool_name, content)
-          end,
-          on_end: fn chat_token_summary ->
-            cost =
-              Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
-
-            block_context().create_run_cost(
-              state[:context_id],
-              state[:block_name],
-              cost
-            )
-
-            finish_chat_message(pid)
-          end,
-          on_error: fn error ->
-            send_error(state, error)
-            finish_chat_message(pid)
-          end,
-          api_key: state[:api_key],
-          model: state[:opts].model,
-          temperature: state[:opts].temperature,
-          tools: tools
-        )
+        chat_task(%{messages: messages,
+        pid: pid,
+        tools: tools,
+        state: state})
       end)
 
       {:noreply, state}
@@ -332,6 +301,82 @@ defmodule Buildel.Blocks.Chat do
       |> send_stream_stop()
 
     {:noreply, state}
+  end
+
+  defp chat_task(%{ messages: messages, pid: pid, tools: tools, state: state }) do
+    with :ok <- call_chat(%{
+      messages: messages,
+      pid: pid,
+      tools: tools,
+      state: state
+    }) do
+      nil
+    else
+      {:error, :context_length_exceeded} ->
+        with {:ok, messages} <- remove_last_non_initial_message(state) do
+          state = put_in(state[:messages], messages)
+          chat_task(%{
+            messages: messages,
+            pid: pid,
+            tools: tools,
+            state: state
+          })
+        else
+          _ ->
+            send_error(state, "Initial messages were too long")
+        end
+    end
+  end
+
+  defp call_chat(%{ messages: messages, pid: pid, tools: tools, state: state }) do
+    chat_gpt().stream_chat(
+      context: %{messages: messages},
+      on_content: fn text_chunk ->
+        Buildel.BlockPubSub.broadcast_to_io(
+          state[:context_id],
+          state[:block_name],
+          "output",
+          {:text, text_chunk}
+        )
+
+        save_text_chunk(pid, text_chunk)
+      end,
+      on_tool_content: fn tool_name, content ->
+        save_tool_result(pid, tool_name, content)
+      end,
+      on_end: fn chat_token_summary ->
+        cost =
+          Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
+
+        block_context().create_run_cost(
+          state[:context_id],
+          state[:block_name],
+          cost
+        )
+
+        finish_chat_message(pid)
+      end,
+      on_error: fn
+        :context_length_exceeded ->
+          send_error(state, "Context length exceeded")
+          nil
+        error ->
+          send_error(state, error)
+          finish_chat_message(pid)
+      end,
+      api_key: state[:api_key],
+      model: state[:opts].model,
+      temperature: state[:opts].temperature,
+      tools: tools
+    )
+  end
+
+  defp remove_last_non_initial_message(state) do
+    if Enum.count(state[:messages]) == Enum.count(initial_messages(state)) do
+      {:error, :initial_messages_too_long}
+    else
+      {:ok, state[:messages] |> List.delete_at(initial_messages(state) |> Enum.count())}
+    end
   end
 
   @impl true

@@ -29,33 +29,33 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
 
   @primary_key false
   embedded_schema do
-    field :endpoint, :string, default: "https://api.openai.com/v1/chat/completions"
+    field(:endpoint, :string, default: "https://api.openai.com/v1/chat/completions")
     # field :model, :string, default: "gpt-4"
-    field :model, :string, default: "gpt-3.5-turbo"
+    field(:model, :string, default: "gpt-3.5-turbo")
     # API key for OpenAI. If not set, will use global api key. Allows for usage
     # of a different API key per-call if desired. For instance, allowing a
     # customer to provide their own.
-    field :api_key, :string
+    field(:api_key, :string)
 
     # What sampling temperature to use, between 0 and 2. Higher values like 0.8
     # will make the output more random, while lower values like 0.2 will make it
     # more focused and deterministic.
-    field :temperature, :float, default: 1.0
+    field(:temperature, :float, default: 1.0)
     # Number between -2.0 and 2.0. Positive values penalize new tokens based on
     # their existing frequency in the text so far, decreasing the model's
     # likelihood to repeat the same line verbatim.
-    field :frequency_penalty, :float, default: 0.0
+    field(:frequency_penalty, :float, default: 0.0)
     # Duration in seconds for the response to be received. When streaming a very
     # lengthy response, a longer time limit may be required. However, when it
     # goes on too long by itself, it tends to hallucinate more.
-    field :receive_timeout, :integer, default: @receive_timeout
+    field(:receive_timeout, :integer, default: @receive_timeout)
     # Seed for more deterministic output. Helpful for testing.
     # https://platform.openai.com/docs/guides/text-generation/reproducible-outputs
-    field :seed, :integer
+    field(:seed, :integer)
     # How many chat completion choices to generate for each input message.
-    field :n, :integer, default: 1
-    field :json_response, :boolean, default: false
-    field :stream, :boolean, default: false
+    field(:n, :integer, default: 1)
+    field(:json_response, :boolean, default: false)
+    field(:stream, :boolean, default: false)
   end
 
   @type t :: %ChatOpenAI{}
@@ -533,7 +533,6 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
         "message" => message,
         "index" => index
       }) do
-
     status =
       case finish_reason do
         "stop" ->
@@ -556,9 +555,9 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
     end
   end
 
-  def do_process_response(%{"error" => %{"message" => reason}}) do
-    Logger.error("Received error from API: #{inspect(reason)}")
-    {:error, reason}
+  def do_process_response(%{"error" => %{"code" => code}}) do
+    Logger.error("Received error from API: #{inspect(code)}")
+    {:error, code}
   end
 
   def do_process_response({:error, %Jason.DecodeError{} = response}) do
