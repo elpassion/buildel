@@ -77,16 +77,13 @@ defmodule Buildel.Blocks.FileSpeechToText do
 
   @impl true
   def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_inputs(context_id, opts.inputs)
+    subscribe_to_connections(context_id, state.connections)
 
     api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
 
     {:ok,
      state
-     |> Map.put(
-       :api_key,
-       api_key
-     )
+     |> Map.put(:api_key, api_key)
      |> assign_stream_state()}
   end
 

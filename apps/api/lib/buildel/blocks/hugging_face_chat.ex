@@ -138,7 +138,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
 
   @impl true
   def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_inputs(context_id, opts.inputs)
+    subscribe_to_connections(context_id, state.connections)
 
     api_key =
       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
@@ -149,11 +149,11 @@ defmodule Buildel.Blocks.HuggingFaceChat do
      state
      |> assign_stream_state
      |> assign_take_latest(true)
-     |> Map.put(:system_message, opts[:system_message])
-     |> Map.put(:prompt_template, opts[:prompt_template])
+     |> Map.put(:system_message, opts.system_message)
+     |> Map.put(:prompt_template, opts.prompt_template)
      |> Map.put(
        :messages,
-       [%{role: "system", content: opts[:system_message]}] ++ opts[:messages]
+       [%{role: "system", content: opts.system_message}] ++ opts.messages
      )
      |> Map.put(:api_key, api_key)
      |> Map.put(:tool_blocks, tool_blocks)

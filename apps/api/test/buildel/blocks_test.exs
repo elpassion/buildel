@@ -176,7 +176,7 @@ defmodule Buildel.BlocksTest do
           name: "test",
           block_name: "test",
           context_id: "run1",
-          opts: %{inputs: [], url: url},
+          opts: %{inputs: [], url: url, metadata: %{}},
           connections: []
         })
 
@@ -316,7 +316,14 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output->input"],
             api_key: "test"
           },
-          connections: []
+          connections: [
+            %Blocks.Connection{
+              block_name: "text_test",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -407,7 +414,14 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output->input"],
             api_key: "test"
           },
-          connections: []
+          connections: [
+            %Blocks.Connection{
+              block_name: "text_test",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -488,7 +502,14 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: ["text_test:output->input"]},
-          connections: []
+          connections: [
+            %Blocks.Connection{
+              block_name: "text_test",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -670,7 +691,14 @@ defmodule Buildel.BlocksTest do
             template: "dupa",
             reset: false
           },
-          connections: []
+          connections: [
+            %Blocks.Connection{
+              block_name: "text_test",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -702,7 +730,14 @@ defmodule Buildel.BlocksTest do
             template: "dupa {{text_test:output}}",
             reset: false
           },
-          connections: []
+          connections: [
+            %Blocks.Connection{
+              block_name: "text_test",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -743,7 +778,20 @@ defmodule Buildel.BlocksTest do
             template: "dupa {{text_test:output}} {{text_test_2:output}}",
             reset: false
           },
-          connections: []
+          connections: [
+            %Blocks.Connection{
+              block_name: "text_test",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            },
+            %Blocks.Connection{
+              block_name: "text_test_2",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -789,7 +837,20 @@ defmodule Buildel.BlocksTest do
             template: "dupa {{text_test:output}} {{text_test_2:output}}",
             reset: true
           },
-          connections: []
+          connections: [
+            %Buildel.Blocks.Connection{
+              block_name: "text_test",
+              input: %Buildel.Blocks.Input{name: "input", type: "text"},
+              output: %Buildel.Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            },
+            %Buildel.Blocks.Connection{
+              block_name: "text_test_2",
+              input: %Buildel.Blocks.Input{name: "input", type: "text"},
+              output: %Buildel.Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -846,7 +907,14 @@ defmodule Buildel.BlocksTest do
           opts: %{
             inputs: ["text_test:output->input"]
           },
-          connections: []
+          connections: [
+            %Blocks.Connection{
+              block_name: "text_test",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
@@ -865,9 +933,16 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{
-            inputs: ["text_test:output"]
+            inputs: ["text_test:output->input"]
           },
-          connections: []
+          connections: [
+            %Blocks.Connection{
+              block_name: "text_test",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
@@ -892,7 +967,14 @@ defmodule Buildel.BlocksTest do
         opts: %{
           inputs: ["text_test:output->input"]
         },
-        connections: []
+        connections: [
+          %Blocks.Connection{
+            block_name: "text_test",
+            input: %Blocks.Input{name: "input", type: "text"},
+            output: %Blocks.Output{name: "output", type: "text"},
+            opts: %{reset: true}
+          }
+        ]
       })
 
     {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
@@ -924,7 +1006,14 @@ defmodule Buildel.BlocksTest do
         opts: %{
           inputs: ["text_test:output->input"]
         },
-        connections: []
+        connections: [
+          %Blocks.Connection{
+            block_name: "text_test",
+            input: %Blocks.Input{name: "input", type: "text"},
+            output: %Blocks.Output{name: "output", type: "text"},
+            opts: %{reset: true}
+          }
+        ]
       })
 
     {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
@@ -974,7 +1063,14 @@ defmodule Buildel.BlocksTest do
           opts: %{
             inputs: ["text_test:output->input"]
           },
-          connections: []
+          connections: [
+            %Blocks.Connection{
+              block_name: "text_test",
+              input: %Blocks.Input{name: "input", type: "text"},
+              output: %Blocks.Output{name: "output", type: "text"},
+              opts: %{reset: true}
+            }
+          ]
         })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")

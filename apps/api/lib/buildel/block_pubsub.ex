@@ -13,6 +13,12 @@ defmodule Buildel.BlockPubSub do
     {:ok, topic}
   end
 
+  def subscribe_to_io(context_id, %Buildel.Blocks.Connection{} = connection) do
+    %{block_name: block_name, output: %{name: output_name}} = connection
+
+    subscribe(io_topic(context_id, block_name, output_name))
+  end
+
   def subscribe_to_io(context_id, connection_string) do
     %{block_name: block_name, output_name: output_name} =
       connection_description_from_connection_string(connection_string)

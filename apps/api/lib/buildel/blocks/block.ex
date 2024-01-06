@@ -118,6 +118,13 @@ defmodule Buildel.Blocks.Block do
 
       defoverridable handle_stream_stop: 2
 
+      defp subscribe_to_connections(context_id, connections) do
+        connections
+        |> Enum.map(fn connection ->
+          BlockPubSub.subscribe_to_io(context_id, connection)
+        end)
+      end
+
       defp subscribe_to_inputs(context_id, inputs) do
         inputs
         |> Enum.map(fn input ->

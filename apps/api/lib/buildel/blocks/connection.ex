@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.Connection do
   defstruct [:block_name, :output, :input, :opts]
 
   def connections_for_block(block_name, blocks_map) do
-    block = blocks_map |> Map.get(block_name)
+    block = blocks_map |> Map.fetch!(block_name)
 
     block
     |> Map.get("inputs")
@@ -25,17 +25,9 @@ defmodule Buildel.Blocks.Connection do
 
       %Buildel.Blocks.Connection{
         block_name: block_name,
-        output: %Buildel.Blocks.Output{
-          name: output["name"],
-          type: output["type"]
-        },
-        input: %Buildel.Blocks.Input{
-          name: input["name"],
-          type: input["type"]
-        },
-        opts: %{
-          reset: true
-        }
+        output: %Buildel.Blocks.Output{name: output.name, type: output.type},
+        input: %Buildel.Blocks.Input{name: input.name, type: input.type},
+        opts: %{reset: true}
       }
     end)
   end

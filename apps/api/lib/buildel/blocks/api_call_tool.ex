@@ -87,16 +87,18 @@ defmodule Buildel.Blocks.ApiCallTool do
   # Server
 
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_inputs(context_id, opts.inputs)
+  def init(
+        %{context_id: context_id, type: __MODULE__, opts: opts, connections: connections} = state
+      ) do
+    subscribe_to_connections(context_id, connections)
 
     context =
       block_context().context_from_context_id(context_id)
-      |> Map.put("metadata", state[:opts][:metadata])
+      |> Map.put("metadata", opts.metadata)
 
     {:ok,
      state
-     |> Map.put(:parameters, Jason.decode!(opts[:parameters]))
+     |> Map.put(:parameters, Jason.decode!(opts.parameters))
      |> Map.put(:context, context)
      |> assign_stream_state(opts)}
   end

@@ -80,7 +80,7 @@ defmodule Buildel.Blocks.SpeechToText do
           opts: opts
         } = state
       ) do
-    subscribe_to_inputs(context_id, opts.inputs)
+    subscribe_to_connections(context_id, state.connections)
 
     api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
 
