@@ -6,9 +6,9 @@ defmodule Buildel.Blocks.Connection do
 
     block
     |> Map.get("inputs")
-    |> Enum.map(fn input ->
+    |> Enum.map(fn connection_string ->
       %{block_name: block_name, input_name: input_name, output_name: output_name} =
-        Buildel.BlockPubSub.block_from_block_output(input)
+        connection_description_from_connection_string(connection_string)
 
       output_block = blocks_map |> Map.get(block_name)
 
@@ -38,5 +38,21 @@ defmodule Buildel.Blocks.Connection do
         }
       }
     end)
+  end
+
+  defp connection_description_from_connection_string(connection_string) do
+    [block_name, io_name] = connection_string |> String.split(":")
+
+    [output_name, input_name] =
+      case String.split(io_name, "->") do
+        [output_name, input_name] -> [output_name, input_name]
+        [input_name] -> ["input", input_name]
+      end
+
+    %{
+      block_name: block_name,
+      output_name: output_name,
+      input_name: input_name
+    }
   end
 end

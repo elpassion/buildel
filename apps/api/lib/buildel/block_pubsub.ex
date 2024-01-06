@@ -13,14 +13,15 @@ defmodule Buildel.BlockPubSub do
     {:ok, topic}
   end
 
-  def subscribe_to_io(context_id, block_output) do
-    %{block_name: block_name, output_name: output_name} = block_from_block_output(block_output)
+  def subscribe_to_io(context_id, connection_string) do
+    %{block_name: block_name, output_name: output_name} =
+      connection_description_from_connection_string(connection_string)
 
     subscribe(io_topic(context_id, block_name, output_name))
   end
 
-  def block_from_block_output(block_output) do
-    [block_name, io_name] = block_output |> String.split(":")
+  defp connection_description_from_connection_string(connection_string) do
+    [block_name, io_name] = connection_string |> String.split(":")
 
     [output_name, input_name] =
       case String.split(io_name, "->") do
