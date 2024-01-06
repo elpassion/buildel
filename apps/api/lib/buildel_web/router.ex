@@ -33,6 +33,8 @@ defmodule BuildelWeb.Router do
 
   ## Api routes
 
+  get "/", BuildelWeb.VersionController, :index
+
   scope "/api", BuildelWeb do
     pipe_through(:api)
 
