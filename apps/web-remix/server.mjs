@@ -125,6 +125,7 @@ async function run() {
     console.log(`✅ app ready: http://localhost:${port}`);
 
     if (process.env.NODE_ENV === "development") {
+      process.env.PAGE_URL = `http://localhost:${port}`;
       broadcastDevReady(initialBuild);
     }
   });
