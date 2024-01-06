@@ -9,6 +9,8 @@ export const routes = {
     `${routes.organization(organizationId)}/settings`,
   organizationSettings: (organizationId: OrganizationId) =>
     `${routes.settings(organizationId)}/organization`,
+  membershipsNew: (organizationId: OrganizationId) =>
+    `${routes.organizationSettings(organizationId)}/memberships/new`,
   profileSettings: (organizationId: OrganizationId) =>
     `${routes.settings(organizationId)}/profile`,
   pipelines: (organizationId: OrganizationId) =>

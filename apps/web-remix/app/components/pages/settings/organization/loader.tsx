@@ -2,7 +2,11 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
-import { APIKeyResponse, OrganizationResponse } from "./contracts";
+import {
+  APIKeyResponse,
+  MembershipsResponse,
+  OrganizationResponse,
+} from "./contracts";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -19,6 +23,15 @@ export async function loader(args: LoaderFunctionArgs) {
       `/organizations/${params.organizationId}`
     );
 
-    return json({ apiKey: apiKey.data, organization: organization.data });
+    const memberships = await fetch(
+      MembershipsResponse,
+      `/organizations/${params.organizationId}/memberships`
+    );
+
+    return json({
+      apiKey: apiKey.data,
+      organization: organization.data,
+      memberships: memberships.data,
+    });
   })(args);
 }
