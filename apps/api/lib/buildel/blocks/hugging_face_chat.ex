@@ -138,13 +138,11 @@ defmodule Buildel.Blocks.HuggingFaceChat do
 
   @impl true
   def init(
-        [
-          name: _name,
-          block_name: _block_name,
+        %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     Logger.debug("Starting chat block with opts: #{inspect(opts)}")
 
@@ -161,16 +159,16 @@ defmodule Buildel.Blocks.HuggingFaceChat do
      state
      |> assign_stream_state
      |> assign_take_latest(true)
-     |> Keyword.put(:system_message, opts[:system_message])
-     |> Keyword.put(:prompt_template, opts[:prompt_template])
-     |> Keyword.put(
+     |> Map.put(:system_message, opts[:system_message])
+     |> Map.put(:prompt_template, opts[:prompt_template])
+     |> Map.put(
        :messages,
        [%{role: "system", content: opts[:system_message]}] ++ opts[:messages]
      )
-     |> Keyword.put(:api_key, api_key)
-     |> Keyword.put(:tool_blocks, tool_blocks)
-     |> Keyword.put(:sentences, [])
-     |> Keyword.put(:sent_sentences, [])}
+     |> Map.put(:api_key, api_key)
+     |> Map.put(:tool_blocks, tool_blocks)
+     |> Map.put(:sentences, [])
+     |> Map.put(:sent_sentences, [])}
   end
 
   @impl true

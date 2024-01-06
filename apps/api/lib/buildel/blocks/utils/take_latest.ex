@@ -12,7 +12,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
             messages |> Map.put(input, nil)
           end)
 
-        state |> Keyword.put(tl_keyword(), messages) |> Keyword.put(tl_reset_keyword(), reset)
+        state |> Map.put(tl_keyword(), messages) |> Map.put(tl_reset_keyword(), reset)
       end
 
       defp save_take_latest_message(state, topic, text) do
@@ -69,7 +69,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
           messages |> Map.put(input, nil)
         end)
 
-      Keyword.put(state, tl_keyword(), messages)
+      Map.put(state, tl_keyword(), messages)
     else
       state
     end

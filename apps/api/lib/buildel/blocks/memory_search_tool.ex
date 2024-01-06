@@ -63,13 +63,11 @@ defmodule Buildel.Blocks.MemorySearchTool do
 
   @impl true
   def init(
-        [
-          name: _name,
-          block_name: _block_name,
+        %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
@@ -83,8 +81,8 @@ defmodule Buildel.Blocks.MemorySearchTool do
 
     {:ok,
      state
-     |> Keyword.put(:api_key, api_key)
-     |> Keyword.put(:collection, collection_name)
+     |> Map.put(:api_key, api_key)
+     |> Map.put(:collection, collection_name)
      |> assign_stream_state(opts)}
   end
 

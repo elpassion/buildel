@@ -51,13 +51,11 @@ defmodule Buildel.Blocks.WebhookOutput do
 
   @impl true
   def init(
-        [
-          name: _name,
-          block_name: _block_name,
+        %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
@@ -65,7 +63,7 @@ defmodule Buildel.Blocks.WebhookOutput do
       block_context().context_from_context_id(context_id)
       |> Map.put("metadata", state[:opts][:metadata])
 
-    {:ok, state |> Keyword.put(:context, context) |> assign_stream_state}
+    {:ok, state |> Map.put(:context, context) |> assign_stream_state}
   end
 
   @impl true

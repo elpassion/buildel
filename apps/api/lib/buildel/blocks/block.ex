@@ -53,16 +53,16 @@ defmodule Buildel.Blocks.Block do
       defstruct [:name, :type, opts: %{}]
       @behaviour Buildel.Blocks.BlockBehaviour
 
-      def start_link(name: name, block_name: block_name, context_id: context_id, opts: opts) do
+      def start_link(%{name: name, block_name: block_name, context_id: context_id, opts: opts}) do
         GenServer.start_link(
           __MODULE__,
-          [
+          %{
             name: name,
             block_name: block_name,
             context_id: context_id,
             type: __MODULE__,
             opts: opts
-          ],
+          },
           name: name |> String.to_atom()
         )
       end

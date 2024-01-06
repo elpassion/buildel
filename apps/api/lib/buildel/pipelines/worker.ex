@@ -51,12 +51,12 @@ defmodule Buildel.Pipelines.Worker do
           start:
             {block_type, :start_link,
              [
-               [
+               %{
                  name: block_id(run, block),
                  block_name: block.name,
                  context_id: context_id(run),
                  opts: opts
-               ]
+               }
              ]}
         }
       end

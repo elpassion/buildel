@@ -55,13 +55,11 @@ defmodule Buildel.Blocks.TextOutput do
 
   @impl true
   def init(
-        [
-          name: _name,
-          block_name: _block_name,
+        %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 

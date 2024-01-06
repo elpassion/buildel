@@ -73,13 +73,12 @@ defmodule Buildel.Blocks.SpeechToText do
 
   @impl true
   def init(
-        [
-          name: _name,
+        %{
           block_name: block_name,
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
@@ -90,7 +89,7 @@ defmodule Buildel.Blocks.SpeechToText do
 
     case deepgram().connect!(api_key, %{stream_to: self(), language: lang, model: model}) do
       {:ok, deepgram_pid} ->
-        {:ok, state |> Keyword.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
+        {:ok, state |> Map.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
 
       {:error, _reason} ->
         {:stop, {:error, block_name, :incorrect_api_key}}
@@ -107,7 +106,7 @@ defmodule Buildel.Blocks.SpeechToText do
   def handle_cast({:transcript, {:binary, chunk}}, state) do
     state = state |> send_stream_start()
 
-    state |> Keyword.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
+    state |> Map.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
 
     {:noreply, state}
   end

@@ -67,13 +67,13 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   @impl true
   def init(
-        [
+        %{
           name: name,
           block_name: block_name,
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs ++ ["#{block_name}:files"])
 
@@ -91,8 +91,8 @@ defmodule Buildel.Blocks.DocumentSearch do
       {:ok,
        state
        |> assign_stream_state
-       |> Keyword.put(:collection, collection.name)
-       |> Keyword.put(:api_key, opts |> Map.get(:api_key))}
+       |> Map.put(:collection, collection.name)
+       |> Map.put(:api_key, opts |> Map.get(:api_key))}
     else
       {:error, error} ->
         {:stop, "Failed to create collection #{inspect(name)} Error: #{inspect(error)}"}

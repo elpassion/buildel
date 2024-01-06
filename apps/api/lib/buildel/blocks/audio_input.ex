@@ -40,13 +40,11 @@ defmodule Buildel.Blocks.AudioInput do
 
   @impl true
   def init(
-        [
-          name: _name,
+        %{
           block_name: block_name,
           context_id: context_id,
-          type: __MODULE__,
-          opts: _opts
-        ] = state
+          type: __MODULE__
+        } = state
       ) do
     subscribe_to_inputs(context_id, ["#{block_name}:input"])
 

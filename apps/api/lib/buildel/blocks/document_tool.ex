@@ -58,19 +58,17 @@ defmodule Buildel.Blocks.DocumentTool do
 
   @impl true
   def init(
-        [
-          name: _name,
-          block_name: _block_name,
+        %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
     {:ok,
      state
-     |> Keyword.put(:collection, opts[:knowledge])
+     |> Map.put(:collection, opts[:knowledge])
      |> assign_stream_state(opts)}
   end
 

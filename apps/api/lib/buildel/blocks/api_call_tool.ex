@@ -88,13 +88,11 @@ defmodule Buildel.Blocks.ApiCallTool do
 
   @impl true
   def init(
-        [
-          name: _name,
-          block_name: _block_name,
+        %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
@@ -104,8 +102,8 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     {:ok,
      state
-     |> Keyword.put(:parameters, Jason.decode!(opts[:parameters]))
-     |> Keyword.put(:context, context)
+     |> Map.put(:parameters, Jason.decode!(opts[:parameters]))
+     |> Map.put(:context, context)
      |> assign_stream_state(opts)}
   end
 

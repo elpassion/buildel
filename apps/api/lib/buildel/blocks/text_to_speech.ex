@@ -50,23 +50,21 @@ defmodule Buildel.Blocks.TextToSpeech do
 
   @impl true
   def init(
-        [
-          name: _name,
-          block_name: _block_name,
+        %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
     {:ok,
      state
-     |> Keyword.put(
+     |> Map.put(
        :api_key,
        block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
      )
-     |> Keyword.put(:clips, %{})
+     |> Map.put(:clips, %{})
      |> assign_stream_state()}
   end
 

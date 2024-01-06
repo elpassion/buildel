@@ -127,13 +127,11 @@ defmodule Buildel.Blocks.Chat do
 
   @impl true
   def init(
-        [
-          name: _name,
-          block_name: _block_name,
+        %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     Logger.debug("Starting chat block with opts: #{inspect(opts)}")
 
@@ -154,13 +152,13 @@ defmodule Buildel.Blocks.Chat do
      state
      |> assign_stream_state
      |> assign_take_latest(true)
-     |> Keyword.put(:system_message, opts[:system_message])
-     |> Keyword.put(:prompt_template, opts[:prompt_template])
-     |> Keyword.put(:messages, initial_messages(state))
-     |> Keyword.put(:api_key, api_key)
-     |> Keyword.put(:tool_blocks, tool_blocks)
-     |> Keyword.put(:sentences, [])
-     |> Keyword.put(:sent_sentences, [])}
+     |> Map.put(:system_message, opts[:system_message])
+     |> Map.put(:prompt_template, opts[:prompt_template])
+     |> Map.put(:messages, initial_messages(state))
+     |> Map.put(:api_key, api_key)
+     |> Map.put(:tool_blocks, tool_blocks)
+     |> Map.put(:sentences, [])
+     |> Map.put(:sent_sentences, [])}
   end
 
   defp initial_messages(state) do
@@ -212,10 +210,7 @@ defmodule Buildel.Blocks.Chat do
         end)
 
       Task.start(fn ->
-        chat_task(%{messages: messages,
-        pid: pid,
-        tools: tools,
-        state: state})
+        chat_task(%{messages: messages, pid: pid, tools: tools, state: state})
       end)
 
       {:noreply, state}
@@ -303,18 +298,20 @@ defmodule Buildel.Blocks.Chat do
     {:noreply, state}
   end
 
-  defp chat_task(%{ messages: messages, pid: pid, tools: tools, state: state }) do
-    with :ok <- call_chat(%{
-      messages: messages,
-      pid: pid,
-      tools: tools,
-      state: state
-    }) do
+  defp chat_task(%{messages: messages, pid: pid, tools: tools, state: state}) do
+    with :ok <-
+           call_chat(%{
+             messages: messages,
+             pid: pid,
+             tools: tools,
+             state: state
+           }) do
       nil
     else
       {:error, :context_length_exceeded} ->
         with {:ok, messages} <- remove_last_non_initial_message(state) do
           state = put_in(state[:messages], messages)
+
           chat_task(%{
             messages: messages,
             pid: pid,
@@ -328,7 +325,7 @@ defmodule Buildel.Blocks.Chat do
     end
   end
 
-  defp call_chat(%{ messages: messages, pid: pid, tools: tools, state: state }) do
+  defp call_chat(%{messages: messages, pid: pid, tools: tools, state: state}) do
     chat_gpt().stream_chat(
       context: %{messages: messages},
       on_content: fn text_chunk ->
@@ -360,6 +357,7 @@ defmodule Buildel.Blocks.Chat do
         :context_length_exceeded ->
           send_error(state, "Context length exceeded")
           nil
+
         error ->
           send_error(state, error)
           finish_chat_message(pid)

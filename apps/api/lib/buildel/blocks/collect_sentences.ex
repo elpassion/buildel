@@ -43,24 +43,22 @@ defmodule Buildel.Blocks.CollectSentences do
 
   @impl true
   def init(
-        [
-          name: _name,
-          block_name: _block_name,
+        %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
-    {:ok, state |> assign_stream_state |> Keyword.put(:text, "")}
+    {:ok, state |> assign_stream_state |> Map.put(:text, "")}
   end
 
   @impl true
   def handle_cast({:save_text_chunk, {:text, text_chunk}}, state) do
     state = state |> send_stream_start("sentences_output")
     text = state[:text] <> text_chunk
-    state = state |> Keyword.put(:text, text)
+    state = state |> Map.put(:text, text)
 
     sentences = text |> Essence.Chunker.sentences()
 
@@ -78,7 +76,7 @@ defmodule Buildel.Blocks.CollectSentences do
         new_text = text |> String.replace(sentence, "") |> String.trim()
 
         state
-        |> Keyword.put(:text, new_text)
+        |> Map.put(:text, new_text)
       else
         state
       end
@@ -117,13 +115,13 @@ defmodule Buildel.Blocks.CollectSentences do
 
       state
       |> send_stream_stop("sentences_output")
-      |> Keyword.put(:text, "")
-      |> Keyword.put(:draining_again, false)
+      |> Map.put(:text, "")
+      |> Map.put(:draining_again, false)
     end
   end
 
   defp drain_again(state) do
-    state = Keyword.put(state, :draining_again, true)
+    state = Map.put(state, :draining_again, true)
     send(self(), {"", :stop_stream, "sentences_output"})
     state
   end

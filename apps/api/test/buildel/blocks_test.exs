@@ -40,12 +40,12 @@ defmodule Buildel.BlocksTest do
 
     test "broadcasts text" do
       {:ok, pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -77,7 +77,7 @@ defmodule Buildel.BlocksTest do
 
     test "broadcasts file" do
       {:ok, pid} =
-        AudioInput.start_link(name: "test", block_name: "test", context_id: "run1", opts: %{})
+        AudioInput.start_link(%{name: "test", block_name: "test", context_id: "run1", opts: %{}})
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -117,12 +117,12 @@ defmodule Buildel.BlocksTest do
 
     test "broadcasts text" do
       {:ok, pid} =
-        TextOutput.start_link(
+        TextOutput.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -164,12 +164,12 @@ defmodule Buildel.BlocksTest do
       url = "http://localhost:3002/cats"
 
       {:ok, webhook_pid} =
-        WebhookOutput.start_link(
+        WebhookOutput.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: [], url: url}
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -180,7 +180,7 @@ defmodule Buildel.BlocksTest do
 
       # TODO: Introduce a mock server to test this
       # assert_receive {:webhook_called, ^url,
-                      # "{\"content\":\"HAHAAH\",\"context\":{\"global\":\"run1\",\"local\":\"run1\",\"parent\":\"run1\"},\"topic\":\"context::run1::block::test::io::output\"}"}
+      # "{\"content\":\"HAHAAH\",\"context\":{\"global\":\"run1\",\"local\":\"run1\",\"parent\":\"run1\"},\"topic\":\"context::run1::block::test::io::output\"}"}
 
       assert_receive {^topic, :stop_stream, nil}
     end
@@ -211,12 +211,12 @@ defmodule Buildel.BlocksTest do
 
     test "broadcasts audio" do
       {:ok, pid} =
-        AudioOutput.start_link(
+        AudioOutput.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -257,15 +257,15 @@ defmodule Buildel.BlocksTest do
 
     test "audio to text works through direct calling" do
       {:ok, _input_pid} =
-        AudioInput.start_link(
+        AudioInput.start_link(%{
           name: "audio_test",
           block_name: "audio_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, pid} =
-        SpeechToText.start_link(
+        SpeechToText.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -273,7 +273,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["audio_test:output"],
             api_key: "test"
           }
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -287,15 +287,15 @@ defmodule Buildel.BlocksTest do
 
     test "audio to text works through broadcasting through input" do
       {:ok, input_pid} =
-        AudioInput.start_link(
+        AudioInput.start_link(%{
           name: "audio_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        SpeechToText.start_link(
+        SpeechToText.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -303,7 +303,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output->input"],
             api_key: "test"
           }
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -346,15 +346,15 @@ defmodule Buildel.BlocksTest do
 
     test "audio to text works through direct calling" do
       {:ok, _input_pid} =
-        AudioInput.start_link(
+        AudioInput.start_link(%{
           name: "audio_test",
           block_name: "audio_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, pid} =
-        FileSpeechToText.start_link(
+        FileSpeechToText.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -362,7 +362,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["audio_test:output"],
             api_key: "test"
           }
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -374,15 +374,15 @@ defmodule Buildel.BlocksTest do
 
     test "audio to text works through broadcasting through input" do
       {:ok, input_pid} =
-        AudioInput.start_link(
+        AudioInput.start_link(%{
           name: "audio_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        FileSpeechToText.start_link(
+        FileSpeechToText.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -390,7 +390,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output->input"],
             api_key: "test"
           }
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -428,20 +428,20 @@ defmodule Buildel.BlocksTest do
 
     test "text to audio works through direct calling" do
       {:ok, _input_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, pid} =
-        TextToSpeech.start_link(
+        TextToSpeech.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: ["text_test:output"]}
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -454,20 +454,20 @@ defmodule Buildel.BlocksTest do
 
     test "text to audio works through input" do
       {:ok, input_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        TextToSpeech.start_link(
+        TextToSpeech.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: ["text_test:output"]}
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -514,15 +514,15 @@ defmodule Buildel.BlocksTest do
 
     test "chat works through input" do
       {:ok, input_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        Chat.start_link(
+        Chat.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -536,7 +536,7 @@ defmodule Buildel.BlocksTest do
             temperature: 0.7,
             knowledge: nil
           }
-        )
+        })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -554,15 +554,15 @@ defmodule Buildel.BlocksTest do
 
     test "interpolates inputs" do
       {:ok, input_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        Chat.start_link(
+        Chat.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -576,7 +576,7 @@ defmodule Buildel.BlocksTest do
             knowledge: nil,
             inputs_blocks: []
           }
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -614,15 +614,15 @@ defmodule Buildel.BlocksTest do
 
     test "outputs value when pushed to if template does not have any input used" do
       {:ok, input_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        TakeLatest.start_link(
+        TakeLatest.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -631,7 +631,7 @@ defmodule Buildel.BlocksTest do
             template: "dupa",
             reset: false
           }
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -644,15 +644,15 @@ defmodule Buildel.BlocksTest do
 
     test "outputs value inside template" do
       {:ok, input_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        TakeLatest.start_link(
+        TakeLatest.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -661,7 +661,7 @@ defmodule Buildel.BlocksTest do
             template: "dupa {{text_test:output}}",
             reset: false
           }
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -674,23 +674,23 @@ defmodule Buildel.BlocksTest do
 
     test "waits for all templates to be filled before emitting" do
       {:ok, input_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, input_2_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test_2",
           block_name: "text_test_2",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        TakeLatest.start_link(
+        TakeLatest.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -699,7 +699,7 @@ defmodule Buildel.BlocksTest do
             template: "dupa {{text_test:output}} {{text_test_2:output}}",
             reset: false
           }
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -717,23 +717,23 @@ defmodule Buildel.BlocksTest do
 
     test "resets after emitting if reset is true" do
       {:ok, input_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, input_2_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test_2",
           block_name: "text_test_2",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        TakeLatest.start_link(
+        TakeLatest.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
@@ -742,7 +742,7 @@ defmodule Buildel.BlocksTest do
             template: "dupa {{text_test:output}} {{text_test_2:output}}",
             reset: true
           }
-        )
+        })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
 
@@ -782,22 +782,22 @@ defmodule Buildel.BlocksTest do
 
     test "outputs full sentence" do
       {:ok, input_pid} =
-        TextInput.start_link(
+        TextInput.start_link(%{
           name: "text_test",
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []}
-        )
+        })
 
       {:ok, _pid} =
-        CollectSentences.start_link(
+        CollectSentences.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
           opts: %{
             inputs: ["text_test:output"]
           }
-        )
+        })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
@@ -810,14 +810,14 @@ defmodule Buildel.BlocksTest do
 
     test "does not output not finished sentence" do
       {:ok, pid} =
-        CollectSentences.start_link(
+        CollectSentences.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
           opts: %{
             inputs: ["text_test:output"]
           }
-        )
+        })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
@@ -834,14 +834,14 @@ defmodule Buildel.BlocksTest do
 
   test "works with 2 separate inputs" do
     {:ok, pid} =
-      CollectSentences.start_link(
+      CollectSentences.start_link(%{
         name: "test",
         block_name: "test",
         context_id: "run1",
         opts: %{
           inputs: ["text_test:output"]
         }
-      )
+      })
 
     {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
@@ -865,14 +865,14 @@ defmodule Buildel.BlocksTest do
 
   test "correctly splits single input with multiple sentences" do
     {:ok, pid} =
-      CollectSentences.start_link(
+      CollectSentences.start_link(%{
         name: "test",
         block_name: "test",
         context_id: "run1",
         opts: %{
           inputs: ["text_test:output"]
         }
-      )
+      })
 
     {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
@@ -914,14 +914,14 @@ defmodule Buildel.BlocksTest do
 
     test "works with 2 separate inputs" do
       {:ok, pid} =
-        CollectSentences.start_link(
+        CollectSentences.start_link(%{
           name: "test",
           block_name: "test",
           context_id: "run1",
           opts: %{
             inputs: ["text_test:output"]
           }
-        )
+        })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 

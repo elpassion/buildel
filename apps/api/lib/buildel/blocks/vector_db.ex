@@ -64,13 +64,12 @@ defmodule Buildel.Blocks.VectorDB do
 
   @impl true
   def init(
-        [
+        %{
           name: name,
-          block_name: _block_name,
           context_id: context_id,
           type: __MODULE__,
           opts: opts
-        ] = state
+        } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
@@ -79,8 +78,8 @@ defmodule Buildel.Blocks.VectorDB do
     {:ok,
      state
      |> assign_stream_state
-     |> Keyword.put(:collection, collection.name)
-     |> Keyword.put(
+     |> Map.put(:collection, collection.name)
+     |> Map.put(
        :api_key,
        block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
      )}
