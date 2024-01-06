@@ -25,7 +25,7 @@ defmodule Buildel.BlockPubSub do
     [output_name, input_name] =
       case String.split(io_name, "->") do
         [output_name, input_name] -> [output_name, input_name]
-        [input_name] -> ["output", input_name]
+        [input_name] -> ["input", input_name]
       end
 
     %{

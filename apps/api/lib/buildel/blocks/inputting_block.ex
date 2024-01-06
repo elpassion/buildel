@@ -12,13 +12,16 @@ defmodule Buildel.Blocks.InputtingBlock do
 
       output_block = blocks_map |> Map.get(block_name)
 
+      input_options = Buildel.Blocks.type(block["type"]).options
+      output_options = Buildel.Blocks.type(output_block["type"]).options
+
       input =
-        (block["block_type"]["inputs"] ++ block["block_type"]["ios"])
-        |> Enum.find(fn %{"name" => name} -> name == input_name end)
+        (input_options[:inputs] ++ input_options[:ios])
+        |> Enum.find(fn %{name: name} -> name == input_name end)
 
       output =
-        (output_block["block_type"]["outputs"] ++ output_block["block_type"]["ios"])
-        |> Enum.find(fn %{"name" => name} -> name == output_name end)
+        (output_options[:inputs] ++ output_options[:ios])
+        |> Enum.find(fn %{name: name} -> name == output_name end)
 
       %Buildel.Blocks.InputtingBlock{
         block_name: block_name,

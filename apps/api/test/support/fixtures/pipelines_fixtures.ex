@@ -14,7 +14,8 @@ defmodule Buildel.PipelinesFixtures do
               "name" => "random_block",
               "type" => "audio_input",
               "opts" => %{},
-              "inputs" => []
+              "inputs" => [],
+              "ios" => []
             },
             %{
               "name" => "random_block_2",
@@ -22,19 +23,22 @@ defmodule Buildel.PipelinesFixtures do
               "opts" => %{
                 "api_key" => "some_api_key"
               },
-              "inputs" => ["random_block:output"]
+              "inputs" => ["random_block:output"],
+              "ios" => []
             },
             %{
               "name" => "random_block_3",
               "type" => "text_output",
               "opts" => %{},
-              "inputs" => ["random_block_2:output"]
+              "inputs" => ["random_block_2:output"],
+              "ios" => []
             },
             %{
               "name" => "random_block_4",
               "type" => "audio_output",
               "opts" => %{},
-              "inputs" => ["random_block:output"]
+              "inputs" => ["random_block:output"],
+              "ios" => []
             }
           ]
         }

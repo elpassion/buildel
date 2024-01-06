@@ -53,7 +53,13 @@ defmodule Buildel.Blocks.Block do
       defstruct [:name, :type, opts: %{}]
       @behaviour Buildel.Blocks.BlockBehaviour
 
-      def start_link(%{name: name, block_name: block_name, context_id: context_id, opts: opts}) do
+      def start_link(%{
+            name: name,
+            block_name: block_name,
+            context_id: context_id,
+            opts: opts,
+            inputting_blocks: inputting_blocks
+          }) do
         GenServer.start_link(
           __MODULE__,
           %{
@@ -61,7 +67,8 @@ defmodule Buildel.Blocks.Block do
             block_name: block_name,
             context_id: context_id,
             type: __MODULE__,
-            opts: opts
+            opts: opts,
+            inputting_blocks: inputting_blocks
           },
           name: name |> String.to_atom()
         )

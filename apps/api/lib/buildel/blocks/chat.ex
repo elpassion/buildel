@@ -126,16 +126,24 @@ defmodule Buildel.Blocks.Chat do
   # Server
 
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
+  def init(
+        %{
+          context_id: context_id,
+          type: __MODULE__,
+          opts: opts,
+          inputting_blocks: inputting_blocks
+        } = state
+      ) do
     subscribe_to_inputs(context_id, opts.inputs)
 
     api_key =
       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
 
     tool_blocks =
-      opts.inputs_blocks
-      |> Enum.filter(fn block ->
-        block["block_type"]["ios"] |> Enum.any?(fn io -> io["type"] == "worker" end)
+      inputting_blocks
+      |> Enum.filter(fn
+        %{input: %{type: "controller"}} -> true
+        _ -> false
       end)
 
     {:ok,
@@ -195,7 +203,7 @@ defmodule Buildel.Blocks.Chat do
       tools =
         state[:tool_blocks]
         |> Enum.map(fn block ->
-          pid = block_context().block_pid(state[:context_id], block["name"])
+          pid = block_context().block_pid(state[:context_id], block.block_name)
           Buildel.Blocks.Block.function(pid)
         end)
 
