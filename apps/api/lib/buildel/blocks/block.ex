@@ -1,6 +1,6 @@
 defmodule Buildel.Blocks.Block do
   alias Buildel.BlockPubSub
-  defstruct [:name, :type, :inputting_blocks, opts: %{}]
+  defstruct [:name, :type, :connections, opts: %{}]
 
   def audio_input(name \\ "input", public \\ false),
     do: %{name: name, type: "audio", public: public}
@@ -58,7 +58,7 @@ defmodule Buildel.Blocks.Block do
             block_name: block_name,
             context_id: context_id,
             opts: opts,
-            inputting_blocks: inputting_blocks
+            connections: connections
           }) do
         GenServer.start_link(
           __MODULE__,
@@ -68,7 +68,7 @@ defmodule Buildel.Blocks.Block do
             context_id: context_id,
             type: __MODULE__,
             opts: opts,
-            inputting_blocks: inputting_blocks
+            connections: connections
           },
           name: name |> String.to_atom()
         )

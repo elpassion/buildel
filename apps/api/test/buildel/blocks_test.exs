@@ -45,7 +45,7 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -83,7 +83,7 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -129,7 +129,7 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -177,7 +177,7 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: [], url: url},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -225,7 +225,7 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -272,7 +272,7 @@ defmodule Buildel.BlocksTest do
           block_name: "audio_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, pid} =
@@ -284,7 +284,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["audio_test:output"],
             api_key: "test"
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -304,7 +304,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -316,7 +316,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output->input"],
             api_key: "test"
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -365,7 +365,7 @@ defmodule Buildel.BlocksTest do
           block_name: "audio_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, pid} =
@@ -377,7 +377,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["audio_test:output"],
             api_key: "test"
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -395,7 +395,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -407,7 +407,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output->input"],
             api_key: "test"
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -451,7 +451,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, pid} =
@@ -460,7 +460,7 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: ["text_test:output"]},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -479,7 +479,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -488,7 +488,7 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{inputs: ["text_test:output->input"]},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -541,7 +541,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -558,8 +558,8 @@ defmodule Buildel.BlocksTest do
             temperature: 0.7,
             knowledge: nil
           },
-          inputting_blocks: [
-            %Blocks.InputtingBlock{
+          connections: [
+            %Blocks.Connection{
               block_name: "text_test",
               input: %Blocks.Input{name: "input", type: "text"},
               output: %Blocks.Output{name: "output", type: "text"},
@@ -589,7 +589,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -606,8 +606,8 @@ defmodule Buildel.BlocksTest do
             temperature: 0.7,
             knowledge: nil
           },
-          inputting_blocks: [
-            %Blocks.InputtingBlock{
+          connections: [
+            %Blocks.Connection{
               block_name: "text_test",
               input: %Blocks.Input{name: "input", type: "text"},
               output: %Blocks.Output{name: "output", type: "text"},
@@ -657,7 +657,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -670,7 +670,7 @@ defmodule Buildel.BlocksTest do
             template: "dupa",
             reset: false
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -689,7 +689,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -702,7 +702,7 @@ defmodule Buildel.BlocksTest do
             template: "dupa {{text_test:output}}",
             reset: false
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -721,7 +721,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, input_2_pid} =
@@ -730,7 +730,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test_2",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -743,7 +743,7 @@ defmodule Buildel.BlocksTest do
             template: "dupa {{text_test:output}} {{text_test_2:output}}",
             reset: false
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -767,7 +767,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, input_2_pid} =
@@ -776,7 +776,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test_2",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -789,7 +789,7 @@ defmodule Buildel.BlocksTest do
             template: "dupa {{text_test:output}} {{text_test_2:output}}",
             reset: true
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -835,7 +835,7 @@ defmodule Buildel.BlocksTest do
           block_name: "text_test",
           context_id: "run1",
           opts: %{inputs: []},
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, _pid} =
@@ -846,7 +846,7 @@ defmodule Buildel.BlocksTest do
           opts: %{
             inputs: ["text_test:output->input"]
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
@@ -867,7 +867,7 @@ defmodule Buildel.BlocksTest do
           opts: %{
             inputs: ["text_test:output"]
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
@@ -892,7 +892,7 @@ defmodule Buildel.BlocksTest do
         opts: %{
           inputs: ["text_test:output->input"]
         },
-        inputting_blocks: []
+        connections: []
       })
 
     {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
@@ -924,7 +924,7 @@ defmodule Buildel.BlocksTest do
         opts: %{
           inputs: ["text_test:output->input"]
         },
-        inputting_blocks: []
+        connections: []
       })
 
     {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
@@ -974,7 +974,7 @@ defmodule Buildel.BlocksTest do
           opts: %{
             inputs: ["text_test:output->input"]
           },
-          inputting_blocks: []
+          connections: []
         })
 
       {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")

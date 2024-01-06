@@ -43,7 +43,7 @@ defmodule Buildel.Pipelines.Worker do
     blocks = Pipelines.blocks_for_run(run)
 
     children =
-      for %Blocks.Block{type: type, opts: opts, name: name, inputting_blocks: inputting_blocks} =
+      for %Blocks.Block{type: type, opts: opts, name: name, connections: connections} =
             block <- blocks do
         block_type = if is_binary(type), do: Blocks.type(type), else: type
 
@@ -56,7 +56,7 @@ defmodule Buildel.Pipelines.Worker do
                  name: block_id(run, block),
                  block_name: name,
                  context_id: context_id(run),
-                 inputting_blocks: inputting_blocks,
+                 connections: connections,
                  opts: opts
                }
              ]}

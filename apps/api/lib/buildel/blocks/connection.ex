@@ -1,7 +1,7 @@
-defmodule Buildel.Blocks.InputtingBlock do
+defmodule Buildel.Blocks.Connection do
   defstruct [:block_name, :output, :input, :opts]
 
-  def inputting_blocks_for_block(block_name, blocks_map) do
+  def connections_for_block(block_name, blocks_map) do
     block = blocks_map |> Map.get(block_name)
 
     block
@@ -23,7 +23,7 @@ defmodule Buildel.Blocks.InputtingBlock do
         (output_options[:outputs] ++ output_options[:ios])
         |> Enum.find(fn %{name: name} -> name == output_name end)
 
-      %Buildel.Blocks.InputtingBlock{
+      %Buildel.Blocks.Connection{
         block_name: block_name,
         output: %Buildel.Blocks.Output{
           name: output["name"],

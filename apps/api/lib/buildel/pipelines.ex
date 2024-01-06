@@ -109,8 +109,8 @@ defmodule Buildel.Pipelines do
           %Buildel.Blocks.Block{
             name: block["name"],
             type: block["type"],
-            inputting_blocks:
-              Buildel.Blocks.InputtingBlock.inputting_blocks_for_block(block["name"], blocks_map),
+            connections:
+              Buildel.Blocks.Connection.connections_for_block(block["name"], blocks_map),
             opts:
               block["opts"]
               |> keys_to_atoms()

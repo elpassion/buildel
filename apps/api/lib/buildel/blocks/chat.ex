@@ -131,7 +131,7 @@ defmodule Buildel.Blocks.Chat do
           context_id: context_id,
           type: __MODULE__,
           opts: opts,
-          inputting_blocks: inputting_blocks
+          connections: connections
         } = state
       ) do
     subscribe_to_inputs(context_id, opts.inputs)
@@ -140,7 +140,7 @@ defmodule Buildel.Blocks.Chat do
       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
 
     tool_blocks =
-      inputting_blocks
+      connections
       |> Enum.filter(fn
         %{input: %{type: "controller"}} -> true
         _ -> false
