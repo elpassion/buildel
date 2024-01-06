@@ -144,11 +144,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
           opts: opts
         } = state
       ) do
-    Logger.debug("Starting chat block with opts: #{inspect(opts)}")
-
     subscribe_to_inputs(context_id, opts.inputs)
-
-    Logger.debug("Chat block subscribed to input")
 
     api_key =
       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
