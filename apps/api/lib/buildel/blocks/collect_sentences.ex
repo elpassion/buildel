@@ -42,13 +42,7 @@ defmodule Buildel.Blocks.CollectSentences do
   # Server
 
   @impl true
-  def init(
-        %{
-          context_id: context_id,
-          type: __MODULE__,
-          opts: opts
-        } = state
-      ) do
+  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
     subscribe_to_inputs(context_id, opts.inputs)
 
     {:ok, state |> assign_stream_state |> Map.put(:text, "")}

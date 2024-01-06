@@ -39,13 +39,7 @@ defmodule Buildel.Blocks.TextInput do
   # Server
 
   @impl true
-  def init(
-        %{
-          block_name: block_name,
-          context_id: context_id,
-          type: __MODULE__
-        } = state
-      ) do
+  def init(%{context_id: context_id, type: __MODULE__, block_name: block_name} = state) do
     subscribe_to_inputs(context_id, ["#{block_name}:input"])
 
     {:ok, state |> assign_stream_state}
