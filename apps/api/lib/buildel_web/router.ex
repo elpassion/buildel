@@ -45,7 +45,7 @@ defmodule BuildelWeb.Router do
     )
 
     resources("/organizations/:organization_id/memberships", OrganizationMembershipController,
-      only: [:index]
+      only: [:index, :create]
     )
 
     post(
