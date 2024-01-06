@@ -20,7 +20,7 @@ defmodule Buildel.Blocks.InputtingBlock do
         |> Enum.find(fn %{name: name} -> name == input_name end)
 
       output =
-        (output_options[:inputs] ++ output_options[:ios])
+        (output_options[:outputs] ++ output_options[:ios])
         |> Enum.find(fn %{name: name} -> name == output_name end)
 
       %Buildel.Blocks.InputtingBlock{
