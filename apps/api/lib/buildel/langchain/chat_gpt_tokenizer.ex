@@ -2,8 +2,10 @@ defmodule Buildel.Langchain.ChatGptTokenizer do
   defstruct [:model, :tokenizer]
 
   def init(model) do
+    tokenizer_dir = Application.app_dir(:buildel, "priv/models/tokenizers")
+
     {:ok, tokenizer} =
-      Tokenizers.Tokenizer.from_file("./lib/buildel/langchain/gpt-tokenizer.json")
+      Tokenizers.Tokenizer.from_file("#{tokenizer_dir}/gpt-tokenizer.json")
 
     %__MODULE__{model: model, tokenizer: tokenizer}
   end
