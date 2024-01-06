@@ -22,15 +22,16 @@ defmodule Buildel.BlockPubSub do
   def block_from_block_output(block_output) do
     [block_name, io_name] = block_output |> String.split(":")
 
-    output_name =
+    [output_name, input_name] =
       case String.split(io_name, "->") do
-        [output_name, _] -> output_name
-        output_name -> output_name
+        [output_name, input_name] -> [output_name, input_name]
+        [input_name] -> ["output", input_name]
       end
 
     %{
       block_name: block_name,
-      output_name: output_name
+      output_name: output_name,
+      input_name: input_name
     }
   end
 

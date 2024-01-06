@@ -1,6 +1,6 @@
 defmodule Buildel.Blocks.Block do
   alias Buildel.BlockPubSub
-  defstruct [:name, :type, opts: %{}]
+  defstruct [:name, :type, :inputting_blocks, opts: %{}]
 
   def audio_input(name \\ "input", public \\ false),
     do: %{name: name, type: "audio", public: public}
