@@ -98,9 +98,8 @@ defmodule Buildel.Organizations do
     Organization |> Repo.get(organization_id) |> Repo.preload(:members) |> Map.get(:members)
   end
 
-  def list_organization_memberships(organization_id) do
-    Organization
-    |> Repo.get(organization_id)
+  def list_organization_memberships(%Organization{} = organization) do
+    organization
     |> Repo.preload(memberships: [:user])
     |> Map.get(:memberships)
   end

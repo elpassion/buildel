@@ -44,6 +44,10 @@ defmodule BuildelWeb.Router do
       only: [:index, :delete, :create, :show, :update]
     )
 
+    resources("/organizations/:organization_id/memberships", OrganizationMembershipController,
+      only: [:index]
+    )
+
     post(
       "/organizations/:organization_id/pipelines/:pipeline_id/runs/:id/start",
       OrganizationPipelineRunController,
