@@ -106,11 +106,20 @@ defmodule Buildel.Pipelines do
 
         blocks
         |> Enum.map(fn block ->
+          connections =
+            if block["connections"] do
+              Buildel.Blocks.Connection.connections_for_block_from_api_connections(
+                block["name"],
+                blocks_map
+              )
+            else
+              Buildel.Blocks.Connection.connections_for_block(block["name"], blocks_map)
+            end
+
           %Buildel.Blocks.Block{
             name: block["name"],
             type: block["type"],
-            connections:
-              Buildel.Blocks.Connection.connections_for_block(block["name"], blocks_map),
+            connections: connections,
             opts:
               block["opts"]
               |> keys_to_atoms()

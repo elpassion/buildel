@@ -1,3 +1,3 @@
 defmodule Buildel.Blocks.Input do
-  defstruct [:name, :type]
+  defstruct [:name, :type, :block_name]
 end

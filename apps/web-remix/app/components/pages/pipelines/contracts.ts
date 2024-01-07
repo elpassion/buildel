@@ -20,6 +20,20 @@ export const BlockConfig = z.object({
   name: z.string(),
   opts: z.record(z.string(), z.any()),
   inputs: z.array(z.string()),
+  connections: z
+    .array(
+      z.object({
+        from: z.object({
+          block_name: z.string(),
+          output_name: z.string(),
+        }),
+        to: z.object({
+          block_name: z.string(),
+          input_name: z.string(),
+        }),
+      })
+    )
+    .optional(),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
   block_type: BlockType,
@@ -29,6 +43,18 @@ export const UpdateBlockConfig = z.object({
   name: z.string(),
   opts: z.record(z.string(), z.any()),
   inputs: z.array(z.string()),
+  connections: z.array(
+    z.object({
+      from: z.object({
+        block_name: z.string(),
+        output_name: z.string(),
+      }),
+      to: z.object({
+        block_name: z.string(),
+        input_name: z.string(),
+      }),
+    })
+  ),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
   block_type: BlockType.optional(),

@@ -75,15 +75,27 @@ export function toPipelineConfig(
 
   tmpNodes.forEach((node) => {
     node.data.inputs = [];
+    node.data.connections = [];
   });
 
   edges.forEach((edge) => {
     const targetNode = tmpNodes.find((node) => node.id === edge.target);
+
     if (!targetNode) return;
 
     targetNode.data.inputs.push(
       `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}`
     );
+    targetNode.data.connections!.push({
+      from: {
+        block_name: edge.source,
+        output_name: edge.sourceHandle!,
+      },
+      to: {
+        block_name: edge.target,
+        input_name: edge.targetHandle!,
+      },
+    });
   });
 
   return {

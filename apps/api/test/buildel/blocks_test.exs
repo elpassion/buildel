@@ -281,10 +281,12 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{
-            inputs: ["audio_test:output"],
+            inputs: ["audio_test:output->input"],
             api_key: "test"
           },
-          connections: []
+          connections: [
+            Blocks.Connection.from_connection_string("audio_test:output->input", "audio")
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -317,12 +319,7 @@ defmodule Buildel.BlocksTest do
             api_key: "test"
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
         })
 
@@ -381,10 +378,12 @@ defmodule Buildel.BlocksTest do
           block_name: "test",
           context_id: "run1",
           opts: %{
-            inputs: ["audio_test:output"],
+            inputs: ["audio_test:output->input"],
             api_key: "test"
           },
-          connections: []
+          connections: [
+            Blocks.Connection.from_connection_string("audio_test:output->input", "audio")
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -415,12 +414,7 @@ defmodule Buildel.BlocksTest do
             api_key: "test"
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "audio")
           ]
         })
 
@@ -473,8 +467,10 @@ defmodule Buildel.BlocksTest do
           name: "test",
           block_name: "test",
           context_id: "run1",
-          opts: %{inputs: ["text_test:output"]},
-          connections: []
+          opts: %{inputs: ["text_test:output->input"]},
+          connections: [
+            Blocks.Connection.from_connection_string("text_test:output->input", "audio")
+          ]
         })
 
       {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
@@ -503,12 +499,7 @@ defmodule Buildel.BlocksTest do
           context_id: "run1",
           opts: %{inputs: ["text_test:output->input"]},
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "audio")
           ]
         })
 
@@ -580,12 +571,7 @@ defmodule Buildel.BlocksTest do
             knowledge: nil
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
         })
 
@@ -628,12 +614,7 @@ defmodule Buildel.BlocksTest do
             knowledge: nil
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
         })
 
@@ -692,12 +673,7 @@ defmodule Buildel.BlocksTest do
             reset: false
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
         })
 
@@ -731,12 +707,7 @@ defmodule Buildel.BlocksTest do
             reset: false
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
         })
 
@@ -779,18 +750,8 @@ defmodule Buildel.BlocksTest do
             reset: false
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            },
-            %Blocks.Connection{
-              block_name: "text_test_2",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text"),
+            Blocks.Connection.from_connection_string("text_test_2:output->input", "text")
           ]
         })
 
@@ -838,18 +799,8 @@ defmodule Buildel.BlocksTest do
             reset: true
           },
           connections: [
-            %Buildel.Blocks.Connection{
-              block_name: "text_test",
-              input: %Buildel.Blocks.Input{name: "input", type: "text"},
-              output: %Buildel.Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            },
-            %Buildel.Blocks.Connection{
-              block_name: "text_test_2",
-              input: %Buildel.Blocks.Input{name: "input", type: "text"},
-              output: %Buildel.Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text"),
+            Blocks.Connection.from_connection_string("text_test_2:output->input", "text")
           ]
         })
 
@@ -908,12 +859,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output->input"]
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
         })
 
@@ -936,12 +882,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output->input"]
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
         })
 
@@ -968,12 +909,7 @@ defmodule Buildel.BlocksTest do
           inputs: ["text_test:output->input"]
         },
         connections: [
-          %Blocks.Connection{
-            block_name: "text_test",
-            input: %Blocks.Input{name: "input", type: "text"},
-            output: %Blocks.Output{name: "output", type: "text"},
-            opts: %{reset: true}
-          }
+          Blocks.Connection.from_connection_string("text_test:output->input", "text")
         ]
       })
 
@@ -1007,12 +943,7 @@ defmodule Buildel.BlocksTest do
           inputs: ["text_test:output->input"]
         },
         connections: [
-          %Blocks.Connection{
-            block_name: "text_test",
-            input: %Blocks.Input{name: "input", type: "text"},
-            output: %Blocks.Output{name: "output", type: "text"},
-            opts: %{reset: true}
-          }
+          Blocks.Connection.from_connection_string("text_test:output->input", "text")
         ]
       })
 
@@ -1064,12 +995,7 @@ defmodule Buildel.BlocksTest do
             inputs: ["text_test:output->input"]
           },
           connections: [
-            %Blocks.Connection{
-              block_name: "text_test",
-              input: %Blocks.Input{name: "input", type: "text"},
-              output: %Blocks.Output{name: "output", type: "text"},
-              opts: %{reset: true}
-            }
+            Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
         })
 

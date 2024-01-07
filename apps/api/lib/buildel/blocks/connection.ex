@@ -1,34 +1,88 @@
 defmodule Buildel.Blocks.Connection do
-  defstruct [:block_name, :output, :input, :opts]
+  defstruct [:from, :to, :opts]
 
-  def connections_for_block(block_name, blocks_map) do
-    block = blocks_map |> Map.fetch!(block_name)
+  def from_connection_string(connection_string, to_type, from_type \\ nil) do
+    %{block_name: block_name, input_name: input_name, output_name: output_name} =
+      connection_description_from_connection_string(connection_string)
 
-    block
+    from_type = from_type || to_type
+
+    %Buildel.Blocks.Connection{
+      from: %Buildel.Blocks.Output{name: output_name, block_name: block_name, type: from_type},
+      to: %Buildel.Blocks.Input{name: input_name, block_name: block_name, type: to_type},
+      opts: %{reset: true}
+    }
+  end
+
+  def from_api_connection(connection, to_type, from_type \\ nil) do
+    %Buildel.Blocks.Connection{
+      from: %Buildel.Blocks.Output{
+        name: connection["from"]["output_name"],
+        block_name: connection["from"]["block_name"],
+        type: from_type
+      },
+      to: %Buildel.Blocks.Input{
+        name: connection["to"]["input_name"],
+        block_name: connection["to"]["block_name"],
+        type: to_type
+      },
+      opts: %{reset: true}
+    }
+  end
+
+  def connections_for_block(to_block_name, blocks_map) do
+    to_block = blocks_map |> Map.fetch!(to_block_name)
+
+    to_block
     |> Map.get("inputs")
     |> Enum.map(fn connection_string ->
-      %{block_name: block_name, input_name: input_name, output_name: output_name} =
+      %{block_name: from_block_name, input_name: input_name, output_name: output_name} =
         connection_description_from_connection_string(connection_string)
 
-      output_block = blocks_map |> Map.get(block_name)
+      from_block = blocks_map |> Map.get(from_block_name)
 
-      input_options = Buildel.Blocks.type(block["type"]).options
-      output_options = Buildel.Blocks.type(output_block["type"]).options
+      to_options = Buildel.Blocks.type(to_block["type"]).options
+      from_options = Buildel.Blocks.type(from_block["type"]).options
 
-      input =
-        (input_options[:inputs] ++ input_options[:ios])
+      to =
+        (to_options[:inputs] ++ to_options[:ios])
         |> Enum.find(fn %{name: name} -> name == input_name end)
 
-      output =
-        (output_options[:outputs] ++ output_options[:ios])
+      from =
+        (from_options[:outputs] ++ from_options[:ios])
         |> Enum.find(fn %{name: name} -> name == output_name end)
 
       %Buildel.Blocks.Connection{
-        block_name: block_name,
-        output: %Buildel.Blocks.Output{name: output.name, type: output.type},
-        input: %Buildel.Blocks.Input{name: input.name, type: input.type},
+        from: %Buildel.Blocks.Output{
+          name: from.name,
+          type: from.type,
+          block_name: from_block_name
+        },
+        to: %Buildel.Blocks.Input{name: to.name, type: to.type, block_name: to_block_name},
         opts: %{reset: true}
       }
+    end)
+  end
+
+  def connections_for_block_from_api_connections(to_block_name, blocks_map) do
+    block = blocks_map |> Map.fetch!(to_block_name)
+
+    block["connections"]
+    |> Enum.map(fn connection ->
+      to_options = Buildel.Blocks.type(block["type"]).options
+
+      to =
+        (to_options[:inputs] ++ to_options[:ios])
+        |> Enum.find(fn %{name: name} -> name == connection["to"]["input_name"] end)
+
+      from_block = blocks_map |> Map.get(connection["from"]["block_name"])
+      from_options = Buildel.Blocks.type(from_block["type"]).options
+
+      from =
+        (from_options[:outputs] ++ from_options[:ios])
+        |> Enum.find(fn %{name: name} -> name == connection["from"]["output_name"] end)
+
+      Buildel.Blocks.Connection.from_api_connection(connection, to.type, from.type)
     end)
   end
 
