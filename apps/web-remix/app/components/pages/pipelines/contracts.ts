@@ -31,12 +31,16 @@ export const BlockConfig = z.object({
           block_name: z.string(),
           input_name: z.string(),
         }),
-        opts: z.object({
-          reset: z.boolean(),
-        }),
+        opts: z
+          .object({
+            reset: z.boolean().default(true),
+          })
+          .default({
+            reset: true,
+          }),
       })
     )
-    .optional(),
+    .default([]),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
   block_type: BlockType,
@@ -56,9 +60,14 @@ export const UpdateBlockConfig = z.object({
         block_name: z.string(),
         input_name: z.string(),
       }),
-      opts: z.object({
-        reset: z.boolean(),
-      }),
+      opts: z
+        .object({
+          reset: z.boolean().optional().default(true),
+        })
+        .optional()
+        .default({
+          reset: true,
+        }),
     })
   ),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
