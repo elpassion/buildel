@@ -83,8 +83,10 @@ defmodule Buildel.Organizations do
     Organization.changeset(organization, attrs)
   end
 
-  def get_member(%Organization{} = organization) do
-    case Repo.get_by(Membership, organization_id: organization.id) do
+  def get_first_member(%Organization{} = organization) do
+    organization_id = organization.id
+
+    case Repo.one(from(m in Membership, where: m.organization_id == ^organization_id)) do
       nil -> {:error, :not_found}
       %Membership{} = membership -> {:ok, membership |> Repo.preload(:user) |> Map.get(:user)}
     end

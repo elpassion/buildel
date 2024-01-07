@@ -31,6 +31,9 @@ export const BlockConfig = z.object({
           block_name: z.string(),
           input_name: z.string(),
         }),
+        opts: z.object({
+          reset: z.boolean(),
+        }),
       })
     )
     .optional(),
@@ -52,6 +55,9 @@ export const UpdateBlockConfig = z.object({
       to: z.object({
         block_name: z.string(),
         input_name: z.string(),
+      }),
+      opts: z.object({
+        reset: z.boolean(),
       }),
     })
   ),

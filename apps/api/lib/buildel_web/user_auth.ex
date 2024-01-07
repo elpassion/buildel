@@ -91,7 +91,7 @@ defmodule BuildelWeb.UserAuth do
       {nil, conn} ->
         with {token, conn} when is_binary(token) <- ensure_api_token(conn),
              {:ok, organization} <- Organizations.get_organization_by_api_key(token),
-             {:ok, user} <- Organizations.get_member(organization) do
+             {:ok, user} <- Organizations.get_first_member(organization) do
           assign(conn, :current_user, user)
         else
           _ ->
