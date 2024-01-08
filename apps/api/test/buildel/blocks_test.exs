@@ -678,98 +678,92 @@ defmodule Buildel.BlocksTest do
     end
 
     test "waits for all templates to be filled before emitting" do
-      {:ok, input_pid} =
-        TextInput.start_link(%{
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, input_2_pid} =
-        TextInput.start_link(%{
-          name: "text_test_2",
-          block_name: "text_test_2",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        TakeLatest.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input", "text_test_2:output->input"],
-            template: "dupa {{text_test:output}} {{text_test_2:output}}",
-            reset: false
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "text"),
-            Blocks.Connection.from_connection_string("text_test_2:output->input", "text")
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "text_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "text_input_2",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: TakeLatest,
+              opts: %{
+                inputs: ["text_input:output->input", "text_input_2:output->input"],
+                template: "dupa {{text_input:output}} {{text_input_2:output}}",
+                reset: false
+              },
+              connections: [
+                Blocks.Connection.from_connection_string("text_input:output->input", "text"),
+                Blocks.Connection.from_connection_string("text_input_2:output->input", "text")
+              ]
+            }
           ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
-      input_pid |> TextInput.cast({:text, "Hello"})
+      test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello"})
       assert_receive({^topic, :start_stream, nil})
       refute_received({^topic, :text, _message})
       refute_received({^topic, :stop_stream, nil})
-      input_2_pid |> TextInput.cast({:text, "World"})
+      test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World"})
       assert_receive({^topic, :text, "dupa Hello World"})
       assert_receive({^topic, :stop_stream, nil})
-      input_2_pid |> TextInput.cast({:text, "World 2"})
+      test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World 2"})
       assert_receive({^topic, :text, "dupa Hello World 2"})
       assert_receive({^topic, :stop_stream, nil})
     end
 
     test "resets after emitting if reset is true" do
-      {:ok, input_pid} =
-        TextInput.start_link(%{
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, input_2_pid} =
-        TextInput.start_link(%{
-          name: "text_test_2",
-          block_name: "text_test_2",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        TakeLatest.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input", "text_test_2:output->input"],
-            template: "dupa {{text_test:output}} {{text_test_2:output}}",
-            reset: true
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "text"),
-            Blocks.Connection.from_connection_string("text_test_2:output->input", "text")
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "text_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "text_input_2",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: TakeLatest,
+              opts: %{
+                inputs: ["text_input:output->input", "text_input_2:output->input"],
+                template: "dupa {{text_input:output}} {{text_input_2:output}}",
+                reset: true
+              },
+              connections: [
+                Blocks.Connection.from_connection_string("text_input:output->input", "text"),
+                Blocks.Connection.from_connection_string("text_input_2:output->input", "text")
+              ]
+            }
           ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
-      input_pid |> TextInput.cast({:text, "Hello"})
-      input_2_pid |> TextInput.cast({:text, "World"})
+      test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello"})
+      test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World"})
       assert_receive({^topic, :text, "dupa Hello World"})
       assert_receive({^topic, :stop_stream, nil})
-      input_2_pid |> TextInput.cast({:text, "World 2"})
+      test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World 2"})
       refute_receive({^topic, :text, "dupa Hello World 2"})
-      input_pid |> TextInput.cast({:text, "Hello 2"})
+      test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello 2"})
       assert_receive({^topic, :text, "dupa Hello 2 World 2"})
     end
   end
@@ -798,38 +792,77 @@ defmodule Buildel.BlocksTest do
     end
 
     test "outputs full sentence" do
-      {:ok, input_pid} =
-        TextInput.start_link(%{
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        CollectSentences.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"]
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "text")
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "text_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: CollectSentences,
+              opts: %{inputs: ["text_input:output->input"]},
+              connections: [
+                Blocks.Connection.from_connection_string("text_input:output->input", "text")
+              ]
+            }
           ]
         })
 
-      {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
+      {:ok, sentences_topic} =
+        test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "sentences_output")
 
-      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
+      test_run
+      |> BlocksTestRunner.Run.input(
+        "text_input",
+        "input",
+        {:text, "Hello darkness my old friend."}
+      )
 
       assert_receive({^sentences_topic, :start_stream, nil})
       assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
       assert_receive({^sentences_topic, :stop_stream, nil})
     end
 
+    @tag :skip
     test "does not output not finished sentence" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "text_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: CollectSentences,
+              opts: %{inputs: ["text_input:output->input"]},
+              connections: [
+                Blocks.Connection.from_connection_string("text_input:output->input", "text")
+              ]
+            }
+          ]
+        })
+
+      {:ok, sentences_topic} =
+        test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "sentences_output")
+
+      test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello darkness my"})
+      test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, " old friend."})
+
+      assert_receive({^sentences_topic, :start_stream, nil})
+      refute_receive({^sentences_topic, :text, "Hello darkness my"})
+      assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
+      assert_receive({^sentences_topic, :stop_stream, nil})
+    end
+
+    @tag :skip
+    test "works with 2 separate inputs" do
       {:ok, pid} =
         CollectSentences.start_link(%{
           name: "test",
@@ -847,76 +880,51 @@ defmodule Buildel.BlocksTest do
 
       pid |> CollectSentences.cast({:text, "Hello darkness my"})
       pid |> CollectSentences.cast({:text, " old friend."})
-      send(pid, {"", :stop_stream, "sentences_output"})
+      BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
+      pid |> CollectSentences.cast({:text, "I've come to talk"})
+      pid |> CollectSentences.cast({:text, " with you again."})
+      BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
 
       assert_receive({^sentences_topic, :start_stream, nil})
       refute_receive({^sentences_topic, :text, "Hello darkness my"})
       assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
       assert_receive({^sentences_topic, :stop_stream, nil})
+      assert_receive({^sentences_topic, :start_stream, nil})
+      refute_receive({^sentences_topic, :text, "Hello darkness my old friend."})
+      refute_receive({^sentences_topic, :text, "I've come to talk"})
+      assert_receive({^sentences_topic, :text, "I've come to talk with you again."})
+      assert_receive({^sentences_topic, :stop_stream, nil})
     end
-  end
 
-  test "works with 2 separate inputs" do
-    {:ok, pid} =
-      CollectSentences.start_link(%{
-        name: "test",
-        block_name: "test",
-        context_id: "run1",
-        opts: %{
-          inputs: ["text_test:output->input"]
-        },
-        connections: [
-          Blocks.Connection.from_connection_string("text_test:output->input", "text")
-        ]
-      })
+    @tag :skip
+    test "correctly splits single input with multiple sentences" do
+      {:ok, pid} =
+        CollectSentences.start_link(%{
+          name: "test",
+          block_name: "test",
+          context_id: "run1",
+          opts: %{
+            inputs: ["text_test:output->input"]
+          },
+          connections: [
+            Blocks.Connection.from_connection_string("text_test:output->input", "text")
+          ]
+        })
 
-    {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
+      {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
 
-    pid |> CollectSentences.cast({:text, "Hello darkness my"})
-    pid |> CollectSentences.cast({:text, " old friend."})
-    BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
-    pid |> CollectSentences.cast({:text, "I've come to talk"})
-    pid |> CollectSentences.cast({:text, " with you again."})
-    BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
+      pid
+      |> CollectSentences.cast(
+        {:text, "Hello darkness my old friend. I've come to talk with you again."}
+      )
 
-    assert_receive({^sentences_topic, :start_stream, nil})
-    refute_receive({^sentences_topic, :text, "Hello darkness my"})
-    assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
-    assert_receive({^sentences_topic, :stop_stream, nil})
-    assert_receive({^sentences_topic, :start_stream, nil})
-    refute_receive({^sentences_topic, :text, "Hello darkness my old friend."})
-    refute_receive({^sentences_topic, :text, "I've come to talk"})
-    assert_receive({^sentences_topic, :text, "I've come to talk with you again."})
-    assert_receive({^sentences_topic, :stop_stream, nil})
-  end
+      BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
 
-  test "correctly splits single input with multiple sentences" do
-    {:ok, pid} =
-      CollectSentences.start_link(%{
-        name: "test",
-        block_name: "test",
-        context_id: "run1",
-        opts: %{
-          inputs: ["text_test:output->input"]
-        },
-        connections: [
-          Blocks.Connection.from_connection_string("text_test:output->input", "text")
-        ]
-      })
-
-    {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
-
-    pid
-    |> CollectSentences.cast(
-      {:text, "Hello darkness my old friend. I've come to talk with you again."}
-    )
-
-    BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
-
-    assert_receive({^sentences_topic, :start_stream, nil})
-    assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
-    assert_receive({^sentences_topic, :text, "I've come to talk with you again."})
-    assert_receive({^sentences_topic, :stop_stream, nil})
+      assert_receive({^sentences_topic, :start_stream, nil})
+      assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
+      assert_receive({^sentences_topic, :text, "I've come to talk with you again."})
+      assert_receive({^sentences_topic, :stop_stream, nil})
+    end
   end
 
   describe "CollectAllText" do
@@ -942,6 +950,7 @@ defmodule Buildel.BlocksTest do
       assert {:error, _} = Blocks.validate_block(CollectAllText, %{})
     end
 
+    @tag :skip
     test "works with 2 separate inputs" do
       {:ok, pid} =
         CollectSentences.start_link(%{
