@@ -185,19 +185,30 @@ defmodule Buildel.BlocksTest do
     test "send data to specific url" do
       url = "http://localhost:3002/cats"
 
-      {:ok, webhook_pid} =
-        WebhookOutput.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{inputs: [], url: url, metadata: %{}},
-          connections: []
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "test_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: WebhookOutput,
+              opts: %{inputs: ["test_input:output->input"], url: url, metadata: %{}},
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->input", "text")
+              ]
+            }
+          ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
       text = "HAHAAH"
-      WebhookOutput.cast(webhook_pid, {:text, text})
+      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
 
       assert_receive {^topic, :start_stream, nil}
 
