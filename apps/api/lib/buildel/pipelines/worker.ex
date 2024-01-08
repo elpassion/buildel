@@ -45,13 +45,15 @@ defmodule Buildel.Pipelines.Worker do
     children =
       for %Blocks.Block{type: type, opts: opts, name: name, connections: connections} =
             block <- blocks do
+        block_id = block_id(run, block)
+
         %{
-          id: block_id(run, block) |> String.to_atom(),
+          id: block_id |> String.to_atom(),
           start:
             {type, :start_link,
              [
                %{
-                 name: block_id(run, block),
+                 name: block_id,
                  block_name: name,
                  context_id: context_id(run),
                  connections: connections,
