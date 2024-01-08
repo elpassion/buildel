@@ -30,7 +30,20 @@ defmodule Buildel.Blocks.Connection do
     }
   end
 
-  def connections_for_block(to_block_name, blocks_map) do
+  def connections_for_block(block_name, blocks_map) do
+    block = blocks_map |> Map.fetch!(block_name)
+
+    if block["connections"] do
+      connections_for_block_from_api_connections(
+        block["name"],
+        blocks_map
+      )
+    else
+      connections_for_block_from_connection_strings(block["name"], blocks_map)
+    end
+  end
+
+  def connections_for_block_from_connection_strings(to_block_name, blocks_map) do
     to_block = blocks_map |> Map.fetch!(to_block_name)
 
     to_block

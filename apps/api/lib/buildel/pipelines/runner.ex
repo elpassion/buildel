@@ -36,29 +36,6 @@ defmodule Buildel.Pipelines.Runner do
     end
   end
 
-  def get_run_blocks(%Run{} = run) do
-    case Process.whereis(
-           (context_id = Buildel.Pipelines.Worker.context_id(run))
-           |> String.to_atom()
-         ) do
-      nil ->
-        Logger.debug("No worker found for #{inspect(run)}")
-        []
-
-      pid ->
-        Supervisor.which_children(pid)
-        |> Enum.map(fn {_name, pid, _, [type]} ->
-          %{
-            pid: pid,
-            type: type,
-            name: type.name(pid),
-            block_name: type.block_name(pid),
-            context_id: context_id
-          }
-        end)
-    end
-  end
-
   def cast_run(%Run{} = run, block_name, input_name, data) do
     context_id = Buildel.Pipelines.Worker.context_id(run)
     Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)

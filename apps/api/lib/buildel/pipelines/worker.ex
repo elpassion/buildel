@@ -45,12 +45,10 @@ defmodule Buildel.Pipelines.Worker do
     children =
       for %Blocks.Block{type: type, opts: opts, name: name, connections: connections} =
             block <- blocks do
-        block_type = if is_binary(type), do: Blocks.type(type), else: type
-
         %{
           id: block_id(run, block) |> String.to_atom(),
           start:
-            {block_type, :start_link,
+            {type, :start_link,
              [
                %{
                  name: block_id(run, block),

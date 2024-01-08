@@ -179,8 +179,7 @@ defmodule BuildelWeb.PipelineChannel do
     run
     |> Pipelines.blocks_for_run()
     |> Enum.map(fn block ->
-      block_type = block.type |> Buildel.Blocks.type()
-      public_outputs = block_type.options.outputs |> Enum.filter(fn output -> output.public end)
+      public_outputs = block.type.options.outputs |> Enum.filter(fn output -> output.public end)
       Buildel.BlockPubSub.subscribe_to_block(context_id, block.name)
 
       for output <- public_outputs do
