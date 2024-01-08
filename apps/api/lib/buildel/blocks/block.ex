@@ -124,13 +124,6 @@ defmodule Buildel.Blocks.Block do
         end)
       end
 
-      defp subscribe_to_inputs(context_id, inputs) do
-        inputs
-        |> Enum.map(fn input ->
-          BlockPubSub.subscribe_to_io(context_id, input)
-        end)
-      end
-
       defp stream_timeout() do
         Application.get_env(:buildel, :stream_timeout, 500)
       end
