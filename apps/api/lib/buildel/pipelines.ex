@@ -115,7 +115,6 @@ defmodule Buildel.Pipelines do
             opts:
               block["opts"]
               |> keys_to_atoms()
-              |> Map.put(:inputs, block["inputs"])
               |> Map.put(:metadata, get_in(run.config, ["metadata"]) || %{})
           }
         end)
