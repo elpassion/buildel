@@ -194,7 +194,7 @@ defmodule Buildel.Blocks.Chat do
 
     if(
       Enum.all?(messages, fn message ->
-        message.content |> message_filled?(state[:opts].inputs)
+        message.content |> message_filled?(state.connections)
       end)
     ) do
       state = cleanup_messages(state)

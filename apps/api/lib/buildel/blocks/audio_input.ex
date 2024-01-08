@@ -39,8 +39,8 @@ defmodule Buildel.Blocks.AudioInput do
   # Server
 
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__, block_name: block_name} = state) do
-    subscribe_to_inputs(context_id, ["#{block_name}:input"])
+  def init(%{context_id: context_id, type: __MODULE__} = state) do
+    subscribe_to_connections(context_id, state.connections)
 
     {:ok, state |> assign_stream_state}
   end

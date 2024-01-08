@@ -75,7 +75,7 @@ defmodule Buildel.Blocks.DocumentSearch do
           opts: opts
         } = state
       ) do
-    subscribe_to_inputs(context_id, opts.inputs ++ ["#{block_name}:files"])
+    subscribe_to_connections(context_id, state.connections)
 
     %{global: global, parent: parent, local: local} =
       block_context().context_from_context_id(context_id)

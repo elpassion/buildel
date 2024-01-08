@@ -278,6 +278,26 @@ defmodule Buildel.Blocks.Block do
         state
       end
 
+      def public_connections(block_name) do
+        __MODULE__.options().inputs
+        |> Enum.filter(fn input -> input.public end)
+        |> Enum.map(fn input ->
+          %Buildel.Blocks.Connection{
+            from: %{
+              name: input.name,
+              block_name: block_name,
+              type: input.type
+            },
+            to: %{
+              name: input.name,
+              block_name: block_name,
+              type: input.type
+            },
+            opts: %{reset: true}
+          }
+        end)
+      end
+
       defp block_secrets_resolver() do
         Application.fetch_env!(:buildel, :block_secrets_resolver)
       end

@@ -6,12 +6,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
       import TakeLatest
 
       defp assign_take_latest(state, reset \\ false) do
-        messages =
-          Enum.reduce(state[:opts].inputs, %{}, fn input, messages ->
-            [input | _] = input |> String.split("->")
-            messages |> Map.put(input, nil)
-          end)
-
+        messages = empty_messages(state)
         state |> Map.put(tl_keyword(), messages) |> Map.put(tl_reset_keyword(), reset)
       end
 
@@ -43,7 +38,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
       defp interpolate_template_with_take_latest_messages(state, template) do
         message = replace_inputs_with_take_latest_messages(state, template)
 
-        if message_filled?(message, state[:opts].inputs) do
+        if message_filled?(message, state.connections) do
           {state |> cleanup_messages(), message}
         else
           {state, nil}
@@ -55,23 +50,25 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
   def tl_keyword(), do: :take_latest_messages
   def tl_reset_keyword(), do: :take_latest_reset
 
-  def message_filled?(message, inputs) do
+  def message_filled?(message, connections) do
     !String.contains?(
       message,
-      inputs |> Enum.map(fn input -> input |> String.split("->") |> List.first() end)
+      connections
+      |> Enum.map(fn connection ->
+        "#{connection.from.block_name}:#{connection.from.name}"
+      end)
     )
   end
 
   def cleanup_messages(state) do
     if state[tl_reset_keyword()] do
-      messages =
-        Enum.reduce(state[:opts].inputs, %{}, fn input, messages ->
-          messages |> Map.put(input, nil)
-        end)
-
-      Map.put(state, tl_keyword(), messages)
+      state |> Map.put(tl_keyword(), empty_messages(state))
     else
       state
     end
+  end
+
+  def empty_messages(state) do
+    Enum.into(state.connections, %{}, fn connection -> {connection.from.name, nil} end)
   end
 end
