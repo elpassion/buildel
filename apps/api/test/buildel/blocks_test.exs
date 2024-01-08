@@ -244,19 +244,30 @@ defmodule Buildel.BlocksTest do
     end
 
     test "broadcasts audio" do
-      {:ok, pid} =
-        AudioOutput.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "test_input",
+              type: AudioInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: AudioOutput,
+              opts: %{inputs: ["test_input:output->input"]},
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->input", "audio")
+              ]
+            }
+          ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
       file = File.read!("test/support/fixtures/real.mp3")
-      pid |> AudioOutput.cast({:binary, file})
+      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:binary, file})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :binary, ^file}
@@ -290,70 +301,35 @@ defmodule Buildel.BlocksTest do
       assert {:error, _} = Blocks.validate_block(SpeechToText, %{})
     end
 
-    test "audio to text works through direct calling" do
-      {:ok, _input_pid} =
-        AudioInput.start_link(%{
-          name: "audio_test",
-          block_name: "audio_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, pid} =
-        SpeechToText.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["audio_test:output->input"],
-            api_key: "test"
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("audio_test:output->input", "audio")
+    test "audio to text works through broadcasting" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "audio_test",
+              type: AudioInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: SpeechToText,
+              opts: %{inputs: ["audio_test:output->input"], api_key: "test"},
+              connections: [
+                Blocks.Connection.from_connection_string("audio_test:output->input", "audio")
+              ]
+            }
           ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
       file = File.read!("test/support/fixtures/real.mp3")
-      pid |> SpeechToText.cast({:binary, file})
+      test_run |> BlocksTestRunner.Run.input("audio_test", "input", {:binary, file})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :text, "Hello"}
       assert_receive {^topic, :stop_stream, nil}
-    end
-
-    test "audio to text works through broadcasting through input" do
-      {:ok, input_pid} =
-        AudioInput.start_link(%{
-          name: "audio_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        SpeechToText.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"],
-            api_key: "test"
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "text")
-          ]
-        })
-
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
-
-      file = File.read!("test/support/fixtures/real.mp3")
-      input_pid |> AudioInput.send_audio({:binary, file})
-
-      assert_receive {^topic, :text, "Hello"}
     end
   end
 
@@ -387,66 +363,31 @@ defmodule Buildel.BlocksTest do
       assert {:error, _} = Blocks.validate_block(FileSpeechToText, %{})
     end
 
-    test "audio to text works through direct calling" do
-      {:ok, _input_pid} =
-        AudioInput.start_link(%{
-          name: "audio_test",
-          block_name: "audio_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, pid} =
-        FileSpeechToText.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["audio_test:output->input"],
-            api_key: "test"
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("audio_test:output->input", "audio")
+    test "audio to text works through broadcasting" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "test_input",
+              type: AudioInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: FileSpeechToText,
+              opts: %{inputs: ["test_input:output->input"], api_key: "test"},
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->input", "audio")
+              ]
+            }
           ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
       file = File.read!("test/support/fixtures/real.mp3")
-      pid |> FileSpeechToText.cast({:binary, file})
-
-      assert_receive {^topic, :text, "Hello"}
-    end
-
-    test "audio to text works through broadcasting through input" do
-      {:ok, input_pid} =
-        AudioInput.start_link(%{
-          name: "audio_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        FileSpeechToText.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"],
-            api_key: "test"
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "audio")
-          ]
-        })
-
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
-
-      file = File.read!("test/support/fixtures/real.mp3")
-      input_pid |> AudioInput.send_audio({:binary, file})
+      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:binary, file})
 
       assert_receive {^topic, :text, "Hello"}
     end
@@ -477,60 +418,31 @@ defmodule Buildel.BlocksTest do
       assert {:error, _} = Blocks.validate_block(TextToSpeech, %{})
     end
 
-    test "text to audio works through direct calling" do
-      {:ok, _input_pid} =
-        TextInput.start_link(%{
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, pid} =
-        TextToSpeech.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{inputs: ["text_test:output->input"]},
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "audio")
-          ]
-        })
-
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
-
-      pid |> TextToSpeech.cast({:text, "Hello darkness my old friend."})
-
-      assert_receive {^topic, :start_stream, nil}
-      assert_receive {^topic, :binary, _}
-      assert_receive {^topic, :stop_stream, nil}
-    end
-
     test "text to audio works through input" do
-      {:ok, input_pid} =
-        TextInput.start_link(%{
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        TextToSpeech.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{inputs: ["text_test:output->input"]},
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "audio")
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "test_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: TextToSpeech,
+              opts: %{inputs: ["test_input:output->input"], api_key: "test"},
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->input", "text")
+              ]
+            }
           ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
-      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
+      text = "Hello darkness my old friend."
+      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
 
       assert_receive({^topic, :binary, _})
     end
@@ -572,39 +484,44 @@ defmodule Buildel.BlocksTest do
     end
 
     test "chat works through input" do
-      {:ok, input_pid} =
-        TextInput.start_link(%{
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        Chat.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"],
-            system_message: "You are a helpful assistant.",
-            messages: [],
-            prompt_template: "{{text_test:output}}",
-            model: "gpt-3.5",
-            temperature: 0.7,
-            knowledge: nil
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "text")
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "test_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: Chat,
+              opts: %{
+                inputs: ["test_input:output->input"],
+                system_message: "You are a helpful assistant.",
+                messages: [],
+                prompt_template: "{{test_input:output}}",
+                model: "gpt-3.5",
+                temperature: 0.7,
+                knowledge: nil
+              },
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->input", "text")
+              ]
+            }
           ]
         })
 
-      {:ok, sentences_topic} = BlockPubSub.subscribe_to_io("run1", "test", "sentences_output")
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
-      {:ok, messages_topic} = BlockPubSub.subscribe_to_io("run1", "test", "message_output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
-      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
+      {:ok, sentences_topic} =
+        test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "sentences_output")
+
+      {:ok, messages_topic} =
+        test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "message_output")
+
+      text = "Hello darkness my old friend."
+      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
 
       assert_receive({^messages_topic, :text, "Hello darkness my old friend."})
       assert_receive({^sentences_topic, :text, "Hello!"})
@@ -615,37 +532,42 @@ defmodule Buildel.BlocksTest do
     end
 
     test "interpolates inputs" do
-      {:ok, input_pid} =
-        TextInput.start_link(%{
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        Chat.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"],
-            system_message: "You are a helpful assistant. {{text_test:output}}",
-            messages: [],
-            prompt_template: "{{text_test:output}}",
-            model: "gpt-3.5",
-            temperature: 0.7,
-            knowledge: nil
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "text")
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "test_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: Chat,
+              opts: %{
+                inputs: ["test_input:output->input"],
+                system_message: "You are a helpful assistant. {{test_input:output}}",
+                messages: [],
+                prompt_template: "{{test_input:output}}",
+                model: "gpt-3.5",
+                temperature: 0.7,
+                knowledge: nil
+              },
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->input", "text")
+              ]
+            }
           ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
-      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
+      test_run
+      |> BlocksTestRunner.Run.input(
+        "test_input",
+        "input",
+        {:text, "Hello darkness my old friend."}
+      )
 
       assert_receive({^topic, :text, " How are you?"})
     end
@@ -678,33 +600,38 @@ defmodule Buildel.BlocksTest do
     end
 
     test "outputs value when pushed to if template does not have any input used" do
-      {:ok, input_pid} =
-        TextInput.start_link(%{
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        TakeLatest.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"],
-            template: "dupa",
-            reset: false
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "text")
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "text_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: TakeLatest,
+              opts: %{
+                inputs: ["text_input:output->input"],
+                template: "dupa",
+                reset: false
+              },
+              connections: [
+                Blocks.Connection.from_connection_string("text_input:output->input", "text")
+              ]
+            }
           ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
-      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
+      test_run
+      |> BlocksTestRunner.Run.input(
+        "text_input",
+        "input",
+        {:text, "Hello darkness my old friend."}
+      )
 
       assert_receive({^topic, :start_stream, nil})
       assert_receive({^topic, :text, "dupa"})
@@ -712,33 +639,38 @@ defmodule Buildel.BlocksTest do
     end
 
     test "outputs value inside template" do
-      {:ok, input_pid} =
-        TextInput.start_link(%{
-          name: "text_test",
-          block_name: "text_test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
-        })
-
-      {:ok, _pid} =
-        TakeLatest.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"],
-            template: "dupa {{text_test:output}}",
-            reset: false
-          },
-          connections: [
-            Blocks.Connection.from_connection_string("text_test:output->input", "text")
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "text_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: TakeLatest,
+              opts: %{
+                inputs: ["text_input:output->input"],
+                template: "dupa {{text_input:output}}",
+                reset: false
+              },
+              connections: [
+                Blocks.Connection.from_connection_string("text_input:output->input", "text")
+              ]
+            }
           ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
-      input_pid |> TextInput.cast({:text, "Hello darkness my old friend."})
+      test_run
+      |> BlocksTestRunner.Run.input(
+        "text_input",
+        "input",
+        {:text, "Hello darkness my old friend."}
+      )
 
       assert_receive({^topic, :start_stream, nil})
       assert_receive({^topic, :text, "dupa Hello darkness my old friend."})
