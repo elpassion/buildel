@@ -54,23 +54,22 @@ defmodule Buildel.Blocks.Block do
       @behaviour Buildel.Blocks.BlockBehaviour
 
       def start_link(%{
-            name: name,
-            block_name: block_name,
-            context_id: context_id,
-            opts: opts,
-            connections: connections
+            block: block,
+            context: context
           }) do
         GenServer.start_link(
           __MODULE__,
           %{
-            name: name,
-            block_name: block_name,
-            context_id: context_id,
+            name: context.block_id,
+            block_name: block.name,
+            context_id: context.context_id,
             type: __MODULE__,
-            opts: opts,
-            connections: connections
+            opts: block.opts,
+            connections: block.connections,
+            block: block,
+            context: context
           },
-          name: name |> String.to_atom()
+          name: context.block_id |> String.to_atom()
         )
       end
 
@@ -84,19 +83,19 @@ defmodule Buildel.Blocks.Block do
 
       @impl true
       def handle_call(:name, _from, state) do
-        {:reply, state[:name], state}
+        {:reply, state.context.block_id, state}
       end
 
       def handle_call(:block_name, _from, state) do
-        {:reply, state[:block_name], state}
+        {:reply, state.block.name, state}
       end
 
       def handle_call(:context_id, _from, state) do
-        {:reply, state[:context_id], state}
+        {:reply, state.context.context_id, state}
       end
 
       def handle_call(:type, _from, state) do
-        {:reply, state[:type], state}
+        {:reply, state.block.type, state}
       end
 
       def handle_info({_topic, :start_stream, _} = message, state) do
@@ -270,8 +269,8 @@ defmodule Buildel.Blocks.Block do
 
       defp broadcast_to_output(state, output_name, message) do
         BlockPubSub.broadcast_to_io(
-          state[:context_id],
-          state[:block_name],
+          state.context.context_id,
+          state.context.block_id,
           output_name,
           message
         )
