@@ -139,10 +139,10 @@ defmodule Buildel.Blocks.Chat do
     api_key =
       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
 
-    tool_blocks =
+    tool_connections =
       connections
       |> Enum.filter(fn
-        %{input: %{type: "controller"}} -> true
+        %{to: %{type: "controller"}} -> true
         _ -> false
       end)
 
@@ -154,7 +154,7 @@ defmodule Buildel.Blocks.Chat do
      |> Map.put(:prompt_template, opts[:prompt_template])
      |> Map.put(:messages, initial_messages(state))
      |> Map.put(:api_key, api_key)
-     |> Map.put(:tool_blocks, tool_blocks)
+     |> Map.put(:tool_connections, tool_connections)
      |> Map.put(:sentences, [])
      |> Map.put(:sent_sentences, [])}
   end
@@ -201,9 +201,9 @@ defmodule Buildel.Blocks.Chat do
       pid = self()
 
       tools =
-        state[:tool_blocks]
-        |> Enum.map(fn block ->
-          pid = block_context().block_pid(state[:context_id], block.block_name)
+        state[:tool_connections]
+        |> Enum.map(fn connection ->
+          pid = block_context().block_pid(state[:context_id], connection.from.block_name)
           Buildel.Blocks.Block.function(pid)
         end)
 

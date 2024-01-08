@@ -64,7 +64,6 @@ export const UpdateBlockConfig = z.object({
         .object({
           reset: z.boolean().optional().default(true),
         })
-        .optional()
         .default({
           reset: true,
         }),

@@ -95,6 +95,9 @@ export function toPipelineConfig(
         block_name: edge.target,
         input_name: edge.targetHandle!,
       },
+      opts: {
+        reset: true,
+      },
     });
   });
 
