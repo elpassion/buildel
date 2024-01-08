@@ -46,8 +46,10 @@ defmodule Buildel.BlocksTest do
             %Block{
               name: "test",
               type: TextInput,
-              opts: %{inputs: []},
-              connections: []
+              opts: %{},
+              connections: [
+                Blocks.Connection.from_connection_string("test:input->input", "text")
+              ]
             }
           ]
         })
@@ -85,8 +87,10 @@ defmodule Buildel.BlocksTest do
             %Block{
               name: "test",
               type: AudioInput,
-              opts: %{inputs: []},
-              connections: []
+              opts: %{},
+              connections: [
+                Blocks.Connection.from_connection_string("test:input->input", "audio")
+              ]
             }
           ]
         })
@@ -130,16 +134,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "test_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            BlocksTestRunner.create_test_text_input_block("test_input"),
             %Block{
               name: "test",
               type: TextOutput,
-              opts: %{inputs: ["test_input:output->input"]},
+              opts: %{},
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->input", "text")
               ]
@@ -188,16 +187,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "test_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            BlocksTestRunner.create_test_text_input_block("test_input"),
             %Block{
               name: "test",
               type: WebhookOutput,
-              opts: %{inputs: ["test_input:output->input"], url: url, metadata: %{}},
+              opts: %{url: url, metadata: %{}},
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->input", "text")
               ]
@@ -247,16 +241,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "test_input",
-              type: AudioInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            BlocksTestRunner.create_test_audio_input_block("test_input"),
             %Block{
               name: "test",
               type: AudioOutput,
-              opts: %{inputs: ["test_input:output->input"]},
+              opts: %{},
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->input", "audio")
               ]
@@ -305,16 +294,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "audio_test",
-              type: AudioInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            BlocksTestRunner.create_test_audio_input_block("audio_test"),
             %Block{
               name: "test",
               type: SpeechToText,
-              opts: %{inputs: ["audio_test:output->input"], api_key: "test"},
+              opts: %{api_key: "test"},
               connections: [
                 Blocks.Connection.from_connection_string("audio_test:output->input", "audio")
               ]
@@ -367,16 +351,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "test_input",
-              type: AudioInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            BlocksTestRunner.create_test_audio_input_block("test_input"),
             %Block{
               name: "test",
               type: FileSpeechToText,
-              opts: %{inputs: ["test_input:output->input"], api_key: "test"},
+              opts: %{api_key: "test"},
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->input", "audio")
               ]
@@ -422,16 +401,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "test_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            BlocksTestRunner.create_test_text_input_block("test_input"),
             %Block{
               name: "test",
               type: TextToSpeech,
-              opts: %{inputs: ["test_input:output->input"], api_key: "test"},
+              opts: %{api_key: "test"},
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->input", "text")
               ]
@@ -487,17 +461,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "test_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            BlocksTestRunner.create_test_text_input_block("test_input"),
             %Block{
               name: "test",
               type: Chat,
               opts: %{
-                inputs: ["test_input:output->input"],
                 system_message: "You are a helpful assistant.",
                 messages: [],
                 prompt_template: "{{test_input:output}}",
@@ -535,17 +503,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "test_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            BlocksTestRunner.create_test_text_input_block("test_input"),
             %Block{
               name: "test",
               type: Chat,
               opts: %{
-                inputs: ["test_input:output->input"],
                 system_message: "You are a helpful assistant. {{test_input:output}}",
                 messages: [],
                 prompt_template: "{{test_input:output}}",
@@ -603,17 +565,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "text_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            Buildel.BlocksTestRunner.create_test_text_input_block("text_input"),
             %Block{
               name: "test",
               type: TakeLatest,
               opts: %{
-                inputs: ["text_input:output->input"],
                 template: "dupa",
                 reset: false
               },
@@ -642,17 +598,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "text_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            Buildel.BlocksTestRunner.create_test_text_input_block("text_input"),
             %Block{
               name: "test",
               type: TakeLatest,
               opts: %{
-                inputs: ["text_input:output->input"],
                 template: "dupa {{text_input:output}}",
                 reset: false
               },
@@ -681,23 +631,12 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "text_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
-            %Block{
-              name: "text_input_2",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            Buildel.BlocksTestRunner.create_test_text_input_block("text_input"),
+            Buildel.BlocksTestRunner.create_test_text_input_block("text_input_2"),
             %Block{
               name: "test",
               type: TakeLatest,
               opts: %{
-                inputs: ["text_input:output->input", "text_input_2:output->input"],
                 template: "dupa {{text_input:output}} {{text_input_2:output}}",
                 reset: false
               },
@@ -727,23 +666,12 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "text_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
-            %Block{
-              name: "text_input_2",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            Buildel.BlocksTestRunner.create_test_text_input_block("text_input"),
+            Buildel.BlocksTestRunner.create_test_text_input_block("text_input_2"),
             %Block{
               name: "test",
               type: TakeLatest,
               opts: %{
-                inputs: ["text_input:output->input", "text_input_2:output->input"],
                 template: "dupa {{text_input:output}} {{text_input_2:output}}",
                 reset: true
               },
@@ -795,16 +723,11 @@ defmodule Buildel.BlocksTest do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            %Block{
-              name: "text_input",
-              type: TextInput,
-              opts: %{inputs: []},
-              connections: []
-            },
+            Buildel.BlocksTestRunner.create_test_text_input_block("text_input"),
             %Block{
               name: "test",
               type: CollectSentences,
-              opts: %{inputs: ["text_input:output->input"]},
+              opts: %{},
               connections: [
                 Blocks.Connection.from_connection_string("text_input:output->input", "text")
               ]
@@ -835,13 +758,13 @@ defmodule Buildel.BlocksTest do
             %Block{
               name: "text_input",
               type: TextInput,
-              opts: %{inputs: []},
+              opts: %{},
               connections: []
             },
             %Block{
               name: "test",
               type: CollectSentences,
-              opts: %{inputs: ["text_input:output->input"]},
+              opts: %{},
               connections: [
                 Blocks.Connection.from_connection_string("text_input:output->input", "text")
               ]
@@ -868,9 +791,7 @@ defmodule Buildel.BlocksTest do
           name: "test",
           block_name: "test",
           context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"]
-          },
+          opts: %{},
           connections: [
             Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
@@ -903,9 +824,7 @@ defmodule Buildel.BlocksTest do
           name: "test",
           block_name: "test",
           context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"]
-          },
+          opts: %{},
           connections: [
             Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]
@@ -957,9 +876,7 @@ defmodule Buildel.BlocksTest do
           name: "test",
           block_name: "test",
           context_id: "run1",
-          opts: %{
-            inputs: ["text_test:output->input"]
-          },
+          opts: %{},
           connections: [
             Blocks.Connection.from_connection_string("text_test:output->input", "text")
           ]

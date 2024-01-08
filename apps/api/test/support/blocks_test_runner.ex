@@ -26,6 +26,28 @@ defmodule Buildel.BlocksTestRunner do
     }
   end
 
+  def create_test_text_input_block(name \\ "test_input") do
+    %Block{
+      name: name,
+      type: Buildel.Blocks.TextInput,
+      opts: %{},
+      connections: [
+        Buildel.Blocks.Connection.from_connection_string("#{name}:input->input", "text")
+      ]
+    }
+  end
+
+  def create_test_audio_input_block(name \\ "test_input") do
+    %Block{
+      name: name,
+      type: Buildel.Blocks.AudioInput,
+      opts: %{},
+      connections: [
+        Buildel.Blocks.Connection.from_connection_string("#{name}:input->input", "audio")
+      ]
+    }
+  end
+
   @impl true
   def init(config) do
     context_id = context_id(self())
