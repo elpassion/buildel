@@ -50,8 +50,16 @@ defmodule Buildel.Blocks.Block do
       use Buildel.Blocks.Utils.Error
       alias Buildel.Blocks.Block
       alias Buildel.BlockPubSub
-      defstruct [:name, :type, opts: %{}]
       @behaviour Buildel.Blocks.BlockBehaviour
+
+      def create(%{name: name, opts: opts, connections: connections}) do
+        %Block{
+          name: name,
+          type: __MODULE__,
+          opts: opts,
+          connections: connections
+        }
+      end
 
       def start_link(%{
             block: block,
