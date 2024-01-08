@@ -2,6 +2,7 @@ defmodule Buildel.BlocksTest do
   alias Buildel.Blocks
   alias Buildel.Blocks.TextOutput
   alias Buildel.BlockPubSub
+  alias Buildel.BlocksTestRunner
   use Buildel.DataCase
 
   alias Buildel.Blocks.{
@@ -39,20 +40,21 @@ defmodule Buildel.BlocksTest do
     end
 
     test "broadcasts text" do
-      {:ok, pid} =
-        TextInput.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "test",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            }
+          ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
-
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
       text = "text"
-      pid |> TextInput.cast({:text, text})
-
+      test_run |> BlocksTestRunner.Run.input("test", "input", {:text, text})
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :text, ^text}
       assert_receive {^topic, :stop_stream, nil}
@@ -77,19 +79,21 @@ defmodule Buildel.BlocksTest do
     end
 
     test "broadcasts file" do
-      {:ok, pid} =
-        AudioInput.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{},
-          connections: []
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "test",
+              type: AudioInput,
+              opts: %{inputs: []},
+              connections: []
+            }
+          ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
-
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
       file = File.read!("test/support/fixtures/real.mp3")
-      pid |> AudioInput.cast({:binary, file})
+      test_run |> BlocksTestRunner.Run.input("test", "input", {:binary, file})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :binary, ^file}
@@ -123,19 +127,29 @@ defmodule Buildel.BlocksTest do
     end
 
     test "broadcasts text" do
-      {:ok, pid} =
-        TextOutput.start_link(%{
-          name: "test",
-          block_name: "test",
-          context_id: "run1",
-          opts: %{inputs: []},
-          connections: []
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            %Block{
+              name: "test_input",
+              type: TextInput,
+              opts: %{inputs: []},
+              connections: []
+            },
+            %Block{
+              name: "test",
+              type: TextOutput,
+              opts: %{inputs: ["test_input:output->input"]},
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->input", "text")
+              ]
+            }
+          ]
         })
 
-      {:ok, topic} = BlockPubSub.subscribe_to_io("run1", "test", "output")
-
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
       text = "text"
-      pid |> TextOutput.cast({:text, text})
+      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
 
       assert_receive {^topic, :start_stream, nil}
       assert_receive {^topic, :text, ^text}
