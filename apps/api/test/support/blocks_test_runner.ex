@@ -27,25 +27,23 @@ defmodule Buildel.BlocksTestRunner do
   end
 
   def create_test_text_input_block(name \\ "test_input") do
-    %Block{
+    Buildel.Blocks.TextInput.create(%{
       name: name,
-      type: Buildel.Blocks.TextInput,
       opts: %{},
       connections: [
         Buildel.Blocks.Connection.from_connection_string("#{name}:input->input", "text")
       ]
-    }
+    })
   end
 
   def create_test_audio_input_block(name \\ "test_input") do
-    %Block{
+    Buildel.Blocks.AudioInput.create(%{
       name: name,
-      type: Buildel.Blocks.AudioInput,
       opts: %{},
       connections: [
         Buildel.Blocks.Connection.from_connection_string("#{name}:input->input", "audio")
       ]
-    }
+    })
   end
 
   @impl true
