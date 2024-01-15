@@ -198,7 +198,13 @@ defmodule Buildel.Blocks.Chat do
 
     messages =
       if List.last(state[:messages])[:role] in ["assistant", "system"] do
-        state[:messages] ++ [%{role: "user", content: state[:prompt_template]}]
+        state[:messages] ++
+          [
+            %{
+              role: "user",
+              content: replace_inputs_with_take_latest_messages(state, state[:prompt_template])
+            }
+          ]
       else
         state[:messages]
       end
