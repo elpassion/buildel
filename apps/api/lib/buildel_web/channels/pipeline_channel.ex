@@ -56,7 +56,7 @@ defmodule BuildelWeb.PipelineChannel do
         {:error, %{errors: %{[block_name] => [reason]}}}
 
       err ->
-        IO.inspect(err)
+        Logger.error("Unhandled error: #{inspect(err)}")
         {:error, %{reason: "unknown"}}
     end
   end

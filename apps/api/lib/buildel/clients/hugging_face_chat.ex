@@ -4,7 +4,7 @@ defmodule Buildel.Clients.HuggingFaceChat do
   @behaviour ChatBehaviour
 
   @impl ChatBehaviour
-  def stream_chat(
+  def stream_chat(%{
         context: context,
         on_content: on_content,
         on_tool_content: _on_tool_content,
@@ -14,7 +14,7 @@ defmodule Buildel.Clients.HuggingFaceChat do
         model: model,
         temperature: _temperature,
         tools: _tools
-      ) do
+      }) do
     messages =
       ((context.messages |> Enum.map(fn %{role: role, content: text} -> "#{role}: #{text}" end)) ++
          ["ANSWER:"])

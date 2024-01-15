@@ -2,7 +2,7 @@ defmodule Buildel.Clients.ChatGPT do
   require Logger
   alias Buildel.Langchain.ChatGptTokenizer
   alias Buildel.Clients.ChatBehaviour
-  alias LangChain.Chains.LLMChain
+  alias Buildel.LangChain.Chains.LLMChain
   alias Buildel.LangChain.ChatModels.ChatOpenAI
   alias LangChain.Message
   alias LangChain.MessageDelta
@@ -11,16 +11,21 @@ defmodule Buildel.Clients.ChatGPT do
 
   @impl ChatBehaviour
   def stream_chat(
-        context: context,
-        on_content: on_content,
-        on_tool_content: on_tool_content,
-        on_end: on_end,
-        on_error: on_error,
-        api_key: api_key,
-        model: model,
-        temperature: temperature,
-        tools: tools
+        %{
+          context: context,
+          on_content: on_content,
+          on_tool_content: on_tool_content,
+          on_end: on_end,
+          on_error: on_error,
+          api_key: api_key,
+          model: model,
+          temperature: temperature,
+          tools: tools
+        } = opts
       ) do
+    api_type = opts |> Map.get(:api_type, "openai")
+    endpoint = opts |> Map.get(:endpoint, "https://api.openai.com/v1/chat/completions")
+
     messages =
       context.messages
       |> Enum.map(fn
@@ -37,7 +42,9 @@ defmodule Buildel.Clients.ChatGPT do
                  model: model,
                  temperature: temperature,
                  stream: true,
-                 api_key: api_key
+                 api_key: api_key,
+                 api_type: api_type,
+                 endpoint: endpoint
                }),
              custom_context: context
            })

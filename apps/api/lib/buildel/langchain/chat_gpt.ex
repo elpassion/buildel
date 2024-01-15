@@ -37,6 +37,9 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
     # customer to provide their own.
     field(:api_key, :string)
 
+    # API type to use. "openai" or "azure". Defaults to "openai".
+    field(:api_type, :string, default: "openai")
+
     # What sampling temperature to use, between 0 and 2. Higher values like 0.8
     # will make the output more random, while lower values like 0.2 will make it
     # more focused and deterministic.
@@ -70,6 +73,8 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
     :temperature,
     :frequency_penalty,
     :api_key,
+    :endpoint,
+    :api_type,
     :seed,
     :n,
     :stream,
@@ -87,6 +92,16 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
   @spec get_org_id() :: String.t() | nil
   defp get_org_id() do
     Config.resolve(:openai_org_id)
+  end
+
+  @spec get_headers(t) :: [tuple()]
+  defp get_headers(%ChatOpenAI{api_type: api_type} = chat) do
+    api_key = get_api_key(chat)
+
+    case api_type do
+      "azure" -> ["api-key": api_key, "Content-Type": "application/json"]
+      _ -> [Authorization: "Bearer #{api_key}"]
+    end
   end
 
   @doc """
@@ -134,8 +149,7 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
       frequency_penalty: openai.frequency_penalty,
       n: openai.n,
       stream: openai.stream,
-      messages: Enum.map(messages, &ForOpenAIApi.for_api/1),
-      response_format: set_response_format(openai)
+      messages: Enum.map(messages, &ForOpenAIApi.for_api/1)
     }
     |> Utils.conditionally_add_to_map(:seed, openai.seed)
     |> Utils.conditionally_add_to_map(:functions, get_functions_for_api(functions))
@@ -146,6 +160,9 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
   defp get_functions_for_api(functions) do
     Enum.map(functions, &ForOpenAIApi.for_api/1)
   end
+
+  defp set_response_format(%ChatOpenAI{api_type: "azure"}),
+    do: nil
 
   defp set_response_format(%ChatOpenAI{json_response: true}),
     do: %{"type" => "json_object"}
@@ -247,7 +264,7 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
       Req.new(
         url: openai.endpoint,
         json: for_api(openai, messages, functions),
-        auth: {:bearer, get_api_key(openai)},
+        headers: get_headers(openai),
         receive_timeout: openai.receive_timeout,
         retry: :transient,
         max_retries: 3,
@@ -332,7 +349,7 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
       Req.new(
         url: openai.endpoint,
         json: for_api(openai, messages, functions),
-        auth: {:bearer, get_api_key(openai)},
+        headers: get_headers(openai),
         receive_timeout: openai.receive_timeout,
         finch_request: finch_fun
       )
@@ -555,8 +572,8 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
     end
   end
 
-  def do_process_response(%{"error" => %{"code" => code}}) do
-    Logger.error("Received error from API: #{inspect(code)}")
+  def do_process_response(%{"error" => %{"code" => code}} = err) do
+    Logger.error("Received error from API: #{inspect(err)}")
     {:error, code}
   end
 

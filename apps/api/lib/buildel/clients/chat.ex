@@ -1,5 +1,5 @@
 defmodule Buildel.Clients.ChatBehaviour do
-  @callback stream_chat(
+  @callback stream_chat(%{
               context: map(),
               on_content: any(),
               on_tool_content: any(),
@@ -9,5 +9,5 @@ defmodule Buildel.Clients.ChatBehaviour do
               model: String.t(),
               temperature: number(),
               tools: list(any())
-            ) :: :ok
+            }) :: :ok
 end

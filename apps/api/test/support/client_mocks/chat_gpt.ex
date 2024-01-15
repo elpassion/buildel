@@ -3,7 +3,7 @@ defmodule Buildel.ClientMocks.ChatGPT do
   @behaviour ChatBehaviour
 
   @impl ChatBehaviour
-  def stream_chat(
+  def stream_chat(%{
         context: _,
         on_content: on_content,
         on_tool_content: _on_tool_content,
@@ -13,7 +13,7 @@ defmodule Buildel.ClientMocks.ChatGPT do
         model: _,
         temperature: _,
         tools: _
-      ) do
+      }) do
     on_content.("Hell")
     on_content.("o!")
     on_content.(" How are you?")

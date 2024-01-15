@@ -35,7 +35,15 @@ defmodule Buildel.Blocks.Chat do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["model", "temperature", "system_message", "messages", "api_key"],
+            "required" => [
+              "model",
+              "temperature",
+              "system_message",
+              "messages",
+              "api_key",
+              "endpoint",
+              "api_type"
+            ],
             "properties" =>
               Jason.OrderedObject.new(
                 api_key:
@@ -50,6 +58,20 @@ defmodule Buildel.Blocks.Chat do
                   "enum" => ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-1106", "gpt-4-1106-preview"],
                   "enumPresentAs" => "radio",
                   "default" => "gpt-3.5-turbo"
+                },
+                endpoint: %{
+                  "type" => "string",
+                  "title" => "Endpoint",
+                  "description" => "The endpoint to use for the chat.",
+                  "default" => "https://api.openai.com/v1/chat/completions"
+                },
+                api_type: %{
+                  "type" => "string",
+                  "title" => "API type",
+                  "description" => "The API type to use for the chat.",
+                  "enum" => ["openai", "azure"],
+                  "enumPresentAs" => "radio",
+                  "default" => "openai"
                 },
                 temperature: %{
                   "type" => "number",
@@ -324,7 +346,7 @@ defmodule Buildel.Blocks.Chat do
   end
 
   defp call_chat(%{messages: messages, pid: pid, tools: tools, state: state}) do
-    chat_gpt().stream_chat(
+    chat_gpt().stream_chat(%{
       context: %{messages: messages},
       on_content: fn text_chunk ->
         Buildel.BlockPubSub.broadcast_to_io(
@@ -363,8 +385,10 @@ defmodule Buildel.Blocks.Chat do
       api_key: state[:api_key],
       model: state[:opts].model,
       temperature: state[:opts].temperature,
-      tools: tools
-    )
+      tools: tools,
+      endpoint: state[:opts].endpoint,
+      api_type: state[:opts].api_type
+    })
   end
 
   defp remove_last_non_initial_message(state) do

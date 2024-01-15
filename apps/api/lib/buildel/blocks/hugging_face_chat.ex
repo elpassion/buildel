@@ -206,7 +206,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
         end)
 
       Task.start(fn ->
-        hugging_face_chat().stream_chat(
+        hugging_face_chat().stream_chat(%{
           context: %{messages: messages, stream: state[:opts].stream != false},
           on_content: fn text_chunk ->
             Buildel.BlockPubSub.broadcast_to_io(
@@ -232,7 +232,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
           model: state[:opts].model,
           temperature: state[:opts].temperature,
           tools: tools
-        )
+        })
       end)
 
       {:noreply, state}
