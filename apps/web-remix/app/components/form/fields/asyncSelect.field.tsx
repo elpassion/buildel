@@ -53,7 +53,7 @@ export const AsyncSelectField = forwardRef<
   }, [selectedId, setSelectedId, defaultValue]);
 
   const getSelectedOption = () => {
-    return options.find((option) => option.id === selectedId);
+    return options.find((option) => option.id.toString() === selectedId);
   };
 
   const selectedOption = getSelectedOption();

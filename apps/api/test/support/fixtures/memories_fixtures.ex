@@ -13,4 +13,18 @@ defmodule Buildel.MemoriesFixtures do
 
     memory
   end
+
+  def collection_fixture(organization_id, attrs \\ %{}) do
+    collection_name =
+      attrs
+      |> Map.get(:collection_name, "collection")
+
+    {:ok, collection} =
+      Buildel.Memories.upsert_collection(%{
+        organization_id: organization_id,
+        collection_name: collection_name
+      })
+
+    collection
+  end
 end

@@ -2,7 +2,10 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
-import { KnowledgeBaseFileListResponse } from "../contracts";
+import {
+  KnowledgeBaseCollectionFromListResponse,
+  KnowledgeBaseFileListResponse,
+} from "../contracts";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -10,9 +13,15 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.organizationId, "organizationId not found");
     invariant(params.collectionName, "collectionName not found");
 
+    const {
+      data: { id: collectionId },
+    } = await fetch(
+      KnowledgeBaseCollectionFromListResponse,
+      `/organizations/${params.organizationId}/memory_collections?collection_name=${params.collectionName}`
+    );
     const knowledgeBase = await fetch(
       KnowledgeBaseFileListResponse,
-      `/organizations/${params.organizationId}/memories?collection_name=${params.collectionName}`
+      `/organizations/${params.organizationId}/memory_collections/${collectionId}/memories`
     );
 
     return json({

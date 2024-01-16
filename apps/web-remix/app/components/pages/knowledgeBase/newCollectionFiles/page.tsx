@@ -10,7 +10,8 @@ import { loader } from "./loader";
 type IExtendedFileUpload = IFileUpload & { file: File };
 export function NewCollectionFilesPage() {
   const revalidator = useRevalidator();
-  const { organizationId, collectionName } = useLoaderData<typeof loader>();
+  const { organizationId, collectionName, collectionId } =
+    useLoaderData<typeof loader>();
   const [items, setItems] = useState<IExtendedFileUpload[]>([]);
 
   const isUploading = items.some(
@@ -61,10 +62,13 @@ export function NewCollectionFilesPage() {
     handleUpdateStatus(fileUpload.id, "uploading");
 
     try {
-      await fetch(`/super-api/organizations/${organizationId}/memories`, {
-        body: formData,
-        method: "POST",
-      }).then((res) => res.json());
+      await fetch(
+        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
+        {
+          body: formData,
+          method: "POST",
+        }
+      ).then((res) => res.json());
 
       handleUpdateStatus(fileUpload.id, "done");
       revalidator.revalidate();

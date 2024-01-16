@@ -149,7 +149,8 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
       frequency_penalty: openai.frequency_penalty,
       n: openai.n,
       stream: openai.stream,
-      messages: Enum.map(messages, &ForOpenAIApi.for_api/1)
+      messages: Enum.map(messages, &ForOpenAIApi.for_api/1),
+      response_format: set_response_format(openai)
     }
     |> Utils.conditionally_add_to_map(:seed, openai.seed)
     |> Utils.conditionally_add_to_map(:functions, get_functions_for_api(functions))
@@ -160,9 +161,6 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
   defp get_functions_for_api(functions) do
     Enum.map(functions, &ForOpenAIApi.for_api/1)
   end
-
-  defp set_response_format(%ChatOpenAI{api_type: "azure"}),
-    do: nil
 
   defp set_response_format(%ChatOpenAI{json_response: true}),
     do: %{"type" => "json_object"}

@@ -9,31 +9,32 @@ defmodule BuildelWeb.CollectionController do
   plug(:require_authenticated_user)
 
   defparams :index do
+    optional(:collection_name, :string)
   end
 
   def index(conn, %{"organization_id" => organization_id} = params) do
     user = conn.assigns.current_user
 
-    with {:ok, %{}} <- validate(:index, params),
-          {:ok, organization} <-
-            Buildel.Organizations.get_user_organization(user, organization_id),
-          collections <-
-            Buildel.Memories.list_organization_collections(organization) do
+    with {:ok, validated_params} <-
+           validate(:index, params),
+         {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         collections <-
+           Buildel.Memories.list_organization_collections(organization, validated_params) do
       render(conn, :index, collections: collections)
     end
   end
 
-  def show(conn, %{"organization_id" => organization_id, "name" => collection_name}) do
+  def show(conn, %{"organization_id" => organization_id, "id" => id}) do
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
-      Buildel.Organizations.get_user_organization(user, organization_id),
-    collection <-
-      Buildel.Memories.get_organization_collection(organization, collection_name) do
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, id) do
       render(conn, :show, collection: collection)
     end
   end
-
 
   defparams :create do
     required(:organization_id, :string)
@@ -44,22 +45,25 @@ defmodule BuildelWeb.CollectionController do
     user = conn.assigns.current_user
 
     with {:ok, %{collection_name: collection_name}} <- validate(:create, params),
-          {:ok, organization} <-
-            Buildel.Organizations.get_user_organization(user, organization_id),
-          {:ok, collection} <-
-            Buildel.Memories.upsert_collection(%{organization_id: organization.id, collection_name: collection_name}) do
+         {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.upsert_collection(%{
+             organization_id: organization.id,
+             collection_name: collection_name
+           }) do
       conn
       |> put_status(:created)
       |> render(:show, collection: collection)
     end
   end
 
-  def delete(conn, %{"organization_id" => organization_id, "name" => name}) do
+  def delete(conn, %{"organization_id" => organization_id, "id" => id}) do
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
-         :ok <- Buildel.Memories.delete_organization_memory_collection(organization, name) do
+         :ok <- Buildel.Memories.delete_organization_memory_collection(organization, id) do
       conn |> put_status(:ok) |> json(%{})
     end
   end

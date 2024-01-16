@@ -14,33 +14,58 @@ defmodule BuildelWeb.MemoryControllerTest do
        |> put_req_header("content-type", "multipart/form-data")}
   end
 
-  setup [:register_and_log_in_user, :create_user_organization, :create_pipeline, :read_file]
+  setup [
+    :register_and_log_in_user,
+    :create_user_organization,
+    :create_pipeline,
+    :read_file,
+    :create_memory_collection
+  ]
 
   describe "create" do
-    test "requires authentication", %{conn: conn, organization: organization} do
+    test "requires authentication", %{
+      conn: conn,
+      organization: organization,
+      collection: collection
+    } do
       conn = conn |> log_out_user()
 
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories")
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories"
+        )
 
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "validates file is present", %{conn: conn, organization: organization} do
+    test "validates file is present", %{
+      conn: conn,
+      organization: organization,
+      collection: collection
+    } do
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{})
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories",
+          %{}
+        )
 
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    test "does not upload in other org", %{conn: conn, upload_file: file} do
+    test "does not upload in other org", %{conn: conn, upload_file: file, collection: collection} do
       organization = organization_fixture()
 
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{
-          file: file,
-          collection_name: "topic"
-        })
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories",
+          %{
+            file: file,
+            collection_name: "topic"
+          }
+        )
 
       assert json_response(conn, 404)["errors"] != %{}
     end
@@ -49,15 +74,20 @@ defmodule BuildelWeb.MemoryControllerTest do
       conn: conn,
       upload_file: file,
       pipeline: pipeline,
-      organization: organization
+      organization: organization,
+      collection: collection
     } do
       collection_name = "pipelines:#{pipeline.id}"
 
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{
-          file: file,
-          collection_name: collection_name
-        })
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories",
+          %{
+            file: file,
+            collection_name: collection_name
+          }
+        )
 
       assert %{
                "data" => %{
@@ -73,16 +103,20 @@ defmodule BuildelWeb.MemoryControllerTest do
     test "saves metadata", %{
       conn: conn,
       upload_file: file,
-      pipeline: pipeline,
-      organization: organization
+      organization: organization,
+      collection: collection
     } do
-      collection_name = "pipelines:#{pipeline.id}"
+      collection_name = collection.collection_name
 
       conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memories", %{
-          file: file,
-          collection_name: collection_name
-        })
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories",
+          %{
+            file: file,
+            collection_name: collection_name
+          }
+        )
 
       assert %{
                "data" => %{
@@ -97,7 +131,7 @@ defmodule BuildelWeb.MemoryControllerTest do
       conn =
         get(
           conn,
-          ~p"/api/organizations/#{organization.id}/memories?collection_name=#{collection_name}"
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories"
         )
 
       assert %{
@@ -116,21 +150,32 @@ defmodule BuildelWeb.MemoryControllerTest do
   describe "delete" do
     setup [:create_memory]
 
-    test "requires authentication", %{conn: conn, organization: organization, memory: memory} do
+    test "requires authentication", %{
+      conn: conn,
+      organization: organization,
+      memory: memory,
+      collection: collection
+    } do
       conn = conn |> log_out_user()
 
       conn =
-        delete(conn, ~p"/api/organizations/#{organization.id}/memories/#{memory.id}")
+        delete(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories/#{memory.id}"
+        )
 
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    test "does not delete in other org", %{conn: conn} do
+    test "does not delete in other org", %{conn: conn, collection: collection} do
       organization = organization_fixture()
       memory = memory_fixture(organization.id, "collection")
 
       conn =
-        delete(conn, ~p"/api/organizations/#{organization.id}/memories/#{memory.id}")
+        delete(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories/#{memory.id}"
+        )
 
       assert json_response(conn, 404)["errors"] != %{}
     end
@@ -138,10 +183,14 @@ defmodule BuildelWeb.MemoryControllerTest do
     test "returns :no_content when valid", %{
       conn: conn,
       organization: organization,
-      memory: memory
+      memory: memory,
+      collection: collection
     } do
       conn =
-        delete(conn, ~p"/api/organizations/#{organization.id}/memories/#{memory.id}")
+        delete(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories/#{memory.id}"
+        )
 
       assert json_response(conn, 200) == %{}
     end
@@ -150,6 +199,11 @@ defmodule BuildelWeb.MemoryControllerTest do
   defp create_memory(%{organization: organization}) do
     memory = memory_fixture(organization.id, "collection")
     %{memory: memory}
+  end
+
+  defp create_memory_collection(%{organization: organization}) do
+    collection = collection_fixture(organization.id)
+    %{collection: collection}
   end
 
   defp read_file(_) do

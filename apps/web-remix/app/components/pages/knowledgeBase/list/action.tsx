@@ -1,9 +1,10 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
-import { actionBuilder } from "~/utils.server";
-import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { z } from "zod";
+import { requireLogin } from "~/session.server";
+import { actionBuilder } from "~/utils.server";
 import { setServerToast } from "~/utils/toast.server";
+import { KnowledgeBaseCollectionFromListResponse } from "../contracts";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -12,10 +13,15 @@ export async function action(actionArgs: ActionFunctionArgs) {
       invariant(params.organizationId, "Missing organizationId");
 
       const collectionName = (await request.formData()).get("collectionName");
-
+      const {
+        data: { id: collectionId },
+      } = await fetch(
+        KnowledgeBaseCollectionFromListResponse,
+        `/organizations/${params.organizationId}/memory_collections?collection_name=${collectionName}`
+      );
       await fetch(
         z.any(),
-        `/organizations/${params.organizationId}/memory_collections/${collectionName}`,
+        `/organizations/${params.organizationId}/memory_collections/${collectionId}`,
         { method: "DELETE" }
       );
       return json(

@@ -10,12 +10,21 @@ export async function action(actionArgs: ActionFunctionArgs) {
     delete: async ({ params, request }, { fetch }) => {
       await requireLogin(request);
       invariant(params.organizationId, "Missing organizationId");
+      invariant(params.collectionName, "Missing collectionName");
 
       const memoryId = (await request.formData()).get("memoryId");
+      const collectionName = params.collectionName;
+
+      const {
+        data: { id: collectionId },
+      } = await fetch(
+        z.any(),
+        `/organizations/${params.organizationId}/memory_collections?collection_name=${collectionName}`
+      );
 
       await fetch(
         z.any(),
-        `/organizations/${params.organizationId}/memories/${memoryId}`,
+        `/organizations/${params.organizationId}/memory_collections/${collectionId}/memories/${memoryId}`,
         { method: "DELETE" }
       );
       return json(

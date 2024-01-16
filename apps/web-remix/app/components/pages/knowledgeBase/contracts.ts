@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { NotFoundError } from "~/utils/errors.server";
 
 export const KnowledgeBaseFile = z.object({
   id: z.number(),
@@ -8,7 +9,7 @@ export const KnowledgeBaseFile = z.object({
 });
 
 export const KnowledgeBaseCollection = z.object({
-  id: z.string(),
+  id: z.number(),
   name: z.string(),
 });
 
@@ -30,3 +31,13 @@ export const KnowledgeBaseCollectionListResponse = z
     data: KnowledgeBaseCollectionList,
   })
   .transform((res) => res.data);
+
+export const KnowledgeBaseCollectionFromListResponse =
+  KnowledgeBaseCollectionListResponse.transform((res) => {
+    const collection = res[0];
+
+    if (!collection) {
+      throw new NotFoundError();
+    }
+    return collection;
+  });

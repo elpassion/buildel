@@ -441,7 +441,9 @@ defmodule Buildel.BlocksTest do
                    "system_message" => "You are a helpful assistant.",
                    "messages" => [
                      %{"role" => "system", "content" => "You are a helpful assistant."}
-                   ]
+                   ],
+                   "endpoint" => nil,
+                   "api_type" => "openai"
                  },
                  "inputs" => []
                })
@@ -462,7 +464,9 @@ defmodule Buildel.BlocksTest do
                 prompt_template: "{{test_input:output}}",
                 model: "gpt-3.5",
                 temperature: 0.7,
-                knowledge: nil
+                knowledge: nil,
+                endpoint: nil,
+                api_type: "openai"
               },
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->input", "text")
@@ -503,7 +507,9 @@ defmodule Buildel.BlocksTest do
                 prompt_template: "{{test_input:output}}",
                 model: "gpt-3.5",
                 temperature: 0.7,
-                knowledge: nil
+                knowledge: nil,
+                endpoint: nil,
+                api_type: "openai"
               },
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->input", "text")

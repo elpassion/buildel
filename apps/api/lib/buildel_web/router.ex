@@ -75,13 +75,14 @@ defmodule BuildelWeb.Router do
     )
 
     resources("/organizations/:organization_id/memory_collections", CollectionController,
-      only: [:index, :create, :show],
-      param: "name"
+      only: [:index, :create, :show, :delete]
     )
 
-    post("/organizations/:organization_id/memories", MemoryController, :create)
-    get("/organizations/:organization_id/memories", MemoryController, :index)
-    delete("/organizations/:organization_id/memories/:id", MemoryController, :delete)
+    resources(
+      "/organizations/:organization_id/memory_collections/:memory_collection_id/memories",
+      MemoryController,
+      only: [:index, :create, :delete]
+    )
 
     post("/users/register", UserRegistrationController, :create)
     get("/users/me", UserController, :me)

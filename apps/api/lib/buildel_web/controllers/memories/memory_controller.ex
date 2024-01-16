@@ -8,18 +8,18 @@ defmodule BuildelWeb.MemoryController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
-  defparams :index do
-    required(:collection_name, :string)
-  end
-
-  def index(conn, %{"organization_id" => organization_id} = params) do
+  def index(
+        conn,
+        %{"organization_id" => organization_id, "memory_collection_id" => memory_collection_id}
+      ) do
     user = conn.assigns.current_user
 
-    with {:ok, %{collection_name: collection_name}} <- validate(:index, params),
-         {:ok, organization} <-
+    with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
          memories <-
-           Buildel.Memories.list_organization_collection_memories(organization, collection_name) do
+           Buildel.Memories.list_organization_collection_memories(organization, collection) do
       render(conn, :index, memories: memories)
     end
   end

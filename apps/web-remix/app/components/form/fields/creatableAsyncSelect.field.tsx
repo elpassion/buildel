@@ -45,7 +45,7 @@ export const CreatableAsyncSelectField = forwardRef<
 >(
   (
     { label, supportingText, url, defaultValue, schema: JSONSchema, ...props },
-    ref
+    _ref
   ) => {
     const { name, getInputProps, validate } = useFieldContext();
     const { isModalOpen, openModal, closeModal } = useModal();
@@ -55,7 +55,9 @@ export const CreatableAsyncSelectField = forwardRef<
     const [options, setOptions] = useState<IAsyncSelectItemList>([]);
 
     const getSelectedOption = () => {
-      return options.find((option) => option.id === selectedId);
+      return options.find(
+        (option) => option.id.toString() === selectedId?.toString()
+      );
     };
 
     const selectedOption = getSelectedOption();

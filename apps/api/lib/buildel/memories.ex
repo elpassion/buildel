@@ -3,35 +3,53 @@ defmodule Buildel.Memories do
 
   def list_organization_collection_memories(
         %Buildel.Organizations.Organization{} = organization,
-        collection_name
+        %Buildel.Memories.MemoryCollection{} = collection
       ) do
     Buildel.Memories.Memory
     |> where(
       [m],
-      m.collection_name == ^collection_name and m.organization_id == ^organization.id
+      m.collection_name == ^collection.collection_name and m.organization_id == ^organization.id
     )
     |> Buildel.Repo.all()
   end
 
-  def list_organization_collections(%Buildel.Organizations.Organization{} = organization) do
+  def list_organization_collections(
+        %Buildel.Organizations.Organization{} = organization,
+        params \\ %{}
+      ) do
     Buildel.Memories.MemoryCollection
     |> where(
       [m],
       m.organization_id == ^organization.id
     )
+    |> where([m], ^collection_filters(params))
     |> Buildel.Repo.all()
+  end
+
+  defp collection_filters(params) do
+    filterable_fields = [:collection_name]
+
+    Enum.reduce(params, [], fn {key, _value} = field, acc ->
+      if Enum.member?(filterable_fields, key), do: acc ++ [field], else: acc
+    end)
   end
 
   def get_organization_collection(
         %Buildel.Organizations.Organization{} = organization,
-        collection_name
+        collection_id
       ) do
-    Buildel.Memories.MemoryCollection
-    |> where(
-      [c],
-      c.collection_name == ^collection_name and c.organization_id == ^organization.id
-    )
-    |> Buildel.Repo.one()
+    case Buildel.Memories.MemoryCollection
+         |> where(
+           [c],
+           c.id == ^collection_id and c.organization_id == ^organization.id
+         )
+         |> Buildel.Repo.one() do
+      nil ->
+        {:error, :not_found}
+
+      collection ->
+        {:ok, collection}
+    end
   end
 
   def create_organization_memory(
@@ -46,10 +64,9 @@ defmodule Buildel.Memories do
 
     metadata = %{file_name: file_name, file_size: file_size, file_type: file_type}
 
-    organization_collection_name = organization_collection_name(organization, collection_name)
-
     with {:ok, collection} <-
            upsert_collection(%{organization_id: organization.id, collection_name: collection_name}),
+         organization_collection_name <- organization_collection_name(organization, collection),
          {:ok, memory} <-
            %Buildel.Memories.Memory{}
            |> Buildel.Memories.Memory.changeset(
@@ -115,7 +132,7 @@ defmodule Buildel.Memories do
       ) do
     memory = get_organization_memory!(organization, id)
 
-    collection_name = organization_collection_name(organization, memory.collection_name)
+    collection_name = organization_collection_name(organization, memory.memory_collection)
 
     with :ok <-
            Buildel.VectorDB.delete_all_with_metadata(collection_name, %{memory_id: memory.id}),
@@ -130,7 +147,7 @@ defmodule Buildel.Memories do
         %Buildel.Organizations.Organization{} = organization,
         id
       ) do
-    collection = get_organization_collection(organization, id)
+    {:ok, collection} = get_organization_collection(organization, id)
     memories = collection |> Buildel.Repo.preload(:memories) |> Map.get(:memories)
 
     memories
@@ -172,6 +189,7 @@ defmodule Buildel.Memories do
     Buildel.Memories.Memory
     |> where([m], m.id == ^id and m.organization_id == ^organization.id)
     |> Buildel.Repo.one!()
+    |> Buildel.Repo.preload(:memory_collection)
   end
 
   def get_collection_memory!(
@@ -190,8 +208,8 @@ defmodule Buildel.Memories do
 
   defp organization_collection_name(
          %Buildel.Organizations.Organization{} = organization,
-         collection_name
+         %Buildel.Memories.MemoryCollection{} = collection
        ) do
-    "#{organization.id}_#{collection_name}"
+    "#{organization.id}_#{collection.id}"
   end
 end

@@ -237,20 +237,31 @@ defmodule Buildel.Blocks.Block do
         }
       end
 
-      def memory_schema(
-            %{"default" => default, "title" => title, "description" => description} \\ %{
-              "default" => "{{pipeline_id}}_{{block_name}}",
-              "title" => "Persist in",
-              "description" => "Where to hold data from inputs."
-            }
-          ) do
+      defp memory_schema(
+             %{"default" => default, "title" => title, "description" => description} \\ %{
+               "default" => "{{pipeline_id}}_{{block_name}}",
+               "title" => "Persist in",
+               "description" => "Memory collection to use."
+             }
+           ) do
         %{
           "type" => "string",
           "title" => title,
-          "url" => "/api/organizations/{{organization_id}}/memory_collections",
-          "presentAs" => "async-select",
           "description" => description,
-          "default" => default
+          "url" => "/api/organizations/{{organization_id}}/memory_collections",
+          "presentAs" => "async-creatable-select",
+          "schema" => %{
+            "type" => "object",
+            "required" => ["collection_name"],
+            "properties" => %{
+              "collection_name" => %{
+                "type" => "string",
+                "title" => "Name",
+                "description" => "The name for collection.",
+                "minLength" => 1
+              }
+            }
+          }
         }
       end
 
