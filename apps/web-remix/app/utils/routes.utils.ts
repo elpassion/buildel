@@ -13,6 +13,8 @@ export const routes = {
     `${routes.organizationSettings(organizationId)}/memberships/new`,
   profileSettings: (organizationId: OrganizationId) =>
     `${routes.settings(organizationId)}/profile`,
+  profileSettingsChangePassword: (organizationId: OrganizationId) =>
+    `${routes.profileSettings(organizationId)}/change-password`,
   pipelines: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/pipelines`,
   pipeline: (organizationId: OrganizationId, pipelineId: PipelineId) =>
