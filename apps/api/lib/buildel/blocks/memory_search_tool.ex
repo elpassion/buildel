@@ -68,10 +68,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
     api_key =
       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
 
-    %{global: global} =
-      block_context().context_from_context_id(context_id)
-
-    collection_name = "#{global}_#{opts[:knowledge]}"
+    collection_name = block_context().global_collection_name(context_id, opts.knowledge)
 
     {:ok,
      state

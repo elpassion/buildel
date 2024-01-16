@@ -77,15 +77,7 @@ defmodule Buildel.Blocks.DocumentSearch do
       ) do
     subscribe_to_connections(context_id, state.connections)
 
-    %{global: global, parent: parent, local: local} =
-      block_context().context_from_context_id(context_id)
-
-    collection_name =
-      case opts.persist_in do
-        "run" -> "#{global}_#{parent}_#{local}_#{block_name}"
-        "workflow" -> "#{global}_#{parent}_#{block_name}"
-        collection_name -> "#{global}_#{collection_name}"
-      end
+    collection_name = block_context().global_collection_name(context_id, opts.persist_in)
 
     with {:ok, collection} <- Buildel.VectorDB.init(collection_name) do
       {:ok,

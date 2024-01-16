@@ -26,22 +26,30 @@ defmodule BuildelWeb.MemoryController do
 
   defparams :create do
     required(:file, :map)
-    required(:collection_name, :string)
   end
 
-  def create(conn, %{"organization_id" => organization_id} = params) do
+  def create(
+        conn,
+        %{"organization_id" => organization_id, "memory_collection_id" => memory_collection_id} =
+          params
+      ) do
     user = conn.assigns.current_user
 
-    with {:ok, %{file: file, collection_name: collection_name}} <-
-           validate(:create, params),
+    with {:ok, %{file: file}} <- validate(:create, params),
          {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
          {:ok, memory} <-
-           Buildel.Memories.create_organization_memory(organization, collection_name, %{
-             path: file |> Map.get(:path),
-             type: file |> Map.get(:content_type),
-             name: file |> Map.get(:filename)
-           }) do
+           Buildel.Memories.create_organization_memory(
+             organization,
+             collection.collection_name,
+             %{
+               path: file |> Map.get(:path),
+               type: file |> Map.get(:content_type),
+               name: file |> Map.get(:filename)
+             }
+           ) do
       conn
       |> put_status(:created)
       |> render(:show, memory: memory)

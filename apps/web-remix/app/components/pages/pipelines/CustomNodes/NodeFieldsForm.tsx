@@ -66,7 +66,7 @@ export function NodeFieldsForm({
       );
 
       const response = await fetch(
-        `/super-api/organizations/${organizationId}/memory_collections${block.opts.persist_in}/memories`,
+        `/super-api/organizations/${organizationId}/memory_collections/${block.opts.persist_in}/memories`,
         {
           body: formData,
           method: "POST",
@@ -81,7 +81,7 @@ export function NodeFieldsForm({
   const removeFile = useCallback(
     async (id: number) => {
       return fetch(
-        `/super-api/organizations/${organizationId}/memory_collections${block.opts.persist_in}/memories/${id}`,
+        `/super-api/organizations/${organizationId}/memory_collections/${block.opts.persist_in}/memories/${id}`,
         {
           method: "DELETE",
         }

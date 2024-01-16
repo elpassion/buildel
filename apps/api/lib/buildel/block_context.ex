@@ -4,6 +4,7 @@ defmodule Buildel.BlockContextBehaviour do
   @callback create_run_auth_token(String.t(), String.t()) :: {:ok, String.t()}
   @callback create_run_cost(String.t(), String.t(), integer()) ::
               {:ok, Buildel.Pipelines.RunCost.t()}
+  @callback global_collection_name(String.t(), String.t()) :: String.t()
 end
 
 defmodule Buildel.BlockContext do
@@ -64,5 +65,12 @@ defmodule Buildel.BlockContext do
       _ ->
         {:error, :not_found}
     end
+  end
+
+  @impl true
+  def global_collection_name(context_id, collection_name) do
+    %{global: organization_id} = context_from_context_id(context_id)
+
+    "#{organization_id}_#{collection_name}"
   end
 end

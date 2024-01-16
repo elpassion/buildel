@@ -20,4 +20,10 @@ defmodule Buildel.BlockContext.Mock do
   def create_run_cost(_context_id, _block_name, _amount) do
     {:ok, %{}}
   end
+
+  @impl true
+  def global_collection_name(context_id, block_name) do
+    context = context_from_context_id(context_id)
+    "#{context[:global]}_#{block_name}"
+  end
 end
