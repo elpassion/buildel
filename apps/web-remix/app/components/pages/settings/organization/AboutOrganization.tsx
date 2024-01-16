@@ -4,10 +4,10 @@ import { ValidatedForm } from "remix-validated-form";
 import { Avatar, Button } from "@elpassion/taco";
 import { IconButton } from "~/components/iconButton";
 import {
-  OrganizationSection,
-  OrganizationSectionContent,
-  OrganizationSectionHeading,
-} from "./OrganizationSection";
+  Section,
+  SectionContent,
+  SectionHeading,
+} from "../settingsLayout/PageLayout";
 import { Modal } from "@elpassion/taco/Modal";
 import { useModal } from "~/hooks/useModal";
 import { IOrganization } from "./organization.types";
@@ -22,17 +22,15 @@ export const AboutOrganization: React.FC<AboutOrganizationProps> = ({
   organization,
 }) => {
   return (
-    <OrganizationSection>
-      <OrganizationSectionHeading>
-        About Organization
-      </OrganizationSectionHeading>
+    <Section>
+      <SectionHeading>About Organization</SectionHeading>
 
-      <OrganizationSectionContent>
+      <SectionContent>
         <OrganizationAvatar organization={organization} />
 
         <EditOrganizationName organization={organization} />
-      </OrganizationSectionContent>
-    </OrganizationSection>
+      </SectionContent>
+    </Section>
   );
 };
 
