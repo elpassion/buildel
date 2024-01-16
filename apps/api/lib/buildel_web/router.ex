@@ -87,6 +87,7 @@ defmodule BuildelWeb.Router do
     get("/users/me", UserController, :me)
     post("/users/log_in", UserSessionController, :create)
     delete("/users/log_out", UserSessionController, :delete)
+    put("/users/password", UserPasswordController, :update)
 
     resources("/organizations", OrganizationController, only: [:index, :create, :show])
     put("/organizations/:id", OrganizationController, :update)
