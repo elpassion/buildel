@@ -69,7 +69,6 @@ defmodule Buildel.Blocks.DocumentSearch do
   def init(
         %{
           name: name,
-          block_name: block_name,
           context_id: context_id,
           type: __MODULE__,
           opts: opts

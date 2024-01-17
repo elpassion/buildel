@@ -73,19 +73,17 @@ defmodule BuildelWeb.MemoryControllerTest do
     test "returns :created when valid", %{
       conn: conn,
       upload_file: file,
-      pipeline: pipeline,
       organization: organization,
       collection: collection
     } do
-      collection_name = "pipelines:#{pipeline.id}"
+      collection_name = collection.collection_name
 
       conn =
         post(
           conn,
           ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories",
           %{
-            file: file,
-            collection_name: collection_name
+            file: file
           }
         )
 
