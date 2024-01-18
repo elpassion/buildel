@@ -2,14 +2,22 @@ import React from "react";
 import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "./loader";
+import {
+  PipelineRunCostsList,
+  PipelineRunCostsListHeader,
+} from "./RunsCostsList";
 
 export function PipelineRunCosts() {
   const { pipelineRun } = useLoaderData<typeof loader>();
 
   return (
-    <div>
-      <p>Costs details</p>
-    </div>
+    <section className="pt-5 pb-1 overflow-x-auto">
+      <div className="min-w-[450px]">
+        {pipelineRun.costs.length > 0 ? <PipelineRunCostsListHeader /> : null}
+
+        <PipelineRunCostsList items={pipelineRun.costs} />
+      </div>
+    </section>
   );
 }
 

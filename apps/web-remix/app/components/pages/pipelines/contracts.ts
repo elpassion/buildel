@@ -91,6 +91,8 @@ export const PipelineCost = z.object({
   id: z.number(),
 });
 
+export const PipelineCosts = z.array(z.object({ data: PipelineCost }));
+
 export const PipelineRun = z.object({
   created_at: z.string(),
   costs: z.array(z.object({ data: PipelineCost })),

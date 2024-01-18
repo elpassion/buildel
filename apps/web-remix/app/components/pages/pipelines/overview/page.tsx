@@ -10,6 +10,7 @@ export function OverviewPage() {
     <section className="pt-5 pb-1 overflow-x-auto">
       <div className="min-w-[550px]">
         {pipelineRuns.length > 0 ? <PipelineRunsListHeader /> : null}
+
         <PipelineRunsList
           items={pipelineRuns}
           pipelineId={pipelineId}

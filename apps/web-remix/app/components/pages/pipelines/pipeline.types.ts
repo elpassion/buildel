@@ -6,7 +6,9 @@ import {
   IOType,
   Pipeline,
   PipelineRun,
+  PipelineCost,
   PipelineRuns,
+  PipelineCosts,
 } from "./contracts";
 
 export type IBlockConfig = z.TypeOf<typeof BlockConfig>;
@@ -53,5 +55,9 @@ export type IBlockType = z.TypeOf<typeof BlockType>;
 export type IPipeline = z.infer<typeof Pipeline>;
 
 export type IPipelineRun = z.infer<typeof PipelineRun>;
+
+export type IPipelineCost = z.infer<typeof PipelineCost>;
+
+export type IPipelineCosts = z.infer<typeof PipelineCosts>;
 
 export type IPipelineRuns = z.infer<typeof PipelineRuns>;
