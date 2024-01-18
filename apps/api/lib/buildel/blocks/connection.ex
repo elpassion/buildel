@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.Connection do
   defstruct [:from, :to, :opts]
 
   def from_connection_string(connection_string, to_type, from_type \\ nil) do
-    %{block_name: block_name, input_name: input_name, output_name: output_name} =
+    %{block_name: block_name, input_name: input_name, output_name: output_name, reset: reset} =
       connection_description_from_connection_string(connection_string)
 
     from_type = from_type || to_type
@@ -10,11 +10,16 @@ defmodule Buildel.Blocks.Connection do
     %Buildel.Blocks.Connection{
       from: %Buildel.Blocks.Output{name: output_name, block_name: block_name, type: from_type},
       to: %Buildel.Blocks.Input{name: input_name, block_name: block_name, type: to_type},
-      opts: %{reset: true}
+      opts: %{reset: reset}
     }
   end
 
   def from_api_connection(connection, to_type, from_type \\ nil) do
+    reset =
+      if is_boolean(connection["opts"]["reset"]),
+        do: connection["opts"]["reset"],
+        else: true
+
     %Buildel.Blocks.Connection{
       from: %Buildel.Blocks.Output{
         name: connection["from"]["output_name"],
@@ -26,7 +31,7 @@ defmodule Buildel.Blocks.Connection do
         block_name: connection["to"]["block_name"],
         type: to_type
       },
-      opts: %{reset: true}
+      opts: %{reset: reset}
     }
   end
 
@@ -49,7 +54,12 @@ defmodule Buildel.Blocks.Connection do
     to_block
     |> Map.get("inputs")
     |> Enum.map(fn connection_string ->
-      %{block_name: from_block_name, input_name: input_name, output_name: output_name} =
+      %{
+        block_name: from_block_name,
+        input_name: input_name,
+        output_name: output_name,
+        reset: reset
+      } =
         connection_description_from_connection_string(connection_string)
 
       from_block = blocks_map |> Map.get(from_block_name)
@@ -72,7 +82,7 @@ defmodule Buildel.Blocks.Connection do
           block_name: from_block_name
         },
         to: %Buildel.Blocks.Input{name: to.name, type: to.type, block_name: to_block_name},
-        opts: %{reset: true}
+        opts: %{reset: reset}
       }
     end)
   end
@@ -100,6 +110,13 @@ defmodule Buildel.Blocks.Connection do
   end
 
   defp connection_description_from_connection_string(connection_string) do
+    [connection_string, reset] =
+      case connection_string |> String.split("?") do
+        [connection_string, "false"] -> [connection_string, false]
+        [connection_string, "true"] -> [connection_string, true]
+        [connection_string] -> [connection_string, true]
+      end
+
     [block_name, io_name] = connection_string |> String.split(":")
 
     [output_name, input_name] =
@@ -111,7 +128,8 @@ defmodule Buildel.Blocks.Connection do
     %{
       block_name: block_name,
       output_name: output_name,
-      input_name: input_name
+      input_name: input_name,
+      reset: reset
     }
   end
 end

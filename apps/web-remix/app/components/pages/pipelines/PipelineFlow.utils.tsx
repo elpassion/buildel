@@ -24,10 +24,14 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
 export function getEdges(pipeline: IPipelineConfig): IEdge[] {
   return pipeline.blocks.flatMap((block) =>
     block.inputs.map((input) => {
+      console.log("getEdges", input);
       let targetHandle = "input";
       let [source, sourceHandle] = input.split(":");
       if (sourceHandle.includes("->")) {
         [sourceHandle, targetHandle] = sourceHandle.split("->");
+      }
+      if (targetHandle.includes("?")) {
+        targetHandle = targetHandle.split("?")[0];
       }
 
       return {
@@ -79,12 +83,23 @@ export function toPipelineConfig(
   });
 
   edges.forEach((edge) => {
+    const originalTargetNode = nodes.find((node) => node.id === edge.target);
     const targetNode = tmpNodes.find((node) => node.id === edge.target);
 
-    if (!targetNode) return;
+    if (!targetNode || !originalTargetNode) return;
+
+    const input = originalTargetNode.data.inputs.find(
+      (input) =>
+        input.split("?")[0] ===
+        `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}`
+    );
+
+    if (!input) return;
+
+    console.log("input", input);
 
     targetNode.data.inputs.push(
-      `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}`
+      `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}?reset=${true}`
     );
     targetNode.data.connections!.push({
       from: {
