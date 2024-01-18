@@ -62,13 +62,38 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
 
   def cleanup_messages(state) do
     if state[tl_reset_keyword()] do
-      state |> Map.put(tl_keyword(), empty_messages(state))
+      new_messages =
+        Map.merge(
+          state |> Map.get(tl_keyword()),
+          empty_messages(state),
+          fn key, old, new ->
+            connection =
+              state.connections
+              |> Enum.find(fn connection ->
+                "#{connection.from.block_name}:#{connection.from.name}" == key
+              end)
+
+            if is_nil(connection) do
+              new
+            else
+              if connection.opts.reset do
+                new
+              else
+                old
+              end
+            end
+          end
+        )
+
+      state |> Map.put(tl_keyword(), new_messages)
     else
       state
     end
   end
 
   def empty_messages(state) do
-    Enum.into(state.connections, %{}, fn connection -> {connection.from.name, nil} end)
+    Enum.into(state.connections, %{}, fn connection ->
+      {"#{connection.from.block_name}:#{connection.from.name}", nil}
+    end)
   end
 end
