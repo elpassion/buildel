@@ -33,12 +33,8 @@ export function PipelineRunLayout() {
         <TabGroup activeTab={location.pathname}>
           <FilledTabsWrapper>
             <FilledTabLink
-              tabId={routes.pipelineRunOverview(
-                organizationId,
-                pipelineId,
-                runId
-              )}
-              to={routes.pipelineRunOverview(organizationId, pipelineId, runId)}
+              tabId={routes.pipelineRun(organizationId, pipelineId, runId)}
+              to={routes.pipelineRun(organizationId, pipelineId, runId)}
             >
               Overview
             </FilledTabLink>

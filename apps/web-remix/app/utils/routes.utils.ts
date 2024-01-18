@@ -26,11 +26,6 @@ export const routes = {
     pipelineId: PipelineId,
     runId: RunId
   ) => `${routes.pipelineRuns(organizationId, pipelineId)}/${runId}`,
-  pipelineRunOverview: (
-    organizationId: OrganizationId,
-    pipelineId: PipelineId,
-    runId: RunId
-  ) => `${routes.pipelineRun(organizationId, pipelineId, runId)}/overview`,
   pipelineRunCosts: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
