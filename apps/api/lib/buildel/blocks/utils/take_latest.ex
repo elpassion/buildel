@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.Utils.TakeLatest do
+  alias Buildel.Blocks.Connection
   alias Buildel.Blocks.Utils.TakeLatest
 
   defmacro __using__(_opts) do
@@ -67,18 +68,12 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
         fn key, old, new ->
           connection =
             state.connections
-            |> Enum.find(fn connection ->
-              "#{connection.from.block_name}:#{connection.from.name}" == key
-            end)
+            |> Enum.find(fn connection -> Connection.block_output_string(connection) == key end)
 
-          if is_nil(connection) do
+          if is_nil(connection) || connection.opts.reset do
             new
           else
-            if connection.opts.reset do
-              new
-            else
-              old
-            end
+            old
           end
         end
       )
@@ -88,7 +83,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
 
   def empty_messages(state) do
     Enum.into(state.connections, %{}, fn connection ->
-      {"#{connection.from.block_name}:#{connection.from.name}", nil}
+      {Connection.block_output_string(connection), nil}
     end)
   end
 end

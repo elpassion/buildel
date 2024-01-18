@@ -109,6 +109,10 @@ defmodule Buildel.Blocks.Connection do
     end)
   end
 
+  def block_output_string(%__MODULE__{} = connection) do
+    "#{connection.from.block_name}:#{connection.from.name}"
+  end
+
   defp connection_description_from_connection_string(connection_string) do
     [connection_string, reset] =
       case connection_string |> String.split("?") do
