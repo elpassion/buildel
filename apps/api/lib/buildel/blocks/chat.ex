@@ -171,7 +171,7 @@ defmodule Buildel.Blocks.Chat do
     {:ok,
      state
      |> assign_stream_state
-     |> assign_take_latest(true)
+     |> assign_take_latest()
      |> Map.put(:system_message, opts[:system_message])
      |> Map.put(:prompt_template, opts[:prompt_template])
      |> Map.put(:messages, initial_messages(state))

@@ -30,18 +30,13 @@ defmodule Buildel.Blocks.TakeLatest do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["template", "reset"],
+            "required" => ["template"],
             "properties" => %{
               "template" => %{
                 "type" => "string",
                 "title" => "Template",
                 "description" => "Output string from combined inputs.",
                 "minLength" => 1
-              },
-              "reset" => %{
-                "type" => "boolean",
-                "title" => "Reset",
-                "description" => "Reset all inputs after output."
               }
             }
           })
@@ -61,7 +56,7 @@ defmodule Buildel.Blocks.TakeLatest do
   def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
     subscribe_to_connections(context_id, state.connections)
 
-    {:ok, state |> assign_stream_state |> assign_take_latest(opts.reset)}
+    {:ok, state |> assign_stream_state |> assign_take_latest()}
   end
 
   @impl true
