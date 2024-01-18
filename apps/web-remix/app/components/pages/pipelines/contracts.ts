@@ -1,5 +1,4 @@
-import { number, z } from "zod";
-import { KnowledgeBaseFile } from "~/components/pages/knowledgeBase/contracts";
+import { z } from "zod";
 
 export const IOType = z.object({
   name: z.string(),
@@ -85,8 +84,16 @@ export const Pipeline = z.object({
   }),
 });
 
+export const PipelineCost = z.object({
+  amount: z.string(),
+  created_at: z.string(),
+  description: z.string(),
+  id: z.number(),
+});
+
 export const PipelineRun = z.object({
   created_at: z.string(),
+  costs: z.array(z.object({ data: PipelineCost })),
   id: z.number(),
   status: z.string(),
   config: z.object({
