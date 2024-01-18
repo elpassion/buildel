@@ -18,6 +18,9 @@ export async function loader(args: LoaderFunctionArgs) {
 
     return json({
       pipeline: pipeline.data,
+      runId: params.runId,
+      pipelineId: params.pipelineId,
+      organizationId: params.organizationId,
     });
   })(args);
 }

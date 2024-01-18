@@ -1,7 +1,7 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
+import invariant from "tiny-invariant";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
-import invariant from "tiny-invariant";
 import { routes } from "~/utils/routes.utils";
 
 export async function loader(args: LoaderFunctionArgs) {

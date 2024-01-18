@@ -18,7 +18,7 @@ export function PipelineRunOverview() {
   return (
     <Builder
       type="readOnly"
-      className="h-[calc(100vh_-_112px)]"
+      className="h-[calc(100vh_-_145px)]"
       pipeline={{ ...pipeline, config: pipelineRun.config }}
       CustomNode={ReadOnlyNode}
       CustomEdge={CustomEdge}

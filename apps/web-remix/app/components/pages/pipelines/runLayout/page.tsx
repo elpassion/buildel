@@ -1,21 +1,24 @@
 import React from "react";
 import { Icon } from "@elpassion/taco";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useLocation } from "@remix-run/react";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { routes } from "~/utils/routes.utils";
+import { TabGroup } from "~/components/tabs/TabGroup";
+import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
+import { FilledTabLink } from "~/components/tabs/FilledTabLink";
 import { loader } from "./loader";
 
 export function PipelineRunLayout() {
-  const { pipeline } = useLoaderData<typeof loader>();
+  const location = useLocation();
+  const { pipeline, runId, pipelineId, organizationId } =
+    useLoaderData<typeof loader>();
 
   return (
     <div>
       <AppNavbar
         leftContent={
           <div className="flex gap-2 text-white">
-            <Link
-              to={routes.pipelineRuns(pipeline.organization_id, pipeline.id)}
-            >
+            <Link to={routes.pipelineRuns(organizationId, pipelineId)}>
               <Icon iconName="arrow-left" className="text-2xl" />
             </Link>
             <div>
@@ -27,7 +30,28 @@ export function PipelineRunLayout() {
       />
 
       <div className="px-4 md:px-6 lg:px-10">
-        <Outlet />
+        <TabGroup activeTab={location.pathname}>
+          <FilledTabsWrapper>
+            <FilledTabLink
+              tabId={routes.pipelineRunOverview(
+                organizationId,
+                pipelineId,
+                runId
+              )}
+              to={routes.pipelineRunOverview(organizationId, pipelineId, runId)}
+            >
+              Overview
+            </FilledTabLink>
+            <FilledTabLink
+              tabId={routes.pipelineRunCosts(organizationId, pipelineId, runId)}
+              to={routes.pipelineRunCosts(organizationId, pipelineId, runId)}
+            >
+              Costs details
+            </FilledTabLink>
+          </FilledTabsWrapper>
+
+          <Outlet />
+        </TabGroup>
       </div>
     </div>
   );

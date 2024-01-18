@@ -35,8 +35,6 @@ export async function loader(args: LoaderFunctionArgs) {
 
     return json({
       pipeline: pipeline.data,
-      organizationId: params.organizationId,
-      pipelineId: params.pipelineId,
       blockTypes: blockTypes.data.data,
       pipelineRun: pipelineRun.data,
     });

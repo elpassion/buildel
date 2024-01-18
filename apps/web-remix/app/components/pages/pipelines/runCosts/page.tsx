@@ -4,7 +4,7 @@ import { useLoaderData } from "@remix-run/react";
 import { loader } from "./loader";
 
 export function PipelineRunCosts() {
-  const { pipeline, pipelineRun } = useLoaderData<typeof loader>();
+  const { pipelineRun } = useLoaderData<typeof loader>();
 
   return (
     <div>
@@ -16,7 +16,7 @@ export function PipelineRunCosts() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: `Run costs details`,
+      title: `Costs details`,
     },
   ];
 };
