@@ -11,7 +11,7 @@ export const BlockInputList: React.FC<BlockInputListProps> = ({ inputs }) => {
   const formattedInputs: IItem[] = useMemo(
     () =>
       inputs.map((input) => {
-        const reset = input.split("?").at(1) !== "false";
+        const reset = input.split("?").at(1) !== "reset=false";
         return {
           id: input,
           originalValue: input,
