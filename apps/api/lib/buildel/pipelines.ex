@@ -56,6 +56,7 @@ defmodule Buildel.Pipelines do
   def list_pipeline_runs(%Pipeline{} = pipeline) do
     from(r in Run, where: r.pipeline_id == ^pipeline.id, order_by: [desc: r.id])
     |> Repo.all()
+    |> Repo.preload(run_costs: :cost)
   end
 
   def get_pipeline_run(%Pipeline{} = pipeline, run_id) do

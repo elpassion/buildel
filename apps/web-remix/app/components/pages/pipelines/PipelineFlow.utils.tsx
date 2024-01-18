@@ -29,6 +29,9 @@ export function getEdges(pipeline: IPipelineConfig): IEdge[] {
       if (sourceHandle.includes("->")) {
         [sourceHandle, targetHandle] = sourceHandle.split("->");
       }
+      if (targetHandle.includes("?")) {
+        targetHandle = targetHandle.split("?")[0];
+      }
 
       return {
         id: `${source}:${sourceHandle}-${block.name}:${targetHandle}`,
@@ -79,13 +82,26 @@ export function toPipelineConfig(
   });
 
   edges.forEach((edge) => {
+    const originalTargetNode = nodes.find((node) => node.id === edge.target);
     const targetNode = tmpNodes.find((node) => node.id === edge.target);
 
-    if (!targetNode) return;
+    if (!targetNode || !originalTargetNode) return;
+
+    const input = originalTargetNode.data.inputs.find(
+      (input) =>
+        input.split("?")[0] ===
+        `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}`
+    );
+
+    if (!input) return;
+
+    const resetMatch = input.match(/reset=([^&]+)/);
+    const resetValue = resetMatch ? resetMatch[1] === "true" : true;
 
     targetNode.data.inputs.push(
-      `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}`
+      `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}?reset=${resetValue}`
     );
+
     targetNode.data.connections!.push({
       from: {
         block_name: edge.source,
@@ -96,7 +112,7 @@ export function toPipelineConfig(
         input_name: edge.targetHandle!,
       },
       opts: {
-        reset: true,
+        reset: resetValue,
       },
     });
   });

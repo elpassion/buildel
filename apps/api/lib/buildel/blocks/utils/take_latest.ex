@@ -1,13 +1,14 @@
 defmodule Buildel.Blocks.Utils.TakeLatest do
+  alias Buildel.Blocks.Connection
   alias Buildel.Blocks.Utils.TakeLatest
 
   defmacro __using__(_opts) do
     quote do
       import TakeLatest
 
-      defp assign_take_latest(state, reset \\ false) do
+      defp assign_take_latest(state) do
         messages = empty_messages(state)
-        state |> Map.put(tl_keyword(), messages) |> Map.put(tl_reset_keyword(), reset)
+        state |> Map.put(tl_keyword(), messages)
       end
 
       defp save_take_latest_message(state, topic, text) do
@@ -48,7 +49,6 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
   end
 
   def tl_keyword(), do: :take_latest_messages
-  def tl_reset_keyword(), do: :take_latest_reset
 
   def message_filled?(message, connections) do
     !String.contains?(
@@ -61,14 +61,29 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
   end
 
   def cleanup_messages(state) do
-    if state[tl_reset_keyword()] do
-      state |> Map.put(tl_keyword(), empty_messages(state))
-    else
-      state
-    end
+    new_messages =
+      Map.merge(
+        state |> Map.get(tl_keyword()),
+        empty_messages(state),
+        fn key, old, new ->
+          connection =
+            state.connections
+            |> Enum.find(fn connection -> Connection.block_output_string(connection) == key end)
+
+          if is_nil(connection) || connection.opts.reset do
+            new
+          else
+            old
+          end
+        end
+      )
+
+    state |> Map.put(tl_keyword(), new_messages)
   end
 
   def empty_messages(state) do
-    Enum.into(state.connections, %{}, fn connection -> {connection.from.name, nil} end)
+    Enum.into(state.connections, %{}, fn connection ->
+      {Connection.block_output_string(connection), nil}
+    end)
   end
 end

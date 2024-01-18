@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { ItemList } from "~/components/list/ItemList";
-import { Badge } from "@elpassion/taco";
+import { Badge, Checkbox } from "@elpassion/taco";
+import { useInputs } from "./EditBlockForm";
 
 interface BlockInputListProps {
   inputs: string[];
@@ -9,11 +10,15 @@ interface BlockInputListProps {
 export const BlockInputList: React.FC<BlockInputListProps> = ({ inputs }) => {
   const formattedInputs: IItem[] = useMemo(
     () =>
-      inputs.map((input) => ({
-        id: input,
-        originalValue: input,
-        value: input.split(":").at(0),
-      })),
+      inputs.map((input) => {
+        const reset = input.split("?").at(1) !== "reset=false";
+        return {
+          id: input,
+          originalValue: input,
+          value: input.split(":").at(0),
+          reset: reset,
+        };
+      }),
     [inputs]
   );
 
@@ -35,8 +40,21 @@ interface IItem {
   id: string;
   originalValue: string;
   value?: string;
+  reset: boolean;
 }
 
-function BlockInputItem({ value, originalValue }: IItem) {
-  return <Badge text={value || originalValue} size="xs" />;
+function BlockInputItem({ value, originalValue, reset }: IItem) {
+  const { updateInputReset } = useInputs();
+  return (
+    <>
+      <Badge text={value || originalValue} size="xs" />
+      <Checkbox
+        checked={reset}
+        onChange={(e) => {
+          console.log("e.target.checked", e.target.checked);
+          updateInputReset(originalValue, e.target.checked);
+        }}
+      />
+    </>
+  );
 }

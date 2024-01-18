@@ -1,4 +1,10 @@
-import React, { ReactNode, useCallback, useEffect } from "react";
+import React, {
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { z } from "zod";
 import { Button } from "@elpassion/taco";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
@@ -38,13 +44,28 @@ export function EditBlockForm({
 }) {
   const schema = generateZODSchema(blockConfig.block_type.schema as any);
   const validator = React.useMemo(() => withZod(schema), []);
+  const [inputs, setInputs] = useState(blockConfig.inputs);
+
+  const updateInputReset = useCallback(
+    (input: string, reset: boolean) => {
+      const newInputs = inputs.map((existingInput) => {
+        if (existingInput.split("?")[0] !== input.split("?")[0])
+          return existingInput;
+        return `${input.split("?")[0]}?reset=${reset}`;
+      });
+      setInputs(newInputs);
+    },
+    [inputs]
+  );
 
   const handleUpdate = (
     data: Record<string, any>,
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    onSubmit({ ...blockConfig, ...data });
+    const newConfig = { ...blockConfig, ...data };
+    newConfig.inputs = inputs;
+    onSubmit(newConfig);
   };
 
   const EditorField = useCallback(
@@ -141,26 +162,28 @@ export function EditBlockForm({
       className="w-full grow flex flex-col h-[60%]"
       noValidate
     >
-      <div className="space-y-4 grow max-h-full overflow-y-auto px-1">
-        <HiddenField name="name" value={blockConfig.name} />
-        <HiddenField name="inputs" value={JSON.stringify(blockConfig.inputs)} />
+      <InputsProvider inputs={inputs} updateInputReset={updateInputReset}>
+        <div className="space-y-4 grow max-h-full overflow-y-auto px-1">
+          <HiddenField name="name" value={blockConfig.name} />
+          <HiddenField name="inputs" value={JSON.stringify(inputs)} />
 
-        <Schema
-          schema={blockConfig.block_type.schema.properties.opts}
-          name="opts"
-          fields={{
-            string: StringField,
-            number: NumberField,
-            array: ArrayField,
-            boolean: BooleanField,
-            editor: EditorField,
-            asyncSelect: SelectField,
-            asyncCreatableSelect: AsyncCreatableField,
-          }}
-        />
+          <Schema
+            schema={blockConfig.block_type.schema.properties.opts}
+            name="opts"
+            fields={{
+              string: StringField,
+              number: NumberField,
+              array: ArrayField,
+              boolean: BooleanField,
+              editor: EditorField,
+              asyncSelect: SelectField,
+              asyncCreatableSelect: AsyncCreatableField,
+            }}
+          />
 
-        {children}
-      </div>
+          {children}
+        </div>
+      </InputsProvider>
 
       <Button
         isFluid
@@ -189,4 +212,27 @@ function TriggerValidation() {
 
 function generateSuggestions(inputs: string[]) {
   return inputs.map((suggestion) => suggestion.split("->").at(0) ?? "");
+}
+
+const InputsContext = React.createContext<{
+  inputs: string[];
+  updateInputReset: (input: string, value: boolean) => void;
+}>({ inputs: [], updateInputReset: () => {} });
+
+const InputsProvider: React.FC<{
+  inputs: string[];
+  updateInputReset: (input: string, value: boolean) => void;
+  children: ReactNode;
+}> = ({ inputs, updateInputReset, children }) => {
+  return (
+    <>
+      <InputsContext.Provider value={{ inputs, updateInputReset }}>
+        {children}
+      </InputsContext.Provider>
+    </>
+  );
+};
+
+export function useInputs() {
+  return React.useContext(InputsContext);
 }
