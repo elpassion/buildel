@@ -15,7 +15,7 @@ export const PipelineRunCostsList: React.FC<PipelineRunCostsListProps> = ({
     <ItemList
       className="flex flex-col-reverse gap-2"
       items={items.map((item) => item.data)}
-      emptyText={<EmptyMessage>There is no runs yet...</EmptyMessage>}
+      emptyText={<EmptyMessage>There is no costs yet...</EmptyMessage>}
       renderItem={(item, index) => (
         <PipelineRunCostsItem data={item} index={index} />
       )}
