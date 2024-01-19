@@ -98,7 +98,7 @@ function Badge({
     <div
       onClick={onClick}
       className={classNames(
-        "bg-neutral-800 px-2 py-1 rounded-sm flex items-center",
+        "bg-neutral-800 px-2 py-1 rounded-md flex items-center",
         className
       )}
     >
