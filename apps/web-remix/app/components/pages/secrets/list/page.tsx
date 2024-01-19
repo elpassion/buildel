@@ -8,7 +8,7 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import { loader } from "./loader";
-import { Button, Icon } from "@elpassion/taco";
+import { Button } from "@elpassion/taco";
 import { SecretKeyList } from "./SecretKeyList";
 import { routes } from "~/utils/routes.utils";
 import {
@@ -16,9 +16,8 @@ import {
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
 import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
-import { Tooltip } from "~/components/tooltip/Tooltip";
-import classNames from "classnames";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
+import { HelpfulIcon } from "~/components/tooltip/HelpfulIcon";
 
 export function SecretListPage() {
   const navigate = useNavigate();
@@ -80,30 +79,3 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
-
-interface HelpfulIconProps {
-  text: string;
-  id: string;
-  className?: string;
-}
-
-function HelpfulIcon({ className, text, id }: HelpfulIconProps) {
-  return (
-    <>
-      <Tooltip
-        anchorSelect={`#${id}-helpful-icon`}
-        content={text}
-        className="!text-xs max-w-[350px] "
-        place="bottom"
-      />
-      <Icon
-        id={`${id}-helpful-icon`}
-        iconName="help-circle"
-        className={classNames(
-          "text-primary-500 text-xl cursor-pointer",
-          className
-        )}
-      />
-    </>
-  );
-}
