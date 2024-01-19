@@ -2,6 +2,7 @@ defmodule Buildel.Blocks.Chat do
   require Logger
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
+  alias LangChain.Function
 
   # Config
 
@@ -20,7 +21,7 @@ defmodule Buildel.Blocks.Chat do
         sentences_output(),
         Block.text_output("message_output")
       ],
-      ios: [Block.io("tool", "controller")],
+      ios: [Block.io("tool", "controller"), Block.io("chat", "worker")],
       schema: schema()
     }
   end
@@ -133,6 +134,10 @@ defmodule Buildel.Blocks.Chat do
     GenServer.cast(pid, {:send_message, message})
   end
 
+  def send_message_sync(pid, {:text, _text} = message, %{block_name: block_name}) do
+    GenServer.call(pid, {:send_message, message, %{block_name: block_name}}, 60_000)
+  end
+
   defp save_text_chunk(pid, chunk) do
     GenServer.cast(pid, {:save_text_chunk, chunk})
   end
@@ -232,7 +237,7 @@ defmodule Buildel.Blocks.Chat do
         state[:tool_connections]
         |> Enum.map(fn connection ->
           pid = block_context().block_pid(state[:context_id], connection.from.block_name)
-          Buildel.Blocks.Block.function(pid)
+          Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
         end)
 
       Task.start(fn ->
@@ -325,7 +330,7 @@ defmodule Buildel.Blocks.Chat do
   end
 
   defp chat_task(%{messages: messages, pid: pid, tools: tools, state: state}) do
-    with :ok <-
+    with {:ok, _, _} <-
            call_chat(%{
              messages: messages,
              pid: pid,
@@ -410,6 +415,102 @@ defmodule Buildel.Blocks.Chat do
     state = save_take_latest_message(state, name, message)
     send_message(self(), {:text, message})
     {:noreply, state}
+  end
+
+  def handle_call({:send_message, {:text, message}, %{block_name: block_name}}, _from, state) do
+    topic = BlockPubSub.io_topic(state[:context_id], block_name, "tool")
+    state = save_take_latest_message(state, topic, message)
+    IO.inspect(state)
+
+    state = send_stream_start(state)
+
+    messages =
+      initial_messages(state) ++
+        [
+          %{
+            role: "user",
+            content: replace_inputs_with_take_latest_messages(state, state[:prompt_template])
+          }
+        ]
+
+    tools =
+      state[:tool_connections]
+      |> Enum.map(fn connection ->
+        pid = block_context().block_pid(state[:context_id], connection.from.block_name)
+        Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
+      end)
+
+    {:ok, _chain, message} =
+      chat_gpt().stream_chat(%{
+        context: %{messages: messages},
+        on_content: fn text_chunk ->
+          Buildel.BlockPubSub.broadcast_to_io(
+            state[:context_id],
+            state[:block_name],
+            "output",
+            {:text, text_chunk}
+          )
+        end,
+        on_tool_content: fn _tool_name, _content ->
+          nil
+        end,
+        on_end: fn chat_token_summary ->
+          cost =
+            Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
+
+          block_context().create_run_cost(
+            state[:context_id],
+            state[:block_name],
+            cost
+          )
+        end,
+        on_error: fn
+          :context_length_exceeded ->
+            send_error(state, "Context length exceeded")
+            nil
+
+          error ->
+            send_error(state, error)
+            nil
+            # finish_chat_message(pid)
+        end,
+        api_key: state[:api_key],
+        model: state[:opts].model,
+        temperature: state[:opts].temperature,
+        tools: tools,
+        endpoint: state[:opts].endpoint,
+        api_type: state[:opts].api_type
+      })
+
+    state = send_stream_stop(state)
+
+    {:reply, message.content, state}
+  end
+
+  @impl true
+  def handle_call({:function, %{block_name: block_name}}, _, state) do
+    pid = self()
+
+    function =
+      Function.new!(%{
+        name: state.block_name,
+        description: state.opts.system_message,
+        parameters_schema: %{
+          type: "object",
+          properties: %{
+            message: %{
+              type: "string",
+              description: "Message to send to the chat."
+            }
+          },
+          required: ["message"]
+        },
+        function: fn %{"message" => message} = _args, _context ->
+          send_message_sync(pid, {:text, message}, %{block_name: block_name})
+        end
+      })
+
+    {:reply, function, state}
   end
 
   defp chat_gpt() do

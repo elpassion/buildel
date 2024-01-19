@@ -39,8 +39,8 @@ defmodule Buildel.Blocks.Block do
     GenServer.call(pid, :type)
   end
 
-  def function(pid) do
-    GenServer.call(pid, :function)
+  def function(pid, %{block_name: _block_name} = from) do
+    GenServer.call(pid, {:function, from})
   end
 
   defmacro __using__(_opts) do

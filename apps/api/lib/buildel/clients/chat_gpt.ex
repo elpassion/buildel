@@ -35,7 +35,7 @@ defmodule Buildel.Clients.ChatGPT do
         %{role: "tool"} = message -> Message.new_function!(message.tool_name, message.content)
       end)
 
-    with {:ok, chain, _} <-
+    with {:ok, chain, message} <-
            LLMChain.new!(%{
              llm:
                ChatOpenAI.new!(%{
@@ -80,7 +80,7 @@ defmodule Buildel.Clients.ChatGPT do
 
       on_end.(statistics)
 
-      :ok
+      {:ok, chain, message}
     else
       {:error, "context_length_exceeded"} ->
         on_error.(:context_length_exceeded)

@@ -162,7 +162,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   @impl true
-  def handle_call(:function, _from, state) do
+  def handle_call({:function, _}, _from, state) do
     pid = self()
 
     function =

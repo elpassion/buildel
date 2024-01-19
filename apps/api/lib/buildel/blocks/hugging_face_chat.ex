@@ -202,7 +202,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
         state[:tool_blocks]
         |> Enum.map(fn block ->
           pid = block_context().block_pid(state[:context_id], block["name"])
-          Buildel.Blocks.Block.function(pid)
+          Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
         end)
 
       Task.start(fn ->
