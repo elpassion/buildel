@@ -2,8 +2,12 @@
   @apply !text-white
 }
 
-.monaco-editor-input .mtk1 .editor-inputs-suggestions-valid,.monaco-editor-input .editor-inputs-suggestions-valid{
+.monaco-editor-input .mtk1 .editor-inputs-suggestions-valid,.monaco-editor-input .editor-inputs-suggestions-valid-resettable{
   @apply !text-green-500;
+}
+
+.monaco-editor-input .mtk1 .editor-inputs-suggestions-valid,.monaco-editor-input .editor-inputs-suggestions-valid-non-resettable{
+  @apply !text-blue-500;
 }
 
 .monaco-editor-input .mtk1 .editor-inputs-suggestions-invalid,.monaco-editor-input .editor-inputs-suggestions-invalid{

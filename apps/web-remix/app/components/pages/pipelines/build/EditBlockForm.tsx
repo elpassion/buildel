@@ -1,10 +1,4 @@
-import React, {
-  PropsWithChildren,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { Button } from "@elpassion/taco";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
@@ -26,6 +20,7 @@ import {
   HiddenField,
 } from "~/components/form/fields/field.context";
 import { BlockConfig } from "../contracts";
+import { IBlockConfigConnection } from "~/components/pages/pipelines/pipeline.types";
 
 export function EditBlockForm({
   onSubmit,
@@ -73,13 +68,12 @@ export function EditBlockForm({
       assert(props.field.type === "string");
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const { fieldErrors } = useFormContext();
-
       return (
         <FormField name={props.name!}>
           <MonacoEditorField
             supportingText={props.field.description}
             label={props.field.title}
-            suggestions={generateSuggestions(blockConfig.inputs)}
+            suggestions={generateSuggestions(blockConfig.connections)}
             error={fieldErrors[props.name!]}
           />
         </FormField>
@@ -210,8 +204,13 @@ function TriggerValidation() {
   return null;
 }
 
-function generateSuggestions(inputs: string[]) {
-  return inputs.map((suggestion) => suggestion.split("->").at(0) ?? "");
+function generateSuggestions(connections: IBlockConfigConnection[]) {
+  return connections.map((connection) => {
+    return {
+      value: `${connection.from.block_name}:${connection.from.output_name}`,
+      reset: connection.opts.reset,
+    };
+  });
 }
 
 const InputsContext = React.createContext<{

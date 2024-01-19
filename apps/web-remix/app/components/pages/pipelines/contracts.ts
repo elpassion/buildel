@@ -15,31 +15,29 @@ export const BlockType = z.object({
   schema: z.record(z.string(), z.any()),
 });
 
+export const BlockConfigConnection = z.object({
+  from: z.object({
+    block_name: z.string(),
+    output_name: z.string(),
+  }),
+  to: z.object({
+    block_name: z.string(),
+    input_name: z.string(),
+  }),
+  opts: z
+    .object({
+      reset: z.boolean().default(true),
+    })
+    .default({
+      reset: true,
+    }),
+});
+
 export const BlockConfig = z.object({
   name: z.string(),
   opts: z.record(z.string(), z.any()),
   inputs: z.array(z.string()),
-  connections: z
-    .array(
-      z.object({
-        from: z.object({
-          block_name: z.string(),
-          output_name: z.string(),
-        }),
-        to: z.object({
-          block_name: z.string(),
-          input_name: z.string(),
-        }),
-        opts: z
-          .object({
-            reset: z.boolean().default(true),
-          })
-          .default({
-            reset: true,
-          }),
-      })
-    )
-    .default([]),
+  connections: z.array(BlockConfigConnection).default([]),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
   block_type: BlockType,

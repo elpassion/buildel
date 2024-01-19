@@ -7,7 +7,7 @@ export const SUGGESTION_REGEX = "\\{\\{[^\\s]+\\}\\}";
 export type IEditor = Parameters<OnMount>[0];
 export interface MonacoEditorInputProps
   extends Partial<Omit<EditorProps, "onMount" | "onChange" | "path">> {
-  suggestions?: string[];
+  suggestions?: { value: string; reset: boolean }[];
   onChange?: (value?: string) => void;
   path: string;
 }
@@ -51,15 +51,30 @@ export const MonacoEditorInput: React.FC<MonacoEditorInputProps> = ({
         [],
         matches.map((match) => {
           const value = model.getValueInRange(match.range);
-          const isOk = suggestions?.map((sug) => `{{${sug}}}`).includes(value);
+          const index = suggestions?.findIndex(
+            (sug) => `{{${sug.value}}}` === value
+          );
+
+          const isOk = typeof index === "number" && index >= 0;
+          const isResettable =
+            isOk && suggestions ? suggestions[index].reset : true;
+
+          const optionStyle = () => {
+            if (isOk) {
+              if (isResettable)
+                return "editor-inputs-suggestions-valid-resettable";
+              return "editor-inputs-suggestions-valid-non-resettable";
+            }
+
+            return "editor-inputs-suggestions-invalid";
+          };
+
           return {
             range: match.range,
             options: {
               isWholeLine: false,
               stickiness: 1,
-              inlineClassName: isOk
-                ? "editor-inputs-suggestions-valid"
-                : "editor-inputs-suggestions-invalid",
+              inlineClassName: optionStyle(),
             },
           };
         })
@@ -93,9 +108,9 @@ export const MonacoEditorInput: React.FC<MonacoEditorInputProps> = ({
     if (!monaco || !suggestions) return [];
 
     return suggestions.map((sug) => ({
-      label: sug,
+      label: sug.value,
       kind: monaco.languages.CompletionItemKind.Keyword,
-      insertText: `{{${sug}}}`,
+      insertText: `{{${sug.value}}}`,
     }));
   }, [monaco, suggestions]);
 
