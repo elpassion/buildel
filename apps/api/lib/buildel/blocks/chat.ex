@@ -37,6 +37,8 @@ defmodule Buildel.Blocks.Chat do
         "opts" =>
           options_schema(%{
             "required" => [
+              "name",
+              "description",
               "model",
               "temperature",
               "system_message",
@@ -47,6 +49,16 @@ defmodule Buildel.Blocks.Chat do
             ],
             "properties" =>
               Jason.OrderedObject.new(
+                name: %{
+                  "type" => "string",
+                  "title" => "Name",
+                  "description" => "The name of the chat."
+                },
+                description: %{
+                  "type" => "string",
+                  "title" => "Description",
+                  "description" => "The description of the chat."
+                },
                 api_key:
                   secret_schema(%{
                     "title" => "API key",
@@ -135,7 +147,7 @@ defmodule Buildel.Blocks.Chat do
   end
 
   def send_message_sync(pid, {:text, _text} = message, %{block_name: block_name}) do
-    GenServer.call(pid, {:send_message, message, %{block_name: block_name}}, 60_000)
+    GenServer.call(pid, {:send_message, message, %{block_name: block_name}}, 5 * 60_000)
   end
 
   defp save_text_chunk(pid, chunk) do
@@ -357,6 +369,8 @@ defmodule Buildel.Blocks.Chat do
   end
 
   defp call_chat(%{messages: messages, pid: pid, tools: tools, state: state}) do
+    IO.inspect("#{state[:block_name]} #{inspect(messages |> Enum.at(-1))} #{inspect(tools)} ")
+
     chat_gpt().stream_chat(%{
       context: %{messages: messages},
       on_content: fn text_chunk ->
@@ -420,7 +434,6 @@ defmodule Buildel.Blocks.Chat do
   def handle_call({:send_message, {:text, message}, %{block_name: block_name}}, _from, state) do
     topic = BlockPubSub.io_topic(state[:context_id], block_name, "tool")
     state = save_take_latest_message(state, topic, message)
-    IO.inspect(state)
 
     state = send_stream_start(state)
 
@@ -439,6 +452,8 @@ defmodule Buildel.Blocks.Chat do
         pid = block_context().block_pid(state[:context_id], connection.from.block_name)
         Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
       end)
+
+    IO.inspect("#{state[:block_name]} #{message} #{inspect(tools)} ")
 
     {:ok, _chain, message} =
       chat_gpt().stream_chat(%{
@@ -493,19 +508,20 @@ defmodule Buildel.Blocks.Chat do
 
     function =
       Function.new!(%{
-        name: state.block_name,
-        description: state.opts.system_message,
+        name: state.opts.name,
+        description: state.opts.description,
         parameters_schema: %{
           type: "object",
           properties: %{
             message: %{
               type: "string",
-              description: "Message to send to the chat."
+              description: "Message to send to the agent."
             }
           },
           required: ["message"]
         },
         function: fn %{"message" => message} = _args, _context ->
+          IO.inspect(message)
           send_message_sync(pid, {:text, message}, %{block_name: block_name})
         end
       })
