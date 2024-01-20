@@ -29,7 +29,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["api_key", "knowledge"],
+            "required" => ["api_key", "knowledge", "limit"],
             "properties" =>
               Jason.OrderedObject.new(
                 api_key:
@@ -42,7 +42,13 @@ defmodule Buildel.Blocks.MemorySearchTool do
                     "title" => "Knowledge",
                     "description" => "The knowledge to use for retrieval.",
                     "default" => ""
-                  })
+                  }),
+                limit: %{
+                  "type" => "number",
+                  "title" => "Limit",
+                  "description" => "The maximum number of results to return.",
+                  "default" => 3
+                }
               )
           })
       }
@@ -80,9 +86,10 @@ defmodule Buildel.Blocks.MemorySearchTool do
   @impl true
   def handle_cast({:query, {:text, query}}, state) do
     state = state |> send_stream_start()
+    limit = state.opts |> Map.get(:limit, 3)
 
     Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
-    |> Enum.take(3)
+    |> Enum.take(limit)
     |> Enum.map(fn %{
                      "document" => document,
                      "metadata" => %{"file_name" => filename, "memory_id" => memory_id}
@@ -103,10 +110,11 @@ defmodule Buildel.Blocks.MemorySearchTool do
   @impl true
   def handle_call({:query, {:text, query}}, _caller, state) do
     state = state |> send_stream_start()
+    limit = state.opts |> Map.get(:limit, 3)
 
     result =
       Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
-      |> Enum.take(3)
+      |> Enum.take(limit)
       |> Enum.map(fn %{
                        "document" => document,
                        "metadata" => %{"file_name" => filename, "memory_id" => memory_id}

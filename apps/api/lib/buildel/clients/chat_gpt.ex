@@ -68,6 +68,10 @@ defmodule Buildel.Clients.ChatGPT do
 
                %Message{} ->
                  nil
+
+               {:error, reason} ->
+                 on_error.(reason)
+                 nil
              end
            ) do
       statistics =

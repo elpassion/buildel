@@ -342,14 +342,14 @@ defmodule Buildel.Blocks.Chat do
   end
 
   defp chat_task(%{messages: messages, pid: pid, tools: tools, state: state}) do
-    with {:ok, _, _} <-
+    with {:ok, _, _} = result <-
            call_chat(%{
              messages: messages,
              pid: pid,
              tools: tools,
              state: state
            }) do
-      nil
+      result
     else
       {:error, :context_length_exceeded} ->
         with {:ok, messages} <- remove_last_non_initial_message(state) do
@@ -369,8 +369,6 @@ defmodule Buildel.Blocks.Chat do
   end
 
   defp call_chat(%{messages: messages, pid: pid, tools: tools, state: state}) do
-    IO.inspect("#{state[:block_name]} #{inspect(messages |> Enum.at(-1))} #{inspect(tools)} ")
-
     chat_gpt().stream_chat(%{
       context: %{messages: messages},
       on_content: fn text_chunk ->
@@ -438,7 +436,7 @@ defmodule Buildel.Blocks.Chat do
     state = send_stream_start(state)
 
     messages =
-      initial_messages(state) ++
+      state.messages ++
         [
           %{
             role: "user",
@@ -453,51 +451,13 @@ defmodule Buildel.Blocks.Chat do
         Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
       end)
 
-    IO.inspect("#{state[:block_name]} #{message} #{inspect(tools)} ")
-
     {:ok, _chain, message} =
-      chat_gpt().stream_chat(%{
-        context: %{messages: messages},
-        on_content: fn text_chunk ->
-          Buildel.BlockPubSub.broadcast_to_io(
-            state[:context_id],
-            state[:block_name],
-            "output",
-            {:text, text_chunk}
-          )
-        end,
-        on_tool_content: fn _tool_name, _content ->
-          nil
-        end,
-        on_end: fn chat_token_summary ->
-          cost =
-            Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
-
-          block_context().create_run_cost(
-            state[:context_id],
-            state[:block_name],
-            cost
-          )
-        end,
-        on_error: fn
-          :context_length_exceeded ->
-            send_error(state, "Context length exceeded")
-            nil
-
-          error ->
-            send_error(state, error)
-            nil
-            # finish_chat_message(pid)
-        end,
-        api_key: state[:api_key],
-        model: state[:opts].model,
-        temperature: state[:opts].temperature,
+      chat_task(%{
+        messages: messages,
+        pid: self(),
         tools: tools,
-        endpoint: state[:opts].endpoint,
-        api_type: state[:opts].api_type
+        state: state
       })
-
-    state = send_stream_stop(state)
 
     {:reply, message.content, state}
   end
@@ -521,7 +481,6 @@ defmodule Buildel.Blocks.Chat do
           required: ["message"]
         },
         function: fn %{"message" => message} = _args, _context ->
-          IO.inspect(message)
           send_message_sync(pid, {:text, message}, %{block_name: block_name})
         end
       })
