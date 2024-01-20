@@ -13,7 +13,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
       type: "memory_search_tool",
       groups: ["text", "tools"],
       inputs: [],
-      outputs: [],
+      outputs: [Block.text_output("results")],
       ios: [Block.io("tool", "worker")],
       schema: schema()
     }
@@ -126,6 +126,13 @@ defmodule Buildel.Blocks.MemorySearchTool do
         }
       end)
       |> Jason.encode!()
+
+    Buildel.BlockPubSub.broadcast_to_io(
+      state[:context_id],
+      state[:block_name],
+      "results",
+      {:text, result}
+    )
 
     state = state |> schedule_stream_stop()
 
