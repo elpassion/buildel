@@ -188,7 +188,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
 
     if(
       Enum.all?(messages, fn message ->
-        message.content |> message_filled?(state[:opts].inputs)
+        message.content |> all_inputs_in_string_filled?(state[:opts].inputs)
       end)
     ) do
       state = cleanup_inputs(state)

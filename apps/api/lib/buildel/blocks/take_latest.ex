@@ -87,7 +87,7 @@ defmodule Buildel.Blocks.TakeLatest do
   defp interpolate_template_with_take_latest_messages(state, template) do
     message = replace_input_strings_with_latest_inputs_values(state, template)
 
-    if message_filled?(message, state.connections) do
+    if all_inputs_in_string_filled?(message, state.connections) do
       {state |> cleanup_inputs(), message}
     else
       {state, nil}

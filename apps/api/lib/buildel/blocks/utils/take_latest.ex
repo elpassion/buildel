@@ -40,7 +40,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
 
   def tl_keyword(), do: :take_latest_messages
 
-  def message_filled?(message, connections) do
+  def all_inputs_in_string_filled?(message, connections) do
     !String.contains?(
       message,
       connections

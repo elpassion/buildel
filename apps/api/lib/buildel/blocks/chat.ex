@@ -145,7 +145,12 @@ defmodule Buildel.Blocks.Chat do
   end
 
   def send_message_sync(pid, {:text, _text} = message, %{block_name: block_name}) do
-    GenServer.call(pid, {:send_message, message, %{block_name: block_name}}, 5 * 60_000)
+    GenServer.cast(
+      pid,
+      {:save_input, %{block_name: block_name, message: message, output_name: "tool"}}
+    )
+
+    GenServer.call(pid, {:send_message, message}, 5 * 60_000)
   end
 
   defp save_text_chunk(pid, chunk) do
@@ -187,19 +192,74 @@ defmodule Buildel.Blocks.Chat do
      state
      |> assign_stream_state
      |> assign_take_latest()
-     |> Map.put(:system_message, opts[:system_message])
-     |> Map.put(:prompt_template, opts[:prompt_template])
+     |> Map.put(:system_message, opts.system_message)
+     |> Map.put(:prompt_template, opts.prompt_template)
      |> Map.put(:messages, initial_messages(state))
      |> Map.put(:api_key, api_key)
      |> Map.put(:tool_connections, tool_connections)}
   end
 
   defp initial_messages(state) do
-    [%{role: "system", content: state[:opts][:system_message]}] ++ state[:opts][:messages]
+    [%{role: "system", content: state.opts.system_message}] ++ state.opts.messages
   end
 
   @impl true
   def handle_cast({:send_message, {:text, text}}, state) do
+    state = send_stream_start(state)
+
+    Buildel.BlockPubSub.broadcast_to_io(
+      state.context_id,
+      state.block_name,
+      "message_output",
+      {:text, text}
+    )
+
+    state = %{
+      state
+      | messages:
+          state.messages ++
+            [
+              %{
+                role: "user",
+                content:
+                  replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
+              }
+            ]
+    }
+
+    messages =
+      state.messages
+      |> Enum.map(fn message ->
+        %{
+          message
+          | content: replace_input_strings_with_latest_inputs_values(state, message.content)
+        }
+      end)
+
+    if(Enum.all?(messages, &all_inputs_in_string_filled?(&1.content, state.connections))) do
+      chat_task(%{messages: messages, state: state})
+      {:noreply, cleanup_inputs(state)}
+    else
+      {:noreply, state}
+    end
+  end
+
+  @impl true
+  def handle_cast(
+        {:save_input,
+         %{block_name: block_name, message: {:text, text}, output_name: output_name}},
+        state
+      ) do
+    topic = BlockPubSub.io_topic(state[:context_id], block_name, output_name)
+    {:noreply, save_take_latest_message(state, topic, text)}
+  end
+
+  @impl true
+  def handle_cast({:save_input, _}, state) do
+    {:noreply, state}
+  end
+
+  def handle_call({:send_message, {:text, text}}, _from, state) do
     state = send_stream_start(state)
 
     Buildel.BlockPubSub.broadcast_to_io(
@@ -209,49 +269,38 @@ defmodule Buildel.Blocks.Chat do
       {:text, text}
     )
 
-    messages =
-      state[:messages] ++
-        [
-          %{
-            role: "user",
-            content:
-              replace_input_strings_with_latest_inputs_values(state, state[:prompt_template])
-          }
-        ]
+    state = %{
+      state
+      | messages:
+          state.messages ++
+            [
+              %{
+                role: "user",
+                content:
+                  replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
+              }
+            ]
+    }
 
-    state = put_in(state[:messages], messages)
-
     messages =
-      state[:messages]
+      state.messages
       |> Enum.map(fn message ->
         %{
           message
-          | content: state |> replace_input_strings_with_latest_inputs_values(message.content)
+          | content: replace_input_strings_with_latest_inputs_values(state, message.content)
         }
       end)
 
-    if(
-      Enum.all?(messages, fn message ->
-        message.content |> message_filled?(state.connections)
-      end)
-    ) do
-      state = cleanup_inputs(state)
-      pid = self()
+    if(Enum.all?(messages, &all_inputs_in_string_filled?(&1.content, state.connections))) do
+      {:ok, _chain, message} =
+        chat_task(%{
+          messages: messages,
+          state: state
+        })
 
-      tools =
-        state[:tool_connections]
-        |> Enum.map(fn connection ->
-          pid = block_context().block_pid(state[:context_id], connection.from.block_name)
-          Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
-        end)
-
-      Task.start(fn ->
-        chat_task(%{messages: messages, pid: pid, tools: tools, state: state})
-      end)
-
-      {:noreply, state}
+      {:reply, message.content, cleanup_inputs(state)}
     else
-      {:noreply, state}
+      {:reply, "ERROR: Not ready to answer question, some of input values are missing.", state}
     end
   end
 
@@ -289,11 +338,17 @@ defmodule Buildel.Blocks.Chat do
     {:noreply, state |> send_stream_stop()}
   end
 
-  defp chat_task(%{messages: messages, pid: pid, tools: tools, state: state}) do
+  defp chat_task(%{messages: messages, state: state}) do
+    tools =
+      state[:tool_connections]
+      |> Enum.map(fn connection ->
+        pid = block_context().block_pid(state[:context_id], connection.from.block_name)
+        Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
+      end)
+
     with {:ok, _, _} = result <-
            call_chat(%{
              messages: messages,
-             pid: pid,
              tools: tools,
              state: state
            }) do
@@ -305,7 +360,6 @@ defmodule Buildel.Blocks.Chat do
 
           chat_task(%{
             messages: messages,
-            pid: pid,
             tools: tools,
             state: state
           })
@@ -316,7 +370,9 @@ defmodule Buildel.Blocks.Chat do
     end
   end
 
-  defp call_chat(%{messages: messages, pid: pid, tools: tools, state: state}) do
+  defp call_chat(%{messages: messages, tools: tools, state: state}) do
+    pid = self()
+
     chat_gpt().stream_chat(%{
       context: %{messages: messages},
       on_content: fn text_chunk ->
@@ -375,40 +431,6 @@ defmodule Buildel.Blocks.Chat do
     state = save_take_latest_message(state, name, message)
     send_message(self(), {:text, message})
     {:noreply, state}
-  end
-
-  def handle_call({:send_message, {:text, message}, %{block_name: block_name}}, _from, state) do
-    topic = BlockPubSub.io_topic(state[:context_id], block_name, "tool")
-    state = save_take_latest_message(state, topic, message)
-
-    state = send_stream_start(state)
-
-    messages =
-      state.messages ++
-        [
-          %{
-            role: "user",
-            content:
-              replace_input_strings_with_latest_inputs_values(state, state[:prompt_template])
-          }
-        ]
-
-    tools =
-      state[:tool_connections]
-      |> Enum.map(fn connection ->
-        pid = block_context().block_pid(state[:context_id], connection.from.block_name)
-        Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
-      end)
-
-    {:ok, _chain, message} =
-      chat_task(%{
-        messages: messages,
-        pid: self(),
-        tools: tools,
-        state: state
-      })
-
-    {:reply, message.content, state}
   end
 
   @impl true
