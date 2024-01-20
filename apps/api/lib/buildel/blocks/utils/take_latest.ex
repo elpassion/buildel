@@ -7,7 +7,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
       import TakeLatest
 
       defp assign_take_latest(state) do
-        messages = empty_messages(state)
+        messages = empty_inputs(state)
         state |> Map.put(tl_keyword(), messages)
       end
 
@@ -18,7 +18,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
         put_in(state, [tl_keyword(), "#{block}:#{output}"], text)
       end
 
-      defp replace_inputs_with_take_latest_messages(state, template) do
+      defp replace_input_strings_with_latest_inputs_values(state, template) do
         state[tl_keyword()]
         |> Enum.reduce(template, fn
           {_input, nil}, template ->
@@ -35,16 +35,6 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
             String.replace(template, "{{#{input}}}", text_string)
         end)
       end
-
-      defp interpolate_template_with_take_latest_messages(state, template) do
-        message = replace_inputs_with_take_latest_messages(state, template)
-
-        if message_filled?(message, state.connections) do
-          {state |> cleanup_messages(), message}
-        else
-          {state, nil}
-        end
-      end
     end
   end
 
@@ -60,11 +50,11 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
     )
   end
 
-  def cleanup_messages(state) do
+  def cleanup_inputs(state) do
     new_messages =
       Map.merge(
         state |> Map.get(tl_keyword()),
-        empty_messages(state),
+        empty_inputs(state),
         fn key, old, new ->
           connection =
             state.connections
@@ -81,7 +71,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
     state |> Map.put(tl_keyword(), new_messages)
   end
 
-  def empty_messages(state) do
+  def empty_inputs(state) do
     Enum.into(state.connections, %{}, fn connection ->
       {Connection.block_output_string(connection), nil}
     end)

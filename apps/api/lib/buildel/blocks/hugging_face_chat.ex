@@ -7,7 +7,6 @@ defmodule Buildel.Blocks.HuggingFaceChat do
 
   @impl true
   defdelegate cast(pid, chunk), to: __MODULE__, as: :send_message
-  def sentences_output(), do: Block.text_output("sentences_output")
 
   @impl true
   def options() do
@@ -17,7 +16,6 @@ defmodule Buildel.Blocks.HuggingFaceChat do
       inputs: [Block.text_input()],
       outputs: [
         Block.text_output("output"),
-        sentences_output(),
         Block.text_output("message_output")
       ],
       ios: [],
@@ -156,9 +154,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
        [%{role: "system", content: opts.system_message}] ++ opts.messages
      )
      |> Map.put(:api_key, api_key)
-     |> Map.put(:tool_blocks, tool_blocks)
-     |> Map.put(:sentences, [])
-     |> Map.put(:sent_sentences, [])}
+     |> Map.put(:tool_blocks, tool_blocks)}
   end
 
   @impl true
@@ -186,7 +182,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
       |> Enum.map(fn message ->
         %{
           message
-          | content: state |> replace_inputs_with_take_latest_messages(message.content)
+          | content: state |> replace_input_strings_with_latest_inputs_values(message.content)
         }
       end)
 
@@ -195,7 +191,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
         message.content |> message_filled?(state[:opts].inputs)
       end)
     ) do
-      state = cleanup_messages(state)
+      state = cleanup_inputs(state)
       pid = self()
 
       tools =
@@ -264,57 +260,12 @@ defmodule Buildel.Blocks.HuggingFaceChat do
       end
 
     state = put_in(state[:messages], messages)
-    existing_sentences = state[:sentences]
-
-    sentences =
-      messages
-      |> List.last()
-      |> Map.get(:content)
-      |> Essence.Chunker.sentences()
-
-    state = put_in(state[:sentences], sentences)
-
-    state =
-      if Enum.count(sentences) > 1 && Enum.count(sentences) != Enum.count(existing_sentences) do
-        sentence = Enum.at(sentences, -2)
-
-        Buildel.BlockPubSub.broadcast_to_io(
-          state[:context_id],
-          state[:block_name],
-          "sentences_output",
-          {:text, sentence}
-        )
-
-        put_in(state[:sent_sentences], state[:sent_sentences] ++ [sentence])
-      else
-        state
-      end
 
     {:noreply, state}
   end
 
   def handle_cast({:finish_chat_message}, state) do
-    sentences = state[:sentences]
-    sent_sentences = state[:sent_sentences]
-
-    state =
-      if sentences != sent_sentences do
-        sentence = Enum.at(sentences, -1)
-
-        Buildel.BlockPubSub.broadcast_to_io(
-          state[:context_id],
-          state[:block_name],
-          "sentences_output",
-          {:text, sentence}
-        )
-
-        put_in(state[:sent_sentences], []) |> put_in([:sentences], [])
-      else
-        state
-      end
-      |> send_stream_stop()
-
-    {:noreply, state}
+    {:noreply, state |> send_stream_stop()}
   end
 
   @impl true
