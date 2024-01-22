@@ -39,13 +39,13 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       {children}
 
       <div className="flex gap-2 justify-end">
-        <Button size="md" type="button" variant="filled" onClick={handleCancel}>
+        <Button size="md" type="button" variant="ghost" onClick={handleCancel}>
           {cancelText}
         </Button>
         <Button
           size="md"
           type="submit"
-          variant="ghost"
+          variant="filled"
           hierarchy="destructive"
           onClick={handleConfirm}
         >
