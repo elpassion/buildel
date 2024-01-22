@@ -80,7 +80,7 @@ defmodule Buildel.Blocks.TakeLatest do
   @impl true
   def handle_info({topic, :text, message}, state) do
     cast(self(), {:text, message})
-    state = state |> save_take_latest_message(topic, message)
+    state = state |> save_latest_input_value(topic, message)
     {:noreply, state}
   end
 

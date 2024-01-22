@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.Chat do
   require Logger
+  alias Buildel.Blocks.Utils.ChatMemory
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
   alias LangChain.Function
@@ -186,11 +187,14 @@ defmodule Buildel.Blocks.Chat do
      state
      |> assign_stream_state
      |> assign_take_latest()
-     |> Map.put(:system_message, opts.system_message)
      |> Map.put(:prompt_template, opts.prompt_template)
      |> Map.put(:messages, initial_messages(state))
      |> Map.put(:api_key, api_key)
-     |> Map.put(:tool_connections, tool_connections)}
+     |> Map.put(:tool_connections, tool_connections)
+     |> Map.put(
+       :chat_memory,
+       ChatMemory.new(%{initial_messages: initial_messages(state)})
+     )}
   end
 
   defp initial_messages(state) do
@@ -218,7 +222,11 @@ defmodule Buildel.Blocks.Chat do
                 content:
                   replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
               }
-            ]
+            ],
+        chat_memory:
+          ChatMemory.add_user_message(state.chat_memory, %{
+            content: replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
+          })
     }
 
     messages =
@@ -245,7 +253,7 @@ defmodule Buildel.Blocks.Chat do
         state
       ) do
     topic = BlockPubSub.io_topic(state[:context_id], block_name, output_name)
-    {:noreply, save_take_latest_message(state, topic, text)}
+    {:noreply, save_latest_input_value(state, topic, text)}
   end
 
   @impl true
@@ -273,7 +281,11 @@ defmodule Buildel.Blocks.Chat do
                 content:
                   replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
               }
-            ]
+            ],
+        chat_memory:
+          ChatMemory.add_user_message(state.chat_memory, %{
+            content: replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
+          })
     }
 
     messages =
@@ -422,7 +434,7 @@ defmodule Buildel.Blocks.Chat do
 
   @impl true
   def handle_info({name, :text, message}, state) do
-    state = save_take_latest_message(state, name, message)
+    state = save_latest_input_value(state, name, message)
     send_message(self(), {:text, message})
     {:noreply, state}
   end

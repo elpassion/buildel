@@ -6,12 +6,16 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
     quote do
       import TakeLatest
 
+      defp input_values(state) do
+        state |> Map.get(tl_keyword())
+      end
+
       defp assign_take_latest(state) do
         messages = empty_inputs(state)
         state |> Map.put(tl_keyword(), messages)
       end
 
-      defp save_take_latest_message(state, topic, text) do
+      defp save_latest_input_value(state, topic, text) do
         %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
         [output | _] = output |> String.split("->")
 

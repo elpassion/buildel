@@ -270,7 +270,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
 
   @impl true
   def handle_info({name, :text, message}, state) do
-    state = save_take_latest_message(state, name, message)
+    state = save_latest_input_value(state, name, message)
     send_message(self(), {:text, message})
     {:noreply, state}
   end
