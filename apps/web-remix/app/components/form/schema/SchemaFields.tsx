@@ -4,14 +4,14 @@ import { Button, Icon, IconButton } from "@elpassion/taco";
 import { Field as FormField } from "~/components/form/fields/field.context";
 import {
   PasswordInputField,
-  TextInputField,
+  ResettableTextInputField,
 } from "~/components/form/fields/text.field";
 import { CheckboxInput } from "~/components/form/inputs/checkbox.input";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
-import { assert } from "~/utils/assert";
-import { Field, FieldProps } from "./Schema";
 import { QuantityInputField } from "~/components/form/fields/quantity.field";
 import { RadioField } from "~/components/form/fields/radio.field";
+import { assert } from "~/utils/assert";
+import { Field, FieldProps } from "./Schema";
 
 export function StringField({ field, name, fields, ...rest }: FieldProps) {
   assert(name);
@@ -65,7 +65,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
 
     return (
       <FormField name={name}>
-        <TextInputField
+        <ResettableTextInputField
           id={name}
           supportingText={field.description}
           label={field.title}
