@@ -41,6 +41,7 @@ export const CreateBlockDraggableItem: React.FC<
         type: block.type,
         block_type: block,
         position: position,
+        connections: [],
       });
     },
     [onCreate, reactFlowInstance]

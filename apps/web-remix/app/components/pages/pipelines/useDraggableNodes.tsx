@@ -46,6 +46,7 @@ export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {
           type: block.type,
           inputs: [],
           position: position,
+          connections: [],
         });
       } catch (err) {
         console.error(err);
