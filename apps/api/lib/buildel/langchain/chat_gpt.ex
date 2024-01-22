@@ -150,8 +150,8 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
       n: openai.n,
       stream: openai.stream,
       messages: Enum.map(messages, &ForOpenAIApi.for_api/1),
-      response_format: set_response_format(openai)
     }
+    |> Utils.conditionally_add_to_map(:response_format, get_response_format(openai))
     |> Utils.conditionally_add_to_map(:seed, openai.seed)
     |> Utils.conditionally_add_to_map(:functions, get_functions_for_api(functions))
   end
@@ -162,10 +162,13 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
     Enum.map(functions, &ForOpenAIApi.for_api/1)
   end
 
-  defp set_response_format(%ChatOpenAI{json_response: true}),
+  defp get_response_format(%ChatOpenAI{api_type: "azure"}),
+    do: nil
+
+  defp get_response_format(%ChatOpenAI{json_response: true}),
     do: %{"type" => "json_object"}
 
-  defp set_response_format(%ChatOpenAI{json_response: false}),
+  defp get_response_format(%ChatOpenAI{json_response: false}),
     do: %{"type" => "text"}
 
   @doc """
