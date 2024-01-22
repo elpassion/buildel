@@ -43,12 +43,16 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
           chat_memory,
         chunk
       ) do
-    new_messages = [
-      %{role: "assistant", content: (content <> chunk) |> String.replace("\n", " ")}
-      | other_messages
-    ]
+    if Enum.count(chat_memory.messages) == Enum.count(chat_memory.initial_messages) do
+      add_assistant_message(chat_memory, %{content: chunk})
+    else
+      new_messages = [
+        %{role: "assistant", content: (content <> chunk) |> String.replace("\n", " ")}
+        | other_messages
+      ]
 
-    chat_memory |> Map.put(:messages, new_messages)
+      chat_memory |> Map.put(:messages, new_messages)
+    end
   end
 
   def add_assistant_chunk(%__MODULE__{} = chat_memory, chunk) do
