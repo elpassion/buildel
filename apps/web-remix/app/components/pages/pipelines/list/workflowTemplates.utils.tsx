@@ -19,11 +19,31 @@ export const sampleTemplates = [
         position: { x: 0, y: -500 },
       }),
       generateChat({
-        inputs: ["text_input_1:output->input"],
+        inputs: ["text_input_1:output->input?reset=true"],
+        connections: [
+          {
+            from: { block_name: "text_input_1", output_name: "output" },
+            opts: { reset: true },
+            to: {
+              block_name: "chat_1",
+              input_name: "input",
+            },
+          },
+        ],
         position: { x: 400, y: -500 },
       }),
       generateTextOutput({
-        inputs: ["chat_1:output->input"],
+        inputs: ["chat_1:output->input?reset=true"],
+        connections: [
+          {
+            from: { block_name: "chat_1", output_name: "output" },
+            opts: { reset: true },
+            to: {
+              block_name: "text_output_1",
+              input_name: "input",
+            },
+          },
+        ],
         position: { x: 800, y: -500 },
       }),
     ],
@@ -34,12 +54,32 @@ export const sampleTemplates = [
     blocks: [
       generateAudioInput({ position: { x: 0, y: -500 } }),
       generateSpeechToText({
-        inputs: ["audio_input_1:output->input"],
+        inputs: ["audio_input_1:output->input?reset=true"],
         position: { x: 400, y: -500 },
+        connections: [
+          {
+            from: { block_name: "audio_input_1", output_name: "output" },
+            opts: { reset: true },
+            to: {
+              block_name: "speech_to_text_1",
+              input_name: "input",
+            },
+          },
+        ],
       }),
       generateTextOutput({
-        inputs: ["speech_to_text_1:output->input"],
+        inputs: ["speech_to_text_1:output->input?reset=true"],
         position: { x: 800, y: -500 },
+        connections: [
+          {
+            from: { block_name: "speech_to_text_1", output_name: "output" },
+            opts: { reset: true },
+            to: {
+              block_name: "text_output_1",
+              input_name: "input",
+            },
+          },
+        ],
       }),
     ],
   },
@@ -51,12 +91,32 @@ export const sampleTemplates = [
         position: { x: 0, y: -500 },
       }),
       generateTextToSpeech({
-        inputs: ["text_input_1:output->input"],
+        inputs: ["text_input_1:output->input?reset=true"],
+        connections: [
+          {
+            from: { block_name: "text_input_1", output_name: "output" },
+            opts: { reset: true },
+            to: {
+              block_name: "text_to_speech_1",
+              input_name: "input",
+            },
+          },
+        ],
         position: { x: 400, y: -500 },
       }),
       generateAudioOutput({
         position: { x: 800, y: -500 },
-        inputs: ["text_to_speech_1:output->input"],
+        inputs: ["text_to_speech_1:output->input?reset=true"],
+        connections: [
+          {
+            from: { block_name: "text_to_speech_1", output_name: "output" },
+            opts: { reset: true },
+            to: {
+              block_name: "audio_output_1",
+              input_name: "input",
+            },
+          },
+        ],
       }),
     ],
   },
@@ -68,11 +128,31 @@ export const sampleTemplates = [
         position: { x: 0, y: -500 },
       }),
       generateDocumentSearch({
-        inputs: ["text_input_1:output->input"],
+        inputs: ["text_input_1:output->input?reset=true"],
+        connections: [
+          {
+            from: { block_name: "text_input_1", output_name: "output" },
+            opts: { reset: true },
+            to: {
+              block_name: "document_search_1",
+              input_name: "input",
+            },
+          },
+        ],
         position: { x: 400, y: -500 },
       }),
       generateTextOutput({
-        inputs: ["document_search_1:output->input"],
+        inputs: ["document_search_1:output->input?reset=true"],
+        connections: [
+          {
+            from: { block_name: "document_search_1", output_name: "output" },
+            opts: { reset: true },
+            to: {
+              block_name: "text_output_1",
+              input_name: "input",
+            },
+          },
+        ],
         position: { x: 800, y: -500 },
       }),
     ],
@@ -163,6 +243,7 @@ function generateBlockConfig(
     position: { x: 800, y: -500 },
     inputs: [],
     opts: {},
+    connections: [],
     ...overrides,
   };
 }
