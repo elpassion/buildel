@@ -47,11 +47,6 @@ defmodule Buildel.Blocks.Chat do
             ],
             "properties" =>
               Jason.OrderedObject.new(
-                name: %{
-                  "type" => "string",
-                  "title" => "Name",
-                  "description" => "The name of the chat."
-                },
                 description: %{
                   "type" => "string",
                   "title" => "Description",

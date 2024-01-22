@@ -13,6 +13,14 @@ export function generateZODSchema(
     }
 
     let nestedSchema: z.ZodString | z.ZodOptional<z.ZodString> = z.string();
+
+    if (schema.regex !== undefined) {
+      nestedSchema = nestedSchema.regex(
+        new RegExp(schema?.regex?.pattern, "i"),
+        schema?.regex?.errorMessage
+      );
+    }
+
     if (isOptional) {
       nestedSchema = nestedSchema.optional();
     }
@@ -145,6 +153,10 @@ export type JSONSchemaField =
       minLength?: number;
       maxLength?: number;
       default?: string;
+      regex?: {
+        pattern: string;
+        errorMessage: string;
+      };
     }
   | {
       type: "string";

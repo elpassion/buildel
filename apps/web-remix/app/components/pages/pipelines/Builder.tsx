@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
+import classNames from "classnames";
 import isEqual from "lodash.isequal";
 import ReactFlow, {
   addEdge,
@@ -34,7 +35,6 @@ import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
-import classNames from "classnames";
 
 interface BuilderProps {
   type?: "readOnly" | "editable";
@@ -127,6 +127,8 @@ export const Builder = ({
       );
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${created.type.toLowerCase()}_${nameNum}`;
+
+      created.opts.name = name;
 
       const newBlock = {
         id: name,

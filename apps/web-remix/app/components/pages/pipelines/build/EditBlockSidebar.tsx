@@ -9,6 +9,7 @@ import { useEditBlockSidebar } from "./EditBlockSidebarProvider";
 import { toPipelineConfig } from "../PipelineFlow.utils";
 import { EditBlockForm } from "./EditBlockForm";
 import { BlockInputList } from "./BlockInputList";
+
 interface EditBlockSidebarProps {
   onSubmit: (config: IPipelineConfig) => void;
   organizationId: number;
@@ -26,15 +27,51 @@ export const EditBlockSidebar: React.FC<EditBlockSidebarProps> = ({
 }) => {
   const { editableBlock, closeSidebar } = useEditBlockSidebar();
 
-  const handleSubmit = (updated: IBlockConfig) => {
+  const handleSubmit = (updated: IBlockConfig & { oldName: string }) => {
     const tmpNodes = cloneDeep(nodes);
+    const tmpEdges = cloneDeep(edges);
+
     const updatedNodes = tmpNodes.map((node) => {
-      if (node.id === updated.name) {
-        node.data = updated;
+      if (node.id === updated.oldName) {
+        const { oldName, ...rest } = updated;
+
+        node.data = rest;
+        node.id = updated.name;
       }
+
+      node.data.connections = node.data.connections.map((connection) => ({
+        ...connection,
+        from: {
+          ...connection.from,
+          block_name: connection.from.block_name.replace(
+            updated.oldName,
+            updated.name
+          ),
+        },
+        to: {
+          ...connection.to,
+          block_name: connection.to.block_name.replace(
+            updated.oldName,
+            updated.name
+          ),
+        },
+      }));
+
+      node.data.inputs = node.data.inputs.map((input) =>
+        input.replace(updated.oldName, updated.name)
+      );
+
       return node;
     });
-    onSubmit(toPipelineConfig(updatedNodes, edges));
+
+    const updatedEdges = tmpEdges.map((edge) => ({
+      ...edge,
+      id: edge.id.replace(updated.oldName, updated.name),
+      source: edge.source.replace(updated.oldName, updated.name),
+      target: edge.target.replace(updated.oldName, updated.name),
+    }));
+
+    onSubmit(toPipelineConfig(updatedNodes, updatedEdges));
     closeSidebar();
   };
 
@@ -56,6 +93,7 @@ export const EditBlockSidebar: React.FC<EditBlockSidebarProps> = ({
             blockConfig={editableBlock}
             organizationId={organizationId}
             pipelineId={pipelineId}
+            nodesNames={nodes.map((node) => node.data.name)}
           >
             <BlockInputList inputs={editableBlock.inputs} />
           </EditBlockForm>

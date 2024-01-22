@@ -20,7 +20,11 @@ import {
   HiddenField,
 } from "~/components/form/fields/field.context";
 import { BlockConfig } from "../contracts";
-import { IBlockConfigConnection } from "~/components/pages/pipelines/pipeline.types";
+import {
+  IBlockConfig,
+  IBlockConfigConnection,
+} from "~/components/pages/pipelines/pipeline.types";
+import { TextInputField } from "~/components/form/fields/text.field";
 
 export function EditBlockForm({
   onSubmit,
@@ -29,17 +33,24 @@ export function EditBlockForm({
   organizationId,
   pipelineId,
   disabled = false,
+  nodesNames,
 }: {
   organizationId: number;
   pipelineId: number;
   children?: ReactNode;
-  onSubmit: (data: z.TypeOf<typeof BlockConfig>) => void;
+  onSubmit: (data: IBlockConfig & { oldName: string }) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
   disabled?: boolean;
+  nodesNames: string[];
 }) {
   const schema = generateZODSchema(blockConfig.block_type.schema as any);
   const validator = React.useMemo(() => withZod(schema), []);
   const [inputs, setInputs] = useState(blockConfig.inputs);
+  const [fieldsErrors, setFieldsErrors] = useState<Record<string, string>>({});
+
+  const clearFieldsErrors = () => {
+    setFieldsErrors({});
+  };
 
   const updateInputReset = useCallback(
     (input: string, reset: boolean) => {
@@ -58,9 +69,18 @@ export function EditBlockForm({
     e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
-    const newConfig = { ...blockConfig, ...data };
+    clearFieldsErrors();
+    const newConfig = { oldName: blockConfig.name, ...blockConfig, ...data };
     newConfig.inputs = inputs;
-    onSubmit(newConfig);
+
+    if (
+      newConfig.oldName !== newConfig.name &&
+      nodesNames.includes(data.name)
+    ) {
+      setFieldsErrors({ name: "This block name is already in used" });
+    } else {
+      onSubmit(newConfig);
+    }
   };
 
   const EditorField = useCallback(
@@ -158,7 +178,15 @@ export function EditBlockForm({
     >
       <InputsProvider inputs={inputs} updateInputReset={updateInputReset}>
         <div className="space-y-4 grow max-h-full overflow-y-auto px-1">
-          <HiddenField name="name" value={blockConfig.name} />
+          <FormField name="name">
+            <TextInputField
+              name="name"
+              label="Name"
+              supportingText="The name of the chat."
+              defaultValue={blockConfig.name}
+              errorMessage={fieldsErrors.name}
+            />
+          </FormField>
           <HiddenField name="inputs" value={JSON.stringify(inputs)} />
 
           <Schema

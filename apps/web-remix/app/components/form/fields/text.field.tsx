@@ -7,7 +7,7 @@ import { useFieldContext } from "~/components/form/fields/field.context";
 export const TextInputField = forwardRef<
   HTMLInputElement,
   Partial<TextInputProps>
->((props, ref) => {
+>(({ errorMessage, ...props }, ref) => {
   const { name, getInputProps, error } = useFieldContext();
   return (
     <TextInput
@@ -17,7 +17,7 @@ export const TextInputField = forwardRef<
       aria-describedby={`${name}-error`}
       aria-errormessage={error ? `${name}-error` : undefined}
       autoComplete={name}
-      errorMessage={error}
+      errorMessage={errorMessage ?? error}
       {...props}
       {...getInputProps()}
     />
