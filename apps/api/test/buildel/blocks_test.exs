@@ -472,7 +472,8 @@ defmodule Buildel.BlocksTest do
                 temperature: 0.7,
                 knowledge: nil,
                 endpoint: nil,
-                api_type: "openai"
+                api_type: "openai",
+                api_key: "123"
               },
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->input", "text")
@@ -510,7 +511,8 @@ defmodule Buildel.BlocksTest do
                 temperature: 0.7,
                 knowledge: nil,
                 endpoint: nil,
-                api_type: "openai"
+                api_type: "openai",
+                api_key: "123"
               },
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->input", "text")
