@@ -433,7 +433,7 @@ defmodule Buildel.Blocks.Chat do
 
     function =
       Function.new!(%{
-        name: state.opts.name,
+        name: state.block.name,
         description: state.opts.description,
         parameters_schema: %{
           type: "object",
