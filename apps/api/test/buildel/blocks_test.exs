@@ -421,12 +421,14 @@ defmodule Buildel.BlocksTest do
                inputs: [Block.text_input("input")],
                outputs: [
                  Block.text_output("output"),
-                 Block.text_output("sentences_output"),
                  Block.text_output("message_output")
                ],
                schema: Chat.schema(),
                groups: ["text", "llms"],
-               ios: [%{name: "tool", public: false, type: "controller"}]
+               ios: [
+                 %{name: "tool", public: false, type: "controller"},
+                 %{name: "chat", public: false, type: "worker"}
+               ]
              }
     end
 
@@ -435,6 +437,8 @@ defmodule Buildel.BlocksTest do
                Blocks.validate_block(Chat, %{
                  "name" => "test",
                  "opts" => %{
+                   "name" => "name",
+                   "description" => "description",
                    "api_key" => "test",
                    "model" => "gpt-4",
                    "temperature" => 0.5,
@@ -459,6 +463,8 @@ defmodule Buildel.BlocksTest do
             Chat.create(%{
               name: "test",
               opts: %{
+                name: "name",
+                description: "description",
                 system_message: "You are a helpful assistant.",
                 messages: [],
                 prompt_template: "{{test_input:output}}",
@@ -477,9 +483,6 @@ defmodule Buildel.BlocksTest do
 
       {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
-      {:ok, sentences_topic} =
-        test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "sentences_output")
-
       {:ok, messages_topic} =
         test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "message_output")
 
@@ -487,8 +490,6 @@ defmodule Buildel.BlocksTest do
       test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
 
       assert_receive({^messages_topic, :text, "Hello darkness my old friend."})
-      assert_receive({^sentences_topic, :text, "Hello!"})
-      assert_receive({^sentences_topic, :text, "How are you?"})
       assert_receive({^topic, :text, "Hell"})
       assert_receive({^topic, :text, "o!"})
       assert_receive({^topic, :text, " How are you?"})
@@ -630,12 +631,17 @@ defmodule Buildel.BlocksTest do
             TakeLatest.create(%{
               name: "test",
               opts: %{
-                template: "dupa {{text_input:output}} {{text_input_2:output}}",
-                reset: false
+                template: "dupa {{text_input:output}} {{text_input_2:output}}"
               },
               connections: [
-                Blocks.Connection.from_connection_string("text_input:output->input", "text"),
-                Blocks.Connection.from_connection_string("text_input_2:output->input", "text")
+                Blocks.Connection.from_connection_string(
+                  "text_input:output->input?reset=false",
+                  "text"
+                ),
+                Blocks.Connection.from_connection_string(
+                  "text_input_2:output->input?reset=false",
+                  "text"
+                )
               ]
             })
           ]

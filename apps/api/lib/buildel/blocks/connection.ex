@@ -116,8 +116,8 @@ defmodule Buildel.Blocks.Connection do
   defp connection_description_from_connection_string(connection_string) do
     [connection_string, reset] =
       case connection_string |> String.split("?") do
-        [connection_string, "false"] -> [connection_string, false]
-        [connection_string, "true"] -> [connection_string, true]
+        [connection_string, "reset=false"] -> [connection_string, false]
+        [connection_string, "reset=true"] -> [connection_string, true]
         [connection_string] -> [connection_string, true]
       end
 
