@@ -23,7 +23,8 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
       end
 
       defp replace_input_strings_with_latest_inputs_values(state, template) do
-        state[tl_keyword()]
+        state
+        |> input_values()
         |> Enum.reduce(template, fn
           {_input, nil}, template ->
             template
@@ -39,45 +40,47 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
             String.replace(template, "{{#{input}}}", text_string)
         end)
       end
+
+      defp tl_keyword(), do: :take_latest_messages
+
+      defp all_inputs_in_string_filled?(message, connections) do
+        !String.contains?(
+          message,
+          connections
+          |> Enum.map(fn connection ->
+            "#{connection.from.block_name}:#{connection.from.name}"
+          end)
+        )
+      end
+
+      def cleanup_inputs(state) do
+        new_messages =
+          Map.merge(
+            state |> Map.get(tl_keyword()),
+            empty_inputs(state),
+            fn key, old, new ->
+              connection =
+                state.connections
+                |> Enum.find(fn connection ->
+                  Connection.block_output_string(connection) == key
+                end)
+
+              if is_nil(connection) || connection.opts.reset do
+                new
+              else
+                old
+              end
+            end
+          )
+
+        state |> Map.put(tl_keyword(), new_messages)
+      end
+
+      def empty_inputs(state) do
+        Enum.into(state.connections, %{}, fn connection ->
+          {Connection.block_output_string(connection), nil}
+        end)
+      end
     end
-  end
-
-  def tl_keyword(), do: :take_latest_messages
-
-  def all_inputs_in_string_filled?(message, connections) do
-    !String.contains?(
-      message,
-      connections
-      |> Enum.map(fn connection ->
-        "#{connection.from.block_name}:#{connection.from.name}"
-      end)
-    )
-  end
-
-  def cleanup_inputs(state) do
-    new_messages =
-      Map.merge(
-        state |> Map.get(tl_keyword()),
-        empty_inputs(state),
-        fn key, old, new ->
-          connection =
-            state.connections
-            |> Enum.find(fn connection -> Connection.block_output_string(connection) == key end)
-
-          if is_nil(connection) || connection.opts.reset do
-            new
-          else
-            old
-          end
-        end
-      )
-
-    state |> Map.put(tl_keyword(), new_messages)
-  end
-
-  def empty_inputs(state) do
-    Enum.into(state.connections, %{}, fn connection ->
-      {Connection.block_output_string(connection), nil}
-    end)
   end
 end

@@ -173,8 +173,7 @@ defmodule Buildel.Blocks.Chat do
       ) do
     subscribe_to_connections(context_id, connections)
 
-    api_key =
-      block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
+    api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
 
     tool_connections =
       connections
@@ -188,7 +187,6 @@ defmodule Buildel.Blocks.Chat do
      |> assign_stream_state
      |> assign_take_latest()
      |> Map.put(:prompt_template, opts.prompt_template)
-     |> Map.put(:messages, initial_messages(state))
      |> Map.put(:api_key, api_key)
      |> Map.put(:tool_connections, tool_connections)
      |> Map.put(
@@ -197,52 +195,30 @@ defmodule Buildel.Blocks.Chat do
      )}
   end
 
-  defp initial_messages(state) do
-    [%{role: "system", content: state.opts.system_message}] ++ state.opts.messages
-  end
-
   @impl true
-  def handle_cast({:send_message, {:text, text}}, state) do
+  def handle_cast({:send_message, {:text, _text}}, state) do
     state = send_stream_start(state)
+
+    content =
+      replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
 
     Buildel.BlockPubSub.broadcast_to_io(
       state.context_id,
       state.block_name,
       "message_output",
-      {:text, text}
+      {:text, content}
     )
 
-    state = %{
-      state
-      | messages:
-          state.messages ++
-            [
-              %{
-                role: "user",
-                content:
-                  replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
-              }
-            ],
-        chat_memory:
-          ChatMemory.add_user_message(state.chat_memory, %{
-            content: replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
-          })
-    }
+    state = update_in(state.chat_memory, &ChatMemory.add_user_message(&1, %{content: content}))
 
-    messages =
-      state.messages
-      |> Enum.map(fn message ->
-        %{
-          message
-          | content: replace_input_strings_with_latest_inputs_values(state, message.content)
-        }
-      end)
-
-    if(Enum.all?(messages, &all_inputs_in_string_filled?(&1.content, state.connections))) do
-      chat_task(%{messages: messages, state: state})
+    with {:ok, _message, state} <- chat_task(state) do
       {:noreply, cleanup_inputs(state)}
     else
-      {:noreply, state}
+      {:error, :not_all_inputs_filled, state} ->
+        {:noreply, state}
+
+      {:error, _reason, state} ->
+        {:noreply, state}
     end
   end
 
@@ -257,186 +233,25 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_cast({:save_input, _}, state) do
-    {:noreply, state}
-  end
-
-  def handle_call({:send_message, {:text, text}}, _from, state) do
-    state = send_stream_start(state)
-
-    Buildel.BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "message_output",
-      {:text, text}
-    )
-
-    state = %{
-      state
-      | messages:
-          state.messages ++
-            [
-              %{
-                role: "user",
-                content:
-                  replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
-              }
-            ],
-        chat_memory:
-          ChatMemory.add_user_message(state.chat_memory, %{
-            content: replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
-          })
-    }
-
-    messages =
-      state.messages
-      |> Enum.map(fn message ->
-        %{
-          message
-          | content: replace_input_strings_with_latest_inputs_values(state, message.content)
-        }
-      end)
-
-    if(Enum.all?(messages, &all_inputs_in_string_filled?(&1.content, state.connections))) do
-      {:ok, _chain, message} =
-        chat_task(%{
-          messages: messages,
-          state: state
-        })
-
-      {:reply, message.content, cleanup_inputs(state)}
-    else
-      {:reply, "ERROR: Not ready to answer question, some of input values are missing.", state}
-    end
-  end
-
   def handle_cast({:save_text_chunk, chunk}, state) do
-    messages = state[:messages]
-    last_message = List.last(messages)
-
-    messages =
-      case last_message do
-        %{role: "assistant"} ->
-          List.delete_at(messages, -1) ++
-            [
-              %{
-                role: "assistant",
-                content: (last_message.content <> chunk) |> String.replace("\n", " ")
-              }
-            ]
-
-        _ ->
-          messages ++ [%{role: "assistant", content: chunk}]
-      end
-
-    state = put_in(state[:messages], messages)
-
-    {:noreply, state}
-  end
-
-  def handle_cast({:save_tool_result, tool_name, content}, state) do
-    messages = state[:messages] ++ [%{role: "tool", content: content, tool_name: tool_name}]
-    state = put_in(state[:messages], messages)
-    {:noreply, state}
-  end
-
-  def handle_cast({:finish_chat_message}, state) do
-    {:noreply, state |> send_stream_stop()}
-  end
-
-  defp chat_task(%{messages: messages, state: state}) do
-    tools =
-      state[:tool_connections]
-      |> Enum.map(fn connection ->
-        pid = block_context().block_pid(state[:context_id], connection.from.block_name)
-        Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
-      end)
-
-    with {:ok, _, _} = result <-
-           call_chat(%{
-             messages: messages,
-             tools: tools,
-             state: state
-           }) do
-      result
-    else
-      {:error, :context_length_exceeded} ->
-        with {:ok, messages} <- remove_last_non_initial_message(state) do
-          state = put_in(state[:messages], messages)
-
-          chat_task(%{
-            messages: messages,
-            tools: tools,
-            state: state
-          })
-        else
-          _ ->
-            send_error(state, "Initial messages were too long")
-        end
-    end
-  end
-
-  defp call_chat(%{messages: messages, tools: tools, state: state}) do
-    pid = self()
-
-    chat_gpt().stream_chat(%{
-      context: %{messages: messages},
-      on_content: fn text_chunk ->
-        Buildel.BlockPubSub.broadcast_to_io(
-          state[:context_id],
-          state[:block_name],
-          "output",
-          {:text, text_chunk}
-        )
-
-        save_text_chunk(pid, text_chunk)
-      end,
-      on_tool_content: fn tool_name, content ->
-        save_tool_result(pid, tool_name, content)
-      end,
-      on_end: fn chat_token_summary ->
-        cost =
-          Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
-
-        block_context().create_run_cost(
-          state[:context_id],
-          state[:block_name],
-          cost
-        )
-
-        finish_chat_message(pid)
-      end,
-      on_error: fn
-        :context_length_exceeded ->
-          send_error(state, "Context length exceeded")
-          nil
-
-        error ->
-          send_error(state, error)
-          finish_chat_message(pid)
-      end,
-      api_key: state[:api_key],
-      model: state[:opts].model,
-      temperature: state[:opts].temperature,
-      tools: tools,
-      endpoint: state[:opts].endpoint,
-      api_type: state[:opts].api_type
-    })
-  end
-
-  defp remove_last_non_initial_message(state) do
-    if Enum.count(state[:messages]) == Enum.count(initial_messages(state)) do
-      {:error, :initial_messages_too_long}
-    else
-      {:ok, state[:messages] |> List.delete_at(initial_messages(state) |> Enum.count())}
-    end
+    chat_memory = ChatMemory.add_assistant_chunk(state.chat_memory, chunk)
+    {:noreply, %{state | chat_memory: chat_memory}}
   end
 
   @impl true
-  def handle_info({name, :text, message}, state) do
-    state = save_latest_input_value(state, name, message)
-    send_message(self(), {:text, message})
-    {:noreply, state}
+  def handle_cast({:save_tool_result, tool_name, content}, state) do
+    chat_memory =
+      ChatMemory.add_tool_result_message(state.chat_memory, %{
+        tool_name: tool_name,
+        content: content
+      })
+
+    {:noreply, %{state | chat_memory: chat_memory}}
+  end
+
+  @impl true
+  def handle_cast({:finish_chat_message}, state) do
+    {:noreply, state |> send_stream_stop()}
   end
 
   @impl true
@@ -463,6 +278,133 @@ defmodule Buildel.Blocks.Chat do
       })
 
     {:reply, function, state}
+  end
+
+  def handle_call({:send_message, {:text, _text}}, _from, state) do
+    state = send_stream_start(state)
+
+    content =
+      replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
+
+    Buildel.BlockPubSub.broadcast_to_io(
+      state[:context_id],
+      state[:block_name],
+      "message_output",
+      {:text, content}
+    )
+
+    state = update_in(state.chat_memory, &ChatMemory.add_user_message(&1, %{content: content}))
+
+    with {:ok, message, state} <- chat_task(state) do
+      {:reply, message.content, cleanup_inputs(state)}
+    else
+      {:error, :not_all_inputs_filled, state} ->
+        {:reply, "ERROR: Not ready to answer question, some of input values are missing.", state}
+
+      _ ->
+        {:reply, "ERROR: Something went wrong.", state}
+    end
+  end
+
+  @impl true
+  def handle_info({name, :text, message}, state) do
+    state = save_latest_input_value(state, name, message)
+    send_message(self(), {:text, message})
+    {:noreply, state}
+  end
+
+  defp chat_task(state) do
+    tools =
+      state[:tool_connections]
+      |> Enum.map(fn connection ->
+        pid = block_context().block_pid(state[:context_id], connection.from.block_name)
+        Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
+      end)
+
+    pid = self()
+
+    with {:ok, messages} <- fill_messages(state),
+         {:ok, _, message} <-
+           chat_gpt().stream_chat(%{
+             context: %{messages: messages},
+             on_content: fn text_chunk ->
+               Buildel.BlockPubSub.broadcast_to_io(
+                 state[:context_id],
+                 state[:block_name],
+                 "output",
+                 {:text, text_chunk}
+               )
+
+               save_text_chunk(pid, text_chunk)
+             end,
+             on_tool_content: fn tool_name, content ->
+               save_tool_result(pid, tool_name, content)
+             end,
+             on_end: fn chat_token_summary ->
+               cost =
+                 Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
+
+               block_context().create_run_cost(
+                 state[:context_id],
+                 state[:block_name],
+                 cost
+               )
+
+               finish_chat_message(pid)
+             end,
+             on_error: fn
+               :context_length_exceeded ->
+                 send_error(state, "Context length exceeded")
+                 nil
+
+               error ->
+                 send_error(state, error)
+                 finish_chat_message(pid)
+             end,
+             api_key: state[:api_key],
+             model: state[:opts].model,
+             temperature: state[:opts].temperature,
+             tools: tools,
+             endpoint: state[:opts].endpoint,
+             api_type: state[:opts].api_type
+           }) do
+      {:ok, message, state}
+    else
+      {:error, :not_all_inputs_filled} ->
+        {:error, :not_all_inputs_filled, state}
+
+      {:error, :context_length_exceeded} ->
+        with {:ok, chat_memory} <- ChatMemory.drop_first_non_initial_message(state.chat_memory) do
+          state = state |> Map.put(:chat_memory, chat_memory)
+          chat_task(state)
+        else
+          _ ->
+            send_error(state, "Initial messages were too long")
+            {:error, :context_length_exceeded, state}
+        end
+
+      {:error, reason} ->
+        {:error, reason, state}
+    end
+  end
+
+  defp initial_messages(state) do
+    [%{role: "system", content: state.opts.system_message}] ++ state.opts.messages
+  end
+
+  defp fill_messages(state) do
+    messages =
+      state.chat_memory
+      |> ChatMemory.get_messages()
+      |> Enum.map(fn message ->
+        update_in(message.content, &replace_input_strings_with_latest_inputs_values(state, &1))
+      end)
+
+    if Enum.all?(messages, &all_inputs_in_string_filled?(&1.content, state.connections)) do
+      {:ok, messages}
+    else
+      {:error, :not_all_inputs_filled}
+    end
   end
 
   defp chat_gpt() do
