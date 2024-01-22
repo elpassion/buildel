@@ -35,7 +35,6 @@ defmodule Buildel.Blocks.Chat do
         "opts" =>
           options_schema(%{
             "required" => [
-              "name",
               "description",
               "model",
               "temperature",
