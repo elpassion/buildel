@@ -71,7 +71,7 @@ export function SidebarLink({
   ...props
 }: SidebarLinkProps) {
   return (
-    <NavLink {...props}>
+    <NavLink prefetch="intent" {...props}>
       {({ isActive }) => (
         <>
           <SidebarMenuItem

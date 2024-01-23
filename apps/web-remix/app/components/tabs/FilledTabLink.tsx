@@ -2,8 +2,8 @@ import React from "react";
 import { TabButtonProps } from "~/components/tabs/Tab";
 import classNames from "classnames";
 import { useTabsContext } from "~/components/tabs/TabGroup";
-import { Link } from "@remix-run/react";
 import { RemixLinkProps } from "@remix-run/react/dist/components";
+import { BasicLink } from "~/components/link/BasicLink";
 
 export const FilledTabLink: React.FC<TabButtonProps & RemixLinkProps> = ({
   children,
@@ -13,7 +13,7 @@ export const FilledTabLink: React.FC<TabButtonProps & RemixLinkProps> = ({
 }) => {
   const { activeTabId } = useTabsContext();
   return (
-    <Link
+    <BasicLink
       className={classNames(
         "text-xs rounded-lg text-neutral-100 py-1 px-3 hover:bg-neutral-900",
         { "bg-neutral-900": activeTabId === tabId },
@@ -22,6 +22,6 @@ export const FilledTabLink: React.FC<TabButtonProps & RemixLinkProps> = ({
       {...rest}
     >
       {children}
-    </Link>
+    </BasicLink>
   );
 };
