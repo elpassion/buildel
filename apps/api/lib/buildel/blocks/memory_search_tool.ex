@@ -88,7 +88,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
     state = state |> send_stream_start()
     limit = state.opts |> Map.get(:limit, 3)
 
-    Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
+    Buildel.VectorDB.query(state[:collection], query, %{api_key: state[:api_key]})
     |> Enum.take(limit)
     |> Enum.map(fn %{
                      "document" => document,
@@ -113,7 +113,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
     limit = state.opts |> Map.get(:limit, 3)
 
     result =
-      Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
+      Buildel.VectorDB.query(state[:collection], query, %{api_key: state[:api_key]})
       |> Enum.take(limit)
       |> Enum.map(fn %{
                        "document" => document,

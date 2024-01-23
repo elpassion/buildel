@@ -35,7 +35,11 @@ defmodule Buildel.VectorDB do
     {:ok, collection}
   end
 
-  deftimed query(collection_name, query, api_key: api_key), [:buildel, :vector_db, :query] do
+  deftimed query(collection_name, query, %{api_key: api_key}), [
+    :buildel,
+    :vector_db,
+    :query
+  ] do
     {:ok, embeddings_list} =
       case Buildel.DocumentCache.get("embeddings::#{query}") do
         nil ->
@@ -52,7 +56,8 @@ defmodule Buildel.VectorDB do
 
     {:ok, results} =
       adapter().query(collection, %{
-        query_embeddings: embeddings_list |> List.first()
+        query_embeddings: embeddings_list |> List.first(),
+        limit: limit
       })
 
     results
@@ -199,21 +204,24 @@ defmodule Buildel.VectorDB.EctoAdapter do
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
   def add(collection, %{embeddings: embeddings, documents: documents, ids: ids}) do
     time = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-    chunks = Enum.zip([ids, embeddings, documents])
-    |> Enum.map(fn {id, embedding, document} ->
-      embedding_1536 = if Enum.count(embedding) == 1536, do: embedding, else: nil
-      embedding_384 = if Enum.count(embedding) == 384, do: embedding, else: nil
-      %{
-        id: id,
-        collection_name: collection.name,
-        embedding_1536: embedding_1536,
-        embedding_384: embedding_384,
-        document: document.document,
-        metadata: document.metadata,
-        inserted_at: time,
-        updated_at: time
-      }
-    end)
+
+    chunks =
+      Enum.zip([ids, embeddings, documents])
+      |> Enum.map(fn {id, embedding, document} ->
+        embedding_1536 = if Enum.count(embedding) == 1536, do: embedding, else: nil
+        embedding_384 = if Enum.count(embedding) == 384, do: embedding, else: nil
+
+        %{
+          id: id,
+          collection_name: collection.name,
+          embedding_1536: embedding_1536,
+          embedding_384: embedding_384,
+          document: document.document,
+          metadata: document.metadata,
+          inserted_at: time,
+          updated_at: time
+        }
+      end)
 
     {_inserted_records, nil} = Buildel.Repo.insert_all(Chunk, chunks)
     :ok
@@ -223,8 +231,9 @@ defmodule Buildel.VectorDB.EctoAdapter do
   def delete_all_with_metadata(collection, metadata) do
     Buildel.Repo.delete_all(
       from c in Chunk,
-      where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata)
+        where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata)
     )
+
     :ok
   end
 
@@ -233,17 +242,21 @@ defmodule Buildel.VectorDB.EctoAdapter do
     embedding_size = Enum.count(query_embeddings)
     embedding_column = "embedding_#{embedding_size}" |> String.to_atom()
 
-    results = Buildel.Repo.all(
-      from c in Chunk,
-        where: c.collection_name == ^collection.name,
-        order_by: cosine_distance(field(c, ^embedding_column), ^query_embeddings),
-        limit: 5
-    ) |> Enum.map(fn chunk ->
-      %{
-        "document" => chunk.document,
-        "metadata" => chunk.metadata
-      }
-    end)
+    results =
+      Buildel.Repo.all(
+        from c in Chunk,
+          where: c.collection_name == ^collection.name,
+          order_by: cosine_distance(field(c, ^embedding_column), ^query_embeddings),
+          limit: 5
+      )
+      |> IO.inspect()
+      |> Enum.map(fn chunk ->
+        %{
+          "document" => chunk.document,
+          "metadata" => chunk.metadata
+        }
+      end)
+
     {:ok, results}
   end
 end

@@ -9,7 +9,7 @@ defmodule Buildel.HybridDB do
 
     search_results = Buildel.SearchDB.query(collection_name, query)
 
-    vector_results = Buildel.VectorDB.query(collection_name, query, api_key: api_key())
+    vector_results = Buildel.VectorDB.query(collection_name, query, %{api_key: api_key()})
 
     if Enum.empty?(vector_results) || Enum.empty?(search_results) do
       join_results(search_results, vector_results)

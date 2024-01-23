@@ -98,7 +98,7 @@ defmodule Buildel.Blocks.DocumentSearch do
       if state[:opts][:hybrid_reranking] do
         Buildel.HybridDB.query(state[:collection], query)
       else
-        Buildel.VectorDB.query(state[:collection], query, api_key: state[:api_key])
+        Buildel.VectorDB.query(state[:collection], query, %{api_key: state[:api_key]})
       end
 
     result =
