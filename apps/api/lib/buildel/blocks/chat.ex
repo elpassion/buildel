@@ -202,7 +202,7 @@ defmodule Buildel.Blocks.Chat do
        :chat_memory,
        ChatMemory.new(%{
          initial_messages: initial_messages(state),
-         type: opts.chat_memory_type |> String.to_existing_atom()
+         type: opts |> Map.get(:chat_memory_type, "full") |> String.to_existing_atom()
        })
      )}
   end

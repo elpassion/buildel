@@ -447,7 +447,8 @@ defmodule Buildel.BlocksTest do
                      %{"role" => "system", "content" => "You are a helpful assistant."}
                    ],
                    "endpoint" => nil,
-                   "api_type" => "openai"
+                   "api_type" => "openai",
+                   "chat_memory_type" => "full"
                  },
                  "inputs" => []
                })
