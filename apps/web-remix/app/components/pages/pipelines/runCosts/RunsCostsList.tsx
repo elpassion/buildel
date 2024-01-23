@@ -16,9 +16,7 @@ export const PipelineRunCostsList: React.FC<PipelineRunCostsListProps> = ({
       className="flex flex-col-reverse gap-2"
       items={items.map((item) => item.data)}
       emptyText={<EmptyMessage>There is no costs yet...</EmptyMessage>}
-      renderItem={(item, index) => (
-        <PipelineRunCostsItem data={item} index={index} />
-      )}
+      renderItem={(item) => <PipelineRunCostsItem data={item} />}
     />
   );
 };
@@ -40,12 +38,10 @@ export const PipelineRunCostsListHeader = () => {
 
 interface PipelineRunCostsItemProps {
   data: IPipelineCost;
-  index: number;
 }
 
 export const PipelineRunCostsItem: React.FC<PipelineRunCostsItemProps> = ({
   data,
-  index,
 }) => {
   return (
     <article
