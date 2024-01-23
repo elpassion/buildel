@@ -41,6 +41,7 @@ defmodule BuildelWeb.Router do
     post("/add", CalculatorController, :add)
 
     resources("/block_types", BlockTypesController, only: [:index])
+    get("/block_types/overviews", BlockTypesController, :overviews)
 
     resources("/organizations/:organization_id/pipelines", OrganizationPipelineController,
       only: [:index, :delete, :create, :show, :update]

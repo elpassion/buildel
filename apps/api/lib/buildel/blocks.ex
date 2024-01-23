@@ -75,6 +75,10 @@ defmodule Buildel.Blocks do
     @names_to_blocks_map |> Map.values() |> Enum.map(fn block -> block.options end)
   end
 
+  def list_types_overviews() do
+    list_types() |> Enum.map(fn block -> %{type: block.type, description: block.description} end)
+  end
+
   def type(name) when is_binary(name) do
     @names_to_blocks_map[name]
   end
