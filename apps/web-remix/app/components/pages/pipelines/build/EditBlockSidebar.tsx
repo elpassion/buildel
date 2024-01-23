@@ -34,7 +34,7 @@ export const EditBlockSidebar: React.FC<EditBlockSidebarProps> = ({
   edges,
 }) => {
   const { editableBlock, closeSidebar } = useEditBlockSidebar();
-
+  console.log(editableBlock);
   const handleSubmit = (updated: IExtendedBlockConfig) => {
     const tmpNodes = cloneDeep(nodes);
     const tmpEdges = cloneDeep(edges);
@@ -56,7 +56,7 @@ export const EditBlockSidebar: React.FC<EditBlockSidebarProps> = ({
         <>
           <ActionSidebarHeader
             heading={editableBlock.type}
-            subheading="Open AI’s Large Language Model chat block."
+            subheading={editableBlock.block_type.description}
             onClose={closeSidebar}
           />
           <EditBlockForm
