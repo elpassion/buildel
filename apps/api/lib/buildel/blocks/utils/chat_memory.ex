@@ -10,7 +10,7 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
   end
 
   def get_messages(%__MODULE__{} = chat_memory) do
-    chat_memory.messages |> Enum.reverse() |> IO.inspect(label: "get_messages")
+    chat_memory.messages |> Enum.reverse()
   end
 
   def add_message(%__MODULE__{messages: existing_messages} = chat_memory, new_message) do

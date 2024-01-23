@@ -35,11 +35,13 @@ defmodule Buildel.VectorDB do
     {:ok, collection}
   end
 
-  deftimed query(collection_name, query, %{api_key: api_key}), [
+  deftimed query(collection_name, query, %{api_key: api_key} = options), [
     :buildel,
     :vector_db,
     :query
   ] do
+    options = Map.merge(%{limit: 5, similarity_threshhold: 0.75}, options)
+
     {:ok, embeddings_list} =
       case Buildel.DocumentCache.get("embeddings::#{query}") do
         nil ->
@@ -57,7 +59,8 @@ defmodule Buildel.VectorDB do
     {:ok, results} =
       adapter().query(collection, %{
         query_embeddings: embeddings_list |> List.first(),
-        limit: limit
+        limit: options.limit,
+        similarity_treshhold: options.similarity_threshhold
       })
 
     results
@@ -142,11 +145,11 @@ defmodule Buildel.VectorDB.QdrantAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
-  def query(collection, %{query_embeddings: query_embeddings}) do
+  def query(collection, %{query_embeddings: query_embeddings, limit: limit}) do
     with {:ok, %{status: 200, body: body}} <-
            Qdrant.search_points(collection.name, %{
              vector: query_embeddings,
-             limit: 5,
+             limit: limit,
              with_payload: true
            }) do
       {:ok,
@@ -171,6 +174,7 @@ defmodule Buildel.VectorDB.EctoAdapter.Chunk do
     field :embedding_384, Pgvector.Ecto.Vector
     field :document, :string
     field :metadata, :map
+    field :similarity, :float, virtual: true
 
     timestamps()
   end
@@ -238,7 +242,11 @@ defmodule Buildel.VectorDB.EctoAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
-  def query(collection, %{query_embeddings: query_embeddings}) do
+  def query(collection, %{
+        query_embeddings: query_embeddings,
+        limit: limit,
+        similarity_treshhold: similarity_treshhold
+      }) do
     embedding_size = Enum.count(query_embeddings)
     embedding_column = "embedding_#{embedding_size}" |> String.to_atom()
 
@@ -247,9 +255,13 @@ defmodule Buildel.VectorDB.EctoAdapter do
         from c in Chunk,
           where: c.collection_name == ^collection.name,
           order_by: cosine_distance(field(c, ^embedding_column), ^query_embeddings),
-          limit: 5
+          limit: ^limit,
+          select: %{
+            c
+            | similarity: 1 - cosine_distance(field(c, ^embedding_column), ^query_embeddings)
+          }
       )
-      |> IO.inspect()
+      |> Enum.filter(&(&1.similarity > similarity_treshhold))
       |> Enum.map(fn chunk ->
         %{
           "document" => chunk.document,

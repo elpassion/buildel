@@ -28,26 +28,33 @@ defmodule Buildel.Blocks.DocumentSearch do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["persist_in", "forwarded_results_count", "hybrid_reranking"],
-            "properties" => %{
-              "persist_in" => memory_schema(),
-              "forwarded_results_count" => %{
-                "type" => "number",
-                "title" => "Forwarded results count",
-                "description" => "Up to how many results to forward to the output.",
-                "default" => 2,
-                "minimum" => 1,
-                "maximum" => 5,
-                "step" => 1
-              },
-              "hybrid_reranking" => %{
-                "type" => "boolean",
-                "title" => "Hybrid reranking",
-                "description" =>
-                  "Whether to rerank results using hybrid encoding model. This will increase the latency of the query.",
-                "default" => false
-              }
-            }
+            "required" => ["persist_in", "limit", "hybrid_reranking", "similarity_threshhold"],
+            "properties" =>
+              Jason.OrderedObject.new(
+                persist_in: memory_schema(),
+                limit: %{
+                  "type" => "number",
+                  "title" => "Limit",
+                  "description" => "The maximum number of results to return.",
+                  "default" => 3
+                },
+                similarity_threshhold: %{
+                  "type" => "number",
+                  "title" => "Similarity threshhold",
+                  "description" => "The similarity threshhold to use for the search.",
+                  "default" => 0.75,
+                  "minimum" => 0.0,
+                  "maximum" => 1.0,
+                  "step" => 0.01
+                },
+                hybrid_reranking: %{
+                  "type" => "boolean",
+                  "title" => "Hybrid reranking",
+                  "description" =>
+                    "Whether to rerank results using hybrid encoding model. This will increase the latency of the query.",
+                  "default" => false
+                }
+              )
           })
       }
     }
@@ -98,12 +105,15 @@ defmodule Buildel.Blocks.DocumentSearch do
       if state[:opts][:hybrid_reranking] do
         Buildel.HybridDB.query(state[:collection], query)
       else
-        Buildel.VectorDB.query(state[:collection], query, %{api_key: state[:api_key]})
+        Buildel.VectorDB.query(state[:collection], query, %{
+          api_key: state[:api_key],
+          limit: state[:opts] |> Map.get(:limit, 3),
+          similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.75)
+        })
       end
 
     result =
       results
-      |> Enum.take(state[:opts].forwarded_results_count)
       |> Enum.map(fn %{
                        "document" => document,
                        "metadata" => %{"file_name" => filename}

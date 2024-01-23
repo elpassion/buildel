@@ -29,7 +29,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["api_key", "knowledge", "limit"],
+            "required" => ["api_key", "knowledge", "limit", "similarity_threshhold"],
             "properties" =>
               Jason.OrderedObject.new(
                 api_key:
@@ -48,6 +48,15 @@ defmodule Buildel.Blocks.MemorySearchTool do
                   "title" => "Limit",
                   "description" => "The maximum number of results to return.",
                   "default" => 3
+                },
+                similarity_threshhold: %{
+                  "type" => "number",
+                  "title" => "Similarity threshhold",
+                  "description" => "The similarity threshhold to use for the search.",
+                  "default" => 0.75,
+                  "minimum" => 0.0,
+                  "maximum" => 1.0,
+                  "step" => 0.01
                 }
               )
           })
@@ -87,9 +96,13 @@ defmodule Buildel.Blocks.MemorySearchTool do
   def handle_cast({:query, {:text, query}}, state) do
     state = state |> send_stream_start()
     limit = state.opts |> Map.get(:limit, 3)
+    similarity_threshhold = state.opts |> Map.get(:similarity_threshhold, 0.75)
 
-    Buildel.VectorDB.query(state[:collection], query, %{api_key: state[:api_key]})
-    |> Enum.take(limit)
+    Buildel.VectorDB.query(state[:collection], query, %{
+      api_key: state[:api_key],
+      limit: limit,
+      similarity_threshhold: similarity_threshhold
+    })
     |> Enum.map(fn %{
                      "document" => document,
                      "metadata" => %{"file_name" => filename, "memory_id" => memory_id}
@@ -111,10 +124,14 @@ defmodule Buildel.Blocks.MemorySearchTool do
   def handle_call({:query, {:text, query}}, _caller, state) do
     state = state |> send_stream_start()
     limit = state.opts |> Map.get(:limit, 3)
+    similarity_threshhold = state.opts |> Map.get(:similarity_threshhold, 0.75)
 
     result =
-      Buildel.VectorDB.query(state[:collection], query, %{api_key: state[:api_key]})
-      |> Enum.take(limit)
+      Buildel.VectorDB.query(state[:collection], query, %{
+        api_key: state[:api_key],
+        limit: limit,
+        similarity_threshhold: similarity_threshhold
+      })
       |> Enum.map(fn %{
                        "document" => document,
                        "metadata" => %{"file_name" => filename, "memory_id" => memory_id}
