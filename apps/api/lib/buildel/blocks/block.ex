@@ -143,6 +143,7 @@ defmodule Buildel.Blocks.Block do
           "description" => "The name of the block.",
           "minLength" => 2,
           "maxLength" => 30,
+          "pattern" => "^[^<>: ?-]*$",
           "regex" => %{
             "pattern" => "^[^<>: ?-]*$",
             "errorMessage" => "Invalid string. Characters '< > : - ? ' are not allowed."
