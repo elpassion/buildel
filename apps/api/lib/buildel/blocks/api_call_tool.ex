@@ -11,6 +11,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   def options() do
     %{
       type: "api_call_tool",
+      description: "Enables the configuration and execution of HTTP requests.",
       groups: ["text", "tools"],
       inputs: [],
       outputs: [],

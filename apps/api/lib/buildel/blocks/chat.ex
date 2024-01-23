@@ -14,6 +14,7 @@ defmodule Buildel.Blocks.Chat do
   def options() do
     %{
       type: "chat",
+      description: "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
       groups: ["text", "llms"],
       inputs: [Block.text_input()],
       outputs: [

@@ -8,6 +8,7 @@ export const IOType = z.object({
 
 export const BlockType = z.object({
   type: z.string(),
+  description: z.string(),
   groups: z.array(z.string()),
   inputs: z.array(IOType),
   outputs: z.array(IOType),

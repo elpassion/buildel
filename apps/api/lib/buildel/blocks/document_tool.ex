@@ -11,6 +11,7 @@ defmodule Buildel.Blocks.DocumentTool do
   def options() do
     %{
       type: "document_tool",
+      description: "It's a powerful tool for applications requiring quick and precise access to specific documents stored in Buildel's knowledge bases.",
       groups: ["text", "tools"],
       inputs: [],
       outputs: [],

@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.TextInput do
   def options() do
     %{
       type: "text_input",
+      description: "This module is crafted for the seamless intake and transmission of textual data.",
       groups: ["text", "inputs / outputs"],
       inputs: [Block.text_input("input", true)],
       outputs: [Block.text_output()],

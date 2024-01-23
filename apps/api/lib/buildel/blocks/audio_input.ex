@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.AudioInput do
   def options() do
     %{
       type: "audio_input",
+      description: "A specialized block designed for capturing and streaming audio data.",
       groups: ["audio", "inputs / outputs"],
       inputs: [Block.audio_input("input", true)],
       outputs: [Block.audio_output()],

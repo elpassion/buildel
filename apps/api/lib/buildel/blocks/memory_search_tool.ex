@@ -11,6 +11,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
   def options() do
     %{
       type: "memory_search_tool",
+      description: "This module excels in searching and retrieving relevant information from a vast collection of documents.",
       groups: ["text", "tools"],
       inputs: [],
       outputs: [Block.text_output("results")],

@@ -12,6 +12,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
   def options() do
     %{
       type: "hugging_face_chat",
+      description: "This module integrates advanced Hugging Face language models to provide dynamic and intelligent chat functionalities.",
       groups: ["text", "llms"],
       inputs: [Block.text_input()],
       outputs: [

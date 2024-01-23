@@ -12,6 +12,7 @@ defmodule Buildel.Blocks.CollectSentences do
   def options() do
     %{
       type: "collect_sentences",
+      description: "This module segmenting and extracting individual sentences from continuous text streams.",
       groups: ["text", "utils"],
       inputs: [Block.text_input()],
       outputs: [sentences_output()],

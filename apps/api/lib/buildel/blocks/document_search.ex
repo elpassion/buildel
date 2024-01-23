@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   def options() do
     %{
       type: "document_search",
+      description: "A sophisticated module designed for efficient searching and retrieval of information from a collection of documents.",
       groups: ["file", "memory"],
       inputs: [Block.file_input("files", true), Block.text_input("query")],
       outputs: [Block.text_output()],

@@ -11,6 +11,7 @@ defmodule Buildel.Blocks.CollectAllText do
   def options() do
     %{
       type: "collect_all_text",
+      description: "This module specializes in accumulating and consolidating text input from streaming sources.",
       groups: ["text", "utils"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output()],

@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.WebhookOutput do
   def options() do
     %{
       type: "webhook_output",
+      description: "This module is adept at forwarding text data to specified webhook URLs, facilitating seamless external integrations.",
       groups: ["inputs / outputs"],
       inputs: [Block.text_input()],
       outputs: [],

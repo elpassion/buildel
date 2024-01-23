@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.IF do
   def options() do
     %{
       type: "if",
+      description: "",
       groups: ["utils"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output("true"), Block.text_output("false")],

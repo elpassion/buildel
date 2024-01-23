@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.AudioOutput do
   def options() do
     %{
       type: "audio_output",
+      description: "It's designed to work seamlessly with other audio-related blocks in Buildel, ensuring smooth and flexible audio output capabilities in applications.",
       groups: ["audio", "inputs / outputs"],
       inputs: [Block.audio_input()],
       outputs: [Block.audio_output("output", true)],

@@ -8,6 +8,7 @@ defmodule Buildel.Blocks.SpeechToText do
   def options() do
     %{
       type: "speech_to_text",
+      description: "This module is adept at transcribing audio data into text, offering outputs in both plain text and JSON formats.",
       groups: ["audio", "text"],
       inputs: [Block.audio_input()],
       outputs: [Block.text_output(), Block.text_output("json_output")],

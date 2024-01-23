@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.TextOutput do
   def options() do
     %{
       type: "text_output",
+      description: "A versatile module designed to output text data.",
       groups: ["text", "inputs / outputs"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output("output", true)],

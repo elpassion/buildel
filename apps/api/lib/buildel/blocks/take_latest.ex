@@ -12,6 +12,7 @@ defmodule Buildel.Blocks.TakeLatest do
   def options() do
     %{
       type: "take_latest",
+      description: "This module specializes in aggregating the latest inputs and combining them based on a specified template.",
       groups: ["text", "utils"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output()],
