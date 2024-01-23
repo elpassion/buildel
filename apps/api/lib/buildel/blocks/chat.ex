@@ -38,6 +38,7 @@ defmodule Buildel.Blocks.Chat do
             "required" => [
               "description",
               "model",
+              "chat_memory_type",
               "temperature",
               "system_message",
               "messages",
@@ -79,13 +80,21 @@ defmodule Buildel.Blocks.Chat do
                   "enumPresentAs" => "radio",
                   "default" => "openai"
                 },
+                chat_memory_type: %{
+                  "type" => "string",
+                  "title" => "Chat memory type",
+                  "description" => "The chat memory type to use for the chat.",
+                  "enum" => ["off", "full", "rolling"],
+                  "enumPresentAs" => "radio",
+                  "default" => "full"
+                },
                 temperature: %{
                   "type" => "number",
                   "title" => "Temperature",
                   "description" => "The temperature of the chat.",
                   "default" => 0.7,
                   "minimum" => 0.0,
-                  "maximum" => 1.0,
+                  "maximum" => 2.0,
                   "step" => 0.1
                 },
                 system_message: %{
@@ -191,7 +200,10 @@ defmodule Buildel.Blocks.Chat do
      |> Map.put(:tool_connections, tool_connections)
      |> Map.put(
        :chat_memory,
-       ChatMemory.new(%{initial_messages: initial_messages(state)})
+       ChatMemory.new(%{
+         initial_messages: initial_messages(state),
+         type: opts.chat_memory_type |> String.to_existing_atom()
+       })
      )}
   end
 
@@ -247,6 +259,12 @@ defmodule Buildel.Blocks.Chat do
       })
 
     {:noreply, %{state | chat_memory: chat_memory}}
+  end
+
+  @impl true
+  def handle_cast({:finish_chat_message}, %{chat_memory: %ChatMemory{type: :off}} = state) do
+    state = update_in(state.chat_memory, &ChatMemory.reset(&1))
+    {:noreply, state |> send_stream_stop()}
   end
 
   @impl true
@@ -337,9 +355,7 @@ defmodule Buildel.Blocks.Chat do
 
                save_text_chunk(pid, text_chunk)
              end,
-             on_tool_content: fn tool_name, content ->
-               save_tool_result(pid, tool_name, content)
-             end,
+             on_tool_content: &save_tool_result(pid, &1, &2),
              on_end: fn chat_token_summary ->
                cost =
                  Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
@@ -378,6 +394,10 @@ defmodule Buildel.Blocks.Chat do
           state = state |> Map.put(:chat_memory, chat_memory)
           chat_task(state)
         else
+          {:error, :full_chat_memory} ->
+            send_error(state, "Chat memory is full")
+            {:error, :full_chat_memory, state}
+
           _ ->
             send_error(state, "Initial messages were too long")
             {:error, :context_length_exceeded, state}

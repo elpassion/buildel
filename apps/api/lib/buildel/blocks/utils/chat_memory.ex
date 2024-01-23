@@ -1,12 +1,16 @@
 defmodule Buildel.Blocks.Utils.ChatMemory do
-  defstruct [:messages, :initial_messages]
+  defstruct [:messages, :initial_messages, :type]
 
-  def new(%{initial_messages: initial_messages}) do
-    %__MODULE__{initial_messages: initial_messages, messages: initial_messages |> Enum.reverse()}
+  def new(%{initial_messages: initial_messages, type: type}) do
+    %__MODULE__{
+      initial_messages: initial_messages,
+      messages: initial_messages |> Enum.reverse(),
+      type: type
+    }
   end
 
   def get_messages(%__MODULE__{} = chat_memory) do
-    chat_memory.messages |> Enum.reverse()
+    chat_memory.messages |> Enum.reverse() |> IO.inspect(label: "get_messages")
   end
 
   def add_message(%__MODULE__{messages: existing_messages} = chat_memory, new_message) do
@@ -59,8 +63,13 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
     add_assistant_message(chat_memory, %{content: chunk})
   end
 
+  def reset(%__MODULE__{} = chat_memory) do
+    %__MODULE__{chat_memory | messages: chat_memory.initial_messages |> Enum.reverse()}
+  end
+
   def drop_first_non_initial_message(
-        %__MODULE__{messages: messages, initial_messages: initial_messages} = chat_memory
+        %__MODULE__{messages: messages, initial_messages: initial_messages, type: :rolling} =
+          chat_memory
       ) do
     initial_messages_length = Enum.count(initial_messages)
 
@@ -70,5 +79,9 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
       new_messages = chat_memory.messages |> List.delete_at(-(initial_messages_length + 1))
       {:ok, chat_memory |> Map.put(:messages, new_messages)}
     end
+  end
+
+  def drop_first_non_initial_message(%__MODULE__{}) do
+    {:error, :full_chat_memory}
   end
 end
