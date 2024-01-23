@@ -144,7 +144,15 @@ export const Builder = ({
 
   const onConnect = useCallback(
     (params: Connection) => {
-      setEdges((eds) => addEdge(params, eds));
+      setEdges((eds) =>
+        addEdge(
+          {
+            id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
+            ...params,
+          },
+          eds
+        )
+      );
 
       setNodes((nds) => {
         return nds.map((nd) => {
