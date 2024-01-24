@@ -4,17 +4,7 @@ import { useBoolean } from "usehooks-ts";
 import cloneDeep from "lodash.clonedeep";
 import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
 import { errorToast } from "~/components/toasts/errorToast";
-interface ELProviderProps {}
-
-export type MessageStatusType = "finished" | "ongoing";
-export type MessageType = "ai" | "user";
-export interface IMessage {
-  id: string;
-  type: MessageType;
-  message: string;
-  created_at: Date;
-  status: MessageStatusType;
-}
+import { IMessage, MessageStatusType, MessageType } from "./EL.types";
 
 interface IELContext {
   isGenerating: boolean;
@@ -27,9 +17,7 @@ interface IELContext {
 
 const ELContext = React.createContext<IELContext>(undefined!);
 
-export const ELProvider: React.FC<PropsWithChildren<ELProviderProps>> = ({
-  children,
-}) => {
+export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const { value: isShown, setTrue: show, setFalse: hide } = useBoolean();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -110,9 +98,9 @@ export const ELProvider: React.FC<PropsWithChildren<ELProviderProps>> = ({
     if (!message.trim()) return;
 
     const newMessage = {
+      message,
       id: uniqueid(),
       type: "user" as MessageType,
-      message,
       created_at: new Date(),
       status: "finished" as MessageStatusType,
     };

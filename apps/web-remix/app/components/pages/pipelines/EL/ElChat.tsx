@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from "react";
+import { useEl } from "~/components/pages/pipelines/EL/ELProvider";
 import {
   IMessage,
   MessageStatusType,
   MessageType,
-  useEl,
-} from "~/components/pages/pipelines/EL/ELProvider";
+} from "~/components/pages/pipelines/EL/EL.types";
 import { Icon } from "@elpassion/taco";
 import { useBoolean } from "usehooks-ts";
 import classNames from "classnames";
