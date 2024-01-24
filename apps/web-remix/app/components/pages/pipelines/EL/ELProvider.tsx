@@ -1,18 +1,23 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import uniqueid from "lodash.uniqueid";
 import { useBoolean } from "usehooks-ts";
+import cloneDeep from "lodash.clonedeep";
 import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
+import { errorToast } from "~/components/toasts/errorToast";
 interface ELProviderProps {}
 
-type MessageType = "ai" | "user";
+export type MessageStatusType = "finished" | "ongoing";
+export type MessageType = "ai" | "user";
 export interface IMessage {
   id: string;
   type: MessageType;
   message: string;
   created_at: Date;
+  status: MessageStatusType;
 }
 
 interface IELContext {
+  isGenerating: boolean;
   isShown: boolean;
   show: () => void;
   hide: () => void;
@@ -22,155 +27,67 @@ interface IELContext {
 
 const ELContext = React.createContext<IELContext>(undefined!);
 
-const dummy_messages = [
-  {
-    id: uniqueid(),
-    message: "pierwsza",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "user" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "user" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "user" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "user" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da d",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "user" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "user" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "testd asd asdas da da da",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-    type: "user" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message:
-      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-  },
-  {
-    id: uniqueid(),
-    message: "ostatnia",
-    type: "user" as MessageType,
-    created_at: new Date(),
-  },
-];
-
 export const ELProvider: React.FC<PropsWithChildren<ELProviderProps>> = ({
   children,
 }) => {
   const { value: isShown, setTrue: show, setFalse: hide } = useBoolean();
-  const [messages, setMessages] = useState<IMessage[]>(dummy_messages);
+  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const onBlockOutput = (
-    blockId: string,
-    outputName: string,
+    _blockId: string,
+    _outputName: string,
     payload: unknown
   ) => {
-    console.log(blockId, outputName, payload);
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: uniqueid(),
-        type: "ai",
-        message: (payload as { message: string }).message,
-        created_at: new Date(),
-      },
-    ]);
+    setMessages((prev) => {
+      const tmpPrev = cloneDeep(prev);
+      const lastMessage = tmpPrev[tmpPrev.length - 1];
+
+      if (
+        lastMessage &&
+        lastMessage.type === "ai" &&
+        lastMessage.status === "ongoing"
+      ) {
+        tmpPrev[tmpPrev.length - 1].message += (
+          payload as { message: string }
+        ).message;
+
+        return tmpPrev;
+      }
+
+      return [
+        ...prev,
+        {
+          id: uniqueid(),
+          type: "ai",
+          message: (payload as { message: string }).message,
+          created_at: new Date(),
+          status: "ongoing",
+        },
+      ];
+    });
+  };
+
+  const onStatusChange = (blockId: string, isWorking: boolean) => {
+    if (isWorking) {
+      setIsGenerating(true);
+    }
+    if (blockId.includes("text_output") && !isWorking) {
+      setIsGenerating(false);
+    }
+  };
+
+  const onError = () => {
+    errorToast({ description: "Ups! Something went wrong" });
+    setIsGenerating(false);
   };
 
   const { startRun, stopRun, push } = usePipelineRun(
     13,
     135,
     onBlockOutput,
-    () => console.log("Status chabge"),
-    () => console.log("Error")
+    onStatusChange,
+    onError
   );
 
   const clearMessages = () => {
@@ -184,15 +101,35 @@ export const ELProvider: React.FC<PropsWithChildren<ELProviderProps>> = ({
 
   const handleHideEL = async () => {
     hide();
-    // clearMessages();
     await stopRun();
+    setIsGenerating(false);
+    clearMessages();
   };
 
   const handlePush = (message: string) => {
-    setMessages((prev) => [
-      ...prev,
-      { id: uniqueid(), type: "user", message, created_at: new Date() },
-    ]);
+    if (!message.trim()) return;
+
+    const newMessage = {
+      id: uniqueid(),
+      type: "user" as MessageType,
+      message,
+      created_at: new Date(),
+      status: "finished" as MessageStatusType,
+    };
+
+    const tmpPrev = cloneDeep(messages);
+    const lastMessage = tmpPrev[tmpPrev.length - 1];
+
+    if (
+      lastMessage &&
+      lastMessage.type === "ai" &&
+      lastMessage.status === "ongoing"
+    ) {
+      tmpPrev[tmpPrev.length - 1].status = "finished";
+    }
+
+    setMessages([...tmpPrev, newMessage]);
+
     push("text_input_1:input", message);
   };
 
@@ -205,8 +142,9 @@ export const ELProvider: React.FC<PropsWithChildren<ELProviderProps>> = ({
   return (
     <ELContext.Provider
       value={{
-        messages,
         isShown,
+        messages,
+        isGenerating,
         show: handleShowEL,
         hide: handleHideEL,
         push: handlePush,
