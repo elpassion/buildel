@@ -2,6 +2,7 @@ import React, { PropsWithChildren, useEffect, useState } from "react";
 import uniqueid from "lodash.uniqueid";
 import { useBoolean } from "usehooks-ts";
 import cloneDeep from "lodash.clonedeep";
+import { BuildelRunStatus } from "@buildel/buildel";
 import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
 import { errorToast } from "~/components/toasts/errorToast";
 import { IMessage, MessageStatusType, MessageType } from "./EL.types";
@@ -13,6 +14,7 @@ interface IELContext {
   hide: () => void;
   push: (message: string) => void;
   messages: IMessage[];
+  connectionStatus: BuildelRunStatus;
 }
 
 const ELContext = React.createContext<IELContext>(undefined!);
@@ -70,7 +72,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     setIsGenerating(false);
   };
 
-  const { startRun, stopRun, push } = usePipelineRun(
+  const { startRun, stopRun, push, status } = usePipelineRun(
     13,
     135,
     onBlockOutput,
@@ -136,6 +138,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         show: handleShowEL,
         hide: handleHideEL,
         push: handlePush,
+        connectionStatus: status,
       }}
     >
       {children}
