@@ -118,7 +118,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
     setMessages([...tmpPrev, newMessage]);
 
-    push("text_input_1:input", message);
+    push("text_input_2:input", message);
   };
 
   useEffect(() => {

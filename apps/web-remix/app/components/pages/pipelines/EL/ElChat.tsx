@@ -1,18 +1,11 @@
 import React, { useMemo, useState } from "react";
-import { useEl } from "~/components/pages/pipelines/EL/ELProvider";
-import {
-  IMessage,
-  MessageStatusType,
-  MessageType,
-} from "~/components/pages/pipelines/EL/EL.types";
 import { Icon } from "@elpassion/taco";
 import { useBoolean } from "usehooks-ts";
 import classNames from "classnames";
-import { ItemList } from "~/components/list/ItemList";
-import { dayjs } from "~/utils/Dayjs";
-interface ElChatProps {}
+import { useEl } from "./ELProvider";
+import { ELChatMessages } from "./ELChatMessages";
 
-export const ElChat: React.FC<ElChatProps> = () => {
+export const ElChat: React.FC = () => {
   const { push, isGenerating } = useEl();
 
   const onSubmit = (message: string) => {
@@ -22,7 +15,7 @@ export const ElChat: React.FC<ElChatProps> = () => {
   return (
     <div className="max-w-full">
       <div className="w-full border border-neutral-800 rounded-lg px-2 py-3">
-        <ChatMessages />
+        <ELChatMessages />
       </div>
 
       <div className="mt-2">
@@ -34,79 +27,6 @@ export const ElChat: React.FC<ElChatProps> = () => {
     </div>
   );
 };
-
-const EMPTY_MESSAGES = [
-  {
-    message:
-      "I'm EL, your AI helper here at Buildel. Feel free to ask me anything about creating the perfect workflow for you in the application.",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-    status: "finished" as MessageStatusType,
-    id: "2",
-  },
-  {
-    message: "👋 Hi there!",
-    type: "ai" as MessageType,
-    created_at: new Date(),
-    status: "finished" as MessageStatusType,
-    id: "1",
-  },
-];
-
-function ChatMessages() {
-  const { messages } = useEl();
-
-  const reversed = useMemo(() => {
-    if (!messages.length) return EMPTY_MESSAGES;
-    return messages.map((_, idx) => messages[messages.length - 1 - idx]);
-  }, [messages]);
-
-  return (
-    <ItemList
-      className={classNames(
-        "flex flex-col-reverse gap-2 w-full h-full overflow-y-auto pr-1",
-        { "h-[300px]": !!messages.length, "h-[200px]": !messages.length }
-      )}
-      itemClassName="w-full"
-      items={reversed}
-      renderItem={(msg) => (
-        <>
-          <ChatMessage data={msg} />
-          <span
-            className={classNames(
-              "block w-fit text-[10px] text-neutral-300 mt-[2px]",
-              {
-                "ml-auto mr-1": msg.type === "user",
-              }
-            )}
-          >
-            {dayjs(msg.created_at).format("HH:mm")}
-          </span>
-        </>
-      )}
-    />
-  );
-}
-
-interface ChatMessageProps {
-  data: IMessage;
-}
-
-function ChatMessage({ data }: ChatMessageProps) {
-  return (
-    <article
-      className={classNames(
-        "w-full max-w-[70%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5 text-neutral-200 text-xs",
-        {
-          "bg-neutral-800 rounded-br-xl": data.type === "ai",
-          "bg-neutral-900 rounded-bl-xl ml-auto mr-0": data.type !== "ai",
-        }
-      )}
-    >
-      <p>{data.message}</p>
-    </article>
-  );
-}
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
