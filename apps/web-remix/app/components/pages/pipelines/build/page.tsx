@@ -1,6 +1,8 @@
 import React, { useCallback } from "react";
 import { LinksFunction, MetaFunction } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
+import { ELProvider } from "~/components/pages/pipelines/EL/ELProvider";
+import { ELHelper } from "~/components/pages/pipelines/build/ELHelper";
 import { IPipeline, IPipelineConfig } from "../pipeline.types";
 import { toPipelineConfig } from "../PipelineFlow.utils";
 import { CustomEdge } from "../CustomEdges/CustomEdge";
@@ -30,36 +32,40 @@ export function PipelineBuilder() {
   );
 
   return (
-    <EditBlockSidebarProvider>
-      <Builder
-        pipeline={pipeline}
-        CustomNode={BuilderNode}
-        CustomEdge={CustomEdge}
-        className="h-[calc(100vh_-_128px)]"
-      >
-        {({ edges, nodes, isUpToDate, onBlockCreate }) => (
-          <>
-            <BuilderHeader
-              isUpToDate={isUpToDate}
-              isSaving={updateFetcher.state !== "idle"}
-              onSave={() => {
-                handleUpdatePipeline(toPipelineConfig(nodes, edges));
-              }}
-            />
+    <ELProvider>
+      <EditBlockSidebarProvider>
+        <Builder
+          pipeline={pipeline}
+          CustomNode={BuilderNode}
+          CustomEdge={CustomEdge}
+          className="h-[calc(100vh_-_128px)]"
+        >
+          {({ edges, nodes, isUpToDate, onBlockCreate }) => (
+            <>
+              <BuilderHeader
+                isUpToDate={isUpToDate}
+                isSaving={updateFetcher.state !== "idle"}
+                onSave={() => {
+                  handleUpdatePipeline(toPipelineConfig(nodes, edges));
+                }}
+              />
 
-            <CreateBlockFloatingMenu onCreate={onBlockCreate} />
+              <CreateBlockFloatingMenu onCreate={onBlockCreate} />
 
-            <EditBlockSidebar
-              nodes={nodes}
-              edges={edges}
-              pipelineId={pipeline.id}
-              onSubmit={handleUpdatePipeline}
-              organizationId={pipeline.organization_id}
-            />
-          </>
-        )}
-      </Builder>
-    </EditBlockSidebarProvider>
+              <EditBlockSidebar
+                nodes={nodes}
+                edges={edges}
+                pipelineId={pipeline.id}
+                onSubmit={handleUpdatePipeline}
+                organizationId={pipeline.organization_id}
+              />
+
+              <ELHelper />
+            </>
+          )}
+        </Builder>
+      </EditBlockSidebarProvider>
+    </ELProvider>
   );
 }
 

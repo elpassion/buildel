@@ -10,6 +10,8 @@ import {
 import { Menu } from "~/components/menu/Menu";
 import { GroupSubMenu } from "./GroupSubMenu";
 import { CreateBlockDraggableItem } from "./CreateBlockDraggableItem";
+import { ELMenuItem } from "./ELMenuItem";
+import { ELProvider } from "~/components/pages/pipelines/EL/ELProvider";
 
 interface CreateBlockFloatingMenuProps {
   onCreate: (node: IBlockConfig) => void;
@@ -52,6 +54,8 @@ export const CreateBlockFloatingMenu: React.FC<
   return (
     <div className="absolute top-1/2 -translate-y-1/2 right-4 h-auto">
       <Menu expandIcon={null}>
+        <ELMenuItem />
+
         {Object.keys(blockGroups).map((group) => (
           <GroupSubMenu
             key={group}
