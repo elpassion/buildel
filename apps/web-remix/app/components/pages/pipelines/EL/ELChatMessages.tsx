@@ -34,7 +34,7 @@ export function ELChatMessages() {
   return (
     <ItemList
       className={classNames(
-        "flex flex-col-reverse gap-2 w-full h-full overflow-y-auto pr-1",
+        "flex flex-col-reverse gap-2 w-full overflow-y-auto pr-1",
         { "h-[300px]": !!messages.length, "h-[200px]": !messages.length }
       )}
       itemClassName="w-full"
