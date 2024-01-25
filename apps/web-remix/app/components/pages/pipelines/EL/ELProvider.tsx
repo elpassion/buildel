@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
-import uniqueid from "lodash.uniqueid";
+import { v4 as uuidv4 } from "uuid";
 import { useBoolean } from "usehooks-ts";
 import cloneDeep from "lodash.clonedeep";
 import { BuildelRunStatus } from "@buildel/buildel";
@@ -48,7 +48,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       return [
         ...prev,
         {
-          id: uniqueid(),
+          id: uuidv4(),
           type: "ai",
           message: (payload as { message: string }).message,
           created_at: new Date(),
@@ -118,7 +118,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
     const newMessage = {
       message,
-      id: uniqueid(),
+      id: uuidv4(),
       type: "user" as MessageType,
       created_at: new Date(),
       status: "finished" as MessageStatusType,
