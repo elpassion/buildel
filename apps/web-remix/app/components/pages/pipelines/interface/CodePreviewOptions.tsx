@@ -4,8 +4,8 @@ import { useOnClickOutside } from "usehooks-ts";
 import { Icon } from "@elpassion/taco";
 import { Menu } from "~/components/menu/Menu";
 import { MenuItem } from "~/components/menu/MenuItem";
+import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import { CodePreviewWrapper } from "./CodePreview";
-import { CopyCodeButton } from "./CopyCodeButton";
 
 interface CodePreviewOptionsProps {
   options: {

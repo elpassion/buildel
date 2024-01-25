@@ -63,6 +63,21 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       setIsGenerating(true);
     }
     if (blockId.includes("text_output") && !isWorking) {
+      setMessages((prev) => {
+        const tmpPrev = cloneDeep(prev);
+        const lastMessage = tmpPrev[tmpPrev.length - 1];
+
+        if (
+          lastMessage &&
+          lastMessage.type === "ai" &&
+          lastMessage.status === "ongoing"
+        ) {
+          tmpPrev[tmpPrev.length - 1].status = "finished";
+        }
+
+        return tmpPrev;
+      });
+
       setIsGenerating(false);
     }
   };
@@ -95,7 +110,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     hide();
     // await stopRun();
     setIsGenerating(false);
-    clearMessages();
+    // clearMessages();
   };
 
   const handlePush = (message: string) => {
@@ -109,18 +124,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       status: "finished" as MessageStatusType,
     };
 
-    const tmpPrev = cloneDeep(messages);
-    const lastMessage = tmpPrev[tmpPrev.length - 1];
-
-    if (
-      lastMessage &&
-      lastMessage.type === "ai" &&
-      lastMessage.status === "ongoing"
-    ) {
-      tmpPrev[tmpPrev.length - 1].status = "finished";
-    }
-
-    setMessages([...tmpPrev, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
 
     push("text_input_1:input", message);
   };
