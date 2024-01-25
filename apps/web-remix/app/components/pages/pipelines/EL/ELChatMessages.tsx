@@ -113,7 +113,9 @@ function ChatMessage({ data }: ChatMessageProps) {
         }
       )}
     >
-      {formatMessage(data.message)}
+      <div className="prose break-words whitespace-pre-wrap text-neutral-200 text-xs">
+        {formatMessage(data.message)}
+      </div>
     </article>
   );
 }
