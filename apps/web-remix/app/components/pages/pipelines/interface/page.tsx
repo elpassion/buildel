@@ -2,6 +2,7 @@ import React from "react";
 import { routes } from "~/utils/routes.utils";
 import { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import {
   PreviewConnector,
   PreviewSection,
@@ -13,7 +14,6 @@ import {
 } from "./PreviewSection";
 import { CodePreviewWrapper } from "./CodePreview";
 import { CodePreviewOptions } from "./CodePreviewOptions";
-import { CopyCodeButton } from "./CopyCodeButton";
 import { loader } from "./loader";
 
 export function InterfacePage() {

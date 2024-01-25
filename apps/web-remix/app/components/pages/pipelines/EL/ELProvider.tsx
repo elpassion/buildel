@@ -86,14 +86,16 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
   const handleShowEL = async () => {
     show();
-    await startRun();
+    if (status === "idle") {
+      await startRun();
+    }
   };
 
   const handleHideEL = async () => {
     hide();
-    await stopRun();
+    // await stopRun();
     setIsGenerating(false);
-    // clearMessages();
+    clearMessages();
   };
 
   const handlePush = (message: string) => {

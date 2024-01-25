@@ -1,9 +1,10 @@
-import React, { useMemo } from "react";
+import React, { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ItemList } from "~/components/list/ItemList";
 import classNames from "classnames";
 import { dayjs } from "~/utils/Dayjs";
 import { IMessage, MessageStatusType, MessageType } from "./EL.types";
 import { useEl } from "./ELProvider";
+import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 
 const EMPTY_MESSAGES = [
   {
@@ -62,18 +63,77 @@ interface ChatMessageProps {
   data: IMessage;
 }
 
+const formats = [
+  { regex: /```json([\s\S]*?)```/g },
+  { regex: /```html([\s\S]*?)```/g },
+];
+
 function ChatMessage({ data }: ChatMessageProps) {
+  const formatMessage = (message: string) => {
+    let lastIndex = 0;
+    const nodes: ReactNode[] = [];
+
+    formats.forEach((format) => {
+      message.replace(format.regex, (match, jsonContent, index) => {
+        const regularText = message.substring(lastIndex, index);
+        if (regularText) {
+          nodes.push(
+            <ChatMessageParagraph>{regularText}</ChatMessageParagraph>
+          );
+        }
+
+        nodes.push(<ChatMessageCode>{jsonContent}</ChatMessageCode>);
+
+        lastIndex = index + match.length;
+        return match;
+      });
+    });
+
+    if (lastIndex < message.length) {
+      nodes.push(
+        <ChatMessageParagraph>
+          {message.substring(lastIndex)}
+        </ChatMessageParagraph>
+      );
+    }
+
+    return nodes;
+  };
+
   return (
     <article
       className={classNames(
-        "w-full max-w-[70%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5 text-neutral-200 text-xs",
+        "w-full max-w-[70%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5",
         {
           "bg-neutral-800 rounded-br-xl": data.type === "ai",
           "bg-neutral-900 rounded-bl-xl ml-auto mr-0": data.type !== "ai",
         }
       )}
     >
-      <p>{data.message}</p>
+      <p className="prose break-words whitespace-pre-wrap text-neutral-200 text-xs">
+        {formatMessage(data.message)}
+      </p>
     </article>
+  );
+}
+
+function ChatMessageParagraph({ children }: PropsWithChildren) {
+  return (
+    <p className="prose break-words whitespace-pre-wrap text-neutral-200 text-xs">
+      {children}
+    </p>
+  );
+}
+
+function ChatMessageCode({ children }: { children: string }) {
+  return (
+    <div className="relative">
+      <div className="absolute top-1 right-1 !text-sm">
+        <CopyCodeButton value={children} />
+      </div>
+      <pre className="my-1 bg-neutral-900">
+        <code>{children}</code>
+      </pre>
+    </div>
   );
 }
