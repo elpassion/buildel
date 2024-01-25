@@ -6,7 +6,7 @@ import { useEl } from "./ELProvider";
 import { ELChatMessages } from "./ELChatMessages";
 
 export const ElChat: React.FC = () => {
-  const { push, isGenerating } = useEl();
+  const { push, isGenerating, connectionStatus } = useEl();
 
   const onSubmit = (message: string) => {
     push(message);
@@ -23,6 +23,7 @@ export const ElChat: React.FC = () => {
       <div className="mt-2">
         <ChatInput
           onSubmit={onSubmit}
+          disabled={connectionStatus !== "running"}
           status={isGenerating ? "working" : "idle"}
         />
       </div>
@@ -63,9 +64,10 @@ function GeneratingAnimation() {
 interface ChatInputProps {
   onSubmit: (message: string) => void;
   status: "working" | "idle";
+  disabled?: boolean;
 }
 
-function ChatInput({ onSubmit, status }: ChatInputProps) {
+function ChatInput({ onSubmit, status, disabled }: ChatInputProps) {
   const [value, setValue] = useState("");
   const {
     value: isFocused,
@@ -78,8 +80,8 @@ function ChatInput({ onSubmit, status }: ChatInputProps) {
   }, [status]);
 
   const isDisabled = useMemo(() => {
-    return isWorking || !value.trim();
-  }, [value, isWorking]);
+    return disabled || isWorking || !value.trim();
+  }, [value, isWorking, disabled]);
 
   const onFocus = () => {
     setFocus();
@@ -112,6 +114,7 @@ function ChatInput({ onSubmit, status }: ChatInputProps) {
       )}
     >
       <input
+        disabled={disabled}
         className="bg-transparent !border-none w-full text-sm text-neutral-200 py-1.5 pl-3 pr-8 placeholder:text-neutral-600"
         placeholder="Ask a question..."
         value={value}
