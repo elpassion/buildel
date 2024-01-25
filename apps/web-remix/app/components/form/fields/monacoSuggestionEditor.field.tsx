@@ -1,17 +1,19 @@
 import React, { forwardRef, ReactNode } from "react";
 import { useControlField } from "remix-validated-form";
 import { InputText, Label } from "@elpassion/taco";
-import { EditorProps } from "@monaco-editor/react";
 import {
   HiddenField,
   useFieldContext,
 } from "~/components/form/fields/field.context";
-import { MonacoEditorInput } from "~/components/editor/MonacoEditorInput";
+import {
+  MonacoEditorWithSuggestions,
+  MonacoEditorWithSuggestionsProps,
+} from "~/components/editor/MonacoEditorWithSuggestions";
 
-export const MonacoEditorField = forwardRef<
+export const MonacoSuggestionEditorField = forwardRef<
   HTMLInputElement,
   Partial<
-    EditorProps & {
+    MonacoEditorWithSuggestionsProps & {
       label: string;
       supportingText: ReactNode;
       error?: string;
@@ -25,7 +27,8 @@ export const MonacoEditorField = forwardRef<
     <>
       <HiddenField value={value} {...getInputProps()} />
       <Label text={label} />
-      <MonacoEditorInput
+      <MonacoEditorWithSuggestions
+        path={name}
         height="130px"
         loading={<div className="w-full h-[130px] border border-neutral-200" />}
         value={value}

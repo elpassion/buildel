@@ -66,6 +66,7 @@ interface ChatMessageProps {
 const formats = [
   { regex: /```json([\s\S]*?)```/g },
   { regex: /```html([\s\S]*?)```/g },
+  { regex: /```block_configuration([\s\S]*?)```/g },
 ];
 
 function ChatMessage({ data }: ChatMessageProps) {

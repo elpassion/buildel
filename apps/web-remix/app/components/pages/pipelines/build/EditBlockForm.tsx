@@ -11,7 +11,7 @@ import {
 } from "~/components/form/schema/SchemaFields";
 import { ValidatedForm, useFormContext } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
-import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
+import { MonacoSuggestionEditorField } from "~/components/form/fields/monacoSuggestionEditor.field";
 import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
 import { CreatableAsyncSelectField } from "~/components/form/fields/creatableAsyncSelect.field";
 import { assert } from "~/utils/assert";
@@ -90,7 +90,7 @@ export function EditBlockForm({
       const { fieldErrors } = useFormContext();
       return (
         <FormField name={props.name!}>
-          <MonacoEditorField
+          <MonacoSuggestionEditorField
             supportingText={props.field.description}
             label={props.field.title}
             suggestions={generateSuggestions(blockConfig.connections)}
