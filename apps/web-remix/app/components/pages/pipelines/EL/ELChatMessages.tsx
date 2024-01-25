@@ -98,7 +98,9 @@ function ChatMessage({ data }: ChatMessageProps) {
       );
     }
 
-    return nodes;
+    return nodes.map((node, index) => (
+      <React.Fragment key={index}>{node}</React.Fragment>
+    ));
   };
 
   return (
@@ -111,9 +113,7 @@ function ChatMessage({ data }: ChatMessageProps) {
         }
       )}
     >
-      <p className="prose break-words whitespace-pre-wrap text-neutral-200 text-xs">
-        {formatMessage(data.message)}
-      </p>
+      {formatMessage(data.message)}
     </article>
   );
 }

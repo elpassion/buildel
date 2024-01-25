@@ -171,6 +171,7 @@ export type JSONSchemaField =
       title: string;
       description: string;
       presentAs: "editor";
+      editorLanguage: "json" | "custom";
     }
   | {
       type: "string";

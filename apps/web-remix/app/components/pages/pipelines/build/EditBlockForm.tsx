@@ -1,7 +1,10 @@
 import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { Button } from "@elpassion/taco";
-import { generateZODSchema } from "~/components/form/schema/SchemaParser";
+import {
+  generateZODSchema,
+  JSONSchemaField,
+} from "~/components/form/schema/SchemaParser";
 import { FieldProps, Schema } from "~/components/form/schema/Schema";
 import {
   ArrayField,
@@ -25,6 +28,7 @@ import {
   IBlockConfigConnection,
 } from "~/components/pages/pipelines/pipeline.types";
 import { TextInputField } from "~/components/form/fields/text.field";
+import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 
 export function EditBlockForm({
   onSubmit,
@@ -83,20 +87,19 @@ export function EditBlockForm({
     }
   };
 
-  const EditorField = useCallback(
+  const CustomEditorField = useCallback(
     (props: FieldProps) => {
-      assert(props.field.type === "string");
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { fieldErrors } = useFormContext();
+      if (!("presentAs" in props.field) || props.field.presentAs !== "editor") {
+        return null;
+      }
+
       return (
-        <FormField name={props.name!}>
-          <MonacoSuggestionEditorField
-            supportingText={props.field.description}
-            label={props.field.title}
-            suggestions={generateSuggestions(blockConfig.connections)}
-            error={fieldErrors[props.name!]}
-          />
-        </FormField>
+        <EditorField
+          field={props.field}
+          name={props.name as string}
+          blockConfig={blockConfig}
+          schema={props.schema}
+        />
       );
     },
     [blockConfig.inputs]
@@ -197,7 +200,7 @@ export function EditBlockForm({
               number: NumberField,
               array: ArrayField,
               boolean: BooleanField,
-              editor: EditorField,
+              editor: CustomEditorField,
               asyncSelect: SelectField,
               asyncCreatableSelect: AsyncCreatableField,
             }}
@@ -262,4 +265,45 @@ const InputsProvider: React.FC<{
 
 export function useInputs() {
   return React.useContext(InputsContext);
+}
+
+interface EditorFieldProps {
+  blockConfig: z.TypeOf<typeof BlockConfig>;
+  field: {
+    type: "string";
+    title: string;
+    description: string;
+    presentAs: "editor";
+    editorLanguage: "json" | "custom";
+  };
+  name: string;
+  schema: JSONSchemaField;
+}
+function EditorField({ field, name, blockConfig }: EditorFieldProps) {
+  const { fieldErrors } = useFormContext();
+
+  const renderEditorByLanguage = () => {
+    switch (field.editorLanguage) {
+      case "json":
+        return (
+          <MonacoEditorField
+            supportingText={field.description}
+            language={field.editorLanguage}
+            label={field.title}
+            error={fieldErrors[name]}
+          />
+        );
+      default:
+        return (
+          <MonacoSuggestionEditorField
+            supportingText={field.description}
+            label={field.title}
+            suggestions={generateSuggestions(blockConfig.connections)}
+            error={fieldErrors[name]}
+          />
+        );
+    }
+  };
+
+  return <FormField name={name}>{renderEditorByLanguage()}</FormField>;
 }

@@ -103,6 +103,7 @@ defmodule Buildel.Blocks.Chat do
                   "title" => "System message",
                   "description" => "The message to start the conversation with.",
                   "presentAs" => "editor",
+                  "editorLanguage" => "custom",
                   "minLength" => 1
                 },
                 messages: %{
@@ -124,7 +125,8 @@ defmodule Buildel.Blocks.Chat do
                       "content" => %{
                         "type" => "string",
                         "title" => "Content",
-                        "presentAs" => "editor"
+                        "presentAs" => "editor",
+                        "editorLanguage" => "custom",
                       }
                     }
                   },

@@ -61,7 +61,8 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "title" => "Parameters",
                   "description" =>
                     "Valid JSONSchema definition of the parameters passed to api call.",
-                  "presentAs" => "editor"
+                  "presentAs" => "editor",
+                  "editorLanguage" => "json"
                 },
                 authorize: %{
                   "type" => "boolean",
