@@ -111,8 +111,12 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     url =
       args
-      |> Enum.reduce(state[:opts][:url], fn {key, value}, acc ->
-        String.replace(acc, "{{#{key}}}", value |> to_string())
+      |> Enum.reduce(state[:opts][:url], fn
+        {key, value}, acc when is_binary(value) ->
+          String.replace(acc, "{{#{key}}}", value |> to_string())
+
+        _, acc ->
+          acc
       end)
 
     payload = args |> Jason.encode!()
@@ -141,7 +145,7 @@ defmodule Buildel.Blocks.ApiCallTool do
       if state[:opts][:authorize] do
         headers ++
           [
-            Authorization: "Bearer #{token}"
+            Authorization: "Bearer gC3spiRVxxLUIjqFhJrvYwSWyOQyRAb0xTqMwesJ2Y0="
           ]
       else
         headers
@@ -152,7 +156,8 @@ defmodule Buildel.Blocks.ApiCallTool do
            url,
            payload,
            headers
-         ) do
+         )
+         |> IO.inspect() do
       {:ok, %{status_code: _status_code, body: body}} ->
         state = state |> schedule_stream_stop()
         {:reply, body, state}

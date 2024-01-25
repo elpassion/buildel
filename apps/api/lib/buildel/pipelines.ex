@@ -122,6 +122,29 @@ defmodule Buildel.Pipelines do
     end
   end
 
+  def create_block(%Pipeline{} = pipeline, block_config) do
+    config = pipeline.config
+
+    new_config =
+      update_in(
+        config["blocks"],
+        &(&1 ++
+            [
+              %{
+                "name" => block_config.name,
+                "type" => block_config.type,
+                "opts" => block_config.opts,
+                "connections" => block_config.connections,
+                "inputs" => block_config.inputs
+              }
+            ])
+      )
+
+    pipeline = Ecto.Changeset.change(pipeline, config: new_config)
+
+    Repo.update(pipeline)
+  end
+
   def create_run_cost(%Run{} = run, %Cost{} = cost, attrs \\ %{}) do
     case %RunCost{}
          |> RunCost.changeset(attrs |> Map.put(:run_id, run.id) |> Map.put(:cost_id, cost.id))

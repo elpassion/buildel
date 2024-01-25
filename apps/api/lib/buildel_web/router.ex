@@ -75,6 +75,12 @@ defmodule BuildelWeb.Router do
       only: [:index, :show, :create]
     )
 
+    resources(
+      "/organizations/:organization_id/pipelines/:pipeline_id/blocks",
+      OrganizationPipelineBlockController,
+      only: [:create]
+    )
+
     resources("/organizations/:organization_id/memory_collections", CollectionController,
       only: [:index, :create, :show, :delete]
     )
