@@ -194,6 +194,11 @@ defmodule Buildel.Blocks.Chat do
         _ -> false
       end)
 
+    memory_type_string = opts |> Map.get(:chat_memory_type, "full")
+
+    memory_type =
+      %{"off" => :off, "full" => :full, "rolling" => :rolling} |> Map.get(memory_type_string)
+
     {:ok,
      state
      |> assign_stream_state
@@ -205,7 +210,7 @@ defmodule Buildel.Blocks.Chat do
        :chat_memory,
        ChatMemory.new(%{
          initial_messages: initial_messages(state),
-         type: opts |> Map.get(:chat_memory_type, "full") |> String.to_existing_atom()
+         type: memory_type
        })
      )}
   end

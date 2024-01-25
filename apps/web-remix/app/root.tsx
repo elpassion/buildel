@@ -46,6 +46,11 @@ function App() {
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
+        <script
+          defer
+          data-domain="buildel-web.fly.dev"
+          src="/statistics/script.js"
+        ></script>
       </head>
       <body className="bg-neutral-950">
         <Toaster />

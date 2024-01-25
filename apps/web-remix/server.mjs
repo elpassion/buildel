@@ -96,6 +96,23 @@ async function run() {
 
   app.use(morgan("tiny"));
 
+  app.use("/statistics", createProxyMiddleware({
+    target: "https://plausible.io/js",
+    changeOrigin: true,
+    secure: true,
+    logLevel: "debug",
+    pathRewrite: {
+      "^/statistics": ""
+    }
+  }));
+
+  app.use("/api/event", createProxyMiddleware({
+    target: "https://plausible.io",
+    changeOrigin: true,
+    secure: true,
+    logLevel: "debug",
+  }));
+
   app.use(
     "/super-api",
     createProxyMiddleware({
