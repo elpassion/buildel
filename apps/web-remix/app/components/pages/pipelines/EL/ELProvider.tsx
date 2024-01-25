@@ -93,7 +93,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     hide();
     await stopRun();
     setIsGenerating(false);
-    clearMessages();
+    // clearMessages();
   };
 
   const handlePush = (message: string) => {
@@ -120,7 +120,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
     setMessages([...tmpPrev, newMessage]);
 
-    push("text_input_2:input", message);
+    push("text_input_1:input", message);
   };
 
   useEffect(() => {
