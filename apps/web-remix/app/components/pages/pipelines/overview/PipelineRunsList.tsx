@@ -46,7 +46,7 @@ export const PipelineRunsListHeader = () => {
     >
       <p>Run</p>
       <p>Time</p>
-      <p>Summary costs ($)</p>
+      <p>Run costs ($)</p>
       <p>Status</p>
     </header>
   );
