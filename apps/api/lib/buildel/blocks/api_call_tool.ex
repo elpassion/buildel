@@ -156,8 +156,7 @@ defmodule Buildel.Blocks.ApiCallTool do
            url,
            payload,
            headers
-         )
-         |> IO.inspect() do
+         ) do
       {:ok, %{status_code: _status_code, body: body}} ->
         state = state |> schedule_stream_stop()
         {:reply, body, state}

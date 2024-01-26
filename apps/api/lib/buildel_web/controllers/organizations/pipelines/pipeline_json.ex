@@ -35,7 +35,6 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
             _ -> true
           end)
         end)
-        |> IO.inspect()
     }
   end
 end
