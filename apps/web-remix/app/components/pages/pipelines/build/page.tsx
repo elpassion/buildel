@@ -32,41 +32,39 @@ export function PipelineBuilder() {
   );
 
   return (
-    <ELProvider>
-      <EditBlockSidebarProvider>
-        <Builder
-          pipeline={pipeline}
-          CustomNode={BuilderNode}
-          CustomEdge={CustomEdge}
-          className="h-[calc(100vh_-_128px)]"
-        >
-          {({ edges, nodes, isUpToDate, onBlockCreate }) => (
-            <>
-              <BuilderHeader
-                isUpToDate={isUpToDate}
-                isSaving={updateFetcher.state !== "idle"}
-                onSave={() => {
-                  handleUpdatePipeline(toPipelineConfig(nodes, edges));
-                }}
-              />
+    <EditBlockSidebarProvider>
+      <Builder
+        pipeline={pipeline}
+        CustomNode={BuilderNode}
+        CustomEdge={CustomEdge}
+        className="h-[calc(100vh_-_128px)]"
+      >
+        {({ edges, nodes, isUpToDate, onBlockCreate }) => (
+          <>
+            <BuilderHeader
+              isUpToDate={isUpToDate}
+              isSaving={updateFetcher.state !== "idle"}
+              onSave={() => {
+                handleUpdatePipeline(toPipelineConfig(nodes, edges));
+              }}
+            />
 
-              <ELProvider>
-                <ELHelper />
-                <CreateBlockFloatingMenu onCreate={onBlockCreate} />
-              </ELProvider>
+            <ELProvider>
+              <ELHelper />
+              <CreateBlockFloatingMenu onCreate={onBlockCreate} />
+            </ELProvider>
 
-              <EditBlockSidebar
-                nodes={nodes}
-                edges={edges}
-                pipelineId={pipeline.id}
-                onSubmit={handleUpdatePipeline}
-                organizationId={pipeline.organization_id}
-              />
-            </>
-          )}
-        </Builder>
-      </EditBlockSidebarProvider>
-    </ELProvider>
+            <EditBlockSidebar
+              nodes={nodes}
+              edges={edges}
+              pipelineId={pipeline.id}
+              onSubmit={handleUpdatePipeline}
+              organizationId={pipeline.organization_id}
+            />
+          </>
+        )}
+      </Builder>
+    </EditBlockSidebarProvider>
   );
 }
 

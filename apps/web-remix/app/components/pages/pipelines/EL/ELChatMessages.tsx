@@ -1,10 +1,11 @@
 import React, { PropsWithChildren, ReactNode, useMemo } from "react";
-import { ItemList } from "~/components/list/ItemList";
 import classNames from "classnames";
+import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
+import { ItemList } from "~/components/list/ItemList";
+import { ClientOnly } from "~/utils/ClientOnly";
 import { dayjs } from "~/utils/Dayjs";
 import { IMessage, MessageStatusType, MessageType } from "./EL.types";
 import { useEl } from "./ELProvider";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 
 const EMPTY_MESSAGES = [
   {
@@ -43,19 +44,27 @@ export function ELChatMessages() {
       renderItem={(msg) => (
         <>
           <ChatMessage data={msg} />
-          <span
-            className={classNames(
-              "block w-fit text-[10px] text-neutral-300 mt-[2px]",
-              {
-                "ml-auto mr-1": msg.type === "user",
-              }
-            )}
-          >
-            {dayjs(msg.created_at).format("HH:mm")}
-          </span>
+          <ClientOnly>
+            <MessageTime message={msg} />
+          </ClientOnly>
         </>
       )}
     />
+  );
+}
+
+function MessageTime({ message }: { message: IMessage }) {
+  return (
+    <span
+      className={classNames(
+        "block w-fit text-[10px] text-neutral-300 mt-[2px]",
+        {
+          "ml-auto mr-1": message.type === "user",
+        }
+      )}
+    >
+      {dayjs(message.created_at).format("HH:mm")}
+    </span>
   );
 }
 

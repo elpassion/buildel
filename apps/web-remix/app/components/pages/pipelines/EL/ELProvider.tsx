@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect, useState } from "react";
+import React, { PropsWithChildren, useEffect, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useBoolean } from "usehooks-ts";
 import cloneDeep from "lodash.clonedeep";
@@ -135,21 +135,28 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     };
   }, []);
 
-  return (
-    <ELContext.Provider
-      value={{
-        isShown,
-        messages,
-        isGenerating,
-        show: handleShowEL,
-        hide: handleHideEL,
-        push: handlePush,
-        connectionStatus: status,
-      }}
-    >
-      {children}
-    </ELContext.Provider>
+  const value = useMemo(
+    () => ({
+      isShown,
+      messages,
+      isGenerating,
+      show: handleShowEL,
+      hide: handleHideEL,
+      push: handlePush,
+      connectionStatus: status,
+    }),
+    [
+      handleHideEL,
+      handlePush,
+      handleShowEL,
+      isGenerating,
+      isShown,
+      messages,
+      status,
+    ]
   );
+
+  return <ELContext.Provider value={value}>{children}</ELContext.Provider>;
 };
 
 export function useEl() {
