@@ -1,5 +1,9 @@
 import React, { useCallback } from "react";
 import { IEvent, useRunPipelineNode } from "../RunPipelineProvider";
+import {
+  ChatMessageFormats,
+  FormatMessageProps,
+} from "~/components/pages/ChatMessageFormats/ChatMessageFormats";
 import { IBlockConfig, IField } from "../pipeline.types";
 import {
   NodeClearButton,
@@ -37,7 +41,16 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
               <NodeClearButton onClear={() => clearBlockEvents(block.name)} />
             </div>
 
-            <NodeTextOutput text={text} />
+            <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+              <ChatMessageFormats
+                message={text}
+                formatComponents={{
+                  default: NodeTextFormatOutput,
+                  json: NodeCodeMessageFormatOutput,
+                  html: NodeCodeMessageFormatOutput,
+                }}
+              />
+            </div>
           </>
         );
       } else if (type === "audio") {
@@ -63,14 +76,19 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
   );
 }
 
-interface NodeTextOutputProps {
-  text: string;
-}
-function NodeTextOutput({ text }: NodeTextOutputProps) {
+function NodeTextFormatOutput({ children }: FormatMessageProps) {
   return (
-    <div className="prose break-words whitespace-pre-wrap text-xs text-white w-full min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-      {text}
+    <div className="prose break-words whitespace-pre-wrap text-xs text-white">
+      {children}
     </div>
+  );
+}
+
+function NodeCodeMessageFormatOutput({ children }: FormatMessageProps) {
+  return (
+    <pre className="my-1 bg-neutral-900 prose break-words whitespace-pre-wrap text-white text-xs">
+      <code>{children}</code>
+    </pre>
   );
 }
 
