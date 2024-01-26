@@ -145,7 +145,7 @@ defmodule Buildel.Blocks.ApiCallTool do
       if state[:opts][:authorize] do
         headers ++
           [
-            Authorization: "Bearer gC3spiRVxxLUIjqFhJrvYwSWyOQyRAb0xTqMwesJ2Y0="
+            Authorization: "Bearer #{token}"
           ]
       else
         headers
