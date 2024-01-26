@@ -48,6 +48,8 @@ export const loaderBuilder =
         });
       }
 
+      console.error(e);
+
       throw e;
     }
   };
