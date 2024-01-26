@@ -50,7 +50,10 @@ export function PipelineBuilder() {
                 }}
               />
 
-              <CreateBlockFloatingMenu onCreate={onBlockCreate} />
+              <ELProvider>
+                <ELHelper />
+                <CreateBlockFloatingMenu onCreate={onBlockCreate} />
+              </ELProvider>
 
               <EditBlockSidebar
                 nodes={nodes}
@@ -59,8 +62,6 @@ export function PipelineBuilder() {
                 onSubmit={handleUpdatePipeline}
                 organizationId={pipeline.organization_id}
               />
-
-              <ELHelper />
             </>
           )}
         </Builder>
