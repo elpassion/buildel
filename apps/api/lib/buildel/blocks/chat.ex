@@ -14,7 +14,8 @@ defmodule Buildel.Blocks.Chat do
   def options() do
     %{
       type: "chat",
-      description: "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
+      description:
+        "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
       groups: ["text", "llms"],
       inputs: [Block.text_input()],
       outputs: [
@@ -126,7 +127,7 @@ defmodule Buildel.Blocks.Chat do
                         "type" => "string",
                         "title" => "Content",
                         "presentAs" => "editor",
-                        "editorLanguage" => "custom",
+                        "editorLanguage" => "custom"
                       }
                     }
                   },
@@ -166,6 +167,10 @@ defmodule Buildel.Blocks.Chat do
 
   defp finish_chat_message(pid) do
     GenServer.cast(pid, {:finish_chat_message})
+  end
+
+  defp save_tool_call(pid, tool_name, arguments) do
+    GenServer.cast(pid, {:save_tool_call, tool_name, arguments})
   end
 
   defp save_tool_result(pid, tool_name, content) do
@@ -255,6 +260,17 @@ defmodule Buildel.Blocks.Chat do
   @impl true
   def handle_cast({:save_text_chunk, chunk}, state) do
     chat_memory = ChatMemory.add_assistant_chunk(state.chat_memory, chunk)
+    {:noreply, %{state | chat_memory: chat_memory}}
+  end
+
+  @impl true
+  def handle_cast({:save_tool_call, tool_name, arguments}, state) do
+    chat_memory =
+      ChatMemory.add_tool_call_message(state.chat_memory, %{
+        tool_name: tool_name,
+        arguments: arguments
+      })
+
     {:noreply, %{state | chat_memory: chat_memory}}
   end
 
@@ -363,6 +379,7 @@ defmodule Buildel.Blocks.Chat do
 
                save_text_chunk(pid, text_chunk)
              end,
+             on_tool_call: &save_tool_call(pid, &1, &2),
              on_tool_content: &save_tool_result(pid, &1, &2),
              on_end: fn chat_token_summary ->
                cost =
@@ -424,8 +441,12 @@ defmodule Buildel.Blocks.Chat do
     messages =
       state.chat_memory
       |> ChatMemory.get_messages()
-      |> Enum.map(fn message ->
-        update_in(message.content, &replace_input_strings_with_latest_inputs_values(state, &1))
+      |> Enum.map(fn
+        %{content: nil} = message ->
+          message
+
+        message ->
+          update_in(message.content, &replace_input_strings_with_latest_inputs_values(state, &1))
       end)
 
     if Enum.all?(messages, &all_inputs_in_string_filled?(&1.content, state.connections)) do

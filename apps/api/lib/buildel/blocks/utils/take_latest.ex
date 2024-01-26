@@ -60,6 +60,8 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
 
       defp tl_keyword(), do: :take_latest_messages
 
+      defp all_inputs_in_string_filled?(nil, connections), do: true
+
       defp all_inputs_in_string_filled?(message, connections) do
         !String.contains?(
           message,

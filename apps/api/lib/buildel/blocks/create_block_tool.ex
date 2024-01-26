@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.CreateBlockTool do
+  alias Buildel.Blocks.TextInput
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
   use Buildel.Blocks.Block
@@ -128,15 +129,8 @@ defmodule Buildel.Blocks.CreateBlockTool do
                 name: %{
                   type: "string"
                 },
-                opts: %{
-                  type: "object",
-                  properties: %{
-                    description: %{
-                      type: "string"
-                    }
-                  },
-                  required: ["description"]
-                },
+                # TODO: Add support for other block types
+                opts: TextInput.schema().properties.opts,
                 type: %{
                   type: "string"
                 }

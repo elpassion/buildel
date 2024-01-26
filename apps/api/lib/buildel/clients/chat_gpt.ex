@@ -15,6 +15,7 @@ defmodule Buildel.Clients.ChatGPT do
           context: context,
           on_content: on_content,
           on_tool_content: on_tool_content,
+          on_tool_call: on_tool_call,
           on_end: on_end,
           on_error: on_error,
           api_key: api_key,
@@ -29,10 +30,20 @@ defmodule Buildel.Clients.ChatGPT do
     messages =
       context.messages
       |> Enum.map(fn
-        %{role: "assistant"} = message -> Message.new_assistant!(message.content)
-        %{role: "system"} = message -> Message.new_system!(message.content)
-        %{role: "user"} = message -> Message.new_user!(message.content)
-        %{role: "tool"} = message -> Message.new_function!(message.tool_name, message.content)
+        %{role: "assistant"} = message ->
+          Message.new_assistant!(message.content)
+
+        %{role: "system"} = message ->
+          Message.new_system!(message.content)
+
+        %{role: "user"} = message ->
+          Message.new_user!(message.content)
+
+        %{role: "tool"} = message ->
+          Message.new_function!(message.tool_name, message.content)
+
+        %{role: "tool_call"} = message ->
+          Message.new_function_call!(message.tool_name, Jason.encode!(message.arguments))
       end)
 
     with {:ok, chain, message} <-
@@ -62,9 +73,13 @@ defmodule Buildel.Clients.ChatGPT do
                %Message{function_name: nil} ->
                  nil
 
-               %Message{function_name: function_name, content: content}
+               %Message{function_name: function_name, content: content, arguments: nil}
                when is_binary(function_name) and is_binary(content) ->
                  on_tool_content.(function_name, content)
+
+               %Message{function_name: function_name, arguments: arguments}
+               when is_binary(function_name) ->
+                 on_tool_call.(function_name, arguments)
 
                %Message{} ->
                  nil
