@@ -1,5 +1,5 @@
 import React from "react";
-import { Outlet, useLoaderData, useLocation } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 import { loader } from "./loader";
 import flowStyles from "reactflow/dist/style.css";
@@ -16,7 +16,6 @@ export const links: LinksFunction = () => [
 ];
 
 export function PipelineLayout() {
-  const location = useLocation();
   const { pipeline } = useLoaderData<typeof loader>();
 
   return (
@@ -27,25 +26,20 @@ export function PipelineLayout() {
         }
       />
       <div className="px-4 md:px-6 lg:px-10">
-        <TabGroup activeTab={location.pathname}>
+        <TabGroup>
           <FilledTabsWrapper>
             <FilledTabLink
-              tabId={routes.pipeline(pipeline.organization_id, pipeline.id)}
+              end
               to={routes.pipeline(pipeline.organization_id, pipeline.id)}
             >
               Build
             </FilledTabLink>
             <FilledTabLink
-              tabId={routes.pipelineRuns(pipeline.organization_id, pipeline.id)}
               to={routes.pipelineRuns(pipeline.organization_id, pipeline.id)}
             >
               Overview
             </FilledTabLink>
             <FilledTabLink
-              tabId={routes.pipelineInterface(
-                pipeline.organization_id,
-                pipeline.id
-              )}
               to={routes.pipelineInterface(
                 pipeline.organization_id,
                 pipeline.id
@@ -54,10 +48,6 @@ export function PipelineLayout() {
               Interface
             </FilledTabLink>
             <FilledTabLink
-              tabId={routes.pipelineSettings(
-                pipeline.organization_id,
-                pipeline.id
-              )}
               to={routes.pipelineSettings(
                 pipeline.organization_id,
                 pipeline.id

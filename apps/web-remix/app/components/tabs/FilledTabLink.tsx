@@ -1,27 +1,25 @@
 import React from "react";
-import { TabButtonProps } from "~/components/tabs/Tab";
 import classNames from "classnames";
-import { useTabsContext } from "~/components/tabs/TabGroup";
-import { RemixLinkProps } from "@remix-run/react/dist/components";
-import { BasicLink } from "~/components/link/BasicLink";
 
-export const FilledTabLink: React.FC<TabButtonProps & RemixLinkProps> = ({
+import { NavLink, NavLinkProps } from "@remix-run/react";
+
+export const FilledTabLink: React.FC<{ className?: string } & NavLinkProps> = ({
   children,
   className,
-  tabId,
   ...rest
 }) => {
-  const { activeTabId } = useTabsContext();
   return (
-    <BasicLink
-      className={classNames(
-        "text-xs rounded-lg text-neutral-100 py-1 px-3 hover:bg-neutral-900",
-        { "bg-neutral-900": activeTabId === tabId },
-        className
-      )}
+    <NavLink
+      className={({ isActive }) =>
+        classNames(
+          "text-xs rounded-lg text-neutral-100 py-1 px-3 hover:bg-neutral-900",
+          { "bg-neutral-900": isActive },
+          className
+        )
+      }
       {...rest}
     >
       {children}
-    </BasicLink>
+    </NavLink>
   );
 };

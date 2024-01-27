@@ -1,7 +1,6 @@
 import React from "react";
-import { Outlet, useLoaderData, useLocation } from "@remix-run/react";
-import { Icon } from "@elpassion/taco";
-import classNames from "classnames";
+import { Outlet, useLoaderData } from "@remix-run/react";
+
 import { TabGroup } from "~/components/tabs/TabGroup";
 import { FilledTabLink } from "~/components/tabs/FilledTabLink";
 import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
@@ -12,7 +11,6 @@ import { loader } from "./loader";
 
 export function SettingsLayout() {
   const { organizationId } = useLoaderData<typeof loader>();
-  const location = useLocation();
 
   return (
     <>
@@ -25,18 +23,12 @@ export function SettingsLayout() {
       />
 
       <PageContentWrapper className="!ml-0">
-        <TabGroup activeTab={location.pathname}>
+        <TabGroup>
           <FilledTabsWrapper>
-            <FilledTabLink
-              tabId={routes.organizationSettings(organizationId)}
-              to={routes.organizationSettings(organizationId)}
-            >
+            <FilledTabLink to={routes.organizationSettings(organizationId)}>
               Your Organization
             </FilledTabLink>
-            <FilledTabLink
-              tabId={routes.profileSettings(organizationId)}
-              to={routes.profileSettings(organizationId)}
-            >
+            <FilledTabLink to={routes.profileSettings(organizationId)}>
               Your Profile
             </FilledTabLink>
           </FilledTabsWrapper>
