@@ -115,7 +115,15 @@ export class BuildelRun {
 
     this.channel = this.socket.channel(
       `pipelines:${this.organizationId}:${this.pipelineId}`,
-      token
+      {
+        ...token,
+        initialInputs: [
+          {
+            name: "",
+            value: "",
+          },
+        ],
+      }
     );
 
     this.channel.onMessage = (event: string, payload: any) => {

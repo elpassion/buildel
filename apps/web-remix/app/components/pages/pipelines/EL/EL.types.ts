@@ -1,9 +1,7 @@
-export type MessageStatusType = "finished" | "ongoing";
-export type MessageType = "ai" | "user";
+export type MessageRole = "ai" | "user";
 export interface IMessage {
   id: string;
-  type: MessageType;
+  role: MessageRole;
   message: string;
   created_at: Date;
-  status: MessageStatusType;
 }

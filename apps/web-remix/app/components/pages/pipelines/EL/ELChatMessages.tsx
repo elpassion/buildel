@@ -4,23 +4,21 @@ import { ItemList } from "~/components/list/ItemList";
 import { ClientOnly } from "~/utils/ClientOnly";
 import { dayjs } from "~/utils/Dayjs";
 import { ChatMessageFormats } from "~/components/pages/ChatMessageFormats/ChatMessageFormats";
-import { IMessage, MessageStatusType, MessageType } from "./EL.types";
+import { IMessage, MessageRole } from "./EL.types";
 import { useEl } from "./ELProvider";
 
 const EMPTY_MESSAGES = [
   {
     message:
       "I'm EL, your AI helper here at Buildel. Feel free to ask me anything about creating the perfect workflow for you in the application.",
-    type: "ai" as MessageType,
+    role: "ai" as MessageRole,
     created_at: new Date(),
-    status: "finished" as MessageStatusType,
     id: "2",
   },
   {
     message: "👋 Hi there!",
-    type: "ai" as MessageType,
+    role: "ai" as MessageRole,
     created_at: new Date(),
-    status: "finished" as MessageStatusType,
     id: "1",
   },
 ];
@@ -59,7 +57,7 @@ function MessageTime({ message }: { message: IMessage }) {
       className={classNames(
         "block w-fit text-[10px] text-neutral-300 mt-[2px]",
         {
-          "ml-auto mr-1": message.type === "user",
+          "ml-auto mr-1": message.role === "user",
         }
       )}
     >
@@ -78,8 +76,8 @@ function ChatMessage({ data }: ChatMessageProps) {
       className={classNames(
         "w-full max-w-[70%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5",
         {
-          "bg-neutral-800 rounded-br-xl": data.type === "ai",
-          "bg-neutral-900 rounded-bl-xl ml-auto mr-0": data.type !== "ai",
+          "bg-neutral-800 rounded-br-xl": data.role === "ai",
+          "bg-neutral-900 rounded-bl-xl ml-auto mr-0": data.role !== "ai",
         }
       )}
     >

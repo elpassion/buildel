@@ -5,7 +5,7 @@ import cloneDeep from "lodash.clonedeep";
 import { BuildelRunStatus } from "@buildel/buildel";
 import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
 import { errorToast } from "~/components/toasts/errorToast";
-import { IMessage, MessageStatusType, MessageType } from "./EL.types";
+import { IMessage, MessageRole } from "./EL.types";
 
 interface IELContext {
   isGenerating: boolean;
@@ -33,11 +33,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       const tmpPrev = cloneDeep(prev);
       const lastMessage = tmpPrev[tmpPrev.length - 1];
 
-      if (
-        lastMessage &&
-        lastMessage.type === "ai" &&
-        lastMessage.status === "ongoing"
-      ) {
+      if (lastMessage && lastMessage.role === "ai") {
         tmpPrev[tmpPrev.length - 1].message += (
           payload as { message: string }
         ).message;
@@ -49,10 +45,9 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         ...prev,
         {
           id: uuidv4(),
-          type: "ai",
+          role: "ai",
           message: (payload as { message: string }).message,
           created_at: new Date(),
-          status: "ongoing",
         },
       ];
     });
@@ -63,21 +58,6 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       setIsGenerating(true);
     }
     if (blockId.includes("text_output") && !isWorking) {
-      setMessages((prev) => {
-        const tmpPrev = cloneDeep(prev);
-        const lastMessage = tmpPrev[tmpPrev.length - 1];
-
-        if (
-          lastMessage &&
-          lastMessage.type === "ai" &&
-          lastMessage.status === "ongoing"
-        ) {
-          tmpPrev[tmpPrev.length - 1].status = "finished";
-        }
-
-        return tmpPrev;
-      });
-
       setIsGenerating(false);
     }
   };
@@ -119,9 +99,8 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     const newMessage = {
       message,
       id: uuidv4(),
-      type: "user" as MessageType,
+      role: "user" as MessageRole,
       created_at: new Date(),
-      status: "finished" as MessageStatusType,
     };
 
     setMessages((prev) => [...prev, newMessage]);

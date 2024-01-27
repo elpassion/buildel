@@ -39,8 +39,8 @@ function GeneratingAnimation() {
     const lastMessage = messages[messages.length - 1];
 
     if (
-      lastMessage.type === "user" ||
-      (lastMessage.type === "ai" && !lastMessage.message.length)
+      lastMessage.role === "user" ||
+      (lastMessage.role === "ai" && !lastMessage.message.length)
     ) {
       return "Thinking...";
     }
