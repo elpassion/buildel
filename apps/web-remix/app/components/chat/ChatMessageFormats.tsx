@@ -1,6 +1,6 @@
 import React, { ComponentType, ReactNode } from "react";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import classNames from "classnames";
+import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 
 type Format = "json" | "html" | "block_configuration";
 

@@ -3,9 +3,8 @@ import classNames from "classnames";
 import { ItemList } from "~/components/list/ItemList";
 import { ClientOnly } from "~/utils/ClientOnly";
 import { dayjs } from "~/utils/Dayjs";
-import { ChatMessageFormats } from "~/components/pages/ChatMessageFormats/ChatMessageFormats";
-import { IMessage, MessageRole } from "./EL.types";
-import { useEl } from "./ELProvider";
+import { ChatMessageFormats } from "./ChatMessageFormats";
+import { IMessage, MessageRole } from "./chat.types";
 
 const EMPTY_MESSAGES = [
   {
@@ -23,9 +22,11 @@ const EMPTY_MESSAGES = [
   },
 ];
 
-export function ELChatMessages() {
-  const { messages } = useEl();
+interface ChatMessagesProps {
+  messages: IMessage[];
+}
 
+export function ChatMessages({ messages }: ChatMessagesProps) {
   const reversed = useMemo(() => {
     if (!messages.length) return EMPTY_MESSAGES;
     return messages.map((_, idx) => messages[messages.length - 1 - idx]);

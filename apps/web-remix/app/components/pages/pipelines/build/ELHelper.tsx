@@ -1,10 +1,7 @@
 import React from "react";
 import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import { ELWrapper } from "~/components/pages/pipelines/EL/ELWrapper";
 import { useEl } from "~/components/pages/pipelines/EL/ELProvider";
-import { ELHeading } from "~/components/pages/pipelines/EL/ELHeading";
-import { ElChat } from "~/components/pages/pipelines/EL/ElChat";
+import { Chat } from "~/components/chat/Chat";
 
 export const ELHelper: React.FC = () => {
   const { isShown, hide } = useEl();
@@ -19,19 +16,7 @@ export const ELHelper: React.FC = () => {
         }
       )}
     >
-      <ELWrapper>
-        <header className="flex justify-between gap-2 items-center mb-3">
-          <ELHeading />
-
-          <button onClick={hide} className="text-neutral-200 hover:text-white">
-            <Icon iconName="x" />
-          </button>
-        </header>
-
-        <div className="w-full">
-          <ElChat />
-        </div>
-      </ELWrapper>
+      <Chat inputTopic="text_input_1:input" onClose={hide} />
     </div>
   );
 };

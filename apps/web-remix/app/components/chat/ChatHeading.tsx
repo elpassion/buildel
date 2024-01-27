@@ -1,22 +1,23 @@
-import React, { useMemo } from "react";
+import React, { PropsWithChildren, useMemo } from "react";
 import { Icon } from "@elpassion/taco";
-import { useEl } from "~/components/pages/pipelines/EL/ELProvider";
 import classNames from "classnames";
+import { BuildelRunStatus } from "@buildel/buildel";
 
-export const ELHeading: React.FC = () => {
+export const ChatHeading: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <h3 className="flex gap-2 items-center text-white">
       <Icon size="xs" iconName="two-layers" />
       <div className="text-white">Ask EL</div>
 
-      <ELStatus />
+      {children}
     </h3>
   );
 };
 
-function ELStatus() {
-  const { connectionStatus } = useEl();
-
+interface ChatStatusProps {
+  connectionStatus: BuildelRunStatus;
+}
+export function ChatStatus({ connectionStatus }: ChatStatusProps) {
   const mappedStatusToText = useMemo(() => {
     switch (connectionStatus) {
       case "starting":

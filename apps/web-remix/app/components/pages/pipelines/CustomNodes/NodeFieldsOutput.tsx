@@ -3,7 +3,7 @@ import { IEvent, useRunPipelineNode } from "../RunPipelineProvider";
 import {
   ChatMessageFormats,
   FormatMessageProps,
-} from "~/components/pages/ChatMessageFormats/ChatMessageFormats";
+} from "~/components/chat/ChatMessageFormats";
 import { IBlockConfig, IField } from "../pipeline.types";
 import {
   NodeClearButton,
