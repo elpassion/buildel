@@ -181,7 +181,16 @@ defmodule Buildel.Blocks.ApiCallTool do
         end
       })
 
-    {:reply, function, state}
+    {:reply,
+     %{
+       function: function,
+       call_formatter: fn args ->
+         "\nCalling API #{state[:opts].name} with \"#{inspect(args)}\"\n"
+       end,
+       response_formatter: fn _response, _context ->
+         nil
+       end
+     }, state}
   end
 
   @impl true

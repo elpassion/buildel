@@ -59,7 +59,7 @@ defmodule Buildel.Clients.ChatGPT do
                }),
              custom_context: context
            })
-           |> LLMChain.add_functions(tools)
+           |> LLMChain.add_functions(tools |> Enum.map(& &1.function))
            |> LLMChain.add_messages(messages)
            |> LLMChain.run(
              while_needs_response: true,
@@ -79,7 +79,10 @@ defmodule Buildel.Clients.ChatGPT do
 
                %Message{function_name: function_name, arguments: arguments}
                when is_binary(function_name) ->
-                 on_tool_call.(function_name, arguments)
+                 %{call_formatter: call_formatter} =
+                   tools |> Enum.find(fn tool -> tool.function.name == function_name end)
+
+                 on_tool_call.(function_name, arguments, call_formatter.(arguments))
 
                %Message{} ->
                  nil

@@ -319,7 +319,16 @@ defmodule Buildel.Blocks.Chat do
         end
       })
 
-    {:reply, function, state}
+    {:reply,
+     %{
+       function: function,
+       call_formatter: fn %{"message" => message} = _args ->
+         "\n@#{state.block.name} #{message}\n"
+       end,
+       response_formatter: fn _response ->
+         nil
+       end
+     }, state}
   end
 
   def handle_call({:send_message, {:text, _text}}, _from, state) do
@@ -377,9 +386,25 @@ defmodule Buildel.Blocks.Chat do
                  {:text, text_chunk}
                )
 
+               Buildel.BlockPubSub.broadcast_to_io(
+                 state[:context_id],
+                 state[:block_name],
+                 "test",
+                 {:text, text_chunk}
+               )
+
                save_text_chunk(pid, text_chunk)
              end,
-             on_tool_call: &save_tool_call(pid, &1, &2),
+             on_tool_call: fn tool_name, arguments, message ->
+               Buildel.BlockPubSub.broadcast_to_io(
+                 state[:context_id],
+                 state[:block_name],
+                 "output",
+                 {:text, message}
+               )
+
+               save_tool_call(pid, tool_name, arguments)
+             end,
              on_tool_content: &save_tool_result(pid, &1, &2),
              on_end: fn chat_token_summary ->
                cost =

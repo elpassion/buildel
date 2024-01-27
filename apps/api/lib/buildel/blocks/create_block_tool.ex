@@ -145,7 +145,16 @@ defmodule Buildel.Blocks.CreateBlockTool do
         end
       })
 
-    {:reply, function, state}
+    {:reply,
+     %{
+       function: function,
+       call_formatter: fn args ->
+         "\n@EL create block #{args["block"]["name"]}\n"
+       end,
+       response_formatter: fn _response ->
+         nil
+       end
+     }, state}
   end
 
   @impl true
