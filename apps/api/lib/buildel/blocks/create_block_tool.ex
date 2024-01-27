@@ -152,7 +152,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
          "\n@EL create block #{args["block"]["name"]}\n"
        end,
        response_formatter: fn _response ->
-         nil
+         ""
        end
      }, state}
   end
