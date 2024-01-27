@@ -5,3 +5,5 @@ export interface IMessage {
   message: string;
   created_at: Date;
 }
+
+export type ChatSize = "sm" | "md";

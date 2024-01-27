@@ -3,17 +3,18 @@ import classNames from "classnames";
 import { useEl } from "~/components/pages/pipelines/EL/ELProvider";
 import { MessageRole } from "~/components/chat/chat.types";
 import { useChat } from "~/components/chat/useChat";
-import { ChatHeading, ChatStatus } from "~/components/chat/ChatHeading";
+import { ChatHeading } from "~/components/chat/ChatHeading";
 import { ChatMessages } from "~/components/chat/ChatMessages";
 import { ChatInput } from "~/components/chat/ChatInput";
 import { ChatWrapper } from "~/components/chat/ChatWrapper";
 import {
-  ChatBody,
   ChatCloseButton,
   ChatGeneratingAnimation,
   ChatHeader,
   ChatMessagesWrapper,
+  ChatStatus,
 } from "~/components/chat/Chat.components";
+import { Icon } from "@elpassion/taco";
 
 const INITIAL_MESSAGES = [
   {
@@ -61,36 +62,43 @@ export const ELHelper: React.FC = () => {
         }
       )}
     >
-      <ChatWrapper>
+      <ChatWrapper className="w-[440px]">
         <ChatHeader>
-          <ChatHeading>
+          <div className="flex gap-2 items-center">
+            <ChatHeading>
+              <Icon size="xs" iconName="two-layers" />
+              <div className="text-white">Ask EL</div>
+            </ChatHeading>
             <ChatStatus connectionStatus={connectionStatus} />
-          </ChatHeading>
+          </div>
 
           <ChatCloseButton onClick={hide} />
         </ChatHeader>
 
-        <ChatBody>
-          <ChatMessagesWrapper>
-            <ChatMessages
-              messages={messages}
-              initialMessages={INITIAL_MESSAGES}
-            />
+        <ChatMessagesWrapper
+          className={classNames({
+            "h-[300px]": !!messages.length,
+            "h-[180px]": !messages.length,
+          })}
+        >
+          <ChatMessages
+            messages={messages}
+            initialMessages={INITIAL_MESSAGES}
+          />
 
-            <ChatGeneratingAnimation
-              messages={messages}
-              isGenerating={isGenerating}
-            />
-          </ChatMessagesWrapper>
+          <ChatGeneratingAnimation
+            messages={messages}
+            isGenerating={isGenerating}
+          />
+        </ChatMessagesWrapper>
 
-          <div className="mt-2">
-            <ChatInput
-              onSubmit={pushMessage}
-              disabled={connectionStatus !== "running"}
-              generating={isGenerating}
-            />
-          </div>
-        </ChatBody>
+        <div className="mt-2">
+          <ChatInput
+            onSubmit={pushMessage}
+            disabled={connectionStatus !== "running"}
+            generating={isGenerating}
+          />
+        </div>
       </ChatWrapper>
     </div>
   );

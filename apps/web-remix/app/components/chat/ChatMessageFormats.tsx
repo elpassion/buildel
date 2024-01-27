@@ -1,12 +1,14 @@
 import React, { ComponentType, ReactNode } from "react";
 import classNames from "classnames";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
+import { ChatSize } from "~/components/chat/chat.types";
 
 type Format = "json" | "html" | "block_configuration";
 
 export interface FormatMessageProps {
   children: string;
   className?: string;
+  size?: ChatSize;
 }
 
 interface FormatComponents {
@@ -19,6 +21,7 @@ interface FormatComponents {
 interface ChatMessageFormatsProps {
   message: string;
   formatComponents?: Partial<FormatComponents>;
+  size?: ChatSize;
 }
 
 const DEFAULT_FORMAT_COMPONENTS: FormatComponents = {
@@ -37,6 +40,7 @@ const formats: Record<Format, RegExp> = {
 export function ChatMessageFormats({
   message,
   formatComponents,
+  size = "sm",
 }: ChatMessageFormatsProps) {
   const { default: DefaultComponent, ...rest } = {
     ...DEFAULT_FORMAT_COMPONENTS,
@@ -50,11 +54,13 @@ export function ChatMessageFormats({
       message.replace(formats[format as Format], (match, content, index) => {
         const regularText = message.substring(lastIndex, index);
         if (regularText) {
-          nodes.push(<DefaultComponent>{regularText}</DefaultComponent>);
+          nodes.push(
+            <DefaultComponent size={size}>{regularText}</DefaultComponent>
+          );
         }
         const FormatComponent = rest[format as Format];
 
-        nodes.push(<FormatComponent>{content}</FormatComponent>);
+        nodes.push(<FormatComponent size={size}>{content}</FormatComponent>);
 
         lastIndex = index + match.length;
         return match;
@@ -63,7 +69,9 @@ export function ChatMessageFormats({
 
     if (lastIndex < message.length) {
       nodes.push(
-        <DefaultComponent>{message.substring(lastIndex)}</DefaultComponent>
+        <DefaultComponent size={size}>
+          {message.substring(lastIndex)}
+        </DefaultComponent>
       );
     }
 
@@ -78,11 +86,13 @@ export function ChatMessageFormats({
 export function ChatMessageDefaultFormat({
   children,
   className,
+  size = "sm",
 }: FormatMessageProps) {
   return (
     <p
       className={classNames(
-        "prose break-words whitespace-pre-wrap text-neutral-200 text-xs",
+        "prose break-words whitespace-pre-wrap text-neutral-200",
+        messageSize(size),
         className
       )}
     >
@@ -94,11 +104,13 @@ export function ChatMessageDefaultFormat({
 export function ChatMessageCodeFormat({
   children,
   className,
+  size = "sm",
 }: FormatMessageProps) {
   return (
     <div
       className={classNames(
-        "relative prose break-words whitespace-pre-wrap text-neutral-200 text-xs",
+        "relative prose break-words whitespace-pre-wrap text-neutral-200",
+        messageSize(size),
         className
       )}
     >
@@ -110,4 +122,9 @@ export function ChatMessageCodeFormat({
       </pre>
     </div>
   );
+}
+
+function messageSize(size?: ChatSize) {
+  if (size === "md") return "text-sm";
+  return "text-xs";
 }
