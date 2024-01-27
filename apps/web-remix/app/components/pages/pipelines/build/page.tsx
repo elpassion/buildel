@@ -50,7 +50,7 @@ export function PipelineBuilder() {
             />
 
             <ELProvider>
-              <ELHelper />
+              {/*<ELHelper />*/}
 
               <CreateBlockFloatingMenu onCreate={onBlockCreate} />
             </ELProvider>
