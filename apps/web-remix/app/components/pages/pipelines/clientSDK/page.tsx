@@ -16,10 +16,10 @@ import { CodePreviewWrapper } from "./CodePreview";
 import { CodePreviewOptions } from "./CodePreviewOptions";
 import { loader } from "./loader";
 
-export function InterfacePage() {
+export function ClientSDKPage() {
   const { organizationId, pipelineId } = useLoaderData<typeof loader>();
   return (
-    <div className="pt-5">
+    <div>
       <h2 className="text-lg text-white font-medium">Client SDK</h2>
       <p className="text-white text-xs mb-6">
         Access our Buildel API easily with our client SDK.
@@ -276,7 +276,7 @@ run.push("your_block_name:input", 'sample payload');`}
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Interface",
+      title: "Client SDK",
     },
   ];
 };

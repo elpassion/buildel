@@ -33,6 +33,13 @@ export const routes = {
   ) => `${routes.pipelineRun(organizationId, pipelineId, runId)}/costs`,
   pipelineInterface: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipeline(organizationId, pipelineId)}/interface`,
+  pipelineClientSDK: (organizationId: OrganizationId, pipelineId: PipelineId) =>
+    `${routes.pipelineInterface(organizationId, pipelineId)}/client-sdk`,
+  pipelineWebsiteChatbot: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId
+  ) =>
+    `${routes.pipelineInterface(organizationId, pipelineId)}/website-chatbot`,
   pipelineSettings: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipeline(organizationId, pipelineId)}/settings`,
   pipelinesNew: (organizationId: OrganizationId) =>
