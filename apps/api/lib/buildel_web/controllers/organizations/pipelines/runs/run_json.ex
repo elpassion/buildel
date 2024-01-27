@@ -14,7 +14,26 @@ defmodule BuildelWeb.OrganizationPipelineRunJSON do
       id: run.id,
       status: run.status,
       created_at: run.inserted_at,
-      config: run.config,
+      config:
+        Map.update(run.config, "blocks", [], fn blocks ->
+          Enum.map(blocks, fn block ->
+            case Buildel.Blocks.type(block["type"]) do
+              nil ->
+                nil
+
+              type ->
+                Map.put(
+                  block,
+                  "block_type",
+                  type.options
+                )
+            end
+          end)
+          |> Enum.filter(fn
+            nil -> false
+            _ -> true
+          end)
+        end),
       costs: costs(run)
     }
   end
