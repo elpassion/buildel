@@ -4,33 +4,18 @@ import { ItemList } from "~/components/list/ItemList";
 import { ClientOnly } from "~/utils/ClientOnly";
 import { dayjs } from "~/utils/Dayjs";
 import { ChatMessageFormats } from "./ChatMessageFormats";
-import { IMessage, MessageRole } from "./chat.types";
-
-const EMPTY_MESSAGES = [
-  {
-    message:
-      "I'm EL, your AI helper here at Buildel. Feel free to ask me anything about creating the perfect workflow for you in the application.",
-    role: "ai" as MessageRole,
-    created_at: new Date(),
-    id: "2",
-  },
-  {
-    message: "👋 Hi there!",
-    role: "ai" as MessageRole,
-    created_at: new Date(),
-    id: "1",
-  },
-];
+import { IMessage } from "./chat.types";
 
 interface ChatMessagesProps {
   messages: IMessage[];
+  initialMessages?: IMessage[];
 }
 
-export function ChatMessages({ messages }: ChatMessagesProps) {
+export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
   const reversed = useMemo(() => {
-    if (!messages.length) return EMPTY_MESSAGES;
+    if (!messages.length) return initialMessages ?? [];
     return messages.map((_, idx) => messages[messages.length - 1 - idx]);
-  }, [messages]);
+  }, [messages, initialMessages]);
 
   return (
     <ItemList

@@ -1,27 +1,17 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import cloneDeep from "lodash.clonedeep";
 import { v4 as uuidv4 } from "uuid";
-import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
 import { errorToast } from "~/components/toasts/errorToast";
+import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
 import { IMessage, MessageRole } from "./chat.types";
-import { ChatHeading, ChatStatus } from "./ChatHeading";
-import { ChatMessages } from "./ChatMessages";
-import { ChatWrapper } from "./ChatWrapper";
-import { ChatInput } from "./ChatInput";
-import {
-  ChatBody,
-  ChatCloseButton,
-  ChatGeneratingAnimation,
-  ChatHeader,
-  ChatMessagesWrapper,
-} from "./Chat.components";
 
-interface ChatProps {
-  onClose: () => void;
-  inputTopic: string;
+interface UseChatProps {
+  inputTopic?: string;
 }
 
-export const Chat: React.FC<ChatProps> = ({ onClose, inputTopic }) => {
+export const useChat = ({
+  inputTopic = "text_input_1:input",
+}: UseChatProps = {}) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -80,20 +70,6 @@ export const Chat: React.FC<ChatProps> = ({ onClose, inputTopic }) => {
     setMessages([]);
   };
 
-  // const handleShowEL = async () => {
-  //   show();
-  //   if (status === "idle") {
-  //     await startRun();
-  //   }
-  // };
-  //
-  // const handleHideEL = async () => {
-  //   hide();
-  //   // await stopRun();
-  //   setIsGenerating(false);
-  //   // clearMessages();
-  // };
-
   const handlePush = (message: string) => {
     if (!message.trim()) return;
 
@@ -109,43 +85,13 @@ export const Chat: React.FC<ChatProps> = ({ onClose, inputTopic }) => {
     push(inputTopic, message);
   };
 
-  useEffect(() => {
-    // todo change it
-    setTimeout(() => startRun(), 500);
-
-    return () => {
-      stopRun();
-    };
-  }, []);
-
-  return (
-    <ChatWrapper>
-      <ChatHeader>
-        <ChatHeading>
-          <ChatStatus connectionStatus={status} />
-        </ChatHeading>
-
-        <ChatCloseButton onClick={onClose} />
-      </ChatHeader>
-
-      <ChatBody>
-        <ChatMessagesWrapper>
-          <ChatMessages messages={messages} />
-
-          <ChatGeneratingAnimation
-            messages={messages}
-            isGenerating={isGenerating}
-          />
-        </ChatMessagesWrapper>
-
-        <div className="mt-2">
-          <ChatInput
-            onSubmit={handlePush}
-            disabled={status !== "running"}
-            generating={isGenerating}
-          />
-        </div>
-      </ChatBody>
-    </ChatWrapper>
-  );
+  return {
+    stopRun,
+    messages,
+    startRun,
+    isGenerating,
+    clearMessages,
+    pushMessage: handlePush,
+    connectionStatus: status,
+  };
 };
