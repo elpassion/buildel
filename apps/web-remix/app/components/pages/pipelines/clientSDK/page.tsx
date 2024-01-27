@@ -3,6 +3,8 @@ import { routes } from "~/utils/routes.utils";
 import { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
+import { CodePreviewWrapper } from "~/components/pages/pipelines/CodePreview/CodePreview";
+import { CodePreviewOptions } from "~/components/pages/pipelines/CodePreview/CodePreviewOptions";
 import {
   PreviewConnector,
   PreviewSection,
@@ -12,8 +14,6 @@ import {
   PreviewSectionStep,
   PreviewSectionText,
 } from "./PreviewSection";
-import { CodePreviewWrapper } from "./CodePreview";
-import { CodePreviewOptions } from "./CodePreviewOptions";
 import { loader } from "./loader";
 
 export function ClientSDKPage() {

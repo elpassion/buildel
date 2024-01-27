@@ -33,8 +33,8 @@ export default function DemoChat() {
   }, []);
 
   return (
-    <div className="flex justify-center items-center h-screen w-full p-6">
-      <ChatWrapper className="max-w-[820px] h-[40vh] !py-4 relative">
+    <div className="flex justify-center items-center h-screen w-full">
+      <ChatWrapper className="max-w-[820px] h-[500px] !py-4 relative">
         <ChatHeader className="mb-1">
           <div className="flex gap-2 items-center">
             <ChatHeading>Simple Chat</ChatHeading>

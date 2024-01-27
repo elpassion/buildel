@@ -58,6 +58,7 @@ export const routes = {
     `${routes.organization(organizationId)}/secrets`,
   secretsNew: (organizationId: OrganizationId) =>
     `${routes.secrets(organizationId)}/new`,
+  chatPreview: () => "/demo-chat",
 };
 
 type OrganizationId = string | number;
