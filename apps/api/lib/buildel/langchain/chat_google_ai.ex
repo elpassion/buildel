@@ -171,8 +171,8 @@ defmodule Buildel.LangChain.ChatModels.ChatGoogleAI do
           "functionResponse" => %{
             "name" => message.function_name,
             "response" => %{
-              "name" => message.function_name,
-              "content" => message.content
+              # TODO: This is a hack to get around the fact that Google AI doesn't support big documents. Seems like 8k is around the max.
+              "content" => message.content |> String.slice(0, 8000)
             }
           }
         }
