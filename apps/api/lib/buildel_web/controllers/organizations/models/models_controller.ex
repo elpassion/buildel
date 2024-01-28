@@ -10,7 +10,8 @@ defmodule BuildelWeb.OrganizationModelController do
 
   @models [
     %{id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo", api_type: "openai"},
-    %{id: "gpt-4-turbo", name: "GPT-4 Turbo", api_type: "openai"},
+    %{id: "gpt-3.5-turbo-1106", name: "GPT-3.5 Turbo Preview", api_type: "openai"},
+    %{id: "gpt-4-turbo-preview", name: "GPT-4 Turbo Preview", api_type: "openai"},
     %{id: "azure", name: "Azure", api_type: "azure"},
     %{id: "gemini-pro", name: "Gemini Pro", api_type: "google"}
   ]
