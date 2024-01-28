@@ -60,27 +60,27 @@ defmodule Buildel.Blocks.Chat do
                     "title" => "API key",
                     "description" => "OpenAI API key to use for the chat."
                   }),
+                api_type: %{
+                  "type" => "string",
+                  "title" => "Model API type",
+                  "description" => "The API type to use for the chat.",
+                  "enum" => ["openai", "azure"],
+                  "enumPresentAs" => "radio",
+                  "default" => "openai"
+                },
                 model: %{
                   "type" => "string",
                   "title" => "Model",
                   "description" => "The model to use for the chat.",
-                  "enum" => ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-1106", "gpt-4-1106-preview"],
-                  "enumPresentAs" => "radio",
-                  "default" => "gpt-3.5-turbo"
+                  "url" =>
+                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}",
+                  "presentAs" => "async-select"
                 },
                 endpoint: %{
                   "type" => "string",
                   "title" => "Endpoint",
                   "description" => "The endpoint to use for the chat.",
                   "default" => "https://api.openai.com/v1/chat/completions"
-                },
-                api_type: %{
-                  "type" => "string",
-                  "title" => "API type",
-                  "description" => "The API type to use for the chat.",
-                  "enum" => ["openai", "azure"],
-                  "enumPresentAs" => "radio",
-                  "default" => "openai"
                 },
                 chat_memory_type: %{
                   "type" => "string",
