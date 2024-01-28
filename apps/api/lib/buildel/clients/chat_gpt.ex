@@ -1,5 +1,6 @@
 defmodule Buildel.Clients.ChatGPT do
   require Logger
+  alias Buildel.LangChain.ChatModels.ChatGoogleAI
   alias Buildel.Langchain.ChatGptTokenizer
   alias Buildel.Clients.ChatBehaviour
   alias Buildel.LangChain.Chains.LLMChain
@@ -18,14 +19,14 @@ defmodule Buildel.Clients.ChatGPT do
           on_tool_call: on_tool_call,
           on_end: on_end,
           on_error: on_error,
-          api_key: api_key,
           model: model,
-          temperature: temperature,
           tools: tools
         } = opts
       ) do
-    api_type = opts |> Map.get(:api_type, "openai")
-    endpoint = opts |> Map.get(:endpoint, "https://api.openai.com/v1/chat/completions")
+    opts =
+      opts
+      |> Map.put_new(:api_type, "openai")
+      |> Map.put_new(:endpoint, "https://api.openai.com/v1/chat/completions")
 
     messages =
       context.messages
@@ -48,15 +49,7 @@ defmodule Buildel.Clients.ChatGPT do
 
     with {:ok, chain, message} <-
            LLMChain.new!(%{
-             llm:
-               ChatOpenAI.new!(%{
-                 model: model,
-                 temperature: temperature,
-                 stream: true,
-                 api_key: api_key,
-                 api_type: api_type,
-                 endpoint: endpoint
-               }),
+             llm: get_llm(opts),
              custom_context: context
            })
            |> LLMChain.add_functions(tools |> Enum.map(& &1.function))
@@ -115,5 +108,37 @@ defmodule Buildel.Clients.ChatGPT do
         on_error.(reason)
         {:error, reason}
     end
+  end
+
+  defp get_llm(%{api_type: "openai"} = opts) do
+    ChatOpenAI.new!(%{
+      model: opts.model,
+      temperature: opts.temperature,
+      stream: true,
+      api_key: opts.api_key,
+      api_type: opts.api_type,
+      endpoint: opts.endpoint
+    })
+  end
+
+  defp get_llm(%{api_type: "azure"} = opts) do
+    ChatOpenAI.new!(%{
+      model: opts.model,
+      temperature: opts.temperature,
+      stream: true,
+      api_key: opts.api_key,
+      api_type: opts.api_type,
+      endpoint: opts.endpoint
+    })
+  end
+
+  defp get_llm(%{api_type: "google"} = opts) do
+    ChatGoogleAI.new!(%{
+      api_key: opts.api_key,
+      model: opts.model,
+      stream: true,
+      temperature: opts.temperature,
+      endpoint: opts.endpoint
+    })
   end
 end

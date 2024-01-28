@@ -234,7 +234,7 @@ defmodule Buildel.LangChain.Chains.LLMChain do
         Logger.error("Error during chat call. Reason: #{inspect(reason)}")
         {:error, reason}
 
-      _ ->
+      _res ->
         {:ok, chain}
     end
   end

@@ -64,7 +64,7 @@ defmodule Buildel.Blocks.Chat do
                   "type" => "string",
                   "title" => "Model API type",
                   "description" => "The API type to use for the chat.",
-                  "enum" => ["openai", "azure"],
+                  "enum" => ["openai", "azure", "google"],
                   "enumPresentAs" => "radio",
                   "default" => "openai"
                 },
