@@ -170,7 +170,10 @@ defmodule Buildel.LangChain.ChatModels.ChatGoogleAI do
         %{
           "functionResponse" => %{
             "name" => message.function_name,
-            "response" => Jason.decode!(message.content)
+            "response" => %{
+              "name" => message.function_name,
+              "content" => message.content
+            }
           }
         }
       ]
@@ -187,7 +190,7 @@ defmodule Buildel.LangChain.ChatModels.ChatGoogleAI do
       },
       %{
         "role" => :model,
-        "parts" => [%{"text" => "ok"}]
+        "parts" => [%{"text" => "Ok."}]
       }
     ]
   end
@@ -426,6 +429,20 @@ defmodule Buildel.LangChain.ChatModels.ChatGoogleAI do
       %{
         "finishReason" => "DOESNOTMATTER",
         "content" => content,
+        "index" => 0
+      },
+      message_type
+    )
+  end
+
+  def do_process_response(
+        %{"content" => %{"role" => role}, "citationMetadata" => _citation_metadata},
+        message_type
+      ) do
+    do_process_response(
+      %{
+        "finishReason" => "DOESNOTMATTER",
+        "content" => %{"role" => role, "parts" => [%{"text" => "Citation"}]},
         "index" => 0
       },
       message_type
