@@ -156,6 +156,9 @@ export const CreatableAsyncSelectField = forwardRef<
             onSubmit={(e) => {
               e.stopPropagation();
             }}
+            onChange={(e) => {
+              e.stopPropagation();
+            }}
           >
             <ValidatedForm
               // @ts-ignore
