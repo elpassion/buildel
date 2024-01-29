@@ -26,6 +26,7 @@ defmodule Buildel.BlocksTest do
     test "exposes options" do
       assert TextInput.options() == %{
                type: "text_input",
+               description: "This module is crafted for the seamless intake and transmission of textual data.",
                inputs: [Block.text_input("input", true)],
                outputs: [Block.text_output("output")],
                schema: TextInput.schema(),
@@ -65,6 +66,7 @@ defmodule Buildel.BlocksTest do
   describe "AudioInput" do
     test "exposes options" do
       assert AudioInput.options() == %{
+               description: "A specialized block designed for capturing and streaming audio data.",
                type: "audio_input",
                inputs: [Block.audio_input("input", true)],
                outputs: [Block.audio_output("output")],
@@ -106,6 +108,7 @@ defmodule Buildel.BlocksTest do
   describe "TextOutput" do
     test "exposes options" do
       assert TextOutput.options() == %{
+               description: "A versatile module designed to output text data.",
                type: "text_output",
                inputs: [Block.text_input("input")],
                outputs: [Block.text_output("output", true)],
@@ -157,6 +160,7 @@ defmodule Buildel.BlocksTest do
     test "exposes options" do
       assert WebhookOutput.options() == %{
                type: "webhook_output",
+               description: "This module is adept at forwarding text data to specified webhook URLs, facilitating seamless external integrations.",
                inputs: [Block.text_input("input")],
                outputs: [],
                schema: WebhookOutput.schema(),
@@ -214,6 +218,7 @@ defmodule Buildel.BlocksTest do
     test "exposes options" do
       assert AudioOutput.options() == %{
                type: "audio_output",
+               description: "It's designed to work seamlessly with other audio-related blocks in Buildel, ensuring smooth and flexible audio output capabilities in applications.",
                inputs: [Block.audio_output("input")],
                outputs: [Block.audio_output("output", true)],
                schema: AudioOutput.schema(),
@@ -262,6 +267,7 @@ defmodule Buildel.BlocksTest do
   describe "SpeechToText" do
     test "exposes options" do
       assert SpeechToText.options() == %{
+               description: "This module is adept at transcribing audio data into text, offering outputs in both plain text and JSON formats.",
                type: "speech_to_text",
                inputs: [Block.audio_input("input")],
                outputs: [Block.text_output("output"), Block.text_output("json_output")],
@@ -314,6 +320,7 @@ defmodule Buildel.BlocksTest do
   describe "FileSpeechToText" do
     test "exposes options" do
       assert FileSpeechToText.options() == %{
+               description: "This module expertly transcribes audio content into text, offering multiple output formats including plain text, JSON, and SRT.",
                type: "file_speech_to_text",
                inputs: [Block.audio_input("input")],
                outputs: [
@@ -369,6 +376,7 @@ defmodule Buildel.BlocksTest do
     test "exposes options" do
       assert TextToSpeech.options() == %{
                type: "text_to_speech",
+               description: "This module enables seamless conversion of textual data into audio format, leveraging the ElevenLabs API",
                inputs: [Block.text_input("input")],
                outputs: [Block.audio_output("output")],
                schema: TextToSpeech.schema(),
@@ -417,6 +425,7 @@ defmodule Buildel.BlocksTest do
   describe "Chat" do
     test "exposes options" do
       assert Chat.options() == %{
+               description: "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
                type: "chat",
                inputs: [Block.text_input("input")],
                outputs: [
@@ -538,6 +547,7 @@ defmodule Buildel.BlocksTest do
   describe "TakeLatest" do
     test "exposes options" do
       assert TakeLatest.options() == %{
+               description: "This module specializes in aggregating the latest inputs and combining them based on a specified template.",
                type: "take_latest",
                inputs: [Block.text_input("input")],
                outputs: [Block.text_output("output")],
@@ -701,6 +711,7 @@ defmodule Buildel.BlocksTest do
     test "exposes options" do
       assert CollectSentences.options() == %{
                type: "collect_sentences",
+               description: "This module segmenting and extracting individual sentences from continuous text streams.",
                inputs: [Block.text_input("input")],
                outputs: [Block.text_output("sentences_output")],
                schema: CollectSentences.schema(),
@@ -844,6 +855,7 @@ defmodule Buildel.BlocksTest do
     test "exposes options" do
       assert CollectAllText.options() == %{
                type: "collect_all_text",
+               description: "This module specializes in accumulating and consolidating text input from streaming sources.",
                inputs: [Block.text_input("input")],
                outputs: [Block.text_output("output")],
                schema: CollectAllText.schema(),
