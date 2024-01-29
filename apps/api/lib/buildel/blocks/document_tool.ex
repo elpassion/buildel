@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.DocumentTool do
   def options() do
     %{
       type: "document_tool",
-      description: "It's a powerful tool for applications requiring quick and precise access to specific documents stored in Buildel's knowledge bases.",
+      description:
+        "It's a powerful tool for applications requiring quick and precise access to specific documents stored in Buildel's knowledge bases.",
       groups: ["text", "tools"],
       inputs: [],
       outputs: [],
@@ -118,7 +119,16 @@ defmodule Buildel.Blocks.DocumentTool do
         end
       })
 
-    {:reply, function, state}
+    {:reply,
+     %{
+       function: function,
+       call_formatter: fn args ->
+         "\nDatabase 📑: Document \"#{args["document_id"]}\"\n"
+       end,
+       response_formatter: fn _response ->
+         ""
+       end
+     }, state}
   end
 
   @impl true

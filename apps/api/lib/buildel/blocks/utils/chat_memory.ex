@@ -35,6 +35,18 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
     add_message(chat_memory, %{role: "assistant", content: content})
   end
 
+  def add_tool_call_message(%__MODULE__{} = chat_memory, %{
+        tool_name: tool_name,
+        arguments: arguments
+      }) do
+    add_message(chat_memory, %{
+      role: "tool_call",
+      tool_name: tool_name,
+      arguments: arguments,
+      content: nil
+    })
+  end
+
   def add_tool_result_message(%__MODULE__{} = chat_memory, %{
         tool_name: tool_name,
         content: content

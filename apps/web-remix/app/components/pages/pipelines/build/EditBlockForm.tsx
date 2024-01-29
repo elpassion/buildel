@@ -51,6 +51,7 @@ export function EditBlockForm({
   const validator = React.useMemo(() => withZod(schema), []);
   const [inputs, setInputs] = useState(blockConfig.inputs);
   const [fieldsErrors, setFieldsErrors] = useState<Record<string, string>>({});
+  const [latestValues, setLatestValues] = useState<Record<string, any>>({});
 
   const clearFieldsErrors = () => {
     setFieldsErrors({});
@@ -102,7 +103,7 @@ export function EditBlockForm({
         />
       );
     },
-    [blockConfig.inputs]
+    [blockConfig.connections]
   );
 
   const SelectField = useCallback(
@@ -115,14 +116,21 @@ export function EditBlockForm({
         return;
       }
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { fieldErrors } = useFormContext();
+      const { fieldErrors, getValues } = useFormContext();
+
+      const replacedUrl = props.field.url
+        .replace("{{organization_id}}", organizationId.toString())
+        .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
+          const values = getValues();
+          const replacedValue = values.get(optKey);
+
+          return replacedValue || optKey;
+        });
+
       return (
         <FormField name={props.name!}>
           <AsyncSelectField
-            url={props.field.url.replace(
-              "{{organization_id}}",
-              organizationId.toString()
-            )}
+            url={replacedUrl}
             label={props.field.title}
             supportingText={props.field.description}
             errorMessage={fieldErrors[props.name!]}
@@ -134,7 +142,7 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId]
+    [blockConfig.name, organizationId, pipelineId, latestValues]
   );
 
   const AsyncCreatableField = useCallback(
@@ -147,15 +155,19 @@ export function EditBlockForm({
         return;
       }
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { fieldErrors } = useFormContext();
+      const { fieldErrors, getValues } = useFormContext();
+      const replacedUrl = props.field.url
+        .replace("{{organization_id}}", organizationId.toString())
+        .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
+          const values = getValues();
+          const replacedValue = values.get(optKey);
+          return replacedValue || optKey;
+        });
 
       return (
         <FormField name={props.name!}>
           <CreatableAsyncSelectField
-            url={props.field.url.replace(
-              "{{organization_id}}",
-              organizationId.toString()
-            )}
+            url={replacedUrl}
             schema={props.field.schema}
             label={props.field.title}
             supportingText={props.field.description}
@@ -167,7 +179,7 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId]
+    [blockConfig.name, organizationId, pipelineId, latestValues]
   );
 
   return (
@@ -177,6 +189,9 @@ export function EditBlockForm({
       defaultValues={blockConfig}
       onSubmit={handleUpdate}
       className="w-full grow flex flex-col h-[60%]"
+      onChange={(e: any) => {
+        setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+      }}
       noValidate
     >
       <InputsProvider inputs={inputs} updateInputReset={updateInputReset}>

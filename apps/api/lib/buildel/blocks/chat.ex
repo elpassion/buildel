@@ -14,7 +14,8 @@ defmodule Buildel.Blocks.Chat do
   def options() do
     %{
       type: "chat",
-      description: "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
+      description:
+        "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
       groups: ["text", "llms"],
       inputs: [Block.text_input()],
       outputs: [
@@ -59,27 +60,27 @@ defmodule Buildel.Blocks.Chat do
                     "title" => "API key",
                     "description" => "OpenAI API key to use for the chat."
                   }),
+                api_type: %{
+                  "type" => "string",
+                  "title" => "Model API type",
+                  "description" => "The API type to use for the chat.",
+                  "enum" => ["openai", "azure", "google"],
+                  "enumPresentAs" => "radio",
+                  "default" => "openai"
+                },
                 model: %{
                   "type" => "string",
                   "title" => "Model",
                   "description" => "The model to use for the chat.",
-                  "enum" => ["gpt-3.5-turbo", "gpt-4", "gpt-3.5-turbo-1106", "gpt-4-1106-preview"],
-                  "enumPresentAs" => "radio",
-                  "default" => "gpt-3.5-turbo"
+                  "url" =>
+                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}",
+                  "presentAs" => "async-select"
                 },
                 endpoint: %{
                   "type" => "string",
                   "title" => "Endpoint",
                   "description" => "The endpoint to use for the chat.",
                   "default" => "https://api.openai.com/v1/chat/completions"
-                },
-                api_type: %{
-                  "type" => "string",
-                  "title" => "API type",
-                  "description" => "The API type to use for the chat.",
-                  "enum" => ["openai", "azure"],
-                  "enumPresentAs" => "radio",
-                  "default" => "openai"
                 },
                 chat_memory_type: %{
                   "type" => "string",
@@ -126,7 +127,7 @@ defmodule Buildel.Blocks.Chat do
                         "type" => "string",
                         "title" => "Content",
                         "presentAs" => "editor",
-                        "editorLanguage" => "custom",
+                        "editorLanguage" => "custom"
                       }
                     }
                   },
@@ -166,6 +167,10 @@ defmodule Buildel.Blocks.Chat do
 
   defp finish_chat_message(pid) do
     GenServer.cast(pid, {:finish_chat_message})
+  end
+
+  defp save_tool_call(pid, tool_name, arguments) do
+    GenServer.cast(pid, {:save_tool_call, tool_name, arguments})
   end
 
   defp save_tool_result(pid, tool_name, content) do
@@ -259,6 +264,17 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
+  def handle_cast({:save_tool_call, tool_name, arguments}, state) do
+    chat_memory =
+      ChatMemory.add_tool_call_message(state.chat_memory, %{
+        tool_name: tool_name,
+        arguments: arguments
+      })
+
+    {:noreply, %{state | chat_memory: chat_memory}}
+  end
+
+  @impl true
   def handle_cast({:save_tool_result, tool_name, content}, state) do
     chat_memory =
       ChatMemory.add_tool_result_message(state.chat_memory, %{
@@ -303,7 +319,16 @@ defmodule Buildel.Blocks.Chat do
         end
       })
 
-    {:reply, function, state}
+    {:reply,
+     %{
+       function: function,
+       call_formatter: fn %{"message" => message} = _args ->
+         "\n@#{state.block.name} 🗨️:  #{message}\n"
+       end,
+       response_formatter: fn response ->
+         "\n@#{state.block.name} 🤖: #{response}\n"
+       end
+     }, state}
   end
 
   def handle_call({:send_message, {:text, _text}}, _from, state) do
@@ -363,7 +388,26 @@ defmodule Buildel.Blocks.Chat do
 
                save_text_chunk(pid, text_chunk)
              end,
-             on_tool_content: &save_tool_result(pid, &1, &2),
+             on_tool_call: fn tool_name, arguments, message ->
+               Buildel.BlockPubSub.broadcast_to_io(
+                 state[:context_id],
+                 state[:block_name],
+                 "output",
+                 {:text, message}
+               )
+
+               save_tool_call(pid, tool_name, arguments)
+             end,
+             on_tool_content: fn tool_name, content, message ->
+               Buildel.BlockPubSub.broadcast_to_io(
+                 state[:context_id],
+                 state[:block_name],
+                 "output",
+                 {:text, message}
+               )
+
+               save_tool_result(pid, tool_name, content)
+             end,
              on_end: fn chat_token_summary ->
                cost =
                  Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
@@ -424,8 +468,12 @@ defmodule Buildel.Blocks.Chat do
     messages =
       state.chat_memory
       |> ChatMemory.get_messages()
-      |> Enum.map(fn message ->
-        update_in(message.content, &replace_input_strings_with_latest_inputs_values(state, &1))
+      |> Enum.map(fn
+        %{content: nil} = message ->
+          message
+
+        message ->
+          update_in(message.content, &replace_input_strings_with_latest_inputs_values(state, &1))
       end)
 
     if Enum.all?(messages, &all_inputs_in_string_filled?(&1.content, state.connections)) do

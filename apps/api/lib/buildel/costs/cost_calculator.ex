@@ -31,6 +31,9 @@ defmodule Buildel.Costs.CostCalculator do
         output_token_price: Decimal.new("0.03") |> Decimal.div(1000)
       }
     }
-    |> Map.get(model)
+    |> Map.get(model, %{
+      input_token_price: 0,
+      output_token_price: 0
+    })
   end
 end

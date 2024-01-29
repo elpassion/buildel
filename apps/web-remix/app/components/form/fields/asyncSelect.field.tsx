@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useState } from "react";
 import {
   HiddenField,
   useFieldContext,
@@ -30,21 +30,21 @@ export const AsyncSelectField = forwardRef<
   const [selectedId, setSelectedId] = useControlField<string>(name);
   const [options, setOptions] = useState<IAsyncSelectItemList>([]);
 
-  const loadOptions = (
-    _input: string,
-    callback: (options: IDropdownOption[]) => void
-  ) => {
-    asyncSelectApi.getData(url).then((options) => {
-      if (
-        defaultValue &&
-        !options.find((option) => option.id === defaultValue)
-      ) {
-        options = [{ id: defaultValue, name: defaultValue }, ...options];
-      }
-      setOptions(options);
-      callback(options.map(toSelectOption));
-    });
-  };
+  const loadOptions = useCallback(
+    (_input: string, callback: (options: IDropdownOption[]) => void) => {
+      asyncSelectApi.getData(url).then((options) => {
+        if (
+          defaultValue &&
+          !options.find((option) => option.id === defaultValue)
+        ) {
+          options = [{ id: defaultValue, name: defaultValue }, ...options];
+        }
+        setOptions(options);
+        callback(options.map(toSelectOption));
+      });
+    },
+    [url, options, defaultValue]
+  );
 
   useEffect(() => {
     if (!selectedId && defaultValue) {
@@ -62,6 +62,7 @@ export const AsyncSelectField = forwardRef<
     <>
       <HiddenField value={selectedId} {...getInputProps()} />
       <AsyncSelectInput
+        key={name + url}
         cacheOptions
         defaultOptions
         id={name}

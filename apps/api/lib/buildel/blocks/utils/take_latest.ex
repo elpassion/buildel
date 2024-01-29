@@ -10,6 +10,23 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
         state |> Map.get(tl_keyword())
       end
 
+      defp get_input_value(state, input_name) do
+        connected_output =
+          state.connections
+          |> Enum.find(&(&1.to.name == input_name))
+
+        connected_output_name =
+          "#{connected_output.from.block_name}:#{connected_output.from.name}"
+
+        case input_values(state) |> Map.get(connected_output_name) do
+          nil ->
+            {:error, "Input #{input_name} is not connected."}
+
+          value ->
+            {:ok, value}
+        end
+      end
+
       defp assign_take_latest(state) do
         messages = empty_inputs(state)
         state |> Map.put(tl_keyword(), messages)
@@ -42,6 +59,8 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
       end
 
       defp tl_keyword(), do: :take_latest_messages
+
+      defp all_inputs_in_string_filled?(nil, connections), do: true
 
       defp all_inputs_in_string_filled?(message, connections) do
         !String.contains?(

@@ -138,15 +138,15 @@ defmodule Buildel.Blocks.Block do
 
       defp name_schema() do
         %{
-          "type" => "string",
-          "title" => "Name",
-          "description" => "The name of the block.",
-          "minLength" => 2,
-          "maxLength" => 30,
-          "pattern" => "^[^<>: ?-]*$",
-          "regex" => %{
-            "pattern" => "^[^<>: ?-]*$",
-            "errorMessage" => "Invalid string. Characters '< > : - ? ' are not allowed."
+          type: "string",
+          title: "Name",
+          description: "The name of the block.",
+          minLength: 2,
+          maxLength: 30,
+          pattern: "^[^<>: ?-]*$",
+          regex: %{
+            pattern: "^[^<>: ?-]*$",
+            errorMessage: "Invalid string. Characters '< > : - ? ' are not allowed."
           }
         }
       end
@@ -203,11 +203,11 @@ defmodule Buildel.Blocks.Block do
            ) do
         Map.merge(
           %{
-            "type" => "object",
-            "title" => "Options",
-            "description" => "Additional options for the block.",
-            "required" => [],
-            "properties" => %{}
+            type: "object",
+            title: "Options",
+            description: "Additional options for the block.",
+            required: [],
+            properties: %{}
           },
           schema
         )

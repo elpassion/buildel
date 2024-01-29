@@ -111,8 +111,12 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     url =
       args
-      |> Enum.reduce(state[:opts][:url], fn {key, value}, acc ->
-        String.replace(acc, "{{#{key}}}", value |> to_string())
+      |> Enum.reduce(state[:opts][:url], fn
+        {key, value}, acc when is_binary(value) ->
+          String.replace(acc, "{{#{key}}}", value |> to_string())
+
+        _, acc ->
+          acc
       end)
 
     payload = args |> Jason.encode!()
@@ -177,7 +181,16 @@ defmodule Buildel.Blocks.ApiCallTool do
         end
       })
 
-    {:reply, function, state}
+    {:reply,
+     %{
+       function: function,
+       call_formatter: fn args ->
+         "\nCalling API #{state[:opts].name} with \"#{inspect(args)}\"..."
+       end,
+       response_formatter: fn _response ->
+         ""
+       end
+     }, state}
   end
 
   @impl true

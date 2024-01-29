@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.MemorySearchTool do
   def options() do
     %{
       type: "memory_search_tool",
-      description: "This module excels in searching and retrieving relevant information from a vast collection of documents.",
+      description:
+        "This module excels in searching and retrieving relevant information from a vast collection of documents.",
       groups: ["text", "tools"],
       inputs: [],
       outputs: [Block.text_output("results")],
@@ -181,7 +182,16 @@ defmodule Buildel.Blocks.MemorySearchTool do
         end
       })
 
-    {:reply, function, state}
+    {:reply,
+     %{
+       function: function,
+       call_formatter: fn args ->
+         "\nDatabase 📑: Search \"#{args["query"]}\"\n"
+       end,
+       response_formatter: fn _response ->
+         ""
+       end
+     }, state}
   end
 
   @impl true

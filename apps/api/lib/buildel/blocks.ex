@@ -22,7 +22,8 @@ defmodule Buildel.Blocks do
     IF,
     MemorySearchTool,
     DocumentTool,
-    ApiCallTool
+    ApiCallTool,
+    CreateBlockTool
   }
 
   @names_to_blocks_map %{
@@ -45,7 +46,8 @@ defmodule Buildel.Blocks do
     "if" => IF,
     "memory_search_tool" => MemorySearchTool,
     "document_tool" => DocumentTool,
-    "api_call_tool" => ApiCallTool
+    "api_call_tool" => ApiCallTool,
+    "create_block_tool" => CreateBlockTool
   }
 
   @blocks_to_names_map %{
@@ -68,7 +70,8 @@ defmodule Buildel.Blocks do
     IF => "if",
     MemorySearchTool => "memory_search_tool",
     DocumentTool => "document_tool",
-    ApiCallTool => "api_call_tool"
+    ApiCallTool => "api_call_tool",
+    CreateBlockTool => "create_block_tool"
   }
 
   def list_types() do

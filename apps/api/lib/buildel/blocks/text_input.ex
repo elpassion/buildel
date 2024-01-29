@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.TextInput do
   def options() do
     %{
       type: "text_input",
-      description: "This module is crafted for the seamless intake and transmission of textual data.",
+      description:
+        "This module is crafted for the seamless intake and transmission of textual data.",
       groups: ["text", "inputs / outputs"],
       inputs: [Block.text_input("input", true)],
       outputs: [Block.text_output()],
@@ -22,11 +23,11 @@ defmodule Buildel.Blocks.TextInput do
   @impl true
   def schema() do
     %{
-      "type" => "object",
-      "required" => ["name", "opts"],
-      "properties" => %{
-        "name" => name_schema(),
-        "opts" => options_schema()
+      type: "object",
+      required: ["name", "opts"],
+      properties: %{
+        name: name_schema(),
+        opts: options_schema()
       }
     }
   end
