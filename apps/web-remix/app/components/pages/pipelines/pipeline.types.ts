@@ -10,6 +10,7 @@ import {
   PipelineRuns,
   PipelineCosts,
   BlockConfigConnection,
+  InterfaceConfig,
 } from "./contracts";
 
 export type IBlockConfig = z.TypeOf<typeof BlockConfig>;
@@ -52,6 +53,8 @@ export interface IHandle {
 export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
 
 export type IBlockType = z.TypeOf<typeof BlockType>;
+
+export type IInterfaceConfig = z.infer<typeof InterfaceConfig>;
 
 export type IPipeline = z.infer<typeof Pipeline>;
 

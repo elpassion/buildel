@@ -1,13 +1,39 @@
 import React from "react";
 import { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { loader } from "./loader";
+import { useFetcher, useLoaderData } from "@remix-run/react";
+import { CodePreviewOptions } from "~/components/pages/pipelines/CodePreview/CodePreviewOptions";
 import { BasicLink } from "~/components/link/BasicLink";
 import { routes } from "~/utils/routes.utils";
-import { CodePreviewOptions } from "~/components/pages/pipelines/CodePreview/CodePreviewOptions";
+import { loader } from "./loader";
+import {
+  IInterfaceConfig,
+  IPipeline,
+} from "~/components/pages/pipelines/pipeline.types";
+import { ClientOnly } from "~/utils/ClientOnly";
+import { InterfaceConfigForm } from "./InterfaceConfigForm";
 
 export function WebsiteChatbotPage() {
-  const { organizationId, pipelineId } = useLoaderData<typeof loader>();
+  const updateFetcher = useFetcher<IPipeline>();
+
+  const { organizationId, pipelineId, pageUrl, pipeline } =
+    useLoaderData<typeof loader>();
+
+  const websiteChatUrl = `${pageUrl}${routes.chatPreview(
+    organizationId,
+    pipelineId
+  )}`;
+
+  const handleUpdate = (interfaceConfig: IInterfaceConfig) => {
+    updateFetcher.submit(
+      { ...pipeline, interfaceConfig },
+      {
+        method: "put",
+        encType: "application/json",
+        action: `${routes.pipeline(organizationId, pipelineId)}?index`,
+      }
+    );
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -19,12 +45,27 @@ export function WebsiteChatbotPage() {
         </div>
 
         <BasicLink
-          to={routes.chatPreview()}
+          to={routes.chatPreview(organizationId, pipelineId)}
           className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md"
         >
           Open preview
         </BasicLink>
       </div>
+
+      <article className="bg-transparent border border-neutral-800 rounded-xl mb-8">
+        <header className="w-full bg-neutral-900 px-6 py-4 rounded-t-xl">
+          <h3 className="text-white text-sm">Inputs and outputs</h3>
+          <p className="text-neutral-100 text-xs">
+            Select inputs and outputs for chatbot
+          </p>
+        </header>
+
+        <div className="p-6 grid grid-cols-1 gap-3 min-h-[174px]">
+          <ClientOnly>
+            <InterfaceConfigForm pipeline={pipeline} onSubmit={handleUpdate} />
+          </ClientOnly>
+        </div>
+      </article>
 
       <article className="bg-transparent border border-neutral-800 rounded-xl">
         <header className="w-full bg-neutral-900 px-6 py-4 rounded-t-xl">
@@ -53,7 +94,7 @@ export function WebsiteChatbotPage() {
                   framework: "Html",
                   language: "html",
                   value: `<iframe
-  src="http://localhost:3000/demo-chat"
+  src={${websiteChatUrl}}
   width="600"
   height="600"
   title="chat"
@@ -65,7 +106,7 @@ export function WebsiteChatbotPage() {
                   framework: "React",
                   language: "html",
                   value: `<iframe
-  src="http://localhost:3000/demo-chat"
+  src={${websiteChatUrl}}
   width="600"
   height="600"
   title="chat"
@@ -77,13 +118,6 @@ export function WebsiteChatbotPage() {
           </div>
         </div>
       </article>
-
-      <iframe
-        src="http://localhost:3000/demo-chat"
-        width="552"
-        height="600"
-        title="chat"
-      />
     </div>
   );
 }

@@ -8,7 +8,7 @@ interface GlobalRuntimeProps {
 
 export const GlobalRuntime: React.FC<GlobalRuntimeProps> = ({ error }) => {
   const status = isRouteErrorResponse(error) ? error.status : 500;
-
+  console.log(error);
   captureRemixErrorBoundaryError(error);
   return (
     <section className="w-full min-h-screen flex items-center justify-center flex-col">

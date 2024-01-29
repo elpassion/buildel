@@ -72,11 +72,17 @@ export const UpdateBlockConfig = z.object({
   block_type: BlockType.optional(),
 });
 
+export const InterfaceConfig = z.object({
+  input: z.string().min(2),
+  output: z.string().min(2),
+});
+
 export const Pipeline = z.object({
   id: z.number(),
   name: z.string(),
   organization_id: z.number(),
   runs_count: z.number(),
+  interfaceConfig: z.union([InterfaceConfig, z.null()]),
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),

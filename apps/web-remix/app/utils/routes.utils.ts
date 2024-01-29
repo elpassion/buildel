@@ -58,7 +58,8 @@ export const routes = {
     `${routes.organization(organizationId)}/secrets`,
   secretsNew: (organizationId: OrganizationId) =>
     `${routes.secrets(organizationId)}/new`,
-  chatPreview: () => "/demo-chat",
+  chatPreview: (organizationId: OrganizationId, pipelineId: PipelineId) =>
+    `/webchats${routes.pipeline(organizationId, pipelineId)}`,
 };
 
 type OrganizationId = string | number;

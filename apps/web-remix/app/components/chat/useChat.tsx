@@ -7,11 +7,15 @@ import { IMessage, MessageRole } from "./chat.types";
 
 interface UseChatProps {
   inputTopic?: string;
+  organizationId: number;
+  pipelineId: number;
 }
 
 export const useChat = ({
   inputTopic = "text_input_1:input",
-}: UseChatProps = {}) => {
+  organizationId,
+  pipelineId,
+}: UseChatProps) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -59,8 +63,8 @@ export const useChat = ({
   };
 
   const { startRun, stopRun, push, status } = usePipelineRun(
-    13,
-    135,
+    organizationId,
+    pipelineId,
     onBlockOutput,
     onStatusChange,
     onError

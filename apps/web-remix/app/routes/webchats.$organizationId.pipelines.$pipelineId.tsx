@@ -12,8 +12,27 @@ import {
   IntroPanel,
 } from "~/components/chat/Chat.components";
 import classNames from "classnames";
+import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { loaderBuilder } from "~/utils.server";
+import { requireLogin } from "~/session.server";
+import invariant from "tiny-invariant";
+import { useLoaderData } from "@remix-run/react";
 
-export default function DemoChat() {
+export async function loader(args: LoaderFunctionArgs) {
+  return loaderBuilder(async ({ request, params }, { fetch }) => {
+    await requireLogin(request);
+    invariant(params.organizationId, "organizationId not found");
+    invariant(params.pipelineId, "pipelineId not found");
+
+    return json({
+      organizationId: params.organizationId,
+      pipelineId: params.pipelineId,
+    });
+  })(args);
+}
+
+export default function WebsiteChat() {
+  const { pipelineId, organizationId } = useLoaderData<typeof loader>();
   const {
     isGenerating,
     connectionStatus,
@@ -21,7 +40,10 @@ export default function DemoChat() {
     stopRun,
     startRun,
     messages,
-  } = useChat();
+  } = useChat({
+    organizationId: organizationId as unknown as number,
+    pipelineId: pipelineId as unknown as number,
+  });
 
   useEffect(() => {
     // todo change it
