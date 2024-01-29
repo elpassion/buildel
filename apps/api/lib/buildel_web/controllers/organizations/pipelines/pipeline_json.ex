@@ -14,7 +14,7 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
       id: pipeline.id,
       name: pipeline.name,
       organization_id: pipeline.organization_id,
-      interfaceConfig: pipeline.interfaceConfig,
+      interface_config: pipeline.interface_config,
       runs_count: pipeline.runs_count,
       config:
         Map.update(pipeline.config, "blocks", [], fn blocks ->

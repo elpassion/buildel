@@ -3,7 +3,7 @@ defmodule Buildel.Repo.Migrations.AddInterfaceConfigToPipelines do
 
   def change do
     alter table(:pipelines) do
-      add :interfaceConfig, :map
+      add :interface_config, :map
     end
   end
 end

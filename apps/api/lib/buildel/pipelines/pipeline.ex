@@ -5,7 +5,7 @@ defmodule Buildel.Pipelines.Pipeline do
   schema "pipelines" do
     field(:name, :string)
     field(:config, :map)
-    field(:interfaceConfig, :map)
+    field(:interface_config, :map)
 
     has_many(:runs, Buildel.Pipelines.Run, on_delete: :delete_all)
     field(:runs_count, :integer, default: 0)
@@ -18,7 +18,7 @@ defmodule Buildel.Pipelines.Pipeline do
   @doc false
   def changeset(pipeline, attrs) do
     pipeline
-    |> cast(attrs, [:name, :config, :interfaceConfig, :organization_id])
+    |> cast(attrs, [:name, :config, :interface_config, :organization_id])
     |> validate_required([:name, :config, :organization_id])
     |> assoc_constraint(:organization)
   end
