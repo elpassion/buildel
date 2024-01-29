@@ -9,7 +9,6 @@ import {
 } from "~/components/pages/pipelines/pipeline.types";
 import { Field } from "~/components/form/fields/field.context";
 import { SelectField } from "~/components/form/fields/select.field";
-import { ClientOnly } from "~/utils/ClientOnly";
 import { schema } from "./schema";
 
 interface InterfaceConfigFormProps {
@@ -41,8 +40,8 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   return (
     <ValidatedForm
       defaultValues={{
-        input: pipeline.interfaceConfig?.input,
-        output: pipeline.interfaceConfig?.output,
+        input: pipeline.interface_config?.input,
+        output: pipeline.interface_config?.output,
       }}
       validator={validator}
       noValidate

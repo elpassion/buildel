@@ -82,7 +82,7 @@ export const Pipeline = z.object({
   name: z.string(),
   organization_id: z.number(),
   runs_count: z.number(),
-  interfaceConfig: z.union([InterfaceConfig, z.null()]),
+  interface_config: z.union([InterfaceConfig, z.null()]),
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),

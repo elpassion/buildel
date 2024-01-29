@@ -51,7 +51,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
           ...validatedBlocks[i],
         };
       });
-      console.log(result.data);
+
       const res = await fetch(
         PipelineResponse,
         `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`,

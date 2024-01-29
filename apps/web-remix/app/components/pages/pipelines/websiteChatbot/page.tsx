@@ -11,6 +11,7 @@ import {
 } from "~/components/pages/pipelines/pipeline.types";
 import { ClientOnly } from "~/utils/ClientOnly";
 import { InterfaceConfigForm } from "./InterfaceConfigForm";
+import { successToast } from "~/components/toasts/successToast";
 
 export function WebsiteChatbotPage() {
   const updateFetcher = useFetcher<IPipeline>();
@@ -25,13 +26,15 @@ export function WebsiteChatbotPage() {
 
   const handleUpdate = (interfaceConfig: IInterfaceConfig) => {
     updateFetcher.submit(
-      { ...pipeline, interfaceConfig },
+      { ...pipeline, interface_config: interfaceConfig },
       {
         method: "put",
         encType: "application/json",
         action: `${routes.pipeline(organizationId, pipelineId)}?index`,
       }
     );
+
+    successToast({ description: "Configuration updated" }); // todo catch errors
   };
 
   return (
