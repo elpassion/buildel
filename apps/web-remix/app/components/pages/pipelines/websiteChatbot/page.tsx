@@ -103,7 +103,7 @@ export function WebsiteChatbotPage() {
                   framework: "Html",
                   language: "html",
                   value: `<iframe
-  src={${websiteChatUrl}}
+  src="${websiteChatUrl}"
   width="600"
   height="600"
   title="chat"
@@ -115,7 +115,7 @@ export function WebsiteChatbotPage() {
                   framework: "React",
                   language: "html",
                   value: `<iframe
-  src={${websiteChatUrl}}
+  src="${websiteChatUrl}"
   width="600"
   height="600"
   title="chat"
