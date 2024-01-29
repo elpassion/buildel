@@ -118,6 +118,8 @@ export function WebsiteChatbotPage() {
           </div>
         </div>
       </article>
+
+      {/*<iframe src={websiteChatUrl} width="600" height="600" title="chat" />*/}
     </div>
   );
 }

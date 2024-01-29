@@ -6,13 +6,15 @@ import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
 import { IMessage, MessageRole } from "./chat.types";
 
 interface UseChatProps {
-  inputTopic?: string;
+  input: string;
+  output: string;
   organizationId: number;
   pipelineId: number;
 }
 
 export const useChat = ({
-  inputTopic = "text_input_1:input",
+  input,
+  output,
   organizationId,
   pipelineId,
 }: UseChatProps) => {
@@ -20,10 +22,13 @@ export const useChat = ({
   const [isGenerating, setIsGenerating] = useState(false);
 
   const onBlockOutput = (
-    _blockId: string,
+    blockId: string,
     _outputName: string,
     payload: unknown
   ) => {
+    // todo: just text_output for now
+    if (!blockId.includes(output)) return;
+
     setMessages((prev) => {
       const tmpPrev = cloneDeep(prev);
       const lastMessage = tmpPrev[tmpPrev.length - 1];
@@ -49,10 +54,10 @@ export const useChat = ({
   };
 
   const onStatusChange = (blockId: string, isWorking: boolean) => {
-    if (isWorking) {
+    if (blockId.includes(input) && isWorking) {
       setIsGenerating(true);
     }
-    if (blockId.includes("text_output") && !isWorking) {
+    if (blockId.includes(output) && !isWorking) {
       setIsGenerating(false);
     }
   };
@@ -86,7 +91,7 @@ export const useChat = ({
 
     setMessages((prev) => [...prev, newMessage]);
 
-    push(inputTopic, message);
+    push(input + ":input", message);
   };
 
   return {

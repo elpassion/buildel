@@ -17,6 +17,7 @@ import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { useLoaderData } from "@remix-run/react";
+import { PipelineResponse } from "~/components/pages/pipelines/contracts";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -24,7 +25,13 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.organizationId, "organizationId not found");
     invariant(params.pipelineId, "pipelineId not found");
 
+    const pipeline = await fetch(
+      PipelineResponse,
+      `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`
+    );
+
     return json({
+      pipeline: pipeline.data,
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
     });
@@ -32,7 +39,9 @@ export async function loader(args: LoaderFunctionArgs) {
 }
 
 export default function WebsiteChat() {
-  const { pipelineId, organizationId } = useLoaderData<typeof loader>();
+  const { pipelineId, organizationId, pipeline } =
+    useLoaderData<typeof loader>();
+
   const {
     isGenerating,
     connectionStatus,
@@ -41,6 +50,8 @@ export default function WebsiteChat() {
     startRun,
     messages,
   } = useChat({
+    input: pipeline.interfaceConfig?.input ?? "",
+    output: pipeline.interfaceConfig?.output ?? "",
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
   });
