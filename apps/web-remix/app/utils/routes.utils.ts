@@ -49,7 +49,9 @@ export const routes = {
   knowledgeBaseNew: (organizationId: OrganizationId) =>
     `${routes.knowledgeBase(organizationId)}/new`,
   collectionFiles: (organizationId: OrganizationId, collectionName: string) =>
-    `${routes.knowledgeBase(organizationId)}/${collectionName}`,
+    `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
+      collectionName
+    )}`,
   collectionFilesNew: (
     organizationId: OrganizationId,
     collectionName: string

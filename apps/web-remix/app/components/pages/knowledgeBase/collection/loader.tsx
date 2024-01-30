@@ -17,7 +17,11 @@ export async function loader(args: LoaderFunctionArgs) {
       data: { id: collectionId },
     } = await fetch(
       KnowledgeBaseCollectionFromListResponse,
-      `/organizations/${params.organizationId}/memory_collections?collection_name=${params.collectionName}`
+      `/organizations/${
+        params.organizationId
+      }/memory_collections?collection_name=${encodeURIComponent(
+        params.collectionName
+      )}`
     );
     const knowledgeBase = await fetch(
       KnowledgeBaseFileListResponse,

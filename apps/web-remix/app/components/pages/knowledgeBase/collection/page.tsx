@@ -23,7 +23,7 @@ export function KnowledgeBaseCollectionPage() {
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const match = useMatch(
-    `${organizationId}/knowledge-base/${collectionName}/new`
+    `${organizationId}/knowledge-base/${encodeURIComponent(collectionName)}/new`
   );
   const isSidebarOpen = !!match;
 

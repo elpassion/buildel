@@ -7,8 +7,8 @@ import {
 import { Icon } from "@elpassion/taco";
 import { IconButton } from "~/components/iconButton";
 import { confirm } from "~/components/modal/confirm";
-import { useFetcher, useLoaderData } from "@remix-run/react";
-import { loader } from "./loader";
+import { useFetcher } from "@remix-run/react";
+
 interface KnowledgeBaseFileListProps {
   items: IKnowledgeBaseFileList;
 }
