@@ -186,7 +186,7 @@ defmodule Buildel.Blocks.MemorySearchTool do
      %{
        function: function,
        call_formatter: fn args ->
-         "\nDatabase 📑: Search \"#{args["query"]}\"\n"
+         "Database 📑: Search \"#{args["query"]}\"\n"
        end,
        response_formatter: fn _response ->
          ""

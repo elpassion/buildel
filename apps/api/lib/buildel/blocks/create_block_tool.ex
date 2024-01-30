@@ -149,10 +149,10 @@ defmodule Buildel.Blocks.CreateBlockTool do
      %{
        function: function,
        call_formatter: fn args ->
-         "\n@EL create block #{args["block"]["name"]}\n"
+         "@EL 🗨️: Create block #{args["block"]["name"]}\n"
        end,
        response_formatter: fn _response ->
-         ""
+         "@EL 🤖: #{response}\n"
        end
      }, state}
   end

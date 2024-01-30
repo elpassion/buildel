@@ -123,7 +123,7 @@ defmodule Buildel.Blocks.DocumentTool do
      %{
        function: function,
        call_formatter: fn args ->
-         "\nDatabase 📑: Document \"#{args["document_id"]}\"\n"
+         "Database 📑: Document \"#{args["document_id"]}\"\n"
        end,
        response_formatter: fn _response ->
          ""

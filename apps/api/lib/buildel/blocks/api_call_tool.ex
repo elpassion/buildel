@@ -185,7 +185,7 @@ defmodule Buildel.Blocks.ApiCallTool do
      %{
        function: function,
        call_formatter: fn args ->
-         "\nCalling API #{state[:opts].name} with \"#{inspect(args)}\"..."
+         "#{state[:opts].name} API 🖥️: #{Jason.encode!(args)}\n"
        end,
        response_formatter: fn _response ->
          ""
