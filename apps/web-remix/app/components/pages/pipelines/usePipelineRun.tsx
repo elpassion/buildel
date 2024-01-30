@@ -18,9 +18,11 @@ export function usePipelineRun(
 
   const [status, setStatus] = useState<BuildelRunStatus>("idle");
 
-  const startRun = async () => {
+  const startRun = async (
+    initialInputs: { name: string; value: string }[] = []
+  ) => {
     assert(run.current);
-    await run.current.start();
+    await run.current.start(initialInputs);
   };
   const stopRun = async () => {
     assert(run.current);

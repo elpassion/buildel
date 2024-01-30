@@ -31,6 +31,13 @@ defmodule BuildelWeb.PipelineChannel do
          {:ok, run} <-
            Pipelines.upsert_run(%{id: run_id, pipeline_id: pipeline_id, config: config}),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
+
+      %{"initial_inputs" => initial_inputs} = params
+
+      initial_inputs |> Enum.each(fn %{"name" => name, "value" => value} ->
+        process_input(name, value, run)
+      end)
+
       listen_to_outputs(run)
 
       {:ok, %{run: %{id: run.id}},
@@ -70,8 +77,14 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   def handle_in("input:" <> input, data, socket) do
+    process_input(input, data, socket.assigns.run)
+
+    {:noreply, socket}
+  end
+
+  defp process_input(input, data, run) do
     [block_name, input_name] = input |> String.split(":")
-    context_id = Pipelines.Worker.context_id(socket.assigns.run)
+    context_id = Pipelines.Worker.context_id(run)
 
     data =
       case data do
@@ -80,7 +93,6 @@ defmodule BuildelWeb.PipelineChannel do
       end
 
     Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
-    {:noreply, socket}
   end
 
   def handle_in(event, data, socket) do

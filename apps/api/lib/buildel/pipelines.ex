@@ -104,8 +104,8 @@ defmodule Buildel.Pipelines do
 
       blocks ->
         blocks_map = blocks |> Enum.into(%{}, fn block -> {block["name"], block} end)
-
         blocks
+        |> Enum.filter(fn block -> Buildel.Blocks.type(block["type"]) != nil end)
         |> Enum.map(fn block ->
           connections = Buildel.Blocks.Connection.connections_for_block(block["name"], blocks_map)
 

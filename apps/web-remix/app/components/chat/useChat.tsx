@@ -10,6 +10,12 @@ interface UseChatProps {
   output: string;
   organizationId: number;
   pipelineId: number;
+  onBlockOutput?: (
+    blockId: string,
+    outputName: string,
+    payload: unknown
+  ) => void;
+  onFinish?: () => void;
 }
 
 export const useChat = ({
@@ -17,6 +23,8 @@ export const useChat = ({
   output,
   organizationId,
   pipelineId,
+  onBlockOutput: onBlockOutputProps,
+  onFinish,
 }: UseChatProps) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -26,6 +34,7 @@ export const useChat = ({
     _outputName: string,
     payload: unknown
   ) => {
+    onBlockOutputProps?.(blockId, _outputName, payload);
     // todo: just text_output for now
     if (!blockId.includes(output)) return;
 
@@ -57,8 +66,10 @@ export const useChat = ({
     if (blockId.includes(input) && isWorking) {
       setIsGenerating(true);
     }
-    if (blockId.includes(output) && !isWorking) {
+    // @todo handle this chat block name
+    if (blockId.includes("chat_1") && !isWorking) {
       setIsGenerating(false);
+      onFinish?.();
     }
   };
 

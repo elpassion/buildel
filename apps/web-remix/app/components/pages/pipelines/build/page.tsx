@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import { LinksFunction, MetaFunction } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData, useRevalidator } from "@remix-run/react";
 import { ELProvider } from "~/components/pages/pipelines/EL/ELProvider";
 import { ELHelper } from "~/components/pages/pipelines/build/ELHelper";
 import { IPipeline, IPipelineConfig } from "../pipeline.types";
@@ -18,6 +18,7 @@ import { loader } from "./loader";
 export const links: LinksFunction = () => [...SubMenuLinks()];
 
 export function PipelineBuilder() {
+  const revalidator = useRevalidator();
   const updateFetcher = useFetcher<IPipeline>();
   const { pipeline } = useLoaderData<typeof loader>();
 
@@ -30,6 +31,10 @@ export function PipelineBuilder() {
     },
     [updateFetcher, pipeline]
   );
+
+  const handleRevalidate = () => {
+    revalidator.revalidate();
+  };
 
   return (
     <EditBlockSidebarProvider>
@@ -50,7 +55,11 @@ export function PipelineBuilder() {
             />
 
             <ELProvider>
-              {/*<ELHelper />*/}
+              {/*<ELHelper*/}
+              {/*  pipelineId={pipelineId}*/}
+              {/*  organizationId={organizationId}*/}
+              {/*  onBlockCreate={handleRevalidate}*/}
+              {/*/>*/}
 
               <CreateBlockFloatingMenu onCreate={onBlockCreate} />
             </ELProvider>

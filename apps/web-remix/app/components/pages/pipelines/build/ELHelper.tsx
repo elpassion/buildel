@@ -32,7 +32,17 @@ const INITIAL_MESSAGES = [
   },
 ];
 
-export const ELHelper: React.FC = () => {
+interface ELHelperProps {
+  pipelineId: string;
+  organizationId: string;
+  onBlockCreate: () => void;
+}
+
+export const ELHelper: React.FC<ELHelperProps> = ({
+  pipelineId,
+  organizationId,
+  onBlockCreate,
+}) => {
   const { isShown, hide } = useEl();
   const {
     isGenerating,
@@ -41,11 +51,24 @@ export const ELHelper: React.FC = () => {
     stopRun,
     startRun,
     messages,
-  } = useChat();
+  } = useChat({
+    pipelineId: 135,
+    organizationId: 13,
+    input: "text_input_1",
+    output: "text_output_1",
+    onFinish: onBlockCreate,
+  });
 
   useEffect(() => {
     // todo change it
-    setTimeout(() => startRun(), 500);
+    setTimeout(
+      () =>
+        startRun([
+          { name: "text_input_2:input", value: organizationId },
+          { name: "text_input_3:input", value: pipelineId },
+        ]),
+      500
+    );
 
     return () => {
       stopRun();
@@ -62,7 +85,7 @@ export const ELHelper: React.FC = () => {
         }
       )}
     >
-      <ChatWrapper className="w-[440px]">
+      <ChatWrapper className="!w-[440px]">
         <ChatHeader>
           <div className="flex gap-2 items-center">
             <ChatHeading>
