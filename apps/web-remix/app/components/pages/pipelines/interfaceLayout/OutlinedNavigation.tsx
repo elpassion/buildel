@@ -15,6 +15,7 @@ export const OutlinedNavigation: React.FC<PropsWithChildren> = ({
 export const OutlinedNavigationLink = ({ children, ...rest }: NavLinkProps) => {
   return (
     <NavLink
+      prefetch="intent"
       className={({ isActive }) =>
         classNames("text-sm pb-2 px-3", {
           "border-b-2 border-white text-white": isActive,
