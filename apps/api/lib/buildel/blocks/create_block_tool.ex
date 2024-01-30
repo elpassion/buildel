@@ -1,6 +1,5 @@
 defmodule Buildel.Blocks.CreateBlockTool do
   alias Buildel.Blocks
-  alias Buildel.Blocks.TextInput
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
   use Buildel.Blocks.Block

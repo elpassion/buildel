@@ -31,10 +31,9 @@ defmodule BuildelWeb.PipelineChannel do
          {:ok, run} <-
            Pipelines.upsert_run(%{id: run_id, pipeline_id: pipeline_id, config: config}),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
-
-      %{"initial_inputs" => initial_inputs} = params
-
-      initial_inputs |> Enum.each(fn %{"name" => name, "value" => value} ->
+      params
+      |> Map.get("initial_inputs", [])
+      |> Enum.each(fn %{"name" => name, "value" => value} ->
         process_input(name, value, run)
       end)
 
@@ -82,6 +81,11 @@ defmodule BuildelWeb.PipelineChannel do
     {:noreply, socket}
   end
 
+  def handle_in(event, data, socket) do
+    Logger.warning("Unhandled message #{inspect(event)}: #{inspect(data)}")
+    {:noreply, socket}
+  end
+
   defp process_input(input, data, run) do
     [block_name, input_name] = input |> String.split(":")
     context_id = Pipelines.Worker.context_id(run)
@@ -93,11 +97,6 @@ defmodule BuildelWeb.PipelineChannel do
       end
 
     Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
-  end
-
-  def handle_in(event, data, socket) do
-    Logger.warning("Unhandled message #{inspect(event)}: #{inspect(data)}")
-    {:noreply, socket}
   end
 
   def handle_info({output_name, :binary, chunk}, socket) do
