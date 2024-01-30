@@ -325,8 +325,8 @@ defmodule Buildel.Blocks.Chat do
        call_formatter: fn %{"message" => message} = _args ->
          "@#{state.block.name} 🗨️:  #{message}\n"
        end,
-       response_formatter: fn response ->
-         "@#{state.block.name} 🤖: #{response}\n"
+       response_formatter: fn _response ->
+         ""
        end
      }, state}
   end

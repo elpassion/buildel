@@ -79,7 +79,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   def call_api_sync(pid, args) do
-    GenServer.call(pid, {:call_api, args})
+    GenServer.call(pid, {:call_api, args}, :infinity)
   end
 
   # Server
