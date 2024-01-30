@@ -20,7 +20,8 @@ export const links: LinksFunction = () => [...SubMenuLinks()];
 export function PipelineBuilder() {
   const revalidator = useRevalidator();
   const updateFetcher = useFetcher<IPipeline>();
-  const { pipeline } = useLoaderData<typeof loader>();
+  const { pipeline, pipelineId, organizationId } =
+    useLoaderData<typeof loader>();
 
   const handleUpdatePipeline = useCallback(
     (config: IPipelineConfig) => {
