@@ -10,6 +10,7 @@ import { useCallback, useMemo } from "react";
 import { IconButton } from "~/components/iconButton";
 import { Icon } from "@elpassion/taco";
 import { useEditBlockSidebar } from "./EditBlockSidebarProvider";
+import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 
 export function BuilderNode(props: CustomNodeProps) {
   return (
@@ -67,6 +68,16 @@ function BuilderNodeHeaderActions({
 
   return (
     <div className="flex gap-2 items-center">
+      <div className="w-4 h-[22px]">
+        <CopyCodeButton
+          value={JSON.stringify({
+            name: data.name,
+            opts: data.opts,
+            type: data.type,
+          })}
+        />
+      </div>
+
       {isEditable && (
         <IconButton
           onlyIcon
