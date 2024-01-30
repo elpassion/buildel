@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.CreateBlockTool do
+  alias Buildel.Blocks
   alias Buildel.Blocks.TextInput
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
@@ -91,8 +92,13 @@ defmodule Buildel.Blocks.CreateBlockTool do
 
     with {:ok, organization_id} <- get_input_value(state, "organization_id"),
          {:ok, pipeline_id} <- get_input_value(state, "pipeline_id"),
-         {:ok, %{block: block_config}} <-
-           validate(:create_block, arguments),
+         {:ok, %{block: block_config}} <- validate(:create_block, arguments),
+         block_type when is_atom(block_type) <- Blocks.type(block_config.type),
+         :ok <-
+           Blocks.validate_block(
+             block_type,
+             arguments["block"] |> Map.put_new("inputs", []) |> Map.put_new("connections", [])
+           ),
          organization <-
            Buildel.Organizations.get_organization!(organization_id),
          {:ok, %Pipeline{} = pipeline} <-
@@ -129,8 +135,12 @@ defmodule Buildel.Blocks.CreateBlockTool do
                 name: %{
                   type: "string"
                 },
-                # TODO: Add support for other block types
-                opts: TextInput.schema().properties.opts,
+                opts: %{
+                  type: "object",
+                  description: "Block options. See block json schema for more details.",
+                  properties: %{},
+                  required: []
+                },
                 type: %{
                   type: "string"
                 }

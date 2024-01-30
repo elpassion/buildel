@@ -5,6 +5,7 @@ end
 defmodule Buildel.Clients.Webhook do
   alias Buildel.Clients.WebhookBehaviour
   @behaviour Buildel.Clients.WebhookBehaviour
+  require Logger
 
   @impl WebhookBehaviour
   def send_content(url, payload, headers \\ []) do

@@ -11,7 +11,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   def options() do
     %{
       type: "api_call_tool",
-      description: "Enables the configuration and execution of HTTP requests.",
+      description: "Tool used to call HTTP APIs.",
       groups: ["text", "tools"],
       inputs: [],
       outputs: [],
@@ -30,7 +30,7 @@ defmodule Buildel.Blocks.ApiCallTool do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["method", "url", "name", "description", "parameters"],
+            "required" => ["method", "url", "description", "parameters"],
             "properties" =>
               Jason.OrderedObject.new(
                 method: %{
@@ -44,12 +44,8 @@ defmodule Buildel.Blocks.ApiCallTool do
                 url: %{
                   "type" => "string",
                   "title" => "URL",
-                  "description" => "The URL to send the request to."
-                },
-                name: %{
-                  "type" => "string",
-                  "title" => "Name",
-                  "description" => "The name of the API call."
+                  "description" =>
+                    "The URL to send the request to. If you want to use a variable, use {{variable_name}}. Notice the double curly braces!"
                 },
                 description: %{
                   "type" => "string",
@@ -60,7 +56,7 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "type" => "string",
                   "title" => "Parameters",
                   "description" =>
-                    "Valid JSONSchema definition of the parameters passed to api call.",
+                    "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. ie. {\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}.",
                   "presentAs" => "editor",
                   "editorLanguage" => "json"
                 },
@@ -173,7 +169,7 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     function =
       Function.new!(%{
-        name: state[:opts].name,
+        name: state.block.name,
         description: state[:opts].description,
         parameters_schema: state[:parameters],
         function: fn args, _context ->
@@ -185,7 +181,7 @@ defmodule Buildel.Blocks.ApiCallTool do
      %{
        function: function,
        call_formatter: fn args ->
-         "#{state[:opts].name} API 🖥️: #{Jason.encode!(args)}\n"
+         "#{state.block.name} API 🖥️: #{Jason.encode!(args)}\n"
        end,
        response_formatter: fn _response ->
          ""
