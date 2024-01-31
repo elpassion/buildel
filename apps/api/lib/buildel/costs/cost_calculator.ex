@@ -29,6 +29,10 @@ defmodule Buildel.Costs.CostCalculator do
       "gpt-4-1106-preview" => %{
         input_token_price: Decimal.new("0.01") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.03") |> Decimal.div(1000)
+      },
+      "gpt-4-turbo-preview" => %{
+        input_token_price: Decimal.new("0.01") |> Decimal.div(1000),
+        output_token_price: Decimal.new("0.03") |> Decimal.div(1000)
       }
     }
     |> Map.get(model, %{
