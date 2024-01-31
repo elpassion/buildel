@@ -68,15 +68,15 @@ function BuilderNodeHeaderActions({
 
   return (
     <div className="flex gap-2 items-center">
-      <div className="w-4 h-[22px]">
-        <CopyCodeButton
-          value={JSON.stringify({
-            name: data.name,
-            opts: data.opts,
-            type: data.type,
-          })}
-        />
-      </div>
+      {/*<div className="w-4 h-[22px]">*/}
+      {/*  <CopyCodeButton*/}
+      {/*    value={JSON.stringify({*/}
+      {/*      name: data.name,*/}
+      {/*      opts: data.opts,*/}
+      {/*      type: data.type,*/}
+      {/*    })}*/}
+      {/*  />*/}
+      {/*</div>*/}
 
       {isEditable && (
         <IconButton

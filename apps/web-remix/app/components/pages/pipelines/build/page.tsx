@@ -7,17 +7,15 @@ import { IPipeline, IPipelineConfig } from "../pipeline.types";
 import { toPipelineConfig } from "../PipelineFlow.utils";
 import { CustomEdge } from "../CustomEdges/CustomEdge";
 import { Builder } from "../Builder";
+import { PasteBlockConfigProvider } from "./CreateBlock/PasteBlockConfigProvider";
 import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
+import { PasteBlockConfiguration } from "./CreateBlock/PastConfigSidebar";
 import { EditBlockSidebarProvider } from "./EditBlockSidebarProvider";
 import { links as SubMenuLinks } from "./CreateBlock/GroupSubMenu";
+import { BuilderHeader, SaveChangesButton } from "./BuilderHeader";
 import { EditBlockSidebar } from "./EditBlockSidebar";
-import { loader } from "./loader";
 import { BuilderNode } from "./BuilderNode";
-import {
-  BuilderHeader,
-  PasteBlockConfiguration,
-  SaveChangesButton,
-} from "./BuilderHeader";
+import { loader } from "./loader";
 
 export const links: LinksFunction = () => [...SubMenuLinks()];
 
@@ -52,8 +50,6 @@ export function PipelineBuilder() {
         {({ edges, nodes, isUpToDate, onBlockCreate }) => (
           <>
             <BuilderHeader isUpToDate={isUpToDate}>
-              <PasteBlockConfiguration onSubmit={onBlockCreate} />
-
               <SaveChangesButton
                 isSaving={updateFetcher.state !== "idle"}
                 isUpToDate={isUpToDate}
@@ -69,8 +65,11 @@ export function PipelineBuilder() {
               {/*  organizationId={organizationId}*/}
               {/*  onBlockCreate={handleRevalidate}*/}
               {/*/>*/}
+              <PasteBlockConfigProvider>
+                <CreateBlockFloatingMenu onCreate={onBlockCreate} />
 
-              <CreateBlockFloatingMenu onCreate={onBlockCreate} />
+                <PasteBlockConfiguration onSubmit={onBlockCreate} />
+              </PasteBlockConfigProvider>
             </ELProvider>
 
             <EditBlockSidebar

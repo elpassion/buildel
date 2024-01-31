@@ -10,6 +10,7 @@ import {
 import { Menu } from "~/components/menu/Menu";
 import { GroupSubMenu } from "./GroupSubMenu";
 import { CreateBlockDraggableItem } from "./CreateBlockDraggableItem";
+import { PasteConfigItem } from "./PasteConfigItem";
 
 interface CreateBlockFloatingMenuProps {
   onCreate: (node: IBlockConfig) => void;
@@ -66,6 +67,8 @@ export const CreateBlockFloatingMenu: React.FC<
             <SubMenuItems group={group} />
           </GroupSubMenu>
         ))}
+
+        <PasteConfigItem />
       </Menu>
     </div>
   );

@@ -29,6 +29,8 @@ import {
 } from "~/components/pages/pipelines/pipeline.types";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
+import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
+import { successToast } from "~/components/toasts/successToast";
 
 export function EditBlockForm({
   onSubmit,
@@ -196,6 +198,16 @@ export function EditBlockForm({
     >
       <InputsProvider inputs={inputs} updateInputReset={updateInputReset}>
         <div className="space-y-4 grow max-h-full overflow-y-auto px-1">
+          <div className="flex justify-end">
+            <CopyConfigurationButton
+              value={JSON.stringify({
+                name: blockConfig.name,
+                opts: blockConfig.opts,
+                type: blockConfig.type,
+              })}
+            />
+          </div>
+
           <FormField name="name">
             <TextInputField
               name="name"
@@ -321,4 +333,28 @@ function EditorField({ field, name, blockConfig }: EditorFieldProps) {
   };
 
   return <FormField name={name}>{renderEditorByLanguage()}</FormField>;
+}
+
+interface CopyConfigurationButtonProps {
+  value: string;
+}
+
+function CopyConfigurationButton({ value }: CopyConfigurationButtonProps) {
+  const { copy, isCopied } = useCopyToClipboard(value ?? "");
+
+  useEffect(() => {
+    if (isCopied) {
+      successToast({ description: "Configuration copied!" });
+    }
+  }, [isCopied]);
+
+  return (
+    <button
+      onClick={copy}
+      type="button"
+      className="self-end text-sm text-neutral-100 underline bg-transparent !border-none hover:text-primary-500"
+    >
+      Copy configuration
+    </button>
+  );
 }
