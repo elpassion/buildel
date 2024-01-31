@@ -10,6 +10,7 @@ import { ValidatedForm } from "remix-validated-form";
 import { HiddenField } from "~/components/form/fields/field.context";
 import { withZod } from "@remix-validated-form/with-zod";
 import { schema } from "./schema";
+import { Duplicate } from "~/icons/Duplicate";
 
 interface PipelinesListItemProps extends PropsWithChildren {
   className?: string;
@@ -111,7 +112,7 @@ function DuplicateForm({ pipeline }: DuplicateFormProps) {
         aria-label="Duplicate workflow"
         className="opacity-0 group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500"
         title={`Duplicate workflow: ${pipeline.name}`}
-        icon={<Icon iconName="copy" />}
+        icon={<Duplicate className="w-3.5 h-3.5" />}
       />
     </ValidatedForm>
   );
