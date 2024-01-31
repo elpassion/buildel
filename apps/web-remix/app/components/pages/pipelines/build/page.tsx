@@ -11,9 +11,13 @@ import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
 import { EditBlockSidebarProvider } from "./EditBlockSidebarProvider";
 import { links as SubMenuLinks } from "./CreateBlock/GroupSubMenu";
 import { EditBlockSidebar } from "./EditBlockSidebar";
-import { BuilderHeader } from "./BuilderHeader";
-import { BuilderNode } from "./BuilderNode";
 import { loader } from "./loader";
+import { BuilderNode } from "./BuilderNode";
+import {
+  BuilderHeader,
+  PasteBlockConfiguration,
+  SaveChangesButton,
+} from "./BuilderHeader";
 
 export const links: LinksFunction = () => [...SubMenuLinks()];
 
@@ -47,13 +51,17 @@ export function PipelineBuilder() {
       >
         {({ edges, nodes, isUpToDate, onBlockCreate }) => (
           <>
-            <BuilderHeader
-              isUpToDate={isUpToDate}
-              isSaving={updateFetcher.state !== "idle"}
-              onSave={() => {
-                handleUpdatePipeline(toPipelineConfig(nodes, edges));
-              }}
-            />
+            <BuilderHeader isUpToDate={isUpToDate}>
+              <PasteBlockConfiguration onSubmit={onBlockCreate} />
+
+              <SaveChangesButton
+                isSaving={updateFetcher.state !== "idle"}
+                isUpToDate={isUpToDate}
+                onSave={() => {
+                  handleUpdatePipeline(toPipelineConfig(nodes, edges));
+                }}
+              />
+            </BuilderHeader>
 
             <ELProvider>
               {/*<ELHelper*/}

@@ -10,8 +10,6 @@ import {
 import { Menu } from "~/components/menu/Menu";
 import { GroupSubMenu } from "./GroupSubMenu";
 import { CreateBlockDraggableItem } from "./CreateBlockDraggableItem";
-import { ELMenuItem } from "./ELMenuItem";
-import { ELProvider } from "~/components/pages/pipelines/EL/ELProvider";
 
 interface CreateBlockFloatingMenuProps {
   onCreate: (node: IBlockConfig) => void;
