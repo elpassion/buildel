@@ -1,30 +1,44 @@
+import { useEffect } from "react";
 import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { loader } from "./loader";
+import { useInView } from "react-intersection-observer";
 import { PipelineRunsList, PipelineRunsListHeader } from "./PipelineRunsList";
-import { useMemo } from "react";
-export function OverviewPage() {
-  const { pipelineRuns, pipelineId, organizationId } =
-    useLoaderData<typeof loader>();
+import { useInfiniteFetch } from "~/components/pagination/useInfiniteFetch";
+import { IPipelineRun } from "~/components/pages/pipelines/pipeline.types";
+import { routes } from "~/utils/routes.utils";
+import { loader } from "./loader";
 
-  const totalCost = useMemo(() => {
-    return pipelineRuns.reduce(
-      (acc, run) =>
-        acc +
-        run.costs.reduce(
-          (costAcc, cost) => costAcc + Number(cost.data.amount),
-          0
-        ),
-      0
-    );
-  }, [pipelineRuns]);
+export function OverviewPage() {
+  const { ref: fetchNextRef, inView } = useInView();
+  const {
+    pipelineRuns: initialRuns,
+    pipelineId,
+    organizationId,
+    pagination,
+    totalCost,
+    totalRuns,
+  } = useLoaderData<typeof loader>();
+
+  const { hasNextPage, data, fetchNextPage, isFetchingNextPage } =
+    useInfiniteFetch<IPipelineRun, typeof loader>({
+      pagination,
+      initialData: initialRuns,
+      loaderUrl: routes.pipelineRuns(organizationId, pipelineId),
+      dataExtractor: (response) => response.data?.pipelineRuns,
+    });
+
+  useEffect(() => {
+    if (inView) {
+      fetchNextPage();
+    }
+  }, [inView]);
 
   return (
     <section className="pt-5 pb-1 overflow-x-auto">
       <div className="flex gap-3 py-4 px-2 mt-3 mb-6 border-b-1 border-neutral-800">
         <p className="text-white">
           <span className="text-sm text-neutral-100">Runs: </span>
-          {pipelineRuns.length}
+          {totalRuns}
         </p>
         <p className="text-white">
           <span className="text-sm text-neutral-100">Summary cost: </span>
@@ -33,13 +47,27 @@ export function OverviewPage() {
       </div>
 
       <div className="min-w-[550px]">
-        {pipelineRuns.length > 0 ? <PipelineRunsListHeader /> : null}
+        {data.length > 0 ? <PipelineRunsListHeader /> : null}
 
         <PipelineRunsList
-          items={pipelineRuns}
+          items={data}
           pipelineId={pipelineId}
           organizationId={organizationId}
         />
+
+        <div className="flex justify-center mt-4" ref={fetchNextRef}>
+          <button
+            onClick={fetchNextPage}
+            disabled={!hasNextPage}
+            className="text-neutral-200 disabled:text-neutral-400 text-sm"
+          >
+            {isFetchingNextPage
+              ? "Fetching..."
+              : hasNextPage
+              ? "Fetch"
+              : "No more data"}
+          </button>
+        </div>
       </div>
     </section>
   );

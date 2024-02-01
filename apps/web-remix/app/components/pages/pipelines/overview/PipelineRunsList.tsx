@@ -37,15 +37,14 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
 };
 
 const LIST_LAYOUT_STYLES =
-  "grid gap-1 grid-cols-[2fr_2fr_1fr_1fr] md:gap-2 md:grid-cols-[3fr_2fr_1fr_1fr]";
+  "grid gap-1 grid-cols-[2fr_1fr_1fr] md:gap-2 md:grid-cols-[3fr_1fr_1fr]";
 
 export const PipelineRunsListHeader = () => {
   return (
     <header
       className={classNames("text-white text-xs py-2 px-6", LIST_LAYOUT_STYLES)}
     >
-      <p>Run</p>
-      <p>Time</p>
+      <p>Date</p>
       <p>Run costs ($)</p>
       <p>Status</p>
     </header>
@@ -72,12 +71,6 @@ export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({
         LIST_LAYOUT_STYLES
       )}
     >
-      <header className="max-w-full truncate">
-        <h3 className="text-lg font-medium text-white truncate max-w-full">
-          Run: {index + 1}
-        </h3>
-      </header>
-
       <p className="text-white text-sm">
         {dayjs(data.created_at).format("DD MMM HH:mm")}
       </p>
