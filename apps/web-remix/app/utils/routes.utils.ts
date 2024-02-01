@@ -42,6 +42,10 @@ export const routes = {
     `${routes.pipelineInterface(organizationId, pipelineId)}/website-chatbot`,
   pipelineSettings: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipeline(organizationId, pipelineId)}/settings`,
+  pipelineSettingsConfiguration: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId
+  ) => `${routes.pipelineSettings(organizationId, pipelineId)}/configuration`,
   pipelinesNew: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/pipelines/new`,
   knowledgeBase: (organizationId: OrganizationId) =>

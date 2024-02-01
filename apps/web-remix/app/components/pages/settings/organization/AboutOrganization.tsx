@@ -26,7 +26,7 @@ export const AboutOrganization: React.FC<AboutOrganizationProps> = ({
       <SectionHeading>About Organization</SectionHeading>
 
       <SectionContent>
-        <OrganizationAvatar organization={organization} />
+        <OrganizationAvatar name={organization.name} />
 
         <EditOrganizationName organization={organization} />
       </SectionContent>
@@ -35,19 +35,19 @@ export const AboutOrganization: React.FC<AboutOrganizationProps> = ({
 };
 
 interface OrganizationAvatarProps {
-  organization: IOrganization;
+  name: string;
 }
-function OrganizationAvatar({ organization }: OrganizationAvatarProps) {
+export function OrganizationAvatar({ name }: OrganizationAvatarProps) {
   return (
     <div className="flex gap-2 items-center">
       <Avatar
-        name={organization.name}
+        name={name}
         contentType="text"
         shape="circle"
         className="!bg-neutral-950 !text-white"
         size="sm"
       />
-      <h3 className="text-sm font-medium">{organization.name}</h3>
+      <h3 className="text-sm font-medium">{name}</h3>
     </div>
   );
 }

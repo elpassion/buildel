@@ -1,13 +1,31 @@
 import React, { useCallback } from "react";
+import {
+  Outlet,
+  useFetcher,
+  useLoaderData,
+  useMatch,
+  useNavigate,
+} from "@remix-run/react";
 import { MetaFunction } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
 import { EditPipelineNameForm } from "./EditPipelineNameForm";
 import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
 import { routes } from "~/utils/routes.utils";
+import {
+  Section,
+  SectionContent,
+  SectionHeading,
+} from "~/components/pages/settings/settingsLayout/PageLayout";
+import {
+  ActionSidebar,
+  ActionSidebarHeader,
+} from "~/components/sidebar/ActionSidebar";
+import { OrganizationAvatar } from "~/components/pages/settings/organization/AboutOrganization";
+import { BasicLink } from "~/components/link/BasicLink";
 import { loader } from "./loader";
 
 export function SettingsPage() {
-  const { pipeline } = useLoaderData<typeof loader>();
+  const { pipeline, organizationId, pipelineId } =
+    useLoaderData<typeof loader>();
   const updateFetcher = useFetcher<IPipeline>();
 
   const handleUpdatePipeline = useCallback(
@@ -22,16 +40,55 @@ export function SettingsPage() {
     [updateFetcher]
   );
 
+  const navigate = useNavigate();
+  const match = useMatch(
+    routes.pipelineSettingsConfiguration(organizationId, pipelineId)
+  );
+  const isSidebarOpen = !!match;
+
+  const handleCloseSidebar = () => {
+    navigate(routes.pipelineSettings(organizationId, pipelineId));
+  };
+
   return (
     <div className="mt-10">
-      <div className="bg-neutral-800 rounded-lg p-4 flex justify-between items-center gap-3 max-w-[400px]">
-        <h2 className="text-lg text-white">{pipeline.name}</h2>
+      <Section>
+        <div className="flex gap-3 justify-between items-center">
+          <SectionHeading>About Workflow</SectionHeading>
+          <BasicLink
+            className="text-sm underline text-neutral-200 hover:text-primary-500"
+            to={routes.pipelineSettingsConfiguration(
+              organizationId,
+              pipelineId
+            )}
+          >
+            Workflow configuration
+          </BasicLink>
+        </div>
 
-        <EditPipelineNameForm
-          defaultValues={pipeline}
-          onSubmit={handleUpdatePipeline}
+        <SectionContent>
+          <OrganizationAvatar name={pipeline.name} />
+
+          <EditPipelineNameForm
+            defaultValues={pipeline}
+            onSubmit={handleUpdatePipeline}
+          />
+        </SectionContent>
+      </Section>
+
+      <ActionSidebar
+        className="!bg-neutral-950 md:!w-[550px]"
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        overlay
+      >
+        <ActionSidebarHeader
+          heading="Workflow configuration"
+          subheading="Any workflow can contain many Blocks and use your Knowledge Base."
+          onClose={handleCloseSidebar}
         />
-      </div>
+        <Outlet />
+      </ActionSidebar>
     </div>
   );
 }

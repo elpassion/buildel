@@ -12,12 +12,12 @@ export const MonacoEditorField = forwardRef<
   HTMLInputElement,
   Partial<
     EditorProps & {
-      label: string;
+      label: ReactNode;
       supportingText: ReactNode;
-      error?: string;
+      error?: ReactNode;
     }
   >
->(({ label, error, supportingText, ...props }) => {
+>(({ label, error, supportingText, onChange, ...props }) => {
   const { name, getInputProps, validate } = useFieldContext();
   const [value, setValue] = useControlField<string | undefined>(name);
 
@@ -31,9 +31,10 @@ export const MonacoEditorField = forwardRef<
         height="130px"
         loading={<div className="w-full h-[130px] border border-neutral-200" />}
         value={value}
-        onChange={(v) => {
+        onChange={(v, e) => {
           setValue(v);
           validate();
+          onChange?.(v, e);
         }}
         {...props}
       />
