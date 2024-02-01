@@ -24,6 +24,12 @@ export function InterfaceLayout() {
           >
             Website Chatbot
           </OutlinedNavigationLink>
+
+          <OutlinedNavigationLink
+            to={routes.pipelineOpenAIApi(organizationId, pipelineId)}
+          >
+            OpenAI Api
+          </OutlinedNavigationLink>
         </OutlinedNavigation>
       </div>
 

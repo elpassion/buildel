@@ -1,4 +1,4 @@
 export {
   page as default,
   loader,
-} from "~/components/pages/pipelines/interfaceLayout";
+} from "~/components/pages/pipelines/interface/interfaceLayout";

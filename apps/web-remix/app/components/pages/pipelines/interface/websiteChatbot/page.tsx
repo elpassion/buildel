@@ -90,9 +90,9 @@ export function WebsiteChatbotPage() {
               Use this code snippet to deploy the form in your application.
             </p>
             <p>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took.
+              This snippet allows for a straightforward integration, offering
+              your visitors the convenience of engaging with Buildel Chat
+              directly on your site.
             </p>
           </div>
           <div className="w-full">

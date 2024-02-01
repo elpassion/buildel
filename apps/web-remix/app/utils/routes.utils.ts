@@ -40,6 +40,8 @@ export const routes = {
     pipelineId: PipelineId
   ) =>
     `${routes.pipelineInterface(organizationId, pipelineId)}/website-chatbot`,
+  pipelineOpenAIApi: (organizationId: OrganizationId, pipelineId: PipelineId) =>
+    `${routes.pipelineInterface(organizationId, pipelineId)}/openai-api`,
   pipelineSettings: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipeline(organizationId, pipelineId)}/settings`,
   pipelineSettingsConfiguration: (

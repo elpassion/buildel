@@ -13,7 +13,7 @@ import {
   PreviewSectionHeading,
   PreviewSectionStep,
   PreviewSectionText,
-} from "./PreviewSection";
+} from "../PreviewSection";
 import { loader } from "./loader";
 
 export function ClientSDKPage() {

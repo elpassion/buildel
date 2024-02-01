@@ -2,4 +2,4 @@ export {
   page as default,
   loader,
   meta,
-} from "~/components/pages/pipelines/clientSDK";
+} from "~/components/pages/pipelines/interface/clientSDK";
