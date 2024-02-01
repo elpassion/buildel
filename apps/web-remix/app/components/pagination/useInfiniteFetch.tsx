@@ -30,9 +30,13 @@ export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
   useEffect(() => {
     if (data[page] !== undefined) return;
 
-    fetcher.load(
-      args.loaderUrl + `?page=${page}&limit=${limit}&search=${search}`
-    );
+    const urlWithParams = buildUrlWithParams(args.loaderUrl, {
+      page,
+      limit,
+      search,
+    });
+
+    fetcher.load(urlWithParams);
   }, [page, limit, search]);
 
   useEffect(() => {
@@ -60,3 +64,18 @@ export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
     data: mergedData,
   };
 };
+
+function buildUrlWithParams(
+  baseUrl: string,
+  params: Record<string, string | number>
+) {
+  const url = new URL(baseUrl, window.location.origin);
+
+  Object.keys(params).forEach((key) => {
+    if (params[key] !== undefined && params[key] !== null) {
+      url.searchParams.set(key, params[key].toString());
+    }
+  });
+
+  return url.pathname + url.search;
+}
