@@ -42,6 +42,7 @@ interface BuilderProps {
   pipeline: IPipeline;
   CustomNode: ComponentType<CustomNodeProps>;
   CustomEdge: ComponentType<CustomEdgeProps>;
+  isUpdating?: boolean;
   children?: ({
     nodes,
     edges,
@@ -59,6 +60,7 @@ export const Builder = ({
   pipeline,
   children,
   type = "editable",
+  isUpdating,
   CustomNode,
   CustomEdge,
   className,
@@ -209,11 +211,11 @@ export const Builder = ({
 
   useEffect(() => {
     const currentConfig = toPipelineConfig(nodes, edges);
-    if (!isEqual(currentConfig, pipeline.config)) {
+    if (!isUpdating && !isEqual(currentConfig, pipeline.config)) {
       setNodes(getNodes(pipeline.config));
       setEdges(getEdges(pipeline.config));
     }
-  }, [pipeline]);
+  }, [pipeline, isUpdating]);
 
   return (
     <div

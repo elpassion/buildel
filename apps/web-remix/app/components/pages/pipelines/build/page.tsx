@@ -62,13 +62,14 @@ export function PipelineBuilder() {
         CustomNode={BuilderNode}
         CustomEdge={CustomEdge}
         className="h-[calc(100vh_-_128px)]"
+        isUpdating={updateFetcher.state !== "idle"}
       >
         {({ edges, nodes, isUpToDate, onBlockCreate }) => (
           <>
             <BuilderHeader isUpToDate={isUpToDate}>
               <SaveChangesButton
-                isSaving={updateFetcher.state !== "idle"}
                 isUpToDate={isUpToDate}
+                isSaving={updateFetcher.state !== "idle"}
                 onSave={() => {
                   handleUpdatePipeline(toPipelineConfig(nodes, edges));
                 }}

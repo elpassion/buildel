@@ -1,8 +1,9 @@
 import invariant from "tiny-invariant";
-import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { PipelineResponse } from "~/components/pages/pipelines/contracts";
+import { routes } from "~/utils/routes.utils";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -21,10 +22,9 @@ export async function loader(args: LoaderFunctionArgs) {
     );
 
     if (!currentBlock) {
-      throw new Response(null, {
-        status: 404,
-        statusText: "Block not exists",
-      });
+      return redirect(
+        routes.pipelineBuild(params.organizationId, params.pipelineId)
+      );
     }
 
     return json({
