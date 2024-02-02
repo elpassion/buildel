@@ -1,55 +1,48 @@
-import React, { forwardRef } from "react";
-import { SingleValue } from "react-select";
-import { IDropdownOption } from "@elpassion/taco/Dropdown";
+import React, { forwardRef, ReactNode } from "react";
+import { useControlField, useFormContext } from "remix-validated-form";
+import { InputText, Label } from "@elpassion/taco";
 import {
   HiddenField,
   useFieldContext,
 } from "~/components/form/fields/field.context";
-import { useControlField, useFormContext } from "remix-validated-form";
 import {
   SelectInput,
   SelectInputProps,
-} from "~/components/form/inputs/select.input";
+} from "~/components/form/inputs/select/select.input";
 
-type SelectFieldProps = Omit<SelectInputProps, "onSelect" | "id">;
+interface SelectFieldProps extends SelectInputProps {
+  label?: ReactNode;
+  supportingText?: ReactNode;
+  errorMessage?: ReactNode;
+}
 
 export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
-  ({ defaultValue, options, ...props }, _ref) => {
+  (
+    { defaultValue, options, label, supportingText, errorMessage, ...props },
+    _ref
+  ) => {
     const { name, getInputProps } = useFieldContext();
     const [selectedId, setSelectedId] = useControlField<string>(name);
-
-    const getSelectedOption = () => {
-      return options.find((option) => option.id.toString() === selectedId);
-    };
-
-    const selectedOption = getSelectedOption();
 
     const { fieldErrors } = useFormContext();
 
     return (
-      <>
+      <div>
         <HiddenField value={selectedId ?? ""} {...getInputProps()} />
+        <Label text={label} />
         <SelectInput
-          key={name}
           id={name}
           options={options}
-          errorMessage={fieldErrors[name]}
-          value={selectedOption && toSelectOption(selectedOption)}
-          onSelect={(option: SingleValue<IDropdownOption>) => {
-            if (option) {
-              setSelectedId(option.id);
-            }
-          }}
+          value={selectedId}
+          placeholder="Select..."
+          onChange={setSelectedId}
           {...props}
         />
-      </>
+        <InputText
+          text={errorMessage || fieldErrors[name] || supportingText}
+          error={!!(errorMessage || fieldErrors[name])}
+        />
+      </div>
     );
   }
 );
-export function toSelectOption(item: IDropdownOption) {
-  return {
-    id: item.id.toString(),
-    value: item.id.toString(),
-    label: item.label,
-  };
-}

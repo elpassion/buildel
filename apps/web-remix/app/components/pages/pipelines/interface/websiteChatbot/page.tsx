@@ -3,7 +3,6 @@ import { MetaFunction } from "@remix-run/node";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { BasicLink } from "~/components/link/BasicLink";
 import { routes } from "~/utils/routes.utils";
-import { ClientOnly } from "~/utils/ClientOnly";
 import { successToast } from "~/components/toasts/successToast";
 import {
   IInterfaceConfig,
@@ -70,9 +69,7 @@ export function WebsiteChatbotPage() {
         </ChatbotSectionHeader>
 
         <div className="p-6 grid grid-cols-1 gap-3 min-h-[174px]">
-          <ClientOnly>
-            <InterfaceConfigForm pipeline={pipeline} onSubmit={handleUpdate} />
-          </ClientOnly>
+          <InterfaceConfigForm pipeline={pipeline} onSubmit={handleUpdate} />
         </div>
       </ChatbotSectionWrapper>
 
