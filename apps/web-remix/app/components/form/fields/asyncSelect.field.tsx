@@ -1,83 +1,60 @@
-import React, { forwardRef, useCallback, useEffect, useState } from "react";
+import React, { forwardRef, ReactNode, useCallback } from "react";
+import { useControlField } from "remix-validated-form";
+import { InputText, Label } from "@elpassion/taco";
 import {
   HiddenField,
   useFieldContext,
 } from "~/components/form/fields/field.context";
 import {
-  AsyncSelectInput,
   AsyncSelectInputProps,
-} from "~/components/form/inputs/asyncSelect.input";
-import {
-  asyncSelectApi,
-  IAsyncSelectItem,
-  IAsyncSelectItemList,
-} from "~/api/AsyncSelectApi";
-import { useControlField } from "remix-validated-form";
-import { IDropdownOption } from "@elpassion/taco/Dropdown";
-import { SingleValue } from "react-select";
+  AsyncSelectInput,
+} from "~/components/form/inputs/select/select.input";
+import { asyncSelectApi, IAsyncSelectItem } from "~/api/AsyncSelectApi";
 
-export interface AsyncSelectFieldProps
-  extends Partial<Omit<AsyncSelectInputProps, "defaultValue">> {
+export interface AsyncSelectFieldProps extends Partial<AsyncSelectInputProps> {
   url: string;
-  defaultValue?: string;
+  label?: ReactNode;
+  supportingText?: ReactNode;
+  errorMessage?: ReactNode;
 }
 
 export const AsyncSelectField = forwardRef<
   HTMLSelectElement,
   AsyncSelectFieldProps
->(({ url, defaultValue, ...props }, _ref) => {
-  const { name, getInputProps } = useFieldContext();
-  const [selectedId, setSelectedId] = useControlField<string>(name);
-  const [options, setOptions] = useState<IAsyncSelectItemList>([]);
+>(
+  (
+    { url, defaultValue, label, supportingText, errorMessage, ...props },
+    _ref
+  ) => {
+    const { name, getInputProps } = useFieldContext();
+    const [selectedId, setSelectedId] = useControlField<string>(name);
 
-  const loadOptions = useCallback(
-    (_input: string, callback: (options: IDropdownOption[]) => void) => {
-      asyncSelectApi.getData(url).then((options) => {
-        if (
-          defaultValue &&
-          !options.find((option) => option.id === defaultValue)
-        ) {
-          options = [{ id: defaultValue, name: defaultValue }, ...options];
-        }
-        setOptions(options);
-        callback(options.map(toSelectOption));
-      });
-    },
-    [url, options, defaultValue]
-  );
+    const fetcher = useCallback(async () => {
+      return asyncSelectApi
+        .getData(url)
+        .then((opts) => opts.map(toSelectOption));
+    }, [url]);
 
-  useEffect(() => {
-    if (!selectedId && defaultValue) {
-      setSelectedId(defaultValue);
-    }
-  }, [selectedId, setSelectedId, defaultValue]);
-
-  const getSelectedOption = () => {
-    return options.find((option) => option.id.toString() === selectedId);
-  };
-
-  const selectedOption = getSelectedOption();
-
-  return (
-    <>
-      <HiddenField value={selectedId} {...getInputProps()} />
-      <AsyncSelectInput
-        key={name + url}
-        cacheOptions
-        defaultOptions
-        id={name}
-        value={selectedOption && toSelectOption(selectedOption)}
-        loadOptions={loadOptions}
-        onSelect={(option: SingleValue<IDropdownOption>) => {
-          if (option) {
-            setSelectedId(option.id);
-          }
-        }}
-        {...props}
-      />
-    </>
-  );
-});
+    return (
+      <>
+        <HiddenField value={selectedId} {...getInputProps()} />
+        <Label text={label} />
+        <AsyncSelectInput
+          placeholder="Select..."
+          fetchOptions={fetcher}
+          defaultValue={defaultValue}
+          onChange={setSelectedId}
+          value={selectedId}
+          {...props}
+        />
+        <InputText
+          text={errorMessage ?? supportingText}
+          error={!!errorMessage}
+        />
+      </>
+    );
+  }
+);
 export function toSelectOption(item: IAsyncSelectItem) {
   return {
     id: item.id.toString(),

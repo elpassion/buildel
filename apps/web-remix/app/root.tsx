@@ -13,6 +13,7 @@ import {
 } from "@remix-run/react";
 import { Toaster } from "~/components/toasts/Toaster";
 import menuStyles from "rc-menu/assets/index.css";
+import selectStyles from "~/components/form/inputs/select/select.input.css";
 import styles from "./tailwind.css";
 import { GlobalNotFound } from "~/components/errorBoundaries/GlobalNotFound";
 import { GlobalRuntime } from "~/components/errorBoundaries/GlobalRuntime";
@@ -21,10 +22,12 @@ export const links: LinksFunction = () => [
     ? [
         { rel: "stylesheet", href: cssBundleHref },
         { rel: "stylesheet", href: menuStyles },
+        { rel: "stylesheet", href: selectStyles },
       ]
     : [
         { rel: "stylesheet", href: styles },
         { rel: "stylesheet", href: menuStyles },
+        { rel: "stylesheet", href: selectStyles },
       ]),
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {

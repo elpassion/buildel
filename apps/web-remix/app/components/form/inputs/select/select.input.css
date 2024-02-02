@@ -1,0 +1,57 @@
+@import "rc-select/assets/index.css";
+
+.rc-select{
+    @apply w-full
+}
+
+.rc-select .rc-select-selector{
+    @apply rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !bg-neutral-800
+}
+
+.rc-select-focused .rc-select-selector{
+    @apply outline outline-offset-[2px] outline-[2px] outline-primary-500
+}
+
+.rc-select .rc-select-selector .rc-select-selection-search-input{
+    @apply !bg-neutral-800 !shadow-none !ring-0 !text-white !text-sm !h-[40px]
+}
+
+.rc-select .rc-select-selection-placeholder{
+    @apply !text-neutral-100  !opacity-100
+}
+
+.rc-select .rc-select-selection-item, .rc-select .rc-select-selection-placeholder {
+    @apply !top-1/2 !left-3 -translate-y-1/2 !text-sm !text-white
+}
+
+.rc-select .rc-select-clear{
+    @apply !text-white !text-sm !cursor-pointer !absolute !top-1/2 right-3 -translate-y-1/2
+}
+
+.rc-select-dropdown{
+    @apply !min-h-fit !bg-neutral-700 !rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !z-[51]
+}
+
+.rc-select-dropdown .rc-select-item-empty{
+    @apply !text-neutral-100 !my-2 !text-sm
+}
+
+.rc-select-dropdown .rc-select-item-option{
+    @apply !cursor-pointer
+}
+
+.rc-select-dropdown .rc-select-item-option .rc-select-item-option-content{
+    @apply !text-white !text-sm !py-2
+}
+
+.rc-select-dropdown .rc-select-item-option-active{
+    @apply !bg-neutral-800
+}
+
+.rc-select-dropdown .rc-select-item-option-selected{
+    @apply !bg-neutral-900
+}
+
+.rc-select-dropdown .rc-select-item-option-selected .rc-select-item-option-state{
+    @apply !hidden
+}

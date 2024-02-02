@@ -136,7 +136,6 @@ export function EditBlockForm({
             label={props.field.title}
             supportingText={props.field.description}
             errorMessage={fieldErrors[props.name!]}
-            isClearable
             defaultValue={props.field.default
               ?.replace("{{pipeline_id}}", pipelineId.toString())
               ?.replace("{{block_name}}", blockConfig.name)}
@@ -181,7 +180,7 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId, latestValues]
+    [blockConfig.name, organizationId, pipelineId]
   );
 
   return (
