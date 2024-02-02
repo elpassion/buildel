@@ -1,11 +1,13 @@
-import React, { FormEvent, forwardRef, useEffect, useState } from "react";
-import { SingleValue } from "react-select";
+import React, { FormEvent, forwardRef, ReactNode, useCallback } from "react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useControlField, ValidatedForm } from "remix-validated-form";
-import { IDropdownOption } from "@elpassion/taco/Dropdown";
-import { Button, Label } from "@elpassion/taco";
-import { Modal } from "@elpassion/taco/Modal";
+import { Button, InputText, Label } from "@elpassion/taco";
 import { toSelectOption } from "~/components/form/fields/asyncSelect.field";
+import { asyncSelectApi, IAsyncSelectItem } from "~/api/AsyncSelectApi";
+import { successToast } from "~/components/toasts/successToast";
+import { Schema } from "~/components/form/schema/Schema";
+import { Modal } from "@elpassion/taco/Modal";
+import { useModal } from "~/hooks/useModal";
 import {
   HiddenField,
   useFieldContext,
@@ -14,8 +16,6 @@ import {
   generateZODSchema,
   JSONSchemaField,
 } from "~/components/form/schema/SchemaParser";
-import { useModal } from "~/hooks/useModal";
-import { Schema } from "~/components/form/schema/Schema";
 import {
   ArrayField,
   BooleanField,
@@ -23,28 +23,33 @@ import {
   StringField,
 } from "~/components/form/schema/SchemaFields";
 import {
-  asyncSelectApi,
-  IAsyncSelectItem,
-  IAsyncSelectItemList,
-} from "~/api/AsyncSelectApi";
-import {
   AsyncSelectInput,
   AsyncSelectInputProps,
-} from "~/components/form/inputs/asyncSelect.input";
-import { successToast } from "~/components/toasts/successToast";
+} from "~/components/form/inputs/select/select.input";
 
-interface CreatableAsyncSelectFieldProps
-  extends Partial<Omit<AsyncSelectInputProps, "defaultValue">> {
-  schema: JSONSchemaField;
+export interface CreatableAsyncSelectFieldProps
+  extends Partial<AsyncSelectInputProps> {
   url: string;
-  defaultValue?: string;
+  label?: ReactNode;
+  supportingText?: ReactNode;
+  errorMessage?: ReactNode;
+  schema: JSONSchemaField;
 }
+
 export const CreatableAsyncSelectField = forwardRef<
   HTMLSelectElement,
   CreatableAsyncSelectFieldProps
 >(
   (
-    { label, supportingText, url, defaultValue, schema: JSONSchema, ...props },
+    {
+      label,
+      supportingText,
+      url,
+      errorMessage,
+      defaultValue,
+      schema: JSONSchema,
+      ...props
+    },
     _ref
   ) => {
     const { name, getInputProps, validate } = useFieldContext();
@@ -52,15 +57,6 @@ export const CreatableAsyncSelectField = forwardRef<
     const schema = generateZODSchema(JSONSchema as any);
     const validator = React.useMemo(() => withZod(schema), []);
     const [selectedId, setSelectedId] = useControlField<string>(name);
-    const [options, setOptions] = useState<IAsyncSelectItemList>([]);
-
-    const getSelectedOption = () => {
-      return options.find(
-        (option) => option.id.toString() === selectedId?.toString()
-      );
-    };
-
-    const selectedOption = getSelectedOption();
 
     const handleSetSelectedId = (id: string) => {
       setSelectedId(id);
@@ -78,39 +74,24 @@ export const CreatableAsyncSelectField = forwardRef<
           data as IAsyncSelectItem
         );
 
-        setOptions((prev) => [...prev, newItem]);
         handleSetSelectedId(newItem.id.toString());
-        closeModal();
         successToast({ title: "Success", description: "Item created!" });
+        closeModal();
       } catch (e) {
         console.error(e);
       }
     };
 
-    const loadOptions = (
-      _input: string,
-      callback: (options: IDropdownOption[]) => void
-    ) => {
-      asyncSelectApi.getData(url).then((options) => {
-        if (
-          defaultValue &&
-          !options.find((option) => option.id === defaultValue)
-        ) {
-          options = [{ id: defaultValue, name: defaultValue }, ...options];
-        }
-        setOptions(options);
-        callback(options.map(toSelectOption));
-      });
-    };
-
-    useEffect(() => {
-      if (!selectedId && defaultValue) {
-        handleSetSelectedId(defaultValue);
-      }
-    }, [selectedId, handleSetSelectedId]);
+    const fetcher = useCallback(async () => {
+      return asyncSelectApi
+        .getData(url)
+        .then((opts) => opts.map(toSelectOption));
+    }, [url, isModalOpen]);
 
     return (
       <>
+        <HiddenField value={selectedId} {...getInputProps()} />
+
         <div className="flex justify-between items-end">
           <Label text={label} labelFor={name} />
 
@@ -123,20 +104,18 @@ export const CreatableAsyncSelectField = forwardRef<
           </button>
         </div>
 
-        <HiddenField value={selectedId} {...getInputProps()} />
-
         <AsyncSelectInput
-          cacheOptions
-          defaultOptions
-          id={name}
-          value={selectedOption && toSelectOption(selectedOption)}
-          loadOptions={loadOptions}
-          onSelect={(option: SingleValue<IDropdownOption>) => {
-            if (option) {
-              handleSetSelectedId(option.id);
-            }
-          }}
+          placeholder="Select..."
+          fetchOptions={fetcher}
+          defaultValue={defaultValue}
+          onChange={setSelectedId}
+          value={selectedId}
           {...props}
+        />
+
+        <InputText
+          text={errorMessage ?? supportingText}
+          error={!!errorMessage}
         />
 
         <Modal

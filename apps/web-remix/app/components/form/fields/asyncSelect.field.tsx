@@ -1,6 +1,7 @@
 import React, { forwardRef, ReactNode, useCallback } from "react";
 import { useControlField } from "remix-validated-form";
 import { InputText, Label } from "@elpassion/taco";
+import { asyncSelectApi, IAsyncSelectItem } from "~/api/AsyncSelectApi";
 import {
   HiddenField,
   useFieldContext,
@@ -9,7 +10,6 @@ import {
   AsyncSelectInputProps,
   AsyncSelectInput,
 } from "~/components/form/inputs/select/select.input";
-import { asyncSelectApi, IAsyncSelectItem } from "~/api/AsyncSelectApi";
 
 export interface AsyncSelectFieldProps extends Partial<AsyncSelectInputProps> {
   url: string;
@@ -27,7 +27,9 @@ export const AsyncSelectField = forwardRef<
     _ref
   ) => {
     const { name, getInputProps } = useFieldContext();
-    const [selectedId, setSelectedId] = useControlField<string>(name);
+    const [selectedId, setSelectedId] = useControlField<string | undefined>(
+      name
+    );
 
     const fetcher = useCallback(async () => {
       return asyncSelectApi

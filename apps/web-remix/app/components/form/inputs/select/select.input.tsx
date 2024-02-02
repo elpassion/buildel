@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Select, { SelectProps } from "rc-select";
+import Select, { SelectProps, Option } from "rc-select";
 import { Icon } from "@elpassion/taco";
 import { useDebounce } from "usehooks-ts";
 
@@ -17,10 +17,12 @@ export interface AsyncSelectInputProps<T = {}>
   fetchOptions: (
     search: string
   ) => Promise<({ value: string; label: string } & T)[]>;
+  onOptionsFetch?: (options: ({ value: string; label: string } & T)[]) => void;
 }
 
 export const AsyncSelectInput = <T = {},>({
   fetchOptions,
+  onOptionsFetch,
   ...props
 }: AsyncSelectInputProps<T>) => {
   const [loading, setLoading] = useState(false);
@@ -33,7 +35,10 @@ export const AsyncSelectInput = <T = {},>({
   const loadOptions = useCallback(() => {
     setLoading(true);
     fetchOptions(debouncedSearch)
-      .then((options) => setOptions(options))
+      .then((options) => {
+        setOptions(options);
+        onOptionsFetch?.(options);
+      })
       .finally(() => setLoading(false));
   }, [fetchOptions, debouncedSearch]);
 
@@ -44,10 +49,16 @@ export const AsyncSelectInput = <T = {},>({
   return (
     <SelectInput
       loading={loading}
-      options={options}
+      // options={options}
       searchValue={searchValue}
       onSearch={setSearchValue}
       {...props}
-    />
+    >
+      {options.map((opt) => (
+        <Option key={opt.value} title={opt.label}>
+          {opt.label}
+        </Option>
+      ))}
+    </SelectInput>
   );
 };

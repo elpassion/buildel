@@ -143,7 +143,7 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId, latestValues]
+    [blockConfig.name, organizationId, pipelineId]
   );
 
   const AsyncCreatableField = useCallback(
