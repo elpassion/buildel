@@ -34,7 +34,8 @@ export function SettingsPage() {
         method: "PUT",
         encType: "application/json",
         action:
-          routes.pipeline(pipeline.organization_id, pipeline.id) + "?index",
+          routes.pipelineBuild(pipeline.organization_id, pipeline.id) +
+          "?index",
       });
     },
     [updateFetcher]

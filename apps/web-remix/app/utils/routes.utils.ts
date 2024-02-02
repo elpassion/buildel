@@ -19,6 +19,15 @@ export const routes = {
     `${routes.organization(organizationId)}/pipelines`,
   pipeline: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipelines(organizationId)}/${pipelineId}`,
+  pipelineBuild: (organizationId: OrganizationId, pipelineId: PipelineId) =>
+    `${routes.pipeline(organizationId, pipelineId)}/build`,
+  pipelineBlocks: (organizationId: OrganizationId, pipelineId: PipelineId) =>
+    `${routes.pipelineBuild(organizationId, pipelineId)}/blocks`,
+  pipelineEditBlock: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    blockName: string
+  ) => `${routes.pipelineBlocks(organizationId, pipelineId)}/${blockName}`,
   pipelineRuns: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipeline(organizationId, pipelineId)}/runs`,
   pipelineRun: (

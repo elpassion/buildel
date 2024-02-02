@@ -30,7 +30,7 @@ export function PipelineLayout() {
           <FilledTabsWrapper>
             <FilledTabLink
               end
-              to={routes.pipeline(pipeline.organization_id, pipeline.id)}
+              to={routes.pipelineBuild(pipeline.organization_id, pipeline.id)}
             >
               Build
             </FilledTabLink>

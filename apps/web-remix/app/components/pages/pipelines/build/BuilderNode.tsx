@@ -9,8 +9,7 @@ import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider
 import { useCallback, useMemo } from "react";
 import { IconButton } from "~/components/iconButton";
 import { Icon } from "@elpassion/taco";
-import { useEditBlockSidebar } from "./EditBlockSidebarProvider";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
+import { useNavigate } from "@remix-run/react";
 
 export function BuilderNode(props: CustomNodeProps) {
   return (
@@ -42,7 +41,7 @@ function BuilderNodeHeaderActions({
   disabled,
   onDelete,
 }: BuilderNodeHeaderActionsProps) {
-  const { openSidebar } = useEditBlockSidebar();
+  const navigate = useNavigate();
   const { status: runStatus } = useRunPipeline();
 
   const handleDelete = useCallback(() => {
@@ -50,7 +49,7 @@ function BuilderNodeHeaderActions({
   }, []);
 
   const handleEdit = useCallback(() => {
-    openSidebar(data);
+    navigate(`./blocks/${data.name}`);
   }, [data]);
 
   const isEditable = useMemo(() => {

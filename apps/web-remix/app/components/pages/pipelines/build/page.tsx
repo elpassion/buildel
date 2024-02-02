@@ -1,8 +1,16 @@
 import React, { useCallback } from "react";
 import { LinksFunction, MetaFunction } from "@remix-run/node";
-import { useFetcher, useLoaderData, useRevalidator } from "@remix-run/react";
+import {
+  Outlet,
+  useFetcher,
+  useLoaderData,
+  useMatch,
+  useNavigate,
+  useRevalidator,
+} from "@remix-run/react";
+import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
 import { ELProvider } from "~/components/pages/pipelines/EL/ELProvider";
-import { ELHelper } from "~/components/pages/pipelines/build/ELHelper";
+import { routes } from "~/utils/routes.utils";
 import { IPipeline, IPipelineConfig } from "../pipeline.types";
 import { toPipelineConfig } from "../PipelineFlow.utils";
 import { CustomEdge } from "../CustomEdges/CustomEdge";
@@ -10,10 +18,8 @@ import { Builder } from "../Builder";
 import { PasteBlockConfigProvider } from "./CreateBlock/PasteBlockConfigProvider";
 import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
 import { PasteBlockConfiguration } from "./CreateBlock/PastConfigSidebar";
-import { EditBlockSidebarProvider } from "./EditBlockSidebarProvider";
 import { links as SubMenuLinks } from "./CreateBlock/GroupSubMenu";
 import { BuilderHeader, SaveChangesButton } from "./BuilderHeader";
-import { EditBlockSidebar } from "./EditBlockSidebar";
 import { BuilderNode } from "./BuilderNode";
 import { loader } from "./loader";
 
@@ -24,6 +30,12 @@ export function PipelineBuilder() {
   const updateFetcher = useFetcher<IPipeline>();
   const { pipeline, pipelineId, organizationId } =
     useLoaderData<typeof loader>();
+
+  const navigate = useNavigate();
+  const match = useMatch(
+    "/:organizationId/pipelines/:pipelineId/build/blocks/:blockName"
+  );
+  const isSidebarOpen = !!match;
 
   const handleUpdatePipeline = useCallback(
     (config: IPipelineConfig) => {
@@ -39,8 +51,12 @@ export function PipelineBuilder() {
     revalidator.revalidate();
   };
 
+  const handleCloseSidebar = () => {
+    navigate(routes.pipelineBuild(organizationId, pipelineId));
+  };
+
   return (
-    <EditBlockSidebarProvider>
+    <>
       <Builder
         pipeline={pipeline}
         CustomNode={BuilderNode}
@@ -71,18 +87,19 @@ export function PipelineBuilder() {
                 <PasteBlockConfiguration onSubmit={onBlockCreate} />
               </PasteBlockConfigProvider>
             </ELProvider>
-
-            <EditBlockSidebar
-              nodes={nodes}
-              edges={edges}
-              pipelineId={pipeline.id}
-              onSubmit={handleUpdatePipeline}
-              organizationId={pipeline.organization_id}
-            />
           </>
         )}
       </Builder>
-    </EditBlockSidebarProvider>
+
+      <ActionSidebar
+        overlay
+        isOpen={isSidebarOpen}
+        onClose={handleCloseSidebar}
+        className="md:w-[460px] lg:w-[550px]"
+      >
+        <Outlet />
+      </ActionSidebar>
+    </>
   );
 }
 

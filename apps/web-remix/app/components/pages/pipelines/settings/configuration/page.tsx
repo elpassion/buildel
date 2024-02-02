@@ -34,7 +34,7 @@ export function SettingsConfigurationPage() {
       updateFetcher.submit(pipeline, {
         method: "PUT",
         encType: "application/json",
-        action: routes.pipeline(organizationId, pipelineId) + "?index",
+        action: routes.pipelineBuild(organizationId, pipelineId) + "?index",
       });
     },
     [updateFetcher]

@@ -36,7 +36,7 @@ export function WebsiteChatbotPage() {
       {
         method: "put",
         encType: "application/json",
-        action: `${routes.pipeline(organizationId, pipelineId)}?index`,
+        action: `${routes.pipelineBuild(organizationId, pipelineId)}?index`,
       }
     );
 
