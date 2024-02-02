@@ -34,8 +34,14 @@ export const AsyncSelectField = forwardRef<
     const fetcher = useCallback(async () => {
       return asyncSelectApi
         .getData(url)
-        .then((opts) => opts.map(toSelectOption));
-    }, [url]);
+        .then((opts) => opts.map(toSelectOption))
+        .then((opts) => {
+          const curr = opts.find((o) => o.value === selectedId);
+          if (!curr) setSelectedId(undefined);
+
+          return opts;
+        });
+    }, [url, selectedId]);
 
     return (
       <>

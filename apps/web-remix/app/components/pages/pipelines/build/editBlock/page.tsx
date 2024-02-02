@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { MetaFunction } from "@remix-run/node";
 import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
-import { ClientOnly } from "~/utils/ClientOnly";
 import { routes } from "~/utils/routes.utils";
 import {
   getEdges,
@@ -66,17 +65,15 @@ export function OpenAIApiPage() {
         onClose={closeSidebar}
       />
 
-      <ClientOnly>
-        <EditBlockForm
-          onSubmit={handleSubmit}
-          blockConfig={block}
-          organizationId={pipeline.organization_id}
-          pipelineId={pipeline.id}
-          nodesNames={nodes.map((node) => node.data.name)}
-        >
-          <BlockInputList inputs={block.inputs} />
-        </EditBlockForm>
-      </ClientOnly>
+      <EditBlockForm
+        onSubmit={handleSubmit}
+        blockConfig={block}
+        organizationId={pipeline.organization_id}
+        pipelineId={pipeline.id}
+        nodesNames={nodes.map((node) => node.data.name)}
+      >
+        <BlockInputList inputs={block.inputs} />
+      </EditBlockForm>
     </>
   );
 }
