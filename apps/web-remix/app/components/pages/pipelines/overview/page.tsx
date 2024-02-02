@@ -5,6 +5,7 @@ import { useInView } from "react-intersection-observer";
 import { PipelineRunsList, PipelineRunsListHeader } from "./PipelineRunsList";
 import { useInfiniteFetch } from "~/components/pagination/useInfiniteFetch";
 import { IPipelineRun } from "~/components/pages/pipelines/pipeline.types";
+import { LoadMoreButton } from "~/components/pagination/LoadMoreButton";
 import { routes } from "~/utils/routes.utils";
 import { loader } from "./loader";
 
@@ -56,17 +57,11 @@ export function OverviewPage() {
         />
 
         <div className="flex justify-center mt-4" ref={fetchNextRef}>
-          <button
+          <LoadMoreButton
+            isFetching={isFetchingNextPage}
+            hasNextPage={hasNextPage}
             onClick={fetchNextPage}
-            disabled={!hasNextPage}
-            className="text-neutral-200 disabled:text-neutral-400 text-sm"
-          >
-            {isFetchingNextPage
-              ? "Fetching..."
-              : hasNextPage
-              ? "Fetch"
-              : "No more data"}
-          </button>
+          />
         </div>
       </div>
     </section>
