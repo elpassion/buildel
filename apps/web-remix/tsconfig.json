@@ -12,6 +12,7 @@
     "strict": true,
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
+    "types": ["vitest/globals"],
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
