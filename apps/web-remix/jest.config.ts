@@ -11,6 +11,18 @@ const config: Config = {
   coverageProvider: "v8",
 
   testEnvironment: "jsdom",
+
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+
+  transform: {
+    "^.+\\.(js|jsx|ts|tsx)$": "babel-jest",
+  },
+
+  moduleNameMapper: {
+    "^~/(.*)$": "<rootDir>/app/$1",
+    "^~/components/(.*)$": "<rootDir>/app/components/$1",
+    "^~/test-utils/(.*)$": "<rootDir>/app/test-utils/$1",
+  },
 };
 
 export default config;

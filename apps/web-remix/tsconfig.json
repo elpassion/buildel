@@ -15,11 +15,10 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
-      "~/components/*": ["./app/components/*"]
+      "~/components/*": ["./app/components/*"],
+      "~/test-utils/*": ["./app/test-utils/*"]
     },
     "skipLibCheck": true,
-
-    // Remix takes care of building everything in `remix build`.
     "noEmit": true
   }
 }
