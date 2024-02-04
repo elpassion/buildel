@@ -67,6 +67,10 @@ defmodule Buildel.Pipelines do
     end
   end
 
+  def get_pipeline_config(%Pipeline{config: config}, "latest") do
+    {:ok, config}
+  end
+
   def get_run(id), do: Repo.get(Run, id) |> Repo.preload(:pipeline)
 
   def create_run(attrs \\ %{}) do

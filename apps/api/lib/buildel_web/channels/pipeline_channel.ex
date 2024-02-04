@@ -8,12 +8,28 @@ defmodule BuildelWeb.PipelineChannel do
   defparams :join do
     required(:auth, :string)
     required(:user_data, :string)
+
+    required(:initial_inputs, {:array, :map}) do
+      required(:name, :string)
+      required(:value, :string)
+    end
+
+    required(:version, :string)
   end
 
+  @default_params %{
+    "initial_inputs" => [],
+    "version" => "latest"
+  }
+
   def join(channel_name, params, socket) do
+    params = Map.merge(@default_params, params)
+
     with {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id}} <-
            parse_channel_name(channel_name),
-         {:ok, %{auth: auth, user_data: user_data}} <- validate(:join, params),
+         {:ok,
+          %{auth: auth, user_data: user_data, initial_inputs: initial_inputs, version: version}} <-
+           validate(:join, params),
          {:ok, pipeline_id} <- Buildel.Utils.parse_id(pipeline_id),
          {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
          {:ok, run_id} <- Buildel.Utils.parse_id(run_id),
@@ -26,16 +42,13 @@ defmodule BuildelWeb.PipelineChannel do
              auth,
              organization.api_key
            ),
-         {:ok, %Pipelines.Pipeline{id: pipeline_id, config: config}} <-
+         {:ok, %Pipelines.Pipeline{id: pipeline_id} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, config} <- Pipelines.get_pipeline_config(pipeline, version),
          {:ok, run} <-
            Pipelines.upsert_run(%{id: run_id, pipeline_id: pipeline_id, config: config}),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
-      params
-      |> Map.get("initial_inputs", [])
-      |> Enum.each(fn %{"name" => name, "value" => value} ->
-        process_input(name, value, run)
-      end)
+      initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
 
       listen_to_outputs(run)
 
