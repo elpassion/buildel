@@ -45,12 +45,18 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
   def create(conn, params) do
     user = conn.assigns.current_user
 
-    with {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id} = params} <- validate(:create, params),
+    with {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id} = params} <-
+           validate(:create, params),
          metadata <- Map.get(params, :metadata, %{}),
          {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, run} <- Pipelines.create_run(%{pipeline_id: pipeline_id, config: pipeline.config |> Map.put(:metadata, metadata)}) do
+         {:ok, config} <- Pipelines.get_pipeline_config(pipeline, "latest"),
+         {:ok, run} <-
+           Pipelines.create_run(%{
+             pipeline_id: pipeline_id,
+             config: config |> Map.put(:metadata, metadata)
+           }) do
       render(conn, :show, run: run)
     end
   end
