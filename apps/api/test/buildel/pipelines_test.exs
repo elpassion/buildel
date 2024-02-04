@@ -124,45 +124,122 @@ defmodule Buildel.PipelinesTest do
 
     import Buildel.PipelinesFixtures
 
-    test "blocks_for_run/1 returns the blocks for the run" do
-      run = run_fixture()
+    test "blocks_for_run/1 returns the blocks for the run in v1" do
+      run = run_fixture(%{})
 
       assert Pipelines.blocks_for_run(run) == [
                AudioInput.create(%{
                  name: "random_block",
                  opts: %{metadata: %{}},
                  connections: [
-                   Connection.from_connection_string("random_block:input->input", "audio")
+                   Connection.from_connection_string(
+                     "random_block:input->input?reset=true",
+                     "audio"
+                   )
                  ]
                }),
                SpeechToText.create(%{
                  name: "random_block_2",
                  opts: %{metadata: %{}, api_key: "some_api_key"},
                  connections: [
-                   Connection.from_connection_string("random_block:output->input", "audio", %{
-                     to_block_name: "random_block_2",
-                     to_type: "audio"
-                   })
+                   Connection.from_connection_string(
+                     "random_block:output->input?reset=false",
+                     "audio",
+                     %{
+                       to_block_name: "random_block_2",
+                       to_type: "audio"
+                     }
+                   )
                  ]
                }),
                TextOutput.create(%{
                  name: "random_block_3",
                  opts: %{metadata: %{}},
                  connections: [
-                   Connection.from_connection_string("random_block_2:output->input", "text", %{
-                     to_block_name: "random_block_3",
-                     to_type: "text"
-                   })
+                   Connection.from_connection_string(
+                     "random_block_2:output->input?reset=true",
+                     "text",
+                     %{
+                       to_block_name: "random_block_3",
+                       to_type: "text"
+                     }
+                   )
                  ]
                }),
                AudioOutput.create(%{
                  name: "random_block_4",
                  opts: %{metadata: %{}},
                  connections: [
-                   Connection.from_connection_string("random_block:output->input", "audio", %{
-                     to_block_name: "random_block_4",
-                     to_type: "audio"
-                   })
+                   Connection.from_connection_string(
+                     "random_block:output->input?reset=true",
+                     "audio",
+                     %{
+                       to_block_name: "random_block_4",
+                       to_type: "audio"
+                     }
+                   )
+                 ]
+               })
+             ]
+    end
+
+    test "blocks_for_run/1 returns the blocks for the run in v2" do
+      run =
+        run_fixture(%{
+          version: "2"
+        })
+
+      assert Pipelines.blocks_for_run(run) == [
+               AudioInput.create(%{
+                 name: "random_block",
+                 opts: %{metadata: %{}},
+                 connections: [
+                   Connection.from_connection_string(
+                     "random_block:input->input?reset=true",
+                     "audio"
+                   )
+                 ]
+               }),
+               SpeechToText.create(%{
+                 name: "random_block_2",
+                 opts: %{metadata: %{}, api_key: "some_api_key"},
+                 connections: [
+                   Connection.from_connection_string(
+                     "random_block:output->input?reset=false",
+                     "audio",
+                     %{
+                       to_block_name: "random_block_2",
+                       to_type: "audio"
+                     }
+                   )
+                 ]
+               }),
+               TextOutput.create(%{
+                 name: "random_block_3",
+                 opts: %{metadata: %{}},
+                 connections: [
+                   Connection.from_connection_string(
+                     "random_block_2:output->input?reset=true",
+                     "text",
+                     %{
+                       to_block_name: "random_block_3",
+                       to_type: "text"
+                     }
+                   )
+                 ]
+               }),
+               AudioOutput.create(%{
+                 name: "random_block_4",
+                 opts: %{metadata: %{}},
+                 connections: [
+                   Connection.from_connection_string(
+                     "random_block:output->input?reset=true",
+                     "audio",
+                     %{
+                       to_block_name: "random_block_4",
+                       to_type: "audio"
+                     }
+                   )
                  ]
                })
              ]

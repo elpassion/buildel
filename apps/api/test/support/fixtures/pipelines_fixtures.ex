@@ -1,7 +1,9 @@
 defmodule Buildel.PipelinesFixtures do
   import Buildel.OrganizationsFixtures
 
-  def pipeline_fixture(attrs \\ %{}) do
+  def pipeline_fixture(attrs \\ %{}, config \\ %{version: "1"})
+
+  def pipeline_fixture(attrs, %{version: "1"}) do
     {:ok, pipeline} =
       attrs
       |> Enum.into(%{
@@ -23,7 +25,7 @@ defmodule Buildel.PipelinesFixtures do
               "opts" => %{
                 "api_key" => "some_api_key"
               },
-              "inputs" => ["random_block:output->input"],
+              "inputs" => ["random_block:output->input?reset=false"],
               "ios" => []
             },
             %{
@@ -38,6 +40,95 @@ defmodule Buildel.PipelinesFixtures do
               "type" => "audio_output",
               "opts" => %{},
               "inputs" => ["random_block:output->input"],
+              "ios" => []
+            }
+          ]
+        }
+      })
+      |> Buildel.Pipelines.create_pipeline()
+
+    pipeline
+  end
+
+  def pipeline_fixture(attrs, %{version: "2"}) do
+    {:ok, pipeline} =
+      attrs
+      |> Enum.into(%{
+        name: "some name",
+        organization_id: organization_fixture().id,
+        config: %{
+          "version" => "2",
+          "blocks" => [
+            %{
+              "name" => "random_block",
+              "type" => "audio_input",
+              "opts" => %{},
+              "connections" => [],
+              "ios" => []
+            },
+            %{
+              "name" => "random_block_2",
+              "type" => "speech_to_text",
+              "opts" => %{
+                "api_key" => "some_api_key"
+              },
+              "connections" => [
+                %{
+                  "from" => %{
+                    "block_name" => "random_block",
+                    "output_name" => "output"
+                  },
+                  "to" => %{
+                    "block_name" => "random_block_2",
+                    "input_name" => "input"
+                  },
+                  "opts" => %{
+                    "reset" => false
+                  }
+                }
+              ],
+              "ios" => []
+            },
+            %{
+              "name" => "random_block_3",
+              "type" => "text_output",
+              "opts" => %{},
+              "connections" => [
+                %{
+                  "from" => %{
+                    "block_name" => "random_block_2",
+                    "output_name" => "output"
+                  },
+                  "to" => %{
+                    "block_name" => "random_block_3",
+                    "input_name" => "input"
+                  },
+                  "opts" => %{
+                    "reset" => true
+                  }
+                }
+              ],
+              "ios" => []
+            },
+            %{
+              "name" => "random_block_4",
+              "type" => "audio_output",
+              "opts" => %{},
+              "connections" => [
+                %{
+                  "from" => %{
+                    "block_name" => "random_block",
+                    "output_name" => "output"
+                  },
+                  "to" => %{
+                    "block_name" => "random_block_4",
+                    "input_name" => "input"
+                  },
+                  "opts" => %{
+                    "reset" => true
+                  }
+                }
+              ],
               "ios" => []
             }
           ]
