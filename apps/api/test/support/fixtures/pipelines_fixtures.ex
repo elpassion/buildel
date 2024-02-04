@@ -139,8 +139,92 @@ defmodule Buildel.PipelinesFixtures do
     pipeline
   end
 
-  def run_fixture(attrs \\ %{}) do
-    pipeline = pipeline_fixture()
+  def pipeline_fixture(attrs, %{version: "3"}) do
+    {:ok, pipeline} =
+      attrs
+      |> Enum.into(%{
+        name: "some name",
+        organization_id: organization_fixture().id,
+        config: %{
+          "version" => "3",
+          "blocks" => [
+            %{
+              "name" => "random_block",
+              "type" => "audio_input",
+              "opts" => %{},
+              "ios" => []
+            },
+            %{
+              "name" => "random_block_2",
+              "type" => "speech_to_text",
+              "opts" => %{
+                "api_key" => "some_api_key"
+              },
+              "ios" => []
+            },
+            %{
+              "name" => "random_block_3",
+              "type" => "text_output",
+              "opts" => %{},
+              "ios" => []
+            },
+            %{
+              "name" => "random_block_4",
+              "type" => "audio_output",
+              "opts" => %{},
+              "ios" => []
+            }
+          ],
+          "connections" => [
+            %{
+              "from" => %{
+                "block_name" => "random_block",
+                "output_name" => "output"
+              },
+              "to" => %{
+                "block_name" => "random_block_2",
+                "input_name" => "input"
+              },
+              "opts" => %{
+                "reset" => false
+              }
+            },
+            %{
+              "from" => %{
+                "block_name" => "random_block_2",
+                "output_name" => "output"
+              },
+              "to" => %{
+                "block_name" => "random_block_3",
+                "input_name" => "input"
+              },
+              "opts" => %{
+                "reset" => true
+              }
+            },
+            %{
+              "from" => %{
+                "block_name" => "random_block",
+                "output_name" => "output"
+              },
+              "to" => %{
+                "block_name" => "random_block_4",
+                "input_name" => "input"
+              },
+              "opts" => %{
+                "reset" => true
+              }
+            }
+          ]
+        }
+      })
+      |> Buildel.Pipelines.create_pipeline()
+
+    pipeline
+  end
+
+  def run_fixture(attrs \\ %{}, pipeline_config \\ %{version: "1"}) do
+    pipeline = pipeline_fixture(%{}, pipeline_config)
 
     {:ok, run} =
       attrs

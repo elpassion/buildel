@@ -123,6 +123,14 @@ defmodule Buildel.Blocks.Block do
         {:noreply, state}
       end
 
+      def get_input(input_name) do
+        options().inputs |> Enum.find(&(&1.name == input_name))
+      end
+
+      def get_output(output_name) do
+        options().outputs |> Enum.find(&(&1.name == output_name))
+      end
+
       defoverridable handle_stream_stop: 2
 
       defp subscribe_to_connections(context_id, connections) do

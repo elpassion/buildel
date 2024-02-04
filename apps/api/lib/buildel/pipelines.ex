@@ -97,30 +97,73 @@ defmodule Buildel.Pipelines do
     run |> Run.finish()
   end
 
-  def blocks_for_run(%Run{} = run) do
-    case get_in(run.pipeline.config, ["blocks"]) do
-      nil ->
-        []
+  def blocks_for_run(%Run{config: nil}), do: []
+  def blocks_for_run(%Run{config: %{"blocks" => nil}}), do: []
 
-      blocks ->
-        blocks_map = blocks |> Enum.into(%{}, fn block -> {block["name"], block} end)
+  def blocks_for_run(%Run{config: %{"blocks" => blocks, "connections" => connections} = config}) do
+    blocks_map = blocks |> Enum.into(%{}, fn block -> {block["name"], block} end)
 
-        blocks
-        |> Enum.filter(fn block -> Buildel.Blocks.type(block["type"]) != nil end)
-        |> Enum.map(fn block ->
-          connections = Buildel.Blocks.Connection.connections_for_block(block["name"], blocks_map)
+    blocks
+    |> Enum.filter(&(Buildel.Blocks.type(&1["type"]) != nil))
+    |> Enum.map(fn block ->
+      block_connections =
+        connections
+        |> Enum.filter(&(&1["to"]["block_name"] == block["name"]))
+        |> Enum.map(fn connection ->
+          from_block = blocks_map[connection["from"]["block_name"]]
+          from_block_module = Buildel.Blocks.type(from_block["type"])
+          to_block = block
+          to_block_module = Buildel.Blocks.type(to_block["type"])
 
-          %Buildel.Blocks.Block{
-            name: block["name"],
-            type: block["type"] |> Buildel.Blocks.type(),
-            connections: connections,
-            opts:
-              block["opts"]
-              |> keys_to_atoms()
-              |> Map.put(:metadata, get_in(run.config, ["metadata"]) || %{})
+          %Buildel.Blocks.Connection{
+            from: %Buildel.Blocks.Output{
+              block_name: connection["from"]["block_name"],
+              name: connection["from"]["output_name"],
+              type: from_block_module.get_output(connection["from"]["output_name"]).type
+            },
+            to: %Buildel.Blocks.Input{
+              block_name: connection["to"]["block_name"],
+              name: connection["to"]["input_name"],
+              type: to_block_module.get_input(connection["to"]["input_name"]).type
+            },
+            opts: %{
+              reset: connection["opts"]["reset"]
+            }
           }
         end)
-    end
+
+      %Buildel.Blocks.Block{
+        name: block["name"],
+        type: block["type"] |> Buildel.Blocks.type(),
+        connections:
+          block_connections ++
+            Buildel.Blocks.type(block["type"]).public_connections(block["name"]),
+        opts:
+          block["opts"]
+          |> keys_to_atoms()
+          |> Map.put(:metadata, config["metadata"] || %{})
+      }
+    end)
+  end
+
+  def blocks_for_run(%Run{config: %{"blocks" => blocks}} = run) do
+    blocks_map = blocks |> Enum.into(%{}, fn block -> {block["name"], block} end)
+
+    blocks
+    |> Enum.filter(fn block -> Buildel.Blocks.type(block["type"]) != nil end)
+    |> Enum.map(fn block ->
+      connections = Buildel.Blocks.Connection.connections_for_block(block["name"], blocks_map)
+
+      %Buildel.Blocks.Block{
+        name: block["name"],
+        type: block["type"] |> Buildel.Blocks.type(),
+        connections: connections,
+        opts:
+          block["opts"]
+          |> keys_to_atoms()
+          |> Map.put(:metadata, get_in(run.config, ["metadata"]) || %{})
+      }
+    end)
   end
 
   def create_block(%Pipeline{} = pipeline, block_config) do
