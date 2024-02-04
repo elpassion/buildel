@@ -39,19 +39,32 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
   defparams :create do
     required(:organization_id, :string)
     required(:pipeline_id, :string)
-    optional(:metadata, :map)
+    required(:metadata, :map)
+    required(:version, :string)
   end
 
+  @create_default_params %{
+    "metadata" => %{},
+    "version" => "latest"
+  }
+
   def create(conn, params) do
+    params = Map.merge(@create_default_params, params)
+
     user = conn.assigns.current_user
 
-    with {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id} = params} <-
+    with {:ok,
+          %{
+            organization_id: organization_id,
+            pipeline_id: pipeline_id,
+            metadata: metadata,
+            version: version
+          }} <-
            validate(:create, params),
-         metadata <- Map.get(params, :metadata, %{}),
          {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, config} <- Pipelines.get_pipeline_config(pipeline, "latest"),
+         {:ok, config} <- Pipelines.get_pipeline_config(pipeline, version),
          {:ok, run} <-
            Pipelines.create_run(%{
              pipeline_id: pipeline_id,
