@@ -116,4 +116,56 @@ defmodule Buildel.PipelinesTest do
       assert run.status == :finished
     end
   end
+
+  describe "blocks" do
+    alias Buildel.Pipelines.Run
+    alias Buildel.Blocks.Connection
+    alias Buildel.Blocks.{AudioInput, SpeechToText, TextOutput, AudioOutput}
+
+    import Buildel.PipelinesFixtures
+
+    test "blocks_for_run/1 returns the blocks for the run" do
+      run = run_fixture()
+
+      assert Pipelines.blocks_for_run(run) == [
+               AudioInput.create(%{
+                 name: "random_block",
+                 opts: %{metadata: %{}},
+                 connections: [
+                   Connection.from_connection_string("random_block:input->input", "audio")
+                 ]
+               }),
+               SpeechToText.create(%{
+                 name: "random_block_2",
+                 opts: %{metadata: %{}, api_key: "some_api_key"},
+                 connections: [
+                   Connection.from_connection_string("random_block:output->input", "audio", %{
+                     to_block_name: "random_block_2",
+                     to_type: "audio"
+                   })
+                 ]
+               }),
+               TextOutput.create(%{
+                 name: "random_block_3",
+                 opts: %{metadata: %{}},
+                 connections: [
+                   Connection.from_connection_string("random_block_2:output->input", "text", %{
+                     to_block_name: "random_block_3",
+                     to_type: "text"
+                   })
+                 ]
+               }),
+               AudioOutput.create(%{
+                 name: "random_block_4",
+                 opts: %{metadata: %{}},
+                 connections: [
+                   Connection.from_connection_string("random_block:output->input", "audio", %{
+                     to_block_name: "random_block_4",
+                     to_type: "audio"
+                   })
+                 ]
+               })
+             ]
+    end
+  end
 end

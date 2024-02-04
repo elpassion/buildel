@@ -302,12 +302,12 @@ defmodule Buildel.Blocks.Block do
         |> Enum.filter(fn input -> input.public end)
         |> Enum.map(fn input ->
           %Buildel.Blocks.Connection{
-            from: %{
+            from: %Buildel.Blocks.Output{
               name: input.name,
               block_name: block_name,
               type: input.type
             },
-            to: %{
+            to: %Buildel.Blocks.Input{
               name: input.name,
               block_name: block_name,
               type: input.type

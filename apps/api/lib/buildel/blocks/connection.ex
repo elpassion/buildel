@@ -1,15 +1,23 @@
 defmodule Buildel.Blocks.Connection do
   defstruct [:from, :to, :opts]
 
-  def from_connection_string(connection_string, to_type, from_type \\ nil) do
+  def from_connection_string(
+        connection_string,
+        from_type,
+        %{
+          to_type: to_type,
+          to_block_name: to_block_name
+        } \\ %{to_type: nil, to_block_name: nil}
+      ) do
     %{block_name: block_name, input_name: input_name, output_name: output_name, reset: reset} =
       connection_description_from_connection_string(connection_string)
 
-    from_type = from_type || to_type
+    to_block_name = to_block_name || block_name
+    to_type = to_type || from_type
 
     %Buildel.Blocks.Connection{
       from: %Buildel.Blocks.Output{name: output_name, block_name: block_name, type: from_type},
-      to: %Buildel.Blocks.Input{name: input_name, block_name: block_name, type: to_type},
+      to: %Buildel.Blocks.Input{name: input_name, block_name: to_block_name, type: to_type},
       opts: %{reset: reset}
     }
   end
