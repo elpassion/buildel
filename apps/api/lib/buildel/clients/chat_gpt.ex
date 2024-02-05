@@ -75,10 +75,14 @@ defmodule Buildel.Clients.ChatGPT do
 
                %Message{function_name: function_name, arguments: arguments}
                when is_binary(function_name) ->
-                 %{call_formatter: call_formatter} =
-                   tools |> Enum.find(fn tool -> tool.function.name == function_name end)
+                 case tools |> Enum.find(fn tool -> tool.function.name == function_name end) do
+                   nil ->
+                     Logger.debug("Tool not found: #{function_name}")
+                     nil
 
-                 on_tool_call.(function_name, arguments, call_formatter.(arguments))
+                   %{call_formatter: call_formatter} ->
+                     on_tool_call.(function_name, arguments, call_formatter.(arguments))
+                 end
 
                %Message{} ->
                  nil
