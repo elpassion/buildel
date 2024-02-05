@@ -40,18 +40,24 @@ export function EditBlockForm({
   pipelineId,
   disabled = false,
   nodesNames,
+  connections: propsConnections,
 }: {
   organizationId: number;
   pipelineId: number;
   children?: ReactNode;
-  onSubmit: (data: IBlockConfig & { oldName: string }) => void;
+  onSubmit: (
+    data: IBlockConfig & { oldName: string },
+    connections: IConfigConnection[]
+  ) => void;
   blockConfig: z.TypeOf<typeof BlockConfig>;
   disabled?: boolean;
   nodesNames: string[];
+  connections: IConfigConnection[];
 }) {
   const schema = generateZODSchema(blockConfig.block_type.schema as any);
   const validator = React.useMemo(() => withZod(schema), []);
-  const [inputs, setInputs] = useState(blockConfig.inputs);
+  const [connections, setConnections] =
+    useState<IConfigConnection[]>(propsConnections);
   const [fieldsErrors, setFieldsErrors] = useState<Record<string, string>>({});
   const [latestValues, setLatestValues] = useState<Record<string, any>>({});
 
@@ -60,15 +66,23 @@ export function EditBlockForm({
   };
 
   const updateInputReset = useCallback(
-    (input: string, reset: boolean) => {
-      const newInputs = inputs.map((existingInput) => {
-        if (existingInput.split("?")[0] !== input.split("?")[0])
-          return existingInput;
-        return `${input.split("?")[0]}?reset=${reset}`;
+    (connection: IConfigConnection, reset: boolean) => {
+      const newConnections = connections.map((existingConnection) => {
+        if (
+          existingConnection.from.block_name === connection.from.block_name &&
+          existingConnection.to.block_name === connection.to.block_name
+        ) {
+          return {
+            ...existingConnection,
+            opts: { ...existingConnection.opts, reset },
+          };
+        }
+
+        return existingConnection;
       });
-      setInputs(newInputs);
+      setConnections(newConnections);
     },
-    [inputs]
+    [connections]
   );
 
   const handleUpdate = (
@@ -78,7 +92,6 @@ export function EditBlockForm({
     e.preventDefault();
     clearFieldsErrors();
     const newConfig = { oldName: blockConfig.name, ...blockConfig, ...data };
-    newConfig.inputs = inputs;
 
     if (
       newConfig.oldName !== newConfig.name &&
@@ -86,7 +99,7 @@ export function EditBlockForm({
     ) {
       setFieldsErrors({ name: "This block name is already in used" });
     } else {
-      onSubmit(newConfig);
+      onSubmit(newConfig, connections);
     }
   };
 
@@ -100,7 +113,9 @@ export function EditBlockForm({
         <EditorField
           field={props.field}
           name={props.name as string}
-          blockConfig={blockConfig}
+          connections={connections.filter(
+            (connection) => connection.to.block_name === blockConfig.name
+          )}
           schema={props.schema}
         />
       );
@@ -195,7 +210,10 @@ export function EditBlockForm({
       }}
       noValidate
     >
-      <InputsProvider inputs={inputs} updateInputReset={updateInputReset}>
+      <InputsProvider
+        connections={connections}
+        updateInputReset={updateInputReset}
+      >
         <div className="space-y-4 grow overflow-y-auto px-1">
           <div className="flex justify-end">
             <CopyConfigurationButton
@@ -216,7 +234,10 @@ export function EditBlockForm({
               errorMessage={fieldsErrors.name}
             />
           </FormField>
-          <HiddenField name="inputs" value={JSON.stringify(inputs)} />
+          <HiddenField
+            name="inputs"
+            value={JSON.stringify(blockConfig.inputs)}
+          />
 
           <Schema
             schema={blockConfig.block_type.schema.properties.opts}
@@ -271,18 +292,18 @@ function generateSuggestions(connections: IConfigConnection[]) {
 }
 
 const InputsContext = React.createContext<{
-  inputs: string[];
-  updateInputReset: (input: string, value: boolean) => void;
-}>({ inputs: [], updateInputReset: () => {} });
+  connections: IConfigConnection[];
+  updateInputReset: (connection: IConfigConnection, value: boolean) => void;
+}>({ connections: [], updateInputReset: () => {} });
 
 const InputsProvider: React.FC<{
-  inputs: string[];
-  updateInputReset: (input: string, value: boolean) => void;
+  connections: IConfigConnection[];
+  updateInputReset: (connection: IConfigConnection, value: boolean) => void;
   children: ReactNode;
-}> = ({ inputs, updateInputReset, children }) => {
+}> = ({ connections, updateInputReset, children }) => {
   return (
     <>
-      <InputsContext.Provider value={{ inputs, updateInputReset }}>
+      <InputsContext.Provider value={{ connections, updateInputReset }}>
         {children}
       </InputsContext.Provider>
     </>
@@ -294,7 +315,7 @@ export function useInputs() {
 }
 
 interface EditorFieldProps {
-  blockConfig: z.TypeOf<typeof BlockConfig>;
+  connections: IConfigConnection[];
   field: {
     type: "string";
     title: string;
@@ -305,7 +326,7 @@ interface EditorFieldProps {
   name: string;
   schema: JSONSchemaField;
 }
-function EditorField({ field, name, blockConfig }: EditorFieldProps) {
+function EditorField({ field, name, connections }: EditorFieldProps) {
   const { fieldErrors } = useFormContext();
 
   const renderEditorByLanguage = () => {
@@ -324,7 +345,7 @@ function EditorField({ field, name, blockConfig }: EditorFieldProps) {
           <MonacoSuggestionEditorField
             supportingText={field.description}
             label={field.title}
-            suggestions={generateSuggestions(blockConfig.connections)}
+            suggestions={generateSuggestions(connections)}
             error={fieldErrors[name]}
           />
         );

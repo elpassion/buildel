@@ -102,20 +102,7 @@ export const Builder = ({
   const handleDelete = useCallback(
     (node: IBlockConfig) => {
       setEdges((eds) => eds.filter((ed) => ed.source !== node.name));
-      setNodes(
-        (nds) => nds.filter((nd) => nd.id !== node.name)
-        // .map((nd) => {
-        //   return {
-        //     ...nd,
-        //     data: {
-        //       ...nd.data,
-        //       inputs: nd.data.inputs.filter(
-        //         (inp) => !inp.includes(`${node.name}:output`)
-        //       ),
-        //     },
-        //   };
-        // })
-      );
+      setNodes((nds) => nds.filter((nd) => nd.id !== node.name));
     },
     [setNodes, setEdges]
   );
@@ -154,19 +141,8 @@ export const Builder = ({
           eds
         )
       );
-
-      setNodes((nds) => {
-        return nds.map((nd) => {
-          if (nd.id !== params.target) return nd;
-          const newInput = `${params.source}:${params.sourceHandle}->${params.targetHandle}`;
-          return {
-            ...nd,
-            data: { ...nd.data, inputs: [...nd.data.inputs, newInput] },
-          };
-        });
-      });
     },
-    [setEdges, setNodes]
+    [setEdges]
   );
 
   const handleDeleteEdge = useCallback((id: string) => {

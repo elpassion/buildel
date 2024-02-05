@@ -11,7 +11,6 @@ import {
 import {
   IBlockConfig,
   IConfigConnection,
-  IEdge,
   INode,
   IPipeline,
 } from "~/components/pages/pipelines/pipeline.types";
@@ -34,14 +33,22 @@ export function OpenAIApiPage() {
     navigate(routes.pipelineBuild(organizationId, pipelineId));
   };
 
-  const handleSubmit = (updated: IExtendedBlockConfig) => {
+  const handleSubmit = (
+    updated: IExtendedBlockConfig,
+    connections: IConfigConnection[]
+  ) => {
     const updatedNodes = nodes.map((node) => updateNode(node, updated));
-    const updatedEdges = edges.map((edge) => updateEdge(edge, updated));
+    const updatedConnections = connections.map((connection) =>
+      updateConnection(connection, updated)
+    );
 
     updateFetcher.submit(
       {
         ...pipeline,
-        config: { ...toPipelineConfig(updatedNodes, updatedEdges) },
+        config: {
+          ...toPipelineConfig(updatedNodes, edges),
+          connections: updatedConnections,
+        },
       },
       {
         method: "PUT",
@@ -71,8 +78,13 @@ export function OpenAIApiPage() {
         organizationId={pipeline.organization_id}
         pipelineId={pipeline.id}
         nodesNames={nodes.map((node) => node.data.name)}
+        connections={pipeline.config.connections}
       >
-        <BlockInputList inputs={block.inputs} />
+        <BlockInputList
+          connections={pipeline.config.connections.filter(
+            (connection) => connection.to.block_name === block.name
+          )}
+        />
       </EditBlockForm>
     </>
   );
@@ -107,27 +119,6 @@ function updateConnection(
   };
 }
 
-function updateInput(input: string, updated: IExtendedBlockConfig) {
-  const parts = input.split(":");
-  return parts[0] === updated.oldName ? `${updated.name}:${parts[1]}` : input;
-}
-
-function updateEdge(edge: IEdge, updated: IExtendedBlockConfig) {
-  const updatedEdge = { ...edge };
-
-  if (edge.source === updated.oldName) {
-    updatedEdge.source = updated.name;
-  }
-  if (edge.target === updated.oldName) {
-    updatedEdge.target = updated.name;
-  }
-
-  return {
-    ...updatedEdge,
-    id: `${updatedEdge.source}:${updatedEdge.sourceHandle}-${updatedEdge.target}:${updatedEdge.targetHandle}`,
-  };
-}
-
 function updateNode(node: INode, updated: IExtendedBlockConfig) {
   if (node.id === updated.oldName) {
     const { oldName, ...rest } = updated;
@@ -135,11 +126,5 @@ function updateNode(node: INode, updated: IExtendedBlockConfig) {
     node.id = updated.name;
   }
 
-  node.data.connections = node.data.connections.map((connection) =>
-    updateConnection(connection, updated)
-  );
-  node.data.inputs = node.data.inputs.map((input) =>
-    updateInput(input, updated)
-  );
   return node;
 }

@@ -1,4 +1,3 @@
-import cloneDeep from "lodash.clonedeep";
 import { Connection } from "reactflow";
 import {
   IPipelineConfig,
@@ -7,7 +6,6 @@ import {
   IField,
   IBlockConfig,
   IHandle,
-  IConfigConnection,
 } from "./pipeline.types";
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
@@ -23,27 +21,16 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
 }
 
 export function getEdges(pipeline: IPipelineConfig): IEdge[] {
-  return pipeline.blocks.flatMap((block) =>
-    block.inputs.map((input) => {
-      let targetHandle = "input";
-      let [source, sourceHandle] = input.split(":");
-      if (sourceHandle.includes("->")) {
-        [sourceHandle, targetHandle] = sourceHandle.split("->");
-      }
-      if (targetHandle.includes("?")) {
-        targetHandle = targetHandle.split("?")[0];
-      }
-
-      return {
-        id: `${source}:${sourceHandle}-${block.name}:${targetHandle}`,
-        source: source,
-        sourceHandle: sourceHandle,
-        target: block.name,
-        targetHandle: targetHandle,
-        type: "default",
-      };
-    })
-  );
+  return pipeline.connections.map((connection) => {
+    return {
+      id: `${connection.from.block_name}:${connection.from.output_name}-${connection.to.block_name}:${connection.to.input_name}`,
+      source: connection.from.block_name,
+      sourceHandle: connection.from.output_name,
+      target: connection.to.block_name,
+      targetHandle: connection.to.input_name,
+      type: "default",
+    };
+  });
 }
 
 export function isValidConnection(
@@ -75,59 +62,24 @@ export function toPipelineConfig(
   nodes: INode[],
   edges: IEdge[]
 ): IPipelineConfig {
-  const tmpNodes = cloneDeep(nodes);
-
-  tmpNodes.forEach((node) => {
-    node.data.inputs = [];
-    node.data.connections = [];
-  });
-
-  const connections: IConfigConnection[] = [];
-
-  edges.forEach((edge) => {
-    const originalTargetNode = nodes.find((node) => node.id === edge.target);
-    const targetNode = tmpNodes.find((node) => node.id === edge.target);
-
-    if (!targetNode || !originalTargetNode) return;
-
-    const input = originalTargetNode.data.inputs.find(
-      (input) =>
-        input.split("?")[0] ===
-        `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}`
-    );
-
-    if (!input) return;
-
-    const resetMatch = input.match(/reset=([^&]+)/);
-    const resetValue = resetMatch ? resetMatch[1] === "true" : true;
-
-    targetNode.data.inputs.push(
-      `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}?reset=${resetValue}`
-    );
-
-    const newConnection = {
-      from: {
-        block_name: edge.source,
-        output_name: edge.sourceHandle!,
-      },
-      to: {
-        block_name: edge.target,
-        input_name: edge.targetHandle!,
-      },
-      opts: {
-        reset: resetValue,
-      },
-    };
-
-    targetNode.data.connections.push(newConnection);
-
-    connections.push(newConnection);
-  });
-
   return {
-    blocks: tmpNodes.map((node) => ({ ...node.data, position: node.position })),
+    blocks: nodes.map((node) => ({ ...node.data, position: node.position })),
     version: "1",
-    connections,
+    connections: edges.map((edge) => {
+      return {
+        from: {
+          block_name: edge.source,
+          output_name: edge.sourceHandle!,
+        },
+        to: {
+          block_name: edge.target,
+          input_name: edge.targetHandle!,
+        },
+        opts: {
+          reset: true,
+        },
+      };
+    }),
   };
 }
 

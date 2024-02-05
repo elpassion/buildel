@@ -1,30 +1,31 @@
 import React, { PropsWithChildren, useMemo, useRef, useState } from "react";
 import { ItemList } from "~/components/list/ItemList";
 import { HelpfulIcon } from "~/components/tooltip/HelpfulIcon";
+import { IConfigConnection } from "~/components/pages/pipelines/pipeline.types";
 import { Checkbox } from "@elpassion/taco";
 import classNames from "classnames";
 import { useInputs } from "./EditBlockForm";
 
 interface BlockInputListProps {
-  inputs: string[];
+  connections: IConfigConnection[];
 }
 
-export const BlockInputList: React.FC<BlockInputListProps> = ({ inputs }) => {
-  const formattedInputs: IItem[] = useMemo(
+export const BlockInputList: React.FC<BlockInputListProps> = ({
+  connections,
+}) => {
+  const formattedConnections: IItem[] = useMemo(
     () =>
-      inputs.map((input) => {
-        const reset = input.split("?").at(1) !== "reset=false";
+      connections.map((connection) => {
+        const id = `${connection.from.block_name}:${connection.from.output_name}-${connection.to.block_name}:${connection.to.input_name}`;
         return {
-          id: input,
-          originalValue: input,
-          value: input.split(":").at(0),
-          reset: reset,
+          id: id,
+          data: connection,
         };
       }),
-    [inputs]
+    [connections]
   );
 
-  if (inputs.length === 0) return null;
+  if (formattedConnections.length === 0) return null;
 
   return (
     <div>
@@ -40,7 +41,7 @@ export const BlockInputList: React.FC<BlockInputListProps> = ({ inputs }) => {
 
       <ItemList
         className="flex flex-wrap gap-2"
-        items={formattedInputs}
+        items={formattedConnections}
         renderItem={(item) => <BlockInputItem {...item} />}
       />
     </div>
@@ -49,18 +50,16 @@ export const BlockInputList: React.FC<BlockInputListProps> = ({ inputs }) => {
 
 interface IItem {
   id: string;
-  originalValue: string;
-  value?: string;
-  reset: boolean;
+  data: IConfigConnection;
 }
 
-function BlockInputItem({ value, originalValue, reset }: IItem) {
+function BlockInputItem({ data }: IItem) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const [resettable, setResettable] = useState(reset);
+  const [resettable, setResettable] = useState(data.opts.reset);
   const { updateInputReset } = useInputs();
 
   const onCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateInputReset(originalValue, e.target.checked);
+    updateInputReset(data, e.target.checked);
     setResettable(e.target.checked);
   };
 
@@ -71,12 +70,15 @@ function BlockInputItem({ value, originalValue, reset }: IItem) {
           size="sm"
           checked={resettable}
           onChange={onCheckedChange}
-          id={`${value}-resettable`}
+          id={`${data.from.block_name}-resettable`}
         />
 
-        <label htmlFor={`${value}-resettable`} className="cursor-pointer">
+        <label
+          htmlFor={`${data.from.block_name}-resettable`}
+          className="cursor-pointer"
+        >
           <BadgeText variant={resettable ? "primary" : "secondary"}>
-            {value ?? originalValue}
+            {data.from.block_name}
           </BadgeText>
         </label>
       </Badge>
