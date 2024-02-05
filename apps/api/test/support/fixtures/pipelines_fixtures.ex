@@ -236,4 +236,26 @@ defmodule Buildel.PipelinesFixtures do
 
     run
   end
+
+  def alias_fixture(attrs \\ %{}) do
+    pipeline =
+      if attrs[:pipeline_id] do
+        attrs[:pipeline_id] |> Buildel.Pipelines.get_pipeline!()
+      else
+        pipeline_fixture()
+      end
+
+    alias_config =
+      attrs
+      |> Enum.into(%{
+        name: "some name",
+        config: pipeline.config || %{},
+        interface_config: pipeline.interface_config || %{},
+        pipeline_id: pipeline.id
+      })
+
+    {:ok, alias} = Buildel.Pipelines.create_alias(alias_config)
+
+    alias
+  end
 end

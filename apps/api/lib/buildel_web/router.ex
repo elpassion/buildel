@@ -80,6 +80,12 @@ defmodule BuildelWeb.Router do
     )
 
     resources(
+      "/organizations/:organization_id/pipelines/:pipeline_id/aliases",
+      OrganizationPipelineAliasController,
+      only: [:index, :create, :show, :update, :delete]
+    )
+
+    resources(
       "/organizations/:organization_id/pipelines/:pipeline_id/blocks",
       OrganizationPipelineBlockController,
       only: [:create]

@@ -1,5 +1,6 @@
 defmodule Buildel.Pipelines do
   import Ecto.Query, warn: false
+  alias Buildel.Pipelines.Alias
   alias Buildel.Costs.Cost
   alias Buildel.Pipelines.RunCost
   alias Buildel.Repo
@@ -69,6 +70,14 @@ defmodule Buildel.Pipelines do
 
   def get_pipeline_config(%Pipeline{config: config}, "latest") do
     {:ok, config}
+  end
+
+  def get_pipeline_alias(%Pipeline{} = pipeline, alias_id) do
+    case from(a in Alias, where: a.pipeline_id == ^pipeline.id and a.id == ^alias_id)
+         |> Repo.one() do
+      nil -> {:error, :not_found}
+      alias -> {:ok, alias}
+    end
   end
 
   def get_run(id), do: Repo.get(Run, id) |> Repo.preload(:pipeline)
@@ -200,6 +209,34 @@ defmodule Buildel.Pipelines do
       {:ok, struct} -> {:ok, struct}
       {:error, changeset} -> {:error, changeset}
     end
+  end
+
+  def get_pipeline_aliases(%Pipeline{} = pipeline) do
+    aliases =
+      pipeline
+      |> Repo.preload(:pipeline_aliases)
+      |> Map.get(:pipeline_aliases)
+
+    {:ok, aliases}
+  end
+
+  def create_alias(alias_config) do
+    case %Alias{}
+         |> Alias.changeset(alias_config)
+         |> Repo.insert() do
+      {:ok, struct} -> {:ok, struct}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  def update_alias(%Alias{} = alias, alias_config) do
+    alias
+    |> Alias.changeset(alias_config)
+    |> Repo.update()
+  end
+
+  def delete_alias(%Alias{} = alias) do
+    Repo.delete(alias)
   end
 
   defp keys_to_atoms(string_key_map) when is_map(string_key_map) do
