@@ -27,7 +27,10 @@ export function NewPipelinePage() {
             label="Name"
           />
         </Field>
+
         <HiddenField name="pipeline.config.version" value="1" />
+
+        <HiddenField name="pipeline.config.connections" value="[]" />
 
         <HiddenField name="pipeline.config.blocks" value={"[]"} />
       </div>
