@@ -34,6 +34,7 @@ export interface IEdge {
   target: string;
   targetHandle?: string | null;
   type?: string;
+  data?: IConfigConnection;
 }
 
 export interface IField {

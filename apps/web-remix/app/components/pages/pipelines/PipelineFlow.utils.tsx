@@ -29,6 +29,7 @@ export function getEdges(pipeline: IPipelineConfig): IEdge[] {
       target: connection.to.block_name,
       targetHandle: connection.to.input_name,
       type: "default",
+      data: connection,
     };
   });
 }
@@ -76,7 +77,7 @@ export function toPipelineConfig(
           input_name: edge.targetHandle!,
         },
         opts: {
-          reset: true,
+          reset: edge.data?.opts?.reset ?? true,
         },
       };
     }),

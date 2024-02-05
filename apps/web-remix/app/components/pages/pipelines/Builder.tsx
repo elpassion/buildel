@@ -30,7 +30,13 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
-import { IBlockConfig, IEdge, INode, IPipeline } from "./pipeline.types";
+import {
+  IBlockConfig,
+  IConfigConnection,
+  IEdge,
+  INode,
+  IPipeline,
+} from "./pipeline.types";
 import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
@@ -69,7 +75,7 @@ export const Builder = ({
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config)
   );
-  const [edges, setEdges, onEdgesChange] = useEdgesState(
+  const [edges, setEdges, onEdgesChange] = useEdgesState<IConfigConnection>(
     getEdges(pipeline.config)
   );
 
