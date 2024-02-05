@@ -22,13 +22,14 @@ import { links as SubMenuLinks } from "./CreateBlock/GroupSubMenu";
 import { BuilderHeader, SaveChangesButton } from "./BuilderHeader";
 import { BuilderNode } from "./BuilderNode";
 import { loader } from "./loader";
+import { ReadOnlyNode } from "~/components/pages/pipelines/runOverview/ReadOnlyNode";
 
 export const links: LinksFunction = () => [...SubMenuLinks()];
 
 export function PipelineBuilder() {
   const revalidator = useRevalidator();
   const updateFetcher = useFetcher<IPipeline>();
-  const { pipeline, pipelineId, organizationId } =
+  const { pipeline, pipelineId, organizationId, aliasId } =
     useLoaderData<typeof loader>();
 
   const navigate = useNavigate();
@@ -55,9 +56,26 @@ export function PipelineBuilder() {
     navigate(routes.pipelineBuild(organizationId, pipelineId));
   };
 
+  const isDisabled = aliasId !== "latest";
+
+  if (isDisabled)
+    return (
+      <Builder
+        key="flow-readOnly"
+        type="readOnly"
+        className="h-[calc(100vh_-_128px)]"
+        pipeline={pipeline}
+        CustomNode={ReadOnlyNode}
+        CustomEdge={CustomEdge}
+      >
+        {({ isUpToDate }) => <BuilderHeader isUpToDate={isUpToDate} />}
+      </Builder>
+    );
+
   return (
     <>
       <Builder
+        key="flow-editable"
         pipeline={pipeline}
         CustomNode={BuilderNode}
         CustomEdge={CustomEdge}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { FetcherWithComponents, useFetcher } from "@remix-run/react";
 import { SerializeFrom } from "@remix-run/node";
 import { Pagination, usePagination } from "./usePagination";
+import { buildUrlWithParams } from "~/utils/url";
 
 interface UseInfiniteFetchProps<T, R> {
   initialData?: T[];
@@ -64,18 +65,3 @@ export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
     data: mergedData,
   };
 };
-
-function buildUrlWithParams(
-  baseUrl: string,
-  params: Record<string, string | number>
-) {
-  const url = new URL(baseUrl, window.location.origin);
-
-  Object.keys(params).forEach((key) => {
-    if (params[key] !== undefined && params[key] !== null) {
-      url.searchParams.set(key, params[key].toString());
-    }
-  });
-
-  return url.pathname + url.search;
-}

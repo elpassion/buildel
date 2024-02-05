@@ -1,3 +1,6 @@
+import { Params } from "@remix-run/react";
+import { buildUrlWithParams } from "~/utils/url";
+
 export const routes = {
   dashboard: "/",
   login: "/login",
@@ -19,17 +22,36 @@ export const routes = {
     `${routes.organization(organizationId)}/pipelines`,
   pipeline: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipelines(organizationId)}/${pipelineId}`,
-  pipelineBuild: (organizationId: OrganizationId, pipelineId: PipelineId) =>
-    `${routes.pipeline(organizationId, pipelineId)}/build`,
+  pipelineBuild: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: Record<string, string | number> = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipeline(organizationId, pipelineId)}/build`,
+      params
+    ),
   pipelineBlocks: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipelineBuild(organizationId, pipelineId)}/blocks`,
   pipelineEditBlock: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    blockName: string
-  ) => `${routes.pipelineBlocks(organizationId, pipelineId)}/${blockName}`,
-  pipelineRuns: (organizationId: OrganizationId, pipelineId: PipelineId) =>
-    `${routes.pipeline(organizationId, pipelineId)}/runs`,
+    blockName: string,
+    params: Record<string, string | number> = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineBlocks(organizationId, pipelineId)}/${blockName}`,
+      params
+    ),
+  pipelineRuns: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: Record<string, string | number> = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipeline(organizationId, pipelineId)}/runs`,
+      params
+    ),
   pipelineRun: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,

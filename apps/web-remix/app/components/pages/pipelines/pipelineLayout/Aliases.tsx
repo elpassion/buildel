@@ -1,23 +1,18 @@
-import React, { HTMLProps, PropsWithChildren, useMemo, useRef } from "react";
+import React, { PropsWithChildren, useMemo, useRef } from "react";
 import { ItemList } from "~/components/list/ItemList";
+import { Icon } from "@elpassion/taco";
+import classNames from "classnames";
+import z from "zod";
 import {
   IPipeline,
   IPipelineAlias,
-  IPipelineConfig,
 } from "~/components/pages/pipelines/pipeline.types";
 import { useBoolean, useOnClickOutside } from "usehooks-ts";
-import classNames from "classnames";
-import { Badge, Icon } from "@elpassion/taco";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
-import { schema } from "~/components/pages/pipelines/list/schema";
-import { routes } from "~/utils/routes.utils";
 import { HiddenField } from "~/components/form/fields/field.context";
-import { IconButton } from "~/components/iconButton";
-import { Duplicate } from "~/icons/Duplicate";
-import { createAliasSchema } from "./schema";
-import z from "zod";
 import { BasicLink } from "~/components/link/BasicLink";
+import { useSearchParams } from "@remix-run/react";
 
 interface AliasSelectProps {
   aliases: IPipelineAlias[];
@@ -83,7 +78,7 @@ export const AliasDropdown: React.FC<PropsWithChildren<AliasDropdownProps>> = ({
   return (
     <div
       className={classNames(
-        "min-w-[250px] absolute z-[11] top-full translate-y-[4px] right-0 bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden p-1 transition",
+        "min-w-[250px] absolute z-[11] top-full translate-y-[4px] right-0 bg-neutral-850 border border-neutral-800 rounded-lg overflow-hidden p-1 transition",
         {
           "opacity-0 pointer-events-none": !isShown,
           "opacity-100 pointer-events-auto": isShown,
@@ -100,13 +95,17 @@ interface AliasListProps {
 }
 
 export const AliasList = ({ data }: AliasListProps) => {
+  const [searchParams] = useSearchParams();
+  const alias = searchParams.get("alias") ?? "latest";
+
   return (
     <ItemList
       items={data}
+      className="flex flex-col gap-1"
       emptyText={<span className="text-neutral-200 text-xs">No data</span>}
       renderItem={(data) => (
-        <BasicLink to={`?alias=${data.id}`}>
-          <AliasListItem data={data} />
+        <BasicLink to={data.id === "latest" ? "" : `?alias=${data.id}`}>
+          <AliasListItem data={data} isActive={alias === `${data.id}`} />
         </BasicLink>
       )}
     />
@@ -115,20 +114,34 @@ export const AliasList = ({ data }: AliasListProps) => {
 
 interface AliasListItemProps {
   data: IPipelineAlias;
+  isActive?: boolean;
 }
 
-export const AliasListItem = ({ data }: AliasListItemProps) => {
+export const AliasListItem = ({ data, isActive }: AliasListItemProps) => {
   return (
-    <div className="flex gap-2 text-neutral-100 text-sm py-2 px-1 rounded hover:px-2 hover:bg-neutral-950 transition-all">
-      <span>{data.name}</span>
+    <div
+      className={classNames(
+        "flex gap-2 text-neutral-100 text-sm py-2 px-1.5 rounded hover:px-2 hover:bg-neutral-950 transition-all",
+        { "bg-neutral-850": !isActive, "bg-neutral-950": isActive }
+      )}
+    >
+      <span className="truncate line-clamp-1">
+        {data.name} {isActive ? "*" : null}
+      </span>
       {data.id === "latest" ? (
-        <div className="px-1 bg-neutral-800 text-neutral-300 text-xs !leading-[20px] rounded-sm">
-          {data.id}
-        </div>
+        <AliasListItemBadge>{data.id}</AliasListItemBadge>
       ) : null}
     </div>
   );
 };
+
+function AliasListItemBadge({ children }: PropsWithChildren) {
+  return (
+    <div className="px-1 bg-neutral-800 text-neutral-300 text-xs !leading-[20px] rounded-sm">
+      {children}
+    </div>
+  );
+}
 
 interface CreateAliasFormProps {
   pipeline: IPipeline;

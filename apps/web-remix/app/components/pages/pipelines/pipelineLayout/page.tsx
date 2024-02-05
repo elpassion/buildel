@@ -1,6 +1,6 @@
 import React from "react";
 import type { LinksFunction } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { Outlet, useLoaderData, useSearchParams } from "@remix-run/react";
 import editorStyles from "~/components/editor/editor.styles.css";
 import flowStyles from "reactflow/dist/style.css";
 import { routes } from "~/utils/routes.utils";
@@ -18,6 +18,7 @@ export const links: LinksFunction = () => [
 
 export function PipelineLayout() {
   const { pipeline, aliases } = useLoaderData<typeof loader>();
+  const [searchParams] = useSearchParams();
 
   return (
     <>
@@ -39,12 +40,20 @@ export function PipelineLayout() {
           <FilledTabsWrapper>
             <FilledTabLink
               end
-              to={routes.pipelineBuild(pipeline.organization_id, pipeline.id)}
+              to={routes.pipelineBuild(
+                pipeline.organization_id,
+                pipeline.id,
+                Object.fromEntries(searchParams)
+              )}
             >
               Build
             </FilledTabLink>
             <FilledTabLink
-              to={routes.pipelineRuns(pipeline.organization_id, pipeline.id)}
+              to={routes.pipelineRuns(
+                pipeline.organization_id,
+                pipeline.id,
+                Object.fromEntries(searchParams)
+              )}
             >
               Overview
             </FilledTabLink>

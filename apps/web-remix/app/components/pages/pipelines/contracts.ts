@@ -130,6 +130,7 @@ export const PipelineRun = z.object({
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),
+    connections: z.array(ConfigConnection).default([]),
   }),
 });
 

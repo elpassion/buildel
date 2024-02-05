@@ -9,8 +9,9 @@ import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider
 import { useCallback, useMemo } from "react";
 import { IconButton } from "~/components/iconButton";
 import { Icon } from "@elpassion/taco";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
 import { confirm } from "~/components/modal/confirm";
+import { routes } from "~/utils/routes.utils";
 
 export function BuilderNode(props: CustomNodeProps) {
   return (
@@ -44,6 +45,8 @@ function BuilderNodeHeaderActions({
 }: BuilderNodeHeaderActionsProps) {
   const navigate = useNavigate();
   const { status: runStatus } = useRunPipeline();
+  const [searchParams] = useSearchParams();
+  const { organizationId, pipelineId } = useParams();
 
   const handleDelete = useCallback(() => {
     confirm({
@@ -58,8 +61,15 @@ function BuilderNodeHeaderActions({
   }, []);
 
   const handleEdit = useCallback(() => {
-    navigate(`./blocks/${data.name}`);
-  }, [data]);
+    navigate(
+      routes.pipelineEditBlock(
+        organizationId ?? "",
+        pipelineId ?? "",
+        data.name,
+        Object.fromEntries(searchParams)
+      )
+    );
+  }, [data, searchParams]);
 
   const isEditable = useMemo(() => {
     try {
