@@ -124,11 +124,13 @@ defmodule Buildel.Blocks.Block do
       end
 
       def get_input(input_name) do
-        options().inputs |> Enum.find(&(&1.name == input_name))
+        opts = options()
+        (opts.inputs ++ opts.ios) |> Enum.find(&(&1.name == input_name))
       end
 
       def get_output(output_name) do
-        options().outputs |> Enum.find(&(&1.name == output_name))
+        opts = options()
+        (opts.outputs ++ opts.ios) |> Enum.find(&(&1.name == output_name))
       end
 
       defoverridable handle_stream_stop: 2
