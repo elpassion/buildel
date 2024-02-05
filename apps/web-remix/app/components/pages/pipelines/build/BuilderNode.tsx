@@ -10,6 +10,7 @@ import { useCallback, useMemo } from "react";
 import { IconButton } from "~/components/iconButton";
 import { Icon } from "@elpassion/taco";
 import { useNavigate } from "@remix-run/react";
+import { confirm } from "~/components/modal/confirm";
 
 export function BuilderNode(props: CustomNodeProps) {
   return (
@@ -45,7 +46,15 @@ function BuilderNodeHeaderActions({
   const { status: runStatus } = useRunPipeline();
 
   const handleDelete = useCallback(() => {
-    onDelete(data);
+    confirm({
+      onConfirm: async () => onDelete(data),
+      children: (
+        <p className="text-white">
+          You are about to delete the "{data.name}" block from your workflow.
+          This action is irreversible.
+        </p>
+      ),
+    });
   }, []);
 
   const handleEdit = useCallback(() => {
