@@ -72,6 +72,13 @@ defmodule Buildel.Pipelines do
     {:ok, config}
   end
 
+  def get_pipeline_config(pipeline, alias_id) do
+    case get_pipeline_alias(pipeline, alias_id) do
+      {:ok, alias} -> {:ok, alias.config}
+      {:error, _} -> {:error, :not_found}
+    end
+  end
+
   def get_pipeline_alias(%Pipeline{} = pipeline, alias_id) do
     case from(a in Alias, where: a.pipeline_id == ^pipeline.id and a.id == ^alias_id)
          |> Repo.one() do
