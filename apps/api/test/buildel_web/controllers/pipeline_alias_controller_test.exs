@@ -31,7 +31,7 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
       assert json_response(conn, 404)
     end
 
-    test "lists all pipeline aliases", %{
+    test "lists all pipeline aliases including latest", %{
       conn: conn,
       organization: organization,
       pipeline: pipeline,
@@ -40,10 +40,20 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
       organization_id = organization.id
       pipeline_id = pipeline.id
       alias_id = alias.id
+      alias_name = alias.name
+
+      %{config: pipeline_config, interface_config: pipeline_interface_config, name: pipeline_name} =
+        pipeline
 
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines/#{pipeline_id}/aliases")
 
       assert [
+               %{
+                 "config" => ^pipeline_config,
+                 "id" => "latest",
+                 "interface_config" => ^pipeline_interface_config,
+                 "name" => ^pipeline_name
+               },
                %{
                  "config" => %{
                    "blocks" => [
@@ -80,7 +90,7 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
                  },
                  "id" => ^alias_id,
                  "interface_config" => %{},
-                 "name" => "some name"
+                 "name" => ^alias_name
                }
              ] = json_response(conn, 200)["data"]
     end

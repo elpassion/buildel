@@ -217,7 +217,7 @@ defmodule Buildel.Pipelines do
       |> Repo.preload(:pipeline_aliases)
       |> Map.get(:pipeline_aliases)
 
-    {:ok, aliases}
+    {:ok, [Alias.latest_pipeline_config(pipeline) | aliases]}
   end
 
   def create_alias(alias_config) do
