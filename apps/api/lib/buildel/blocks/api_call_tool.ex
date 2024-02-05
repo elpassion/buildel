@@ -109,7 +109,7 @@ defmodule Buildel.Blocks.ApiCallTool do
       args
       |> Enum.reduce(state[:opts][:url], fn
         {key, value}, acc when is_binary(value) ->
-          String.replace(acc, "{{#{key}}}", value |> to_string())
+          String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
 
         _, acc ->
           acc
