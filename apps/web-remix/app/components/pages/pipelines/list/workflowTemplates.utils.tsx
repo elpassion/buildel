@@ -14,6 +14,24 @@ export const sampleTemplates = [
   {
     name: "AI Chat",
     icon: <AiChatSpark />,
+    connections: [
+      {
+        from: { block_name: "text_input_1", output_name: "output" },
+        opts: { reset: true },
+        to: {
+          block_name: "chat_1",
+          input_name: "input",
+        },
+      },
+      {
+        from: { block_name: "chat_1", output_name: "output" },
+        opts: { reset: true },
+        to: {
+          block_name: "text_output_1",
+          input_name: "input",
+        },
+      },
+    ],
     blocks: [
       generateTextInput({
         position: { x: 0, y: -500 },
@@ -51,6 +69,24 @@ export const sampleTemplates = [
   {
     name: "Speech To Text",
     icon: <SoundRecognition />,
+    connections: [
+      {
+        from: { block_name: "audio_input_1", output_name: "output" },
+        opts: { reset: true },
+        to: {
+          block_name: "speech_to_text_1",
+          input_name: "input",
+        },
+      },
+      {
+        from: { block_name: "speech_to_text_1", output_name: "output" },
+        opts: { reset: true },
+        to: {
+          block_name: "text_output_1",
+          input_name: "input",
+        },
+      },
+    ],
     blocks: [
       generateAudioInput({ position: { x: 0, y: -500 } }),
       generateSpeechToText({
@@ -86,6 +122,24 @@ export const sampleTemplates = [
   {
     name: "Text To Speech",
     icon: <VoiceMailBubble />,
+    connections: [
+      {
+        from: { block_name: "text_input_1", output_name: "output" },
+        opts: { reset: true },
+        to: {
+          block_name: "text_to_speech_1",
+          input_name: "input",
+        },
+      },
+      {
+        from: { block_name: "text_to_speech_1", output_name: "output" },
+        opts: { reset: true },
+        to: {
+          block_name: "audio_output_1",
+          input_name: "input",
+        },
+      },
+    ],
     blocks: [
       generateTextInput({
         position: { x: 0, y: -500 },
@@ -123,6 +177,24 @@ export const sampleTemplates = [
   {
     name: "Knowledge Search To Text",
     icon: <Icon iconName="search" />,
+    connections: [
+      {
+        from: { block_name: "text_input_1", output_name: "output" },
+        opts: { reset: true },
+        to: {
+          block_name: "document_search_1",
+          input_name: "input",
+        },
+      },
+      {
+        from: { block_name: "document_search_1", output_name: "output" },
+        opts: { reset: true },
+        to: {
+          block_name: "text_output_1",
+          input_name: "input",
+        },
+      },
+    ],
     blocks: [
       generateTextInput({
         position: { x: 0, y: -500 },

@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { Button, Icon } from "@elpassion/taco";
 import { ItemList } from "~/components/list/ItemList";
 import { HiddenField } from "~/components/form/fields/field.context";
-import type { IBlockConfig } from "../pipeline.types";
+import type { IBlockConfig, IConfigConnection } from "../pipeline.types";
 import { schema } from "./schema";
 
 interface WorkflowTemplatesProps extends PropsWithChildren {
@@ -33,6 +33,7 @@ interface ITemplate {
   id: string | number;
   name: string;
   icon?: ReactNode;
+  connections: IConfigConnection[];
   blocks: Partial<Omit<IBlockConfig, "block_type">>[];
 }
 
@@ -63,6 +64,7 @@ function WorkflowTemplatesListItem({
   name,
   blocks,
   organizationId,
+  connections,
 }: ITemplateItem) {
   const validator = useMemo(() => withZod(schema), []);
   return (
@@ -78,6 +80,11 @@ function WorkflowTemplatesListItem({
       </div>
 
       <HiddenField name="pipeline.name" value={name} />
+
+      <HiddenField
+        name="pipeline.config.connections"
+        value={JSON.stringify(connections)}
+      />
 
       <HiddenField name="pipeline.config.version" value="1" />
 
