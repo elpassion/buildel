@@ -34,12 +34,12 @@ export function OpenAIApiPage() {
   };
 
   const handleSubmit = (
-    updated: IExtendedBlockConfig,
+    updatedBlock: IExtendedBlockConfig,
     connections: IConfigConnection[]
   ) => {
-    const updatedNodes = nodes.map((node) => updateNode(node, updated));
+    const updatedNodes = nodes.map((node) => updateNode(node, updatedBlock));
     const updatedConnections = connections.map((connection) =>
-      updateConnection(connection, updated)
+      updateConnection(connection, updatedBlock)
     );
 
     updateFetcher.submit(

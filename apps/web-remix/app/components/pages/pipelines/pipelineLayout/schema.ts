@@ -15,3 +15,23 @@ export const updateSchema = z.object({
     connections: z.array(ConfigConnection).default([]),
   }),
 });
+
+export const createAliasSchema = z.object({
+  name: z.string().min(1),
+  interface_config: z.union([
+    z.string().transform((value) => JSON.parse(value)),
+    InterfaceConfig,
+    z.null(),
+  ]),
+  config: z.object({
+    version: z.string(),
+    blocks: z.union([
+      z.string().transform((value) => JSON.parse(value)),
+      z.array(UpdateBlockConfig),
+    ]),
+    connections: z.union([
+      z.string().transform((value) => JSON.parse(value)),
+      z.array(ConfigConnection).default([]),
+    ]),
+  }),
+});

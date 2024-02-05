@@ -14,6 +14,7 @@ export const sampleTemplates = [
   {
     name: "AI Chat",
     icon: <AiChatSpark />,
+    interface_config: null,
     connections: [
       {
         from: { block_name: "text_input_1", output_name: "output" },
@@ -69,6 +70,7 @@ export const sampleTemplates = [
   {
     name: "Speech To Text",
     icon: <SoundRecognition />,
+    interface_config: null,
     connections: [
       {
         from: { block_name: "audio_input_1", output_name: "output" },
@@ -122,6 +124,7 @@ export const sampleTemplates = [
   {
     name: "Text To Speech",
     icon: <VoiceMailBubble />,
+    interface_config: null,
     connections: [
       {
         from: { block_name: "text_input_1", output_name: "output" },
@@ -177,6 +180,7 @@ export const sampleTemplates = [
   {
     name: "Knowledge Search To Text",
     icon: <Icon iconName="search" />,
+    interface_config: null,
     connections: [
       {
         from: { block_name: "text_input_1", output_name: "output" },

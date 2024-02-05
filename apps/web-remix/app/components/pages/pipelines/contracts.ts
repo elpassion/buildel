@@ -41,7 +41,7 @@ export const BlockConfig = z.object({
   connections: z.array(ConfigConnection).default([]),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
-  block_type: BlockType,
+  block_type: BlockType.optional(),
 });
 
 export const UpdateBlockConfig = z.object({
@@ -73,8 +73,8 @@ export const UpdateBlockConfig = z.object({
 });
 
 export const InterfaceConfig = z.object({
-  input: z.string().min(2),
-  output: z.string().min(2),
+  input: z.string().min(2).optional(),
+  output: z.string().min(2).optional(),
 });
 
 export const Pipeline = z.object({
@@ -89,6 +89,29 @@ export const Pipeline = z.object({
     connections: z.array(ConfigConnection).default([]),
   }),
 });
+
+export const Alias = z.object({
+  id: z.union([z.string().min(1), z.number()]),
+  name: z.string().min(2),
+  config: z.object({
+    version: z.string(),
+    blocks: z.array(BlockConfig),
+    connections: z.array(ConfigConnection).default([]),
+  }),
+  interface_config: z.union([InterfaceConfig, z.null()]),
+});
+
+export const AliasResponse = z
+  .object({
+    data: Alias,
+  })
+  .transform((response) => {
+    return response.data;
+  });
+
+export const AliasesResponse = z
+  .object({ data: z.array(Alias) })
+  .transform((response) => response.data);
 
 export const PipelineCost = z.object({
   amount: z.string(),
