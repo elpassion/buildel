@@ -16,7 +16,7 @@ export const BlockType = z.object({
   schema: z.record(z.string(), z.any()),
 });
 
-export const BlockConfigConnection = z.object({
+export const ConfigConnection = z.object({
   from: z.object({
     block_name: z.string(),
     output_name: z.string(),
@@ -38,7 +38,7 @@ export const BlockConfig = z.object({
   name: z.string(),
   opts: z.record(z.string(), z.any()),
   inputs: z.array(z.string()),
-  connections: z.array(BlockConfigConnection).default([]),
+  connections: z.array(ConfigConnection).default([]),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
   block_type: BlockType,
@@ -86,6 +86,7 @@ export const Pipeline = z.object({
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),
+    connections: z.array(ConfigConnection).default([]),
   }),
 });
 

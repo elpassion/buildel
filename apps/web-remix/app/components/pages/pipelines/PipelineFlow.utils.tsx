@@ -7,6 +7,7 @@ import {
   IField,
   IBlockConfig,
   IHandle,
+  IConfigConnection,
 } from "./pipeline.types";
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
@@ -81,6 +82,8 @@ export function toPipelineConfig(
     node.data.connections = [];
   });
 
+  const connections: IConfigConnection[] = [];
+
   edges.forEach((edge) => {
     const originalTargetNode = nodes.find((node) => node.id === edge.target);
     const targetNode = tmpNodes.find((node) => node.id === edge.target);
@@ -102,7 +105,7 @@ export function toPipelineConfig(
       `${edge.source}:${edge.sourceHandle}->${edge.targetHandle}?reset=${resetValue}`
     );
 
-    targetNode.data.connections!.push({
+    const newConnection = {
       from: {
         block_name: edge.source,
         output_name: edge.sourceHandle!,
@@ -114,12 +117,17 @@ export function toPipelineConfig(
       opts: {
         reset: resetValue,
       },
-    });
+    };
+
+    targetNode.data.connections.push(newConnection);
+
+    connections.push(newConnection);
   });
 
   return {
     blocks: tmpNodes.map((node) => ({ ...node.data, position: node.position })),
     version: "1",
+    connections,
   };
 }
 

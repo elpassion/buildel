@@ -1,5 +1,9 @@
 import { z } from "zod";
-import { InterfaceConfig, UpdateBlockConfig } from "../contracts";
+import {
+  ConfigConnection,
+  InterfaceConfig,
+  UpdateBlockConfig,
+} from "../contracts";
 
 export const updateSchema = z.object({
   id: z.number(),
@@ -8,5 +12,6 @@ export const updateSchema = z.object({
   config: z.object({
     version: z.string(),
     blocks: z.array(UpdateBlockConfig),
+    connections: z.array(ConfigConnection).default([]),
   }),
 });

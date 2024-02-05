@@ -10,7 +10,7 @@ import {
 } from "~/components/pages/pipelines/PipelineFlow.utils";
 import {
   IBlockConfig,
-  IBlockConfigConnection,
+  IConfigConnection,
   IEdge,
   INode,
   IPipeline,
@@ -97,7 +97,7 @@ function updateConnectionEnd<T>(
 }
 
 function updateConnection(
-  connection: IBlockConfigConnection,
+  connection: IConfigConnection,
   updated: IExtendedBlockConfig
 ) {
   return {
