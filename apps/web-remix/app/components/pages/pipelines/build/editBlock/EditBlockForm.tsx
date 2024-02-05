@@ -24,7 +24,7 @@ import {
 } from "~/components/form/schema/SchemaParser";
 import {
   IBlockConfig,
-  IBlockConfigConnection,
+  IConfigConnection,
 } from "~/components/pages/pipelines/pipeline.types";
 import {
   Field as FormField,
@@ -261,7 +261,7 @@ function TriggerValidation() {
   return null;
 }
 
-function generateSuggestions(connections: IBlockConfigConnection[]) {
+function generateSuggestions(connections: IConfigConnection[]) {
   return connections.map((connection) => {
     return {
       value: `${connection.from.block_name}:${connection.from.output_name}`,

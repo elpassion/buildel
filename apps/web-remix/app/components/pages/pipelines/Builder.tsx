@@ -102,20 +102,19 @@ export const Builder = ({
   const handleDelete = useCallback(
     (node: IBlockConfig) => {
       setEdges((eds) => eds.filter((ed) => ed.source !== node.name));
-      setNodes((nds) =>
-        nds
-          .filter((nd) => nd.id !== node.name)
-          .map((nd) => {
-            return {
-              ...nd,
-              data: {
-                ...nd.data,
-                inputs: nd.data.inputs.filter(
-                  (inp) => !inp.includes(`${node.name}:output`)
-                ),
-              },
-            };
-          })
+      setNodes(
+        (nds) => nds.filter((nd) => nd.id !== node.name)
+        // .map((nd) => {
+        //   return {
+        //     ...nd,
+        //     data: {
+        //       ...nd.data,
+        //       inputs: nd.data.inputs.filter(
+        //         (inp) => !inp.includes(`${node.name}:output`)
+        //       ),
+        //     },
+        //   };
+        // })
       );
     },
     [setNodes, setEdges]
