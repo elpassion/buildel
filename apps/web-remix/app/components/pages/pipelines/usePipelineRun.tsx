@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { assert } from "~/utils/assert";
 import { BuildelRun, BuildelRunStatus, BuildelSocket } from "@buildel/buildel";
+import { string } from "zod";
 
 export function usePipelineRun(
   organizationId: number,
@@ -19,10 +20,11 @@ export function usePipelineRun(
   const [status, setStatus] = useState<BuildelRunStatus>("idle");
 
   const startRun = async (
-    initialInputs: { name: string; value: string }[] = []
+    initialInputs: { name: string; value: string }[] = [],
+    alias?: string
   ) => {
     assert(run.current);
-    await run.current.start(initialInputs);
+    await run.current.start(initialInputs, alias);
   };
   const stopRun = async () => {
     assert(run.current);

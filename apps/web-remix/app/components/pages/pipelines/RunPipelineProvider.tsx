@@ -41,11 +41,13 @@ const RunPipelineContext = React.createContext<IRunPipelineContext | undefined>(
 );
 interface RunPipelineProviderProps extends PropsWithChildren {
   pipeline: IPipeline;
+  alias: string;
 }
 
 export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   children,
   pipeline,
+  alias,
 }) => {
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [events, setEvents] = useState<any[]>([]);
@@ -88,11 +90,11 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     onStatusChange,
     onError
   );
-
+  console.log(alias);
   const handleStartRun = useCallback(async () => {
     setErrors({});
-    await startRun();
-  }, [startRun]);
+    await startRun([], alias);
+  }, [startRun, alias]);
 
   const handlePush = useCallback(
     (topic: string, payload: any) => {

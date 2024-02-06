@@ -23,7 +23,7 @@ import { links as SubMenuLinks } from "./CreateBlock/GroupSubMenu";
 import { BuilderHeader, SaveChangesButton } from "./BuilderHeader";
 import { BuilderNode } from "./BuilderNode";
 import { loader } from "./loader";
-import { ReadOnlyNode } from "~/components/pages/pipelines/runOverview/ReadOnlyNode";
+import { AliasNode } from "~/components/pages/pipelines/build/AliasNode";
 
 export const links: LinksFunction = () => [...SubMenuLinks()];
 
@@ -69,11 +69,12 @@ export function PipelineBuilder() {
   if (isDisabled)
     return (
       <Builder
+        alias={aliasId}
         key="flow-readOnly"
         type="readOnly"
         className="h-[calc(100vh_-_128px)]"
         pipeline={pipeline}
-        CustomNode={ReadOnlyNode}
+        CustomNode={AliasNode}
         CustomEdge={CustomEdge}
       >
         {({ isUpToDate }) => <BuilderHeader isUpToDate={isUpToDate} />}
@@ -83,6 +84,7 @@ export function PipelineBuilder() {
   return (
     <>
       <Builder
+        alias={aliasId}
         key="flow-editable"
         pipeline={pipeline}
         CustomNode={BuilderNode}

@@ -43,6 +43,7 @@ import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
 
 interface BuilderProps {
+  alias?: string;
   type?: "readOnly" | "editable";
   className?: string;
   pipeline: IPipeline;
@@ -65,6 +66,7 @@ interface BuilderProps {
 export const Builder = ({
   pipeline,
   children,
+  alias = "latest",
   type = "editable",
   isUpdating,
   CustomNode,
@@ -204,6 +206,7 @@ export const Builder = ({
       ref={reactFlowWrapper}
     >
       <RunPipelineProvider
+        alias={alias}
         pipeline={{ ...pipeline, config: toPipelineConfig(nodes, edges) }}
       >
         <ReactFlowProvider>

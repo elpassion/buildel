@@ -26,8 +26,8 @@ importers:
   apps/web-remix:
     dependencies:
       '@buildel/buildel':
-        specifier: ^0.1.5
-        version: 0.1.5
+        specifier: ^0.1.6
+        version: 0.1.6
       '@elpassion/taco':
         specifier: ^0.6.0
         version: 0.6.0(@tanstack/react-table@8.9.3)(@types/react-dom@18.0.11)(@types/react-modal@3.16.0)(@types/react@18.2.18)(classnames@2.3.2)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.16.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.7.4)(react@18.2.0)
@@ -750,8 +750,8 @@ packages:
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
 
-  /@buildel/buildel@0.1.5:
-    resolution: {integrity: sha512-/4JsJcnng3OutkMhRJmjo79N4dUfuQJcsbpNCkRPgKK3PhnrOQxlpcHP+NQ5LE4IGzW2zIXMLKIgYJAdm+tw0g==}
+  /@buildel/buildel@0.1.6:
+    resolution: {integrity: sha512-8sI7XEI852OMJeXOh8t50QCDtcAuwkP4kjhAG0O9fXVcetRcJp2lhK8Ww8tFWGpvlY70JKk6QXX8f0Ki/AvWQA==}
     dependencies:
       phoenix: 1.7.7
       uuid: 9.0.1
