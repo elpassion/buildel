@@ -62,7 +62,8 @@ export function PipelineLayout() {
             <FilledTabLink
               to={routes.pipelineInterface(
                 pipeline.organization_id,
-                pipeline.id
+                pipeline.id,
+                Object.fromEntries(searchParams)
               )}
             >
               Interface
@@ -70,7 +71,8 @@ export function PipelineLayout() {
             <FilledTabLink
               to={routes.pipelineSettings(
                 pipeline.organization_id,
-                pipeline.id
+                pipeline.id,
+                Object.fromEntries(searchParams)
               )}
             >
               Settings

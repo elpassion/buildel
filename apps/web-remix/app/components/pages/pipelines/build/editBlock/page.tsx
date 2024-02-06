@@ -1,6 +1,11 @@
 import React, { useEffect } from "react";
 import { MetaFunction } from "@remix-run/node";
-import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
+import {
+  useFetcher,
+  useLoaderData,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
 import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
 import { routes } from "~/utils/routes.utils";
 import {
@@ -20,17 +25,24 @@ import { loader } from "./loader";
 
 type IExtendedBlockConfig = IBlockConfig & { oldName: string };
 
-export function OpenAIApiPage() {
+export function EditBlockPage() {
   const { organizationId, pipelineId, block, pipeline } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const updateFetcher = useFetcher<IPipeline>();
+  const [searchParams] = useSearchParams();
 
   const nodes = getNodes(pipeline.config);
   const edges = getEdges(pipeline.config);
 
   const closeSidebar = () => {
-    navigate(routes.pipelineBuild(organizationId, pipelineId));
+    navigate(
+      routes.pipelineBuild(
+        organizationId,
+        pipelineId,
+        Object.fromEntries(searchParams.entries())
+      )
+    );
   };
 
   const handleSubmit = (
@@ -62,7 +74,7 @@ export function OpenAIApiPage() {
     if (updateFetcher.data) {
       closeSidebar();
     }
-  }, [updateFetcher]);
+  }, [updateFetcher.data]);
 
   return (
     <>

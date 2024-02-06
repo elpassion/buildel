@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { dayjs } from "~/utils/Dayjs";
 import { IPipelineRun, IPipelineRuns } from "../pipeline.types";
-import { Link } from "@remix-run/react";
+import { Link, useSearchParams } from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
 import { Indicator } from "@elpassion/taco";
 
@@ -18,6 +18,7 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
   pipelineId,
   organizationId,
 }) => {
+  const [searchParams] = useSearchParams();
   const reversed = useMemo(() => {
     return [...items].reverse();
   }, [items]);
@@ -28,7 +29,14 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
       items={reversed}
       emptyText={<EmptyMessage>There is no runs yet...</EmptyMessage>}
       renderItem={(item, index) => (
-        <Link to={routes.pipelineRun(organizationId, pipelineId, item.id)}>
+        <Link
+          to={routes.pipelineRun(
+            organizationId,
+            pipelineId,
+            item.id,
+            Object.fromEntries(searchParams.entries())
+          )}
+        >
           <PipelineRunsItem data={item} index={index} />
         </Link>
       )}

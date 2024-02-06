@@ -1,2 +1,2 @@
 export { loader } from "./loader";
-export { OpenAIApiPage as page, meta } from "./page";
+export { EditBlockPage as page, meta } from "./page";

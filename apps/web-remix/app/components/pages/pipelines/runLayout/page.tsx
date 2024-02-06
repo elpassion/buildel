@@ -1,6 +1,6 @@
 import React from "react";
 import { Icon } from "@elpassion/taco";
-import { Link, Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useSearchParams } from "@remix-run/react";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { routes } from "~/utils/routes.utils";
 import { TabGroup } from "~/components/tabs/TabGroup";
@@ -9,6 +9,7 @@ import { FilledTabLink } from "~/components/tabs/FilledTabLink";
 import { loader } from "./loader";
 
 export function PipelineRunLayout() {
+  const [searchParams] = useSearchParams();
   const { pipeline, runId, pipelineId, organizationId } =
     useLoaderData<typeof loader>();
 
@@ -17,7 +18,13 @@ export function PipelineRunLayout() {
       <AppNavbar
         leftContent={
           <div className="flex gap-2 text-white">
-            <Link to={routes.pipelineRuns(organizationId, pipelineId)}>
+            <Link
+              to={routes.pipelineRuns(
+                organizationId,
+                pipelineId,
+                Object.fromEntries(searchParams.entries())
+              )}
+            >
               <Icon iconName="arrow-left" className="text-2xl" />
             </Link>
             <div>
@@ -33,12 +40,22 @@ export function PipelineRunLayout() {
           <FilledTabsWrapper>
             <FilledTabLink
               end
-              to={routes.pipelineRun(organizationId, pipelineId, runId)}
+              to={routes.pipelineRun(
+                organizationId,
+                pipelineId,
+                runId,
+                Object.fromEntries(searchParams.entries())
+              )}
             >
               Overview
             </FilledTabLink>
             <FilledTabLink
-              to={routes.pipelineRunCosts(organizationId, pipelineId, runId)}
+              to={routes.pipelineRunCosts(
+                organizationId,
+                pipelineId,
+                runId,
+                Object.fromEntries(searchParams.entries())
+              )}
             >
               Costs details
             </FilledTabLink>

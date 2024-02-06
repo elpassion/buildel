@@ -5,6 +5,7 @@ import {
   useLoaderData,
   useMatch,
   useNavigate,
+  useSearchParams,
 } from "@remix-run/react";
 import { MetaFunction } from "@remix-run/node";
 import { EditPipelineNameForm } from "./EditPipelineNameForm";
@@ -27,6 +28,7 @@ export function SettingsPage() {
   const { pipeline, organizationId, pipelineId } =
     useLoaderData<typeof loader>();
   const updateFetcher = useFetcher<IPipeline>();
+  const [searchParams] = useSearchParams();
 
   const handleUpdatePipeline = useCallback(
     (pipeline: IPipeline) => {
@@ -48,7 +50,13 @@ export function SettingsPage() {
   const isSidebarOpen = !!match;
 
   const handleCloseSidebar = () => {
-    navigate(routes.pipelineSettings(organizationId, pipelineId));
+    navigate(
+      routes.pipelineSettings(
+        organizationId,
+        pipelineId,
+        Object.fromEntries(searchParams.entries())
+      )
+    );
   };
 
   return (
@@ -60,7 +68,8 @@ export function SettingsPage() {
             className="text-sm underline text-neutral-200 hover:text-primary-500"
             to={routes.pipelineSettingsConfiguration(
               organizationId,
-              pipelineId
+              pipelineId,
+              Object.fromEntries(searchParams.entries())
             )}
           >
             Workflow configuration

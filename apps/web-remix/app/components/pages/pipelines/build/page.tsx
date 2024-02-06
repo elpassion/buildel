@@ -7,6 +7,7 @@ import {
   useMatch,
   useNavigate,
   useRevalidator,
+  useSearchParams,
 } from "@remix-run/react";
 import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
 import { ELProvider } from "~/components/pages/pipelines/EL/ELProvider";
@@ -29,6 +30,7 @@ export const links: LinksFunction = () => [...SubMenuLinks()];
 export function PipelineBuilder() {
   const revalidator = useRevalidator();
   const updateFetcher = useFetcher<IPipeline>();
+  const [searchParams] = useSearchParams();
   const { pipeline, pipelineId, organizationId, aliasId } =
     useLoaderData<typeof loader>();
 
@@ -53,7 +55,13 @@ export function PipelineBuilder() {
   };
 
   const handleCloseSidebar = () => {
-    navigate(routes.pipelineBuild(organizationId, pipelineId));
+    navigate(
+      routes.pipelineBuild(
+        organizationId,
+        pipelineId,
+        Object.fromEntries(searchParams.entries())
+      )
+    );
   };
 
   const isDisabled = aliasId !== "latest";

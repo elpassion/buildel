@@ -1,6 +1,8 @@
 import { Params } from "@remix-run/react";
 import { buildUrlWithParams } from "~/utils/url";
 
+type RouteParam = Record<string, string | number>;
+
 export const routes = {
   dashboard: "/",
   login: "/login",
@@ -25,7 +27,7 @@ export const routes = {
   pipelineBuild: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: Record<string, string | number> = {}
+    params: RouteParam = {}
   ) =>
     buildUrlWithParams(
       `${routes.pipeline(organizationId, pipelineId)}/build`,
@@ -37,7 +39,7 @@ export const routes = {
     organizationId: OrganizationId,
     pipelineId: PipelineId,
     blockName: string,
-    params: Record<string, string | number> = {}
+    params: RouteParam = {}
   ) =>
     buildUrlWithParams(
       `${routes.pipelineBlocks(organizationId, pipelineId)}/${blockName}`,
@@ -46,7 +48,7 @@ export const routes = {
   pipelineRuns: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: Record<string, string | number> = {}
+    params: RouteParam = {}
   ) =>
     buildUrlWithParams(
       `${routes.pipeline(organizationId, pipelineId)}/runs`,
@@ -55,30 +57,77 @@ export const routes = {
   pipelineRun: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    runId: RunId
-  ) => `${routes.pipelineRuns(organizationId, pipelineId)}/${runId}`,
+    runId: RunId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineRuns(organizationId, pipelineId)}/${runId}`,
+      params
+    ),
   pipelineRunCosts: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    runId: RunId
-  ) => `${routes.pipelineRun(organizationId, pipelineId, runId)}/costs`,
-  pipelineInterface: (organizationId: OrganizationId, pipelineId: PipelineId) =>
-    `${routes.pipeline(organizationId, pipelineId)}/interface`,
-  pipelineClientSDK: (organizationId: OrganizationId, pipelineId: PipelineId) =>
-    `${routes.pipelineInterface(organizationId, pipelineId)}/client-sdk`,
+    runId: RunId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineRun(organizationId, pipelineId, runId)}/costs`,
+      params
+    ),
+  pipelineInterface: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipeline(organizationId, pipelineId)}/interface`,
+      params
+    ),
+  pipelineClientSDK: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineInterface(organizationId, pipelineId)}/client-sdk`,
+      params
+    ),
   pipelineWebsiteChatbot: (
     organizationId: OrganizationId,
-    pipelineId: PipelineId
+    pipelineId: PipelineId,
+    params: RouteParam = {}
   ) =>
-    `${routes.pipelineInterface(organizationId, pipelineId)}/website-chatbot`,
-  pipelineOpenAIApi: (organizationId: OrganizationId, pipelineId: PipelineId) =>
-    `${routes.pipelineInterface(organizationId, pipelineId)}/openai-api`,
-  pipelineSettings: (organizationId: OrganizationId, pipelineId: PipelineId) =>
-    `${routes.pipeline(organizationId, pipelineId)}/settings`,
+    buildUrlWithParams(
+      `${routes.pipelineInterface(organizationId, pipelineId)}/website-chatbot`,
+      params
+    ),
+  pipelineOpenAIApi: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineInterface(organizationId, pipelineId)}/openai-api`,
+      params
+    ),
+  pipelineSettings: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipeline(organizationId, pipelineId)}/settings`,
+      params
+    ),
   pipelineSettingsConfiguration: (
     organizationId: OrganizationId,
-    pipelineId: PipelineId
-  ) => `${routes.pipelineSettings(organizationId, pipelineId)}/configuration`,
+    pipelineId: PipelineId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineSettings(organizationId, pipelineId)}/configuration`,
+      params
+    ),
   pipelinesNew: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/pipelines/new`,
   knowledgeBase: (organizationId: OrganizationId) =>
