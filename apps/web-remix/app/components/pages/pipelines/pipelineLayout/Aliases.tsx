@@ -17,11 +17,12 @@ import { routes } from "~/utils/routes.utils";
 
 interface AliasSelectProps {
   aliases: IPipelineAlias[];
+  value?: string;
 }
 
-export const AliasSelect = ({ aliases }: AliasSelectProps) => {
+export const AliasSelect = ({ aliases, value }: AliasSelectProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { value, setTrue, setFalse } = useBoolean(false);
+  const { value: isShown, setTrue, setFalse } = useBoolean(false);
 
   const show = () => {
     setTrue();
@@ -38,11 +39,11 @@ export const AliasSelect = ({ aliases }: AliasSelectProps) => {
       <SelectTrigger onClick={show}>
         <div className="flex gap-1 items-center">
           <span>Aliases</span>
-          <Icon iconName={value ? "chevron-up" : "chevron-down"} />
+          <Icon iconName={isShown ? "chevron-up" : "chevron-down"} />
         </div>
       </SelectTrigger>
 
-      <AliasDropdown isShown={value}>
+      <AliasDropdown isShown={isShown}>
         <AliasList data={aliases} />
       </AliasDropdown>
     </div>
@@ -170,17 +171,18 @@ function AliasListItemBadge({ children }: PropsWithChildren) {
 
 interface CreateAliasFormProps {
   pipeline: IPipeline;
+  aliases: IPipelineAlias[];
 }
 
-export const CreateAliasForm = ({ pipeline }: CreateAliasFormProps) => {
+export const CreateAliasForm = ({
+  pipeline,
+  aliases,
+}: CreateAliasFormProps) => {
   const validator = useMemo(() => withZod(z.any()), []);
 
   return (
     <ValidatedForm method="POST" validator={validator}>
-      <HiddenField
-        name="name"
-        value={pipeline.name + ` ${Math.random().toFixed(2)}`}
-      />
+      <HiddenField name="name" value={pipeline.name + ` ${aliases.length}`} />
 
       <HiddenField
         name="interface_config"
@@ -212,14 +214,9 @@ export const CreateAliasForm = ({ pipeline }: CreateAliasFormProps) => {
 
 interface RestoreWorkflowProps {
   pipeline: IPipeline;
-
-  aliasId: string;
 }
 
-export const RestoreWorkflow = ({
-  pipeline,
-  aliasId,
-}: RestoreWorkflowProps) => {
+export const RestoreWorkflow = ({ pipeline }: RestoreWorkflowProps) => {
   const updateFetcher = useFetcher();
   const navigate = useNavigate();
 
@@ -236,8 +233,6 @@ export const RestoreWorkflow = ({
       navigate(routes.pipelineBuild(pipeline.organization_id, pipeline.id));
     }
   }, [updateFetcher.data]);
-
-  if (aliasId === "latest") return null;
 
   return (
     <button
