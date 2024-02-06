@@ -8,7 +8,12 @@ import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { HiddenField } from "~/components/form/fields/field.context";
 import { BasicLink } from "~/components/link/BasicLink";
-import { useFetcher, useNavigate, useSearchParams } from "@remix-run/react";
+import {
+  useFetcher,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
 import {
   IPipeline,
   IPipelineAlias,
@@ -99,6 +104,7 @@ interface AliasListProps {
 export const AliasList = ({ data }: AliasListProps) => {
   const [searchParams] = useSearchParams();
   const alias = searchParams.get("alias") ?? "latest";
+  const location = useLocation();
 
   return (
     <ItemList
@@ -106,7 +112,7 @@ export const AliasList = ({ data }: AliasListProps) => {
       className="flex flex-col gap-1"
       emptyText={<span className="text-neutral-200 text-xs">No data</span>}
       renderItem={(data) => (
-        <BasicLink to={data.id === "latest" ? "" : `?alias=${data.id}`}>
+        <BasicLink to={`${location.pathname}?alias=${data.id}`}>
           <AliasListItem data={data} isActive={alias === `${data.id}`} />
         </BasicLink>
       )}

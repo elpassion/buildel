@@ -18,6 +18,7 @@ import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { useLoaderData } from "@remix-run/react";
 import { PipelineResponse } from "~/components/pages/pipelines/contracts";
+import { getAlias } from "~/components/pages/pipelines/alias.utils";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -30,16 +31,19 @@ export async function loader(args: LoaderFunctionArgs) {
       `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`
     );
 
+    const alias = getAlias(request.url);
+
     return json({
       pipeline: pipeline.data,
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
+      alias,
     });
   })(args);
 }
 
 export default function WebsiteChat() {
-  const { pipelineId, organizationId, pipeline } =
+  const { pipelineId, organizationId, pipeline, alias } =
     useLoaderData<typeof loader>();
 
   const {
@@ -58,7 +62,7 @@ export default function WebsiteChat() {
 
   useEffect(() => {
     // todo change it
-    setTimeout(() => startRun(), 500);
+    setTimeout(() => startRun([], alias), 500);
 
     return () => {
       stopRun();

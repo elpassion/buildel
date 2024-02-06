@@ -146,8 +146,15 @@ export const routes = {
     `${routes.organization(organizationId)}/secrets`,
   secretsNew: (organizationId: OrganizationId) =>
     `${routes.secrets(organizationId)}/new`,
-  chatPreview: (organizationId: OrganizationId, pipelineId: PipelineId) =>
-    `/webchats${routes.pipeline(organizationId, pipelineId)}`,
+  chatPreview: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `/webchats${routes.pipeline(organizationId, pipelineId)}`,
+      params
+    ),
 };
 
 type OrganizationId = string | number;

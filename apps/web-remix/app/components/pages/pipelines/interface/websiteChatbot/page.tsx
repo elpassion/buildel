@@ -1,6 +1,6 @@
 import React from "react";
 import { MetaFunction } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
 import { BasicLink } from "~/components/link/BasicLink";
 import { routes } from "~/utils/routes.utils";
 import { successToast } from "~/components/toasts/successToast";
@@ -20,13 +20,15 @@ import {
 
 export function WebsiteChatbotPage() {
   const updateFetcher = useFetcher<IPipeline>();
+  const [searchParams] = useSearchParams();
 
   const { organizationId, pipelineId, pageUrl, pipeline } =
     useLoaderData<typeof loader>();
 
   const websiteChatUrl = `${pageUrl}${routes.chatPreview(
     organizationId,
-    pipelineId
+    pipelineId,
+    Object.fromEntries(searchParams.entries())
   )}`;
 
   const handleUpdate = (interfaceConfig: IInterfaceConfig) => {
@@ -53,7 +55,11 @@ export function WebsiteChatbotPage() {
         </div>
 
         <BasicLink
-          to={routes.chatPreview(organizationId, pipelineId)}
+          to={routes.chatPreview(
+            organizationId,
+            pipelineId,
+            Object.fromEntries(searchParams.entries())
+          )}
           className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
         >
           Open preview
