@@ -1,9 +1,5 @@
 import React, { useCallback } from "react";
 import { IEvent, useRunPipelineNode } from "../RunPipelineProvider";
-import {
-  ChatMessageFormats,
-  FormatMessageProps,
-} from "~/components/chat/ChatMessageFormats";
 import { IBlockConfig, IField } from "../pipeline.types";
 import {
   NodeClearButton,
@@ -11,6 +7,7 @@ import {
   NodeDownloadButton,
 } from "./NodeActionButtons";
 import { AudioOutput } from "./AudioOutput";
+import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 
 interface NodeFieldsOutputProps {
   fields: IField[];
@@ -40,16 +37,8 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
 
               <NodeClearButton onClear={() => clearBlockEvents(block.name)} />
             </div>
-
             <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-              <ChatMessageFormats
-                message={text}
-                formatComponents={{
-                  default: NodeTextFormatOutput,
-                  json: NodeCodeMessageFormatOutput,
-                  html: NodeCodeMessageFormatOutput,
-                }}
-              />
+              <ChatMarkdown>{text}</ChatMarkdown>
             </div>
           </>
         );
@@ -73,22 +62,6 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
         </React.Fragment>
       ))}
     </div>
-  );
-}
-
-function NodeTextFormatOutput({ children }: FormatMessageProps) {
-  return (
-    <div className="prose break-words whitespace-pre-wrap text-xs text-white">
-      {children}
-    </div>
-  );
-}
-
-function NodeCodeMessageFormatOutput({ children }: FormatMessageProps) {
-  return (
-    <pre className="my-1 bg-neutral-900 prose break-words whitespace-pre-wrap text-white text-xs">
-      <code>{children}</code>
-    </pre>
   );
 }
 

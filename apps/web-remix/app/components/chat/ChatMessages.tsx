@@ -3,8 +3,8 @@ import classNames from "classnames";
 import { ItemList } from "~/components/list/ItemList";
 import { ClientOnly } from "~/utils/ClientOnly";
 import { dayjs } from "~/utils/Dayjs";
-import { ChatMessageFormats } from "./ChatMessageFormats";
 import { ChatSize, IMessage, MessageRole } from "./chat.types";
+import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 
 interface ChatMessagesProps {
   messages: IMessage[];
@@ -12,11 +12,7 @@ interface ChatMessagesProps {
   size?: ChatSize;
 }
 
-export function ChatMessages({
-  messages,
-  initialMessages,
-  size = "sm",
-}: ChatMessagesProps) {
+export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
   const reversed = useMemo(() => {
     if (!messages.length) return initialMessages ?? [];
     return messages.map((_, idx) => messages[messages.length - 1 - idx]);
@@ -25,14 +21,14 @@ export function ChatMessages({
   return (
     <ItemList
       className={classNames(
-        "flex flex-col-reverse gap-2 w-full h-[97%] overflow-y-auto pr-1"
+        "flex flex-col-reverse gap-2 w-full h-[97%] overflow-y-auto pr-1 prose"
       )}
       itemClassName="w-full"
       items={reversed}
       renderItem={(msg) => (
         <>
           <ChatMessage role={msg.role}>
-            <ChatMessageFormats message={msg.message} size={size} />
+            <ChatMarkdown>{msg.message}</ChatMarkdown>
           </ChatMessage>
 
           <ClientOnly>
@@ -67,7 +63,7 @@ function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
   return (
     <article
       className={classNames(
-        "w-full max-w-[70%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5",
+        "w-full max-w-[70%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5 prose",
         {
           "bg-neutral-800 rounded-br-xl": role === "ai",
           "bg-neutral-900 rounded-bl-xl ml-auto mr-0": role !== "ai",
