@@ -136,7 +136,10 @@ function H6({
 }: React.ParamHTMLAttributes<HTMLHeadingElement>) {
   return (
     <h6
-      className={classNames("break-words whitespace-pre-wrap", className)}
+      className={classNames(
+        "break-words whitespace-pre-wrap text-neutral-100",
+        className
+      )}
       {...rest}
     >
       {children}
@@ -151,7 +154,7 @@ function H5({
   return (
     <h5
       className={classNames(
-        "break-words whitespace-pre-wrap text-sm",
+        "break-words whitespace-pre-wrap text-sm text-neutral-100",
         className
       )}
       {...rest}
@@ -169,7 +172,7 @@ function H4({
   return (
     <h4
       className={classNames(
-        "break-words whitespace-pre-wrap text-base",
+        "break-words whitespace-pre-wrap text-base text-neutral-100",
         className
       )}
       {...rest}
@@ -187,7 +190,7 @@ function H3({
   return (
     <h3
       className={classNames(
-        "break-words whitespace-pre-wrap text-lg",
+        "break-words whitespace-pre-wrap text-lg text-neutral-100",
         className
       )}
       {...rest}
@@ -205,7 +208,7 @@ function H2({
   return (
     <h2
       className={classNames(
-        "break-words whitespace-pre-wrap text-xl",
+        "break-words whitespace-pre-wrap text-xl text-neutral-100",
         className
       )}
       {...rest}
@@ -223,7 +226,7 @@ function H1({
   return (
     <h2
       className={classNames(
-        "break-words whitespace-pre-wrap text-2xl",
+        "break-words whitespace-pre-wrap text-2xl text-neutral-100",
         className
       )}
       {...rest}
