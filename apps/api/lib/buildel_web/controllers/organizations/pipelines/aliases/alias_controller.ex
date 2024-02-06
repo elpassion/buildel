@@ -94,7 +94,7 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
          {:ok, pipeline} <- Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, alias} <- Pipelines.get_pipeline_alias(pipeline, id),
          {:ok, _} <- Pipelines.delete_alias(alias) do
-      conn |> put_status(:no_content) |> json(%{})
+      conn |> put_status(:ok) |> render(:show, alias: alias)
     end
   end
 end
