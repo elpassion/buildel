@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, json } from "@remix-run/node";
+import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
 import invariant from "tiny-invariant";
@@ -7,6 +7,8 @@ import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { setServerToast } from "~/utils/toast.server";
 import { createAliasSchema } from "./schema";
+import { AliasResponse } from "~/components/pages/pipelines/contracts";
+import { routes } from "~/utils/routes.utils";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -21,8 +23,8 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      await fetch(
-        z.any(),
+      const alias = await fetch(
+        AliasResponse,
         `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/aliases`,
         {
           method: "POST",
@@ -35,8 +37,10 @@ export async function action(actionArgs: ActionFunctionArgs) {
         }
       );
 
-      return json(
-        {},
+      return redirect(
+        routes.pipelineBuild(params.organizationId, params.pipelineId, {
+          alias: alias.data.id,
+        }),
         {
           headers: {
             "Set-Cookie": await setServerToast(request, {
