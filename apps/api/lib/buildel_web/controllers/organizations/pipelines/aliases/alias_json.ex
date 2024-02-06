@@ -13,7 +13,26 @@ defmodule BuildelWeb.OrganizationPipelineAliasJSON do
     %{
       id: alias.id,
       name: alias.name,
-      config: alias.config,
+      config:
+        Map.update(alias.config, "blocks", [], fn blocks ->
+          Enum.map(blocks, fn block ->
+            case Buildel.Blocks.type(block["type"]) do
+              nil ->
+                nil
+
+              type ->
+                Map.put(
+                  block,
+                  "block_type",
+                  type.options
+                )
+            end
+          end)
+          |> Enum.filter(fn
+            nil -> false
+            _ -> true
+          end)
+        end),
       interface_config: alias.interface_config
     }
   end
