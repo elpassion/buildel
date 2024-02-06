@@ -3,7 +3,6 @@ import { MetaFunction } from "@remix-run/node";
 import { useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
 import { BasicLink } from "~/components/link/BasicLink";
 import { routes } from "~/utils/routes.utils";
-import { successToast } from "~/components/toasts/successToast";
 import {
   IInterfaceConfig,
   IPipeline,
@@ -22,7 +21,7 @@ export function WebsiteChatbotPage() {
   const updateFetcher = useFetcher<IPipeline>();
   const [searchParams] = useSearchParams();
 
-  const { organizationId, pipelineId, pageUrl, pipeline } =
+  const { organizationId, pipelineId, pageUrl, pipeline, aliasId } =
     useLoaderData<typeof loader>();
 
   const websiteChatUrl = `${pageUrl}${routes.chatPreview(
@@ -32,16 +31,10 @@ export function WebsiteChatbotPage() {
   )}`;
 
   const handleUpdate = (interfaceConfig: IInterfaceConfig) => {
-    updateFetcher.submit(
-      { ...pipeline, interface_config: interfaceConfig },
-      {
-        method: "put",
-        encType: "application/json",
-        action: `${routes.pipelineBuild(organizationId, pipelineId)}?index`,
-      }
-    );
-
-    successToast({ description: "Configuration updated" }); // todo catch errors
+    updateFetcher.submit(interfaceConfig, {
+      method: "PATCH",
+      encType: "application/json",
+    });
   };
 
   return (
@@ -75,7 +68,11 @@ export function WebsiteChatbotPage() {
         </ChatbotSectionHeader>
 
         <div className="p-6 grid grid-cols-1 gap-3 min-h-[174px]">
-          <InterfaceConfigForm pipeline={pipeline} onSubmit={handleUpdate} />
+          <InterfaceConfigForm
+            key={aliasId}
+            pipeline={pipeline}
+            onSubmit={handleUpdate}
+          />
         </div>
       </ChatbotSectionWrapper>
 
