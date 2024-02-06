@@ -289,7 +289,7 @@ function Code({
   return (
     <code
       className={classNames(
-        "my-1 bg-neutral-900 break-words whitespace-pre-wrap",
+        "my-1 bg-neutral-900 break-words whitespace-pre-wrap text-neutral-100",
         className
       )}
       {...rest}
