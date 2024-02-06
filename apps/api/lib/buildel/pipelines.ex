@@ -220,9 +220,8 @@ defmodule Buildel.Pipelines do
 
   def get_pipeline_aliases(%Pipeline{} = pipeline) do
     aliases =
-      pipeline
-      |> Repo.preload(:pipeline_aliases)
-      |> Map.get(:pipeline_aliases)
+      from(a in Alias, where: a.pipeline_id == ^pipeline.id, order_by: [desc: a.inserted_at])
+      |> Repo.all()
 
     {:ok, [Alias.latest_pipeline_config(pipeline) | aliases]}
   end
