@@ -108,7 +108,10 @@ export class BuildelRun {
     }
   ) {}
 
-  public async start(initial_inputs: { name: string; value: string }[] = []) {
+  public async start(
+    initial_inputs: { name: string; value: string }[] = [],
+    alias?: string
+  ) {
     if (this.status !== "idle") return;
 
     const token = await this.authenticateChannel();
@@ -118,6 +121,7 @@ export class BuildelRun {
       {
         ...token,
         initial_inputs,
+        alias,
       }
     );
 
