@@ -39,11 +39,25 @@ export const AliasSelect = ({ aliases, value }: AliasSelectProps) => {
 
   useOnClickOutside(wrapperRef, hide);
 
+  const name = useMemo(() => {
+    return (
+      aliases.find((alias) => alias.id.toString() === value?.toString())
+        ?.name ?? "Latest"
+    );
+  }, [value, aliases]);
+
   return (
     <div ref={wrapperRef} className="relative">
       <SelectTrigger onClick={show}>
         <div className="flex gap-1 items-center">
-          <span>Aliases</span>
+          <span>
+            Aliases{" "}
+            <span
+              className={classNames({ "text-primary-500": value !== "latest" })}
+            >
+              ({name})
+            </span>
+          </span>
           <Icon iconName={isShown ? "chevron-up" : "chevron-down"} />
         </div>
       </SelectTrigger>

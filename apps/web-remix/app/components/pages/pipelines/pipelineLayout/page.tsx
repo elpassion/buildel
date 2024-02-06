@@ -28,7 +28,7 @@ export function PipelineLayout() {
             <h1 className="text-2xl font-medium text-white">{pipeline.name}</h1>
 
             <div className="flex gap-2 items-center">
-              <AliasSelect aliases={aliases} />
+              <AliasSelect aliases={aliases} value={aliasId} />
 
               {aliasId !== "latest" && <RestoreWorkflow pipeline={pipeline} />}
 
