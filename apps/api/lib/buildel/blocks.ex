@@ -20,7 +20,6 @@ defmodule Buildel.Blocks do
     DocumentSearch,
     WebhookOutput,
     IF,
-    MemorySearchTool,
     DocumentTool,
     ApiCallTool,
     CreateBlockTool
@@ -44,7 +43,6 @@ defmodule Buildel.Blocks do
     "webhook_output" => WebhookOutput,
     "document_search" => DocumentSearch,
     "if" => IF,
-    "memory_search_tool" => MemorySearchTool,
     "document_tool" => DocumentTool,
     "api_call_tool" => ApiCallTool,
     "create_block_tool" => CreateBlockTool
@@ -68,7 +66,6 @@ defmodule Buildel.Blocks do
     DocumentSearch => "document_search",
     WebhookOutput => "webhook_output",
     IF => "if",
-    MemorySearchTool => "memory_search_tool",
     DocumentTool => "document_tool",
     ApiCallTool => "api_call_tool",
     CreateBlockTool => "create_block_tool"

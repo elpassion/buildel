@@ -239,7 +239,7 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
           ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}/aliases/#{alias}"
         )
 
-      assert response(conn, 204)
+      assert response(conn, 200)
 
       conn =
         get(
