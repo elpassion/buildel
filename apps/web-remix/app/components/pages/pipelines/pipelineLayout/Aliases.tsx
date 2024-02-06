@@ -19,6 +19,7 @@ import {
   IPipelineAlias,
 } from "~/components/pages/pipelines/pipeline.types";
 import { routes } from "~/utils/routes.utils";
+import { confirm } from "~/components/modal/confirm";
 
 interface AliasSelectProps {
   aliases: IPipelineAlias[];
@@ -241,10 +242,19 @@ export const RestoreWorkflow = ({ pipeline }: RestoreWorkflowProps) => {
   const navigate = useNavigate();
 
   const onSubmit = () => {
-    updateFetcher.submit(pipeline, {
-      method: "PUT",
-      encType: "application/json",
-      action: routes.pipelineBuild(pipeline.organization_id, pipeline.id),
+    confirm({
+      onConfirm: async () =>
+        updateFetcher.submit(pipeline, {
+          method: "PUT",
+          encType: "application/json",
+          action: routes.pipelineBuild(pipeline.organization_id, pipeline.id),
+        }),
+      children: (
+        <p className="text-neutral-100 text-sm">
+          You are about to restore the workflow to previous version. This action
+          is irreversible.
+        </p>
+      ),
     });
   };
 
