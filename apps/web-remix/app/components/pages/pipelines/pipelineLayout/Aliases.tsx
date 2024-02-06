@@ -58,7 +58,7 @@ function SelectTrigger({
     <button
       type="button"
       className={classNames(
-        "px-2 py-1 text-neutral-100 text-sm border border-neutral-800 rounded-lg",
+        "px-2 py-1 text-neutral-100 text-sm border border-neutral-800 rounded-lg transition bg-transparent hover:bg-neutral-900",
         className
       )}
       {...rest}
@@ -199,7 +199,11 @@ export const CreateAliasForm = ({ pipeline }: CreateAliasFormProps) => {
         value={JSON.stringify(pipeline.config.connections)}
       />
 
-      <button type="submit" aria-label="Create workflow alias">
+      <button
+        type="submit"
+        aria-label="Create workflow alias"
+        className="bg-secondary-500 hover:bg-secondary-600 rounded-lg text-neutral-100 px-2 py-1 text-sm transition"
+      >
         Create alias
       </button>
     </ValidatedForm>
@@ -236,7 +240,11 @@ export const RestoreWorkflow = ({
   if (aliasId === "latest") return null;
 
   return (
-    <button type="button" onClick={onSubmit}>
+    <button
+      type="button"
+      onClick={onSubmit}
+      className="border border-neutral-800 rounded-lg text-neutral-100 px-2 py-1 text-sm transition bg-transparent hover:bg-neutral-900"
+    >
       Restore
     </button>
   );

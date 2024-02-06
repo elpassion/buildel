@@ -750,6 +750,13 @@ packages:
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
 
+  /@buildel/buildel@0.1.5:
+    resolution: {integrity: sha512-/4JsJcnng3OutkMhRJmjo79N4dUfuQJcsbpNCkRPgKK3PhnrOQxlpcHP+NQ5LE4IGzW2zIXMLKIgYJAdm+tw0g==}
+    dependencies:
+      phoenix: 1.7.7
+      uuid: 9.0.1
+    dev: false
+
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
