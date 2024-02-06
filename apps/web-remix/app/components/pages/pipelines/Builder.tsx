@@ -36,6 +36,7 @@ import {
   IEdge,
   INode,
   IPipeline,
+  IPipelineConfig,
 } from "./pipeline.types";
 import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
@@ -61,6 +62,7 @@ interface BuilderProps {
     isUpToDate: boolean;
     onBlockCreate: (created: IBlockConfig) => Promise<void>;
   }) => ReactNode;
+  onSave?: (config: IPipelineConfig) => void;
 }
 
 export const Builder = ({
@@ -72,6 +74,7 @@ export const Builder = ({
   CustomNode,
   CustomEdge,
   className,
+  onSave,
 }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(
@@ -85,6 +88,12 @@ export const Builder = ({
 
   useBeforeUnloadWarning(!isUpToDate);
 
+  const handleOnSave = useCallback(() => {
+    if (!isUpToDate) {
+      onSave?.(toPipelineConfig(nodes, edges));
+    }
+  }, [edges, isUpToDate, nodes, onSave]);
+
   const handleOnNodesChange = useCallback(
     (changes: NodeChange[]) => {
       if (type === "readOnly") return;
@@ -95,10 +104,11 @@ export const Builder = ({
 
   const handleOnEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
+      handleOnSave();
       if (type === "readOnly") return;
       return onEdgesChange(changes);
     },
-    [onEdgesChange, type]
+    [handleOnSave, onEdgesChange, type]
   );
 
   const handleIsValidConnection = useCallback(
@@ -226,6 +236,8 @@ export const Builder = ({
             onInit={onInit}
             onDrop={onDrop}
             onDragOver={onDragOver}
+            onBlur={handleOnSave}
+            onNodeDragStop={handleOnSave}
             isValidConnection={handleIsValidConnection}
             fitViewOptions={{
               minZoom: 0.5,

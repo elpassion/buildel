@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect } from "react";
+import React, { PropsWithChildren } from "react";
 import { Button } from "@elpassion/taco";
 import { RunPipelineButton } from "./RunPipelineButton";
 import { useRunPipeline } from "../RunPipelineProvider";
@@ -34,18 +34,6 @@ export function SaveChangesButton({
   onSave,
 }: SaveChangesButtonProps) {
   const { status: runStatus } = useRunPipeline();
-
-  useEffect(() => {
-    const id = setTimeout(() => {
-      if (!isUpToDate) {
-        onSave();
-      }
-    }, 1000);
-
-    return () => {
-      clearTimeout(id);
-    };
-  });
 
   return (
     <div className="flex items-center gap-2">

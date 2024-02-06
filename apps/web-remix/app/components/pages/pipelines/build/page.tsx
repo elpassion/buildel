@@ -91,6 +91,7 @@ export function PipelineBuilder() {
         CustomEdge={CustomEdge}
         className="h-[calc(100vh_-_128px)]"
         isUpdating={updateFetcher.state !== "idle"}
+        onSave={handleUpdatePipeline}
       >
         {({ edges, nodes, isUpToDate, onBlockCreate }) => (
           <>
