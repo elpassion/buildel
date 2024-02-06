@@ -8,7 +8,7 @@ import { TabGroup } from "~/components/tabs/TabGroup";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { FilledTabLink } from "~/components/tabs/FilledTabLink";
 import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
-import { AliasSelect, CreateAliasForm } from "./Aliases";
+import { AliasSelect, CreateAliasForm, RestoreWorkflow } from "./Aliases";
 import { loader } from "./loader";
 
 export const links: LinksFunction = () => [
@@ -17,7 +17,7 @@ export const links: LinksFunction = () => [
 ];
 
 export function PipelineLayout() {
-  const { pipeline, aliases } = useLoaderData<typeof loader>();
+  const { pipeline, aliases, aliasId } = useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
 
   return (
@@ -29,6 +29,8 @@ export function PipelineLayout() {
 
             <div className="flex gap-2 items-center">
               <AliasSelect aliases={aliases} />
+
+              <RestoreWorkflow aliasId={aliasId} pipeline={pipeline} />
 
               <CreateAliasForm pipeline={pipeline} />
             </div>

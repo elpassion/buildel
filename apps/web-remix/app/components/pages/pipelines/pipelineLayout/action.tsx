@@ -18,7 +18,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       const validator = withZod(createAliasSchema);
 
       const result = await validator.validate(await request.formData());
-      console.log(result);
+
       if (result.error) return validationError(result.error);
 
       await fetch(
@@ -43,6 +43,39 @@ export async function action(actionArgs: ActionFunctionArgs) {
               success: {
                 title: "Alias created",
                 description: `You've successfully created workflow alias`,
+              },
+            }),
+          },
+        }
+      );
+    },
+    delete: async ({ params, request }, { fetch }) => {
+      await requireLogin(request);
+      invariant(params.organizationId, "Missing organizationId");
+      invariant(params.pipelineId, "Missing pipelineId");
+
+      const validator = withZod(z.object({ id: z.number() }));
+
+      const result = await validator.validate(await actionArgs.request.json());
+
+      if (result.error) return validationError(result.error);
+
+      await fetch(
+        z.any(),
+        `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/aliases/${result.data.id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      return json(
+        {},
+        {
+          headers: {
+            "Set-Cookie": await setServerToast(request, {
+              success: {
+                title: "Alias deleted",
+                description: `You've successfully deleted workflow alias`,
               },
             }),
           },

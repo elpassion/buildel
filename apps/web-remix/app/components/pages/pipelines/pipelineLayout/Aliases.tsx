@@ -1,18 +1,19 @@
-import React, { PropsWithChildren, useMemo, useRef } from "react";
+import React, { PropsWithChildren, useEffect, useMemo, useRef } from "react";
 import { ItemList } from "~/components/list/ItemList";
 import { Icon } from "@elpassion/taco";
 import classNames from "classnames";
 import z from "zod";
-import {
-  IPipeline,
-  IPipelineAlias,
-} from "~/components/pages/pipelines/pipeline.types";
 import { useBoolean, useOnClickOutside } from "usehooks-ts";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { HiddenField } from "~/components/form/fields/field.context";
 import { BasicLink } from "~/components/link/BasicLink";
-import { useSearchParams } from "@remix-run/react";
+import { useFetcher, useNavigate, useSearchParams } from "@remix-run/react";
+import {
+  IPipeline,
+  IPipelineAlias,
+} from "~/components/pages/pipelines/pipeline.types";
+import { routes } from "~/utils/routes.utils";
 
 interface AliasSelectProps {
   aliases: IPipelineAlias[];
@@ -118,18 +119,42 @@ interface AliasListItemProps {
 }
 
 export const AliasListItem = ({ data, isActive }: AliasListItemProps) => {
+  const fetcher = useFetcher();
+
+  const onDelete = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    fetcher.submit(
+      { id: data.id },
+      { method: "DELETE", encType: "application/json" }
+    );
+  };
+
   return (
     <div
       className={classNames(
-        "flex gap-2 text-neutral-100 text-sm py-2 px-1.5 rounded hover:px-2 hover:bg-neutral-950 transition-all",
+        "group flex justify-between items-center gap-2 text-neutral-100 text-sm py-2 px-1.5 rounded hover:pl-2 hover:bg-neutral-950 transition-all",
         { "bg-neutral-850": !isActive, "bg-neutral-950": isActive }
       )}
     >
-      <span className="truncate line-clamp-1">
-        {data.name} {isActive ? "*" : null}
-      </span>
-      {data.id === "latest" ? (
-        <AliasListItemBadge>{data.id}</AliasListItemBadge>
+      <div className="flex gap-2 items-center">
+        <span className="truncate line-clamp-1">
+          {isActive ? "*" : null} {data.name}
+        </span>
+        {data.id === "latest" ? (
+          <AliasListItemBadge>{data.id}</AliasListItemBadge>
+        ) : null}
+      </div>
+
+      {data.id !== "latest" && !isActive ? (
+        <button
+          onClick={onDelete}
+          aria-label="Delete alias"
+          className="text-sm text-neutral-200 hover:text-primary-500 opacity-0 group-hover:opacity-100"
+        >
+          <Icon iconName="trash" />
+        </button>
       ) : null}
     </div>
   );
@@ -178,5 +203,41 @@ export const CreateAliasForm = ({ pipeline }: CreateAliasFormProps) => {
         Create alias
       </button>
     </ValidatedForm>
+  );
+};
+
+interface RestoreWorkflowProps {
+  pipeline: IPipeline;
+
+  aliasId: string;
+}
+
+export const RestoreWorkflow = ({
+  pipeline,
+  aliasId,
+}: RestoreWorkflowProps) => {
+  const updateFetcher = useFetcher();
+  const navigate = useNavigate();
+
+  const onSubmit = () => {
+    updateFetcher.submit(pipeline, {
+      method: "PUT",
+      encType: "application/json",
+      action: routes.pipelineBuild(pipeline.organization_id, pipeline.id),
+    });
+  };
+
+  useEffect(() => {
+    if (updateFetcher.data) {
+      navigate(routes.pipelineBuild(pipeline.organization_id, pipeline.id));
+    }
+  }, [updateFetcher.data]);
+
+  if (aliasId === "latest") return null;
+
+  return (
+    <button type="button" onClick={onSubmit}>
+      Restore
+    </button>
   );
 };

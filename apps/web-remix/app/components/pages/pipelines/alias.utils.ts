@@ -6,6 +6,9 @@ import {
 } from "~/components/pages/pipelines/contracts";
 import { Params } from "@remix-run/react";
 
+export const getAlias = (url: string) =>
+  new URL(url).searchParams.get("alias") ?? "latest";
+
 export const getAliasedPipeline = async ({
   fetch,
   params,
@@ -23,7 +26,7 @@ export const getAliasedPipeline = async ({
     `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`
   );
 
-  const aliasId = new URL(url).searchParams.get("alias") ?? "latest";
+  const aliasId = getAlias(url);
 
   if (aliasId !== "latest") {
     const alias = await fetch(
