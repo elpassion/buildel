@@ -90,7 +90,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     onStatusChange,
     onError
   );
-  console.log(alias);
+
   const handleStartRun = useCallback(async () => {
     setErrors({});
     await startRun([], alias);

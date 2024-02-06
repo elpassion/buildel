@@ -41,7 +41,7 @@ export const BlockConfig = z.object({
   connections: z.array(ConfigConnection).default([]),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
-  block_type: BlockType.optional(),
+  block_type: BlockType,
 });
 
 export const UpdateBlockConfig = z.object({
