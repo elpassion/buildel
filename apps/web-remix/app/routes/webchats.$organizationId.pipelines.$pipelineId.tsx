@@ -80,7 +80,7 @@ export default function WebsiteChat() {
         </ChatHeader>
 
         <ChatMessagesWrapper>
-          <ChatMessages size="md" messages={messages} />
+          <ChatMessages messages={messages} />
 
           <ChatGeneratingAnimation
             messages={messages}

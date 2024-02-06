@@ -49,9 +49,7 @@ export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
           h1: {
             component: H1,
           },
-          ul: {
-            component: Ul,
-          },
+
           li: {
             component: Li,
           },
@@ -60,6 +58,9 @@ export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
           },
           img: {
             component: Image,
+          },
+          strong: {
+            component: Strong,
           },
         },
         ...options,
@@ -71,6 +72,18 @@ export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
   );
 };
 
+function Strong({
+  children,
+  className,
+  ...rest
+}: React.ParamHTMLAttributes<HTMLDivElement>) {
+  return (
+    <strong className={classNames("font-bold text-white", className)} {...rest}>
+      {children}
+    </strong>
+  );
+}
+
 function Paragraph({
   children,
   className,
@@ -78,10 +91,7 @@ function Paragraph({
 }: React.ParamHTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={classNames(
-        "prose break-words whitespace-pre-wrap text-xs text-white",
-        className
-      )}
+      className={classNames("my-2 break-words whitespace-pre-wrap", className)}
       {...rest}
     >
       {children}
@@ -96,10 +106,7 @@ function Span({
 }: React.ParamHTMLAttributes<HTMLSpanElement>) {
   return (
     <span
-      className={classNames(
-        "prose break-words whitespace-pre-wrap text-xs text-neutral-100",
-        className
-      )}
+      className={classNames(" break-words whitespace-pre-wrap", className)}
       {...rest}
     >
       {children}
@@ -114,10 +121,7 @@ function Div({
 }: React.ParamHTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={classNames(
-        "prose break-words whitespace-pre-wrap text-xs text-neutral-100",
-        className
-      )}
+      className={classNames("break-words whitespace-pre-wrap", className)}
       {...rest}
     >
       {children}
@@ -132,10 +136,7 @@ function H6({
 }: React.ParamHTMLAttributes<HTMLHeadingElement>) {
   return (
     <h6
-      className={classNames(
-        "prose break-words whitespace-pre-wrap text-xs text-neutral-100 font-bold",
-        className
-      )}
+      className={classNames("break-words whitespace-pre-wrap", className)}
       {...rest}
     >
       {children}
@@ -150,7 +151,7 @@ function H5({
   return (
     <h5
       className={classNames(
-        "prose break-words whitespace-pre-wrap text-sm text-neutral-100 font-bold",
+        "break-words whitespace-pre-wrap text-sm",
         className
       )}
       {...rest}
@@ -168,7 +169,7 @@ function H4({
   return (
     <h4
       className={classNames(
-        "prose break-words whitespace-pre-wrap text-base text-neutral-100 font-bold",
+        "break-words whitespace-pre-wrap text-base",
         className
       )}
       {...rest}
@@ -186,7 +187,7 @@ function H3({
   return (
     <h3
       className={classNames(
-        "prose break-words whitespace-pre-wrap text-lg text-neutral-100 font-bold",
+        "break-words whitespace-pre-wrap text-lg",
         className
       )}
       {...rest}
@@ -204,7 +205,7 @@ function H2({
   return (
     <h2
       className={classNames(
-        "prose break-words whitespace-pre-wrap text-xl text-neutral-100 font-bold",
+        "break-words whitespace-pre-wrap text-xl",
         className
       )}
       {...rest}
@@ -222,25 +223,13 @@ function H1({
   return (
     <h2
       className={classNames(
-        "prose break-words whitespace-pre-wrap text-2xl text-neutral-100 font-bold",
+        "break-words whitespace-pre-wrap text-2xl",
         className
       )}
       {...rest}
     >
       {children}
     </h2>
-  );
-}
-
-function Ul({
-  children,
-  className,
-  ...rest
-}: React.ParamHTMLAttributes<HTMLUListElement>) {
-  return (
-    <ul className={classNames("prose text-neutral-100", className)} {...rest}>
-      {children}
-    </ul>
   );
 }
 
@@ -251,7 +240,7 @@ function Li({
 }: React.ParamHTMLAttributes<HTMLLIElement>) {
   return (
     <li
-      className={classNames("prose text-neutral-100 text-sm !m-0", className)}
+      className={classNames("!m-0 marker:text-neutral-100", className)}
       {...rest}
     >
       {children}
@@ -265,10 +254,7 @@ function Link({
   ...rest
 }: AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
-    <a
-      className={classNames("prose text-primary-500 text-xs", className)}
-      {...rest}
-    >
+    <a className={classNames("text-primary-500", className)} {...rest}>
       {children}
     </a>
   );
@@ -282,7 +268,7 @@ function Pre({
   return (
     <pre
       className={classNames(
-        "my-1 bg-neutral-900 prose break-words whitespace-pre-wrap text-white text-xs",
+        "my-1 bg-neutral-900 break-words whitespace-pre-wrap",
         className
       )}
       {...rest}
@@ -300,7 +286,7 @@ function Code({
   return (
     <code
       className={classNames(
-        "my-1 bg-neutral-900 prose break-words whitespace-pre-wrap text-white text-xs",
+        "my-1 bg-neutral-900 break-words whitespace-pre-wrap",
         className
       )}
       {...rest}

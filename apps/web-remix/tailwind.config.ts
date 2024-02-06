@@ -23,6 +23,15 @@ const customConfig = {
     fontFamily: {
       sans: ["DM Sans", ...defaultTheme.fontFamily.sans],
     },
+    typography: {
+      DEFAULT: {
+        css: {
+          color: "#EBEBEB",
+          fontSize: "12px",
+          lineHeight: "20px",
+        },
+      },
+    },
     ...merge(
       //@ts-ignore
       ...getComponentsColorConfig(

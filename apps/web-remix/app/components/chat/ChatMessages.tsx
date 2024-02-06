@@ -21,7 +21,7 @@ export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
   return (
     <ItemList
       className={classNames(
-        "flex flex-col-reverse gap-2 w-full h-[97%] overflow-y-auto pr-1 prose"
+        "flex flex-col-reverse gap-2 min-w-full w-full h-[97%] overflow-y-auto pr-1 prose"
       )}
       itemClassName="w-full"
       items={reversed}
@@ -63,7 +63,7 @@ function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
   return (
     <article
       className={classNames(
-        "w-full max-w-[70%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5 prose",
+        "w-full max-w-[60%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5 prose ",
         {
           "bg-neutral-800 rounded-br-xl": role === "ai",
           "bg-neutral-900 rounded-bl-xl ml-auto mr-0": role !== "ai",
