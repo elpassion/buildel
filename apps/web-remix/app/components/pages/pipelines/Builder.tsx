@@ -2,6 +2,7 @@ import React, {
   ComponentType,
   ReactNode,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
 } from "react";
@@ -39,6 +40,7 @@ import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
+import { useLocation, useNavigate } from "@remix-run/react";
 
 interface BuilderProps {
   alias?: string;
@@ -78,6 +80,9 @@ export const Builder = ({
   const [edges, setEdges, onEdgesChange] = useEdgesState<IConfigConnection>(
     getEdges(pipeline.config)
   );
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleOnNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -186,13 +191,13 @@ export const Builder = ({
     onDrop: onBlockCreate,
   });
 
-  // useEffect(() => {
-  //   const currentConfig = toPipelineConfig(nodes, edges);
-  //   if (!isUpdating && !isEqual(currentConfig, pipeline.config)) {
-  //     setNodes(getNodes(pipeline.config));
-  //     setEdges(getEdges(pipeline.config));
-  //   }
-  // }, [pipeline, isUpdating]);
+  useEffect(() => {
+    if (location.state?.reset) {
+      navigate(".", { state: null });
+      setNodes(getNodes(pipeline.config));
+      setEdges(getEdges(pipeline.config));
+    }
+  }, [pipeline, location.state]);
 
   const handleOnSave = useCallback(() => {
     onSave?.(toPipelineConfig(nodes, edges));

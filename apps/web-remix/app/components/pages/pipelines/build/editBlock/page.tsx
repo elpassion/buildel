@@ -41,7 +41,8 @@ export function EditBlockPage() {
         organizationId,
         pipelineId,
         Object.fromEntries(searchParams.entries())
-      )
+      ),
+      { state: { reset: true } }
     );
   };
 
