@@ -1,6 +1,7 @@
 defmodule Buildel.PipelineConfigMigratorTest do
   use ExUnit.Case
   alias Buildel.PipelineConfigMigrator
+  alias Buildel.BlockConfigMigrator
 
   describe "#rename_block_types" do
     test "renames block types" do
@@ -60,6 +61,36 @@ defmodule Buildel.PipelineConfigMigratorTest do
                    %{"type" => "old_type", "opts" => %{"opt2" => "value2"}},
                    %{"type" => "another_old_type"},
                    %{"type" => "old_type", "opts" => %{"opt2" => "value2"}}
+                 ]
+               }
+    end
+  end
+
+  describe "#update_block_config" do
+    test "updates block opts" do
+      config = %{
+        "blocks" => [
+          %{"type" => "old_type", "opts" => %{"opt1" => "value1", "opt2" => "value2"}},
+          %{"type" => "another_old_type"},
+          %{"type" => "old_type", "opts" => %{"opt1" => "value1", "opt2" => "value2"}}
+        ]
+      }
+
+      assert PipelineConfigMigrator.update_block_config(config, "old_type", fn config ->
+               BlockConfigMigrator.add_block_opt(config, "opt3", "new_value1")
+               |> BlockConfigMigrator.remove_block_opt("opt2")
+             end) ==
+               %{
+                 "blocks" => [
+                   %{
+                     "type" => "old_type",
+                     "opts" => %{"opt1" => "value1", "opt3" => "new_value1"}
+                   },
+                   %{"type" => "another_old_type"},
+                   %{
+                     "type" => "old_type",
+                     "opts" => %{"opt1" => "value1", "opt3" => "new_value1"}
+                   }
                  ]
                }
     end
