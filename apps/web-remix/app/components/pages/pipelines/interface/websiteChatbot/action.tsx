@@ -4,10 +4,9 @@ import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
-import { AliasResponse } from "~/components/pages/pipelines/contracts";
-import { getAlias } from "~/components/pages/pipelines/alias.utils";
-import { schema } from "./schema";
 import { setServerToast } from "~/utils/toast.server";
+import { PipelineApi } from "~/api/PipelineApi";
+import { schema } from "./schema";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -15,7 +14,6 @@ export async function action(actionArgs: ActionFunctionArgs) {
       await requireLogin(request);
       invariant(params.organizationId, "Missing organizationId");
       invariant(params.pipelineId, "Missing pipelineId");
-      const aliasId = getAlias(request.url);
 
       const validator = withZod(schema);
 
@@ -23,27 +21,25 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       if (result.error) return validationError(result.error);
 
+      const pipelineApi = new PipelineApi(fetch);
+      const aliasId = pipelineApi.getAliasFromUrl(request.url);
+
       const isLatestPipeline = !aliasId || aliasId === "latest";
 
-      const url = isLatestPipeline
-        ? `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`
-        : `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/aliases/${aliasId}`;
+      const body = { interface_config: result.data };
 
-      const body = isLatestPipeline
-        ? {
-            pipeline: { interface_config: result.data },
-          }
-        : {
-            alias: { interface_config: result.data },
-          };
-
-      const res = await fetch(AliasResponse, url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
+      const res = isLatestPipeline
+        ? await pipelineApi.updatePipelinePatch(
+            params.organizationId,
+            params.pipelineId,
+            body
+          )
+        : await pipelineApi.updateAliasPatch(
+            params.organizationId,
+            params.pipelineId,
+            aliasId,
+            body
+          );
 
       return json(res.data, {
         headers: {

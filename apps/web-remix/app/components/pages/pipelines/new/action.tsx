@@ -3,10 +3,10 @@ import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
 import invariant from "tiny-invariant";
 import { actionBuilder } from "~/utils.server";
-import { PipelineResponse } from "../contracts";
 import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
 import { setServerToast } from "~/utils/toast.server";
+import { PipelineApi } from "~/api/PipelineApi";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -18,13 +18,10 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      const { data } = await fetch(
-        PipelineResponse,
-        `/organizations/${params.organizationId}/pipelines`,
-        {
-          method: "POST",
-          body: JSON.stringify(result.data),
-        }
+      const pipelineApi = new PipelineApi(fetch);
+      const { data } = await pipelineApi.createPipeline(
+        params.organizationId,
+        result.data
       );
 
       return redirect(routes.pipeline(params.organizationId, data.id), {

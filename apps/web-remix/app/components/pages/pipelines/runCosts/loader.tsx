@@ -2,7 +2,7 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
-import { PipelineRunResponse } from "~/components/pages/pipelines/contracts";
+import { PipelineApi } from "~/api/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -11,9 +11,12 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.pipelineId, "pipelineId not found");
     invariant(params.runId, "runId not found");
 
-    const pipelineRun = await fetch(
-      PipelineRunResponse,
-      `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/runs/${params.runId}`
+    const pipelineApi = new PipelineApi(fetch);
+
+    const pipelineRun = await pipelineApi.getPipelineRun(
+      params.organizationId,
+      params.pipelineId,
+      params.runId
     );
 
     return json({

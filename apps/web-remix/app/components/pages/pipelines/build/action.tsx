@@ -5,11 +5,11 @@ import invariant from "tiny-invariant";
 import { withZod } from "@remix-validated-form/with-zod";
 import { updateSchema } from "~/components/pages/pipelines/pipelineLayout/schema";
 import { validationError } from "remix-validated-form";
-import { PipelineResponse } from "~/components/pages/pipelines/contracts";
 import {
   JSONSchemaField,
   generateZODSchema,
 } from "~/components/form/schema/SchemaParser";
+import { PipelineApi } from "~/api/PipelineApi";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -55,18 +55,12 @@ export async function action(actionArgs: ActionFunctionArgs) {
         return finalBlock;
       });
 
-      const res = await fetch(
-        PipelineResponse,
-        `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            pipeline: result.data,
-          }),
-        }
+      const pipelineApi = new PipelineApi(fetch);
+
+      await pipelineApi.updatePipeline(
+        params.organizationId,
+        params.pipelineId,
+        result.data
       );
 
       return json({});

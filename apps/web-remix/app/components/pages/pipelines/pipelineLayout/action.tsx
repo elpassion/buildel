@@ -2,13 +2,13 @@ import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
 import invariant from "tiny-invariant";
-import { z } from "zod";
 import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { setServerToast } from "~/utils/toast.server";
 import { createAliasSchema } from "./schema";
-import { AliasResponse } from "~/components/pages/pipelines/contracts";
 import { routes } from "~/utils/routes.utils";
+import { PipelineApi } from "~/api/PipelineApi";
+import { z } from "zod";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -23,18 +23,12 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      const alias = await fetch(
-        AliasResponse,
-        `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/aliases`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            alias: result.data,
-          }),
-        }
+      const pipelineApi = new PipelineApi(fetch);
+
+      const alias = await pipelineApi.createAlias(
+        params.organizationId,
+        params.pipelineId,
+        result.data
       );
 
       return redirect(
@@ -64,12 +58,12 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      await fetch(
-        z.any(),
-        `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/aliases/${result.data.id}`,
-        {
-          method: "DELETE",
-        }
+      const pipelineApi = new PipelineApi(fetch);
+
+      await pipelineApi.deleteAlias(
+        params.organizationId,
+        params.pipelineId,
+        result.data.id
       );
 
       return json(

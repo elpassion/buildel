@@ -2,11 +2,8 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
-import {
-  BlockTypesResponse,
-  PipelineResponse,
-  PipelineRunResponse,
-} from "~/components/pages/pipelines/contracts";
+import { BlockTypesResponse } from "~/components/pages/pipelines/contracts";
+import { PipelineApi } from "~/api/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -17,14 +14,17 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const blockTypesPromise = fetch(BlockTypesResponse, `/block_types`);
 
-    const pipelinePromise = fetch(
-      PipelineResponse,
-      `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`
+    const pipelineApi = new PipelineApi(fetch);
+
+    const pipelinePromise = pipelineApi.getPipeline(
+      params.organizationId,
+      params.pipelineId
     );
 
-    const pipelineRunPromise = fetch(
-      PipelineRunResponse,
-      `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/runs/${params.runId}`
+    const pipelineRunPromise = pipelineApi.getPipelineRun(
+      params.organizationId,
+      params.pipelineId,
+      params.runId
     );
 
     const [blockTypes, pipeline, pipelineRun] = await Promise.all([

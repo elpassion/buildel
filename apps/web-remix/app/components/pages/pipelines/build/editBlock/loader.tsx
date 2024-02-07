@@ -3,10 +3,8 @@ import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
-import {
-  BlockTypesResponse,
-  PipelineResponse,
-} from "~/components/pages/pipelines/contracts";
+import { BlockTypesResponse } from "~/components/pages/pipelines/contracts";
+import { PipelineApi } from "~/api/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -15,9 +13,11 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.pipelineId, "pipelineId not found");
     invariant(params.blockName, "blockName not found");
 
-    const pipelinePromise = fetch(
-      PipelineResponse,
-      `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`
+    const pipelineApi = new PipelineApi(fetch);
+
+    const pipelinePromise = pipelineApi.getPipeline(
+      params.organizationId,
+      params.pipelineId
     );
 
     const blockTypesPromise = fetch(BlockTypesResponse, `/block_types`);

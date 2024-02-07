@@ -1,8 +1,9 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
+import invariant from "tiny-invariant";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
-import invariant from "tiny-invariant";
-import { PipelineResponse } from "~/components/pages/pipelines/contracts";
+import { BlockTypesResponse } from "~/components/pages/pipelines/contracts";
+import { PipelineApi } from "~/api/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -10,13 +11,32 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.organizationId, "organizationId not found");
     invariant(params.pipelineId, "pipelineId not found");
 
-    const pipeline = await fetch(
-      PipelineResponse,
-      `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`
+    const blockTypesPromise = fetch(BlockTypesResponse, `/block_types`);
+
+    const pipelineApi = new PipelineApi(fetch);
+
+    const pipelinePromise = pipelineApi.getPipeline(
+      params.organizationId,
+      params.pipelineId
     );
 
+    const [pipeline, blockTypes] = await Promise.all([
+      pipelinePromise,
+      blockTypesPromise,
+    ]);
+
+    const blocks = pipeline.data.config.blocks.map((block) => ({
+      ...block,
+      block_type: blockTypes.data.data.find(
+        (blockType) => blockType.type === block.type
+      ),
+    }));
+
     return json({
-      pipeline: pipeline.data,
+      pipeline: {
+        ...pipeline.data,
+        config: { ...pipeline.data.config, blocks },
+      },
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
     });

@@ -2,8 +2,8 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
-import { PipelineRunsResponse } from "~/components/pages/pipelines/contracts";
 import { getParamsPagination } from "~/components/pagination/usePagination";
+import { PipelineApi } from "~/api/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -11,9 +11,11 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.organizationId, "organizationId not found");
     invariant(params.pipelineId, "pipelineId not found");
 
-    const pipelineRuns = await fetch(
-      PipelineRunsResponse,
-      `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/runs`
+    const pipelineApi = new PipelineApi(fetch);
+
+    const pipelineRuns = await pipelineApi.getPipelineRuns(
+      params.organizationId,
+      params.pipelineId
     );
 
     const { page, limit, search } = getParamsPagination(
