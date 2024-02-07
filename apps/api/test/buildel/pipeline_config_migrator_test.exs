@@ -43,4 +43,25 @@ defmodule Buildel.PipelineConfigMigratorTest do
                }
     end
   end
+
+  describe "#remove_block_opt" do
+    test "removes block opt" do
+      config = %{
+        "blocks" => [
+          %{"type" => "old_type", "opts" => %{"opt1" => "value1", "opt2" => "value2"}},
+          %{"type" => "another_old_type"},
+          %{"type" => "old_type", "opts" => %{"opt1" => "value1", "opt2" => "value2"}}
+        ]
+      }
+
+      assert PipelineConfigMigrator.remove_block_opt(config, "old_type", "opt1") ==
+               %{
+                 "blocks" => [
+                   %{"type" => "old_type", "opts" => %{"opt2" => "value2"}},
+                   %{"type" => "another_old_type"},
+                   %{"type" => "old_type", "opts" => %{"opt2" => "value2"}}
+                 ]
+               }
+    end
+  end
 end

@@ -17,4 +17,11 @@ defmodule Buildel.PipelineConfigMigrator do
       | "blocks" => Buildel.BlockConfigMigrator.add_block_opt(blocks, block_type, opt, value)
     }
   end
+
+  def remove_block_opt(%{"blocks" => blocks} = config, block_type, opt) do
+    %{
+      config
+      | "blocks" => Buildel.BlockConfigMigrator.remove_block_opt(blocks, block_type, opt)
+    }
+  end
 end

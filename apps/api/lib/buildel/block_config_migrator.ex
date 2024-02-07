@@ -20,6 +20,14 @@ defmodule Buildel.BlockConfigMigrator do
     %{block_config | "opts" => Map.put(block_config["opts"], opt, value)}
   end
 
+  def remove_block_opt(block_config, block_type, opt) when is_list(block_config) do
+    block_config |> map_blocks_with_type(block_type, &remove_block_opt(&1, opt))
+  end
+
+  def remove_block_opt(block_config, opt) when is_map(block_config) do
+    %{block_config | "opts" => Map.delete(block_config["opts"], opt)}
+  end
+
   defp map_blocks_with_type(blocks, block_type, fun) do
     blocks
     |> Enum.map(fn
