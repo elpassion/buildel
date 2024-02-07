@@ -12,7 +12,7 @@ import { NodeFieldsOutput } from "./NodeFieldsOutput";
 export interface CustomNodeProps extends PropsWithChildren {
   data: IBlockConfig;
   selected: boolean;
-  onUpdate: (block: IBlockConfig) => void;
+  onUpdate?: (block: IBlockConfig) => void;
   onDelete: (block: IBlockConfig) => void;
   isConnectable?: boolean;
   disabled?: boolean;

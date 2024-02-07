@@ -19,6 +19,7 @@ import ReactFlow, {
   useNodesState,
   NodeChange,
   EdgeChange,
+  NodeProps,
 } from "reactflow";
 import {
   getAllBlockTypes,
@@ -158,7 +159,7 @@ export const Builder = ({
   }, []);
 
   const PipelineNode = useCallback(
-    (props: CustomNodeProps) => (
+    (props: NodeProps) => (
       <CustomNode
         {...props}
         onDelete={handleDelete}
