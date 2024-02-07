@@ -75,4 +75,23 @@ defmodule Buildel.PipelineConfigMigrator do
         "connections" => new_connections
     }
   end
+
+  def connect_blocks(%{"connections" => connections} = config, %Buildel.Blocks.Connection{
+        from: %Buildel.Blocks.Output{block_name: from_block, name: output_name},
+        to: %Buildel.Blocks.Input{block_name: to_block, name: input_name},
+        opts: %{reset: reset}
+      }) do
+    %{
+      config
+      | "connections" =>
+          connections ++
+            [
+              %{
+                "from" => %{"block_name" => from_block, "output_name" => output_name},
+                "to" => %{"block_name" => to_block, "input_name" => input_name},
+                "reset" => reset
+              }
+            ]
+    }
+  end
 end

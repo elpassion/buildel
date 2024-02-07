@@ -162,4 +162,45 @@ defmodule Buildel.PipelineConfigMigratorTest do
                }
     end
   end
+
+  describe "#connect_blocks" do
+    test "creates a new connection between blocks" do
+      config = %{
+        "blocks" => [
+          %{
+            "type" => "old_type",
+            "name" => "1",
+            "opts" => %{"opt1" => "value1", "opt2" => "value2"}
+          },
+          %{"type" => "another_old_type", "name" => "2"}
+        ],
+        "connections" => []
+      }
+
+      connection = %Buildel.Blocks.Connection{
+        from: %Buildel.Blocks.Output{name: "output_name", block_name: "1", type: "text"},
+        to: %Buildel.Blocks.Input{name: "input_name", block_name: "2", type: "text"},
+        opts: %{reset: true}
+      }
+
+      assert PipelineConfigMigrator.connect_blocks(config, connection) ==
+               %{
+                 "blocks" => [
+                   %{
+                     "type" => "old_type",
+                     "name" => "1",
+                     "opts" => %{"opt1" => "value1", "opt2" => "value2"}
+                   },
+                   %{"type" => "another_old_type", "name" => "2"}
+                 ],
+                 "connections" => [
+                   %{
+                     "from" => %{"block_name" => "1", "output_name" => "output_name"},
+                     "reset" => true,
+                     "to" => %{"block_name" => "2", "input_name" => "input_name"}
+                   }
+                 ]
+               }
+    end
+  end
 end
