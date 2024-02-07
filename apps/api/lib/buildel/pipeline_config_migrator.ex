@@ -54,10 +54,25 @@ defmodule Buildel.PipelineConfigMigrator do
     }
   end
 
-  def remove_blocks_with_type(%{"blocks" => blocks} = config, block_type) do
+  def remove_blocks_with_type(
+        %{"blocks" => blocks, "connections" => connections} = config,
+        block_type
+      ) do
+    {rejected_blocks, new_blocks} = blocks |> Enum.split_with(&(&1["type"] == block_type))
+
+    rejected_blocks_names = rejected_blocks |> Enum.map(& &1["name"])
+
+    new_connections =
+      connections
+      |> Enum.reject(fn
+        %{"from" => %{"block_name" => block_name}, "to" => %{"block_name" => to_block_name}} ->
+          block_name in rejected_blocks_names || to_block_name in rejected_blocks_names
+      end)
+
     %{
       config
-      | "blocks" => blocks |> Enum.reject(&(&1["type"] == block_type))
+      | "blocks" => new_blocks,
+        "connections" => new_connections
     }
   end
 end

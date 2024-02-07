@@ -127,19 +127,37 @@ defmodule Buildel.PipelineConfigMigratorTest do
   end
 
   describe "#remove_blocks_with_type" do
-    test "removes all blocks with type" do
+    test "removes all blocks and connections from / to blocks with type" do
       config = %{
         "blocks" => [
-          %{"type" => "old_type", "opts" => %{"opt1" => "value1", "opt2" => "value2"}},
-          %{"type" => "another_old_type"},
-          %{"type" => "old_type", "opts" => %{"opt1" => "value1", "opt2" => "value2"}}
+          %{
+            "type" => "old_type",
+            "name" => "1",
+            "opts" => %{"opt1" => "value1", "opt2" => "value2"}
+          },
+          %{"type" => "another_old_type", "name" => "2"},
+          %{
+            "type" => "old_type",
+            "name" => "3",
+            "opts" => %{"opt1" => "value1", "opt2" => "value2"}
+          },
+          %{"type" => "another_old_type", "name" => "4"}
+        ],
+        "connections" => [
+          %{"from" => %{"block_name" => "1"}, "to" => %{"block_name" => "2"}},
+          %{"from" => %{"block_name" => "2"}, "to" => %{"block_name" => "3"}},
+          %{"from" => %{"block_name" => "2"}, "to" => %{"block_name" => "4"}}
         ]
       }
 
       assert PipelineConfigMigrator.remove_blocks_with_type(config, "old_type") ==
                %{
                  "blocks" => [
-                   %{"type" => "another_old_type"}
+                   %{"type" => "another_old_type", "name" => "2"},
+                   %{"type" => "another_old_type", "name" => "4"}
+                 ],
+                 "connections" => [
+                   %{"from" => %{"block_name" => "2"}, "to" => %{"block_name" => "4"}}
                  ]
                }
     end
