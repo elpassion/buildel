@@ -40,7 +40,8 @@ import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
-import { useLocation, useNavigate } from "@remix-run/react";
+import { useLocation, useNavigate, useSearchParams } from "@remix-run/react";
+import { buildUrlWithParams } from "~/utils/url";
 
 interface BuilderProps {
   alias?: string;
@@ -49,7 +50,6 @@ interface BuilderProps {
   pipeline: IExtendedPipeline;
   CustomNode: ComponentType<CustomNodeProps>;
   CustomEdge: ComponentType<CustomEdgeProps>;
-  isUpdating?: boolean;
   children?: ({
     nodes,
     edges,
@@ -67,7 +67,7 @@ export const Builder = ({
   children,
   alias = "latest",
   type = "editable",
-  isUpdating,
+
   CustomNode,
   CustomEdge,
   className,
@@ -83,6 +83,7 @@ export const Builder = ({
 
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleOnNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -193,11 +194,14 @@ export const Builder = ({
 
   useEffect(() => {
     if (location.state?.reset) {
-      navigate(".", { state: null });
+      navigate(
+        buildUrlWithParams(".", Object.fromEntries(searchParams.entries())),
+        { state: null }
+      );
       setNodes(getNodes(pipeline.config));
       setEdges(getEdges(pipeline.config));
     }
-  }, [pipeline, location.state]);
+  }, [pipeline, location.state, searchParams]);
 
   const handleOnSave = useCallback(() => {
     onSave?.(toPipelineConfig(nodes, edges));

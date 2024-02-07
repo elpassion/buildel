@@ -127,7 +127,10 @@ export const AliasList = ({ data }: AliasListProps) => {
       className="flex flex-col gap-1"
       emptyText={<span className="text-neutral-200 text-xs">No data</span>}
       renderItem={(data) => (
-        <BasicLink to={`${location.pathname}?alias=${data.id}`}>
+        <BasicLink
+          to={`${location.pathname}?alias=${data.id}`}
+          state={{ reset: true }}
+        >
           <AliasListItem data={data} isActive={alias === `${data.id}`} />
         </BasicLink>
       )}

@@ -46,10 +46,13 @@ export async function action(actionArgs: ActionFunctionArgs) {
       )) as any[];
 
       result.data.config.blocks = result.data.config.blocks.map((block, i) => {
-        return {
+        const finalBlock = {
           ...block,
           ...validatedBlocks[i],
         };
+        delete finalBlock.block_type;
+
+        return finalBlock;
       });
 
       const res = await fetch(
