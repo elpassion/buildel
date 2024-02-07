@@ -203,10 +203,11 @@ export const CreateAliasForm = ({
   aliases,
 }: CreateAliasFormProps) => {
   const validator = useMemo(() => withZod(z.any()), []);
+  const version = getLastAliasNumber(aliases.map((alias) => alias.name)) + 1;
 
   return (
     <ValidatedForm method="POST" validator={validator}>
-      <HiddenField name="name" value={pipeline.name + ` ${aliases.length}`} />
+      <HiddenField name="name" value={pipeline.name + ` v${version}`} />
 
       <HiddenField
         name="interface_config"
@@ -277,3 +278,12 @@ export const RestoreWorkflow = ({ pipeline }: RestoreWorkflowProps) => {
     </button>
   );
 };
+
+export function getLastAliasNumber(names: string[]) {
+  const nrs = names
+    .map((name) => name.split("v"))
+    .map((part) => Number.parseInt(part[part.length - 1]))
+    .filter((n) => !isNaN(n));
+
+  return Math.max(...nrs, 0);
+}
