@@ -95,4 +95,34 @@ defmodule Buildel.PipelineConfigMigratorTest do
                }
     end
   end
+
+  describe "#add_block" do
+    test "adds block" do
+      config = %{
+        "blocks" => [
+          %{"type" => "old_type", "opts" => %{"opt1" => "value1", "opt2" => "value2"}},
+          %{"type" => "another_old_type"}
+        ]
+      }
+
+      assert PipelineConfigMigrator.add_block(config, %{
+               type: "if",
+               name: "if_1",
+               opts: %{},
+               position: %{"x" => 1352.4950576584902, "y" => -723.5960369026218}
+             }) ==
+               %{
+                 "blocks" => [
+                   %{"type" => "old_type", "opts" => %{"opt1" => "value1", "opt2" => "value2"}},
+                   %{"type" => "another_old_type"},
+                   %{
+                     "type" => "if",
+                     "name" => "if_1",
+                     "opts" => %{},
+                     "position" => %{"x" => 1352.4950576584902, "y" => -723.5960369026218}
+                   }
+                 ]
+               }
+    end
+  end
 end
