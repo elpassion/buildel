@@ -4,23 +4,12 @@ import { useRunPipeline } from "../RunPipelineProvider";
 import { PlayFilled } from "~/icons/PlayFilled";
 import { errorToast } from "~/components/toasts/errorToast";
 
-interface RunPipelineButtonProps {
-  isUpToDate: boolean;
-}
-export const RunPipelineButton: React.FC<RunPipelineButtonProps> = ({
-  isUpToDate,
-}) => {
+export const RunPipelineButton: React.FC = () => {
   const { status, stopRun, startRun, isValid } = useRunPipeline();
 
   const handleRun = () => {
     if (status === "idle") {
-      if (!isUpToDate) {
-        errorToast({
-          title: "Unsaved changes",
-          description:
-            "You have unsaved changes in your workflow. Please save them before running the workflow again.",
-        });
-      } else if (!isValid) {
+      if (!isValid) {
         errorToast({
           title: "Invalid workflow",
           description:

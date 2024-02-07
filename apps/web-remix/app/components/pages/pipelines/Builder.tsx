@@ -2,12 +2,10 @@ import React, {
   ComponentType,
   ReactNode,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
 } from "react";
 import classNames from "classnames";
-import isEqual from "lodash.isequal";
 import ReactFlow, {
   addEdge,
   Background,
@@ -21,7 +19,6 @@ import ReactFlow, {
   NodeChange,
   EdgeChange,
 } from "reactflow";
-import { useBeforeUnloadWarning } from "~/hooks/useBeforeUnloadWarning";
 import {
   getAllBlockTypes,
   getEdges,
@@ -54,12 +51,10 @@ interface BuilderProps {
   children?: ({
     nodes,
     edges,
-    isUpToDate,
     onBlockCreate,
   }: {
     nodes: INode[];
     edges: IEdge[];
-    isUpToDate: boolean;
     onBlockCreate: (created: IBlockConfig) => Promise<void>;
   }) => ReactNode;
   onSave?: (config: IPipelineConfig) => void;
@@ -84,16 +79,6 @@ export const Builder = ({
     getEdges(pipeline.config)
   );
 
-  const isUpToDate = isEqual(toPipelineConfig(nodes, edges), pipeline.config);
-
-  useBeforeUnloadWarning(!isUpToDate);
-
-  const handleOnSave = useCallback(() => {
-    if (!isUpToDate) {
-      onSave?.(toPipelineConfig(nodes, edges));
-    }
-  }, [edges, isUpToDate, nodes, onSave]);
-
   const handleOnNodesChange = useCallback(
     (changes: NodeChange[]) => {
       if (type === "readOnly") return;
@@ -104,11 +89,10 @@ export const Builder = ({
 
   const handleOnEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
-      handleOnSave();
       if (type === "readOnly") return;
       return onEdgesChange(changes);
     },
-    [handleOnSave, onEdgesChange, type]
+    [onEdgesChange, type]
   );
 
   const handleIsValidConnection = useCallback(
@@ -202,13 +186,17 @@ export const Builder = ({
     onDrop: onBlockCreate,
   });
 
-  useEffect(() => {
-    const currentConfig = toPipelineConfig(nodes, edges);
-    if (!isUpdating && !isEqual(currentConfig, pipeline.config)) {
-      setNodes(getNodes(pipeline.config));
-      setEdges(getEdges(pipeline.config));
-    }
-  }, [pipeline, isUpdating]);
+  // useEffect(() => {
+  //   const currentConfig = toPipelineConfig(nodes, edges);
+  //   if (!isUpdating && !isEqual(currentConfig, pipeline.config)) {
+  //     setNodes(getNodes(pipeline.config));
+  //     setEdges(getEdges(pipeline.config));
+  //   }
+  // }, [pipeline, isUpdating]);
+
+  const handleOnSave = useCallback(() => {
+    onSave?.(toPipelineConfig(nodes, edges));
+  }, [edges, nodes, onSave]);
 
   return (
     <div
@@ -237,7 +225,6 @@ export const Builder = ({
             onDrop={onDrop}
             onDragOver={onDragOver}
             onBlur={handleOnSave}
-            onNodeDragStop={handleOnSave}
             isValidConnection={handleIsValidConnection}
             fitViewOptions={{
               minZoom: 0.5,
@@ -257,7 +244,6 @@ export const Builder = ({
           {children?.({
             nodes,
             edges,
-            isUpToDate,
             onBlockCreate,
           })}
         </ReactFlowProvider>

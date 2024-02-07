@@ -1,19 +1,14 @@
-import React, { PropsWithChildren } from "react";
-import { Button } from "@elpassion/taco";
+import React, { PropsWithChildren, useCallback, useEffect } from "react";
+import { Icon } from "@elpassion/taco";
 import { RunPipelineButton } from "./RunPipelineButton";
 import { useRunPipeline } from "../RunPipelineProvider";
+import { IPipelineConfig } from "~/components/pages/pipelines/pipeline.types";
+import { useDebounce, useIsFirstRender } from "usehooks-ts";
 
-interface BuilderHeaderProps {
-  isUpToDate: boolean;
-}
-
-export const BuilderHeader: React.FC<PropsWithChildren<BuilderHeaderProps>> = ({
-  isUpToDate,
-  children,
-}) => {
+export const BuilderHeader: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <header className="absolute top-8 left-4 right-4 z-10 flex justify-between pointer-events-none">
-      <RunPipelineButton isUpToDate={isUpToDate} />
+      <RunPipelineButton />
 
       <div className="flex gap-2 items-center pointer-events-auto">
         {children}
@@ -23,35 +18,54 @@ export const BuilderHeader: React.FC<PropsWithChildren<BuilderHeaderProps>> = ({
 };
 
 interface SaveChangesButtonProps {
-  isUpToDate: boolean;
-  onSave: () => void;
+  onSave: (config: IPipelineConfig) => void;
+  config: IPipelineConfig;
   isSaving?: boolean;
 }
 
 export function SaveChangesButton({
   isSaving,
-  isUpToDate,
   onSave,
+  config,
 }: SaveChangesButtonProps) {
+  const isFirstRender = useIsFirstRender();
   const { status: runStatus } = useRunPipeline();
+  const debounced = useDebounce(JSON.stringify(config), 300);
+
+  const handleSave = useCallback(() => {
+    try {
+      onSave(JSON.parse(debounced));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [debounced]);
+
+  useEffect(() => {
+    if (isFirstRender || runStatus !== "idle") return;
+    handleSave();
+  }, [debounced, isFirstRender, runStatus]);
 
   return (
     <div className="flex items-center gap-2">
-      {isUpToDate ? null : (
-        <div className="py-1 px-2 bg-neutral-800 text-neutral-100 rounded text-xs">
-          There are unsaved changes
-        </div>
+      {isSaving ? (
+        <SavingStatusWrapper>
+          <span>Saving changes</span>
+          <Icon iconName="loader" className="animate-spin" />
+        </SavingStatusWrapper>
+      ) : (
+        <SavingStatusWrapper>
+          <span>All changes saved</span>
+          <Icon iconName="check-circle" />
+        </SavingStatusWrapper>
       )}
+    </div>
+  );
+}
 
-      <Button
-        disabled={runStatus !== "idle" || isUpToDate}
-        onClick={onSave}
-        variant="filled"
-        size="sm"
-        isLoading={isSaving}
-      >
-        Save changes
-      </Button>
+function SavingStatusWrapper({ children }: PropsWithChildren) {
+  return (
+    <div className="bg-neutral-950 text-neutral-100 px-2 py-1 rounded-lg text-sm flex gap-1 items-center">
+      {children}
     </div>
   );
 }
