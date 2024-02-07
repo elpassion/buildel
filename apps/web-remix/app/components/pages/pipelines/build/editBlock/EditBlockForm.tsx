@@ -30,7 +30,7 @@ import {
   Field as FormField,
   HiddenField,
 } from "~/components/form/fields/field.context";
-import { BlockConfig } from "../../contracts";
+import { BlockConfig, ExtendedBlockConfig } from "../../contracts";
 
 export function EditBlockForm({
   onSubmit,
@@ -49,12 +49,12 @@ export function EditBlockForm({
     data: IBlockConfig & { oldName: string },
     connections: IConfigConnection[]
   ) => void;
-  blockConfig: z.TypeOf<typeof BlockConfig>;
+  blockConfig: z.TypeOf<typeof ExtendedBlockConfig>;
   disabled?: boolean;
   nodesNames: string[];
   connections: IConfigConnection[];
 }) {
-  const schema = generateZODSchema(blockConfig.block_type.schema as any);
+  const schema = generateZODSchema(blockConfig.block_type?.schema as any);
   const validator = React.useMemo(() => withZod(schema), []);
   const [connections, setConnections] =
     useState<IConfigConnection[]>(propsConnections);
@@ -240,7 +240,7 @@ export function EditBlockForm({
           />
 
           <Schema
-            schema={blockConfig.block_type.schema.properties.opts}
+            schema={blockConfig.block_type?.schema.properties.opts}
             name="opts"
             fields={{
               string: StringField,

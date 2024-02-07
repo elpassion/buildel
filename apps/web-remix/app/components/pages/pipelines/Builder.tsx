@@ -233,7 +233,7 @@ export const Builder = ({
             onInit={onInit}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            onBlur={handleOnSave}
+            // onBlur={handleOnSave}
             isValidConnection={handleIsValidConnection}
             fitViewOptions={{
               minZoom: 0.5,
