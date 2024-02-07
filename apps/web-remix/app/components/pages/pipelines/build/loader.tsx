@@ -13,15 +13,22 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const blockTypes = await fetch(BlockTypesResponse, `/block_types`);
 
-    const pipelineData = await getAliasedPipeline({
+    const { pipeline, aliasId } = await getAliasedPipeline({
       fetch,
       params,
       url: request.url,
     });
 
+    const blocks = pipeline.config.blocks.map((block) => ({
+      ...block,
+      block_type: blockTypes.data.data.find(
+        (blockType) => blockType.type === block.type
+      ),
+    }));
+
     return json({
-      pipeline: pipelineData.pipeline,
-      aliasId: pipelineData.aliasId,
+      pipeline: { ...pipeline, config: { ...pipeline.config, blocks } },
+      aliasId: aliasId,
       blockTypes: blockTypes.data.data,
       pipelineId: params.pipelineId,
       organizationId: params.organizationId,

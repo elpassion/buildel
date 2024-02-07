@@ -48,10 +48,10 @@ export function isValidConnection(
   if (
     !sourceBlock ||
     !targetBlock ||
-    sourceBlock.block_type.outputs.find(
+    sourceBlock.block_type?.outputs.find(
       (output) => output.name === connection.sourceHandle
     )?.type !==
-      targetBlock.block_type.inputs.find(
+      targetBlock.block_type?.inputs.find(
         (input) => input.name === connection.targetHandle
       )?.type
   )
@@ -86,7 +86,7 @@ export function toPipelineConfig(
 
 export function getBlockHandles(block: IBlockConfig): IHandle[] {
   const blockType = block.block_type;
-
+  if (!blockType) return [];
   return [
     ...blockType.inputs
       .filter((input) => !input.public)
@@ -123,6 +123,7 @@ export function getBlockHandles(block: IBlockConfig): IHandle[] {
 
 export function getBlockFields(block: IBlockConfig): IField[] {
   const blockType = block.block_type;
+  if (!blockType) return [];
   return [
     ...blockType.inputs
       .filter((input) => input.public)

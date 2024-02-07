@@ -9,7 +9,7 @@ import React, {
 import { SafeParseReturnType, ZodError } from "zod";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 import { usePipelineRun } from "./usePipelineRun";
-import { IBlockConfig, IPipeline } from "./pipeline.types";
+import { IBlockConfig, IExtendedPipeline } from "./pipeline.types";
 import { errorToast } from "~/components/toasts/errorToast";
 
 export interface IEvent {
@@ -40,7 +40,7 @@ const RunPipelineContext = React.createContext<IRunPipelineContext | undefined>(
   undefined
 );
 interface RunPipelineProviderProps extends PropsWithChildren {
-  pipeline: IPipeline;
+  pipeline: IExtendedPipeline;
   alias: string;
 }
 
@@ -116,6 +116,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     if (!pipeline) return {};
 
     return pipeline.config.blocks.reduce((acc, block) => {
+      if (!block.block_type?.schema) return acc;
       return {
         ...acc,
         [block.name]: generateZODSchema(

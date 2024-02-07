@@ -32,8 +32,8 @@ import {
   IBlockConfig,
   IConfigConnection,
   IEdge,
+  IExtendedPipeline,
   INode,
-  IPipeline,
   IPipelineConfig,
 } from "./pipeline.types";
 import { CustomNodeProps } from "./CustomNodes/CustomNode";
@@ -46,7 +46,7 @@ interface BuilderProps {
   alias?: string;
   type?: "readOnly" | "editable";
   className?: string;
-  pipeline: IPipeline;
+  pipeline: IExtendedPipeline;
   CustomNode: ComponentType<CustomNodeProps>;
   CustomEdge: ComponentType<CustomEdgeProps>;
   isUpdating?: boolean;

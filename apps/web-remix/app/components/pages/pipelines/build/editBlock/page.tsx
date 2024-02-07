@@ -45,7 +45,7 @@ export function EditBlockPage() {
       { state: { reset: true } }
     );
   };
-
+  console.log(block);
   const handleSubmit = (
     updatedBlock: IExtendedBlockConfig,
     connections: IConfigConnection[]
@@ -81,7 +81,7 @@ export function EditBlockPage() {
     <>
       <ActionSidebarHeader
         heading={block.name}
-        subheading={block.block_type.description}
+        subheading={block.block_type?.description}
         onClose={closeSidebar}
       />
 

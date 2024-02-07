@@ -41,7 +41,10 @@ export const BlockConfig = z.object({
   connections: z.array(ConfigConnection).default([]),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
-  block_type: BlockType,
+});
+
+export const ExtendedBlockConfig = BlockConfig.extend({
+  block_type: BlockType.optional(),
 });
 
 export const UpdateBlockConfig = z.object({
@@ -86,6 +89,19 @@ export const Pipeline = z.object({
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),
+    connections: z.array(ConfigConnection).default([]),
+  }),
+});
+
+export const ExtendedPipeline = z.object({
+  id: z.number(),
+  name: z.string(),
+  organization_id: z.number(),
+  runs_count: z.number(),
+  interface_config: z.union([InterfaceConfig, z.null()]),
+  config: z.object({
+    version: z.string(),
+    blocks: z.array(ExtendedBlockConfig),
     connections: z.array(ConfigConnection).default([]),
   }),
 });

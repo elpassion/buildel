@@ -12,9 +12,14 @@ import {
   ConfigConnection,
   InterfaceConfig,
   Alias,
+  ExtendedBlockConfig,
+  ExtendedPipeline,
 } from "./contracts";
 
-export type IBlockConfig = z.TypeOf<typeof BlockConfig>;
+export type IBlockConfig = z.TypeOf<typeof ExtendedBlockConfig>;
+
+export type IExtendedBlockConfig = z.TypeOf<typeof ExtendedBlockConfig>;
+
 export interface IPipelineConfig {
   blocks: IBlockConfig[];
   connections: IConfigConnection[];
@@ -60,6 +65,8 @@ export type IBlockType = z.TypeOf<typeof BlockType>;
 export type IInterfaceConfig = z.infer<typeof InterfaceConfig>;
 
 export type IPipeline = z.infer<typeof Pipeline>;
+
+export type IExtendedPipeline = z.infer<typeof ExtendedPipeline>;
 
 export type IPipelineAlias = z.infer<typeof Alias>;
 
