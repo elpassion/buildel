@@ -17,8 +17,7 @@ import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { useLoaderData } from "@remix-run/react";
-import { PipelineResponse } from "~/components/pages/pipelines/contracts";
-import { getAlias } from "~/components/pages/pipelines/alias.utils";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -26,12 +25,14 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.organizationId, "organizationId not found");
     invariant(params.pipelineId, "pipelineId not found");
 
-    const pipeline = await fetch(
-      PipelineResponse,
-      `/organizations/${params.organizationId}/pipelines/${params.pipelineId}`
+    const pipelineApi = new PipelineApi(fetch);
+
+    const pipeline = await pipelineApi.getPipeline(
+      params.organizationId,
+      params.pipelineId
     );
 
-    const alias = getAlias(request.url);
+    const alias = pipelineApi.getAliasFromUrl(request.url);
 
     return json({
       pipeline: pipeline.data,

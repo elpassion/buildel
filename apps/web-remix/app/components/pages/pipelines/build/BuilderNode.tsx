@@ -74,7 +74,7 @@ function BuilderNodeHeaderActions({
   const isEditable = useMemo(() => {
     try {
       const propKeys = Object.keys(
-        data.block_type.schema.properties.opts.properties
+        data.block_type?.schema.properties.opts.properties
       );
 
       return propKeys.length > 0;

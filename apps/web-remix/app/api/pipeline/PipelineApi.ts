@@ -3,16 +3,14 @@ import { fetchTyped } from "~/utils/fetch.server";
 import {
   AliasesResponse,
   AliasResponse,
+  CreateAliasSchema,
   PipelineResponse,
   PipelineRunResponse,
   PipelineRunsResponse,
   PipelinesResponse,
-} from "~/components/pages/pipelines/contracts";
-import { schema } from "~/components/pages/pipelines/new/schema";
-import {
-  createAliasSchema,
-  updateSchema,
-} from "~/components/pages/pipelines/pipelineLayout/schema";
+  UpdatePipelineSchema,
+  CreatePipelineSchema,
+} from "./pipeline.contracts";
 
 export class PipelineApi {
   constructor(private client: typeof fetchTyped) {}
@@ -59,7 +57,7 @@ export class PipelineApi {
   createAlias(
     organizationId: string | number,
     pipelineId: string | number,
-    data: z.TypeOf<typeof createAliasSchema>
+    data: z.TypeOf<typeof CreateAliasSchema>
   ) {
     return this.client(
       AliasResponse,
@@ -134,7 +132,7 @@ export class PipelineApi {
 
   createPipeline(
     organizationId: string | number,
-    data: z.TypeOf<typeof schema>
+    data: z.TypeOf<typeof CreatePipelineSchema>
   ) {
     return this.client(
       PipelineResponse,
@@ -149,7 +147,7 @@ export class PipelineApi {
   updatePipeline(
     organizationId: string | number,
     pipelineId: string | number,
-    data: z.TypeOf<typeof updateSchema>
+    data: z.TypeOf<typeof UpdatePipelineSchema>
   ) {
     return this.client(
       PipelineResponse,
@@ -169,7 +167,7 @@ export class PipelineApi {
   updatePipelinePatch(
     organizationId: string | number,
     pipelineId: string | number,
-    data: Partial<z.TypeOf<typeof updateSchema>>
+    data: Partial<z.TypeOf<typeof UpdatePipelineSchema>>
   ) {
     return this.client(
       PipelineResponse,
@@ -188,7 +186,7 @@ export class PipelineApi {
     organizationId: string | number,
     pipelineId: string | number,
     aliasId: string | number,
-    data: Partial<z.TypeOf<typeof updateSchema>>
+    data: Partial<z.TypeOf<typeof UpdatePipelineSchema>>
   ) {
     return this.client(
       AliasResponse,

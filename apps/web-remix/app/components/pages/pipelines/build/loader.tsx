@@ -2,7 +2,7 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
-import { BlockTypesResponse } from "~/components/pages/pipelines/contracts";
+import { BlockTypesResponse } from "~/api/pipeline/pipeline.contracts";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {

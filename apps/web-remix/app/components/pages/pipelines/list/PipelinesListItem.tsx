@@ -1,5 +1,5 @@
 import { Icon } from "@elpassion/taco";
-import { IPipeline } from "./pipelines.types";
+import { IPipeline } from "../pipeline.types";
 import React, { PropsWithChildren, useMemo } from "react";
 import classNames from "classnames";
 import { IconButton } from "~/components/iconButton";
@@ -9,7 +9,7 @@ import { routes } from "~/utils/routes.utils";
 import { ValidatedForm } from "remix-validated-form";
 import { HiddenField } from "~/components/form/fields/field.context";
 import { withZod } from "@remix-validated-form/with-zod";
-import { schema } from "./schema";
+import { CreatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
 import { Duplicate } from "~/icons/Duplicate";
 
 interface PipelinesListItemProps extends PropsWithChildren {
@@ -89,7 +89,7 @@ interface DuplicateFormProps {
 }
 
 function DuplicateForm({ pipeline }: DuplicateFormProps) {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(CreatePipelineSchema), []);
 
   return (
     <ValidatedForm

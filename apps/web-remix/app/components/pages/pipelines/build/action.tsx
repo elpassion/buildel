@@ -3,7 +3,7 @@ import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { withZod } from "@remix-validated-form/with-zod";
-import { updateSchema } from "~/components/pages/pipelines/pipelineLayout/schema";
+import { UpdatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
 import { validationError } from "remix-validated-form";
 import {
   JSONSchemaField,
@@ -18,7 +18,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       invariant(params.organizationId, "Missing organizationId");
       invariant(params.pipelineId, "Missing pipelineId");
 
-      const validator = withZod(updateSchema);
+      const validator = withZod(UpdatePipelineSchema);
 
       const result = await validator.validate(await actionArgs.request.json());
 

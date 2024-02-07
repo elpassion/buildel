@@ -5,10 +5,10 @@ import invariant from "tiny-invariant";
 import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { setServerToast } from "~/utils/toast.server";
-import { createAliasSchema } from "./schema";
 import { routes } from "~/utils/routes.utils";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { z } from "zod";
+import { CreateAliasSchema } from "~/api/pipeline/pipeline.contracts";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -17,7 +17,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       invariant(params.organizationId, "Missing organizationId");
       invariant(params.pipelineId, "Missing pipelineId");
 
-      const validator = withZod(createAliasSchema);
+      const validator = withZod(CreateAliasSchema);
 
       const result = await validator.validate(await request.formData());
 

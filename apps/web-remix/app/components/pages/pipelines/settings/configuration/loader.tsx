@@ -2,8 +2,8 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
-import { BlockTypesResponse } from "~/components/pages/pipelines/contracts";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
+import { BlockTypesResponse } from "~/api/pipeline/pipeline.contracts";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {

@@ -7,7 +7,7 @@ import { Button, Icon } from "@elpassion/taco";
 import { ItemList } from "~/components/list/ItemList";
 import { HiddenField } from "~/components/form/fields/field.context";
 import type { IBlockConfig, IConfigConnection } from "../pipeline.types";
-import { schema } from "./schema";
+import { CreatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
 
 interface WorkflowTemplatesProps extends PropsWithChildren {
   className?: string;
@@ -66,7 +66,7 @@ function WorkflowTemplatesListItem({
   organizationId,
   connections,
 }: ITemplateItem) {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(CreatePipelineSchema), []);
   return (
     <ValidatedForm
       method="POST"

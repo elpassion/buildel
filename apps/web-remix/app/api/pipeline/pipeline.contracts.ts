@@ -177,3 +177,51 @@ export const BlockTypes = z.array(BlockType);
 export const BlockTypesResponse = z.object({
   data: BlockTypes,
 });
+
+export const CreateAliasSchema = z.object({
+  name: z.string().min(1),
+  interface_config: z.union([
+    z.string().transform((value) => JSON.parse(value)),
+    InterfaceConfig,
+    z.null(),
+  ]),
+  config: z.object({
+    version: z.string(),
+    blocks: z.union([
+      z.string().transform((value) => JSON.parse(value)),
+      z.array(UpdateBlockConfig),
+    ]),
+    connections: z.union([
+      z.string().transform((value) => JSON.parse(value)),
+      z.array(ConfigConnection).default([]),
+    ]),
+  }),
+});
+
+export const UpdatePipelineSchema = z.object({
+  id: z.number(),
+  name: z.string().min(1),
+  interface_config: z.union([InterfaceConfig, z.null()]),
+  config: z.object({
+    version: z.string(),
+    blocks: z.array(UpdateBlockConfig),
+    connections: z.array(ConfigConnection).default([]),
+  }),
+});
+
+export const CreatePipelineSchema = z.object({
+  pipeline: z.object({
+    name: z.string().min(2),
+    config: z.object({
+      version: z.string(),
+      connections: z.union([
+        z.string().transform((value) => JSON.parse(value)),
+        z.array(ConfigConnection).default([]),
+      ]),
+      blocks: z.union([
+        z.string().transform((value) => JSON.parse(value)),
+        z.array(UpdateBlockConfig),
+      ]),
+    }),
+  }),
+});

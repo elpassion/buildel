@@ -9,13 +9,13 @@ import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
 import { Field as FormField } from "~/components/form/fields/field.context";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { updateSchema } from "~/components/pages/pipelines/pipelineLayout/schema";
 import { routes } from "~/utils/routes.utils";
 import {
   generateZODSchema,
   JSONSchemaField,
 } from "~/components/form/schema/SchemaParser";
 import { successToast } from "~/components/toasts/successToast";
+import { UpdatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
 import { loader } from "./loader";
 
 const schema = z.object({
@@ -48,7 +48,7 @@ export function SettingsConfigurationPage() {
     setErrors({});
     try {
       const config = JSON.parse(data.configuration);
-      const validator = withZod(updateSchema);
+      const validator = withZod(UpdatePipelineSchema);
 
       const result = await validator.validate(config);
 

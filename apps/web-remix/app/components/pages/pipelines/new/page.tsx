@@ -5,10 +5,10 @@ import { ValidatedForm } from "remix-validated-form";
 import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { Button } from "@elpassion/taco";
-import { schema } from "./schema";
+import { CreatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
 
 export function NewPipelinePage() {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(CreatePipelineSchema), []);
 
   return (
     <ValidatedForm

@@ -30,7 +30,7 @@ import {
   Field as FormField,
   HiddenField,
 } from "~/components/form/fields/field.context";
-import { BlockConfig, ExtendedBlockConfig } from "../../contracts";
+import { ExtendedBlockConfig } from "~/api/pipeline/pipeline.contracts";
 
 export function EditBlockForm({
   onSubmit,

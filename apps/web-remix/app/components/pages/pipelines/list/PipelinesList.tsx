@@ -1,6 +1,6 @@
 import React from "react";
 import { ItemList } from "~/components/list/ItemList";
-import type { IPipeline } from "./pipelines.types";
+import type { IPipeline } from "../pipeline.types";
 import { PipelineListItemHeader, PipelinesListItem } from "./PipelinesListItem";
 import classNames from "classnames";
 import { routes } from "~/utils/routes.utils";
