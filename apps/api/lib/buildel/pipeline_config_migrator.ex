@@ -53,4 +53,11 @@ defmodule Buildel.PipelineConfigMigrator do
             ]
     }
   end
+
+  def remove_blocks_with_type(%{"blocks" => blocks} = config, block_type) do
+    %{
+      config
+      | "blocks" => blocks |> Enum.reject(&(&1["type"] == block_type))
+    }
+  end
 end
