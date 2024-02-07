@@ -2,7 +2,7 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
-import { AliasesResponse } from "../contracts";
+import { AliasesResponse, BlockTypesResponse } from "../contracts";
 import { getAliasedPipeline } from "~/components/pages/pipelines/alias.utils";
 
 export async function loader(args: LoaderFunctionArgs) {
@@ -16,19 +16,32 @@ export async function loader(args: LoaderFunctionArgs) {
       `/organizations/${params.organizationId}/pipelines/${params.pipelineId}/aliases`
     );
 
+    const blockTypesPromise = fetch(BlockTypesResponse, `/block_types`);
+
     const pipelinePromise = getAliasedPipeline({
       fetch,
       params,
       url: request.url,
     });
 
-    const [pipelineData, aliases] = await Promise.all([
+    const [pipelineData, aliases, blockTypes] = await Promise.all([
       pipelinePromise,
       aliasesPromise,
+      blockTypesPromise,
     ]);
 
+    const blocks = pipelineData.pipeline.config.blocks.map((block) => ({
+      ...block,
+      block_type: blockTypes.data.data.find(
+        (blockType) => blockType.type === block.type
+      ),
+    }));
+
     return json({
-      pipeline: pipelineData.pipeline,
+      pipeline: {
+        ...pipelineData.pipeline,
+        config: { ...pipelineData.pipeline.config, blocks },
+      },
       aliasId: pipelineData.aliasId,
       aliases: aliases.data,
       organizationId: params.organizationId,
