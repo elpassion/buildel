@@ -45,7 +45,7 @@ export function EditBlockPage() {
       { state: { reset: true } }
     );
   };
-  console.log(block);
+
   const handleSubmit = (
     updatedBlock: IExtendedBlockConfig,
     connections: IConfigConnection[]
