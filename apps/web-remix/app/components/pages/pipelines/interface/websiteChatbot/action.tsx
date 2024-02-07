@@ -5,7 +5,7 @@ import invariant from "tiny-invariant";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
 import { setServerToast } from "~/utils/toast.server";
-import { PipelineApi } from "~/api/PipelineApi";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { schema } from "./schema";
 
 export async function action(actionArgs: ActionFunctionArgs) {

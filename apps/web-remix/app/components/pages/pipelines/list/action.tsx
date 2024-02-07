@@ -3,7 +3,7 @@ import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { setServerToast } from "~/utils/toast.server";
-import { PipelineApi } from "~/api/PipelineApi";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

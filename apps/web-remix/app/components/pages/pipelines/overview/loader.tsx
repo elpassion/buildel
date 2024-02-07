@@ -3,7 +3,7 @@ import invariant from "tiny-invariant";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { getParamsPagination } from "~/components/pagination/usePagination";
-import { PipelineApi } from "~/api/PipelineApi";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {

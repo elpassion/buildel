@@ -7,7 +7,7 @@ import { requireLogin } from "~/session.server";
 import { setServerToast } from "~/utils/toast.server";
 import { createAliasSchema } from "./schema";
 import { routes } from "~/utils/routes.utils";
-import { PipelineApi } from "~/api/PipelineApi";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { z } from "zod";
 
 export async function action(actionArgs: ActionFunctionArgs) {

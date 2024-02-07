@@ -9,7 +9,7 @@ import {
   JSONSchemaField,
   generateZODSchema,
 } from "~/components/form/schema/SchemaParser";
-import { PipelineApi } from "~/api/PipelineApi";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

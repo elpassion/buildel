@@ -6,7 +6,7 @@ import { actionBuilder } from "~/utils.server";
 import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
 import { setServerToast } from "~/utils/toast.server";
-import { PipelineApi } from "~/api/PipelineApi";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

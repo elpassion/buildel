@@ -4,7 +4,7 @@ import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
 import { BlockTypesResponse } from "~/components/pages/pipelines/contracts";
-import { PipelineApi } from "~/api/PipelineApi";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
