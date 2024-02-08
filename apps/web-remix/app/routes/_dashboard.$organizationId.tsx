@@ -13,7 +13,6 @@ import {
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { OrganizationsResponse } from "~/components/pages/organizations/contracts";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { routes } from "~/utils/routes.utils";
@@ -29,6 +28,7 @@ import {
   SidebarLink,
 } from "~/components/sidebar/NavSidebar";
 import { getCurrentUser } from "~/utils/currentUser.server";
+import { OrganizationApi } from "~/api/organization/OrganizationApi";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: DataFunctionArgs) {
@@ -36,11 +36,9 @@ export async function loader(loaderArgs: DataFunctionArgs) {
     await requireLogin(request);
 
     invariant(params.organizationId, "organizationId not found");
+    const organizationApi = new OrganizationApi(fetch);
 
-    const organizationsResponse = await fetch(
-      OrganizationsResponse,
-      "/organizations"
-    );
+    const organizationsResponse = await organizationApi.getOrganizations();
 
     const organization = organizationsResponse.data.data.find(
       (org) => org.id === Number(params.organizationId)

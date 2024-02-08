@@ -4,11 +4,11 @@ import { useMemo } from "react";
 import { ValidatedForm } from "remix-validated-form";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { schema } from "./schema";
 import { Button } from "@elpassion/taco";
+import { CreateOrganizationSchema } from "~/api/organization/organization.contracts";
 
 export function NewOrganizationPage() {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(CreateOrganizationSchema), []);
 
   return (
     <div className="min-h-screen w-full flex justify-center items-center p-2">
