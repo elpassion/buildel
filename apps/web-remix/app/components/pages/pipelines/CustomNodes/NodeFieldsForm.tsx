@@ -62,11 +62,11 @@ export function NodeFieldsForm({
       formData.append("file", file);
       formData.append(
         "collection_name",
-        block.opts.persist_in || `${pipelineId}_${blockName}`
+        block.opts.knowledge || `${pipelineId}_${blockName}`
       );
 
       const response = await fetch(
-        `/super-api/organizations/${organizationId}/memory_collections/${block.opts.persist_in}/memories`,
+        `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories`,
         {
           body: formData,
           method: "POST",
@@ -81,7 +81,7 @@ export function NodeFieldsForm({
   const removeFile = useCallback(
     async (id: number) => {
       return fetch(
-        `/super-api/organizations/${organizationId}/memory_collections/${block.opts.persist_in}/memories/${id}`,
+        `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories/${id}`,
         {
           method: "DELETE",
         }
@@ -91,9 +91,9 @@ export function NodeFieldsForm({
   );
 
   const fetchFiles = useCallback(async (): Promise<IFile[]> => {
-    if (!block.opts.persist_in) return [];
+    if (!block.opts.knowledge) return [];
     const response = await fetch(
-      `/super-api/organizations/${organizationId}/memory_collections/${block.opts.persist_in}/memories`
+      `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories`
     ).then((res) => res.json());
 
     return KnowledgeBaseFileListResponse.parse(response).map((file) => ({
