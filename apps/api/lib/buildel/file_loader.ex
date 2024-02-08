@@ -54,7 +54,7 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
     file =
       partitioned_file
       |> Enum.map(&Map.get(&1, "text"))
-      |> Enum.join("\n\n")
+      |> Enum.join("")
 
     {:ok, file}
   end
@@ -71,9 +71,15 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
     file_data =
       {:file, path, {"form-data", [name: "files[]", filename: Path.basename(path)]}, options}
 
-    chunking_data = {"chunking_strategy", "by_title"}
 
-    form_data = [file_data, chunking_data]
+    form_data = [
+      file_data,
+      {"chunking_strategy", "by_title"},
+      {"strategy", "ocr_only"},
+      {"max_characters", "1000"},
+      # TODO: UNHARDCODE LANGUAGES
+      {"ocr_languages", "pol"}
+    ]
 
     form_data =
       if file_metadata |> Map.has_key?(:encoding) do
