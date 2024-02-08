@@ -1,19 +1,21 @@
 import { z } from "zod";
 import {
-  BlockType,
-  BlockTypes,
-  IOType,
   Pipeline,
   PipelineRun,
   PipelineCost,
   PipelineRuns,
   PipelineCosts,
-  ConfigConnection,
   InterfaceConfig,
   Alias,
-  ExtendedBlockConfig,
   ExtendedPipeline,
 } from "~/api/pipeline/pipeline.contracts";
+import {
+  ExtendedBlockConfig,
+  ConfigConnection,
+  BlockType,
+  BlockTypes,
+  IOType,
+} from "~/api/blockType/blockType.contracts";
 
 export type IBlockConfig = z.TypeOf<typeof ExtendedBlockConfig>;
 

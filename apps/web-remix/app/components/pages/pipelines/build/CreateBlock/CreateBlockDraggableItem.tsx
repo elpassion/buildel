@@ -4,7 +4,7 @@ import startCase from "lodash.startcase";
 import { useReactFlow } from "reactflow";
 import { z } from "zod";
 import { Icon, IconButton } from "@elpassion/taco";
-import { BlockType } from "~/api/pipeline/pipeline.contracts";
+import { BlockType } from "~/api/blockType/blockType.contracts";
 import { useRunPipeline } from "../../RunPipelineProvider";
 import { IBlockConfig, IBlockType } from "../../pipeline.types";
 

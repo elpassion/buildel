@@ -12,6 +12,7 @@ import { TextInputField } from "~/components/form/fields/text.field";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
 import { successToast } from "~/components/toasts/successToast";
+import { ExtendedBlockConfig } from "~/api/blockType/blockType.contracts";
 import {
   ArrayField,
   BooleanField,
@@ -30,7 +31,6 @@ import {
   Field as FormField,
   HiddenField,
 } from "~/components/form/fields/field.context";
-import { ExtendedBlockConfig } from "~/api/pipeline/pipeline.contracts";
 
 export function EditBlockForm({
   onSubmit,

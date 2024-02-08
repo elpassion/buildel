@@ -3,7 +3,7 @@ import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
-import { BlockTypesResponse } from "~/api/pipeline/pipeline.contracts";
+import { BlockTypeApi } from "~/api/blockType/BlockTypeApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -12,9 +12,10 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.pipelineId, "pipelineId not found");
     invariant(params.runId, "runId not found");
 
-    const blockTypesPromise = fetch(BlockTypesResponse, `/block_types`);
-
     const pipelineApi = new PipelineApi(fetch);
+    const blockTypeApi = new BlockTypeApi(fetch);
+
+    const blockTypesPromise = blockTypeApi.getBlockTypes();
 
     const pipelinePromise = pipelineApi.getPipeline(
       params.organizationId,

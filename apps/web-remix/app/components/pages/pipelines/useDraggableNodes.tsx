@@ -3,7 +3,7 @@ import { ReactFlowInstance } from "reactflow";
 import { z } from "zod";
 import { assert } from "~/utils/assert";
 import { IBlockConfig } from "./pipeline.types";
-import { BlockType } from "~/api/pipeline/pipeline.contracts";
+import { BlockType } from "~/api/blockType/blockType.contracts";
 
 interface IUseDraggableNodes {
   wrapper: RefObject<HTMLDivElement>;

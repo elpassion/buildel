@@ -2,8 +2,8 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
-import { BlockTypesResponse } from "~/api/pipeline/pipeline.contracts";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
+import { BlockTypeApi } from "~/api/blockType/BlockTypeApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -11,10 +11,11 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.organizationId, "organizationId not found");
     invariant(params.pipelineId, "pipelineId not found");
 
-    const blockTypes = await fetch(BlockTypesResponse, `/block_types`);
-
+    const blockTypeApi = new BlockTypeApi(fetch);
     const pipelineApi = new PipelineApi(fetch);
     const aliasId = pipelineApi.getAliasFromUrl(request.url);
+
+    const blockTypes = await blockTypeApi.getBlockTypes();
 
     const pipeline = await pipelineApi.getAliasedPipeline(
       params.organizationId,
