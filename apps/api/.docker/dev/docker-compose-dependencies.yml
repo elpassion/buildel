@@ -4,7 +4,7 @@ services:
   database:
     image: ankane/pgvector:latest
     ports:
-      - "5432:5432"
+      - "54321:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -22,7 +22,7 @@ services:
   #   ports:
   #     - "8000:8000"
   #   volumes:
-  #     - "lnx_storage:/etc/lnx/index" 
+  #     - "lnx_storage:/etc/lnx/index"
   #   environment:
   #     - AUTHORIZATION_KEY=hello
   #     - LOG_LEVEL=info

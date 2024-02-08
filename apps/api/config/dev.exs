@@ -6,6 +6,7 @@ config :buildel, Buildel.Repo,
   password: "postgres",
   hostname: "localhost",
   database: "buildel_dev",
+  port: 54321,
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
