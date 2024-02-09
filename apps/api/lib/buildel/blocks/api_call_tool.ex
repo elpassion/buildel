@@ -13,7 +13,7 @@ defmodule Buildel.Blocks.ApiCallTool do
       type: "api_call_tool",
       description: "Tool used to call HTTP APIs.",
       groups: ["text", "tools"],
-      inputs: [],
+      inputs: [Block.text_input("headers")],
       outputs: [],
       ios: [Block.io("tool", "worker")],
       schema: schema()
@@ -30,7 +30,7 @@ defmodule Buildel.Blocks.ApiCallTool do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["method", "url", "description", "parameters"],
+            "required" => ["method", "url", "description", "parameters", "headers"],
             "properties" =>
               Jason.OrderedObject.new(
                 method: %{
@@ -79,6 +79,10 @@ defmodule Buildel.Blocks.ApiCallTool do
     :ok
   end
 
+  def send_headers(pid, {:text, _text} = message) do
+    GenServer.cast(pid, {:send_headers, message})
+  end
+
   def call_api_sync(pid, args) do
     GenServer.call(pid, {:call_api, args}, :infinity)
   end
@@ -100,6 +104,15 @@ defmodule Buildel.Blocks.ApiCallTool do
      |> Map.put(:parameters, Jason.decode!(opts.parameters))
      |> Map.put(:context, context)
      |> assign_stream_state(opts)}
+  end
+
+
+  def handle_cast({:send_headers, {:text, message}}, state) do
+    state = send_stream_start(state)
+    state = state |> Map.put(:headers, Jason.decode!(message))
+
+    state = send_stream_stop(state)
+    {:noreply, state}
   end
 
   @impl true
@@ -135,8 +148,9 @@ defmodule Buildel.Blocks.ApiCallTool do
       Accept: "application/json",
       "Content-Type": "application/json",
       "X-Buildel-Topic": topic,
-      "X-Buildel-Context": state[:context] |> Jason.encode!()
-    ]
+      "X-Buildel-Context": state[:context] |> Jason.encode!(),
+    ] ++ Map.to_list(state[:headers])
+
 
     headers =
       if state[:opts][:authorize] do
@@ -192,7 +206,7 @@ defmodule Buildel.Blocks.ApiCallTool do
 
   @impl true
   def handle_info({_name, :text, text}, state) do
-    cast(self(), {:text, text})
+    send_headers(self(), {:text, text})
     {:noreply, state}
   end
 end
