@@ -78,7 +78,7 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
       {"strategy", "ocr_only"},
       {"max_characters", "1000"},
       # TODO: UNHARDCODE LANGUAGES
-      {"ocr_languages", "pol"}
+      # {"ocr_languages", "pol"}
     ]
 
     form_data =
