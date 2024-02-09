@@ -11,6 +11,7 @@ export class BlockTypeApi {
     if (cache) return cache;
     const response = await this.client(BlockTypesResponse, `/block_types`);
     cache = response;
+    setTimeout(() => (cache = undefined), 1000 * 60 * 5);
     return response;
   }
 }
