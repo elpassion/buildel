@@ -1,6 +1,5 @@
-import { commitSession, getSession, logout } from "~/session.server";
 import { ICurrentUser } from "~/api/CurrentUserApi";
-import { redirect } from "@remix-run/node";
+import { commitSession, getSession } from "~/session.server";
 import { UnauthorizedError } from "./errors.server";
 
 export async function setCurrentUser(
