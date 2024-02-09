@@ -8,12 +8,15 @@ import * as Sentry from "@sentry/remix";
 import { PassThrough } from "node:stream";
 
 import type {
+  ActionFunctionArgs,
   AppLoadContext,
   DataFunctionArgs,
   EntryContext,
+  LoaderFunctionArgs,
 } from "@remix-run/node";
 import { createReadableStreamFromReadable } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
+import etag from "etag";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 
@@ -147,4 +150,25 @@ function handleBrowserRequest(
 
     setTimeout(abort, ABORT_DELAY);
   });
+}
+
+export async function handleDataRequest(
+  response: Response,
+  {
+    request,
+  }: LoaderFunctionArgs | ActionFunctionArgs
+) {
+  const shouldComputeEtag = 
+    (request.method.toLowerCase() === "get" || request.method.toLowerCase() === "head") && 
+    response.status === 200;
+
+  if (shouldComputeEtag) {
+    const body = await response.clone().text();
+    response.headers.set("etag", etag(body));
+    if (request.headers.get("If-None-Match") === response.headers.get("ETag")) {
+      return new Response("", { status: 304, headers: response.headers });
+    }
+  }
+
+  return response;
 }
