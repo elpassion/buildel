@@ -24,6 +24,7 @@ import { BuilderHeader, SaveChangesButton } from "./BuilderHeader";
 import { BuilderNode } from "./BuilderNode";
 import { loader } from "./loader";
 import { AliasNode } from "~/components/pages/pipelines/build/AliasNode";
+import isEqual from "lodash.isequal";
 
 export const links: LinksFunction = () => [...SubMenuLinks()];
 
@@ -42,6 +43,7 @@ export function PipelineBuilder() {
 
   const handleUpdatePipeline = useCallback(
     (config: IPipelineConfig) => {
+      if (isEqual(pipeline.config, config)) return;
       updateFetcher.submit(
         { ...pipeline, config: { ...config } },
         { method: "PUT", encType: "application/json" }
