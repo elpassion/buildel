@@ -13,11 +13,11 @@ const cache = new LRUCache<string, Response>({ max: 500 });
 export async function fetchTyped<T extends ZodType>(
   schema: T,
   url: string,
-  options?: RequestInit & { requestEtag?: string | null } | undefined
+  options?: RequestInit & { requestCacheId?: string | null } | undefined
 ): Promise<ParsedResponse<z.infer<T>>> {
   let cachedResponse: Response | undefined;
-  if ((!options?.method || options.method === "GET") && options?.requestEtag) {
-    cachedResponse = cache.get(options.requestEtag + url);
+  if ((!options?.method || options.method === "GET") && options?.requestCacheId) {
+    cachedResponse = cache.get(options.requestCacheId + url);
   }
 
   let response = await fetch(
@@ -34,8 +34,8 @@ export async function fetchTyped<T extends ZodType>(
     response = cachedResponse?.clone()!;
   }
 
-  if ((!options?.method || options.method === "GET") && options?.requestEtag) {
-    cache.set(options.requestEtag + url, response.clone());
+  if ((!options?.method || options.method === "GET") && options?.requestCacheId) {
+    cache.set(options.requestCacheId + url, response.clone());
   }
 
   if (!response.ok) {

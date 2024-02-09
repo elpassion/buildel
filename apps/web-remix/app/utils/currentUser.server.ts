@@ -26,3 +26,12 @@ export async function getCurrentUser(request: Request): Promise<{
 
   return { user };
 }
+
+export async function getCurrentUserOrNull(request: Request): Promise<{
+  user: ICurrentUser | null;
+}> {
+  const session = await getSession(request.headers.get("Cookie") || "");
+  const user = session.get("user");
+
+  return { user };
+}

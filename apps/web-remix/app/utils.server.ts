@@ -16,6 +16,7 @@ import {
 import { fetchTyped } from "./utils/fetch.server";
 import { setServerToast } from "./utils/toast.server";
 import { logout } from "~/session.server";
+import { getCurrentUserOrNull } from "./utils/currentUser.server";
 
 export const loaderBuilder =
   <T>(
@@ -151,6 +152,7 @@ export const actionBuilder =
 async function requestFetchTyped(
   actionArgs: ActionFunctionArgs
 ): Promise<typeof fetchTyped> {
+  const {user} = await getCurrentUserOrNull(actionArgs.request);
   return (schema, url, options) => {
     return fetchTyped(
       schema,
@@ -161,7 +163,7 @@ async function requestFetchTyped(
             "Content-Type": "application/json",
             Cookie: actionArgs.request.headers.get("cookie"),
           },
-          requestEtag: actionArgs.request.headers.get("if-none-match"),
+          requestCacheId: user?.id.toString() || null,
         },
         options || {}
       )
