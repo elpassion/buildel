@@ -18,15 +18,8 @@ defmodule BuildelWeb.OrganizationPipelineRunJSON do
         Map.update(run.config, "blocks", [], fn blocks ->
           Enum.map(blocks, fn block ->
             case Buildel.Blocks.type(block["type"]) do
-              nil ->
-                nil
-
-              type ->
-                Map.put(
-                  block,
-                  "block_type",
-                  type.options
-                )
+              nil -> nil
+              _type -> block |> Map.delete("block_type")
             end
           end)
           |> Enum.filter(fn

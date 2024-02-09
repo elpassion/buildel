@@ -6,21 +6,37 @@ import {
   ValidationError,
 } from "./errors.server";
 import merge from "lodash.merge";
+import { LRUCache } from "lru-cache"
+
+const cache = new LRUCache<string, Response>({ max: 500 });
 
 export async function fetchTyped<T extends ZodType>(
   schema: T,
   url: string,
-  options?: RequestInit | undefined
+  options?: RequestInit & { requestEtag?: string | null } | undefined
 ): Promise<ParsedResponse<z.infer<T>>> {
-  const response = await fetch(
+  let cachedResponse: Response | undefined;
+  if ((!options?.method || options.method === "GET") && options?.requestEtag) {
+    cachedResponse = cache.get(options.requestEtag + url);
+  }
+
+  let response = await fetch(
     url,
-    merge(options, { headers: { connection: "keep-alive" } })
+    merge(options || {}, { headers: { connection: "keep-alive", "if-none-match": cachedResponse?.headers.get("etag") } })
   ).catch((e) => {
     console.error(
       `Failed to connect to API error: ${e} during request to ${url}`
     );
     throw new UnknownAPIError();
   });
+
+  if (response.status === 304) {
+    response = cachedResponse?.clone()!;
+  }
+
+  if ((!options?.method || options.method === "GET") && options?.requestEtag) {
+    cache.set(options.requestEtag + url, response.clone());
+  }
 
   if (!response.ok) {
     if (response.status === 422) {

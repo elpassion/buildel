@@ -161,6 +161,7 @@ async function requestFetchTyped(
             "Content-Type": "application/json",
             Cookie: actionArgs.request.headers.get("cookie"),
           },
+          requestEtag: actionArgs.request.headers.get("if-none-match"),
         },
         options || {}
       )

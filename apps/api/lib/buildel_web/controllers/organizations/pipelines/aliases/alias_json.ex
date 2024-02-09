@@ -17,15 +17,8 @@ defmodule BuildelWeb.OrganizationPipelineAliasJSON do
         Map.update(alias.config, "blocks", [], fn blocks ->
           Enum.map(blocks, fn block ->
             case Buildel.Blocks.type(block["type"]) do
-              nil ->
-                nil
-
-              type ->
-                Map.put(
-                  block,
-                  "block_type",
-                  type.options
-                ) |> Map.delete("block_type")
+              nil -> nil
+              _type -> block |> Map.delete("block_type")
             end
           end)
           |> Enum.filter(fn
