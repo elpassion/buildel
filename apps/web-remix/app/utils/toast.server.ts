@@ -36,3 +36,15 @@ export async function getServerToast(request: Request): Promise<{
 
   return { cookie: await commitSession(session), error, success, warning };
 }
+
+export async function getOrganizationId(cookie: string): Promise<number | undefined> {
+  const session = await getSession(cookie);
+  const organizationId = session.get("organizationId");
+  return organizationId;
+}
+
+export async function setOrganizationId(cookie: string, organizationId: number): Promise<string> {
+  const session = await getSession(cookie);
+  session.set("organizationId", organizationId);
+  return await commitSession(session);
+}

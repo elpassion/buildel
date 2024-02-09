@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
 import { routes } from "~/utils/routes.utils";
+import { getOrganizationId } from "~/utils/toast.server";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {
@@ -13,7 +14,9 @@ export async function loader(args: LoaderFunctionArgs) {
       `/organizations`
     );
 
-    const organization = organizations.data.at(0);
+    const organizationId = await getOrganizationId(request.headers.get("Cookie") || "");
+    const savedOrganizationIndex = organizations.data.findIndex((org) => org.id === organizationId);
+    const organization = organizations.data.at(savedOrganizationIndex);
 
     if (organization) {
       return redirect(routes.pipelines(organization.id));

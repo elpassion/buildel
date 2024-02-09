@@ -1,9 +1,3 @@
-import { PropsWithChildren, useCallback, useRef, useState } from "react";
-import invariant from "tiny-invariant";
-import classNames from "classnames";
-import Modal from "react-modal";
-import { useOnClickOutside } from "usehooks-ts";
-import { MenuInfo } from "rc-menu/es/interface";
 import { Avatar, Button, Icon, IconButton } from "@elpassion/taco";
 import { DataFunctionArgs, json } from "@remix-run/node";
 import {
@@ -13,22 +7,28 @@ import {
   useLoaderData,
   useNavigate,
 } from "@remix-run/react";
-import { loaderBuilder } from "~/utils.server";
-import { requireLogin } from "~/session.server";
-import { routes } from "~/utils/routes.utils";
+import classNames from "classnames";
+import { MenuInfo } from "rc-menu/es/interface";
+import { PropsWithChildren, useCallback, useRef, useState } from "react";
+import Modal from "react-modal";
+import invariant from "tiny-invariant";
+import { useOnClickOutside } from "usehooks-ts";
+import { OrganizationApi } from "~/api/organization/OrganizationApi";
 import { Menu } from "~/components/menu/Menu";
 import { MenuItem } from "~/components/menu/MenuItem";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
-import { getServerToast } from "~/utils/toast.server";
-import { useServerToasts } from "~/hooks/useServerToasts";
 import {
   NavMobileSidebar,
   NavSidebar,
   NavSidebarContext,
   SidebarLink,
 } from "~/components/sidebar/NavSidebar";
+import { useServerToasts } from "~/hooks/useServerToasts";
+import { requireLogin } from "~/session.server";
+import { loaderBuilder } from "~/utils.server";
 import { getCurrentUser } from "~/utils/currentUser.server";
-import { OrganizationApi } from "~/api/organization/OrganizationApi";
+import { routes } from "~/utils/routes.utils";
+import { getServerToast, setOrganizationId } from "~/utils/toast.server";
 
 Modal.setAppElement("#_root");
 export async function loader(loaderArgs: DataFunctionArgs) {
@@ -44,7 +44,8 @@ export async function loader(loaderArgs: DataFunctionArgs) {
       (org) => org.id === Number(params.organizationId)
     );
 
-    const { cookie, ...toasts } = await getServerToast(request);
+
+    let { cookie, ...toasts } = await getServerToast(request);
 
     if (!organization) {
       throw new Response(null, {
@@ -52,6 +53,8 @@ export async function loader(loaderArgs: DataFunctionArgs) {
         statusText: "Not Found",
       });
     }
+
+    cookie = await setOrganizationId(cookie, organization!.id);
 
     const { user } = await getCurrentUser(request);
 

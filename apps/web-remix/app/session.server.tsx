@@ -5,6 +5,7 @@ import { setServerToast } from "~/utils/toast.server";
 type SessionData = {
   apiToken?: string;
   user?: ICurrentUser;
+  organizationId?: number;
 };
 
 export type SessionToast = {
