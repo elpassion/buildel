@@ -26,6 +26,7 @@ const { getSession, commitSession, destroySession } =
       secrets: [process.env.SESSION_SECRET as string],
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 14, // 14 days
     },
   });
 
