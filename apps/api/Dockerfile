@@ -28,8 +28,9 @@ RUN apt-get update -y && apt-get install -y build-essential git curl \
 WORKDIR /app
 
 # install hex + rebar
-RUN mix local.hex --force && \
-  mix local.rebar --force
+RUN --mount=type=cache,id=hex,target=/root/.hex \
+  --mount=type=cache,id=mix,target=/root/.mix \
+  mix local.hex --force && mix local.rebar --force
 
 # set build ENV
 ENV MIX_ENV="prod"
@@ -37,29 +38,45 @@ ENV BUMBLEBEE_CACHE_DIR=/app/.bumblebee
 
 # install mix dependencies
 COPY ./mix.exs ./mix.lock ./
-RUN mix deps.get --only $MIX_ENV
+RUN --mount=type=cache,id=hex,target=/root/.hex \
+  --mount=type=cache,id=mix,target=/root/.mix \
+  mix deps.get --only $MIX_ENV
 RUN mkdir config
 
 # copy compile-time config files before we compile dependencies
 # to ensure any relevant config change will trigger the dependencies
 # to be re-compiled.
 COPY ./config/config.exs ./config/${MIX_ENV}.exs config/
-RUN mix deps.compile
+RUN --mount=type=cache,id=hex,target=/root/.hex \
+  --mount=type=cache,id=mix,target=/root/.mix \
+  --mount=type=cache,id=xla,target=/root/.cache/xla \
+  --mount=type=cache,id=rustler,target=/root/.cache/rustler_precompiled \
+  mix deps.compile
 
 COPY ./priv priv
 
 COPY ./lib lib
 
 # Compile the release
-RUN mix compile
+RUN --mount=type=cache,id=hex,target=/root/.hex \
+  --mount=type=cache,id=mix,target=/root/.mix \
+  --mount=type=cache,id=xla,target=/root/.cache/xla \
+  --mount=type=cache,id=rustler,target=/root/.cache/rustler_precompiled \
+  mix compile
 
 # Changes to config/runtime.exs don't require recompiling the code
 COPY ./config/runtime.exs config/
 
 COPY ./rel rel
-RUN mix release
+RUN --mount=type=cache,id=hex,target=/root/.hex \
+  --mount=type=cache,id=mix,target=/root/.mix \
+  --mount=type=cache,id=xla,target=/root/.cache/xla \
+  --mount=type=cache,id=rustler,target=/root/.cache/rustler_precompiled \
+  mix release
 
-RUN DATABASE_URL="ecto://USER:PASS@HOST/DATABASE" SECRET_KEY_BASE="doesnotmatter" ENCRYPTION_KEY="ZG9lc25vdG1hdTEstg==" SKIP_DB="true" mix run -e 'Buildel.Application.load_servings()'
+RUN --mount=type=cache,id=hex,target=/root/.hex \
+  --mount=type=cache,id=mix,target=/root/.mix \
+  DATABASE_URL="ecto://USER:PASS@HOST/DATABASE" SECRET_KEY_BASE="doesnotmatter" ENCRYPTION_KEY="ZG9lc25vdG1hdTEstg==" SKIP_DB="true" mix run -e 'Buildel.Application.load_servings()'
 
 RUN mkdir -p /app/.bumblebee
 
