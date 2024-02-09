@@ -17,6 +17,7 @@ import selectStyles from "~/components/form/inputs/select/select.input.css";
 import styles from "./tailwind.css";
 import { GlobalNotFound } from "~/components/errorBoundaries/GlobalNotFound";
 import { GlobalRuntime } from "~/components/errorBoundaries/GlobalRuntime";
+
 export const links: LinksFunction = () => [
   ...(cssBundleHref
     ? [
