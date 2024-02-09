@@ -4,7 +4,7 @@ import { useSearchParams, Link } from "@remix-run/react";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { schema } from "./schema";
-import { Field } from "~/components/form/fields/field.context";
+import { Field, HiddenField } from "~/components/form/fields/field.context";
 import {
   PasswordInputField,
   TextInputField,
@@ -15,7 +15,7 @@ import { Button } from "@elpassion/taco";
 export function LoginPage() {
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/stories";
+  const redirectTo = searchParams.get("redirectTo");
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
 
@@ -62,7 +62,7 @@ export function LoginPage() {
             <PasswordInputField ref={passwordRef} label="Password" />
           </Field>
         </div>
-        <input type="hidden" name="redirectTo" value={redirectTo} />
+        <HiddenField name="redirectTo" value={redirectTo ?? undefined} />
         <Button type="submit" isFluid>
           Log in
         </Button>

@@ -36,7 +36,9 @@ export async function action(actionArgs: ActionFunctionArgs) {
       headers.append("Set-Cookie", authCookie);
       headers.append("Set-Cookie", sessionCookie);
 
-      return redirect(routes.dashboard, {
+      const redirectTo = result.data.redirectTo ?? routes.dashboard;
+
+      return redirect(redirectTo, {
         headers,
       });
     },

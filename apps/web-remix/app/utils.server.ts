@@ -41,7 +41,14 @@ export const loaderBuilder =
       } else if (e instanceof NotFoundError) {
         throw notFound();
       } else if (e instanceof UnauthorizedError) {
-        throw redirect("/login", {
+        const request = args.request;
+
+        const fromURL = new URL(request.url);
+        const toURL = new URL("/login", fromURL.origin);
+
+        toURL.searchParams.set("redirectTo", fromURL.pathname);
+
+        throw redirect(toURL.toString(), {
           headers: await logout(args.request, {
             error: { title: "Unauthorized", description: "Session expired" },
           }),
@@ -106,7 +113,16 @@ export const actionBuilder =
       if (e instanceof ValidationError) {
         return validationError({ fieldErrors: e.fieldErrors });
       } else if (e instanceof UnauthorizedError) {
-        throw redirect("/login", {
+        const request = actionArgs.request;
+        const fromURL = new URL(request.url);
+        const toURL = new URL("/login", fromURL.origin);
+
+        const referer = actionArgs.request.headers.get("referer");
+        if (referer) {
+          toURL.searchParams.set("redirectTo", referer);
+        }
+
+        throw redirect(toURL.toString(), {
           headers: await logout(actionArgs.request, {
             error: { title: "Unauthorized", description: "Session expired" },
           }),

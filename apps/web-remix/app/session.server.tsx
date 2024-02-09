@@ -30,16 +30,25 @@ const { getSession, commitSession, destroySession } =
 
 export { getSession, commitSession, destroySession };
 
-export async function requireLogin(request: Request) {
+export async function requireLogin(request: Request) {  
   const cookie = request.headers.get("Cookie");
   if (!cookie?.includes("_buildel_key")) {
-    throw redirect("/login", { headers: await logout(request) });
+    const fromURL = new URL(request.url);
+    const toURL = new URL("/login", fromURL.origin);
+
+    toURL.searchParams.set("redirectTo", fromURL.pathname);
+
+    throw redirect(toURL.toString(), { headers: await logout(request) });
   }
 }
 
 export async function requireNotLogin(request: Request) {
   const cookie = request.headers.get("Cookie");
-  if (cookie?.includes("_buildel_key")) throw redirect("/");
+  if (cookie?.includes("_buildel_key")) {
+    const url = new URL(request.url);
+    const toURL = url.searchParams.get("redirectTo") || "/";
+    throw redirect(toURL);
+  }
 }
 
 export async function logout(

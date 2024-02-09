@@ -1,6 +1,7 @@
 import { commitSession, getSession, logout } from "~/session.server";
 import { ICurrentUser } from "~/api/CurrentUserApi";
 import { redirect } from "@remix-run/node";
+import { UnauthorizedError } from "./errors.server";
 
 export async function setCurrentUser(
   request: Request,
@@ -20,11 +21,7 @@ export async function getCurrentUser(request: Request): Promise<{
   const user = session.get("user");
 
   if (!user) {
-    throw redirect("/login", {
-      headers: await logout(request, {
-        error: { title: "Unauthorized", description: "Session expired" },
-      }),
-    });
+    throw new UnauthorizedError();
   }
 
   return { user };
