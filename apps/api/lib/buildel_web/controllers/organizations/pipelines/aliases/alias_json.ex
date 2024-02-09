@@ -25,7 +25,7 @@ defmodule BuildelWeb.OrganizationPipelineAliasJSON do
                   block,
                   "block_type",
                   type.options
-                )
+                ) |> Map.delete("block_type")
             end
           end)
           |> Enum.filter(fn
