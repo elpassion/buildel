@@ -200,7 +200,7 @@ defmodule BuildelWeb.MemoryControllerTest do
   end
 
   defp create_memory_collection(%{organization: organization}) do
-    collection = collection_fixture(organization.id)
+    collection = collection_fixture(%{organization_id: organization.id})
     %{collection: collection}
   end
 
