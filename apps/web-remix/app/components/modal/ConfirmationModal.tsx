@@ -43,14 +43,15 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <Button size="md" type="button" variant="ghost" onClick={handleCancel}>
           {cancelText}
         </Button>
-        <SubmitButton
+        <Button
+          type="submit"
           size="md"
           variant="filled"
           hierarchy="destructive"
           onClick={handleConfirm}
         >
           {confirmText}
-        </SubmitButton>
+        </Button>
       </div>
     </Modal>
   );

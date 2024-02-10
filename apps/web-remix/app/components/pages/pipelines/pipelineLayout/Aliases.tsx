@@ -20,7 +20,6 @@ import {
 } from "~/components/pages/pipelines/pipeline.types";
 import { routes } from "~/utils/routes.utils";
 import { confirm } from "~/components/modal/confirm";
-import { SubmitButton } from "~/components/form/submit";
 
 interface AliasSelectProps {
   aliases: IPipelineAlias[];
@@ -227,12 +226,13 @@ export const CreateAliasForm = ({
         value={JSON.stringify(pipeline.config.connections)}
       />
 
-      <SubmitButton
+      <button
+        type="submit"
         aria-label="Create workflow alias"
         className="bg-secondary-500 hover:bg-secondary-600 rounded-lg text-neutral-100 px-2 py-1 text-sm transition"
       >
         Create alias
-      </SubmitButton>
+      </button>
     </ValidatedForm>
   );
 };
