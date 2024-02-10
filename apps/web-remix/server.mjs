@@ -48,9 +48,21 @@ await app.register(fastifyHttpProxy, {
 })
 
 await app.register(fastifyHttpProxy, {
+  upstream: "https://plausible.io",
+  prefix: "/api/event",
+  rewritePrefix: "/api/event"
+})
+
+await app.register(fastifyHttpProxy, {
   upstream: process.env.API_URL,
   prefix: "/super-api",
   rewritePrefix: "/api"
+})
+
+await app.register(fastifyHttpProxy, {
+  upstream: "https://plausible.io/js",
+  prefix: "/statistics",
+  rewritePrefix: ""
 })
 
 await app.register(fastifyStatic, {
