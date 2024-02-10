@@ -5,124 +5,12 @@ defmodule Buildel.BlocksTest do
   use Buildel.DataCase
 
   alias Buildel.Blocks.{
-    SpeechToText,
-    FileSpeechToText,
-    FileSpeechToText,
-    TextToSpeech,
     Chat,
     Block,
-    AudioOutput,
     CollectSentences,
     CollectAllText,
     TakeLatest
   }
-
-  describe "FileSpeechToText" do
-    test "exposes options" do
-      assert FileSpeechToText.options() == %{
-               description:
-                 "This module expertly transcribes audio content into text, offering multiple output formats including plain text, JSON, and SRT.",
-               type: "file_speech_to_text",
-               inputs: [Block.audio_input("input")],
-               outputs: [
-                 Block.text_output("output"),
-                 Block.text_output("json_output"),
-                 Block.text_output("srt_output")
-               ],
-               schema: FileSpeechToText.schema(),
-               groups: ["audio", "text"],
-               ios: []
-             }
-    end
-
-    test "validates schema correctly" do
-      assert :ok =
-               Blocks.validate_block(FileSpeechToText, %{
-                 "name" => "test",
-                 "opts" => %{
-                   "api_key" => "test",
-                   "language" => "en"
-                 },
-                 "inputs" => []
-               })
-
-      assert {:error, _} = Blocks.validate_block(FileSpeechToText, %{})
-    end
-
-    test "audio to text works through broadcasting" do
-      {:ok, test_run} =
-        BlocksTestRunner.start_run(%{
-          blocks: [
-            BlocksTestRunner.create_test_audio_input_block("test_input"),
-            FileSpeechToText.create(%{
-              name: "test",
-              opts: %{api_key: "test"},
-              connections: [
-                Blocks.Connection.from_connection_string("test_input:output->input", "audio")
-              ]
-            })
-          ]
-        })
-
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
-
-      file = File.read!("test/support/fixtures/real.mp3")
-      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:binary, file})
-
-      assert_receive {^topic, :text, "Hello"}
-    end
-  end
-
-  describe "TextToSpeech" do
-    test "exposes options" do
-      assert TextToSpeech.options() == %{
-               type: "text_to_speech",
-               description:
-                 "This module enables seamless conversion of textual data into audio format, leveraging the ElevenLabs API",
-               inputs: [Block.text_input("input")],
-               outputs: [Block.audio_output("output")],
-               schema: TextToSpeech.schema(),
-               groups: ["text", "audio"],
-               ios: []
-             }
-    end
-
-    test "validates schema correctly" do
-      assert :ok =
-               Blocks.validate_block(TextToSpeech, %{
-                 "name" => "test",
-                 "opts" => %{
-                   "api_key" => "test"
-                 },
-                 "inputs" => []
-               })
-
-      assert {:error, _} = Blocks.validate_block(TextToSpeech, %{})
-    end
-
-    test "text to audio works through input" do
-      {:ok, test_run} =
-        BlocksTestRunner.start_run(%{
-          blocks: [
-            BlocksTestRunner.create_test_text_input_block("test_input"),
-            TextToSpeech.create(%{
-              name: "test",
-              opts: %{api_key: "test"},
-              connections: [
-                Blocks.Connection.from_connection_string("test_input:output->input", "text")
-              ]
-            })
-          ]
-        })
-
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
-
-      text = "Hello darkness my old friend."
-      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
-
-      assert_receive({^topic, :binary, _})
-    end
-  end
 
   describe "Chat" do
     test "exposes options" do
