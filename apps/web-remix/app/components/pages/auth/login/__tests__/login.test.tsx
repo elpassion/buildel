@@ -35,6 +35,17 @@ describe(LoginPage.name, () => {
     await waitFor(() => screen.findByText(/String must contain at least 2/i));
   });
 
+  test("should display error from BE", async () => {
+    setupServer.use(...errorHandlers);
+
+    const page = new LoginObject().render({ initialEntries: ["/login"] });
+    await page.fillInputs();
+
+    await page.submit();
+
+    await waitFor(() => screen.findByText(/Invalid username or password/i));
+  });
+
   test("should redirect user at correct url after signing in", async () => {
     const page = new LoginObject().render({
       initialEntries: ["/login?redirectTo=/organization/2"],
@@ -44,23 +55,6 @@ describe(LoginPage.name, () => {
     await page.submit();
 
     await waitFor(() => screen.findByText(/Organization/i));
-  });
-});
-
-describe(LoginPage.name, () => {
-  const setupServer = server(errorHandlers);
-
-  beforeAll(() => setupServer.listen());
-  afterEach(() => setupServer.resetHandlers());
-  afterAll(() => setupServer.close());
-
-  test("should display error from BE", async () => {
-    const page = new LoginObject().render({ initialEntries: ["/login"] });
-    await page.fillInputs();
-
-    await page.submit();
-
-    await waitFor(() => screen.findByText(/Invalid username or password/i));
   });
 });
 

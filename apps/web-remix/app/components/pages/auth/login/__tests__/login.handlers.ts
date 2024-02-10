@@ -15,12 +15,16 @@ export const handlers = [
 ];
 
 export const errorHandlers = [
-  http.post("/super-api/users/log_in", () => {
-    return HttpResponse.json(
-      { errors: { global: ["Invalid username or password"] } },
-      {
-        status: 422,
-      }
-    );
-  }),
+  http.post(
+    "/super-api/users/log_in",
+    () => {
+      return HttpResponse.json(
+        { errors: { global: ["Invalid username or password"] } },
+        {
+          status: 422,
+        }
+      );
+    },
+    { once: true }
+  ),
 ];
