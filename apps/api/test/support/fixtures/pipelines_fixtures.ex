@@ -13,6 +13,13 @@ defmodule Buildel.PipelinesFixtures do
           "version" => "1",
           "blocks" => [
             %{
+              "name" => "input_block",
+              "type" => "text_input",
+              "opts" => %{},
+              "inputs" => [],
+              "ios" => []
+            },
+            %{
               "name" => "random_block",
               "type" => "audio_input",
               "opts" => %{},
@@ -224,7 +231,11 @@ defmodule Buildel.PipelinesFixtures do
   end
 
   def run_fixture(attrs \\ %{}, pipeline_config \\ %{version: "1"}) do
-    pipeline = pipeline_fixture(%{}, pipeline_config)
+    pipeline =
+      case attrs[:pipeline_id] do
+        nil -> pipeline_fixture(%{}, pipeline_config)
+        id -> Buildel.Pipelines.get_pipeline!(id)
+      end
 
     {:ok, run} =
       attrs

@@ -1,4 +1,5 @@
 defmodule Buildel.PipelinesTest do
+  alias Buildel.Blocks.TextInput
   use Buildel.DataCase
   import Buildel.OrganizationsFixtures
 
@@ -128,6 +129,16 @@ defmodule Buildel.PipelinesTest do
       run = run_fixture(%{})
 
       assert Pipelines.blocks_for_run(run) == [
+               TextInput.create(%{
+                 name: "input_block",
+                 opts: %{metadata: %{}},
+                 connections: [
+                   Connection.from_connection_string(
+                     "input_block:input->input?reset=true",
+                     "text"
+                   )
+                 ]
+               }),
                AudioInput.create(%{
                  name: "random_block",
                  opts: %{metadata: %{}},

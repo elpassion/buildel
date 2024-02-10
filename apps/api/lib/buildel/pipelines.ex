@@ -68,6 +68,18 @@ defmodule Buildel.Pipelines do
     end
   end
 
+  def get_running_pipeline_run(%Pipeline{} = pipeline, run_id) do
+    case get_pipeline_run(pipeline, run_id) do
+      {:ok, %Run{status: :running} = run} -> {:ok, run}
+      {:ok, _run} -> {:error, :not_running}
+      e -> e
+    end
+  end
+
+  def get_pipeline_config(%Pipeline{config: config}, 0) do
+    {:ok, config}
+  end
+
   def get_pipeline_config(%Pipeline{config: config}, "latest") do
     {:ok, config}
   end

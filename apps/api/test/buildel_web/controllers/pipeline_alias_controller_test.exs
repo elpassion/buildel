@@ -35,12 +35,10 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
       conn: conn,
       organization: organization,
       pipeline: pipeline,
-      alias: alias
+      alias: %{id: alias_id, name: alias_name, config: alias_config}
     } do
       organization_id = organization.id
       pipeline_id = pipeline.id
-      alias_id = alias.id
-      alias_name = alias.name
 
       %{config: pipeline_config, interface_config: pipeline_interface_config, name: pipeline_name} =
         pipeline
@@ -55,39 +53,7 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
                  "name" => ^pipeline_name
                },
                %{
-                 "config" => %{
-                   "blocks" => [
-                     %{
-                       "inputs" => [],
-                       "ios" => [],
-                       "name" => "random_block",
-                       "opts" => %{},
-                       "type" => "audio_input"
-                     },
-                     %{
-                       "inputs" => ["random_block:output->input?reset=false"],
-                       "ios" => [],
-                       "name" => "random_block_2",
-                       "opts" => %{"api_key" => "some_api_key"},
-                       "type" => "speech_to_text"
-                     },
-                     %{
-                       "inputs" => ["random_block_2:output->input"],
-                       "ios" => [],
-                       "name" => "random_block_3",
-                       "opts" => %{},
-                       "type" => "text_output"
-                     },
-                     %{
-                       "inputs" => ["random_block:output->input"],
-                       "ios" => [],
-                       "name" => "random_block_4",
-                       "opts" => %{},
-                       "type" => "audio_output"
-                     }
-                   ],
-                   "version" => "1"
-                 },
+                 "config" => ^alias_config,
                  "id" => ^alias_id,
                  "interface_config" => %{},
                  "name" => ^alias_name

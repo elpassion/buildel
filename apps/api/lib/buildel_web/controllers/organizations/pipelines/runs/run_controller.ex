@@ -40,12 +40,12 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     required(:organization_id, :string)
     required(:pipeline_id, :string)
     required(:metadata, :map)
-    required(:alias, :string)
+    required(:alias, :integer)
   end
 
   @create_default_params %{
     "metadata" => %{},
-    "alias" => "latest"
+    "alias" => 0
   }
 
   def create(conn, params) do
@@ -126,9 +126,12 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
          {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, run} <- Pipelines.get_pipeline_run(pipeline, id),
+         {:ok, run} <- Pipelines.get_running_pipeline_run(pipeline, id),
          {:ok, run} <- Pipelines.Runner.cast_run(run, block_name, input_name, {:text, data}) do
       render(conn, :show, run: run)
+    else
+      {:error, :not_running} -> {:error, :bad_request}
+      err -> err
     end
   end
 end

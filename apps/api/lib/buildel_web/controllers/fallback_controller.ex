@@ -38,8 +38,16 @@ defmodule BuildelWeb.FallbackController do
     |> render(:"422")
   end
 
+  def call(conn, {:error, :bad_request}) do
+    conn
+    |> put_status(:bad_request)
+    |> put_view(html: BuildelWeb.ErrorHTML, json: BuildelWeb.ErrorJSON)
+    |> render(:"400")
+  end
+
   def call(conn, error) do
     Logger.error("Unhandled error: #{inspect(error)}")
+
     conn
     |> put_status(:internal_server_error)
     |> put_view(html: BuildelWeb.ErrorHTML, json: BuildelWeb.ErrorJSON)
