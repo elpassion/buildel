@@ -26,7 +26,7 @@ defmodule Buildel.BlocksTestRunner do
     }
   end
 
-  def create_test_text_input_block(name \\ "test_input") do
+  def create_test_text_input_block(name) do
     Buildel.Blocks.TextInput.create(%{
       name: name,
       opts: %{},
@@ -36,7 +36,7 @@ defmodule Buildel.BlocksTestRunner do
     })
   end
 
-  def create_test_audio_input_block(name \\ "test_input") do
+  def create_test_audio_input_block(name) do
     Buildel.Blocks.AudioInput.create(%{
       name: name,
       opts: %{},
