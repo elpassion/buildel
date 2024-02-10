@@ -24,10 +24,9 @@ defmodule Buildel.Blocks.ApiCallTool do
   def schema() do
     %{
       "type" => "object",
-      "required" => ["name", "inputs", "opts"],
+      "required" => ["name", "opts"],
       "properties" => %{
         "name" => name_schema(),
-        "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
             "required" => ["method", "url", "description", "parameters", "headers"],
@@ -68,7 +67,8 @@ defmodule Buildel.Blocks.ApiCallTool do
                     "Valid JSON object of the headers to be sent with the request. ie. {\"Content-Type\": \"application/json\"}.",
                   "presentAs" => "editor",
                   "editorLanguage" => "json",
-                  "default" => "{}"
+                  "default" =>
+                    "{\"Content-Type\": \"application/json\", \"Accept\": \"application/json\"}"
                 },
                 authorize: %{
                   "type" => "boolean",
@@ -143,8 +143,6 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     headers =
       [
-        Accept: "application/json",
-        "Content-Type": "application/json",
         "X-Buildel-Topic": topic,
         "X-Buildel-Context": state[:context] |> Jason.encode!()
       ] ++ state[:headers]

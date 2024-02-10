@@ -35,4 +35,12 @@ defmodule Buildel.BlocksTestRunner.Run do
       {:start_stream, nil}
     )
   end
+
+  def get_block_function(_run, block_name) do
+    Buildel.Blocks.Block.function(block_pid(block_name), %{block_name: "test"})
+  end
+
+  defp block_pid(block_name) do
+    Process.whereis(block_name |> String.to_atom())
+  end
 end
