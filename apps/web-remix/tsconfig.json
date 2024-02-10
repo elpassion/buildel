@@ -17,7 +17,7 @@
     "paths": {
       "~/*": ["./app/*"],
       "~/components/*": ["./app/components/*"],
-      "~/test-utils/*": ["./app/test-utils/*"]
+      "~/tests/*": ["./app/tests/*"]
     },
     "skipLibCheck": true,
     "noEmit": true
