@@ -8,7 +8,7 @@ import { server } from "~/tests/server.mock";
 import { LoginPage } from "../page";
 import { loader } from "../loader";
 import { action } from "../action";
-import { handlers } from "./login.handlers";
+import { errorHandlers, handlers } from "./login.handlers";
 
 describe(LoginPage.name, () => {
   const setupServer = server(handlers);
@@ -19,10 +19,7 @@ describe(LoginPage.name, () => {
 
   test("should sign in user correctly", async () => {
     const page = new LoginObject().render({ initialEntries: ["/login"] });
-    const { emailInput, passwordInput } = await page.getElements();
-
-    await emailInput.type("test@gmail.com");
-    await passwordInput.type("password");
+    await page.fillInputs();
 
     await page.submit();
 
@@ -42,14 +39,28 @@ describe(LoginPage.name, () => {
     const page = new LoginObject().render({
       initialEntries: ["/login?redirectTo=/organization/2"],
     });
-    const { emailInput, passwordInput } = await page.getElements();
-
-    await emailInput.type("test@gmail.com");
-    await passwordInput.type("password");
+    await page.fillInputs();
 
     await page.submit();
 
     await waitFor(() => screen.findByText(/Organization/i));
+  });
+});
+
+describe(LoginPage.name, () => {
+  const setupServer = server(errorHandlers);
+
+  beforeAll(() => setupServer.listen());
+  afterEach(() => setupServer.resetHandlers());
+  afterAll(() => setupServer.close());
+
+  test("should display error from BE", async () => {
+    const page = new LoginObject().render({ initialEntries: ["/login"] });
+    await page.fillInputs();
+
+    await page.submit();
+
+    await waitFor(() => screen.findByText(/Invalid username or password/i));
   });
 });
 
@@ -81,6 +92,15 @@ class LoginObject {
     const { button } = await this.getElements();
 
     await button.click();
+
+    return this;
+  }
+
+  async fillInputs() {
+    const { emailInput, passwordInput } = await this.getElements();
+
+    await emailInput.type("test@gmail.com");
+    await passwordInput.type("password");
 
     return this;
   }
