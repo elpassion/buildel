@@ -10,6 +10,7 @@ import {
 import { Field } from "~/components/form/fields/field.context";
 import { SelectField } from "~/components/form/fields/select.field";
 import { schema } from "./schema";
+import { SubmitButton } from "~/components/form/submit";
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;
@@ -57,9 +58,9 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
         </Field>
       </div>
 
-      <Button size="sm" type="submit" variant="filled" className="mt-6">
+      <SubmitButton size="sm" variant="filled" className="mt-6">
         Save changes
-      </Button>
+      </SubmitButton>
     </ValidatedForm>
   );
 };

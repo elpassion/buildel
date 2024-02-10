@@ -8,6 +8,7 @@ import { ItemList } from "~/components/list/ItemList";
 import { HiddenField } from "~/components/form/fields/field.context";
 import type { IBlockConfig, IConfigConnection } from "../pipeline.types";
 import { CreatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
+import { SubmitButton } from "~/components/form/submit";
 
 interface WorkflowTemplatesProps extends PropsWithChildren {
   className?: string;
@@ -93,12 +94,12 @@ function WorkflowTemplatesListItem({
         value={JSON.stringify(blocks)}
       />
 
-      <Button type="submit" size="xs" className="hidden group-hover:block">
+      <SubmitButton size="xs" className="hidden group-hover:block">
         <div className="flex gap-1 items-center">
           <span className="text-xs">Build</span>
           <Icon iconName="arrow-right" className="text-sm" />
         </div>
-      </Button>
+      </SubmitButton>
     </ValidatedForm>
   );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import { Modal } from "@elpassion/taco/Modal";
 import { Button, ModalProps } from "@elpassion/taco";
 import classNames from "classnames";
+import { SubmitButton } from "../form/submit";
 export interface ConfirmationModalProps extends ModalProps {
   onConfirm?: () => Promise<void>;
   onCancel?: () => Promise<void>;
@@ -42,15 +43,14 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <Button size="md" type="button" variant="ghost" onClick={handleCancel}>
           {cancelText}
         </Button>
-        <Button
+        <SubmitButton
           size="md"
-          type="submit"
           variant="filled"
           hierarchy="destructive"
           onClick={handleConfirm}
         >
           {confirmText}
-        </Button>
+        </SubmitButton>
       </div>
     </Modal>
   );

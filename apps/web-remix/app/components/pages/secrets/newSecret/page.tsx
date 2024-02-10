@@ -1,21 +1,18 @@
-import React, { useMemo } from "react";
 import { MetaFunction } from "@remix-run/node";
-import { ValidatedForm } from "remix-validated-form";
+import { useNavigation } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
-import { Button } from "@elpassion/taco";
+import { useMemo } from "react";
+import { ValidatedForm } from "remix-validated-form";
 import { Field } from "~/components/form/fields/field.context";
 import {
   PasswordInputField,
   TextInputField,
 } from "~/components/form/fields/text.field";
+import { SubmitButton } from "~/components/form/submit";
 import { schema } from "./schema";
-import { useNavigation } from "@remix-run/react";
 
 export function NewSecret() {
-  const navigation = useNavigation();
   const validator = useMemo(() => withZod(schema), []);
-
-  const isSubmitting = navigation.state === "submitting";
 
   return (
     <ValidatedForm
@@ -43,15 +40,12 @@ export function NewSecret() {
           />
         </Field>
       </div>
-      <Button
+      <SubmitButton
         size="sm"
         hierarchy="primary"
-        type="submit"
-        isLoading={isSubmitting}
-        disabled={isSubmitting}
       >
         Save the Secret
-      </Button>
+      </SubmitButton>
     </ValidatedForm>
   );
 }

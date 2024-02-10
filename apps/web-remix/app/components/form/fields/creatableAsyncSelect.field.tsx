@@ -26,6 +26,7 @@ import {
   AsyncSelectInput,
   AsyncSelectInputProps,
 } from "~/components/form/inputs/select/select.input";
+import { SubmitButton } from "../submit";
 
 export interface CreatableAsyncSelectFieldProps
   extends Partial<AsyncSelectInputProps> {
@@ -160,15 +161,14 @@ export const CreatableAsyncSelectField = forwardRef<
                 }}
               />
 
-              <Button
+              <SubmitButton
                 size="sm"
-                type="submit"
                 variant="filled"
                 className="mt-6"
                 isFluid
               >
                 Create new
-              </Button>
+              </SubmitButton>
             </ValidatedForm>
           </div>
         </Modal>

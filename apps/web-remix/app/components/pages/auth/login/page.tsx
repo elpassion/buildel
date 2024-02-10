@@ -11,6 +11,7 @@ import {
 } from "~/components/form/fields/text.field";
 import { FieldError } from "~/components/form/fields/field.error";
 import { Button } from "@elpassion/taco";
+import { SubmitButton } from "~/components/form/submit";
 
 export function LoginPage() {
   const validator = React.useMemo(() => withZod(schema), []);
@@ -63,9 +64,9 @@ export function LoginPage() {
           </Field>
         </div>
         <HiddenField name="redirectTo" value={redirectTo ?? undefined} />
-        <Button type="submit" isFluid>
+        <SubmitButton isFluid>
           Log in
-        </Button>
+        </SubmitButton>
       </ValidatedForm>
     </div>
   );

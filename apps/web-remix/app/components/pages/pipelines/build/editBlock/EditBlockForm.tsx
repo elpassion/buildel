@@ -31,6 +31,7 @@ import {
   Field as FormField,
   HiddenField,
 } from "~/components/form/fields/field.context";
+import { SubmitButton } from "~/components/form/submit";
 
 export function EditBlockForm({
   onSubmit,
@@ -257,16 +258,15 @@ export function EditBlockForm({
         </div>
       </InputsProvider>
 
-      <Button
+      <SubmitButton
         isFluid
         size="sm"
-        type="submit"
         variant="filled"
         className="mt-6"
         disabled={disabled}
       >
         Save changes
-      </Button>
+      </SubmitButton>
 
       <TriggerValidation />
     </ValidatedForm>

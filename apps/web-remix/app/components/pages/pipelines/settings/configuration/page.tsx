@@ -17,6 +17,7 @@ import {
 import { successToast } from "~/components/toasts/successToast";
 import { UpdatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
 import { loader } from "./loader";
+import { SubmitButton } from "~/components/form/submit";
 
 const schema = z.object({
   configuration: z.string(),
@@ -129,16 +130,14 @@ export function SettingsConfigurationPage() {
         </FormField>
       </div>
 
-      <Button
+      <SubmitButton
         isFluid
         size="sm"
-        type="submit"
         variant="filled"
         className="mt-6"
-        isLoading={updateFetcher.state !== "idle"}
       >
         Save
-      </Button>
+      </SubmitButton>
     </ValidatedForm>
   );
 }

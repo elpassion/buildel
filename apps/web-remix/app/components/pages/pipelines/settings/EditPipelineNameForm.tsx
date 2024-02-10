@@ -10,6 +10,7 @@ import { Button } from "@elpassion/taco";
 import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
 import { updatePipelineNameSchema } from "./schema";
 import { successToast } from "~/components/toasts/successToast";
+import { SubmitButton } from "~/components/form/submit";
 
 interface EditPipelineNameFormProps {
   defaultValues: IPipeline;
@@ -73,9 +74,9 @@ export function EditPipelineNameForm({
               />
             </Field>
 
-            <Button size="lg" type="submit" className="mt-4 ml-auto mr-0">
+            <SubmitButton size="lg" className="mt-4 ml-auto mr-0">
               Save
-            </Button>
+            </SubmitButton>
           </ValidatedForm>
         </div>
       </Modal>

@@ -6,6 +6,7 @@ import { Button } from "@elpassion/taco";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { schema } from "./schema";
+import { SubmitButton } from "~/components/form/submit";
 
 export function NewKnowledgeBasePage() {
   const validator = useMemo(() => withZod(schema), []);
@@ -28,9 +29,9 @@ export function NewKnowledgeBasePage() {
           />
         </Field>
       </div>
-      <Button hierarchy="primary" type="submit" size="sm">
+      <SubmitButton hierarchy="primary" size="sm">
         Create collection
-      </Button>
+      </SubmitButton>
     </ValidatedForm>
   );
 }

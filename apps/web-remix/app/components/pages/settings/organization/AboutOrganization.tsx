@@ -14,6 +14,7 @@ import { IOrganization } from "./organization.types";
 import { schema } from "./schema";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
+import { SubmitButton } from "~/components/form/submit";
 interface AboutOrganizationProps {
   organization: IOrganization;
 }
@@ -99,9 +100,9 @@ function EditOrganizationName({ organization }: EditOrganizationNameProps) {
               />
             </Field>
 
-            <Button size="lg" type="submit" className="mt-4 ml-auto mr-0">
+            <SubmitButton size="lg" className="mt-4 ml-auto mr-0">
               Save
-            </Button>
+            </SubmitButton>
           </ValidatedForm>
         </div>
       </Modal>

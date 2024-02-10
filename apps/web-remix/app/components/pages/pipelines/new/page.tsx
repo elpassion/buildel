@@ -6,6 +6,7 @@ import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { Button } from "@elpassion/taco";
 import { CreatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
+import { SubmitButton } from "~/components/form/submit";
 
 export function NewPipelinePage() {
   const validator = useMemo(() => withZod(CreatePipelineSchema), []);
@@ -34,9 +35,9 @@ export function NewPipelinePage() {
 
         <HiddenField name="pipeline.config.blocks" value={"[]"} />
       </div>
-      <Button type="submit" size="sm" hierarchy="primary">
+      <SubmitButton size="sm" hierarchy="primary">
         Create workflow
-      </Button>
+      </SubmitButton>
     </ValidatedForm>
   );
 }

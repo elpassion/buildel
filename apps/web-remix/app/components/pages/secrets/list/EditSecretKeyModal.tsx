@@ -10,6 +10,7 @@ import {
 } from "~/components/form/fields/text.field";
 import { ISecretKey } from "../variables.types";
 import { schema } from "./schema";
+import { SubmitButton } from "~/components/form/submit";
 interface EditSecretModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -62,14 +63,13 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
             />
           </Field>
 
-          <Button
+          <SubmitButton
             size="sm"
             hierarchy="primary"
-            type="submit"
             className="mt-6 ml-auto mr-0"
           >
             Update Secret
-          </Button>
+          </SubmitButton>
         </ValidatedForm>
       </div>
     </Modal>

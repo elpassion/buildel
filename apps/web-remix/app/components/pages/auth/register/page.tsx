@@ -11,6 +11,7 @@ import {
 } from "~/components/form/fields/text.field";
 import { schema } from "./schema";
 import { Button } from "@elpassion/taco";
+import { SubmitButton } from "~/components/form/submit";
 
 export function RegisterPage() {
   const validator = React.useMemo(() => withZod(schema), []);
@@ -54,9 +55,9 @@ export function RegisterPage() {
             <PasswordInputField label="Password" />
           </Field>
         </div>
-        <Button type="submit" isFluid>
+        <SubmitButton isFluid>
           Register
-        </Button>
+        </SubmitButton>
       </ValidatedForm>
     </div>
   );

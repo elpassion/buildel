@@ -7,6 +7,7 @@ import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { Section, SectionContent } from "../../settingsLayout/PageLayout";
 import { changePasswordSchema } from "./schema";
+import { SubmitButton } from "~/components/form/submit";
 
 export function ChangePasswordPage() {
   const validator = useMemo(() => withZod(changePasswordSchema), []);
@@ -37,9 +38,9 @@ export function ChangePasswordPage() {
           </p>
         </SectionContent>
       </Section>
-      <Button type="submit" size="sm" hierarchy="primary">
+      <SubmitButton size="sm" hierarchy="primary">
         Change password
-      </Button>
+      </SubmitButton>
     </ValidatedForm>
   );
 }

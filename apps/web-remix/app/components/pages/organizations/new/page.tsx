@@ -6,6 +6,7 @@ import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { Button } from "@elpassion/taco";
 import { CreateOrganizationSchema } from "~/api/organization/organization.contracts";
+import { SubmitButton } from "~/components/form/submit";
 
 export function NewOrganizationPage() {
   const validator = useMemo(() => withZod(CreateOrganizationSchema), []);
@@ -33,9 +34,9 @@ export function NewOrganizationPage() {
               />
             </Field>
           </div>
-          <Button size="lg" type="submit" className="mt-8 mx-auto">
+          <SubmitButton size="lg" className="mt-8 mx-auto">
             Create organisation
-          </Button>
+          </SubmitButton>
         </ValidatedForm>
       </div>
     </div>

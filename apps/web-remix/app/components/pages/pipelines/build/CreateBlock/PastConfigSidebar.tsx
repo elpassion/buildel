@@ -16,6 +16,7 @@ import {
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
 import { usePasteConfig } from "./PasteBlockConfigProvider";
+import { SubmitButton } from "~/components/form/submit";
 
 export function PasteBlockConfiguration({
   onSubmit,
@@ -136,16 +137,15 @@ export function PasteBlockConfigurationForm({
         </FormField>
       </div>
 
-      <Button
+      <SubmitButton
         isFluid
         size="sm"
-        type="submit"
         variant="filled"
         className="mt-6"
         disabled={disabled}
       >
         Add block
-      </Button>
+      </SubmitButton>
     </ValidatedForm>
   );
 }
