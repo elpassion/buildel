@@ -4,12 +4,8 @@ import { screen, Matcher } from "../render";
 export class InputHandle {
   constructor(public readonly inputElement: HTMLInputElement) {}
 
-  static fromRole(name?: string): InputHandle {
-    return new InputHandle(screen.getByRole("textbox", { name }));
-  }
-
-  static fromLabelText(label: Matcher): InputHandle {
-    return new InputHandle(screen.getByLabelText(label));
+  static async fromLabelText(label: Matcher): Promise<InputHandle> {
+    return new InputHandle(await screen.findByLabelText(label));
   }
 
   isDisabled(): boolean {

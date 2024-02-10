@@ -1,8 +1,10 @@
-import { createRemixStub } from "@remix-run/testing";
+import { createRemixStub, RemixStubProps } from "@remix-run/testing";
 
-type RemixStubProps = Parameters<typeof createRemixStub>;
+type RemixRoutesProps = Parameters<typeof createRemixStub>;
 
 export const setupRoutes = (
-  routes: RemixStubProps[0],
-  ctx?: RemixStubProps[1]
+  routes: RemixRoutesProps[0],
+  ctx?: RemixRoutesProps[1]
 ) => createRemixStub(routes, ctx);
+
+export type RoutesProps = RemixStubProps;

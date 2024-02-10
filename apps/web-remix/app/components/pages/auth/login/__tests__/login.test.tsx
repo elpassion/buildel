@@ -1,50 +1,61 @@
 import React from "react";
-import { LoginPage } from "../page";
-import { render, screen, waitFor } from "~/test-utils/render";
-import { createRemixStub } from "@remix-run/testing";
 import { test, describe } from "vitest";
+import { RoutesProps, setupRoutes } from "~/tests/setup.tests";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { InputHandle } from "~/tests/handles/Input.handle";
+import { render, screen, waitFor } from "~/tests/render";
+import { server } from "~/tests/server.mock";
+import { LoginPage } from "../page";
 import { loader } from "../loader";
 import { action } from "../action";
-import { act, fireEvent } from "@testing-library/react";
-import { server } from "~/tests/server.mock";
-import { handlers } from "~/components/pages/auth/login/__tests__/login.handles";
+import { handlers } from "./login.handlers";
 
-const RemixStub = createRemixStub([
-  {
-    path: "/login",
-    Component: LoginPage,
-    action,
-    loader,
-  },
-  {
-    path: "/",
-    Component: () => <p>Homepage</p>,
-  },
-]);
 describe(LoginPage.name, () => {
   const setupServer = server(handlers);
+
   beforeAll(() => setupServer.listen());
   afterEach(() => setupServer.resetHandlers());
   afterAll(() => setupServer.close());
 
   test("should sign in user correctly", async () => {
-    render(<RemixStub initialEntries={["/login"]} />);
+    const page = new LoginObject().render({ initialEntries: ["/login"] });
+    const { emailInput, passwordInput } = await page.getElements();
 
-    const email = await waitFor(() => screen.findByLabelText(/email/i));
-    fireEvent.change(email, { target: { value: "dvdk98@gmail.com" } });
+    await emailInput.type("test@gmail.com");
+    await passwordInput.type("password");
 
-    const password = await waitFor(() => screen.findByLabelText(/password/i));
-    fireEvent.change(password, { target: { value: "dvdk98@gmail.com" } });
-
-    const btn = await waitFor(() => screen.findByRole("button"));
-
-    await act(() => fireEvent.submit(btn));
+    await page.submit();
 
     await waitFor(() => screen.findByText(/Homepage/i));
   });
 
+  test("should display error if fields not filled in", async () => {
+    const page = new LoginObject().render({ initialEntries: ["/login"] });
+
+    await page.submit();
+
+    await waitFor(() => screen.findByText(/Invalid email/i));
+    await waitFor(() => screen.findByText(/String must contain at least 2/i));
+  });
+
   test("should redirect user at correct url after signing in", async () => {
-    const CustomStub = createRemixStub([
+    const page = new LoginObject().render({
+      initialEntries: ["/login?redirectTo=/organization/2"],
+    });
+    const { emailInput, passwordInput } = await page.getElements();
+
+    await emailInput.type("test@gmail.com");
+    await passwordInput.type("password");
+
+    await page.submit();
+
+    await waitFor(() => screen.findByText(/Organization/i));
+  });
+});
+
+class LoginObject {
+  render(props?: RoutesProps) {
+    const Routes = setupRoutes([
       {
         path: "/login",
         Component: LoginPage,
@@ -52,39 +63,33 @@ describe(LoginPage.name, () => {
         loader,
       },
       {
+        path: "/",
+        Component: () => <p>Homepage</p>,
+      },
+      {
         path: "/organization/:organizationId",
         Component: () => <p>Organization</p>,
       },
     ]);
-    render(
-      <CustomStub initialEntries={["/login?redirectTo=/organization/2"]} />
-    );
 
-    const email = await waitFor(() => screen.findByLabelText(/email/i));
-    fireEvent.change(email, { target: { value: "dvdk98@gmail.com" } });
+    render(<Routes {...props} />);
 
-    const password = await waitFor(() => screen.findByLabelText(/password/i));
-    fireEvent.change(password, { target: { value: "dvdk98@gmail.com" } });
+    return this;
+  }
 
-    const btn = await waitFor(() => screen.findByRole("button"));
+  async submit() {
+    const { button } = await this.getElements();
 
-    await act(() => fireEvent.submit(btn));
+    await button.click();
 
-    await waitFor(() => screen.findByText(/Organization/i));
-  });
+    return this;
+  }
 
-  test("should display error if fields not filled in", async () => {
-    render(<RemixStub initialEntries={["/login"]} />);
+  async getElements() {
+    const button = await ButtonHandle.fromRole();
+    const emailInput = await InputHandle.fromLabelText(/email/i);
+    const passwordInput = await InputHandle.fromLabelText(/password/i);
 
-    await waitFor(() => screen.findByLabelText(/email/i));
-
-    await waitFor(() => screen.findByLabelText(/password/i));
-
-    const btn = await waitFor(() => screen.findByRole("button"));
-
-    await act(() => fireEvent.submit(btn));
-
-    await waitFor(() => screen.findByText(/Invalid email/i));
-    await waitFor(() => screen.findByText(/String must contain at least 2/i));
-  });
-});
+    return { button, emailInput, passwordInput };
+  }
+}

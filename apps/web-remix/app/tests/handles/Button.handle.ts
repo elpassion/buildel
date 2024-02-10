@@ -4,8 +4,8 @@ import { screen } from "../render";
 export class ButtonHandle {
   constructor(public readonly buttonElement: HTMLButtonElement) {}
 
-  static fromRole(name?: string): ButtonHandle {
-    return new ButtonHandle(screen.getByRole("button", { name }));
+  static async fromRole(name?: string): Promise<ButtonHandle> {
+    return new ButtonHandle(await screen.findByRole("button", { name }));
   }
   isDisabled(): boolean {
     return this.buttonElement.hasAttribute("disabled");
