@@ -48,9 +48,108 @@ defmodule BuildelWeb.SecretControllerTest do
     end
   end
 
-  defp create_secret(%{organization: organization}) do
+  describe "create" do
+    test "requires authentication", %{conn: conn, organization: organization} do
+      conn = conn |> log_out_user()
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization}/secrets", %{name: "name", value: "value"})
+
+      assert json_response(conn, 401)
+    end
+
+    test "requires organization membership", %{conn: conn, another_organization: organization} do
+      conn =
+        post(conn, ~p"/api/organizations/#{organization}/secrets", %{name: "name", value: "value"})
+
+      assert json_response(conn, 404)
+    end
+
+    test "validates input", %{conn: conn, organization: organization} do
+      conn =
+        post(conn, ~p"/api/organizations/#{organization}/secrets", %{})
+
+      assert json_response(conn, 422)
+    end
+
+    test "creates a secret", %{conn: conn, organization: organization} do
+      conn =
+        post(conn, ~p"/api/organizations/#{organization}/secrets", %{name: "name", value: "value"})
+
+      assert json_response(conn, 201)
+    end
+  end
+
+  describe "delete" do
+    test "requires authentication", %{conn: conn, organization: organization, secret: secret} do
+      conn = conn |> log_out_user()
+
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization}/secrets/#{secret.name}")
+
+      assert json_response(conn, 401)
+    end
+
+    test "requires organization membership", %{
+      conn: conn,
+      another_organization: organization,
+      another_secret: secret
+    } do
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization}/secrets/#{secret.name}")
+
+      assert json_response(conn, 404)
+    end
+
+    test "deletes a secret", %{conn: conn, organization: organization, secret: secret} do
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization}/secrets/#{secret.name}")
+
+      assert json_response(conn, 200)
+    end
+  end
+
+  describe "update" do
+    test "requires authentication", %{conn: conn, organization: organization, secret: secret} do
+      conn = conn |> log_out_user()
+
+      conn =
+        put(conn, ~p"/api/organizations/#{organization}/secrets/#{secret.name}", %{value: "value"})
+
+      assert json_response(conn, 401)
+    end
+
+    test "requires organization membership", %{
+      conn: conn,
+      another_organization: organization,
+      another_secret: secret
+    } do
+      conn =
+        put(conn, ~p"/api/organizations/#{organization}/secrets/#{secret.name}", %{value: "value"})
+
+      assert json_response(conn, 404)
+    end
+
+    test "validates input", %{conn: conn, organization: organization, secret: secret} do
+      conn =
+        put(conn, ~p"/api/organizations/#{organization}/secrets/#{secret.name}", %{})
+
+      assert json_response(conn, 422)
+    end
+
+    test "updates a secret", %{conn: conn, organization: organization, secret: secret} do
+      conn =
+        put(conn, ~p"/api/organizations/#{organization}/secrets/#{secret.name}", %{value: "value"})
+
+      assert json_response(conn, 200)
+    end
+  end
+
+  defp create_secret(%{organization: organization, another_organization: another_organization}) do
     secret = secret_fixture(%{organization_id: organization.id})
-    %{secret: secret}
+
+    another_secret = secret_fixture(%{organization_id: another_organization.id})
+    %{secret: secret, another_secret: another_secret}
   end
 
   defp create_user_organization(%{user: user}) do
