@@ -15,7 +15,7 @@ defmodule Buildel.Memories do
 
   def list_organization_collections(
         %Buildel.Organizations.Organization{} = organization,
-        params \\ %{}
+        params
       ) do
     Buildel.Memories.MemoryCollection
     |> where(
@@ -147,17 +147,14 @@ defmodule Buildel.Memories do
         %Buildel.Organizations.Organization{} = organization,
         id
       ) do
-    {:ok, collection} = get_organization_collection(organization, id)
-    memories = collection |> Buildel.Repo.preload(:memories) |> Map.get(:memories)
+    with {:ok, collection} <- get_organization_collection(organization, id) do
+      memories = collection |> Buildel.Repo.preload(:memories) |> Map.get(:memories)
+      memories |> Enum.map(&delete_organization_memory(organization, &1.id))
 
-    memories
-    |> Enum.map(fn memory ->
-      delete_organization_memory(organization, memory.id)
-    end)
+      Buildel.Repo.delete(collection)
 
-    Buildel.Repo.delete(collection)
-
-    :ok
+      :ok
+    end
   end
 
   def upsert_collection(%{organization_id: organization_id, collection_name: collection_name}) do

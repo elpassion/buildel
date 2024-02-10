@@ -148,6 +148,44 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
     end
   end
 
+  describe "delete" do
+    test "requires authentication", %{conn: conn, organization: organization} do
+      conn = conn |> log_out_user()
+
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization.id}/memory_collections/1")
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
+    test "does not delete in other org", %{conn: conn, another_collection: another_collection} do
+      conn =
+        delete(
+          conn,
+          ~p"/api/organizations/#{another_collection.organization_id}/memory_collections/#{another_collection}"
+        )
+
+      assert json_response(conn, 404)["errors"] != %{}
+    end
+
+    test "handles not found", %{conn: conn, organization: organization} do
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization.id}/memory_collections/1")
+
+      assert json_response(conn, 404)["errors"] != %{}
+    end
+
+    test "deletes collection", %{conn: conn, organization: organization, collection: collection} do
+      conn =
+        delete(
+          conn,
+          ~p"/api/organizations/#{organization}/memory_collections/#{collection}"
+        )
+
+      assert json_response(conn, 200) == %{}
+    end
+  end
+
   defp read_file(_) do
     %{
       upload_file: %Plug.Upload{
