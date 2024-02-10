@@ -17,8 +17,6 @@ export function LoginPage() {
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo");
-  const emailRef = React.useRef<HTMLInputElement>(null);
-  const passwordRef = React.useRef<HTMLInputElement>(null);
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
@@ -51,7 +49,7 @@ export function LoginPage() {
         <div className="form-control w-full mb-4">
           <Field name="user.email">
             <TextInputField
-              ref={emailRef}
+              aria-label="email"
               type="email"
               label="Email address"
               autoFocus
@@ -60,7 +58,7 @@ export function LoginPage() {
         </div>
         <div className="max-w-s form-control w-full mb-6">
           <Field name="user.password">
-            <PasswordInputField ref={passwordRef} label="Password" />
+            <PasswordInputField aria-label="password" label="Password" />
           </Field>
         </div>
         <HiddenField name="redirectTo" value={redirectTo ?? undefined} />

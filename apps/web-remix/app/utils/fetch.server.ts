@@ -6,23 +6,31 @@ import {
   ValidationError,
 } from "./errors.server";
 import merge from "lodash.merge";
-import { LRUCache } from "lru-cache"
+import { LRUCache } from "lru-cache";
 
 const cache = new LRUCache<string, Response>({ max: 500 });
 
 export async function fetchTyped<T extends ZodType>(
   schema: T,
   url: string,
-  options?: RequestInit & { requestCacheId?: string | null } | undefined
+  options?: (RequestInit & { requestCacheId?: string | null }) | undefined
 ): Promise<ParsedResponse<z.infer<T>>> {
   let cachedResponse: Response | undefined;
-  if ((!options?.method || options.method === "GET") && options?.requestCacheId) {
+  if (
+    (!options?.method || options.method === "GET") &&
+    options?.requestCacheId
+  ) {
     cachedResponse = cache.get(options.requestCacheId + url);
   }
 
   let response = await fetch(
     url,
-    merge(options || {}, { headers: { connection: "keep-alive", "if-none-match": cachedResponse?.headers.get("etag") } })
+    merge(options || {}, {
+      headers: {
+        connection: "keep-alive",
+        "if-none-match": cachedResponse?.headers.get("etag"),
+      },
+    })
   ).catch((e) => {
     console.error(
       `Failed to connect to API error: ${e} during request to ${url}`
@@ -34,7 +42,10 @@ export async function fetchTyped<T extends ZodType>(
     response = cachedResponse?.clone()!;
   }
 
-  if ((!options?.method || options.method === "GET") && options?.requestCacheId) {
+  if (
+    (!options?.method || options.method === "GET") &&
+    options?.requestCacheId
+  ) {
     cache.set(options.requestCacheId + url, response.clone());
   }
 

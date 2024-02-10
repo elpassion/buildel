@@ -158,8 +158,8 @@ export async function handleDataRequest(
     request,
   }: LoaderFunctionArgs | ActionFunctionArgs
 ) {
-  const shouldComputeEtag = 
-    (request.method.toLowerCase() === "get" || request.method.toLowerCase() === "head") && 
+  const shouldComputeEtag =
+    (request.method.toLowerCase() === "get" || request.method.toLowerCase() === "head") &&
     response.status === 200;
 
   if (shouldComputeEtag) {
