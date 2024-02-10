@@ -1,5 +1,5 @@
 defmodule BuildelWeb.CalculatorController do
-  use Phoenix.Controller
+  use BuildelWeb, :controller
   use BuildelWeb.Validator
 
   action_fallback(BuildelWeb.FallbackController)
