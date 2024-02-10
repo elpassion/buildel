@@ -5,173 +5,17 @@ defmodule Buildel.BlocksTest do
   use Buildel.DataCase
 
   alias Buildel.Blocks.{
-    AudioInput,
     SpeechToText,
     FileSpeechToText,
     FileSpeechToText,
     TextToSpeech,
     Chat,
     Block,
-    TextOutput,
-    WebhookOutput,
     AudioOutput,
     CollectSentences,
     CollectAllText,
     TakeLatest
   }
-
-  describe "AudioInput" do
-    test "exposes options" do
-      assert AudioInput.options() == %{
-               description:
-                 "A specialized block designed for capturing and streaming audio data.",
-               type: "audio_input",
-               inputs: [Block.audio_input("input", true)],
-               outputs: [Block.audio_output("output")],
-               schema: AudioInput.schema(),
-               groups: ["audio", "inputs / outputs"],
-               ios: []
-             }
-    end
-
-    test "validates schema correctly" do
-      assert :ok = Blocks.validate_block(AudioInput, %{"name" => "test", "opts" => %{}})
-      assert {:error, _} = Blocks.validate_block(AudioInput, %{})
-    end
-
-    test "broadcasts file" do
-      {:ok, test_run} =
-        BlocksTestRunner.start_run(%{
-          blocks: [
-            AudioInput.create(%{
-              name: "test",
-              opts: %{},
-              connections: [
-                Blocks.Connection.from_connection_string("test:input->input", "audio")
-              ]
-            })
-          ]
-        })
-
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
-      file = File.read!("test/support/fixtures/real.mp3")
-      test_run |> BlocksTestRunner.Run.input("test", "input", {:binary, file})
-
-      assert_receive {^topic, :start_stream, nil}
-      assert_receive {^topic, :binary, ^file}
-      assert_receive {^topic, :stop_stream, nil}
-    end
-  end
-
-  describe "TextOutput" do
-    test "exposes options" do
-      assert TextOutput.options() == %{
-               description: "A versatile module designed to output text data.",
-               type: "text_output",
-               inputs: [Block.text_input("input")],
-               outputs: [Block.text_output("output", true)],
-               schema: TextOutput.schema(),
-               groups: ["text", "inputs / outputs"],
-               ios: []
-             }
-    end
-
-    test "validates schema correctly" do
-      assert :ok =
-               Blocks.validate_block(TextOutput, %{
-                 "name" => "test",
-                 "opts" => %{
-                   "stream_timeout" => 500
-                 },
-                 "inputs" => []
-               })
-
-      assert {:error, _} = Blocks.validate_block(TextOutput, %{})
-    end
-
-    test "broadcasts text" do
-      {:ok, test_run} =
-        BlocksTestRunner.start_run(%{
-          blocks: [
-            BlocksTestRunner.create_test_text_input_block("test_input"),
-            TextOutput.create(%{
-              name: "test",
-              opts: %{},
-              connections: [
-                Blocks.Connection.from_connection_string("test_input:output->input", "text")
-              ]
-            })
-          ]
-        })
-
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
-      text = "text"
-      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
-
-      assert_receive {^topic, :start_stream, nil}
-      assert_receive {^topic, :text, ^text}
-      assert_receive {^topic, :stop_stream, nil}
-    end
-  end
-
-  describe "WebhookOutput" do
-    test "exposes options" do
-      assert WebhookOutput.options() == %{
-               type: "webhook_output",
-               description:
-                 "This module is adept at forwarding text data to specified webhook URLs, facilitating seamless external integrations.",
-               inputs: [Block.text_input("input")],
-               outputs: [],
-               schema: WebhookOutput.schema(),
-               groups: ["inputs / outputs"],
-               ios: []
-             }
-    end
-
-    test "validates schema correctly" do
-      assert :ok =
-               Blocks.validate_block(WebhookOutput, %{
-                 "name" => "test",
-                 "opts" => %{
-                   "url" => "http://localhost:3002/cats"
-                 },
-                 "inputs" => []
-               })
-
-      assert {:error, _} = Blocks.validate_block(WebhookOutput, %{})
-    end
-
-    test "send data to specific url" do
-      url = "http://localhost:3002/cats"
-
-      {:ok, test_run} =
-        BlocksTestRunner.start_run(%{
-          blocks: [
-            BlocksTestRunner.create_test_text_input_block("test_input"),
-            WebhookOutput.create(%{
-              name: "test",
-              opts: %{url: url, metadata: %{}},
-              connections: [
-                Blocks.Connection.from_connection_string("test_input:output->input", "text")
-              ]
-            })
-          ]
-        })
-
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
-
-      text = "HAHAAH"
-      test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
-
-      assert_receive {^topic, :start_stream, nil}
-
-      # TODO: Introduce a mock server to test this
-      # assert_receive {:webhook_called, ^url,
-      # "{\"content\":\"HAHAAH\",\"context\":{\"global\":\"run1\",\"local\":\"run1\",\"parent\":\"run1\"},\"topic\":\"context::run1::block::test::io::output\"}"}
-
-      assert_receive {^topic, :stop_stream, nil}
-    end
-  end
 
   describe "AudioOutput" do
     test "exposes options" do

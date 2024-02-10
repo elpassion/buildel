@@ -1,9 +1,6 @@
-defmodule Buildel.TextInputTest do
-  use Buildel.DataCase
-
-  alias Buildel.Blocks
-  alias Buildel.Blocks.TextInput
-  alias Buildel.BlocksTestRunner
+defmodule Buildel.Blocks.TextInputTest do
+  use Buildel.BlockCase
+  alias Blocks.TextInput
 
   describe "TextInput" do
     test "exposes options" do
