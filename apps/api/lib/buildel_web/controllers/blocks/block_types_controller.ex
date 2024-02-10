@@ -1,15 +1,19 @@
 defmodule BuildelWeb.BlockTypesController do
-  use Phoenix.Controller
+  use BuildelWeb, :controller
+
+  action_fallback(BuildelWeb.FallbackController)
 
   def index(conn, %{"type" => type}) do
-    render(conn, :index, block_types: Buildel.Blocks.list_types() |> Enum.filter(fn block -> block.type == type end))
+    render(conn, :index,
+      block_types: Buildel.Blocks.list_types() |> Enum.filter(fn block -> block.type == type end)
+    )
   end
 
-  def index(conn,  _params) do
+  def index(conn, _params) do
     render(conn, :index, block_types: Buildel.Blocks.list_types())
   end
 
-  def overviews(conn,  _params) do
+  def overviews(conn, _params) do
     render(conn, :overviews, block_overviews: Buildel.Blocks.list_types_overviews())
   end
 end
