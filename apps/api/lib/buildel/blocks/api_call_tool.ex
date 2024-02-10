@@ -13,7 +13,7 @@ defmodule Buildel.Blocks.ApiCallTool do
       type: "api_call_tool",
       description: "Tool used to call HTTP APIs.",
       groups: ["text", "tools"],
-      inputs: [Block.text_input("headers")],
+      inputs: [],
       outputs: [],
       ios: [Block.io("tool", "worker")],
       schema: schema()
@@ -61,6 +61,15 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "editorLanguage" => "json",
                   "default" => "{\"type\": \"object\", \"properties\": {}, \"required\": []}"
                 },
+                headers: %{
+                  "type" => "string",
+                  "title" => "Headers",
+                  "description" =>
+                    "Valid JSON object of the headers to be sent with the request. ie. {\"Content-Type\": \"application/json\"}.",
+                  "presentAs" => "editor",
+                  "editorLanguage" => "json",
+                  "default" => "{}"
+                },
                 authorize: %{
                   "type" => "boolean",
                   "title" => "Authorize",
@@ -77,10 +86,6 @@ defmodule Buildel.Blocks.ApiCallTool do
 
   def call_api(_pid, _text) do
     :ok
-  end
-
-  def send_headers(pid, {:text, _text} = message) do
-    GenServer.cast(pid, {:send_headers, message})
   end
 
   def call_api_sync(pid, args) do
@@ -101,18 +106,10 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     {:ok,
      state
+     |> Map.put(:headers, Jason.decode!(opts.headers || "{}") |> Map.to_list())
      |> Map.put(:parameters, Jason.decode!(opts.parameters))
      |> Map.put(:context, context)
      |> assign_stream_state(opts)}
-  end
-
-
-  def handle_cast({:send_headers, {:text, message}}, state) do
-    state = send_stream_start(state)
-    state = state |> Map.put(:headers, Jason.decode!(message))
-
-    state = send_stream_stop(state)
-    {:noreply, state}
   end
 
   @impl true
@@ -144,13 +141,13 @@ defmodule Buildel.Blocks.ApiCallTool do
         "#{state[:context] |> Jason.encode!()}::#{payload}"
       )
 
-    headers = [
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      "X-Buildel-Topic": topic,
-      "X-Buildel-Context": state[:context] |> Jason.encode!(),
-    ] ++ Map.to_list(state[:headers])
-
+    headers =
+      [
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-Buildel-Topic": topic,
+        "X-Buildel-Context": state[:context] |> Jason.encode!()
+      ] ++ state[:headers]
 
     headers =
       if state[:opts][:authorize] do
@@ -205,8 +202,8 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   @impl true
-  def handle_info({_name, :text, text}, state) do
-    send_headers(self(), {:text, text})
+  def handle_info({_name, :binary, chunk}, state) do
+    cast(self(), {:binary, chunk})
     {:noreply, state}
   end
 end

@@ -322,6 +322,7 @@ interface EditorFieldProps {
     description: string;
     presentAs: "editor";
     editorLanguage: "json" | "custom";
+    default?: string;
   };
   name: string;
   schema: JSONSchemaField;
@@ -337,6 +338,7 @@ function EditorField({ field, name, connections }: EditorFieldProps) {
             supportingText={field.description}
             language={field.editorLanguage}
             label={field.title}
+            defaultValue={field.default}
             error={fieldErrors[name]}
           />
         );
