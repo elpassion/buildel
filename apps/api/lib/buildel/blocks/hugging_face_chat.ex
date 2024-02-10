@@ -12,7 +12,8 @@ defmodule Buildel.Blocks.HuggingFaceChat do
   def options() do
     %{
       type: "hugging_face_chat",
-      description: "This module integrates advanced Hugging Face language models to provide dynamic and intelligent chat functionalities.",
+      description:
+        "This module integrates advanced Hugging Face language models to provide dynamic and intelligent chat functionalities.",
       groups: ["text", "llms"],
       inputs: [Block.text_input()],
       outputs: [
@@ -140,7 +141,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
     subscribe_to_connections(context_id, state.connections)
 
     api_key =
-      block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
+      block_context().get_secret_from_context(context_id, opts |> Map.get(:api_key))
 
     tool_blocks = []
 

@@ -9,7 +9,8 @@ defmodule Buildel.Blocks.TextToSpeech do
   def options() do
     %{
       type: "text_to_speech",
-      description: "This module enables seamless conversion of textual data into audio format, leveraging the ElevenLabs API",
+      description:
+        "This module enables seamless conversion of textual data into audio format, leveraging the ElevenLabs API",
       groups: ["text", "audio"],
       inputs: [Block.text_input()],
       outputs: [Block.audio_output()],
@@ -57,7 +58,7 @@ defmodule Buildel.Blocks.TextToSpeech do
      state
      |> Map.put(
        :api_key,
-       block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
+       block_context().get_secret_from_context(context_id, opts |> Map.get(:api_key))
      )
      |> Map.put(:clips, %{})
      |> assign_stream_state()}

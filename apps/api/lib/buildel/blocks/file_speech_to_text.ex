@@ -8,7 +8,8 @@ defmodule Buildel.Blocks.FileSpeechToText do
   def options() do
     %{
       type: "file_speech_to_text",
-      description: "This module expertly transcribes audio content into text, offering multiple output formats including plain text, JSON, and SRT.",
+      description:
+        "This module expertly transcribes audio content into text, offering multiple output formats including plain text, JSON, and SRT.",
       groups: ["audio", "text"],
       inputs: [Block.audio_input()],
       outputs: [
@@ -80,7 +81,7 @@ defmodule Buildel.Blocks.FileSpeechToText do
   def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
     subscribe_to_connections(context_id, state.connections)
 
-    api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
+    api_key = block_context().get_secret_from_context(context_id, opts.api_key)
 
     {:ok,
      state

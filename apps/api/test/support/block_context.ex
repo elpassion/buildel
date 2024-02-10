@@ -26,4 +26,9 @@ defmodule Buildel.BlockContext.Mock do
     context = context_from_context_id(context_id)
     "#{context[:global]}_#{block_name}"
   end
+
+  @impl true
+  def get_secret_from_context(_context, _key) do
+    "secret"
+  end
 end

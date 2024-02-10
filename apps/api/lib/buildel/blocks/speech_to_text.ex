@@ -8,7 +8,8 @@ defmodule Buildel.Blocks.SpeechToText do
   def options() do
     %{
       type: "speech_to_text",
-      description: "This module is adept at transcribing audio data into text, offering outputs in both plain text and JSON formats.",
+      description:
+        "This module is adept at transcribing audio data into text, offering outputs in both plain text and JSON formats.",
       groups: ["audio", "text"],
       inputs: [Block.audio_input()],
       outputs: [Block.text_output(), Block.text_output("json_output")],
@@ -83,7 +84,7 @@ defmodule Buildel.Blocks.SpeechToText do
       ) do
     subscribe_to_connections(context_id, state.connections)
 
-    api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
+    api_key = block_context().get_secret_from_context(context_id, opts.api_key)
 
     lang = Map.get(opts, :language, "en")
     model = Map.get(opts, :model, "base")

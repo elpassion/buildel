@@ -62,7 +62,6 @@ config :buildel, :embeddings, Buildel.Clients.OpenAIEmbeddings
 config :buildel, :file_loader, Buildel.FileLoaderUnstructuredApiAdapter
 config :buildel, :search_db, Buildel.SearchDB.EctoAdapter
 config :buildel, :hybrid_db, false
-config :buildel, :block_secrets_resolver, Buildel.BlockSecrets
 config :buildel, :block_context_resolver, Buildel.BlockContext
 
 config :buildel, :secure_cookie, false

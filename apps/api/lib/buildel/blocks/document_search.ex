@@ -100,7 +100,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     subscribe_to_connections(context_id, state.connections)
 
     api_key =
-      block_secrets_resolver().get_secret_from_context(context_id, opts |> Map.get(:api_key))
+      block_context().get_secret_from_context(context_id, opts |> Map.get(:api_key))
 
     collection_name = block_context().global_collection_name(context_id, opts.knowledge)
 

@@ -190,7 +190,7 @@ defmodule Buildel.Blocks.Chat do
       ) do
     subscribe_to_connections(context_id, connections)
 
-    api_key = block_secrets_resolver().get_secret_from_context(context_id, opts.api_key)
+    api_key = block_context().get_secret_from_context(context_id, opts.api_key)
 
     tool_connections =
       connections
