@@ -209,9 +209,7 @@ defmodule Buildel.Pipelines do
               %{
                 "name" => block_config.name,
                 "type" => block_config.type,
-                "opts" => block_config.opts,
-                "connections" => block_config.connections,
-                "inputs" => block_config.inputs
+                "opts" => block_config.opts
               }
             ])
       )

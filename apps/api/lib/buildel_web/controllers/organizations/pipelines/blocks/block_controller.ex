@@ -19,8 +19,6 @@ defmodule BuildelWeb.OrganizationPipelineBlockController do
       required(:name, :string)
       required(:type, :string)
       required(:opts, :map)
-      optional(:connections, :list, default: [])
-      optional(:inputs, :list, default: [])
     end
   end
 
@@ -33,10 +31,7 @@ defmodule BuildelWeb.OrganizationPipelineBlockController do
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, %Pipeline{} = _pipeline} <-
-           Pipelines.create_block(
-             pipeline,
-             Map.merge(block_config, %{connections: [], inputs: []})
-           ) do
+           Pipelines.create_block(pipeline, block_config) do
       conn
       |> put_status(:created)
       |> json(%{})
