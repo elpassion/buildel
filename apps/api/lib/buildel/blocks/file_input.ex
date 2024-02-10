@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.FileInput do
   def options() do
     %{
       type: "file_input",
-      description: "A streamlined module designed for the efficient handling and transmission of file data.",
+      description:
+        "A streamlined module designed for the efficient handling and transmission of file data.",
       groups: ["file", "inputs / outputs"],
       inputs: [Block.file_input("input", true)],
       outputs: [Block.file_output()],
@@ -41,7 +42,10 @@ defmodule Buildel.Blocks.FileInput do
 
   @impl true
   def init(%{context_id: context_id, type: __MODULE__} = state) do
-    subscribe_to_connections(context_id, state.connections)
+    subscribe_to_connections(
+      context_id,
+      state.connections ++ public_connections(state.block.name)
+    )
 
     {:ok, state |> assign_stream_state}
   end

@@ -132,22 +132,12 @@ defmodule Buildel.PipelinesTest do
                TextInput.create(%{
                  name: "input_block",
                  opts: %{metadata: %{}},
-                 connections: [
-                   Connection.from_connection_string(
-                     "input_block:input->input?reset=true",
-                     "text"
-                   )
-                 ]
+                 connections: []
                }),
                AudioInput.create(%{
                  name: "random_block",
                  opts: %{metadata: %{}},
-                 connections: [
-                   Connection.from_connection_string(
-                     "random_block:input->input?reset=true",
-                     "audio"
-                   )
-                 ]
+                 connections: []
                }),
                SpeechToText.create(%{
                  name: "random_block_2",
@@ -204,12 +194,7 @@ defmodule Buildel.PipelinesTest do
                AudioInput.create(%{
                  name: "random_block",
                  opts: %{metadata: %{}},
-                 connections: [
-                   Connection.from_connection_string(
-                     "random_block:input->input?reset=true",
-                     "audio"
-                   )
-                 ]
+                 connections: []
                }),
                SpeechToText.create(%{
                  name: "random_block_2",
@@ -266,12 +251,7 @@ defmodule Buildel.PipelinesTest do
                AudioInput.create(%{
                  name: "random_block",
                  opts: %{metadata: %{}},
-                 connections: [
-                   Connection.from_connection_string(
-                     "random_block:input->input?reset=true",
-                     "audio"
-                   )
-                 ]
+                 connections: []
                }),
                SpeechToText.create(%{
                  name: "random_block_2",

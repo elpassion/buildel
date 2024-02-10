@@ -53,7 +53,7 @@ defmodule Buildel.Blocks.Connection do
       )
     else
       connections_for_block_from_connection_strings(block["name"], blocks_map)
-    end ++ Buildel.Blocks.type(block["type"]).public_connections(block["name"])
+    end
   end
 
   def connections_for_block_from_connection_strings(to_block_name, blocks_map) do

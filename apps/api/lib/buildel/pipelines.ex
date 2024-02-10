@@ -167,9 +167,7 @@ defmodule Buildel.Pipelines do
       %Buildel.Blocks.Block{
         name: block["name"],
         type: block["type"] |> Buildel.Blocks.type(),
-        connections:
-          block_connections ++
-            Buildel.Blocks.type(block["type"]).public_connections(block["name"]),
+        connections: block_connections,
         opts:
           block["opts"]
           |> keys_to_atoms()
