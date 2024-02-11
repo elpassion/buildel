@@ -13,8 +13,8 @@ defmodule Buildel.Blocks.ApiCallTool do
       type: "api_call_tool",
       description: "Tool used to call HTTP APIs.",
       groups: ["text", "tools"],
-      inputs: [],
-      outputs: [],
+      inputs: [Block.text_input("args")],
+      outputs: [Block.text_output("response")],
       ios: [Block.io("tool", "worker")],
       schema: schema()
     }
@@ -84,12 +84,16 @@ defmodule Buildel.Blocks.ApiCallTool do
 
   # Client
 
-  def call_api(_pid, _args) do
-    :ok
+  def call_api(pid, args) do
+    GenServer.cast(pid, {:call_api, args})
   end
 
   def call_api_sync(pid, args) do
     GenServer.call(pid, {:call_api, args}, :infinity)
+  end
+
+  def send_response(pid, response) do
+    GenServer.cast(pid, {:response, response})
   end
 
   # Server
@@ -113,56 +117,37 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   @impl true
-  def handle_call({:call_api, args}, _caller, state) do
+  def handle_cast({:call_api, args}, state) do
+    pid = self()
     state = state |> send_stream_start()
 
-    url = build_url(state[:opts][:url], args)
+    Task.start(fn ->
+      response = do_call_api(state, args)
+      send_response(pid, {:text, response})
+    end)
 
-    payload = args |> Jason.encode!()
+    {:noreply, state}
+  end
 
-    topic =
-      Buildel.BlockPubSub.io_topic(
-        state[:context_id],
-        state[:block_name],
-        "output"
-      )
+  @impl true
+  def handle_cast({:response, response}, state) do
+    Buildel.BlockPubSub.broadcast_to_io(
+      state.context_id,
+      state.block_name,
+      "response",
+      response
+    )
 
-    {:ok, token} =
-      block_context().create_run_auth_token(
-        state[:context_id],
-        "#{state[:context] |> Jason.encode!()}::#{payload}"
-      )
+    state = state |> schedule_stream_stop()
+    {:noreply, state}
+  end
 
-    headers =
-      [
-        "X-Buildel-Topic": topic,
-        "X-Buildel-Context": state[:context] |> Jason.encode!()
-      ] ++ state[:headers]
-
-    headers =
-      if state[:opts][:authorize] do
-        headers ++
-          [
-            Authorization: "Bearer #{token}"
-          ]
-      else
-        headers
-      end
-
-    case HTTPoison.request(
-           state[:opts][:method],
-           url,
-           payload,
-           headers
-         ) do
-      {:ok, %{status_code: status_code, body: body}} ->
-        state = state |> schedule_stream_stop()
-        {:reply, Jason.encode!(%{status: status_code, body: body}), state}
-
-      {:error, %{reason: reason}} ->
-        state = state |> schedule_stream_stop()
-        {:reply, "Error: #{reason}", state}
-    end
+  @impl true
+  def handle_call({:call_api, args}, _caller, state) do
+    state = state |> send_stream_start()
+    response = do_call_api(state, args)
+    state = state |> schedule_stream_stop()
+    {:reply, response, state}
   end
 
   @impl true
@@ -195,12 +180,55 @@ defmodule Buildel.Blocks.ApiCallTool do
   def handle_info({_name, :text, message}, state) do
     case Jason.decode(message) do
       {:ok, decoded} ->
-        state = state |> call_api(decoded)
+        cast(self(), decoded)
         {:noreply, state}
 
       {:error, _} ->
-        send_error(state[:context_id], "Invalid JSON message received.")
+        send_error(state, "Invalid JSON message received.")
         {:noreply, state}
+    end
+  end
+
+  defp do_call_api(state, args) do
+    url = build_url(state.opts.url, args)
+
+    payload = args |> Jason.encode!()
+
+    topic = Buildel.BlockPubSub.io_topic(state.context_id, state.block_name, "output")
+
+    {:ok, token} =
+      block_context().create_run_auth_token(
+        state.context_id,
+        "#{Jason.encode!(state.context)}::#{payload}"
+      )
+
+    headers =
+      [
+        "X-Buildel-Topic": topic,
+        "X-Buildel-Context": Jason.encode!(state.context)
+      ] ++ state[:headers]
+
+    headers =
+      if state[:opts][:authorize] do
+        headers ++
+          [
+            Authorization: "Bearer #{token}"
+          ]
+      else
+        headers
+      end
+
+    case HTTPoison.request(
+           state[:opts][:method],
+           url,
+           payload,
+           headers
+         ) do
+      {:ok, %{status_code: status_code, body: body}} ->
+        Jason.encode!(%{status: status_code, body: body})
+
+      {:error, %{reason: reason}} ->
+        "Error: #{reason}"
     end
   end
 

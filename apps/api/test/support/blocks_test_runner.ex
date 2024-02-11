@@ -30,9 +30,7 @@ defmodule Buildel.BlocksTestRunner do
     Buildel.Blocks.TextInput.create(%{
       name: name,
       opts: %{},
-      connections: [
-        Buildel.Blocks.Connection.from_connection_string("#{name}:input->input", "text")
-      ]
+      connections: []
     })
   end
 
@@ -40,9 +38,7 @@ defmodule Buildel.BlocksTestRunner do
     Buildel.Blocks.AudioInput.create(%{
       name: name,
       opts: %{},
-      connections: [
-        Buildel.Blocks.Connection.from_connection_string("#{name}:input->input", "audio")
-      ]
+      connections: []
     })
   end
 

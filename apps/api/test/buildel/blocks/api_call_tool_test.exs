@@ -8,8 +8,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
     assert ApiCallTool.options() == %{
              description: "Tool used to call HTTP APIs.",
              groups: ["text", "tools"],
-             inputs: [],
-             outputs: [],
+             inputs: [Block.text_input("args")],
+             outputs: [Block.text_output("response")],
              ios: [Block.io("tool", "worker")],
              schema: ApiCallTool.schema(),
              type: "api_call_tool"
@@ -30,6 +30,44 @@ defmodule Buildel.Blocks.ApiCallToolTest do
              })
 
     assert {:error, _} = Blocks.validate_block(ApiCallTool, %{})
+  end
+
+  describe "input" do
+    test "calls api correctly" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            BlocksTestRunner.create_test_text_input_block("test_input"),
+            ApiCallTool.create(%{
+              name: "test",
+              opts: %{
+                method: "GET",
+                url: "https://jsonplaceholder.typicode.com/todos/{{id}}?abc={{abc}}&efg={{efg}}",
+                description: "description",
+                parameters: "{}",
+                headers: "{}",
+                metadata: %{}
+              },
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->args", "text")
+              ]
+            })
+          ]
+        })
+
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "response")
+
+      use_cassette("example_api_call") do
+        test_run
+        |> BlocksTestRunner.Run.input(
+          "test_input",
+          "input",
+          {:text, %{id: 1, abc: "abc", efg: %{a: "123"}} |> Jason.encode!()}
+        )
+
+        assert_receive({^topic, :text, _})
+      end
+    end
   end
 
   describe "function" do
