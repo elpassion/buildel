@@ -66,7 +66,8 @@ defmodule Buildel.MixProject do
       {:pgvector, "~> 0.2.0"},
       {:dotenv, "~> 3.0.0"},
       {:money, "~> 1.12"},
-      {:etag_plug, "~> 1.0"}
+      {:etag_plug, "~> 1.0"},
+      {:exvcr, "~> 0.15.1", only: :test}
     ]
   end
 
