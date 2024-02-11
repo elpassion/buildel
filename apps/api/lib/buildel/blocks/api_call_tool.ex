@@ -5,7 +5,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   # Config
 
   @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :call_api
+  defdelegate cast(pid, text), to: __MODULE__, as: :call_api
 
   @impl true
   def options() do
@@ -84,7 +84,7 @@ defmodule Buildel.Blocks.ApiCallTool do
 
   # Client
 
-  def call_api(_pid, _text) do
+  def call_api(_pid, _args) do
     :ok
   end
 
@@ -116,15 +116,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   def handle_call({:call_api, args}, _caller, state) do
     state = state |> send_stream_start()
 
-    url =
-      args
-      |> Enum.reduce(state[:opts][:url], fn
-        {key, value}, acc when is_binary(value) ->
-          String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
-
-        _, acc ->
-          acc
-      end)
+    url = build_url(state[:opts][:url], args)
 
     payload = args |> Jason.encode!()
 
@@ -163,13 +155,13 @@ defmodule Buildel.Blocks.ApiCallTool do
            payload,
            headers
          ) do
-      {:ok, %{status_code: _status_code, body: body}} ->
+      {:ok, %{status_code: status_code, body: body}} ->
         state = state |> schedule_stream_stop()
-        {:reply, body, state}
+        {:reply, Jason.encode!(%{status: status_code, body: body}), state}
 
-      {:error, error} ->
+      {:error, %{reason: reason}} ->
         state = state |> schedule_stream_stop()
-        {:reply, "Error: #{inspect(error)}", state}
+        {:reply, "Error: #{reason}", state}
     end
   end
 
@@ -200,8 +192,29 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   @impl true
-  def handle_info({_name, :binary, chunk}, state) do
-    cast(self(), {:binary, chunk})
-    {:noreply, state}
+  def handle_info({_name, :text, message}, state) do
+    case Jason.decode(message) do
+      {:ok, decoded} ->
+        state = state |> call_api(decoded)
+        {:noreply, state}
+
+      {:error, _} ->
+        send_error(state[:context_id], "Invalid JSON message received.")
+        {:noreply, state}
+    end
+  end
+
+  defp build_url(url, args) do
+    args
+    |> Enum.reduce(url, fn
+      {key, value}, acc when is_number(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      {key, value}, acc when is_binary(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      _, acc ->
+        acc
+    end)
   end
 end

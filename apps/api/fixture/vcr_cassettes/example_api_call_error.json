@@ -1,0 +1,22 @@
+[
+  {
+    "request": {
+      "options": [],
+      "body": "{\"id\":\"lol\"}",
+      "url": "https://non-existent.com",
+      "headers": {
+        "X-Buildel-Topic": "context::#PID<0.929.0>::block::test::io::output",
+        "X-Buildel-Context": "{\"global\":\"#PID<0.929.0>\",\"local\":\"#PID<0.929.0>\",\"parent\":\"#PID<0.929.0>\",\"metadata\":{}}"
+      },
+      "method": "GET",
+      "request_body": ""
+    },
+    "response": {
+      "binary": false,
+      "type": "error",
+      "body": "connect_timeout",
+      "headers": [],
+      "status_code": null
+    }
+  }
+]

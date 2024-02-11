@@ -2,6 +2,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
   use Buildel.BlockCase
   alias Blocks.ApiCallTool
 
+  use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney
+
   test "exposes options" do
     assert ApiCallTool.options() == %{
              description: "Tool used to call HTTP APIs.",
@@ -30,39 +32,125 @@ defmodule Buildel.Blocks.ApiCallToolTest do
     assert {:error, _} = Blocks.validate_block(ApiCallTool, %{})
   end
 
-  test "exposes function" do
-    {:ok, test_run} =
-      BlocksTestRunner.start_run(%{
-        blocks: [
-          ApiCallTool.create(%{
-            name: "test",
-            opts: %{
-              method: "GET",
-              url: "http://example.com",
-              description: "description",
-              parameters: "{}",
-              headers: "{}",
-              metadata: %{}
-            },
-            connections: []
-          })
-        ]
-      })
+  describe "function" do
+    test "exposes function correctly" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            ApiCallTool.create(%{
+              name: "test",
+              opts: %{
+                method: "GET",
+                url: "http://example.com",
+                description: "description",
+                parameters: "{}",
+                headers: "{}",
+                metadata: %{}
+              },
+              connections: []
+            })
+          ]
+        })
 
-    function = test_run |> BlocksTestRunner.Run.get_block_function("test")
+      function = test_run |> BlocksTestRunner.Run.get_block_function("test")
 
-    assert %{
-             function: %{
-               name: "test",
-               description: "description"
-             },
-             call_formatter: call_formatter,
-             response_formatter: response_formatter
-           } = function
+      assert %{
+               function: %{
+                 name: "test",
+                 description: "description"
+               },
+               call_formatter: call_formatter,
+               response_formatter: response_formatter
+             } = function
 
-    args = %{hello: "world"}
+      args = %{hello: "world"}
 
-    assert "test API 🖥️: #{Jason.encode!(args)}\n" == call_formatter.(args)
-    assert "" == response_formatter.("hello")
+      assert "test API 🖥️: #{Jason.encode!(args)}\n" == call_formatter.(args)
+      assert "" == response_formatter.("hello")
+    end
+
+    test "calls API correctly" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            ApiCallTool.create(%{
+              name: "test",
+              opts: %{
+                method: "GET",
+                url: "https://jsonplaceholder.typicode.com/todos/{{id}}?abc={{abc}}&efg={{efg}}",
+                description: "description",
+                parameters: "{}",
+                headers: "{}",
+                metadata: %{}
+              },
+              connections: []
+            })
+          ]
+        })
+
+      %{function: %{function: function}} =
+        test_run |> BlocksTestRunner.Run.get_block_function("test")
+
+      use_cassette("example_api_call") do
+        assert "{\"status\":200,\"body\":\"{\\n  \\\"userId\\\": 1,\\n  \\\"id\\\": 1,\\n  \\\"title\\\": \\\"delectus aut autem\\\",\\n  \\\"completed\\\": false\\n}\"}" =
+                 function.(%{id: 1, abc: "abc", efg: %{a: "123"}}, %{})
+      end
+    end
+
+    test "handles errors" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            ApiCallTool.create(%{
+              name: "test",
+              opts: %{
+                method: "GET",
+                url: "https://non-existent.com",
+                description: "description",
+                parameters: "{}",
+                headers: "{}",
+                metadata: %{}
+              },
+              connections: []
+            })
+          ]
+        })
+
+      %{function: %{function: function}} =
+        test_run |> BlocksTestRunner.Run.get_block_function("test")
+
+      use_cassette("example_api_call_error") do
+        assert "Error: connect_timeout" = function.(%{id: "lol"}, %{})
+      end
+    end
+
+    test "adds authorization header" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            ApiCallTool.create(%{
+              name: "test",
+              opts: %{
+                method: "GET",
+                url: "https://jsonplaceholder.typicode.com/todos/{{id}}",
+                description: "description",
+                parameters: "{}",
+                headers: "{}",
+                metadata: %{},
+                authorize: true
+              },
+              connections: []
+            })
+          ]
+        })
+
+      %{function: %{function: function}} =
+        test_run |> BlocksTestRunner.Run.get_block_function("test")
+
+      use_cassette("example_api_call_with_auth_headers") do
+        assert "{\"status\":200,\"body\":\"{\\n  \\\"userId\\\": 1,\\n  \\\"id\\\": 1,\\n  \\\"title\\\": \\\"delectus aut autem\\\",\\n  \\\"completed\\\": false\\n}\"}" =
+                 function.(%{id: 1}, %{})
+      end
+    end
   end
 end
