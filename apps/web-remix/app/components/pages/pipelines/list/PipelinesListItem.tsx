@@ -72,7 +72,7 @@ export const PipelineListItemHeader = ({
           <IconButton
             size="xs"
             variant="ghost"
-            aria-label="Remove workflow"
+            aria-label={`Remove workflow: ${pipeline.name}`}
             className="opacity-0 group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500"
             title={`Remove workflow: ${pipeline.name}`}
             icon={<Icon iconName="trash" />}

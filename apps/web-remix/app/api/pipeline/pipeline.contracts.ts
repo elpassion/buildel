@@ -93,6 +93,8 @@ export const PipelineResponse = z
 
 export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
 
+export type IPipelineResponse = z.TypeOf<typeof PipelinesResponse>;
+
 export const PipelineRunsResponse = z
   .object({ data: PipelineRuns })
   .transform((response) => {

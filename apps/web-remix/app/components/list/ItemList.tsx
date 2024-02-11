@@ -14,9 +14,10 @@ export const ItemList = <T extends { id: number | string }>({
   className,
   itemClassName,
   emptyText,
-}: ItemListProps<T>) => {
+  ...rest
+}: ItemListProps<T> & React.HTMLProps<HTMLUListElement>) => {
   return (
-    <ul className={className}>
+    <ul className={className} {...rest}>
       {emptyText && <li className="hidden last:block">{emptyText}</li>}
       {items.map((item, index) => (
         <li className={itemClassName} key={item.id}>

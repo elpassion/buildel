@@ -17,6 +17,7 @@ export const PipelinesList: React.FC<PipelinesListProps> = ({
 }) => {
   return (
     <ItemList
+      aria-label="Workflows list"
       items={pipelines}
       renderItem={(item) => (
         <BasicLink to={routes.pipelineBuild(item.organization_id, item.id)}>

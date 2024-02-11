@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event";
-import { screen } from "../render";
+import { screen, Matcher } from "../render";
 
 export class ButtonHandle {
   constructor(public readonly buttonElement: HTMLButtonElement) {}
@@ -7,6 +7,11 @@ export class ButtonHandle {
   static async fromRole(name?: string): Promise<ButtonHandle> {
     return new ButtonHandle(await screen.findByRole("button", { name }));
   }
+
+  static async fromLabelText(label: Matcher): Promise<ButtonHandle> {
+    return new ButtonHandle(await screen.findByLabelText(label));
+  }
+
   isDisabled(): boolean {
     return this.buttonElement.hasAttribute("disabled");
   }
