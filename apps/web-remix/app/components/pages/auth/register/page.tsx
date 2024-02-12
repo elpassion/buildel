@@ -47,17 +47,20 @@ export function RegisterPage() {
 
         <div className="form-control w-full mb-4">
           <Field name="user.email">
-            <TextInputField type="email" autoFocus label="Email address" />
+            <TextInputField
+              aria-label="email"
+              type="email"
+              autoFocus
+              label="Email address"
+            />
           </Field>
         </div>
         <div className="max-w-s form-control w-full mb-6">
           <Field name="user.password">
-            <PasswordInputField label="Password" />
+            <PasswordInputField aria-label="password" label="Password" />
           </Field>
         </div>
-        <SubmitButton isFluid>
-          Register
-        </SubmitButton>
+        <SubmitButton isFluid>Register</SubmitButton>
       </ValidatedForm>
     </div>
   );

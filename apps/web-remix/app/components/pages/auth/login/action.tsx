@@ -7,6 +7,7 @@ import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
 import { setCurrentUser } from "~/utils/currentUser.server";
 import { CurrentUserResponse } from "~/api/CurrentUserApi";
+import { AuthApi } from "~/api/auth/AuthApi";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -17,10 +18,9 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       if (result.error) return validationError(result.error);
 
-      const response = await fetch(z.any(), "/users/log_in", {
-        method: "POST",
-        body: JSON.stringify(result.data),
-      });
+      const authApi = new AuthApi(fetch);
+
+      const response = await authApi.signIn(result.data.user);
 
       const authCookie = response.headers.get("Set-Cookie")!;
 
