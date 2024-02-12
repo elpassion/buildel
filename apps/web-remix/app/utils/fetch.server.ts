@@ -38,15 +38,16 @@ export async function fetchTyped<T extends ZodType>(
     throw new UnknownAPIError();
   });
 
-  if (response.status === 304) {
-    response = cachedResponse?.clone()!;
-  }
-
   if (
     (!options?.method || options.method === "GET") &&
+    response.status === 200 &&
     options?.requestCacheId
   ) {
     cache.set(options.requestCacheId + url, response.clone());
+  }
+
+  if (response.status === 304) {
+    response = cachedResponse?.clone()!;
   }
 
   if (!response.ok) {

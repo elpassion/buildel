@@ -154,12 +154,11 @@ function handleBrowserRequest(
 
 export async function handleDataRequest(
   response: Response,
-  {
-    request,
-  }: LoaderFunctionArgs | ActionFunctionArgs
+  { request }: LoaderFunctionArgs | ActionFunctionArgs
 ) {
   const shouldComputeEtag =
-    (request.method.toLowerCase() === "get" || request.method.toLowerCase() === "head") &&
+    (request.method.toLowerCase() === "get" ||
+      request.method.toLowerCase() === "head") &&
     response.status === 200;
 
   if (shouldComputeEtag) {
