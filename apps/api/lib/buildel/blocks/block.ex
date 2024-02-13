@@ -345,7 +345,8 @@ defmodule Buildel.Blocks.BlockBehaviour do
               inputs: [%{name: String.t(), type: String.t(), public: boolean()}],
               outputs: [%{name: String.t(), type: String.t(), public: boolean()}],
               ios: [%{name: String.t(), type: String.t(), public: boolean()}],
-              schema: map()
+              schema: map(),
+              description: String.t()
             }
   @callback schema() :: map()
   @callback cast(pid, any()) :: :ok
