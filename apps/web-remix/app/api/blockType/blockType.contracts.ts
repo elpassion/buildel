@@ -37,7 +37,7 @@ export const ConfigConnection = z.object({
 export const BlockConfig = z.object({
   name: z.string(),
   opts: z.record(z.string(), z.any()),
-  inputs: z.array(z.string()),
+  inputs: z.array(z.string()).default([]),
   connections: z.array(ConfigConnection).default([]),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),

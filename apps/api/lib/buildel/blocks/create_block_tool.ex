@@ -6,6 +6,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
   alias LangChain.Function
   use BuildelWeb.Validator
   use Buildel.Blocks.Utils.TakeLatest
+  require Logger
 
   # Config
 
@@ -110,7 +111,8 @@ defmodule Buildel.Blocks.CreateBlockTool do
       state = state |> send_stream_stop()
       {:reply, "Created block", state}
     else
-      _ ->
+      err ->
+        Logger.error("Error creating block: #{inspect(err)}")
         state = state |> send_stream_stop()
 
         {:reply, "Something went wrong.", state}
