@@ -19,7 +19,11 @@ export class BuildelAuth {
     return { auth, user_data: userJSON };
   }
 
-  createAuthMessage(socketId: string, channelName: string, userJSON: string) {
+  private createAuthMessage(
+    socketId: string,
+    channelName: string,
+    userJSON: string
+  ) {
     return `${socketId}::${channelName}::${userJSON}`;
   }
 }

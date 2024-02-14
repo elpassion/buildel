@@ -71,12 +71,11 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
     file_data =
       {:file, path, {"form-data", [name: "files[]", filename: Path.basename(path)]}, options}
 
-
     form_data = [
       file_data,
       {"chunking_strategy", "by_title"},
-      {"strategy", "ocr_only"},
-      {"max_characters", "1000"},
+      # {"strategy", "ocr_only"},
+      {"max_characters", "1000"}
       # TODO: UNHARDCODE LANGUAGES
       # {"ocr_languages", "pol"}
     ]
