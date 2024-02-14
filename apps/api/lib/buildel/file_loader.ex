@@ -39,6 +39,7 @@ defmodule Buildel.FileLoaderUnstructuredLocalAdapter do
 end
 
 defmodule Buildel.FileLoaderUnstructuredApiAdapter do
+  require Logger
   @behaviour Buildel.FileLoaderBehaviour
 
   @impl true
@@ -89,7 +90,7 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
 
     with {:ok, %{body: result, status_code: 200}} <-
            HTTPoison.post(
-             "https://api.unstructured.io/general/v0/general",
+             "https://grifel-8i70wllb.api.unstructuredapp.io/general/v0/general",
              {:multipart, form_data},
              headers,
              timeout: 60_000,
@@ -97,7 +98,8 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
            ) do
       {:ok, result}
     else
-      _status ->
+      error ->
+        Logger.error(inspect(error))
         :error
     end
   end

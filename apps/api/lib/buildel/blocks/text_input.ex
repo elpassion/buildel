@@ -27,7 +27,18 @@ defmodule Buildel.Blocks.TextInput do
       "required" => ["name", "opts", "inputs"],
       "properties" => %{
         "name" => name_schema(),
-        "opts" => options_schema()
+        "opts" =>
+          options_schema(%{
+            "required" => [],
+            "properties" => %{
+              "pull" => %{
+                "type" => "boolean",
+                "title" => "Pull",
+                "description" => "pull",
+                "default" => false
+              }
+            }
+          })
       }
     }
   end
