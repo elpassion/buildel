@@ -30,7 +30,7 @@ export async function getCurrentUserOrNull(request: Request): Promise<{
   user: ICurrentUser | null;
 }> {
   const session = await getSession(request.headers.get("Cookie") || "");
-  const user = session.get("user");
+  const user = session.get("user") ?? null;
 
   return { user };
 }

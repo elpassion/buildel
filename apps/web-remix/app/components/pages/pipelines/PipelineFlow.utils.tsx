@@ -6,6 +6,7 @@ import {
   IField,
   IBlockConfig,
   IHandle,
+  IConfigConnection,
 } from "./pipeline.types";
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
@@ -154,4 +155,33 @@ export function getLastBlockNumber(blocks: IBlockConfig[]) {
     .filter((n) => !isNaN(n));
 
   return Math.max(...nrs, 0);
+}
+
+export function reverseToolConnections(
+  connections: IConfigConnection[],
+  blockName: string
+) {
+  return connections
+    .filter(
+      (connection) =>
+        connection.from.block_name === blockName &&
+        connection.to.input_name === "tool"
+    )
+    .map(reverseConnection);
+}
+
+function reverseConnection(connection: IConfigConnection) {
+  return {
+    ...connection,
+    to: {
+      ...connection.to,
+      block_name: connection.from.block_name,
+      input_name: connection.from.output_name,
+    },
+    from: {
+      ...connection.from,
+      block_name: connection.to.block_name,
+      output_name: connection.to.input_name,
+    },
+  };
 }

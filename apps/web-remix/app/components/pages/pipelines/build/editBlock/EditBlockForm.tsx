@@ -32,6 +32,7 @@ import {
   HiddenField,
 } from "~/components/form/fields/field.context";
 import { SubmitButton } from "~/components/form/submit";
+import { reverseToolConnections } from "~/components/pages/pipelines/PipelineFlow.utils";
 
 export function EditBlockForm({
   onSubmit,
@@ -114,9 +115,12 @@ export function EditBlockForm({
         <EditorField
           field={props.field}
           name={props.name as string}
-          connections={connections.filter(
-            (connection) => connection.to.block_name === blockConfig.name
-          )}
+          connections={[
+            ...connections.filter(
+              (connection) => connection.to.block_name === blockConfig.name
+            ),
+            ...reverseToolConnections(connections, blockConfig.name),
+          ]}
           schema={props.schema}
         />
       );

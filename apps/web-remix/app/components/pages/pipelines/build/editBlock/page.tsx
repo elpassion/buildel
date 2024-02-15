@@ -11,6 +11,7 @@ import { routes } from "~/utils/routes.utils";
 import {
   getEdges,
   getNodes,
+  reverseToolConnections,
   toPipelineConfig,
 } from "~/components/pages/pipelines/PipelineFlow.utils";
 import {
@@ -94,14 +95,18 @@ export function EditBlockPage() {
         connections={pipeline.config.connections}
       >
         <BlockInputList
-          connections={pipeline.config.connections.filter(
-            (connection) => connection.to.block_name === block.name
-          )}
+          connections={[
+            ...pipeline.config.connections.filter(
+              (connection) => connection.to.block_name === block.name
+            ),
+            ...reverseToolConnections(pipeline.config.connections, block.name),
+          ]}
         />
       </EditBlockForm>
     </>
   );
 }
+
 export const meta: MetaFunction = () => {
   return [
     {

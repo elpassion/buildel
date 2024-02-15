@@ -69,7 +69,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       const formValues = getValues();
       const defaultKey = Object.keys(field.defaultWhen)[0];
       const defaultFieldValue = formValues.get(defaultKey);
-      console.log(defaultKey, defaultFieldValue, formValues);
+
       if (typeof defaultFieldValue === "string") {
         defaultValue = field.defaultWhen[defaultKey][defaultFieldValue];
       }
