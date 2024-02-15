@@ -17,7 +17,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
   assert(name);
   assert(field.type === "string");
 
-  const { fieldErrors } = useFormContext();
+  const { fieldErrors, getValues } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
 
@@ -63,6 +63,18 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       );
     }
 
+    let defaultValue = field.default;
+
+    if ("defaultWhen" in field && field.defaultWhen) {
+      const formValues = getValues();
+      const defaultKey = Object.keys(field.defaultWhen)[0];
+      const defaultFieldValue = formValues.get(defaultKey);
+      console.log(defaultKey, defaultFieldValue, formValues);
+      if (typeof defaultFieldValue === "string") {
+        defaultValue = field.defaultWhen[defaultKey][defaultFieldValue];
+      }
+    }
+
     return (
       <FormField name={name}>
         <ResettableTextInputField
@@ -70,7 +82,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
           supportingText={field.description}
           label={field.title}
           errorMessage={error}
-          defaultValue={field.default}
+          defaultValue={defaultValue}
         />
       </FormField>
     );

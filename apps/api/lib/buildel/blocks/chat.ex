@@ -80,7 +80,16 @@ defmodule Buildel.Blocks.Chat do
                   "type" => "string",
                   "title" => "Endpoint",
                   "description" => "The endpoint to use for the chat.",
-                  "default" => "https://api.openai.com/v1/chat/completions"
+                  "defaultWhen" => %{
+                    "opts.api_type" => %{
+                      "openai" => "https://api.openai.com/v1/chat/completions",
+                      "azure" =>
+                        "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}/chat/completions?api-version={api_version}",
+                      "google" =>
+                        "https://{region}-aiplatform.googleapis.com/v1/projects/{project_id}/locations/{region}/publishers/google/models",
+                      "mistral" => "https://api.mistral.ai/v1/chat/completions"
+                    }
+                  }
                 },
                 chat_memory_type: %{
                   "type" => "string",
