@@ -1,5 +1,6 @@
 defmodule Buildel.Clients.ChatGPT do
   require Logger
+  alias Buildel.Langchain.ChatModels.ChatMistralAI
   alias Buildel.LangChain.ChatModels.ChatGoogleAI
   alias Buildel.Langchain.ChatGptTokenizer
   alias Buildel.Clients.ChatBehaviour
@@ -112,6 +113,16 @@ defmodule Buildel.Clients.ChatGPT do
         on_error.(reason)
         {:error, reason}
     end
+  end
+
+  defp get_llm(%{api_type: "mistral"} = opts) do
+    ChatMistralAI.new!(%{
+      model: opts.model,
+      temperature: opts.temperature,
+      stream: true,
+      api_key: opts.api_key,
+      endpoint: opts.endpoint
+    })
   end
 
   defp get_llm(%{api_type: "openai"} = opts) do

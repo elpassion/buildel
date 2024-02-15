@@ -14,7 +14,10 @@ defmodule BuildelWeb.OrganizationModelController do
     %{id: "gpt-3.5-turbo-1106", name: "GPT-3.5 Turbo Preview", api_type: "openai"},
     %{id: "gpt-4-turbo-preview", name: "GPT-4 Turbo Preview", api_type: "openai"},
     %{id: "azure", name: "Azure", api_type: "azure"},
-    %{id: "gemini-pro", name: "Gemini Pro", api_type: "google"}
+    %{id: "gemini-pro", name: "Gemini Pro", api_type: "google"},
+    %{id: "mistral-tiny", name: "Mistral Tiny", api_type: "mistral"},
+    %{id: "mistral-small", name: "Mistral Small", api_type: "mistral"},
+    %{id: "mistral-medium", name: "Mistral Medium", api_type: "mistral"}
   ]
 
   def index(conn, %{"organization_id" => organization_id, "api_type" => type}) do

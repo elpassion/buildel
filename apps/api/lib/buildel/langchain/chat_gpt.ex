@@ -147,7 +147,7 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
       frequency_penalty: openai.frequency_penalty,
       n: openai.n,
       stream: openai.stream,
-      messages: Enum.map(messages, &ForOpenAIApi.for_api/1),
+      messages: Enum.map(messages, &ForOpenAIApi.for_api/1)
     }
     |> Utils.conditionally_add_to_map(:response_format, get_response_format(openai))
     |> Utils.conditionally_add_to_map(:seed, openai.seed)
@@ -320,7 +320,7 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
     Req.new(
       url: openai.endpoint,
       json: for_api(openai, messages, functions),
-      auth: {:bearer, get_api_key(openai)},
+      headers: get_headers(openai),
       receive_timeout: openai.receive_timeout
     )
     |> maybe_add_org_id_header()
