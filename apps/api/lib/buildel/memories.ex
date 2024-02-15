@@ -55,12 +55,12 @@ defmodule Buildel.Memories do
   def create_organization_memory(
         %Buildel.Organizations.Organization{} = organization,
         collection_name,
-        %{path: path, type: type, name: name}
+        file
       ) do
-    file_name = name || Path.basename(path)
-    file_size = File.stat!(path).size
-    file_type = type || MIME.from_path(path)
-    {:ok, file} = Buildel.FileLoader.load_file(path, %{type: file_type})
+    %{file_name: file_name, file_size: file_size, file_type: file_type} =
+      Buildel.FileLoader.file_properties(file)
+
+    {:ok, file} = Buildel.FileLoader.load_file(file.path, %{type: file_type})
 
     metadata = %{file_name: file_name, file_size: file_size, file_type: file_type}
 

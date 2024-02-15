@@ -40,7 +40,10 @@ defmodule BuildelWeb.OrganizationModelControllerTest do
                  "name" => "GPT-4 Turbo Preview"
                },
                %{"api_type" => "azure", "id" => "azure", "name" => "Azure"},
-               %{"api_type" => "google", "id" => "gemini-pro", "name" => "Gemini Pro"}
+               %{"api_type" => "google", "id" => "gemini-pro", "name" => "Gemini Pro"},
+               %{"api_type" => "mistral", "id" => "mistral-tiny", "name" => "Mistral Tiny"},
+               %{"api_type" => "mistral", "id" => "mistral-small", "name" => "Mistral Small"},
+               %{"api_type" => "mistral", "id" => "mistral-medium", "name" => "Mistral Medium"}
              ]
     end
 

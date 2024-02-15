@@ -3,6 +3,14 @@ defmodule Buildel.FileLoaderBehaviour do
 end
 
 defmodule Buildel.FileLoader do
+  def file_properties(%{path: path, type: type, name: name}) do
+    file_name = name || Path.basename(path)
+    file_size = File.stat!(path).size
+    file_type = type || MIME.from_path(path)
+
+    %{file_name: file_name, file_size: file_size, file_type: file_type}
+  end
+
   def load_file(path, file_metadata) do
     adapter().load_file(path, file_metadata)
   end
