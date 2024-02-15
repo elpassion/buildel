@@ -52,7 +52,7 @@ function App() {
         <Links />
         <script
           defer
-          data-domain="buildel-web.fly.dev"
+          data-domain="app.buildel.ai"
           src="/statistics/script.js"
         ></script>
       </head>
