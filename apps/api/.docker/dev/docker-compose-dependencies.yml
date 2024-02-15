@@ -11,6 +11,10 @@ services:
     volumes:
       - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
       - pg_data:/var/lib/postgresql/data
+  nlm:
+    image: ghcr.io/nlmatics/nlm-ingestor:latest
+    ports:
+      - "5010:5001"
   # qdrant:
   #   image: qdrant/qdrant:latest
   #   ports:

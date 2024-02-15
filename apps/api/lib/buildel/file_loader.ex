@@ -38,7 +38,7 @@ defmodule Buildel.FileLoaderUnstructuredLocalAdapter do
   end
 end
 
-defmodule Buildel.FileLoaderUnstructuredApiAdapter do
+defmodule Buildel.FileLoaderNLMApiAdapter do
   require Logger
   @behaviour Buildel.FileLoaderBehaviour
 
@@ -50,18 +50,47 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
         :error -> request(path, file_metadata |> Map.put(:encoding, "utf_8"))
       end
 
-    partitioned_file = Jason.decode!(result)
+    partitioned_file =
+      Jason.decode!(result)
+      |> get_in(["return_dict", "result", "blocks"])
 
-    file =
+    %{text: file} =
       partitioned_file
-      |> Enum.map(&Map.get(&1, "text"))
-      |> Enum.join("")
+      |> Enum.filter(&Map.has_key?(&1, "sentences"))
+      |> Enum.reduce(
+        %{text: "", current_level: 0},
+        fn %{
+             "sentences" => sentences,
+             "tag" => tag,
+             "level" => level
+           },
+           acc ->
+          joiner =
+            case {tag, level} do
+              {"header", _level} ->
+                "\n\n"
+
+              {"para", _level} ->
+                "\n"
+
+              {"list_item", _level} ->
+                "\n"
+
+              {tag, _} ->
+                Logger.warning("Unknown tag: #{tag}")
+                " "
+            end
+
+          new_text = acc.text <> Enum.join(sentences, " ") <> joiner
+          %{current_level: level, text: new_text}
+        end
+      )
 
     {:ok, file}
   end
 
   defp request(path, file_metadata) do
-    headers = [{"unstructured-api-key", token()}, {"Content-Type", "multipart/form-data"}]
+    headers = [{"Content-Type", "multipart/form-data"}]
 
     options =
       case file_metadata |> Map.get(:type) do
@@ -70,16 +99,9 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
       end
 
     file_data =
-      {:file, path, {"form-data", [name: "files[]", filename: Path.basename(path)]}, options}
+      {:file, path, {"form-data", [name: "file", filename: Path.basename(path)]}, options}
 
-    form_data = [
-      file_data,
-      {"chunking_strategy", "by_title"},
-      # {"strategy", "ocr_only"},
-      {"max_characters", "1000"}
-      # TODO: UNHARDCODE LANGUAGES
-      # {"ocr_languages", "pol"}
-    ]
+    form_data = [file_data]
 
     form_data =
       if file_metadata |> Map.has_key?(:encoding) do
@@ -90,7 +112,7 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
 
     with {:ok, %{body: result, status_code: 200}} <-
            HTTPoison.post(
-             "https://grifel-8i70wllb.api.unstructuredapp.io/general/v0/general",
+             "#{url()}/api/parseDocument?applyOcr=yes",
              {:multipart, form_data},
              headers,
              timeout: 60_000,
@@ -104,7 +126,7 @@ defmodule Buildel.FileLoaderUnstructuredApiAdapter do
     end
   end
 
-  defp token do
-    System.fetch_env!("UNSTRUCTURED_API_KEY")
+  defp url do
+    Application.fetch_env!(:buildel, :nlm_api_url)
   end
 end

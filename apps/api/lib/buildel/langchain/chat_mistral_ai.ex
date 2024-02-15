@@ -201,7 +201,7 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
     req =
       Req.new(
         url: mistral.endpoint,
-        json: for_api(mistral, messages, functions) |> IO.inspect(label: "Mistral API Request"),
+        json: for_api(mistral, messages, functions),
         headers: get_headers(mistral),
         receive_timeout: mistral.receive_timeout,
         retry: :transient,
@@ -246,7 +246,7 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
       ) do
     Req.new(
       url: mistral.endpoint,
-      json: for_api(mistral, messages, functions) |> IO.inspect(label: "Mistral API Request"),
+      json: for_api(mistral, messages, functions),
       headers: get_headers(mistral),
       receive_timeout: mistral.receive_timeout
     )

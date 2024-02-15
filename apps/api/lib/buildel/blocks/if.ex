@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.IF do
   def options() do
     %{
       type: "if",
-      description: "",
+      description:
+        "Use this block to compare the input to a condition and forward the input to the true or false output",
       groups: ["utils"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output("true"), Block.text_output("false")],
