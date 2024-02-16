@@ -39,7 +39,7 @@ defmodule BuildelWeb.UserSessionController do
 
   def create_google(conn, params) do
     with {:ok, %{token: token}} <- validate(:create_google, params),
-         {:ok, %{"email" => email}} <- BuildelWeb.GoogleToken.verify_and_validate(token) |> IO.inspect(),
+         {:ok, %{"email" => email}} <- BuildelWeb.GoogleToken.verify_and_validate(token),
          {:ok, %User{} = user} <- Accounts.get_or_create_user_by_email(email) do
       conn
       |> UserAuth.log_in_user(user, %{"remember_me" => "true"})
@@ -47,7 +47,6 @@ defmodule BuildelWeb.UserSessionController do
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/users/me")
       |> render(:show, user: user)
-
     else
       {:error, :not_found} ->
         {:error, changeset_error(global: "Invalid username or password")}

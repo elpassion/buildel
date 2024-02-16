@@ -88,3 +88,5 @@ config :langchain, openai_key: fn -> System.get_env("OPENAI_API_KEY") end
 config :buildel, :basic_auth, %{username: "michalmichal", password: "rzadzirzadzi"}
 
 config :buildel, :nlm_api_url, "http://localhost:5010"
+
+config :buildel, :page_url, "http://localhost:3000"

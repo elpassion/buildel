@@ -11,7 +11,7 @@ defmodule BuildelWeb.UserPasswordResetController do
   end
 
   def create(conn, params) do
-    with {:ok, email} <- validate(:create, params),
+    with {:ok, %{email: email}} <- validate(:create, params),
          user <- Accounts.get_user_by_email(email),
          {:ok, _} <- deliver_user_reset_password_instructions(user) do
       conn
@@ -25,7 +25,7 @@ defmodule BuildelWeb.UserPasswordResetController do
 
   defp deliver_user_reset_password_instructions(user) do
     Accounts.deliver_user_reset_password_instructions(user, fn token ->
-      "#{Application.get_env(:buildel, :page_url)}/auth/set_password?token=#{token}"
+      "#{Application.fetch_env!(:buildel, :page_url)}/auth/set_password?token=#{token}"
     end)
   end
 end

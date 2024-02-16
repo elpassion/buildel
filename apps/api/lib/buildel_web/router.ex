@@ -109,7 +109,7 @@ defmodule BuildelWeb.Router do
     post("/users/google/log_in", UserSessionController, :create_google)
     delete("/users/log_out", UserSessionController, :delete)
     put("/users/password", UserPasswordController, :update)
-    post("/users/password/reset", UserPasswordResetController, :reset)
+    post("/users/password/reset", UserPasswordResetController, :create)
 
     resources("/organizations", OrganizationController, only: [:index, :create, :show])
     put("/organizations/:id", OrganizationController, :update)
