@@ -68,12 +68,13 @@ export function LoginPage() {
         <SubmitButton isFluid>Log in</SubmitButton>
       </ValidatedForm>
 
-      <span className="my-3 text-neutral-300 text-sm">Or</span>
-
       {googleLoginEnabled && (
-        <GoogleSignInForm className="max-w-md">
-          <GoogleButton />
-        </GoogleSignInForm>
+        <>
+          <span className="my-3 text-neutral-300 text-sm">Or</span>
+          <GoogleSignInForm className="max-w-md">
+            <GoogleButton />
+          </GoogleSignInForm>
+        </>
       )}
     </div>
   );
