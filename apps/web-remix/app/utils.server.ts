@@ -27,6 +27,7 @@ export const loaderBuilder =
     try {
       return await fn(args, { fetch: await requestFetchTyped(args) });
     } catch (e) {
+      console.error(e);
       if (e instanceof UnknownAPIError) {
         throw json(
           { error: "Unknown API error" },
@@ -143,6 +144,7 @@ export const actionBuilder =
           }
         );
       }
+      console.error(e);
       throw e;
     }
 
@@ -152,7 +154,7 @@ export const actionBuilder =
 async function requestFetchTyped(
   actionArgs: ActionFunctionArgs
 ): Promise<typeof fetchTyped> {
-  const {user} = await getCurrentUserOrNull(actionArgs.request);
+  const { user } = await getCurrentUserOrNull(actionArgs.request);
   return (schema, url, options) => {
     return fetchTyped(
       schema,

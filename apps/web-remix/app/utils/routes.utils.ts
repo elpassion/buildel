@@ -7,6 +7,8 @@ export const routes = {
   dashboard: "/",
   login: "/login",
   register: "/register",
+  resetPassowrd: () => "/reset-password",
+  resetPasswordSent: () => "/reset-password/sent",
   organizations: "/organizations",
   organization: (organizationId: OrganizationId) => `/${organizationId}`,
   newOrganization: () => `${routes.organizations}/new`,

@@ -18,4 +18,22 @@ export class AuthApi {
       body: JSON.stringify({ user }),
     });
   }
+
+  resetPassword(email: string) {
+    return this.client(z.any(), `/users/password/reset`, {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  setPassword(params: {
+    token: string;
+    password: string;
+    password_confirmation: string;
+  }) {
+    return this.client(z.any(), `/users/password/reset`, {
+      method: "PUT",
+      body: JSON.stringify(params),
+    });
+  }
 }

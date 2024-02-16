@@ -32,7 +32,6 @@ export function SettingsPage() {
 
   const handleUpdatePipeline = useCallback(
     (pipeline: IPipeline) => {
-      console.log(pipeline);
       updateFetcher.submit(pipeline, {
         method: "PUT",
         encType: "application/json",

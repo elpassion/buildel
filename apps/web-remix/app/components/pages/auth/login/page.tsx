@@ -1,6 +1,6 @@
 import * as React from "react";
 import { MetaFunction } from "@remix-run/node";
-import { useSearchParams, Link, useLoaderData } from "@remix-run/react";
+import { useSearchParams, Link, useLoaderData, Form } from "@remix-run/react";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { schema } from "./schema";
@@ -14,6 +14,7 @@ import {
 } from "~/components/form/fields/text.field";
 import { loader } from "./loader";
 import { GoogleButton } from "~/components/googleAuth/GoogleButton";
+import { routes } from "~/utils/routes.utils";
 
 export function LoginPage() {
   const { googleLoginEnabled } = useLoaderData<typeof loader>();
@@ -67,6 +68,9 @@ export function LoginPage() {
         <HiddenField name="redirectTo" value={redirectTo ?? undefined} />
         <SubmitButton isFluid>Log in</SubmitButton>
       </ValidatedForm>
+      <Link to={routes.resetPassowrd()} className="mt-2 text-neutral-100">
+        Forgot your password? Reset it here.
+      </Link>
 
       {googleLoginEnabled && (
         <>
