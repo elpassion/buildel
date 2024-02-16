@@ -1,16 +1,16 @@
+import z from "zod";
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { OAuth2Client } from "~/clients/OAuth2Client";
 import { CurrentUserResponse } from "~/api/CurrentUserApi";
 import { setCurrentUser } from "~/utils/currentUser.server";
 import { routes } from "~/utils/routes.utils";
 import { loaderBuilder } from "~/utils.server";
-import z from "zod";
 import { assert } from "~/utils/assert";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
-    assert(process.env.GOOGLE_CLIENT_ID);
-    assert(process.env.GOOGLE_CLIENT_SECRET);
+    assert(process.env.GOOGLE_CLIENT_ID, "Missing GOOGLE_CLIENT_ID");
+    assert(process.env.GOOGLE_CLIENT_SECRET, "Missing GOOGLE_CLIENT_SECRET");
 
     const oAuth2Client = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,

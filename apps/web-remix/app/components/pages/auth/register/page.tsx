@@ -1,5 +1,5 @@
 import { MetaFunction } from "@remix-run/node";
-import { Link, useSearchParams } from "@remix-run/react";
+import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
 import * as React from "react";
 import { ValidatedForm } from "remix-validated-form";
@@ -10,10 +10,13 @@ import {
   TextInputField,
 } from "~/components/form/fields/text.field";
 import { schema } from "./schema";
-import { Button } from "@elpassion/taco";
 import { SubmitButton } from "~/components/form/submit";
+import { GoogleSignInForm } from "~/components/googleAuth/GoogleSignInForm";
+import { loader } from "./loader";
+import { GoogleButton } from "~/components/googleAuth/GoogleButton";
 
 export function RegisterPage() {
+  const { googleLoginEnabled } = useLoaderData<typeof loader>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
 
@@ -62,6 +65,14 @@ export function RegisterPage() {
         </div>
         <SubmitButton isFluid>Register</SubmitButton>
       </ValidatedForm>
+
+      <span className="my-3 text-neutral-300 text-sm">Or</span>
+
+      {googleLoginEnabled && (
+        <GoogleSignInForm className="max-w-md">
+          <GoogleButton content="Sign up with Google" />
+        </GoogleSignInForm>
+      )}
     </div>
   );
 }

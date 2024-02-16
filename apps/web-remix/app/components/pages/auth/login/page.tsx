@@ -1,17 +1,19 @@
 import * as React from "react";
 import { MetaFunction } from "@remix-run/node";
-import { useSearchParams, Link, Form, useLoaderData } from "@remix-run/react";
+import { useSearchParams, Link, useLoaderData } from "@remix-run/react";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { schema } from "./schema";
 import { Field, HiddenField } from "~/components/form/fields/field.context";
+import { FieldError } from "~/components/form/fields/field.error";
+import { SubmitButton } from "~/components/form/submit";
+import { GoogleSignInForm } from "~/components/googleAuth/GoogleSignInForm";
 import {
   PasswordInputField,
   TextInputField,
 } from "~/components/form/fields/text.field";
-import { FieldError } from "~/components/form/fields/field.error";
-import { SubmitButton } from "~/components/form/submit";
 import { loader } from "./loader";
+import { GoogleButton } from "~/components/googleAuth/GoogleButton";
 
 export function LoginPage() {
   const { googleLoginEnabled } = useLoaderData<typeof loader>();
@@ -66,10 +68,12 @@ export function LoginPage() {
         <SubmitButton isFluid>Log in</SubmitButton>
       </ValidatedForm>
 
+      <span className="my-3 text-neutral-300 text-sm">Or</span>
+
       {googleLoginEnabled && (
-        <Form action="/auth/google" method="post">
-          <button>Login with Google</button>
-        </Form>
+        <GoogleSignInForm className="max-w-md">
+          <GoogleButton />
+        </GoogleSignInForm>
       )}
     </div>
   );
