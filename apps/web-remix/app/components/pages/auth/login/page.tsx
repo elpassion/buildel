@@ -1,6 +1,6 @@
 import * as React from "react";
 import { MetaFunction } from "@remix-run/node";
-import { useSearchParams, Link } from "@remix-run/react";
+import { useSearchParams, Link, Form, useLoaderData } from "@remix-run/react";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { schema } from "./schema";
@@ -10,10 +10,11 @@ import {
   TextInputField,
 } from "~/components/form/fields/text.field";
 import { FieldError } from "~/components/form/fields/field.error";
-import { Button } from "@elpassion/taco";
 import { SubmitButton } from "~/components/form/submit";
+import { loader } from "./loader";
 
 export function LoginPage() {
+  const { googleLoginEnabled } = useLoaderData<typeof loader>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo");
@@ -62,10 +63,14 @@ export function LoginPage() {
           </Field>
         </div>
         <HiddenField name="redirectTo" value={redirectTo ?? undefined} />
-        <SubmitButton isFluid>
-          Log in
-        </SubmitButton>
+        <SubmitButton isFluid>Log in</SubmitButton>
       </ValidatedForm>
+
+      {googleLoginEnabled && (
+        <Form action="/auth/google" method="post">
+          <button>Login with Google</button>
+        </Form>
+      )}
     </div>
   );
 }

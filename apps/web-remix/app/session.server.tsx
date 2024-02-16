@@ -6,6 +6,7 @@ type SessionData = {
   apiToken?: string;
   user?: ICurrentUser;
   organizationId?: number;
+  [key: string]: unknown;
 };
 
 export type SessionToast = {
@@ -17,22 +18,25 @@ export type SessionFlashData = {
   error: SessionToast | string;
   success: SessionToast | string;
   warning: SessionToast | string;
+  [key: string]: unknown;
 };
 
-const { getSession, commitSession, destroySession } =
-  createCookieSessionStorage<SessionData, SessionFlashData>({
-    cookie: {
-      name: "__session",
-      secrets: [process.env.SESSION_SECRET as string],
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24 * 14, // 14 days
-    },
-  });
+const sessionStorage = createCookieSessionStorage<
+  SessionData,
+  SessionFlashData
+>({
+  cookie: {
+    name: "__session",
+    secrets: [process.env.SESSION_SECRET as string],
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 14, // 14 days
+  },
+});
 
-export { getSession, commitSession, destroySession };
+export const { getSession, commitSession, destroySession } = sessionStorage;
 
-export async function requireLogin(request: Request) {  
+export async function requireLogin(request: Request) {
   const cookie = request.headers.get("Cookie");
   if (!cookie?.includes("_buildel_key")) {
     const fromURL = new URL(request.url);
