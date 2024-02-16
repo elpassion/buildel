@@ -22,7 +22,9 @@ defmodule Buildel.Application do
         # Start document cache
         Buildel.DocumentCache,
         # Start the vault used for encryption
-        Buildel.Vault
+        Buildel.Vault,
+        # JWKS storage
+        BuildelWeb.GoogleJwksStrategy
       ]
       |> maybe_add_db()
       |> maybe_add_bumblebee_embedding()

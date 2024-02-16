@@ -67,7 +67,9 @@ defmodule Buildel.MixProject do
       {:dotenv, "~> 3.0.0"},
       {:money, "~> 1.12"},
       {:etag_plug, "~> 1.0"},
-      {:exvcr, "~> 0.15.1", only: :test}
+      {:exvcr, "~> 0.15.1", only: :test},
+      {:joken, "~> 2.5"},
+      {:joken_jwks, "~> 1.6"}
     ]
   end
 

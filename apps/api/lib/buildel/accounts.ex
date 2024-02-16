@@ -26,6 +26,13 @@ defmodule Buildel.Accounts do
     Repo.get_by(User, email: email)
   end
 
+  def get_or_create_user_by_email(email) when is_binary(email) do
+    case get_user_by_email(email) do
+      nil -> register_user(%{email: email, password: :crypto.strong_rand_bytes(32) |> Base.encode64()})
+      user -> {:ok, user}
+    end
+  end
+
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
     with %User{} = user <- get_user_by_email(email),
