@@ -17,7 +17,7 @@ export function SetPasswordPage() {
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
       <h1 className="text-center text-3xl font-bold text-neutral-100">
-        Set new password
+        Set new password{" "}
       </h1>
       <p className="text-center text-neutral-100">
         Go back to

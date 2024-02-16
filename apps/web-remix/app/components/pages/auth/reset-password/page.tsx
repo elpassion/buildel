@@ -18,7 +18,7 @@ export function ResetPasswordPage() {
         Reset password
       </h1>
       <p className="text-center text-neutral-100">
-        Go back to
+        Go back to{" "}
         <Link
           to={{
             pathname: "/login",
