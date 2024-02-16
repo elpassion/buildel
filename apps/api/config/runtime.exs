@@ -61,4 +61,12 @@ if config_env() == :prod do
     password: System.get_env("BASIC_AUTH_PASSWORD")
 
   config :buildel, :nlm_api_url, System.get_env("NLM_API_URL")
+
+  config :buildel, :page_url, System.get_env("PAGE_URL")
+
+  if api_key = System.get_env("RESEND_API_KEY") do
+    config :buildel, Buildel.Mailer,
+      adapter: Resend.Swoosh.Adapter,
+      api_key: api_key
+  end
 end

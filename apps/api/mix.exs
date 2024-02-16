@@ -69,7 +69,8 @@ defmodule Buildel.MixProject do
       {:etag_plug, "~> 1.0"},
       {:exvcr, "~> 0.15.1", only: :test},
       {:joken, "~> 2.5"},
-      {:joken_jwks, "~> 1.6"}
+      {:joken_jwks, "~> 1.6"},
+      {:resend, "~> 0.4.1"}
     ]
   end
 

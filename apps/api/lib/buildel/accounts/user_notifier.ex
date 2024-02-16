@@ -8,7 +8,7 @@ defmodule Buildel.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Buildel", "contact@example.com"})
+      |> from({"Buildel", "contact@buildel.ai"})
       |> subject(subject)
       |> text_body(body)
 
@@ -27,8 +27,9 @@ defmodule Buildel.Accounts.UserNotifier do
 
     Hi #{user.email},
 
-    You can confirm your account by visiting the URL below:
+    You've just created an account with us. We're excited to have you on board!
 
+    You can now create an organization by visiting the URL below:
     #{url}
 
     If you didn't create an account with us, please ignore this.
