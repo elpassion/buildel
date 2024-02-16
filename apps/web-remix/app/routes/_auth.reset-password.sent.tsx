@@ -11,7 +11,7 @@ export default function ResetPasswordSent() {
         Reset password instructions successfully sent!
       </h1>
       <p className="text-center text-neutral-100">
-        Go back to
+        Go back to{" "}
         <Link
           to={{
             pathname: "/login",
