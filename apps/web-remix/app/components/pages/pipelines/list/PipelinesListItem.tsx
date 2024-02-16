@@ -109,7 +109,7 @@ function DuplicateForm({ pipeline }: DuplicateFormProps) {
       <IconButton
         size="xs"
         variant="ghost"
-        aria-label="Duplicate workflow"
+        aria-label={`Duplicate workflow: ${pipeline.name}`}
         className="opacity-0 group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500"
         title={`Duplicate workflow: ${pipeline.name}`}
         icon={<Duplicate className="w-3.5 h-3.5" />}

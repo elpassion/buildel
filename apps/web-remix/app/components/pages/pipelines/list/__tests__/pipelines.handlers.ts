@@ -33,6 +33,13 @@ export const handlers = [
       return HttpResponse.json(null);
     }
   ),
+
+  http.post("/super-api/organizations/:organizationId/pipelines", async () => {
+    return HttpResponse.json(
+      { data: pipelineFixture({ id: 321 }) },
+      { status: 201 }
+    );
+  }),
 ];
 
 export const emptyHandlers = [

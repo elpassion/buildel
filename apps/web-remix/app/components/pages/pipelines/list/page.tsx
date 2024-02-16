@@ -59,6 +59,7 @@ export function PipelinesPage() {
               <Link
                 to={routes.pipelinesNew(organizationId)}
                 className="mb-6 block w-fit ml-auto mr-0"
+                aria-label="Create new workflow"
               >
                 <Button tabIndex={0} size="sm">
                   New Workflow

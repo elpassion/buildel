@@ -12,8 +12,12 @@ import { server } from "~/tests/server.mock";
 import { PipelinesPage } from "../page";
 import { loader } from "../loader";
 import { action } from "../action";
+import { action as newPipelineAction } from "../../new/action";
 import { emptyHandlers, handlers } from "./pipelines.handlers";
 import { ListHandle } from "~/tests/handles/List.handle";
+import { NewPipelinePage } from "../../new/page";
+import { LinkHandle } from "~/tests/handles/Link.handle";
+import { InputHandle } from "~/tests/handles/Input.handle";
 
 describe(PipelinesPage.name, () => {
   const setupServer = server(handlers);
@@ -65,6 +69,55 @@ describe(PipelinesPage.name, () => {
 
     expect(workflowList.children).toHaveLength(1);
   });
+
+  test("should duplicate pipeline", async () => {
+    new PipelinesObject().render({
+      initialEntries: ["/2/pipelines"],
+    });
+
+    const button = await ButtonHandle.fromLabelText(
+      /Duplicate workflow: sample-workflow/i
+    );
+
+    await button.click();
+
+    const text = screen.findByText(/pipeline/i);
+
+    expect(text).toBeTruthy();
+  });
+
+  test("should create pipeline from template", async () => {
+    new PipelinesObject().render({
+      initialEntries: ["/2/pipelines"],
+    });
+
+    const button = await ButtonHandle.fromLabelText(
+      /Create workflow: Speech To Text/i
+    );
+
+    await button.click();
+
+    const text = screen.findByText(/pipeline/i);
+    expect(text).toBeTruthy();
+  });
+
+  test("should create new pipeline", async () => {
+    new PipelinesObject().render({
+      initialEntries: ["/2/pipelines"],
+    });
+
+    const link = await LinkHandle.fromLabelText(/Create new workflow/i);
+    await link.click();
+
+    const input = await InputHandle.fromLabelText(/Name/i);
+    await input.type("LALALA");
+
+    const submit = await ButtonHandle.fromRole("Create workflow");
+    await submit.click();
+
+    const text = screen.findByText(/pipeline/i);
+    expect(text).toBeTruthy();
+  });
 });
 
 class PipelinesObject {
@@ -83,6 +136,15 @@ class PipelinesObject {
         Component: PipelinesPage,
         loader: loaderWithSession(loader),
         action: actionWithSession(action),
+      },
+      {
+        path: "/:organizationId/pipelines/new",
+        action: actionWithSession(newPipelineAction),
+        Component: NewPipelinePage,
+      },
+      {
+        path: "/:organizationId/pipelines/:pipelineId",
+        Component: () => <p>Pipeline</p>,
       },
     ]);
 

@@ -94,7 +94,11 @@ function WorkflowTemplatesListItem({
         value={JSON.stringify(blocks)}
       />
 
-      <SubmitButton size="xs" className="hidden group-hover:block">
+      <SubmitButton
+        size="xs"
+        className="opacity-0 group-hover:opacity-100"
+        aria-label={`Create workflow: ${name}`}
+      >
         <div className="flex gap-1 items-center">
           <span className="text-xs">Build</span>
           <Icon iconName="arrow-right" className="text-sm" />

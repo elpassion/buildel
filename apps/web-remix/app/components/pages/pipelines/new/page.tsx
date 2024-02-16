@@ -26,6 +26,7 @@ export function NewPipelinePage() {
             placeholder="eg. Text To Speech"
             supportingText="It will help you identify the workflow in BUILDEL"
             label="Name"
+            aria-label="Name"
           />
         </Field>
 
