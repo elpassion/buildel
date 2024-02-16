@@ -14,7 +14,8 @@ processes = []
 
 [env]
   API_URL = "https://buildel-api.fly.dev"
-  PAGE_URL = "https://buildel-web.fly.dev"
+  PAGE_URL = "https://app.buildel.ai"
+  GOOGLE_REDIRECT_URI = "https://app.buildel.ai/auth/google/callback"
 
 [http_service]
   internal_port = 8080
