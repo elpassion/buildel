@@ -85,8 +85,7 @@ defmodule Buildel.Blocks.Chat do
                       "openai" => "https://api.openai.com/v1/chat/completions",
                       "azure" =>
                         "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}/chat/completions?api-version={api_version}",
-                      "google" =>
-                        "https://{region}-aiplatform.googleapis.com/v1/projects/{project_id}/locations/{region}/publishers/google/models",
+                      "google" => "https://generativelanguage.googleapis.com/v1beta/models",
                       "mistral" => "https://api.mistral.ai/v1/chat/completions"
                     }
                   }

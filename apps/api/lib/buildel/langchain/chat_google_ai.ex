@@ -33,6 +33,8 @@ defmodule Buildel.LangChain.ChatModels.ChatGoogleAI do
     field :model, :string, default: "gemini-pro"
     field :api_key, :string
 
+    field :api_type, :string, default: "aistudio"
+
     # What sampling temperature to use, between 0 and 2. Higher values like 0.8
     # will make the output more random, while lower values like 0.2 will make it
     # more focused and deterministic.
@@ -70,6 +72,7 @@ defmodule Buildel.LangChain.ChatModels.ChatGoogleAI do
     :version,
     :model,
     :api_key,
+    :api_type,
     :temperature,
     :top_p,
     :top_k,
@@ -303,7 +306,6 @@ defmodule Buildel.LangChain.ChatModels.ChatGoogleAI do
     )
     |> Req.Request.put_header("accept-encoding", "utf-8")
     |> Req.Request.put_header("content-type", "application/json")
-    |> Req.Request.put_header("authorization", "Bearer #{get_api_key(google_ai)}")
     |> Req.post(
       into: Utils.handle_stream_fn(google_ai, &do_process_response(&1, MessageDelta), callback_fn)
     )
@@ -335,11 +337,23 @@ defmodule Buildel.LangChain.ChatModels.ChatGoogleAI do
   defp build_url(%ChatGoogleAI{endpoint: endpoint, version: _version, model: model} = google_ai) do
     "#{endpoint}/#{model}:#{get_action(google_ai)}"
     |> use_sse(google_ai)
+    |> append_key(google_ai)
   end
 
   @spec use_sse(String.t(), t()) :: String.t()
   defp use_sse(url, %ChatGoogleAI{stream: true}), do: url <> "?alt=sse"
   defp use_sse(url, _model), do: url
+
+  @spec append_key(String.t(), t()) :: String.t()
+  defp append_key(url, %ChatGoogleAI{api_type: "aistudio"} = model) do
+    if url =~ "?" do
+      url <> "&key=#{get_api_key(model)}"
+    else
+      url <> "?key=#{get_api_key(model)}"
+    end
+  end
+
+  defp append_key(url, _model), do: url
 
   @spec get_action(t()) :: String.t()
   defp get_action(%ChatGoogleAI{stream: false}), do: "generateContent"
