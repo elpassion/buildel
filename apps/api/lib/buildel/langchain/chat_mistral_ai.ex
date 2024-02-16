@@ -38,15 +38,6 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
     # C as a candidate. The default topP value is 0.95.
     field :top_p, :float, default: 1.0
 
-    # The topK parameter changes how the model selects tokens for output. A topK of
-    # 1 means the selected token is the most probable among all the tokens in the
-    # model's vocabulary (also called greedy decoding), while a topK of 3 means that
-    # the next token is selected from among the 3 most probable using the temperature.
-    # For each token selection step, the topK tokens with the highest probabilities
-    # are sampled. Tokens are then further filtered based on topP with the final token
-    # selected using temperature sampling.
-    field :top_k, :float, default: 1.0
-
     # Duration in seconds for the response to be received. When streaming a very
     # lengthy response, a longer time limit may be required. However, when it
     # goes on too long by itself, it tends to hallucinate more.
@@ -69,7 +60,6 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
     :api_key,
     :temperature,
     :top_p,
-    :top_k,
     :receive_timeout,
     :max_tokens,
     :safe_prompt,
@@ -77,8 +67,7 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
     :stream
   ]
   @required_fields [
-    :model,
-    :api_key
+    :model
   ]
 
   @spec get_api_key(t) :: String.t()
