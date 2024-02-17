@@ -11,9 +11,9 @@ config :bcrypt_elixir, :log_rounds, 1
 config :buildel, Buildel.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "localhost",
+  hostname: System.get_env("POSTGRES_HOST", "localhost"),
   database: "buildel_test#{System.get_env("MIX_TEST_PARTITION")}",
-  port: 54321,
+  port: System.get_env("POSTGRES_PORT", 54321),
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
