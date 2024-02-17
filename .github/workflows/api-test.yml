@@ -1,4 +1,4 @@
-name: Test API
+name: API Test
 on:
   push:
     branches:
@@ -12,7 +12,7 @@ defaults:
 
 jobs:
   test:
-    name: Test API
+    name: Test
     runs-on: ubuntu-latest
     concurrency: deploy-group
     steps:

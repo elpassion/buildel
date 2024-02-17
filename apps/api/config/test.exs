@@ -59,3 +59,4 @@ config :buildel, Buildel.Vault,
   ]
 
 config :buildel, :page_url, "http://localhost:3000"
+config :logger, level: :critical
