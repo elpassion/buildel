@@ -276,6 +276,35 @@ defmodule Buildel.Blocks.Block do
                 "title" => "Name",
                 "description" => "The name for collection.",
                 "minLength" => 1
+              },
+              "embeddings" => %{
+                "type" => "object",
+                "title" => "Embeddings",
+                "description" => "The embeddings to use for the collection.",
+                "required" => ["api_type", "model", "secret_name"],
+                "properties" => %{
+                  "api_type" => %{
+                    "type" => "string",
+                    "title" => "API Type",
+                    "description" => "The type of the embeddings API.",
+                    "enum" => ["openai"],
+                    "default" => "openai",
+                    "enumPresentAs" => "radio"
+                  },
+                  "model" => %{
+                    "type" => "string",
+                    "title" => "Model",
+                    "description" => "The model to use for the embeddings.",
+                    "default" => "text-embedding-ada-002",
+                    "enum" => ["text-embedding-ada-002"],
+                    "enumPresentAs" => "radio"
+                  },
+                  "secret_name" =>
+                    secret_schema(%{
+                      "title" => "Embeddings Secret",
+                      "description" => "The secret to use for the embeddings."
+                    })
+                }
               }
             }
           }
