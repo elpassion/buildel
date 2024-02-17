@@ -28,7 +28,6 @@ defmodule Buildel.Application do
       ]
       |> maybe_add_db()
       |> maybe_add_bumblebee_embedding()
-      |> maybe_add_hybrid_db_embedding()
       |> maybe_add_python_workers()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -46,12 +45,8 @@ defmodule Buildel.Application do
   end
 
   def load_servings() do
-    if Application.get_env(:buildel, :embeddings) == Buildel.Clients.BumblebeeEmbeddings do
+    if should_add_bumblebee_embedding?() do
       Buildel.Clients.BumblebeeEmbeddings.serving()
-    end
-
-    if Application.get_env(:buildel, :hybrid_db) do
-      Buildel.HybridDB.serving()
     end
   end
 
@@ -68,25 +63,13 @@ defmodule Buildel.Application do
   end
 
   defp maybe_add_bumblebee_embedding(children) do
-    if Application.get_env(:buildel, :embeddings) == Buildel.Clients.BumblebeeEmbeddings do
+    if should_add_bumblebee_embedding?() do
       children ++
         [
           {Nx.Serving,
            serving: Buildel.Clients.BumblebeeEmbeddings.serving(),
            name: Buildel.Clients.BumblebeeEmbeddings,
            batch_timeout: 50}
-        ]
-    else
-      children
-    end
-  end
-
-  defp maybe_add_hybrid_db_embedding(children) do
-    if Application.get_env(:buildel, :hybrid_db) do
-      children ++
-        [
-          {Nx.Serving,
-           serving: Buildel.HybridDB.serving(), name: Buildel.HybridDB, batch_timeout: 50}
         ]
     else
       children
@@ -102,6 +85,10 @@ defmodule Buildel.Application do
     else
       children
     end
+  end
+
+  defp should_add_bumblebee_embedding?() do
+    false
   end
 
   defp python_poolboy_config() do

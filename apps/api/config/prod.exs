@@ -22,5 +22,4 @@ config :logger, level: :info
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
 
-config :buildel, :vector_db, Buildel.VectorDB.EctoAdapter
 config :buildel, :secure_cookie, true

@@ -43,7 +43,7 @@ defmodule BuildelWeb.MemoryController do
          {:ok, memory} <-
            Buildel.Memories.create_organization_memory(
              organization,
-             collection.collection_name,
+             collection,
              %{
                path: file |> Map.get(:path),
                type: file |> Map.get(:content_type),

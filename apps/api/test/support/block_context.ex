@@ -22,7 +22,7 @@ defmodule Buildel.BlockContext.Mock do
   end
 
   @impl true
-  def global_collection_name(context_id, block_name) do
+  def get_collection(context_id, block_name) do
     context = context_from_context_id(context_id)
     "#{context[:global]}_#{block_name}"
   end

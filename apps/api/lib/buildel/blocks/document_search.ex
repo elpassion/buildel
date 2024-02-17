@@ -32,19 +32,12 @@ defmodule Buildel.Blocks.DocumentSearch do
         "opts" =>
           options_schema(%{
             "required" => [
-              "api_key",
               "knowledge",
               "limit",
-              "hybrid_reranking",
               "similarity_threshhold"
             ],
             "properties" =>
               Jason.OrderedObject.new(
-                api_key:
-                  secret_schema(%{
-                    "title" => "API key",
-                    "description" => "OpenAI API key to use for the embeddings."
-                  }),
                 knowledge:
                   memory_schema(%{
                     "title" => "Knowledge",
@@ -91,7 +84,6 @@ defmodule Buildel.Blocks.DocumentSearch do
   @impl true
   def init(
         %{
-          name: name,
           context_id: context_id,
           type: __MODULE__,
           opts: opts
@@ -99,21 +91,16 @@ defmodule Buildel.Blocks.DocumentSearch do
       ) do
     subscribe_to_connections(context_id, state.connections)
 
-    api_key =
-      block_context().get_secret_from_context(context_id, opts |> Map.get(:api_key))
+    {:ok, vector_db} = block_context().get_vector_db(context_id, opts.knowledge)
 
-    collection_name = block_context().global_collection_name(context_id, opts.knowledge)
+    {:ok, collection} =
+      block_context().get_global_collection_name(context_id, opts.knowledge)
 
-    with {:ok, collection} <- Buildel.VectorDB.init(collection_name) do
-      {:ok,
-       state
-       |> assign_stream_state
-       |> Map.put(:collection, collection.name)
-       |> Map.put(:api_key, api_key)}
-    else
-      {:error, error} ->
-        {:stop, "Failed to create collection #{inspect(name)} Error: #{inspect(error)}"}
-    end
+    {:ok,
+     state
+     |> assign_stream_state()
+     |> Map.put(:vector_db, vector_db)
+     |> Map.put(:collection, collection)}
   end
 
   @impl true
@@ -121,8 +108,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     state = send_stream_start(state)
 
     result =
-      Buildel.VectorDB.query(state[:collection], query, %{
-        api_key: state[:api_key],
+      Buildel.VectorDB.query(state.vector_db, state[:collection], query, %{
         limit: state[:opts] |> Map.get(:limit, 3),
         similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.75)
       })
@@ -166,7 +152,7 @@ defmodule Buildel.Blocks.DocumentSearch do
         }
       end)
 
-    Buildel.VectorDB.add(state[:collection], documents, api_key: state[:api_key])
+    Buildel.VectorDB.add(state.vector_db, state[:collection], documents)
     state = send_stream_stop(state)
     {:noreply, state}
   end
@@ -178,8 +164,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     similarity_threshhold = state.opts |> Map.get(:similarity_threshhold, 0.75)
 
     result =
-      Buildel.VectorDB.query(state[:collection], query, %{
-        api_key: state[:api_key],
+      Buildel.VectorDB.query(state.vector_db, state[:collection], query, %{
         limit: limit,
         similarity_threshhold: similarity_threshhold
       })

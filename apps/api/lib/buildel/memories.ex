@@ -1,4 +1,5 @@
 defmodule Buildel.Memories do
+  alias Buildel.Organizations
   import Ecto.Query
 
   def list_organization_collection_memories(
@@ -54,7 +55,7 @@ defmodule Buildel.Memories do
 
   def create_organization_memory(
         %Buildel.Organizations.Organization{} = organization,
-        collection_name,
+        %Buildel.Memories.MemoryCollection{} = collection,
         file
       ) do
     %{file_name: file_name, file_size: file_size, file_type: file_type} =
@@ -64,8 +65,7 @@ defmodule Buildel.Memories do
 
     metadata = %{file_name: file_name, file_size: file_size, file_type: file_type}
 
-    with {:ok, collection} <-
-           upsert_collection(%{organization_id: organization.id, collection_name: collection_name}),
+    with organization <- Organizations.get_organization!(organization.id),
          organization_collection_name <- organization_collection_name(organization, collection),
          {:ok, memory} <-
            %Buildel.Memories.Memory{}
@@ -73,13 +73,25 @@ defmodule Buildel.Memories do
              metadata
              |> Map.merge(%{
                organization_id: organization.id,
-               collection_name: collection_name,
+               collection_name: collection.collection_name,
                memory_collection_id: collection.id,
                content: file
              })
            )
            |> Buildel.Repo.insert(),
-         {:ok, _} <- Buildel.VectorDB.init(organization_collection_name),
+         {:ok, api_key} <-
+           Organizations.get_organization_secret(organization, collection.embeddings_secret_name),
+         vector_db <-
+           Buildel.VectorDB.new(%{
+             adapter: Buildel.VectorDB.EctoAdapter,
+             embeddings:
+               Buildel.Clients.Embeddings.new(%{
+                 api_type: collection.embeddings_api_type,
+                 model: collection.embeddings_model,
+                 api_key: api_key.value
+               })
+           }),
+         {:ok, _} <- Buildel.VectorDB.init(vector_db, organization_collection_name),
          {:ok, _} <- Buildel.SearchDB.init(organization_collection_name),
          {time, documents} <-
            :timer.tc(fn ->
@@ -98,9 +110,7 @@ defmodule Buildel.Memories do
              }
            end),
          {:ok, _} <-
-           Buildel.VectorDB.add(organization_collection_name, documents,
-             api_key: System.get_env("OPENAI_API_KEY", "key")
-           ),
+           Buildel.VectorDB.add(vector_db, organization_collection_name, documents),
          {:ok, _} <-
            Buildel.SearchDB.add(organization_collection_name, documents) do
       :telemetry.execute(
@@ -112,20 +122,6 @@ defmodule Buildel.Memories do
     end
   end
 
-  def create_organization_memory(organization_id, collection_name, %{
-        path: path,
-        type: type,
-        name: name
-      }) do
-    organization = Buildel.Organizations.get_organization!(organization_id)
-
-    create_organization_memory(organization, collection_name, %{
-      path: path,
-      type: type,
-      name: name
-    })
-  end
-
   def delete_organization_memory(
         %Buildel.Organizations.Organization{} = organization,
         id
@@ -134,8 +130,20 @@ defmodule Buildel.Memories do
 
     collection_name = organization_collection_name(organization, memory.memory_collection)
 
-    with :ok <-
-           Buildel.VectorDB.delete_all_with_metadata(collection_name, %{memory_id: memory.id}),
+    with vector_db <-
+           Buildel.VectorDB.new(%{
+             adapter: Buildel.VectorDB.EctoAdapter,
+             embeddings:
+               Buildel.Clients.Embeddings.new(%{
+                 api_type: memory.memory_collection.embeddings_api_type,
+                 model: memory.memory_collection.embeddings_model,
+                 api_key: memory.memory_collection.embeddings_secret_name
+               })
+           }),
+         :ok <-
+           Buildel.VectorDB.delete_all_with_metadata(vector_db, collection_name, %{
+             memory_id: memory.id
+           }),
          :ok <-
            Buildel.SearchDB.delete_all_with_metadata(collection_name, %{memory_id: memory.id}),
          {:ok, _} <- Buildel.Repo.delete(memory) do
@@ -157,7 +165,11 @@ defmodule Buildel.Memories do
     end
   end
 
-  def upsert_collection(%{organization_id: organization_id, collection_name: collection_name}) do
+  def upsert_collection(%{
+        organization_id: organization_id,
+        collection_name: collection_name,
+        embeddings: embeddings
+      }) do
     Buildel.Memories.MemoryCollection
     |> where([c], c.collection_name == ^collection_name and c.organization_id == ^organization_id)
     |> Buildel.Repo.one()
@@ -166,7 +178,10 @@ defmodule Buildel.Memories do
         %Buildel.Memories.MemoryCollection{}
         |> Buildel.Memories.MemoryCollection.changeset(%{
           collection_name: collection_name,
-          organization_id: organization_id
+          organization_id: organization_id,
+          embeddings_api_type: embeddings.api_type,
+          embeddings_model: embeddings.model,
+          embeddings_secret_name: embeddings.secret_name
         })
         |> Buildel.Repo.insert()
 
@@ -203,10 +218,10 @@ defmodule Buildel.Memories do
     |> Buildel.Repo.one!()
   end
 
-  defp organization_collection_name(
-         %Buildel.Organizations.Organization{} = organization,
-         %Buildel.Memories.MemoryCollection{} = collection
-       ) do
+  def organization_collection_name(
+        %Buildel.Organizations.Organization{} = organization,
+        %Buildel.Memories.MemoryCollection{} = collection
+      ) do
     "#{organization.id}_#{collection.id}"
   end
 end

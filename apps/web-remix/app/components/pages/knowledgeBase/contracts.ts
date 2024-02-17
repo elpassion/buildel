@@ -11,6 +11,11 @@ export const KnowledgeBaseFile = z.object({
 export const KnowledgeBaseCollection = z.object({
   id: z.number(),
   name: z.string(),
+  embeddings: z.object({
+    api_type: z.string(),
+    model: z.string(),
+    secret_name: z.string(),
+  }),
 });
 
 export const KnowledgeBaseFileResponse = z

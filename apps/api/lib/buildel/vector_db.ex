@@ -1,32 +1,38 @@
 defmodule Buildel.VectorDB do
   alias Buildel.Utils.TelemetryWrapper
+  alias Buildel.Clients.Embeddings
   use TelemetryWrapper
+  @enforce_keys [:adapter, :embeddings]
+  defstruct [:adapter, :embeddings]
 
-  def init(collection_name) do
+  def new(%{adapter: adapter, embeddings: embeddings}) do
+    %__MODULE__{adapter: adapter, embeddings: embeddings}
+  end
+
+  def init(%__MODULE__{adapter: adapter, embeddings: embeddings}, collection_name) do
     with {:ok, _collection} <-
-           adapter().create_collection(collection_name, embeddings().collection_config()) do
+           adapter.create_collection(
+             collection_name,
+             Embeddings.get_config(embeddings)
+           ) do
       {:ok, %{name: collection_name}}
     else
       {:error, error} -> {:error, error}
     end
   end
 
-  def add(collection_name, documents, api_key: api_key) do
+  def add(%__MODULE__{adapter: adapter, embeddings: embeddings}, collection_name, documents) do
     inputs = documents |> Enum.map(&Map.get(&1, :document))
 
     ids =
       documents
       |> Enum.map(&get_in(&1, [:metadata, :chunk_id]))
 
-    {:ok, embeddings_list} =
-      embeddings().get_embeddings(
-        inputs: inputs,
-        api_key: api_key
-      )
+    {:ok, embeddings_list} = Embeddings.get_embeddings(embeddings, inputs)
 
-    {:ok, collection} = adapter().get_collection(collection_name)
+    {:ok, collection} = adapter.get_collection(collection_name)
 
-    adapter().add(collection, %{
+    adapter.add(collection, %{
       embeddings: embeddings_list,
       documents: documents,
       ids: ids
@@ -35,29 +41,25 @@ defmodule Buildel.VectorDB do
     {:ok, collection}
   end
 
-  deftimed query(collection_name, query, %{api_key: api_key} = options), [
-    :buildel,
-    :vector_db,
-    :query
-  ] do
+  deftimed query(
+             %__MODULE__{adapter: adapter, embeddings: embeddings},
+             collection_name,
+             query,
+             options
+           ),
+           [
+             :buildel,
+             :vector_db,
+             :query
+           ] do
     options = Map.merge(%{limit: 5, similarity_threshhold: 0.75}, options)
 
-    {:ok, embeddings_list} =
-      case Buildel.DocumentCache.get("embeddings::#{query}") do
-        nil ->
-          Buildel.DocumentCache.put(
-            "embeddings::#{query}",
-            embeddings().get_embeddings(inputs: [query], api_key: api_key)
-          )
+    {:ok, embeddings_list} = Embeddings.get_embeddings(embeddings, [query])
 
-        res ->
-          res
-      end
-
-    {:ok, collection} = adapter().get_collection(collection_name)
+    {:ok, collection} = adapter.get_collection(collection_name)
 
     {:ok, results} =
-      adapter().query(collection, %{
+      adapter.query(collection, %{
         query_embeddings: embeddings_list |> List.first(),
         limit: options.limit,
         similarity_treshhold: options.similarity_threshhold
@@ -66,18 +68,10 @@ defmodule Buildel.VectorDB do
     results
   end
 
-  def delete_all_with_metadata(collection_name, metadata) do
-    {:ok, collection} = adapter().get_collection(collection_name)
+  def delete_all_with_metadata(%__MODULE__{adapter: adapter}, collection_name, metadata) do
+    {:ok, collection} = adapter.get_collection(collection_name)
 
-    adapter().delete_all_with_metadata(collection, metadata)
-  end
-
-  defp adapter do
-    Application.fetch_env!(:buildel, :vector_db)
-  end
-
-  defp embeddings do
-    Application.fetch_env!(:buildel, :embeddings)
+    adapter.delete_all_with_metadata(collection, metadata)
   end
 end
 

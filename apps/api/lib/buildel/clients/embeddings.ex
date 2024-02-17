@@ -1,46 +1,83 @@
-defmodule Buildel.Clients.EmbeddingsBehaviour do
-  @callback get_embeddings(inputs: list(String.t())) :: {:ok, list(list(float()))}
-  @callback collection_config() :: map()
+defmodule Buildel.Clients.Embeddings do
+  alias __MODULE__
+  @type t :: %Embeddings{}
+
+  @enforce_keys [:api_type, :model, :api_key]
+  defstruct [:api_type, :model, :api_key]
+
+  @spec new(%{:api_key => String.t(), :api_type => String.t(), :model => String.t()}) :: t()
+  def new(%{api_type: api_type, model: model, api_key: api_key}) do
+    %__MODULE__{api_type: api_type, model: model, api_key: api_key}
+  end
+
+  def get_embeddings(%__MODULE__{api_type: "openai", model: model, api_key: api_key}, inputs) do
+    Buildel.Clients.OpenAIEmbeddings.get_embeddings(%{
+      inputs: inputs,
+      api_key: api_key,
+      model: model
+    })
+  end
+
+  def get_embeddings(%__MODULE__{api_type: "test"}) do
+    {:ok,
+     [
+       Enum.map(1..100, fn _ -> Enum.map(1..100, fn _ -> :rand.uniform() end) end),
+       Enum.map(1..100, fn _ -> Enum.map(1..100, fn _ -> :rand.uniform() end) end)
+     ]}
+  end
+
+  def get_config(%__MODULE__{api_type: "openai", model: model}) do
+    Buildel.Clients.OpenAIEmbeddings.model_config(model)
+  end
+
+  def get_config(%__MODULE__{api_type: "test"}) do
+    %{size: 100, distance: "cosine"}
+  end
+end
+
+defmodule Buildel.Clients.EmbeddingsAdapterBehaviour do
+  @callback get_embeddings(%{inputs: [String.t()], model: String.t(), api_key: String.t()}) ::
+              {:ok, list(list(float()))}
+  @callback model_config(String.t()) :: %{size: non_neg_integer, distance: String.t()}
 end
 
 defmodule Buildel.Clients.OpenAIEmbeddings do
+  @behaviour Buildel.Clients.EmbeddingsAdapterBehaviour
   use Buildel.Utils.TelemetryWrapper
 
-  @behaviour Buildel.Clients.EmbeddingsBehaviour
-
   @impl true
-  def collection_config() do
+  def model_config("text-embedding-ada-002") do
     %{size: 1536, distance: "Cosine"}
   end
 
   @impl true
-  deftimed get_embeddings(inputs: inputs, api_key: api_key), [:buildel, :embeddings, :generation] do
+  deftimed get_embeddings(%{inputs: inputs, api_key: api_key, model: model}), [
+    :buildel,
+    :embeddings,
+    :generation
+  ] do
     {:ok, %{data: gpt_embeddings}} =
-      OpenAI.embeddings([model: "text-embedding-ada-002", input: inputs], config(false, api_key))
+      OpenAI.embeddings([model: model, input: inputs], config(api_key))
 
     {:ok, gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)}
   end
 
-  def config(stream \\ false, api_key \\ nil) do
-    http_options =
-      if stream, do: [recv_timeout: :infinity, stream_to: self(), async: :once], else: []
-
+  def config(api_key \\ nil) do
     %OpenAI.Config{
-      api_key: api_key || System.get_env("OPENAI_API_KEY"),
-      http_options: http_options,
-      api_url: "http://localhost/"
+      api_key: api_key,
+      http_options: []
     }
   end
 end
 
 defmodule Buildel.Clients.BumblebeeEmbeddings do
-  @behaviour Buildel.Clients.EmbeddingsBehaviour
+  @behaviour Buildel.Clients.EmbeddingsAdapterBehaviour
   use Buildel.Utils.TelemetryWrapper
 
   @impl true
-  deftimed get_embeddings(inputs: texts, api_key: _api_key), [:buildel, :embeddings, :generation] do
+  deftimed get_embeddings(%{inputs: inputs}), [:buildel, :embeddings, :generation] do
     results =
-      Nx.Serving.batched_run(__MODULE__, texts)
+      Nx.Serving.batched_run(__MODULE__, inputs)
       |> Enum.map(& &1[:embedding])
       |> Enum.map(&Nx.to_list/1)
 
@@ -48,7 +85,7 @@ defmodule Buildel.Clients.BumblebeeEmbeddings do
   end
 
   @impl true
-  def collection_config() do
+  def model_config(_model) do
     %{size: 384, distance: "Dot"}
   end
 

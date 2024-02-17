@@ -12,7 +12,12 @@ defmodule BuildelWeb.CollectionJSON do
   defp data(%MemoryCollection{} = collection) do
     %{
       id: collection.id,
-      name: collection.collection_name
+      name: collection.collection_name,
+      embeddings: %{
+        api_type: collection.embeddings_api_type,
+        model: collection.embeddings_model,
+        secret_name: collection.embeddings_secret_name
+      }
     }
   end
 end

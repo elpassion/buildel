@@ -1,4 +1,4 @@
-defmodule Buildel.ClientMocks.ChatGPT do
+defmodule Buildel.ClientMocks.Chat do
   alias Buildel.Clients.ChatBehaviour
   @behaviour ChatBehaviour
 

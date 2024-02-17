@@ -39,18 +39,30 @@ defmodule BuildelWeb.CollectionController do
   defparams :create do
     required(:organization_id, :string)
     required(:collection_name, :string)
+
+    required(:embeddings, :map) do
+      required(:api_type, :string)
+      required(:model, :string)
+      required(:secret_name, :string)
+    end
   end
 
   def create(conn, %{"organization_id" => organization_id} = params) do
     user = conn.assigns.current_user
 
-    with {:ok, %{collection_name: collection_name}} <- validate(:create, params),
+    with {:ok, %{collection_name: collection_name} = params} <- validate(:create, params),
          {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, _} <-
+           Buildel.Organizations.get_organization_secret(
+             organization,
+             params.embeddings.secret_name
+           ),
          {:ok, collection} <-
            Buildel.Memories.upsert_collection(%{
              organization_id: organization.id,
-             collection_name: collection_name
+             collection_name: collection_name,
+             embeddings: params.embeddings
            }) do
       conn
       |> put_status(:created)

@@ -81,18 +81,6 @@ defmodule BuildelWeb.Telemetry do
       summary("vm.total_run_queue_lengths.io"),
 
       # Performance Metrics
-      summary("buildel.hybrid_db.query.duration",
-        unit: {:native, :millisecond},
-        description: "The time spent executing the query"
-      ),
-      summary("buildel.hybrid_db.sorting.duration",
-        unit: {:native, :millisecond},
-        description: "The time spent reraanking the results of queries"
-      ),
-      summary("buildel.hybrid_db.sorting.batch_processing.duration",
-        unit: {:native, :millisecond},
-        description: "The time spent processing a batch of results"
-      ),
       summary("buildel.vector_db.query.duration",
         unit: {:native, :millisecond},
         description: "The time spent executing the query"

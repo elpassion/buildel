@@ -22,6 +22,7 @@ export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
       <RadioInput
         {...props}
         {...getInputProps({ type: "radio", id: props.id })}
+        ref={ref}
         checked={formValue === props.value}
         onChange={(e) => {
           setFormValue(e.target.value);
@@ -29,5 +30,5 @@ export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
         }}
       />
     );
-  }
+  },
 );

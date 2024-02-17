@@ -57,11 +57,8 @@ config :buildel, :deepgram, Buildel.Clients.Deepgram
 config :buildel, :elevenlabs, Buildel.Clients.Elevenlabs
 config :buildel, :webhook, Buildel.Clients.Webhook
 config :buildel, :chat, Buildel.Clients.Chat
-config :buildel, :vector_db, Buildel.VectorDB.EctoAdapter
-config :buildel, :embeddings, Buildel.Clients.OpenAIEmbeddings
 config :buildel, :file_loader, Buildel.FileLoaderNLMApiAdapter
 config :buildel, :search_db, Buildel.SearchDB.EctoAdapter
-config :buildel, :hybrid_db, false
 config :buildel, :block_context_resolver, Buildel.BlockContext
 
 config :buildel, :secure_cookie, false

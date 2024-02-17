@@ -41,13 +41,10 @@ config :buildel, :secret_key_base, "secret_key_base"
 config :buildel, :deepgram, Buildel.ClientMocks.Deepgram
 config :buildel, :elevenlabs, Buildel.ClientMocks.Elevenlabs
 config :buildel, :webhook, Buildel.ClientMocks.Webhook
-config :buildel, :chat, Buildel.ClientMocks.ChatGPT
+config :buildel, :chat, Buildel.ClientMocks.Chat
 config :buildel, :stream_timeout, 10
-config :buildel, :vector_db, Buildel.ClientMocks.VectorDB.QdrantAdapter
-config :buildel, :embeddings, Buildel.ClientMocks.Embeddings
 config :buildel, :file_loader, Buildel.FileLoaderRawAdapter
 config :buildel, :search_db, Buildel.ClientMocks.SearchDB.LNXAdapter
-config :buildel, :hybrid_db, false
 config :buildel, :block_context_resolver, Buildel.BlockContext.Mock
 config :langchain, openai_key: fn -> System.get_env("OPENAI_API_KEY") end
 

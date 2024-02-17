@@ -4,8 +4,9 @@ defmodule Buildel.BlockContextBehaviour do
   @callback create_run_auth_token(String.t(), String.t()) :: {:ok, String.t()}
   @callback create_run_cost(String.t(), String.t(), integer()) ::
               {:ok, Buildel.Pipelines.RunCost.t()}
-  @callback global_collection_name(String.t(), String.t()) :: String.t()
-  @callback get_secret_from_context(String.t(), String.t()) :: String.t()
+  @callback get_vector_db(String.t(), String.t()) :: Buildel.VectorDB.t()
+  @callback get_global_collection_name(String.t(), String.t()) :: {:ok, String.t()}
+  @callback get_secret_from_context(String.t(), String.t()) :: {:ok, String.t()}
 end
 
 defmodule Buildel.BlockContext do
@@ -69,15 +70,43 @@ defmodule Buildel.BlockContext do
   end
 
   @impl true
-  def global_collection_name(context_id, collection_name) do
+  def get_global_collection_name(context_id, collection_name) do
     %{global: organization_id} = context_from_context_id(context_id)
+    organization = Buildel.Organizations.get_organization!(organization_id)
 
-    "#{organization_id}_#{collection_name}"
+    {:ok, collection} =
+      Buildel.Memories.get_organization_collection(organization, collection_name)
+
+    {:ok, Buildel.Memories.organization_collection_name(organization, collection)}
   end
 
   @impl true
-  def get_secret_from_context(context, secret_name) do
-    with %{global: organization_id} <- context_from_context_id(context),
+  def get_vector_db(context_id, collection_name) do
+    %{global: organization_id} = context_from_context_id(context_id)
+    organization = Buildel.Organizations.get_organization!(organization_id)
+
+    {:ok, collection} =
+      Buildel.Memories.get_organization_collection(organization, collection_name)
+
+    api_key = get_secret_from_context(context_id, collection.embeddings_secret_name)
+
+    vector_db =
+      Buildel.VectorDB.new(%{
+        adapter: Buildel.VectorDB.EctoAdapter,
+        embeddings:
+          Buildel.Clients.Embeddings.new(%{
+            api_type: collection.embeddings_api_type,
+            model: collection.embeddings_model,
+            api_key: api_key
+          })
+      })
+
+    {:ok, vector_db}
+  end
+
+  @impl true
+  def get_secret_from_context(context_id, secret_name) do
+    with %{global: organization_id} <- context_from_context_id(context_id),
          %Buildel.Organizations.Organization{} = organization <-
            Buildel.Organizations.get_organization!(organization_id),
          {:ok, secret} <- Buildel.Organizations.get_organization_secret(organization, secret_name) do
