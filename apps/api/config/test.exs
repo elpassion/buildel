@@ -57,3 +57,5 @@ config :buildel, Buildel.Vault,
       {Cloak.Ciphers.AES.GCM,
        tag: "AES.GCM.V1", key: Base.decode64!("SXgbxNqc73TsknZpgmCNS51pJAinwb4EA3dnd8kYdup=")}
   ]
+
+config :buildel, :page_url, "http://localhost:3000"
