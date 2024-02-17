@@ -6,6 +6,7 @@ defmodule BuildelWeb.UserController do
   action_fallback(BuildelWeb.FallbackController)
 
   plug(:fetch_current_user)
+
   plug(:require_authenticated_user)
 
   def me(conn, _params) do
