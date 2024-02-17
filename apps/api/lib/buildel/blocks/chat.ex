@@ -384,7 +384,7 @@ defmodule Buildel.Blocks.Chat do
 
     with {:ok, messages} <- fill_messages(state),
          {:ok, _, message} <-
-           chat_gpt().stream_chat(%{
+           chat().stream_chat(%{
              context: %{messages: messages},
              on_content: fn text_chunk ->
                Buildel.BlockPubSub.broadcast_to_io(
@@ -491,7 +491,7 @@ defmodule Buildel.Blocks.Chat do
     end
   end
 
-  defp chat_gpt() do
-    Application.fetch_env!(:buildel, :chat_gpt)
+  defp chat() do
+    Application.fetch_env!(:buildel, :chat)
   end
 end
