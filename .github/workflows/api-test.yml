@@ -1,0 +1,25 @@
+name: Test API
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/api'
+
+defaults:
+  run:
+    working-directory: apps/api
+
+jobs:
+  test:
+    name: Test API
+    runs-on: ubuntu-latest
+    concurrency: deploy-group
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '26'
+          elixir-version: '1.16.1'
+      - run: mix deps.get
+      - run: mix test
