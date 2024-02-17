@@ -9,11 +9,11 @@ config :bcrypt_elixir, :log_rounds, 1
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :buildel, Buildel.Repo,
+  hostname: System.get_env("POSTGRES_HOST", "localhost"),
+  port: String.to_integer(System.get_env("POSTGRES_PORT", "54321")),
   username: System.get_env("POSTGRES_USER", "postgres"),
   password: System.get_env("POSTGRES_PASSWORD", "postgres"),
-  hostname: System.get_env("POSTGRES_HOST", "localhost"),
   database: "buildel_test#{System.get_env("MIX_TEST_PARTITION")}",
-  port: String.to_integer(System.get_env("POSTGRES_PORT", "54321")),
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
