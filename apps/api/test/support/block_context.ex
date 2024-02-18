@@ -35,7 +35,7 @@ defmodule Buildel.BlockContext.Mock do
        embeddings:
          Buildel.Clients.Embeddings.new(%{
            api_key: "",
-           api_type: "openai",
+           api_type: "test",
            model: "text-embedding-ada-002"
          })
      })}
