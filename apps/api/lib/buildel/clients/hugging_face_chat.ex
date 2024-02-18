@@ -11,6 +11,7 @@ defmodule Buildel.Clients.HuggingFaceChat do
         on_end: on_end,
         on_error: _on_error,
         api_key: api_key,
+        on_cost: _on_cost,
         model: model,
         temperature: _temperature,
         tools: _tools
@@ -31,11 +32,11 @@ defmodule Buildel.Clients.HuggingFaceChat do
 
       %{"token" => %{"text" => content}, "generated_text" => _text} ->
         on_content.(content)
-        on_end.(%{})
+        on_end.()
 
       %{"generated_text" => content} ->
         on_content.(content)
-        on_end.(%{})
+        on_end.()
 
       message ->
         Logger.error("Unknown message #{inspect(message)}")

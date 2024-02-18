@@ -46,6 +46,7 @@ defmodule Buildel.Langchain.ChatGptTokenizer do
 
     summary = %Buildel.Langchain.ChatTokenSummary{
       model: tokenizer.model,
+      endpoint: "openai",
       input_tokens:
         input_message_tokens + function_metadata_tokens + output_function_messages_tokens,
       output_tokens: output_text_messages_tokens

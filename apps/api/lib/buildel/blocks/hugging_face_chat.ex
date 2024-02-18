@@ -219,7 +219,10 @@ defmodule Buildel.Blocks.HuggingFaceChat do
           on_tool_content: fn tool_name, content ->
             save_tool_result(pid, tool_name, content)
           end,
-          on_end: fn _chat_token_summary ->
+          on_cost: fn _usage ->
+            nil
+          end,
+          on_end: fn ->
             finish_chat_message(pid)
           end,
           on_error: fn error ->

@@ -4,6 +4,7 @@ defmodule Buildel.Clients.ChatBehaviour do
               on_content: any(),
               on_tool_content: any(),
               on_tool_call: any(),
+              on_cost: any(),
               on_end: any(),
               on_error: any(),
               api_key: String.t(),
@@ -19,7 +20,6 @@ defmodule Buildel.Clients.Chat do
   alias Buildel.Langchain.TokenUsage
   alias Buildel.Langchain.ChatModels.ChatMistralAI
   alias Buildel.LangChain.ChatModels.ChatGoogleAI
-  alias Buildel.Langchain.ChatGptTokenizer
   alias Buildel.Clients.ChatBehaviour
   alias Buildel.LangChain.Chains.LLMChain
   alias Buildel.LangChain.ChatModels.ChatOpenAI
@@ -37,6 +37,7 @@ defmodule Buildel.Clients.Chat do
           on_tool_call: on_tool_call,
           on_end: on_end,
           on_error: on_error,
+          on_cost: on_cost,
           model: model,
           tools: tools
         } = opts
@@ -106,7 +107,14 @@ defmodule Buildel.Clients.Chat do
                  nil
 
                %TokenUsage{} = usage ->
-                 IO.inspect(usage)
+                 token_summary = %Buildel.Langchain.ChatTokenSummary{
+                   input_tokens: usage.prompt_tokens,
+                   output_tokens: usage.completion_tokens,
+                   model: model,
+                   endpoint: opts.endpoint
+                 }
+
+                 on_cost.(token_summary)
                  nil
 
                {:error, reason} ->
@@ -114,15 +122,7 @@ defmodule Buildel.Clients.Chat do
                  nil
              end
            ) do
-      statistics =
-        ChatGptTokenizer.init(model)
-        |> ChatGptTokenizer.count_chain_tokens(%{
-          functions: chain.functions,
-          messages: chain.messages,
-          input_messages: chain.custom_context.messages
-        })
-
-      on_end.(statistics)
+      on_end.()
 
       {:ok, chain, message}
     else

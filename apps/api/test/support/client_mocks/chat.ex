@@ -12,11 +12,12 @@ defmodule Buildel.ClientMocks.Chat do
         api_key: _,
         model: _,
         temperature: _,
-        tools: _
+        tools: _,
+        on_cost: _
       }) do
     on_content.("Hell")
     on_content.("o!")
     on_content.(" How are you?")
-    on_end.(Buildel.Langchain.ChatTokenSummary.empty())
+    on_end.()
   end
 end

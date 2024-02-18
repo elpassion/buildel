@@ -416,16 +416,16 @@ defmodule Buildel.Blocks.Chat do
 
                save_tool_result(pid, tool_name, content)
              end,
-             on_end: fn chat_token_summary ->
-               cost =
-                 Buildel.Costs.CostCalculator.calculate_chat_cost(chat_token_summary)
+             on_cost: fn token_summary ->
+               chat_cost = Buildel.Costs.CostCalculator.calculate_chat_cost(token_summary)
 
                block_context().create_run_cost(
                  state[:context_id],
                  state[:block_name],
-                 cost
+                 chat_cost
                )
-
+             end,
+             on_end: fn ->
                finish_chat_message(pid)
              end,
              on_error: fn
