@@ -13,6 +13,7 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
   require Logger
   import Ecto.Changeset
   import LangChain.Utils.ApiOverride
+  alias Buildel.Langchain.TokenUsage
   alias __MODULE__
   alias LangChain.Config
   alias LangChain.ChatModels.ChatModel
@@ -287,6 +288,8 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
     # parse the body and return it as parsed structs
     |> case do
       {:ok, %Req.Response{body: data}} ->
+        call_callback_with_token_usage(data, callback_fn)
+
         case do_process_response(data) do
           {:error, reason} ->
             {:error, reason}
@@ -327,6 +330,22 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
     |> Req.post(into: Utils.handle_stream_fn(openai, &do_process_response/1, callback_fn))
     |> case do
       {:ok, %Req.Response{body: data}} ->
+        chain_tokens =
+          Buildel.Langchain.ChatGptTokenizer.init(openai.model)
+          |> Buildel.Langchain.ChatGptTokenizer.count_chain_tokens(%{
+            functions: functions,
+            input_messages: messages,
+            messages: data |> List.flatten()
+          })
+
+        callback_fn.(
+          TokenUsage.new!(%{
+            prompt_tokens: chain_tokens.input_tokens,
+            completion_tokens: chain_tokens.output_tokens,
+            total_tokens: chain_tokens.input_tokens + chain_tokens.output_tokens
+          })
+        )
+
         data
 
       {:error, %LangChainError{message: reason}} ->
@@ -497,4 +516,11 @@ defmodule Buildel.LangChain.ChatModels.ChatOpenAI do
       req
     end
   end
+
+  defp call_callback_with_token_usage(_data, nil), do: nil
+
+  defp call_callback_with_token_usage(%{"usage" => usage}, callback_fn) when is_map(usage),
+    do: callback_fn.(TokenUsage.new!(usage))
+
+  defp call_callback_with_token_usage(_data, _callback_fn), do: nil
 end

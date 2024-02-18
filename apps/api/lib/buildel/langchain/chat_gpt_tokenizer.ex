@@ -14,42 +14,38 @@ defmodule Buildel.Langchain.ChatGptTokenizer do
 
   def count_chain_tokens(%__MODULE__{} = tokenizer, %{
         functions: functions,
-        messages: messages,
+        messages: output_messages,
         input_messages: input_messages
       }) do
     function_metadata_tokens =
       functions
-      |> Enum.map(&count_function_tokens(tokenizer, &1))
+      |> Enum.map(fn function -> count_function_tokens(tokenizer, function) + 4 end)
       |> Enum.sum()
+
+    function_metadata_tokens =
+      if function_metadata_tokens > 0 do
+        function_metadata_tokens + 4
+      else
+        function_metadata_tokens
+      end
 
     input_message_tokens =
-      messages
-      |> Enum.take(Enum.count(input_messages))
-      |> Enum.map(&count_message_tokens(tokenizer, &1))
+      input_messages
+      |> Enum.map(fn message -> count_message_tokens(tokenizer, message) + 4 end)
       |> Enum.sum()
 
-    output_messages =
-      messages
-      |> Enum.drop(Enum.count(input_messages))
+    input_message_tokens = input_message_tokens + 3
 
-    output_function_messages_tokens =
+    output_message_tokens =
       output_messages
-      |> Enum.filter(&(&1.function_name != nil && &1.arguments == nil))
-      |> Enum.map(&count_message_tokens(tokenizer, &1))
-      |> Enum.sum()
-
-    output_text_messages_tokens =
-      output_messages
-      |> Enum.filter(&(&1.function_name == nil || &1.arguments != nil))
       |> Enum.map(&count_message_tokens(tokenizer, &1))
       |> Enum.sum()
 
     summary = %Buildel.Langchain.ChatTokenSummary{
       model: tokenizer.model,
       endpoint: "openai",
-      input_tokens:
-        input_message_tokens + function_metadata_tokens + output_function_messages_tokens,
-      output_tokens: output_text_messages_tokens
+      input_tokens: input_message_tokens + function_metadata_tokens,
+      output_tokens: output_message_tokens
     }
 
     Logger.debug("ChatTokenSumary: #{inspect(summary)}")
@@ -57,8 +53,16 @@ defmodule Buildel.Langchain.ChatGptTokenizer do
     summary
   end
 
-  def count_message_tokens(%__MODULE__{}, %{content: nil, function_name: nil}) do
+  def count_message_tokens(%__MODULE__{}, %{content: nil, function_name: nil, arguments: nil}) do
     0
+  end
+
+  def count_message_tokens(%__MODULE__{} = tokenizer, %{
+        content: nil,
+        function_name: nil,
+        arguments: arguments
+      }) do
+    count_text_tokens(tokenizer, arguments)
   end
 
   def count_message_tokens(%__MODULE__{} = tokenizer, %{
@@ -76,14 +80,14 @@ defmodule Buildel.Langchain.ChatGptTokenizer do
       })
       when is_binary(function_name) do
     count_text_tokens(tokenizer, function_name) +
-      count_text_tokens(tokenizer, arguments |> Jason.encode!())
+      count_text_tokens(tokenizer, arguments |> Jason.encode!()) + 7
   end
 
   def count_message_tokens(%__MODULE__{} = tokenizer, %{
         content: content,
         function_name: nil
       }) do
-    count_text_tokens(tokenizer, content) + 7
+    count_text_tokens(tokenizer, content)
   end
 
   def count_message_tokens(%__MODULE__{} = tokenizer, %{
