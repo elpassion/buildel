@@ -1,10 +1,18 @@
 defmodule Buildel.VectorDB do
+  alias __MODULE__
   alias Buildel.Utils.TelemetryWrapper
   alias Buildel.Clients.Embeddings
   use TelemetryWrapper
   @enforce_keys [:adapter, :embeddings]
   defstruct [:adapter, :embeddings]
 
+  @type t :: %VectorDB{}
+
+  @spec new(%{
+          :adapter => Buildel.VectorDB.VectorDBAdapterBehaviour,
+          :embeddings => Buildel.Clients.Embeddings.t(),
+          optional(any()) => any()
+        }) :: t()
   def new(%{adapter: adapter, embeddings: embeddings}) do
     %__MODULE__{adapter: adapter, embeddings: embeddings}
   end

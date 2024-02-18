@@ -31,7 +31,7 @@ defmodule BuildelWeb.OrganizationModelControllerTest do
                %{"api_type" => "openai", "id" => "gpt-3.5-turbo", "name" => "GPT-3.5 Turbo"},
                %{
                  "api_type" => "openai",
-                 "id" => "gpt-3.5-turbo-1106",
+                 "id" => "gpt-3.5-turbo-0125",
                  "name" => "GPT-3.5 Turbo Preview"
                },
                %{

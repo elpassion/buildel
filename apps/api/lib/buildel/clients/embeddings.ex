@@ -18,12 +18,8 @@ defmodule Buildel.Clients.Embeddings do
     })
   end
 
-  def get_embeddings(%__MODULE__{api_type: "test"}) do
-    {:ok,
-     [
-       Enum.map(1..100, fn _ -> Enum.map(1..100, fn _ -> :rand.uniform() end) end),
-       Enum.map(1..100, fn _ -> Enum.map(1..100, fn _ -> :rand.uniform() end) end)
-     ]}
+  def get_embeddings(%__MODULE__{api_type: "test"}, inputs) do
+    {:ok, inputs |> Enum.map(fn _ -> Enum.map(1..100, fn _ -> :rand.uniform() end) end)}
   end
 
   def get_config(%__MODULE__{api_type: "openai", model: model}) do

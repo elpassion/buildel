@@ -88,7 +88,12 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
 
       conn =
         post(conn, ~p"/api/organizations/#{organization.id}/memory_collections", %{
-          collection_name: "topic"
+          collection_name: "topic",
+          embeddings: %{
+            api_type: "openai",
+            model: "text-embedding-ada-002",
+            secret_name: "some name"
+          }
         })
 
       assert json_response(conn, 404)["errors"] != %{}
@@ -103,7 +108,12 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
 
       conn =
         post(conn, ~p"/api/organizations/#{organization.id}/memory_collections", %{
-          collection_name: collection_name
+          collection_name: collection_name,
+          embeddings: %{
+            api_type: "openai",
+            model: "text-embedding-ada-002",
+            secret_name: "some name"
+          }
         })
 
       assert %{
@@ -123,7 +133,12 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
 
       conn =
         post(conn, ~p"/api/organizations/#{organization.id}/memory_collections", %{
-          collection_name: collection_name
+          collection_name: collection_name,
+          embeddings: %{
+            api_type: "openai",
+            model: "text-embedding-ada-002",
+            secret_name: "some name"
+          }
         })
 
       assert %{
