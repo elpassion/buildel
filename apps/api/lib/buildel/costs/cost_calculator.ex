@@ -16,16 +16,24 @@ defmodule Buildel.Costs.CostCalculator do
   defp prices({endpoint, model} = api_model) do
     %{
       {"https://api.openai.com/v1/chat/completions", "gpt-3.5-turbo"} => %{
-        input_token_price: Decimal.new("0.0030") |> Decimal.div(1000),
-        output_token_price: Decimal.new("0.0060") |> Decimal.div(1000)
+        input_token_price: Decimal.new("0.0015") |> Decimal.div(1000),
+        output_token_price: Decimal.new("0.0020") |> Decimal.div(1000)
       },
       {"https://api.openai.com/v1/chat/completions", "gpt-3.5-turbo-1106"} => %{
         input_token_price: Decimal.new("0.0010") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.0020") |> Decimal.div(1000)
       },
+      {"https://api.openai.com/v1/chat/completions", "gpt-3.5-turbo-0125"} => %{
+        input_token_price: Decimal.new("0.0005") |> Decimal.div(1000),
+        output_token_price: Decimal.new("0.0015") |> Decimal.div(1000)
+      },
       {"https://api.openai.com/v1/chat/completions", "gpt-4"} => %{
         input_token_price: Decimal.new("0.03") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.06") |> Decimal.div(1000)
+      },
+      {"https://api.openai.com/v1/chat/completions", "gpt-4-32k"} => %{
+        input_token_price: Decimal.new("0.06") |> Decimal.div(1000),
+        output_token_price: Decimal.new("0.12") |> Decimal.div(1000)
       },
       {"https://api.openai.com/v1/chat/completions", "gpt-4-1106-preview"} => %{
         input_token_price: Decimal.new("0.01") |> Decimal.div(1000),
