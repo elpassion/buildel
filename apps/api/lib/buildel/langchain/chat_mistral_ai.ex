@@ -3,6 +3,7 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
   require Logger
   import Ecto.Changeset
   import LangChain.Utils.ApiOverride
+  alias Buildel.Langchain.TokenUsage
   alias LangChain.ForOpenAIApi
   alias __MODULE__
   alias LangChain.Config
@@ -239,7 +240,9 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
       headers: get_headers(mistral),
       receive_timeout: mistral.receive_timeout
     )
-    |> Req.post(into: Utils.handle_stream_fn(mistral, &do_process_response/1, callback_fn))
+    |> Req.post(
+      into: Utils.handle_stream_fn(mistral, &do_process_response(&1, callback_fn), callback_fn)
+    )
     |> case do
       {:ok, %Req.Response{body: data}} ->
         data
@@ -264,6 +267,11 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
     end
   end
 
+  def do_process_response(data, callback_fn) do
+    call_callback_with_token_usage(data, callback_fn)
+    do_process_response(data)
+  end
+
   # Parse a new message response
   @doc false
   @spec do_process_response(data :: %{String.t() => any()} | {:error, any()}) ::
@@ -272,7 +280,7 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
           | MessageDelta.t()
           | [MessageDelta.t()]
           | {:error, String.t()}
-  def do_process_response(%{"choices" => choices}) when is_list(choices) do
+  def do_process_response(%{"choices" => choices} = _msg) when is_list(choices) do
     # process each response individually. Return a list of all processed choices
     for choice <- choices do
       do_process_response(choice)
@@ -301,18 +309,8 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
           nil
       end
 
-    # more explicitly interpret the role. We treat a "function_call" as a a role
-    # while OpenAI addresses it as an "assistant". Technically, they are correct
-    # that the assistant is issuing the function_call.
-    role =
-      case delta_body do
-        %{"role" => role} -> role
-        _other -> "unknown"
-      end
-
     data =
       delta_body
-      |> Map.put("role", role)
       |> Map.put("index", index)
       |> Map.put("status", status)
 
@@ -370,4 +368,11 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
     Logger.error("Trying to process an unexpected response. #{inspect(other)}")
     {:error, "Unexpected response"}
   end
+
+  defp call_callback_with_token_usage(_data, nil), do: nil
+
+  defp call_callback_with_token_usage(%{"usage" => usage}, callback_fn) when is_map(usage),
+    do: callback_fn.(TokenUsage.new!(usage))
+
+  defp call_callback_with_token_usage(_data, _callback_fn), do: nil
 end

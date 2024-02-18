@@ -16,6 +16,7 @@ end
 
 defmodule Buildel.Clients.Chat do
   require Logger
+  alias Buildel.Langchain.TokenUsage
   alias Buildel.Langchain.ChatModels.ChatMistralAI
   alias Buildel.LangChain.ChatModels.ChatGoogleAI
   alias Buildel.Langchain.ChatGptTokenizer
@@ -102,6 +103,10 @@ defmodule Buildel.Clients.Chat do
                  end
 
                %Message{} ->
+                 nil
+
+               %TokenUsage{} = usage ->
+                 IO.inspect(usage)
                  nil
 
                {:error, reason} ->
