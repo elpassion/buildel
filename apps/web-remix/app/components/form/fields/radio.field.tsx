@@ -7,7 +7,7 @@ import {
 import { useControlField } from "remix-validated-form";
 
 export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
-  ({ defaultValue, ...props }, ref) => {
+  ({ defaultValue, onChange, ...props }, ref) => {
     const { name, getInputProps, validate } = useFieldContext();
     const [formValue, setFormValue] = useControlField<string>(name);
 
@@ -27,8 +27,9 @@ export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
         onChange={(e) => {
           setFormValue(e.target.value);
           validate();
+          onChange?.(e);
         }}
       />
     );
-  },
+  }
 );
