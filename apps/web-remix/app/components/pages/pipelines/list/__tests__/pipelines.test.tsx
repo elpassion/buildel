@@ -10,9 +10,9 @@ import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { render, screen, waitFor } from "~/tests/render";
 import { server } from "~/tests/server.mock";
 import { PipelinesPage } from "../page";
-import { loader } from "../loader";
-import { action } from "../action";
-import { action as newPipelineAction } from "../../new/action";
+import { loader } from "../loader.server";
+import { action } from "../action.server";
+import { action as newPipelineAction } from "../../new/action.server";
 import { emptyHandlers, handlers } from "./pipelines.handlers";
 import { ListHandle } from "~/tests/handles/List.handle";
 import { NewPipelinePage } from "../../new/page";
@@ -44,7 +44,7 @@ describe(PipelinesPage.name, () => {
     });
 
     await waitFor(() =>
-      screen.findByRole("button", { name: /Build a new AI workflow/i })
+      screen.findByRole("button", { name: /Build a new AI workflow/i }),
     );
   });
 
@@ -54,13 +54,13 @@ describe(PipelinesPage.name, () => {
     });
 
     const button = await ButtonHandle.fromLabelText(
-      /Remove workflow: AI Chat/i
+      /Remove workflow: AI Chat/i,
     );
 
     await button.click();
 
     const confirmButton = await waitFor(() =>
-      ButtonHandle.fromRole("Delete workflow")
+      ButtonHandle.fromRole("Delete workflow"),
     );
 
     await confirmButton.click();
@@ -76,7 +76,7 @@ describe(PipelinesPage.name, () => {
     });
 
     const button = await ButtonHandle.fromLabelText(
-      /Duplicate workflow: sample-workflow/i
+      /Duplicate workflow: sample-workflow/i,
     );
 
     await button.click();
@@ -92,7 +92,7 @@ describe(PipelinesPage.name, () => {
     });
 
     const button = await ButtonHandle.fromLabelText(
-      /Create workflow: Speech To Text/i
+      /Create workflow: Speech To Text/i,
     );
 
     await button.click();
