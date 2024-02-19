@@ -1,11 +1,16 @@
-import React, { FormEvent, forwardRef, ReactNode, useCallback } from "react";
+import React, {
+  FormEvent,
+  forwardRef,
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+} from "react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useControlField, ValidatedForm } from "remix-validated-form";
-import { Button, InputText, Label } from "@elpassion/taco";
+import { InputText, Label } from "@elpassion/taco";
 import { toSelectOption } from "~/components/form/fields/asyncSelect.field";
 import { asyncSelectApi, IAsyncSelectItem } from "~/api/AsyncSelectApi";
 import { successToast } from "~/components/toasts/successToast";
-import { Schema } from "~/components/form/schema/Schema";
 import { Modal } from "@elpassion/taco/Modal";
 import { useModal } from "~/hooks/useModal";
 import {
@@ -16,12 +21,6 @@ import {
   generateZODSchema,
   JSONSchemaField,
 } from "~/components/form/schema/SchemaParser";
-import {
-  ArrayField,
-  BooleanField,
-  NumberField,
-  StringField,
-} from "~/components/form/schema/SchemaFields";
 import {
   AsyncSelectInput,
   AsyncSelectInputProps,
@@ -35,6 +34,14 @@ export interface CreatableAsyncSelectFieldProps
   supportingText?: ReactNode;
   errorMessage?: ReactNode;
   schema: JSONSchemaField;
+  renderForm: ({
+    onCreate,
+  }: {
+    onCreate: (
+      data: Record<string, any>,
+      e: FormEvent<HTMLFormElement>
+    ) => void;
+  }) => ReactNode;
 }
 
 export const CreatableAsyncSelectField = forwardRef<
@@ -49,14 +56,14 @@ export const CreatableAsyncSelectField = forwardRef<
       errorMessage,
       defaultValue,
       schema: JSONSchema,
+      renderForm,
       ...props
     },
     _ref
   ) => {
     const { name, getInputProps, validate } = useFieldContext();
     const { isModalOpen, openModal, closeModal } = useModal();
-    const schema = generateZODSchema(JSONSchema as any);
-    const validator = React.useMemo(() => withZod(schema), []);
+
     const [selectedId, setSelectedId] = useControlField<string>(name);
 
     const handleSetSelectedId = (id: string) => {
@@ -123,7 +130,7 @@ export const CreatableAsyncSelectField = forwardRef<
           isOpen={isModalOpen}
           onClose={closeModal}
           overlayClassName="!z-[60]"
-          className="w-[90%] min-w-[340px] max-w-[500px]"
+          className="w-[90%] min-w-[340px] md:min-w-[500px]"
           header={
             <header className="p-1 text-white">
               <p className="text-2xl mb-2">{label}</p>
@@ -140,39 +147,40 @@ export const CreatableAsyncSelectField = forwardRef<
               e.stopPropagation();
             }}
           >
-            <ValidatedForm
-              // @ts-ignore
-              validator={validator}
-              className="w-full grow flex flex-col"
-              onSubmit={handleCreate}
-              noValidate
-            >
-              <Schema
-                schema={JSONSchema as any}
-                name={null}
-                fields={{
-                  string: StringField,
-                  number: NumberField,
-                  array: ArrayField,
-                  boolean: BooleanField,
-                  editor: () => <></>,
-                  asyncSelect: () => <></>,
-                  asyncCreatableSelect: () => <></>,
-                }}
-              />
-
-              <SubmitButton
-                size="sm"
-                variant="filled"
-                className="mt-6"
-                isFluid
-              >
-                Create new
-              </SubmitButton>
-            </ValidatedForm>
+            {renderForm({ onCreate: handleCreate })}
           </div>
         </Modal>
       </>
     );
   }
 );
+
+interface CreatableAsyncFormProps {
+  onCreate: (data: Record<string, any>, e: FormEvent<HTMLFormElement>) => void;
+  schema: JSONSchemaField;
+}
+
+export function CreatableAsyncForm({
+  onCreate,
+  schema: JSONSchema,
+  children,
+}: PropsWithChildren<CreatableAsyncFormProps>) {
+  const schema = generateZODSchema(JSONSchema as any);
+  const validator = React.useMemo(() => withZod(schema), []);
+
+  return (
+    <ValidatedForm
+      // @ts-ignore
+      validator={validator}
+      className="w-full grow flex flex-col"
+      onSubmit={onCreate}
+      noValidate
+    >
+      {children}
+
+      <SubmitButton size="sm" variant="filled" className="mt-6" isFluid>
+        Create new
+      </SubmitButton>
+    </ValidatedForm>
+  );
+}

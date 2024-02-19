@@ -6,7 +6,10 @@ import { ValidatedForm, useFormContext } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { MonacoSuggestionEditorField } from "~/components/form/fields/monacoSuggestionEditor.field";
 import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
-import { CreatableAsyncSelectField } from "~/components/form/fields/creatableAsyncSelect.field";
+import {
+  CreatableAsyncForm,
+  CreatableAsyncSelectField,
+} from "~/components/form/fields/creatableAsyncSelect.field";
 import { assert } from "~/utils/assert";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
@@ -177,6 +180,7 @@ export function EditBlockForm({
       }
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const { fieldErrors, getValues } = useFormContext();
+
       const replacedUrl = props.field.url
         .replace("{{organization_id}}", organizationId.toString())
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
@@ -196,6 +200,32 @@ export function EditBlockForm({
             defaultValue={props.field.default
               ?.replace(":pipeline_id", pipelineId.toString())
               ?.replace(":block_name", blockConfig.name)}
+            renderForm={({ onCreate }) => (
+              <CreatableAsyncForm
+                //@ts-ignore
+                schema={props.field.schema}
+                onCreate={onCreate}
+              >
+                <Schema
+                  //@ts-ignore
+                  schema={props.field.schema}
+                  name={null}
+                  fields={{
+                    editor: () => <></>,
+                    string: StringField,
+                    number: NumberField,
+                    array: ArrayField,
+                    boolean: BooleanField,
+                    asyncSelect: (innerProps) => (
+                      <SelectField {...innerProps} />
+                    ),
+                    asyncCreatableSelect: (innerProps) => (
+                      <AsyncCreatableField {...innerProps} />
+                    ),
+                  }}
+                />
+              </CreatableAsyncForm>
+            )}
           />
         </FormField>
       );

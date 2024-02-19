@@ -27,7 +27,7 @@
 }
 
 .rc-select-dropdown{
-    @apply !min-h-fit !bg-neutral-700 !rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !z-[51]
+    @apply !min-h-fit !bg-neutral-700 !rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !z-[61]
 }
 
 .rc-select-dropdown .rc-select-item-empty{
