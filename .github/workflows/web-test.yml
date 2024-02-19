@@ -1,0 +1,28 @@
+name: Web Test
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/web-remix/**'
+
+defaults:
+  run:
+    working-directory: apps/web-remix
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '21.6.2'
+          cache: 'pnpm'
+      - run: pnpm install
+      - run: pnpm test
