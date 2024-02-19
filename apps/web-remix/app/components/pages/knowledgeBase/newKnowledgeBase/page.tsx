@@ -94,14 +94,12 @@ function ApiTypesRadioGroupField({ onChange }: ApiTypesRadioGroupFieldProps) {
 function ModelSelectField() {
   const { organizationId } = useLoaderData<typeof loader>();
   const { fieldErrors, getValues } = useFormContext();
-  const values = getValues();
+  // const values = getValues();
 
   return (
     <FormField name="embeddings.model">
       <AsyncSelectField
-        url={`/api/organizations/${organizationId}/models/embeddings?api_type=${values.get(
-          "embeddings.api_type"
-        )}`}
+        url={`/api/organizations/${organizationId}/models/embeddings?api_type=openai`}
         label="Model"
         supportingText="The model to use for the embeddings."
         errorMessage={fieldErrors["embeddings.model"]}
