@@ -244,6 +244,9 @@ devDependencies:
   autoprefixer:
     specifier: ^10.4.17
     version: 10.4.17(postcss@8.4.35)
+  dotenv:
+    specifier: ^16.4.4
+    version: 16.4.4
   esbuild:
     specifier: ^0.19.2
     version: 0.19.12
@@ -1813,7 +1816,7 @@ packages:
       chalk: 4.1.2
       chokidar: 3.6.0
       cross-spawn: 7.0.3
-      dotenv: 16.4.1
+      dotenv: 16.4.4
       es-module-lexer: 1.4.1
       esbuild: 0.17.6
       esbuild-plugins-node-modules-polyfill: 1.6.2(esbuild@0.17.6)
@@ -4229,8 +4232,8 @@ packages:
       csstype: 3.1.3
     dev: false
 
-  /dotenv@16.4.1:
-    resolution: {integrity: sha512-CjA3y+Dr3FyFDOAMnxZEGtnW9KBR2M0JvvUtXNW+dYJL5ROWxP9DUHCwgFqpMk0OXCc0ljhaNTr2w/kutYIcHQ==}
+  /dotenv@16.4.4:
+    resolution: {integrity: sha512-XvPXc8XAQThSjAbY6cQ/9PcBXmFoWuw1sQ3b8HqUCR6ziGXjkTi//kB9SWa2UwqlgdAIuRqAa/9hVljzPehbYg==}
     engines: {node: '>=12'}
     dev: true
 
