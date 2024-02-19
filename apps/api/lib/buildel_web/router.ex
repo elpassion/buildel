@@ -51,6 +51,12 @@ defmodule BuildelWeb.Router do
       only: [:index]
     )
 
+    resources(
+      "/organizations/:organization_id/models/embeddings",
+      OrganizationModelEmbeddingController,
+      only: [:index]
+    )
+
     resources("/organizations/:organization_id/memberships", OrganizationMembershipController,
       only: [:index, :create]
     )
