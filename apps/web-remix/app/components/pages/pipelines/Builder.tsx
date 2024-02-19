@@ -76,6 +76,7 @@ export const Builder = ({
   onSave,
 }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
+
   const [nodes, setNodes, onNodesChange] = useNodesState(
     getNodes(pipeline.config),
   );
