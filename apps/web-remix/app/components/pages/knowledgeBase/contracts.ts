@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { NotFoundError } from "~/utils/errors.server";
+import { NotFoundError } from "~/utils/errors";
 
 export const KnowledgeBaseFile = z.object({
   id: z.number(),

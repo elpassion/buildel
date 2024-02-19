@@ -1,6 +1,5 @@
+export { page as default, meta } from "~/components/pages/auth/set-password";
 export {
-  action,
   loader,
-  page as default,
-  meta,
-} from "~/components/pages/auth/set-password";
+  action,
+} from "~/components/pages/auth/set-password/index.server";

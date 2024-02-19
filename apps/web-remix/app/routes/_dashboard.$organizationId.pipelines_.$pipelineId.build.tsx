@@ -1,7 +1,5 @@
+export { page as default, meta } from "~/components/pages/pipelines/build";
 export {
-  page as default,
-  action,
   loader,
-  meta,
-  links,
-} from "~/components/pages/pipelines/build/index";
+  action,
+} from "~/components/pages/pipelines/build/index.server";

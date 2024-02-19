@@ -1,6 +1,5 @@
 export {
   page as default,
-  loader,
   meta,
-  links,
 } from "~/components/pages/pipelines/runOverview";
+export { loader } from "~/components/pages/pipelines/runOverview/index.server";

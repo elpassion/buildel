@@ -10,13 +10,16 @@ dependencies:
     version: 0.1.6
   '@elpassion/taco':
     specifier: ^0.6.0
-    version: 0.6.0(@tanstack/react-table@8.11.8)(@types/react-dom@18.2.19)(@types/react-modal@3.16.3)(@types/react@18.2.55)(classnames@2.5.1)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.25.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.8.0)(react@18.2.0)
+    version: 0.6.0(@tanstack/react-table@8.12.0)(@types/react-dom@18.2.19)(@types/react-modal@3.16.3)(@types/react@18.2.55)(classnames@2.5.1)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.25.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.8.0)(react@18.2.0)
   '@fastify/early-hints':
     specifier: ^1.0.1
     version: 1.0.1
   '@fastify/http-proxy':
     specifier: ^9.4.0
     version: 9.4.0
+  '@fastify/middie':
+    specifier: ^8.3.0
+    version: 8.3.0
   '@fastify/static':
     specifier: ^7.0.1
     version: 7.0.1
@@ -26,9 +29,6 @@ dependencies:
   '@monaco-editor/react':
     specifier: ^4.5.2
     version: 4.6.0(monaco-editor@0.46.0)(react-dom@18.2.0)(react@18.2.0)
-  '@remix-run/css-bundle':
-    specifier: 2.5.1
-    version: 2.5.1
   '@remix-run/node':
     specifier: 2.5.1
     version: 2.5.1(typescript@5.3.3)
@@ -47,6 +47,9 @@ dependencies:
   '@tailwindcss/forms':
     specifier: ^0.5.4
     version: 0.5.7(tailwindcss@3.3.3)
+  '@tanstack/react-table':
+    specifier: ^8.12.0
+    version: 8.12.0(react-dom@18.2.0)(react@18.2.0)
   '@types/etag':
     specifier: ^1.8.3
     version: 1.8.3
@@ -174,7 +177,7 @@ dependencies:
 devDependencies:
   '@remix-run/dev':
     specifier: 2.5.1
-    version: 2.5.1(@remix-run/serve@2.5.1)(typescript@5.3.3)
+    version: 2.5.1(@remix-run/serve@2.5.1)(typescript@5.3.3)(vite@5.1.3)
   '@remix-run/eslint-config':
     specifier: 2.5.1
     version: 2.5.1(eslint@8.56.0)(react@18.2.0)(typescript@5.3.3)
@@ -238,6 +241,9 @@ devDependencies:
   '@types/uuid':
     specifier: ^9.0.3
     version: 9.0.8
+  autoprefixer:
+    specifier: ^10.4.17
+    version: 10.4.17(postcss@8.4.35)
   esbuild:
     specifier: ^0.19.2
     version: 0.19.12
@@ -262,6 +268,12 @@ devDependencies:
   typescript:
     specifier: ^5.0.4
     version: 5.3.3
+  vite:
+    specifier: ^5.1.3
+    version: 5.1.3
+  vite-tsconfig-paths:
+    specifier: ^4.3.1
+    version: 4.3.1(typescript@5.3.3)(vite@5.1.3)
   vitest:
     specifier: ^1.2.2
     version: 1.2.2(jsdom@24.0.0)
@@ -701,7 +713,7 @@ packages:
       statuses: 2.0.1
     dev: true
 
-  /@elpassion/taco@0.6.0(@tanstack/react-table@8.11.8)(@types/react-dom@18.2.19)(@types/react-modal@3.16.3)(@types/react@18.2.55)(classnames@2.5.1)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.25.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.8.0)(react@18.2.0):
+  /@elpassion/taco@0.6.0(@tanstack/react-table@8.12.0)(@types/react-dom@18.2.19)(@types/react-modal@3.16.3)(@types/react@18.2.55)(classnames@2.5.1)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.25.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.8.0)(react@18.2.0):
     resolution: {integrity: sha512-JdyCwnHZJ7LY15OytS8h0LuP025zZqJ8KMcowNE1o8zAqN7KyjAn6szRwXzgy7p+yfjnqY1ydP/yFhG6OBPh8w==}
     engines: {node: '>=16'}
     peerDependencies:
@@ -720,7 +732,7 @@ packages:
       react-quill: ^2.0.0
       react-select: ^5.7.0
     dependencies:
-      '@tanstack/react-table': 8.11.8(react-dom@18.2.0)(react@18.2.0)
+      '@tanstack/react-table': 8.12.0(react-dom@18.2.0)(react@18.2.0)
       '@types/react': 18.2.55
       '@types/react-dom': 18.2.19
       '@types/react-modal': 3.16.3
@@ -1319,6 +1331,15 @@ packages:
       fast-deep-equal: 3.1.3
     dev: false
 
+  /@fastify/middie@8.3.0:
+    resolution: {integrity: sha512-h+zBxCzMlkEkh4fM7pZaSGzqS7P9M0Z6rXnWPdUEPfe7x1BCj++wEk/pQ5jpyYY4pF8AknFqb77n7uwh8HdxEA==}
+    dependencies:
+      '@fastify/error': 3.4.1
+      fastify-plugin: 4.5.1
+      path-to-regexp: 6.2.1
+      reusify: 1.0.4
+    dev: false
+
   /@fastify/reply-from@9.7.0:
     resolution: {integrity: sha512-/F1QBl3FGlTqStjmiuoLRDchVxP967TZh6FZPwQteWhdLsDec8mqSACE+cRzw6qHUj3v9hfdd7JNgmb++fyFhQ==}
     dependencies:
@@ -1755,12 +1776,7 @@ packages:
       - immer
     dev: false
 
-  /@remix-run/css-bundle@2.5.1:
-    resolution: {integrity: sha512-QPeNvgD7fj4NmXB9CuGM5Mp0ZtM43dMeda8Ik3AUoQOMgMWb0d4jK4Cye6eoTGwJOron6XISKh0mq8MorucWEQ==}
-    engines: {node: '>=18.0.0'}
-    dev: false
-
-  /@remix-run/dev@2.5.1(@remix-run/serve@2.5.1)(typescript@5.3.3):
+  /@remix-run/dev@2.5.1(@remix-run/serve@2.5.1)(typescript@5.3.3)(vite@5.1.3):
     resolution: {integrity: sha512-IrYhWANubH+WM62Wz55n8NWT5kBqfbyytXDFlP0VoZLrr1IpJf2GtaT4IA+CODMaNoeXeMACOD5Tw5/Y2bO5lA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
@@ -1830,6 +1846,7 @@ packages:
       tar-fs: 2.1.1
       tsconfig-paths: 4.2.0
       typescript: 5.3.3
+      vite: 5.1.3
       ws: 7.5.9
     transitivePeerDependencies:
       - '@types/node'
@@ -2398,20 +2415,20 @@ packages:
       tailwindcss: 3.3.3
     dev: true
 
-  /@tanstack/react-table@8.11.8(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-NEwvIq4iSiDQozEyvbdiSdCOiLa+g5xHmdEnvwDb98FObcK6YkBOkRrs/CNqrKdDy+/lqoIllIWHk+M80GW6+g==}
+  /@tanstack/react-table@8.12.0(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-LlEQ1Gpz4bfpiET+qmle4BhKDgKN3Y/sssc+O/wLqX8HRtjV+nhusYbllZlutZfMR8oeef83whKTj/VhaV8EeA==}
     engines: {node: '>=12'}
     peerDependencies:
       react: '>=16'
       react-dom: '>=16'
     dependencies:
-      '@tanstack/table-core': 8.11.8
+      '@tanstack/table-core': 8.12.0
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@tanstack/table-core@8.11.8:
-    resolution: {integrity: sha512-DECHvtq4YW4U/gqg6etup7ydt/RB1Bi1pJaMpHUXl65ooW1d71Nv7BzD66rUdHrBSNdyiW3PLTPUQlpXjAgDeA==}
+  /@tanstack/table-core@8.12.0:
+    resolution: {integrity: sha512-cq/ylWVrOwixmwNXQjgZaQw1Izf7+nPxjczum7paAnMtwPg1S2qRAJU+Jb8rEBUWm69voC/zcChmePlk2hc6ug==}
     engines: {node: '>=12'}
     dev: false
 
@@ -3088,7 +3105,7 @@ packages:
       lodash: 4.17.21
       mlly: 1.5.0
       outdent: 0.8.0
-      vite: 5.1.1
+      vite: 5.1.3
       vite-node: 1.2.2
     transitivePeerDependencies:
       - '@types/node'
@@ -3431,6 +3448,22 @@ packages:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
     engines: {node: '>=8.0.0'}
     dev: false
+
+  /autoprefixer@10.4.17(postcss@8.4.35):
+    resolution: {integrity: sha512-/cpVNRLSfhOtcGflT13P2794gVSgmPgTR+erw5ifnMLZb0UnSlkK4tquLmkd3BhA+nLo5tX8Cu0upUsGKvKbmg==}
+    engines: {node: ^10 || ^12 || >=14}
+    hasBin: true
+    peerDependencies:
+      postcss: ^8.1.0
+    dependencies:
+      browserslist: 4.22.3
+      caniuse-lite: 1.0.30001585
+      fraction.js: 4.3.7
+      normalize-range: 0.1.2
+      picocolors: 1.0.0
+      postcss: 8.4.35
+      postcss-value-parser: 4.2.0
+    dev: true
 
   /available-typed-arrays@1.0.6:
     resolution: {integrity: sha512-j1QzY8iPNPG4o4xmO3ptzpRxTciqD3MgEHtifP/YnJpIo58Xu+ne4BejlbkuaLfXn/nz6HFiw29bLpj2PNMdGg==}
@@ -5254,6 +5287,10 @@ packages:
     resolution: {integrity: sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==}
     engines: {node: '>= 0.6'}
 
+  /fraction.js@4.3.7:
+    resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
+    dev: true
+
   /fresh@0.5.2:
     resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
     engines: {node: '>= 0.6'}
@@ -5457,6 +5494,10 @@ packages:
       ignore: 5.3.1
       merge2: 1.4.1
       slash: 3.0.0
+    dev: true
+
+  /globrex@0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
     dev: true
 
   /goober@2.1.14(csstype@3.1.3):
@@ -7122,6 +7163,11 @@ packages:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
     engines: {node: '>=0.10.0'}
 
+  /normalize-range@0.1.2:
+    resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
+    engines: {node: '>=0.10.0'}
+    dev: true
+
   /npm-install-checks@6.3.0:
     resolution: {integrity: sha512-W29RiK/xtpCGqn6f3ixfRYGk+zRyr+Ew9F2E20BfXxT5/euLdA/Nm7fO7OeTGuAmTs30cpgInyJ0cYe708YTZw==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
@@ -7471,7 +7517,6 @@ packages:
 
   /path-to-regexp@6.2.1:
     resolution: {integrity: sha512-JLyh7xT1kizaEvcaXOQwOc2/Yhw6KZOvPf1S8401UyLk86CU79LN3vl7ztXGm/pZ+YjoyAJ4rxmHwbkBXJX+yw==}
-    dev: true
 
   /path-type@3.0.0:
     resolution: {integrity: sha512-T2ZUsdZFHgA3u4e5PfPbjd7HDDpxPnQb5jN0SrDsjNSuVXHJqtwTnWqG0B1jZrgmJ/7lj1EmVIByWt1gxGkWvg==}
@@ -9169,6 +9214,19 @@ packages:
   /ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
+  /tsconfck@3.0.2(typescript@5.3.3):
+    resolution: {integrity: sha512-6lWtFjwuhS3XI4HsX4Zg0izOI3FU/AI9EGVlPEUMDIhvLPMD4wkiof0WCoDgW7qY+Dy198g4d9miAqUHWHFH6Q==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 5.3.3
+    dev: true
+
   /tsconfig-paths@3.15.0:
     resolution: {integrity: sha512-2Ac2RgzDe/cn48GvOe3M+o82pEFewD3UPbyoUHHdKasHwJKjds4fLXWf/Ux5kATBKN20oaFGu+jbElp1pos0mg==}
     dependencies:
@@ -9524,7 +9582,7 @@ packages:
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.1.1
+      vite: 5.1.3
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -9536,8 +9594,25 @@ packages:
       - terser
     dev: true
 
-  /vite@5.1.1:
-    resolution: {integrity: sha512-wclpAgY3F1tR7t9LL5CcHC41YPkQIpKUGeIuT8MdNwNZr6OqOTLs7JX5vIHAtzqLWXts0T+GDrh9pN2arneKqg==}
+  /vite-tsconfig-paths@4.3.1(typescript@5.3.3)(vite@5.1.3):
+    resolution: {integrity: sha512-cfgJwcGOsIxXOLU/nELPny2/LUD/lcf1IbfyeKTv2bsupVbTH/xpFtdQlBmIP1GEK2CjjLxYhFfB+QODFAx5aw==}
+    peerDependencies:
+      vite: '*'
+    peerDependenciesMeta:
+      vite:
+        optional: true
+    dependencies:
+      debug: 4.3.4
+      globrex: 0.1.2
+      tsconfck: 3.0.2(typescript@5.3.3)
+      vite: 5.1.3
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+    dev: true
+
+  /vite@5.1.3:
+    resolution: {integrity: sha512-UfmUD36DKkqhi/F75RrxvPpry+9+tTkrXfMNZD+SboZqBCMsxKtO52XeGzzuh7ioz+Eo/SYDBbdb0Z7vgcDJew==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -9615,7 +9690,7 @@ packages:
       strip-literal: 1.3.0
       tinybench: 2.6.0
       tinypool: 0.8.2
-      vite: 5.1.1
+      vite: 5.1.3
       vite-node: 1.2.2
       why-is-node-running: 2.2.2
     transitivePeerDependencies:

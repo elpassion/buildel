@@ -1,20 +1,11 @@
-import React from "react";
-import type { LinksFunction } from "@remix-run/node";
 import { Outlet, useLoaderData, useSearchParams } from "@remix-run/react";
-import editorStyles from "~/components/editor/editor.styles.css";
-import flowStyles from "reactflow/dist/style.css";
-import { routes } from "~/utils/routes.utils";
-import { TabGroup } from "~/components/tabs/TabGroup";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { FilledTabLink } from "~/components/tabs/FilledTabLink";
 import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
+import { TabGroup } from "~/components/tabs/TabGroup";
+import { routes } from "~/utils/routes.utils";
 import { AliasSelect, CreateAliasForm, RestoreWorkflow } from "./Aliases";
-import { loader } from "./loader";
-
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: flowStyles },
-  { rel: "stylesheet", href: editorStyles },
-];
+import { loader } from "./loader.server";
 
 export function PipelineLayout() {
   const { pipeline, aliases, aliasId } = useLoaderData<typeof loader>();
@@ -47,7 +38,7 @@ export function PipelineLayout() {
               to={routes.pipelineBuild(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams)
+                Object.fromEntries(searchParams),
               )}
             >
               Build
@@ -56,7 +47,7 @@ export function PipelineLayout() {
               to={routes.pipelineRuns(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams)
+                Object.fromEntries(searchParams),
               )}
             >
               Overview
@@ -65,7 +56,7 @@ export function PipelineLayout() {
               to={routes.pipelineInterface(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams)
+                Object.fromEntries(searchParams),
               )}
             >
               Interface
@@ -74,7 +65,7 @@ export function PipelineLayout() {
               to={routes.pipelineSettings(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams)
+                Object.fromEntries(searchParams),
               )}
             >
               Settings

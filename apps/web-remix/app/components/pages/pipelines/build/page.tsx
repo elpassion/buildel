@@ -19,14 +19,11 @@ import { Builder } from "../Builder";
 import { PasteBlockConfigProvider } from "./CreateBlock/PasteBlockConfigProvider";
 import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
 import { PasteBlockConfiguration } from "./CreateBlock/PastConfigSidebar";
-import { links as SubMenuLinks } from "./CreateBlock/GroupSubMenu";
 import { BuilderHeader, SaveChangesButton } from "./BuilderHeader";
 import { BuilderNode } from "./BuilderNode";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { AliasNode } from "~/components/pages/pipelines/build/AliasNode";
 import isEqual from "lodash.isequal";
-
-export const links: LinksFunction = () => [...SubMenuLinks()];
 
 export function PipelineBuilder() {
   const revalidator = useRevalidator();
@@ -37,7 +34,7 @@ export function PipelineBuilder() {
 
   const navigate = useNavigate();
   const match = useMatch(
-    "/:organizationId/pipelines/:pipelineId/build/blocks/:blockName"
+    "/:organizationId/pipelines/:pipelineId/build/blocks/:blockName",
   );
   const isSidebarOpen = !!match;
 
@@ -46,10 +43,10 @@ export function PipelineBuilder() {
       if (isEqual(pipeline.config, config)) return;
       updateFetcher.submit(
         { ...pipeline, config: { ...config } },
-        { method: "PUT", encType: "application/json" }
+        { method: "PUT", encType: "application/json" },
       );
     },
-    [updateFetcher, pipeline]
+    [updateFetcher, pipeline],
   );
 
   const handleRevalidate = () => {
@@ -61,8 +58,8 @@ export function PipelineBuilder() {
       routes.pipelineBuild(
         organizationId,
         pipelineId,
-        Object.fromEntries(searchParams.entries())
-      )
+        Object.fromEntries(searchParams.entries()),
+      ),
     );
   };
 

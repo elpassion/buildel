@@ -3,7 +3,7 @@ import { MetaFunction } from "@remix-run/node";
 import { ApiKey } from "./ApiKey";
 import { AboutOrganization } from "./AboutOrganization";
 import { Outlet, useLoaderData, useMatch, useNavigate } from "@remix-run/react";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { Memberships } from "./Memberships";
 import {
   ActionSidebar,

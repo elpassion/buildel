@@ -17,13 +17,13 @@ import {
   SectionContent,
   SectionHeading,
 } from "../settingsLayout/PageLayout";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
 export function ProfileSettingsPage() {
   const { organization } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const match = useMatch(
-    routes.profileSettingsChangePassword(organization.data.id)
+    routes.profileSettingsChangePassword(organization.data.id),
   );
   const isSidebarOpen = !!match;
 

@@ -1,6 +1,8 @@
 export {
   page as default,
-  loader,
-  action,
   meta,
 } from "~/components/pages/settings/profile/changePassword";
+export {
+  loader,
+  action,
+} from "~/components/pages/settings/profile/changePassword/index.server";

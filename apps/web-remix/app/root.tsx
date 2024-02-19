@@ -1,10 +1,8 @@
 import { withSentry } from "@sentry/remix";
-import { cssBundleHref } from "@remix-run/css-bundle";
 import type { LinksFunction } from "@remix-run/node";
 import {
   isRouteErrorResponse,
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -12,24 +10,11 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import { Toaster } from "~/components/toasts/Toaster";
-import menuStyles from "rc-menu/assets/index.css";
-import selectStyles from "~/components/form/inputs/select/select.input.css";
-import styles from "./tailwind.css";
+import "./tailwind.css";
 import { GlobalNotFound } from "~/components/errorBoundaries/GlobalNotFound";
 import { GlobalRuntime } from "~/components/errorBoundaries/GlobalRuntime";
 
 export const links: LinksFunction = () => [
-  ...(cssBundleHref
-    ? [
-        { rel: "stylesheet", href: cssBundleHref },
-        { rel: "stylesheet", href: menuStyles },
-        { rel: "stylesheet", href: selectStyles },
-      ]
-    : [
-        { rel: "stylesheet", href: styles },
-        { rel: "stylesheet", href: menuStyles },
-        { rel: "stylesheet", href: selectStyles },
-      ]),
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -65,7 +50,6 @@ function App() {
         <Outlet />
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );

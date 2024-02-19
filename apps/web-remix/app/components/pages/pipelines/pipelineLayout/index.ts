@@ -1,3 +1,1 @@
-export { loader } from "./loader";
-export { action } from "./action";
-export { PipelineLayout as page, links } from "./page";
+export { PipelineLayout as page } from "./page";

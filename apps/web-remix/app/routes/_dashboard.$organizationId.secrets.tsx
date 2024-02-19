@@ -1,6 +1,2 @@
-export {
-  page as default,
-  loader,
-  meta,
-  action,
-} from "~/components/pages/secrets/list";
+export { page as default, meta } from "~/components/pages/secrets/list";
+export { loader, action } from "~/components/pages/secrets/list/index.server";

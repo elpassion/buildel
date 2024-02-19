@@ -42,8 +42,8 @@ COPY ./pnpm-lock.yaml /app/pnpm-lock.yaml
 COPY ./remix.config.js /app/remix.config.js
 COPY ./server.mjs /app/server.mjs
 
-COPY --from=build /app/build /app/build
-COPY --from=build /app/public /app/public
+COPY --from=build /app/build/server /app/build/server
+COPY --from=build /app/build/client /app/build/client
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs

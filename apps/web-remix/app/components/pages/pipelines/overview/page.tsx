@@ -7,7 +7,7 @@ import { useInfiniteFetch } from "~/components/pagination/useInfiniteFetch";
 import { IPipelineRun } from "~/components/pages/pipelines/pipeline.types";
 import { LoadMoreButton } from "~/components/pagination/LoadMoreButton";
 import { routes } from "~/utils/routes.utils";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
 export function OverviewPage() {
   const { ref: fetchNextRef, inView } = useInView();

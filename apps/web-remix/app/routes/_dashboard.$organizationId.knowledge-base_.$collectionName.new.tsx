@@ -1,5 +1,5 @@
 export {
   page as default,
   meta,
-  loader,
 } from "~/components/pages/knowledgeBase/newCollectionFiles";
+export { loader } from "~/components/pages/knowledgeBase/newCollectionFiles/index.server";

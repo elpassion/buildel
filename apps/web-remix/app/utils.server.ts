@@ -12,7 +12,7 @@ import {
   UnauthorizedError,
   UnknownAPIError,
   ValidationError,
-} from "./utils/errors.server";
+} from "./utils/errors";
 import { fetchTyped } from "./utils/fetch.server";
 import { setServerToast } from "./utils/toast.server";
 import { logout } from "~/session.server";
@@ -20,7 +20,7 @@ import { getCurrentUserOrNull } from "./utils/currentUser.server";
 
 export const loaderBuilder =
   <T>(
-    fn: (args: LoaderFunctionArgs, helpers: { fetch: typeof fetchTyped }) => T
+    fn: (args: LoaderFunctionArgs, helpers: { fetch: typeof fetchTyped }) => T,
   ) =>
   async (args: LoaderFunctionArgs) => {
     const notFound = () => json(null, { status: 404 });
@@ -38,7 +38,7 @@ export const loaderBuilder =
                 error: "Unknown API error",
               }),
             },
-          }
+          },
         );
       } else if (e instanceof NotFoundError) {
         throw notFound();
@@ -65,7 +65,7 @@ export const loaderBuilder =
 
 type ActionHandler<T> = (
   args: ActionFunctionArgs,
-  helpers: { fetch: typeof fetchTyped }
+  helpers: { fetch: typeof fetchTyped },
 ) => Promise<T>;
 
 export const actionBuilder =
@@ -141,7 +141,7 @@ export const actionBuilder =
                 error: "Unknown API error",
               }),
             },
-          }
+          },
         );
       }
       console.error(e);
@@ -152,7 +152,7 @@ export const actionBuilder =
   };
 
 async function requestFetchTyped(
-  actionArgs: ActionFunctionArgs
+  actionArgs: ActionFunctionArgs,
 ): Promise<typeof fetchTyped> {
   const { user } = await getCurrentUserOrNull(actionArgs.request);
   return (schema, url, options) => {
@@ -167,8 +167,8 @@ async function requestFetchTyped(
           },
           requestCacheId: user?.id.toString() || null,
         },
-        options || {}
-      )
+        options || {},
+      ),
     );
   };
 }

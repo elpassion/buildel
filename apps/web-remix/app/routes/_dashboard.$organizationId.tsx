@@ -8,7 +8,7 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import classNames from "classnames";
-import { MenuInfo } from "rc-menu/es/interface";
+import type { MenuInfo } from "rc-menu/es/interface";
 import { PropsWithChildren, useCallback, useRef, useState } from "react";
 import Modal from "react-modal";
 import invariant from "tiny-invariant";
@@ -41,9 +41,8 @@ export async function loader(loaderArgs: DataFunctionArgs) {
     const organizationsResponse = await organizationApi.getOrganizations();
 
     const organization = organizationsResponse.data.data.find(
-      (org) => org.id === Number(params.organizationId)
+      (org) => org.id === Number(params.organizationId),
     );
-
 
     let { cookie, ...toasts } = await getServerToast(request);
 
@@ -69,7 +68,7 @@ export async function loader(loaderArgs: DataFunctionArgs) {
         headers: {
           "Set-Cookie": cookie,
         },
-      }
+      },
     );
   })(loaderArgs);
 }
@@ -139,7 +138,7 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
         "gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]",
         {
           "!px-0": !isCollapsed,
-        }
+        },
       )}
     >
       <div className="flex flex-col gap-1">

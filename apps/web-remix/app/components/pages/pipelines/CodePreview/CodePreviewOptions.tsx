@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { MenuInfo } from "rc-menu/es/interface";
+import type { MenuInfo } from "rc-menu/es/interface";
 import { useOnClickOutside } from "usehooks-ts";
 import { Icon } from "@elpassion/taco";
 import { Menu } from "~/components/menu/Menu";

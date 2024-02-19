@@ -22,7 +22,7 @@ import {
 } from "~/components/sidebar/ActionSidebar";
 import { OrganizationAvatar } from "~/components/pages/settings/organization/AboutOrganization";
 import { BasicLink } from "~/components/link/BasicLink";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
 export function SettingsPage() {
   const { pipeline, organizationId, pipelineId } =
@@ -40,12 +40,12 @@ export function SettingsPage() {
           "?index",
       });
     },
-    [updateFetcher]
+    [updateFetcher],
   );
 
   const navigate = useNavigate();
   const match = useMatch(
-    routes.pipelineSettingsConfiguration(organizationId, pipelineId)
+    routes.pipelineSettingsConfiguration(organizationId, pipelineId),
   );
   const isSidebarOpen = !!match;
 
@@ -54,8 +54,8 @@ export function SettingsPage() {
       routes.pipelineSettings(
         organizationId,
         pipelineId,
-        Object.fromEntries(searchParams.entries())
-      )
+        Object.fromEntries(searchParams.entries()),
+      ),
     );
   };
 
@@ -69,7 +69,7 @@ export function SettingsPage() {
             to={routes.pipelineSettingsConfiguration(
               organizationId,
               pipelineId,
-              Object.fromEntries(searchParams.entries())
+              Object.fromEntries(searchParams.entries()),
             )}
           >
             Workflow configuration

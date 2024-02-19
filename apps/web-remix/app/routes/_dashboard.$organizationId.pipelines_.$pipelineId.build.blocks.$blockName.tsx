@@ -1,5 +1,5 @@
 export {
   page as default,
-  loader,
   meta,
-} from "~/components/pages/pipelines/build/editBlock/index";
+} from "~/components/pages/pipelines/build/editBlock";
+export { loader } from "~/components/pages/pipelines/build/editBlock/index.server";

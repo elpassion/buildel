@@ -6,7 +6,7 @@ import { routes } from "~/utils/routes.utils";
 import { TabGroup } from "~/components/tabs/TabGroup";
 import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
 import { FilledTabLink } from "~/components/tabs/FilledTabLink";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
 export function PipelineRunLayout() {
   const [searchParams] = useSearchParams();
@@ -22,7 +22,7 @@ export function PipelineRunLayout() {
               to={routes.pipelineRuns(
                 organizationId,
                 pipelineId,
-                Object.fromEntries(searchParams.entries())
+                Object.fromEntries(searchParams.entries()),
               )}
             >
               <Icon iconName="arrow-left" className="text-2xl" />
@@ -44,7 +44,7 @@ export function PipelineRunLayout() {
                 organizationId,
                 pipelineId,
                 runId,
-                Object.fromEntries(searchParams.entries())
+                Object.fromEntries(searchParams.entries()),
               )}
             >
               Overview
@@ -54,7 +54,7 @@ export function PipelineRunLayout() {
                 organizationId,
                 pipelineId,
                 runId,
-                Object.fromEntries(searchParams.entries())
+                Object.fromEntries(searchParams.entries()),
               )}
             >
               Costs details

@@ -7,7 +7,7 @@ import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
 import { routes } from "~/utils/routes.utils";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
 export function SettingsLayout() {
   const { organizationId } = useLoaderData<typeof loader>();

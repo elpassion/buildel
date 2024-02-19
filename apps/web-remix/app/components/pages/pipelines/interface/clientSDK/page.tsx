@@ -14,7 +14,7 @@ import {
   PreviewSectionStep,
   PreviewSectionText,
 } from "../PreviewSection";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
 export function ClientSDKPage() {
   const { organizationId, pipelineId } = useLoaderData<typeof loader>();

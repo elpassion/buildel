@@ -6,8 +6,8 @@ import { InputHandle } from "~/tests/handles/Input.handle";
 import { render, screen, waitFor } from "~/tests/render";
 import { server } from "~/tests/server.mock";
 import { LoginPage } from "../page";
-import { loader } from "../loader";
-import { action } from "../action";
+import { loader } from "../loader.server";
+import { action } from "../action.server";
 import { errorHandlers, handlers } from "./login.handlers";
 
 describe(LoginPage.name, () => {

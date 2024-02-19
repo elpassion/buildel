@@ -12,7 +12,7 @@ import {
   PasswordInputField,
   TextInputField,
 } from "~/components/form/fields/text.field";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { GoogleButton } from "~/components/googleAuth/GoogleButton";
 import { routes } from "~/utils/routes.utils";
 

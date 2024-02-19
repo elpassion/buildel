@@ -10,7 +10,7 @@ import {
   ChatbotSectionHeaderParagraph,
   ChatbotSectionHeading,
 } from "../websiteChatbot/ChatbotSectionHeading";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
 export function OpenAIApiPage() {
   const { organizationId, pipelineId, apiUrl } = useLoaderData<typeof loader>();

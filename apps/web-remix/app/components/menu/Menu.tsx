@@ -1,15 +1,12 @@
-import React from "react";
-import RcMenu, { MenuProps } from "rc-menu";
-import classNames from "classnames";
+import { MenuProps } from "rc-menu";
+import { Suspense, lazy } from "react";
 
-export const Menu: React.FC<MenuProps> = ({ className, ...rest }) => {
+const AsyncMenu = lazy(() => import("./MenuImpl"));
+
+export const Menu: React.FC<MenuProps> = (props) => {
   return (
-    <RcMenu
-      className={classNames(
-        "border border-neutral-100 bg-neutral-700 !rounded-lg !shadow-none !p-0 overflow-hidden divide-y divide-solid",
-        className
-      )}
-      {...rest}
-    />
+    <Suspense fallback={null}>
+      <AsyncMenu {...props} />
+    </Suspense>
   );
 };

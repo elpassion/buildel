@@ -5,7 +5,7 @@ import { Form, useLoaderData, useRevalidator } from "@remix-run/react";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import { IFileUpload } from "~/components/fileUpload/fileUpload.types";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
 type IExtendedFileUpload = IFileUpload & { file: File };
 export function NewCollectionFilesPage() {
@@ -15,7 +15,7 @@ export function NewCollectionFilesPage() {
   const [items, setItems] = useState<IExtendedFileUpload[]>([]);
 
   const isUploading = items.some(
-    (fileUpload) => fileUpload.status === "uploading"
+    (fileUpload) => fileUpload.status === "uploading",
   );
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -41,7 +41,7 @@ export function NewCollectionFilesPage() {
 
   const handleUpdateStatus = (
     id: number,
-    status: "done" | "error" | "uploading"
+    status: "done" | "error" | "uploading",
   ) => {
     setItems((prev) =>
       prev.map((fileUpload) => {
@@ -50,7 +50,7 @@ export function NewCollectionFilesPage() {
         }
 
         return fileUpload;
-      })
+      }),
     );
   };
 
@@ -67,7 +67,7 @@ export function NewCollectionFilesPage() {
         {
           body: formData,
           method: "POST",
-        }
+        },
       ).then((res) => res.json());
 
       handleUpdateStatus(fileUpload.id, "done");

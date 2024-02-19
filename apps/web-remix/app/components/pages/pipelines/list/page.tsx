@@ -9,7 +9,7 @@ import {
 } from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
 import { Button } from "@elpassion/taco";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { PipelinesNavbar } from "./PipelinesNavbar";
 import { PipelinesList } from "./PipelinesList";
 import { generateTemplates, sampleTemplates } from "./workflowTemplates.utils";

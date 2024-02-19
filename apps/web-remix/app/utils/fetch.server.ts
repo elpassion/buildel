@@ -4,7 +4,7 @@ import {
   UnauthorizedError,
   UnknownAPIError,
   ValidationError,
-} from "./errors.server";
+} from "./errors";
 import merge from "lodash.merge";
 import { LRUCache } from "lru-cache";
 
@@ -13,7 +13,7 @@ const cache = new LRUCache<string, Response>({ max: 500 });
 export async function fetchTyped<T extends ZodType>(
   schema: T,
   url: string,
-  options?: (RequestInit & { requestCacheId?: string | null }) | undefined
+  options?: (RequestInit & { requestCacheId?: string | null }) | undefined,
 ): Promise<ParsedResponse<z.infer<T>>> {
   let cachedResponse: Response | undefined;
   if (
@@ -30,10 +30,10 @@ export async function fetchTyped<T extends ZodType>(
         connection: "keep-alive",
         "if-none-match": cachedResponse?.headers.get("etag"),
       },
-    })
+    }),
   ).catch((e) => {
     console.error(
-      `Failed to connect to API error: ${e} during request to ${url}`
+      `Failed to connect to API error: ${e} during request to ${url}`,
     );
     throw new UnknownAPIError();
   });
@@ -80,7 +80,7 @@ type ParsedResponse<T> = Response & { data: T };
 
 function deepMergeAPIErrors(
   errors: Record<string, APIErrorField>,
-  contextKey = ""
+  contextKey = "",
 ): Record<string, ErrorField> {
   const result: Record<string, ErrorField> = {};
 

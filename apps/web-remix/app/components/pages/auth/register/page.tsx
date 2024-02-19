@@ -12,7 +12,7 @@ import {
 import { schema } from "./schema";
 import { SubmitButton } from "~/components/form/submit";
 import { GoogleSignInForm } from "~/components/googleAuth/GoogleSignInForm";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { GoogleButton } from "~/components/googleAuth/GoogleButton";
 
 export function RegisterPage() {

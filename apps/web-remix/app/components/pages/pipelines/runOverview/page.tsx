@@ -1,17 +1,10 @@
-import React from "react";
-import flowStyles from "reactflow/dist/style.css";
-import { LinksFunction, MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import editorStyles from "~/components/editor/editor.styles.css";
-import { CustomEdge } from "../CustomEdges/CustomEdge";
 import { Builder } from "../Builder";
+import { CustomEdge } from "../CustomEdges/CustomEdge";
 import { ReadOnlyNode } from "./ReadOnlyNode";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
-export const links: LinksFunction = () => [
-  { rel: "stylesheet", href: flowStyles },
-  { rel: "stylesheet", href: editorStyles },
-];
 export function PipelineRunOverview() {
   const { pipeline, pipelineRun } = useLoaderData<typeof loader>();
 

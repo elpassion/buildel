@@ -8,7 +8,7 @@ import { FieldError } from "~/components/form/fields/field.error";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { SubmitButton } from "~/components/form/submit";
 import { schema } from "./schema";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 
 export function SetPasswordPage() {
   const validator = React.useMemo(() => withZod(schema), []);

@@ -1,5 +1,3 @@
-@import "rc-select/assets/index.css";
-
 .rc-select{
     @apply w-full
 }

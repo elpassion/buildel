@@ -9,7 +9,7 @@ import {
 } from "@remix-run/react";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { Button } from "@elpassion/taco";
 import { KnowledgeBaseCollectionList } from "./KnowledgeBaseCollectionList";
 import { routes } from "~/utils/routes.utils";

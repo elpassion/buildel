@@ -1,6 +1,8 @@
 export {
   page as default,
-  loader,
-  action,
   meta,
 } from "~/components/pages/pipelines/interface/websiteChatbot";
+export {
+  loader,
+  action,
+} from "~/components/pages/pipelines/interface/websiteChatbot/index.server";

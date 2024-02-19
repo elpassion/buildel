@@ -1,6 +1,5 @@
+export { page as default } from "~/components/pages/pipelines/pipelineLayout";
 export {
-  page as default,
-  action,
   loader,
-  links,
-} from "~/components/pages/pipelines/pipelineLayout";
+  action,
+} from "~/components/pages/pipelines/pipelineLayout/index.server";

@@ -3,7 +3,7 @@ import { IMembership } from "./organization.types";
 import { ItemList } from "~/components/list/ItemList";
 import { Link, useLoaderData } from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { Button } from "@elpassion/taco";
 
 interface MembershipsProps {
@@ -50,7 +50,7 @@ export const MembershipListItem = ({ membership }: MembershipListItemProps) => {
   return (
     <article
       className={classNames(
-        "group bg-neutral-800 px-6 py-4 rounded-lg text-basic-white hover:bg-neutral-850 transition cursor-pointer"
+        "group bg-neutral-800 px-6 py-4 rounded-lg text-basic-white hover:bg-neutral-850 transition cursor-pointer",
       )}
     >
       {membership.user.email}

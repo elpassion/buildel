@@ -7,7 +7,7 @@ import {
   useMatch,
   useNavigate,
 } from "@remix-run/react";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { Button } from "@elpassion/taco";
 import { SecretKeyList } from "./SecretKeyList";
 import { routes } from "~/utils/routes.utils";

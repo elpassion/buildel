@@ -1,12 +1,17 @@
-import React, { useCallback, useEffect, useState } from "react";
-import Select, { SelectProps, Option } from "rc-select";
-import { Icon } from "@elpassion/taco";
+import { Option } from "rc-select";
+import "rc-select/assets/index.css";
+import React, { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { useDebounce } from "usehooks-ts";
+import { SelectInputProps } from "./select.input-impl";
 
-export type SelectInputProps = SelectProps;
+const AsyncSelectInputComponent = lazy(() => import("./select.input-impl"));
 
 export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
-  return <Select showSearch clearIcon={<Icon iconName="x" />} {...props} />;
+  return (
+    <Suspense fallback={null}>
+      <AsyncSelectInputComponent {...props} />
+    </Suspense>
+  );
 };
 
 export interface AsyncSelectInputProps<T = {}>
@@ -15,7 +20,7 @@ export interface AsyncSelectInputProps<T = {}>
     "options" | "loading" | "onSearch" | "searchValue"
   > {
   fetchOptions: (
-    search: string
+    search: string,
   ) => Promise<({ value: string; label: string } & T)[]>;
   onOptionsFetch?: (options: ({ value: string; label: string } & T)[]) => void;
 }
@@ -29,7 +34,7 @@ export const AsyncSelectInput = <T = {},>({
   const [searchValue, setSearchValue] = useState("");
   const debouncedSearch = useDebounce(searchValue, 500);
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
-    []
+    [],
   );
 
   const loadOptions = useCallback(() => {

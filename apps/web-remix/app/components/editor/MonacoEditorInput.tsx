@@ -2,6 +2,8 @@ import React from "react";
 import type { EditorProps, OnMount } from "@monaco-editor/react";
 import { Editor } from "@monaco-editor/react";
 
+import "./editor.styles.css";
+
 export const SUGGESTION_REGEX = "\\{\\{[^\\s]+\\}\\}";
 
 export type IEditor = Parameters<OnMount>[0];

@@ -16,7 +16,7 @@ import {
 } from "~/components/form/schema/SchemaParser";
 import { successToast } from "~/components/toasts/successToast";
 import { UpdatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { SubmitButton } from "~/components/form/submit";
 
 const schema = z.object({
@@ -38,12 +38,12 @@ export function SettingsConfigurationPage() {
         action: routes.pipelineBuild(organizationId, pipelineId) + "?index",
       });
     },
-    [updateFetcher]
+    [updateFetcher],
   );
 
   const handleOnSubmit = async (
     data: { configuration: string },
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
     setErrors({});
@@ -64,7 +64,7 @@ export function SettingsConfigurationPage() {
               organization_id: organizationId,
               pipeline_id: pipelineId,
               block_name: block.name,
-            }
+            },
           );
 
           const validator = withZod(schema);
@@ -74,7 +74,7 @@ export function SettingsConfigurationPage() {
             return validatedBlock.data;
           }
           return block;
-        })
+        }),
       )) as any[];
 
       result.data.config.blocks = result.data.config.blocks.map((block, i) => {
@@ -130,12 +130,7 @@ export function SettingsConfigurationPage() {
         </FormField>
       </div>
 
-      <SubmitButton
-        isFluid
-        size="sm"
-        variant="filled"
-        className="mt-6"
-      >
+      <SubmitButton isFluid size="sm" variant="filled" className="mt-6">
         Save
       </SubmitButton>
     </ValidatedForm>

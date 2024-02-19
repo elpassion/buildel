@@ -10,7 +10,7 @@ import {
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { KnowledgeBaseFileList } from "./KnowledgeBaseFileList";
-import { loader } from "./loader";
+import { loader } from "./loader.server";
 import { Button } from "@elpassion/taco";
 import {
   ActionSidebar,
@@ -23,7 +23,7 @@ export function KnowledgeBaseCollectionPage() {
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const match = useMatch(
-    `${organizationId}/knowledge-base/${encodeURIComponent(collectionName)}/new`
+    `${organizationId}/knowledge-base/${encodeURIComponent(collectionName)}/new`,
   );
   const isSidebarOpen = !!match;
 

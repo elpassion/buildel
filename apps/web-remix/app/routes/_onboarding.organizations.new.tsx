@@ -1,6 +1,5 @@
+export { page as default, meta } from "~/components/pages/organizations/new";
 export {
-  page as default,
-  action,
   loader,
-  meta,
-} from "~/components/pages/organizations/new";
+  action,
+} from "~/components/pages/organizations/new/index.server";
