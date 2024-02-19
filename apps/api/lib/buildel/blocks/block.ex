@@ -295,9 +295,9 @@ defmodule Buildel.Blocks.Block do
                     "type" => "string",
                     "title" => "Model",
                     "description" => "The model to use for the embeddings.",
-                    "default" => "text-embedding-ada-002",
-                    "enum" => ["text-embedding-ada-002"],
-                    "enumPresentAs" => "radio"
+                    "url" =>
+                      "/api/organizations/{{organization_id}}/models/embeddings?api_type={{embeddings.api_type}}",
+                    "presentAs" => "async-select"
                   },
                   "secret_name" =>
                     secret_schema(%{
