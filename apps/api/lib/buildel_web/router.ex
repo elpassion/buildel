@@ -32,6 +32,7 @@ defmodule BuildelWeb.Router do
   end
 
   ## Api routes
+
   get "/", BuildelWeb.VersionController, :index
 
   scope "/api", BuildelWeb do
