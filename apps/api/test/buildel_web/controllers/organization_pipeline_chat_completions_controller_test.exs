@@ -27,17 +27,20 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
       assert json_response(conn, 401)["errors"] != %{}
     end
 
-    # test "does not allow access to other organizations", %{
-    #   conn: conn
-    # } do
-    #   other_organization = organization_fixture()
-    #   other_pipeline = pipeline_fixture(%{organization_id: other_organization.id})
+    test "does not allow access to other organizations", %{
+      conn: conn
+    } do
+      other_organization = organization_fixture()
+      other_pipeline = pipeline_fixture(%{organization_id: other_organization.id})
 
-    #   conn =
-    #     post(conn, ~p"/api/organizations/#{other_organization}/pipelines/#{other_pipeline}/runs")
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{other_organization}/pipelines/#{other_pipeline}/chat/completions"
+        )
 
-    #   assert json_response(conn, 404)
-    # end
+      assert json_response(conn, 404)
+    end
 
     # test "creates run with latest alias by default", %{
     #   conn: conn,

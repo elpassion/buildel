@@ -13,9 +13,13 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
-  def create(conn, %{"organization_id" => organization_id, "pipeline" => pipeline_params}) do
-    conn
-    |> put_status(201)
-    |> render("show.json", completion: %{})
+  def create(conn, %{"organization_id" => organization_id, "pipeline_id" => _pipeline_id}) do
+    current_user = conn.assigns[:current_user]
+
+    with {:ok, organization} <- Organizations.get_user_organization(current_user, organization_id) do
+      conn
+      |> put_status(201)
+      |> render("show.json", completion: %{})
+    end
   end
 end
