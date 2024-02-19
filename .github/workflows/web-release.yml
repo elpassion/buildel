@@ -1,0 +1,33 @@
+name: Web Release
+on:
+  push:
+    tags:
+      - 'web-v*.*.*'
+  
+defaults:
+  run:
+    working-directory: apps/web-remix
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '21.6.2'
+          cache: 'pnpm'
+          cache-dependency-path: apps/web-remix/pnpm-lock.yaml
+      - run: pnpm install
+      - run: pnpm tsc
+      - run: pnpm test
+      - run: pnpm build
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+            FLY_API_TOKEN: ${{ secrets.BUILDEL_WEB__FLY_API_TOKEN }}
