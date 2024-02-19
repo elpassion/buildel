@@ -24,5 +24,6 @@ jobs:
         with:
           node-version: '21.6.2'
           cache: 'pnpm'
+          cache-dependency-path: apps/web-remix/pnpm-lock.yaml
       - run: pnpm install
       - run: pnpm test
