@@ -1,6 +1,5 @@
 import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { z } from "zod";
-import { Button } from "@elpassion/taco";
 import { FieldProps, Schema } from "~/components/form/schema/Schema";
 import { ValidatedForm, useFormContext } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
@@ -185,6 +184,7 @@ export function EditBlockForm({
         .replace("{{organization_id}}", organizationId.toString())
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
+
           const replacedValue = values.get(optKey);
           return replacedValue || optKey;
         });
@@ -205,26 +205,11 @@ export function EditBlockForm({
                 //@ts-ignore
                 schema={props.field.schema}
                 onCreate={onCreate}
-              >
-                <Schema
-                  //@ts-ignore
-                  schema={props.field.schema}
-                  name={null}
-                  fields={{
-                    editor: () => <></>,
-                    string: StringField,
-                    number: NumberField,
-                    array: ArrayField,
-                    boolean: BooleanField,
-                    asyncSelect: (innerProps) => (
-                      <SelectField {...innerProps} />
-                    ),
-                    asyncCreatableSelect: (innerProps) => (
-                      <AsyncCreatableField {...innerProps} />
-                    ),
-                  }}
-                />
-              </CreatableAsyncForm>
+                asyncSelect={(innerProps) => <SelectField {...innerProps} />}
+                asyncCreatableSelect={(innerProps) => (
+                  <AsyncCreatableField {...innerProps} />
+                )}
+              />
             )}
           />
         </FormField>

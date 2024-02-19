@@ -4,6 +4,8 @@ import React, {
   PropsWithChildren,
   ReactNode,
   useCallback,
+  useEffect,
+  useState,
 } from "react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useControlField, ValidatedForm } from "remix-validated-form";
@@ -26,6 +28,13 @@ import {
   AsyncSelectInputProps,
 } from "~/components/form/inputs/select/select.input";
 import { SubmitButton } from "../submit";
+import { FieldProps, Schema } from "~/components/form/schema/Schema";
+import {
+  ArrayField,
+  BooleanField,
+  NumberField,
+  StringField,
+} from "~/components/form/schema/SchemaFields";
 
 export interface CreatableAsyncSelectFieldProps
   extends Partial<AsyncSelectInputProps> {
@@ -158,15 +167,24 @@ export const CreatableAsyncSelectField = forwardRef<
 interface CreatableAsyncFormProps {
   onCreate: (data: Record<string, any>, e: FormEvent<HTMLFormElement>) => void;
   schema: JSONSchemaField;
+  asyncSelect: React.FC<FieldProps>;
+  asyncCreatableSelect: React.FC<FieldProps>;
 }
 
 export function CreatableAsyncForm({
   onCreate,
   schema: JSONSchema,
+  asyncCreatableSelect,
+  asyncSelect,
   children,
 }: PropsWithChildren<CreatableAsyncFormProps>) {
   const schema = generateZODSchema(JSONSchema as any);
   const validator = React.useMemo(() => withZod(schema), []);
+  const [latestValues, setLatestValues] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    setLatestValues({});
+  }, []);
 
   return (
     <ValidatedForm
@@ -174,9 +192,26 @@ export function CreatableAsyncForm({
       validator={validator}
       className="w-full grow flex flex-col"
       onSubmit={onCreate}
+      onChange={(e: any) => {
+        setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+      }}
       noValidate
     >
       {children}
+
+      <Schema
+        schema={JSONSchema}
+        name={null}
+        fields={{
+          editor: () => <></>,
+          string: StringField,
+          number: NumberField,
+          array: ArrayField,
+          boolean: BooleanField,
+          asyncSelect,
+          asyncCreatableSelect,
+        }}
+      />
 
       <SubmitButton size="sm" variant="filled" className="mt-6" isFluid>
         Create new
