@@ -152,6 +152,9 @@ dependencies:
   reactflow:
     specifier: ^11.8.3
     version: 11.10.3(@types/react@18.2.55)(react-dom@18.2.0)(react@18.2.0)
+  remix-utils:
+    specifier: ^7.5.0
+    version: 7.5.0(@remix-run/node@2.5.1)(@remix-run/react@2.5.1)(react@18.2.0)(zod@3.22.4)
   remix-validated-form:
     specifier: ^5.1.5
     version: 5.1.5(@remix-run/node@2.5.1)(@remix-run/react@2.5.1)(@remix-run/server-runtime@2.6.0)(@types/react@18.2.55)(react@18.2.0)
@@ -8418,6 +8421,49 @@ packages:
     resolution: {integrity: sha512-p5HzqKlMK02mvnalm3mavRaUeRljqKoE7r0QgDDzbZ9C0jFowisYLPU9e52gCZOd7Dn6KAWTPbVucJtcPfAIxA==}
     dev: false
 
+  /remix-utils@7.5.0(@remix-run/node@2.5.1)(@remix-run/react@2.5.1)(react@18.2.0)(zod@3.22.4):
+    resolution: {integrity: sha512-vzjDhbdwK+3XxqL2LM7ZPzq0zyjb+77eAWbKhDqhnh0nlA11n3CmTtYzrZYpVf6h24+6m5mD6KnRfcdD3Zrl7w==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@remix-run/cloudflare': ^2.0.0
+      '@remix-run/deno': ^2.0.0
+      '@remix-run/node': ^2.0.0
+      '@remix-run/react': ^2.0.0
+      '@remix-run/router': ^1.7.2
+      crypto-js: ^4.1.1
+      intl-parse-accept-language: ^1.0.0
+      is-ip: ^5.0.1
+      react: ^18.0.0
+      zod: ^3.22.4
+    peerDependenciesMeta:
+      '@remix-run/cloudflare':
+        optional: true
+      '@remix-run/deno':
+        optional: true
+      '@remix-run/node':
+        optional: true
+      '@remix-run/react':
+        optional: true
+      '@remix-run/router':
+        optional: true
+      crypto-js:
+        optional: true
+      intl-parse-accept-language:
+        optional: true
+      is-ip:
+        optional: true
+      react:
+        optional: true
+      zod:
+        optional: true
+    dependencies:
+      '@remix-run/node': 2.5.1(typescript@5.3.3)
+      '@remix-run/react': 2.5.1(react-dom@18.2.0)(react@18.2.0)(typescript@5.3.3)
+      react: 18.2.0
+      type-fest: 4.10.2
+      zod: 3.22.4
+    dev: false
+
   /remix-validated-form@5.1.5(@remix-run/node@2.5.1)(@remix-run/react@2.5.1)(@remix-run/server-runtime@2.6.0)(@types/react@18.2.55)(react@18.2.0):
     resolution: {integrity: sha512-v27JGzhOMGREyvPIDAgjhywfVYahe3CC4EXGIzJbwZfXnq7GFju5f/yNmyUyQLeYcOmU6uhzq+vwDJDOiXjvBA==}
     peerDependencies:
@@ -9291,7 +9337,6 @@ packages:
   /type-fest@4.10.2:
     resolution: {integrity: sha512-anpAG63wSpdEbLwOqH8L84urkL6PiVIov3EMmgIhhThevh9aiMQov+6Btx0wldNcvm4wV+e2/Rt1QdDwKHFbHw==}
     engines: {node: '>=16'}
-    dev: true
 
   /type-is@1.6.18:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}

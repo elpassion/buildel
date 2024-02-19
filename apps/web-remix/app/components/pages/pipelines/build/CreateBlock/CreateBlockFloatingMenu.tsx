@@ -1,16 +1,17 @@
 import React, { useMemo } from "react";
 import { useLoaderData } from "@remix-run/react";
 import startCase from "lodash.startcase";
-import { loader } from "../loader";
+import { loader } from "../loader.server";
 import {
   IBlockConfig,
   IBlockType,
   IBlockTypes,
 } from "~/components/pages/pipelines/pipeline.types";
-import { Menu } from "~/components/menu/Menu";
+import { MenuClient } from "~/components/menu/Menu.client";
 import { GroupSubMenu } from "./GroupSubMenu";
 import { CreateBlockDraggableItem } from "./CreateBlockDraggableItem";
 import { PasteConfigItem } from "./PasteConfigItem";
+import { ClientOnly } from "remix-utils/client-only";
 
 interface CreateBlockFloatingMenuProps {
   onCreate: (node: IBlockConfig) => void;
@@ -52,24 +53,28 @@ export const CreateBlockFloatingMenu: React.FC<
 
   return (
     <div className="absolute top-1/2 -translate-y-1/2 right-4 h-auto">
-      <Menu expandIcon={null}>
-        {/*<ELMenuItem />*/}
+      <ClientOnly fallback={null}>
+        {() => (
+          <MenuClient expandIcon={null}>
+            {/*<ELMenuItem />*/}
 
-        {Object.keys(blockGroups).map((group) => (
-          <GroupSubMenu
-            key={group}
-            title={
-              <span className="truncate w-full text-center">
-                {startCase(group)}
-              </span>
-            }
-          >
-            <SubMenuItems group={group} />
-          </GroupSubMenu>
-        ))}
+            {Object.keys(blockGroups).map((group) => (
+              <GroupSubMenu
+                key={group}
+                title={
+                  <span className="truncate w-full text-center">
+                    {startCase(group)}
+                  </span>
+                }
+              >
+                <SubMenuItems group={group} />
+              </GroupSubMenu>
+            ))}
 
-        <PasteConfigItem />
-      </Menu>
+            <PasteConfigItem />
+          </MenuClient>
+        )}
+      </ClientOnly>
     </div>
   );
 };

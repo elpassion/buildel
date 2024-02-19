@@ -3,7 +3,7 @@ import { routes } from "~/utils/routes.utils";
 import { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
 import { ChatbotSectionWrapper } from "~/components/pages/pipelines/interface/websiteChatbot/ChatbotSectionWrapper";
-import { CodePreviewWrapper } from "~/components/pages/pipelines/CodePreview/CodePreview";
+import { CodePreviewWrapper } from "~/components/pages/pipelines/CodePreview/CodePreviewWrapper";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import {
   ChatbotSectionHeader,

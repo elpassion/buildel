@@ -14,7 +14,7 @@ import Modal from "react-modal";
 import invariant from "tiny-invariant";
 import { useOnClickOutside } from "usehooks-ts";
 import { OrganizationApi } from "~/api/organization/OrganizationApi";
-import { Menu } from "~/components/menu/Menu";
+import { MenuClient } from "~/components/menu/Menu.client";
 import { MenuItem } from "~/components/menu/MenuItem";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
 import {
@@ -29,8 +29,10 @@ import { loaderBuilder } from "~/utils.server";
 import { getCurrentUser } from "~/utils/currentUser.server";
 import { routes } from "~/utils/routes.utils";
 import { getServerToast, setOrganizationId } from "~/utils/toast.server";
+import { ClientOnly } from "remix-utils/client-only";
 
 Modal.setAppElement("#_root");
+
 export async function loader(loaderArgs: DataFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
@@ -41,7 +43,7 @@ export async function loader(loaderArgs: DataFunctionArgs) {
     const organizationsResponse = await organizationApi.getOrganizations();
 
     const organization = organizationsResponse.data.data.find(
-      (org) => org.id === Number(params.organizationId),
+      (org) => org.id === Number(params.organizationId)
     );
 
     let { cookie, ...toasts } = await getServerToast(request);
@@ -68,7 +70,7 @@ export async function loader(loaderArgs: DataFunctionArgs) {
         headers: {
           "Set-Cookie": cookie,
         },
-      },
+      }
     );
   })(loaderArgs);
 }
@@ -138,7 +140,7 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
         "gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]",
         {
           "!px-0": !isCollapsed,
-        },
+        }
       )}
     >
       <div className="flex flex-col gap-1">
@@ -238,18 +240,22 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
           )}
         </button>
 
-        <Menu
-          hidden={!showMenu}
-          activeKey={`${organization.id}`}
-          className="min-w-[248px] absolute z-[51] top-[60px] left-[30%] max-h-[400px] overflow-y-auto md:left-[85%]"
-          onClick={handleChangeRoute}
-        >
-          <NewOrganizationLink />
+        <ClientOnly fallback={null}>
+          {() => (
+            <MenuClient
+              hidden={!showMenu}
+              activeKey={`${organization.id}`}
+              className="min-w-[248px] absolute z-[51] top-[60px] left-[30%] max-h-[400px] overflow-y-auto md:left-[85%]"
+              onClick={handleChangeRoute}
+            >
+              <NewOrganizationLink />
 
-          {organizations.map((org) => {
-            return <MenuItem key={`${org.id}`}>{org.name}</MenuItem>;
-          })}
-        </Menu>
+              {organizations.map((org) => {
+                return <MenuItem key={`${org.id}`}>{org.name}</MenuItem>;
+              })}
+            </MenuClient>
+          )}
+        </ClientOnly>
       </div>
     </SidebarContentWrapper>
   );

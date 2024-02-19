@@ -1,5 +1,5 @@
 .rc-select{
-    @apply w-full
+    @apply !w-full
 }
 
 .rc-select .rc-select-selector{

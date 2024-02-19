@@ -2,10 +2,11 @@ import React, { useMemo, useRef, useState } from "react";
 import type { MenuInfo } from "rc-menu/es/interface";
 import { useOnClickOutside } from "usehooks-ts";
 import { Icon } from "@elpassion/taco";
-import { Menu } from "~/components/menu/Menu";
+import { MenuClient } from "~/components/menu/Menu.client";
 import { MenuItem } from "~/components/menu/MenuItem";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { CodePreviewWrapper } from "./CodePreview";
+import { CodePreviewWrapper } from "./CodePreviewWrapper";
+import { ClientOnly } from "remix-utils/client-only";
 
 interface CodePreviewOptionsProps {
   options: {
@@ -50,18 +51,24 @@ export const CodePreviewOptions: React.FC<CodePreviewOptionsProps> = ({
       {() => (
         <>
           <div className="relative w-fit" ref={wrapperRef}>
-            <Menu
-              hidden={!showMenu}
-              activeKey={activeKey}
-              className="w-[200px] absolute z-10 -top-10 right-0"
-              onClick={onChange}
-            >
-              {options.map((option) => {
-                return (
-                  <MenuItem key={`${option.id}`}>{option.framework}</MenuItem>
-                );
-              })}
-            </Menu>
+            <ClientOnly>
+              {() => (
+                <MenuClient
+                  hidden={!showMenu}
+                  activeKey={activeKey}
+                  className="w-[200px] absolute z-10 -top-10 right-0"
+                  onClick={onChange}
+                >
+                  {options.map((option) => {
+                    return (
+                      <MenuItem key={`${option.id}`}>
+                        {option.framework}
+                      </MenuItem>
+                    );
+                  })}
+                </MenuClient>
+              )}
+            </ClientOnly>
 
             <button
               onClick={handleShow}

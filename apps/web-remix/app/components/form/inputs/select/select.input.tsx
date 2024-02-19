@@ -1,20 +1,21 @@
 import { Option } from "rc-select";
-import "rc-select/assets/index.css";
-import React, { Suspense, lazy, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "usehooks-ts";
-import { SelectInputProps } from "./select.input-impl";
-
-const AsyncSelectInputComponent = lazy(() => import("./select.input-impl"));
+import AsyncSelectInputComponent, {
+  SelectInputProps,
+} from "./select.input-impl.client";
+import { ClientOnly } from "remix-utils/client-only";
+import "rc-select/assets/index.css";
 
 export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
   return (
-    <Suspense
+    <ClientOnly
       fallback={
         <div className="w-full h-[44px] rounded-lg border-[1.5px] border-neutral-200 bg-neutral-800" />
       }
     >
-      <AsyncSelectInputComponent {...props} />
-    </Suspense>
+      {() => <AsyncSelectInputComponent {...props} />}
+    </ClientOnly>
   );
 };
 

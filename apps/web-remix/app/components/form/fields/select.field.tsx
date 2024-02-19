@@ -5,10 +5,8 @@ import {
   HiddenField,
   useFieldContext,
 } from "~/components/form/fields/field.context";
-import {
-  SelectInput,
-  SelectInputProps,
-} from "~/components/form/inputs/select/select.input";
+import { SelectInput } from "~/components/form/inputs/select/select.input";
+import { SelectInputProps } from "~/components/form/inputs/select/select.input-impl.client";
 
 interface SelectFieldProps extends SelectInputProps {
   label?: ReactNode;
