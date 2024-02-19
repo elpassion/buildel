@@ -31,7 +31,7 @@ export function KnowledgeBasePage() {
   return (
     <>
       <AppNavbar
-        leftContent={<AppNavbarHeading>Knowledge base</AppNavbarHeading>}
+        leftContent={<AppNavbarHeading>Knowledge base123</AppNavbarHeading>}
       />
 
       <ActionSidebar

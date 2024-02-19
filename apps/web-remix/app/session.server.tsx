@@ -6,7 +6,6 @@ type SessionData = {
   apiToken?: string;
   user?: ICurrentUser;
   organizationId?: number;
-  [key: string]: unknown;
 };
 
 export type SessionToast = {
@@ -18,7 +17,6 @@ export type SessionFlashData = {
   error: SessionToast | string;
   success: SessionToast | string;
   warning: SessionToast | string;
-  [key: string]: unknown;
 };
 
 const sessionStorage = createCookieSessionStorage<

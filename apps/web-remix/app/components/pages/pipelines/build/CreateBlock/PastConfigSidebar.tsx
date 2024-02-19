@@ -1,12 +1,11 @@
 import { IBlockConfig } from "~/components/pages/pipelines/pipeline.types";
 import React, { useEffect, useState } from "react";
-import { Button } from "@elpassion/taco";
 import { v4 as uuidv4 } from "uuid";
 import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider";
 import z from "zod";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useLoaderData } from "@remix-run/react";
-import { loader } from "~/components/pages/pipelines/build";
+import { loader } from "~/components/pages/pipelines/build/loader.server";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 import { ValidatedForm } from "remix-validated-form";
 import { Field as FormField } from "~/components/form/fields/field.context";

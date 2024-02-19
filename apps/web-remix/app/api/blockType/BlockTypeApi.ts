@@ -1,17 +1,18 @@
 import { fetchTyped } from "~/utils/fetch.server";
-import { BlockTypesResponse } from "./blockType.contracts";
+import { BlockTypesResponse, IBlockTypesResponse } from "./blockType.contracts";
 
-let cache = undefined as any;
+let cache: undefined | IBlockTypesResponse = undefined;
 
 export class BlockTypeApi {
   constructor(private client: typeof fetchTyped) {}
 
-  async getBlockTypes() {
+  async getBlockTypes(): Promise<IBlockTypesResponse> {
     // TODO: Setup better caching
     if (cache) return cache;
     const response = await this.client(BlockTypesResponse, `/block_types`);
-    cache = response;
+    cache = response.data;
     setTimeout(() => (cache = undefined), 1000 * 60 * 5);
-    return response;
+
+    return response.data;
   }
 }

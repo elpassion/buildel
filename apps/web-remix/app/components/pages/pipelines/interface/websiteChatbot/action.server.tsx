@@ -10,6 +10,7 @@ import { schema } from "./schema";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
+    // @ts-ignore
     patch: async ({ params, request }, { fetch }) => {
       await requireLogin(request);
       invariant(params.organizationId, "Missing organizationId");
