@@ -7,11 +7,11 @@
 }
 
 .rc-select-focused .rc-select-selector{
-    @apply outline outline-offset-[2px] outline-[2px] outline-primary-500
+    @apply outline outline-offset-[2px] outline-[2px] outline-primary-500 !border-neutral-200
 }
 
 .rc-select .rc-select-selector .rc-select-selection-search-input{
-    @apply !bg-neutral-800 !shadow-none !ring-0 !text-white !text-sm !h-[40px]
+    @apply !bg-neutral-800 !shadow-none !ring-0 !text-white !text-sm !h-[40px] !outline-none
 }
 
 .rc-select .rc-select-selection-placeholder{

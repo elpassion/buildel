@@ -1,5 +1,6 @@
 import Select, { SelectProps } from "rc-select";
 import { Icon } from "@elpassion/taco";
+import "rc-select/assets/index.css";
 import "./select.input.css";
 
 export type SelectInputProps = SelectProps;

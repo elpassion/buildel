@@ -5,7 +5,6 @@ import AsyncSelectInputComponent, {
   SelectInputProps,
 } from "./select.input-impl.client";
 import { ClientOnly } from "remix-utils/client-only";
-import "rc-select/assets/index.css";
 
 export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
   return (
