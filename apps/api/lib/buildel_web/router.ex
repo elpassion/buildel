@@ -85,6 +85,12 @@ defmodule BuildelWeb.Router do
       only: [:index, :show, :create]
     )
 
+    post(
+      "/organizations/:organization_id/pipelines/:pipeline_id/chat/completions",
+      OrganizationPipelineChatCompletionController,
+      :create
+    )
+
     resources(
       "/organizations/:organization_id/pipelines/:pipeline_id/aliases",
       OrganizationPipelineAliasController,
