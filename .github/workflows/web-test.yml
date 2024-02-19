@@ -26,4 +26,6 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: apps/web-remix/pnpm-lock.yaml
       - run: pnpm install
+      - run: pnpm tsc
       - run: pnpm test
+      - run: pnpm build
