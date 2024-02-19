@@ -1,5 +1,6 @@
 defmodule BuildelWeb.OrganizationPipelineChatCompletionController do
   use BuildelWeb, :controller
+  use BuildelWeb.Validator
 
   import BuildelWeb.UserAuth
 
@@ -13,13 +14,26 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
-  def create(conn, %{"organization_id" => organization_id, "pipeline_id" => _pipeline_id}) do
+  defparams(:create) do
+    required(:model, :string)
+
+    required(:messages, {:array, :map}) do
+      required(:role, :string)
+      required(:content, :string)
+    end
+  end
+
+  def create(
+        conn,
+        %{"organization_id" => organization_id, "pipeline_id" => _pipeline_id} = params
+      ) do
     current_user = conn.assigns[:current_user]
 
-    with {:ok, organization} <- Organizations.get_user_organization(current_user, organization_id) do
+    with {:ok, params} <- validate(:create, conn.params),
+         {:ok, organization} <- Organizations.get_user_organization(current_user, organization_id) do
       conn
       |> put_status(201)
-      |> render("show.json", completion: %{})
+      |> json(%{})
     end
   end
 end

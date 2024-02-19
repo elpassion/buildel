@@ -42,19 +42,20 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
       assert json_response(conn, 404)
     end
 
-    # test "creates run with latest alias by default", %{
-    #   conn: conn,
-    #   organization: organization,
-    #   pipeline: pipeline
-    # } do
-    #   conn = post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
-    #   blocks = pipeline.config["blocks"]
+    test "validates params", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline
+    } do
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/chat/completions",
+          %{}
+        )
 
-    #   assert %{
-    #            "status" => "created",
-    #            "config" => %{"metadata" => %{}, "blocks" => ^blocks}
-    #          } = json_response(conn, 200)["data"]
-    # end
+      assert json_response(conn, 422)["errors"] != %{}
+    end
 
     # test "saves metadata", %{
     #   conn: conn,
