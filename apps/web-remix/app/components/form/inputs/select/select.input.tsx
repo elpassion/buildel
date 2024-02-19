@@ -8,7 +8,11 @@ const AsyncSelectInputComponent = lazy(() => import("./select.input-impl"));
 
 export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      fallback={
+        <div className="w-full h-[44px] rounded-lg border-[1.5px] border-neutral-200 bg-neutral-800" />
+      }
+    >
       <AsyncSelectInputComponent {...props} />
     </Suspense>
   );
@@ -20,7 +24,7 @@ export interface AsyncSelectInputProps<T = {}>
     "options" | "loading" | "onSearch" | "searchValue"
   > {
   fetchOptions: (
-    search: string,
+    search: string
   ) => Promise<({ value: string; label: string } & T)[]>;
   onOptionsFetch?: (options: ({ value: string; label: string } & T)[]) => void;
 }
@@ -34,7 +38,7 @@ export const AsyncSelectInput = <T = {},>({
   const [searchValue, setSearchValue] = useState("");
   const debouncedSearch = useDebounce(searchValue, 500);
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
-    [],
+    []
   );
 
   const loadOptions = useCallback(() => {

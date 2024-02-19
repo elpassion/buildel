@@ -29,6 +29,11 @@ export function NewKnowledgeBasePage() {
       method="post"
       noValidate
       className="w-full grow flex flex-col gap-2 h-[70%]"
+      defaultValues={{
+        embeddings: {
+          api_type: "openai",
+        },
+      }}
     >
       <div className="max-w-s w-full grow overflow-y-auto p-1 flex flex-col gap-2 space-y-1">
         <Field name="collection_name">
@@ -70,7 +75,7 @@ function ApiTypesRadioGroupField({ onChange }: ApiTypesRadioGroupFieldProps) {
 
   return (
     <Field name="embeddings.api_type">
-      <p className="text-white">Embeddings API Type</p>
+      <p className="text-white mb-1 text-sm">Embeddings API Type</p>
       {["openai"].map((value) => (
         <RadioField
           onChange={onChange}
