@@ -1,15 +1,15 @@
-defmodule Buildel.Blocks.MapTest do
+defmodule Buildel.Blocks.MapInputsTest do
   use Buildel.BlockCase
-  alias Blocks.Map
+  alias Blocks.MapInputs
 
   test "exposes options" do
-    assert Map.options() == %{
+    assert MapInputs.options() == %{
              description:
                "This module specializes in aggregating the latest inputs and combining them based on a specified template.",
-             type: "map",
+             type: "map_inputs",
              inputs: [Block.text_input("input")],
              outputs: [Block.text_output("output")],
-             schema: Map.schema(),
+             schema: MapInputs.schema(),
              groups: ["text", "utils"],
              ios: []
            }
@@ -17,7 +17,7 @@ defmodule Buildel.Blocks.MapTest do
 
   test "validates schema correctly" do
     assert :ok =
-             Blocks.validate_block(Map, %{
+             Blocks.validate_block(MapInputs, %{
                "name" => "test",
                "opts" => %{
                  "template" => "{{text_output:output}}",
@@ -26,7 +26,7 @@ defmodule Buildel.Blocks.MapTest do
                "inputs" => []
              })
 
-    assert {:error, _} = Blocks.validate_block(Map, %{})
+    assert {:error, _} = Blocks.validate_block(MapInputs, %{})
   end
 
   test "outputs value when pushed to if template does not have any input used" do
@@ -34,7 +34,7 @@ defmodule Buildel.Blocks.MapTest do
       BlocksTestRunner.start_run(%{
         blocks: [
           Buildel.BlocksTestRunner.create_test_text_input_block("text_input"),
-          Map.create(%{
+          MapInputs.create(%{
             name: "test",
             opts: %{
               template: "dupa",
@@ -66,7 +66,7 @@ defmodule Buildel.Blocks.MapTest do
       BlocksTestRunner.start_run(%{
         blocks: [
           Buildel.BlocksTestRunner.create_test_text_input_block("text_input"),
-          Map.create(%{
+          MapInputs.create(%{
             name: "test",
             opts: %{
               template: "dupa {{text_input:output}}",
@@ -99,7 +99,7 @@ defmodule Buildel.Blocks.MapTest do
         blocks: [
           Buildel.BlocksTestRunner.create_test_text_input_block("text_input"),
           Buildel.BlocksTestRunner.create_test_text_input_block("text_input_2"),
-          Map.create(%{
+          MapInputs.create(%{
             name: "test",
             opts: %{
               template: "dupa {{text_input:output}} {{text_input_2:output}}"
@@ -138,7 +138,7 @@ defmodule Buildel.Blocks.MapTest do
         blocks: [
           Buildel.BlocksTestRunner.create_test_text_input_block("text_input"),
           Buildel.BlocksTestRunner.create_test_text_input_block("text_input_2"),
-          Map.create(%{
+          MapInputs.create(%{
             name: "test",
             opts: %{
               template: "dupa {{text_input:output}} {{text_input_2:output}}",

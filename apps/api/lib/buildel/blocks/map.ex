@@ -1,4 +1,4 @@
-defmodule Buildel.Blocks.Map do
+defmodule Buildel.Blocks.MapInputs do
   require Logger
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
@@ -11,7 +11,7 @@ defmodule Buildel.Blocks.Map do
   @impl true
   def options() do
     %{
-      type: "map",
+      type: "map_inputs",
       description:
         "Used to map the latest inputs and combine them based on a specified template.",
       groups: ["text", "utils"],

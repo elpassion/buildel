@@ -9,11 +9,18 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
+  @valid_params %{
+    model: "pipeline",
+    messages: [
+      %{role: "user", content: "Hello"},
+      %{role: "bot", content: "Hi"}
+    ]
+  }
+
   setup [
     :register_and_log_in_user,
     :create_user_organization,
     :create_pipeline,
-    :create_run,
     :create_alias
   ]
 
@@ -36,7 +43,8 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
       conn =
         post(
           conn,
-          ~p"/api/organizations/#{other_organization}/pipelines/#{other_pipeline}/chat/completions"
+          ~p"/api/organizations/#{other_organization}/pipelines/#{other_pipeline}/chat/completions",
+          @valid_params
         )
 
       assert json_response(conn, 404)
@@ -57,49 +65,20 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
-    # test "saves metadata", %{
-    #   conn: conn,
-    #   organization: organization,
-    #   pipeline: pipeline
-    # } do
-    #   conn =
-    #     post(
-    #       conn,
-    #       ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs",
-    #       %{"metadata" => %{"key" => "value"}}
-    #     )
+    test "creates a chat completion", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline
+    } do
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/chat/completions",
+          @valid_params
+        )
 
-    #   assert %{
-    #            "status" => "created",
-    #            "config" => %{"metadata" => %{"key" => "value"}}
-    #          } = json_response(conn, 200)["data"]
-    # end
-
-    # test "creates run with specific alias", %{
-    #   conn: conn,
-    #   organization: organization,
-    #   pipeline: pipeline,
-    #   alias: %{config: config, id: id}
-    # } do
-    #   conn =
-    #     post(
-    #       conn,
-    #       ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs",
-    #       %{"alias" => id}
-    #     )
-
-    #   blocks = config["blocks"]
-
-    #   assert %{
-    #            "status" => "created",
-    #            "config" => %{"metadata" => %{}, "blocks" => ^blocks}
-    #          } = json_response(conn, 200)["data"]
-    # end
-  end
-
-  defp create_run(%{pipeline: pipeline}) do
-    run = run_fixture(%{pipeline_id: pipeline.id})
-    %{run: run}
+      assert json_response(conn, 201) == %{}
+    end
   end
 
   defp create_pipeline(%{organization: organization}) do

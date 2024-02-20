@@ -110,7 +110,6 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     {:ok,
      state
-     |> Map.put(:headers, Jason.decode!(opts.headers || "{}") |> Map.to_list())
      |> Map.put(:parameters, Jason.decode!(opts.parameters))
      |> Map.put(:context, context)
      |> assign_stream_state(opts)}
@@ -191,6 +190,7 @@ defmodule Buildel.Blocks.ApiCallTool do
 
   defp do_call_api(state, args) do
     url = build_url(state.opts.url, args)
+    headers = build_headers(state.opts.headers, args)
 
     payload = args |> Jason.encode!()
 
@@ -203,10 +203,11 @@ defmodule Buildel.Blocks.ApiCallTool do
       )
 
     headers =
-      [
-        "X-Buildel-Topic": topic,
-        "X-Buildel-Context": Jason.encode!(state.context)
-      ] ++ state[:headers]
+      headers ++
+        [
+          "X-Buildel-Topic": topic,
+          "X-Buildel-Context": Jason.encode!(state.context)
+        ]
 
     headers =
       if state[:opts][:authorize] do
@@ -244,5 +245,21 @@ defmodule Buildel.Blocks.ApiCallTool do
       _, acc ->
         acc
     end)
+  end
+
+  defp build_headers(headers_string, args) do
+    args
+    |> Enum.reduce(headers_string, fn
+      {key, value}, acc when is_number(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string())
+
+      {key, value}, acc when is_binary(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string())
+
+      _, acc ->
+        acc
+    end)
+    |> Jason.decode!()
+    |> Enum.to_list()
   end
 end

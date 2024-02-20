@@ -1,7 +1,7 @@
 defmodule Buildel.PipelinesFixtures do
   import Buildel.OrganizationsFixtures
 
-  def pipeline_fixture(attrs \\ %{}, config \\ %{version: "1"})
+  def pipeline_fixture(attrs \\ %{}, config \\ %{version: "3"})
 
   def pipeline_fixture(attrs, %{version: "1"}) do
     {:ok, pipeline} =
