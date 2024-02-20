@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Button } from "@elpassion/taco";
+import { Badge, Button } from "@elpassion/taco";
 import {
   IBlockConfig,
   IField,
@@ -148,14 +148,20 @@ export function NodeFieldsForm({
 
       if (type === "text") {
         return (
-          <TextareaInput
-            label=""
-            id={name}
-            name={name}
-            placeholder="Input text to test the workflow"
-            rows={5}
-            disabled={disabled}
-          />
+          <div>
+            <div className="bg-neutral-900 w-fit text-xs px-2 py-0.5 rounded !rounded-bl-none text-primary-500">
+              {name}
+            </div>
+            <TextareaInput
+              style={{ borderTopLeftRadius: 0 }}
+              label=""
+              id={name}
+              name={name}
+              placeholder={`Input text to test the workflow`}
+              rows={5}
+              disabled={disabled}
+            />
+          </div>
         );
       } else if (type === "file") {
         return (

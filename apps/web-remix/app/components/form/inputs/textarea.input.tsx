@@ -4,6 +4,7 @@ import { Textarea, TextareaProps } from "@elpassion/taco";
 export type TextareaInputProps = TextareaProps;
 export const TextareaInput: React.FC<TextareaInputProps> = ({
   className,
+  style,
   ...props
 }) => {
   //className do not work right now
@@ -17,6 +18,7 @@ export const TextareaInput: React.FC<TextareaInputProps> = ({
         color: "white",
         padding: "8px 10px",
         resize: "none",
+        ...style,
       }}
     />
   );
