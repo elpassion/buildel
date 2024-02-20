@@ -1,4 +1,4 @@
-defmodule Buildel.Blocks.TakeLatest do
+defmodule Buildel.Blocks.Map do
   require Logger
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
@@ -11,8 +11,9 @@ defmodule Buildel.Blocks.TakeLatest do
   @impl true
   def options() do
     %{
-      type: "take_latest",
-      description: "This module specializes in aggregating the latest inputs and combining them based on a specified template.",
+      type: "map",
+      description:
+        "Used to map the latest inputs and combine them based on a specified template.",
       groups: ["text", "utils"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output()],
@@ -62,7 +63,7 @@ defmodule Buildel.Blocks.TakeLatest do
 
   @impl true
   def handle_cast({:combine, {:text, _text}}, state) do
-    state = state |> send_stream_start("output")
+    state = state |> send_stream_start()
 
     {state, message} =
       state |> interpolate_template_with_take_latest_messages(state[:opts].template)
@@ -72,16 +73,21 @@ defmodule Buildel.Blocks.TakeLatest do
         {:noreply, state}
 
       message ->
-        state |> broadcast_to_output("output", {:text, message}) |> send_stream_stop("output")
+        Buildel.BlockPubSub.broadcast_to_io(
+          state[:context_id],
+          state[:block_name],
+          "output",
+          {:text, message}
+        )
 
-        {:noreply, state}
+        {:noreply, state |> send_stream_stop()}
     end
   end
 
   @impl true
   def handle_info({topic, :text, message}, state) do
-    cast(self(), {:text, message})
     state = state |> save_latest_input_value(topic, message)
+    cast(self(), {:text, message})
     {:noreply, state}
   end
 
