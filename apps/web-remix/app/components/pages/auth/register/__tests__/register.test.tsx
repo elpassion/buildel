@@ -3,7 +3,7 @@ import { test, describe } from "vitest";
 import { RoutesProps, setupRoutes } from "~/tests/setup.tests";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
-import { render, screen, waitFor } from "~/tests/render";
+import { render, screen, waitFor, act } from "~/tests/render";
 import { server } from "~/tests/server.mock";
 import { RegisterPage } from "../page";
 import { loader } from "../loader.server";
@@ -74,7 +74,7 @@ class RegisterObject {
   async submit() {
     const { button } = await this.getElements();
 
-    await button.click();
+    await act(() => button.click());
 
     return this;
   }

@@ -7,7 +7,7 @@ import {
   setupRoutes,
 } from "~/tests/setup.tests";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { render, screen, waitFor } from "~/tests/render";
+import { render, screen, waitFor, act } from "~/tests/render";
 import { server } from "~/tests/server.mock";
 import { PipelinesPage } from "../list/page";
 import { loader as listLoader } from "../list/loader.server";
@@ -57,13 +57,13 @@ describe(PipelinesPage.name, () => {
       /Remove workflow: AI Chat/i
     );
 
-    await button.click();
+    await act(() => button.click());
 
     const confirmButton = await waitFor(() =>
       ButtonHandle.fromRole("Delete workflow")
     );
 
-    await confirmButton.click();
+    await act(() => confirmButton.click());
 
     const workflowList = await ListHandle.fromLabelText(/Workflows list/i);
 
@@ -79,7 +79,7 @@ describe(PipelinesPage.name, () => {
       /Duplicate workflow: sample-workflow/i
     );
 
-    await button.click();
+    await act(() => button.click());
 
     const text = screen.findByText(/pipeline/i);
 
@@ -95,7 +95,7 @@ describe(PipelinesPage.name, () => {
       /Create workflow: Speech To Text/i
     );
 
-    await button.click();
+    await act(() => button.click());
 
     const text = screen.findByText(/pipeline/i);
     expect(text).toBeTruthy();
@@ -107,14 +107,14 @@ describe(PipelinesPage.name, () => {
     });
 
     const link = await LinkHandle.fromLabelText(/Create new workflow/i);
-    await link.click();
+    await act(() => link.click());
 
     const input = await InputHandle.fromLabelText(/Name/i);
     await input.type("LALALA");
 
     const submit = await ButtonHandle.fromRole("Create workflow");
 
-    await submit.click();
+    await act(() => submit.click());
 
     const text = screen.findByText(/pipeline/i);
     expect(text).toBeTruthy();

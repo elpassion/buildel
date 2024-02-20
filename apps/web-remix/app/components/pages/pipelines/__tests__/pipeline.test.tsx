@@ -1,5 +1,5 @@
 import React from "react";
-import { test, describe, expect } from "vitest";
+import { test, describe, expect, vi } from "vitest";
 import { render, screen, waitFor, fireEvent, act } from "~/tests/render";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
@@ -62,7 +62,7 @@ describe(PipelinesPage.name, () => {
 
     const addButton = blockTypes[0].querySelector("button");
 
-    await userEvent.click(addButton!);
+    await act(() => userEvent.click(addButton!));
 
     const blocks = await page.getBlocks();
 
@@ -78,11 +78,11 @@ describe(PipelinesPage.name, () => {
       /Delete block: text_input_1/i
     );
 
-    await page.fireBlockOnClick(deleteButton.buttonElement);
+    await act(() => page.fireBlockOnClick(deleteButton.buttonElement));
 
     const confirmButton = await ButtonHandle.fromRole("Confirm");
 
-    await confirmButton.click();
+    await act(() => confirmButton.click());
 
     const blocks = await page.getBlocks();
 
@@ -100,7 +100,7 @@ describe(PipelinesPage.name, () => {
       /Edit block: text_output_1/i
     );
 
-    await page.fireBlockOnClick(editButton.buttonElement);
+    await act(() => page.fireBlockOnClick(editButton.buttonElement));
 
     await screen.findByText(/Text Output 1/i);
 
