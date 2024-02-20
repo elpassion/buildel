@@ -112,6 +112,15 @@ export const routes = {
       `${routes.pipelineInterface(organizationId, pipelineId)}/openai-api`,
       params
     ),
+  pipelineHTTPApi: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineInterface(organizationId, pipelineId)}/http-api`,
+      params
+    ),
   pipelineSettings: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,

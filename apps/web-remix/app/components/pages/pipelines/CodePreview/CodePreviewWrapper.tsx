@@ -7,6 +7,7 @@ interface CodePreviewWrapperProps extends CodePreviewProps {
 
 export const CodePreviewWrapper: React.FC<CodePreviewWrapperProps> = ({
   children,
+  height,
   ...props
 }) => {
   return (
@@ -15,8 +16,8 @@ export const CodePreviewWrapper: React.FC<CodePreviewWrapperProps> = ({
         {children?.(props.value)}
       </div>
 
-      <ClientOnly fallback={null}>
-        {() => <CodePreviewClient {...props} />}
+      <ClientOnly fallback={<div style={{ minHeight: `${height}px` }} />}>
+        {() => <CodePreviewClient height={height} {...props} />}
       </ClientOnly>
     </div>
   );

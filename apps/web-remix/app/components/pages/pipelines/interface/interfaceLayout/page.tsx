@@ -19,16 +19,27 @@ export function InterfaceLayout() {
             to={routes.pipelineClientSDK(
               organizationId,
               pipelineId,
-              Object.fromEntries(searchParams.entries()),
+              Object.fromEntries(searchParams.entries())
             )}
           >
             Client SDK
           </OutlinedNavigationLink>
+
+          <OutlinedNavigationLink
+            to={routes.pipelineHTTPApi(
+              organizationId,
+              pipelineId,
+              Object.fromEntries(searchParams.entries())
+            )}
+          >
+            HTTP Api
+          </OutlinedNavigationLink>
+
           <OutlinedNavigationLink
             to={routes.pipelineWebsiteChatbot(
               organizationId,
               pipelineId,
-              Object.fromEntries(searchParams.entries()),
+              Object.fromEntries(searchParams.entries())
             )}
           >
             Website Chatbot
@@ -38,7 +49,7 @@ export function InterfaceLayout() {
             to={routes.pipelineOpenAIApi(
               organizationId,
               pipelineId,
-              Object.fromEntries(searchParams.entries()),
+              Object.fromEntries(searchParams.entries())
             )}
           >
             OpenAI Api
