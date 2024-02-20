@@ -100,7 +100,7 @@ function BuilderNodeHeaderActions({
         <IconButton
           onlyIcon
           icon={<Icon iconName="settings" />}
-          aria-label="Edit block"
+          aria-label={`Edit block: ${data.name}`}
           onClick={handleEdit}
           disabled={runStatus !== "idle"}
         />
@@ -108,7 +108,7 @@ function BuilderNodeHeaderActions({
 
       <IconButton
         onlyIcon
-        aria-label="Delete block"
+        aria-label={`Delete block: ${data.name}`}
         icon={<Icon iconName="trash" />}
         onClick={handleDelete}
         disabled={runStatus !== "idle" || disabled}

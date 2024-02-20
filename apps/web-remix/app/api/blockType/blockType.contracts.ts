@@ -81,4 +81,6 @@ export const BlockTypesResponse = z.object({
   data: BlockTypes,
 });
 
+export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
+
 export type IBlockTypesResponse = z.TypeOf<typeof BlockTypesResponse>;

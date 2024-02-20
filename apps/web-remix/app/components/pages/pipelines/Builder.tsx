@@ -196,7 +196,7 @@ export const Builder = ({
   });
 
   useEffect(() => {
-    if (location.state?.reset) {
+    if (location.state?._isRedirect) {
       navigate(
         buildUrlWithParams(".", Object.fromEntries(searchParams.entries())),
         { state: null }
@@ -204,7 +204,7 @@ export const Builder = ({
       setNodes(getNodes(pipeline.config));
       setEdges(getEdges(pipeline.config));
     }
-  }, [pipeline, location.state, searchParams]);
+  }, [pipeline, location, searchParams]);
 
   const handleOnSave = useCallback(() => {
     onSave?.(toPipelineConfig(nodes, edges));
@@ -212,6 +212,7 @@ export const Builder = ({
 
   return (
     <div
+      data-testid="workflow-builder"
       className={classNames("relative pt-5 w-full", className)}
       ref={reactFlowWrapper}
     >

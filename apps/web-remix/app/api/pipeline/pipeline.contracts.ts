@@ -56,9 +56,13 @@ export const AliasResponse = z
     return response.data;
   });
 
+export type IAliasResponse = z.TypeOf<typeof AliasResponse>;
+
 export const AliasesResponse = z
   .object({ data: z.array(Alias) })
   .transform((response) => response.data);
+
+export type IAliasesResponse = z.TypeOf<typeof AliasesResponse>;
 
 export const PipelineCost = z.object({
   amount: z.string(),
@@ -93,7 +97,9 @@ export const PipelineResponse = z
 
 export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
 
-export type IPipelineResponse = z.TypeOf<typeof PipelinesResponse>;
+export type IPipelinesResponse = z.TypeOf<typeof PipelinesResponse>;
+
+export type IPipelineResponse = z.TypeOf<typeof PipelineResponse>;
 
 export const PipelineRunsResponse = z
   .object({ data: PipelineRuns })

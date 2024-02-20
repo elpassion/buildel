@@ -296,7 +296,13 @@ function TriggerValidation() {
   const { validate } = useFormContext();
 
   useEffect(() => {
-    validate();
+    const validateForm = async () => {
+      try {
+        await validate();
+      } catch {}
+    };
+
+    validateForm();
   }, [validate]);
   return null;
 }

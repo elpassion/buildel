@@ -8,6 +8,10 @@ export class InputHandle {
     return new InputHandle(await screen.findByLabelText(label));
   }
 
+  static async fromRole(name?: string): Promise<InputHandle> {
+    return new InputHandle(await screen.findByRole("textbox", { name }));
+  }
+
   isDisabled(): boolean {
     return this.inputElement.hasAttribute("disabled");
   }
@@ -18,5 +22,9 @@ export class InputHandle {
     }
 
     await userEvent.type(this.inputElement, text);
+  }
+
+  get value() {
+    return this.inputElement.value;
   }
 }

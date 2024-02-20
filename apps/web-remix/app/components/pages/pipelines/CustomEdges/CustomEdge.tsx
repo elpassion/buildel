@@ -56,6 +56,7 @@ export function CustomEdge({
     <>
       <path
         id={id}
+        data-testid="builder-edge"
         className="react-flow__edge-path"
         d={edgePath}
         fill="none"

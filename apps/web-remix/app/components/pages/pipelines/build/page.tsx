@@ -34,7 +34,7 @@ export function PipelineBuilder() {
 
   const navigate = useNavigate();
   const match = useMatch(
-    "/:organizationId/pipelines/:pipelineId/build/blocks/:blockName",
+    "/:organizationId/pipelines/:pipelineId/build/blocks/:blockName"
   );
   const isSidebarOpen = !!match;
 
@@ -43,10 +43,10 @@ export function PipelineBuilder() {
       if (isEqual(pipeline.config, config)) return;
       updateFetcher.submit(
         { ...pipeline, config: { ...config } },
-        { method: "PUT", encType: "application/json" },
+        { method: "PUT", encType: "application/json" }
       );
     },
-    [updateFetcher, pipeline],
+    [updateFetcher, pipeline]
   );
 
   const handleRevalidate = () => {
@@ -58,14 +58,14 @@ export function PipelineBuilder() {
       routes.pipelineBuild(
         organizationId,
         pipelineId,
-        Object.fromEntries(searchParams.entries()),
-      ),
+        Object.fromEntries(searchParams.entries())
+      )
     );
   };
 
   const isDisabled = aliasId !== "latest";
 
-  if (isDisabled)
+  if (isDisabled) {
     return (
       <Builder
         alias={aliasId}
@@ -79,6 +79,7 @@ export function PipelineBuilder() {
         {() => <BuilderHeader />}
       </Builder>
     );
+  }
 
   return (
     <>

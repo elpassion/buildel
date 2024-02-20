@@ -49,6 +49,7 @@ export const CreateBlockDraggableItem: React.FC<
 
   return (
     <div
+      id="draggable-block-item"
       key={data.type}
       className={classNames(
         "min-w-[100px] bg-neutral-850 py-2 pl-3 pr-2 text-white flex justify-between items-center transition text-xs",
@@ -66,7 +67,8 @@ export const CreateBlockDraggableItem: React.FC<
       <span>{startCase(data.type)}</span>
       <IconButton
         size="xs"
-        aria-label="Add block"
+        data-testid={`Add block: ${data.type}`}
+        aria-label={`Add block: ${data.type}`}
         className="!w-5 !h-5 !rounded"
         onClick={() => onClickAdd(data)}
         icon={<Icon iconName="plus" />}

@@ -39,7 +39,10 @@ export const CreateBlockFloatingMenu: React.FC<
 
   const SubMenuItems = ({ group }: { group: string }) => {
     return (
-      <div className="rounded-lg overflow-hidden drop-shadow-md border border-neutral-100 divide-y divide-solid">
+      <div
+        data-testid={`submenu-${group}`}
+        className="rounded-lg overflow-hidden drop-shadow-md border border-neutral-100 divide-y divide-solid"
+      >
         {blockGroups[group].map((block) => (
           <CreateBlockDraggableItem
             key={block.type}
