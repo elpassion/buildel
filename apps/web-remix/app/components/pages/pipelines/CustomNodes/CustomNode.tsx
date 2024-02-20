@@ -16,8 +16,14 @@ export interface CustomNodeProps extends PropsWithChildren {
   onDelete: (block: IBlockConfig) => void;
   isConnectable?: boolean;
   disabled?: boolean;
+  className?: string;
 }
-export function CustomNode({ data, selected, children }: CustomNodeProps) {
+export function CustomNode({
+  data,
+  selected,
+  children,
+  className,
+}: CustomNodeProps) {
   const { status, isValid, errors } = useRunPipelineNode(data);
 
   const borderStyles = useCallback(() => {
@@ -35,7 +41,8 @@ export function CustomNode({ data, selected, children }: CustomNodeProps) {
           {
             "scale-110": status,
             "border-primary-700": status,
-          }
+          },
+          className
         )}
       >
         <NodeWorkingIcon isWorking={status} />

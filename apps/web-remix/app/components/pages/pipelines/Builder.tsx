@@ -78,10 +78,10 @@ export const Builder = ({
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(
-    getNodes(pipeline.config),
+    getNodes(pipeline.config)
   );
   const [edges, setEdges, onEdgesChange] = useEdgesState<IConfigConnection>(
-    getEdges(pipeline.config),
+    getEdges(pipeline.config)
   );
 
   const location = useLocation();
@@ -93,7 +93,7 @@ export const Builder = ({
       if (type === "readOnly") return;
       return onNodesChange(changes);
     },
-    [onNodesChange, type],
+    [onNodesChange, type]
   );
 
   const handleOnEdgesChange = useCallback(
@@ -101,13 +101,13 @@ export const Builder = ({
       if (type === "readOnly") return;
       return onEdgesChange(changes);
     },
-    [onEdgesChange, type],
+    [onEdgesChange, type]
   );
 
   const handleIsValidConnection = useCallback(
     (connection: Connection) =>
       isValidConnection(toPipelineConfig(nodes, edges), connection),
-    [edges, nodes],
+    [edges, nodes]
   );
 
   const handleDelete = useCallback(
@@ -115,14 +115,14 @@ export const Builder = ({
       setEdges((eds) => eds.filter((ed) => ed.source !== node.name));
       setNodes((nds) => nds.filter((nd) => nd.id !== node.name));
     },
-    [setNodes, setEdges],
+    [setNodes, setEdges]
   );
 
   const onBlockCreate = useCallback(
     async (created: IBlockConfig) => {
       const sameBlockTypes = getAllBlockTypes(
         toPipelineConfig(nodes, edges),
-        created.type,
+        created.type
       );
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${created.type.toLowerCase()}_${nameNum}`;
@@ -138,7 +138,7 @@ export const Builder = ({
 
       setNodes((prev) => [...prev, newBlock]);
     },
-    [setNodes, nodes, edges],
+    [setNodes, nodes, edges]
   );
 
   const onConnect = useCallback(
@@ -149,11 +149,11 @@ export const Builder = ({
             id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
             ...params,
           },
-          eds,
-        ),
+          eds
+        )
       );
     },
-    [setEdges],
+    [setEdges]
   );
 
   const handleDeleteEdge = useCallback((id: string) => {
@@ -168,7 +168,7 @@ export const Builder = ({
         disabled={type === "readOnly"}
       />
     ),
-    [handleDelete],
+    [handleDelete]
   );
 
   const nodeTypes = useMemo(() => {
@@ -183,7 +183,7 @@ export const Builder = ({
         disabled={type === "readOnly"}
       />
     ),
-    [handleDeleteEdge, type],
+    [handleDeleteEdge, type]
   );
 
   const edgeTypes = useMemo(() => {
@@ -199,7 +199,7 @@ export const Builder = ({
     if (location.state?.reset) {
       navigate(
         buildUrlWithParams(".", Object.fromEntries(searchParams.entries())),
-        { state: null },
+        { state: null }
       );
       setNodes(getNodes(pipeline.config));
       setEdges(getEdges(pipeline.config));
@@ -246,8 +246,8 @@ export const Builder = ({
           >
             <Background
               variant={BackgroundVariant.Dots}
-              gap={35}
-              color="#aaa"
+              gap={20}
+              color="#666"
               className="bg-black rounded-lg"
             />
             <Controls showInteractive={false} />

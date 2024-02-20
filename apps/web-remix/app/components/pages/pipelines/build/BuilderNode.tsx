@@ -15,7 +15,7 @@ import { routes } from "~/utils/routes.utils";
 
 export function BuilderNode(props: CustomNodeProps) {
   return (
-    <CustomNode {...props}>
+    <CustomNode {...props} className="hover:border-primary-700">
       <CustomNodeHeader data={props.data}>
         <BuilderNodeHeaderActions
           data={props.data}

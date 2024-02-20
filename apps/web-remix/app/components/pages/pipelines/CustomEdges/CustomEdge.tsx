@@ -63,7 +63,7 @@ export function CustomEdge({
         style={{
           ...style,
           strokeWidth: "1",
-          stroke: selected ? "#DE8411" : "#fff",
+          stroke: selected ? "#DE8411" : "#ccc",
           ...statusStyles,
         }}
       />
