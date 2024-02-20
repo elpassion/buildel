@@ -6,6 +6,7 @@ dotenv.config({ path: ".env.test" });
 
 export default defineConfig({
   test: {
+    setupFiles: ["./app/tests/setupFiles.ts"],
     environment: "jsdom",
     globals: true,
     server: {

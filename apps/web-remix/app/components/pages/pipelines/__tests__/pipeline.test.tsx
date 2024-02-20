@@ -1,60 +1,26 @@
 import React from "react";
 import { test, describe, expect } from "vitest";
+import { render, screen, waitFor, fireEvent, act } from "~/tests/render";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { InputHandle } from "~/tests/handles/Input.handle";
+import userEvent from "@testing-library/user-event";
+import { server } from "~/tests/server.mock";
 import {
   actionWithSession,
   RoutesProps,
   setupRoutes,
 } from "~/tests/setup.tests";
-import { render, screen, waitFor, fireEvent, act } from "~/tests/render";
-import { server } from "~/tests/server.mock";
+import { loader as editBlockLoader } from "../build/editBlock/loader.server";
+import { handlers as blockTypesHandlers } from "./blockTypes.handlers";
+import { action as buildAction } from "../build/action.server";
+import { loader as buildLoader } from "../build/loader.server";
+import { EditBlockPage } from "../build/editBlock/page";
+import { PipelineBuilder } from "../build/page";
 import { PipelinesPage } from "../list/page";
 import {
   handlers as pipelinesHandlers,
   updatedPipelineHandles,
 } from "./pipelines.handlers";
-import { handlers as blockTypesHandlers } from "./blockTypes.handlers";
-import { action as buildAction } from "../build/action.server";
-import { loader as buildLoader } from "../build/loader.server";
-import { PipelineBuilder } from "../build/page";
-import { EditBlockPage } from "../build/editBlock/page";
-import { loader as editBlockLoader } from "../build/editBlock/loader.server";
-import { vi } from "vitest";
-import userEvent from "@testing-library/user-event";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { InputHandle } from "~/tests/handles/Input.handle";
-
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
-
-class WebSocketMock {
-  url: string;
-  readyState: any;
-  static readonly CONNECTING = 0;
-  static readonly OPEN = 1;
-  static readonly CLOSING = 2;
-  static readonly CLOSED = 3;
-
-  constructor(url: string) {
-    console.log(`WebSocketMock created for url: ${url}`);
-    this.url = url;
-    this.readyState = WebSocket.OPEN;
-  }
-
-  send() {
-    console.log(`Mock send: `);
-  }
-
-  close() {
-    console.log(`Mock WebSocket closed`);
-    this.readyState = WebSocketMock.CLOSED;
-  }
-}
-
-// @ts-ignore
-global.WebSocket = WebSocketMock;
 
 describe(PipelinesPage.name, () => {
   const setupServer = server([...pipelinesHandlers, ...blockTypesHandlers]);
