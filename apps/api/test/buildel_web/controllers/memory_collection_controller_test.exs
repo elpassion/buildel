@@ -183,9 +183,16 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
       assert json_response(conn, 404)["errors"] != %{}
     end
 
-    test "handles not found", %{conn: conn, organization: organization} do
+    test "handles not found", %{
+      conn: conn,
+      organization: organization,
+      another_collection: another_collection
+    } do
       conn =
-        delete(conn, ~p"/api/organizations/#{organization.id}/memory_collections/1")
+        delete(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{another_collection}"
+        )
 
       assert json_response(conn, 404)["errors"] != %{}
     end

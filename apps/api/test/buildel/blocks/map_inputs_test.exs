@@ -5,7 +5,7 @@ defmodule Buildel.Blocks.MapInputsTest do
   test "exposes options" do
     assert MapInputs.options() == %{
              description:
-               "This module specializes in aggregating the latest inputs and combining them based on a specified template.",
+               "Used to map the latest inputs and combine them based on a specified template.",
              type: "map_inputs",
              inputs: [Block.text_input("input")],
              outputs: [Block.text_output("output")],
