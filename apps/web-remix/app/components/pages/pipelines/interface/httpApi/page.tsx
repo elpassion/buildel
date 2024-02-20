@@ -59,7 +59,7 @@ export function HTTPApiPage() {
       <PreviewSection>
         <PreviewConnector />
         <PreviewSectionHeader>
-          <PreviewSectionStep>1</PreviewSectionStep>
+          <PreviewSectionStep>2</PreviewSectionStep>
 
           <PreviewSectionHeading>
             Install Buildel packages
@@ -89,7 +89,7 @@ export function HTTPApiPage() {
       <PreviewSection>
         <PreviewConnector />
         <PreviewSectionHeader>
-          <PreviewSectionStep>1</PreviewSectionStep>
+          <PreviewSectionStep>3</PreviewSectionStep>
 
           <PreviewSectionHeading>
             Install Buildel packages
@@ -118,9 +118,8 @@ export function HTTPApiPage() {
       </PreviewSection>
 
       <PreviewSection>
-        <PreviewConnector />
         <PreviewSectionHeader>
-          <PreviewSectionStep>1</PreviewSectionStep>
+          <PreviewSectionStep>4</PreviewSectionStep>
 
           <PreviewSectionHeading>
             Install Buildel packages
