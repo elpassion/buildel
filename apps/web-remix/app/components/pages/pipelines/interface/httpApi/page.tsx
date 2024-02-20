@@ -30,16 +30,16 @@ export function HTTPApiPage() {
         <PreviewSectionHeader>
           <PreviewSectionStep>1</PreviewSectionStep>
 
-          <PreviewSectionHeading>
-            Install Buildel packages
-          </PreviewSectionHeading>
+          <PreviewSectionHeading>Create a new run</PreviewSectionHeading>
         </PreviewSectionHeader>
 
         <PreviewSectionContent>
           <PreviewSectionText>
-            Begin by installing the necessary Buildel packages using npm. This
-            initial step equips you with the tools required for seamless
-            integration with our API.
+            To create a new run, send a POST request to the runs endpoint of our
+            API. Optionally the request can include additional metadata object,
+            which contains any data you will need later inside of the run. By
+            default metadata is empty. Also you can specify an alias for the
+            run, which will be used. By default alias is 0 ~ latest.
           </PreviewSectionText>
 
           <CodePreviewWrapper
@@ -47,7 +47,7 @@ export function HTTPApiPage() {
   -X POST \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer \${BUILDEL_API_KEY}" \\
-  -d '{"metadata": {"userId": 123}}'`}
+  -d '{"metadata": {"userId": 123}, "alias": 0}'`}
             language="shell"
             height={115}
           >
@@ -61,16 +61,15 @@ export function HTTPApiPage() {
         <PreviewSectionHeader>
           <PreviewSectionStep>2</PreviewSectionStep>
 
-          <PreviewSectionHeading>
-            Install Buildel packages
-          </PreviewSectionHeading>
+          <PreviewSectionHeading>Start the run</PreviewSectionHeading>
         </PreviewSectionHeader>
 
         <PreviewSectionContent>
           <PreviewSectionText>
-            Begin by installing the necessary Buildel packages using npm. This
-            initial step equips you with the tools required for seamless
-            integration with our API.
+            Once the run is created, you can start it by sending a POST request
+            to the start endpoint of our API. This will trigger the start of
+            run. From this point, the run will be in progress and you can
+            interact with it.
           </PreviewSectionText>
 
           <CodePreviewWrapper
@@ -91,16 +90,15 @@ export function HTTPApiPage() {
         <PreviewSectionHeader>
           <PreviewSectionStep>3</PreviewSectionStep>
 
-          <PreviewSectionHeading>
-            Install Buildel packages
-          </PreviewSectionHeading>
+          <PreviewSectionHeading>Input data to the run</PreviewSectionHeading>
         </PreviewSectionHeader>
 
         <PreviewSectionContent>
           <PreviewSectionText>
-            Begin by installing the necessary Buildel packages using npm. This
-            initial step equips you with the tools required for seamless
-            integration with our API.
+            To input data to the run, send a POST request to the input endpoint
+            of our API. This will trigger the input of data to the run. You can
+            interact with all public inputs of the run. You can input data to
+            the run only if it is in progress.
           </PreviewSectionText>
 
           <CodePreviewWrapper
@@ -121,16 +119,14 @@ export function HTTPApiPage() {
         <PreviewSectionHeader>
           <PreviewSectionStep>4</PreviewSectionStep>
 
-          <PreviewSectionHeading>
-            Install Buildel packages
-          </PreviewSectionHeading>
+          <PreviewSectionHeading>Stop the run</PreviewSectionHeading>
         </PreviewSectionHeader>
 
         <PreviewSectionContent>
           <PreviewSectionText>
-            Begin by installing the necessary Buildel packages using npm. This
-            initial step equips you with the tools required for seamless
-            integration with our API.
+            To stop the run, send a POST request to the stop endpoint of our
+            API. This will trigger the stop of run. From this point, the run
+            will be stopped and you can't interact with it anymore.
           </PreviewSectionText>
 
           <CodePreviewWrapper
