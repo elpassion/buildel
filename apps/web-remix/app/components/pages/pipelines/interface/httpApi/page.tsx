@@ -1,10 +1,8 @@
 import React from "react";
-import { routes } from "~/utils/routes.utils";
 import { MetaFunction } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import { CodePreviewWrapper } from "~/components/pages/pipelines/CodePreview/CodePreviewWrapper";
-import { CodePreviewOptions } from "~/components/pages/pipelines/CodePreview/CodePreviewOptions";
 import {
   PreviewConnector,
   PreviewSection,
@@ -22,7 +20,7 @@ export function HTTPApiPage() {
     <div>
       <h2 className="text-lg text-white font-medium">HTTP Api</h2>
       <p className="text-white text-xs mb-6">
-        Access our Buildel API easily with our client SDK.
+        Access our Buildel API easily with our HTTP Api.
       </p>
 
       <PreviewSection>
