@@ -78,7 +78,9 @@ describe(PipelinesPage.name, () => {
 
     const addButton = blockTypes[0].querySelector("button");
 
-    await act(() => userEvent.click(addButton!));
+    await act(async () => {
+      await userEvent.click(addButton!);
+    });
 
     const blocks = await page.getBlocks();
 
@@ -94,11 +96,11 @@ describe(PipelinesPage.name, () => {
       /Delete block: text_input_1/i
     );
 
-    await act(() => page.fireBlockOnClick(deleteButton.buttonElement));
+    act(() => {
+      page.fireBlockOnClick(deleteButton.buttonElement);
+    });
 
-    const confirmButton = await ButtonHandle.fromRole("Confirm");
-
-    await act(() => confirmButton.click());
+    await page.confirmAction();
 
     const blocks = await page.getBlocks();
 
@@ -114,7 +116,9 @@ describe(PipelinesPage.name, () => {
       /Edit block: text_output_1/i
     );
 
-    await act(() => page.fireBlockOnClick(editButton.buttonElement));
+    act(() => {
+      page.fireBlockOnClick(editButton.buttonElement);
+    });
 
     await screen.findByText(/Text Output 1/i);
 
@@ -126,7 +130,9 @@ describe(PipelinesPage.name, () => {
 
     const submit = await ButtonHandle.fromRole("Save changes");
 
-    await act(async () => await submit.click());
+    await act(async () => {
+      await submit.click();
+    });
 
     await waitFor(() => screen.findByText(/super_output/i));
   });
