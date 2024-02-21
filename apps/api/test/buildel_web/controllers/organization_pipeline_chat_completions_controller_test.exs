@@ -82,7 +82,31 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
   end
 
   defp create_pipeline(%{organization: organization}) do
-    pipeline = pipeline_fixture(%{organization_id: organization.id})
+    pipeline =
+      pipeline_fixture(%{
+        organization_id: organization.id,
+        config: %{
+          "version" => "3",
+          "blocks" => [
+            %{
+              "name" => "chat_block",
+              "type" => "chat",
+              "opts" => %{
+                "prompt_template" => "Hello, how can I help you?",
+                "api_key" => "some_api_key",
+                "system_message" => "Hi, I'm a bot!",
+                "messages" => []
+              },
+              "ios" => []
+            }
+          ],
+          "connections" => []
+        },
+        interface_config: %{
+          "chat" => "chat_block"
+        }
+      })
+
     %{pipeline: pipeline}
   end
 

@@ -42,6 +42,12 @@ defmodule Buildel.Pipelines.Runner do
     {:ok, run}
   end
 
+  def create_chat_completion(%Run{} = run, params) do
+    block_name = run.pipeline.interface_config["chat"] |> IO.inspect()
+
+    Buildel.Blocks.Block.call(block_pid(run, block_name), :chat_completion, params)
+  end
+
   def block_pid(%Run{} = run, block_name) do
     Process.whereis(
       Buildel.Pipelines.Worker.block_id(run, %Buildel.Blocks.Block{name: block_name})

@@ -366,6 +366,11 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
+  def handle_call({:chat_completion, %{messages: messages, model: model}}, _, state) do
+    {:reply, {:ok, %{}}, state}
+  end
+
+  @impl true
   def handle_info({name, :text, message}, state) do
     state = save_latest_input_value(state, name, message)
     send_message(self(), {:text, message})
