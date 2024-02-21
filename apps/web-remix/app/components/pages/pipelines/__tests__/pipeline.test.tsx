@@ -1,6 +1,13 @@
 import React from "react";
-import { test, describe, expect, vi } from "vitest";
-import { render, screen, waitFor, fireEvent, act } from "~/tests/render";
+import { test, describe, expect } from "vitest";
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  act,
+  Matcher,
+} from "~/tests/render";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
 import userEvent from "@testing-library/user-event";
@@ -17,13 +24,22 @@ import { loader as buildLoader } from "../build/loader.server";
 import { EditBlockPage } from "../build/editBlock/page";
 import { PipelineBuilder } from "../build/page";
 import { PipelinesPage } from "../list/page";
+import { PipelineLayout } from "../pipelineLayout/page";
+import {
+  loader as layoutLoader,
+  action as layoutAction,
+} from "../pipelineLayout/index.server";
 import {
   handlers as pipelinesHandlers,
-  updatedPipelineHandles,
+  pipelineAliasesHandlers,
 } from "./pipelines.handlers";
 
 describe(PipelinesPage.name, () => {
-  const setupServer = server([...pipelinesHandlers, ...blockTypesHandlers]);
+  const setupServer = server([
+    ...pipelinesHandlers,
+    ...pipelineAliasesHandlers,
+    ...blockTypesHandlers,
+  ]);
 
   beforeAll(() => setupServer.listen());
   afterEach(() => setupServer.resetHandlers());
@@ -90,8 +106,6 @@ describe(PipelinesPage.name, () => {
   });
 
   test("should edit block name", async () => {
-    setupServer.use(...updatedPipelineHandles);
-
     const page = new PipelineObject().render({
       initialEntries: ["/2/pipelines/2/build"],
     });
@@ -116,21 +130,96 @@ describe(PipelinesPage.name, () => {
 
     await waitFor(() => screen.findByText(/super_output/i));
   });
+
+  test("should create alias", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: ["/2/pipelines/2/build"],
+    });
+
+    await page.createAlias();
+
+    const links = await page.getAliasLinks();
+
+    expect(links).toHaveLength(3);
+  });
+
+  test("should delete alias", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: ["/2/pipelines/2/build"],
+    });
+
+    const links = await page.getAliasLinks();
+
+    expect(links).toHaveLength(3);
+
+    await page.openAliasDropdown();
+
+    await page.deleteAlias(/Delete alias: sample-workflow v1/i);
+
+    const linksAfterDelete = await page.getAliasLinks();
+
+    expect(linksAfterDelete).toHaveLength(2);
+  });
+
+  test("change alias and load its configuration", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: ["/2/pipelines/2/build"],
+    });
+
+    const blocks = await page.getBlocks();
+
+    expect(blocks).toHaveLength(3);
+
+    await page.openAliasDropdown();
+
+    await page.selectAlias(/Select alias: alias/i);
+
+    const aliasBlocks = await waitFor(() =>
+      screen.queryAllByTestId("builder-block")
+    );
+
+    expect(aliasBlocks).toHaveLength(0);
+  });
+
+  test("should restore alias", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: ["/2/pipelines/2/build"],
+    });
+
+    await page.openAliasDropdown();
+
+    await page.selectAlias(/Select alias: alias/i);
+
+    await page.restore();
+
+    await page.confirmAction();
+
+    const aliasBlocks = await waitFor(() =>
+      screen.queryAllByTestId("builder-block")
+    );
+
+    expect(aliasBlocks).toHaveLength(0);
+  });
 });
 
 class PipelineObject {
   render(props?: RoutesProps) {
     const Routes = setupRoutes([
       {
-        path: "/",
-        Component: () => <p>Dashboard</p>,
+        action: actionWithSession(layoutAction),
+        loader: actionWithSession(layoutLoader),
+        path: "/:organizationId/pipelines/:pipelineId",
+        Component: PipelineLayout,
+        children: [
+          {
+            action: actionWithSession(buildAction),
+            loader: actionWithSession(buildLoader),
+            path: "/:organizationId/pipelines/:pipelineId/build",
+            Component: PipelineBuilder,
+          },
+        ],
       },
-      {
-        action: actionWithSession(buildAction),
-        loader: actionWithSession(buildLoader),
-        path: "/:organizationId/pipelines/:pipelineId/build",
-        Component: PipelineBuilder,
-      },
+
       {
         loader: actionWithSession(editBlockLoader),
         path: "/:organizationId/pipelines/:pipelineId/build/blocks/:blockName",
@@ -171,6 +260,70 @@ class PipelineObject {
         cancelable: true,
       })
     );
+
+    return this;
+  }
+
+  async openAliasDropdown() {
+    const aliasDropdown = await ButtonHandle.fromLabelText(/Select aliases/i);
+
+    await act(async () => {
+      await aliasDropdown.click();
+    });
+
+    return this;
+  }
+
+  async restore() {
+    const restore = await ButtonHandle.fromRole("Restore");
+
+    await act(async () => {
+      await restore.click();
+    });
+
+    return this;
+  }
+
+  async createAlias() {
+    const create = await ButtonHandle.fromTestId("create-alias");
+
+    await act(async () => {
+      await create.click();
+    });
+
+    return this;
+  }
+
+  async selectAlias(name: Matcher) {
+    const aliasLink = await ButtonHandle.fromLabelText(name);
+
+    await act(async () => {
+      await aliasLink.click();
+    });
+
+    return this;
+  }
+
+  async getAliasLinks() {
+    return screen.findAllByTestId("alias-link");
+  }
+
+  async deleteAlias(label: Matcher) {
+    const deleteButton = await ButtonHandle.fromLabelText(label);
+
+    await act(async () => {
+      await deleteButton.click();
+    });
+
+    return this;
+  }
+
+  async confirmAction() {
+    const confirmButton = await ButtonHandle.fromRole("Confirm");
+
+    await act(async () => {
+      await confirmButton.click();
+    });
 
     return this;
   }

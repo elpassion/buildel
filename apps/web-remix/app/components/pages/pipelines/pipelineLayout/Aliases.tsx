@@ -77,6 +77,7 @@ function SelectTrigger({
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
+      aria-label="Select aliases"
       type="button"
       className={classNames(
         "px-2 py-1 text-neutral-100 text-sm border border-neutral-800 rounded-lg transition bg-transparent hover:bg-neutral-900",
@@ -91,11 +92,13 @@ function SelectTrigger({
 
 interface AliasDropdownProps {
   isShown: boolean;
+  className?: string;
 }
 
 export const AliasDropdown: React.FC<PropsWithChildren<AliasDropdownProps>> = ({
   children,
   isShown,
+  className,
 }) => {
   return (
     <div
@@ -104,7 +107,8 @@ export const AliasDropdown: React.FC<PropsWithChildren<AliasDropdownProps>> = ({
         {
           "opacity-0 pointer-events-none": !isShown,
           "opacity-100 pointer-events-auto": isShown,
-        }
+        },
+        className
       )}
     >
       <div className="overflow-y-auto max-h-[300px]">{children}</div>
@@ -130,6 +134,9 @@ export const AliasList = ({ data }: AliasListProps) => {
         <BasicLink
           to={`${location.pathname}?alias=${data.id}`}
           state={{ reset: true }}
+          className="focus:border"
+          aria-label={`Select alias: ${data.name}`}
+          data-testid="alias-link"
         >
           <AliasListItem data={data} isActive={alias === `${data.id}`} />
         </BasicLink>
@@ -175,7 +182,7 @@ export const AliasListItem = ({ data, isActive }: AliasListItemProps) => {
       {data.id !== "latest" && !isActive ? (
         <button
           onClick={onDelete}
-          aria-label="Delete alias"
+          aria-label={`Delete alias: ${data.name}`}
           className="text-sm text-neutral-200 hover:text-primary-500 opacity-0 group-hover:opacity-100"
         >
           <Icon iconName="trash" />
@@ -228,7 +235,7 @@ export const CreateAliasForm = ({
 
       <button
         type="submit"
-        aria-label="Create workflow alias"
+        data-testid="create-alias"
         className="bg-secondary-500 hover:bg-secondary-600 rounded-lg text-neutral-100 px-2 py-1 text-sm transition"
       >
         Create alias

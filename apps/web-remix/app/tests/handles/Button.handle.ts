@@ -12,6 +12,10 @@ export class ButtonHandle {
     return new ButtonHandle(await screen.findByLabelText(label));
   }
 
+  static async fromTestId(testId: Matcher): Promise<ButtonHandle> {
+    return new ButtonHandle(await screen.findByTestId(testId));
+  }
+
   isDisabled(): boolean {
     return this.buttonElement.hasAttribute("disabled");
   }

@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import {
+  IAliasesResponse,
   IAliasResponse,
   IPipelineResponse,
   IPipelinesResponse,
@@ -24,23 +25,47 @@ export const handlers = [
 
   http.get(
     "/super-api/organizations/:organizationId/pipelines/:pipelineId",
-    () => {
+    ({ params }) => {
+      const pipeline = pipelines.get(Number(params.pipelineId));
+
+      if (!pipeline) {
+        return HttpResponse.json(
+          {},
+          {
+            status: 404,
+          }
+        );
+      }
+
       return HttpResponse.json<{ data: IPipelineResponse }>(
-        { data: pipelineFixture({ id: 123 }) },
+        { data: pipeline },
         { status: 200 }
       );
     }
   ),
 
-  http.get(
-    "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId",
-    () => {
-      return HttpResponse.json<{ data: IAliasResponse }>(
-        { data: aliasFixture({ id: 123 }) },
-        {
-          status: 200,
-        }
-      );
+  http.put<any, { pipeline: IPipeline }>(
+    "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+    async ({ request, params }) => {
+      const data = await request.json();
+      const pipelineId = Number(params.pipelineId);
+
+      const pipeline = pipelines.get(pipelineId);
+
+      if (!pipeline) {
+        return HttpResponse.json(
+          {},
+          {
+            status: 404,
+          }
+        );
+      }
+
+      const updated = { ...pipeline, ...data.pipeline };
+
+      pipelines.set(pipelineId, updated);
+
+      return HttpResponse.json({ data: updated }, { status: 200 });
     }
   ),
 
@@ -67,13 +92,6 @@ export const handlers = [
       { status: 201 }
     );
   }),
-
-  http.put(
-    "/super-api/organizations/:organizationId/pipelines/:pipelineId",
-    async () => {
-      return HttpResponse.json({ data: pipelineFixture() }, { status: 200 });
-    }
-  ),
 ];
 
 export const emptyHandlers = [
@@ -87,25 +105,87 @@ export const emptyHandlers = [
   }),
 ];
 
-let pipeline = pipelineFixture({ id: 123 });
+const aliases = new Map<number, IAliasResponse>();
+aliases.set(1, aliasFixture({ id: 1 }));
+aliases.set(
+  2,
+  aliasFixture({
+    id: 2,
+    name: "alias",
+    config: { ...aliasFixture().config, blocks: [], connections: [] },
+  })
+);
 
-export const updatedPipelineHandles = [
-  http.get(
-    "/super-api/organizations/:organizationId/pipelines/:pipelineId",
-    () => {
-      return HttpResponse.json<{ data: IPipelineResponse }>(
-        { data: pipeline },
-        { status: 200 }
+export const pipelineAliasesHandlers = [
+  http.post<any, { alias: IAliasResponse }>(
+    "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases",
+    async ({ request }) => {
+      const { alias } = await request.json();
+
+      alias.id = 3;
+
+      aliases.set(3, alias);
+
+      return HttpResponse.json<{ data: IAliasResponse }>(
+        { data: alias },
+        {
+          status: 200,
+        }
       );
     }
   ),
-  http.put<any, { pipeline: IPipeline }>(
-    "/super-api/organizations/:organizationId/pipelines/:pipelineId",
-    async ({ request }) => {
-      const data = await request.json();
-      pipeline = { ...pipeline, ...data.pipeline };
 
-      return HttpResponse.json({ data: pipeline }, { status: 200 });
+  http.delete(
+    "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId",
+    async ({ params }) => {
+      const { aliasId } = params;
+
+      aliases.delete(Number(aliasId));
+
+      return HttpResponse.json(
+        {},
+        {
+          status: 200,
+        }
+      );
+    }
+  ),
+
+  http.get(
+    "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId",
+    ({ params }) => {
+      const { aliasId } = params;
+      const alias = aliases.get(Number(aliasId));
+
+      if (!alias) {
+        return HttpResponse.json(
+          {},
+          {
+            status: 404,
+          }
+        );
+      }
+
+      return HttpResponse.json<{ data: IAliasResponse }>(
+        { data: alias },
+        {
+          status: 200,
+        }
+      );
+    }
+  ),
+
+  http.get(
+    "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases",
+    () => {
+      return HttpResponse.json<{ data: IAliasesResponse }>(
+        {
+          data: [...aliases.values()],
+        },
+        {
+          status: 200,
+        }
+      );
     }
   ),
 ];
