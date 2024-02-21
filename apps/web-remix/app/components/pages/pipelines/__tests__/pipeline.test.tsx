@@ -30,19 +30,26 @@ import {
   action as layoutAction,
 } from "../pipelineLayout/index.server";
 import {
-  handlers as pipelinesHandlers,
-  pipelineAliasesHandlers,
+  PipelineHandlers,
+  pipelineFixtureWithUnfilledBlock,
+  AliasHandlers,
 } from "./pipelines.handlers";
+import { TextareaHandle } from "~/tests/handles/Textarea.handle";
+import { SelectHandle } from "~/tests/handles/SelectHandle";
+import { asyncSelectHandlers } from "~/components/pages/pipelines/__tests__/asyncSelect.handlers";
+
+const handlers = () => [
+  ...new PipelineHandlers().handlers,
+  ...new AliasHandlers().handlers,
+  ...asyncSelectHandlers(),
+  ...blockTypesHandlers(),
+];
 
 describe(PipelinesPage.name, () => {
-  const setupServer = server([
-    ...pipelinesHandlers,
-    ...pipelineAliasesHandlers,
-    ...blockTypesHandlers,
-  ]);
+  const setupServer = server([...handlers()]);
 
   beforeAll(() => setupServer.listen());
-  afterEach(() => setupServer.resetHandlers());
+  afterEach(() => setupServer.resetHandlers(...handlers()));
   afterAll(() => setupServer.close());
 
   test("should render correct amount of build nodes based on pipeline config", async () => {
@@ -170,15 +177,15 @@ describe(PipelinesPage.name, () => {
 
     const links = await page.getAliasLinks();
 
-    expect(links).toHaveLength(3);
+    expect(links).toHaveLength(2);
 
     await page.openAliasDropdown();
 
-    await page.deleteAlias(/Delete alias: sample-workflow v1/i);
+    await page.deleteAlias(/Delete alias: alias/i);
 
     const linksAfterDelete = await page.getAliasLinks();
 
-    expect(linksAfterDelete).toHaveLength(2);
+    expect(linksAfterDelete).toHaveLength(1);
   });
 
   test("change alias and load its configuration", async () => {
@@ -234,6 +241,56 @@ describe(PipelinesPage.name, () => {
 
     expect(aliasBlocks).toHaveLength(1);
   });
+
+  test("should render form inputs based on chat block schema", async () => {
+    new PipelineObject().render({
+      initialEntries: [
+        `/2/pipelines/${pipelineFixtureWithUnfilledBlock().id}/build/blocks/${
+          pipelineFixtureWithUnfilledBlock().config.blocks[0].name
+        }`,
+      ],
+    });
+
+    await InputHandle.fromRole("opts.description");
+    await InputHandle.fromRole("opts.endpoint");
+    await InputHandle.fromLabelText("opts.api_key");
+    await InputHandle.fromLabelText("google");
+    await InputHandle.fromLabelText("opts.model");
+    await InputHandle.fromLabelText("rolling");
+    await InputHandle.fromLabelText("Temperature");
+    await InputHandle.fromLabelText("opts.system_message");
+    await InputHandle.fromLabelText("opts.prompt_template");
+  });
+
+  test("should fill required inputs and submit", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: [
+        `/2/pipelines/${pipelineFixtureWithUnfilledBlock().id}/build`,
+      ],
+    });
+
+    await screen.findByText(/This block contains problems to fix./i);
+
+    await page.editBlock("chat_123321");
+
+    const system_message = await TextareaHandle.fromTestId(
+      "opts.system_message-editor"
+    );
+    await system_message.type("You are a helpful asistant");
+
+    const select = await SelectHandle.fromTestId("opts.api_key");
+    await select.selectOption("OPENAI");
+
+    const submit = await ButtonHandle.fromRole("Save changes");
+
+    await act(async () => {
+      await submit.click();
+    });
+
+    expect(
+      screen.queryByText(/This block contains problems to fix./i)
+    ).toBeNull();
+  });
 });
 
 class PipelineObject {
@@ -283,6 +340,18 @@ class PipelineObject {
   async getBlockTypes() {
     const submenu = await screen.findByTestId(/submenu-text/i);
     return submenu.querySelectorAll("#draggable-block-item");
+  }
+
+  async editBlock(blockName: string) {
+    const editButton = await ButtonHandle.fromLabelText(
+      `Edit block: ${blockName}`
+    );
+
+    act(() => {
+      this.fireBlockOnClick(editButton.buttonElement);
+    });
+
+    return this;
   }
 
   //to avoid issue with d3.drag lib (document = null).

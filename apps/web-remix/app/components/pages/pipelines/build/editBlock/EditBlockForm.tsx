@@ -155,7 +155,10 @@ export function EditBlockForm({
         <FormField name={props.name!}>
           <AsyncSelectField
             url={replacedUrl}
+            id={`${props.name}`}
+            data-testid={props.name}
             label={props.field.title}
+            dropdownClassName={`${props.name}-dropdown`}
             supportingText={props.field.description}
             errorMessage={fieldErrors[props.name!]}
             defaultValue={props.field.default
@@ -194,9 +197,12 @@ export function EditBlockForm({
           <CreatableAsyncSelectField
             url={replacedUrl}
             schema={props.field.schema}
+            id={`${props.name}`}
             label={props.field.title}
             supportingText={props.field.description}
             errorMessage={fieldErrors[props.name!]}
+            dropdownClassName={`${props.name}-dropdown`}
+            data-testid={props.name}
             defaultValue={props.field.default
               ?.replace(":pipeline_id", pipelineId.toString())
               ?.replace(":block_name", blockConfig.name)}

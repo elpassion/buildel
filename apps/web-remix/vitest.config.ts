@@ -6,7 +6,10 @@ dotenv.config({ path: ".env.test" });
 
 export default defineConfig({
   test: {
-    setupFiles: ["./app/tests/setupFiles.ts"],
+    setupFiles: [
+      "./app/tests/setupFiles.ts",
+      "./app/tests/MonacoEditor.mock.tsx",
+    ],
     environment: "jsdom",
     globals: true,
     server: {

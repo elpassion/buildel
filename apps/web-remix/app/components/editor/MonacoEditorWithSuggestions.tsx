@@ -98,12 +98,12 @@ export const MonacoEditorWithSuggestions: React.FC<
 
   const handleOnChange: OnChange = useCallback(
     (value?: string) => {
+      onChange?.(value);
+
       if (!editorRef.current) return;
 
       clearDecorations(editorRef.current);
       applyDecorations(editorRef.current);
-
-      onChange?.(value);
     },
     [applyDecorations, clearDecorations, onChange]
   );

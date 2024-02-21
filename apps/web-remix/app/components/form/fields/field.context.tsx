@@ -20,7 +20,7 @@ export function HiddenField({
   name: string;
   value?: number | string | string[];
 }) {
-  return <input type="hidden" name={name} value={value} />;
+  return <input type="hidden" name={name} aria-label={name} value={value} />;
 }
 
 export const FieldContext = React.createContext<{

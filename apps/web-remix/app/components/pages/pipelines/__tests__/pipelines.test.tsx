@@ -13,17 +13,19 @@ import { PipelinesPage } from "../list/page";
 import { loader as listLoader } from "../list/loader.server";
 import { action as listAction } from "../list/action.server";
 import { action as newPipelineAction } from "../new/action.server";
-import { emptyHandlers, handlers } from "./pipelines.handlers";
+import { emptyHandlers, PipelineHandlers } from "./pipelines.handlers";
 import { ListHandle } from "~/tests/handles/List.handle";
 import { NewPipelinePage } from "../new/page";
 import { LinkHandle } from "~/tests/handles/Link.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
 
 describe(PipelinesPage.name, () => {
-  const setupServer = server(handlers);
+  const setupServer = server(new PipelineHandlers().handlers);
 
   beforeAll(() => setupServer.listen());
-  afterEach(() => setupServer.resetHandlers());
+  afterEach(() =>
+    setupServer.resetHandlers(...new PipelineHandlers().handlers)
+  );
   afterAll(() => setupServer.close());
 
   test("should render correct amount of pipelines", async () => {
@@ -33,11 +35,11 @@ describe(PipelinesPage.name, () => {
 
     const workflowList = await ListHandle.fromLabelText(/Workflows list/i);
 
-    expect(workflowList.children).toHaveLength(2);
+    expect(workflowList.children).toHaveLength(3);
   });
 
   test("should render only workflow-templates when pipelines are empty", async () => {
-    setupServer.use(...emptyHandlers);
+    setupServer.use(...emptyHandlers());
 
     new PipelinesObject().render({
       initialEntries: ["/2/pipelines"],
@@ -57,17 +59,21 @@ describe(PipelinesPage.name, () => {
       /Remove workflow: AI Chat/i
     );
 
-    await act(() => button.click());
+    await act(async () => {
+      await button.click();
+    });
 
     const confirmButton = await waitFor(() =>
       ButtonHandle.fromRole("Delete workflow")
     );
 
-    await act(() => confirmButton.click());
+    await act(async () => {
+      await confirmButton.click();
+    });
 
     const workflowList = await ListHandle.fromLabelText(/Workflows list/i);
 
-    expect(workflowList.children).toHaveLength(1);
+    expect(workflowList.children).toHaveLength(2);
   });
 
   test("should duplicate pipeline", async () => {
@@ -79,7 +85,9 @@ describe(PipelinesPage.name, () => {
       /Duplicate workflow: sample-workflow/i
     );
 
-    await act(() => button.click());
+    await act(async () => {
+      await button.click();
+    });
 
     const text = screen.findByText(/pipeline/i);
 
@@ -95,7 +103,9 @@ describe(PipelinesPage.name, () => {
       /Create workflow: Speech To Text/i
     );
 
-    await act(() => button.click());
+    await act(async () => {
+      await button.click();
+    });
 
     const text = screen.findByText(/pipeline/i);
     expect(text).toBeTruthy();
@@ -107,14 +117,18 @@ describe(PipelinesPage.name, () => {
     });
 
     const link = await LinkHandle.fromLabelText(/Create new workflow/i);
-    await act(() => link.click());
+    await act(async () => {
+      await link.click();
+    });
 
     const input = await InputHandle.fromLabelText(/Name/i);
     await input.type("LALALA");
 
     const submit = await ButtonHandle.fromRole("Create workflow");
 
-    await act(() => submit.click());
+    await act(async () => {
+      await submit.click();
+    });
 
     const text = screen.findByText(/pipeline/i);
     expect(text).toBeTruthy();

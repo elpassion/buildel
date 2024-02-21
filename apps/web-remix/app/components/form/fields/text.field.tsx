@@ -16,6 +16,7 @@ export const TextInputField = forwardRef<
       aria-invalid={error ? true : undefined}
       aria-describedby={`${name}-error`}
       aria-errormessage={error ? `${name}-error` : undefined}
+      aria-label={name}
       autoComplete={name}
       errorMessage={errorMessage ?? error}
       {...props}

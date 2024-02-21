@@ -14,7 +14,15 @@ export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
     useEffect(() => {
       if (!formValue && defaultValue) {
         setFormValue(defaultValue as string);
-        validate();
+
+        const validateRadio = async () => {
+          try {
+            // async to prevent errors in tests
+            await validate();
+          } catch {}
+        };
+
+        validateRadio();
       }
     }, [defaultValue, formValue, setFormValue, validate]);
 

@@ -64,7 +64,11 @@ export const AsyncSelectInput = <T = {},>({
       {...props}
     >
       {options.map((opt) => (
-        <Option key={opt.value} title={opt.label}>
+        <Option
+          key={opt.value}
+          title={opt.label}
+          data-testid={`${props.id}-option`}
+        >
           {opt.label}
         </Option>
       ))}

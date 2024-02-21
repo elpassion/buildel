@@ -8,6 +8,10 @@ export class InputHandle {
     return new InputHandle(await screen.findByLabelText(label));
   }
 
+  static async fromTestId(testId: string): Promise<InputHandle> {
+    return new InputHandle(await screen.findByTestId(testId));
+  }
+
   static async fromRole(name?: string): Promise<InputHandle> {
     return new InputHandle(await screen.findByRole("textbox", { name }));
   }
