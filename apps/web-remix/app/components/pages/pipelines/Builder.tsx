@@ -196,7 +196,7 @@ export const Builder = ({
   });
 
   useEffect(() => {
-    if (location.state?._isRedirect) {
+    if (location.state?.reset) {
       navigate(
         buildUrlWithParams(".", Object.fromEntries(searchParams.entries())),
         { state: null }
