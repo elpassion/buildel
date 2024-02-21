@@ -112,7 +112,11 @@ aliases.set(
   aliasFixture({
     id: 2,
     name: "alias",
-    config: { ...aliasFixture().config, blocks: [], connections: [] },
+    config: {
+      ...aliasFixture().config,
+      blocks: [aliasFixture().config.blocks[0]],
+      connections: [],
+    },
   })
 );
 

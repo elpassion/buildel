@@ -178,7 +178,21 @@ describe(PipelinesPage.name, () => {
       screen.queryAllByTestId("builder-block")
     );
 
-    expect(aliasBlocks).toHaveLength(0);
+    expect(aliasBlocks).toHaveLength(1);
+  });
+
+  test("shouldn't allow to edit configuration", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: ["/2/pipelines/2/build"],
+    });
+
+    await page.openAliasDropdown();
+
+    await page.selectAlias(/Select alias: alias/i);
+
+    expect(screen.queryByLabelText(/Delete block: text_input_1/i)).toBeNull();
+    expect(screen.queryByLabelText(/Edit block: text_input_1/i)).toBeNull();
+    expect(screen.queryAllByRole("menuitem")).toHaveLength(0);
   });
 
   test("should restore alias", async () => {
@@ -198,7 +212,7 @@ describe(PipelinesPage.name, () => {
       screen.queryAllByTestId("builder-block")
     );
 
-    expect(aliasBlocks).toHaveLength(0);
+    expect(aliasBlocks).toHaveLength(1);
   });
 });
 
