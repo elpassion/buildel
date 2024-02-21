@@ -65,6 +65,20 @@ describe(PipelinesPage.name, () => {
     expect(blockGroups).toHaveLength(9);
   });
 
+  test("should render handles based on block configuration", async () => {
+    new PipelineObject().render({
+      initialEntries: ["/2/pipelines/2/build"],
+    });
+
+    await screen.findByTestId("text_input_1-output-handle");
+    await screen.findByTestId("chat_123321-input-handle");
+    await screen.findByTestId("chat_123321-output-handle");
+    await screen.findByTestId("chat_123321-message_output-handle");
+    await screen.findByTestId("chat_123321-tool-handle");
+    await screen.findByTestId("chat_123321-chat-handle");
+    await screen.findByTestId("text_output_1-input-handle");
+  });
+
   test("should add block after clicking on side menu item", async () => {
     const page = new PipelineObject().render({
       initialEntries: ["/2/pipelines/2/build"],

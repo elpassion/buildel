@@ -8,12 +8,14 @@ interface HandleProps {
   handle: IHandle;
   index: number;
   isConnectable?: boolean;
+  blockName: string;
 }
 
 export function InputHandle({
   handle,
   index,
   isConnectable = true,
+  blockName,
 }: HandleProps) {
   const handleTypeClassName = useMemo(() => {
     switch (handle.data.type) {
@@ -34,12 +36,13 @@ export function InputHandle({
         {startCase(handle.data.name.replace(/_input/g, " "))}
       </span>
       <Handle
+        id={handle.id}
         key={handle.id}
         type={handle.type}
         position={Position.Left}
-        style={{ top: (index + 1) * 25 }}
         isConnectable={isConnectable}
-        id={handle.id}
+        style={{ top: (index + 1) * 25 }}
+        data-testid={`${blockName}-${handle.data.name}-handle`}
         className={classNames(
           "!border-1 !border-primary-500 !w-[10px] !h-[10px] !-translate-x-[50%]",
           handleTypeClassName
@@ -49,7 +52,12 @@ export function InputHandle({
   );
 }
 
-export function OutputHandle({ handle, index, isConnectable }: HandleProps) {
+export function OutputHandle({
+  handle,
+  index,
+  isConnectable,
+  blockName,
+}: HandleProps) {
   const handleTypeClassName = useMemo(() => {
     switch (handle.data.type) {
       case "text":
@@ -75,6 +83,7 @@ export function OutputHandle({ handle, index, isConnectable }: HandleProps) {
         isConnectable={isConnectable}
         style={{ top: (index + 1) * 25 }}
         id={handle.id}
+        data-testid={`${blockName}-${handle.data.name}-handle`}
         data-name={handle.data.name}
         className={classNames(
           "!border-1 !border-secondary-500 !w-[10px] !h-[10px] !translate-x-[40%]",
@@ -89,6 +98,7 @@ export function ToolHandle({
   handle,
   index,
   isConnectable = true,
+  blockName,
 }: HandleProps) {
   const isWorker = handle.data.type === "worker";
   const handleTypeClassName = useMemo(() => {
@@ -120,6 +130,7 @@ export function ToolHandle({
         position={isWorker ? Position.Top : Position.Bottom}
         isConnectable={isConnectable}
         id={handle.id}
+        data-testid={`${blockName}-${handle.data.name}-handle`}
         className={classNames(
           "!border-1 !w-[10px] !h-[10px] !rotate-45 !-translate-x-1/2",
           handleTypeClassName

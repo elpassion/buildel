@@ -150,6 +150,7 @@ export function CustomNodeBody({
           handle={handle}
           index={index}
           isConnectable={isConnectable}
+          blockName={data.name}
         />
       ))}
       {outputsHandles.map((handle, index) => (
@@ -158,6 +159,7 @@ export function CustomNodeBody({
           handle={handle}
           index={index}
           isConnectable={isConnectable}
+          blockName={data.name}
         />
       ))}
 
@@ -167,6 +169,7 @@ export function CustomNodeBody({
           handle={handle}
           index={index}
           isConnectable={isConnectable}
+          blockName={data.name}
         />
       ))}
     </div>
