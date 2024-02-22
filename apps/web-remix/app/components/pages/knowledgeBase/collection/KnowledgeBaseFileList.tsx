@@ -7,7 +7,10 @@ import {
 import { Icon } from "@elpassion/taco";
 import { IconButton } from "~/components/iconButton";
 import { confirm } from "~/components/modal/confirm";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
+import { BasicLink } from "~/components/link/BasicLink";
+import { routes } from "~/utils/routes.utils";
+import { loader } from "./loader.server";
 
 interface KnowledgeBaseFileListProps {
   items: IKnowledgeBaseFileList;
@@ -17,6 +20,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
   items,
 }) => {
   const fetcher = useFetcher();
+  const { organizationId, collectionName } = useLoaderData<typeof loader>();
   const handleDelete = (file: IKnowledgeBaseFile) => {
     confirm({
       onConfirm: async () =>
@@ -42,7 +46,11 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
         <EmptyMessage>There is no files in collection yet...</EmptyMessage>
       }
       renderItem={(item) => (
-        <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
+        <BasicLink
+          to={routes.collectionMemory(organizationId, collectionName, item.id)}
+        >
+          <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
+        </BasicLink>
       )}
     />
   );
@@ -72,7 +80,10 @@ export const KnowledgeBaseFileListItem: React.FC<
         </p>
       </header>
 
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition">
+      <div
+        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition"
+        onClick={(e) => e.preventDefault()}
+      >
         <IconButton
           size="xs"
           variant="ghost"

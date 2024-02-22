@@ -17,17 +17,26 @@ import {
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
 import { routes } from "~/utils/routes.utils";
+import { Modal } from "@elpassion/taco/Modal";
+import { ConfirmationModalHeader } from "~/components/modal/ConfirmationModal";
 
 export function KnowledgeBaseCollectionPage() {
   const { fileList, organizationId, collectionName } =
     useLoaderData<typeof loader>();
   const navigate = useNavigate();
-  const match = useMatch(
-    `${organizationId}/knowledge-base/${encodeURIComponent(collectionName)}/new`,
-  );
-  const isSidebarOpen = !!match;
 
-  const handleCloseSidebar = () => {
+  const matchNew = useMatch(
+    routes.collectionFilesNew(organizationId, collectionName)
+  );
+  const isSidebarOpen = !!matchNew;
+
+  const matchDetails = useMatch(
+    `:organizationId/knowledge-base/:collectionName/:memoryId/chunks`
+  );
+
+  const isDetails = !!matchDetails;
+
+  const handleClose = () => {
     navigate(routes.collectionFiles(organizationId, collectionName));
   };
   return (
@@ -51,16 +60,30 @@ export function KnowledgeBaseCollectionPage() {
         <KnowledgeBaseFileList items={fileList} />
       </PageContentWrapper>
 
+      <Modal
+        isOpen={isDetails}
+        header={
+          <h3 className="text-white font-medium text-xl">Memory Chunks</h3>
+        }
+        closeButtonProps={{ iconName: "x", "aria-label": "Close" }}
+        onClose={handleClose}
+        className="w-full max-w-3xl"
+      >
+        <div className="max-h-[70vh] p-2">
+          <Outlet />
+        </div>
+      </Modal>
+
       <ActionSidebar
         className="!bg-neutral-950"
         isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
+        onClose={handleClose}
         overlay
       >
         <ActionSidebarHeader
           heading="New knowledge items"
           subheading={`Upload files to add to ${collectionName} Database.`}
-          onClose={handleCloseSidebar}
+          onClose={handleClose}
         />
         <Outlet />
       </ActionSidebar>

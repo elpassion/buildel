@@ -1,11 +1,24 @@
 import { z } from "zod";
 import { NotFoundError } from "~/utils/errors";
+import { PaginationMeta } from "~/components/pagination/pagination.types";
 
 export const KnowledgeBaseFile = z.object({
   id: z.number(),
   file_name: z.string(),
   file_size: z.number(),
   file_type: z.string(),
+});
+
+export const MemoryChunk = z.object({
+  id: z.string(),
+  content: z.string(),
+});
+
+export const MemoryChunks = z.array(MemoryChunk);
+
+export const MemoryChunksResponse = z.object({
+  data: MemoryChunks,
+  meta: PaginationMeta,
 });
 
 export const KnowledgeBaseCollection = z.object({

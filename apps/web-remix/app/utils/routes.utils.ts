@@ -149,6 +149,15 @@ export const routes = {
     `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
       collectionName
     )}`,
+  collectionMemory: (
+    organizationId: OrganizationId,
+    collectionName: string,
+    memoryId: string | number
+  ) =>
+    `${routes.collectionFiles(
+      organizationId,
+      collectionName
+    )}/${encodeURIComponent(memoryId)}/chunks`,
   collectionFilesNew: (
     organizationId: OrganizationId,
     collectionName: string
