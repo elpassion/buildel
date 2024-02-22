@@ -1,4 +1,6 @@
 defmodule Buildel.Memories do
+  alias Buildel.Organizations.Organization
+  alias Buildel.Memories.Memory
   alias Buildel.Organizations
   import Ecto.Query
 
@@ -216,6 +218,29 @@ defmodule Buildel.Memories do
         m.organization_id == ^organization.id
     )
     |> Buildel.Repo.one!()
+  end
+
+  def list_organization_memory_chunks(
+        %Organization{id: organization_id},
+        %Memory{memory_collection_id: memory_collection_id},
+        _params \\ %{}
+      ) do
+    vector_db =
+      Buildel.VectorDB.new(%{
+        adapter: Buildel.VectorDB.EctoAdapter,
+        embeddings:
+          Buildel.Clients.Embeddings.new(%{
+            api_type: "",
+            model: "",
+            api_key: ""
+          })
+      })
+
+    Buildel.VectorDB.get_all(
+      vector_db,
+      "#{organization_id}_#{memory_collection_id}",
+      %{}
+    )
   end
 
   def organization_collection_name(

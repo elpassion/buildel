@@ -113,6 +113,12 @@ defmodule BuildelWeb.Router do
       only: [:index, :create, :delete]
     )
 
+    resources(
+      "/organizations/:organization_id/memory_collections/:memory_collection_id/memories/:id/chunks",
+      MemoryChunkController,
+      only: [:index]
+    )
+
     post("/organizations/:organization_id/tools/chunks", OrganizationToolChunkController, :create)
 
     post("/users/register", UserRegistrationController, :create)

@@ -76,6 +76,12 @@ defmodule Buildel.VectorDB do
     results
   end
 
+  def get_all(%__MODULE__{adapter: adapter}, collection_name, _params) do
+    {:ok, collection} = adapter.get_collection(collection_name)
+
+    adapter.get_all(collection, %{})
+  end
+
   def delete_all_with_metadata(%__MODULE__{adapter: adapter}, collection_name, metadata) do
     {:ok, collection} = adapter.get_collection(collection_name)
 
@@ -231,6 +237,19 @@ defmodule Buildel.VectorDB.EctoAdapter do
 
     {_inserted_records, nil} = Buildel.Repo.insert_all(Chunk, chunks)
     :ok
+  end
+
+  def get_all(collection, _params) do
+    Buildel.Repo.all(
+      from c in Chunk,
+        where: c.collection_name == ^collection.name
+    )
+    |> Enum.map(fn chunk ->
+      %{
+        "document" => chunk.document,
+        "metadata" => chunk.metadata
+      }
+    end)
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
