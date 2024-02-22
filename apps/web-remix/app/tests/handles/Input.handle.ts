@@ -1,11 +1,18 @@
 import userEvent from "@testing-library/user-event";
-import { screen, Matcher } from "../render";
+import { screen, Matcher, findByLabelText } from "../render";
 
 export class InputHandle {
   constructor(public readonly inputElement: HTMLInputElement) {}
 
   static async fromLabelText(label: Matcher): Promise<InputHandle> {
     return new InputHandle(await screen.findByLabelText(label));
+  }
+
+  static async fromLabelTextAndContainer(
+    label: Matcher,
+    container: HTMLElement
+  ): Promise<InputHandle> {
+    return new InputHandle(await findByLabelText(container, label));
   }
 
   static async fromTestId(testId: string): Promise<InputHandle> {

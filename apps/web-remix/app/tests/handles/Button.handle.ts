@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event";
-import { screen, Matcher } from "../render";
+import { screen, Matcher, act, findByLabelText } from "../render";
 
 export class ButtonHandle {
   constructor(public readonly buttonElement: HTMLButtonElement) {}
@@ -10,6 +10,13 @@ export class ButtonHandle {
 
   static async fromLabelText(label: Matcher): Promise<ButtonHandle> {
     return new ButtonHandle(await screen.findByLabelText(label));
+  }
+
+  static async fromLabelTextAndContainer(
+    label: Matcher,
+    container: HTMLElement
+  ): Promise<ButtonHandle> {
+    return new ButtonHandle(await findByLabelText(container, label));
   }
 
   static async fromTestId(testId: Matcher): Promise<ButtonHandle> {
@@ -25,6 +32,8 @@ export class ButtonHandle {
       throw new Error(`(${this.buttonElement.name}) button is disabled!`);
     }
 
-    await userEvent.click(this.buttonElement);
+    await act(async () => {
+      await userEvent.click(this.buttonElement);
+    });
   }
 }

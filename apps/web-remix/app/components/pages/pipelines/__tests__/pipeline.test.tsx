@@ -7,6 +7,7 @@ import {
   fireEvent,
   act,
   Matcher,
+  findByText,
 } from "~/tests/render";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
@@ -35,13 +36,18 @@ import {
   AliasHandlers,
 } from "./pipelines.handlers";
 import { TextareaHandle } from "~/tests/handles/Textarea.handle";
-import { SelectHandle } from "~/tests/handles/SelectHandle";
-import { asyncSelectHandlers } from "~/components/pages/pipelines/__tests__/asyncSelect.handlers";
+import {
+  CreatableSelectHandle,
+  SelectHandle,
+} from "~/tests/handles/SelectHandle";
+import { SecretsHandlers, ModelsHandlers } from "./asyncSelect.handlers";
+import { RadioHandle } from "~/tests/handles/Radio.handle";
 
 const handlers = () => [
   ...new PipelineHandlers().handlers,
   ...new AliasHandlers().handlers,
-  ...asyncSelectHandlers(),
+  ...new SecretsHandlers().handlers,
+  ...new ModelsHandlers().handlers,
   ...blockTypesHandlers(),
 ];
 
@@ -273,10 +279,7 @@ describe(PipelinesPage.name, () => {
 
     await page.editBlock("chat_123321");
 
-    const system_message = await TextareaHandle.fromTestId(
-      "opts.system_message-editor"
-    );
-    await system_message.type("You are a helpful asistant");
+    await page.fillSystemMessage("You are a helpful assistant");
 
     const select = await SelectHandle.fromTestId("opts.api_key");
     await select.selectOption("OPENAI");
@@ -290,6 +293,72 @@ describe(PipelinesPage.name, () => {
     expect(
       screen.queryByText(/This block contains problems to fix./i)
     ).toBeNull();
+  });
+
+  test("should allow to create new secret value and select it", async () => {
+    new PipelineObject().render({
+      initialEntries: [
+        `/2/pipelines/${
+          pipelineFixtureWithUnfilledBlock().id
+        }/build/blocks/chat_123321`,
+      ],
+    });
+
+    const select = await CreatableSelectHandle.fromTestId("opts.api_key");
+    await select.openModal();
+    const selectModal = await select.getModal();
+
+    const name = await InputHandle.fromLabelTextAndContainer(
+      /name/i,
+      selectModal
+    );
+    await name.type("SAMPLE_KEY");
+
+    const modalSubmit = await ButtonHandle.fromLabelTextAndContainer(
+      /create new/i,
+      selectModal
+    );
+
+    await modalSubmit.click();
+
+    await findByText(selectModal, /String must contain at least 1 character/i);
+
+    const value = await InputHandle.fromLabelTextAndContainer(
+      /value/i,
+      selectModal
+    );
+    await value.type("SAMPLE_KEY_VALUE");
+
+    await modalSubmit.click();
+
+    await select.selectOption("SAMPLE_KEY");
+  });
+
+  test("should clear model and endpoint after changing API type", async () => {
+    new PipelineObject().render({
+      initialEntries: [
+        `/2/pipelines/${
+          pipelineFixtureWithUnfilledBlock().id
+        }/build/blocks/chat_123321`,
+      ],
+    });
+
+    const endpoint = await InputHandle.fromRole("opts.endpoint");
+    const select = await SelectHandle.fromTestId("opts.model");
+
+    await select.selectOption("GPT-3.5 Turbo");
+
+    expect(select.value).toBe("GPT-3.5 Turbo");
+    expect(endpoint.value).toBe("https://api.openai.com/v1/chat/completions");
+
+    const googleRadio = await RadioHandle.fromLabelText("google");
+
+    await googleRadio.click();
+
+    expect(select.value).toBe(null);
+    expect(endpoint.value).toBe(
+      "https://generativelanguage.googleapis.com/v1beta/models"
+    );
   });
 });
 
@@ -427,6 +496,16 @@ class PipelineObject {
     await act(async () => {
       await confirmButton.click();
     });
+
+    return this;
+  }
+
+  async fillSystemMessage(message: string) {
+    const system_message = await TextareaHandle.fromTestId(
+      "opts.system_message-editor"
+    );
+
+    await system_message.type(message);
 
     return this;
   }

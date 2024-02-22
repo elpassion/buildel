@@ -9,6 +9,7 @@ export const TextInputField = forwardRef<
   Partial<TextInputProps>
 >(({ errorMessage, ...props }, ref) => {
   const { name, getInputProps, error } = useFieldContext();
+
   return (
     <TextInput
       name={name}

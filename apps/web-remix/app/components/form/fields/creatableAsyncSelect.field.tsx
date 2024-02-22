@@ -39,6 +39,7 @@ import {
 export interface CreatableAsyncSelectFieldProps
   extends Partial<AsyncSelectInputProps> {
   url: string;
+  id: string;
   label?: ReactNode;
   supportingText?: ReactNode;
   errorMessage?: ReactNode;
@@ -116,6 +117,7 @@ export const CreatableAsyncSelectField = forwardRef<
             className="text-primary-500 text-sm mb-[6px] bg-transparent"
             onClick={openModal}
             type="button"
+            data-testid={`${props.id}-create-button`}
           >
             Add new
           </button>
@@ -138,6 +140,7 @@ export const CreatableAsyncSelectField = forwardRef<
         <Modal
           isOpen={isModalOpen}
           onClose={closeModal}
+          testId={`${name}-modal`}
           overlayClassName="!z-[60]"
           className="w-[90%] min-w-[340px] md:min-w-[500px]"
           header={
@@ -213,7 +216,13 @@ export function CreatableAsyncForm({
         }}
       />
 
-      <SubmitButton size="sm" variant="filled" className="mt-6" isFluid>
+      <SubmitButton
+        size="sm"
+        variant="filled"
+        className="mt-6"
+        isFluid
+        aria-label="create new"
+      >
         Create new
       </SubmitButton>
     </ValidatedForm>

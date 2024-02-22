@@ -1,11 +1,12 @@
 import userEvent from "@testing-library/user-event";
 import { screen } from "../render";
 import { act } from "~/tests/render";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
 
 export class SelectHandle {
   constructor(
     public readonly selectElement: HTMLInputElement,
-    private readonly id: string
+    protected readonly id: string
   ) {}
 
   static async fromTestId(testId: string): Promise<SelectHandle> {
@@ -47,12 +48,37 @@ export class SelectHandle {
   }
 
   get value() {
-    return this.getSelectInput().value;
+    const input = this.getSelectInput();
+    if (!input) return null;
+
+    return input.textContent;
   }
 
   private getSelectInput() {
     return this.selectElement.querySelector(
       ".rc-select-selection-item"
-    ) as HTMLInputElement;
+    ) as HTMLDivElement;
+  }
+}
+
+export class CreatableSelectHandle extends SelectHandle {
+  static async fromTestId(testId: string): Promise<CreatableSelectHandle> {
+    return new CreatableSelectHandle(await screen.findByTestId(testId), testId);
+  }
+
+  async getAddNewButton() {
+    return ButtonHandle.fromTestId(`${this.id}-create-button`);
+  }
+
+  async getModal() {
+    return screen.findByTestId(`${this.id}-modal`);
+  }
+
+  async openModal() {
+    const button = await this.getAddNewButton();
+
+    await button.click();
+
+    return this;
   }
 }
