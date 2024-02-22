@@ -1,8 +1,18 @@
 defmodule BuildelWeb.OrganizationPipelineRunJSON do
   alias Buildel.Pipelines.Run
 
-  def index(%{runs: runs}) do
-    %{data: for(run <- runs, do: data(run))}
+  def index(%{runs: runs, pagination_params: pagination_params}) do
+    %{
+      data:
+        for(run <- runs, do: data(run))
+        |> Enum.drop(pagination_params.page * pagination_params.per_page)
+        |> Enum.take(pagination_params.per_page),
+      meta: %{
+        total: Enum.count(runs),
+        page: pagination_params.page,
+        per_page: pagination_params.per_page
+      }
+    }
   end
 
   def show(%{run: run}) do
