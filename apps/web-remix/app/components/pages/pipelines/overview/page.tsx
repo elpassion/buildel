@@ -16,8 +16,6 @@ export function OverviewPage() {
     pipelineId,
     organizationId,
     pagination,
-    totalCost,
-    totalRuns,
   } = useLoaderData<typeof loader>();
 
   const { hasNextPage, data, fetchNextPage, isFetchingNextPage } =
@@ -36,16 +34,16 @@ export function OverviewPage() {
 
   return (
     <section className="pt-5 pb-1 overflow-x-auto">
-      <div className="flex gap-3 py-4 px-2 mt-3 mb-6 border-b-1 border-neutral-800">
-        <p className="text-white">
-          <span className="text-sm text-neutral-100">Runs: </span>
-          {totalRuns}
-        </p>
-        <p className="text-white">
-          <span className="text-sm text-neutral-100">Summary cost: </span>
-          {totalCost.toFixed(10)}$
-        </p>
-      </div>
+      {/*<div className="flex gap-3 py-4 px-2 mt-3 mb-6 border-b-1 border-neutral-800">*/}
+      {/*  <p className="text-white">*/}
+      {/*    <span className="text-sm text-neutral-100">Runs: </span>*/}
+      {/*    {totalRuns}*/}
+      {/*  </p>*/}
+      {/*  <p className="text-white">*/}
+      {/*    <span className="text-sm text-neutral-100">Summary cost: </span>*/}
+      {/*    {totalCost.toFixed(10)}$*/}
+      {/*  </p>*/}
+      {/*</div>*/}
 
       <div className="min-w-[550px]">
         {data.length > 0 ? <PipelineRunsListHeader /> : null}

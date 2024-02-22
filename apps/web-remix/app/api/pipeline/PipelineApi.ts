@@ -11,6 +11,8 @@ import {
   UpdatePipelineSchema,
   CreatePipelineSchema,
 } from "./pipeline.contracts";
+import { PaginationQueryParams } from "~/components/pagination/usePagination";
+import { buildUrlWithParams } from "~/utils/url";
 
 export class PipelineApi {
   constructor(private client: typeof fetchTyped) {}
@@ -24,12 +26,15 @@ export class PipelineApi {
 
   getPipelineRuns(
     organizationId: string | number,
-    pipelineId: string | number
+    pipelineId: string | number,
+    pagination?: PaginationQueryParams
   ) {
-    return this.client(
-      PipelineRunsResponse,
-      `/organizations/${organizationId}/pipelines/${pipelineId}/runs`
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/pipelines/${pipelineId}/runs`,
+      { ...pagination }
     );
+
+    return this.client(PipelineRunsResponse, url);
   }
 
   getPipelineRun(

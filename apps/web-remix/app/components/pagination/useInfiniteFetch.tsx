@@ -15,7 +15,7 @@ interface UseInfiniteFetchProps<T, R> {
 
 export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
   const fetcher = useFetcher<R>();
-  const { page, limit, search, goToNext, hasNextPage } = usePagination(
+  const { page, per_page, search, goToNext, hasNextPage } = usePagination(
     args.pagination
   );
 
@@ -33,12 +33,12 @@ export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
 
     const urlWithParams = buildUrlWithParams(args.loaderUrl, {
       page,
-      limit,
+      per_page,
       search,
     });
 
     fetcher.load(urlWithParams);
-  }, [page, limit, search]);
+  }, [page, per_page, search]);
 
   useEffect(() => {
     const newData = args.dataExtractor(fetcher);
@@ -57,7 +57,7 @@ export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
 
   return {
     page,
-    limit,
+    per_page,
     search,
     hasNextPage,
     fetchNextPage,

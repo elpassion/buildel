@@ -13,38 +13,24 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const pipelineApi = new PipelineApi(fetch);
 
-    const pipelineRuns = await pipelineApi.getPipelineRuns(
-      params.organizationId,
-      params.pipelineId
-    );
-
-    const { page, limit, search } = getParamsPagination(
+    const { page, per_page, search } = getParamsPagination(
       new URL(request.url).searchParams
     );
 
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
+    const { data: pipelineRuns } = await pipelineApi.getPipelineRuns(
+      params.organizationId,
+      params.pipelineId,
+      { page, per_page, search }
+    );
 
-    const paginatedData = pipelineRuns.data.slice(startIndex, endIndex);
-
-    const totalItems = pipelineRuns.data.length;
-    const totalPages = Math.ceil(totalItems / limit);
+    const totalItems = pipelineRuns.meta.total;
+    const totalPages = Math.ceil(totalItems / per_page);
 
     return json({
-      pipelineRuns: paginatedData,
-      totalCost: pipelineRuns.data.reduce(
-        (acc, run) =>
-          acc +
-          run.costs.reduce(
-            (costAcc, cost) => costAcc + Number(cost.data.amount),
-            0
-          ),
-        0
-      ),
-      totalRuns: pipelineRuns.data.length,
+      pipelineRuns: pipelineRuns.data,
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
-      pagination: { page, limit, search, totalItems, totalPages },
+      pagination: { page, per_page, search, totalItems, totalPages },
     });
   })(args);
 }

@@ -2,9 +2,12 @@ import { isNotNil } from "~/utils/guards";
 
 export function buildUrlWithParams(
   baseUrl: string,
-  params: Record<string, string | number | undefined>
+  params?: Record<string, string | number | undefined>
 ) {
   let url = baseUrl;
+
+  if (!params) return url;
+
   const queryString = Object.entries(params)
     .filter(([, value]) => isNotNil(value))
     .map(

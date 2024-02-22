@@ -2,15 +2,21 @@ import { useState } from "react";
 
 export interface Pagination {
   page: number;
-  limit: number;
+  per_page: number;
   totalItems: number;
   totalPages: number;
   search: string;
 }
 
+export interface PaginationQueryParams {
+  page: number;
+  per_page: number;
+  search: string;
+}
+
 export const DEFAULT_PAGINATION: Pagination = {
-  page: 1,
-  limit: 20,
+  page: 0,
+  per_page: 20,
   search: "",
   totalItems: 0,
   totalPages: 0,
@@ -52,7 +58,7 @@ export const usePagination = (initialPagination?: Partial<Pagination>) => {
 export function getParamsPagination(params: URLSearchParams) {
   return {
     page: Number(params.get("page")) || DEFAULT_PAGINATION.page,
-    limit: Number(params.get("limit")) || DEFAULT_PAGINATION.limit,
+    per_page: Number(params.get("per_page")) || DEFAULT_PAGINATION.per_page,
     search: params.get("search") || DEFAULT_PAGINATION.search,
   };
 }

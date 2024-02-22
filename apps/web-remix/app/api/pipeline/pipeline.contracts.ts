@@ -5,6 +5,7 @@ import {
   ExtendedBlockConfig,
   UpdateBlockConfig,
 } from "~/api/blockType/blockType.contracts";
+import { PaginationMeta } from "~/components/pagination/pagination.types";
 
 export const InterfaceConfig = z.object({
   input: z.string().min(2).optional(),
@@ -101,11 +102,11 @@ export type IPipelinesResponse = z.TypeOf<typeof PipelinesResponse>;
 
 export type IPipelineResponse = z.TypeOf<typeof PipelineResponse>;
 
-export const PipelineRunsResponse = z
-  .object({ data: PipelineRuns })
-  .transform((response) => {
-    return response.data;
-  });
+export const PipelineRunsResponse = z.object({
+  data: PipelineRuns,
+  meta: PaginationMeta,
+});
+
 export const PipelineRunResponse = z
   .object({ data: PipelineRun })
   .transform((response) => {
