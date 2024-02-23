@@ -5,9 +5,9 @@ import {
   ActionFunction,
   ActionFunctionArgs,
 } from "@remix-run/node";
-import { commitSession, getSession } from "~/session.server";
 import { ICurrentUser } from "~/api/CurrentUserApi";
 import { setCurrentUser } from "~/utils/currentUser.server";
+import { setOrganizationId } from "~/utils/toast.server";
 
 type RemixRoutesProps = Parameters<typeof createRemixStub>;
 
@@ -24,20 +24,36 @@ export const getBuildelCookie = () => {
 
 export const getSessionCookie = async (
   request: Request,
-  user?: ICurrentUser | null
+  args?: ISessionData
 ) => {
-  if (user === null) return "__session";
-  return await setCurrentUser(request, user ?? { id: 1 });
+  let sessionCookie = "";
+
+  if (args?.user !== null) {
+    sessionCookie = await setCurrentUser(request, args?.user ?? { id: 1 });
+  }
+  if (args?.organizationId) {
+    sessionCookie = await setOrganizationId(sessionCookie, args.organizationId);
+  }
+
+  return sessionCookie;
+};
+
+type ISessionData = {
+  user?: ICurrentUser | null;
+  organizationId?: number;
 };
 
 export const loaderWithSession = (
   loader: LoaderFunction,
-  user?: ICurrentUser | null
+  sessionData?: ISessionData
 ) => {
-  return async (args: LoaderFunctionArgs, user?: ICurrentUser) => {
+  return async (args: LoaderFunctionArgs) => {
     args.request.headers.set(
       "cookie",
-      `${getBuildelCookie()};${await getSessionCookie(args.request, user)}`
+      `${getBuildelCookie()};${await getSessionCookie(
+        args.request,
+        sessionData
+      )}`
     );
     return loader(args);
   };
@@ -45,13 +61,15 @@ export const loaderWithSession = (
 
 export const actionWithSession = (
   action: ActionFunction,
-  user?: ICurrentUser | null
+  sessionData?: ISessionData
 ) => {
   return async (args: ActionFunctionArgs) => {
-    args.request.headers.set(
-      "cookie",
-      `${getBuildelCookie()};${await getSessionCookie(args.request, user)}`
-    );
+    const cookie = [
+      getBuildelCookie(),
+      await getSessionCookie(args.request, sessionData),
+    ].join(";");
+
+    args.request.headers.set("cookie", cookie);
 
     return action(args);
   };

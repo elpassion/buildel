@@ -61,15 +61,26 @@ describe("Onboarding", () => {
 
     await screen.findByText(/Pick a starting point for your next AI workflow/i);
   });
+
+  test("should redirect to organization saved in cookie", async () => {
+    new OnboardingObject().render(
+      {
+        initialEntries: ["/"],
+      },
+      2
+    );
+
+    await screen.findByTestId(/organization-2/i);
+  });
 });
 
 class OnboardingObject {
-  render(props?: RoutesProps) {
+  render(props?: RoutesProps, organizationId?: number) {
     const Routes = setupRoutes([
       {
         path: "/",
         Component: () => <Outlet />,
-        loader: loaderWithSession(homeLoader),
+        loader: loaderWithSession(homeLoader, { organizationId }),
       },
       {
         path: "/organizations/new",

@@ -1,5 +1,7 @@
 import React from "react";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
+import { useLoaderData } from "@remix-run/react";
+import { loader } from "~/components/pages/pipelines/list/loader.server";
 
 export const PipelinesNavbar = () => {
   return (
@@ -10,9 +12,15 @@ export const PipelinesNavbar = () => {
 };
 
 function LeftContent() {
+  const { organizationId } = useLoaderData<typeof loader>();
   return (
     <div className="flex items-center justify-center gap-2">
-      <h2 className="text-2xl font-bold text-white">Workflows</h2>
+      <h2
+        className="text-2xl font-bold text-white"
+        data-testid={`organization-${organizationId}`}
+      >
+        Workflows
+      </h2>
     </div>
   );
 }
