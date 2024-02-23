@@ -29,7 +29,6 @@ export function PipelinesPage() {
   const navigate = useNavigate();
   const match = useMatch(`${organizationId}/pipelines/new`);
   const isSidebarOpen = !!match;
-
   const handleCloseSidebar = () => {
     navigate(routes.pipelines(organizationId));
   };
