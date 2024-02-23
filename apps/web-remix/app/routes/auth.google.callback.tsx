@@ -6,11 +6,29 @@ import { setCurrentUser } from "~/utils/currentUser.server";
 import { routes } from "~/utils/routes.utils";
 import { loaderBuilder } from "~/utils.server";
 import { assert } from "~/utils/assert";
+import { setServerToast } from "~/utils/toast.server";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     assert(process.env.GOOGLE_CLIENT_ID, "Missing GOOGLE_CLIENT_ID");
     assert(process.env.GOOGLE_CLIENT_SECRET, "Missing GOOGLE_CLIENT_SECRET");
+
+    const url = new URL(request.url);
+
+    const code = url.searchParams.get("code");
+
+    if (!code) {
+      return redirect(routes.login, {
+        headers: {
+          "Set-Cookie": await setServerToast(request, {
+            error: {
+              title: "Ups",
+              description: "Something went wrong!",
+            },
+          }),
+        },
+      });
+    }
 
     const oAuth2Client = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
@@ -18,9 +36,7 @@ export async function loader(args: LoaderFunctionArgs) {
       process.env.GOOGLE_REDIRECT_URI
     );
 
-    const url = new URL(request.url);
-
-    const token = await oAuth2Client.getToken(url.searchParams.get("code")!);
+    const token = await oAuth2Client.getToken(code);
 
     const response = await fetch(z.any(), "/users/google/log_in", {
       method: "POST",
