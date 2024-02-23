@@ -92,13 +92,18 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionController do
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, config} <- Pipelines.get_pipeline_config(pipeline, "latest"),
          {:ok, run} <- Pipelines.create_run(%{pipeline_id: pipeline_id, config: config}),
-         {:ok, run} <- Pipelines.Runner.start_run(run),
-         {:ok, chat_completion} <-
-           Pipelines.Runner.create_chat_completion(run, params),
-         {:ok, _run} <- Pipelines.Runner.stop_run(run) do
-      conn
-      |> put_status(:ok)
-      |> json(chat_completion)
+         {:ok, run} <- Pipelines.Runner.start_run(run) do
+      {:ok, _} =
+        Pipelines.Runner.create_chat_completion_stream(run, params |> Map.put(:stream, true))
+
+      receive do
+        {:chat_end, message} ->
+          Pipelines.Runner.stop_run(run)
+
+          conn
+          |> put_status(:ok)
+          |> json(message)
+      end
     end
   end
 end

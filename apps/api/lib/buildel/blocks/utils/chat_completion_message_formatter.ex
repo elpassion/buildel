@@ -4,13 +4,43 @@ defmodule Buildel.Blocks.Utils.ChatCompletionMessageFormatter do
 
     delta =
       case reason do
-        "stop" -> %{}
-        _ -> %{"content" => message_delta.content}
+        "stop" ->
+          %{
+            "role" => "assistant"
+          }
+
+        _ ->
+          %{"content" => message_delta.content}
+      end
+
+    delta =
+      case message_delta.function_name do
+        nil ->
+          delta
+
+        function_name ->
+          %{
+            "content" => "Calling: #{function_name} "
+          }
+      end
+
+    delta =
+      case message_delta.arguments do
+        nil ->
+          delta
+
+        "" ->
+          delta
+
+        arguments ->
+          %{
+            "content" => arguments
+          }
       end
 
     choices = [
       %{
-        "finish_reason" => finish_reason(message_delta),
+        "finish_reason" => reason,
         "index" => message_delta.index,
         "delta" => delta,
         "logprobs" => nil
@@ -26,7 +56,7 @@ defmodule Buildel.Blocks.Utils.ChatCompletionMessageFormatter do
     }
   end
 
-  def format_message(message, completion_id, model) do
+  def format_message(message, completion_id, model, usage) do
     choices = [
       %{
         "finish_reason" => finish_reason(message),
@@ -45,12 +75,7 @@ defmodule Buildel.Blocks.Utils.ChatCompletionMessageFormatter do
       "id" => completion_id,
       "model" => model,
       "object" => "chat.completion",
-      # TODO: Add usage
-      "usage" => %{
-        "completion_tokens" => 17,
-        "prompt_tokens" => 57,
-        "total_tokens" => 74
-      }
+      "usage" => usage(usage)
     }
   end
 
@@ -72,7 +97,16 @@ defmodule Buildel.Blocks.Utils.ChatCompletionMessageFormatter do
   defp role(message) do
     case message.role do
       :function_call -> "function_call"
+      :assistant -> "assistant"
       _ -> "other"
     end
+  end
+
+  defp usage(%Buildel.Langchain.TokenUsage{} = usage) do
+    %{
+      "completion_tokens" => usage.completion_tokens,
+      "prompt_tokens" => usage.prompt_tokens,
+      "total_tokens" => usage.total_tokens
+    }
   end
 end

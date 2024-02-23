@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.Chat do
   require Logger
+  alias Buildel.Langchain.TokenUsage
   alias Buildel.Blocks.Utils.ChatMemory
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
@@ -185,6 +186,14 @@ defmodule Buildel.Blocks.Chat do
     GenServer.cast(pid, {:save_tool_result, tool_name, content})
   end
 
+  defp save_usage(pid, usage) do
+    GenServer.cast(pid, {:save_usage, usage})
+  end
+
+  defp usage(pid) do
+    GenServer.call(pid, {:usage})
+  end
+
   # Server
 
   @impl true
@@ -225,7 +234,8 @@ defmodule Buildel.Blocks.Chat do
          initial_messages: initial_messages(state),
          type: memory_type
        })
-     )}
+     )
+     |> Map.put(:usage, Buildel.Langchain.TokenUsage.new!())}
   end
 
   @impl true
@@ -305,6 +315,11 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
+  def handle_cast({:save_usage, usage}, state) do
+    {:noreply, %{state | usage: TokenUsage.add(state.usage, usage)}}
+  end
+
+  @impl true
   def handle_call({:function, %{block_name: block_name}}, _, state) do
     pid = self()
 
@@ -367,10 +382,13 @@ defmodule Buildel.Blocks.Chat do
 
   @impl true
   def handle_call(
-        {:chat_completion, %{messages: messages, model: _model, stream: true, stream_to: pid}},
+        {:chat_completion,
+         %{messages: messages, model: _model, stream: true, stream_to: stream_to}},
         _from,
         state
       ) do
+    pid = self()
+
     tools =
       state[:tool_connections]
       |> Enum.map(fn connection ->
@@ -381,87 +399,65 @@ defmodule Buildel.Blocks.Chat do
     completion_id = "chatcmpl-#{:crypto.strong_rand_bytes(32) |> Base.encode64()}"
 
     Task.start(fn ->
-      chat().stream_chat(%{
-        context: %{messages: messages},
-        on_message: fn
-          %LangChain.MessageDelta{} = message ->
-            message =
-              Buildel.Blocks.Utils.ChatCompletionMessageFormatter.format_message_delta(
-                message,
-                completion_id,
-                state[:opts].model
-              )
+      {:ok, _chain, last_message} =
+        chat().stream_chat(%{
+          context: %{messages: messages},
+          on_message: fn
+            %LangChain.MessageDelta{} = message ->
+              message =
+                Buildel.Blocks.Utils.ChatCompletionMessageFormatter.format_message_delta(
+                  message,
+                  completion_id,
+                  state[:opts].model
+                )
 
-            send(pid, {:chat_completion, message})
+              send(stream_to, {:chat_completion, message})
 
-          %LangChain.Message{} = message ->
-            message =
-              Buildel.Blocks.Utils.ChatCompletionMessageFormatter.format_message(
-                message,
-                completion_id,
-                state[:opts].model
-              )
+            %Buildel.Langchain.TokenUsage{} = usage ->
+              save_usage(pid, usage)
 
-            send(pid, {:chat_end, message})
+            _ ->
+              nil
+          end,
+          on_content: fn _content -> nil end,
+          on_tool_call: fn _tool_name, _arguments, _message -> nil end,
+          on_tool_content: fn _tool_name, _content, _message -> nil end,
+          on_cost: fn token_summary ->
+            chat_cost = Buildel.Costs.CostCalculator.calculate_chat_cost(token_summary)
 
-          _ ->
-            nil
-        end,
-        on_content: fn _content -> nil end,
-        on_tool_call: fn _tool_name, _arguments, _message -> nil end,
-        on_tool_content: fn _tool_name, _content, _message -> nil end,
-        on_cost: fn _token_summary -> nil end,
-        on_end: fn -> nil end,
-        on_error: fn _ -> nil end,
-        api_key: state[:api_key],
-        model: state[:opts].model,
-        temperature: state[:opts].temperature,
-        tools: tools,
-        endpoint: state[:opts].endpoint,
-        api_type: state[:opts].api_type
-      })
+            block_context().create_run_cost(
+              state[:context_id],
+              state[:block_name],
+              chat_cost
+            )
+          end,
+          on_end: fn -> nil end,
+          on_error: fn _ -> nil end,
+          api_key: state[:api_key],
+          model: state[:opts].model,
+          temperature: state[:opts].temperature,
+          tools: tools,
+          endpoint: state[:opts].endpoint,
+          api_type: state[:opts].api_type
+        })
+
+      message =
+        Buildel.Blocks.Utils.ChatCompletionMessageFormatter.format_message(
+          last_message,
+          completion_id,
+          state[:opts].model,
+          usage(pid)
+        )
+
+      send(stream_to, {:chat_end, message})
     end)
 
     {:reply, {:ok, "streaming"}, state}
   end
 
   @impl true
-  def handle_call({:chat_completion, %{messages: messages, model: _model}}, _from, state) do
-    tools =
-      state[:tool_connections]
-      |> Enum.map(fn connection ->
-        pid = block_context().block_pid(state[:context_id], connection.from.block_name)
-        Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
-      end)
-
-    completion_id = "chatcmpl-#{:crypto.strong_rand_bytes(32) |> Base.encode64()}"
-
-    with {:ok, _chain, message} =
-           chat().stream_chat(%{
-             context: %{messages: messages},
-             on_message: fn _message -> nil end,
-             on_content: fn _content -> nil end,
-             on_tool_call: fn _tool_name, _arguments, _message -> nil end,
-             on_tool_content: fn _tool_name, _content, _message -> nil end,
-             on_cost: fn _token_summary -> nil end,
-             on_end: fn -> nil end,
-             on_error: fn _ -> nil end,
-             api_key: state[:api_key],
-             model: state[:opts].model,
-             temperature: state[:opts].temperature,
-             tools: tools,
-             endpoint: state[:opts].endpoint,
-             api_type: state[:opts].api_type
-           }) do
-      message =
-        Buildel.Blocks.Utils.ChatCompletionMessageFormatter.format_message(
-          message,
-          completion_id,
-          state[:opts].model
-        )
-
-      {:reply, {:ok, message}, state}
-    end
+  def handle_call({:usage}, _from, state) do
+    {:reply, state.usage, state}
   end
 
   @impl true
