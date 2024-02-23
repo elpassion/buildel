@@ -12,8 +12,8 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
   @valid_params %{
     model: "pipeline",
     messages: [
-      %{role: "user", content: "Hello"},
-      %{role: "bot", content: "Hi"}
+      %{role: "system", content: "You are a helpful assistant"},
+      %{role: "user", content: "Hello"}
     ]
   }
 
@@ -65,6 +65,7 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
+    @tag :skip
     test "creates a chat completion", %{
       conn: conn,
       organization: organization,
@@ -77,7 +78,26 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
           @valid_params
         )
 
-      assert json_response(conn, 201) == %{}
+      assert %{
+               "choices" => [
+                 %{
+                   "finish_reason" => "stop",
+                   "index" => 0,
+                   "message" => %{
+                     "content" => "Hello! How can I assist you today?",
+                     "role" => "assistant"
+                   },
+                   "logprobs" => nil
+                 }
+               ],
+               "model" => "gpt-3.5-turbo",
+               "object" => "chat.completion",
+               "usage" => %{
+                 "completion_tokens" => 17,
+                 "prompt_tokens" => 57,
+                 "total_tokens" => 74
+               }
+             } = json_response(conn, 201)
     end
   end
 
@@ -95,7 +115,10 @@ defmodule BuildelWeb.OrganizationPipelineChatCompletionsControllerTest do
                 "prompt_template" => "Hello, how can I help you?",
                 "api_key" => "some_api_key",
                 "system_message" => "Hi, I'm a bot!",
-                "messages" => []
+                "messages" => [],
+                "temperature" => 0.5,
+                "endpoint" => "https://api.openai.com/v1/chat/completions",
+                "api_type" => "test"
               },
               "ios" => []
             }

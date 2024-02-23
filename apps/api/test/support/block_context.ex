@@ -42,7 +42,7 @@ defmodule Buildel.BlockContext.Mock do
   end
 
   @impl true
-  def get_secret_from_context(_context, _key) do
-    {:ok, "secret"}
+  def get_secret_from_context(_context, key) do
+    key
   end
 end

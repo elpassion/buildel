@@ -44,6 +44,7 @@ defmodule Buildel.Clients.Chat do
       ) do
     opts =
       opts
+      |> Map.put_new(:on_message, fn _ -> nil end)
       |> Map.put_new(:api_type, "openai")
       |> Map.put_new(:endpoint, "https://api.openai.com/v1/chat/completions")
 
@@ -66,6 +67,53 @@ defmodule Buildel.Clients.Chat do
           Message.new_function_call!(message.tool_name, Jason.encode!(message.arguments))
       end)
 
+    callback_fn = fn
+      %MessageDelta{content: nil} ->
+        nil
+
+      %MessageDelta{} = data ->
+        on_content.(data.content)
+
+      %Message{function_name: nil} ->
+        nil
+
+      %Message{function_name: function_name, content: content, arguments: nil}
+      when is_binary(function_name) and is_binary(content) ->
+        %{response_formatter: response_formatter} =
+          tools |> Enum.find(fn tool -> tool.function.name == function_name end)
+
+        on_tool_content.(function_name, content, response_formatter.(content))
+
+      %Message{function_name: function_name, arguments: arguments}
+      when is_binary(function_name) ->
+        case tools |> Enum.find(fn tool -> tool.function.name == function_name end) do
+          nil ->
+            Logger.debug("Tool not found: #{function_name}")
+            nil
+
+          %{call_formatter: call_formatter} ->
+            on_tool_call.(function_name, arguments, call_formatter.(arguments))
+        end
+
+      %Message{} ->
+        nil
+
+      %TokenUsage{} = usage ->
+        token_summary = %Buildel.Langchain.ChatTokenSummary{
+          input_tokens: usage.prompt_tokens,
+          output_tokens: usage.completion_tokens,
+          model: model,
+          endpoint: opts.endpoint
+        }
+
+        on_cost.(token_summary)
+        nil
+
+      {:error, reason} ->
+        on_error.(reason)
+        nil
+    end
+
     with {:ok, chain, message} <-
            LLMChain.new!(%{
              llm: get_llm(opts),
@@ -75,51 +123,9 @@ defmodule Buildel.Clients.Chat do
            |> LLMChain.add_messages(messages)
            |> LLMChain.run(
              while_needs_response: true,
-             callback_fn: fn
-               %MessageDelta{content: nil} ->
-                 nil
-
-               %MessageDelta{} = data ->
-                 on_content.(data.content)
-
-               %Message{function_name: nil} ->
-                 nil
-
-               %Message{function_name: function_name, content: content, arguments: nil}
-               when is_binary(function_name) and is_binary(content) ->
-                 %{response_formatter: response_formatter} =
-                   tools |> Enum.find(fn tool -> tool.function.name == function_name end)
-
-                 on_tool_content.(function_name, content, response_formatter.(content))
-
-               %Message{function_name: function_name, arguments: arguments}
-               when is_binary(function_name) ->
-                 case tools |> Enum.find(fn tool -> tool.function.name == function_name end) do
-                   nil ->
-                     Logger.debug("Tool not found: #{function_name}")
-                     nil
-
-                   %{call_formatter: call_formatter} ->
-                     on_tool_call.(function_name, arguments, call_formatter.(arguments))
-                 end
-
-               %Message{} ->
-                 nil
-
-               %TokenUsage{} = usage ->
-                 token_summary = %Buildel.Langchain.ChatTokenSummary{
-                   input_tokens: usage.prompt_tokens,
-                   output_tokens: usage.completion_tokens,
-                   model: model,
-                   endpoint: opts.endpoint
-                 }
-
-                 on_cost.(token_summary)
-                 nil
-
-               {:error, reason} ->
-                 on_error.(reason)
-                 nil
+             callback_fn: fn message ->
+               opts.on_message.(message)
+               callback_fn.(message)
              end
            ) do
       on_end.()

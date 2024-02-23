@@ -20,7 +20,7 @@ defmodule BuildelWeb.Router do
   end
 
   pipeline :api do
-    plug(:accepts, ["json"])
+    plug(:accepts, ["json", "sse"])
     plug(:fetch_session)
   end
 
@@ -87,6 +87,12 @@ defmodule BuildelWeb.Router do
 
     post(
       "/organizations/:organization_id/pipelines/:pipeline_id/chat/completions",
+      OrganizationPipelineChatCompletionController,
+      :create
+    )
+
+    post(
+      "/organizations/:organization_id/pipelines/:pipeline_id/v1/chat/completions",
       OrganizationPipelineChatCompletionController,
       :create
     )
