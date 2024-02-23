@@ -10,19 +10,32 @@
     "pnpm": "8"
   },
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "dependencies:up": "turbo run dependencies:up",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
+    "build": "concurrently \"pnpm run build:api\" \"pnpm run build:web\"",
+    "dev": "concurrently \"pnpm run dev:api\" \"pnpm run dev:web\"",
+    "dependencies:up": "concurrently \"pnpm run dependencies:up:api\" \"pnpm run dependencies:up:web\"",
+    "lint": "concurrently \"pnpm run lint:api\" \"pnpm run lint:web\"",
+    "test": "concurrently \"pnpm run test:api\" \"pnpm run test:web\"",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "build:docker:api": "DOCKER_BUILDKIT=1 docker build -f .docker/Dockerfile.api . -t buildel/api",
-    "build:docker:web": "DOCKER_BUILDKIT=1 docker build -f .docker/Dockerfile.web . -t buildel/web"
+
+    "postinstall": "concurrently \"pnpm run install:api\" \"pnpm run install:web\"",
+
+    "build:api": "cd ./apps/api && pnpm run build",
+    "dev:api": "cd ./apps/api && pnpm run dev",
+    "dependencies:up:api": "cd ./apps/api && pnpm run dependencies:up",
+    "lint:api": "cd ./apps/api && pnpm run lint",
+    "test:api": "cd ./apps/api && pnpm run test",
+    "install:api": "cd ./apps/api && pnpm install",
+
+    "build:web": "cd ./apps/web-remix && pnpm run build",
+    "dev:web": "cd ./apps/web-remix && pnpm run dev",
+    "dependencies:up:web": "cd ./apps/web-remix && pnpm run dependencies:up",
+    "lint:web": "cd ./apps/web-remix && pnpm run lint",
+    "test:web": "cd ./apps/web-remix && pnpm run test",
+    "install:web": "cd ./apps/web-remix && pnpm install"
   },
   "devDependencies": {
-    "@turbo/gen": "^1.9.7",
     "eslint": "^7.32.0",
     "prettier": "^2.5.1",
-    "turbo": "^1.10.13"
+    "concurrently": "^8.2.2"
   }
 }

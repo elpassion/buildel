@@ -1,9 +1,11 @@
 {
   "name": "api",
   "scripts": {
+    "build": "mix release",
     "dev": "mix phx.server",
-    "test": "mix test",
     "dependencies:up": "mix dependencies.up",
+    "lint": "mix format --check-formatted",
+    "test": "mix test",
     "postinstall": "mix deps.get"
   }
 }

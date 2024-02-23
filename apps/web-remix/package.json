@@ -5,11 +5,13 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "node ./server.mjs",
     "build": "remix vite:build",
+    "dev": "node ./server.mjs",
+    "dependencies:up": "echo 'No dependencies'",
+    "lint": "echo 'No linting'",
+    "test": "vitest",
     "start": "cross-env NODE_ENV=production node ./server.mjs",
-    "typecheck": "tsc",
-    "test": "vitest"
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@buildel/buildel": "^0.1.6",
