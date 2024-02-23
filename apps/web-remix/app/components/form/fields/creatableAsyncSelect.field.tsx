@@ -108,7 +108,7 @@ export const CreatableAsyncSelectField = forwardRef<
 
     return (
       <>
-        <HiddenField value={selectedId} {...getInputProps()} />
+        <HiddenField value={selectedId ?? ""} {...getInputProps()} />
 
         <div className="flex justify-between items-end">
           <Label text={label} labelFor={name} />

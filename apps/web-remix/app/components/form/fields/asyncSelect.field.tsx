@@ -10,6 +10,7 @@ import {
   AsyncSelectInputProps,
   AsyncSelectInput,
 } from "~/components/form/inputs/select/select.input";
+import { useIsMounted } from "usehooks-ts";
 
 export interface AsyncSelectFieldProps extends Partial<AsyncSelectInputProps> {
   url: string;
@@ -27,6 +28,7 @@ export const AsyncSelectField = forwardRef<
     { url, defaultValue, label, supportingText, errorMessage, ...props },
     _ref
   ) => {
+    const isMounted = useIsMounted();
     const { name, getInputProps } = useFieldContext();
     const [selectedId, setSelectedId] = useControlField<string | undefined>(
       name
@@ -38,7 +40,7 @@ export const AsyncSelectField = forwardRef<
         .then((opts) => opts.map(toSelectOption))
         .then((opts) => {
           const curr = opts.find((o) => o.value === selectedId);
-          if (!curr) setSelectedId(undefined);
+          if (!curr && isMounted()) setSelectedId(undefined);
 
           return opts;
         });
@@ -46,7 +48,7 @@ export const AsyncSelectField = forwardRef<
 
     return (
       <>
-        <HiddenField value={selectedId} {...getInputProps()} />
+        <HiddenField value={selectedId ?? ""} {...getInputProps()} />
         <Label text={label} />
         <AsyncSelectInput
           placeholder="Select..."
