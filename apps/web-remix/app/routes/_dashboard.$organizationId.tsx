@@ -1,5 +1,5 @@
 import { Avatar, Button, Icon, IconButton } from "@elpassion/taco";
-import { DataFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
+import { json, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Link,
   Outlet,

@@ -1,5 +1,6 @@
 import { withSentry } from "@sentry/remix";
 import type { LinksFunction } from "@remix-run/node";
+import Modal from "react-modal";
 import {
   isRouteErrorResponse,
   Links,
@@ -13,7 +14,7 @@ import { Toaster } from "~/components/toasts/Toaster";
 import "./tailwind.css";
 import { GlobalNotFound } from "~/components/errorBoundaries/GlobalNotFound";
 import { GlobalRuntime } from "~/components/errorBoundaries/GlobalRuntime";
-import Modal from "react-modal";
+import { PageProgress } from "~/components/progressBar/PageProgress";
 
 Modal.setAppElement("#_root");
 
@@ -50,6 +51,7 @@ function App() {
       </head>
       <body className="bg-neutral-950">
         <Toaster />
+        <PageProgress />
         <Outlet />
         <ScrollRestoration />
         <Scripts />
