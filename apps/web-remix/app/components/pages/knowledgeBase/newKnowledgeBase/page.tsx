@@ -6,8 +6,8 @@ import {
   Field as FormField,
   Field,
 } from "~/components/form/fields/field.context";
+import { CreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { schema } from "./schema";
 import { SubmitButton } from "~/components/form/submit";
 import { RadioField } from "~/components/form/fields/radio.field";
 import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
@@ -16,7 +16,7 @@ import { useLoaderData } from "@remix-run/react";
 import { loader } from "./loader.server";
 
 export function NewKnowledgeBasePage() {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(CreateCollectionSchema), []);
   const [_, setWatchedValues] = useState<Record<string, any>>({});
 
   const onValueChange = (name: string, value: unknown) => {

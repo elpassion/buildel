@@ -2,14 +2,8 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
-import {
-  KnowledgeBaseCollectionFromListResponse,
-  KnowledgeBaseFileListResponse,
-  MemoryChunksResponse,
-} from "~/components/pages/knowledgeBase/contracts";
-import z from "zod";
+import { KnowledgeBaseCollectionFromListResponse } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { getParamsPagination } from "~/components/pagination/usePagination";
-import { buildUrlWithParams } from "~/utils/url";
 import { KnowledgeBaseApi } from "~/api/knowledgeBase/KnowledgeBaseApi";
 
 export async function loader(args: LoaderFunctionArgs) {

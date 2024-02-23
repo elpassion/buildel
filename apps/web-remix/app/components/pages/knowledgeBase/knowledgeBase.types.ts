@@ -3,7 +3,7 @@ import {
   KnowledgeBaseCollection,
   KnowledgeBaseFile,
   KnowledgeBaseFileList,
-} from "./contracts";
+} from "~/api/knowledgeBase/knowledgeApi.contracts";
 
 export type IKnowledgeBaseFile = z.TypeOf<typeof KnowledgeBaseFile>;
 

@@ -1,10 +1,78 @@
 import { fetchTyped } from "~/utils/fetch.server";
 import { buildUrlWithParams } from "~/utils/url";
-import { MemoryChunksResponse } from "~/components/pages/knowledgeBase/contracts";
+import {
+  KnowledgeBaseCollectionFromListResponse,
+  KnowledgeBaseCollectionListResponse,
+  KnowledgeBaseFileListResponse,
+  MemoryChunksResponse,
+  CreateCollectionSchema,
+} from "./knowledgeApi.contracts";
 import { PaginationQueryParams } from "~/components/pagination/usePagination";
+import { z } from "zod";
 
 export class KnowledgeBaseApi {
   constructor(private client: typeof fetchTyped) {}
+
+  async getCollections(organizationId: string | number) {
+    return this.client(
+      KnowledgeBaseCollectionListResponse,
+      `/organizations/${organizationId}/memory_collections`
+    );
+  }
+
+  async getCollectionByName(
+    organizationId: string | number,
+    collectionName: string | number
+  ) {
+    return this.client(
+      KnowledgeBaseCollectionFromListResponse,
+      `/organizations/${organizationId}/memory_collections?collection_name=${collectionName}`
+    );
+  }
+
+  async deleteCollection(
+    organizationId: string | number,
+    collectionId: string | number
+  ) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/memory_collections/${collectionId}`,
+      { method: "DELETE" }
+    );
+  }
+
+  async getCollectionMemories(
+    organizationId: string | number,
+    collectionId: string | number
+  ) {
+    return this.client(
+      KnowledgeBaseFileListResponse,
+      `/organizations/${organizationId}/memory_collections/${collectionId}/memories`
+    );
+  }
+
+  async deleteCollectionMemory(
+    organizationId: string | number,
+    collectionId: string | number,
+    memoryId: string | number
+  ) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/memory_collections/${collectionId}/memories/${memoryId}`,
+      { method: "DELETE" }
+    );
+  }
+
+  async createCollection(
+    organizationId: string | number,
+    data: z.TypeOf<typeof CreateCollectionSchema>
+  ) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/memory_collections`,
+      { method: "POST", body: JSON.stringify(data) }
+    );
+  }
 
   async getMemoryChunk(
     organizationId: string | number,

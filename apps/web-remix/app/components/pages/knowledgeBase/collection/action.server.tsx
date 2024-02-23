@@ -2,8 +2,8 @@ import { ActionFunctionArgs, json } from "@remix-run/node";
 import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
-import { z } from "zod";
 import { setServerToast } from "~/utils/toast.server";
+import { KnowledgeBaseApi } from "~/api/knowledgeBase/KnowledgeBaseApi";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -15,18 +15,21 @@ export async function action(actionArgs: ActionFunctionArgs) {
       const memoryId = (await request.formData()).get("memoryId");
       const collectionName = params.collectionName;
 
+      const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
+
       const {
         data: { id: collectionId },
-      } = await fetch(
-        z.any(),
-        `/organizations/${params.organizationId}/memory_collections?collection_name=${collectionName}`
+      } = await knowledgeBaseApi.getCollectionByName(
+        params.organizationId,
+        collectionName
       );
 
-      await fetch(
-        z.any(),
-        `/organizations/${params.organizationId}/memory_collections/${collectionId}/memories/${memoryId}`,
-        { method: "DELETE" }
+      await knowledgeBaseApi.deleteCollectionMemory(
+        params.organizationId,
+        collectionId,
+        memoryId as string
       );
+
       return json(
         {},
         {

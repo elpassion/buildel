@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Badge, Button } from "@elpassion/taco";
+import { Button } from "@elpassion/taco";
 import {
   IBlockConfig,
   IField,
@@ -8,7 +8,7 @@ import { IFile } from "~/components/fileUpload/fileUpload.types";
 import {
   KnowledgeBaseFileListResponse,
   KnowledgeBaseFileResponse,
-} from "~/components/pages/knowledgeBase/contracts";
+} from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
