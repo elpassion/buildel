@@ -13,6 +13,9 @@ import { Toaster } from "~/components/toasts/Toaster";
 import "./tailwind.css";
 import { GlobalNotFound } from "~/components/errorBoundaries/GlobalNotFound";
 import { GlobalRuntime } from "~/components/errorBoundaries/GlobalRuntime";
+import Modal from "react-modal";
+
+Modal.setAppElement("#_root");
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

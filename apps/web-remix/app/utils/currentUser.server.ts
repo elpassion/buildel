@@ -4,7 +4,7 @@ import { UnauthorizedError } from "./errors";
 
 export async function setCurrentUser(
   request: Request,
-  user: ICurrentUser,
+  user: ICurrentUser
 ): Promise<string> {
   const session = await getSession(request.headers.get("Cookie")!);
 

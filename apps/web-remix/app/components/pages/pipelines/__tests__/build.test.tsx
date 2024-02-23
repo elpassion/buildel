@@ -15,16 +15,16 @@ import userEvent from "@testing-library/user-event";
 import { server } from "~/tests/server.mock";
 import {
   actionWithSession,
+  loaderWithSession,
   RoutesProps,
   setupRoutes,
 } from "~/tests/setup.tests";
 import { loader as editBlockLoader } from "../build/editBlock/loader.server";
-import { handlers as blockTypesHandlers } from "./blockTypes.handlers";
+import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
 import { action as buildAction } from "../build/action.server";
 import { loader as buildLoader } from "../build/loader.server";
 import { EditBlockPage } from "../build/editBlock/page";
 import { PipelineBuilder } from "../build/page";
-import { PipelinesPage } from "../list/page";
 import { PipelineLayout } from "../pipelineLayout/page";
 import {
   loader as layoutLoader,
@@ -34,7 +34,7 @@ import {
   PipelineHandlers,
   pipelineFixtureWithUnfilledBlock,
   AliasHandlers,
-} from "./pipelines.handlers";
+} from "~/tests/handlers/pipelines.handlers";
 import { TextareaHandle } from "~/tests/handles/Textarea.handle";
 import {
   CreatableSelectHandle,
@@ -47,15 +47,32 @@ import {
 } from "~/tests/handlers/model.handlers";
 import { RadioHandle } from "~/tests/handles/Radio.handle";
 import { CollectionHandlers } from "~/tests/handlers/collection.handlers";
+import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
+import { aliasFixture } from "~/tests/fixtures/alias.fixtures";
 
 const handlers = () => [
-  ...new PipelineHandlers().handlers,
-  ...new AliasHandlers().handlers,
+  ...blockTypesHandlers(),
   ...new SecretsHandlers().handlers,
   ...new ModelsHandlers().handlers,
   ...new CollectionHandlers().handlers,
   ...new EmbeddingsHandlers().handlers,
-  ...blockTypesHandlers(),
+  ...new PipelineHandlers([
+    pipelineFixture(),
+    pipelineFixture({ id: 2, name: "sample-workflow" }),
+    pipelineFixtureWithUnfilledBlock(),
+  ]).handlers,
+  ...new AliasHandlers([
+    aliasFixture(),
+    aliasFixture({
+      id: 2,
+      name: "alias",
+      config: {
+        ...aliasFixture().config,
+        blocks: [aliasFixture().config.blocks[0]],
+        connections: [],
+      },
+    }),
+  ]).handlers,
 ];
 
 describe(PipelineBuilder.name, () => {
@@ -430,13 +447,13 @@ class PipelineObject {
     const Routes = setupRoutes([
       {
         action: actionWithSession(layoutAction),
-        loader: actionWithSession(layoutLoader),
+        loader: loaderWithSession(layoutLoader),
         path: "/:organizationId/pipelines/:pipelineId",
         Component: PipelineLayout,
         children: [
           {
             action: actionWithSession(buildAction),
-            loader: actionWithSession(buildLoader),
+            loader: loaderWithSession(buildLoader),
             path: "/:organizationId/pipelines/:pipelineId/build",
             Component: PipelineBuilder,
           },
@@ -444,7 +461,7 @@ class PipelineObject {
       },
 
       {
-        loader: actionWithSession(editBlockLoader),
+        loader: loaderWithSession(editBlockLoader),
         path: "/:organizationId/pipelines/:pipelineId/build/blocks/:blockName",
         Component: EditBlockPage,
       },

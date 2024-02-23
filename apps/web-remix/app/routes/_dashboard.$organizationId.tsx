@@ -1,5 +1,5 @@
 import { Avatar, Button, Icon, IconButton } from "@elpassion/taco";
-import { DataFunctionArgs, json } from "@remix-run/node";
+import { DataFunctionArgs, json, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -10,7 +10,6 @@ import {
 import classNames from "classnames";
 import type { MenuInfo } from "rc-menu/es/interface";
 import { PropsWithChildren, useCallback, useRef, useState } from "react";
-import Modal from "react-modal";
 import invariant from "tiny-invariant";
 import { useOnClickOutside } from "usehooks-ts";
 import { OrganizationApi } from "~/api/organization/OrganizationApi";
@@ -31,9 +30,7 @@ import { routes } from "~/utils/routes.utils";
 import { getServerToast, setOrganizationId } from "~/utils/toast.server";
 import { ClientOnly } from "remix-utils/client-only";
 
-Modal.setAppElement("#_root");
-
-export async function loader(loaderArgs: DataFunctionArgs) {
+export async function loader(loaderArgs: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
 
@@ -55,7 +52,7 @@ export async function loader(loaderArgs: DataFunctionArgs) {
       });
     }
 
-    cookie = await setOrganizationId(cookie, organization!.id);
+    cookie = await setOrganizationId(cookie, organization.id);
 
     const { user } = await getCurrentUser(request);
 

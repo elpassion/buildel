@@ -1,21 +1,24 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { z } from "zod";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
 import { routes } from "~/utils/routes.utils";
 import { getOrganizationId } from "~/utils/toast.server";
+import { OrganizationApi } from "~/api/organization/OrganizationApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {
     await requireLogin(request);
 
-    const { data: organizations } = await fetch(
-      OrganizationsResponse,
-      `/organizations`
-    );
+    const organizationApi = new OrganizationApi(fetch);
 
-    const organizationId = await getOrganizationId(request.headers.get("Cookie") || "");
-    const savedOrganizationIndex = organizations.data.findIndex((org) => org.id === organizationId);
+    const { data: organizations } = await organizationApi.getOrganizations();
+
+    const organizationId = await getOrganizationId(
+      request.headers.get("Cookie") || ""
+    );
+    const savedOrganizationIndex = organizations.data.findIndex(
+      (org) => org.id === organizationId
+    );
     const organization = organizations.data.at(savedOrganizationIndex);
 
     if (organization) {
@@ -25,11 +28,3 @@ export async function loader(args: LoaderFunctionArgs) {
     }
   })(args);
 }
-
-const OrganizationsResponse = z.object({
-  data: z.array(
-    z.object({
-      id: z.number(),
-    })
-  ),
-});

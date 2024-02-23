@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import { ValidatedForm } from "remix-validated-form";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { Button } from "@elpassion/taco";
 import { CreateOrganizationSchema } from "~/api/organization/organization.contracts";
 import { SubmitButton } from "~/components/form/submit";
 

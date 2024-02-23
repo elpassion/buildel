@@ -13,19 +13,25 @@ import { PipelinesPage } from "../list/page";
 import { loader as listLoader } from "../list/loader.server";
 import { action as listAction } from "../list/action.server";
 import { action as newPipelineAction } from "../new/action.server";
-import { emptyHandlers, PipelineHandlers } from "./pipelines.handlers";
+import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
 import { ListHandle } from "~/tests/handles/List.handle";
 import { NewPipelinePage } from "../new/page";
 import { LinkHandle } from "~/tests/handles/Link.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
+import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
+
+const handlers = () => [
+  ...new PipelineHandlers([
+    pipelineFixture(),
+    pipelineFixture({ id: 2, name: "sample-workflow" }),
+  ]).handlers,
+];
 
 describe(PipelinesPage.name, () => {
-  const setupServer = server(new PipelineHandlers().handlers);
+  const setupServer = server(handlers());
 
   beforeAll(() => setupServer.listen());
-  afterEach(() =>
-    setupServer.resetHandlers(...new PipelineHandlers().handlers)
-  );
+  afterEach(() => setupServer.resetHandlers(...handlers()));
   afterAll(() => setupServer.close());
 
   test("should render correct amount of pipelines", async () => {
@@ -35,11 +41,11 @@ describe(PipelinesPage.name, () => {
 
     const workflowList = await ListHandle.fromLabelText(/Workflows list/i);
 
-    expect(workflowList.children).toHaveLength(3);
+    expect(workflowList.children).toHaveLength(2);
   });
 
   test("should render only workflow-templates when pipelines are empty", async () => {
-    setupServer.use(...emptyHandlers());
+    setupServer.use(...new PipelineHandlers().handlers);
 
     new PipelinesObject().render({
       initialEntries: ["/2/pipelines"],
@@ -73,7 +79,7 @@ describe(PipelinesPage.name, () => {
 
     const workflowList = await ListHandle.fromLabelText(/Workflows list/i);
 
-    expect(workflowList.children).toHaveLength(2);
+    expect(workflowList.children).toHaveLength(1);
   });
 
   test("should duplicate pipeline", async () => {

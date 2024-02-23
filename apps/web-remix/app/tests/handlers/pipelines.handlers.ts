@@ -12,13 +12,10 @@ import { aliasFixture } from "~/tests/fixtures/alias.fixtures";
 export class PipelineHandlers {
   private pipelines: Map<number, IPipeline> = new Map();
 
-  constructor() {
-    this.pipelines.set(1, pipelineFixture());
-    this.pipelines.set(2, pipelineFixture({ id: 2, name: "sample-workflow" }));
-    this.pipelines.set(
-      pipelineFixtureWithUnfilledBlock().id,
-      pipelineFixtureWithUnfilledBlock()
-    );
+  constructor(initials: IPipeline[] = []) {
+    initials.forEach((pipeline) => {
+      this.pipelines.set(pipeline.id, pipeline);
+    });
   }
 
   getPipelinesHandler() {
@@ -109,7 +106,7 @@ export class PipelineHandlers {
       "/super-api/organizations/:organizationId/pipelines",
       async () => {
         return HttpResponse.json(
-          { data: pipelineFixture({ id: 321 }) },
+          { data: pipelineFixture({ id: this.pipelines.size + 1 }) },
           { status: 201 }
         );
       }
@@ -125,42 +122,25 @@ export class PipelineHandlers {
       this.updateHandler(),
     ];
   }
-
-  get getPipelines() {
-    return this.pipelines.values();
-  }
 }
 
-export const emptyHandlers = () => {
-  return [
-    http.get("/super-api/organizations/:organizationId/pipelines", () => {
-      return HttpResponse.json<IPipelinesResponse>(
-        {
-          data: [],
-        },
-        { status: 200 }
-      );
-    }),
-  ];
-};
-
 export class AliasHandlers {
-  private aliases: Map<number, IAliasResponse> = new Map();
+  private aliases: Map<number | string, IAliasResponse> = new Map();
 
-  constructor() {
-    this.aliases.set(1, aliasFixture({ id: 1 }));
-    this.aliases.set(
-      2,
-      aliasFixture({
-        id: 2,
-        name: "alias",
-        config: {
-          ...aliasFixture().config,
-          blocks: [aliasFixture().config.blocks[0]],
-          connections: [],
-        },
-      })
-    );
+  constructor(initials: IAliasResponse[] = []) {
+    initials.forEach((alias) => {
+      this.aliases.set(alias.id, alias);
+    });
+
+    aliasFixture({
+      id: 2,
+      name: "alias",
+      config: {
+        ...aliasFixture().config,
+        blocks: [aliasFixture().config.blocks[0]],
+        connections: [],
+      },
+    });
   }
 
   createHandler() {
@@ -169,7 +149,7 @@ export class AliasHandlers {
       async ({ request }) => {
         const { alias } = await request.json();
 
-        alias.id = 3;
+        alias.id = this.aliases.size + 1;
 
         this.aliases.set(3, alias);
 
@@ -250,10 +230,6 @@ export class AliasHandlers {
       this.getAliasHandler(),
       this.deleteHandler(),
     ];
-  }
-
-  get getAliases() {
-    return this.aliases.values();
   }
 
   get length() {
