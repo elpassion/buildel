@@ -1,6 +1,5 @@
 import { http, HttpResponse } from "msw";
 import { IAsyncSelectItem, IAsyncSelectItemList } from "~/api/AsyncSelectApi";
-import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
 import {
   IFixtureAsyncSelectModel,
   modelFixture,

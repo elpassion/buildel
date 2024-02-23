@@ -18,7 +18,7 @@ import { KnowledgeBasePage } from "~/components/pages/knowledgeBase/list/page";
 import {
   CollectionHandlers,
   CollectionMemoriesHandlers,
-} from "~/components/pages/knowledgeBase/__tests__/collection.handlers";
+} from "~/tests/handlers/collection.handlers";
 import { NewKnowledgeBasePage } from "../newKnowledgeBase/page";
 import { loader as newCollectionLoader } from "../newKnowledgeBase/loader.server";
 import { action as newCollectionAction } from "../newKnowledgeBase/action.server";

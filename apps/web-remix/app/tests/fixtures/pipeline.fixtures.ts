@@ -14,6 +14,19 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
       version: "1",
       blocks: [
         {
+          name: "document_search_1",
+          opts: {
+            name: "document_search_1",
+          },
+          inputs: [],
+          connections: [],
+          position: {
+            x: -24.355610006095844,
+            y: -1060.6251483015994,
+          },
+          type: "document_search",
+        },
+        {
           name: "text_input_1",
           opts: {},
           inputs: [],
@@ -119,4 +132,18 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
     },
     ...override,
   };
+};
+
+const t = {
+  name: "document_search_1",
+  opts: {
+    name: "document_search_1",
+  },
+  inputs: [],
+  connections: [],
+  position: {
+    x: -24.355610006095844,
+    y: -1060.6251483015994,
+  },
+  type: "document_search",
 };

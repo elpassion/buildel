@@ -45,8 +45,8 @@ export class CollectionHandlers {
         };
         this.collections.set(3, newCollection);
 
-        return HttpResponse.json<{ data: IKnowledgeBaseCollection[] }>(
-          { data: [...this.collections.values()] },
+        return HttpResponse.json(
+          { data: newCollection },
           {
             status: 200,
           }

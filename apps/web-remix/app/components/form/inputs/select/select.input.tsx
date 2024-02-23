@@ -1,6 +1,6 @@
 import { Option } from "rc-select";
 import React, { useCallback, useEffect, useState } from "react";
-import { useDebounce } from "usehooks-ts";
+import { useDebounce, useIsMounted } from "usehooks-ts";
 import AsyncSelectInputComponent, {
   SelectInputProps,
 } from "./select.input-impl.client";
@@ -34,6 +34,7 @@ export const AsyncSelectInput = <T = {},>({
   onOptionsFetch,
   ...props
 }: AsyncSelectInputProps<T>) => {
+  const isMounted = useIsMounted();
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const debouncedSearch = useDebounce(searchValue, 500);
@@ -48,7 +49,7 @@ export const AsyncSelectInput = <T = {},>({
         setOptions(options);
         onOptionsFetch?.(options);
       })
-      .finally(() => setLoading(false));
+      .finally(() => isMounted() && setLoading(false));
   }, [fetchOptions, debouncedSearch]);
 
   useEffect(() => {

@@ -41,18 +41,24 @@ import {
   SelectHandle,
 } from "~/tests/handles/SelectHandle";
 import { SecretsHandlers } from "~/tests/handlers/secret.handlers";
-import { ModelsHandlers } from "~/tests/handlers/model.handlers";
+import {
+  EmbeddingsHandlers,
+  ModelsHandlers,
+} from "~/tests/handlers/model.handlers";
 import { RadioHandle } from "~/tests/handles/Radio.handle";
+import { CollectionHandlers } from "~/tests/handlers/collection.handlers";
 
 const handlers = () => [
   ...new PipelineHandlers().handlers,
   ...new AliasHandlers().handlers,
   ...new SecretsHandlers().handlers,
   ...new ModelsHandlers().handlers,
+  ...new CollectionHandlers().handlers,
+  ...new EmbeddingsHandlers().handlers,
   ...blockTypesHandlers(),
 ];
 
-describe(PipelinesPage.name, () => {
+describe(PipelineBuilder.name, () => {
   const setupServer = server([...handlers()]);
 
   beforeAll(() => setupServer.listen());
@@ -66,7 +72,7 @@ describe(PipelinesPage.name, () => {
 
     const blocks = await page.getBlocks();
 
-    expect(blocks).toHaveLength(3);
+    expect(blocks).toHaveLength(4);
   });
 
   test("should render blocks types", async () => {
@@ -112,7 +118,7 @@ describe(PipelinesPage.name, () => {
 
     const blocks = await page.getBlocks();
 
-    expect(blocks).toHaveLength(4);
+    expect(blocks).toHaveLength(5);
   });
 
   test("should remove block after clicking trash icon on node", async () => {
@@ -132,7 +138,7 @@ describe(PipelinesPage.name, () => {
 
     const blocks = await page.getBlocks();
 
-    expect(blocks).toHaveLength(2);
+    expect(blocks).toHaveLength(3);
   });
 
   test("should edit block name", async () => {
@@ -202,7 +208,7 @@ describe(PipelinesPage.name, () => {
 
     const blocks = await page.getBlocks();
 
-    expect(blocks).toHaveLength(3);
+    expect(blocks).toHaveLength(4);
 
     await page.openAliasDropdown();
 
@@ -333,6 +339,62 @@ describe(PipelinesPage.name, () => {
     await modalSubmit.click();
 
     await select.selectOption("SAMPLE_KEY");
+  });
+
+  test("should render recursive creatable select in DocumentSearchBlock", async () => {
+    new PipelineObject().render({
+      initialEntries: [`/2/pipelines/1/build/blocks/document_search_1`],
+    });
+
+    const knowledgeSelect = await CreatableSelectHandle.fromTestId(
+      "opts.knowledge"
+    );
+    await knowledgeSelect.openModal();
+    const submitKnowledgeBase = await ButtonHandle.fromLabelTextAndContainer(
+      /Create new/i,
+      await knowledgeSelect.getModal()
+    );
+
+    // new knowledge base
+
+    const newKnowledgeNameInput = await InputHandle.fromLabelText(
+      /collection_name/i
+    );
+    await newKnowledgeNameInput.type("NEW_NEW");
+    const newKnowledgeModelSelect = await SelectHandle.fromTestId(
+      "embeddings.model"
+    );
+    await newKnowledgeModelSelect.selectOption("text-embedding-ada-002");
+
+    // new knowledge base -> new secret
+
+    const newKnowledgeSecretSelect = await CreatableSelectHandle.fromTestId(
+      "embeddings.secret_name"
+    );
+    await newKnowledgeSecretSelect.openModal();
+    const newSecretModal = await newKnowledgeSecretSelect.getModal();
+    const newSecretNameInput = await InputHandle.fromLabelTextAndContainer(
+      /name/i,
+      newSecretModal
+    );
+    await newSecretNameInput.type("WRRR");
+    const newSecretValueInput = await InputHandle.fromLabelTextAndContainer(
+      /value/i,
+      newSecretModal
+    );
+    await newSecretValueInput.type("WRRR");
+    const newSecretSubmitButton = await ButtonHandle.fromLabelTextAndContainer(
+      /Create new/i,
+      newSecretModal
+    );
+    await newSecretSubmitButton.click();
+    expect(newKnowledgeSecretSelect.value).toBe("WRRR");
+
+    // --------
+
+    await submitKnowledgeBase.click();
+
+    expect(knowledgeSelect.value).toBe("NEW_NEW");
   });
 
   test("should clear model and endpoint after changing API type", async () => {
