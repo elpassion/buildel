@@ -10,6 +10,7 @@ import { PaginationMeta } from "~/components/pagination/pagination.types";
 export const InterfaceConfig = z.object({
   input: z.string().min(2).optional(),
   output: z.string().min(2).optional(),
+  chat: z.string().min(2).optional(),
 });
 
 export const Pipeline = z.object({

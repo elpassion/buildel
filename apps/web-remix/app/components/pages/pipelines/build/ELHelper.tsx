@@ -54,6 +54,7 @@ export const ELHelper: React.FC<ELHelperProps> = ({
   } = useChat({
     pipelineId: 135,
     organizationId: 13,
+    chat: "chat_1",
     input: "text_input_1",
     output: "text_output_1",
     onFinish: onBlockCreate,

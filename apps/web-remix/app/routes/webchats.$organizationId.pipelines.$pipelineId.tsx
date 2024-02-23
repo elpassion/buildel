@@ -57,6 +57,7 @@ export default function WebsiteChat() {
   } = useChat({
     input: pipeline.interface_config?.input ?? "",
     output: pipeline.interface_config?.output ?? "",
+    chat: pipeline.interface_config?.chat ?? "",
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
   });

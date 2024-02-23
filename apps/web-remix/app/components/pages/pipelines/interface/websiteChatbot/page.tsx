@@ -27,7 +27,7 @@ export function WebsiteChatbotPage() {
   const websiteChatUrl = `${pageUrl}${routes.chatPreview(
     organizationId,
     pipelineId,
-    Object.fromEntries(searchParams.entries()),
+    Object.fromEntries(searchParams.entries())
   )}`;
 
   const handleUpdate = (interfaceConfig: IInterfaceConfig) => {
@@ -51,7 +51,7 @@ export function WebsiteChatbotPage() {
           to={routes.chatPreview(
             organizationId,
             pipelineId,
-            Object.fromEntries(searchParams.entries()),
+            Object.fromEntries(searchParams.entries())
           )}
           className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
         >

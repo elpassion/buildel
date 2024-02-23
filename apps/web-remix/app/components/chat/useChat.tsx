@@ -8,6 +8,7 @@ import { IMessage, MessageRole } from "./chat.types";
 interface UseChatProps {
   input: string;
   output: string;
+  chat: string;
   organizationId: number;
   pipelineId: number;
   onBlockOutput?: (
@@ -21,6 +22,7 @@ interface UseChatProps {
 export const useChat = ({
   input,
   output,
+  chat,
   organizationId,
   pipelineId,
   onBlockOutput: onBlockOutputProps,
@@ -66,8 +68,8 @@ export const useChat = ({
     if (blockId.includes(input) && isWorking) {
       setIsGenerating(true);
     }
-    // @todo handle this chat block name
-    if (blockId.includes("chat_1") && !isWorking) {
+
+    if (blockId.includes(chat) && !isWorking) {
       setIsGenerating(false);
       onFinish?.();
     }
