@@ -27,6 +27,8 @@ export const CreateCollectionSchema = z.object({
   }),
 });
 
+export type ICreateCollectionSchema = z.TypeOf<typeof CreateCollectionSchema>;
+
 export const KnowledgeBaseFile = z.object({
   id: z.number(),
   file_name: z.string(),

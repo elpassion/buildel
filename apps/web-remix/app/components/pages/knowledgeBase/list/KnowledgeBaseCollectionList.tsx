@@ -35,6 +35,7 @@ export const KnowledgeBaseCollectionList: React.FC<
 
   return (
     <ItemList
+      aria-label="Memory collections list"
       className="grid grid-cols-1 gap-2"
       items={items}
       emptyText={<EmptyMessage>There is no Collections yet...</EmptyMessage>}
@@ -75,7 +76,7 @@ export const KnowledgeBaseCollectionListItem: React.FC<
       <IconButton
         size="xs"
         variant="ghost"
-        aria-label="Remove collection"
+        aria-label={`Remove collection: ${data.name}`}
         className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
         title={`Remove collection: ${data.name}`}
         icon={<Icon iconName="trash" />}

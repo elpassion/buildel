@@ -99,6 +99,7 @@ function ModelSelectField() {
   return (
     <FormField name="embeddings.model">
       <AsyncSelectField
+        id="model"
         url={`/api/organizations/${organizationId}/models/embeddings?api_type=openai`}
         label="Model"
         supportingText="The model to use for the embeddings."
@@ -117,6 +118,7 @@ function SecretSelectField() {
       <AsyncSelectField
         url={`/api/organizations/${organizationId}/secrets`}
         label="Secret"
+        id="secret"
         supportingText="The secret to use for the embeddings."
         errorMessage={fieldErrors["embeddings.secret_name"]}
       />

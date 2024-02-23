@@ -50,7 +50,10 @@ export function KnowledgeBasePage() {
 
       <PageContentWrapper>
         <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
-          <Link to={routes.knowledgeBaseNew(organizationId)}>
+          <Link
+            to={routes.knowledgeBaseNew(organizationId)}
+            aria-label="Go to new collection page"
+          >
             <Button size="sm" tabIndex={0}>
               New collection
             </Button>

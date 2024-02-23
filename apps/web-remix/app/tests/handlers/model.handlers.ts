@@ -5,40 +5,34 @@ import {
   IFixtureAsyncSelectModel,
   modelFixture,
 } from "~/tests/fixtures/models.fixtures";
+import { embeddingFixture } from "~/tests/fixtures/embedding.fixtures";
 
-export class SecretsHandlers {
-  private secrets: Map<string | number, IAsyncSelectItem> = new Map();
+//@todo handle filtering by api type
+export class EmbeddingsHandlers {
+  private embeddings: Map<string | number, IAsyncSelectItem> = new Map();
 
   constructor() {
-    this.secrets.set(secretFixture().id, secretFixture());
-    this.secrets.set("Test", secretFixture({ name: "Test", id: "Test" }));
+    this.embeddings.set(embeddingFixture().id, embeddingFixture());
+    this.embeddings.set(
+      "embedding",
+      embeddingFixture({ name: "embedding", id: "embedding" })
+    );
   }
 
-  getSecretsHandler() {
-    return http.get("/super-api/organizations/:organizationId/secrets", () => {
-      return HttpResponse.json<{ data: IAsyncSelectItemList }>(
-        { data: [...this.secrets.values()] },
-        { status: 200 }
-      );
-    });
-  }
-
-  createHandler() {
-    return http.post<any, { name: string; value: string }>(
-      "/super-api/organizations/:organizationId/secrets",
-      async ({ request }) => {
-        const data = await request.json();
-        const transformed = { id: data.value, name: data.name };
-
-        this.secrets.set(data.value, transformed);
-
-        return HttpResponse.json({ data: transformed }, { status: 200 });
+  getEmbeddingsHandler() {
+    return http.get(
+      "/super-api/organizations/:organizationId/models/embeddings",
+      () => {
+        return HttpResponse.json<{ data: IAsyncSelectItemList }>(
+          { data: [...this.embeddings.values()] },
+          { status: 200 }
+        );
       }
     );
   }
 
   get handlers() {
-    return [this.getSecretsHandler(), this.createHandler()];
+    return [this.getEmbeddingsHandler()];
   }
 }
 
@@ -46,7 +40,7 @@ export class ModelsHandlers {
   private models: Map<string | number, IFixtureAsyncSelectModel> = new Map();
 
   constructor() {
-    this.models.set(modelFixture().id, modelFixture());
+    this.models.set(embeddingFixture().id, modelFixture());
     this.models.set(
       "Test",
       modelFixture({ name: "Test", id: "Test", type: "google" })

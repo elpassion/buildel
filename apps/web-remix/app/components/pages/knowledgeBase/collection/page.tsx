@@ -18,7 +18,6 @@ import {
 } from "~/components/sidebar/ActionSidebar";
 import { routes } from "~/utils/routes.utils";
 import { Modal } from "@elpassion/taco/Modal";
-import { ConfirmationModalHeader } from "~/components/modal/ConfirmationModal";
 
 export function KnowledgeBaseCollectionPage() {
   const { fileList, organizationId, collectionName } =

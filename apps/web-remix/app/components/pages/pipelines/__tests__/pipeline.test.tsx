@@ -40,7 +40,8 @@ import {
   CreatableSelectHandle,
   SelectHandle,
 } from "~/tests/handles/SelectHandle";
-import { SecretsHandlers, ModelsHandlers } from "./asyncSelect.handlers";
+import { SecretsHandlers } from "~/tests/handlers/secret.handlers";
+import { ModelsHandlers } from "~/tests/handlers/model.handlers";
 import { RadioHandle } from "~/tests/handles/Radio.handle";
 
 const handlers = () => [

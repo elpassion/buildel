@@ -16,6 +16,7 @@ export interface AsyncSelectFieldProps extends Partial<AsyncSelectInputProps> {
   label?: ReactNode;
   supportingText?: ReactNode;
   errorMessage?: ReactNode;
+  id: string;
 }
 
 export const AsyncSelectField = forwardRef<
@@ -53,6 +54,7 @@ export const AsyncSelectField = forwardRef<
           defaultValue={defaultValue}
           onChange={setSelectedId}
           value={selectedId}
+          data-testid={props.id}
           {...props}
         />
         <InputText
