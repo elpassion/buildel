@@ -72,6 +72,17 @@ describe("Onboarding", () => {
 
     await screen.findByTestId(/organization-2/i);
   });
+
+  test("should redirect to last organization if id not match", async () => {
+    new OnboardingObject().render(
+      {
+        initialEntries: ["/"],
+      },
+      22
+    );
+
+    await screen.findByTestId(/organization-3/i);
+  });
 });
 
 class OnboardingObject {
