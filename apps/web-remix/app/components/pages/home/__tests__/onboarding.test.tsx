@@ -19,7 +19,6 @@ import { loader as organizationLoader } from "../../organizations/show/loader.se
 import { loader as homeLoader } from "../loader.server";
 import { OrganizationHandlers } from "~/tests/handlers/organization.handlers";
 import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
-
 import { InputHandle } from "~/tests/handles/Input.handle";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { organizationFixture } from "~/tests/fixtures/organization.fixtures";
@@ -83,7 +82,6 @@ class OnboardingObject {
         path: "/:organizationId",
         loader: loaderWithSession(organizationLoader),
       },
-
       {
         path: "/:organizationId/pipelines",
         Component: PipelinesPage,
