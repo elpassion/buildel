@@ -176,6 +176,7 @@ export function NodeFieldsForm({
             preview={(props) => (
               <FileUploadListPreview
                 {...props}
+                aria-label={`${blockName} memory list`}
                 className="max-h-[110px]"
                 disabled={disabled}
               />

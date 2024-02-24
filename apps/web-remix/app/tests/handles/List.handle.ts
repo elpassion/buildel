@@ -8,6 +8,6 @@ export class ListHandle {
   }
 
   get children() {
-    return this.listElement.children;
+    return [...this.listElement.children];
   }
 }

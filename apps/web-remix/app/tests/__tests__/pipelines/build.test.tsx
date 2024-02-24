@@ -45,13 +45,18 @@ import {
   ModelsHandlers,
 } from "~/tests/handlers/model.handlers";
 import { RadioHandle } from "~/tests/handles/Radio.handle";
-import { CollectionHandlers } from "~/tests/handlers/collection.handlers";
+import {
+  CollectionHandlers,
+  CollectionMemoriesHandlers,
+} from "~/tests/handlers/collection.handlers";
 import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
 import { aliasFixture } from "~/tests/fixtures/alias.fixtures";
 import { collectionFixture } from "~/tests/fixtures/collection.fixtures";
 import { embeddingFixture } from "~/tests/fixtures/embedding.fixtures";
 import { modelFixture } from "~/tests/fixtures/models.fixtures";
 import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
+import { collectionMemoryFixtures } from "~/tests/fixtures/collectionMemory.fixtures";
+import { ListHandle } from "~/tests/handles/List.handle";
 
 const handlers = () => [
   ...blockTypesHandlers(),
@@ -70,6 +75,10 @@ const handlers = () => [
   ...new CollectionHandlers([
     collectionFixture(),
     collectionFixture({ id: 2, name: "super-collection" }),
+  ]).handlers,
+  ...new CollectionMemoriesHandlers([
+    collectionMemoryFixtures(),
+    collectionMemoryFixtures({ id: 2, file_name: "test_file" }),
   ]).handlers,
   ...new PipelineHandlers([
     pipelineFixture(),
@@ -417,6 +426,36 @@ describe(PipelineBuilder.name, () => {
     await waitFor(() => submitKnowledgeBase.click());
 
     expect(knowledgeSelect.value).toBe("NEW_NEW");
+  });
+
+  test("should reload memory files after changing knowledge base", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: [`/2/pipelines/2/build`],
+    });
+
+    const list = await ListHandle.fromLabelText(
+      /document_search_1 memory list/i
+    );
+    expect(list.children).toHaveLength(0);
+
+    const editButton = await ButtonHandle.fromLabelText(
+      /Edit block: document_search_1/i
+    );
+    await page.fireBlockOnClick(editButton.buttonElement);
+
+    const knowledgeSelect = await SelectHandle.fromTestId("opts.knowledge");
+    await knowledgeSelect.selectOption("super-collection");
+
+    const submit = await ButtonHandle.fromRole("Save changes");
+    await waitFor(async () => {
+      await submit.click();
+    });
+
+    const listAfterUpdate = await ListHandle.fromLabelText(
+      /document_search_1 memory list/i
+    );
+
+    expect(listAfterUpdate.children).toHaveLength(2);
   });
 
   test("should clear model and endpoint after changing API type", async () => {

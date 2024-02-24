@@ -5,7 +5,9 @@ import { ItemList } from "~/components/list/ItemList";
 import { IFileUpload, IPreviewProps } from "./fileUpload.types";
 import { IconButton } from "~/components/iconButton";
 
-interface FileUploadListPreviewProps extends Omit<IPreviewProps, "remove"> {
+interface FileUploadListPreviewProps
+  extends Omit<IPreviewProps, "remove">,
+    React.HTMLProps<HTMLUListElement> {
   remove?: (id: number) => Promise<void>;
   disabled?: boolean;
   className?: string;
@@ -15,6 +17,7 @@ export function FileUploadListPreview({
   remove,
   className,
   disabled,
+  ...rest
 }: FileUploadListPreviewProps) {
   return (
     <ItemList
@@ -27,6 +30,7 @@ export function FileUploadListPreview({
       renderItem={(file) => (
         <FileUploadListItem file={file} onRemove={remove} disabled={disabled} />
       )}
+      {...rest}
     />
   );
 }
