@@ -170,6 +170,17 @@ defmodule Buildel.Blocks.Chat do
     GenServer.call(pid, {:send_message, message}, 5 * 60_000)
   end
 
+  defp save_input_and_send_message(pid, {topic, :text, message}) do
+    %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
+
+    GenServer.cast(
+      pid,
+      {:save_input, %{block_name: block, message: {:text, message}, output_name: output}}
+    )
+
+    GenServer.cast(pid, {:send_message, {:text, message}})
+  end
+
   defp save_text_chunk(pid, chunk) do
     GenServer.cast(pid, {:save_text_chunk, chunk})
   end
@@ -225,6 +236,12 @@ defmodule Buildel.Blocks.Chat do
      state
      |> assign_stream_state
      |> assign_take_latest()
+     |> Map.put(
+       :input_queue,
+       Buildel.Blocks.Utils.InputQueue.new([], fn input ->
+         save_input_and_send_message(self(), input)
+       end)
+     )
      |> Map.put(:prompt_template, opts.prompt_template)
      |> Map.put(:api_key, api_key)
      |> Map.put(:tool_connections, tool_connections)
@@ -306,11 +323,13 @@ defmodule Buildel.Blocks.Chat do
   @impl true
   def handle_cast({:finish_chat_message}, %{chat_memory: %ChatMemory{type: :off}} = state) do
     state = update_in(state.chat_memory, &ChatMemory.reset(&1))
+    state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
     {:noreply, state |> send_stream_stop()}
   end
 
   @impl true
   def handle_cast({:finish_chat_message}, state) do
+    state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
     {:noreply, state |> send_stream_stop()}
   end
 
@@ -461,9 +480,8 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_info({name, :text, message}, state) do
-    state = save_latest_input_value(state, name, message)
-    send_message(self(), {:text, message})
+  def handle_info({_name, :text, _message} = info, state) do
+    state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
     {:noreply, state}
   end
 
