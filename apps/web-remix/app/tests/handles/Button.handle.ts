@@ -32,8 +32,6 @@ export class ButtonHandle {
       throw new Error(`(${this.buttonElement.name}) button is disabled!`);
     }
 
-    await act(async () => {
-      await userEvent.click(this.buttonElement);
-    });
+    await userEvent.click(this.buttonElement);
   }
 }

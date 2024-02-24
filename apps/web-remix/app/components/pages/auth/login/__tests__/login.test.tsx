@@ -85,7 +85,7 @@ class LoginObject {
   async submit() {
     const { button } = await this.getElements();
 
-    await act(() => button.click());
+    await button.click();
 
     return this;
   }

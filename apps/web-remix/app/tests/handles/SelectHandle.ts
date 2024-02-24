@@ -1,6 +1,5 @@
 import userEvent from "@testing-library/user-event";
 import { screen } from "../render";
-import { act } from "~/tests/render";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 
 export class SelectHandle {
@@ -22,9 +21,7 @@ export class SelectHandle {
 
     if (!input) throw new Error(`Input in ${this.id} select does not exist`);
 
-    await act(async () => {
-      await userEvent.click(input);
-    });
+    await userEvent.click(input);
 
     return this;
   }
@@ -40,9 +37,7 @@ export class SelectHandle {
       throw new Error(`There is not ${value} in ${this.id} select`);
     }
 
-    await act(async () => {
-      await userEvent.click(option);
-    });
+    await userEvent.click(option);
 
     return option;
   }

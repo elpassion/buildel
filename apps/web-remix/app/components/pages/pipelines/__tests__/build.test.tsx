@@ -5,7 +5,6 @@ import {
   screen,
   waitFor,
   fireEvent,
-  act,
   Matcher,
   findByText,
 } from "~/tests/render";
@@ -129,9 +128,7 @@ describe(PipelineBuilder.name, () => {
 
     const addButton = blockTypes[0].querySelector("button");
 
-    await act(async () => {
-      await userEvent.click(addButton!);
-    });
+    await userEvent.click(addButton!);
 
     const blocks = await page.getBlocks();
 
@@ -147,9 +144,7 @@ describe(PipelineBuilder.name, () => {
       /Delete block: text_input_1/i
     );
 
-    act(() => {
-      page.fireBlockOnClick(deleteButton.buttonElement);
-    });
+    await page.fireBlockOnClick(deleteButton.buttonElement);
 
     await page.confirmAction();
 
@@ -167,9 +162,7 @@ describe(PipelineBuilder.name, () => {
       /Edit block: text_output_1/i
     );
 
-    act(() => {
-      page.fireBlockOnClick(editButton.buttonElement);
-    });
+    await page.fireBlockOnClick(editButton.buttonElement);
 
     await screen.findByText(/Text Output 1/i);
 
@@ -181,9 +174,7 @@ describe(PipelineBuilder.name, () => {
 
     const submit = await ButtonHandle.fromRole("Save changes");
 
-    await act(async () => {
-      await submit.click();
-    });
+    await submit.click();
 
     await waitFor(() => screen.findByText(/super_output/i));
   });
@@ -310,9 +301,7 @@ describe(PipelineBuilder.name, () => {
 
     const submit = await ButtonHandle.fromRole("Save changes");
 
-    await act(async () => {
-      await submit.click();
-    });
+    await submit.click();
 
     expect(
       screen.queryByText(/This block contains problems to fix./i)
@@ -409,7 +398,7 @@ describe(PipelineBuilder.name, () => {
 
     // --------
 
-    await submitKnowledgeBase.click();
+    await waitFor(() => submitKnowledgeBase.click());
 
     expect(knowledgeSelect.value).toBe("NEW_NEW");
   });
@@ -481,7 +470,7 @@ class PipelineObject {
   }
 
   async hoverOverBlockGroup(element: Element) {
-    await act(() => userEvent.hover(element));
+    await userEvent.hover(element);
 
     return this;
   }
@@ -496,9 +485,7 @@ class PipelineObject {
       `Edit block: ${blockName}`
     );
 
-    act(() => {
-      this.fireBlockOnClick(editButton.buttonElement);
-    });
+    await this.fireBlockOnClick(editButton.buttonElement);
 
     return this;
   }
@@ -519,9 +506,7 @@ class PipelineObject {
   async openAliasDropdown() {
     const aliasDropdown = await ButtonHandle.fromLabelText(/Select aliases/i);
 
-    await act(async () => {
-      await aliasDropdown.click();
-    });
+    await aliasDropdown.click();
 
     return this;
   }
@@ -529,9 +514,7 @@ class PipelineObject {
   async restore() {
     const restore = await ButtonHandle.fromRole("Restore");
 
-    await act(async () => {
-      await restore.click();
-    });
+    await restore.click();
 
     return this;
   }
@@ -539,9 +522,7 @@ class PipelineObject {
   async createAlias() {
     const create = await ButtonHandle.fromTestId("create-alias");
 
-    await act(async () => {
-      await create.click();
-    });
+    await create.click();
 
     return this;
   }
@@ -549,9 +530,7 @@ class PipelineObject {
   async selectAlias(name: Matcher) {
     const aliasLink = await ButtonHandle.fromLabelText(name);
 
-    await act(async () => {
-      await aliasLink.click();
-    });
+    await aliasLink.click();
 
     return this;
   }
@@ -563,9 +542,7 @@ class PipelineObject {
   async deleteAlias(label: Matcher) {
     const deleteButton = await ButtonHandle.fromLabelText(label);
 
-    await act(async () => {
-      await deleteButton.click();
-    });
+    await deleteButton.click();
 
     return this;
   }
@@ -573,9 +550,7 @@ class PipelineObject {
   async confirmAction() {
     const confirmButton = await ButtonHandle.fromRole("Confirm");
 
-    await act(async () => {
-      await confirmButton.click();
-    });
+    await confirmButton.click();
 
     return this;
   }

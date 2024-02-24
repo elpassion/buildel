@@ -26,8 +26,6 @@ export class RadioHandle {
       throw new Error(`(${this.radioElement.name}) is disabled!`);
     }
 
-    await act(async () => {
-      await userEvent.click(this.radioElement);
-    });
+    await userEvent.click(this.radioElement);
   }
 }

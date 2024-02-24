@@ -23,7 +23,7 @@ describe(RegisterPage.name, () => {
 
     await page.submit();
 
-    await waitFor(() => screen.findByText(/Homepage/i));
+    await screen.findByText(/Homepage/i);
   });
 
   test("should display error if fields not filled in", async () => {
@@ -31,8 +31,8 @@ describe(RegisterPage.name, () => {
 
     await page.submit();
 
-    await waitFor(() => screen.findByText(/Invalid email/i));
-    await waitFor(() => screen.findByText(/String must contain at least 2/i));
+    await screen.findByText(/Invalid email/i);
+    await screen.findByText(/String must contain at least 2/i);
   });
 
   test("should display error if email already taken", async () => {
@@ -43,7 +43,7 @@ describe(RegisterPage.name, () => {
 
     await page.submit();
 
-    await waitFor(() => screen.findByText(/email has already been taken/i));
+    await screen.findByText(/email has already been taken/i);
   });
 });
 
@@ -74,7 +74,7 @@ class RegisterObject {
   async submit() {
     const { button } = await this.getElements();
 
-    await act(() => button.click());
+    await button.click();
 
     return this;
   }

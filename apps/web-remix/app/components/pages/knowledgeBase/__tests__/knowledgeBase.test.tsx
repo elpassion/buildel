@@ -6,7 +6,7 @@ import {
   RoutesProps,
   setupRoutes,
 } from "~/tests/setup.tests";
-import { render, screen, waitFor, act } from "~/tests/render";
+import { render, screen, waitFor } from "~/tests/render";
 import { server } from "~/tests/server.mock";
 import { loader as listLoader } from "../list/loader.server";
 import { action as listAction } from "../list/action.server";
@@ -66,9 +66,7 @@ describe("KnowledgeBase", () => {
       /Remove collection: super-collection/i
     );
 
-    await act(async () => {
-      await button.click();
-    });
+    await button.click();
 
     await page.confirmDelete();
 
@@ -102,7 +100,7 @@ describe("KnowledgeBase", () => {
 
     await page.submitCollection();
 
-    await screen.getByRole("heading", { name: /test collection database/i });
+    screen.getByRole("heading", { name: /test collection database/i });
   });
 });
 
@@ -145,9 +143,7 @@ class KnowledgeBaseObject {
       ButtonHandle.fromRole("Delete collection")
     );
 
-    await act(async () => {
-      await confirmButton.click();
-    });
+    await confirmButton.click();
 
     return this;
   }

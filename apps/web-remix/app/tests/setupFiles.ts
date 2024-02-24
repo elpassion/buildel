@@ -1,5 +1,10 @@
-import { vi } from "vitest";
+import { afterEach, vi } from "vitest";
 import { WebSocketMock } from "./WebSocket.mock";
+import { cleanup } from "@testing-library/react";
+
+afterEach(() => {
+  cleanup();
+});
 
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
