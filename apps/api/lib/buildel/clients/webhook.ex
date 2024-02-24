@@ -12,7 +12,7 @@ defmodule Buildel.Clients.Webhook do
     headers = [{"Accept", "application/json"}, {"Content-Type", "application/json"}] ++ headers
 
     with {:ok, response} <-
-           HTTPoison.post(url, payload, headers, timeout: 60_000, recv_timeout: 60_000) do
+           HTTPoison.post(url, payload, headers, timeout: 10 * 60_000, recv_timeout: 10 * 60_000) do
       Logger.debug("Webhook response: #{inspect(response)}")
     else
       {:error, %HTTPoison.Error{reason: _reason} = error} ->
