@@ -248,7 +248,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
     |> Enum.map(fn chunk ->
       %{
         "document" => chunk.document,
-        "metadata" => chunk.metadata
+        "metadata" => chunk.metadata,
+        "chunk_id" => chunk.id
       }
     end)
   end
@@ -288,7 +289,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
       |> Enum.map(fn chunk ->
         %{
           "document" => chunk.document,
-          "metadata" => chunk.metadata
+          "metadata" => chunk.metadata,
+          "chunk_id" => chunk.id
         }
       end)
 

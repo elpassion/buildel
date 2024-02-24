@@ -46,9 +46,9 @@ defmodule Buildel.Blocks.Utils.InputQueue do
   end
 
   def pop(%__MODULE__{queue: [_item | [item | rest]], process_item: process_item}) do
-    IO.puts("removing another item from queue")
+    IO.puts("removing another item from queue with #{rest |> Enum.count()} items left")
     process_item.(item)
 
-    %__MODULE__{queue: rest, process_item: process_item}
+    %__MODULE__{queue: [item | rest], process_item: process_item}
   end
 end

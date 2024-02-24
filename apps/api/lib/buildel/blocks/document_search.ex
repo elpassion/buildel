@@ -124,11 +124,16 @@ defmodule Buildel.Blocks.DocumentSearch do
       |> Enum.map(fn
         %{
           "document" => document,
-          "metadata" => %{"file_name" => filename, "memory_id" => memory_id}
+          "metadata" => %{
+            "file_name" => filename,
+            "memory_id" => memory_id,
+            "chunk_id" => chunk_id
+          }
         } ->
           %{
             document_id: memory_id,
             document_name: filename,
+            chunk_id: chunk_id,
             chunk: document |> String.trim()
           }
       end)
@@ -180,11 +185,16 @@ defmodule Buildel.Blocks.DocumentSearch do
       |> Enum.map(fn
         %{
           "document" => document,
-          "metadata" => %{"file_name" => filename, "memory_id" => memory_id}
+          "metadata" => %{
+            "file_name" => filename,
+            "memory_id" => memory_id,
+            "chunk_id" => chunk_id
+          }
         } ->
           %{
             document_id: memory_id,
             document_name: filename,
+            chunk_id: chunk_id,
             chunk: document |> String.trim()
           }
       end)
