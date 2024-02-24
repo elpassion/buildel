@@ -1,4 +1,8 @@
-export { page as default, meta } from "~/components/pages/pipelines/build";
+export {
+  page as default,
+  meta,
+  ErrorBoundary,
+} from "~/components/pages/pipelines/build";
 export {
   loader,
   action,

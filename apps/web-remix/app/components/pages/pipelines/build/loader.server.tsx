@@ -20,13 +20,13 @@ export async function loader(args: LoaderFunctionArgs) {
     const pipeline = await pipelineApi.getAliasedPipeline(
       params.organizationId,
       params.pipelineId,
-      aliasId,
+      aliasId
     );
 
     const blocks = pipeline.config.blocks.map((block) => ({
       ...block,
       block_type: blockTypes.data.find(
-        (blockType) => blockType.type === block.type,
+        (blockType) => blockType.type === block.type
       ),
     }));
 
