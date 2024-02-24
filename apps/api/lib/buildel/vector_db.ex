@@ -53,6 +53,7 @@ defmodule Buildel.VectorDB do
              %__MODULE__{adapter: adapter, embeddings: embeddings},
              collection_name,
              query,
+             metadata,
              options
            ),
            [
@@ -67,7 +68,7 @@ defmodule Buildel.VectorDB do
     {:ok, collection} = adapter.get_collection(collection_name)
 
     {:ok, results} =
-      adapter.query(collection, %{
+      adapter.query(collection, metadata, %{
         query_embeddings: embeddings_list |> List.first(),
         limit: options.limit,
         similarity_treshhold: options.similarity_threshhold
@@ -94,7 +95,7 @@ defmodule Buildel.VectorDB.VectorDBAdapterBehaviour do
   @callback create_collection(String.t(), map()) :: {:ok, map()}
   @callback delete_all_with_metadata(map(), map()) :: :ok
   @callback add(map(), map()) :: :ok
-  @callback query(map(), map()) :: {:ok, list()}
+  @callback query(map(), map(), map()) :: {:ok, list()}
 end
 
 defmodule Buildel.VectorDB.QdrantAdapter do
@@ -153,7 +154,7 @@ defmodule Buildel.VectorDB.QdrantAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
-  def query(collection, %{query_embeddings: query_embeddings, limit: limit}) do
+  def query(collection, _metadata, %{query_embeddings: query_embeddings, limit: limit}) do
     with {:ok, %{status: 200, body: body}} <-
            Qdrant.search_points(collection.name, %{
              vector: query_embeddings,
@@ -263,7 +264,7 @@ defmodule Buildel.VectorDB.EctoAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
-  def query(collection, %{
+  def query(collection, metadata, %{
         query_embeddings: query_embeddings,
         limit: limit,
         similarity_treshhold: similarity_treshhold
@@ -274,7 +275,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
     results =
       Buildel.Repo.all(
         from c in Chunk,
-          where: c.collection_name == ^collection.name,
+          where:
+            c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
           order_by: cosine_distance(field(c, ^embedding_column), ^query_embeddings),
           limit: ^limit,
           select: %{

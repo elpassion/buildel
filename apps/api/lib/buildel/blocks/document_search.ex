@@ -59,7 +59,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "maximum" => 1.0,
                   "step" => 0.01
                 },
-                metadata: %{
+                where: %{
                   "type" => "string",
                   "title" => "Metadata",
                   "description" => "The metadata of documents to include in retrieval.",
@@ -108,7 +108,8 @@ defmodule Buildel.Blocks.DocumentSearch do
      state
      |> assign_stream_state()
      |> Map.put(:vector_db, vector_db)
-     |> Map.put(:collection, collection)}
+     |> Map.put(:collection, collection)
+     |> Map.put(:where, opts |> Map.get(:where, "{}") |> Jason.decode!())}
   end
 
   @impl true
@@ -116,7 +117,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     state = send_stream_start(state)
 
     result =
-      Buildel.VectorDB.query(state.vector_db, state[:collection], query, %{
+      Buildel.VectorDB.query(state.vector_db, state[:collection], query, state.where, %{
         limit: state[:opts] |> Map.get(:limit, 3),
         similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.75)
       })
@@ -172,7 +173,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     similarity_threshhold = state.opts |> Map.get(:similarity_threshhold, 0.75)
 
     result =
-      Buildel.VectorDB.query(state.vector_db, state[:collection], query, %{
+      Buildel.VectorDB.query(state.vector_db, state[:collection], query, state.where, %{
         limit: limit,
         similarity_threshhold: similarity_threshhold
       })
