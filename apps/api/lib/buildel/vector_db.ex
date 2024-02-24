@@ -76,10 +76,10 @@ defmodule Buildel.VectorDB do
     results
   end
 
-  def get_all(%__MODULE__{adapter: adapter}, collection_name, _params) do
+  def get_all(%__MODULE__{adapter: adapter}, collection_name, metadata \\ %{}, params \\ %{}) do
     {:ok, collection} = adapter.get_collection(collection_name)
 
-    adapter.get_all(collection, %{})
+    adapter.get_all(collection, metadata, params)
   end
 
   def delete_all_with_metadata(%__MODULE__{adapter: adapter}, collection_name, metadata) do
@@ -239,10 +239,10 @@ defmodule Buildel.VectorDB.EctoAdapter do
     :ok
   end
 
-  def get_all(collection, _params) do
+  def get_all(collection, metadata, _params) do
     Buildel.Repo.all(
       from c in Chunk,
-        where: c.collection_name == ^collection.name
+        where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata)
     )
     |> Enum.map(fn chunk ->
       %{

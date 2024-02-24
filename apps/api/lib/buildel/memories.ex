@@ -222,7 +222,7 @@ defmodule Buildel.Memories do
 
   def list_organization_memory_chunks(
         %Organization{id: organization_id},
-        %Memory{memory_collection_id: memory_collection_id},
+        %Memory{memory_collection_id: memory_collection_id, id: memory_id},
         _params \\ %{}
       ) do
     vector_db =
@@ -239,6 +239,7 @@ defmodule Buildel.Memories do
     Buildel.VectorDB.get_all(
       vector_db,
       "#{organization_id}_#{memory_collection_id}",
+      %{memory_id: memory_id},
       %{}
     )
   end

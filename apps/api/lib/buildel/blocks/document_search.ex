@@ -58,6 +58,14 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "minimum" => 0.0,
                   "maximum" => 1.0,
                   "step" => 0.01
+                },
+                metadata: %{
+                  "type" => "string",
+                  "title" => "Metadata",
+                  "description" => "The metadata of documents to include in retrieval.",
+                  "default" => "{}",
+                  "presentAs" => "editor",
+                  "editorLanguage" => "json"
                 }
               )
           })
