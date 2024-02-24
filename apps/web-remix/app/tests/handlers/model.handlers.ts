@@ -1,20 +1,14 @@
 import { http, HttpResponse } from "msw";
 import { IAsyncSelectItem, IAsyncSelectItemList } from "~/api/AsyncSelectApi";
-import {
-  IFixtureAsyncSelectModel,
-  modelFixture,
-} from "~/tests/fixtures/models.fixtures";
-import { embeddingFixture } from "~/tests/fixtures/embedding.fixtures";
+import { IFixtureAsyncSelectModel } from "~/tests/fixtures/models.fixtures";
 
 //@todo handle filtering by api type
 export class EmbeddingsHandlers {
   private embeddings: Map<string | number, IAsyncSelectItem> = new Map();
 
-  constructor() {
-    this.embeddings.set(embeddingFixture().id, embeddingFixture());
-    this.embeddings.set(
-      "embedding",
-      embeddingFixture({ name: "embedding", id: "embedding" })
+  constructor(initials: IAsyncSelectItem[] = []) {
+    initials.forEach((embedding) =>
+      this.embeddings.set(embedding.id, embedding)
     );
   }
 
@@ -38,12 +32,8 @@ export class EmbeddingsHandlers {
 export class ModelsHandlers {
   private models: Map<string | number, IFixtureAsyncSelectModel> = new Map();
 
-  constructor() {
-    this.models.set(embeddingFixture().id, modelFixture());
-    this.models.set(
-      "Test",
-      modelFixture({ name: "Test", id: "Test", type: "google" })
-    );
+  constructor(initials: IFixtureAsyncSelectModel[] = []) {
+    initials.forEach((model) => this.models.set(model.id, model));
   }
 
   getModelsHandler() {

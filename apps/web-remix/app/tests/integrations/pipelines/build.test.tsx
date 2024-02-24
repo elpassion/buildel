@@ -18,17 +18,17 @@ import {
   RoutesProps,
   setupRoutes,
 } from "~/tests/setup.tests";
-import { loader as editBlockLoader } from "../build/editBlock/loader.server";
+import { loader as editBlockLoader } from "~/components/pages/pipelines/build/editBlock/loader.server";
 import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
-import { action as buildAction } from "../build/action.server";
-import { loader as buildLoader } from "../build/loader.server";
-import { EditBlockPage } from "../build/editBlock/page";
-import { PipelineBuilder } from "../build/page";
-import { PipelineLayout } from "../pipelineLayout/page";
+import { action as buildAction } from "~/components/pages/pipelines/build/action.server";
+import { loader as buildLoader } from "~/components/pages/pipelines/build/loader.server";
+import { EditBlockPage } from "~/components/pages/pipelines/build/editBlock/page";
+import { PipelineBuilder } from "~/components/pages/pipelines/build/page";
+import { PipelineLayout } from "~/components/pages/pipelines/pipelineLayout/page";
 import {
   loader as layoutLoader,
   action as layoutAction,
-} from "../pipelineLayout/index.server";
+} from "~/components/pages/pipelines/pipelineLayout/index.server";
 import {
   PipelineHandlers,
   pipelineFixtureWithUnfilledBlock,
@@ -48,13 +48,29 @@ import { RadioHandle } from "~/tests/handles/Radio.handle";
 import { CollectionHandlers } from "~/tests/handlers/collection.handlers";
 import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
 import { aliasFixture } from "~/tests/fixtures/alias.fixtures";
+import { collectionFixture } from "~/tests/fixtures/collection.fixtures";
+import { embeddingFixture } from "~/tests/fixtures/embedding.fixtures";
+import { modelFixture } from "~/tests/fixtures/models.fixtures";
+import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
 
 const handlers = () => [
   ...blockTypesHandlers(),
-  ...new SecretsHandlers().handlers,
-  ...new ModelsHandlers().handlers,
-  ...new CollectionHandlers().handlers,
-  ...new EmbeddingsHandlers().handlers,
+  ...new SecretsHandlers([
+    secretFixture(),
+    secretFixture({ name: "Test", id: "Test" }),
+  ]).handlers,
+  ...new ModelsHandlers([
+    modelFixture(),
+    modelFixture({ name: "Test", id: "Test", type: "google" }),
+  ]).handlers,
+  ...new EmbeddingsHandlers([
+    embeddingFixture(),
+    embeddingFixture({ name: "embedding", id: "embedding" }),
+  ]).handlers,
+  ...new CollectionHandlers([
+    collectionFixture(),
+    collectionFixture({ id: 2, name: "super-collection" }),
+  ]).handlers,
   ...new PipelineHandlers([
     pipelineFixture(),
     pipelineFixture({ id: 2, name: "sample-workflow" }),

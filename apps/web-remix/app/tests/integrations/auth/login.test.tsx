@@ -5,54 +5,65 @@ import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
 import { render, screen, waitFor, act } from "~/tests/render";
 import { server } from "~/tests/server.mock";
-import { RegisterPage } from "../page";
-import { loader } from "../loader.server";
-import { action } from "../action.server";
-import { errorHandlers, handlers } from "./register.handlers";
+import { LoginPage } from "~/components/pages/auth/login/page";
+import { loader } from "~/components/pages/auth/login/loader.server";
+import { action } from "~/components/pages/auth/login/action.server";
+import { errorHandlers, handlers } from "./login.handlers";
 
-describe(RegisterPage.name, () => {
+describe(LoginPage.name, () => {
   const setupServer = server(handlers);
 
   beforeAll(() => setupServer.listen());
   afterEach(() => setupServer.resetHandlers());
   afterAll(() => setupServer.close());
 
-  test("should register user correctly", async () => {
-    const page = new RegisterObject().render({ initialEntries: ["/register"] });
+  test("should sign in user correctly", async () => {
+    const page = new LoginObject().render({ initialEntries: ["/login"] });
     await page.fillInputs();
 
     await page.submit();
 
-    await screen.findByText(/Homepage/i);
+    await waitFor(() => screen.findByText(/Homepage/i));
   });
 
   test("should display error if fields not filled in", async () => {
-    const page = new RegisterObject().render({ initialEntries: ["/register"] });
+    const page = new LoginObject().render({ initialEntries: ["/login"] });
 
     await page.submit();
 
-    await screen.findByText(/Invalid email/i);
-    await screen.findByText(/String must contain at least 2/i);
+    await waitFor(() => screen.findByText(/Invalid email/i));
+    await waitFor(() => screen.findByText(/String must contain at least 2/i));
   });
 
-  test("should display error if email already taken", async () => {
+  test("should display error from BE", async () => {
     setupServer.use(...errorHandlers);
 
-    const page = new RegisterObject().render({ initialEntries: ["/register"] });
+    const page = new LoginObject().render({ initialEntries: ["/login"] });
     await page.fillInputs();
 
     await page.submit();
 
-    await screen.findByText(/email has already been taken/i);
+    await waitFor(() => screen.findByText(/Invalid username or password/i));
+  });
+
+  test("should redirect user at correct url after signing in", async () => {
+    const page = new LoginObject().render({
+      initialEntries: ["/login?redirectTo=/organization/2"],
+    });
+    await page.fillInputs();
+
+    await page.submit();
+
+    await waitFor(() => screen.findByText(/Organization/i));
   });
 });
 
-class RegisterObject {
+class LoginObject {
   render(props?: RoutesProps) {
     const Routes = setupRoutes([
       {
-        path: "/register",
-        Component: RegisterPage,
+        path: "/login",
+        Component: LoginPage,
         action,
         loader,
       },

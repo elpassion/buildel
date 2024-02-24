@@ -8,8 +8,8 @@ import {
 } from "~/tests/setup.tests";
 import { render, screen, waitFor } from "~/tests/render";
 import { server } from "~/tests/server.mock";
-import { loader as listLoader } from "../list/loader.server";
-import { action as listAction } from "../list/action.server";
+import { loader as listLoader } from "~/components/pages/knowledgeBase/list/loader.server";
+import { action as listAction } from "~/components/pages/knowledgeBase/list/action.server";
 import { ListHandle } from "~/tests/handles/List.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
@@ -19,24 +19,44 @@ import {
   CollectionHandlers,
   CollectionMemoriesHandlers,
 } from "~/tests/handlers/collection.handlers";
-import { NewKnowledgeBasePage } from "../newKnowledgeBase/page";
-import { loader as newCollectionLoader } from "../newKnowledgeBase/loader.server";
-import { action as newCollectionAction } from "../newKnowledgeBase/action.server";
-import { KnowledgeBaseCollectionPage } from "../collection/page";
-import { loader as collectionLoader } from "../collection/loader.server";
-import { action as collectionAction } from "../collection/action.server";
+import { NewKnowledgeBasePage } from "~/components/pages/knowledgeBase/newKnowledgeBase/page";
+import { loader as newCollectionLoader } from "~/components/pages/knowledgeBase/newKnowledgeBase/loader.server";
+import { action as newCollectionAction } from "~/components/pages/knowledgeBase/newKnowledgeBase/action.server";
+import { KnowledgeBaseCollectionPage } from "~/components/pages/knowledgeBase/collection/page";
+import { loader as collectionLoader } from "~/components/pages/knowledgeBase/collection/loader.server";
+import { action as collectionAction } from "~/components/pages/knowledgeBase/collection/action.server";
 import {
   EmbeddingsHandlers,
   ModelsHandlers,
 } from "~/tests/handlers/model.handlers";
 import { SelectHandle } from "~/tests/handles/SelectHandle";
+import { collectionFixture } from "~/tests/fixtures/collection.fixtures";
+import { collectionMemoryFixtures } from "~/tests/fixtures/collectionMemory.fixtures";
+import { embeddingFixture } from "~/tests/fixtures/embedding.fixtures";
+import { modelFixture } from "~/tests/fixtures/models.fixtures";
+import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
 
 const handlers = () => [
-  ...new CollectionHandlers().handlers,
-  ...new SecretsHandlers().handlers,
-  ...new EmbeddingsHandlers().handlers,
-  ...new ModelsHandlers().handlers,
-  ...new CollectionMemoriesHandlers().handlers,
+  ...new SecretsHandlers([
+    secretFixture(),
+    secretFixture({ name: "Test", id: "Test" }),
+  ]).handlers,
+  ...new ModelsHandlers([
+    modelFixture(),
+    modelFixture({ name: "Test", id: "Test", type: "google" }),
+  ]).handlers,
+  ...new EmbeddingsHandlers([
+    embeddingFixture(),
+    embeddingFixture({ name: "embedding", id: "embedding" }),
+  ]).handlers,
+  ...new CollectionMemoriesHandlers([
+    collectionMemoryFixtures(),
+    collectionMemoryFixtures({ id: 2, file_name: "test_file" }),
+  ]).handlers,
+  ...new CollectionHandlers([
+    collectionFixture(),
+    collectionFixture({ id: 2, name: "super-collection" }),
+  ]).handlers,
 ];
 
 describe("KnowledgeBase", () => {

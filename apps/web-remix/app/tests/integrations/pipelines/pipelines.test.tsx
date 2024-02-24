@@ -7,15 +7,15 @@ import {
   setupRoutes,
 } from "~/tests/setup.tests";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { render, screen, waitFor, act } from "~/tests/render";
+import { render, screen, waitFor } from "~/tests/render";
 import { server } from "~/tests/server.mock";
-import { PipelinesPage } from "../list/page";
-import { loader as listLoader } from "../list/loader.server";
-import { action as listAction } from "../list/action.server";
-import { action as newPipelineAction } from "../new/action.server";
+import { PipelinesPage } from "~/components/pages/pipelines/list/page";
+import { loader as listLoader } from "~/components/pages/pipelines/list/loader.server";
+import { action as listAction } from "~/components/pages/pipelines/list/action.server";
+import { action as newPipelineAction } from "~/components/pages/pipelines/new/action.server";
 import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
 import { ListHandle } from "~/tests/handles/List.handle";
-import { NewPipelinePage } from "../new/page";
+import { NewPipelinePage } from "~/components/pages/pipelines/new/page";
 import { LinkHandle } from "~/tests/handles/Link.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
 import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";

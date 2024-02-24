@@ -9,19 +9,19 @@ import {
 import { Outlet } from "@remix-run/react";
 import { render, screen } from "~/tests/render";
 import { server } from "~/tests/server.mock";
-import { PipelinesPage } from "../../pipelines/list/page";
-import { loader as pipelinesLoader } from "../../pipelines/list/loader.server";
-import { action as pipelinesAction } from "../../pipelines/list/action.server";
-import { NewOrganizationPage } from "../../organizations/new/page";
-import { loader as newOrganizationLoader } from "../../organizations/new/loader.server";
-import { action as newOrganizationAction } from "../../organizations/new/action.server";
-import { loader as organizationLoader } from "../../organizations/show/loader.server";
-import { loader as homeLoader } from "../loader.server";
+import { loader as pipelinesLoader } from "~/components/pages/pipelines/list/loader.server";
+import { action as pipelinesAction } from "~/components/pages/pipelines/list/action.server";
+import { loader as newOrganizationLoader } from "~/components/pages/organizations/new/loader.server";
+import { action as newOrganizationAction } from "~/components/pages/organizations/new/action.server";
+import { loader as organizationLoader } from "~/components/pages/organizations/show/loader.server";
+import { NewOrganizationPage } from "~/components/pages/organizations/new/page";
 import { OrganizationHandlers } from "~/tests/handlers/organization.handlers";
-import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
-import { InputHandle } from "~/tests/handles/Input.handle";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { loader as homeLoader } from "~/components/pages/home/loader.server";
 import { organizationFixture } from "~/tests/fixtures/organization.fixtures";
+import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
+import { PipelinesPage } from "~/components/pages/pipelines/list/page";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { InputHandle } from "~/tests/handles/Input.handle";
 
 const handlers = () => [
   ...new PipelineHandlers().handlers,

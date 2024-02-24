@@ -3,18 +3,13 @@ import {
   IKnowledgeBaseCollection,
   IKnowledgeBaseFile,
 } from "~/components/pages/knowledgeBase/knowledgeBase.types";
-import { collectionFixture } from "~/tests/fixtures/collection.fixtures";
 import { ICreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { collectionMemoryFixtures } from "~/tests/fixtures/collectionMemory.fixtures";
-
 export class CollectionHandlers {
   private collections: Map<number, IKnowledgeBaseCollection> = new Map();
 
-  constructor() {
-    this.collections.set(collectionFixture().id, collectionFixture());
-    this.collections.set(
-      2,
-      collectionFixture({ id: 2, name: "super-collection" })
+  constructor(initials: IKnowledgeBaseCollection[] = []) {
+    initials.forEach((collection) =>
+      this.collections.set(collection.id, collection)
     );
   }
 
@@ -40,10 +35,10 @@ export class CollectionHandlers {
 
         const newCollection = {
           ...data,
-          id: 3,
+          id: this.collections.size + 1,
           name: data.collection_name,
         };
-        this.collections.set(3, newCollection);
+        this.collections.set(newCollection.id, newCollection);
 
         return HttpResponse.json(
           { data: newCollection },
@@ -85,15 +80,8 @@ export class CollectionHandlers {
 export class CollectionMemoriesHandlers {
   private collectionMemories: Map<number, IKnowledgeBaseFile> = new Map();
 
-  constructor() {
-    this.collectionMemories.set(
-      collectionMemoryFixtures().id,
-      collectionMemoryFixtures()
-    );
-    this.collectionMemories.set(
-      2,
-      collectionMemoryFixtures({ id: 2, file_name: "test_file" })
-    );
+  constructor(initials: IKnowledgeBaseFile[] = []) {
+    initials.forEach((file) => this.collectionMemories.set(file.id, file));
   }
 
   getCollectionMemories() {

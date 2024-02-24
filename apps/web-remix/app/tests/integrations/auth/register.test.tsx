@@ -3,67 +3,56 @@ import { test, describe } from "vitest";
 import { RoutesProps, setupRoutes } from "~/tests/setup.tests";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
-import { render, screen, waitFor, act } from "~/tests/render";
+import { render, screen } from "~/tests/render";
 import { server } from "~/tests/server.mock";
-import { LoginPage } from "../page";
-import { loader } from "../loader.server";
-import { action } from "../action.server";
-import { errorHandlers, handlers } from "./login.handlers";
+import { RegisterPage } from "~/components/pages/auth/register/page";
+import { loader } from "~/components/pages/auth/register/loader.server";
+import { action } from "~/components/pages/auth/register/action.server";
+import { errorHandlers, handlers } from "./register.handlers";
 
-describe(LoginPage.name, () => {
+describe(RegisterPage.name, () => {
   const setupServer = server(handlers);
 
   beforeAll(() => setupServer.listen());
   afterEach(() => setupServer.resetHandlers());
   afterAll(() => setupServer.close());
 
-  test("should sign in user correctly", async () => {
-    const page = new LoginObject().render({ initialEntries: ["/login"] });
+  test("should register user correctly", async () => {
+    const page = new RegisterObject().render({ initialEntries: ["/register"] });
     await page.fillInputs();
 
     await page.submit();
 
-    await waitFor(() => screen.findByText(/Homepage/i));
+    await screen.findByText(/Homepage/i);
   });
 
   test("should display error if fields not filled in", async () => {
-    const page = new LoginObject().render({ initialEntries: ["/login"] });
+    const page = new RegisterObject().render({ initialEntries: ["/register"] });
 
     await page.submit();
 
-    await waitFor(() => screen.findByText(/Invalid email/i));
-    await waitFor(() => screen.findByText(/String must contain at least 2/i));
+    await screen.findByText(/Invalid email/i);
+    await screen.findByText(/String must contain at least 2/i);
   });
 
-  test("should display error from BE", async () => {
+  test("should display error if email already taken", async () => {
     setupServer.use(...errorHandlers);
 
-    const page = new LoginObject().render({ initialEntries: ["/login"] });
+    const page = new RegisterObject().render({ initialEntries: ["/register"] });
     await page.fillInputs();
 
     await page.submit();
 
-    await waitFor(() => screen.findByText(/Invalid username or password/i));
-  });
-
-  test("should redirect user at correct url after signing in", async () => {
-    const page = new LoginObject().render({
-      initialEntries: ["/login?redirectTo=/organization/2"],
-    });
-    await page.fillInputs();
-
-    await page.submit();
-
-    await waitFor(() => screen.findByText(/Organization/i));
+    await screen.findByText(/email has already been taken/i);
   });
 });
 
-class LoginObject {
+class RegisterObject {
   render(props?: RoutesProps) {
     const Routes = setupRoutes([
       {
-        path: "/login",
-        Component: LoginPage,
+        path: "/register",
+        Component: RegisterPage,
         action,
         loader,
       },

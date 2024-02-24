@@ -5,9 +5,10 @@ import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
 export class SecretsHandlers {
   private secrets: Map<string | number, IAsyncSelectItem> = new Map();
 
-  constructor() {
-    this.secrets.set(secretFixture().id, secretFixture());
-    this.secrets.set("Test", secretFixture({ name: "Test", id: "Test" }));
+  constructor(initials: IAsyncSelectItem[] = []) {
+    initials.forEach((secret) => this.secrets.set(secret.id, secret));
+    // this.secrets.set(secretFixture().id, secretFixture());
+    // this.secrets.set("Test", secretFixture({ name: "Test", id: "Test" }));
   }
 
   getSecretsHandler() {
