@@ -474,6 +474,17 @@ defmodule Buildel.LangChain.ChatModels.ChatGoogleAI do
     )
   end
 
+  def do_process_response(%{"finishReason" => "SAFETY", "index" => index}, message_type) do
+    do_process_response(
+      %{
+        "finishReason" => "DOESNOTMATTER",
+        "content" => %{"role" => "model", "parts" => [%{"text" => "Safety"}]},
+        "index" => index
+      },
+      message_type
+    )
+  end
+
   def do_process_response(%{"error" => %{"message" => reason}}, _) do
     Logger.error("Received error from API: #{inspect(reason)}")
     {:error, reason}
