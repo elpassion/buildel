@@ -1,0 +1,241 @@
+{
+  "info": {
+    "version": "1.0",
+    "title": "Buildel"
+  },
+  "host": "localhost:4000",
+  "definitions": {
+    "Key": {
+      "properties": {
+        "data": {
+          "properties": {
+            "key": {
+              "description": "API key",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key"
+          ],
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "Organization": {
+      "description": "A organization",
+      "example": {
+        "data": {
+          "id": 123,
+          "name": "Google"
+        }
+      },
+      "properties": {
+        "data": {
+          "properties": {
+            "id": {
+              "description": "Unique identifier",
+              "type": "string"
+            },
+            "name": {
+              "description": "Organization name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "id"
+          ],
+          "type": "object"
+        }
+      },
+      "title": "Organization",
+      "type": "object"
+    },
+    "CreateOrganizationParams": {
+      "description": "Create organization params",
+      "example": {
+        "organization": {
+          "name": "Google"
+        }
+      },
+      "properties": {
+        "organization": {
+          "properties": {
+            "name": {
+              "description": "Organization name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        }
+      },
+      "title": "Create organization params",
+      "type": "object"
+    },
+    "Organizations": {
+      "description": "A collection of Organizations",
+      "example": {
+        "data": [
+          {
+            "id": 123,
+            "name": "Google"
+          }
+        ]
+      },
+      "items": {
+        "$ref": "#/definitions/Organization"
+      },
+      "title": "Organizations",
+      "type": "array"
+    }
+  },
+  "paths": {
+    "/organizations": {
+      "get": {
+        "description": "List user organizations",
+        "operationId": "BuildelWeb.OrganizationController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Organizations"
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Organization"
+        ]
+      },
+      "post": {
+        "description": "Create organization",
+        "operationId": "BuildelWeb.OrganizationController.create",
+        "parameters": [
+          {
+            "description": "Org params",
+            "in": "body",
+            "name": "organization",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateOrganizationParams"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Organization"
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Organization"
+        ]
+      }
+    },
+    "/organizations/{organization_id}": {
+      "get": {
+        "description": "Get organization api key",
+        "operationId": "BuildelWeb.OrganizationController.get_api_key",
+        "parameters": [
+          {
+            "description": "Organization ID",
+            "in": "path",
+            "name": "organization_id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Key"
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Organization"
+        ]
+      },
+      "post": {
+        "description": "Reset organization api key",
+        "operationId": "BuildelWeb.OrganizationController.reset_api_key",
+        "parameters": [
+          {
+            "description": "Organization ID",
+            "in": "path",
+            "name": "organization_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Org params",
+            "in": "body",
+            "name": "organization",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateOrganizationParams"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Organization"
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Organization"
+        ]
+      },
+      "put": {
+        "description": "Update organization",
+        "operationId": "BuildelWeb.OrganizationController.update",
+        "parameters": [
+          {
+            "description": "Organization ID",
+            "in": "path",
+            "name": "organization_id",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Org params",
+            "in": "body",
+            "name": "organization",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateOrganizationParams"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/Organization"
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Organization"
+        ]
+      }
+    }
+  },
+  "swagger": "2.0",
+  "basePath": "/api"
+}

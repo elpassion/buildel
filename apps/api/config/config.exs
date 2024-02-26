@@ -7,6 +7,16 @@
 # General application configuration
 import Config
 
+config :buildel, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      router: BuildelWeb.Router,     # phoenix routes will be converted to swagger paths
+      endpoint: BuildelWeb.Endpoint  # (optional) endpoint config used to set host, port and https schemes.
+    ]
+  }
+
+config :phoenix_swagger, json_library: Jason
+
 config :buildel,
   ecto_repos: [Buildel.Repo]
 

@@ -6,6 +6,7 @@ defmodule BuildelWeb.Router do
   import Phoenix.LiveDashboard.Router
 
   pipeline :browser do
+    plug ETag.Plug
     plug(:accepts, ["html"])
     plug(:fetch_session)
     plug(:fetch_live_flash)
@@ -16,10 +17,12 @@ defmodule BuildelWeb.Router do
   end
 
   pipeline :require_basic_auth do
+    plug ETag.Plug
     plug :basic_auth
   end
 
   pipeline :api do
+    plug ETag.Plug
     plug(:accepts, ["json"])
     plug(:fetch_session)
   end
@@ -34,6 +37,20 @@ defmodule BuildelWeb.Router do
   ## Api routes
 
   get "/", BuildelWeb.VersionController, :index
+
+  def swagger_info do
+    %{
+      basePath: "/api",
+      info: %{
+        version: "1.0",
+        title: "Buildel"
+      }
+    }
+  end
+
+  scope "/swagger" do
+    forward "/", PhoenixSwagger.Plug.SwaggerUI, otp_app: :buildel, swagger_file: "swagger.json"
+  end
 
   scope "/api", BuildelWeb do
     pipe_through(:api)

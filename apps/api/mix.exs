@@ -9,7 +9,8 @@ defmodule Buildel.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      compilers: Mix.compilers ++ [:phoenix_swagger],
     ]
   end
 
@@ -70,7 +71,8 @@ defmodule Buildel.MixProject do
       {:exvcr, "~> 0.15.1", only: :test},
       {:joken, "~> 2.5"},
       {:joken_jwks, "~> 1.6"},
-      {:resend, "~> 0.4.1"}
+      {:resend, "~> 0.4.1"},
+      {:phoenix_swagger, "~> 0.8"}
     ]
   end
 
