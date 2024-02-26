@@ -40,11 +40,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
       get(conn, ~p"/api/organizations/#{organization}")
     end
 
-    test "does not allow to access another user's organization", %{conn: conn, api_spec: api_spec} do
-      organization = organization_fixture()
-      conn = get(conn, ~p"/api/organizations/#{organization.id}")
-      response = json_response(conn, 404)
-      assert_schema(response, "NotFoundResponse", api_spec)
+    test_not_found %{conn: conn, another_organization: organization} do
+      get(conn, ~p"/api/organizations/#{organization}")
     end
 
     test "returns the organization with given id", %{
@@ -90,13 +87,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
       put(conn, ~p"/api/organizations/#{organization.id}", organization)
     end
 
-    test "does not allow to update another user's organization", %{conn: conn} do
-      organization = organization_fixture()
-
-      conn =
-        put(conn, ~p"/api/organizations/#{organization.id}", %{organization: %{name: "new name"}})
-
-      assert json_response(conn, 404)["errors"] != %{}
+    test_not_found %{conn: conn, another_organization: organization} do
+      put(conn, ~p"/api/organizations/#{organization}", organization: %{name: "new name"})
     end
 
     test "returns the organization", %{conn: conn, organization: organization} do
@@ -111,10 +103,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
       get(conn, ~p"/api/organizations/#{organization.id}/api_key")
     end
 
-    test "does not allow to access another user's organization", %{conn: conn} do
-      organization = organization_fixture()
-      conn = get(conn, ~p"/api/organizations/#{organization.id}/api_key")
-      assert json_response(conn, 404)["errors"] != %{}
+    test_not_found %{conn: conn, another_organization: organization} do
+      get(conn, ~p"/api/organizations/#{organization.id}/api_key")
     end
 
     test "returns the organization api key", %{conn: conn, organization: organization} do
@@ -131,10 +121,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
       post(conn, ~p"/api/organizations/#{organization.id}/api_key")
     end
 
-    test "does not allow to access another user's organization", %{conn: conn} do
-      organization = organization_fixture()
-      conn = post(conn, ~p"/api/organizations/#{organization.id}/api_key")
-      assert json_response(conn, 404)["errors"] != %{}
+    test_not_found %{conn: conn, another_organization: organization} do
+      post(conn, ~p"/api/organizations/#{organization.id}/api_key")
     end
 
     test "returns the organization with new api key", %{conn: conn, organization: organization} do
@@ -151,6 +139,7 @@ defmodule BuildelWeb.OrganizationControllerTest do
   defp create_user_organization(%{user: user}) do
     membership = membership_fixture(%{user_id: user.id})
     organization = membership |> Map.get(:organization_id) |> Organizations.get_organization!()
-    %{organization: organization}
+    another_organization = organization_fixture()
+    %{organization: organization, another_organization: another_organization}
   end
 end
