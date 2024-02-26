@@ -117,7 +117,7 @@ describe("Secrets", () => {
 
     await updateSubmit.click();
 
-    await screen.findByText(/02:00/i);
+    await screen.findByText(/01\/01\/2024/i);
   });
 });
 

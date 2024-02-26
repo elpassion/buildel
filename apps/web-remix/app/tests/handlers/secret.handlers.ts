@@ -64,7 +64,7 @@ export class SecretsHandlers {
 
         this.secrets.set(params.secretId.toString(), {
           ...secret,
-          updated_at: "07/02/2024 00:00:00",
+          updated_at: "2024-01-01T13:00:00",
         });
         return HttpResponse.json({}, { status: 200 });
       }
