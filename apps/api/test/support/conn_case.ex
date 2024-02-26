@@ -29,6 +29,7 @@ defmodule BuildelWeb.ConnCase do
       import Phoenix.ConnTest
       import BuildelWeb.ConnCase
       import OpenApiSpex.TestAssertions
+      import BuildelWeb.TestMacros
 
       setup [:add_schema]
 

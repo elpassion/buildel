@@ -14,11 +14,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
   setup [:register_and_log_in_user, :create_user_organization]
 
   describe "index" do
-    test "requires authentication", %{conn: conn, api_spec: api_spec} do
-      conn = conn |> log_out_user()
-      conn = get(conn, ~p"/api/organizations")
-      response = json_response(conn, 401)
-      assert_schema(response, "UnauthorizedResponse", api_spec)
+    test_requires_authentication %{conn: conn} do
+      get(conn, ~p"/api/organizations")
     end
 
     test "lists all user organizations", %{
@@ -39,11 +36,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
   end
 
   describe "show" do
-    test "requires authentication", %{conn: conn, organization: organization, api_spec: api_spec} do
-      conn = conn |> log_out_user()
-      conn = get(conn, ~p"/api/organizations/#{organization.id}")
-      response = json_response(conn, 401)
-      assert_schema(response, "UnauthorizedResponse", api_spec)
+    test_requires_authentication %{organization: organization, conn: conn} do
+      get(conn, ~p"/api/organizations/#{organization}")
     end
 
     test "does not allow to access another user's organization", %{conn: conn, api_spec: api_spec} do
@@ -72,14 +66,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
   end
 
   describe "create" do
-    test "requires authentication", %{conn: conn, api_spec: api_spec} do
-      conn = conn |> log_out_user()
-
-      conn =
-        post(conn, ~p"/api/organizations", organization: %{name: "some name"})
-
-      response = json_response(conn, 401)["errors"]
-      assert_schema(response, "UnauthorizedResponse", api_spec)
+    test_requires_authentication %{conn: conn} do
+      post(conn, ~p"/api/organizations", organization: %{name: "some name"})
     end
 
     test "validates organization name", %{conn: conn} do
@@ -98,13 +86,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
   end
 
   describe "update" do
-    test "requires authentication", %{conn: conn, organization: organization} do
-      conn = conn |> log_out_user()
-
-      conn =
-        put(conn, ~p"/api/organizations/#{organization.id}", organization)
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization} do
+      put(conn, ~p"/api/organizations/#{organization.id}", organization)
     end
 
     test "does not allow to update another user's organization", %{conn: conn} do
@@ -124,12 +107,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
   end
 
   describe "get_api_key" do
-    test "requires authentication", %{conn: conn, organization: organization} do
-      conn = conn |> log_out_user()
-
-      conn = get(conn, ~p"/api/organizations/#{organization.id}/api_key")
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization} do
+      get(conn, ~p"/api/organizations/#{organization.id}/api_key")
     end
 
     test "does not allow to access another user's organization", %{conn: conn} do
@@ -148,12 +127,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
   end
 
   describe "reset_api_key" do
-    test "requires authentication", %{conn: conn, organization: organization} do
-      conn = conn |> log_out_user()
-
-      conn = post(conn, ~p"/api/organizations/#{organization.id}/api_key")
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization} do
+      post(conn, ~p"/api/organizations/#{organization.id}/api_key")
     end
 
     test "does not allow to access another user's organization", %{conn: conn} do
