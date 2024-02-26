@@ -25,6 +25,7 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
 
   return (
     <ItemList
+      aria-label="Runs list"
       className="flex flex-col-reverse gap-2"
       items={reversed}
       emptyText={<EmptyMessage>There is no runs yet...</EmptyMessage>}

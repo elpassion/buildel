@@ -15,7 +15,8 @@ import "./tailwind.css";
 import { GlobalNotFound } from "~/components/errorBoundaries/GlobalNotFound";
 import { GlobalRuntime } from "~/components/errorBoundaries/GlobalRuntime";
 import { PageProgress } from "~/components/progressBar/PageProgress";
-import { ErrorBoundaryLayout } from "~/components/errorBoundaries/ErrorBoundaryLayout";
+
+export { ErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
 
 Modal.setAppElement("#_root");
 
@@ -62,21 +63,3 @@ function App() {
 }
 
 export default withSentry(App);
-
-export function ErrorBoundary() {
-  const error = useRouteError();
-
-  const renderErrorUi = () => {
-    if (isRouteErrorResponse(error)) {
-      if (error.status === 404) return <GlobalNotFound error={error} />;
-    }
-
-    return <GlobalRuntime error={error} />;
-  };
-
-  return (
-    <ErrorBoundaryLayout className="bg-neutral-950 text-white">
-      {renderErrorUi()}
-    </ErrorBoundaryLayout>
-  );
-}

@@ -13,6 +13,7 @@ export const PipelineRunCostsList: React.FC<PipelineRunCostsListProps> = ({
 }) => {
   return (
     <ItemList
+      aria-label="Run cost list"
       className="flex flex-col-reverse gap-2"
       items={items.map((item) => item.data)}
       emptyText={<EmptyMessage>There is no costs yet...</EmptyMessage>}

@@ -5,3 +5,5 @@ export const PaginationMeta = z.object({
   page: z.number(),
   per_page: z.number(),
 });
+
+export type IPaginationMeta = z.TypeOf<typeof PaginationMeta>;
