@@ -28,6 +28,13 @@ defmodule BuildelWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import BuildelWeb.ConnCase
+      import OpenApiSpex.TestAssertions
+
+      setup [:add_schema]
+
+      def add_schema(%{}) do
+        %{api_spec: BuildelWeb.ApiSpec.spec()}
+      end
     end
   end
 

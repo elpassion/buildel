@@ -11,7 +11,8 @@ defmodule BuildelWeb.Schemas.Organizations do
         id: %Schema{type: :integer, description: "Organization ID"},
         name: %Schema{type: :string, description: "Organization name"},
         api_key: %Schema{type: :string, description: "Organization API key"}
-      }
+      },
+      required: [:id, :name]
     })
   end
 
@@ -26,7 +27,8 @@ defmodule BuildelWeb.Schemas.Organizations do
           type: :array,
           items: Organization
         }
-      }
+      },
+      required: [:data]
     })
   end
 
@@ -38,7 +40,8 @@ defmodule BuildelWeb.Schemas.Organizations do
       type: :object,
       properties: %{
         data: BuildelWeb.Schemas.Organizations.Organization
-      }
+      },
+      required: [:data]
     })
   end
 
@@ -72,9 +75,11 @@ defmodule BuildelWeb.Schemas.Organizations do
           type: :object,
           properties: %{
             key: %Schema{type: :string, description: "Organization API key"}
-          }
+          },
+          required: [:key]
         }
-      }
+      },
+      required: [:data]
     })
   end
 end

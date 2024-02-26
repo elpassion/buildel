@@ -10,7 +10,7 @@ defmodule BuildelWeb.Schemas.Errors do
         errors: %Schema{
           type: :object,
           properties: %{
-            detail: %Schema{type: :string, description: "Error message"}
+            detail: %Schema{type: :string, description: "Error message", enum: ["Not Found"]}
           }
         }
       }
@@ -26,7 +26,7 @@ defmodule BuildelWeb.Schemas.Errors do
         errors: %Schema{
           type: :object,
           properties: %{
-            detail: %Schema{type: :string, description: "Error message"}
+            detail: %Schema{type: :string, description: "Error message", enum: ["Unauthorized"]}
           }
         }
       }
@@ -42,7 +42,7 @@ defmodule BuildelWeb.Schemas.Errors do
         errors: %Schema{
           type: :object,
           properties: %{
-            detail: %Schema{type: :string, description: "Error message"}
+            detail: %Schema{enum: ["Forbidden"]}
           }
         }
       }
@@ -59,7 +59,11 @@ defmodule BuildelWeb.Schemas.Errors do
           type: :object,
           additionalProperties: %Schema{
             type: :array,
-            items: %Schema{type: :string, description: "Field error message"}
+            items: %Schema{
+              type: :string,
+              description: "Field error message",
+              enum: ["Unprocessable entity"]
+            }
           }
         }
       }

@@ -14,52 +14,72 @@ defmodule BuildelWeb.OrganizationControllerTest do
   setup [:register_and_log_in_user, :create_user_organization]
 
   describe "index" do
-    test "requires authentication", %{conn: conn} do
+    test "requires authentication", %{conn: conn, api_spec: api_spec} do
       conn = conn |> log_out_user()
       conn = get(conn, ~p"/api/organizations")
-      assert json_response(conn, 401)["errors"] != %{}
+      response = json_response(conn, 401)
+      assert_schema(response, "UnauthorizedResponse", api_spec)
     end
 
-    test "lists all user organizations", %{conn: conn, organization: organization} do
+    test "lists all user organizations", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
       conn = get(conn, ~p"/api/organizations")
 
-      assert json_response(conn, 200)["data"] == [
+      response = json_response(conn, 200)
+
+      assert response["data"] == [
                %{"id" => organization.id, "name" => organization.name}
              ]
+
+      assert_schema(response, "OrganizationIndexResponse", api_spec)
     end
   end
 
   describe "show" do
-    test "requires authentication", %{conn: conn, organization: organization} do
+    test "requires authentication", %{conn: conn, organization: organization, api_spec: api_spec} do
       conn = conn |> log_out_user()
       conn = get(conn, ~p"/api/organizations/#{organization.id}")
-      assert json_response(conn, 401)["errors"] != %{}
+      response = json_response(conn, 401)
+      assert_schema(response, "UnauthorizedResponse", api_spec)
     end
 
-    test "does not allow to access another user's organization", %{conn: conn} do
+    test "does not allow to access another user's organization", %{conn: conn, api_spec: api_spec} do
       organization = organization_fixture()
       conn = get(conn, ~p"/api/organizations/#{organization.id}")
-      assert json_response(conn, 404)["errors"] != %{}
+      response = json_response(conn, 404)
+      assert_schema(response, "NotFoundResponse", api_spec)
     end
 
-    test "returns the organization with given id", %{conn: conn, organization: organization} do
+    test "returns the organization with given id", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
       conn = get(conn, ~p"/api/organizations/#{organization.id}")
 
-      assert json_response(conn, 200)["data"] == %{
+      response = json_response(conn, 200)
+
+      assert response["data"] == %{
                "id" => organization.id,
                "name" => organization.name
              }
+
+      assert_schema(response, "OrganizationShowResponse", api_spec)
     end
   end
 
   describe "create" do
-    test "requires authentication", %{conn: conn} do
+    test "requires authentication", %{conn: conn, api_spec: api_spec} do
       conn = conn |> log_out_user()
 
       conn =
         post(conn, ~p"/api/organizations", organization: %{name: "some name"})
 
-      assert json_response(conn, 401)["errors"] != %{}
+      response = json_response(conn, 401)["errors"]
+      assert_schema(response, "UnauthorizedResponse", api_spec)
     end
 
     test "validates organization name", %{conn: conn} do
