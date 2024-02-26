@@ -2,14 +2,14 @@ import React, { useMemo } from "react";
 import { ValidatedForm } from "remix-validated-form";
 import { Modal } from "@elpassion/taco/Modal";
 import { withZod } from "@remix-validated-form/with-zod";
-import { Button } from "@elpassion/taco";
+
 import { Field } from "~/components/form/fields/field.context";
 import {
   PasswordInputField,
   TextInputField,
 } from "~/components/form/fields/text.field";
 import { ISecretKey } from "../variables.types";
-import { schema } from "./schema";
+import { CreateUpdateSecretSchema } from "~/api/secrets/secrets.contracts";
 import { SubmitButton } from "~/components/form/submit";
 interface EditSecretModalProps {
   isOpen: boolean;
@@ -22,7 +22,7 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
   onClose,
   initialData,
 }) => {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(CreateUpdateSecretSchema), []);
 
   return (
     <Modal

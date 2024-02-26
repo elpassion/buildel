@@ -9,10 +9,9 @@ import {
   TextInputField,
 } from "~/components/form/fields/text.field";
 import { SubmitButton } from "~/components/form/submit";
-import { schema } from "./schema";
-
+import { CreateUpdateSecretSchema } from "~/api/secrets/secrets.contracts";
 export function NewSecret() {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(CreateUpdateSecretSchema), []);
 
   return (
     <ValidatedForm
@@ -40,10 +39,7 @@ export function NewSecret() {
           />
         </Field>
       </div>
-      <SubmitButton
-        size="sm"
-        hierarchy="primary"
-      >
+      <SubmitButton size="sm" hierarchy="primary">
         Save the Secret
       </SubmitButton>
     </ValidatedForm>

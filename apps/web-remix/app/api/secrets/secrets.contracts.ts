@@ -18,3 +18,12 @@ export const SecretKeyListResponse = z
     data: SecretKeyList,
   })
   .transform((res) => res.data);
+
+export const CreateUpdateSecretSchema = z.object({
+  name: z.string().min(2),
+  value: z.string().min(2),
+});
+
+export type ICreateUpdateSecretSchema = z.TypeOf<
+  typeof CreateUpdateSecretSchema
+>;

@@ -2,12 +2,13 @@ import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
 import { actionBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
-import { z } from "zod";
 import { validationError } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
-import { schema } from "./schema";
+import { CreateUpdateSecretSchema } from "~/api/secrets/secrets.contracts";
 import { routes } from "~/utils/routes.utils";
 import { setServerToast } from "~/utils/toast.server";
+import { SecretsApi } from "~/api/secrets/SecretsApi";
+import { assert } from "~/utils/assert";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -16,11 +17,11 @@ export async function action(actionArgs: ActionFunctionArgs) {
       invariant(params.organizationId, "Missing organizationId");
       const name = (await request.formData()).get("name");
 
-      await fetch(
-        z.any(),
-        `/organizations/${params.organizationId}/secrets/${name}`,
-        { method: "DELETE" }
-      );
+      assert(name);
+
+      const secretsApi = new SecretsApi(fetch);
+
+      await secretsApi.deleteSecret(params.organizationId, name as string);
 
       return json(
         {},
@@ -40,17 +41,15 @@ export async function action(actionArgs: ActionFunctionArgs) {
       await requireLogin(request);
       invariant(params.organizationId, "Missing organizationId");
 
-      const validator = withZod(schema);
+      const validator = withZod(CreateUpdateSecretSchema);
 
       const result = await validator.validate(await request.formData());
 
       if (result.error) return validationError(result.error);
 
-      await fetch(
-        z.any(),
-        `/organizations/${params.organizationId}/secrets/${result.data.name}`,
-        { method: "PUT", body: JSON.stringify({ value: result.data.value }) }
-      );
+      const secretsApi = new SecretsApi(fetch);
+
+      await secretsApi.updateSecret(params.organizationId, result.data);
 
       return redirect(routes.secrets(params.organizationId), {
         headers: {
