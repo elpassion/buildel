@@ -49,8 +49,15 @@ defmodule BuildelWeb.Schemas.Organizations do
       title: "OrganizationCreateRequest",
       type: :object,
       properties: %{
-        name: %Schema{type: :string, description: "Organization name"}
-      }
+        organization: %Schema{
+          type: :object,
+          properties: %{
+            name: %Schema{type: :string, description: "Organization name", minLength: 2}
+          },
+          required: [:name]
+        }
+      },
+      required: [:organization]
     })
   end
 

@@ -12,6 +12,10 @@ defmodule BuildelWeb.OrganizationController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
+  plug OpenApiSpex.Plug.CastAndValidate,
+    json_render_error_v2: true,
+    render_error: BuildelWeb.ErrorRendererPlug
+
   tags ["organization"]
 
   operation :index,
@@ -44,11 +48,12 @@ defmodule BuildelWeb.OrganizationController do
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
     ]
 
-  def show(conn, %{"id" => organization_id}) do
+  def show(conn, _params) do
+    organization_id = conn.params.id
     user = conn.assigns.current_user
 
-    with {organization_id, _} when is_number(organization_id) <- Integer.parse(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id) do
+    with {:ok, organization} <-
+           Organizations.get_user_organization(user, organization_id) do
       render(conn, :show, organization: organization)
     end
   end
@@ -69,15 +74,10 @@ defmodule BuildelWeb.OrganizationController do
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
     ]
 
-  defparams :create do
-    required(:organization, :map) do
-      required(:name, :string)
-    end
-  end
+  def create(conn, _params) do
+    organization_params = conn.body_params.organization
 
-  def create(conn, params) do
-    with {:ok, %{organization: organization_params}} <- validate(:create, params),
-         {:ok, %Organizations.Organization{} = organization} <-
+    with {:ok, %Organizations.Organization{} = organization} <-
            Organizations.create_organization(
              organization_params
              |> Map.put(:user_id, conn.assigns.current_user.id)
@@ -113,12 +113,12 @@ defmodule BuildelWeb.OrganizationController do
     end
   end
 
-  def update(conn, %{"id" => organization_id} = params) do
+  def update(conn, _params) do
     user = conn.assigns.current_user
+    organization_id = conn.params.id
+    organization_params = conn.body_params.organization
 
-    with {:ok, %{organization: organization_params}} <- validate(:update, params),
-         {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Organizations.Organization{} = organization} <-
            Organizations.update_organization(organization, organization_params) do
       conn
@@ -144,11 +144,11 @@ defmodule BuildelWeb.OrganizationController do
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
     ]
 
-  def get_api_key(conn, %{"id" => organization_id}) do
+  def get_api_key(conn, _params) do
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
-           Organizations.get_user_organization(user, organization_id) do
+           Organizations.get_user_organization(user, conn.params.id) do
       render(conn, :organization_key, key: organization.api_key, hidden: true)
     end
   end
@@ -169,11 +169,11 @@ defmodule BuildelWeb.OrganizationController do
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
     ]
 
-  def reset_api_key(conn, %{"id" => organization_id}) do
+  def reset_api_key(conn, _params) do
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
-           Organizations.get_user_organization(user, organization_id),
+           Organizations.get_user_organization(user, conn.params.id),
          {:ok, organization} <- Organizations.reset_organization_api_key(organization) do
       render(conn, :organization_key, key: organization.api_key, hidden: true)
     end
