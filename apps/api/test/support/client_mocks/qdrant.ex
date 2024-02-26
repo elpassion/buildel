@@ -17,7 +17,7 @@ defmodule Buildel.ClientMocks.VectorDB.QdrantAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
-  def query(_, _) do
+  def query(_, _, _) do
     {:ok, []}
   end
 
