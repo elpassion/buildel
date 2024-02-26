@@ -27,9 +27,10 @@
 
 <p align="center">
   <a href="#introduction">Introduction</a> •
-  <a href="#key-features">Key Features</a> •
+  <a href="#features">Features</a> •
   <a href="#examples">Examples</a> •
   <a href="#development">Development</a> •
+  <a href="#links">Links</a> •
   <a href="#community">Community</a> •
   <a href="#license">License</a>
 </p>
@@ -44,7 +45,7 @@ With an intuitive, modular approach, Buildel allows you to assemble workflows fr
 
 This flexibility makes it ideal for a wide range of applications, from AI-powered document retrieval systems and sophisticated conversational interfaces to complex data integration frameworks.
 
-## Key Features 
+## Features 
 
 * 🔀 Multiple Providers - We support multiple providers for the same type of block. Use OpenAI, Google, Mistral and many more.
 * 💻 Different Interfaces - You can build different interfaces for the same workflow. Use chat, api, or any other interface.
@@ -128,6 +129,13 @@ mix ecto.migrate
 ```bash
 pnpm dev
 ```
+
+## Links
+ - [Website](https://buildel.ai/) overview of the product.
+ - [Buildel App](https://app.buildel.ai/) hosted version of the Buildel.
+ - [Discord](https://discord.gg/SUXs7FyRT2) for support and discussions with the community and the team.
+ - [Github](https://github.com/elpassion/buildel) for source code, project board, issues, and pull requests.
+ - [Swagger](https://buildel.ai/) for API documentation.
 
 ## Community
 
