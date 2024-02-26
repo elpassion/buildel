@@ -70,7 +70,8 @@ defmodule Buildel.MixProject do
       {:exvcr, "~> 0.15.1", only: :test},
       {:joken, "~> 2.5"},
       {:joken_jwks, "~> 1.6"},
-      {:resend, "~> 0.4.1"}
+      {:resend, "~> 0.4.1"},
+      {:open_api_spex, "~> 3.18"}
     ]
   end
 

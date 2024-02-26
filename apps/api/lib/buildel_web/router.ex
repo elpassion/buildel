@@ -4,6 +4,7 @@ defmodule BuildelWeb.Router do
   import BuildelWeb.UserAuth
   import BuildelWeb.BasicAuth
   import Phoenix.LiveDashboard.Router
+  alias OpenApiSpex.Plug.{RenderSpec, PutApiSpec}
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -22,6 +23,13 @@ defmodule BuildelWeb.Router do
   pipeline :api do
     plug(:accepts, ["json", "sse"])
     plug(:fetch_session)
+    plug(PutApiSpec, module: BuildelWeb.ApiSpec)
+  end
+
+  scope "/" do
+    pipe_through(:browser)
+
+    get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
   end
 
   scope "/dev" do
@@ -148,5 +156,11 @@ defmodule BuildelWeb.Router do
     )
 
     post("/channel_auth", ChannelAuthController, :create)
+  end
+
+  scope "/api" do
+    pipe_through(:api)
+
+    get "/openapi", RenderSpec, []
   end
 end
