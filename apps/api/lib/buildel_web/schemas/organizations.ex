@@ -5,6 +5,7 @@ defmodule BuildelWeb.Schemas.Organizations do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "Organization",
       type: :object,
       properties: %{
         id: %Schema{type: :integer, description: "Organization ID"},
@@ -18,6 +19,7 @@ defmodule BuildelWeb.Schemas.Organizations do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "OrganizationIndexResponse",
       type: :object,
       properties: %{
         data: %Schema{
@@ -32,6 +34,7 @@ defmodule BuildelWeb.Schemas.Organizations do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "OrganizationShowResponse",
       type: :object,
       properties: %{
         data: BuildelWeb.Schemas.Organizations.Organization
@@ -43,6 +46,7 @@ defmodule BuildelWeb.Schemas.Organizations do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "OrganizationCreateRequest",
       type: :object,
       properties: %{
         name: %Schema{type: :string, description: "Organization name"}
@@ -54,6 +58,7 @@ defmodule BuildelWeb.Schemas.Organizations do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "OrganizationShowApiKeyResponse",
       type: :object,
       properties: %{
         data: %Schema{
