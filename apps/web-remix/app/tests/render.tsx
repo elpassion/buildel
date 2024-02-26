@@ -1,12 +1,14 @@
 import React, { ReactElement } from "react";
+import Modal from "react-modal";
+import { Toaster } from "~/components/toasts/Toaster";
 import { render, RenderOptions } from "@testing-library/react";
 import { NavSidebarContext } from "~/components/sidebar/NavSidebar";
-import Modal from "react-modal";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   Modal.setAppElement("div");
   return (
     <div id="_root">
+      <Toaster />
       <NavSidebarContext.Provider
         value={{
           isOpen: false,

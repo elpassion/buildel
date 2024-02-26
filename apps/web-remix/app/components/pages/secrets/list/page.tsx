@@ -59,7 +59,10 @@ export function SecretListPage() {
 
       <PageContentWrapper>
         <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
-          <Link to={routes.secretsNew(organizationId)}>
+          <Link
+            to={routes.secretsNew(organizationId)}
+            aria-label="Add new secret"
+          >
             <Button size="sm" tabIndex={0}>
               New Secret
             </Button>

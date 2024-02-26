@@ -42,6 +42,7 @@ export const SecretKeyList: React.FC<SecretKeyListProps> = ({ items }) => {
       <ItemList
         className="grid grid-cols-1 gap-2"
         items={items}
+        aria-label="Secret list"
         emptyText={<EmptyMessage>There is no Secrets yet...</EmptyMessage>}
         renderItem={(item) => (
           <SecretKeyItem
@@ -100,7 +101,7 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
         <IconButton
           size="xs"
           variant="ghost"
-          aria-label="Edit secret"
+          aria-label={`Edit secret: ${data.name}`}
           className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500 lg:opacity-0"
           title={`Edit Secret: ${data.name}`}
           icon={<Icon iconName="edit" />}
@@ -110,9 +111,9 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
         <IconButton
           size="xs"
           variant="ghost"
-          aria-label="Remove secret"
+          aria-label={`Delete secret: ${data.name}`}
           className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
-          title={`Remove Secret: ${data.name}`}
+          title={`Delete Secret: ${data.name}`}
           icon={<Icon iconName="trash" />}
           onClick={handleDelete}
         />

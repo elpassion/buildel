@@ -1,19 +1,16 @@
 import { http, HttpResponse } from "msw";
-import { IAsyncSelectItem, IAsyncSelectItemList } from "~/api/AsyncSelectApi";
-import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
+import { ISecretKey } from "~/components/pages/secrets/variables.types";
 
 export class SecretsHandlers {
-  private secrets: Map<string | number, IAsyncSelectItem> = new Map();
+  private secrets: Map<string | number, ISecretKey> = new Map();
 
-  constructor(initials: IAsyncSelectItem[] = []) {
+  constructor(initials: ISecretKey[] = []) {
     initials.forEach((secret) => this.secrets.set(secret.id, secret));
-    // this.secrets.set(secretFixture().id, secretFixture());
-    // this.secrets.set("Test", secretFixture({ name: "Test", id: "Test" }));
   }
 
   getSecretsHandler() {
     return http.get("/super-api/organizations/:organizationId/secrets", () => {
-      return HttpResponse.json<{ data: IAsyncSelectItemList }>(
+      return HttpResponse.json<{ data: ISecretKey[] }>(
         { data: [...this.secrets.values()] },
         { status: 200 }
       );
@@ -25,7 +22,12 @@ export class SecretsHandlers {
       "/super-api/organizations/:organizationId/secrets",
       async ({ request }) => {
         const data = await request.json();
-        const transformed = { id: data.value, name: data.name };
+        const transformed: ISecretKey = {
+          id: data.value,
+          name: data.name,
+          created_at: "07/02/2024 11:35",
+          updated_at: "07/02/2024 11:35",
+        };
 
         this.secrets.set(data.value, transformed);
 
@@ -34,7 +36,47 @@ export class SecretsHandlers {
     );
   }
 
+  deleteHandler() {
+    return http.delete(
+      "/super-api/organizations/:organizationId/secrets/:secretId",
+      async ({ params }) => {
+        this.secrets.delete(params.secretId.toString());
+
+        return HttpResponse.json({}, { status: 200 });
+      }
+    );
+  }
+
+  updateHandler() {
+    return http.put(
+      "/super-api/organizations/:organizationId/secrets/:secretId",
+      async ({ params, request }) => {
+        const secret = this.secrets.get(params.secretId.toString());
+
+        if (!secret) {
+          return HttpResponse.json(
+            {},
+            {
+              status: 404,
+            }
+          );
+        }
+
+        this.secrets.set(params.secretId.toString(), {
+          ...secret,
+          updated_at: "07/02/2024 00:00:00",
+        });
+        return HttpResponse.json({}, { status: 200 });
+      }
+    );
+  }
+
   get handlers() {
-    return [this.getSecretsHandler(), this.createHandler()];
+    return [
+      this.getSecretsHandler(),
+      this.createHandler(),
+      this.deleteHandler(),
+      this.updateHandler(),
+    ];
   }
 }

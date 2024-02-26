@@ -2,18 +2,14 @@ import { withSentry } from "@sentry/remix";
 import type { LinksFunction } from "@remix-run/node";
 import Modal from "react-modal";
 import {
-  isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-  useRouteError,
 } from "@remix-run/react";
 import { Toaster } from "~/components/toasts/Toaster";
 import "./tailwind.css";
-import { GlobalNotFound } from "~/components/errorBoundaries/GlobalNotFound";
-import { GlobalRuntime } from "~/components/errorBoundaries/GlobalRuntime";
 import { PageProgress } from "~/components/progressBar/PageProgress";
 
 export { ErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
