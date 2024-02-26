@@ -55,11 +55,11 @@ This flexibility makes it ideal for a wide range of applications, from AI-powere
 
 
 ## Examples 
-Below are examples of workflow configurations you can create to enhance your projects with dynamic, AI-powered solutions:
+Below are examples of workflows you can create to enhance your projects with dynamic, AI-powered solutions:
 
 #### Memory
 
-This setup is perfect for building an interactive, AI-powered document retrieval system that can understand natural language queries and provide precise, contextually relevant information from a vast repository of documents.
+This setup is an AI-powered document retrieval system that can understand natural language queries and provide precise, contextually relevant information from a vast repository of documents.
 
 <p>
     <img src="apps/web-remix/public/examples/memory.webp" alt="Simple memory example" />
@@ -94,10 +94,6 @@ The website provides an overview of the application, additional information on t
 ## Development
 
 Alternatively, instead of using the hosted version of the product, [Buildel](https://app.buildel.ai/) can be run locally.
-
-Project contains:
-- `web`: TypeScript based web app
-- `api`: Elixir based api
 
 #### How to run locally?
 To be able to start Buildel locally, make sure that you have the following prerequisites installed:
@@ -135,9 +131,23 @@ pnpm dev
 
 ## Community
 
-Not sure where to start? Join our [discord](https://discord.gg/SUXs7FyRT2) and we will help you get started!
+Not sure where to start? Join our discord and we will help you get started!
+
+<a href="https://discord.gg/SUXs7FyRT2">
+  <img src="apps/web-remix/public/join-discord.svg" alt="Version"/>
+</a>
+
+
 
 ## License 
 
 GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3, 19 November 2007
+
+
+<p style="font-weight: lighter; font-size: 12px">
+  Powered by
+  <a href="https://www.elpassion.com/">
+    <img src="apps/web-remix/public/ELP-logo.png" alt="Buildel.ai" width="80"/>
+  </a>
+</p>
