@@ -35,6 +35,14 @@ export class InputHandle {
     await userEvent.type(this.inputElement, text);
   }
 
+  async clear() {
+    if (this.isDisabled()) {
+      throw new Error(`(${this.inputElement.name}) input is disabled!`);
+    }
+
+    await userEvent.clear(this.inputElement);
+  }
+
   get value() {
     return this.inputElement.value;
   }

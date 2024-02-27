@@ -1,7 +1,6 @@
-import React, { useCallback } from "react";
+import React from "react";
 import {
   Outlet,
-  useFetcher,
   useLoaderData,
   useMatch,
   useNavigate,
@@ -9,7 +8,6 @@ import {
 } from "@remix-run/react";
 import { MetaFunction } from "@remix-run/node";
 import { EditPipelineNameForm } from "./EditPipelineNameForm";
-import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
 import { routes } from "~/utils/routes.utils";
 import {
   Section,
@@ -27,25 +25,11 @@ import { loader } from "./loader.server";
 export function SettingsPage() {
   const { pipeline, organizationId, pipelineId } =
     useLoaderData<typeof loader>();
-  const updateFetcher = useFetcher<IPipeline>();
   const [searchParams] = useSearchParams();
-
-  const handleUpdatePipeline = useCallback(
-    (pipeline: IPipeline) => {
-      updateFetcher.submit(pipeline, {
-        method: "PUT",
-        encType: "application/json",
-        action:
-          routes.pipelineBuild(pipeline.organization_id, pipeline.id) +
-          "?index",
-      });
-    },
-    [updateFetcher],
-  );
 
   const navigate = useNavigate();
   const match = useMatch(
-    routes.pipelineSettingsConfiguration(organizationId, pipelineId),
+    routes.pipelineSettingsConfiguration(organizationId, pipelineId)
   );
   const isSidebarOpen = !!match;
 
@@ -54,8 +38,8 @@ export function SettingsPage() {
       routes.pipelineSettings(
         organizationId,
         pipelineId,
-        Object.fromEntries(searchParams.entries()),
-      ),
+        Object.fromEntries(searchParams.entries())
+      )
     );
   };
 
@@ -69,7 +53,7 @@ export function SettingsPage() {
             to={routes.pipelineSettingsConfiguration(
               organizationId,
               pipelineId,
-              Object.fromEntries(searchParams.entries()),
+              Object.fromEntries(searchParams.entries())
             )}
           >
             Workflow configuration
@@ -79,10 +63,7 @@ export function SettingsPage() {
         <SectionContent>
           <OrganizationAvatar name={pipeline.name} />
 
-          <EditPipelineNameForm
-            defaultValues={pipeline}
-            onSubmit={handleUpdatePipeline}
-          />
+          <EditPipelineNameForm defaultValues={pipeline} />
         </SectionContent>
       </Section>
 

@@ -19,7 +19,6 @@ import {
   setupRoutes,
 } from "~/tests/setup.tests";
 import { loader as editBlockLoader } from "~/components/pages/pipelines/build/editBlock/loader.server";
-import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
 import { action as buildAction } from "~/components/pages/pipelines/build/action.server";
 import { loader as buildLoader } from "~/components/pages/pipelines/build/loader.server";
 import { EditBlockPage } from "~/components/pages/pipelines/build/editBlock/page";
@@ -33,78 +32,22 @@ import {
 import {
   PipelineHandlers,
   pipelineFixtureWithUnfilledBlock,
-  AliasHandlers,
 } from "~/tests/handlers/pipelines.handlers";
 import { TextareaHandle } from "~/tests/handles/Textarea.handle";
 import {
   CreatableSelectHandle,
   SelectHandle,
 } from "~/tests/handles/SelectHandle";
-import { SecretsHandlers } from "~/tests/handlers/secret.handlers";
-import {
-  EmbeddingsHandlers,
-  ModelsHandlers,
-} from "~/tests/handlers/model.handlers";
 import { RadioHandle } from "~/tests/handles/Radio.handle";
-import {
-  CollectionHandlers,
-  CollectionMemoriesHandlers,
-} from "~/tests/handlers/collection.handlers";
 import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
-import { aliasFixture } from "~/tests/fixtures/alias.fixtures";
-import { collectionFixture } from "~/tests/fixtures/collection.fixtures";
-import { embeddingFixture } from "~/tests/fixtures/embedding.fixtures";
-import { modelFixture } from "~/tests/fixtures/models.fixtures";
-import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
-import { collectionMemoryFixtures } from "~/tests/fixtures/collectionMemory.fixtures";
 import { ListHandle } from "~/tests/handles/List.handle";
-
-const handlers = () => [
-  ...blockTypesHandlers(),
-  ...new SecretsHandlers([
-    secretFixture(),
-    secretFixture({ name: "Test", id: "Test" }),
-  ]).handlers,
-  ...new ModelsHandlers([
-    modelFixture(),
-    modelFixture({ name: "Test", id: "Test", type: "google" }),
-  ]).handlers,
-  ...new EmbeddingsHandlers([
-    embeddingFixture(),
-    embeddingFixture({ name: "embedding", id: "embedding" }),
-  ]).handlers,
-  ...new CollectionHandlers([
-    collectionFixture(),
-    collectionFixture({ id: 2, name: "super-collection" }),
-  ]).handlers,
-  ...new CollectionMemoriesHandlers([
-    collectionMemoryFixtures(),
-    collectionMemoryFixtures({ id: 2, file_name: "test_file" }),
-  ]).handlers,
-  ...new PipelineHandlers([
-    pipelineFixture(),
-    pipelineFixture({ id: 2, name: "sample-workflow" }),
-    pipelineFixtureWithUnfilledBlock(),
-  ]).handlers,
-  ...new AliasHandlers([
-    aliasFixture(),
-    aliasFixture({
-      id: 2,
-      name: "alias",
-      config: {
-        ...aliasFixture().config,
-        blocks: [aliasFixture().config.blocks[0]],
-        connections: [],
-      },
-    }),
-  ]).handlers,
-];
+import { buildHandlers } from "./build.handlers";
 
 describe(PipelineBuilder.name, () => {
-  const setupServer = server([...handlers()]);
+  const setupServer = server([...buildHandlers()]);
 
   beforeAll(() => setupServer.listen());
-  afterEach(() => setupServer.resetHandlers(...handlers()));
+  afterEach(() => setupServer.resetHandlers(...buildHandlers()));
   afterAll(() => setupServer.close());
 
   test("should render correct amount of build nodes based on pipeline config", async () => {

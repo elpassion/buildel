@@ -25,6 +25,7 @@ export class TextareaHandle {
       throw new Error(`(${this.textareaElement.name}) textarea is disabled!`);
     }
 
+    await userEvent.clear(this.textareaElement);
     await userEvent.click(this.textareaElement);
     await userEvent.paste(text);
   }

@@ -1,5 +1,5 @@
 import { z } from "zod";
 
 export const updatePipelineNameSchema = z.object({
-  name: z.string(),
+  name: z.string().min(2),
 });

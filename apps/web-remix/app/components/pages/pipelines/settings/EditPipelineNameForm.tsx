@@ -1,37 +1,51 @@
 import { useModal } from "~/hooks/useModal";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { IconButton } from "~/components/iconButton";
 import { Modal } from "@elpassion/taco/Modal";
 import { ValidatedForm } from "remix-validated-form";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { Button } from "@elpassion/taco";
 import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
 import { updatePipelineNameSchema } from "./schema";
 import { successToast } from "~/components/toasts/successToast";
 import { SubmitButton } from "~/components/form/submit";
+import { useFetcher } from "@remix-run/react";
+import { routes } from "~/utils/routes.utils";
 
 interface EditPipelineNameFormProps {
   defaultValues: IPipeline;
-  onSubmit: (data: IPipeline) => void;
 }
 export function EditPipelineNameForm({
   defaultValues,
-  onSubmit,
 }: EditPipelineNameFormProps) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const validator = useMemo(() => withZod(updatePipelineNameSchema), []);
 
+  const updateFetcher = useFetcher<IPipeline>();
+
   const handleOnSubmit = useCallback(
     (data: { name: string }, e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      onSubmit({ ...defaultValues, name: data.name });
+      const pipeline = { ...defaultValues, name: data.name };
+
+      updateFetcher.submit(pipeline, {
+        method: "PUT",
+        encType: "application/json",
+        action:
+          routes.pipelineBuild(pipeline.organization_id, pipeline.id) +
+          "?index",
+      });
+    },
+    [defaultValues]
+  );
+
+  useEffect(() => {
+    if (updateFetcher.data) {
       closeModal();
       successToast({ description: "Workflow name has been changed" });
-    },
-    [defaultValues, onSubmit]
-  );
+    }
+  }, [updateFetcher]);
 
   return (
     <>
@@ -39,7 +53,7 @@ export function EditPipelineNameForm({
         iconName="edit-2"
         variant="ghost"
         size="sm"
-        aria-label="Edit organization name"
+        aria-label="Edit workflow name"
         onClick={openModal}
       />
 
@@ -74,7 +88,7 @@ export function EditPipelineNameForm({
               />
             </Field>
 
-            <SubmitButton size="lg" className="mt-4 ml-auto mr-0">
+            <SubmitButton type="submit" size="lg" className="mt-4 ml-auto mr-0">
               Save
             </SubmitButton>
           </ValidatedForm>
