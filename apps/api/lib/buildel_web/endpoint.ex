@@ -13,6 +13,9 @@ defmodule BuildelWeb.Endpoint do
     http_only: true,
     secure: @secure_cookie
   ]
+
+  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+
   socket "/socket", BuildelWeb.PipelineSocket, websocket: true, longpoll: false
 
   plug Phoenix.LiveDashboard.RequestLogger,

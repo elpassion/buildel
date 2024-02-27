@@ -9,7 +9,10 @@ defmodule Buildel.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      preferred_cli_env: [
+        "test.watch": :test
+      ]
     ]
   end
 
@@ -19,7 +22,7 @@ defmodule Buildel.MixProject do
   def application do
     [
       mod: {Buildel.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :os_mon]
     ]
   end
 
@@ -71,7 +74,8 @@ defmodule Buildel.MixProject do
       {:joken, "~> 2.5"},
       {:joken_jwks, "~> 1.6"},
       {:resend, "~> 0.4.1"},
-      {:open_api_spex, "~> 3.18"}
+      {:open_api_spex, "~> 3.18"},
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
 

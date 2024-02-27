@@ -4,6 +4,10 @@ if System.get_env("PHX_SERVER") do
   config :buildel, BuildelWeb.Endpoint, server: true
 end
 
+if log_level = System.get_env("LOG_LEVEL") do
+  config :logger, level: String.to_atom(log_level)
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
