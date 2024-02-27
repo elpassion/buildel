@@ -1,9 +1,8 @@
 import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 import { GlobalNotFound } from "./GlobalNotFound";
 import { GlobalRuntime } from "./GlobalRuntime";
-import { ErrorBoundaryLayout } from "./ErrorBoundaryLayout";
 
-export function ErrorBoundary() {
+export function RootErrorBoundary() {
   const error = useRouteError();
 
   const renderErrorUi = () => {
@@ -14,9 +13,5 @@ export function ErrorBoundary() {
     return <GlobalRuntime error={error} />;
   };
 
-  return (
-    <ErrorBoundaryLayout className="bg-neutral-950 text-white">
-      {renderErrorUi()}
-    </ErrorBoundaryLayout>
-  );
+  return renderErrorUi();
 }

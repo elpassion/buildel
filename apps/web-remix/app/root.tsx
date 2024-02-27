@@ -11,8 +11,8 @@ import {
 import { Toaster } from "~/components/toasts/Toaster";
 import "./tailwind.css";
 import { PageProgress } from "~/components/progressBar/PageProgress";
-
-export { ErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
+import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
+import { ErrorBoundaryLayout } from "~/components/errorBoundaries/ErrorBoundaryLayout";
 
 Modal.setAppElement("#_root");
 
@@ -59,3 +59,11 @@ function App() {
 }
 
 export default withSentry(App);
+
+export function ErrorBoundary() {
+  return (
+    <ErrorBoundaryLayout className="bg-neutral-950 text-white">
+      <RootErrorBoundary />
+    </ErrorBoundaryLayout>
+  );
+}

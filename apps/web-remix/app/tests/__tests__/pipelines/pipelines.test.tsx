@@ -19,6 +19,7 @@ import { NewPipelinePage } from "~/components/pages/pipelines/new/page";
 import { LinkHandle } from "~/tests/handles/Link.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
 import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
+import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
 
 const handlers = () => [
   ...new PipelineHandlers([
@@ -44,6 +45,16 @@ describe(PipelinesPage.name, () => {
     expect(workflowList.children).toHaveLength(2);
   });
 
+  test("should render error message if fetch fails", async () => {
+    setupServer.use(new PipelineHandlers().getPipelinesErrorHandler());
+
+    new PipelinesObject().render({
+      initialEntries: ["/2/pipelines"],
+    });
+
+    await screen.findByText(/Internal server error/i);
+  });
+
   test("should render only workflow-templates when pipelines are empty", async () => {
     setupServer.use(...new PipelineHandlers().handlers);
 
@@ -57,25 +68,29 @@ describe(PipelinesPage.name, () => {
   });
 
   test("should delete pipeline", async () => {
-    new PipelinesObject().render({
+    const page = new PipelinesObject().render({
       initialEntries: ["/2/pipelines"],
     });
 
-    const button = await ButtonHandle.fromLabelText(
-      /Remove workflow: AI Chat/i
-    );
-
-    await button.click();
-
-    const confirmButton = await waitFor(() =>
-      ButtonHandle.fromRole("Delete workflow")
-    );
-
-    await confirmButton.click();
+    await page.deleteWorkflow("AI Chat");
 
     const workflowList = await ListHandle.fromLabelText(/Workflows list/i);
 
     expect(workflowList.children).toHaveLength(1);
+  });
+
+  test("should render error message if deletion fails", async () => {
+    setupServer.use(new PipelineHandlers().deleteErrorHandler());
+
+    const page = new PipelinesObject().render({
+      initialEntries: ["/2/pipelines"],
+    });
+
+    await page.deleteWorkflow("AI Chat");
+
+    await waitFor(async () => {
+      screen.findByText(/Internal server error/i);
+    });
   });
 
   test("should duplicate pipeline", async () => {
@@ -89,9 +104,25 @@ describe(PipelinesPage.name, () => {
 
     await button.click();
 
-    const text = await screen.findByText(/pipeline/i);
+    await screen.findByText(/pipeline/i);
+  });
 
-    expect(text).toBeTruthy();
+  test("should render error message if duplicate fails", async () => {
+    setupServer.use(new PipelineHandlers().createErrorHandler());
+
+    new PipelinesObject().render({
+      initialEntries: ["/2/pipelines"],
+    });
+
+    const button = await ButtonHandle.fromLabelText(
+      /Duplicate workflow: sample-workflow/i
+    );
+
+    await button.click();
+
+    await waitFor(async () => {
+      screen.findByText(/Internal server error/i);
+    });
   });
 
   test("should create pipeline from template", async () => {
@@ -105,8 +136,7 @@ describe(PipelinesPage.name, () => {
 
     await button.click();
 
-    const text = await screen.findByText(/pipeline/i);
-    expect(text).toBeTruthy();
+    await screen.findByText(/pipeline/i);
   });
 
   test("should create new pipeline", async () => {
@@ -125,8 +155,30 @@ describe(PipelinesPage.name, () => {
 
     await submit.click();
 
-    const text = await screen.findByText(/pipeline/i);
-    expect(text).toBeTruthy();
+    await screen.findByText(/pipeline/i);
+  });
+
+  test("should render error message if creation fails", async () => {
+    setupServer.use(new PipelineHandlers().createErrorHandler());
+
+    new PipelinesObject().render({
+      initialEntries: ["/2/pipelines"],
+    });
+
+    const link = await LinkHandle.fromLabelText(/Create new workflow/i);
+
+    await link.click();
+
+    const input = await InputHandle.fromLabelText(/Name/i);
+    await input.type("LALALA");
+
+    const submit = await ButtonHandle.fromRole("Create workflow");
+
+    await submit.click();
+
+    await waitFor(async () => {
+      screen.findByText(/Internal server error/i);
+    });
   });
 });
 
@@ -144,6 +196,7 @@ class PipelinesObject {
       {
         path: "/:organizationId/pipelines",
         Component: PipelinesPage,
+        ErrorBoundary: RootErrorBoundary,
         loader: loaderWithSession(listLoader),
         action: actionWithSession(listAction),
       },
@@ -159,6 +212,20 @@ class PipelinesObject {
     ]);
 
     render(<Routes {...props} />);
+
+    return this;
+  }
+
+  async deleteWorkflow(name: string) {
+    const button = await ButtonHandle.fromLabelText(`Remove workflow: ${name}`);
+
+    await button.click();
+
+    const confirmButton = await waitFor(() =>
+      ButtonHandle.fromRole("Delete workflow")
+    );
+
+    await confirmButton.click();
 
     return this;
   }

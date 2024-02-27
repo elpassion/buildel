@@ -22,6 +22,7 @@ import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
 import { PipelinesPage } from "~/components/pages/pipelines/list/page";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
+import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
 
 const handlers = () => [
   ...new PipelineHandlers().handlers,
@@ -83,6 +84,18 @@ describe("Onboarding", () => {
 
     await screen.findByTestId(/organization-3/i);
   });
+
+  test("should show runtime error message if loader fails", async () => {
+    setupServer.use(new OrganizationHandlers().getOrganizationsError());
+    new OnboardingObject().render(
+      {
+        initialEntries: ["/"],
+      },
+      22
+    );
+
+    await screen.findByText(/Internal server error/i);
+  });
 });
 
 class OnboardingObject {
@@ -91,11 +104,13 @@ class OnboardingObject {
       {
         path: "/",
         Component: () => <Outlet />,
+        ErrorBoundary: RootErrorBoundary,
         loader: loaderWithSession(homeLoader, { organizationId }),
       },
       {
         path: "/organizations/new",
         Component: NewOrganizationPage,
+        ErrorBoundary: RootErrorBoundary,
         loader: loaderWithSession(newOrganizationLoader),
         action: actionWithSession(newOrganizationAction),
       },

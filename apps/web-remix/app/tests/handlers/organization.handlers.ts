@@ -22,6 +22,14 @@ export class OrganizationHandlers {
     });
   }
 
+  getOrganizationsError() {
+    return http.get("/super-api/organizations", () => {
+      return HttpResponse.json<{ data: IOrganization[] }>(null, {
+        status: 500,
+      });
+    });
+  }
+
   createOrganization() {
     return http.post<any, ICreateOrganizationSchema>(
       "/super-api/organizations",
@@ -42,6 +50,17 @@ export class OrganizationHandlers {
             status: 200,
           }
         );
+      }
+    );
+  }
+
+  createOrganizationError() {
+    return http.post<any, ICreateOrganizationSchema>(
+      "/super-api/organizations",
+      async () => {
+        return HttpResponse.json(null, {
+          status: 500,
+        });
       }
     );
   }

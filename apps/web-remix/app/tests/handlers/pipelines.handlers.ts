@@ -32,6 +32,15 @@ export class PipelineHandlers {
     );
   }
 
+  getPipelinesErrorHandler() {
+    return http.get(
+      "/super-api/organizations/:organizationId/pipelines",
+      () => {
+        return HttpResponse.json<IPipelinesResponse>(null, { status: 500 });
+      }
+    );
+  }
+
   getPipelineHandler() {
     return http.get(
       "/super-api/organizations/:organizationId/pipelines/:pipelineId",
@@ -101,6 +110,15 @@ export class PipelineHandlers {
     );
   }
 
+  deleteErrorHandler() {
+    return http.delete(
+      "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+      () => {
+        return HttpResponse.json(null, { status: 500 });
+      }
+    );
+  }
+
   createHandler() {
     return http.post(
       "/super-api/organizations/:organizationId/pipelines",
@@ -109,6 +127,15 @@ export class PipelineHandlers {
           { data: pipelineFixture({ id: this.pipelines.size + 1 }) },
           { status: 201 }
         );
+      }
+    );
+  }
+
+  createErrorHandler() {
+    return http.post(
+      "/super-api/organizations/:organizationId/pipelines",
+      async () => {
+        return HttpResponse.json(null, { status: 500 });
       }
     );
   }
