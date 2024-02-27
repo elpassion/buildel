@@ -64,6 +64,17 @@ export class PipelineHandlers {
     );
   }
 
+  getPipelineErrorHandler() {
+    return http.get(
+      "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+      () => {
+        return HttpResponse.json<{ data: IPipelineResponse }>(null, {
+          status: 500,
+        });
+      }
+    );
+  }
+
   updateHandler() {
     return http.put<any, { pipeline: IPipeline }>(
       "/super-api/organizations/:organizationId/pipelines/:pipelineId",
@@ -87,6 +98,15 @@ export class PipelineHandlers {
         this.pipelines.set(pipelineId, updated);
 
         return HttpResponse.json({ data: updated }, { status: 200 });
+      }
+    );
+  }
+
+  updateErrorHandler() {
+    return http.put(
+      "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+      async () => {
+        return HttpResponse.json(null, { status: 500 });
       }
     );
   }

@@ -98,7 +98,33 @@ export class CollectionMemoriesHandlers {
     );
   }
 
+  deleteCollectionMemory() {
+    return http.delete(
+      "/super-api/organizations/:organizationId/memory_collections/:collectionId/memories/:memoryId",
+      ({ params }) => {
+        const { memoryId } = params;
+
+        const memory = this.collectionMemories.get(Number(memoryId));
+
+        if (!memory) {
+          return HttpResponse.json(null, {
+            status: 404,
+          });
+        }
+
+        this.collectionMemories.delete(Number(memoryId));
+
+        return HttpResponse.json<{ data: IKnowledgeBaseFile[] }>(
+          { data: [...this.collectionMemories.values()] },
+          {
+            status: 200,
+          }
+        );
+      }
+    );
+  }
+
   get handlers() {
-    return [this.getCollectionMemories()];
+    return [this.getCollectionMemories(), this.deleteCollectionMemory()];
   }
 }

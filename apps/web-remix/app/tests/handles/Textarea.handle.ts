@@ -20,6 +20,15 @@ export class TextareaHandle {
     await userEvent.type(this.textareaElement, text);
   }
 
+  async paste(text: string) {
+    if (this.isDisabled()) {
+      throw new Error(`(${this.textareaElement.name}) textarea is disabled!`);
+    }
+
+    await userEvent.click(this.textareaElement);
+    await userEvent.paste(text);
+  }
+
   get value() {
     return this.textareaElement.value;
   }

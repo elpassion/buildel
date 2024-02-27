@@ -25,6 +25,7 @@ import { loader as buildLoader } from "~/components/pages/pipelines/build/loader
 import { EditBlockPage } from "~/components/pages/pipelines/build/editBlock/page";
 import { PipelineBuilder } from "~/components/pages/pipelines/build/page";
 import { PipelineLayout } from "~/components/pages/pipelines/pipelineLayout/page";
+import { BuildErrorBoundary } from "~/components/pages/pipelines/build/errorBoundary";
 import {
   loader as layoutLoader,
   action as layoutAction,
@@ -114,6 +115,15 @@ describe(PipelineBuilder.name, () => {
     const blocks = await page.getBlocks();
 
     expect(blocks).toHaveLength(4);
+  });
+
+  test("should render error message if loader fail", async () => {
+    setupServer.use(new PipelineHandlers().getPipelineErrorHandler());
+    new PipelineObject().render({
+      initialEntries: ["/2/pipelines/2/build"],
+    });
+
+    await screen.findByText(/Something went wrong/i);
   });
 
   test("should render blocks types", async () => {
@@ -458,6 +468,37 @@ describe(PipelineBuilder.name, () => {
     expect(listAfterUpdate.children).toHaveLength(2);
   });
 
+  test("should remove memory file after clicking on delete", async () => {
+    setupServer.use(
+      ...new PipelineHandlers([
+        pipelineFixture({
+          id: 2,
+          name: "sample-workflow",
+          config: {
+            ...pipelineFixture().config,
+            blocks: [
+              {
+                ...pipelineFixture().config.blocks[0],
+                opts: { knowledge: 2 },
+              },
+            ],
+          },
+        }),
+      ]).handlers
+    );
+    new PipelineObject().render({
+      initialEntries: [`/2/pipelines/2/build`],
+    });
+
+    const button = await ButtonHandle.fromLabelText(/Delete file: test_file/i);
+    await button.click();
+
+    const list = await waitFor(async () => {
+      return await ListHandle.fromLabelText(/document_search_1 memory list/i);
+    });
+    expect(list.children).toHaveLength(1);
+  });
+
   test("should clear model and endpoint after changing API type", async () => {
     new PipelineObject().render({
       initialEntries: [
@@ -484,6 +525,53 @@ describe(PipelineBuilder.name, () => {
       "https://generativelanguage.googleapis.com/v1beta/models"
     );
   });
+
+  test("should create block after pasting configuration", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: [`/2/pipelines/2/build`],
+    });
+
+    await page.openPastBlockConfig();
+    await page.pasteBlockConfig(pipelineFixture().config.blocks[1]);
+    await page.submitBlockConfig();
+
+    await screen.findByText(/text_input_2/i);
+  });
+
+  test("should show validation errors if pasted configuration has missing type", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: [`/2/pipelines/2/build`],
+    });
+
+    await page.openPastBlockConfig();
+    await page.pasteBlockConfig({ opts: {} });
+    await page.submitBlockConfig();
+
+    await screen.findByText(/Missing block 'type'/i);
+  });
+
+  test("should show validation errors if pasted configuration has incorrect type", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: [`/2/pipelines/2/build`],
+    });
+
+    await page.openPastBlockConfig();
+    await page.pasteBlockConfig({ type: "test", opts: {} });
+    await page.submitBlockConfig();
+
+    await screen.findByText(/Incorrect block 'type'/i);
+  });
+
+  test("should show errors if pasted configuration is incorrect", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: [`/2/pipelines/2/build`],
+    });
+
+    await page.openPastBlockConfig();
+    await page.submitBlockConfig();
+
+    await screen.findByText(/Invalid configuration/i);
+  });
 });
 
 class PipelineObject {
@@ -494,6 +582,7 @@ class PipelineObject {
         loader: loaderWithSession(layoutLoader),
         path: "/:organizationId/pipelines/:pipelineId",
         Component: PipelineLayout,
+        ErrorBoundary: BuildErrorBoundary,
         children: [
           {
             action: actionWithSession(buildAction),
@@ -616,6 +705,28 @@ class PipelineObject {
     );
 
     await system_message.type(message);
+
+    return this;
+  }
+
+  async openPastBlockConfig() {
+    const button = await ButtonHandle.fromRole("Paste configuration");
+    await button.click();
+    return this;
+  }
+
+  async pasteBlockConfig(config: Record<string, any>) {
+    const configuration = await TextareaHandle.fromTestId(
+      "configuration-editor"
+    );
+    await configuration.paste(JSON.stringify(config));
+
+    return this;
+  }
+
+  async submitBlockConfig() {
+    const submit = await ButtonHandle.fromRole("Add block");
+    await submit.click();
 
     return this;
   }
