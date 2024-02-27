@@ -160,12 +160,8 @@ describe(PipelinesPage.name, () => {
     setupServer.use(new PipelineHandlers().createErrorHandler());
 
     new PipelinesObject().render({
-      initialEntries: ["/2/pipelines"],
+      initialEntries: ["/2/pipelines/new"],
     });
-
-    const link = await LinkHandle.fromLabelText(/Create new workflow/i);
-
-    await link.click();
 
     const input = await InputHandle.fromLabelText(/Name/i);
     await input.type("LALALA");
@@ -197,17 +193,16 @@ class PipelinesObject {
             loader: loaderWithSession(listLoader),
             action: actionWithSession(listAction),
           },
+          {
+            path: "/:organizationId/pipelines/new",
+            action: actionWithSession(newPipelineAction),
+            Component: NewPipelinePage,
+          },
+          {
+            path: "/:organizationId/pipelines/:pipelineId",
+            Component: () => <p>Pipeline</p>,
+          },
         ],
-      },
-
-      {
-        path: "/:organizationId/pipelines/new",
-        action: actionWithSession(newPipelineAction),
-        Component: NewPipelinePage,
-      },
-      {
-        path: "/:organizationId/pipelines/:pipelineId",
-        Component: () => <p>Pipeline</p>,
       },
     ]);
 
