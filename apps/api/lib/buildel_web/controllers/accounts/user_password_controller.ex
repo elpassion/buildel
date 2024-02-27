@@ -1,6 +1,6 @@
 defmodule BuildelWeb.UserPasswordController do
   use BuildelWeb, :controller
-  use BuildelWeb.Validator
+  use OpenApiSpex.ControllerSpecs
 
   import BuildelWeb.UserAuth
 
@@ -12,15 +12,30 @@ defmodule BuildelWeb.UserPasswordController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
-  defparams :update do
-    required(:current_password, :string, min: 12)
-    required(:password, :string, min: 12)
-    required(:password_confirmation, :string, min: 12)
-  end
+  plug OpenApiSpex.Plug.CastAndValidate,
+    json_render_error_v2: true,
+    render_error: BuildelWeb.ErrorRendererPlug
 
-  def update(conn, params) do
-    with {:ok, password_params} <- validate(:update, params),
-         user <- conn.assigns.current_user,
+  tags ["user"]
+
+  operation :update,
+    summary: "Update user password",
+    parameters: [],
+    request_body:
+      {"user", "application/json", BuildelWeb.Schemas.Users.UpdatePasswordRequest},
+    responses: [
+      ok: {"user", "application/json", BuildelWeb.Schemas.Users.ShowResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ]
+
+  def update(conn, _params) do
+    password_params = conn.body_params
+    with user <- conn.assigns.current_user,
          {:ok, %User{} = user} <-
            Accounts.update_user_password(user, password_params.current_password, %{
              password: password_params.password,

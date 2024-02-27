@@ -21,7 +21,7 @@ defmodule BuildelWeb.UserController do
     parameters: [],
     request_body: nil,
     responses: [
-      ok: {"organization", "application/json", BuildelWeb.Schemas.Users.ShowResponse},
+      ok: {"user", "application/json", BuildelWeb.Schemas.Users.ShowResponse},
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
