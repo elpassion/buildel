@@ -62,9 +62,7 @@ describe(PipelinesPage.name, () => {
       initialEntries: ["/2/pipelines"],
     });
 
-    await waitFor(() =>
-      screen.findByRole("button", { name: /Build a new AI workflow/i })
-    );
+    await screen.findByRole("button", { name: /Build a new AI workflow/i });
   });
 
   test("should delete pipeline", async () => {
@@ -191,15 +189,17 @@ class PipelinesObject {
       },
       {
         path: "/:organizationId",
-        Component: () => <p>organizationId</p>,
-      },
-      {
-        path: "/:organizationId/pipelines",
-        Component: PipelinesPage,
         ErrorBoundary: RootErrorBoundary,
-        loader: loaderWithSession(listLoader),
-        action: actionWithSession(listAction),
+        children: [
+          {
+            path: "/:organizationId/pipelines",
+            Component: PipelinesPage,
+            loader: loaderWithSession(listLoader),
+            action: actionWithSession(listAction),
+          },
+        ],
       },
+
       {
         path: "/:organizationId/pipelines/new",
         action: actionWithSession(newPipelineAction),
