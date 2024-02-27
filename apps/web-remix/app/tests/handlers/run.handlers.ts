@@ -14,7 +14,7 @@ export class RunHandlers {
     });
   }
 
-  gerRunHandler() {
+  getRunHandler() {
     return http.get(
       "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId",
       ({ params }) => {
@@ -41,7 +41,7 @@ export class RunHandlers {
     );
   }
 
-  gerRunErrorHandler() {
+  getRunErrorHandler() {
     return http.get(
       "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId",
       () => {
@@ -84,6 +84,6 @@ export class RunHandlers {
   }
 
   get handlers() {
-    return [this.getRunsHandler(), this.gerRunHandler()];
+    return [this.getRunsHandler(), this.getRunHandler()];
   }
 }

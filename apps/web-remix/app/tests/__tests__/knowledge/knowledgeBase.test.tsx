@@ -13,57 +13,29 @@ import { action as listAction } from "~/components/pages/knowledgeBase/list/acti
 import { ListHandle } from "~/tests/handles/List.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { SecretsHandlers } from "~/tests/handlers/secret.handlers";
 import { KnowledgeBasePage } from "~/components/pages/knowledgeBase/list/page";
-import {
-  CollectionHandlers,
-  CollectionMemoriesHandlers,
-} from "~/tests/handlers/collection.handlers";
 import { NewKnowledgeBasePage } from "~/components/pages/knowledgeBase/newKnowledgeBase/page";
 import { loader as newCollectionLoader } from "~/components/pages/knowledgeBase/newKnowledgeBase/loader.server";
 import { action as newCollectionAction } from "~/components/pages/knowledgeBase/newKnowledgeBase/action.server";
 import { KnowledgeBaseCollectionPage } from "~/components/pages/knowledgeBase/collection/page";
 import { loader as collectionLoader } from "~/components/pages/knowledgeBase/collection/loader.server";
 import { action as collectionAction } from "~/components/pages/knowledgeBase/collection/action.server";
-import {
-  EmbeddingsHandlers,
-  ModelsHandlers,
-} from "~/tests/handlers/model.handlers";
+import { NewCollectionFilesPage } from "~/components/pages/knowledgeBase/newCollectionFiles/page";
+import { loader as newCollectionFilesLoader } from "~/components/pages/knowledgeBase/newCollectionFiles/loader.server";
 import { SelectHandle } from "~/tests/handles/SelectHandle";
-import { collectionFixture } from "~/tests/fixtures/collection.fixtures";
-import { collectionMemoryFixtures } from "~/tests/fixtures/collectionMemory.fixtures";
-import { embeddingFixture } from "~/tests/fixtures/embedding.fixtures";
-import { modelFixture } from "~/tests/fixtures/models.fixtures";
-import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
-
-const handlers = () => [
-  ...new SecretsHandlers([
-    secretFixture(),
-    secretFixture({ name: "Test", id: "Test" }),
-  ]).handlers,
-  ...new ModelsHandlers([
-    modelFixture(),
-    modelFixture({ name: "Test", id: "Test", type: "google" }),
-  ]).handlers,
-  ...new EmbeddingsHandlers([
-    embeddingFixture(),
-    embeddingFixture({ name: "embedding", id: "embedding" }),
-  ]).handlers,
-  ...new CollectionMemoriesHandlers([
-    collectionMemoryFixtures(),
-    collectionMemoryFixtures({ id: 2, file_name: "test_file" }),
-  ]).handlers,
-  ...new CollectionHandlers([
-    collectionFixture(),
-    collectionFixture({ id: 2, name: "super-collection" }),
-  ]).handlers,
-];
+import { knowledgeBaseHandlers } from "./knowledgeBase.handlers";
+import {
+  CollectionHandlers,
+  CollectionMemoriesHandlers,
+} from "~/tests/handlers/collection.handlers";
+import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
+import { FileInputHandle } from "~/tests/handles/FileInput.handle";
 
 describe("KnowledgeBase", () => {
-  const setupServer = server([...handlers()]);
+  const setupServer = server([...knowledgeBaseHandlers()]);
 
   beforeAll(() => setupServer.listen());
-  afterEach(() => setupServer.resetHandlers(...handlers()));
+  afterEach(() => setupServer.resetHandlers(...knowledgeBaseHandlers()));
   afterAll(() => setupServer.close());
 
   test("should render correct amount of collections", async () => {
@@ -77,6 +49,15 @@ describe("KnowledgeBase", () => {
     expect(collectionList.children).toHaveLength(3);
   });
 
+  test("should display empty message if no collections", async () => {
+    setupServer.use(...new CollectionHandlers().handlers);
+    new KnowledgeBaseObject().render({
+      initialEntries: ["/2/knowledge-base"],
+    });
+
+    await screen.findByText(/There is no Collections yet/i);
+  });
+
   test("should remove collection", async () => {
     const page = new KnowledgeBaseObject().render({
       initialEntries: ["/2/knowledge-base"],
@@ -88,7 +69,7 @@ describe("KnowledgeBase", () => {
 
     await button.click();
 
-    await page.confirmDelete();
+    await page.confirmCollectionDelete();
 
     const collectionList = await page.getCollectionList();
 
@@ -101,12 +82,6 @@ describe("KnowledgeBase", () => {
     });
 
     await page.openNewForm();
-
-    await page.submitCollection();
-
-    expect(
-      await screen.findAllByText(/String must contain at least/i)
-    ).toHaveLength(3);
 
     const name = await InputHandle.fromLabelText("collection_name");
 
@@ -122,6 +97,88 @@ describe("KnowledgeBase", () => {
 
     screen.getByRole("heading", { name: /test collection database/i });
   });
+
+  test("should show validation error", async () => {
+    const page = new KnowledgeBaseObject().render({
+      initialEntries: ["/2/knowledge-base/new"],
+    });
+
+    await page.openNewForm();
+
+    await page.submitCollection();
+
+    expect(
+      await screen.findAllByText(/String must contain at least/i)
+    ).toHaveLength(3);
+  });
+
+  test("should render correct amount of collection files", async () => {
+    new KnowledgeBaseObject().render({
+      initialEntries: ["/2/knowledge-base/super-collection"],
+    });
+
+    const list = await ListHandle.fromLabelText(/Collection files/i);
+
+    expect(list.children).toHaveLength(3);
+  });
+
+  test("should display empty message if no collections", async () => {
+    setupServer.use(...new CollectionMemoriesHandlers().handlers);
+    new KnowledgeBaseObject().render({
+      initialEntries: ["/2/knowledge-base/super-collection"],
+    });
+
+    await screen.findByText(/There is no files in collection yet/i);
+  });
+
+  test("should display file chunks", async () => {
+    new KnowledgeBaseObject().render({
+      initialEntries: ["/2/knowledge-base/super-collection"],
+    });
+
+    const list = await ListHandle.fromLabelText(/Collection files/i);
+
+    expect(list.children).toHaveLength(3);
+  });
+
+  test("should delete collection file", async () => {
+    const page = new KnowledgeBaseObject().render({
+      initialEntries: ["/2/knowledge-base/super-collection"],
+    });
+
+    const button = await ButtonHandle.fromLabelText(/Delete file: test_file/i);
+    await button.click();
+    await page.confirmFileDelete();
+
+    const list = await ListHandle.fromLabelText(/Collection files/i);
+    expect(list.children).toHaveLength(2);
+  });
+
+  test("should disable button if files empty", async () => {
+    new KnowledgeBaseObject().render({
+      initialEntries: ["/2/knowledge-base/super-collection/new"],
+    });
+
+    const submit = await ButtonHandle.fromLabelText(/Upload knowledge items/i);
+    expect(submit.isDisabled()).toBe(true);
+  });
+
+  test("should upload collection file", async () => {
+    new KnowledgeBaseObject().render({
+      initialEntries: ["/2/knowledge-base/super-collection/new"],
+    });
+
+    const file = new File(["hello"], "hello.png", { type: "image/png" });
+    const fileInput = await FileInputHandle.fromLabelText(/files/i);
+    await fileInput.upload(file);
+
+    await screen.findByText(/hello/i);
+
+    const submit = await ButtonHandle.fromLabelText(/Upload knowledge items/i);
+    await submit.click();
+
+    expect(screen.queryByText(/hello/i)).toBeNull();
+  });
 });
 
 class KnowledgeBaseObject {
@@ -130,6 +187,7 @@ class KnowledgeBaseObject {
       {
         path: "/",
         Component: () => <p>Dashboard</p>,
+        ErrorBoundary: RootErrorBoundary,
       },
       {
         path: "/:organizationId/knowledge-base",
@@ -149,6 +207,11 @@ class KnowledgeBaseObject {
             action: actionWithSession(collectionAction),
             loader: loaderWithSession(collectionLoader),
           },
+          {
+            path: "/:organizationId/knowledge-base/:collectionName/new",
+            loader: loaderWithSession(newCollectionFilesLoader),
+            Component: NewCollectionFilesPage,
+          },
         ],
       },
     ]);
@@ -158,9 +221,19 @@ class KnowledgeBaseObject {
     return this;
   }
 
-  async confirmDelete() {
+  async confirmCollectionDelete() {
     const confirmButton = await waitFor(() =>
       ButtonHandle.fromRole("Delete collection")
+    );
+
+    await confirmButton.click();
+
+    return this;
+  }
+
+  async confirmFileDelete() {
+    const confirmButton = await waitFor(() =>
+      ButtonHandle.fromRole("Delete item")
     );
 
     await confirmButton.click();

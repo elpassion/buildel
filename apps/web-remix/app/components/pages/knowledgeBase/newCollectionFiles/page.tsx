@@ -15,7 +15,7 @@ export function NewCollectionFilesPage() {
   const [items, setItems] = useState<IExtendedFileUpload[]>([]);
 
   const isUploading = items.some(
-    (fileUpload) => fileUpload.status === "uploading",
+    (fileUpload) => fileUpload.status === "uploading"
   );
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -41,7 +41,7 @@ export function NewCollectionFilesPage() {
 
   const handleUpdateStatus = (
     id: number,
-    status: "done" | "error" | "uploading",
+    status: "done" | "error" | "uploading"
   ) => {
     setItems((prev) =>
       prev.map((fileUpload) => {
@@ -50,7 +50,7 @@ export function NewCollectionFilesPage() {
         }
 
         return fileUpload;
-      }),
+      })
     );
   };
 
@@ -67,7 +67,7 @@ export function NewCollectionFilesPage() {
         {
           body: formData,
           method: "POST",
-        },
+        }
       ).then((res) => res.json());
 
       handleUpdateStatus(fileUpload.id, "done");
@@ -98,6 +98,7 @@ export function NewCollectionFilesPage() {
         />
       </div>
       <Button
+        ariaLabel="Upload knowledge items"
         isFluid
         size="sm"
         disabled={!items.length || isUploading}

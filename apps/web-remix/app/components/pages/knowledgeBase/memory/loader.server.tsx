@@ -17,13 +17,9 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const {
       data: { id: collectionId },
-    } = await fetch(
-      KnowledgeBaseCollectionFromListResponse,
-      `/organizations/${
-        params.organizationId
-      }/memory_collections?collection_name=${encodeURIComponent(
-        params.collectionName
-      )}`
+    } = await knowledgeBaseApi.getCollectionByName(
+      params.organizationId,
+      params.collectionName
     );
 
     const { page, per_page, search } = getParamsPagination(

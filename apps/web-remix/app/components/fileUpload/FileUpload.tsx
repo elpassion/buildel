@@ -124,6 +124,7 @@ export function FileUpload({
       <label htmlFor={rest.id}>
         <span className="text-white text-xs font-medium">{labelText}</span>
         <input
+          name={name}
           type="file"
           ref={inputRef}
           {...rest}

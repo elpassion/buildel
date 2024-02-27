@@ -4,6 +4,7 @@ import {
   IKnowledgeBaseFile,
 } from "~/components/pages/knowledgeBase/knowledgeBase.types";
 import { ICreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
+import { z } from "zod";
 export class CollectionHandlers {
   private collections: Map<number, IKnowledgeBaseCollection> = new Map();
 
@@ -98,6 +99,32 @@ export class CollectionMemoriesHandlers {
     );
   }
 
+  createCollectionMemory() {
+    return http.post(
+      "/super-api/organizations/:organizationId/memory_collections/:collectionId/memories",
+      async ({ request }) => {
+        const data = await request.formData();
+        const file = data.get("file") as File;
+
+        const newMemory = {
+          id: this.collectionMemories.size + 1,
+          file_name: file.name,
+          file_size: file.size,
+          file_type: file.type,
+        };
+
+        this.collectionMemories.set(newMemory.id, newMemory);
+
+        return HttpResponse.json<{ data: IKnowledgeBaseFile[] }>(
+          { data: [...this.collectionMemories.values()] },
+          {
+            status: 200,
+          }
+        );
+      }
+    );
+  }
+
   deleteCollectionMemory() {
     return http.delete(
       "/super-api/organizations/:organizationId/memory_collections/:collectionId/memories/:memoryId",
@@ -113,7 +140,7 @@ export class CollectionMemoriesHandlers {
         }
 
         this.collectionMemories.delete(Number(memoryId));
-
+        console.log([...this.collectionMemories.values()]);
         return HttpResponse.json<{ data: IKnowledgeBaseFile[] }>(
           { data: [...this.collectionMemories.values()] },
           {
@@ -125,6 +152,10 @@ export class CollectionMemoriesHandlers {
   }
 
   get handlers() {
-    return [this.getCollectionMemories(), this.deleteCollectionMemory()];
+    return [
+      this.getCollectionMemories(),
+      this.deleteCollectionMemory(),
+      this.createCollectionMemory(),
+    ];
   }
 }

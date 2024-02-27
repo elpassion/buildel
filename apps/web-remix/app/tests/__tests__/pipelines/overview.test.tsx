@@ -75,7 +75,7 @@ describe("Workflow overview", () => {
   });
 
   test("should render error message if Run fetch fails", async () => {
-    setupServer.use(new RunHandlers([]).gerRunErrorHandler());
+    setupServer.use(new RunHandlers([]).getRunErrorHandler());
     new OverviewObject().render({
       initialEntries: ["/2/pipelines/2/runs/1"],
     });
@@ -101,7 +101,7 @@ describe("Workflow overview", () => {
   });
 
   test("should render error message if Costs fetch fails", async () => {
-    setupServer.use(new RunHandlers([]).gerRunErrorHandler());
+    setupServer.use(new RunHandlers([]).getRunErrorHandler());
     new OverviewObject().render({
       initialEntries: ["/2/pipelines/2/runs/1/costs"],
     });

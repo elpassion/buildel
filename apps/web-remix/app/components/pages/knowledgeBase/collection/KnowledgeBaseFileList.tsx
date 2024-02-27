@@ -40,6 +40,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
 
   return (
     <ItemList
+      aria-label="Collection files"
       className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3"
       items={items}
       emptyText={
@@ -87,7 +88,7 @@ export const KnowledgeBaseFileListItem: React.FC<
         <IconButton
           size="xs"
           variant="ghost"
-          aria-label="Remove file"
+          aria-label={`Delete file: ${data.file_name}`}
           className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500"
           icon={<Icon iconName="trash" />}
           onClick={handleDelete}
