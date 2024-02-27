@@ -41,6 +41,17 @@ export class RunHandlers {
     );
   }
 
+  gerRunErrorHandler() {
+    return http.get(
+      "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId",
+      () => {
+        return HttpResponse.json<{
+          data: IPipelineRun;
+        }>(null, { status: 500 });
+      }
+    );
+  }
+
   getRunsHandler() {
     return http.get(
       "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs",
@@ -59,6 +70,15 @@ export class RunHandlers {
           },
           { status: 200 }
         );
+      }
+    );
+  }
+
+  getRunsErrorHandler() {
+    return http.get(
+      "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs",
+      () => {
+        return HttpResponse.json(null, { status: 500 });
       }
     );
   }

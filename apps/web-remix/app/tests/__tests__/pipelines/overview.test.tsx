@@ -19,6 +19,7 @@ import { runFixture } from "~/tests/fixtures/run.fixtures";
 import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
 import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
 import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
+import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
 
 const handlers = () => [
   ...blockTypesHandlers(),
@@ -45,6 +46,15 @@ describe("Workflow overview", () => {
     expect(await screen.findAllByText(/finished/i)).toHaveLength(2);
   });
 
+  test("should render error message if Runs fetch fails", async () => {
+    setupServer.use(new RunHandlers([]).getRunsErrorHandler());
+    new OverviewObject().render({
+      initialEntries: ["/2/pipelines/2/runs"],
+    });
+
+    await screen.findAllByText(/Internal server error/i);
+  });
+
   test("should render empty list message if runs empty", async () => {
     setupServer.use(...new RunHandlers([]).handlers);
     new OverviewObject().render({
@@ -64,6 +74,15 @@ describe("Workflow overview", () => {
     expect(screen.queryByLabelText(/run/i)).toBeNull();
   });
 
+  test("should render error message if Run fetch fails", async () => {
+    setupServer.use(new RunHandlers([]).gerRunErrorHandler());
+    new OverviewObject().render({
+      initialEntries: ["/2/pipelines/2/runs/1"],
+    });
+
+    await screen.findAllByText(/Internal server error/i);
+  });
+
   test("should render error message if run not found", async () => {
     new OverviewObject().render({
       initialEntries: ["/2/pipelines/2/runs/123"],
@@ -79,6 +98,15 @@ describe("Workflow overview", () => {
 
     const list = await ListHandle.fromLabelText(/Run cost list/i);
     expect(list.children).toHaveLength(3);
+  });
+
+  test("should render error message if Costs fetch fails", async () => {
+    setupServer.use(new RunHandlers([]).gerRunErrorHandler());
+    new OverviewObject().render({
+      initialEntries: ["/2/pipelines/2/runs/1/costs"],
+    });
+
+    await screen.findAllByText(/Internal server error/i);
   });
 
   test("should render correct amount of run costs", async () => {
@@ -105,7 +133,7 @@ class OverviewObject {
     const Routes = setupRoutes([
       {
         path: "/",
-        ErrorBoundary: () => <p>page not found</p>,
+        ErrorBoundary: RootErrorBoundary,
         children: [
           {
             path: "/:organizationId/pipelines/:pipelineId/runs",
