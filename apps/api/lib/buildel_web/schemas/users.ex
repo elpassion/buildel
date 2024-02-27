@@ -41,4 +41,32 @@ defmodule BuildelWeb.Schemas.Users do
       required: [:current_password, :password, :password_confirmation]
     })
   end
+
+  defmodule CreateForgotPasswordRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "UserCreateForgotPasswordRequest",
+      type: :object,
+      properties: %{
+        email: %Schema{type: :string, description: "User email", pattern: ~r/@/},
+      },
+      required: [:email]
+    })
+  end
+
+  defmodule UpdateForgotPasswordRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "UserUpdateForgotPasswordRequest",
+      type: :object,
+      properties: %{
+        token: %Schema{type: :string, description: "Token"},
+        password: %Schema{type: :string, description: "New password", minLength: 12},
+        password_confirmation: %Schema{type: :string, description: "New password confirmation", minLength: 12},
+      },
+      required: [:token, :password, :password_confirmation]
+    })
+  end
 end
