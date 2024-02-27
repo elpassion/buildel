@@ -1,5 +1,5 @@
 defmodule BuildelWeb.TestMacros do
-  defmacro test_requires_authentication(title, params \\ quote(do: %{}), do: block) do
+  defmacro test_requires_authentication(params \\ quote(do: %{}), do: block) do
     quote do
       test "requires authentication", test_params do
         test_params = update_in(test_params.conn, fn conn -> log_out_user(conn) end)
