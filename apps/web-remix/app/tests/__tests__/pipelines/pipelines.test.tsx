@@ -7,7 +7,7 @@ import {
   setupRoutes,
 } from "~/tests/setup.tests";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { render, screen, waitFor } from "~/tests/render";
+import { render, screen, waitFor, act } from "~/tests/render";
 import { server } from "~/tests/server.mock";
 import { PipelinesPage } from "~/components/pages/pipelines/list/page";
 import { loader as listLoader } from "~/components/pages/pipelines/list/loader.server";
@@ -86,9 +86,7 @@ describe(PipelinesPage.name, () => {
 
     await page.deleteWorkflow("AI Chat");
 
-    await waitFor(async () => {
-      screen.findByText(/Internal server error/i);
-    });
+    await screen.findByText(/Not Found/i);
   });
 
   test("should duplicate pipeline", async () => {
@@ -118,9 +116,7 @@ describe(PipelinesPage.name, () => {
 
     await button.click();
 
-    await waitFor(async () => {
-      screen.findByText(/Internal server error/i);
-    });
+    await screen.findByText(/Not Found/i);
   });
 
   test("should create pipeline from template", async () => {
@@ -170,9 +166,7 @@ describe(PipelinesPage.name, () => {
 
     await submit.click();
 
-    await waitFor(async () => {
-      screen.findByText(/Internal server error/i);
-    });
+    await screen.findByText(/Not Found/i);
   });
 });
 

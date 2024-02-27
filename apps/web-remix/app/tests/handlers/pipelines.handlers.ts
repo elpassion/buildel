@@ -106,7 +106,7 @@ export class PipelineHandlers {
     return http.put(
       "/super-api/organizations/:organizationId/pipelines/:pipelineId",
       async () => {
-        return HttpResponse.json(null, { status: 500 });
+        return HttpResponse.json(null, { status: 404 });
       }
     );
   }
@@ -134,7 +134,7 @@ export class PipelineHandlers {
     return http.delete(
       "/super-api/organizations/:organizationId/pipelines/:pipelineId",
       () => {
-        return HttpResponse.json(null, { status: 500 });
+        return HttpResponse.json(null, { status: 404 });
       }
     );
   }
@@ -155,7 +155,7 @@ export class PipelineHandlers {
     return http.post(
       "/super-api/organizations/:organizationId/pipelines",
       async () => {
-        return HttpResponse.json(null, { status: 500 });
+        return HttpResponse.json(null, { status: 404 });
       }
     );
   }
