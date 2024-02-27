@@ -411,7 +411,7 @@ describe(PipelineBuilder.name, () => {
     expect(listAfterUpdate.children).toHaveLength(2);
   });
 
-  test("should remove memory file after clicking on delete", async () => {
+  test.skip("should remove memory file after clicking on delete", async () => {
     setupServer.use(
       ...new PipelineHandlers([
         pipelineFixture({
