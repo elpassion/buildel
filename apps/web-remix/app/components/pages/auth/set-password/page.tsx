@@ -42,12 +42,18 @@ export function SetPasswordPage() {
         </Field>
         <div className="form-control w-full mb-4">
           <Field name="password">
-            <TextInputField type="password" label="New password" autoFocus />
+            <TextInputField
+              type="password"
+              label="New password"
+              autoFocus
+              data-testid="new-password"
+            />
           </Field>
           <Field name="password_confirmation">
             <TextInputField
               type="password"
               label="Confirm new password"
+              data-testid="new-password-confirmation"
               autoFocus
             />
           </Field>

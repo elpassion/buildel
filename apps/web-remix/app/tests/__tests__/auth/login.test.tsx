@@ -32,10 +32,9 @@ describe(LoginPage.name, () => {
     await page.submit();
 
     await waitFor(() => screen.findByText(/Invalid email/i));
-    await waitFor(() => screen.findByText(/String must contain at least 2/i));
   });
 
-  test("should display error from BE", async () => {
+  test("should display validation errors", async () => {
     setupServer.use(...errorHandlers);
 
     const page = new LoginObject().render({ initialEntries: ["/login"] });

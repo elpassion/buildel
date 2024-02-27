@@ -3,6 +3,6 @@ import z from "zod";
 export const schema = z.object({
   user: z.object({
     email: z.string().email(),
-    password: z.string().min(2),
+    password: z.string().min(12),
   }),
 });

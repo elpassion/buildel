@@ -26,13 +26,13 @@ describe(RegisterPage.name, () => {
     await screen.findByText(/Homepage/i);
   });
 
-  test("should display error if fields not filled in", async () => {
+  test("should display validation errors", async () => {
     const page = new RegisterObject().render({ initialEntries: ["/register"] });
 
     await page.submit();
 
     await screen.findByText(/Invalid email/i);
-    await screen.findByText(/String must contain at least 2/i);
+    await screen.findByText(/String must contain at least 12/i);
   });
 
   test("should display error if email already taken", async () => {
@@ -83,7 +83,7 @@ class RegisterObject {
     const { emailInput, passwordInput } = await this.getElements();
 
     await emailInput.type("test@gmail.com");
-    await passwordInput.type("password");
+    await passwordInput.type("password123456");
 
     return this;
   }

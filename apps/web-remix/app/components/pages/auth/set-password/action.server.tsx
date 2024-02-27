@@ -17,7 +17,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const authApi = new AuthApi(fetch);
 
-      const response = await authApi.setPassword(result.data);
+      await authApi.setPassword(result.data);
 
       const redirectTo = routes.login;
 
