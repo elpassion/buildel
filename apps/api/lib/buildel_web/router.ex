@@ -35,7 +35,12 @@ defmodule BuildelWeb.Router do
   scope "/dev" do
     pipe_through([:browser, :require_basic_auth])
 
-    live_dashboard("/dashboard", metrics: BuildelWeb.Telemetry, ecto_repos: [Buildel.Repo])
+    live_dashboard("/dashboard",
+      metrics: BuildelWeb.Telemetry,
+      metrics_history: {BuildelWeb.MetricsStorage, :metrics_history, []},
+      ecto_repos: [Buildel.Repo]
+    )
+
     forward("/mailbox", Plug.Swoosh.MailboxPreview)
   end
 

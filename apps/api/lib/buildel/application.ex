@@ -24,7 +24,8 @@ defmodule Buildel.Application do
         # Start the vault used for encryption
         Buildel.Vault,
         # JWKS storage
-        BuildelWeb.GoogleJwksStrategy
+        BuildelWeb.GoogleJwksStrategy,
+        {BuildelWeb.MetricsStorage, BuildelWeb.Telemetry.metrics()}
       ]
       |> maybe_add_db()
       |> maybe_add_bumblebee_embedding()

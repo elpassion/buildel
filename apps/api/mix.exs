@@ -75,6 +75,7 @@ defmodule Buildel.MixProject do
       {:joken_jwks, "~> 1.6"},
       {:resend, "~> 0.4.1"},
       {:open_api_spex, "~> 3.18"},
+      {:circular_buffer, "~> 0.4.0"},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
     ]
   end
