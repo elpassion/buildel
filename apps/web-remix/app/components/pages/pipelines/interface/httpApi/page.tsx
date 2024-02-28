@@ -15,7 +15,7 @@ import {
 import { loader } from "./loader.server";
 
 export function HTTPApiPage() {
-  const { organizationId, pipelineId } = useLoaderData<typeof loader>();
+  const { organizationId, pipelineId, apiUrl } = useLoaderData<typeof loader>();
   return (
     <div>
       <h2 className="text-lg text-white font-medium">HTTP Api</h2>
@@ -41,7 +41,7 @@ export function HTTPApiPage() {
           </PreviewSectionText>
 
           <CodePreviewWrapper
-            value={`curl https://buildel-api.fly.dev/api/organizations/${organizationId}/pipelines/${pipelineId}/runs \\
+            value={`curl ${apiUrl}/api/organizations/${organizationId}/pipelines/${pipelineId}/runs \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer \${BUILDEL_API_KEY}" \\
@@ -71,7 +71,7 @@ export function HTTPApiPage() {
           </PreviewSectionText>
 
           <CodePreviewWrapper
-            value={`curl https://buildel-api.fly.dev/api/organizations/${organizationId}/pipelines/${pipelineId}/runs/RUN_ID/start \\
+            value={`curl ${apiUrl}/api/organizations/${organizationId}/pipelines/${pipelineId}/runs/RUN_ID/start \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer \${BUILDEL_API_KEY}"`}
@@ -100,7 +100,7 @@ export function HTTPApiPage() {
           </PreviewSectionText>
 
           <CodePreviewWrapper
-            value={`curl https://buildel-api.fly.dev/api/organizations/${organizationId}/pipelines/${pipelineId}/runs/RUN_ID/input \\
+            value={`curl ${apiUrl}/api/organizations/${organizationId}/pipelines/${pipelineId}/runs/RUN_ID/input \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer \${BUILDEL_API_KEY}" \\
@@ -128,7 +128,7 @@ export function HTTPApiPage() {
           </PreviewSectionText>
 
           <CodePreviewWrapper
-            value={`curl https://buildel-api.fly.dev/api/organizations/${organizationId}/pipelines/${pipelineId}/runs/RUN_ID/stop \\
+            value={`curl ${apiUrl}/api/organizations/${organizationId}/pipelines/${pipelineId}/runs/RUN_ID/stop \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer \${BUILDEL_API_KEY}"`}

@@ -12,6 +12,7 @@ export async function loader(args: LoaderFunctionArgs) {
     return json({
       pipelineId: params.pipelineId,
       organizationId: params.organizationId,
+      apiUrl: process.env.API_URL!,
     });
   })(args);
 }
