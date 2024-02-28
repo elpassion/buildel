@@ -42,11 +42,16 @@ import { RadioHandle } from "~/tests/handles/Radio.handle";
 import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
 import { ListHandle } from "~/tests/handles/List.handle";
 import { buildHandlers } from "./build.handlers";
+import { WebSocketClientMock } from "~/tests/WebSocketClientMock";
 
 describe(PipelineBuilder.name, () => {
   const setupServer = server([...buildHandlers()]);
 
-  beforeAll(() => setupServer.listen());
+  beforeAll(() => {
+    //@ts-ignore
+    global.WebSocket = WebSocketClientMock;
+    setupServer.listen();
+  });
   afterEach(() => setupServer.resetHandlers(...buildHandlers()));
   afterAll(() => setupServer.close());
 

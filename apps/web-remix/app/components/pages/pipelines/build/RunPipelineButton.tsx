@@ -23,14 +23,17 @@ export const RunPipelineButton: React.FC = () => {
     }
   };
 
+  const isRunning = status !== "idle";
+
   return (
     <div className="flex items-center gap-2 pointer-events-auto">
       <Button
+        aria-label={isRunning ? "Stop workflow" : "Start workflow"}
         onClick={handleRun}
         size="sm"
         rightIcon={status === "idle" && <PlayFilled />}
       >
-        {status === "idle" ? "Run" : "Stop"}
+        {isRunning ? "Stop" : "Start"}
       </Button>
     </div>
   );

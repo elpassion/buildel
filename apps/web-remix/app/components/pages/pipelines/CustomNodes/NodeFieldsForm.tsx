@@ -153,6 +153,7 @@ export function NodeFieldsForm({
               {name}
             </div>
             <TextareaInput
+              data-testid={`${blockName}-${name}`}
               style={{ borderTopLeftRadius: 0 }}
               label=""
               id={name}
@@ -207,6 +208,7 @@ export function NodeFieldsForm({
 
       {fields.length > 0 && fields[0].data.type === "text" ? (
         <Button
+          aria-label={`Send message from: ${blockName}`}
           type="submit"
           size="xs"
           disabled={status !== "running"}

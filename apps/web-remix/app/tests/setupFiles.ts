@@ -1,9 +1,9 @@
 import { afterEach, vi } from "vitest";
-import { WebSocketMock } from "./WebSocket.mock";
 import { cleanup } from "@testing-library/react";
 
 afterEach(() => {
   cleanup();
+  vi.clearAllMocks();
 });
 
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
@@ -31,6 +31,3 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: vi.fn(),
   })),
 });
-
-// @ts-ignore
-global.WebSocket = WebSocketMock;

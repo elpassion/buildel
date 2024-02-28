@@ -1,4 +1,4 @@
-export class WebSocketMock {
+export class WebSocketClientMock {
   url: string;
   readyState: any;
   static readonly CONNECTING = 0;
@@ -18,6 +18,6 @@ export class WebSocketMock {
 
   close() {
     console.log(`Mock WebSocket closed`);
-    this.readyState = WebSocketMock.CLOSED;
+    this.readyState = WebSocketClientMock.CLOSED;
   }
 }
