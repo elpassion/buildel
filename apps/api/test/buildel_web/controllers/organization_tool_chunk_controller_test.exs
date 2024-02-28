@@ -20,19 +20,14 @@ defmodule BuildelWeb.OrganizationToolChunkControllerTest do
   ]
 
   describe "create" do
-    test "requires authentication", %{
+    test_requires_authentication %{
       conn: conn,
       organization: organization
     } do
-      conn = conn |> log_out_user()
-
-      conn =
-        post(
-          conn,
-          ~p"/api/organizations/#{organization.id}/tools/chunks"
-        )
-
-      assert json_response(conn, 401)["errors"] != %{}
+      post(
+        conn,
+        ~p"/api/organizations/#{organization.id}/tools/chunks"
+      )
     end
 
     test "validates file is present", %{
@@ -68,7 +63,8 @@ defmodule BuildelWeb.OrganizationToolChunkControllerTest do
     test "returns chunks when valid", %{
       conn: conn,
       upload_file: file,
-      organization: organization
+      organization: organization,
+      api_spec: api_spec
     } do
       conn =
         post(
@@ -79,9 +75,13 @@ defmodule BuildelWeb.OrganizationToolChunkControllerTest do
           }
         )
 
+      response = json_response(conn, 201)
+
       assert %{
                "data" => [%{"text" => "This is an example file!"}]
-             } = json_response(conn, 201)
+             } = response
+
+      assert_schema(response, "ChunkShowResponse", api_spec)
     end
   end
 

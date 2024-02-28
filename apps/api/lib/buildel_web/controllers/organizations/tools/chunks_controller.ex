@@ -1,36 +1,42 @@
 defmodule BuildelWeb.OrganizationToolChunkController do
   use BuildelWeb, :controller
 
-  use BuildelWeb.Validator
+  use OpenApiSpex.ControllerSpecs
   import BuildelWeb.UserAuth
   action_fallback(BuildelWeb.FallbackController)
 
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
-  defparams :create do
-    required(:file, :map)
-    required(:chunk_size, :integer)
-    required(:chunk_overlap, :integer)
-  end
+  plug OpenApiSpex.Plug.CastAndValidate,
+    json_render_error_v2: true,
+    render_error: BuildelWeb.ErrorRendererPlug
 
-  @create_default_params %{
-    "chunk_size" => 1000,
-    "chunk_overlap" => 250
-  }
+  tags ["organization"]
 
-  def create(
-        conn,
-        %{"organization_id" => organization_id} =
-          params
-      ) do
-    params = Map.merge(@create_default_params, params)
+  operation :create,
+    summary: "Create file chunks",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer, required: true]
+    ],
+    request_body: {"chunk", "multipart/form-data", BuildelWeb.Schemas.Chunks.CreateChunkRequest},
+    responses: [
+      created: {"created", "application/json", BuildelWeb.Schemas.Chunks.ShowResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ]
+
+  def create(conn, _params) do
+    %{organization_id: organization_id} = conn.params
+    %{file: file, chunk_size: chunk_size, chunk_overlap: chunk_overlap} = conn.body_params
 
     user = conn.assigns.current_user
 
-    with {:ok, %{file: file, chunk_size: chunk_size, chunk_overlap: chunk_overlap}} <-
-           validate(:create, params),
-         {:ok, _organization} <-
+    with {:ok, _organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id) do
       file_properties = %{
         path: file |> Map.get(:path),
