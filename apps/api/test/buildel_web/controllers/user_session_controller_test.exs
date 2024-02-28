@@ -3,12 +3,17 @@ defmodule BuildelWeb.UserSessionControllerTest do
 
   import Buildel.AccountsFixtures
 
-  setup do
-    %{user: user_fixture()}
+  setup %{conn: conn} do
+    %{
+      user: user_fixture(),
+      conn:
+        put_req_header(conn, "accept", "application/json")
+        |> put_req_header("content-type", "application/json")
+    }
   end
 
   describe "POST /users/log_in" do
-    test "logs the user in", %{conn: conn, user: user} do
+    test "logs the user in", %{conn: conn, user: user, api_spec: api_spec} do
       conn =
         post(conn, ~p"/api/users/log_in", %{
           "user" => %{"email" => user.email, "password" => valid_user_password()}
@@ -16,7 +21,9 @@ defmodule BuildelWeb.UserSessionControllerTest do
 
       assert get_session(conn, :user_token)
       conn = get(conn, ~p"/api/users/me")
-      json_response(conn, 200)
+
+      response = json_response(conn, 200)
+      assert_schema(response, "UserShowResponse", api_spec)
     end
 
     test "logs the user in with remember me", %{conn: conn, user: user} do
@@ -52,7 +59,22 @@ defmodule BuildelWeb.UserSessionControllerTest do
         })
 
       assert json_response(conn, 422) == %{
-               "errors" => %{"user" => %{"email" => ["has invalid format"]}}
+               "errors" => %{
+                 "user" => %{"email" => ["Invalid format. Expected ~r/^[^\\s]+@[^\\s]+$/"]}
+               }
+             }
+    end
+  end
+
+  describe "POST /users/google/log_in" do
+    test "returns error with bad request", %{conn: conn} do
+      conn =
+        post(conn, ~p"/api/users/google/log_in", %{})
+
+      assert json_response(conn, 422) == %{
+               "errors" => %{
+                 "token" => ["Missing field: token"]
+               }
              }
     end
   end

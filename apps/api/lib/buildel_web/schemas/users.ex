@@ -107,4 +107,49 @@ defmodule BuildelWeb.Schemas.Users do
       required: [:user]
     })
   end
+
+  defmodule CreateLoginRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "UserCreateLoginRequest",
+      type: :object,
+      properties: %{
+        user: %Schema{
+          type: :object,
+          properties: %{
+            email: %Schema{
+              type: :string,
+              description: "Email",
+              pattern: ~r/^[^\s]+@[^\s]+$/,
+              example: "email@email.com"
+            },
+            password: %Schema{type: :string, description: "Password"},
+            remember_me: %Schema{
+              type: :boolean,
+              description: "Adds _buildel_web_user_remember_me cookie"
+            }
+          },
+          required: [:email, :password]
+        }
+      },
+      required: [:user]
+    })
+  end
+
+  defmodule CreateLoginWithGoogleRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "UserCreateLoginWithGoogleRequest",
+      type: :object,
+      properties: %{
+        token: %Schema{
+          type: :string,
+          description: "Token"
+        }
+      },
+      required: [:token]
+    })
+  end
 end
