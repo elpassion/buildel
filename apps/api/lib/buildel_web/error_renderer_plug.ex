@@ -26,6 +26,10 @@ defmodule BuildelWeb.ErrorRendererPlug do
     |> send_resp(422, json)
   end
 
+  defp add_error(errors, [], error) do
+    Map.update(errors, :global, [to_string(error)], &(&1 ++ [to_string(error)]))
+  end
+
   defp add_error(errors, [path], error) do
     Map.update(errors, path, [to_string(error)], &(&1 ++ [to_string(error)]))
   end

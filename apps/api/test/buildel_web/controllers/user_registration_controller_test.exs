@@ -3,15 +3,25 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
 
   import Buildel.AccountsFixtures
 
+  setup %{conn: conn} do
+    {:ok,
+     conn:
+       put_req_header(conn, "accept", "application/json")
+       |> put_req_header("content-type", "application/json")}
+  end
+
   describe "POST /api/users/register" do
     @tag :capture_log
-    test "creates account and logs the user in", %{conn: conn} do
+    test "creates account and logs the user in", %{conn: conn, api_spec: api_spec} do
       email = unique_user_email()
 
       conn =
         post(conn, ~p"/api/users/register", %{
           "user" => valid_user_attributes(email: email)
         })
+
+      response = json_response(conn, 201)
+      assert_schema(response, "UserShowResponse", api_spec)
 
       assert get_session(conn, :user_token)
       conn = get(conn, ~p"/api/users/me")
@@ -27,8 +37,8 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
       assert json_response(conn, 422) == %{
                "errors" => %{
                  "user" => %{
-                   "email" => ["has invalid format"],
-                   "password" => ["should be at least 12 character(s)"]
+                   "email" => ["Invalid format. Expected ~r/^[^\\s]+@[^\\s]+$/"],
+                   "password" => ["String length is smaller than minLength: 12"]
                  }
                }
              }
@@ -47,9 +57,13 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
       json_response(conn, 200)
 
       conn =
-        post(conn, ~p"/api/users/register", %{
-          "user" => valid_user_attributes(email: email)
-        })
+        post(
+          build_conn() |> put_req_header("content-type", "application/json"),
+          ~p"/api/users/register",
+          %{
+            "user" => valid_user_attributes(email: email)
+          }
+        )
 
       assert json_response(conn, 422) == %{
                "errors" => %{

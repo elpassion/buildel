@@ -1,6 +1,6 @@
 defmodule BuildelWeb.UserRegistrationController do
   use BuildelWeb, :controller
-  use BuildelWeb.Validator
+  use OpenApiSpex.ControllerSpecs
 
   alias Buildel.Accounts
   alias Buildel.Accounts.User
@@ -9,16 +9,28 @@ defmodule BuildelWeb.UserRegistrationController do
 
   action_fallback(BuildelWeb.FallbackController)
 
-  defparams :create do
-    required(:user, :map) do
-      required(:email, :string, format: :email)
-      required(:password, :string, min: 12)
-    end
-  end
+  plug OpenApiSpex.Plug.CastAndValidate,
+    json_render_error_v2: true,
+    render_error: BuildelWeb.ErrorRendererPlug
 
-  def create(conn, params) do
-    with {:ok, %{user: user_params}} <- validate(:create, params),
-         {:ok, %User{} = user} <- Accounts.register_user(user_params),
+  tags ["user"]
+
+  operation :create,
+    summary: "Create user forgot password request",
+    parameters: [],
+    request_body:
+      {"user", "application/json", BuildelWeb.Schemas.Users.CreateRegistrationRequest},
+    responses: [
+      created: {"user", "application/json", BuildelWeb.Schemas.Users.ShowResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity}
+    ]
+
+  def create(conn, _params) do
+    %{user: user_params} = conn.body_params
+
+    with {:ok, %User{} = user} <- Accounts.register_user(user_params),
          {:ok, _} =
            Accounts.deliver_user_confirmation_instructions(
              user,
@@ -35,7 +47,16 @@ defmodule BuildelWeb.UserRegistrationController do
       |> render(:show, user: user)
     else
       {:error, %Ecto.Changeset{action: :insert}} ->
-        {:error, changeset_error(global: "email has already been taken")}
+        {:error,
+         %Ecto.Changeset{
+           action: :validate,
+           errors:
+             %{global: "email has already been taken"}
+             |> Enum.map(fn {key, value} -> {key, {value, []}} end)
+             |> Enum.into(%{}),
+           changes: %{},
+           types: %{}
+         }}
 
       e ->
         e
