@@ -6,7 +6,10 @@ defmodule BuildelWeb.OrganizationPipelineBlockControllerTest do
   alias Buildel.Organizations
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok,
+     conn:
+       put_req_header(conn, "accept", "application/json")
+       |> put_req_header("content-type", "application/json")}
   end
 
   setup [
@@ -16,19 +19,14 @@ defmodule BuildelWeb.OrganizationPipelineBlockControllerTest do
   ]
 
   describe "create" do
-    test "requires authentication", %{conn: conn, organization: organization, pipeline: pipeline} do
-      conn = conn |> log_out_user()
-
-      conn =
-        post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/blocks", %{
-          block: %{
-            name: "block",
-            type: "text_input",
-            opts: %{}
-          }
-        })
-
-      assert json_response(conn, 401)
+    test_requires_authentication %{conn: conn, organization: organization, pipeline: pipeline} do
+      post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/blocks", %{
+        block: %{
+          name: "block",
+          type: "text_input",
+          opts: %{}
+        }
+      })
     end
 
     test "requires organization membership", %{conn: conn, another_pipeline: pipeline} do
