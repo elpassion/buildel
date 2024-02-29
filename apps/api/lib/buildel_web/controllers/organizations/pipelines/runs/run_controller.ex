@@ -1,6 +1,6 @@
 defmodule BuildelWeb.OrganizationPipelineRunController do
   use BuildelWeb, :controller
-  use BuildelWeb.Validator
+  use OpenApiSpex.ControllerSpecs
 
   import BuildelWeb.UserAuth
 
@@ -14,33 +14,77 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
-  defparams :index do
-    required(:page, :integer)
-    required(:per_page, :integer)
-  end
+  plug OpenApiSpex.Plug.CastAndValidate,
+    json_render_error_v2: true,
+    render_error: BuildelWeb.ErrorRendererPlug
 
-  @default_params %{
-    "page" => 0,
-    "per_page" => 10
-  }
+  tags ["run"]
 
-  def index(conn, %{"organization_id" => organization_id, "pipeline_id" => pipeline_id} = params) do
-    params = Map.merge(@default_params, params)
+  operation :index,
+    summary: "List pipeline runs",
+    parameters:
+      [
+        organization_id: [
+          in: :path,
+          description: "Organization ID",
+          type: :integer,
+          required: true
+        ],
+        pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true]
+      ] ++ BuildelWeb.Schemas.Pagination.default_params(),
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Runs.IndexResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ]
+
+  def index(conn, _params) do
+    %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
+    pagination_params = conn.params |> Map.take([:page, :per_page])
+
+    IO.inspect(conn.params)
+    IO.inspect(pagination_params)
     user = conn.assigns.current_user
 
-    with {:ok, params} <- validate(:index, params),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          runs <- Pipelines.list_pipeline_runs(pipeline) do
-      render(conn, :index, runs: runs, pagination_params: params)
+      render(conn, :index, runs: runs, pagination_params: pagination_params)
     end
   end
 
-  def show(
-        conn,
-        %{"organization_id" => organization_id, "pipeline_id" => pipeline_id, "id" => id}
-      ) do
+  operation :show,
+    summary: "Show pipeline run",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      id: [in: :path, description: "Run ID", type: :integer, required: true]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ]
+
+  def show(conn, _params) do
+    %{organization_id: organization_id, pipeline_id: pipeline_id, id: id} = conn.params
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
@@ -51,32 +95,36 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     end
   end
 
-  defparams :create do
-    required(:organization_id, :string)
-    required(:pipeline_id, :string)
-    required(:metadata, :map)
-    required(:alias, :integer)
-  end
+  operation :create,
+    summary: "Create pipeline run",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true]
+    ],
+    request_body: {"run", "application/json", BuildelWeb.Schemas.Runs.CreateRequest},
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ]
 
-  @create_default_params %{
-    "metadata" => %{},
-    "alias" => 0
-  }
-
-  def create(conn, params) do
-    params = Map.merge(@create_default_params, params)
+  def create(conn, _params) do
+    %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
+    %{metadata: metadata, alias: alias} = conn.body_params
 
     user = conn.assigns.current_user
 
-    with {:ok,
-          %{
-            organization_id: organization_id,
-            pipeline_id: pipeline_id,
-            metadata: metadata,
-            alias: alias
-          }} <-
-           validate(:create, params),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, config} <- Pipelines.get_pipeline_config(pipeline, alias),
@@ -89,11 +137,37 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     end
   end
 
-  def start(conn, %{
-        "organization_id" => organization_id,
-        "pipeline_id" => pipeline_id,
-        "id" => id
-      }) do
+  operation :start,
+    summary: "Start pipeline run",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      id: [in: :path, description: "Run ID", type: :integer, required: true]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ]
+
+  def start(conn, _params) do
+    %{
+      organization_id: organization_id,
+      pipeline_id: pipeline_id,
+      id: id
+    } = conn.params
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
@@ -105,7 +179,37 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     end
   end
 
-  def stop(conn, %{"organization_id" => organization_id, "pipeline_id" => pipeline_id, "id" => id}) do
+  operation :stop,
+    summary: "Stop pipeline run",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      id: [in: :path, description: "Run ID", type: :integer, required: true]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ]
+
+  def stop(conn, _params) do
+    %{
+      organization_id: organization_id,
+      pipeline_id: pipeline_id,
+      id: id
+    } = conn.params
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
@@ -117,28 +221,48 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     end
   end
 
-  defparams :input do
-    required(:organization_id, :string)
-    required(:pipeline_id, :string)
-    required(:id, :string)
-    required(:block_name, :string)
-    required(:input_name, :string)
-    required(:data, :string)
-  end
+  operation :input,
+    summary: "Add run input",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      id: [in: :path, description: "Run ID", type: :integer, required: true]
+    ],
+    request_body: {"input", "application/json", BuildelWeb.Schemas.Runs.InputRequest},
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      bad_request:
+        {"bad request", "application/json", BuildelWeb.Schemas.Errors.BadRequestResponse}
+    ]
 
-  def input(conn, params) do
+  def input(conn, _params) do
+    %{
+      block_name: block_name,
+      input_name: input_name,
+      data: data
+    } = conn.body_params
+
+    %{
+      organization_id: organization_id,
+      pipeline_id: pipeline_id,
+      id: id
+    } = conn.params
+
     user = conn.assigns.current_user
 
-    with {:ok,
-          %{
-            organization_id: organization_id,
-            pipeline_id: pipeline_id,
-            id: id,
-            block_name: block_name,
-            input_name: input_name,
-            data: data
-          }} <- validate(:input, params),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_running_pipeline_run(pipeline, id),

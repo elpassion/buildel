@@ -1,6 +1,22 @@
 defmodule BuildelWeb.Schemas.Errors do
   alias OpenApiSpex.Schema
 
+  defmodule BadRequestResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      type: :object,
+      properties: %{
+        errors: %Schema{
+          type: :object,
+          properties: %{
+            detail: %Schema{type: :string, description: "Error message", enum: ["Bad Request"]}
+          }
+        }
+      }
+    })
+  end
+
   defmodule NotFoundResponse do
     require OpenApiSpex
 

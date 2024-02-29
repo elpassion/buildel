@@ -7,7 +7,10 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
   alias Buildel.Organizations
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok,
+     conn:
+       put_req_header(conn, "accept", "application/json")
+       |> put_req_header("content-type", "application/json")}
   end
 
   setup [
@@ -19,10 +22,8 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
   ]
 
   describe "index" do
-    test "requires authentication", %{conn: conn, organization: organization, pipeline: pipeline} do
-      conn = conn |> log_out_user()
-      conn = get(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization, pipeline: pipeline} do
+      get(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
     end
 
     test "does not allow access to other organizations", %{
@@ -40,23 +41,34 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
     test "lists all organization pipeline runs", %{
       conn: conn,
       organization: organization,
-      pipeline: pipeline
+      pipeline: pipeline,
+      api_spec: api_spec
     } do
       conn = get(conn, ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/runs")
-      assert [_] = json_response(conn, 200)["data"]
+
+      response = json_response(conn, 200)
+      assert [_] = response["data"]
+
+      assert_schema(response, "RunIndexResponse", api_spec)
     end
   end
 
   describe "show" do
-    test "requires authentication", %{
+    test_requires_authentication %{
       conn: conn,
       organization: organization,
       pipeline: pipeline,
       run: run
     } do
-      conn = conn |> log_out_user()
-      conn = get(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}")
-      assert json_response(conn, 401)["errors"] != %{}
+      get(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}")
+    end
+
+    test_not_found %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline
+    } do
+      get(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/123")
     end
 
     test "does not allow access to other organizations", %{
@@ -79,18 +91,19 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       conn: conn,
       organization: organization,
       pipeline: pipeline,
-      run: run
+      run: run,
+      api_spec: api_spec
     } do
       conn = get(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}")
-      assert json_response(conn, 200)["data"]["id"] == run.id
+      response = json_response(conn, 200)
+      assert response["data"]["id"] == run.id
+      assert_schema(response, "RunShowResponse", api_spec)
     end
   end
 
   describe "create" do
-    test "requires authentication", %{conn: conn, organization: organization, pipeline: pipeline} do
-      conn = conn |> log_out_user()
-      conn = post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization, pipeline: pipeline} do
+      post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
     end
 
     test "does not allow access to other organizations", %{
@@ -108,21 +121,27 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
     test "creates run with latest alias by default", %{
       conn: conn,
       organization: organization,
-      pipeline: pipeline
+      pipeline: pipeline,
+      api_spec: api_spec
     } do
       conn = post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
       blocks = pipeline.config["blocks"]
 
+      response = json_response(conn, 200)
+
       assert %{
                "status" => "created",
                "config" => %{"metadata" => %{}, "blocks" => ^blocks}
-             } = json_response(conn, 200)["data"]
+             } = response["data"]
+
+      assert_schema(response, "RunShowResponse", api_spec)
     end
 
     test "saves metadata", %{
       conn: conn,
       organization: organization,
-      pipeline: pipeline
+      pipeline: pipeline,
+      api_spec: api_spec
     } do
       conn =
         post(
@@ -131,17 +150,22 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
           %{"metadata" => %{"key" => "value"}}
         )
 
+      response = json_response(conn, 200)
+
       assert %{
                "status" => "created",
                "config" => %{"metadata" => %{"key" => "value"}}
-             } = json_response(conn, 200)["data"]
+             } = response["data"]
+
+      assert_schema(response, "RunShowResponse", api_spec)
     end
 
     test "creates run with specific alias", %{
       conn: conn,
       organization: organization,
       pipeline: pipeline,
-      alias: %{config: config, id: id}
+      alias: %{config: config, id: id},
+      api_spec: api_spec
     } do
       conn =
         post(
@@ -152,26 +176,25 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
 
       blocks = config["blocks"]
 
+      response = json_response(conn, 200)
+
       assert %{
                "status" => "created",
                "config" => %{"metadata" => %{}, "blocks" => ^blocks}
-             } = json_response(conn, 200)["data"]
+             } = response["data"]
+
+      assert_schema(response, "RunShowResponse", api_spec)
     end
   end
 
   describe "start" do
-    test "requires authentication", %{
+    test_requires_authentication %{
       conn: conn,
       organization: organization,
       pipeline: pipeline,
       run: run
     } do
-      conn = conn |> log_out_user()
-
-      conn =
-        post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/start")
-
-      assert json_response(conn, 401)["errors"] != %{}
+      post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/start")
     end
 
     test "does not allow access to other organizations", %{
@@ -194,28 +217,26 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       conn: conn,
       organization: organization,
       pipeline: pipeline,
-      run: run
+      run: run,
+      api_spec: api_spec
     } do
       conn =
         post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/start")
 
-      assert json_response(conn, 200)["data"]["status"] == "running"
+      response = json_response(conn, 200)
+      assert response["data"]["status"] == "running"
+      assert_schema(response, "RunShowResponse", api_spec)
     end
   end
 
   describe "stop" do
-    test "requires authentication", %{
+    test_requires_authentication %{
       conn: conn,
       organization: organization,
       pipeline: pipeline,
       run: run
     } do
-      conn = conn |> log_out_user()
-
-      conn =
-        post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/stop")
-
-      assert json_response(conn, 401)["errors"] != %{}
+      post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/stop")
     end
 
     test "does not allow access to other organizations", %{
@@ -238,36 +259,34 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       conn: conn,
       organization: organization,
       pipeline: pipeline,
-      run: run
+      run: run,
+      api_spec: api_spec
     } do
       conn =
         post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/stop")
 
-      assert json_response(conn, 200)["data"]["status"] == "finished"
+      response = json_response(conn, 200)
+      assert response["data"]["status"] == "finished"
+      assert_schema(response, "RunShowResponse", api_spec)
     end
   end
 
   describe "input" do
-    test "requires authentication", %{
+    test_requires_authentication %{
       conn: conn,
       organization: organization,
       pipeline: pipeline,
       run: run
     } do
-      conn = conn |> log_out_user()
-
-      conn =
-        post(
-          conn,
-          ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/input",
-          %{
-            "block_name" => "block",
-            "input_name" => "input",
-            "data" => "data"
-          }
-        )
-
-      assert json_response(conn, 401)["errors"] != %{}
+      post(
+        conn,
+        ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/input",
+        %{
+          "block_name" => "block",
+          "input_name" => "input",
+          "data" => "data"
+        }
+      )
     end
 
     test "does not allow access to other organizations", %{
@@ -331,7 +350,8 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       conn: conn,
       organization: organization,
       pipeline: pipeline,
-      run: run
+      run: run,
+      api_spec: api_spec
     } do
       start_run(%{run: run})
 
@@ -346,7 +366,9 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
           }
         )
 
-      assert json_response(conn, 200)["data"]["status"] == "running"
+      response = json_response(conn, 200)
+      assert response["data"]["status"] == "running"
+      assert_schema(response, "RunShowResponse", api_spec)
     end
   end
 
