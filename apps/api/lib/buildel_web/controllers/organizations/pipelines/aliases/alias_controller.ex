@@ -1,6 +1,6 @@
 defmodule BuildelWeb.OrganizationPipelineAliasController do
   use BuildelWeb, :controller
-  use BuildelWeb.Validator
+  use OpenApiSpex.ControllerSpecs
 
   import BuildelWeb.UserAuth
 
@@ -14,7 +14,36 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
-  def index(conn, %{"organization_id" => organization_id, "pipeline_id" => pipeline_id}) do
+  plug OpenApiSpex.Plug.CastAndValidate,
+    json_render_error_v2: true,
+    render_error: BuildelWeb.ErrorRendererPlug
+
+  tags ["alias"]
+
+  operation :index,
+    summary: "List pipeline aliases",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Aliases.IndexResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ]
+
+  def index(conn, _params) do
+    %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
@@ -24,7 +53,37 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
     end
   end
 
-  def show(conn, %{"organization_id" => organization_id, "pipeline_id" => pipeline_id, "id" => id}) do
+  operation :show,
+    summary: "Show pipeline alias",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      id: [in: :path, description: "Alias ID", type: :string, required: true]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Aliases.ShowResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      not_found: {"not found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
+    ]
+
+  def show(conn, _params) do
+    %{
+      organization_id: organization_id,
+      pipeline_id: pipeline_id,
+      id: id
+    } = conn.params
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
@@ -34,20 +93,40 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
     end
   end
 
-  defparams(:create) do
-    required(:alias, :map) do
-      required(:name, :string)
-      required(:config, :map)
-      required(:interface_config, :map)
-    end
-  end
+  operation :create,
+    summary: "Create pipeline alias",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true]
+    ],
+    request_body: {"Alias", "application/json", BuildelWeb.Schemas.Aliases.CreateRequest},
+    responses: [
+      created: {"created", "application/json", BuildelWeb.Schemas.Aliases.ShowResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      not_found: {"not found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
+    ]
 
-  def create(conn, %{"organization_id" => organization_id, "pipeline_id" => pipeline_id} = params) do
+  def create(conn, _params) do
+    %{alias: alias_config} = conn.body_params
+
+    %{
+      organization_id: organization_id,
+      pipeline_id: pipeline_id
+    } = conn.params
+
     user = conn.assigns.current_user
 
-    with {:ok, %{alias: alias_config}} <-
-           validate(:create, params),
-         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = _pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, %Alias{} = alias} <-
@@ -58,24 +137,44 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
     end
   end
 
-  defparams(:update) do
-    required(:alias, :map) do
-      optional(:name, :string)
-      optional(:config, :map)
-      optional(:interface_config, :map)
-    end
-  end
+  operation :update,
+    summary: "Update pipeline alias",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      id: [in: :path, description: "Alias ID", type: :string, required: true]
+    ],
+    request_body: {"Alias", "application/json", BuildelWeb.Schemas.Aliases.UpdateRequest},
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Aliases.ShowResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      not_found: {"not found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
+    ]
 
-  def update(
-        conn,
-        %{"organization_id" => organization_id, "pipeline_id" => pipeline_id, "id" => id} = params
-      ) do
+  def update(conn, _params) do
+    %{alias: alias_config} = conn.body_params
+
+    %{
+      organization_id: organization_id,
+      pipeline_id: pipeline_id,
+      id: id
+    } = conn.params
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, pipeline} <- Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, alias} <- Pipelines.get_pipeline_alias(pipeline, id),
-         {:ok, %{alias: alias_config}} <- validate(:update, params),
          {:ok, alias} <- Pipelines.update_alias(alias, alias_config) do
       conn
       |> put_status(:ok)
@@ -83,11 +182,37 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
     end
   end
 
-  def delete(conn, %{
-        "organization_id" => organization_id,
-        "pipeline_id" => pipeline_id,
-        "id" => id
-      }) do
+  operation :delete,
+    summary: "Delete pipeline alias",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      id: [in: :path, description: "Alias ID", type: :string, required: true]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Aliases.ShowResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      not_found: {"not found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
+    ]
+
+  def delete(conn, _params) do
+    %{
+      organization_id: organization_id,
+      pipeline_id: pipeline_id,
+      id: id
+    } = conn.params
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),

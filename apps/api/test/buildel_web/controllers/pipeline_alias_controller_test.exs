@@ -7,7 +7,10 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
   alias Buildel.Pipelines.{Alias}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok,
+     conn:
+       put_req_header(conn, "accept", "application/json")
+       |> put_req_header("content-type", "application/json")}
   end
 
   setup [
@@ -18,12 +21,8 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
   ]
 
   describe "index" do
-    test "requires authentication", %{conn: conn, organization: organization, pipeline: pipeline} do
-      conn = conn |> log_out_user()
-      organization_id = organization.id
-      pipeline_id = pipeline.id
-      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines/#{pipeline_id}/aliases")
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization, pipeline: pipeline} do
+      get(conn, ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/aliases")
     end
 
     test "returns 404 when pipeline does not exist", %{conn: conn, organization: organization} do
@@ -35,7 +34,8 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
       conn: conn,
       organization: organization,
       pipeline: pipeline,
-      alias: %{id: alias_id, name: alias_name, config: alias_config}
+      alias: %{id: alias_id, name: alias_name, config: alias_config},
+      api_spec: api_spec
     } do
       organization_id = organization.id
       pipeline_id = pipeline.id
@@ -44,6 +44,8 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
         pipeline
 
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines/#{pipeline_id}/aliases")
+
+      response = json_response(conn, 200)
 
       assert [
                %{
@@ -58,28 +60,89 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
                  "interface_config" => %{},
                  "name" => ^alias_name
                }
-             ] = json_response(conn, 200)["data"]
+             ] = response["data"]
+
+      assert_schema(response, "AliasIndexResponse", api_spec)
+    end
+  end
+
+  describe "show" do
+    test_requires_authentication %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      alias: alias
+    } do
+      get(
+        conn,
+        ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/aliases/#{alias.id}"
+      )
+    end
+
+    test "returns 404 when pipeline does not exist", %{
+      conn: conn,
+      organization: organization
+    } do
+      conn =
+        get(conn, ~p"/api/organizations/#{organization.id}/pipelines/420/aliases/123")
+
+      assert json_response(conn, 404)
+    end
+
+    test "returns 404 when alias does not exist", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline
+    } do
+      conn =
+        get(conn, ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/aliases/69")
+
+      assert json_response(conn, 404)
+    end
+
+    test "shows pipeline alias", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      alias: %{id: alias_id, name: alias_name, config: alias_config},
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      pipeline_id = pipeline.id
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization_id}/pipelines/#{pipeline_id}/aliases/#{alias_id}"
+        )
+
+      response = json_response(conn, 200)
+
+      assert %{
+               "config" => ^alias_config,
+               "id" => ^alias_id,
+               "interface_config" => %{},
+               "name" => ^alias_name
+             } = response["data"]
+
+      assert_schema(response, "AliasShowResponse", api_spec)
     end
   end
 
   describe "create alias" do
-    test "requires authentication", %{conn: conn, organization: organization, pipeline: pipeline} do
-      conn = conn |> log_out_user()
-
-      conn =
-        post(
-          conn,
-          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/aliases",
-          %{}
-        )
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization, pipeline: pipeline} do
+      post(
+        conn,
+        ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/aliases",
+        %{}
+      )
     end
 
     test "renders alias when data is valid", %{
       conn: conn,
       organization: organization,
-      pipeline: pipeline
+      pipeline: pipeline,
+      api_spec: api_spec
     } do
       organization_id = organization.id
 
@@ -96,7 +159,9 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
           }
         )
 
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      response = json_response(conn, 201)
+      assert %{"id" => id} = response["data"]
+      assert_schema(response, "AliasShowResponse", api_spec)
 
       conn =
         get(
@@ -132,23 +197,19 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
   describe "update alias" do
     setup [:create_pipeline, :create_pipeline_alias]
 
-    test "requires authentication", %{conn: conn, pipeline: pipeline, alias: alias} do
-      conn = conn |> log_out_user()
-
-      conn =
-        put(
-          conn,
-          ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}/aliases/#{alias}",
-          alias: %{"name" => "some updated name"}
-        )
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, pipeline: pipeline, alias: alias} do
+      put(
+        conn,
+        ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}/aliases/#{alias}",
+        alias: %{"name" => "some updated name"}
+      )
     end
 
     test "renders pipeline when data is valid", %{
       conn: conn,
       pipeline: pipeline,
-      alias: %Alias{id: id} = alias
+      alias: %Alias{id: id} = alias,
+      api_spec: api_spec
     } do
       conn =
         put(
@@ -157,7 +218,9 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
           alias: %{"name" => "some updated name"}
         )
 
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+      response = json_response(conn, 200)
+      assert %{"id" => ^id} = response["data"]
+      assert_schema(response, "AliasShowResponse", api_spec)
 
       conn =
         get(
@@ -186,26 +249,28 @@ defmodule BuildelWeb.OrganizationPipelineAliasControllerTest do
   describe "delete alias" do
     setup [:create_pipeline, :create_pipeline_alias]
 
-    test "requires authentication", %{conn: conn, pipeline: pipeline, alias: alias} do
-      conn = conn |> log_out_user()
-
-      conn =
-        delete(
-          conn,
-          ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}/aliases/#{alias}"
-        )
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, pipeline: pipeline, alias: alias} do
+      delete(
+        conn,
+        ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}/aliases/#{alias}"
+      )
     end
 
-    test "deletes chosen alias", %{conn: conn, pipeline: pipeline, alias: alias} do
+    test "deletes chosen alias", %{
+      conn: conn,
+      pipeline: pipeline,
+      alias: alias,
+      api_spec: api_spec
+    } do
       conn =
         delete(
           conn,
           ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}/aliases/#{alias}"
         )
 
-      assert response(conn, 200)
+      response = json_response(conn, 200)
+      assert response
+      assert_schema(response, "AliasShowResponse", api_spec)
 
       conn =
         get(
