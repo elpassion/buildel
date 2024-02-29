@@ -17,47 +17,92 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
   @invalid_attrs %{name: nil, config: nil}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok,
+     conn:
+       put_req_header(conn, "accept", "application/json")
+       |> put_req_header("content-type", "application/json")}
   end
 
   setup [:register_and_log_in_user, :create_user_organization]
 
   describe "index" do
-    test "requires authentication", %{conn: conn, organization: organization} do
-      conn = conn |> log_out_user()
-      organization_id = organization.id
-      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines")
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization} do
+      get(conn, ~p"/api/organizations/#{organization.id}/pipelines")
     end
 
-    test "lists all organization pipelines", %{conn: conn, organization: organization} do
+    test "requires organization membership", %{conn: conn} do
+      another_organization = organization_fixture()
+      conn = get(conn, ~p"/api/organizations/#{another_organization.id}/pipelines")
+      assert json_response(conn, 404)
+    end
+
+    test "empty list if no pipelines", %{conn: conn, organization: organization} do
       organization_id = organization.id
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines")
       assert json_response(conn, 200)["data"] == []
     end
+
+    test "lists all organization pipelines", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      pipeline_fixture(%{organization_id: organization_id})
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines")
+      response = json_response(conn, 200)
+      assert_schema(response, "PipelineIndexResponse", api_spec)
+    end
+  end
+
+  describe "show" do
+    setup [:create_pipeline]
+
+    test_requires_authentication %{conn: conn, organization: organization, pipeline: pipeline} do
+      get(conn, ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}")
+    end
+
+    test "Returns 404 when pipeline does not exist", %{
+      conn: conn,
+      organization: organization
+    } do
+      conn = get(conn, ~p"/api/organizations/#{organization.id}/pipelines/123123")
+
+      assert json_response(conn, 404)
+    end
+
+    test "Shows organization pipeline", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines/#{pipeline.id}")
+      response = json_response(conn, 200)
+      assert response["data"] != %{}
+      assert_schema(response, "PipelineShowResponse", api_spec)
+    end
   end
 
   describe "create pipeline" do
-    test "requires authentication", %{conn: conn, organization: organization} do
-      conn = conn |> log_out_user()
-
-      conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/pipelines",
-          pipeline: @create_attrs |> Enum.into(%{organization_id: organization.id})
-        )
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization} do
+      post(conn, ~p"/api/organizations/#{organization.id}/pipelines", pipeline: @create_attrs)
     end
 
-    test "renders pipeline when data is valid", %{conn: conn, organization: organization} do
+    test "renders pipeline when data is valid", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
       organization_id = organization.id
 
       conn =
-        post(conn, ~p"/api/organizations/#{organization_id}/pipelines",
-          pipeline: @create_attrs |> Enum.into(%{organization_id: organization_id})
-        )
+        post(conn, ~p"/api/organizations/#{organization_id}/pipelines", pipeline: @create_attrs)
 
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      response = json_response(conn, 201)
+      assert %{"id" => id} = response["data"]
+      assert_schema(response, "PipelineShowResponse", api_spec)
 
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines/#{id}")
 
@@ -82,27 +127,26 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
   describe "update pipeline" do
     setup [:create_pipeline]
 
-    test "requires authentication", %{conn: conn, pipeline: %Pipeline{id: _id} = pipeline} do
-      conn = conn |> log_out_user()
-
-      conn =
-        put(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}",
-          pipeline: @update_attrs
-        )
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, pipeline: %Pipeline{id: _id} = pipeline} do
+      put(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}",
+        pipeline: @update_attrs
+      )
     end
 
     test "renders pipeline when data is valid", %{
       conn: conn,
-      pipeline: %Pipeline{id: id} = pipeline
+      pipeline: %Pipeline{id: id} = pipeline,
+      api_spec: api_spec
     } do
       conn =
         put(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{pipeline}",
           pipeline: @update_attrs
         )
 
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+      response = json_response(conn, 200)
+
+      assert %{"id" => ^id} = response["data"]
+      assert_schema(response, "PipelineShowResponse", api_spec)
 
       conn = get(conn, ~p"/api/organizations/#{pipeline.organization_id}/pipelines/#{id}")
 
