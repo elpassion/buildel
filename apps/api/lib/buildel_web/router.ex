@@ -57,7 +57,19 @@ defmodule BuildelWeb.Router do
     get("/block_types/overviews", BlockTypesController, :overviews)
 
     resources("/organizations/:organization_id/pipelines", OrganizationPipelineController,
-      only: [:index, :delete, :create, :update]
+      only: [:index, :create]
+    )
+
+    delete(
+      "/organizations/:organization_id/pipelines/:pipeline_id",
+      OrganizationPipelineController,
+      :delete
+    )
+
+    put(
+      "/organizations/:organization_id/pipelines/:pipeline_id",
+      OrganizationPipelineController,
+      :update
     )
 
     get(

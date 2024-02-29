@@ -8,11 +8,9 @@ defmodule BuildelWeb.Schemas.Pipelines do
       title: "PipelineConfig",
       type: :object,
       properties: %{
-        # todo add block type
-        blocks: %Schema{type: :array, description: "Blocks list", items: %Schema{type: :object}},
-        version: %Schema{type: :string, description: "Pipeline config version"}
+        blocks: %Schema{type: :array, description: "Blocks list", items: %Schema{type: :object}}
       },
-      required: [:blocks, :version]
+      required: [:blocks]
     })
   end
 
@@ -26,7 +24,7 @@ defmodule BuildelWeb.Schemas.Pipelines do
         id: %Schema{type: :integer, description: "Pipeline ID"},
         name: %Schema{type: :string, description: "Pipeline name"},
         organization_id: %Schema{type: :integer, description: "Organization ID"},
-        interface_config: %Schema{type: :object, description: "Interface config"},
+        interface_config: %Schema{type: :object, description: "Interface config", nullable: true},
         runs_count: %Schema{type: :integer, description: "Runs count"},
         config: PipelineConfig
       },
@@ -74,11 +72,24 @@ defmodule BuildelWeb.Schemas.Pipelines do
           type: :object,
           properties: %{
             name: %Schema{type: :string, description: "Pipeline name"},
-            config: %Schema{type: :object, description: "Pipeline config"},
-            # not sure if required here
-            organization_id: %Schema{type: :integer, description: "Organization ID"}
+            config: %Schema{type: :object, description: "Pipeline config"}
           },
           required: [:name, :config]
+        }
+      },
+      required: [:pipeline]
+    })
+  end
+
+  defmodule UpdatePipelineRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "PipelineUpdateRequest",
+      type: :object,
+      properties: %{
+        pipeline: %Schema{
+          type: :object
         }
       },
       required: [:pipeline]
