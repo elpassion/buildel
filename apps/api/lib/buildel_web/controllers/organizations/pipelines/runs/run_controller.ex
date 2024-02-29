@@ -47,8 +47,6 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
     pagination_params = conn.params |> Map.take([:page, :per_page])
 
-    IO.inspect(conn.params)
-    IO.inspect(pagination_params)
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
