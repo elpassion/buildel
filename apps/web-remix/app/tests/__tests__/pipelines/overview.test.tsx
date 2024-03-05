@@ -1,6 +1,7 @@
 import React from "react";
 import { test, describe, expect } from "vitest";
 import {
+  actionWithSession,
   loaderWithSession,
   RoutesProps,
   setupRoutes,
@@ -13,6 +14,9 @@ import { PipelineRunOverview } from "~/components/pages/pipelines/runOverview/pa
 import { loader as runOverviewLoader } from "~/components/pages/pipelines/runOverview/loader.server";
 import { PipelineRunCosts } from "~/components/pages/pipelines/runCosts/page";
 import { loader as runCostsLoader } from "~/components/pages/pipelines/runCosts/loader.server";
+import { PipelineRunLayout } from "~/components/pages/pipelines/runLayout/page";
+import { loader as runLayoutLoader } from "~/components/pages/pipelines/runLayout/loader.server";
+import { action as buildAction } from "~/components/pages/pipelines/build/action.server";
 import { ListHandle } from "~/tests/handles/List.handle";
 import { RunHandlers } from "~/tests/handlers/run.handlers";
 import { runFixture } from "~/tests/fixtures/run.fixtures";
@@ -20,6 +24,8 @@ import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
 import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
 import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
 import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { WebSocketServerMock } from "~/tests/WebSocketServerMock";
 
 const handlers = () => [
   ...blockTypesHandlers(),
@@ -29,6 +35,7 @@ const handlers = () => [
 ];
 
 describe("Workflow overview", () => {
+  const wsServer = new WebSocketServerMock();
   const setupServer = server(handlers());
 
   beforeAll(() => setupServer.listen());
@@ -126,6 +133,21 @@ describe("Workflow overview", () => {
 
     await screen.findByText(/There is no costs yet/i);
   });
+
+  test("should restore run configuration", async () => {
+    new OverviewObject().render({
+      initialEntries: ["/2/pipelines/2/runs/1"],
+    });
+
+    const convertButton = await ButtonHandle.fromRole("Convert as latest");
+
+    await convertButton.click();
+
+    const confirmButton = await ButtonHandle.fromRole("Restore Run");
+    await confirmButton.click();
+
+    await screen.findByText(/build/i);
+  });
 });
 
 class OverviewObject {
@@ -136,19 +158,30 @@ class OverviewObject {
         ErrorBoundary: RootErrorBoundary,
         children: [
           {
+            path: "/:organizationId/pipelines/:pipelineId/build",
+            Component: () => <p>build</p>,
+            action: actionWithSession(buildAction),
+          },
+          {
             path: "/:organizationId/pipelines/:pipelineId/runs",
             Component: OverviewPage,
             loader: loaderWithSession(overviewLoader),
           },
           {
-            path: "/:organizationId/pipelines/:pipelineId/runs/:runId",
-            Component: PipelineRunOverview,
-            loader: loaderWithSession(runOverviewLoader),
-          },
-          {
-            path: "/:organizationId/pipelines/:pipelineId/runs/:runId/costs",
-            Component: PipelineRunCosts,
-            loader: loaderWithSession(runCostsLoader),
+            Component: PipelineRunLayout,
+            loader: loaderWithSession(runLayoutLoader),
+            children: [
+              {
+                path: "/:organizationId/pipelines/:pipelineId/runs/:runId",
+                Component: PipelineRunOverview,
+                loader: loaderWithSession(runOverviewLoader),
+              },
+              {
+                path: "/:organizationId/pipelines/:pipelineId/runs/:runId/costs",
+                Component: PipelineRunCosts,
+                loader: loaderWithSession(runCostsLoader),
+              },
+            ],
           },
         ],
       },
