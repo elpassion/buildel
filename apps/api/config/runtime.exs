@@ -64,7 +64,9 @@ if config_env() == :prod do
     username: System.get_env("BASIC_AUTH_USERNAME"),
     password: System.get_env("BASIC_AUTH_PASSWORD")
 
-  config :buildel, :nlm_api_url, System.get_env("NLM_API_URL")
+  config :buildel,
+         :nlm_api_url,
+         System.get_env("NLM_API_URL", "https://buildel-nlm-ingestor.fly.dev")
 
   config :buildel, :page_url, System.get_env("PAGE_URL")
 
