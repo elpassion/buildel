@@ -10,17 +10,17 @@ import { server } from "~/tests/server.mock";
 import { PipelineBuilder } from "~/components/pages/pipelines/build/page";
 import { loader as builderLoader } from "~/components/pages/pipelines/build/loader.server";
 import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
-import {
-  pipelineFixture,
-  simplePipelineFixture,
-} from "~/tests/fixtures/pipeline.fixtures";
 import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
 import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { TextareaHandle } from "~/tests/handles/Textarea.handle";
 import { WebSocketServerMock } from "~/tests/WebSocketServerMock";
-import { runHandlers } from "~/tests/__tests__/pipelines/pipeline-run.handlers";
 import { BlockHandle } from "~/tests/handles/Block.handle";
+import {
+  pipelineFixture,
+  simplePipelineFixture,
+} from "~/tests/fixtures/pipeline.fixtures";
+import { runHandlers } from "./pipeline-run.handlers";
 
 const handlers = () => [
   ...runHandlers(),
@@ -106,7 +106,7 @@ describe("Pipeline workflow run", () => {
     await screen.findByText(/Required/i);
   });
 
-  test("should toggle block active", async () => {
+  test("should toggle block activeness", async () => {
     const page = new PipelineRunObject().render({
       initialEntries: ["/1/pipelines/1/build"],
     });
@@ -139,6 +139,34 @@ describe("Pipeline workflow run", () => {
     });
 
     expect(textOutputBlock.isActive).toBe(false);
+  });
+
+  test("should display Block Run errors", async () => {
+    const page = new PipelineRunObject().render({
+      initialEntries: ["/1/pipelines/1/build"],
+    });
+
+    const startButton = await page.startWorkflowButton();
+    await startButton.click();
+
+    const textOutputBlock = await BlockHandle.fromLabelText(
+      "Block: text_output_1"
+    );
+
+    expect(textOutputBlock.isValid).toBe(true);
+
+    await act(async () => {
+      wsServer.send({
+        topicName: "pipelines:1:1",
+        eventName: "error:text_output_1",
+        payload: {
+          errors: ["Ups! Block error occurred"],
+        },
+      });
+    });
+
+    expect(textOutputBlock.isValid).toBe(false);
+    await screen.findByText(/The workflow run failed due to an error/i);
   });
 });
 

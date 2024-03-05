@@ -14,4 +14,8 @@ export class BlockHandle {
   get isActive(): boolean {
     return this.blockElement.getAttribute("data-active") === "true";
   }
+
+  get isValid(): boolean {
+    return this.blockElement.getAttribute("data-valid") === "true";
+  }
 }
