@@ -35,7 +35,9 @@ export function CustomNode({
   return (
     <>
       <section
+        aria-label={`Block: ${data.name}`}
         data-testid="builder-block"
+        data-active={status}
         className={classNames(
           "min-h-[100px] min-w-[250px] max-w-[500px] break-words rounded bg-neutral-800 drop-shadow-sm transition border nowheel",
           borderStyles(),

@@ -20,6 +20,7 @@ import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { TextareaHandle } from "~/tests/handles/Textarea.handle";
 import { WebSocketServerMock } from "~/tests/WebSocketServerMock";
 import { runHandlers } from "~/tests/__tests__/pipelines/pipeline-run.handlers";
+import { BlockHandle } from "~/tests/handles/Block.handle";
 
 const handlers = () => [
   ...runHandlers(),
@@ -103,6 +104,41 @@ describe("Pipeline workflow run", () => {
 
     await screen.findByText(/Invalid workflow/i);
     await screen.findByText(/Required/i);
+  });
+
+  test("should toggle block active", async () => {
+    const page = new PipelineRunObject().render({
+      initialEntries: ["/1/pipelines/1/build"],
+    });
+
+    const startButton = await page.startWorkflowButton();
+    await startButton.click();
+
+    const textOutputBlock = await BlockHandle.fromLabelText(
+      "Block: text_output_1"
+    );
+
+    expect(textOutputBlock.isActive).toBe(false);
+
+    await act(async () => {
+      wsServer.send({
+        topicName: "pipelines:1:1",
+        eventName: "start:text_output_1",
+        payload: {},
+      });
+    });
+
+    expect(textOutputBlock.isActive).toBe(true);
+
+    await act(async () => {
+      wsServer.send({
+        topicName: "pipelines:1:1",
+        eventName: "stop:text_output_1",
+        payload: {},
+      });
+    });
+
+    expect(textOutputBlock.isActive).toBe(false);
   });
 });
 
