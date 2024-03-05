@@ -1,17 +1,56 @@
-import React from "react";
-import { Icon } from "@elpassion/taco";
-import { Link, Outlet, useLoaderData, useSearchParams } from "@remix-run/react";
+import React, { useEffect } from "react";
+import { Button, Icon } from "@elpassion/taco";
+import {
+  Link,
+  Outlet,
+  useFetcher,
+  useLoaderData,
+  useNavigate,
+  useSearchParams,
+} from "@remix-run/react";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { routes } from "~/utils/routes.utils";
 import { TabGroup } from "~/components/tabs/TabGroup";
 import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
 import { FilledTabLink } from "~/components/tabs/FilledTabLink";
 import { loader } from "./loader.server";
+import { confirm } from "~/components/modal/confirm";
+import { successToast } from "~/components/toasts/successToast";
 
 export function PipelineRunLayout() {
+  const navigate = useNavigate();
+  const fetcher = useFetcher();
   const [searchParams] = useSearchParams();
-  const { pipeline, runId, pipelineId, organizationId } =
+  const { pipeline, pipelineRun, runId, pipelineId, organizationId } =
     useLoaderData<typeof loader>();
+
+  const handleRestoreRun = () => {
+    confirm({
+      onConfirm: async () =>
+        fetcher.submit(
+          { ...pipeline, config: { ...pipelineRun.config } },
+          {
+            method: "PUT",
+            encType: "application/json",
+            action: routes.pipelineBuild(organizationId, pipelineId) + "?index",
+          }
+        ),
+      confirmText: "Restore Run",
+      children: (
+        <p className="text-neutral-100 text-sm">
+          You are about to restore pipeline run configuration. This action is
+          irreversible.
+        </p>
+      ),
+    });
+  };
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      successToast({ description: "Configuration restored!" });
+      navigate(routes.pipelineBuild(organizationId, pipelineId));
+    }
+  }, [fetcher]);
 
   return (
     <div>
@@ -22,7 +61,7 @@ export function PipelineRunLayout() {
               to={routes.pipelineRuns(
                 organizationId,
                 pipelineId,
-                Object.fromEntries(searchParams.entries()),
+                Object.fromEntries(searchParams.entries())
               )}
             >
               <Icon iconName="arrow-left" className="text-2xl" />
@@ -37,29 +76,40 @@ export function PipelineRunLayout() {
 
       <div className="px-4 md:px-6 lg:px-10">
         <TabGroup>
-          <FilledTabsWrapper>
-            <FilledTabLink
-              end
-              to={routes.pipelineRun(
-                organizationId,
-                pipelineId,
-                runId,
-                Object.fromEntries(searchParams.entries()),
-              )}
+          <div className="flex justify-between items-center">
+            <FilledTabsWrapper>
+              <FilledTabLink
+                end
+                to={routes.pipelineRun(
+                  organizationId,
+                  pipelineId,
+                  runId,
+                  Object.fromEntries(searchParams.entries())
+                )}
+              >
+                Overview
+              </FilledTabLink>
+              <FilledTabLink
+                to={routes.pipelineRunCosts(
+                  organizationId,
+                  pipelineId,
+                  runId,
+                  Object.fromEntries(searchParams.entries())
+                )}
+              >
+                Costs details
+              </FilledTabLink>
+            </FilledTabsWrapper>
+
+            <Button
+              size="xs"
+              hierarchy="primary"
+              variant="outlined"
+              onClick={handleRestoreRun}
             >
-              Overview
-            </FilledTabLink>
-            <FilledTabLink
-              to={routes.pipelineRunCosts(
-                organizationId,
-                pipelineId,
-                runId,
-                Object.fromEntries(searchParams.entries()),
-              )}
-            >
-              Costs details
-            </FilledTabLink>
-          </FilledTabsWrapper>
+              Convert as latest
+            </Button>
+          </div>
 
           <Outlet />
         </TabGroup>
