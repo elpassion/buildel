@@ -10,7 +10,10 @@ import { server } from "~/tests/server.mock";
 import { PipelineBuilder } from "~/components/pages/pipelines/build/page";
 import { loader as builderLoader } from "~/components/pages/pipelines/build/loader.server";
 import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
-import { simplePipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
+import {
+  pipelineFixture,
+  simplePipelineFixture,
+} from "~/tests/fixtures/pipeline.fixtures";
 import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
 import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
@@ -87,6 +90,19 @@ describe("Pipeline workflow run", () => {
     });
 
     await screen.findByText("Hey HO");
+  });
+
+  test("should display error when workflow is invalid", async () => {
+    setupServer.use(...new PipelineHandlers([pipelineFixture()]).handlers);
+    const page = new PipelineRunObject().render({
+      initialEntries: ["/1/pipelines/1/build"],
+    });
+
+    const startButton = await page.startWorkflowButton();
+    await startButton.click();
+
+    await screen.findByText(/Invalid workflow/i);
+    await screen.findByText(/Required/i);
   });
 });
 
