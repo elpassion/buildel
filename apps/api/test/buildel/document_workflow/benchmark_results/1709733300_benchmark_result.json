@@ -1,0 +1,42 @@
+[
+    [
+        {
+            "index": 2,
+            "chunk": "Przychody przyszłych okresów",
+            "result": {
+                "chunk_id": "60861da2-9762-46f5-bc15-62aa89d329f2",
+                "document": " I. Rozliczenia międzyokresowe 1. Rozliczenia międzyokresowe kosztów 2. Ujemna wartość firmy 3. Przychody przyszłych okresów Pasywa razem Pozycje pozabilansowe 1. Należności warunkowe, w tym: 1.1. otrzymane gwarancje i poręczenia 1.2. pozostałe 2. Zobowiązania warunkowe, w tym: 2.1. udzielone poręczenia i gwarancje 2.2. weksle akceptowane i indosowane 2.3. aktywa z zobowiązaniem odsprzedaży 2.4. inne zobowiązania zabezpieczone na aktywach lub na przychodach 3. Zabezpieczenia z tytułu reasekuracji ustanowione na rzecz zakładu ubezpieczeń 4. Zabezpieczenia z tytułu reasekuracji ustanowione przez zakład ubezpieczeń na rzecz cedentów 5. Obce składniki aktywów nieujęte w aktywach Techniczny rachunek ubezpieczeń majątkowych i osobowych I. Składki (1-2-3+4) 1. Składki przypisane brutto 2. Udział reasekuratorów w składce przypisanej 3. Zmiana stanu rezerw składek i rezerwy na ryzyko niewygasłe brutto 4. Udział reasekuratorów w zmianie stanu rezerw składek II. Przychody z lokat netto po uwzględnieniu kosztów, przeniesione z ogólnego rachunku zysków i strat",
+                "metadata": {
+                    "chunk_id": "60861da2-9762-46f5-bc15-62aa89d329f2"
+                }
+            }
+        },
+        {
+            "index": 2,
+            "chunk": "Pasywa",
+            "result": {
+                "chunk_id": "60861da2-9762-46f5-bc15-62aa89d329f2",
+                "document": " I. Rozliczenia międzyokresowe 1. Rozliczenia międzyokresowe kosztów 2. Ujemna wartość firmy 3. Przychody przyszłych okresów Pasywa razem Pozycje pozabilansowe 1. Należności warunkowe, w tym: 1.1. otrzymane gwarancje i poręczenia 1.2. pozostałe 2. Zobowiązania warunkowe, w tym: 2.1. udzielone poręczenia i gwarancje 2.2. weksle akceptowane i indosowane 2.3. aktywa z zobowiązaniem odsprzedaży 2.4. inne zobowiązania zabezpieczone na aktywach lub na przychodach 3. Zabezpieczenia z tytułu reasekuracji ustanowione na rzecz zakładu ubezpieczeń 4. Zabezpieczenia z tytułu reasekuracji ustanowione przez zakład ubezpieczeń na rzecz cedentów 5. Obce składniki aktywów nieujęte w aktywach Techniczny rachunek ubezpieczeń majątkowych i osobowych I. Składki (1-2-3+4) 1. Składki przypisane brutto 2. Udział reasekuratorów w składce przypisanej 3. Zmiana stanu rezerw składek i rezerwy na ryzyko niewygasłe brutto 4. Udział reasekuratorów w zmianie stanu rezerw składek II. Przychody z lokat netto po uwzględnieniu kosztów, przeniesione z ogólnego rachunku zysków i strat",
+                "metadata": {
+                    "chunk_id": "60861da2-9762-46f5-bc15-62aa89d329f2"
+                }
+            }
+        },
+        {
+            "index": 11,
+            "chunk": "Fundusze specjalne",
+            "result": {
+                "chunk_id": "43e04e55-532b-44bf-b05e-b2eaa6cae1d8",
+                "document": " VIII. Fundusze specjalne i inne zobowiązania IX. Koszty i przychody rozliczane w czasie 1. Rozliczenia międzyokresowe kosztów 2. Ujemna wartość firmy 3. Pozostałe rozliczenia międzyokresowe przychodów X. Rezerwy 1. Rezerwa z tytułu odroczonego podatku dochodowego 2. Pozostałe rezerwy XI. Zobowiązania podporządkowane XII. Kapitał (fundusz) podstawowy XIII. Kapitał (fundusz) zapasowy XIV. Kapitał (fundusz) z aktualizacji wyceny XV. Pozostałe kapitały (fundusze) rezerwowe 1. Fundusz ogólnego ryzyka bankowego 2. Pozostałe XVI. Zysk (strata) z lat ubiegłych XVII. Zysk (strata) netto XVIII. Odpisy z zysku netto w ciągu roku obrotowego (wielkość ujemna) Pasywa razem Współczynnik wypłacalności Pozycje pozabilansowe I. Zobowiązania warunkowe udzielone i otrzymane 1. Zobowiązania udzielone: a) finansowe b) gwarancyjne 2. Zobowiązania otrzymane: a) finansowe b) gwarancyjne II. Zobowiązania związane z realizacją operacji kupna/sprzedaży III. Pozostałe Rachunek zysków i strat I. Przychody z tytułu odsetek",
+                "metadata": {
+                    "chunk_id": "43e04e55-532b-44bf-b05e-b2eaa6cae1d8"
+                }
+            }
+        },
+        {
+            "index": -1,
+            "chunk": "ZAŁĄCZNIK Nr 3",
+            "result": null
+        }
+    ]
+]

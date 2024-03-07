@@ -76,7 +76,9 @@ defmodule Buildel.MixProject do
       {:resend, "~> 0.4.1"},
       {:open_api_spex, "~> 3.18"},
       {:circular_buffer, "~> 0.4.0"},
-      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false}
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:req, "~> 0.4.11"},
+      {:multipart, "~> 0.4.0"}
     ]
   end
 

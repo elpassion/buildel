@@ -63,13 +63,9 @@ defmodule Buildel.Memories do
     %{file_name: file_name, file_size: file_size, file_type: file_type} =
       Buildel.FileLoader.file_properties(file)
 
-    {:ok, file} = Buildel.FileLoader.load_file(file.path, %{type: file_type})
-
     metadata = %{file_name: file_name, file_size: file_size, file_type: file_type}
 
-    with organization <- Organizations.get_organization!(organization.id),
-         organization_collection_name <- organization_collection_name(organization, collection),
-         {:ok, memory} <-
+    with {:ok, memory} <-
            %Buildel.Memories.Memory{}
            |> Buildel.Memories.Memory.changeset(
              metadata
@@ -77,51 +73,72 @@ defmodule Buildel.Memories do
                organization_id: organization.id,
                collection_name: collection.collection_name,
                memory_collection_id: collection.id,
-               content: file
+               content: "content"
              })
            )
-           |> Buildel.Repo.insert(),
-         {:ok, api_key} <-
-           Organizations.get_organization_secret(organization, collection.embeddings_secret_name),
-         vector_db <-
-           Buildel.VectorDB.new(%{
-             adapter: Buildel.VectorDB.EctoAdapter,
-             embeddings:
-               Buildel.Clients.Embeddings.new(%{
-                 api_type: collection.embeddings_api_type,
-                 model: collection.embeddings_model,
-                 api_key: api_key.value
-               })
-           }),
-         {:ok, _} <- Buildel.VectorDB.init(vector_db, organization_collection_name),
-         {:ok, _} <- Buildel.SearchDB.init(organization_collection_name),
-         {time, documents} <-
-           :timer.tc(fn ->
-             Buildel.Splitters.recursive_character_text_split(file, %{
-               chunk_size: 1000,
-               chunk_overlap: 250
-             })
-           end),
-         documents <-
-           documents
-           |> Enum.map(fn document ->
-             %{
-               document: document,
-               metadata:
-                 metadata |> Map.put(:memory_id, memory.id) |> Map.put(:chunk_id, UUID.uuid4())
-             }
-           end),
-         {:ok, _} <-
-           Buildel.VectorDB.add(vector_db, organization_collection_name, documents),
-         {:ok, _} <-
-           Buildel.SearchDB.add(organization_collection_name, documents) do
-      :telemetry.execute(
-        [:buildel, :recursive_splitter, :split],
-        %{duration: time * 1000}
-      )
-
+           |> Buildel.Repo.insert() do
       {:ok, memory}
     end
+
+    # {:ok, file} = Buildel.FileLoader.load_file(file.path, %{type: file_type})
+
+    # metadata = %{file_name: file_name, file_size: file_size, file_type: file_type}
+
+    # with organization <- Organizations.get_organization!(organization.id),
+    #      organization_collection_name <- organization_collection_name(organization, collection),
+    #      {:ok, memory} <-
+    #        %Buildel.Memories.Memory{}
+    #        |> Buildel.Memories.Memory.changeset(
+    #          metadata
+    #          |> Map.merge(%{
+    #            organization_id: organization.id,
+    #            collection_name: collection.collection_name,
+    #            memory_collection_id: collection.id,
+    #            content: file
+    #          })
+    #        )
+    #        |> Buildel.Repo.insert(),
+    #      {:ok, api_key} <-
+    #        Organizations.get_organization_secret(organization, collection.embeddings_secret_name),
+    #      vector_db <-
+    #        Buildel.VectorDB.new(%{
+    #          adapter: Buildel.VectorDB.EctoAdapter,
+    #          embeddings:
+    #            Buildel.Clients.Embeddings.new(%{
+    #              api_type: collection.embeddings_api_type,
+    #              model: collection.embeddings_model,
+    #              api_key: api_key.value
+    #            })
+    #        }),
+    #      {:ok, _} <- Buildel.VectorDB.init(vector_db, organization_collection_name),
+    #      {:ok, _} <- Buildel.SearchDB.init(organization_collection_name),
+    #      {time, documents} <-
+    #        :timer.tc(fn ->
+    #          Buildel.Splitters.recursive_character_text_split(file, %{
+    #            chunk_size: 1000,
+    #            chunk_overlap: 250
+    #          })
+    #        end),
+    #      documents <-
+    #        documents
+    #        |> Enum.map(fn document ->
+    #          %{
+    #            document: document,
+    #            metadata:
+    #              metadata |> Map.put(:memory_id, memory.id) |> Map.put(:chunk_id, UUID.uuid4())
+    #          }
+    #        end),
+    #      {:ok, _} <-
+    #        Buildel.VectorDB.add(vector_db, organization_collection_name, documents),
+    #      {:ok, _} <-
+    #        Buildel.SearchDB.add(organization_collection_name, documents) do
+    #   :telemetry.execute(
+    #     [:buildel, :recursive_splitter, :split],
+    #     %{duration: time * 1000}
+    #   )
+
+    #   {:ok, memory}
+    # end
   end
 
   def delete_organization_memory(

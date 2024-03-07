@@ -70,6 +70,8 @@ if config_env() == :prod do
 
   config :buildel, :page_url, System.get_env("PAGE_URL")
 
+  config :buildel, :document_loader, Buildel.DocumentWorkflow.DocumentLoaderAdapter
+
   if api_key = System.get_env("RESEND_API_KEY") do
     config :buildel, Buildel.Mailer,
       adapter: Resend.Swoosh.Adapter,

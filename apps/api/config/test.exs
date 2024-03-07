@@ -48,6 +48,10 @@ config :buildel, :search_db, Buildel.ClientMocks.SearchDB.LNXAdapter
 config :buildel, :block_context_resolver, Buildel.BlockContext.Mock
 config :langchain, openai_key: fn -> System.get_env("OPENAI_API_KEY") end
 
+config :buildel, :nlm_api_url, System.get_env("NLM_API_URL")
+
+config :buildel, :document_loader, Buildel.DocumentWorkflow.DocumentLoaderTestAdapter
+
 config :buildel, Buildel.Vault,
   ciphers: [
     default:

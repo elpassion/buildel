@@ -47,6 +47,11 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
   end
 
   @impl true
+  def model_config("text-embedding-3-small") do
+    %{size: 1536, distance: "Cosine"}
+  end
+
+  @impl true
   deftimed get_embeddings(%{inputs: inputs, api_key: api_key, model: model}), [
     :buildel,
     :embeddings,
@@ -61,7 +66,10 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
   def config(api_key \\ nil) do
     %OpenAI.Config{
       api_key: api_key,
-      http_options: []
+      http_options: [
+        timeout: 100_000,
+        recv_timeout: 100_000
+      ]
     }
   end
 end

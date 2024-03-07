@@ -60,7 +60,7 @@ config :buildel, :chat, Buildel.Clients.Chat
 config :buildel, :file_loader, Buildel.FileLoaderNLMApiAdapter
 config :buildel, :search_db, Buildel.SearchDB.EctoAdapter
 config :buildel, :block_context_resolver, Buildel.BlockContext
-
+config :buildel, :document_loader, Buildel.DocumentWorkflow.DocumentLoaderAdapter
 config :buildel, :secure_cookie, false
 
 # Import environment specific config. This must remain at the bottom

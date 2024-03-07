@@ -1,0 +1,140 @@
+{
+    "return_dict": {
+        "num_pages": 171,
+        "page_dim": [
+            440.0,
+            623.0
+        ],
+        "result": {
+            "blocks": [
+                {
+                    "bbox": [
+                        28.0,
+                        86.93,
+                        87.59,
+                        95.83000000000001
+                    ],
+                    "block_class": "cls_0",
+                    "block_idx": 0,
+                    "level": 0,
+                    "page_idx": 0,
+                    "sentences": [
+                        "Para1"
+                    ],
+                    "tag": "para"
+                },
+                {
+                    "level": 0,
+                    "page_idx": 0,
+                    "tag": "header"
+                },
+                {
+                    "bbox": [
+                        28.0,
+                        297.44,
+                        133.74,
+                        306.34
+                    ],
+                    "block_class": "cls_0",
+                    "block_idx": 3,
+                    "level": 0,
+                    "page_idx": 0,
+                    "sentences": [
+                        "header1"
+                    ],
+                    "tag": "header"
+                },
+                {
+                    "bbox": [
+                        28.0,
+                        366.7,
+                        378.61,
+                        389.34000000000003
+                    ],
+                    "block_class": "cls_1",
+                    "block_idx": 6,
+                    "level": 1,
+                    "page_idx": 0,
+                    "sentences": [
+                        "li11",
+                        "li12"
+                    ],
+                    "tag": "list_item"
+                },
+                {
+                    "bbox": [
+                        28.0,
+                        350.21,
+                        170.12,
+                        359.10999999999996
+                    ],
+                    "block_class": "cls_0",
+                    "block_idx": 5,
+                    "level": 0,
+                    "page_idx": 0,
+                    "sentences": [
+                        "header2"
+                    ],
+                    "tag": "header"
+                },
+                {
+                    "bbox": [
+                        38.44,
+                        396.93,
+                        381.1,
+                        433.31000000000006
+                    ],
+                    "block_class": "cls_1",
+                    "block_idx": 7,
+                    "level": 2,
+                    "page_idx": 0,
+                    "sentences": [
+                        "li2"
+                    ],
+                    "tag": "list_item"
+                },
+                {
+                    "bbox": [
+                        38.44,
+                        440.9,
+                        390.09,
+                        532.2400000000002
+                    ],
+                    "block_class": "cls_1",
+                    "block_idx": 8,
+                    "level": 0,
+                    "page_idx": 0,
+                    "sentences": [
+                        "header3"
+                    ],
+                    "tag": "header"
+                }
+            ],
+            "styles": [
+                {
+                    "class_name": "cls_0",
+                    "style": {
+                        "font-family": "TimesNewRomanPS-BoldMT",
+                        "font-size": 12.839999999999998,
+                        "font-style": "normal",
+                        "font-weight": 600,
+                        "text-align": "left",
+                        "text-transform": "none"
+                    }
+                },
+                {
+                    "class_name": "cls_1",
+                    "style": {
+                        "font-family": "TimesNewRomanPSMT",
+                        "font-size": 12.839999999999998,
+                        "font-style": "normal",
+                        "font-weight": 400,
+                        "text-align": "left",
+                        "text-transform": "none"
+                    }
+                }
+            ]
+        }
+    },
+    "status": null
+}
