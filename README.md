@@ -36,7 +36,7 @@
 </p>
 
 <p align="center">
-    <img src="apps/web-remix/public/buildel-ai.png" alt="Buildel.ai" />
+    <img src="apps/web-remix/public/buildel-landing-hero.png" alt="Buildel.ai" />
 </p>
 
 ## Introduction
