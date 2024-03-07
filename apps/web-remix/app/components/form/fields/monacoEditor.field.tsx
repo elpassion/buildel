@@ -17,20 +17,20 @@ export const MonacoEditorField = forwardRef<
       error?: ReactNode;
     }
   >
->(({ label, error, supportingText, onChange, ...props }) => {
+>(({ label, defaultValue, error, supportingText, onChange, ...props }) => {
   const { name, getInputProps, validate } = useFieldContext();
   const [value, setValue] = useControlField<string | undefined>(name);
 
   return (
     <>
-      <HiddenField value={value} {...getInputProps()} />
+      <HiddenField value={value ?? defaultValue} {...getInputProps()} />
       <Label text={label} />
       <MonacoEditorInput
         path={name}
         theme="vs-dark"
         height="130px"
         loading={<div className="w-full h-[130px] border border-neutral-200" />}
-        value={value}
+        value={value ?? defaultValue}
         onChange={(v, e) => {
           setValue(v);
           validate();

@@ -379,6 +379,7 @@ function EditorField({ field, name, connections }: EditorFieldProps) {
             supportingText={field.description}
             label={field.title}
             suggestions={generateSuggestions(connections)}
+            defaultValue={field.default}
             error={fieldErrors[name]}
           />
         );

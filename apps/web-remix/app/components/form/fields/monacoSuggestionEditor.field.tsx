@@ -19,19 +19,19 @@ export const MonacoSuggestionEditorField = forwardRef<
       error?: string;
     }
   >
->(({ label, error, supportingText, ...props }) => {
+>(({ label, defaultValue, error, supportingText, ...props }) => {
   const { name, getInputProps, validate } = useFieldContext();
   const [value, setValue] = useControlField<string | undefined>(name);
 
   return (
     <>
-      <HiddenField value={value} {...getInputProps()} />
+      <HiddenField value={value ?? defaultValue} {...getInputProps()} />
       <Label text={label} />
       <MonacoEditorWithSuggestions
         path={name}
         height="130px"
         loading={<div className="w-full h-[130px] border border-neutral-200" />}
-        value={value}
+        value={value ?? defaultValue}
         onChange={(v) => {
           setValue(v);
           validate();
