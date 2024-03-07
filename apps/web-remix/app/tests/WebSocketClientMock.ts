@@ -7,7 +7,6 @@ export class WebSocketClientMock {
   static readonly CLOSED = 3;
 
   constructor(url: string) {
-    console.log(`WebSocketMock created for url: ${url}`);
     this.url = url;
     this.readyState = WebSocket.OPEN;
   }
@@ -17,7 +16,6 @@ export class WebSocketClientMock {
   }
 
   close() {
-    console.log(`Mock WebSocket closed`);
     this.readyState = WebSocketClientMock.CLOSED;
   }
 }
