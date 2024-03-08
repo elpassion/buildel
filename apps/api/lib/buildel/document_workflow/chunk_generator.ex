@@ -7,10 +7,12 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
     @type t :: %Chunk{
             id: binary(),
             value: binary(),
-            keyword: binary(),
-            embeddings: [float()]
+            keywords: [binary()],
+            embeddings: [float()],
+            prev: integer(),
+            next: integer()
           }
-    defstruct [:id, :value, :keyword, :embeddings]
+    defstruct [:id, :value, :keywords, :embeddings, prev: nil, next: nil]
   end
 
   @chunk_size 1000
@@ -29,29 +31,48 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
     splitter(list, "", [], [], merged_config)
   end
 
-  defp splitter([], chunk, chunks, deepest_header, _config) do
-    keyword = Enum.join(deepest_header, " # ")
-    chunks ++ [create_chunk(chunk, keyword)]
+  @spec add_neighbors([Chunk.t()]) :: [Chunk.t()]
+  def add_neighbors(list) do
+    {list_with_prev, _, next_map} =
+      list
+      |> Enum.reduce({[], nil, %{}}, fn elem, {acc, prev_id, next_map} ->
+        updated_elem = Map.put(elem, :prev, prev_id)
+
+        updated_next_map = Map.put(next_map, prev_id, elem.id)
+
+        {[updated_elem | acc], Map.get(elem, :id), updated_next_map}
+      end)
+
+    list_with_prev
+    |> Enum.reverse()
+    |> Enum.map(fn elem ->
+      next_id = Map.get(next_map, elem.id)
+      Map.put(elem, :next, next_id)
+    end)
   end
 
-  defp splitter(list, chunk, chunks, deepest_header, config) do
+  defp splitter([], chunk, chunk_list, keywords, _config) do
+    chunk_list ++ [create_chunk(chunk, Enum.uniq(keywords))]
+  end
+
+  defp splitter(list, chunk, chunk_list, keywords, config) do
     if String.length(chunk) < config.chunk_size do
       [head | tail] = list
 
-      if length(head.metadata.headers) > length(deepest_header) do
-        splitter(tail, chunk <> " " <> head.value, chunks, head.metadata.headers, config)
-      else
-        splitter(tail, chunk <> " " <> head.value, chunks, deepest_header, config)
-      end
+      splitter(
+        tail,
+        chunk <> " " <> head.value,
+        chunk_list,
+        keywords ++ head.metadata.headers,
+        config
+      )
     else
-      # add headers meta at the beginning of the chunk
-      keyword = Enum.join(deepest_header, " # ")
-      new_chunk_list = chunks ++ [create_chunk(chunk, keyword)]
+      new_chunk_list = chunk_list ++ [create_chunk(chunk, Enum.uniq(keywords))]
       splitter(list, "", new_chunk_list, [], config)
     end
   end
 
-  defp create_chunk(text, keyword) do
-    %Chunk{id: UUID.uuid4(), value: text, keyword: keyword}
+  defp create_chunk(text, keywords) do
+    %Chunk{id: UUID.uuid4(), value: text, keywords: keywords}
   end
 end

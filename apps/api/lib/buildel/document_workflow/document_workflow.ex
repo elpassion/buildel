@@ -60,7 +60,7 @@ defmodule Buildel.DocumentWorkflow do
   end
 
   def build_node_chunks(documents, config \\ %{}) do
-    ChunkGenerator.split_into_chunks(documents, config)
+    ChunkGenerator.split_into_chunks(documents, config) |> ChunkGenerator.add_neighbors()
   end
 
   @type keyword_node :: %{
