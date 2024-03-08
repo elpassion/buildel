@@ -32,32 +32,57 @@ defmodule Buildel.DocumentWorkflow.DocumentWorkflowBenchmarkTest do
             limit: 100
           })
 
-        indices =
-          item.chunks
-          |> Enum.map(fn chunk ->
-            index = find_index(results, chunk)
+        %{
+          query: item.query,
+          results:
+            item.chunks
+            |> Enum.map(fn chunk ->
+              index = find_index(results, chunk)
 
-            if index != nil do
-              %{
-                index: index,
-                chunk: chunk,
-                result: results |> Enum.at(index)
-              }
-            else
-              %{
-                index: -1,
-                chunk: chunk,
-                result: nil
-              }
-            end
-          end)
+              if index != nil do
+                %{
+                  index: index,
+                  chunk: chunk,
+                  result: results |> Enum.at(index)
+                }
+              else
+                %{
+                  index: -1,
+                  chunk: chunk,
+                  result: nil
+                }
+              end
+            end)
+        }
       end)
-      |> IO.inspect()
+
+    data = generate_statistics(benchmark_results) |> IO.inspect()
 
     File.write(
       "./test/buildel/document_workflow/benchmark_results/#{:os.system_time(:seconds)}_benchmark_result.json",
-      Jason.encode!(benchmark_results)
+      Jason.encode!(data)
     )
+  end
+
+  defp generate_statistics(benchmark_results) do
+    Enum.map(benchmark_results, fn %{query: query, results: results} ->
+      avg_result_index =
+        Enum.reduce(results, 0, fn item, acc -> acc + item.index end) /
+          length(results)
+
+      failed_hits = results |> Enum.filter(fn x -> x.index == -1 end) |> length()
+      total_hits = results |> length()
+
+      %{
+        meta: %{
+          query: query,
+          avg_result_index: avg_result_index,
+          failed_hits: failed_hits,
+          total_hits: total_hits
+        },
+        results: results
+      }
+    end)
   end
 
   defp find_index(results, text) do
@@ -67,7 +92,7 @@ defmodule Buildel.DocumentWorkflow.DocumentWorkflowBenchmarkTest do
   defp init_db() do
     embeddings_adapter =
       Embeddings.new(%{
-        api_key: "",
+        api_key: System.get_env("OPENAI_API_KEY"),
         model: "text-embedding-3-small",
         api_type: "openai"
       })

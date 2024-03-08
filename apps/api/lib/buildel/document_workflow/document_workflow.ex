@@ -74,7 +74,7 @@ defmodule Buildel.DocumentWorkflow do
   def generate_embeddings(chunks) do
     embeddings_adapter =
       Embeddings.new(%{
-        api_key: "",
+        api_key: System.get_env("OPENAI_API_KEY"),
         model: "text-embedding-3-small",
         api_type: "openai"
       })
