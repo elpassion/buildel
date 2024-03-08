@@ -1,5 +1,4 @@
 defmodule Buildel.DocumentWorkflow do
-  alias Buildel.DocumentWorkflow.ChunkGenerator.Chunk
   alias Buildel.DocumentWorkflow.DocumentProcessor
   alias Buildel.DocumentWorkflow.ChunkGenerator
   alias Buildel.Clients.Embeddings
@@ -46,7 +45,12 @@ defmodule Buildel.DocumentWorkflow do
 
   @spec read(document()) :: struct_list()
   def read({path, file_metadata}) do
-    with {:ok, result} <- DocumentProcessor.load_file(path, file_metadata) do
+    document_loader =
+      Buildel.DocumentWorkflow.DocumentLoader.new(%{
+        adapter: Application.fetch_env!(:buildel, :document_loader)
+      })
+
+    with {:ok, result} <- DocumentProcessor.load_file(document_loader, path, file_metadata) do
       Jason.decode!(result)
       |> DocumentProcessor.get_blocks()
       |> DocumentProcessor.filter_empty_blocks()
