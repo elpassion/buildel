@@ -4,15 +4,20 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
   defmodule Chunk do
     alias __MODULE__
 
+    @type chunk_metadata :: %{
+            building_block_ids: [binary()],
+            keywords: [binary()]
+          }
+
     @type t :: %Chunk{
             id: binary(),
             value: binary(),
-            keywords: [binary()],
             embeddings: [float()],
+            metadata: chunk_metadata(),
             prev: integer(),
             next: integer()
           }
-    defstruct [:id, :value, :keywords, :embeddings, prev: nil, next: nil]
+    defstruct [:id, :value, :embeddings, :metadata, prev: nil, next: nil]
   end
 
   @chunk_size 1000
@@ -28,7 +33,7 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
   @spec split_into_chunks(struct_list(), chunk_config()) :: [Chunk.t()]
   def split_into_chunks(list, config \\ %{}) do
     merged_config = Map.merge(%{chunk_size: @chunk_size}, config)
-    splitter(list, "", [], [], merged_config)
+    splitter(list, "", [], %{}, merged_config)
   end
 
   @spec add_neighbors([Chunk.t()]) :: [Chunk.t()]
@@ -51,28 +56,32 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
     end)
   end
 
-  defp splitter([], chunk, chunk_list, keywords, _config) do
-    chunk_list ++ [create_chunk(chunk, Enum.uniq(keywords))]
+  defp splitter([], text, chunk_list, metadata, _config) do
+    chunk_list ++ [create_chunk(text, metadata)]
   end
 
-  defp splitter(list, chunk, chunk_list, keywords, config) do
-    if String.length(chunk) < config.chunk_size do
+  defp splitter(list, text, chunk_list, metadata, config) do
+    if String.length(text) < config.chunk_size do
       [head | tail] = list
+
+      new_metadata =
+        Map.update(metadata, :building_block_ids, [head.id], &(&1 ++ [head.id]))
+        |> Map.update(:keywords, head.metadata.headers, &(&1 ++ head.metadata.headers))
 
       splitter(
         tail,
-        chunk <> " " <> head.value,
+        text <> " " <> head.value,
         chunk_list,
-        keywords ++ head.metadata.headers,
+        new_metadata,
         config
       )
     else
-      new_chunk_list = chunk_list ++ [create_chunk(chunk, Enum.uniq(keywords))]
-      splitter(list, "", new_chunk_list, [], config)
+      new_chunk_list = chunk_list ++ [create_chunk(text, metadata)]
+      splitter(list, "", new_chunk_list, %{}, config)
     end
   end
 
-  defp create_chunk(text, keywords) do
-    %Chunk{id: UUID.uuid4(), value: text, keywords: keywords}
+  defp create_chunk(text, metadata) do
+    %Chunk{id: UUID.uuid4(), value: text, metadata: metadata}
   end
 end
