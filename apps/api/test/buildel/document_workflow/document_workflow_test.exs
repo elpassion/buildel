@@ -22,17 +22,16 @@ defmodule Buildel.DocumentWorkflowTest do
     end
   end
 
-  describe "build_node_chunks/1" do
-    test "returns list of structs" do
+  describe "generate_keyword_nodes/1" do
+    test "assings chunks to their keywords" do
       result =
         DocumentWorkflow.read({@file_params.path, @file_params.file_metadata})
+        |> DocumentWorkflow.build_node_chunks()
+        |> DocumentWorkflow.generate_keyword_nodes()
 
-      assert is_list(result)
-      assert length(result) > 0
-      assert is_map(Enum.at(result, 0))
-      assert %DocumentProcessor.Paragraph{} = Enum.at(result, 0)
-      assert %DocumentProcessor.Header{} = Enum.at(result, 1)
-      assert %DocumentProcessor.ListItem{} = Enum.at(result, 2)
+      assert %{
+               "header1" => [_, _]
+             } = result
     end
   end
 end

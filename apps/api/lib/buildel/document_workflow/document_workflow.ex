@@ -68,7 +68,11 @@ defmodule Buildel.DocumentWorkflow do
         }
   @spec generate_keyword_nodes([ChunkGenerator.Chunk.t()]) :: keyword_node()
   def generate_keyword_nodes(chunks) do
-    Enum.group_by(chunks, & &1.keyword, & &1.id)
+    Enum.reduce(chunks, %{}, fn %{id: id, metadata: %{keywords: keywords}}, acc ->
+      Enum.reduce(keywords, acc, fn keyword, acc ->
+        Map.update(acc, keyword, [id], fn ids -> [id | ids] end)
+      end)
+    end)
   end
 
   def generate_embeddings(chunks) do
