@@ -123,4 +123,21 @@ defmodule BuildelWeb.Schemas.Runs do
       required: [:block_name, :input_name, :data]
     })
   end
+
+  defmodule StartRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "RunStartRequest",
+      type: :object,
+      properties: %{
+        initial_inputs: %Schema{
+          type: :array,
+          description: "Blocks initial inputs",
+          items: InputRequest,
+          default: []
+        }
+      }
+    })
+  end
 end

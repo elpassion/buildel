@@ -150,7 +150,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
       id: [in: :path, description: "Run ID", type: :integer, required: true]
     ],
-    request_body: nil,
+    request_body: {"start", "application/json", BuildelWeb.Schemas.Runs.StartRequest},
     responses: [
       ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
       not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
@@ -164,6 +164,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     security: [%{"authorization" => []}]
 
   def start(conn, _params) do
+    %{initial_inputs: initial_inputs} = conn.body_params
+
     %{
       organization_id: organization_id,
       pipeline_id: pipeline_id,
@@ -177,8 +179,21 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_pipeline_run(pipeline, id),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
+      initial_inputs |> Enum.each(&process_input(&1.block_name, &1.input_name, &1.data, run))
       render(conn, :show, run: run)
     end
+  end
+
+  defp process_input(block_name, input_name, data, run) do
+    context_id = Pipelines.Worker.context_id(run)
+
+    data =
+      case data do
+        {:binary, _} -> data
+        _ -> {:text, data}
+      end
+
+    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
   end
 
   operation :stop,
