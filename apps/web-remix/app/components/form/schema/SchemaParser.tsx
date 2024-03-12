@@ -4,7 +4,7 @@ import { zfd } from "zod-form-data";
 export function generateZODSchema(
   schema: JSONSchemaField,
   isOptional = false,
-  context: Record<string, string> = {}
+  context: Record<string, string> = {},
 ): z.ZodSchema<unknown> {
   if (schema.type === "string") {
     if ("enum" in schema) {
@@ -17,7 +17,7 @@ export function generateZODSchema(
     if ("regex" in schema && schema.regex !== undefined) {
       nestedSchema = nestedSchema.regex(
         new RegExp(schema?.regex?.pattern, "i"),
-        schema?.regex?.errorMessage
+        schema?.regex?.errorMessage,
       );
     }
 
@@ -92,7 +92,7 @@ export function generateZODSchema(
     let nestedSchema:
       | z.ZodArray<z.ZodTypeAny>
       | z.ZodOptional<z.ZodArray<z.ZodTypeAny>> = z.array(
-      generateZODSchema(schema.items, false, context) as z.ZodTypeAny
+      generateZODSchema(schema.items, false, context) as z.ZodTypeAny,
     );
 
     if (schema.minItems !== undefined) {
@@ -114,14 +114,14 @@ export function generateZODSchema(
 
   if (schema.type === "object") {
     const propertySchemas: z.ZodRawShape = Object.entries(
-      schema.properties
+      schema.properties,
     ).reduce((acc, [key, value]) => {
       return {
         ...acc,
         [key]: generateZODSchema(
           value,
           !(schema.required || []).includes(key),
-          context
+          context,
         ),
       };
     }, {});
@@ -181,6 +181,8 @@ export type JSONSchemaField =
       description: string;
       presentAs: "editor";
       editorLanguage: "json" | "custom";
+      minLength?: number;
+      maxLength?: number;
       default?: string;
     }
   | {

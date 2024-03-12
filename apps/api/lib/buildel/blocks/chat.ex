@@ -40,21 +40,23 @@ defmodule Buildel.Blocks.Chat do
           options_schema(%{
             "required" => [
               "description",
+              "api_key",
+              "api_type",
               "model",
+              "endpoint",
               "chat_memory_type",
               "temperature",
               "system_message",
               "messages",
-              "api_key",
-              "endpoint",
-              "api_type"
+              "prompt_template"
             ],
             "properties" =>
               Jason.OrderedObject.new(
                 description: %{
                   "type" => "string",
                   "title" => "Description",
-                  "description" => "The description of the chat."
+                  "description" => "The description of the chat.",
+                  "default" => "Chat with a large language model."
                 },
                 api_key:
                   secret_schema(%{
@@ -75,7 +77,8 @@ defmodule Buildel.Blocks.Chat do
                   "description" => "The model to use for the chat.",
                   "url" =>
                     "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}",
-                  "presentAs" => "async-select"
+                  "presentAs" => "async-select",
+                  "minLength" => 1
                 },
                 endpoint: %{
                   "type" => "string",
@@ -97,7 +100,8 @@ defmodule Buildel.Blocks.Chat do
                   "description" => "The chat memory type to use for the chat.",
                   "enum" => ["off", "full", "rolling"],
                   "enumPresentAs" => "radio",
-                  "default" => "full"
+                  "default" => "full",
+                  "minLength" => 1
                 },
                 temperature: %{
                   "type" => "number",
@@ -114,7 +118,8 @@ defmodule Buildel.Blocks.Chat do
                   "description" => "The message to start the conversation with.",
                   "presentAs" => "editor",
                   "editorLanguage" => "custom",
-                  "minLength" => 1
+                  "minLength" => 1,
+                  "default" => "You are a helpful assistant."
                 },
                 messages: %{
                   "type" => "array",
@@ -145,7 +150,8 @@ defmodule Buildel.Blocks.Chat do
                 prompt_template: %{
                   "type" => "string",
                   "title" => "Prompt template",
-                  "description" => "The template to use for the prompt.",
+                  "description" =>
+                    "The template to use for the prompt. Pass `{{input_name:output}}` to use the input value.",
                   "presentAs" => "editor",
                   "minLength" => 1
                 }

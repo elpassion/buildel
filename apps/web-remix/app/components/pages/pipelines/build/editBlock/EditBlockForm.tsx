@@ -51,7 +51,7 @@ export function EditBlockForm({
   children?: ReactNode;
   onSubmit: (
     data: IBlockConfig & { oldName: string },
-    connections: IConfigConnection[]
+    connections: IConfigConnection[],
   ) => void;
   blockConfig: z.TypeOf<typeof ExtendedBlockConfig>;
   disabled?: boolean;
@@ -86,12 +86,12 @@ export function EditBlockForm({
       });
       setConnections(newConnections);
     },
-    [connections]
+    [connections],
   );
 
   const handleUpdate = (
     data: Record<string, any>,
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
     clearFieldsErrors();
@@ -119,7 +119,7 @@ export function EditBlockForm({
           name={props.name as string}
           connections={[
             ...connections.filter(
-              (connection) => connection.to.block_name === blockConfig.name
+              (connection) => connection.to.block_name === blockConfig.name,
             ),
             ...reverseToolConnections(connections, blockConfig.name),
           ]}
@@ -127,7 +127,7 @@ export function EditBlockForm({
         />
       );
     },
-    [blockConfig.connections]
+    [blockConfig.connections],
   );
 
   const SelectField = useCallback(
@@ -144,6 +144,7 @@ export function EditBlockForm({
 
       const replacedUrl = props.field.url
         .replace("{{organization_id}}", organizationId.toString())
+        .replace("{{pipeline_id}}", pipelineId.toString())
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
           const replacedValue = values.get(optKey);
@@ -163,12 +164,18 @@ export function EditBlockForm({
             errorMessage={fieldErrors[props.name!]}
             defaultValue={props.field.default
               ?.replace("{{pipeline_id}}", pipelineId.toString())
-              ?.replace("{{block_name}}", blockConfig.name)}
+              ?.replace("{{block_name}}", blockConfig.name)
+              ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
+                const values = getValues();
+                const replacedValue = values.get(optKey);
+
+                return replacedValue || optKey;
+              })}
           />
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId]
+    [blockConfig.name, organizationId, pipelineId],
   );
 
   const AsyncCreatableField = useCallback(
@@ -204,8 +211,14 @@ export function EditBlockForm({
             dropdownClassName={`${props.name}-dropdown`}
             data-testid={props.name}
             defaultValue={props.field.default
-              ?.replace(":pipeline_id", pipelineId.toString())
-              ?.replace(":block_name", blockConfig.name)}
+              ?.replace("{{pipeline_id}}", pipelineId.toString())
+              ?.replace("{{block_name}}", blockConfig.name)
+              ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
+                const values = getValues();
+                const replacedValue = values.get(optKey);
+
+                return replacedValue || optKey;
+              })}
             renderForm={({ onCreate }) => (
               <CreatableAsyncForm
                 //@ts-ignore
@@ -221,7 +234,7 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId]
+    [blockConfig.name, organizationId, pipelineId],
   );
 
   return (

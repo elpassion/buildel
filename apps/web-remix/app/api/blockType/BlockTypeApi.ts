@@ -8,7 +8,7 @@ export class BlockTypeApi {
 
   async getBlockTypes(): Promise<IBlockTypesResponse> {
     // TODO: Setup better caching
-    if (cache) return cache;
+    if (process.env.NODE_ENV === "production" && cache) return cache;
     const response = await this.client(BlockTypesResponse, `/block_types`);
     cache = response.data;
     setTimeout(() => (cache = undefined), 1000 * 60 * 5);
