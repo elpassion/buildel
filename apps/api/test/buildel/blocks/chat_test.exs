@@ -37,7 +37,8 @@ defmodule Buildel.Blocks.ChatTest do
                  ],
                  "endpoint" => nil,
                  "api_type" => "openai",
-                 "chat_memory_type" => "full"
+                 "chat_memory_type" => "full",
+                 "prompt_template" => "Hello, {{input}}!"
                },
                "inputs" => []
              })
