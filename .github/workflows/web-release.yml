@@ -1,9 +1,11 @@
 name: Web Release
 on:
   push:
-    tags:
-      - 'web-v*.*.*'
-  
+    branches:
+      - main
+    paths:
+      - "apps/web-remix/**"
+
 defaults:
   run:
     working-directory: apps/web-remix
@@ -20,8 +22,8 @@ jobs:
           version: 8.15.3
       - uses: actions/setup-node@v4
         with:
-          node-version: '21.6.2'
-          cache: 'pnpm'
+          node-version: "21.6.2"
+          cache: "pnpm"
           cache-dependency-path: apps/web-remix/pnpm-lock.yaml
       - run: pnpm install
       # - run: pnpm tsc
@@ -30,4 +32,4 @@ jobs:
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
         env:
-            FLY_API_TOKEN: ${{ secrets.BUILDEL_WEB__FLY_API_TOKEN }}
+          FLY_API_TOKEN: ${{ secrets.BUILDEL_WEB__FLY_API_TOKEN }}
