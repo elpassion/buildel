@@ -44,7 +44,7 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "type" => "string",
                   "title" => "URL",
                   "description" =>
-                    "The URL to send the request to. If you want to use a variable, use {{variable_name}}. Notice the double curly braces!"
+                    "The URL to send the request to. If you want to use a variable, use `{{variable_name}}`. Notice the double curly braces!"
                 },
                 description: %{
                   "type" => "string",
@@ -55,7 +55,7 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "type" => "string",
                   "title" => "Parameters",
                   "description" =>
-                    "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. ie. {\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}.",
+                    "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. ie. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
                   "presentAs" => "editor",
                   "editorLanguage" => "json",
                   "default" => "{\"type\": \"object\", \"properties\": {}, \"required\": []}"
@@ -64,7 +64,7 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "type" => "string",
                   "title" => "Headers",
                   "description" =>
-                    "Valid JSON object of the headers to be sent with the request. ie. {\"Content-Type\": \"application/json\"}.",
+                    "Valid JSON object of the headers to be sent with the request. ie. `{\"Content-Type\": \"application/json\"}`.",
                   "presentAs" => "editor",
                   "editorLanguage" => "json",
                   "default" =>
