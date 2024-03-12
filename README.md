@@ -115,6 +115,7 @@ git clone https://github.com/elpassion/buildel.git
 pnpm i
 ```
 
+
 3. Run dependencies:
 ```bash
 pnpm dependencies:up
