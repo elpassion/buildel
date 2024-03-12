@@ -40,7 +40,8 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def index(conn, _params) do
     %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
@@ -75,7 +76,8 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
       not_found: {"not found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def show(conn, _params) do
     %{
@@ -114,7 +116,8 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
       not_found: {"not found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def create(conn, _params) do
     %{alias: alias_config} = conn.body_params
@@ -159,7 +162,8 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
       not_found: {"not found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def update(conn, _params) do
     %{alias: alias_config} = conn.body_params
@@ -204,7 +208,8 @@ defmodule BuildelWeb.OrganizationPipelineAliasController do
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
       not_found: {"not found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def delete(conn, _params) do
     %{

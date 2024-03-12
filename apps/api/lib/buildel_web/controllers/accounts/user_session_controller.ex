@@ -91,7 +91,8 @@ defmodule BuildelWeb.UserSessionController do
     request_body: nil,
     responses: [
       no_content: {"user", "application/json", nil}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def delete(conn, _params) do
     conn

@@ -34,7 +34,8 @@ defmodule BuildelWeb.OrganizationPipelineController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def index(conn, _params) do
     %{organization_id: organization_id} = conn.params
@@ -62,7 +63,8 @@ defmodule BuildelWeb.OrganizationPipelineController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def show(conn, _params) do
     %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
@@ -91,7 +93,8 @@ defmodule BuildelWeb.OrganizationPipelineController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def create(conn, _params) do
     %{organization_id: organization_id} = conn.params
@@ -128,7 +131,8 @@ defmodule BuildelWeb.OrganizationPipelineController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def update(conn, _params) do
     %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
@@ -159,7 +163,8 @@ defmodule BuildelWeb.OrganizationPipelineController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def delete(conn, _params) do
     %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params

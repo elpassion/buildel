@@ -1,5 +1,5 @@
 defmodule BuildelWeb.ApiSpec do
-  alias OpenApiSpex.{Info, OpenApi, Paths, Server}
+  alias OpenApiSpex.{Info, OpenApi, Paths, Server, Components, SecurityScheme}
   alias BuildelWeb.{Endpoint, Router}
   @behaviour OpenApi
 
@@ -13,7 +13,10 @@ defmodule BuildelWeb.ApiSpec do
         title: "Buildel",
         version: "1.0"
       },
-      paths: Paths.from_router(Router)
+      paths: Paths.from_router(Router),
+      components: %Components{
+        securitySchemes: %{"authorization" => %SecurityScheme{type: "http", scheme: "bearer"}}
+      }
     }
     |> OpenApiSpex.resolve_schema_modules()
   end

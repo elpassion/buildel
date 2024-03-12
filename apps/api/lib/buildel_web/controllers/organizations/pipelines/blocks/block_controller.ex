@@ -35,7 +35,8 @@ defmodule BuildelWeb.OrganizationPipelineBlockController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def create(conn, _params) do
     %{block: block_config} = conn.body_params

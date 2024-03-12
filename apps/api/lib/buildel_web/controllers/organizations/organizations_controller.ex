@@ -27,7 +27,8 @@ defmodule BuildelWeb.OrganizationController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def index(conn, _) do
     organizations = conn.assigns.current_user |> Organizations.list_user_organizations()
@@ -46,7 +47,8 @@ defmodule BuildelWeb.OrganizationController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def show(conn, _params) do
     organization_id = conn.params.id
@@ -72,7 +74,8 @@ defmodule BuildelWeb.OrganizationController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def create(conn, _params) do
     organization_params = conn.body_params.organization
@@ -105,7 +108,8 @@ defmodule BuildelWeb.OrganizationController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   defparams :update do
     required(:organization, :map) do
@@ -142,7 +146,8 @@ defmodule BuildelWeb.OrganizationController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def get_api_key(conn, _params) do
     user = conn.assigns.current_user
@@ -167,7 +172,8 @@ defmodule BuildelWeb.OrganizationController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def reset_api_key(conn, _params) do
     user = conn.assigns.current_user

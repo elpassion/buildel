@@ -41,7 +41,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def index(conn, _params) do
     %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
@@ -79,7 +80,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def show(conn, _params) do
     %{organization_id: organization_id, pipeline_id: pipeline_id, id: id} = conn.params
@@ -114,7 +116,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def create(conn, _params) do
     %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
@@ -157,7 +160,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def start(conn, _params) do
     %{
@@ -199,7 +203,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def stop(conn, _params) do
     %{
@@ -243,7 +248,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
       bad_request:
         {"bad request", "application/json", BuildelWeb.Schemas.Errors.BadRequestResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def input(conn, _params) do
     %{

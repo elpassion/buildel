@@ -21,8 +21,7 @@ defmodule BuildelWeb.UserPasswordController do
   operation :update,
     summary: "Update user password",
     parameters: [],
-    request_body:
-      {"user", "application/json", BuildelWeb.Schemas.Users.UpdatePasswordRequest},
+    request_body: {"user", "application/json", BuildelWeb.Schemas.Users.UpdatePasswordRequest},
     responses: [
       ok: {"user", "application/json", BuildelWeb.Schemas.Users.ShowResponse},
       unprocessable_entity:
@@ -31,10 +30,12 @@ defmodule BuildelWeb.UserPasswordController do
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
-    ]
+    ],
+    security: [%{"authorization" => []}]
 
   def update(conn, _params) do
     password_params = conn.body_params
+
     with user <- conn.assigns.current_user,
          {:ok, %User{} = user} <-
            Accounts.update_user_password(user, password_params.current_password, %{
