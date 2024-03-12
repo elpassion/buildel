@@ -275,9 +275,11 @@ defmodule Buildel.Blocks.Chat do
       {:noreply, cleanup_inputs(state)}
     else
       {:error, :not_all_inputs_filled, state} ->
+        state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
         {:noreply, state}
 
       {:error, _reason, state} ->
+        state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
         {:noreply, state}
     end
   end
