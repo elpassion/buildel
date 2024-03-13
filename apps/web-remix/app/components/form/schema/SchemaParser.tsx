@@ -125,8 +125,14 @@ export function generateZODSchema(
         ),
       };
     }, {});
+
     let nestedSchema: z.ZodSchema | z.ZodOptional<z.ZodSchema> =
       z.object(propertySchemas);
+
+    if (isOptional) {
+      nestedSchema = nestedSchema.optional();
+    }
+
     return nestedSchema;
   }
 

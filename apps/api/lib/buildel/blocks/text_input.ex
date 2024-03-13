@@ -24,21 +24,10 @@ defmodule Buildel.Blocks.TextInput do
   def schema() do
     %{
       "type" => "object",
-      "required" => ["name", "opts", "inputs"],
+      "required" => ["name", "inputs"],
       "properties" => %{
         "name" => name_schema(),
-        "opts" =>
-          options_schema(%{
-            "required" => [],
-            "properties" => %{
-              "pull" => %{
-                "type" => "boolean",
-                "title" => "Pull",
-                "description" => "pull.",
-                "default" => false
-              }
-            }
-          })
+        "opts" => options_schema()
       }
     }
   end

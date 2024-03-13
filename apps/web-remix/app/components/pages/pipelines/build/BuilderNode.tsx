@@ -71,19 +71,6 @@ function BuilderNodeHeaderActions({
     );
   }, [data, searchParams]);
 
-  const isEditable = useMemo(() => {
-    try {
-      const propKeys = Object.keys(
-        data.block_type?.schema.properties.opts.properties
-      );
-
-      return propKeys.length > 0;
-    } catch (err) {
-      console.error(err);
-      return false;
-    }
-  }, [data]);
-
   return (
     <div className="flex gap-2 items-center">
       {/*<div className="w-4 h-[22px]">*/}
@@ -96,15 +83,13 @@ function BuilderNodeHeaderActions({
       {/*  />*/}
       {/*</div>*/}
 
-      {isEditable && (
-        <IconButton
-          onlyIcon
-          icon={<Icon iconName="settings" />}
-          aria-label={`Edit block: ${data.name}`}
-          onClick={handleEdit}
-          disabled={runStatus !== "idle"}
-        />
-      )}
+      <IconButton
+        onlyIcon
+        icon={<Icon iconName="settings" />}
+        aria-label={`Edit block: ${data.name}`}
+        onClick={handleEdit}
+        disabled={runStatus !== "idle"}
+      />
 
       <IconButton
         onlyIcon
