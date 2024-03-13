@@ -23,7 +23,8 @@ defmodule Buildel.Blocks do
     DocumentTool,
     ApiCallTool,
     CreateBlockTool,
-    MapList
+    MapList,
+    Timer
   }
 
   @names_to_blocks_map %{
@@ -47,7 +48,8 @@ defmodule Buildel.Blocks do
     "document_tool" => DocumentTool,
     "api_call_tool" => ApiCallTool,
     "create_block_tool" => CreateBlockTool,
-    "map_list" => MapList
+    "map_list" => MapList,
+    "timer" => Timer
   }
 
   @blocks_to_names_map %{
@@ -71,7 +73,8 @@ defmodule Buildel.Blocks do
     DocumentTool => "document_tool",
     ApiCallTool => "api_call_tool",
     CreateBlockTool => "create_block_tool",
-    MapList => "map_list"
+    MapList => "map_list",
+    Timer => "timer"
   }
 
   def list_types() do

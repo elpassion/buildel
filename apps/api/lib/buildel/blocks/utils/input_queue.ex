@@ -14,39 +14,32 @@ defmodule Buildel.Blocks.Utils.InputQueue do
 
   @spec push(t(), item()) :: t()
   def push(%__MODULE__{queue: [], process_item: process_item}, item) do
-    IO.puts("pushing first item")
     process_item.(item)
 
     %__MODULE__{queue: [item], process_item: process_item}
   end
 
   def push(%__MODULE__{queue: queue, process_item: process_item}, item) do
-    IO.puts("pushing another item")
-
     %__MODULE__{queue: queue ++ [item], process_item: process_item}
   end
 
   @spec pop(t()) :: t()
   def pop(%__MODULE__{queue: [], process_item: process_item}) do
-    IO.puts("removing from empty queue")
     %__MODULE__{queue: [], process_item: process_item}
   end
 
   @spec pop(t()) :: t()
   def pop(%__MODULE__{queue: [_item], process_item: process_item}) do
-    IO.puts("removing last item")
     %__MODULE__{queue: [], process_item: process_item}
   end
 
   def pop(%__MODULE__{queue: [_item | [item]], process_item: process_item}) do
-    IO.puts("removing another item")
     process_item.(item)
 
     %__MODULE__{queue: [item], process_item: process_item}
   end
 
   def pop(%__MODULE__{queue: [_item | [item | rest]], process_item: process_item}) do
-    IO.puts("removing another item from queue with #{rest |> Enum.count()} items left")
     process_item.(item)
 
     %__MODULE__{queue: [item | rest], process_item: process_item}
