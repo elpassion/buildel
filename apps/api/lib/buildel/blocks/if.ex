@@ -35,7 +35,7 @@ defmodule Buildel.Blocks.IF do
               condition: %{
                 "type" => "string",
                 "title" => "Condition",
-                "description" => "The value to compare the input to",
+                "description" => "The value to compare the input to.",
                 "minLength" => 1
               }
             }

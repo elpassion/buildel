@@ -34,7 +34,7 @@ defmodule Buildel.Blocks.SplitText do
               chunk_size: %{
                 "type" => "number",
                 "title" => "Chunk size",
-                "description" => "The value to compare the input to",
+                "description" => "The value to compare the input to.",
                 "minimum" => 0,
                 "default" => 500
               }

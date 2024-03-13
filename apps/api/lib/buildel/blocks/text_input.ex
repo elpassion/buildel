@@ -34,7 +34,7 @@ defmodule Buildel.Blocks.TextInput do
               "pull" => %{
                 "type" => "boolean",
                 "title" => "Pull",
-                "description" => "pull",
+                "description" => "pull.",
                 "default" => false
               }
             }
