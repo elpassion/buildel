@@ -57,7 +57,7 @@ defmodule BuildelWeb.PipelineChannel do
            Pipelines.upsert_run(%{
              id: run_id,
              pipeline_id: pipeline_id,
-             config: config |> Map.put(:metadata, metadata)
+             config: config |> Map.put("metadata", metadata)
            }),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
       initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
@@ -211,6 +211,8 @@ defmodule BuildelWeb.PipelineChannel do
 
   defp listen_to_outputs(run) do
     context_id = Pipelines.Worker.context_id(run)
+
+    IO.puts("Listening to outputs for run")
 
     run
     |> Pipelines.blocks_for_run()
