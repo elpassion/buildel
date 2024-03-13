@@ -34,7 +34,7 @@ defmodule Buildel.Blocks.TimerTest do
           Timer.create(%{
             name: "test",
             opts: %{
-              timer: 10
+              time: 10
             },
             connections: [
               Blocks.Connection.from_connection_string("text_input:output->start", "text")
@@ -65,7 +65,7 @@ defmodule Buildel.Blocks.TimerTest do
           Timer.create(%{
             name: "test",
             opts: %{
-              timer: 10
+              time: 10
             },
             connections: [
               Blocks.Connection.from_connection_string("text_input:output->start", "text")
