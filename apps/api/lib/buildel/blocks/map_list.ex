@@ -8,7 +8,7 @@ defmodule Buildel.Blocks.MapList do
   def options() do
     %{
       type: "map_list",
-      description: "Used for mapping and transforming 1 input list into n outputs",
+      description: "Used for mapping and transforming 1 input list into n outputs.",
       groups: ["utils"],
       inputs: [Block.text_input("list")],
       outputs: [Block.text_output()],

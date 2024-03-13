@@ -17,7 +17,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
   def options() do
     %{
       type: "create_block_tool",
-      description: "Used to create block in workflow abc",
+      description: "Used to create block in workflow abc.",
       groups: ["el", "tools"],
       inputs: [
         Block.text_input("organization_id"),

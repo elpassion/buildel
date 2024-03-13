@@ -11,7 +11,7 @@ defmodule Buildel.Blocks.IF do
     %{
       type: "if",
       description:
-        "Use this block to compare the input to a condition and forward the input to the true or false output",
+        "Use this block to compare the input to a condition and forward the input to the true or false output.",
       groups: ["utils"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output("true"), Block.text_output("false")],

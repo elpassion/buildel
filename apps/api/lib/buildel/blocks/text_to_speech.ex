@@ -10,7 +10,7 @@ defmodule Buildel.Blocks.TextToSpeech do
     %{
       type: "text_to_speech",
       description:
-        "This module enables seamless conversion of textual data into audio format, leveraging the ElevenLabs API",
+        "This module enables seamless conversion of textual data into audio format, leveraging the ElevenLabs API.",
       groups: ["text", "audio"],
       inputs: [Block.text_input()],
       outputs: [Block.audio_output()],
