@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { LinksFunction, MetaFunction } from "@remix-run/node";
+import { MetaFunction } from "@remix-run/node";
 import {
   Outlet,
   useFetcher,

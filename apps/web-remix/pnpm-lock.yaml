@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@buildel/buildel':
-    specifier: ^0.1.6
-    version: 0.1.6
+    specifier: ^0.2.1
+    version: 0.2.1
   '@elpassion/taco':
     specifier: ^0.6.0
     version: 0.6.0(@tanstack/react-table@8.12.0)(@types/react-dom@18.2.19)(@types/react-modal@3.16.3)(@types/react@18.2.55)(classnames@2.5.1)(date-fns@2.30.0)(embla-carousel-react@7.1.0)(lodash.merge@4.6.2)(react-datepicker@4.25.0)(react-dom@18.2.0)(react-modal@3.16.1)(react-quill@2.0.0)(react-select@5.8.0)(react@18.2.0)
@@ -709,8 +709,8 @@ packages:
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
 
-  /@buildel/buildel@0.1.6:
-    resolution: {integrity: sha512-8sI7XEI852OMJeXOh8t50QCDtcAuwkP4kjhAG0O9fXVcetRcJp2lhK8Ww8tFWGpvlY70JKk6QXX8f0Ki/AvWQA==}
+  /@buildel/buildel@0.2.1:
+    resolution: {integrity: sha512-S9/kxB1ADUEXhjxMWk176pef8IMOIGOknPej59FPl/Kju0JfjFINcdwg06bfYv6cV3x24Ktv7RXjK2Y44rkDMA==}
     dependencies:
       phoenix: 1.7.11
       uuid: 9.0.1

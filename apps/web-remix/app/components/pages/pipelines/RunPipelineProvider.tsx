@@ -12,6 +12,8 @@ import { usePipelineRun } from "./usePipelineRun";
 import { IBlockConfig, IExtendedPipeline } from "./pipeline.types";
 import { errorToast } from "~/components/toasts/errorToast";
 
+export type Metadata = Record<string, any>;
+
 export interface IEvent {
   block: string;
   output: string;
@@ -34,6 +36,8 @@ interface IRunPipelineContext {
   isValid: boolean;
   organizationId: number;
   pipelineId: number;
+  metadata: Metadata;
+  setMetadata: (value: Metadata) => void;
 }
 
 const RunPipelineContext = React.createContext<IRunPipelineContext | undefined>(
@@ -49,6 +53,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   pipeline,
   alias,
 }) => {
+  const [metadata, setMetadata] = useState<Metadata>({});
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [events, setEvents] = useState<any[]>([]);
   const [blockStatuses, setBlockStatuses] = useState<Record<string, boolean>>(
@@ -93,7 +98,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
 
   const handleStartRun = useCallback(async () => {
     setErrors({});
-    await startRun([], alias);
+    await startRun({ initial_inputs: [], alias, metadata });
   }, [startRun, alias]);
 
   const handlePush = useCallback(
@@ -155,6 +160,8 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       organizationId: pipeline.organization_id,
       pipelineId: pipeline.id,
       errors,
+      metadata,
+      setMetadata,
     }),
     [
       errors,
@@ -168,6 +175,8 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       blockStatuses,
       blockValidations,
       isValid,
+      metadata,
+      setMetadata,
     ]
   );
   return (
