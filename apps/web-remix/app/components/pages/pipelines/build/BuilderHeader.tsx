@@ -4,7 +4,7 @@ import { RunPipelineButton } from "./RunPipelineButton";
 import { useRunPipeline } from "../RunPipelineProvider";
 import { IPipelineConfig } from "~/components/pages/pipelines/pipeline.types";
 import { useDebounce, useIsFirstRender } from "usehooks-ts";
-import { MetadataField } from "./Metadata";
+import { Metadata } from "./Metadata";
 
 export const BuilderHeader: React.FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -12,7 +12,7 @@ export const BuilderHeader: React.FC<PropsWithChildren> = ({ children }) => {
       <div className="flex gap-2 items-center pointer-events-auto">
         <RunPipelineButton />
 
-        <MetadataField />
+        <Metadata />
       </div>
 
       <div className="flex gap-2 items-center pointer-events-auto">

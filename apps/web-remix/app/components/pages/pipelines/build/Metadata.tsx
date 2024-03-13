@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Icon } from "@elpassion/taco";
 import {
   useRunPipeline,
@@ -16,8 +16,9 @@ import {
   DropdownPopup,
   DropdownTrigger,
 } from "~/components/dropdown/Dropdown";
+import { useDropdown } from "~/components/dropdown/DropdownContext";
 
-export const MetadataField = () => {
+export const Metadata = () => {
   const { metadata, setMetadata } = useRunPipeline();
 
   return (
@@ -60,6 +61,8 @@ interface MetadataFormProps {
   onSubmit: (value: IMetadata) => void;
 }
 function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
+  const { isShown, hide } = useDropdown();
+  const [key, setKey] = useState(new Date().getTime());
   const validator = React.useMemo(() => withZod(metadataSchema), []);
 
   const handleOnSubmit = (
@@ -72,10 +75,18 @@ function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
     onSubmit(data.value);
 
     successToast({ description: "Metadata configured" });
+    hide();
   };
+
+  useEffect(() => {
+    if (!isShown) {
+      setKey(new Date().getTime());
+    }
+  }, [isShown]);
 
   return (
     <ValidatedForm
+      key={key}
       defaultValues={{ value: defaultValue }}
       onSubmit={handleOnSubmit}
       validator={validator}
