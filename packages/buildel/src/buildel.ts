@@ -86,6 +86,12 @@ export class BuildelSocket {
   }
 }
 
+interface BuildelRunStartArgs {
+  initial_inputs?: { name: string; value: string }[];
+  alias?: string;
+  metadata?: Record<string, any>;
+}
+
 export class BuildelRun {
   private channel: Channel | null = null;
 
@@ -108,10 +114,7 @@ export class BuildelRun {
     }
   ) {}
 
-  public async start(
-    initial_inputs: { name: string; value: string }[] = [],
-    alias?: string
-  ) {
+  public async start(args: BuildelRunStartArgs = { initial_inputs: [] }) {
     if (this.status !== "idle") return;
 
     const token = await this.authenticateChannel();
@@ -120,8 +123,9 @@ export class BuildelRun {
       `pipelines:${this.organizationId}:${this.pipelineId}`,
       {
         ...token,
-        initial_inputs,
-        alias,
+        initial_inputs: args.initial_inputs,
+        alias: args.alias,
+        metadata: args.metadata,
       }
     );
 
