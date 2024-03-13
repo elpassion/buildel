@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.ApiCallTool do
+  alias Buildel.FlattenMap
   use Buildel.Blocks.Block
   alias LangChain.Function
 
@@ -189,6 +190,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   defp do_call_api(state, args) do
+    args = args |> Map.put(:metadata, state.opts.metadata) |> FlattenMap.flatten()
     url = build_url(state.opts.url, args)
     headers = build_headers(state.opts.headers, args)
 

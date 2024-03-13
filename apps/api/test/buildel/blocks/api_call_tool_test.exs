@@ -68,6 +68,39 @@ defmodule Buildel.Blocks.ApiCallToolTest do
         assert_receive({^topic, :text, _})
       end
     end
+
+    test "interpolates metadata" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            BlocksTestRunner.create_test_text_input_block("test_input"),
+            ApiCallTool.create(%{
+              name: "test",
+              opts: %{
+                method: "GET",
+                url:
+                  "https://jsonplaceholder.typicode.com/todos/{{metadata.id}}?abc={{metadata.abc}}&efg={{metadata.efg.a}}",
+                description: "description",
+                parameters: "{}",
+                headers: "{\"test\": \"{{metadata.abc}}\"}",
+                metadata: %{"id" => "1", "abc" => "abc", "efg" => %{"a" => "123"}}
+              },
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->args", "text")
+              ]
+            })
+          ]
+        })
+
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "response")
+
+      use_cassette("example_api_call_with_interpolation") do
+        test_run
+        |> BlocksTestRunner.Run.input("test_input", "input", {:text, "{}"})
+
+        assert_receive({^topic, :text, _}, 10000)
+      end
+    end
   end
 
   describe "function" do
