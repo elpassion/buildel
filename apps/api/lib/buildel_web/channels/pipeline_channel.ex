@@ -15,11 +15,13 @@ defmodule BuildelWeb.PipelineChannel do
     end
 
     required(:alias, :string)
+    required(:metadata, :map)
   end
 
   @default_params %{
     "initial_inputs" => [],
-    "alias" => "latest"
+    "alias" => "latest",
+    "metadata" => %{}
   }
 
   def join(channel_name, params, socket) do
@@ -27,7 +29,14 @@ defmodule BuildelWeb.PipelineChannel do
 
     with {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id}} <-
            parse_channel_name(channel_name),
-         {:ok, %{auth: auth, user_data: user_data, initial_inputs: initial_inputs, alias: alias}} <-
+         {:ok,
+          %{
+            auth: auth,
+            user_data: user_data,
+            initial_inputs: initial_inputs,
+            alias: alias,
+            metadata: metadata
+          }} <-
            validate(:join, params),
          {:ok, pipeline_id} <- Buildel.Utils.parse_id(pipeline_id),
          {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
@@ -45,7 +54,11 @@ defmodule BuildelWeb.PipelineChannel do
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, config} <- Pipelines.get_pipeline_config(pipeline, alias),
          {:ok, run} <-
-           Pipelines.upsert_run(%{id: run_id, pipeline_id: pipeline_id, config: config}),
+           Pipelines.upsert_run(%{
+             id: run_id,
+             pipeline_id: pipeline_id,
+             config: config |> Map.put(:metadata, metadata)
+           }),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
       initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
 
