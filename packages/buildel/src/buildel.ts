@@ -86,12 +86,6 @@ export class BuildelSocket {
   }
 }
 
-interface BuildelRunStartArgs {
-  initial_inputs?: { name: string; value: string }[];
-  alias?: string;
-  metadata?: Record<string, any>;
-}
-
 export class BuildelRun {
   private channel: Channel | null = null;
 
@@ -224,3 +218,9 @@ export class BuildelRun {
 }
 
 export type BuildelRunStatus = "idle" | "starting" | "running";
+
+export type BuildelRunStartArgs = {
+  initial_inputs?: { name: string; value: string }[];
+  alias?: string;
+  metadata?: Record<string, any>;
+};
