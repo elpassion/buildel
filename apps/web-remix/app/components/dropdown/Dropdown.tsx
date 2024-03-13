@@ -5,9 +5,11 @@ import {
   flip,
   Placement,
   OffsetOptions,
+  autoUpdate,
 } from "@floating-ui/react-dom";
 import { useBoolean, useOnClickOutside } from "usehooks-ts";
 import classNames from "classnames";
+
 import { DropdownContext, useDropdown } from "./DropdownContext";
 
 interface DropdownProps {
@@ -23,8 +25,9 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   offset = 5,
 }) => {
   const floatingContext = useFloating({
-    middleware: [floatingOffset(offset), flip()],
     placement,
+    middleware: [floatingOffset(offset), flip()],
+    whileElementsMounted: autoUpdate,
   });
   const wrapperRef = useRef<HTMLDivElement>(null);
   const {

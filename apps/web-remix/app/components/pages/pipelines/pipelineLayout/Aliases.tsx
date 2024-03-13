@@ -1,9 +1,8 @@
-import React, { PropsWithChildren, useEffect, useMemo, useRef } from "react";
+import React, { PropsWithChildren, useEffect, useMemo } from "react";
 import { ItemList } from "~/components/list/ItemList";
 import { Icon } from "@elpassion/taco";
 import classNames from "classnames";
 import z from "zod";
-import { useBoolean, useOnClickOutside } from "usehooks-ts";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { HiddenField } from "~/components/form/fields/field.context";
@@ -20,6 +19,12 @@ import {
 } from "~/components/pages/pipelines/pipeline.types";
 import { routes } from "~/utils/routes.utils";
 import { confirm } from "~/components/modal/confirm";
+import {
+  Dropdown,
+  DropdownPopup,
+  DropdownTrigger,
+} from "~/components/dropdown/Dropdown";
+import { useDropdown } from "~/components/dropdown/DropdownContext";
 
 interface AliasSelectProps {
   aliases: IPipelineAlias[];
@@ -27,19 +32,6 @@ interface AliasSelectProps {
 }
 
 export const AliasSelect = ({ aliases, value }: AliasSelectProps) => {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const { value: isShown, setTrue, setFalse } = useBoolean(false);
-
-  const show = () => {
-    setTrue();
-  };
-
-  const hide = () => {
-    setFalse();
-  };
-
-  useOnClickOutside(wrapperRef, hide);
-
   const name = useMemo(() => {
     return (
       aliases.find((alias) => alias.id.toString() === value?.toString())
@@ -48,73 +40,42 @@ export const AliasSelect = ({ aliases, value }: AliasSelectProps) => {
   }, [value, aliases]);
 
   return (
-    <div ref={wrapperRef} className="relative">
-      <SelectTrigger onClick={show}>
-        <div className="flex gap-1 items-center">
-          <span>
-            Aliases{" "}
-            <span
-              className={classNames({ "text-primary-500": value !== "latest" })}
-            >
-              ({name})
-            </span>
-          </span>
-          <Icon iconName={isShown ? "chevron-up" : "chevron-down"} />
+    <Dropdown placement="bottom-end">
+      <AliasTrigger name={name} value={value} />
+
+      <DropdownPopup className="min-w-[250px] absolute z-[11] top-full translate-y-[4px] right-0 bg-neutral-850 border border-neutral-800 rounded-lg overflow-hidden p-1 transition">
+        <div className="overflow-y-auto max-h-[300px]">
+          <AliasList data={aliases} />
         </div>
-      </SelectTrigger>
-
-      <AliasDropdown isShown={isShown}>
-        <AliasList data={aliases} />
-      </AliasDropdown>
-    </div>
+      </DropdownPopup>
+    </Dropdown>
   );
 };
 
-function SelectTrigger({
-  children,
-  className,
-  ...rest
+function AliasTrigger({
+  name,
+  value,
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  const { isShown } = useDropdown();
   return (
-    <button
+    <DropdownTrigger
       aria-label="Select aliases"
-      type="button"
-      className={classNames(
-        "px-2 py-1 text-neutral-100 text-sm border border-neutral-800 rounded-lg transition bg-transparent hover:bg-neutral-900",
-        className
-      )}
-      {...rest}
+      className="px-2 py-1 text-neutral-100 text-sm border border-neutral-800 rounded-lg transition bg-transparent hover:bg-neutral-900"
     >
-      {children}
-    </button>
+      <div className="flex gap-1 items-center">
+        <span>
+          Aliases{" "}
+          <span
+            className={classNames({ "text-primary-500": value !== "latest" })}
+          >
+            ({name})
+          </span>
+        </span>
+        <Icon iconName={isShown ? "chevron-up" : "chevron-down"} />
+      </div>
+    </DropdownTrigger>
   );
 }
-
-interface AliasDropdownProps {
-  isShown: boolean;
-  className?: string;
-}
-
-export const AliasDropdown: React.FC<PropsWithChildren<AliasDropdownProps>> = ({
-  children,
-  isShown,
-  className,
-}) => {
-  return (
-    <div
-      className={classNames(
-        "min-w-[250px] absolute z-[11] top-full translate-y-[4px] right-0 bg-neutral-850 border border-neutral-800 rounded-lg overflow-hidden p-1 transition",
-        {
-          "opacity-0 pointer-events-none": !isShown,
-          "opacity-100 pointer-events-auto": isShown,
-        },
-        className
-      )}
-    >
-      <div className="overflow-y-auto max-h-[300px]">{children}</div>
-    </div>
-  );
-};
 
 interface AliasListProps {
   data: IPipelineAlias[];
