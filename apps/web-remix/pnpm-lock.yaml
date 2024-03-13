@@ -23,6 +23,9 @@ dependencies:
   '@fastify/static':
     specifier: ^7.0.1
     version: 7.0.1
+  '@floating-ui/react-dom':
+    specifier: ^2.0.8
+    version: 2.0.8(react-dom@18.2.0)(react@18.2.0)
   '@mcansh/remix-fastify':
     specifier: ^3.2.2
     version: 3.2.2(@fastify/early-hints@1.0.1)(@remix-run/node@2.7.1)(fastify@4.26.0)
@@ -1400,6 +1403,17 @@ packages:
     dependencies:
       '@floating-ui/core': 1.6.0
       '@floating-ui/utils': 0.2.1
+    dev: false
+
+  /@floating-ui/react-dom@2.0.8(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-HOdqOt3R3OGeTKidaLvJKcgg75S6tibQ3Tif4eyd91QnIJWr0NLvoXFpJA/j8HqkFSL68GDca9AuyWEHlhyClw==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+    dependencies:
+      '@floating-ui/dom': 1.6.1
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@floating-ui/utils@0.2.1:

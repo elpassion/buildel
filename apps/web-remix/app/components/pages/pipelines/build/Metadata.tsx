@@ -1,7 +1,5 @@
-import React, { ButtonHTMLAttributes, PropsWithChildren, useRef } from "react";
+import React from "react";
 import { Icon } from "@elpassion/taco";
-import classNames from "classnames";
-import { useBoolean, useOnClickOutside } from "usehooks-ts";
 import {
   useRunPipeline,
   Metadata as IMetadata,
@@ -24,11 +22,9 @@ export const MetadataField = () => {
 
   return (
     <Dropdown>
-      <DropdownTrigger className="bg-neutral-950 text-neutral-100 w-8 h-8 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition">
-        <Icon iconName="file-text" />
-      </DropdownTrigger>
+      <MetadataTrigger />
 
-      <DropdownPopup>
+      <DropdownPopup className="min-w-[250px] z-[11] bg-neutral-850 border border-neutral-800 rounded-lg overflow-hidden p-2 lg:min-w-[350px]">
         <MetadataForm
           defaultValue={JSON.stringify(metadata)}
           onSubmit={setMetadata}
@@ -36,37 +32,13 @@ export const MetadataField = () => {
       </DropdownPopup>
     </Dropdown>
   );
-
-  // return (
-  //   <Metadata>
-  //     <MetadataForm
-  //       defaultValue={JSON.stringify(metadata)}
-  //       onSubmit={setMetadata}
-  //     />
-  //   </Metadata>
-  // );
 };
 
-function Metadata({ children }: PropsWithChildren) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const { value: isShown, setFalse, toggle } = useBoolean(false);
-
-  const hide = () => {
-    setFalse();
-  };
-
-  useOnClickOutside(wrapperRef, hide);
-
+function MetadataTrigger() {
   return (
-    <div ref={wrapperRef} className="relative">
-      <MetadataTrigger onClick={toggle} />
-
-      {isShown && (
-        <MetadataDropdown className="lg:min-w-[400px]">
-          {children}
-        </MetadataDropdown>
-      )}
-    </div>
+    <DropdownTrigger className="bg-neutral-950 text-neutral-100 w-8 h-8 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition">
+      <Icon iconName="file-text" />
+    </DropdownTrigger>
   );
 }
 
@@ -131,44 +103,5 @@ function MetadataEditor() {
       defaultValue=""
       error={fieldErrors["value"]}
     />
-  );
-}
-
-function MetadataTrigger({
-  className,
-  ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button
-      className={classNames(
-        "bg-neutral-950 text-neutral-100 w-8 h-8 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition",
-        className
-      )}
-      {...rest}
-    >
-      <Icon iconName="file-text" />
-    </button>
-  );
-}
-
-interface MetadataDropdownProps {
-  className?: string;
-}
-
-function MetadataDropdown({
-  children,
-
-  className,
-}: PropsWithChildren<MetadataDropdownProps>) {
-  return (
-    <div
-      className={classNames(
-        "min-w-[250px] absolute z-[11] top-full translate-y-[4px] left-0 bg-neutral-850 border border-neutral-800 rounded-lg p-2 transition",
-
-        className
-      )}
-    >
-      {children}
-    </div>
   );
 }

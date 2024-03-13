@@ -1,35 +1,31 @@
 import React, { PropsWithChildren, useRef } from "react";
+import {
+  offset as floatingOffset,
+  useFloating,
+  flip,
+  Placement,
+  OffsetOptions,
+} from "@floating-ui/react-dom";
 import { useBoolean, useOnClickOutside } from "usehooks-ts";
 import classNames from "classnames";
-
-interface IDropdownContext {
-  show: () => void;
-  hide: () => void;
-  toggle: () => void;
-  isShown: boolean;
-}
-
-const DropdownContext = React.createContext<IDropdownContext | undefined>(
-  undefined
-);
-
-export const useDropdown = () => {
-  const ctx = React.useContext(DropdownContext);
-
-  if (!ctx)
-    throw new Error("useDropdown can be used only inside Dropdown component");
-
-  return ctx;
-};
+import { DropdownContext, useDropdown } from "./DropdownContext";
 
 interface DropdownProps {
   defaultShown?: boolean;
+  placement?: Placement;
+  offset?: OffsetOptions;
 }
 
 export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   children,
   defaultShown,
+  placement = "bottom-start",
+  offset = 5,
 }) => {
+  const floatingContext = useFloating({
+    middleware: [floatingOffset(offset), flip()],
+    placement,
+  });
   const wrapperRef = useRef<HTMLDivElement>(null);
   const {
     value: isShown,
@@ -49,7 +45,9 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   useOnClickOutside(wrapperRef, hide);
 
   return (
-    <DropdownContext.Provider value={{ isShown, hide, show, toggle }}>
+    <DropdownContext.Provider
+      value={{ isShown, hide, show, toggle, context: floatingContext }}
+    >
       <div ref={wrapperRef} className="relative">
         {children}
       </div>
@@ -65,11 +63,13 @@ export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
   children,
   className,
 }) => {
-  const { isShown } = useDropdown();
+  const { isShown, context } = useDropdown();
   return (
     <div
+      ref={context.refs.setFloating}
+      style={context.floatingStyles}
       className={classNames(
-        "min-w-[250px] absolute z-[11] top-full translate-y-[4px] right-0 bg-neutral-850 border border-neutral-800 rounded-lg overflow-hidden p-2 transition",
+        "transition-opacity",
         {
           "opacity-0 pointer-events-none": !isShown,
           "opacity-100 pointer-events-auto": isShown,
@@ -85,7 +85,7 @@ export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
 export const DropdownTrigger: React.FC<
   React.ButtonHTMLAttributes<HTMLButtonElement>
 > = ({ children, className, onClick, ...rest }) => {
-  const { toggle } = useDropdown();
+  const { toggle, context } = useDropdown();
 
   const handleOnClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -95,7 +95,12 @@ export const DropdownTrigger: React.FC<
   };
 
   return (
-    <button className={classNames(className)} onClick={handleOnClick} {...rest}>
+    <button
+      ref={context.refs.setReference}
+      className={classNames(className)}
+      onClick={handleOnClick}
+      {...rest}
+    >
       {children}
     </button>
   );
