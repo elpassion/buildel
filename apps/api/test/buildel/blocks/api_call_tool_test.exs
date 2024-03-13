@@ -133,6 +133,38 @@ defmodule Buildel.Blocks.ApiCallToolTest do
         assert_receive({^topic, :text, _}, 10000)
       end
     end
+
+    test "interpolates all available values" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            BlocksTestRunner.create_test_text_input_block("test_input"),
+            ApiCallTool.create(%{
+              name: "test",
+              opts: %{
+                method: "GET",
+                url: "https://jsonplaceholder.typicode.com/todos/{{secrets.id}}",
+                description: "description",
+                parameters: "{}",
+                headers: "{\"test\": \"{{secrets.abc}}\", \"w\": \"{{metadata.w}}\"}",
+                metadata: %{}
+              },
+              connections: [
+                Blocks.Connection.from_connection_string("test_input:output->args", "text")
+              ]
+            })
+          ]
+        })
+
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "response")
+
+      use_cassette("example_api_partial_call") do
+        test_run
+        |> BlocksTestRunner.Run.input("test_input", "input", {:text, "{}"})
+
+        assert_receive({^topic, :text, _}, 10000)
+      end
+    end
   end
 
   describe "function" do

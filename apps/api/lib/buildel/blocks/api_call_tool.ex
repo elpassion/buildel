@@ -193,8 +193,8 @@ defmodule Buildel.Blocks.ApiCallTool do
     payload = args |> Jason.encode!()
 
     used_secrets =
-      (Regex.scan(~r/{{secrets.(.*)}}/, state.opts.url) ++
-         Regex.scan(~r/{{secrets.(.*)}}/, state.opts.headers))
+      (Regex.scan(~r/{{secrets.(.*)}}/U, state.opts.url) ++
+         Regex.scan(~r/{{secrets.(.*)}}/U, state.opts.headers))
       |> Enum.map(fn [_, secret] -> secret end)
       |> Enum.reduce(%{}, fn secret, acc ->
         acc
