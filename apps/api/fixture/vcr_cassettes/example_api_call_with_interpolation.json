@@ -2,12 +2,12 @@
   {
     "request": {
       "options": [],
-      "body": "{\"metadata.abc\":\"abc\",\"metadata.efg.a\":\"123\",\"metadata.id\":\"1\"}",
+      "body": "{}",
       "url": "https://jsonplaceholder.typicode.com/todos/1?abc=abc&efg=123",
       "headers": {
         "test": "abc",
-        "X-Buildel-Topic": "context::#PID<0.595.0>::block::test::io::output",
-        "X-Buildel-Context": "{\"global\":\"#PID<0.595.0>\",\"local\":\"#PID<0.595.0>\",\"parent\":\"#PID<0.595.0>\",\"metadata\":{\"abc\":\"abc\",\"efg\":{\"a\":\"123\"},\"id\":\"1\"}}"
+        "X-Buildel-Topic": "context::#PID<0.661.0>::block::test::io::output",
+        "X-Buildel-Context": "{\"global\":\"#PID<0.661.0>\",\"local\":\"#PID<0.661.0>\",\"parent\":\"#PID<0.661.0>\",\"metadata\":{\"abc\":\"abc\",\"efg\":{\"a\":\"123\"},\"id\":\"1\"}}"
       },
       "method": "GET",
       "request_body": ""
@@ -17,7 +17,7 @@
       "type": "ok",
       "body": "{\n  \"userId\": 1,\n  \"id\": 1,\n  \"title\": \"delectus aut autem\",\n  \"completed\": false\n}",
       "headers": {
-        "Date": "Wed, 13 Mar 2024 09:04:24 GMT",
+        "Date": "Wed, 13 Mar 2024 09:42:53 GMT",
         "Content-Type": "application/json; charset=utf-8",
         "Content-Length": "83",
         "Connection": "keep-alive",
@@ -37,10 +37,10 @@
         "Etag": "W/\"53-hfEnumeNh6YirfjyjaujcOPPT+s\"",
         "Via": "1.1 vegur",
         "CF-Cache-Status": "HIT",
-        "Age": "391",
+        "Age": "2700",
         "Accept-Ranges": "bytes",
         "Server": "cloudflare",
-        "CF-RAY": "863adb3bce183500-WAW",
+        "CF-RAY": "863b13991aa8862e-WAW",
         "alt-svc": "h3=\":443\"; ma=86400"
       },
       "status_code": 200

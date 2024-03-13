@@ -190,11 +190,25 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   defp do_call_api(state, args) do
-    args = args |> Map.put(:metadata, state.opts.metadata) |> FlattenMap.flatten()
+    payload = args |> Jason.encode!()
+
+    used_secrets =
+      (Regex.scan(~r/{{secrets.(.*)}}/, state.opts.url) ++
+         Regex.scan(~r/{{secrets.(.*)}}/, state.opts.headers))
+      |> Enum.map(fn [_, secret] -> secret end)
+      |> Enum.reduce(%{}, fn secret, acc ->
+        acc
+        |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
+      end)
+
+    args =
+      args
+      |> Map.put(:metadata, state.opts.metadata)
+      |> Map.put(:secrets, used_secrets)
+      |> FlattenMap.flatten()
+
     url = build_url(state.opts.url, args)
     headers = build_headers(state.opts.headers, args)
-
-    payload = args |> Jason.encode!()
 
     topic = Buildel.BlockPubSub.io_topic(state.context_id, state.block_name, "output")
 
