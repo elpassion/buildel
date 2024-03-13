@@ -6,7 +6,7 @@ defmodule Buildel.Blocks.TextToSpeechTest do
     assert TextToSpeech.options() == %{
              type: "text_to_speech",
              description:
-               "This module enables seamless conversion of textual data into audio format, leveraging the ElevenLabs API",
+               "This module enables seamless conversion of textual data into audio format, leveraging the ElevenLabs API.",
              inputs: [Block.text_input("input")],
              outputs: [Block.audio_output("output")],
              schema: TextToSpeech.schema(),
