@@ -13,18 +13,38 @@ import { Field } from "~/components/form/fields/field.context";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import { SubmitButton } from "~/components/form/submit";
 import { successToast } from "~/components/toasts/successToast";
+import {
+  Dropdown,
+  DropdownPopup,
+  DropdownTrigger,
+} from "~/components/dropdown/Dropdown";
 
 export const MetadataField = () => {
   const { metadata, setMetadata } = useRunPipeline();
 
   return (
-    <Metadata>
-      <MetadataForm
-        defaultValue={JSON.stringify(metadata)}
-        onSubmit={setMetadata}
-      />
-    </Metadata>
+    <Dropdown>
+      <DropdownTrigger className="bg-neutral-950 text-neutral-100 w-8 h-8 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition">
+        <Icon iconName="file-text" />
+      </DropdownTrigger>
+
+      <DropdownPopup>
+        <MetadataForm
+          defaultValue={JSON.stringify(metadata)}
+          onSubmit={setMetadata}
+        />
+      </DropdownPopup>
+    </Dropdown>
   );
+
+  // return (
+  //   <Metadata>
+  //     <MetadataForm
+  //       defaultValue={JSON.stringify(metadata)}
+  //       onSubmit={setMetadata}
+  //     />
+  //   </Metadata>
+  // );
 };
 
 function Metadata({ children }: PropsWithChildren) {
