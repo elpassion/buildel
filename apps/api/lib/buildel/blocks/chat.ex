@@ -92,7 +92,8 @@ defmodule Buildel.Blocks.Chat do
                       "google" => "https://generativelanguage.googleapis.com/v1beta/models",
                       "mistral" => "https://api.mistral.ai/v1/chat/completions"
                     }
-                  }
+                  },
+                  "minLength" => 1
                 },
                 chat_memory_type: %{
                   "type" => "string",
@@ -153,7 +154,8 @@ defmodule Buildel.Blocks.Chat do
                   "description" =>
                     "The template to use for the prompt. Pass `{{input_name:output}}` to use the input value.",
                   "presentAs" => "editor",
-                  "minLength" => 1
+                  "minLength" => 1,
+                  "default" => "{{text_input_1:output}}"
                 }
               )
           })

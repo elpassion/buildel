@@ -45,12 +45,14 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "type" => "string",
                   "title" => "URL",
                   "description" =>
-                    "The URL to send the request to. If you want to use a variable, use `{{variable_name}}`. Notice the double curly braces!"
+                    "The URL to send the request to. If you want to use a variable, use `{{variable_name}}`. Notice the double curly braces!",
+                  "minLength" => 1
                 },
                 description: %{
                   "type" => "string",
                   "title" => "Description",
-                  "description" => "The description of the API call."
+                  "description" => "The description of the API call.",
+                  "minLength" => 1
                 },
                 parameters: %{
                   "type" => "string",
@@ -59,7 +61,8 @@ defmodule Buildel.Blocks.ApiCallTool do
                     "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
                   "presentAs" => "editor",
                   "editorLanguage" => "json",
-                  "default" => "{\"type\": \"object\", \"properties\": {}, \"required\": []}"
+                  "default" => "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
+                  "minLength" => 1
                 },
                 headers: %{
                   "type" => "string",
@@ -69,7 +72,8 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "presentAs" => "editor",
                   "editorLanguage" => "json",
                   "default" =>
-                    "{\"Content-Type\": \"application/json\", \"Accept\": \"application/json\"}"
+                    "{\"Content-Type\": \"application/json\", \"Accept\": \"application/json\"}",
+                  "minLength" => 1
                 },
                 authorize: %{
                   "type" => "boolean",

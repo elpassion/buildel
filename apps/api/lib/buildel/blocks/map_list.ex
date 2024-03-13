@@ -35,8 +35,6 @@ defmodule Buildel.Blocks.MapList do
   end
 
   def map(pid, {:text, list}) do
-    IO.inspect(list, label: "MapList")
-
     case Jason.decode(list) do
       {:ok, list} ->
         GenServer.cast(pid, {:map, list})
