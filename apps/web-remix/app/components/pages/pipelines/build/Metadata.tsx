@@ -12,6 +12,7 @@ import { useFormContext, ValidatedForm } from "remix-validated-form";
 import { Field } from "~/components/form/fields/field.context";
 import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import { SubmitButton } from "~/components/form/submit";
+import { successToast } from "~/components/toasts/successToast";
 
 export const MetadataField = () => {
   const { metadata, setMetadata } = useRunPipeline();
@@ -69,9 +70,16 @@ interface MetadataFormProps {
 function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
   const validator = React.useMemo(() => withZod(metadataSchema), []);
 
-  const handleOnSubmit = (data: MetadataSchema) => {
+  const handleOnSubmit = (
+    data: MetadataSchema,
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+
     if (!data.value) return onSubmit({});
     onSubmit(data.value);
+
+    successToast({ description: "Metadata configured" });
   };
 
   return (
