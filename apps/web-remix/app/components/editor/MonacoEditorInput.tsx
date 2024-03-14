@@ -10,6 +10,7 @@ export type IEditor = Parameters<OnMount>[0];
 
 export const MonacoEditorInput: React.FC<EditorProps> = ({
   options,
+  theme,
   ...props
 }) => {
   //DOCS here - https://microsoft.github.io/monaco-editor/typedoc/interfaces/editor.IStandaloneEditorConstructionOptions.html#minimap
@@ -34,6 +35,7 @@ export const MonacoEditorInput: React.FC<EditorProps> = ({
         },
         ...options,
       }}
+      theme={theme || "vs-dark"}
       {...props}
     />
   );
