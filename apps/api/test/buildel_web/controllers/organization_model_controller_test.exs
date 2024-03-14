@@ -41,6 +41,11 @@ defmodule BuildelWeb.OrganizationModelControllerTest do
                },
                %{"api_type" => "azure", "id" => "azure", "name" => "Azure"},
                %{"api_type" => "google", "id" => "gemini-pro", "name" => "Gemini Pro"},
+               %{
+                 "api_type" => "google",
+                 "id" => "gemini-1.5-pro-latest",
+                 "name" => "Gemini 1.5 Pro"
+               },
                %{"api_type" => "mistral", "id" => "mistral-tiny", "name" => "Mistral Tiny"},
                %{"api_type" => "mistral", "id" => "mistral-small", "name" => "Mistral Small"},
                %{"api_type" => "mistral", "id" => "mistral-medium", "name" => "Mistral Medium"}
