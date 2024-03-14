@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.ApiCallTool do
+  alias Buildel.Blocks.Utils.Injectable
   alias Buildel.FlattenMap
   use Buildel.Blocks.Block
   alias LangChain.Function
@@ -113,10 +114,28 @@ defmodule Buildel.Blocks.ApiCallTool do
       block_context().context_from_context_id(context_id)
       |> Map.put("metadata", opts.metadata)
 
+    flattened_metadata = FlattenMap.flatten(opts.metadata)
+
     {:ok,
      state
      |> Map.put(:parameters, Jason.decode!(opts.parameters))
      |> Map.put(:context, context)
+     |> Map.put(
+       :available_metadata,
+       Injectable.used_metadata_keys([opts.url, opts.headers])
+       |> Enum.reduce(%{}, fn key, acc ->
+         acc
+         |> Map.put(key, flattened_metadata[key])
+       end)
+     )
+     |> Map.put(
+       :available_secrets,
+       Injectable.used_secrets_keys([opts.url, opts.headers])
+       |> Enum.reduce(%{}, fn secret, acc ->
+         acc
+         |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
+       end)
+     )
      |> assign_stream_state(opts)}
   end
 
@@ -196,19 +215,10 @@ defmodule Buildel.Blocks.ApiCallTool do
   defp do_call_api(state, args) do
     payload = args |> Jason.encode!()
 
-    used_secrets =
-      (Regex.scan(~r/{{secrets.(.*)}}/U, state.opts.url) ++
-         Regex.scan(~r/{{secrets.(.*)}}/U, state.opts.headers))
-      |> Enum.map(fn [_, secret] -> secret end)
-      |> Enum.reduce(%{}, fn secret, acc ->
-        acc
-        |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
-      end)
-
     args =
       args
-      |> Map.put(:metadata, state.opts.metadata)
-      |> Map.put(:secrets, used_secrets)
+      |> Map.put(:metadata, state.available_metadata)
+      |> Map.put(:secrets, state.available_secrets)
       |> FlattenMap.flatten()
 
     url = build_url(state.opts.url, args)
