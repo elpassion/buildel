@@ -61,16 +61,27 @@ export const MonacoEditorField = forwardRef<
       />
       <InputText text={error ?? supportingText} error={!!error} />
 
-      <MaximizedEditor
-        label={label}
-        supportingText={supportingText}
-        value={currentValue}
-        isOpen={isShown}
-        close={hide}
-        error={error}
-        onChange={handleOnChange}
-        {...props}
-      />
+      <div
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <MaximizedEditor
+          label={label}
+          supportingText={supportingText}
+          value={currentValue}
+          isOpen={isShown}
+          close={hide}
+          error={error}
+          onChange={handleOnChange}
+          {...props}
+        />
+      </div>
     </>
   );
 });
