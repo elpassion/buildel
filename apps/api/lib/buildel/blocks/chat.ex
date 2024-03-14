@@ -5,6 +5,8 @@ defmodule Buildel.Blocks.Chat do
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
   alias LangChain.Function
+  alias Buildel.Blocks.Utils.Injectable
+  alias Buildel.FlattenMap
 
   # Config
 
@@ -240,6 +242,9 @@ defmodule Buildel.Blocks.Chat do
     memory_type =
       %{"off" => :off, "full" => :full, "rolling" => :rolling} |> Map.get(memory_type_string)
 
+    flattened_metadata =
+      FlattenMap.flatten(opts.metadata)
+
     {:ok,
      state
      |> assign_stream_state
@@ -260,7 +265,23 @@ defmodule Buildel.Blocks.Chat do
          type: memory_type
        })
      )
-     |> Map.put(:usage, Buildel.Langchain.TokenUsage.new!())}
+     |> Map.put(:usage, Buildel.Langchain.TokenUsage.new!())
+     |> Map.put(
+       :available_metadata,
+       Injectable.used_metadata_keys([opts.prompt_template, opts.system_message])
+       |> Enum.reduce(%{}, fn key, acc ->
+         acc
+         |> Map.put(key, flattened_metadata[key])
+       end)
+     )
+     |> Map.put(
+       :available_secrets,
+       Injectable.used_secrets_keys([opts.prompt_template, opts.system_message])
+       |> Enum.reduce(%{}, fn secret, acc ->
+         acc
+         |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
+       end)
+     )}
   end
 
   @impl true
@@ -269,6 +290,8 @@ defmodule Buildel.Blocks.Chat do
 
     content =
       replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
+
+    content = fill_with_available_metadata_and_secrets(state, content)
 
     Buildel.BlockPubSub.broadcast_to_io(
       state.context_id,
@@ -604,7 +627,10 @@ defmodule Buildel.Blocks.Chat do
           message
 
         message ->
-          update_in(message.content, &replace_input_strings_with_latest_inputs_values(state, &1))
+          update_in(message.content, fn message ->
+            message = replace_input_strings_with_latest_inputs_values(state, message)
+            fill_with_available_metadata_and_secrets(state, message)
+          end)
       end)
 
     if Enum.all?(messages, &all_inputs_in_string_filled?(&1.content, state.connections)) do
@@ -612,6 +638,21 @@ defmodule Buildel.Blocks.Chat do
     else
       {:error, :not_all_inputs_filled}
     end
+  end
+
+  defp fill_with_available_metadata_and_secrets(state, string) do
+    %{metadata: state.available_metadata, secrets: state.available_secrets}
+    |> FlattenMap.flatten()
+    |> Enum.reduce(string, fn
+      {key, value}, acc when is_number(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string())
+
+      {key, value}, acc when is_binary(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string())
+
+      _, acc ->
+        acc
+    end)
   end
 
   defp chat() do
