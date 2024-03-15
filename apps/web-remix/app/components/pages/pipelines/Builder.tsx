@@ -7,6 +7,7 @@ import React, {
   useRef,
 } from "react";
 import classNames from "classnames";
+import { useEventListener } from "usehooks-ts";
 import ReactFlow, {
   addEdge,
   Background,
@@ -81,6 +82,18 @@ export const Builder = ({
       nodes: getNodes(pipeline.config),
       edges: getEdges(pipeline.config),
     },
+  });
+
+  useEventListener("keydown", (e) => {
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      (e.key === "z" || e.key === "Z") &&
+      e.shiftKey
+    ) {
+      redo();
+    } else if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+      undo();
+    }
   });
 
   const location = useLocation();
