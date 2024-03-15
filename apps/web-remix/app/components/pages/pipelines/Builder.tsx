@@ -72,14 +72,11 @@ export const Builder = ({
   className,
 }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
-  const {
-    history: flowState,
-    setHistory: setFlowState,
-    allowUndo,
-    allowRedo,
-    undo,
-    redo,
-  } = useUndoRedo({
+  const [
+    flowState,
+    setFlowState,
+    { updateCurrent, allowUndo, allowRedo, undo, redo },
+  ] = useUndoRedo({
     initial: {
       nodes: getNodes(pipeline.config),
       edges: getEdges(pipeline.config),
@@ -93,14 +90,17 @@ export const Builder = ({
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       if (type === "readOnly") return;
-
-      setFlowState(
-        (state) => ({
+      if (["select", "position", "dimensions"].includes(changes[0].type)) {
+        updateCurrent((state) => ({
           ...state,
           nodes: applyNodeChanges(changes, state.nodes),
-        }),
-        ["select", "position", "dimensions"].includes(changes[0].type)
-      );
+        }));
+      } else {
+        setFlowState((state) => ({
+          ...state,
+          nodes: applyNodeChanges(changes, state.nodes),
+        }));
+      }
     },
     [type]
   );
@@ -108,14 +108,17 @@ export const Builder = ({
   const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       if (type === "readOnly") return;
-
-      setFlowState(
-        (state) => ({
+      if (["select"].includes(changes[0].type)) {
+        updateCurrent((state) => ({
           ...state,
           edges: applyEdgeChanges(changes, state.edges),
-        }),
-        ["select"].includes(changes[0].type)
-      );
+        }));
+      } else {
+        setFlowState((state) => ({
+          ...state,
+          edges: applyEdgeChanges(changes, state.edges),
+        }));
+      }
     },
     [type]
   );

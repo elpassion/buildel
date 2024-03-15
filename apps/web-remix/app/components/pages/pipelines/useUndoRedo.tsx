@@ -6,8 +6,13 @@ type Action<T> =
       type: "SET";
       payload: {
         data: ((state: T) => T) | T;
-        ignore: boolean;
         maxLength: number;
+      };
+    }
+  | {
+      type: "UPDATE";
+      payload: {
+        data: ((state: T) => T) | T;
       };
     }
   | { type: "REDO" }
@@ -29,12 +34,25 @@ const reducer = <T,>(state: State<T>, action: Action<T>): State<T> => {
           : action.payload.data;
 
       if (isEqual(state.curr, newCurr)) return state;
-      if (action.payload.ignore) return { ...state, curr: newCurr };
 
       return {
         prev: [...state.prev, state.curr].slice(-action.payload.maxLength),
         curr: newCurr,
         next: [],
+      };
+
+    case "UPDATE":
+      const curr =
+        typeof action.payload.data === "function"
+          ? //@ts-ignore
+            action.payload.data(state.curr)
+          : action.payload.data;
+
+      if (isEqual(state.curr, curr)) return state;
+
+      return {
+        ...state,
+        curr: curr,
       };
     case "REDO":
       if (state.next.length === 0) return state;
@@ -78,16 +96,23 @@ export const useUndoRedo = <T,>({
     dispatch({ type: "REDO" });
   }, []);
 
-  const set = useCallback((cb: ((oldState: T) => T) | T, ignore = false) => {
-    dispatch({ type: "SET", payload: { data: cb, ignore, maxLength } });
+  const set = useCallback((cb: ((oldState: T) => T) | T) => {
+    dispatch({ type: "SET", payload: { data: cb, maxLength } });
   }, []);
 
-  return {
-    allowUndo: state.prev.length > 0,
-    allowRedo: state.next.length > 0,
-    history: state.curr,
-    setHistory: set,
-    undo,
-    redo,
-  };
+  const update = useCallback((cb: ((oldState: T) => T) | T) => {
+    dispatch({ type: "UPDATE", payload: { data: cb } });
+  }, []);
+
+  return [
+    state.curr,
+    set,
+    {
+      updateCurrent: update,
+      allowUndo: state.prev.length > 0,
+      allowRedo: state.next.length > 0,
+      undo,
+      redo,
+    },
+  ] as const;
 };
