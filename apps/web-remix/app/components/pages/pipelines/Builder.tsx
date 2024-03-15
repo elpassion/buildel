@@ -24,6 +24,7 @@ import ReactFlow, {
 } from "reactflow";
 import { useLocation, useNavigate, useSearchParams } from "@remix-run/react";
 import { buildUrlWithParams } from "~/utils/url";
+import { useUndoRedo } from "~/hooks/useUndoRedo";
 import {
   getAllBlockTypes,
   getEdges,
@@ -43,7 +44,7 @@ import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
 import { useCopyPasteNode } from "./useCopyPasteNode";
-import { useUndoRedo } from "./useUndoRedo";
+
 import "reactflow/dist/style.css";
 
 interface BuilderProps {
