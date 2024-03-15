@@ -80,8 +80,10 @@ export const Builder = ({
     undo,
     redo,
   } = useUndoRedo({
-    nodes: getNodes(pipeline.config),
-    edges: getEdges(pipeline.config),
+    initial: {
+      nodes: getNodes(pipeline.config),
+      edges: getEdges(pipeline.config),
+    },
   });
 
   const location = useLocation();

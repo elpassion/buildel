@@ -2,7 +2,14 @@ import { useCallback, useReducer } from "react";
 import isEqual from "lodash.isequal";
 
 type Action<T> =
-  | { type: "SET"; payload: { data: ((state: T) => T) | T; ignore: boolean } }
+  | {
+      type: "SET";
+      payload: {
+        data: ((state: T) => T) | T;
+        ignore: boolean;
+        maxLength: number;
+      };
+    }
   | { type: "REDO" }
   | { type: "UNDO" };
 
@@ -25,7 +32,7 @@ const reducer = <T,>(state: State<T>, action: Action<T>): State<T> => {
       if (action.payload.ignore) return { ...state, curr: newCurr };
 
       return {
-        prev: [...state.prev, state.curr],
+        prev: [...state.prev, state.curr].slice(-action.payload.maxLength),
         curr: newCurr,
         next: [],
       };
@@ -48,7 +55,15 @@ const reducer = <T,>(state: State<T>, action: Action<T>): State<T> => {
   }
 };
 
-export const useUndoRedo = <T,>(initial: T) => {
+type UseUndoRedoArgs<T> = {
+  initial: T;
+  maxLength?: number;
+};
+
+export const useUndoRedo = <T,>({
+  initial,
+  maxLength = 30,
+}: UseUndoRedoArgs<T>) => {
   const [state, dispatch] = useReducer(reducer<T>, {
     prev: [],
     curr: initial,
@@ -64,7 +79,7 @@ export const useUndoRedo = <T,>(initial: T) => {
   }, []);
 
   const set = useCallback((cb: ((oldState: T) => T) | T, ignore = false) => {
-    dispatch({ type: "SET", payload: { data: cb, ignore } });
+    dispatch({ type: "SET", payload: { data: cb, ignore, maxLength } });
   }, []);
 
   return {
