@@ -73,11 +73,7 @@ export const Builder = ({
   className,
 }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
-  const [
-    flowState,
-    setFlowState,
-    { updateCurrent, allowUndo, allowRedo, undo, redo },
-  ] = useUndoRedo({
+  const [flowState, setFlowState, { updateCurrent, undo, redo }] = useUndoRedo({
     initial: {
       nodes: getNodes(pipeline.config),
       edges: getEdges(pipeline.config),
@@ -316,24 +312,6 @@ export const Builder = ({
             edges: flowState.edges,
             onBlockCreate,
           })}
-
-          <div className="absolute top-0 right-1/2 flex gap-3">
-            <button
-              disabled={!allowUndo}
-              onClick={undo}
-              className="disabled:bg-red-500"
-            >
-              Undo
-            </button>
-
-            <button
-              disabled={!allowRedo}
-              onClick={redo}
-              className="disabled:bg-red-500"
-            >
-              Redo
-            </button>
-          </div>
         </ReactFlowProvider>
       </RunPipelineProvider>
     </div>
