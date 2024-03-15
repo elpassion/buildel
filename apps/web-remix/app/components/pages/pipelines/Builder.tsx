@@ -15,8 +15,6 @@ import ReactFlow, {
   Controls,
   EdgeProps,
   ReactFlowProvider,
-  useEdgesState,
-  useNodesState,
   NodeChange,
   EdgeChange,
   NodeProps,
@@ -33,7 +31,6 @@ import {
 } from "./PipelineFlow.utils";
 import {
   IBlockConfig,
-  IConfigConnection,
   IEdge,
   IExtendedPipeline,
   INode,
@@ -129,15 +126,12 @@ export const Builder = ({
     [state]
   );
 
-  const handleDelete = useCallback(
-    (node: IBlockConfig) => {
-      setState((state) => ({
-        ...state,
-        nodes: state.nodes.filter((nd) => nd.id !== node.name),
-      }));
-    },
-    [setState]
-  );
+  const handleDelete = useCallback((node: IBlockConfig) => {
+    setState((state) => ({
+      ...state,
+      nodes: state.nodes.filter((nd) => nd.id !== node.name),
+    }));
+  }, []);
 
   const onBlockCreate = useCallback(
     async (created: IBlockConfig) => {
@@ -196,7 +190,7 @@ export const Builder = ({
         disabled={type === "readOnly"}
       />
     ),
-    []
+    [handleDelete]
   );
 
   const nodeTypes = useMemo(() => {
