@@ -20,6 +20,8 @@ import ReactFlow, {
   NodeChange,
   EdgeChange,
   NodeProps,
+  applyEdgeChanges,
+  applyNodeChanges,
 } from "reactflow";
 import {
   getAllBlockTypes,
@@ -44,6 +46,7 @@ import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
 import { useLocation, useNavigate, useSearchParams } from "@remix-run/react";
 import { buildUrlWithParams } from "~/utils/url";
 import "reactflow/dist/style.css";
+import { useUndoRedo } from "./useUndoRedo";
 
 interface BuilderProps {
   alias?: string;
@@ -76,13 +79,10 @@ export const Builder = ({
   onSave,
 }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
-
-  const [nodes, setNodes, onNodesChange] = useNodesState(
-    getNodes(pipeline.config)
-  );
-  const [edges, setEdges, onEdgesChange] = useEdgesState<IConfigConnection>(
-    getEdges(pipeline.config)
-  );
+  const { state, setState, allowUndo, allowRedo, undo, redo } = useUndoRedo({
+    nodes: getNodes(pipeline.config),
+    edges: getEdges(pipeline.config),
+  });
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -91,37 +91,58 @@ export const Builder = ({
   const handleOnNodesChange = useCallback(
     (changes: NodeChange[]) => {
       if (type === "readOnly") return;
-      return onNodesChange(changes);
+
+      const ignore = ["select", "position", "dimensions"].includes(
+        changes[0].type
+      );
+
+      setState(
+        (state) => ({
+          ...state,
+          nodes: applyNodeChanges(changes, state.nodes),
+        }),
+        ignore
+      );
     },
-    [onNodesChange, type]
+    [setState, type]
   );
 
   const handleOnEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       if (type === "readOnly") return;
-      return onEdgesChange(changes);
+      const ignore = ["select"].includes(changes[0].type);
+
+      setState(
+        (state) => ({
+          ...state,
+          edges: applyEdgeChanges(changes, state.edges),
+        }),
+        ignore
+      );
     },
-    [onEdgesChange, type]
+    [setState, type]
   );
 
   const handleIsValidConnection = useCallback(
     (connection: Connection) =>
-      isValidConnection(toPipelineConfig(nodes, edges), connection),
-    [edges, nodes]
+      isValidConnection(toPipelineConfig(state.nodes, state.edges), connection),
+    [state]
   );
 
   const handleDelete = useCallback(
     (node: IBlockConfig) => {
-      setEdges((eds) => eds.filter((ed) => ed.source !== node.name));
-      setNodes((nds) => nds.filter((nd) => nd.id !== node.name));
+      setState((state) => ({
+        ...state,
+        nodes: state.nodes.filter((nd) => nd.id !== node.name),
+      }));
     },
-    [setNodes, setEdges]
+    [setState]
   );
 
   const onBlockCreate = useCallback(
     async (created: IBlockConfig) => {
       const sameBlockTypes = getAllBlockTypes(
-        toPipelineConfig(nodes, edges),
+        toPipelineConfig(state.nodes, state.edges),
         created.type
       );
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
@@ -136,28 +157,35 @@ export const Builder = ({
         data: { ...created, name },
       };
 
-      setNodes((prev) => [...prev, newBlock]);
+      setState((state) => ({
+        ...state,
+        nodes: [...state.nodes, newBlock],
+      }));
     },
-    [setNodes, nodes, edges]
+    [setState, state.nodes]
   );
 
   const onConnect = useCallback(
     (params: Connection) => {
-      setEdges((eds) =>
-        addEdge(
+      setState((state) => ({
+        ...state,
+        edges: addEdge(
           {
             id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
             ...params,
           },
-          eds
-        )
-      );
+          state.edges
+        ),
+      }));
     },
-    [setEdges]
+    [setState]
   );
 
   const handleDeleteEdge = useCallback((id: string) => {
-    setEdges((eds) => eds.filter((edge) => edge.id !== id));
+    setState((state) => ({
+      ...state,
+      edges: state.edges.filter((edge) => edge.id !== id),
+    }));
   }, []);
 
   const PipelineNode = useCallback(
@@ -168,7 +196,7 @@ export const Builder = ({
         disabled={type === "readOnly"}
       />
     ),
-    [handleDelete]
+    []
   );
 
   const nodeTypes = useMemo(() => {
@@ -201,14 +229,13 @@ export const Builder = ({
         buildUrlWithParams(".", Object.fromEntries(searchParams.entries())),
         { state: null }
       );
-      setNodes(getNodes(pipeline.config));
-      setEdges(getEdges(pipeline.config));
+
+      setState(() => ({
+        nodes: getNodes(pipeline.config),
+        edges: getEdges(pipeline.config),
+      }));
     }
   }, [pipeline, location, searchParams]);
-
-  const handleOnSave = useCallback(() => {
-    onSave?.(toPipelineConfig(nodes, edges));
-  }, [edges, nodes, onSave]);
 
   return (
     <div
@@ -218,7 +245,10 @@ export const Builder = ({
     >
       <RunPipelineProvider
         alias={alias}
-        pipeline={{ ...pipeline, config: toPipelineConfig(nodes, edges) }}
+        pipeline={{
+          ...pipeline,
+          config: toPipelineConfig(state.nodes, state.edges),
+        }}
       >
         <ReactFlowProvider>
           <ReactFlow
@@ -227,8 +257,8 @@ export const Builder = ({
             nodesDraggable={type !== "readOnly"}
             nodesConnectable={type !== "readOnly"}
             nodesFocusable={type !== "readOnly"}
-            nodes={nodes}
-            edges={edges}
+            nodes={state.nodes}
+            edges={state.edges}
             onNodesChange={handleOnNodesChange}
             onEdgesChange={handleOnEdgesChange}
             onConnect={onConnect}
@@ -237,6 +267,7 @@ export const Builder = ({
             onInit={onInit}
             onDrop={onDrop}
             onDragOver={onDragOver}
+            // onNodeDragStop={(e, a, b) => console.log("STOP", e, a, b)}
             // onBlur={handleOnSave}
             isValidConnection={handleIsValidConnection}
             fitViewOptions={{
@@ -255,10 +286,28 @@ export const Builder = ({
           </ReactFlow>
 
           {children?.({
-            nodes,
-            edges,
+            nodes: state.nodes,
+            edges: state.edges,
             onBlockCreate,
           })}
+
+          <div className="absolute top-0 right-1/2 flex gap-3">
+            <button
+              disabled={!allowUndo}
+              onClick={undo}
+              className="disabled:bg-red-500"
+            >
+              Undo
+            </button>
+
+            <button
+              disabled={!allowRedo}
+              onClick={redo}
+              className="disabled:bg-red-500"
+            >
+              Redo
+            </button>
+          </div>
         </ReactFlowProvider>
       </RunPipelineProvider>
     </div>
