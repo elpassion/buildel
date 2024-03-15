@@ -37,7 +37,10 @@ export const Metadata = () => {
 
 function MetadataTrigger() {
   return (
-    <DropdownTrigger className="bg-neutral-950 text-neutral-100 w-8 h-8 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition">
+    <DropdownTrigger
+      aria-label="Open metadata editor"
+      className="bg-neutral-950 text-neutral-100 w-8 h-8 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition"
+    >
       <Icon iconName="file-text" />
     </DropdownTrigger>
   );

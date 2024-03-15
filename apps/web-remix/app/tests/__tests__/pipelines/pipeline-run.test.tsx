@@ -21,6 +21,7 @@ import {
   simplePipelineFixture,
 } from "~/tests/fixtures/pipeline.fixtures";
 import { runHandlers } from "./pipeline-run.handlers";
+import { EditorHandle } from "~/tests/handles/Editor.handle";
 
 const handlers = () => [
   ...runHandlers(),
@@ -168,6 +169,35 @@ describe("Pipeline workflow run", () => {
     expect(textOutputBlock.isValid).toBe(false);
     await screen.findByText(/The workflow run failed due to an error/i);
   });
+
+  test("should send metadata through socket", async () => {
+    const page = new PipelineRunObject().render({
+      initialEntries: ["/1/pipelines/1/build"],
+    });
+    const startButton = await page.startWorkflowButton();
+
+    const metadataTrigger = await page.metadataDropdownTrigger();
+
+    await metadataTrigger.click();
+
+    const metadataSubmit = await page.metadataSubmit();
+    const metadataEditor = await page.metadataEditor();
+
+    await metadataEditor.paste('{"test": 123}');
+    await metadataSubmit.click();
+
+    await startButton.click();
+
+    await waitFor(async () => {
+      expect(onMessageMock).toHaveBeenCalledWith({
+        auth: expect.any(String),
+        user_data: expect.any(Object),
+        initial_inputs: expect.any(Array),
+        alias: "latest",
+        metadata: { test: 123 },
+      });
+    });
+  });
 });
 
 class PipelineRunObject {
@@ -201,5 +231,17 @@ class PipelineRunObject {
 
   async textBlockInput(blockName: string) {
     return TextareaHandle.fromTestId(blockName);
+  }
+
+  async metadataDropdownTrigger() {
+    return ButtonHandle.fromRole("Open metadata editor");
+  }
+
+  async metadataEditor() {
+    return EditorHandle.fromTestId("value");
+  }
+
+  async metadataSubmit() {
+    return ButtonHandle.fromRole("Set");
   }
 }
