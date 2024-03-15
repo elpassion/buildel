@@ -31,6 +31,7 @@ export interface INode {
   id: string;
   type?: string;
   position: { x: number; y: number };
+  selected?: boolean;
   data: IBlockConfig;
 }
 

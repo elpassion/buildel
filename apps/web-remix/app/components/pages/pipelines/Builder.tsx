@@ -22,6 +22,8 @@ import ReactFlow, {
   applyEdgeChanges,
   applyNodeChanges,
 } from "reactflow";
+import { useLocation, useNavigate, useSearchParams } from "@remix-run/react";
+import { buildUrlWithParams } from "~/utils/url";
 import {
   getAllBlockTypes,
   getEdges,
@@ -40,8 +42,7 @@ import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
 import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
-import { useLocation, useNavigate, useSearchParams } from "@remix-run/react";
-import { buildUrlWithParams } from "~/utils/url";
+import { useCopyPasteNode } from "./useCopyPasteNode";
 import { useUndoRedo } from "./useUndoRedo";
 import "reactflow/dist/style.css";
 
@@ -223,7 +224,17 @@ export const Builder = ({
     }));
   }, []);
 
-  const { onDragOver, onDrop, onInit } = useDraggableNodes({
+  const { onInit: onInitCopyPaste, onMouseMove } = useCopyPasteNode({
+    wrapper: reactFlowWrapper,
+    onPaste: onBlockCreate,
+    nodes: flowState.nodes,
+  });
+
+  const {
+    onDragOver,
+    onDrop,
+    onInit: onInitDraggable,
+  } = useDraggableNodes({
     wrapper: reactFlowWrapper,
     onDrop: onBlockCreate,
   });
@@ -280,18 +291,22 @@ export const Builder = ({
             nodesFocusable={type !== "readOnly"}
             nodes={flowState.nodes}
             edges={flowState.edges}
+            onMouseMove={onMouseMove}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
-            onInit={onInit}
             onDrop={onDrop}
             onDragOver={onDragOver}
             onNodeDragStart={onNodeDragStartStop}
             onNodeDragStop={onNodeDragStartStop}
             // onBlur={handleOnSave}
             isValidConnection={handleIsValidConnection}
+            onInit={(instance) => {
+              onInitCopyPaste(instance);
+              onInitDraggable(instance);
+            }}
             fitViewOptions={{
               minZoom: 0.5,
               maxZoom: 1,

@@ -17,6 +17,7 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
       x: 100,
       y: 100,
     },
+    selected: false,
     data: block,
   }));
 }
