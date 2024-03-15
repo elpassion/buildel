@@ -118,6 +118,8 @@ export const useUndoRedo = <T,>({
       updateCurrent: update,
       allowUndo: state.prev.length > 0,
       allowRedo: state.next.length > 0,
+      prev: state.prev,
+      next: state.next,
       reset,
       undo,
       redo,
