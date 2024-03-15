@@ -15,6 +15,7 @@ type Action<T> =
         data: ((state: T) => T) | T;
       };
     }
+  | { type: "RESET"; payload: T }
   | { type: "REDO" }
   | { type: "UNDO" };
 
@@ -70,6 +71,8 @@ const reducer = <T,>(state: State<T>, action: Action<T>): State<T> => {
         curr: state.prev[state.prev.length - 1],
         next: [state.curr, ...state.next],
       };
+    case "RESET":
+      return { prev: [], curr: action.payload, next: [] };
   }
 };
 
@@ -87,6 +90,10 @@ export const useUndoRedo = <T,>({
     curr: initial,
     next: [],
   });
+
+  const reset = useCallback(() => {
+    dispatch({ type: "RESET", payload: initial });
+  }, []);
 
   const undo = useCallback(() => {
     dispatch({ type: "UNDO" });
@@ -111,6 +118,7 @@ export const useUndoRedo = <T,>({
       updateCurrent: update,
       allowUndo: state.prev.length > 0,
       allowRedo: state.next.length > 0,
+      reset,
       undo,
       redo,
     },
