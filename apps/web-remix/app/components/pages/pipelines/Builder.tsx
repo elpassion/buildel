@@ -151,8 +151,12 @@ export const Builder = ({
 
   const handleDelete = useCallback((node: IBlockConfig) => {
     setFlowState((state) => ({
-      ...state,
       nodes: state.nodes.filter((nd) => nd.id !== node.name),
+      edges: state.edges.filter(
+        (ed) =>
+          ed.data?.from.block_name !== node.name &&
+          ed.data?.to.block_name !== node.name
+      ),
     }));
   }, []);
 
