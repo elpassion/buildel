@@ -34,7 +34,6 @@ import {
   IEdge,
   IExtendedPipeline,
   INode,
-  IPipelineConfig,
 } from "./pipeline.types";
 import { CustomNodeProps } from "./CustomNodes/CustomNode";
 import { useDraggableNodes } from "./useDraggableNodes";
@@ -42,8 +41,8 @@ import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
 import { useLocation, useNavigate, useSearchParams } from "@remix-run/react";
 import { buildUrlWithParams } from "~/utils/url";
-import "reactflow/dist/style.css";
 import { useUndoRedo } from "./useUndoRedo";
+import "reactflow/dist/style.css";
 
 interface BuilderProps {
   alias?: string;
@@ -61,7 +60,6 @@ interface BuilderProps {
     edges: IEdge[];
     onBlockCreate: (created: IBlockConfig) => Promise<void>;
   }) => ReactNode;
-  onSave?: (config: IPipelineConfig) => void;
 }
 
 export const Builder = ({
@@ -69,14 +67,19 @@ export const Builder = ({
   children,
   alias = "latest",
   type = "editable",
-
   CustomNode,
   CustomEdge,
   className,
-  onSave,
 }: BuilderProps) => {
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
-  const { state, setState, allowUndo, allowRedo, undo, redo } = useUndoRedo({
+  const {
+    history: flowState,
+    setHistory: setFlowState,
+    allowUndo,
+    allowRedo,
+    undo,
+    redo,
+  } = useUndoRedo({
     nodes: getNodes(pipeline.config),
     edges: getEdges(pipeline.config),
   });
@@ -85,49 +88,70 @@ export const Builder = ({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const handleOnNodesChange = useCallback(
+  const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
       if (type === "readOnly") return;
 
-      const ignore = ["select", "position", "dimensions"].includes(
-        changes[0].type
-      );
-
-      setState(
+      setFlowState(
         (state) => ({
           ...state,
           nodes: applyNodeChanges(changes, state.nodes),
         }),
-        ignore
+        ["select", "position", "dimensions"].includes(changes[0].type)
       );
     },
-    [setState, type]
+    [setFlowState, type]
   );
 
-  const handleOnEdgesChange = useCallback(
+  const onEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
       if (type === "readOnly") return;
-      const ignore = ["select"].includes(changes[0].type);
 
-      setState(
+      setFlowState(
         (state) => ({
           ...state,
           edges: applyEdgeChanges(changes, state.edges),
         }),
-        ignore
+        ["select"].includes(changes[0].type)
       );
     },
-    [setState, type]
+    [setFlowState, type]
   );
+
+  const onConnect = useCallback(
+    (params: Connection) => {
+      setFlowState((state) => ({
+        ...state,
+        edges: addEdge(
+          {
+            id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
+            ...params,
+          },
+          state.edges
+        ),
+      }));
+    },
+    [setFlowState]
+  );
+
+  const handleDeleteEdge = useCallback((id: string) => {
+    setFlowState((state) => ({
+      ...state,
+      edges: state.edges.filter((edge) => edge.id !== id),
+    }));
+  }, []);
 
   const handleIsValidConnection = useCallback(
     (connection: Connection) =>
-      isValidConnection(toPipelineConfig(state.nodes, state.edges), connection),
-    [state]
+      isValidConnection(
+        toPipelineConfig(flowState.nodes, flowState.edges),
+        connection
+      ),
+    [flowState]
   );
 
   const handleDelete = useCallback((node: IBlockConfig) => {
-    setState((state) => ({
+    setFlowState((state) => ({
       ...state,
       nodes: state.nodes.filter((nd) => nd.id !== node.name),
     }));
@@ -136,7 +160,7 @@ export const Builder = ({
   const onBlockCreate = useCallback(
     async (created: IBlockConfig) => {
       const sameBlockTypes = getAllBlockTypes(
-        toPipelineConfig(state.nodes, state.edges),
+        toPipelineConfig(flowState.nodes, flowState.edges),
         created.type
       );
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
@@ -151,36 +175,43 @@ export const Builder = ({
         data: { ...created, name },
       };
 
-      setState((state) => ({
+      setFlowState((state) => ({
         ...state,
         nodes: [...state.nodes, newBlock],
       }));
     },
-    [setState, state.nodes]
+    [setFlowState, flowState.nodes]
   );
 
-  const onConnect = useCallback(
-    (params: Connection) => {
-      setState((state) => ({
-        ...state,
-        edges: addEdge(
-          {
-            id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
-            ...params,
-          },
-          state.edges
-        ),
-      }));
-    },
-    [setState]
-  );
+  useEffect(() => {
+    if (location.state?.reset) {
+      navigate(
+        buildUrlWithParams(".", Object.fromEntries(searchParams.entries())),
+        { state: null }
+      );
 
-  const handleDeleteEdge = useCallback((id: string) => {
-    setState((state) => ({
-      ...state,
-      edges: state.edges.filter((edge) => edge.id !== id),
+      setFlowState({
+        nodes: getNodes(pipeline.config),
+        edges: getEdges(pipeline.config),
+      });
+    }
+  }, [pipeline, location, searchParams]);
+
+  const onNodeDragStartStop = useCallback((_: unknown, node: INode) => {
+    setFlowState((prev) => ({
+      ...prev,
+      nodes: prev.nodes.map((nd) => {
+        if (nd.id !== node.id) return nd;
+
+        return { ...node, dragging: false };
+      }),
     }));
   }, []);
+
+  const { onDragOver, onDrop, onInit } = useDraggableNodes({
+    wrapper: reactFlowWrapper,
+    onDrop: onBlockCreate,
+  });
 
   const PipelineNode = useCallback(
     (props: NodeProps) => (
@@ -212,25 +243,6 @@ export const Builder = ({
     return { default: DefaultEdge };
   }, [DefaultEdge]);
 
-  const { onDragOver, onDrop, onInit } = useDraggableNodes({
-    wrapper: reactFlowWrapper,
-    onDrop: onBlockCreate,
-  });
-
-  useEffect(() => {
-    if (location.state?.reset) {
-      navigate(
-        buildUrlWithParams(".", Object.fromEntries(searchParams.entries())),
-        { state: null }
-      );
-
-      setState(() => ({
-        nodes: getNodes(pipeline.config),
-        edges: getEdges(pipeline.config),
-      }));
-    }
-  }, [pipeline, location, searchParams]);
-
   return (
     <div
       data-testid="workflow-builder"
@@ -241,7 +253,7 @@ export const Builder = ({
         alias={alias}
         pipeline={{
           ...pipeline,
-          config: toPipelineConfig(state.nodes, state.edges),
+          config: toPipelineConfig(flowState.nodes, flowState.edges),
         }}
       >
         <ReactFlowProvider>
@@ -251,17 +263,18 @@ export const Builder = ({
             nodesDraggable={type !== "readOnly"}
             nodesConnectable={type !== "readOnly"}
             nodesFocusable={type !== "readOnly"}
-            nodes={state.nodes}
-            edges={state.edges}
-            onNodesChange={handleOnNodesChange}
-            onEdgesChange={handleOnEdgesChange}
+            nodes={flowState.nodes}
+            edges={flowState.edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             onInit={onInit}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            // onNodeDragStop={(e, a, b) => console.log("STOP", e, a, b)}
+            onNodeDragStart={onNodeDragStartStop}
+            onNodeDragStop={onNodeDragStartStop}
             // onBlur={handleOnSave}
             isValidConnection={handleIsValidConnection}
             fitViewOptions={{
@@ -280,8 +293,8 @@ export const Builder = ({
           </ReactFlow>
 
           {children?.({
-            nodes: state.nodes,
-            edges: state.edges,
+            nodes: flowState.nodes,
+            edges: flowState.edges,
             onBlockCreate,
           })}
 

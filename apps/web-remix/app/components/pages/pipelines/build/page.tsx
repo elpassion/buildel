@@ -90,7 +90,6 @@ export function PipelineBuilder() {
         CustomNode={BuilderNode}
         CustomEdge={CustomEdge}
         className="h-[calc(100vh_-_128px)]"
-        onSave={handleUpdatePipeline}
       >
         {({ edges, nodes, onBlockCreate }) => (
           <>

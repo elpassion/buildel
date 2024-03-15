@@ -70,8 +70,8 @@ export const useUndoRedo = <T,>(initial: T) => {
   return {
     allowUndo: state.prev.length > 0,
     allowRedo: state.next.length > 0,
-    state: state.curr,
-    setState: set,
+    history: state.curr,
+    setHistory: set,
     undo,
     redo,
   };
