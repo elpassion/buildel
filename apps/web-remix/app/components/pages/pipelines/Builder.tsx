@@ -100,7 +100,7 @@ export const Builder = ({
         ["select", "position", "dimensions"].includes(changes[0].type)
       );
     },
-    [setFlowState, type]
+    [type]
   );
 
   const onEdgesChange = useCallback(
@@ -115,24 +115,21 @@ export const Builder = ({
         ["select"].includes(changes[0].type)
       );
     },
-    [setFlowState, type]
+    [type]
   );
 
-  const onConnect = useCallback(
-    (params: Connection) => {
-      setFlowState((state) => ({
-        ...state,
-        edges: addEdge(
-          {
-            id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
-            ...params,
-          },
-          state.edges
-        ),
-      }));
-    },
-    [setFlowState]
-  );
+  const onConnect = useCallback((params: Connection) => {
+    setFlowState((state) => ({
+      ...state,
+      edges: addEdge(
+        {
+          id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
+          ...params,
+        },
+        state.edges
+      ),
+    }));
+  }, []);
 
   const handleDeleteEdge = useCallback((id: string) => {
     setFlowState((state) => ({
@@ -180,7 +177,7 @@ export const Builder = ({
         nodes: [...state.nodes, newBlock],
       }));
     },
-    [setFlowState, flowState.nodes]
+    [flowState.nodes]
   );
 
   useEffect(() => {
