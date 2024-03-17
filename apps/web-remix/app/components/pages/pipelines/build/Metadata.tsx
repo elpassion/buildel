@@ -8,7 +8,6 @@ import { z } from "zod";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useFormContext, ValidatedForm } from "remix-validated-form";
 import { Field } from "~/components/form/fields/field.context";
-import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import { SubmitButton } from "~/components/form/submit";
 import { successToast } from "~/components/toasts/successToast";
 import {
@@ -17,6 +16,7 @@ import {
   DropdownTrigger,
 } from "~/components/dropdown/Dropdown";
 import { useDropdown } from "~/components/dropdown/DropdownContext";
+import { EditorField } from "~/components/form/fields/editor.field";
 
 export const Metadata = () => {
   const { metadata, setMetadata } = useRunPipeline();
@@ -110,7 +110,7 @@ function MetadataEditor() {
   const { fieldErrors } = useFormContext();
 
   return (
-    <MonacoEditorField
+    <EditorField
       supportingText="Properties that will be accessible in every block."
       language="json"
       label="Metadata"

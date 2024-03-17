@@ -1,0 +1,7 @@
+.valid-suggestion {
+  color: green;
+}
+
+.invalid-suggestion,.highlighted-text {
+  color: red;
+}

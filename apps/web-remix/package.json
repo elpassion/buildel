@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@buildel/buildel": "^0.2.1",
+    "@codemirror/autocomplete": "^6.15.0",
     "@elpassion/taco": "^0.6.0",
     "@fastify/early-hints": "^1.0.1",
     "@fastify/http-proxy": "^9.4.0",
@@ -31,6 +32,9 @@
     "@tailwindcss/forms": "^0.5.4",
     "@tanstack/react-table": "^8.12.0",
     "@types/etag": "^1.8.3",
+    "@uiw/codemirror-extensions-langs": "^4.21.24",
+    "@uiw/codemirror-themes-all": "^4.21.24",
+    "@uiw/react-codemirror": "^4.21.24",
     "chokidar": "^3.5.3",
     "classnames": "^2.3.2",
     "compression": "^1.7.4",
