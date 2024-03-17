@@ -9,6 +9,7 @@ export default defineConfig({
     setupFiles: [
       "./app/tests/setupFiles.ts",
       "./app/tests/MonacoEditor.mock.tsx",
+      "./app/tests/CodeMirror.mock.tsx",
     ],
     environment: "jsdom",
     globals: true,

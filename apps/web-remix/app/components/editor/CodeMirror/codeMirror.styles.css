@@ -1,7 +1,15 @@
-.valid-suggestion {
-  color: green;
+.valid-suggestion-primary,.valid-suggestion-primary *   {
+  @apply !text-green-400
 }
 
-.invalid-suggestion,.highlighted-text {
-  color: red;
+.valid-suggestion-secondary,.valid-suggestion-secondary *   {
+  @apply !text-blue-400
+}
+
+.invalid-suggestion, .invalid-suggestion * {
+  @apply !text-red-500
+}
+
+.cm-scroller {
+  scrollbar-width: thin;
 }

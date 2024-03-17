@@ -1,1 +1,6 @@
-export type Suggestion = { type: string; label: string; info: string };
+export type Suggestion = {
+  label: string;
+  type?: "keyword" | "none";
+  info?: string;
+  variant?: "primary" | "secondary";
+};

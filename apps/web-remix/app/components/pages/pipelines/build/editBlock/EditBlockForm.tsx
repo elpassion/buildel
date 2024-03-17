@@ -3,7 +3,6 @@ import { z } from "zod";
 import { FieldProps, Schema } from "~/components/form/schema/Schema";
 import { ValidatedForm, useFormContext } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
-import { MonacoSuggestionEditorField } from "~/components/form/fields/monacoSuggestionEditor.field";
 import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
 import {
   CreatableAsyncForm,
@@ -11,7 +10,7 @@ import {
 } from "~/components/form/fields/creatableAsyncSelect.field";
 import { assert } from "~/utils/assert";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
+import { EditorField } from "~/components/form/fields/editor.field";
 import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
 import { successToast } from "~/components/toasts/successToast";
 import { ExtendedBlockConfig } from "~/api/blockType/blockType.contracts";
@@ -21,10 +20,7 @@ import {
   NumberField,
   StringField,
 } from "~/components/form/schema/SchemaFields";
-import {
-  generateZODSchema,
-  JSONSchemaField,
-} from "~/components/form/schema/SchemaParser";
+import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 import {
   IBlockConfig,
   IConfigConnection,
@@ -35,6 +31,7 @@ import {
 } from "~/components/form/fields/field.context";
 import { SubmitButton } from "~/components/form/submit";
 import { reverseToolConnections } from "~/components/pages/pipelines/PipelineFlow.utils";
+import { Suggestion } from "~/components/editor/CodeMirror/codeMirror.types";
 
 export function EditBlockForm({
   onSubmit,
@@ -51,7 +48,7 @@ export function EditBlockForm({
   children?: ReactNode;
   onSubmit: (
     data: IBlockConfig & { oldName: string },
-    connections: IConfigConnection[],
+    connections: IConfigConnection[]
   ) => void;
   blockConfig: z.TypeOf<typeof ExtendedBlockConfig>;
   disabled?: boolean;
@@ -86,12 +83,12 @@ export function EditBlockForm({
       });
       setConnections(newConnections);
     },
-    [connections],
+    [connections]
   );
 
   const handleUpdate = (
     data: Record<string, any>,
-    e: React.FormEvent<HTMLFormElement>,
+    e: React.FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
     clearFieldsErrors();
@@ -114,20 +111,23 @@ export function EditBlockForm({
       }
 
       return (
-        <EditorField
-          field={props.field}
-          name={props.name as string}
-          connections={[
-            ...connections.filter(
-              (connection) => connection.to.block_name === blockConfig.name,
-            ),
-            ...reverseToolConnections(connections, blockConfig.name),
-          ]}
-          schema={props.schema}
-        />
+        <FormField name={props.name!}>
+          <EditorField
+            supportingText={props.field.description}
+            language={props.field.editorLanguage}
+            label={props.field.title}
+            defaultValue={props.field.default}
+            suggestions={generateSuggestions([
+              ...connections.filter(
+                (connection) => connection.to.block_name === blockConfig.name
+              ),
+              ...reverseToolConnections(connections, blockConfig.name),
+            ])}
+          />
+        </FormField>
       );
     },
-    [blockConfig.connections],
+    [blockConfig.connections]
   );
 
   const SelectField = useCallback(
@@ -175,7 +175,7 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId],
+    [blockConfig.name, organizationId, pipelineId]
   );
 
   const AsyncCreatableField = useCallback(
@@ -234,7 +234,7 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId],
+    [blockConfig.name, organizationId, pipelineId]
   );
 
   return (
@@ -326,11 +326,12 @@ function TriggerValidation() {
   return null;
 }
 
-function generateSuggestions(connections: IConfigConnection[]) {
+function generateSuggestions(connections: IConfigConnection[]): Suggestion[] {
   return connections.map((connection) => {
     return {
-      value: `${connection.from.block_name}:${connection.from.output_name}`,
-      reset: connection.opts.reset,
+      label: `${connection.from.block_name}:${connection.from.output_name}`,
+      info: "",
+      variant: connection.opts.reset ? "primary" : "secondary",
     };
   });
 }
@@ -356,64 +357,6 @@ const InputsProvider: React.FC<{
 
 export function useInputs() {
   return React.useContext(InputsContext);
-}
-
-interface EditorFieldProps {
-  connections: IConfigConnection[];
-  field: {
-    type: "string";
-    title: string;
-    description: string;
-    presentAs: "editor";
-    editorLanguage: "json" | "custom";
-    suggestions?: { value: string; description: string; type: string }[];
-    default?: string;
-  };
-  name: string;
-  schema: JSONSchemaField;
-}
-function EditorField({ field, name, connections, schema }: EditorFieldProps) {
-  const { fieldErrors } = useFormContext();
-
-  const renderEditorByLanguage = () => {
-    switch (field.editorLanguage) {
-      case "json":
-        return (
-          <MonacoSuggestionEditorField
-            supportingText={field.description}
-            language={field.editorLanguage}
-            label={field.title}
-            defaultValue={field.default}
-            error={fieldErrors[name]}
-          />
-        );
-      default:
-        const suggestions = (field.suggestions || []).flatMap((suggestion) => {
-          if (suggestion.value === "inputs.*") {
-            return generateSuggestions(connections);
-          }
-          if (suggestion.value === "metadata.*") {
-            return [{ value: "metadata.", reset: false }];
-          }
-          if (suggestion.value === "secrets.*") {
-            return [{ value: "secrets.", reset: false }];
-          }
-          return [{ value: suggestion.value, reset: false }];
-        });
-
-        return (
-          <MonacoSuggestionEditorField
-            supportingText={field.description}
-            label={field.title}
-            suggestions={suggestions}
-            defaultValue={field.default}
-            error={fieldErrors[name]}
-          />
-        );
-    }
-  };
-
-  return <FormField name={name}>{renderEditorByLanguage()}</FormField>;
 }
 
 interface CopyConfigurationButtonProps {

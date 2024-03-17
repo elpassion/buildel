@@ -23,8 +23,15 @@ type EditorFieldProps = Partial<
 >;
 
 export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
-  ({ label, defaultValue, error, supportingText, onChange, ...props }) => {
-    const { name, getInputProps, validate } = useFieldContext();
+  ({
+    label,
+    defaultValue,
+    error: propsError,
+    supportingText,
+    onChange,
+    ...props
+  }) => {
+    const { name, getInputProps, validate, error } = useFieldContext();
     const { value: isShown, setTrue: show, setFalse: hide } = useBoolean(false);
     const [value, setValue] = useControlField<string | undefined>(name);
 
@@ -35,6 +42,8 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
     };
 
     const currentValue = value ?? defaultValue;
+
+    const currentError = propsError ?? error;
 
     return (
       <>
@@ -54,10 +63,14 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
           value={currentValue}
           onChange={handleOnChange}
           height="130px"
+          id={`${name}-editor`}
           {...props}
         />
 
-        <InputText text={error ?? supportingText} error={!!error} />
+        <InputText
+          text={currentError ?? supportingText}
+          error={!!currentError}
+        />
 
         <div
           onClick={(e) => {
@@ -75,7 +88,7 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
             value={currentValue}
             isOpen={isShown}
             close={hide}
-            error={error}
+            error={currentError}
             onChange={handleOnChange}
             {...props}
           />
@@ -122,6 +135,7 @@ function MaximizedEditor({
     >
       <div className="p-2">
         <EditorInput
+          id={`${name}-editor`}
           value={value}
           onChange={onChange}
           height="500px"

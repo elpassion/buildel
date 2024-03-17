@@ -21,7 +21,6 @@ import {
   simplePipelineFixture,
 } from "~/tests/fixtures/pipeline.fixtures";
 import { runHandlers } from "./pipeline-run.handlers";
-import { EditorHandle } from "~/tests/handles/Editor.handle";
 
 const handlers = () => [
   ...runHandlers(),
@@ -238,7 +237,7 @@ class PipelineRunObject {
   }
 
   async metadataEditor() {
-    return EditorHandle.fromTestId("value");
+    return TextareaHandle.fromTestId("value-editor");
   }
 
   async metadataSubmit() {

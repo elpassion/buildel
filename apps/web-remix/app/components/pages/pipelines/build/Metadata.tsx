@@ -6,17 +6,17 @@ import {
 } from "~/components/pages/pipelines/RunPipelineProvider";
 import { z } from "zod";
 import { withZod } from "@remix-validated-form/with-zod";
-import { useFormContext, ValidatedForm } from "remix-validated-form";
+import { ValidatedForm } from "remix-validated-form";
 import { Field } from "~/components/form/fields/field.context";
 import { SubmitButton } from "~/components/form/submit";
 import { successToast } from "~/components/toasts/successToast";
+import { useDropdown } from "~/components/dropdown/DropdownContext";
+import { EditorField } from "~/components/form/fields/editor.field";
 import {
   Dropdown,
   DropdownPopup,
   DropdownTrigger,
 } from "~/components/dropdown/Dropdown";
-import { useDropdown } from "~/components/dropdown/DropdownContext";
-import { EditorField } from "~/components/form/fields/editor.field";
 
 export const Metadata = () => {
   const { metadata, setMetadata } = useRunPipeline();
@@ -96,26 +96,16 @@ function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
       noValidate
     >
       <Field name="value">
-        <MetadataEditor />
+        <EditorField
+          supportingText="Properties that will be accessible in every block."
+          language="json"
+          label="Metadata"
+        />
       </Field>
 
       <div className="flex justify-end w-full">
         <SubmitButton size="xs">Set</SubmitButton>
       </div>
     </ValidatedForm>
-  );
-}
-
-function MetadataEditor() {
-  const { fieldErrors } = useFormContext();
-
-  return (
-    <EditorField
-      supportingText="Properties that will be accessible in every block."
-      language="json"
-      label="Metadata"
-      defaultValue=""
-      error={fieldErrors["value"]}
-    />
   );
 }
