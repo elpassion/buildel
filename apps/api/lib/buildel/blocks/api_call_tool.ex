@@ -76,6 +76,14 @@ defmodule Buildel.Blocks.ApiCallTool do
                     "{\"Content-Type\": \"application/json\", \"Accept\": \"application/json\"}",
                   "minLength" => 1
                 },
+                call_formatter: %{
+                  "type" => "string",
+                  "title" => "Call formatter",
+                  "default" =>"{{config.block_name}} API 🖥️: {{config.args}}\n",
+                  "description" =>
+                    "The URL to send the request to. If you want to use a variable, use `{{variable_name}}`. Notice the double curly braces!",
+                  "minLength" => 1
+                },
                 authorize: %{
                   "type" => "boolean",
                   "title" => "Authorize",
@@ -122,7 +130,7 @@ defmodule Buildel.Blocks.ApiCallTool do
      |> Map.put(:context, context)
      |> Map.put(
        :available_metadata,
-       Injectable.used_metadata_keys([opts.url, opts.headers])
+       Injectable.used_metadata_keys([opts.url, opts.headers, opts.call_formatter])
        |> Enum.reduce(%{}, fn key, acc ->
          acc
          |> Map.put(key, flattened_metadata[key])
@@ -130,7 +138,7 @@ defmodule Buildel.Blocks.ApiCallTool do
      )
      |> Map.put(
        :available_secrets,
-       Injectable.used_secrets_keys([opts.url, opts.headers])
+       Injectable.used_secrets_keys([opts.url, opts.headers, opts.call_formatter])
        |> Enum.reduce(%{}, fn secret, acc ->
          acc
          |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
@@ -190,8 +198,10 @@ defmodule Buildel.Blocks.ApiCallTool do
     {:reply,
      %{
        function: function,
-       call_formatter: fn args ->
-         "#{state.block.name} API 🖥️: #{Jason.encode!(args)}\n"
+       call_formatter: fn props ->
+        args =  %{"config.args" => props, "config.block_name" => state.block.name}
+
+        "#{build_call_formatter(state.block.opts.call_formatter, args)}\n"
        end,
        response_formatter: fn _response ->
          ""
@@ -261,6 +271,24 @@ defmodule Buildel.Blocks.ApiCallTool do
       {:error, %{reason: reason}} ->
         "Error: #{reason}"
     end
+  end
+
+
+  defp build_call_formatter(value, args) do
+    args
+    |> Enum.reduce(value, fn
+      {key, value}, acc when is_number(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      {key, value}, acc when is_binary(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      {key, value}, acc when is_map(value) ->
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+
+      _, acc ->
+        acc
+    end)
   end
 
   defp build_url(url, args) do
