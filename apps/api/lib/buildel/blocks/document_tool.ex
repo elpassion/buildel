@@ -39,7 +39,14 @@ defmodule Buildel.Blocks.DocumentTool do
                     "title" => "Knowledge",
                     "description" => "The knowledge to use for retrieval.",
                     "default" => ""
-                  })
+                  }),
+                call_formatter: %{
+                  "type" => "string",
+                  "title" => "Call Formatter",
+                  "description" => "The formatter to use for the API call.",
+                  "presentAs" => "editor",
+                  "default" => "Database 📑: Document {{config.args}}\n"
+                }
               )
           })
       }
@@ -123,7 +130,8 @@ defmodule Buildel.Blocks.DocumentTool do
      %{
        function: function,
        call_formatter: fn args ->
-         "Database 📑: Document \"#{args["document_id"]}\"\n"
+         args = %{"config.args" => args, "config.block_name" => state.block.name}
+         build_call_formatter(state.block.opts.call_formatter, args)
        end,
        response_formatter: fn _response ->
          ""
@@ -135,5 +143,22 @@ defmodule Buildel.Blocks.DocumentTool do
   def handle_info({_name, :text, text}, state) do
     cast(self(), {:text, text})
     {:noreply, state}
+  end
+
+  defp build_call_formatter(value, args) do
+    args
+    |> Enum.reduce(value, fn
+      {key, value}, acc when is_number(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      {key, value}, acc when is_binary(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      {key, value}, acc when is_map(value) ->
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+
+      _, acc ->
+        acc
+    end)
   end
 end

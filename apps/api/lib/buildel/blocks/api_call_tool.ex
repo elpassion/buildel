@@ -79,9 +79,9 @@ defmodule Buildel.Blocks.ApiCallTool do
                 call_formatter: %{
                   "type" => "string",
                   "title" => "Call formatter",
-                  "default" =>"{{config.block_name}} API 🖥️: {{config.args}}\n",
-                  "description" =>
-                    "The URL to send the request to. If you want to use a variable, use `{{variable_name}}`. Notice the double curly braces!",
+                  "presentAs" => "editor",
+                  "default" => "{{config.block_name}} API 🖥️: {{config.args}}\n",
+                  "description" => "How to format calling of api call through tool interface.",
                   "minLength" => 1
                 },
                 authorize: %{
@@ -199,9 +199,8 @@ defmodule Buildel.Blocks.ApiCallTool do
      %{
        function: function,
        call_formatter: fn props ->
-        args =  %{"config.args" => props, "config.block_name" => state.block.name}
-
-        "#{build_call_formatter(state.block.opts.call_formatter, args)}\n"
+         args = %{"config.args" => props, "config.block_name" => state.block.name}
+         build_call_formatter(state.block.opts.call_formatter, args)
        end,
        response_formatter: fn _response ->
          ""
@@ -272,7 +271,6 @@ defmodule Buildel.Blocks.ApiCallTool do
         "Error: #{reason}"
     end
   end
-
 
   defp build_call_formatter(value, args) do
     args

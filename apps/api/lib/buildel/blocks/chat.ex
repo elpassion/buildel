@@ -115,6 +115,13 @@ defmodule Buildel.Blocks.Chat do
                   "maximum" => 2.0,
                   "step" => 0.1
                 },
+                call_formatter: %{
+                  "type" => "string",
+                  "title" => "Call Formatter",
+                  "description" => "The formatter to use for the API call.",
+                  "presentAs" => "editor",
+                  "default" => "@{{config.block_name}} 🗨️:  {{config.args}}\n"
+                },
                 system_message: %{
                   "type" => "string",
                   "title" => "System message",
@@ -397,8 +404,9 @@ defmodule Buildel.Blocks.Chat do
     {:reply,
      %{
        function: function,
-       call_formatter: fn %{"message" => message} = _args ->
-         "@#{state.block.name} 🗨️:  #{message}\n"
+       call_formatter: fn args ->
+         args = %{"config.args" => args, "config.block_name" => state.block.name}
+         build_call_formatter(state.block.opts.call_formatter, args)
        end,
        response_formatter: fn _response ->
          ""
@@ -649,6 +657,23 @@ defmodule Buildel.Blocks.Chat do
 
       {key, value}, acc when is_binary(value) ->
         String.replace(acc, "{{#{key}}}", value |> to_string())
+
+      _, acc ->
+        acc
+    end)
+  end
+
+  defp build_call_formatter(value, args) do
+    args
+    |> Enum.reduce(value, fn
+      {key, value}, acc when is_number(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      {key, value}, acc when is_binary(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      {key, value}, acc when is_map(value) ->
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
 
       _, acc ->
         acc

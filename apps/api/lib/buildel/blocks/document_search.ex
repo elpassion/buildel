@@ -59,6 +59,14 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "maximum" => 1.0,
                   "step" => 0.01
                 },
+                call_formatter: %{
+                  "type" => "string",
+                  "title" => "Call formatter",
+                  "presentAs" => "editor",
+                  "default" => "Database 📑: Search \"{{config.args}}\"\n",
+                  "description" => "How to format calling of api call through tool interface.",
+                  "minLength" => 1
+                },
                 where: %{
                   "type" => "string",
                   "title" => "Metadata",
@@ -240,7 +248,8 @@ defmodule Buildel.Blocks.DocumentSearch do
      %{
        function: function,
        call_formatter: fn args ->
-         "Database 📑: Search \"#{args["query"]}\"\n"
+         args = %{"config.args" => args, "config.block_name" => state.block.name}
+         build_call_formatter(state.block.opts.call_formatter, args)
        end,
        response_formatter: fn _response ->
          ""
@@ -259,5 +268,22 @@ defmodule Buildel.Blocks.DocumentSearch do
     cast(self(), {:text, text})
 
     {:noreply, state}
+  end
+
+  defp build_call_formatter(value, args) do
+    args
+    |> Enum.reduce(value, fn
+      {key, value}, acc when is_number(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      {key, value}, acc when is_binary(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+      {key, value}, acc when is_map(value) ->
+        String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+
+      _, acc ->
+        acc
+    end)
   end
 end
