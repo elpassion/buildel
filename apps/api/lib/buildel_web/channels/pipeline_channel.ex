@@ -212,8 +212,6 @@ defmodule BuildelWeb.PipelineChannel do
   defp listen_to_outputs(run) do
     context_id = Pipelines.Worker.context_id(run)
 
-    IO.puts("Listening to outputs for run")
-
     run
     |> Pipelines.blocks_for_run()
     |> Enum.map(fn block ->
