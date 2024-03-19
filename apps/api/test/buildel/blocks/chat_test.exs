@@ -64,7 +64,8 @@ defmodule Buildel.Blocks.ChatTest do
               knowledge: nil,
               endpoint: nil,
               api_type: "openai",
-              api_key: "123"
+              api_key: "123",
+              metadata: %{}
             },
             connections: [
               Blocks.Connection.from_connection_string("test_input:output->input", "text")
@@ -103,7 +104,8 @@ defmodule Buildel.Blocks.ChatTest do
               knowledge: nil,
               endpoint: nil,
               api_type: "openai",
-              api_key: "123"
+              api_key: "123",
+              metadata: %{}
             },
             connections: [
               Blocks.Connection.from_connection_string("test_input:output->input", "text")

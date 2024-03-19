@@ -185,7 +185,7 @@ defmodule Buildel.Blocks.ApiCallToolTest do
                 parameters: "{}",
                 headers: "{}",
                 metadata: %{},
-                call_formatter: "{{config.block_name}} API 🖥️: {{config.args}}"
+                call_formatter: "{{config.block_name}} API 🖥️: {{config.args}}\n"
               },
               connections: []
             })
