@@ -3,6 +3,14 @@ defmodule Buildel.DocumentWorkflow do
   alias Buildel.DocumentWorkflow.ChunkGenerator
   alias Buildel.Clients.Embeddings
 
+  defstruct [:embeddings, :collection_name, :db_adapter]
+
+  @type t :: %__MODULE__{
+          embeddings: Embeddings.t(),
+          collection_name: binary(),
+          db_adapter: Buildel.VectorDB.VectorDBAdapterBehaviour.t()
+        }
+
   @type document :: {binary(), map()}
   @type struct_list :: [
           DocumentProcessor.Header.t()
@@ -11,47 +19,29 @@ defmodule Buildel.DocumentWorkflow do
         ]
 
   @type embeddings :: [float()]
-  @type chunk :: %{
-          embeddings: embeddings(),
-          metadata: map(),
-          previous: integer(),
-          next: integer(),
-          parent: integer(),
-          chunk: binary()
-        }
-  @spec process(document()) :: [chunk()]
-  def process(_document) do
-    # # file ie. document.pdf
-    # document
-    # # get the content of the file (chunked) [Header{level: 0, metadata: {page: 0}}, Paragraph{level: 1}, Paragraph{level: 1}, ListItem{level: 2, metadata: {page: 1}}]
-    # # build nodes with relations to other nodes (parent?, next?, previous?)
-    # |> read
-    # # 1500 characters per chunk keeping metadata  "#Zał 3. ##Pasywa, ###coś tam, ####dobra trwałe\n maszyny coś tam..."
-    # |> build_node_chunks
-    # # { "zał 3" => [id_chunku, id_chunku_2], "pasywa" => [chunk_3], "coś tam" => [], "dobra trwałe" =>[], "maszyny coś tam" => [] }
-    # |> generate_keyword_nodes
-    # # generate embeddings for each chunk
-    # |> generate_embeddings_for_chunks
-    # # save the chunk with embeddings in database
-    # |> put_in_database
+  @type chunk :: ChunkGenerator.Chunk.t()
 
-    []
-    # document
-    # |> read ("abc cde\n\n fgh\n ijk\n listitem\n")
-    # |> build_node_chunks (["abc cde\n\n", "fgh\n ijk\n listitem\n"])
-    # |> generate_embeddings_for_chunks ([{embeddings: [...], chunk: "abc cde\n\n"}, {embeddings: [...], chunk: "fgh\n ijk\n listitem\n"}])
-    # |> put_in_database ([{embeddings: [...], chunk: "abc cde\n\n"}, {embeddings: [...], chunk: "fgh\n ijk\n listitem\n"}])
+  def new(%{embeddings: embeddings, collection_name: collection_name, db_adapter: db_adapter}) do
+    %__MODULE__{embeddings: embeddings, collection_name: collection_name, db_adapter: db_adapter}
   end
 
-  @spec read(document()) :: struct_list()
-  def read({path, file_metadata}) do
+  @spec process(t(), document()) :: [chunk()]
+  def process(workflow, document) do
+    document = read(workflow, document)
+    chunks = build_node_chunks(workflow, document)
+    chunks = generate_embeddings_for_chunks(workflow, chunks)
+    put_in_database(workflow, chunks)
+  end
+
+  @spec read(t(), document()) :: struct_list()
+  def read(_workflow, {path, file_metadata}) do
     document_loader =
       Buildel.DocumentWorkflow.DocumentLoader.new(%{
         adapter: Application.fetch_env!(:buildel, :document_loader)
       })
 
     with {:ok, result} <- DocumentProcessor.load_file(document_loader, path, file_metadata) do
-      Jason.decode!(result)
+      result
       |> DocumentProcessor.get_blocks()
       |> DocumentProcessor.filter_empty_blocks()
       |> DocumentProcessor.map_to_structures()
@@ -63,15 +53,16 @@ defmodule Buildel.DocumentWorkflow do
     end
   end
 
-  def build_node_chunks(documents, config \\ %{}) do
-    ChunkGenerator.split_into_chunks(documents, config) |> ChunkGenerator.add_neighbors()
+  @spec build_node_chunks(t(), struct_list()) :: [chunk()]
+  def build_node_chunks(_workflow, documents) do
+    ChunkGenerator.split_into_chunks(documents, %{}) |> ChunkGenerator.add_neighbors()
   end
 
   @type keyword_node :: %{
           binary() => [binary()]
         }
-  @spec generate_keyword_nodes([ChunkGenerator.Chunk.t()]) :: keyword_node()
-  def generate_keyword_nodes(chunks) do
+  @spec generate_keyword_nodes(t(), [ChunkGenerator.Chunk.t()]) :: keyword_node()
+  def generate_keyword_nodes(_workflow, chunks) do
     Enum.reduce(chunks, %{}, fn %{id: id, metadata: %{keywords: keywords}}, acc ->
       Enum.reduce(keywords, acc, fn keyword, acc ->
         Map.update(acc, keyword, [id], fn ids -> [id | ids] end)
@@ -79,32 +70,26 @@ defmodule Buildel.DocumentWorkflow do
     end)
   end
 
-  def generate_embeddings(chunks) do
-    embeddings_adapter =
-      Embeddings.new(%{
-        api_key: System.get_env("OPENAI_API_KEY"),
-        model: "text-embedding-3-small",
-        api_type: "openai"
-      })
+  def generate_embeddings_for_chunks(workflow, chunks) do
+    embeddings_adapter = workflow.embeddings
 
-    database_adapter = Buildel.VectorDB.EctoAdapter
-    vector_db = Buildel.VectorDB.new(%{adapter: database_adapter, embeddings: embeddings_adapter})
-
-    documents =
-      chunks
-      |> Enum.map(fn chunk ->
-        %{
-          document: chunk.value,
-          metadata: %{
-            chunk_id: chunk.id
-          }
-        }
-      end)
-
-    vector_db |> Buildel.VectorDB.add("test", documents)
+    with {:ok, embeddings} <-
+           embeddings_adapter
+           |> Embeddings.get_embeddings(chunks |> Enum.map(&Map.get(&1, :value))) do
+      embeddings
+      |> Enum.zip(chunks)
+      |> Enum.map(fn {embeddings, chunk} -> Map.put(chunk, :embeddings, embeddings) end)
+    end
   end
 
-  defp put_in_database(_document) do
-    []
+  def put_in_database(workflow, chunks) do
+    vector_db =
+      Buildel.VectorDB.new(%{
+        adapter: workflow.db_adapter,
+        embeddings: workflow.embeddings
+      })
+
+    vector_db |> Buildel.VectorDB.init(workflow.collection_name)
+    vector_db |> Buildel.VectorDB.add(workflow.collection_name, chunks)
   end
 end

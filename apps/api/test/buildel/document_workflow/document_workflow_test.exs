@@ -8,10 +8,22 @@ defmodule Buildel.DocumentWorkflowTest do
     file_metadata: %{type: "application/pdf"}
   }
 
-  describe "read/1" do
+  describe "read/2" do
     test "returns list of structs" do
+      workflow =
+        DocumentWorkflow.new(%{
+          embeddings:
+            Buildel.Clients.Embeddings.new(%{
+              api_type: "test",
+              model: "test",
+              api_key: "test"
+            }),
+          collection_name: "test",
+          db_adapter: Buildel.VectorDB.EctoAdapter
+        })
+
       result =
-        DocumentWorkflow.read({@file_params.path, @file_params.file_metadata})
+        DocumentWorkflow.read(workflow, {@file_params.path, @file_params.file_metadata})
 
       assert is_list(result)
       assert length(result) > 0
@@ -19,19 +31,6 @@ defmodule Buildel.DocumentWorkflowTest do
       assert %DocumentProcessor.Paragraph{} = Enum.at(result, 0)
       assert %DocumentProcessor.Header{} = Enum.at(result, 1)
       assert %DocumentProcessor.ListItem{} = Enum.at(result, 2)
-    end
-  end
-
-  describe "generate_keyword_nodes/1" do
-    test "assings chunks to their keywords" do
-      result =
-        DocumentWorkflow.read({@file_params.path, @file_params.file_metadata})
-        |> DocumentWorkflow.build_node_chunks()
-        |> DocumentWorkflow.generate_keyword_nodes()
-
-      assert %{
-               "header1" => [_, _]
-             } = result
     end
   end
 end

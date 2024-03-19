@@ -66,7 +66,7 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
 
       new_metadata =
         Map.update(metadata, :building_block_ids, [head.id], &(&1 ++ [head.id]))
-        |> Map.update(:keywords, head.metadata.headers, &(&1 ++ head.metadata.headers))
+        |> Map.update(:keywords, head.metadata.headers, &Enum.uniq(&1 ++ head.metadata.headers))
 
       splitter(
         tail,

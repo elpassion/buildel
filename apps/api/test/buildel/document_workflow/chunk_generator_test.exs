@@ -1,10 +1,11 @@
 defmodule Buildel.ChunkGeneratorTest do
   use ExUnit.Case
   alias Buildel.DocumentWorkflow
+  setup [:create_workflow]
 
   describe "split_into_chunks/1" do
-    test "should split into chunks based od config" do
-      list = DocumentWorkflow.read({"foo", %{}})
+    test "should split into chunks based od config", %{workflow: workflow} do
+      list = DocumentWorkflow.read(workflow, {"foo", %{}})
       result = DocumentWorkflow.ChunkGenerator.split_into_chunks(list, %{chunk_size: 20})
 
       assert [
@@ -21,8 +22,8 @@ defmodule Buildel.ChunkGeneratorTest do
              ] = result
     end
 
-    test "should add metadata to chunks" do
-      list = DocumentWorkflow.read({"foo", %{}})
+    test "should add metadata to chunks", %{workflow: workflow} do
+      list = DocumentWorkflow.read(workflow, {"foo", %{}})
       result = DocumentWorkflow.ChunkGenerator.split_into_chunks(list, %{chunk_size: 20})
       first_chunk_building_block_ids = list |> Enum.map(& &1.id) |> Enum.take(3)
       second_chunk_building_block_ids = list |> Enum.map(& &1.id) |> Enum.drop(3)
@@ -45,8 +46,8 @@ defmodule Buildel.ChunkGeneratorTest do
   end
 
   describe "add_neighbors/1" do
-    test "correctly assigns next nad prev" do
-      list = DocumentWorkflow.read({"foo", %{}})
+    test "correctly assigns next nad prev", %{workflow: workflow} do
+      list = DocumentWorkflow.read(workflow, {"foo", %{}})
 
       result =
         DocumentWorkflow.ChunkGenerator.split_into_chunks(list, %{chunk_size: 13})
@@ -74,5 +75,21 @@ defmodule Buildel.ChunkGeneratorTest do
                }
              ] = result
     end
+  end
+
+  defp create_workflow(_context) do
+    workflow =
+      DocumentWorkflow.new(%{
+        embeddings:
+          Buildel.Clients.Embeddings.new(%{
+            api_type: "test",
+            model: "test",
+            api_key: "test"
+          }),
+        collection_name: "test",
+        db_adapter: Buildel.VectorDB.EctoAdapter
+      })
+
+    %{workflow: workflow}
   end
 end

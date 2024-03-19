@@ -23,7 +23,8 @@ defmodule Buildel.DocumentWorkflow.DocumentLoaderTestAdapter do
 
   @impl true
   def request(_, _) do
-    File.read("./test/buildel/document_workflow/response_short.json")
+    {:ok, file_json} = File.read("./test/buildel/document_workflow/response_short.json")
+    {:ok, file_json |> Jason.decode!()}
   end
 end
 

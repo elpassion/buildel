@@ -15,7 +15,7 @@ defmodule BuildelWeb.MemoryChunkJSON do
 
   defp data(%{} = chunk) do
     %{
-      id: chunk["metadata"]["chunk_id"],
+      id: chunk["chunk_id"],
       content: chunk["document"]
     }
   end

@@ -10,8 +10,7 @@ defmodule Buildel.VectorDB do
 
   @spec new(%{
           :adapter => Buildel.VectorDB.VectorDBAdapterBehaviour,
-          :embeddings => Buildel.Clients.Embeddings.t(),
-          optional(any()) => any()
+          :embeddings => Buildel.Clients.Embeddings.t()
         }) :: t()
   def new(%{adapter: adapter, embeddings: embeddings}) do
     %__MODULE__{adapter: adapter, embeddings: embeddings}
@@ -29,22 +28,10 @@ defmodule Buildel.VectorDB do
     end
   end
 
-  def add(%__MODULE__{adapter: adapter, embeddings: embeddings}, collection_name, documents) do
-    inputs = documents |> Enum.map(&Map.get(&1, :document))
-
-    ids =
-      documents
-      |> Enum.map(&get_in(&1, [:metadata, :chunk_id]))
-
-    {:ok, embeddings_list} = Embeddings.get_embeddings(embeddings, inputs)
-
+  def add(%__MODULE__{adapter: adapter}, collection_name, documents) do
     {:ok, collection} = adapter.get_collection(collection_name)
 
-    adapter.add(collection, %{
-      embeddings: embeddings_list,
-      documents: documents,
-      ids: ids
-    })
+    adapter.add(collection, documents)
 
     {:ok, collection}
   end
@@ -91,10 +78,11 @@ defmodule Buildel.VectorDB do
 end
 
 defmodule Buildel.VectorDB.VectorDBAdapterBehaviour do
+  @type t :: module()
   @callback get_collection(String.t()) :: {:ok, map()}
   @callback create_collection(String.t(), map()) :: {:ok, map()}
   @callback delete_all_with_metadata(map(), map()) :: :ok
-  @callback add(map(), map()) :: :ok
+  @callback add(map(), list(map())) :: :ok
   @callback query(map(), map(), map()) :: {:ok, list()}
 end
 
@@ -122,12 +110,12 @@ defmodule Buildel.VectorDB.QdrantAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
-  def add(collection, %{embeddings: embeddings, documents: documents, ids: ids}) do
+  def add(collection, documents) do
     with {:ok, %{status: 200}} <-
            Qdrant.upsert_point(collection.name, %{
              batch: %{
-               ids: ids,
-               vectors: embeddings,
+               ids: documents |> Enum.map(&Map.get(&1, :id)),
+               vectors: documents |> Enum.map(&Map.get(&1, :embeddings)),
                payloads: documents
              }
            }) do
@@ -215,21 +203,21 @@ defmodule Buildel.VectorDB.EctoAdapter do
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
-  def add(collection, %{embeddings: embeddings, documents: documents, ids: ids}) do
+  def add(collection, documents) do
     time = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
     chunks =
-      Enum.zip([ids, embeddings, documents])
-      |> Enum.map(fn {id, embedding, document} ->
-        embedding_1536 = if Enum.count(embedding) == 1536, do: embedding, else: nil
-        embedding_384 = if Enum.count(embedding) == 384, do: embedding, else: nil
+      documents
+      |> Enum.map(fn %{embeddings: embeddings, id: id, value: value} = document ->
+        embedding_1536 = if Enum.count(embeddings) == 1536, do: embeddings, else: nil
+        embedding_384 = if Enum.count(embeddings) == 384, do: embeddings, else: nil
 
         %{
           id: id,
           collection_name: collection.name,
           embedding_1536: embedding_1536,
           embedding_384: embedding_384,
-          document: document.document,
+          document: value,
           metadata: document.metadata,
           inserted_at: time,
           updated_at: time

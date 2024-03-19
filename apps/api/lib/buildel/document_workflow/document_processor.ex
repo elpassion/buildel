@@ -77,11 +77,17 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
     Enum.map(
       list,
       fn item ->
+        level =
+          case item["level"] do
+            false -> 0
+            level -> level
+          end
+
         case item["tag"] do
           "header" ->
             %Header{
               id: UUID.uuid4(),
-              level: item["level"],
+              level: level,
               metadata: %{page: item["page_idx"]},
               value: Enum.join(item["sentences"], " ")
             }
@@ -89,7 +95,7 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
           "para" ->
             %Paragraph{
               id: UUID.uuid4(),
-              level: item["level"],
+              level: level,
               metadata: %{page: item["page_idx"]},
               value: Enum.join(item["sentences"], " ")
             }
@@ -97,7 +103,7 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
           "list_item" ->
             %ListItem{
               id: UUID.uuid4(),
-              level: item["level"],
+              level: level,
               metadata: %{page: item["page_idx"]},
               value: Enum.join(item["sentences"], " ")
             }
