@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.DocumentTool do
+  alias Buildel.Blocks.Fields.EditorField
   use Buildel.Blocks.Block
   alias LangChain.Function
 
@@ -40,13 +41,11 @@ defmodule Buildel.Blocks.DocumentTool do
                     "description" => "The knowledge to use for retrieval.",
                     "default" => ""
                   }),
-                call_formatter: %{
-                  "type" => "string",
-                  "title" => "Call Formatter",
-                  "description" => "The formatter to use for the API call.",
-                  "presentAs" => "editor",
-                  "default" => "Database 📑: Document {{config.args}}\n"
-                }
+                call_formatter:
+                  EditorField.call_formatter(%{
+                    description: "The formatter to use when retrieving data from DB.",
+                    default: "Database 📑: Document {{config.args}}\n"
+                  })
               )
           })
       }

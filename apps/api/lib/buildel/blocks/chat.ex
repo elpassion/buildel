@@ -1,5 +1,7 @@
 defmodule Buildel.Blocks.Chat do
   require Logger
+  alias Buildel.Blocks.Fields.EditorField.Suggestion
+  alias Buildel.Blocks.Fields.EditorField
   alias Buildel.Langchain.TokenUsage
   alias Buildel.Blocks.Utils.ChatMemory
   use Buildel.Blocks.Block
@@ -115,22 +117,27 @@ defmodule Buildel.Blocks.Chat do
                   "maximum" => 2.0,
                   "step" => 0.1
                 },
-                call_formatter: %{
-                  "type" => "string",
-                  "title" => "Call Formatter",
-                  "description" => "The formatter to use for the API call.",
-                  "presentAs" => "editor",
-                  "default" => "@{{config.block_name}} 🗨️:  {{config.args}}\n"
-                },
-                system_message: %{
-                  "type" => "string",
-                  "title" => "System message",
-                  "description" => "The message to start the conversation with.",
-                  "presentAs" => "editor",
-                  "editorLanguage" => "custom",
-                  "minLength" => 1,
-                  "default" => "You are a helpful assistant."
-                },
+                call_formatter:
+                  EditorField.call_formatter(%{
+                    default: "@{{config.block_name}} 🗨️:  {{config.args}}\n"
+                  }),
+                system_message:
+                  EditorField.new(%{
+                    title: "System message",
+                    description: "The message to start the conversation with.",
+                    minLength: 1,
+                    default: "You are a helpful assistant.",
+                    suggestions: [
+                      Suggestion.inputs(),
+                      Suggestion.metadata(),
+                      Suggestion.secrets(),
+                      Suggestion.new(%{
+                        type: "test",
+                        value: "test.value",
+                        title: "Test suggestion"
+                      })
+                    ]
+                  }),
                 messages: %{
                   "type" => "array",
                   "title" => "Messages",
@@ -147,25 +154,33 @@ defmodule Buildel.Blocks.Chat do
                         "enumPresentAs" => "radio",
                         "default" => "user"
                       },
-                      "content" => %{
-                        "type" => "string",
-                        "title" => "Content",
-                        "presentAs" => "editor",
-                        "editorLanguage" => "custom"
-                      }
+                      "content" =>
+                        EditorField.new(%{
+                          title: "Content",
+                          description: "The content of the message.",
+                          suggestions: [
+                            Suggestion.inputs(),
+                            Suggestion.metadata(),
+                            Suggestion.secrets()
+                          ]
+                        })
                     }
                   },
                   "default" => []
                 },
-                prompt_template: %{
-                  "type" => "string",
-                  "title" => "Prompt template",
-                  "description" =>
-                    "The template to use for the prompt. Pass `{{input_name:output}}` to use the input value.",
-                  "presentAs" => "editor",
-                  "minLength" => 1,
-                  "default" => "{{text_input_1:output}}"
-                }
+                prompt_template:
+                  EditorField.new(%{
+                    title: "Prompt template",
+                    description:
+                      "The template to use for the prompt. Pass `{{input_name:output}}` to use the input value.",
+                    minLength: 1,
+                    default: "{{text_input_1:output}}",
+                    suggestions: [
+                      Suggestion.inputs(),
+                      Suggestion.metadata(),
+                      Suggestion.secrets()
+                    ]
+                  })
               )
           })
       }

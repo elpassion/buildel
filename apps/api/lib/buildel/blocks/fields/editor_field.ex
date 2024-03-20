@@ -1,4 +1,44 @@
 defmodule Buildel.Blocks.Fields.EditorField do
+  defmodule Suggestion do
+    alias __MODULE__
+    defstruct [:value, :description, :type]
+
+    defimpl Jason.Encoder, for: Suggestion do
+      def encode(%Suggestion{} = suggestion, opts) do
+        Jason.Encode.map(
+          %{
+            value: suggestion.value,
+            description: suggestion.description,
+            type: suggestion.type
+          },
+          opts
+        )
+      end
+    end
+
+    @type t :: %Suggestion{}
+
+    @spec new(attrs :: map()) :: t
+    def new(%{} = attrs \\ %{}) do
+      %Suggestion{type: "default"} |> Map.merge(attrs)
+    end
+
+    @spec secrets() :: t
+    def secrets() do
+      new(%{value: "secrets.*", description: "Secrets"})
+    end
+
+    @spec inputs() :: t
+    def inputs() do
+      new(%{value: "inputs.*", description: "Inputs"})
+    end
+
+    @spec metadata() :: t
+    def metadata() do
+      new(%{value: "metadata.*", description: "Metadata"})
+    end
+  end
+
   use Ecto.Schema
   alias __MODULE__
   import Ecto.Changeset
@@ -10,6 +50,13 @@ defmodule Buildel.Blocks.Fields.EditorField do
     field :default, :string
     field :min_length, :integer, default: 0
     field :editor_language, Ecto.Enum, default: :custom, values: ~w(json custom)a
+
+    field :suggestions, {:array, :map},
+      default: [
+        Suggestion.new(%{value: "secrets.*", description: "Secrets", type: "string"}),
+        Suggestion.new(%{value: "inputs.*", description: "Inputs", type: "string"}),
+        Suggestion.new(%{value: "metadata.*", description: "Metadata", type: "string"})
+      ]
   end
 
   defimpl Jason.Encoder, for: EditorField do
@@ -22,7 +69,8 @@ defmodule Buildel.Blocks.Fields.EditorField do
           title: field.title,
           description: field.description,
           default: field.default,
-          min_length: field.min_length
+          min_length: field.min_length,
+          suggestions: field.suggestions
         },
         opts
       )
@@ -31,7 +79,7 @@ defmodule Buildel.Blocks.Fields.EditorField do
 
   @type t :: %EditorField{}
 
-  @create_fields ~w(title description default min_length editor_language)a
+  @create_fields ~w(title description default min_length editor_language suggestions)a
   @required_fields ~w(title description)a
 
   @spec new(attrs :: map()) :: t
@@ -44,5 +92,26 @@ defmodule Buildel.Blocks.Fields.EditorField do
       |> apply_action(:insert)
 
     field
+  end
+
+  @spec call_formatter(attrs :: map()) :: t
+  def call_formatter(%{} = attrs \\ %{}) do
+    new(
+      Map.merge(
+        %{
+          title: "Call formatter",
+          description: "The formatter to use for presenting llm message.",
+          default: "{{config.block_name}}: {{config.args}}",
+          suggestions: [
+            Suggestion.new(%{
+              value: "config.args",
+              description: "Arguments passed to function call."
+            }),
+            Suggestion.new(%{value: "config.block_name", description: "Name of the block."})
+          ]
+        },
+        attrs
+      )
+    )
   end
 end

@@ -24,7 +24,11 @@ export function generateZODSchema(
     if (isOptional) {
       nestedSchema = nestedSchema.optional();
     }
-    if ("default" in schema && schema.default !== undefined) {
+    if (
+      "default" in schema &&
+      schema.default !== undefined &&
+      schema.default !== null
+    ) {
       let defaultValue = schema.default;
       Object.entries(context).forEach(([key, value]) => {
         defaultValue = defaultValue.replace(`{{${key}}}`, value);
@@ -187,6 +191,7 @@ export type JSONSchemaField =
       description: string;
       presentAs: "editor";
       editorLanguage: "json" | "custom";
+      suggestions: { value: string; description: string; type: string }[];
       minLength?: number;
       maxLength?: number;
       default?: string;

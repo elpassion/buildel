@@ -366,19 +366,20 @@ interface EditorFieldProps {
     description: string;
     presentAs: "editor";
     editorLanguage: "json" | "custom";
+    suggestions?: { value: string; description: string; type: string }[];
     default?: string;
   };
   name: string;
   schema: JSONSchemaField;
 }
-function EditorField({ field, name, connections }: EditorFieldProps) {
+function EditorField({ field, name, connections, schema }: EditorFieldProps) {
   const { fieldErrors } = useFormContext();
 
   const renderEditorByLanguage = () => {
     switch (field.editorLanguage) {
       case "json":
         return (
-          <MonacoEditorField
+          <MonacoSuggestionEditorField
             supportingText={field.description}
             language={field.editorLanguage}
             label={field.title}
@@ -387,11 +388,24 @@ function EditorField({ field, name, connections }: EditorFieldProps) {
           />
         );
       default:
+        const suggestions = (field.suggestions || []).flatMap((suggestion) => {
+          if (suggestion.value === "inputs.*") {
+            return generateSuggestions(connections);
+          }
+          if (suggestion.value === "metadata.*") {
+            return [{ value: "metadata.", reset: false }];
+          }
+          if (suggestion.value === "secrets.*") {
+            return [{ value: "secrets.", reset: false }];
+          }
+          return [{ value: suggestion.value, reset: false }];
+        });
+
         return (
           <MonacoSuggestionEditorField
             supportingText={field.description}
             label={field.title}
-            suggestions={generateSuggestions(connections)}
+            suggestions={suggestions}
             defaultValue={field.default}
             error={fieldErrors[name]}
           />

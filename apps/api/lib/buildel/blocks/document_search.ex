@@ -61,10 +61,8 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "step" => 0.01
                 },
                 call_formatter:
-                  EditorField.new(%{
-                    title: "Call formatter",
+                  EditorField.call_formatter(%{
                     default: "Database 📑: Search \"{{config.args}}\"\n",
-                    description: "How to format calling of api call through tool interface.",
                     minLength: 1
                   }),
                 where:

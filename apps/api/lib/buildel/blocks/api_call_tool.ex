@@ -1,4 +1,6 @@
 defmodule Buildel.Blocks.ApiCallTool do
+  alias Buildel.Blocks.Fields.EditorField.Suggestion
+  alias Buildel.Blocks.Fields.EditorField
   alias Buildel.Blocks.Utils.Injectable
   alias Buildel.FlattenMap
   use Buildel.Blocks.Block
@@ -55,35 +57,36 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "description" => "The description of the API call.",
                   "minLength" => 1
                 },
-                parameters: %{
-                  "type" => "string",
-                  "title" => "Parameters",
-                  "description" =>
-                    "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
-                  "presentAs" => "editor",
-                  "editorLanguage" => "json",
-                  "default" => "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
-                  "minLength" => 1
-                },
-                headers: %{
-                  "type" => "string",
-                  "title" => "Headers",
-                  "description" =>
-                    "Valid JSON object of the headers to be sent with the request. i.e. `{\"Content-Type\": \"application/json\"}`.",
-                  "presentAs" => "editor",
-                  "editorLanguage" => "json",
-                  "default" =>
-                    "{\"Content-Type\": \"application/json\", \"Accept\": \"application/json\"}",
-                  "minLength" => 1
-                },
-                call_formatter: %{
-                  "type" => "string",
-                  "title" => "Call formatter",
-                  "presentAs" => "editor",
-                  "default" => "{{config.block_name}} API 🖥️: {{config.args}}\n",
-                  "description" => "How to format calling of api call through tool interface.",
-                  "minLength" => 1
-                },
+                parameters:
+                  EditorField.new(%{
+                    title: "Parameters",
+                    description:
+                      "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
+                    editorLanguage: "json",
+                    default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
+                    minLength: 1
+                  }),
+                headers:
+                  EditorField.new(%{
+                    title: "Headers",
+                    description:
+                      "Valid JSON object of the headers to be sent with the request. i.e. `{\"Content-Type\": \"application/json\"}`.",
+                    editorLanguage: "json",
+                    default:
+                      "{\"Content-Type\": \"application/json\", \"Accept\": \"application/json\"}",
+                    minLength: 1,
+                    suggestions: [
+                      Suggestion.inputs(),
+                      Suggestion.metadata(),
+                      Suggestion.secrets()
+                    ]
+                  }),
+                call_formatter:
+                  EditorField.call_formatter(%{
+                    default: "{{config.block_name}} API 🖥️: {{config.args}}\n",
+                    description: "How to format calling of api call through tool interface.",
+                    minLength: 1
+                  }),
                 authorize: %{
                   "type" => "boolean",
                   "title" => "Authorize",
