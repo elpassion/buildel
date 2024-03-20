@@ -110,6 +110,42 @@ export function EditBlockForm({
         return null;
       }
 
+      const suggestions: Suggestion[] = (props.field.suggestions || []).flatMap(
+        (suggestion) => {
+          if (suggestion.value === "inputs.*") {
+            return generateSuggestions([
+              ...connections,
+              ...reverseToolConnections(connections, blockConfig.name),
+            ]);
+          }
+          if (suggestion.value === "metadata.*") {
+            return [
+              {
+                label: "metadata.",
+                info: suggestion.description,
+                type: suggestion.type,
+              },
+            ];
+          }
+          if (suggestion.value === "secrets.*") {
+            return [
+              {
+                label: "secrets.",
+                info: suggestion.description,
+                type: suggestion.type,
+              },
+            ];
+          }
+          return [
+            {
+              label: suggestion.value,
+              info: suggestion.description,
+              type: suggestion.type,
+            },
+          ];
+        }
+      );
+
       return (
         <FormField name={props.name!}>
           <EditorField
@@ -117,12 +153,7 @@ export function EditBlockForm({
             language={props.field.editorLanguage}
             label={props.field.title}
             defaultValue={props.field.default}
-            suggestions={generateSuggestions([
-              ...connections.filter(
-                (connection) => connection.to.block_name === blockConfig.name
-              ),
-              ...reverseToolConnections(connections, blockConfig.name),
-            ])}
+            suggestions={suggestions}
           />
         </FormField>
       );

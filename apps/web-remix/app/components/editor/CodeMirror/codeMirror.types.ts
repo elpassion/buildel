@@ -1,6 +1,6 @@
 export type Suggestion = {
   label: string;
-  type?: "keyword" | "none";
+  type?: string;
   info?: string;
   variant?: "primary" | "secondary";
 };
