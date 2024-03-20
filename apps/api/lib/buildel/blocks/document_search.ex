@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.DocumentSearch do
+  alias Buildel.Blocks.Fields.EditorField
   use Buildel.Blocks.Block
   alias LangChain.Function
 
@@ -59,22 +60,20 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "maximum" => 1.0,
                   "step" => 0.01
                 },
-                call_formatter: %{
-                  "type" => "string",
-                  "title" => "Call formatter",
-                  "presentAs" => "editor",
-                  "default" => "Database 📑: Search \"{{config.args}}\"\n",
-                  "description" => "How to format calling of api call through tool interface.",
-                  "minLength" => 1
-                },
-                where: %{
-                  "type" => "string",
-                  "title" => "Metadata",
-                  "description" => "The metadata of documents to include in retrieval.",
-                  "default" => "{}",
-                  "presentAs" => "editor",
-                  "editorLanguage" => "json"
-                }
+                call_formatter:
+                  EditorField.new(%{
+                    title: "Call formatter",
+                    default: "Database 📑: Search \"{{config.args}}\"\n",
+                    description: "How to format calling of api call through tool interface.",
+                    minLength: 1
+                  }),
+                where:
+                  EditorField.new(%{
+                    title: "Metadata",
+                    description: "The metadata of documents to include in retrieval.",
+                    default: "{}",
+                    editor_language: "json"
+                  })
               )
           })
       }
