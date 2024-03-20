@@ -43,7 +43,14 @@ function suggestionDecorations(
       const startPos = from + match.index;
       const endPos = startPos + match[0].length;
 
-      const current = suggestions.find((sug) => sug.label === match![1]);
+      const current = suggestions.find((sug) => {
+        const a = sug.label.split(".");
+        const b = match![1].split(".");
+
+        if (a[0] === b[0] && sug.matchAll) return sug;
+        return sug.label === match![1];
+      });
+
       const className = current
         ? `valid-suggestion-${current.variant ?? "primary"}`
         : "invalid-suggestion";

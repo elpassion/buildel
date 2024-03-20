@@ -124,6 +124,7 @@ export function EditBlockForm({
                 label: "metadata.",
                 info: suggestion.description,
                 type: suggestion.type,
+                matchAll: true,
               },
             ];
           }
@@ -133,6 +134,7 @@ export function EditBlockForm({
                 label: "secrets.",
                 info: suggestion.description,
                 type: suggestion.type,
+                matchAll: true,
               },
             ];
           }

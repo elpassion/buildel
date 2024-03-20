@@ -3,4 +3,5 @@ export type Suggestion = {
   type?: string;
   info?: string;
   variant?: "primary" | "secondary";
+  matchAll?: boolean;
 };
