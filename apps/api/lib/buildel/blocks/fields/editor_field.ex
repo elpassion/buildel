@@ -16,6 +16,8 @@ defmodule Buildel.Blocks.Fields.EditorField do
       end
     end
 
+    use MakeEnumerable
+
     @type t :: %Suggestion{}
 
     @spec new(attrs :: map()) :: t
@@ -76,6 +78,8 @@ defmodule Buildel.Blocks.Fields.EditorField do
       )
     end
   end
+
+  use MakeEnumerable
 
   @type t :: %EditorField{}
 
