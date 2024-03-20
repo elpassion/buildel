@@ -45,7 +45,7 @@ function suggestionDecorations(
 
       const current = suggestions.find((sug) => sug.label === match![1]);
       const className = current
-        ? `valid-suggestion-${current.variant}`
+        ? `valid-suggestion-${current.variant ?? "primary"}`
         : "invalid-suggestion";
 
       const deco = Decoration.mark({ class: className });
