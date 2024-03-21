@@ -42,17 +42,18 @@ defmodule BuildelWeb.PipelineChannel do
          {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
          {:ok, run_id} <- Buildel.Utils.parse_id(run_id),
          organization <- Buildel.Organizations.get_organization!(organization_id),
+         {:ok, %Pipelines.Pipeline{id: pipeline_id} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, config} <- Pipelines.get_pipeline_config(pipeline, alias),
          :ok <-
-           BuildelWeb.ChannelAuth.verify_auth_token(
+           verify_auth_token(
+             pipeline.interface_config,
              socket.id,
              channel_name,
              user_data,
              auth,
              organization.api_key
            ),
-         {:ok, %Pipelines.Pipeline{id: pipeline_id} = pipeline} <-
-           Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, config} <- Pipelines.get_pipeline_config(pipeline, alias),
          {:ok, run} <-
            Pipelines.upsert_run(%{
              id: run_id,
@@ -222,5 +223,19 @@ defmodule BuildelWeb.PipelineChannel do
         Buildel.BlockPubSub.subscribe_to_io(context_id, block.name, output.name)
       end
     end)
+  end
+
+  defp verify_auth_token(%{"public" => true}, _, _, _, _, _) do
+    :ok
+  end
+
+  defp verify_auth_token(_config, socket_id, channel_name, user_json, auth_token, secret) do
+    BuildelWeb.ChannelAuth.verify_auth_token(
+      socket_id,
+      channel_name,
+      user_json,
+      auth_token,
+      secret
+    )
   end
 end

@@ -11,6 +11,7 @@ import { Field } from "~/components/form/fields/field.context";
 import { SelectField } from "~/components/form/fields/select.field";
 import { schema } from "./schema";
 import { SubmitButton } from "~/components/form/submit";
+import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;
@@ -24,16 +25,16 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   const validator = useMemo(() => withZod(schema), []);
 
   const inputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_input"
+    (block) => block.type === "text_input",
   );
   const outputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_output"
+    (block) => block.type === "text_output",
   );
   const chats = pipeline.config.blocks.filter((block) => block.type === "chat");
 
   const handleOnSubmit = (
     data: IInterfaceConfig,
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
     onSubmit(data);
@@ -45,12 +46,13 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
         input: pipeline.interface_config?.input,
         output: pipeline.interface_config?.output,
         chat: pipeline.interface_config?.chat,
+        public: pipeline.interface_config?.public,
       }}
       validator={validator}
       noValidate
       onSubmit={handleOnSubmit}
     >
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 items-center max-w-screen-2xl">
+      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 items-center max-w-screen-2xl">
         <Field name="input">
           <SelectField options={inputs.map(toSelectOption)} label="Input" />
         </Field>
@@ -61,6 +63,10 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 
         <Field name="chat">
           <SelectField options={chats.map(toSelectOption)} label="Chat" />
+        </Field>
+
+        <Field name="public">
+          <CheckboxInputField label="Public" />
         </Field>
       </div>
 
