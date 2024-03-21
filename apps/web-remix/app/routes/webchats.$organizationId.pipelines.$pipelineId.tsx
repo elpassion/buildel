@@ -29,7 +29,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const pipeline = await pipelineApi.getPipeline(
       params.organizationId,
-      params.pipelineId
+      params.pipelineId,
     );
 
     const alias = pipelineApi.getAliasFromUrl(request.url);
@@ -64,7 +64,7 @@ export default function WebsiteChat() {
 
   useEffect(() => {
     // todo change it
-    setTimeout(() => startRun([], alias), 500);
+    setTimeout(() => startRun({ alias, initial_inputs: [] }), 500);
 
     return () => {
       stopRun();
