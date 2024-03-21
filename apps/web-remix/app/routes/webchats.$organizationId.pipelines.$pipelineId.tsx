@@ -64,7 +64,9 @@ export default function WebsiteChat() {
 
   useEffect(() => {
     // todo change it
-    setTimeout(() => startRun({ alias, initial_inputs: [] }), 500);
+    setTimeout(() => {
+      startRun({ alias, initial_inputs: [] });
+    }, 500);
 
     return () => {
       stopRun();
@@ -76,7 +78,7 @@ export default function WebsiteChat() {
       <ChatWrapper className="max-w-[820px] h-[500px] !py-4 relative">
         <ChatHeader className="mb-1">
           <div className="flex gap-2 items-center">
-            <ChatHeading>Simple Chat</ChatHeading>
+            <ChatHeading>{pipeline.name}</ChatHeading>
             <ChatStatus connectionStatus={connectionStatus} />
           </div>
         </ChatHeader>
@@ -100,6 +102,7 @@ export default function WebsiteChat() {
           <p>Ask me anything!</p>
         </IntroPanel>
       </ChatWrapper>
+      <div id="_root"></div>
     </div>
   );
 }
