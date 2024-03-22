@@ -14,9 +14,10 @@ interface UseChatProps {
   onBlockOutput?: (
     blockId: string,
     outputName: string,
-    payload: unknown
+    payload: unknown,
   ) => void;
   onFinish?: () => void;
+  useAuth?: boolean;
 }
 
 export const useChat = ({
@@ -27,14 +28,17 @@ export const useChat = ({
   pipelineId,
   onBlockOutput: onBlockOutputProps,
   onFinish,
+  useAuth,
 }: UseChatProps) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const useAuthWithDefault = useAuth ?? true;
+  console.log(useAuthWithDefault);
 
   const onBlockOutput = (
     blockId: string,
     _outputName: string,
-    payload: unknown
+    payload: unknown,
   ) => {
     onBlockOutputProps?.(blockId, _outputName, payload);
     // todo: just text_output for now
@@ -85,7 +89,8 @@ export const useChat = ({
     pipelineId,
     onBlockOutput,
     onStatusChange,
-    onError
+    onError,
+    useAuthWithDefault,
   );
 
   const clearMessages = () => {

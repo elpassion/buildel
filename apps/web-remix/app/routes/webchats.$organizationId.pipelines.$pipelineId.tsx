@@ -58,6 +58,7 @@ export default function WebsiteChat() {
     chat: pipeline.interface_config?.chat ?? "",
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
+    useAuth: !(pipeline.interface_config?.public ?? false),
   });
 
   useEffect(() => {

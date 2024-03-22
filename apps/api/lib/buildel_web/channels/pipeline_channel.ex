@@ -19,6 +19,8 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   @default_params %{
+    "auth" => "default",
+    "user_data" => "{}",
     "initial_inputs" => [],
     "alias" => "latest",
     "metadata" => %{}

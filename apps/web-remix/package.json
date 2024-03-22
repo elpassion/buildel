@@ -14,7 +14,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@buildel/buildel": "^0.2.1",
+    "@buildel/buildel": "^0.2.3",
     "@codemirror/autocomplete": "^6.15.0",
     "@elpassion/taco": "^0.6.0",
     "@fastify/early-hints": "^1.0.1",
