@@ -1,4 +1,4 @@
-defmodule BuildelWeb.OrganizationPipelineControllerTest do
+defmodule BuildelWeb.OrganizationPipelinePublicControllerTest do
   use BuildelWeb.ConnCase
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
@@ -16,10 +16,6 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
 
   describe "show" do
     setup [:create_pipeline, :create_public_pipeline]
-
-    test_requires_authentication %{conn: conn, organization: organization, public_pipeline: pipeline} do
-      get(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/public")
-    end
 
     test "Returns 404 when pipeline does not exist", %{
       conn: conn,
@@ -49,7 +45,7 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines/#{pipeline.id}/public")
       response = json_response(conn, 200)
       assert response["data"] != %{}
-      assert_schema(response, "PipelineShowResponse", api_spec)
+      assert_schema(response, "PipelinePublicShowResponse", api_spec)
     end
   end
 

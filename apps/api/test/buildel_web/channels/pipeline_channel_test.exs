@@ -6,20 +6,6 @@ defmodule BuildelWeb.PipelineChannelTest do
   import Buildel.AccountsFixtures
 
   describe "join" do
-    test "fails when starting a pipeline without token", %{socket: socket} do
-      assert {:error,
-              %{
-                reason: "invalid",
-                errors: %{auth: ["can't be blank"], user_data: ["can't be blank"]}
-              }} =
-               socket
-               |> subscribe_and_join(
-                 BuildelWeb.PipelineChannel,
-                 "pipelines:org:non-existent",
-                 %{}
-               )
-    end
-
     test "fails when starting a pipeline with invalid token", %{
       socket: socket,
       organization: organization
@@ -143,6 +129,27 @@ defmodule BuildelWeb.PipelineChannelTest do
         event: ^event,
         payload: ^payload
       }
+    end
+  end
+
+  describe "public" do
+    test "allows connecting to public channels without auth", %{
+      socket: socket,
+      organization: organization
+    }  do
+      pipeline =
+        pipeline_fixture(%{
+          organization_id: organization.id,
+          interface_config: %{ "public" => true }
+        })
+
+      {:ok, %{run: _run}, _socket} =
+        socket
+        |> subscribe_and_join(
+          BuildelWeb.PipelineChannel,
+          "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+          %{}
+        )
     end
   end
 
