@@ -43,7 +43,7 @@ defmodule BuildelWeb.OrganizationPipelinePublicController do
            Pipelines.get_organization_pipeline(organization, pipeline_id) do
       case pipeline.interface_config do
         %{"public" => true} -> render(conn, :show, pipeline: pipeline)
-        _ -> render(conn, :forbidden, "Forbidden")
+        _ -> {:error, :unauthorized}
       end
     end
   end
