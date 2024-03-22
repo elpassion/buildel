@@ -17,6 +17,12 @@ import { loaderBuilder } from "~/utils.server";
 import invariant from "tiny-invariant";
 import { useLoaderData } from "@remix-run/react";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
+import { UnauthorizedError } from "~/utils/errors";
+import {
+  IPipelinePublicResponse,
+  IPipelineResponse,
+} from "~/api/pipeline/pipeline.contracts";
+import { ParsedResponse } from "~/utils/fetch.server";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -25,10 +31,19 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const pipelineApi = new PipelineApi(fetch);
 
-    const pipeline = await pipelineApi.getPublicPipeline(
-      params.organizationId,
-      params.pipelineId,
-    );
+    let pipeline: ParsedResponse<IPipelinePublicResponse> | void =
+      await pipelineApi
+        .getPipeline(params.organizationId, params.pipelineId)
+        .catch((e) => {
+          if (e instanceof UnauthorizedError) return;
+          throw e;
+        });
+    if (!pipeline) {
+      pipeline = await pipelineApi.getPublicPipeline(
+        params.organizationId,
+        params.pipelineId,
+      );
+    }
 
     const alias = pipelineApi.getAliasFromUrl(request.url);
 

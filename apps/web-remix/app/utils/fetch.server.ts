@@ -76,7 +76,7 @@ export async function fetchTyped<T extends ZodType>(
   return Object.assign(response, { data, error: null });
 }
 
-type ParsedResponse<T> = Response & { data: T };
+export type ParsedResponse<T> = Response & { data: T };
 
 function deepMergeAPIErrors(
   errors: Record<string, APIErrorField>,

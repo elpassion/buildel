@@ -120,6 +120,8 @@ export type IPipelinesResponse = z.TypeOf<typeof PipelinesResponse>;
 
 export type IPipelineResponse = z.TypeOf<typeof PipelineResponse>;
 
+export type IPipelinePublicResponse = z.TypeOf<typeof PipelinePublicResponse>;
+
 export const PipelineRunsResponse = z.object({
   data: PipelineRuns,
   meta: PaginationMeta,

@@ -33,7 +33,6 @@ export const useChat = ({
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const useAuthWithDefault = useAuth ?? true;
-  console.log(useAuthWithDefault);
 
   const onBlockOutput = (
     blockId: string,

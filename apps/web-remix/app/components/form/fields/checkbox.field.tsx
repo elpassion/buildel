@@ -12,7 +12,6 @@ export const CheckboxInputField = forwardRef<
 >((props, ref) => {
   const { name, getInputProps, validate, error } = useFieldContext();
   const [formValue, setFormValue] = useControlField<boolean>(name);
-  console.log("CheckboxInputField", formValue, error);
 
   return (
     <CheckboxInput
