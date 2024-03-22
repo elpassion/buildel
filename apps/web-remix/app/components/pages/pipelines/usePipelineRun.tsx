@@ -16,7 +16,8 @@ export function usePipelineRun(
     payload: unknown
   ) => void = () => {},
   onBlockStatusChange: (blockId: string, isWorking: boolean) => void = () => {},
-  onError: (blockId: string, errors: string[]) => void
+  onError: (blockId: string, errors: string[]) => void,
+  useAuth: boolean = true
 ) {
   const buildel = useRef<BuildelSocket>();
   const run = useRef<BuildelRun>();
@@ -39,6 +40,7 @@ export function usePipelineRun(
   useEffect(() => {
     buildel.current = new BuildelSocket(organizationId, {
       socketUrl: "/super-api/socket",
+      useAuth,
     });
     buildel.current.connect().then((buildel) => {
       run.current = buildel.run(pipelineId, {

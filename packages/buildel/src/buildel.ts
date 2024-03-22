@@ -6,6 +6,7 @@ interface BuildelSocketOptions {
   socketUrl?: string;
   authUrl?: string;
   headers?: Record<string, string>;
+  useAuth?: boolean;
 }
 export class BuildelSocket {
   private readonly socket: Socket;
@@ -13,13 +14,14 @@ export class BuildelSocket {
   private readonly authUrl: string;
   private readonly socketUrl: string;
   private readonly headers: Record<string, string>;
+  private readonly useAuth: boolean = true;
 
   constructor(
     private readonly organizationId: number,
     options: BuildelSocketOptions = {}
   ) {
     this.authUrl = options.authUrl ?? "/super-api/channel_auth";
-    this.socketUrl = options.socketUrl ?? "wss://buildel-api.fly.dev/socket";
+    this.socketUrl = options.socketUrl ?? "wss://api.buildel.ai/socket";
     this.headers = options.headers ?? {};
     this.id = v4();
     this.socket = new Socket(this.socketUrl, {
@@ -27,6 +29,7 @@ export class BuildelSocket {
         id: this.id,
       },
     });
+    this.useAuth = options.useAuth ?? true;
   }
 
   public async connect() {
@@ -81,6 +84,7 @@ export class BuildelSocket {
       pipelineId,
       this.authUrl,
       this.headers,
+      this.useAuth,
       { onBlockOutput, onBlockStatusChange, onStatusChange, onBlockError }
     );
   }
@@ -96,6 +100,7 @@ export class BuildelRun {
     private readonly pipelineId: number,
     private readonly authUrl: string,
     private readonly headers: Record<string, string>,
+    private readonly useAuth: boolean,
     private readonly handlers: {
       onBlockOutput: (
         blockId: string,
@@ -202,6 +207,8 @@ export class BuildelRun {
   }
 
   private async authenticateChannel() {
+    if (!this.useAuth) return {};
+
     return await fetch(this.authUrl, {
       headers: {
         "Content-Type": "application/json",
