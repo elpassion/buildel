@@ -32,6 +32,21 @@ defmodule BuildelWeb.Schemas.Pipelines do
     })
   end
 
+  defmodule PipelinePublic do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "PipelinePublic",
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer, description: "Pipeline ID"},
+        name: %Schema{type: :string, description: "Pipeline name"},
+        interface_config: %Schema{type: :object, description: "Interface config", nullable: true}
+      },
+      required: [:id, :name]
+    })
+  end
+
   defmodule IndexResponse do
     require OpenApiSpex
 
@@ -93,6 +108,19 @@ defmodule BuildelWeb.Schemas.Pipelines do
         }
       },
       required: [:pipeline]
+    })
+  end
+
+  defmodule PipelinePublicShowResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "PipelinePublicShowResponse",
+      type: :object,
+      properties: %{
+        data: BuildelWeb.Schemas.Pipelines.PipelinePublic
+      },
+      required: [:data]
     })
   end
 end

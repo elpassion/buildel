@@ -14,20 +14,18 @@ import {
 import classNames from "classnames";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { loaderBuilder } from "~/utils.server";
-import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { useLoaderData } from "@remix-run/react";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
-    await requireLogin(request);
     invariant(params.organizationId, "organizationId not found");
     invariant(params.pipelineId, "pipelineId not found");
 
     const pipelineApi = new PipelineApi(fetch);
 
-    const pipeline = await pipelineApi.getPipeline(
+    const pipeline = await pipelineApi.getPublicPipeline(
       params.organizationId,
       params.pipelineId,
     );

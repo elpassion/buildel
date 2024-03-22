@@ -29,6 +29,12 @@ export const Pipeline = z.object({
   }),
 });
 
+export const PipelinePublic = z.object({
+  id: z.number(),
+  name: z.string(),
+  interface_config: z.union([InterfaceConfig, z.null()]),
+});
+
 export const ExtendedPipeline = z.object({
   id: z.number(),
   name: z.string(),
@@ -91,6 +97,14 @@ export const PipelineRun = z.object({
 });
 
 export const PipelineRuns = z.array(PipelineRun);
+
+export const PipelinePublicResponse = z
+  .object({
+    data: PipelinePublic,
+  })
+  .transform((response) => {
+    return response.data;
+  });
 
 export const PipelineResponse = z
   .object({
