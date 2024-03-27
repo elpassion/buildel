@@ -138,7 +138,7 @@ function H6({
     <h6
       className={classNames(
         "break-words whitespace-pre-wrap text-neutral-100",
-        className
+        className,
       )}
       {...rest}
     >
@@ -155,7 +155,7 @@ function H5({
     <h5
       className={classNames(
         "break-words whitespace-pre-wrap text-sm text-neutral-100",
-        className
+        className,
       )}
       {...rest}
     >
@@ -173,7 +173,7 @@ function H4({
     <h4
       className={classNames(
         "break-words whitespace-pre-wrap text-base text-neutral-100",
-        className
+        className,
       )}
       {...rest}
     >
@@ -191,7 +191,7 @@ function H3({
     <h3
       className={classNames(
         "break-words whitespace-pre-wrap text-lg text-neutral-100",
-        className
+        className,
       )}
       {...rest}
     >
@@ -209,7 +209,7 @@ function H2({
     <h2
       className={classNames(
         "break-words whitespace-pre-wrap text-xl text-neutral-100",
-        className
+        className,
       )}
       {...rest}
     >
@@ -227,7 +227,7 @@ function H1({
     <h2
       className={classNames(
         "break-words whitespace-pre-wrap text-2xl text-neutral-100",
-        className
+        className,
       )}
       {...rest}
     >
@@ -257,7 +257,12 @@ function Link({
   ...rest
 }: AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
-    <a className={classNames("text-primary-500", className)} {...rest}>
+    <a
+      className={classNames("text-primary-500", className)}
+      target="_blank"
+      rel="noreferrer"
+      {...rest}
+    >
       {children}
     </a>
   );
@@ -272,7 +277,7 @@ function Pre({
     <pre
       className={classNames(
         "my-1 bg-neutral-900 break-words whitespace-pre-wrap",
-        className
+        className,
       )}
       {...rest}
     >
@@ -290,7 +295,7 @@ function Code({
     <code
       className={classNames(
         "my-1 bg-neutral-900 break-words whitespace-pre-wrap text-neutral-100",
-        className
+        className,
       )}
       {...rest}
     >
