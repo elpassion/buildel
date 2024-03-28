@@ -17,7 +17,7 @@ defmodule Buildel.BlockContext.Mock do
   end
 
   @impl true
-  def create_run_cost(_context_id, _block_name, _amount) do
+  def create_run_cost(_context_id, _block_name, _costs_data) do
     {:ok, %{}}
   end
 

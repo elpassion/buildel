@@ -1,8 +1,10 @@
 defmodule Buildel.BlockContextBehaviour do
+  @type costs_data :: %{amount: integer(), input_tokens: integer(), output_tokens: integer()}
+
   @callback context_from_context_id(String.t()) :: map()
   @callback block_pid(String.t(), String.t()) :: pid()
   @callback create_run_auth_token(String.t(), String.t()) :: {:ok, String.t()}
-  @callback create_run_cost(String.t(), String.t(), integer()) ::
+  @callback create_run_cost(String.t(), String.t(), costs_data()) ::
               {:ok, Buildel.Pipelines.RunCost.t()}
   @callback get_vector_db(String.t(), String.t()) :: Buildel.VectorDB.t()
   @callback get_global_collection_name(String.t(), String.t()) :: {:ok, String.t()}
@@ -47,7 +49,7 @@ defmodule Buildel.BlockContext do
   end
 
   @impl true
-  def create_run_cost(context_id, block_name, amount) do
+  def create_run_cost(context_id, block_name, costs_data) do
     %{global: organization_id, parent: pipeline_id, local: run_id} =
       context_from_context_id(context_id)
 
@@ -57,7 +59,7 @@ defmodule Buildel.BlockContext do
            Buildel.Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Buildel.Pipelines.get_pipeline_run(pipeline, run_id),
          {:ok, cost} <-
-           Buildel.Organizations.create_organization_cost(organization, %{amount: amount}),
+           Buildel.Organizations.create_organization_cost(organization, costs_data),
          {:ok, run_cost} <-
            Buildel.Pipelines.create_run_cost(run, cost, %{
              description: block_name

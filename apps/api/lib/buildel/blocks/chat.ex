@@ -503,7 +503,11 @@ defmodule Buildel.Blocks.Chat do
             block_context().create_run_cost(
               state[:context_id],
               state[:block_name],
-              chat_cost
+              %{
+                amount: chat_cost,
+                input_tokens: token_summary.input_tokens,
+                output_tokens: token_summary.output_tokens
+              }
             )
           end,
           on_end: fn -> nil end,
@@ -591,7 +595,11 @@ defmodule Buildel.Blocks.Chat do
                block_context().create_run_cost(
                  state[:context_id],
                  state[:block_name],
-                 chat_cost
+                 %{
+                   amount: chat_cost,
+                   input_tokens: token_summary.input_tokens,
+                   output_tokens: token_summary.output_tokens
+                 }
                )
              end,
              on_end: fn ->

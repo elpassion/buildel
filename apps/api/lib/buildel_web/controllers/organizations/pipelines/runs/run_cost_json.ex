@@ -9,6 +9,8 @@ defmodule BuildelWeb.OrganizationPipelineRunCostJSON do
     %{
       id: run_cost.cost.id,
       amount: run_cost.cost.amount,
+      input_tokens: run_cost.cost.input_tokens,
+      output_tokens: run_cost.cost.output_tokens,
       description: run_cost.description,
       created_at: run_cost.inserted_at
     }
