@@ -5,8 +5,8 @@ defmodule Buildel.Costs.Cost do
   schema "costs" do
     belongs_to :organization, Buildel.Organizations.Organization
     field :amount, :decimal
-    field :input_tokens, :integer
-    field :output_tokens, :integer
+    field :input_tokens, :integer, default: 0
+    field :output_tokens, :integer, default: 0
 
     timestamps()
   end
