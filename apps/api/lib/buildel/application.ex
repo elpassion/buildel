@@ -7,6 +7,10 @@ defmodule Buildel.Application do
 
   @impl true
   def start(_type, _args) do
+    :logger.add_handler(:buildel_sentry_handler, Sentry.LoggerHandler, %{
+      config: %{metadata: [:file, :line]}
+    })
+
     children =
       [
         # Start the Telemetry supervisor

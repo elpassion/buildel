@@ -77,4 +77,12 @@ if config_env() == :prod do
       adapter: Resend.Swoosh.Adapter,
       api_key: api_key
   end
+
+  if sentry_dsn = System.get_env("SENTRY_DSN") do
+    config :sentry,
+      dsn: sentry_dsn,
+      environment_name: Mix.env(),
+      enable_source_code_context: true,
+      root_source_code_paths: File.cwd!()
+  end
 end

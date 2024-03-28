@@ -1,4 +1,5 @@
 defmodule BuildelWeb.Endpoint do
+  use Sentry.PlugCapture
   use Phoenix.Endpoint, otp_app: :buildel
 
   # The session will be stored in the cookie and signed,
@@ -36,4 +37,5 @@ defmodule BuildelWeb.Endpoint do
   plug CORSPlug
   plug ETag.Plug
   plug BuildelWeb.Router
+  plug Sentry.PlugContext
 end

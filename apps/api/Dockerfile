@@ -78,6 +78,10 @@ RUN --mount=type=cache,id=hex,target=/root/.hex \
   --mount=type=cache,id=mix,target=/root/.mix \
   DATABASE_URL="ecto://USER:PASS@HOST/DATABASE" SECRET_KEY_BASE="doesnotmatter" ENCRYPTION_KEY="ZG9lc25vdG1hdTEstg==" SKIP_DB="true" mix run -e 'Buildel.Application.load_servings()'
 
+RUN --mount=type=cache,id=hex,target=/root/.hex \
+  --mount=type=cache,id=mix,target=/root/.mix \
+  mix sentry.package_source_code
+
 RUN mkdir -p /app/.bumblebee
 
 # start a new build stage so that the final image will only contain
