@@ -19,7 +19,7 @@
         <img src="https://img.shields.io/badge/discord-join-success?style=flat&logo=discord" alt="Join Slack"/>
     </a>
     <a href="https://github.com/elpassion/buildel/actions/workflows/web-test.yml">
-        <img src="https://img.shields.io/github/actions/workflow/status/elpassion/buildel/web-test.yml" alt="Build Status"/>
+        <img src="https://img.shields.io/github/actions/workflow/status/elpassion/buildel/web-release.yml" alt="Build Status"/>
     </a>
 </p>
 
