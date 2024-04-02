@@ -47,7 +47,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
                 parameters: "{}",
                 headers: "{}",
                 metadata: %{},
-                call_formatter: ""
+                call_formatter: "",
+                jq_filter: "."
               },
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->args", "text")
@@ -85,7 +86,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
                 parameters: "{}",
                 headers: "{\"test\": \"{{metadata.abc}}\"}",
                 metadata: %{"id" => "1", "abc" => "abc", "efg" => %{"a" => "123"}},
-                call_formatter: ""
+                call_formatter: "",
+                jq_filter: "."
               },
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->args", "text")
@@ -118,7 +120,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
                 parameters: "{}",
                 headers: "{\"test\": \"{{secrets.abc}}\"}",
                 metadata: %{},
-                call_formatter: ""
+                call_formatter: "",
+                jq_filter: "."
               },
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->args", "text")
@@ -151,7 +154,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
                 parameters: "{}",
                 headers: "{\"test\": \"{{secrets.abc}}\", \"w\": \"{{metadata.w}}\"}",
                 metadata: %{},
-                call_formatter: ""
+                call_formatter: "",
+                jq_filter: "."
               },
               connections: [
                 Blocks.Connection.from_connection_string("test_input:output->args", "text")
@@ -185,7 +189,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
                 parameters: "{}",
                 headers: "{}",
                 metadata: %{},
-                call_formatter: "{{config.block_name}} API 🖥️: {{config.args}}\n"
+                call_formatter: "{{config.block_name}} API 🖥️: {{config.args}}\n",
+                jq_filter: "."
               },
               connections: []
             })
@@ -222,7 +227,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
                 parameters: "{}",
                 headers: "{}",
                 metadata: %{},
-                call_formatter: ""
+                call_formatter: "",
+                jq_filter: "."
               },
               connections: []
             })
@@ -251,7 +257,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
                 parameters: "{}",
                 headers: "{}",
                 metadata: %{},
-                call_formatter: ""
+                call_formatter: "",
+                jq_filter: "."
               },
               connections: []
             })
@@ -280,7 +287,8 @@ defmodule Buildel.Blocks.ApiCallToolTest do
                 headers: "{}",
                 metadata: %{},
                 authorize: true,
-                call_formatter: ""
+                call_formatter: "",
+                jq_filter: "."
               },
               connections: []
             })
