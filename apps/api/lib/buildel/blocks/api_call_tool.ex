@@ -155,7 +155,7 @@ defmodule Buildel.Blocks.ApiCallTool do
          |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
        end)
      )
-     |> Map.put(:jq_filter, opts.jq_filter || ".")
+     |> Map.put(:jq_filter, opts[:jq_filter] || ".")
      |> assign_stream_state(opts)}
   end
 
