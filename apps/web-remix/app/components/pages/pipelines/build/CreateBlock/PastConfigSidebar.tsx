@@ -9,13 +9,13 @@ import { loader } from "~/components/pages/pipelines/build/loader.server";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
 import { ValidatedForm } from "remix-validated-form";
 import { Field as FormField } from "~/components/form/fields/field.context";
-import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
 import { usePasteConfig } from "./PasteBlockConfigProvider";
 import { SubmitButton } from "~/components/form/submit";
+import { EditorField } from "~/components/form/fields/editor.field";
 
 export function PasteBlockConfiguration({
   onSubmit,
@@ -126,7 +126,7 @@ export function PasteBlockConfigurationForm({
     >
       <div className="grow">
         <FormField name="configuration">
-          <MonacoEditorField
+          <EditorField
             height="350px"
             label="Block configuration"
             supportingText="Paste the block configuration in JSON format."

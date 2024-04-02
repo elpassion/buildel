@@ -17,6 +17,7 @@ export const CodePreviewClient: React.FC<CodePreviewProps> = ({
   return (
     <CodeMirror
       editable={false}
+      wrapLines={false}
       height={`${height}px`}
       theme={vscodeDark}
       className="rounded-xl overflow-hidden !text-[13px]"

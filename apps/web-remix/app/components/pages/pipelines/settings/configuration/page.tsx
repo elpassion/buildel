@@ -1,13 +1,11 @@
 import React, { useCallback, useState } from "react";
 import z from "zod";
-import { Button } from "@elpassion/taco";
 import { MetaFunction } from "@remix-run/node";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
 import { Field as FormField } from "~/components/form/fields/field.context";
-import { MonacoEditorField } from "~/components/form/fields/monacoEditor.field";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import { routes } from "~/utils/routes.utils";
 import {
@@ -18,6 +16,7 @@ import { successToast } from "~/components/toasts/successToast";
 import { UpdatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
 import { loader } from "./loader.server";
 import { SubmitButton } from "~/components/form/submit";
+import { EditorField } from "~/components/form/fields/editor.field";
 
 const schema = z.object({
   configuration: z.string(),
@@ -102,7 +101,7 @@ export function SettingsConfigurationPage() {
     >
       <div className="grow">
         <FormField name="configuration">
-          <MonacoEditorField
+          <EditorField
             height="450px"
             loading={
               <div className="w-full h-[450px] border border-neutral-200 rounded-lg" />

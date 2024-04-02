@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { ReactNode, useMemo, useRef } from "react";
 import { ClientOnly } from "remix-utils/client-only";
 import { autocompletion } from "@codemirror/autocomplete";
 import { xcodeDark } from "@uiw/codemirror-themes-all";
@@ -19,6 +19,8 @@ export interface CodeMirrorProps extends ReactCodeMirrorProps {
   suggestions?: Suggestion[];
   language?: EditorLanguage;
   onChange?: (value?: string) => void;
+  loading?: ReactNode;
+  wrapLines?: boolean;
 }
 
 export const CodeMirror: React.FC<CodeMirrorProps> = ({
@@ -26,6 +28,7 @@ export const CodeMirror: React.FC<CodeMirrorProps> = ({
   onChange,
   suggestions = [],
   language = "tsx",
+  wrapLines = true,
   ...rest
 }) => {
   const editorRef = useRef<ReactCodeMirrorRef>(null);
@@ -45,15 +48,20 @@ export const CodeMirror: React.FC<CodeMirrorProps> = ({
   };
 
   const extensions = useMemo(() => {
-    return [
-      // EditorView.lineWrapping,
+    const ext = [
       currentLanguage(language),
       suggestionHighlighter(suggestions),
       autocompletion({
         override: [(context) => completions(context, suggestions)],
       }),
     ];
-  }, [suggestions.length, language]);
+
+    if (wrapLines) {
+      ext.push(EditorView.lineWrapping);
+    }
+
+    return ext;
+  }, [suggestions.length, language, wrapLines]);
 
   return (
     <ReactCodeMirror
@@ -74,16 +82,19 @@ export const CodeMirror: React.FC<CodeMirrorProps> = ({
 
 const ClientCodeMirror: React.FC<CodeMirrorProps> = ({
   height = "150px",
+  loading,
   ...rest
 }) => {
   return (
     <div style={{ minHeight: height }} className="w-full">
       <ClientOnly
         fallback={
-          <div
-            style={{ minHeight: height }}
-            className="w-full border border-neutral-200"
-          />
+          loading ?? (
+            <div
+              style={{ minHeight: height }}
+              className="w-full border border-neutral-200"
+            />
+          )
         }
       >
         {() => <CodeMirror height={height} {...rest} />}
