@@ -79,7 +79,8 @@ defmodule Buildel.MixProject do
       {:mix_test_watch, "~> 1.0", only: [:dev, :test], runtime: false},
       {:req, "~> 0.4.13"},
       {:multipart, "~> 0.4.0"},
-      {:sentry, "~> 10.2.0"}
+      {:sentry, "~> 10.2.0"},
+      {:jq, "~>1.0"}
     ]
   end
 

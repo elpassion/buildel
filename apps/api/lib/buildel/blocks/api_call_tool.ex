@@ -92,7 +92,15 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "title" => "Authorize",
                   "description" => "Whether to authorize the request with organization secret.",
                   "default" => false
-                }
+                },
+                jq_filter:
+                  EditorField.new(%{
+                    title: "JQ Filter",
+                    description: "JQ filter to apply to the response.",
+                    editorLanguage: "json",
+                    default: ".",
+                    minLength: 1
+                  })
               )
           })
       }
@@ -147,6 +155,7 @@ defmodule Buildel.Blocks.ApiCallTool do
          |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
        end)
      )
+     |> Map.put(:jq_filter, opts.jq_filter || ".")
      |> assign_stream_state(opts)}
   end
 
@@ -164,12 +173,20 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   @impl true
-  def handle_cast({:response, response}, state) do
+  def handle_cast({:response, {:text, body}}, state) do
+    %{"status" => status, "body" => body} = body |> Jason.decode!()
+
+    body = Buildel.JQ.query!(body, state.jq_filter)
+
+    message =
+      %{status: status, body: body}
+      |> Jason.encode!()
+
     Buildel.BlockPubSub.broadcast_to_io(
       state.context_id,
       state.block_name,
       "response",
-      response
+      {:text, message}
     )
 
     state = state |> schedule_stream_stop()
