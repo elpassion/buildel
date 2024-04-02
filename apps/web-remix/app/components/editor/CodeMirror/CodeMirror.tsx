@@ -13,7 +13,7 @@ import { completions } from "./extensions/completions";
 import { Suggestion } from "./codeMirror.types";
 import "./codeMirror.styles.css";
 
-type EditorLanguage = "tsx" | "json" | "shell" | "custom" | "html";
+export type EditorLanguage = "tsx" | "json" | "shell" | "html" | "custom";
 
 export interface CodeMirrorProps extends ReactCodeMirrorProps {
   suggestions?: Suggestion[];

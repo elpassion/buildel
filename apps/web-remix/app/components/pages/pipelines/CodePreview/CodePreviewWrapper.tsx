@@ -16,16 +16,18 @@ export const CodePreviewWrapper: React.FC<CodePreviewWrapperProps> = ({
         {children?.(props.value)}
       </div>
 
-      <ClientOnly
-        fallback={
-          <div
-            className="w-full bg-[#1E1E1E] rounded-xl animate-pulse"
-            style={{ height: height }}
-          />
-        }
-      >
-        {() => <CodePreviewClient height={height} {...props} />}
-      </ClientOnly>
+      <div style={{ minHeight: height }}>
+        <ClientOnly
+          fallback={
+            <div
+              className="w-full bg-[#1E1E1E] rounded-xl animate-pulse"
+              style={{ height: height }}
+            />
+          }
+        >
+          {() => <CodePreviewClient height={height} {...props} />}
+        </ClientOnly>
+      </div>
     </div>
   );
 };

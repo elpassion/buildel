@@ -7,6 +7,7 @@ import { MenuItem } from "~/components/menu/MenuItem";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import { CodePreviewWrapper } from "./CodePreviewWrapper";
 import { ClientOnly } from "remix-utils/client-only";
+import { EditorLanguage } from "~/components/editor/CodeMirror/CodeMirror";
 
 interface CodePreviewOptionsProps {
   options: {
@@ -14,7 +15,7 @@ interface CodePreviewOptionsProps {
     framework: string;
     value: string;
     height: number;
-    language?: string;
+    language?: EditorLanguage;
   }[];
 }
 
@@ -44,7 +45,7 @@ export const CodePreviewOptions: React.FC<CodePreviewOptionsProps> = ({
 
   return (
     <CodePreviewWrapper
-      language={activeOption?.language ?? "typescript"}
+      language={activeOption?.language ?? "tsx"}
       value={activeOption?.value ?? ""}
       height={activeOption?.height ?? 60}
     >
