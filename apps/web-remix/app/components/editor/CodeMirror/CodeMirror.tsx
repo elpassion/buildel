@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from "react";
 import { ClientOnly } from "remix-utils/client-only";
 import { autocompletion } from "@codemirror/autocomplete";
-import { dracula } from "@uiw/codemirror-themes-all";
+import { xcodeDark } from "@uiw/codemirror-themes-all";
 import { langs } from "@uiw/codemirror-extensions-langs";
 import ReactCodeMirror, {
   ReactCodeMirrorRef,
@@ -58,7 +58,7 @@ const CodeMirror: React.FC<CodeMirrorProps> = ({
       ref={editorRef}
       value={value}
       onChange={onChange}
-      theme={dracula}
+      theme={xcodeDark}
       extensions={extensions}
       basicSetup={{
         lineNumbers: false,
