@@ -23,7 +23,6 @@
     "@fastify/static": "^7.0.1",
     "@floating-ui/react-dom": "^2.0.8",
     "@mcansh/remix-fastify": "^3.2.2",
-    "@monaco-editor/react": "^4.5.2",
     "@remix-run/node": "2.7.1",
     "@remix-run/react": "2.7.1",
     "@remix-run/serve": "2.7.1",
