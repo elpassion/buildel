@@ -44,8 +44,8 @@ export function ClientSDKPage() {
 
           <CodePreviewWrapper
             value="npm install @buildel/buildel @buildel/buildel-auth"
-            language="bash"
-            height={35}
+            language="shell"
+            height={30}
           >
             {(value) => <CopyCodeButton value={value} />}
           </CodePreviewWrapper>
@@ -85,6 +85,7 @@ export function ClientSDKPage() {
           <CodePreviewOptions
             options={[
               {
+                language: "tsx",
                 id: 0,
                 framework: "Next.js",
                 value: `import { BuildelAuth } from "@buildel/buildel-auth";
@@ -98,9 +99,10 @@ export async function POST(request: Request) {
 
   return NextResponse.json(authData);
 }`,
-                height: 215,
+                height: 210,
               },
               {
+                language: "tsx",
                 id: 1,
                 framework: "Remix",
                 value: `import { BuildelAuth } from "@buildel/buildel-auth"
@@ -116,7 +118,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   return json({ authData });
 }`,
-                height: 250,
+                height: 245,
               },
             ]}
           />
@@ -150,7 +152,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
 // ${organizationId} is an identifier of your organization
 const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-endpoint' });`}
-            language="typescript"
+            language="shell"
             height={90}
           >
             {(value) => <CopyCodeButton value={value} />}
@@ -174,7 +176,7 @@ const buildel = new BuildelSocket(${organizationId}, { authUrl: '/your-api/auth-
 
           <CodePreviewWrapper
             value="await buildel.connect();"
-            language="typescript"
+            language="tsx"
             height={35}
           >
             {(value) => <CopyCodeButton value={value} />}
@@ -213,7 +215,7 @@ const run = buildel.run(${pipelineId}, {
     console.log(\`Block \${blockId} errors: \${errors}\`);
   }
 })`}
-            language="typescript"
+            language="tsx"
             height={305}
           >
             {(value) => <CopyCodeButton value={value} />}
@@ -238,7 +240,7 @@ const run = buildel.run(${pipelineId}, {
           <CodePreviewWrapper
             value={`await run.start()
 run.push("your_block_name:input", 'sample payload');`}
-            language="typescript"
+            language="tsx"
             height={55}
           >
             {(value) => <CopyCodeButton value={value} />}
@@ -262,7 +264,7 @@ run.push("your_block_name:input", 'sample payload');`}
           <div>
             <CodePreviewWrapper
               value={`await buildel.disconnect();`}
-              language="typescript"
+              language="tsx"
               height={35}
             >
               {(value) => <CopyCodeButton value={value} />}

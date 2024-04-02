@@ -13,15 +13,15 @@ import { completions } from "./extensions/completions";
 import { Suggestion } from "./codeMirror.types";
 import "./codeMirror.styles.css";
 
-type EditorLanguage = "tsx" | "json" | "shell" | "custom";
+type EditorLanguage = "tsx" | "json" | "shell" | "custom" | "html";
 
 export interface CodeMirrorProps extends ReactCodeMirrorProps {
   suggestions?: Suggestion[];
   language?: EditorLanguage;
-  onChange: (value?: string) => void;
+  onChange?: (value?: string) => void;
 }
 
-const CodeMirror: React.FC<CodeMirrorProps> = ({
+export const CodeMirror: React.FC<CodeMirrorProps> = ({
   value,
   onChange,
   suggestions = [],
@@ -36,6 +36,8 @@ const CodeMirror: React.FC<CodeMirrorProps> = ({
         return langs.tsx();
       case "shell":
         return langs.shell();
+      case "html":
+        return langs.html();
       case "json":
       default:
         return langs.json();
@@ -44,7 +46,7 @@ const CodeMirror: React.FC<CodeMirrorProps> = ({
 
   const extensions = useMemo(() => {
     return [
-      EditorView.lineWrapping,
+      // EditorView.lineWrapping,
       currentLanguage(language),
       suggestionHighlighter(suggestions),
       autocompletion({

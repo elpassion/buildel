@@ -68,7 +68,7 @@ const completion = await openai.chat.completions.create({
 });
 
 console.log(completion.choices[0]);`}
-              language="typescript"
+              language="tsx"
               height={250}
             >
               {(value) => <CopyCodeButton value={value} />}
