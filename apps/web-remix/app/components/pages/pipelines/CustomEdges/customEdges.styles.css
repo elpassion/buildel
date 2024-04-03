@@ -1,0 +1,7 @@
+.react-flow__handle-connecting {
+  @apply !bg-red-500 !border-red-500
+}
+
+.react-flow__handle-valid {
+  @apply !bg-green-500 !border-green-500
+}

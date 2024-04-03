@@ -3,6 +3,7 @@ import { EdgeProps, getBezierPath } from "reactflow";
 import { Icon } from "@elpassion/taco";
 import { useRunPipelineEdge } from "../RunPipelineProvider";
 import classNames from "classnames";
+import "./customEdges.styles.css";
 
 export interface CustomEdgeProps extends EdgeProps {
   onDelete: (id: string) => void;
