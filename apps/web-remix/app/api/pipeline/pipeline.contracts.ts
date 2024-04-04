@@ -79,6 +79,8 @@ export const PipelineCost = z.object({
   amount: z.string(),
   created_at: z.string(),
   description: z.string(),
+  input_tokens: z.number(),
+  output_tokens: z.number(),
   id: z.number(),
 });
 

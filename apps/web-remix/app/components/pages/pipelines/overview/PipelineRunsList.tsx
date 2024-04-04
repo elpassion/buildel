@@ -46,7 +46,7 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
 };
 
 const LIST_LAYOUT_STYLES =
-  "grid gap-1 grid-cols-[2fr_1fr_1fr] md:gap-2 md:grid-cols-[3fr_1fr_1fr]";
+  "grid gap-1 grid-cols-[2fr_2fr_2fr_2fr_1fr] md:gap-2 md:grid-cols-[4fr_2fr_1fr_1fr_1fr]";
 
 export const PipelineRunsListHeader = () => {
   return (
@@ -55,6 +55,8 @@ export const PipelineRunsListHeader = () => {
     >
       <p>Date</p>
       <p>Run costs ($)</p>
+      <p>Input tokens</p>
+      <p>Output tokens</p>
       <p>Status</p>
     </header>
   );
@@ -73,6 +75,15 @@ export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({
     .reduce((acc, curr) => acc + Number(curr.data.amount), 0)
     .toFixed(10);
 
+  const summaryInputTokens = data.costs.reduce(
+    (acc, curr) => acc + Number(curr.data.input_tokens),
+    0
+  );
+
+  const summaryOutputTokens = data.costs.reduce(
+    (acc, curr) => acc + Number(curr.data.output_tokens),
+    0
+  );
   return (
     <article
       className={classNames(
@@ -85,6 +96,10 @@ export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({
       </p>
 
       <p className="text-white text-sm">{summaryCosts}</p>
+
+      <p className="text-white text-sm">{summaryInputTokens}</p>
+
+      <p className="text-white text-sm">{summaryOutputTokens}</p>
 
       <div className="w-fit">
         <Indicator
