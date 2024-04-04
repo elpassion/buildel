@@ -2,6 +2,7 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
   use BuildelWeb.ConnCase
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
+  import Buildel.CostsFixtures
 
   alias Buildel.Pipelines
   alias Buildel.Organizations
@@ -227,6 +228,58 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       assert response["data"]["status"] == "running"
       assert_schema(response, "RunShowResponse", api_spec)
     end
+
+    test "allows to start a run if budget is not set", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      run: run,
+      api_spec: api_spec
+    } do
+      create_cost(%{organization: organization, run: run})
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/start")
+
+      response = json_response(conn, 200)
+      assert response["data"]["status"] == "running"
+      assert_schema(response, "RunShowResponse", api_spec)
+    end
+
+    test "allows to start a run if budget is not exceeded", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      run: run,
+      api_spec: api_spec
+    } do
+      Buildel.Pipelines.update_pipeline(pipeline, %{budget_limit: 110})
+
+      create_cost(%{organization: organization, run: run})
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/start")
+
+      response = json_response(conn, 200)
+      assert response["data"]["status"] == "running"
+      assert_schema(response, "RunShowResponse", api_spec)
+    end
+
+    test "does not allow to start a run if budget is exceeded", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      run: run
+    } do
+      Buildel.Pipelines.update_pipeline(pipeline, %{budget_limit: 90})
+
+      create_cost(%{organization: organization, run: run})
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/start")
+
+      assert json_response(conn, 400)
+    end
   end
 
   describe "stop" do
@@ -384,6 +437,10 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
   defp create_pipeline(%{organization: organization}) do
     pipeline = pipeline_fixture(%{organization_id: organization.id})
     %{pipeline: pipeline}
+  end
+
+  defp create_cost(%{organization: organization, run: run}) do
+    cost_fixture(organization, run)
   end
 
   defp create_alias(%{pipeline: pipeline}) do
