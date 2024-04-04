@@ -2,6 +2,7 @@ import { RefObject, useCallback, useRef } from "react";
 import { useEventListener } from "usehooks-ts";
 import { IBlockConfig, INode } from "./pipeline.types";
 import { ReactFlowInstance } from "reactflow";
+import { BlockConfig } from "~/api/blockType/blockType.contracts";
 
 interface UseCopyPasteNodeArgs {
   onPaste: (config: IBlockConfig) => Promise<void>;
@@ -14,7 +15,6 @@ export const useCopyPasteNode = ({
   nodes,
   wrapper,
 }: UseCopyPasteNodeArgs) => {
-  const copiedNode = useRef<INode | null>(null);
   const mousePosition = useRef({ clientX: 0, clientY: 0 });
   const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
 
@@ -26,11 +26,11 @@ export const useCopyPasteNode = ({
           const selectedNode = nodes.find((node) => node.selected);
 
           if (selectedNode) {
-            copiedNode.current = selectedNode;
+            navigator.clipboard.writeText(JSON.stringify(selectedNode));
           }
         }
 
-        if (e.key === "v" && copiedNode.current) {
+        if (e.key === "v") {
           const reactFlowBounds = wrapper.current?.getBoundingClientRect();
 
           const position = reactFlowInstance.current?.project({
@@ -38,9 +38,19 @@ export const useCopyPasteNode = ({
             y: mousePosition.current.clientY - reactFlowBounds!.top,
           });
 
-          onPaste({
-            ...copiedNode.current.data,
-            position: position ?? copiedNode.current?.position,
+          navigator.clipboard.readText().then((content) => {
+            try {
+              const node = JSON.parse(content);
+
+              BlockConfig.parse(node?.data);
+
+              onPaste({
+                ...node.data,
+                position: position ?? node.position,
+              });
+            } catch (err) {
+              console.error(err);
+            }
           });
         }
       }
