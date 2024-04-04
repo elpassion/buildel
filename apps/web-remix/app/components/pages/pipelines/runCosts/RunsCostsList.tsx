@@ -23,7 +23,7 @@ export const PipelineRunCostsList: React.FC<PipelineRunCostsListProps> = ({
 };
 
 const LIST_LAYOUT_STYLES =
-  "grid gap-1 grid-cols-[2fr_2fr_1fr] md:gap-2 md:grid-cols-[3fr_2fr_1fr]";
+  "grid gap-1 grid-cols-[2fr_2fr_2fr_1fr_1fr] md:gap-2 md:grid-cols-[3fr_2fr_2fr_1fr_1fr]";
 
 export const PipelineRunCostsListHeader = () => {
   return (
@@ -33,6 +33,8 @@ export const PipelineRunCostsListHeader = () => {
       <p>Block</p>
       <p>Time</p>
       <p>Costs ($)</p>
+      <p>Input tokens</p>
+      <p>Output tokens</p>
     </header>
   );
 };
@@ -62,6 +64,10 @@ export const PipelineRunCostsItem: React.FC<PipelineRunCostsItemProps> = ({
       </p>
 
       <p className="text-white text-sm">{Number(data.amount).toFixed(10)}</p>
+
+      <p className="text-white text-sm">{Number(data.input_tokens)}</p>
+
+      <p className="text-white text-sm">{Number(data.output_tokens)}</p>
     </article>
   );
 };
