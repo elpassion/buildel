@@ -12,6 +12,7 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
   }
   @update_attrs %{
     name: "some updated name",
+    budget_limit: 100,
     config: %{}
   }
   @invalid_attrs %{name: nil, config: nil}

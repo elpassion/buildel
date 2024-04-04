@@ -6,6 +6,7 @@ defmodule Buildel.Pipelines.Pipeline do
     field(:name, :string)
     field(:config, :map)
     field(:interface_config, :map)
+    field(:budget_limit, :decimal)
 
     has_many(:runs, Buildel.Pipelines.Run, on_delete: :delete_all)
     has_many(:pipeline_aliases, Buildel.Pipelines.Alias, on_delete: :delete_all)
@@ -19,7 +20,7 @@ defmodule Buildel.Pipelines.Pipeline do
   @doc false
   def changeset(pipeline, attrs) do
     pipeline
-    |> cast(attrs, [:name, :config, :interface_config, :organization_id])
+    |> cast(attrs, [:name, :config, :interface_config, :organization_id, :budget_limit])
     |> validate_required([:name, :config, :organization_id])
     |> assoc_constraint(:organization)
   end

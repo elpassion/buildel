@@ -16,7 +16,8 @@ defmodule BuildelWeb.OrganizationPipelineController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
     json_render_error_v2: true,
-    render_error: BuildelWeb.ErrorRendererPlug
+    render_error: BuildelWeb.ErrorRendererPlug,
+    replace_params: false
 
   tags ["pipeline"]
 
@@ -38,7 +39,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
     security: [%{"authorization" => []}]
 
   def index(conn, _params) do
-    %{organization_id: organization_id} = conn.params
+    %{"organization_id" => organization_id} = conn.params
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
@@ -67,7 +68,8 @@ defmodule BuildelWeb.OrganizationPipelineController do
     security: [%{"authorization" => []}]
 
   def show(conn, _params) do
-    %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
+    %{"organization_id" => organization_id, "pipeline_id" => pipeline_id} = conn.params
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
@@ -97,13 +99,19 @@ defmodule BuildelWeb.OrganizationPipelineController do
     security: [%{"authorization" => []}]
 
   def create(conn, _params) do
-    %{organization_id: organization_id} = conn.params
-    %{pipeline: pipeline_params} = conn.body_params
+    %{
+      "organization_id" => organization_id
+    } = conn.params
+
+    %{"pipeline" => pipeline_params} = conn.body_params
+
+    IO.inspect(pipeline_params)
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
-           Pipelines.create_pipeline(Map.put(pipeline_params, :organization_id, organization.id)) do
+           Pipelines.create_pipeline(Map.put(pipeline_params, "organization_id", organization.id)) do
       conn
       |> put_status(:created)
       |> put_resp_header(
@@ -135,8 +143,12 @@ defmodule BuildelWeb.OrganizationPipelineController do
     security: [%{"authorization" => []}]
 
   def update(conn, _params) do
-    %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
-    %{pipeline: pipeline_params} = conn.body_params
+    %{
+      "organization_id" => organization_id,
+      "pipeline_id" => pipeline_id
+    } = conn.params
+
+    %{"pipeline" => pipeline_params} = conn.body_params
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
@@ -167,7 +179,11 @@ defmodule BuildelWeb.OrganizationPipelineController do
     security: [%{"authorization" => []}]
 
   def delete(conn, _params) do
-    %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
+    %{
+      "organization_id" => organization_id,
+      "pipeline_id" => pipeline_id
+    } = conn.params
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),

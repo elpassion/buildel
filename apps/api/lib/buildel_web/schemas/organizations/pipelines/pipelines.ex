@@ -23,6 +23,7 @@ defmodule BuildelWeb.Schemas.Pipelines do
       properties: %{
         id: %Schema{type: :integer, description: "Pipeline ID"},
         name: %Schema{type: :string, description: "Pipeline name"},
+        budget_limit: %Schema{type: :number, description: "Pipeline budget limit", nullable: true},
         organization_id: %Schema{type: :integer, description: "Organization ID"},
         interface_config: %Schema{type: :object, description: "Interface config", nullable: true},
         runs_count: %Schema{type: :integer, description: "Runs count"},
@@ -87,7 +88,8 @@ defmodule BuildelWeb.Schemas.Pipelines do
           type: :object,
           properties: %{
             name: %Schema{type: :string, description: "Pipeline name"},
-            config: %Schema{type: :object, description: "Pipeline config"}
+            config: %Schema{type: :object, description: "Pipeline config"},
+            budget_limit: %Schema{type: :number, description: "Pipeline budget limit"}
           },
           required: [:name, :config]
         }
@@ -104,7 +106,16 @@ defmodule BuildelWeb.Schemas.Pipelines do
       type: :object,
       properties: %{
         pipeline: %Schema{
-          type: :object
+          type: :object,
+          properties: %{
+            name: %Schema{type: :string, description: "Pipeline name"},
+            config: %Schema{type: :object, description: "Pipeline config"},
+            budget_limit: %Schema{
+              type: :number,
+              description: "Pipeline budget limit",
+              nullable: true
+            }
+          }
         }
       },
       required: [:pipeline]
