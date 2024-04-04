@@ -14,6 +14,27 @@ export class RunHandlers {
     });
   }
 
+  stopRunHandler() {
+    return http.post(
+      "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId/stop",
+      ({ params }) => {
+        const { runId } = params;
+
+        const id = Number(runId);
+
+        const updatedRun = this.runs.get(id);
+
+        if (!updatedRun) return HttpResponse.json(null, { status: 404 });
+
+        updatedRun.status = "finished";
+
+        this.runs.set(id, updatedRun);
+
+        return HttpResponse.json({ data: updatedRun });
+      }
+    );
+  }
+
   getRunHandler() {
     return http.get(
       "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId",
@@ -84,6 +105,6 @@ export class RunHandlers {
   }
 
   get handlers() {
-    return [this.getRunsHandler(), this.getRunHandler()];
+    return [this.getRunsHandler(), this.getRunHandler(), this.stopRunHandler()];
   }
 }

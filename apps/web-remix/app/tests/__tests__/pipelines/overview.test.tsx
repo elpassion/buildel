@@ -10,6 +10,7 @@ import { render, screen } from "~/tests/render";
 import { server } from "~/tests/server.mock";
 import { OverviewPage } from "~/components/pages/pipelines/overview/page";
 import { loader as overviewLoader } from "~/components/pages/pipelines/overview/loader.server";
+import { action as overviewAction } from "~/components/pages/pipelines/overview/action.server";
 import { PipelineRunOverview } from "~/components/pages/pipelines/runOverview/page";
 import { loader as runOverviewLoader } from "~/components/pages/pipelines/runOverview/loader.server";
 import { PipelineRunCosts } from "~/components/pages/pipelines/runCosts/page";
@@ -29,7 +30,11 @@ import { WebSocketServerMock } from "~/tests/WebSocketServerMock";
 
 const handlers = () => [
   ...blockTypesHandlers(),
-  ...new RunHandlers([runFixture(), runFixture({ id: 2 })]).handlers,
+  ...new RunHandlers([
+    runFixture(),
+    runFixture({ id: 2 }),
+    runFixture({ id: 3, status: "running" }),
+  ]).handlers,
   ...new PipelineHandlers([pipelineFixture({ id: 2, name: "sample-workflow" })])
     .handlers,
 ];
@@ -49,8 +54,9 @@ describe("Workflow overview", () => {
 
     const list = await ListHandle.fromLabelText(/Runs list/i);
 
-    expect(list.children).toHaveLength(3);
+    expect(list.children).toHaveLength(4);
     expect(await screen.findAllByText(/finished/i)).toHaveLength(2);
+    expect(await screen.findAllByText(/running/i)).toHaveLength(1);
   });
 
   test("should render error message if Runs fetch fails", async () => {
@@ -69,6 +75,21 @@ describe("Workflow overview", () => {
     });
 
     await screen.findByText(/There is no runs yet/i);
+  });
+
+  test("should stop non finished run", async () => {
+    new OverviewObject().render({
+      initialEntries: ["/2/pipelines/2/runs"],
+    });
+
+    expect(await screen.findAllByText(/running/i)).toHaveLength(1);
+    expect(await screen.findAllByText(/finished/i)).toHaveLength(2);
+
+    const stopRun = await ButtonHandle.fromRole("Stop run");
+    await stopRun.click();
+
+    expect(await screen.findAllByText(/finished/i)).toHaveLength(3);
+    expect(screen.queryAllByText(/running/i)).toHaveLength(0);
   });
 
   test("should render readOnly run builder", async () => {
@@ -166,6 +187,7 @@ class OverviewObject {
             path: "/:organizationId/pipelines/:pipelineId/runs",
             Component: OverviewPage,
             loader: loaderWithSession(overviewLoader),
+            action: actionWithSession(overviewAction),
           },
           {
             Component: PipelineRunLayout,
