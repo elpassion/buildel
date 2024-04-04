@@ -19,7 +19,7 @@ export const StopRunForm: React.FC<StopRunFormProps> = ({ id, onStop }) => {
 
   useEffect(() => {
     // @ts-ignore
-    if (updated?.run) {
+    if (updated && updated.run && updated.run.id === id) {
       // @ts-ignore
       onStop(updated.run);
     }
