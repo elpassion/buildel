@@ -41,7 +41,7 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
       onChange?.(v);
     };
 
-    const currentValue = value ?? defaultValue;
+    const currentValue = value ?? defaultValue ?? "";
 
     const currentError = propsError ?? error;
 
