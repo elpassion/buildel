@@ -1,11 +1,12 @@
-import React, { useMemo } from "react";
-import classNames from "classnames";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
-import { dayjs } from "~/utils/Dayjs";
-import { IPipelineRun, IPipelineRuns } from "../pipeline.types";
+import React, { useMemo, useState } from "react";
 import { Link, useSearchParams } from "@remix-run/react";
-import { routes } from "~/utils/routes.utils";
 import { Indicator } from "@elpassion/taco";
+import classNames from "classnames";
+import { dayjs } from "~/utils/Dayjs";
+import { routes } from "~/utils/routes.utils";
+import { EmptyMessage, ItemList } from "~/components/list/ItemList";
+import { IPipelineRun, IPipelineRuns } from "../pipeline.types";
+import { StopRunForm } from "./StopRunForm";
 
 interface PipelineRunsListProps {
   items: IPipelineRuns;
@@ -29,7 +30,7 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
       className="flex flex-col-reverse gap-2"
       items={reversed}
       emptyText={<EmptyMessage>There is no runs yet...</EmptyMessage>}
-      renderItem={(item, index) => (
+      renderItem={(item) => (
         <Link
           to={routes.pipelineRun(
             organizationId,
@@ -38,7 +39,7 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
             Object.fromEntries(searchParams.entries())
           )}
         >
-          <PipelineRunsItem data={item} index={index} />
+          <PipelineRunsItem data={item} />
         </Link>
       )}
     />
@@ -46,7 +47,7 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
 };
 
 const LIST_LAYOUT_STYLES =
-  "grid gap-1 grid-cols-[2fr_2fr_2fr_2fr_1fr] md:gap-2 md:grid-cols-[4fr_2fr_1fr_1fr_1fr]";
+  "grid gap-1 grid-cols-[2fr_2fr_2fr_2fr_1fr_0.5fr] md:gap-2 md:grid-cols-[4fr_2fr_1fr_1fr_1fr_0.5fr]";
 
 export const PipelineRunsListHeader = () => {
   return (
@@ -58,19 +59,18 @@ export const PipelineRunsListHeader = () => {
       <p>Input tokens</p>
       <p>Output tokens</p>
       <p>Status</p>
+      <span />
     </header>
   );
 };
 
 interface PipelineRunsItemProps {
   data: IPipelineRun;
-  index: number;
 }
 
-export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({
-  data,
-  index,
-}) => {
+export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({ data }) => {
+  const [status, setStatus] = useState(data.status);
+
   const summaryCosts = data.costs
     .reduce((acc, curr) => acc + Number(curr.data.amount), 0)
     .toFixed(10);
@@ -84,6 +84,11 @@ export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({
     (acc, curr) => acc + Number(curr.data.output_tokens),
     0
   );
+
+  const onStatusChange = (run: IPipelineRun) => {
+    setStatus(run.status);
+  };
+
   return (
     <article
       className={classNames(
@@ -103,10 +108,16 @@ export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({
 
       <div className="w-fit">
         <Indicator
-          type={data.status !== "finished" ? "warning" : "success"}
+          type={status !== "finished" ? "warning" : "success"}
           variant="badge"
-          text={data.status}
+          text={status}
         />
+      </div>
+
+      <div onClick={(e) => e.stopPropagation()}>
+        {status === "running" ? (
+          <StopRunForm id={data.id} onStop={onStatusChange} />
+        ) : null}
       </div>
     </article>
   );
