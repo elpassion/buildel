@@ -54,6 +54,42 @@ defmodule Buildel.Pipelines do
     Repo.all(Run) |> Repo.preload(:pipeline)
   end
 
+  def verify_pipeline_budget_limit(%Pipeline{} = pipeline) do
+    %{total_cost: total_cost} = get_pipeline_costs_for_current_month(pipeline)
+
+    budget_limit = Decimal.new(pipeline.budget_limit || 0.0)
+    result = Decimal.compare(total_cost || 0.0, budget_limit)
+
+    case result do
+      :lt -> {:ok, total_cost}
+      _ -> {:error, :budget_limit_exceeded}
+    end
+  end
+
+  def get_pipeline_costs_for_current_month(%Pipeline{} = pipeline) do
+    today = Date.utc_today()
+    start_date = today |> Date.beginning_of_month()
+
+    start_of_month_naive = start_date |> NaiveDateTime.new!(~T[00:00:00])
+    today_naive = NaiveDateTime.utc_now()
+
+    get_pipeline_costs_by_dates(pipeline, start_of_month_naive, today_naive)
+  end
+
+  def get_pipeline_costs_by_dates(%Pipeline{} = pipeline, start_date, end_date) do
+    from(r in Run,
+      where: r.pipeline_id == ^pipeline.id,
+      join: rc in RunCost,
+      on: rc.run_id == r.id,
+      join: c in Cost,
+      on: c.id == rc.cost_id,
+      where: c.inserted_at >= ^start_date and c.inserted_at <= ^end_date,
+      group_by: r.pipeline_id,
+      select: %{total_cost: sum(c.amount)}
+    )
+    |> Repo.one()
+  end
+
   def list_pipeline_runs(%Pipeline{} = pipeline) do
     from(r in Run, where: r.pipeline_id == ^pipeline.id, order_by: [desc: r.id])
     |> Repo.all()
