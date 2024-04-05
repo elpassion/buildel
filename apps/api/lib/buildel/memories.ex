@@ -85,10 +85,11 @@ defmodule Buildel.Memories do
         {file.path, %{type: metadata.file_type}}
       )
 
-    chunks = Buildel.DocumentWorkflow.build_node_chunks(workflow, document)
-    chunks = Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks)
-
-    with {:ok, memory} <-
+    with chunks when is_list(chunks) <-
+           Buildel.DocumentWorkflow.build_node_chunks(workflow, document),
+         chunks when is_list(chunks) <-
+           Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks),
+         {:ok, memory} <-
            %Buildel.Memories.Memory{}
            |> Buildel.Memories.Memory.changeset(
              metadata
@@ -110,6 +111,12 @@ defmodule Buildel.Memories do
       Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
 
       {:ok, memory}
+    else
+      {:error, :invalid_api_key} ->
+        {:error, :bad_request, "Invalid API key provided for embeddings model"}
+
+      err ->
+        err
     end
   end
 

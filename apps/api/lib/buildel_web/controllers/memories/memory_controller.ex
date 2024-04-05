@@ -53,6 +53,12 @@ defmodule BuildelWeb.MemoryController do
       conn
       |> put_status(:created)
       |> render(:show, memory: memory)
+    else
+      {:error, :invalid_api_key} ->
+        {:error, %{errors: %{file: "Invalid API key"}}}
+
+      err ->
+        err
     end
   end
 
