@@ -6,6 +6,7 @@ import {
   UpdateBlockConfig,
 } from "~/api/blockType/blockType.contracts";
 import { PaginationMeta } from "~/components/pagination/pagination.types";
+import { zfd } from "zod-form-data";
 
 export const InterfaceConfig = z.object({
   input: z.string().min(2).optional(),
@@ -21,6 +22,7 @@ export const Pipeline = z.object({
   name: z.string(),
   organization_id: z.number(),
   runs_count: z.number(),
+  budget_limit: z.union([zfd.numeric(), z.null()]),
   interface_config: z.union([InterfaceConfig, z.null()]),
   config: z.object({
     version: z.string(),
@@ -158,6 +160,7 @@ export const CreateAliasSchema = z.object({
 export const UpdatePipelineSchema = z.object({
   id: z.number(),
   name: z.string().min(1),
+  budget_limit: z.union([zfd.numeric(), z.null()]),
   interface_config: z.union([InterfaceConfig, z.null()]),
   config: z.object({
     version: z.string(),

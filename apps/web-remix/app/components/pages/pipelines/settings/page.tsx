@@ -20,6 +20,7 @@ import {
 } from "~/components/sidebar/ActionSidebar";
 import { OrganizationAvatar } from "~/components/pages/settings/organization/AboutOrganization";
 import { BasicLink } from "~/components/link/BasicLink";
+import { EditPipelineLimitForm } from "./EditPipelineLimitForm";
 import { loader } from "./loader.server";
 
 export function SettingsPage() {
@@ -60,11 +61,17 @@ export function SettingsPage() {
           </BasicLink>
         </div>
 
-        <SectionContent>
-          <OrganizationAvatar name={pipeline.name} />
+        <div className="flex flex-col gap-6">
+          <SectionContent>
+            <OrganizationAvatar name={pipeline.name} />
 
-          <EditPipelineNameForm defaultValues={pipeline} />
-        </SectionContent>
+            <EditPipelineNameForm defaultValues={pipeline} />
+          </SectionContent>
+
+          <SectionContent>
+            <EditPipelineLimitForm defaultValues={pipeline} />
+          </SectionContent>
+        </div>
       </Section>
 
       <ActionSidebar

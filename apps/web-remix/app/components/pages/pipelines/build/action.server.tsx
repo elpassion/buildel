@@ -33,7 +33,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
               organization_id: params.organizationId!,
               pipeline_id: params.pipelineId!,
               block_name: block.name,
-            },
+            }
           );
           const validator = withZod(schema);
           const validatedBlock = await validator.validate(block);
@@ -42,7 +42,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
             return validatedBlock.data;
           }
           return block;
-        }),
+        })
       )) as any[];
 
       result.data.config.blocks = result.data.config.blocks.map((block, i) => {
@@ -56,11 +56,10 @@ export async function action(actionArgs: ActionFunctionArgs) {
       });
 
       const pipelineApi = new PipelineApi(fetch);
-
       await pipelineApi.updatePipeline(
         params.organizationId,
         params.pipelineId,
-        result.data,
+        result.data
       );
 
       return json({});
