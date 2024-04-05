@@ -67,6 +67,7 @@ export class BuildelSocket {
         outputName: string,
         payload: unknown
       ) => void;
+      onError: (error: string) => void;
       onBlockError?: (blockId: string, errors: string[]) => void;
       onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
       onStatusChange?: (status: BuildelRunStatus) => void;
@@ -76,6 +77,7 @@ export class BuildelSocket {
     const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => {});
     const onStatusChange = handlers?.onStatusChange ?? (() => {});
     const onBlockError = handlers?.onBlockError ?? (() => {});
+    const onError = handlers?.onError ?? (() => {});
 
     return new BuildelRun(
       this.socket,
@@ -85,7 +87,13 @@ export class BuildelSocket {
       this.authUrl,
       this.headers,
       this.useAuth,
-      { onBlockOutput, onBlockStatusChange, onStatusChange, onBlockError }
+      {
+        onBlockOutput,
+        onBlockStatusChange,
+        onStatusChange,
+        onBlockError,
+        onError,
+      }
     );
   }
 }
@@ -110,6 +118,7 @@ export class BuildelRun {
       onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
       onStatusChange: (status: BuildelRunStatus) => void;
       onBlockError: (blockId: string, errors: string[]) => void;
+      onError: (error: string) => void;
     }
   ) {}
 
@@ -133,6 +142,10 @@ export class BuildelRun {
         Object.keys(payload.response.errors).forEach((blockId) => {
           this.handlers.onBlockError(blockId, payload.response.errors[blockId]);
         });
+
+        if (payload.response.reason) {
+          this.handlers.onError(payload.response.reason);
+        }
 
         return this.stop();
       }

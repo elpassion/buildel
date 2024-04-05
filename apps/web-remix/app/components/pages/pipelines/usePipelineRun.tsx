@@ -48,6 +48,7 @@ export function usePipelineRun(
         onBlockStatusChange,
         onStatusChange: setStatus,
         onBlockError: onError,
+        onError: () => {},
       });
     });
     return () => {
