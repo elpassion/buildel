@@ -65,7 +65,8 @@ defmodule BuildelWeb.Schemas.Runs do
           items: ShowRunCostResponse,
           description: "Run costs",
           nullable: true
-        }
+        },
+        total_cost: %Schema{type: :number, description: "Total run cost"}
       },
       required: [:id, :status, :created_at, :config, :costs]
     })

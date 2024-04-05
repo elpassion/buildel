@@ -37,7 +37,8 @@ defmodule BuildelWeb.OrganizationPipelineRunJSON do
             _ -> true
           end)
         end),
-      costs: costs(run)
+      costs: costs(run),
+      total_cost: run.total_cost
     }
   end
 

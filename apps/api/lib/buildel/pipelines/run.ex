@@ -9,6 +9,7 @@ defmodule Buildel.Pipelines.Run do
     has_many(:run_costs, Buildel.Pipelines.RunCost)
     field(:status, Ecto.Enum, values: [created: 0, running: 1, finished: 2], default: :created)
     field(:config, :map)
+    field(:total_cost, :decimal, default: 0)
 
     timestamps()
   end
