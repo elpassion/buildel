@@ -504,6 +504,14 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
     {:error, reason}
   end
 
+  def do_process_response(%{
+        "message" => "Function calling is not enabled for this model" = reason,
+        "object" => "error",
+        "type" => "invalid_request_error"
+      }) do
+    {:error, reason}
+  end
+
   def do_process_response({:error, %Jason.DecodeError{} = response}) do
     error_message = "Received invalid JSON: #{inspect(response)}"
     Logger.error(error_message)
