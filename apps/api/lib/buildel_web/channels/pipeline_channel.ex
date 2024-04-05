@@ -46,6 +46,7 @@ defmodule BuildelWeb.PipelineChannel do
          organization <- Buildel.Organizations.get_organization!(organization_id),
          {:ok, %Pipelines.Pipeline{id: pipeline_id} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, _} <- Pipelines.verify_pipeline_budget_limit(pipeline),
          {:ok, config} <- Pipelines.get_pipeline_config(pipeline, alias),
          :ok <-
            verify_auth_token(
@@ -78,6 +79,9 @@ defmodule BuildelWeb.PipelineChannel do
 
       {:error, :failed_to_verify_token} ->
         {:error, %{reason: "unauthorized"}}
+
+      {:error, :budget_limit_exceeded} ->
+        {:error, %{reason: "budget_limit_exceeded"}}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:error,

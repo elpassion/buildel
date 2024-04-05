@@ -4,6 +4,7 @@ defmodule BuildelWeb.PipelineChannelTest do
   import Buildel.PipelinesFixtures
   import Buildel.OrganizationsFixtures
   import Buildel.AccountsFixtures
+  import Buildel.CostsFixtures
 
   describe "join" do
     test "fails when starting a pipeline with invalid token", %{
@@ -31,6 +32,104 @@ defmodule BuildelWeb.PipelineChannelTest do
       user_data = Jason.encode!(%{user_id: user.id})
 
       assert {:ok, %{}, %Phoenix.Socket{assigns: %{run: %{}}}} =
+               socket
+               |> subscribe_and_join(
+                 BuildelWeb.PipelineChannel,
+                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                 %{
+                   auth:
+                     BuildelWeb.ChannelAuth.create_auth_token(
+                       "socket_id",
+                       "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                       user_data,
+                       organization.api_key
+                     ),
+                   user_data: user_data
+                 }
+               )
+    end
+
+    test "fails when trying to join a run for pipeline with exceeded budged", %{
+      socket: socket,
+      organization: organization,
+      user: user
+    } do
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+
+      run =
+        run_fixture(%{pipeline_id: pipeline.id})
+
+      Buildel.Pipelines.update_pipeline(pipeline, %{budget_limit: 90})
+      create_cost(%{organization: organization, run: run})
+
+      user_data = Jason.encode!(%{user_id: user.id})
+
+      assert {:error, %{reason: "budget_limit_exceeded"}} =
+               socket
+               |> subscribe_and_join(
+                 BuildelWeb.PipelineChannel,
+                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                 %{
+                   auth:
+                     BuildelWeb.ChannelAuth.create_auth_token(
+                       "socket_id",
+                       "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                       user_data,
+                       organization.api_key
+                     ),
+                   user_data: user_data
+                 }
+               )
+    end
+
+    test "succeeds when trying to join a run for pipeline without budget limit set", %{
+      socket: socket,
+      organization: organization,
+      user: user
+    } do
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+
+      run =
+        run_fixture(%{pipeline_id: pipeline.id})
+
+      create_cost(%{organization: organization, run: run})
+
+      user_data = Jason.encode!(%{user_id: user.id})
+
+      assert {:ok, %{run: _joined_run}, _socket} =
+               socket
+               |> subscribe_and_join(
+                 BuildelWeb.PipelineChannel,
+                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                 %{
+                   auth:
+                     BuildelWeb.ChannelAuth.create_auth_token(
+                       "socket_id",
+                       "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                       user_data,
+                       organization.api_key
+                     ),
+                   user_data: user_data
+                 }
+               )
+    end
+
+    test "succeeds when trying to join a run for pipeline with budget limit not exceeded", %{
+      socket: socket,
+      organization: organization,
+      user: user
+    } do
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+
+      run =
+        run_fixture(%{pipeline_id: pipeline.id})
+
+      Buildel.Pipelines.update_pipeline(pipeline, %{budget_limit: 110})
+      create_cost(%{organization: organization, run: run})
+
+      user_data = Jason.encode!(%{user_id: user.id})
+
+      assert {:ok, %{run: _joined_run}, _socket} =
                socket
                |> subscribe_and_join(
                  BuildelWeb.PipelineChannel,
@@ -136,11 +235,11 @@ defmodule BuildelWeb.PipelineChannelTest do
     test "allows connecting to public channels without auth", %{
       socket: socket,
       organization: organization
-    }  do
+    } do
       pipeline =
         pipeline_fixture(%{
           organization_id: organization.id,
-          interface_config: %{ "public" => true }
+          interface_config: %{"public" => true}
         })
 
       {:ok, %{run: _run}, _socket} =
@@ -159,5 +258,9 @@ defmodule BuildelWeb.PipelineChannelTest do
     socket = BuildelWeb.PipelineSocket |> socket("socket_id", %{})
 
     %{socket: socket, user: user, organization: organization}
+  end
+
+  defp create_cost(%{organization: organization, run: run}) do
+    cost_fixture(organization, run)
   end
 end
