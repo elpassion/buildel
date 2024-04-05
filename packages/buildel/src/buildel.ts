@@ -139,9 +139,14 @@ export class BuildelRun {
 
     this.channel.onMessage = (event: string, payload: any) => {
       if (event === "phx_reply" && payload.status === "error") {
-        Object.keys(payload.response.errors).forEach((blockId) => {
-          this.handlers.onBlockError(blockId, payload.response.errors[blockId]);
-        });
+        if (payload.response.errors) {
+          Object.keys(payload.response.errors).forEach((blockId) => {
+            this.handlers.onBlockError(
+              blockId,
+              payload.response.errors[blockId]
+            );
+          });
+        }
 
         if (payload.response.reason) {
           this.handlers.onError(payload.response.reason);

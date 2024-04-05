@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@buildel/buildel':
-    specifier: ^0.2.4
-    version: 0.2.4
+    specifier: ^0.2.5
+    version: 0.2.5
   '@codemirror/autocomplete':
     specifier: ^6.15.0
     version: 6.15.0(@codemirror/language@6.10.1)(@codemirror/state@6.4.1)(@codemirror/view@6.26.0)(@lezer/common@1.2.1)
@@ -721,8 +721,8 @@ packages:
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
 
-  /@buildel/buildel@0.2.4:
-    resolution: {integrity: sha512-Uf1BNrKAbxenY7uunkkECymiJsMHbg82pz6mU2em3lsCmTUBOHoKXaDA95I/Pt8jt+/FMi7kNGhdZBhMrOx45Q==}
+  /@buildel/buildel@0.2.5:
+    resolution: {integrity: sha512-R+k6ycCWY0KwPDv4xz4y96ehJYYlG05rN1IYd9IzlJTRl1v5qZgfbrZ/jF5k71exG02s2oip4dlSnhyhe0qsQA==}
     dependencies:
       phoenix: 1.7.11
       uuid: 9.0.1

@@ -16,7 +16,8 @@ export function usePipelineRun(
     payload: unknown
   ) => void = () => {},
   onBlockStatusChange: (blockId: string, isWorking: boolean) => void = () => {},
-  onError: (blockId: string, errors: string[]) => void,
+  onBlockError: (blockId: string, errors: string[]) => void,
+  onError: (error: string) => void,
   useAuth: boolean = true
 ) {
   const buildel = useRef<BuildelSocket>();
@@ -47,8 +48,8 @@ export function usePipelineRun(
         onBlockOutput,
         onBlockStatusChange,
         onStatusChange: setStatus,
-        onBlockError: onError,
-        onError: () => {},
+        onBlockError: onBlockError,
+        onError: onError,
       });
     });
     return () => {
