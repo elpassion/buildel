@@ -12,6 +12,8 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
   alias LangChain.MessageDelta
   alias LangChain.LangChainError
   alias LangChain.Utils
+  alias LangChain.Function
+  alias LangChain.FunctionParam
 
   @behaviour ChatModel
   @receive_timeout 60_000
@@ -113,17 +115,99 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
   end
 
   @spec for_api(t, message :: [map()], functions :: [map()]) :: %{atom() => any()}
-  def for_api(%ChatMistralAI{} = mistral, messages, _functions) do
+  def for_api(%ChatMistralAI{} = mistral, messages, functions) do
     %{
       model: mistral.model,
       temperature: mistral.temperature,
       top_p: mistral.top_p,
       safe_prompt: mistral.safe_prompt,
       stream: mistral.stream,
-      messages: Enum.map(messages, &ForOpenAIApi.for_api/1)
+      messages: Enum.map(messages, &ChatMistralAI.for_api/1)
     }
     |> Utils.conditionally_add_to_map(:random_seed, mistral.random_seed)
     |> Utils.conditionally_add_to_map(:max_tokens, mistral.max_tokens)
+    |> Utils.conditionally_add_to_map(:tools, get_tools_for_api(functions))
+  end
+
+  defp get_tools_for_api(nil), do: []
+
+  defp get_tools_for_api(functions) do
+    get_functions_for_api(functions)
+    |> Enum.map(&tool_from_api_function/1)
+  end
+
+  defp tool_from_api_function(api_function) do
+    %{
+      "type" => "function",
+      "function" => api_function
+    }
+  end
+
+  defp get_functions_for_api(nil), do: []
+
+  defp get_functions_for_api(functions) do
+    Enum.map(functions, &for_api/1)
+  end
+
+  @doc """
+  Convert a LangChain structure to the expected map of data for the OpenAI API.
+  """
+  @spec for_api(Message.t() | Function.t()) :: %{String.t() => any()}
+  def for_api(%Message{role: :assistant, function_name: fun_name} = msg)
+      when is_binary(fun_name) do
+    %{
+      "role" => :assistant,
+      "tool_calls" => [
+        %{
+          "type" => "function",
+          "function" => %{
+            "name" => fun_name,
+            "arguments" => Jason.encode!(msg.arguments)
+          }
+        }
+      ],
+      "content" => msg.content
+    }
+  end
+
+  def for_api(%Message{role: :function} = msg) do
+    %{
+      "role" => :tool,
+      "name" => msg.function_name,
+      "content" => msg.content
+    }
+  end
+
+  def for_api(%Message{} = msg) do
+    %{
+      "role" => msg.role,
+      "content" => msg.content
+    }
+  end
+
+  # Function support
+  def for_api(%Function{} = fun) do
+    %{
+      "name" => fun.name,
+      "parameters" => get_parameters(fun)
+    }
+    |> Utils.conditionally_add_to_map("description", fun.description)
+  end
+
+  defp get_parameters(%Function{parameters: [], parameters_schema: nil} = _fun) do
+    %{
+      "type" => "object",
+      "properties" => %{}
+    }
+  end
+
+  defp get_parameters(%Function{parameters: [], parameters_schema: schema} = _fun)
+       when is_map(schema) do
+    schema
+  end
+
+  defp get_parameters(%Function{parameters: params} = _fun) do
+    FunctionParam.to_parameters_schema(params)
   end
 
   @impl ChatModel
@@ -280,7 +364,7 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
           | MessageDelta.t()
           | [MessageDelta.t()]
           | {:error, String.t()}
-  def do_process_response(%{"choices" => choices} = _msg) when is_list(choices) do
+  def do_process_response(%{"choices" => choices}) when is_list(choices) do
     # process each response individually. Return a list of all processed choices
     for choice <- choices do
       do_process_response(choice)
@@ -304,15 +388,54 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
         "model_length" ->
           :length
 
+        "tool_calls" ->
+          :complete
+
         other ->
           Logger.warning("Unsupported finish_reason in delta message. Reason: #{inspect(other)}")
           nil
       end
 
+    function_name =
+      case delta_body do
+        %{"tool_calls" => calls} ->
+          calls |> Enum.at(0) |> Map.get("function") |> Map.get("name")
+
+        _other ->
+          nil
+      end
+
+    arguments =
+      case delta_body do
+        %{"tool_calls" => calls} ->
+          args = calls |> Enum.at(0) |> Map.get("function") |> Map.get("arguments")
+
+          if is_binary(args) do
+            args
+          else
+            nil
+          end
+
+        _other ->
+          nil
+      end
+
+    # more explicitly interpret the role. We treat a "function_call" as a a role
+    # while OpenAI addresses it as an "assistant". Technically, they are correct
+    # that the assistant is issuing the function_call.
+    role =
+      case delta_body do
+        %{"role" => role} -> role
+        _other -> "unknown"
+      end
+
     data =
       delta_body
+      |> Map.put("role", role)
       |> Map.put("index", index)
       |> Map.put("status", status)
+      |> Map.put("function_name", function_name)
+      |> Map.put("arguments", arguments)
 
     case MessageDelta.new(data) do
       {:ok, message} ->
@@ -320,6 +443,29 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
 
       {:error, changeset} ->
         {:error, Utils.changeset_error_to_string(changeset)}
+    end
+  end
+
+  def do_process_response(
+        %{
+          "finish_reason" => "tool_calls",
+          "message" => %{"tool_calls" => calls}
+        } = data
+      ) do
+    with call <- calls |> Enum.at(0) do
+      case Message.new(%{
+             "role" => "assistant",
+             "function_name" => call["function"]["name"],
+             "arguments" => call["function"]["arguments"],
+             "complete" => true,
+             "index" => data["index"]
+           }) do
+        {:ok, message} ->
+          message
+
+        {:error, changeset} ->
+          {:error, Utils.changeset_error_to_string(changeset)}
+      end
     end
   end
 
