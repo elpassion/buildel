@@ -14,7 +14,7 @@ interface UseChatProps {
   onBlockOutput?: (
     blockId: string,
     outputName: string,
-    payload: unknown,
+    payload: unknown
   ) => void;
   onFinish?: () => void;
   useAuth?: boolean;
@@ -37,7 +37,7 @@ export const useChat = ({
   const onBlockOutput = (
     blockId: string,
     _outputName: string,
-    payload: unknown,
+    payload: unknown
   ) => {
     onBlockOutputProps?.(blockId, _outputName, payload);
     // todo: just text_output for now
@@ -78,8 +78,13 @@ export const useChat = ({
     }
   };
 
-  const onError = () => {
+  const onBlockError = () => {
     errorToast({ description: "Ups! Something went wrong" });
+    setIsGenerating(false);
+  };
+
+  const onError = (error: string) => {
+    errorToast({ description: error });
     setIsGenerating(false);
   };
 
@@ -88,8 +93,9 @@ export const useChat = ({
     pipelineId,
     onBlockOutput,
     onStatusChange,
+    onBlockError,
     onError,
-    useAuthWithDefault,
+    useAuthWithDefault
   );
 
   const clearMessages = () => {
