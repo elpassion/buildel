@@ -4,7 +4,6 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
   import Ecto.Changeset
   import LangChain.Utils.ApiOverride
   alias Buildel.Langchain.TokenUsage
-  alias LangChain.ForOpenAIApi
   alias __MODULE__
   alias LangChain.Config
   alias LangChain.ChatModels.ChatModel
