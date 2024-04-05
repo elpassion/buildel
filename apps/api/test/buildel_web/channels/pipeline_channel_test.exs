@@ -64,7 +64,7 @@ defmodule BuildelWeb.PipelineChannelTest do
 
       user_data = Jason.encode!(%{user_id: user.id})
 
-      assert {:error, %{reason: "budget_limit_exceeded"}} =
+      assert {:error, %{reason: "Budget limit exceeded"}} =
                socket
                |> subscribe_and_join(
                  BuildelWeb.PipelineChannel,

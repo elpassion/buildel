@@ -81,7 +81,7 @@ defmodule BuildelWeb.PipelineChannel do
         {:error, %{reason: "unauthorized"}}
 
       {:error, :budget_limit_exceeded} ->
-        {:error, %{reason: "budget_limit_exceeded"}}
+        {:error, %{reason: "Budget limit exceeded"}}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:error,
