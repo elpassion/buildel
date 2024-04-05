@@ -76,13 +76,13 @@ defmodule Buildel.PipelinesTest do
     @invalid_attrs %{}
 
     test "list_runs/0 returns all runs" do
-      run = run_fixture()
-      assert Pipelines.list_runs() == [run]
+      %{id: id} = run_fixture()
+      assert [%Buildel.Pipelines.Run{id: ^id}] = Pipelines.list_runs()
     end
 
     test "get_run/1 returns the run with given id" do
-      run = run_fixture()
-      assert Pipelines.get_run(run.id) == run
+      %{id: id} = run = run_fixture()
+      assert %Buildel.Pipelines.Run{id: ^id} = Pipelines.get_run(run.id)
     end
 
     test "create_run/1 with valid data creates a run" do

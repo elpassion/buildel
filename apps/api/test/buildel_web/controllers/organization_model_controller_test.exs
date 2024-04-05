@@ -47,8 +47,21 @@ defmodule BuildelWeb.OrganizationModelControllerTest do
                  "name" => "Gemini 1.5 Pro"
                },
                %{"api_type" => "mistral", "id" => "mistral-tiny", "name" => "Mistral Tiny"},
-               %{"api_type" => "mistral", "id" => "mistral-small", "name" => "Mistral Small"},
-               %{"api_type" => "mistral", "id" => "mistral-medium", "name" => "Mistral Medium"}
+               %{
+                 "api_type" => "mistral",
+                 "id" => "mistral-small-latest",
+                 "name" => "Mistral Small"
+               },
+               %{
+                 "api_type" => "mistral",
+                 "id" => "mistral-medium-latest",
+                 "name" => "Mistral Medium"
+               },
+               %{
+                 "api_type" => "mistral",
+                 "id" => "mistral-large-latest",
+                 "name" => "Mistral Large"
+               }
              ]
     end
 
