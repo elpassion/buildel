@@ -114,7 +114,11 @@ defmodule Buildel.Blocks.DocumentSearch do
      |> assign_stream_state()
      |> Map.put(:vector_db, vector_db)
      |> Map.put(:collection, collection)
-     |> Map.put(:where, opts |> Map.get(:where, "{}") |> Jason.decode!())}
+     |> Map.put(:where, opts |> Map.get(:where, "{}") |> Jason.decode!())
+     |> Map.put(
+       :call_formatter,
+       opts |> Map.get(:call_formatter, "Database 📑: Search \"{{config.args}}\"\n")
+     )}
   end
 
   @impl true
@@ -182,39 +186,49 @@ defmodule Buildel.Blocks.DocumentSearch do
     limit = state.opts |> Map.get(:limit, 3)
     similarity_threshhold = state.opts |> Map.get(:similarity_threshhold, 0.75)
 
-    result =
-      Buildel.VectorDB.query(state.vector_db, state[:collection], query, state.where, %{
-        limit: limit,
-        similarity_threshhold: similarity_threshhold
-      })
-      |> Enum.map(fn
-        %{
-          "document" => document,
-          "metadata" => %{
-            "file_name" => filename,
-            "memory_id" => memory_id,
-            "chunk_id" => chunk_id
-          }
-        } ->
-          %{
-            document_id: memory_id,
-            document_name: filename,
-            chunk_id: chunk_id,
-            chunk: document |> String.trim()
-          }
-      end)
-      |> Jason.encode!()
+    case Buildel.VectorDB.query(state.vector_db, state[:collection], query, state.where, %{
+           limit: limit,
+           similarity_threshhold: similarity_threshhold
+         }) do
+      result when is_list(result) ->
+        result =
+          result
+          |> Enum.map(fn
+            %{
+              "document" => document,
+              "metadata" => %{
+                "file_name" => filename,
+                "memory_id" => memory_id,
+                "chunk_id" => chunk_id
+              }
+            } ->
+              %{
+                document_id: memory_id,
+                document_name: filename,
+                chunk_id: chunk_id,
+                chunk: document |> String.trim()
+              }
+          end)
+          |> Jason.encode!()
 
-    Buildel.BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "output",
-      {:text, result}
-    )
+        Buildel.BlockPubSub.broadcast_to_io(
+          state[:context_id],
+          state[:block_name],
+          "output",
+          {:text, result}
+        )
 
-    state = state |> schedule_stream_stop()
+        state = state |> schedule_stream_stop()
 
-    {:reply, result, state}
+        {:reply, result, state}
+
+      {:error, :invalid_api_key} ->
+        send_error(state, "Invalid API key used for querying documents.")
+
+        state = state |> schedule_stream_stop()
+
+        {:reply, "Unable to query the database.", state}
+    end
   end
 
   @impl true
@@ -246,7 +260,7 @@ defmodule Buildel.Blocks.DocumentSearch do
        function: function,
        call_formatter: fn args ->
          args = %{"config.args" => args, "config.block_name" => state.block.name}
-         build_call_formatter(state.block.opts.call_formatter, args)
+         build_call_formatter(state.call_formatter, args)
        end,
        response_formatter: fn _response ->
          ""

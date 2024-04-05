@@ -57,10 +57,12 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
     :embeddings,
     :generation
   ] do
-    {:ok, %{data: gpt_embeddings}} =
-      OpenAI.embeddings([model: model, input: inputs], config(api_key))
-
-    {:ok, gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)}
+    with {:ok, %{data: gpt_embeddings}} <-
+           OpenAI.embeddings([model: model, input: inputs], config(api_key)) do
+      {:ok, gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)}
+    else
+      {:error, %{"error" => %{"code" => "invalid_api_key"}}} -> {:error, :invalid_api_key}
+    end
   end
 
   def config(api_key \\ nil) do
