@@ -159,7 +159,9 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
          BuildelWeb.Schemas.Errors.UnprocessableEntity},
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
-      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      bad_request:
+        {"bad request", "application/json", BuildelWeb.Schemas.Errors.BudgetLimitExceededResponse}
     ],
     security: [%{"authorization" => []}]
 
@@ -183,7 +185,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       initial_inputs |> Enum.each(&process_input(&1.block_name, &1.input_name, &1.data, run))
       render(conn, :show, run: run)
     else
-      {:error, :budget_limit_exceeded} -> {:error, :bad_request}
+      {:error, :budget_limit_exceeded} -> {:error, :bad_request, "Budget limit exceeded"}
       err -> err
     end
   end

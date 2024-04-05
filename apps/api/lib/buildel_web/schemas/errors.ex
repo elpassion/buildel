@@ -5,6 +5,7 @@ defmodule BuildelWeb.Schemas.Errors do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "BadRequestResponse",
       type: :object,
       properties: %{
         errors: %Schema{
@@ -21,6 +22,7 @@ defmodule BuildelWeb.Schemas.Errors do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "NotFoundResponse",
       type: :object,
       properties: %{
         errors: %Schema{
@@ -37,6 +39,7 @@ defmodule BuildelWeb.Schemas.Errors do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "UnauthorizedResponse",
       type: :object,
       properties: %{
         errors: %Schema{
@@ -53,6 +56,7 @@ defmodule BuildelWeb.Schemas.Errors do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "ForbiddenResponse",
       type: :object,
       properties: %{
         errors: %Schema{
@@ -69,6 +73,7 @@ defmodule BuildelWeb.Schemas.Errors do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
+      title: "UnprocessableEntity",
       type: :object,
       properties: %{
         errors: %Schema{
@@ -79,6 +84,27 @@ defmodule BuildelWeb.Schemas.Errors do
               type: :string,
               description: "Field error message",
               enum: ["Unprocessable entity"]
+            }
+          }
+        }
+      }
+    })
+  end
+
+  defmodule BudgetLimitExceededResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "BudgetLimitExceededResponse",
+      type: :object,
+      properties: %{
+        errors: %Schema{
+          type: :object,
+          properties: %{
+            detail: %Schema{
+              type: :string,
+              description: "Error message",
+              enum: ["Budget limit exceeded"]
             }
           }
         }

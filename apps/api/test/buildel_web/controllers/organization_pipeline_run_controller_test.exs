@@ -269,7 +269,8 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       conn: conn,
       organization: organization,
       pipeline: pipeline,
-      run: run
+      run: run,
+      api_spec: api_spec
     } do
       Buildel.Pipelines.update_pipeline(pipeline, %{budget_limit: 90})
 
@@ -278,7 +279,8 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       conn =
         post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs/#{run}/start")
 
-      assert json_response(conn, 400)
+      res = json_response(conn, 400)
+      assert_schema(res, "BudgetLimitExceededResponse", api_spec)
     end
   end
 

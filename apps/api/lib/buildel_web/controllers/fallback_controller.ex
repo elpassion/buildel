@@ -38,6 +38,14 @@ defmodule BuildelWeb.FallbackController do
     |> render(:"422")
   end
 
+  def call(conn, {:error, :bad_request, custom_message}) do
+    conn
+    |> put_status(:bad_request)
+    |> assign(:custom_message, custom_message)
+    |> put_view(html: BuildelWeb.ErrorHTML, json: BuildelWeb.ErrorJSON)
+    |> render(:"400")
+  end
+
   def call(conn, {:error, :bad_request}) do
     conn
     |> put_status(:bad_request)

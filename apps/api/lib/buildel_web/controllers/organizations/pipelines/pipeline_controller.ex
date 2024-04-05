@@ -105,8 +105,6 @@ defmodule BuildelWeb.OrganizationPipelineController do
 
     %{"pipeline" => pipeline_params} = conn.body_params
 
-    IO.inspect(pipeline_params)
-
     user = conn.assigns.current_user
 
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
