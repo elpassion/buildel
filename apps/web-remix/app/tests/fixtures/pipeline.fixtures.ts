@@ -6,6 +6,7 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
     name: "AI Chat",
     organization_id: 1,
     runs_count: 2,
+    budget_limit: null,
     interface_config: {
       input: "text_input_1",
       output: "text_output_1",
@@ -141,6 +142,7 @@ export const simplePipelineFixture = (
     id: 1,
     name: "inputOutput",
     organization_id: 1,
+    budget_limit: null,
     runs_count: 2,
     interface_config: {
       input: "text_input_1",
