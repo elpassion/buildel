@@ -54,6 +54,22 @@ defmodule Buildel.Costs.CostCalculator do
       {"https://api.mistral.ai/v1/chat/completions", "mistral-medium"} => %{
         input_token_price: Decimal.new("2.7") |> Decimal.div(1_000_000),
         output_token_price: Decimal.new("8.1") |> Decimal.div(1_000_000)
+      },
+      {"https://api.mistral.ai/v1/chat/completions", "mistral-tiny-latest"} => %{
+        input_token_price: Decimal.new("0.25") |> Decimal.div(1_000_000),
+        output_token_price: Decimal.new("0.25") |> Decimal.div(1_000_000)
+      },
+      {"https://api.mistral.ai/v1/chat/completions", "mistral-small-latest"} => %{
+        input_token_price: Decimal.new("2") |> Decimal.div(1_000_000),
+        output_token_price: Decimal.new("6") |> Decimal.div(1_000_000)
+      },
+      {"https://api.mistral.ai/v1/chat/completions", "mistral-medium-latest"} => %{
+        input_token_price: Decimal.new("2.7") |> Decimal.div(1_000_000),
+        output_token_price: Decimal.new("8.1") |> Decimal.div(1_000_000)
+      },
+      {"https://api.mistral.ai/v1/chat/completions", "mistral-large-latest"} => %{
+        input_token_price: Decimal.new("8") |> Decimal.div(1_000_000),
+        output_token_price: Decimal.new("24") |> Decimal.div(1_000_000)
       }
     }
     |> Map.get_lazy(api_model, fn ->
