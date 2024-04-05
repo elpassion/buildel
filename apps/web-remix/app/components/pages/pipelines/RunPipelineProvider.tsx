@@ -85,22 +85,10 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   }, []);
 
   const onError = useCallback((error: string) => {
-    console.log(error);
-    // setErrors((prev) => {
-    //   const blockErrors = prev[blockId] || [];
-    //
-    //   return {
-    //     ...prev,
-    //     [blockId]: [...blockErrors, ...errors],
-    //   };
-    // });
-    //
-    // errors.forEach((err) => {
-    //   errorToast({
-    //     title: "Run failed!",
-    //     description: `The workflow run failed due to an error (${err}) in block ${blockId}.`,
-    //   });
-    // });
+    errorToast({
+      title: "Run failed!",
+      description: `The workflow run failed due to an error: ${error}.`,
+    });
   }, []);
 
   const onStatusChange = useCallback((block: string, status: boolean) => {
