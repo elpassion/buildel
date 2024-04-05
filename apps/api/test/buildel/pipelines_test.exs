@@ -118,6 +118,88 @@ defmodule Buildel.PipelinesTest do
     end
   end
 
+  describe "budget" do
+    alias Buildel.Pipelines.Run
+
+    import Buildel.PipelinesFixtures
+    import Buildel.CostsFixtures
+
+    test "get_pipeline_costs_by_dates/3 returns correct cost for given dates" do
+      organization = organization_fixture()
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+      run = run_fixture(%{pipeline_id: pipeline.id})
+      %{cost: cost} = cost_fixture(organization, run)
+      %{cost: different_cost} = cost_fixture(organization, run)
+
+      start_date = NaiveDateTime.utc_now() |> NaiveDateTime.add(-1, :day)
+      end_date = NaiveDateTime.utc_now() |> NaiveDateTime.add(1, :day)
+
+      %{total_cost: total_cost} =
+        Pipelines.get_pipeline_costs_by_dates(pipeline, start_date, end_date)
+
+      assert Decimal.eq?(total_cost, Decimal.add(cost.amount, different_cost.amount))
+    end
+
+    test "get_pipeline_costs_by_dates/3 returns total_cost 0 if no costs between dates" do
+      organization = organization_fixture()
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+      run = run_fixture(%{pipeline_id: pipeline.id})
+      cost_fixture(organization, run)
+      cost_fixture(organization, run)
+
+      start_date = NaiveDateTime.utc_now() |> NaiveDateTime.add(-2, :day)
+      end_date = NaiveDateTime.utc_now() |> NaiveDateTime.add(-1, :day)
+
+      %{total_cost: total_cost} =
+        Pipelines.get_pipeline_costs_by_dates(pipeline, start_date, end_date)
+
+      assert Decimal.eq?(total_cost, Decimal.new(0))
+    end
+
+    test "get_pipeline_costs_for_current_month/1 returns total_cost only for current month" do
+      organization = organization_fixture()
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+      run = run_fixture(%{pipeline_id: pipeline.id})
+      cost_fixture(organization, run, NaiveDateTime.utc_now() |> NaiveDateTime.add(-35, :day))
+      %{cost: cost} = cost_fixture(organization, run)
+      %{cost: different_cost} = cost_fixture(organization, run)
+
+      %{total_cost: total_cost} =
+        Pipelines.get_pipeline_costs_for_current_month(pipeline)
+
+      assert Decimal.eq?(total_cost, Decimal.add(cost.amount, different_cost.amount))
+    end
+
+    test "verify_pipeline_budget_limit/1 returns ok if budget not set" do
+      organization = organization_fixture()
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+      run = run_fixture(%{pipeline_id: pipeline.id})
+      cost_fixture(organization, run)
+      cost_fixture(organization, run)
+
+      assert {:ok, _} = Pipelines.verify_pipeline_budget_limit(pipeline)
+    end
+
+    test "verify_pipeline_budget_limit/1 returns ok if budget not exceeded" do
+      organization = organization_fixture()
+      pipeline = pipeline_fixture(%{organization_id: organization.id, budget_limit: 250})
+      run = run_fixture(%{pipeline_id: pipeline.id})
+      cost_fixture(organization, run)
+      cost_fixture(organization, run)
+
+      assert {:ok, _} = Pipelines.verify_pipeline_budget_limit(pipeline)
+    end
+
+    test "verify_pipeline_budget_limit/1 returns error if budget exceeded" do
+      organization = organization_fixture()
+      pipeline = pipeline_fixture(%{organization_id: organization.id, budget_limit: 90})
+      run = run_fixture(%{pipeline_id: pipeline.id})
+      cost_fixture(organization, run)
+
+      assert {:error, _} = Pipelines.verify_pipeline_budget_limit(pipeline)
+    end
+  end
+
   describe "blocks" do
     alias Buildel.Pipelines.Run
     alias Buildel.Blocks.Connection
