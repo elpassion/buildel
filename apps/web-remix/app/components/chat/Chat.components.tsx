@@ -47,7 +47,7 @@ export const ChatMessagesWrapper: React.FC<
   return (
     <div
       className={classNames(
-        "w-full border border-neutral-800 rounded-lg px-2 py-3 grow max-h-[calc(100%-80px)]",
+        "w-full border border-neutral-800 rounded-lg px-2 py-3 grow overflow-hidden",
         className
       )}
     >

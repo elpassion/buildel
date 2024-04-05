@@ -41,7 +41,7 @@ export async function loader(args: LoaderFunctionArgs) {
     if (!pipeline) {
       pipeline = await pipelineApi.getPublicPipeline(
         params.organizationId,
-        params.pipelineId,
+        params.pipelineId
       );
     }
 
