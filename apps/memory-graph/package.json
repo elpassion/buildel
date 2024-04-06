@@ -1,0 +1,22 @@
+{
+  "name": "memory-graph",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@elysiajs/swagger": "^1.0.3",
+    "elysia": "^1.0.11",
+    "neo4j-driver": "^5.19.0"
+  },
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts",
+    "start": "NODE_ENV=production bun src/index.ts",
+    "test": "bun test"
+  }
+}
