@@ -80,11 +80,11 @@ export function FileUpload({
               })
             );
           })
-          .catch(() => {
+          .catch((e) => {
             setFileList((prev) =>
               prev.map((file) => {
                 if (file.id === id) {
-                  return { ...file, status: "error" };
+                  return { ...file, status: "error", error: e };
                 }
                 return file;
               })

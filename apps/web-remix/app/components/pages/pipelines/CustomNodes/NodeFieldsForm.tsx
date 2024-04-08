@@ -71,9 +71,14 @@ export function NodeFieldsForm({
           body: formData,
           method: "POST",
         }
-      ).then((res) => res.json());
+      );
+      const data = await response.json();
 
-      return { ...KnowledgeBaseFileResponse.parse(response), status: "done" };
+      if (!response.ok) {
+        throw new Error(data?.errors?.detail ?? "Something went wrong!");
+      }
+
+      return { ...KnowledgeBaseFileResponse.parse(data), status: "done" };
     },
     [block.opts]
   );
