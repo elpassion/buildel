@@ -41,24 +41,17 @@ export function KnowledgeBasePage() {
 
       <ActionSidebar
         className="!bg-neutral-950"
-        isOpen={isNewSidebarOpen}
+        isOpen={isNewSidebarOpen || isEditSidebarOpen}
         onClose={handleCloseSidebar}
         overlay
       >
-        <ActionSidebarHeader
-          heading="Create a new collection"
-          subheading="Any collection can contain many files and be used in your workflows"
-          onClose={handleCloseSidebar}
-        />
-        <Outlet />
-      </ActionSidebar>
-
-      <ActionSidebar
-        className="!bg-neutral-950"
-        isOpen={isEditSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
-      >
+        {isNewSidebarOpen && (
+          <ActionSidebarHeader
+            heading="Create a new collection"
+            subheading="Any collection can contain many files and be used in your workflows"
+            onClose={handleCloseSidebar}
+          />
+        )}
         <Outlet />
       </ActionSidebar>
 
