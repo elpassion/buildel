@@ -104,7 +104,9 @@ export function NewCollectionFilesPage() {
           fileList={items}
           onChange={onChange}
           onRemove={removeFile}
-          preview={FileUploadListPreview}
+          preview={({ fileList }) => (
+            <FileUploadListPreview fileList={fileList} remove={removeFile} />
+          )}
         />
       </div>
       <Button
