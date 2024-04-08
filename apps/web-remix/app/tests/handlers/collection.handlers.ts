@@ -125,6 +125,24 @@ export class CollectionMemoriesHandlers {
     );
   }
 
+  createCollectionMemoryFailed() {
+    return http.post(
+      "/super-api/organizations/:organizationId/memory_collections/:collectionId/memories",
+      async () => {
+        return HttpResponse.json(
+          {
+            errors: {
+              detail: "Invalid API key provided for embeddings model",
+            },
+          },
+          {
+            status: 400,
+          }
+        );
+      }
+    );
+  }
+
   deleteCollectionMemory() {
     return http.delete(
       "/super-api/organizations/:organizationId/memory_collections/:collectionId/memories/:memoryId",
@@ -140,7 +158,6 @@ export class CollectionMemoriesHandlers {
         }
 
         this.collectionMemories.delete(Number(memoryId));
-        console.log([...this.collectionMemories.values()]);
         return HttpResponse.json<{ data: IKnowledgeBaseFile[] }>(
           { data: [...this.collectionMemories.values()] },
           {

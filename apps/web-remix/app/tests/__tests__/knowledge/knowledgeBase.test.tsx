@@ -154,30 +154,58 @@ describe("KnowledgeBase", () => {
     expect(list.children).toHaveLength(2);
   });
 
-  test("should disable button if files empty", async () => {
-    new KnowledgeBaseObject().render({
-      initialEntries: ["/2/knowledge-base/super-collection/new"],
-    });
-
-    const submit = await ButtonHandle.fromLabelText(/Upload knowledge items/i);
-    expect(submit.isDisabled()).toBe(true);
-  });
-
-  test("should upload collection file", async () => {
-    new KnowledgeBaseObject().render({
-      initialEntries: ["/2/knowledge-base/super-collection/new"],
-    });
-
+  describe("File uploading", () => {
     const file = new File(["hello"], "hello.png", { type: "image/png" });
-    const fileInput = await FileInputHandle.fromLabelText(/files/i);
-    await fileInput.upload(file);
 
-    await screen.findByText(/hello/i);
+    test("should disable button if files empty", async () => {
+      new KnowledgeBaseObject().render({
+        initialEntries: ["/2/knowledge-base/super-collection/new"],
+      });
 
-    const submit = await ButtonHandle.fromLabelText(/Upload knowledge items/i);
-    await submit.click();
+      const submit = await ButtonHandle.fromLabelText(
+        /Upload knowledge items/i
+      );
 
-    expect(screen.queryByText(/hello/i)).toBeNull();
+      expect(submit.isDisabled()).toBe(true);
+    });
+
+    test("should upload collection file", async () => {
+      new KnowledgeBaseObject().render({
+        initialEntries: ["/2/knowledge-base/super-collection/new"],
+      });
+
+      const fileInput = await FileInputHandle.fromLabelText(/files/i);
+      await fileInput.upload(file);
+
+      await screen.findByText(/hello/i);
+
+      const submit = await ButtonHandle.fromLabelText(
+        /Upload knowledge items/i
+      );
+      await submit.click();
+
+      expect(screen.queryByText(/hello/i)).toBeNull();
+    });
+
+    test("should show uploading error", async () => {
+      setupServer.use(
+        new CollectionMemoriesHandlers().createCollectionMemoryFailed()
+      );
+
+      new KnowledgeBaseObject().render({
+        initialEntries: ["/2/knowledge-base/super-collection/new"],
+      });
+
+      const fileInput = await FileInputHandle.fromLabelText(/files/i);
+      await fileInput.upload(file);
+
+      const submit = await ButtonHandle.fromLabelText(
+        /Upload knowledge items/i
+      );
+      await submit.click();
+
+      await screen.findByText(/Invalid API key provided for embeddings model/i);
+    });
   });
 });
 
