@@ -1,19 +1,16 @@
 import React, { useMemo, useState } from "react";
 import { MetaFunction } from "@remix-run/node";
-import { useFormContext, ValidatedForm } from "remix-validated-form";
+import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
-import {
-  Field as FormField,
-  Field,
-} from "~/components/form/fields/field.context";
+import { Field } from "~/components/form/fields/field.context";
 import { CreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { SubmitButton } from "~/components/form/submit";
-import { RadioField } from "~/components/form/fields/radio.field";
-import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
-import { InputText } from "@elpassion/taco";
-import { useLoaderData } from "@remix-run/react";
-import { loader } from "./loader.server";
+import {
+  ApiTypesRadioGroupField,
+  ModelSelectField,
+  SecretSelectField,
+} from "~/components/pages/knowledgeBase/KnowledgeBaseFields";
 
 export function NewKnowledgeBasePage() {
   const validator = useMemo(() => withZod(CreateCollectionSchema), []);
@@ -64,65 +61,6 @@ export function NewKnowledgeBasePage() {
         Create collection
       </SubmitButton>
     </ValidatedForm>
-  );
-}
-
-interface ApiTypesRadioGroupFieldProps {
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-function ApiTypesRadioGroupField({ onChange }: ApiTypesRadioGroupFieldProps) {
-  const { fieldErrors } = useFormContext();
-
-  return (
-    <Field name="embeddings.api_type">
-      <p className="text-white mb-1 text-sm">Embeddings API Type</p>
-      {["openai"].map((value) => (
-        <RadioField
-          onChange={onChange}
-          name={value}
-          id={value}
-          key={value}
-          value={value}
-          label={value}
-        />
-      ))}
-      <InputText error text={fieldErrors["embeddings.api_type"]} />
-    </Field>
-  );
-}
-
-function ModelSelectField() {
-  const { organizationId } = useLoaderData<typeof loader>();
-  const { fieldErrors, getValues } = useFormContext();
-  // const values = getValues();
-
-  return (
-    <FormField name="embeddings.model">
-      <AsyncSelectField
-        id="model"
-        url={`/api/organizations/${organizationId}/models/embeddings?api_type=openai`}
-        label="Model"
-        supportingText="The model to use for the embeddings."
-        errorMessage={fieldErrors["embeddings.model"]}
-      />
-    </FormField>
-  );
-}
-
-function SecretSelectField() {
-  const { organizationId } = useLoaderData<typeof loader>();
-  const { fieldErrors } = useFormContext();
-
-  return (
-    <FormField name="embeddings.secret_name">
-      <AsyncSelectField
-        url={`/api/organizations/${organizationId}/secrets`}
-        label="Secret"
-        id="secret"
-        supportingText="The secret to use for the embeddings."
-        errorMessage={fieldErrors["embeddings.secret_name"]}
-      />
-    </FormField>
   );
 }
 

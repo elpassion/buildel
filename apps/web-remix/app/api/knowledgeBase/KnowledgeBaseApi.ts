@@ -6,6 +6,7 @@ import {
   KnowledgeBaseFileListResponse,
   MemoryChunksResponse,
   CreateCollectionSchema,
+  UpdateCollectionSchema,
 } from "./knowledgeApi.contracts";
 import { PaginationQueryParams } from "~/components/pagination/usePagination";
 import { z } from "zod";
@@ -71,6 +72,18 @@ export class KnowledgeBaseApi {
       z.any(),
       `/organizations/${organizationId}/memory_collections`,
       { method: "POST", body: JSON.stringify(data) }
+    );
+  }
+
+  async updateCollection(
+    organizationId: string | number,
+    collectionId: string | number,
+    data: z.TypeOf<typeof UpdateCollectionSchema>
+  ) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/memory_collections/${collectionId}`,
+      { method: "PUT", body: JSON.stringify(data) }
     );
   }
 

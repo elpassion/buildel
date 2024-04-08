@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { PaginationMeta } from "~/components/pagination/pagination.types";
 import { NotFoundError } from "~/utils/errors";
+import { zfd } from "zod-form-data";
 
 export const MemoryChunk = z.object({
   id: z.string(),
@@ -23,6 +24,16 @@ export const CreateCollectionSchema = z.object({
   embeddings: z.object({
     api_type: z.string().min(2),
     model: z.string().min(2),
+    secret_name: z.string().min(2),
+  }),
+});
+
+export const UpdateCollectionSchema = z.object({
+  id: zfd.numeric(),
+  // name: z.string().min(2),
+  embeddings: z.object({
+    // api_type: z.string().min(2),
+    // model: z.string().min(2),
     secret_name: z.string().min(2),
   }),
 });

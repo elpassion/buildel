@@ -1,6 +1,6 @@
 import React from "react";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
-import { Link, useFetcher } from "@remix-run/react";
+import { Link, useFetcher, useNavigate } from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
 import { IKnowledgeBaseCollection } from "../knowledgeBase.types";
 import { confirm } from "~/components/modal/confirm";
@@ -44,6 +44,7 @@ export const KnowledgeBaseCollectionList: React.FC<
           <KnowledgeBaseCollectionListItem
             data={item}
             onDelete={handleDelete}
+            organizationId={organizationId}
           />
         </Link>
       )}
@@ -54,34 +55,55 @@ export const KnowledgeBaseCollectionList: React.FC<
 interface KnowledgeBaseCollectionListItemProps {
   data: IKnowledgeBaseCollection;
   onDelete: (collection: IKnowledgeBaseCollection) => void;
+  organizationId: string;
 }
 
 export const KnowledgeBaseCollectionListItem: React.FC<
   KnowledgeBaseCollectionListItemProps
-> = ({ data, onDelete }) => {
+> = ({ data, onDelete, organizationId }) => {
+  const navigate = useNavigate();
+
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();
     onDelete(data);
   };
 
+  const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    navigate(routes.knowledgeBaseEdit(organizationId, data.name));
+  };
+
   return (
-    <article className="group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 grid grid-cols-1 gap-1 max-w-full items-center md:gap-2 md:grid-cols-[1fr_30px] ">
+    <article className="group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 grid grid-cols-1 gap-1 max-w-full items-center md:gap-2 md:grid-cols-[1fr_60px] ">
       <header className="max-w-full truncate">
         <h3 className="text-lg font-medium text-white truncate max-w-full">
           {data.name}
         </h3>
       </header>
 
-      <IconButton
-        size="xs"
-        variant="ghost"
-        aria-label={`Remove collection: ${data.name}`}
-        className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
-        title={`Remove collection: ${data.name}`}
-        icon={<Icon iconName="trash" />}
-        onClick={handleDelete}
-      />
+      <div className="flex gap-2">
+        <IconButton
+          size="xs"
+          variant="ghost"
+          aria-label={`Edit collection: ${data.name}`}
+          className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500 lg:opacity-0"
+          title={`Edit collection: ${data.name}`}
+          icon={<Icon iconName="edit" />}
+          onClick={handleEdit}
+        />
+
+        <IconButton
+          size="xs"
+          variant="ghost"
+          aria-label={`Remove collection: ${data.name}`}
+          className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
+          title={`Remove collection: ${data.name}`}
+          icon={<Icon iconName="trash" />}
+          onClick={handleDelete}
+        />
+      </div>
     </article>
   );
 };

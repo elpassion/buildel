@@ -21,8 +21,13 @@ import {
 export function KnowledgeBasePage() {
   const { organizationId, collections } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
-  const match = useMatch(routes.knowledgeBaseNew(organizationId));
-  const isSidebarOpen = !!match;
+  const matchNew = useMatch(routes.knowledgeBaseNew(organizationId));
+  const isNewSidebarOpen = !!matchNew;
+
+  const matchEdit = useMatch(
+    "/:organizationId/knowledge-base/:collectionName/edit"
+  );
+  const isEditSidebarOpen = !!matchEdit;
 
   const handleCloseSidebar = () => {
     navigate(routes.knowledgeBase(organizationId));
@@ -36,7 +41,7 @@ export function KnowledgeBasePage() {
 
       <ActionSidebar
         className="!bg-neutral-950"
-        isOpen={isSidebarOpen}
+        isOpen={isNewSidebarOpen}
         onClose={handleCloseSidebar}
         overlay
       >
@@ -45,6 +50,15 @@ export function KnowledgeBasePage() {
           subheading="Any collection can contain many files and be used in your workflows"
           onClose={handleCloseSidebar}
         />
+        <Outlet />
+      </ActionSidebar>
+
+      <ActionSidebar
+        className="!bg-neutral-950"
+        isOpen={isEditSidebarOpen}
+        onClose={handleCloseSidebar}
+        overlay
+      >
         <Outlet />
       </ActionSidebar>
 
