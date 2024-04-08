@@ -6,6 +6,7 @@ import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPre
 import { IFileUpload } from "~/components/fileUpload/fileUpload.types";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { loader } from "./loader.server";
+import { errorToast } from "~/components/toasts/errorToast";
 
 type IExtendedFileUpload = IFileUpload & { file: File };
 export function NewCollectionFilesPage() {
@@ -62,19 +63,28 @@ export function NewCollectionFilesPage() {
     handleUpdateStatus(fileUpload.id, "uploading");
 
     try {
-      await fetch(
+      const res = await fetch(
         `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
         {
           body: formData,
           method: "POST",
         }
-      ).then((res) => res.json());
+      );
+
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body?.errors?.detail ?? "Something went wrong!");
+      }
 
       handleUpdateStatus(fileUpload.id, "done");
       revalidator.revalidate();
 
       removeFile(fileUpload.id);
-    } catch {
+    } catch (e) {
+      if (e instanceof Error) {
+        errorToast(e.message);
+      }
+
       handleUpdateStatus(fileUpload.id, "error");
     }
   };
