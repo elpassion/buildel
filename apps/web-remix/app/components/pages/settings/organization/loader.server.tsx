@@ -2,31 +2,30 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
-import {
-  APIKeyResponse,
-  MembershipsResponse,
-  OrganizationResponse,
-} from "./contracts";
+import { OrganizationApi } from "~/api/organization/OrganizationApi";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
     invariant(params.organizationId, "organizationId not found");
 
-    const apiKey = await fetch(
-      APIKeyResponse,
-      `/organizations/${params.organizationId}/api_key`
+    const organizationApi = new OrganizationApi(fetch);
+
+    const apiKeyPromise = organizationApi.getApiKey(params.organizationId);
+
+    const organizationPromise = organizationApi.getOrganization(
+      params.organizationId
     );
 
-    const organization = await fetch(
-      OrganizationResponse,
-      `/organizations/${params.organizationId}`
+    const membershipsPromise = organizationApi.getMemberships(
+      params.organizationId
     );
 
-    const memberships = await fetch(
-      MembershipsResponse,
-      `/organizations/${params.organizationId}/memberships`
-    );
+    const [apiKey, organization, memberships] = await Promise.all([
+      apiKeyPromise,
+      organizationPromise,
+      membershipsPromise,
+    ]);
 
     return json({
       apiKey: apiKey.data,
