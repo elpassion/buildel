@@ -130,7 +130,7 @@ defmodule BuildelWeb.Router do
     )
 
     resources("/organizations/:organization_id/memory_collections", CollectionController,
-      only: [:index, :create, :show, :delete]
+      only: [:index, :create, :show, :delete, :update]
     )
 
     resources(

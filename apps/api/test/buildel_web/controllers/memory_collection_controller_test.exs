@@ -1,6 +1,7 @@
 defmodule BuildelWeb.MemoryCollectionControllerTest do
   use BuildelWeb.ConnCase
   import Buildel.OrganizationsFixtures
+  import Buildel.SecretsFixtures
   import Buildel.PipelinesFixtures
   import Buildel.MemoriesFixtures
 
@@ -10,7 +11,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
     {:ok,
      conn:
        conn
-       |> put_req_header("accept", "application/json")}
+       |> put_req_header("accept", "application/json")
+       |> put_req_header("content-type", "application/json")}
   end
 
   setup [
@@ -44,17 +46,22 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
     test "lists all organization collections", %{
       conn: conn,
       organization: organization,
-      collection: %{id: collection_id}
+      collection: %{id: collection_id},
+      api_spec: api_spec
     } do
       conn =
         get(conn, ~p"/api/organizations/#{organization}/memory_collections")
 
-      assert [%{"id" => ^collection_id}] = json_response(conn, 200)["data"]
+      response = json_response(conn, 200)
+      assert [%{"id" => ^collection_id}] = response["data"]
+
+      assert_schema(response, "CollectionIndexResponse", api_spec)
     end
 
     test "lists all organization collections with collection_name", %{
       conn: conn,
-      organization: organization
+      organization: organization,
+      api_spec: api_spec
     } do
       %{id: collection_id} =
         collection_fixture(%{organization_id: organization.id, collection_name: "topic"})
@@ -62,18 +69,49 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
       conn =
         get(conn, ~p"/api/organizations/#{organization}/memory_collections?collection_name=topic")
 
-      assert [%{"id" => ^collection_id}] = json_response(conn, 200)["data"]
+      response = json_response(conn, 200)
+      assert [%{"id" => ^collection_id}] = response["data"]
+      assert_schema(response, "CollectionIndexResponse", api_spec)
+    end
+  end
+
+  describe "show" do
+    test_requires_authentication %{conn: conn, organization: organization, collection: collection} do
+      get(conn, ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}")
+    end
+
+    test "does not show collection from other org", %{
+      conn: conn,
+      another_collection: another_collection
+    } do
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{another_collection.organization_id}/memory_collections/#{another_collection.id}"
+        )
+
+      assert json_response(conn, 404)["errors"] != %{}
+    end
+
+    test "shows organization collection", %{
+      conn: conn,
+      organization: organization,
+      collection: %{id: collection_id},
+      api_spec: api_spec
+    } do
+      conn =
+        get(conn, ~p"/api/organizations/#{organization}/memory_collections/#{collection_id}")
+
+      response = json_response(conn, 200)
+      assert %{"id" => ^collection_id} = response["data"]
+
+      assert_schema(response, "CollectionShowResponse", api_spec)
     end
   end
 
   describe "create" do
-    test "requires authentication", %{conn: conn, organization: organization} do
-      conn = conn |> log_out_user()
-
-      conn =
-        post(conn, ~p"/api/organizations/#{organization.id}/memory_collections")
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization} do
+      post(conn, ~p"/api/organizations/#{organization.id}/memory_collections")
     end
 
     test "validates name is present", %{conn: conn, organization: organization} do
@@ -102,7 +140,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
     test "returns :created when valid", %{
       conn: conn,
       pipeline: pipeline,
-      organization: organization
+      organization: organization,
+      api_spec: api_spec
     } do
       collection_name = "pipelines:#{pipeline.id}"
 
@@ -116,18 +155,23 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
           }
         })
 
+      response = json_response(conn, 201)
+
       assert %{
                "data" => %{
                  "name" => ^collection_name,
                  "id" => _
                }
-             } = json_response(conn, 201)
+             } = response
+
+      assert_schema(response, "CollectionShowResponse", api_spec)
     end
 
     test "saves metadata", %{
       conn: conn,
       pipeline: pipeline,
-      organization: organization
+      organization: organization,
+      api_spec: api_spec
     } do
       collection_name = "pipelines:#{pipeline.id}"
 
@@ -154,23 +198,22 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
           ~p"/api/organizations/#{organization.id}/memory_collections/#{id}"
         )
 
+      response = json_response(conn, 200)
+
       assert %{
                "data" => %{
                  "id" => ^id,
                  "name" => ^collection_name
                }
-             } = json_response(conn, 200)
+             } = response
+
+      assert_schema(response, "CollectionShowResponse", api_spec)
     end
   end
 
   describe "delete" do
-    test "requires authentication", %{conn: conn, organization: organization} do
-      conn = conn |> log_out_user()
-
-      conn =
-        delete(conn, ~p"/api/organizations/#{organization.id}/memory_collections/1")
-
-      assert json_response(conn, 401)["errors"] != %{}
+    test_requires_authentication %{conn: conn, organization: organization} do
+      delete(conn, ~p"/api/organizations/#{organization.id}/memory_collections/1")
     end
 
     test "does not delete in other org", %{conn: conn, another_collection: another_collection} do
@@ -205,6 +248,79 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
         )
 
       assert json_response(conn, 200) == %{}
+    end
+  end
+
+  describe "update" do
+    test_requires_authentication %{conn: conn, organization: organization} do
+      put(conn, ~p"/api/organizations/#{organization.id}/memory_collections/1")
+    end
+
+    test "validates name is present", %{
+      conn: conn,
+      organization: organization,
+      collection: collection
+    } do
+      conn =
+        put(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}",
+          %{}
+        )
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "does not update in other org", %{conn: conn} do
+      organization = organization_fixture()
+      collection = collection_fixture(%{organization_id: organization.id})
+
+      conn =
+        put(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}",
+          %{
+            embeddings: %{
+              secret_name: "some name"
+            }
+          }
+        )
+
+      assert json_response(conn, 404)["errors"] != %{}
+    end
+
+    test "returns :ok when valid", %{
+      conn: conn,
+      organization: organization,
+      collection: collection,
+      api_spec: api_spec
+    } do
+      collection_id = collection.id
+      secret_fixture(%{organization_id: organization.id, name: "new_secret_name"})
+
+      conn =
+        put(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}",
+          %{
+            embeddings: %{
+              secret_name: "new_secret_name"
+            }
+          }
+        )
+
+      response = json_response(conn, 200)
+
+      assert %{
+               "data" => %{
+                 "id" => ^collection_id,
+                 "embeddings" => %{
+                   "secret_name" => "new_secret_name"
+                 }
+               }
+             } = response
+
+      assert_schema(response, "CollectionShowResponse", api_spec)
     end
   end
 
