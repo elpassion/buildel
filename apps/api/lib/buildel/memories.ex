@@ -184,7 +184,15 @@ defmodule Buildel.Memories do
         |> Buildel.Repo.insert()
 
       collection ->
-        {:ok, collection}
+        collection
+        |> Buildel.Memories.MemoryCollection.changeset(%{
+          collection_name: collection_name,
+          organization_id: organization_id,
+          embeddings_api_type: embeddings.api_type,
+          embeddings_model: embeddings.model,
+          embeddings_secret_name: embeddings.secret_name
+        })
+        |> Buildel.Repo.update()
     end
   end
 

@@ -32,7 +32,6 @@ defmodule BuildelWeb.CollectionController do
   def index(conn, _params) do
     %{organization_id: organization_id} = conn.params
     user = conn.assigns.current_user
-    IO.inspect(conn.params)
 
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
@@ -157,7 +156,6 @@ defmodule BuildelWeb.CollectionController do
     %{organization_id: organization_id, id: id} = conn.params
     %{embeddings: embeddings} = conn.body_params
     user = conn.assigns.current_user
-    IO.inspect(conn.body_params)
 
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
