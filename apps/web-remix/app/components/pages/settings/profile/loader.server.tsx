@@ -2,7 +2,7 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { requireLogin } from "~/session.server";
 import { loaderBuilder } from "~/utils.server";
 import { getCurrentUser } from "~/utils/currentUser.server";
-import { OrganizationResponse } from "../organization/contracts";
+import { OrganizationResponse } from "~/api/organization/organization.contracts";
 import invariant from "tiny-invariant";
 
 export async function loader(args: LoaderFunctionArgs) {

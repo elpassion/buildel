@@ -64,10 +64,12 @@ export const ELHelper: React.FC<ELHelperProps> = ({
     // todo change it
     setTimeout(
       () =>
-        startRun([
-          { name: "text_input_2:input", value: organizationId },
-          { name: "text_input_3:input", value: pipelineId },
-        ]),
+        startRun({
+          initial_inputs: [
+            { name: "text_input_2:input", value: organizationId },
+            { name: "text_input_3:input", value: pipelineId },
+          ],
+        }),
       500
     );
 

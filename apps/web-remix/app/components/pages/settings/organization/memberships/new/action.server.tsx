@@ -6,7 +6,7 @@ import { actionBuilder } from "~/utils.server";
 import { schema } from "./schema";
 import { routes } from "~/utils/routes.utils";
 import { setServerToast } from "~/utils/toast.server";
-import { MembershipResponse } from "../../contracts";
+import { MembershipResponse } from "~/api/organization/organization.contracts";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

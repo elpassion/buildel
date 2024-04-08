@@ -2,7 +2,7 @@ import { ActionFunctionArgs, json } from "@remix-run/node";
 import invariant from "tiny-invariant";
 import { actionBuilder } from "~/utils.server";
 import { setServerToast } from "~/utils/toast.server";
-import { OrganizationResponse } from "./contracts";
+import { OrganizationResponse } from "~/api/organization/organization.contracts";
 import { z } from "zod";
 import { requireLogin } from "~/session.server";
 import { withZod } from "@remix-validated-form/with-zod";
