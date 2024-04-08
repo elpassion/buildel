@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { Message, type IMessage } from "./message";
 
-interface IChatClient {
+export interface IChatClient {
   generate(messages: IMessage[]): Promise<IMessage>;
 }
 
@@ -13,7 +13,11 @@ export class ChatClient implements IChatClient {
   public async generate(messages: IMessage[]): Promise<IMessage> {
     const completion = await this.openAi.chat.completions.create({
       messages: messages,
-      model: "gpt-3.5-turbo",
+      model: "qwen:14b",
+      response_format: {
+        type: "json_object",
+      },
+      temperature: 0.1,
     });
     const message = completion.choices.at(0);
     if (!message) throw new Error("OpenAI didn't return a message");
@@ -24,5 +28,26 @@ export class ChatClient implements IChatClient {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error("Provide env OPENAI_API_KEY");
     return apiKey;
+  }
+}
+
+export class OLLAMAChatClient implements IChatClient {
+  private readonly openAi = new OpenAI({
+    apiKey: "doesntmatter",
+    baseURL: "http://127.0.0.1:11434/v1",
+  });
+
+  public async generate(messages: IMessage[]): Promise<IMessage> {
+    const completion = await this.openAi.chat.completions.create({
+      messages: messages,
+      model: "qwen:14b",
+      response_format: {
+        type: "json_object",
+      },
+      temperature: 0.1,
+    });
+    const message = completion.choices.at(0);
+    if (!message) throw new Error("Chat didn't return a message");
+    return Message.parse(message.message);
   }
 }

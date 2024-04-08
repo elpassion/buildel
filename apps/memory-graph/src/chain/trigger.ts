@@ -7,6 +7,7 @@ export class TriggerService {
 export const EmailTrigger = z.object({
   type: z.literal("email_received"),
   from: z.string(),
+  title: z.string(),
   body: z.string(),
 });
 

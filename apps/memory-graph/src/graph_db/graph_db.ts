@@ -28,4 +28,30 @@ export class GraphDB {
       }
     );
   }
+
+  upsertRelation(data: { from: string; to: string; type: string }) {
+    return this.graphDBClient.query(
+      `
+      MATCH (from { id: $from }), (to { id: $to })
+      MERGE (from)-[r:${data.type} { type: $type }]->(to)
+      RETURN r
+      `,
+      data
+    );
+  }
+
+  async getRelationsToType(data: {
+    id: string;
+    relatedToNodeType: string;
+    relationType: string;
+  }) {
+    const result = await this.graphDBClient.query(
+      `
+      MATCH (from { id: $id })-[r:${data.relationType} { type: $relationType }]->(to:$relatedToNodeType)
+      RETURN to
+      `,
+      data
+    );
+    return result.records.map((r: any) => r.toObject().to.properties);
+  }
 }

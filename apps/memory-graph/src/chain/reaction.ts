@@ -4,14 +4,21 @@ export class ReactionService {
   constructor(private readonly reaction: IReaction) {}
 }
 
-const ApprovalReaction = z.object({
+export const ApprovalReaction = z.object({
   type: z.literal("request_approval"),
+  message: z.string(),
 });
 
-const LogReaction = z.object({
+export const LogReaction = z.object({
   type: z.literal("send_log"),
+  log: z.string(),
 });
 
-const Reaction = z.union([ApprovalReaction, LogReaction]);
+export const UploadInvoice = z.object({
+  type: z.literal("upload_invoice"),
+  invoice: z.string(),
+});
+
+export const Reaction = z.union([ApprovalReaction, LogReaction, UploadInvoice]);
 
 export type IReaction = z.infer<typeof Reaction>;
