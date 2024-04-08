@@ -3,8 +3,10 @@ import {
   IKnowledgeBaseCollection,
   IKnowledgeBaseFile,
 } from "~/components/pages/knowledgeBase/knowledgeBase.types";
-import { ICreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { z } from "zod";
+import {
+  ICreateCollectionSchema,
+  IUpdateCollectionSchema,
+} from "~/api/knowledgeBase/knowledgeApi.contracts";
 export class CollectionHandlers {
   private collections: Map<number, IKnowledgeBaseCollection> = new Map();
 
@@ -51,6 +53,44 @@ export class CollectionHandlers {
     );
   }
 
+  updateCollection() {
+    return http.put<any, IUpdateCollectionSchema>(
+      "/super-api/organizations/:organizationId/memory_collections/:collectionId",
+      async ({ request, params }) => {
+        const data = await request.json();
+        const { collectionId } = params;
+
+        const collection = this.collections.get(collectionId);
+
+        if (!collection) {
+          return HttpResponse.json(
+            {},
+            {
+              status: 404,
+            }
+          );
+        }
+
+        const updatedCollection: IKnowledgeBaseCollection = {
+          ...collection,
+          embeddings: {
+            ...collection.embeddings,
+            secret_name: data.embeddings.secret_name,
+          },
+        };
+
+        this.collections.set(collectionId, updatedCollection);
+
+        return HttpResponse.json(
+          { data: updatedCollection },
+          {
+            status: 200,
+          }
+        );
+      }
+    );
+  }
+
   deleteHandler() {
     return http.delete(
       "/super-api/organizations/:organizationId/memory_collections/:collectionId",
@@ -74,6 +114,7 @@ export class CollectionHandlers {
       this.getCollections(),
       this.deleteHandler(),
       this.createCollection(),
+      this.updateCollection(),
     ];
   }
 }

@@ -17,6 +17,9 @@ import { KnowledgeBasePage } from "~/components/pages/knowledgeBase/list/page";
 import { NewKnowledgeBasePage } from "~/components/pages/knowledgeBase/newKnowledgeBase/page";
 import { loader as newCollectionLoader } from "~/components/pages/knowledgeBase/newKnowledgeBase/loader.server";
 import { action as newCollectionAction } from "~/components/pages/knowledgeBase/newKnowledgeBase/action.server";
+import { EditKnowledgeBasePage } from "~/components/pages/knowledgeBase/editKnowledgeBase/page";
+import { loader as editCollectionLoader } from "~/components/pages/knowledgeBase/editKnowledgeBase/loader.server";
+import { action as editCollectionAction } from "~/components/pages/knowledgeBase/editKnowledgeBase/action.server";
 import { KnowledgeBaseCollectionPage } from "~/components/pages/knowledgeBase/collection/page";
 import { loader as collectionLoader } from "~/components/pages/knowledgeBase/collection/loader.server";
 import { action as collectionAction } from "~/components/pages/knowledgeBase/collection/action.server";
@@ -74,6 +77,25 @@ describe("KnowledgeBase", () => {
     const collectionList = await page.getCollectionList();
 
     expect(collectionList.children).toHaveLength(2);
+  });
+
+  test("should edit collection", async () => {
+    const page = new KnowledgeBaseObject().render({
+      initialEntries: ["/2/knowledge-base"],
+    });
+
+    const button = await ButtonHandle.fromLabelText(/Edit collection: test/i);
+    await button.click();
+
+    const secret = await SelectHandle.fromTestId("secret");
+    expect(secret.value).toBe("openai");
+
+    await secret.selectOption("Test");
+
+    await page.updateCollection();
+
+    await button.click();
+    expect(secret.value).toBe("Test");
   });
 
   test("should create collection", async () => {
@@ -236,6 +258,12 @@ class KnowledgeBaseObject {
             loader: loaderWithSession(collectionLoader),
           },
           {
+            path: "/:organizationId/knowledge-base/:collectionName/edit",
+            Component: EditKnowledgeBasePage,
+            action: actionWithSession(editCollectionAction),
+            loader: loaderWithSession(editCollectionLoader),
+          },
+          {
             path: "/:organizationId/knowledge-base/:collectionName/new",
             loader: loaderWithSession(newCollectionFilesLoader),
             Component: NewCollectionFilesPage,
@@ -284,6 +312,16 @@ class KnowledgeBaseObject {
   async submitCollection() {
     const submit = await waitFor(() =>
       ButtonHandle.fromRole("Create collection")
+    );
+
+    await submit.click();
+
+    return this;
+  }
+
+  async updateCollection() {
+    const submit = await waitFor(() =>
+      ButtonHandle.fromRole("Update collection")
     );
 
     await submit.click();

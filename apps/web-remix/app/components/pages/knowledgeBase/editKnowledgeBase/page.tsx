@@ -43,7 +43,6 @@ export function EditKnowledgeBasePage() {
         validator={validator}
         className="w-full grow flex flex-col gap-2 h-[70%]"
         defaultValues={collection}
-        onSubmit={(data) => console.log(data)}
       >
         <HiddenField name="id" value={collection.id} />
 

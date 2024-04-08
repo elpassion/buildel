@@ -40,6 +40,8 @@ export const UpdateCollectionSchema = z.object({
 
 export type ICreateCollectionSchema = z.TypeOf<typeof CreateCollectionSchema>;
 
+export type IUpdateCollectionSchema = z.TypeOf<typeof UpdateCollectionSchema>;
+
 export const KnowledgeBaseFile = z.object({
   id: z.number(),
   file_name: z.string(),
