@@ -26,4 +26,27 @@ defmodule Buildel.OrganizationsFixtures do
 
     membership |> Buildel.Repo.preload(:organization) |> Buildel.Repo.preload(:user)
   end
+
+  def invitation_fixture(attrs \\ %{}) do
+    {encoded_token, invitation_token} =
+      Buildel.Invitations.build_hashed_token("test@test.com", organization_fixture(%{}).id, nil)
+
+    changeset =
+      attrs
+      |> Enum.into(%{
+        email: invitation_token.email,
+        token: invitation_token.token,
+        expires_at: invitation_token.expires_at,
+        organization_id: invitation_token.organization_id,
+        user_id: invitation_token.user_id
+      })
+
+    invitation =
+      %Buildel.Organizations.Invitation{}
+      |> Buildel.Organizations.Invitation.changeset(changeset)
+      |> Buildel.Repo.insert!()
+
+    {invitation |> Buildel.Repo.preload(:organization) |> Buildel.Repo.preload(:user),
+     encoded_token}
+  end
 end
