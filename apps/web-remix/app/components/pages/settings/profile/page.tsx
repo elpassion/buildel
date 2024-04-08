@@ -22,13 +22,11 @@ import { loader } from "./loader.server";
 export function ProfileSettingsPage() {
   const { organization } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
-  const match = useMatch(
-    routes.profileSettingsChangePassword(organization.data.id),
-  );
+  const match = useMatch(routes.profileSettingsChangePassword(organization.id));
   const isSidebarOpen = !!match;
 
   const handleCloseSidebar = () => {
-    navigate(routes.profileSettings(organization.data.id));
+    navigate(routes.profileSettings(organization.id));
   };
   return (
     <>
@@ -48,9 +46,7 @@ export function ProfileSettingsPage() {
         <Section>
           <SectionHeading>Password</SectionHeading>
           <SectionContent>
-            <Link
-              to={routes.profileSettingsChangePassword(organization.data.id)}
-            >
+            <Link to={routes.profileSettingsChangePassword(organization.id)}>
               <Button tabIndex={0} size="sm">
                 Change password
               </Button>

@@ -11,20 +11,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const organizationApi = new OrganizationApi(fetch);
 
-    const apiKeyPromise = organizationApi.getApiKey(params.organizationId);
-
-    const organizationPromise = organizationApi.getOrganization(
-      params.organizationId
-    );
-
-    const [apiKey, organization] = await Promise.all([
-      apiKeyPromise,
-      organizationPromise,
-    ]);
-
     return json({
-      apiKey: apiKey.data,
-      organization: organization.data,
       organizationId: params.organizationId,
     });
   })(args);

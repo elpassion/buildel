@@ -2,7 +2,7 @@ import React, { PropsWithChildren } from "react";
 import { NavLink, NavLinkProps } from "@remix-run/react";
 import classNames from "classnames";
 
-export const OutlinedNavigation: React.FC<PropsWithChildren> = ({
+export const OutlinedTabsWrapper: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   return (
@@ -12,7 +12,7 @@ export const OutlinedNavigation: React.FC<PropsWithChildren> = ({
   );
 };
 
-export const OutlinedNavigationLink = ({ children, ...rest }: NavLinkProps) => {
+export const OutlinedTabLink = ({ children, ...rest }: NavLinkProps) => {
   return (
     <NavLink
       prefetch="intent"

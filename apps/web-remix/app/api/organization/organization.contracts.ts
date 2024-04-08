@@ -11,9 +11,11 @@ export const OrganizationsResponse = z.object({
   data: z.array(Organization),
 });
 
-export const OrganizationResponse = z.object({
-  data: Organization,
-});
+export const OrganizationResponse = z
+  .object({
+    data: Organization,
+  })
+  .transform((res) => res.data);
 
 export const CreateOrganizationSchema = z.object({
   organization: z.object({
@@ -33,9 +35,11 @@ export const Membership = z.object({
   }),
 });
 
-export const MembershipsResponse = z.object({
-  data: z.array(Membership),
-});
+export const MembershipsResponse = z
+  .object({
+    data: z.array(Membership),
+  })
+  .transform((res) => res.data);
 export const MembershipResponse = z.object({
   data: Membership,
 });

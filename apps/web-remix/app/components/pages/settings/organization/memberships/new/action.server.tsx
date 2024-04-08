@@ -27,7 +27,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
         }
       );
 
-      return redirect(routes.organizationSettings(params.organizationId), {
+      return redirect(routes.organizationInvitations(params.organizationId), {
         headers: {
           "Set-Cookie": await setServerToast(request, {
             success: {

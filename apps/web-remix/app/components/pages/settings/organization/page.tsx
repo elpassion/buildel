@@ -2,46 +2,46 @@ import React from "react";
 import { MetaFunction } from "@remix-run/node";
 import { ApiKey } from "./ApiKey";
 import { AboutOrganization } from "./AboutOrganization";
-import { Outlet, useLoaderData, useMatch, useNavigate } from "@remix-run/react";
-import { loader } from "./loader.server";
-import { Memberships } from "./Memberships";
-import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
+import { TabGroup } from "~/components/tabs/TabGroup";
+import {
+  OutlinedTabLink,
+  OutlinedTabsWrapper,
+} from "~/components/tabs/OutlinedTabs";
+import { loader } from "./loader.server";
 
 export function OrganizationSettingsPage() {
-  const { apiKey, organization, memberships } = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
-  const match = useMatch(routes.membershipsNew(organization.data.id));
-  const isSidebarOpen = !!match;
-
-  const handleCloseSidebar = () => {
-    navigate(routes.organizationSettings(organization.data.id));
-  };
+  const { apiKey, organization } = useLoaderData<typeof loader>();
 
   return (
-    <>
-      <ActionSidebar
-        className="!bg-neutral-950"
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
-      >
-        <ActionSidebarHeader
-          heading="Create a new workflow"
-          subheading="Any workflow can contain many Blocks and use your Knowledge Base."
-          onClose={handleCloseSidebar}
-        />
-        <Outlet />
-      </ActionSidebar>
-      <div className="flex flex-col gap-9">
-        <AboutOrganization organization={organization.data} />
-        <ApiKey apiKey={apiKey} />
-        <Memberships memberships={memberships.data} />
+    <div className="flex flex-col gap-9">
+      <AboutOrganization organization={organization} />
+
+      <ApiKey apiKey={apiKey} />
+
+      <div className="mt-6">
+        <TabGroup>
+          <OutlinedTabsWrapper>
+            <OutlinedTabLink
+              end
+              to={routes.organizationSettings(organization.id)}
+            >
+              Members
+            </OutlinedTabLink>
+            <OutlinedTabLink
+              to={routes.organizationInvitations(organization.id)}
+            >
+              Invitations
+            </OutlinedTabLink>
+          </OutlinedTabsWrapper>
+
+          <div className="pt-8">
+            <Outlet />
+          </div>
+        </TabGroup>
       </div>
-    </>
+    </div>
   );
 }
 

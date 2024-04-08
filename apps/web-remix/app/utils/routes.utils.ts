@@ -16,8 +16,10 @@ export const routes = {
     `${routes.organization(organizationId)}/settings`,
   organizationSettings: (organizationId: OrganizationId) =>
     `${routes.settings(organizationId)}/organization`,
-  membershipsNew: (organizationId: OrganizationId) =>
-    `${routes.organizationSettings(organizationId)}/memberships/new`,
+  organizationInvitations: (organizationId: OrganizationId) =>
+    `${routes.organizationSettings(organizationId)}/invitations`,
+  organizationInvitationsNew: (organizationId: OrganizationId) =>
+    `${routes.organizationInvitations(organizationId)}/new`,
   profileSettings: (organizationId: OrganizationId) =>
     `${routes.settings(organizationId)}/profile`,
   profileSettingsChangePassword: (organizationId: OrganizationId) =>

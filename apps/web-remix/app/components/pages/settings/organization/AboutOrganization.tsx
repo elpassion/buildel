@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { ValidatedForm } from "remix-validated-form";
-import { Avatar, Button } from "@elpassion/taco";
+import { Avatar } from "@elpassion/taco";
 import { IconButton } from "~/components/iconButton";
 import {
   Section,
