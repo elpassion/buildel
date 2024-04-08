@@ -98,9 +98,9 @@ export function FileUpload({
   const handleRemove = useCallback(
     async (id: number) => {
       try {
-        if (!onRemove) return;
-
-        await onRemove(id);
+        if (onRemove && id % 1 === 0) {
+          await onRemove(id);
+        }
 
         setFileList((prev) => prev.filter((file) => file.id !== id));
       } catch (err) {
