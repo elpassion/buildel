@@ -1,15 +1,23 @@
 import fs from "fs/promises";
 import { Worker } from "worker_threads";
 import type {
-  Embedding,
   Document,
   Documents,
-  WorkerData,
-  WorkerResult,
+  Embedding,
   Requests,
-} from "./types";
+  WorkerResult,
+} from "../types";
 
-export class VectorDB {
+export interface IVectorDBClient {
+  add(document: Document): Document;
+  get(id: string): Document | undefined;
+  query(
+    queryVector: Embedding,
+    top_k: number
+  ): Promise<{ documents: { similarity: number; document: Document }[] }>;
+}
+
+export class VectorDBClient implements IVectorDBClient {
   private worker: Worker;
   private requests: Requests;
   private documents: Documents;
@@ -31,9 +39,9 @@ export class VectorDB {
     });
   }
 
-  add(document: Document): Document | undefined {
+  add(document: Document): Document {
     this.documents.set(document.id, document);
-    return this.documents.get(document.id);
+    return this.documents.get(document.id)!;
   }
 
   get(id: string): Document | undefined {
@@ -64,13 +72,13 @@ export class VectorDB {
     await fs.writeFile(filename, jsonDump);
   }
 
-  query(
+  async query(
     queryVector: Embedding,
     top_k: number = 10
-  ): Promise<{ id: string; results: Document[] }> {
+  ): Promise<{ documents: { similarity: number; document: Document }[] }> {
     const documents = this.documents;
 
-    return new Promise((resolve) => {
+    const response = (await new Promise((resolve) => {
       const id = Math.floor(Math.random() * 10000) + 1;
       // @ts-ignore
       this.requests.set(id, { resolve });
@@ -79,8 +87,12 @@ export class VectorDB {
         queryVector,
         documents,
         top_k,
-      } as WorkerData);
-    });
+      });
+    })) as { similarity: number; document: Document }[];
+
+    return {
+      documents: response,
+    };
   }
 
   async terminate() {

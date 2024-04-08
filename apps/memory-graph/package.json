@@ -11,7 +11,9 @@
   "dependencies": {
     "@elysiajs/swagger": "^1.0.3",
     "elysia": "^1.0.11",
-    "neo4j-driver": "^5.19.0"
+    "neo4j-driver": "^5.19.0",
+    "openai": "^4.33.0",
+    "zod": "^3.22.4"
   },
   "scripts": {
     "dev": "bun --watch src/index.ts",

@@ -1,4 +1,4 @@
-import type { Embedding, WorkerData } from "./types";
+import type { Embedding, WorkerData } from "../types";
 
 // prevents TS errors
 declare var self: Worker;
