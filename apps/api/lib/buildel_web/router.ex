@@ -88,6 +88,12 @@ defmodule BuildelWeb.Router do
     )
 
     post(
+      "/organizations/invitations/accept",
+      OrganizationMembershipInvitationController,
+      :accept
+    )
+
+    post(
       "/organizations/:organization_id/pipelines/:pipeline_id/runs/:id/start",
       OrganizationPipelineRunController,
       :start

@@ -55,6 +55,20 @@ defmodule Buildel.Invitations do
      }}
   end
 
+  def resolve_invitation(%Invitation{} = invitation) do
+    case Repo.delete(invitation) do
+      {:ok, _} -> {:ok, invitation}
+      {:error, _} -> {:error, :not_found}
+    end
+  end
+
+  def get_invitation_by_token(token) do
+    case Repo.get_by(Invitation, token: token) do
+      nil -> {:error, :not_found}
+      invitation -> {:ok, invitation}
+    end
+  end
+
   def verify_token(token) do
     case Base.url_decode64(token, padding: false) do
       {:ok, decoded_token} ->
@@ -63,7 +77,7 @@ defmodule Buildel.Invitations do
         {:ok, hashed_token}
 
       :error ->
-        :error
+        {:error, :invalid_token}
     end
   end
 end

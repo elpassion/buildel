@@ -99,6 +99,72 @@ defmodule BuildelWeb.OrganizationMembershipInvitationControllerTest do
 
       assert_schema(response, "InvitationShowResponse", api_spec)
     end
+
+    test "returns created invitation if user does not exist", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      user_email = "non_existing@mail.com"
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization.id}/invitations", %{
+          email: user_email
+        })
+
+      response = json_response(conn, 201)
+
+      assert %{
+               "id" => _id,
+               "email" => ^user_email
+             } = response["data"]
+
+      assert_schema(response, "InvitationShowResponse", api_spec)
+    end
+  end
+
+  describe "accept" do
+    test_requires_authentication %{conn: conn} do
+      post(conn, ~p"/api/organizations/invitations/accept?token=123")
+    end
+
+    test "returns ok if accepted", %{
+      conn: conn,
+      organization: organization
+    } do
+      log_out_user(conn)
+      %{user: another_user} = create_user(%{})
+      conn = log_in_user(conn, another_user)
+
+      {_invitation, encoded_token} =
+        invitation_fixture(%{organization_id: organization.id, email: another_user.email})
+
+      conn =
+        post(conn, ~p"/api/organizations/invitations/accept?token=#{encoded_token}")
+
+      assert json_response(conn, 200)
+    end
+
+    test "returns email mismatch error", %{
+      conn: conn,
+      organization: organization
+    } do
+      log_out_user(conn)
+      %{user: another_user} = create_user(%{})
+      conn = log_in_user(conn, another_user)
+
+      {_invitation, encoded_token} =
+        invitation_fixture(%{organization_id: organization.id, email: "wrong@mail.com"})
+
+      conn =
+        post(conn, ~p"/api/organizations/invitations/accept?token=#{encoded_token}")
+
+      response = json_response(conn, 422)
+
+      assert %{
+               "invitation.email" => ["Email mismatch."]
+             } = response["errors"]
+    end
   end
 
   defp create_user_organization(%{user: user}) do
