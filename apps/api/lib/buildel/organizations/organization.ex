@@ -9,6 +9,7 @@ defmodule Buildel.Organizations.Organization do
     field(:api_key_hash, Cloak.Ecto.SHA256)
 
     has_many(:memberships, Buildel.Organizations.Membership)
+    has_many(:invitations, Buildel.Organizations.Invitation)
     has_many(:api_keys, Buildel.ApiKeys.ApiKey)
     has_many(:secrets, Buildel.Secrets.Secret)
     has_many(:memories, Buildel.Memories.Memory)

@@ -3,7 +3,7 @@ import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
 import * as React from "react";
 import { ValidatedForm } from "remix-validated-form";
-import { Field } from "~/components/form/fields/field.context";
+import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { FieldError } from "~/components/form/fields/field.error";
 import {
   PasswordInputField,
@@ -19,6 +19,7 @@ export function RegisterPage() {
   const { googleLoginEnabled } = useLoaderData<typeof loader>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo");
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
@@ -47,6 +48,8 @@ export function RegisterPage() {
         <Field name="global">
           <FieldError />
         </Field>
+
+        <HiddenField name="redirectTo" value={redirectTo ?? undefined} />
 
         <div className="form-control w-full mb-4">
           <Field name="user.email">

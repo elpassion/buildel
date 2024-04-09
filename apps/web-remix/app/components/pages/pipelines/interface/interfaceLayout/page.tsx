@@ -2,9 +2,9 @@ import React from "react";
 import { Outlet, useLoaderData, useSearchParams } from "@remix-run/react";
 import { loader } from "./loader.server";
 import {
-  OutlinedNavigation,
-  OutlinedNavigationLink,
-} from "./OutlinedNavigation";
+  OutlinedTabLink,
+  OutlinedTabsWrapper,
+} from "~/components/tabs/OutlinedTabs";
 import { routes } from "~/utils/routes.utils";
 
 export function InterfaceLayout() {
@@ -14,8 +14,8 @@ export function InterfaceLayout() {
   return (
     <div className="pt-5">
       <div className="mt-5 mb-12">
-        <OutlinedNavigation>
-          <OutlinedNavigationLink
+        <OutlinedTabsWrapper>
+          <OutlinedTabLink
             to={routes.pipelineClientSDK(
               organizationId,
               pipelineId,
@@ -23,9 +23,9 @@ export function InterfaceLayout() {
             )}
           >
             Client SDK
-          </OutlinedNavigationLink>
+          </OutlinedTabLink>
 
-          <OutlinedNavigationLink
+          <OutlinedTabLink
             to={routes.pipelineHTTPApi(
               organizationId,
               pipelineId,
@@ -33,9 +33,9 @@ export function InterfaceLayout() {
             )}
           >
             HTTP Api
-          </OutlinedNavigationLink>
+          </OutlinedTabLink>
 
-          <OutlinedNavigationLink
+          <OutlinedTabLink
             to={routes.pipelineWebsiteChatbot(
               organizationId,
               pipelineId,
@@ -43,9 +43,9 @@ export function InterfaceLayout() {
             )}
           >
             Website Chatbot
-          </OutlinedNavigationLink>
+          </OutlinedTabLink>
 
-          <OutlinedNavigationLink
+          <OutlinedTabLink
             to={routes.pipelineOpenAIApi(
               organizationId,
               pipelineId,
@@ -53,8 +53,8 @@ export function InterfaceLayout() {
             )}
           >
             OpenAI Api
-          </OutlinedNavigationLink>
-        </OutlinedNavigation>
+          </OutlinedTabLink>
+        </OutlinedTabsWrapper>
       </div>
 
       <Outlet />

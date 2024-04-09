@@ -1,15 +1,14 @@
-import { Button } from "@elpassion/taco";
 import { MetaFunction } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { useMemo } from "react";
 import { ValidatedForm } from "remix-validated-form";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { schema } from "./schema";
 import { SubmitButton } from "~/components/form/submit";
+import { CreateInvitationSchema } from "~/api/organization/organization.contracts";
 
 export function NewMembershipPage() {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(CreateInvitationSchema), []);
 
   return (
     <ValidatedForm
@@ -19,7 +18,7 @@ export function NewMembershipPage() {
       className="w-full grow flex flex-col gap-2 h-[70%]"
     >
       <div className="max-w-s w-full grow overflow-y-auto p-1">
-        <Field name="membership.user_email">
+        <Field name="invitation.email">
           <TextInputField
             type="email"
             autoFocus

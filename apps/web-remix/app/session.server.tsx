@@ -39,8 +39,10 @@ export async function requireLogin(request: Request) {
   if (!cookie?.includes("_buildel_key")) {
     const fromURL = new URL(request.url);
     const toURL = new URL("/login", fromURL.origin);
-
-    toURL.searchParams.set("redirectTo", fromURL.pathname);
+    toURL.searchParams.set(
+      "redirectTo",
+      `${fromURL.pathname}${fromURL.search}`
+    );
 
     throw redirect(toURL.toString(), { headers: await logout(request) });
   }

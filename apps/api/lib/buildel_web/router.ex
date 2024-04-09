@@ -81,6 +81,18 @@ defmodule BuildelWeb.Router do
       only: [:index, :create]
     )
 
+    resources(
+      "/organizations/:organization_id/invitations",
+      OrganizationMembershipInvitationController,
+      only: [:index, :create]
+    )
+
+    post(
+      "/organizations/invitations/accept",
+      OrganizationMembershipInvitationController,
+      :accept
+    )
+
     post(
       "/organizations/:organization_id/pipelines/:pipeline_id/runs/:id/start",
       OrganizationPipelineRunController,

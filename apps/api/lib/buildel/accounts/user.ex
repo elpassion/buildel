@@ -8,7 +8,11 @@ defmodule Buildel.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
-    many_to_many :organizations, Buildel.Organizations.Organization, join_through: Buildel.Organizations.Membership
+    has_many(:invitations, Buildel.Organizations.Invitation)
+
+    many_to_many :organizations, Buildel.Organizations.Organization,
+      join_through: Buildel.Organizations.Membership
+
     timestamps()
   end
 

@@ -17,6 +17,23 @@ defmodule Buildel.Accounts.UserNotifier do
     end
   end
 
+  def deliver_invitation_instructions(email, url) do
+    deliver(email, "Invitation instructions", """
+
+    ==============================
+
+    Hi #{email},
+
+    You've been invited to join an organization. You can accept the invitation by visiting the URL below:
+
+    #{url}
+
+    If you didn't request this change, please ignore this.
+
+    ==============================
+    """)
+  end
+
   @doc """
   Deliver instructions to confirm account.
   """

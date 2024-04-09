@@ -19,7 +19,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const response = await organizationApi.createOrganization(result.data);
 
-      throw redirect(routes.organization(response.data.data.id));
+      throw redirect(routes.organization(response.data.id));
     },
   })(actionArgs);
 }

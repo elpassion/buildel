@@ -140,6 +140,13 @@ defmodule Buildel.Organizations do
     Membership.changeset(membership, attrs)
   end
 
+  def check_membership(%User{} = user, organization_id) do
+    case Repo.get_by(Membership, user_id: user.id, organization_id: organization_id) do
+      nil -> {:ok, :not_found}
+      _ -> {:ok, :found}
+    end
+  end
+
   def get_organization_secret(%Organization{} = organization, secret_name) do
     case Repo.get_by(Secret, name: secret_name, organization_id: organization.id) do
       nil -> {:error, :not_found}

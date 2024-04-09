@@ -11,21 +11,15 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const organizationApi = new OrganizationApi(fetch);
 
-    const apiKeyPromise = organizationApi.getApiKey(params.organizationId);
-
-    const organizationPromise = organizationApi.getOrganization(
+    const invitationsPromise = organizationApi.getInvitations(
       params.organizationId
     );
 
-    const [apiKey, organization] = await Promise.all([
-      apiKeyPromise,
-      organizationPromise,
-    ]);
+    const [invitations] = await Promise.all([invitationsPromise]);
 
     return json({
-      apiKey: apiKey.data,
-      organization: organization.data,
       organizationId: params.organizationId,
+      invitations: invitations.data,
     });
   })(args);
 }
