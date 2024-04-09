@@ -6,7 +6,6 @@ import {
   MembershipsResponse,
   APIKeyResponse,
   InvitationsResponse,
-  CreateInvitationSchema,
   InvitationResponse,
 } from "./organization.contracts";
 import z from "zod";
@@ -60,6 +59,16 @@ export class OrganizationApi {
       {
         method: "POST",
         body: JSON.stringify(data),
+      }
+    );
+  }
+
+  acceptInvitation(token: string) {
+    return this.client(
+      z.any(),
+      `/organizations/invitations/accept?token=${token}`,
+      {
+        method: "POST",
       }
     );
   }
