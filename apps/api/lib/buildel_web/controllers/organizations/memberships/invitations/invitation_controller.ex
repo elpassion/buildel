@@ -108,7 +108,7 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
     ],
     request_body: nil,
     responses: [
-      created: {"ok", "application/json", BuildelWeb.Schemas.Invitations.ShowResponse},
+      created: {"ok", "application/json", nil},
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
