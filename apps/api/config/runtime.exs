@@ -72,6 +72,10 @@ if config_env() == :prod do
 
   config :buildel, :document_loader, Buildel.DocumentWorkflow.DocumentLoaderAdapter
 
+  config :buildel,
+         :registration_disabled,
+         System.get_env("REGISTRATION_DISABLED") == "true" || false
+
   if api_key = System.get_env("RESEND_API_KEY") do
     config :buildel, Buildel.Mailer,
       adapter: Resend.Swoosh.Adapter,

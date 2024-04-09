@@ -160,6 +160,7 @@ defmodule BuildelWeb.Router do
     post("/organizations/:organization_id/tools/chunks", OrganizationToolChunkController, :create)
 
     post("/users/register", UserRegistrationController, :create)
+    post("/users/register/invitation", UserRegistrationController, :invitation_create)
     get("/users/me", UserController, :me)
     post("/users/log_in", UserSessionController, :create)
     post("/users/google/log_in", UserSessionController, :create_google)

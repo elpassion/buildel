@@ -108,6 +108,26 @@ defmodule BuildelWeb.Schemas.Users do
     })
   end
 
+  defmodule CreateInvitationRegistrationRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "UserCreateInvitationRegistrationRequest",
+      type: :object,
+      properties: %{
+        user: %Schema{
+          type: :object,
+          properties: %{
+            token: %Schema{type: :string, description: "Invitation token"},
+            password: %Schema{type: :string, description: "Password", minLength: 12}
+          },
+          required: [:token, :password]
+        }
+      },
+      required: [:user]
+    })
+  end
+
   defmodule CreateLoginRequest do
     require OpenApiSpex
 

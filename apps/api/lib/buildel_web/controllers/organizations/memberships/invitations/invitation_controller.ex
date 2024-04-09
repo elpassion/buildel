@@ -1,7 +1,6 @@
 defmodule BuildelWeb.OrganizationMembershipInvitationController do
   use BuildelWeb, :controller
   use OpenApiSpex.ControllerSpecs
-
   import BuildelWeb.UserAuth
 
   alias Buildel.Organizations
@@ -125,6 +124,7 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
 
     with {:ok, hashed_token} <- Invitations.verify_token(token),
          {:ok, invitation} <- Invitations.get_invitation_by_token(hashed_token),
+         {:ok, invitation} <- Invitations.verify_invitation(invitation),
          {:ok, user} <- verify_invitation_email(user, invitation.email),
          {:ok, user_id} <- verify_existing_membership(user, invitation.organization_id),
          {:ok, _membership} <-
@@ -137,6 +137,12 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
       |> put_status(:ok)
       |> json(%{})
     else
+      {:error, :invitation_expired} ->
+        {:error,
+         changeset_for_errors(%{
+           "invitation.token": "Invitation expired."
+         })}
+
       {:error, :email_mismatch} ->
         {:error,
          changeset_for_errors(%{

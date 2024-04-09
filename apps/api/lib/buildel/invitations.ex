@@ -69,6 +69,13 @@ defmodule Buildel.Invitations do
     end
   end
 
+  def verify_invitation(%Invitation{} = invitation) do
+    case DateTime.utc_now() do
+      now when now < invitation.expires_at -> {:ok, invitation}
+      _ -> {:error, :invitation_expired}
+    end
+  end
+
   def verify_token(token) do
     case Base.url_decode64(token, padding: false) do
       {:ok, decoded_token} ->
