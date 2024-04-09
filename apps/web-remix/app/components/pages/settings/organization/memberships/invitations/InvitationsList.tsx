@@ -1,9 +1,10 @@
-import { IMembership } from "~/components/pages/settings/organization/organization.types";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import classNames from "classnames";
+import { EmptyMessage, ItemList } from "~/components/list/ItemList";
+import { IInvitation } from "~/api/organization/organization.contracts";
+import { dayjs } from "~/utils/Dayjs";
 
 interface InvitationsListProps {
-  invitations: IMembership[];
+  invitations: IInvitation[];
 }
 
 export function InvitationsList({ invitations }: InvitationsListProps) {
@@ -22,7 +23,7 @@ export function InvitationsList({ invitations }: InvitationsListProps) {
 }
 
 interface InvitationsListItemProps {
-  invitation: IMembership;
+  invitation: IInvitation;
 }
 export const InvitationsListItem = ({
   invitation,
@@ -30,10 +31,12 @@ export const InvitationsListItem = ({
   return (
     <article
       className={classNames(
-        "group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white"
+        "group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white grid grid-cols-[130px_1fr] gap-4 text-sm"
       )}
     >
-      {invitation.user.email}
+      <p>{dayjs(invitation.expires_at).format()}</p>
+
+      <p>{invitation.email}</p>
     </article>
   );
 };

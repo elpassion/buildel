@@ -5,6 +5,9 @@ import {
   OrganizationsResponse,
   MembershipsResponse,
   APIKeyResponse,
+  InvitationsResponse,
+  CreateInvitationSchema,
+  InvitationResponse,
 } from "./organization.contracts";
 import z from "zod";
 
@@ -40,6 +43,24 @@ export class OrganizationApi {
     return this.client(
       APIKeyResponse,
       `/organizations/${organizationId}/api_key`
+    );
+  }
+
+  getInvitations(organizationId: string | number) {
+    return this.client(
+      InvitationsResponse,
+      `/organizations/${organizationId}/invitations`
+    );
+  }
+
+  createInvitation(organizationId: string | number, data: { email: string }) {
+    return this.client(
+      InvitationResponse,
+      `/organizations/${organizationId}/invitations`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      }
     );
   }
 }

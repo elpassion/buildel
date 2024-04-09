@@ -11,8 +11,15 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const organizationApi = new OrganizationApi(fetch);
 
+    const invitationsPromise = organizationApi.getInvitations(
+      params.organizationId
+    );
+
+    const [invitations] = await Promise.all([invitationsPromise]);
+
     return json({
       organizationId: params.organizationId,
+      invitations: invitations.data,
     });
   })(args);
 }

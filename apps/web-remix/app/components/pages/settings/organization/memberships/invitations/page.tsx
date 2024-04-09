@@ -16,7 +16,7 @@ import { InvitationsList } from "./InvitationsList";
 import { loader } from "./loader.server";
 
 export function InvitationsPage() {
-  const { organizationId } = useLoaderData<typeof loader>();
+  const { organizationId, invitations } = useLoaderData<typeof loader>();
 
   const navigate = useNavigate();
   const match = useMatch(routes.organizationInvitationsNew(organizationId));
@@ -53,7 +53,7 @@ export function InvitationsPage() {
         </Link>
 
         <div className="w-full">
-          <InvitationsList invitations={[]} />
+          <InvitationsList invitations={invitations} />
         </div>
       </div>
     </>
