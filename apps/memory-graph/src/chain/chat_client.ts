@@ -17,7 +17,7 @@ export class ChatClient implements IChatClient {
       response_format: {
         type: "json_object",
       },
-      temperature: 0.1,
+      temperature: 0,
     });
     const message = completion.choices.at(0);
     if (!message) throw new Error("OpenAI didn't return a message");
@@ -37,14 +37,17 @@ export class OLLAMAChatClient implements IChatClient {
     baseURL: "http://127.0.0.1:11434/v1",
   });
 
+  constructor(private readonly options: { maxTokens?: number } = {}) {}
+
   public async generate(messages: IMessage[]): Promise<IMessage> {
     const completion = await this.openAi.chat.completions.create({
       messages: messages,
-      model: "qwen:14b",
+      model: "mixtral:8x7b-instruct-v0.1-q2_K",
       response_format: {
         type: "json_object",
       },
       temperature: 0.1,
+      max_tokens: this.options.maxTokens,
     });
     const message = completion.choices.at(0);
     if (!message) throw new Error("Chat didn't return a message");

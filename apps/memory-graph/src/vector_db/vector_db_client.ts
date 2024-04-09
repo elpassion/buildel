@@ -57,7 +57,6 @@ export class VectorDBClient implements IVectorDBClient {
   }
 
   async loadFile(filename: string) {
-    // TODO: handle exceptions
     const dataBuffer = await fs.readFile(filename);
     const documents = JSON.parse(dataBuffer.toString());
 
@@ -67,7 +66,6 @@ export class VectorDBClient implements IVectorDBClient {
   }
 
   async dumpFile(filename: string) {
-    // TODO: handle exceptions
     const jsonDump = JSON.stringify([...this.documents.values()]);
     await fs.writeFile(filename, jsonDump);
   }

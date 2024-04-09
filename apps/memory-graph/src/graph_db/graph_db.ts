@@ -29,11 +29,16 @@ export class GraphDB {
     );
   }
 
-  upsertRelation(data: { from: string; to: string; type: string }) {
+  upsertRelation(data: {
+    from: string;
+    to: string;
+    type: string;
+    status: string;
+  }) {
     return this.graphDBClient.query(
       `
       MATCH (from { id: $from }), (to { id: $to })
-      MERGE (from)-[r:${data.type} { type: $type }]->(to)
+      MERGE (from)-[r:${data.type} { type: $type, status: $status }]->(to)
       RETURN r
       `,
       data
@@ -47,7 +52,7 @@ export class GraphDB {
   }) {
     const result = await this.graphDBClient.query(
       `
-      MATCH (from { id: $id })-[r:${data.relationType} { type: $relationType }]->(to:$relatedToNodeType)
+      MATCH (from { id: $id })-[r:${data.relationType} { type: $relationType }]-(to:$relatedToNodeType)
       RETURN to
       `,
       data

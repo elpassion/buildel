@@ -51,7 +51,7 @@ export class MemoryGraph {
     await this.vectorDB.add({ embedding, id, metadata: { event: trigger } });
     await this.graphDB.upsertNode({
       id,
-      type: trigger.type,
+      type: "trigger",
       metadata: { event: trigger },
     });
 
@@ -86,6 +86,46 @@ export class MemoryGraph {
     throw new Error("Method not implemented.");
   }
 
+  async saveReactionToHelpReaction({
+    reactionId,
+    reaction,
+  }: {
+    reactionId: string;
+    reaction: IReaction;
+  }) {
+    const id = randomUUID();
+
+    const [{ id: triggerId }] = await this.graphDB.getRelationsToType({
+      id: reactionId,
+      relatedToNodeType: "trigger",
+      relationType: "ask_for_help",
+    });
+
+    await this.graphDB.upsertNode({
+      id,
+      type: "reaction",
+      metadata: reaction,
+    });
+
+    await this.graphDB.upsertRelation({
+      from: id,
+      to: reactionId,
+      type: "resolved_help",
+      status: "resolved",
+    });
+
+    await this.graphDB.upsertRelation({
+      from: triggerId,
+      to: id,
+      type: "reaction",
+      status: "resolved",
+    });
+
+    await this.markAskForHelpAsResolved(reactionId);
+
+    return { id };
+  }
+
   async saveReactionToTrigger({
     reaction,
     triggerId,
@@ -103,15 +143,19 @@ export class MemoryGraph {
 
     const relationType =
       {
-        request_approval: "request_approval",
+        ask_for_help: "ask_for_help",
         send_log: "reaction",
         upload_invoice: "reaction",
+        archive_email: "reaction",
       }[reaction.type] || "reaction";
+
+    const status = reaction.type === "ask_for_help" ? "pending" : "resolved";
 
     await this.graphDB.upsertRelation({
       from: triggerId,
       to: id,
       type: relationType,
+      status,
     });
 
     return { id };
@@ -165,6 +209,7 @@ export class MemoryGraph {
           from: queryId,
           to: document.document.id,
           type: "query_result",
+          status: "resolved",
         });
       })
     );
@@ -180,9 +225,35 @@ export class MemoryGraph {
     triggerId: string;
   }) {
     await this.graphDB.upsertRelation({
-      from: queryId,
-      to: triggerId,
+      from: triggerId,
+      to: queryId,
       type: "trigger",
+      status: "resolved",
     });
+  }
+
+  async markAskForHelpAsResolved(reactionId: string) {
+    await this.graphDB.query(
+      `
+      MATCH (trigger)-[r:ask_for_help]->(reaction { id: $reactionId })
+      SET r.status = "resolved"
+      RETURN trigger, r, reaction
+      `,
+      { reactionId }
+    );
+  }
+
+  async getReactionsWaitingForHelp(): Promise<
+    { id: string; metadata: IReaction }[]
+  > {
+    const response = await this.graphDB.query(
+      `
+      MATCH (trigger)-[r:ask_for_help]->(reaction)
+      WHERE r.status = "pending"
+      RETURN reaction
+      `
+    );
+
+    return response.records.map((r: any) => r.toObject().reaction.properties);
   }
 }

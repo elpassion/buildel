@@ -10,4 +10,12 @@ export class Memory {
   addMessage(newMessage: IMessage) {
     this.messages.push(newMessage);
   }
+
+  clearMessages() {
+    this.messages.length = 0;
+  }
+
+  dropLastMessage() {
+    this.messages.pop();
+  }
 }

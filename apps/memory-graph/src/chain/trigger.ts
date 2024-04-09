@@ -11,10 +11,18 @@ export const EmailTrigger = z.object({
   body: z.string(),
 });
 
+export const EmailTriggerWithSummary = EmailTrigger.extend({
+  summary: z.string(),
+});
+
 export const FeedbackTrigger = z.object({
   type: z.literal("feedback_received"),
 });
 
-export const Trigger = z.union([EmailTrigger, FeedbackTrigger]);
+export const Trigger = z.union([
+  EmailTrigger,
+  EmailTriggerWithSummary,
+  FeedbackTrigger,
+]);
 
 export type ITrigger = z.infer<typeof Trigger>;

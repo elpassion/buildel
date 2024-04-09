@@ -18,11 +18,15 @@ export class Chat {
   }
 
   public async generate(outputSchema?: z.ZodSchema): Promise<any> {
+    console.log(this.memory.getMessages());
+
     const newMessage = await this.chatClient.generate(
       this.memory.getMessages()
     );
 
     this.memory.addMessage(newMessage);
+
+    console.log("Generated message:", newMessage.content.trim());
 
     if (outputSchema) {
       const parseResult = outputSchema.safeParse(
@@ -34,10 +38,7 @@ export class Chat {
 
         if (this.retryCount > 3) throw new Error("Failed to parse response");
 
-        this.addMessage({
-          role: "user",
-          content: `Failed to parse response. Try again but this time correctly use schema. ERROR: ${parseResult.error.message}`,
-        });
+        this.memory.dropLastMessage();
 
         return this.generate(outputSchema);
       }
