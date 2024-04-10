@@ -19,8 +19,11 @@ const vectorDbClient = new VectorDBClient();
 vectorDbClient.loadFile("data.json");
 
 process.on("SIGINT", () => {
-  vectorDbClient.dumpFile("data.json");
-  process.exit();
+  vectorDbClient.dumpFile("data.json").then(() => {
+    console.log("Data saved to data.json");
+    console.log("Exiting...");
+    process.exit();
+  });
 });
 
 const memoryGraph = new MemoryGraph({

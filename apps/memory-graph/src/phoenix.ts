@@ -68,17 +68,22 @@ export class Phoenix {
       triggerId: triggerToSave.id,
     });
 
+    console.log("Reacting");
+
+    await this.invokeReaction(parsedReaction);
+
     return {
       reactionId,
       triggerId: triggerToSave.id,
     };
   }
-
   public async resolveAskForHelp(reactionId: string, reaction: IReaction) {
     const { id } = await this.memoryGraph.saveReactionToHelpReaction({
       reactionId,
       reaction,
     });
+
+    await this.invokeReaction(reaction);
 
     return {
       reactionId: id,
@@ -107,7 +112,7 @@ You are my personal assistant. Your job is to react to triggers I send you.
 
 You will receive a trigger in a form: { type: "trigger_type", ...metadata }
 
-Your job is to react to the trigger.
+Your job is to REACT to the trigger.
   
 First of all, look at the trigger and try to understand it.
 Then, look at the reactions to similar triggers and see how they were reacted to.
@@ -118,13 +123,18 @@ Based on that, decide on your own reaction.
 Write it in a form of json: {type: "reaction_type", ...metadata}.
 
 ONLY AVAILABLE REACTIONS ARE:
+
 - upload_invoice: Upload an invoice. Use only if you have an invoice to upload. ie. { "type": "upload_invoice", "invoice": "Invoice number" }. 
+
 - archive_email: This deletes the email. DO NOT ARCHIVE IF YOU DID NOT SEE IT DONE PREVIOUSLY WITH SIMILAR MESSAGES. ie. { "type": "archive_email", "reason": "Reason for archiving" }. 
+
+- respond_to_email: DON'T RESPOND IF YOU DON'T HAVE PREVIOUS SIMILAR REACTIONS. ie. { "type": "respond_to_email", "email": "example@gmail.com", subject: "Subject", body: "Body" }
+
 - ask_for_help: Ask for help for the reaction because you don't know what to do. ie. { "type": "ask_for_help", "message": "I have no idea what to do" }
 
 If you want to perform an action just do it. Do not ask for permission or if you should proceed.
 
-DO NOT USE ANY REACTIONS OTHER THEN THE ONES ABOVE: ["upload_invoice", "archive_email", "ask_for_help"].
+DO NOT USE ANY REACTIONS OTHER THEN THE ONES ABOVE: ["upload_invoice", "archive_email", "respond_to_email", "ask_for_help"].
 
 RETURN ONLY THE JSON. DO NOT ADD ANY ADDITIONAL TEXT.
 `.trim();
@@ -185,5 +195,20 @@ RETURN ONLY THE JSON. DO NOT ADD ANY ADDITIONAL TEXT.
 
   private static formatReaction(reaction: { id: string; metadata: IReaction }) {
     return JSON.stringify(reaction.metadata);
+  }
+
+  private async invokeReaction(parsedReaction: IReaction) {
+    await fetch(
+      "http://127.0.0.1:5678/webhook/0a94951a-f93f-4617-9489-2867251b8ce3",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(parsedReaction),
+      }
+    )
+      .then(console.log)
+      .catch(console.error);
   }
 }

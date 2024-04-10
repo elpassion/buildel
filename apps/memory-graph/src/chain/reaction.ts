@@ -24,11 +24,19 @@ export const UploadInvoiceReaction = z.object({
   invoice: z.string(),
 });
 
+export const SendEmailReaction = z.object({
+  type: z.literal("respond_to_email"),
+  email: z.string(),
+  subject: z.string(),
+  body: z.string(),
+});
+
 export const Reaction = z.discriminatedUnion("type", [
   AskForHelpReaction,
   LogReaction,
   UploadInvoiceReaction,
   ArchiveReaction,
+  SendEmailReaction,
 ]);
 
 export type IReaction = z.infer<typeof Reaction>;

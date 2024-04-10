@@ -147,6 +147,7 @@ export class MemoryGraph {
         send_log: "reaction",
         upload_invoice: "reaction",
         archive_email: "reaction",
+        respond_to_email: "reaction",
       }[reaction.type] || "reaction";
 
     const status = reaction.type === "ask_for_help" ? "pending" : "resolved";
