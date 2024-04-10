@@ -74,7 +74,7 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
            Invitations.deliver_user_invitation_instructions(
              user_email,
              fn token ->
-               "#{Application.fetch_env!(:buildel, :page_url)}/organizations/invitation?token=#{token}"
+               invitaiton_url(token)
              end,
              organization.id,
              user_id
@@ -164,6 +164,16 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
       err ->
         err
     end
+  end
+
+  defp invitaiton_url(token) do
+    path =
+      case Application.fetch_env!(:buildel, :registration_disabled) do
+        true -> "/organizations/invitation/setup?token=#{token}"
+        false -> "/organizations/invitation?token=#{token}"
+      end
+
+    "#{Application.fetch_env!(:buildel, :page_url)}#{path}"
   end
 
   defp verify_invitation_email(%Buildel.Accounts.User{} = user, email) do

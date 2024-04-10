@@ -61,3 +61,7 @@ config :buildel, Buildel.Vault,
 
 config :buildel, :page_url, "http://localhost:3000"
 config :logger, level: :critical
+
+config :buildel,
+       :registration_disabled,
+       System.get_env("REGISTRATION_DISABLED") == "true" || false

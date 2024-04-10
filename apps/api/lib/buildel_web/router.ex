@@ -3,6 +3,7 @@ defmodule BuildelWeb.Router do
 
   import BuildelWeb.UserAuth
   import BuildelWeb.BasicAuth
+  import BuildelWeb.RegistrationMode
   import Phoenix.LiveDashboard.Router
   alias OpenApiSpex.Plug.{RenderSpec, PutApiSpec}
 
@@ -18,6 +19,10 @@ defmodule BuildelWeb.Router do
 
   pipeline :require_basic_auth do
     plug :basic_auth
+  end
+
+  pipeline :disable_registration do
+    plug :registration_mode
   end
 
   pipeline :api do
@@ -159,8 +164,6 @@ defmodule BuildelWeb.Router do
 
     post("/organizations/:organization_id/tools/chunks", OrganizationToolChunkController, :create)
 
-    post("/users/register", UserRegistrationController, :create)
-    post("/users/register/invitation", UserRegistrationController, :invitation_create)
     get("/users/me", UserController, :me)
     post("/users/log_in", UserSessionController, :create)
     post("/users/google/log_in", UserSessionController, :create_google)
@@ -181,6 +184,15 @@ defmodule BuildelWeb.Router do
     )
 
     post("/channel_auth", ChannelAuthController, :create)
+  end
+
+  scope "/api", BuildelWeb do
+    pipe_through(:api)
+
+    post("/users/register/invitation", UserRegistrationController, :invitation_create)
+
+    pipe_through(:disable_registration)
+    post("/users/register", UserRegistrationController, :create)
   end
 
   scope "/api" do
