@@ -5,7 +5,8 @@ import { AuthApi } from "~/api/auth/AuthApi";
 import { actionBuilder } from "~/utils.server";
 import { routes } from "~/utils/routes.utils";
 import { schema } from "./schema";
-import { setServerToast } from "~/utils/toast.server";
+import { CurrentUserResponse } from "~/api/CurrentUserApi";
+import { setCurrentUser } from "~/utils/currentUser.server";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -18,19 +19,24 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const authApi = new AuthApi(fetch);
 
-      await authApi.signUpInvitation(result.data);
+      const response = await authApi.signUpInvitation(result.data);
 
-      const redirectTo = routes.login;
+      const authCookie = response.headers.get("Set-Cookie")!;
 
-      return redirect(redirectTo, {
+      const meResponse = await fetch(CurrentUserResponse, "/users/me", {
         headers: {
-          "Set-Cookie": await setServerToast(request, {
-            success: {
-              title: "Account created",
-              description: `Your account has been created and you have been added to organization. Now, you can sign in!`,
-            },
-          }),
+          Cookie: authCookie,
         },
+      });
+
+      const sessionCookie = await setCurrentUser(request, meResponse.data);
+
+      const headers = new Headers();
+      headers.append("Set-Cookie", authCookie);
+      headers.append("Set-Cookie", sessionCookie);
+
+      return redirect(routes.dashboard, {
+        headers,
       });
     },
   })(actionArgs);
