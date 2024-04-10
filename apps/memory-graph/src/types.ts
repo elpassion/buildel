@@ -1,3 +1,6 @@
+import type { IReaction } from "./chain/reaction";
+import type { IEnhancedTrigger } from "./chain/trigger";
+
 export type Embedding = number[];
 
 export type Document = {
@@ -31,3 +34,9 @@ export type Request = {
 };
 
 export type Requests = Map<number, Request>;
+
+export type IEnhancedTriggerWithReactions = {
+  documentId: string;
+  trigger: IEnhancedTrigger;
+  reactions: { id: string; metadata: IReaction }[];
+};

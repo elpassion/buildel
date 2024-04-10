@@ -1,10 +1,12 @@
 import type { EmailTriggerEnhancer } from "./email";
 import { type IEnhancedTrigger, type ITrigger } from "../../chain/trigger";
+import { BaseTriggerEnhancer } from "./base";
 
-export class TriggerEnhancer {
+export class TriggerEnhancer extends BaseTriggerEnhancer {
   private enhancers: { email: EmailTriggerEnhancer };
 
   constructor(enhancers: { email: EmailTriggerEnhancer }) {
+    super();
     this.enhancers = enhancers;
   }
 

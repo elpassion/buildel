@@ -17,29 +17,29 @@ export class Chat {
     this.memory.addMessage(message);
   }
 
-  public async generate(outputSchema?: z.ZodSchema): Promise<any> {
+  public async generate<T extends z.ZodSchema>(
+    outputSchema: T
+  ): Promise<z.infer<T>> {
     const newMessage = await this.chatClient.generate(
       this.memory.getMessages()
     );
 
     this.memory.addMessage(newMessage);
 
-    if (outputSchema) {
-      const parseResult = outputSchema.safeParse(
-        JSON.parse(newMessage.content.trim())
-      );
+    const parseResult = outputSchema.safeParse(
+      JSON.parse(newMessage.content.trim())
+    );
 
-      if (!parseResult.success) {
-        this.retryCount++;
+    if (!parseResult.success) {
+      this.retryCount++;
 
-        if (this.retryCount > 3) throw new Error("Failed to parse response");
+      if (this.retryCount > 3) throw new Error("Failed to parse response");
 
-        this.memory.dropLastMessage();
+      this.memory.dropLastMessage();
 
-        return this.generate(outputSchema);
-      }
+      return this.generate(outputSchema);
     }
 
-    return newMessage;
+    return parseResult.data;
   }
 }

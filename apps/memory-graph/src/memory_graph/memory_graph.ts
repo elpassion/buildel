@@ -1,7 +1,11 @@
 import db from "neo4j-driver";
 import { randomUUID } from "node:crypto";
 import type { z } from "zod";
-import { EmailTrigger, type ITrigger } from "../chain/trigger";
+import {
+  EmailTrigger,
+  type IEnhancedTrigger,
+  type ITrigger,
+} from "../chain/trigger";
 import { GraphDB } from "../graph_db/graph_db";
 import { GraphClient } from "../graph_db/graph_db_client";
 import { EmbeddingsService } from "../vector_db/embeddings";
@@ -9,6 +13,8 @@ import { EmbeddingsClient } from "../vector_db/embeddings_client";
 import { VectorDB } from "../vector_db/vector_db";
 import { VectorDBClient } from "../vector_db/vector_db_client";
 import type { IReaction } from "../chain/reaction";
+import type { IEnhancedTriggerWithReactions } from "../types";
+import { Logger } from "../logger";
 
 export class MemoryGraph {
   private readonly vectorDB: VectorDB;
@@ -31,6 +37,7 @@ export class MemoryGraph {
   }
 
   saveTrigger(trigger: ITrigger): Promise<{ id: string }> {
+    Logger.debug(`Saving trigger: ${JSON.stringify(trigger.type)}`);
     switch (trigger.type) {
       case "email_received":
         return this.saveEmailTrigger(trigger);
@@ -58,7 +65,7 @@ export class MemoryGraph {
     return { id };
   }
 
-  formatTrigger(trigger: ITrigger): string {
+  private formatTrigger(trigger: ITrigger): string {
     switch (trigger.type) {
       case "email_received":
         return this.formatEmailTrigger(trigger);
@@ -152,6 +159,8 @@ export class MemoryGraph {
 
     const status = reaction.type === "ask_for_help" ? "pending" : "resolved";
 
+    Logger.debug(`Saving reaction to trigger: ${JSON.stringify(reaction)}`);
+
     await this.graphDB.upsertRelation({
       from: triggerId,
       to: id,
@@ -175,7 +184,17 @@ export class MemoryGraph {
     });
   }
 
-  async searchForTriggersWithReactions(query: string, top_k: number) {
+  async searchForTriggersWithReactions(
+    trigger: IEnhancedTrigger,
+    top_k: number
+  ): Promise<{
+    queryId: string;
+    triggersWithReactions: IEnhancedTriggerWithReactions[];
+  }> {
+    const query = this.formatTrigger(trigger);
+
+    Logger.debug(`Searching for triggers with reactions for query: ${query}`);
+
     const [embedding] = await this.embeddings.generate([query]);
 
     const { documents } = await this.vectorDB.query(embedding, top_k);
@@ -196,7 +215,13 @@ export class MemoryGraph {
       })
     );
 
+    Logger.debug(
+      `Found ${triggersWithReactions.length} triggers with reactions for query: ${query}`
+    );
+
     const queryId = randomUUID();
+
+    Logger.debug(`Saving query with id: ${queryId}`);
 
     await this.graphDB.upsertNode({
       id: queryId,

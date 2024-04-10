@@ -9,20 +9,28 @@ export const AskForHelpReaction = z.object({
   message: z.string(),
 });
 
+export type IAskForHelpReaction = z.infer<typeof AskForHelpReaction>;
+
 export const ArchiveReaction = z.object({
   type: z.literal("archive_email"),
   reason: z.string(),
 });
+
+export type IArchiveReaction = z.infer<typeof ArchiveReaction>;
 
 export const LogReaction = z.object({
   type: z.literal("send_log"),
   log: z.string(),
 });
 
+export type ILogReaction = z.infer<typeof LogReaction>;
+
 export const UploadInvoiceReaction = z.object({
   type: z.literal("upload_invoice"),
   invoice: z.string(),
 });
+
+export type IUploadInvoiceReaction = z.infer<typeof UploadInvoiceReaction>;
 
 export const SendEmailReaction = z.object({
   type: z.literal("respond_to_email"),
@@ -30,6 +38,8 @@ export const SendEmailReaction = z.object({
   subject: z.string(),
   body: z.string(),
 });
+
+export type ISendEmailReaction = z.infer<typeof SendEmailReaction>;
 
 export const Reaction = z.discriminatedUnion("type", [
   AskForHelpReaction,

@@ -30,7 +30,7 @@ DO NOT RESPOND WITH ANYTHING ELSE. JUST THE JSON OBJECT IN A FORMAT: { "summary"
 
     const message = await this.chat.generate(z.object({ summary: z.string() }));
 
-    const summary = JSON.parse(message.content).summary;
+    const summary = message.summary;
 
     Logger.info(
       `Enhanced email trigger: ${trigger.title} with summary: ${summary}`

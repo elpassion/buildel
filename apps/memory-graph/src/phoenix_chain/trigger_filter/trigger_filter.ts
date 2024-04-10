@@ -1,14 +1,44 @@
 import { z } from "zod";
-import type { Chat } from "./chat";
-import { type ITrigger } from "./trigger";
+import type { Chat } from "../../chain/chat";
+import { type IEnhancedTrigger } from "../../chain/trigger";
+import type { IEnhancedTriggerWithReactions } from "../../types";
+import { Logger } from "../../logger";
 
 export class TriggerFilter {
   constructor(private readonly chat: Chat) {}
 
-  public async filter(
-    baseTrigger: ITrigger,
-    comparedTrigger: ITrigger
-  ): Promise<ITrigger | null> {
+  public async filterMultiple(
+    baseTrigger: IEnhancedTrigger,
+    comparedTriggers: IEnhancedTriggerWithReactions[]
+  ): Promise<IEnhancedTriggerWithReactions[]> {
+    Logger.debug(
+      `Filtering triggers for relatedness to trigger ${baseTrigger.type}`
+    );
+
+    const relatedTriggers: IEnhancedTriggerWithReactions[] = [];
+
+    for (const comparedTrigger of comparedTriggers) {
+      const relatedTrigger = await this.filter(
+        baseTrigger,
+        comparedTrigger.trigger
+      );
+
+      if (relatedTrigger) {
+        relatedTriggers.push(comparedTrigger);
+      }
+    }
+
+    Logger.debug(
+      `Found ${relatedTriggers.length} related triggers for trigger ${baseTrigger.type}`
+    );
+
+    return relatedTriggers;
+  }
+
+  private async filter(
+    baseTrigger: IEnhancedTrigger,
+    comparedTrigger: IEnhancedTrigger
+  ): Promise<IEnhancedTrigger | null> {
     this.chat.addMessage({
       role: "system",
       content: `
@@ -40,7 +70,7 @@ ${TriggerFilter.formatTrigger(comparedTrigger)}
       z.object({ related: z.boolean() })
     );
 
-    const { related } = JSON.parse(message.content);
+    const { related } = message;
 
     if (related) {
       return comparedTrigger;
@@ -49,7 +79,7 @@ ${TriggerFilter.formatTrigger(comparedTrigger)}
     }
   }
 
-  private static formatTrigger(trigger: ITrigger): string {
+  private static formatTrigger(trigger: IEnhancedTrigger): string {
     switch (trigger.type) {
       case "email_received":
         return JSON.stringify(
@@ -57,8 +87,7 @@ ${TriggerFilter.formatTrigger(comparedTrigger)}
             type: trigger.type,
             from: trigger.from,
             title: trigger.title,
-            summary:
-              "summary" in trigger ? trigger.summary : "No summary available",
+            summary: trigger.summary,
           },
           null,
           2

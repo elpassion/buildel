@@ -10,10 +10,14 @@ import { EmbeddingsService } from "./vector_db/embeddings";
 import { OLLAEmbeddingsClient } from "./vector_db/embeddings_client";
 import { Reaction } from "./chain/reaction";
 import { TriggerEnhancer } from "./phoenix_chain/trigger_enhancer/trigger_enhancer";
-import { TriggerFilter } from "./chain/trigger_filter";
+import { TriggerFilter } from "./phoenix_chain/trigger_filter/trigger_filter";
 import { VectorDB } from "./vector_db/vector_db";
 import { VectorDBClient } from "./vector_db/vector_db_client";
 import { EmailTriggerEnhancer } from "./phoenix_chain/trigger_enhancer/email";
+import { ReactionTypePicker } from "./phoenix_chain/reaction_type_picker/reaction_type_picker";
+import { ReactionCreator } from "./phoenix_chain/reaction_creator/reaction_creator";
+import { EmailReactionCreator } from "./phoenix_chain/reaction_creator/email";
+import { HelpCreator } from "./phoenix_chain/reaction_creator/help";
 
 const vectorDbClient = new VectorDBClient();
 
@@ -32,33 +36,46 @@ const memoryGraph = new MemoryGraph({
   vectorDB: new VectorDB(vectorDbClient),
 });
 
+const buildPhoenix = () => {
+  return new Phoenix(
+    memoryGraph,
+    new Chat({
+      chat: new OLLAMAChatClient({ maxTokens: 1000 }),
+      memory: new Memory(),
+    }),
+    new TriggerEnhancer({
+      email: new EmailTriggerEnhancer(
+        new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
+      ),
+    }),
+    new TriggerFilter(
+      new Chat({
+        chat: new OLLAMAChatClient({ maxTokens: 50 }),
+        memory: new Memory(),
+      })
+    ),
+    new ReactionTypePicker(
+      new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
+    ),
+    new ReactionCreator({
+      email: new EmailReactionCreator(
+        new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
+      ),
+      help: new HelpCreator(
+        new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
+      ),
+    })
+  );
+};
+
 new Elysia()
   .post(
     "/triggers",
     async ({ body: trigger }) => {
       console.log("Received trigger:", trigger);
-      const service = new Phoenix(
-        memoryGraph,
-        new Chat({
-          chat: new OLLAMAChatClient({ maxTokens: 1000 }),
-          memory: new Memory(),
-        }),
-        new TriggerEnhancer({
-          email: new EmailTriggerEnhancer(
-            new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
-          ),
-        }),
-        new TriggerFilter(
-          new Chat({
-            chat: new OLLAMAChatClient({ maxTokens: 50 }),
-            memory: new Memory(),
-          })
-        )
-      );
+      const service = buildPhoenix();
 
       const response = await service.handleTrigger(Trigger.parse(trigger));
-
-      console.log("Resolved trigger:", response);
 
       return response;
     },
@@ -81,21 +98,7 @@ new Elysia()
     async ({ body: reaction, params: { reactionId } }) => {
       console.log("Resolving reaction with id:", reactionId);
 
-      const service = new Phoenix(
-        memoryGraph,
-        new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() }),
-        new TriggerEnhancer({
-          email: new EmailTriggerEnhancer(
-            new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
-          ),
-        }),
-        new TriggerFilter(
-          new Chat({
-            chat: new OLLAMAChatClient({ maxTokens: 50 }),
-            memory: new Memory(),
-          })
-        )
-      );
+      const service = buildPhoenix();
 
       const parsedReaction = Reaction.parse(reaction);
 
