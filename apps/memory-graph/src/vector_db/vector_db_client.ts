@@ -57,6 +57,10 @@ export class VectorDBClient implements IVectorDBClient {
   }
 
   async loadFile(filename: string) {
+    if (!(await fs.exists(filename))) {
+      await fs.writeFile(filename, "[]");
+    }
+
     const dataBuffer = await fs.readFile(filename);
     const documents = JSON.parse(dataBuffer.toString());
 

@@ -1,7 +1,7 @@
 import type { Chat } from "./chain/chat";
 import { Reaction, type IReaction } from "./chain/reaction";
 import type { ITrigger } from "./chain/trigger";
-import type { TriggerEnhancer } from "./chain/trigger_enhancer";
+import type { TriggerEnhancer } from "./phoenix_chain/trigger_enhancer/trigger_enhancer";
 import type { TriggerFilter } from "./chain/trigger_filter";
 import type { MemoryGraph } from "./memory_graph/memory_graph";
 

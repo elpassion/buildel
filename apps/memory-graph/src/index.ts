@@ -9,10 +9,11 @@ import { Phoenix } from "./phoenix";
 import { EmbeddingsService } from "./vector_db/embeddings";
 import { OLLAEmbeddingsClient } from "./vector_db/embeddings_client";
 import { Reaction } from "./chain/reaction";
-import { TriggerEnhancer } from "./chain/trigger_enhancer";
+import { TriggerEnhancer } from "./phoenix_chain/trigger_enhancer/trigger_enhancer";
 import { TriggerFilter } from "./chain/trigger_filter";
 import { VectorDB } from "./vector_db/vector_db";
 import { VectorDBClient } from "./vector_db/vector_db_client";
+import { EmailTriggerEnhancer } from "./phoenix_chain/trigger_enhancer/email";
 
 const vectorDbClient = new VectorDBClient();
 
@@ -42,9 +43,11 @@ new Elysia()
           chat: new OLLAMAChatClient({ maxTokens: 1000 }),
           memory: new Memory(),
         }),
-        new TriggerEnhancer(
-          new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
-        ),
+        new TriggerEnhancer({
+          email: new EmailTriggerEnhancer(
+            new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
+          ),
+        }),
         new TriggerFilter(
           new Chat({
             chat: new OLLAMAChatClient({ maxTokens: 50 }),
@@ -81,9 +84,11 @@ new Elysia()
       const service = new Phoenix(
         memoryGraph,
         new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() }),
-        new TriggerEnhancer(
-          new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
-        ),
+        new TriggerEnhancer({
+          email: new EmailTriggerEnhancer(
+            new Chat({ chat: new OLLAMAChatClient(), memory: new Memory() })
+          ),
+        }),
         new TriggerFilter(
           new Chat({
             chat: new OLLAMAChatClient({ maxTokens: 50 }),
