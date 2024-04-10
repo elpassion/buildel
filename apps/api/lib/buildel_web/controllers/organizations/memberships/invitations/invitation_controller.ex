@@ -166,11 +166,45 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
     end
   end
 
+  operation :delete,
+    summary: "Delete invitation",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      id: [in: :path, description: "Invitation ID", type: :integer]
+    ],
+    request_body: nil,
+    responses: [
+      no_content: {"success", "application/json", nil},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def delete(conn, _params) do
+    %{organization_id: organization_id, id: id} = conn.params
+    current_user = conn.assigns.current_user
+
+    with {:ok, _} <-
+           Organizations.get_user_organization(current_user, organization_id),
+         {:ok, invitation} <-
+           Invitations.get_invitation_by_id(id),
+         {:ok, _} <-
+           Invitations.delete_invitation(invitation) do
+      conn
+      |> send_resp(:no_content, "")
+    else
+      err ->
+        err
+    end
+  end
+
   defp invitaiton_url(token) do
     path =
       case Application.fetch_env!(:buildel, :registration_disabled) do
-        true -> "/organizations/invitation/setup?token=#{token}"
-        false -> "/organizations/invitation?token=#{token}"
+        true -> "/invitation/setup?token=#{token}"
+        false -> "/invitation/accept?token=#{token}"
       end
 
     "#{Application.fetch_env!(:buildel, :page_url)}#{path}"

@@ -89,7 +89,7 @@ defmodule BuildelWeb.Router do
     resources(
       "/organizations/:organization_id/invitations",
       OrganizationMembershipInvitationController,
-      only: [:index, :create]
+      only: [:index, :create, :delete]
     )
 
     post(

@@ -8,11 +8,18 @@ defmodule Buildel.Invitations do
   @rand_size 32
 
   def get_invitation_by_id(id) do
-    Repo.get(Invitation, id)
+    case Repo.get(Invitation, id) do
+      nil -> {:error, :not_found}
+      invitation -> {:ok, invitation}
+    end
   end
 
   def list_organization_invitations(organization_id) do
     from(i in Invitation, where: i.organization_id == ^organization_id) |> Repo.all()
+  end
+
+  def delete_invitation(%Invitation{} = invitation) do
+    Repo.delete(invitation)
   end
 
   def deliver_user_invitation_instructions(

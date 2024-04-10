@@ -192,6 +192,27 @@ defmodule BuildelWeb.OrganizationMembershipInvitationControllerTest do
     end
   end
 
+  describe "delete" do
+    test_requires_authentication %{conn: conn, organization: organization} do
+      delete(conn, ~p"/api/organizations/#{organization.id}/invitations/123")
+    end
+
+    test "returns no content if deleted", %{
+      conn: conn,
+      organization: organization
+    } do
+      email = AccountsFixtures.unique_user_email()
+
+      {invitation, _encoded_token} =
+        invitation_fixture(%{organization_id: organization.id, email: email})
+
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization.id}/invitations/#{invitation.id}")
+
+      assert response(conn, 204)
+    end
+  end
+
   defp create_user_organization(%{user: user}) do
     membership = membership_fixture(%{user_id: user.id})
     organization = membership |> Map.get(:organization_id) |> Organizations.get_organization!()
