@@ -18,15 +18,11 @@ export class Chat {
   }
 
   public async generate(outputSchema?: z.ZodSchema): Promise<any> {
-    console.log(this.memory.getMessages());
-
     const newMessage = await this.chatClient.generate(
       this.memory.getMessages()
     );
 
     this.memory.addMessage(newMessage);
-
-    console.log("Generated message:", newMessage.content.trim());
 
     if (outputSchema) {
       const parseResult = outputSchema.safeParse(

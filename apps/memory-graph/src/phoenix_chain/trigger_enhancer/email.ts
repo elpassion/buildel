@@ -6,6 +6,7 @@ import {
   type IEmailTriggerWithSummary,
 } from "../../chain/trigger";
 import { BaseTriggerEnhancer } from "./base";
+import { Logger } from "../../logger";
 
 export class EmailTriggerEnhancer extends BaseTriggerEnhancer {
   constructor(private readonly chat: Chat) {
@@ -13,6 +14,8 @@ export class EmailTriggerEnhancer extends BaseTriggerEnhancer {
   }
 
   async enhance(trigger: IEmailTrigger): Promise<IEmailTriggerWithSummary> {
+    Logger.info(`Enhancing email trigger: ${trigger.title}`);
+
     this.chat.addMessage({
       role: "system",
       content: `
@@ -28,6 +31,10 @@ DO NOT RESPOND WITH ANYTHING ELSE. JUST THE JSON OBJECT IN A FORMAT: { "summary"
     const message = await this.chat.generate(z.object({ summary: z.string() }));
 
     const summary = JSON.parse(message.content).summary;
+
+    Logger.info(
+      `Enhanced email trigger: ${trigger.title} with summary: ${summary}`
+    );
 
     return EmailTriggerWithSummary.parse({
       ...trigger,
