@@ -1,5 +1,9 @@
 import { fetchTyped } from "~/utils/fetch.server";
-import { ISignInSchema, ISignUpSchema } from "./auth.contracts";
+import {
+  ISignInSchema,
+  ISignUpSchema,
+  SignUpInvitation,
+} from "./auth.contracts";
 import z from "zod";
 
 export class AuthApi {
@@ -19,6 +23,12 @@ export class AuthApi {
     });
   }
 
+  signUpInvitation(user: z.TypeOf<typeof SignUpInvitation>) {
+    return this.client(z.any(), `/users/register/invitation`, {
+      method: "POST",
+      body: JSON.stringify({ user }),
+    });
+  }
   resetPassword(email: string) {
     return this.client(z.any(), `/users/password/reset`, {
       method: "POST",
