@@ -26,8 +26,8 @@ defmodule BuildelWeb.UserRegistrationController do
     ]
 
   def check(conn, _params) do
-    case Accounts.check_if_any_account_exists() do
-      :not_found ->
+    case Accounts.registration_mode() do
+      {:ok, :registration_enabled} ->
         conn
         |> put_status(:ok)
         |> json(%{
@@ -36,7 +36,7 @@ defmodule BuildelWeb.UserRegistrationController do
           }
         })
 
-      :ok ->
+      {:error, :registration_disabled} ->
         conn
         |> put_status(:ok)
         |> json(%{

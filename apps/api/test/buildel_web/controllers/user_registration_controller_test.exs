@@ -33,10 +33,11 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
       assert_schema(response, "RegistrationShowResponse", api_spec)
     end
 
-    test "returns registration_disabled true accounts exist", %{
-      conn: conn,
-      api_spec: api_spec
-    } do
+    test "returns registration_disabled false if accounts exist and registration enabled in env",
+         %{
+           conn: conn,
+           api_spec: api_spec
+         } do
       create_user(%{})
 
       conn =
@@ -46,7 +47,7 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
 
       assert response == %{
                "data" => %{
-                 "registration_disabled" => true
+                 "registration_disabled" => false
                }
              }
 

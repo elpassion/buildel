@@ -40,7 +40,12 @@ defmodule Buildel.Accounts do
   def get_or_create_user_by_email(email) when is_binary(email) do
     case get_user_by_email(email) do
       nil ->
-        register_user(%{email: email, password: :crypto.strong_rand_bytes(32) |> Base.encode64()})
+        with {:ok, :registration_enabled} <- registration_mode() do
+          register_user(%{
+            email: email,
+            password: :crypto.strong_rand_bytes(32) |> Base.encode64()
+          })
+        end
 
       user ->
         {:ok, user}

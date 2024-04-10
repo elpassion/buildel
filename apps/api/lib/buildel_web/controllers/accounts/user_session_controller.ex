@@ -77,6 +77,9 @@ defmodule BuildelWeb.UserSessionController do
       |> put_resp_header("location", ~p"/api/users/me")
       |> render(:show, user: user)
     else
+      {:error, :registration_disabled} ->
+        {:error, :forbidden}
+
       {:error, :not_found} ->
         {:error, changeset_error(global: "Invalid username or password")}
 
