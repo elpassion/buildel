@@ -9,6 +9,19 @@ export const handlers = [
       },
     });
   }),
+
+  http.get("/super-api/users/register", () => {
+    return HttpResponse.json(
+      { data: { registration_disabled: false } },
+      {
+        headers: {
+          "Set-Cookie":
+            "_buildel_key=123; path=/; secure; HttpOnly; SameSite=Lax",
+        },
+      }
+    );
+  }),
+
   http.get("/super-api/users/me", () => {
     return HttpResponse.json({ data: { id: 1 } }, { status: 200 });
   }),

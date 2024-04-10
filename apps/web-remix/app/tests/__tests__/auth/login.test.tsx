@@ -9,9 +9,10 @@ import { LoginPage } from "~/components/pages/auth/login/page";
 import { loader } from "~/components/pages/auth/login/loader.server";
 import { action } from "~/components/pages/auth/login/action.server";
 import { errorHandlers, handlers } from "./login.handlers";
+import { handlers as registerHandlers } from "./register.handlers";
 
 describe(LoginPage.name, () => {
-  const setupServer = server(handlers);
+  const setupServer = server([...handlers, ...registerHandlers]);
 
   beforeAll(() => setupServer.listen());
   afterEach(() => setupServer.resetHandlers());

@@ -14,9 +14,10 @@ import { handlers, notMatchHandler } from "./reset-password.handlers";
 import { InputHandle } from "~/tests/handles/Input.handle";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import ResetPasswordSent from "~/routes/_auth.reset-password.sent";
+import { handlers as registerHandlers } from "./register.handlers";
 
 describe("Reset password flow", () => {
-  const setupServer = server(handlers);
+  const setupServer = server([...handlers, ...registerHandlers]);
 
   beforeAll(() => setupServer.listen());
   afterEach(() => setupServer.resetHandlers());
