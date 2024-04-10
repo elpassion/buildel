@@ -17,7 +17,7 @@ import { GoogleButton } from "~/components/googleAuth/GoogleButton";
 import { routes } from "~/utils/routes.utils";
 
 export function LoginPage() {
-  const { googleLoginEnabled } = useLoaderData<typeof loader>();
+  const { googleLoginEnabled, signupEnabled } = useLoaderData<typeof loader>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo");
@@ -27,19 +27,21 @@ export function LoginPage() {
       <h1 className="text-center text-3xl font-bold text-neutral-100">
         Sign in to account
       </h1>
-      <p className="text-center text-neutral-100">
-        Don't have an account?{" "}
-        <Link
-          to={{
-            pathname: "/register",
-            search: searchParams.toString(),
-          }}
-          className="text-primary-500"
-        >
-          Sign up
-        </Link>{" "}
-        for an account now.
-      </p>
+      {signupEnabled && (
+        <p className="text-center text-neutral-100">
+          Don't have an account?{" "}
+          <Link
+            to={{
+              pathname: "/register",
+              search: searchParams.toString(),
+            }}
+            className="text-primary-500"
+          >
+            Sign up
+          </Link>{" "}
+          for an account now.
+        </p>
+      )}
 
       <ValidatedForm
         validator={validator}
