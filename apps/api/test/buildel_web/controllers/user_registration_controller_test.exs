@@ -111,7 +111,7 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
 
       assert json_response(conn, 422) == %{
                "errors" => %{
-                 "global" => ["email has already been taken"]
+                 "global" => ["Email has already been taken."]
                }
              }
     end
@@ -121,7 +121,7 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
     setup [:create_user, :create_user_organization]
 
     @tag :capture_log
-    test "creates account and logs the user in", %{
+    test "creates account, adds user to organization and logs the user in", %{
       conn: conn,
       api_spec: api_spec,
       organization: organization
@@ -144,7 +144,18 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
 
       assert get_session(conn, :user_token)
       conn = get(conn, ~p"/api/users/me")
-      json_response(conn, 200)
+      assert json_response(conn, 200)
+
+      conn = get(conn, ~p"/api/organizations")
+
+      assert json_response(conn, 200) == %{
+               "data" => [
+                 %{
+                   "id" => organization.id,
+                   "name" => organization.name
+                 }
+               ]
+             }
     end
 
     test "render errors for invalid data", %{conn: conn} do

@@ -5,6 +5,7 @@ defmodule BuildelWeb.UserRegistrationController do
   alias Buildel.Accounts
   alias Buildel.Accounts.User
   alias Buildel.Invitations
+  alias Buildel.Organizations
 
   alias BuildelWeb.UserAuth
 
@@ -61,7 +62,8 @@ defmodule BuildelWeb.UserRegistrationController do
   def create(conn, _params) do
     %{user: user_params} = conn.body_params
 
-    with {:ok, %User{} = user} <- Accounts.register_user(user_params),
+    with {:ok, _} <- registration_mode(),
+         {:ok, %User{} = user} <- Accounts.register_user(user_params),
          {:ok, _} =
            Accounts.deliver_user_confirmation_instructions(
              user,
@@ -77,17 +79,14 @@ defmodule BuildelWeb.UserRegistrationController do
       |> put_resp_header("location", ~p"/api/users/me")
       |> render(:show, user: user)
     else
+      {:error, :registration_disabled} ->
+        {:error, :forbidden}
+
       {:error, %Ecto.Changeset{action: :insert}} ->
         {:error,
-         %Ecto.Changeset{
-           action: :validate,
-           errors:
-             %{global: "email has already been taken"}
-             |> Enum.map(fn {key, value} -> {key, {value, []}} end)
-             |> Enum.into(%{}),
-           changes: %{},
-           types: %{}
-         }}
+         changeset_for_errors(%{
+           global: "Email has already been taken."
+         })}
 
       e ->
         e
@@ -117,6 +116,12 @@ defmodule BuildelWeb.UserRegistrationController do
              email: invitation.email,
              password: user_params.password
            }),
+         {:ok, _membership} <-
+           Organizations.create_membership(%{
+             organization_id: invitation.organization_id,
+             user_id: user.id
+           }),
+         {:ok, _} <- Invitations.resolve_invitation(invitation),
          {:ok, _} =
            Accounts.deliver_user_confirmation_instructions(
              user,
@@ -158,6 +163,17 @@ defmodule BuildelWeb.UserRegistrationController do
 
       e ->
         e
+    end
+  end
+
+  defp registration_mode() do
+    with true <- Application.fetch_env!(:buildel, :registration_disabled) do
+      case Accounts.check_if_any_account_exist() do
+        :not_found -> {:ok, :registration_enabled}
+        :ok -> {:error, :registration_disabled}
+      end
+    else
+      false -> {:ok, :registration_enabled}
     end
   end
 
