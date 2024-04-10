@@ -16,6 +16,36 @@ defmodule BuildelWeb.UserRegistrationController do
 
   tags ["user"]
 
+  operation :check,
+    summary: "Check if registration is possible",
+    parameters: [],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Registrations.ShowResponse}
+    ]
+
+  def check(conn, _params) do
+    case Accounts.check_if_any_account_exist() do
+      :not_found ->
+        conn
+        |> put_status(:ok)
+        |> json(%{
+          data: %{
+            registration_disabled: false
+          }
+        })
+
+      :ok ->
+        conn
+        |> put_status(:ok)
+        |> json(%{
+          data: %{
+            registration_disabled: true
+          }
+        })
+    end
+  end
+
   operation :create,
     summary: "Create user registration request",
     parameters: [],

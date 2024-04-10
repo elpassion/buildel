@@ -28,8 +28,11 @@ defmodule Buildel.Accounts do
 
   def get_or_create_user_by_email(email) when is_binary(email) do
     case get_user_by_email(email) do
-      nil -> register_user(%{email: email, password: :crypto.strong_rand_bytes(32) |> Base.encode64()})
-      user -> {:ok, user}
+      nil ->
+        register_user(%{email: email, password: :crypto.strong_rand_bytes(32) |> Base.encode64()})
+
+      user ->
+        {:ok, user}
     end
   end
 
@@ -347,6 +350,13 @@ defmodule Buildel.Accounts do
     |> case do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
+    end
+  end
+
+  def check_if_any_account_exist() do
+    case Repo.one(from(u in User)) do
+      %User{} -> :ok
+      _ -> :not_found
     end
   end
 end

@@ -14,6 +14,46 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
        |> put_req_header("content-type", "application/json")}
   end
 
+  describe "GET /api/users/register" do
+    test "returns registration_disabled false if no accounts exist", %{
+      conn: conn,
+      api_spec: api_spec
+    } do
+      conn =
+        get(conn, ~p"/api/users/register")
+
+      response = json_response(conn, 200)
+
+      assert response == %{
+               "data" => %{
+                 "registration_disabled" => false
+               }
+             }
+
+      assert_schema(response, "RegistrationShowResponse", api_spec)
+    end
+
+    test "returns registration_disabled true accounts exist", %{
+      conn: conn,
+      api_spec: api_spec
+    } do
+      create_user(%{})
+
+      conn =
+        get(conn, ~p"/api/users/register")
+
+      response = json_response(conn, 200)
+
+      assert response == %{
+               "data" => %{
+                 "registration_disabled" => true
+               }
+             }
+
+      assert_schema(response, "RegistrationShowResponse", api_spec)
+    end
+  end
+
   describe "POST /api/users/register" do
     @tag :capture_log
     test "creates account and logs the user in", %{conn: conn, api_spec: api_spec} do

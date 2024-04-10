@@ -191,6 +191,8 @@ defmodule BuildelWeb.Router do
 
     post("/users/register/invitation", UserRegistrationController, :invitation_create)
 
+    get("/users/register", UserRegistrationController, :check)
+
     pipe_through(:disable_registration)
     post("/users/register", UserRegistrationController, :create)
   end
