@@ -11,7 +11,7 @@ import {
 import z from "zod";
 
 export class OrganizationApi {
-  constructor(private client: typeof fetchTyped) {}
+  constructor(private client: typeof fetchTyped) { }
 
   getOrganizations() {
     return this.client(OrganizationsResponse, "/organizations");
@@ -59,6 +59,16 @@ export class OrganizationApi {
       {
         method: "POST",
         body: JSON.stringify(data),
+      }
+    );
+  }
+
+  deleteInvitation(organizationId: string | number, invitationId: string | number) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/invitations/${invitationId}`,
+      {
+        method: "DELETE",
       }
     );
   }
