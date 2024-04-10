@@ -56,7 +56,12 @@ defmodule BuildelWeb.Schemas.Invitations do
       title: "InvitationCreateRequest",
       type: :object,
       properties: %{
-        email: %Schema{type: :string, description: "Invited user email"}
+        email: %Schema{
+          type: :string,
+          description: "Invited user email",
+          pattern: ~r/^[^\s]+@[^\s]+$/,
+          example: "email@email.com"
+        }
       },
       required: [:email]
     })

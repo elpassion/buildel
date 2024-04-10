@@ -1,7 +1,6 @@
 defmodule BuildelWeb.OrganizationMembershipInvitationController do
   use BuildelWeb, :controller
   use OpenApiSpex.ControllerSpecs
-
   import BuildelWeb.UserAuth
 
   alias Buildel.Organizations
@@ -75,7 +74,7 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
            Invitations.deliver_user_invitation_instructions(
              user_email,
              fn token ->
-               "#{Application.fetch_env!(:buildel, :page_url)}/organizations/invitation?token=#{token}"
+               invitaiton_url(token)
              end,
              organization.id,
              user_id
@@ -125,6 +124,7 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
 
     with {:ok, hashed_token} <- Invitations.verify_token(token),
          {:ok, invitation} <- Invitations.get_invitation_by_token(hashed_token),
+         {:ok, invitation} <- Invitations.verify_invitation(invitation),
          {:ok, user} <- verify_invitation_email(user, invitation.email),
          {:ok, user_id} <- verify_existing_membership(user, invitation.organization_id),
          {:ok, _membership} <-
@@ -137,6 +137,12 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
       |> put_status(:ok)
       |> json(%{})
     else
+      {:error, :invitation_expired} ->
+        {:error,
+         changeset_for_errors(%{
+           "invitation.token": "Invitation expired."
+         })}
+
       {:error, :email_mismatch} ->
         {:error,
          changeset_for_errors(%{
@@ -158,6 +164,50 @@ defmodule BuildelWeb.OrganizationMembershipInvitationController do
       err ->
         err
     end
+  end
+
+  operation :delete,
+    summary: "Delete invitation",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      id: [in: :path, description: "Invitation ID", type: :integer]
+    ],
+    request_body: nil,
+    responses: [
+      no_content: {"success", "application/json", nil},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def delete(conn, _params) do
+    %{organization_id: organization_id, id: id} = conn.params
+    current_user = conn.assigns.current_user
+
+    with {:ok, _} <-
+           Organizations.get_user_organization(current_user, organization_id),
+         {:ok, invitation} <-
+           Invitations.get_invitation_by_id(id),
+         {:ok, _} <-
+           Invitations.delete_invitation(invitation) do
+      conn
+      |> send_resp(:no_content, "")
+    else
+      err ->
+        err
+    end
+  end
+
+  defp invitaiton_url(token) do
+    path =
+      case Application.fetch_env!(:buildel, :registration_disabled) do
+        true -> "/invitation/setup?token=#{token}"
+        false -> "/invitation/accept?token=#{token}"
+      end
+
+    "#{Application.fetch_env!(:buildel, :page_url)}#{path}"
   end
 
   defp verify_invitation_email(%Buildel.Accounts.User{} = user, email) do

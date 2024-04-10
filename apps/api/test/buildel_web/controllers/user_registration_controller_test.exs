@@ -2,12 +2,57 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
   use BuildelWeb.ConnCase, async: true
 
   import Buildel.AccountsFixtures
+  import Buildel.OrganizationsFixtures
+
+  alias Buildel.AccountsFixtures
+  alias Buildel.Organizations
 
   setup %{conn: conn} do
     {:ok,
      conn:
        put_req_header(conn, "accept", "application/json")
        |> put_req_header("content-type", "application/json")}
+  end
+
+  describe "GET /api/users/register" do
+    test "returns registration_disabled false if no accounts exist", %{
+      conn: conn,
+      api_spec: api_spec
+    } do
+      conn =
+        get(conn, ~p"/api/users/register")
+
+      response = json_response(conn, 200)
+
+      assert response == %{
+               "data" => %{
+                 "registration_disabled" => false
+               }
+             }
+
+      assert_schema(response, "RegistrationShowResponse", api_spec)
+    end
+
+    test "returns registration_disabled false if accounts exist and registration enabled in env",
+         %{
+           conn: conn,
+           api_spec: api_spec
+         } do
+      create_user(%{})
+
+      conn =
+        get(conn, ~p"/api/users/register")
+
+      response = json_response(conn, 200)
+
+      assert response == %{
+               "data" => %{
+                 "registration_disabled" => false
+               }
+             }
+
+      assert_schema(response, "RegistrationShowResponse", api_spec)
+    end
   end
 
   describe "POST /api/users/register" do
@@ -67,9 +112,108 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
 
       assert json_response(conn, 422) == %{
                "errors" => %{
-                 "global" => ["email has already been taken"]
+                 "global" => ["Email has already been taken."]
                }
              }
     end
+  end
+
+  describe "POST /api/users/register/invitation" do
+    setup [:create_user, :create_user_organization]
+
+    @tag :capture_log
+    test "creates account, adds user to organization and logs the user in", %{
+      conn: conn,
+      api_spec: api_spec,
+      organization: organization
+    } do
+      email = unique_user_email()
+
+      {_invitation, encoded_token} =
+        invitation_fixture(%{organization_id: organization.id, email: email})
+
+      conn =
+        post(conn, ~p"/api/users/register/invitation", %{
+          "user" => %{
+            "token" => encoded_token,
+            "password" => valid_user_password()
+          }
+        })
+
+      response = json_response(conn, 201)
+      assert_schema(response, "UserShowResponse", api_spec)
+
+      assert get_session(conn, :user_token)
+      conn = get(conn, ~p"/api/users/me")
+      assert json_response(conn, 200)
+
+      conn = get(conn, ~p"/api/organizations")
+
+      assert json_response(conn, 200) == %{
+               "data" => [
+                 %{
+                   "id" => organization.id,
+                   "name" => organization.name
+                 }
+               ]
+             }
+    end
+
+    test "render errors for invalid data", %{conn: conn} do
+      conn =
+        post(conn, ~p"/api/users/register/invitation", %{
+          "user" => %{"token" => 123, "password" => "too short"}
+        })
+
+      assert json_response(conn, 422) == %{
+               "errors" => %{
+                 "user" => %{
+                   "token" => ["Invalid string. Got: integer"],
+                   "password" => ["String length is smaller than minLength: 12"]
+                 }
+               }
+             }
+    end
+
+    test "returns error if invitation expired", %{
+      conn: conn,
+      organization: organization
+    } do
+      email = unique_user_email()
+
+      {_invitation, encoded_token} =
+        invitation_fixture(%{
+          organization_id: organization.id,
+          email: email,
+          expires_at: DateTime.utc_now() |> DateTime.add(-1, :day) |> DateTime.truncate(:second)
+        })
+
+      conn =
+        post(conn, ~p"/api/users/register/invitation", %{
+          "user" => %{
+            "token" => encoded_token,
+            "password" => valid_user_password()
+          }
+        })
+
+      response = json_response(conn, 422)
+
+      assert response == %{
+               "errors" => %{
+                 "invitation.email" => ["Invitation expired."]
+               }
+             }
+    end
+  end
+
+  defp create_user_organization(%{user: user}) do
+    membership = membership_fixture(%{user_id: user.id})
+    organization = membership |> Map.get(:organization_id) |> Organizations.get_organization!()
+    %{organization: organization}
+  end
+
+  defp create_user(_) do
+    user = AccountsFixtures.user_fixture()
+    %{user: user}
   end
 end

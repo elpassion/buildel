@@ -165,6 +165,52 @@ defmodule BuildelWeb.OrganizationMembershipInvitationControllerTest do
                "invitation.email" => ["Email mismatch."]
              } = response["errors"]
     end
+
+    test "returns invitation expired error", %{
+      conn: conn,
+      organization: organization
+    } do
+      log_out_user(conn)
+      %{user: another_user} = create_user(%{})
+      conn = log_in_user(conn, another_user)
+
+      {_invitation, encoded_token} =
+        invitation_fixture(%{
+          organization_id: organization.id,
+          email: another_user.email,
+          expires_at: DateTime.utc_now() |> DateTime.add(-1, :day) |> DateTime.truncate(:second)
+        })
+
+      conn =
+        post(conn, ~p"/api/organizations/invitations/accept?token=#{encoded_token}")
+
+      response = json_response(conn, 422)
+
+      assert %{
+               "invitation.token" => ["Invitation expired."]
+             } = response["errors"]
+    end
+  end
+
+  describe "delete" do
+    test_requires_authentication %{conn: conn, organization: organization} do
+      delete(conn, ~p"/api/organizations/#{organization.id}/invitations/123")
+    end
+
+    test "returns no content if deleted", %{
+      conn: conn,
+      organization: organization
+    } do
+      email = AccountsFixtures.unique_user_email()
+
+      {invitation, _encoded_token} =
+        invitation_fixture(%{organization_id: organization.id, email: email})
+
+      conn =
+        delete(conn, ~p"/api/organizations/#{organization.id}/invitations/#{invitation.id}")
+
+      assert response(conn, 204)
+    end
   end
 
   defp create_user_organization(%{user: user}) do

@@ -26,10 +26,29 @@ defmodule Buildel.Accounts do
     Repo.get_by(User, email: email)
   end
 
+  def registration_mode() do
+    with true <- Application.fetch_env!(:buildel, :registration_disabled) do
+      case check_if_any_account_exists() do
+        :not_found -> {:ok, :registration_enabled}
+        :ok -> {:error, :registration_disabled}
+      end
+    else
+      false -> {:ok, :registration_enabled}
+    end
+  end
+
   def get_or_create_user_by_email(email) when is_binary(email) do
     case get_user_by_email(email) do
-      nil -> register_user(%{email: email, password: :crypto.strong_rand_bytes(32) |> Base.encode64()})
-      user -> {:ok, user}
+      nil ->
+        with {:ok, :registration_enabled} <- registration_mode() do
+          register_user(%{
+            email: email,
+            password: :crypto.strong_rand_bytes(32) |> Base.encode64()
+          })
+        end
+
+      user ->
+        {:ok, user}
     end
   end
 
@@ -347,6 +366,13 @@ defmodule Buildel.Accounts do
     |> case do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
+    end
+  end
+
+  def check_if_any_account_exists() do
+    case Repo.one(from(u in User, select: count(u.id))) do
+      0 -> :not_found
+      _ -> :ok
     end
   end
 end

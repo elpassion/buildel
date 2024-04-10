@@ -84,7 +84,7 @@ defmodule BuildelWeb.Router do
     resources(
       "/organizations/:organization_id/invitations",
       OrganizationMembershipInvitationController,
-      only: [:index, :create]
+      only: [:index, :create, :delete]
     )
 
     post(
@@ -159,7 +159,6 @@ defmodule BuildelWeb.Router do
 
     post("/organizations/:organization_id/tools/chunks", OrganizationToolChunkController, :create)
 
-    post("/users/register", UserRegistrationController, :create)
     get("/users/me", UserController, :me)
     post("/users/log_in", UserSessionController, :create)
     post("/users/google/log_in", UserSessionController, :create_google)
@@ -180,6 +179,10 @@ defmodule BuildelWeb.Router do
     )
 
     post("/channel_auth", ChannelAuthController, :create)
+
+    post("/users/register/invitation", UserRegistrationController, :invitation_create)
+    get("/users/register", UserRegistrationController, :check)
+    post("/users/register", UserRegistrationController, :create)
   end
 
   scope "/api" do
