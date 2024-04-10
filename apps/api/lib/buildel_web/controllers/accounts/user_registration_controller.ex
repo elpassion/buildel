@@ -26,7 +26,7 @@ defmodule BuildelWeb.UserRegistrationController do
     ]
 
   def check(conn, _params) do
-    case Accounts.check_if_any_account_exist() do
+    case Accounts.check_if_any_account_exists() do
       :not_found ->
         conn
         |> put_status(:ok)
@@ -62,7 +62,7 @@ defmodule BuildelWeb.UserRegistrationController do
   def create(conn, _params) do
     %{user: user_params} = conn.body_params
 
-    with {:ok, _} <- registration_mode(),
+    with {:ok, _} <- Accounts.registration_mode(),
          {:ok, %User{} = user} <- Accounts.register_user(user_params),
          {:ok, _} =
            Accounts.deliver_user_confirmation_instructions(
@@ -163,17 +163,6 @@ defmodule BuildelWeb.UserRegistrationController do
 
       e ->
         e
-    end
-  end
-
-  defp registration_mode() do
-    with true <- Application.fetch_env!(:buildel, :registration_disabled) do
-      case Accounts.check_if_any_account_exist() do
-        :not_found -> {:ok, :registration_enabled}
-        :ok -> {:error, :registration_disabled}
-      end
-    else
-      false -> {:ok, :registration_enabled}
     end
   end
 
