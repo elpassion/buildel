@@ -5,6 +5,7 @@ import { OrganizationApi } from "~/api/organization/OrganizationApi";
 import invariant from "tiny-invariant";
 import { routes } from "~/utils/routes.utils";
 import { setServerToast } from "~/utils/toast.server";
+import { ValidationError } from "~/utils/errors";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {
@@ -17,17 +18,35 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const organizationApi = new OrganizationApi(fetch);
 
-    await organizationApi.acceptInvitation(token);
+    try {
+      await organizationApi.acceptInvitation(token);
 
-    return redirect(routes.dashboard, {
-      headers: {
-        "Set-Cookie": await setServerToast(request, {
-          success: {
-            title: "Invitation accepted",
-            description: `You've been added to organization.`,
-          },
-        }),
-      },
-    });
+      return redirect(routes.dashboard, {
+        headers: {
+          "Set-Cookie": await setServerToast(request, {
+            success: {
+              title: "Invitation accepted",
+              description: `You've been added to organization.`,
+            },
+          }),
+        },
+      });
+    } catch (e) {
+      let errorDescription = `Something went wrong with invitation process.`;
+      if (e instanceof ValidationError) {
+        errorDescription = `This invitation was sent to a different email address.`;
+      }
+
+      return redirect(routes.dashboard, {
+        headers: {
+          "Set-Cookie": await setServerToast(request, {
+            error: {
+              title: "Invitation failed",
+              description: errorDescription,
+            },
+          }),
+        },
+      });
+    }
   })(args);
 }
