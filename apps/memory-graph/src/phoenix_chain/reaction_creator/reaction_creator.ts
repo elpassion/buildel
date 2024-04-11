@@ -15,6 +15,7 @@ export class ReactionCreator extends BaseReactionCreator {
 
   public async create(args: {
     reactionType: IReaction["type"];
+    reactionReason: string;
     trigger: IEnhancedTrigger;
     relatedTriggersWithReactions: IEnhancedTriggerWithReactions[];
   }): Promise<IReaction> {

@@ -25,8 +25,34 @@ Send me back the summary in a json format like so: { "summary": "Your summary he
 DO NOT RESPOND WITH ANYTHING ELSE. JUST THE JSON OBJECT IN A FORMAT: { "summary": "Your summary here" }.
 `.trim(),
     });
+    const exampleEmail = `
+Hello, I am writing to you to ask for help.
+I have a problem with my computer.
+It is not turning on.
+I would appreciate your help.
+Thank you.
+    `.trim();
 
-    this.chat.addMessage({ role: "user", content: `Email:\n ${trigger.body}` });
+    const exampleEmailSummary = `
+The user is asking for help with their computer.
+The computer is not turning on.
+The user would appreciate help.
+`.trim();
+
+    this.chat.addMessage({ role: "user", content: `Email:\n ${exampleEmail}` });
+
+    this.chat.addMessage({
+      role: "assistant",
+      content: JSON.stringify({ summary: exampleEmailSummary }),
+    });
+
+    this.chat.addMessage({
+      role: "user",
+      content: `Email:\n ${trigger.body.replaceAll(
+        new RegExp(/<https?:\/\/.*>/g),
+        "URL"
+      )}`,
+    });
 
     const message = await this.chat.generate(z.object({ summary: z.string() }));
 
@@ -38,6 +64,7 @@ DO NOT RESPOND WITH ANYTHING ELSE. JUST THE JSON OBJECT IN A FORMAT: { "summary"
 
     return EmailTriggerWithSummary.parse({
       ...trigger,
+      body: trigger.body.replaceAll(new RegExp(/<https?:\/\/.*>/g), "URL"),
       summary: summary.trim(),
     });
   }

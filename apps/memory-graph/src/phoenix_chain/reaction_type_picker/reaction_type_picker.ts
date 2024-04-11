@@ -11,13 +11,20 @@ export class ReactionTypePicker {
   public async pickReactionType(
     baseTrigger: IEnhancedTrigger,
     similarTriggers: IEnhancedTriggerWithReactions[]
-  ): Promise<{ type: IReaction["type"] }> {
+  ): Promise<{ type: IReaction["type"]; reason: string }> {
     this.chat.addMessage({
       role: "system",
       content: ReactionTypePicker.systemMessage(),
     });
-    if (similarTriggers.flatMap((t) => t.reactions).length < 3) {
-      return { type: "ask_for_help" };
+    const reactionsCount = similarTriggers.flatMap((t) => t.reactions).length;
+    if (reactionsCount < 2) {
+      Logger.debug(
+        `Not enough similar reactions to determine. Found ${reactionsCount} reactions. Asking for help.`
+      );
+      return {
+        type: "ask_for_help",
+        reason: "Not enough similar reactions to determine. Asking for help.",
+      };
     }
 
     similarTriggers.forEach((triggerWithReactions) => {
@@ -28,7 +35,10 @@ export class ReactionTypePicker {
         });
         this.chat.addMessage({
           role: "assistant",
-          content: JSON.stringify({ type: reaction.metadata.type }),
+          content: JSON.stringify({
+            type: reaction.metadata.type,
+            reason: reaction.metadata.reason,
+          }),
         });
       });
     });
@@ -48,6 +58,7 @@ export class ReactionTypePicker {
           z.literal("respond_to_email"),
           z.literal("ask_for_help"),
         ]),
+        reason: z.string(),
       })
     );
 
@@ -65,7 +76,7 @@ INSTRUCTIONS:
 1. You will receive a trigger in a form: { type: "trigger_type", ...metadata }
 2. Look at the trigger and try to understand it.
 3. Based on that, decide on your own reaction.
-4. Write it in a form of json: {"type": "reaction_type"}.
+4. Write it in a form of json: {"type": "reaction_type", "reason": "Why you picked this reaction"}.
 
 ONLY AVAILABLE REACTIONS ARE:
 

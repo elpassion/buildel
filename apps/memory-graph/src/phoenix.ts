@@ -24,7 +24,7 @@ export class Phoenix {
 
     const results = await this.memoryGraph.searchForTriggersWithReactions(
       enhancedTrigger,
-      3
+      5
     );
     const filteredTriggersWithReactions =
       await this.triggerFilter.filterMultiple(
@@ -37,6 +37,7 @@ export class Phoenix {
     );
     const reaction = await this.reactionCreator.create({
       reactionType: reactionType.type,
+      reactionReason: reactionType.reason,
       trigger: enhancedTrigger,
       relatedTriggersWithReactions: filteredTriggersWithReactions,
     });

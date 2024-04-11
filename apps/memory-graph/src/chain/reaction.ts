@@ -6,6 +6,7 @@ export class ReactionService {
 
 export const AskForHelpReaction = z.object({
   type: z.literal("ask_for_help"),
+  reason: z.string(),
   message: z.string(),
 });
 
@@ -20,6 +21,7 @@ export type IArchiveReaction = z.infer<typeof ArchiveReaction>;
 
 export const LogReaction = z.object({
   type: z.literal("send_log"),
+  reason: z.string(),
   log: z.string(),
 });
 
@@ -27,6 +29,7 @@ export type ILogReaction = z.infer<typeof LogReaction>;
 
 export const UploadInvoiceReaction = z.object({
   type: z.literal("upload_invoice"),
+  reason: z.string(),
   invoice: z.string(),
 });
 
@@ -34,6 +37,7 @@ export type IUploadInvoiceReaction = z.infer<typeof UploadInvoiceReaction>;
 
 export const SendEmailReaction = z.object({
   type: z.literal("respond_to_email"),
+  reason: z.string(),
   email: z.string(),
   subject: z.string(),
   body: z.string(),

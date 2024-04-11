@@ -1,14 +1,10 @@
 import { z } from "zod";
 import type { Chat } from "../../chain/chat";
-import type {
-  IAskForHelpReaction,
-  IReaction,
-  ISendEmailReaction,
-} from "../../chain/reaction";
+import type { IAskForHelpReaction, IReaction } from "../../chain/reaction";
 import { type IEnhancedTrigger } from "../../chain/trigger";
+import { Logger } from "../../logger";
 import type { IEnhancedTriggerWithReactions } from "../../types";
 import { BaseReactionCreator } from "./base";
-import { Logger } from "../../logger";
 
 export class HelpCreator extends BaseReactionCreator {
   constructor(private readonly chat: Chat) {
@@ -17,6 +13,7 @@ export class HelpCreator extends BaseReactionCreator {
 
   async create(args: {
     reactionType: IReaction["type"];
+    reactionReason: string;
     trigger: IEnhancedTrigger;
     relatedTriggersWithReactions: IEnhancedTriggerWithReactions[];
   }): Promise<IAskForHelpReaction> {
@@ -31,7 +28,10 @@ export class HelpCreator extends BaseReactionCreator {
         if (reaction.metadata.type !== "ask_for_help") return;
         this.chat.addMessage({
           role: "user",
-          content: HelpCreator.userMessage(relatedTrigger.trigger),
+          content: HelpCreator.userMessage(
+            relatedTrigger.trigger,
+            reaction.metadata.reason
+          ),
         });
         this.chat.addMessage({
           role: "assistant",
@@ -42,7 +42,7 @@ export class HelpCreator extends BaseReactionCreator {
 
     this.chat.addMessage({
       role: "user",
-      content: HelpCreator.userMessage(args.trigger),
+      content: HelpCreator.userMessage(args.trigger, args.reactionReason),
     });
 
     const message = await this.chat.generate(z.object({ message: z.string() }));
@@ -51,22 +51,30 @@ export class HelpCreator extends BaseReactionCreator {
 
     return {
       type: "ask_for_help",
+      reason: args.reactionReason,
       message: message.message,
     };
   }
 
-  static userMessage(trigger: IEnhancedTrigger): string {
+  static userMessage(
+    trigger: IEnhancedTrigger,
+    reactionReason: string
+  ): string {
+    let message = `Reason for asking for help: ${reactionReason}\n Trigger:`;
     switch (trigger.type) {
       case "email_received":
-        return JSON.stringify({
+        message += JSON.stringify({
           type: trigger.type,
           title: trigger.title,
           from: trigger.from,
           summary: trigger.summary,
         });
+        break;
       case "feedback_received":
-        return JSON.stringify(trigger);
+        message += JSON.stringify(trigger);
     }
+
+    return message;
   }
 
   static assistantMessage(reaction: IAskForHelpReaction): string {

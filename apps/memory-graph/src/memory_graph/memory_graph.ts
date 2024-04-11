@@ -171,19 +171,6 @@ export class MemoryGraph {
     return { id };
   }
 
-  async searchForEmailTriggers(query: string, top_k: number) {
-    const [embedding] = await this.embeddings.generate([query]);
-
-    const { documents } = await this.vectorDB.query(embedding, top_k);
-
-    return documents.map((document) => {
-      return {
-        id: document.document.id,
-        trigger: EmailTrigger.parse(document.document.metadata.event),
-      };
-    });
-  }
-
   async searchForTriggersWithReactions(
     trigger: IEnhancedTrigger,
     top_k: number
@@ -193,13 +180,13 @@ export class MemoryGraph {
   }> {
     const query = this.formatTrigger(trigger);
 
-    Logger.debug(`Searching for triggers with reactions for query: ${query}`);
+    Logger.debug(`Searching for triggers with reactions for query`);
 
     const [embedding] = await this.embeddings.generate([query]);
 
     const { documents } = await this.vectorDB.query(embedding, top_k);
 
-    const triggersWithReactions = await Promise.all(
+    let triggersWithReactions = await Promise.all(
       documents.map(async (document) => {
         const reactions = await this.graphDB.getRelationsToType({
           id: document.document.id,
@@ -215,8 +202,12 @@ export class MemoryGraph {
       })
     );
 
+    triggersWithReactions = triggersWithReactions.filter(
+      (triggerWithReactions) => triggerWithReactions.reactions.length > 0
+    );
+
     Logger.debug(
-      `Found ${triggersWithReactions.length} triggers with reactions for query: ${query}`
+      `Found ${triggersWithReactions.length} triggers with reactions for query`
     );
 
     const queryId = randomUUID();

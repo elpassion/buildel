@@ -29,7 +29,7 @@ export class TriggerFilter {
     }
 
     Logger.debug(
-      `Found ${relatedTriggers.length} related triggers for trigger ${baseTrigger.type}`
+      `\nFound ${relatedTriggers.length} related triggers for trigger ${baseTrigger.type}\n`
     );
 
     return relatedTriggers;

@@ -13,6 +13,7 @@ export class EmailReactionCreator extends BaseReactionCreator {
 
   async create(args: {
     reactionType: IReaction["type"];
+    reactionReason: string;
     trigger: IEnhancedTrigger;
     relatedTriggersWithReactions: IEnhancedTriggerWithReactions[];
   }): Promise<ISendEmailReaction> {
@@ -27,7 +28,10 @@ export class EmailReactionCreator extends BaseReactionCreator {
         if (reaction.metadata.type !== "respond_to_email") return;
         this.chat.addMessage({
           role: "user",
-          content: EmailReactionCreator.userMessage(relatedTrigger.trigger),
+          content: EmailReactionCreator.userMessage(
+            relatedTrigger.trigger,
+            reaction.metadata.reason
+          ),
         });
         this.chat.addMessage({
           role: "assistant",
@@ -38,7 +42,10 @@ export class EmailReactionCreator extends BaseReactionCreator {
 
     this.chat.addMessage({
       role: "user",
-      content: EmailReactionCreator.userMessage(args.trigger),
+      content: EmailReactionCreator.userMessage(
+        args.trigger,
+        args.reactionReason
+      ),
     });
 
     const email = await this.chat.generate(
@@ -49,24 +56,32 @@ export class EmailReactionCreator extends BaseReactionCreator {
 
     return {
       type: "respond_to_email",
+      reason: args.reactionReason,
       email: email.email,
       subject: email.subject,
       body: email.body,
     };
   }
 
-  static userMessage(trigger: IEnhancedTrigger): string {
+  static userMessage(
+    trigger: IEnhancedTrigger,
+    reactionReason: string
+  ): string {
+    let message = `Reason for writing email: ${reactionReason}\n Trigger:`;
     switch (trigger.type) {
       case "email_received":
-        return JSON.stringify({
+        message += JSON.stringify({
           type: trigger.type,
           title: trigger.title,
           from: trigger.from,
           summary: trigger.summary,
         });
+        break;
       case "feedback_received":
-        return JSON.stringify(trigger);
+        message += JSON.stringify(trigger);
     }
+
+    return message;
   }
 
   static assistantMessage(reaction: ISendEmailReaction): string {
