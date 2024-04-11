@@ -172,13 +172,13 @@ export class MemoryGraph {
   }
 
   async searchForTriggersWithReactions(
-    trigger: IEnhancedTrigger,
+    trigger: { id: string; trigger: IEnhancedTrigger },
     top_k: number
   ): Promise<{
     queryId: string;
     triggersWithReactions: IEnhancedTriggerWithReactions[];
   }> {
-    const query = this.formatTrigger(trigger);
+    const query = this.formatTrigger(trigger.trigger);
 
     Logger.debug(`Searching for triggers with reactions for query`);
 
@@ -202,9 +202,13 @@ export class MemoryGraph {
       })
     );
 
-    triggersWithReactions = triggersWithReactions.filter(
-      (triggerWithReactions) => triggerWithReactions.reactions.length > 0
-    );
+    triggersWithReactions = triggersWithReactions
+      .filter(
+        (triggerWithReactions) => triggerWithReactions.documentId !== trigger.id
+      )
+      .filter(
+        (triggerWithReactions) => triggerWithReactions.reactions.length > 0
+      );
 
     Logger.debug(
       `Found ${triggersWithReactions.length} triggers with reactions for query`

@@ -23,7 +23,7 @@ export class Phoenix {
     const triggerToSave = await this.memoryGraph.saveTrigger(enhancedTrigger);
 
     const results = await this.memoryGraph.searchForTriggersWithReactions(
-      enhancedTrigger,
+      { id: triggerToSave.id, trigger: enhancedTrigger },
       5
     );
     const filteredTriggersWithReactions =

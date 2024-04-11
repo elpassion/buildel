@@ -42,7 +42,7 @@ export class OLLAMAChatClient implements IChatClient {
   public async generate(messages: IMessage[]): Promise<IMessage> {
     const completion = await this.openAi.chat.completions.create({
       messages: messages,
-      model: "mixtral:8x7b-instruct-v0.1-q2_K",
+      model: "dolphin-mixtral:local",
       response_format: {
         type: "json_object",
       },

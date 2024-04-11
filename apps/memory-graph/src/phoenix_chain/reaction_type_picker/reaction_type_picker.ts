@@ -81,13 +81,13 @@ INSTRUCTIONS:
 ONLY AVAILABLE REACTIONS ARE:
 
 - "upload_invoice": Upload an invoice. Use only if you have an invoice to upload. 
-- "archive_email": This deletes the email. DO NOT ARCHIVE IF YOU DID NOT SEE IT DONE PREVIOUSLY WITH SIMILAR MESSAGES.
-- "respond_to_email": DON'T RESPOND IF YOU DON'T HAVE PREVIOUS SIMILAR REACTIONS.
+- "archive_email": This deletes the email. DO NOT ARCHIVE IF YOU DID NOT DO IT PREVIOUSLY.
+- "respond_to_email": DON'T RESPOND IF YOU DID NOT DO IT PREVIOUSLY.
 - "ask_for_help": Ask for help for the reaction because you don't know what to do.
 
 If you want to pick a reaction type just do it. Do not ask for permission or if you should pick this specific one.
 
-DO NOT USE ANY REACTIONS OTHER THEN THE ONES ABOVE: ["upload_invoice", "archive_email", "respond_to_email", "ask_for_help"].
+DO NOT USE ANY REACTIONS OTHER THEN THE ONES ABOVE: ["upload_invoice", "archive_email", "ask_for_help"].
 
 RETURN ONLY THE JSON. DO NOT ADD ANY ADDITIONAL TEXT.
 `.trim();

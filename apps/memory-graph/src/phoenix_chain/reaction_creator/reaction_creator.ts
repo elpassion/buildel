@@ -26,6 +26,12 @@ export class ReactionCreator extends BaseReactionCreator {
       case "ask_for_help": {
         return this.creators.help.create(args);
       }
+      case "archive_email": {
+        return {
+          type: "archive_email",
+          reason: args.reactionReason,
+        };
+      }
     }
 
     throw new Error(`Unknown reaction type ${args.reactionType}`);
