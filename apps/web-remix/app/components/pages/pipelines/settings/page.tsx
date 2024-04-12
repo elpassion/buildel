@@ -20,7 +20,7 @@ import {
 } from "~/components/sidebar/ActionSidebar";
 import { OrganizationAvatar } from "~/components/pages/settings/organization/AboutOrganization";
 import { BasicLink } from "~/components/link/BasicLink";
-import { EditPipelineLimitForm } from "./EditPipelineLimitForm";
+import { EditPipelineSettingsForm } from "./EditPipelineSettingsForm";
 import { loader } from "./loader.server";
 
 export function SettingsPage() {
@@ -69,7 +69,7 @@ export function SettingsPage() {
           </SectionContent>
 
           <SectionContent>
-            <EditPipelineLimitForm defaultValues={pipeline} />
+            <EditPipelineSettingsForm defaultValues={pipeline} />
           </SectionContent>
         </div>
       </Section>

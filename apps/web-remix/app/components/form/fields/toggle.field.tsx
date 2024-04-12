@@ -4,24 +4,22 @@ import {
   ToggleInput,
   ToggleInputProps,
 } from "~/components/form/inputs/toggle.input";
+import { useControlField } from "remix-validated-form";
 
 export const ToggleInputField = forwardRef<
   HTMLInputElement,
   Partial<ToggleInputProps>
 >(({ ...props }, ref) => {
-  const { name, getInputProps, error } = useFieldContext();
-
+  const { name } = useFieldContext();
+  const [value, setValue] = useControlField<boolean | undefined>(name);
+  const currentVal = value ?? false;
   return (
     <ToggleInput
       name={name}
-      ref={ref}
-      aria-invalid={error ? true : undefined}
-      aria-describedby={`${name}-error`}
-      aria-errormessage={error ? `${name}-error` : undefined}
-      aria-label={name}
-      autoComplete={name}
+      onChange={setValue}
+      checked={currentVal}
+      value={currentVal.toString()}
       {...props}
-      {...getInputProps()}
     />
   );
 });

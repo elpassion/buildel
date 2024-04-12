@@ -7,6 +7,7 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
     organization_id: 1,
     runs_count: 2,
     budget_limit: null,
+    logs_enabled: false,
     interface_config: {
       input: "text_input_1",
       output: "text_output_1",
@@ -143,6 +144,7 @@ export const simplePipelineFixture = (
     name: "inputOutput",
     organization_id: 1,
     budget_limit: null,
+    logs_enabled: false,
     runs_count: 2,
     interface_config: {
       input: "text_input_1",
