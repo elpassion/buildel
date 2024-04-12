@@ -52,7 +52,7 @@ export class Phoenix {
       triggerId: triggerToSave.id,
     });
 
-    await this.invokeReaction(reaction);
+    await this.invokeReaction({ ...reaction, id: reactionId.id });
 
     return {
       reactionId,
@@ -65,14 +65,14 @@ export class Phoenix {
       reaction,
     });
 
-    await this.invokeReaction(reaction);
+    await this.invokeReaction({ ...reaction, id });
 
     return {
       reactionId: id,
     };
   }
 
-  private async invokeReaction(parsedReaction: IReaction) {
+  private async invokeReaction(parsedReaction: IReaction & { id: string }) {
     Logger.debug(`Invoking reaction ${parsedReaction}`);
 
     await fetch(
