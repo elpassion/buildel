@@ -134,7 +134,7 @@ defmodule BuildelWeb.PipelineChannel do
   def handle_info({output_name, :binary, chunk}, socket) do
     Logger.debug("Channel Sending binary chunk to #{output_name}")
 
-    %{block_name: block_name, output_name: output_name} = parse_topic(output_name)
+    %{block: block_name, io: output_name} = parse_topic(output_name)
 
     socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
     {:noreply, socket}
@@ -143,7 +143,7 @@ defmodule BuildelWeb.PipelineChannel do
   def handle_info({output_name, :text, message}, socket) do
     Logger.debug("Channel Sending text chunk to #{output_name}")
 
-    %{block_name: block_name, output_name: output_name} = parse_topic(output_name)
+    %{block: block_name, io: output_name} = parse_topic(output_name)
 
     socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
     {:noreply, socket}
@@ -151,7 +151,7 @@ defmodule BuildelWeb.PipelineChannel do
 
   def handle_info({output_name, :start_stream, _}, socket) do
     case parse_topic(output_name) do
-      %{output_name: nil, block_name: block_name} ->
+      %{io: nil, block: block_name} ->
         socket |> Phoenix.Channel.push("start:#{block_name}", %{})
 
       _ ->
@@ -163,7 +163,7 @@ defmodule BuildelWeb.PipelineChannel do
 
   def handle_info({output_name, :stop_stream, _}, socket) do
     case parse_topic(output_name) do
-      %{output_name: nil, block_name: block_name} ->
+      %{io: nil, block: block_name} ->
         socket |> Phoenix.Channel.push("stop:#{block_name}", %{})
 
       _ ->
@@ -175,7 +175,7 @@ defmodule BuildelWeb.PipelineChannel do
 
   def handle_info({output_name, :error, errors}, socket) do
     case parse_topic(output_name) do
-      %{output_name: nil, block_name: block_name} ->
+      %{io: nil, block: block_name} ->
         socket |> Phoenix.Channel.push("error:#{block_name}", %{errors: errors})
 
       _ ->
@@ -186,21 +186,7 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   defp parse_topic(topic) do
-    case topic |> String.split("::") do
-      ["context", context_id, "block", block_name, "io", output_name] ->
-        %{
-          context_id: context_id,
-          block_name: block_name,
-          output_name: output_name
-        }
-
-      ["context", context_id, "block", block_name] ->
-        %{
-          context_id: context_id,
-          block_name: block_name,
-          output_name: nil
-        }
-    end
+    Buildel.BlockPubSub.io_from_topic(topic)
   end
 
   defp parse_channel_name(channel_name) do

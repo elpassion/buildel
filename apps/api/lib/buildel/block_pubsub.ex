@@ -20,13 +20,21 @@ defmodule Buildel.BlockPubSub do
   end
 
   def io_from_topic(topic) do
-    ["context", context, "block", block, "io", output_name] = String.split(topic, "::")
+    case topic |> String.split("::") do
+      ["context", context_id, "block", block_name, "io", output_name] ->
+        %{
+          context: context_id,
+          block: block_name,
+          io: output_name
+        }
 
-    %{
-      context: context,
-      block: block,
-      io: output_name
-    }
+      ["context", context_id, "block", block_name] ->
+        %{
+          context: context_id,
+          block: block_name,
+          io: nil
+        }
+    end
   end
 
   def broadcast_to_block(context_id, block_name, message) do
@@ -50,6 +58,9 @@ defmodule Buildel.BlockPubSub do
 
   defp broadcast(topic, {message_type, content} = message) do
     Logger.debug("Broadcasting to topic: #{topic}, message: #{inspect(message)}")
+
+    Buildel.PubSub
+    |> PubSub.broadcast!("buildel::logger", {topic, message_type, content})
 
     Buildel.PubSub
     |> PubSub.broadcast!(topic, {topic, message_type, content})
