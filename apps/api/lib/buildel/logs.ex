@@ -10,6 +10,11 @@ defmodule Buildel.Logs do
     {:ok, %{}}
   end
 
+  def handle_info({:clear_logs_memory}, state) do
+    pipeline_logger().clear_pipelines_memory()
+    {:noreply, state}
+  end
+
   def handle_info(message, state) do
     log_message(message)
     {:noreply, state}
@@ -68,6 +73,7 @@ defmodule Buildel.Logs.LoggerBehaviour do
         }
 
   @callback save_log(log_data()) :: :ok
+  @callback clear_pipelines_memory() :: :ok
 end
 
 defmodule Buildel.Logs.DBPipelineLogger do
@@ -90,22 +96,43 @@ defmodule Buildel.Logs.DBPipelineLogger do
   end
 
   @impl true
+  def clear_pipelines_memory() do
+    GenServer.cast(__MODULE__, {:clear_pipelines_memory})
+  end
+
+  @impl true
   def init(_initial_state) do
     Process.send_after(self(), {:flush}, 1000)
-    {:ok, %{runs: %{}, logs: []}}
+    {:ok, %{runs: %{}, pipelines: %{}, logs: []}}
+  end
+
+  @impl true
+  def handle_cast({:clear_pipelines_memory}, state) do
+    {:noreply, %{state | pipelines: %{}}}
   end
 
   @impl true
   def handle_cast(
-        {:save_log, %{local: run_id} = log_data},
-        %{runs: runs, logs: logs} = state
+        {:save_log, %{local: run_id, parent: pipeline_id} = log_data},
+        %{runs: runs, pipelines: pipelines, logs: logs} = state
       ) do
+    pipelines =
+      Map.put_new_lazy(pipelines, pipeline_id, fn ->
+        Buildel.Pipelines.get_pipeline(pipeline_id).logs_enabled || false
+      end)
+
     runs = Map.put_new_lazy(runs, run_id, fn -> !!Buildel.Pipelines.get_run(run_id) end)
 
-    should_save = Map.get(runs, run_id)
+    should_save =
+      case {Map.get(runs, run_id), Map.get(pipelines, pipeline_id)} do
+        {nil, _} -> false
+        {_, nil} -> false
+        {_, logs_enabled} -> logs_enabled
+      end
 
     logs = if should_save, do: [log_data | logs], else: logs
-    {:noreply, %{state | runs: runs, logs: do_save_logs(logs)}}
+
+    {:noreply, %{state | runs: runs, pipelines: pipelines, logs: do_save_logs(logs)}}
   end
 
   @impl true

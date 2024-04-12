@@ -6,6 +6,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
 
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
+  alias Phoenix.PubSub
 
   alias Buildel.Organizations
 
@@ -152,7 +153,10 @@ defmodule BuildelWeb.OrganizationPipelineController do
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, %Pipeline{} = pipeline} <- Pipelines.update_pipeline(pipeline, pipeline_params) do
+         {:ok, %Pipeline{} = pipeline} <- Pipelines.update_pipeline(pipeline, pipeline_params),
+         :ok <-
+           Buildel.PubSub
+           |> PubSub.broadcast!("buildel::logger", {:clear_logs_memory}) do
       render(conn, :show, pipeline: pipeline)
     end
   end

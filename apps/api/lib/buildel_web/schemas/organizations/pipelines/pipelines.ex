@@ -24,12 +24,13 @@ defmodule BuildelWeb.Schemas.Pipelines do
         id: %Schema{type: :integer, description: "Pipeline ID"},
         name: %Schema{type: :string, description: "Pipeline name"},
         budget_limit: %Schema{type: :number, description: "Pipeline budget limit", nullable: true},
+        logs_enabled: %Schema{type: :boolean, description: "Pipeline logs toggle"},
         organization_id: %Schema{type: :integer, description: "Organization ID"},
         interface_config: %Schema{type: :object, description: "Interface config", nullable: true},
         runs_count: %Schema{type: :integer, description: "Runs count"},
         config: PipelineConfig
       },
-      required: [:id, :name, :organization_id, :runs_count, :config]
+      required: [:id, :name, :organization_id, :runs_count, :config, :logs_enabled]
     })
   end
 
@@ -114,6 +115,10 @@ defmodule BuildelWeb.Schemas.Pipelines do
               type: :number,
               description: "Pipeline budget limit",
               nullable: true
+            },
+            logs_enabled: %Schema{
+              type: :boolean,
+              description: "Pipeline logs toggle"
             }
           }
         }
