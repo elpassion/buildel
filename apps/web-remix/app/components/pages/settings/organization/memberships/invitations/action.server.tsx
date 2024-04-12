@@ -17,7 +17,10 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const organizationApi = new OrganizationApi(fetch);
 
-      await organizationApi.deleteInvitation(params.organizationId, invitationId as string);
+      await organizationApi.deleteInvitation(
+        params.organizationId,
+        invitationId as string
+      );
 
       return json(
         {},
@@ -25,8 +28,8 @@ export async function action(actionArgs: ActionFunctionArgs) {
           headers: {
             "Set-Cookie": await setServerToast(request, {
               success: {
-                title: "Secret deleted",
-                description: `You've successfully deleted the secret`,
+                title: "Invitation deleted",
+                description: `You've successfully deleted the invitation`,
               },
             }),
           },
