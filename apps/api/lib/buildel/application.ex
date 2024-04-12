@@ -26,8 +26,6 @@ defmodule Buildel.Application do
         BuildelWeb.Endpoint,
         # Start a worker by calling: Buildel.Worker.start_link(arg)
         Buildel.Pipelines.Runner,
-        # Start document cache
-        Buildel.DocumentCache,
         # Start the vault used for encryption
         Buildel.Vault,
         # JWKS storage

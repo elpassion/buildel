@@ -40,6 +40,7 @@ defmodule Buildel.Logs do
       message_type: message_type,
       message: message,
       metadata: %{},
+      created_at: NaiveDateTime.utc_now(:second),
       latency: 0
     })
   end
@@ -77,6 +78,8 @@ defmodule Buildel.Logs.DBPipelineLogger do
 
   @behaviour Buildel.Logs.LoggerBehaviour
 
+  @batch_size 50
+
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
@@ -88,16 +91,44 @@ defmodule Buildel.Logs.DBPipelineLogger do
 
   @impl true
   def init(_initial_state) do
-    {:ok, %{runs: %{}}}
+    Process.send_after(self(), {:flush}, 1000)
+    {:ok, %{runs: %{}, logs: []}}
   end
 
   @impl true
-  def handle_cast({:save_log, log_data}, state) do
-    do_save_log(log_data)
-    {:noreply, state}
+  def handle_cast(
+        {:save_log, %{local: run_id} = log_data},
+        %{runs: runs, logs: logs} = state
+      ) do
+    runs = Map.put_new_lazy(runs, run_id, fn -> !!Buildel.Pipelines.get_run(run_id) end)
+
+    should_save = Map.get(runs, run_id)
+
+    logs = if should_save, do: [log_data | logs], else: logs
+    {:noreply, %{state | runs: runs, logs: do_save_logs(logs)}}
   end
 
-  defp do_save_log(%{
+  @impl true
+  def handle_info({:flush}, %{logs: logs} = state) do
+    Process.send_after(self(), {:flush}, 1000)
+    {:noreply, %{state | logs: do_save_logs(logs, true)}}
+  end
+
+  defp do_save_logs(logs, force \\ false)
+
+  defp do_save_logs(logs, true) do
+    Repo.insert_all(Log, logs |> Enum.map(&create_log/1))
+    []
+  end
+
+  defp do_save_logs(logs, _force) when length(logs) > @batch_size do
+    Repo.insert_all(Log, logs |> Enum.map(&create_log/1))
+    []
+  end
+
+  defp do_save_logs(logs, _force), do: logs
+
+  defp create_log(%{
          global: _global,
          parent: _parent,
          local: run_id,
@@ -106,16 +137,18 @@ defmodule Buildel.Logs.DBPipelineLogger do
          message_type: message_type,
          message: message,
          metadata: _metadata,
-         latency: latency
+         latency: latency,
+         created_at: inserted_at
        }) do
-    %Log{
+    %{
       run_id: String.to_integer(run_id),
       block_name: block_name,
       output_name: output_name,
       message_type: message_type,
       message: message,
-      latency: latency
+      latency: latency,
+      inserted_at: inserted_at,
+      updated_at: inserted_at
     }
-    |> Repo.insert()
   end
 end
