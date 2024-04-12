@@ -19,7 +19,9 @@ defmodule Buildel.Application do
         {Phoenix.PubSub, name: Buildel.PubSub},
         # Start Finch
         {Finch, name: Buildel.Finch},
+        # Start the Logs system
         Buildel.Logs,
+        Buildel.Logs.DBPipelineLogger,
         # Start the Endpoint (http/https)
         BuildelWeb.Endpoint,
         # Start a worker by calling: Buildel.Worker.start_link(arg)
