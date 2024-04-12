@@ -140,6 +140,12 @@ defmodule Buildel.Logs.DBPipelineLogger do
          latency: latency,
          created_at: inserted_at
        }) do
+    message =
+      case message_type do
+        :binary -> "{binary}"
+        _ -> message
+      end
+
     %{
       run_id: String.to_integer(run_id),
       block_name: block_name,
