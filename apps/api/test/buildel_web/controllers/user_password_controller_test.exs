@@ -1,10 +1,13 @@
 defmodule BuildelWeb.UserPasswordControllerTest do
-  use BuildelWeb.ConnCase
+  use BuildelWeb.ConnCase, async: true
 
   import Buildel.AccountsFixtures
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json") |> put_req_header("content-type", "application/json")}
+    {:ok,
+     conn:
+       put_req_header(conn, "accept", "application/json")
+       |> put_req_header("content-type", "application/json")}
   end
 
   setup [:register_and_log_in_user]

@@ -1,5 +1,5 @@
 defmodule Buildel.OrganizationsTest do
-  use Buildel.DataCase
+  use Buildel.DataCase, async: true
 
   alias Buildel.Organizations
   alias Buildel.Accounts

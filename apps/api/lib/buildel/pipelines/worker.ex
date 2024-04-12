@@ -37,7 +37,6 @@ defmodule Buildel.Pipelines.Worker do
   @impl true
   def init(run) do
     Process.flag(:trap_exit, true)
-
     run |> Pipelines.start()
 
     blocks = Pipelines.blocks_for_run(run)

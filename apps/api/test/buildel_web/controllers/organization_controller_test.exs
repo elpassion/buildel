@@ -1,5 +1,5 @@
 defmodule BuildelWeb.OrganizationControllerTest do
-  use BuildelWeb.ConnCase
+  use BuildelWeb.ConnCase, async: true
   import Buildel.OrganizationsFixtures
   alias Buildel.Repo
   alias Buildel.Organizations

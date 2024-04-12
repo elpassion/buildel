@@ -1,5 +1,5 @@
 defmodule BuildelWeb.OrganizationPipelinePublicControllerTest do
-  use BuildelWeb.ConnCase
+  use BuildelWeb.ConnCase, async: true
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
 
@@ -55,7 +55,9 @@ defmodule BuildelWeb.OrganizationPipelinePublicControllerTest do
   end
 
   defp create_public_pipeline(%{organization: organization}) do
-    pipeline = pipeline_fixture(%{organization_id: organization.id, interface_config: %{ "public" => true }})
+    pipeline =
+      pipeline_fixture(%{organization_id: organization.id, interface_config: %{"public" => true}})
+
     %{public_pipeline: pipeline}
   end
 

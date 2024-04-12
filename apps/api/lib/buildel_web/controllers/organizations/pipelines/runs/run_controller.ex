@@ -179,8 +179,10 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, _} <- Pipelines.verify_pipeline_budget_limit(pipeline),
-         {:ok, run} <- Pipelines.get_pipeline_run(pipeline, id),
+         {:ok, _} <-
+           Pipelines.verify_pipeline_budget_limit(pipeline),
+         {:ok, run} <-
+           Pipelines.get_pipeline_run(pipeline, id),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
       initial_inputs |> Enum.each(&process_input(&1.block_name, &1.input_name, &1.data, run))
       render(conn, :show, run: run)

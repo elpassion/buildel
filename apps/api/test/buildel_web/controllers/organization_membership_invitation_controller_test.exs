@@ -1,5 +1,5 @@
 defmodule BuildelWeb.OrganizationMembershipInvitationControllerTest do
-  use BuildelWeb.ConnCase
+  use BuildelWeb.ConnCase, async: true
   import Buildel.OrganizationsFixtures
   alias Buildel.AccountsFixtures
   alias Buildel.Organizations

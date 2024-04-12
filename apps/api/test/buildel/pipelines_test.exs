@@ -1,6 +1,6 @@
 defmodule Buildel.PipelinesTest do
   alias Buildel.Blocks.TextInput
-  use Buildel.DataCase
+  use Buildel.DataCase, async: true
   import Buildel.OrganizationsFixtures
 
   alias Buildel.Pipelines

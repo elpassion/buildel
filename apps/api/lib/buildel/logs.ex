@@ -3,11 +3,11 @@ defmodule Buildel.Logs do
   use GenServer
 
   def start_link(args) do
-    GenServer.start_link(__MODULE__, args, name: __MODULE__)
+    GenServer.start_link(__MODULE__, args)
   end
 
   def init(_initial_state) do
-    # Phoenix.PubSub.subscribe(Buildel.PubSub, "buildel::logger")
+    Phoenix.PubSub.subscribe(Buildel.PubSub, "buildel::logger")
     {:ok, %{}}
   end
 

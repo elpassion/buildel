@@ -1,5 +1,5 @@
 defmodule BuildelWeb.OrganizationPipelineBlockControllerTest do
-  use BuildelWeb.ConnCase
+  use BuildelWeb.ConnCase, async: true
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
 
