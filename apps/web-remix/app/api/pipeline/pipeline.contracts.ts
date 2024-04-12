@@ -23,7 +23,7 @@ export const Pipeline = z.object({
   organization_id: z.number(),
   runs_count: z.number(),
   budget_limit: z.union([zfd.numeric(), z.null()]),
-  logs_enabled: z.boolean().optional(),
+  logs_enabled: z.boolean(),
   interface_config: z.union([InterfaceConfig, z.null()]),
   config: z.object({
     version: z.string(),
@@ -162,6 +162,7 @@ export const UpdatePipelineSchema = z.object({
   id: z.number(),
   name: z.string().min(1),
   budget_limit: z.union([zfd.numeric(), z.null()]),
+  logs_enabled: z.boolean(),
   interface_config: z.union([InterfaceConfig, z.null()]),
   config: z.object({
     version: z.string(),
