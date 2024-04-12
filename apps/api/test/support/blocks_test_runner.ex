@@ -10,8 +10,8 @@ defmodule Buildel.BlocksTestRunner do
     {:ok, %Run{pid: pid}}
   end
 
-  def block_id(block) do
-    block.name
+  def block_id(context, block) do
+    "#{context}::#{block.name}"
   end
 
   def context_id(pid) do
@@ -48,7 +48,7 @@ defmodule Buildel.BlocksTestRunner do
 
     children =
       for %Block{type: type} = block <- config.blocks do
-        block_id = block_id(block)
+        block_id = block_id(context_id(self()), block)
 
         %{
           id: block_id |> String.to_atom(),

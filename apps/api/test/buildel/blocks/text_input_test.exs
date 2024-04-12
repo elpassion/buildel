@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.TextInputTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.TextInput
 
   describe "TextInput" do

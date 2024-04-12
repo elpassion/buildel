@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.TextOutputTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.TextOutput
 
   test "exposes options" do

@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.ChatTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.Chat
 
   test "exposes options" do

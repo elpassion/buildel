@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.MapInputsTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.MapInputs
 
   test "exposes options" do

@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.CollectAllTextTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.CollectAllText
 
   test "exposes options" do

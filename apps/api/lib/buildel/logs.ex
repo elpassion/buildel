@@ -7,7 +7,7 @@ defmodule Buildel.Logs do
   end
 
   def init(_initial_state) do
-    Phoenix.PubSub.subscribe(Buildel.PubSub, "buildel::logger")
+    # Phoenix.PubSub.subscribe(Buildel.PubSub, "buildel::logger")
     {:ok, %{}}
   end
 

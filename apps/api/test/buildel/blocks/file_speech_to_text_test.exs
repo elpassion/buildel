@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.FileSpeechToTextTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.FileSpeechToText
 
   test "exposes options" do

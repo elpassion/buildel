@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.AudioInputTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.AudioInput
 
   test "exposes options" do

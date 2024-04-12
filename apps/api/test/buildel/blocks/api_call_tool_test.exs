@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.ApiCallToolTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.ApiCallTool
 
   use ExVCR.Mock, adapter: ExVCR.Adapter.Hackney

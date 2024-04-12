@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.WebhookOutputTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.WebhookOutput
 
   test "exposes options" do

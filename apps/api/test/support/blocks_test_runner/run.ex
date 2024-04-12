@@ -36,8 +36,13 @@ defmodule Buildel.BlocksTestRunner.Run do
     )
   end
 
-  def get_block_function(_run, block_name) do
-    Buildel.Blocks.Block.function(block_pid(block_name), %{block_name: "test"})
+  def get_block_function(run, block_name) do
+    full_block_name = block_id(run, %{name: block_name})
+    Buildel.Blocks.Block.function(block_pid(full_block_name), %{block_name: "test"})
+  end
+
+  def block_id(run, block_name) do
+    Buildel.BlocksTestRunner.block_id(Buildel.BlocksTestRunner.context_id(run.pid), block_name)
   end
 
   defp block_pid(block_name) do

@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.CollectSentencesTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.CollectSentences
 
   test "exposes options" do

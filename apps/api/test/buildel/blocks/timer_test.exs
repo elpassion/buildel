@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.TimerTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.Timer
 
   test "exposes options" do
