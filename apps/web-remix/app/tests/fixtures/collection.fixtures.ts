@@ -11,6 +11,7 @@ export const collectionFixture = (
       model: "text-embedding-ada-002",
       secret_name: "openai",
     },
+    chunk_size: 1000,
     ...override,
   };
 };
