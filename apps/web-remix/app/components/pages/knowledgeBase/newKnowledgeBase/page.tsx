@@ -5,6 +5,7 @@ import { withZod } from "@remix-validated-form/with-zod";
 import { Field } from "~/components/form/fields/field.context";
 import { CreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { TextInputField } from "~/components/form/fields/text.field";
+import { NumberInputField } from "~/components/form/fields/number.field";
 import { SubmitButton } from "~/components/form/submit";
 import {
   ApiTypesRadioGroupField,
@@ -30,6 +31,7 @@ export function NewKnowledgeBasePage() {
         embeddings: {
           api_type: "openai",
         },
+        chunk_size: 1000,
       }}
     >
       <div className="max-w-s w-full grow overflow-y-auto p-1 flex flex-col gap-2 space-y-1">
@@ -56,6 +58,14 @@ export function NewKnowledgeBasePage() {
         <div>
           <SecretSelectField />
         </div>
+
+        <Field name="chunk_size">
+          <NumberInputField
+            label="Chunk size"
+            placeholder="eg. 1000"
+            supportingText="Size of the generated chunks in the collection."
+          />
+        </Field>
       </div>
       <SubmitButton hierarchy="primary" size="sm">
         Create collection

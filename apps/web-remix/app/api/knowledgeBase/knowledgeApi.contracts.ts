@@ -26,6 +26,7 @@ export const CreateCollectionSchema = z.object({
     model: z.string().min(2),
     secret_name: z.string().min(2),
   }),
+  chunk_size: zfd.numeric(z.number().int().positive()),
 });
 
 export const UpdateCollectionSchema = z.object({
@@ -36,6 +37,7 @@ export const UpdateCollectionSchema = z.object({
     // model: z.string().min(2),
     secret_name: z.string().min(2),
   }),
+  chunk_size: zfd.numeric(z.number().int().positive()),
 });
 
 export type ICreateCollectionSchema = z.TypeOf<typeof CreateCollectionSchema>;
@@ -57,6 +59,7 @@ export const KnowledgeBaseCollection = z.object({
     model: z.string(),
     secret_name: z.string(),
   }),
+  chunk_size: z.number(),
 });
 
 export const KnowledgeBaseFileResponse = z

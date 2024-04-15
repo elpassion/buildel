@@ -5,6 +5,7 @@ import { withZod } from "@remix-validated-form/with-zod";
 import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { UpdateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { TextInputField } from "~/components/form/fields/text.field";
+import { NumberInputField } from "~/components/form/fields/number.field";
 import { SubmitButton } from "~/components/form/submit";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
@@ -72,6 +73,14 @@ export function EditKnowledgeBasePage() {
           <div>
             <SecretSelectField />
           </div>
+
+          <Field name="chunk_size">
+            <NumberInputField
+              label="Chunk size"
+              placeholder="eg. 1000"
+              supportingText="Size of the generated chunks in the collection."
+            />
+          </Field>
         </div>
         <SubmitButton hierarchy="primary" size="sm">
           Update collection
