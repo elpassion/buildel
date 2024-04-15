@@ -182,13 +182,15 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
             api_type: "openai",
             model: "text-embedding-ada-002",
             secret_name: "some name"
-          }
+          },
+          chunk_size: 420
         })
 
       assert %{
                "data" => %{
                  "name" => ^collection_name,
-                 "id" => id
+                 "id" => id,
+                 "chunk_size" => 420
                }
              } = json_response(conn, 201)
 
@@ -203,7 +205,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
       assert %{
                "data" => %{
                  "id" => ^id,
-                 "name" => ^collection_name
+                 "name" => ^collection_name,
+                 "chunk_size" => 420
                }
              } = response
 
@@ -316,7 +319,64 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
                  "id" => ^collection_id,
                  "embeddings" => %{
                    "secret_name" => "new_secret_name"
-                 }
+                 },
+                 "chunk_size" => 1000
+               }
+             } = response
+
+      assert_schema(response, "CollectionShowResponse", api_spec)
+    end
+
+    test "updates chunk size", %{
+      conn: conn,
+      organization: organization,
+      collection: collection,
+      api_spec: api_spec
+    } do
+      collection_id = collection.id
+      secret_fixture(%{organization_id: organization.id, name: "new_secret_name"})
+
+      conn =
+        put(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}",
+          %{
+            embeddings: %{
+              secret_name: "new_secret_name"
+            },
+            chunk_size: 420
+          }
+        )
+
+      response = json_response(conn, 200)
+
+      assert %{
+               "data" => %{
+                 "id" => ^collection_id,
+                 "embeddings" => %{
+                   "secret_name" => "new_secret_name"
+                 },
+                 "chunk_size" => 420
+               }
+             } = response
+
+      assert_schema(response, "CollectionShowResponse", api_spec)
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}"
+        )
+
+      response = json_response(conn, 200)
+
+      assert %{
+               "data" => %{
+                 "id" => ^collection_id,
+                 "embeddings" => %{
+                   "secret_name" => "new_secret_name"
+                 },
+                 "chunk_size" => 420
                }
              } = response
 

@@ -17,7 +17,8 @@ defmodule BuildelWeb.CollectionJSON do
         api_type: collection.embeddings_api_type,
         model: collection.embeddings_model,
         secret_name: collection.embeddings_secret_name
-      }
+      },
+      chunk_size: collection.chunk_size
     }
   end
 end

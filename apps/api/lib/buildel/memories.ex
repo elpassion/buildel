@@ -163,11 +163,15 @@ defmodule Buildel.Memories do
     end
   end
 
-  def upsert_collection(%{
-        organization_id: organization_id,
-        collection_name: collection_name,
-        embeddings: embeddings
-      }) do
+  def upsert_collection(
+        %{
+          organization_id: organization_id,
+          collection_name: collection_name,
+          embeddings: embeddings
+        } = collection_data
+      ) do
+    chunk_size = Map.get(collection_data, :chunk_size, nil)
+
     Buildel.Memories.MemoryCollection
     |> where([c], c.collection_name == ^collection_name and c.organization_id == ^organization_id)
     |> Buildel.Repo.one()
@@ -179,7 +183,8 @@ defmodule Buildel.Memories do
           organization_id: organization_id,
           embeddings_api_type: embeddings.api_type,
           embeddings_model: embeddings.model,
-          embeddings_secret_name: embeddings.secret_name
+          embeddings_secret_name: embeddings.secret_name,
+          chunk_size: chunk_size || 1000
         })
         |> Buildel.Repo.insert()
 
@@ -190,7 +195,8 @@ defmodule Buildel.Memories do
           organization_id: organization_id,
           embeddings_api_type: embeddings.api_type,
           embeddings_model: embeddings.model,
-          embeddings_secret_name: embeddings.secret_name
+          embeddings_secret_name: embeddings.secret_name,
+          chunk_size: chunk_size || collection.chunk_size
         })
         |> Buildel.Repo.update()
     end

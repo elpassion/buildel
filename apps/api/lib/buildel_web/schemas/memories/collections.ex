@@ -25,9 +25,10 @@ defmodule BuildelWeb.Schemas.Collections do
       properties: %{
         id: %Schema{type: :integer, description: "Collection ID"},
         name: %Schema{type: :string, description: "Collection name"},
+        chunk_size: %Schema{type: :integer, description: "Chunk size"},
         embeddings: CollectionEmbedding
       },
-      required: [:id, :name]
+      required: [:id, :name, :chunk_size]
     })
   end
 
@@ -83,7 +84,8 @@ defmodule BuildelWeb.Schemas.Collections do
       type: :object,
       properties: %{
         collection_name: %Schema{type: :string, description: "Collection name"},
-        embeddings: CollectionEmbeddingCreate
+        embeddings: CollectionEmbeddingCreate,
+        chunk_size: %Schema{type: :integer, description: "Chunk size"}
       },
       required: [:collection_name, :embeddings]
     })
@@ -109,7 +111,8 @@ defmodule BuildelWeb.Schemas.Collections do
       title: "CollectionUpdateRequest",
       type: :object,
       properties: %{
-        embeddings: CollectionEmbeddingUpdate
+        embeddings: CollectionEmbeddingUpdate,
+        chunk_size: %Schema{type: :integer, description: "Chunk size"}
       },
       required: [:embeddings]
     })
