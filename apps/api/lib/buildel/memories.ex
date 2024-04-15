@@ -76,7 +76,10 @@ defmodule Buildel.Memories do
             api_key: api_key.value
           }),
         collection_name: organization_collection_name,
-        db_adapter: Buildel.VectorDB.EctoAdapter
+        db_adapter: Buildel.VectorDB.EctoAdapter,
+        workflow_config: %{
+          chunk_size: collection.chunk_size
+        }
       })
 
     document =

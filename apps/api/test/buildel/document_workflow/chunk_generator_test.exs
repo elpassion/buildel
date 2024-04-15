@@ -6,7 +6,7 @@ defmodule Buildel.ChunkGeneratorTest do
   describe "split_into_chunks/1" do
     test "should split into chunks based od config", %{workflow: workflow} do
       list = DocumentWorkflow.read(workflow, {"foo", %{}})
-      result = DocumentWorkflow.ChunkGenerator.split_into_chunks(list, %{chunk_size: 20})
+      result = DocumentWorkflow.ChunkGenerator.split_into_chunks(list, workflow.workflow_config)
 
       assert [
                %DocumentWorkflow.ChunkGenerator.Chunk{
@@ -24,7 +24,7 @@ defmodule Buildel.ChunkGeneratorTest do
 
     test "should add metadata to chunks", %{workflow: workflow} do
       list = DocumentWorkflow.read(workflow, {"foo", %{}})
-      result = DocumentWorkflow.ChunkGenerator.split_into_chunks(list, %{chunk_size: 20})
+      result = DocumentWorkflow.ChunkGenerator.split_into_chunks(list, workflow.workflow_config)
       first_chunk_building_block_ids = list |> Enum.map(& &1.id) |> Enum.take(3)
       second_chunk_building_block_ids = list |> Enum.map(& &1.id) |> Enum.drop(3)
 
@@ -87,7 +87,10 @@ defmodule Buildel.ChunkGeneratorTest do
             api_key: "test"
           }),
         collection_name: "test",
-        db_adapter: Buildel.VectorDB.EctoAdapter
+        db_adapter: Buildel.VectorDB.EctoAdapter,
+        workflow_config: %{
+          chunk_size: 20
+        }
       })
 
     %{workflow: workflow}

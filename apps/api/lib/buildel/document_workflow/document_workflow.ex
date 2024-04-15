@@ -3,12 +3,17 @@ defmodule Buildel.DocumentWorkflow do
   alias Buildel.DocumentWorkflow.ChunkGenerator
   alias Buildel.Clients.Embeddings
 
-  defstruct [:embeddings, :collection_name, :db_adapter]
+  defstruct [:embeddings, :collection_name, :db_adapter, :workflow_config]
+
+  @type workflow_config :: %{
+          chunk_size: integer()
+        }
 
   @type t :: %__MODULE__{
           embeddings: Embeddings.t(),
           collection_name: binary(),
-          db_adapter: Buildel.VectorDB.VectorDBAdapterBehaviour.t()
+          db_adapter: Buildel.VectorDB.VectorDBAdapterBehaviour.t(),
+          workflow_config: workflow_config()
         }
 
   @type document :: {binary(), map()}
@@ -21,8 +26,25 @@ defmodule Buildel.DocumentWorkflow do
   @type embeddings :: [float()]
   @type chunk :: ChunkGenerator.Chunk.t()
 
-  def new(%{embeddings: embeddings, collection_name: collection_name, db_adapter: db_adapter}) do
-    %__MODULE__{embeddings: embeddings, collection_name: collection_name, db_adapter: db_adapter}
+  def new(
+        %{
+          embeddings: embeddings,
+          collection_name: collection_name,
+          db_adapter: db_adapter
+        } = module_data
+      ) do
+    default_workflow_config = %{
+      chunk_size: 1000
+    }
+
+    workflow_config = Map.get(module_data, :workflow_config, %{})
+
+    %__MODULE__{
+      embeddings: embeddings,
+      collection_name: collection_name,
+      db_adapter: db_adapter,
+      workflow_config: Map.merge(default_workflow_config, workflow_config)
+    }
   end
 
   @spec process(t(), document()) :: [chunk()]
@@ -54,8 +76,13 @@ defmodule Buildel.DocumentWorkflow do
   end
 
   @spec build_node_chunks(t(), struct_list()) :: [chunk()]
-  def build_node_chunks(_workflow, documents) do
-    ChunkGenerator.split_into_chunks(documents, %{}) |> ChunkGenerator.add_neighbors()
+  def build_node_chunks(%{workflow_config: workflow_config}, documents) do
+    %{chunk_size: chunk_size} = workflow_config
+
+    ChunkGenerator.split_into_chunks(documents, %{
+      chunk_size: chunk_size
+    })
+    |> ChunkGenerator.add_neighbors()
   end
 
   @type keyword_node :: %{
