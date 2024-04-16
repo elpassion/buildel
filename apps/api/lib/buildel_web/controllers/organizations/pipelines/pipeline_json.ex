@@ -9,6 +9,14 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
     %{data: data(pipeline)}
   end
 
+  def details(%{total_cost: total_cost}) do
+    %{
+      data: %{
+        total_cost: total_cost
+      }
+    }
+  end
+
   defp data(%Pipeline{} = pipeline) do
     %{
       id: pipeline.id,

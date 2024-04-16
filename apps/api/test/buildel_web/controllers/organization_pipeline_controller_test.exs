@@ -2,6 +2,7 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
   use BuildelWeb.ConnCase, async: true
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
+  import Buildel.CostsFixtures
 
   alias Buildel.Pipelines.Pipeline
   alias Buildel.Organizations
@@ -25,6 +26,68 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
   end
 
   setup [:register_and_log_in_user, :create_user_organization]
+
+  describe "details" do
+    setup [:create_pipeline]
+
+    test_requires_authentication %{conn: conn, organization: organization, pipeline: pipeline} do
+      get(conn, ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/details")
+    end
+
+    test "Returns 404 when pipeline does not exist", %{
+      conn: conn,
+      organization: organization
+    } do
+      date =
+        NaiveDateTime.utc_now()
+        |> NaiveDateTime.to_iso8601()
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/123123/details?start_date=#{date}&end_date=#{date}"
+        )
+
+      assert json_response(conn, 404)
+    end
+
+    test "Shows organization pipeline details", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+
+      run = run_fixture(%{pipeline_id: pipeline.id})
+      %{cost: cost} = cost_fixture(organization, run)
+
+      start_date =
+        NaiveDateTime.utc_now()
+        |> NaiveDateTime.add(-1, :day)
+        |> NaiveDateTime.to_iso8601()
+
+      end_date =
+        NaiveDateTime.utc_now()
+        |> NaiveDateTime.to_iso8601()
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization_id}/pipelines/#{pipeline.id}/details?start_date=#{start_date}&end_date=#{end_date}"
+        )
+
+      response = json_response(conn, 200)
+
+      assert %{
+               "total_cost" => amount
+             } = response["data"]
+
+      assert Decimal.equal?(cost.amount, Decimal.new(amount))
+
+      assert_schema(response, "PipelineDetailsResponse", api_spec)
+    end
+  end
 
   describe "index" do
     test_requires_authentication %{conn: conn, organization: organization} do

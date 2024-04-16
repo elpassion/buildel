@@ -6,6 +6,7 @@ defmodule BuildelWeb.OrganizationPipelineController do
 
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
+  alias OpenApiSpex.Schema
   alias Phoenix.PubSub
 
   alias Buildel.Organizations
@@ -21,6 +22,91 @@ defmodule BuildelWeb.OrganizationPipelineController do
     replace_params: false
 
   tags ["pipeline"]
+
+  operation :details,
+    summary: "Show pipeline details",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      start_date: [
+        in: :query,
+        description: "Start date",
+        schema: %Schema{type: :string, format: :date_time},
+        required: true
+      ],
+      end_date: [
+        in: :query,
+        description: "End date",
+        schema: %Schema{type: :string, format: :date_time},
+        required: true
+      ]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Pipelines.DetailsResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def details(conn, _params) do
+    %{"organization_id" => organization_id, "pipeline_id" => pipeline_id} = conn.params
+    date_params = conn.params |> Map.take(["start_date", "end_date"])
+
+    user = conn.assigns.current_user
+
+    with {:ok, %{start_date: start_date, end_date: end_date}} <-
+           validate_date_params(date_params),
+         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Pipeline{} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id),
+         %{total_cost: total_cost} <-
+           Pipelines.get_pipeline_costs_by_dates(
+             pipeline,
+             start_date,
+             end_date
+           ) do
+      render(conn, :details, total_cost: total_cost)
+    end
+  end
+
+  defp validate_date_params(%{"start_date" => start_date, "end_date" => end_date}) do
+    with {:ok, start_date} <- NaiveDateTime.from_iso8601(start_date),
+         {:ok, end_date} <- NaiveDateTime.from_iso8601(end_date) do
+      {:ok, %{start_date: start_date, end_date: end_date}}
+    else
+      _ ->
+        {:error,
+         changeset_for_errors(%{
+           date: "Invalid date format."
+         })}
+    end
+  end
+
+  defp validate_date_params(%{}) do
+    {:ok, %{start_date: nil, end_date: nil}}
+  end
+
+  defp changeset_for_errors(errors) do
+    %Ecto.Changeset{
+      action: :validate,
+      errors:
+        errors
+        |> Enum.map(fn {key, value} -> {key, {value, []}} end)
+        |> Enum.into(%{}),
+      changes: %{},
+      types: %{}
+    }
+  end
 
   operation :index,
     summary: "List user organization pipelines",

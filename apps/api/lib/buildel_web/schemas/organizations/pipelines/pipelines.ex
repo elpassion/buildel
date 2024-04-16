@@ -34,6 +34,19 @@ defmodule BuildelWeb.Schemas.Pipelines do
     })
   end
 
+  defmodule PipelineDetails do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "PipelineDetails",
+      type: :object,
+      properties: %{
+        total_cost: %Schema{type: :number, description: "Pipeline total cost"}
+      },
+      required: [:total_cost]
+    })
+  end
+
   defmodule PipelinePublic do
     require OpenApiSpex
 
@@ -73,6 +86,19 @@ defmodule BuildelWeb.Schemas.Pipelines do
       type: :object,
       properties: %{
         data: BuildelWeb.Schemas.Pipelines.Pipeline
+      },
+      required: [:data]
+    })
+  end
+
+  defmodule DetailsResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "PipelineDetailsResponse",
+      type: :object,
+      properties: %{
+        data: BuildelWeb.Schemas.Pipelines.PipelineDetails
       },
       required: [:data]
     })

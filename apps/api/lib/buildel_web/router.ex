@@ -62,6 +62,12 @@ defmodule BuildelWeb.Router do
     )
 
     get(
+      "/organizations/:organization_id/pipelines/:pipeline_id/details",
+      OrganizationPipelineController,
+      :details
+    )
+
+    get(
       "/organizations/:organization_id/pipelines/:pipeline_id/public",
       OrganizationPipelinePublicController,
       :show
