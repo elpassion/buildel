@@ -2,10 +2,15 @@ import { http, HttpResponse } from "msw";
 import {
   IAliasesResponse,
   IAliasResponse,
+  IPipelineDetailsResponse,
   IPipelineResponse,
   IPipelinesResponse,
+  PipelineDetailsResponse,
 } from "~/api/pipeline/pipeline.contracts";
-import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
+import {
+  pipelineDetailsFixture,
+  pipelineFixture,
+} from "~/tests/fixtures/pipeline.fixtures";
 import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
 import { aliasFixture } from "~/tests/fixtures/alias.fixtures";
 
@@ -26,6 +31,18 @@ export class PipelineHandlers {
           {
             data: [...this.pipelines.values()],
           },
+          { status: 200 }
+        );
+      }
+    );
+  }
+
+  getPipelineDetails() {
+    return http.get(
+      "/super-api/organizations/:organizationId/pipelines/:pipelineId/details",
+      () => {
+        return HttpResponse.json<{ data: IPipelineDetailsResponse }>(
+          { data: pipelineDetailsFixture() },
           { status: 200 }
         );
       }
@@ -167,6 +184,7 @@ export class PipelineHandlers {
       this.deleteHandler(),
       this.createHandler(),
       this.updateHandler(),
+      this.getPipelineDetails(),
     ];
   }
 }

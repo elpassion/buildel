@@ -114,7 +114,11 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
           </tr>
         ) : null}
         {table.getRowModel().rows.map((row) => (
-          <tr key={row.id} className="border-t border-neutral-800">
+          <tr
+            key={row.id}
+            className="border-t border-neutral-800"
+            aria-label="pipeline run"
+          >
             {row.getVisibleCells().map((cell) => (
               <td key={cell.id} className="py-3 px-5 text-neutral-100 text-sm">
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

@@ -6,7 +6,7 @@ import {
   RoutesProps,
   setupRoutes,
 } from "~/tests/setup.tests";
-import { render, screen } from "~/tests/render";
+import { render, screen, findAllByLabelText } from "~/tests/render";
 import { server } from "~/tests/server.mock";
 import { OverviewPage } from "~/components/pages/pipelines/overview/page";
 import { loader as overviewLoader } from "~/components/pages/pipelines/overview/loader.server";
@@ -52,9 +52,9 @@ describe("Workflow overview", () => {
       initialEntries: ["/2/pipelines/2/runs"],
     });
 
-    const list = await ListHandle.fromLabelText(/Runs list/i);
+    const runs = await screen.findAllByLabelText(/pipeline run/i);
 
-    expect(list.children).toHaveLength(3);
+    expect(runs).toHaveLength(3);
     expect(await screen.findAllByText(/finished/i)).toHaveLength(2);
     expect(await screen.findAllByText(/running/i)).toHaveLength(1);
   });
@@ -74,7 +74,7 @@ describe("Workflow overview", () => {
       initialEntries: ["/2/pipelines/2/runs"],
     });
 
-    await screen.findByText(/fetch/i);
+    await screen.findByText(/There are no pipeline runs.../i);
   });
 
   test("should stop non finished run", async () => {

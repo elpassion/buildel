@@ -1,4 +1,5 @@
 import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
+import { IPipelineDetails } from "~/api/pipeline/pipeline.contracts";
 
 export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
   return {
@@ -132,6 +133,15 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
         },
       ],
     },
+    ...override,
+  };
+};
+
+export const pipelineDetailsFixture = (
+  override?: Partial<IPipelineDetails>
+): IPipelineDetails => {
+  return {
+    total_cost: 123,
     ...override,
   };
 };

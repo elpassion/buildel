@@ -108,6 +108,8 @@ export const PipelineDetails = z.object({
   ]),
 });
 
+export type IPipelineDetails = z.TypeOf<typeof PipelineDetails>;
+
 export const PipelineDetailsResponse = z
   .object({
     data: PipelineDetails,
@@ -115,6 +117,8 @@ export const PipelineDetailsResponse = z
   .transform((response) => {
     return response.data;
   });
+
+export type IPipelineDetailsResponse = z.TypeOf<typeof PipelineDetailsResponse>;
 
 export const PipelineRuns = z.array(PipelineRun);
 
