@@ -90,7 +90,8 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
                 to={routes.pipelineRun(organizationId, pipelineId, id)}
               >
                 <IconButton
-                  aria-label="Stop run"
+                  tabIndex={-1}
+                  aria-label="Go to run overview"
                   iconName="external-link"
                   size="xs"
                   onlyIcon
