@@ -1,4 +1,5 @@
 import React, { PropsWithChildren, ReactNode } from "react";
+import classNames from "classnames";
 
 interface ItemListProps<T> {
   items: T[];
@@ -28,6 +29,12 @@ export const ItemList = <T extends { id: number | string }>({
   );
 };
 
-export const EmptyMessage: React.FC<PropsWithChildren> = ({ children }) => {
-  return <span className="text-sm text-white">{children}</span>;
+export const EmptyMessage: React.FC<
+  PropsWithChildren<{ className?: string }>
+> = ({ children, className }) => {
+  return (
+    <span className={classNames("text-sm text-white", className)}>
+      {children}
+    </span>
+  );
 };
