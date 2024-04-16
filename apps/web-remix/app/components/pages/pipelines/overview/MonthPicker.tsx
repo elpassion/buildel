@@ -1,5 +1,8 @@
 import React from "react";
-import { DatepickerInput } from "~/components/form/inputs/datepicker.input";
+import {
+  DatepickerInput,
+  DatepickerInputFallback,
+} from "~/components/form/inputs/datepicker.input";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { loader } from "./loader.server";
 import { routes } from "~/utils/routes.utils";
@@ -25,6 +28,8 @@ export const MonthPicker = () => {
       onChange={handleSetDate}
       showMonthYearPicker
       dateFormat="MMMM"
+      className="h-[34px]"
+      fallback={<DatepickerInputFallback className="!h-[34px]" />}
     />
   );
 };

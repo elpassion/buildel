@@ -20,7 +20,7 @@ export function OverviewPage() {
 
   return (
     <section className="pt-5 pb-1">
-      <header className="w-full flex items-center justify-between py-2 mb-6">
+      <header className="w-full flex items-center justify-between py-2 mb-4">
         <p className="text-white">
           <span className="text-neutral-100">Summary cost ($):</span>{" "}
           {details.total_cost}
