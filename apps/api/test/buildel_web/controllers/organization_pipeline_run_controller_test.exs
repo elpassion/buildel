@@ -52,6 +52,138 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
 
       assert_schema(response, "RunIndexResponse", api_spec)
     end
+
+    test "lists paginated results", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      api_spec: api_spec
+    } do
+      1..4
+      |> Enum.each(fn _ -> create_run(%{pipeline: pipeline}) end)
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/runs?per_page=2&page=2"
+        )
+
+      response = json_response(conn, 200)
+      assert 1 = length(response["data"])
+
+      assert %{
+               "total" => 5,
+               "page" => 2,
+               "per_page" => 2
+             } = response["meta"]
+
+      assert_schema(response, "RunIndexResponse", api_spec)
+    end
+
+    test "filters by current month by default", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      api_spec: api_spec
+    } do
+      1..4
+      |> Enum.each(fn _ ->
+        create_run(
+          %{pipeline: pipeline},
+          NaiveDateTime.utc_now(:second) |> NaiveDateTime.add(-35, :day)
+        )
+      end)
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/runs"
+        )
+
+      response = json_response(conn, 200)
+      assert 1 = length(response["data"])
+
+      assert %{
+               "total" => 1,
+               "page" => 0,
+               "per_page" => 10
+             } = response["meta"]
+
+      assert_schema(response, "RunIndexResponse", api_spec)
+    end
+
+    test "validates date format", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline
+    } do
+      1..4
+      |> Enum.each(fn _ ->
+        create_run(
+          %{pipeline: pipeline},
+          NaiveDateTime.utc_now(:second) |> NaiveDateTime.add(-35, :day)
+        )
+      end)
+
+      start_date =
+        NaiveDateTime.utc_now(:second)
+        |> NaiveDateTime.add(-37, :day)
+        |> NaiveDateTime.to_iso8601()
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/runs?start_date=#{start_date}&end_date=sdfsdf"
+        )
+
+      response = json_response(conn, 422)
+
+      assert %{
+               "date" => ["Invalid date format."]
+             } = response["errors"]
+    end
+
+    test "filters by date", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      api_spec: api_spec
+    } do
+      1..4
+      |> Enum.each(fn _ ->
+        create_run(
+          %{pipeline: pipeline},
+          NaiveDateTime.utc_now(:second) |> NaiveDateTime.add(-35, :day)
+        )
+      end)
+
+      start_date =
+        NaiveDateTime.utc_now(:second)
+        |> NaiveDateTime.add(-37, :day)
+        |> NaiveDateTime.to_iso8601()
+
+      end_date =
+        NaiveDateTime.utc_now(:second)
+        |> NaiveDateTime.add(-30, :day)
+        |> NaiveDateTime.to_iso8601()
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/runs?start_date=#{start_date}&end_date=#{end_date}"
+        )
+
+      response = json_response(conn, 200)
+      assert 4 = length(response["data"])
+
+      assert %{
+               "total" => 4,
+               "page" => 0,
+               "per_page" => 10
+             } = response["meta"]
+
+      assert_schema(response, "RunIndexResponse", api_spec)
+    end
   end
 
   describe "show" do
@@ -431,8 +563,8 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
     Pipelines.Runner.start_run(run)
   end
 
-  defp create_run(%{pipeline: pipeline}) do
-    run = run_fixture(%{pipeline_id: pipeline.id})
+  defp create_run(%{pipeline: pipeline}, date \\ nil) do
+    run = run_fixture(%{pipeline_id: pipeline.id}, %{version: "1"}, date)
     %{run: run}
   end
 

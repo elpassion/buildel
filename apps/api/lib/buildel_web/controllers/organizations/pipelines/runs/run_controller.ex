@@ -6,7 +6,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
 
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
-
+  alias OpenApiSpex.Schema
   alias Buildel.Organizations
 
   action_fallback(BuildelWeb.FallbackController)
@@ -30,7 +30,19 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
           type: :integer,
           required: true
         ],
-        pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true]
+        pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+        start_date: [
+          in: :query,
+          description: "Start date",
+          schema: %Schema{type: :string, format: :date_time},
+          required: false
+        ],
+        end_date: [
+          in: :query,
+          description: "End date",
+          schema: %Schema{type: :string, format: :date_time},
+          required: false
+        ]
       ] ++ BuildelWeb.Schemas.Pagination.default_params(),
     request_body: nil,
     responses: [
@@ -47,15 +59,51 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
   def index(conn, _params) do
     %{organization_id: organization_id, pipeline_id: pipeline_id} = conn.params
     pagination_params = conn.params |> Map.take([:page, :per_page])
+    date_params = conn.params |> Map.take([:start_date, :end_date])
 
     user = conn.assigns.current_user
 
-    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+    with {:ok, %{start_date: start_date, end_date: end_date}} <-
+           validate_date_params(date_params),
+         {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         runs <- Pipelines.list_pipeline_runs(pipeline) do
-      render(conn, :index, runs: runs, pagination_params: pagination_params)
+         {:ok, runs, total} <-
+           Pipelines.PipelineRunManager.list_pipeline_runs(
+             pipeline,
+             Map.merge(pagination_params, %{start_date: start_date, end_date: end_date})
+           ) do
+      render(conn, :index, runs: runs, pagination_params: pagination_params, total: total)
     end
+  end
+
+  defp validate_date_params(%{start_date: start_date, end_date: end_date}) do
+    with {:ok, start_date} <- NaiveDateTime.from_iso8601(start_date),
+         {:ok, end_date} <- NaiveDateTime.from_iso8601(end_date) do
+      {:ok, %{start_date: start_date, end_date: end_date}}
+    else
+      _ ->
+        {:error,
+         changeset_for_errors(%{
+           date: "Invalid date format."
+         })}
+    end
+  end
+
+  defp validate_date_params(%{}) do
+    {:ok, %{start_date: nil, end_date: nil}}
+  end
+
+  defp changeset_for_errors(errors) do
+    %Ecto.Changeset{
+      action: :validate,
+      errors:
+        errors
+        |> Enum.map(fn {key, value} -> {key, {value, []}} end)
+        |> Enum.into(%{}),
+      changes: %{},
+      types: %{}
+    }
   end
 
   operation :show,

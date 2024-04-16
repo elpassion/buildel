@@ -1,5 +1,6 @@
 defmodule Buildel.PipelinesFixtures do
   import Buildel.OrganizationsFixtures
+  require Ecto.Query
 
   def pipeline_fixture(attrs \\ %{}, config \\ %{version: "3"})
 
@@ -230,7 +231,7 @@ defmodule Buildel.PipelinesFixtures do
     pipeline
   end
 
-  def run_fixture(attrs \\ %{}, pipeline_config \\ %{version: "1"}) do
+  def run_fixture(attrs \\ %{}, pipeline_config \\ %{version: "1"}, date \\ nil) do
     pipeline =
       case attrs[:pipeline_id] do
         nil -> pipeline_fixture(%{}, pipeline_config)
@@ -244,6 +245,14 @@ defmodule Buildel.PipelinesFixtures do
         config: pipeline.config
       })
       |> Buildel.Pipelines.create_run()
+
+    if date do
+      Ecto.Query.from(r in Buildel.Pipelines.Run,
+        where: r.id == ^run.id,
+        update: [set: [inserted_at: ^date]]
+      )
+      |> Buildel.Repo.update_all([])
+    end
 
     run
   end
