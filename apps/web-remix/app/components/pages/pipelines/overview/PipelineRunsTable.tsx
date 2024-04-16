@@ -13,6 +13,7 @@ import {
 import { Indicator } from "@elpassion/taco";
 import { dayjs } from "~/utils/Dayjs";
 import { EmptyMessage } from "~/components/list/ItemList";
+import { StopRunForm } from "~/components/pages/pipelines/overview/StopRunForm";
 
 interface PipelineRunsTableProps {
   data: IPipelineRuns;
@@ -61,6 +62,17 @@ const columns = [
       info
         .getValue()
         .reduce((acc, curr) => acc + Number(curr.data.output_tokens), 0),
+  }),
+
+  columnHelper.accessor("status", {
+    header: "",
+    id: "action",
+    maxSize: 20,
+    cell: (info) => {
+      return info.getValue() === "running" ? (
+        <StopRunForm id={info.row.original.id} />
+      ) : null;
+    },
   }),
 ];
 

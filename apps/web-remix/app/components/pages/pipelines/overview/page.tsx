@@ -32,7 +32,7 @@ export function OverviewPage() {
       </header>
 
       <div className="overflow-x-auto">
-        <div className="min-w-[550px]">
+        <div className="min-w-[750px] pb-3">
           <PipelineRunsTable data={runs} />
 
           <div className="flex justify-end mt-4">
