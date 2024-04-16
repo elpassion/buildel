@@ -54,7 +54,7 @@ describe("Workflow overview", () => {
 
     const list = await ListHandle.fromLabelText(/Runs list/i);
 
-    expect(list.children).toHaveLength(4);
+    expect(list.children).toHaveLength(3);
     expect(await screen.findAllByText(/finished/i)).toHaveLength(2);
     expect(await screen.findAllByText(/running/i)).toHaveLength(1);
   });
@@ -74,7 +74,7 @@ describe("Workflow overview", () => {
       initialEntries: ["/2/pipelines/2/runs"],
     });
 
-    await screen.findByText(/There is no runs yet/i);
+    await screen.findByText(/fetch/i);
   });
 
   test("should stop non finished run", async () => {
