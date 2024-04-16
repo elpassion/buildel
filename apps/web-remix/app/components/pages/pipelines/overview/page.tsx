@@ -33,7 +33,11 @@ export function OverviewPage() {
 
       <div className="overflow-x-auto">
         <div className="min-w-[750px] pb-3">
-          <PipelineRunsTable data={runs} />
+          <PipelineRunsTable
+            data={runs}
+            organizationId={organizationId}
+            pipelineId={pipelineId}
+          />
 
           <div className="flex justify-end mt-4">
             <Pagination

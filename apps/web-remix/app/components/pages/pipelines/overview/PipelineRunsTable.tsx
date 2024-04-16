@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import {
   createColumnHelper,
@@ -14,74 +14,107 @@ import { Indicator } from "@elpassion/taco";
 import { dayjs } from "~/utils/Dayjs";
 import { EmptyMessage } from "~/components/list/ItemList";
 import { StopRunForm } from "~/components/pages/pipelines/overview/StopRunForm";
+import { routes } from "~/utils/routes.utils";
+import { IconButton } from "~/components/iconButton";
+import { Link } from "@remix-run/react";
 
 interface PipelineRunsTableProps {
   data: IPipelineRuns;
+  pipelineId: string;
+  organizationId: string;
 }
 
 const columnHelper = createColumnHelper<IPipelineRun>();
 
-const columns = [
-  columnHelper.accessor("created_at", {
-    header: "Date",
-    id: "created_at",
-    cell: (info) => dayjs(info.getValue()).format("DD MMM HH:mm"),
-  }),
-  columnHelper.accessor("status", {
-    id: "status",
-    cell: (info) => (
-      <Indicator
-        type={info.getValue() !== "finished" ? "warning" : "success"}
-        variant="badge"
-        text={info.getValue()}
-      />
-    ),
-    header: "Status",
-  }),
-  columnHelper.accessor("costs", {
-    header: "Run costs ($)",
-    id: "costs",
-    cell: (info) =>
-      info
-        .getValue()
-        .reduce((acc, curr) => acc + Number(curr.data.amount), 0)
-        .toFixed(10),
-  }),
-  columnHelper.accessor("costs", {
-    header: "Input tokens",
-    id: "input_tokens",
-    cell: (info) =>
-      info
-        .getValue()
-        .reduce((acc, curr) => acc + Number(curr.data.input_tokens), 0),
-  }),
-  columnHelper.accessor("costs", {
-    header: "Output tokens",
-    id: "output_tokens",
-    cell: (info) =>
-      info
-        .getValue()
-        .reduce((acc, curr) => acc + Number(curr.data.output_tokens), 0),
-  }),
-
-  columnHelper.accessor("status", {
-    header: "",
-    id: "action",
-    maxSize: 20,
-    cell: (info) => {
-      return info.getValue() === "running" ? (
-        <StopRunForm id={info.row.original.id} />
-      ) : null;
-    },
-  }),
-];
-
 export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
   data,
+  pipelineId,
+  organizationId,
 }) => {
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("created_at", {
+        header: "Date",
+        id: "created_at",
+        cell: (info) => dayjs(info.getValue()).format("DD MMM HH:mm"),
+      }),
+      columnHelper.accessor("status", {
+        id: "status",
+        cell: (info) => (
+          <Indicator
+            type={info.getValue() !== "finished" ? "warning" : "success"}
+            variant="badge"
+            text={info.getValue()}
+          />
+        ),
+        header: "Status",
+      }),
+      columnHelper.accessor("costs", {
+        header: "Run costs ($)",
+        id: "costs",
+        cell: (info) =>
+          info
+            .getValue()
+            .reduce((acc, curr) => acc + Number(curr.data.amount), 0)
+            .toFixed(10),
+      }),
+      columnHelper.accessor("costs", {
+        header: "Input tokens",
+        id: "input_tokens",
+        cell: (info) =>
+          info
+            .getValue()
+            .reduce((acc, curr) => acc + Number(curr.data.input_tokens), 0),
+      }),
+      columnHelper.accessor("costs", {
+        header: "Output tokens",
+        id: "output_tokens",
+        cell: (info) =>
+          info
+            .getValue()
+            .reduce((acc, curr) => acc + Number(curr.data.output_tokens), 0),
+      }),
+
+      columnHelper.accessor("status", {
+        header: "",
+        id: "action",
+        maxSize: 20,
+        cell: (info) => {
+          return (
+            <div className="flex gap-3 items-center justify-end">
+              {info.getValue() === "running" ? (
+                <StopRunForm id={info.row.original.id} />
+              ) : null}
+
+              <Link
+                to={routes.pipelineRun(
+                  organizationId,
+                  pipelineId,
+                  info.row.original.id
+                )}
+              >
+                <IconButton
+                  aria-label="Stop run"
+                  iconName="external-link"
+                  size="xs"
+                  onlyIcon
+                />
+              </Link>
+            </div>
+          );
+        },
+      }),
+    ],
+    []
+  );
+
+  const tableData = useMemo(() => {
+    return data;
+  }, [data]);
+
   const table = useReactTable({
-    data,
     columns,
+    data: tableData,
     getCoreRowModel: getCoreRowModel(),
   });
 
