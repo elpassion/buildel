@@ -23,21 +23,35 @@ export async function loader(args: LoaderFunctionArgs) {
       searchParams.get("end_date") ??
       dayjs(new Date()).endOfMonth.toISOString();
 
-    const { data: pipelineRuns } = await pipelineApi.getPipelineRuns(
+    const runsPromise = pipelineApi.getPipelineRuns(
       params.organizationId,
       params.pipelineId,
       { page, per_page, search, start_date, end_date }
     );
+
+    const detailsPromise = pipelineApi.getPipelineDetails(
+      params.organizationId,
+      params.pipelineId,
+      { start_date, end_date }
+    );
+
+    const [{ data: pipelineRuns }, details] = await Promise.all([
+      runsPromise,
+      detailsPromise,
+    ]);
 
     const totalItems = pipelineRuns.meta.total;
     const totalPages = Math.ceil(totalItems / per_page);
     const pagination = { page, per_page, search, totalItems, totalPages };
 
     return json({
+      details: details.data,
       pipelineRuns: pipelineRuns.data,
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
       pagination,
+      startDate: start_date,
+      endDate: end_date,
     });
   })(args);
 }

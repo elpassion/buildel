@@ -101,6 +101,21 @@ export const PipelineRun = z.object({
   }),
 });
 
+export const PipelineDetails = z.object({
+  total_cost: z.union([
+    z.number(),
+    z.string().transform((value) => Number(value)),
+  ]),
+});
+
+export const PipelineDetailsResponse = z
+  .object({
+    data: PipelineDetails,
+  })
+  .transform((response) => {
+    return response.data;
+  });
+
 export const PipelineRuns = z.array(PipelineRun);
 
 export const PipelinePublicResponse = z

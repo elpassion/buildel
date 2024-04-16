@@ -11,14 +11,15 @@ import {
   UpdatePipelineSchema,
   CreatePipelineSchema,
   PipelinePublicResponse,
+  PipelineDetailsResponse,
 } from "./pipeline.contracts";
 import { PaginationQueryParams } from "~/components/pagination/usePagination";
 import { buildUrlWithParams } from "~/utils/url";
 
-type QueryParamsWithDates = {
+type DateQueryParams = {
   start_date: string;
   end_date: string;
-} & PaginationQueryParams;
+};
 
 export class PipelineApi {
   constructor(private client: typeof fetchTyped) {}
@@ -33,7 +34,7 @@ export class PipelineApi {
   getPipelineRuns(
     organizationId: string | number,
     pipelineId: string | number,
-    pagination?: QueryParamsWithDates
+    pagination?: DateQueryParams & PaginationQueryParams
   ) {
     const url = buildUrlWithParams(
       `/organizations/${organizationId}/pipelines/${pipelineId}/runs`,
@@ -52,6 +53,19 @@ export class PipelineApi {
       PipelineRunResponse,
       `/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}`
     );
+  }
+
+  getPipelineDetails(
+    organizationId: string | number,
+    pipelineId: string | number,
+    queryParams: DateQueryParams
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/pipelines/${pipelineId}/details`,
+      { ...queryParams }
+    );
+
+    return this.client(PipelineDetailsResponse, url);
   }
 
   stopPipelineRun(
