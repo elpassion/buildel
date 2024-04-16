@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-
 import {
   createColumnHelper,
   flexRender,
@@ -17,6 +16,7 @@ import { StopRunForm } from "~/components/pages/pipelines/overview/StopRunForm";
 import { routes } from "~/utils/routes.utils";
 import { IconButton } from "~/components/iconButton";
 import { Link } from "@remix-run/react";
+import { Tooltip } from "~/components/tooltip/Tooltip";
 
 interface PipelineRunsTableProps {
   data: IPipelineRuns;
@@ -80,18 +80,14 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
         id: "action",
         maxSize: 20,
         cell: (info) => {
+          const id = info.row.original.id;
           return (
             <div className="flex gap-3 items-center justify-end">
-              {info.getValue() === "running" ? (
-                <StopRunForm id={info.row.original.id} />
-              ) : null}
+              {info.getValue() === "running" ? <StopRunForm id={id} /> : null}
 
               <Link
-                to={routes.pipelineRun(
-                  organizationId,
-                  pipelineId,
-                  info.row.original.id
-                )}
+                id={`run-link-${id}`}
+                to={routes.pipelineRun(organizationId, pipelineId, id)}
               >
                 <IconButton
                   aria-label="Stop run"
@@ -100,6 +96,13 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
                   onlyIcon
                 />
               </Link>
+
+              <Tooltip
+                offset={17}
+                anchorSelect={`#run-link-${id}`}
+                content="Go to run overview"
+                place="top"
+              />
             </div>
           );
         },
