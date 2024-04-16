@@ -79,7 +79,10 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id} className="rounded-xl overflow-hidden">
             {headerGroup.headers.map((header) => (
-              <th key={header.id} className="py-3 px-5">
+              <th
+                key={header.id}
+                className="py-3 px-5 first:rounded-tl-sm first:rounded-bl-sm last:rounded-tr-sm last:rounded-br-sm"
+              >
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext()
