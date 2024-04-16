@@ -5,26 +5,37 @@ import {
 } from "./usePagination";
 import classNames from "classnames";
 import { Icon } from "@elpassion/taco";
+import { useNavigate } from "@remix-run/react";
+import { buildUrlWithParams } from "~/utils/url";
 
 interface PaginationProps {
-  onPageChange: (page: number) => void;
   pagination: Partial<UsePaginationProps>;
+  loaderUrl: string;
 }
 
 export const Pagination: React.FC<PaginationProps> = ({
   pagination = DEFAULT_PAGINATION,
-  onPageChange,
+  loaderUrl,
 }) => {
+  const navigate = useNavigate();
   const { totalPages, page } = { ...DEFAULT_PAGINATION, ...pagination };
   const hasNextPage = totalPages > page + 1;
   const hasPreviousPage = page > 0;
 
   const onNext = () => {
-    onPageChange(page + 1);
+    const urlWithParams = buildUrlWithParams(loaderUrl, {
+      page: page + 1,
+    });
+
+    navigate(urlWithParams);
   };
 
   const onPrev = () => {
-    onPageChange(page - 1);
+    const urlWithParams = buildUrlWithParams(loaderUrl, {
+      page: page - 1,
+    });
+
+    navigate(urlWithParams);
   };
 
   const currentPage = totalPages > 0 ? page + 1 : 0;

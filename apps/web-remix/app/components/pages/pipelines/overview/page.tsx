@@ -1,5 +1,5 @@
 import { MetaFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
 import { dayjs } from "~/utils/Dayjs";
 import { loader } from "./loader.server";
@@ -8,7 +8,6 @@ import { PipelineRunsTable } from "~/components/pages/pipelines/overview/Pipelin
 import { Pagination } from "~/components/pagination/Pagination";
 
 export function OverviewPage() {
-  const navigate = useNavigate();
   const {
     pipelineRuns: runs,
     pipelineId,
@@ -18,16 +17,6 @@ export function OverviewPage() {
     startDate,
     endDate,
   } = useLoaderData<typeof loader>();
-
-  const onPageChange = (page: number) => {
-    navigate(
-      routes.pipelineRuns(organizationId, pipelineId, {
-        start_date: dayjs(startDate).startOfMonth.toISOString(),
-        end_date: dayjs(endDate).endOfMonth.toISOString(),
-        page,
-      })
-    );
-  };
 
   return (
     <section className="pt-5 pb-1">
@@ -47,7 +36,13 @@ export function OverviewPage() {
           <PipelineRunsTable data={runs} />
 
           <div className="flex justify-end mt-4">
-            <Pagination pagination={pagination} onPageChange={onPageChange} />
+            <Pagination
+              pagination={pagination}
+              loaderUrl={routes.pipelineRuns(organizationId, pipelineId, {
+                start_date: dayjs(startDate).startOfMonth.toISOString(),
+                end_date: dayjs(endDate).endOfMonth.toISOString(),
+              })}
+            />
           </div>
         </div>
       </div>
