@@ -13,6 +13,7 @@ export const DatepickerInput: React.FC<DatepickerInputProps> = (props) => {
       fallback={
         <div className="w-full bg-neutral-800 rounded-lg h-[42px] border border-neutral-200" />
       }
+      showPopperArrow={false}
       {...props}
     />
   );

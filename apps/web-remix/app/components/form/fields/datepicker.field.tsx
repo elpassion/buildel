@@ -17,11 +17,6 @@ export const DatepickerField: React.FC<
   };
 
   return (
-    <DatepickerInput
-      onChange={handleOnChange}
-      selected={value}
-      showPopperArrow={false}
-      {...props}
-    />
+    <DatepickerInput onChange={handleOnChange} selected={value} {...props} />
   );
 };

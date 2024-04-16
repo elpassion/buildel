@@ -15,7 +15,7 @@
     @apply text-white
 }
 
-.react-datepicker__day{
+.react-datepicker__day, .react-datepicker__month-text{
     @apply text-neutral-100 hover:bg-neutral-700
 }
 
@@ -23,7 +23,7 @@
     @apply bg-secondary-400
 }
 
-.react-datepicker__day--selected, .react-datepicker__day--keyboard-selected{
+.react-datepicker__day--selected, .react-datepicker__day--keyboard-selected, .react-datepicker__month-text--selected, .react-datepicker__month-text--keyboard-selected{
     @apply bg-secondary-700 text-white
 }
 
@@ -37,4 +37,8 @@
 
 .react-datepicker__input-container input:focus{
     @apply outline outline-2 outline-offset-1 outline-primary-500 !ring-0
+}
+
+.react-datepicker-year-header{
+  @apply text-neutral-100
 }

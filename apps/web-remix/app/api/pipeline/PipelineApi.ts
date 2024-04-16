@@ -15,6 +15,11 @@ import {
 import { PaginationQueryParams } from "~/components/pagination/usePagination";
 import { buildUrlWithParams } from "~/utils/url";
 
+type QueryParamsWithDates = {
+  start_date: string;
+  end_date: string;
+} & PaginationQueryParams;
+
 export class PipelineApi {
   constructor(private client: typeof fetchTyped) {}
 
@@ -28,7 +33,7 @@ export class PipelineApi {
   getPipelineRuns(
     organizationId: string | number,
     pipelineId: string | number,
-    pagination?: PaginationQueryParams
+    pagination?: QueryParamsWithDates
   ) {
     const url = buildUrlWithParams(
       `/organizations/${organizationId}/pipelines/${pipelineId}/runs`,

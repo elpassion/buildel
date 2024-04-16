@@ -1,4 +1,6 @@
 import originalDayjs, { Dayjs as OriginalDayjs } from "dayjs";
+import localeData from "dayjs/plugin/localeData";
+originalDayjs.extend(localeData);
 
 export class Dayjs {
   private instance: OriginalDayjs;
@@ -14,6 +16,37 @@ export class Dayjs {
 
   format(template?: string): string {
     return this.instance.format(template ?? this.defaultFormat);
+  }
+
+  month(): number {
+    return this.instance.month();
+  }
+
+  toISOString(): string {
+    return this.instance.toISOString();
+  }
+
+  startOf(unit: originalDayjs.OpUnitType): originalDayjs.Dayjs {
+    return this.instance.startOf(unit);
+  }
+
+  endOf(unit: originalDayjs.OpUnitType): originalDayjs.Dayjs {
+    return this.instance.endOf(unit);
+  }
+
+  add(
+    value: number,
+    unit?: originalDayjs.ManipulateType | undefined
+  ): OriginalDayjs {
+    return this.instance.add(value, unit);
+  }
+
+  get startOfMonth() {
+    return this.startOf("month");
+  }
+
+  get endOfMonth() {
+    return this.endOf("month");
   }
 }
 

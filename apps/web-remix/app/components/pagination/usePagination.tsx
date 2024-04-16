@@ -46,11 +46,16 @@ export const usePagination = (initialPagination?: Partial<Pagination>) => {
         }
       : undefined;
 
+  const goToPage = (page: number) => {
+    setPagination((prev) => ({ ...prev, page }));
+  };
+
   return {
     ...pagination,
     changeSearch,
     goToNext,
     goToPrev,
+    goToPage,
     hasNextPage: pagination.totalPages > pagination.page,
   };
 };

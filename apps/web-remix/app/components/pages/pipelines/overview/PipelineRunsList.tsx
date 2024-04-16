@@ -29,7 +29,6 @@ export const PipelineRunsList: React.FC<PipelineRunsListProps> = ({
       aria-label="Runs list"
       className="flex flex-col-reverse gap-2"
       items={reversed}
-      emptyText={<EmptyMessage>There is no runs yet...</EmptyMessage>}
       renderItem={(item) => (
         <Link
           to={routes.pipelineRun(
@@ -120,5 +119,32 @@ export const PipelineRunsItem: React.FC<PipelineRunsItemProps> = ({ data }) => {
         ) : null}
       </div>
     </article>
+  );
+};
+
+export const PipelineRunsSkeletonList = ({
+  length = 15,
+}: {
+  length?: number;
+}) => {
+  const items = Array.from({ length }, (_, i) => ({ id: i }));
+
+  return (
+    <ItemList
+      aria-label="Runs list"
+      className="flex flex-col-reverse gap-2"
+      items={items}
+      renderItem={PipelineRunsItemSkeleton}
+    />
+  );
+};
+
+const PipelineRunsItemSkeleton: React.FC = () => {
+  return (
+    <div
+      className={classNames(
+        "group bg-neutral-800 rounded-lg py-4 px-6 max-w-full items-center md:gap-2 w-full h-[58px] animate-pulse"
+      )}
+    />
   );
 };
