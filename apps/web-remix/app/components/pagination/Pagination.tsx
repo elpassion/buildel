@@ -68,7 +68,7 @@ export function PaginationButton({
     <button
       className={classNames(
         className,
-        "flex items-center gap-1 px-2 py-1 rounded bg-transparent border border-neutral-800 text-neutral-100 text-sm disabled:bg-neutral-900 disabled:text-neutral-500 hover:text-white hover:bg-neutral-900 transition"
+        "flex items-center gap-1 px-2 py-1 rounded-lg bg-transparent border border-neutral-800 text-neutral-100 text-sm disabled:bg-neutral-900 disabled:text-neutral-500 hover:text-white hover:bg-neutral-900 transition"
       )}
       {...rest}
     >

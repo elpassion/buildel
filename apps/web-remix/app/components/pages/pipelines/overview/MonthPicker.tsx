@@ -60,7 +60,7 @@ export const MonthPicker = () => {
         dateFormat="MMMM"
         className="h-[30px]"
         fallback={
-          <DatepickerInputFallback className="!h-[30px] !bg-transparent !border-neutral-800 !rounded" />
+          <DatepickerInputFallback className="!h-[30px] !bg-transparent !border-neutral-800" />
         }
       />
 

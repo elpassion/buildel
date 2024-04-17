@@ -1,5 +1,5 @@
 .react-datepicker__input-container input{
-  @apply !bg-transparent !border-neutral-800 !text-neutral-100 hover:!text-white !text-sm !rounded
+  @apply !bg-transparent !border-neutral-800 !text-neutral-100 hover:!text-white !text-sm
 }
 
 .react-datepicker__input-container input:focus{
