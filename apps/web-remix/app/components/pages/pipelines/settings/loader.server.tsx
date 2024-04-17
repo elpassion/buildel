@@ -4,6 +4,10 @@ import { requireLogin } from "~/session.server";
 import invariant from "tiny-invariant";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { BlockTypeApi } from "~/api/blockType/BlockTypeApi";
+import {
+  DEFAULT_END_DATE,
+  DEFAULT_START_DATE,
+} from "~/components/pages/pipelines/MonthPicker/monthPicker.utils";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -20,9 +24,16 @@ export async function loader(args: LoaderFunctionArgs) {
       params.pipelineId
     );
 
-    const [pipeline, blockTypes] = await Promise.all([
+    const detailsPromise = pipelineApi.getPipelineDetails(
+      params.organizationId,
+      params.pipelineId,
+      { start_date: DEFAULT_START_DATE, end_date: DEFAULT_END_DATE }
+    );
+
+    const [pipeline, blockTypes, { data: details }] = await Promise.all([
       pipelinePromise,
       blockTypesPromise,
+      detailsPromise,
     ]);
 
     const blocks = pipeline.data.config.blocks.map((block) => ({
@@ -39,6 +50,7 @@ export async function loader(args: LoaderFunctionArgs) {
       },
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
+      details,
     });
   })(args);
 }

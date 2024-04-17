@@ -3,7 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import { routes } from "~/utils/routes.utils";
 import { dayjs } from "~/utils/Dayjs";
 import { loader } from "./loader.server";
-import { MonthPicker } from "~/components/pages/pipelines/overview/MonthPicker";
+import { MonthPicker } from "~/components/pages/pipelines/MonthPicker/MonthPicker";
 import { PipelineRunsTable } from "~/components/pages/pipelines/overview/PipelineRunsTable";
 import { Pagination } from "~/components/pagination/Pagination";
 
@@ -27,7 +27,10 @@ export function OverviewPage() {
         </p>
 
         <div className="w-[170px]">
-          <MonthPicker />
+          <MonthPicker
+            date={new Date(startDate)}
+            loaderUrl={routes.pipelineRuns(organizationId, pipelineId)}
+          />
         </div>
       </header>
 

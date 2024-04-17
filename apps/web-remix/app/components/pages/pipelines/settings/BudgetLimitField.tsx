@@ -7,12 +7,16 @@ import {
   NumberInput,
   NumberInputProps,
 } from "~/components/form/inputs/number.input";
+import { useLoaderData } from "@remix-run/react";
+import { loader } from "~/components/pages/pipelines/settings/loader.server";
 
 export const BudgetLimitField: React.FC<Partial<NumberInputProps>> = ({
   supportingText,
   label,
   ...rest
 }) => {
+  const { details } = useLoaderData<typeof loader>();
+
   const { name } = useFieldContext();
   const { fieldErrors } = useFormContext();
   const [value, setValue] = useControlField<number | null>(name);
@@ -30,14 +34,23 @@ export const BudgetLimitField: React.FC<Partial<NumberInputProps>> = ({
   };
   return (
     <div>
-      <div className="flex gap-2" onClick={(e) => e.preventDefault()}>
-        <Label text={label} />
-        <ToggleInput
-          autoComplete={name}
-          checked={value !== null}
-          onChange={onCheck}
-          value=""
-        />
+      <div
+        className="flex gap-2 justify-between items-center mb-2"
+        onClick={(e) => e.preventDefault()}
+      >
+        <div className="flex gap-2">
+          <Label text={label} className="!m-0" />
+          <ToggleInput
+            autoComplete={name}
+            checked={value !== null}
+            onChange={onCheck}
+            value=""
+          />
+        </div>
+
+        <p className="text-xs text-neutral-100">
+          Currently ($): {details.total_cost}
+        </p>
       </div>
 
       <NumberInput

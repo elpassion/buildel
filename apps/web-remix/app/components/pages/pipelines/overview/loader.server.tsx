@@ -4,11 +4,11 @@ import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { getParamsPagination } from "~/components/pagination/usePagination";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
-import { dayjs } from "~/utils/Dayjs";
+import {
+  DEFAULT_END_DATE,
+  DEFAULT_START_DATE,
+} from "~/components/pages/pipelines/MonthPicker/monthPicker.utils";
 import { DateFilterSchema } from "./schema";
-
-const DEFAULT_START_DATE = dayjs(new Date()).startOfMonth.toISOString();
-const DEFAULT_END_DATE = dayjs(new Date()).endOfMonth.toISOString();
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
