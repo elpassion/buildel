@@ -5,6 +5,10 @@ import { requireLogin } from "~/session.server";
 import { getParamsPagination } from "~/components/pagination/usePagination";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { dayjs } from "~/utils/Dayjs";
+import { DateFilterSchema } from "./schema";
+
+const DEFAULT_START_DATE = dayjs(new Date()).startOfMonth.toISOString();
+const DEFAULT_END_DATE = dayjs(new Date()).endOfMonth.toISOString();
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -15,24 +19,28 @@ export async function loader(args: LoaderFunctionArgs) {
     const pipelineApi = new PipelineApi(fetch);
     const searchParams = new URL(request.url).searchParams;
     const { page, per_page, search } = getParamsPagination(searchParams);
+    const start_date = searchParams.get("start_date") ?? DEFAULT_START_DATE;
+    const end_date = searchParams.get("end_date") ?? DEFAULT_END_DATE;
 
-    const start_date =
-      searchParams.get("start_date") ??
-      dayjs(new Date()).startOfMonth.toISOString();
-    const end_date =
-      searchParams.get("end_date") ??
-      dayjs(new Date()).endOfMonth.toISOString();
+    const dateResult = DateFilterSchema.safeParse({ start_date, end_date });
+
+    const dates = dateResult.success
+      ? { start_date, end_date }
+      : {
+          start_date: DEFAULT_START_DATE,
+          end_date: DEFAULT_END_DATE,
+        };
 
     const runsPromise = pipelineApi.getPipelineRuns(
       params.organizationId,
       params.pipelineId,
-      { page, per_page, search, start_date, end_date }
+      { page, per_page, search, ...dates }
     );
 
     const detailsPromise = pipelineApi.getPipelineDetails(
       params.organizationId,
       params.pipelineId,
-      { start_date, end_date }
+      dates
     );
 
     const [{ data: pipelineRuns }, details] = await Promise.all([
@@ -50,8 +58,8 @@ export async function loader(args: LoaderFunctionArgs) {
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
       pagination,
-      startDate: start_date,
-      endDate: end_date,
+      startDate: dates.start_date,
+      endDate: dates.end_date,
     });
   })(args);
 }
