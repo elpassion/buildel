@@ -130,7 +130,7 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
             {headerGroup.headers.map((header) => (
               <th
                 key={header.id}
-                className="py-3 px-5 first:rounded-tl-sm first:rounded-bl-sm last:rounded-tr-sm last:rounded-br-sm"
+                className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
               >
                 {flexRender(
                   header.column.columnDef.header,
@@ -153,7 +153,7 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
         {table.getRowModel().rows.map((row) => (
           <tr
             key={row.id}
-            className="border-t border-neutral-800"
+            className="[&:not(:first-child)]:border-t border-neutral-800"
             aria-label="pipeline run"
           >
             {row.getVisibleCells().map((cell) => (
