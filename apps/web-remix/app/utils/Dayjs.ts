@@ -41,11 +41,19 @@ export class Dayjs {
     return this.instance.add(value, unit);
   }
 
+  addMonth(value: number) {
+    return this.add(value, "month");
+  }
+
   subtract(
     value: number,
     unit?: originalDayjs.ManipulateType | undefined
   ): OriginalDayjs {
     return this.instance.subtract(value, unit);
+  }
+
+  subtractMonth(value: number) {
+    return this.subtract(value, "month");
   }
 
   get startOfMonth() {

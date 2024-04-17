@@ -26,7 +26,7 @@ export const MonthPicker = () => {
   };
 
   const nextMonth = () => {
-    const date = dayjs(startDate).add(1, "month");
+    const date = dayjs(startDate).addMonth(1);
 
     navigate(
       routes.pipelineRuns(organizationId, pipelineId, {
@@ -37,7 +37,7 @@ export const MonthPicker = () => {
   };
 
   const prevMonth = () => {
-    const date = dayjs(startDate).subtract(1, "month");
+    const date = dayjs(startDate).subtractMonth(1);
 
     navigate(
       routes.pipelineRuns(organizationId, pipelineId, {
