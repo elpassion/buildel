@@ -26,7 +26,7 @@ export function OverviewPage() {
           {details.total_cost}
         </p>
 
-        <div className="w-[150px]">
+        <div className="w-[170px]">
           <MonthPicker />
         </div>
       </header>

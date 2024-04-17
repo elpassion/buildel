@@ -59,7 +59,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   );
 };
 
-function PaginationButton({
+export function PaginationButton({
   className,
   children,
   ...rest
