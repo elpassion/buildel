@@ -12,6 +12,7 @@ import {
   CreatePipelineSchema,
   PipelinePublicResponse,
   PipelineDetailsResponse,
+  UpdateAliasSchema,
 } from "./pipeline.contracts";
 import { PaginationQueryParams } from "~/components/pagination/usePagination";
 import { buildUrlWithParams } from "~/utils/url";
@@ -101,6 +102,27 @@ export class PipelineApi {
       `/organizations/${organizationId}/pipelines/${pipelineId}/aliases`,
       {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          alias: data,
+        }),
+      }
+    );
+  }
+
+  updateAlias(
+    organizationId: string | number,
+    pipelineId: string | number,
+    aliasId: string | number,
+    data: z.TypeOf<typeof UpdateAliasSchema>
+  ) {
+    return this.client(
+      AliasResponse,
+      `/organizations/${organizationId}/pipelines/${pipelineId}/aliases/${aliasId}`,
+      {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },

@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useEffect, useMemo } from "react";
+import React, { PropsWithChildren, useEffect, useMemo, useState } from "react";
 import { ItemList } from "~/components/list/ItemList";
 import { Icon } from "@elpassion/taco";
 import classNames from "classnames";
@@ -25,6 +25,10 @@ import {
   DropdownTrigger,
 } from "~/components/dropdown/Dropdown";
 import { useDropdown } from "~/components/dropdown/DropdownContext";
+import { IconButton } from "~/components/iconButton";
+import { ISecretKey } from "~/components/pages/secrets/variables.types";
+import { EditSecretKeyModal } from "~/components/pages/secrets/list/EditSecretKeyModal";
+import { EditAliasNameModal } from "~/components/pages/pipelines/pipelineLayout/EditAliasNameModal";
 
 interface AliasSelectProps {
   aliases: IPipelineAlias[];
@@ -85,33 +89,61 @@ export const AliasList = ({ data }: AliasListProps) => {
   const [searchParams] = useSearchParams();
   const alias = searchParams.get("alias") ?? "latest";
   const location = useLocation();
+  const [editableKey, setEditableKey] = useState<IPipelineAlias | null>(null);
+
+  const handleEdit = (alias: IPipelineAlias) => {
+    setEditableKey(alias);
+  };
+
+  const onClose = () => {
+    setEditableKey(null);
+  };
 
   return (
-    <ItemList
-      items={data}
-      className="flex flex-col gap-1"
-      emptyText={<span className="text-neutral-200 text-xs">No data</span>}
-      renderItem={(data) => (
-        <BasicLink
-          to={`${location.pathname}?alias=${data.id}`}
-          state={{ reset: true }}
-          className="focus:border"
-          aria-label={`Select alias: ${data.name}`}
-          data-testid="alias-link"
-        >
-          <AliasListItem data={data} isActive={alias === `${data.id}`} />
-        </BasicLink>
+    <>
+      <ItemList
+        items={data}
+        className="flex flex-col gap-1"
+        emptyText={<span className="text-neutral-200 text-xs">No data</span>}
+        renderItem={(data) => (
+          <BasicLink
+            to={`${location.pathname}?alias=${data.id}`}
+            state={{ reset: true }}
+            className="focus:border"
+            aria-label={`Select alias: ${data.name}`}
+            data-testid="alias-link"
+          >
+            <AliasListItem
+              data={data}
+              onEdit={handleEdit}
+              isActive={alias === `${data.id}`}
+            />
+          </BasicLink>
+        )}
+      />
+
+      {editableKey && (
+        <EditAliasNameModal
+          onClose={onClose}
+          isOpen={!!editableKey}
+          initialData={editableKey}
+        />
       )}
-    />
+    </>
   );
 };
 
 interface AliasListItemProps {
   data: IPipelineAlias;
   isActive?: boolean;
+  onEdit: (alias: IPipelineAlias) => void;
 }
 
-export const AliasListItem = ({ data, isActive }: AliasListItemProps) => {
+export const AliasListItem = ({
+  data,
+  isActive,
+  onEdit,
+}: AliasListItemProps) => {
   const fetcher = useFetcher();
 
   const onDelete = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -124,6 +156,12 @@ export const AliasListItem = ({ data, isActive }: AliasListItemProps) => {
     );
   };
 
+  const handleOnEdit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onEdit(data);
+  };
+
   return (
     <div
       className={classNames(
@@ -132,7 +170,7 @@ export const AliasListItem = ({ data, isActive }: AliasListItemProps) => {
       )}
     >
       <div className="flex gap-2 items-center">
-        <span className="truncate line-clamp-1">
+        <span className="truncate max-w-[175px]">
           {isActive ? "*" : null} {data.name}
         </span>
         {data.id === "latest" ? (
@@ -140,15 +178,25 @@ export const AliasListItem = ({ data, isActive }: AliasListItemProps) => {
         ) : null}
       </div>
 
-      {data.id !== "latest" && !isActive ? (
-        <button
-          onClick={onDelete}
-          aria-label={`Delete alias: ${data.name}`}
-          className="text-sm text-neutral-200 hover:text-primary-500 opacity-0 group-hover:opacity-100"
-        >
-          <Icon iconName="trash" />
-        </button>
-      ) : null}
+      {data.id !== "latest" && (
+        <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100">
+          <IconButton
+            onlyIcon
+            iconName="edit"
+            aria-label="Edit alias name"
+            onClick={handleOnEdit}
+          />
+
+          {!isActive ? (
+            <IconButton
+              onlyIcon
+              iconName="trash"
+              onClick={onDelete}
+              aria-label={`Delete alias: ${data.name}`}
+            />
+          ) : null}
+        </div>
+      )}
     </div>
   );
 };

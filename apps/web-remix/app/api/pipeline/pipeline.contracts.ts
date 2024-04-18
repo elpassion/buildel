@@ -177,6 +177,19 @@ export const CreateAliasSchema = z.object({
   }),
 });
 
+export const UpdateAliasSchema = z.object({
+  id: z.union([z.string(), z.number()]).optional(),
+  name: z.string().min(1).optional(),
+  interface_config: z
+    .string()
+    .transform((value) => JSON.parse(value))
+    .optional(),
+  config: z
+    .string()
+    .transform((value) => JSON.parse(value))
+    .optional(),
+});
+
 export const UpdatePipelineSchema = z.object({
   id: z.number(),
   name: z.string().min(1),
