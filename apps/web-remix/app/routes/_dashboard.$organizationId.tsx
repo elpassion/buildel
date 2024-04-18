@@ -275,8 +275,8 @@ function SidebarBottomContent({ isCollapsed }: SidebarContentProps) {
     <SidebarContentWrapper className="border-t border-neutral-400 py-3 !flex-row justify-between">
       {!isCollapsed && (
         <div className="flex flex-col text-xs text-white">
-          <p>Majkel Ward</p>
-          <p>elp@elp.com</p>
+          {/*<p>Majkel Ward</p>*/}
+          {/*<p>elp@elp.com</p>*/}
         </div>
       )}
       <LogoutButton />
