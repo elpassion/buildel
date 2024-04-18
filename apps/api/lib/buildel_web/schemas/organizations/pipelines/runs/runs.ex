@@ -26,7 +26,7 @@ defmodule BuildelWeb.Schemas.Runs do
         input_tokens: %Schema{type: :number, description: "Input tokens amount"},
         output_tokens: %Schema{type: :number, description: "Output tokens amount"},
         description: %Schema{type: :string, description: "Run cost description"},
-        created_at: %Schema{type: :date, description: "Run cost created at"}
+        created_at: %Schema{type: :string, description: "Run cost created at"}
       },
       required: [:id, :amount, :description, :created_at]
     })
