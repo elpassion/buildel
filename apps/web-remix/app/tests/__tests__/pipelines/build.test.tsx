@@ -192,6 +192,43 @@ describe(PipelineBuilder.name, () => {
     expect(linksAfterDelete).toHaveLength(1);
   });
 
+  test("should edit alias name", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: ["/2/pipelines/2/build"],
+    });
+
+    await page.openAliasDropdown();
+
+    await page.editAlias(/Edit alias: alias/i);
+
+    const nameInput = await InputHandle.fromTestId("alias-name");
+    expect(nameInput.value).toBe("alias");
+
+    await nameInput.type(" v2");
+
+    await page.saveAlias();
+
+    await ButtonHandle.fromLabelText(/Edit alias: alias v2/i);
+  });
+
+  test("shouldn't allow edit alias name", async () => {
+    const page = new PipelineObject().render({
+      initialEntries: ["/2/pipelines/2/build"],
+    });
+
+    await page.openAliasDropdown();
+
+    await page.editAlias(/Edit alias: alias/i);
+
+    const nameInput = await InputHandle.fromTestId("alias-name");
+    expect(nameInput.value).toBe("alias");
+
+    await nameInput.clear();
+    await page.saveAlias();
+
+    await screen.findByText(/String must contain at least/i);
+  });
+
   test("change alias and load its configuration", async () => {
     const page = new PipelineObject().render({
       initialEntries: ["/2/pipelines/2/build"],
@@ -635,6 +672,21 @@ class PipelineObject {
     const deleteButton = await ButtonHandle.fromLabelText(label);
 
     await deleteButton.click();
+
+    return this;
+  }
+
+  async editAlias(label: Matcher) {
+    const editButton = await ButtonHandle.fromLabelText(label);
+
+    await editButton.click();
+
+    return this;
+  }
+
+  async saveAlias() {
+    const button = await ButtonHandle.fromRole("Save");
+    await button.click();
 
     return this;
   }

@@ -183,7 +183,7 @@ export const AliasListItem = ({
           <IconButton
             onlyIcon
             iconName="edit"
-            aria-label="Edit alias name"
+            aria-label={`Edit alias: ${data.name}`}
             onClick={handleOnEdit}
           />
 

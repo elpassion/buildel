@@ -48,7 +48,7 @@ export const EditAliasNameModal: React.FC<EditAliasNameModalProps> = ({
           <HiddenField name="id" value={initialData.id} />
 
           <Field name="name">
-            <TextInputField />
+            <TextInputField label="Name" data-testid="alias-name" />
           </Field>
 
           <SubmitButton

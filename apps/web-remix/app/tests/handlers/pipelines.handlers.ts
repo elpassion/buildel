@@ -208,6 +208,33 @@ export class AliasHandlers {
     });
   }
 
+  updateHandler() {
+    return http.patch<any, { alias: IAliasResponse }>(
+      "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId",
+      async ({ request, params }) => {
+        const data = await request.json();
+        const aliasId = Number(params.aliasId);
+
+        const alias = this.aliases.get(aliasId);
+
+        if (!alias) {
+          return HttpResponse.json(
+            {},
+            {
+              status: 404,
+            }
+          );
+        }
+
+        const updated = { ...alias, ...data.alias };
+
+        this.aliases.set(aliasId, updated);
+
+        return HttpResponse.json({ data: updated }, { status: 200 });
+      }
+    );
+  }
+
   createHandler() {
     return http.post<any, { alias: IAliasResponse }>(
       "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases",
@@ -294,6 +321,7 @@ export class AliasHandlers {
       this.getAliasesHandler(),
       this.getAliasHandler(),
       this.deleteHandler(),
+      this.updateHandler(),
     ];
   }
 
