@@ -1,6 +1,17 @@
 defmodule BuildelWeb.CollectionJSON do
   alias Buildel.Memories.MemoryCollection
 
+  def search(%{memory_chunks: memory_chunks}) do
+    %{data: for(chunk <- memory_chunks, do: search_data(chunk))}
+  end
+
+  defp search_data(%{"chunk_id" => chunk_id, "document" => document}) do
+    %{
+      id: chunk_id,
+      content: document
+    }
+  end
+
   def index(%{collections: collections}) do
     %{data: for(collection <- collections, do: data(collection))}
   end

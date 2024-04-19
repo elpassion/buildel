@@ -33,6 +33,36 @@ defmodule BuildelWeb.Schemas.Collections do
     })
   end
 
+  defmodule CollectionMemoryChunk do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "CollectionMemoryChunk",
+      type: :object,
+      properties: %{
+        id: %Schema{type: :integer, description: "Chunk ID"},
+        content: %Schema{type: :string, description: "Content"}
+      },
+      required: [:id, :content]
+    })
+  end
+
+  defmodule SearchResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "CollectionSearchResponse",
+      type: :object,
+      properties: %{
+        data: %Schema{
+          type: :array,
+          items: CollectionMemoryChunk
+        }
+      },
+      required: [:data]
+    })
+  end
+
   defmodule IndexResponse do
     require OpenApiSpex
 

@@ -14,6 +14,42 @@ defmodule BuildelWeb.CollectionController do
 
   tags ["collection"]
 
+  operation :search,
+    summary: "Search in collection documents",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      id: [in: :path, description: "Collection ID", type: :integer],
+      query: [in: :query, description: "Search query", type: :string]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Collections.SearchResponse},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def search(conn, _params) do
+    %{
+      organization_id: organization_id,
+      id: id,
+      query: search_query
+    } =
+      conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, id),
+         memory_chunks =
+           Buildel.Memories.search_organization_collection(organization, collection, search_query) do
+      render(conn, :search, memory_chunks: memory_chunks)
+    end
+  end
+
   operation :index,
     summary: "List collections",
     parameters: [

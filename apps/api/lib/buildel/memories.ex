@@ -167,6 +167,46 @@ defmodule Buildel.Memories do
     end
   end
 
+  def search_organization_collection(organization, collection, search_query) do
+    {:ok, api_key} =
+      Organizations.get_organization_secret(organization, collection.embeddings_secret_name)
+
+    organization_collection_name = organization_collection_name(organization, collection)
+
+    workflow =
+      Buildel.DocumentWorkflow.new(%{
+        embeddings:
+          Buildel.Clients.Embeddings.new(%{
+            api_type: collection.embeddings_api_type,
+            model: collection.embeddings_model,
+            api_key: api_key.value
+          }),
+        collection_name: organization_collection_name,
+        db_adapter: Buildel.VectorDB.EctoAdapter,
+        workflow_config: %{
+          chunk_size: collection.chunk_size,
+          chunk_overlap: collection.chunk_overlap
+        }
+      })
+
+    vector_db =
+      Buildel.VectorDB.new(%{
+        adapter: workflow.db_adapter,
+        embeddings: workflow.embeddings
+      })
+
+    Buildel.VectorDB.query(
+      vector_db,
+      organization_collection_name,
+      search_query,
+      "{}" |> Jason.decode!(),
+      %{
+        limit: 3,
+        similarity_threshhold: 0.75
+      }
+    )
+  end
+
   def upsert_collection(
         %{
           organization_id: organization_id,

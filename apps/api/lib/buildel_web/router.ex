@@ -151,6 +151,12 @@ defmodule BuildelWeb.Router do
       only: [:index, :create, :show, :delete, :update]
     )
 
+    get(
+      "/organizations/:organization_id/memory_collections/:id/search",
+      CollectionController,
+      :search
+    )
+
     resources(
       "/organizations/:organization_id/memory_collections/:memory_collection_id/memories",
       MemoryController,
