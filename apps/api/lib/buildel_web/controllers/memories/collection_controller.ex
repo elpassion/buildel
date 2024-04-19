@@ -87,7 +87,12 @@ defmodule BuildelWeb.CollectionController do
   def create(conn, _params) do
     %{organization_id: organization_id} = conn.params
 
-    %{collection_name: collection_name, embeddings: embeddings, chunk_size: chunk_size} =
+    %{
+      collection_name: collection_name,
+      embeddings: embeddings,
+      chunk_size: chunk_size,
+      chunk_overlap: chunk_overlap
+    } =
       conn.body_params
 
     user = conn.assigns.current_user
@@ -104,7 +109,8 @@ defmodule BuildelWeb.CollectionController do
              organization_id: organization.id,
              collection_name: collection_name,
              embeddings: embeddings,
-             chunk_size: chunk_size
+             chunk_size: chunk_size,
+             chunk_overlap: chunk_overlap
            }) do
       conn
       |> put_status(:created)
@@ -158,7 +164,10 @@ defmodule BuildelWeb.CollectionController do
 
   def update(conn, _params) do
     %{organization_id: organization_id, id: id} = conn.params
-    %{embeddings: embeddings, chunk_size: chunk_size} = conn.body_params
+
+    %{embeddings: embeddings, chunk_size: chunk_size, chunk_overlap: chunk_overlap} =
+      conn.body_params
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
@@ -178,7 +187,8 @@ defmodule BuildelWeb.CollectionController do
                model: collection.embeddings_model,
                secret_name: embeddings.secret_name
              },
-             chunk_size: chunk_size
+             chunk_size: chunk_size,
+             chunk_overlap: chunk_overlap
            }) do
       conn
       |> put_status(:ok)

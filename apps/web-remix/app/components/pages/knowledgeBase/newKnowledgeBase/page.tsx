@@ -32,6 +32,7 @@ export function NewKnowledgeBasePage() {
           api_type: "openai",
         },
         chunk_size: 1000,
+        chunk_overlap: 0,
       }}
     >
       <div className="max-w-s w-full grow overflow-y-auto p-1 flex flex-col gap-2 space-y-1">
@@ -64,6 +65,14 @@ export function NewKnowledgeBasePage() {
             label="Chunk size"
             placeholder="eg. 1000"
             supportingText="Size of the generated chunks in the collection."
+          />
+        </Field>
+
+        <Field name="chunk_overlap">
+          <NumberInputField
+            label="Chunk overlap"
+            placeholder="eg. 50"
+            supportingText="Overlap between the generated chunks in the collection."
           />
         </Field>
       </div>

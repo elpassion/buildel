@@ -78,7 +78,8 @@ defmodule Buildel.Memories do
         collection_name: organization_collection_name,
         db_adapter: Buildel.VectorDB.EctoAdapter,
         workflow_config: %{
-          chunk_size: collection.chunk_size
+          chunk_size: collection.chunk_size,
+          chunk_overlap: collection.chunk_overlap
         }
       })
 
@@ -174,6 +175,7 @@ defmodule Buildel.Memories do
         } = collection_data
       ) do
     chunk_size = Map.get(collection_data, :chunk_size, nil)
+    chunk_overlap = Map.get(collection_data, :chunk_overlap, nil)
 
     Buildel.Memories.MemoryCollection
     |> where([c], c.collection_name == ^collection_name and c.organization_id == ^organization_id)
@@ -187,7 +189,8 @@ defmodule Buildel.Memories do
           embeddings_api_type: embeddings.api_type,
           embeddings_model: embeddings.model,
           embeddings_secret_name: embeddings.secret_name,
-          chunk_size: chunk_size || 1000
+          chunk_size: chunk_size || 1000,
+          chunk_overlap: chunk_overlap || 0
         })
         |> Buildel.Repo.insert()
 
@@ -199,7 +202,8 @@ defmodule Buildel.Memories do
           embeddings_api_type: embeddings.api_type,
           embeddings_model: embeddings.model,
           embeddings_secret_name: embeddings.secret_name,
-          chunk_size: chunk_size || collection.chunk_size
+          chunk_size: chunk_size || collection.chunk_size,
+          chunk_overlap: chunk_overlap || collection.chunk_overlap
         })
         |> Buildel.Repo.update()
     end

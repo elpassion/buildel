@@ -12,6 +12,7 @@ export const collectionFixture = (
       secret_name: "openai",
     },
     chunk_size: 1000,
+    chunk_overlap: 0,
     ...override,
   };
 };

@@ -6,7 +6,8 @@ defmodule Buildel.DocumentWorkflow do
   defstruct [:embeddings, :collection_name, :db_adapter, :workflow_config]
 
   @type workflow_config :: %{
-          chunk_size: integer()
+          chunk_size: integer(),
+          chunk_overlap: integer()
         }
 
   @type t :: %__MODULE__{
@@ -34,7 +35,8 @@ defmodule Buildel.DocumentWorkflow do
         } = module_data
       ) do
     default_workflow_config = %{
-      chunk_size: 1000
+      chunk_size: 1000,
+      chunk_overlap: 0
     }
 
     workflow_config = Map.get(module_data, :workflow_config, %{})
@@ -77,10 +79,11 @@ defmodule Buildel.DocumentWorkflow do
 
   @spec build_node_chunks(t(), struct_list()) :: [chunk()]
   def build_node_chunks(%{workflow_config: workflow_config}, documents) do
-    %{chunk_size: chunk_size} = workflow_config
+    %{chunk_size: chunk_size, chunk_overlap: chunk_overlap} = workflow_config
 
     ChunkGenerator.split_into_chunks(documents, %{
-      chunk_size: chunk_size
+      chunk_size: chunk_size,
+      chunk_overlap: chunk_overlap
     })
     |> ChunkGenerator.add_neighbors()
   end

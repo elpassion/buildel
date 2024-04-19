@@ -27,6 +27,7 @@ export const CreateCollectionSchema = z.object({
     secret_name: z.string().min(2),
   }),
   chunk_size: zfd.numeric(z.number().int().positive()),
+  chunk_overlap: zfd.numeric(z.number().int().min(0)),
 });
 
 export const UpdateCollectionSchema = z.object({
@@ -38,6 +39,7 @@ export const UpdateCollectionSchema = z.object({
     secret_name: z.string().min(2),
   }),
   chunk_size: zfd.numeric(z.number().int().positive()),
+  chunk_overlap: zfd.numeric(z.number().int().min(0)),
 });
 
 export type ICreateCollectionSchema = z.TypeOf<typeof CreateCollectionSchema>;
@@ -60,6 +62,7 @@ export const KnowledgeBaseCollection = z.object({
     secret_name: z.string(),
   }),
   chunk_size: z.number(),
+  chunk_overlap: z.number(),
 });
 
 export const KnowledgeBaseFileResponse = z

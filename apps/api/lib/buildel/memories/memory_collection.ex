@@ -8,6 +8,7 @@ defmodule Buildel.Memories.MemoryCollection do
     field(:embeddings_model, :string)
     field(:embeddings_secret_name, :string)
     field(:chunk_size, :integer, default: 1000)
+    field(:chunk_overlap, :integer, default: 0)
 
     belongs_to(:organization, Buildel.Organizations.Organization)
     has_many(:memories, Buildel.Memories.Memory)
@@ -23,7 +24,8 @@ defmodule Buildel.Memories.MemoryCollection do
       :embeddings_api_type,
       :embeddings_model,
       :embeddings_secret_name,
-      :chunk_size
+      :chunk_size,
+      :chunk_overlap
     ])
     |> validate_required([
       :organization_id,

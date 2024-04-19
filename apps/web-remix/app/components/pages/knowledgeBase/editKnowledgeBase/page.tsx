@@ -81,6 +81,14 @@ export function EditKnowledgeBasePage() {
               supportingText="Size of the generated chunks in the collection."
             />
           </Field>
+
+          <Field name="chunk_overlap">
+            <NumberInputField
+              label="Chunk overlap"
+              placeholder="eg. 50"
+              supportingText="Overlap between the generated chunks in the collection."
+            />
+          </Field>
         </div>
         <SubmitButton hierarchy="primary" size="sm">
           Update collection

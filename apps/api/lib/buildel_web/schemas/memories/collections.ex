@@ -26,9 +26,10 @@ defmodule BuildelWeb.Schemas.Collections do
         id: %Schema{type: :integer, description: "Collection ID"},
         name: %Schema{type: :string, description: "Collection name"},
         chunk_size: %Schema{type: :integer, description: "Chunk size"},
+        chunk_overlap: %Schema{type: :integer, description: "Chunk overlap"},
         embeddings: CollectionEmbedding
       },
-      required: [:id, :name, :chunk_size]
+      required: [:id, :name, :chunk_size, :chunk_overlap]
     })
   end
 
@@ -85,7 +86,8 @@ defmodule BuildelWeb.Schemas.Collections do
       properties: %{
         collection_name: %Schema{type: :string, description: "Collection name"},
         embeddings: CollectionEmbeddingCreate,
-        chunk_size: %Schema{type: :integer, description: "Chunk size"}
+        chunk_size: %Schema{type: :integer, description: "Chunk size"},
+        chunk_overlap: %Schema{type: :integer, description: "Chunk overlap"}
       },
       required: [:collection_name, :embeddings]
     })
@@ -112,7 +114,8 @@ defmodule BuildelWeb.Schemas.Collections do
       type: :object,
       properties: %{
         embeddings: CollectionEmbeddingUpdate,
-        chunk_size: %Schema{type: :integer, description: "Chunk size"}
+        chunk_size: %Schema{type: :integer, description: "Chunk size"},
+        chunk_overlap: %Schema{type: :integer, description: "Chunk overlap"}
       },
       required: [:embeddings]
     })

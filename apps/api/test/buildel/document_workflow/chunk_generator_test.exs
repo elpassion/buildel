@@ -4,6 +4,26 @@ defmodule Buildel.ChunkGeneratorTest do
   setup [:create_workflow]
 
   describe "split_into_chunks/1" do
+    test "should overlap chunks based od config", %{workflow: workflow} do
+      list = DocumentWorkflow.read(workflow, {"foo", %{}})
+
+      config = Map.put(workflow.workflow_config, :chunk_overlap, 5)
+      result = DocumentWorkflow.ChunkGenerator.split_into_chunks(list, config)
+
+      assert [
+               %DocumentWorkflow.ChunkGenerator.Chunk{
+                 id: _,
+                 value: " Para1 header1 li11 li12",
+                 embeddings: nil
+               },
+               %DocumentWorkflow.ChunkGenerator.Chunk{
+                 id: _,
+                 value: " li12 header2 li2 header3",
+                 embeddings: nil
+               }
+             ] = result
+    end
+
     test "should split into chunks based od config", %{workflow: workflow} do
       list = DocumentWorkflow.read(workflow, {"foo", %{}})
       result = DocumentWorkflow.ChunkGenerator.split_into_chunks(list, workflow.workflow_config)
@@ -24,7 +44,10 @@ defmodule Buildel.ChunkGeneratorTest do
 
     test "should add metadata to chunks", %{workflow: workflow} do
       list = DocumentWorkflow.read(workflow, {"foo", %{}})
-      result = DocumentWorkflow.ChunkGenerator.split_into_chunks(list, workflow.workflow_config)
+
+      result =
+        DocumentWorkflow.ChunkGenerator.split_into_chunks(list, workflow.workflow_config)
+
       first_chunk_building_block_ids = list |> Enum.map(& &1.id) |> Enum.take(3)
       second_chunk_building_block_ids = list |> Enum.map(& &1.id) |> Enum.drop(3)
 
@@ -89,7 +112,8 @@ defmodule Buildel.ChunkGeneratorTest do
         collection_name: "test",
         db_adapter: Buildel.VectorDB.EctoAdapter,
         workflow_config: %{
-          chunk_size: 20
+          chunk_size: 20,
+          chunk_overlap: 0
         }
       })
 

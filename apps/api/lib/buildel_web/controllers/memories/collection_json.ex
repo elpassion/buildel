@@ -18,7 +18,8 @@ defmodule BuildelWeb.CollectionJSON do
         model: collection.embeddings_model,
         secret_name: collection.embeddings_secret_name
       },
-      chunk_size: collection.chunk_size
+      chunk_size: collection.chunk_size,
+      chunk_overlap: collection.chunk_overlap
     }
   end
 end

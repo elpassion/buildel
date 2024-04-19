@@ -183,14 +183,16 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
             model: "text-embedding-ada-002",
             secret_name: "some name"
           },
-          chunk_size: 420
+          chunk_size: 420,
+          chunk_overlap: 20
         })
 
       assert %{
                "data" => %{
                  "name" => ^collection_name,
                  "id" => id,
-                 "chunk_size" => 420
+                 "chunk_size" => 420,
+                 "chunk_overlap" => 20
                }
              } = json_response(conn, 201)
 
@@ -206,7 +208,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
                "data" => %{
                  "id" => ^id,
                  "name" => ^collection_name,
-                 "chunk_size" => 420
+                 "chunk_size" => 420,
+                 "chunk_overlap" => 20
                }
              } = response
 
@@ -320,14 +323,15 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
                  "embeddings" => %{
                    "secret_name" => "new_secret_name"
                  },
-                 "chunk_size" => 1000
+                 "chunk_size" => 1000,
+                 "chunk_overlap" => 0
                }
              } = response
 
       assert_schema(response, "CollectionShowResponse", api_spec)
     end
 
-    test "updates chunk size", %{
+    test "updates chunk size and overlap", %{
       conn: conn,
       organization: organization,
       collection: collection,
@@ -344,7 +348,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
             embeddings: %{
               secret_name: "new_secret_name"
             },
-            chunk_size: 420
+            chunk_size: 420,
+            chunk_overlap: 20
           }
         )
 
@@ -356,7 +361,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
                  "embeddings" => %{
                    "secret_name" => "new_secret_name"
                  },
-                 "chunk_size" => 420
+                 "chunk_size" => 420,
+                 "chunk_overlap" => 20
                }
              } = response
 
@@ -376,7 +382,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
                  "embeddings" => %{
                    "secret_name" => "new_secret_name"
                  },
-                 "chunk_size" => 420
+                 "chunk_size" => 420,
+                 "chunk_overlap" => 20
                }
              } = response
 

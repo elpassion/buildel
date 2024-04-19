@@ -21,9 +21,11 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
   end
 
   @chunk_size 1000
+  @chunk_overlap 0
 
   @type chunk_config :: %{
-          chunk_size: integer()
+          chunk_size: integer(),
+          chunk_overlap: integer()
         }
   @type struct_list :: [
           DocumentProcessor.Header.t()
@@ -32,7 +34,7 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
         ]
   @spec split_into_chunks(struct_list(), chunk_config()) :: [Chunk.t()]
   def split_into_chunks(list, config \\ %{}) do
-    merged_config = Map.merge(%{chunk_size: @chunk_size}, config)
+    merged_config = Map.merge(%{chunk_size: @chunk_size, chunk_overlap: @chunk_overlap}, config)
     splitter(list, "", [], %{}, merged_config)
   end
 
@@ -76,6 +78,30 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
         config
       )
     else
+      overlap_length = config.chunk_overlap
+
+      list =
+        if overlap_length > 0 do
+          overlap_text = String.slice(text, -overlap_length..-1)
+
+          {_, new_overlap_list} = String.split(overlap_text, " ") |> List.pop_at(0)
+
+          if Enum.empty?(new_overlap_list) do
+            list
+          else
+            new_overlap_text = Enum.join(new_overlap_list, " ")
+
+            [first_element | rest_of_list] = list
+
+            modified_first_element =
+              Map.put(first_element, :value, new_overlap_text <> " " <> first_element.value)
+
+            [modified_first_element | rest_of_list]
+          end
+        else
+          list
+        end
+
       new_chunk_list = chunk_list ++ [create_chunk(text, metadata)]
       splitter(list, "", new_chunk_list, %{}, config)
     end
