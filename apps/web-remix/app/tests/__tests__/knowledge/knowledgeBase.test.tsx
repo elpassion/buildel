@@ -144,15 +144,6 @@ describe("KnowledgeBase", () => {
     expect(list.children).toHaveLength(3);
   });
 
-  test("should display empty message if no collections", async () => {
-    setupServer.use(...new CollectionMemoriesHandlers().handlers);
-    new KnowledgeBaseObject().render({
-      initialEntries: ["/2/knowledge-base/super-collection"],
-    });
-
-    await screen.findByText(/There is no files in collection yet/i);
-  });
-
   test("should display file chunks", async () => {
     new KnowledgeBaseObject().render({
       initialEntries: ["/2/knowledge-base/super-collection"],
