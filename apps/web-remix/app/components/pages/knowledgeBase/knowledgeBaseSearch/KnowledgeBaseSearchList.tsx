@@ -1,18 +1,26 @@
 import React from "react";
-import { ItemList } from "~/components/list/ItemList";
+import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { IKnowledgeBaseSearchChunk } from "~/api/knowledgeBase/knowledgeApi.contracts";
 
 interface KnowledgeBaseSearchListProps {
   items: IKnowledgeBaseSearchChunk[];
+  query?: string;
 }
 
 export const KnowledgeBaseSearchList: React.FC<
   KnowledgeBaseSearchListProps
-> = ({ items }) => {
+> = ({ items, query }) => {
+  const hasNoChunks = !!query && items.length === 0;
+
   return (
     <ItemList
-      className="flex flex-col gap-2"
       items={items}
+      emptyText={
+        hasNoChunks && (
+          <EmptyMessage>No answers found in knowledge base...</EmptyMessage>
+        )
+      }
+      className="flex flex-col gap-2"
       renderItem={(item) => <KnowledgeBaseSearchListItem item={item} />}
     />
   );

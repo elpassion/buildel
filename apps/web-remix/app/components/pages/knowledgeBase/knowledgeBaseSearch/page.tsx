@@ -26,8 +26,8 @@ export function KnowledgeBaseSearch() {
 
       <KnowledgeBaseSearchForm defaultValue={query ?? ""} />
 
-      <div className="overflow-y-auto mt-6">
-        <KnowledgeBaseSearchList items={chunks} />
+      <div className="overflow-y-auto mt-4">
+        <KnowledgeBaseSearchList items={chunks} query={query} />
       </div>
     </>
   );
