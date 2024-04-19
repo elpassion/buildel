@@ -7,6 +7,7 @@ interface ItemListProps<T> {
   className?: string;
   itemClassName?: string;
   emptyText?: ReactNode;
+  children?: ReactNode;
 }
 
 export const ItemList = <T extends { id: number | string }>({
@@ -15,11 +16,13 @@ export const ItemList = <T extends { id: number | string }>({
   className,
   itemClassName,
   emptyText,
+  children,
   ...rest
 }: ItemListProps<T> & React.HTMLProps<HTMLUListElement>) => {
   return (
     <ul className={className} {...rest}>
       {emptyText && <li className="hidden last:block">{emptyText}</li>}
+      {children}
       {items.map((item, index) => (
         <li className={itemClassName} key={item.id}>
           {renderItem(item, index)}

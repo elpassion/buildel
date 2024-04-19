@@ -1,5 +1,5 @@
 import React from "react";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
+import { ItemList } from "~/components/list/ItemList";
 import {
   IKnowledgeBaseFile,
   IKnowledgeBaseFileList,
@@ -7,7 +7,7 @@ import {
 import { Icon } from "@elpassion/taco";
 import { IconButton } from "~/components/iconButton";
 import { confirm } from "~/components/modal/confirm";
-import { useFetcher, useLoaderData } from "@remix-run/react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
 import { BasicLink } from "~/components/link/BasicLink";
 import { routes } from "~/utils/routes.utils";
 import { loader } from "./loader.server";
@@ -43,9 +43,6 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
       aria-label="Collection files"
       className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3"
       items={items}
-      emptyText={
-        <EmptyMessage>There is no files in collection yet...</EmptyMessage>
-      }
       renderItem={(item) => (
         <BasicLink
           to={routes.collectionMemory(organizationId, collectionName, item.id)}
@@ -53,7 +50,17 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
           <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
         </BasicLink>
       )}
-    />
+    >
+      <li>
+        <Link
+          to={routes.collectionFilesNew(organizationId, collectionName)}
+          className="bg-neutral-900 transition rounded-lg py-2 px-6 w-full h-full text-neutral-600 hover:text-neutral-300 flex flex-col items-center justify-center h-[80px] border border-neutral-800 hover:border-neutral-700"
+        >
+          <Icon iconName="plus" className="text-xl" />
+          <p className="font-medium">Add new memory file</p>
+        </Link>
+      </li>
+    </ItemList>
   );
 };
 

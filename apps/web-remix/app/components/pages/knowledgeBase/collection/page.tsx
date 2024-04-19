@@ -55,13 +55,7 @@ export function KnowledgeBaseCollectionPage() {
         <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
           <Link to={routes.knowledgeBaseSearch(organizationId, collectionName)}>
             <Button size="sm" tabIndex={0}>
-              Test collection
-            </Button>
-          </Link>
-
-          <Link to={routes.collectionFilesNew(organizationId, collectionName)}>
-            <Button size="sm" tabIndex={0}>
-              New knowledge item
+              Ask a question
             </Button>
           </Link>
         </div>
