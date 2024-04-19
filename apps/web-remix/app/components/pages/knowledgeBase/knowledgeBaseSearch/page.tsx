@@ -4,6 +4,7 @@ import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
 import { routes } from "~/utils/routes.utils";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { KnowledgeBaseSearchForm } from "./KnowledgeBaseSearchForm";
+import { KnowledgeBaseSearchList } from "./KnowledgeBaseSearchList";
 import { loader } from "./loader.server";
 
 export function KnowledgeBaseSearch() {
@@ -24,6 +25,10 @@ export function KnowledgeBaseSearch() {
       />
 
       <KnowledgeBaseSearchForm defaultValue={query ?? ""} />
+
+      <div className="overflow-y-auto mt-6">
+        <KnowledgeBaseSearchList items={chunks} />
+      </div>
     </>
   );
 }
