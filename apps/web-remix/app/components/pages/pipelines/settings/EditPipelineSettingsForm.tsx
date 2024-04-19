@@ -51,7 +51,7 @@ export function EditPipelineSettingsForm({
     if (updateFetcher.data) {
       successToast({ description: "Workflow settings have been changed" });
     }
-  }, [updateFetcher]);
+  }, [updateFetcher.data]);
 
   return (
     <ValidatedForm
