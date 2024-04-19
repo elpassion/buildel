@@ -9,9 +9,13 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.organizationId, "organizationId not found");
     invariant(params.collectionName, "collectionName not found");
 
+    const url = new URL(request.url);
+
     return json({
       organizationId: params.organizationId,
       collectionName: params.collectionName,
+      query: url.searchParams.get("query"),
+      chunks: [],
     });
   })(args);
 }
