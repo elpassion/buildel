@@ -54,13 +54,13 @@ export const KnowledgeBaseFile = z.object({
 });
 
 export const KnowledgeBaseSearchChunk = z.object({
-  id: z.number(),
+  id: z.string(),
   content: z.string(),
-  file_name: z.string(),
+  // file_name: z.string(),
 });
 
 export const KnowledgeBaseSearchChunkResponse = z
-  .object({ data: KnowledgeBaseSearchChunk })
+  .object({ data: z.array(KnowledgeBaseSearchChunk) })
   .transform((res) => res.data);
 
 export type IKnowledgeBaseSearchChunk = z.TypeOf<

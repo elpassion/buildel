@@ -54,7 +54,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
       <li>
         <Link
           to={routes.collectionFilesNew(organizationId, collectionName)}
-          className="bg-neutral-900 transition rounded-lg py-2 px-6 w-full h-full text-neutral-600 hover:text-neutral-300 flex flex-col items-center justify-center h-[80px] border border-neutral-800 hover:border-neutral-700"
+          className="bg-neutral-900 transition rounded-lg py-2 px-6 w-full text-neutral-600 hover:text-neutral-300 flex flex-col items-center justify-center h-[80px] border border-neutral-800 hover:border-neutral-700"
         >
           <Icon iconName="plus" className="text-xl" />
           <p className="font-medium">Add new memory file</p>

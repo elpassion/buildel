@@ -3,6 +3,7 @@ import invariant from "tiny-invariant";
 import { loaderBuilder } from "~/utils.server";
 import { requireLogin } from "~/session.server";
 import { KnowledgeBaseApi } from "~/api/knowledgeBase/KnowledgeBaseApi";
+import { IKnowledgeBaseSearchChunk } from "~/api/knowledgeBase/knowledgeApi.contracts";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -22,11 +23,16 @@ export async function loader(args: LoaderFunctionArgs) {
       params.collectionName
     );
 
-    const { data: chunks } = await knowledgeBaseApi.searchCollectionChunks(
-      params.organizationId,
-      collectionId,
-      { query }
-    );
+    let chunks: IKnowledgeBaseSearchChunk[] = [];
+    if (query) {
+      const { data } = await knowledgeBaseApi.searchCollectionChunks(
+        params.organizationId,
+        collectionId,
+        { query }
+      );
+
+      chunks = data;
+    }
 
     return json({
       query,
