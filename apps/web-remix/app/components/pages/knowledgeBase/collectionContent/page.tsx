@@ -1,40 +1,31 @@
 import React from "react";
 import { MetaFunction } from "@remix-run/node";
-import {
-  Link,
-  Outlet,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-} from "@remix-run/react";
-import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
-import { AppNavbar } from "~/components/navbar/AppNavbar";
+import { Outlet, useLoaderData, useMatch, useNavigate } from "@remix-run/react";
+
 import { KnowledgeBaseFileList } from "./KnowledgeBaseFileList";
 import { loader } from "./loader.server";
-import { Button } from "@elpassion/taco";
-import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
 import { Modal } from "@elpassion/taco/Modal";
+import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
 import classNames from "classnames";
+import { routes } from "~/utils/routes.utils";
 
-export function KnowledgeBaseCollectionPage() {
+export function KnowledgeBaseContentPage() {
   const { fileList, organizationId, collectionName } =
     useLoaderData<typeof loader>();
+
   const navigate = useNavigate();
 
   const matchNew = useMatch(
     routes.collectionFilesNew(organizationId, collectionName)
   );
   const matchSearch = useMatch(
-    routes.knowledgeBaseSearch(organizationId, collectionName)
+    routes.collectionSearch(organizationId, collectionName)
   );
-
   const isSidebarOpen = !!matchNew || !!matchSearch;
 
   const matchDetails = useMatch(
-    `:organizationId/knowledge-base/:collectionName/:memoryId/chunks`
+    `:organizationId/knowledge-base/:collectionName/content/:memoryId/chunks`
   );
-
   const isDetails = !!matchDetails;
 
   const handleClose = () => {
@@ -43,24 +34,7 @@ export function KnowledgeBaseCollectionPage() {
 
   return (
     <>
-      <AppNavbar
-        leftContent={
-          <h1 className="text-2xl font-medium text-white">
-            {collectionName} Database
-          </h1>
-        }
-      />
-
-      <PageContentWrapper>
-        <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
-          <Link to={routes.knowledgeBaseSearch(organizationId, collectionName)}>
-            <Button size="sm" tabIndex={0}>
-              Ask a question
-            </Button>
-          </Link>
-        </div>
-        <KnowledgeBaseFileList items={fileList} />
-      </PageContentWrapper>
+      <KnowledgeBaseFileList items={fileList} />
 
       <Modal
         isOpen={isDetails}

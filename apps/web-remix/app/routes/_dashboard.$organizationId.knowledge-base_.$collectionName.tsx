@@ -1,8 +1,5 @@
 export {
   page as default,
   meta,
-} from "~/components/pages/knowledgeBase/collection";
-export {
-  loader,
-  action,
-} from "~/components/pages/knowledgeBase/collection/index.server";
+} from "~/components/pages/knowledgeBase/collectionLayout";
+export { loader } from "~/components/pages/knowledgeBase/collectionLayout/index.server";

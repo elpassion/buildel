@@ -20,9 +20,11 @@ import { action as newCollectionAction } from "~/components/pages/knowledgeBase/
 import { EditKnowledgeBasePage } from "~/components/pages/knowledgeBase/editKnowledgeBase/page";
 import { loader as editCollectionLoader } from "~/components/pages/knowledgeBase/editKnowledgeBase/loader.server";
 import { action as editCollectionAction } from "~/components/pages/knowledgeBase/editKnowledgeBase/action.server";
-import { KnowledgeBaseCollectionPage } from "~/components/pages/knowledgeBase/collection/page";
-import { loader as collectionLoader } from "~/components/pages/knowledgeBase/collection/loader.server";
-import { action as collectionAction } from "~/components/pages/knowledgeBase/collection/action.server";
+import { KnowledgeBaseContentPage } from "~/components/pages/knowledgeBase/collectionContent/page";
+import { loader as collectionLoader } from "~/components/pages/knowledgeBase/collectionContent/loader.server";
+import { action as collectionAction } from "~/components/pages/knowledgeBase/collectionContent/action.server";
+import { KnowledgeBaseCollectionLayout } from "~/components/pages/knowledgeBase/collectionLayout/page";
+import { loader as collectionLayoutLoader } from "~/components/pages/knowledgeBase/collectionLayout/loader.server";
 import { NewCollectionFilesPage } from "~/components/pages/knowledgeBase/newCollectionFiles/page";
 import { loader as newCollectionFilesLoader } from "~/components/pages/knowledgeBase/newCollectionFiles/loader.server";
 import { SelectHandle } from "~/tests/handles/SelectHandle";
@@ -136,7 +138,7 @@ describe("KnowledgeBase", () => {
 
   test("should render correct amount of collection files", async () => {
     new KnowledgeBaseObject().render({
-      initialEntries: ["/2/knowledge-base/super-collection"],
+      initialEntries: ["/2/knowledge-base/super-collection/content"],
     });
 
     const list = await ListHandle.fromLabelText(/Collection files/i);
@@ -146,7 +148,7 @@ describe("KnowledgeBase", () => {
 
   test("should display file chunks", async () => {
     new KnowledgeBaseObject().render({
-      initialEntries: ["/2/knowledge-base/super-collection"],
+      initialEntries: ["/2/knowledge-base/super-collection/content"],
     });
 
     const list = await ListHandle.fromLabelText(/Collection files/i);
@@ -156,7 +158,7 @@ describe("KnowledgeBase", () => {
 
   test("should delete collection file", async () => {
     const page = new KnowledgeBaseObject().render({
-      initialEntries: ["/2/knowledge-base/super-collection"],
+      initialEntries: ["/2/knowledge-base/super-collection/content"],
     });
 
     const button = await ButtonHandle.fromLabelText(/Delete file: test_file/i);
@@ -172,7 +174,7 @@ describe("KnowledgeBase", () => {
 
     test("should disable button if files empty", async () => {
       new KnowledgeBaseObject().render({
-        initialEntries: ["/2/knowledge-base/super-collection/new"],
+        initialEntries: ["/2/knowledge-base/super-collection/content/new"],
       });
 
       const submit = await ButtonHandle.fromLabelText(
@@ -184,7 +186,7 @@ describe("KnowledgeBase", () => {
 
     test("should upload collection file", async () => {
       new KnowledgeBaseObject().render({
-        initialEntries: ["/2/knowledge-base/super-collection/new"],
+        initialEntries: ["/2/knowledge-base/super-collection/content/new"],
       });
 
       const fileInput = await FileInputHandle.fromLabelText(/files/i);
@@ -206,7 +208,7 @@ describe("KnowledgeBase", () => {
       );
 
       new KnowledgeBaseObject().render({
-        initialEntries: ["/2/knowledge-base/super-collection/new"],
+        initialEntries: ["/2/knowledge-base/super-collection/content/new"],
       });
 
       const fileInput = await FileInputHandle.fromLabelText(/files/i);
@@ -244,20 +246,27 @@ class KnowledgeBaseObject {
           },
           {
             path: "/:organizationId/knowledge-base/:collectionName",
-            Component: KnowledgeBaseCollectionPage,
-            action: actionWithSession(collectionAction),
-            loader: loaderWithSession(collectionLoader),
-          },
-          {
-            path: "/:organizationId/knowledge-base/:collectionName/edit",
-            Component: EditKnowledgeBasePage,
-            action: actionWithSession(editCollectionAction),
-            loader: loaderWithSession(editCollectionLoader),
-          },
-          {
-            path: "/:organizationId/knowledge-base/:collectionName/new",
-            loader: loaderWithSession(newCollectionFilesLoader),
-            Component: NewCollectionFilesPage,
+            Component: KnowledgeBaseCollectionLayout,
+            loader: loaderWithSession(collectionLayoutLoader),
+            children: [
+              {
+                path: "/:organizationId/knowledge-base/:collectionName/content",
+                Component: KnowledgeBaseContentPage,
+                action: actionWithSession(collectionAction),
+                loader: loaderWithSession(collectionLoader),
+              },
+              {
+                path: "/:organizationId/knowledge-base/:collectionName/edit",
+                Component: EditKnowledgeBasePage,
+                action: actionWithSession(editCollectionAction),
+                loader: loaderWithSession(editCollectionLoader),
+              },
+              {
+                path: "/:organizationId/knowledge-base/:collectionName/content/new",
+                loader: loaderWithSession(newCollectionFilesLoader),
+                Component: NewCollectionFilesPage,
+              },
+            ],
           },
         ],
       },
