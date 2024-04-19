@@ -2,18 +2,18 @@ import React from "react";
 import { routes } from "~/utils/routes.utils";
 import { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { ChatbotSectionWrapper } from "~/components/pages/pipelines/interface/websiteChatbot/ChatbotSectionWrapper";
-import { CodePreviewWrapper } from "~/components/pages/pipelines/CodePreview/CodePreviewWrapper";
+import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import {
-  ChatbotSectionHeader,
-  ChatbotSectionHeaderParagraph,
-  ChatbotSectionHeading,
-} from "../websiteChatbot/ChatbotSectionHeading";
+  InterfaceSectionWrapper,
+  InterfaceSectionHeading,
+  InterfaceSectionHeaderParagraph,
+  InterfaceSectionHeader,
+} from "~/components/interfaces/InterfaceSection";
 import { loader } from "./loader.server";
 
 export function OpenAIApiPage() {
-  const { organizationId, pipelineId, apiUrl } = useLoaderData<typeof loader>();
+  const { organizationId, apiUrl } = useLoaderData<typeof loader>();
 
   return (
     <div>
@@ -24,16 +24,16 @@ export function OpenAIApiPage() {
         </p>
       </div>
 
-      <ChatbotSectionWrapper>
-        <ChatbotSectionHeader>
-          <ChatbotSectionHeading>
+      <InterfaceSectionWrapper>
+        <InterfaceSectionHeader>
+          <InterfaceSectionHeading>
             Connect to Our Custom API
-          </ChatbotSectionHeading>
-          <ChatbotSectionHeaderParagraph>
+          </InterfaceSectionHeading>
+          <InterfaceSectionHeaderParagraph>
             Easily integrate your chatbot with our API by following these
             straightforward instructions.
-          </ChatbotSectionHeaderParagraph>
-        </ChatbotSectionHeader>
+          </InterfaceSectionHeaderParagraph>
+        </InterfaceSectionHeader>
 
         <div className="p-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
           <div className="text-white text-sm">
@@ -75,7 +75,7 @@ console.log(completion.choices[0]);`}
             </CodePreviewWrapper>
           </div>
         </div>
-      </ChatbotSectionWrapper>
+      </InterfaceSectionWrapper>
     </div>
   );
 }

@@ -1,21 +1,21 @@
 import React from "react";
 import { MetaFunction } from "@remix-run/node";
+import { routes } from "~/utils/routes.utils";
 import { useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
 import { BasicLink } from "~/components/link/BasicLink";
-import { routes } from "~/utils/routes.utils";
+import { CodePreviewOptions } from "~/components/interfaces/CodePreview/CodePreviewOptions";
+import {
+  InterfaceSectionWrapper,
+  InterfaceSectionHeading,
+  InterfaceSectionHeaderParagraph,
+  InterfaceSectionHeader,
+} from "~/components/interfaces/InterfaceSection";
 import {
   IInterfaceConfig,
   IPipeline,
 } from "~/components/pages/pipelines/pipeline.types";
-import { CodePreviewOptions } from "~/components/pages/pipelines/CodePreview/CodePreviewOptions";
-import { ChatbotSectionWrapper } from "./ChatbotSectionWrapper";
 import { InterfaceConfigForm } from "./InterfaceConfigForm";
 import { loader } from "./loader.server";
-import {
-  ChatbotSectionHeading,
-  ChatbotSectionHeaderParagraph,
-  ChatbotSectionHeader,
-} from "./ChatbotSectionHeading";
 
 export function WebsiteChatbotPage() {
   const updateFetcher = useFetcher<IPipeline>();
@@ -59,13 +59,13 @@ export function WebsiteChatbotPage() {
         </BasicLink>
       </div>
 
-      <ChatbotSectionWrapper className="mb-8">
-        <ChatbotSectionHeader>
-          <ChatbotSectionHeading>Inputs and outputs</ChatbotSectionHeading>
-          <ChatbotSectionHeaderParagraph>
+      <InterfaceSectionWrapper className="mb-8">
+        <InterfaceSectionHeader>
+          <InterfaceSectionHeading>Inputs and outputs</InterfaceSectionHeading>
+          <InterfaceSectionHeaderParagraph>
             Select inputs and outputs for chatbot
-          </ChatbotSectionHeaderParagraph>
-        </ChatbotSectionHeader>
+          </InterfaceSectionHeaderParagraph>
+        </InterfaceSectionHeader>
 
         <div className="p-6 grid grid-cols-1 gap-3 min-h-[174px]">
           <InterfaceConfigForm
@@ -74,15 +74,15 @@ export function WebsiteChatbotPage() {
             onSubmit={handleUpdate}
           />
         </div>
-      </ChatbotSectionWrapper>
+      </InterfaceSectionWrapper>
 
-      <ChatbotSectionWrapper>
-        <ChatbotSectionHeader>
-          <ChatbotSectionHeading>Embed in website</ChatbotSectionHeading>
-          <ChatbotSectionHeaderParagraph>
+      <InterfaceSectionWrapper>
+        <InterfaceSectionHeader>
+          <InterfaceSectionHeading>Embed in website</InterfaceSectionHeading>
+          <InterfaceSectionHeaderParagraph>
             Integrate your Buildel Chat easily on your website.
-          </ChatbotSectionHeaderParagraph>
-        </ChatbotSectionHeader>
+          </InterfaceSectionHeaderParagraph>
+        </InterfaceSectionHeader>
 
         <div className="p-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
           <div className="text-white text-sm">
@@ -126,7 +126,7 @@ export function WebsiteChatbotPage() {
             />
           </div>
         </div>
-      </ChatbotSectionWrapper>
+      </InterfaceSectionWrapper>
 
       {/*<iframe src={websiteChatUrl} width="600" height="600" title="chat" />*/}
     </div>

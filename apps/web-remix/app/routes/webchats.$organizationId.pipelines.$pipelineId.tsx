@@ -18,10 +18,7 @@ import invariant from "tiny-invariant";
 import { useLoaderData } from "@remix-run/react";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { UnauthorizedError } from "~/utils/errors";
-import {
-  IPipelinePublicResponse,
-  IPipelineResponse,
-} from "~/api/pipeline/pipeline.contracts";
+import { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
 import { ParsedResponse } from "~/utils/fetch.server";
 
 export async function loader(args: LoaderFunctionArgs) {

@@ -2,7 +2,7 @@ import React from "react";
 import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { CodePreviewWrapper } from "~/components/pages/pipelines/CodePreview/CodePreviewWrapper";
+import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
 import {
   PreviewConnector,
   PreviewSection,
