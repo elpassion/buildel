@@ -147,8 +147,17 @@ export const routes = {
     `${routes.organization(organizationId)}/knowledge-base`,
   knowledgeBaseNew: (organizationId: OrganizationId) =>
     `${routes.knowledgeBase(organizationId)}/new`,
+  knowledgeBaseSearch: (
+    organizationId: OrganizationId,
+    collectionName: string
+  ) =>
+    `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
+      collectionName
+    )}/search`,
   knowledgeBaseEdit: (organizationId: OrganizationId, collectionName: string) =>
-    `${routes.knowledgeBase(organizationId)}/${collectionName}/edit`,
+    `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
+      collectionName
+    )}/edit`,
   collectionFiles: (organizationId: OrganizationId, collectionName: string) =>
     `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
       collectionName

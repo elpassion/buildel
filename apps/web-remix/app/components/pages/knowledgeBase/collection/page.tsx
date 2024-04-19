@@ -12,12 +12,10 @@ import { AppNavbar } from "~/components/navbar/AppNavbar";
 import { KnowledgeBaseFileList } from "./KnowledgeBaseFileList";
 import { loader } from "./loader.server";
 import { Button } from "@elpassion/taco";
-import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
+import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
 import { routes } from "~/utils/routes.utils";
 import { Modal } from "@elpassion/taco/Modal";
+import classNames from "classnames";
 
 export function KnowledgeBaseCollectionPage() {
   const { fileList, organizationId, collectionName } =
@@ -27,7 +25,11 @@ export function KnowledgeBaseCollectionPage() {
   const matchNew = useMatch(
     routes.collectionFilesNew(organizationId, collectionName)
   );
-  const isSidebarOpen = !!matchNew;
+  const matchSearch = useMatch(
+    routes.knowledgeBaseSearch(organizationId, collectionName)
+  );
+
+  const isSidebarOpen = !!matchNew || !!matchSearch;
 
   const matchDetails = useMatch(
     `:organizationId/knowledge-base/:collectionName/:memoryId/chunks`
@@ -38,6 +40,7 @@ export function KnowledgeBaseCollectionPage() {
   const handleClose = () => {
     navigate(routes.collectionFiles(organizationId, collectionName));
   };
+
   return (
     <>
       <AppNavbar
@@ -50,6 +53,12 @@ export function KnowledgeBaseCollectionPage() {
 
       <PageContentWrapper>
         <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
+          <Link to={routes.knowledgeBaseSearch(organizationId, collectionName)}>
+            <Button size="sm" tabIndex={0}>
+              Test collection
+            </Button>
+          </Link>
+
           <Link to={routes.collectionFilesNew(organizationId, collectionName)}>
             <Button size="sm" tabIndex={0}>
               New knowledge item
@@ -74,16 +83,13 @@ export function KnowledgeBaseCollectionPage() {
       </Modal>
 
       <ActionSidebar
-        className="!bg-neutral-950"
+        className={classNames("!bg-neutral-950", {
+          "md:w-[550px]": matchSearch,
+        })}
         isOpen={isSidebarOpen}
         onClose={handleClose}
         overlay
       >
-        <ActionSidebarHeader
-          heading="New knowledge items"
-          subheading={`Upload files to add to ${collectionName} Database.`}
-          onClose={handleClose}
-        />
         <Outlet />
       </ActionSidebar>
     </>
