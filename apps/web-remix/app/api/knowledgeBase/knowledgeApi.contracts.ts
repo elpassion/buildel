@@ -56,7 +56,8 @@ export const KnowledgeBaseFile = z.object({
 export const KnowledgeBaseSearchChunk = z.object({
   id: z.string(),
   content: z.string(),
-  // file_name: z.string(),
+  file_name: z.union([z.string(), z.null()]),
+  similarity: z.number(),
 });
 
 export const KnowledgeBaseSearchChunkResponse = z

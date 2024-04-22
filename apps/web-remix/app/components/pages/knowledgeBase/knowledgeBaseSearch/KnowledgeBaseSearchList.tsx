@@ -37,9 +37,13 @@ function KnowledgeBaseSearchListItem({
     <article className="p-3 bg-neutral-850 rounded-lg text-sm">
       <p className="text-neutral-100">{item.content}</p>
 
-      {/*<div className="mt-1 flex gap-2 justify-between">*/}
-      {/*  <p className="font-bold text-neutral-100">{item.file_name}</p>*/}
-      {/*</div>*/}
+      <div className="mt-2 flex gap-2 justify-between text-neutral-100 ">
+        <p className="font-bold">{item.file_name}</p>
+
+        <p className="font-bold">
+          Score: {(item.similarity * 100).toFixed(0)}%
+        </p>
+      </div>
     </article>
   );
 }
