@@ -1,27 +1,39 @@
 defmodule Buildel.WorkflowTemplates do
   @available_templates [
-    "AI Chat",
-    "Speech To Text",
-    "Text To Speech",
-    "Knowledge Search To Text"
+    %{
+      name: "AI Chat",
+      template_name: "ai_chat"
+    },
+    %{
+      name: "Speech To Text",
+      template_name: "speech_to_text"
+    },
+    %{
+      name: "Text To Speech",
+      template_name: "text_to_speech"
+    },
+    %{
+      name: "Knowledge Search To Text",
+      template_name: "knowledge_search_to_text"
+    }
   ]
 
   def get_workflow_template_names() do
-    Enum.map(@available_templates, fn template_name -> %{name: template_name} end)
+    @available_templates
   end
 
   def create_pipeline_config_from_template(organization_id, template_name) do
     case template_name do
-      "AI Chat" ->
+      "ai_chat" ->
         {:ok, generate_ai_chat_template_config(organization_id)}
 
-      "Speech To Text" ->
+      "speech_to_text" ->
         {:ok, generate_speech_to_text_template_config(organization_id)}
 
-      "Text To Speech" ->
+      "text_to_speech" ->
         {:ok, generate_text_to_speech_template_config(organization_id)}
 
-      "Knowledge Search To Text" ->
+      "knowledge_search_to_text" ->
         {:ok, generate_document_search_template_config(organization_id)}
 
       _ ->

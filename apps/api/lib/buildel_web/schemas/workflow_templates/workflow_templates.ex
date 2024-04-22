@@ -8,9 +8,10 @@ defmodule BuildelWeb.Schemas.WorkflowTemplates do
       title: "WorkflowTemplate",
       type: :object,
       properties: %{
-        name: %Schema{type: :string, description: "Workflow template name"}
+        name: %Schema{type: :string, description: "Workflow template readable name"},
+        template_name: %Schema{type: :string, description: "Workflow template name"}
       },
-      required: [:name]
+      required: [:name, :template_name]
     })
   end
 
@@ -30,14 +31,20 @@ defmodule BuildelWeb.Schemas.WorkflowTemplates do
     })
   end
 
-  defmodule ShowResponse do
+  defmodule CreateResponse do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
-      title: "WorkflowTemplateShowResponse",
+      title: "WorkflowTemplateCreateResponse",
       type: :object,
       properties: %{
-        data: WorkflowTemplate
+        data: %Schema{
+          type: :object,
+          properties: %{
+            pipeline_id: %Schema{type: :integer, description: "Created pipeline ID"}
+          },
+          required: [:pipeline_id]
+        }
       },
       required: [:data]
     })

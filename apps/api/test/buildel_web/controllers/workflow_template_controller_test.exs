@@ -29,10 +29,13 @@ defmodule BuildelWeb.WorkflowTemplateControllerTest do
       response = json_response(conn, 200)
 
       assert [
-               %{"name" => "AI Chat"},
-               %{"name" => "Speech To Text"},
-               %{"name" => "Text To Speech"},
-               %{"name" => "Knowledge Search To Text"}
+               %{"name" => "AI Chat", "template_name" => "ai_chat"},
+               %{"name" => "Speech To Text", "template_name" => "speech_to_text"},
+               %{"name" => "Text To Speech", "template_name" => "text_to_speech"},
+               %{
+                 "name" => "Knowledge Search To Text",
+                 "template_name" => "knowledge_search_to_text"
+               }
              ] == response["data"]
 
       assert_schema(response, "WorkflowTemplateIndexResponse", api_spec)
@@ -63,14 +66,14 @@ defmodule BuildelWeb.WorkflowTemplateControllerTest do
     } do
       conn =
         post(conn, ~p"/api/organizations/#{organization.id}/workflow_templates", %{
-          template_name: "AI Chat"
+          template_name: "ai_chat"
         })
 
       response = json_response(conn, 200)
 
-      assert %{"name" => "AI Chat"} == response["data"]
+      assert %{"pipeline_id" => _pipeline_id} = response["data"]
 
-      assert_schema(response, "WorkflowTemplateShowResponse", api_spec)
+      assert_schema(response, "WorkflowTemplateCreateResponse", api_spec)
 
       conn = get(conn, ~p"/api/organizations/#{organization.id}/pipelines")
 

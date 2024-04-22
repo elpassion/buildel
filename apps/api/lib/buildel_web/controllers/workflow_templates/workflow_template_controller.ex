@@ -47,7 +47,8 @@ defmodule BuildelWeb.WorkflowTemplateController do
     request_body:
       {"template", "application/json", BuildelWeb.Schemas.WorkflowTemplates.CreateRequest},
     responses: [
-      created: {"created", "application/json", BuildelWeb.Schemas.WorkflowTemplates.ShowResponse},
+      created:
+        {"created", "application/json", BuildelWeb.Schemas.WorkflowTemplates.CreateResponse},
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
@@ -67,8 +68,8 @@ defmodule BuildelWeb.WorkflowTemplateController do
              organization.id,
              template_name
            ),
-         {:ok, _pipeline} <- Pipelines.create_pipeline(config) do
-      render(conn, :show, workflow_template: %{name: template_name})
+         {:ok, pipeline} <- Pipelines.create_pipeline(config) do
+      render(conn, :create, pipeline: pipeline)
     else
       e -> e
     end
