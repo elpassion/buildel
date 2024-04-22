@@ -45,7 +45,7 @@ export function KnowledgeBaseCollectionInterface() {
           </p>
         </div>
 
-        <InterfaceSectionWrapper>
+        <InterfaceSectionWrapper className="mb-8">
           <InterfaceSectionHeader>
             <InterfaceSectionHeading>Search</InterfaceSectionHeading>
             <InterfaceSectionHeaderParagraph>
@@ -70,13 +70,51 @@ export function KnowledgeBaseCollectionInterface() {
             </div>
             <div className="w-full">
               <CodePreviewWrapper
-                wrapLines
                 value={`curl "${apiUrl}/api/organizations/${organizationId}/memory_collections/${collectionId}/search?query=your_search_term_here" \\
   -X GET \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer \${BUILDEL_API_KEY}"`}
                 language="shell"
-                height={122}
+                height={105}
+              >
+                {(value) => <CopyCodeButton value={value} />}
+              </CodePreviewWrapper>
+            </div>
+          </div>
+        </InterfaceSectionWrapper>
+
+        <InterfaceSectionWrapper>
+          <InterfaceSectionHeader>
+            <InterfaceSectionHeading>Insert</InterfaceSectionHeading>
+            <InterfaceSectionHeaderParagraph>
+              Use this endpoint to add data to your knowledge base.
+            </InterfaceSectionHeaderParagraph>
+          </InterfaceSectionHeader>
+
+          <div className="p-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
+            <div className="text-white text-sm">
+              <p className="lg:mt-4 mb-2">
+                Ensure you replace the baseURL with our API's URL and include
+                your{" "}
+                <Link
+                  to={routes.organizationSettings(organizationId)}
+                  className="text-primary-500 hover:underline"
+                  target="_blank"
+                >
+                  API key
+                </Link>{" "}
+                as the bearer token in the Authorization header.
+              </p>
+            </div>
+            <div className="w-full">
+              <CodePreviewWrapper
+                value={`curl "${apiUrl}/api/organizations/${organizationId}/memory_collections/${collectionId}/memories" \\
+  -X POST \\
+  -H "Authorization: Bearer \${BUILDEL_API_KEY}" \\
+  -F "file=@/path/to/your/file" \\
+  -F "collection_name=${collectionName}"`}
+                language="shell"
+                height={120}
               >
                 {(value) => <CopyCodeButton value={value} />}
               </CodePreviewWrapper>
