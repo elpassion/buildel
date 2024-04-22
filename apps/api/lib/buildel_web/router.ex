@@ -56,7 +56,9 @@ defmodule BuildelWeb.Router do
     resources("/block_types", BlockTypesController, only: [:index])
     get("/block_types/overviews", BlockTypesController, :overviews)
 
-    resources("/workflow_templates", WorkflowTemplateController, only: [:index])
+    resources("/organizations/:organization_id/workflow_templates", WorkflowTemplateController,
+      only: [:index, :create]
+    )
 
     resources("/organizations/:organization_id/pipelines", OrganizationPipelineController,
       only: [:index, :create, :delete, :show, :update],

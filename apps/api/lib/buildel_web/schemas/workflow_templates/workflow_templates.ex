@@ -42,4 +42,17 @@ defmodule BuildelWeb.Schemas.WorkflowTemplates do
       required: [:data]
     })
   end
+
+  defmodule CreateRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "WorkflowTemplateCreateRequest",
+      type: :object,
+      properties: %{
+        template_name: %Schema{type: :string, description: "Workflow template name"}
+      },
+      required: [:template_name]
+    })
+  end
 end
