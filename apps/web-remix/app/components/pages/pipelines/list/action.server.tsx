@@ -30,19 +30,16 @@ export async function action(actionArgs: ActionFunctionArgs) {
         result.data
       );
 
-      return redirect(
-        routes.pipelineBuild(params.organizationId, pipeline_id),
-        {
-          headers: {
-            "Set-Cookie": await setServerToast(request, {
-              success: {
-                title: "Workflow create",
-                description: `You've successfully created workflow`,
-              },
-            }),
-          },
-        }
-      );
+      return redirect(routes.pipeline(params.organizationId, pipeline_id), {
+        headers: {
+          "Set-Cookie": await setServerToast(request, {
+            success: {
+              title: "Workflow create",
+              description: `You've successfully created workflow`,
+            },
+          }),
+        },
+      });
     },
     delete: async ({ params, request }, { fetch }) => {
       await requireLogin(request);

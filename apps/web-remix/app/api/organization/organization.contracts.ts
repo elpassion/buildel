@@ -100,3 +100,7 @@ export const CreateFromTemplateResponse = z
     data: z.object({ pipeline_id: z.number() }),
   })
   .transform((res) => res.data);
+
+export type ICreateFromTemplateResponse = z.TypeOf<
+  typeof CreateFromTemplateResponse
+>;

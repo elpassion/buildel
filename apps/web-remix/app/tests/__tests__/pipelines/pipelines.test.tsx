@@ -20,12 +20,14 @@ import { LinkHandle } from "~/tests/handles/Link.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
 import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
 import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
+import { OrganizationHandlers } from "~/tests/handlers/organization.handlers";
 
 const handlers = () => [
   ...new PipelineHandlers([
     pipelineFixture(),
     pipelineFixture({ id: 2, name: "sample-workflow" }),
   ]).handlers,
+  ...new OrganizationHandlers().handlers,
 ];
 
 describe(PipelinesPage.name, () => {

@@ -1,8 +1,11 @@
 import { http, HttpResponse } from "msw";
 import {
+  ICreateFromTemplateResponse,
   ICreateOrganizationSchema,
   IOrganization,
+  IWorkflowTemplate,
 } from "~/api/organization/organization.contracts";
+import { templateFixture } from "~/tests/fixtures/templates.fixtures";
 
 export class OrganizationHandlers {
   private organizations: Map<number, IOrganization> = new Map();
@@ -54,18 +57,40 @@ export class OrganizationHandlers {
     );
   }
 
-  createOrganizationError() {
-    return http.post<any, ICreateOrganizationSchema>(
-      "/super-api/organizations",
-      async () => {
-        return HttpResponse.json(null, {
-          status: 500,
-        });
+  getTemplates() {
+    return http.get(
+      "/super-api/organizations/:organizationId/workflow_templates",
+      () => {
+        return HttpResponse.json<{ data: IWorkflowTemplate[] }>(
+          { data: [templateFixture()] },
+          {
+            status: 200,
+          }
+        );
+      }
+    );
+  }
+
+  createFromTemplate() {
+    return http.post(
+      "/super-api/organizations/:organizationId/workflow_templates",
+      () => {
+        return HttpResponse.json<{ data: ICreateFromTemplateResponse }>(
+          { data: { pipeline_id: 999 } },
+          {
+            status: 200,
+          }
+        );
       }
     );
   }
 
   get handlers() {
-    return [this.getOrganizations(), this.createOrganization()];
+    return [
+      this.getOrganizations(),
+      this.createOrganization(),
+      this.getTemplates(),
+      this.createFromTemplate(),
+    ];
   }
 }
