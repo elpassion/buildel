@@ -75,3 +75,28 @@ export const APIKey = z.object({
 export const APIKeyResponse = z
   .object({ data: APIKey })
   .transform((res) => res.data);
+
+export const WorkflowTemplate = z.object({
+  name: z.string(),
+  template_name: z.string(),
+});
+
+export type IWorkflowTemplate = z.TypeOf<typeof WorkflowTemplate>;
+
+export const WorkflowTemplatesResponse = z
+  .object({ data: z.array(WorkflowTemplate) })
+  .transform((res) => res.data);
+
+export const CreateFromTemplateSchema = z.object({
+  template_name: z.string(),
+});
+
+export type ICreateFromTemplateSchema = z.TypeOf<
+  typeof CreateFromTemplateSchema
+>;
+
+export const CreateFromTemplateResponse = z
+  .object({
+    data: z.object({ pipeline_id: z.number() }),
+  })
+  .transform((res) => res.data);

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { MetaFunction } from "@remix-run/node";
 import {
   Link,
@@ -12,7 +12,6 @@ import { Button } from "@elpassion/taco";
 import { loader } from "./loader.server";
 import { PipelinesNavbar } from "./PipelinesNavbar";
 import { PipelinesList } from "./PipelinesList";
-import { generateTemplates, sampleTemplates } from "./workflowTemplates.utils";
 import {
   WorkflowTemplates,
   WorkflowTemplatesHeader,
@@ -87,12 +86,13 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-function TemplatesWithPipelines({
-  organizationId,
-}: {
+interface PipelinesTemplatesProps {
   organizationId: string;
-}) {
-  const templates = useMemo(() => generateTemplates(sampleTemplates), []);
+}
+
+function TemplatesWithPipelines({ organizationId }: PipelinesTemplatesProps) {
+  const { templates } = useLoaderData<typeof loader>();
+
   return (
     <WorkflowTemplates className="order-1 lg:order-2 h-fit">
       <WorkflowTemplatesHeader
@@ -110,10 +110,9 @@ function TemplatesWithPipelines({
 
 function TemplatesWithoutPipelines({
   organizationId,
-}: {
-  organizationId: string;
-}) {
-  const templates = useMemo(() => generateTemplates(sampleTemplates), []);
+}: PipelinesTemplatesProps) {
+  const { templates } = useLoaderData<typeof loader>();
+
   return (
     <WorkflowTemplates className="max-w-[38rem] mx-auto w-full md:p-8 col-span-2">
       <Link to={routes.pipelinesNew(organizationId)}>

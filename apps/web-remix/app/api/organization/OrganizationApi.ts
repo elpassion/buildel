@@ -7,11 +7,14 @@ import {
   APIKeyResponse,
   InvitationsResponse,
   InvitationResponse,
+  WorkflowTemplatesResponse,
+  ICreateFromTemplateSchema,
+  CreateFromTemplateResponse,
 } from "./organization.contracts";
 import z from "zod";
 
 export class OrganizationApi {
-  constructor(private client: typeof fetchTyped) { }
+  constructor(private client: typeof fetchTyped) {}
 
   getOrganizations() {
     return this.client(OrganizationsResponse, "/organizations");
@@ -63,7 +66,10 @@ export class OrganizationApi {
     );
   }
 
-  deleteInvitation(organizationId: string | number, invitationId: string | number) {
+  deleteInvitation(
+    organizationId: string | number,
+    invitationId: string | number
+  ) {
     return this.client(
       z.any(),
       `/organizations/${organizationId}/invitations/${invitationId}`,
@@ -80,6 +86,24 @@ export class OrganizationApi {
       {
         method: "POST",
       }
+    );
+  }
+
+  getTemplates(organizationId: string | number) {
+    return this.client(
+      WorkflowTemplatesResponse,
+      `/organizations/${organizationId}/workflow_templates`
+    );
+  }
+
+  createFromTemplate(
+    organizationId: string | number,
+    data: ICreateFromTemplateSchema
+  ) {
+    return this.client(
+      CreateFromTemplateResponse,
+      `/organizations/${organizationId}/workflow_templates`,
+      { method: "POST", body: JSON.stringify(data) }
     );
   }
 }
