@@ -330,65 +330,6 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
 
       assert_schema(response, "CollectionShowResponse", api_spec)
     end
-
-    test "updates chunk size and overlap", %{
-      conn: conn,
-      organization: organization,
-      collection: collection,
-      api_spec: api_spec
-    } do
-      collection_id = collection.id
-      secret_fixture(%{organization_id: organization.id, name: "new_secret_name"})
-
-      conn =
-        put(
-          conn,
-          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}",
-          %{
-            embeddings: %{
-              secret_name: "new_secret_name"
-            },
-            chunk_size: 420,
-            chunk_overlap: 20
-          }
-        )
-
-      response = json_response(conn, 200)
-
-      assert %{
-               "data" => %{
-                 "id" => ^collection_id,
-                 "embeddings" => %{
-                   "secret_name" => "new_secret_name"
-                 },
-                 "chunk_size" => 420,
-                 "chunk_overlap" => 20
-               }
-             } = response
-
-      assert_schema(response, "CollectionShowResponse", api_spec)
-
-      conn =
-        get(
-          conn,
-          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}"
-        )
-
-      response = json_response(conn, 200)
-
-      assert %{
-               "data" => %{
-                 "id" => ^collection_id,
-                 "embeddings" => %{
-                   "secret_name" => "new_secret_name"
-                 },
-                 "chunk_size" => 420,
-                 "chunk_overlap" => 20
-               }
-             } = response
-
-      assert_schema(response, "CollectionShowResponse", api_spec)
-    end
   end
 
   defp read_file(_) do

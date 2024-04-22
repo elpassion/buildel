@@ -145,9 +145,7 @@ defmodule BuildelWeb.Schemas.Collections do
       title: "CollectionUpdateRequest",
       type: :object,
       properties: %{
-        embeddings: CollectionEmbeddingUpdate,
-        chunk_size: %Schema{type: :integer, description: "Chunk size"},
-        chunk_overlap: %Schema{type: :integer, description: "Chunk overlap"}
+        embeddings: CollectionEmbeddingUpdate
       },
       required: [:embeddings]
     })

@@ -37,9 +37,7 @@ export const UpdateCollectionSchema = z.object({
     // api_type: z.string().min(2),
     // model: z.string().min(2),
     secret_name: z.string().min(2),
-  }),
-  chunk_size: zfd.numeric(z.number().int().positive()),
-  chunk_overlap: zfd.numeric(z.number().int().min(0)),
+  })
 });
 
 export type ICreateCollectionSchema = z.TypeOf<typeof CreateCollectionSchema>;

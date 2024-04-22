@@ -205,7 +205,7 @@ defmodule BuildelWeb.CollectionController do
   def update(conn, _params) do
     %{organization_id: organization_id, id: id} = conn.params
 
-    %{embeddings: embeddings, chunk_size: chunk_size, chunk_overlap: chunk_overlap} =
+    %{embeddings: embeddings} =
       conn.body_params
 
     user = conn.assigns.current_user
@@ -226,9 +226,7 @@ defmodule BuildelWeb.CollectionController do
                api_type: collection.embeddings_api_type,
                model: collection.embeddings_model,
                secret_name: embeddings.secret_name
-             },
-             chunk_size: chunk_size,
-             chunk_overlap: chunk_overlap
+             }
            }) do
       conn
       |> put_status(:ok)

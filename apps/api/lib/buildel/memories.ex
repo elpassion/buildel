@@ -243,8 +243,8 @@ defmodule Buildel.Memories do
           embeddings_api_type: embeddings.api_type,
           embeddings_model: embeddings.model,
           embeddings_secret_name: embeddings.secret_name,
-          chunk_size: chunk_size || collection.chunk_size,
-          chunk_overlap: chunk_overlap || collection.chunk_overlap
+          chunk_size: collection.chunk_size,
+          chunk_overlap: collection.chunk_overlap
         })
         |> Buildel.Repo.update()
     end
