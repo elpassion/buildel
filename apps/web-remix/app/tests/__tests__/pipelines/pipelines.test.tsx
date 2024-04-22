@@ -198,6 +198,10 @@ class PipelinesObject {
             path: "/:organizationId/pipelines/:pipelineId",
             Component: () => <p>Pipeline</p>,
           },
+          {
+            path: "/:organizationId/pipelines/:pipelineId/build",
+            Component: () => <p>Pipeline</p>,
+          },
         ],
       },
     ]);
