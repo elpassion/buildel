@@ -276,7 +276,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
         %{
           "document" => chunk.document,
           "metadata" => chunk.metadata,
-          "chunk_id" => chunk.id
+          "chunk_id" => chunk.id,
+          "similarity" => chunk.similarity
         }
       end)
 

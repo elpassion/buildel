@@ -148,8 +148,6 @@ defmodule Buildel.Blocks.DocumentSearch do
       end)
       |> Jason.encode!()
 
-    IO.inspect(result)
-
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
       state[:block_name],

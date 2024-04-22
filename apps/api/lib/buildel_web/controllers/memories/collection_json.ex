@@ -5,10 +5,17 @@ defmodule BuildelWeb.CollectionJSON do
     %{data: for(chunk <- memory_chunks, do: search_data(chunk))}
   end
 
-  defp search_data(%{"chunk_id" => chunk_id, "document" => document}) do
+  defp search_data(%{
+         "chunk_id" => chunk_id,
+         "document" => document,
+         "similarity" => similarity,
+         "metadata" => metadata
+       }) do
     %{
       id: chunk_id,
-      content: document
+      content: document,
+      similarity: similarity,
+      file_name: metadata["file_name"]
     }
   end
 

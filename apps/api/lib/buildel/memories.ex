@@ -202,8 +202,8 @@ defmodule Buildel.Memories do
       search_query,
       "{}" |> Jason.decode!(),
       %{
-        limit: 3,
-        similarity_threshhold: 0.75
+        limit: 10,
+        similarity_threshhold: 0
       }
     )
   end

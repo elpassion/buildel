@@ -33,17 +33,19 @@ defmodule BuildelWeb.Schemas.Collections do
     })
   end
 
-  defmodule CollectionMemoryChunk do
+  defmodule CollectionMemorySearchChunk do
     require OpenApiSpex
 
     OpenApiSpex.schema(%{
-      title: "CollectionMemoryChunk",
+      title: "CollectionMemorySearchChunk",
       type: :object,
       properties: %{
         id: %Schema{type: :integer, description: "Chunk ID"},
-        content: %Schema{type: :string, description: "Content"}
+        content: %Schema{type: :string, description: "Content"},
+        similarity: %Schema{type: :number, description: "Similarity score"},
+        file_name: %Schema{type: :string, description: "File name"}
       },
-      required: [:id, :content]
+      required: [:id, :content, :similarity, :file_name]
     })
   end
 
@@ -56,7 +58,7 @@ defmodule BuildelWeb.Schemas.Collections do
       properties: %{
         data: %Schema{
           type: :array,
-          items: CollectionMemoryChunk
+          items: CollectionMemorySearchChunk
         }
       },
       required: [:data]
