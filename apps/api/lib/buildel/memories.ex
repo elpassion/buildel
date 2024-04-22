@@ -111,6 +111,7 @@ defmodule Buildel.Memories do
           [Access.all(), Access.key!(:metadata), :memory_id],
           memory.id
         )
+        |> put_in([Access.all(), Access.key!(:metadata), :file_name], metadata.file_name)
 
       Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
 

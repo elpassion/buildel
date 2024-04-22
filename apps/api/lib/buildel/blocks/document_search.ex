@@ -132,11 +132,11 @@ defmodule Buildel.Blocks.DocumentSearch do
       })
       |> Enum.map(fn
         %{
+          "chunk_id" => chunk_id,
           "document" => document,
           "metadata" => %{
             "file_name" => filename,
-            "memory_id" => memory_id,
-            "chunk_id" => chunk_id
+            "memory_id" => memory_id
           }
         } ->
           %{
@@ -147,6 +147,8 @@ defmodule Buildel.Blocks.DocumentSearch do
           }
       end)
       |> Jason.encode!()
+
+    IO.inspect(result)
 
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
