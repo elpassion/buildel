@@ -120,6 +120,9 @@ defmodule Buildel.Memories do
       {:error, :invalid_api_key} ->
         {:error, :bad_request, "Invalid API key provided for embeddings model"}
 
+      {:error, :insufficient_quota} ->
+        {:error, :bad_request, "Insufficient quota for embeddings model"}
+
       err ->
         err
     end

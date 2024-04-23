@@ -57,6 +57,9 @@ defmodule BuildelWeb.MemoryController do
       {:error, :invalid_api_key} ->
         {:error, %{errors: %{file: "Invalid API key"}}}
 
+      {:error, :insufficient_quota} ->
+        {:error, %{errors: %{file: "Insufficient quota for embeddings model"}}}
+
       err ->
         err
     end

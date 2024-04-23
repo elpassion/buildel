@@ -67,6 +67,7 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
       {:ok, gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)}
     else
       {:error, %{"error" => %{"code" => "invalid_api_key"}}} -> {:error, :invalid_api_key}
+      {:error, %{"error" => %{"code" => "insufficient_quota"}}} -> {:error, :insufficient_quota}
     end
   end
 

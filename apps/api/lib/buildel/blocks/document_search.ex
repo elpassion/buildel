@@ -228,6 +228,13 @@ defmodule Buildel.Blocks.DocumentSearch do
         state = state |> schedule_stream_stop()
 
         {:reply, "Unable to query the database.", state}
+
+      {:error, :insufficient_quota} ->
+        send_error(state, "Insufficient quota for querying documents.")
+
+        state = state |> schedule_stream_stop()
+
+        {:reply, "Unable to query the database.", state}
     end
   end
 
