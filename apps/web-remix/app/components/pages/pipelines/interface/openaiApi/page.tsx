@@ -11,6 +11,7 @@ import {
   InterfaceSectionHeader,
 } from "~/components/interfaces/InterfaceSection";
 import { loader } from "./loader.server";
+import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 
 export function OpenAIApiPage() {
   const { organizationId, apiUrl } = useLoaderData<typeof loader>();
@@ -76,6 +77,10 @@ console.log(completion.choices[0]);`}
           </div>
         </div>
       </InterfaceSectionWrapper>
+
+      <div className="mt-20">
+        <DocumentationCTA />
+      </div>
     </div>
   );
 }

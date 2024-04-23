@@ -13,6 +13,7 @@ import {
   PreviewSectionText,
 } from "../PreviewSection";
 import { loader } from "./loader.server";
+import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 
 export function HTTPApiPage() {
   const { organizationId, pipelineId, apiUrl } = useLoaderData<typeof loader>();
@@ -139,6 +140,10 @@ export function HTTPApiPage() {
           </CodePreviewWrapper>
         </PreviewSectionContent>
       </PreviewSection>
+
+      <div className="mt-20">
+        <DocumentationCTA />
+      </div>
     </div>
   );
 }

@@ -15,6 +15,7 @@ import {
   PreviewSectionText,
 } from "../PreviewSection";
 import { loader } from "./loader.server";
+import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 
 export function ClientSDKPage() {
   const { organizationId, pipelineId } = useLoaderData<typeof loader>();
@@ -272,6 +273,10 @@ run.push("your_block_name:input", 'sample payload');`}
           </div>
         </PreviewSectionContent>
       </PreviewSection>
+
+      <div className="mt-20">
+        <DocumentationCTA />
+      </div>
     </div>
   );
 }

@@ -16,6 +16,7 @@ import {
 } from "~/components/pages/pipelines/pipeline.types";
 import { InterfaceConfigForm } from "./InterfaceConfigForm";
 import { loader } from "./loader.server";
+import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 
 export function WebsiteChatbotPage() {
   const updateFetcher = useFetcher<IPipeline>();
@@ -128,7 +129,9 @@ export function WebsiteChatbotPage() {
         </div>
       </InterfaceSectionWrapper>
 
-      {/*<iframe src={websiteChatUrl} width="600" height="600" title="chat" />*/}
+      <div className="mt-20">
+        <DocumentationCTA />
+      </div>
     </div>
   );
 }

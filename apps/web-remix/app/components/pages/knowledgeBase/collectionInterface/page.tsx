@@ -19,6 +19,7 @@ import {
 } from "~/components/interfaces/InterfaceSection";
 import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
+import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 
 export function KnowledgeBaseCollectionInterface() {
   const { organizationId, collectionName, collectionId, apiUrl } =
@@ -158,6 +159,10 @@ export function KnowledgeBaseCollectionInterface() {
             </div>
           </div>
         </InterfaceSectionWrapper>
+      </div>
+
+      <div className="mt-20">
+        <DocumentationCTA />
       </div>
 
       <ActionSidebar
