@@ -203,7 +203,7 @@ defmodule Buildel.Memories do
       vector_db,
       organization_collection_name,
       search_query,
-      "{}" |> Jason.decode!(),
+      %{},
       %{
         limit: metadata.limit,
         similarity_threshhold: 0

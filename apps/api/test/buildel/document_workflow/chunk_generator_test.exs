@@ -83,18 +83,24 @@ defmodule Buildel.ChunkGeneratorTest do
       assert [
                %DocumentWorkflow.ChunkGenerator.Chunk{
                  id: _,
-                 prev: nil,
-                 next: ^second_id
+                 metadata: %{
+                   prev: nil,
+                   next: ^second_id
+                 }
                },
                %DocumentWorkflow.ChunkGenerator.Chunk{
                  id: _,
-                 prev: ^first_id,
-                 next: ^third_id
+                 metadata: %{
+                   prev: ^first_id,
+                   next: ^third_id
+                 }
                },
                %DocumentWorkflow.ChunkGenerator.Chunk{
                  id: _,
-                 prev: ^second_id,
-                 next: nil
+                 metadata: %{
+                   prev: ^second_id,
+                   next: nil
+                 }
                }
              ] = result
     end

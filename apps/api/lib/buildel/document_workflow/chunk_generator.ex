@@ -6,18 +6,18 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
 
     @type chunk_metadata :: %{
             building_block_ids: [binary()],
-            keywords: [binary()]
+            keywords: [binary()],
+            prev: integer(),
+            next: integer()
           }
 
     @type t :: %Chunk{
             id: binary(),
             value: binary(),
             embeddings: [float()],
-            metadata: chunk_metadata(),
-            prev: integer(),
-            next: integer()
+            metadata: chunk_metadata()
           }
-    defstruct [:id, :value, :embeddings, :metadata, prev: nil, next: nil]
+    defstruct [:id, :value, :embeddings, :metadata]
   end
 
   @chunk_size 1000
@@ -43,7 +43,7 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
     {list_with_prev, _, next_map} =
       list
       |> Enum.reduce({[], nil, %{}}, fn elem, {acc, prev_id, next_map} ->
-        updated_elem = Map.put(elem, :prev, prev_id)
+        updated_elem = Map.put(elem, :metadata, Map.merge(elem.metadata, %{prev: prev_id}))
 
         updated_next_map = Map.put(next_map, prev_id, elem.id)
 
@@ -54,7 +54,7 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
     |> Enum.reverse()
     |> Enum.map(fn elem ->
       next_id = Map.get(next_map, elem.id)
-      Map.put(elem, :next, next_id)
+      Map.put(elem, :metadata, Map.merge(elem.metadata, %{next: next_id}))
     end)
   end
 
