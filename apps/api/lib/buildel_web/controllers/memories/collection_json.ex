@@ -15,7 +15,8 @@ defmodule BuildelWeb.CollectionJSON do
       id: chunk_id,
       content: document,
       similarity: similarity,
-      file_name: metadata["file_name"]
+      file_name: metadata["file_name"],
+      keywords: metadata["keywords"]
     }
   end
 

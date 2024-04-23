@@ -6,6 +6,7 @@ import { zfd } from "zod-form-data";
 export const MemoryChunk = z.object({
   id: z.string(),
   content: z.string(),
+  keywords: z.array(z.string()).default([]),
 });
 
 export type IMemoryChunk = z.TypeOf<typeof MemoryChunk>;
@@ -56,6 +57,7 @@ export const KnowledgeBaseSearchChunk = z.object({
   content: z.string(),
   file_name: z.union([z.string(), z.null()]),
   similarity: z.number(),
+  keywords: z.array(z.string()),
 });
 
 export const KnowledgeBaseSearchChunkResponse = z

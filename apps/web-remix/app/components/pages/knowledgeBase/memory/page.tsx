@@ -21,7 +21,7 @@ export function CollectionMemory() {
       loaderUrl: routes.collectionMemory(
         organizationId,
         collectionName,
-        memoryId
+        memoryId,
       ),
       dataExtractor: (response) => response.data?.chunks,
     });

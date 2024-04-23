@@ -52,6 +52,11 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
   end
 
   @impl true
+  def model_config("text-embedding-3-large") do
+    %{size: 3072, distance: "Cosine"}
+  end
+
+  @impl true
   deftimed get_embeddings(%{inputs: inputs, api_key: api_key, model: model}), [
     :buildel,
     :embeddings,

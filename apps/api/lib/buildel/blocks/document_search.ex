@@ -55,7 +55,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "type" => "number",
                   "title" => "Similarity threshhold",
                   "description" => "The similarity threshhold to use for the search.",
-                  "default" => 0.75,
+                  "default" => 0.25,
                   "minimum" => 0.0,
                   "maximum" => 1.0,
                   "step" => 0.01
@@ -128,7 +128,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     result =
       Buildel.VectorDB.query(state.vector_db, state[:collection], query, state.where, %{
         limit: state[:opts] |> Map.get(:limit, 3),
-        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.75)
+        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25)
       })
       |> Enum.map(fn
         %{
@@ -184,7 +184,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   def handle_call({:query, {:text, query}}, _caller, state) do
     state = state |> send_stream_start()
     limit = state.opts |> Map.get(:limit, 3)
-    similarity_threshhold = state.opts |> Map.get(:similarity_threshhold, 0.75)
+    similarity_threshhold = state.opts |> Map.get(:similarity_threshhold, 0.25)
 
     case Buildel.VectorDB.query(state.vector_db, state[:collection], query, state.where, %{
            limit: limit,

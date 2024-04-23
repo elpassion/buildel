@@ -14,6 +14,16 @@ defmodule BuildelWeb.OrganizationModelEmbeddingController do
       api_type: "openai",
       id: "text-embedding-ada-002",
       name: "text-embedding-ada-002"
+    },
+    %{
+      api_type: "openai",
+      id: "text-embedding-3-small",
+      name: "text-embedding-3-small"
+    },
+    %{
+      api_type: "openai",
+      id: "text-embedding-3-large",
+      name: "text-embedding-3-large"
     }
   ]
 

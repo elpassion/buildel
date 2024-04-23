@@ -48,7 +48,7 @@ defmodule Buildel.VectorDB do
              :vector_db,
              :query
            ] do
-    options = Map.merge(%{limit: 5, similarity_threshhold: 0.75}, options)
+    options = Map.merge(%{limit: 5, similarity_threshhold: 0.25}, options)
 
     with {:ok, embeddings_list} <- Embeddings.get_embeddings(embeddings, [query]),
          {:ok, collection} <- adapter.get_collection(collection_name),
@@ -165,6 +165,7 @@ defmodule Buildel.VectorDB.EctoAdapter.Chunk do
 
   schema "vector_collection_chunks" do
     field :collection_name, :string
+    field :embedding_3072, Pgvector.Ecto.Vector
     field :embedding_1536, Pgvector.Ecto.Vector
     field :embedding_384, Pgvector.Ecto.Vector
     field :document, :string
@@ -176,8 +177,23 @@ defmodule Buildel.VectorDB.EctoAdapter.Chunk do
 
   def changeset(chunk, attrs) do
     chunk
-    |> cast(attrs, [:id, :collection_name, :embedding_1536, :embedding_384, :document, :metadata])
-    |> validate_required([:collection_name, :embedding_1536, :embedding_384, :document, :metadata])
+    |> cast(attrs, [
+      :id,
+      :collection_name,
+      :embedding_3072,
+      :embedding_1536,
+      :embedding_384,
+      :document,
+      :metadata
+    ])
+    |> validate_required([
+      :collection_name,
+      :embedding_3072,
+      :embedding_1536,
+      :embedding_384,
+      :document,
+      :metadata
+    ])
     |> unique_constraint(:id)
   end
 end
@@ -207,12 +223,14 @@ defmodule Buildel.VectorDB.EctoAdapter do
     chunks =
       documents
       |> Enum.map(fn %{embeddings: embeddings, id: id, value: value} = document ->
+        embedding_3072 = if Enum.count(embeddings) == 3072, do: embeddings, else: nil
         embedding_1536 = if Enum.count(embeddings) == 1536, do: embeddings, else: nil
         embedding_384 = if Enum.count(embeddings) == 384, do: embeddings, else: nil
 
         %{
           id: id,
           collection_name: collection.name,
+          embedding_3072: embedding_3072,
           embedding_1536: embedding_1536,
           embedding_384: embedding_384,
           document: value,

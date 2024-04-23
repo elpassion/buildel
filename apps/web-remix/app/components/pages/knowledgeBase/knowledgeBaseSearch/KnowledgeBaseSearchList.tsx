@@ -35,7 +35,15 @@ function KnowledgeBaseSearchListItem({
 }: KnowledgeBaseSearchListItemProps) {
   return (
     <article className="p-3 bg-neutral-850 rounded-lg text-sm">
-      <p className="text-neutral-100">{item.content}</p>
+      {item.keywords.length ? (
+        <p className="font-bold text-neutral-100">
+          {item.keywords.join(" - ")}
+        </p>
+      ) : (
+        ""
+      )}
+
+      <p className="text-neutral-100 mt-2">{item.content}</p>
 
       <div className="mt-2 flex gap-2 justify-between text-neutral-100 ">
         <p className="font-bold">{item.file_name}</p>

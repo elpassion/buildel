@@ -16,15 +16,15 @@ export function KnowledgeBaseContentPage() {
   const navigate = useNavigate();
 
   const matchNew = useMatch(
-    routes.collectionFilesNew(organizationId, collectionName)
+    routes.collectionFilesNew(organizationId, collectionName),
   );
   const matchSearch = useMatch(
-    routes.collectionSearch(organizationId, collectionName)
+    routes.collectionSearch(organizationId, collectionName),
   );
   const isSidebarOpen = !!matchNew || !!matchSearch;
 
   const matchDetails = useMatch(
-    `:organizationId/knowledge-base/:collectionName/content/:memoryId/chunks`
+    `:organizationId/knowledge-base/:collectionName/content/:memoryId/chunks`,
   );
   const isDetails = !!matchDetails;
 
