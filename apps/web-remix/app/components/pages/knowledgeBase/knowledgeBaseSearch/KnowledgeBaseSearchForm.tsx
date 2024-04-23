@@ -6,6 +6,8 @@ import { TextInputField } from "~/components/form/fields/text.field";
 import { SearchSchema } from "./schema";
 import { IconButton } from "~/components/iconButton";
 import classNames from "classnames";
+import { SearchParams } from "./SearchParams";
+import { NumberInputField } from "~/components/form/fields/number.field";
 
 interface KnowledgeBaseSearchFormProps {
   defaultValue?: string;
@@ -22,9 +24,28 @@ export const KnowledgeBaseSearchForm: React.FC<
       validator={validator}
       defaultValues={{ query: defaultValue }}
       noValidate
+      className="flex gap-2 w-full "
     >
+      <SearchParams>
+        <Field name="limit">
+          <NumberInputField
+            label="Results limit"
+            placeholder="eg. 10"
+            supportingText="Limit the number of results returned by the search. Default is 10."
+          />
+        </Field>
+
+        <Field name="token_limit">
+          <NumberInputField
+            label="Token limit"
+            placeholder="eg. 500"
+            supportingText="Limit the number of tokens returned by the search. Disabled by default."
+          />
+        </Field>
+      </SearchParams>
+
       <Field name="query">
-        <div className="relative">
+        <div className="relative w-full">
           <TextInputField
             placeholder="Ask a question..."
             inputClassName="!pr-8"

@@ -13,6 +13,8 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const url = new URL(request.url);
     const query = url.searchParams.get("query") ?? undefined;
+    const limit = url.searchParams.get("limit") ?? undefined;
+    const token_limit = url.searchParams.get("token_limit") ?? undefined;
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
@@ -29,7 +31,7 @@ export async function loader(args: LoaderFunctionArgs) {
       const { data } = await knowledgeBaseApi.searchCollectionChunks(
         params.organizationId,
         collectionId,
-        { query }
+        { query, limit: limit ? parseInt(limit) : undefined, token_limit: token_limit ? parseInt(token_limit) : undefined }
       );
 
       chunks = data.data;
