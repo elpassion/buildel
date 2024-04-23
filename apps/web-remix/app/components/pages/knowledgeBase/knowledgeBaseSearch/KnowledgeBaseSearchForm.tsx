@@ -37,7 +37,7 @@ export const KnowledgeBaseSearchForm: React.FC<
 
         <Field name="token_limit">
           <NumberInputField
-            label="Token limit"
+            label="Tokens limit"
             placeholder="eg. 500"
             supportingText="Limit the number of tokens returned by the search. Disabled by default."
           />

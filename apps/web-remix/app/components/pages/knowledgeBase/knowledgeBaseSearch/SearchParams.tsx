@@ -21,6 +21,7 @@ export const SearchParams: React.FC<PropsWithChildren> = ({ children }) => {
 function SearchParamsTrigger() {
   return (
     <DropdownTrigger
+      type="button"
       aria-label="Open search params editor"
       className="bg-neutral-800 text-neutral-100 w-10 h-10 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition"
     >
