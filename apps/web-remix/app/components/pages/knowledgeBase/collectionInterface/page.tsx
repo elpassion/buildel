@@ -83,7 +83,7 @@ export function KnowledgeBaseCollectionInterface() {
           </div>
         </InterfaceSectionWrapper>
 
-        <InterfaceSectionWrapper>
+        <InterfaceSectionWrapper className="mb-8">
           <InterfaceSectionHeader>
             <InterfaceSectionHeading>Insert</InterfaceSectionHeading>
             <InterfaceSectionHeaderParagraph>
@@ -115,6 +115,43 @@ export function KnowledgeBaseCollectionInterface() {
   -F "collection_name=${collectionName}"`}
                 language="shell"
                 height={120}
+              >
+                {(value) => <CopyCodeButton value={value} />}
+              </CodePreviewWrapper>
+            </div>
+          </div>
+        </InterfaceSectionWrapper>
+
+        <InterfaceSectionWrapper>
+          <InterfaceSectionHeader>
+            <InterfaceSectionHeading>Delete</InterfaceSectionHeading>
+            <InterfaceSectionHeaderParagraph>
+              Use this endpoint to delete data from your knowledge base.
+            </InterfaceSectionHeaderParagraph>
+          </InterfaceSectionHeader>
+
+          <div className="p-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
+            <div className="text-white text-sm">
+              <p className="lg:mt-4 mb-2">
+                Ensure you replace the baseURL with our API's URL and include
+                your{" "}
+                <Link
+                  to={routes.organizationSettings(organizationId)}
+                  className="text-primary-500 hover:underline"
+                  target="_blank"
+                >
+                  API key
+                </Link>{" "}
+                as the bearer token in the Authorization header.
+              </p>
+            </div>
+            <div className="w-full">
+              <CodePreviewWrapper
+                value={`curl "${apiUrl}/api/organizations/${organizationId}/memory_collections/${collectionId}/memories/:memoryId" \\
+  -X DELETE \\
+  -H "Authorization: Bearer \${BUILDEL_API_KEY}"`}
+                language="shell"
+                height={80}
               >
                 {(value) => <CopyCodeButton value={value} />}
               </CodePreviewWrapper>
