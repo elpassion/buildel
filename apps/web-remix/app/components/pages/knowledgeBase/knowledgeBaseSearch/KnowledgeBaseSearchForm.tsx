@@ -8,6 +8,8 @@ import { IconButton } from "~/components/iconButton";
 import classNames from "classnames";
 import { SearchParams } from "./SearchParams";
 import { NumberInputField } from "~/components/form/fields/number.field";
+import { ToggleInputField } from "~/components/form/fields/toggle.field";
+import { ExtendChunksField } from "./ExtendChunksToggleField";
 
 interface KnowledgeBaseSearchFormProps {
   defaultValue?: string;
@@ -40,6 +42,13 @@ export const KnowledgeBaseSearchForm: React.FC<
             label="Tokens limit"
             placeholder="eg. 500"
             supportingText="Limit the number of tokens returned by the search. Disabled by default."
+          />
+        </Field>
+
+        <Field name="extend_neighbors">
+          <ExtendChunksField
+            label="Extend neighbors"
+            supportingText="Extend the search to include neighbor chunks"
           />
         </Field>
       </SearchParams>

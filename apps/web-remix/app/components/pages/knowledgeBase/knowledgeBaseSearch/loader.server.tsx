@@ -15,6 +15,7 @@ export async function loader(args: LoaderFunctionArgs) {
     const query = url.searchParams.get("query") ?? undefined;
     const limit = url.searchParams.get("limit") ?? undefined;
     const token_limit = url.searchParams.get("token_limit") ?? undefined;
+    const extend_neighbors = url.searchParams.get("extend_neighbors") ?? undefined;
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
@@ -31,7 +32,12 @@ export async function loader(args: LoaderFunctionArgs) {
       const { data } = await knowledgeBaseApi.searchCollectionChunks(
         params.organizationId,
         collectionId,
-        { query, limit: limit ? parseInt(limit) : undefined, token_limit: token_limit ? parseInt(token_limit) : undefined }
+        {
+          query,
+          limit: limit ? parseInt(limit) : undefined,
+          token_limit: token_limit ? parseInt(token_limit) : undefined,
+          extend_neighbors: extend_neighbors === "on" ? "true" : "false",
+        }
       );
 
       chunks = data.data;

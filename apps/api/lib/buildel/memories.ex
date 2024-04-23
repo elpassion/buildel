@@ -199,16 +199,44 @@ defmodule Buildel.Memories do
         embeddings: workflow.embeddings
       })
 
-    Buildel.VectorDB.query(
-      vector_db,
-      organization_collection_name,
-      search_query,
-      %{},
-      %{
-        limit: metadata.limit,
-        similarity_threshhold: 0
-      }
-    )
+    result =
+      Buildel.VectorDB.query(
+        vector_db,
+        organization_collection_name,
+        search_query,
+        %{},
+        %{
+          limit: metadata.limit,
+          similarity_threshhold: 0
+        }
+      )
+
+    if metadata.extend_neighbors do
+      # query only by neighbor ids
+      all_chunks =
+        Buildel.VectorDB.get_all(
+          vector_db,
+          organization_collection_name,
+          %{}
+        )
+
+      Enum.map(result, fn chunk ->
+        prev_id = Map.get(chunk["metadata"], "prev")
+        next_id = Map.get(chunk["metadata"], "next")
+
+        prev = Enum.find(all_chunks, %{}, fn c -> Map.get(c, "chunk_id") == prev_id end)
+        next = Enum.find(all_chunks, %{}, fn c -> Map.get(c, "chunk_id") == next_id end)
+
+        prev_doc = Map.get(prev, "document", "")
+        next_doc = Map.get(next, "document", "")
+
+        combined_document = [prev_doc, chunk["document"], next_doc] |> Enum.join(" ")
+
+        Map.put(chunk, "document", combined_document)
+      end)
+    else
+      result
+    end
   end
 
   def upsert_collection(

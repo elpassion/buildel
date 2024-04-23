@@ -21,7 +21,8 @@ defmodule BuildelWeb.CollectionController do
       id: [in: :path, description: "Collection ID", type: :integer],
       query: [in: :query, description: "Search query", type: :string],
       limit: [in: :query, description: "Results limit", type: :integer],
-      token_limit: [in: :query, description: "Token limit", type: :integer]
+      token_limit: [in: :query, description: "Token limit", type: :integer],
+      extend_neighbors: [in: :query, description: "Extend neighbor chunks", type: :boolean]
     ],
     request_body: nil,
     responses: [
@@ -34,7 +35,8 @@ defmodule BuildelWeb.CollectionController do
 
   @default_metadata %{
     limit: 10,
-    token_limit: nil
+    token_limit: nil,
+    extend_neighbors: false
   }
 
   def search(conn, _params) do

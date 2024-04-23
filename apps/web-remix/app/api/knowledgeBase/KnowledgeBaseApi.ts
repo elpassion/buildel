@@ -57,7 +57,7 @@ export class KnowledgeBaseApi {
   async searchCollectionChunks(
     organizationId: string | number,
     collectionId: string | number,
-    params: { query?: string, limit?: number, token_limit?: number }
+    params: { query?: string, limit?: number, token_limit?: number, extend_neighbors: boolean }
   ) {
     const urlWithParams = buildUrlWithParams(
       `/organizations/${organizationId}/memory_collections/${collectionId}/search`,
