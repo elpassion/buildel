@@ -9,7 +9,7 @@ import { loader } from "./loader.server";
 
 export function KnowledgeBaseSearch() {
   const navigate = useNavigate();
-  const { organizationId, collectionName, chunks, query } =
+  const { organizationId, collectionName, chunks, metadata, query } =
     useLoaderData<typeof loader>();
 
   const handleClose = () => {
@@ -23,6 +23,10 @@ export function KnowledgeBaseSearch() {
         subheading="Let's ask your knowledge base some questions so you can see how your chatbot will answer and where it'll take it's information from."
         onClose={handleClose}
       />
+
+      <p className="font-bold text-neutral-100 mb-2">
+        Total tokens: {metadata.total_tokens}
+      </p>
 
       <KnowledgeBaseSearchForm defaultValue={query ?? ""} />
 

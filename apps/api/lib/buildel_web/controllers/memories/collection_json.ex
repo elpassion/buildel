@@ -1,8 +1,47 @@
 defmodule BuildelWeb.CollectionJSON do
   alias Buildel.Memories.MemoryCollection
 
-  def search(%{memory_chunks: memory_chunks}) do
-    %{data: for(chunk <- memory_chunks, do: search_data(chunk))}
+  def search(%{memory_chunks: memory_chunks, metadata: metadata}) do
+    tokenizer = Buildel.Langchain.ChatGptTokenizer.init(%{})
+
+    case metadata.token_limit do
+      nil ->
+        total = Enum.map_join(memory_chunks, " ", & &1["document"])
+        total_tokens = tokenizer |> Buildel.Langchain.ChatGptTokenizer.count_text_tokens(total)
+
+        %{
+          data: for(chunk <- memory_chunks, do: search_data(chunk)),
+          meta: %{
+            total_tokens: total_tokens
+          }
+        }
+
+      token_limit ->
+        {list, total} =
+          memory_chunks
+          |> Enum.reduce_while({[], ""}, fn chunk, {list, total} ->
+            new_total = total <> " " <> chunk["document"]
+
+            total_tokens =
+              tokenizer |> Buildel.Langchain.ChatGptTokenizer.count_text_tokens(new_total)
+
+            if total_tokens > token_limit do
+              {:halt, {list, total}}
+            else
+              {:cont, {[chunk | list], new_total}}
+            end
+          end)
+
+        reversed = Enum.reverse(list)
+        total_tokens = tokenizer |> Buildel.Langchain.ChatGptTokenizer.count_text_tokens(total)
+
+        %{
+          data: for(chunk <- reversed, do: search_data(chunk)),
+          meta: %{
+            total_tokens: total_tokens
+          }
+        }
+    end
   end
 
   defp search_data(%{

@@ -59,6 +59,13 @@ defmodule BuildelWeb.Schemas.Collections do
         data: %Schema{
           type: :array,
           items: CollectionMemorySearchChunk
+        },
+        meta: %Schema{
+          type: :object,
+          properties: %{
+            total_tokens: %Schema{type: :integer, description: "Total tokens count"}
+          },
+          required: [:total_tokens]
         }
       },
       required: [:data]

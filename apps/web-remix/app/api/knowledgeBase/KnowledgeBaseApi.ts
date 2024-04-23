@@ -14,7 +14,7 @@ import { PaginationQueryParams } from "~/components/pagination/usePagination";
 import { z } from "zod";
 
 export class KnowledgeBaseApi {
-  constructor(private client: typeof fetchTyped) {}
+  constructor(private client: typeof fetchTyped) { }
 
   async getCollections(organizationId: string | number) {
     return this.client(

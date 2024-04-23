@@ -171,7 +171,7 @@ defmodule Buildel.Memories do
     end
   end
 
-  def search_organization_collection(organization, collection, search_query) do
+  def search_organization_collection(organization, collection, search_query, metadata) do
     {:ok, api_key} =
       Organizations.get_organization_secret(organization, collection.embeddings_secret_name)
 
@@ -205,7 +205,7 @@ defmodule Buildel.Memories do
       search_query,
       "{}" |> Jason.decode!(),
       %{
-        limit: 10,
+        limit: metadata.limit,
         similarity_threshhold: 0
       }
     )

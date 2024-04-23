@@ -60,12 +60,20 @@ export const KnowledgeBaseSearchChunk = z.object({
   keywords: z.array(z.string()),
 });
 
+export const KnowledgeBaseSearchChunkMeta = z.object({
+  total_tokens: z.number(),
+});
+
 export const KnowledgeBaseSearchChunkResponse = z
-  .object({ data: z.array(KnowledgeBaseSearchChunk) })
-  .transform((res) => res.data);
+  .object({ data: z.array(KnowledgeBaseSearchChunk), meta: KnowledgeBaseSearchChunkMeta })
+  .transform((res) => ({ data: res.data, meta: res.meta }));
 
 export type IKnowledgeBaseSearchChunk = z.TypeOf<
   typeof KnowledgeBaseSearchChunk
+>;
+
+export type IKnowledgeBaseSearchChunkMeta = z.TypeOf<
+  typeof KnowledgeBaseSearchChunkMeta
 >;
 
 export const KnowledgeBaseCollection = z.object({

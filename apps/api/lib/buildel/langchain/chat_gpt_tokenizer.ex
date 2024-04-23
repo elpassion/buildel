@@ -109,7 +109,7 @@ defmodule Buildel.Langchain.ChatGptTokenizer do
       count_text_tokens(tokenizer, parameters_schema |> Jason.encode!())
   end
 
-  defp count_text_tokens(%__MODULE__{tokenizer: tokenizer}, text) do
+  def count_text_tokens(%__MODULE__{tokenizer: tokenizer}, text) do
     {:ok, encoding} = Tokenizers.Tokenizer.encode(tokenizer, text)
     encoding |> Tokenizers.Encoding.n_tokens()
   end

@@ -19,7 +19,9 @@ defmodule BuildelWeb.CollectionController do
     parameters: [
       organization_id: [in: :path, description: "Organization ID", type: :integer],
       id: [in: :path, description: "Collection ID", type: :integer],
-      query: [in: :query, description: "Search query", type: :string]
+      query: [in: :query, description: "Search query", type: :string],
+      limit: [in: :query, description: "Results limit", type: :integer],
+      token_limit: [in: :query, description: "Token limit", type: :integer]
     ],
     request_body: nil,
     responses: [
@@ -30,6 +32,11 @@ defmodule BuildelWeb.CollectionController do
     ],
     security: [%{"authorization" => []}]
 
+  @default_metadata %{
+    limit: 10,
+    token_limit: nil
+  }
+
   def search(conn, _params) do
     %{
       organization_id: organization_id,
@@ -38,6 +45,7 @@ defmodule BuildelWeb.CollectionController do
     } =
       conn.params
 
+    metadata = Map.merge(@default_metadata, conn.params)
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
@@ -48,9 +56,10 @@ defmodule BuildelWeb.CollectionController do
            Buildel.Memories.search_organization_collection(
              organization,
              collection,
-             search_query
+             search_query,
+             metadata
            ) do
-      render(conn, :search, memory_chunks: memory_chunks)
+      render(conn, :search, memory_chunks: memory_chunks, metadata: metadata)
     end
   end
 
