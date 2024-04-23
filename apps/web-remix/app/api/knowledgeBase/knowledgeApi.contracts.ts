@@ -38,7 +38,7 @@ export const UpdateCollectionSchema = z.object({
     // api_type: z.string().min(2),
     // model: z.string().min(2),
     secret_name: z.string().min(2),
-  })
+  }),
 });
 
 export type ICreateCollectionSchema = z.TypeOf<typeof CreateCollectionSchema>;
@@ -57,7 +57,7 @@ export const KnowledgeBaseSearchChunk = z.object({
   content: z.string(),
   file_name: z.union([z.string(), z.null()]),
   similarity: z.number(),
-  keywords: z.array(z.string()),
+  keywords: z.array(z.string()).default([]),
 });
 
 export const KnowledgeBaseSearchChunkMeta = z.object({
@@ -65,7 +65,10 @@ export const KnowledgeBaseSearchChunkMeta = z.object({
 });
 
 export const KnowledgeBaseSearchChunkResponse = z
-  .object({ data: z.array(KnowledgeBaseSearchChunk), meta: KnowledgeBaseSearchChunkMeta })
+  .object({
+    data: z.array(KnowledgeBaseSearchChunk),
+    meta: KnowledgeBaseSearchChunkMeta,
+  })
   .transform((res) => ({ data: res.data, meta: res.meta }));
 
 export type IKnowledgeBaseSearchChunk = z.TypeOf<
