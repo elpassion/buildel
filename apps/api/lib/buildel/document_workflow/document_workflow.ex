@@ -124,4 +124,34 @@ defmodule Buildel.DocumentWorkflow do
     vector_db |> Buildel.VectorDB.init(workflow.collection_name)
     vector_db |> Buildel.VectorDB.add(workflow.collection_name, chunks)
   end
+
+  def query_database(workflow, search_query, query_metadata, options) do
+    vector_db =
+      Buildel.VectorDB.new(%{
+        adapter: workflow.db_adapter,
+        embeddings: workflow.embeddings
+      })
+
+    Buildel.VectorDB.query(
+      vector_db,
+      workflow.collection_name,
+      search_query,
+      query_metadata,
+      options
+    )
+  end
+
+  def get_all_from_database(workflow, query_metadata \\ %{}) do
+    vector_db =
+      Buildel.VectorDB.new(%{
+        adapter: workflow.db_adapter,
+        embeddings: workflow.embeddings
+      })
+
+    Buildel.VectorDB.get_all(
+      vector_db,
+      workflow.collection_name,
+      query_metadata
+    )
+  end
 end

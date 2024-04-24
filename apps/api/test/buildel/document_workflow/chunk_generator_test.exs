@@ -106,6 +106,71 @@ defmodule Buildel.ChunkGeneratorTest do
     end
   end
 
+  describe "add_order/1" do
+    test "correctly assigns index metadata", %{workflow: workflow} do
+      list = DocumentWorkflow.read(workflow, {"foo", %{}})
+
+      result =
+        DocumentWorkflow.ChunkGenerator.split_into_chunks(list, %{chunk_size: 13})
+        |> DocumentWorkflow.ChunkGenerator.add_order()
+
+      assert [
+               %DocumentWorkflow.ChunkGenerator.Chunk{
+                 id: _,
+                 metadata: %{
+                   index: 0
+                 }
+               },
+               %DocumentWorkflow.ChunkGenerator.Chunk{
+                 id: _,
+                 metadata: %{
+                   index: 1
+                 }
+               },
+               %DocumentWorkflow.ChunkGenerator.Chunk{
+                 id: _,
+                 metadata: %{
+                   index: 2
+                 }
+               }
+             ] = result
+    end
+  end
+
+  describe "add_parents/2" do
+    test "correctly assigns parent metadata", %{workflow: workflow} do
+      list = DocumentWorkflow.read(workflow, {"foo", %{}})
+
+      result =
+        DocumentWorkflow.ChunkGenerator.split_into_chunks(list, %{chunk_size: 13})
+        |> DocumentWorkflow.ChunkGenerator.add_parents(list)
+
+      first_chunk_id = Enum.at(result, 0).id
+      second_chunk_id = Enum.at(result, 1).id
+
+      assert [
+               %DocumentWorkflow.ChunkGenerator.Chunk{
+                 id: _,
+                 metadata: %{
+                   parent: nil
+                 }
+               },
+               %DocumentWorkflow.ChunkGenerator.Chunk{
+                 id: _,
+                 metadata: %{
+                   parent: ^first_chunk_id
+                 }
+               },
+               %DocumentWorkflow.ChunkGenerator.Chunk{
+                 id: _,
+                 metadata: %{
+                   parent: ^second_chunk_id
+                 }
+               }
+             ] = result
+    end
+  end
+
   defp create_workflow(_context) do
     workflow =
       DocumentWorkflow.new(%{

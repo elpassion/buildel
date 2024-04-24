@@ -1,5 +1,8 @@
 defmodule BuildelWeb.CollectionController do
+  alias Buildel.Memories.MemoryCollectionSearch
+
   import BuildelWeb.UserAuth
+
   use BuildelWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
@@ -34,13 +37,6 @@ defmodule BuildelWeb.CollectionController do
     ],
     security: [%{"authorization" => []}]
 
-  @default_metadata %{
-    limit: 10,
-    token_limit: nil,
-    extend_neighbors: false,
-    extend_parents: false
-  }
-
   def search(conn, _params) do
     %{
       organization_id: organization_id,
@@ -49,21 +45,17 @@ defmodule BuildelWeb.CollectionController do
     } =
       conn.params
 
-    metadata = Map.merge(@default_metadata, conn.params)
+    params =
+      MemoryCollectionSearch.Params.from_map(Map.put(conn.params, :search_query, search_query))
+
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, collection} <-
            Buildel.Memories.get_organization_collection(organization, id),
-         memory_chunks =
-           Buildel.Memories.search_organization_collection(
-             organization,
-             collection,
-             search_query,
-             metadata
-           ) do
-      render(conn, :search, memory_chunks: memory_chunks, metadata: metadata)
+         memory_chunks <- MemoryCollectionSearch.search(organization, collection, params) do
+      render(conn, :search, memory_chunks: memory_chunks, params: params)
     end
   end
 

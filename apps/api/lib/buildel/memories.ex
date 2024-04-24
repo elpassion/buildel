@@ -2,7 +2,6 @@ defmodule Buildel.Memories do
   alias Buildel.Organizations.Organization
   alias Buildel.Memories.Memory
   alias Buildel.Organizations
-  alias Buildel.VectorDB.EctoAdapter.Chunk
   import Ecto.Query
 
   def list_organization_collection_memories(
@@ -169,96 +168,6 @@ defmodule Buildel.Memories do
       Buildel.Repo.delete(collection)
 
       :ok
-    end
-  end
-
-  def search_organization_collection(organization, collection, search_query, metadata) do
-    {:ok, api_key} =
-      Organizations.get_organization_secret(organization, collection.embeddings_secret_name)
-
-    organization_collection_name = organization_collection_name(organization, collection)
-
-    workflow =
-      Buildel.DocumentWorkflow.new(%{
-        embeddings:
-          Buildel.Clients.Embeddings.new(%{
-            api_type: collection.embeddings_api_type,
-            model: collection.embeddings_model,
-            api_key: api_key.value
-          }),
-        collection_name: organization_collection_name,
-        db_adapter: Buildel.VectorDB.EctoAdapter,
-        workflow_config: %{
-          chunk_size: collection.chunk_size,
-          chunk_overlap: collection.chunk_overlap
-        }
-      })
-
-    vector_db =
-      Buildel.VectorDB.new(%{
-        adapter: workflow.db_adapter,
-        embeddings: workflow.embeddings
-      })
-
-    result =
-      Buildel.VectorDB.query(
-        vector_db,
-        organization_collection_name,
-        search_query,
-        %{},
-        %{
-          limit: metadata.limit,
-          similarity_threshhold: 0
-        }
-      )
-
-    # refactor
-    if metadata.extend_parents do
-      Enum.map(result, fn chunk ->
-        parent_context =
-          Buildel.Repo.all(
-            from c in Chunk,
-              where:
-                (c.collection_name == ^organization_collection_name and
-                   fragment("metadata->>'parent' = ?", ^chunk["metadata"]["parent"])) or
-                  c.id == ^chunk["metadata"]["parent"],
-              order_by: fragment("metadata->>'index' ASC")
-          )
-          |> Enum.map(fn chunk ->
-            chunk.document
-          end)
-
-        combined_document = parent_context |> Enum.join(" ")
-
-        Map.put(chunk, "document", combined_document)
-      end)
-    else
-      if metadata.extend_neighbors do
-        # query only by neighbor ids
-        all_chunks =
-          Buildel.VectorDB.get_all(
-            vector_db,
-            organization_collection_name,
-            %{}
-          )
-
-        Enum.map(result, fn chunk ->
-          prev_id = Map.get(chunk["metadata"], "prev")
-          next_id = Map.get(chunk["metadata"], "next")
-
-          prev = Enum.find(all_chunks, %{}, fn c -> Map.get(c, "chunk_id") == prev_id end)
-          next = Enum.find(all_chunks, %{}, fn c -> Map.get(c, "chunk_id") == next_id end)
-
-          prev_doc = Map.get(prev, "document", "")
-          next_doc = Map.get(next, "document", "")
-
-          combined_document = [prev_doc, chunk["document"], next_doc] |> Enum.join(" ")
-
-          Map.put(chunk, "document", combined_document)
-        end)
-      else
-        result
-      end
     end
   end
 
