@@ -2,6 +2,7 @@ defmodule Buildel.Memories do
   alias Buildel.Organizations.Organization
   alias Buildel.Memories.Memory
   alias Buildel.Organizations
+  alias Buildel.VectorDB.EctoAdapter.Chunk
   import Ecto.Query
 
   def list_organization_collection_memories(
@@ -211,31 +212,53 @@ defmodule Buildel.Memories do
         }
       )
 
-    if metadata.extend_neighbors do
-      # query only by neighbor ids
-      all_chunks =
-        Buildel.VectorDB.get_all(
-          vector_db,
-          organization_collection_name,
-          %{}
-        )
-
+    # refactor
+    if metadata.extend_parents do
       Enum.map(result, fn chunk ->
-        prev_id = Map.get(chunk["metadata"], "prev")
-        next_id = Map.get(chunk["metadata"], "next")
+        parent_context =
+          Buildel.Repo.all(
+            from c in Chunk,
+              where:
+                (c.collection_name == ^organization_collection_name and
+                   fragment("metadata->>'parent' = ?", ^chunk["metadata"]["parent"])) or
+                  c.id == ^chunk["metadata"]["parent"],
+              order_by: fragment("metadata->>'index' ASC")
+          )
+          |> Enum.map(fn chunk ->
+            chunk.document
+          end)
 
-        prev = Enum.find(all_chunks, %{}, fn c -> Map.get(c, "chunk_id") == prev_id end)
-        next = Enum.find(all_chunks, %{}, fn c -> Map.get(c, "chunk_id") == next_id end)
-
-        prev_doc = Map.get(prev, "document", "")
-        next_doc = Map.get(next, "document", "")
-
-        combined_document = [prev_doc, chunk["document"], next_doc] |> Enum.join(" ")
+        combined_document = parent_context |> Enum.join(" ")
 
         Map.put(chunk, "document", combined_document)
       end)
     else
-      result
+      if metadata.extend_neighbors do
+        # query only by neighbor ids
+        all_chunks =
+          Buildel.VectorDB.get_all(
+            vector_db,
+            organization_collection_name,
+            %{}
+          )
+
+        Enum.map(result, fn chunk ->
+          prev_id = Map.get(chunk["metadata"], "prev")
+          next_id = Map.get(chunk["metadata"], "next")
+
+          prev = Enum.find(all_chunks, %{}, fn c -> Map.get(c, "chunk_id") == prev_id end)
+          next = Enum.find(all_chunks, %{}, fn c -> Map.get(c, "chunk_id") == next_id end)
+
+          prev_doc = Map.get(prev, "document", "")
+          next_doc = Map.get(next, "document", "")
+
+          combined_document = [prev_doc, chunk["document"], next_doc] |> Enum.join(" ")
+
+          Map.put(chunk, "document", combined_document)
+        end)
+      else
+        result
+      end
     end
   end
 

@@ -86,6 +86,8 @@ defmodule Buildel.DocumentWorkflow do
       chunk_overlap: chunk_overlap
     })
     |> ChunkGenerator.add_neighbors()
+    |> ChunkGenerator.add_parents(documents)
+    |> ChunkGenerator.add_order()
   end
 
   @type keyword_node :: %{

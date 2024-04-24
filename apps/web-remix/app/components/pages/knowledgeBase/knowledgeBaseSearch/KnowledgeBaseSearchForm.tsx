@@ -51,6 +51,13 @@ export const KnowledgeBaseSearchForm: React.FC<
             supportingText="Extend the search to include neighbor chunks"
           />
         </Field>
+
+        <Field name="extend_parents">
+          <ExtendChunksField
+            label="Extend parents"
+            supportingText="Extend the search to include the whole context of the parent chunk"
+          />
+        </Field>
       </SearchParams>
 
       <Field name="query">
