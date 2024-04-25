@@ -174,24 +174,25 @@ defmodule Buildel.Blocks.DocumentSearch do
       })
       |> MemoryCollectionSearch.search(params)
 
-    result
-    |> Enum.map(fn
-      %{
-        "chunk_id" => chunk_id,
-        "document" => document,
-        "metadata" => %{
-          "file_name" => filename,
-          "memory_id" => memory_id
-        }
-      } ->
+    result =
+      result
+      |> Enum.map(fn
         %{
-          document_id: memory_id,
-          document_name: filename,
-          chunk_id: chunk_id,
-          chunk: document |> String.trim()
-        }
-    end)
-    |> Jason.encode!()
+          "chunk_id" => chunk_id,
+          "document" => document,
+          "metadata" => %{
+            "file_name" => filename,
+            "memory_id" => memory_id
+          }
+        } ->
+          %{
+            document_id: memory_id,
+            document_name: filename,
+            chunk_id: chunk_id,
+            chunk: document |> String.trim()
+          }
+      end)
+      |> Jason.encode!()
 
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
