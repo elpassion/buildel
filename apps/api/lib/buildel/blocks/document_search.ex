@@ -256,11 +256,11 @@ defmodule Buildel.Blocks.DocumentSearch do
           result
           |> Enum.map(fn
             %{
+              "chunk_id" => chunk_id,
               "document" => document,
               "metadata" => %{
                 "file_name" => filename,
-                "memory_id" => memory_id,
-                "chunk_id" => chunk_id
+                "memory_id" => memory_id
               }
             } ->
               %{
