@@ -54,7 +54,9 @@ defmodule BuildelWeb.CollectionController do
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, collection} <-
            Buildel.Memories.get_organization_collection(organization, id),
-         memory_chunks <- MemoryCollectionSearch.search(organization, collection, params) do
+         memory_chunks <-
+           MemoryCollectionSearch.new(organization, collection)
+           |> MemoryCollectionSearch.search(params) do
       render(conn, :search, memory_chunks: memory_chunks, params: params)
     end
   end

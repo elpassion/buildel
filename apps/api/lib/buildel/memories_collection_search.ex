@@ -3,9 +3,41 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
   alias Buildel.Memories
   alias Buildel.Memories.MemoryCollection
   alias Buildel.Organizations
-  alias Buildel.VectorDB.EctoAdapter.Chunk
 
-  import Ecto.Query
+  defstruct [:vector_db, :organization_collection_name]
+
+  def new(%{
+        vector_db: vector_db,
+        organization_collection_name: organization_collection_name
+      }) do
+    %__MODULE__{
+      vector_db: vector_db,
+      organization_collection_name: organization_collection_name
+    }
+  end
+
+  def new(%Organization{} = organization, %MemoryCollection{} = collection) do
+    {:ok, api_key} =
+      Organizations.get_organization_secret(organization, collection.embeddings_secret_name)
+
+    organization_collection_name = Memories.organization_collection_name(organization, collection)
+
+    vector_db =
+      Buildel.VectorDB.new(%{
+        adapter: Buildel.VectorDB.EctoAdapter,
+        embeddings:
+          Buildel.Clients.Embeddings.new(%{
+            api_type: collection.embeddings_api_type,
+            model: collection.embeddings_model,
+            api_key: api_key.value
+          })
+      })
+
+    %__MODULE__{
+      vector_db: vector_db,
+      organization_collection_name: organization_collection_name
+    }
+  end
 
   defmodule Params do
     @default_params %{
@@ -24,22 +56,28 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
     end
   end
 
-  def search(%Organization{} = organization, %MemoryCollection{} = collection, %Params{} = params) do
-    workflow = get_workflow(organization, collection)
-
+  def search(
+        %__MODULE__{vector_db: vector_db, organization_collection_name: collection_name} = module,
+        %Params{} = params
+      ) do
     result =
-      workflow
-      |> Buildel.DocumentWorkflow.query_database(params.search_query, %{}, %{
-        limit: params.limit,
-        similarity_threshhold: 0
-      })
+      Buildel.VectorDB.query(
+        vector_db,
+        collection_name,
+        params.search_query,
+        %{},
+        %{
+          limit: params.limit,
+          similarity_threshhold: 0
+        }
+      )
 
     case params do
       %Params{extend_parents: true} ->
-        extend_parents_query(result, workflow)
+        module |> extend_parents_query(result)
 
       %Params{extend_neighbors: true} ->
-        extend_neighbors_query(result, workflow)
+        module |> extend_neighbors_query(result)
 
       %Params{extend_neighbors: false, extend_parents: false} ->
         result
@@ -49,16 +87,16 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
     end
   end
 
-  defp extend_parents_query(result, workflow) do
+  defp extend_parents_query(
+         %__MODULE__{vector_db: vector_db, organization_collection_name: collection_name},
+         result
+       ) do
     Enum.map(result, fn chunk ->
       parent_context =
-        Buildel.Repo.all(
-          from c in Chunk,
-            where:
-              (c.collection_name == ^workflow.collection_name and
-                 fragment("metadata->>'parent' = ?", ^chunk["metadata"]["parent"])) or
-                c.id == ^chunk["metadata"]["parent"],
-            order_by: fragment("metadata->>'index' ASC")
+        Buildel.VectorDB.get_by_parent_id(
+          vector_db,
+          collection_name,
+          chunk["metadata"]["parent"]
         )
         |> Enum.map(fn chunk ->
           chunk.document
@@ -70,8 +108,16 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
     end)
   end
 
-  defp extend_neighbors_query(result, workflow) do
-    all_chunks = workflow |> Buildel.DocumentWorkflow.get_all_from_database()
+  defp extend_neighbors_query(
+         %__MODULE__{vector_db: vector_db, organization_collection_name: collection_name},
+         result
+       ) do
+    all_chunks =
+      Buildel.VectorDB.get_all(
+        vector_db,
+        collection_name,
+        %{}
+      )
 
     Enum.map(result, fn chunk ->
       prev_id = Map.get(chunk["metadata"], "prev")
@@ -87,27 +133,5 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
 
       Map.put(chunk, "document", combined_document)
     end)
-  end
-
-  defp get_workflow(%Organization{} = organization, %MemoryCollection{} = collection) do
-    {:ok, api_key} =
-      Organizations.get_organization_secret(organization, collection.embeddings_secret_name)
-
-    organization_collection_name = Memories.organization_collection_name(organization, collection)
-
-    Buildel.DocumentWorkflow.new(%{
-      embeddings:
-        Buildel.Clients.Embeddings.new(%{
-          api_type: collection.embeddings_api_type,
-          model: collection.embeddings_model,
-          api_key: api_key.value
-        }),
-      collection_name: organization_collection_name,
-      db_adapter: Buildel.VectorDB.EctoAdapter,
-      workflow_config: %{
-        chunk_size: collection.chunk_size,
-        chunk_overlap: collection.chunk_overlap
-      }
-    })
   end
 end

@@ -62,6 +62,12 @@ defmodule Buildel.VectorDB do
     end
   end
 
+  def get_by_parent_id(%__MODULE__{adapter: adapter}, collection_name, parent_id) do
+    {:ok, collection} = adapter.get_collection(collection_name)
+
+    adapter.get_by_parent_id(collection, parent_id)
+  end
+
   def get_all(%__MODULE__{adapter: adapter}, collection_name, metadata \\ %{}, params \\ %{}) do
     {:ok, collection} = adapter.get_collection(collection_name)
 
@@ -242,6 +248,17 @@ defmodule Buildel.VectorDB.EctoAdapter do
 
     {_inserted_records, nil} = Buildel.Repo.insert_all(Chunk, chunks)
     :ok
+  end
+
+  def get_by_parent_id(collection, parent_id) do
+    Buildel.Repo.all(
+      from c in Chunk,
+        where:
+          (c.collection_name == ^collection.name and
+             fragment("metadata->>'parent' = ?", ^parent_id)) or
+            c.id == ^parent_id,
+        order_by: fragment("metadata->>'index' ASC")
+    )
   end
 
   def get_all(collection, metadata, _params) do
