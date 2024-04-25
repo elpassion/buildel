@@ -37,7 +37,7 @@ defmodule Buildel.Blocks.DocumentSearch do
               "knowledge",
               "limit",
               "similarity_threshhold",
-              # "token_limit",
+              "token_limit",
               "extend_neighbors",
               "extend_parents"
             ],
@@ -55,14 +55,14 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "description" => "The maximum number of results to return.",
                   "default" => 3
                 },
-                # token_limit: %{
-                #   "type" => "number",
-                #   "title" => "Token limit",
-                #   "description" =>
-                #     "The maximum number of tokens in result. Set to 0 for no limit.",
-                #   "default" => 0,
-                #   "minimum" => 0
-                # },
+                token_limit: %{
+                  "type" => "number",
+                  "title" => "Token limit",
+                  "description" =>
+                    "The maximum number of tokens in result. Set to 0 for no limit.",
+                  "default" => 0,
+                  "minimum" => 0
+                },
                 similarity_threshhold: %{
                   "type" => "number",
                   "title" => "Similarity threshhold",
@@ -167,29 +167,31 @@ defmodule Buildel.Blocks.DocumentSearch do
           end
       })
 
-    result =
+    {result, _total_tokens} =
       MemoryCollectionSearch.new(%{
         vector_db: state.vector_db,
         organization_collection_name: state[:collection]
       })
       |> MemoryCollectionSearch.search(params)
-      |> Enum.map(fn
+
+    result
+    |> Enum.map(fn
+      %{
+        "chunk_id" => chunk_id,
+        "document" => document,
+        "metadata" => %{
+          "file_name" => filename,
+          "memory_id" => memory_id
+        }
+      } ->
         %{
-          "chunk_id" => chunk_id,
-          "document" => document,
-          "metadata" => %{
-            "file_name" => filename,
-            "memory_id" => memory_id
-          }
-        } ->
-          %{
-            document_id: memory_id,
-            document_name: filename,
-            chunk_id: chunk_id,
-            chunk: document |> String.trim()
-          }
-      end)
-      |> Jason.encode!()
+          document_id: memory_id,
+          document_name: filename,
+          chunk_id: chunk_id,
+          chunk: document |> String.trim()
+        }
+    end)
+    |> Jason.encode!()
 
     Buildel.BlockPubSub.broadcast_to_io(
       state[:context_id],
@@ -251,7 +253,7 @@ defmodule Buildel.Blocks.DocumentSearch do
            organization_collection_name: state[:collection]
          })
          |> MemoryCollectionSearch.search(params) do
-      result when is_list(result) ->
+      {result, _total_tokens} when is_list(result) ->
         result =
           result
           |> Enum.map(fn

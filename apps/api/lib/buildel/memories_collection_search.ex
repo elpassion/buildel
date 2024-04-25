@@ -69,30 +69,34 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
         %__MODULE__{vector_db: vector_db, organization_collection_name: collection_name} = module,
         %Params{} = params
       ) do
-    result =
-      Buildel.VectorDB.query(
-        vector_db,
-        collection_name,
-        params.search_query,
-        params.where,
-        %{
-          limit: params.limit,
-          similarity_threshhold: params.similarity_threshhold
-        }
-      )
+    with result when is_list(result) <-
+           Buildel.VectorDB.query(
+             vector_db,
+             collection_name,
+             params.search_query,
+             params.where,
+             %{
+               limit: params.limit,
+               similarity_threshhold: params.similarity_threshhold
+             }
+           ) do
+      extended_result =
+        case params do
+          %Params{extend_parents: true} ->
+            module |> extend_parents_query(result)
 
-    case params do
-      %Params{extend_parents: true} ->
-        module |> extend_parents_query(result)
+          %Params{extend_neighbors: true} ->
+            module |> extend_neighbors_query(result)
 
-      %Params{extend_neighbors: true} ->
-        module |> extend_neighbors_query(result)
+          _ ->
+            result
+        end
 
-      %Params{extend_neighbors: false, extend_parents: false} ->
-        result
+      {limited_result, total_tokens} = limit_result_and_count_tokens(extended_result, params)
 
-      _ ->
-        result
+      {limited_result, total_tokens}
+    else
+      e -> e
     end
   end
 
@@ -142,5 +146,38 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
 
       Map.put(chunk, "document", combined_document)
     end)
+  end
+
+  defp limit_result_and_count_tokens(result, %Params{} = params) do
+    tokenizer = Buildel.Langchain.ChatGptTokenizer.init(%{})
+
+    case params.token_limit do
+      nil ->
+        total = Enum.map_join(result, " ", & &1["document"])
+        total_tokens = tokenizer |> Buildel.Langchain.ChatGptTokenizer.count_text_tokens(total)
+
+        {result, total_tokens}
+
+      token_limit ->
+        {list, total} =
+          result
+          |> Enum.reduce_while({[], ""}, fn chunk, {list, total} ->
+            new_total = total <> " " <> chunk["document"]
+
+            total_tokens =
+              tokenizer |> Buildel.Langchain.ChatGptTokenizer.count_text_tokens(new_total)
+
+            if total_tokens > token_limit do
+              {:halt, {list, total}}
+            else
+              {:cont, {[chunk | list], new_total}}
+            end
+          end)
+
+        reversed_list = Enum.reverse(list)
+        total_tokens = tokenizer |> Buildel.Langchain.ChatGptTokenizer.count_text_tokens(total)
+
+        {reversed_list, total_tokens}
+    end
   end
 end
