@@ -43,16 +43,25 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
     @default_params %{
       search_query: "",
       limit: 10,
+      similarity_threshhold: 0,
+      where: %{},
       token_limit: nil,
       extend_neighbors: false,
       extend_parents: false
     }
 
-    defstruct [:search_query, :limit, :token_limit, :extend_neighbors, :extend_parents]
+    defstruct [
+      :search_query,
+      :limit,
+      :similarity_threshhold,
+      :where,
+      :token_limit,
+      :extend_neighbors,
+      :extend_parents
+    ]
 
     def from_map(params) do
-      %__MODULE__{}
-      |> struct(Map.merge(@default_params, params))
+      %__MODULE__{} |> struct(Map.merge(@default_params, params))
     end
   end
 
@@ -65,10 +74,10 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
         vector_db,
         collection_name,
         params.search_query,
-        %{},
+        params.where,
         %{
           limit: params.limit,
-          similarity_threshhold: 0
+          similarity_threshhold: params.similarity_threshhold
         }
       )
 

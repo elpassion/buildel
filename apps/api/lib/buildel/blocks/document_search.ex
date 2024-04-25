@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.DocumentSearch do
   alias Buildel.Blocks.Fields.EditorField
+  alias Buildel.Memories.MemoryCollectionSearch
   use Buildel.Blocks.Block
   alias LangChain.Function
 
@@ -35,7 +36,10 @@ defmodule Buildel.Blocks.DocumentSearch do
             "required" => [
               "knowledge",
               "limit",
-              "similarity_threshhold"
+              "similarity_threshhold",
+              # "token_limit",
+              "extend_neighbors",
+              "extend_parents"
             ],
             "properties" =>
               Jason.OrderedObject.new(
@@ -51,6 +55,14 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "description" => "The maximum number of results to return.",
                   "default" => 3
                 },
+                # token_limit: %{
+                #   "type" => "number",
+                #   "title" => "Token limit",
+                #   "description" =>
+                #     "The maximum number of tokens in result. Set to 0 for no limit.",
+                #   "default" => 0,
+                #   "minimum" => 0
+                # },
                 similarity_threshhold: %{
                   "type" => "number",
                   "title" => "Similarity threshhold",
@@ -59,6 +71,19 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "minimum" => 0.0,
                   "maximum" => 1.0,
                   "step" => 0.01
+                },
+                extend_neighbors: %{
+                  "type" => "boolean",
+                  "title" => "Extend neighbors",
+                  "description" => "Extend the search to include neighbor chunks",
+                  "default" => false
+                },
+                extend_parents: %{
+                  "type" => "boolean",
+                  "title" => "Extend parents",
+                  "description" =>
+                    "Extend the search to include the whole context of the parent chunk",
+                  "default" => false
                 },
                 call_formatter:
                   EditorField.call_formatter(%{
@@ -124,12 +149,30 @@ defmodule Buildel.Blocks.DocumentSearch do
   @impl true
   def handle_cast({:query, {:text, query}}, state) do
     state = send_stream_start(state)
+    token_limit = state.opts |> Map.get(:token_limit, 0)
+
+    params =
+      MemoryCollectionSearch.Params.from_map(%{
+        search_query: query,
+        where: state.where,
+        limit: state[:opts] |> Map.get(:limit, 3),
+        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
+        extend_neighbors: state.opts |> Map.get(:extend_neighbors, false) != false,
+        extend_parents: state.opts |> Map.get(:extend_parents, false) != false,
+        token_limit:
+          if token_limit == 0 do
+            nil
+          else
+            token_limit
+          end
+      })
 
     result =
-      Buildel.VectorDB.query(state.vector_db, state[:collection], query, state.where, %{
-        limit: state[:opts] |> Map.get(:limit, 3),
-        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25)
+      MemoryCollectionSearch.new(%{
+        vector_db: state.vector_db,
+        organization_collection_name: state[:collection]
       })
+      |> MemoryCollectionSearch.search(params)
       |> Enum.map(fn
         %{
           "chunk_id" => chunk_id,
@@ -185,11 +228,29 @@ defmodule Buildel.Blocks.DocumentSearch do
     state = state |> send_stream_start()
     limit = state.opts |> Map.get(:limit, 3)
     similarity_threshhold = state.opts |> Map.get(:similarity_threshhold, 0.25)
+    token_limit = state.opts |> Map.get(:token_limit, 0)
 
-    case Buildel.VectorDB.query(state.vector_db, state[:collection], query, state.where, %{
-           limit: limit,
-           similarity_threshhold: similarity_threshhold
-         }) do
+    params =
+      MemoryCollectionSearch.Params.from_map(%{
+        search_query: query,
+        where: state.where,
+        limit: limit,
+        similarity_threshhold: similarity_threshhold,
+        extend_neighbors: state.opts |> Map.get(:extend_neighbors, false) != false,
+        extend_parents: state.opts |> Map.get(:extend_parents, false) != false,
+        token_limit:
+          if token_limit == 0 do
+            nil
+          else
+            token_limit
+          end
+      })
+
+    case MemoryCollectionSearch.new(%{
+           vector_db: state.vector_db,
+           organization_collection_name: state[:collection]
+         })
+         |> MemoryCollectionSearch.search(params) do
       result when is_list(result) ->
         result =
           result
