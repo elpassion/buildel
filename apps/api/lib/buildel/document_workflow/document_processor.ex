@@ -119,6 +119,10 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
                                                 {acc, parents, previous_id, temp_next_updates} ->
         parent_id = Map.get(parents, item.level - 1)
 
+        # parent needs to be fixed. It does not take into account that there might be a not direct level parent f.e.
+        # [{lvl: 1}, {lvl: 1}, {lvl: 0}, {lvl: 2}]
+        # the last element should have parent 0, not 1
+
         new_item =
           item
           |> Map.put(:parent, parent_id)

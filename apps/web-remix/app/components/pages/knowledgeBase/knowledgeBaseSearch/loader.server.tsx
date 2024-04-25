@@ -16,6 +16,7 @@ export async function loader(args: LoaderFunctionArgs) {
     const limit = url.searchParams.get("limit") ?? undefined;
     const token_limit = url.searchParams.get("token_limit") ?? undefined;
     const extend_neighbors = url.searchParams.get("extend_neighbors") ?? undefined;
+    const extend_parents = url.searchParams.get("extend_parents") ?? undefined;
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
@@ -37,6 +38,7 @@ export async function loader(args: LoaderFunctionArgs) {
           limit: limit ? parseInt(limit) : undefined,
           token_limit: token_limit ? parseInt(token_limit) : undefined,
           extend_neighbors: extend_neighbors === "on" ? "true" : "false",
+          extend_parents: extend_parents === "on" ? "true" : "false",
         }
       );
 

@@ -8,7 +8,9 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
             building_block_ids: [binary()],
             keywords: [binary()],
             prev: integer(),
-            next: integer()
+            next: integer(),
+            parent: integer(),
+            index: integer()
           }
 
     @type t :: %Chunk{
@@ -55,6 +57,42 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
     |> Enum.map(fn elem ->
       next_id = Map.get(next_map, elem.id)
       Map.put(elem, :metadata, Map.merge(elem.metadata, %{next: next_id}))
+    end)
+  end
+
+  @spec add_order([Chunk.t()]) :: [Chunk.t()]
+  def add_order(list) do
+    list
+    |> Enum.with_index()
+    |> Enum.map(fn {elem, index} ->
+      Map.put(elem, :metadata, Map.merge(elem.metadata, %{index: index}))
+    end)
+  end
+
+  @spec add_parents([Chunk.t()], struct_list()) :: [Chunk.t()]
+  def add_parents(chunk_list, node_list) do
+    chunk_list
+    |> Enum.map(fn chunk ->
+      parent =
+        Enum.reduce_while(chunk.metadata.building_block_ids, nil, fn id, acc ->
+          %{parent: parent} = node_list |> Enum.find(&(&1.id == id))
+          real_parent = node_list |> Enum.find(&(&1.id == parent))
+
+          case parent do
+            nil -> {:cont, acc}
+            _ -> {:halt, real_parent}
+          end
+        end)
+
+      if parent do
+        chunk_parent =
+          chunk_list
+          |> Enum.find(%{id: nil}, fn chunk -> String.contains?(chunk.value, parent.value) end)
+
+        Map.put(chunk, :metadata, Map.merge(chunk.metadata, %{parent: chunk_parent.id}))
+      else
+        Map.put(chunk, :metadata, Map.merge(chunk.metadata, %{parent: nil}))
+      end
     end)
   end
 

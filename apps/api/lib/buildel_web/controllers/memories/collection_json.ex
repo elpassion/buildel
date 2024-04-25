@@ -1,10 +1,14 @@
 defmodule BuildelWeb.CollectionJSON do
   alias Buildel.Memories.MemoryCollection
+  alias Buildel.Memories.MemoryCollectionSearch
 
-  def search(%{memory_chunks: memory_chunks, metadata: metadata}) do
+  def search(%{
+        memory_chunks: memory_chunks,
+        params: %MemoryCollectionSearch.Params{} = params
+      }) do
     tokenizer = Buildel.Langchain.ChatGptTokenizer.init(%{})
 
-    case metadata.token_limit do
+    case params.token_limit do
       nil ->
         total = Enum.map_join(memory_chunks, " ", & &1["document"])
         total_tokens = tokenizer |> Buildel.Langchain.ChatGptTokenizer.count_text_tokens(total)
