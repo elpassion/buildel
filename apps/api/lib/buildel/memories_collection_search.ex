@@ -106,14 +106,20 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
        ) do
     Enum.map(result, fn chunk ->
       parent_context =
-        Buildel.VectorDB.get_by_parent_id(
-          vector_db,
-          collection_name,
-          chunk["metadata"]["parent"]
-        )
-        |> Enum.map(fn chunk ->
-          chunk.document
-        end)
+        case chunk["metadata"]["parent"] do
+          nil ->
+            [chunk["document"]]
+
+          parent_id ->
+            Buildel.VectorDB.get_by_parent_id(
+              vector_db,
+              collection_name,
+              parent_id
+            )
+            |> Enum.map(fn chunk ->
+              chunk["document"]
+            end)
+        end
 
       combined_document = parent_context |> Enum.join(" ")
 

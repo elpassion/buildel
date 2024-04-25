@@ -259,6 +259,14 @@ defmodule Buildel.VectorDB.EctoAdapter do
             c.id == ^parent_id,
         order_by: fragment("metadata->>'index' ASC")
     )
+    |> Enum.map(fn chunk ->
+      %{
+        "document" => chunk.document,
+        "metadata" => chunk.metadata,
+        "chunk_id" => chunk.id,
+        "similarity" => chunk.similarity
+      }
+    end)
   end
 
   def get_all(collection, metadata, _params) do
@@ -270,7 +278,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
       %{
         "document" => chunk.document,
         "metadata" => chunk.metadata,
-        "chunk_id" => chunk.id
+        "chunk_id" => chunk.id,
+        "similarity" => chunk.similarity
       }
     end)
   end
