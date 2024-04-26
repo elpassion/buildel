@@ -4,11 +4,9 @@ defmodule Buildel.Memories.MemoryCollectionCost do
 
   schema "memory_collection_costs" do
     field(:cost_type, Ecto.Enum, values: [file_upload: 0, query: 1])
-    field(:file_name, :string)
-    field(:query, :string)
-    field(:total_tokens, :integer)
+    field(:description, :string)
 
-    belongs_to(:organization, Buildel.Organizations.Organization)
+    belongs_to(:cost, Buildel.Costs.Cost)
     belongs_to(:memory_collection, Buildel.Memories.MemoryCollection)
 
     timestamps()
@@ -18,19 +16,16 @@ defmodule Buildel.Memories.MemoryCollectionCost do
     memory_collection_cost
     |> cast(attrs, [
       :cost_type,
-      :organization_id,
-      :file_name,
-      :query,
-      :total_tokens,
+      :cost_id,
+      :description,
       :memory_collection_id
     ])
     |> validate_required([
       :cost_type,
-      :organization_id,
-      :total_tokens,
+      :cost_id,
       :memory_collection_id
     ])
-    |> assoc_constraint(:organization)
+    |> assoc_constraint(:cost)
     |> assoc_constraint(:memory_collection)
   end
 end

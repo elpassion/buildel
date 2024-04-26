@@ -1,8 +1,26 @@
 defmodule Buildel.Memories do
   alias Buildel.Organizations.Organization
+  alias Buildel.Memories.MemoryCollectionCost
   alias Buildel.Memories.Memory
   alias Buildel.Organizations
   import Ecto.Query
+
+  def create_memory_collection_cost(
+        %Buildel.Memories.MemoryCollection{} = collection,
+        %Buildel.Costs.Cost{} = cost,
+        attrs \\ %{}
+      ) do
+    case %MemoryCollectionCost{}
+         |> MemoryCollectionCost.changeset(
+           attrs
+           |> Map.put(:memory_collection_id, collection.id)
+           |> Map.put(:cost_id, cost.id)
+         )
+         |> Buildel.Repo.insert() do
+      {:ok, struct} -> {:ok, struct}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
 
   def list_organization_collection_memories(
         %Buildel.Organizations.Organization{} = organization,
@@ -105,16 +123,27 @@ defmodule Buildel.Memories do
              })
            )
            |> Buildel.Repo.insert(),
+         cost_amount <-
+           Buildel.Costs.CostCalculator.calculate_embeddings_cost(
+             %Buildel.Langchain.EmbeddingsTokenSummary{
+               tokens: total_tokens,
+               model: collection.embeddings_model
+             }
+           ),
+         {:ok, cost} <-
+           Organizations.create_organization_cost(
+             organization,
+             %{
+               amount: cost_amount,
+               input_tokens: total_tokens,
+               output_tokens: 0
+             }
+           ),
          {:ok, _} <-
-           %Buildel.Memories.MemoryCollectionCost{}
-           |> Buildel.Memories.MemoryCollectionCost.changeset(%{
+           create_memory_collection_cost(collection, cost, %{
              cost_type: :file_upload,
-             organization_id: organization.id,
-             memory_collection_id: collection.id,
-             total_tokens: total_tokens,
-             file_name: memory.file_name
-           })
-           |> Buildel.Repo.insert() do
+             description: memory.file_name
+           }) do
       chunks =
         put_in(
           chunks,

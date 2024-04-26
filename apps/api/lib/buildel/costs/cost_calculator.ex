@@ -1,6 +1,18 @@
 defmodule Buildel.Costs.CostCalculator do
   require Logger
 
+  def calculate_embeddings_cost(
+        %Buildel.Langchain.EmbeddingsTokenSummary{
+          model: model,
+          endpoint: endpoint
+        } = summary
+      ) do
+    %{token_price: token_price} =
+      embeddings_prices({endpoint, model})
+
+    Decimal.mult(token_price, summary.tokens)
+  end
+
   def calculate_chat_cost(
         %Buildel.Langchain.ChatTokenSummary{model: model, endpoint: endpoint} = chat_token_summary
       ) do
@@ -11,6 +23,27 @@ defmodule Buildel.Costs.CostCalculator do
     output_tokens_cost = Decimal.mult(output_token_price, chat_token_summary.output_tokens)
 
     Decimal.add(input_tokens_cost, output_tokens_cost)
+  end
+
+  defp embeddings_prices({endpoint, model} = api_model) do
+    %{
+      {"https://api.openai.com/v1/embeddings", "text-embedding-ada-002"} => %{
+        token_price: Decimal.new("0.0001") |> Decimal.div(1000)
+      },
+      {"https://api.openai.com/v1/embeddings", "text-embedding-3-small"} => %{
+        token_price: Decimal.new("0.00002") |> Decimal.div(1000)
+      },
+      {"https://api.openai.com/v1/embeddings", "text-embedding-3-large"} => %{
+        token_price: Decimal.new("0.00013") |> Decimal.div(1000)
+      }
+    }
+    |> Map.get_lazy(api_model, fn ->
+      Logger.warning("Model not found: #{endpoint} #{model}. Using empty prices.")
+
+      %{
+        token_price: 0
+      }
+    end)
   end
 
   defp prices({endpoint, model} = api_model) do

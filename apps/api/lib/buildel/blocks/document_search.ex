@@ -167,7 +167,8 @@ defmodule Buildel.Blocks.DocumentSearch do
           end
       })
 
-    {result, _total_tokens} =
+    # todo: save costs
+    {result, _total_tokens, embeddings_tokens} =
       MemoryCollectionSearch.new(%{
         vector_db: state.vector_db,
         organization_collection_name: state[:collection]
@@ -251,12 +252,13 @@ defmodule Buildel.Blocks.DocumentSearch do
           end
       })
 
+    # todo: save costs
     case MemoryCollectionSearch.new(%{
            vector_db: state.vector_db,
            organization_collection_name: state[:collection]
          })
          |> MemoryCollectionSearch.search(params) do
-      {result, _total_tokens} when is_list(result) ->
+      {result, _total_tokens, embeddings_tokens} when is_list(result) ->
         result =
           result
           |> Enum.map(fn

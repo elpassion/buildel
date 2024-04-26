@@ -83,7 +83,7 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
         } = module,
         %Params{} = params
       ) do
-    with %{result: result, total_tokens: total_tokens} when is_list(result) <-
+    with %{result: result, total_tokens: embeddings_tokens} when is_list(result) <-
            Buildel.VectorDB.query(
              vector_db,
              collection_name,
@@ -93,17 +93,7 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
                limit: params.limit,
                similarity_threshhold: params.similarity_threshhold
              }
-           ),
-         {:ok, _} <-
-           %Buildel.Memories.MemoryCollectionCost{}
-           |> Buildel.Memories.MemoryCollectionCost.changeset(%{
-             cost_type: :query,
-             organization_id: organization_id,
-             memory_collection_id: collection_id,
-             total_tokens: total_tokens,
-             query: params.search_query
-           })
-           |> Buildel.Repo.insert() do
+           ) do
       extended_result =
         case params do
           %Params{extend_parents: true} ->
@@ -118,7 +108,7 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
 
       {limited_result, total_tokens} = limit_result_and_count_tokens(extended_result, params)
 
-      {limited_result, total_tokens}
+      {limited_result, total_tokens, embeddings_tokens}
     else
       e -> e
     end
