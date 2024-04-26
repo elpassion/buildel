@@ -1,0 +1,19 @@
+[
+  {
+    "request": {
+      "options": [],
+      "body": "",
+      "url": "http://nonexistentwebsite1234567890.com",
+      "headers": [],
+      "method": "get",
+      "request_body": ""
+    },
+    "response": {
+      "binary": false,
+      "type": "error",
+      "body": "nxdomain",
+      "headers": [],
+      "status_code": null
+    }
+  }
+]
