@@ -117,13 +117,20 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
               parent_id
             )
             |> Enum.map(fn chunk ->
-              chunk["document"]
+              %{
+                document: chunk["document"],
+                pages: chunk["metadata"]["pages"]
+              }
             end)
         end
 
-      combined_document = parent_context |> Enum.join(" ")
+      combined_document = parent_context |> Enum.map_join(" ", & &1.document)
+      IO.inspect(parent_context)
+      combined_pages = parent_context |> Enum.flat_map(& &1.pages) |> Enum.uniq()
 
-      Map.put(chunk, "document", combined_document)
+      chunk
+      |> Map.put("document", combined_document)
+      |> Map.put("metadata", Map.put(chunk["metadata"], "pages", combined_pages))
     end)
   end
 
@@ -150,7 +157,13 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
 
       combined_document = [prev_doc, chunk["document"], next_doc] |> Enum.join(" ")
 
-      Map.put(chunk, "document", combined_document)
+      combined_pages =
+        (prev["metadata"]["pages"] ++ chunk["metadata"]["pages"] ++ next["metadata"]["pages"])
+        |> Enum.uniq()
+
+      chunk
+      |> Map.put("metadata", Map.put(chunk["metadata"], "pages", combined_pages))
+      |> Map.put("document", combined_document)
     end)
   end
 
