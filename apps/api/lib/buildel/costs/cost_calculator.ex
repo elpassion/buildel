@@ -41,7 +41,7 @@ defmodule Buildel.Costs.CostCalculator do
       Logger.warning("Model not found: #{endpoint} #{model}. Using empty prices.")
 
       %{
-        token_price: 0
+        token_price: Decimal.new(0)
       }
     end)
   end
