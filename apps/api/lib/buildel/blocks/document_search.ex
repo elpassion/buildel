@@ -180,16 +180,18 @@ defmodule Buildel.Blocks.DocumentSearch do
         %{
           "chunk_id" => chunk_id,
           "document" => document,
-          "metadata" => %{
-            "file_name" => filename,
-            "memory_id" => memory_id
-          }
+          "metadata" =>
+            %{
+              "file_name" => filename,
+              "memory_id" => memory_id
+            } = metadata
         } ->
           %{
             document_id: memory_id,
             document_name: filename,
             chunk_id: chunk_id,
-            chunk: document |> String.trim()
+            chunk: document |> String.trim(),
+            pages: metadata |> Map.get("pages", [])
           }
       end)
       |> Jason.encode!()
@@ -261,16 +263,18 @@ defmodule Buildel.Blocks.DocumentSearch do
             %{
               "chunk_id" => chunk_id,
               "document" => document,
-              "metadata" => %{
-                "file_name" => filename,
-                "memory_id" => memory_id
-              }
+              "metadata" =>
+                %{
+                  "file_name" => filename,
+                  "memory_id" => memory_id
+                } = metadata
             } ->
               %{
                 document_id: memory_id,
                 document_name: filename,
                 chunk_id: chunk_id,
-                chunk: document |> String.trim()
+                chunk: document |> String.trim(),
+                pages: metadata |> Map.get("pages", [])
               }
           end)
           |> Jason.encode!()

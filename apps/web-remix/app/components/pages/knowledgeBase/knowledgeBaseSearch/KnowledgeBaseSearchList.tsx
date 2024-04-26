@@ -52,6 +52,9 @@ function KnowledgeBaseSearchListItem({
           Score: {(item.similarity * 100).toFixed(0)}%
         </p>
       </div>
+      <p className="mt-2 font-bold text-neutral-100">
+        Page: {item.pages.join(", ")}
+      </p>
     </article>
   );
 }

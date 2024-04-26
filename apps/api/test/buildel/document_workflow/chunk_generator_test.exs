@@ -55,13 +55,15 @@ defmodule Buildel.ChunkGeneratorTest do
                %DocumentWorkflow.ChunkGenerator.Chunk{
                  metadata: %{
                    keywords: ["header1"],
-                   building_block_ids: ^first_chunk_building_block_ids
+                   building_block_ids: ^first_chunk_building_block_ids,
+                   pages: [0]
                  }
                },
                %DocumentWorkflow.ChunkGenerator.Chunk{
                  metadata: %{
                    keywords: ["header1"],
-                   building_block_ids: ^second_chunk_building_block_ids
+                   building_block_ids: ^second_chunk_building_block_ids,
+                   pages: [0, 1]
                  }
                }
              ] = result

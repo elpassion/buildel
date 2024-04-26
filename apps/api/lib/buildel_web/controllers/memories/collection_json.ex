@@ -24,7 +24,8 @@ defmodule BuildelWeb.CollectionJSON do
       content: document,
       similarity: similarity,
       file_name: metadata["file_name"],
-      keywords: metadata["keywords"] || []
+      keywords: metadata["keywords"] || [],
+      pages: metadata["pages"] || []
     }
   end
 

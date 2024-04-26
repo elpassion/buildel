@@ -105,8 +105,10 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
       [head | tail] = list
 
       new_metadata =
-        Map.update(metadata, :building_block_ids, [head.id], &(&1 ++ [head.id]))
+        metadata
+        |> Map.update(:building_block_ids, [head.id], &(&1 ++ [head.id]))
         |> Map.update(:keywords, head.metadata.headers, &Enum.uniq(&1 ++ head.metadata.headers))
+        |> Map.update(:pages, [head.metadata.page], &(&1 ++ [head.metadata.page]))
 
       splitter(
         tail,
@@ -146,6 +148,9 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
   end
 
   defp create_chunk(text, metadata) do
+    pages = metadata |> Map.get(:pages, []) |> Enum.uniq()
+    metadata = Map.put(metadata, :pages, pages)
+
     %Chunk{id: UUID.uuid4(), value: text, metadata: metadata}
   end
 end

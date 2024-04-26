@@ -58,6 +58,7 @@ export const KnowledgeBaseSearchChunk = z.object({
   file_name: z.union([z.string(), z.null()]),
   similarity: z.number(),
   keywords: z.array(z.string()).default([]),
+  pages: z.array(z.number()).default([]),
 });
 
 export const KnowledgeBaseSearchChunkMeta = z.object({
