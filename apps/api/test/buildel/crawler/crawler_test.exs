@@ -10,5 +10,11 @@ defmodule Buildel.Crawler.CrawlerTest do
       assert Buildel.Crawler.crawl("http://nonexistentwebsite1234567890.com") ==
                {:error, :request_failed}
     end
+
+    test "returns ok  when request succeeds" do
+      url = "http://example.com"
+      assert {:ok, %{body: body, url: ^url}} = Buildel.Crawler.crawl(url)
+      assert String.contains?(body, "<html>")
+    end
   end
 end
