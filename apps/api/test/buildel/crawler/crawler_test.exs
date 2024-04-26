@@ -22,7 +22,14 @@ defmodule Buildel.Crawler.CrawlerTest do
                   id: _,
                   start_url: "http://nonexistentwebsite1234567890.com",
                   status: :error,
-                  error: :request_failed
+                  error: :not_all_pages_successful,
+                  pages: [
+                    %Buildel.Crawler.Page{
+                      status: :error,
+                      url: "http://nonexistentwebsite1234567890.com",
+                      error: :request_failed
+                    }
+                  ]
                 }} = Buildel.Crawler.crawl("http://nonexistentwebsite1234567890.com")
       end
     end
