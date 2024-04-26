@@ -69,7 +69,7 @@ defmodule BuildelWeb.CollectionController do
              organization,
              %{
                amount: cost_amount,
-               input_tokens: total_tokens,
+               input_tokens: embeddings_tokens,
                output_tokens: 0
              }
            ),
