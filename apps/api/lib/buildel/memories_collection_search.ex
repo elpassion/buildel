@@ -4,15 +4,22 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
   alias Buildel.Memories.MemoryCollection
   alias Buildel.Organizations
 
-  defstruct [:vector_db, :organization_collection_name]
+  defstruct [:vector_db, :organization_collection_name, :organization_id, :collection_id]
 
   def new(%{
         vector_db: vector_db,
         organization_collection_name: organization_collection_name
       }) do
+    %{
+      organization_id: organization_id,
+      collection_id: collection_id
+    } = Memories.context_from_organization_collection_name(organization_collection_name)
+
     %__MODULE__{
       vector_db: vector_db,
-      organization_collection_name: organization_collection_name
+      organization_collection_name: organization_collection_name,
+      organization_id: organization_id,
+      collection_id: collection_id
     }
   end
 
@@ -35,7 +42,9 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
 
     %__MODULE__{
       vector_db: vector_db,
-      organization_collection_name: organization_collection_name
+      organization_collection_name: organization_collection_name,
+      organization_id: organization.id,
+      collection_id: collection.id
     }
   end
 
@@ -66,10 +75,15 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
   end
 
   def search(
-        %__MODULE__{vector_db: vector_db, organization_collection_name: collection_name} = module,
+        %__MODULE__{
+          vector_db: vector_db,
+          organization_collection_name: collection_name,
+          organization_id: organization_id,
+          collection_id: collection_id
+        } = module,
         %Params{} = params
       ) do
-    with result when is_list(result) <-
+    with %{result: result, total_tokens: total_tokens} when is_list(result) <-
            Buildel.VectorDB.query(
              vector_db,
              collection_name,
@@ -79,7 +93,17 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
                limit: params.limit,
                similarity_threshhold: params.similarity_threshhold
              }
-           ) do
+           ),
+         {:ok, _} <-
+           %Buildel.Memories.MemoryCollectionCost{}
+           |> Buildel.Memories.MemoryCollectionCost.changeset(%{
+             cost_type: :query,
+             organization_id: organization_id,
+             memory_collection_id: collection_id,
+             total_tokens: total_tokens,
+             query: params.search_query
+           })
+           |> Buildel.Repo.insert() do
       extended_result =
         case params do
           %Params{extend_parents: true} ->

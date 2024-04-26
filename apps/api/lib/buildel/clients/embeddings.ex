@@ -19,7 +19,11 @@ defmodule Buildel.Clients.Embeddings do
   end
 
   def get_embeddings(%__MODULE__{api_type: "test"}, inputs) do
-    {:ok, inputs |> Enum.map(fn _ -> Enum.map(1..100, fn _ -> :rand.uniform() end) end)}
+    {:ok,
+     %{
+       embeddings: inputs |> Enum.map(fn _ -> Enum.map(1..100, fn _ -> :rand.uniform() end) end),
+       total_tokens: 100
+     }}
   end
 
   def get_config(%__MODULE__{api_type: "openai", model: model}) do
@@ -32,8 +36,14 @@ defmodule Buildel.Clients.Embeddings do
 end
 
 defmodule Buildel.Clients.EmbeddingsAdapterBehaviour do
+  @type embeddings :: list(list(float()))
+
   @callback get_embeddings(%{inputs: [String.t()], model: String.t(), api_key: String.t()}) ::
-              {:ok, list(list(float()))}
+              {:ok,
+               %{
+                 embeddings: embeddings(),
+                 total_tokens: integer()
+               }}
   @callback model_config(String.t()) :: %{size: non_neg_integer, distance: String.t()}
 end
 
@@ -62,9 +72,13 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
     :embeddings,
     :generation
   ] do
-    with {:ok, %{data: gpt_embeddings}} <-
+    with {:ok, %{data: gpt_embeddings, usage: usage}} <-
            OpenAI.embeddings([model: model, input: inputs], config(api_key)) do
-      {:ok, gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end)}
+      {:ok,
+       %{
+         embeddings: gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end),
+         total_tokens: usage["total_tokens"]
+       }}
     else
       {:error, %{"error" => %{"code" => "invalid_api_key"}}} -> {:error, :invalid_api_key}
       {:error, %{"error" => %{"code" => "insufficient_quota"}}} -> {:error, :insufficient_quota}

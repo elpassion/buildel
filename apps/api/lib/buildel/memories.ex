@@ -91,7 +91,7 @@ defmodule Buildel.Memories do
 
     with chunks when is_list(chunks) <-
            Buildel.DocumentWorkflow.build_node_chunks(workflow, document),
-         chunks when is_list(chunks) <-
+         %{chunks: chunks, total_tokens: total_tokens} when is_list(chunks) <-
            Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks),
          {:ok, memory} <-
            %Buildel.Memories.Memory{}
@@ -104,6 +104,16 @@ defmodule Buildel.Memories do
                content: "content"
              })
            )
+           |> Buildel.Repo.insert(),
+         {:ok, _} <-
+           %Buildel.Memories.MemoryCollectionCost{}
+           |> Buildel.Memories.MemoryCollectionCost.changeset(%{
+             cost_type: :file_upload,
+             organization_id: organization.id,
+             memory_collection_id: collection.id,
+             total_tokens: total_tokens,
+             file_name: memory.file_name
+           })
            |> Buildel.Repo.insert() do
       chunks =
         put_in(
@@ -270,5 +280,14 @@ defmodule Buildel.Memories do
         %Buildel.Memories.MemoryCollection{} = collection
       ) do
     "#{organization.id}_#{collection.id}"
+  end
+
+  def context_from_organization_collection_name(organization_collection_name) do
+    [organization_id, collection_id] = String.split(organization_collection_name, "_")
+
+    %{
+      organization_id: organization_id,
+      collection_id: collection_id
+    }
   end
 end

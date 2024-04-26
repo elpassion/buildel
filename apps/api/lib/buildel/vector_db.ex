@@ -50,7 +50,8 @@ defmodule Buildel.VectorDB do
            ] do
     options = Map.merge(%{limit: 5, similarity_threshhold: 0.25}, options)
 
-    with {:ok, embeddings_list} <- Embeddings.get_embeddings(embeddings, [query]),
+    with {:ok, %{embeddings: embeddings_list, total_tokens: total_tokens}} <-
+           Embeddings.get_embeddings(embeddings, [query]),
          {:ok, collection} <- adapter.get_collection(collection_name),
          {:ok, results} <-
            adapter.query(collection, metadata, %{
@@ -58,7 +59,7 @@ defmodule Buildel.VectorDB do
              limit: options.limit,
              similarity_treshhold: options.similarity_threshhold
            }) do
-      results
+      %{result: results, total_tokens: total_tokens}
     end
   end
 
