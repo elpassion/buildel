@@ -51,5 +51,27 @@ defmodule Buildel.Crawler.CrawlerTest do
         assert String.contains?(body, "<html>")
       end
     end
+
+    test "crawls nested pages when depth is greater than 0" do
+      use_cassette("crawler_nested_http_example") do
+        url = "https://example.com"
+
+        assert {:ok,
+                %Crawl{
+                  id: _,
+                  start_url: ^url,
+                  status: :success,
+                  error: nil,
+                  pages: [
+                    %Page{url: ^url, body: body},
+                    %Page{url: "https://www.iana.org/domains/example", body: body2}
+                  ]
+                }} =
+                 Buildel.Crawler.crawl(url, max_depth: 2)
+
+        assert String.contains?(body, "<html>")
+        assert String.contains?(body2, "<html>")
+      end
+    end
   end
 end

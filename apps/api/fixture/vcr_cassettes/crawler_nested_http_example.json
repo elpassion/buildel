@@ -1,0 +1,62 @@
+[
+  {
+    "request": {
+      "options": [],
+      "body": "",
+      "url": "https://example.com",
+      "headers": [],
+      "method": "get",
+      "request_body": ""
+    },
+    "response": {
+      "binary": false,
+      "type": "ok",
+      "body": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: -apple-system, system-ui, BlinkMacSystemFont, \"Segoe UI\", \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 2em;\n        background-color: #fdfdff;\n        border-radius: 0.5em;\n        box-shadow: 2px 3px 7px 2px rgba(0,0,0,0.02);\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        div {\n            margin: 0 auto;\n            width: auto;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is for use in illustrative examples in documents. You may use this\n    domain in literature without prior coordination or asking for permission.</p>\n    <p><a href=\"https://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n",
+      "headers": {
+        "Age": "386681",
+        "Cache-Control": "max-age=604800",
+        "Content-Type": "text/html; charset=UTF-8",
+        "Date": "Mon, 29 Apr 2024 08:12:33 GMT",
+        "Etag": "\"3147526947+ident\"",
+        "Expires": "Mon, 06 May 2024 08:12:33 GMT",
+        "Last-Modified": "Thu, 17 Oct 2019 07:18:26 GMT",
+        "Server": "ECAcc (dcd/7D19)",
+        "Vary": "Accept-Encoding",
+        "X-Cache": "HIT",
+        "Content-Length": "1256"
+      },
+      "status_code": 200
+    }
+  },
+  {
+    "request": {
+      "options": [],
+      "body": "",
+      "url": "https://www.iana.org/domains/example",
+      "headers": [],
+      "method": "get",
+      "request_body": ""
+    },
+    "response": {
+      "binary": false,
+      "type": "ok",
+      "body": "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\n<html><head>\n<title>301 Moved Permanently</title>\n</head><body>\n<h1>Moved Permanently</h1>\n<p>The document has moved <a href=\"http://www.iana.org/help/example-domains\">here</a>.</p>\n</body></html>\n",
+      "headers": {
+        "Date": "Mon, 29 Apr 2024 07:52:04 GMT",
+        "Server": "Apache",
+        "Vary": "Accept-Encoding",
+        "Location": "http://www.iana.org/help/example-domains",
+        "Cache-Control": "public, max-age=21603",
+        "Expires": "Mon, 29 Apr 2024 09:52:04 GMT",
+        "Content-Length": "248",
+        "X-Frame-Options": "SAMEORIGIN",
+        "Referrer-Policy": "origin-when-cross-origin",
+        "Content-Security-Policy": "upgrade-insecure-requests; default-src 'self' https://*.iana.org; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://cse.google.com https://clients1.google.com; style-src 'self' 'unsafe-inline' https://www.google.com; child-src 'self' https://www.youtube.com https://clients1.google.com https://cse.google.com https://www.google.com/; img-src 'self' https://data.iana.org https://www.iana.org https://www.google.com https://www.googleapis.com https://clients1.google.com https://*.gstatic.com;",
+        "Age": "1229",
+        "Content-Type": "text/html; charset=iso-8859-1",
+        "Strict-Transport-Security": "max-age=48211200; preload"
+      },
+      "status_code": 301
+    }
+  }
+]

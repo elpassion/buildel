@@ -80,7 +80,8 @@ defmodule Buildel.MixProject do
       {:req, "~> 0.4.13"},
       {:multipart, "~> 0.4.0"},
       {:sentry, "~> 10.2.0"},
-      {:jq, "~>1.0"}
+      {:jq, "~>1.0"},
+      {:floki, "~> 0.36.1"}
     ]
   end
 
