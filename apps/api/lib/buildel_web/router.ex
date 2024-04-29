@@ -162,6 +162,12 @@ defmodule BuildelWeb.Router do
     )
 
     resources(
+      "/organizations/:organization_id/memory_collections/:memory_collection_id/costs",
+      CollectionCostsController,
+      only: [:index]
+    )
+
+    resources(
       "/organizations/:organization_id/memory_collections/:memory_collection_id/memories",
       MemoryController,
       only: [:index, :create, :delete]
