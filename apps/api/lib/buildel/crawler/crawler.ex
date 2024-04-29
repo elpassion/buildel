@@ -26,6 +26,7 @@ defmodule Buildel.Crawler do
       :error,
       pages: [],
       pending_pages: [],
+      processed_urls: [],
       max_depth: 1
     ]
 
@@ -55,7 +56,15 @@ defmodule Buildel.Crawler do
         do: crawl
 
     def add_page(crawl, page) do
-      %Crawl{crawl | pending_pages: [page | crawl.pending_pages]}
+      if Enum.member?(crawl.processed_urls, page.url) do
+        crawl
+      else
+        %Crawl{
+          crawl
+          | processed_urls: [page.url | crawl.processed_urls],
+            pending_pages: [page | crawl.pending_pages]
+        }
+      end
     end
 
     def success_page(crawl, url, body) do
