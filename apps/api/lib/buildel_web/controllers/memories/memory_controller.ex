@@ -25,7 +25,8 @@ defmodule BuildelWeb.MemoryController do
   end
 
   defparams :create do
-    required(:file, :map)
+    optional(:file, :map)
+    optional(:url, :string)
   end
 
   def create(

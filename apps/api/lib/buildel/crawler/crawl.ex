@@ -7,6 +7,7 @@ defmodule Buildel.Crawler.Crawl do
     :status,
     :start_url,
     :error,
+    :url_filter,
     pages: [],
     pending_pages: [],
     processed_urls: [],
@@ -16,6 +17,7 @@ defmodule Buildel.Crawler.Crawl do
   def new(opts \\ []) do
     start_url = Keyword.get(opts, :start_url)
     max_depth = Keyword.get(opts, :max_depth)
+    url_filter = Keyword.get(opts, :url_filter)
 
     case URI.parse(start_url) do
       %URI{scheme: nil} ->
@@ -24,11 +26,18 @@ defmodule Buildel.Crawler.Crawl do
           status: :error,
           error: :invalid_url,
           start_url: start_url,
-          max_depth: max_depth
+          max_depth: max_depth,
+          url_filter: url_filter
         }
 
       _ ->
-        %Crawl{id: UUID.uuid4(), status: :pending, start_url: start_url, max_depth: max_depth}
+        %Crawl{
+          id: UUID.uuid4(),
+          status: :pending,
+          start_url: start_url,
+          max_depth: max_depth,
+          url_filter: url_filter
+        }
     end
   end
 
@@ -39,7 +48,7 @@ defmodule Buildel.Crawler.Crawl do
       do: crawl
 
   def add_page(crawl, page) do
-    if Enum.member?(crawl.processed_urls, page.url) do
+    if Enum.member?(crawl.processed_urls, page.url) || !crawl.url_filter.(page.url) do
       crawl
     else
       %Crawl{
@@ -100,7 +109,7 @@ defmodule Buildel.Crawler.Crawl do
       when status_code >= 200 and status_code <= 400 ->
         crawl = success_page(crawl, url, body)
 
-        find_linked_pages(body, depth + 1)
+        find_linked_pages(body, depth + 1, url)
         |> Enum.reduce(crawl, &Crawl.add_page(&2, &1))
         |> request()
 
@@ -110,11 +119,21 @@ defmodule Buildel.Crawler.Crawl do
     end
   end
 
-  defp find_linked_pages(html, depth) do
+  defp find_linked_pages(html, depth, base_url) do
     {:ok, document} = Floki.parse_document(html)
 
     Floki.find(document, "a")
     |> Enum.flat_map(&Floki.attribute(&1, "href"))
+    |> Enum.map(fn href ->
+      case String.contains?(href, "://") do
+        true -> href
+        false -> URI.merge(base_url, href) |> Map.put(:fragment, nil) |> to_string()
+      end
+    end)
+    |> Enum.map(fn url ->
+      url |> String.trim_trailing("/")
+    end)
+    |> Enum.uniq()
     |> Enum.map(&Page.new(url: &1, depth: depth))
     |> Enum.filter(fn page -> page.status == :pending end)
   end

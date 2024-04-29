@@ -128,7 +128,6 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
         end
 
       combined_document = parent_context |> Enum.map_join(" ", & &1.document)
-      IO.inspect(parent_context)
       combined_pages = parent_context |> Enum.flat_map(& &1.pages) |> Enum.uniq()
 
       chunk
