@@ -170,7 +170,6 @@ defmodule Buildel.Blocks.DocumentSearch do
     %{collection_id: collection_id} =
       Buildel.Memories.context_from_organization_collection_name(state[:collection])
 
-    # todo: save costs
     {result, _total_tokens, embeddings_tokens} =
       MemoryCollectionSearch.new(%{
         vector_db: state.vector_db,
