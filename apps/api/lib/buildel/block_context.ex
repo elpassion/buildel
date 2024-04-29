@@ -71,6 +71,46 @@ defmodule Buildel.BlockContext do
     end
   end
 
+  def create_run_and_collection_cost(context_id, block_name, tokens, collection_id) do
+    %{global: organization_id, parent: pipeline_id, local: run_id} =
+      context_from_context_id(context_id)
+
+    with organization <-
+           Buildel.Organizations.get_organization!(organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, collection_id),
+         cost_amount <-
+           Buildel.Costs.CostCalculator.calculate_embeddings_cost(
+             %Buildel.Langchain.EmbeddingsTokenSummary{
+               tokens: tokens,
+               model: collection.embeddings_model
+             }
+           ),
+         {:ok, pipeline} <-
+           Buildel.Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, run} <- Buildel.Pipelines.get_pipeline_run(pipeline, run_id),
+         {:ok, cost} <-
+           Buildel.Organizations.create_organization_cost(organization, %{
+             amount: cost_amount,
+             input_tokens: tokens,
+             output_tokens: 0
+           }),
+         {:ok, run_cost} <-
+           Buildel.Pipelines.create_run_cost(run, cost, %{
+             description: block_name
+           }),
+         {:ok, collection_cost} <-
+           Buildel.Memories.create_memory_collection_cost(collection, cost, %{
+             cost_type: :query,
+             description: "document_search"
+           }) do
+      {:ok, run_cost, collection_cost}
+    else
+      _ ->
+        {:error, :not_found}
+    end
+  end
+
   @impl true
   def get_global_collection_name(context_id, collection_name) do
     %{global: organization_id} = context_from_context_id(context_id)

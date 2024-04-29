@@ -173,16 +173,13 @@ defmodule BuildelWeb.MemoryControllerTest do
              } = json_response(conn, 201)
 
       costs = Buildel.Memories.MemoryCollectionCost |> Buildel.Repo.all()
-      organization_id = organization.id
       collection_id = collection.id
 
       assert [
                %{
-                 organization_id: ^organization_id,
                  memory_collection_id: ^collection_id,
                  cost_type: :file_upload,
-                 file_name: "example.txt",
-                 total_tokens: 100
+                 description: "example.txt"
                }
              ] = costs
     end

@@ -4,22 +4,15 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
   alias Buildel.Memories.MemoryCollection
   alias Buildel.Organizations
 
-  defstruct [:vector_db, :organization_collection_name, :organization_id, :collection_id]
+  defstruct [:vector_db, :organization_collection_name]
 
   def new(%{
         vector_db: vector_db,
         organization_collection_name: organization_collection_name
       }) do
-    %{
-      organization_id: organization_id,
-      collection_id: collection_id
-    } = Memories.context_from_organization_collection_name(organization_collection_name)
-
     %__MODULE__{
       vector_db: vector_db,
-      organization_collection_name: organization_collection_name,
-      organization_id: organization_id,
-      collection_id: collection_id
+      organization_collection_name: organization_collection_name
     }
   end
 
@@ -42,9 +35,7 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
 
     %__MODULE__{
       vector_db: vector_db,
-      organization_collection_name: organization_collection_name,
-      organization_id: organization.id,
-      collection_id: collection.id
+      organization_collection_name: organization_collection_name
     }
   end
 
@@ -77,13 +68,11 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
   def search(
         %__MODULE__{
           vector_db: vector_db,
-          organization_collection_name: collection_name,
-          organization_id: organization_id,
-          collection_id: collection_id
+          organization_collection_name: collection_name
         } = module,
         %Params{} = params
       ) do
-    with %{result: result, total_tokens: embeddings_tokens} when is_list(result) <-
+    with %{result: result, embeddings_tokens: embeddings_tokens} when is_list(result) <-
            Buildel.VectorDB.query(
              vector_db,
              collection_name,
@@ -106,9 +95,9 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
             result
         end
 
-      {limited_result, total_tokens} = limit_result_and_count_tokens(extended_result, params)
+      {limited_result, result_tokens} = limit_result_and_count_tokens(extended_result, params)
 
-      {limited_result, total_tokens, embeddings_tokens}
+      {limited_result, result_tokens, embeddings_tokens}
     else
       e -> e
     end

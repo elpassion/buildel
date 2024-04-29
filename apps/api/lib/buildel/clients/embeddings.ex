@@ -22,7 +22,7 @@ defmodule Buildel.Clients.Embeddings do
     {:ok,
      %{
        embeddings: inputs |> Enum.map(fn _ -> Enum.map(1..100, fn _ -> :rand.uniform() end) end),
-       total_tokens: 100
+       embeddings_tokens: 100
      }}
   end
 
@@ -42,7 +42,7 @@ defmodule Buildel.Clients.EmbeddingsAdapterBehaviour do
               {:ok,
                %{
                  embeddings: embeddings(),
-                 total_tokens: integer()
+                 embeddings_tokens: integer()
                }}
   @callback model_config(String.t()) :: %{size: non_neg_integer, distance: String.t()}
 end
@@ -77,7 +77,7 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
       {:ok,
        %{
          embeddings: gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end),
-         total_tokens: usage["total_tokens"]
+         embeddings_tokens: usage["total_tokens"]
        }}
     else
       {:error, %{"error" => %{"code" => "invalid_api_key"}}} -> {:error, :invalid_api_key}

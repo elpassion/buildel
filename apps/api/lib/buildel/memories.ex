@@ -109,7 +109,7 @@ defmodule Buildel.Memories do
 
     with chunks when is_list(chunks) <-
            Buildel.DocumentWorkflow.build_node_chunks(workflow, document),
-         %{chunks: chunks, total_tokens: total_tokens} when is_list(chunks) <-
+         %{chunks: chunks, embeddings_tokens: embeddings_tokens} when is_list(chunks) <-
            Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks),
          {:ok, memory} <-
            %Buildel.Memories.Memory{}
@@ -126,7 +126,7 @@ defmodule Buildel.Memories do
          cost_amount <-
            Buildel.Costs.CostCalculator.calculate_embeddings_cost(
              %Buildel.Langchain.EmbeddingsTokenSummary{
-               tokens: total_tokens,
+               tokens: embeddings_tokens,
                model: collection.embeddings_model
              }
            ),
@@ -135,7 +135,7 @@ defmodule Buildel.Memories do
              organization,
              %{
                amount: cost_amount,
-               input_tokens: total_tokens,
+               input_tokens: embeddings_tokens,
                output_tokens: 0
              }
            ),

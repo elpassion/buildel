@@ -105,7 +105,7 @@ defmodule Buildel.DocumentWorkflow do
   def generate_embeddings_for_chunks(workflow, chunks) do
     embeddings_adapter = workflow.embeddings
 
-    with {:ok, %{embeddings: embeddings, total_tokens: total_tokens}} <-
+    with {:ok, %{embeddings: embeddings, embeddings_tokens: embeddings_tokens}} <-
            embeddings_adapter
            |> Embeddings.get_embeddings(chunks |> Enum.map(&Map.get(&1, :value))) do
       chunks =
@@ -113,7 +113,7 @@ defmodule Buildel.DocumentWorkflow do
         |> Enum.zip(chunks)
         |> Enum.map(fn {embeddings, chunk} -> Map.put(chunk, :embeddings, embeddings) end)
 
-      %{chunks: chunks, total_tokens: total_tokens}
+      %{chunks: chunks, embeddings_tokens: embeddings_tokens}
     end
   end
 

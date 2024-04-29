@@ -54,7 +54,7 @@ defmodule BuildelWeb.CollectionController do
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, collection} <-
            Buildel.Memories.get_organization_collection(organization, id),
-         {memory_chunks, total_tokens, embeddings_tokens} <-
+         {memory_chunks, result_tokens, embeddings_tokens} <-
            MemoryCollectionSearch.new(organization, collection)
            |> MemoryCollectionSearch.search(params),
          cost_amount <-
@@ -78,7 +78,7 @@ defmodule BuildelWeb.CollectionController do
              cost_type: :query,
              description: "collection_search"
            }) do
-      render(conn, :search, memory_chunks: memory_chunks, total_tokens: total_tokens)
+      render(conn, :search, memory_chunks: memory_chunks, total_tokens: result_tokens)
     end
   end
 
