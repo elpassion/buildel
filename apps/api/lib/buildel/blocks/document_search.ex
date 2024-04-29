@@ -167,12 +167,22 @@ defmodule Buildel.Blocks.DocumentSearch do
           end
       })
 
-    {result, _total_tokens} =
+    %{collection_id: collection_id} =
+      Buildel.Memories.context_from_organization_collection_name(state[:collection])
+
+    {result, _total_tokens, embeddings_tokens} =
       MemoryCollectionSearch.new(%{
         vector_db: state.vector_db,
         organization_collection_name: state[:collection]
       })
       |> MemoryCollectionSearch.search(params)
+
+    block_context().create_run_and_collection_cost(
+      state[:context_id],
+      state[:block_name],
+      embeddings_tokens,
+      collection_id
+    )
 
     result =
       result
@@ -251,12 +261,15 @@ defmodule Buildel.Blocks.DocumentSearch do
           end
       })
 
+    %{collection_id: collection_id} =
+      Buildel.Memories.context_from_organization_collection_name(state[:collection])
+
     case MemoryCollectionSearch.new(%{
            vector_db: state.vector_db,
            organization_collection_name: state[:collection]
          })
          |> MemoryCollectionSearch.search(params) do
-      {result, _total_tokens} when is_list(result) ->
+      {result, _total_tokens, embeddings_tokens} when is_list(result) ->
         result =
           result
           |> Enum.map(fn
@@ -278,6 +291,13 @@ defmodule Buildel.Blocks.DocumentSearch do
               }
           end)
           |> Jason.encode!()
+
+        block_context().create_run_and_collection_cost(
+          state[:context_id],
+          state[:block_name],
+          embeddings_tokens,
+          collection_id
+        )
 
         Buildel.BlockPubSub.broadcast_to_io(
           state[:context_id],

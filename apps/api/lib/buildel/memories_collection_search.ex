@@ -66,10 +66,13 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
   end
 
   def search(
-        %__MODULE__{vector_db: vector_db, organization_collection_name: collection_name} = module,
+        %__MODULE__{
+          vector_db: vector_db,
+          organization_collection_name: collection_name
+        } = module,
         %Params{} = params
       ) do
-    with result when is_list(result) <-
+    with %{result: result, embeddings_tokens: embeddings_tokens} when is_list(result) <-
            Buildel.VectorDB.query(
              vector_db,
              collection_name,
@@ -92,9 +95,9 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
             result
         end
 
-      {limited_result, total_tokens} = limit_result_and_count_tokens(extended_result, params)
+      {limited_result, result_tokens} = limit_result_and_count_tokens(extended_result, params)
 
-      {limited_result, total_tokens}
+      {limited_result, result_tokens, embeddings_tokens}
     else
       e -> e
     end

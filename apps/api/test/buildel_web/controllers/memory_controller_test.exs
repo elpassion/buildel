@@ -143,6 +143,46 @@ defmodule BuildelWeb.MemoryControllerTest do
                ]
              } = json_response(conn, 200)
     end
+
+    test "saves tokens cost", %{
+      conn: conn,
+      upload_file: file,
+      organization: organization,
+      collection: collection
+    } do
+      collection_name = collection.collection_name
+
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories",
+          %{
+            file: file,
+            collection_name: collection_name
+          }
+        )
+
+      assert %{
+               "data" => %{
+                 "file_name" => "example.txt",
+                 "file_size" => 24,
+                 "file_type" => "text/plain",
+                 "collection_name" => ^collection_name,
+                 "id" => _
+               }
+             } = json_response(conn, 201)
+
+      costs = Buildel.Memories.MemoryCollectionCost |> Buildel.Repo.all()
+      collection_id = collection.id
+
+      assert [
+               %{
+                 memory_collection_id: ^collection_id,
+                 cost_type: :file_upload,
+                 description: "example.txt"
+               }
+             ] = costs
+    end
   end
 
   describe "delete" do

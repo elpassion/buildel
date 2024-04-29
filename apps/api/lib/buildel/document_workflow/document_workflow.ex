@@ -53,7 +53,7 @@ defmodule Buildel.DocumentWorkflow do
   def process(workflow, document) do
     document = read(workflow, document)
     chunks = build_node_chunks(workflow, document)
-    chunks = generate_embeddings_for_chunks(workflow, chunks)
+    %{chunks: chunks} = generate_embeddings_for_chunks(workflow, chunks)
     put_in_database(workflow, chunks)
   end
 
@@ -105,12 +105,15 @@ defmodule Buildel.DocumentWorkflow do
   def generate_embeddings_for_chunks(workflow, chunks) do
     embeddings_adapter = workflow.embeddings
 
-    with {:ok, embeddings} <-
+    with {:ok, %{embeddings: embeddings, embeddings_tokens: embeddings_tokens}} <-
            embeddings_adapter
            |> Embeddings.get_embeddings(chunks |> Enum.map(&Map.get(&1, :value))) do
-      embeddings
-      |> Enum.zip(chunks)
-      |> Enum.map(fn {embeddings, chunk} -> Map.put(chunk, :embeddings, embeddings) end)
+      chunks =
+        embeddings
+        |> Enum.zip(chunks)
+        |> Enum.map(fn {embeddings, chunk} -> Map.put(chunk, :embeddings, embeddings) end)
+
+      %{chunks: chunks, embeddings_tokens: embeddings_tokens}
     end
   end
 

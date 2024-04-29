@@ -1,8 +1,26 @@
 defmodule Buildel.Memories do
   alias Buildel.Organizations.Organization
+  alias Buildel.Memories.MemoryCollectionCost
   alias Buildel.Memories.Memory
   alias Buildel.Organizations
   import Ecto.Query
+
+  def create_memory_collection_cost(
+        %Buildel.Memories.MemoryCollection{} = collection,
+        %Buildel.Costs.Cost{} = cost,
+        attrs \\ %{}
+      ) do
+    case %MemoryCollectionCost{}
+         |> MemoryCollectionCost.changeset(
+           attrs
+           |> Map.put(:memory_collection_id, collection.id)
+           |> Map.put(:cost_id, cost.id)
+         )
+         |> Buildel.Repo.insert() do
+      {:ok, struct} -> {:ok, struct}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
 
   def list_organization_collection_memories(
         %Buildel.Organizations.Organization{} = organization,
@@ -91,7 +109,7 @@ defmodule Buildel.Memories do
 
     with chunks when is_list(chunks) <-
            Buildel.DocumentWorkflow.build_node_chunks(workflow, document),
-         chunks when is_list(chunks) <-
+         %{chunks: chunks, embeddings_tokens: embeddings_tokens} when is_list(chunks) <-
            Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks),
          {:ok, memory} <-
            %Buildel.Memories.Memory{}
@@ -104,7 +122,28 @@ defmodule Buildel.Memories do
                content: "content"
              })
            )
-           |> Buildel.Repo.insert() do
+           |> Buildel.Repo.insert(),
+         cost_amount <-
+           Buildel.Costs.CostCalculator.calculate_embeddings_cost(
+             %Buildel.Langchain.EmbeddingsTokenSummary{
+               tokens: embeddings_tokens,
+               model: collection.embeddings_model
+             }
+           ),
+         {:ok, cost} <-
+           Organizations.create_organization_cost(
+             organization,
+             %{
+               amount: cost_amount,
+               input_tokens: embeddings_tokens,
+               output_tokens: 0
+             }
+           ),
+         {:ok, _} <-
+           create_memory_collection_cost(collection, cost, %{
+             cost_type: :file_upload,
+             description: memory.file_name
+           }) do
       chunks =
         put_in(
           chunks,
@@ -270,5 +309,14 @@ defmodule Buildel.Memories do
         %Buildel.Memories.MemoryCollection{} = collection
       ) do
     "#{organization.id}_#{collection.id}"
+  end
+
+  def context_from_organization_collection_name(organization_collection_name) do
+    [organization_id, collection_id] = String.split(organization_collection_name, "_")
+
+    %{
+      organization_id: organization_id,
+      collection_id: collection_id
+    }
   end
 end
