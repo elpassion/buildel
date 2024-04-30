@@ -40,6 +40,11 @@ export function KnowledgeBaseCollectionLayout() {
                 Content
               </FilledTabLink>
               <FilledTabLink
+                to={routes.collectionOverview(organizationId, collectionName)}
+              >
+                Overview
+              </FilledTabLink>
+              <FilledTabLink
                 to={routes.collectionInterface(organizationId, collectionName)}
               >
                 Interface

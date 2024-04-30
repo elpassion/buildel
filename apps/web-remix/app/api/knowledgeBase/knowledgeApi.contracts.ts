@@ -92,6 +92,23 @@ export const KnowledgeBaseCollection = z.object({
   chunk_overlap: z.number(),
 });
 
+export const KnowledgeBaseCollectionCost = z.object({
+  id: z.number(),
+  amount: z.string(),
+  cost_type: z.string(),
+  description: z.string(),
+  input_tokens: z.number(),
+  output_tokens: z.number(),
+  created_at: z.string(),
+})
+
+export const KnowledgeBaseCollectionCostResponse = z
+  .object({
+    data: z.array(KnowledgeBaseCollectionCost),
+    meta: PaginationMeta,
+  })
+  .transform((res) => ({ data: res.data, meta: res.meta }));
+
 export const KnowledgeBaseFileResponse = z
   .object({ data: KnowledgeBaseFile })
   .transform((res) => res.data);

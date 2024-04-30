@@ -159,6 +159,14 @@ export const routes = {
     `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
       collectionName
     )}/interface`,
+  collectionOverview: (
+    organizationId: OrganizationId,
+    collectionName: string,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(`${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
+      collectionName
+    )}/overview`, params),
   collectionSearch: (organizationId: OrganizationId, collectionName: string) =>
     `${routes.collectionFiles(organizationId, collectionName)}/search`,
   collectionInterfaceSearch: (

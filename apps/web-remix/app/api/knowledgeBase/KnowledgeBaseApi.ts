@@ -9,9 +9,15 @@ import {
   UpdateCollectionSchema,
   KnowledgeBaseSearchChunkResponse,
   IKnowledgeBaseSearchChunk,
+  KnowledgeBaseCollectionCostResponse,
 } from "./knowledgeApi.contracts";
 import { PaginationQueryParams } from "~/components/pagination/usePagination";
 import { z } from "zod";
+
+type DateQueryParams = {
+  start_date: string;
+  end_date: string;
+};
 
 export class KnowledgeBaseApi {
   constructor(private client: typeof fetchTyped) { }
@@ -52,6 +58,19 @@ export class KnowledgeBaseApi {
       KnowledgeBaseFileListResponse,
       `/organizations/${organizationId}/memory_collections/${collectionId}/memories`
     );
+  }
+
+  async getCollectionCosts(
+    organizationId: string | number,
+    collectionId: string | number,
+    pagination?: DateQueryParams & PaginationQueryParams
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/memory_collections/${collectionId}/costs`,
+      { ...pagination }
+    );
+
+    return this.client(KnowledgeBaseCollectionCostResponse, url);
   }
 
   async searchCollectionChunks(
