@@ -77,9 +77,10 @@ defmodule Buildel.Invitations do
   end
 
   def verify_invitation(%Invitation{} = invitation) do
-    case DateTime.utc_now() do
-      now when now < invitation.expires_at -> {:ok, invitation}
-      _ -> {:error, :invitation_expired}
+    if DateTime.before?(DateTime.utc_now(), invitation.expires_at) do
+      {:ok, invitation}
+    else
+      {:error, :invitation_expired}
     end
   end
 
