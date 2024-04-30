@@ -21,7 +21,7 @@ defmodule Buildel.Clients.Embeddings do
   def get_embeddings(%__MODULE__{api_type: "test"}, inputs) do
     {:ok,
      %{
-       embeddings: inputs |> Enum.map(fn _ -> Enum.map(1..100, fn _ -> :rand.uniform() end) end),
+       embeddings: inputs |> Enum.map(fn _ -> Enum.map(1..1536, fn _ -> :rand.uniform() end) end),
        embeddings_tokens: 100
      }}
   end
