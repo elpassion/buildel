@@ -50,18 +50,19 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
              url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
            ) do
       crawl.pages
-      |> Enum.filter(fn page -> page.status == :success end)
-      |> Enum.filter(fn page -> !(page.body == "" || is_nil(page.body)) end)
       |> Enum.map(fn page ->
-        path = Temp.path!(suffix: ".html")
-        File.write!(path, page.body)
+        Task.async(fn ->
+          path = Temp.path!(suffix: ".html")
+          File.write!(path, page.body)
 
-        Buildel.Memories.create_organization_memory(organization, collection, %{
-          path: path,
-          type: "text/html",
-          name: page.url
-        })
+          Buildel.Memories.create_organization_memory(organization, collection, %{
+            path: path,
+            type: "text/html",
+            name: page.url
+          })
+        end)
       end)
+      |> Task.await_many()
 
       conn
       |> put_status(:created)

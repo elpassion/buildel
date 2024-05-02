@@ -11,6 +11,13 @@ defmodule Buildel.Crawler do
       |> Crawl.add_page(Page.new(url: url))
       |> Crawl.start()
 
+    pages =
+      crawl.pages
+      |> Enum.filter(fn page -> page.status == :success end)
+      |> Enum.filter(fn page -> !(page.body == "" || is_nil(page.body)) end)
+
+    crawl = crawl |> Map.put(:pages, pages)
+
     case crawl.status do
       :error -> {:error, crawl}
       _ -> {:ok, crawl}
