@@ -45,7 +45,7 @@ defmodule Buildel.Logs do
       message_type: message_type,
       message: message,
       metadata: %{},
-      created_at: NaiveDateTime.utc_now(:second),
+      created_at: NaiveDateTime.utc_now(),
       latency: 0
     })
   end

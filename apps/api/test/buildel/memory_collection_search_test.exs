@@ -54,6 +54,52 @@ defmodule Buildel.MemoryCollectionSearchTest do
               ], 11, _} = MemoryCollectionSearch.search(search, params)
     end
 
+    test "should correctly return pages when neighbors are null", %{vector_db: vector_db} do
+      Application.put_env(:buildel, :vectordb_mock_query_hook, fn _collection,
+                                                                  _metadata,
+                                                                  _params ->
+        {:ok,
+         [
+           %{
+             "document" => "Lorem ipsum dolor sit amet",
+             "chunk_id" => UUID.uuid4(),
+             "similarity" => 0.95,
+             "metadata" => %{
+               "building_block_ids" => [],
+               "file_name" => "Ustawa o zmianie ustawy.pdf",
+               "index" => 44,
+               "keywords" => ["ZAŁĄCZNIKI"],
+               "memory_id" => 23,
+               "next" => nil,
+               "pages" => [1],
+               "parent" => nil,
+               "prev" => nil
+             }
+           }
+         ]}
+      end)
+
+      search =
+        MemoryCollectionSearch.new(%{
+          vector_db: vector_db,
+          organization_collection_name: "1_1"
+        })
+
+      params =
+        MemoryCollectionSearch.Params.from_map(%{
+          extend_neighbors: true
+        })
+
+      assert {[
+                %{
+                  "document" => " Lorem ipsum dolor sit amet ",
+                  "metadata" => %{
+                    "pages" => [1]
+                  }
+                }
+              ], 6, _} = MemoryCollectionSearch.search(search, params)
+    end
+
     test "should return chunks with parent context", %{vector_db: vector_db} do
       search =
         MemoryCollectionSearch.new(%{

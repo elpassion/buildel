@@ -1,4 +1,6 @@
 defmodule Buildel.Pipelines.Log do
+  @timestamps_opts [type: :naive_datetime_usec]
+
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -14,7 +16,7 @@ defmodule Buildel.Pipelines.Log do
     field(:block_name, :string)
     field(:output_name, :string)
 
-    timestamps()
+    timestamps(type: :naive_datetime_usec)
   end
 
   @doc false

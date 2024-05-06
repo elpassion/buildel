@@ -159,8 +159,11 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
 
       combined_document = [prev_doc, chunk["document"], next_doc] |> Enum.join(" ")
 
+      prev_pages = prev["metadata"]["pages"] || []
+      next_pages = next["metadata"]["pages"] || []
+
       combined_pages =
-        (prev["metadata"]["pages"] ++ chunk["metadata"]["pages"] ++ next["metadata"]["pages"])
+        (prev_pages ++ chunk["metadata"]["pages"] ++ next_pages)
         |> Enum.uniq()
 
       chunk
