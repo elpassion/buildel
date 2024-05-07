@@ -17,6 +17,7 @@ defmodule Buildel.LogsAggregator do
 
   alias Buildel.Repo
   alias Buildel.Pipelines.Log
+  alias Phoenix.PubSub
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
@@ -44,6 +45,22 @@ defmodule Buildel.LogsAggregator do
     save_aggregated_logs(aggregated)
 
     set_processed(aggregated)
+
+    # Log |> Repo.update_all(set: [processed: false])
+
+    context = Map.get(List.first(aggregated, %{}), :context)
+
+    if context do
+      %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id} =
+        from_log_context(context)
+
+      topic = "logs::#{organization_id}::#{pipeline_id}::#{run_id}"
+
+      IO.inspect(topic, label: "broadcasting")
+
+      Buildel.PubSub
+      |> PubSub.broadcast!(topic, {topic, "LOOOGI"})
+    end
 
     aggregated
   end
@@ -149,8 +166,6 @@ defmodule Buildel.LogsAggregator do
             {aggregated_list, current}
 
           :error ->
-            IO.inspect("Error")
-
             current_block = Map.get(current, log_context, default_log)
 
             message = current_block.message <> log.message
