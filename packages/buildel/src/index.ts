@@ -1,7 +1,7 @@
-import { BuildelSocket, BuildelRun } from "./buildel.ts";
+import { BuildelSocket, BuildelRun, BuildelRunLogs } from "./buildel.ts";
 
-import type { BuildelRunStatus, BuildelRunStartArgs } from "./buildel.ts";
+import type { BuildelRunStatus, BuildelRunStartArgs, BuildelRunLogsConnectionStatus, BuildelRunLogsJoinArgs } from "./buildel.ts";
 
-export { BuildelSocket, BuildelRun };
+export { BuildelSocket, BuildelRun, BuildelRunLogs };
 
-export type { BuildelRunStatus, BuildelRunStartArgs };
+export type { BuildelRunStatus, BuildelRunStartArgs, BuildelRunLogsConnectionStatus, BuildelRunLogsJoinArgs };

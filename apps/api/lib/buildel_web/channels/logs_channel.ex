@@ -10,13 +10,16 @@ defmodule BuildelWeb.LogsChannel do
   defparams :join do
     required(:auth, :string)
     required(:user_data, :string)
+    optional(:block_name, :string)
   end
 
   @default_params %{
     "auth" => "default",
-    "user_data" => "{}"
+    "user_data" => "{}",
+    "block_name" => nil
   }
 
+  # todo: implement logging for specific block
   def join(channel_name, params, socket) do
     params = Map.merge(@default_params, params)
 
@@ -25,7 +28,8 @@ defmodule BuildelWeb.LogsChannel do
          {:ok,
           %{
             auth: auth,
-            user_data: user_data
+            user_data: user_data,
+            block_name: _block_name
           }} <-
            validate(:join, params),
          {:ok, pipeline_id} <- Buildel.Utils.parse_id(pipeline_id),
@@ -46,8 +50,7 @@ defmodule BuildelWeb.LogsChannel do
            ) do
       listen_to_outputs(organization, pipeline, run)
 
-      {:ok, %{run: %{id: run.id}},
-       socket |> assign(:run, run) |> assign(:joined_existing, run_id != nil)}
+      {:ok, %{run: %{id: run.id}}, socket |> assign(:run, run)}
     else
       {:error, :invalid_id} ->
         {:error, %{reason: "not_found"}}
@@ -66,18 +69,15 @@ defmodule BuildelWeb.LogsChannel do
 
   def handle_info(topic, socket) do
     IO.inspect(topic)
-    IO.inspect("JESTEM")
+    # todo: implement
 
     {:noreply, socket}
   end
 
   defp parse_channel_name(channel_name) do
     case channel_name |> String.split(":") do
-      ["pipelines", organization_id, pipeline_id, run_id] ->
+      ["logs", organization_id, pipeline_id, run_id] ->
         {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id}}
-
-      ["pipelines", organization_id, pipeline_id] ->
-        {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: nil}}
 
       _ ->
         {:error, :not_found}

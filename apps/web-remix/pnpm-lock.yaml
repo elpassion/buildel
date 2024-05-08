@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@buildel/buildel':
-    specifier: ^0.2.5
-    version: 0.2.5
+    specifier: file:../../packages/buildel/dist
+    version: file:../../packages/buildel/dist
   '@codemirror/autocomplete':
     specifier: ^6.15.0
     version: 6.15.0(@codemirror/language@6.10.1)(@codemirror/state@6.4.1)(@codemirror/view@6.26.0)(@lezer/common@1.2.1)
@@ -726,13 +726,6 @@ packages:
       '@babel/helper-string-parser': 7.23.4
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
-
-  /@buildel/buildel@0.2.5:
-    resolution: {integrity: sha512-R+k6ycCWY0KwPDv4xz4y96ehJYYlG05rN1IYd9IzlJTRl1v5qZgfbrZ/jF5k71exG02s2oip4dlSnhyhe0qsQA==}
-    dependencies:
-      phoenix: 1.7.11
-      uuid: 9.0.1
-    dev: false
 
   /@bundled-es-modules/cookie@2.0.0:
     resolution: {integrity: sha512-Or6YHg/kamKHpxULAdSqhGqnWFneIXu1NKvvfBBzKGwpVsYuFIQ5aBPHDnnoR3ghW1nvSkALd+EF9iMtY7Vjxw==}
@@ -11147,3 +11140,8 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
+
+  file:../../packages/buildel/dist:
+    resolution: {directory: ../../packages/buildel/dist, type: directory}
+    name: dist
+    dev: false
