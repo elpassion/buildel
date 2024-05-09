@@ -4,6 +4,7 @@ defmodule BuildelWeb.LogsChannel do
 
   require Logger
 
+  alias BuildelWeb.OrganizationPipelineRunLogsJSON
   alias Phoenix.PubSub
   alias Buildel.Pipelines
 
@@ -69,8 +70,9 @@ defmodule BuildelWeb.LogsChannel do
   end
 
   def handle_info({topic, log}, socket) do
-    IO.inspect("Received log")
-    socket |> Phoenix.Channel.push(topic, log)
+    serialized_log = BuildelWeb.OrganizationPipelineRunLogsJSON.show(%{log: log})
+
+    socket |> Phoenix.Channel.push(topic, serialized_log)
     {:noreply, socket}
   end
 
