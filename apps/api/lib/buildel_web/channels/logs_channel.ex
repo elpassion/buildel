@@ -21,6 +21,7 @@ defmodule BuildelWeb.LogsChannel do
 
   # todo: implement logging for specific block
   def join(channel_name, params, socket) do
+    IO.inspect("Joining logs channel")
     params = Map.merge(@default_params, params)
 
     with {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id}} <-
@@ -67,10 +68,9 @@ defmodule BuildelWeb.LogsChannel do
     end
   end
 
-  def handle_info(topic, socket) do
-    IO.inspect(topic)
-    # todo: implement
-
+  def handle_info({topic, log}, socket) do
+    IO.inspect("Received log")
+    socket |> Phoenix.Channel.push(topic, log)
     {:noreply, socket}
   end
 
@@ -87,6 +87,7 @@ defmodule BuildelWeb.LogsChannel do
   defp listen_to_outputs(organization, pipeline, run) do
     topic = "logs::#{organization.id}::#{pipeline.id}::#{run.id}"
 
+    IO.inspect(topic, label: "Listening to topic")
     Buildel.PubSub |> PubSub.subscribe(topic)
   end
 

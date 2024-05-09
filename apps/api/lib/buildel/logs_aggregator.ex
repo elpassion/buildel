@@ -42,33 +42,40 @@ defmodule Buildel.LogsAggregator do
 
     aggregated = aggregate_logs(logs)
 
-    save_aggregated_logs(aggregated)
+    {_, saved_logs} = save_aggregated_logs(aggregated)
 
     set_processed(aggregated)
 
-    # Log |> Repo.update_all(set: [processed: false])
+    for %Buildel.Pipelines.AggregatedLog{} = log <- saved_logs || [] do
+      if log.context do
+        %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id} =
+          from_log_context(log.context)
 
-    context = Map.get(List.first(aggregated, %{}), :context)
+        topic = "logs::#{organization_id}::#{pipeline_id}::#{run_id}"
 
-    if context do
-      %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id} =
-        from_log_context(context)
-
-      topic = "logs::#{organization_id}::#{pipeline_id}::#{run_id}"
-
-      IO.inspect(topic, label: "broadcasting")
-
-      Buildel.PubSub
-      |> PubSub.broadcast!(topic, {topic, "LOOOGI"})
+        # todo: format the message
+        Buildel.PubSub
+        |> PubSub.broadcast!(
+          topic,
+          {topic,
+           %{
+             block_name: log.block_name,
+             message: log.message,
+             message_types: log.message_types,
+             raw_logs: log.raw_logs
+           }}
+        )
+      end
     end
 
-    aggregated
+    saved_logs
   end
 
   defp save_aggregated_logs(aggregated_logs) do
     Repo.insert_all(
       Buildel.Pipelines.AggregatedLog,
-      aggregated_logs |> Enum.map(&create_db_aggregated_log/1)
+      aggregated_logs |> Enum.map(&create_db_aggregated_log/1),
+      returning: true
     )
   end
 

@@ -7,6 +7,7 @@ interface BuildelSocketOptions {
   authUrl?: string;
   headers?: Record<string, string>;
   useAuth?: boolean;
+  onStatusChange?: (status: ConnectionState) => void;
 }
 export class BuildelSocket {
   private readonly socket: Socket;
@@ -15,6 +16,7 @@ export class BuildelSocket {
   private readonly socketUrl: string;
   private readonly headers: Record<string, string>;
   private readonly useAuth: boolean = true;
+  private readonly onStatusChange: (status: ConnectionState) => void;
 
   constructor(
     private readonly organizationId: number,
@@ -30,15 +32,18 @@ export class BuildelSocket {
       },
     });
     this.useAuth = options.useAuth ?? true;
+    this.onStatusChange = options.onStatusChange ?? ((_status: ConnectionState) => { });
   }
 
   public async connect() {
     return new Promise<BuildelSocket>((resolve, reject) => {
       this.socket.connect();
       this.socket.onOpen(() => {
+        this.onStatusChange(this.status());
         resolve(this);
       });
       this.socket.onError((error) => {
+        this.onStatusChange(this.status());
         reject(error);
       });
     });
@@ -47,9 +52,11 @@ export class BuildelSocket {
   public async disconnect() {
     return new Promise<BuildelSocket>((resolve, reject) => {
       this.socket.disconnect(() => {
+        this.onStatusChange(this.status());
         resolve(this);
       });
       this.socket.onError((error) => {
+        this.onStatusChange(this.status());
         reject(error);
       });
     });

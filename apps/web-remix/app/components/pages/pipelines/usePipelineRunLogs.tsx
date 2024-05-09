@@ -5,6 +5,7 @@ import {
   BuildelRunLogsConnectionStatus,
   BuildelSocket,
   BuildelRunLogsJoinArgs,
+  ConnectionState,
 } from "/home/pawel/work/code/buildel/apps/web-remix/node_modules/.pnpm/file+..+..+packages+buildel+dist/node_modules/dist/index";
 
 export function usePipelineRunLogs(
@@ -19,10 +20,11 @@ export function usePipelineRunLogs(
   const buildel = useRef<BuildelSocket>();
   const run = useRef<BuildelRunLogs>();
 
-  const [status, setStatus] = useState<BuildelRunLogsConnectionStatus>("idle");
+  const [status, setStatus] = useState<ConnectionState>("closed");
 
   const listenToLogs = async (args: BuildelRunLogsJoinArgs) => {
     assert(run.current);
+    console.log('przeszlo')
     await run.current.join(args);
   };
   const stopListening = async () => {
@@ -34,13 +36,18 @@ export function usePipelineRunLogs(
     buildel.current = new BuildelSocket(organizationId, {
       socketUrl: "/super-api/socket",
       useAuth,
+      onStatusChange: setStatus,
     });
+    console.log("CURRENT")
     buildel.current.connect().then((buildel) => {
       run.current = buildel.logs(pipelineId, runId, {
         onMessage: onMessage,
-        onStatusChange: setStatus,
+        onStatusChange: () => { },
       });
+      console.log('foo')
     });
+    console.log("DONE")
+
     return () => {
       if (!buildel.current) return;
       buildel.current.disconnect();
