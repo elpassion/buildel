@@ -219,3 +219,18 @@ export const CreatePipelineSchema = z.object({
     }),
   }),
 });
+
+export const PipelineRunLog = z.object({
+  id: z.number(),
+  message: z.string(),
+  message_types: z.array(z.string()),
+  raw_logs: z.array(z.number()),
+  block_name: z.string(),
+  created_at: z.string(),
+});
+
+export const PipelineRunLogsResponse = z
+  .object({ data: z.array(PipelineRunLog) })
+  .transform((response) => {
+    return response.data;
+  });

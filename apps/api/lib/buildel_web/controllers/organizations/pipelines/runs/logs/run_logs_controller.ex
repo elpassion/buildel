@@ -30,7 +30,13 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsController do
         required: true
       ],
       pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
-      id: [in: :path, description: "Run ID", type: :integer, required: true]
+      id: [in: :path, description: "Run ID", type: :integer, required: true],
+      block_name: [
+        in: :query,
+        description: "Block name",
+        type: :string,
+        required: false
+      ]
     ],
     request_body: nil,
     responses: [
@@ -53,7 +59,8 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsController do
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_pipeline_run(pipeline, run_id),
-         logs <- RunLogs.list_run_logs(run) do
+         logs <-
+           RunLogs.list_run_logs(run, conn.params) do
       render(conn, :index, logs: logs)
     end
   end

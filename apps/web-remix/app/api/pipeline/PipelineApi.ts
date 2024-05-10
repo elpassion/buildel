@@ -13,6 +13,7 @@ import {
   PipelinePublicResponse,
   PipelineDetailsResponse,
   UpdateAliasSchema,
+  PipelineRunLogsResponse,
 } from "./pipeline.contracts";
 import { PaginationQueryParams } from "~/components/pagination/usePagination";
 import { buildUrlWithParams } from "~/utils/url";
@@ -23,7 +24,7 @@ type DateQueryParams = {
 };
 
 export class PipelineApi {
-  constructor(private client: typeof fetchTyped) {}
+  constructor(private client: typeof fetchTyped) { }
 
   getPipeline(organizationId: string | number, pipelineId: string | number) {
     return this.client(
@@ -271,6 +272,23 @@ export class PipelineApi {
     return this.client(
       PipelinePublicResponse,
       `/organizations/${organizationId}/pipelines/${pipelineId}/public`
+    );
+  }
+
+  getPipelineRunLogs(
+    organizationId: string | number,
+    pipelineId: string | number,
+    runId: string | number,
+    block_name?: string
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/logs`,
+      { block_name }
+    );
+
+    return this.client(
+      PipelineRunLogsResponse,
+      url
     );
   }
 }

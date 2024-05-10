@@ -28,10 +28,17 @@ export async function loader(args: LoaderFunctionArgs) {
       params.runId
     );
 
-    const [blockTypes, pipeline, pipelineRun] = await Promise.all([
+    const pipelineRunLogsPromise = pipelineApi.getPipelineRunLogs(
+      params.organizationId,
+      params.pipelineId,
+      params.runId
+    );
+
+    const [blockTypes, pipeline, pipelineRun, pipelineRunLogs] = await Promise.all([
       blockTypesPromise,
       pipelinePromise,
       pipelineRunPromise,
+      pipelineRunLogsPromise,
     ]);
 
     const blocks = pipelineRun.data.config.blocks.map((block) => ({
@@ -49,7 +56,8 @@ export async function loader(args: LoaderFunctionArgs) {
       pipelineRun: {
         ...pipelineRun.data,
         config: { ...pipelineRun.data.config, blocks },
-      }
+      },
+      pipelineRunLogs: pipelineRunLogs.data,
     });
   })(args);
 }

@@ -111,11 +111,17 @@ export class BuildelSocket {
       onMessage: (
         payload: unknown
       ) => void;
+      onLogMessage: (
+        payload: unknown
+      ) => void;
       onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
+      onError: (error: string) => void;
     }
   ) {
     const onMessage = handlers?.onMessage ?? (() => { });
+    const onLogMessage = handlers?.onLogMessage ?? (() => { });
     const onStatusChange = handlers?.onStatusChange ?? (() => { });
+    const onError = handlers?.onError ?? (() => { });
 
 
     return new BuildelRunLogs(
@@ -129,7 +135,9 @@ export class BuildelSocket {
       this.useAuth,
       {
         onMessage,
+        onLogMessage,
         onStatusChange,
+        onError
       }
     );
   }
@@ -153,7 +161,11 @@ export class BuildelRunLogs {
       onMessage: (
         payload: unknown
       ) => void;
+      onLogMessage: (
+        payload: unknown
+      ) => void;
       onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
+      onError: (error: string) => void;
     }
   ) { }
 
@@ -172,18 +184,17 @@ export class BuildelRunLogs {
 
     this.channel.onMessage = (event: string, payload: any) => {
       if (event === "phx_reply" && payload.status === "error") {
-        console.log("phx_reply error")
-
-        if (payload.response.errors) {
-          // todo
-          console.log("payload response errors")
-        }
-
         if (payload.response.reason) {
-          console.log("payload response reason")
+          this.handlers.onError(payload.response.reason);
         }
+
+        this.handlers.onError("Unknown error");
 
         return this.leave();
+      }
+
+      if (event.startsWith("logs:")) {
+        this.handlers.onLogMessage(payload);
       }
 
       this.handlers.onMessage(payload);

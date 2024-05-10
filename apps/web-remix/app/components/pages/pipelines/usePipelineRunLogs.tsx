@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { assert } from "~/utils/assert";
 import {
   BuildelRunLogs,
-  BuildelRunLogsConnectionStatus,
   BuildelSocket,
   BuildelRunLogsJoinArgs,
   ConnectionState,
@@ -13,8 +12,12 @@ export function usePipelineRunLogs(
   pipelineId: number,
   runId: number,
   onMessage: (
-    payload: unknown
+    payload: any
   ) => void = () => { },
+  onLogMessage: (
+    payload: any
+  ) => void = () => { },
+  onError: (error: string) => void = () => { },
   useAuth: boolean = true
 ) {
   const buildel = useRef<BuildelSocket>();
@@ -24,7 +27,6 @@ export function usePipelineRunLogs(
 
   const listenToLogs = async (args: BuildelRunLogsJoinArgs) => {
     assert(run.current);
-    console.log('przeszlo')
     await run.current.join(args);
   };
   const stopListening = async () => {
@@ -38,15 +40,14 @@ export function usePipelineRunLogs(
       useAuth,
       onStatusChange: setStatus,
     });
-    console.log("CURRENT")
     buildel.current.connect().then((buildel) => {
       run.current = buildel.logs(pipelineId, runId, {
         onMessage: onMessage,
+        onLogMessage: onLogMessage,
         onStatusChange: () => { },
+        onError: onError,
       });
-      console.log('foo')
     });
-    console.log("DONE")
 
     return () => {
       if (!buildel.current) return;

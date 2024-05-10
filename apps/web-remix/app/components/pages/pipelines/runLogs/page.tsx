@@ -2,30 +2,51 @@ import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { loader } from "./loader.server";
 import { usePipelineRunLogs } from "../usePipelineRunLogs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function PipelineRunLogs() {
-  const { pipeline, pipelineRun } = useLoaderData<typeof loader>();
+  const { pipeline, pipelineRun, pipelineRunLogs } = useLoaderData<typeof loader>();
+  const [liveLogs, setLiveLogs] = useState<any[]>([])
 
-  const { status, listenToLogs, stopListening } = usePipelineRunLogs(
+  const { status, listenToLogs } = usePipelineRunLogs(
     pipeline.organization_id,
     pipeline.id,
     pipelineRun.id,
-    payload => console.log(payload))
+    () => { },
+    payload => {
+      setLiveLogs((prev) => [...prev, payload.data])
+    },
+    error => console.error(error),
+  )
 
-  console.log(status)
   useEffect(() => {
     if (status === "open") {
       listenToLogs({})
     }
-    // return () => {
-    //   console.log('stop')
-    //   stopListening()
-    // }
   }, [status])
 
+
   return (
-    <p>LOGI LOGI LOGI</p>
+    <div className="bg-gray-800 text-gray-400 font-mono p-4 h-96 overflow-y-auto">
+      {pipelineRunLogs.map((log) => (
+        <div key={log.id} className="mb-2">
+          <span className="text-cyan-400 mr-2">{log?.created_at}</span>
+          <span className="text-purple-500 mr-2">{log?.block_name}</span>
+          <span className="text-gray-300 mr-2">{log?.message}</span>
+          <span className="text-green-300">{log?.message_types?.join(" -> ")}</span>
+        </div>
+      ))}
+      {liveLogs.map(log => (
+        <div key={log.id} className="mb-2">
+          <span className="text-cyan-400 mr-2">{log?.created_at}</span>
+          <span className="text-purple-500 mr-2">{log?.block_name}</span>
+          <span className="text-gray-300 mr-2">{log?.message}</span>
+          <span className="text-green-300">{log?.message_types?.join(" -> ")}</span>
+        </div>
+      ))}
+
+    </div>
+
   );
 }
 

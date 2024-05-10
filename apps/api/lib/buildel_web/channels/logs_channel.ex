@@ -20,7 +20,6 @@ defmodule BuildelWeb.LogsChannel do
     "block_name" => nil
   }
 
-  # todo: implement logging for specific block
   def join(channel_name, params, socket) do
     IO.inspect("Joining logs channel")
     params = Map.merge(@default_params, params)
@@ -31,7 +30,7 @@ defmodule BuildelWeb.LogsChannel do
           %{
             auth: auth,
             user_data: user_data,
-            block_name: _block_name
+            block_name: block_name
           }} <-
            validate(:join, params),
          {:ok, pipeline_id} <- Buildel.Utils.parse_id(pipeline_id),
@@ -52,7 +51,7 @@ defmodule BuildelWeb.LogsChannel do
            ) do
       listen_to_outputs(organization, pipeline, run)
 
-      {:ok, %{run: %{id: run.id}}, socket |> assign(:run, run)}
+      {:ok, %{run: %{id: run.id}}, socket |> assign(:run, run) |> assign(:block_name, block_name)}
     else
       {:error, :invalid_id} ->
         {:error, %{reason: "not_found"}}
@@ -70,10 +69,21 @@ defmodule BuildelWeb.LogsChannel do
   end
 
   def handle_info({topic, log}, socket) do
-    serialized_log = BuildelWeb.OrganizationPipelineRunLogsJSON.show(%{log: log})
+    case socket.assigns.block_name do
+      nil ->
+        socket |> Phoenix.Channel.push(topic, log)
+        {:noreply, socket}
 
-    socket |> Phoenix.Channel.push(topic, serialized_log)
-    {:noreply, socket}
+      block_name ->
+        case log.data.block_name do
+          ^block_name ->
+            socket |> Phoenix.Channel.push(topic, log)
+            {:noreply, socket}
+
+          _ ->
+            {:noreply, socket}
+        end
+    end
   end
 
   defp parse_channel_name(channel_name) do

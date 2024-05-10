@@ -53,17 +53,10 @@ defmodule Buildel.LogsAggregator do
 
         topic = "logs::#{organization_id}::#{pipeline_id}::#{run_id}"
 
-        # todo: format the message
         Buildel.PubSub
         |> PubSub.broadcast!(
           topic,
-          {topic,
-           %{
-             block_name: log.block_name,
-             message: log.message,
-             message_types: log.message_types,
-             raw_logs: log.raw_logs
-           }}
+          {topic, BuildelWeb.OrganizationPipelineRunLogsJSON.show(%{log: log})}
         )
       end
     end
