@@ -61,6 +61,7 @@ export function PipelineRunLogs() {
             stopListening().then(() => listenToLogs({
               block_name: selected?.value ?? undefined
             }))
+            setLiveLogs([])
 
             navigate(urlWithParams);
           }}

@@ -5,7 +5,9 @@ defmodule Buildel.RunLogs do
 
   @default_attrs %{
     block_name: nil,
-    limit: 10
+    limit: 10,
+    start_date: NaiveDateTime.utc_now() |> NaiveDateTime.add(-5, :minute),
+    end_date: nil
   }
 
   def list_run_logs(run, attrs \\ %{}) do
@@ -22,6 +24,12 @@ defmodule Buildel.RunLogs do
 
         {:limit, limit}, query when is_integer(limit) ->
           from l in query, limit: ^limit
+
+        {:start_date, start_date}, query when is_binary(start_date) ->
+          from l in query, where: l.inserted_at >= ^start_date
+
+        {:end_date, end_date}, query when is_binary(end_date) ->
+          from l in query, where: l.inserted_at <= ^end_date
 
         _, query ->
           query

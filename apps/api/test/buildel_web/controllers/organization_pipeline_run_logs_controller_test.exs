@@ -111,6 +111,49 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsControllerTest do
 
       assert_schema(response, "LogIndexResponse", api_spec)
     end
+
+    test "filters by date", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      run: run,
+      api_spec: api_spec
+    } do
+      log =
+        log_fixture(%{
+          run_id: run.id,
+          message: "Test log",
+          block_name: "chat_1",
+          context: "context",
+          message_types: ["start_stream", "stop_stream"],
+          raw_logs: [1, 2],
+          inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.add(-2, :day)
+        })
+
+      start_date =
+        NaiveDateTime.utc_now() |> NaiveDateTime.add(-3, :day) |> NaiveDateTime.to_iso8601()
+
+      end_date =
+        NaiveDateTime.utc_now() |> NaiveDateTime.add(-1, :day) |> NaiveDateTime.to_iso8601()
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/runs/#{run.id}/logs?start_date=#{start_date}&end_date=#{end_date}"
+        )
+
+      response = json_response(conn, 200)
+      assert 1 = length(response["data"])
+
+      assert [
+               %{
+                 "message" => "Test log",
+                 "block_name" => "chat_1"
+               }
+             ] = response["data"]
+
+      assert_schema(response, "LogIndexResponse", api_spec)
+    end
   end
 
   defp create_run_log(%{run: run}) do

@@ -8,6 +8,7 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsController do
   alias Buildel.Pipelines.Pipeline
   alias Buildel.RunLogs
   alias Buildel.Organizations
+  alias OpenApiSpex.Schema
 
   action_fallback(BuildelWeb.FallbackController)
 
@@ -35,6 +36,18 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsController do
         in: :query,
         description: "Block name",
         type: :string,
+        required: false
+      ],
+      start_date: [
+        in: :query,
+        description: "Start date",
+        schema: %Schema{type: :string, format: :date_time},
+        required: false
+      ],
+      end_date: [
+        in: :query,
+        description: "End date",
+        schema: %Schema{type: :string, format: :date_time},
         required: false
       ]
     ],

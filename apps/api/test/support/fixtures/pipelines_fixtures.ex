@@ -276,6 +276,14 @@ defmodule Buildel.PipelinesFixtures do
       })
       |> Buildel.RunLogs.create_run_log()
 
+    if attrs[:inserted_at] do
+      Ecto.Query.from(l in Buildel.Pipelines.AggregatedLog,
+        where: l.id == ^log.id,
+        update: [set: [inserted_at: ^attrs[:inserted_at]]]
+      )
+      |> Buildel.Repo.update_all([])
+    end
+
     log
   end
 
