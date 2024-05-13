@@ -12,6 +12,9 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.pipelineId, "pipelineId not found");
     invariant(params.runId, "runId not found");
 
+    const searchParams = new URL(request.url).searchParams;
+    const blockName = searchParams.get("block_name") ?? undefined;
+
     const pipelineApi = new PipelineApi(fetch);
     const blockTypeApi = new BlockTypeApi(fetch);
 
@@ -31,7 +34,8 @@ export async function loader(args: LoaderFunctionArgs) {
     const pipelineRunLogsPromise = pipelineApi.getPipelineRunLogs(
       params.organizationId,
       params.pipelineId,
-      params.runId
+      params.runId,
+      blockName
     );
 
     const [blockTypes, pipeline, pipelineRun, pipelineRunLogs] = await Promise.all([
@@ -58,6 +62,7 @@ export async function loader(args: LoaderFunctionArgs) {
         config: { ...pipelineRun.data.config, blocks },
       },
       pipelineRunLogs: pipelineRunLogs.data,
+      blockName
     });
   })(args);
 }

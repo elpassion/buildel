@@ -257,6 +257,28 @@ defmodule Buildel.PipelinesFixtures do
     run
   end
 
+  def log_fixture(attrs \\ %{}) do
+    run =
+      case attrs[:run_id] do
+        nil ->
+          run_fixture(%{
+            pipeline_id: attrs[:pipeline_id]
+          })
+
+        id ->
+          Buildel.Pipelines.get_run(id)
+      end
+
+    {:ok, log} =
+      attrs
+      |> Enum.into(%{
+        run_id: run.id
+      })
+      |> Buildel.RunLogs.create_run_log()
+
+    log
+  end
+
   def alias_fixture(attrs \\ %{}) do
     pipeline =
       if attrs[:pipeline_id] do

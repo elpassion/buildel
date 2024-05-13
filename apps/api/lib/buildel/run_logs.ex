@@ -29,4 +29,13 @@ defmodule Buildel.RunLogs do
 
     query |> Repo.all()
   end
+
+  def create_run_log(attrs \\ %{}) do
+    case %AggregatedLog{}
+         |> AggregatedLog.changeset(attrs)
+         |> Repo.insert() do
+      {:ok, struct} -> {:ok, struct |> Repo.preload(:run)}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
 end
