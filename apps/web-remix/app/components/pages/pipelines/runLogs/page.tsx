@@ -68,14 +68,13 @@ export function PipelineRunLogs() {
         />}
       </ClientOnly>
 
-      <div className="mt-2 bg-gray-800 text-gray-400 font-mono p-4 h-96 overflow-y-auto rounded-lg ">
-        {pipelineRunLogs.map((log) => (
-          <Log key={log.id} log={log} />
-        )).reverse()}
+      <div className="mt-2 bg-gray-800 text-gray-400 font-mono p-4 h-96 overflow-y-auto rounded-lg flex flex-col-reverse">\
         {liveLogs.map(log => (
           <Log key={log.id} log={log} />
+        )).reverse()}
+        {pipelineRunLogs.map((log) => (
+          <Log key={log.id} log={log} />
         ))}
-
       </div>
     </div>
 
