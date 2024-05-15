@@ -78,7 +78,7 @@ defmodule BuildelWeb.OrganizationToolChunkControllerTest do
       response = json_response(conn, 201)
 
       assert %{
-               "data" => [%{"text" => "This is an example file!"}]
+               "data" => [%{"text" => " Para1 header1 li11 li12 header2 li2 header3"}]
              } = response
 
       assert_schema(response, "ChunkShowResponse", api_spec)
