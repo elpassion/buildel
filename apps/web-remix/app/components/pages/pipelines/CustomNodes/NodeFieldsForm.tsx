@@ -198,6 +198,18 @@ export function NodeFieldsForm({
             onChunk={uploadAudioChunk}
           />
         );
+      } else if (type === "file_memory") {
+        return (
+          <FileUpload
+            multiple
+            name={name}
+            onUpload={(file) => convertToBlobAndUpload(file, name)}
+            preview={(props) => (
+              <FileUploadListPreview {...props} className="max-h-[110px]" />
+            )}
+            disabled={status !== "running" || disabled}
+          />
+        );
       }
 
       return <span>Unsupported input type - {type}</span>;

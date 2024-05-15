@@ -81,7 +81,9 @@ defmodule Buildel.MixProject do
       {:multipart, "~> 0.4.0"},
       {:sentry, "~> 10.2.0"},
       {:jq, "~>1.0"},
-      {:floki, "~> 0.36.1"}
+      {:floki, "~> 0.36.1"},
+      {:ecto_sqlite3, "~> 0.13"},
+      {:csv, "~> 3.2"}
     ]
   end
 

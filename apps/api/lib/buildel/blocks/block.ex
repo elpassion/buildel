@@ -20,6 +20,9 @@ defmodule Buildel.Blocks.Block do
   def file_input(name \\ "input", public \\ false),
     do: %{name: name, type: "file", public: public}
 
+  def file_memory_input(name \\ "input", public \\ false),
+    do: %{name: name, type: "file_memory", public: public}
+
   def io(name \\ "tool", role \\ "controller"),
     do: %{name: name, type: role, public: false}
 
