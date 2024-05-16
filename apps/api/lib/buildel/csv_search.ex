@@ -34,11 +34,8 @@ defmodule Buildel.CSVSearch do
   defp process_file(repo_pid, pid) do
     stream = IO.stream(pid, :line) |> CSV.decode(headers: true)
 
-    IO.inspect("JESTEM")
-
     case Enum.split_with(stream, &match?({:ok, _}, &1)) do
       {ok_results, []} when ok_results != [] ->
-        IO.inspect(ok_results, label: "OK RESULTS")
         rows = Enum.map(ok_results, fn {:ok, row} -> row end)
         headers = rows |> hd() |> Map.keys()
         content = rows |> Enum.map(&Map.values(&1))
@@ -46,8 +43,6 @@ defmodule Buildel.CSVSearch do
         process_content(repo_pid, headers, content)
 
       {_, error_results} when error_results != [] ->
-        IO.inspect(error_results, label: "ERROR RESULTS")
-
         {:error,
          "CSV decoding errors: #{Enum.map_join(error_results, ", ", fn {:error, reason} -> reason end)}"}
 
