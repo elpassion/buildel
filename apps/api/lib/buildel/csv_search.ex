@@ -147,7 +147,7 @@ defmodule Buildel.CSVSearch do
       ~r/\bUPDATE\b/i,
       ~r/\bDELETE\b/i,
       ~r/\bMERGE\b/i,
-      ~r/\bREPLACE\b/i,
+      # ~r/\bREPLACE\b/i,
       ~r/\bCALL\b/i,
       ~r/\bLOCK\b/i,
       ~r/\bCREATE\b/i,
