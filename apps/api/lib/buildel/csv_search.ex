@@ -109,7 +109,7 @@ defmodule Buildel.CSVSearch do
   end
 
   defp generate_create_table_sql(table_name, headers) do
-    "CREATE TABLE #{table_name} (id INTEGER PRIMARY KEY AUTOINCREMENT, " <>
+    "CREATE TABLE #{table_name} (__buildel_temporary_id__ INTEGER PRIMARY KEY AUTOINCREMENT, " <>
       Enum.map_join(headers, ", ", fn header ->
         "#{header} TEXT"
       end) <> ")"
