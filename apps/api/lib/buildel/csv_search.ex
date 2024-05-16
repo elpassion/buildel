@@ -26,49 +26,79 @@ defmodule Buildel.CSVSearch do
   end
 
   def handle_upload(repo_pid, file) do
+    with {:ok, pid} <- StringIO.open(file) do
+      process_file(repo_pid, pid)
+    end
+  end
+
+  defp process_file(repo_pid, pid) do
+    stream = IO.stream(pid, :line) |> CSV.decode(headers: true)
+
+    IO.inspect("JESTEM")
+
+    case Enum.split_with(stream, &match?({:ok, _}, &1)) do
+      {ok_results, []} when ok_results != [] ->
+        IO.inspect(ok_results, label: "OK RESULTS")
+        rows = Enum.map(ok_results, fn {:ok, row} -> row end)
+        headers = rows |> hd() |> Map.keys()
+        content = rows |> Enum.map(&Map.values(&1))
+
+        process_content(repo_pid, headers, content)
+
+      {_, error_results} when error_results != [] ->
+        IO.inspect(error_results, label: "ERROR RESULTS")
+
+        {:error,
+         "CSV decoding errors: #{Enum.map_join(error_results, ", ", fn {:error, reason} -> reason end)}"}
+
+      {[], []} ->
+        {:error, "CSV file is empty or has no valid rows"}
+    end
+  end
+
+  defp process_content(repo_pid, headers, content) do
     headers =
-      file
-      |> StringIO.open()
-      |> case do
-        {:ok, io_device} ->
-          io_device
-          |> IO.stream(:line)
-          |> CSV.decode!(headers: true)
-          |> Enum.at(0)
-          |> Map.keys()
+      headers
+      |> Enum.map(&String.downcase/1)
+      |> Enum.map(&String.replace(&1, " ", "_"))
 
-        {:error, reason} ->
-          {:error, reason}
-      end
-
-    table_name = "table_#{:rand.uniform(1_000_000)}"
-
-    # todo: normalize table column names
-
-    validate_name(table_name)
     Enum.each(headers, &validate_name/1)
 
+    table_name = generate_table_name()
+
+    with :ok <- create_table(repo_pid, table_name, headers),
+         :ok <- insert_rows(repo_pid, table_name, content) do
+      {:ok, {table_name, headers}}
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp generate_table_name do
+    "table_#{:rand.uniform(1_000_000)}"
+  end
+
+  defp create_table(repo_pid, table_name, headers) do
     create_table_sql = generate_create_table_sql(table_name, headers)
 
-    Ecto.Adapters.SQL.query(repo_pid, create_table_sql)
-
-    file
-    |> StringIO.open()
-    |> case do
-      {:ok, io_device} ->
-        io_device
-        |> IO.stream(:line)
-        |> CSV.decode!(headers: true)
-        |> Enum.each(fn row ->
-          {insert_sql, insert_parameters} = generate_insert_sql(repo_pid, table_name, row)
-          Ecto.Adapters.SQL.query(repo_pid, insert_sql, insert_parameters)
-        end)
-
-      {:error, reason} ->
-        {:error, reason}
+    case Ecto.Adapters.SQL.query(repo_pid, create_table_sql) do
+      {:ok, _result} -> :ok
+      {:error, reason} -> {:error, "Failed to create table: #{reason}"}
     end
+  end
 
-    {table_name, headers}
+  defp insert_rows(repo_pid, table_name, content) do
+    Enum.each(content, fn row ->
+      case generate_insert_sql(repo_pid, table_name, row) do
+        {insert_sql, insert_parameters} ->
+          case Ecto.Adapters.SQL.query(repo_pid, insert_sql, insert_parameters) do
+            {:ok, _result} -> :ok
+            {:error, reason} -> {:error, "Failed to insert row: #{reason}"}
+          end
+      end
+    end)
+
+    :ok
   end
 
   def execute_query(pid, query) do
@@ -84,10 +114,9 @@ defmodule Buildel.CSVSearch do
 
   defp generate_insert_sql(repo_pid, table_name, row) do
     columns = get_table_columns(repo_pid, table_name) |> Enum.join(", ")
-    values = Map.values(row)
 
     escaped_parameters =
-      values
+      row
       |> Enum.with_index()
       |> Enum.map_join(", ", fn {_value, index} ->
         "$#{index + 1}"
@@ -95,7 +124,7 @@ defmodule Buildel.CSVSearch do
 
     sql = "INSERT INTO #{table_name} (#{columns}) VALUES (" <> escaped_parameters <> ")"
 
-    {sql, values}
+    {sql, row}
   end
 
   defp get_table_columns(repo_pid, table_name) do

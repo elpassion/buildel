@@ -124,15 +124,26 @@ defmodule Buildel.Blocks.CSVSearch do
     state = send_stream_start(state)
 
     {_, repo_pid} = state[:repo]
-    {table_name, headers} = Buildel.CSVSearch.handle_upload(repo_pid, file)
 
-    state =
-      Map.update(state, :table_names, [{table_name, headers}], fn table_names ->
-        [{table_name, headers} | table_names]
-      end)
+    with {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file) do
+      state =
+        Map.update(state, :table_names, [{table_name, headers}], fn table_names ->
+          [{table_name, headers} | table_names]
+        end)
 
-    state = send_stream_stop(state)
-    {:noreply, state}
+      state = send_stream_stop(state)
+      {:noreply, state}
+    else
+      {:error, message} ->
+        send_error(state, message)
+        state = schedule_stream_stop(state)
+        {:noreply, state}
+
+      _ ->
+        send_error(state, "Unknown error")
+        state = schedule_stream_stop(state)
+        {:noreply, state}
+    end
   end
 
   @impl true
