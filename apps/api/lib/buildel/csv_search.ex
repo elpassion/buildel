@@ -21,8 +21,17 @@ end
 defmodule Buildel.CSVSearch do
   @valid_name_regex ~r/^[a-zA-Z_][a-zA-Z0-9_]*$/
 
-  def validate_name(name) when is_binary(name) do
-    if Regex.match?(@valid_name_regex, name), do: name, else: raise("Invalid name: #{name}")
+  defp validate_name(name) when is_binary(name) do
+    if Regex.match?(@valid_name_regex, name), do: :ok, else: {:error, "Invalid name: #{name}"}
+  end
+
+  defp validate_headers(headers) do
+    Enum.reduce_while(headers, {:ok, []}, fn header, {:ok, acc} ->
+      case validate_name(header) do
+        :ok -> {:cont, {:ok, acc ++ [header]}}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
   end
 
   def handle_upload(repo_pid, file) do
@@ -57,11 +66,10 @@ defmodule Buildel.CSVSearch do
       |> Enum.map(&String.downcase/1)
       |> Enum.map(&String.replace(&1, " ", "_"))
 
-    Enum.each(headers, &validate_name/1)
-
     table_name = generate_table_name()
 
-    with :ok <- create_table(repo_pid, table_name, headers),
+    with {:ok, valid_headers} <- validate_headers(headers),
+         :ok <- create_table(repo_pid, table_name, valid_headers),
          :ok <- insert_rows(repo_pid, table_name, content) do
       {:ok, {table_name, headers}}
     else
