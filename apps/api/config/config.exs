@@ -39,6 +39,8 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :phoenix, :filter_parameters, ["password", "auth"]
+
 config :tesla, adapter: Tesla.Adapter.Hackney
 
 config :money,
