@@ -1,6 +1,8 @@
-import React, { AnchorHTMLAttributes } from "react";
+import React, { AnchorHTMLAttributes, useEffect, useRef } from "react";
 import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
 import classNames from "classnames";
+import mermaid from "mermaid";
+
 interface ChatMarkdownProps {
   [key: string]: any;
   children: string;
@@ -273,6 +275,10 @@ function Pre({
   className,
   ...rest
 }: React.ParamHTMLAttributes<HTMLPreElement>) {
+  useEffect(() => {
+    mermaid.initialize({});
+  }, []);
+
   return (
     <pre
       className={classNames(
@@ -291,8 +297,15 @@ function Code({
   className,
   ...rest
 }: React.ParamHTMLAttributes<HTMLPreElement>) {
+  const codeRef = useRef<HTMLElement>(null);
+  if (className?.includes("lang-mermaid")) {
+    mermaid.run({
+      nodes: [codeRef.current!],
+    });
+  }
   return (
     <code
+      ref={codeRef}
       className={classNames(
         "my-1 bg-neutral-900 break-words whitespace-pre-wrap text-neutral-100",
         className,

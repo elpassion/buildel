@@ -55,6 +55,7 @@
     "lodash.startcase": "^4.4.0",
     "lru-cache": "^10.2.0",
     "markdown-to-jsx": "^7.4.1",
+    "mermaid": "^10.9.1",
     "morgan": "^1.10.0",
     "nprogress": "^0.2.0",
     "phoenix": "^1.7.7",
