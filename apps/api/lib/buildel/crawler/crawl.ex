@@ -106,7 +106,7 @@ defmodule Buildel.Crawler.Crawl do
 
     case HTTPoison.get(url) do
       {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
-      when status_code >= 200 and status_code <= 400 ->
+      when status_code >= 200 and status_code < 400 ->
         crawl = success_page(crawl, url, body)
 
         find_linked_pages(body, depth + 1, url)

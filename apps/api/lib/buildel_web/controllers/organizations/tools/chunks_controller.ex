@@ -54,7 +54,8 @@ defmodule BuildelWeb.OrganizationToolChunkController do
             Buildel.Clients.Embeddings.new(%{
               api_type: "does",
               model: "not matter",
-              api_key: "key"
+              api_key: "key",
+              endpoint: "really"
             }),
           collection_name: "name",
           db_adapter: Buildel.VectorDB.EctoAdapter,

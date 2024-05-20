@@ -7,6 +7,7 @@ defmodule Buildel.Memories.MemoryCollection do
     field(:embeddings_api_type, :string)
     field(:embeddings_model, :string)
     field(:embeddings_secret_name, :string)
+    field(:embeddings_endpoint, :string)
     field(:chunk_size, :integer, default: 1000)
     field(:chunk_overlap, :integer, default: 0)
 
@@ -24,6 +25,7 @@ defmodule Buildel.Memories.MemoryCollection do
       :embeddings_api_type,
       :embeddings_model,
       :embeddings_secret_name,
+      :embeddings_endpoint,
       :chunk_size,
       :chunk_overlap
     ])
@@ -32,7 +34,8 @@ defmodule Buildel.Memories.MemoryCollection do
       :collection_name,
       :embeddings_api_type,
       :embeddings_model,
-      :embeddings_secret_name
+      :embeddings_secret_name,
+      :embeddings_endpoint
     ])
     |> assoc_constraint(:organization)
   end

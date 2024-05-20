@@ -2,19 +2,28 @@ defmodule Buildel.Clients.Embeddings do
   alias __MODULE__
   @type t :: %Embeddings{}
 
-  @enforce_keys [:api_type, :model, :api_key]
-  defstruct [:api_type, :model, :api_key]
+  @enforce_keys [:api_type, :model, :api_key, :endpoint]
+  defstruct [:api_type, :model, :api_key, :endpoint]
 
-  @spec new(%{:api_key => String.t(), :api_type => String.t(), :model => String.t()}) :: t()
-  def new(%{api_type: api_type, model: model, api_key: api_key}) do
-    %__MODULE__{api_type: api_type, model: model, api_key: api_key}
+  @spec new(%{
+          :api_key => String.t(),
+          :api_type => String.t(),
+          :model => String.t(),
+          :endpoint => String.t()
+        }) :: t()
+  def new(%{api_type: api_type, model: model, api_key: api_key, endpoint: endpoint}) do
+    %__MODULE__{api_type: api_type, model: model, api_key: api_key, endpoint: endpoint}
   end
 
-  def get_embeddings(%__MODULE__{api_type: "openai", model: model, api_key: api_key}, inputs) do
+  def get_embeddings(
+        %__MODULE__{api_type: "openai", model: model, api_key: api_key, endpoint: endpoint},
+        inputs
+      ) do
     Buildel.Clients.OpenAIEmbeddings.get_embeddings(%{
       inputs: inputs,
       api_key: api_key,
-      model: model
+      model: model,
+      endpoint: endpoint
     })
   end
 
@@ -67,21 +76,38 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
   end
 
   @impl true
-  deftimed get_embeddings(%{inputs: inputs, api_key: api_key, model: model}), [
-    :buildel,
-    :embeddings,
-    :generation
-  ] do
-    with {:ok, %{data: gpt_embeddings, usage: usage}} <-
-           OpenAI.embeddings([model: model, input: inputs], config(api_key)) do
+  deftimed get_embeddings(%{inputs: inputs, api_key: api_key, model: model, endpoint: endpoint}),
+           [
+             :buildel,
+             :embeddings,
+             :generation
+           ] do
+    with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
+         when status_code >= 200 and status_code < 400 <-
+           HTTPoison.post(
+             endpoint,
+             %{
+               input: inputs,
+               model: model
+             }
+             |> Jason.encode!(),
+             Authorization: "Bearer #{api_key}",
+             "api-key": api_key,
+             "content-type": "application/json"
+           ),
+         {:ok, body} <- Jason.decode(body) do
       {:ok,
        %{
-         embeddings: gpt_embeddings |> Enum.map(fn %{"embedding" => embedding} -> embedding end),
-         embeddings_tokens: usage["total_tokens"]
+         embeddings: body["data"] |> Enum.map(& &1["embedding"]),
+         embeddings_tokens: body["usage"]["total_tokens"]
        }}
     else
-      {:error, %{"error" => %{"code" => "invalid_api_key"}}} -> {:error, :invalid_api_key}
-      {:error, %{"error" => %{"code" => "insufficient_quota"}}} -> {:error, :insufficient_quota}
+      {:ok, %HTTPoison.Response{body: body}} ->
+        case body |> Jason.decode!() do
+          %{"error" => %{"code" => "invalid_api_key"}} -> {:error, :invalid_api_key}
+          %{"error" => %{"code" => "insufficient_quota"}} -> {:error, :insufficient_quota}
+          %{"error" => %{"code" => "model_not_found"}} -> {:error, :model_not_found}
+        end
     end
   end
 

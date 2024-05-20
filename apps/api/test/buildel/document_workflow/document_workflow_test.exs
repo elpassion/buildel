@@ -16,7 +16,8 @@ defmodule Buildel.DocumentWorkflowTest do
             Buildel.Clients.Embeddings.new(%{
               api_type: "test",
               model: "test",
-              api_key: "test"
+              api_key: "test",
+              endpoint: "test"
             }),
           collection_name: "test",
           db_adapter: Buildel.VectorDB.EctoAdapter

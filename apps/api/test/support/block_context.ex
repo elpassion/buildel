@@ -36,7 +36,8 @@ defmodule Buildel.BlockContext.Mock do
          Buildel.Clients.Embeddings.new(%{
            api_key: "",
            api_type: "test",
-           model: "text-embedding-ada-002"
+           model: "text-embedding-ada-002",
+           endpoint: "test"
          })
      })}
   end

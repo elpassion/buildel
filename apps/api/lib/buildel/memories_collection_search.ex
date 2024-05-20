@@ -29,7 +29,8 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
           Buildel.Clients.Embeddings.new(%{
             api_type: collection.embeddings_api_type,
             model: collection.embeddings_model,
-            api_key: api_key.value
+            api_key: api_key.value,
+            endpoint: collection.embeddings_endpoint
           })
       })
 

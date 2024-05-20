@@ -43,7 +43,8 @@ defmodule Buildel.MemoriesFixtures do
         embeddings: %{
           secret_name: api_key.name,
           api_type: "test",
-          model: "text-embedding-ada-002"
+          model: "text-embedding-ada-002",
+          endpoint: "test"
         }
       })
 

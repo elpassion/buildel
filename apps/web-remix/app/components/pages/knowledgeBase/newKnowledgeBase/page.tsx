@@ -30,6 +30,7 @@ export function NewKnowledgeBasePage() {
       defaultValues={{
         embeddings: {
           api_type: "openai",
+          endpoint: "https://api.openai.com/v1/embeddings",
         },
         chunk_size: 1000,
         chunk_overlap: 0,
@@ -50,6 +51,17 @@ export function NewKnowledgeBasePage() {
           <ApiTypesRadioGroupField
             onChange={(e) => onValueChange(e.target.name, e.target.value)}
           />
+        </div>
+
+        <div>
+          <Field name="embeddings.endpoint">
+            <TextInputField
+              type="text"
+              label={"Endpoint"}
+              name={"endpoint"}
+              supportingText="API endpoint used for retrieving embeddings"
+            />
+          </Field>
         </div>
 
         <div>
