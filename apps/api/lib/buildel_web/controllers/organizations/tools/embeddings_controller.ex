@@ -15,12 +15,12 @@ defmodule BuildelWeb.OrganizationToolEmbeddingsController do
   tags ["organization"]
 
   operation :create,
-    summary: "Create file chunks",
+    summary: "Create embeddings",
     parameters: [
       organization_id: [in: :path, description: "Organization ID", type: :integer, required: true]
     ],
     request_body:
-      {"chunk", "multipart/form-data", BuildelWeb.Schemas.Embeddings.CreateEmbeddingsRequest},
+      {"embeddings", "application/json", BuildelWeb.Schemas.Embeddings.CreateEmbeddingsRequest},
     responses: [
       created: {"created", "application/json", BuildelWeb.Schemas.Embeddings.ShowResponse},
       unprocessable_entity:
