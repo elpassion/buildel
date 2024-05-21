@@ -9,7 +9,7 @@ defmodule BuildelWeb.OrganizationToolEmbeddingsControllerTest do
      conn:
        conn
        |> put_req_header("accept", "application/json")
-       |> put_req_header("content-type", "multipart/form-data")}
+       |> put_req_header("content-type", "application/json")}
   end
 
   setup [
