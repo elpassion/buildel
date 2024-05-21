@@ -53,7 +53,28 @@ defmodule BuildelWeb.OrganizationToolEmbeddingsController do
              api_key: api_key.value,
              endpoint: collection.embeddings_endpoint
            })
-           |> Buildel.Clients.Embeddings.get_embeddings(inputs) do
+           |> Buildel.Clients.Embeddings.get_embeddings(inputs),
+         cost_amount <-
+           Buildel.Costs.CostCalculator.calculate_embeddings_cost(
+             %Buildel.Langchain.EmbeddingsTokenSummary{
+               tokens: embeddings.embeddings_tokens,
+               model: collection.embeddings_model
+             }
+           ),
+         {:ok, cost} <-
+           Buildel.Organizations.create_organization_cost(
+             organization,
+             %{
+               amount: cost_amount,
+               input_tokens: embeddings.embeddings_tokens,
+               output_tokens: 0
+             }
+           ),
+         {:ok, _} <-
+           Buildel.Memories.create_memory_collection_cost(collection, cost, %{
+             cost_type: :query,
+             description: "Api call for embeddings"
+           }) do
       conn
       |> put_status(:created)
       |> render(:show, embeddings: embeddings)
