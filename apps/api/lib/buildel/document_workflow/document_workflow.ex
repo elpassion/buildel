@@ -67,7 +67,6 @@ defmodule Buildel.DocumentWorkflow do
     with {:ok, result} <- DocumentProcessor.load_file(document_loader, path, file_metadata) do
       result
       |> DocumentProcessor.get_blocks()
-      |> DocumentProcessor.filter_empty_blocks()
       |> DocumentProcessor.map_to_structures()
       |> DocumentProcessor.map_with_relations()
       |> DocumentProcessor.map_with_headers_metadata()

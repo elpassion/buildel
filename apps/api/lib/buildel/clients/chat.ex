@@ -191,7 +191,7 @@ defmodule Buildel.Clients.Chat do
         }
       end)
     else
-      e ->
+      _e ->
         []
     end
   end
