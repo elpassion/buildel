@@ -72,12 +72,10 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
     end
 
     defp table_rows_to_strings(table_rows) do
-      table_width = Enum.max(Enum.map(table_rows, &length(&1["cells"])))
-
-      table_rows
-      |> Enum.map(fn row ->
-        update_in(row, ["cells"], fn cells ->
-          cells =
+      table_rows =
+        table_rows
+        |> Enum.map(fn row ->
+          update_in(row, ["cells"], fn cells ->
             cells
             |> Enum.flat_map(fn
               %{"col_span" => col_span, "cell_value" => value} ->
@@ -86,7 +84,16 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
               %{"cell_value" => value} ->
                 [value]
             end)
+            |> Enum.map(&String.replace(&1, "|", " "))
+          end)
+        end)
 
+      table_width =
+        Enum.max(Enum.map(table_rows, &length(&1["cells"])))
+
+      table_rows
+      |> Enum.map(fn row ->
+        update_in(row, ["cells"], fn cells ->
           Stream.concat(cells, Stream.repeatedly(fn -> "" end))
           |> Enum.take(table_width)
         end)
@@ -127,10 +134,6 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
 
   def get_blocks(list) do
     list |> get_in(["return_dict", "result", "blocks"])
-  end
-
-  def filter_incom(list) do
-    list |> Enum.filter(&Map.has_key?(&1, "sentences"))
   end
 
   @spec map_to_structures(list()) :: [Header.t() | Paragraph.t() | ListItem.t()]
