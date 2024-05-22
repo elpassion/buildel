@@ -76,6 +76,14 @@ defmodule Buildel.Costs.CostCalculator do
         input_token_price: Decimal.new("0.01") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.03") |> Decimal.div(1000)
       },
+      {"https://api.openai.com/v1/chat/completions", "gpt-4-turbo"} => %{
+        input_token_price: Decimal.new("0.01") |> Decimal.div(1000),
+        output_token_price: Decimal.new("0.03") |> Decimal.div(1000)
+      },
+      {"https://api.openai.com/v1/chat/completions", "gpt-4o"} => %{
+        input_token_price: Decimal.new("0.005") |> Decimal.div(1000),
+        output_token_price: Decimal.new("0.015") |> Decimal.div(1000)
+      },
       {"https://api.mistral.ai/v1/chat/completions", "mistral-tiny"} => %{
         input_token_price: Decimal.new("0.1512") |> Decimal.div(1_000_000),
         output_token_price: Decimal.new("0.4536") |> Decimal.div(1_000_000)

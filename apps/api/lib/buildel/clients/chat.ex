@@ -144,6 +144,21 @@ defmodule Buildel.Clients.Chat do
     end
   end
 
+  def get_models(%{api_type: "openai"} = opts) do
+    with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
+         when status_code >= 200 and status_code < 400 <-
+           HTTPoison.get(opts.endpoint <> "/models", Authorization: "Bearer #{opts.api_key}") do
+      body |> Jason.decode!() |> Map.get("data")
+    else
+      _ ->
+        []
+    end
+  end
+
+  def get_models(_) do
+    []
+  end
+
   defp get_llm(%{api_type: "mistral"} = opts) do
     ChatMistralAI.new!(%{
       model: opts.model,

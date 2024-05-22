@@ -75,15 +75,6 @@ defmodule Buildel.Blocks.Chat do
                   "enumPresentAs" => "radio",
                   "default" => "openai"
                 },
-                model: %{
-                  "type" => "string",
-                  "title" => "Model",
-                  "description" => "The model to use for the chat.",
-                  "url" =>
-                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
-                  "presentAs" => "async-select",
-                  "minLength" => 1
-                },
                 endpoint: %{
                   "type" => "string",
                   "title" => "Endpoint",
@@ -97,6 +88,15 @@ defmodule Buildel.Blocks.Chat do
                       "mistral" => "https://api.mistral.ai/v1"
                     }
                   },
+                  "minLength" => 1
+                },
+                model: %{
+                  "type" => "string",
+                  "title" => "Model",
+                  "description" => "The model to use for the chat.",
+                  "url" =>
+                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
+                  "presentAs" => "async-select",
                   "minLength" => 1
                 },
                 chat_memory_type: %{
