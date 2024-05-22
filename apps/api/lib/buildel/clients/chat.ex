@@ -46,7 +46,9 @@ defmodule Buildel.Clients.Chat do
       opts
       |> Map.put_new(:on_message, fn _ -> nil end)
       |> Map.put_new(:api_type, "openai")
-      |> Map.put_new(:endpoint, "https://api.openai.com/v1/chat/completions")
+      |> Map.put_new(:endpoint, "https://api.openai.com/v1")
+
+    llm = get_llm(opts)
 
     messages =
       context.messages
@@ -103,7 +105,7 @@ defmodule Buildel.Clients.Chat do
           input_tokens: usage.prompt_tokens,
           output_tokens: usage.completion_tokens,
           model: model,
-          endpoint: opts.endpoint
+          endpoint: llm.endpoint
         }
 
         on_cost.(token_summary)
@@ -116,7 +118,7 @@ defmodule Buildel.Clients.Chat do
 
     with {:ok, chain, message} <-
            LLMChain.new!(%{
-             llm: get_llm(opts),
+             llm: llm,
              custom_context: context
            })
            |> LLMChain.add_functions(tools |> Enum.map(& &1.function))
@@ -148,7 +150,7 @@ defmodule Buildel.Clients.Chat do
       temperature: opts.temperature,
       stream: true,
       api_key: opts.api_key,
-      endpoint: opts.endpoint
+      endpoint: opts.endpoint <> "/chat/completions"
     })
   end
 
@@ -159,7 +161,7 @@ defmodule Buildel.Clients.Chat do
       stream: true,
       api_key: opts.api_key,
       api_type: opts.api_type,
-      endpoint: opts.endpoint
+      endpoint: opts.endpoint <> "/chat/completions"
     })
   end
 
@@ -170,7 +172,7 @@ defmodule Buildel.Clients.Chat do
       stream: true,
       api_key: opts.api_key,
       api_type: opts.api_type,
-      endpoint: opts.endpoint
+      endpoint: opts.endpoint <> "/chat/completions?version=2024-02-01"
     })
   end
 

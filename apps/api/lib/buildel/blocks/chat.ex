@@ -80,7 +80,7 @@ defmodule Buildel.Blocks.Chat do
                   "title" => "Model",
                   "description" => "The model to use for the chat.",
                   "url" =>
-                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}",
+                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
                   "presentAs" => "async-select",
                   "minLength" => 1
                 },
@@ -90,11 +90,11 @@ defmodule Buildel.Blocks.Chat do
                   "description" => "The endpoint to use for the chat.",
                   "defaultWhen" => %{
                     "opts.api_type" => %{
-                      "openai" => "https://api.openai.com/v1/chat/completions",
+                      "openai" => "https://api.openai.com/v1",
                       "azure" =>
-                        "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}/chat/completions?api-version={api_version}",
+                        "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}",
                       "google" => "https://generativelanguage.googleapis.com/v1beta/models",
-                      "mistral" => "https://api.mistral.ai/v1/chat/completions"
+                      "mistral" => "https://api.mistral.ai/v1"
                     }
                   },
                   "minLength" => 1

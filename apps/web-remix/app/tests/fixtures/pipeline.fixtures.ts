@@ -47,7 +47,7 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
             api_type: "openai",
             chat_memory_type: "full",
             description: "",
-            endpoint: "https://api.openai.com/v1/chat/completions",
+            endpoint: "https://api.openai.com/v1",
             messages: [],
             model: "gpt-3.5-turbo",
             prompt_template: "{{text_input_1:output}}",
@@ -138,7 +138,7 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
 };
 
 export const pipelineDetailsFixture = (
-  override?: Partial<IPipelineDetails>
+  override?: Partial<IPipelineDetails>,
 ): IPipelineDetails => {
   return {
     total_cost: 123,
@@ -147,7 +147,7 @@ export const pipelineDetailsFixture = (
 };
 
 export const simplePipelineFixture = (
-  override?: Partial<IPipeline>
+  override?: Partial<IPipeline>,
 ): IPipeline => {
   return {
     id: 1,

@@ -340,11 +340,11 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
                 defaultWhen: {
                   "opts.api_type": {
                     azure:
-                      "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}/chat/completions?api-version={api_version}",
+                      "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}",
                     google:
                       "https://generativelanguage.googleapis.com/v1beta/models",
-                    mistral: "https://api.mistral.ai/v1/chat/completions",
-                    openai: "https://api.openai.com/v1/chat/completions",
+                    mistral: "https://api.mistral.ai/v1",
+                    openai: "https://api.openai.com/v1",
                   },
                 },
                 description: "The endpoint to use for the chat.",

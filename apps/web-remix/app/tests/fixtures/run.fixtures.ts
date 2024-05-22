@@ -30,7 +30,7 @@ export const runFixture = (override?: Partial<IPipelineRun>): IPipelineRun => {
             api_type: "openai",
             chat_memory_type: "full",
             description: "",
-            endpoint: "https://api.openai.com/v1/chat/completions",
+            endpoint: "https://api.openai.com/v1",
             messages: [],
             model: "",
             prompt_template: "{{text_input_1:output}}",

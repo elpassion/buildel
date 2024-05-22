@@ -1,7 +1,7 @@
 import { IPipelineAlias } from "~/components/pages/pipelines/pipeline.types";
 
 export const aliasFixture = (
-  override?: Partial<IPipelineAlias>
+  override?: Partial<IPipelineAlias>,
 ): IPipelineAlias => {
   return {
     id: 1,
@@ -31,7 +31,7 @@ export const aliasFixture = (
             api_type: "openai",
             chat_memory_type: "full",
             description: "",
-            endpoint: "https://api.openai.com/v1/chat/completions",
+            endpoint: "https://api.openai.com/v1",
             messages: [],
             model: "gpt-3.5-turbo",
             prompt_template: "{{text_input_1:output}}",

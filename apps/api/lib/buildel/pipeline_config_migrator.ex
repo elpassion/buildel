@@ -25,11 +25,11 @@ defmodule Buildel.PipelineConfigMigrator do
     }
   end
 
-  def update_block_config(%{"blocks" => blocks} = config, block_name, new_config) do
+  def update_block_config(%{"blocks" => blocks} = config, block_type, new_config) do
     %{
       config
       | "blocks" =>
-          Buildel.BlockConfigMigrator.update_block_config(blocks, block_name, new_config)
+          Buildel.BlockConfigMigrator.update_block_config(blocks, block_type, new_config)
     }
   end
 
