@@ -36,18 +36,15 @@ defmodule BuildelWeb.OrganizationModelController do
     with {:ok, organization} <-
            Organizations.get_user_organization(current_user, organization_id),
          {:ok, secret} <- Organizations.get_organization_secret(organization, api_key) do
-      openai_models =
+      remote_models =
         Chat.get_models(%{endpoint: endpoint, api_key: secret.value, api_type: api_type})
-        |> Enum.map(fn model ->
-          %{id: model["id"], name: model["id"], api_type: "openai"}
-        end)
 
       local_models =
         @models
-        |> Enum.filter(fn model -> model.api_type == "openai" end)
+        |> Enum.filter(fn model -> model.api_type == api_type end)
 
       models =
-        (local_models ++ openai_models)
+        (local_models ++ remote_models)
         |> Enum.uniq_by(& &1.id)
 
       render(conn, :index, models: models)

@@ -148,9 +148,50 @@ defmodule Buildel.Clients.Chat do
     with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
          when status_code >= 200 and status_code < 400 <-
            HTTPoison.get(opts.endpoint <> "/models", Authorization: "Bearer #{opts.api_key}") do
-      body |> Jason.decode!() |> Map.get("data")
+      body
+      |> Jason.decode!()
+      |> Map.get("data")
+      |> Enum.map(fn model ->
+        %{id: model["id"], name: model["id"], api_type: "openai"}
+      end)
     else
       _ ->
+        []
+    end
+  end
+
+  def get_models(%{api_type: "mistral"} = opts) do
+    with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
+         when status_code >= 200 and status_code < 400 <-
+           HTTPoison.get(opts.endpoint <> "/models", Authorization: "Bearer #{opts.api_key}") do
+      body
+      |> Jason.decode!()
+      |> Map.get("data")
+      |> Enum.map(fn model ->
+        %{id: model["id"], name: model["id"], api_type: "mistral"}
+      end)
+    else
+      _ ->
+        []
+    end
+  end
+
+  def get_models(%{api_type: "google"} = opts) do
+    with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
+         when status_code >= 200 and status_code < 400 <-
+           HTTPoison.get(opts.endpoint <> "?key=#{opts.api_key}") do
+      body
+      |> Jason.decode!()
+      |> Map.get("models")
+      |> Enum.map(fn model ->
+        %{
+          id: model["name"] |> String.split("/") |> Enum.at(1),
+          name: model["displayName"],
+          api_type: "google"
+        }
+      end)
+    else
+      e ->
         []
     end
   end
