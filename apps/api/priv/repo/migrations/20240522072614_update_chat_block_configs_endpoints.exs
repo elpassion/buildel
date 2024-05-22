@@ -31,11 +31,15 @@ defmodule Buildel.Repo.Migrations.UpdateChatBlockConfigsEndpoints do
         update_in(
           block_config,
           ["opts", "endpoint"],
-          &String.replace(&1, "/chat/completions", "")
+          &String.replace(&1 || "https://api.openai.com/v1", "/chat/completions", "")
         )
         |> update_in(
           ["opts", "endpoint"],
-          &String.replace(&1, ~r/\?api_version=\w\w\w\w-\w\w-\w\w/, "")
+          &String.replace(
+            &1 || "https://api.openai.com/v1",
+            ~r/\?api_version=\w\w\w\w-\w\w-\w\w/,
+            ""
+          )
         )
       end
     )
