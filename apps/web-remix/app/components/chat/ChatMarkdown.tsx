@@ -2,6 +2,7 @@ import React, { AnchorHTMLAttributes, useEffect, useRef } from "react";
 import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
 import classNames from "classnames";
 import mermaid from "mermaid";
+import { z } from "zod";
 
 interface ChatMarkdownProps {
   [key: string]: any;
@@ -292,6 +293,10 @@ function Pre({
   );
 }
 
+const MessageAttachments = z.array(
+  z.object({ id: z.number(), name: z.string() }),
+);
+
 function Code({
   children,
   className,
@@ -302,6 +307,19 @@ function Code({
     mermaid.run({
       nodes: [codeRef.current!],
     });
+  }
+  if (className?.includes("lang-buildel_message_attachments")) {
+    try {
+      const attachments = MessageAttachments.parse(
+        JSON.parse((children || "").toString()),
+      );
+      return attachments.map((attachment) => {
+        return <div>{attachment.name}</div>;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    return "Uploaded files";
   }
   return (
     <code

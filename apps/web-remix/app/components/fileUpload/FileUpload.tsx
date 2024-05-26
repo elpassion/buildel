@@ -9,6 +9,7 @@ import React, {
 import { IFile, IFileUpload, IPreviewProps } from "./fileUpload.types";
 import { assert } from "~/utils/assert";
 import classNames from "classnames";
+import { KnowledgeBaseFileResponse } from "~/api/knowledgeBase/knowledgeApi.contracts";
 
 export interface FileUploadProps extends React.HTMLProps<HTMLInputElement> {
   preview?: (props: IPreviewProps) => ReactNode;
@@ -77,7 +78,7 @@ export function FileUpload({
                   return { ...res, status: "done" };
                 }
                 return file;
-              })
+              }),
             );
           })
           .catch((e) => {
@@ -87,12 +88,12 @@ export function FileUpload({
                   return { ...file, status: "error", error: e };
                 }
                 return file;
-              })
+              }),
             );
           });
       });
     },
-    [onUpload, onChange]
+    [onUpload, onChange],
   );
 
   const handleRemove = useCallback(
@@ -107,7 +108,7 @@ export function FileUpload({
         console.error(err);
       }
     },
-    [onRemove]
+    [onRemove],
   );
 
   const handleSelectFiles = useCallback(() => {
@@ -150,4 +151,124 @@ export function FileUpload({
       })}
     </div>
   );
+}
+
+export function useFilesUpload({
+  organizationId,
+  collectionId,
+}: {
+  organizationId: number;
+  collectionId: number;
+}): {
+  fileList: IFileUpload[];
+  uploadFile: (file: File) => Promise<void>;
+  removeFile: (fileId: number) => void;
+  inputRef: React.MutableRefObject<HTMLInputElement | null>;
+  clearFiles: () => void;
+  isUploading: boolean;
+} {
+  const [fileList, setFileList] = useState<IFileUpload[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const uploadFileRequest = useCallback(
+    async (file: File): Promise<IFile> => {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(
+        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
+        {
+          body: formData,
+          method: "POST",
+        },
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.errors?.detail ?? "Something went wrong!");
+      }
+
+      const fileUpload = {
+        ...KnowledgeBaseFileResponse.parse(data),
+        status: "done" as const,
+      };
+
+      return fileUpload;
+    },
+    [organizationId, collectionId],
+  );
+
+  const removeFileRequest = useCallback(
+    async (id: number) => {
+      return fetch(
+        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/memories/${id}`,
+        {
+          method: "DELETE",
+        },
+      );
+    },
+    [organizationId, collectionId],
+  );
+
+  const uploadFile = async (file: File) => {
+    const id = Math.random();
+    setFileList((prev) => [
+      {
+        id: id,
+        file_name: file.name,
+        file_size: file.size,
+        file_type: file.type,
+        status: "uploading",
+      },
+      ...prev,
+    ]);
+    try {
+      const res = await uploadFileRequest(file);
+      setFileList((prev) =>
+        prev.map((file) => {
+          if (file.id === id) {
+            return { ...res, status: "done" };
+          }
+          return file;
+        }),
+      );
+    } catch (e) {
+      setFileList((prev) =>
+        prev.map((file) => {
+          if (file.id === id) {
+            return { ...file, status: "error", error: e };
+          }
+          return file;
+        }),
+      );
+    } finally {
+      if (!inputRef.current) return;
+      inputRef.current.value = "";
+    }
+  };
+
+  const removeFile = useCallback(async (id: number) => {
+    try {
+      if (id % 1 === 0) {
+        await removeFileRequest(id);
+      }
+
+      setFileList((prev) => prev.filter((file) => file.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  const clearFiles = useCallback(() => {
+    setFileList([]);
+  }, [setFileList]);
+
+  return {
+    fileList,
+    uploadFile,
+    removeFile,
+    inputRef,
+    clearFiles,
+    isUploading: fileList.some((upload) => upload.status === "uploading"),
+  };
 }

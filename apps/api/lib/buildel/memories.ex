@@ -120,7 +120,7 @@ defmodule Buildel.Memories do
                organization_id: organization.id,
                collection_name: collection.collection_name,
                memory_collection_id: collection.id,
-               content: "content"
+               content: chunks |> Enum.map(&Map.get(&1, :value)) |> Enum.join("\n")
              })
            )
            |> Buildel.Repo.insert(),
