@@ -234,13 +234,13 @@ defmodule Buildel.Blocks.CSVSearch do
   end
 
   @impl true
-  def handle_info({_name, :binary, binary}, state) do
+  def handle_info({_name, :binary, binary, _metadata}, state) do
     add_file(self(), {:binary, binary})
     {:noreply, state}
   end
 
   @impl true
-  def handle_info({_name, :text, text}, state) do
+  def handle_info({_name, :text, text, _metadata}, state) do
     cast(self(), {:text, text})
 
     {:noreply, state}

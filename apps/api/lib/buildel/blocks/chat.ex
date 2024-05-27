@@ -202,7 +202,7 @@ defmodule Buildel.Blocks.Chat do
     GenServer.call(pid, {:send_message, message}, 5 * 60_000)
   end
 
-  defp save_input_and_send_message(pid, {topic, :text, message}) do
+  defp save_input_and_send_message(pid, {topic, :text, message, _metadata}) do
     %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
 
     GenServer.cast(
@@ -540,7 +540,7 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_info({_name, :text, _message} = info, state) do
+  def handle_info({_name, :text, _message, _metadata} = info, state) do
     state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
     {:noreply, state}
   end

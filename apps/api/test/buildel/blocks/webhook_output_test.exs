@@ -50,12 +50,12 @@ defmodule Buildel.Blocks.WebhookOutputTest do
     text = "HAHAAH"
     test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
 
-    assert_receive {^topic, :start_stream, nil}
+    assert_receive {^topic, :start_stream, nil, _}
 
     # TODO: Introduce a mock server to test this
     # assert_receive {:webhook_called, ^url,
     # "{\"content\":\"HAHAAH\",\"context\":{\"global\":\"run1\",\"local\":\"run1\",\"parent\":\"run1\"},\"topic\":\"context::run1::block::test::io::output\"}"}
 
-    assert_receive {^topic, :stop_stream, nil}
+    assert_receive {^topic, :stop_stream, nil, _}
   end
 end

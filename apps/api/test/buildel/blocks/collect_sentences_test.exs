@@ -51,9 +51,9 @@ defmodule Buildel.Blocks.CollectSentencesTest do
       {:text, "Hello darkness my old friend."}
     )
 
-    assert_receive({^sentences_topic, :start_stream, nil})
-    assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
-    assert_receive({^sentences_topic, :stop_stream, nil})
+    assert_receive({^sentences_topic, :start_stream, nil, _})
+    assert_receive({^sentences_topic, :text, "Hello darkness my old friend.", _})
+    assert_receive({^sentences_topic, :stop_stream, nil, _})
   end
 
   @tag :skip
@@ -78,10 +78,10 @@ defmodule Buildel.Blocks.CollectSentencesTest do
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello darkness my"})
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, " old friend."})
 
-    assert_receive({^sentences_topic, :start_stream, nil})
-    refute_receive({^sentences_topic, :text, "Hello darkness my"})
-    assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
-    assert_receive({^sentences_topic, :stop_stream, nil})
+    assert_receive({^sentences_topic, :start_stream, nil, _})
+    refute_receive({^sentences_topic, :text, "Hello darkness my", _})
+    assert_receive({^sentences_topic, :text, "Hello darkness my old friend.", _})
+    assert_receive({^sentences_topic, :stop_stream, nil, _})
   end
 
   @tag :skip
@@ -107,14 +107,14 @@ defmodule Buildel.Blocks.CollectSentencesTest do
     BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
 
     assert_receive({^sentences_topic, :start_stream, nil})
-    refute_receive({^sentences_topic, :text, "Hello darkness my"})
-    assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
-    assert_receive({^sentences_topic, :stop_stream, nil})
-    assert_receive({^sentences_topic, :start_stream, nil})
-    refute_receive({^sentences_topic, :text, "Hello darkness my old friend."})
-    refute_receive({^sentences_topic, :text, "I've come to talk"})
-    assert_receive({^sentences_topic, :text, "I've come to talk with you again."})
-    assert_receive({^sentences_topic, :stop_stream, nil})
+    refute_receive({^sentences_topic, :text, "Hello darkness my", _})
+    assert_receive({^sentences_topic, :text, "Hello darkness my old friend.", _})
+    assert_receive({^sentences_topic, :stop_stream, nil, _})
+    assert_receive({^sentences_topic, :start_stream, nil, _})
+    refute_receive({^sentences_topic, :text, "Hello darkness my old friend.", _})
+    refute_receive({^sentences_topic, :text, "I've come to talk", _})
+    assert_receive({^sentences_topic, :text, "I've come to talk with you again.", _})
+    assert_receive({^sentences_topic, :stop_stream, nil, _})
   end
 
   @tag :skip
@@ -139,9 +139,9 @@ defmodule Buildel.Blocks.CollectSentencesTest do
 
     BlockPubSub.broadcast_to_io("run1", "text_test", "output", {:stop_stream, nil})
 
-    assert_receive({^sentences_topic, :start_stream, nil})
-    assert_receive({^sentences_topic, :text, "Hello darkness my old friend."})
-    assert_receive({^sentences_topic, :text, "I've come to talk with you again."})
-    assert_receive({^sentences_topic, :stop_stream, nil})
+    assert_receive({^sentences_topic, :start_stream, nil, _})
+    assert_receive({^sentences_topic, :text, "Hello darkness my old friend.", _})
+    assert_receive({^sentences_topic, :text, "I've come to talk with you again.", _})
+    assert_receive({^sentences_topic, :stop_stream, nil, _})
   end
 end

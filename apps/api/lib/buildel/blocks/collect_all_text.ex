@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.CollectAllText do
   def options() do
     %{
       type: "collect_all_text",
-      description: "This module specializes in accumulating and consolidating text input from streaming sources.",
+      description:
+        "This module specializes in accumulating and consolidating text input from streaming sources.",
       groups: ["text", "utils"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output()],
@@ -58,12 +59,12 @@ defmodule Buildel.Blocks.CollectAllText do
   end
 
   @impl true
-  def handle_info({_name, :text, message}, state) do
+  def handle_info({_name, :text, message, _metadata}, state) do
     cast(self(), {:text, message})
     {:noreply, state}
   end
 
-  def handle_stream_stop({_name, :stop_stream, _output}, state) do
+  def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do
     state = drain_text(state)
     {:noreply, state}
   end

@@ -127,6 +127,21 @@ defmodule BuildelWeb.Schemas.Runs do
     })
   end
 
+  defmodule FileInputRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "RunFileInputRequest",
+      type: :object,
+      properties: %{
+        block_name: %Schema{type: :string, description: "Block name"},
+        input_name: %Schema{type: :string, description: "Input name"},
+        file: %Schema{type: :string, description: "File", format: :binary}
+      },
+      required: [:block_name, :input_name, :file]
+    })
+  end
+
   defmodule StartRequest do
     require OpenApiSpex
 

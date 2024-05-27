@@ -20,7 +20,7 @@ defmodule Buildel.Logs do
     {:noreply, state}
   end
 
-  defp log_message({topic, message_type, content}) do
+  defp log_message({topic, message_type, content, _metadata}) do
     %{block: block_name, io: output_name, context: context} =
       Buildel.BlockPubSub.io_from_topic(topic)
 

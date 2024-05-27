@@ -67,7 +67,7 @@ defmodule Buildel.Blocks.FileInput do
   end
 
   @impl true
-  def handle_info({_name, :binary, chunk}, state) do
+  def handle_info({_name, :binary, chunk, _metadata}, state) do
     cast(self(), {:binary, chunk})
     {:noreply, state}
   end

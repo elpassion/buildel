@@ -82,10 +82,10 @@ defmodule Buildel.Blocks.ChatTest do
     text = "Hello darkness my old friend."
     test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
 
-    assert_receive({^messages_topic, :text, "Hello darkness my old friend."})
-    assert_receive({^topic, :text, "Hell"})
-    assert_receive({^topic, :text, "o!"})
-    assert_receive({^topic, :text, " How are you?"})
+    assert_receive({^messages_topic, :text, "Hello darkness my old friend.", _})
+    assert_receive({^topic, :text, "Hell", _})
+    assert_receive({^topic, :text, "o!", _})
+    assert_receive({^topic, :text, " How are you?", _})
   end
 
   test "interpolates inputs" do
@@ -123,6 +123,6 @@ defmodule Buildel.Blocks.ChatTest do
       {:text, "Hello darkness my old friend."}
     )
 
-    assert_receive({^topic, :text, " How are you?"})
+    assert_receive({^topic, :text, " How are you?", _})
   end
 end

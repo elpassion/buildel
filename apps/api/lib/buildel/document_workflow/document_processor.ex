@@ -147,33 +147,36 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
             level -> level
           end
 
-        case item["tag"] do
-          "header" ->
+        case {item["tag"], item["sentences"]} do
+          {"table", nil} ->
+            Table.from_item(UUID.uuid4(), level, %{page: item["page_idx"]}, item)
+
+          {_, nil} ->
+            nil
+
+          {"header", sentences} ->
             %Header{
               id: UUID.uuid4(),
               level: level,
               metadata: %{page: item["page_idx"]},
-              value: Enum.join(item["sentences"], " ")
+              value: Enum.join(sentences, " ")
             }
 
-          "para" ->
+          {"para", sentences} ->
             %Paragraph{
               id: UUID.uuid4(),
               level: level,
               metadata: %{page: item["page_idx"]},
-              value: Enum.join(item["sentences"], " ")
+              value: Enum.join(sentences, " ")
             }
 
-          "list_item" ->
+          {"list_item", sentences} ->
             %ListItem{
               id: UUID.uuid4(),
               level: level,
               metadata: %{page: item["page_idx"]},
-              value: Enum.join(item["sentences"], " ")
+              value: Enum.join(sentences, " ")
             }
-
-          "table" ->
-            Table.from_item(UUID.uuid4(), level, %{page: item["page_idx"]}, item)
 
           _ ->
             nil

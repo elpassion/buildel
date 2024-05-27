@@ -52,9 +52,9 @@ defmodule Buildel.Blocks.TimerTest do
       {:text, "whatever"}
     )
 
-    assert_receive({^topic, :start_stream, nil})
-    assert_receive({^topic, :text, "0"})
-    assert_receive({^topic, :stop_stream, nil})
+    assert_receive({^topic, :start_stream, nil, _})
+    assert_receive({^topic, :text, "0", _})
+    assert_receive({^topic, :stop_stream, nil, _})
   end
 
   test "resets timer on second stream" do
@@ -90,9 +90,9 @@ defmodule Buildel.Blocks.TimerTest do
       {:text, "whatever2"}
     )
 
-    assert_receive({^topic, :start_stream, nil})
-    assert_receive({^topic, :text, "0"})
-    assert_receive({^topic, :stop_stream, nil})
-    refute_receive({^topic, :text, "0"})
+    assert_receive({^topic, :start_stream, nil, _})
+    assert_receive({^topic, :text, "0", _})
+    assert_receive({^topic, :stop_stream, nil, _})
+    refute_receive({^topic, :text, "0", _})
   end
 end

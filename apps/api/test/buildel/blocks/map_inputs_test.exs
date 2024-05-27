@@ -56,9 +56,9 @@ defmodule Buildel.Blocks.MapInputsTest do
       {:text, "Hello darkness my old friend."}
     )
 
-    assert_receive({^topic, :start_stream, nil})
-    assert_receive({^topic, :text, "dupa"})
-    assert_receive({^topic, :stop_stream, nil})
+    assert_receive({^topic, :start_stream, nil, _})
+    assert_receive({^topic, :text, "dupa", _})
+    assert_receive({^topic, :stop_stream, nil, _})
   end
 
   test "outputs value inside template" do
@@ -88,9 +88,9 @@ defmodule Buildel.Blocks.MapInputsTest do
       {:text, "Hello darkness my old friend."}
     )
 
-    assert_receive({^topic, :start_stream, nil})
-    assert_receive({^topic, :text, "dupa Hello darkness my old friend."})
-    assert_receive({^topic, :stop_stream, nil})
+    assert_receive({^topic, :start_stream, nil, _})
+    assert_receive({^topic, :text, "dupa Hello darkness my old friend.", _})
+    assert_receive({^topic, :stop_stream, nil, _})
   end
 
   test "waits for all templates to be filled before emitting" do
@@ -121,15 +121,15 @@ defmodule Buildel.Blocks.MapInputsTest do
     {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello"})
-    assert_receive({^topic, :start_stream, nil})
-    refute_received({^topic, :text, _message})
-    refute_received({^topic, :stop_stream, nil})
+    assert_receive({^topic, :start_stream, nil, _})
+    refute_received({^topic, :text, _message, _})
+    refute_received({^topic, :stop_stream, nil, _})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World"})
-    assert_receive({^topic, :text, "dupa Hello World"})
-    assert_receive({^topic, :stop_stream, nil})
+    assert_receive({^topic, :text, "dupa Hello World", _})
+    assert_receive({^topic, :stop_stream, nil, _})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World 2"})
-    assert_receive({^topic, :text, "dupa Hello World 2"})
-    assert_receive({^topic, :stop_stream, nil})
+    assert_receive({^topic, :text, "dupa Hello World 2", _})
+    assert_receive({^topic, :stop_stream, nil, _})
   end
 
   test "resets after emitting if reset is true" do
@@ -156,11 +156,11 @@ defmodule Buildel.Blocks.MapInputsTest do
 
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello"})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World"})
-    assert_receive({^topic, :text, "dupa Hello World"})
-    assert_receive({^topic, :stop_stream, nil})
+    assert_receive({^topic, :text, "dupa Hello World", _})
+    assert_receive({^topic, :stop_stream, nil, _})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World 2"})
-    refute_receive({^topic, :text, "dupa Hello World 2"})
+    refute_receive({^topic, :text, "dupa Hello World 2", _})
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello 2"})
-    assert_receive({^topic, :text, "dupa Hello 2 World 2"})
+    assert_receive({^topic, :text, "dupa Hello 2 World 2", _})
   end
 end

@@ -12,7 +12,8 @@ defmodule Buildel.Blocks.CollectSentences do
   def options() do
     %{
       type: "collect_sentences",
-      description: "This module segmenting and extracting individual sentences from continuous text streams.",
+      description:
+        "This module segmenting and extracting individual sentences from continuous text streams.",
       groups: ["text", "utils"],
       inputs: [Block.text_input()],
       outputs: [sentences_output()],
@@ -80,12 +81,12 @@ defmodule Buildel.Blocks.CollectSentences do
   end
 
   @impl true
-  def handle_info({_name, :text, message}, state) do
+  def handle_info({_name, :text, message, _metadata}, state) do
     cast(self(), {:text, message})
     {:noreply, state}
   end
 
-  def handle_stream_stop({_name, :stop_stream, _output}, state) do
+  def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do
     state = drain_text(state)
     {:noreply, state}
   end

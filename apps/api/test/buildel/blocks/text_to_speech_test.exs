@@ -48,6 +48,6 @@ defmodule Buildel.Blocks.TextToSpeechTest do
     text = "Hello darkness my old friend."
     test_run |> BlocksTestRunner.Run.input("test_input", "input", {:text, text})
 
-    assert_receive({^topic, :binary, _})
+    assert_receive({^topic, :binary, _, _})
   end
 end

@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.AudioOutput do
   def options() do
     %{
       type: "audio_output",
-      description: "It's designed to work seamlessly with other audio-related blocks in Buildel, ensuring smooth and flexible audio output capabilities in applications.",
+      description:
+        "It's designed to work seamlessly with other audio-related blocks in Buildel, ensuring smooth and flexible audio output capabilities in applications.",
       groups: ["audio", "inputs / outputs"],
       inputs: [Block.audio_input()],
       outputs: [Block.audio_output("output", true)],
@@ -64,7 +65,7 @@ defmodule Buildel.Blocks.AudioOutput do
   end
 
   @impl true
-  def handle_info({_name, :binary, chunk}, state) do
+  def handle_info({_name, :binary, chunk, _metadata}, state) do
     cast(self(), {:binary, chunk})
     {:noreply, state}
   end

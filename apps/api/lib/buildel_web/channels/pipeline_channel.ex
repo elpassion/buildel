@@ -131,7 +131,7 @@ defmodule BuildelWeb.PipelineChannel do
     Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
   end
 
-  def handle_info({output_name, :binary, chunk}, socket) do
+  def handle_info({output_name, :binary, chunk, _metadata}, socket) do
     Logger.debug("Channel Sending binary chunk to #{output_name}")
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
@@ -140,7 +140,7 @@ defmodule BuildelWeb.PipelineChannel do
     {:noreply, socket}
   end
 
-  def handle_info({output_name, :text, message}, socket) do
+  def handle_info({output_name, :text, message, _metadata}, socket) do
     Logger.debug("Channel Sending text chunk to #{output_name}")
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
@@ -149,7 +149,7 @@ defmodule BuildelWeb.PipelineChannel do
     {:noreply, socket}
   end
 
-  def handle_info({output_name, :start_stream, _}, socket) do
+  def handle_info({output_name, :start_stream, _, _metadata}, socket) do
     case parse_topic(output_name) do
       %{io: nil, block: block_name} ->
         socket |> Phoenix.Channel.push("start:#{block_name}", %{})
@@ -161,7 +161,7 @@ defmodule BuildelWeb.PipelineChannel do
     {:noreply, socket}
   end
 
-  def handle_info({output_name, :stop_stream, _}, socket) do
+  def handle_info({output_name, :stop_stream, _, _metadata}, socket) do
     case parse_topic(output_name) do
       %{io: nil, block: block_name} ->
         socket |> Phoenix.Channel.push("stop:#{block_name}", %{})
@@ -173,7 +173,7 @@ defmodule BuildelWeb.PipelineChannel do
     {:noreply, socket}
   end
 
-  def handle_info({output_name, :error, errors}, socket) do
+  def handle_info({output_name, :error, errors, _metadata}, socket) do
     case parse_topic(output_name) do
       %{io: nil, block: block_name} ->
         socket |> Phoenix.Channel.push("error:#{block_name}", %{errors: errors})

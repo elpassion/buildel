@@ -169,7 +169,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
   end
 
   @impl true
-  def handle_info({name, :text, message}, state) do
+  def handle_info({name, :text, message, _metadata}, state) do
     state = save_latest_input_value(state, name, message)
     {:noreply, state}
   end

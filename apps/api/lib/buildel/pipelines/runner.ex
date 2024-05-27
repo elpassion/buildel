@@ -36,9 +36,9 @@ defmodule Buildel.Pipelines.Runner do
     end
   end
 
-  def cast_run(%Run{} = run, block_name, input_name, data) do
+  def cast_run(%Run{} = run, block_name, input_name, data, metadata \\ %{}) do
     context_id = Buildel.Pipelines.Worker.context_id(run)
-    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
+    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, metadata)
     {:ok, run}
   end
 

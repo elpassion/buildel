@@ -229,7 +229,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   @impl true
-  def handle_info({_name, :text, message}, state) do
+  def handle_info({_name, :text, message, _metadata}, state) do
     case Jason.decode(message) do
       {:ok, decoded} ->
         cast(self(), decoded)
