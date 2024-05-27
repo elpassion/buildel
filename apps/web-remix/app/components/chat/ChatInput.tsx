@@ -1,17 +1,21 @@
+import { Icon } from "@elpassion/taco";
+import classNames from "classnames";
 import React, { useMemo, useRef, useState } from "react";
 import { useBoolean, useIsomorphicLayoutEffect } from "usehooks-ts";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import { FileUpload, useFilesUpload } from "../fileUpload/FileUpload";
-import { setFiles } from "@testing-library/user-event/dist/cjs/utils/index.js";
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
   generating?: boolean;
   disabled?: boolean;
+  prefix?: React.ReactNode;
 }
 
-export function ChatInput({ onSubmit, generating, disabled }: ChatInputProps) {
+export function ChatInput({
+  onSubmit,
+  generating,
+  disabled,
+  prefix,
+}: ChatInputProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [value, setValue] = useState("");
@@ -20,22 +24,11 @@ export function ChatInput({ onSubmit, generating, disabled }: ChatInputProps) {
     setTrue: setFocus,
     setFalse: setBlur,
   } = useBoolean(false);
-  const {
-    fileList,
-    removeFile,
-    uploadFile,
-    inputRef,
-    clearFiles,
-    isUploading,
-  } = useFilesUpload({
-    organizationId: 6,
-    collectionId: 6,
-  });
 
   useAutosizeTextArea(textareaRef.current, value);
 
   const isDisabled = useMemo(() => {
-    return disabled || generating || !value.trim() || isUploading;
+    return disabled || generating || !value.trim();
   }, [value, generating, disabled]);
 
   const onFocus = () => {
@@ -52,20 +45,8 @@ export function ChatInput({ onSubmit, generating, disabled }: ChatInputProps) {
 
   const handleOnSubmit = () => {
     if (isDisabled) return;
-    const files = fileList
-      .map((file) =>
-        file.status === "done" ? { id: file.id, name: file.file_name } : null,
-      )
-      .filter((f) => !!f);
-    const filesString = files.length
-      ? `
-\`\`\`buildel_message_attachments
-${JSON.stringify(files)}
-\`\`\`\n`
-      : "";
-    onSubmit(`${filesString}${value}`);
+    onSubmit(value);
     setValue("");
-    clearFiles();
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -87,33 +68,7 @@ ${JSON.stringify(files)}
         },
       )}
     >
-      {process.env.NODE_ENV === "development" && (
-        <div className="w-full">
-          {fileList.map((file) => {
-            return (
-              <div className="text-white px-1">
-                {file.status} {file.file_name}
-                <button onClick={() => removeFile(file.id)} className="ml-2">
-                  R
-                </button>
-              </div>
-            );
-          })}
-          <label className="text-white px-1">
-            U
-            <input
-              ref={inputRef}
-              type="file"
-              className="hidden"
-              onChange={(e) => {
-                [...(e.target.files || [])].forEach((file) => {
-                  uploadFile(file);
-                });
-              }}
-            />
-          </label>
-        </div>
-      )}
+      {prefix}
       <form
         className="flex flex-1 w-full"
         ref={formRef}

@@ -155,10 +155,14 @@ export function FileUpload({
 
 export function useFilesUpload({
   organizationId,
-  collectionId,
+  pipelineId,
+  runId,
+  fileBlockName,
 }: {
   organizationId: number;
-  collectionId: number;
+  pipelineId: number;
+  runId: number;
+  fileBlockName: string;
 }): {
   fileList: IFileUpload[];
   uploadFile: (file: File) => Promise<void>;
@@ -174,9 +178,11 @@ export function useFilesUpload({
     async (file: File): Promise<IFile> => {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("block_name", fileBlockName);
+      formData.append("input_name", "input");
 
       const response = await fetch(
-        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
+        `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
         {
           body: formData,
           method: "POST",
@@ -195,19 +201,27 @@ export function useFilesUpload({
 
       return fileUpload;
     },
-    [organizationId, collectionId],
+    [organizationId, pipelineId, runId],
   );
 
   const removeFileRequest = useCallback(
     async (id: number) => {
       return fetch(
-        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/memories/${id}`,
+        `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
         {
           method: "DELETE",
+          body: JSON.stringify({
+            file_id: id,
+            block_name: fileBlockName,
+            input_name: "input",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
       );
     },
-    [organizationId, collectionId],
+    [organizationId, pipelineId, runId],
   );
 
   const uploadFile = async (file: File) => {
@@ -247,17 +261,20 @@ export function useFilesUpload({
     }
   };
 
-  const removeFile = useCallback(async (id: number) => {
-    try {
-      if (id % 1 === 0) {
-        await removeFileRequest(id);
-      }
+  const removeFile = useCallback(
+    async (id: number) => {
+      try {
+        if (id % 1 === 0 || typeof id === "string") {
+          await removeFileRequest(id);
+        }
 
-      setFileList((prev) => prev.filter((file) => file.id !== id));
-    } catch (err) {
-      console.error(err);
-    }
-  }, []);
+        setFileList((prev) => prev.filter((file) => file.id !== id));
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [removeFileRequest, setFileList],
+  );
 
   const clearFiles = useCallback(() => {
     setFileList([]);

@@ -121,6 +121,18 @@ defmodule BuildelWeb.Router do
       :input
     )
 
+    post(
+      "/organizations/:organization_id/pipelines/:pipeline_id/runs/:id/input_file",
+      OrganizationPipelineRunController,
+      :input_file
+    )
+
+    delete(
+      "/organizations/:organization_id/pipelines/:pipeline_id/runs/:id/input_file",
+      OrganizationPipelineRunController,
+      :input_file_delete
+    )
+
     resources(
       "/organizations/:organization_id/pipelines/:pipeline_id/runs",
       OrganizationPipelineRunController,

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { ChatWrapper } from "~/components/chat/ChatWrapper";
 import { ChatHeading } from "~/components/chat/ChatHeading";
 import { ChatMessages } from "~/components/chat/ChatMessages";
@@ -20,6 +20,7 @@ import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { UnauthorizedError } from "~/utils/errors";
 import { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
 import { ParsedResponse } from "~/utils/fetch.server";
+import { useFilesUpload } from "~/components/fileUpload/FileUpload";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -74,6 +75,36 @@ export default function WebsiteChat() {
     useAuth: !(pipeline.interface_config?.public ?? false),
   });
 
+  const {
+    fileList,
+    removeFile,
+    uploadFile,
+    inputRef,
+    clearFiles,
+    isUploading,
+  } = useFilesUpload({
+    organizationId: parseInt(organizationId),
+    pipelineId: parseInt(pipelineId),
+    runId: runId,
+    fileBlockName: "file_input_1",
+  });
+
+  const onSubmit = useCallback((value: string) => {
+    const files = fileList
+      .map((file) =>
+        file.status === "done" ? { id: file.id, name: file.file_name } : null,
+      )
+      .filter((f) => !!f);
+    const filesString = files.length
+      ? `
+\`\`\`buildel_message_attachments
+${JSON.stringify(files)}
+\`\`\`\n`
+      : "";
+    pushMessage(`${filesString}${value}`);
+    clearFiles();
+  }, []);
+
   useEffect(() => {
     // todo change it
     setTimeout(() => {
@@ -105,9 +136,41 @@ export default function WebsiteChat() {
         </ChatMessagesWrapper>
 
         <ChatInput
-          onSubmit={pushMessage}
-          disabled={connectionStatus !== "running"}
+          onSubmit={onSubmit}
+          disabled={connectionStatus !== "running" || isUploading}
           generating={isGenerating}
+          prefix={
+            process.env.NODE_ENV === "development" && (
+              <div className="w-full">
+                {fileList.map((file) => {
+                  return (
+                    <div className="text-white px-1">
+                      {file.status} {file.file_name}
+                      <button
+                        onClick={() => removeFile(file.id)}
+                        className="ml-2"
+                      >
+                        R
+                      </button>
+                    </div>
+                  );
+                })}
+                <label className="text-white px-1">
+                  U
+                  <input
+                    ref={inputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                      [...(e.target.files || [])].forEach((file) => {
+                        uploadFile(file);
+                      });
+                    }}
+                  />
+                </label>
+              </div>
+            )
+          }
         />
 
         <IntroPanel className={classNames({ hidden: !!messages.length })}>

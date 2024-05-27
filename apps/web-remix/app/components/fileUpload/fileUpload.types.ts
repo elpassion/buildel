@@ -1,5 +1,5 @@
 export interface IFile {
-  id: number;
+  id: number | string;
   file_name: string;
   file_size: number;
   file_type: string;

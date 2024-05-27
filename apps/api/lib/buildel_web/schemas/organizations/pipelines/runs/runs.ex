@@ -142,6 +142,21 @@ defmodule BuildelWeb.Schemas.Runs do
     })
   end
 
+  defmodule FileInputRemoveRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "RunFileInputRemoveRequest",
+      type: :object,
+      properties: %{
+        block_name: %Schema{type: :string, description: "Block name"},
+        input_name: %Schema{type: :string, description: "Input name"},
+        file_id: %Schema{type: :string, description: "File ID"}
+      },
+      required: [:block_name, :input_name, :file_id]
+    })
+  end
+
   defmodule StartRequest do
     require OpenApiSpex
 
