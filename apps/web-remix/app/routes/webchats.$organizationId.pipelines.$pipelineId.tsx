@@ -38,7 +38,7 @@ export async function loader(args: LoaderFunctionArgs) {
     if (!pipeline) {
       pipeline = await pipelineApi.getPublicPipeline(
         params.organizationId,
-        params.pipelineId
+        params.pipelineId,
       );
     }
 
@@ -64,6 +64,7 @@ export default function WebsiteChat() {
     stopRun,
     startRun,
     messages,
+    runId,
   } = useChat({
     input: pipeline.interface_config?.input ?? "",
     output: pipeline.interface_config?.output ?? "",

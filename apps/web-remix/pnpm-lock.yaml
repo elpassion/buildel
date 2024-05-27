@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@buildel/buildel':
-    specifier: ^0.2.5
-    version: 0.2.5
+    specifier: ^0.2.6
+    version: 0.2.6
   '@codemirror/autocomplete':
     specifier: ^6.15.0
     version: 6.15.0(@codemirror/language@6.10.1)(@codemirror/state@6.4.1)(@codemirror/view@6.26.0)(@lezer/common@1.2.1)
@@ -734,8 +734,8 @@ packages:
     resolution: {integrity: sha512-s3jaWicZd0pkP0jf5ysyHUI/RE7MHos6qlToFcGWXVp+ykHOy77OUMrfbgJ9it2C5bow7OIQwYYaHjk9XlBQ2A==}
     dev: false
 
-  /@buildel/buildel@0.2.5:
-    resolution: {integrity: sha512-R+k6ycCWY0KwPDv4xz4y96ehJYYlG05rN1IYd9IzlJTRl1v5qZgfbrZ/jF5k71exG02s2oip4dlSnhyhe0qsQA==}
+  /@buildel/buildel@0.2.6:
+    resolution: {integrity: sha512-8gl3aC3PfuCd9gZOAr8fzD05klcqSEYbD+1fbBhVUmjUxuWxN61u/shxA4LGq3SlkVY/vnkK3nWVaU6gY50S9g==}
     dependencies:
       phoenix: 1.7.11
       uuid: 9.0.1

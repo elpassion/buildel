@@ -14,7 +14,7 @@ interface UseChatProps {
   onBlockOutput?: (
     blockId: string,
     outputName: string,
-    payload: unknown
+    payload: unknown,
   ) => void;
   onFinish?: () => void;
   useAuth?: boolean;
@@ -37,7 +37,7 @@ export const useChat = ({
   const onBlockOutput = (
     blockId: string,
     _outputName: string,
-    payload: unknown
+    payload: unknown,
   ) => {
     onBlockOutputProps?.(blockId, _outputName, payload);
     // todo: just text_output for now
@@ -88,14 +88,14 @@ export const useChat = ({
     setIsGenerating(false);
   };
 
-  const { startRun, stopRun, push, status } = usePipelineRun(
+  const { startRun, stopRun, push, status, id } = usePipelineRun(
     organizationId,
     pipelineId,
     onBlockOutput,
     onStatusChange,
     onBlockError,
     onError,
-    useAuthWithDefault
+    useAuthWithDefault,
   );
 
   const clearMessages = () => {
@@ -125,5 +125,6 @@ export const useChat = ({
     clearMessages,
     pushMessage: handlePush,
     connectionStatus: status,
+    runId: id,
   };
 };
