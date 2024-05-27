@@ -153,7 +153,13 @@ ${JSON.stringify(files)}
                 {fileList.map((file) => {
                   return (
                     <div
-                      className="text-white px-1 border border-neutral-700 rounded-md flex items-center gap-1"
+                      className={classNames(
+                        "text-white px-1 border rounded-md flex items-center gap-1",
+                        {
+                          "border-neutral-700": file.status === "done",
+                          "border-neutral-900": file.status !== "done",
+                        },
+                      )}
                       key={file.id}
                     >
                       {file.file_name}
@@ -169,7 +175,7 @@ ${JSON.stringify(files)}
           prefix={
             process.env.NODE_ENV === "development" &&
             pipeline.interface_config?.file && (
-              <label className="text-white pl-2">
+              <label className="text-white pl-2 cursor-pointer">
                 <Icon iconName="upload" />
                 <input
                   ref={inputRef}
