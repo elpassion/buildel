@@ -34,6 +34,13 @@ defmodule Buildel.CSVSearch do
     end)
   end
 
+  def handle_delete(repo_pid, table_name) do
+    case Ecto.Adapters.SQL.query(repo_pid, "DROP TABLE #{table_name}") do
+      {:ok, _result} -> :ok
+      {:error, reason} -> {:error, "Failed to delete table: #{reason}"}
+    end
+  end
+
   def handle_upload(repo_pid, file) do
     with {:ok, pid} <- StringIO.open(file) do
       process_file(repo_pid, pid)

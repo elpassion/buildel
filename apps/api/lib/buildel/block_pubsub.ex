@@ -57,7 +57,9 @@ defmodule Buildel.BlockPubSub do
   end
 
   defp broadcast(topic, {message_type, content} = message, metadata \\ %{}) do
-    Logger.debug("Broadcasting to topic: #{topic}, message: #{inspect(message)}")
+    Logger.debug(
+      "Broadcasting to topic: #{topic}, message: #{inspect(message)}, metadata: #{inspect(metadata)})"
+    )
 
     Buildel.PubSub
     |> PubSub.broadcast!("buildel::logger", {topic, message_type, content, metadata})

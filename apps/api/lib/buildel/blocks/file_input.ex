@@ -34,8 +34,8 @@ defmodule Buildel.Blocks.FileInput do
 
   # Client
 
-  def send_file(pid, {:binary, _chunk} = audio) do
-    GenServer.cast(pid, {:send_file, audio})
+  def send_file(pid, {{:binary, _chunk} = audio, metadata}) do
+    GenServer.cast(pid, {:send_file, audio, metadata})
   end
 
   # Server
@@ -51,14 +51,15 @@ defmodule Buildel.Blocks.FileInput do
   end
 
   @impl true
-  def handle_cast({:send_file, {:binary, _chunk} = file}, state) do
+  def handle_cast({:send_file, {:binary, _chunk} = file, metadata}, state) do
     state = send_stream_start(state)
 
     BlockPubSub.broadcast_to_io(
       state[:context_id],
       state[:block_name],
       "output",
-      file
+      file,
+      metadata
     )
 
     state = schedule_stream_stop(state)
@@ -67,13 +68,21 @@ defmodule Buildel.Blocks.FileInput do
   end
 
   @impl true
-  def handle_info({_name, :text, _, _metadata}, state) do
+  def handle_info({_name, :text, file_id, %{method: :delete}}, state) do
+    BlockPubSub.broadcast_to_io(
+      state[:context_id],
+      state[:block_name],
+      "output",
+      {:text, file_id},
+      %{method: :delete}
+    )
+
     {:noreply, state}
   end
 
   @impl true
-  def handle_info({_name, :binary, chunk, _metadata}, state) do
-    cast(self(), {:binary, chunk})
+  def handle_info({_name, :binary, chunk, metadata}, state) do
+    cast(self(), {{:binary, chunk}, metadata})
     {:noreply, state}
   end
 end

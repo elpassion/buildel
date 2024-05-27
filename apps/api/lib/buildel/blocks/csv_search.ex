@@ -13,7 +13,11 @@ defmodule Buildel.Blocks.CSVSearch do
       type: "csv_search",
       description: "Used for SQL searching and retrieval of information from CSV files",
       groups: ["file", "memory"],
-      inputs: [Block.file_memory_input("files", true), Block.text_input("query")],
+      inputs: [
+        Block.file_input("input", false),
+        Block.file_memory_input("files", true),
+        Block.text_input("query")
+      ],
       outputs: [Block.text_output()],
       ios: [Block.io("tool", "worker")],
       schema: schema()
@@ -49,6 +53,10 @@ defmodule Buildel.Blocks.CSVSearch do
 
   def add_file(pid, file) do
     GenServer.cast(pid, {:add_file, file})
+  end
+
+  def delete_file(pid, file_id) do
+    GenServer.cast(pid, {:delete_file, file_id})
   end
 
   # Server
@@ -120,14 +128,46 @@ defmodule Buildel.Blocks.CSVSearch do
     {:noreply, state}
   end
 
-  def handle_cast({:add_file, {:binary, file}}, state) do
+  def handle_cast({:delete_file, file_id}, state) do
     state = send_stream_start(state)
 
+    table_name =
+      state[:table_names]
+      |> Enum.find(fn {_, _, id} -> id == file_id end)
+      |> elem(0)
+
+    {_, repo_pid} = state[:repo]
+
+    with :ok <- Buildel.CSVSearch.handle_delete(repo_pid, table_name) do
+      state =
+        Map.update(state, :table_names, [], fn table_names ->
+          Enum.reject(table_names, fn {_, _, id} -> id == file_id end)
+        end)
+
+      state = send_stream_stop(state)
+      {:noreply, state}
+    else
+      {:error, message} ->
+        send_error(state, message)
+        state = schedule_stream_stop(state)
+        {:noreply, state}
+
+      _ ->
+        send_error(state, "Unknown error")
+        state = schedule_stream_stop(state)
+        {:noreply, state}
+    end
+  end
+
+  def handle_cast({:add_file, {:binary, file, metadata}}, state) do
+    state = send_stream_start(state)
+
+    file_id = Map.get(metadata, :file_id, UUID.uuid4())
     {_, repo_pid} = state[:repo]
 
     with {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file) do
       state =
-        Map.update(state, :table_names, [{table_name, headers}], fn table_names ->
+        Map.update(state, :table_names, [{table_name, headers, file_id}], fn table_names ->
           [{table_name, headers} | table_names]
         end)
 
@@ -194,7 +234,7 @@ defmodule Buildel.Blocks.CSVSearch do
 
         table_names ->
           table_names
-          |> Enum.map(fn {table, columns} -> "#{table}: #{Enum.join(columns, ", ")}" end)
+          |> Enum.map(fn {table, columns, _file_id} -> "#{table}: #{Enum.join(columns, ", ")}" end)
           |> Enum.join("\n")
       end
 
@@ -234,8 +274,14 @@ defmodule Buildel.Blocks.CSVSearch do
   end
 
   @impl true
-  def handle_info({_name, :binary, binary, _metadata}, state) do
-    add_file(self(), {:binary, binary})
+  def handle_info({_name, :binary, binary, metadata}, state) do
+    add_file(self(), {:binary, binary, metadata})
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info({_name, :text, file_id, %{method: :delete}}, state) do
+    delete_file(self(), file_id)
     {:noreply, state}
   end
 

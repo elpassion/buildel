@@ -398,8 +398,9 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_running_pipeline_run(pipeline, id),
+         {:ok, file_content} <- File.read(file |> Map.get(:path)),
          {:ok, _run} <-
-           Pipelines.Runner.cast_run(run, block_name, input_name, {:binary, file}, %{
+           Pipelines.Runner.cast_run(run, block_name, input_name, {:binary, file_content}, %{
              file_id: file_id
            }) do
       render(conn, :input_file,
@@ -463,7 +464,9 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_running_pipeline_run(pipeline, id),
          {:ok, run} <-
-           Pipelines.Runner.cast_run(run, block_name, input_name, {:text, file_id}) do
+           Pipelines.Runner.cast_run(run, block_name, input_name, {:text, file_id}, %{
+             method: :delete
+           }) do
       render(conn, :show, run: run)
     else
       {:error, :not_running} -> {:error, :bad_request}
