@@ -73,11 +73,11 @@ export class BuildelSocket {
       onStatusChange?: (status: BuildelRunStatus) => void;
     }
   ) {
-    const onBlockOutput = handlers?.onBlockOutput ?? (() => {});
-    const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => {});
-    const onStatusChange = handlers?.onStatusChange ?? (() => {});
-    const onBlockError = handlers?.onBlockError ?? (() => {});
-    const onError = handlers?.onError ?? (() => {});
+    const onBlockOutput = handlers?.onBlockOutput ?? (() => { });
+    const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => { });
+    const onStatusChange = handlers?.onStatusChange ?? (() => { });
+    const onBlockError = handlers?.onBlockError ?? (() => { });
+    const onError = handlers?.onError ?? (() => { });
 
     return new BuildelRun(
       this.socket,
@@ -100,6 +100,7 @@ export class BuildelSocket {
 
 export class BuildelRun {
   private channel: Channel | null = null;
+  public runId: string | null = null;
 
   public constructor(
     private readonly socket: Socket,
@@ -120,7 +121,7 @@ export class BuildelRun {
       onBlockError: (blockId: string, errors: string[]) => void;
       onError: (error: string) => void;
     }
-  ) {}
+  ) { }
 
   public async start(args: BuildelRunStartArgs = { initial_inputs: [] }) {
     if (this.status !== "idle") return;
@@ -175,7 +176,8 @@ export class BuildelRun {
 
     return new Promise<BuildelRun>((resolve, reject) => {
       assert(this.channel);
-      this.channel.join().receive("ok", () => {
+      this.channel.join().receive("ok", response => {
+        this.runId = response.run.id;
         resolve(this);
         this.handlers.onStatusChange("running");
       });
