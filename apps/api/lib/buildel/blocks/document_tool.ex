@@ -15,7 +15,9 @@ defmodule Buildel.Blocks.DocumentTool do
       description:
         "It's a powerful tool for applications requiring quick and precise access to specific documents stored in Buildel's knowledge bases.",
       groups: ["text", "tools"],
-      inputs: [],
+      inputs: [
+        Block.file_input("input", false)
+      ],
       outputs: [],
       ios: [Block.io("tool", "worker")],
       schema: schema()
@@ -62,6 +64,10 @@ defmodule Buildel.Blocks.DocumentTool do
     GenServer.call(pid, {:query, text})
   end
 
+  def add_file(pid, file) do
+    GenServer.cast(pid, {:add_file, file})
+  end
+
   # Server
 
   @impl true
@@ -85,8 +91,34 @@ defmodule Buildel.Blocks.DocumentTool do
     {:noreply, state}
   end
 
+  def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
+    state = send_stream_start(state)
+
+    %{global: organization_id} = block_context().context_from_context_id(state[:context_id])
+    collection_id = state[:collection]
+
+    organization = Buildel.Organizations.get_organization!(organization_id)
+    {:ok, collection} = Buildel.Memories.get_organization_collection(organization, collection_id)
+
+    Buildel.Memories.create_organization_memory(
+      organization,
+      collection,
+      %{
+        path: file_path,
+        type: metadata |> Map.get(:file_type),
+        name: metadata |> Map.get(:file_name)
+      },
+      %{
+        file_uuid: metadata |> Map.get(:file_id)
+      }
+    )
+
+    state = send_stream_stop(state)
+    {:noreply, state}
+  end
+
   @impl true
-  def handle_call({:query, {:text, document_id}}, _caller, state) do
+  def handle_call({:query, {:text, file_uuid}}, _caller, state) do
     state = state |> send_stream_start()
 
     %{global: global} =
@@ -95,7 +127,11 @@ defmodule Buildel.Blocks.DocumentTool do
     organization = global |> Buildel.Organizations.get_organization!()
 
     memory =
-      Buildel.Memories.get_collection_memory!(organization, state[:collection], document_id)
+      Buildel.Memories.get_collection_memory_by_file_uuid!(
+        organization,
+        state[:collection],
+        file_uuid
+      )
 
     state = state |> schedule_stream_stop()
 
@@ -114,8 +150,8 @@ defmodule Buildel.Blocks.DocumentTool do
           type: "object",
           properties: %{
             document_id: %{
-              type: "number",
-              description: "Document id"
+              type: "string",
+              description: "Document id (uuid)"
             }
           },
           required: ["document_id"]
@@ -141,6 +177,12 @@ defmodule Buildel.Blocks.DocumentTool do
   @impl true
   def handle_info({_name, :text, text, _metadata}, state) do
     cast(self(), {:text, text})
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info({_name, :binary, binary, metadata}, state) do
+    add_file(self(), {:binary, binary, metadata})
     {:noreply, state}
   end
 

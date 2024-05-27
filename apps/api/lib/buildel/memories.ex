@@ -76,9 +76,10 @@ defmodule Buildel.Memories do
   def create_organization_memory(
         %Buildel.Organizations.Organization{} = organization,
         %Buildel.Memories.MemoryCollection{} = collection,
-        file
+        file,
+        metadata \\ %{}
       ) do
-    metadata = Buildel.FileLoader.file_properties(file)
+    metadata = Map.merge(metadata, Buildel.FileLoader.file_properties(file))
 
     {:ok, api_key} =
       Organizations.get_organization_secret(organization, collection.embeddings_secret_name)
@@ -273,15 +274,15 @@ defmodule Buildel.Memories do
     |> Buildel.Repo.preload(:memory_collection)
   end
 
-  def get_collection_memory!(
+  def get_collection_memory_by_file_uuid!(
         %Buildel.Organizations.Organization{} = organization,
         collection_id,
-        id
+        file_uuid
       ) do
     Buildel.Memories.Memory
     |> where(
       [m],
-      m.id == ^id and m.memory_collection_id == ^collection_id and
+      m.file_uuid == ^file_uuid and m.memory_collection_id == ^collection_id and
         m.organization_id == ^organization.id
     )
     |> Buildel.Repo.one!()

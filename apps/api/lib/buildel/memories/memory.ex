@@ -3,6 +3,7 @@ defmodule Buildel.Memories.Memory do
   import Ecto.Changeset
 
   schema "memories" do
+    field(:file_uuid, Ecto.UUID)
     field(:file_name, :string)
     field(:file_size, :integer)
     field(:file_type, :string)
@@ -29,7 +30,8 @@ defmodule Buildel.Memories.Memory do
       :file_type,
       :collection_name,
       :memory_collection_id,
-      :content
+      :content,
+      :file_uuid
     ])
     |> validate_required([
       :organization_id,
