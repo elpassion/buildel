@@ -21,6 +21,7 @@ import { UnauthorizedError } from "~/utils/errors";
 import { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
 import { ParsedResponse } from "~/utils/fetch.server";
 import { useFilesUpload } from "~/components/fileUpload/FileUpload";
+import { Icon } from "@elpassion/taco";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -144,37 +145,43 @@ ${JSON.stringify(files)}
           onSubmit={onSubmit}
           disabled={connectionStatus !== "running" || isUploading}
           generating={isGenerating}
-          prefix={
+          attachments={
             process.env.NODE_ENV === "development" &&
-            pipeline.interface_config?.file && (
-              <div className="w-full">
+            pipeline.interface_config?.file &&
+            fileList.length > 0 && (
+              <div className="w-full flex gap-1 p-1 flex-wrap">
                 {fileList.map((file) => {
                   return (
-                    <div className="text-white px-1" key={file.id}>
-                      {file.status} {file.file_name}
-                      <button
-                        onClick={() => removeFile(file.id)}
-                        className="ml-2"
-                      >
-                        R
+                    <div
+                      className="text-white px-1 border border-neutral-700 rounded-md flex items-center gap-1"
+                      key={file.id}
+                    >
+                      {file.file_name}
+                      <button type="button" onClick={() => removeFile(file.id)}>
+                        <Icon iconName="trash" />
                       </button>
                     </div>
                   );
                 })}
-                <label className="text-white px-1">
-                  U
-                  <input
-                    ref={inputRef}
-                    type="file"
-                    className="hidden"
-                    onChange={(e) => {
-                      [...(e.target.files || [])].forEach((file) => {
-                        uploadFile(file);
-                      });
-                    }}
-                  />
-                </label>
               </div>
+            )
+          }
+          prefix={
+            process.env.NODE_ENV === "development" &&
+            pipeline.interface_config?.file && (
+              <label className="text-white pl-2">
+                <Icon iconName="upload" />
+                <input
+                  ref={inputRef}
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => {
+                    [...(e.target.files || [])].forEach((file) => {
+                      uploadFile(file);
+                    });
+                  }}
+                />
+              </label>
             )
           }
         />

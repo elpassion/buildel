@@ -6,7 +6,7 @@ export const schema = z.object({
   chat: z.string().min(2),
   file: z
     .string()
-    .transform((v) => (v === "" ? null : v))
+    .transform((v) => (v === "" ? undefined : v))
     .optional(),
   public: z
     .union([
