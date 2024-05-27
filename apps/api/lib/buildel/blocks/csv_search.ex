@@ -159,13 +159,14 @@ defmodule Buildel.Blocks.CSVSearch do
     end
   end
 
-  def handle_cast({:add_file, {:binary, file, metadata}}, state) do
+  def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
     state = send_stream_start(state)
 
     file_id = Map.get(metadata, :file_id, UUID.uuid4())
     {_, repo_pid} = state[:repo]
 
-    with {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file) do
+    with {:ok, file_content} <- File.read(file_path),
+         {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file_content) do
       state =
         Map.update(state, :table_names, [{table_name, headers, file_id}], fn table_names ->
           [{table_name, headers} | table_names]

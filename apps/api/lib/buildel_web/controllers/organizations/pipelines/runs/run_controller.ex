@@ -398,11 +398,20 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_running_pipeline_run(pipeline, id),
-         {:ok, file_content} <- File.read(file |> Map.get(:path)),
+         block_pid <- Buildel.Pipelines.Runner.block_pid(run, block_name),
+         :ok <- Plug.Upload.give_away(file, block_pid),
          {:ok, _run} <-
-           Pipelines.Runner.cast_run(run, block_name, input_name, {:binary, file_content}, %{
-             file_id: file_id
-           }) do
+           Pipelines.Runner.cast_run(
+             run,
+             block_name,
+             input_name,
+             {:binary, file |> Map.get(:path)},
+             %{
+               file_id: file_id,
+               file_name: file |> Map.get(:filename),
+               file_type: file |> Map.get(:content_type)
+             }
+           ) do
       render(conn, :input_file,
         file: %{
           id: file_id,

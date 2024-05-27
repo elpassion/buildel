@@ -16,7 +16,11 @@ defmodule Buildel.Blocks.DocumentSearch do
       description:
         "Used for efficient searching and retrieval of information from a collection of documents inside Buildel Knowledge Base.",
       groups: ["file", "memory"],
-      inputs: [Block.file_input("files", true), Block.text_input("query")],
+      inputs: [
+        Block.file_input("input", false),
+        Block.file_input("files", true),
+        Block.text_input("query")
+      ],
       outputs: [Block.text_output()],
       ios: [Block.io("tool", "worker")],
       schema: schema()
@@ -218,22 +222,25 @@ defmodule Buildel.Blocks.DocumentSearch do
     {:noreply, state}
   end
 
-  def handle_cast({:add_file, {:binary, file}}, state) do
+  def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
     state = send_stream_start(state)
 
-    documents =
-      Buildel.Splitters.recursive_character_text_split(file, %{
-        chunk_size: 1000,
-        chunk_overlap: 200
-      })
-      |> Enum.map(fn document ->
-        %{
-          document: document,
-          metadata: %{memory_id: "TODO: FIX", chunk_id: UUID.uuid4()}
-        }
-      end)
+    %{organization_id: organization_id, collection_id: collection_id} =
+      Buildel.Memories.context_from_organization_collection_name(state[:collection])
 
-    Buildel.VectorDB.add(state.vector_db, state[:collection], documents)
+    organization = Buildel.Organizations.get_organization!(organization_id)
+    {:ok, collection} = Buildel.Memories.get_organization_collection(organization, collection_id)
+
+    Buildel.Memories.create_organization_memory(
+      organization,
+      collection,
+      %{
+        path: file_path,
+        type: metadata |> Map.get(:file_type),
+        name: metadata |> Map.get(:file_name)
+      }
+    )
+
     state = send_stream_stop(state)
     {:noreply, state}
   end
@@ -364,8 +371,8 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   @impl true
-  def handle_info({_name, :binary, binary, _metadata}, state) do
-    add_file(self(), {:binary, binary})
+  def handle_info({_name, :binary, binary, metadata}, state) do
+    add_file(self(), {:binary, binary, metadata})
     {:noreply, state}
   end
 
