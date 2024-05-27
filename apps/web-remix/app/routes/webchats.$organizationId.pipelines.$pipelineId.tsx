@@ -86,7 +86,7 @@ export default function WebsiteChat() {
     organizationId: parseInt(organizationId),
     pipelineId: parseInt(pipelineId),
     runId: runId,
-    fileBlockName: "file_input_1",
+    fileBlockName: pipeline.interface_config?.file,
   });
 
   const onSubmit = useCallback(
@@ -145,7 +145,8 @@ ${JSON.stringify(files)}
           disabled={connectionStatus !== "running" || isUploading}
           generating={isGenerating}
           prefix={
-            process.env.NODE_ENV === "development" && (
+            process.env.NODE_ENV === "development" &&
+            pipeline.interface_config?.file && (
               <div className="w-full">
                 {fileList.map((file) => {
                   return (

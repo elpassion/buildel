@@ -4,6 +4,10 @@ export const schema = z.object({
   input: z.string().min(2),
   output: z.string().min(2),
   chat: z.string().min(2),
+  file: z
+    .string()
+    .transform((v) => (v === "" ? null : v))
+    .optional(),
   public: z
     .union([
       z.boolean(),

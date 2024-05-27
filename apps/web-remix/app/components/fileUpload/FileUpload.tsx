@@ -162,7 +162,7 @@ export function useFilesUpload({
   organizationId: number;
   pipelineId: number;
   runId: number;
-  fileBlockName: string;
+  fileBlockName?: string | null;
 }): {
   fileList: IFileUpload[];
   uploadFile: (file: File) => Promise<void>;
@@ -176,6 +176,7 @@ export function useFilesUpload({
 
   const uploadFileRequest = useCallback(
     async (file: File): Promise<IFile> => {
+      if (!fileBlockName) throw new Error("Missing file block name");
       const formData = new FormData();
       formData.append("file", file);
       formData.append("block_name", fileBlockName);
