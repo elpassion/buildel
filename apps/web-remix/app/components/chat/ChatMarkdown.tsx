@@ -294,7 +294,7 @@ function Pre({
 }
 
 const MessageAttachments = z.array(
-  z.object({ id: z.number(), name: z.string() }),
+  z.object({ id: z.union([z.number(), z.string()]), file_name: z.string() }),
 );
 
 function Code({
@@ -314,7 +314,7 @@ function Code({
         JSON.parse((children || "").toString()),
       );
       return attachments.map((attachment) => {
-        return <div>{attachment.name}</div>;
+        return <div key={attachment.id}>{attachment.file_name}</div>;
       });
     } catch (e) {
       console.error(e);

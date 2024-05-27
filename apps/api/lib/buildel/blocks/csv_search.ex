@@ -239,7 +239,7 @@ defmodule Buildel.Blocks.CSVSearch do
       end
 
     description =
-      "Search the database using valid SQL query. If no tables available - abort. \n\n ---------- \n\n Available tables and columns (all columns are type TEXT): \n\n #{table_names_string}"
+      "Search the database using valid SQL query. If no tables are available - abort. \n\n ---------- \n\n Available tables and columns (all columns are type TEXT): \n\n #{table_names_string} \n\n YOU CAN USE ONLY THOSE TABLES. DO NOT USE ANY OTHER TABLES. DO *NOT* USE FILE_NAMES AS TABLE NAMES. \n\n ----------"
 
     function =
       Function.new!(%{

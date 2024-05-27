@@ -166,7 +166,7 @@ export function useFilesUpload({
 }): {
   fileList: IFileUpload[];
   uploadFile: (file: File) => Promise<void>;
-  removeFile: (fileId: number) => void;
+  removeFile: (fileId: number | string) => void;
   inputRef: React.MutableRefObject<HTMLInputElement | null>;
   clearFiles: () => void;
   isUploading: boolean;
@@ -205,7 +205,7 @@ export function useFilesUpload({
   );
 
   const removeFileRequest = useCallback(
-    async (id: number) => {
+    async (id: number | string) => {
       return fetch(
         `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
         {
@@ -262,9 +262,9 @@ export function useFilesUpload({
   };
 
   const removeFile = useCallback(
-    async (id: number) => {
+    async (id: number | string) => {
       try {
-        if (id % 1 === 0 || typeof id === "string") {
+        if (typeof id === "string" || id % 1 === 0) {
           await removeFileRequest(id);
         }
 

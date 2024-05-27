@@ -89,21 +89,26 @@ export default function WebsiteChat() {
     fileBlockName: "file_input_1",
   });
 
-  const onSubmit = useCallback((value: string) => {
-    const files = fileList
-      .map((file) =>
-        file.status === "done" ? { id: file.id, name: file.file_name } : null,
-      )
-      .filter((f) => !!f);
-    const filesString = files.length
-      ? `
+  const onSubmit = useCallback(
+    (value: string) => {
+      const files = fileList
+        .map((file) =>
+          file.status === "done"
+            ? { id: file.id, file_name: file.file_name }
+            : null,
+        )
+        .filter((f) => !!f);
+      const filesString = files.length
+        ? `
 \`\`\`buildel_message_attachments
 ${JSON.stringify(files)}
 \`\`\`\n`
-      : "";
-    pushMessage(`${filesString}${value}`);
-    clearFiles();
-  }, []);
+        : "";
+      pushMessage(`${filesString}${value}`);
+      clearFiles();
+    },
+    [fileList, pushMessage, clearFiles],
+  );
 
   useEffect(() => {
     // todo change it
@@ -144,7 +149,7 @@ ${JSON.stringify(files)}
               <div className="w-full">
                 {fileList.map((file) => {
                   return (
-                    <div className="text-white px-1">
+                    <div className="text-white px-1" key={file.id}>
                       {file.status} {file.file_name}
                       <button
                         onClick={() => removeFile(file.id)}
