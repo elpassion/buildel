@@ -56,9 +56,11 @@ defmodule Buildel.DocumentWorkflow.DocumentLoaderAdapter do
              base_url:
                "#{Application.fetch_env!(:buildel, :nlm_api_url)}/api/parseDocument?applyOcr=yes",
              headers: headers,
-             body: Multipart.body_stream(multipart)
-             #  timeout: 60_000,
-             #  recv_timeout: 60_000
+             body: Multipart.body_stream(multipart),
+             connect_options: [
+               timeout: 60_000
+             ],
+             receive_timeout: 60_000
            ]
            |> Req.post() do
       {:ok, result}
