@@ -146,7 +146,6 @@ ${JSON.stringify(files)}
           disabled={connectionStatus !== "running" || isUploading}
           generating={isGenerating}
           attachments={
-            process.env.NODE_ENV === "development" &&
             pipeline.interface_config?.file &&
             fileList.length > 0 && (
               <div className="w-full flex gap-1 p-1 flex-wrap">
@@ -173,7 +172,6 @@ ${JSON.stringify(files)}
             )
           }
           prefix={
-            process.env.NODE_ENV === "development" &&
             pipeline.interface_config?.file && (
               <label className="text-white pl-2 cursor-pointer">
                 <Icon iconName="upload" />
