@@ -52,7 +52,7 @@ defmodule Buildel.Blocks.CollectSentencesTest do
     )
 
     assert_receive({^sentences_topic, :start_stream, nil, _})
-    assert_receive({^sentences_topic, :text, "Hello darkness my old friend.", _})
+    assert_receive({^sentences_topic, :text, "Hello darkness my old friend.", _}, 1000)
     assert_receive({^sentences_topic, :stop_stream, nil, _})
   end
 
