@@ -68,6 +68,10 @@ defmodule Buildel.Blocks.DocumentTool do
     GenServer.cast(pid, {:add_file, file})
   end
 
+  def delete_file(pid, file_id) do
+    GenServer.cast(pid, {:delete_file, file_id})
+  end
+
   # Server
 
   @impl true
@@ -115,6 +119,32 @@ defmodule Buildel.Blocks.DocumentTool do
 
     state = send_stream_stop(state)
     {:noreply, state}
+  end
+
+  def handle_cast({:delete_file, file_id}, state) do
+    state = send_stream_start(state)
+
+    %{global: organization_id} = block_context().context_from_context_id(state[:context_id])
+    collection_id = state[:collection]
+
+    try do
+      organization = Buildel.Organizations.get_organization!(organization_id)
+
+      memory =
+        Buildel.Memories.get_collection_memory_by_file_uuid!(organization, collection_id, file_id)
+
+      {:ok, _} = Buildel.Memories.delete_organization_memory(organization, memory.id)
+
+      state = send_stream_stop(state)
+      {:noreply, state}
+    rescue
+      _ ->
+        send_error(state, "Failed to delete the file")
+
+        state = state |> send_stream_stop()
+
+        {:noreply, state}
+    end
   end
 
   @impl true
@@ -172,6 +202,12 @@ defmodule Buildel.Blocks.DocumentTool do
          ""
        end
      }, state}
+  end
+
+  @impl true
+  def handle_info({_name, :text, file_id, %{method: :delete}}, state) do
+    delete_file(self(), file_id)
+    {:noreply, state}
   end
 
   @impl true
