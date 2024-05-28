@@ -233,23 +233,48 @@ defmodule Buildel.Blocks.DocumentSearch do
       Buildel.Memories.context_from_organization_collection_name(state[:collection])
 
     organization = Buildel.Organizations.get_organization!(organization_id)
-    {:ok, collection} = Buildel.Memories.get_organization_collection(organization, collection_id)
 
-    Buildel.Memories.create_organization_memory(
-      organization,
-      collection,
-      %{
-        path: file_path,
-        type: metadata |> Map.get(:file_type),
-        name: metadata |> Map.get(:file_name)
-      },
-      %{
-        file_uuid: metadata |> Map.get(:file_id)
-      }
-    )
+    try do
+      with {:ok, collection} <-
+             Buildel.Memories.get_organization_collection(organization, collection_id),
+           {:ok, _memory} <-
+             Buildel.Memories.create_organization_memory(
+               organization,
+               collection,
+               %{
+                 path: file_path,
+                 type: metadata |> Map.get(:file_type),
+                 name: metadata |> Map.get(:file_name)
+               },
+               %{
+                 file_uuid: metadata |> Map.get(:file_id)
+               }
+             ) do
+        state = send_stream_stop(state)
+        {:noreply, state}
+      else
+        {:error, _, message} ->
+          send_error(state, message)
 
-    state = send_stream_stop(state)
-    {:noreply, state}
+          state = state |> send_stream_stop()
+
+          {:noreply, state}
+
+        _ ->
+          send_error(state, "Failed to add the file")
+
+          state = state |> send_stream_stop()
+
+          {:noreply, state}
+      end
+    rescue
+      _ ->
+        send_error(state, "Failed to add the file")
+
+        state = state |> send_stream_stop()
+
+        {:noreply, state}
+    end
   end
 
   def handle_cast({:delete_file, file_id}, state) do
