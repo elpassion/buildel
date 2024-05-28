@@ -32,8 +32,8 @@ export class WebSocketServerMock {
               refId,
               topicName,
               "phx_reply",
-              { response: {}, status: "ok" },
-            ])
+              { response: { run: { id: 123 } }, status: "ok" },
+            ]),
           );
         }
       });
