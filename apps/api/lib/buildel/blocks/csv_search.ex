@@ -165,9 +165,16 @@ defmodule Buildel.Blocks.CSVSearch do
     file_id = Map.get(metadata, :file_id, UUID.uuid4())
     {_, repo_pid} = state[:repo]
 
-    with :ok <- validate_file_type(Map.get(metadata, :file_type)),
-         {:ok, file_content} <- File.read(file_path),
-         {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file_content) do
+    {:ok, file_content} =
+      case metadata do
+        %{method: :file_memory} ->
+          {:ok, file_path}
+
+        _ ->
+          File.read(file_path)
+      end
+
+    with {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file_content) do
       state =
         Map.update(state, :table_names, [{table_name, headers, file_id}], fn table_names ->
           [{table_name, headers} | table_names]
@@ -313,6 +320,7 @@ defmodule Buildel.Blocks.CSVSearch do
 
   defp validate_file_type(file_type) do
     case file_type do
+      nil -> :ok
       "text/csv" -> :ok
       type -> {:error, "Invalid file type #{type}. Only text/csv is allowed."}
     end

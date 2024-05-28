@@ -128,7 +128,9 @@ defmodule BuildelWeb.PipelineChannel do
         _ -> {:text, data}
       end
 
-    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
+    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{
+      method: :file_memory
+    })
   end
 
   def handle_info({output_name, :binary, chunk, _metadata}, socket) do
