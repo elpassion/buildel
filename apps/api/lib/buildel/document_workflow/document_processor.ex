@@ -74,18 +74,27 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
     defp table_rows_to_strings(table_rows) do
       table_rows =
         table_rows
-        |> Enum.map(fn row ->
-          update_in(row, ["cells"], fn cells ->
-            cells
-            |> Enum.flat_map(fn
-              %{"col_span" => col_span, "cell_value" => value} ->
-                [value | 1..col_span |> Enum.map(fn _ -> "" end)]
+        |> Enum.map(fn
+          %{"type" => "full_row", "col_span" => col_span, "cell_value" => value} = row ->
+            row
+            |> Map.put(
+              "cells",
+              [value | 1..col_span |> Enum.map(fn _ -> "" end)]
+              |> Enum.map(&String.replace(&1, "|", " "))
+            )
 
-              %{"cell_value" => value} ->
-                [value]
+          row ->
+            update_in(row, ["cells"], fn cells ->
+              cells
+              |> Enum.flat_map(fn
+                %{"col_span" => col_span, "cell_value" => value} ->
+                  [value | 1..col_span |> Enum.map(fn _ -> "" end)]
+
+                %{"cell_value" => value} ->
+                  [value]
+              end)
+              |> Enum.map(&String.replace(&1, "|", " "))
             end)
-            |> Enum.map(&String.replace(&1, "|", " "))
-          end)
         end)
 
       table_width =
