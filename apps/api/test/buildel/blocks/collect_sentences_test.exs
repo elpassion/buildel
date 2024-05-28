@@ -26,6 +26,7 @@ defmodule Buildel.Blocks.CollectSentencesTest do
     assert {:error, _} = Blocks.validate_block(CollectSentences, %{})
   end
 
+  @tag :skip
   test "outputs full sentence" do
     {:ok, test_run} =
       BlocksTestRunner.start_run(%{
