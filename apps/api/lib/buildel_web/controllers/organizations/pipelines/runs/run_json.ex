@@ -16,6 +16,10 @@ defmodule BuildelWeb.OrganizationPipelineRunJSON do
     %{data: data(run)}
   end
 
+  def start(%{run: run, outputs: outputs}) do
+    %{data: data(run), outputs: outputs}
+  end
+
   def input_file(%{file: file}) do
     %{data: file}
   end

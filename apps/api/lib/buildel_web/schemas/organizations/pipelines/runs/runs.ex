@@ -157,6 +157,20 @@ defmodule BuildelWeb.Schemas.Runs do
     })
   end
 
+  defmodule BlockOutput do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "BlockIO",
+      type: :object,
+      properties: %{
+        block_name: %Schema{type: :string, description: "Block name"},
+        output_name: %Schema{type: :string, description: "Output name"}
+      },
+      required: [:block_name, :output_name]
+    })
+  end
+
   defmodule StartRequest do
     require OpenApiSpex
 
@@ -165,9 +179,15 @@ defmodule BuildelWeb.Schemas.Runs do
       type: :object,
       properties: %{
         initial_inputs: %Schema{
-          type: :array,
+          # type: :any,
           description: "Blocks initial inputs",
-          items: InputRequest,
+          # items: %Schema{type: :any},
+          default: []
+        },
+        wait_for_outputs: %Schema{
+          type: :array,
+          description: "List of outputs to wait for before responding",
+          items: BlockOutput,
           default: []
         }
       }

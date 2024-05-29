@@ -4,6 +4,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
 
   import BuildelWeb.UserAuth
 
+  alias OpenApiSpex.Operation
+  alias Buildel.BlockPubSub
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
   alias OpenApiSpex.Schema
@@ -198,7 +200,15 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
       id: [in: :path, description: "Run ID", type: :integer, required: true]
     ],
-    request_body: {"start", "application/json", BuildelWeb.Schemas.Runs.StartRequest},
+    request_body:
+      Operation.request_body(
+        "start",
+        %{
+          "application/json" => [],
+          "multipart/form-data" => []
+        },
+        BuildelWeb.Schemas.Runs.StartRequest
+      ),
     responses: [
       ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
       not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
@@ -214,7 +224,44 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     security: [%{"authorization" => []}]
 
   def start(conn, _params) do
-    %{initial_inputs: initial_inputs} = conn.body_params
+    %{initial_inputs: initial_inputs, wait_for_outputs: wait_for_outputs} =
+      conn.body_params
+
+    initial_inputs =
+      initial_inputs
+      |> Enum.map(fn
+        input when is_binary(input) ->
+          %{"block_name" => block_name, "data" => data, "input_name" => input_name} =
+            Jason.decode!(input)
+
+          %{block_name: block_name, data: data, input_name: input_name}
+
+        input when is_map(input) ->
+          %{"block_name" => block_name, "data" => data, "input_name" => input_name} =
+            input
+
+          %{block_name: block_name, data: data, input_name: input_name}
+
+        _ ->
+          raise "Invalid initial input"
+      end)
+
+    wait_for_outputs =
+      wait_for_outputs
+      |> Enum.map(fn
+        output when is_binary(output) ->
+          %{"block_name" => block_name, "output_name" => output_name} = Jason.decode!(output)
+
+          %{block_name: block_name, output_name: output_name}
+
+        output when is_map(output) ->
+          %{"block_name" => block_name, "output_name" => output_name} = output
+
+          %{block_name: block_name, output_name: output_name}
+
+        _ ->
+          raise "Invalid initial input"
+      end)
 
     %{
       organization_id: organization_id,
@@ -232,11 +279,72 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
          {:ok, run} <-
            Pipelines.get_pipeline_run(pipeline, id),
          {:ok, run} <- Pipelines.Runner.start_run(run) do
+      outputs =
+        wait_for_outputs
+        |> Enum.map(fn output ->
+          topic =
+            BlockPubSub.io_topic(
+              Buildel.Pipelines.Worker.context_id(run),
+              output.block_name,
+              output.output_name
+            )
+
+          BlockPubSub.subscribe_to_io(
+            Buildel.Pipelines.Worker.context_id(run),
+            output.block_name,
+            output.output_name
+          )
+
+          %{
+            block_name: output.block_name,
+            output_name: output.output_name,
+            topic: topic,
+            data: nil
+          }
+        end)
+
       initial_inputs |> Enum.each(&process_input(&1.block_name, &1.input_name, &1.data, run))
-      render(conn, :show, run: run)
+
+      outputs =
+        Enum.reduce_while(Stream.repeatedly(fn -> nil end), outputs, fn _, outputs ->
+          outputs = receive_output(outputs)
+
+          if Enum.any?(outputs, &(&1.data == nil)) do
+            {:cont, outputs}
+          else
+            {:halt, outputs}
+          end
+        end)
+
+      render(conn, :start, %{run: run, outputs: outputs})
     else
       {:error, :budget_limit_exceeded} -> {:error, :bad_request, "Budget limit exceeded"}
       err -> err
+    end
+  end
+
+  defp receive_output([]), do: []
+
+  defp receive_output(outputs) do
+    topics = outputs |> Enum.map(& &1[:topic])
+
+    receive do
+      {topic, type, data, _metadata} when type != :start_stream and type != :stop_stream ->
+        if topic in topics do
+          outputs
+          |> update_in(
+            [
+              Access.at(Enum.find_index(outputs, fn output -> output[:topic] == topic end)),
+              :data
+            ],
+            fn _ -> data end
+          )
+        else
+          outputs
+        end
+
+      _other ->
+        outputs
     end
   end
 
