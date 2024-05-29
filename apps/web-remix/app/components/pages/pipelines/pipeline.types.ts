@@ -50,7 +50,7 @@ export interface IField {
   data: {
     name: string;
     public: boolean;
-    type: "audio" | "text" | "file" | "file_memory" | "worker" | "controller";
+    type: "audio" | "text" | "file" | "file_temporary" | "worker" | "controller";
   };
 }
 

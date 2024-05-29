@@ -15,7 +15,6 @@ defmodule Buildel.Blocks.CSVSearch do
       groups: ["file", "memory"],
       inputs: [
         Block.file_input("input", false),
-        Block.file_memory_input("files", true),
         Block.text_input("query")
       ],
       outputs: [Block.text_output()],
@@ -165,16 +164,9 @@ defmodule Buildel.Blocks.CSVSearch do
     file_id = Map.get(metadata, :file_id, UUID.uuid4())
     {_, repo_pid} = state[:repo]
 
-    {:ok, file_content} =
-      case metadata do
-        %{method: :file_memory} ->
-          {:ok, file_path}
-
-        _ ->
-          File.read(file_path)
-      end
-
-    with {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file_content) do
+    with :ok <- validate_file_type(Map.get(metadata, :file_type)),
+         {:ok, file_content} <- File.read(file_path),
+         {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file_content) do
       state =
         Map.update(state, :table_names, [{table_name, headers, file_id}], fn table_names ->
           [{table_name, headers} | table_names]

@@ -14,7 +14,7 @@ export type IFileUpload = IFile | IUploadError;
 
 export interface IPreviewProps {
   fileList: IFileUpload[];
-  remove?: (id: number) => Promise<void>;
+  remove?: (id: string | number) => Promise<void>;
 }
 
 export function isUploadError(upload: IFileUpload): upload is IUploadError {

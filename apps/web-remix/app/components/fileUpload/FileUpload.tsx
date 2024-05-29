@@ -15,7 +15,7 @@ export interface FileUploadProps extends React.HTMLProps<HTMLInputElement> {
   preview?: (props: IPreviewProps) => ReactNode;
   onUpload?: (file: File) => Promise<IFile>;
   onFetch?: () => Promise<IFile[]>;
-  onRemove?: (id: number) => Promise<any>;
+  onRemove?: (id: number | string) => Promise<any>;
   uploadText?: ReactNode;
   labelText?: ReactNode;
   fileList?: IFileUpload[];
@@ -97,9 +97,9 @@ export function FileUpload({
   );
 
   const handleRemove = useCallback(
-    async (id: number) => {
+    async (id: string | number) => {
       try {
-        if (onRemove && id % 1 === 0) {
+        if (onRemove && (typeof id === "string" || id % 1 === 0)) {
           await onRemove(id);
         }
 

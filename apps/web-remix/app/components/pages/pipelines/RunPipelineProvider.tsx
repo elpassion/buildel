@@ -32,6 +32,7 @@ interface IRunPipelineContext {
   push: (topic: string, payload: any) => void;
   clearEvents: (blockName: string) => void;
   clearBlockEvents: (blockName: string) => void;
+  runId: string | null | undefined;
   status: "idle" | "starting" | "running";
   isValid: boolean;
   organizationId: number;
@@ -95,7 +96,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     setBlockStatuses((prev) => ({ ...prev, [block]: status }));
   }, []);
 
-  const { status, startRun, stopRun, push } = usePipelineRun(
+  const { status, startRun, stopRun, push, id: runId } = usePipelineRun(
     pipeline.organization_id,
     pipeline.id,
     onMessage,
@@ -162,6 +163,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       stopRun,
       clearEvents,
       clearBlockEvents,
+      runId,
       blockStatuses,
       blockValidations,
       isValid,
