@@ -18,7 +18,9 @@ defmodule Buildel.Blocks.DocumentTool do
       inputs: [
         Block.file_input("input", false)
       ],
-      outputs: [],
+      outputs: [
+        Block.text_output("output", false)
+      ],
       ios: [Block.io("tool", "worker")],
       schema: schema()
     }
@@ -106,7 +108,7 @@ defmodule Buildel.Blocks.DocumentTool do
     try do
       with {:ok, collection} <-
              Buildel.Memories.get_organization_collection(organization, collection_id),
-           {:ok, _memory} <-
+           {:ok, memory} <-
              Buildel.Memories.create_organization_memory(
                organization,
                collection,
@@ -119,6 +121,13 @@ defmodule Buildel.Blocks.DocumentTool do
                  file_uuid: metadata |> Map.get(:file_id)
                }
              ) do
+        BlockPubSub.broadcast_to_io(
+          state[:context_id],
+          state[:block_name],
+          "output",
+          {:text, memory.content}
+        )
+
         state = send_stream_stop(state)
         {:noreply, state}
       else
