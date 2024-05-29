@@ -47,6 +47,7 @@ defmodule Buildel.Clients.Chat do
       |> Map.put_new(:on_message, fn _ -> nil end)
       |> Map.put_new(:api_type, "openai")
       |> Map.put_new(:endpoint, "https://api.openai.com/v1")
+      |> Map.put_new(:response_format, "text")
 
     llm = get_llm(opts)
 
@@ -206,7 +207,8 @@ defmodule Buildel.Clients.Chat do
       temperature: opts.temperature,
       stream: true,
       api_key: opts.api_key,
-      endpoint: opts.endpoint <> "/chat/completions"
+      endpoint: opts.endpoint <> "/chat/completions",
+      json_response: opts.response_format == "json"
     })
   end
 
@@ -217,7 +219,8 @@ defmodule Buildel.Clients.Chat do
       stream: true,
       api_key: opts.api_key,
       api_type: opts.api_type,
-      endpoint: opts.endpoint <> "/chat/completions"
+      endpoint: opts.endpoint <> "/chat/completions",
+      json_response: opts.response_format == "json"
     })
   end
 
@@ -228,7 +231,8 @@ defmodule Buildel.Clients.Chat do
       stream: true,
       api_key: opts.api_key,
       api_type: opts.api_type,
-      endpoint: opts.endpoint <> "/chat/completions?version=2024-02-01"
+      endpoint: opts.endpoint <> "/chat/completions?version=2024-02-01",
+      json_response: opts.response_format == "json"
     })
   end
 

@@ -52,6 +52,8 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
     field :random_seed, :integer
 
     field :stream, :boolean, default: false
+
+    field :json_response, :boolean, default: false
   end
 
   @type t :: %ChatMistralAI{}
@@ -66,7 +68,8 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
     :max_tokens,
     :safe_prompt,
     :random_seed,
-    :stream
+    :stream,
+    :json_response
   ]
   @required_fields [
     :model
@@ -123,6 +126,7 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
       stream: mistral.stream,
       messages: Enum.map(messages, &ChatMistralAI.for_api/1)
     }
+    |> Utils.conditionally_add_to_map(:response_format, get_response_format(mistral))
     |> Utils.conditionally_add_to_map(:random_seed, mistral.random_seed)
     |> Utils.conditionally_add_to_map(:max_tokens, mistral.max_tokens)
     |> Utils.conditionally_add_to_map(:tools, get_tools_for_api(functions))
@@ -147,6 +151,12 @@ defmodule Buildel.Langchain.ChatModels.ChatMistralAI do
   defp get_functions_for_api(functions) do
     Enum.map(functions, &for_api/1)
   end
+
+  defp get_response_format(%ChatMistralAI{json_response: true}),
+    do: %{"type" => "json_object"}
+
+  defp get_response_format(%ChatMistralAI{json_response: false}),
+    do: %{"type" => "text"}
 
   @doc """
   Convert a LangChain structure to the expected map of data for the OpenAI API.

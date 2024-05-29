@@ -117,6 +117,15 @@ defmodule Buildel.Blocks.Chat do
                   "maximum" => 2.0,
                   "step" => 0.1
                 },
+                response_format: %{
+                  "type" => "string",
+                  "title" => "Chat response format",
+                  "description" => "The format used by chat to respond.",
+                  "enum" => ["text", "json"],
+                  "enumPresentAs" => "radio",
+                  "default" => "text",
+                  "minLength" => 1
+                },
                 call_formatter:
                   EditorField.call_formatter(%{
                     default: "@{{config.block_name}} 🗨️:  {{config.args}}\n"
@@ -303,7 +312,8 @@ defmodule Buildel.Blocks.Chat do
          acc
          |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
        end)
-     )}
+     )
+     |> Map.put(:response_format, "text")}
   end
 
   @impl true
@@ -619,7 +629,8 @@ defmodule Buildel.Blocks.Chat do
              temperature: state[:opts].temperature,
              tools: tools,
              endpoint: state[:opts].endpoint,
-             api_type: state[:opts].api_type
+             api_type: state[:opts].api_type,
+             response_format: state[:opts].response_format
            }) do
       {:ok, message, state}
     else

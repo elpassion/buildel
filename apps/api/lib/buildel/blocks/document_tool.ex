@@ -169,6 +169,13 @@ defmodule Buildel.Blocks.DocumentTool do
 
       {:ok, _} = Buildel.Memories.delete_organization_memory(organization, memory.id)
 
+      BlockPubSub.broadcast_to_io(
+        state[:context_id],
+        state[:block_name],
+        "output",
+        {:text, ""}
+      )
+
       state = send_stream_stop(state)
       {:noreply, state}
     rescue
