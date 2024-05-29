@@ -9,12 +9,13 @@ import React, {
 import { IFile, IFileUpload, IPreviewProps } from "./fileUpload.types";
 import { assert } from "~/utils/assert";
 import classNames from "classnames";
+import { KnowledgeBaseFileResponse } from "~/api/knowledgeBase/knowledgeApi.contracts";
 
 export interface FileUploadProps extends React.HTMLProps<HTMLInputElement> {
   preview?: (props: IPreviewProps) => ReactNode;
   onUpload?: (file: File) => Promise<IFile>;
   onFetch?: () => Promise<IFile[]>;
-  onRemove?: (id: number) => Promise<any>;
+  onRemove?: (id: number | string) => Promise<any>;
   uploadText?: ReactNode;
   labelText?: ReactNode;
   fileList?: IFileUpload[];
@@ -77,7 +78,7 @@ export function FileUpload({
                   return { ...res, status: "done" };
                 }
                 return file;
-              })
+              }),
             );
           })
           .catch((e) => {
@@ -87,18 +88,18 @@ export function FileUpload({
                   return { ...file, status: "error", error: e };
                 }
                 return file;
-              })
+              }),
             );
           });
       });
     },
-    [onUpload, onChange]
+    [onUpload, onChange],
   );
 
   const handleRemove = useCallback(
-    async (id: number) => {
+    async (id: string | number) => {
       try {
-        if (onRemove && id % 1 === 0) {
+        if (onRemove && (typeof id === "string" || id % 1 === 0)) {
           await onRemove(id);
         }
 
@@ -107,7 +108,7 @@ export function FileUpload({
         console.error(err);
       }
     },
-    [onRemove]
+    [onRemove],
   );
 
   const handleSelectFiles = useCallback(() => {
@@ -150,4 +151,142 @@ export function FileUpload({
       })}
     </div>
   );
+}
+
+export function useFilesUpload({
+  organizationId,
+  pipelineId,
+  runId,
+  fileBlockName,
+}: {
+  organizationId: number;
+  pipelineId: number;
+  runId: number;
+  fileBlockName?: string | null;
+}): {
+  fileList: IFileUpload[];
+  uploadFile: (file: File) => Promise<void>;
+  removeFile: (fileId: number | string) => void;
+  inputRef: React.MutableRefObject<HTMLInputElement | null>;
+  clearFiles: () => void;
+  isUploading: boolean;
+} {
+  const [fileList, setFileList] = useState<IFileUpload[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const uploadFileRequest = useCallback(
+    async (file: File): Promise<IFile> => {
+      if (!fileBlockName) throw new Error("Missing file block name");
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("block_name", fileBlockName);
+      formData.append("input_name", "input");
+
+      const response = await fetch(
+        `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
+        {
+          body: formData,
+          method: "POST",
+        },
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.errors?.detail ?? "Something went wrong!");
+      }
+
+      const fileUpload = {
+        ...KnowledgeBaseFileResponse.parse(data),
+        status: "done" as const,
+      };
+
+      return fileUpload;
+    },
+    [organizationId, pipelineId, runId],
+  );
+
+  const removeFileRequest = useCallback(
+    async (id: number | string) => {
+      return fetch(
+        `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
+        {
+          method: "DELETE",
+          body: JSON.stringify({
+            file_id: id,
+            block_name: fileBlockName,
+            input_name: "input",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    },
+    [organizationId, pipelineId, runId],
+  );
+
+  const uploadFile = async (file: File) => {
+    const id = Math.random();
+    setFileList((prev) => [
+      {
+        id: id,
+        file_name: file.name,
+        file_size: file.size,
+        file_type: file.type,
+        status: "uploading",
+      },
+      ...prev,
+    ]);
+    try {
+      const res = await uploadFileRequest(file);
+      setFileList((prev) =>
+        prev.map((file) => {
+          if (file.id === id) {
+            return { ...res, status: "done" };
+          }
+          return file;
+        }),
+      );
+    } catch (e) {
+      setFileList((prev) =>
+        prev.map((file) => {
+          if (file.id === id) {
+            return { ...file, status: "error", error: e };
+          }
+          return file;
+        }),
+      );
+    } finally {
+      if (!inputRef.current) return;
+      inputRef.current.value = "";
+    }
+  };
+
+  const removeFile = useCallback(
+    async (id: number | string) => {
+      try {
+        if (typeof id === "string" || id % 1 === 0) {
+          await removeFileRequest(id);
+        }
+
+        setFileList((prev) => prev.filter((file) => file.id !== id));
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    [removeFileRequest, setFileList],
+  );
+
+  const clearFiles = useCallback(() => {
+    setFileList([]);
+  }, [setFileList]);
+
+  return {
+    fileList,
+    uploadFile,
+    removeFile,
+    inputRef,
+    clearFiles,
+    isUploading: fileList.some((upload) => upload.status === "uploading"),
+  };
 }

@@ -40,9 +40,9 @@ defmodule Buildel.Blocks.TextInputTest do
       {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
       text = "text"
       test_run |> BlocksTestRunner.Run.input("test", "input", {:text, text})
-      assert_receive {^topic, :start_stream, nil}
-      assert_receive {^topic, :text, ^text}
-      assert_receive {^topic, :stop_stream, nil}
+      assert_receive {^topic, :start_stream, nil, _}
+      assert_receive {^topic, :text, ^text, _}
+      assert_receive {^topic, :stop_stream, nil, _}
     end
   end
 end

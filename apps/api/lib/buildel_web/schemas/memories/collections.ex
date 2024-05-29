@@ -10,9 +10,10 @@ defmodule BuildelWeb.Schemas.Collections do
       properties: %{
         api_type: %Schema{type: :string, description: "API type"},
         model: %Schema{type: :string, description: "Model"},
-        secret_name: %Schema{type: :string, description: "Secret name"}
+        secret_name: %Schema{type: :string, description: "Secret name"},
+        endpoint: %Schema{type: :string, description: "API Endpoint"}
       },
-      required: [:api_type, :model, :secret_name]
+      required: [:api_type, :model, :secret_name, :endpoint]
     })
   end
 
@@ -110,9 +111,10 @@ defmodule BuildelWeb.Schemas.Collections do
       properties: %{
         api_type: %Schema{type: :string, description: "API type"},
         model: %Schema{type: :string, description: "Model"},
-        secret_name: %Schema{type: :string, description: "Secret name"}
+        secret_name: %Schema{type: :string, description: "Secret name"},
+        endpoint: %Schema{type: :string, description: "Endpoint for model"}
       },
-      required: [:api_type, :model, :secret_name]
+      required: [:api_type, :model, :secret_name, :endpoint]
     })
   end
 

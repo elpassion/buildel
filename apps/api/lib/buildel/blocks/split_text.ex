@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.SplitText do
   def options() do
     %{
       type: "split_text",
-      description: "It's an essential utility for processing large texts, enabling efficient text handling and manipulation in Buildel applications.",
+      description:
+        "It's an essential utility for processing large texts, enabling efficient text handling and manipulation in Buildel applications.",
       groups: ["utils", "text"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output("output")],
@@ -84,7 +85,7 @@ defmodule Buildel.Blocks.SplitText do
   end
 
   @impl true
-  def handle_info({_name, :text, text}, state) do
+  def handle_info({_name, :text, text, _metadata}, state) do
     cast(self(), {:text, text})
     {:noreply, state}
   end

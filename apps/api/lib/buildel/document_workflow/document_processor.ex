@@ -44,6 +44,83 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
     defstruct [:id, :value, :level, :type, metadata: %{}, parent: nil, next: nil, previous: nil]
   end
 
+  defmodule Table do
+    alias __MODULE__
+
+    @type t :: %Table{
+            id: binary(),
+            value: binary(),
+            level: integer(),
+            metadata: map(),
+            parent: integer(),
+            next: integer(),
+            previous: integer()
+          }
+    defstruct [:id, :value, :level, :type, metadata: %{}, parent: nil, next: nil, previous: nil]
+
+    def from_item(id, level, metadata, %{"table_rows" => table_rows, "name" => name}) do
+      %Table{
+        id: id,
+        level: level,
+        metadata: metadata,
+        value: table_value(name, table_rows)
+      }
+    end
+
+    defp table_value(name, table_rows) do
+      "#{name}\n#{table_rows_to_strings(table_rows)}"
+    end
+
+    defp table_rows_to_strings(table_rows) do
+      table_rows =
+        table_rows
+        |> Enum.map(fn
+          %{"type" => "full_row", "col_span" => col_span, "cell_value" => value} = row ->
+            row
+            |> Map.put(
+              "cells",
+              [value | 1..col_span |> Enum.map(fn _ -> "" end)]
+              |> Enum.map(&String.replace(&1, "|", " "))
+            )
+
+          row ->
+            update_in(row, ["cells"], fn cells ->
+              cells
+              |> Enum.flat_map(fn
+                %{"col_span" => col_span, "cell_value" => value} ->
+                  [value | 1..col_span |> Enum.map(fn _ -> "" end)]
+
+                %{"cell_value" => value} ->
+                  [value]
+              end)
+              |> Enum.map(&String.replace(&1, "|", " "))
+            end)
+        end)
+
+      table_width =
+        Enum.max(Enum.map(table_rows, &length(&1["cells"])))
+
+      table_rows
+      |> Enum.map(fn row ->
+        update_in(row, ["cells"], fn cells ->
+          Stream.concat(cells, Stream.repeatedly(fn -> "" end))
+          |> Enum.take(table_width)
+        end)
+      end)
+      |> List.insert_at(1, %{
+        "cells" => 1..table_width |> Enum.map(fn _ -> "---" end)
+      })
+      |> Enum.map(&table_row_to_string/1)
+      |> Enum.join("\n")
+    end
+
+    defp table_row_to_string(%{"cells" => cells}) do
+      string = cells |> Enum.join(" | ")
+
+      "| #{string} |"
+    end
+  end
+
   def load_file(
         %Buildel.DocumentWorkflow.DocumentLoader{adapter: document_loader},
         path,
@@ -68,10 +145,6 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
     list |> get_in(["return_dict", "result", "blocks"])
   end
 
-  def filter_empty_blocks(list) do
-    list |> Enum.filter(&Map.has_key?(&1, "sentences"))
-  end
-
   @spec map_to_structures(list()) :: [Header.t() | Paragraph.t() | ListItem.t()]
   def map_to_structures(list) do
     Enum.map(
@@ -83,33 +156,43 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
             level -> level
           end
 
-        case item["tag"] do
-          "header" ->
+        case {item["tag"], item["sentences"]} do
+          {"table", nil} ->
+            Table.from_item(UUID.uuid4(), level, %{page: item["page_idx"]}, item)
+
+          {_, nil} ->
+            nil
+
+          {"header", sentences} ->
             %Header{
               id: UUID.uuid4(),
               level: level,
               metadata: %{page: item["page_idx"]},
-              value: Enum.join(item["sentences"], " ")
+              value: Enum.join(sentences, " ")
             }
 
-          "para" ->
+          {"para", sentences} ->
             %Paragraph{
               id: UUID.uuid4(),
               level: level,
               metadata: %{page: item["page_idx"]},
-              value: Enum.join(item["sentences"], " ")
+              value: Enum.join(sentences, " ")
             }
 
-          "list_item" ->
+          {"list_item", sentences} ->
             %ListItem{
               id: UUID.uuid4(),
               level: level,
               metadata: %{page: item["page_idx"]},
-              value: Enum.join(item["sentences"], " ")
+              value: Enum.join(sentences, " ")
             }
+
+          _ ->
+            nil
         end
       end
     )
+    |> Enum.reject(&is_nil/1)
   end
 
   @spec map_with_relations(list()) :: [Header.t() | Paragraph.t() | ListItem.t()]

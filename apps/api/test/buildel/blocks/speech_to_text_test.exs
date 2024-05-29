@@ -49,8 +49,8 @@ defmodule Buildel.Blocks.SpeechToTextTest do
     file = File.read!("test/support/fixtures/real.mp3")
     test_run |> BlocksTestRunner.Run.input("audio_test", "input", {:binary, file})
 
-    assert_receive {^topic, :start_stream, nil}
-    assert_receive {^topic, :text, "Hello"}
-    assert_receive {^topic, :stop_stream, nil}
+    assert_receive {^topic, :start_stream, nil, _}
+    assert_receive {^topic, :text, "Hello", _}
+    assert_receive {^topic, :stop_stream, nil, _}
   end
 end

@@ -124,7 +124,7 @@ describe(PipelineBuilder.name, () => {
     });
 
     const deleteButton = await ButtonHandle.fromLabelText(
-      /Delete block: text_input_1/i
+      /Delete block: text_input_1/i,
     );
 
     await page.fireBlockOnClick(deleteButton.buttonElement);
@@ -142,7 +142,7 @@ describe(PipelineBuilder.name, () => {
     });
 
     const editButton = await ButtonHandle.fromLabelText(
-      /Edit block: text_output_1/i
+      /Edit block: text_output_1/i,
     );
 
     await page.fireBlockOnClick(editButton.buttonElement);
@@ -243,7 +243,7 @@ describe(PipelineBuilder.name, () => {
     await page.selectAlias(/Select alias: alias/i);
 
     const aliasBlocks = await waitFor(() =>
-      screen.queryAllByTestId("builder-block")
+      screen.queryAllByTestId("builder-block"),
     );
 
     expect(aliasBlocks).toHaveLength(1);
@@ -277,7 +277,7 @@ describe(PipelineBuilder.name, () => {
     await page.confirmAction();
 
     const aliasBlocks = await waitFor(() =>
-      screen.queryAllByTestId("builder-block")
+      screen.queryAllByTestId("builder-block"),
     );
 
     expect(aliasBlocks).toHaveLength(1);
@@ -324,7 +324,7 @@ describe(PipelineBuilder.name, () => {
     await submit.click();
 
     expect(
-      screen.queryByText(/This block contains problems to fix./i)
+      screen.queryByText(/This block contains problems to fix./i),
     ).toBeNull();
   });
 
@@ -343,13 +343,13 @@ describe(PipelineBuilder.name, () => {
 
     const name = await InputHandle.fromLabelTextAndContainer(
       /name/i,
-      selectModal
+      selectModal,
     );
     await name.type("SAMPLE_KEY");
 
     const modalSubmit = await ButtonHandle.fromLabelTextAndContainer(
       /create new/i,
-      selectModal
+      selectModal,
     );
 
     await modalSubmit.click();
@@ -358,7 +358,7 @@ describe(PipelineBuilder.name, () => {
 
     const value = await InputHandle.fromLabelTextAndContainer(
       /value/i,
-      selectModal
+      selectModal,
     );
     await value.type("SAMPLE_KEY_VALUE");
 
@@ -372,46 +372,43 @@ describe(PipelineBuilder.name, () => {
       initialEntries: [`/2/pipelines/1/build/blocks/document_search_1`],
     });
 
-    const knowledgeSelect = await CreatableSelectHandle.fromTestId(
-      "opts.knowledge"
-    );
+    const knowledgeSelect =
+      await CreatableSelectHandle.fromTestId("opts.knowledge");
     await knowledgeSelect.openModal();
     const submitKnowledgeBase = await ButtonHandle.fromLabelTextAndContainer(
       /Create new/i,
-      await knowledgeSelect.getModal()
+      await knowledgeSelect.getModal(),
     );
 
     // new knowledge base
 
-    const newKnowledgeNameInput = await InputHandle.fromLabelText(
-      /collection_name/i
-    );
+    const newKnowledgeNameInput =
+      await InputHandle.fromLabelText(/collection_name/i);
     await newKnowledgeNameInput.type("NEW_NEW");
-    const newKnowledgeModelSelect = await SelectHandle.fromTestId(
-      "embeddings.model"
-    );
+    const newKnowledgeModelSelect =
+      await SelectHandle.fromTestId("embeddings.model");
     await newKnowledgeModelSelect.selectOption("text-embedding-ada-002");
 
     // new knowledge base -> new secret
 
     const newKnowledgeSecretSelect = await CreatableSelectHandle.fromTestId(
-      "embeddings.secret_name"
+      "embeddings.secret_name",
     );
     await newKnowledgeSecretSelect.openModal();
     const newSecretModal = await newKnowledgeSecretSelect.getModal();
     const newSecretNameInput = await InputHandle.fromLabelTextAndContainer(
       /name/i,
-      newSecretModal
+      newSecretModal,
     );
     await newSecretNameInput.type("WRRR");
     const newSecretValueInput = await InputHandle.fromLabelTextAndContainer(
       /value/i,
-      newSecretModal
+      newSecretModal,
     );
     await newSecretValueInput.type("WRRR");
     const newSecretSubmitButton = await ButtonHandle.fromLabelTextAndContainer(
       /Create new/i,
-      newSecretModal
+      newSecretModal,
     );
     await newSecretSubmitButton.click();
     expect(newKnowledgeSecretSelect.value).toBe("WRRR");
@@ -429,12 +426,12 @@ describe(PipelineBuilder.name, () => {
     });
 
     const list = await ListHandle.fromLabelText(
-      /document_search_1 memory list/i
+      /document_search_1 memory list/i,
     );
     expect(list.children).toHaveLength(0);
 
     const editButton = await ButtonHandle.fromLabelText(
-      /Edit block: document_search_1/i
+      /Edit block: document_search_1/i,
     );
     await page.fireBlockOnClick(editButton.buttonElement);
 
@@ -447,7 +444,7 @@ describe(PipelineBuilder.name, () => {
     });
 
     const listAfterUpdate = await ListHandle.fromLabelText(
-      /document_search_1 memory list/i
+      /document_search_1 memory list/i,
     );
 
     expect(listAfterUpdate.children).toHaveLength(2);
@@ -469,7 +466,7 @@ describe(PipelineBuilder.name, () => {
             ],
           },
         }),
-      ]).handlers
+      ]).handlers,
     );
     new PipelineObject().render({
       initialEntries: [`/2/pipelines/2/build`],
@@ -499,7 +496,7 @@ describe(PipelineBuilder.name, () => {
     await select.selectOption("GPT-3.5 Turbo");
 
     expect(select.value).toBe("GPT-3.5 Turbo");
-    expect(endpoint.value).toBe("https://api.openai.com/v1/chat/completions");
+    expect(endpoint.value).toBe("https://api.openai.com/v1");
 
     const googleRadio = await RadioHandle.fromLabelText("google");
 
@@ -507,7 +504,7 @@ describe(PipelineBuilder.name, () => {
 
     expect(select.value).toBe(null);
     expect(endpoint.value).toBe(
-      "https://generativelanguage.googleapis.com/v1beta/models"
+      "https://generativelanguage.googleapis.com/v1beta/models",
     );
   });
 
@@ -611,7 +608,7 @@ class PipelineObject {
 
   async editBlock(blockName: string) {
     const editButton = await ButtonHandle.fromLabelText(
-      `Edit block: ${blockName}`
+      `Edit block: ${blockName}`,
     );
 
     await this.fireBlockOnClick(editButton.buttonElement);
@@ -626,7 +623,7 @@ class PipelineObject {
       new MouseEvent("click", {
         bubbles: true,
         cancelable: true,
-      })
+      }),
     );
 
     return this;
@@ -701,7 +698,7 @@ class PipelineObject {
 
   async fillSystemMessage(message: string) {
     const system_message = await TextareaHandle.fromTestId(
-      "opts.system_message-editor"
+      "opts.system_message-editor",
     );
 
     await system_message.type(message);
@@ -717,7 +714,7 @@ class PipelineObject {
 
   async pasteBlockConfig(config: Record<string, any>) {
     const configuration = await TextareaHandle.fromTestId(
-      "configuration-editor"
+      "configuration-editor",
     );
     await configuration.paste(JSON.stringify(config));
 

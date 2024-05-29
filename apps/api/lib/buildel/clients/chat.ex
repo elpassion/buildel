@@ -46,7 +46,10 @@ defmodule Buildel.Clients.Chat do
       opts
       |> Map.put_new(:on_message, fn _ -> nil end)
       |> Map.put_new(:api_type, "openai")
-      |> Map.put_new(:endpoint, "https://api.openai.com/v1/chat/completions")
+      |> Map.put_new(:endpoint, "https://api.openai.com/v1")
+      |> Map.put_new(:response_format, "text")
+
+    llm = get_llm(opts)
 
     messages =
       context.messages
@@ -103,7 +106,7 @@ defmodule Buildel.Clients.Chat do
           input_tokens: usage.prompt_tokens,
           output_tokens: usage.completion_tokens,
           model: model,
-          endpoint: opts.endpoint
+          endpoint: llm.endpoint
         }
 
         on_cost.(token_summary)
@@ -116,7 +119,7 @@ defmodule Buildel.Clients.Chat do
 
     with {:ok, chain, message} <-
            LLMChain.new!(%{
-             llm: get_llm(opts),
+             llm: llm,
              custom_context: context
            })
            |> LLMChain.add_functions(tools |> Enum.map(& &1.function))
@@ -142,13 +145,70 @@ defmodule Buildel.Clients.Chat do
     end
   end
 
+  def get_models(%{api_type: "openai"} = opts) do
+    with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
+         when status_code >= 200 and status_code < 400 <-
+           HTTPoison.get(opts.endpoint <> "/models", Authorization: "Bearer #{opts.api_key}") do
+      body
+      |> Jason.decode!()
+      |> Map.get("data")
+      |> Enum.map(fn model ->
+        %{id: model["id"], name: model["id"], api_type: "openai"}
+      end)
+    else
+      _ ->
+        []
+    end
+  end
+
+  def get_models(%{api_type: "mistral"} = opts) do
+    with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
+         when status_code >= 200 and status_code < 400 <-
+           HTTPoison.get(opts.endpoint <> "/models", Authorization: "Bearer #{opts.api_key}") do
+      body
+      |> Jason.decode!()
+      |> Map.get("data")
+      |> Enum.map(fn model ->
+        %{id: model["id"], name: model["id"], api_type: "mistral"}
+      end)
+    else
+      _ ->
+        []
+    end
+  end
+
+  def get_models(%{api_type: "google"} = opts) do
+    with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
+         when status_code >= 200 and status_code < 400 <-
+           HTTPoison.get(opts.endpoint <> "?key=#{opts.api_key}") do
+      body
+      |> Jason.decode!()
+      |> Map.get("models")
+      |> Enum.map(fn model ->
+        %{
+          id: model["name"] |> String.split("/") |> Enum.at(1),
+          name: model["displayName"],
+          api_type: "google"
+        }
+      end)
+    else
+      _e ->
+        []
+    end
+  end
+
+  def get_models(_) do
+    []
+  end
+
   defp get_llm(%{api_type: "mistral"} = opts) do
     ChatMistralAI.new!(%{
       model: opts.model,
       temperature: opts.temperature,
       stream: true,
       api_key: opts.api_key,
-      endpoint: opts.endpoint
+      endpoint: opts.endpoint <> "/chat/completions",
+      json_response: opts.response_format == "json"
     })
   end
 
@@ -159,7 +219,8 @@ defmodule Buildel.Clients.Chat do
       stream: true,
       api_key: opts.api_key,
       api_type: opts.api_type,
-      endpoint: opts.endpoint
+      endpoint: opts.endpoint <> "/chat/completions",
+      json_response: opts.response_format == "json"
     })
   end
 
@@ -170,7 +231,8 @@ defmodule Buildel.Clients.Chat do
       stream: true,
       api_key: opts.api_key,
       api_type: opts.api_type,
-      endpoint: opts.endpoint
+      endpoint: opts.endpoint <> "/chat/completions?version=2024-02-01",
+      json_response: opts.response_format == "json"
     })
   end
 

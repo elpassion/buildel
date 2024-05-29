@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { ChatWrapper } from "~/components/chat/ChatWrapper";
 import { ChatHeading } from "~/components/chat/ChatHeading";
 import { ChatMessages } from "~/components/chat/ChatMessages";
@@ -20,6 +20,8 @@ import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { UnauthorizedError } from "~/utils/errors";
 import { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
 import { ParsedResponse } from "~/utils/fetch.server";
+import { useFilesUpload } from "~/components/fileUpload/FileUpload";
+import { Icon } from "@elpassion/taco";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -38,7 +40,7 @@ export async function loader(args: LoaderFunctionArgs) {
     if (!pipeline) {
       pipeline = await pipelineApi.getPublicPipeline(
         params.organizationId,
-        params.pipelineId
+        params.pipelineId,
       );
     }
 
@@ -64,6 +66,7 @@ export default function WebsiteChat() {
     stopRun,
     startRun,
     messages,
+    runId,
   } = useChat({
     input: pipeline.interface_config?.input ?? "",
     output: pipeline.interface_config?.output ?? "",
@@ -72,6 +75,41 @@ export default function WebsiteChat() {
     pipelineId: pipelineId as unknown as number,
     useAuth: !(pipeline.interface_config?.public ?? false),
   });
+
+  const {
+    fileList,
+    removeFile,
+    uploadFile,
+    inputRef,
+    clearFiles,
+    isUploading,
+  } = useFilesUpload({
+    organizationId: parseInt(organizationId),
+    pipelineId: parseInt(pipelineId),
+    runId: runId,
+    fileBlockName: pipeline.interface_config?.file,
+  });
+
+  const onSubmit = useCallback(
+    (value: string) => {
+      const files = fileList
+        .map((file) =>
+          file.status === "done"
+            ? { id: file.id, file_name: file.file_name }
+            : null,
+        )
+        .filter((f) => !!f);
+      const filesString = files.length
+        ? `
+\`\`\`buildel_message_attachments
+${JSON.stringify(files)}
+\`\`\`\n`
+        : "";
+      pushMessage(`${filesString}${value}`);
+      clearFiles();
+    },
+    [fileList, pushMessage, clearFiles],
+  );
 
   useEffect(() => {
     // todo change it
@@ -104,9 +142,52 @@ export default function WebsiteChat() {
         </ChatMessagesWrapper>
 
         <ChatInput
-          onSubmit={pushMessage}
-          disabled={connectionStatus !== "running"}
+          onSubmit={onSubmit}
+          disabled={connectionStatus !== "running" || isUploading}
           generating={isGenerating}
+          attachments={
+            pipeline.interface_config?.file &&
+            fileList.length > 0 && (
+              <div className="w-full flex gap-1 p-1 flex-wrap">
+                {fileList.map((file) => {
+                  return (
+                    <div
+                      className={classNames(
+                        "text-white px-1 border rounded-md flex items-center gap-1",
+                        {
+                          "border-neutral-700": file.status === "done",
+                          "border-neutral-900": file.status !== "done",
+                        },
+                      )}
+                      key={file.id}
+                    >
+                      {file.file_name}
+                      <button type="button" onClick={() => removeFile(file.id)}>
+                        <Icon iconName="trash" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )
+          }
+          prefix={
+            pipeline.interface_config?.file && (
+              <label className="text-white pl-2 cursor-pointer">
+                <Icon iconName="upload" />
+                <input
+                  ref={inputRef}
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => {
+                    [...(e.target.files || [])].forEach((file) => {
+                      uploadFile(file);
+                    });
+                  }}
+                />
+              </label>
+            )
+          }
         />
 
         <IntroPanel className={classNames({ hidden: !!messages.length })}>

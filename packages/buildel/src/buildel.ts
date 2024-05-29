@@ -257,6 +257,7 @@ export class BuildelRunLogs {
 
 export class BuildelRun {
   private channel: Channel | null = null;
+  public runId: string | null = null;
 
   public constructor(
     private readonly socket: Socket,
@@ -332,7 +333,8 @@ export class BuildelRun {
 
     return new Promise<BuildelRun>((resolve, reject) => {
       assert(this.channel);
-      this.channel.join().receive("ok", () => {
+      this.channel.join().receive("ok", response => {
+        this.runId = response.run.id;
         resolve(this);
         this.handlers.onStatusChange("running");
       });

@@ -83,7 +83,7 @@ defmodule Buildel.Blocks.IF do
   end
 
   @impl true
-  def handle_info({_name, :text, text}, state) do
+  def handle_info({_name, :text, text, _metadata}, state) do
     cast(self(), {:text, text})
     {:noreply, state}
   end

@@ -37,8 +37,8 @@ defmodule Buildel.Blocks.AudioInputTest do
     file = File.read!("test/support/fixtures/real.mp3")
     test_run |> BlocksTestRunner.Run.input("test", "input", {:binary, file})
 
-    assert_receive {^topic, :start_stream, nil}
-    assert_receive {^topic, :binary, ^file}
-    assert_receive {^topic, :stop_stream, nil}
+    assert_receive {^topic, :start_stream, nil, _}
+    assert_receive {^topic, :binary, ^file, _}
+    assert_receive {^topic, :stop_stream, nil, _}
   end
 end

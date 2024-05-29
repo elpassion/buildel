@@ -142,7 +142,7 @@ defmodule Buildel.Blocks.SpeechToText do
     {:noreply, state}
   end
 
-  def handle_info({_name, :binary, chunk}, state) do
+  def handle_info({_name, :binary, chunk, _metadata}, state) do
     transcript(self(), {:binary, chunk})
     {:noreply, state}
   end

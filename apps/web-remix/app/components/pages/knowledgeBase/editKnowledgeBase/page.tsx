@@ -67,6 +67,18 @@ export function EditKnowledgeBasePage() {
           </div>
 
           <div>
+            <Field name="embeddings.endpoint">
+              <TextInputField
+                disabled
+                type="text"
+                label={"Endpoint"}
+                name={"endpoint"}
+                supportingText="API endpoint used for retrieving embeddings"
+              />
+            </Field>
+          </div>
+
+          <div>
             <ModelSelectField disabled />
           </div>
 

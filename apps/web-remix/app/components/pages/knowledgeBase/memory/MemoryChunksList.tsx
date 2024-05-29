@@ -29,7 +29,9 @@ export const MemoryChunksListItem: React.FC<MemoryChunksListItemProps> = ({
   return (
     <div>
       <p className="font-bold text-neutral-100">{data.keywords.join(" - ")}</p>
-      <p className="text-neutral-100 text-sm break-words">{data.content}</p>
+      <pre className="text-neutral-100 text-sm break-words">
+        {data.content.trim()}
+      </pre>
     </div>
   );
 };

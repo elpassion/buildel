@@ -1,6 +1,9 @@
-import React, { AnchorHTMLAttributes } from "react";
+import React, { AnchorHTMLAttributes, useEffect, useRef } from "react";
 import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
 import classNames from "classnames";
+import mermaid from "mermaid";
+import { z } from "zod";
+
 interface ChatMarkdownProps {
   [key: string]: any;
   children: string;
@@ -273,6 +276,10 @@ function Pre({
   className,
   ...rest
 }: React.ParamHTMLAttributes<HTMLPreElement>) {
+  useEffect(() => {
+    mermaid.initialize({});
+  }, []);
+
   return (
     <pre
       className={classNames(
@@ -286,13 +293,37 @@ function Pre({
   );
 }
 
+const MessageAttachments = z.array(
+  z.object({ id: z.union([z.number(), z.string()]), file_name: z.string() }),
+);
+
 function Code({
   children,
   className,
   ...rest
 }: React.ParamHTMLAttributes<HTMLPreElement>) {
+  const codeRef = useRef<HTMLElement>(null);
+  if (className?.includes("lang-mermaid")) {
+    mermaid.run({
+      nodes: [codeRef.current!],
+    });
+  }
+  if (className?.includes("lang-buildel_message_attachments")) {
+    try {
+      const attachments = MessageAttachments.parse(
+        JSON.parse((children || "").toString()),
+      );
+      return attachments.map((attachment) => {
+        return <div key={attachment.id}>{attachment.file_name}</div>;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    return "Uploaded files";
+  }
   return (
     <code
+      ref={codeRef}
       className={classNames(
         "my-1 bg-neutral-900 break-words whitespace-pre-wrap text-neutral-100",
         className,

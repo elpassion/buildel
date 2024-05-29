@@ -348,4 +348,138 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       err -> err
     end
   end
+
+  operation :input_file,
+    summary: "Add run input file",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      id: [in: :path, description: "Run ID", type: :integer, required: true]
+    ],
+    request_body: {"file", "multipart/form-data", BuildelWeb.Schemas.Runs.FileInputRequest},
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      bad_request:
+        {"bad request", "application/json", BuildelWeb.Schemas.Errors.BadRequestResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def input_file(conn, _params) do
+    %{
+      block_name: block_name,
+      input_name: input_name,
+      file: file
+    } = conn.body_params
+
+    %{
+      organization_id: organization_id,
+      pipeline_id: pipeline_id,
+      id: id
+    } = conn.params
+
+    user = conn.assigns.current_user
+
+    file_id = UUID.uuid4()
+
+    with {:ok, organization} <-
+           Organizations.get_user_organization(user, organization_id),
+         {:ok, %Pipeline{} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, run} <- Pipelines.get_running_pipeline_run(pipeline, id),
+         block_pid <- Buildel.Pipelines.Runner.block_pid(run, block_name),
+         :ok <- Plug.Upload.give_away(file, block_pid),
+         {:ok, _run} <-
+           Pipelines.Runner.cast_run(
+             run,
+             block_name,
+             input_name,
+             {:binary, file |> Map.get(:path)},
+             %{
+               file_id: file_id,
+               file_name: file |> Map.get(:filename),
+               file_type: file |> Map.get(:content_type)
+             }
+           ) do
+      render(conn, :input_file,
+        file: %{
+          id: file_id,
+          file_name: file |> Map.get(:filename),
+          file_size: 1,
+          file_type: file |> Map.get(:content_type)
+        }
+      )
+    else
+      {:error, :not_running} -> {:error, :bad_request}
+      err -> err
+    end
+  end
+
+  operation :input_file_delete,
+    summary: "Remove run input file",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+      id: [in: :path, description: "Run ID", type: :integer, required: true]
+    ],
+    request_body: {"input", "application/json", BuildelWeb.Schemas.Runs.FileInputRemoveRequest},
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      bad_request:
+        {"bad request", "application/json", BuildelWeb.Schemas.Errors.BadRequestResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def input_file_delete(conn, _params) do
+    %{
+      block_name: block_name,
+      input_name: input_name,
+      file_id: file_id
+    } = conn.body_params
+
+    %{
+      organization_id: organization_id,
+      pipeline_id: pipeline_id,
+      id: id
+    } = conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Pipeline{} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id),
+         {:ok, run} <- Pipelines.get_running_pipeline_run(pipeline, id),
+         {:ok, run} <-
+           Pipelines.Runner.cast_run(run, block_name, input_name, {:text, file_id}, %{
+             method: :delete
+           }) do
+      render(conn, :show, run: run)
+    else
+      {:error, :not_running} -> {:error, :bad_request}
+      err -> err
+    end
+  end
 end

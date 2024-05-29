@@ -27,42 +27,8 @@ defmodule BuildelWeb.OrganizationModelControllerTest do
     test "lists all organization models", %{conn: conn, organization: organization} do
       conn = get(conn, ~p"/api/organizations/#{organization}/models")
 
-      assert json_response(conn, 200)["data"] == [
-               %{"api_type" => "openai", "id" => "gpt-3.5-turbo", "name" => "GPT-3.5 Turbo"},
-               %{
-                 "api_type" => "openai",
-                 "id" => "gpt-3.5-turbo-0125",
-                 "name" => "GPT-3.5 Turbo Preview"
-               },
-               %{
-                 "api_type" => "openai",
-                 "id" => "gpt-4-turbo-preview",
-                 "name" => "GPT-4 Turbo Preview"
-               },
-               %{"api_type" => "azure", "id" => "azure", "name" => "Azure"},
-               %{"api_type" => "google", "id" => "gemini-pro", "name" => "Gemini Pro"},
-               %{
-                 "api_type" => "google",
-                 "id" => "gemini-1.5-pro-latest",
-                 "name" => "Gemini 1.5 Pro"
-               },
-               %{"api_type" => "mistral", "id" => "mistral-tiny", "name" => "Mistral Tiny"},
-               %{
-                 "api_type" => "mistral",
-                 "id" => "mistral-small-latest",
-                 "name" => "Mistral Small"
-               },
-               %{
-                 "api_type" => "mistral",
-                 "id" => "mistral-medium-latest",
-                 "name" => "Mistral Medium"
-               },
-               %{
-                 "api_type" => "mistral",
-                 "id" => "mistral-large-latest",
-                 "name" => "Mistral Large"
-               }
-             ]
+      assert models = json_response(conn, 200)["data"]
+      assert length(models) > 0
     end
 
     test "lists all organization models filtered by api_type", %{

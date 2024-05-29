@@ -14,7 +14,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@buildel/buildel": "file:../../packages/buildel/dist",
+    "@buildel/buildel": "^0.2.6",
     "@codemirror/autocomplete": "^6.15.0",
     "@elpassion/taco": "^0.6.0",
     "@fastify/early-hints": "^1.0.1",
@@ -55,6 +55,7 @@
     "lodash.startcase": "^4.4.0",
     "lru-cache": "^10.2.0",
     "markdown-to-jsx": "^7.4.1",
+    "mermaid": "^10.9.1",
     "morgan": "^1.10.0",
     "nprogress": "^0.2.0",
     "phoenix": "^1.7.7",

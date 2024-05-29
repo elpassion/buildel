@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.WebhookOutput do
   def options() do
     %{
       type: "webhook_output",
-      description: "This module is adept at forwarding text data to specified webhook URLs, facilitating seamless external integrations.",
+      description:
+        "This module is adept at forwarding text data to specified webhook URLs, facilitating seamless external integrations.",
       groups: ["inputs / outputs"],
       inputs: [Block.text_input()],
       outputs: [],
@@ -94,7 +95,7 @@ defmodule Buildel.Blocks.WebhookOutput do
   end
 
   @impl true
-  def handle_info({_name, :text, text}, state) do
+  def handle_info({_name, :text, text, _metadata}, state) do
     cast(self(), {:text, text})
     {:noreply, state}
   end

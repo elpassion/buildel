@@ -75,28 +75,28 @@ defmodule Buildel.Blocks.Chat do
                   "enumPresentAs" => "radio",
                   "default" => "openai"
                 },
-                model: %{
-                  "type" => "string",
-                  "title" => "Model",
-                  "description" => "The model to use for the chat.",
-                  "url" =>
-                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}",
-                  "presentAs" => "async-select",
-                  "minLength" => 1
-                },
                 endpoint: %{
                   "type" => "string",
                   "title" => "Endpoint",
                   "description" => "The endpoint to use for the chat.",
                   "defaultWhen" => %{
                     "opts.api_type" => %{
-                      "openai" => "https://api.openai.com/v1/chat/completions",
+                      "openai" => "https://api.openai.com/v1",
                       "azure" =>
-                        "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}/chat/completions?api-version={api_version}",
+                        "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}",
                       "google" => "https://generativelanguage.googleapis.com/v1beta/models",
-                      "mistral" => "https://api.mistral.ai/v1/chat/completions"
+                      "mistral" => "https://api.mistral.ai/v1"
                     }
                   },
+                  "minLength" => 1
+                },
+                model: %{
+                  "type" => "string",
+                  "title" => "Model",
+                  "description" => "The model to use for the chat.",
+                  "url" =>
+                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
+                  "presentAs" => "async-select",
                   "minLength" => 1
                 },
                 chat_memory_type: %{
@@ -116,6 +116,15 @@ defmodule Buildel.Blocks.Chat do
                   "minimum" => 0.0,
                   "maximum" => 2.0,
                   "step" => 0.1
+                },
+                response_format: %{
+                  "type" => "string",
+                  "title" => "Chat response format",
+                  "description" => "The format used by chat to respond.",
+                  "enum" => ["text", "json"],
+                  "enumPresentAs" => "radio",
+                  "default" => "text",
+                  "minLength" => 1
                 },
                 call_formatter:
                   EditorField.call_formatter(%{
@@ -202,7 +211,7 @@ defmodule Buildel.Blocks.Chat do
     GenServer.call(pid, {:send_message, message}, 5 * 60_000)
   end
 
-  defp save_input_and_send_message(pid, {topic, :text, message}) do
+  defp save_input_and_send_message(pid, {topic, :text, message, _metadata}) do
     %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
 
     GenServer.cast(
@@ -303,7 +312,8 @@ defmodule Buildel.Blocks.Chat do
          acc
          |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
        end)
-     )}
+     )
+     |> Map.put(:response_format, "text")}
   end
 
   @impl true
@@ -540,7 +550,7 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_info({_name, :text, _message} = info, state) do
+  def handle_info({_name, :text, _message, _metadata} = info, state) do
     state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
     {:noreply, state}
   end
@@ -619,7 +629,8 @@ defmodule Buildel.Blocks.Chat do
              temperature: state[:opts].temperature,
              tools: tools,
              endpoint: state[:opts].endpoint,
-             api_type: state[:opts].api_type
+             api_type: state[:opts].api_type,
+             response_format: state[:opts].response_format
            }) do
       {:ok, message, state}
     else

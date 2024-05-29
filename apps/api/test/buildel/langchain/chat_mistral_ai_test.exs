@@ -59,7 +59,8 @@ defmodule Buildel.LangChain.ChatModels.ChatMistralAITest do
                  stream: false,
                  max_tokens: 100,
                  safe_prompt: true,
-                 random_seed: 42
+                 random_seed: 42,
+                 response_format: %{"type" => "text"}
                }
     end
 

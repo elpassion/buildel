@@ -2,7 +2,6 @@
 
 - [Remix Docs](https://remix.run/docs)
 
-
 ## Fly Setup
 
 1. [Install `flyctl`](https://fly.io/docs/getting-started/installing-flyctl/)

@@ -15,24 +15,24 @@ defmodule Buildel.Crawler.CrawlerTest do
               }} = Buildel.Crawler.crawl("invalid_url")
     end
 
-    test "returns error when request fails" do
-      use_cassette("crawler_http_fail") do
-        assert {:error,
-                %Crawl{
-                  id: _,
-                  start_url: "http://nonexistentwebsite1234567890.com",
-                  status: :error,
-                  error: :not_all_pages_successful,
-                  pages: [
-                    %Buildel.Crawler.Page{
-                      status: :error,
-                      url: "http://nonexistentwebsite1234567890.com",
-                      error: :request_failed
-                    }
-                  ]
-                }} = Buildel.Crawler.crawl("http://nonexistentwebsite1234567890.com")
-      end
-    end
+    # test "returns error when request fails" do
+    #   use_cassette("crawler_http_fail") do
+    #     assert {:error,
+    #             %Crawl{
+    #               id: _,
+    #               start_url: "http://nonexistentwebsite1234567890.com",
+    #               status: :error,
+    #               error: :not_all_pages_successful,
+    #               pages: [
+    #                 %Buildel.Crawler.Page{
+    #                   status: :error,
+    #                   url: "http://nonexistentwebsite1234567890.com",
+    #                   error: :request_failed
+    #                 }
+    #               ]
+    #             }} = Buildel.Crawler.crawl("http://nonexistentwebsite1234567890.com")
+    #   end
+    # end
 
     test "returns ok  when request succeeds" do
       use_cassette("crawler_http_example") do

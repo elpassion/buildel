@@ -121,6 +121,18 @@ defmodule BuildelWeb.Router do
       :input
     )
 
+    post(
+      "/organizations/:organization_id/pipelines/:pipeline_id/runs/:id/input_file",
+      OrganizationPipelineRunController,
+      :input_file
+    )
+
+    delete(
+      "/organizations/:organization_id/pipelines/:pipeline_id/runs/:id/input_file",
+      OrganizationPipelineRunController,
+      :input_file_delete
+    )
+
     resources(
       "/organizations/:organization_id/pipelines/:pipeline_id/runs",
       OrganizationPipelineRunController,
@@ -187,6 +199,12 @@ defmodule BuildelWeb.Router do
 
     post("/organizations/:organization_id/tools/chunks", OrganizationToolChunkController, :create)
     post("/organizations/:organization_id/tools/crawls", OrganizationToolCrawlController, :create)
+
+    post(
+      "/organizations/:organization_id/tools/embeddings",
+      OrganizationToolEmbeddingsController,
+      :create
+    )
 
     get("/users/me", UserController, :me)
     post("/users/log_in", UserSessionController, :create)

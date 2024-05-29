@@ -253,7 +253,8 @@ defmodule BuildelWeb.CollectionController do
              embeddings: %{
                api_type: collection.embeddings_api_type,
                model: collection.embeddings_model,
-               secret_name: embeddings.secret_name
+               secret_name: embeddings.secret_name,
+               endpoint: collection.embeddings_endpoint
              }
            }) do
       conn

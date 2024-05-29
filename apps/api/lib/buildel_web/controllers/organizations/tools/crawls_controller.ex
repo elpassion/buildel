@@ -52,7 +52,7 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
       crawl.pages
       |> Enum.map(fn page ->
         Task.async(fn ->
-          path = Temp.path!(suffix: ".html")
+          path = Temp.path!(%{suffix: ".html"})
           File.write!(path, page.body)
 
           Buildel.Memories.create_organization_memory(organization, collection, %{
@@ -60,6 +60,8 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
             type: "text/html",
             name: page.url
           })
+
+          nil
         end)
       end)
       |> Task.await_many()

@@ -37,27 +37,48 @@ defmodule BuildelWeb.OrganizationToolChunkController do
 
     user = conn.assigns.current_user
 
+    file_properties = %{
+      path: file |> Map.get(:path),
+      type: file |> Map.get(:content_type),
+      name: file |> Map.get(:filename)
+    }
+
     with {:ok, _organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id) do
-      file_properties = %{
-        path: file |> Map.get(:path),
-        type: file |> Map.get(:content_type),
-        name: file |> Map.get(:filename)
-      }
+      %{file_type: file_type, file_name: file_name} =
+        Buildel.FileLoader.file_properties(file_properties)
 
-      %{file_type: file_type} = Buildel.FileLoader.file_properties(file_properties)
-      {:ok, file} = Buildel.FileLoader.load_file(file_properties.path, %{type: file_type})
-
-      chunks =
-        Buildel.Splitters.recursive_character_text_split(file, %{
-          chunk_size: chunk_size,
-          chunk_overlap: chunk_overlap
+      workflow =
+        Buildel.DocumentWorkflow.new(%{
+          embeddings:
+            Buildel.Clients.Embeddings.new(%{
+              api_type: "does",
+              model: "not matter",
+              api_key: "key",
+              endpoint: "really"
+            }),
+          collection_name: "name",
+          db_adapter: Buildel.VectorDB.EctoAdapter,
+          workflow_config: %{
+            chunk_size: chunk_size,
+            chunk_overlap: chunk_overlap
+          }
         })
-        |> Enum.map(fn chunk -> %{text: chunk} end)
 
-      conn
-      |> put_status(:created)
-      |> render(:show, chunks: chunks)
+      document = Buildel.DocumentWorkflow.read(workflow, {file.path, file_type})
+
+      with chunks when is_list(chunks) <-
+             Buildel.DocumentWorkflow.build_node_chunks(workflow, document),
+           chunks <-
+             put_in(
+               chunks,
+               [Access.all(), Access.key!(:metadata), :file_name],
+               file_name
+             ) do
+        conn
+        |> put_status(:created)
+        |> render(:show, chunks: chunks)
+      end
     end
   end
 end

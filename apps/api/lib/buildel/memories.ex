@@ -76,9 +76,10 @@ defmodule Buildel.Memories do
   def create_organization_memory(
         %Buildel.Organizations.Organization{} = organization,
         %Buildel.Memories.MemoryCollection{} = collection,
-        file
+        file,
+        metadata \\ %{}
       ) do
-    metadata = Buildel.FileLoader.file_properties(file)
+    metadata = Map.merge(metadata, Buildel.FileLoader.file_properties(file))
 
     {:ok, api_key} =
       Organizations.get_organization_secret(organization, collection.embeddings_secret_name)
@@ -91,7 +92,8 @@ defmodule Buildel.Memories do
           Buildel.Clients.Embeddings.new(%{
             api_type: collection.embeddings_api_type,
             model: collection.embeddings_model,
-            api_key: api_key.value
+            api_key: api_key.value,
+            endpoint: collection.embeddings_endpoint
           }),
         collection_name: organization_collection_name,
         db_adapter: Buildel.VectorDB.EctoAdapter,
@@ -119,7 +121,7 @@ defmodule Buildel.Memories do
                organization_id: organization.id,
                collection_name: collection.collection_name,
                memory_collection_id: collection.id,
-               content: "content"
+               content: chunks |> Enum.map(&Map.get(&1, :value)) |> Enum.join("\n")
              })
            )
            |> Buildel.Repo.insert(),
@@ -162,6 +164,9 @@ defmodule Buildel.Memories do
       {:error, :insufficient_quota} ->
         {:error, :bad_request, "Insufficient quota for embeddings model"}
 
+      {:error, :model_not_found} ->
+        {:error, :bad_request, "Model not found"}
+
       err ->
         err
     end
@@ -182,7 +187,8 @@ defmodule Buildel.Memories do
                Buildel.Clients.Embeddings.new(%{
                  api_type: memory.memory_collection.embeddings_api_type,
                  model: memory.memory_collection.embeddings_model,
-                 api_key: memory.memory_collection.embeddings_secret_name
+                 api_key: memory.memory_collection.embeddings_secret_name,
+                 endpoint: memory.memory_collection.embeddings_endpoint
                })
            }),
          :ok <-
@@ -232,6 +238,7 @@ defmodule Buildel.Memories do
           embeddings_api_type: embeddings.api_type,
           embeddings_model: embeddings.model,
           embeddings_secret_name: embeddings.secret_name,
+          embeddings_endpoint: embeddings.endpoint,
           chunk_size: chunk_size || 1000,
           chunk_overlap: chunk_overlap || 0
         })
@@ -245,6 +252,7 @@ defmodule Buildel.Memories do
           embeddings_api_type: embeddings.api_type,
           embeddings_model: embeddings.model,
           embeddings_secret_name: embeddings.secret_name,
+          embeddings_endpoint: embeddings.endpoint,
           chunk_size: collection.chunk_size,
           chunk_overlap: collection.chunk_overlap
         })
@@ -266,15 +274,15 @@ defmodule Buildel.Memories do
     |> Buildel.Repo.preload(:memory_collection)
   end
 
-  def get_collection_memory!(
+  def get_collection_memory_by_file_uuid!(
         %Buildel.Organizations.Organization{} = organization,
         collection_id,
-        id
+        file_uuid
       ) do
     Buildel.Memories.Memory
     |> where(
       [m],
-      m.id == ^id and m.memory_collection_id == ^collection_id and
+      m.file_uuid == ^file_uuid and m.memory_collection_id == ^collection_id and
         m.organization_id == ^organization.id
     )
     |> Buildel.Repo.one!()
@@ -292,7 +300,8 @@ defmodule Buildel.Memories do
           Buildel.Clients.Embeddings.new(%{
             api_type: "",
             model: "",
-            api_key: ""
+            api_key: "",
+            endpoint: ""
           })
       })
 

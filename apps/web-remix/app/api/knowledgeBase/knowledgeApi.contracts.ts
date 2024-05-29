@@ -26,6 +26,7 @@ export const CreateCollectionSchema = z.object({
     api_type: z.string().min(2),
     model: z.string().min(2),
     secret_name: z.string().min(2),
+    endpoint: z.string().min(2),
   }),
   chunk_size: zfd.numeric(z.number().int().positive()),
   chunk_overlap: zfd.numeric(z.number().int().min(0)),
@@ -46,7 +47,7 @@ export type ICreateCollectionSchema = z.TypeOf<typeof CreateCollectionSchema>;
 export type IUpdateCollectionSchema = z.TypeOf<typeof UpdateCollectionSchema>;
 
 export const KnowledgeBaseFile = z.object({
-  id: z.number(),
+  id: z.union([z.number(), z.string()]),
   file_name: z.string(),
   file_size: z.number(),
   file_type: z.string(),
@@ -87,6 +88,7 @@ export const KnowledgeBaseCollection = z.object({
     api_type: z.string(),
     model: z.string(),
     secret_name: z.string(),
+    endpoint: z.string(),
   }),
   chunk_size: z.number(),
   chunk_overlap: z.number(),
@@ -100,7 +102,7 @@ export const KnowledgeBaseCollectionCost = z.object({
   input_tokens: z.number(),
   output_tokens: z.number(),
   created_at: z.string(),
-})
+});
 
 export const KnowledgeBaseCollectionCostResponse = z
   .object({

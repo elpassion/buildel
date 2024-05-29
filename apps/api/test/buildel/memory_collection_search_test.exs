@@ -158,7 +158,8 @@ defmodule Buildel.MemoryCollectionSearchTest do
           Buildel.Clients.Embeddings.new(%{
             api_type: "test",
             model: "buildel",
-            api_key: "buildel"
+            api_key: "buildel",
+            endpoint: "test"
           })
       })
 

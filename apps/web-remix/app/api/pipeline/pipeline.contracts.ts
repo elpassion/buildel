@@ -12,6 +12,10 @@ export const InterfaceConfig = z.object({
   input: z.string().min(2).optional(),
   output: z.string().min(2).optional(),
   chat: z.string().min(2).optional(),
+  file: z
+    .string()
+    .transform((v) => (v === "" ? undefined : v))
+    .optional(),
   public: z
     .union([z.boolean(), z.string().transform((v) => v === "on")])
     .optional(),

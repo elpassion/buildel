@@ -8,8 +8,8 @@ import { Tooltip } from "~/components/tooltip/Tooltip";
 
 interface FileUploadListPreviewProps
   extends Omit<IPreviewProps, "remove">,
-    React.HTMLProps<HTMLUListElement> {
-  remove?: (id: number) => Promise<void>;
+  React.HTMLProps<HTMLUListElement> {
+  remove?: (id: string | number) => Promise<void>;
   disabled?: boolean;
   className?: string;
 }
@@ -38,7 +38,7 @@ export function FileUploadListPreview({
 
 interface FileUploadListItemProps {
   file: IFileUpload;
-  onRemove?: (id: number) => Promise<void>;
+  onRemove?: (id: string | number) => Promise<void>;
   disabled?: boolean;
 }
 export function FileUploadListItem({

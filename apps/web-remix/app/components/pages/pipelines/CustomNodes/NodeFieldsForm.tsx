@@ -10,7 +10,7 @@ import {
   KnowledgeBaseFileResponse,
 } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
-import { FileUpload } from "~/components/fileUpload/FileUpload";
+import { FileUpload, useFilesUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
 import { AudioFieldTabs } from "./AudioFieldTabs";
@@ -27,7 +27,7 @@ export function NodeFieldsForm({
   disabled = false,
 }: NodeFieldsFormProps) {
   const blockName = block.name;
-  const { status, organizationId, pipelineId } = useRunPipeline();
+  const { status, organizationId, pipelineId, runId } = useRunPipeline();
   const { push, clearEvents } = useRunPipelineNode(block);
 
   const onSubmit = useCallback(
@@ -83,8 +83,54 @@ export function NodeFieldsForm({
     [block.opts]
   );
 
+  const uploadFileTemporary = useCallback(
+    async (file: File): Promise<IFile> => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("block_name", blockName);
+      formData.append("input_name", "input");
+
+      const response = await fetch(
+        `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
+        {
+          body: formData,
+          method: "POST",
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.errors?.detail ?? "Something went wrong!");
+      }
+
+      return { ...KnowledgeBaseFileResponse.parse(data), status: "done" };
+    },
+    [block.opts, runId]
+  );
+
+  const removeFileTemporary = useCallback(
+    async (id: string | number) => {
+      return fetch(
+        `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
+        {
+          body: JSON.stringify({
+            file_id: id,
+            block_name: blockName,
+            input_name: "input",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "DELETE",
+        },
+      );
+    },
+    [block.opts, runId]
+  );
+
   const removeFile = useCallback(
-    async (id: number) => {
+    async (id: string | number) => {
       return fetch(
         `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories/${id}`,
         {
@@ -169,7 +215,8 @@ export function NodeFieldsForm({
             />
           </div>
         );
-      } else if (type === "file") {
+      }
+      else if (type === "file") {
         return (
           <FileUpload
             multiple
@@ -189,7 +236,28 @@ export function NodeFieldsForm({
             )}
           />
         );
-      } else if (type === "audio") {
+      }
+      else if (type === "file_temporary") {
+        return (
+          <FileUpload
+            multiple
+            id={name}
+            name={name}
+            onUpload={uploadFileTemporary}
+            onRemove={removeFileTemporary}
+            disabled={status !== "running" || disabled}
+            preview={(props) => (
+              <FileUploadListPreview
+                {...props}
+                aria-label={`${blockName} temporary list`}
+                className="max-h-[110px]"
+                disabled={disabled}
+              />
+            )}
+          />
+        );
+      }
+      else if (type === "audio") {
         return (
           <AudioFieldTabs
             disabled={disabled}

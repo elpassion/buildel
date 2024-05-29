@@ -85,7 +85,7 @@ defmodule Buildel.Blocks.MapInputs do
   end
 
   @impl true
-  def handle_info({topic, :text, message}, state) do
+  def handle_info({topic, :text, message, _metadata}, state) do
     state = state |> save_latest_input_value(topic, message)
     cast(self(), {:text, message})
     {:noreply, state}

@@ -130,7 +130,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
           embeddings: %{
             api_type: "openai",
             model: "text-embedding-ada-002",
-            secret_name: "some name"
+            secret_name: "some name",
+            endpoint: "some endpoint"
           }
         })
 
@@ -151,7 +152,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
           embeddings: %{
             api_type: "openai",
             model: "text-embedding-ada-002",
-            secret_name: "some name"
+            secret_name: "some name",
+            endpoint: "some endpoint"
           }
         })
 
@@ -181,7 +183,8 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
           embeddings: %{
             api_type: "openai",
             model: "text-embedding-ada-002",
-            secret_name: "some name"
+            secret_name: "some name",
+            endpoint: "some endpoint"
           },
           chunk_size: 420,
           chunk_overlap: 20

@@ -20,6 +20,9 @@ defmodule Buildel.Blocks.Block do
   def file_input(name \\ "input", public \\ false),
     do: %{name: name, type: "file", public: public}
 
+  def file_temporary_input(name \\ "input", public \\ false),
+    do: %{name: name, type: "file_temporary", public: public}
+
   def io(name \\ "tool", role \\ "controller"),
     do: %{name: name, type: role, public: false}
 
@@ -110,11 +113,11 @@ defmodule Buildel.Blocks.Block do
         {:reply, state.block.type, state}
       end
 
-      def handle_info({_topic, :start_stream, _} = message, state) do
+      def handle_info({_topic, :start_stream, _, _} = message, state) do
         {:noreply, state}
       end
 
-      def handle_info({_topic, :stop_stream, _} = message, state) do
+      def handle_info({_topic, :stop_stream, _, _} = message, state) do
         handle_stream_stop(message, state)
       end
 
@@ -123,7 +126,7 @@ defmodule Buildel.Blocks.Block do
         {:noreply, state}
       end
 
-      def handle_stream_stop({_topic, :stop_stream, output}, state) do
+      def handle_stream_stop({_topic, :stop_stream, output, _metadata}, state) do
         {:noreply, state}
       end
 

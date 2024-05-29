@@ -53,6 +53,6 @@ defmodule Buildel.Blocks.FileSpeechToTextTest do
     file = File.read!("test/support/fixtures/real.mp3")
     test_run |> BlocksTestRunner.Run.input("test_input", "input", {:binary, file})
 
-    assert_receive {^topic, :text, "Hello"}
+    assert_receive {^topic, :text, "Hello", _}
   end
 end

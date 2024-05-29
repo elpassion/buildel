@@ -1,5 +1,5 @@
 export interface IFile {
-  id: number;
+  id: number | string;
   file_name: string;
   file_size: number;
   file_type: string;
@@ -14,7 +14,7 @@ export type IFileUpload = IFile | IUploadError;
 
 export interface IPreviewProps {
   fileList: IFileUpload[];
-  remove?: (id: number) => Promise<void>;
+  remove?: (id: string | number) => Promise<void>;
 }
 
 export function isUploadError(upload: IFileUpload): upload is IUploadError {

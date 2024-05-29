@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const IOType = z.object({
   name: z.string(),
-  type: z.enum(["audio", "text", "file", "worker", "controller"]),
+  type: z.enum(["audio", "text", "file", "file_temporary", "worker", "controller"]),
   public: z.boolean(),
 });
 

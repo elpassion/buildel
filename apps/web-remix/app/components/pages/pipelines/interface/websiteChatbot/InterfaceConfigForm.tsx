@@ -27,6 +27,9 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   const inputs = pipeline.config.blocks.filter(
     (block) => block.type === "text_input",
   );
+  const fileInputs = pipeline.config.blocks.filter(
+    (block) => block.type === "file_input",
+  );
   const outputs = pipeline.config.blocks.filter(
     (block) => block.type === "text_output",
   );
@@ -47,6 +50,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
         output: pipeline.interface_config?.output,
         chat: pipeline.interface_config?.chat,
         public: pipeline.interface_config?.public,
+        file: pipeline.interface_config?.file,
       }}
       validator={validator}
       noValidate
@@ -63,6 +67,14 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 
         <Field name="chat">
           <SelectField options={chats.map(toSelectOption)} label="Chat" />
+        </Field>
+
+        <Field name="file">
+          <SelectField
+            options={fileInputs.map(toSelectOption)}
+            label="File"
+            allowClear
+          />
         </Field>
 
         <Field name="public">
