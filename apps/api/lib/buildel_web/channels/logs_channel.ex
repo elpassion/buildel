@@ -21,7 +21,6 @@ defmodule BuildelWeb.LogsChannel do
   }
 
   def join(channel_name, params, socket) do
-    IO.inspect("Joining logs channel")
     params = Map.merge(@default_params, params)
 
     with {:ok, %{organization_id: organization_id, pipeline_id: pipeline_id, run_id: run_id}} <-

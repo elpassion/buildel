@@ -143,7 +143,6 @@ export class BuildelSocket {
   }
 }
 
-// BuildelRunLogs - it will be able to connect to 2 channels, either to whole run logs or to specific block logs
 
 export class BuildelRunLogs {
   private channel: Channel | null = null;

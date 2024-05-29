@@ -95,7 +95,7 @@ defmodule Buildel.LogsAggregator do
   end
 
   defp aggregate_logs(logs_list) do
-    {aggregated, _corrupted_logs} =
+    {aggregated, unfinished_logs} =
       logs_list
       |> Enum.reduce({[], %{}}, fn log, {aggregated_list, current} ->
         log_context = get_log_context(log)
@@ -186,7 +186,21 @@ defmodule Buildel.LogsAggregator do
         end
       end)
 
-    # IO.inspect(corrupted_logs)
+    corrupted_logs =
+      Map.values(unfinished_logs)
+      |> Enum.filter(
+        &NaiveDateTime.before?(
+          &1.created_at,
+          NaiveDateTime.utc_now() |> NaiveDateTime.add(-1, :minute)
+        )
+      )
+      |> Enum.map(fn %AggregatedLog{} = log ->
+        Map.put(log, :corrupted, true)
+        |> Map.put(:message_types, log.message_types ++ [:unhandled_exception])
+        |> Map.put(:message, log.message <> " - Unhandled exception")
+      end)
+
+    aggregated = aggregated ++ corrupted_logs
 
     # todo: handle corrupted logs - they occur when a start_stream message is not followed by a stop_stream or error message
     # it happens when there is an unhandled exception in the block
