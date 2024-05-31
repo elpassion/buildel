@@ -13,9 +13,9 @@ export function usePipelineRun(
   onBlockOutput: (
     blockId: string,
     outputName: string,
-    payload: unknown,
-  ) => void = () => {},
-  onBlockStatusChange: (blockId: string, isWorking: boolean) => void = () => {},
+    payload: unknown
+  ) => void = () => { },
+  onBlockStatusChange: (blockId: string, isWorking: boolean) => void = () => { },
   onBlockError: (blockId: string, errors: string[]) => void,
   onError: (error: string) => void,
   useAuth: boolean = true,

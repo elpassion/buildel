@@ -7,6 +7,7 @@ interface BuildelSocketOptions {
   authUrl?: string;
   headers?: Record<string, string>;
   useAuth?: boolean;
+  onStatusChange?: (status: ConnectionState) => void;
 }
 export class BuildelSocket {
   private readonly socket: Socket;
@@ -15,6 +16,7 @@ export class BuildelSocket {
   private readonly socketUrl: string;
   private readonly headers: Record<string, string>;
   private readonly useAuth: boolean = true;
+  private readonly onStatusChange: (status: ConnectionState) => void;
 
   constructor(
     private readonly organizationId: number,
@@ -30,15 +32,18 @@ export class BuildelSocket {
       },
     });
     this.useAuth = options.useAuth ?? true;
+    this.onStatusChange = options.onStatusChange ?? ((_status: ConnectionState) => { });
   }
 
   public async connect() {
     return new Promise<BuildelSocket>((resolve, reject) => {
       this.socket.connect();
       this.socket.onOpen(() => {
+        this.onStatusChange(this.status());
         resolve(this);
       });
       this.socket.onError((error) => {
+        this.onStatusChange(this.status());
         reject(error);
       });
     });
@@ -47,9 +52,11 @@ export class BuildelSocket {
   public async disconnect() {
     return new Promise<BuildelSocket>((resolve, reject) => {
       this.socket.disconnect(() => {
+        this.onStatusChange(this.status());
         resolve(this);
       });
       this.socket.onError((error) => {
+        this.onStatusChange(this.status());
         reject(error);
       });
     });
@@ -95,6 +102,155 @@ export class BuildelSocket {
         onError,
       }
     );
+  }
+
+  public logs(
+    pipelineId: number,
+    runId: number,
+    handlers?: {
+      onMessage: (
+        payload: unknown
+      ) => void;
+      onLogMessage: (
+        payload: unknown
+      ) => void;
+      onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
+      onError: (error: string) => void;
+    }
+  ) {
+    const onMessage = handlers?.onMessage ?? (() => { });
+    const onLogMessage = handlers?.onLogMessage ?? (() => { });
+    const onStatusChange = handlers?.onStatusChange ?? (() => { });
+    const onError = handlers?.onError ?? (() => { });
+
+
+    return new BuildelRunLogs(
+      this.socket,
+      this.id,
+      this.organizationId,
+      pipelineId,
+      runId,
+      this.authUrl,
+      this.headers,
+      this.useAuth,
+      {
+        onMessage,
+        onLogMessage,
+        onStatusChange,
+        onError
+      }
+    );
+  }
+}
+
+
+export class BuildelRunLogs {
+  private channel: Channel | null = null;
+
+  public constructor(
+    private readonly socket: Socket,
+    private readonly id: string,
+    private readonly organizationId: number,
+    private readonly pipelineId: number,
+    private readonly runId: number,
+    private readonly authUrl: string,
+    private readonly headers: Record<string, string>,
+    private readonly useAuth: boolean,
+    private readonly handlers: {
+      onMessage: (
+        payload: unknown
+      ) => void;
+      onLogMessage: (
+        payload: unknown
+      ) => void;
+      onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
+      onError: (error: string) => void;
+    }
+  ) { }
+
+  public async join(args: BuildelRunLogsJoinArgs) {
+    if (this.status !== "idle") return;
+
+    const token = await this.authenticateChannel();
+
+    this.channel = this.socket.channel(
+      `logs:${this.organizationId}:${this.pipelineId}:${this.runId}`,
+      {
+        ...token,
+        block_name: args.block_name,
+      }
+    );
+
+    this.channel.onMessage = (event: string, payload: any) => {
+      if (event === "phx_reply" && payload.status === "error") {
+        if (payload.response.reason) {
+          this.handlers.onError(payload.response.reason);
+        }
+
+        this.handlers.onError("Unknown error");
+
+        return this.leave();
+      }
+
+      if (event.startsWith("logs:")) {
+        this.handlers.onLogMessage(payload);
+      }
+
+      this.handlers.onMessage(payload);
+
+      return payload;
+    };
+
+    return new Promise<BuildelRunLogs>((resolve, reject) => {
+      assert(this.channel);
+      this.channel.join().receive("ok", () => {
+        resolve(this);
+        this.handlers.onStatusChange("joined");
+      });
+      this.channel.onError((error) => {
+        reject(error);
+        this.handlers.onStatusChange("idle");
+      });
+    });
+  }
+
+  public async leave() {
+    if (this.status !== "joined" && this.status !== "joining") return;
+
+    return new Promise<BuildelRunLogs>((resolve, reject) => {
+      assert(this.channel);
+      this.channel.leave().receive("ok", () => {
+        this.channel = null;
+        resolve(this);
+        this.handlers.onStatusChange("idle");
+      });
+      this.channel.onError((error) => {
+        reject(error);
+      });
+    });
+  }
+
+  public get status(): BuildelRunLogsConnectionStatus {
+    if (this.socket.connectionState() !== "open" || this.channel === null)
+      return "idle";
+    return this.channel.state === "joined" ? "joined" : "joining";
+  }
+
+  private async authenticateChannel() {
+    if (!this.useAuth) return {};
+
+    return await fetch(this.authUrl, {
+      headers: {
+        "Content-Type": "application/json",
+        ...this.headers,
+      },
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify({
+        socket_id: this.id,
+        channel_name: `logs:${this.organizationId}:${this.pipelineId}:${this.runId}`,
+      }),
+    }).then((response) => response.json());
   }
 }
 
@@ -251,3 +407,9 @@ export type BuildelRunStartArgs = {
   alias?: string;
   metadata?: Record<string, any>;
 };
+
+export type BuildelRunLogsConnectionStatus = "idle" | "joining" | "joined";
+
+export type BuildelRunLogsJoinArgs = {
+  block_name?: string;
+}

@@ -78,6 +78,16 @@ export const routes = {
       `${routes.pipelineRun(organizationId, pipelineId, runId)}/costs`,
       params
     ),
+  pipelineRunLogs: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    runId: RunId,
+    params: RouteParam = {}
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineRun(organizationId, pipelineId, runId)}/logs`,
+      params
+    ),
   pipelineInterface: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,

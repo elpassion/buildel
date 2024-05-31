@@ -96,6 +96,8 @@ defmodule Buildel.Blocks.CSVSearch do
          {:ok, %Exqlite.Result{} = response} <- Buildel.CSVSearch.execute_query(repo_pid, query) do
       response = %{rows: response.rows, columns: response.columns}
 
+      response = Jason.encode!(response)
+
       Buildel.BlockPubSub.broadcast_to_io(
         state[:context_id],
         state[:block_name],
@@ -196,6 +198,7 @@ defmodule Buildel.Blocks.CSVSearch do
     with :ok <- Buildel.CSVSearch.SQLFilter.is_safe_sql(query),
          {:ok, %Exqlite.Result{} = response} <- Buildel.CSVSearch.execute_query(repo_pid, query) do
       response = %{rows: response.rows, columns: response.columns}
+      response = Jason.encode!(response)
 
       Buildel.BlockPubSub.broadcast_to_io(
         state[:context_id],

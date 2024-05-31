@@ -4,15 +4,17 @@ defmodule BuildelWeb.PipelineSocket do
 
   channel "pipeline_runs:*", BuildelWeb.PipelineRunChannel
   channel "pipelines:*", BuildelWeb.PipelineChannel
+  channel "logs:*", BuildelWeb.LogsChannel
 
   defparams :connect do
-    required :id, :string
+    required(:id, :string)
   end
 
   def connect(params, socket, _connect_info) do
     case validate(:connect, params) do
       {:ok, %{id: id}} ->
         {:ok, socket |> assign(:socket_id, id)}
+
       {:error, _} ->
         {:error, %{reason: "invalid"}}
     end

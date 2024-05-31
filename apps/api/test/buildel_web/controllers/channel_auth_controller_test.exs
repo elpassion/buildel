@@ -30,6 +30,13 @@ defmodule BuildelWeb.ChannelAuthControllerTest do
       assert json_response(conn, 401)["errors"] != %{}
     end
 
+    test "returns 404 if channel_name does not match", %{conn: conn} do
+      conn =
+        post(conn, ~p"/api/channel_auth", %{channel_name: "non_existing:1:1", socket_id: "1"})
+
+      assert json_response(conn, 404)["errors"] != %{}
+    end
+
     test "authenticates if pipeline exists in org", %{conn: conn, organization: organization} do
       pipeline = pipeline_fixture(%{organization_id: organization.id})
       channel_name = "pipelines:#{organization.id}:#{pipeline.id}"

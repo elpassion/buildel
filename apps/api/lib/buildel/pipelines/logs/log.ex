@@ -15,6 +15,7 @@ defmodule Buildel.Pipelines.Log do
     field(:latency, :integer)
     field(:block_name, :string)
     field(:output_name, :string)
+    field(:processed, :boolean, default: false)
 
     timestamps(type: :naive_datetime_usec)
   end

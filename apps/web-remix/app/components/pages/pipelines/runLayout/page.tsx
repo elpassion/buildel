@@ -99,6 +99,16 @@ export function PipelineRunLayout() {
               >
                 Costs details
               </FilledTabLink>
+              <FilledTabLink
+                to={routes.pipelineRunLogs(
+                  organizationId,
+                  pipelineId,
+                  runId,
+                  Object.fromEntries(searchParams.entries())
+                )}
+              >
+                Logs
+              </FilledTabLink>
             </FilledTabsWrapper>
 
             <Button
