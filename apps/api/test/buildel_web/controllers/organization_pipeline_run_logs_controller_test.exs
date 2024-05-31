@@ -2,9 +2,7 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsControllerTest do
   use BuildelWeb.ConnCase
   import Buildel.OrganizationsFixtures
   import Buildel.PipelinesFixtures
-  import Buildel.CostsFixtures
 
-  alias Buildel.Pipelines
   alias Buildel.Organizations
 
   setup %{conn: conn} do
@@ -73,25 +71,23 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsControllerTest do
       run: run,
       api_spec: api_spec
     } do
-      log =
-        log_fixture(%{
-          run_id: run.id,
-          message: "Test log",
-          block_name: "chat_1",
-          context: "context",
-          message_types: ["start_stream", "stop_stream"],
-          raw_logs: [1, 2]
-        })
+      log_fixture(%{
+        run_id: run.id,
+        message: "Test log",
+        block_name: "chat_1",
+        context: "context",
+        message_types: ["start_stream", "stop_stream"],
+        raw_logs: [1, 2]
+      })
 
-      another_log =
-        log_fixture(%{
-          run_id: run.id,
-          message: "Test log 2",
-          block_name: "text_input_1",
-          context: "context",
-          message_types: ["start_stream", "stop_stream"],
-          raw_logs: [1, 2]
-        })
+      log_fixture(%{
+        run_id: run.id,
+        message: "Test log 2",
+        block_name: "text_input_1",
+        context: "context",
+        message_types: ["start_stream", "stop_stream"],
+        raw_logs: [1, 2]
+      })
 
       conn =
         get(
@@ -119,16 +115,15 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsControllerTest do
       run: run,
       api_spec: api_spec
     } do
-      log =
-        log_fixture(%{
-          run_id: run.id,
-          message: "Test log",
-          block_name: "chat_1",
-          context: "context",
-          message_types: ["start_stream", "stop_stream"],
-          raw_logs: [1, 2],
-          inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.add(-2, :day)
-        })
+      log_fixture(%{
+        run_id: run.id,
+        message: "Test log",
+        block_name: "chat_1",
+        context: "context",
+        message_types: ["start_stream", "stop_stream"],
+        raw_logs: [1, 2],
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.add(-2, :day)
+      })
 
       start_date =
         NaiveDateTime.utc_now() |> NaiveDateTime.add(-3, :day) |> NaiveDateTime.to_iso8601()

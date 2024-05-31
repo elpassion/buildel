@@ -4,7 +4,6 @@ defmodule BuildelWeb.LogsChannel do
 
   require Logger
 
-  alias BuildelWeb.OrganizationPipelineRunLogsJSON
   alias Phoenix.PubSub
   alias Buildel.Pipelines
 

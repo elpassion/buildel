@@ -95,4 +95,20 @@ defmodule BuildelWeb.ChannelAuthController do
         err
     end
   end
+
+  def create(_conn, params) do
+    with {:ok,
+          %{
+            channel_name: _channel_name,
+            socket_id: _socket_id
+          }} <- validate(:create, params) do
+      {:error, :not_found}
+    else
+      {:error, :not_found} ->
+        {:error, :unauthorized}
+
+      err ->
+        err
+    end
+  end
 end
