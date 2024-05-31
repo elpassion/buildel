@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@buildel/buildel':
-    specifier: file:../../packages/buildel/dist
-    version: file:../../packages/buildel/dist
+    specifier: ^0.2.7
+    version: 0.2.7
   '@codemirror/autocomplete':
     specifier: ^6.15.0
     version: 6.15.0(@codemirror/language@6.10.1)(@codemirror/state@6.4.1)(@codemirror/view@6.26.0)(@lezer/common@1.2.1)
@@ -732,6 +732,13 @@ packages:
 
   /@braintree/sanitize-url@6.0.4:
     resolution: {integrity: sha512-s3jaWicZd0pkP0jf5ysyHUI/RE7MHos6qlToFcGWXVp+ykHOy77OUMrfbgJ9it2C5bow7OIQwYYaHjk9XlBQ2A==}
+    dev: false
+
+  /@buildel/buildel@0.2.7:
+    resolution: {integrity: sha512-uphl33Dx5zTT+ZytIUcw3SRkLLsP+SaW6lZzTOdj9+p81BkLiDHiMmoUFlTzROv0XmPHEGGvrM89UrgIJmZZEg==}
+    dependencies:
+      phoenix: 1.7.11
+      uuid: 9.0.1
     dev: false
 
   /@bundled-es-modules/cookie@2.0.0:
@@ -11443,8 +11450,3 @@ packages:
   /zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
     dev: true
-
-  file:../../packages/buildel/dist:
-    resolution: {directory: ../../packages/buildel/dist, type: directory}
-    name: dist
-    dev: false

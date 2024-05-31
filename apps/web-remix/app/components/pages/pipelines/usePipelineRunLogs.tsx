@@ -5,7 +5,7 @@ import {
   BuildelSocket,
   BuildelRunLogsJoinArgs,
   ConnectionState,
-} from "/home/pawel/work/code/buildel/apps/web-remix/node_modules/.pnpm/file+..+..+packages+buildel+dist/node_modules/dist/index";
+} from "@buildel/buildel";
 
 export function usePipelineRunLogs(
   organizationId: number,
