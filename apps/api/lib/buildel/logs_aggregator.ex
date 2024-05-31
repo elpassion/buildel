@@ -15,6 +15,7 @@ defmodule Buildel.LogsAggregator do
 
   import Ecto.Query
 
+  require Logger
   alias Buildel.Repo
   alias Buildel.Pipelines.Log
   alias Phoenix.PubSub
@@ -183,6 +184,13 @@ defmodule Buildel.LogsAggregator do
 
             current = Map.delete(current, log_context)
             {merged_list, current}
+
+          _ ->
+            Logger.debug(
+              "Unhandled message type for log: #{log.id}, block: #{log.block_name}, context: #{log_context}"
+            )
+
+            {aggregated_list, current}
         end
       end)
 
