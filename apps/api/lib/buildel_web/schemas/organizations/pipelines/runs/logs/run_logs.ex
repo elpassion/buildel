@@ -48,7 +48,8 @@ defmodule BuildelWeb.Schemas.RunLogs do
       title: "LogIndexResponse",
       type: :object,
       properties: %{
-        data: %Schema{type: :array, items: Log, description: "Logs list"}
+        data: %Schema{type: :array, items: Log, description: "Logs list"},
+        meta: BuildelWeb.Schemas.Pagination.CursorMeta
       },
       required: [:data]
     })

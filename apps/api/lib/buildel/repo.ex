@@ -2,6 +2,8 @@ defmodule Buildel.Repo do
   use Ecto.Repo,
     otp_app: :buildel,
     adapter: Ecto.Adapters.Postgres
+
+  use Paginator
 end
 
 defmodule Buildel.DynamicRepoSqlite do

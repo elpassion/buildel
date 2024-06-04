@@ -1,9 +1,14 @@
 defmodule BuildelWeb.OrganizationPipelineRunLogsJSON do
   alias Buildel.Pipelines.AggregatedLog
 
-  def index(%{logs: logs}) do
+  def index(%{logs: logs, metadata: metadata}) do
     %{
-      data: for(log <- logs, do: data(log))
+      data: for(log <- logs, do: data(log)),
+      meta: %{
+        after: metadata.after,
+        before: metadata.before,
+        total: metadata.total_count
+      }
     }
   end
 

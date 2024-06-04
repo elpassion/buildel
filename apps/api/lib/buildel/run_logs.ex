@@ -3,39 +3,72 @@ defmodule Buildel.RunLogs do
   alias Buildel.Pipelines.AggregatedLog
   alias Buildel.Repo
 
-  @default_attrs %{
-    block_name: nil,
-    limit: 10,
-    start_date: NaiveDateTime.utc_now() |> NaiveDateTime.add(-5, :minute),
-    end_date: nil
-  }
+  defmodule ListRunLogAttrs do
+    @default_attrs %{
+      block_name: nil,
+      limit: 10,
+      start_date: NaiveDateTime.utc_now() |> NaiveDateTime.add(-5, :minute),
+      end_date: nil,
+      before: nil,
+      after: nil
+    }
+
+    defstruct [:block_name, :limit, :start_date, :end_date, :before, :after]
+
+    def from_map(attrs) do
+      attrs =
+        attrs
+        |> Enum.reduce(@default_attrs, fn
+          {:start_date, date_str}, acc when is_binary(date_str) ->
+            case NaiveDateTime.from_iso8601(date_str) do
+              {:ok, dt} -> Map.put(acc, :start_date, dt)
+              _error -> acc
+            end
+
+          {:end_date, date_str}, acc when is_binary(date_str) ->
+            case NaiveDateTime.from_iso8601(date_str) do
+              {:ok, dt} -> Map.put(acc, :end_date, dt)
+              _error -> acc
+            end
+
+          {:per_page, per_page}, acc ->
+            Map.put(acc, :limit, per_page)
+
+          {key, value}, acc ->
+            Map.put(acc, key, value)
+        end)
+
+      struct(__MODULE__, attrs)
+    end
+  end
 
   def list_run_logs(run, attrs \\ %{}) do
-    attrs = Map.merge(@default_attrs, attrs)
+    attrs = ListRunLogAttrs.from_map(attrs)
     run_id = run.id
 
     base_query =
       from(l in AggregatedLog, where: l.run_id == ^run_id, order_by: [desc: l.inserted_at])
 
     query =
-      Enum.reduce(attrs, base_query, fn
+      Enum.reduce(Map.to_list(attrs), base_query, fn
         {:block_name, block_name}, query when is_binary(block_name) ->
           from l in query, where: l.block_name == ^block_name
 
-        {:limit, limit}, query when is_integer(limit) ->
-          from l in query, limit: ^limit
-
-        {:start_date, start_date}, query when is_binary(start_date) ->
+        {:start_date, start_date}, query when is_struct(start_date, NaiveDateTime) ->
           from l in query, where: l.inserted_at >= ^start_date
 
-        {:end_date, end_date}, query when is_binary(end_date) ->
+        {:end_date, end_date}, query when is_struct(end_date, NaiveDateTime) ->
           from l in query, where: l.inserted_at <= ^end_date
 
         _, query ->
           query
       end)
 
-    query |> Repo.all()
+    Repo.paginate(query,
+      limit: attrs.limit,
+      cursor_fields: [{:inserted_at, :desc}, {:id, :asc}],
+      after: attrs.after
+    )
   end
 
   def create_run_log(attrs \\ %{}) do

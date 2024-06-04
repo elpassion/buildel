@@ -50,8 +50,22 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsControllerTest do
       organization: organization,
       pipeline: pipeline,
       run: run,
-      api_spec: api_spec
+      api_spec: api_spec,
+      log: log
     } do
+      log_fixture(%{
+        run_id: run.id,
+        message: "Old log",
+        block_name: "text_input_1",
+        context: "context",
+        message_types: ["start_stream", "stop_stream"],
+        raw_logs: [1, 2],
+        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.add(-2, :day)
+      })
+
+      log_message = log.message
+      log_block_name = log.block_name
+
       conn =
         get(
           conn,
@@ -59,7 +73,59 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsControllerTest do
         )
 
       response = json_response(conn, 200)
-      assert [_] = response["data"]
+
+      assert [
+               %{
+                 "message" => ^log_message,
+                 "block_name" => ^log_block_name
+               }
+             ] = response["data"]
+
+      assert 1 = length(response["data"])
+
+      assert_schema(response, "LogIndexResponse", api_spec)
+    end
+
+    test "works with pagination", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      run: run,
+      api_spec: api_spec
+    } do
+      create_run_log(%{run: run})
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/runs/#{run.id}/logs?per_page=1"
+        )
+
+      response = json_response(conn, 200)
+
+      assert %{
+               "after" => cursor_after,
+               "before" => nil
+             } =
+               response["meta"]
+
+      assert 1 = length(response["data"])
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/runs/#{run.id}/logs?per_page=1&after=#{cursor_after}"
+        )
+
+      response = json_response(conn, 200)
+
+      assert %{
+               "after" => nil,
+               "before" => _cursor_before
+             } =
+               response["meta"]
+
+      assert 1 = length(response["data"])
 
       assert_schema(response, "LogIndexResponse", api_spec)
     end

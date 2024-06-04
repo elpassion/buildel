@@ -23,34 +23,35 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsController do
 
   operation :index,
     summary: "List run logs",
-    parameters: [
-      organization_id: [
-        in: :path,
-        description: "Organization ID",
-        type: :integer,
-        required: true
-      ],
-      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
-      id: [in: :path, description: "Run ID", type: :integer, required: true],
-      block_name: [
-        in: :query,
-        description: "Block name",
-        type: :string,
-        required: false
-      ],
-      start_date: [
-        in: :query,
-        description: "Start date",
-        schema: %Schema{type: :string, format: :date_time},
-        required: false
-      ],
-      end_date: [
-        in: :query,
-        description: "End date",
-        schema: %Schema{type: :string, format: :date_time},
-        required: false
-      ]
-    ],
+    parameters:
+      [
+        organization_id: [
+          in: :path,
+          description: "Organization ID",
+          type: :integer,
+          required: true
+        ],
+        pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
+        id: [in: :path, description: "Run ID", type: :integer, required: true],
+        block_name: [
+          in: :query,
+          description: "Block name",
+          type: :string,
+          required: false
+        ],
+        start_date: [
+          in: :query,
+          description: "Start date",
+          schema: %Schema{type: :string, format: :date_time},
+          required: false
+        ],
+        end_date: [
+          in: :query,
+          description: "End date",
+          schema: %Schema{type: :string, format: :date_time},
+          required: false
+        ]
+      ] ++ BuildelWeb.Schemas.Pagination.cursor_params(),
     request_body: nil,
     responses: [
       ok: {"success", "application/json", BuildelWeb.Schemas.RunLogs.IndexResponse},
@@ -72,9 +73,9 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsController do
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_pipeline_run(pipeline, run_id),
-         logs <-
+         %Paginator.Page{metadata: metadata, entries: entries} <-
            RunLogs.list_run_logs(run, conn.params) do
-      render(conn, :index, logs: logs)
+      render(conn, :index, logs: entries, metadata: metadata)
     end
   end
 end

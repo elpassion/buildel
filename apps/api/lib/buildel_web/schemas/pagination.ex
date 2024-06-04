@@ -16,6 +16,32 @@ defmodule BuildelWeb.Schemas.Pagination do
     })
   end
 
+  defmodule CursorMeta do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "PaginationCursorMeta",
+      type: :object,
+      properties: %{
+        before: %Schema{type: :string, description: "Cursor before", nullable: true},
+        after: %Schema{type: :string, description: "Cursor after", nullable: true},
+        total: %Schema{type: :integer, description: "Total items", nullable: true}
+      }
+    })
+  end
+
+  def cursor_params do
+    [
+      before: [in: :query, type: :string, description: "Cursor before", required: false],
+      after: [in: :query, type: :string, description: "Cursor after", required: false],
+      per_page: [
+        in: :query,
+        description: "Items per page",
+        schema: %Schema{type: :integer, default: 10}
+      ]
+    ]
+  end
+
   def default_params do
     [
       search: [in: :query, type: :string, description: "Search text", required: false],
