@@ -53,16 +53,6 @@ defmodule BuildelWeb.OrganizationPipelineRunLogsControllerTest do
       api_spec: api_spec,
       log: log
     } do
-      log_fixture(%{
-        run_id: run.id,
-        message: "Old log",
-        block_name: "text_input_1",
-        context: "context",
-        message_types: ["start_stream", "stop_stream"],
-        raw_logs: [1, 2],
-        inserted_at: NaiveDateTime.utc_now() |> NaiveDateTime.add(-2, :day)
-      })
-
       log_message = log.message
       log_block_name = log.block_name
 
