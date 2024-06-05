@@ -279,11 +279,14 @@ export class PipelineApi {
     organizationId: string | number,
     pipelineId: string | number,
     runId: string | number,
-    block_name?: string
+    args: {
+      block_name?: string,
+      after?: string,
+    }
   ) {
     const url = buildUrlWithParams(
       `/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/logs`,
-      { block_name }
+      { block_name: args.block_name, after: args.after }
     );
 
     return this.client(

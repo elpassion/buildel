@@ -1,18 +1,24 @@
 import { MetaFunction } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useFetcher, useLoaderData, useNavigate } from "@remix-run/react";
 import { loader } from "./loader.server";
 import { usePipelineRunLogs } from "../usePipelineRunLogs";
 import { useEffect, useState } from "react";
 import { SelectInput } from "~/components/form/inputs/select.input";
 import { ClientOnly } from "remix-utils/client-only";
 import { buildUrlWithParams } from "~/utils/url";
-import { b } from "vitest/dist/suite-UrZdHRff.js";
 import { routes } from "~/utils/routes.utils";
+import { IPipelineRunLog, IPipelineRunLogsResponse } from "~/api/pipeline/pipeline.contracts";
+import { useInView } from "react-intersection-observer";
+import { LoadMoreButton } from "~/components/pagination/LoadMoreButton";
 
 export function PipelineRunLogs() {
+  const fetcher = useFetcher();
+  const { ref: fetchNextRef, inView } = useInView();
   const navigate = useNavigate();
   const { pipeline, pipelineRun, pipelineRunLogs, blockName } = useLoaderData<typeof loader>();
   const [liveLogs, setLiveLogs] = useState<any[]>([])
+  const [data, setData] = useState<IPipelineRunLog[]>(pipelineRunLogs.data)
+  const [after, setAfter] = useState<string | null | undefined>(pipelineRunLogs.meta.after);
 
   const { status, listenToLogs, stopListening } = usePipelineRunLogs(
     pipeline.organization_id,
@@ -24,6 +30,41 @@ export function PipelineRunLogs() {
     },
     error => console.error(error),
   )
+
+  const fetchNextPage = () => {
+    if (fetcher.state !== "idle") return;
+
+    const urlWithParams = buildUrlWithParams(routes.pipelineRunLogs(
+      pipeline.organization_id,
+      pipeline.id,
+      pipelineRun.id
+    ), {
+      per_page: 10,
+      after: after ?? undefined,
+    });
+
+    fetcher.load(urlWithParams);
+  }
+
+  useEffect(() => {
+    const newData = (fetcher.data as any)?.pipelineRunLogs;
+
+    if (newData) {
+      setAfter(newData.meta.after);
+      if (newData.data.length > 0) {
+        setData((prev) => ([...prev, ...newData.data]));
+      }
+    }
+
+  }, [fetcher.data]);
+
+
+  useEffect(() => {
+    if (inView && after) {
+      fetchNextPage();
+    }
+  }, [inView, after]);
+
 
 
   useEffect(() => {
@@ -72,9 +113,16 @@ export function PipelineRunLogs() {
         {liveLogs.map(log => (
           <Log key={log.id} log={log} />
         )).reverse()}
-        {pipelineRunLogs.map((log) => (
+        {data.map((log) => (
           <Log key={log.id} log={log} />
         ))}
+        <div className="flex justify-center mt-5" ref={fetchNextRef}>
+          <LoadMoreButton
+            isFetching={fetcher.state !== "idle"}
+            hasNextPage={!!after}
+            onClick={fetchNextPage}
+          />
+        </div>
       </div>
     </div>
 

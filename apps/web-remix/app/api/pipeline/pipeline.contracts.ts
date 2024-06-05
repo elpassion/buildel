@@ -235,7 +235,7 @@ export const PipelineRunLog = z.object({
 });
 
 export const PipelineRunLogsResponse = z
-  .object({ data: z.array(PipelineRunLog) })
-  .transform((response) => {
-    return response.data;
-  });
+  .object({ data: z.array(PipelineRunLog), meta: z.object({ after: z.string().nullish(), totalItems: z.number().nullish() }) })
+
+export type IPipelineRunLogsResponse = z.TypeOf<typeof PipelineRunLogsResponse>;
+export type IPipelineRunLog = z.TypeOf<typeof PipelineRunLog>;

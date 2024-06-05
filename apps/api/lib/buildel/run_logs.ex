@@ -4,21 +4,21 @@ defmodule Buildel.RunLogs do
   alias Buildel.Repo
 
   defmodule ListRunLogAttrs do
-    @default_attrs %{
-      block_name: nil,
-      limit: 10,
-      start_date: NaiveDateTime.utc_now() |> NaiveDateTime.add(-5, :minute),
-      end_date: nil,
-      before: nil,
-      after: nil
-    }
-
     defstruct [:block_name, :limit, :start_date, :end_date, :before, :after]
 
     def from_map(attrs) do
+      default_attrs = %{
+        block_name: nil,
+        limit: 10,
+        start_date: nil,
+        end_date: nil,
+        before: nil,
+        after: nil
+      }
+
       attrs =
         attrs
-        |> Enum.reduce(@default_attrs, fn
+        |> Enum.reduce(default_attrs, fn
           {:start_date, date_str}, acc when is_binary(date_str) ->
             case NaiveDateTime.from_iso8601(date_str) do
               {:ok, dt} -> Map.put(acc, :start_date, dt)
@@ -52,13 +52,13 @@ defmodule Buildel.RunLogs do
     query =
       Enum.reduce(Map.to_list(attrs), base_query, fn
         {:block_name, block_name}, query when is_binary(block_name) ->
-          from l in query, where: l.block_name == ^block_name
+          from(l in query, where: l.block_name == ^block_name)
 
         {:start_date, start_date}, query when is_struct(start_date, NaiveDateTime) ->
-          from l in query, where: l.inserted_at >= ^start_date
+          from(l in query, where: l.inserted_at >= ^start_date)
 
         {:end_date, end_date}, query when is_struct(end_date, NaiveDateTime) ->
-          from l in query, where: l.inserted_at <= ^end_date
+          from(l in query, where: l.inserted_at <= ^end_date)
 
         _, query ->
           query

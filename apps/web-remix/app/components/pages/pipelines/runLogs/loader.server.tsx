@@ -14,6 +14,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const searchParams = new URL(request.url).searchParams;
     const blockName = searchParams.get("block_name") ?? undefined;
+    const after = searchParams.get("after") ?? undefined;
 
     const pipelineApi = new PipelineApi(fetch);
     const blockTypeApi = new BlockTypeApi(fetch);
@@ -35,7 +36,10 @@ export async function loader(args: LoaderFunctionArgs) {
       params.organizationId,
       params.pipelineId,
       params.runId,
-      blockName
+      {
+        block_name: blockName,
+        after
+      }
     );
 
     const [blockTypes, pipeline, pipelineRun, pipelineRunLogs] = await Promise.all([
