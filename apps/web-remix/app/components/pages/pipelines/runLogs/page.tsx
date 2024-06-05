@@ -14,11 +14,11 @@ import { LoadMoreButton } from "~/components/pagination/LoadMoreButton";
 export function PipelineRunLogs() {
   const fetcher = useFetcher();
   const { ref: fetchNextRef, inView } = useInView();
-  const navigate = useNavigate();
   const { pipeline, pipelineRun, pipelineRunLogs, blockName } = useLoaderData<typeof loader>();
   const [liveLogs, setLiveLogs] = useState<any[]>([])
   const [data, setData] = useState<IPipelineRunLog[]>(pipelineRunLogs.data)
   const [after, setAfter] = useState<string | null | undefined>(pipelineRunLogs.meta.after);
+  const [selectedBlock, setSelectedBlock] = useState<string | null | undefined>(blockName);
 
   const { status, listenToLogs, stopListening } = usePipelineRunLogs(
     pipeline.organization_id,
@@ -39,8 +39,8 @@ export function PipelineRunLogs() {
       pipeline.id,
       pipelineRun.id
     ), {
-      per_page: 10,
       after: after ?? undefined,
+      block_name: selectedBlock ?? undefined
     });
 
     fetcher.load(urlWithParams);
@@ -103,10 +103,14 @@ export function PipelineRunLogs() {
               block_name: selected?.value ?? undefined
             }))
             setLiveLogs([])
+            setData([])
+            setSelectedBlock(selected?.value)
 
-            navigate(urlWithParams);
+            fetcher.load(urlWithParams);
           }}
         />}
+
+
       </ClientOnly>
 
       <div className="mt-2 bg-gray-800 text-gray-400 font-mono p-4 h-96 overflow-y-auto rounded-lg flex flex-col-reverse">\

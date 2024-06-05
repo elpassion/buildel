@@ -282,6 +282,7 @@ export class PipelineApi {
     args: {
       block_name?: string,
       after?: string,
+      per_page?: string | number
     }
   ) {
     const url = buildUrlWithParams(
