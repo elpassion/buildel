@@ -69,6 +69,10 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
       }
     end
 
+    defp table_value(name, []) do
+      "#{name}\n"
+    end
+
     defp table_value(name, table_rows) do
       "#{name}\n#{table_rows_to_strings(table_rows)}"
     end
@@ -87,8 +91,14 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
 
           row ->
             update_in(row, ["cells"], fn cells ->
-              cells
+            cells
               |> Enum.flat_map(fn
+                %{"cell_value" => %{ "sentences" => value }} = cell ->
+                  if (col_span = cell["col_span"]) do
+                    value ++ [1..col_span |> Enum.map(fn _ -> "" end)]
+                  else
+                    value
+                  end
                 %{"col_span" => col_span, "cell_value" => value} ->
                   [value | 1..col_span |> Enum.map(fn _ -> "" end)]
 
