@@ -65,7 +65,7 @@ defmodule BuildelWeb.OrganizationToolChunkController do
           }
         })
 
-      document = Buildel.DocumentWorkflow.read(workflow, {file.path, file_type})
+      document = Buildel.DocumentWorkflow.read(workflow, {file.path, %{type: file_type}})
 
       with chunks when is_list(chunks) <-
              Buildel.DocumentWorkflow.build_node_chunks(workflow, document),
