@@ -181,7 +181,7 @@ defmodule BuildelWeb.Schemas.Runs do
         initial_inputs: %Schema{
           type: :array,
           description: "Blocks initial inputs",
-          items: %Schema{type: InputRequest},
+          items: InputRequest,
           default: []
         },
         wait_for_outputs: %Schema{
