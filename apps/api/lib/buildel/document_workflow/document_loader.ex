@@ -58,7 +58,8 @@ defmodule Buildel.DocumentWorkflow.DocumentLoaderAdapter do
              headers: headers,
              body: Multipart.body_stream(multipart),
              connect_options: [
-               timeout: 60_000
+               timeout: 60_000,
+               protocols: [:http1]
              ],
              receive_timeout: 60_000
            ]
