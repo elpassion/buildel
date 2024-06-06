@@ -91,9 +91,15 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
                model: model
              }
              |> Jason.encode!(),
-             Authorization: "Bearer #{api_key}",
-             "api-key": api_key,
-             "content-type": "application/json"
+             [
+               Authorization: "Bearer #{api_key}",
+               "api-key": api_key,
+               "content-type": "application/json",
+             ],
+             [
+               timeout: 60_000,
+               recv_timeout: 60_000
+             ]
            ),
          {:ok, body} <- Jason.decode(body) do
       {:ok,
