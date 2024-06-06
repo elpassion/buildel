@@ -231,7 +231,7 @@ defmodule Buildel.Clients.Chat do
       stream: true,
       api_key: opts.api_key,
       api_type: opts.api_type,
-      endpoint: opts.endpoint <> "/chat/completions?version=2024-02-01",
+      endpoint: opts.endpoint <> "/chat/completions?api-version=2024-02-01",
       json_response: opts.response_format == "json"
     })
   end
