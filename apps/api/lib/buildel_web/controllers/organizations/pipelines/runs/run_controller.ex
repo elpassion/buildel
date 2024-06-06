@@ -4,7 +4,6 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
 
   import BuildelWeb.UserAuth
 
-  alias OpenApiSpex.Operation
   alias Buildel.BlockPubSub
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
@@ -200,15 +199,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
       id: [in: :path, description: "Run ID", type: :integer, required: true]
     ],
-    request_body:
-      Operation.request_body(
-        "start",
-        %{
-          "application/json" => [],
-          "multipart/form-data" => []
-        },
-        BuildelWeb.Schemas.Runs.StartRequest
-      ),
+    request_body: {"start", "application/json", BuildelWeb.Schemas.Runs.StartRequest},
     responses: [
       ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
       not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
@@ -226,42 +217,6 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
   def start(conn, _params) do
     %{initial_inputs: initial_inputs, wait_for_outputs: wait_for_outputs} =
       conn.body_params
-
-    initial_inputs =
-      initial_inputs
-      |> Enum.map(fn
-        input when is_binary(input) ->
-          %{"block_name" => block_name, "data" => data, "input_name" => input_name} =
-            Jason.decode!(input)
-
-          %{block_name: block_name, data: data, input_name: input_name}
-
-        input when is_map(input) ->
-          %{"block_name" => block_name, "data" => data, "input_name" => input_name} =
-            input
-
-          %{block_name: block_name, data: data, input_name: input_name}
-
-        _ ->
-          raise "Invalid initial input"
-      end)
-
-    wait_for_outputs =
-      wait_for_outputs
-      |> Enum.map(fn
-        output when is_binary(output) ->
-          %{"block_name" => block_name, "output_name" => output_name} = Jason.decode!(output)
-
-          %{block_name: block_name, output_name: output_name}
-
-        output when is_map(output) ->
-          %{"block_name" => block_name, "output_name" => output_name} = output
-
-          %{block_name: block_name, output_name: output_name}
-
-        _ ->
-          raise "Invalid initial input"
-      end)
 
     %{
       organization_id: organization_id,
