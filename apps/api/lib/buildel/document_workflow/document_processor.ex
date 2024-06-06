@@ -58,7 +58,9 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
           }
     defstruct [:id, :value, :level, :type, metadata: %{}, parent: nil, next: nil, previous: nil]
 
-    def from_item(id, level, metadata, %{"table_rows" => table_rows, "name" => name}) do
+    def from_item(id, level, metadata, %{"name" => name} = table) do
+      table_rows = table["table_rows"] || []
+
       %Table{
         id: id,
         level: level,
