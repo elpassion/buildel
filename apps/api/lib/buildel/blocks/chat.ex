@@ -270,6 +270,8 @@ defmodule Buildel.Blocks.Chat do
 
     memory_type_string = opts |> Map.get(:chat_memory_type, "full")
 
+    response_format = opts |> Map.get(:response_format, "text")
+
     memory_type =
       %{"off" => :off, "full" => :full, "rolling" => :rolling} |> Map.get(memory_type_string)
 
@@ -313,7 +315,7 @@ defmodule Buildel.Blocks.Chat do
          |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
        end)
      )
-     |> Map.put(:response_format, "text")}
+     |> Map.put(:response_format, response_format)}
   end
 
   @impl true
@@ -630,7 +632,7 @@ defmodule Buildel.Blocks.Chat do
              tools: tools,
              endpoint: state[:opts].endpoint,
              api_type: state[:opts].api_type,
-             response_format: state[:opts].response_format
+             response_format: state.response_format
            }) do
       {:ok, message, state}
     else
