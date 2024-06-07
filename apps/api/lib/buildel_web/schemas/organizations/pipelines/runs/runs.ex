@@ -121,7 +121,12 @@ defmodule BuildelWeb.Schemas.Runs do
       properties: %{
         block_name: %Schema{type: :string, description: "Block name"},
         input_name: %Schema{type: :string, description: "Input name"},
-        data: %Schema{type: :string, description: "Data"}
+        data: %Schema{
+          anyOf: [
+            %Schema{type: :string, description: "Data"},
+            %Schema{type: :string, description: "Data", format: :binary}
+          ]
+        }
       },
       required: [:block_name, :input_name, :data]
     })

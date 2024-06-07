@@ -4,6 +4,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
 
   import BuildelWeb.UserAuth
 
+  alias OpenApiSpex.Operation
   alias Buildel.BlockPubSub
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
@@ -14,6 +15,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
 
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
+  plug BuildelWeb.FormDataArrayParserPlug
 
   plug OpenApiSpex.Plug.CastAndValidate,
     json_render_error_v2: true,
@@ -199,7 +201,15 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true],
       id: [in: :path, description: "Run ID", type: :integer, required: true]
     ],
-    request_body: {"start", "application/json", BuildelWeb.Schemas.Runs.StartRequest},
+    request_body:
+      Operation.request_body(
+        "start",
+        %{
+          "application/json" => [],
+          "multipart/form-data" => []
+        },
+        BuildelWeb.Schemas.Runs.StartRequest
+      ),
     responses: [
       ok: {"success", "application/json", BuildelWeb.Schemas.Runs.ShowResponse},
       not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
@@ -306,13 +316,29 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
   defp process_input(block_name, input_name, data, run) do
     context_id = Pipelines.Worker.context_id(run)
 
-    data =
-      case data do
-        {:binary, _} -> data
-        _ -> {:text, data}
-      end
+    case data do
+      {:binary, _} ->
+        Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
 
-    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data)
+      %Plug.Upload{} = file ->
+        with block_pid <- Buildel.Pipelines.Runner.block_pid(run, block_name),
+             :ok <- Plug.Upload.give_away(file, block_pid) do
+          Pipelines.Runner.cast_run(
+            run,
+            block_name,
+            input_name,
+            {:binary, file |> Map.get(:path)},
+            %{
+              file_id: UUID.uuid4(),
+              file_name: file |> Map.get(:filename),
+              file_type: file |> Map.get(:content_type)
+            }
+          )
+        end
+
+      _ ->
+        Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, {:text, data})
+    end
   end
 
   operation :stop,
@@ -544,5 +570,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       {:error, :not_running} -> {:error, :bad_request}
       err -> err
     end
+  end
+
+  defp input_file(file) do
   end
 end
