@@ -27,18 +27,26 @@ defmodule Buildel.DocumentWorkflow do
   @type embeddings :: [float()]
   @type chunk :: ChunkGenerator.Chunk.t()
 
-  def new(
-        %{
-          embeddings: embeddings,
-          collection_name: collection_name,
-          db_adapter: db_adapter
-        } = module_data
-      ) do
+  def new(module_data \\ %{}) do
     default_workflow_config = %{
       chunk_size: 1000,
       chunk_overlap: 0
     }
 
+    embeddings =
+      Map.get(
+        module_data,
+        :embeddings,
+        Buildel.Clients.Embeddings.new(%{
+          api_type: "",
+          model: "",
+          api_key: "",
+          endpoint: ""
+        })
+      )
+
+    collection_name = Map.get(module_data, :collection_name, "default")
+    db_adapter = Map.get(module_data, :db_adapter, Buildel.VectorDB.EctoAdapter)
     workflow_config = Map.get(module_data, :workflow_config, %{})
 
     %__MODULE__{

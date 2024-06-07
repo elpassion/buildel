@@ -149,7 +149,10 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
 
   defp create_chunk(text, metadata) do
     pages = metadata |> Map.get(:pages, []) |> Enum.uniq()
-    metadata = Map.put(metadata, :pages, pages)
+    building_block_ids = metadata |> Map.get(:building_block_ids, [])
+
+    metadata =
+      Map.put(metadata, :pages, pages) |> Map.put(:building_block_ids, building_block_ids)
 
     %Chunk{id: UUID.uuid4(), value: text, metadata: metadata}
   end

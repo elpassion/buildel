@@ -2,6 +2,7 @@ defmodule Buildel.Crawler.Crawl do
   alias Buildel.Crawler.Page
   alias __MODULE__
 
+  @derive {Jason.Encoder, only: [:id, :status, :start_url, :error, :pages]}
   defstruct [
     :id,
     :status,

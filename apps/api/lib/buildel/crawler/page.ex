@@ -1,5 +1,6 @@
 defmodule Buildel.Crawler.Page do
   alias __MODULE__
+  @derive {Jason.Encoder, only: [:url, :body, :status, :error]}
   defstruct [:url, :body, :status, :error, :depth]
 
   def new(opts \\ []) do

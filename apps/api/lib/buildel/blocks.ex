@@ -25,7 +25,8 @@ defmodule Buildel.Blocks do
     CreateBlockTool,
     MapList,
     Timer,
-    CSVSearch
+    CSVSearch,
+    Browser
   }
 
   @names_to_blocks_map %{
@@ -51,7 +52,8 @@ defmodule Buildel.Blocks do
     "create_block_tool" => CreateBlockTool,
     "map_list" => MapList,
     "timer" => Timer,
-    "csv_search" => CSVSearch
+    "csv_search" => CSVSearch,
+    "browser" => Browser
   }
 
   @blocks_to_names_map %{
@@ -77,7 +79,8 @@ defmodule Buildel.Blocks do
     CreateBlockTool => "create_block_tool",
     MapList => "map_list",
     Timer => "timer",
-    CSVSearch => "csv_search"
+    CSVSearch => "csv_search",
+    Browser => "browser"
   }
 
   def list_types() do
