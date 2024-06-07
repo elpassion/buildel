@@ -571,7 +571,4 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
       err -> err
     end
   end
-
-  defp input_file(file) do
-  end
 end

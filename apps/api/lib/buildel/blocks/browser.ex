@@ -18,7 +18,7 @@ defmodule Buildel.Blocks.Browser do
       inputs: [
         Block.text_input("url")
       ],
-      outputs: [Block.text_output()],
+      outputs: [Block.text_output(), Block.file_output("file_output")],
       ios: [Block.io("tool", "worker")],
       schema: schema()
     }
@@ -103,6 +103,18 @@ defmodule Buildel.Blocks.Browser do
         {:text, content}
       )
 
+      Buildel.BlockPubSub.broadcast_to_io(
+        state[:context_id],
+        state[:block_name],
+        "file_output",
+        {:binary, path},
+        %{
+          file_id: UUID.uuid4(),
+          file_name: url,
+          file_type: "text/html"
+        }
+      )
+
       state = send_stream_stop(state)
 
       {:noreply, state}
@@ -157,13 +169,25 @@ defmodule Buildel.Blocks.Browser do
         {:text, content}
       )
 
+      Buildel.BlockPubSub.broadcast_to_io(
+        state[:context_id],
+        state[:block_name],
+        "file_output",
+        {:binary, path},
+        %{
+          file_id: UUID.uuid4(),
+          file_name: url,
+          file_type: "text/html"
+        }
+      )
+
       state = state |> schedule_stream_stop()
       {:reply, content, state}
     else
       {:error, %Crawler.Crawl{} = crawl} ->
         send_error(state, crawl.error)
         state = state |> schedule_stream_stop()
-        {:reply, crawl.error, state}
+        {:reply, to_string(crawl.error), state}
 
       {:ok, %Crawler.Crawl{}} ->
         send_error(state, "No content found")
