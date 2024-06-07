@@ -81,7 +81,7 @@ defmodule Buildel.Blocks.Browser do
 
     uri = URI.parse(url)
 
-    with {:ok, crawl} <-
+    with {:ok, crawl} when length(crawl.pages) != 0 <-
            Crawler.crawl(url,
              max_depth: 1,
              url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
@@ -112,6 +112,11 @@ defmodule Buildel.Blocks.Browser do
         state = state |> schedule_stream_stop()
         {:noreply, state}
 
+      {:ok, %Crawler.Crawl{}} ->
+        send_error(state, "No content found")
+        state = state |> schedule_stream_stop()
+        {:noreply, state}
+
       {:error, reason} ->
         send_error(state, reason)
         state = state |> send_stream_stop()
@@ -130,7 +135,7 @@ defmodule Buildel.Blocks.Browser do
 
     uri = URI.parse(url)
 
-    with {:ok, crawl} <-
+    with {:ok, crawl} when length(crawl.pages) != 0 <-
            Crawler.crawl(url,
              max_depth: 1,
              url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
@@ -159,6 +164,11 @@ defmodule Buildel.Blocks.Browser do
         send_error(state, crawl.error)
         state = state |> schedule_stream_stop()
         {:reply, crawl.error, state}
+
+      {:ok, %Crawler.Crawl{}} ->
+        send_error(state, "No content found")
+        state = state |> schedule_stream_stop()
+        {:noreply, state}
 
       {:error, reason} ->
         send_error(state, reason)
