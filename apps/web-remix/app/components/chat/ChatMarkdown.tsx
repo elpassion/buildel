@@ -303,7 +303,11 @@ function Code({
   ...rest
 }: React.ParamHTMLAttributes<HTMLPreElement>) {
   const codeRef = useRef<HTMLElement>(null);
-  if (className?.includes("lang-mermaid")) {
+  const isMermaidCode = className?.includes("lang-mermaid");
+  if (isMermaidCode) {
+    mermaid.initialize({
+      theme: "dark",
+    });
     mermaid.run({
       nodes: [codeRef.current!],
     });
