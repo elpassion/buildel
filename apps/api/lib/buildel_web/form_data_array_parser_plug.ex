@@ -22,6 +22,9 @@ defmodule BuildelWeb.FormDataArrayParserPlug do
       |> Map.to_list()
       |> Enum.reduce(%{}, fn {field, value}, acc ->
         case value do
+          value when is_struct(value) ->
+            Map.put(acc, field, value)
+
           value when is_map(value) ->
             is_not_fully_array =
               value
