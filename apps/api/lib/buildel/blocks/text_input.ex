@@ -41,16 +41,6 @@ defmodule Buildel.Blocks.TextInput do
   # Server
 
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__} = state) do
-    subscribe_to_connections(
-      context_id,
-      state.connections ++ public_connections(state.block.name)
-    )
-
-    {:ok, state |> assign_stream_state}
-  end
-
-  @impl true
   def handle_cast({:send_text, {:text, text_chunk}}, state) do
     state = send_stream_start(state)
 

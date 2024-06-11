@@ -1,6 +1,15 @@
 defmodule Buildel.Blocks.Block do
   alias Buildel.BlockPubSub
-  defstruct [:name, :type, connections: [], opts: %{}]
+  alias __MODULE__
+
+  defstruct [:name, :type, connections: [], opts: %{}, context: %{}]
+
+  def set_context(
+        block,
+        %{block_id: _block_id, context_id: _context_id, context: _context} = context
+      ) do
+    %{block | context: context}
+  end
 
   def audio_input(name \\ "input", public \\ false),
     do: %{name: name, type: "audio", public: public}
@@ -58,6 +67,25 @@ defmodule Buildel.Blocks.Block do
       alias Buildel.Blocks.Block
       alias Buildel.BlockPubSub
       @behaviour Buildel.Blocks.BlockBehaviour
+
+      @impl true
+      def init(%{block: block} = state) do
+        subscribe_to_connections(
+          block.context.context_id,
+          block.connections ++ public_connections(block.name)
+        )
+
+        state |> assign_stream_state() |> setup()
+      end
+
+      defoverridable init: 1
+
+      @impl true
+      def setup(state) do
+        {:ok, state}
+      end
+
+      defoverridable setup: 1
 
       def create(%{name: name, opts: opts, connections: connections}) do
         %Block{
@@ -386,4 +414,5 @@ defmodule Buildel.Blocks.BlockBehaviour do
             }
   @callback schema() :: map()
   @callback cast(pid, any()) :: :ok
+  @callback setup(any()) :: {:ok, any()} | {:error, any()}
 end

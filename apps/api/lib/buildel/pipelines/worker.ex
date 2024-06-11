@@ -45,6 +45,11 @@ defmodule Buildel.Pipelines.Worker do
       for %Blocks.Block{type: type} = block <- blocks do
         block_id = block_id(run, block)
         context_id = context_id(run)
+        context = %{
+          block_id: block_id,
+          context_id: context_id,
+          context: context_from_context_id(context_id)
+        }
 
         %{
           id: block_id |> String.to_atom(),
@@ -52,12 +57,8 @@ defmodule Buildel.Pipelines.Worker do
             {type, :start_link,
              [
                %{
-                 block: block,
-                 context: %{
-                   block_id: block_id,
-                   context_id: context_id,
-                   context: context_from_context_id(context_id)
-                 }
+                 block: block |> Buildel.Blocks.Block.set_context(context),
+                 context: context
                }
              ]}
         }
