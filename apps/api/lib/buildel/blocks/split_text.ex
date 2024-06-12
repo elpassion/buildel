@@ -25,7 +25,7 @@ defmodule Buildel.Blocks.SplitText do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["condition"],
+            "required" => ["chunk_size"],
             "properties" => %{
               chunk_size: %{
                 "type" => "number",
@@ -41,21 +41,11 @@ defmodule Buildel.Blocks.SplitText do
   end
 
   defp split(text, state) do
-    state = state |> send_stream_start("output")
-
     text
     |> String.codepoints()
-    |> Enum.chunk_every(state.opts[:chunk_size])
-    |> Enum.take(1)
+    |> Enum.chunk_every(state.opts["chunk_size"])
     |> Enum.map(fn chunk ->
-      BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "output",
-        {:text,
-         chunk
-         |> Enum.join("")}
-      )
+      output(state, "output", {:text, chunk |> Enum.join("")}, %{stream_stop: :none})
     end)
 
     state |> send_stream_stop("output")
