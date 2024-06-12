@@ -126,6 +126,7 @@ defmodule Buildel.Blocks.Block do
         case opts.stream_stop do
           :send -> send_stream_stop(state, output_name)
           :schedule -> schedule_stream_stop(state, output_name)
+          :none -> state
         end
       end
 

@@ -41,13 +41,13 @@ defmodule Buildel.Blocks.IF do
 
   defp compare(text_value, state) do
     output =
-      if text_value == state.opts[:condition] do
+      if text_value == state.opts["condition"] do
         "true"
       else
         "false"
       end
 
-    output(state, output, text_value)
+    output(state, output, {:text, text_value})
   end
 
   @impl true
