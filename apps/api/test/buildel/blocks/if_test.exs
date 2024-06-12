@@ -20,7 +20,7 @@ defmodule Buildel.Blocks.IFTest do
              Blocks.validate_block(IF, %{
                "name" => "test",
                "opts" => %{
-                 condition: "test"
+                 "condition" => "test"
                },
                "inputs" => []
              })
