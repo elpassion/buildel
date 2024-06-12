@@ -59,7 +59,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
   # Server
 
   @impl true
-  def setup(%{type: __MODULE__, opts: opts} = state) do
+  def setup(%{type: __MODULE__} = state) do
     {:ok, state |> assign_take_latest()}
   end
 
