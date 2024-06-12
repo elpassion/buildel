@@ -16,7 +16,8 @@ defmodule Buildel.Blocks.DocumentTool do
         "It's a powerful tool for applications requiring quick and precise access to specific documents stored in Buildel's knowledge bases.",
       groups: ["text", "tools"],
       inputs: [
-        Block.file_input("input", false)
+        Block.file_input("input", false),
+        Block.file_input("files", true)
       ],
       outputs: [
         Block.text_output("output", false)
