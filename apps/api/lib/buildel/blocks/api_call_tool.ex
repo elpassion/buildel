@@ -9,9 +9,6 @@ defmodule Buildel.Blocks.ApiCallTool do
   # Config
 
   @impl true
-  defdelegate cast(pid, text), to: __MODULE__, as: :call_api
-
-  @impl true
   def options() do
     %{
       type: "api_call_tool",
@@ -124,11 +121,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   # Server
 
   @impl true
-  def init(
-        %{context_id: context_id, type: __MODULE__, opts: opts, connections: connections} = state
-      ) do
-    subscribe_to_connections(context_id, connections)
-
+  def setup(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
     context =
       block_context().context_from_context_id(context_id)
       |> Map.put("metadata", opts.metadata)
@@ -155,8 +148,7 @@ defmodule Buildel.Blocks.ApiCallTool do
          |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
        end)
      )
-     |> Map.put(:jq_filter, opts[:jq_filter] || ".")
-     |> assign_stream_state(opts)}
+     |> Map.put(:jq_filter, opts[:jq_filter] || ".")}
   end
 
   @impl true
@@ -229,15 +221,15 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   @impl true
-  def handle_info({_name, :text, message, _metadata}, state) do
+  def handle_input("args", {_topic, :text, message, _metadata}, state) do
     case Jason.decode(message) do
       {:ok, decoded} ->
-        cast(self(), decoded)
-        {:noreply, state}
+        call_api(self(), decoded)
+        state
 
       {:error, _} ->
         send_error(state, "Invalid JSON message received.")
-        {:noreply, state}
+        state
     end
   end
 

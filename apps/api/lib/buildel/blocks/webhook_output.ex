@@ -1,11 +1,6 @@
 defmodule Buildel.Blocks.WebhookOutput do
   use Buildel.Blocks.Block
 
-  # Config
-
-  @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :send_text
-
   @impl true
   def options() do
     %{
@@ -43,27 +38,18 @@ defmodule Buildel.Blocks.WebhookOutput do
     }
   end
 
-  # Client
-
-  def send_text(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:send_text, text})
-  end
-
   # Server
 
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_connections(context_id, state.connections)
-
+  def setup(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
     context =
       block_context().context_from_context_id(context_id)
       |> Map.put("metadata", opts.metadata)
 
-    {:ok, state |> Map.put(:context, context) |> assign_stream_state}
+    {:ok, state |> Map.put(:context, context)}
   end
 
-  @impl true
-  def handle_cast({:send_text, {:text, content}}, state) do
+  defp send_text(content, state) do
     state = state |> send_stream_start()
 
     url = state |> get_in([:opts, :url])
@@ -89,15 +75,12 @@ defmodule Buildel.Blocks.WebhookOutput do
       "X-Buildel-Context": state[:context] |> Jason.encode!()
     )
 
-    state = state |> schedule_stream_stop()
-
-    {:noreply, state}
+    state |> send_stream_stop()
   end
 
   @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    cast(self(), {:text, text})
-    {:noreply, state}
+  def handle_input("input", {_name, :text, text, _metadata}, state) do
+    send_text(text, state)
   end
 
   defp webhook() do

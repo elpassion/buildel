@@ -154,9 +154,9 @@ defmodule Buildel.Blocks.FileSpeechToText do
     {:noreply, state}
   end
 
-  def handle_info({_name, :binary, chunk, _metadata}, state) do
+  def handle_input("input", {_name, :binary, chunk, _metadata}, state) do
     transcript(self(), {:binary, chunk})
-    {:noreply, state}
+    state
   end
 
   defp deepgram() do

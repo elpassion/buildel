@@ -13,9 +13,6 @@ defmodule Buildel.Blocks.Chat do
   # Config
 
   @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :send_message
-
-  @impl true
   def options() do
     %{
       type: "chat",
@@ -249,7 +246,7 @@ defmodule Buildel.Blocks.Chat do
   # Server
 
   @impl true
-  def init(
+  def setup(
         %{
           context_id: context_id,
           type: __MODULE__,
@@ -257,8 +254,6 @@ defmodule Buildel.Blocks.Chat do
           connections: connections
         } = state
       ) do
-    subscribe_to_connections(context_id, connections)
-
     api_key = block_context().get_secret_from_context(context_id, opts.api_key)
 
     tool_connections =
@@ -280,7 +275,6 @@ defmodule Buildel.Blocks.Chat do
 
     {:ok,
      state
-     |> assign_stream_state
      |> assign_take_latest()
      |> Map.put(
        :input_queue,
@@ -552,9 +546,8 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_info({_name, :text, _message, _metadata} = info, state) do
-    state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
-    {:noreply, state}
+  def handle_input("input", {_name, :text, _message, _metadata} = info, state) do
+    update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
   end
 
   defp chat_task(state) do

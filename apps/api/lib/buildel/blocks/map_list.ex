@@ -2,9 +2,6 @@ defmodule Buildel.Blocks.MapList do
   use Buildel.Blocks.Block
 
   @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :map
-
-  @impl true
   def options() do
     %{
       type: "map_list",
@@ -34,46 +31,21 @@ defmodule Buildel.Blocks.MapList do
     }
   end
 
-  def map(pid, {:text, list}) do
-    case Jason.decode(list) do
-      {:ok, list} ->
-        GenServer.cast(pid, {:map, list})
-
-      {:error, _} ->
-        GenServer.cast(pid, {:map, []})
+  defp map(text, state) do
+    case Jason.decode(text) do
+      {:ok, list} -> do_map(list, state)
+      {:error, _} -> do_map([], state)
     end
   end
 
-  # Server
-
-  @impl true
-  def init(state) do
-    subscribe_to_connections(state.context_id, state.connections)
-    {:ok, state |> assign_stream_state()}
-  end
-
-  @impl true
-  def handle_cast({:map, list}, state) do
-    state = state |> send_stream_start("output")
-
+  defp do_map(list, state) do
     list
-    |> Enum.each(
-      &Buildel.BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "output",
-        {:text, &1 |> Jason.encode!()}
-      )
-    )
-
-    state = state |> send_stream_stop("output")
-
-    {:noreply, state}
+    |> Enum.each(&output(state, "output", {:text, &1 |> Jason.encode!()}, %{stream_stop: :none}))
   end
 
   @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    cast(self(), {:text, text})
-    {:noreply, state}
+  def handle_input("input", {_name, :text, text, _metadata}, state) do
+    map(text, state)
+    state
   end
 end

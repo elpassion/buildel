@@ -26,9 +26,7 @@ defmodule Buildel.Blocks.AudioInputTest do
           AudioInput.create(%{
             name: "test",
             opts: %{},
-            connections: [
-              Connection.from_connection_string("test:input->input", "audio")
-            ]
+            connections: []
           })
         ]
       })

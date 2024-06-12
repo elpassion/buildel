@@ -1,11 +1,6 @@
 defmodule Buildel.Blocks.Timer do
   use Buildel.Blocks.Block
 
-  # Config
-
-  @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :start
-
   @impl true
   def options() do
     %{
@@ -44,34 +39,21 @@ defmodule Buildel.Blocks.Timer do
     }
   end
 
-  # Client
-
-  def start(pid, {:text, _text}) do
-    GenServer.cast(pid, {:start})
+  @impl true
+  def setup(%{type: __MODULE__} = state) do
+    {:ok, state |> Map.put(:timer, nil)}
   end
 
-  # Server
-
-  @impl true
-  def init(%{context_id: context_id, type: __MODULE__} = state) do
-    subscribe_to_connections(context_id, state.connections)
-
-    {:ok, state |> assign_stream_state |> Map.put(:timer, nil)}
-  end
-
-  @impl true
-  def handle_cast({:start}, state) do
+  defp start(state) do
     if state.timer, do: Process.cancel_timer(state.timer)
     state = send_stream_start(state, "on_stop")
     timer = Process.send_after(self(), {:stop}, state.opts.time)
-    state = Map.put(state, :timer, timer)
-    {:noreply, state}
+    Map.put(state, :timer, timer)
   end
 
   @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    cast(self(), {:text, text})
-    {:noreply, state}
+  def handle_input("start", {_name, :text, _text, _metadata}, state) do
+    start(state)
   end
 
   @impl true

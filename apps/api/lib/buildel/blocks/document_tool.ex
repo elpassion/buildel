@@ -255,21 +255,15 @@ defmodule Buildel.Blocks.DocumentTool do
   end
 
   @impl true
-  def handle_info({_name, :text, file_id, %{method: :delete}}, state) do
+  def handle_input("input", {_name, :text, file_id, %{method: :delete}}, state) do
     delete_file(self(), file_id)
-    {:noreply, state}
+    state
   end
 
   @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    cast(self(), {:text, text})
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_info({_name, :binary, binary, metadata}, state) do
+  def handle_input("input", {_name, :binary, binary, metadata}, state) do
     add_file(self(), {:binary, binary, metadata})
-    {:noreply, state}
+    state
   end
 
   defp build_call_formatter(value, args) do

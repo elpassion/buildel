@@ -2,9 +2,6 @@ defmodule Buildel.Blocks.SpeechToText do
   use Buildel.Blocks.Block
 
   @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :transcript
-
-  @impl true
   def options() do
     %{
       type: "speech_to_text",
@@ -66,15 +63,8 @@ defmodule Buildel.Blocks.SpeechToText do
     }
   end
 
-  # Client
-  def transcript(pid, {:binary, _chunk} = audio) do
-    GenServer.cast(pid, {:transcript, audio})
-  end
-
-  # Server
-
   @impl true
-  def init(
+  def setup(
         %{
           block_name: block_name,
           context_id: context_id,
@@ -82,8 +72,6 @@ defmodule Buildel.Blocks.SpeechToText do
           opts: opts
         } = state
       ) do
-    subscribe_to_connections(context_id, state.connections)
-
     api_key = block_context().get_secret_from_context(context_id, opts.api_key)
 
     lang = Map.get(opts, :language, "en")
@@ -91,7 +79,7 @@ defmodule Buildel.Blocks.SpeechToText do
 
     case deepgram().connect!(api_key, %{stream_to: self(), language: lang, model: model}) do
       {:ok, deepgram_pid} ->
-        {:ok, state |> Map.put(:deepgram_pid, deepgram_pid) |> assign_stream_state()}
+        {:ok, state |> Map.put(:deepgram_pid, deepgram_pid)}
 
       {:error, _reason} ->
         {:stop, {:error, block_name, :incorrect_api_key}}
@@ -104,13 +92,12 @@ defmodule Buildel.Blocks.SpeechToText do
     state
   end
 
-  @impl true
-  def handle_cast({:transcript, {:binary, chunk}}, state) do
+  defp transcript(chunk, state) do
     state = state |> send_stream_start()
 
     state |> Map.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
 
-    {:noreply, state}
+    state
   end
 
   @impl true
@@ -119,32 +106,17 @@ defmodule Buildel.Blocks.SpeechToText do
   end
 
   def handle_info({:transcript, %{message: text, is_final: true}}, state) do
-    Buildel.BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "output",
-      {:text, text}
-    )
-
-    state = state |> send_stream_stop()
-
+    state = output(state, "output", {:text, text})
     {:noreply, state}
   end
 
   def handle_info({:raw_transcript, message}, state) do
-    Buildel.BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "json_output",
-      {:text, message}
-    )
-
+    state = output(state, "json_output", {:text, message})
     {:noreply, state}
   end
 
-  def handle_info({_name, :binary, chunk, _metadata}, state) do
-    transcript(self(), {:binary, chunk})
-    {:noreply, state}
+  def handle_input("input", {_name, :binary, chunk, _metadata}, state) do
+    transcript(chunk, state)
   end
 
   defp deepgram() do

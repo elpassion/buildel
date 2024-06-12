@@ -7,9 +7,6 @@ defmodule Buildel.Blocks.Browser do
   # Config
 
   @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :url
-
-  @impl true
   def options() do
     %{
       type: "browser",
@@ -54,21 +51,9 @@ defmodule Buildel.Blocks.Browser do
   # Server
 
   @impl true
-  def init(
-        %{
-          context_id: context_id,
-          type: __MODULE__,
-          opts: opts
-        } = state
-      ) do
-    subscribe_to_connections(
-      context_id,
-      state.connections ++ public_connections(state.block.name)
-    )
-
+  def setup(%{opts: opts} = state) do
     {:ok,
      state
-     |> assign_stream_state()
      |> Map.put(
        :call_formatter,
        opts |> Map.get(:call_formatter, "Browse 📑: \"{{config.args}}\"\n")
@@ -96,26 +81,14 @@ defmodule Buildel.Blocks.Browser do
         |> Enum.map(&Map.get(&1, :value))
         |> Enum.join(" ")
 
-      Buildel.BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "output",
-        {:text, content}
-      )
+      state = output(state, "output", {:text, content})
 
-      Buildel.BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "file_output",
-        {:binary, path},
-        %{
+      state =
+        output(state, "file_output", {:binary, path}, %{
           file_id: UUID.uuid4(),
           file_name: url,
           file_type: "text/html"
-        }
-      )
-
-      state = send_stream_stop(state)
+        })
 
       {:noreply, state}
     else
@@ -162,26 +135,15 @@ defmodule Buildel.Blocks.Browser do
         |> Enum.map(&Map.get(&1, :value))
         |> Enum.join(" ")
 
-      Buildel.BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "output",
-        {:text, content}
-      )
+      state = output(state, "output", {:text, content})
 
-      Buildel.BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "file_output",
-        {:binary, path},
-        %{
+      state =
+        output(state, "file_output", {:binary, path}, %{
           file_id: UUID.uuid4(),
           file_name: url,
           file_type: "text/html"
-        }
-      )
+        })
 
-      state = state |> schedule_stream_stop()
       {:reply, content, state}
     else
       {:error, %Crawler.Crawl{} = crawl} ->
@@ -245,10 +207,9 @@ defmodule Buildel.Blocks.Browser do
   end
 
   @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    cast(self(), {:text, text})
-
-    {:noreply, state}
+  def handle_input("url", {_topic, :text, text, _metadata}, state) do
+    url(self(), {:text, text})
+    state
   end
 
   defp build_call_formatter(value, args) do

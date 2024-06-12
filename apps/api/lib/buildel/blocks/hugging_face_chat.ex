@@ -274,10 +274,10 @@ defmodule Buildel.Blocks.HuggingFaceChat do
   end
 
   @impl true
-  def handle_info({name, :text, message, _metadata}, state) do
+  def handle_input("input", {name, :text, message, _metadata}, state) do
     state = save_latest_input_value(state, name, message)
     send_message(self(), {:text, message})
-    {:noreply, state}
+    state
   end
 
   defp hugging_face_chat() do

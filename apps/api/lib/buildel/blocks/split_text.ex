@@ -1,11 +1,6 @@
 defmodule Buildel.Blocks.SplitText do
   use Buildel.Blocks.Block
 
-  # Config
-
-  @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :split
-
   @impl true
   def options() do
     %{
@@ -30,7 +25,7 @@ defmodule Buildel.Blocks.SplitText do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["condition"],
+            "required" => ["chunk_size"],
             "properties" => %{
               chunk_size: %{
                 "type" => "number",
@@ -45,48 +40,19 @@ defmodule Buildel.Blocks.SplitText do
     }
   end
 
-  # Client
-
-  def split(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:split, text})
-  end
-
-  # Server
-
-  @impl true
-  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_connections(context_id, state.connections)
-
-    {:ok, state |> assign_stream_state |> Map.put(:chunk_size, opts[:chunk_size])}
-  end
-
-  @impl true
-  def handle_cast({:split, {:text, text_value}}, state) do
-    state = state |> send_stream_start("output")
-
-    text_value
+  defp split(text, state) do
+    text
     |> String.codepoints()
-    |> Enum.chunk_every(state[:chunk_size])
-    |> Enum.take(1)
+    |> Enum.chunk_every(state.opts.chunk_size)
     |> Enum.map(fn chunk ->
-      BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "output",
-        {:text,
-         chunk
-         |> Enum.join("")}
-      )
+      output(state, "output", {:text, chunk |> Enum.join("")}, %{stream_stop: :none})
     end)
 
-    state = state |> send_stream_stop("output")
-
-    {:noreply, state}
+    state |> send_stream_stop("output")
   end
 
   @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    cast(self(), {:text, text})
-    {:noreply, state}
+  def handle_input("input", {_name, :text, text, _metadata}, state) do
+    split(text, state)
   end
 end

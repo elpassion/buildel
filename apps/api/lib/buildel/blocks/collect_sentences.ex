@@ -4,9 +4,7 @@ defmodule Buildel.Blocks.CollectSentences do
 
   # Config
 
-  @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :save_text_chunk
-  def sentences_output(), do: Block.text_output("sentences_output")
+  defp sentences_output(), do: Block.text_output("sentences_output")
 
   @impl true
   def options() do
@@ -37,53 +35,40 @@ defmodule Buildel.Blocks.CollectSentences do
 
   # Client
 
-  def save_text_chunk(pid, {:text, _text} = chunk) do
-    GenServer.cast(pid, {:save_text_chunk, chunk})
+  @impl true
+  def setup(%{type: __MODULE__} = state) do
+    {:ok, state |> Map.put(:text, "")}
   end
 
-  # Server
-
-  @impl true
-  def init(%{context_id: context_id, type: __MODULE__} = state) do
-    subscribe_to_connections(context_id, state.connections)
-
-    {:ok, state |> assign_stream_state |> Map.put(:text, "")}
-  end
-
-  @impl true
-  def handle_cast({:save_text_chunk, {:text, text_chunk}}, state) do
+  defp save_text_chunk(text_chunk, state) do
     state = state |> send_stream_start("sentences_output")
     text = state[:text] <> text_chunk
     state = state |> Map.put(:text, text)
 
     sentences = text |> Essence.Chunker.sentences()
 
-    state =
-      if Enum.count(sentences) > 1 do
-        sentence = sentences |> List.first()
+    if Enum.count(sentences) > 1 do
+      sentence = sentences |> List.first()
 
-        Buildel.BlockPubSub.broadcast_to_io(
-          state[:context_id],
-          state[:block_name],
-          "sentences_output",
-          {:text, sentence}
-        )
+      Buildel.BlockPubSub.broadcast_to_io(
+        state[:context_id],
+        state[:block_name],
+        "sentences_output",
+        {:text, sentence}
+      )
 
-        new_text = text |> String.replace(sentence, "") |> String.trim()
+      new_text = text |> String.replace(sentence, "") |> String.trim()
 
-        state
-        |> Map.put(:text, new_text)
-      else
-        state
-      end
-
-    {:noreply, state}
+      state
+      |> Map.put(:text, new_text)
+    else
+      state
+    end
   end
 
   @impl true
-  def handle_info({_name, :text, message, _metadata}, state) do
-    cast(self(), {:text, message})
-    {:noreply, state}
+  def handle_input("input", {_name, :text, message, _metadata}, state) do
+    save_text_chunk(message, state)
   end
 
   def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do
@@ -117,8 +102,8 @@ defmodule Buildel.Blocks.CollectSentences do
   end
 
   defp drain_again(state) do
-    state = Map.put(state, :draining_again, true)
-    send(self(), {"", :stop_stream, "sentences_output"})
     state
+    |> Map.put(:draining_again, true)
+    |> drain_text()
   end
 end
