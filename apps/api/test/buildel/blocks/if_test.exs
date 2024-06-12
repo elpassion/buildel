@@ -20,7 +20,7 @@ defmodule Buildel.Blocks.IFTest do
              Blocks.validate_block(IF, %{
                "name" => "test",
                "opts" => %{
-                 "condition" => "test"
+                 condition: "test"
                },
                "inputs" => []
              })
@@ -36,7 +36,7 @@ defmodule Buildel.Blocks.IFTest do
           IF.create(%{
             name: "test",
             opts: %{
-              "condition" => "test"
+              condition: "test"
             },
             connections: [
               Blocks.Connection.from_connection_string("test_input:output->input", "text")

@@ -43,7 +43,7 @@ defmodule Buildel.Blocks.SplitText do
   defp split(text, state) do
     text
     |> String.codepoints()
-    |> Enum.chunk_every(state.opts["chunk_size"])
+    |> Enum.chunk_every(state.opts.chunk_size)
     |> Enum.map(fn chunk ->
       output(state, "output", {:text, chunk |> Enum.join("")}, %{stream_stop: :none})
     end)

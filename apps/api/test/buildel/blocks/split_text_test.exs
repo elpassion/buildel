@@ -36,7 +36,7 @@ defmodule Buildel.Blocks.SplitTextTest do
           SplitText.create(%{
             name: "test",
             opts: %{
-              "chunk_size" => 5
+              chunk_size: 5
             },
             connections: [
               Blocks.Connection.from_connection_string("test_input:output->input", "text")
