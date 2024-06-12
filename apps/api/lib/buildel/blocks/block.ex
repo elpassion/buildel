@@ -72,7 +72,7 @@ defmodule Buildel.Blocks.Block do
       def init(%{block: block} = state) do
         subscribe_to_connections(
           block.context.context_id,
-          block.connections ++ public_connections(block.name)
+          all_connections(block)
         )
 
         state |> assign_stream_state() |> setup()
@@ -94,6 +94,13 @@ defmodule Buildel.Blocks.Block do
 
       defoverridable cast: 2
 
+      @impl true
+      def handle_input(_name, _payload, _metadata, state) do
+        state
+      end
+
+      defoverridable handle_input: 4
+
       def create(%{name: name, opts: opts, connections: connections}) do
         %Block{
           name: name,
@@ -104,7 +111,7 @@ defmodule Buildel.Blocks.Block do
       end
 
       def output(state, output_name, {:text, text} = payload, opts \\ %{}) do
-        opts = Map.merge(%{stream_stop: :send}, opts)
+        opts = Map.merge(%{stream_stop: :send, metadata: %{}}, opts)
 
         state = send_stream_start(state, output_name)
 
@@ -112,13 +119,18 @@ defmodule Buildel.Blocks.Block do
           state.block.context.context_id,
           state.block.name,
           output_name,
-          payload
+          payload,
+          opts.metadata
         )
 
         case opts.stream_stop do
           :send -> send_stream_stop(state, output_name)
           :schedule -> schedule_stream_stop(state, output_name)
         end
+      end
+
+      def all_connections(block) do
+        block.connections ++ public_connections(block.name)
       end
 
       def start_link(%{
@@ -166,6 +178,7 @@ defmodule Buildel.Blocks.Block do
         {:reply, state.block.type, state}
       end
 
+      @impl true
       def handle_info({_topic, :start_stream, _, _} = message, state) do
         {:noreply, state}
       end
@@ -177,6 +190,26 @@ defmodule Buildel.Blocks.Block do
       def handle_info({:stop_stream, output}, state) do
         state = send_stream_stop(state, output)
         {:noreply, state}
+      end
+
+      def handle_info({topic, message_type, value, metadata}, state) do
+        state =
+          inputs_subscribed_to_topic(all_connections(state.block), topic)
+          |> Enum.reduce(state, fn input, state ->
+            handle_input(input.name, {message_type, value}, metadata, state)
+          end)
+
+        {:noreply, state}
+      end
+
+      defp inputs_subscribed_to_topic(connections, topic) do
+        %{block: block, io: output_name} = BlockPubSub.io_from_topic(topic)
+
+        connections
+        |> Enum.filter(fn connection ->
+          connection.from.block_name == block && connection.from.name == output_name
+        end)
+        |> Enum.map(& &1.to)
       end
 
       def handle_stream_stop({_topic, :stop_stream, output, _metadata}, state) do
@@ -440,4 +473,5 @@ defmodule Buildel.Blocks.BlockBehaviour do
   @callback schema() :: map()
   @callback cast(pid, any()) :: :ok
   @callback setup(any()) :: {:ok, any()} | {:error, any()}
+  @callback handle_input(String.t(), {atom(), any()}, map(), map()) :: map()
 end

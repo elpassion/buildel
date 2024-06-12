@@ -30,9 +30,7 @@ defmodule Buildel.Blocks.TextInputTest do
             TextInput.create(%{
               name: "test",
               opts: %{},
-              connections: [
-                Blocks.Connection.from_connection_string("test:input->input", "text")
-              ]
+              connections: []
             })
           ]
         })

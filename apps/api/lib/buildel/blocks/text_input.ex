@@ -1,8 +1,6 @@
 defmodule Buildel.Blocks.TextInput do
   use Buildel.Blocks.Block
 
-  # Config
-
   @impl true
   def options() do
     %{
@@ -29,11 +27,8 @@ defmodule Buildel.Blocks.TextInput do
     }
   end
 
-  # Server
-
   @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    state = output(state, "output", {:text, text})
-    {:noreply, state}
+  def handle_input("input", {:text, text}, _metadata, state) do
+    output(state, "output", {:text, text})
   end
 end
