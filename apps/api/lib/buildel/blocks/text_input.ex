@@ -4,9 +4,6 @@ defmodule Buildel.Blocks.TextInput do
   # Config
 
   @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :send_text
-
-  @impl true
   def options() do
     %{
       type: "text_input",
@@ -32,33 +29,11 @@ defmodule Buildel.Blocks.TextInput do
     }
   end
 
-  # Client
-
-  def send_text(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:send_text, text})
-  end
-
   # Server
 
   @impl true
-  def handle_cast({:send_text, {:text, text_chunk}}, state) do
-    state = send_stream_start(state)
-
-    Buildel.BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "output",
-      {:text, text_chunk}
-    )
-
-    state = send_stream_stop(state)
-
-    {:noreply, state}
-  end
-
-  @impl true
   def handle_info({_name, :text, text, _metadata}, state) do
-    cast(self(), {:text, text})
+    state = output(state, "output", {:text, text})
     {:noreply, state}
   end
 end

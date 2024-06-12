@@ -87,6 +87,13 @@ defmodule Buildel.Blocks.Block do
 
       defoverridable setup: 1
 
+      @impl true
+      def cast(pid, payload) do
+        :ok
+      end
+
+      defoverridable cast: 2
+
       def create(%{name: name, opts: opts, connections: connections}) do
         %Block{
           name: name,
@@ -94,6 +101,24 @@ defmodule Buildel.Blocks.Block do
           opts: opts,
           connections: connections
         }
+      end
+
+      def output(state, output_name, {:text, text} = payload, opts \\ %{}) do
+        opts = Map.merge(%{stream_stop: :send}, opts)
+
+        state = send_stream_start(state, output_name)
+
+        Buildel.BlockPubSub.broadcast_to_io(
+          state.block.context.context_id,
+          state.block.name,
+          output_name,
+          payload
+        )
+
+        case opts.stream_stop do
+          :send -> send_stream_stop(state, output_name)
+          :schedule -> schedule_stream_stop(state, output_name)
+        end
       end
 
       def start_link(%{
