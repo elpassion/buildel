@@ -39,23 +39,13 @@ defmodule Buildel.Blocks.MapList do
   end
 
   defp do_map(list, state) do
-    state = state |> send_stream_start("output")
-
     list
-    |> Enum.each(
-      &Buildel.BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "output",
-        {:text, &1 |> Jason.encode!()}
-      )
-    )
-
-    state |> send_stream_stop("output")
+    |> Enum.each(&output(state, "output", {:text, &1 |> Jason.encode!()}, %{stream_stop: :none}))
   end
 
   @impl true
   def handle_input("input", {_name, :text, text, _metadata}, state) do
     map(text, state)
+    state
   end
 end
