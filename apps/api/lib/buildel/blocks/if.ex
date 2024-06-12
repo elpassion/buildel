@@ -1,11 +1,6 @@
 defmodule Buildel.Blocks.IF do
   use Buildel.Blocks.Block
 
-  # Config
-
-  @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :compare
-
   @impl true
   def options() do
     %{
@@ -44,47 +39,19 @@ defmodule Buildel.Blocks.IF do
     }
   end
 
-  # Client
-
-  def compare(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:compare, text})
-  end
-
-  # Server
-
-  @impl true
-  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_connections(context_id, state.connections)
-
-    {:ok, state |> assign_stream_state |> Map.put(:condition, opts.condition)}
-  end
-
-  @impl true
-  def handle_cast({:compare, {:text, text_value} = text}, state) do
+  defp compare(text_value, state) do
     output =
-      if text_value == state[:condition] do
+      if text_value == state.opts[:condition] do
         "true"
       else
         "false"
       end
 
-    state = state |> send_stream_start(output)
-
-    BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      output,
-      text
-    )
-
-    state = state |> send_stream_stop(output)
-
-    {:noreply, state}
+    output(state, output, text_value)
   end
 
   @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    cast(self(), {:text, text})
-    {:noreply, state}
+  def handle_input("input", {_name, :text, text, _metadata}, state) do
+    compare(text, state)
   end
 end

@@ -59,10 +59,8 @@ defmodule Buildel.Blocks.CreateBlockTool do
   # Server
 
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_connections(context_id, state.connections)
-
-    {:ok, state |> assign_stream_state(opts) |> assign_take_latest()}
+  def setup(%{type: __MODULE__, opts: opts} = state) do
+    {:ok, state |> assign_take_latest()}
   end
 
   @impl true
@@ -169,8 +167,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
   end
 
   @impl true
-  def handle_info({name, :text, message, _metadata}, state) do
-    state = save_latest_input_value(state, name, message)
-    {:noreply, state}
+  def handle_input(_input_name, {name, :text, message, _metadata}, state) do
+    save_latest_input_value(state, name, message)
   end
 end

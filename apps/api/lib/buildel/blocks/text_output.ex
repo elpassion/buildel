@@ -1,11 +1,6 @@
 defmodule Buildel.Blocks.TextOutput do
   use Buildel.Blocks.Block
 
-  # Config
-
-  @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :send_text
-
   @impl true
   def options() do
     %{
@@ -46,40 +41,8 @@ defmodule Buildel.Blocks.TextOutput do
     }
   end
 
-  # Client
-
-  def send_text(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:send_text, text})
-  end
-
-  # Server
-
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_connections(context_id, state.connections)
-
-    {:ok, state |> assign_stream_state(opts)}
-  end
-
-  @impl true
-  def handle_cast({:send_text, {:text, text_chunk}}, state) do
-    state = state |> send_stream_start()
-
-    Buildel.BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "output",
-      {:text, text_chunk}
-    )
-
-    state = state |> schedule_stream_stop()
-
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    cast(self(), {:text, text})
-    {:noreply, state}
+  def handle_input("input", {_name, :text, text, _metadata}, state) do
+    output(state, "output", {:text, text})
   end
 end

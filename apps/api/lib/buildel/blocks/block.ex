@@ -75,7 +75,7 @@ defmodule Buildel.Blocks.Block do
           all_connections(block)
         )
 
-        state |> assign_stream_state() |> setup()
+        state |> assign_stream_state(block.opts) |> setup()
       end
 
       defoverridable init: 1
@@ -95,11 +95,11 @@ defmodule Buildel.Blocks.Block do
       defoverridable cast: 2
 
       @impl true
-      def handle_input(_name, _payload, _metadata, state) do
+      def handle_input(_name, _payload, state) do
         state
       end
 
-      defoverridable handle_input: 4
+      defoverridable handle_input: 3
 
       def create(%{name: name, opts: opts, connections: connections}) do
         %Block{
@@ -110,7 +110,7 @@ defmodule Buildel.Blocks.Block do
         }
       end
 
-      def output(state, output_name, {:text, text} = payload, opts \\ %{}) do
+      def output(state, output_name, payload, opts \\ %{}) do
         opts = Map.merge(%{stream_stop: :send, metadata: %{}}, opts)
 
         state = send_stream_start(state, output_name)
@@ -192,11 +192,11 @@ defmodule Buildel.Blocks.Block do
         {:noreply, state}
       end
 
-      def handle_info({topic, message_type, value, metadata}, state) do
+      def handle_info({topic, message_type, value, metadata} = payload, state) do
         state =
           inputs_subscribed_to_topic(all_connections(state.block), topic)
           |> Enum.reduce(state, fn input, state ->
-            handle_input(input.name, {message_type, value}, metadata, state)
+            handle_input(input.name, payload, state)
           end)
 
         {:noreply, state}
@@ -473,5 +473,5 @@ defmodule Buildel.Blocks.BlockBehaviour do
   @callback schema() :: map()
   @callback cast(pid, any()) :: :ok
   @callback setup(any()) :: {:ok, any()} | {:error, any()}
-  @callback handle_input(String.t(), {atom(), any()}, map(), map()) :: map()
+  @callback handle_input(String.t(), {String.t(), atom(), any(), map()}, map()) :: map()
 end

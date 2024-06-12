@@ -1,11 +1,6 @@
 defmodule Buildel.Blocks.FileInput do
   use Buildel.Blocks.Block
 
-  # Config
-
-  @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :send_file
-
   @impl true
   def options() do
     %{
@@ -32,57 +27,13 @@ defmodule Buildel.Blocks.FileInput do
     }
   end
 
-  # Client
-
-  def send_file(pid, {{:binary, _chunk} = audio, metadata}) do
-    GenServer.cast(pid, {:send_file, audio, metadata})
-  end
-
-  # Server
-
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__} = state) do
-    subscribe_to_connections(
-      context_id,
-      state.connections ++ public_connections(state.block.name)
-    )
-
-    {:ok, state |> assign_stream_state}
+  def handle_input("input", {_name, :text, file_id, %{method: :delete}}, state) do
+    output(state, "output", {:text, file_id}, %{metadata: %{method: :delete}})
   end
 
   @impl true
-  def handle_cast({:send_file, {:binary, _chunk} = file, metadata}, state) do
-    state = send_stream_start(state)
-
-    BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "output",
-      file,
-      metadata
-    )
-
-    state = schedule_stream_stop(state)
-
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_info({_name, :text, file_id, %{method: :delete}}, state) do
-    BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "output",
-      {:text, file_id},
-      %{method: :delete}
-    )
-
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_info({_name, :binary, chunk, metadata}, state) do
-    cast(self(), {{:binary, chunk}, metadata})
-    {:noreply, state}
+  def handle_input("input", {_name, :binary, chunk, metadata}, state) do
+    output(state, "output", {:binary, chunk}, %{metadata: metadata})
   end
 end

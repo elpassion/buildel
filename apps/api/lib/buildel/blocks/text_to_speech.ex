@@ -1,9 +1,6 @@
 defmodule Buildel.Blocks.TextToSpeech do
   use Buildel.Blocks.Block
 
-  @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :synthesize
-
   # Config
   @impl true
   def options() do
@@ -42,12 +39,6 @@ defmodule Buildel.Blocks.TextToSpeech do
     }
   end
 
-  # Client
-
-  def synthesize(pid, {:text, _text} = message) do
-    GenServer.cast(pid, {:synthesize, message})
-  end
-
   # Server
 
   @impl true
@@ -64,18 +55,15 @@ defmodule Buildel.Blocks.TextToSpeech do
      |> assign_stream_state()}
   end
 
-  @impl true
-  def handle_cast({:synthesize, {:text, text}}, state) do
+  defp synthesize(text, state) do
     state = state |> send_stream_start()
     elevenlabs().synthesize(text, state[:api_key])
-
-    {:noreply, state}
+    state
   end
 
   @impl true
-  def handle_info({_name, :text, text, _metadata}, state) do
-    synthesize(self(), {:text, text})
-    {:noreply, state}
+  def handle_input("input", {_name, :text, text, _metadata}, state) do
+    synthesize(text, state)
   end
 
   def handle_info(%HTTPoison.AsyncStatus{id: ref}, state) do

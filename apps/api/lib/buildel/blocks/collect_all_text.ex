@@ -2,11 +2,6 @@ defmodule Buildel.Blocks.CollectAllText do
   require Logger
   use Buildel.Blocks.Block
 
-  # Config
-
-  @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :save_text_chunk
-
   @impl true
   def options() do
     %{
@@ -34,34 +29,18 @@ defmodule Buildel.Blocks.CollectAllText do
     }
   end
 
-  # Client
-
-  def save_text_chunk(pid, {:text, _text} = chunk) do
-    GenServer.cast(pid, {:save_text_chunk, chunk})
-  end
-
-  # Server
-
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__} = state) do
-    subscribe_to_connections(context_id, state.connections)
+  def setup(%{type: __MODULE__} = state), do: {:ok, state |> Map.put(:text, "")}
 
-    {:ok, state |> assign_stream_state |> Map.put(:text, "")}
-  end
-
-  @impl true
-  def handle_cast({:save_text_chunk, {:text, text_chunk}}, state) do
+  defp save_text_chunk(text_chunk, state) do
     state = state |> send_stream_start("output")
     text = state[:text] <> text_chunk
-    state = state |> Map.put(:text, text)
-
-    {:noreply, state}
+    state |> Map.put(:text, text)
   end
 
   @impl true
-  def handle_info({_name, :text, message, _metadata}, state) do
-    cast(self(), {:text, message})
-    {:noreply, state}
+  def handle_input("input", {_name, :text, message, _metadata}, state) do
+    save_text_chunk(message, state)
   end
 
   def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do
@@ -75,23 +54,16 @@ defmodule Buildel.Blocks.CollectAllText do
     else
       text = state[:text]
 
-      Buildel.BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "output",
-        {:text, text}
-      )
-
       state
-      |> send_stream_stop("output")
+      |> output("output", {:text, text})
       |> Map.put(:text, "")
       |> Map.put(:draining_again, false)
     end
   end
 
   defp drain_again(state) do
-    state = Map.put(state, :draining_again, true)
-    send(self(), {"", :stop_stream, "output"})
     state
+    |> Map.put(:draining_again, true)
+    |> drain_text()
   end
 end

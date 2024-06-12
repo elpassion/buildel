@@ -3,11 +3,6 @@ defmodule Buildel.Blocks.MapInputs do
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
 
-  # Config
-
-  @impl true
-  defdelegate cast(pid, input_data), to: __MODULE__, as: :combine
-
   @impl true
   def options() do
     %{
@@ -46,23 +41,14 @@ defmodule Buildel.Blocks.MapInputs do
     }
   end
 
-  # Client
-
-  def combine(pid, {:text, _text} = input_data) do
-    GenServer.cast(pid, {:combine, input_data})
-  end
-
   # Server
 
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__} = state) do
-    subscribe_to_connections(context_id, state.connections)
-
-    {:ok, state |> assign_stream_state |> assign_take_latest()}
+  def setup(%{type: __MODULE__} = state) do
+    {:ok, state |> assign_take_latest()}
   end
 
-  @impl true
-  def handle_cast({:combine, {:text, _text}}, state) do
+  defp combine(state) do
     state = state |> send_stream_start()
 
     {state, message} =
@@ -70,25 +56,16 @@ defmodule Buildel.Blocks.MapInputs do
 
     case message do
       nil ->
-        {:noreply, state}
+        state
 
       message ->
-        Buildel.BlockPubSub.broadcast_to_io(
-          state[:context_id],
-          state[:block_name],
-          "output",
-          {:text, message}
-        )
-
-        {:noreply, state |> send_stream_stop()}
+        output(state, "output", {:text, message})
     end
   end
 
   @impl true
-  def handle_info({topic, :text, message, _metadata}, state) do
-    state = state |> save_latest_input_value(topic, message)
-    cast(self(), {:text, message})
-    {:noreply, state}
+  def handle_input("input", {topic, :text, message, _metadata}, state) do
+    state |> save_latest_input_value(topic, message) |> combine()
   end
 
   defp interpolate_template_with_take_latest_messages(state, template) do
