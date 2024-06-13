@@ -212,6 +212,11 @@ defmodule Buildel.Blocks.Browser do
     state
   end
 
+  @impl true
+  def handle_input("tool", {_topic, :text, _text, _metadata} = _payload, state) do
+    state
+  end
+
   defp build_call_formatter(value, args) do
     args
     |> Enum.reduce(value, fn

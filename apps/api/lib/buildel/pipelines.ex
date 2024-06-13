@@ -171,39 +171,66 @@ defmodule Buildel.Pipelines do
   def blocks_for_run(%Run{config: %{"blocks" => blocks, "connections" => connections} = config}) do
     blocks_map = blocks |> Enum.into(%{}, fn block -> {block["name"], block} end)
 
+    block_connections =
+      connections
+      |> Enum.reduce(%{}, fn connection, acc ->
+        from_block = blocks_map[connection["from"]["block_name"]]
+        from_block_module = Buildel.Blocks.type(from_block["type"])
+        to_block = blocks_map[connection["to"]["block_name"]]
+        to_block_module = Buildel.Blocks.type(to_block["type"])
+
+        output_type =
+          from_block_module.get_output(connection["from"]["output_name"]).type
+
+        input_type =
+          to_block_module.get_input(connection["to"]["input_name"]).type
+
+        connection = %Buildel.Blocks.Connection{
+          from: %Buildel.Blocks.Output{
+            block_name: from_block["name"],
+            name: connection["from"]["output_name"],
+            type: output_type
+          },
+          to: %Buildel.Blocks.Input{
+            block_name: to_block["name"],
+            name: connection["to"]["input_name"],
+            type: input_type
+          },
+          opts: %{
+            reset: connection["opts"]["reset"]
+          }
+        }
+
+        acc =
+          acc
+          |> Map.update(to_block["name"], [connection], fn block_connections ->
+            [connection | block_connections]
+          end)
+
+        case output_type do
+          "worker" ->
+            reversed_connection = %Buildel.Blocks.Connection{
+              from: connection.to,
+              to: connection.from,
+              opts: connection.opts
+            }
+
+            Map.update(acc, from_block["name"], [reversed_connection], fn block_connections ->
+              [reversed_connection | block_connections]
+            end)
+
+          _ ->
+            acc
+        end
+      end)
+
     blocks
     |> Enum.filter(&(Buildel.Blocks.type(&1["type"]) != nil))
     |> Enum.map(fn block ->
-      block_connections =
-        connections
-        |> Enum.filter(&(&1["to"]["block_name"] == block["name"]))
-        |> Enum.map(fn connection ->
-          from_block = blocks_map[connection["from"]["block_name"]]
-          from_block_module = Buildel.Blocks.type(from_block["type"])
-          to_block = block
-          to_block_module = Buildel.Blocks.type(to_block["type"])
-
-          %Buildel.Blocks.Connection{
-            from: %Buildel.Blocks.Output{
-              block_name: connection["from"]["block_name"],
-              name: connection["from"]["output_name"],
-              type: from_block_module.get_output(connection["from"]["output_name"]).type
-            },
-            to: %Buildel.Blocks.Input{
-              block_name: connection["to"]["block_name"],
-              name: connection["to"]["input_name"],
-              type: to_block_module.get_input(connection["to"]["input_name"]).type
-            },
-            opts: %{
-              reset: connection["opts"]["reset"]
-            }
-          }
-        end)
-
       %Buildel.Blocks.Block{
         name: block["name"],
         type: block["type"] |> Buildel.Blocks.type(),
-        connections: block_connections,
+        connections: block_connections[block["name"]] || [],
         opts:
           block["opts"]
           |> keys_to_atoms()
