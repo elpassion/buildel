@@ -1,7 +1,7 @@
 defmodule Buildel.Blocks.DocumentTool do
   alias Buildel.Blocks.Fields.EditorField
   use Buildel.Blocks.Block
-  alias LangChain.Function
+  use Buildel.Blocks.Tool
 
   # Config
 
@@ -57,6 +57,35 @@ defmodule Buildel.Blocks.DocumentTool do
     }
   end
 
+  @impl true
+  def tools(state) do
+    [
+      %{
+        function: %{
+          name: "documents",
+          description: "Retrieve full document by id.",
+          parameters_schema: %{
+            type: "object",
+            properties: %{
+              document_id: %{
+                type: "string",
+                description: "Document id (uuid)"
+              }
+            },
+            required: ["document_id"]
+          }
+        },
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          build_call_formatter(state.block.opts.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
+        end
+      }
+    ]
+  end
+
   # Client
 
   def query(pid, {:text, _text} = text) do
@@ -78,26 +107,13 @@ defmodule Buildel.Blocks.DocumentTool do
   # Server
 
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_connections(context_id, state.connections)
-
+  def setup(%{type: __MODULE__, opts: opts} = state) do
     {:ok,
      state
-     |> Map.put(:collection, opts.knowledge)
-     |> assign_stream_state(opts)}
+     |> Map.put(:collection, opts.knowledge)}
   end
 
   @impl true
-  def handle_cast({:query, {:text, _query}}, state) do
-    state = state |> send_stream_start()
-
-    # TODO: Add support for async calling
-
-    state = state |> schedule_stream_stop()
-
-    {:noreply, state}
-  end
-
   def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
     state = send_stream_start(state)
 
@@ -190,7 +206,7 @@ defmodule Buildel.Blocks.DocumentTool do
   end
 
   @impl true
-  def handle_call({:query, {:text, file_uuid}}, _caller, state) do
+  def handle_tool("tool", "documents", {_topic, :text, args, _}, state) do
     state = state |> send_stream_start()
 
     %{global: global} =
@@ -203,56 +219,24 @@ defmodule Buildel.Blocks.DocumentTool do
         Buildel.Memories.get_collection_memory_by_file_uuid!(
           organization,
           state[:collection],
-          file_uuid
+          args["document_id"]
         )
 
-      state = state |> schedule_stream_stop()
-
-      {:reply, "Document name: #{memory.file_name}\n\n#{memory.content |> String.trim()}", state}
+      respond_to_tool(
+        state,
+        "tool",
+        {:text, "Document name: #{memory.file_name}\n\n#{memory.content |> String.trim()}"}
+      )
     rescue
       _ ->
         send_error(state, "Failed to retrieve the document")
 
-        state = state |> send_stream_stop()
-
-        {:reply, "", state}
+        respond_to_tool(
+          state,
+          "tool",
+          {:text, "Failed to retrieve document"}
+        )
     end
-  end
-
-  @impl true
-  def handle_call({:function, _}, _from, state) do
-    pid = self()
-
-    function =
-      Function.new!(%{
-        name: "documents",
-        description: "Retrieve full document by id.",
-        parameters_schema: %{
-          type: "object",
-          properties: %{
-            document_id: %{
-              type: "string",
-              description: "Document id (uuid)"
-            }
-          },
-          required: ["document_id"]
-        },
-        function: fn %{"document_id" => document_id} = _args, _context ->
-          query_sync(pid, {:text, document_id})
-        end
-      })
-
-    {:reply,
-     %{
-       function: function,
-       call_formatter: fn args ->
-         args = %{"config.args" => args, "config.block_name" => state.block.name}
-         build_call_formatter(state.block.opts.call_formatter, args)
-       end,
-       response_formatter: fn _response ->
-         ""
-       end
-     }, state}
   end
 
   @impl true

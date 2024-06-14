@@ -1,6 +1,6 @@
 defmodule Buildel.Blocks.CSVSearch do
   use Buildel.Blocks.Block
-  alias LangChain.Function
+  use Buildel.Blocks.Tool
 
   # Config
 
@@ -61,24 +61,17 @@ defmodule Buildel.Blocks.CSVSearch do
   # Server
 
   @impl true
-  def init(
+  def setup(
         %{
-          context_id: context_id,
           type: __MODULE__,
           opts: opts
         } = state
       ) do
-    subscribe_to_connections(
-      context_id,
-      state.connections ++ public_connections(state.block.name)
-    )
-
     repo_name = Buildel.SqliteRepoManager.generate_unique_name()
     {:ok, repo_pid} = Buildel.SqliteRepoManager.start_dynamic_repo(repo_name)
 
     {:ok,
      state
-     |> assign_stream_state()
      |> Map.put(:repo, {repo_name, repo_pid})
      |> Map.put(
        :call_formatter,
@@ -98,35 +91,43 @@ defmodule Buildel.Blocks.CSVSearch do
 
       response = Jason.encode!(response)
 
-      Buildel.BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "output",
-        {:text, response}
-      )
+      state =
+        state
+        |> output("output", {:text, response})
+        |> respond_to_tool("tool", {:text, response})
 
-      state = state |> schedule_stream_stop()
-      {:reply, response, state}
+      {:noreply, state}
     else
       :error ->
         send_error(state, "Invalid SQL query")
-        state = state |> schedule_stream_stop()
+
+        state =
+          state
+          |> send_stream_stop()
+          |> respond_to_tool("tool", {:text, "Invalid SQL query"})
+
         {:reply, "Invalid SQL query", state}
 
       {:error, %Exqlite.Error{} = error} ->
         send_error(state, error.message)
-        state = state |> schedule_stream_stop()
-        {:reply, error.message, state}
+
+        state =
+          state
+          |> send_stream_stop()
+          |> respond_to_tool("tool", {:text, error.message})
+
+        {:noreply, state}
 
       _ ->
         send_error(state, "Unknown error")
-        state = state |> schedule_stream_stop()
-        {:reply, "Unknown error", state}
+
+        state =
+          state
+          |> send_stream_stop()
+          |> respond_to_tool("tool", {:text, "Unknown error"})
+
+        {:noreply, state}
     end
-
-    state = send_stream_stop(state)
-
-    {:noreply, state}
   end
 
   def handle_cast({:delete_file, file_id}, state) do
@@ -190,47 +191,7 @@ defmodule Buildel.Blocks.CSVSearch do
   end
 
   @impl true
-  def handle_call({:query, {:text, query}}, _caller, state) do
-    state = send_stream_start(state)
-
-    {_, repo_pid} = state[:repo]
-
-    with :ok <- Buildel.CSVSearch.SQLFilter.is_safe_sql(query),
-         {:ok, %Exqlite.Result{} = response} <- Buildel.CSVSearch.execute_query(repo_pid, query) do
-      response = %{rows: response.rows, columns: response.columns}
-      response = Jason.encode!(response)
-
-      Buildel.BlockPubSub.broadcast_to_io(
-        state[:context_id],
-        state[:block_name],
-        "output",
-        {:text, response}
-      )
-
-      state = state |> schedule_stream_stop()
-      {:reply, response, state}
-    else
-      :error ->
-        send_error(state, "Invalid SQL query")
-        state = state |> schedule_stream_stop()
-        {:reply, "Invalid SQL query", state}
-
-      {:error, %Exqlite.Error{} = error} ->
-        send_error(state, error.message)
-        state = state |> schedule_stream_stop()
-        {:reply, error.message, state}
-
-      _ ->
-        send_error(state, "Unknown error")
-        state = state |> schedule_stream_stop()
-        {:reply, "Unknown error", state}
-    end
-  end
-
-  @impl true
-  def handle_call({:function, _}, _from, state) do
-    pid = self()
-
+  def tools(state) do
     table_names_string =
       case state[:table_names] do
         nil ->
@@ -245,36 +206,31 @@ defmodule Buildel.Blocks.CSVSearch do
     description =
       "Search the database using valid SQL query. If no tables are available - abort. \n\n ---------- \n\n Available tables and columns (all columns are type TEXT): \n\n #{table_names_string} \n\n YOU CAN USE ONLY THOSE TABLES. DO NOT USE ANY OTHER TABLES. DO *NOT* USE FILE_NAMES AS TABLE NAMES. \n\n ----------"
 
-    function =
-      Function.new!(%{
-        name: "query",
-        description: description,
-        parameters_schema: %{
-          type: "object",
-          properties: %{
-            query: %{
-              type: "string",
-              description: "The query to search for."
-            }
-          },
-          required: ["query"]
+    [
+      %{
+        function: %{
+          name: "query",
+          description: description,
+          parameters_schema: %{
+            type: "object",
+            properties: %{
+              query: %{
+                type: "string",
+                description: "The query to search for."
+              }
+            },
+            required: ["query"]
+          }
         },
-        function: fn %{"query" => query} = _args, _context ->
-          query_sync(pid, {:text, query})
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          build_call_formatter(state.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
         end
-      })
-
-    {:reply,
-     %{
-       function: function,
-       call_formatter: fn args ->
-         args = %{"config.args" => args, "config.block_name" => state.block.name}
-         build_call_formatter(state.call_formatter, args)
-       end,
-       response_formatter: fn _response ->
-         ""
-       end
-     }, state}
+      }
+    ]
   end
 
   @impl true
@@ -292,6 +248,12 @@ defmodule Buildel.Blocks.CSVSearch do
   @impl true
   def handle_input("query", {_name, :text, text, _metadata}, state) do
     query(self(), {:text, text})
+    state
+  end
+
+  @impl true
+  def handle_tool("tool", "query", {_name, :text, args, _}, state) do
+    query(self(), {:text, args["query"]})
     state
   end
 

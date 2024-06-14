@@ -2,6 +2,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
   require Logger
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
+  alias LangChain.Function
 
   # Config
 
@@ -197,10 +198,28 @@ defmodule Buildel.Blocks.HuggingFaceChat do
       pid = self()
 
       tools =
-        state[:tool_blocks]
-        |> Enum.map(fn block ->
-          pid = block_context().block_pid(state[:context_id], block["name"])
-          Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
+        state[:tool_connections]
+        |> Enum.flat_map(fn connection ->
+          pid = block_context().block_pid(state[:context_id], connection.from.block_name)
+
+          Buildel.Blocks.Tool.get_tools(pid)
+          |> Enum.map(fn tool_definition ->
+            function =
+              Function.new!(
+                tool_definition.function
+                |> Map.put(:function, fn args, _context ->
+                  {_, {:text, response}} =
+                    output_and_wait_for_response(state, "tool", {:text, Jason.encode!(args)}, %{
+                      metadata: %{tool_name: tool_definition.function.name},
+                      stream_stop: :none
+                    })
+
+                  response
+                end)
+              )
+
+            %{tool_definition | function: function}
+          end)
         end)
 
       Task.start(fn ->

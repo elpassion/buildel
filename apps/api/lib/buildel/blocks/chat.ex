@@ -6,6 +6,7 @@ defmodule Buildel.Blocks.Chat do
   alias Buildel.Blocks.Utils.ChatMemory
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
+  use Buildel.Blocks.Tool
   alias LangChain.Function
   alias Buildel.Blocks.Utils.Injectable
   alias Buildel.FlattenMap
@@ -199,15 +200,6 @@ defmodule Buildel.Blocks.Chat do
     GenServer.cast(pid, {:send_message, message})
   end
 
-  def send_message_sync(pid, {:text, _text} = message, %{block_name: block_name}) do
-    GenServer.cast(
-      pid,
-      {:save_input, %{block_name: block_name, message: message, output_name: "tool"}}
-    )
-
-    GenServer.call(pid, {:send_message, message}, 5 * 60_000)
-  end
-
   defp save_input_and_send_message(pid, {topic, :text, message, _metadata}) do
     %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
 
@@ -321,23 +313,27 @@ defmodule Buildel.Blocks.Chat do
 
     content = fill_with_available_metadata_and_secrets(state, content)
 
-    Buildel.BlockPubSub.broadcast_to_io(
-      state.context_id,
-      state.block_name,
-      "message_output",
-      {:text, content}
-    )
+    output(state, "message_output", {:text, content}, %{stream_stop: :none})
 
     state = update_in(state.chat_memory, &ChatMemory.add_user_message(&1, %{content: content}))
 
-    with {:ok, _message, state} <- chat_task(state) do
+    with {:ok, message, state} <- chat_task(state) do
+      state = respond_to_tool(state, "chat", {:text, message.content})
       {:noreply, cleanup_inputs(state)}
     else
       {:error, :not_all_inputs_filled, state} ->
+        state =
+          respond_to_tool(
+            state,
+            "chat",
+            {:text, "ERROR: Not all inputs required to answer question are filled"}
+          )
+
         state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
         {:noreply, state}
 
       {:error, _reason, state} ->
+        state = respond_to_tool(state, "chat", {:text, "ERROR: Something went wrong"})
         state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
         {:noreply, state}
     end
@@ -400,65 +396,32 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_call({:function, %{block_name: block_name}}, _, state) do
-    pid = self()
-
-    function =
-      Function.new!(%{
-        name: state.block.name,
-        description: state.opts.description,
-        parameters_schema: %{
-          type: "object",
-          properties: %{
-            message: %{
-              type: "string",
-              description: "Message to send to the agent."
-            }
-          },
-          required: ["message"]
+  def tools(state) do
+    [
+      %{
+        function: %{
+          name: "agent",
+          description: state.opts.description,
+          parameters_schema: %{
+            type: "object",
+            properties: %{
+              message: %{
+                type: "string",
+                description: "Message to send to the agent."
+              }
+            },
+            required: ["message"]
+          }
         },
-        function: fn %{"message" => message} = _args, _context ->
-          send_message_sync(pid, {:text, message}, %{block_name: block_name})
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          build_call_formatter(state.block.opts.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
         end
-      })
-
-    {:reply,
-     %{
-       function: function,
-       call_formatter: fn args ->
-         args = %{"config.args" => args, "config.block_name" => state.block.name}
-         build_call_formatter(state.block.opts.call_formatter, args)
-       end,
-       response_formatter: fn _response ->
-         ""
-       end
-     }, state}
-  end
-
-  def handle_call({:send_message, {:text, _text}}, _from, state) do
-    state = send_stream_start(state)
-
-    content =
-      replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
-
-    Buildel.BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "message_output",
-      {:text, content}
-    )
-
-    state = update_in(state.chat_memory, &ChatMemory.add_user_message(&1, %{content: content}))
-
-    with {:ok, message, state} <- chat_task(state) do
-      {:reply, message.content, cleanup_inputs(state)}
-    else
-      {:error, :not_all_inputs_filled, state} ->
-        {:reply, "ERROR: Not ready to answer question, some of input values are missing.", state}
-
-      _ ->
-        {:reply, "ERROR: Something went wrong.", state}
-    end
+      }
+    ]
   end
 
   @impl true
@@ -472,9 +435,27 @@ defmodule Buildel.Blocks.Chat do
 
     tools =
       state[:tool_connections]
-      |> Enum.map(fn connection ->
+      |> Enum.flat_map(fn connection ->
         pid = block_context().block_pid(state[:context_id], connection.from.block_name)
-        Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
+
+        Buildel.Blocks.Tool.get_tools(pid)
+        |> Enum.map(fn tool_definition ->
+          function =
+            Function.new!(
+              tool_definition.function
+              |> Map.put(:function, fn args, _context ->
+                {_, {:text, response}} =
+                  output_and_wait_for_response(state, "tool", {:text, Jason.encode!(args)}, %{
+                    metadata: %{tool_name: tool_definition.function.name},
+                    stream_stop: :none
+                  })
+
+                response
+              end)
+            )
+
+          %{tool_definition | function: function}
+        end)
       end)
 
     completion_id = "chatcmpl-#{:crypto.strong_rand_bytes(32) |> Base.encode64()}"
@@ -550,12 +531,43 @@ defmodule Buildel.Blocks.Chat do
     update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
   end
 
+  @impl true
+  def handle_tool(
+        "chat",
+        "agent",
+        {topic, :text, message, metadata},
+        state
+      ) do
+    %{"message" => message} = message
+    info = {topic, :text, message, metadata}
+    update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
+  end
+
   defp chat_task(state) do
     tools =
       state[:tool_connections]
-      |> Enum.map(fn connection ->
+      |> Enum.flat_map(fn connection ->
         pid = block_context().block_pid(state[:context_id], connection.from.block_name)
-        Buildel.Blocks.Block.function(pid, %{block_name: state.block_name})
+
+        Buildel.Blocks.Tool.get_tools(pid)
+        |> Enum.map(fn tool_definition ->
+          function =
+            Function.new!(
+              tool_definition.function
+              |> Map.update(:name, nil, fn name -> name |> String.split("::") |> List.last() end)
+              |> Map.put(:function, fn args, _context ->
+                {_, {:text, response}} =
+                  output_and_wait_for_response(state, "tool", {:text, Jason.encode!(args)}, %{
+                    metadata: %{tool_name: tool_definition.function.name},
+                    stream_stop: :none
+                  })
+
+                response
+              end)
+            )
+
+          %{tool_definition | function: function}
+        end)
       end)
 
     pid = self()
@@ -565,32 +577,17 @@ defmodule Buildel.Blocks.Chat do
            chat().stream_chat(%{
              context: %{messages: messages},
              on_content: fn text_chunk ->
-               Buildel.BlockPubSub.broadcast_to_io(
-                 state[:context_id],
-                 state[:block_name],
-                 "output",
-                 {:text, text_chunk}
-               )
+               output(state, "output", {:text, text_chunk}, %{stream_stop: :none})
 
                save_text_chunk(pid, text_chunk)
              end,
              on_tool_call: fn tool_name, arguments, message ->
-               Buildel.BlockPubSub.broadcast_to_io(
-                 state[:context_id],
-                 state[:block_name],
-                 "output",
-                 {:text, message}
-               )
+               output(state, "output", {:text, message}, %{stream_stop: :none})
 
                save_tool_call(pid, tool_name, arguments)
              end,
              on_tool_content: fn tool_name, content, message ->
-               Buildel.BlockPubSub.broadcast_to_io(
-                 state[:context_id],
-                 state[:block_name],
-                 "output",
-                 {:text, message}
-               )
+               output(state, "output", {:text, message}, %{stream_stop: :none})
 
                save_tool_result(pid, tool_name, content)
              end,

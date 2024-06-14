@@ -43,16 +43,8 @@ defmodule Buildel.Blocks.Block do
     GenServer.call(pid, :block_name)
   end
 
-  def context_id(pid) do
-    GenServer.call(pid, :context_id)
-  end
-
   def type(pid) do
     GenServer.call(pid, :type)
-  end
-
-  def function(pid, %{block_name: _block_name} = from) do
-    GenServer.call(pid, {:function, from})
   end
 
   def call(pid, method_name, args) do
@@ -121,6 +113,7 @@ defmodule Buildel.Blocks.Block do
           output_name,
           payload,
           opts.metadata
+          |> Map.put_new_lazy(:message_id, fn -> state[:message_id] || UUID.uuid4() end)
         )
 
         case opts.stream_stop do
@@ -128,6 +121,33 @@ defmodule Buildel.Blocks.Block do
           :schedule -> schedule_stream_stop(state, output_name)
           :none -> state
         end
+      end
+
+      def output_and_wait_for_response(state, output_name, payload, opts \\ %{}) do
+        message_id = UUID.uuid4()
+        opts = Map.merge(%{stream_stop: :send, metadata: %{}}, opts)
+
+        opts =
+          update_in(opts, [:metadata], fn metadata ->
+            metadata
+            |> Map.put(:message_id, message_id)
+          end)
+
+        state = output(state, output_name, payload, opts |> Map.put(:stream_stop, :none))
+
+        response =
+          receive do
+            {_, payload_type, payload, %{message_id: message_id}} -> {payload_type, payload}
+          end
+
+        state =
+          case opts.stream_stop do
+            :send -> send_stream_stop(state, output_name)
+            :schedule -> schedule_stream_stop(state, output_name)
+            :none -> state
+          end
+
+        {state, response}
       end
 
       def all_connections(block) do
@@ -160,19 +180,14 @@ defmodule Buildel.Blocks.Block do
 
       defdelegate name(pid), to: Block
       defdelegate block_name(pid), to: Block
-      defdelegate context_id(pid), to: Block
 
       @impl true
       def handle_call(:name, _from, state) do
-        {:reply, state.context.block_id, state}
+        {:reply, state.block.context.block_id, state}
       end
 
       def handle_call(:block_name, _from, state) do
         {:reply, state.block.name, state}
-      end
-
-      def handle_call(:context_id, _from, state) do
-        {:reply, state.context.context_id, state}
       end
 
       def handle_call(:type, _from, state) do

@@ -4,7 +4,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   alias Buildel.Blocks.Utils.Injectable
   alias Buildel.FlattenMap
   use Buildel.Blocks.Block
-  alias LangChain.Function
+  use Buildel.Blocks.Tool
 
   # Config
 
@@ -104,22 +104,6 @@ defmodule Buildel.Blocks.ApiCallTool do
     }
   end
 
-  # Client
-
-  def call_api(pid, args) do
-    GenServer.cast(pid, {:call_api, args})
-  end
-
-  def call_api_sync(pid, args) do
-    GenServer.call(pid, {:call_api, args}, :infinity)
-  end
-
-  def send_response(pid, response) do
-    GenServer.cast(pid, {:response, response})
-  end
-
-  # Server
-
   @impl true
   def setup(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
     context =
@@ -152,88 +136,57 @@ defmodule Buildel.Blocks.ApiCallTool do
   end
 
   @impl true
-  def handle_cast({:call_api, args}, state) do
-    pid = self()
-    state = state |> send_stream_start()
-
-    Task.start(fn ->
-      response = do_call_api(state, args)
-      send_response(pid, {:text, response})
-    end)
-
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast({:response, {:text, body}}, state) do
-    %{"status" => status, "body" => body} = body |> Jason.decode!()
-
-    body = Buildel.JQ.query!(body, state.jq_filter)
-
-    message =
-      %{status: status, body: body}
-      |> Jason.encode!()
-
-    Buildel.BlockPubSub.broadcast_to_io(
-      state.context_id,
-      state.block_name,
-      "response",
-      {:text, message}
-    )
-
-    state = state |> schedule_stream_stop()
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_call({:call_api, args}, _caller, state) do
-    state = state |> send_stream_start()
-    response = do_call_api(state, args)
-    state = state |> schedule_stream_stop()
-    {:reply, response, state}
-  end
-
-  @impl true
-  def handle_call({:function, _}, _from, state) do
-    pid = self()
-
-    function =
-      Function.new!(%{
-        name: state.block.name,
-        description: state[:opts].description,
-        parameters_schema: state[:parameters],
-        function: fn args, _context ->
-          call_api_sync(pid, args)
+  def tools(state) do
+    [
+      %{
+        function: %{
+          name: "request",
+          description: state[:opts].description,
+          parameters_schema: state[:parameters]
+        },
+        call_formatter: fn props ->
+          args = %{"config.args" => props, "config.block_name" => state.block.name}
+          build_call_formatter(state.block.opts.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
         end
-      })
-
-    {:reply,
-     %{
-       function: function,
-       call_formatter: fn props ->
-         args = %{"config.args" => props, "config.block_name" => state.block.name}
-         build_call_formatter(state.block.opts.call_formatter, args)
-       end,
-       response_formatter: fn _response ->
-         ""
-       end
-     }, state}
+      }
+    ]
   end
 
   @impl true
   def handle_input("args", {_topic, :text, message, _metadata}, state) do
+    send_stream_start(state, "response")
+
     case Jason.decode(message) do
-      {:ok, decoded} ->
-        call_api(self(), decoded)
-        state
+      {:ok, args} ->
+        response = call_api(state, args)
+        output(state, "response", {:text, response |> Jason.encode!()})
 
       {:error, _} ->
         send_error(state, "Invalid JSON message received.")
+        send_stream_stop(state, "response")
         state
     end
   end
 
-  defp do_call_api(state, args) do
+  @impl true
+  def handle_tool(
+        "tool",
+        "request",
+        {_topic, :text, args, _},
+        state
+      ) do
+    state = send_stream_start(state)
+    response = call_api(state, args)
+
+    state
+    |> output("response", {:text, response |> Jason.encode!()})
+    |> respond_to_tool("tool", {:text, response |> Jason.encode!()})
+  end
+
+  defp call_api(state, args) do
     payload = args |> Jason.encode!()
 
     args =
@@ -277,10 +230,11 @@ defmodule Buildel.Blocks.ApiCallTool do
            headers
          ) do
       {:ok, %{status_code: status_code, body: body}} ->
-        Jason.encode!(%{status: status_code, body: body})
+        body = Buildel.JQ.query!(body, state.jq_filter)
+        %{status: status_code, body: body}
 
       {:error, %{reason: reason}} ->
-        "Error: #{reason}"
+        %{status: 500, body: "Error: #{reason}"}
     end
   end
 

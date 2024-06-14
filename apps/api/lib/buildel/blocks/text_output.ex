@@ -43,6 +43,6 @@ defmodule Buildel.Blocks.TextOutput do
 
   @impl true
   def handle_input("input", {_name, :text, text, _metadata}, state) do
-    output(state, "output", {:text, text})
+    output(state, "output", {:text, text}, %{stream_stop: :schedule})
   end
 end

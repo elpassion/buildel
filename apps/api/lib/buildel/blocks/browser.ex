@@ -1,8 +1,8 @@
 defmodule Buildel.Blocks.Browser do
   use Buildel.Blocks.Block
+  use Buildel.Blocks.Tool
 
   alias Buildel.Crawler
-  alias LangChain.Function
 
   # Config
 
@@ -38,16 +38,6 @@ defmodule Buildel.Blocks.Browser do
     }
   end
 
-  # Client
-
-  def url(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:url, text})
-  end
-
-  def url_sync(pid, {:text, _text} = text) do
-    GenServer.call(pid, {:url, text})
-  end
-
   # Server
 
   @impl true
@@ -60,8 +50,7 @@ defmodule Buildel.Blocks.Browser do
      )}
   end
 
-  @impl true
-  def handle_cast({:url, {:text, url}}, state) do
+  defp url(url, state) do
     state = send_stream_start(state)
 
     uri = URI.parse(url)
@@ -82,139 +71,69 @@ defmodule Buildel.Blocks.Browser do
         |> Enum.join(" ")
 
       state = output(state, "output", {:text, content})
+      state = respond_to_tool(state, "tool", {:text, content})
 
-      state =
-        output(state, "file_output", {:binary, path}, %{
-          file_id: UUID.uuid4(),
-          file_name: url,
-          file_type: "text/html"
-        })
-
-      {:noreply, state}
-    else
-      {:error, %Crawler.Crawl{} = crawl} ->
-        send_error(state, crawl.error)
-        state = state |> schedule_stream_stop()
-        {:noreply, state}
-
-      {:ok, %Crawler.Crawl{}} ->
-        send_error(state, "No content found")
-        state = state |> schedule_stream_stop()
-        {:noreply, state}
-
-      {:error, reason} ->
-        send_error(state, reason)
-        state = state |> send_stream_stop()
-        {:noreply, state}
-
-      _ ->
-        send_error(state, "Unknown error")
-        state = state |> send_stream_stop()
-        {:noreply, state}
-    end
-  end
-
-  @impl true
-  def handle_call({:url, {:text, url}}, _caller, state) do
-    state = send_stream_start(state)
-
-    uri = URI.parse(url)
-
-    with {:ok, crawl} when length(crawl.pages) != 0 <-
-           Crawler.crawl(url,
-             max_depth: 1,
-             url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
-           ),
-         {:ok, path} <- Temp.path(%{suffix: ".html"}),
-         :ok <- File.write(path, List.first(crawl.pages).body),
-         workflow <- Buildel.DocumentWorkflow.new(),
-         document when is_list(document) <-
-           Buildel.DocumentWorkflow.read(workflow, {path, %{type: "text/html"}}) do
-      content =
-        Buildel.DocumentWorkflow.build_node_chunks(workflow, document)
-        |> Enum.map(&Map.get(&1, :value))
-        |> Enum.join(" ")
-
-      state = output(state, "output", {:text, content})
-
-      state =
-        output(state, "file_output", {:binary, path}, %{
-          file_id: UUID.uuid4(),
-          file_name: url,
-          file_type: "text/html"
-        })
-
-      {:reply, content, state}
-    else
-      {:error, %Crawler.Crawl{} = crawl} ->
-        send_error(state, crawl.error)
-        state = state |> schedule_stream_stop()
-        {:reply, to_string(crawl.error), state}
-
-      {:ok, %Crawler.Crawl{}} ->
-        send_error(state, "No content found")
-        state = state |> schedule_stream_stop()
-        {:noreply, state}
-
-      {:error, reason} ->
-        send_error(state, reason)
-        state = state |> schedule_stream_stop()
-        {:reply, reason, state}
-
-      _ ->
-        send_error(state, "Unknown error")
-        state = state |> schedule_stream_stop()
-        {:reply, "Unknown error", state}
-    end
-  end
-
-  @impl true
-  def handle_call({:function, _}, _from, state) do
-    pid = self()
-
-    description = "Browse a website and extract information."
-
-    function =
-      Function.new!(%{
-        name: "url",
-        description: description,
-        parameters_schema: %{
-          type: "object",
-          properties: %{
-            url: %{
-              type: "string",
-              description: "The URL to browse."
-            }
-          },
-          required: ["url"]
-        },
-        function: fn %{"url" => url} = _args, _context ->
-          url_sync(pid, {:text, url})
-        end
+      output(state, "file_output", {:binary, path}, %{
+        file_id: UUID.uuid4(),
+        file_name: url,
+        file_type: "text/html"
       })
+    else
+      {:error, %Crawler.Crawl{} = crawl} ->
+        send_error(state, crawl.error)
+        state |> send_stream_stop() |> respond_to_tool("tool", {:text, to_string(crawl.error)})
 
-    {:reply,
-     %{
-       function: function,
-       call_formatter: fn args ->
-         args = %{"config.args" => args, "config.block_name" => state.block.name}
-         build_call_formatter(state.call_formatter, args)
-       end,
-       response_formatter: fn _response ->
-         ""
-       end
-     }, state}
+      {:ok, %Crawler.Crawl{}} ->
+        send_error(state, "No content found")
+        state |> send_stream_stop() |> respond_to_tool("tool", {:text, "No content found"})
+
+      {:error, reason} ->
+        send_error(state, reason)
+        state |> send_stream_stop() |> respond_to_tool("tool", {:text, to_string(reason)})
+
+      _ ->
+        send_error(state, "Unknown error")
+        state |> send_stream_stop() |> respond_to_tool("tool", {:text, "Unknown error"})
+    end
+  end
+
+  @impl true
+  def tools(state) do
+    [
+      %{
+        function: %{
+          name: "url",
+          description: "Browse a website and extract information.",
+          parameters_schema: %{
+            type: "object",
+            properties: %{
+              url: %{
+                type: "string",
+                description: "The URL to browse."
+              }
+            },
+            required: ["url"]
+          }
+        },
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          build_call_formatter(state.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
+        end
+      }
+    ]
   end
 
   @impl true
   def handle_input("url", {_topic, :text, text, _metadata}, state) do
-    url(self(), {:text, text})
-    state
+    url(text, state)
   end
 
   @impl true
-  def handle_input("tool", {_topic, :text, _text, _metadata} = _payload, state) do
-    state
+  def handle_tool("tool", "url", {_topic, :text, args, _}, state) do
+    url(args["url"], state)
   end
 
   defp build_call_formatter(value, args) do

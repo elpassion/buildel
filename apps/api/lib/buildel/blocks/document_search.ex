@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   alias Buildel.Blocks.Fields.EditorField
   alias Buildel.Memories.MemoryCollectionSearch
   use Buildel.Blocks.Block
-  alias LangChain.Function
+  use Buildel.Blocks.Tool
 
   # Config
 
@@ -128,15 +128,13 @@ defmodule Buildel.Blocks.DocumentSearch do
   # Server
 
   @impl true
-  def init(
+  def setup(
         %{
           context_id: context_id,
           type: __MODULE__,
           opts: opts
         } = state
       ) do
-    subscribe_to_connections(context_id, state.connections)
-
     {:ok, vector_db} = block_context().get_vector_db(context_id, opts.knowledge)
 
     {:ok, collection} =
@@ -144,7 +142,6 @@ defmodule Buildel.Blocks.DocumentSearch do
 
     {:ok,
      state
-     |> assign_stream_state()
      |> Map.put(:vector_db, vector_db)
      |> Map.put(:collection, collection)
      |> Map.put(:where, opts |> Map.get(:where, "{}") |> Jason.decode!())
@@ -214,14 +211,10 @@ defmodule Buildel.Blocks.DocumentSearch do
       end)
       |> Jason.encode!()
 
-    Buildel.BlockPubSub.broadcast_to_io(
-      state[:context_id],
-      state[:block_name],
-      "output",
-      {:text, result}
-    )
-
-    state = send_stream_stop(state)
+    state =
+      state
+      |> output("output", {:text, result})
+      |> respond_to_tool("tool", {:text, result})
 
     {:noreply, state}
   end
@@ -304,128 +297,33 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   @impl true
-  def handle_call({:query, {:text, query}}, _caller, state) do
-    state = state |> send_stream_start()
-    limit = state.opts |> Map.get(:limit, 3)
-    similarity_threshhold = state.opts |> Map.get(:similarity_threshhold, 0.25)
-    token_limit = state.opts |> Map.get(:token_limit, 0)
-
-    params =
-      MemoryCollectionSearch.Params.from_map(%{
-        search_query: query,
-        where: state.where,
-        limit: limit,
-        similarity_threshhold: similarity_threshhold,
-        extend_neighbors: state.opts |> Map.get(:extend_neighbors, false) != false,
-        extend_parents: state.opts |> Map.get(:extend_parents, false) != false,
-        token_limit:
-          if token_limit == 0 do
-            nil
-          else
-            token_limit
-          end
-      })
-
-    %{collection_id: collection_id} =
-      Buildel.Memories.context_from_organization_collection_name(state[:collection])
-
-    case MemoryCollectionSearch.new(%{
-           vector_db: state.vector_db,
-           organization_collection_name: state[:collection]
-         })
-         |> MemoryCollectionSearch.search(params) do
-      {result, _total_tokens, embeddings_tokens} when is_list(result) ->
-        result =
-          result
-          |> Enum.map(fn
-            %{
-              "chunk_id" => chunk_id,
-              "document" => document,
-              "metadata" =>
-                %{
-                  "file_name" => filename,
-                  "memory_id" => memory_id
-                } = metadata
-            } ->
-              %{
-                document_id: memory_id,
-                document_name: filename,
-                chunk_id: chunk_id,
-                chunk: document |> String.trim(),
-                pages: metadata |> Map.get("pages", [])
+  def tools(state) do
+    [
+      %{
+        function: %{
+          name: "query",
+          description:
+            "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.",
+          parameters_schema: %{
+            type: "object",
+            properties: %{
+              query: %{
+                type: "string",
+                description: "The query to search for."
               }
-          end)
-          |> Jason.encode!()
-
-        block_context().create_run_and_collection_cost(
-          state[:context_id],
-          state[:block_name],
-          embeddings_tokens,
-          collection_id
-        )
-
-        Buildel.BlockPubSub.broadcast_to_io(
-          state[:context_id],
-          state[:block_name],
-          "output",
-          {:text, result}
-        )
-
-        state = state |> schedule_stream_stop()
-
-        {:reply, result, state}
-
-      {:error, :invalid_api_key} ->
-        send_error(state, "Invalid API key used for querying documents.")
-
-        state = state |> schedule_stream_stop()
-
-        {:reply, "Unable to query the database.", state}
-
-      {:error, :insufficient_quota} ->
-        send_error(state, "Insufficient quota for querying documents.")
-
-        state = state |> schedule_stream_stop()
-
-        {:reply, "Unable to query the database.", state}
-    end
-  end
-
-  @impl true
-  def handle_call({:function, _}, _from, state) do
-    pid = self()
-
-    function =
-      Function.new!(%{
-        name: "query",
-        description:
-          "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.",
-        parameters_schema: %{
-          type: "object",
-          properties: %{
-            query: %{
-              type: "string",
-              description: "The query to search for."
-            }
-          },
-          required: ["query"]
+            },
+            required: ["query"]
+          }
         },
-        function: fn %{"query" => query} = _args, _context ->
-          query_sync(pid, {:text, query})
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          build_call_formatter(state.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
         end
-      })
-
-    {:reply,
-     %{
-       function: function,
-       call_formatter: fn args ->
-         args = %{"config.args" => args, "config.block_name" => state.block.name}
-         build_call_formatter(state.call_formatter, args)
-       end,
-       response_formatter: fn _response ->
-         ""
-       end
-     }, state}
+      }
+    ]
   end
 
   @impl true
@@ -441,6 +339,12 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   def handle_input("query", {_name, :text, text, _metadata}, state) do
     query(self(), {:text, text})
+    state
+  end
+
+  @impl true
+  def handle_tool("tool", "query", {_name, :text, args, _metadata}, state) do
+    query(self(), {:text, args["query"]})
     state
   end
 
