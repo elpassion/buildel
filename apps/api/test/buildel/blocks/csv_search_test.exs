@@ -194,6 +194,57 @@ defmodule Buildel.Blocks.CSVSearchTest do
         1000
       )
     end
+
+    test "validates query for allowed keywords" do
+      {:ok, test_run} =
+        BlocksTestRunner.start_run(%{
+          blocks: [
+            BlocksTestRunner.create_test_text_input_block("test_text_input"),
+            BlocksTestRunner.create_test_file_input_block("test_file_input"),
+            CSVSearch.create(%{
+              name: "test",
+              opts: %{},
+              connections: [
+                Blocks.Connection.from_connection_string("test_text_input:output->query", "text"),
+                Blocks.Connection.from_connection_string("test_file_input:output->input", "text")
+              ]
+            })
+          ]
+        })
+
+      {:ok, text_topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
+      {:ok, block_topic} = test_run |> BlocksTestRunner.Run.subscribe_to_block("test")
+
+      {:ok, path} = Temp.path(%{suffix: ".txt"})
+      File.write(path, "id, name\n1, John\n2, Jane\n3, Doe\n")
+
+      test_run
+      |> BlocksTestRunner.Run.input(
+        "test_file_input",
+        "input",
+        {:binary, path}
+      )
+
+      assert_receive({^text_topic, :start_stream, _, _}, 1000)
+      assert_receive({^text_topic, :stop_stream, _, _}, 1000)
+
+      [%{function: %{description: description}}] =
+        test_run |> BlocksTestRunner.Run.get_tools("test")
+
+      table_name = get_table_name_from_description(description)
+
+      test_run
+      |> BlocksTestRunner.Run.input(
+        "test_text_input",
+        "input",
+        {:text, "DROP TABLE #{table_name}"}
+      )
+
+      assert_receive(
+        {^block_topic, :error, ["Invalid SQL query"], _},
+        1000
+      )
+    end
   end
 
   defp get_table_name_from_description(description) do
