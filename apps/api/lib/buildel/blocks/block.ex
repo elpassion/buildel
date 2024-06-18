@@ -48,6 +48,10 @@ defmodule Buildel.Blocks.Block do
     GenServer.call(pid, :type)
   end
 
+  def state(pid) do
+    GenServer.call(pid, :state)
+  end
+
   def call(pid, method_name, args) do
     GenServer.call(pid, {method_name, args})
   end
@@ -195,6 +199,10 @@ defmodule Buildel.Blocks.Block do
         {:reply, state.block.type, state}
       end
 
+      def handle_call(:state, _from, state) do
+        {:reply, state, state}
+      end
+
       @impl true
       def handle_info({_topic, :start_stream, _, _} = message, state) do
         {:noreply, state}
@@ -213,20 +221,14 @@ defmodule Buildel.Blocks.Block do
             {topic, message_type, value, metadata} = payload,
             state
           ) do
+        pid = self()
+
         Task.start(fn ->
           inputs_subscribed_to_topic(all_connections(state.block), topic)
           |> Enum.map(fn input ->
             {:input, input.name, {message_type, value, metadata}}
           end)
-          # |> Stream.flat_map(fn {:input, name, input} ->
-          #   output = handle_input(name, input)
-
-          #   case Enumerable.impl_for(output) do
-          #     nil -> List.wrap(output)
-          #     _ -> output
-          #   end
-          # end)
-          |> Stream.each(&process_signal(state, &1))
+          |> Stream.each(&process_signal(state |> Map.put(:pid, pid), &1))
           |> Stream.run()
         end)
 
@@ -234,7 +236,7 @@ defmodule Buildel.Blocks.Block do
       end
 
       defp process_signal(state, signals) when is_list(signals) do
-        IO.inspect(signals)
+        Enum.each(signals, &process_signal(state, &1))
       end
 
       defp process_signal(state, {:input, input_name, input}) do
@@ -255,6 +257,10 @@ defmodule Buildel.Blocks.Block do
         send_stream_stop(state, output_name)
       end
 
+      defp process_signal(state, {:error, message}) do
+        send_error(state, message)
+      end
+
       defp process_signal(state, {:output, output_name, {type, payload, metadata}}) do
         Buildel.BlockPubSub.broadcast_to_io(
           state.block.context.context_id,
@@ -266,7 +272,7 @@ defmodule Buildel.Blocks.Block do
       end
 
       defp process_signal(state, {:cast, fun}) do
-        result = fun.(state)
+        result = fun.(fn -> Buildel.Blocks.Block.state(state.pid) end)
         process_signal(state, result)
       end
 

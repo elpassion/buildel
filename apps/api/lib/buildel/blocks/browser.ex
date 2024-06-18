@@ -59,15 +59,11 @@ defmodule Buildel.Blocks.Browser do
      )}
   end
 
-  defp url(url, state) do
-    state = send_stream_start(state)
-
-    uri = URI.parse(url)
-
+  defp url(url) do
     with {:ok, crawl} when length(crawl.pages) != 0 <-
            Crawler.crawl(url,
              max_depth: 1,
-             url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
+             url_filter: fn inc_url -> inc_url |> String.contains?(URI.parse(url).host) end
            ),
          {:ok, path} <- Temp.path(%{suffix: ".html"}),
          :ok <- File.write(path, List.first(crawl.pages).body),
@@ -79,32 +75,30 @@ defmodule Buildel.Blocks.Browser do
         |> Enum.map(&Map.get(&1, :value))
         |> Enum.join(" ")
 
-      state = output(state, "output", {:text, content})
-      state = respond_to_tool(state, "tool", {:text, content})
-
-      output(state, "file_output", {:binary, path}, %{
-        metadata: %{
-          file_id: UUID.uuid4(),
-          file_name: url,
-          file_type: "text/html"
-        }
-      })
+      [
+        {:output, "output", {:text, content, %{}}},
+        {:output, "file_output",
+         {:binary, path,
+          %{
+            metadata: %{
+              file_id: UUID.uuid4(),
+              file_name: url,
+              file_type: "text/html"
+            }
+          }}}
+      ]
     else
       {:error, %Crawler.Crawl{} = crawl} ->
-        send_error(state, crawl.error)
-        state |> send_stream_stop() |> respond_to_tool("tool", {:text, to_string(crawl.error)})
+        {:error, crawl.error}
 
       {:ok, %Crawler.Crawl{}} ->
-        send_error(state, "No content found")
-        state |> send_stream_stop() |> respond_to_tool("tool", {:text, "No content found"})
+        {:error, "No content found"}
 
       {:error, reason} ->
-        send_error(state, reason)
-        state |> send_stream_stop() |> respond_to_tool("tool", {:text, to_string(reason)})
+        {:error, reason}
 
       _ ->
-        send_error(state, "Unknown error")
-        state |> send_stream_stop() |> respond_to_tool("tool", {:text, "Unknown error"})
+        {:error, "Unknown error"}
     end
   end
 
@@ -137,14 +131,29 @@ defmodule Buildel.Blocks.Browser do
     ]
   end
 
-  @impl true
-  def handle_input("url", {_topic, :text, text, _metadata}, state) do
-    url(text, state)
+  def handle_input("url", {:text, text, _metadata}) do
+    [
+      {:start_stream, "output"},
+      url(text),
+      {:stop_stream, "output"}
+    ]
   end
 
   @impl true
-  def handle_tool("tool", "url", {_topic, :text, args, _}, state) do
-    url(args["url"], state)
+  def handle_tool("tool", "url", {:text, args, _}, _state) do
+    [
+      {:start_stream, "output"},
+      {:cast,
+       fn _ ->
+         response = url(args["url"])
+
+         [
+           {:output, "output", {:text, response, %{}}},
+           {:respond, "tool", {:text, response, %{}}}
+         ]
+       end},
+      {:stop_stream, "output"}
+    ]
   end
 
   defp build_call_formatter(value, args) do
