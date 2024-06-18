@@ -3,6 +3,7 @@ defmodule Buildel.Blocks.Browser do
   use Buildel.Blocks.Tool
 
   alias Buildel.Crawler
+  alias Buildel.Blocks.Fields.EditorField
 
   # Config
 
@@ -32,7 +33,15 @@ defmodule Buildel.Blocks.Browser do
         "opts" =>
           options_schema(%{
             "required" => [],
-            "properties" => %{}
+            "properties" =>
+              Jason.OrderedObject.new(
+                call_formatter:
+                  EditorField.call_formatter(%{
+                    default: "{{config.block_name}} Browse 📑: \"{{config.args}}\"\n",
+                    description: "How to format calling of api call through tool interface.",
+                    minLength: 1
+                  })
+              )
           })
       }
     }
@@ -74,9 +83,11 @@ defmodule Buildel.Blocks.Browser do
       state = respond_to_tool(state, "tool", {:text, content})
 
       output(state, "file_output", {:binary, path}, %{
-        file_id: UUID.uuid4(),
-        file_name: url,
-        file_type: "text/html"
+        metadata: %{
+          file_id: UUID.uuid4(),
+          file_name: url,
+          file_type: "text/html"
+        }
       })
     else
       {:error, %Crawler.Crawl{} = crawl} ->

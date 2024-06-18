@@ -9,6 +9,13 @@ defmodule Buildel.BlocksTestRunner.Run do
     )
   end
 
+  def subscribe_to_block(run, block) do
+    Buildel.BlockPubSub.subscribe_to_block(
+      Buildel.BlocksTestRunner.context_id(run.pid),
+      block
+    )
+  end
+
   def input(run, block_name, input_name, data) do
     Buildel.BlockPubSub.broadcast_to_io(
       Buildel.BlocksTestRunner.context_id(run.pid),

@@ -1,0 +1,35 @@
+[
+  {
+    "request": {
+      "options": [],
+      "body": "",
+      "url": "https://reddit.com",
+      "headers": [],
+      "method": "get",
+      "request_body": ""
+    },
+    "response": {
+      "binary": false,
+      "type": "ok",
+      "body": "",
+      "headers": {
+        "Connection": "close",
+        "Content-Length": "0",
+        "Retry-After": "0",
+        "Location": "https://www.reddit.com/",
+        "Accept-Ranges": "bytes",
+        "Date": "Tue, 18 Jun 2024 09:21:30 GMT",
+        "Via": "1.1 varnish",
+        "Strict-Transport-Security": "max-age=31536000; includeSubdomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-XSS-Protection": "1; mode=block",
+        "Cache-Control": "private, max-age=3600",
+        "Server": "snooserv",
+        "Report-To": "{\"group\": \"w3-reporting-nel\", \"max_age\": 14400, \"include_subdomains\": true,  \"endpoints\": [{ \"url\": \"https://w3-reporting-nel.reddit.com/reports\" }]}, {\"group\": \"w3-reporting\", \"max_age\": 14400, \"include_subdomains\": true, \"endpoints\": [{ \"url\": \"https://w3-reporting.reddit.com/reports\" }]}, {\"group\": \"w3-reporting-csp\", \"max_age\": 14400, \"include_subdomains\": true, \"endpoints\": [{ \"url\": \"https://w3-reporting-csp.reddit.com/reports\" }]}",
+        "NEL": "{\"report_to\": \"w3-reporting-nel\", \"max_age\": 14400, \"include_subdomains\": false, \"success_fraction\": 1.0, \"failure_fraction\": 1.0}"
+      },
+      "status_code": 301
+    }
+  }
+]
