@@ -102,7 +102,7 @@ defmodule Buildel.Blocks.ApiCallToolTest do
         test_run
         |> BlocksTestRunner.Run.input("test_input", "input", {:text, "{}"})
 
-        assert_receive({^topic, :text, _, _}, 10000)
+        assert_receive({^topic, :text, _, _}, 100)
       end
     end
 
@@ -136,7 +136,7 @@ defmodule Buildel.Blocks.ApiCallToolTest do
         test_run
         |> BlocksTestRunner.Run.input("test_input", "input", {:text, "{}"})
 
-        assert_receive({^topic, :text, _, _}, 10000)
+        assert_receive({^topic, :text, _, _}, 100)
       end
     end
 
@@ -170,7 +170,7 @@ defmodule Buildel.Blocks.ApiCallToolTest do
         test_run
         |> BlocksTestRunner.Run.input("test_input", "input", {:text, "{}"})
 
-        assert_receive({^topic, :text, _, _}, 10000)
+        assert_receive({^topic, :text, _, _}, 100)
       end
     end
   end

@@ -155,20 +155,25 @@ defmodule Buildel.Blocks.ApiCallTool do
     ]
   end
 
-  @impl true
-  def handle_input("args", {_topic, :text, message, _metadata}, state) do
-    send_stream_start(state, "response")
+  def handle_input("args", {:text, message, metadata}) do
+    [{:start_stream, "response"}, {:text, message, metadata}, {:stop_stream, "response"}]
+    |> Stream.map(fn
+      {:text, message, _metadata} ->
+        case Jason.decode(message) do
+          {:ok, args} ->
+            {:cast,
+             fn state ->
+               response = call_api(state, args)
+               {:output, "response", {:text, response |> Jason.encode!(), %{}}}
+             end}
 
-    case Jason.decode(message) do
-      {:ok, args} ->
-        response = call_api(state, args)
-        output(state, "response", {:text, response |> Jason.encode!()})
+          {:error, _} ->
+            {:error, "Invalid JSON message received."}
+        end
 
-      {:error, _} ->
-        send_error(state, "Invalid JSON message received.")
-        send_stream_stop(state, "response")
-        state
-    end
+      event ->
+        event
+    end)
   end
 
   @impl true

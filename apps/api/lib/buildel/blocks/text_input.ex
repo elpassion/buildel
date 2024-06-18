@@ -27,8 +27,11 @@ defmodule Buildel.Blocks.TextInput do
     }
   end
 
-  @impl true
-  def handle_input("input", {_topic, :text, text, _metadata}, state) do
-    output(state, "output", {:text, text})
+  def handle_input("input", {message_type, value, metadata}) do
+    [
+      {:start_stream, "output"},
+      {:output, "output", {message_type, value, metadata}},
+      {:stop_stream, "output"}
+    ]
   end
 end

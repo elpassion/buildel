@@ -1,8 +1,6 @@
 defmodule Buildel.Blocks.AudioInput do
   use Buildel.Blocks.Block
 
-  # Config
-
   @impl true
   def options() do
     %{
@@ -28,8 +26,11 @@ defmodule Buildel.Blocks.AudioInput do
     }
   end
 
-  @impl true
-  def handle_input("input", {_topic, :binary, chunk, metadata}, state) do
-    output(state, "output", {:binary, chunk}, %{metadata: metadata})
+  def handle_input("input", {:binary, chunk, metadata}) do
+    [
+      {:start_stream, "output"},
+      {:output, "output", {:binary, chunk, metadata}},
+      {:stop_stream, "output"}
+    ]
   end
 end

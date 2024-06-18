@@ -11,53 +11,53 @@ defmodule Buildel.Blocks.Utils.StreamState do
       end
 
       defp send_stream_start(state, output \\ "output") do
-        case state[:stream_state] do
-          :idle ->
-            state = put_in(state[:stream_state], :streaming)
+        # case state[:stream_state] do
+        #   :idle ->
+        #     state = put_in(state[:stream_state], :streaming)
 
-            BlockPubSub.broadcast_to_io(
-              state[:context_id],
-              state[:block_name],
-              output,
-              {:start_stream, nil}
-            )
+        BlockPubSub.broadcast_to_io(
+          state[:context_id],
+          state[:block_name],
+          output,
+          {:start_stream, nil}
+        )
 
-            BlockPubSub.broadcast_to_block(
-              state[:context_id],
-              state[:block_name],
-              {:start_stream, nil}
-            )
+        BlockPubSub.broadcast_to_block(
+          state[:context_id],
+          state[:block_name],
+          {:start_stream, nil}
+        )
 
-            state
+        #   state
 
-          _ ->
-            state
-        end
+        # _ ->
+        #   state
+        # end
       end
 
       defp send_stream_stop(state, output \\ "output") do
-        case state[:stream_state] do
-          :streaming ->
-            state = put_in(state[:stream_state], :idle)
+        # case state[:stream_state] do
+        #   :streaming ->
+        #     state = put_in(state[:stream_state], :idle)
 
-            BlockPubSub.broadcast_to_io(
-              state[:context_id],
-              state[:block_name],
-              output,
-              {:stop_stream, nil}
-            )
+        BlockPubSub.broadcast_to_io(
+          state[:context_id],
+          state[:block_name],
+          output,
+          {:stop_stream, nil}
+        )
 
-            BlockPubSub.broadcast_to_block(
-              state[:context_id],
-              state[:block_name],
-              {:stop_stream, nil}
-            )
+        BlockPubSub.broadcast_to_block(
+          state[:context_id],
+          state[:block_name],
+          {:stop_stream, nil}
+        )
 
-            state
+        #   state
 
-          _ ->
-            state
-        end
+        # _ ->
+        #   state
+        # end
       end
 
       defp schedule_stream_stop(state, output \\ "output") do

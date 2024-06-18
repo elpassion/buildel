@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.Block do
+  require Logger
   alias Buildel.BlockPubSub
   alias __MODULE__
 
@@ -207,6 +208,73 @@ defmodule Buildel.Blocks.Block do
         state = send_stream_stop(state, output)
         {:noreply, state}
       end
+
+      def handle_info(
+            {topic, message_type, value, metadata} = payload,
+            state
+          ) do
+        Task.start(fn ->
+          inputs_subscribed_to_topic(all_connections(state.block), topic)
+          |> Enum.map(fn input ->
+            {:input, input.name, {message_type, value, metadata}}
+          end)
+          # |> Stream.flat_map(fn {:input, name, input} ->
+          #   output = handle_input(name, input)
+
+          #   case Enumerable.impl_for(output) do
+          #     nil -> List.wrap(output)
+          #     _ -> output
+          #   end
+          # end)
+          |> Stream.each(&process_signal(state, &1))
+          |> Stream.run()
+        end)
+
+        {:noreply, state}
+      end
+
+      defp process_signal(state, signals) when is_list(signals) do
+        IO.inspect(signals)
+      end
+
+      defp process_signal(state, {:input, input_name, input}) do
+        result = handle_input(input_name, input)
+
+        case Enumerable.impl_for(result) do
+          nil -> List.wrap(result)
+          _ -> result
+        end
+        |> Enum.each(&process_signal(state, &1))
+      end
+
+      defp process_signal(state, {:start_stream, output_name}) do
+        send_stream_start(state, output_name)
+      end
+
+      defp process_signal(state, {:stop_stream, output_name}) do
+        send_stream_stop(state, output_name)
+      end
+
+      defp process_signal(state, {:output, output_name, {type, payload, metadata}}) do
+        Buildel.BlockPubSub.broadcast_to_io(
+          state.block.context.context_id,
+          state.block.name,
+          output_name,
+          {type, payload},
+          metadata
+        )
+      end
+
+      defp process_signal(state, {:cast, fun}) do
+        result = fun.(state)
+        process_signal(state, result)
+      end
+
+      def handle_input(name, {message_type, value, metadata}) do
+        {:output, name, {message_type, value, metadata}}
+      end
+
+      defoverridable handle_input: 2
 
       def handle_info({topic, message_type, value, metadata} = payload, state) do
         state =

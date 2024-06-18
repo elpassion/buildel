@@ -41,8 +41,11 @@ defmodule Buildel.Blocks.TextOutput do
     }
   end
 
-  @impl true
-  def handle_input("input", {_name, :text, text, _metadata}, state) do
-    output(state, "output", {:text, text}, %{stream_stop: :schedule})
+  def handle_input("input", {:text, text, metadata}) do
+    [
+      {:start_stream, "output"},
+      {:output, "output", {:text, text, metadata}},
+      {:stop_stream, "output"}
+    ]
   end
 end
