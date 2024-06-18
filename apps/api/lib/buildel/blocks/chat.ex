@@ -554,7 +554,6 @@ defmodule Buildel.Blocks.Chat do
           function =
             Function.new!(
               tool_definition.function
-              |> Map.update(:name, nil, fn name -> name |> String.split("::") |> List.last() end)
               |> Map.put(:function, fn args, _context ->
                 {_, {:text, response}} =
                   output_and_wait_for_response(state, "tool", {:text, Jason.encode!(args)}, %{
@@ -563,6 +562,9 @@ defmodule Buildel.Blocks.Chat do
                   })
 
                 response
+              end)
+              |> Map.update(:name, nil, fn name ->
+                name |> String.replace("::", "__")
               end)
             )
 
