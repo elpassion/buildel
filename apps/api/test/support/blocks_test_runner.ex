@@ -34,6 +34,14 @@ defmodule Buildel.BlocksTestRunner do
     })
   end
 
+  def create_test_file_input_block(name) do
+    Buildel.Blocks.FileInput.create(%{
+      name: name,
+      opts: %{},
+      connections: []
+    })
+  end
+
   def create_test_audio_input_block(name) do
     Buildel.Blocks.AudioInput.create(%{
       name: name,
