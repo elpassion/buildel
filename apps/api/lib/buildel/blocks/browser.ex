@@ -80,11 +80,9 @@ defmodule Buildel.Blocks.Browser do
         {:output, "file_output",
          {:binary, path,
           %{
-            metadata: %{
-              file_id: UUID.uuid4(),
-              file_name: url,
-              file_type: "text/html"
-            }
+            file_id: UUID.uuid4(),
+            file_name: url,
+            file_type: "text/html"
           }}}
       ]
     else
