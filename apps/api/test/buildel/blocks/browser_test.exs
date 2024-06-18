@@ -143,7 +143,7 @@ defmodule Buildel.Blocks.BrowserTest do
           {:text, "https://jsonplaceholder.typicode.com/todos/1"}
         )
 
-        assert_receive({^text_topic, :text, _, _})
+        assert_receive({^text_topic, :text, _, _}, 200)
 
         assert_receive(
           {^file_topic, :binary, _,
@@ -151,7 +151,8 @@ defmodule Buildel.Blocks.BrowserTest do
              file_id: _,
              file_name: _,
              file_type: _
-           }}
+           }},
+          200
         )
       end
     end
