@@ -52,6 +52,10 @@ defmodule Buildel.Blocks.Block do
     GenServer.call(pid, :state)
   end
 
+  def set_state(pid, new_state) do
+    GenServer.call(pid, {:set_state, new_state})
+  end
+
   def call(pid, method_name, args) do
     GenServer.call(pid, {method_name, args})
   end
@@ -203,6 +207,10 @@ defmodule Buildel.Blocks.Block do
         {:reply, state, state}
       end
 
+      def handle_call({:set_state, new_state}, _from, _state) do
+        {:reply, new_state, new_state}
+      end
+
       @impl true
       def handle_info({_topic, :start_stream, _, _} = message, state) do
         {:noreply, state}
@@ -274,6 +282,17 @@ defmodule Buildel.Blocks.Block do
       defp process_signal(state, {:cast, fun}) do
         result = fun.(fn -> Buildel.Blocks.Block.state(state.pid) end)
         process_signal(state, result)
+      end
+
+      defp process_signal(state, {:call, fun}) do
+        {result, new_state} = fun.(fn -> Buildel.Blocks.Block.state(state.pid) end)
+        state = new_state |> Map.put(:pid, state.pid)
+        Buildel.Blocks.Block.set_state(state.pid, state)
+        process_signal(state, result)
+      end
+
+      defp process_signal(state, nil) do
+        nil
       end
 
       def handle_input(name, {message_type, value, metadata}) do

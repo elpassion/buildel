@@ -80,117 +80,6 @@ defmodule Buildel.Blocks.CSVSearch do
   end
 
   @impl true
-  def handle_cast({:query, {:text, query}}, state) do
-    state = send_stream_start(state)
-
-    {_, repo_pid} = state[:repo]
-
-    with :ok <- Buildel.CSVSearch.SQLFilter.is_safe_sql(query),
-         {:ok, %Exqlite.Result{} = response} <- Buildel.CSVSearch.execute_query(repo_pid, query) do
-      response = %{rows: response.rows, columns: response.columns}
-
-      response = Jason.encode!(response)
-
-      state =
-        state
-        |> output("output", {:text, response})
-        |> respond_to_tool("tool", {:text, response})
-
-      {:noreply, state}
-    else
-      :error ->
-        send_error(state, "Invalid SQL query")
-
-        state =
-          state
-          |> send_stream_stop()
-          |> respond_to_tool("tool", {:text, "Invalid SQL query"})
-
-        {:reply, "Invalid SQL query", state}
-
-      {:error, %Exqlite.Error{} = error} ->
-        send_error(state, error.message)
-
-        state =
-          state
-          |> send_stream_stop()
-          |> respond_to_tool("tool", {:text, error.message})
-
-        {:noreply, state}
-
-      _ ->
-        send_error(state, "Unknown error")
-
-        state =
-          state
-          |> send_stream_stop()
-          |> respond_to_tool("tool", {:text, "Unknown error"})
-
-        {:noreply, state}
-    end
-  end
-
-  def handle_cast({:delete_file, file_id}, state) do
-    state = send_stream_start(state)
-
-    table_name =
-      state[:table_names]
-      |> Enum.find(fn {_, _, id} -> id == file_id end)
-      |> elem(0)
-
-    {_, repo_pid} = state[:repo]
-
-    with :ok <- Buildel.CSVSearch.handle_delete(repo_pid, table_name) do
-      state =
-        Map.update(state, :table_names, [], fn table_names ->
-          Enum.reject(table_names, fn {_, _, id} -> id == file_id end)
-        end)
-
-      state = send_stream_stop(state)
-      {:noreply, state}
-    else
-      {:error, message} ->
-        send_error(state, message)
-        state = schedule_stream_stop(state)
-        {:noreply, state}
-
-      _ ->
-        send_error(state, "Unknown error")
-        state = schedule_stream_stop(state)
-        {:noreply, state}
-    end
-  end
-
-  def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
-    state = send_stream_start(state)
-
-    file_id = Map.get(metadata, :file_id, UUID.uuid4())
-    {_, repo_pid} = state[:repo]
-
-    with :ok <- validate_file_type(Map.get(metadata, :file_type)),
-         {:ok, file_content} <- File.read(file_path),
-         {:ok, {table_name, headers}} <- Buildel.CSVSearch.handle_upload(repo_pid, file_content) do
-      state =
-        Map.update(state, :table_names, [{table_name, headers, file_id}], fn table_names ->
-          [{table_name, headers} | table_names]
-        end)
-
-      state = send_stream_stop(state)
-      {:noreply, state}
-    else
-      {:error, message} ->
-        send_error(state, message)
-        state = schedule_stream_stop(state)
-        {:noreply, state}
-
-      _ ->
-        send_error(state, "Unknown error")
-        state = schedule_stream_stop(state)
-        {:noreply, state}
-    end
-  end
-
-  @impl true
   def tools(state) do
     table_names_string =
       case state[:table_names] do
@@ -233,22 +122,101 @@ defmodule Buildel.Blocks.CSVSearch do
     ]
   end
 
-  @impl true
-  def handle_input("input", {_name, :binary, binary, metadata}, state) do
-    add_file(self(), {:binary, binary, metadata})
-    state
+  def handle_input("input", {:binary, file_path, metadata}) do
+    [
+      {:start_stream, "output"},
+      {:call,
+       fn get_state ->
+         state = get_state.()
+
+         file_id = Map.get(metadata, :file_id, UUID.uuid4())
+         {_, repo_pid} = state[:repo]
+
+         with :ok <- validate_file_type(Map.get(metadata, :file_type)),
+              {:ok, file_content} <- File.read(file_path),
+              {:ok, {table_name, headers}} <-
+                Buildel.CSVSearch.handle_upload(repo_pid, file_content) do
+           state =
+             Map.update(state, :table_names, [{table_name, headers, file_id}], fn table_names ->
+               [{table_name, headers} | table_names]
+             end)
+
+           {nil, state}
+         else
+           {:error, message} ->
+             {{:error, message}, state}
+
+           _ ->
+             {{:error, "Unknown error"}, state}
+         end
+       end},
+      {:stop_stream, "output"}
+    ]
   end
 
-  @impl true
-  def handle_input("input", {_name, :text, file_id, %{method: :delete}}, state) do
-    delete_file(self(), file_id)
-    state
+  def handle_input("input", {:text, file_id, %{method: :delete}}) do
+    [
+      {:start_stream, "output"},
+      {:call,
+       fn get_state ->
+         state = get_state.()
+
+         table_name =
+           state[:table_names]
+           |> Enum.find(fn {_, _, id} -> id == file_id end)
+           |> elem(0)
+
+         {_, repo_pid} = state[:repo]
+
+         with :ok <- Buildel.CSVSearch.handle_delete(repo_pid, table_name) do
+           state =
+             Map.update(state, :table_names, [], fn table_names ->
+               Enum.reject(table_names, fn {_, _, id} -> id == file_id end)
+             end)
+
+           {nil, state}
+         else
+           {:error, message} ->
+             {{:error, message}, state}
+
+           _ ->
+             {{:error, "Unknown error"}, state}
+         end
+       end},
+      {:stop_stream, "output"}
+    ]
   end
 
-  @impl true
-  def handle_input("query", {_name, :text, text, _metadata}, state) do
-    query(self(), {:text, text})
-    state
+  def handle_input("query", {:text, query, _metadata}) do
+    [
+      {:start_stream, "output"},
+      {:cast,
+       fn get_state ->
+         state = get_state.()
+
+         {_, repo_pid} = state[:repo]
+
+         with :ok <- Buildel.CSVSearch.SQLFilter.is_safe_sql(query),
+              {:ok, %Exqlite.Result{} = response} <-
+                Buildel.CSVSearch.execute_query(repo_pid, query) do
+           response = %{rows: response.rows, columns: response.columns}
+
+           response = Jason.encode!(response)
+
+           [{:output, "output", {:text, response, %{}}}]
+         else
+           :error ->
+             {:error, "Invalid SQL query"}
+
+           {:error, %Exqlite.Error{} = error} ->
+             {:error, error.message}
+
+           _ ->
+             {:error, "Unknown error"}
+         end
+       end},
+      {:stop_stream, "output"}
+    ]
   end
 
   @impl true
