@@ -26,7 +26,7 @@ defmodule Buildel.Blocks.AudioInput do
     }
   end
 
-  def handle_input("input", {:binary, chunk, metadata}) do
+  def handle_input("input", {_topic, :binary, chunk, metadata}) do
     [
       {:start_stream, "output"},
       {:output, "output", {:binary, chunk, metadata}},

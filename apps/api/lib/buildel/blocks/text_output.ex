@@ -41,7 +41,7 @@ defmodule Buildel.Blocks.TextOutput do
     }
   end
 
-  def handle_input("input", {:text, text, metadata}) do
+  def handle_input("input", {_topic, :text, text, metadata}) do
     [
       {:start_stream, "output"},
       {:output, "output", {:text, text, metadata}},

@@ -155,7 +155,7 @@ defmodule Buildel.Blocks.ApiCallTool do
     ]
   end
 
-  def handle_input("args", {:text, message, _metadata}) do
+  def handle_input("args", {_topic, :text, message, _metadata}) do
     [
       {:start_stream, "response"},
       case Jason.decode(message) do

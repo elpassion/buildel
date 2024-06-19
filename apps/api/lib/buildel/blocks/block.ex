@@ -56,6 +56,10 @@ defmodule Buildel.Blocks.Block do
     GenServer.call(pid, {:set_state, new_state})
   end
 
+  def update_state(pid, update_fn) do
+    GenServer.call(pid, {:update_state, update_fn})
+  end
+
   def call(pid, method_name, args) do
     GenServer.call(pid, {method_name, args})
   end
@@ -203,6 +207,10 @@ defmodule Buildel.Blocks.Block do
         {:reply, state.block.type, state}
       end
 
+      def handle_call({:update_state, updater}, _from, state) do
+        apply(updater, [state])
+      end
+
       def handle_call(:state, _from, state) do
         {:reply, state, state}
       end
@@ -226,7 +234,7 @@ defmodule Buildel.Blocks.Block do
       end
 
       def handle_info(
-            {topic, message_type, value, metadata} = payload,
+            {topic, _message_type, _value, _metadata} = payload,
             state
           ) do
         pid = self()
@@ -234,7 +242,7 @@ defmodule Buildel.Blocks.Block do
         Task.start(fn ->
           inputs_subscribed_to_topic(all_connections(state.block), topic)
           |> Enum.map(fn input ->
-            {:input, input.name, {message_type, value, metadata}}
+            {:input, input.name, payload}
           end)
           |> Stream.each(&process_signal(state |> Map.put(:pid, pid), &1))
           |> Stream.run()
@@ -285,9 +293,13 @@ defmodule Buildel.Blocks.Block do
       end
 
       defp process_signal(state, {:call, fun}) do
-        {result, new_state} = fun.(fn -> Buildel.Blocks.Block.state(state.pid) end)
-        state = new_state |> Map.put(:pid, state.pid)
-        Buildel.Blocks.Block.set_state(state.pid, state)
+        wrapped_fun =
+          fn state ->
+            {result, state} = fun.(state)
+            {:reply, result, state}
+          end
+
+        result = Buildel.Blocks.Block.update_state(state.pid, wrapped_fun)
         process_signal(state, result)
       end
 

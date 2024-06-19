@@ -48,24 +48,26 @@ defmodule Buildel.Blocks.MapInputs do
     {:ok, state |> assign_take_latest()}
   end
 
-  defp combine(state) do
-    state = state |> send_stream_start()
+  def handle_input("input", {topic, :text, message, _metadata}) do
+    [
+      {:start_stream, "output"},
+      {:call,
+       fn state ->
+         state = save_latest_input_value(state, topic, message)
 
-    {state, message} =
-      state |> interpolate_template_with_take_latest_messages(state[:opts].template)
+         {state, message} =
+           state |> interpolate_template_with_take_latest_messages(state[:opts].template)
 
-    case message do
-      nil ->
-        state
+         case message do
+           nil ->
+             {nil, state}
 
-      message ->
-        output(state, "output", {:text, message})
-    end
-  end
-
-  @impl true
-  def handle_input("input", {topic, :text, message, _metadata}, state) do
-    state |> save_latest_input_value(topic, message) |> combine()
+           message ->
+             {{:output, "output", {:text, message, %{}}}, state}
+         end
+       end},
+      {:stop_stream, "output"}
+    ]
   end
 
   defp interpolate_template_with_take_latest_messages(state, template) do

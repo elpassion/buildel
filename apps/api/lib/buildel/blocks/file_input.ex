@@ -27,7 +27,7 @@ defmodule Buildel.Blocks.FileInput do
     }
   end
 
-  def handle_input("input", {:text, file_id, %{method: :delete}}) do
+  def handle_input("input", {_topic, :text, file_id, %{method: :delete}}) do
     [
       {:start_stream, "output"},
       {:output, "output", {:text, file_id, %{metadata: %{method: :delete}}}},
@@ -35,7 +35,7 @@ defmodule Buildel.Blocks.FileInput do
     ]
   end
 
-  def handle_input("input", {:binary, chunk, metadata}) do
+  def handle_input("input", {_topic, :binary, chunk, metadata}) do
     [
       {:start_stream, "output"},
       {:output, "output", {:binary, chunk, metadata}},

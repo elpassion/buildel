@@ -129,7 +129,7 @@ defmodule Buildel.Blocks.Browser do
     ]
   end
 
-  def handle_input("url", {:text, text, _metadata}) do
+  def handle_input("url", {_topic, :text, text, _metadata}) do
     [
       {:start_stream, "output"},
       url(text),

@@ -122,13 +122,11 @@ defmodule Buildel.Blocks.CSVSearch do
     ]
   end
 
-  def handle_input("input", {:binary, file_path, metadata}) do
+  def handle_input("input", {_topic, :binary, file_path, metadata}) do
     [
       {:start_stream, "output"},
       {:call,
-       fn get_state ->
-         state = get_state.()
-
+       fn state ->
          file_id = Map.get(metadata, :file_id, UUID.uuid4())
          {_, repo_pid} = state[:repo]
 
@@ -154,13 +152,11 @@ defmodule Buildel.Blocks.CSVSearch do
     ]
   end
 
-  def handle_input("input", {:text, file_id, %{method: :delete}}) do
+  def handle_input("input", {_topic, :text, file_id, %{method: :delete}}) do
     [
       {:start_stream, "output"},
       {:call,
-       fn get_state ->
-         state = get_state.()
-
+       fn state ->
          table_name =
            state[:table_names]
            |> Enum.find(fn {_, _, id} -> id == file_id end)
@@ -187,7 +183,7 @@ defmodule Buildel.Blocks.CSVSearch do
     ]
   end
 
-  def handle_input("query", {:text, query, _metadata}) do
+  def handle_input("query", {_topic, :text, query, _metadata}) do
     [
       {:start_stream, "output"},
       {:cast,
