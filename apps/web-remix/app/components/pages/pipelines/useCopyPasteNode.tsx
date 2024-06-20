@@ -36,7 +36,7 @@ export const useCopyPasteNode = ({
           }
         }
 
-        if (e.key === "v") {
+        if (e.code === "KeyV") {
           const reactFlowBounds = wrapper.current?.getBoundingClientRect();
 
           const position = reactFlowInstance.current?.project({
@@ -61,7 +61,6 @@ export const useCopyPasteNode = ({
         }
       }
     },
-    wrapper,
   );
 
   const onInit = useCallback((inst: ReactFlowInstance) => {
