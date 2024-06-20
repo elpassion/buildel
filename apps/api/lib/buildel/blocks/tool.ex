@@ -15,7 +15,11 @@ defmodule Buildel.Blocks.Tool do
     "#{block_name}::#{tool_name}"
   end
 
-  defmacro __using__(_opts) do
+  defmacro __using__(block_opts \\ []) do
+    parallel =
+      block_opts
+      |> Keyword.get(:parallel, [])
+
     quote do
       @behaviour Buildel.Blocks.ToolBehaviour
 
@@ -38,12 +42,12 @@ defmodule Buildel.Blocks.Tool do
           state = state |> Map.put(:message_id, message_id)
           info = {topic, :text, message, metadata}
 
-          handle_tool(
-            input,
-            tool_name,
-            info,
+          if unquote(parallel) |> Enum.member?(tool_name) do
+            Task.start(fn -> handle_tool(input, tool_name, info, state) end)
             state
-          )
+          else
+            handle_tool(input, tool_name, info, state)
+          end
         else
           state
         end

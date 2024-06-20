@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   alias Buildel.Blocks.Fields.EditorField
   alias Buildel.Memories.MemoryCollectionSearch
   use Buildel.Blocks.Block
-  use Buildel.Blocks.Tool
+  use Buildel.Blocks.Tool, parallel: ["query"]
 
   # Config
 

@@ -1,6 +1,6 @@
 defmodule Buildel.Blocks.Browser do
   use Buildel.Blocks.Block
-  use Buildel.Blocks.Tool
+  use Buildel.Blocks.Tool, parallel: ["url"]
 
   alias Buildel.Crawler
   alias Buildel.Blocks.Fields.EditorField

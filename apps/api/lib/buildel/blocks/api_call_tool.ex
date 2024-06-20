@@ -4,7 +4,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   alias Buildel.Blocks.Utils.Injectable
   alias Buildel.FlattenMap
   use Buildel.Blocks.Block
-  use Buildel.Blocks.Tool
+  use Buildel.Blocks.Tool, parallel: ["request"]
 
   # Config
 

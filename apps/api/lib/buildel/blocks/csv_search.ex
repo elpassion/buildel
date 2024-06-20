@@ -1,6 +1,6 @@
 defmodule Buildel.Blocks.CSVSearch do
   use Buildel.Blocks.Block
-  use Buildel.Blocks.Tool
+  use Buildel.Blocks.Tool, parallel: ["query"]
 
   # Config
 
