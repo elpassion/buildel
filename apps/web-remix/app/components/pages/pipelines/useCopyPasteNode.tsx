@@ -21,13 +21,11 @@ export const useCopyPasteNode = ({
   useEventListener(
     "keydown",
     (e) => {
-      const textareas = wrapper.current?.getElementsByTagName("textarea");
-      if (textareas) {
-        const activeElement = Object.values(textareas).find(
-          (textarea) => textarea === document.activeElement,
-        );
-        if (activeElement) return;
-      }
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      )
+        return;
 
       if (e.ctrlKey || e.metaKey) {
         if (e.key === "c") {
