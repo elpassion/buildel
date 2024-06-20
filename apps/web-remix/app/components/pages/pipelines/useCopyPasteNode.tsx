@@ -21,6 +21,14 @@ export const useCopyPasteNode = ({
   useEventListener(
     "keydown",
     (e) => {
+      const textareas = wrapper.current?.getElementsByTagName("textarea");
+      if (textareas) {
+        const activeElement = Object.values(textareas).find(
+          (textarea) => textarea === document.activeElement,
+        );
+        if (activeElement) return;
+      }
+
       if (e.ctrlKey || e.metaKey) {
         if (e.key === "c") {
           const selectedNode = nodes.find((node) => node.selected);
@@ -55,7 +63,7 @@ export const useCopyPasteNode = ({
         }
       }
     },
-    wrapper
+    wrapper,
   );
 
   const onInit = useCallback((inst: ReactFlowInstance) => {
@@ -66,7 +74,7 @@ export const useCopyPasteNode = ({
     (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       mousePosition.current = { clientX: e.clientX, clientY: e.clientY };
     },
-    []
+    [],
   );
 
   return { onInit, onMouseMove };
