@@ -47,11 +47,20 @@ defmodule Buildel.Blocks.IF do
         "false"
       end
 
-    output(state, output, {:text, text_value})
+    [
+      {:start_stream, output},
+      {:output, output, {:text, text_value, %{}}},
+      {:stop_stream, output}
+    ]
   end
 
-  @impl true
-  def handle_input("input", {_name, :text, text, _metadata}, state) do
-    compare(text, state)
+  def handle_input("input", {_name, :text, text, _metadata}) do
+    [
+      {:cast,
+       fn get_state ->
+         state = get_state.()
+         compare(text, state)
+       end}
+    ]
   end
 end
