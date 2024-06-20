@@ -31,21 +31,19 @@ defmodule Buildel.Blocks.MapList do
     }
   end
 
-  defp map(text, state) do
+  def handle_input("input", {_name, :text, text, _metadata}) do
+    [{:start_stream, "output"}, map(text), {:stop_stream, "output"}]
+  end
+
+  defp map(text) do
     case Jason.decode(text) do
-      {:ok, list} -> do_map(list, state)
-      {:error, _} -> do_map([], state)
+      {:ok, list} -> do_map(list)
+      {:error, _} -> {:error, "Invalid JSON"}
     end
   end
 
-  defp do_map(list, state) do
+  defp do_map(list) do
     list
-    |> Enum.each(&output(state, "output", {:text, &1 |> Jason.encode!()}, %{stream_stop: :none}))
-  end
-
-  @impl true
-  def handle_input("input", {_name, :text, text, _metadata}, state) do
-    map(text, state)
-    state
+    |> Enum.map(&{:output, "output", {:text, &1 |> Jason.encode!(), %{}}})
   end
 end

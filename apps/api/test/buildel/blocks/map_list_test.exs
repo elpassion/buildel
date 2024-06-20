@@ -48,6 +48,6 @@ defmodule Buildel.Blocks.MapListTest do
     assert_receive {^topic, :text, "1", _}
     assert_receive {^topic, :text, "2", _}
     assert_receive {^topic, :text, "3", _}
-    refute_receive {^topic, :stop_stream, nil, _}
+    assert_receive {^topic, :stop_stream, nil, _}
   end
 end
