@@ -31,7 +31,7 @@ defmodule Buildel.Blocks.AudioOutput do
   def handle_input("input", {_topic, :binary, chunk, metadata}) do
     [
       {:start_stream, "output"},
-      {:output, {:binary, chunk, metadata}},
+      {:output, "output", {:binary, chunk, metadata}},
       {:stop_stream, "output"}
     ]
   end
