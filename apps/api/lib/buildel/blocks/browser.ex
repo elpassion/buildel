@@ -132,12 +132,19 @@ defmodule Buildel.Blocks.Browser do
   def handle_input("url", {_topic, :text, text, _metadata}) do
     [
       {:start_stream, "output"},
-      url(text),
+      {:cast,
+       fn _ ->
+         url(text)
+       end},
       {:stop_stream, "output"}
     ]
   end
 
   @impl true
+  @spec handle_tool(<<_::32>>, <<_::24>>, {:text, any(), any()}, any()) :: [
+          {:cast, (any() -> any())} | {:start_stream, <<_::48>>} | {:stop_stream, <<_::48>>},
+          ...
+        ]
   def handle_tool("tool", "url", {:text, args, _}, _state) do
     [
       {:start_stream, "output"},
@@ -146,8 +153,7 @@ defmodule Buildel.Blocks.Browser do
          response = url(args["url"])
 
          [
-           {:output, "output", {:text, response, %{}}},
-           {:respond, "tool", {:text, response, %{}}}
+           {:output, "output", {:text, response, %{}}}
          ]
        end},
       {:stop_stream, "output"}

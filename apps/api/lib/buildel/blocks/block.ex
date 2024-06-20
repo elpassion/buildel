@@ -251,10 +251,6 @@ defmodule Buildel.Blocks.Block do
         {:noreply, state}
       end
 
-      defp process_signal(state, signals) when is_list(signals) do
-        Enum.each(signals, &process_signal(state, &1))
-      end
-
       defp process_signal(state, {:input, input_name, input}) do
         result = handle_input(input_name, input)
 
@@ -288,7 +284,9 @@ defmodule Buildel.Blocks.Block do
       end
 
       defp process_signal(state, {:cast, fun}) do
-        result = fun.(fn -> Buildel.Blocks.Block.state(state.pid) end)
+        result =
+          fun.(fn -> Buildel.Blocks.Block.state(state.pid) end)
+
         process_signal(state, result)
       end
 
@@ -305,6 +303,13 @@ defmodule Buildel.Blocks.Block do
 
       defp process_signal(state, nil) do
         nil
+      end
+
+      defp process_signal(state, signals) do
+        case Enumerable.impl_for(signals) do
+          nil -> process_signal(state, signals)
+          _ -> Enum.map(signals, &process_signal(state, &1))
+        end
       end
 
       def handle_input(name, {message_type, value, metadata}) do

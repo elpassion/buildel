@@ -199,7 +199,7 @@ defmodule Buildel.Blocks.CSVSearch do
 
            response = Jason.encode!(response)
 
-           [{:output, "output", {:text, response, %{}}}]
+           {:output, "output", {:text, response, %{}}}
          else
            :error ->
              {:error, "Invalid SQL query"}

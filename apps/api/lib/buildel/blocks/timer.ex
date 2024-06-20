@@ -44,23 +44,28 @@ defmodule Buildel.Blocks.Timer do
     {:ok, state |> Map.put(:timer, nil)}
   end
 
-  defp start(state) do
-    if state.timer, do: Process.cancel_timer(state.timer)
-    state = send_stream_start(state, "on_stop")
-    timer = Process.send_after(self(), {:stop}, state.opts.time)
-    Map.put(state, :timer, timer)
-  end
+  def handle_input("start", {_name, :text, _text, _metadata}) do
+    [
+      {:start_stream, "on_stop"},
+      {:call,
+       fn state ->
+         timer = UUID.uuid4()
 
-  @impl true
-  def handle_input("start", {_name, :text, _text, _metadata}, state) do
-    start(state)
-  end
+         stream =
+           Stream.timer(state.opts.time)
+           |> Stream.map(fn _ ->
+             {:call,
+              fn
+                %{timer: ^timer} = state ->
+                  {[{:output, "on_stop", {:text, "0", %{}}}, {:stop_stream, "on_stop"}], state}
 
-  @impl true
-  def handle_info({:stop}, state) do
-    state = state |> Map.put(:timer, nil)
-    BlockPubSub.broadcast_to_io(state.context_id, state.block_name, "on_stop", {:text, "0"})
-    state = send_stream_stop(state, "on_stop")
-    {:noreply, state}
+                state ->
+                  {nil, state}
+              end}
+           end)
+
+         {stream, state |> Map.put(:timer, timer)}
+       end}
+    ]
   end
 end
