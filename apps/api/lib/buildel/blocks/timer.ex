@@ -47,25 +47,22 @@ defmodule Buildel.Blocks.Timer do
   def handle_input("start", {_name, :text, _text, _metadata}) do
     [
       {:start_stream, "on_stop"},
-      {:call,
-       fn state ->
-         timer = UUID.uuid4()
-
-         stream =
-           Stream.timer(state.opts.time)
-           |> Stream.map(fn _ ->
-             {:call,
-              fn
-                %{timer: ^timer} = state ->
-                  {[{:output, "on_stop", {:text, "0", %{}}}, {:stop_stream, "on_stop"}], state}
-
-                state ->
-                  {nil, state}
-              end}
-           end)
-
-         {stream, state |> Map.put(:timer, timer)}
-       end}
+      {:call, &start_new_timer/1}
     ]
   end
+
+  defp start_new_timer(state) do
+    timer = UUID.uuid4()
+
+    stream =
+      Stream.timer(state.opts.time)
+      |> Stream.map(fn _ -> {:call, &handle_timer_tick(&1, timer)} end)
+
+    {stream, state |> Map.put(:timer, timer)}
+  end
+
+  defp handle_timer_tick(%{timer: timer} = state, timer_id) when timer == timer_id,
+    do: {[{:output, "on_stop", {:text, "0", %{}}}, {:stop_stream, "on_stop"}], state}
+
+  defp handle_timer_tick(state, _), do: {nil, state}
 end

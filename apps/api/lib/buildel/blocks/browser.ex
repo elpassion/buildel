@@ -141,10 +141,6 @@ defmodule Buildel.Blocks.Browser do
   end
 
   @impl true
-  @spec handle_tool(<<_::32>>, <<_::24>>, {:text, any(), any()}, any()) :: [
-          {:cast, (any() -> any())} | {:start_stream, <<_::48>>} | {:stop_stream, <<_::48>>},
-          ...
-        ]
   def handle_tool("tool", "url", {:text, args, _}, _state) do
     [
       {:start_stream, "output"},
