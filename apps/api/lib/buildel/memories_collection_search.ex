@@ -104,6 +104,36 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
     end
   end
 
+  def parent(
+        %__MODULE__{
+          vector_db: vector_db,
+          organization_collection_name: collection_name
+        },
+        chunk_id
+      ) do
+    chunk = Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id)
+
+    parent_context =
+      Buildel.VectorDB.get_by_parent_id(
+        vector_db,
+        collection_name,
+        chunk["metadata"]["parent"]
+      )
+      |> Enum.map(fn chunk ->
+        %{
+          document: chunk["document"],
+          pages: chunk["metadata"]["pages"]
+        }
+      end)
+
+    combined_document = parent_context |> Enum.map_join(" ", & &1.document)
+    combined_pages = parent_context |> Enum.flat_map(& &1.pages) |> Enum.uniq()
+
+    chunk
+    |> Map.put("document", combined_document)
+    |> Map.put("metadata", Map.put(chunk["metadata"], "pages", combined_pages))
+  end
+
   defp extend_parents_query(
          %__MODULE__{vector_db: vector_db, organization_collection_name: collection_name},
          result

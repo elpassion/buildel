@@ -69,6 +69,12 @@ defmodule Buildel.VectorDB do
     adapter.get_by_parent_id(collection, parent_id)
   end
 
+  def get_by_id(%__MODULE__{adapter: adapter}, collection_name, chunk_id) do
+    {:ok, collection} = adapter.get_collection(collection_name)
+
+    adapter.get_by_id(collection, chunk_id)
+  end
+
   def get_all(%__MODULE__{adapter: adapter}, collection_name, metadata \\ %{}, params \\ %{}) do
     {:ok, collection} = adapter.get_collection(collection_name)
 
@@ -268,6 +274,23 @@ defmodule Buildel.VectorDB.EctoAdapter do
         "similarity" => chunk.similarity
       }
     end)
+  end
+
+  def get_by_id(collection, chunk_id) do
+    chunk =
+      Buildel.Repo.one!(
+        from c in Chunk,
+          where:
+            c.collection_name == ^collection.name and
+              c.id == ^chunk_id,
+          order_by: fragment("metadata->>'index' ASC")
+      )
+
+    %{
+      "document" => chunk.document,
+      "metadata" => chunk.metadata,
+      "chunk_id" => chunk.id
+    }
   end
 
   def get_all(collection, metadata, _params) do

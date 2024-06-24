@@ -210,7 +210,8 @@ defmodule Buildel.Blocks.DocumentSearch do
             document_name: filename,
             chunk_id: chunk_id,
             chunk: document |> String.trim(),
-            pages: metadata |> Map.get("pages", [])
+            pages: metadata |> Map.get("pages", []),
+            keywords: metadata |> Map.get("keywords", [])
           }
       end)
       |> Jason.encode!()
@@ -224,7 +225,33 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   def handle_cast({:parent, {:text, chunk_id}}, state) do
-    state = state |> respond_to_tool("tool", {:text, "this is the parent"})
+    result =
+      MemoryCollectionSearch.new(%{
+        vector_db: state.vector_db,
+        organization_collection_name: state[:collection]
+      })
+      |> MemoryCollectionSearch.parent(chunk_id)
+      |> then(fn %{
+                   "chunk_id" => chunk_id,
+                   "document" => document,
+                   "metadata" =>
+                     %{
+                       "file_name" => filename,
+                       "memory_id" => memory_id
+                     } = metadata
+                 } ->
+        %{
+          document_id: memory_id,
+          document_name: filename,
+          chunk_id: chunk_id,
+          chunk: document |> String.trim(),
+          pages: metadata |> Map.get("pages", []),
+          keywords: metadata |> Map.get("keywords", [])
+        }
+      end)
+      |> Jason.encode!()
+
+    state = state |> respond_to_tool("tool", {:text, result}) |> output("output", {:text, result})
     {:noreply, state}
   end
 
@@ -335,8 +362,7 @@ defmodule Buildel.Blocks.DocumentSearch do
       %{
         function: %{
           name: "parent",
-          description:
-            "Retrieve the parent context of a specified chunk",
+          description: "Retrieve the parent context of a specified chunk",
           parameters_schema: %{
             type: "object",
             properties: %{
