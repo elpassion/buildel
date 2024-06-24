@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   alias Buildel.Blocks.Fields.EditorField
   alias Buildel.Memories.MemoryCollectionSearch
   use Buildel.Blocks.Block
-  use Buildel.Blocks.Tool, parallel: ["query"]
+  use Buildel.Blocks.Tool
 
   # Config
 
@@ -117,6 +117,10 @@ defmodule Buildel.Blocks.DocumentSearch do
     GenServer.call(pid, {:query, text})
   end
 
+  def parent(pid, {:text, _text} = text) do
+    GenServer.cast(pid, {:parent, text})
+  end
+
   def add_file(pid, file) do
     GenServer.cast(pid, {:add_file, file})
   end
@@ -219,6 +223,11 @@ defmodule Buildel.Blocks.DocumentSearch do
     {:noreply, state}
   end
 
+  def handle_cast({:parent, {:text, chunk_id}}, state) do
+    state = state |> respond_to_tool("tool", {:text, "this is the parent"})
+    {:noreply, state}
+  end
+
   def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
     state = send_stream_start(state)
 
@@ -303,7 +312,7 @@ defmodule Buildel.Blocks.DocumentSearch do
         function: %{
           name: "query",
           description:
-            "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.",
+            "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function. call it with json format { \"query\": \"example query\" }",
           parameters_schema: %{
             type: "object",
             properties: %{
@@ -313,6 +322,30 @@ defmodule Buildel.Blocks.DocumentSearch do
               }
             },
             required: ["query"]
+          }
+        },
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          build_call_formatter(state.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
+        end
+      },
+      %{
+        function: %{
+          name: "parent",
+          description:
+            "Retrieve the parent context of a specified chunk",
+          parameters_schema: %{
+            type: "object",
+            properties: %{
+              chunk_id: %{
+                type: "string",
+                description: "chunk_id"
+              }
+            },
+            required: ["chunk_id"]
           }
         },
         call_formatter: fn args ->
@@ -345,6 +378,11 @@ defmodule Buildel.Blocks.DocumentSearch do
   @impl true
   def handle_tool("tool", "query", {_name, :text, args, _metadata}, state) do
     query(self(), {:text, args["query"]})
+    state
+  end
+
+  def handle_tool("tool", "parent", {_name, :text, args, _metadata}, state) do
+    parent(self(), {:text, args["chunk_id"]})
     state
   end
 
