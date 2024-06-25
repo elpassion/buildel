@@ -24,7 +24,7 @@ export function NewCollectionFilesPage() {
   const [items, setItems] = useState<IExtendedFileUpload[]>([]);
 
   const isUploading = items.some(
-    (fileUpload) => fileUpload.status === "uploading"
+    (fileUpload) => fileUpload.status === "uploading",
   );
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -44,13 +44,13 @@ export function NewCollectionFilesPage() {
 
     setItems((prev) => [...uploadFiles, ...prev]);
   };
-  const removeFile = async (id: number) => {
+  const removeFile = async (id: number | string) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const handleUpdateStatus = (
-    id: number,
-    status: "done" | "error" | "uploading"
+    id: number | string,
+    status: "done" | "error" | "uploading",
   ) => {
     setItems((prev) =>
       prev.map((fileUpload) => {
@@ -59,24 +59,24 @@ export function NewCollectionFilesPage() {
         }
 
         return fileUpload;
-      })
+      }),
     );
   };
 
   const handleUploadFile = async (fileUpload: IExtendedFileUpload) => {
-    const formData = new FormData();
-    formData.append("file", fileUpload.file);
-    formData.append("collection_name", collectionName);
+    async function createFile(fileUpload: IExtendedFileUpload) {
+      const formData = new FormData();
+      formData.append("file", fileUpload.file);
+      formData.append("collection_name", collectionName);
 
-    handleUpdateStatus(fileUpload.id, "uploading");
+      handleUpdateStatus(fileUpload.id, "uploading");
 
-    try {
       const res = await fetch(
-        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
+        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/files`,
         {
           body: formData,
           method: "POST",
-        }
+        },
       );
 
       if (!res.ok) {
@@ -84,15 +84,67 @@ export function NewCollectionFilesPage() {
         throw new Error(body?.errors?.detail ?? "Something went wrong!");
       }
 
-      handleUpdateStatus(fileUpload.id, "done");
-      revalidator.revalidate();
+      return res.json();
+    }
 
-      removeFile(fileUpload.id);
-    } catch (e) {
-      if (e instanceof Error) {
-        errorToast(e.message);
+    async function refreshFileStatus(fileId: string | number) {
+      const res = await fetch(
+        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/files/${fileId}`,
+      );
+
+      if (!res.ok) {
+        const body = await res.json();
+        errorToast("Something went wrong!");
+        handleUpdateStatus(fileUpload.id, "error");
+        throw new Error(body?.errors?.detail ?? "Something went wrong!");
       }
 
+      const data = await res.json();
+
+      if (data.data.status === "success") {
+        return data;
+      } else if (data.data.status === "error") {
+        throw new Error();
+      } else {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            refreshFileStatus(fileId).then(resolve).catch(reject);
+          }, 1000);
+        });
+      }
+    }
+
+    async function createMemory(fileId: string | number) {
+      const res = await fetch(
+        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
+        {
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            file_id: fileId,
+          }),
+          method: "POST",
+        },
+      );
+
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body?.errors?.detail ?? "Something went wrong!");
+      }
+    }
+
+    try {
+      const {
+        data: { id: fileId },
+      } = await createFile(fileUpload);
+      await refreshFileStatus(fileId);
+      await createMemory(fileId);
+      handleUpdateStatus(fileUpload.id, "done");
+      revalidator.revalidate();
+      removeFile(fileUpload.id);
+    } catch (e) {
+      errorToast("Something went wrong!");
       handleUpdateStatus(fileUpload.id, "error");
     }
   };

@@ -159,4 +159,38 @@ defmodule BuildelWeb.Schemas.Collections do
       required: [:embeddings]
     })
   end
+
+  defmodule FileRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "CollectionFileRequest",
+      type: :object,
+      properties: %{
+        file: %Schema{type: :string, description: "Data", format: :binary}
+      },
+      required: [:file]
+    })
+  end
+
+  defmodule FileResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "CollectionFileResponse",
+      type: :object,
+      properties: %{
+        id: %Schema{type: :string, description: "File ID"},
+        name: %Schema{type: :string, description: "File name"},
+        size: %Schema{type: :integer, description: "File size in bytes"},
+        created_at: %Schema{
+          type: :string,
+          format: :dateTime,
+          description: "Creation date and time"
+        },
+        status: %Schema{type: :string, description: "File status"}
+      },
+      required: [:id, :name, :size, :created_at, :status]
+    })
+  end
 end
