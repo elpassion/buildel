@@ -192,9 +192,9 @@ defmodule BuildelWeb.Router do
     )
 
     resources(
-      "/organizations/:organization_id/memory_collections/:id/files",
+      "/organizations/:organization_id/memory_collections/:memory_collection_id/files",
       MemoryFilesController,
-      only: [:create]
+      only: [:show, :create]
     )
 
     resources(

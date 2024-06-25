@@ -20,7 +20,7 @@ defmodule BuildelWeb.MemoryFilesController do
     summary: "Create a new file upload",
     parameters: [
       organization_id: [in: :path, description: "Organization ID", type: :integer],
-      id: [in: :path, description: "Collection ID", type: :integer]
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer]
     ],
     request_body: {"file", "multipart/form-data", BuildelWeb.Schemas.Collections.FileRequest},
     responses: [
@@ -34,7 +34,7 @@ defmodule BuildelWeb.MemoryFilesController do
   def create(conn, _params) do
     %{
       organization_id: organization_id,
-      id: id
+      memory_collection_id: id
     } =
       conn.params
 
@@ -54,6 +54,43 @@ defmodule BuildelWeb.MemoryFilesController do
            Buildel.Memories.MemoryFile.create(organization, collection, conn.body_params.file) do
       conn
       |> put_status(:created)
+      |> render(:show, %{file: file_upload})
+    end
+  end
+
+  operation :show,
+    summary: "Retrieves file upload",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer],
+      id: [in: :path, description: "Memory ID", type: :string]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Collections.FileResponse},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def show(conn, _params) do
+    %{
+      organization_id: organization_id,
+      memory_collection_id: memory_collection_id,
+      id: id
+    } =
+      conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, _collection} <-
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
+         {:ok, file_upload} <-
+           Buildel.Memories.MemoryFile.get(id) do
+      conn
       |> render(:show, %{file: file_upload})
     end
   end

@@ -76,6 +76,60 @@ defmodule Buildel.Memories do
   def create_organization_memory(
         %Buildel.Organizations.Organization{} = organization,
         %Buildel.Memories.MemoryCollection{} = collection,
+        file_id
+      )
+      when is_binary(file_id) do
+    {:ok, api_key} =
+      Organizations.get_organization_secret(organization, collection.embeddings_secret_name)
+
+    organization_collection_name = organization_collection_name(organization, collection)
+
+    workflow =
+      Buildel.DocumentWorkflow.new(%{
+        embeddings:
+          Buildel.Clients.Embeddings.new(%{
+            api_type: collection.embeddings_api_type,
+            model: collection.embeddings_model,
+            api_key: api_key.value,
+            endpoint: collection.embeddings_endpoint
+          }),
+        collection_name: organization_collection_name,
+        db_adapter: Buildel.VectorDB.EctoAdapter,
+        workflow_config: %{
+          chunk_size: collection.chunk_size,
+          chunk_overlap: collection.chunk_overlap
+        }
+      })
+
+    with {:ok, file} <- Buildel.Memories.MemoryFile.get(file_id) |> IO.inspect(),
+         {:ok, memory} <-
+           %Buildel.Memories.Memory{}
+           |> Buildel.Memories.Memory.changeset(
+             Map.merge(file.metadata, %{
+               organization_id: organization.id,
+               collection_name: collection.collection_name,
+               memory_collection_id: collection.id,
+               content: file.chunks |> Enum.map_join("\n", &Map.get(&1, :value))
+             })
+           )
+           |> Buildel.Repo.insert() do
+      chunks =
+        put_in(
+          file.chunks,
+          [Access.all(), Access.key!(:metadata), :memory_id],
+          memory.id
+        )
+        |> put_in([Access.all(), Access.key!(:metadata), :file_name], file.upload.filename)
+
+      Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
+
+      {:ok, memory}
+    end
+  end
+
+  def create_organization_memory(
+        %Buildel.Organizations.Organization{} = organization,
+        %Buildel.Memories.MemoryCollection{} = collection,
         file,
         metadata \\ %{}
       ) do
@@ -317,7 +371,11 @@ defmodule Buildel.Memories do
         %Buildel.Organizations.Organization{} = organization,
         %Buildel.Memories.MemoryCollection{} = collection
       ) do
-    "#{organization.id}_#{collection.id}"
+    organization_collection_name(organization.id, collection.id)
+  end
+
+  def organization_collection_name(organization_id, collection_id) do
+    "#{organization_id}_#{collection_id}"
   end
 
   def context_from_organization_collection_name(organization_collection_name) do

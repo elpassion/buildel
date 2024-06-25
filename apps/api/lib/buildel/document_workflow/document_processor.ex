@@ -91,14 +91,15 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
 
           row ->
             update_in(row, ["cells"], fn cells ->
-            cells
+              cells
               |> Enum.flat_map(fn
-                %{"cell_value" => %{ "sentences" => value }} = cell ->
-                  if (col_span = cell["col_span"]) do
+                %{"cell_value" => %{"sentences" => value}} = cell ->
+                  if col_span = cell["col_span"] do
                     value ++ [1..col_span |> Enum.map(fn _ -> "" end)]
                   else
                     value
                   end
+
                 %{"col_span" => col_span, "cell_value" => value} ->
                   [value | 1..col_span |> Enum.map(fn _ -> "" end)]
 
@@ -138,19 +139,16 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
         path,
         file_metadata
       ) do
-    {:ok, result} =
-      case document_loader.request(path, file_metadata) do
-        {:ok, result} ->
-          {:ok, result}
+    case document_loader.request(path, file_metadata) do
+      {:ok, result} ->
+        {:ok, result}
 
-        :error ->
-          document_loader.request(
-            path,
-            file_metadata |> Map.put(:encoding, "utf_8")
-          )
-      end
-
-    {:ok, result}
+      :error ->
+        document_loader.request(
+          path,
+          file_metadata |> Map.put(:encoding, "utf_8")
+        )
+    end
   end
 
   def get_blocks(list) do

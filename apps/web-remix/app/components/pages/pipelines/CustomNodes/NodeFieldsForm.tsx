@@ -53,34 +53,94 @@ export function NodeFieldsForm({
         }
       });
     },
-    [blockName, clearEvents, push]
+    [blockName, clearEvents, push],
   );
 
   const uploadFile = useCallback(
     async (file: File): Promise<IFile> => {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append(
-        "collection_name",
-        block.opts.knowledge || `${pipelineId}_${blockName}`
-      );
+      console.log("uploading");
+      async function createFile(fileUpload: File) {
+        const formData = new FormData();
+        formData.append("file", fileUpload);
+        formData.append(
+          "collection_name",
+          block.opts.knowledge || `${pipelineId}_${blockName}`,
+        );
 
-      const response = await fetch(
-        `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories`,
-        {
-          body: formData,
-          method: "POST",
+        const res = await fetch(
+          `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/files`,
+          {
+            body: formData,
+            method: "POST",
+          },
+        );
+
+        if (!res.ok) {
+          const body = await res.json();
+          throw new Error(body?.errors?.detail ?? "Something went wrong!");
         }
-      );
-      const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data?.errors?.detail ?? "Something went wrong!");
+        return res.json();
       }
 
-      return { ...KnowledgeBaseFileResponse.parse(data), status: "done" };
+      async function refreshFileStatus(fileId: string | number) {
+        const res = await fetch(
+          `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/files/${fileId}`,
+        );
+
+        if (!res.ok) {
+          const body = await res.json();
+          throw new Error(body?.errors?.detail ?? "Something went wrong!");
+        }
+
+        const data = await res.json();
+
+        if (data.data.status === "success") {
+          return data;
+        } else if (data.data.status === "error") {
+          throw new Error();
+        } else {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              refreshFileStatus(fileId).then(resolve).catch(reject);
+            }, 1000);
+          });
+        }
+      }
+
+      async function createMemory(fileId: string | number) {
+        const res = await fetch(
+          `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories`,
+          {
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({
+              file_id: fileId,
+            }),
+            method: "POST",
+          },
+        );
+
+        if (!res.ok) {
+          const body = await res.json();
+          throw new Error(body?.errors?.detail ?? "Something went wrong!");
+        }
+
+        return res;
+      }
+
+      const {
+        data: { id: fileId },
+      } = await createFile(file);
+      await refreshFileStatus(fileId);
+      const response = await createMemory(fileId);
+      return {
+        ...KnowledgeBaseFileResponse.parse(await response.json()),
+        status: "done",
+      };
     },
-    [block.opts]
+    [block.opts],
   );
 
   const uploadFileTemporary = useCallback(
@@ -106,7 +166,7 @@ export function NodeFieldsForm({
 
       return { ...KnowledgeBaseFileResponse.parse(data), status: "done" };
     },
-    [block.opts, runId]
+    [block.opts, runId],
   );
 
   const removeFileTemporary = useCallback(
@@ -126,7 +186,7 @@ export function NodeFieldsForm({
         },
       );
     },
-    [block.opts, runId]
+    [block.opts, runId],
   );
 
   const removeFile = useCallback(
@@ -135,16 +195,16 @@ export function NodeFieldsForm({
         `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories/${id}`,
         {
           method: "DELETE",
-        }
+        },
       );
     },
-    [block.opts]
+    [block.opts],
   );
 
   const fetchFiles = useCallback(async (): Promise<IFile[]> => {
     if (!block.opts.knowledge) return [];
     const response = await fetch(
-      `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories`
+      `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories`,
     ).then((res) => res.json());
 
     return KnowledgeBaseFileListResponse.parse(response).map((file) => ({
@@ -158,7 +218,7 @@ export function NodeFieldsForm({
       const topic = `${blockName}:${fieldName}`;
       push(topic, chunk);
     },
-    [blockName, push]
+    [blockName, push],
   );
 
   const convertToBlobAndUpload = useCallback(
@@ -190,7 +250,7 @@ export function NodeFieldsForm({
         };
       }
     },
-    [uploadAudioChunk]
+    [uploadAudioChunk],
   );
 
   const renderInput = useCallback(
@@ -215,8 +275,7 @@ export function NodeFieldsForm({
             />
           </div>
         );
-      }
-      else if (type === "file") {
+      } else if (type === "file") {
         return (
           <FileUpload
             multiple
@@ -236,8 +295,7 @@ export function NodeFieldsForm({
             )}
           />
         );
-      }
-      else if (type === "file_temporary") {
+      } else if (type === "file_temporary") {
         return (
           <FileUpload
             multiple
@@ -256,8 +314,7 @@ export function NodeFieldsForm({
             )}
           />
         );
-      }
-      else if (type === "audio") {
+      } else if (type === "audio") {
         return (
           <AudioFieldTabs
             disabled={disabled}
@@ -270,7 +327,7 @@ export function NodeFieldsForm({
 
       return <span>Unsupported input type - {type}</span>;
     },
-    [fetchFiles, removeFile, uploadFile, status]
+    [fetchFiles, removeFile, uploadFile, status],
   );
 
   return (

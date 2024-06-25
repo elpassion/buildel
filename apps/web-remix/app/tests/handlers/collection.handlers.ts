@@ -12,7 +12,7 @@ export class CollectionHandlers {
 
   constructor(initials: IKnowledgeBaseCollection[] = []) {
     initials.forEach((collection) =>
-      this.collections.set(collection.id, collection)
+      this.collections.set(collection.id, collection),
     );
   }
 
@@ -24,9 +24,9 @@ export class CollectionHandlers {
           { data: [...this.collections.values()] },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
@@ -47,9 +47,9 @@ export class CollectionHandlers {
           { data: newCollection },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
@@ -67,7 +67,7 @@ export class CollectionHandlers {
             {},
             {
               status: 404,
-            }
+            },
           );
         }
 
@@ -85,9 +85,9 @@ export class CollectionHandlers {
           { data: updatedCollection },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
@@ -103,9 +103,9 @@ export class CollectionHandlers {
           {},
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
@@ -120,7 +120,8 @@ export class CollectionHandlers {
 }
 
 export class CollectionMemoriesHandlers {
-  private collectionMemories: Map<number, IKnowledgeBaseFile> = new Map();
+  private collectionMemories: Map<number | string, IKnowledgeBaseFile> =
+    new Map();
 
   constructor(initials: IKnowledgeBaseFile[] = []) {
     initials.forEach((file) => this.collectionMemories.set(file.id, file));
@@ -134,9 +135,9 @@ export class CollectionMemoriesHandlers {
           { data: [...this.collectionMemories.values()] },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
@@ -160,9 +161,9 @@ export class CollectionMemoriesHandlers {
           { data: [...this.collectionMemories.values()] },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
@@ -178,9 +179,9 @@ export class CollectionMemoriesHandlers {
           },
           {
             status: 400,
-          }
+          },
         );
-      }
+      },
     );
   }
 
@@ -203,9 +204,9 @@ export class CollectionMemoriesHandlers {
           { data: [...this.collectionMemories.values()] },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
