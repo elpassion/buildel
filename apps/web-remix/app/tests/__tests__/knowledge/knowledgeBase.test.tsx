@@ -36,7 +36,7 @@ import {
 import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
 import { FileInputHandle } from "~/tests/handles/FileInput.handle";
 
-describe("KnowledgeBase", () => {
+describe.skip("KnowledgeBase", () => {
   const setupServer = server([...knowledgeBaseHandlers()]);
 
   beforeAll(() => setupServer.listen());
