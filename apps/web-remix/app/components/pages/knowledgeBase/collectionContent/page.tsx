@@ -1,6 +1,6 @@
 import React from "react";
 import { MetaFunction } from "@remix-run/node";
-import { Outlet, useLoaderData, useMatch, useNavigate } from "@remix-run/react";
+import { Outlet, useLoaderData, useMatch, useNavigate, useSearchParams } from "@remix-run/react";
 
 import { KnowledgeBaseFileList } from "./KnowledgeBaseFileList";
 import { loader } from "./loader.server";
@@ -26,6 +26,8 @@ export function KnowledgeBaseContentPage() {
   const matchDetails = useMatch(
     `:organizationId/knowledge-base/:collectionName/content/:memoryId/chunks`,
   );
+
+  const [searchParams] = useSearchParams();
   const isDetails = !!matchDetails;
 
   const handleClose = () => {
@@ -39,7 +41,7 @@ export function KnowledgeBaseContentPage() {
       <Modal
         isOpen={isDetails}
         header={
-          <h3 className="text-white font-medium text-xl">Memory Chunks</h3>
+          <h3 className="text-white font-medium text-xl">{searchParams.get("file_name")}</h3>
         }
         closeButtonProps={{ iconName: "x", "aria-label": "Close" }}
         onClose={handleClose}

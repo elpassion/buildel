@@ -45,7 +45,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
       items={items}
       renderItem={(item) => (
         <BasicLink
-          to={routes.collectionMemory(organizationId, collectionName, item.id)}
+          to={routes.collectionMemory(organizationId, collectionName, item.id, item.file_name)}
         >
           <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
         </BasicLink>

@@ -190,12 +190,15 @@ export const routes = {
   collectionMemory: (
     organizationId: OrganizationId,
     collectionName: string,
-    memoryId: string | number
+    memoryId: string | number,
+    file_name?: string
   ) =>
     `${routes.collectionFiles(
       organizationId,
       collectionName
-    )}/${encodeURIComponent(memoryId)}/chunks`,
+    )}/${encodeURIComponent(memoryId)}/chunks?file_name=${encodeURIComponent(
+      file_name || ""
+    )}`,
   collectionFilesNew: (
     organizationId: OrganizationId,
     collectionName: string
