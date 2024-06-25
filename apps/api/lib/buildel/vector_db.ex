@@ -286,10 +286,17 @@ defmodule Buildel.VectorDB.EctoAdapter do
           order_by: fragment("metadata->>'index' ASC")
       )
 
+    embedding_column =
+      Map.keys(chunk)
+      |> Enum.filter(fn key -> String.starts_with?(to_string(key), "embedding_") end)
+      |> Enum.filter(fn key -> chunk |> Map.get(key) |> is_struct(Pgvector) end)
+      |> List.first()
+
     %{
       "document" => chunk.document,
       "metadata" => chunk.metadata,
-      "chunk_id" => chunk.id
+      "chunk_id" => chunk.id,
+      "embedding" => chunk |> Map.get(embedding_column)
     }
   end
 

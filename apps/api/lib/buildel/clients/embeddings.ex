@@ -19,12 +19,16 @@ defmodule Buildel.Clients.Embeddings do
         %__MODULE__{api_type: "openai", model: model, api_key: api_key, endpoint: endpoint},
         inputs
       ) do
-    Buildel.Clients.OpenAIEmbeddings.get_embeddings(%{
-      inputs: inputs,
-      api_key: api_key,
-      model: model,
-      endpoint: endpoint
-    })
+    if inputs |> Enum.at(0) |> is_struct(Pgvector) do
+      {:ok, %{embeddings: inputs |> Enum.map(&Pgvector.to_list/1), embeddings_tokens: 0}}
+    else
+      Buildel.Clients.OpenAIEmbeddings.get_embeddings(%{
+        inputs: inputs,
+        api_key: api_key,
+        model: model,
+        endpoint: endpoint
+      })
+    end
   end
 
   def get_embeddings(%__MODULE__{api_type: "test"}, inputs) do
@@ -94,12 +98,10 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
              [
                Authorization: "Bearer #{api_key}",
                "api-key": api_key,
-               "content-type": "application/json",
+               "content-type": "application/json"
              ],
-             [
-               timeout: 60_000,
-               recv_timeout: 60_000
-             ]
+             timeout: 60_000,
+             recv_timeout: 60_000
            ),
          {:ok, body} <- Jason.decode(body) do
       {:ok,

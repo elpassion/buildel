@@ -1,6 +1,7 @@
 defmodule Buildel.Blocks.DocumentSearch do
   alias Buildel.Blocks.Fields.EditorField
   alias Buildel.Memories.MemoryCollectionSearch
+  alias Buildel.Blocks.DocumentSearch.DocumentSearchJSON
   use Buildel.Blocks.Block
   use Buildel.Blocks.Tool
 
@@ -121,6 +122,10 @@ defmodule Buildel.Blocks.DocumentSearch do
     GenServer.cast(pid, {:parent, text})
   end
 
+  def related(pid, {:text, _text} = text) do
+    GenServer.cast(pid, {:related, text})
+  end
+
   def add_file(pid, file) do
     GenServer.cast(pid, {:add_file, file})
   end
@@ -195,25 +200,7 @@ defmodule Buildel.Blocks.DocumentSearch do
 
     result =
       result
-      |> Enum.map(fn
-        %{
-          "chunk_id" => chunk_id,
-          "document" => document,
-          "metadata" =>
-            %{
-              "file_name" => filename,
-              "memory_id" => memory_id
-            } = metadata
-        } ->
-          %{
-            document_id: memory_id,
-            document_name: filename,
-            chunk_id: chunk_id,
-            chunk: document |> String.trim(),
-            pages: metadata |> Map.get("pages", []),
-            keywords: metadata |> Map.get("keywords", [])
-          }
-      end)
+      |> Enum.map(&DocumentSearchJSON.show/1)
       |> Jason.encode!()
 
     state =
@@ -231,24 +218,38 @@ defmodule Buildel.Blocks.DocumentSearch do
         organization_collection_name: state[:collection]
       })
       |> MemoryCollectionSearch.parent(chunk_id)
-      |> then(fn %{
-                   "chunk_id" => chunk_id,
-                   "document" => document,
-                   "metadata" =>
-                     %{
-                       "file_name" => filename,
-                       "memory_id" => memory_id
-                     } = metadata
-                 } ->
-        %{
-          document_id: memory_id,
-          document_name: filename,
-          chunk_id: chunk_id,
-          chunk: document |> String.trim(),
-          pages: metadata |> Map.get("pages", []),
-          keywords: metadata |> Map.get("keywords", [])
-        }
-      end)
+      |> then(&DocumentSearchJSON.show/1)
+      |> Jason.encode!()
+
+    state = state |> respond_to_tool("tool", {:text, result}) |> output("output", {:text, result})
+    {:noreply, state}
+  end
+
+  def handle_cast({:related, {:text, chunk_id}}, state) do
+    chunk = Buildel.VectorDB.get_by_id(state.vector_db, state[:collection], chunk_id)
+
+    params =
+      MemoryCollectionSearch.Params.from_map(%{
+        search_query: Map.get(chunk, "embedding"),
+        where: state.where,
+        limit: 2,
+        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
+        extend_neighbors: false,
+        extend_parents: false,
+        token_limit: nil
+      })
+
+    {result, _total_tokens, _embeddings_tokens} =
+      MemoryCollectionSearch.new(%{
+        vector_db: state.vector_db,
+        organization_collection_name: state[:collection]
+      })
+      |> MemoryCollectionSearch.search(params)
+
+    result =
+      result
+      |> Enum.at(1)
+      |> then(&DocumentSearchJSON.show/1)
       |> Jason.encode!()
 
     state = state |> respond_to_tool("tool", {:text, result}) |> output("output", {:text, result})
@@ -381,6 +382,29 @@ defmodule Buildel.Blocks.DocumentSearch do
         response_formatter: fn _response ->
           ""
         end
+      },
+      %{
+        function: %{
+          name: "related",
+          description: "Retrieve the related context of a specified chunk",
+          parameters_schema: %{
+            type: "object",
+            properties: %{
+              chunk_id: %{
+                type: "string",
+                description: "chunk_id"
+              }
+            },
+            required: ["chunk_id"]
+          }
+        },
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          build_call_formatter(state.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
+        end
       }
     ]
   end
@@ -412,6 +436,11 @@ defmodule Buildel.Blocks.DocumentSearch do
     state
   end
 
+  def handle_tool("tool", "related", {_name, :text, args, _metadata}, state) do
+    related(self(), {:text, args["chunk_id"]})
+    state
+  end
+
   defp build_call_formatter(value, args) do
     args
     |> Enum.reduce(value, fn
@@ -427,5 +456,26 @@ defmodule Buildel.Blocks.DocumentSearch do
       _, acc ->
         acc
     end)
+  end
+end
+
+defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
+  def show(%{
+        "chunk_id" => chunk_id,
+        "document" => document,
+        "metadata" =>
+          %{
+            "file_name" => filename,
+            "memory_id" => memory_id
+          } = metadata
+      }) do
+    %{
+      document_id: memory_id,
+      document_name: filename,
+      chunk_id: chunk_id,
+      chunk: document |> String.trim(),
+      pages: metadata |> Map.get("pages", []),
+      keywords: metadata |> Map.get("keywords", [])
+    }
   end
 end

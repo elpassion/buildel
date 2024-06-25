@@ -130,6 +130,7 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
     combined_pages = parent_context |> Enum.flat_map(& &1.pages) |> Enum.uniq()
 
     chunk
+    |> Map.delete("embedding")
     |> Map.put("document", combined_document)
     |> Map.put("metadata", Map.put(chunk["metadata"], "pages", combined_pages))
   end
