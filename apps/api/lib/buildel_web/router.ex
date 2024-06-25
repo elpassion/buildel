@@ -192,6 +192,12 @@ defmodule BuildelWeb.Router do
     )
 
     resources(
+      "/organizations/:organization_id/memory_collections/:id/files",
+      MemoryFilesController,
+      only: [:create]
+    )
+
+    resources(
       "/organizations/:organization_id/memory_collections/:memory_collection_id/memories/:id/chunks",
       MemoryChunkController,
       only: [:index]

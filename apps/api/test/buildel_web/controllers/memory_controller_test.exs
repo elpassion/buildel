@@ -234,6 +234,79 @@ defmodule BuildelWeb.MemoryControllerTest do
     end
   end
 
+  describe "create file upload" do
+    test "requires authentication", %{
+      conn: conn,
+      organization: organization,
+      collection: collection
+    } do
+      conn = conn |> log_out_user()
+
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/files"
+        )
+
+      assert json_response(conn, 401)["errors"] != %{}
+    end
+
+    test "validates file is present", %{
+      conn: conn,
+      organization: organization,
+      collection: collection
+    } do
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/files",
+          %{}
+        )
+
+      assert json_response(conn, 422)["errors"] != %{}
+    end
+
+    test "does not upload in other org", %{conn: conn, upload_file: file, collection: collection} do
+      organization = organization_fixture()
+
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/files",
+          %{
+            file: file
+          }
+        )
+
+      assert json_response(conn, 404)["errors"] != %{}
+    end
+
+    test "returns :created when valid", %{
+      conn: conn,
+      upload_file: file,
+      organization: organization,
+      collection: collection
+    } do
+      collection_name = collection.collection_name
+
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/files",
+          %{
+            file: file
+          }
+        )
+
+      assert %{
+               "data" => %{
+                 "id" => _,
+                 "status" => "processing"
+               }
+             } = json_response(conn, 201)
+    end
+  end
+
   defp create_memory(%{organization: organization}) do
     memory = memory_fixture(organization.id, "collection")
     %{memory: memory}
