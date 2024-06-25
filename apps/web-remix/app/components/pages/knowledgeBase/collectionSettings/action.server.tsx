@@ -14,6 +14,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
     put: async ({ params, request }, { fetch }) => {
       const validator = withZod(UpdateCollectionSchema);
       invariant(params.organizationId, "organizationId not found");
+      invariant(params.collectionName, "collectionName not found");
 
       const result = await validator.validate(await request.formData());
 
@@ -21,13 +22,14 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
+
       await knowledgeBaseApi.updateCollection(
         params.organizationId,
         result.data.id,
         result.data
       );
 
-      return redirect(routes.knowledgeBase(params.organizationId), {
+      return redirect(routes.collectionSettings(params.organizationId, params.collectionName), {
         headers: {
           "Set-Cookie": await setServerToast(request, {
             success: {

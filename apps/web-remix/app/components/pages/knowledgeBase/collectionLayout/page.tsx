@@ -49,6 +49,11 @@ export function KnowledgeBaseCollectionLayout() {
               >
                 Interface
               </FilledTabLink>
+              <FilledTabLink
+                to={routes.collectionSettings(organizationId, collectionName)}
+              >
+                Settings
+              </FilledTabLink>
             </FilledTabsWrapper>
 
             <Link to={linkToSearch}>

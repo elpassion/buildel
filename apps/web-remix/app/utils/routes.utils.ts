@@ -158,10 +158,13 @@ export const routes = {
   knowledgeBaseNew: (organizationId: OrganizationId) =>
     `${routes.knowledgeBase(organizationId)}/new`,
 
-  knowledgeBaseEdit: (organizationId: OrganizationId, collectionName: string) =>
+  collectionSettings: (
+    organizationId: OrganizationId,
+    collectionName: string
+  ) =>
     `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
       collectionName
-    )}/edit`,
+    )}/settings`,
   collectionInterface: (
     organizationId: OrganizationId,
     collectionName: string

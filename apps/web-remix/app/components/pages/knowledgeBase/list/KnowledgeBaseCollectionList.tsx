@@ -69,12 +69,6 @@ export const KnowledgeBaseCollectionListItem: React.FC<
     onDelete(data);
   };
 
-  const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    navigate(routes.knowledgeBaseEdit(organizationId, data.name));
-  };
-
   return (
     <article className="group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 grid grid-cols-1 gap-1 max-w-full items-center md:gap-2 md:grid-cols-[1fr_60px] ">
       <header className="max-w-full truncate">
@@ -84,16 +78,6 @@ export const KnowledgeBaseCollectionListItem: React.FC<
       </header>
 
       <div className="flex gap-2">
-        <IconButton
-          size="xs"
-          variant="ghost"
-          aria-label={`Edit collection: ${data.name}`}
-          className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500 lg:opacity-0"
-          title={`Edit collection: ${data.name}`}
-          icon={<Icon iconName="edit" />}
-          onClick={handleEdit}
-        />
-
         <IconButton
           size="xs"
           variant="ghost"
