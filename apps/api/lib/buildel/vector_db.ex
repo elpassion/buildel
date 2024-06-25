@@ -303,7 +303,9 @@ defmodule Buildel.VectorDB.EctoAdapter do
   def get_all(collection, metadata, _params) do
     Buildel.Repo.all(
       from c in Chunk,
-        where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata)
+        where:
+          c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
+        order_by: fragment("metadata->>'index' ASC")
     )
     |> Enum.map(fn chunk ->
       %{

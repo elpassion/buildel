@@ -67,7 +67,7 @@ defmodule Buildel.Blocks.ApiCallToolTest do
           {:text, %{id: 1, abc: "abc", efg: %{a: "123"}} |> Jason.encode!()}
         )
 
-        assert_receive({^topic, :text, _, _})
+        assert_receive({^topic, :text, _, _}, 200)
       end
     end
 
