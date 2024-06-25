@@ -116,26 +116,26 @@ defmodule Buildel.Blocks.BrowserTest do
 
   describe "outputs" do
     test "outputs text and file" do
-      {:ok, test_run} =
-        BlocksTestRunner.start_run(%{
-          blocks: [
-            BlocksTestRunner.create_test_text_input_block("test_input"),
-            Browser.create(%{
-              name: "test",
-              opts: %{},
-              connections: [
-                Blocks.Connection.from_connection_string("test_input:output->url", "text")
-              ]
-            })
-          ]
-        })
-
-      {:ok, text_topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
-
-      {:ok, file_topic} =
-        test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "file_output")
-
       use_cassette("browser_api_call_outputs") do
+        {:ok, test_run} =
+          BlocksTestRunner.start_run(%{
+            blocks: [
+              BlocksTestRunner.create_test_text_input_block("test_input"),
+              Browser.create(%{
+                name: "test",
+                opts: %{},
+                connections: [
+                  Blocks.Connection.from_connection_string("test_input:output->url", "text")
+                ]
+              })
+            ]
+          })
+
+        {:ok, text_topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
+
+        {:ok, file_topic} =
+          test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "file_output")
+
         test_run
         |> BlocksTestRunner.Run.input(
           "test_input",
