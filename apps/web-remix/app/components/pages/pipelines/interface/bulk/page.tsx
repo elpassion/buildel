@@ -1,145 +1,176 @@
-import React from "react";
 import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
-import {
-  PreviewConnector,
-  PreviewSection,
-  PreviewSectionContent,
-  PreviewSectionHeader,
-  PreviewSectionHeading,
-  PreviewSectionStep,
-  PreviewSectionText,
-} from "../PreviewSection";
-import { loader } from "./loader.server";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
+import { loader } from "./loader.server";
 
 export function BulkPage() {
-  const { organizationId, pipelineId, apiUrl } = useLoaderData<typeof loader>();
+  const { organizationId, pipelineId, apiUrl, pipeline } =
+    useLoaderData<typeof loader>();
+
+  const inputs = pipeline.config.blocks.filter(
+    (block) => block.type === "text_input",
+  );
+
+  const outputs = pipeline.config.blocks.filter(
+    (block) => block.type === "text_output",
+  );
+
+  const [tests, setTests] = useState<
+    {
+      id: string;
+      inputs: Record<string, string>;
+      outputs: Record<string, string>;
+    }[]
+  >(() => [generateNewTest()]);
+
+  function generateNewTest() {
+    return {
+      id: uuidv4(),
+      inputs: inputs.reduce((acc, input) => ({ ...acc, [input.name]: "" }), {}),
+      outputs: outputs.reduce(
+        (acc, output) => ({ ...acc, [output.name]: "" }),
+        {},
+      ),
+    };
+  }
+
+  const handleOnSubmitTest = async (test: {
+    id: string;
+    inputs: Record<string, string>;
+  }) => {
+    const response = await fetch(
+      `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs`,
+      {
+        method: "POST",
+        body: JSON.stringify({}),
+        headers: {
+          "content-type": "application/json",
+        },
+      },
+    );
+    const {
+      data: { id },
+    } = await response.json();
+
+    const runResponse = await fetch(
+      `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/start`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          initial_inputs: Object.entries(test.inputs).map(([name, value]) => ({
+            block_name: name,
+            input_name: "input",
+            data: value,
+          })),
+          wait_for_outputs: outputs.map((output) => ({
+            block_name: output.name,
+            output_name: "output",
+          })),
+        }),
+        headers: {
+          "content-type": "application/json",
+        },
+      },
+    );
+
+    const data = await runResponse.json();
+
+    const newOutputs = data.outputs.reduce(
+      (acc: Record<string, string>, output: any) => ({
+        ...acc,
+        [output.block_name]: output.data,
+      }),
+      {},
+    );
+
+    setTests((tests) =>
+      tests.map((t) => (t.id === test.id ? { ...t, outputs: newOutputs } : t)),
+    );
+  };
+
+  const handleOnSubmit = (e: any) => {
+    e.preventDefault();
+    tests.map((test) => {
+      handleOnSubmitTest(test);
+    });
+  };
+
   return (
     <div>
-      <h2 className="text-lg text-white font-medium">HTTP Api</h2>
-      <p className="text-white text-xs mb-6">
-        Access our Buildel API easily with our HTTP Api.
-      </p>
+      <div className="flex flex-col gap-3 mb-6 md:justify-between md:flex-row md:items-center">
+        <div>
+          <h2 className="text-lg text-white font-medium">Bulk</h2>
+          <p className="text-white text-xs">
+            Run multiple workflows at once in parallel.
+          </p>
+        </div>
 
-      <PreviewSection>
-        <PreviewConnector />
-        <PreviewSectionHeader>
-          <PreviewSectionStep>1</PreviewSectionStep>
+        <button
+          onClick={handleOnSubmit}
+          className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
+        >
+          Run bulk
+        </button>
+      </div>
 
-          <PreviewSectionHeading>Create a new run</PreviewSectionHeading>
-        </PreviewSectionHeader>
+      <div className="text-white">
+        <div className="border-1 p-2 flex justify-between">
+          {inputs.map((input) => (
+            <div key={input.name}>{input.name}</div>
+          ))}
+          {outputs.map((output) => (
+            <div key={output.name}>{output.name}</div>
+          ))}
+        </div>
+        {tests.map((test) => {
+          return (
+            <div className="border-1 p-2 flex justify-between" key={test.id}>
+              {inputs.map((input) => (
+                <input
+                  className="text-black"
+                  key={input.name}
+                  value={test.inputs[input.name]}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    const value = e.target.value;
 
-        <PreviewSectionContent>
-          <PreviewSectionText>
-            To create a new run, send a POST request to the runs endpoint of our
-            API. Optionally the request can include additional metadata object,
-            which contains any data you will need later inside of the run. By
-            default metadata is empty. Also you can specify an alias for the
-            run, which will be used. By default alias is 0 ~ latest.
-          </PreviewSectionText>
-
-          <CodePreviewWrapper
-            value={`curl ${apiUrl}/api/organizations/${organizationId}/pipelines/${pipelineId}/runs \\
-  -X POST \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer \${BUILDEL_API_KEY}" \\
-  -d '{"metadata": {"userId": 123}, "alias": 0}'`}
-            language="shell"
-            height={115}
-          >
-            {(value) => <CopyCodeButton value={value} />}
-          </CodePreviewWrapper>
-        </PreviewSectionContent>
-      </PreviewSection>
-
-      <PreviewSection>
-        <PreviewConnector />
-        <PreviewSectionHeader>
-          <PreviewSectionStep>2</PreviewSectionStep>
-
-          <PreviewSectionHeading>Start the run</PreviewSectionHeading>
-        </PreviewSectionHeader>
-
-        <PreviewSectionContent>
-          <PreviewSectionText>
-            Once the run is created, you can start it by sending a POST request
-            to the start endpoint of our API. This will trigger the start of
-            run. From this point, the run will be in progress and you can
-            interact with it.
-          </PreviewSectionText>
-
-          <CodePreviewWrapper
-            value={`curl ${apiUrl}/api/organizations/${organizationId}/pipelines/${pipelineId}/runs/RUN_ID/start \\
-  -X POST \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer \${BUILDEL_API_KEY}"`}
-            language="shell"
-            height={95}
-          >
-            {(value) => <CopyCodeButton value={value} />}
-          </CodePreviewWrapper>
-        </PreviewSectionContent>
-      </PreviewSection>
-
-      <PreviewSection>
-        <PreviewConnector />
-        <PreviewSectionHeader>
-          <PreviewSectionStep>3</PreviewSectionStep>
-
-          <PreviewSectionHeading>Input data to the run</PreviewSectionHeading>
-        </PreviewSectionHeader>
-
-        <PreviewSectionContent>
-          <PreviewSectionText>
-            To input data to the run, send a POST request to the input endpoint
-            of our API. This will trigger the input of data to the run. You can
-            interact with all public inputs of the run. You can input data to
-            the run only if it is in progress.
-          </PreviewSectionText>
-
-          <CodePreviewWrapper
-            value={`curl ${apiUrl}/api/organizations/${organizationId}/pipelines/${pipelineId}/runs/RUN_ID/input \\
-  -X POST \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer \${BUILDEL_API_KEY}" \\
-  -d '{"block_name": "text_input_1", "input_name": "input", "data": "Content"}'`}
-            language="shell"
-            height={110}
-          >
-            {(value) => <CopyCodeButton value={value} />}
-          </CodePreviewWrapper>
-        </PreviewSectionContent>
-      </PreviewSection>
-
-      <PreviewSection>
-        <PreviewSectionHeader>
-          <PreviewSectionStep>4</PreviewSectionStep>
-
-          <PreviewSectionHeading>Stop the run</PreviewSectionHeading>
-        </PreviewSectionHeader>
-
-        <PreviewSectionContent>
-          <PreviewSectionText>
-            To stop the run, send a POST request to the stop endpoint of our
-            API. This will trigger the stop of run. From this point, the run
-            will be stopped and you can't interact with it anymore.
-          </PreviewSectionText>
-
-          <CodePreviewWrapper
-            value={`curl ${apiUrl}/api/organizations/${organizationId}/pipelines/${pipelineId}/runs/RUN_ID/stop \\
-  -X POST \\
-  -H "Content-Type: application/json" \\
-  -H "Authorization: Bearer \${BUILDEL_API_KEY}"`}
-            language="shell"
-            height={95}
-          >
-            {(value) => <CopyCodeButton value={value} />}
-          </CodePreviewWrapper>
-        </PreviewSectionContent>
-      </PreviewSection>
+                    setTests((tests) => {
+                      return tests.map((t) =>
+                        test.id === t.id
+                          ? {
+                              ...test,
+                              inputs: { ...test.inputs, [input.name]: value },
+                            }
+                          : t,
+                      );
+                    });
+                  }}
+                />
+              ))}
+              {outputs.map((output) => test.outputs[output.name])}
+              {tests.length > 1 ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setTests((tests) =>
+                      tests.filter(({ id }) => id !== test.id),
+                    )
+                  }
+                >
+                  -
+                </button>
+              ) : null}
+            </div>
+          );
+        })}
+        <button
+          onClick={() => setTests((tests) => tests.concat([generateNewTest()]))}
+        >
+          +
+        </button>
+      </div>
 
       <div className="mt-20">
         <DocumentationCTA />
