@@ -88,6 +88,13 @@ export function BulkPage() {
     setTests((tests) =>
       tests.map((t) => (t.id === test.id ? { ...t, outputs: newOutputs } : t)),
     );
+
+    await fetch(
+      `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/stop`,
+      {
+        method: "POST",
+      },
+    );
   };
 
   const handleOnSubmit = (e: any) => {
@@ -140,9 +147,9 @@ export function BulkPage() {
                       return tests.map((t) =>
                         test.id === t.id
                           ? {
-                              ...test,
-                              inputs: { ...test.inputs, [input.name]: value },
-                            }
+                            ...test,
+                            inputs: { ...test.inputs, [input.name]: value },
+                          }
                           : t,
                       );
                     });
