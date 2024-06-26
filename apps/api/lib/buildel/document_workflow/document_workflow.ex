@@ -72,7 +72,11 @@ defmodule Buildel.DocumentWorkflow do
         adapter: Application.fetch_env!(:buildel, :document_loader)
       })
 
+    IO.inspect("loading file")
+
     with {:ok, result} <- DocumentProcessor.load_file(document_loader, path, file_metadata) do
+      IO.inspect("loaded file")
+
       result
       |> DocumentProcessor.get_blocks()
       |> DocumentProcessor.map_to_structures()
@@ -86,6 +90,7 @@ defmodule Buildel.DocumentWorkflow do
 
   @spec build_node_chunks(t(), struct_list()) :: [chunk()]
   def build_node_chunks(%{workflow_config: workflow_config}, documents) do
+    IO.inspect("chunking file")
     %{chunk_size: chunk_size, chunk_overlap: chunk_overlap} = workflow_config
 
     ChunkGenerator.split_into_chunks(documents, %{
@@ -111,6 +116,7 @@ defmodule Buildel.DocumentWorkflow do
 
   def generate_embeddings_for_chunks(workflow, chunks) do
     embeddings_adapter = workflow.embeddings
+    IO.inspect("generating embeddings")
 
     with {:ok, %{embeddings: embeddings, embeddings_tokens: embeddings_tokens}} <-
            embeddings_adapter
@@ -119,6 +125,8 @@ defmodule Buildel.DocumentWorkflow do
         embeddings
         |> Enum.zip(chunks)
         |> Enum.map(fn {embeddings, chunk} -> Map.put(chunk, :embeddings, embeddings) end)
+
+      IO.inspect("generated embeddings")
 
       %{chunks: chunks, embeddings_tokens: embeddings_tokens}
     end

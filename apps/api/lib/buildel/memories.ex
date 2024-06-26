@@ -101,6 +101,8 @@ defmodule Buildel.Memories do
         }
       })
 
+    IO.inspect("getting memory")
+
     with {:ok, file} <- Buildel.Memories.MemoryFile.get(file_id),
          chunks <- Buildel.Memories.MemoryFile.FileUpload.chunks(file),
          {:ok, memory} <-
@@ -114,6 +116,8 @@ defmodule Buildel.Memories do
              })
            )
            |> Buildel.Repo.insert() do
+      IO.inspect("saving chunks")
+
       chunks =
         put_in(
           chunks,

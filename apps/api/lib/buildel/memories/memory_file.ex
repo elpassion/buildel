@@ -23,6 +23,7 @@ defmodule Buildel.Memories.MemoryFile do
     end
 
     def chunks(state) do
+      IO.inspect("retrieving chunks")
       File.read!(state.chunks_file) |> :erlang.binary_to_term()
     end
 
@@ -102,6 +103,7 @@ defmodule Buildel.Memories.MemoryFile do
 
   def handle_call({:update_file, file}, _from, state) do
     Process.send_after(self(), {:remove_file, file.file.id}, 5 * 60_000)
+    IO.inspect("updating files state")
     state |> State.update_file(file) |> then(&{:reply, :ok, &1})
   end
 
@@ -132,6 +134,8 @@ defmodule Buildel.Memories.MemoryFile do
 
   defp process_file(%{organization_id: organization_id, collection_id: collection_id, file: file}) do
     metadata = file.metadata
+
+    IO.inspect("proecssing file")
 
     with organization <-
            Buildel.Organizations.get_organization!(organization_id),
@@ -190,7 +194,10 @@ defmodule Buildel.Memories.MemoryFile do
              cost_type: :file_upload,
              description: metadata.file_name
            }) do
+      IO.inspect("saving file")
+
       file = FileUpload.success(file, chunks)
+      IO.inspect("saved file to temp")
 
       {:ok,
        %{
