@@ -1,6 +1,6 @@
 defmodule Buildel.Memories.MemoryFile do
   defmodule FileUpload do
-    defstruct [:id, :status, :upload, :chunks, :metadata, :reason]
+    defstruct [:id, :status, :upload, :chunks_file, :metadata, :reason]
 
     def new(id, upload) do
       %FileUpload{
@@ -17,15 +17,17 @@ defmodule Buildel.Memories.MemoryFile do
     end
 
     def success(state, chunks) do
-      %{state | status: :success, chunks: chunks}
+      {:ok, chunks_file} = Temp.path()
+      File.write(chunks_file, chunks |> :erlang.term_to_binary())
+      %{state | status: :success, chunks_file: chunks_file}
+    end
+
+    def chunks(state) do
+      File.read!(state.chunks_file) |> :erlang.binary_to_term()
     end
 
     def error(state, error) do
       %{state | status: :error, reason: error}
-    end
-
-    def content(state) do
-      state.chunks |> Enum.map_join("\n", &Map.get(&1, :value))
     end
   end
 
@@ -45,6 +47,14 @@ defmodule Buildel.Memories.MemoryFile do
     end
 
     def remove_file(%State{} = state, file_id) do
+      case state.files |> Map.get(file_id) do
+        %{file: %{chunks_file: chunks_file}} when is_binary(chunks_file) ->
+          File.rm_rf!(chunks_file)
+
+        _ ->
+          nil
+      end
+
       %{state | files: state.files |> Map.delete(file_id)}
     end
   end

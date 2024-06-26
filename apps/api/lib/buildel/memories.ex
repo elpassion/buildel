@@ -101,7 +101,8 @@ defmodule Buildel.Memories do
         }
       })
 
-    with {:ok, file} <- Buildel.Memories.MemoryFile.get(file_id) |> IO.inspect(),
+    with {:ok, file} <- Buildel.Memories.MemoryFile.get(file_id),
+         chunks <- Buildel.Memories.MemoryFile.FileUpload.chunks(file),
          {:ok, memory} <-
            %Buildel.Memories.Memory{}
            |> Buildel.Memories.Memory.changeset(
@@ -109,13 +110,13 @@ defmodule Buildel.Memories do
                organization_id: organization.id,
                collection_name: collection.collection_name,
                memory_collection_id: collection.id,
-               content: file.chunks |> Enum.map_join("\n", &Map.get(&1, :value))
+               content: chunks |> Enum.map_join("\n", &Map.get(&1, :value))
              })
            )
            |> Buildel.Repo.insert() do
       chunks =
         put_in(
-          file.chunks,
+          chunks,
           [Access.all(), Access.key!(:metadata), :memory_id],
           memory.id
         )
