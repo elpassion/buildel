@@ -14,6 +14,7 @@ import { loader } from "./loader.server";
 import { errorToast } from "~/components/toasts/errorToast";
 import { routes } from "~/utils/routes.utils";
 import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
+import { loadingToast } from "~/components/toasts/loadingToast";
 
 type IExtendedFileUpload = IFileUpload & { file: File };
 export function NewCollectionFilesPage() {
@@ -149,8 +150,21 @@ export function NewCollectionFilesPage() {
     }
   };
 
-  const handleUploadFiles = () => {
-    items.forEach(handleUploadFile);
+  const handleUploadFiles = async () => {
+    loadingToast(() => Promise.all(items.map(handleUploadFile)), {
+      loading: {
+        title: "Files are still processing...",
+        description: "Please do not close or refresh the app.",
+      },
+      success: {
+        title: "Files processed successfully",
+        description: "You can now view the file in the collection.",
+      },
+      error: {
+        title: "Files processing failed",
+        description: "Please try again later.",
+      },
+    });
   };
 
   const handleClose = () => {
