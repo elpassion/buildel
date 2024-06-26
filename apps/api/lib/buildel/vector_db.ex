@@ -331,17 +331,20 @@ defmodule Buildel.VectorDB.EctoAdapter do
   def query(collection, metadata, %{
         query_embeddings: query_embeddings,
         limit: limit,
-        similarity_treshhold: similarity_treshhold
+        similarity_treshhold: _similarity_treshhold
       }) do
     embedding_size = Enum.count(query_embeddings)
     embedding_column = "embedding_#{embedding_size}" |> String.to_atom()
 
+    query =
+      from c in Chunk,
+        where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata)
+
     results =
       Buildel.Repo.all(
-        from c in Chunk,
-          where:
-            c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
-          order_by: l2_distance(field(c, ^embedding_column), ^query_embeddings),
+        from c in subquery(query),
+          order_by:
+            fragment("?::halfvec(3072) <-> ?", field(c, ^embedding_column), ^query_embeddings),
           limit: ^limit,
           select: %{
             c
