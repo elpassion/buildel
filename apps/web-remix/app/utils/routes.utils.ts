@@ -31,11 +31,11 @@ export const routes = {
   pipelineBuild: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipeline(organizationId, pipelineId)}/build`,
-      params
+      params,
     ),
   pipelineBlocks: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipelineBuild(organizationId, pipelineId)}/blocks`,
@@ -43,113 +43,122 @@ export const routes = {
     organizationId: OrganizationId,
     pipelineId: PipelineId,
     blockName: string,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipelineBlocks(organizationId, pipelineId)}/${blockName}`,
-      params
+      params,
     ),
   pipelineRuns: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipeline(organizationId, pipelineId)}/runs`,
-      params
+      params,
     ),
   pipelineRun: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
     runId: RunId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipelineRuns(organizationId, pipelineId)}/${runId}`,
-      params
+      params,
     ),
   pipelineRunCosts: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
     runId: RunId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipelineRun(organizationId, pipelineId, runId)}/costs`,
-      params
+      params,
     ),
   pipelineRunLogs: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
     runId: RunId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipelineRun(organizationId, pipelineId, runId)}/logs`,
-      params
+      params,
     ),
   pipelineInterface: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipeline(organizationId, pipelineId)}/interface`,
-      params
+      params,
     ),
   pipelineClientSDK: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipelineInterface(organizationId, pipelineId)}/client-sdk`,
-      params
+      params,
     ),
   pipelineWebsiteChatbot: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipelineInterface(organizationId, pipelineId)}/website-chatbot`,
-      params
+      params,
     ),
   pipelineOpenAIApi: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipelineInterface(organizationId, pipelineId)}/openai-api`,
-      params
+      params,
+    ),
+  pipelineBulk: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: RouteParam = {},
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineInterface(organizationId, pipelineId)}/bulk`,
+      params,
     ),
   pipelineHTTPApi: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipelineInterface(organizationId, pipelineId)}/http-api`,
-      params
+      params,
     ),
   pipelineSettings: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipeline(organizationId, pipelineId)}/settings`,
-      params
+      params,
     ),
   pipelineSettingsConfiguration: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `${routes.pipelineSettings(organizationId, pipelineId)}/configuration`,
-      params
+      params,
     ),
   pipelinesNew: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/pipelines/new`,
@@ -160,51 +169,54 @@ export const routes = {
 
   collectionSettings: (
     organizationId: OrganizationId,
-    collectionName: string
+    collectionName: string,
   ) =>
     `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
-      collectionName
+      collectionName,
     )}/settings`,
   collectionInterface: (
     organizationId: OrganizationId,
-    collectionName: string
+    collectionName: string,
   ) =>
     `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
-      collectionName
+      collectionName,
     )}/interface`,
   collectionOverview: (
     organizationId: OrganizationId,
     collectionName: string,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
-    buildUrlWithParams(`${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
-      collectionName
-    )}/overview`, params),
+    buildUrlWithParams(
+      `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
+        collectionName,
+      )}/overview`,
+      params,
+    ),
   collectionSearch: (organizationId: OrganizationId, collectionName: string) =>
     `${routes.collectionFiles(organizationId, collectionName)}/search`,
   collectionInterfaceSearch: (
     organizationId: OrganizationId,
-    collectionName: string
+    collectionName: string,
   ) => `${routes.collectionInterface(organizationId, collectionName)}/search`,
   collectionFiles: (organizationId: OrganizationId, collectionName: string) =>
     `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
-      collectionName
+      collectionName,
     )}/content`,
   collectionMemory: (
     organizationId: OrganizationId,
     collectionName: string,
     memoryId: string | number,
-    file_name?: string
+    file_name?: string,
   ) =>
     `${routes.collectionFiles(
       organizationId,
-      collectionName
+      collectionName,
     )}/${encodeURIComponent(memoryId)}/chunks?file_name=${encodeURIComponent(
-      file_name || ""
+      file_name || "",
     )}`,
   collectionFilesNew: (
     organizationId: OrganizationId,
-    collectionName: string
+    collectionName: string,
   ) => `${routes.collectionFiles(organizationId, collectionName)}/new`,
   secrets: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/secrets`,
@@ -213,11 +225,11 @@ export const routes = {
   chatPreview: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
-    params: RouteParam = {}
+    params: RouteParam = {},
   ) =>
     buildUrlWithParams(
       `/webchats${routes.pipeline(organizationId, pipelineId)}`,
-      params
+      params,
     ),
 };
 
