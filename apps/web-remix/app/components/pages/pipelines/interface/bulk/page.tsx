@@ -4,6 +4,10 @@ import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 import { loader } from "./loader.server";
+import classNames from "classnames";
+import { TextareaInput } from "~/components/form/inputs/textarea.input";
+import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
+import { Button, Icon, IconButton } from "@elpassion/taco";
 
 export function BulkPage() {
   const { organizationId, pipelineId, apiUrl, pipeline } =
@@ -22,13 +26,18 @@ export function BulkPage() {
       id: string;
       inputs: Record<string, string>;
       outputs: Record<string, string>;
+      status: "pending" | "running" | "done";
     }[]
   >(() => [generateNewTest()]);
 
   function generateNewTest() {
     return {
       id: uuidv4(),
-      inputs: inputs.reduce((acc, input) => ({ ...acc, [input.name]: "" }), {}),
+      status: "pending" as const,
+      inputs: inputs.reduce(
+        (acc, input) => ({ ...acc, [input.name]: " " }),
+        {},
+      ),
       outputs: outputs.reduce(
         (acc, output) => ({ ...acc, [output.name]: "" }),
         {},
@@ -86,7 +95,9 @@ export function BulkPage() {
     );
 
     setTests((tests) =>
-      tests.map((t) => (t.id === test.id ? { ...t, outputs: newOutputs } : t)),
+      tests.map((t) =>
+        t.id === test.id ? { ...t, outputs: newOutputs, status: "done" } : t,
+      ),
     );
 
     await fetch(
@@ -97,8 +108,9 @@ export function BulkPage() {
     );
   };
 
-  const handleOnSubmit = (e: any) => {
+  const handleOnSubmit = async (e: any) => {
     e.preventDefault();
+    setTests((tests) => tests.map((t) => ({ ...t, status: "running" })));
     tests.map((test) => {
       handleOnSubmitTest(test);
     });
@@ -114,71 +126,122 @@ export function BulkPage() {
           </p>
         </div>
 
-        <button
+        <Button
+          disabled={tests.some((test) => test.status === "running")}
           onClick={handleOnSubmit}
           className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
         >
           Run bulk
-        </button>
+        </Button>
       </div>
 
-      <div className="text-white">
-        <div className="border-1 p-2 flex justify-between">
-          {inputs.map((input) => (
-            <div key={input.name}>{input.name}</div>
-          ))}
-          {outputs.map((output) => (
-            <div key={output.name}>{output.name}</div>
-          ))}
-        </div>
-        {tests.map((test) => {
-          return (
-            <div className="border-1 p-2 flex justify-between" key={test.id}>
-              {inputs.map((input) => (
-                <input
-                  className="text-black"
-                  key={input.name}
-                  value={test.inputs[input.name]}
-                  onChange={(e) => {
-                    e.preventDefault();
-                    const value = e.target.value;
+      <table className="w-full">
+        <thead className="text-left text-white text-xs bg-neutral-800">
+          <tr className="rounded-xl overflow-hidden">
+            {inputs.map((input) => (
+              <th
+                key={input.name}
+                className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
+              >
+                {input.name}
+              </th>
+            ))}
+            {outputs.map((output) => (
+              <th
+                key={output.name}
+                className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
+              >
+                {output.name}
+              </th>
+            ))}
+            <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg">
+              {" "}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {tests.map((test) => {
+            return (
+              <tr
+                key={test.id}
+                className={classNames(
+                  "[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden",
+                  {
+                    "bg-primary-500": test.status === "running",
+                    "bg-neutral-8800": test.status === "done",
+                  },
+                )}
+                aria-label="pipeline run"
+              >
+                {inputs.map((input) => (
+                  <td
+                    key={input.name}
+                    className="py-3 px-5 text-neutral-100 text-sm"
+                  >
+                    <TextareaInput
+                      id={input.name}
+                      key={input.name}
+                      value={test.inputs[input.name]}
+                      onChange={(e) => {
+                        e.preventDefault();
+                        const value = e.target.value;
 
-                    setTests((tests) => {
-                      return tests.map((t) =>
-                        test.id === t.id
-                          ? {
-                            ...test,
-                            inputs: { ...test.inputs, [input.name]: value },
-                          }
-                          : t,
-                      );
-                    });
-                  }}
-                />
-              ))}
-              {outputs.map((output) => test.outputs[output.name])}
-              {tests.length > 1 ? (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setTests((tests) =>
-                      tests.filter(({ id }) => id !== test.id),
-                    )
-                  }
-                >
-                  -
-                </button>
-              ) : null}
-            </div>
-          );
-        })}
-        <button
-          onClick={() => setTests((tests) => tests.concat([generateNewTest()]))}
-        >
-          +
-        </button>
-      </div>
-
+                        setTests((tests) =>
+                          tests.map((t) =>
+                            test.id === t.id
+                              ? {
+                                  ...test,
+                                  inputs: {
+                                    ...test.inputs,
+                                    [input.name]: value,
+                                  },
+                                }
+                              : t,
+                          ),
+                        );
+                      }}
+                    />
+                  </td>
+                ))}
+                {outputs.map((output) => (
+                  <td
+                    key={output.name}
+                    className="py-3 px-5 text-neutral-100 text-sm"
+                  >
+                    <ChatMarkdown>{test.outputs[output.name]}</ChatMarkdown>
+                  </td>
+                ))}
+                <td className="py-3 px-5 text-neutral-100 text-sm">
+                  {tests.length > 1 ? (
+                    <IconButton
+                      size="xs"
+                      variant="basic"
+                      aria-label={`Remove item`}
+                      className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+                      title={`Remove item`}
+                      icon={<Icon iconName="trash" />}
+                      onClick={() =>
+                        setTests((tests) =>
+                          tests.filter(({ id }) => id !== test.id),
+                        )
+                      }
+                    />
+                  ) : null}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <IconButton
+        size="xs"
+        variant="basic"
+        aria-label={`Add item`}
+        className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+        title={`Add item`}
+        icon={<Icon iconName="plus" />}
+        onClick={() => setTests((tests) => tests.concat([generateNewTest()]))}
+      />
       <div className="mt-20">
         <DocumentationCTA />
       </div>
