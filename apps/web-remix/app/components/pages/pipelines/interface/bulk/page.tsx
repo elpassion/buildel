@@ -8,6 +8,8 @@ import classNames from "classnames";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
 import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 import { Button, Icon, IconButton } from "@elpassion/taco";
+import { SmallFileInput } from "~/components/form/inputs/file.input";
+import Papa from "papaparse";
 
 export function BulkPage() {
   const { organizationId, pipelineId, apiUrl, pipeline } =
@@ -116,6 +118,32 @@ export function BulkPage() {
     });
   };
 
+  const exportCSV = () => {
+    const testsWithFields = tests.map((test) => ({
+      ...test.inputs,
+      ...test.outputs,
+    }));
+    console.log(testsWithFields);
+    const csv = Papa.unparse(testsWithFields, {});
+    download(`${organizationId}-${pipelineId}-runs.csv`, csv);
+  };
+
+  function download(filename: string, text: string) {
+    const element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      "data:text/csv;charset=utf-8," + encodeURIComponent(text),
+    );
+    element.setAttribute("download", filename);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+  }
+
   return (
     <div>
       <div className="flex flex-col gap-3 mb-6 md:justify-between md:flex-row md:items-center">
@@ -126,13 +154,50 @@ export function BulkPage() {
           </p>
         </div>
 
-        <Button
-          disabled={tests.some((test) => test.status === "running")}
-          onClick={handleOnSubmit}
-          className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
-        >
-          Run bulk
-        </Button>
+        <div className="flex ml-auto gap-2">
+          <SmallFileInput
+            multiple={false}
+            buttonText="Add from CSV"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              Papa.parse(file, {
+                header: true,
+                complete: function (results) {
+                  setTests(
+                    results.data.map((result: any) => {
+                      const test = generateNewTest();
+                      const newInputs = Object.entries(test.inputs).reduce(
+                        (inputs, [input, value]) => ({
+                          ...inputs,
+                          [input]: result[input] || value,
+                        }),
+                        {},
+                      );
+                      return { ...test, inputs: newInputs };
+                    }),
+                  );
+                },
+              });
+            }}
+          />
+
+          <Button
+            disabled={tests.some((test) => test.status !== "done")}
+            onClick={exportCSV}
+            className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
+          >
+            Export CSV
+          </Button>
+
+          <Button
+            disabled={tests.some((test) => test.status === "running")}
+            onClick={handleOnSubmit}
+            className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
+          >
+            Run bulk
+          </Button>
+        </div>
       </div>
 
       <table className="w-full">
