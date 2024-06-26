@@ -48,7 +48,7 @@ defmodule Buildel.VectorDB do
              :vector_db,
              :query
            ] do
-    options = Map.merge(%{limit: 5, similarity_threshhold: 0.25}, options)
+    options = Map.merge(%{limit: 5, similarity_threshhold: 0}, options)
 
     with {:ok, %{embeddings: embeddings_list, embeddings_tokens: embeddings_tokens}} <-
            Embeddings.get_embeddings(embeddings, [query]),
@@ -341,14 +341,14 @@ defmodule Buildel.VectorDB.EctoAdapter do
         from c in Chunk,
           where:
             c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
-          order_by: cosine_distance(field(c, ^embedding_column), ^query_embeddings),
+          order_by: l2_distance(field(c, ^embedding_column), ^query_embeddings),
           limit: ^limit,
           select: %{
             c
-            | similarity: 1 - cosine_distance(field(c, ^embedding_column), ^query_embeddings)
+            | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings)
           }
       )
-      |> Enum.filter(&(&1.similarity > similarity_treshhold))
+      # |> Enum.filter(&(&1.similarity > similarity_treshhold))
       |> Enum.map(fn chunk ->
         %{
           "document" => chunk.document,
