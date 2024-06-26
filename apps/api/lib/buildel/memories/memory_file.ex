@@ -56,6 +56,7 @@ defmodule Buildel.Memories.MemoryFile do
   end
 
   def init(_args) do
+    Process.flag(:max_heap_size, 0)
     {:ok, State.new(%{})}
   end
 
