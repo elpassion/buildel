@@ -104,7 +104,11 @@ defmodule Buildel.Memories do
     IO.inspect("getting memory")
 
     with {:ok, file} <- Buildel.Memories.MemoryFile.get(file_id),
-         chunks <- Buildel.Memories.MemoryFile.FileUpload.chunks(file),
+         content <-
+           Buildel.Memories.MemoryFile.FileUpload.chunks(file)
+           |> Enum.map_join("\n", fn chunks ->
+             chunks |> Enum.map_join("\n", &Map.get(&1, :value))
+           end),
          {:ok, memory} <-
            %Buildel.Memories.Memory{}
            |> Buildel.Memories.Memory.changeset(
@@ -112,21 +116,22 @@ defmodule Buildel.Memories do
                organization_id: organization.id,
                collection_name: collection.collection_name,
                memory_collection_id: collection.id,
-               content: chunks |> Enum.map_join("\n", &Map.get(&1, :value))
+               content: content
              })
            )
            |> Buildel.Repo.insert() do
-      IO.inspect("saving chunks")
+      Buildel.Memories.MemoryFile.FileUpload.chunks(file)
+      |> Enum.each(fn chunks ->
+        chunks =
+          put_in(
+            chunks,
+            [Access.all(), Access.key!(:metadata), :memory_id],
+            memory.id
+          )
+          |> put_in([Access.all(), Access.key!(:metadata), :file_name], file.upload.filename)
 
-      chunks =
-        put_in(
-          chunks,
-          [Access.all(), Access.key!(:metadata), :memory_id],
-          memory.id
-        )
-        |> put_in([Access.all(), Access.key!(:metadata), :file_name], file.upload.filename)
-
-      Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
+        Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
+      end)
 
       {:ok, memory}
     end

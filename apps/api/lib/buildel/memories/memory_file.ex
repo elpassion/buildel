@@ -1,12 +1,13 @@
 defmodule Buildel.Memories.MemoryFile do
   defmodule FileUpload do
-    defstruct [:id, :status, :upload, :chunks_file, :metadata, :reason]
+    defstruct [:id, :status, :upload, :chunks_files, :metadata, :reason]
 
     def new(id, upload) do
       %FileUpload{
         id: id,
         status: :processing,
         upload: upload,
+        chunks_files: [],
         metadata:
           Buildel.FileLoader.file_properties(%{
             path: upload |> Map.get(:path),
@@ -19,12 +20,13 @@ defmodule Buildel.Memories.MemoryFile do
     def success(state, chunks) do
       {:ok, chunks_file} = Temp.path()
       File.write(chunks_file, chunks |> :erlang.term_to_binary())
-      %{state | status: :success, chunks_file: chunks_file}
+      %{state | status: :success, chunks_files: state.chunks_files ++ [chunks_file]}
     end
 
     def chunks(state) do
-      IO.inspect("retrieving chunks")
-      File.read!(state.chunks_file) |> :erlang.binary_to_term()
+      state.chunks_files
+      |> Stream.map(&File.read!/1)
+      |> Stream.map(&:erlang.binary_to_term/1)
     end
 
     def error(state, error) do
@@ -49,8 +51,8 @@ defmodule Buildel.Memories.MemoryFile do
 
     def remove_file(%State{} = state, file_id) do
       case state.files |> Map.get(file_id) do
-        %{file: %{chunks_file: chunks_file}} when is_binary(chunks_file) ->
-          File.rm_rf!(chunks_file)
+        %{file: %{chunks_files: chunks_files}} ->
+          Enum.each(chunks_files, &File.rm_rf!(&1))
 
         _ ->
           nil
@@ -135,8 +137,6 @@ defmodule Buildel.Memories.MemoryFile do
   defp process_file(%{organization_id: organization_id, collection_id: collection_id, file: file}) do
     metadata = file.metadata
 
-    IO.inspect("proecssing file")
-
     with organization <-
            Buildel.Organizations.get_organization!(organization_id),
          {:ok, collection} <-
@@ -170,34 +170,36 @@ defmodule Buildel.Memories.MemoryFile do
              {file.upload.path, %{type: metadata.file_type}}
            ),
          chunks when is_list(chunks) <-
-           Buildel.DocumentWorkflow.build_node_chunks(workflow, items),
-         %{chunks: chunks, embeddings_tokens: embeddings_tokens} when is_list(chunks) <-
-           Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks),
-         cost_amount <-
-           Buildel.Costs.CostCalculator.calculate_embeddings_cost(
-             %Buildel.Langchain.EmbeddingsTokenSummary{
-               tokens: embeddings_tokens,
-               model: collection.embeddings_model
-             }
-           ),
-         {:ok, cost} <-
-           Buildel.Organizations.create_organization_cost(
-             organization,
-             %{
-               amount: cost_amount,
-               input_tokens: embeddings_tokens,
-               output_tokens: 0
-             }
-           ),
-         {:ok, _} <-
-           Buildel.Memories.create_memory_collection_cost(collection, cost, %{
-             cost_type: :file_upload,
-             description: metadata.file_name
-           }) do
-      IO.inspect("saving file")
-
-      file = FileUpload.success(file, chunks)
-      IO.inspect("saved file to temp")
+           Buildel.DocumentWorkflow.build_node_chunks(workflow, items) do
+      file =
+        Enum.chunk_every(chunks, 20)
+        |> Enum.reduce(file, fn chunks, file ->
+          with %{chunks: chunks, embeddings_tokens: embeddings_tokens} when is_list(chunks) <-
+                 Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks),
+               cost_amount <-
+                 Buildel.Costs.CostCalculator.calculate_embeddings_cost(
+                   %Buildel.Langchain.EmbeddingsTokenSummary{
+                     tokens: embeddings_tokens,
+                     model: collection.embeddings_model
+                   }
+                 ),
+               {:ok, cost} <-
+                 Buildel.Organizations.create_organization_cost(
+                   organization,
+                   %{
+                     amount: cost_amount,
+                     input_tokens: embeddings_tokens,
+                     output_tokens: 0
+                   }
+                 ),
+               {:ok, _} <-
+                 Buildel.Memories.create_memory_collection_cost(collection, cost, %{
+                   cost_type: :file_upload,
+                   description: metadata.file_name
+                 }) do
+            FileUpload.success(file, chunks)
+          end
+        end)
 
       {:ok,
        %{

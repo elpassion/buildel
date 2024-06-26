@@ -57,14 +57,6 @@ defmodule Buildel.DocumentWorkflow do
     }
   end
 
-  @spec process(t(), document()) :: [chunk()]
-  def process(workflow, document) do
-    document = read(workflow, document)
-    chunks = build_node_chunks(workflow, document)
-    %{chunks: chunks} = generate_embeddings_for_chunks(workflow, chunks)
-    put_in_database(workflow, chunks)
-  end
-
   @spec read(t(), document()) :: struct_list()
   def read(_workflow, {path, file_metadata}) do
     document_loader =
@@ -116,7 +108,6 @@ defmodule Buildel.DocumentWorkflow do
 
   def generate_embeddings_for_chunks(workflow, chunks) do
     embeddings_adapter = workflow.embeddings
-    IO.inspect("generating embeddings")
 
     with {:ok, %{embeddings: embeddings, embeddings_tokens: embeddings_tokens}} <-
            embeddings_adapter
@@ -125,8 +116,6 @@ defmodule Buildel.DocumentWorkflow do
         embeddings
         |> Enum.zip(chunks)
         |> Enum.map(fn {embeddings, chunk} -> Map.put(chunk, :embeddings, embeddings) end)
-
-      IO.inspect("generated embeddings")
 
       %{chunks: chunks, embeddings_tokens: embeddings_tokens}
     end
