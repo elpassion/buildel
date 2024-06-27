@@ -107,7 +107,6 @@ defmodule Buildel.Memories.MemoryFile do
 
   def handle_call({:update_file, file}, _from, state) do
     Process.send_after(self(), {:remove_file, file.file.id}, 5 * 60_000)
-    IO.inspect("updating files state")
     state |> State.update_file(file) |> then(&{:reply, :ok, &1})
   end
 

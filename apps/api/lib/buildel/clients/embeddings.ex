@@ -22,14 +22,19 @@ defmodule Buildel.Clients.Embeddings do
     if inputs |> Enum.at(0) |> is_struct(Pgvector) do
       {:ok, %{embeddings: inputs |> Enum.map(&Pgvector.to_list/1), embeddings_tokens: 0}}
     else
-      Buildel.Cache.lookup("#{endpoint}#{model}#{inputs |> Enum.join(",")}", fn ->
-        Buildel.Clients.OpenAIEmbeddings.get_embeddings(%{
-          inputs: inputs,
-          api_key: api_key,
-          model: model,
-          endpoint: endpoint
-        })
-      end)
+      Buildel.Cache.lookup(
+        "#{endpoint}#{model}#{inputs |> Enum.join(",")}"
+        |> then(&:crypto.hash(:sha256, &1))
+        |> Base.encode16(),
+        fn ->
+          Buildel.Clients.OpenAIEmbeddings.get_embeddings(%{
+            inputs: inputs,
+            api_key: api_key,
+            model: model,
+            endpoint: endpoint
+          })
+        end
+      )
     end
   end
 

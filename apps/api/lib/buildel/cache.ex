@@ -10,7 +10,11 @@ defmodule Buildel.Cache do
     case :ets.lookup(:buildel_cache, key) do
       [] ->
         result = f.()
-        :ets.insert(:buildel_cache, {key, result})
+
+        if result |> :erlang.term_to_binary() |> :erlang.byte_size() < 1000 * 1024 do
+          :ets.insert(:buildel_cache, {key, result})
+        end
+
         result
 
       [{_key, value}] ->
