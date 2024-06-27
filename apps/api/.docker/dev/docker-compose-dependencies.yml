@@ -2,7 +2,7 @@ version: "3.5"
 
 services:
   database:
-    image: ankane/pgvector:latest
+    image: pgvector/pgvector:0.7.2-pg15
     ports:
       - "54321:5432"
     environment:
@@ -11,6 +11,7 @@ services:
     volumes:
       - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
       - pg_data:/var/lib/postgresql/data
+      - ./postgresql.conf:/var/lib/postgresql/data/postgresql.conf
   nlm:
     image: ghcr.io/nlmatics/nlm-ingestor:latest
     ports:

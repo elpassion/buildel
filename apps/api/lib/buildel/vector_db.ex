@@ -48,7 +48,7 @@ defmodule Buildel.VectorDB do
              :vector_db,
              :query
            ] do
-    options = Map.merge(%{limit: 5, similarity_threshhold: 0.25}, options)
+    options = Map.merge(%{limit: 5, similarity_threshhold: 0}, options)
 
     with {:ok, %{embeddings: embeddings_list, embeddings_tokens: embeddings_tokens}} <-
            Embeddings.get_embeddings(embeddings, [query]),
@@ -331,24 +331,49 @@ defmodule Buildel.VectorDB.EctoAdapter do
   def query(collection, metadata, %{
         query_embeddings: query_embeddings,
         limit: limit,
-        similarity_treshhold: similarity_treshhold
+        similarity_treshhold: _similarity_treshhold
       }) do
     embedding_size = Enum.count(query_embeddings)
     embedding_column = "embedding_#{embedding_size}" |> String.to_atom()
 
+    query =
+      from c in Chunk,
+        where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata)
+
+    embeddings_query =
+      if supports_halfvec?(),
+        do:
+          from(c in subquery(query),
+            order_by:
+              fragment(
+                "?::halfvec(3072) <-> ?",
+                field(c, ^embedding_column),
+                ^query_embeddings
+              ),
+            limit: ^limit,
+            select: %{
+              c
+              | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings)
+            }
+          ),
+        else:
+          from(c in subquery(query),
+            order_by:
+              fragment(
+                "? <-> ?",
+                field(c, ^embedding_column),
+                ^query_embeddings
+              ),
+            limit: ^limit,
+            select: %{
+              c
+              | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings)
+            }
+          )
+
     results =
-      Buildel.Repo.all(
-        from c in Chunk,
-          where:
-            c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
-          order_by: cosine_distance(field(c, ^embedding_column), ^query_embeddings),
-          limit: ^limit,
-          select: %{
-            c
-            | similarity: 1 - cosine_distance(field(c, ^embedding_column), ^query_embeddings)
-          }
-      )
-      |> Enum.filter(&(&1.similarity > similarity_treshhold))
+      Buildel.Repo.all(embeddings_query)
+      # |> Enum.filter(&(&1.similarity > similarity_treshhold))
       |> Enum.map(fn chunk ->
         %{
           "document" => chunk.document,
@@ -359,5 +384,32 @@ defmodule Buildel.VectorDB.EctoAdapter do
       end)
 
     {:ok, results}
+  end
+
+  def supports_halfvec?(repo \\ Buildel.Repo) do
+    case extension_version(repo) do
+      nil ->
+        false
+
+      version when is_binary(version) ->
+        [major, minor | _] = String.split(version, ".")
+        major = String.to_integer(major)
+        minor = String.to_integer(minor)
+        if major * 10 + minor >= 7, do: true, else: false
+    end
+  end
+
+  defp extension_version(repo) do
+    case repo.one(
+           from e in "pg_available_extensions",
+             where: e.name == "vector",
+             select: e.installed_version
+         ) do
+      version when is_binary(version) ->
+        version
+
+      _ ->
+        nil
+    end
   end
 end

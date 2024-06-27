@@ -1,5 +1,5 @@
 Postgrex.Types.define(
   Buildel.PostgrexTypes,
-  [Pgvector.Extensions.Vector] ++ Ecto.Adapters.Postgres.extensions(),
+  Pgvector.extensions() ++ Ecto.Adapters.Postgres.extensions(),
   []
 )
