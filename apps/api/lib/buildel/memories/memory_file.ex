@@ -21,9 +21,7 @@ defmodule Buildel.Memories.MemoryFile do
       %{state | content: content}
     end
 
-    def success(state, chunks) do
-      {:ok, chunks_file} = Temp.path()
-      File.write(chunks_file, chunks |> :erlang.term_to_binary())
+    def success(state, chunks_file) do
       %{state | status: :success, chunks_files: state.chunks_files ++ [chunks_file]}
     end
 
@@ -180,33 +178,40 @@ defmodule Buildel.Memories.MemoryFile do
 
       file =
         Enum.chunk_every(chunks, 20)
-        |> Enum.reduce(file, fn chunks, file ->
-          with %{chunks: chunks, embeddings_tokens: embeddings_tokens} when is_list(chunks) <-
-                 Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks),
-               cost_amount <-
-                 Buildel.Costs.CostCalculator.calculate_embeddings_cost(
-                   %Buildel.Langchain.EmbeddingsTokenSummary{
-                     tokens: embeddings_tokens,
-                     model: collection.embeddings_model
-                   }
-                 ),
-               {:ok, cost} <-
-                 Buildel.Organizations.create_organization_cost(
-                   organization,
-                   %{
-                     amount: cost_amount,
-                     input_tokens: embeddings_tokens,
-                     output_tokens: 0
-                   }
-                 ),
-               {:ok, _} <-
-                 Buildel.Memories.create_memory_collection_cost(collection, cost, %{
-                   cost_type: :file_upload,
-                   description: metadata.file_name
-                 }) do
-            FileUpload.success(file, chunks)
-          end
+        |> Task.async_stream(
+          fn chunks ->
+            with %{chunks: chunks, embeddings_tokens: embeddings_tokens} when is_list(chunks) <-
+                   Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks),
+                 cost_amount <-
+                   Buildel.Costs.CostCalculator.calculate_embeddings_cost(
+                     %Buildel.Langchain.EmbeddingsTokenSummary{
+                       tokens: embeddings_tokens,
+                       model: collection.embeddings_model
+                     }
+                   ),
+                 {:ok, cost} <-
+                   Buildel.Organizations.create_organization_cost(
+                     organization,
+                     %{
+                       amount: cost_amount,
+                       input_tokens: embeddings_tokens,
+                       output_tokens: 0
+                     }
+                   ),
+                 {:ok, _} <-
+                   Buildel.Memories.create_memory_collection_cost(collection, cost, %{
+                     cost_type: :file_upload,
+                     description: metadata.file_name
+                   }) do
+              save_chunks_to_file(chunks)
+            end
+          end,
+          max_concurrency: 15
+        )
+        |> Enum.reduce(file, fn {:ok, chunks_file}, file ->
+          FileUpload.success(file, chunks_file)
         end)
+        |> IO.inspect()
 
       {:ok,
        %{
@@ -223,5 +228,11 @@ defmodule Buildel.Memories.MemoryFile do
            file: file |> FileUpload.error(error)
          }}
     end
+  end
+
+  defp save_chunks_to_file(chunks) do
+    {:ok, chunks_file} = Temp.path()
+    File.write(chunks_file, chunks |> :erlang.term_to_binary())
+    chunks_file
   end
 end

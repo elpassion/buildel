@@ -116,13 +116,10 @@ defmodule Buildel.Memories do
            )
            |> Buildel.Repo.insert() do
       Buildel.Memories.MemoryFile.FileUpload.chunks(file)
-      |> Enum.reduce([], fn chunks, all_chunks -> all_chunks ++ chunks end)
-      |> then(fn chunks ->
-        IO.inspect("putting in db")
-
+      |> Enum.each(fn chunks ->
         chunks =
-          put_in(
-            chunks,
+          chunks
+          |> put_in(
             [Access.all(), Access.key!(:metadata), :memory_id],
             memory.id
           )
