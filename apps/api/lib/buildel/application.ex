@@ -32,7 +32,8 @@ defmodule Buildel.Application do
         # JWKS storage
         BuildelWeb.GoogleJwksStrategy,
         {BuildelWeb.MetricsStorage, BuildelWeb.Telemetry.metrics()},
-        Buildel.Memories.MemoryFile
+        Buildel.Memories.MemoryFile,
+        Buildel.Cache
       ]
       |> maybe_add_db()
       |> maybe_add_bumblebee_embedding()
