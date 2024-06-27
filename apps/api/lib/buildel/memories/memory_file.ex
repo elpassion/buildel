@@ -211,7 +211,6 @@ defmodule Buildel.Memories.MemoryFile do
         |> Enum.reduce(file, fn {:ok, chunks_file}, file ->
           FileUpload.success(file, chunks_file)
         end)
-        |> IO.inspect()
 
       {:ok,
        %{
