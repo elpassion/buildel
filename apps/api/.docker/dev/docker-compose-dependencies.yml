@@ -11,6 +11,7 @@ services:
     volumes:
       - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
       - pg_data:/var/lib/postgresql/data
+      - ./postgresql.conf:/var/lib/postgresql/data/postgresql.conf
   nlm:
     image: ghcr.io/nlmatics/nlm-ingestor:latest
     ports:
