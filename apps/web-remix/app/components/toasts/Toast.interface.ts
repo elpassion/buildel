@@ -3,4 +3,4 @@ import { ToastOptions } from "react-hot-toast";
 
 export type ToastProps = {
   options?: Pick<ToastOptions, "duration" | "position">;
-} & Partial<Omit<SmallToastProps, "backgroundColor">>;
+} & Partial<SmallToastProps>;

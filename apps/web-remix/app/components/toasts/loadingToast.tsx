@@ -10,7 +10,7 @@ type LoadingToastProps = {
     loading?: ToastProps;
 };
 
-export const loadingToast = (callback: () => Promise<unknown>, props?: LoadingToastProps) => {
+export const loadingToast = (callback: () => Promise<any>, props?: LoadingToastProps) => {
     const { loading, success, error } = {
         ...props,
     };
@@ -23,12 +23,15 @@ export const loadingToast = (callback: () => Promise<unknown>, props?: LoadingTo
                 withCloseButton={false}
                 onClose={() => toast.dismiss()}
             />,
-            success: <SuccessToast
-                {...success}
+            success: (data) => <SuccessToast
+                title={data?.title || success?.title}
+                description={data?.description || success?.description}
+                backgroundColor={data?.backgroundColor || success?.backgroundColor}
                 onClose={() => toast.dismiss()}
             />,
-            error: <ErrorToast
-                {...error}
+            error: (data) => <ErrorToast
+                title={data?.title || error?.title}
+                description={data?.description || error?.description}
                 onClose={() => toast.dismiss()}
             />,
         },

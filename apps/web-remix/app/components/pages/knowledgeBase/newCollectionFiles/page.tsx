@@ -145,25 +145,40 @@ export function NewCollectionFilesPage() {
       revalidator.revalidate();
       removeFile(fileUpload.id);
     } catch (e) {
-      errorToast("Something went wrong!");
       handleUpdateStatus(fileUpload.id, "error");
+      throw e;
     }
   };
 
   const handleUploadFiles = async () => {
-    loadingToast(() => Promise.all(items.map(handleUploadFile)), {
+    loadingToast(async () => {
+      const results = await Promise.allSettled(items.map(handleUploadFile))
+
+      const successCount = results.filter(result => result.status === "fulfilled").length;
+      const errorCount = results.filter(result => result.status === "rejected").length;
+
+      if (errorCount === 0) {
+        return Promise.resolve({
+          title: "Files processed successfully",
+          description: `You can now view the files in the collection.`,
+        });
+      } else if (successCount === 0) {
+        return Promise.reject({
+          title: "Files processing failed",
+          description: "Please try again later.",
+        });
+      } else {
+        return Promise.resolve({
+          title: "Partial success",
+          description: `${successCount} file(s) processed successfully, ${errorCount} file(s) failed.`,
+          backgroundColor: "bg-yellow-500",
+        });
+      }
+    }, {
       loading: {
         title: "Files are still processing...",
         description: "Please do not close or refresh the app.",
-      },
-      success: {
-        title: "Files processed successfully",
-        description: "You can now view the file in the collection.",
-      },
-      error: {
-        title: "Files processing failed",
-        description: "Please try again later.",
-      },
+      }
     });
   };
 
