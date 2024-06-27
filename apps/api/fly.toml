@@ -21,7 +21,7 @@ swap_size_mb = 512
   NLM_API_URL = "https://buildel-nlm-ingestor.fly.dev"
   PAGE_URL = "https://app.buildel.ai"
   ECTO_IPV6 = true
-  POOL_SIZE = 30
+  POOL_SIZE = 10
 
 [http_service]
   internal_port = 8080
