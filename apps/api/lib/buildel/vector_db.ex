@@ -353,7 +353,9 @@ defmodule Buildel.VectorDB.EctoAdapter do
             limit: ^limit,
             select: %{
               c
-              | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings)
+              | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings),
+                embedding_1536: nil,
+                embedding_3072: nil
             }
           ),
         else:
@@ -367,13 +369,16 @@ defmodule Buildel.VectorDB.EctoAdapter do
             limit: ^limit,
             select: %{
               c
-              | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings)
+              | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings),
+              embedding_1536: nil,
+              embedding_3072: nil
             }
           )
 
     results =
       Buildel.Repo.all(embeddings_query)
       # |> Enum.filter(&(&1.similarity > similarity_treshhold))
+      |> IO.inspect()
       |> Enum.map(fn chunk ->
         %{
           "document" => chunk.document,
