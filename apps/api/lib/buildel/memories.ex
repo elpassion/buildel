@@ -122,6 +122,8 @@ defmodule Buildel.Memories do
            |> Buildel.Repo.insert() do
       Buildel.Memories.MemoryFile.FileUpload.chunks(file)
       |> Enum.each(fn chunks ->
+        IO.inspect("saving chunk")
+
         chunks =
           put_in(
             chunks,
@@ -132,6 +134,8 @@ defmodule Buildel.Memories do
 
         Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
       end)
+
+      IO.inspect("done")
 
       {:ok, memory}
     end
