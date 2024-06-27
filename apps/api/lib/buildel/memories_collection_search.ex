@@ -169,7 +169,7 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
   end
 
   defp extend_neighbors_query(
-         %__MODULE__{vector_db: vector_db, organization_collection_name: collection_name},
+         %__MODULE__{vector_db: vector_db},
          result
        ) do
     all_chunks =

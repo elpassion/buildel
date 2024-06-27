@@ -41,6 +41,14 @@ defmodule Buildel.ClientMocks.VectorDB.EctoAdapter do
     end
   end
 
+  def get_all_by_id(_ids) do
+    if function = Application.get_env(:buildel, :vectordb_mock_get_all_hook) do
+      function.("", %{}, %{})
+    else
+      []
+    end
+  end
+
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
   def delete_all_with_metadata(_collection, _metadata) do
     :ok
