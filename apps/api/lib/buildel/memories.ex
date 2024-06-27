@@ -116,19 +116,23 @@ defmodule Buildel.Memories do
            )
            |> Buildel.Repo.insert() do
       Buildel.Memories.MemoryFile.FileUpload.chunks(file)
-      |> Enum.each(fn chunks ->
-        chunks =
-          chunks
-          |> put_in(
-            [Access.all(), Access.key!(:metadata), :memory_id],
-            memory.id
-          )
-          |> put_in([Access.all(), Access.key!(:metadata), :file_name], file.upload.filename)
+      |> Task.async_stream(
+        fn chunks ->
+          IO.inspect("saving chunk in db")
 
-        Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
-      end)
+          chunks =
+            chunks
+            |> put_in(
+              [Access.all(), Access.key!(:metadata), :memory_id],
+              memory.id
+            )
+            |> put_in([Access.all(), Access.key!(:metadata), :file_name], file.upload.filename)
 
-      IO.inspect("done")
+          Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
+        end,
+        max_concurrency: 4
+      )
+      |> Stream.run()
 
       {:ok, memory}
     end
