@@ -336,14 +336,11 @@ defmodule Buildel.VectorDB.EctoAdapter do
     embedding_size = Enum.count(query_embeddings)
     embedding_column = "embedding_#{embedding_size}" |> String.to_atom()
 
-    query =
-      from c in Chunk,
-        where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata)
-
     embeddings_query =
       if supports_halfvec?(),
         do:
-          from(c in subquery(query),
+          from(c in Chunk,
+            where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
             order_by:
               fragment(
                 "?::halfvec(3072) <-> ?",
@@ -359,7 +356,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
             }
           ),
         else:
-          from(c in subquery(query),
+          from(c in Chunk,
+            where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
             order_by:
               fragment(
                 "? <-> ?",
@@ -378,7 +376,6 @@ defmodule Buildel.VectorDB.EctoAdapter do
     results =
       Buildel.Repo.all(embeddings_query)
       # |> Enum.filter(&(&1.similarity > similarity_treshhold))
-      |> IO.inspect()
       |> Enum.map(fn chunk ->
         %{
           "document" => chunk.document,
