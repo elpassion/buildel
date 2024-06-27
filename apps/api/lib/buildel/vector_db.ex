@@ -81,6 +81,14 @@ defmodule Buildel.VectorDB do
     adapter.get_all(collection, metadata, params)
   end
 
+  def get_all_by_id(
+        %__MODULE__{adapter: adapter},
+        ids,
+        _params \\ %{}
+      ) do
+    adapter.get_all_by_id(ids)
+  end
+
   def delete_all_with_metadata(%__MODULE__{adapter: adapter}, collection_name, metadata) do
     {:ok, collection} = adapter.get_collection(collection_name)
 
@@ -305,14 +313,40 @@ defmodule Buildel.VectorDB.EctoAdapter do
       from c in Chunk,
         where:
           c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
-        order_by: fragment("metadata->>'index' ASC")
+        order_by: fragment("metadata->>'index' ASC"),
+        select: %{
+          c
+          | embedding_1536: nil,
+            embedding_3072: nil
+        }
     )
     |> Enum.map(fn chunk ->
       %{
         "document" => chunk.document,
         "metadata" => chunk.metadata,
         "chunk_id" => chunk.id,
-        "similarity" => chunk.similarity
+        "similarity" => 0.0
+      }
+    end)
+  end
+
+  def get_all_by_id(ids) do
+    Buildel.Repo.all(
+      from c in Chunk,
+        where: c.id in ^ids,
+        order_by: fragment("metadata->>'index' ASC"),
+        select: %{
+          c
+          | embedding_1536: nil,
+            embedding_3072: nil
+        }
+    )
+    |> Enum.map(fn chunk ->
+      %{
+        "document" => chunk.document,
+        "metadata" => chunk.metadata,
+        "chunk_id" => chunk.id,
+        "similarity" => 0.0
       }
     end)
   end
@@ -340,7 +374,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
       if supports_halfvec?(),
         do:
           from(c in Chunk,
-            where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
+            where:
+              c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
             order_by:
               fragment(
                 "?::halfvec(3072) <-> ?",
@@ -357,7 +392,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
           ),
         else:
           from(c in Chunk,
-            where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
+            where:
+              c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
             order_by:
               fragment(
                 "? <-> ?",
@@ -368,8 +404,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
             select: %{
               c
               | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings),
-              embedding_1536: nil,
-              embedding_3072: nil
+                embedding_1536: nil,
+                embedding_3072: nil
             }
           )
 

@@ -173,11 +173,15 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
          result
        ) do
     all_chunks =
-      Buildel.VectorDB.get_all(
-        vector_db,
-        collection_name,
-        %{}
-      )
+      result
+      |> Enum.flat_map(fn chunk ->
+        prev_id = Map.get(chunk["metadata"], "prev")
+        next_id = Map.get(chunk["metadata"], "next")
+        [prev_id, next_id]
+      end)
+      |> MapSet.new()
+      |> MapSet.to_list()
+      |> then(&Buildel.VectorDB.get_all_by_id(vector_db, &1))
 
     Enum.map(result, fn chunk ->
       prev_id = Map.get(chunk["metadata"], "prev")
