@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.TextOutput do
+  alias Buildel.Blocks.Fields.EditorField
   use Buildel.Blocks.Block
 
   @impl true
@@ -25,24 +26,53 @@ defmodule Buildel.Blocks.TextOutput do
         "opts" =>
           options_schema(%{
             "required" => ["stream_timeout"],
-            "properties" => %{
-              "stream_timeout" => %{
-                "type" => "number",
-                "title" => "Stop after (ms)",
-                "description" =>
-                  "Wait this many milliseconds after receiving the last chunk before stopping the stream.",
-                "minimum" => 500,
-                "default" => 500,
-                "step" => 1
-              }
-            }
+            "properties" =>
+              Jason.OrderedObject.new(
+                stream_timeout: %{
+                  "type" => "number",
+                  "title" => "Stop after (ms)",
+                  "description" =>
+                    "Wait this many milliseconds after receiving the last chunk before stopping the stream.",
+                  "minimum" => 500,
+                  "default" => 500,
+                  "step" => 1
+                },
+                jq_filter:
+                  EditorField.new(%{
+                    title: "JQ Filter",
+                    description: "JQ filter to apply to the response.",
+                    editorLanguage: "json",
+                    default: ".",
+                    minLength: 1
+                  })
+              )
           })
       }
     }
   end
 
   @impl true
+  def setup(state) do
+    normalized_filter =
+      case state.opts[:jq_filter] do
+        nil -> nil
+        "" -> nil
+        "." -> nil
+        filter -> filter
+      end
+
+    {:ok, state |> Map.put(:filter, normalized_filter)}
+  end
+
+  @impl true
   def handle_input("input", {_name, :text, text, _metadata}, state) do
+    text =
+      if state.filter do
+        Buildel.JQ.query!(text, state.filter) |> String.trim()
+      else
+        text
+      end
+
     output(state, "output", {:text, text}, %{stream_stop: :schedule})
   end
 end
