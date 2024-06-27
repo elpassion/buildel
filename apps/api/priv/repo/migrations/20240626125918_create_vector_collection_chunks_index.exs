@@ -8,7 +8,7 @@ defmodule Buildel.Repo.Migrations.CreateVectorCollectionChunksIndex do
     execute(fn ->
       if Buildel.VectorDB.EctoAdapter.supports_halfvec?(repo()) do
         repo().query!(
-          "CREATE INDEX CONCURRENTLY ON vector_collection_chunks USING hnsw ((embedding_3072::halfvec(3072)) halfvec_l2_ops);"
+          "CREATE INDEX ON vector_collection_chunks USING hnsw ((embedding_3072::halfvec(3072)) halfvec_l2_ops);"
         )
       end
     end)
