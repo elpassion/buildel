@@ -135,7 +135,7 @@ defmodule Buildel.Memories do
           Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
           IO.inspect("saved chunk")
         end,
-        max_concurrency: 1,
+        max_concurrency: 4,
         timeout: 60 * 1000
       )
       |> Stream.run()
