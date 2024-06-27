@@ -1,6 +1,6 @@
 defmodule Buildel.Memories.MemoryFile do
   defmodule FileUpload do
-    defstruct [:id, :status, :upload, :chunks_files, :metadata, :reason]
+    defstruct [:id, :status, :upload, :content, :chunks_files, :metadata, :reason]
 
     def new(id, upload) do
       %FileUpload{
@@ -15,6 +15,10 @@ defmodule Buildel.Memories.MemoryFile do
             name: upload |> Map.get(:filename)
           })
       }
+    end
+
+    def set_content(state, content) do
+      %{state | content: content}
     end
 
     def success(state, chunks) do
@@ -170,7 +174,10 @@ defmodule Buildel.Memories.MemoryFile do
              {file.upload.path, %{type: metadata.file_type}}
            ),
          chunks when is_list(chunks) <-
-           Buildel.DocumentWorkflow.build_node_chunks(workflow, items) do
+           Buildel.DocumentWorkflow.build_node_chunks(workflow, items),
+         content <- items |> Enum.map_join("\n", &Map.get(&1, :value)) do
+      file = Buildel.Memories.MemoryFile.FileUpload.set_content(file, content)
+
       file =
         Enum.chunk_every(chunks, 20)
         |> Enum.reduce(file, fn chunks, file ->
