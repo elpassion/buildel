@@ -243,7 +243,7 @@ export function BulkPage() {
               <Field name="inputs">
                 <SelectInput
                   options={inputs.map(toSelectOption)}
-                  label="Input"
+                  label="Inputs"
                   isMulti
                   id="inputs"
                   onSelect={(selected: MultiValue<IDropdownOption>) => {
