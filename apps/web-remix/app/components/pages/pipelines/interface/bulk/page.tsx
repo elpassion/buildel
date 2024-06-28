@@ -26,7 +26,7 @@ import { IDropdownOption } from "@elpassion/taco/Dropdown";
 
 export function BulkPage() {
   const validator = useMemo(() => withZod(schema), []);
-  const { organizationId, pipelineId, apiUrl, pipeline } =
+  const { organizationId, pipelineId, pipeline } =
     useLoaderData<typeof loader>();
 
   const [selectedInputs, setSelectedInputs] = useState<
@@ -289,113 +289,119 @@ export function BulkPage() {
               </Field>
             </div>
           </ValidatedForm>
-          <table className="w-full">
-            <thead className="text-left text-white text-xs bg-neutral-800">
-              <tr className="rounded-xl overflow-hidden">
-                {selectedInputs?.map((input: any) => (
-                  <th
-                    key={input.label}
-                    className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
-                  >
-                    {input.label}
-                  </th>
-                ))}
-                {selectedOutputs?.map((output: any) => (
-                  <th
-                    key={output.label}
-                    className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
-                  >
-                    {output.label}
-                  </th>
-                ))}
-                <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {tests.map((test) => {
-                return (
-                  <tr
-                    key={test.id}
-                    className={classNames(
-                      "[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden",
-                      {
-                        "bg-primary-500": test.status === "running",
-                        "bg-neutral-8800": test.status === "done",
-                      },
-                    )}
-                    aria-label="pipeline run"
-                  >
-                    {selectedInputs.map((input) => (
-                      <td
-                        key={input.label}
-                        className="py-3 px-5 text-neutral-100 text-sm"
-                      >
-                        <TextareaInput
-                          id={input.label}
+          {(selectedInputs.length > 0 || selectedOutputs.length > 0) && (
+            <table className="w-full">
+              <thead className="text-left text-white text-xs bg-neutral-800">
+                <tr className="rounded-xl overflow-hidden">
+                  {selectedInputs?.map((input: any) => (
+                    <th
+                      key={input.label}
+                      className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
+                    >
+                      {input.label}
+                    </th>
+                  ))}
+                  {selectedOutputs?.map((output: any) => (
+                    <th
+                      key={output.label}
+                      className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
+                    >
+                      {output.label}
+                    </th>
+                  ))}
+                  <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {tests.map((test) => {
+                  return (
+                    <tr
+                      key={test.id}
+                      className={classNames(
+                        "[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden",
+                        {
+                          "bg-primary-500": test.status === "running",
+                          "bg-neutral-8800": test.status === "done",
+                        },
+                      )}
+                      aria-label="pipeline run"
+                    >
+                      {selectedInputs.map((input) => (
+                        <td
                           key={input.label}
-                          value={test.inputs[input.label]}
-                          onChange={(e) => {
-                            e.preventDefault();
-                            const value = e.target.value;
+                          className="py-3 px-5 text-neutral-100 text-sm"
+                        >
+                          <TextareaInput
+                            id={input.label}
+                            key={input.label}
+                            value={test.inputs[input.label]}
+                            onChange={(e) => {
+                              e.preventDefault();
+                              const value = e.target.value;
 
-                            setTests((tests) =>
-                              tests.map((t) =>
-                                test.id === t.id
-                                  ? {
-                                      ...test,
-                                      inputs: {
-                                        ...test.inputs,
-                                        [input.label]: value,
-                                      },
-                                    }
-                                  : t,
-                              ),
-                            );
-                          }}
-                        />
+                              setTests((tests) =>
+                                tests.map((t) =>
+                                  test.id === t.id
+                                    ? {
+                                        ...test,
+                                        inputs: {
+                                          ...test.inputs,
+                                          [input.label]: value,
+                                        },
+                                      }
+                                    : t,
+                                ),
+                              );
+                            }}
+                          />
+                        </td>
+                      ))}
+                      {selectedOutputs.map((output) => (
+                        <td
+                          key={output.label}
+                          className="py-3 px-5 text-neutral-100 text-sm"
+                        >
+                          <ChatMarkdown>
+                            {test.outputs[output.label]}
+                          </ChatMarkdown>
+                        </td>
+                      ))}
+                      <td className="py-3 px-5 text-neutral-100 text-sm">
+                        {tests.length > 1 ? (
+                          <IconButton
+                            size="xs"
+                            variant="basic"
+                            aria-label={`Remove item`}
+                            className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+                            title={`Remove item`}
+                            icon={<Icon iconName="trash" />}
+                            onClick={() =>
+                              setTests((tests) =>
+                                tests.filter(({ id }) => id !== test.id),
+                              )
+                            }
+                          />
+                        ) : null}
                       </td>
-                    ))}
-                    {selectedOutputs.map((output) => (
-                      <td
-                        key={output.label}
-                        className="py-3 px-5 text-neutral-100 text-sm"
-                      >
-                        <ChatMarkdown>{test.outputs[output.label]}</ChatMarkdown>
-                      </td>
-                    ))}
-                    <td className="py-3 px-5 text-neutral-100 text-sm">
-                      {tests.length > 1 ? (
-                        <IconButton
-                          size="xs"
-                          variant="basic"
-                          aria-label={`Remove item`}
-                          className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
-                          title={`Remove item`}
-                          icon={<Icon iconName="trash" />}
-                          onClick={() =>
-                            setTests((tests) =>
-                              tests.filter(({ id }) => id !== test.id),
-                            )
-                          }
-                        />
-                      ) : null}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <IconButton
-            size="xs"
-            variant="basic"
-            aria-label={`Add item`}
-            className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
-            title={`Add item`}
-            icon={<Icon iconName="plus" />}
-            onClick={() =>
-              setTests((tests) => tests.concat([generateNewTest()]))
-            }
-          />
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+          {(selectedInputs.length > 0 || selectedOutputs.length > 0) && (
+            <IconButton
+              size="xs"
+              variant="basic"
+              aria-label={`Add item`}
+              className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+              title={`Add item`}
+              icon={<Icon iconName="plus" />}
+              onClick={() =>
+                setTests((tests) => tests.concat([generateNewTest()]))
+              }
+            />
+          )}
         </div>
       </InterfaceSectionWrapper>
       <div className="mt-20">
