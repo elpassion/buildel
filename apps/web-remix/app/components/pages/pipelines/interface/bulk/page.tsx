@@ -225,7 +225,7 @@ export function BulkPage() {
         <InterfaceSectionHeader>
           <InterfaceSectionHeading>Inputs and outputs</InterfaceSectionHeading>
           <InterfaceSectionHeaderParagraph>
-            Select inputs and outputs for chatbot
+            Select inputs and outputs for Bulk
           </InterfaceSectionHeaderParagraph>
         </InterfaceSectionHeader>
 
