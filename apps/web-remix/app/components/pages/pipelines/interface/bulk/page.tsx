@@ -1,6 +1,6 @@
-import { MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { ValidatedForm } from "remix-validated-form";
+import { MetaFunction, useLoaderData } from "@remix-run/react";
 import { v4 as uuidv4 } from "uuid";
 import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 import { loader } from "./loader.server";
@@ -10,10 +10,31 @@ import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 import { Button, Icon, IconButton } from "@elpassion/taco";
 import { SmallFileInput } from "~/components/form/inputs/file.input";
 import Papa from "papaparse";
+import { Field } from "~/components/form/fields/field.context";
+import { withZod } from "@remix-validated-form/with-zod";
+import { schema } from "./schema";
+import { IBlockConfig } from "../../pipeline.types";
+import {
+  InterfaceSectionHeader,
+  InterfaceSectionHeaderParagraph,
+  InterfaceSectionHeading,
+  InterfaceSectionWrapper,
+} from "~/components/interfaces/InterfaceSection";
+import { SelectInput } from "~/components/form/inputs/select.input";
+import { MultiValue } from "react-select";
+import { IDropdownOption } from "@elpassion/taco/Dropdown";
 
 export function BulkPage() {
+  const validator = useMemo(() => withZod(schema), []);
   const { organizationId, pipelineId, apiUrl, pipeline } =
     useLoaderData<typeof loader>();
+
+  const [selectedInputs, setSelectedInputs] = useState<
+    MultiValue<IDropdownOption>
+  >([]);
+  const [selectedOutputs, setSelectedOutputs] = useState<
+    MultiValue<IDropdownOption>
+  >([]);
 
   const inputs = pipeline.config.blocks.filter(
     (block) => block.type === "text_input",
@@ -36,12 +57,12 @@ export function BulkPage() {
     return {
       id: uuidv4(),
       status: "pending" as const,
-      inputs: inputs.reduce(
-        (acc, input) => ({ ...acc, [input.name]: " " }),
+      inputs: selectedInputs.reduce(
+        (acc, input) => ({ ...acc, [input.label]: " " }),
         {},
       ),
-      outputs: outputs.reduce(
-        (acc, output) => ({ ...acc, [output.name]: "" }),
+      outputs: selectedOutputs.reduce(
+        (acc, output) => ({ ...acc, [output.label]: "" }),
         {},
       ),
     };
@@ -200,119 +221,190 @@ export function BulkPage() {
         </div>
       </div>
 
-      <table className="w-full">
-        <thead className="text-left text-white text-xs bg-neutral-800">
-          <tr className="rounded-xl overflow-hidden">
-            {inputs.map((input) => (
-              <th
-                key={input.name}
-                className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
-              >
-                {input.name}
-              </th>
-            ))}
-            {outputs.map((output) => (
-              <th
-                key={output.name}
-                className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
-              >
-                {output.name}
-              </th>
-            ))}
-            <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg">
-              {" "}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {tests.map((test) => {
-            return (
-              <tr
-                key={test.id}
-                className={classNames(
-                  "[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden",
-                  {
-                    "bg-primary-500": test.status === "running",
-                    "bg-neutral-8800": test.status === "done",
-                  },
-                )}
-                aria-label="pipeline run"
-              >
-                {inputs.map((input) => (
-                  <td
-                    key={input.name}
-                    className="py-3 px-5 text-neutral-100 text-sm"
-                  >
-                    <TextareaInput
-                      id={input.name}
-                      key={input.name}
-                      value={test.inputs[input.name]}
-                      onChange={(e) => {
-                        e.preventDefault();
-                        const value = e.target.value;
+      <InterfaceSectionWrapper className="mb-8">
+        <InterfaceSectionHeader>
+          <InterfaceSectionHeading>Inputs and outputs</InterfaceSectionHeading>
+          <InterfaceSectionHeaderParagraph>
+            Select inputs and outputs for chatbot
+          </InterfaceSectionHeaderParagraph>
+        </InterfaceSectionHeader>
 
-                        setTests((tests) =>
-                          tests.map((t) =>
-                            test.id === t.id
-                              ? {
-                                  ...test,
-                                  inputs: {
-                                    ...test.inputs,
-                                    [input.name]: value,
-                                  },
-                                }
-                              : t,
-                          ),
-                        );
-                      }}
-                    />
-                  </td>
-                ))}
-                {outputs.map((output) => (
-                  <td
-                    key={output.name}
-                    className="py-3 px-5 text-neutral-100 text-sm"
+        <div className="p-6 grid grid-cols-1 gap-3 min-h-[174px]">
+          <ValidatedForm
+            defaultValues={{
+              inputs: pipeline.interface_config?.input,
+              outputs: pipeline.interface_config?.output,
+            }}
+            validator={validator}
+            noValidate
+            onSubmit={handleOnSubmit}
+          >
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 items-center max-w-screen-2xl">
+              <Field name="inputs">
+                <SelectInput
+                  options={inputs.map(toSelectOption)}
+                  label="Input"
+                  isMulti
+                  id="inputs"
+                  onSelect={(selected: MultiValue<IDropdownOption>) => {
+                    setSelectedInputs(selected);
+                    setTests((tests) =>
+                      tests.map((test) => ({
+                        ...test,
+                        inputs: selected.reduce(
+                          (acc, input) => ({
+                            ...acc,
+                            [input.label]: "",
+                          }),
+                          {},
+                        ),
+                      })),
+                    );
+                  }}
+                />
+              </Field>
+
+              <Field name="outputs">
+                <SelectInput
+                  options={outputs.map(toSelectOption)}
+                  label="Outputs"
+                  isMulti
+                  id="outputs"
+                  onSelect={(selected: MultiValue<IDropdownOption>) => {
+                    setSelectedOutputs(selected);
+                    setTests((tests) =>
+                      tests.map((test) => ({
+                        ...test,
+                        outputs: selected.reduce(
+                          (acc, output) => ({
+                            ...acc,
+                            [output.label]: "",
+                          }),
+                          {},
+                        ),
+                      })),
+                    );
+                  }}
+                />
+              </Field>
+            </div>
+          </ValidatedForm>
+          <table className="w-full">
+            <thead className="text-left text-white text-xs bg-neutral-800">
+              <tr className="rounded-xl overflow-hidden">
+                {selectedInputs?.map((input: any) => (
+                  <th
+                    key={input.label}
+                    className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
                   >
-                    <ChatMarkdown>{test.outputs[output.name]}</ChatMarkdown>
-                  </td>
+                    {input.label}
+                  </th>
                 ))}
-                <td className="py-3 px-5 text-neutral-100 text-sm">
-                  {tests.length > 1 ? (
-                    <IconButton
-                      size="xs"
-                      variant="basic"
-                      aria-label={`Remove item`}
-                      className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
-                      title={`Remove item`}
-                      icon={<Icon iconName="trash" />}
-                      onClick={() =>
-                        setTests((tests) =>
-                          tests.filter(({ id }) => id !== test.id),
-                        )
-                      }
-                    />
-                  ) : null}
-                </td>
+                {selectedOutputs?.map((output: any) => (
+                  <th
+                    key={output.label}
+                    className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
+                  >
+                    {output.label}
+                  </th>
+                ))}
+                <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <IconButton
-        size="xs"
-        variant="basic"
-        aria-label={`Add item`}
-        className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
-        title={`Add item`}
-        icon={<Icon iconName="plus" />}
-        onClick={() => setTests((tests) => tests.concat([generateNewTest()]))}
-      />
+            </thead>
+            <tbody>
+              {tests.map((test) => {
+                return (
+                  <tr
+                    key={test.id}
+                    className={classNames(
+                      "[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden",
+                      {
+                        "bg-primary-500": test.status === "running",
+                        "bg-neutral-8800": test.status === "done",
+                      },
+                    )}
+                    aria-label="pipeline run"
+                  >
+                    {selectedInputs.map((input) => (
+                      <td
+                        key={input.label}
+                        className="py-3 px-5 text-neutral-100 text-sm"
+                      >
+                        <TextareaInput
+                          id={input.label}
+                          key={input.label}
+                          value={test.inputs[input.label]}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            const value = e.target.value;
+
+                            setTests((tests) =>
+                              tests.map((t) =>
+                                test.id === t.id
+                                  ? {
+                                      ...test,
+                                      inputs: {
+                                        ...test.inputs,
+                                        [input.label]: value,
+                                      },
+                                    }
+                                  : t,
+                              ),
+                            );
+                          }}
+                        />
+                      </td>
+                    ))}
+                    {selectedOutputs.map((output) => (
+                      <td
+                        key={output.label}
+                        className="py-3 px-5 text-neutral-100 text-sm"
+                      >
+                        <ChatMarkdown>{test.outputs[output.label]}</ChatMarkdown>
+                      </td>
+                    ))}
+                    <td className="py-3 px-5 text-neutral-100 text-sm">
+                      {tests.length > 1 ? (
+                        <IconButton
+                          size="xs"
+                          variant="basic"
+                          aria-label={`Remove item`}
+                          className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+                          title={`Remove item`}
+                          icon={<Icon iconName="trash" />}
+                          onClick={() =>
+                            setTests((tests) =>
+                              tests.filter(({ id }) => id !== test.id),
+                            )
+                          }
+                        />
+                      ) : null}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <IconButton
+            size="xs"
+            variant="basic"
+            aria-label={`Add item`}
+            className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+            title={`Add item`}
+            icon={<Icon iconName="plus" />}
+            onClick={() =>
+              setTests((tests) => tests.concat([generateNewTest()]))
+            }
+          />
+        </div>
+      </InterfaceSectionWrapper>
       <div className="mt-20">
         <DocumentationCTA />
       </div>
     </div>
   );
 }
+
 export const meta: MetaFunction = () => {
   return [
     {
@@ -320,3 +412,11 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
+
+function toSelectOption(item: IBlockConfig) {
+  return {
+    id: item.name.toString(),
+    value: item.name.toString(),
+    label: item.name,
+  };
+}
