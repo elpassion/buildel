@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { ValidatedForm } from "remix-validated-form";
-import { MetaFunction, useLoaderData } from "@remix-run/react";
+import { Link, MetaFunction, useLoaderData } from "@remix-run/react";
 import { v4 as uuidv4 } from "uuid";
 import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 import { loader } from "./loader.server";
@@ -24,6 +24,7 @@ import { SelectInput } from "~/components/form/inputs/select.input";
 import { MultiValue } from "react-select";
 import { IDropdownOption } from "@elpassion/taco/Dropdown";
 import { ClientOnly } from "remix-utils/client-only";
+import { routes } from "~/utils/routes.utils";
 
 export function BulkPage() {
   const { organizationId, pipelineId, pipeline } =
@@ -51,6 +52,7 @@ export function BulkPage() {
       inputs: Record<string, string>;
       outputs: Record<string, string>;
       status: "pending" | "running" | "done";
+      run?: number;
     }[]
   >(() => [generateNewTest()]);
 
@@ -86,6 +88,10 @@ export function BulkPage() {
     const {
       data: { id },
     } = await response.json();
+
+    setTests((tests) =>
+      tests.map((t) => (t.id === test.id ? { ...t, run: id } : t)),
+    );
 
     const runResponse = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/start`,
@@ -299,7 +305,7 @@ export function BulkPage() {
             </div>
           </ValidatedForm>
           {(selectedInputs.length > 0 || selectedOutputs.length > 0) && (
-            <table className="w-full">
+            <table className="w-full" table-layout="fixed">
               <thead className="text-left text-white text-xs bg-neutral-800">
                 <tr className="rounded-xl overflow-hidden">
                   {selectedInputs?.map((input: any) => (
@@ -318,6 +324,7 @@ export function BulkPage() {
                       {output.label}
                     </th>
                   ))}
+                  <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
                   <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
                 </tr>
               </thead>
@@ -338,12 +345,13 @@ export function BulkPage() {
                       {selectedInputs.map((input) => (
                         <td
                           key={input.label}
-                          className="py-3 px-5 text-neutral-100 text-sm"
+                          className="w-[40%] py-3 px-5 text-neutral-100 text-sm"
                         >
                           <TextareaInput
                             id={input.label}
                             key={input.label}
                             value={test.inputs[input.label]}
+                            areaClassName="min-h-full"
                             onChange={(e) => {
                               e.preventDefault();
                               const value = e.target.value;
@@ -368,20 +376,20 @@ export function BulkPage() {
                       {selectedOutputs.map((output) => (
                         <td
                           key={output.label}
-                          className="py-3 px-5 text-neutral-100 text-sm"
+                          className="py-3 px-5 text-neutral-100 text-sm w-[40%]"
                         >
                           <ChatMarkdown>
                             {test.outputs[output.label]}
                           </ChatMarkdown>
                         </td>
                       ))}
-                      <td className="py-3 px-5 text-neutral-100 text-sm">
+                      <td className="w-7 py-3 text-neutral-100 text-sm">
                         {tests.length > 1 ? (
                           <IconButton
                             size="xs"
                             variant="basic"
                             aria-label={`Remove item`}
-                            className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+                            className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
                             title={`Remove item`}
                             icon={<Icon iconName="trash" />}
                             onClick={() =>
@@ -392,6 +400,26 @@ export function BulkPage() {
                           />
                         ) : null}
                       </td>
+                      {test.run && (
+                        <td className="w-7 py-3">
+                          <Link
+                            id={`run-link-${test.run}`}
+                            to={routes.pipelineRun(
+                              organizationId,
+                              pipelineId,
+                              test.run,
+                            )}
+                          >
+                            <IconButton
+                              className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
+                              variant="basic"
+                              aria-label="Go to run overview"
+                              icon={<Icon iconName="external-link" />}
+                              size="xs"
+                            />
+                          </Link>
+                        </td>
+                      )}
                     </tr>
                   );
                 })}
