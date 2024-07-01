@@ -48,8 +48,8 @@ export async function loader(args: LoaderFunctionArgs) {
 
     return json({
       pipeline: pipeline.data,
-      organizationId: params.organizationId,
-      pipelineId: params.pipelineId,
+      organizationId: params.organizationId as string,
+      pipelineId: params.pipelineId as string,
       alias,
     });
   })(args);
@@ -67,11 +67,11 @@ export default function WebsiteChat() {
     messages,
     runId,
   } = useChat({
-    input: pipeline.interface_config?.webchat?.input ?? "",
-    output: pipeline.interface_config?.webchat?.output ?? "",
+    input: pipeline.interface_config.webchat.inputs[0] ?? "",
+    output: pipeline.interface_config.webchat.outputs[0] ?? "",
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
-    useAuth: !(pipeline.interface_config?.webchat?.public ?? false),
+    useAuth: !(pipeline.interface_config.webchat.public ?? false),
   });
 
   const {
@@ -85,7 +85,7 @@ export default function WebsiteChat() {
     organizationId: parseInt(organizationId),
     pipelineId: parseInt(pipelineId),
     runId: runId,
-    fileBlockName: pipeline.interface_config?.webchat?.file,
+    fileBlockName: pipeline.interface_config.webchat.inputs[1],
   });
 
   const onSubmit = useCallback(
@@ -144,7 +144,7 @@ ${JSON.stringify(files)}
           disabled={connectionStatus !== "running" || isUploading}
           generating={isGenerating}
           attachments={
-            pipeline.interface_config?.webchat?.file &&
+            pipeline.interface_config.webchat.inputs[1] &&
             fileList.length > 0 && (
               <div className="w-full flex gap-1 p-1 flex-wrap">
                 {fileList.map((file) => {
@@ -170,7 +170,7 @@ ${JSON.stringify(files)}
             )
           }
           prefix={
-            pipeline.interface_config?.webchat?.file && (
+            pipeline.interface_config.webchat.inputs[1] && (
               <label className="text-white pl-2 cursor-pointer">
                 <Icon iconName="upload" />
                 <input

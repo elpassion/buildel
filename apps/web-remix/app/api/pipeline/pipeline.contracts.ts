@@ -11,13 +11,13 @@ import { zfd } from "zod-form-data";
 export const InterfaceConfigForm = z.object({
   inputs: z
     .union([
-      z.string().transform((value) => JSON.parse(value)),
+      z.string().transform((value) => JSON.parse(value) as string[]),
       z.array(z.string()),
     ])
     .default([]),
   outputs: z
     .union([
-      z.string().transform((value) => JSON.parse(value)),
+      z.string().transform((value) => JSON.parse(value) as string[]),
       z.array(z.string()),
     ])
     .default([]),
@@ -28,8 +28,16 @@ export const InterfaceConfigForm = z.object({
 });
 
 export const InterfaceConfig = z.object({
-  webchat: InterfaceConfigForm.optional().default({}),
-  form: InterfaceConfigForm.optional().default({}),
+  webchat: InterfaceConfigForm.optional().default({
+    inputs: [] as string[],
+    outputs: [] as string[],
+    public: false,
+  }),
+  form: InterfaceConfigForm.optional().default({
+    inputs: [] as string[],
+    outputs: [] as string[],
+    public: false,
+  }),
 });
 
 export const Pipeline = z.object({
@@ -68,7 +76,36 @@ export const Pipeline = z.object({
 export const PipelinePublic = z.object({
   id: z.number(),
   name: z.string(),
-  interface_config: z.union([InterfaceConfig, z.null()]),
+  interface_config: z
+    .union([InterfaceConfig, z.null()])
+    .transform((c) =>
+      c
+        ? c
+        : {
+            webchat: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+            form: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+          },
+    )
+    .default({
+      webchat: {
+        inputs: [],
+        outputs: [],
+        public: false,
+      },
+      form: {
+        inputs: [],
+        outputs: [],
+        public: false,
+      },
+    }),
 });
 
 export const ExtendedPipeline = z.object({
