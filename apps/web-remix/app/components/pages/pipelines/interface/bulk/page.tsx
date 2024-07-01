@@ -23,12 +23,13 @@ import {
 import { SelectInput } from "~/components/form/inputs/select.input";
 import { MultiValue } from "react-select";
 import { IDropdownOption } from "@elpassion/taco/Dropdown";
+import { ClientOnly } from "remix-utils/client-only";
 
 export function BulkPage() {
-  const validator = useMemo(() => withZod(schema), []);
   const { organizationId, pipelineId, pipeline } =
     useLoaderData<typeof loader>();
 
+  const validator = useMemo(() => withZod(schema), []);
   const [selectedInputs, setSelectedInputs] = useState<
     MultiValue<IDropdownOption>
   >([]);
@@ -96,8 +97,8 @@ export function BulkPage() {
             input_name: "input",
             data: value,
           })),
-          wait_for_outputs: outputs.map((output) => ({
-            block_name: output.name,
+          wait_for_outputs: selectedOutputs.map((output) => ({
+            block_name: output.label,
             output_name: "output",
           })),
         }),
@@ -241,51 +242,59 @@ export function BulkPage() {
           >
             <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 items-center max-w-screen-2xl">
               <Field name="inputs">
-                <SelectInput
-                  options={inputs.map(toSelectOption)}
-                  label="Inputs"
-                  isMulti
-                  id="inputs"
-                  onSelect={(selected: MultiValue<IDropdownOption>) => {
-                    setSelectedInputs(selected);
-                    setTests((tests) =>
-                      tests.map((test) => ({
-                        ...test,
-                        inputs: selected.reduce(
-                          (acc, input) => ({
-                            ...acc,
-                            [input.label]: "",
-                          }),
-                          {},
-                        ),
-                      })),
-                    );
-                  }}
-                />
+                <ClientOnly fallback={<div />}>
+                  {() => (
+                    <SelectInput
+                      options={inputs.map(toSelectOption)}
+                      label="Inputs"
+                      isMulti
+                      id="inputs"
+                      onSelect={(selected: MultiValue<IDropdownOption>) => {
+                        setSelectedInputs(selected);
+                        setTests((tests) =>
+                          tests.map((test) => ({
+                            ...test,
+                            inputs: selected.reduce(
+                              (acc, input) => ({
+                                ...acc,
+                                [input.label]: "",
+                              }),
+                              {},
+                            ),
+                          })),
+                        );
+                      }}
+                    />
+                  )}
+                </ClientOnly>
               </Field>
 
               <Field name="outputs">
-                <SelectInput
-                  options={outputs.map(toSelectOption)}
-                  label="Outputs"
-                  isMulti
-                  id="outputs"
-                  onSelect={(selected: MultiValue<IDropdownOption>) => {
-                    setSelectedOutputs(selected);
-                    setTests((tests) =>
-                      tests.map((test) => ({
-                        ...test,
-                        outputs: selected.reduce(
-                          (acc, output) => ({
-                            ...acc,
-                            [output.label]: "",
-                          }),
-                          {},
-                        ),
-                      })),
-                    );
-                  }}
-                />
+                <ClientOnly fallback={<div />}>
+                  {() => (
+                    <SelectInput
+                      options={outputs.map(toSelectOption)}
+                      label="Outputs"
+                      isMulti
+                      id="outputs"
+                      onSelect={(selected: MultiValue<IDropdownOption>) => {
+                        setSelectedOutputs(selected);
+                        setTests((tests) =>
+                          tests.map((test) => ({
+                            ...test,
+                            outputs: selected.reduce(
+                              (acc, output) => ({
+                                ...acc,
+                                [output.label]: "",
+                              }),
+                              {},
+                            ),
+                          })),
+                        );
+                      }}
+                    />
+                  )}
+                </ClientOnly>
               </Field>
             </div>
           </ValidatedForm>
