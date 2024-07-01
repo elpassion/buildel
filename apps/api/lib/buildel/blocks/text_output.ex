@@ -75,4 +75,9 @@ defmodule Buildel.Blocks.TextOutput do
 
     output(state, "output", {:text, text}, %{stream_stop: :schedule})
   end
+
+  def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do
+    state = send_stream_stop(state, "output")
+    {:noreply, state}
+  end
 end
