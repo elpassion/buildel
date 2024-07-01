@@ -1,65 +1,71 @@
+import { withZod } from "@remix-validated-form/with-zod";
 import React, { useMemo } from "react";
 import { ValidatedForm } from "remix-validated-form";
-import { Button } from "@elpassion/taco";
-import { withZod } from "@remix-validated-form/with-zod";
-import {
-  IBlockConfig,
-  IFormInterfaceConfig,
-  IPipeline,
-} from "~/components/pages/pipelines/pipeline.types";
+import { InterfaceConfig } from "~/api/pipeline/pipeline.contracts";
+import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
 import { Field } from "~/components/form/fields/field.context";
 import { SelectField } from "~/components/form/fields/select.field";
 import { SubmitButton } from "~/components/form/submit";
-import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
-import { FormInterfaceConfig } from "~/api/pipeline/pipeline.contracts";
+import {
+  IBlockConfig,
+  IInterfaceConfig,
+  IPipeline,
+} from "~/components/pages/pipelines/pipeline.types";
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;
-  onSubmit: (config: IFormInterfaceConfig) => void;
+  onSubmit: (config: IInterfaceConfig) => void;
 }
 
 export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   pipeline,
   onSubmit,
 }) => {
-  const validator = useMemo(() => withZod(FormInterfaceConfig), []);
+  const validator = useMemo(() => withZod(InterfaceConfig), []);
 
-  const inputs = pipeline.config.blocks.filter(
-    (block) => ["text_input", "file_input"].includes(block.type),
+  const inputs = pipeline.config.blocks.filter((block) =>
+    ["text_input", "file_input"].includes(block.type),
   );
   const outputs = pipeline.config.blocks.filter(
     (block) => block.type === "text_output", // todo: add file output
   );
 
   const handleOnSubmit = (
-    data: IFormInterfaceConfig,
+    data: IInterfaceConfig,
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
-    onSubmit(data);
+    const body = { ...pipeline.interface_config, form: data.form };
+    onSubmit(body);
   };
 
   return (
     <ValidatedForm
       defaultValues={{
-        inputs: pipeline.interface_config?.form?.inputs,
-        outputs: pipeline.interface_config?.form?.outputs,
-        public: pipeline.interface_config?.form?.public,
+        ...pipeline.interface_config,
       }}
       validator={validator}
       noValidate
       onSubmit={handleOnSubmit}
     >
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 items-center max-w-screen-2xl">
-        <Field name="input">
-          <SelectField options={inputs.map(toSelectOption)} label="Input" />
+        <Field name="form.inputs">
+          <SelectField
+            options={inputs.map(toSelectOption)}
+            mode="multiple"
+            label="Input"
+          />
         </Field>
 
-        <Field name="output">
-          <SelectField options={outputs.map(toSelectOption)} label="Output" />
+        <Field name="form.outputs">
+          <SelectField
+            options={outputs.map(toSelectOption)}
+            mode="multiple"
+            label="Output"
+          />
         </Field>
 
-        <Field name="public">
+        <Field name="form.public">
           <CheckboxInputField label="Public" />
         </Field>
       </div>

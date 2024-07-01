@@ -27,19 +27,23 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const isLatestPipeline = !aliasId || aliasId === "latest";
 
-      const body = { interface_config: result.data };
+      const body = {
+        interface_config: {
+          ...result.data,
+        },
+      };
 
       const res = isLatestPipeline
         ? await pipelineApi.updatePipelinePatch(
             params.organizationId,
             params.pipelineId,
-            body
+            body,
           )
         : await pipelineApi.updateAliasPatch(
             params.organizationId,
             params.pipelineId,
             aliasId,
-            body
+            body,
           );
 
       return json(res.data, {

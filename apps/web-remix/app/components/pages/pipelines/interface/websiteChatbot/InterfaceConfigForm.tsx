@@ -1,22 +1,20 @@
+import { withZod } from "@remix-validated-form/with-zod";
 import React, { useMemo } from "react";
 import { ValidatedForm } from "remix-validated-form";
-import { Button } from "@elpassion/taco";
-import { withZod } from "@remix-validated-form/with-zod";
+import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
+import { Field } from "~/components/form/fields/field.context";
+import { SelectField } from "~/components/form/fields/select.field";
+import { SubmitButton } from "~/components/form/submit";
 import {
   IBlockConfig,
   IInterfaceConfig,
   IPipeline,
-  IWebchatInterfaceConfig,
 } from "~/components/pages/pipelines/pipeline.types";
-import { Field } from "~/components/form/fields/field.context";
-import { SelectField } from "~/components/form/fields/select.field";
 import { schema } from "./schema";
-import { SubmitButton } from "~/components/form/submit";
-import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;
-  onSubmit: (config: IWebchatInterfaceConfig) => void;
+  onSubmit: (config: IInterfaceConfig) => void;
 }
 
 export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
@@ -25,54 +23,49 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 }) => {
   const validator = useMemo(() => withZod(schema), []);
 
-  const inputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_input",
-  );
-  const fileInputs = pipeline.config.blocks.filter(
-    (block) => block.type === "file_input",
+  const inputs = pipeline.config.blocks.filter((block) =>
+    ["text_input", "file_input"].includes(block.type),
   );
   const outputs = pipeline.config.blocks.filter(
     (block) => block.type === "text_output",
   );
 
   const handleOnSubmit = (
-    data: IWebchatInterfaceConfig,
+    data: IInterfaceConfig,
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
-    onSubmit(data);
+    const body = { ...pipeline.interface_config, webchat: data.webchat };
+    onSubmit(body);
   };
 
   return (
     <ValidatedForm
       defaultValues={{
-        input: pipeline.interface_config?.webchat?.input,
-        output: pipeline.interface_config?.webchat?.output,
-        public: pipeline.interface_config?.webchat?.public,
-        file: pipeline.interface_config?.webchat?.file,
+        ...pipeline.interface_config,
       }}
       validator={validator}
       noValidate
       onSubmit={handleOnSubmit}
     >
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 items-center max-w-screen-2xl">
-        <Field name="input">
-          <SelectField options={inputs.map(toSelectOption)} label="Input" />
-        </Field>
-
-        <Field name="output">
-          <SelectField options={outputs.map(toSelectOption)} label="Output" />
-        </Field>
-
-        <Field name="file">
+        <Field name="webchat.inputs">
           <SelectField
-            options={fileInputs.map(toSelectOption)}
-            label="File"
-            allowClear
+            options={inputs.map(toSelectOption)}
+            mode="multiple"
+            label="Input"
           />
         </Field>
 
-        <Field name="public">
+        <Field name="webchat.outputs">
+          <SelectField
+            options={outputs.map(toSelectOption)}
+            mode="multiple"
+            label="Output"
+          />
+        </Field>
+
+        <Field name="webchat.public">
           <CheckboxInputField label="Public" />
         </Field>
       </div>

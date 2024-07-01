@@ -8,32 +8,29 @@ import {
 import { PaginationMeta } from "~/components/pagination/pagination.types";
 import { zfd } from "zod-form-data";
 
-
-// export const WebchatInterfaceConfig = z.object({
-//   input: z.string().min(2).optional(),
-//   output: z.string().min(2).optional(),
-//   file: z
-//     .string()
-//     .transform((v) => (v === "" ? undefined : v))
-//     .optional(),
-//   public: z
-//     .union([z.boolean(), z.string().transform((v) => v === "on")])
-//     .optional(),
-// });
-
 export const InterfaceConfigForm = z.object({
-  inputs: z.array(z.object({ name: z.string(), type: z.string() })),
-  outputs: z.array(z.object({ name: z.string(), type: z.string() })),
+  inputs: z
+    .union([
+      z.string().transform((value) => JSON.parse(value)),
+      z.array(z.string()),
+    ])
+    .default([]),
+  outputs: z
+    .union([
+      z.string().transform((value) => JSON.parse(value)),
+      z.array(z.string()),
+    ])
+    .default([]),
   public: z
     .union([z.boolean(), z.string().transform((v) => v === "on")])
-    .optional(),
-})
+    .optional()
+    .default(false),
+});
 
 export const InterfaceConfig = z.object({
-  webchat: InterfaceConfigForm.optional(),
-  form: InterfaceConfigForm.optional(),
-})
-
+  webchat: InterfaceConfigForm.optional().default({}),
+  form: InterfaceConfigForm.optional().default({}),
+});
 
 export const Pipeline = z.object({
   id: z.number(),
@@ -42,7 +39,25 @@ export const Pipeline = z.object({
   runs_count: z.number(),
   budget_limit: z.union([zfd.numeric(), z.null()]),
   logs_enabled: z.boolean(),
-  interface_config: z.union([InterfaceConfig, z.null()]),
+  interface_config: z
+    .union([InterfaceConfig, z.null()])
+    .transform((c) =>
+      c
+        ? c
+        : {
+            webchat: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+            form: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+          },
+    )
+    .default({}),
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),
@@ -248,8 +263,13 @@ export const PipelineRunLog = z.object({
   created_at: z.string(),
 });
 
-export const PipelineRunLogsResponse = z
-  .object({ data: z.array(PipelineRunLog), meta: z.object({ after: z.string().nullish(), totalItems: z.number().nullish() }) })
+export const PipelineRunLogsResponse = z.object({
+  data: z.array(PipelineRunLog),
+  meta: z.object({
+    after: z.string().nullish(),
+    totalItems: z.number().nullish(),
+  }),
+});
 
 export type IPipelineRunLogsResponse = z.TypeOf<typeof PipelineRunLogsResponse>;
 export type IPipelineRunLog = z.TypeOf<typeof PipelineRunLog>;

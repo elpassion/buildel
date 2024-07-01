@@ -1,13 +1,12 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
-import { actionBuilder } from "~/utils.server";
-import { requireLogin } from "~/session.server";
-import invariant from "tiny-invariant";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
-import { setServerToast } from "~/utils/toast.server";
+import invariant from "tiny-invariant";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
-import { schema } from "./schema";
-import { WebchatInterfaceConfig } from "~/api/pipeline/pipeline.contracts";
+import { InterfaceConfig } from "~/api/pipeline/pipeline.contracts";
+import { requireLogin } from "~/session.server";
+import { actionBuilder } from "~/utils.server";
+import { setServerToast } from "~/utils/toast.server";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -17,7 +16,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       invariant(params.organizationId, "Missing organizationId");
       invariant(params.pipelineId, "Missing pipelineId");
 
-      const validator = withZod(WebchatInterfaceConfig);
+      const validator = withZod(InterfaceConfig);
 
       const result = await validator.validate(await actionArgs.request.json());
 
@@ -29,23 +28,21 @@ export async function action(actionArgs: ActionFunctionArgs) {
       const isLatestPipeline = !aliasId || aliasId === "latest";
 
       const body = {
-        interface_config: {
-          webchat: result.data
-        }
+        interface_config: result.data,
       };
 
       const res = isLatestPipeline
         ? await pipelineApi.updatePipelinePatch(
-          params.organizationId,
-          params.pipelineId,
-          body
-        )
+            params.organizationId,
+            params.pipelineId,
+            body,
+          )
         : await pipelineApi.updateAliasPatch(
-          params.organizationId,
-          params.pipelineId,
-          aliasId,
-          body
-        );
+            params.organizationId,
+            params.pipelineId,
+            aliasId,
+            body,
+          );
 
       return json(res.data, {
         headers: {
