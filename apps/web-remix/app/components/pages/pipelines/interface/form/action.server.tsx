@@ -7,7 +7,6 @@ import { validationError } from "remix-validated-form";
 import { setServerToast } from "~/utils/toast.server";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { schema } from "./schema";
-import { WebchatInterfaceConfig } from "~/api/pipeline/pipeline.contracts";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -17,7 +16,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       invariant(params.organizationId, "Missing organizationId");
       invariant(params.pipelineId, "Missing pipelineId");
 
-      const validator = withZod(WebchatInterfaceConfig);
+      const validator = withZod(schema);
 
       const result = await validator.validate(await actionArgs.request.json());
 
@@ -28,24 +27,20 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const isLatestPipeline = !aliasId || aliasId === "latest";
 
-      const body = {
-        interface_config: {
-          webchat: result.data
-        }
-      };
+      const body = { interface_config: result.data };
 
       const res = isLatestPipeline
         ? await pipelineApi.updatePipelinePatch(
-          params.organizationId,
-          params.pipelineId,
-          body
-        )
+            params.organizationId,
+            params.pipelineId,
+            body
+          )
         : await pipelineApi.updateAliasPatch(
-          params.organizationId,
-          params.pipelineId,
-          aliasId,
-          body
-        );
+            params.organizationId,
+            params.pipelineId,
+            aliasId,
+            body
+          );
 
       return json(res.data, {
         headers: {

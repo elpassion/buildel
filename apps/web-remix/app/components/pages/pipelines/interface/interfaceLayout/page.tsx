@@ -46,6 +46,16 @@ export function InterfaceLayout() {
           </OutlinedTabLink>
 
           <OutlinedTabLink
+            to={routes.pipelineForm(
+              organizationId,
+              pipelineId,
+              Object.fromEntries(searchParams.entries()),
+            )}
+          >
+            Form
+          </OutlinedTabLink>
+
+          <OutlinedTabLink
             to={routes.pipelineOpenAIApi(
               organizationId,
               pipelineId,

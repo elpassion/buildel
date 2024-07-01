@@ -40,7 +40,6 @@ defmodule BuildelWeb.LogsChannel do
          {:ok, run} <- Pipelines.get_pipeline_run(pipeline, run_id),
          :ok <-
            verify_auth_token(
-             pipeline.interface_config,
              socket.id,
              channel_name,
              user_data,
@@ -101,11 +100,7 @@ defmodule BuildelWeb.LogsChannel do
     Buildel.PubSub |> PubSub.subscribe(topic)
   end
 
-  defp verify_auth_token(%{"public" => true}, _, _, _, _, _) do
-    :ok
-  end
-
-  defp verify_auth_token(_config, socket_id, channel_name, user_json, auth_token, secret) do
+  defp verify_auth_token(socket_id, channel_name, user_json, auth_token, secret) do
     BuildelWeb.ChannelAuth.verify_auth_token(
       socket_id,
       channel_name,

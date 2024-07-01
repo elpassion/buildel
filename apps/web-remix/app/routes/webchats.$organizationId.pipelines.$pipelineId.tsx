@@ -58,7 +58,6 @@ export async function loader(args: LoaderFunctionArgs) {
 export default function WebsiteChat() {
   const { pipelineId, organizationId, pipeline, alias } =
     useLoaderData<typeof loader>();
-
   const {
     isGenerating,
     connectionStatus,
@@ -68,12 +67,11 @@ export default function WebsiteChat() {
     messages,
     runId,
   } = useChat({
-    input: pipeline.interface_config?.input ?? "",
-    output: pipeline.interface_config?.output ?? "",
-    chat: pipeline.interface_config?.chat ?? "",
+    input: pipeline.interface_config?.webchat?.input ?? "",
+    output: pipeline.interface_config?.webchat?.output ?? "",
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
-    useAuth: !(pipeline.interface_config?.public ?? false),
+    useAuth: !(pipeline.interface_config?.webchat?.public ?? false),
   });
 
   const {
@@ -87,7 +85,7 @@ export default function WebsiteChat() {
     organizationId: parseInt(organizationId),
     pipelineId: parseInt(pipelineId),
     runId: runId,
-    fileBlockName: pipeline.interface_config?.file,
+    fileBlockName: pipeline.interface_config?.webchat?.file,
   });
 
   const onSubmit = useCallback(
@@ -146,7 +144,7 @@ ${JSON.stringify(files)}
           disabled={connectionStatus !== "running" || isUploading}
           generating={isGenerating}
           attachments={
-            pipeline.interface_config?.file &&
+            pipeline.interface_config?.webchat?.file &&
             fileList.length > 0 && (
               <div className="w-full flex gap-1 p-1 flex-wrap">
                 {fileList.map((file) => {
@@ -172,7 +170,7 @@ ${JSON.stringify(files)}
             )
           }
           prefix={
-            pipeline.interface_config?.file && (
+            pipeline.interface_config?.webchat?.file && (
               <label className="text-white pl-2 cursor-pointer">
                 <Icon iconName="upload" />
                 <input

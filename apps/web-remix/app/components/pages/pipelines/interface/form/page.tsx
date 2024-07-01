@@ -13,13 +13,12 @@ import {
 import {
   IInterfaceConfig,
   IPipeline,
-  IWebchatInterfaceConfig,
 } from "~/components/pages/pipelines/pipeline.types";
 import { InterfaceConfigForm } from "./InterfaceConfigForm";
 import { loader } from "./loader.server";
 import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 
-export function WebsiteChatbotPage() {
+export function FormPage() {
   const updateFetcher = useFetcher<IPipeline>();
   const [searchParams] = useSearchParams();
 
@@ -32,7 +31,7 @@ export function WebsiteChatbotPage() {
     Object.fromEntries(searchParams.entries())
   )}`;
 
-  const handleUpdate = (interfaceConfig: IWebchatInterfaceConfig) => {
+  const handleUpdate = (interfaceConfig: IInterfaceConfig) => {
     updateFetcher.submit(interfaceConfig, {
       method: "PATCH",
       encType: "application/json",
@@ -43,7 +42,7 @@ export function WebsiteChatbotPage() {
     <div>
       <div className="flex flex-col gap-3 mb-6 md:justify-between md:flex-row md:items-center">
         <div>
-          <h2 className="text-lg text-white font-medium">Website Chatbot</h2>
+          <h2 className="text-lg text-white font-medium">Website Chatbotblablabla</h2>
           <p className="text-white text-xs">
             Share your Chatbot through url or embed into page.
           </p>
@@ -139,7 +138,7 @@ export function WebsiteChatbotPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Website Chatbot",
+      title: "Form",
     },
   ];
 };

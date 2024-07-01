@@ -50,7 +50,7 @@ defmodule BuildelWeb.PipelineChannel do
          {:ok, config} <- Pipelines.get_pipeline_config(pipeline, alias),
          :ok <-
            verify_auth_token(
-             pipeline.interface_config,
+             is_public_interface?(pipeline.interface_config, metadata),
              socket.id,
              channel_name,
              user_data,
@@ -219,11 +219,38 @@ defmodule BuildelWeb.PipelineChannel do
     end)
   end
 
-  defp verify_auth_token(%{"public" => true}, _, _, _, _, _) do
+  defp is_public_interface?(interface_config, metadata) do
+    case Map.get(metadata, "interface") do
+      nil ->
+        false
+
+      interface ->
+        case Map.get(interface_config, interface, %{}) do
+          %{"public" => public} -> public
+          _ -> false
+        end
+    end
+  end
+
+  defp verify_auth_token(
+         true,
+         _,
+         _,
+         _,
+         _,
+         _
+       ) do
     :ok
   end
 
-  defp verify_auth_token(_config, socket_id, channel_name, user_json, auth_token, secret) do
+  defp verify_auth_token(
+         _config,
+         socket_id,
+         channel_name,
+         user_json,
+         auth_token,
+         secret
+       ) do
     BuildelWeb.ChannelAuth.verify_auth_token(
       socket_id,
       channel_name,

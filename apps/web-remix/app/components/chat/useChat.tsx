@@ -8,7 +8,6 @@ import { IMessage, MessageRole } from "./chat.types";
 interface UseChatProps {
   input: string;
   output: string;
-  chat: string;
   organizationId: number;
   pipelineId: number;
   onBlockOutput?: (
@@ -23,7 +22,6 @@ interface UseChatProps {
 export const useChat = ({
   input,
   output,
-  chat,
   organizationId,
   pipelineId,
   onBlockOutput: onBlockOutputProps,
@@ -72,7 +70,7 @@ export const useChat = ({
       setIsGenerating(true);
     }
 
-    if (blockId.includes(chat) && !isWorking) {
+    if (blockId.includes(output) && !isWorking) {
       setIsGenerating(false);
       onFinish?.();
     }

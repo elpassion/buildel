@@ -27,7 +27,7 @@ export function usePipelineRun(
 
   const startRun = async (args: BuildelRunStartArgs) => {
     assert(run.current);
-    await run.current.start(args);
+    await run.current.start(args).catch(console.error);
   };
   const stopRun = async () => {
     assert(run.current);

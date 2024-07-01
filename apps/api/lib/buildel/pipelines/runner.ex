@@ -43,13 +43,13 @@ defmodule Buildel.Pipelines.Runner do
   end
 
   def create_chat_completion(%Run{} = run, params) do
-    block_name = run.pipeline.interface_config["chat"] || "chat_1"
+    block_name = "chat_1"
 
     Buildel.Blocks.Block.call(block_pid(run, block_name), :chat_completion, params)
   end
 
   def create_chat_completion_stream(%Run{} = run, params) do
-    block_name = run.pipeline.interface_config["chat"] || "chat_1"
+    block_name = "chat_1"
 
     Buildel.Blocks.Block.call(
       block_pid(run, block_name),

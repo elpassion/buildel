@@ -4,39 +4,35 @@ import { Button } from "@elpassion/taco";
 import { withZod } from "@remix-validated-form/with-zod";
 import {
   IBlockConfig,
-  IInterfaceConfig,
+  IFormInterfaceConfig,
   IPipeline,
-  IWebchatInterfaceConfig,
 } from "~/components/pages/pipelines/pipeline.types";
 import { Field } from "~/components/form/fields/field.context";
 import { SelectField } from "~/components/form/fields/select.field";
-import { schema } from "./schema";
 import { SubmitButton } from "~/components/form/submit";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
+import { FormInterfaceConfig } from "~/api/pipeline/pipeline.contracts";
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;
-  onSubmit: (config: IWebchatInterfaceConfig) => void;
+  onSubmit: (config: IFormInterfaceConfig) => void;
 }
 
 export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   pipeline,
   onSubmit,
 }) => {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(FormInterfaceConfig), []);
 
   const inputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_input",
-  );
-  const fileInputs = pipeline.config.blocks.filter(
-    (block) => block.type === "file_input",
+    (block) => ["text_input", "file_input"].includes(block.type),
   );
   const outputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_output",
+    (block) => block.type === "text_output", // todo: add file output
   );
 
   const handleOnSubmit = (
-    data: IWebchatInterfaceConfig,
+    data: IFormInterfaceConfig,
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
@@ -46,10 +42,9 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   return (
     <ValidatedForm
       defaultValues={{
-        input: pipeline.interface_config?.webchat?.input,
-        output: pipeline.interface_config?.webchat?.output,
-        public: pipeline.interface_config?.webchat?.public,
-        file: pipeline.interface_config?.webchat?.file,
+        inputs: pipeline.interface_config?.form?.inputs,
+        outputs: pipeline.interface_config?.form?.outputs,
+        public: pipeline.interface_config?.form?.public,
       }}
       validator={validator}
       noValidate
@@ -62,14 +57,6 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 
         <Field name="output">
           <SelectField options={outputs.map(toSelectOption)} label="Output" />
-        </Field>
-
-        <Field name="file">
-          <SelectField
-            options={fileInputs.map(toSelectOption)}
-            label="File"
-            allowClear
-          />
         </Field>
 
         <Field name="public">

@@ -42,7 +42,8 @@ defmodule BuildelWeb.OrganizationPipelinePublicController do
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id) do
       case pipeline.interface_config do
-        %{"public" => true} -> render(conn, :show, pipeline: pipeline)
+        %{"webchat" => %{"public" => true}} -> render(conn, :show, pipeline: pipeline)
+        %{"form" => %{"public" => true}} -> render(conn, :show, pipeline: pipeline)
         _ -> {:error, :unauthorized}
       end
     end

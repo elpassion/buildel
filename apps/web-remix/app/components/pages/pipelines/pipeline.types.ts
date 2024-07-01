@@ -8,6 +8,10 @@ import {
   InterfaceConfig,
   Alias,
   ExtendedPipeline,
+  FormInterfaceConfig,
+  NewInterfaceConfig,
+  WebchatInterfaceConfig,
+  InterfaceConfigForm,
 } from "~/api/pipeline/pipeline.contracts";
 import {
   ExtendedBlockConfig,
@@ -65,6 +69,7 @@ export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
 export type IBlockType = z.TypeOf<typeof BlockType>;
 
 export type IInterfaceConfig = z.infer<typeof InterfaceConfig>;
+export type IInterfaceConfigForm = z.infer<typeof InterfaceConfigForm>;
 
 export type IPipeline = z.infer<typeof Pipeline>;
 
