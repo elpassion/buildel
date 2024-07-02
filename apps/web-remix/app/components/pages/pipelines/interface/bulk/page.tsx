@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ValidatedForm } from "remix-validated-form";
 import { Link, MetaFunction, useLoaderData } from "@remix-run/react";
 import { v4 as uuidv4 } from "uuid";
@@ -20,23 +20,17 @@ import {
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
 } from "~/components/interfaces/InterfaceSection";
-import { SelectInput } from "~/components/form/inputs/select.input";
-import { MultiValue } from "react-select";
-import { IDropdownOption } from "@elpassion/taco/Dropdown";
-import { ClientOnly } from "remix-utils/client-only";
 import { routes } from "~/utils/routes.utils";
+import { SelectField } from "~/components/form/fields/select.field";
+import "./bulk.styles.css";
 
 export function BulkPage() {
   const { organizationId, pipelineId, pipeline } =
     useLoaderData<typeof loader>();
 
   const validator = useMemo(() => withZod(schema), []);
-  const [selectedInputs, setSelectedInputs] = useState<
-    MultiValue<IDropdownOption>
-  >([]);
-  const [selectedOutputs, setSelectedOutputs] = useState<
-    MultiValue<IDropdownOption>
-  >([]);
+  const [selectedInputs, setSelectedInputs] = useState<string[]>([]);
+  const [selectedOutputs, setSelectedOutputs] = useState<string[]>([]);
 
   const inputs = pipeline.config.blocks.filter(
     (block) => block.type === "text_input",
@@ -61,11 +55,11 @@ export function BulkPage() {
       id: uuidv4(),
       status: "pending" as const,
       inputs: selectedInputs.reduce(
-        (acc, input) => ({ ...acc, [input.label]: " " }),
+        (acc, input) => ({ ...acc, [input]: " " }),
         {},
       ),
       outputs: selectedOutputs.reduce(
-        (acc, output) => ({ ...acc, [output.label]: "" }),
+        (acc, output) => ({ ...acc, [output]: "" }),
         {},
       ),
     };
@@ -104,7 +98,7 @@ export function BulkPage() {
             data: value,
           })),
           wait_for_outputs: selectedOutputs.map((output) => ({
-            block_name: output.label,
+            block_name: output,
             output_name: "output",
           })),
         }),
@@ -171,6 +165,42 @@ export function BulkPage() {
 
     document.body.removeChild(element);
   }
+
+  const handleChangeNewSelectedInputs = (
+    newSelected: string[],
+    type: "inputs" | "outputs",
+  ) => {
+    if (type === "inputs") {
+      setSelectedInputs(newSelected);
+      setTests((tests) =>
+        tests.map((test) => ({
+          ...test,
+          inputs: newSelected.reduce(
+            (acc, input) => ({
+              ...acc,
+              [input]: "",
+            }),
+            {},
+          ),
+        })),
+      );
+    }
+    if (type === "outputs") {
+      setSelectedOutputs(newSelected);
+      setTests((tests) =>
+        tests.map((test) => ({
+          ...test,
+          outputs: newSelected.reduce(
+            (acc, output) => ({
+              ...acc,
+              [output]: "",
+            }),
+            {},
+          ),
+        })),
+      );
+    }
+  };
 
   return (
     <div>
@@ -248,59 +278,47 @@ export function BulkPage() {
           >
             <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 items-center max-w-screen-2xl">
               <Field name="inputs">
-                <ClientOnly fallback={<div />}>
-                  {() => (
-                    <SelectInput
-                      options={inputs.map(toSelectOption)}
-                      label="Inputs"
-                      isMulti
-                      id="inputs"
-                      onSelect={(selected: MultiValue<IDropdownOption>) => {
-                        setSelectedInputs(selected);
-                        setTests((tests) =>
-                          tests.map((test) => ({
-                            ...test,
-                            inputs: selected.reduce(
-                              (acc, input) => ({
-                                ...acc,
-                                [input.label]: "",
-                              }),
-                              {},
-                            ),
-                          })),
-                        );
-                      }}
-                    />
-                  )}
-                </ClientOnly>
+                <SelectField
+                  options={inputs.map(toSelectOption)}
+                  label="Inputs"
+                  mode="multiple"
+                  onSelect={(selected: string) => {
+                    const newSelectedInputs = [...selectedInputs, selected];
+
+                    handleChangeNewSelectedInputs(newSelectedInputs, "inputs");
+                  }}
+                  onDeselect={(deselected: string) => {
+                    const newSelectedInputs = selectedInputs.filter(
+                      (item) => item !== deselected,
+                    );
+
+                    handleChangeNewSelectedInputs(newSelectedInputs, "inputs");
+                  }}
+                />
               </Field>
 
               <Field name="outputs">
-                <ClientOnly fallback={<div />}>
-                  {() => (
-                    <SelectInput
-                      options={outputs.map(toSelectOption)}
-                      label="Outputs"
-                      isMulti
-                      id="outputs"
-                      onSelect={(selected: MultiValue<IDropdownOption>) => {
-                        setSelectedOutputs(selected);
-                        setTests((tests) =>
-                          tests.map((test) => ({
-                            ...test,
-                            outputs: selected.reduce(
-                              (acc, output) => ({
-                                ...acc,
-                                [output.label]: "",
-                              }),
-                              {},
-                            ),
-                          })),
-                        );
-                      }}
-                    />
-                  )}
-                </ClientOnly>
+                <SelectField
+                  options={outputs.map(toSelectOption)}
+                  label="Outputs"
+                  mode="multiple"
+                  onSelect={(selected: string) => {
+                    const newSelectedOutputs = [...selectedOutputs, selected];
+                    handleChangeNewSelectedInputs(
+                      newSelectedOutputs,
+                      "outputs",
+                    );
+                  }}
+                  onDeselect={(selected: string) => {
+                    const newSelectedOutputs = selectedOutputs.filter(
+                      (item) => item !== selected,
+                    );
+                    handleChangeNewSelectedInputs(
+                      newSelectedOutputs,
+                      "outputs",
+                    );
+                  }}
+                />
               </Field>
             </div>
           </ValidatedForm>
@@ -308,20 +326,20 @@ export function BulkPage() {
             <table className="w-full" table-layout="fixed">
               <thead className="text-left text-white text-xs bg-neutral-800">
                 <tr className="rounded-xl overflow-hidden">
-                  {selectedInputs?.map((input: any) => (
+                  {selectedInputs?.map((input: string) => (
                     <th
-                      key={input.label}
+                      key={input}
                       className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
                     >
-                      {input.label}
+                      {input}
                     </th>
                   ))}
-                  {selectedOutputs?.map((output: any) => (
+                  {selectedOutputs?.map((output: string) => (
                     <th
-                      key={output.label}
+                      key={output}
                       className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
                     >
-                      {output.label}
+                      {output}
                     </th>
                   ))}
                   <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
@@ -344,13 +362,13 @@ export function BulkPage() {
                     >
                       {selectedInputs.map((input) => (
                         <td
-                          key={input.label}
+                          key={input}
                           className="w-[40%] py-3 px-5 text-neutral-100 text-sm"
                         >
                           <TextareaInput
-                            id={input.label}
-                            key={input.label}
-                            value={test.inputs[input.label]}
+                            id={input}
+                            key={input}
+                            value={test.inputs[input]}
                             areaClassName="min-h-full"
                             onChange={(e) => {
                               e.preventDefault();
@@ -363,7 +381,7 @@ export function BulkPage() {
                                         ...test,
                                         inputs: {
                                           ...test.inputs,
-                                          [input.label]: value,
+                                          [input]: value,
                                         },
                                       }
                                     : t,
@@ -375,12 +393,10 @@ export function BulkPage() {
                       ))}
                       {selectedOutputs.map((output) => (
                         <td
-                          key={output.label}
+                          key={output}
                           className="py-3 px-5 text-neutral-100 text-sm w-[40%]"
                         >
-                          <ChatMarkdown>
-                            {test.outputs[output.label]}
-                          </ChatMarkdown>
+                          <ChatMarkdown>{test.outputs[output]}</ChatMarkdown>
                         </td>
                       ))}
                       <td className="w-7 py-3 text-neutral-100 text-sm">
