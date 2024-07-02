@@ -7,18 +7,23 @@ import {
 } from "~/api/blockType/blockType.contracts";
 import { PaginationMeta } from "~/components/pagination/pagination.types";
 import { zfd } from "zod-form-data";
+import { IInterfaceConfigFormProperty } from "~/components/pages/pipelines/pipeline.types";
 
+export const InterfaceConfigFormProperty = z.object({
+  name: z.string(),
+  type: z.string(),
+})
 export const InterfaceConfigForm = z.object({
   inputs: z
     .union([
-      z.string().transform((value) => JSON.parse(value) as string[]),
-      z.array(z.string()),
+      z.string().transform((value) => JSON.parse(value) as IInterfaceConfigFormProperty[]),
+      z.array(InterfaceConfigFormProperty),
     ])
     .default([]),
   outputs: z
     .union([
-      z.string().transform((value) => JSON.parse(value) as string[]),
-      z.array(z.string()),
+      z.string().transform((value) => JSON.parse(value) as IInterfaceConfigFormProperty[]),
+      z.array(InterfaceConfigFormProperty),
     ])
     .default([]),
   public: z
@@ -29,13 +34,13 @@ export const InterfaceConfigForm = z.object({
 
 export const InterfaceConfig = z.object({
   webchat: InterfaceConfigForm.optional().default({
-    inputs: [] as string[],
-    outputs: [] as string[],
+    inputs: [] as IInterfaceConfigFormProperty[],
+    outputs: [] as IInterfaceConfigFormProperty[],
     public: false,
   }),
   form: InterfaceConfigForm.optional().default({
-    inputs: [] as string[],
-    outputs: [] as string[],
+    inputs: [] as IInterfaceConfigFormProperty[],
+    outputs: [] as IInterfaceConfigFormProperty[],
     public: false,
   }),
 });
@@ -53,17 +58,17 @@ export const Pipeline = z.object({
       c
         ? c
         : {
-            webchat: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
-            form: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
+          webchat: {
+            inputs: [],
+            outputs: [],
+            public: false,
           },
+          form: {
+            inputs: [],
+            outputs: [],
+            public: false,
+          },
+        },
     )
     .default({}),
   config: z.object({
@@ -82,17 +87,17 @@ export const PipelinePublic = z.object({
       c
         ? c
         : {
-            webchat: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
-            form: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
+          webchat: {
+            inputs: [],
+            outputs: [],
+            public: false,
           },
+          form: {
+            inputs: [],
+            outputs: [],
+            public: false,
+          },
+        },
     )
     .default({
       webchat: {

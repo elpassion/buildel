@@ -67,8 +67,8 @@ export default function WebsiteChat() {
     messages,
     runId,
   } = useChat({
-    input: pipeline.interface_config.webchat.inputs[0] ?? "",
-    output: pipeline.interface_config.webchat.outputs[0] ?? "",
+    input: pipeline.interface_config.webchat.inputs.filter(input => input.type === "text_input")[0]?.name ?? "",
+    output: pipeline.interface_config.webchat.outputs.filter(output => output.type === "text_output")[0].name ?? "",
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
     useAuth: !(pipeline.interface_config.webchat.public ?? false),
@@ -85,7 +85,7 @@ export default function WebsiteChat() {
     organizationId: parseInt(organizationId),
     pipelineId: parseInt(pipelineId),
     runId: runId,
-    fileBlockName: pipeline.interface_config.webchat.inputs[1],
+    fileBlockName: pipeline.interface_config.webchat.inputs.filter(input => input.type === "file_input")[0]?.name ?? "",
   });
 
   const onSubmit = useCallback(
@@ -112,7 +112,11 @@ ${JSON.stringify(files)}
   useEffect(() => {
     // todo change it
     setTimeout(() => {
-      startRun({ alias, initial_inputs: [] });
+      startRun({
+        alias, initial_inputs: [], metadata: {
+          interface: "webchat",
+        }
+      });
     }, 500);
 
     return () => {

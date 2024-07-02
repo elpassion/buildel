@@ -1,6 +1,6 @@
 import { withZod } from "@remix-validated-form/with-zod";
 import React, { useMemo } from "react";
-import { ValidatedForm } from "remix-validated-form";
+import { ValidatedForm, useField } from "remix-validated-form";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
 import { Field } from "~/components/form/fields/field.context";
 import { SelectField } from "~/components/form/fields/select.field";
@@ -8,6 +8,7 @@ import { SubmitButton } from "~/components/form/submit";
 import {
   IBlockConfig,
   IInterfaceConfig,
+  IInterfaceConfigFormProperty,
   IPipeline,
 } from "~/components/pages/pipelines/pipeline.types";
 import { schema } from "./schema";
@@ -35,15 +36,37 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
-    const body = { ...pipeline.interface_config, webchat: data.webchat };
+    const inputs = data.webchat.inputs.map((input) => {
+      const parsed = JSON.parse(input as unknown as string);
+      return {
+        name: parsed.name,
+        type: parsed.type,
+      }
+    })
+    const outputs = data.webchat.outputs.map((output) => {
+      const parsed = JSON.parse(output as unknown as string);
+      return {
+        name: parsed.name,
+        type: parsed.type,
+      }
+    })
+
+    const body = {
+      ...pipeline.interface_config,
+      webchat: {
+        inputs,
+        outputs,
+        public: data.webchat.public,
+      }
+    };
     onSubmit(body);
   };
 
+
   return (
     <ValidatedForm
-      defaultValues={{
-        ...pipeline.interface_config,
-      }}
+      id="webchat-config-form"
+      defaultValues={toSelectDefaults(pipeline.interface_config) as any}
       validator={validator}
       noValidate
       onSubmit={handleOnSubmit}
@@ -77,10 +100,20 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   );
 };
 
-function toSelectOption(item: IBlockConfig) {
+function toSelectOption(item: IBlockConfig | IInterfaceConfigFormProperty) {
   return {
     id: item.name.toString(),
-    value: item.name.toString(),
+    value: JSON.stringify({ name: item.name, type: item.type }),
     label: item.name,
+  };
+}
+
+function toSelectDefaults(data: IInterfaceConfig) {
+  return {
+    webchat: {
+      inputs: data.webchat.inputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
+      outputs: data.webchat.outputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
+      public: data.webchat.public,
+    },
   };
 }
