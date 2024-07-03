@@ -240,6 +240,15 @@ export const routes = {
       `/webchats${routes.pipeline(organizationId, pipelineId)}`,
       params,
     ),
+  formPreview: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    params: RouteParam = {},
+  ) =>
+    buildUrlWithParams(
+      `/forms${routes.pipeline(organizationId, pipelineId)}`,
+      params,
+    ),
 };
 
 type OrganizationId = string | number;

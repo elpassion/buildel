@@ -27,7 +27,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     ["text_input", "file_input"].includes(block.type),
   );
   const outputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_output", // todo: add file output
+    (block) => block.type === "text_output",
   );
 
   const handleOnSubmit = (
@@ -35,15 +35,35 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
-    const body = { ...pipeline.interface_config, form: data.form };
+    const inputs = data.form.inputs.map((input) => {
+      const parsed = JSON.parse(input as unknown as string);
+      return {
+        name: parsed.name,
+        type: parsed.type,
+      }
+    })
+    const outputs = data.form.outputs.map((output) => {
+      const parsed = JSON.parse(output as unknown as string);
+      return {
+        name: parsed.name,
+        type: parsed.type,
+      }
+    })
+
+    const body = {
+      ...pipeline.interface_config,
+      form: {
+        inputs,
+        outputs,
+        public: data.form.public,
+      }
+    };
     onSubmit(body);
   };
 
   return (
     <ValidatedForm
-      defaultValues={{
-        ...pipeline.interface_config,
-      }}
+      defaultValues={toSelectDefaults(pipeline.interface_config) as any}
       validator={validator}
       noValidate
       onSubmit={handleOnSubmit}
@@ -80,7 +100,17 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 function toSelectOption(item: IBlockConfig) {
   return {
     id: item.name.toString(),
-    value: item.name.toString(),
+    value: JSON.stringify({ name: item.name, type: item.type }),
     label: item.name,
+  };
+}
+
+function toSelectDefaults(data: IInterfaceConfig) {
+  return {
+    form: {
+      inputs: data.form.inputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
+      outputs: data.form.outputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
+      public: data.form.public,
+    },
   };
 }

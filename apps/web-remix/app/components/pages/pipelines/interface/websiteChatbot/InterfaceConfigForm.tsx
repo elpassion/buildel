@@ -65,7 +65,6 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 
   return (
     <ValidatedForm
-      id="webchat-config-form"
       defaultValues={toSelectDefaults(pipeline.interface_config) as any}
       validator={validator}
       noValidate
@@ -100,7 +99,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   );
 };
 
-function toSelectOption(item: IBlockConfig | IInterfaceConfigFormProperty) {
+function toSelectOption(item: IBlockConfig) {
   return {
     id: item.name.toString(),
     value: JSON.stringify({ name: item.name, type: item.type }),

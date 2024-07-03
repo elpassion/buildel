@@ -25,7 +25,7 @@ export function FormPage() {
   const { organizationId, pipelineId, pageUrl, pipeline, aliasId } =
     useLoaderData<typeof loader>();
 
-  const websiteChatUrl = `${pageUrl}${routes.chatPreview(
+  const websiteFormUrl = `${pageUrl}${routes.formPreview(
     organizationId,
     pipelineId,
     Object.fromEntries(searchParams.entries())
@@ -42,14 +42,14 @@ export function FormPage() {
     <div>
       <div className="flex flex-col gap-3 mb-6 md:justify-between md:flex-row md:items-center">
         <div>
-          <h2 className="text-lg text-white font-medium">Website Chatbotblablabla</h2>
+          <h2 className="text-lg text-white font-medium">Form</h2>
           <p className="text-white text-xs">
-            Share your Chatbot through url or embed into page.
+            Share your form through url or embed into page.
           </p>
         </div>
 
         <BasicLink
-          to={routes.chatPreview(
+          to={routes.formPreview(
             organizationId,
             pipelineId,
             Object.fromEntries(searchParams.entries())
@@ -81,7 +81,7 @@ export function FormPage() {
         <InterfaceSectionHeader>
           <InterfaceSectionHeading>Embed in website</InterfaceSectionHeading>
           <InterfaceSectionHeaderParagraph>
-            Integrate your Buildel Chat easily on your website.
+            Integrate your Buildel Form easily on your website.
           </InterfaceSectionHeaderParagraph>
         </InterfaceSectionHeader>
 
@@ -104,7 +104,7 @@ export function FormPage() {
                   framework: "Html",
                   language: "html",
                   value: `<iframe
-  src="${websiteChatUrl}"
+  src="${websiteFormUrl}"
   width="600"
   height="600"
   title="chat"
@@ -116,7 +116,7 @@ export function FormPage() {
                   framework: "React",
                   language: "html",
                   value: `<iframe
-  src="${websiteChatUrl}"
+  src="${websiteFormUrl}"
   width="600"
   height="600"
   title="chat"
