@@ -5,8 +5,8 @@
   padding: 4px 16px;
 }
 
-.rc-select .rc-select-selection-placeholder,
-.rc-select .rc-select-selection-item {
+.rc-select.rc-select-multiple .rc-select-selection-placeholder,
+.rc-select.rc-select-multiple .rc-select-selection-item {
   transform: translate(0, 0);
 }
 
