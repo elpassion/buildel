@@ -323,7 +323,7 @@ export function BulkPage() {
             </div>
           </ValidatedForm>
           {(selectedInputs.length > 0 || selectedOutputs.length > 0) && (
-            <table className="w-full" table-layout="fixed">
+            <table className="w-full table-auto">
               <thead className="text-left text-white text-xs bg-neutral-800">
                 <tr className="rounded-xl overflow-hidden">
                   {selectedInputs?.map((input: string) => (
@@ -342,8 +342,12 @@ export function BulkPage() {
                       {output}
                     </th>
                   ))}
-                  <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
-                  <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
+                  {tests.length > 1 && (
+                    <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
+                  )}
+                  {tests.find((test) => test?.run) && (
+                    <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -363,13 +367,14 @@ export function BulkPage() {
                       {selectedInputs.map((input) => (
                         <td
                           key={input}
-                          className="w-[40%] py-3 px-5 text-neutral-100 text-sm"
+                          className="py-3 px-5 text-neutral-100 text-sm"
                         >
                           <TextareaInput
                             id={input}
                             key={input}
                             value={test.inputs[input]}
-                            areaClassName="min-h-full"
+                            className="inline-block h-full"
+                            areaClassName="min-h-full !resize-y"
                             onChange={(e) => {
                               e.preventDefault();
                               const value = e.target.value;
@@ -399,8 +404,8 @@ export function BulkPage() {
                           <ChatMarkdown>{test.outputs[output]}</ChatMarkdown>
                         </td>
                       ))}
-                      <td className="w-7 py-3 text-neutral-100 text-sm">
-                        {tests.length > 1 ? (
+                      {tests.length > 1 && (
+                        <td className="w-7 py-3 text-neutral-100 text-sm">
                           <IconButton
                             size="xs"
                             variant="basic"
@@ -414,8 +419,8 @@ export function BulkPage() {
                               )
                             }
                           />
-                        ) : null}
-                      </td>
+                        </td>
+                      )}
                       {test.run && (
                         <td className="w-7 py-3">
                           <Link
