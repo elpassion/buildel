@@ -8,11 +8,18 @@ defmodule Buildel.Pipelines.Runner do
     DynamicSupervisor.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
-  def start_run(%Run{} = run) do
+  def start_run(%Run{} = run, interface_config \\ %{}) do
     spec = {Buildel.Pipelines.Worker, [run]}
 
     with {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec) do
-      {:ok, run |> Buildel.Repo.reload() |> Buildel.Repo.preload(:pipeline)}
+      {:ok,
+       run
+       |> Buildel.Pipelines.Run.changeset(%{
+         interface_config: interface_config
+       })
+       |> Buildel.Repo.update!()
+       |> Buildel.Repo.reload()
+       |> Buildel.Repo.preload(:pipeline)}
     else
       {:error, {:already_started, _}} ->
         {:ok, run |> Buildel.Repo.reload() |> Buildel.Repo.preload(:pipeline)}

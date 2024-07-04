@@ -16,6 +16,8 @@ import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { NodeClearButton, NodeCopyButton, NodeDownloadButton } from "~/components/pages/pipelines/CustomNodes/NodeActionButtons";
 import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
+import { Icon } from "@elpassion/taco";
+import { SmallFileInputField } from "~/components/form/fields/file.field";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -68,7 +70,8 @@ export default function WebsiteForm() {
     pipelineId: pipelineId as unknown as number,
     useAuth: !(pipeline.interface_config.form.public ?? false),
     onFinish: () => {
-      stopRun();
+      console.log("finish")
+      // stopRun();
     },
     onBlockOutput: (blockId, outputName, payload) => {
       setOutputs((prev) => ({
@@ -77,47 +80,6 @@ export default function WebsiteForm() {
       }));
     }
   });
-
-  // const {
-  //   fileList,
-  //   removeFile,
-  //   uploadFile,
-  //   inputRef,
-  //   clearFiles,
-  //   isUploading,
-  // } = useFilesUpload({
-  //   organizationId: parseInt(organizationId),
-  //   pipelineId: parseInt(pipelineId),
-  //   runId: runId,
-  //   fileBlockName: pipeline.interface_config.webchat.inputs.filter(input => input.type === "file_input")[0]?.name ?? "",
-  // });
-
-  // const onSubmit = useCallback(
-  //   (value: string) => {
-  // startRun({
-  //   alias, initial_inputs: [], metadata: {
-  //     interface: "form",
-  //   }
-  // });
-
-  //       const files = fileList
-  //         .map((file) =>
-  //           file.status === "done"
-  //             ? { id: file.id, file_name: file.file_name }
-  //             : null,
-  //         )
-  //         .filter((f) => !!f);
-  //       const filesString = files.length
-  //         ? `
-  // \`\`\`buildel_message_attachments
-  // ${JSON.stringify(files)}
-  // \`\`\`\n`
-  //         : "";
-  //       pushMessage(`${filesString}${value}`);
-  //       clearFiles();
-  // },
-  //[fileList, pushMessage, clearFiles],
-  // );
 
   useEffect(() => {
     return () => {
@@ -128,22 +90,40 @@ export default function WebsiteForm() {
 
   const validator = useMemo(() => withZod(z.any()), []);
 
-  const handleOnSubmit = (foo: any) => {
+  const handleOnSubmit = async (data: any) => {
     setOutputs({});
-    const inputs = Object.entries(foo)
+    await startRun({
+      alias, initial_inputs: [], metadata: {
+        interface: "form",
+      }
+    });
+
+    const inputs = await Promise.all(Object.entries(data)
       .filter(([_, value]) => value)
-      .map(([key, value]) => {
+      .map(async ([key, value]) => {
+        const inputType = pipeline.interface_config.form.inputs.find(input => input.name === key)?.type
+        if (inputType === "file_input") {
+          const blob = await (value as File).arrayBuffer().then((arrayBuffer: any) => {
+            return new Blob([new Uint8Array(arrayBuffer)], {
+              type: (value as File).type,
+            });
+          });
+
+          return {
+            name: `${key}:input`,
+            value: await blob.arrayBuffer() as unknown as string
+          }
+        }
+
         return {
           name: `${key}:input`,
           value: value as string
         }
-      })
+      }))
 
-    startRun({
-      alias, initial_inputs: inputs, metadata: {
-        interface: "form",
-      }
-    });
+    for (const input of inputs) {
+      push(input.name, input.value)
+    }
   }
 
   return (
@@ -164,8 +144,13 @@ export default function WebsiteForm() {
                   />
                 )}
                 {input.type === "file_input" && (
-                  <TextInputField
-                    label={input.name}
+                  <SmallFileInputField
+                    multiple={false}
+                    buttonText={input.name}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      console.log(file)
+                    }}
                   />
                 )}
               </Field>

@@ -4,6 +4,7 @@ defmodule BuildelWeb.PipelineChannel do
 
   require Logger
   alias Buildel.Pipelines
+  alias Buildel.Pipelines.Pipeline
 
   defparams :join do
     required(:auth, :string)
@@ -63,7 +64,8 @@ defmodule BuildelWeb.PipelineChannel do
              pipeline_id: pipeline_id,
              config: config |> Map.put("metadata", metadata)
            }),
-         {:ok, run} <- Pipelines.Runner.start_run(run) do
+         run_interface <- get_interface_config(pipeline, metadata),
+         {:ok, run} <- Pipelines.Runner.start_run(run, run_interface) do
       initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
 
       listen_to_outputs(run)
@@ -99,6 +101,10 @@ defmodule BuildelWeb.PipelineChannel do
     end
   end
 
+  def get_interface_config(%Pipeline{} = pipeline, metadata) do
+    Map.get(pipeline.interface_config, Map.get(metadata, "interface"), %{})
+  end
+
   def terminate(_reason, socket) do
     if socket.assigns |> Map.has_key?(:run) && !socket.assigns.joined_existing do
       Pipelines.Runner.stop_run(socket.assigns.run)
@@ -124,13 +130,28 @@ defmodule BuildelWeb.PipelineChannel do
 
     data =
       case data do
-        {:binary, _} -> data
-        _ -> {:text, data}
+        {:binary, content} ->
+          block_type =
+            run.interface_config
+            |> Map.get("inputs", [])
+            |> Enum.find(%{}, fn input -> Map.get(input, "name") == block_name end)
+            |> Map.get("type")
+
+          if block_type == "file_input" do
+            {:ok, path} = Temp.path()
+            IO.inspect({path, content}, label: "file_input")
+            File.write!(path, content)
+
+            {:binary, path}
+          else
+            data
+          end
+
+        _ ->
+          {:text, data}
       end
 
-    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{
-      method: :file_memory
-    })
+    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{})
   end
 
   def handle_info({output_name, :binary, chunk, _metadata}, socket) do

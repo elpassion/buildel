@@ -84,8 +84,7 @@ export default function WebsiteChat() {
   } = useFilesUpload({
     organizationId: parseInt(organizationId),
     pipelineId: parseInt(pipelineId),
-    runId: runId,
-    fileBlockName: pipeline.interface_config.webchat.inputs.filter(input => input.type === "file_input")[0]?.name ?? "",
+    runId: runId
   });
 
   const onSubmit = useCallback(
@@ -164,7 +163,7 @@ ${JSON.stringify(files)}
                       key={file.id}
                     >
                       {file.file_name}
-                      <button type="button" onClick={() => removeFile(file.id)}>
+                      <button type="button" onClick={() => removeFile(file.id, pipeline.interface_config.webchat.inputs.filter(input => input.type === "file_input")[0]?.name ?? "")}>
                         <Icon iconName="trash" />
                       </button>
                     </div>
@@ -183,7 +182,7 @@ ${JSON.stringify(files)}
                   className="hidden"
                   onChange={(e) => {
                     [...(e.target.files || [])].forEach((file) => {
-                      uploadFile(file);
+                      uploadFile(file, pipeline.interface_config.webchat.inputs.filter(input => input.type === "file_input")[0]?.name ?? "");
                     });
                   }}
                 />
