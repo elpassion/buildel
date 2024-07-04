@@ -1,12 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ValidatedForm } from "remix-validated-form";
-import { Link, MetaFunction, useLoaderData } from "@remix-run/react";
+import { MetaFunction, useLoaderData } from "@remix-run/react";
 import { v4 as uuidv4 } from "uuid";
 import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 import { loader } from "./loader.server";
-import classNames from "classnames";
-import { TextareaInput } from "~/components/form/inputs/textarea.input";
-import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 import { Button, Icon, IconButton } from "@elpassion/taco";
 import { SmallFileInput } from "~/components/form/inputs/file.input";
 import Papa from "papaparse";
@@ -20,9 +17,17 @@ import {
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
 } from "~/components/interfaces/InterfaceSection";
-import { routes } from "~/utils/routes.utils";
 import { SelectField } from "~/components/form/fields/select.field";
 import "./bulk.styles.css";
+import { BulkTable } from "./BulkTable";
+
+export interface ITest {
+  id: string;
+  inputs: Record<string, string>;
+  outputs: Record<string, string>;
+  status: "pending" | "running" | "done";
+  run?: number;
+}
 
 export function BulkPage() {
   const { organizationId, pipelineId, pipeline } =
@@ -43,15 +48,7 @@ export function BulkPage() {
     (block) => block.type === "text_output",
   );
 
-  const [tests, setTests] = useState<
-    {
-      id: string;
-      inputs: Record<string, string>;
-      outputs: Record<string, string>;
-      status: "pending" | "running" | "done";
-      run?: number;
-    }[]
-  >(() => [generateNewTest()]);
+  const [tests, setTests] = useState<ITest[]>(() => [generateNewTest()]);
 
   function generateNewTest() {
     return {
@@ -297,14 +294,12 @@ export function BulkPage() {
                   mode="multiple"
                   onSelect={(selected: string) => {
                     const newSelectedInputs = [...selectedInputs, selected];
-
                     handleChangeNewSelectedInputs(newSelectedInputs, "inputs");
                   }}
                   onDeselect={(deselected: string) => {
                     const newSelectedInputs = selectedInputs.filter(
                       (item) => item !== deselected,
                     );
-
                     handleChangeNewSelectedInputs(newSelectedInputs, "inputs");
                   }}
                 />
@@ -341,142 +336,26 @@ export function BulkPage() {
                 <span className="text-neutral-100">Summary cost ($): </span>
                 {summaryRunCost.reduce((acc, runCost) => acc + runCost.cost, 0)}
               </p>
-              <table className="w-full table-auto">
-                <thead className="text-left text-white text-xs bg-neutral-800">
-                  <tr className="rounded-xl overflow-hidden">
-                    {selectedInputs?.map((input: string) => (
-                      <th
-                        key={input}
-                        className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
-                      >
-                        {input}
-                      </th>
-                    ))}
-                    {selectedOutputs?.map((output: string) => (
-                      <th
-                        key={output}
-                        className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
-                      >
-                        {output}
-                      </th>
-                    ))}
-                    {tests.length > 1 && (
-                      <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
-                    )}
-                    {tests.find((test) => test?.run) && (
-                      <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {tests.map((test) => {
-                    return (
-                      <tr
-                        key={test.id}
-                        className={classNames(
-                          "[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden",
-                          {
-                            "bg-primary-500": test.status === "running",
-                            "bg-neutral-8800": test.status === "done",
-                          },
-                        )}
-                        aria-label="pipeline run"
-                      >
-                        {selectedInputs.map((input) => (
-                          <td
-                            key={input}
-                            className="py-3 px-5 text-neutral-100 text-sm"
-                          >
-                            <TextareaInput
-                              id={input}
-                              key={input}
-                              value={test.inputs[input]}
-                              areaClassName="min-h-full !resize-y"
-                              onChange={(e) => {
-                                e.preventDefault();
-                                const value = e.target.value;
-
-                                setTests((tests) =>
-                                  tests.map((t) =>
-                                    test.id === t.id
-                                      ? {
-                                          ...test,
-                                          inputs: {
-                                            ...test.inputs,
-                                            [input]: value,
-                                          },
-                                        }
-                                      : t,
-                                  ),
-                                );
-                              }}
-                            />
-                          </td>
-                        ))}
-                        {selectedOutputs.map((output) => (
-                          <td
-                            key={output}
-                            className="py-3 px-5 text-neutral-100 text-sm w-[40%]"
-                          >
-                            <ChatMarkdown>{test.outputs[output]}</ChatMarkdown>
-                          </td>
-                        ))}
-                        {tests.length > 1 && (
-                          <td className="w-7 py-3 text-neutral-100 text-sm">
-                            <IconButton
-                              size="xs"
-                              variant="basic"
-                              aria-label={`Remove item`}
-                              className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
-                              title={`Remove item`}
-                              icon={<Icon iconName="trash" />}
-                              onClick={() =>
-                                setTests((tests) =>
-                                  tests.filter(({ id }) => id !== test.id),
-                                )
-                              }
-                            />
-                          </td>
-                        )}
-                        {test.run && (
-                          <td className="w-7 py-3">
-                            <Link
-                              id={`run-link-${test.run}`}
-                              to={routes.pipelineRun(
-                                organizationId,
-                                pipelineId,
-                                test.run,
-                              )}
-                            >
-                              <IconButton
-                                className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
-                                variant="basic"
-                                aria-label="Go to run overview"
-                                icon={<Icon iconName="external-link" />}
-                                size="xs"
-                              />
-                            </Link>
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <BulkTable
+                selectedInputs={selectedInputs}
+                selectedOutputs={selectedOutputs}
+                tests={tests}
+                setTests={setTests}
+                organizationId={organizationId}
+                pipelineId={pipelineId}
+              />
+              <IconButton
+                size="xs"
+                variant="basic"
+                aria-label={`Add item`}
+                className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+                title={`Add item`}
+                icon={<Icon iconName="plus" />}
+                onClick={() =>
+                  setTests((tests) => tests.concat([generateNewTest()]))
+                }
+              />
             </>
-          )}
-          {(selectedInputs.length > 0 || selectedOutputs.length > 0) && (
-            <IconButton
-              size="xs"
-              variant="basic"
-              aria-label={`Add item`}
-              className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
-              title={`Add item`}
-              icon={<Icon iconName="plus" />}
-              onClick={() =>
-                setTests((tests) => tests.concat([generateNewTest()]))
-              }
-            />
           )}
         </div>
       </InterfaceSectionWrapper>
