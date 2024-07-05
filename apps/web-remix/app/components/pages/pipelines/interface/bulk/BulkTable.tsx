@@ -44,9 +44,12 @@ export const BulkTable: React.FC<BulkTableProps> = ({
               {output}
             </th>
           ))}
-          <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
-          <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
-        </tr>
+          {tests.length > 1 && (
+            <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
+          )}
+          {tests.find((test) => test?.run) && (
+            <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
+          )}</tr>
       </thead>
       <tbody>
         {tests.map((test) => {
@@ -98,7 +101,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                   <ChatMarkdown>{test.outputs[output]}</ChatMarkdown>
                 </td>
               ))}
-              {tests.length > 1 ? (
+              {tests.length > 1 && (
                 <td className="w-7 py-3 text-neutral-100 text-sm">
                   <IconButton
                     size="xs"
@@ -114,8 +117,8 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                     }
                   />
                 </td>
-              ) : null}
-              {test?.run ? (
+              )}
+              {test?.run && (
                 <td className="w-7 py-3">
                   <Link
                     id={`run-link-${test.run}`}
@@ -134,7 +137,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                     />
                   </Link>
                 </td>
-              ) : null}
+              )}
             </tr>
           );
         })}
