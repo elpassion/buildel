@@ -36,6 +36,7 @@ export function BulkPage() {
   const validator = useMemo(() => withZod(schema), []);
   const [selectedInputs, setSelectedInputs] = useState<string[]>([]);
   const [selectedOutputs, setSelectedOutputs] = useState<string[]>([]);
+  const [tests, setTests] = useState<ITest[]>(() => [generateNewTest()]);
   const [summaryRunCost, setSummaryRunCost] = useState<
     { id: string; cost: number }[]
   >([]);
@@ -48,14 +49,12 @@ export function BulkPage() {
     (block) => block.type === "text_output",
   );
 
-  const [tests, setTests] = useState<ITest[]>(() => [generateNewTest()]);
-
   function generateNewTest() {
     return {
       id: uuidv4(),
       status: "pending" as const,
       inputs: selectedInputs.reduce(
-        (acc, input) => ({ ...acc, [input]: " " }),
+        (acc, input) => ({ ...acc, [input]: "" }),
         {},
       ),
       outputs: selectedOutputs.reduce(
@@ -124,22 +123,18 @@ export function BulkPage() {
       ),
     );
 
-    await fetch(
+    const runStopResponse = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/stop`,
       {
         method: "POST",
       },
-    )
-      .then((res) => res.json())
-      .then((stopData) => {
-        const newSummaryRunCost = summaryRunCost.map((runCost) =>
-          runCost.id === id
-            ? { id, cost: Number(stopData.data.total_cost) }
-            : runCost,
-        );
+    );
 
-        setSummaryRunCost(newSummaryRunCost);
-      });
+    const {
+      data: { total_cost },
+    } = await runStopResponse.json();
+
+    setSummaryRunCost((prev) => [...prev, { id, cost: Number(total_cost) }]);
   };
 
   const handleOnSubmit = async (e: any) => {

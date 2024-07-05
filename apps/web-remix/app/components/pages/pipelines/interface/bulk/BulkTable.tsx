@@ -24,6 +24,9 @@ export const BulkTable: React.FC<BulkTableProps> = ({
   organizationId,
   pipelineId,
 }) => {
+  const isTrashIconColumnVisible = tests.length > 1;
+  const isRunLinkIconColumnVisible = tests.find((test) => test?.run);
+
   return (
     <table className="w-full table-auto">
       <thead className="text-left text-white text-xs bg-neutral-800">
@@ -44,12 +47,13 @@ export const BulkTable: React.FC<BulkTableProps> = ({
               {output}
             </th>
           ))}
-          {tests.length > 1 && (
+          {isTrashIconColumnVisible && (
             <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
           )}
-          {tests.find((test) => test?.run) && (
+          {isRunLinkIconColumnVisible && (
             <th className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"></th>
-          )}</tr>
+          )}
+        </tr>
       </thead>
       <tbody>
         {tests.map((test) => {
@@ -101,7 +105,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                   <ChatMarkdown>{test.outputs[output]}</ChatMarkdown>
                 </td>
               ))}
-              {tests.length > 1 && (
+              {isTrashIconColumnVisible && (
                 <td className="w-7 py-3 text-neutral-100 text-sm">
                   <IconButton
                     size="xs"
