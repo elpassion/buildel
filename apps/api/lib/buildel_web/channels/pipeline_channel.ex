@@ -102,7 +102,10 @@ defmodule BuildelWeb.PipelineChannel do
   end
 
   def get_interface_config(%Pipeline{} = pipeline, metadata) do
-    Map.get(pipeline.interface_config, Map.get(metadata, "interface"), %{})
+    case pipeline.interface_config do
+      nil -> %{}
+      interface_config -> Map.get(interface_config, Map.get(metadata, "interface"), %{})
+    end
   end
 
   def terminate(_reason, socket) do
@@ -228,8 +231,21 @@ defmodule BuildelWeb.PipelineChannel do
   defp listen_to_outputs(run) do
     context_id = Pipelines.Worker.context_id(run)
 
-    run
-    |> Pipelines.blocks_for_run()
+    interface_output_names =
+      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
+
+    filtered_blocks =
+      case interface_output_names do
+        [] ->
+          run |> Pipelines.blocks_for_run()
+
+        _ ->
+          run
+          |> Pipelines.blocks_for_run()
+          |> Enum.filter(&Enum.member?(interface_output_names, &1.name))
+      end
+
+    filtered_blocks
     |> Enum.map(fn block ->
       public_outputs = block.type.options.outputs |> Enum.filter(fn output -> output.public end)
       Buildel.BlockPubSub.subscribe_to_block(context_id, block.name)

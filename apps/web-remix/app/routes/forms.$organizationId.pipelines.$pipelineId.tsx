@@ -147,10 +147,7 @@ export default function WebsiteForm() {
                   <SmallFileInputField
                     multiple={false}
                     buttonText={input.name}
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      console.log(file)
-                    }}
+                    onChange={async () => { }}
                   />
                 )}
               </Field>

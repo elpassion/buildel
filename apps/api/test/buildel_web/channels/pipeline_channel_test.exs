@@ -229,17 +229,70 @@ defmodule BuildelWeb.PipelineChannelTest do
         payload: ^payload
       }
     end
+
+    test "outputs only outputs allowed in the interface", %{
+      socket: socket,
+      organization: organization,
+      user: user
+    } do
+      user_data = Jason.encode!(%{user_id: user.id})
+
+      pipeline =
+        pipeline_fixture(%{
+          organization_id: organization.id,
+          interface_config: %{
+            "webchat" => %{"outputs" => [%{"name" => "random_block_4", "type" => "audio_output"}]}
+          }
+        })
+
+      {:ok, %{run: _run}, socket} =
+        socket
+        |> subscribe_and_join(
+          BuildelWeb.PipelineChannel,
+          "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+          %{
+            auth:
+              BuildelWeb.ChannelAuth.create_auth_token(
+                "socket_id",
+                "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                user_data,
+                organization.api_key
+              ),
+            user_data: user_data,
+            metadata: %{"interface" => "webchat"}
+          }
+        )
+
+      payload = {:binary, File.read!("test/support/fixtures/real.mp3")}
+
+      socket |> push("input:random_block:input", payload)
+
+      event = "output:random_block_4:output"
+
+      assert_receive %Phoenix.Socket.Message{
+        event: ^event,
+        payload: ^payload
+      }
+
+      event = "output:random_block_3:output"
+      payload = %{message: "Hello"}
+
+      refute_receive %Phoenix.Socket.Message{
+        event: ^event,
+        payload: ^payload
+      }
+    end
   end
 
   describe "public" do
-    test "allows connecting to public channels without auth", %{
+    test "allows connecting to public interfaces without auth", %{
       socket: socket,
       organization: organization
     } do
       pipeline =
         pipeline_fixture(%{
           organization_id: organization.id,
-          interface_config: %{"public" => true}
+          interface_config: %{"webchat" => %{"public" => true}}
         })
 
       {:ok, %{run: _run}, _socket} =
@@ -247,7 +300,11 @@ defmodule BuildelWeb.PipelineChannelTest do
         |> subscribe_and_join(
           BuildelWeb.PipelineChannel,
           "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
-          %{}
+          %{
+            "metadata" => %{
+              "interface" => "webchat"
+            }
+          }
         )
     end
   end
