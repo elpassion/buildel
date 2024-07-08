@@ -142,7 +142,6 @@ defmodule BuildelWeb.PipelineChannel do
 
           if block_type == "file_input" do
             {:ok, path} = Temp.path()
-            IO.inspect({path, content}, label: "file_input")
             File.write!(path, content)
 
             {:binary, path}
@@ -162,8 +161,24 @@ defmodule BuildelWeb.PipelineChannel do
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
 
-    socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
-    {:noreply, socket}
+    run = socket.assigns.run
+
+    interface_output_block_names =
+      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
+
+    case interface_output_block_names do
+      [] ->
+        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+        {:noreply, socket}
+
+      block_names ->
+        if Enum.member?(block_names, block_name) do
+          socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+          {:noreply, socket}
+        else
+          {:noreply, socket}
+        end
+    end
   end
 
   def handle_info({output_name, :text, message, _metadata}, socket) do
@@ -171,8 +186,26 @@ defmodule BuildelWeb.PipelineChannel do
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
 
-    socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
-    {:noreply, socket}
+    run = socket.assigns.run
+
+    interface_output_block_names =
+      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
+
+    case interface_output_block_names do
+      [] ->
+        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
+        {:noreply, socket}
+
+      block_names ->
+        if Enum.member?(block_names, block_name) do
+          socket
+          |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
+
+          {:noreply, socket}
+        else
+          {:noreply, socket}
+        end
+    end
   end
 
   def handle_info({output_name, :start_stream, _, _metadata}, socket) do
@@ -231,21 +264,8 @@ defmodule BuildelWeb.PipelineChannel do
   defp listen_to_outputs(run) do
     context_id = Pipelines.Worker.context_id(run)
 
-    interface_output_names =
-      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
-
-    filtered_blocks =
-      case interface_output_names do
-        [] ->
-          run |> Pipelines.blocks_for_run()
-
-        _ ->
-          run
-          |> Pipelines.blocks_for_run()
-          |> Enum.filter(&Enum.member?(interface_output_names, &1.name))
-      end
-
-    filtered_blocks
+    run
+    |> Pipelines.blocks_for_run()
     |> Enum.map(fn block ->
       public_outputs = block.type.options.outputs |> Enum.filter(fn output -> output.public end)
       Buildel.BlockPubSub.subscribe_to_block(context_id, block.name)
