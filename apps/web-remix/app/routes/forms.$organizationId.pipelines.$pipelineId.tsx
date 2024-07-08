@@ -71,10 +71,6 @@ export default function WebsiteForm() {
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
     useAuth: !(pipeline.interface_config.form.public ?? false),
-    onFinish: () => {
-      console.log("finish")
-      // stopRun();
-    },
     onBlockOutput: (blockId, outputName, payload) => {
       const message = (payload as { message: string })?.message;
 
