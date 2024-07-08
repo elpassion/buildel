@@ -43,22 +43,15 @@ defmodule Buildel.Blocks.Tool do
 
           {response, state} = handle_tool(input, tool_name, info, state)
 
-          respond_to_tool(
-            {:text, response},
-            %{send_to: metadata.send_to, message_id: metadata.message_id}
+          send(
+            send_to,
+            {:response, :text, response, %{message_id: message_id}}
           )
 
           state
         else
           state
         end
-      end
-
-      def respond_to_tool({:text, content}, %{send_to: send_to, message_id: message_id}) do
-        send(
-          send_to,
-          {:response, :text, content, %{message_id: message_id}}
-        )
       end
     end
   end
