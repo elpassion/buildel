@@ -1,6 +1,7 @@
 import { withZod } from "@remix-validated-form/with-zod";
 import React, { useMemo } from "react";
-import { ValidatedForm, useField } from "remix-validated-form";
+import { ValidatedForm } from "remix-validated-form";
+import { InterfaceConfig } from "~/api/pipeline/pipeline.contracts";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
 import { Field } from "~/components/form/fields/field.context";
 import { SelectField } from "~/components/form/fields/select.field";
@@ -8,10 +9,8 @@ import { SubmitButton } from "~/components/form/submit";
 import {
   IBlockConfig,
   IInterfaceConfig,
-  IInterfaceConfigFormProperty,
   IPipeline,
 } from "~/components/pages/pipelines/pipeline.types";
-import { schema } from "./schema";
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;
@@ -22,7 +21,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   pipeline,
   onSubmit,
 }) => {
-  const validator = useMemo(() => withZod(schema), []);
+  const validator = useMemo(() => withZod(InterfaceConfig), []);
 
   const inputs = pipeline.config.blocks.filter((block) =>
     ["text_input", "file_input"].includes(block.type),
@@ -36,14 +35,14 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
-    const inputs = data.webchat.inputs.map((input) => {
+    const inputs = data.form.inputs.map((input) => {
       const parsed = JSON.parse(input as unknown as string);
       return {
         name: parsed.name,
         type: parsed.type,
       }
     })
-    const outputs = data.webchat.outputs.map((output) => {
+    const outputs = data.form.outputs.map((output) => {
       const parsed = JSON.parse(output as unknown as string);
       return {
         name: parsed.name,
@@ -53,15 +52,14 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 
     const body = {
       ...pipeline.interface_config,
-      webchat: {
+      form: {
         inputs,
         outputs,
-        public: data.webchat.public,
+        public: data.form.public,
       }
     };
     onSubmit(body);
   };
-
 
   return (
     <ValidatedForm
@@ -71,7 +69,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
       onSubmit={handleOnSubmit}
     >
       <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 items-center max-w-screen-2xl">
-        <Field name="webchat.inputs">
+        <Field name="form.inputs">
           <SelectField
             options={inputs.map(toSelectOption)}
             mode="multiple"
@@ -79,7 +77,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
           />
         </Field>
 
-        <Field name="webchat.outputs">
+        <Field name="form.outputs">
           <SelectField
             options={outputs.map(toSelectOption)}
             mode="multiple"
@@ -87,7 +85,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
           />
         </Field>
 
-        <Field name="webchat.public">
+        <Field name="form.public">
           <CheckboxInputField label="Public" />
         </Field>
       </div>
@@ -109,10 +107,10 @@ function toSelectOption(item: IBlockConfig) {
 
 function toSelectDefaults(data: IInterfaceConfig) {
   return {
-    webchat: {
-      inputs: data.webchat.inputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
-      outputs: data.webchat.outputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
-      public: data.webchat.public,
+    form: {
+      inputs: data.form.inputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
+      outputs: data.form.outputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
+      public: data.form.public,
     },
   };
 }

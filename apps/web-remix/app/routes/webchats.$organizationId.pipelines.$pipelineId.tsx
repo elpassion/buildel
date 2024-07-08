@@ -48,8 +48,8 @@ export async function loader(args: LoaderFunctionArgs) {
 
     return json({
       pipeline: pipeline.data,
-      organizationId: params.organizationId,
-      pipelineId: params.pipelineId,
+      organizationId: params.organizationId as string,
+      pipelineId: params.pipelineId as string,
       alias,
     });
   })(args);
@@ -58,7 +58,6 @@ export async function loader(args: LoaderFunctionArgs) {
 export default function WebsiteChat() {
   const { pipelineId, organizationId, pipeline, alias } =
     useLoaderData<typeof loader>();
-
   const {
     isGenerating,
     connectionStatus,
@@ -68,12 +67,11 @@ export default function WebsiteChat() {
     messages,
     runId,
   } = useChat({
-    input: pipeline.interface_config?.input ?? "",
-    output: pipeline.interface_config?.output ?? "",
-    chat: pipeline.interface_config?.chat ?? "",
+    input: pipeline.interface_config.webchat.inputs.filter(input => input.type === "text_input")[0]?.name ?? "",
+    output: pipeline.interface_config.webchat.outputs.filter(output => output.type === "text_output")[0].name ?? "",
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
-    useAuth: !(pipeline.interface_config?.public ?? false),
+    useAuth: !(pipeline.interface_config.webchat.public ?? false),
   });
 
   const {
@@ -86,8 +84,7 @@ export default function WebsiteChat() {
   } = useFilesUpload({
     organizationId: parseInt(organizationId),
     pipelineId: parseInt(pipelineId),
-    runId: runId,
-    fileBlockName: pipeline.interface_config?.file,
+    runId: runId
   });
 
   const onSubmit = useCallback(
@@ -114,7 +111,11 @@ ${JSON.stringify(files)}
   useEffect(() => {
     // todo change it
     setTimeout(() => {
-      startRun({ alias, initial_inputs: [] });
+      startRun({
+        alias, initial_inputs: [], metadata: {
+          interface: "webchat",
+        }
+      });
     }, 500);
 
     return () => {
@@ -146,7 +147,7 @@ ${JSON.stringify(files)}
           disabled={connectionStatus !== "running" || isUploading}
           generating={isGenerating}
           attachments={
-            pipeline.interface_config?.file &&
+            pipeline.interface_config.webchat.inputs[1] &&
             fileList.length > 0 && (
               <div className="w-full flex gap-1 p-1 flex-wrap">
                 {fileList.map((file) => {
@@ -162,7 +163,7 @@ ${JSON.stringify(files)}
                       key={file.id}
                     >
                       {file.file_name}
-                      <button type="button" onClick={() => removeFile(file.id)}>
+                      <button type="button" onClick={() => removeFile(file.id, pipeline.interface_config.webchat.inputs.filter(input => input.type === "file_input")[0]?.name ?? "")}>
                         <Icon iconName="trash" />
                       </button>
                     </div>
@@ -172,7 +173,7 @@ ${JSON.stringify(files)}
             )
           }
           prefix={
-            pipeline.interface_config?.file && (
+            pipeline.interface_config.webchat.inputs[1] && (
               <label className="text-white pl-2 cursor-pointer">
                 <Icon iconName="upload" />
                 <input
@@ -181,7 +182,7 @@ ${JSON.stringify(files)}
                   className="hidden"
                   onChange={(e) => {
                     [...(e.target.files || [])].forEach((file) => {
-                      uploadFile(file);
+                      uploadFile(file, pipeline.interface_config.webchat.inputs.filter(input => input.type === "file_input")[0]?.name ?? "");
                     });
                   }}
                 />

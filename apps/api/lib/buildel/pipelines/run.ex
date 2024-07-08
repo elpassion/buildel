@@ -10,6 +10,7 @@ defmodule Buildel.Pipelines.Run do
     field(:status, Ecto.Enum, values: [created: 0, running: 1, finished: 2], default: :created)
     field(:config, :map)
     field(:total_cost, :decimal, default: 0)
+    field(:interface_config, :map, default: %{})
 
     timestamps()
   end
@@ -17,7 +18,7 @@ defmodule Buildel.Pipelines.Run do
   @doc false
   def changeset(run, attrs) do
     run
-    |> cast(attrs, [:pipeline_id, :config])
+    |> cast(attrs, [:pipeline_id, :config, :interface_config])
     |> validate_required([:pipeline_id, :config])
     |> assoc_constraint(:pipeline)
     |> prepare_changes(fn changeset ->

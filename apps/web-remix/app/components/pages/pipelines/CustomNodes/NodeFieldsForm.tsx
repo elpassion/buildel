@@ -10,7 +10,7 @@ import {
   KnowledgeBaseFileResponse,
 } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
-import { FileUpload, useFilesUpload } from "~/components/fileUpload/FileUpload";
+import { FileUpload } from "~/components/fileUpload/FileUpload";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
 import { AudioFieldTabs } from "./AudioFieldTabs";

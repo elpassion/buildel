@@ -4,6 +4,7 @@ defmodule BuildelWeb.PipelineChannel do
 
   require Logger
   alias Buildel.Pipelines
+  alias Buildel.Pipelines.Pipeline
 
   defparams :join do
     required(:auth, :string)
@@ -50,7 +51,7 @@ defmodule BuildelWeb.PipelineChannel do
          {:ok, config} <- Pipelines.get_pipeline_config(pipeline, alias),
          :ok <-
            verify_auth_token(
-             pipeline.interface_config,
+             is_public_interface?(pipeline.interface_config, metadata),
              socket.id,
              channel_name,
              user_data,
@@ -63,7 +64,8 @@ defmodule BuildelWeb.PipelineChannel do
              pipeline_id: pipeline_id,
              config: config |> Map.put("metadata", metadata)
            }),
-         {:ok, run} <- Pipelines.Runner.start_run(run) do
+         run_interface <- get_interface_config(pipeline, metadata),
+         {:ok, run} <- Pipelines.Runner.start_run(run, run_interface) do
       initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
 
       listen_to_outputs(run)
@@ -99,6 +101,13 @@ defmodule BuildelWeb.PipelineChannel do
     end
   end
 
+  def get_interface_config(%Pipeline{} = pipeline, metadata) do
+    case pipeline.interface_config do
+      nil -> %{}
+      interface_config -> Map.get(interface_config, Map.get(metadata, "interface"), %{})
+    end
+  end
+
   def terminate(_reason, socket) do
     if socket.assigns |> Map.has_key?(:run) && !socket.assigns.joined_existing do
       Pipelines.Runner.stop_run(socket.assigns.run)
@@ -124,13 +133,27 @@ defmodule BuildelWeb.PipelineChannel do
 
     data =
       case data do
-        {:binary, _} -> data
-        _ -> {:text, data}
+        {:binary, content} ->
+          block_type =
+            run.interface_config
+            |> Map.get("inputs", [])
+            |> Enum.find(%{}, fn input -> Map.get(input, "name") == block_name end)
+            |> Map.get("type")
+
+          if block_type == "file_input" do
+            {:ok, path} = Temp.path()
+            File.write!(path, content)
+
+            {:binary, path}
+          else
+            data
+          end
+
+        _ ->
+          {:text, data}
       end
 
-    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{
-      method: :file_memory
-    })
+    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{})
   end
 
   def handle_info({output_name, :binary, chunk, _metadata}, socket) do
@@ -138,8 +161,24 @@ defmodule BuildelWeb.PipelineChannel do
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
 
-    socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
-    {:noreply, socket}
+    run = socket.assigns.run
+
+    interface_output_block_names =
+      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
+
+    case interface_output_block_names do
+      [] ->
+        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+        {:noreply, socket}
+
+      block_names ->
+        if Enum.member?(block_names, block_name) do
+          socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+          {:noreply, socket}
+        else
+          {:noreply, socket}
+        end
+    end
   end
 
   def handle_info({output_name, :text, message, _metadata}, socket) do
@@ -147,8 +186,26 @@ defmodule BuildelWeb.PipelineChannel do
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
 
-    socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
-    {:noreply, socket}
+    run = socket.assigns.run
+
+    interface_output_block_names =
+      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
+
+    case interface_output_block_names do
+      [] ->
+        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
+        {:noreply, socket}
+
+      block_names ->
+        if Enum.member?(block_names, block_name) do
+          socket
+          |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
+
+          {:noreply, socket}
+        else
+          {:noreply, socket}
+        end
+    end
   end
 
   def handle_info({output_name, :start_stream, _, _metadata}, socket) do
@@ -219,11 +276,38 @@ defmodule BuildelWeb.PipelineChannel do
     end)
   end
 
-  defp verify_auth_token(%{"public" => true}, _, _, _, _, _) do
+  defp is_public_interface?(interface_config, metadata) do
+    case Map.get(metadata, "interface") do
+      nil ->
+        false
+
+      interface ->
+        case Map.get(interface_config, interface, %{}) do
+          %{"public" => public} -> public
+          _ -> false
+        end
+    end
+  end
+
+  defp verify_auth_token(
+         true,
+         _,
+         _,
+         _,
+         _,
+         _
+       ) do
     :ok
   end
 
-  defp verify_auth_token(_config, socket_id, channel_name, user_json, auth_token, secret) do
+  defp verify_auth_token(
+         _config,
+         socket_id,
+         channel_name,
+         user_json,
+         auth_token,
+         secret
+       ) do
     BuildelWeb.ChannelAuth.verify_auth_token(
       socket_id,
       channel_name,

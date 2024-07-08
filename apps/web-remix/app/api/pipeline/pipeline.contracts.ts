@@ -7,18 +7,42 @@ import {
 } from "~/api/blockType/blockType.contracts";
 import { PaginationMeta } from "~/components/pagination/pagination.types";
 import { zfd } from "zod-form-data";
+import { IInterfaceConfigFormProperty } from "~/components/pages/pipelines/pipeline.types";
 
-export const InterfaceConfig = z.object({
-  input: z.string().min(2).optional(),
-  output: z.string().min(2).optional(),
-  chat: z.string().min(2).optional(),
-  file: z
-    .string()
-    .transform((v) => (v === "" ? undefined : v))
-    .optional(),
+export const InterfaceConfigFormProperty = z.object({
+  name: z.string(),
+  type: z.string(),
+})
+export const InterfaceConfigForm = z.object({
+  inputs: z
+    .union([
+      z.string().transform((value) => JSON.parse(value) as IInterfaceConfigFormProperty[]),
+      z.array(InterfaceConfigFormProperty),
+    ])
+    .default([]),
+  outputs: z
+    .union([
+      z.string().transform((value) => JSON.parse(value) as IInterfaceConfigFormProperty[]),
+      z.array(InterfaceConfigFormProperty),
+    ])
+    .default([]),
   public: z
     .union([z.boolean(), z.string().transform((v) => v === "on")])
-    .optional(),
+    .optional()
+    .default(false),
+});
+
+export const InterfaceConfig = z.object({
+  webchat: InterfaceConfigForm.optional().default({
+    inputs: [] as IInterfaceConfigFormProperty[],
+    outputs: [] as IInterfaceConfigFormProperty[],
+    public: false,
+  }),
+  form: InterfaceConfigForm.optional().default({
+    inputs: [] as IInterfaceConfigFormProperty[],
+    outputs: [] as IInterfaceConfigFormProperty[],
+    public: false,
+  }),
 });
 
 export const Pipeline = z.object({
@@ -28,7 +52,25 @@ export const Pipeline = z.object({
   runs_count: z.number(),
   budget_limit: z.union([zfd.numeric(), z.null()]),
   logs_enabled: z.boolean(),
-  interface_config: z.union([InterfaceConfig, z.null()]),
+  interface_config: z
+    .union([InterfaceConfig, z.null()])
+    .transform((c) =>
+      c
+        ? c
+        : {
+          webchat: {
+            inputs: [],
+            outputs: [],
+            public: false,
+          },
+          form: {
+            inputs: [],
+            outputs: [],
+            public: false,
+          },
+        },
+    )
+    .default({}),
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),
@@ -39,7 +81,36 @@ export const Pipeline = z.object({
 export const PipelinePublic = z.object({
   id: z.number(),
   name: z.string(),
-  interface_config: z.union([InterfaceConfig, z.null()]),
+  interface_config: z
+    .union([InterfaceConfig, z.null()])
+    .transform((c) =>
+      c
+        ? c
+        : {
+          webchat: {
+            inputs: [],
+            outputs: [],
+            public: false,
+          },
+          form: {
+            inputs: [],
+            outputs: [],
+            public: false,
+          },
+        },
+    )
+    .default({
+      webchat: {
+        inputs: [],
+        outputs: [],
+        public: false,
+      },
+      form: {
+        inputs: [],
+        outputs: [],
+        public: false,
+      },
+    }),
 });
 
 export const ExtendedPipeline = z.object({
@@ -234,8 +305,13 @@ export const PipelineRunLog = z.object({
   created_at: z.string(),
 });
 
-export const PipelineRunLogsResponse = z
-  .object({ data: z.array(PipelineRunLog), meta: z.object({ after: z.string().nullish(), totalItems: z.number().nullish() }) })
+export const PipelineRunLogsResponse = z.object({
+  data: z.array(PipelineRunLog),
+  meta: z.object({
+    after: z.string().nullish(),
+    totalItems: z.number().nullish(),
+  }),
+});
 
 export type IPipelineRunLogsResponse = z.TypeOf<typeof PipelineRunLogsResponse>;
 export type IPipelineRunLog = z.TypeOf<typeof PipelineRunLog>;

@@ -156,17 +156,15 @@ export function FileUpload({
 export function useFilesUpload({
   organizationId,
   pipelineId,
-  runId,
-  fileBlockName,
+  runId
 }: {
   organizationId: number;
   pipelineId: number;
   runId: number;
-  fileBlockName?: string | null;
 }): {
   fileList: IFileUpload[];
-  uploadFile: (file: File) => Promise<void>;
-  removeFile: (fileId: number | string) => void;
+  uploadFile: (file: File, fileBlockName?: string | null) => Promise<void>;
+  removeFile: (fileId: number | string, fileBlockName?: string | null) => void;
   inputRef: React.MutableRefObject<HTMLInputElement | null>;
   clearFiles: () => void;
   isUploading: boolean;
@@ -175,7 +173,7 @@ export function useFilesUpload({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const uploadFileRequest = useCallback(
-    async (file: File): Promise<IFile> => {
+    async (file: File, fileBlockName?: string | null): Promise<IFile> => {
       if (!fileBlockName) throw new Error("Missing file block name");
       const formData = new FormData();
       formData.append("file", file);
@@ -206,7 +204,7 @@ export function useFilesUpload({
   );
 
   const removeFileRequest = useCallback(
-    async (id: number | string) => {
+    async (id: number | string, fileBlockName?: string | null) => {
       return fetch(
         `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
         {
@@ -225,7 +223,7 @@ export function useFilesUpload({
     [organizationId, pipelineId, runId],
   );
 
-  const uploadFile = async (file: File) => {
+  const uploadFile = async (file: File, fileBlockName?: string | null) => {
     const id = Math.random();
     setFileList((prev) => [
       {
@@ -238,7 +236,7 @@ export function useFilesUpload({
       ...prev,
     ]);
     try {
-      const res = await uploadFileRequest(file);
+      const res = await uploadFileRequest(file, fileBlockName);
       setFileList((prev) =>
         prev.map((file) => {
           if (file.id === id) {
@@ -263,10 +261,10 @@ export function useFilesUpload({
   };
 
   const removeFile = useCallback(
-    async (id: number | string) => {
+    async (id: number | string, fileBlockName?: string | null) => {
       try {
         if (typeof id === "string" || id % 1 === 0) {
-          await removeFileRequest(id);
+          await removeFileRequest(id, fileBlockName);
         }
 
         setFileList((prev) => prev.filter((file) => file.id !== id));

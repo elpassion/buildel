@@ -8,11 +8,18 @@ defmodule Buildel.Pipelines.Runner do
     DynamicSupervisor.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
-  def start_run(%Run{} = run) do
+  def start_run(%Run{} = run, interface_config \\ %{}) do
     spec = {Buildel.Pipelines.Worker, [run]}
 
     with {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec) do
-      {:ok, run |> Buildel.Repo.reload() |> Buildel.Repo.preload(:pipeline)}
+      {:ok,
+       run
+       |> Buildel.Pipelines.Run.changeset(%{
+         interface_config: interface_config
+       })
+       |> Buildel.Repo.update!()
+       |> Buildel.Repo.reload()
+       |> Buildel.Repo.preload(:pipeline)}
     else
       {:error, {:already_started, _}} ->
         {:ok, run |> Buildel.Repo.reload() |> Buildel.Repo.preload(:pipeline)}
@@ -43,13 +50,13 @@ defmodule Buildel.Pipelines.Runner do
   end
 
   def create_chat_completion(%Run{} = run, params) do
-    block_name = run.pipeline.interface_config["chat"] || "chat_1"
+    block_name = "chat_1"
 
     Buildel.Blocks.Block.call(block_pid(run, block_name), :chat_completion, params)
   end
 
   def create_chat_completion_stream(%Run{} = run, params) do
-    block_name = run.pipeline.interface_config["chat"] || "chat_1"
+    block_name = "chat_1"
 
     Buildel.Blocks.Block.call(
       block_pid(run, block_name),

@@ -267,7 +267,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     try do
       with {:ok, collection} <-
              Buildel.Memories.get_organization_collection(organization, collection_id),
-           {:ok, _memory} <-
+           {:ok, memory} <-
              Buildel.Memories.create_organization_memory(
                organization,
                collection,
@@ -280,7 +280,11 @@ defmodule Buildel.Blocks.DocumentSearch do
                  file_uuid: metadata |> Map.get(:file_id)
                }
              ) do
-        state = send_stream_stop(state)
+        state =
+          state
+          |> output("output", {:text, memory.content})
+          |> send_stream_stop(state)
+
         {:noreply, state}
       else
         {:error, _, message} ->

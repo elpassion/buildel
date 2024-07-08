@@ -56,7 +56,10 @@ defmodule BuildelWeb.OrganizationPipelinePublicControllerTest do
 
   defp create_public_pipeline(%{organization: organization}) do
     pipeline =
-      pipeline_fixture(%{organization_id: organization.id, interface_config: %{"public" => true}})
+      pipeline_fixture(%{
+        organization_id: organization.id,
+        interface_config: %{"webchat" => %{"public" => true}}
+      })
 
     %{public_pipeline: pipeline}
   end

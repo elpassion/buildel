@@ -1,21 +1,23 @@
 import { z } from "zod";
 import {
-  Pipeline,
-  PipelineRun,
-  PipelineCost,
-  PipelineRuns,
-  PipelineCosts,
-  InterfaceConfig,
-  Alias,
-  ExtendedPipeline,
-} from "~/api/pipeline/pipeline.contracts";
-import {
-  ExtendedBlockConfig,
-  ConfigConnection,
   BlockType,
   BlockTypes,
+  ConfigConnection,
+  ExtendedBlockConfig,
   IOType,
 } from "~/api/blockType/blockType.contracts";
+import {
+  Alias,
+  ExtendedPipeline,
+  InterfaceConfig,
+  InterfaceConfigForm,
+  InterfaceConfigFormProperty,
+  Pipeline,
+  PipelineCost,
+  PipelineCosts,
+  PipelineRun,
+  PipelineRuns,
+} from "~/api/pipeline/pipeline.contracts";
 
 export type IBlockConfig = z.TypeOf<typeof ExtendedBlockConfig>;
 
@@ -50,7 +52,13 @@ export interface IField {
   data: {
     name: string;
     public: boolean;
-    type: "audio" | "text" | "file" | "file_temporary" | "worker" | "controller";
+    type:
+    | "audio"
+    | "text"
+    | "file"
+    | "file_temporary"
+    | "worker"
+    | "controller";
   };
 }
 
@@ -65,6 +73,8 @@ export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
 export type IBlockType = z.TypeOf<typeof BlockType>;
 
 export type IInterfaceConfig = z.infer<typeof InterfaceConfig>;
+export type IInterfaceConfigForm = z.infer<typeof InterfaceConfigForm>;
+export type IInterfaceConfigFormProperty = z.infer<typeof InterfaceConfigFormProperty>;
 
 export type IPipeline = z.infer<typeof Pipeline>;
 

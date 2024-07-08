@@ -17,16 +17,25 @@ interface SelectFieldProps extends SelectInputProps {
 export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
   (
     { defaultValue, options, label, supportingText, errorMessage, ...props },
-    _ref
+    _ref,
   ) => {
     const { name, getInputProps } = useFieldContext();
-    const [selectedId, setSelectedId] = useControlField<string>(name);
+    const [selectedId, setSelectedId] = useControlField<string | string[]>(
+      name,
+    );
 
     const { fieldErrors } = useFormContext();
 
     return (
       <div>
-        <HiddenField value={selectedId ?? ""} {...getInputProps()} />
+        <HiddenField
+          value={
+            Array.isArray(selectedId)
+              ? JSON.stringify(selectedId)
+              : selectedId ?? ""
+          }
+          {...getInputProps()}
+        />
         <Label text={label} />
         <SelectInput
           id={name}
@@ -42,5 +51,5 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
         />
       </div>
     );
-  }
+  },
 );

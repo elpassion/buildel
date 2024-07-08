@@ -68,7 +68,7 @@ defmodule Buildel.Blocks.TextOutput do
   def handle_input("input", {_name, :text, text, _metadata}, state) do
     text =
       if state.filter do
-        Buildel.JQ.query!(text, state.filter) |> String.trim()
+        Buildel.JQ.query!(text, state.filter)
       else
         text
       end

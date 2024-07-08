@@ -1,12 +1,12 @@
 import { ActionFunctionArgs, json } from "@remix-run/node";
+import { actionBuilder } from "~/utils.server";
+import { requireLogin } from "~/session.server";
+import invariant from "tiny-invariant";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
-import invariant from "tiny-invariant";
-import { PipelineApi } from "~/api/pipeline/PipelineApi";
-import { InterfaceConfig } from "~/api/pipeline/pipeline.contracts";
-import { requireLogin } from "~/session.server";
-import { actionBuilder } from "~/utils.server";
 import { setServerToast } from "~/utils/toast.server";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
+import { schema } from "./schema";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -16,7 +16,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       invariant(params.organizationId, "Missing organizationId");
       invariant(params.pipelineId, "Missing pipelineId");
 
-      const validator = withZod(InterfaceConfig);
+      const validator = withZod(schema);
 
       const result = await validator.validate(await actionArgs.request.json());
 
@@ -28,7 +28,9 @@ export async function action(actionArgs: ActionFunctionArgs) {
       const isLatestPipeline = !aliasId || aliasId === "latest";
 
       const body = {
-        interface_config: result.data,
+        interface_config: {
+          ...result.data,
+        },
       };
 
       const res = isLatestPipeline
