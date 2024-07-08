@@ -46,10 +46,6 @@ defmodule Buildel.Blocks.CSVSearch do
     GenServer.cast(pid, {:query, text})
   end
 
-  def query_sync(pid, {:text, _text} = text) do
-    GenServer.call(pid, {:query, text})
-  end
-
   def add_file(pid, file) do
     GenServer.cast(pid, {:add_file, file})
   end
@@ -94,7 +90,8 @@ defmodule Buildel.Blocks.CSVSearch do
       state =
         state
         |> output("output", {:text, response})
-        |> respond_to_tool("tool", {:text, response})
+
+      # |> respond_to_tool("tool", {:text, response})
 
       {:noreply, state}
     else
@@ -104,7 +101,8 @@ defmodule Buildel.Blocks.CSVSearch do
         state =
           state
           |> send_stream_stop()
-          |> respond_to_tool("tool", {:text, "Invalid SQL query"})
+
+        # |> respond_to_tool("tool", {:text, "Invalid SQL query"})
 
         {:reply, "Invalid SQL query", state}
 
@@ -114,7 +112,8 @@ defmodule Buildel.Blocks.CSVSearch do
         state =
           state
           |> send_stream_stop()
-          |> respond_to_tool("tool", {:text, error.message})
+
+        # |> respond_to_tool("tool", {:text, error.message})
 
         {:noreply, state}
 
@@ -124,7 +123,8 @@ defmodule Buildel.Blocks.CSVSearch do
         state =
           state
           |> send_stream_stop()
-          |> respond_to_tool("tool", {:text, "Unknown error"})
+
+        # |> respond_to_tool("tool", {:text, "Unknown error"})
 
         {:noreply, state}
     end

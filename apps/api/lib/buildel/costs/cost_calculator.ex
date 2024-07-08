@@ -48,67 +48,67 @@ defmodule Buildel.Costs.CostCalculator do
 
   defp prices({endpoint, model} = api_model) do
     %{
-      {"https://api.openai.com/v1/chat/completions", "gpt-3.5-turbo"} => %{
+      {"https://api.openai.com/v1", "gpt-3.5-turbo"} => %{
         input_token_price: Decimal.new("0.0005") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.0015") |> Decimal.div(1000)
       },
-      {"https://api.openai.com/v1/chat/completions", "gpt-3.5-turbo-1106"} => %{
+      {"https://api.openai.com/v1", "gpt-3.5-turbo-1106"} => %{
         input_token_price: Decimal.new("0.0010") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.0020") |> Decimal.div(1000)
       },
-      {"https://api.openai.com/v1/chat/completions", "gpt-3.5-turbo-0125"} => %{
+      {"https://api.openai.com/v1", "gpt-3.5-turbo-0125"} => %{
         input_token_price: Decimal.new("0.0005") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.0015") |> Decimal.div(1000)
       },
-      {"https://api.openai.com/v1/chat/completions", "gpt-4"} => %{
+      {"https://api.openai.com/v1", "gpt-4"} => %{
         input_token_price: Decimal.new("0.03") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.06") |> Decimal.div(1000)
       },
-      {"https://api.openai.com/v1/chat/completions", "gpt-4-32k"} => %{
+      {"https://api.openai.com/v1", "gpt-4-32k"} => %{
         input_token_price: Decimal.new("0.06") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.12") |> Decimal.div(1000)
       },
-      {"https://api.openai.com/v1/chat/completions", "gpt-4-1106-preview"} => %{
+      {"https://api.openai.com/v1", "gpt-4-1106-preview"} => %{
         input_token_price: Decimal.new("0.01") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.03") |> Decimal.div(1000)
       },
-      {"https://api.openai.com/v1/chat/completions", "gpt-4-turbo-preview"} => %{
+      {"https://api.openai.com/v1", "gpt-4-turbo-preview"} => %{
         input_token_price: Decimal.new("0.01") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.03") |> Decimal.div(1000)
       },
-      {"https://api.openai.com/v1/chat/completions", "gpt-4-turbo"} => %{
+      {"https://api.openai.com/v1", "gpt-4-turbo"} => %{
         input_token_price: Decimal.new("0.01") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.03") |> Decimal.div(1000)
       },
-      {"https://api.openai.com/v1/chat/completions", "gpt-4o"} => %{
+      {"https://api.openai.com/v1", "gpt-4o"} => %{
         input_token_price: Decimal.new("0.005") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.015") |> Decimal.div(1000)
       },
-      {"https://api.mistral.ai/v1/chat/completions", "mistral-tiny"} => %{
+      {"https://api.mistral.ai/v1", "mistral-tiny"} => %{
         input_token_price: Decimal.new("0.1512") |> Decimal.div(1_000_000),
         output_token_price: Decimal.new("0.4536") |> Decimal.div(1_000_000)
       },
-      {"https://api.mistral.ai/v1/chat/completions", "mistral-small"} => %{
+      {"https://api.mistral.ai/v1", "mistral-small"} => %{
         input_token_price: Decimal.new("0.648") |> Decimal.div(1_000_000),
         output_token_price: Decimal.new("1.944") |> Decimal.div(1_000_000)
       },
-      {"https://api.mistral.ai/v1/chat/completions", "mistral-medium"} => %{
+      {"https://api.mistral.ai/v1", "mistral-medium"} => %{
         input_token_price: Decimal.new("2.7") |> Decimal.div(1_000_000),
         output_token_price: Decimal.new("8.1") |> Decimal.div(1_000_000)
       },
-      {"https://api.mistral.ai/v1/chat/completions", "mistral-tiny-latest"} => %{
+      {"https://api.mistral.ai/v1", "mistral-tiny-latest"} => %{
         input_token_price: Decimal.new("0.25") |> Decimal.div(1_000_000),
         output_token_price: Decimal.new("0.25") |> Decimal.div(1_000_000)
       },
-      {"https://api.mistral.ai/v1/chat/completions", "mistral-small-latest"} => %{
+      {"https://api.mistral.ai/v1", "mistral-small-latest"} => %{
         input_token_price: Decimal.new("2") |> Decimal.div(1_000_000),
         output_token_price: Decimal.new("6") |> Decimal.div(1_000_000)
       },
-      {"https://api.mistral.ai/v1/chat/completions", "mistral-medium-latest"} => %{
+      {"https://api.mistral.ai/v1", "mistral-medium-latest"} => %{
         input_token_price: Decimal.new("2.7") |> Decimal.div(1_000_000),
         output_token_price: Decimal.new("8.1") |> Decimal.div(1_000_000)
       },
-      {"https://api.mistral.ai/v1/chat/completions", "mistral-large-latest"} => %{
+      {"https://api.mistral.ai/v1", "mistral-large-latest"} => %{
         input_token_price: Decimal.new("8") |> Decimal.div(1_000_000),
         output_token_price: Decimal.new("24") |> Decimal.div(1_000_000)
       }

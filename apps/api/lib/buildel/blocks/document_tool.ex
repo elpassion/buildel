@@ -92,10 +92,6 @@ defmodule Buildel.Blocks.DocumentTool do
     GenServer.cast(pid, {:query, text})
   end
 
-  def query_sync(pid, {:text, _text} = text) do
-    GenServer.call(pid, {:query, text})
-  end
-
   def add_file(pid, file) do
     GenServer.cast(pid, {:add_file, file})
   end
@@ -222,20 +218,21 @@ defmodule Buildel.Blocks.DocumentTool do
           args["document_id"]
         )
 
-      respond_to_tool(
-        state,
-        "tool",
-        {:text, "Document name: #{memory.file_name}\n\n#{memory.content |> String.trim()}"}
-      )
+      state
+      # respond_to_tool(
+      #   state,
+      #   "tool",
+      #   {:text, "Document name: #{memory.file_name}\n\n#{memory.content |> String.trim()}"}
+      # )
     rescue
       _ ->
         send_error(state, "Failed to retrieve the document")
-
-        respond_to_tool(
-          state,
-          "tool",
-          {:text, "Failed to retrieve document"}
-        )
+        state
+        # respond_to_tool(
+        #   state,
+        #   "tool",
+        #   {:text, "Failed to retrieve document"}
+        # )
     end
   end
 

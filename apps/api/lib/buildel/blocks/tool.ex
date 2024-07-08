@@ -32,14 +32,14 @@ defmodule Buildel.Blocks.Tool do
       def handle_input(
             input,
             {topic, :text, message_json,
-             %{tool_name: tool_name, message_id: message_id} = metadata},
+             %{tool_name: tool_name, message_id: message_id, send_to: send_to} = metadata},
             %{block: %{name: block_name}} = state
           ) do
         [target_block, tool_name] = tool_name |> String.split("::")
 
         if target_block == block_name do
           message = Jason.decode!(message_json)
-          state = state |> Map.put(:message_id, message_id)
+          state = state |> Map.put(:message_id, message_id) |> Map.put(:send_to, send_to)
           info = {topic, :text, message, metadata}
 
           if unquote(parallel) |> Enum.member?(tool_name) do
@@ -53,15 +53,11 @@ defmodule Buildel.Blocks.Tool do
         end
       end
 
-      def respond_to_tool(state, tool_name, {:text, content}) do
-        if state[:message_id],
-          do:
-            output(
-              state,
-              tool_name,
-              {:text, content}
-            ),
-          else: state
+      def respond_to_tool({:text, content, %{send_to: send_to, message_id: message_id}}) do
+        send(
+          send_to,
+          {:response, :text, content, %{message_id: message_id}}
+        )
       end
     end
   end

@@ -80,7 +80,7 @@ defmodule Buildel.Blocks.Browser do
         |> Enum.join(" ")
 
       state = output(state, "output", {:text, content})
-      state = respond_to_tool(state, "tool", {:text, content})
+      # state = respond_to_tool(state, "tool", {:text, content})
 
       output(state, "file_output", {:binary, path}, %{
         metadata: %{
@@ -92,19 +92,26 @@ defmodule Buildel.Blocks.Browser do
     else
       {:error, %Crawler.Crawl{} = crawl} ->
         send_error(state, crawl.error)
-        state |> send_stream_stop() |> respond_to_tool("tool", {:text, to_string(crawl.error)})
+        state |> send_stream_stop()
+
+      # |> respond_to_tool("tool", {:text, to_string(crawl.error)})
 
       {:ok, %Crawler.Crawl{}} ->
         send_error(state, "No content found")
-        state |> send_stream_stop() |> respond_to_tool("tool", {:text, "No content found"})
+        state |> send_stream_stop()
+
+      # |> respond_to_tool("tool", {:text, "No content found"})
 
       {:error, reason} ->
         send_error(state, reason)
-        state |> send_stream_stop() |> respond_to_tool("tool", {:text, to_string(reason)})
+        state |> send_stream_stop()
+
+      # |> respond_to_tool("tool", {:text, to_string(reason)})
 
       _ ->
         send_error(state, "Unknown error")
-        state |> send_stream_stop() |> respond_to_tool("tool", {:text, "Unknown error"})
+        state |> send_stream_stop()
+        #  |> respond_to_tool("tool", {:text, "Unknown error"})
     end
   end
 

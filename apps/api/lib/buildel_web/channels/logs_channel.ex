@@ -96,7 +96,6 @@ defmodule BuildelWeb.LogsChannel do
   defp listen_to_outputs(organization, pipeline, run) do
     topic = "logs::#{organization.id}::#{pipeline.id}::#{run.id}"
 
-    IO.inspect(topic, label: "Listening to topic")
     Buildel.PubSub |> PubSub.subscribe(topic)
   end
 

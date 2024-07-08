@@ -131,13 +131,15 @@ defmodule Buildel.Blocks.Block do
           update_in(opts, [:metadata], fn metadata ->
             metadata
             |> Map.put(:message_id, message_id)
+            |> Map.put(:send_to, self())
           end)
 
         state = output(state, output_name, payload, opts |> Map.put(:stream_stop, :none))
 
         response =
           receive do
-            {_, payload_type, payload, %{message_id: message_id}} -> {payload_type, payload}
+            {_, payload_type, payload, %{message_id: ^message_id}} ->
+              {payload_type, payload}
           end
 
         state =

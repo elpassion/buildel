@@ -183,7 +183,8 @@ defmodule Buildel.Blocks.ApiCallTool do
 
     state
     |> output("response", {:text, response |> Jason.encode!()})
-    |> respond_to_tool("tool", {:text, response |> Jason.encode!()})
+
+    # |> respond_to_tool("tool", {:text, response |> Jason.encode!()})
   end
 
   defp call_api(state, args) do

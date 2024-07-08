@@ -318,22 +318,22 @@ defmodule Buildel.Blocks.Chat do
     state = update_in(state.chat_memory, &ChatMemory.add_user_message(&1, %{content: content}))
 
     with {:ok, message, state} <- chat_task(state) do
-      state = respond_to_tool(state, "chat", {:text, message.content})
+      # state = respond_to_tool(state, "chat", {:text, message.content})
       {:noreply, cleanup_inputs(state)}
     else
       {:error, :not_all_inputs_filled, state} ->
+        # respond_to_tool(
+        #   state,
+        #   "chat",
+        #   {:text, "ERROR: Not all inputs required to answer question are filled"}
+        # )
         state =
-          respond_to_tool(
-            state,
-            "chat",
-            {:text, "ERROR: Not all inputs required to answer question are filled"}
-          )
+          state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
 
-        state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
         {:noreply, state}
 
       {:error, _reason, state} ->
-        state = respond_to_tool(state, "chat", {:text, "ERROR: Something went wrong"})
+        # state = respond_to_tool(state, "chat", {:text, "ERROR: Something went wrong"})
         state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
         {:noreply, state}
     end
@@ -444,6 +444,8 @@ defmodule Buildel.Blocks.Chat do
             Function.new!(
               tool_definition.function
               |> Map.put(:function, fn args, _context ->
+                # TUTAJ MUSISZ ZASUBSKRYBOWAĆ TOPIC!
+                # Buildel.BlockPubSub.subscribe_to_io()
                 {_, {:text, response}} =
                   output_and_wait_for_response(state, "tool", {:text, Jason.encode!(args)}, %{
                     metadata: %{tool_name: tool_definition.function.name},

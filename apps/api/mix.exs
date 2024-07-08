@@ -65,7 +65,7 @@ defmodule Buildel.MixProject do
       {:erlport, "~>0.11"},
       {:poolboy, "~> 1.5"},
       {:cloak_ecto, "~> 1.2.0"},
-      {:langchain, "~> 0.1.7"},
+      {:langchain, "~> 0.3.0-rc.0"},
       {:pgvector, "~> 0.3.0"},
       {:dotenv, "~> 3.0.0"},
       {:money, "~> 1.12"},

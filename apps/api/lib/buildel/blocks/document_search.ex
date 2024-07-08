@@ -110,20 +110,16 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   # Client
 
-  def query(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:query, text})
+  def query(pid, {:text, _text} = text, metadata \\ %{}) do
+    GenServer.cast(pid, {:query, text, metadata})
   end
 
-  def query_sync(pid, {:text, _text} = text) do
-    GenServer.call(pid, {:query, text})
+  def parent(pid, {:text, _text} = text, metadata \\ %{}) do
+    GenServer.cast(pid, {:parent, text, metadata})
   end
 
-  def parent(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:parent, text})
-  end
-
-  def related(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:related, text})
+  def related(pid, {:text, _text} = text, metadata \\ %{}) do
+    GenServer.cast(pid, {:related, text, metadata})
   end
 
   def add_file(pid, file) do
@@ -161,7 +157,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   @impl true
-  def handle_cast({:query, {:text, query}}, state) do
+  def handle_cast({:query, {:text, query}, metadata}, state) do
     state = send_stream_start(state)
     token_limit = state.opts |> Map.get(:token_limit, 0)
 
@@ -206,12 +202,15 @@ defmodule Buildel.Blocks.DocumentSearch do
     state =
       state
       |> output("output", {:text, result})
-      |> respond_to_tool("tool", {:text, result})
+
+    respond_to_tool(
+      {:text, result, %{send_to: metadata.send_to, message_id: metadata.message_id}}
+    )
 
     {:noreply, state}
   end
 
-  def handle_cast({:parent, {:text, chunk_id}}, state) do
+  def handle_cast({:parent, {:text, chunk_id}, _metadata}, state) do
     result =
       MemoryCollectionSearch.new(%{
         vector_db: state.vector_db,
@@ -221,11 +220,15 @@ defmodule Buildel.Blocks.DocumentSearch do
       |> then(&DocumentSearchJSON.show/1)
       |> Jason.encode!()
 
-    state = state |> respond_to_tool("tool", {:text, result}) |> output("output", {:text, result})
+    state =
+      state
+      #  |> respond_to_tool("tool", {:text, result})
+      |> output("output", {:text, result})
+
     {:noreply, state}
   end
 
-  def handle_cast({:related, {:text, chunk_id}}, state) do
+  def handle_cast({:related, {:text, chunk_id}, metadata}, state) do
     chunk = Buildel.VectorDB.get_by_id(state.vector_db, state[:collection], chunk_id)
 
     params =
@@ -252,11 +255,14 @@ defmodule Buildel.Blocks.DocumentSearch do
       |> then(&DocumentSearchJSON.show/1)
       |> Jason.encode!()
 
-    state = state |> respond_to_tool("tool", {:text, result}) |> output("output", {:text, result})
+    state =
+      state
+      |> output("output", {:text, result})
+
     {:noreply, state}
   end
 
-  def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
+  def handle_cast({:add_file, {:binary, file_path}, metadata}, state) do
     state = send_stream_start(state)
 
     %{organization_id: organization_id, collection_id: collection_id} =
@@ -430,8 +436,14 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   @impl true
-  def handle_tool("tool", "query", {_name, :text, args, _metadata}, state) do
-    query(self(), {:text, args["query"]})
+  def handle_tool("tool", "query", {_name, :text, args, metadata}, state) do
+    IO.inspect(metadata)
+
+    query(self(), {:text, args["query"]}, %{
+      send_to: metadata.send_to,
+      message_id: metadata.message_id
+    })
+
     state
   end
 
