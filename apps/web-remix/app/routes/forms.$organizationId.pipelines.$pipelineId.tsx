@@ -55,82 +55,81 @@ export default function WebsiteForm() {
   const { pipelineId, organizationId, pipeline, alias } =
     useLoaderData<typeof loader>();
   const [outputs, setOutputs] = useState<Record<string, string>>({});
-  const [blockStatus, setBlockStatus] = useState<Record<string, boolean>>({});
   const [files, setFiles] = useState<Record<string, File>>({});
-
-  const {
-    isGenerating,
-    connectionStatus,
-    stopRun,
-    startRun,
-    runId,
-    push
-  } = useFormInterface({
-    inputs: pipeline.interface_config.form.inputs,
-    outputs: pipeline.interface_config.form.outputs,
-    organizationId: organizationId as unknown as number,
-    pipelineId: pipelineId as unknown as number,
-    useAuth: !(pipeline.interface_config.form.public ?? false),
-    onBlockOutput: (blockId, outputName, payload) => {
-      const message = (payload as { message: string })?.message;
-
-      setOutputs((prev) => ({
-        ...prev,
-        [blockId]: prev[blockId] ? prev[blockId] + message : message,
-      }));
-    },
-    onBlockStatusChange: (blockName, isWorking) => {
-      setBlockStatus((prev) => ({
-        ...prev,
-        [blockName]: isWorking,
-      }));
-    }
-  });
-
-  useEffect(() => {
-    setTimeout(() => {
-      startRun({
-        alias, initial_inputs: [], metadata: {
-          interface: "form",
-        }
-      });
-    }, 500);
-
-    return () => {
-      stopRun();
-    };
-  }, []);
-
 
   const validator = useMemo(() => withZod(z.any()), []);
 
-  const handleOnSubmit = (data: any) => {
+  const handleOnSubmit = async (data: any) => {
     setOutputs({});
 
     const inputs = Object.entries(data)
-      .filter(([_, value]) => value)
-      .map(([key, value]) => {
-        const inputType = pipeline.interface_config.form.inputs.find(input => input.name === key)?.type
-        if (inputType === "file_input") {
-          return null
-        }
-
-        return {
-          name: `${key}:input`,
-          value: value
-        }
+      .filter(([blockName, value]) => {
+        if (!value) return false
+        if (typeof value !== "string" && !files[blockName]) return false
+        return true
       })
-      .filter(Boolean) as unknown as { name: string, value: string }[]
+      .map(([key, value]) => ({
+        name: key,
+        input: "input",
+        value: value
+      }))
 
-    for (const input of inputs) {
-      push(input.name, input.value)
-    }
+    const response = await fetch(
+      `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs`,
+      {
+        method: "POST",
+        body: JSON.stringify({}),
+        headers: {
+          "content-type": "application/json",
+        },
+      },
+    );
+    const {
+      data: { id },
+    } = await response.json();
+
+    const formData = new FormData();
+
+    inputs.forEach((input, index) => {
+      formData.append(`initial_inputs[${index}][block_name]`, input.name);
+      formData.append(`initial_inputs[${index}][input_name]`, input.input);
+      formData.append(`initial_inputs[${index}][data]`, input.value as string | File);
+    });
+
+    pipeline.interface_config.form.outputs.forEach((output, index) => {
+      formData.append(`wait_for_outputs[${index}][block_name]`, output.name);
+      formData.append(`wait_for_outputs[${index}][output_name]`, "output");
+    });
+
+    const runResponse = await fetch(
+      `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/start`,
+      {
+        method: "POST",
+        body: formData,
+
+      },
+    );
+
+    const runResponseData = await runResponse.json();
+
+    runResponseData.outputs.forEach((output: any) => {
+      setOutputs((prev) => ({
+        ...prev,
+        [output.block_name]: prev[output.block_name] ? prev[output.block_name] + output.data : output.data,
+      }));
+    })
+
+    await fetch(
+      `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/stop`,
+      {
+        method: "POST",
+      },
+    )
   }
 
   return (
     <div className="flex justify-center items-center h-screen h-screen w-full">
       <div className="flex flex-col w-[820px] bg-neutral-900 p-2 rounded-lg">
-        <ChatStatus connectionStatus={connectionStatus} className="mb-2" />
         <ValidatedForm
           validator={validator}
           noValidate
@@ -157,16 +156,11 @@ export default function WebsiteForm() {
                           const file = e.target.files?.[0]
                           if (!file) return
 
-                          const buffer = await file.arrayBuffer()
-
-                          push(`${input.name}:input`, buffer)
-
                           setFiles(prev => ({
                             ...prev,
                             [input.name]: file
                           }))
                         }}
-                        disabled={blockStatus[input.name]}
                       />
                       <p>{files[input.name]?.name}</p>
                     </div>
