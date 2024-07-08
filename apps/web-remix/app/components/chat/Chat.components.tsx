@@ -94,8 +94,9 @@ export const ChatGeneratingAnimation = ({
 
 interface ChatStatusProps {
   connectionStatus: BuildelRunStatus;
+  className?: string;
 }
-export const ChatStatus = ({ connectionStatus }: ChatStatusProps) => {
+export const ChatStatus = ({ connectionStatus, className }: ChatStatusProps) => {
   const mappedStatusToText = useMemo(() => {
     switch (connectionStatus) {
       case "starting":
@@ -110,7 +111,7 @@ export const ChatStatus = ({ connectionStatus }: ChatStatusProps) => {
   return (
     <div
       title={mappedStatusToText}
-      className="py-0.5 px-1 bg-neutral-800 rounded flex gap-1 items-center"
+      className={classNames("py-0.5 px-1 bg-neutral-800 rounded flex gap-1 items-center", className)}
     >
       <div
         className={classNames("w-[6px] h-[6px] rounded-full", {

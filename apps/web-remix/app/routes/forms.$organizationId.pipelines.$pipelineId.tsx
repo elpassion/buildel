@@ -17,7 +17,7 @@ import { TextInputField } from "~/components/form/fields/text.field";
 import { NodeClearButton, NodeCopyButton, NodeDownloadButton } from "~/components/pages/pipelines/CustomNodes/NodeActionButtons";
 import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 import { SmallFileInputField } from "~/components/form/fields/file.field";
-import classNames from "classnames";
+import { ChatStatus } from "~/components/chat/Chat.components";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -56,6 +56,7 @@ export default function WebsiteForm() {
     useLoaderData<typeof loader>();
   const [outputs, setOutputs] = useState<Record<string, string>>({});
   const [blockStatus, setBlockStatus] = useState<Record<string, boolean>>({});
+  const [files, setFiles] = useState<Record<string, File>>({});
 
   const {
     isGenerating,
@@ -112,7 +113,7 @@ export default function WebsiteForm() {
 
     const inputs = Object.entries(data)
       .filter(([_, value]) => value)
-      .map(async ([key, value]) => {
+      .map(([key, value]) => {
         const inputType = pipeline.interface_config.form.inputs.find(input => input.name === key)?.type
         if (inputType === "file_input") {
           return null
@@ -131,20 +132,14 @@ export default function WebsiteForm() {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen flex-col h-screen w-full">
-
-      <div className="max-w-[820px]">
-        <div
-          className={classNames("w-[6px] h-[6px] rounded-full", {
-            "bg-red-500": connectionStatus === "idle",
-            "bg-green-500": connectionStatus === "running",
-            "bg-orange-500": connectionStatus === "starting",
-          })}
-        />
+    <div className="flex justify-center items-center h-screen h-screen w-full">
+      <div className="flex flex-col w-[820px] bg-neutral-900 p-2 rounded-lg">
+        <ChatStatus connectionStatus={connectionStatus} className="mb-2" />
         <ValidatedForm
           validator={validator}
           noValidate
           onSubmit={handleOnSubmit}
+          className="w-full"
         >
           <div className="flex flex-col items-start w-full gap-5">
             {pipeline.interface_config.form.inputs.map(input => {
@@ -158,19 +153,27 @@ export default function WebsiteForm() {
                     />
                   )}
                   {input.type === "file_input" && (
-                    <SmallFileInputField
-                      multiple={false}
-                      buttonText={input.name}
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0]
-                        if (!file) return
+                    <div className="flex text-white justify-start items-center gap-2 bg-neutral-800 rounded-lg w-full">
+                      <SmallFileInputField
+                        multiple={false}
+                        buttonText={input.name}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
 
-                        const buffer = await file.arrayBuffer()
+                          const buffer = await file.arrayBuffer()
 
-                        push(`${input.name}:input`, buffer)
-                      }}
-                      disabled={blockStatus[input.name]}
-                    />
+                          push(`${input.name}:input`, buffer)
+
+                          setFiles(prev => ({
+                            ...prev,
+                            [input.name]: file
+                          }))
+                        }}
+                        disabled={blockStatus[input.name]}
+                      />
+                      <p>{files[input.name]?.name}</p>
+                    </div>
                   )}
                 </Field>
               )
@@ -184,18 +187,12 @@ export default function WebsiteForm() {
 
           {
             pipeline.interface_config.form.outputs.map(output => (
-              <React.Fragment key={output.name}>
-                <div className="mb-1 flex gap-1">
-                  <NodeCopyButton text={outputs[output.name]} />
-
-                  <NodeDownloadButton blockName={output.name} text={outputs[output.name]} />
-
-                  <NodeClearButton onClear={() => { }} />
-                </div>
-                <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-                  <ChatMarkdown>{outputs[output.name] ?? ""}</ChatMarkdown>
-                </div>
-              </React.Fragment>
+              <FormInterfaceOutput
+                key={output.name}
+                blockName={output.name}
+                blockType={output.type}
+                payload={outputs[output.name]}
+              />
             ))
           }
 
@@ -204,4 +201,21 @@ export default function WebsiteForm() {
       <div id="_root"></div>
     </div>
   );
+}
+
+export function FormInterfaceOutput({ payload, blockName, blockType }: { payload: string, blockName: string, blockType: string }) {
+  return (
+    <div>
+      <div className="mb-1 flex gap-1">
+        <NodeCopyButton text={payload} />
+
+        <NodeDownloadButton blockName={blockName} text={payload} />
+
+        <NodeClearButton onClear={() => { }} />
+      </div>
+      <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+        <ChatMarkdown>{payload ?? ""}</ChatMarkdown>
+      </div>
+    </div>
+  )
 }
