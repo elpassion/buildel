@@ -14,6 +14,7 @@ interface UseFormInterfaceProps {
         payload: unknown,
     ) => void;
     onFinish?: () => void;
+    onBlockStatusChange?: (blockName: string, isWorking: boolean) => void;
     useAuth?: boolean;
 }
 
@@ -24,6 +25,7 @@ export const useFormInterface = ({
     pipelineId,
     onBlockOutput: onBlockOutputProps,
     onFinish,
+    onBlockStatusChange,
     useAuth,
 }: UseFormInterfaceProps) => {
     const [finishedOutputs, setFinishedOutputs] = useState<string[]>([]);
@@ -46,6 +48,8 @@ export const useFormInterface = ({
     };
 
     const onStatusChange = (blockId: string, isWorking: boolean) => {
+        onBlockStatusChange?.(blockId, isWorking);
+
         if (isWorking) {
             setIsGenerating(true);
         }

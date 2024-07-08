@@ -17,8 +17,8 @@ export const SmallFileInputField = forwardRef<
       aria-label={name}
       autoComplete={name}
       errorMessage={errorMessage ?? error}
-      {...props}
       {...getInputProps()}
+      {...props}
     />
   );
 });

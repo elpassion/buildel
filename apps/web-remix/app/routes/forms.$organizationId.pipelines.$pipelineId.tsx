@@ -16,8 +16,8 @@ import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { NodeClearButton, NodeCopyButton, NodeDownloadButton } from "~/components/pages/pipelines/CustomNodes/NodeActionButtons";
 import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
-import { Icon } from "@elpassion/taco";
 import { SmallFileInputField } from "~/components/form/fields/file.field";
+import classNames from "classnames";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -55,6 +55,7 @@ export default function WebsiteForm() {
   const { pipelineId, organizationId, pipeline, alias } =
     useLoaderData<typeof loader>();
   const [outputs, setOutputs] = useState<Record<string, string>>({});
+  const [blockStatus, setBlockStatus] = useState<Record<string, boolean>>({});
 
   const {
     isGenerating,
@@ -74,14 +75,30 @@ export default function WebsiteForm() {
       // stopRun();
     },
     onBlockOutput: (blockId, outputName, payload) => {
+      const message = (payload as { message: string })?.message;
+
       setOutputs((prev) => ({
         ...prev,
-        [blockId]: prev[blockId] ? prev[blockId] + (payload as any)?.message : (payload as any)?.message,
+        [blockId]: prev[blockId] ? prev[blockId] + message : message,
+      }));
+    },
+    onBlockStatusChange: (blockName, isWorking) => {
+      setBlockStatus((prev) => ({
+        ...prev,
+        [blockName]: isWorking,
       }));
     }
   });
 
   useEffect(() => {
+    setTimeout(() => {
+      startRun({
+        alias, initial_inputs: [], metadata: {
+          interface: "form",
+        }
+      });
+    }, 500);
+
     return () => {
       stopRun();
     };
@@ -90,36 +107,23 @@ export default function WebsiteForm() {
 
   const validator = useMemo(() => withZod(z.any()), []);
 
-  const handleOnSubmit = async (data: any) => {
+  const handleOnSubmit = (data: any) => {
     setOutputs({});
-    await startRun({
-      alias, initial_inputs: [], metadata: {
-        interface: "form",
-      }
-    });
 
-    const inputs = await Promise.all(Object.entries(data)
+    const inputs = Object.entries(data)
       .filter(([_, value]) => value)
       .map(async ([key, value]) => {
         const inputType = pipeline.interface_config.form.inputs.find(input => input.name === key)?.type
         if (inputType === "file_input") {
-          const blob = await (value as File).arrayBuffer().then((arrayBuffer: any) => {
-            return new Blob([new Uint8Array(arrayBuffer)], {
-              type: (value as File).type,
-            });
-          });
-
-          return {
-            name: `${key}:input`,
-            value: await blob.arrayBuffer() as unknown as string
-          }
+          return null
         }
 
         return {
           name: `${key}:input`,
-          value: value as string
+          value: value
         }
-      }))
+      })
+      .filter(Boolean) as unknown as { name: string, value: string }[]
 
     for (const input of inputs) {
       push(input.name, input.value)
@@ -127,58 +131,76 @@ export default function WebsiteForm() {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen w-full">
-      <ValidatedForm
-        validator={validator}
-        noValidate
-        onSubmit={handleOnSubmit}
-      >
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 items-center max-w-screen-2xl">
-          {pipeline.interface_config.form.inputs.map(input => {
+    <div className="flex justify-center items-center h-screen flex-col h-screen w-full">
 
-            return (
-              <Field name={input.name} key={input.name}>
-                {input.type === "text_input" && (
-                  <TextInputField
-                    label={input.name}
-                  />
-                )}
-                {input.type === "file_input" && (
-                  <SmallFileInputField
-                    multiple={false}
-                    buttonText={input.name}
-                    onChange={async () => { }}
-                  />
-                )}
-              </Field>
-            )
+      <div className="max-w-[820px]">
+        <div
+          className={classNames("w-[6px] h-[6px] rounded-full", {
+            "bg-red-500": connectionStatus === "idle",
+            "bg-green-500": connectionStatus === "running",
+            "bg-orange-500": connectionStatus === "starting",
           })}
+        />
+        <ValidatedForm
+          validator={validator}
+          noValidate
+          onSubmit={handleOnSubmit}
+        >
+          <div className="flex flex-col items-start w-full gap-5">
+            {pipeline.interface_config.form.inputs.map(input => {
 
+              return (
+                <Field name={input.name} key={input.name}>
+                  {input.type === "text_input" && (
+                    <TextInputField
+                      className="w-full"
+                      label={input.name}
+                    />
+                  )}
+                  {input.type === "file_input" && (
+                    <SmallFileInputField
+                      multiple={false}
+                      buttonText={input.name}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
 
-        </div>
+                        const buffer = await file.arrayBuffer()
 
-        <SubmitButton size="sm" variant="filled" className="mt-6 mb-6">
-          Submit
-        </SubmitButton>
+                        push(`${input.name}:input`, buffer)
+                      }}
+                      disabled={blockStatus[input.name]}
+                    />
+                  )}
+                </Field>
+              )
+            })}
 
-        {
-          pipeline.interface_config.form.outputs.map(output => (
-            <React.Fragment key={output.name}>
-              <div className="mb-1 flex gap-1">
-                <NodeCopyButton text={outputs[output.name]} />
+          </div>
 
-                <NodeDownloadButton blockName={output.name} text={outputs[output.name]} />
+          <SubmitButton size="sm" variant="filled" className="mt-6 mb-6">
+            Submit
+          </SubmitButton>
 
-                <NodeClearButton onClear={() => { }} />
-              </div>
-              <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-                <ChatMarkdown>{outputs[output.name] ?? ""}</ChatMarkdown>
-              </div>
-            </React.Fragment>
-          ))
-        }
+          {
+            pipeline.interface_config.form.outputs.map(output => (
+              <React.Fragment key={output.name}>
+                <div className="mb-1 flex gap-1">
+                  <NodeCopyButton text={outputs[output.name]} />
 
-      </ValidatedForm>
+                  <NodeDownloadButton blockName={output.name} text={outputs[output.name]} />
+
+                  <NodeClearButton onClear={() => { }} />
+                </div>
+                <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+                  <ChatMarkdown>{outputs[output.name] ?? ""}</ChatMarkdown>
+                </div>
+              </React.Fragment>
+            ))
+          }
+
+        </ValidatedForm>
+      </div>
       <div id="_root"></div>
     </div>
   );
