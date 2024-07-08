@@ -219,12 +219,12 @@ defmodule Buildel.Blocks.Chat do
     GenServer.cast(pid, {:finish_chat_message})
   end
 
-  defp save_tool_call(pid, tool_name, arguments) do
-    GenServer.cast(pid, {:save_tool_call, tool_name, arguments})
+  defp save_tool_calls(pid, tool_calls) do
+    GenServer.cast(pid, {:save_tool_calls, tool_calls})
   end
 
-  defp save_tool_result(pid, tool_name, content) do
-    GenServer.cast(pid, {:save_tool_result, tool_name, content})
+  defp save_tool_results(pid, tool_results) do
+    GenServer.cast(pid, {:save_tool_results, tool_results})
   end
 
   defp save_usage(pid, usage) do
@@ -356,22 +356,20 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_cast({:save_tool_call, tool_name, arguments}, state) do
+  def handle_cast({:save_tool_calls, tool_calls}, state) do
     chat_memory =
-      ChatMemory.add_tool_call_message(state.chat_memory, %{
-        tool_name: tool_name,
-        arguments: arguments
+      ChatMemory.add_tool_calls_message(state.chat_memory, %{
+        tool_calls: tool_calls
       })
 
     {:noreply, %{state | chat_memory: chat_memory}}
   end
 
   @impl true
-  def handle_cast({:save_tool_result, tool_name, content}, state) do
+  def handle_cast({:save_tool_results, tool_results}, state) do
     chat_memory =
-      ChatMemory.add_tool_result_message(state.chat_memory, %{
-        tool_name: tool_name,
-        content: content
+      ChatMemory.add_tool_results_message(state.chat_memory, %{
+        tool_results: tool_results
       })
 
     {:noreply, %{state | chat_memory: chat_memory}}
@@ -444,8 +442,6 @@ defmodule Buildel.Blocks.Chat do
             Function.new!(
               tool_definition.function
               |> Map.put(:function, fn args, _context ->
-                # TUTAJ MUSISZ ZASUBSKRYBOWAĆ TOPIC!
-                # Buildel.BlockPubSub.subscribe_to_io()
                 {_, {:text, response}} =
                   output_and_wait_for_response(state, "tool", {:text, Jason.encode!(args)}, %{
                     metadata: %{tool_name: tool_definition.function.name},
@@ -585,15 +581,31 @@ defmodule Buildel.Blocks.Chat do
 
                save_text_chunk(pid, text_chunk)
              end,
-             on_tool_call: fn tool_name, arguments, message ->
-               output(state, "output", {:text, message}, %{stream_stop: :none})
+             on_tool_call: fn tool_calls ->
+               tool_calls
+               |> Enum.map(fn tool_call ->
+                 %{call_formatter: call_formatter} =
+                   tools |> Enum.find(fn tool -> tool.function.name == tool_call.name end)
 
-               save_tool_call(pid, tool_name, arguments)
+                 output(state, "output", {:text, call_formatter.(tool_call.arguments)}, %{
+                   stream_stop: :none
+                 })
+               end)
+
+               save_tool_calls(pid, tool_calls)
              end,
-             on_tool_content: fn tool_name, content, message ->
-               output(state, "output", {:text, message}, %{stream_stop: :none})
+             on_tool_content: fn tool_results ->
+               tool_results
+               |> Enum.map(fn tool_result ->
+                 %{response_formatter: response_formatter} =
+                   tools |> Enum.find(fn tool -> tool.function.name == tool_result.name end)
 
-               save_tool_result(pid, tool_name, content)
+                 output(state, "output", {:text, response_formatter.(tool_result.content)}, %{
+                   stream_stop: :none
+                 })
+               end)
+
+               save_tool_results(pid, tool_results)
              end,
              on_cost: fn token_summary ->
                chat_cost = Buildel.Costs.CostCalculator.calculate_chat_cost(token_summary)

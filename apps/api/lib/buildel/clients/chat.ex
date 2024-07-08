@@ -17,17 +17,13 @@ end
 
 defmodule Buildel.Clients.Chat do
   require Logger
-  # alias Buildel.Langchain.TokenUsage
-  # alias Buildel.Langchain.ChatModels.ChatMistralAI
-  # alias Buildel.LangChain.ChatModels.ChatGoogleAI
+  alias LangChain.Message.ToolResult
+  alias LangChain.Message.ToolCall
   alias Buildel.Clients.ChatBehaviour
-  # alias Buildel.LangChain.Chains.LLMChain
-  # alias Buildel.LangChain.ChatModels.ChatOpenAI
   alias Langchain.ChatModels.ChatMistralAI
   alias LangChain.ChatModels.ChatOpenAI
   alias LangChain.ChatModels.ChatGoogleAI
   alias LangChain.Message
-  alias LangChain.MessageDelta
   alias LangChain.Chains.LLMChain
 
   @behaviour ChatBehaviour
@@ -37,7 +33,7 @@ defmodule Buildel.Clients.Chat do
         %{
           context: context,
           on_content: on_content,
-          on_tool_content: _on_tool_content,
+          on_tool_content: on_tool_content,
           on_tool_call: on_tool_call,
           on_end: on_end,
           on_error: on_error,
@@ -56,7 +52,7 @@ defmodule Buildel.Clients.Chat do
     handler = %{
       on_llm_new_delta: fn _model, delta ->
         case delta do
-          %LangChain.MessageDelta{status: :incomplete, content: content, tool_calls: nil} = delta
+          %LangChain.MessageDelta{status: :incomplete, content: content, tool_calls: nil}
           when is_binary(content) ->
             on_content.(content)
 
@@ -90,41 +86,32 @@ defmodule Buildel.Clients.Chat do
         %{role: "user"} = message ->
           Message.new_user!(message.content)
 
-          # %{role: "tool"} = message ->
-          #   Message.new_tool_result!(%{tool_results: [], content: message.content})
+        %{role: "tool"} = message ->
+          Message.new_tool_result!(%{
+            tool_results:
+              message.tool_results
+              |> Enum.map(
+                &ToolResult.new!(%{
+                  name: &1.tool_name,
+                  content: &1.content,
+                  tool_call_id: &1.call_id
+                })
+              )
+          })
 
-          # %{role: "tool_call"} = message ->
-          #   Message.new_function_call!(message.tool_name, Jason.encode!(message.arguments))
+        %{role: "tool_call"} = message ->
+          Message.new_assistant!(%{
+            tool_calls:
+              message.tool_calls
+              |> Enum.map(
+                &ToolCall.new!(%{
+                  name: &1.tool_name,
+                  arguments: &1.arguments,
+                  call_id: &1.call_id
+                })
+              )
+          })
       end)
-
-    IO.inspect(messages, label: "messages")
-
-    # callback_fn = fn
-    # %Message{function_name: function_name, content: content, arguments: nil}
-    # when is_binary(function_name) and is_binary(content) ->
-    #   %{response_formatter: response_formatter} =
-    #     tools |> Enum.find(fn tool -> tool.function.name == function_name end)
-
-    #   on_tool_content.(function_name, content, response_formatter.(content))
-
-    # %Message{function_name: function_name, arguments: arguments}
-    # when is_binary(function_name) ->
-    #   case tools |> Enum.find(fn tool -> tool.function.name == function_name end) do
-    #     nil ->
-    #       Logger.debug("Tool not found: #{function_name}")
-    #       nil
-
-    #     %{call_formatter: call_formatter} ->
-    #       on_tool_call.(function_name, arguments, call_formatter.(arguments))
-    #   end
-
-    # %Message{} ->
-    #   nil
-
-    # {:error, reason} ->
-    #   on_error.(reason)
-    #   nil
-    # end
 
     with {:ok, chain, message} <-
            LLMChain.new!(%{
@@ -137,32 +124,18 @@ defmodule Buildel.Clients.Chat do
              on_retries_exceeded: fn _chain ->
                nil
              end,
-             on_message_processing_error: fn _chain, message ->
+             on_message_processing_error: fn _chain, _message ->
                nil
              end,
-             on_error_message_created: fn _chain, message ->
+             on_error_message_created: fn _chain, _message ->
                nil
              end,
              on_tool_response_created: fn _chain, message ->
-               nil
+               on_tool_content.(message.tool_results)
              end,
              on_message_processed: fn _chain, message ->
                if Message.is_tool_call?(message) do
-                 message.tool_calls
-                 |> Enum.map(fn tool_call ->
-                   case tools |> Enum.find(fn tool -> tool.function.name == tool_call.name end) do
-                     nil ->
-                       Logger.debug("Tool not found: #{tool_call.name}")
-                       nil
-
-                     %{call_formatter: call_formatter} ->
-                       on_tool_call.(
-                         tool_call.name,
-                         tool_call.arguments,
-                         call_formatter.(tool_call.arguments)
-                       )
-                   end
-                 end)
+                 on_tool_call.(message.tool_calls)
                end
              end
            })
@@ -236,8 +209,6 @@ defmodule Buildel.Clients.Chat do
   def get_models(_) do
     []
   end
-
-  defp get_llm(opts, callbacks \\ [])
 
   defp get_llm(%{api_type: "mistral"} = opts, callbacks) do
     ChatMistralAI.new!(%{

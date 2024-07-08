@@ -369,53 +369,53 @@ defmodule Buildel.Blocks.DocumentSearch do
         response_formatter: fn _response ->
           ""
         end
-      },
-      %{
-        function: %{
-          name: "parent",
-          description: "Retrieve the parent context of a specified chunk",
-          parameters_schema: %{
-            type: "object",
-            properties: %{
-              chunk_id: %{
-                type: "string",
-                description: "chunk_id"
-              }
-            },
-            required: ["chunk_id"]
-          }
-        },
-        call_formatter: fn args ->
-          args = %{"config.args" => args, "config.block_name" => state.block.name}
-          build_call_formatter(state.call_formatter, args)
-        end,
-        response_formatter: fn _response ->
-          ""
-        end
-      },
-      %{
-        function: %{
-          name: "related",
-          description: "Retrieve the related context of a specified chunk",
-          parameters_schema: %{
-            type: "object",
-            properties: %{
-              chunk_id: %{
-                type: "string",
-                description: "chunk_id"
-              }
-            },
-            required: ["chunk_id"]
-          }
-        },
-        call_formatter: fn args ->
-          args = %{"config.args" => args, "config.block_name" => state.block.name}
-          build_call_formatter(state.call_formatter, args)
-        end,
-        response_formatter: fn _response ->
-          ""
-        end
       }
+      # %{
+      #   function: %{
+      #     name: "parent",
+      #     description: "Retrieve the parent context of a specified chunk",
+      #     parameters_schema: %{
+      #       type: "object",
+      #       properties: %{
+      #         chunk_id: %{
+      #           type: "string",
+      #           description: "chunk_id"
+      #         }
+      #       },
+      #       required: ["chunk_id"]
+      #     }
+      #   },
+      #   call_formatter: fn args ->
+      #     args = %{"config.args" => args, "config.block_name" => state.block.name}
+      #     build_call_formatter(state.call_formatter, args)
+      #   end,
+      #   response_formatter: fn _response ->
+      #     ""
+      #   end
+      # },
+      # %{
+      #   function: %{
+      #     name: "related",
+      #     description: "Retrieve the related context of a specified chunk",
+      #     parameters_schema: %{
+      #       type: "object",
+      #       properties: %{
+      #         chunk_id: %{
+      #           type: "string",
+      #           description: "chunk_id"
+      #         }
+      #       },
+      #       required: ["chunk_id"]
+      #     }
+      #   },
+      #   call_formatter: fn args ->
+      #     args = %{"config.args" => args, "config.block_name" => state.block.name}
+      #     build_call_formatter(state.call_formatter, args)
+      #   end,
+      #   response_formatter: fn _response ->
+      #     ""
+      #   end
+      # }
     ]
   end
 
@@ -437,8 +437,6 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   @impl true
   def handle_tool("tool", "query", {_name, :text, args, metadata}, state) do
-    IO.inspect(metadata)
-
     query(self(), {:text, args["query"]}, %{
       send_to: metadata.send_to,
       message_id: metadata.message_id
