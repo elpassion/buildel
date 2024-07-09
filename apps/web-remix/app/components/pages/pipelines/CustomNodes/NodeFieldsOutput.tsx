@@ -8,6 +8,7 @@ import {
 } from "./NodeActionButtons";
 import { AudioOutput } from "./AudioOutput";
 import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
+import { FileOutput } from "./FileOutput";
 
 interface NodeFieldsOutputProps {
   fields: IField[];
@@ -47,6 +48,11 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
           fieldEvents.length > 0 ? getAudioOutput(fieldEvents) : null;
 
         return <AudioOutput audio={audio} />;
+      } else if (type === "file") {
+        const files =
+          fieldEvents.length > 0 ? fieldEvents.map(getFileOutput) : [];
+
+        return <FileOutput files={files} />;
       }
 
       return <span>Unsupported output type - {type}</span>;
@@ -89,5 +95,12 @@ function getAudioOutput(events: IEvent[]) {
   return new Blob(
     events.map((event) => event.payload),
     { type: "audio/mp3" }
+  );
+}
+
+function getFileOutput(event: IEvent) {
+  return new Blob(
+    [event.payload],
+    { type: "file" }
   );
 }
