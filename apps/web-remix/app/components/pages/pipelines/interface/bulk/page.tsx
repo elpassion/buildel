@@ -18,7 +18,6 @@ import {
   InterfaceSectionWrapper,
 } from "~/components/interfaces/InterfaceSection";
 import { SelectField } from "~/components/form/fields/select.field";
-import "./bulk.styles.css";
 import { BulkTable } from "./BulkTable";
 
 export interface ITest {

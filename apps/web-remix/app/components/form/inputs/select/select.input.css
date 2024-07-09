@@ -1,55 +1,89 @@
-.rc-select{
-    @apply !w-full
+.rc-select {
+  @apply !w-full;
 }
 
-.rc-select .rc-select-selector{
-    @apply rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !bg-neutral-800
+.rc-select .rc-select-selector {
+  @apply rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !bg-neutral-800;
 }
 
-.rc-select-focused .rc-select-selector{
-    @apply outline outline-offset-[2px] outline-[2px] outline-primary-500 !border-neutral-200
+.rc-select-focused .rc-select-selector {
+  @apply outline outline-offset-[2px] outline-[2px] outline-primary-500 !border-neutral-200;
 }
 
-.rc-select .rc-select-selector .rc-select-selection-search-input{
-    @apply !bg-neutral-800 !shadow-none !ring-0 !text-white !text-sm !h-[40px] !outline-none
+.rc-select .rc-select-selector .rc-select-selection-search-input {
+  @apply !bg-neutral-800 !shadow-none !ring-0 !text-white !text-sm !h-[40px] !outline-none;
 }
 
-.rc-select .rc-select-selection-placeholder{
-    @apply !text-neutral-100  !opacity-100
+.rc-select .rc-select-selection-placeholder {
+  @apply !text-neutral-100  !opacity-100;
 }
 
-.rc-select .rc-select-selection-item, .rc-select .rc-select-selection-placeholder {
-    @apply !top-1/2 !left-3 -translate-y-1/2 !text-sm !text-white
+.rc-select .rc-select-selection-item,
+.rc-select .rc-select-selection-placeholder {
+  @apply !top-1/2 !left-3 -translate-y-1/2 !text-sm !text-white;
 }
 
-.rc-select .rc-select-clear{
-    @apply !text-white !text-sm !cursor-pointer !absolute !top-1/2 right-3 -translate-y-1/2
+.rc-select .rc-select-clear {
+  @apply !text-white !text-sm !cursor-pointer !absolute !top-1/2 right-3 -translate-y-1/2;
 }
 
-.rc-select-dropdown{
-    @apply !min-h-fit !bg-neutral-700 !rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !z-[61]
+.rc-select-dropdown {
+  @apply !min-h-fit !bg-neutral-700 !rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !z-[61];
 }
 
-.rc-select-dropdown .rc-select-item-empty{
-    @apply !text-neutral-100 !my-2 !text-sm
+.rc-select-dropdown .rc-select-item-empty {
+  @apply !text-neutral-100 !my-2 !text-sm;
 }
 
-.rc-select-dropdown .rc-select-item-option{
-    @apply !cursor-pointer
+.rc-select-dropdown .rc-select-item-option {
+  @apply !cursor-pointer;
 }
 
-.rc-select-dropdown .rc-select-item-option .rc-select-item-option-content{
-    @apply !text-white !text-sm !py-2
+.rc-select-dropdown .rc-select-item-option .rc-select-item-option-content {
+  @apply !text-white !text-sm !py-2;
 }
 
-.rc-select-dropdown .rc-select-item-option-active{
-    @apply !bg-neutral-800
+.rc-select-dropdown .rc-select-item-option-active {
+  @apply !bg-neutral-800;
 }
 
-.rc-select-dropdown .rc-select-item-option-selected{
-    @apply !bg-neutral-900
+.rc-select-dropdown .rc-select-item-option-selected {
+  @apply !bg-neutral-900;
 }
 
-.rc-select-dropdown .rc-select-item-option-selected .rc-select-item-option-state{
-    @apply !hidden
+.rc-select-dropdown
+  .rc-select-item-option-selected
+  .rc-select-item-option-state {
+  @apply !hidden;
+}
+
+.rc-select.rc-select-multiple .rc-select-selector {
+  @apply flex-nowrap flex-row-reverse items-center px-4 py-1;
+}
+
+.rc-select.rc-select-multiple .rc-select-selection-placeholder,
+.rc-select.rc-select-multiple .rc-select-selection-item {
+  @apply transform-none;
+}
+
+.rc-select-multiple .rc-select-selector .rc-select-selection-item {
+  @apply px-2 py-1.5 m-0 flex gap-3 cursor-pointer bg-neutral-300;
+}
+
+.rc-select-multiple .rc-select-selector .rc-select-selection-overflow-item {
+  @apply flex items-center justify-center h-full;
+}
+
+.rc-select-multiple .rc-select-selector .rc-select-selection-overflow {
+  @apply gap-3 items-center flex-nowrap overflow-x-scroll;
+}
+
+.rc-select-multiple
+  .rc-select-selector
+  .rc-select-selection-overflow::-webkit-scrollbar {
+  @apply hidden;
+}
+
+.rc-select-selection-item:hover > .rc-select-selection-item-remove {
+  @apply text-[#ef4444];
 }
