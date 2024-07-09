@@ -44,7 +44,7 @@ defmodule Buildel.Blocks.MapList do
   end
 
   @impl true
-  def handle_input("input", {_name, :text, text, _metadata}, state) do
+  def handle_input("list", {_name, :text, text, _metadata}, state) do
     map(text, state)
     state
   end

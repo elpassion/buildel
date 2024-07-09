@@ -34,7 +34,7 @@ defmodule Buildel.Blocks.MapListTest do
             name: "test",
             opts: %{},
             connections: [
-              Blocks.Connection.from_connection_string("test_input:output->input", "text")
+              Blocks.Connection.from_connection_string("test_input:output->list", "text")
             ]
           })
         ]
