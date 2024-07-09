@@ -16,12 +16,13 @@ defmodule Buildel.BlocksTestRunner.Run do
     )
   end
 
-  def input(run, block_name, input_name, data) do
+  def input(run, block_name, input_name, data, metadata \\ %{}) do
     Buildel.BlockPubSub.broadcast_to_io(
       Buildel.BlocksTestRunner.context_id(run.pid),
       block_name,
       input_name,
-      data
+      data,
+      metadata
     )
   end
 
