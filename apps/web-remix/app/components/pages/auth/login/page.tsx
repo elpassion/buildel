@@ -7,7 +7,6 @@ import { schema } from "./schema";
 import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { FieldError } from "~/components/form/fields/field.error";
 import { SubmitButton } from "~/components/form/submit";
-import { GoogleSignInForm } from "~/components/googleAuth/GoogleSignInForm";
 import {
   PasswordInputField,
   TextInputField,
@@ -15,6 +14,8 @@ import {
 import { loader } from "./loader.server";
 import { GoogleButton } from "~/components/googleAuth/GoogleButton";
 import { routes } from "~/utils/routes.utils";
+import { SocialSignInForm } from "~/components/socialAuth/SocialSignInForm";
+import { GithubButton } from "~/components/githubAuth/GithubButton";
 
 export function LoginPage() {
   const { googleLoginEnabled, signupEnabled } = useLoaderData<typeof loader>();
@@ -77,9 +78,12 @@ export function LoginPage() {
       {googleLoginEnabled && (
         <>
           <span className="my-3 text-neutral-300 text-sm">Or</span>
-          <GoogleSignInForm className="max-w-md">
+          <SocialSignInForm action="/auth/google" className="max-w-md mb-4">
             <GoogleButton />
-          </GoogleSignInForm>
+          </SocialSignInForm>
+          <SocialSignInForm action="/auth/github" className="max-w-md">
+            <GithubButton />
+          </SocialSignInForm>
         </>
       )}
     </div>

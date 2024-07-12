@@ -1,18 +1,18 @@
 import React, { PropsWithChildren } from "react";
 import { Form } from "@remix-run/react";
-import { GoogleButton } from "./GoogleButton";
 import classNames from "classnames";
 
-interface GoogleSignInFormProps {
+interface SocialSignInFormProps {
   className?: string;
+  action: string;
 }
 
-export const GoogleSignInForm: React.FC<
-  PropsWithChildren<GoogleSignInFormProps>
-> = ({ className, children }) => {
+export const SocialSignInForm: React.FC<
+  PropsWithChildren<SocialSignInFormProps>
+> = ({ className, children, action }) => {
   return (
     <Form
-      action="/auth/google"
+      action={action}
       method="post"
       className={classNames("w-full", className)}
     >

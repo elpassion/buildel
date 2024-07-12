@@ -172,4 +172,20 @@ defmodule BuildelWeb.Schemas.Users do
       required: [:token]
     })
   end
+
+  defmodule CreateLoginWithGithubRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "UserCreateLoginWithGithubRequest",
+      type: :object,
+      properties: %{
+        token: %Schema{
+          type: :string,
+          description: "Token"
+        }
+      },
+      required: [:token]
+    })
+  end
 end

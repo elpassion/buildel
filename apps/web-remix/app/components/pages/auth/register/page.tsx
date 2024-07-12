@@ -11,9 +11,10 @@ import {
 } from "~/components/form/fields/text.field";
 import { schema } from "./schema";
 import { SubmitButton } from "~/components/form/submit";
-import { GoogleSignInForm } from "~/components/googleAuth/GoogleSignInForm";
 import { loader } from "./loader.server";
 import { GoogleButton } from "~/components/googleAuth/GoogleButton";
+import { SocialSignInForm } from "~/components/socialAuth/SocialSignInForm";
+import { GithubButton } from "~/components/githubAuth/GithubButton";
 
 export function RegisterPage() {
   const { googleLoginEnabled } = useLoaderData<typeof loader>();
@@ -72,9 +73,12 @@ export function RegisterPage() {
       {googleLoginEnabled && (
         <>
           <span className="my-3 text-neutral-300 text-sm">Or</span>
-          <GoogleSignInForm className="max-w-md">
+          <SocialSignInForm action="/auth/google" className="max-w-md mb-4">
             <GoogleButton content="Sign up with Google" />
-          </GoogleSignInForm>
+          </SocialSignInForm>
+          <SocialSignInForm action="/auth/github" className="max-w-md">
+            <GithubButton content="Sign up with Github" />
+          </SocialSignInForm>
         </>
       )}
     </div>

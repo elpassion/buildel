@@ -215,6 +215,7 @@ defmodule BuildelWeb.Router do
     get("/users/me", UserController, :me)
     post("/users/log_in", UserSessionController, :create)
     post("/users/google/log_in", UserSessionController, :create_google)
+    post("/users/github/log_in", UserSessionController, :create_github)
     delete("/users/log_out", UserSessionController, :delete)
     put("/users/password", UserPasswordController, :update)
     post("/users/password/reset", UserPasswordResetController, :create)
