@@ -1,7 +1,7 @@
 import React, { DragEvent, useCallback } from "react";
 import classNames from "classnames";
 import startCase from "lodash.startcase";
-import { useReactFlow } from "reactflow";
+import { useReactFlow } from "@xyflow/react";
 import { z } from "zod";
 import { Icon, IconButton } from "@elpassion/taco";
 import { BlockType } from "~/api/blockType/blockType.contracts";
@@ -29,7 +29,7 @@ export const CreateBlockDraggableItem: React.FC<
   const onClickAdd = useCallback(
     (block: z.TypeOf<typeof BlockType>) => {
       const { x, y } = reactFlowInstance.getViewport();
-      const position = reactFlowInstance.project({
+      const position = reactFlowInstance.screenToFlowPosition({
         x: (x / 2) * Math.random(),
         y: (y / 2) * Math.random(),
       });

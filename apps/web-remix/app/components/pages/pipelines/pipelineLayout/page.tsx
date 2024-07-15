@@ -21,7 +21,7 @@ export function PipelineLayout() {
             <div className="flex gap-2 items-center">
               <AliasSelect aliases={aliases} value={aliasId} />
 
-              {aliasId !== "latest" && <RestoreWorkflow pipeline={pipeline} />}
+              {aliasId !== "latest" && <RestoreWorkfulow pipeline={pipeline} />}
 
               {aliasId === "latest" && (
                 <CreateAliasForm pipeline={pipeline} aliases={aliases} />
@@ -38,7 +38,7 @@ export function PipelineLayout() {
               to={routes.pipelineBuild(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams),
+                Object.fromEntries(searchParams)
               )}
             >
               Build
@@ -47,7 +47,7 @@ export function PipelineLayout() {
               to={routes.pipelineRuns(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams),
+                Object.fromEntries(searchParams)
               )}
             >
               Overview
@@ -56,7 +56,7 @@ export function PipelineLayout() {
               to={routes.pipelineInterface(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams),
+                Object.fromEntries(searchParams)
               )}
             >
               Interface
@@ -65,7 +65,7 @@ export function PipelineLayout() {
               to={routes.pipelineSettings(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams),
+                Object.fromEntries(searchParams)
               )}
             >
               Settings

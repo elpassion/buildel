@@ -1,8 +1,8 @@
 import { DragEvent, RefObject, useCallback, useState } from "react";
-import { ReactFlowInstance } from "reactflow";
+import { ReactFlowInstance } from "@xyflow/react";
 import { z } from "zod";
 import { assert } from "~/utils/assert";
-import { IBlockConfig } from "./pipeline.types";
+import { IBlockConfig, IEdge, INode } from "./pipeline.types";
 import { BlockType } from "~/api/blockType/blockType.contracts";
 
 interface IUseDraggableNodes {
@@ -10,8 +10,10 @@ interface IUseDraggableNodes {
   onDrop: (node: IBlockConfig) => void;
 }
 export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {
-  const [reactFlowInstance, setReactFlowInstance] =
-    useState<ReactFlowInstance | null>(null);
+  const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance<
+    INode,
+    IEdge
+  > | null>(null);
 
   const handleOnDragOver = useCallback((event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -34,7 +36,7 @@ export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {
 
         if (!block) return;
 
-        const position = reactFlowInstance.project({
+        const position = reactFlowInstance.screenToFlowPosition({
           x: event.clientX - reactFlowBounds.left,
           y: event.clientY - reactFlowBounds.top,
         });
@@ -55,7 +57,7 @@ export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {
     [onDrop, reactFlowInstance, wrapper]
   );
 
-  const onInit = useCallback((inst: ReactFlowInstance) => {
+  const onInit = useCallback((inst: ReactFlowInstance<INode, IEdge>) => {
     setReactFlowInstance(inst);
   }, []);
 

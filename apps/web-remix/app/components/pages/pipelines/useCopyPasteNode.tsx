@@ -1,7 +1,7 @@
 import { RefObject, useCallback, useRef } from "react";
 import { useEventListener } from "usehooks-ts";
-import { IBlockConfig, INode } from "./pipeline.types";
-import { ReactFlowInstance } from "reactflow";
+import { IBlockConfig, IEdge, INode } from "./pipeline.types";
+import { ReactFlowInstance } from "@xyflow/react";
 import { BlockConfig } from "~/api/blockType/blockType.contracts";
 
 interface UseCopyPasteNodeArgs {
@@ -18,7 +18,9 @@ export const useCopyPasteNode = ({
   allowCopyPaste = () => true,
 }: UseCopyPasteNodeArgs) => {
   const mousePosition = useRef({ clientX: 0, clientY: 0 });
-  const reactFlowInstance = useRef<ReactFlowInstance | null>(null);
+  const reactFlowInstance = useRef<ReactFlowInstance<INode, IEdge> | null>(
+    null
+  );
 
   useEventListener("keydown", (e) => {
     if (
@@ -41,7 +43,7 @@ export const useCopyPasteNode = ({
       if (e.code === "KeyV") {
         const reactFlowBounds = wrapper.current?.getBoundingClientRect();
 
-        const position = reactFlowInstance.current?.project({
+        const position = reactFlowInstance.current?.screenToFlowPosition({
           x: mousePosition.current.clientX - reactFlowBounds!.left,
           y: mousePosition.current.clientY - reactFlowBounds!.top,
         });
@@ -64,7 +66,7 @@ export const useCopyPasteNode = ({
     }
   });
 
-  const onInit = useCallback((inst: ReactFlowInstance) => {
+  const onInit = useCallback((inst: ReactFlowInstance<INode, IEdge>) => {
     reactFlowInstance.current = inst;
   }, []);
 

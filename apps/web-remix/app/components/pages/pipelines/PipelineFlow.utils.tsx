@@ -1,4 +1,4 @@
-import { Connection } from "reactflow";
+import { Connection } from "@xyflow/react";
 import {
   IPipelineConfig,
   INode,

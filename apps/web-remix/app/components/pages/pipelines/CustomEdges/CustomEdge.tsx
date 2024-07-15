@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { EdgeProps, getBezierPath } from "reactflow";
+import { EdgeProps, getBezierPath } from "@xyflow/react";
 import { Icon } from "@elpassion/taco";
 import { useRunPipelineEdge } from "../RunPipelineProvider";
 import classNames from "classnames";

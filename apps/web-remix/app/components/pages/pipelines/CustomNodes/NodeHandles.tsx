@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import startCase from "lodash.startcase";
-import { Handle, Position } from "reactflow";
+import { Handle, Position } from "@xyflow/react";
 import { IHandle } from "../pipeline.types";
 import classNames from "classnames";
 

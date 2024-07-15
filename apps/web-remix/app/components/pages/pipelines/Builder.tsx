@@ -1,5 +1,6 @@
 import React, {
   ComponentType,
+  FunctionComponent,
   ReactNode,
   useCallback,
   useEffect,
@@ -8,7 +9,8 @@ import React, {
 } from "react";
 import classNames from "classnames";
 import { useEventListener } from "usehooks-ts";
-import ReactFlow, {
+import {
+  ReactFlow,
   addEdge,
   Background,
   BackgroundVariant,
@@ -21,7 +23,8 @@ import ReactFlow, {
   NodeProps,
   applyEdgeChanges,
   applyNodeChanges,
-} from "reactflow";
+  Edge,
+} from "@xyflow/react";
 import {
   useLocation,
   useNavigate,
@@ -50,7 +53,7 @@ import { RunPipelineProvider } from "./RunPipelineProvider";
 import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
 import { useCopyPasteNode } from "./useCopyPasteNode";
 
-import "reactflow/dist/style.css";
+import "@xyflow/react/dist/style.css";
 
 interface BuilderProps {
   alias?: string;
@@ -112,7 +115,7 @@ export const Builder = ({
   });
 
   const onNodesChange = useCallback(
-    (changes: NodeChange[]) => {
+    (changes: NodeChange<INode>[]) => {
       if (type === "readOnly") return;
       if (["select", "position", "dimensions"].includes(changes[0].type)) {
         updateCurrent((state) => ({
@@ -130,7 +133,7 @@ export const Builder = ({
   );
 
   const onEdgesChange = useCallback(
-    (changes: EdgeChange[]) => {
+    (changes: EdgeChange<IEdge>[]) => {
       if (type === "readOnly") return;
       if (["select"].includes(changes[0].type)) {
         updateCurrent((state) => ({
@@ -168,11 +171,14 @@ export const Builder = ({
   }, []);
 
   const handleIsValidConnection = useCallback(
-    (connection: Connection) =>
-      isValidConnection(
+    (connection: Connection | Edge) => {
+      if (!isConnection(connection)) return false;
+
+      return isValidConnection(
         toPipelineConfig(flowState.nodes, flowState.edges),
         connection
-      ),
+      );
+    },
     [flowState]
   );
 
@@ -198,11 +204,12 @@ export const Builder = ({
 
       created.opts.name = name;
 
-      const newBlock = {
+      const newBlock: INode = {
         id: name,
         type: "custom",
         position: created.position ?? { x: 100, y: 100 },
         data: { ...created, name },
+        selected: false,
       };
 
       setFlowState((state) => ({
@@ -254,8 +261,8 @@ export const Builder = ({
     onDrop: onBlockCreate,
   });
 
-  const PipelineNode = useCallback(
-    (props: NodeProps) => (
+  const PipelineNode: FunctionComponent<NodeProps<INode>> = useCallback(
+    (props: NodeProps<INode>) => (
       <CustomNode
         {...props}
         onDelete={handleDelete}
@@ -298,7 +305,7 @@ export const Builder = ({
         }}
       >
         <ReactFlowProvider>
-          <ReactFlow
+          <ReactFlow<INode, IEdge>
             edgesUpdatable={type !== "readOnly"}
             edgesFocusable={type !== "readOnly"}
             nodesDraggable={type !== "readOnly"}
@@ -310,6 +317,7 @@ export const Builder = ({
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            //@ts-ignore
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             onDrop={onDrop}
@@ -332,7 +340,7 @@ export const Builder = ({
               variant={BackgroundVariant.Dots}
               gap={20}
               color="#666"
-              className="bg-black rounded-lg"
+              className="!bg-black rounded-lg"
             />
             <Controls showInteractive={false} />
           </ReactFlow>
@@ -347,3 +355,7 @@ export const Builder = ({
     </div>
   );
 };
+
+function isConnection(edge: Edge | Connection): edge is Connection {
+  return (edge as Connection).source !== undefined;
+}

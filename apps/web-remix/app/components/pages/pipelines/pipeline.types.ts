@@ -33,7 +33,7 @@ export interface INode {
   id: string;
   type?: string;
   position: { x: number; y: number };
-  selected?: boolean;
+  selected: boolean;
   data: IBlockConfig;
 }
 
@@ -53,12 +53,12 @@ export interface IField {
     name: string;
     public: boolean;
     type:
-    | "audio"
-    | "text"
-    | "file"
-    | "file_temporary"
-    | "worker"
-    | "controller";
+      | "audio"
+      | "text"
+      | "file"
+      | "file_temporary"
+      | "worker"
+      | "controller";
   };
 }
 
@@ -74,7 +74,9 @@ export type IBlockType = z.TypeOf<typeof BlockType>;
 
 export type IInterfaceConfig = z.infer<typeof InterfaceConfig>;
 export type IInterfaceConfigForm = z.infer<typeof InterfaceConfigForm>;
-export type IInterfaceConfigFormProperty = z.infer<typeof InterfaceConfigFormProperty>;
+export type IInterfaceConfigFormProperty = z.infer<
+  typeof InterfaceConfigFormProperty
+>;
 
 export type IPipeline = z.infer<typeof Pipeline>;
 
