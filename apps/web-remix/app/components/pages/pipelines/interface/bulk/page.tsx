@@ -41,11 +41,11 @@ export function BulkPage() {
   >([]);
 
   const inputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_input",
+    (block) => block.type === "text_input"
   );
 
   const outputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_output",
+    (block) => block.type === "text_output"
   );
 
   function generateNewTest() {
@@ -54,11 +54,11 @@ export function BulkPage() {
       status: "pending" as const,
       inputs: selectedInputs.reduce(
         (acc, input) => ({ ...acc, [input]: "" }),
-        {},
+        {}
       ),
       outputs: selectedOutputs.reduce(
         (acc, output) => ({ ...acc, [output]: "" }),
-        {},
+        {}
       ),
     };
   }
@@ -75,14 +75,14 @@ export function BulkPage() {
         headers: {
           "content-type": "application/json",
         },
-      },
+      }
     );
     const {
       data: { id },
     } = await response.json();
 
     setTests((tests) =>
-      tests.map((t) => (t.id === test.id ? { ...t, run: id } : t)),
+      tests.map((t) => (t.id === test.id ? { ...t, run: id } : t))
     );
 
     const runResponse = await fetch(
@@ -103,7 +103,7 @@ export function BulkPage() {
         headers: {
           "content-type": "application/json",
         },
-      },
+      }
     );
 
     const data = await runResponse.json();
@@ -113,20 +113,20 @@ export function BulkPage() {
         ...acc,
         [output.block_name]: output.data,
       }),
-      {},
+      {}
     );
 
     setTests((tests) =>
       tests.map((t) =>
-        t.id === test.id ? { ...t, outputs: newOutputs, status: "done" } : t,
-      ),
+        t.id === test.id ? { ...t, outputs: newOutputs, status: "done" } : t
+      )
     );
 
     const runStopResponse = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/stop`,
       {
         method: "POST",
-      },
+      }
     );
 
     const {
@@ -158,7 +158,7 @@ export function BulkPage() {
     const element = document.createElement("a");
     element.setAttribute(
       "href",
-      "data:text/csv;charset=utf-8," + encodeURIComponent(text),
+      "data:text/csv;charset=utf-8," + encodeURIComponent(text)
     );
     element.setAttribute("download", filename);
 
@@ -172,7 +172,7 @@ export function BulkPage() {
 
   const handleChangeNewSelectedInputs = (
     newSelected: string[],
-    type: "inputs" | "outputs",
+    type: "inputs" | "outputs"
   ) => {
     if (type === "inputs") {
       setSelectedInputs(newSelected);
@@ -184,9 +184,9 @@ export function BulkPage() {
               ...acc,
               [input]: "",
             }),
-            {},
+            {}
           ),
-        })),
+        }))
       );
     }
     if (type === "outputs") {
@@ -199,9 +199,9 @@ export function BulkPage() {
               ...acc,
               [output]: "",
             }),
-            {},
+            {}
           ),
-        })),
+        }))
       );
     }
   };
@@ -234,10 +234,10 @@ export function BulkPage() {
                           ...inputs,
                           [input]: result[input] || value,
                         }),
-                        {},
+                        {}
                       );
                       return { ...test, inputs: newInputs };
-                    }),
+                    })
                   );
                 },
               });
@@ -272,10 +272,6 @@ export function BulkPage() {
 
         <div className="p-6 grid grid-cols-1 gap-3 min-h-[174px]">
           <ValidatedForm
-            defaultValues={{
-              inputs: pipeline.interface_config?.input,
-              outputs: pipeline.interface_config?.output,
-            }}
             validator={validator}
             noValidate
             onSubmit={handleOnSubmit}
@@ -292,7 +288,7 @@ export function BulkPage() {
                   }}
                   onDeselect={(deselected: string) => {
                     const newSelectedInputs = selectedInputs.filter(
-                      (item) => item !== deselected,
+                      (item) => item !== deselected
                     );
                     handleChangeNewSelectedInputs(newSelectedInputs, "inputs");
                   }}
@@ -308,16 +304,16 @@ export function BulkPage() {
                     const newSelectedOutputs = [...selectedOutputs, selected];
                     handleChangeNewSelectedInputs(
                       newSelectedOutputs,
-                      "outputs",
+                      "outputs"
                     );
                   }}
                   onDeselect={(selected: string) => {
                     const newSelectedOutputs = selectedOutputs.filter(
-                      (item) => item !== selected,
+                      (item) => item !== selected
                     );
                     handleChangeNewSelectedInputs(
                       newSelectedOutputs,
-                      "outputs",
+                      "outputs"
                     );
                   }}
                 />
