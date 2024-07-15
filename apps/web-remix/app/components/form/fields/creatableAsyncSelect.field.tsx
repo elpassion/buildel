@@ -71,7 +71,13 @@ export const CreatableAsyncSelectField = forwardRef<
     },
     _ref
   ) => {
-    const { name, getInputProps, validate } = useFieldContext();
+    const { name, getInputProps, validate } = useFieldContext({
+      validationBehavior: {
+        initial: "onBlur",
+        whenTouched: "onBlur",
+        whenSubmitted: "onBlur",
+      },
+    });
     const { isModalOpen, openModal, closeModal } = useModal();
 
     const [selectedId, setSelectedId] = useControlField<string>(name);
@@ -129,6 +135,7 @@ export const CreatableAsyncSelectField = forwardRef<
           defaultValue={defaultValue}
           onChange={setSelectedId}
           value={selectedId}
+          onBlur={getInputProps().onBlur}
           {...props}
         />
 

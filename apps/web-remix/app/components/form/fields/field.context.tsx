@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { useField } from "remix-validated-form";
+import { ValidationBehaviorOptions } from "remix-validated-form/browser/internal/getInputProps";
 
 export function Field({
   children,
@@ -28,12 +29,18 @@ export const FieldContext = React.createContext<{
   error?: string[] | null;
 } | null>(null);
 
-export const useFieldContext = () => {
+interface UseFieldContextProps {
+  validationBehavior?: Partial<ValidationBehaviorOptions>;
+}
+
+export const useFieldContext = (args?: UseFieldContextProps) => {
   const context = useContext(FieldContext);
   if (!context)
     throw new Error("You tried to use a field without using <Field />");
+
   const fieldProps = useField(context.name, {
-    validationBehavior: { initial: "onSubmit" },
+    validationBehavior: args?.validationBehavior ?? { initial: "onSubmit" },
   });
+
   return { ...context, ...fieldProps };
 };

@@ -29,7 +29,13 @@ export const AsyncSelectField = forwardRef<
     _ref
   ) => {
     const isMounted = useIsMounted();
-    const { name, getInputProps } = useFieldContext();
+    const { name, getInputProps } = useFieldContext({
+      validationBehavior: {
+        initial: "onBlur",
+        whenTouched: "onBlur",
+        whenSubmitted: "onBlur",
+      },
+    });
     const [selectedId, setSelectedId] = useControlField<string | undefined>(
       name
     );
@@ -51,6 +57,7 @@ export const AsyncSelectField = forwardRef<
         <HiddenField value={selectedId ?? ""} {...getInputProps()} />
         <Label text={label} />
         <AsyncSelectInput
+          onBlur={getInputProps().onBlur}
           placeholder="Select..."
           fetchOptions={fetcher}
           defaultValue={defaultValue}
