@@ -16,6 +16,7 @@ processes = []
   API_URL = "https://api.buildel.ai"
   PAGE_URL = "https://app.buildel.ai"
   GOOGLE_REDIRECT_URI = "https://app.buildel.ai/auth/google/callback"
+  GITHUB_REDIRECT_URI = "https://app.buildel.ai/auth/github/callback"
 
 [http_service]
   internal_port = 8080
