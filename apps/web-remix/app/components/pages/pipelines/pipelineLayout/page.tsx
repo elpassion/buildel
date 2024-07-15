@@ -21,7 +21,7 @@ export function PipelineLayout() {
             <div className="flex gap-2 items-center">
               <AliasSelect aliases={aliases} value={aliasId} />
 
-              {aliasId !== "latest" && <RestoreWorkfulow pipeline={pipeline} />}
+              {aliasId !== "latest" && <RestoreWorkflow pipeline={pipeline} />}
 
               {aliasId === "latest" && (
                 <CreateAliasForm pipeline={pipeline} aliases={aliases} />
