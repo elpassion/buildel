@@ -27,7 +27,8 @@ defmodule Buildel.Blocks do
     Timer,
     CSVSearch,
     Browser,
-    FileOutput
+    FileOutput,
+    Date
   }
 
   @names_to_blocks_map %{
@@ -55,7 +56,8 @@ defmodule Buildel.Blocks do
     "timer" => Timer,
     "csv_search" => CSVSearch,
     "browser" => Browser,
-    "file_output" => FileOutput
+    "file_output" => FileOutput,
+    "date" => Date
   }
 
   @blocks_to_names_map %{
@@ -83,7 +85,8 @@ defmodule Buildel.Blocks do
     Timer => "timer",
     CSVSearch => "csv_search",
     Browser => "browser",
-    FileOutput => "file_output"
+    FileOutput => "file_output",
+    Date => "date"
   }
 
   def list_types() do
