@@ -22,7 +22,12 @@ import ReactFlow, {
   applyEdgeChanges,
   applyNodeChanges,
 } from "reactflow";
-import { useLocation, useNavigate, useSearchParams } from "@remix-run/react";
+import {
+  useLocation,
+  useNavigate,
+  useOutlet,
+  useSearchParams,
+} from "@remix-run/react";
 import { buildUrlWithParams } from "~/utils/url";
 import { useUndoRedo } from "~/hooks/useUndoRedo";
 import {
@@ -74,6 +79,10 @@ export const Builder = ({
   CustomEdge,
   className,
 }: BuilderProps) => {
+  const outletData = useOutlet();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
   const [flowState, setFlowState, { updateCurrent, undo, redo }] = useUndoRedo({
     initial: {
@@ -85,9 +94,11 @@ export const Builder = ({
   useEventListener("keydown", (e) => {
     if (
       e.target instanceof HTMLInputElement ||
-      e.target instanceof HTMLTextAreaElement
-    )
+      e.target instanceof HTMLTextAreaElement ||
+      !!outletData
+    ) {
       return;
+    }
 
     if (
       (e.ctrlKey || e.metaKey) &&
@@ -99,10 +110,6 @@ export const Builder = ({
       undo();
     }
   });
-
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   const onNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -119,7 +126,7 @@ export const Builder = ({
         }));
       }
     },
-    [type],
+    [type]
   );
 
   const onEdgesChange = useCallback(
@@ -137,7 +144,7 @@ export const Builder = ({
         }));
       }
     },
-    [type],
+    [type]
   );
 
   const onConnect = useCallback((params: Connection) => {
@@ -148,7 +155,7 @@ export const Builder = ({
           id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
           ...params,
         },
-        state.edges,
+        state.edges
       ),
     }));
   }, []);
@@ -164,9 +171,9 @@ export const Builder = ({
     (connection: Connection) =>
       isValidConnection(
         toPipelineConfig(flowState.nodes, flowState.edges),
-        connection,
+        connection
       ),
-    [flowState],
+    [flowState]
   );
 
   const handleDelete = useCallback((node: IBlockConfig) => {
@@ -175,7 +182,7 @@ export const Builder = ({
       edges: state.edges.filter(
         (ed) =>
           ed.data?.from.block_name !== node.name &&
-          ed.data?.to.block_name !== node.name,
+          ed.data?.to.block_name !== node.name
       ),
     }));
   }, []);
@@ -184,7 +191,7 @@ export const Builder = ({
     async (created: IBlockConfig) => {
       const sameBlockTypes = getAllBlockTypes(
         toPipelineConfig(flowState.nodes, flowState.edges),
-        created.type,
+        created.type
       );
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${created.type.toLowerCase()}_${nameNum}`;
@@ -203,14 +210,14 @@ export const Builder = ({
         nodes: [...state.nodes, newBlock],
       }));
     },
-    [flowState.nodes],
+    [flowState.nodes]
   );
 
   useEffect(() => {
     if (location.state?.reset) {
       navigate(
         buildUrlWithParams(".", Object.fromEntries(searchParams.entries())),
-        { state: null },
+        { state: null }
       );
 
       setFlowState({
@@ -232,6 +239,7 @@ export const Builder = ({
   }, []);
 
   const { onInit: onInitCopyPaste, onMouseMove } = useCopyPasteNode({
+    allowCopyPaste: () => !outletData,
     wrapper: reactFlowWrapper,
     onPaste: onBlockCreate,
     nodes: flowState.nodes,
@@ -254,7 +262,7 @@ export const Builder = ({
         disabled={type === "readOnly"}
       />
     ),
-    [handleDelete],
+    [handleDelete]
   );
 
   const nodeTypes = useMemo(() => {
@@ -269,7 +277,7 @@ export const Builder = ({
         disabled={type === "readOnly"}
       />
     ),
-    [handleDeleteEdge, type],
+    [handleDeleteEdge, type]
   );
 
   const edgeTypes = useMemo(() => {
