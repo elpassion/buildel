@@ -1,6 +1,6 @@
 import classNames from "classnames";
-import { SubMenu as RcSubMenu, SubMenuProps } from "rc-menu";
-import React from "react";
+import { SubMenu as RcSubMenu } from "rc-menu";
+import React, { PropsWithChildren, ReactNode } from "react";
 import "./createBlockSubMenu.styles.css";
 import "rc-menu/assets/index.css";
 
@@ -8,7 +8,11 @@ export const GroupSubMenu = ({
   className,
   popupClassName,
   ...rest
-}: SubMenuProps) => {
+}: PropsWithChildren<{
+  className?: string;
+  popupClassName?: string;
+  title: ReactNode;
+}>) => {
   return (
     <RcSubMenu
       className={classNames(
