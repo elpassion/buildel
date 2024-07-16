@@ -3,7 +3,6 @@ import type { ActionFunctionArgs } from '@remix-run/node';
 import { withZod } from '@remix-validated-form/with-zod';
 import { validationError } from 'remix-validated-form';
 import invariant from 'tiny-invariant';
-import { z } from 'zod';
 
 import { UpdateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { KnowledgeBaseApi } from '~/api/knowledgeBase/KnowledgeBaseApi';

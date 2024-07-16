@@ -28,8 +28,6 @@ import type {
   IPipelineAlias,
 } from '~/components/pages/pipelines/pipeline.types';
 import { EditAliasNameModal } from '~/components/pages/pipelines/pipelineLayout/EditAliasNameModal';
-import { EditSecretKeyModal } from '~/components/pages/secrets/list/EditSecretKeyModal';
-import { ISecretKey } from '~/components/pages/secrets/variables.types';
 import { routes } from '~/utils/routes.utils';
 
 interface AliasSelectProps {

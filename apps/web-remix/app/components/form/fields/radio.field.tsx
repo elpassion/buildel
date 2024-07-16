@@ -40,3 +40,4 @@ export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
     );
   },
 );
+RadioField.displayName = 'RadioField';

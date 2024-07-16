@@ -6,7 +6,7 @@ import { useFieldContext } from '~/components/form/fields/field.context';
 export const FieldError = forwardRef<
   HTMLDivElement,
   HTMLAttributes<HTMLDivElement>
->(({ children, ...props }, ref) => {
+>(({ children, ...props }) => {
   const { name, error } = useFieldContext();
   return (
     <div
@@ -18,3 +18,4 @@ export const FieldError = forwardRef<
     </div>
   );
 });
+FieldError.displayName = 'FieldError';

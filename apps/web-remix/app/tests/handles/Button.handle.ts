@@ -1,6 +1,6 @@
 import userEvent from '@testing-library/user-event';
 
-import { act, findByLabelText, screen } from '../render';
+import { findByLabelText, screen } from '../render';
 import type { Matcher } from '../render';
 
 export class ButtonHandle {

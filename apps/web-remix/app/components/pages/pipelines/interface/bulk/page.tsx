@@ -142,7 +142,7 @@ export function BulkPage() {
   const handleOnSubmit = async (e: any) => {
     e.preventDefault();
     setTests((tests) => tests.map((t) => ({ ...t, status: 'running' })));
-    tests.map((test) => {
+    tests.forEach((test) => {
       handleOnSubmitTest(test);
     });
   };

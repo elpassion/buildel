@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { Button } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 

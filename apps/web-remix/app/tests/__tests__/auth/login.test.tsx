@@ -6,7 +6,7 @@ import { loader } from '~/components/pages/auth/login/loader.server';
 import { LoginPage } from '~/components/pages/auth/login/page';
 import { ButtonHandle } from '~/tests/handles/Button.handle';
 import { InputHandle } from '~/tests/handles/Input.handle';
-import { act, render, screen, waitFor } from '~/tests/render';
+import { render, screen, waitFor } from '~/tests/render';
 import { server } from '~/tests/server.mock';
 import { setupRoutes } from '~/tests/setup.tests';
 import type { RoutesProps } from '~/tests/setup.tests';

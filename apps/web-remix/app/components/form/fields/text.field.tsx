@@ -27,13 +27,15 @@ export const TextInputField = forwardRef<
     />
   );
 });
-
+TextInputField.displayName = 'TextInputField';
 export const PasswordInputField = forwardRef<
   HTMLInputElement,
   Partial<TextInputProps>
 >((props, ref) => {
   return <TextInputField ref={ref} type={'password'} {...props} />;
 });
+
+PasswordInputField.displayName = 'PasswordInputField';
 
 export function ResettableTextInputField({
   label,

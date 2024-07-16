@@ -48,7 +48,7 @@ export function NodeClearButton({ onClear }: { onClear: () => void }) {
 export function NodeActionButton({
   children,
   className,
-  type,
+  type: _,
   ...rest
 }: HTMLProps<HTMLButtonElement>) {
   return (

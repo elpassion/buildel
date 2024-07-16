@@ -141,7 +141,7 @@ function updateConnection(
 
 function updateNode(node: INode, updated: IExtendedBlockConfig) {
   if (node.id === updated.oldName) {
-    const { oldName, ...rest } = updated;
+    const { oldName: _, ...rest } = updated;
     node.data = rest;
     node.id = updated.name;
   }

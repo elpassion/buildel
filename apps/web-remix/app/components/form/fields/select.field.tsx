@@ -18,7 +18,7 @@ interface SelectFieldProps extends SelectInputProps {
 
 export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
   (
-    { defaultValue, options, label, supportingText, errorMessage, ...props },
+    { defaultValue: _, options, label, supportingText, errorMessage, ...props },
     _ref,
   ) => {
     const { name, getInputProps } = useFieldContext();
@@ -55,3 +55,4 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
     );
   },
 );
+SelectField.displayName = 'SelectField';

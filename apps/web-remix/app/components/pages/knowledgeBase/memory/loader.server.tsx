@@ -2,7 +2,6 @@ import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 
-import { KnowledgeBaseCollectionFromListResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { KnowledgeBaseApi } from '~/api/knowledgeBase/KnowledgeBaseApi';
 import { getParamsPagination } from '~/components/pagination/usePagination';
 import { requireLogin } from '~/session.server';

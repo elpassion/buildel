@@ -1,12 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { useLoaderData, useNavigate } from '@remix-run/react';
+import { useLoaderData } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { UpdateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { Field, HiddenField } from '~/components/form/fields/field.context';
-import { NumberInputField } from '~/components/form/fields/number.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import {
@@ -14,14 +13,12 @@ import {
   ModelSelectField,
   SecretSelectField,
 } from '~/components/pages/knowledgeBase/KnowledgeBaseFields';
-import { ActionSidebarHeader } from '~/components/sidebar/ActionSidebar';
-import { routes } from '~/utils/routes.utils';
 
 import { SectionContent } from '../../settings/settingsLayout/PageLayout';
 import type { loader } from './loader.server';
 
 export function CollectionSettingsPage() {
-  const { organizationId, collection } = useLoaderData<typeof loader>();
+  const { collection } = useLoaderData<typeof loader>();
   const validator = useMemo(() => withZod(UpdateCollectionSchema), []);
   const [_, setWatchedValues] = useState<Record<string, any>>({});
 

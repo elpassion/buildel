@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
-import { useField, ValidatedForm } from 'remix-validated-form';
+import { ValidatedForm } from 'remix-validated-form';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field } from '~/components/form/fields/field.context';
@@ -11,7 +11,6 @@ import type {
   IInterfaceConfig,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
-import { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
 
 import { schema } from './schema';
 

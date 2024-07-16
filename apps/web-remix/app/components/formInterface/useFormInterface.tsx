@@ -21,7 +21,6 @@ interface UseFormInterfaceProps {
 }
 
 export const useFormInterface = ({
-  inputs,
   outputs,
   organizationId,
   pipelineId,

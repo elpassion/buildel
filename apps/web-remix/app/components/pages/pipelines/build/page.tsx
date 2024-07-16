@@ -6,7 +6,6 @@ import {
   useLoaderData,
   useMatch,
   useNavigate,
-  useRevalidator,
   useSearchParams,
 } from '@remix-run/react';
 import isEqual from 'lodash.isequal';
@@ -28,7 +27,6 @@ import { PasteBlockConfigProvider } from './CreateBlock/PasteBlockConfigProvider
 import type { loader } from './loader.server';
 
 export function PipelineBuilder() {
-  const revalidator = useRevalidator();
   const updateFetcher = useFetcher<IPipeline>();
   const [searchParams] = useSearchParams();
   const { pipeline, pipelineId, organizationId, aliasId } =
@@ -50,10 +48,6 @@ export function PipelineBuilder() {
     },
     [updateFetcher, pipeline],
   );
-
-  const handleRevalidate = () => {
-    revalidator.revalidate();
-  };
 
   const handleCloseSidebar = () => {
     navigate(

@@ -1,5 +1,3 @@
-import { Params } from '@remix-run/react';
-
 import { buildUrlWithParams } from '~/utils/url';
 
 type RouteParam = Record<string, string | number>;

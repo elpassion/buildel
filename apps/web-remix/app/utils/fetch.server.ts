@@ -48,7 +48,8 @@ export async function fetchTyped<T extends ZodType>(
   }
 
   if (response.status === 304) {
-    response = cachedResponse?.clone()!;
+    // @ts-ignore
+    response = cachedResponse?.clone();
   }
 
   if (!response.ok) {

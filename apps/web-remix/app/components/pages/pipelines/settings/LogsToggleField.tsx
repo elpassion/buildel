@@ -26,3 +26,4 @@ export const LogsToggleField = forwardRef<
     </div>
   );
 });
+LogsToggleField.displayName = 'LogsToggleField';

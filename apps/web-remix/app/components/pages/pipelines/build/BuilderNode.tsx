@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from '@remix-run/react';
 import { Icon } from '@elpassion/taco';
 

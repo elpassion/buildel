@@ -20,7 +20,7 @@ Sentry.init({
     'Validate called before form was initialized.',
     'Object captured as promise rejection with keys: msg, type',
   ],
-  beforeSend(event, hint) {
+  beforeSend(event) {
     if (event.level === 'warning') {
       return null;
     }

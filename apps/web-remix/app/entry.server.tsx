@@ -8,7 +8,6 @@ import { renderToPipeableStream } from 'react-dom/server';
 import { createReadableStreamFromReadable } from '@remix-run/node';
 import type {
   ActionFunctionArgs,
-  AppLoadContext,
   DataFunctionArgs,
   EntryContext,
   LoaderFunctionArgs,
@@ -36,7 +35,6 @@ export default function handleRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
-  loadContext: AppLoadContext,
 ) {
   return isbot(request.headers.get('user-agent'))
     ? handleBotRequest(

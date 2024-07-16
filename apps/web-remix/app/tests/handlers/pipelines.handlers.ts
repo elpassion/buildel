@@ -7,7 +7,6 @@ import type {
   IPipelineResponse,
   IPipelinesResponse,
 } from '~/api/pipeline/pipeline.contracts';
-import { PipelineDetailsResponse } from '~/api/pipeline/pipeline.contracts';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { aliasFixture } from '~/tests/fixtures/alias.fixtures';
 import {

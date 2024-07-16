@@ -97,7 +97,7 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
     );
   },
 );
-
+EditorField.displayName = 'EditorField';
 interface MaximizedEditorProps extends Omit<EditorFieldProps, 'onChange'> {
   value?: string;
   isOpen: boolean;
@@ -106,7 +106,7 @@ interface MaximizedEditorProps extends Omit<EditorFieldProps, 'onChange'> {
 }
 
 function MaximizedEditor({
-  children,
+  children: _,
   value,
   isOpen,
   close,

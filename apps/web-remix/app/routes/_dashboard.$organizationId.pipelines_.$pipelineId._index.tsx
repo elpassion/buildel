@@ -7,7 +7,7 @@ import { loaderBuilder } from '~/utils.server';
 import { routes } from '~/utils/routes.utils';
 
 export async function loader(loaderArgs: DataFunctionArgs) {
-  return loaderBuilder(async ({ request, params }, { fetch }) => {
+  return loaderBuilder(async ({ request, params }) => {
     await requireLogin(request);
     invariant(params.organizationId, 'organizationId not found');
     invariant(params.pipelineId, 'pipelineId not found');

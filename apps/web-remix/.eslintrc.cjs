@@ -12,6 +12,10 @@ module.exports = {
     "import/order": "off",
     "no-useless-constructor": "off",
     "react-hooks/exhaustive-deps": "off",
-    "no-loop-func": "off"
+    "no-loop-func": "off",
+    "@typescript-eslint/no-unused-vars": ["error", {
+      "argsIgnorePattern": "^_",
+      "varsIgnorePattern": "^_"
+    }]
   }
 };

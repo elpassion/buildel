@@ -58,7 +58,6 @@ export const CreatableAsyncSelectField = forwardRef<
       url,
       errorMessage,
       defaultValue,
-      schema: JSONSchema,
       renderForm,
       ...props
     },
@@ -183,7 +182,7 @@ export function CreatableAsyncForm({
 }: PropsWithChildren<CreatableAsyncFormProps>) {
   const schema = generateZODSchema(JSONSchema as any);
   const validator = React.useMemo(() => withZod(schema), []);
-  const [latestValues, setLatestValues] = useState<Record<string, any>>({});
+  const [_latestValues, setLatestValues] = useState<Record<string, any>>({});
 
   useEffect(() => {
     setLatestValues({});
@@ -228,3 +227,5 @@ export function CreatableAsyncForm({
     </ValidatedForm>
   );
 }
+
+CreatableAsyncSelectField.displayName = 'CreatableAsyncSelectField';

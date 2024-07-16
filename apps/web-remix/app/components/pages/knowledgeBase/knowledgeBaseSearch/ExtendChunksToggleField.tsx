@@ -8,7 +8,7 @@ import type { ToggleInputProps } from '~/components/form/inputs/toggle.input';
 export const ExtendChunksField = forwardRef<
   HTMLInputElement,
   Partial<ToggleInputProps>
->(({ label, supportingText, ...props }) => {
+>(({ label, supportingText }) => {
   const { error } = useFieldContext();
 
   return (
@@ -25,3 +25,4 @@ export const ExtendChunksField = forwardRef<
     </div>
   );
 });
+ExtendChunksField.displayName = 'ExtendChunksField';

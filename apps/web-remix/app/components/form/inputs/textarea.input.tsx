@@ -4,7 +4,6 @@ import { Textarea } from '@elpassion/taco';
 
 export type TextareaInputProps = TextareaProps;
 export const TextareaInput: React.FC<TextareaInputProps> = ({
-  className,
   style,
   ...props
 }) => {

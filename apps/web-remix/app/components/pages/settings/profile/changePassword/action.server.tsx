@@ -1,4 +1,4 @@
-import { json, redirect } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
 import { withZod } from '@remix-validated-form/with-zod';
 import { validationError } from 'remix-validated-form';

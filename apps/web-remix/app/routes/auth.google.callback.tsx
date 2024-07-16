@@ -11,7 +11,7 @@ import { routes } from '~/utils/routes.utils';
 import { setServerToast } from '~/utils/toast.server';
 
 export async function loader(args: LoaderFunctionArgs) {
-  return loaderBuilder(async ({ request, params }, { fetch }) => {
+  return loaderBuilder(async ({ request }, { fetch }) => {
     assert(process.env.GOOGLE_CLIENT_ID, 'Missing GOOGLE_CLIENT_ID');
     assert(process.env.GOOGLE_CLIENT_SECRET, 'Missing GOOGLE_CLIENT_SECRET');
 

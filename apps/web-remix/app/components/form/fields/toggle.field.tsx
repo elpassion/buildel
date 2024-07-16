@@ -8,7 +8,7 @@ import { ToggleInput } from '~/components/form/inputs/toggle.input';
 export const ToggleInputField = forwardRef<
   HTMLInputElement,
   Partial<ToggleInputProps>
->(({ ...props }, ref) => {
+>(({ ...props }) => {
   const { name } = useFieldContext();
   const [value, setValue] = useControlField<boolean | undefined>(name);
   const currentVal = value ?? false;
@@ -22,3 +22,4 @@ export const ToggleInputField = forwardRef<
     />
   );
 });
+ToggleInputField.displayName = 'ToggleInputField';

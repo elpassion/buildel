@@ -97,7 +97,6 @@ export function OutputHandle({
 
 export function ToolHandle({
   handle,
-  index,
   isConnectable = true,
   blockName,
 }: HandleProps) {

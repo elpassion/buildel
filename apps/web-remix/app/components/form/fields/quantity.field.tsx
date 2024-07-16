@@ -22,3 +22,4 @@ export const QuantityInputField = forwardRef<
     />
   );
 });
+QuantityInputField.displayName = 'QuantityInputField';

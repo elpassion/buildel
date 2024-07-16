@@ -6,7 +6,7 @@ import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
 
 export async function loader(args: LoaderFunctionArgs) {
-  return loaderBuilder(async ({ request, params }, { fetch }) => {
+  return loaderBuilder(async ({ request, params }) => {
     await requireLogin(request);
     invariant(params.organizationId, 'organizationId not found');
 

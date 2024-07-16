@@ -12,6 +12,7 @@ describe('useUndoRedo', () => {
   });
 
   test("should correctly initialize state with 'first' and no history", () => {
+    //eslint-disable-next-line
     const [state, _, { prev, next, allowRedo, allowUndo }] = result.current;
 
     expect(state).toBe('first');
@@ -25,7 +26,7 @@ describe('useUndoRedo', () => {
     await act(async () => {
       result.current[1]('second');
     });
-
+    //eslint-disable-next-line
     const [state, _, { allowRedo, allowUndo, prev, next }] = result.current;
 
     expect(state).toBe('second');
@@ -46,7 +47,7 @@ describe('useUndoRedo', () => {
       await act(async () => {
         result.current[2].undo();
       });
-
+      //eslint-disable-next-line
       const [state, _, { allowRedo, allowUndo, prev, next }] = result.current;
 
       expect(state).toBe('first');
@@ -65,6 +66,7 @@ describe('useUndoRedo', () => {
         result.current[2].redo();
       });
 
+      //eslint-disable-next-line
       const [state, _, { allowRedo, allowUndo, prev, next }] = result.current;
 
       expect(state).toBe('second');

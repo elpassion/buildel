@@ -14,7 +14,7 @@ import { ButtonHandle } from '~/tests/handles/Button.handle';
 import { InputHandle } from '~/tests/handles/Input.handle';
 import { LinkHandle } from '~/tests/handles/Link.handle';
 import { ListHandle } from '~/tests/handles/List.handle';
-import { act, render, screen, waitFor } from '~/tests/render';
+import { render, screen, waitFor } from '~/tests/render';
 import { server } from '~/tests/server.mock';
 import {
   actionWithSession,

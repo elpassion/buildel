@@ -14,3 +14,4 @@ export const FieldLabel = forwardRef<
     </label>
   );
 });
+FieldLabel.displayName = 'FieldLabel';

@@ -19,7 +19,7 @@ import { PipelineHandlers } from '~/tests/handlers/pipelines.handlers';
 import { RunHandlers } from '~/tests/handlers/run.handlers';
 import { ButtonHandle } from '~/tests/handles/Button.handle';
 import { ListHandle } from '~/tests/handles/List.handle';
-import { findAllByLabelText, render, screen } from '~/tests/render';
+import { render, screen } from '~/tests/render';
 import { server } from '~/tests/server.mock';
 import {
   actionWithSession,
@@ -41,7 +41,7 @@ const handlers = () => [
 ];
 
 describe('Workflow overview', () => {
-  const wsServer = new WebSocketServerMock();
+  new WebSocketServerMock();
   const setupServer = server(handlers());
 
   beforeAll(() => setupServer.listen());

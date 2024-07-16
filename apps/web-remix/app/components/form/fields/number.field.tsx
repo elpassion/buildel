@@ -24,3 +24,4 @@ export const NumberInputField = forwardRef<
     />
   );
 });
+NumberInputField.displayName = 'NumberInputField';

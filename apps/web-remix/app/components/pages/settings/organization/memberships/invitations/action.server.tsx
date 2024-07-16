@@ -1,4 +1,4 @@
-import { json, redirect } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 

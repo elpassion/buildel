@@ -56,7 +56,7 @@ export async function loader(args: LoaderFunctionArgs) {
 }
 
 export default function WebsiteForm() {
-  const { pipelineId, organizationId, pipeline, alias } =
+  const { pipelineId, organizationId, pipeline } =
     useLoaderData<typeof loader>();
   const [outputs, setOutputs] = useState<Record<string, string>>({});
   const [files, setFiles] = useState<Record<string, File>>({});
@@ -196,7 +196,6 @@ export default function WebsiteForm() {
 export function FormInterfaceOutput({
   payload,
   blockName,
-  blockType,
 }: {
   payload: string;
   blockName: string;

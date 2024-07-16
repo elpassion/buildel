@@ -51,7 +51,7 @@ export class SecretsHandlers {
   updateHandler() {
     return http.put(
       '/super-api/organizations/:organizationId/secrets/:secretId',
-      async ({ params, request }) => {
+      async ({ params }) => {
         const secret = this.secrets.get(params.secretId.toString());
 
         if (!secret) {

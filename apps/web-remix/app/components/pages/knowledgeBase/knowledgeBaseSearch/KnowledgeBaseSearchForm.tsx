@@ -6,7 +6,6 @@ import { useFormContext, ValidatedForm } from 'remix-validated-form';
 import { Field } from '~/components/form/fields/field.context';
 import { NumberInputField } from '~/components/form/fields/number.field';
 import { TextInputField } from '~/components/form/fields/text.field';
-import { ToggleInputField } from '~/components/form/fields/toggle.field';
 import { IconButton } from '~/components/iconButton';
 
 import { ExtendChunksField } from './ExtendChunksToggleField';

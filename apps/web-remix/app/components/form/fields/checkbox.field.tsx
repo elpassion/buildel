@@ -9,7 +9,7 @@ export const CheckboxInputField = forwardRef<
   HTMLInputElement,
   Partial<CheckboxInputProps>
 >((props, ref) => {
-  const { name, getInputProps, validate, error } = useFieldContext();
+  const { name, getInputProps, validate } = useFieldContext();
   const [formValue, setFormValue] = useControlField<boolean>(name);
 
   return (
@@ -25,3 +25,4 @@ export const CheckboxInputField = forwardRef<
     />
   );
 });
+CheckboxInputField.displayName = 'CheckboxInputField';

@@ -63,7 +63,7 @@ export function EditBlockForm({
   const [connections, setConnections] =
     useState<IConfigConnection[]>(propsConnections);
   const [fieldsErrors, setFieldsErrors] = useState<Record<string, string>>({});
-  const [latestValues, setLatestValues] = useState<Record<string, any>>({});
+  const [_latestValues, setLatestValues] = useState<Record<string, any>>({});
 
   const clearFieldsErrors = () => {
     setFieldsErrors({});

@@ -6,7 +6,7 @@ import { loaderBuilder } from '~/utils.server';
 import { getCurrentUser } from '~/utils/currentUser.server';
 
 export async function loader(args: LoaderFunctionArgs) {
-  return loaderBuilder(async ({ request }, { fetch }) => {
+  return loaderBuilder(async ({ request }) => {
     await requireLogin(request);
 
     const { user } = await getCurrentUser(request);

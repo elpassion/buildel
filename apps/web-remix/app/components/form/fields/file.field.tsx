@@ -8,7 +8,7 @@ import type { SmallFileInputProps } from '../inputs/file.input';
 export const SmallFileInputField = forwardRef<
   HTMLInputElement,
   Partial<SmallFileInputProps>
->(({ errorMessage, ...props }, ref) => {
+>(({ errorMessage, ...props }) => {
   const { name, getInputProps, error } = useFieldContext();
 
   return (
@@ -25,3 +25,4 @@ export const SmallFileInputField = forwardRef<
     />
   );
 });
+SmallFileInputField.displayName = 'SmallFileInputField';

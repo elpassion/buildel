@@ -75,6 +75,9 @@ export const AsyncSelectField = forwardRef<
     );
   },
 );
+
+AsyncSelectField.displayName = 'AsyncSelectField';
+
 export function toSelectOption(item: IAsyncSelectItem) {
   return {
     id: item.id.toString(),

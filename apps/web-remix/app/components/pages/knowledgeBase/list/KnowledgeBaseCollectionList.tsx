@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useFetcher, useNavigate } from '@remix-run/react';
+import { Link, useFetcher } from '@remix-run/react';
 import { Icon } from '@elpassion/taco';
 
 import { IconButton } from '~/components/iconButton';
@@ -62,9 +62,7 @@ interface KnowledgeBaseCollectionListItemProps {
 
 export const KnowledgeBaseCollectionListItem: React.FC<
   KnowledgeBaseCollectionListItemProps
-> = ({ data, onDelete, organizationId }) => {
-  const navigate = useNavigate();
-
+> = ({ data, onDelete }) => {
   const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();

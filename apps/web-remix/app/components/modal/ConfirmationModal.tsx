@@ -4,8 +4,6 @@ import { Button } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import classNames from 'classnames';
 
-import { SubmitButton } from '../form/submit';
-
 export interface ConfirmationModalProps extends ModalProps {
   onConfirm?: () => Promise<void>;
   onCancel?: () => Promise<void>;
