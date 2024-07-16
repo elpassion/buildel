@@ -1,29 +1,31 @@
-import React, { useEffect } from "react";
-import { useFieldArray, useFormContext } from "remix-validated-form";
-import { Button, Icon, IconButton } from "@elpassion/taco";
-import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
-import { Field as FormField } from "~/components/form/fields/field.context";
-import { QuantityInputField } from "~/components/form/fields/quantity.field";
-import { RadioField } from "~/components/form/fields/radio.field";
+import React, { useEffect } from 'react';
+import { Button, Icon, IconButton } from '@elpassion/taco';
+import { useFieldArray, useFormContext } from 'remix-validated-form';
+
+import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
+import { Field as FormField } from '~/components/form/fields/field.context';
+import { QuantityInputField } from '~/components/form/fields/quantity.field';
+import { RadioField } from '~/components/form/fields/radio.field';
 import {
   PasswordInputField,
   ResettableTextInputField,
-} from "~/components/form/fields/text.field";
-import { CheckboxInput } from "~/components/form/inputs/checkbox.input";
-import { assert } from "~/utils/assert";
-import { Field } from "./Schema";
-import type { FieldProps } from "./Schema";
+} from '~/components/form/fields/text.field';
+import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
+import { assert } from '~/utils/assert';
+
+import { Field } from './Schema';
+import type { FieldProps } from './Schema';
 
 export function StringField({ field, name, fields, ...rest }: FieldProps) {
   assert(name);
-  assert(field.type === "string");
+  assert(field.type === 'string');
 
   const { fieldErrors, getValues } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
 
-  if (!("enum" in field)) {
-    if ("presentAs" in field && field.presentAs === "password") {
+  if (!('enum' in field)) {
+    if ('presentAs' in field && field.presentAs === 'password') {
       return (
         <FormField name={name}>
           <PasswordInputField
@@ -36,13 +38,13 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       );
     }
 
-    if ("presentAs" in field && field.presentAs === "editor") {
+    if ('presentAs' in field && field.presentAs === 'editor') {
       return (
         <fields.editor field={field} name={name} fields={fields} {...rest} />
       );
     }
 
-    if ("presentAs" in field && field.presentAs === "async-select") {
+    if ('presentAs' in field && field.presentAs === 'async-select') {
       return (
         <fields.asyncSelect
           field={field}
@@ -53,7 +55,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       );
     }
 
-    if ("presentAs" in field && field.presentAs === "async-creatable-select") {
+    if ('presentAs' in field && field.presentAs === 'async-creatable-select') {
       return (
         <fields.asyncCreatableSelect
           field={field}
@@ -66,12 +68,12 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
 
     let defaultValue = field.default;
 
-    if ("defaultWhen" in field && field.defaultWhen) {
+    if ('defaultWhen' in field && field.defaultWhen) {
       const formValues = getValues();
       const defaultKey = Object.keys(field.defaultWhen)[0];
       const defaultFieldValue = formValues.get(defaultKey);
 
-      if (typeof defaultFieldValue === "string") {
+      if (typeof defaultFieldValue === 'string') {
         defaultValue = field.defaultWhen[defaultKey][defaultFieldValue];
       }
     }
@@ -88,7 +90,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       </FormField>
     );
   }
-  if (field.enumPresentAs === "radio") {
+  if (field.enumPresentAs === 'radio') {
     return (
       <FormField name={name}>
         <div className="space-y-3">
@@ -111,7 +113,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       </FormField>
     );
   }
-  if (field.enumPresentAs === "checkbox") {
+  if (field.enumPresentAs === 'checkbox') {
     return field.enum.map((value, index) => (
       <FormField key={`${name}.${index}`} name={name}>
         <CheckboxInput
@@ -129,7 +131,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
 
 export function NumberField({ field, name }: FieldProps) {
   assert(name);
-  assert(field.type === "number" || field.type === "integer");
+  assert(field.type === 'number' || field.type === 'integer');
   const { fieldErrors } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
@@ -150,8 +152,8 @@ export function NumberField({ field, name }: FieldProps) {
 }
 
 export function ArrayField({ field, name, fields, schema }: FieldProps) {
-  assert(field.type === "array");
-  if ("enum" in field.items && field.items.enumPresentAs === "checkbox") {
+  assert(field.type === 'array');
+  if ('enum' in field.items && field.items.enumPresentAs === 'checkbox') {
     return (
       <>
         <p>{field.title}</p>
@@ -177,7 +179,7 @@ export function ArrayField({ field, name, fields, schema }: FieldProps) {
 
 export function BooleanField({ field, name }: FieldProps) {
   assert(name);
-  assert(field.type === "boolean");
+  assert(field.type === 'boolean');
   const { fieldErrors } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
@@ -195,7 +197,7 @@ export function BooleanField({ field, name }: FieldProps) {
 }
 
 function RealArrayField({ field, name, fields, schema }: FieldProps) {
-  assert(field.type === "array");
+  assert(field.type === 'array');
   const [rhfFields, { push, remove }] = useFieldArray(name!);
 
   useEffect(() => {

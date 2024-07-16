@@ -1,17 +1,18 @@
-import React, { useMemo, useState } from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { CreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { Field } from "~/components/form/fields/field.context";
-import { NumberInputField } from "~/components/form/fields/number.field";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
+import React, { useMemo, useState } from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { CreateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { Field } from '~/components/form/fields/field.context';
+import { NumberInputField } from '~/components/form/fields/number.field';
+import { TextInputField } from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
 import {
   ApiTypesRadioGroupField,
   ModelSelectField,
   SecretSelectField,
-} from "~/components/pages/knowledgeBase/KnowledgeBaseFields";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/pages/knowledgeBase/KnowledgeBaseFields';
 
 export function NewKnowledgeBasePage() {
   const validator = useMemo(() => withZod(CreateCollectionSchema), []);
@@ -29,8 +30,8 @@ export function NewKnowledgeBasePage() {
       className="w-full grow flex flex-col gap-2 h-[70%]"
       defaultValues={{
         embeddings: {
-          api_type: "openai",
-          endpoint: "https://api.openai.com/v1/embeddings",
+          api_type: 'openai',
+          endpoint: 'https://api.openai.com/v1/embeddings',
         },
         chunk_size: 1000,
         chunk_overlap: 0,
@@ -57,8 +58,8 @@ export function NewKnowledgeBasePage() {
           <Field name="embeddings.endpoint">
             <TextInputField
               type="text"
-              label={"Endpoint"}
-              name={"endpoint"}
+              label={'Endpoint'}
+              name={'endpoint'}
               supportingText="API endpoint used for retrieving embeddings"
             />
           </Field>
@@ -98,7 +99,7 @@ export function NewKnowledgeBasePage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "New Knowledge Base",
+      title: 'New Knowledge Base',
     },
   ];
 };

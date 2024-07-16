@@ -1,30 +1,26 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  BuildelSocket
-} from "@buildel/buildel";
-import { assert } from "~/utils/assert";
+import { useEffect, useRef, useState } from 'react';
+import { BuildelSocket } from '@buildel/buildel';
 import type {
   BuildelRunLogs,
   BuildelRunLogsJoinArgs,
-  ConnectionState} from "@buildel/buildel";
+  ConnectionState,
+} from '@buildel/buildel';
+
+import { assert } from '~/utils/assert';
 
 export function usePipelineRunLogs(
   organizationId: number,
   pipelineId: number,
   runId: number,
-  onMessage: (
-    payload: any
-  ) => void = () => { },
-  onLogMessage: (
-    payload: any
-  ) => void = () => { },
-  onError: (error: string) => void = () => { },
-  useAuth: boolean = true
+  onMessage: (payload: any) => void = () => {},
+  onLogMessage: (payload: any) => void = () => {},
+  onError: (error: string) => void = () => {},
+  useAuth: boolean = true,
 ) {
   const buildel = useRef<BuildelSocket>();
   const run = useRef<BuildelRunLogs>();
 
-  const [status, setStatus] = useState<ConnectionState>("closed");
+  const [status, setStatus] = useState<ConnectionState>('closed');
 
   const listenToLogs = async (args: BuildelRunLogsJoinArgs) => {
     assert(run.current);
@@ -37,7 +33,7 @@ export function usePipelineRunLogs(
 
   useEffect(() => {
     buildel.current = new BuildelSocket(organizationId, {
-      socketUrl: "/super-api/socket",
+      socketUrl: '/super-api/socket',
       useAuth,
       onStatusChange: setStatus,
     });
@@ -45,7 +41,7 @@ export function usePipelineRunLogs(
       run.current = buildel.logs(pipelineId, runId, {
         onMessage: onMessage,
         onLogMessage: onLogMessage,
-        onStatusChange: () => { },
+        onStatusChange: () => {},
         onError: onError,
       });
     });
@@ -59,6 +55,6 @@ export function usePipelineRunLogs(
   return {
     status,
     listenToLogs,
-    stopListening
+    stopListening,
   };
 }

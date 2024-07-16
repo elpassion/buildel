@@ -1,15 +1,17 @@
-import React, { useMemo } from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import classNames from "classnames";
-import { ValidatedForm, useFormContext } from "remix-validated-form";
-import { Field } from "~/components/form/fields/field.context";
-import { NumberInputField } from "~/components/form/fields/number.field";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { ToggleInputField } from "~/components/form/fields/toggle.field";
-import { IconButton } from "~/components/iconButton";
-import { ExtendChunksField } from "./ExtendChunksToggleField";
-import { SearchSchema } from "./schema";
-import { SearchParams } from "./SearchParams";
+import React, { useMemo } from 'react';
+import { withZod } from '@remix-validated-form/with-zod';
+import classNames from 'classnames';
+import { useFormContext, ValidatedForm } from 'remix-validated-form';
+
+import { Field } from '~/components/form/fields/field.context';
+import { NumberInputField } from '~/components/form/fields/number.field';
+import { TextInputField } from '~/components/form/fields/text.field';
+import { ToggleInputField } from '~/components/form/fields/toggle.field';
+import { IconButton } from '~/components/iconButton';
+
+import { ExtendChunksField } from './ExtendChunksToggleField';
+import { SearchSchema } from './schema';
+import { SearchParams } from './SearchParams';
 
 interface KnowledgeBaseSearchFormProps {
   defaultValue?: string;
@@ -82,9 +84,9 @@ function SearchButton() {
   return (
     <IconButton
       onlyIcon
-      iconName={isSubmitting ? "loader" : "search"}
+      iconName={isSubmitting ? 'loader' : 'search'}
       aria-label="Search"
-      className={classNames({ "animate-spin": isSubmitting })}
+      className={classNames({ 'animate-spin': isSubmitting })}
     />
   );
 }

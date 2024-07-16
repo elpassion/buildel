@@ -1,14 +1,15 @@
-import type { PropsWithChildren} from "react";
-import { useCallback, useMemo } from "react";
-import classNames from "classnames";
-import startCase from "lodash.startcase";
-import { Badge, Icon } from "@elpassion/taco";
-import { getBlockFields, getBlockHandles } from "../PipelineFlow.utils";
-import { useRunPipelineNode } from "../RunPipelineProvider";
-import { NodeFieldsForm } from "./NodeFieldsForm";
-import { NodeFieldsOutput } from "./NodeFieldsOutput";
-import { InputHandle, OutputHandle, ToolHandle } from "./NodeHandles";
-import type { IBlockConfig } from "../pipeline.types";
+import type { PropsWithChildren } from 'react';
+import { useCallback, useMemo } from 'react';
+import { Badge, Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+import startCase from 'lodash.startcase';
+
+import type { IBlockConfig } from '../pipeline.types';
+import { getBlockFields, getBlockHandles } from '../PipelineFlow.utils';
+import { useRunPipelineNode } from '../RunPipelineProvider';
+import { NodeFieldsForm } from './NodeFieldsForm';
+import { NodeFieldsOutput } from './NodeFieldsOutput';
+import { InputHandle, OutputHandle, ToolHandle } from './NodeHandles';
 
 export interface CustomNodeProps extends PropsWithChildren {
   data: IBlockConfig;
@@ -28,9 +29,9 @@ export function CustomNode({
   const { status, isValid, errors } = useRunPipelineNode(data);
 
   const borderStyles = useCallback(() => {
-    if (!isValid) return "border-red-500";
-    if (selected) return "border-primary-700";
-    return "border-neutral-900";
+    if (!isValid) return 'border-red-500';
+    if (selected) return 'border-primary-700';
+    return 'border-neutral-900';
   }, [isValid, selected]);
 
   return (
@@ -41,13 +42,13 @@ export function CustomNode({
         data-active={status}
         data-valid={isValid}
         className={classNames(
-          "min-h-[100px] min-w-[250px] max-w-[500px] break-words rounded bg-neutral-800 drop-shadow-sm transition border nowheel",
+          'min-h-[100px] min-w-[250px] max-w-[500px] break-words rounded bg-neutral-800 drop-shadow-sm transition border nowheel',
           borderStyles(),
           {
-            "scale-110": status,
-            "border-primary-700": status,
+            'scale-110': status,
+            'border-primary-700': status,
           },
-          className
+          className,
         )}
       >
         <NodeWorkingIcon isWorking={status} />
@@ -59,7 +60,7 @@ export function CustomNode({
           <span className="text-xs">
             {errors.length === 1
               ? errors[0]
-              : "This block contains problems to fix."}
+              : 'This block contains problems to fix.'}
           </span>
         </p>
       )}
@@ -75,7 +76,7 @@ export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
   return (
     <header
       className={classNames(
-        "relative flex items-center justify-between p-2 rounded-t bg-neutral-900 gap-2"
+        'relative flex items-center justify-between p-2 rounded-t bg-neutral-900 gap-2',
       )}
     >
       <div className="flex items-center gap-2">
@@ -105,33 +106,33 @@ export function CustomNodeBody({
   const inputsHandles = useMemo(
     () =>
       handles
-        .filter((h) => h.data.type !== "controller" && h.data.type !== "worker")
-        .filter((h) => h.type === "target"),
-    [handles]
+        .filter((h) => h.data.type !== 'controller' && h.data.type !== 'worker')
+        .filter((h) => h.type === 'target'),
+    [handles],
   );
   const outputsHandles = useMemo(
     () =>
       handles
-        .filter((h) => h.data.type !== "controller" && h.data.type !== "worker")
-        .filter((h) => h.type === "source"),
-    [handles]
+        .filter((h) => h.data.type !== 'controller' && h.data.type !== 'worker')
+        .filter((h) => h.type === 'source'),
+    [handles],
   );
   const ioHandles = useMemo(
     () =>
       handles.filter(
-        (h) => h.data.type === "controller" || h.data.type === "worker"
+        (h) => h.data.type === 'controller' || h.data.type === 'worker',
       ),
-    [handles]
+    [handles],
   );
 
   const fields = useMemo(() => getBlockFields(data), [data]);
   const inputsFields = useMemo(
-    () => fields.filter((field) => field.type === "input"),
-    [fields]
+    () => fields.filter((field) => field.type === 'input'),
+    [fields],
   );
   const outputFields = useMemo(
-    () => fields.filter((field) => field.type === "output"),
-    [fields]
+    () => fields.filter((field) => field.type === 'output'),
+    [fields],
   );
 
   return (
@@ -184,11 +185,11 @@ function NodeWorkingIcon({ isWorking }: { isWorking: boolean }) {
   return (
     <div
       className={classNames(
-        "animate-ping w-2 h-2 rounded-full bg-primary-500 flex justify-center items-center absolute z-10 -top-1 -right-1",
+        'animate-ping w-2 h-2 rounded-full bg-primary-500 flex justify-center items-center absolute z-10 -top-1 -right-1',
         {
           hidden: !isWorking,
           block: isWorking,
-        }
+        },
       )}
     />
   );

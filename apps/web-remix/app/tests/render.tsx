@@ -1,13 +1,14 @@
-import type { ReactElement } from "react";
-import React from "react";
-import { render } from "@testing-library/react";
-import Modal from "react-modal";
-import { NavSidebarContext } from "~/components/sidebar/NavSidebar";
-import { Toaster } from "~/components/toasts/Toaster";
-import type { RenderOptions } from "@testing-library/react";
+import type { ReactElement } from 'react';
+import React from 'react';
+import Modal from 'react-modal';
+import { render } from '@testing-library/react';
+import type { RenderOptions } from '@testing-library/react';
+
+import { NavSidebarContext } from '~/components/sidebar/NavSidebar';
+import { Toaster } from '~/components/toasts/Toaster';
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
-  Modal.setAppElement("div");
+  Modal.setAppElement('div');
   return (
     <div id="_root">
       <Toaster />
@@ -28,8 +29,8 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 
 const customRender = (
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
+  options?: Omit<RenderOptions, 'wrapper'>,
 ) => render(ui, { wrapper: AllTheProviders, ...options });
 
-export * from "@testing-library/react";
+export * from '@testing-library/react';
 export { customRender as render };

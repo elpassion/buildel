@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 export interface Pagination {
   page: number;
@@ -17,7 +17,7 @@ export interface PaginationQueryParams {
 export const DEFAULT_PAGINATION: Pagination = {
   page: 0,
   per_page: 20,
-  search: "",
+  search: '',
   totalItems: 0,
   totalPages: 0,
 };
@@ -62,8 +62,8 @@ export const usePagination = (initialPagination?: Partial<Pagination>) => {
 
 export function getParamsPagination(params: URLSearchParams) {
   return {
-    page: Number(params.get("page")) || DEFAULT_PAGINATION.page,
-    per_page: Number(params.get("per_page")) || DEFAULT_PAGINATION.per_page,
-    search: params.get("search") || DEFAULT_PAGINATION.search,
+    page: Number(params.get('page')) || DEFAULT_PAGINATION.page,
+    per_page: Number(params.get('per_page')) || DEFAULT_PAGINATION.per_page,
+    search: params.get('search') || DEFAULT_PAGINATION.search,
   };
 }

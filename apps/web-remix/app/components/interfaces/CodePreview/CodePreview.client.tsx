@@ -1,12 +1,11 @@
-import React from "react";
-import { vscodeDark } from "@uiw/codemirror-themes-all";
-import type {
-  CodeMirrorProps} from "~/components/editor/CodeMirror/CodeMirror";
-import {
-  CodeMirror,
-} from "~/components/editor/CodeMirror/CodeMirror";
+import React from 'react';
+import { vscodeDark } from '@uiw/codemirror-themes-all';
+
+import type { CodeMirrorProps } from '~/components/editor/CodeMirror/CodeMirror';
+import { CodeMirror } from '~/components/editor/CodeMirror/CodeMirror';
+
 export interface CodePreviewProps
-  extends Omit<CodeMirrorProps, "height" | "value"> {
+  extends Omit<CodeMirrorProps, 'height' | 'value'> {
   value: string;
   height: number;
 }

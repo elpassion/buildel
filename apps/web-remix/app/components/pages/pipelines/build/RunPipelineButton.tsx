@@ -1,19 +1,21 @@
-import React from "react";
-import { Button } from "@elpassion/taco";
-import { errorToast } from "~/components/toasts/errorToast";
-import { PlayFilled } from "~/icons/PlayFilled";
-import { useRunPipeline } from "../RunPipelineProvider";
+import React from 'react';
+import { Button } from '@elpassion/taco';
+
+import { errorToast } from '~/components/toasts/errorToast';
+import { PlayFilled } from '~/icons/PlayFilled';
+
+import { useRunPipeline } from '../RunPipelineProvider';
 
 export const RunPipelineButton: React.FC = () => {
   const { status, stopRun, startRun, isValid } = useRunPipeline();
 
   const handleRun = () => {
-    if (status === "idle") {
+    if (status === 'idle') {
       if (!isValid) {
         errorToast({
-          title: "Invalid workflow",
+          title: 'Invalid workflow',
           description:
-            "We couldn’t run the workflow due to errors in some of your blocks. Please check the highlighted blocks.",
+            'We couldn’t run the workflow due to errors in some of your blocks. Please check the highlighted blocks.',
         });
       } else {
         startRun();
@@ -23,17 +25,17 @@ export const RunPipelineButton: React.FC = () => {
     }
   };
 
-  const isRunning = status !== "idle";
+  const isRunning = status !== 'idle';
 
   return (
     <div className="flex items-center gap-2 pointer-events-auto">
       <Button
-        aria-label={isRunning ? "Stop workflow" : "Start workflow"}
+        aria-label={isRunning ? 'Stop workflow' : 'Start workflow'}
         onClick={handleRun}
         size="sm"
-        rightIcon={status === "idle" && <PlayFilled />}
+        rightIcon={status === 'idle' && <PlayFilled />}
       >
-        {isRunning ? "Stop" : "Start"}
+        {isRunning ? 'Stop' : 'Start'}
       </Button>
     </div>
   );

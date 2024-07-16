@@ -1,5 +1,5 @@
-import type { SessionToast } from "~/session.server";
-import { commitSession, getSession } from "~/session.server";
+import type { SessionToast } from '~/session.server';
+import { commitSession, getSession } from '~/session.server';
 
 export async function setServerToast(
   request: Request,
@@ -7,18 +7,18 @@ export async function setServerToast(
     error?: SessionToast | string;
     success?: SessionToast | string;
     warning?: SessionToast | string;
-  }
+  },
 ): Promise<string> {
-  const session = await getSession(request.headers.get("Cookie")!);
+  const session = await getSession(request.headers.get('Cookie')!);
 
   if (args?.error) {
-    session.flash("error", args.error);
+    session.flash('error', args.error);
   }
   if (args?.success) {
-    session.flash("success", args.success);
+    session.flash('success', args.success);
   }
   if (args?.warning) {
-    session.flash("warning", args.warning);
+    session.flash('warning', args.warning);
   }
 
   return await commitSession(session);
@@ -30,22 +30,27 @@ export async function getServerToast(request: Request): Promise<{
   warning: SessionToast | string | undefined;
   cookie: string;
 }> {
-  const session = await getSession(request.headers.get("Cookie")!);
-  const error = session.get("error");
-  const success = session.get("success");
-  const warning = session.get("warning");
+  const session = await getSession(request.headers.get('Cookie')!);
+  const error = session.get('error');
+  const success = session.get('success');
+  const warning = session.get('warning');
 
   return { cookie: await commitSession(session), error, success, warning };
 }
 
-export async function getOrganizationId(cookie: string): Promise<number | undefined> {
+export async function getOrganizationId(
+  cookie: string,
+): Promise<number | undefined> {
   const session = await getSession(cookie);
-  const organizationId = session.get("organizationId");
+  const organizationId = session.get('organizationId');
   return organizationId;
 }
 
-export async function setOrganizationId(cookie: string, organizationId: number): Promise<string> {
+export async function setOrganizationId(
+  cookie: string,
+  organizationId: number,
+): Promise<string> {
   const session = await getSession(cookie);
-  session.set("organizationId", organizationId);
+  session.set('organizationId', organizationId);
   return await commitSession(session);
 }

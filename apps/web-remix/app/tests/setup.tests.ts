@@ -1,20 +1,21 @@
-import { createRemixStub } from "@remix-run/testing";
-import type { ICurrentUser } from "~/api/CurrentUserApi";
-import { setCurrentUser } from "~/utils/currentUser.server";
-import { setOrganizationId } from "~/utils/toast.server";
 import type {
   ActionFunction,
   ActionFunctionArgs,
   LoaderFunction,
   LoaderFunctionArgs,
-} from "@remix-run/node";
-import type { RemixStubProps } from "@remix-run/testing";
+} from '@remix-run/node';
+import { createRemixStub } from '@remix-run/testing';
+import type { RemixStubProps } from '@remix-run/testing';
+
+import type { ICurrentUser } from '~/api/CurrentUserApi';
+import { setCurrentUser } from '~/utils/currentUser.server';
+import { setOrganizationId } from '~/utils/toast.server';
 
 type RemixRoutesProps = Parameters<typeof createRemixStub>;
 
 export const setupRoutes = (
   routes: RemixRoutesProps[0],
-  ctx?: RemixRoutesProps[1]
+  ctx?: RemixRoutesProps[1],
 ) => createRemixStub(routes, ctx);
 
 export type RoutesProps = RemixStubProps;
@@ -25,9 +26,9 @@ export const getBuildelCookie = () => {
 
 export const getSessionCookie = async (
   request: Request,
-  args?: ISessionData
+  args?: ISessionData,
 ) => {
-  let sessionCookie = "";
+  let sessionCookie = '';
 
   if (args?.user !== null) {
     sessionCookie = await setCurrentUser(request, args?.user ?? { id: 1 });
@@ -46,15 +47,15 @@ type ISessionData = {
 
 export const loaderWithSession = (
   loader: LoaderFunction,
-  sessionData?: ISessionData
+  sessionData?: ISessionData,
 ) => {
   return async (args: LoaderFunctionArgs) => {
     args.request.headers.set(
-      "cookie",
+      'cookie',
       `${getBuildelCookie()};${await getSessionCookie(
         args.request,
-        sessionData
-      )}`
+        sessionData,
+      )}`,
     );
     return loader(args);
   };
@@ -62,15 +63,15 @@ export const loaderWithSession = (
 
 export const actionWithSession = (
   action: ActionFunction,
-  sessionData?: ISessionData
+  sessionData?: ISessionData,
 ) => {
   return async (args: ActionFunctionArgs) => {
     const cookie = [
       getBuildelCookie(),
       await getSessionCookie(args.request, sessionData),
-    ].join(";");
+    ].join(';');
 
-    args.request.headers.set("cookie", cookie);
+    args.request.headers.set('cookie', cookie);
 
     return action(args);
   };

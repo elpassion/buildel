@@ -1,1 +1,1 @@
-export { NewOrganizationPage as page, meta } from "./page";
+export { NewOrganizationPage as page, meta } from './page';

@@ -1,9 +1,11 @@
-import { useState } from "react";
-import cloneDeep from "lodash.clonedeep";
-import { v4 as uuidv4 } from "uuid";
-import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
-import { errorToast } from "~/components/toasts/errorToast";
-import type { IMessage, MessageRole } from "./chat.types";
+import { useState } from 'react';
+import cloneDeep from 'lodash.clonedeep';
+import { v4 as uuidv4 } from 'uuid';
+
+import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
+import { errorToast } from '~/components/toasts/errorToast';
+
+import type { IMessage, MessageRole } from './chat.types';
 
 interface UseChatProps {
   input: string;
@@ -45,7 +47,7 @@ export const useChat = ({
       const tmpPrev = cloneDeep(prev);
       const lastMessage = tmpPrev[tmpPrev.length - 1];
 
-      if (lastMessage && lastMessage.role === "ai") {
+      if (lastMessage && lastMessage.role === 'ai') {
         tmpPrev[tmpPrev.length - 1].message += (
           payload as { message: string }
         ).message;
@@ -57,7 +59,7 @@ export const useChat = ({
         ...prev,
         {
           id: uuidv4(),
-          role: "ai",
+          role: 'ai',
           message: (payload as { message: string }).message,
           created_at: new Date(),
         },
@@ -77,7 +79,7 @@ export const useChat = ({
   };
 
   const onBlockError = () => {
-    errorToast({ description: "Ups! Something went wrong" });
+    errorToast({ description: 'Ups! Something went wrong' });
     setIsGenerating(false);
   };
 
@@ -106,13 +108,13 @@ export const useChat = ({
     const newMessage = {
       message,
       id: uuidv4(),
-      role: "user" as MessageRole,
+      role: 'user' as MessageRole,
       created_at: new Date(),
     };
 
     setMessages((prev) => [...prev, newMessage]);
 
-    push(input + ":input", message);
+    push(input + ':input', message);
   };
 
   return {

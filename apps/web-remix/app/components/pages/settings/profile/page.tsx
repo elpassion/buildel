@@ -1,23 +1,25 @@
+import type { MetaFunction } from '@remix-run/node';
 import {
   Link,
   Outlet,
   useLoaderData,
   useMatch,
   useNavigate,
-} from "@remix-run/react";
-import { Button } from "@elpassion/taco";
+} from '@remix-run/react';
+import { Button } from '@elpassion/taco';
+
 import {
   ActionSidebar,
   ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
+} from '~/components/sidebar/ActionSidebar';
+import { routes } from '~/utils/routes.utils';
+
 import {
   Section,
   SectionContent,
   SectionHeading,
-} from "../settingsLayout/PageLayout";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '../settingsLayout/PageLayout';
+import type { loader } from './loader.server';
 
 export function ProfileSettingsPage() {
   const { organization } = useLoaderData<typeof loader>();
@@ -61,7 +63,7 @@ export function ProfileSettingsPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Profile settings",
+      title: 'Profile settings',
     },
   ];
 };

@@ -1,34 +1,35 @@
-import React, { useEffect } from "react";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
+import React, { useEffect } from 'react';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+
 import {
   ChatCloseButton,
   ChatGeneratingAnimation,
   ChatHeader,
   ChatMessagesWrapper,
   ChatStatus,
-} from "~/components/chat/Chat.components";
-import type { MessageRole } from "~/components/chat/chat.types";
-import { ChatHeading } from "~/components/chat/ChatHeading";
-import { ChatInput } from "~/components/chat/ChatInput";
-import { ChatMessages } from "~/components/chat/ChatMessages";
-import { ChatWrapper } from "~/components/chat/ChatWrapper";
-import { useChat } from "~/components/chat/useChat";
-import { useEl } from "~/components/pages/pipelines/EL/ELProvider";
+} from '~/components/chat/Chat.components';
+import type { MessageRole } from '~/components/chat/chat.types';
+import { ChatHeading } from '~/components/chat/ChatHeading';
+import { ChatInput } from '~/components/chat/ChatInput';
+import { ChatMessages } from '~/components/chat/ChatMessages';
+import { ChatWrapper } from '~/components/chat/ChatWrapper';
+import { useChat } from '~/components/chat/useChat';
+import { useEl } from '~/components/pages/pipelines/EL/ELProvider';
 
 const INITIAL_MESSAGES = [
   {
     message:
       "I'm EL, your AI helper here at Buildel. Feel free to ask me anything about creating the perfect workflow for you in the application.",
-    role: "ai" as MessageRole,
+    role: 'ai' as MessageRole,
     created_at: new Date(),
-    id: "2",
+    id: '2',
   },
   {
-    message: "👋 Hi there!",
-    role: "ai" as MessageRole,
+    message: '👋 Hi there!',
+    role: 'ai' as MessageRole,
     created_at: new Date(),
-    id: "1",
+    id: '1',
   },
 ];
 
@@ -54,8 +55,8 @@ export const ELHelper: React.FC<ELHelperProps> = ({
   } = useChat({
     pipelineId: 135,
     organizationId: 13,
-    input: "text_input_1",
-    output: "text_output_1",
+    input: 'text_input_1',
+    output: 'text_output_1',
     onFinish: onBlockCreate,
   });
 
@@ -65,11 +66,11 @@ export const ELHelper: React.FC<ELHelperProps> = ({
       () =>
         startRun({
           initial_inputs: [
-            { name: "text_input_2:input", value: organizationId },
-            { name: "text_input_3:input", value: pipelineId },
+            { name: 'text_input_2:input', value: organizationId },
+            { name: 'text_input_3:input', value: pipelineId },
           ],
         }),
-      500
+      500,
     );
 
     return () => {
@@ -80,11 +81,11 @@ export const ELHelper: React.FC<ELHelperProps> = ({
   return (
     <div
       className={classNames(
-        "absolute top-8 z-10 right-0 transition md:right-4",
+        'absolute top-8 z-10 right-0 transition md:right-4',
         {
-          "opacity-0 pointer-events-none scale-90": !isShown,
-          "opacity-100 pointer-events-auto scale-100": isShown,
-        }
+          'opacity-0 pointer-events-none scale-90': !isShown,
+          'opacity-100 pointer-events-auto scale-100': isShown,
+        },
       )}
     >
       <ChatWrapper className="!w-[440px]">
@@ -102,8 +103,8 @@ export const ELHelper: React.FC<ELHelperProps> = ({
 
         <ChatMessagesWrapper
           className={classNames({
-            "h-[300px]": !!messages.length,
-            "h-[180px]": !messages.length,
+            'h-[300px]': !!messages.length,
+            'h-[180px]': !messages.length,
           })}
         >
           <ChatMessages
@@ -120,7 +121,7 @@ export const ELHelper: React.FC<ELHelperProps> = ({
         <div className="mt-2">
           <ChatInput
             onSubmit={pushMessage}
-            disabled={connectionStatus !== "running"}
+            disabled={connectionStatus !== 'running'}
             generating={isGenerating}
           />
         </div>

@@ -1,1 +1,1 @@
-export { NewSecret as page, meta } from "./page";
+export { NewSecret as page, meta } from './page';

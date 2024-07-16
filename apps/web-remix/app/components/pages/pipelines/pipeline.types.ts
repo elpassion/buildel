@@ -1,10 +1,12 @@
+import type { z } from 'zod';
+
 import type {
   BlockType,
   BlockTypes,
   ConfigConnection,
   ExtendedBlockConfig,
   IOType,
-} from "~/api/blockType/blockType.contracts";
+} from '~/api/blockType/blockType.contracts';
 import type {
   Alias,
   ExtendedPipeline,
@@ -16,8 +18,7 @@ import type {
   PipelineCosts,
   PipelineRun,
   PipelineRuns,
-} from "~/api/pipeline/pipeline.contracts";
-import type { z } from "zod";
+} from '~/api/pipeline/pipeline.contracts';
 
 export type IBlockConfig = z.TypeOf<typeof ExtendedBlockConfig>;
 
@@ -48,22 +49,22 @@ export interface IEdge {
 }
 
 export interface IField {
-  type: "input" | "output";
+  type: 'input' | 'output';
   data: {
     name: string;
     public: boolean;
     type:
-      | "audio"
-      | "text"
-      | "file"
-      | "file_temporary"
-      | "worker"
-      | "controller";
+      | 'audio'
+      | 'text'
+      | 'file'
+      | 'file_temporary'
+      | 'worker'
+      | 'controller';
   };
 }
 
 export interface IHandle {
-  type: "source" | "target";
+  type: 'source' | 'target';
   id: string;
   data: z.TypeOf<typeof IOType>;
 }

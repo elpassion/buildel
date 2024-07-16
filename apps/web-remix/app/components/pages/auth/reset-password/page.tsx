@@ -1,13 +1,15 @@
-import * as React from "react";
-import { Link } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Field } from "~/components/form/fields/field.context";
-import { FieldError } from "~/components/form/fields/field.error";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import { schema } from "./schema";
-import type { MetaFunction } from "@remix-run/node";
+import * as React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { Link } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { Field } from '~/components/form/fields/field.context';
+import { FieldError } from '~/components/form/fields/field.error';
+import { TextInputField } from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
+
+import { schema } from './schema';
 
 export function ResetPasswordPage() {
   const validator = React.useMemo(() => withZod(schema), []);
@@ -18,10 +20,10 @@ export function ResetPasswordPage() {
         Reset password
       </h1>
       <p className="text-center text-neutral-100">
-        Go back to{" "}
+        Go back to{' '}
         <Link
           to={{
-            pathname: "/login",
+            pathname: '/login',
           }}
           className="text-primary-500"
         >
@@ -57,7 +59,7 @@ export function ResetPasswordPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Reset Password",
+      title: 'Reset Password',
     },
   ];
 };

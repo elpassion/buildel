@@ -1,16 +1,12 @@
-import type {
-  ReactNode} from "react";
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import classNames from "classnames";
-import { Button } from "@elpassion/taco";
-import { KnowledgeBaseFileResponse } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { assert } from "~/utils/assert";
-import type { IFile, IFileUpload, IPreviewProps } from "./fileUpload.types";
+import type { ReactNode } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Button } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import { KnowledgeBaseFileResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { assert } from '~/utils/assert';
+
+import type { IFile, IFileUpload, IPreviewProps } from './fileUpload.types';
 
 export interface FileUploadProps extends React.HTMLProps<HTMLInputElement> {
   preview?: (props: IPreviewProps) => ReactNode;
@@ -29,8 +25,8 @@ export function FileUpload({
   onFetch,
   onRemove,
   disabled,
-  uploadText = "Browse files to upload",
-  labelText = "Upload files",
+  uploadText = 'Browse files to upload',
+  labelText = 'Upload files',
   className,
   onChange,
   fileList: propsFileList,
@@ -67,7 +63,7 @@ export function FileUpload({
             file_name: file.name,
             file_size: file.size,
             file_type: file.type,
-            status: "uploading",
+            status: 'uploading',
           },
           ...prev,
         ]);
@@ -76,31 +72,31 @@ export function FileUpload({
             setFileList((prev) =>
               prev.map((file) => {
                 if (file.id === id) {
-                  return { ...res, status: "done" };
+                  return { ...res, status: 'done' };
                 }
                 return file;
-              })
+              }),
             );
           })
           .catch((e) => {
             setFileList((prev) =>
               prev.map((file) => {
                 if (file.id === id) {
-                  return { ...file, status: "error", error: e };
+                  return { ...file, status: 'error', error: e };
                 }
                 return file;
-              })
+              }),
             );
           });
       });
     },
-    [onUpload, onChange]
+    [onUpload, onChange],
   );
 
   const handleRemove = useCallback(
     async (id: string | number) => {
       try {
-        if (onRemove && (typeof id === "string" || id % 1 === 0)) {
+        if (onRemove && (typeof id === 'string' || id % 1 === 0)) {
           await onRemove(id);
         }
 
@@ -109,7 +105,7 @@ export function FileUpload({
         console.error(err);
       }
     },
-    [onRemove]
+    [onRemove],
   );
 
   const handleSelectFiles = useCallback(() => {
@@ -122,7 +118,7 @@ export function FileUpload({
   }, [handleFetchFiles]);
 
   return (
-    <div className={classNames("flex flex-col gap-2", className)}>
+    <div className={classNames('flex flex-col gap-2', className)}>
       <label htmlFor={rest.id}>
         <span className="text-white text-xs font-medium">{labelText}</span>
         <input
@@ -175,33 +171,33 @@ export function useFilesUpload({
 
   const uploadFileRequest = useCallback(
     async (file: File, fileBlockName?: string | null): Promise<IFile> => {
-      if (!fileBlockName) throw new Error("Missing file block name");
+      if (!fileBlockName) throw new Error('Missing file block name');
       const formData = new FormData();
-      formData.append("file", file);
-      formData.append("block_name", fileBlockName);
-      formData.append("input_name", "input");
+      formData.append('file', file);
+      formData.append('block_name', fileBlockName);
+      formData.append('input_name', 'input');
 
       const response = await fetch(
         `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
         {
           body: formData,
-          method: "POST",
-        }
+          method: 'POST',
+        },
       );
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.errors?.detail ?? "Something went wrong!");
+        throw new Error(data?.errors?.detail ?? 'Something went wrong!');
       }
 
       const fileUpload = {
         ...KnowledgeBaseFileResponse.parse(data),
-        status: "done" as const,
+        status: 'done' as const,
       };
 
       return fileUpload;
     },
-    [organizationId, pipelineId, runId]
+    [organizationId, pipelineId, runId],
   );
 
   const removeFileRequest = useCallback(
@@ -209,19 +205,19 @@ export function useFilesUpload({
       return fetch(
         `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
         {
-          method: "DELETE",
+          method: 'DELETE',
           body: JSON.stringify({
             file_id: id,
             block_name: fileBlockName,
-            input_name: "input",
+            input_name: 'input',
           }),
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-        }
+        },
       );
     },
-    [organizationId, pipelineId, runId]
+    [organizationId, pipelineId, runId],
   );
 
   const uploadFile = async (file: File, fileBlockName?: string | null) => {
@@ -232,7 +228,7 @@ export function useFilesUpload({
         file_name: file.name,
         file_size: file.size,
         file_type: file.type,
-        status: "uploading",
+        status: 'uploading',
       },
       ...prev,
     ]);
@@ -241,30 +237,30 @@ export function useFilesUpload({
       setFileList((prev) =>
         prev.map((file) => {
           if (file.id === id) {
-            return { ...res, status: "done" };
+            return { ...res, status: 'done' };
           }
           return file;
-        })
+        }),
       );
     } catch (e) {
       setFileList((prev) =>
         prev.map((file) => {
           if (file.id === id) {
-            return { ...file, status: "error", error: e };
+            return { ...file, status: 'error', error: e };
           }
           return file;
-        })
+        }),
       );
     } finally {
       if (!inputRef.current) return;
-      inputRef.current.value = "";
+      inputRef.current.value = '';
     }
   };
 
   const removeFile = useCallback(
     async (id: number | string, fileBlockName?: string | null) => {
       try {
-        if (typeof id === "string" || id % 1 === 0) {
+        if (typeof id === 'string' || id % 1 === 0) {
           await removeFileRequest(id, fileBlockName);
         }
 
@@ -273,7 +269,7 @@ export function useFilesUpload({
         console.error(err);
       }
     },
-    [removeFileRequest, setFileList]
+    [removeFileRequest, setFileList],
   );
 
   const clearFiles = useCallback(() => {
@@ -286,6 +282,6 @@ export function useFilesUpload({
     removeFile,
     inputRef,
     clearFiles,
-    isUploading: fileList.some((upload) => upload.status === "uploading"),
+    isUploading: fileList.some((upload) => upload.status === 'uploading'),
   };
 }

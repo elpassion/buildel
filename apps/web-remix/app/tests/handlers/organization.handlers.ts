@@ -1,11 +1,12 @@
-import { HttpResponse, http } from "msw";
+import { http, HttpResponse } from 'msw';
+
 import type {
   ICreateFromTemplateResponse,
   ICreateOrganizationSchema,
   IOrganization,
   IWorkflowTemplate,
-} from "~/api/organization/organization.contracts";
-import { templateFixture } from "~/tests/fixtures/templates.fixtures";
+} from '~/api/organization/organization.contracts';
+import { templateFixture } from '~/tests/fixtures/templates.fixtures';
 
 export class OrganizationHandlers {
   private organizations: Map<number, IOrganization> = new Map();
@@ -15,18 +16,18 @@ export class OrganizationHandlers {
   }
 
   getOrganizations() {
-    return http.get("/super-api/organizations", () => {
+    return http.get('/super-api/organizations', () => {
       return HttpResponse.json<{ data: IOrganization[] }>(
         { data: [...this.organizations.values()] },
         {
           status: 200,
-        }
+        },
       );
     });
   }
 
   getOrganizationsError() {
-    return http.get("/super-api/organizations", () => {
+    return http.get('/super-api/organizations', () => {
       return HttpResponse.json<{ data: IOrganization[] }>(null, {
         status: 500,
       });
@@ -35,7 +36,7 @@ export class OrganizationHandlers {
 
   createOrganization() {
     return http.post<any, ICreateOrganizationSchema>(
-      "/super-api/organizations",
+      '/super-api/organizations',
       async ({ request }) => {
         const data = await request.json();
         const id = this.organizations.size + 1;
@@ -51,37 +52,37 @@ export class OrganizationHandlers {
           { data: newOrganization },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
   getTemplates() {
     return http.get(
-      "/super-api/organizations/:organizationId/workflow_templates",
+      '/super-api/organizations/:organizationId/workflow_templates',
       () => {
         return HttpResponse.json<{ data: IWorkflowTemplate[] }>(
           { data: [templateFixture()] },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
   createFromTemplate() {
     return http.post(
-      "/super-api/organizations/:organizationId/workflow_templates",
+      '/super-api/organizations/:organizationId/workflow_templates',
       () => {
         return HttpResponse.json<{ data: ICreateFromTemplateResponse }>(
           { data: { pipeline_id: 999 } },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 

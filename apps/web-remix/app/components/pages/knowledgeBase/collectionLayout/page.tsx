@@ -1,19 +1,21 @@
-import React from "react";
-import { Link, Outlet, useLoaderData, useMatch } from "@remix-run/react";
-import { Button } from "@elpassion/taco";
-import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
-import { AppNavbar } from "~/components/navbar/AppNavbar";
-import { FilledTabLink } from "~/components/tabs/FilledTabLink";
-import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
-import { TabGroup } from "~/components/tabs/TabGroup";
-import { routes } from "~/utils/routes.utils";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { Link, Outlet, useLoaderData, useMatch } from '@remix-run/react';
+import { Button } from '@elpassion/taco';
+
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { AppNavbar } from '~/components/navbar/AppNavbar';
+import { FilledTabLink } from '~/components/tabs/FilledTabLink';
+import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
+import { TabGroup } from '~/components/tabs/TabGroup';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
 
 export function KnowledgeBaseCollectionLayout() {
   const { organizationId, collectionName } = useLoaderData<typeof loader>();
   const matchContent = useMatch(
-    routes.collectionFiles(organizationId, collectionName)
+    routes.collectionFiles(organizationId, collectionName),
   );
 
   const linkToSearch = !matchContent

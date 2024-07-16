@@ -1,4 +1,4 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from '@remix-run/node';
 
 export function AcceptPage() {
   return null;
@@ -7,7 +7,7 @@ export function AcceptPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Accept",
+      title: 'Accept',
     },
   ];
 };

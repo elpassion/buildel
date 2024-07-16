@@ -1,39 +1,40 @@
-import type { ReactNode} from "react";
-import React, { useCallback, useEffect, useState } from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm, useFormContext } from "remix-validated-form";
-import type { ExtendedBlockConfig } from "~/api/blockType/blockType.contracts";
-import type { Suggestion } from "~/components/editor/CodeMirror/codeMirror.types";
-import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
+import type { ReactNode } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { useFormContext, ValidatedForm } from 'remix-validated-form';
+import type { z } from 'zod';
+
+import type { ExtendedBlockConfig } from '~/api/blockType/blockType.contracts';
+import type { Suggestion } from '~/components/editor/CodeMirror/codeMirror.types';
+import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 import {
   CreatableAsyncForm,
   CreatableAsyncSelectField,
-} from "~/components/form/fields/creatableAsyncSelect.field";
-import { EditorField } from "~/components/form/fields/editor.field";
+} from '~/components/form/fields/creatableAsyncSelect.field';
+import { EditorField } from '~/components/form/fields/editor.field';
 import {
   Field as FormField,
   HiddenField,
-} from "~/components/form/fields/field.context";
-import { TextInputField } from "~/components/form/fields/text.field";
-import type { FieldProps} from "~/components/form/schema/Schema";
-import { Schema } from "~/components/form/schema/Schema";
+} from '~/components/form/fields/field.context';
+import { TextInputField } from '~/components/form/fields/text.field';
+import type { FieldProps } from '~/components/form/schema/Schema';
+import { Schema } from '~/components/form/schema/Schema';
 import {
   ArrayField,
   BooleanField,
   NumberField,
   StringField,
-} from "~/components/form/schema/SchemaFields";
-import { generateZODSchema } from "~/components/form/schema/SchemaParser";
-import { SubmitButton } from "~/components/form/submit";
+} from '~/components/form/schema/SchemaFields';
+import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import { SubmitButton } from '~/components/form/submit';
 import type {
   IBlockConfig,
   IConfigConnection,
-} from "~/components/pages/pipelines/pipeline.types";
-import { reverseToolConnections } from "~/components/pages/pipelines/PipelineFlow.utils";
-import { successToast } from "~/components/toasts/successToast";
-import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
-import { assert } from "~/utils/assert";
-import type { z } from "zod";
+} from '~/components/pages/pipelines/pipeline.types';
+import { reverseToolConnections } from '~/components/pages/pipelines/PipelineFlow.utils';
+import { successToast } from '~/components/toasts/successToast';
+import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
+import { assert } from '~/utils/assert';
 
 export function EditBlockForm({
   onSubmit,
@@ -50,7 +51,7 @@ export function EditBlockForm({
   children?: ReactNode;
   onSubmit: (
     data: IBlockConfig & { oldName: string },
-    connections: IConfigConnection[]
+    connections: IConfigConnection[],
   ) => void;
   blockConfig: z.TypeOf<typeof ExtendedBlockConfig>;
   disabled?: boolean;
@@ -85,12 +86,12 @@ export function EditBlockForm({
       });
       setConnections(newConnections);
     },
-    [connections]
+    [connections],
   );
 
   const handleUpdate = (
     data: Record<string, any>,
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
     clearFieldsErrors();
@@ -100,7 +101,7 @@ export function EditBlockForm({
       newConfig.oldName !== newConfig.name &&
       nodesNames.includes(data.name)
     ) {
-      setFieldsErrors({ name: "This block name is already in used" });
+      setFieldsErrors({ name: 'This block name is already in used' });
     } else {
       onSubmit(newConfig, connections);
     }
@@ -108,32 +109,32 @@ export function EditBlockForm({
 
   const CustomEditorField = useCallback(
     (props: FieldProps) => {
-      if (!("presentAs" in props.field) || props.field.presentAs !== "editor") {
+      if (!('presentAs' in props.field) || props.field.presentAs !== 'editor') {
         return null;
       }
 
       const suggestions: Suggestion[] = (props.field.suggestions || []).flatMap(
         (suggestion) => {
-          if (suggestion.value === "inputs.*") {
+          if (suggestion.value === 'inputs.*') {
             return generateSuggestions([
               ...connections,
               ...reverseToolConnections(connections, blockConfig.name),
             ]);
           }
-          if (suggestion.value === "metadata.*") {
+          if (suggestion.value === 'metadata.*') {
             return [
               {
-                label: "metadata.",
+                label: 'metadata.',
                 info: suggestion.description,
                 type: suggestion.type,
                 matchAll: true,
               },
             ];
           }
-          if (suggestion.value === "secrets.*") {
+          if (suggestion.value === 'secrets.*') {
             return [
               {
-                label: "secrets.",
+                label: 'secrets.',
                 info: suggestion.description,
                 type: suggestion.type,
                 matchAll: true,
@@ -147,7 +148,7 @@ export function EditBlockForm({
               type: suggestion.type,
             },
           ];
-        }
+        },
       );
 
       return (
@@ -162,15 +163,15 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.connections]
+    [blockConfig.connections],
   );
 
   const SelectField = useCallback(
     (props: FieldProps) => {
-      assert(props.field.type === "string");
+      assert(props.field.type === 'string');
       if (
-        !("presentAs" in props.field) ||
-        props.field.presentAs !== "async-select"
+        !('presentAs' in props.field) ||
+        props.field.presentAs !== 'async-select'
       ) {
         return;
       }
@@ -178,8 +179,8 @@ export function EditBlockForm({
       const { fieldErrors, getValues } = useFormContext();
 
       const replacedUrl = props.field.url
-        .replace("{{organization_id}}", organizationId.toString())
-        .replace("{{pipeline_id}}", pipelineId.toString())
+        .replace('{{organization_id}}', organizationId.toString())
+        .replace('{{pipeline_id}}', pipelineId.toString())
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
           const replacedValue = values.get(optKey);
@@ -198,8 +199,8 @@ export function EditBlockForm({
             supportingText={props.field.description}
             errorMessage={fieldErrors[props.name!]}
             defaultValue={props.field.default
-              ?.replace("{{pipeline_id}}", pipelineId.toString())
-              ?.replace("{{block_name}}", blockConfig.name)
+              ?.replace('{{pipeline_id}}', pipelineId.toString())
+              ?.replace('{{block_name}}', blockConfig.name)
               ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
                 const values = getValues();
                 const replacedValue = values.get(optKey);
@@ -210,15 +211,15 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId]
+    [blockConfig.name, organizationId, pipelineId],
   );
 
   const AsyncCreatableField = useCallback(
     (props: FieldProps) => {
-      assert(props.field.type === "string");
+      assert(props.field.type === 'string');
       if (
-        !("presentAs" in props.field) ||
-        props.field.presentAs !== "async-creatable-select"
+        !('presentAs' in props.field) ||
+        props.field.presentAs !== 'async-creatable-select'
       ) {
         return;
       }
@@ -226,7 +227,7 @@ export function EditBlockForm({
       const { fieldErrors, getValues } = useFormContext();
 
       const replacedUrl = props.field.url
-        .replace("{{organization_id}}", organizationId.toString())
+        .replace('{{organization_id}}', organizationId.toString())
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
 
@@ -246,8 +247,8 @@ export function EditBlockForm({
             dropdownClassName={`${props.name}-dropdown`}
             data-testid={props.name}
             defaultValue={props.field.default
-              ?.replace("{{pipeline_id}}", pipelineId.toString())
-              ?.replace("{{block_name}}", blockConfig.name)
+              ?.replace('{{pipeline_id}}', pipelineId.toString())
+              ?.replace('{{block_name}}', blockConfig.name)
               ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
                 const values = getValues();
                 const replacedValue = values.get(optKey);
@@ -269,7 +270,7 @@ export function EditBlockForm({
         </FormField>
       );
     },
-    [blockConfig.name, organizationId, pipelineId]
+    [blockConfig.name, organizationId, pipelineId],
   );
 
   return (
@@ -365,8 +366,8 @@ function generateSuggestions(connections: IConfigConnection[]): Suggestion[] {
   return connections.map((connection) => {
     return {
       label: `${connection.from.block_name}:${connection.from.output_name}`,
-      info: "",
-      variant: connection.opts.reset ? "primary" : "secondary",
+      info: '',
+      variant: connection.opts.reset ? 'primary' : 'secondary',
     };
   });
 }
@@ -399,11 +400,11 @@ interface CopyConfigurationButtonProps {
 }
 
 function CopyConfigurationButton({ value }: CopyConfigurationButtonProps) {
-  const { copy, isCopied } = useCopyToClipboard(value ?? "");
+  const { copy, isCopied } = useCopyToClipboard(value ?? '');
 
   useEffect(() => {
     if (isCopied) {
-      successToast({ description: "Configuration copied!" });
+      successToast({ description: 'Configuration copied!' });
     }
   }, [isCopied]);
 

@@ -1,19 +1,21 @@
-import React from "react";
+import React from 'react';
 import {
   Link,
   Outlet,
   useLoaderData,
   useMatch,
   useNavigate,
-} from "@remix-run/react";
-import { Button } from "@elpassion/taco";
+} from '@remix-run/react';
+import { Button } from '@elpassion/taco';
+
 import {
   ActionSidebar,
   ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
-import { InvitationsList } from "./InvitationsList";
-import type { loader } from "./loader.server";
+} from '~/components/sidebar/ActionSidebar';
+import { routes } from '~/utils/routes.utils';
+
+import { InvitationsList } from './InvitationsList';
+import type { loader } from './loader.server';
 
 export function InvitationsPage() {
   const { organizationId, invitations } = useLoaderData<typeof loader>();

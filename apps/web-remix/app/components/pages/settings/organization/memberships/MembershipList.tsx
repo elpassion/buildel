@@ -1,6 +1,7 @@
-import classNames from "classnames";
-import { ItemList } from "~/components/list/ItemList";
-import type { IMembership } from "~/components/pages/settings/organization/organization.types";
+import classNames from 'classnames';
+
+import { ItemList } from '~/components/list/ItemList';
+import type { IMembership } from '~/components/pages/settings/organization/organization.types';
 
 interface MembershipListProps {
   memberships: IMembership[];
@@ -25,7 +26,7 @@ export const MembershipListItem = ({ membership }: MembershipListItemProps) => {
   return (
     <article
       className={classNames(
-        "group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white text-sm"
+        'group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white text-sm',
       )}
     >
       {membership.user.email}

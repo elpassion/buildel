@@ -1,5 +1,6 @@
-import userEvent from "@testing-library/user-event";
-import { screen } from "../render";
+import userEvent from '@testing-library/user-event';
+
+import { screen } from '../render';
 
 export class TextareaHandle {
   constructor(public readonly textareaElement: HTMLTextAreaElement) {}
@@ -9,7 +10,7 @@ export class TextareaHandle {
   }
 
   isDisabled(): boolean {
-    return this.textareaElement.hasAttribute("disabled");
+    return this.textareaElement.hasAttribute('disabled');
   }
 
   async type(text: string) {

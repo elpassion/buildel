@@ -1,17 +1,18 @@
-import type {
-  PropsWithChildren} from "react";
+import type { PropsWithChildren } from 'react';
 import React, {
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
-} from "react";
-import { generateZODSchema } from "~/components/form/schema/SchemaParser";
-import { errorToast } from "~/components/toasts/errorToast";
-import { usePipelineRun } from "./usePipelineRun";
-import type { IBlockConfig, IExtendedPipeline } from "./pipeline.types";
-import type { SafeParseReturnType, ZodError } from "zod";
+} from 'react';
+import type { SafeParseReturnType, ZodError } from 'zod';
+
+import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import { errorToast } from '~/components/toasts/errorToast';
+
+import type { IBlockConfig, IExtendedPipeline } from './pipeline.types';
+import { usePipelineRun } from './usePipelineRun';
 
 export type Metadata = Record<string, any>;
 
@@ -34,7 +35,7 @@ interface IRunPipelineContext {
   clearEvents: (blockName: string) => void;
   clearBlockEvents: (blockName: string) => void;
   runId: string | null | undefined;
-  status: "idle" | "starting" | "running";
+  status: 'idle' | 'starting' | 'running';
   isValid: boolean;
   organizationId: number;
   pipelineId: number;
@@ -43,7 +44,7 @@ interface IRunPipelineContext {
 }
 
 const RunPipelineContext = React.createContext<IRunPipelineContext | undefined>(
-  undefined
+  undefined,
 );
 interface RunPipelineProviderProps extends PropsWithChildren {
   pipeline: IExtendedPipeline;
@@ -59,13 +60,13 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [events, setEvents] = useState<any[]>([]);
   const [blockStatuses, setBlockStatuses] = useState<Record<string, boolean>>(
-    {}
+    {},
   );
 
   const onMessage = useCallback(
     (block: string, output: string, payload: any) =>
       setEvents((events) => [...events, { block, output, payload }]),
-    []
+    [],
   );
 
   const onBlockError = useCallback((blockId: string, errors: string[]) => {
@@ -80,7 +81,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
 
     errors.forEach((err) => {
       errorToast({
-        title: "Run failed!",
+        title: 'Run failed!',
         description: `The workflow run failed due to an error (${err}) in block ${blockId}.`,
       });
     });
@@ -88,7 +89,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
 
   const onError = useCallback((error: string) => {
     errorToast({
-      title: "Run failed!",
+      title: 'Run failed!',
       description: `The workflow run failed due to an error: ${error}.`,
     });
   }, []);
@@ -97,13 +98,19 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     setBlockStatuses((prev) => ({ ...prev, [block]: status }));
   }, []);
 
-  const { status, startRun, stopRun, push, id: runId } = usePipelineRun(
+  const {
+    status,
+    startRun,
+    stopRun,
+    push,
+    id: runId,
+  } = usePipelineRun(
     pipeline.organization_id,
     pipeline.id,
     onMessage,
     onStatusChange,
     onBlockError,
-    onError
+    onError,
   );
 
   const handleStartRun = useCallback(async () => {
@@ -116,7 +123,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       push(topic, payload);
       setErrors({});
     },
-    [push]
+    [push],
   );
 
   const clearEvents = useCallback((blockName: string) => {
@@ -130,19 +137,22 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   const blockValidations = useMemo(() => {
     if (!pipeline) return {};
 
-    return pipeline.config.blocks.reduce((acc, block) => {
-      if (!block.block_type?.schema) return acc;
-      return {
-        ...acc,
-        [block.name]: generateZODSchema(
-          block.block_type.schema as any
-        ).safeParse({
-          name: block.name,
-          opts: block.opts,
-          inputs: block.inputs,
-        }),
-      };
-    }, {} as Record<string, SafeParseReturnType<unknown, unknown>>);
+    return pipeline.config.blocks.reduce(
+      (acc, block) => {
+        if (!block.block_type?.schema) return acc;
+        return {
+          ...acc,
+          [block.name]: generateZODSchema(
+            block.block_type.schema as any,
+          ).safeParse({
+            name: block.name,
+            opts: block.opts,
+            inputs: block.inputs,
+          }),
+        };
+      },
+      {} as Record<string, SafeParseReturnType<unknown, unknown>>,
+    );
   }, [pipeline]);
 
   const isValid = useMemo(() => {
@@ -150,7 +160,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   }, [blockValidations]);
 
   useEffect(() => {
-    if (status === "idle") {
+    if (status === 'idle') {
       setBlockStatuses({});
     }
   }, [status]);
@@ -188,7 +198,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       isValid,
       metadata,
       setMetadata,
-    ]
+    ],
   );
   return (
     <RunPipelineContext.Provider value={value}>
@@ -201,7 +211,7 @@ export const useRunPipeline = () => {
   const ctx = useContext(RunPipelineContext);
 
   if (!ctx) {
-    throw new Error("useRunPipeline must be used within RunPipelineProvider");
+    throw new Error('useRunPipeline must be used within RunPipelineProvider');
   }
 
   return ctx;
@@ -211,7 +221,7 @@ export const useRunPipelineEdge = () => {
   const ctx = useContext(RunPipelineContext);
 
   if (!ctx) {
-    throw new Error("useRunPipeline must be used within RunPipelineProvider");
+    throw new Error('useRunPipeline must be used within RunPipelineProvider');
   }
 
   const value = useMemo(() => {
@@ -227,18 +237,18 @@ export const useRunPipelineNode = (block: IBlockConfig) => {
 
   if (!ctx) {
     throw new Error(
-      "useRunPipelineNode must be used within RunPipelineProvider"
+      'useRunPipelineNode must be used within RunPipelineProvider',
     );
   }
 
   const filteredEvents = useMemo(
     () => ctx.events.filter((ev) => ev.block === blockName),
-    [blockName, ctx.events]
+    [blockName, ctx.events],
   );
 
   const status = useMemo(
     () => ctx.blockStatuses[blockName] ?? false,
-    [blockName, ctx.blockStatuses]
+    [blockName, ctx.blockStatuses],
   );
 
   const isValid = useMemo(() => {
@@ -273,6 +283,6 @@ export const useRunPipelineNode = (block: IBlockConfig) => {
       ctx.clearBlockEvents,
       ctx.blockValidations,
       blockName,
-    ]
+    ],
   );
 };

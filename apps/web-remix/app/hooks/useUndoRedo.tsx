@@ -1,23 +1,23 @@
-import { useCallback, useReducer } from "react";
-import isEqual from "lodash.isequal";
+import { useCallback, useReducer } from 'react';
+import isEqual from 'lodash.isequal';
 
 type Action<T> =
   | {
-      type: "SET";
+      type: 'SET';
       payload: {
         data: ((state: T) => T) | T;
         maxLength: number;
       };
     }
   | {
-      type: "UPDATE";
+      type: 'UPDATE';
       payload: {
         data: ((state: T) => T) | T;
       };
     }
-  | { type: "RESET"; payload: T }
-  | { type: "REDO" }
-  | { type: "UNDO" };
+  | { type: 'RESET'; payload: T }
+  | { type: 'REDO' }
+  | { type: 'UNDO' };
 
 type State<T> = {
   prev: T[];
@@ -27,9 +27,9 @@ type State<T> = {
 
 const reducer = <T,>(state: State<T>, action: Action<T>): State<T> => {
   switch (action.type) {
-    case "SET":
+    case 'SET':
       const newCurr =
-        typeof action.payload.data === "function"
+        typeof action.payload.data === 'function'
           ? //@ts-ignore
             action.payload.data(state.curr)
           : action.payload.data;
@@ -42,9 +42,9 @@ const reducer = <T,>(state: State<T>, action: Action<T>): State<T> => {
         next: [],
       };
 
-    case "UPDATE":
+    case 'UPDATE':
       const curr =
-        typeof action.payload.data === "function"
+        typeof action.payload.data === 'function'
           ? //@ts-ignore
             action.payload.data(state.curr)
           : action.payload.data;
@@ -55,7 +55,7 @@ const reducer = <T,>(state: State<T>, action: Action<T>): State<T> => {
         ...state,
         curr: curr,
       };
-    case "REDO":
+    case 'REDO':
       if (state.next.length === 0) return state;
 
       return {
@@ -63,7 +63,7 @@ const reducer = <T,>(state: State<T>, action: Action<T>): State<T> => {
         curr: state.next[0],
         next: state.next.slice(1),
       };
-    case "UNDO":
+    case 'UNDO':
       if (state.prev.length === 0) return state;
 
       return {
@@ -71,7 +71,7 @@ const reducer = <T,>(state: State<T>, action: Action<T>): State<T> => {
         curr: state.prev[state.prev.length - 1],
         next: [state.curr, ...state.next],
       };
-    case "RESET":
+    case 'RESET':
       return { prev: [], curr: action.payload, next: [] };
   }
 };
@@ -92,23 +92,23 @@ export const useUndoRedo = <T,>({
   });
 
   const reset = useCallback(() => {
-    dispatch({ type: "RESET", payload: initial });
+    dispatch({ type: 'RESET', payload: initial });
   }, []);
 
   const undo = useCallback(() => {
-    dispatch({ type: "UNDO" });
+    dispatch({ type: 'UNDO' });
   }, []);
 
   const redo = useCallback(() => {
-    dispatch({ type: "REDO" });
+    dispatch({ type: 'REDO' });
   }, []);
 
   const set = useCallback((cb: ((oldState: T) => T) | T) => {
-    dispatch({ type: "SET", payload: { data: cb, maxLength } });
+    dispatch({ type: 'SET', payload: { data: cb, maxLength } });
   }, []);
 
   const update = useCallback((cb: ((oldState: T) => T) | T) => {
-    dispatch({ type: "UPDATE", payload: { data: cb } });
+    dispatch({ type: 'UPDATE', payload: { data: cb } });
   }, []);
 
   return [

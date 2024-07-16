@@ -1,1 +1,1 @@
-export { InterfaceLayout as page } from "./page";
+export { InterfaceLayout as page } from './page';

@@ -1,6 +1,7 @@
-import type { PropsWithChildren } from "react";
-import React from "react";
-import classNames from "classnames";
+import type { PropsWithChildren } from 'react';
+import React from 'react';
+import classNames from 'classnames';
+
 interface InterfaceSectionWrapperProps {
   className?: string;
 }
@@ -11,8 +12,8 @@ export const InterfaceSectionWrapper: React.FC<
   return (
     <article
       className={classNames(
-        "bg-transparent border border-neutral-800 rounded-xl",
-        className
+        'bg-transparent border border-neutral-800 rounded-xl',
+        className,
       )}
     >
       {children}
@@ -30,8 +31,8 @@ export const InterfaceSectionHeader: React.FC<
   return (
     <header
       className={classNames(
-        "w-full bg-neutral-900 px-6 py-4 rounded-t-xl",
-        className
+        'w-full bg-neutral-900 px-6 py-4 rounded-t-xl',
+        className,
       )}
     >
       {children}

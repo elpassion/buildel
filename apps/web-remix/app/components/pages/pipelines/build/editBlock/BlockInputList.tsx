@@ -1,11 +1,13 @@
-import type { PropsWithChildren} from "react";
-import React, { useMemo, useRef, useState } from "react";
-import classNames from "classnames";
-import { Checkbox } from "@elpassion/taco";
-import { ItemList } from "~/components/list/ItemList";
-import type { IConfigConnection } from "~/components/pages/pipelines/pipeline.types";
-import { HelpfulIcon } from "~/components/tooltip/HelpfulIcon";
-import { useInputs } from "./EditBlockForm";
+import type { PropsWithChildren } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
+import { Checkbox } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import { ItemList } from '~/components/list/ItemList';
+import type { IConfigConnection } from '~/components/pages/pipelines/pipeline.types';
+import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
+
+import { useInputs } from './EditBlockForm';
 
 interface BlockInputListProps {
   connections: IConfigConnection[];
@@ -23,7 +25,7 @@ export const BlockInputList: React.FC<BlockInputListProps> = ({
           data: connection,
         };
       }),
-    [connections]
+    [connections],
   );
 
   if (formattedConnections.length === 0) return null;
@@ -78,7 +80,7 @@ function BlockInputItem({ data }: IItem) {
           htmlFor={`${data.from.block_name}-resettable`}
           className="cursor-pointer"
         >
-          <BadgeText variant={resettable ? "primary" : "secondary"}>
+          <BadgeText variant={resettable ? 'primary' : 'secondary'}>
             {data.from.block_name}
           </BadgeText>
         </label>
@@ -101,8 +103,8 @@ function Badge({
     <div
       onClick={onClick}
       className={classNames(
-        "bg-neutral-800 px-2 py-1 rounded-md flex items-center",
-        className
+        'bg-neutral-800 px-2 py-1 rounded-md flex items-center',
+        className,
       )}
     >
       {children}
@@ -111,18 +113,18 @@ function Badge({
 }
 
 interface BadgeTextProps {
-  variant?: "primary" | "secondary";
+  variant?: 'primary' | 'secondary';
 }
 
 function BadgeText({
-  variant = "primary",
+  variant = 'primary',
   children,
 }: PropsWithChildren<BadgeTextProps>) {
   return (
     <p
-      className={classNames("text-xs", {
-        "text-primary-500": variant === "primary",
-        "text-secondary-500": variant === "secondary",
+      className={classNames('text-xs', {
+        'text-primary-500': variant === 'primary',
+        'text-secondary-500': variant === 'secondary',
       })}
     >
       {children}

@@ -1,16 +1,18 @@
-import React from "react";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
-import { Icon } from "@elpassion/taco";
-import { IconButton } from "~/components/iconButton";
-import { BasicLink } from "~/components/link/BasicLink";
-import { ItemList } from "~/components/list/ItemList";
-import { confirm } from "~/components/modal/confirm";
-import { routes } from "~/utils/routes.utils";
-import type { loader } from "./loader.server";
+import React from 'react';
+import { Link, useFetcher, useLoaderData } from '@remix-run/react';
+import { Icon } from '@elpassion/taco';
+
+import { IconButton } from '~/components/iconButton';
+import { BasicLink } from '~/components/link/BasicLink';
+import { ItemList } from '~/components/list/ItemList';
+import { confirm } from '~/components/modal/confirm';
+import { routes } from '~/utils/routes.utils';
+
 import type {
   IKnowledgeBaseFile,
   IKnowledgeBaseFileList,
-} from "../knowledgeBase.types";
+} from '../knowledgeBase.types';
+import type { loader } from './loader.server';
 
 interface KnowledgeBaseFileListProps {
   items: IKnowledgeBaseFileList;
@@ -24,14 +26,14 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
   const handleDelete = (file: IKnowledgeBaseFile) => {
     confirm({
       onConfirm: async () =>
-        fetcher.submit({ memoryId: file.id }, { method: "delete" }),
-      confirmText: "Delete item",
+        fetcher.submit({ memoryId: file.id }, { method: 'delete' }),
+      confirmText: 'Delete item',
       children: (
         <p className="text-neutral-100 text-sm">
-          You are about to delete the{" "}
+          You are about to delete the{' '}
           <span className="block font-bold max-w-full truncate">
             "{file.file_name}”
-          </span>{" "}
+          </span>{' '}
           file from your knowledge base. This action is irreversible.
         </p>
       ),
@@ -45,7 +47,12 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
       items={items}
       renderItem={(item) => (
         <BasicLink
-          to={routes.collectionMemory(organizationId, collectionName, item.id, item.file_name)}
+          to={routes.collectionMemory(
+            organizationId,
+            collectionName,
+            item.id,
+            item.file_name,
+          )}
         >
           <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
         </BasicLink>
@@ -83,7 +90,7 @@ export const KnowledgeBaseFileListItem: React.FC<
         </h3>
 
         <p className="text-xs text-white flex gap-2">
-          <Icon iconName="file" />{" "}
+          <Icon iconName="file" />{' '}
           <span className="uppercase">{data.file_type}</span>
         </p>
       </header>

@@ -1,20 +1,23 @@
-import React, { useMemo } from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Avatar } from "@elpassion/taco";
-import { Modal } from "@elpassion/taco/Modal";
-import { Field } from "~/components/form/fields/field.context";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import { IconButton } from "~/components/iconButton";
-import { useModal } from "~/hooks/useModal";
+import React, { useMemo } from 'react';
+import { Avatar } from '@elpassion/taco';
+import { Modal } from '@elpassion/taco/Modal';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { Field } from '~/components/form/fields/field.context';
+import { TextInputField } from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
+import { IconButton } from '~/components/iconButton';
+import { useModal } from '~/hooks/useModal';
+
 import {
   Section,
   SectionContent,
   SectionHeading,
-} from "../settingsLayout/PageLayout";
-import { schema } from "./schema";
-import type { IOrganization } from "./organization.types";
+} from '../settingsLayout/PageLayout';
+import type { IOrganization } from './organization.types';
+import { schema } from './schema';
+
 interface AboutOrganizationProps {
   organization: IOrganization;
 }
@@ -73,13 +76,13 @@ function EditOrganizationName({ organization }: EditOrganizationNameProps) {
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        closeButtonProps={{ iconName: "x", "aria-label": "Close" }}
+        closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
         header={
           <header className="p-1 text-white mr-3">
             <p className="text-3xl mb-4">Edit name</p>
 
             <p className="text-sm text-neutral-400">
-              Edit <span className="font-bold">{organization.name}</span>{" "}
+              Edit <span className="font-bold">{organization.name}</span>{' '}
               organization.
             </p>
           </header>

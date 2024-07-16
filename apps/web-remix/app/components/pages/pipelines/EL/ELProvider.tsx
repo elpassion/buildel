@@ -1,6 +1,6 @@
-import type { PropsWithChildren} from "react";
-import React, { useMemo } from "react";
-import { useBoolean } from "usehooks-ts";
+import type { PropsWithChildren } from 'react';
+import React, { useMemo } from 'react';
+import { useBoolean } from 'usehooks-ts';
 
 interface IELContext {
   isShown: boolean;
@@ -19,7 +19,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
       show,
       hide,
     }),
-    [show, hide, isShown]
+    [show, hide, isShown],
   );
 
   return <ELContext.Provider value={value}>{children}</ELContext.Provider>;
@@ -28,7 +28,7 @@ export const ELProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 export function useEl() {
   const ctx = React.useContext(ELContext);
 
-  if (!ctx) throw new Error("useEl have to be used inside ElProvider");
+  if (!ctx) throw new Error('useEl have to be used inside ElProvider');
 
   return ctx;
 }

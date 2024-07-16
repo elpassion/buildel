@@ -1,6 +1,6 @@
-import React from "react";
-import { isRouteErrorResponse } from "@remix-run/react";
-import { captureRemixErrorBoundaryError } from "@sentry/remix";
+import React from 'react';
+import { isRouteErrorResponse } from '@remix-run/react';
+import { captureRemixErrorBoundaryError } from '@sentry/remix';
 
 interface GlobalRuntimeProps {
   error: unknown;

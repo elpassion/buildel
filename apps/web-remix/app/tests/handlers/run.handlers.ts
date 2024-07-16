@@ -1,9 +1,10 @@
-import { HttpResponse, http } from "msw";
+import { http, HttpResponse } from 'msw';
+
 import type {
   IPipelineRun,
   IPipelineRuns,
-} from "~/components/pages/pipelines/pipeline.types";
-import type { IPaginationMeta } from "~/components/pagination/pagination.types";
+} from '~/components/pages/pipelines/pipeline.types';
+import type { IPaginationMeta } from '~/components/pagination/pagination.types';
 
 export class RunHandlers {
   private runs: Map<number | string, IPipelineRun> = new Map();
@@ -16,7 +17,7 @@ export class RunHandlers {
 
   stopRunHandler() {
     return http.post(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId/stop",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId/stop',
       ({ params }) => {
         const { runId } = params;
 
@@ -26,18 +27,18 @@ export class RunHandlers {
 
         if (!updatedRun) return HttpResponse.json(null, { status: 404 });
 
-        updatedRun.status = "finished";
+        updatedRun.status = 'finished';
 
         this.runs.set(id, updatedRun);
 
         return HttpResponse.json({ data: updatedRun });
-      }
+      },
     );
   }
 
   getRunHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId',
       ({ params }) => {
         const run = this.runs.get(Number(params.runId));
 
@@ -46,7 +47,7 @@ export class RunHandlers {
             {},
             {
               status: 404,
-            }
+            },
           );
         }
 
@@ -56,26 +57,26 @@ export class RunHandlers {
           {
             data: run,
           },
-          { status: 200 }
+          { status: 200 },
         );
-      }
+      },
     );
   }
 
   getRunErrorHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/runs/:runId',
       () => {
         return HttpResponse.json<{
           data: IPipelineRun;
         }>(null, { status: 500 });
-      }
+      },
     );
   }
 
   getRunsHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/runs',
       () => {
         return HttpResponse.json<{
           data: IPipelineRuns;
@@ -89,18 +90,18 @@ export class RunHandlers {
               per_page: 10,
             },
           },
-          { status: 200 }
+          { status: 200 },
         );
-      }
+      },
     );
   }
 
   getRunsErrorHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/runs",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/runs',
       () => {
         return HttpResponse.json(null, { status: 500 });
-      }
+      },
     );
   }
 

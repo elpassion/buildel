@@ -1,26 +1,28 @@
-import * as React from "react";
-import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Field, HiddenField } from "~/components/form/fields/field.context";
-import { FieldError } from "~/components/form/fields/field.error";
+import * as React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { Link, useLoaderData, useSearchParams } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { FieldError } from '~/components/form/fields/field.error';
 import {
   PasswordInputField,
   TextInputField,
-} from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import { GithubButton } from "~/components/githubAuth/GithubButton";
-import { GoogleButton } from "~/components/googleAuth/GoogleButton";
-import { SocialSignInForm } from "~/components/socialAuth/SocialSignInForm";
-import { schema } from "./schema";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
+import { GithubButton } from '~/components/githubAuth/GithubButton';
+import { GoogleButton } from '~/components/googleAuth/GoogleButton';
+import { SocialSignInForm } from '~/components/socialAuth/SocialSignInForm';
+
+import type { loader } from './loader.server';
+import { schema } from './schema';
 
 export function RegisterPage() {
   const { googleLoginEnabled } = useLoaderData<typeof loader>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo");
+  const redirectTo = searchParams.get('redirectTo');
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
@@ -28,16 +30,16 @@ export function RegisterPage() {
         Register for an account
       </h1>
       <p className="text-center text-neutral-100">
-        Already registered?{" "}
+        Already registered?{' '}
         <Link
           to={{
-            pathname: "/login",
+            pathname: '/login',
             search: searchParams.toString(),
           }}
           className="text-primary-500"
         >
           Sign in
-        </Link>{" "}
+        </Link>{' '}
         to your account now.
       </p>
       <ValidatedForm
@@ -88,7 +90,7 @@ export function RegisterPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Register",
+      title: 'Register',
     },
   ];
 };

@@ -1,4 +1,5 @@
-import React, { useCallback } from "react";
+import React, { useCallback } from 'react';
+import type { MetaFunction } from '@remix-run/node';
 import {
   Outlet,
   useFetcher,
@@ -7,23 +8,24 @@ import {
   useNavigate,
   useRevalidator,
   useSearchParams,
-} from "@remix-run/react";
-import isEqual from "lodash.isequal";
-import { AliasNode } from "~/components/pages/pipelines/build/AliasNode";
-import { ELProvider } from "~/components/pages/pipelines/EL/ELProvider";
-import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
-import { Builder } from "../Builder";
-import { CustomEdge } from "../CustomEdges/CustomEdge";
-import { toPipelineConfig } from "../PipelineFlow.utils";
-import { BuilderHeader, SaveChangesButton } from "./BuilderHeader";
-import { BuilderNode } from "./BuilderNode";
-import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
-import { PasteBlockConfiguration } from "./CreateBlock/PastConfigSidebar";
-import { PasteBlockConfigProvider } from "./CreateBlock/PasteBlockConfigProvider";
-import type { loader } from "./loader.server";
-import type { IPipeline, IPipelineConfig } from "../pipeline.types";
-import type { MetaFunction } from "@remix-run/node";
+} from '@remix-run/react';
+import isEqual from 'lodash.isequal';
+
+import { AliasNode } from '~/components/pages/pipelines/build/AliasNode';
+import { ELProvider } from '~/components/pages/pipelines/EL/ELProvider';
+import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
+import { routes } from '~/utils/routes.utils';
+
+import { Builder } from '../Builder';
+import { CustomEdge } from '../CustomEdges/CustomEdge';
+import type { IPipeline, IPipelineConfig } from '../pipeline.types';
+import { toPipelineConfig } from '../PipelineFlow.utils';
+import { BuilderHeader, SaveChangesButton } from './BuilderHeader';
+import { BuilderNode } from './BuilderNode';
+import { CreateBlockFloatingMenu } from './CreateBlock/CreateBlockFloatingMenu';
+import { PasteBlockConfiguration } from './CreateBlock/PastConfigSidebar';
+import { PasteBlockConfigProvider } from './CreateBlock/PasteBlockConfigProvider';
+import type { loader } from './loader.server';
 
 export function PipelineBuilder() {
   const revalidator = useRevalidator();
@@ -34,7 +36,7 @@ export function PipelineBuilder() {
 
   const navigate = useNavigate();
   const match = useMatch(
-    "/:organizationId/pipelines/:pipelineId/build/blocks/:blockName"
+    '/:organizationId/pipelines/:pipelineId/build/blocks/:blockName',
   );
   const isSidebarOpen = !!match;
 
@@ -43,10 +45,10 @@ export function PipelineBuilder() {
       if (isEqual(pipeline.config, config)) return;
       updateFetcher.submit(
         { ...pipeline, config: { ...config } },
-        { method: "PUT", encType: "application/json" }
+        { method: 'PUT', encType: 'application/json' },
       );
     },
-    [updateFetcher, pipeline]
+    [updateFetcher, pipeline],
   );
 
   const handleRevalidate = () => {
@@ -58,12 +60,12 @@ export function PipelineBuilder() {
       routes.pipelineBuild(
         organizationId,
         pipelineId,
-        Object.fromEntries(searchParams.entries())
-      )
+        Object.fromEntries(searchParams.entries()),
+      ),
     );
   };
 
-  const isDisabled = aliasId !== "latest";
+  const isDisabled = aliasId !== 'latest';
 
   if (isDisabled) {
     return (
@@ -96,7 +98,7 @@ export function PipelineBuilder() {
             <BuilderHeader>
               <SaveChangesButton
                 config={toPipelineConfig(nodes, edges)}
-                isSaving={updateFetcher.state !== "idle"}
+                isSaving={updateFetcher.state !== 'idle'}
                 onSave={handleUpdatePipeline}
               />
             </BuilderHeader>
@@ -132,7 +134,7 @@ export function PipelineBuilder() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Build",
+      title: 'Build',
     },
   ];
 };

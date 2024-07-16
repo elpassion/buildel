@@ -1,21 +1,22 @@
-import { redirect } from "@remix-run/node";
-import invariant from "tiny-invariant";
-import { OrganizationApi } from "~/api/organization/OrganizationApi";
-import { requireLogin } from "~/session.server";
-import { ValidationError } from "~/utils/errors";
-import { routes } from "~/utils/routes.utils";
-import { setServerToast } from "~/utils/toast.server";
-import { loaderBuilder } from "~/utils.server";
-import type { LoaderFunctionArgs} from "@remix-run/node";
+import { redirect } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import invariant from 'tiny-invariant';
+
+import { OrganizationApi } from '~/api/organization/OrganizationApi';
+import { requireLogin } from '~/session.server';
+import { loaderBuilder } from '~/utils.server';
+import { ValidationError } from '~/utils/errors';
+import { routes } from '~/utils/routes.utils';
+import { setServerToast } from '~/utils/toast.server';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {
     await requireLogin(request);
 
     const url = new URL(request.url);
-    const token = url.searchParams.get("token");
+    const token = url.searchParams.get('token');
 
-    invariant(token, "token not found");
+    invariant(token, 'token not found');
 
     const organizationApi = new OrganizationApi(fetch);
 
@@ -24,9 +25,9 @@ export async function loader(args: LoaderFunctionArgs) {
 
       return redirect(routes.dashboard, {
         headers: {
-          "Set-Cookie": await setServerToast(request, {
+          'Set-Cookie': await setServerToast(request, {
             success: {
-              title: "Invitation accepted",
+              title: 'Invitation accepted',
               description: `You've been added to organization.`,
             },
           }),
@@ -40,9 +41,9 @@ export async function loader(args: LoaderFunctionArgs) {
 
       return redirect(routes.dashboard, {
         headers: {
-          "Set-Cookie": await setServerToast(request, {
+          'Set-Cookie': await setServerToast(request, {
             error: {
-              title: "Invitation failed",
+              title: 'Invitation failed',
               description: errorDescription,
             },
           }),

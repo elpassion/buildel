@@ -1,22 +1,24 @@
-import React, { useMemo, useState } from "react";
-import { useLoaderData, useNavigate } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { UpdateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { Field, HiddenField } from "~/components/form/fields/field.context";
-import { NumberInputField } from "~/components/form/fields/number.field";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
+import React, { useMemo, useState } from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { useLoaderData, useNavigate } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { UpdateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { NumberInputField } from '~/components/form/fields/number.field';
+import { TextInputField } from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
 import {
   ApiTypesRadioGroupField,
   ModelSelectField,
   SecretSelectField,
-} from "~/components/pages/knowledgeBase/KnowledgeBaseFields";
-import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
-import { SectionContent } from "../../settings/settingsLayout/PageLayout";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/pages/knowledgeBase/KnowledgeBaseFields';
+import { ActionSidebarHeader } from '~/components/sidebar/ActionSidebar';
+import { routes } from '~/utils/routes.utils';
+
+import { SectionContent } from '../../settings/settingsLayout/PageLayout';
+import type { loader } from './loader.server';
 
 export function CollectionSettingsPage() {
   const { organizationId, collection } = useLoaderData<typeof loader>();
@@ -26,7 +28,6 @@ export function CollectionSettingsPage() {
   const onValueChange = (name: string, value: unknown) => {
     setWatchedValues((prev) => ({ ...prev, [name]: value }));
   };
-
 
   return (
     <>
@@ -64,8 +65,8 @@ export function CollectionSettingsPage() {
                 <TextInputField
                   disabled
                   type="text"
-                  label={"Endpoint"}
-                  name={"endpoint"}
+                  label={'Endpoint'}
+                  name={'endpoint'}
                   supportingText="API endpoint used for retrieving embeddings"
                 />
               </Field>
@@ -91,7 +92,7 @@ export function CollectionSettingsPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Collection settings",
+      title: 'Collection settings',
     },
   ];
 };

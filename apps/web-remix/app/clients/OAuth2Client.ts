@@ -1,4 +1,4 @@
-import { OAuth2Client as AuthClient } from "google-auth-library";
+import { OAuth2Client as AuthClient } from 'google-auth-library';
 
 export class OAuth2Client {
   private readonly client: AuthClient;
@@ -10,12 +10,12 @@ export class OAuth2Client {
 
   generateAuthUrl() {
     return this.client.generateAuthUrl({
-      prompt: "select_account",
+      prompt: 'select_account',
       redirect_uri: this.redirectUri,
       scope: [
-        "https://www.googleapis.com/auth/userinfo.profile",
-        "https://www.googleapis.com/auth/userinfo.email",
-        "openid",
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/userinfo.email',
+        'openid',
       ],
     });
   }

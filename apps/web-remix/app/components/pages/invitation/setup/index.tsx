@@ -1,1 +1,1 @@
-export { SetupPage as page, meta } from "./page";
+export { SetupPage as page, meta } from './page';

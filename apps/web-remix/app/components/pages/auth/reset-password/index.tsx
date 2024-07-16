@@ -1,1 +1,1 @@
-export { ResetPasswordPage as page, meta } from "./page";
+export { ResetPasswordPage as page, meta } from './page';

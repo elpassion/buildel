@@ -1,5 +1,6 @@
-import { Icon, SmallToast } from "@elpassion/taco";
-import type { ToastProps } from "../Toast.interface";
+import { Icon, SmallToast } from '@elpassion/taco';
+
+import type { ToastProps } from '../Toast.interface';
 
 export const SuccessToast = ({
   icon,
@@ -10,7 +11,7 @@ export const SuccessToast = ({
   return (
     <SmallToast
       icon={icon ?? <Icon iconName="check" />}
-      backgroundColor={backgroundColor ?? "bg-green-900"}
+      backgroundColor={backgroundColor ?? 'bg-green-900'}
       withCloseButton={withCloseButton}
       {...rest}
     />

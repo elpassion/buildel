@@ -1,6 +1,10 @@
-import { HttpResponse, http } from "msw";
-import type { IAsyncSelectItem, IAsyncSelectItemList } from "~/api/AsyncSelectApi";
-import type { IFixtureAsyncSelectModel } from "~/tests/fixtures/models.fixtures";
+import { http, HttpResponse } from 'msw';
+
+import type {
+  IAsyncSelectItem,
+  IAsyncSelectItemList,
+} from '~/api/AsyncSelectApi';
+import type { IFixtureAsyncSelectModel } from '~/tests/fixtures/models.fixtures';
 
 //@todo handle filtering by api type
 export class EmbeddingsHandlers {
@@ -8,19 +12,19 @@ export class EmbeddingsHandlers {
 
   constructor(initials: IAsyncSelectItem[] = []) {
     initials.forEach((embedding) =>
-      this.embeddings.set(embedding.id, embedding)
+      this.embeddings.set(embedding.id, embedding),
     );
   }
 
   getEmbeddingsHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/models/embeddings",
+      '/super-api/organizations/:organizationId/models/embeddings',
       () => {
         return HttpResponse.json<{ data: IAsyncSelectItemList }>(
           { data: [...this.embeddings.values()] },
-          { status: 200 }
+          { status: 200 },
         );
-      }
+      },
     );
   }
 
@@ -38,20 +42,20 @@ export class ModelsHandlers {
 
   getModelsHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/models",
+      '/super-api/organizations/:organizationId/models',
       ({ request }) => {
         const url = new URL(request.url);
-        const apiType = url.searchParams.get("api_type") ?? "openai";
+        const apiType = url.searchParams.get('api_type') ?? 'openai';
 
         return HttpResponse.json<{ data: IAsyncSelectItemList }>(
           {
             data: [...this.models.values()].filter(
-              (model) => model.type === apiType
+              (model) => model.type === apiType,
             ),
           },
-          { status: 200 }
+          { status: 200 },
         );
-      }
+      },
     );
   }
 

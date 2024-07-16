@@ -1,6 +1,8 @@
-import React from "react";
-import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider";
-import { usePasteConfig } from "./PasteBlockConfigProvider";
+import React from 'react';
+
+import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
+
+import { usePasteConfig } from './PasteBlockConfigProvider';
 
 export const PasteConfigItem: React.FC = () => {
   const { show } = usePasteConfig();
@@ -9,7 +11,7 @@ export const PasteConfigItem: React.FC = () => {
     <button
       key="paste-config"
       onClick={show}
-      disabled={runStatus !== "idle"}
+      disabled={runStatus !== 'idle'}
       title="Paste configuration"
       className="w-[70px] px-1 overflow-hidden line-clamp-1 text-xs text-white bg-neutral-900 h-[40px] border-none! hover:bg-neutral-950"
     >

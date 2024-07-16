@@ -1,33 +1,34 @@
-import React, { useCallback, useEffect } from "react";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import classNames from "classnames";
-import invariant from "tiny-invariant";
-import { Icon } from "@elpassion/taco";
-import type { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
-import { PipelineApi } from "~/api/pipeline/PipelineApi";
+import React, { useCallback, useEffect } from 'react';
+import { json } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+import invariant from 'tiny-invariant';
+
+import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
+import { PipelineApi } from '~/api/pipeline/PipelineApi';
 import {
   ChatGeneratingAnimation,
   ChatHeader,
   ChatMessagesWrapper,
   ChatStatus,
   IntroPanel,
-} from "~/components/chat/Chat.components";
-import { ChatHeading } from "~/components/chat/ChatHeading";
-import { ChatInput } from "~/components/chat/ChatInput";
-import { ChatMessages } from "~/components/chat/ChatMessages";
-import { ChatWrapper } from "~/components/chat/ChatWrapper";
-import { useChat } from "~/components/chat/useChat";
-import { useFilesUpload } from "~/components/fileUpload/FileUpload";
-import { UnauthorizedError } from "~/utils/errors";
-import type { ParsedResponse } from "~/utils/fetch.server";
-import { loaderBuilder } from "~/utils.server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+} from '~/components/chat/Chat.components';
+import { ChatHeading } from '~/components/chat/ChatHeading';
+import { ChatInput } from '~/components/chat/ChatInput';
+import { ChatMessages } from '~/components/chat/ChatMessages';
+import { ChatWrapper } from '~/components/chat/ChatWrapper';
+import { useChat } from '~/components/chat/useChat';
+import { useFilesUpload } from '~/components/fileUpload/FileUpload';
+import { loaderBuilder } from '~/utils.server';
+import { UnauthorizedError } from '~/utils/errors';
+import type { ParsedResponse } from '~/utils/fetch.server';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
-    invariant(params.organizationId, "organizationId not found");
-    invariant(params.pipelineId, "pipelineId not found");
+    invariant(params.organizationId, 'organizationId not found');
+    invariant(params.pipelineId, 'pipelineId not found');
 
     const pipelineApi = new PipelineApi(fetch);
 
@@ -41,7 +42,7 @@ export async function loader(args: LoaderFunctionArgs) {
     if (!pipeline) {
       pipeline = await pipelineApi.getPublicPipeline(
         params.organizationId,
-        params.pipelineId
+        params.pipelineId,
       );
     }
 
@@ -70,12 +71,12 @@ export default function WebsiteChat() {
   } = useChat({
     input:
       pipeline.interface_config.webchat.inputs.filter(
-        (input) => input.type === "text_input"
-      )[0]?.name ?? "",
+        (input) => input.type === 'text_input',
+      )[0]?.name ?? '',
     output:
       pipeline.interface_config.webchat.outputs.filter(
-        (output) => output.type === "text_output"
-      )[0].name ?? "",
+        (output) => output.type === 'text_output',
+      )[0].name ?? '',
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
     useAuth: !(pipeline.interface_config.webchat.public ?? false),
@@ -98,9 +99,9 @@ export default function WebsiteChat() {
     (value: string) => {
       const files = fileList
         .map((file) =>
-          file.status === "done"
+          file.status === 'done'
             ? { id: file.id, file_name: file.file_name }
-            : null
+            : null,
         )
         .filter((f) => !!f);
       const filesString = files.length
@@ -108,11 +109,11 @@ export default function WebsiteChat() {
 \`\`\`buildel_message_attachments
 ${JSON.stringify(files)}
 \`\`\`\n`
-        : "";
+        : '';
       pushMessage(`${filesString}${value}`);
       clearFiles();
     },
-    [fileList, pushMessage, clearFiles]
+    [fileList, pushMessage, clearFiles],
   );
 
   useEffect(() => {
@@ -122,7 +123,7 @@ ${JSON.stringify(files)}
         alias,
         initial_inputs: [],
         metadata: {
-          interface: "webchat",
+          interface: 'webchat',
         },
       });
     }, 500);
@@ -153,7 +154,7 @@ ${JSON.stringify(files)}
 
         <ChatInput
           onSubmit={onSubmit}
-          disabled={connectionStatus !== "running" || isUploading}
+          disabled={connectionStatus !== 'running' || isUploading}
           generating={isGenerating}
           attachments={
             pipeline.interface_config.webchat.inputs[1] &&
@@ -163,11 +164,11 @@ ${JSON.stringify(files)}
                   return (
                     <div
                       className={classNames(
-                        "text-white px-1 border rounded-md flex items-center gap-1",
+                        'text-white px-1 border rounded-md flex items-center gap-1',
                         {
-                          "border-neutral-700": file.status === "done",
-                          "border-neutral-900": file.status !== "done",
-                        }
+                          'border-neutral-700': file.status === 'done',
+                          'border-neutral-900': file.status !== 'done',
+                        },
                       )}
                       key={file.id}
                     >
@@ -178,8 +179,8 @@ ${JSON.stringify(files)}
                           removeFile(
                             file.id,
                             pipeline.interface_config.webchat.inputs.filter(
-                              (input) => input.type === "file_input"
-                            )[0]?.name ?? ""
+                              (input) => input.type === 'file_input',
+                            )[0]?.name ?? '',
                           )
                         }
                       >
@@ -204,8 +205,8 @@ ${JSON.stringify(files)}
                       uploadFile(
                         file,
                         pipeline.interface_config.webchat.inputs.filter(
-                          (input) => input.type === "file_input"
-                        )[0]?.name ?? ""
+                          (input) => input.type === 'file_input',
+                        )[0]?.name ?? '',
                       );
                     });
                   }}

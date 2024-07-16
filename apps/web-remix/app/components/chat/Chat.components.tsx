@@ -1,9 +1,11 @@
-import type { PropsWithChildren} from "react";
-import React, { useMemo } from "react";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import type { IMessage } from "~/components/chat/chat.types";
-import type { BuildelRunStatus } from "@buildel/buildel";
+import type { PropsWithChildren } from 'react';
+import React, { useMemo } from 'react';
+import type { BuildelRunStatus } from '@buildel/buildel';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import type { IMessage } from '~/components/chat/chat.types';
+
 interface ChatCloseButtonProps {
   onClick: () => void;
 }
@@ -29,8 +31,8 @@ export const ChatHeader: React.FC<PropsWithChildren<ChatHeaderProps>> = ({
   return (
     <header
       className={classNames(
-        "flex justify-between gap-2 items-center",
-        className
+        'flex justify-between gap-2 items-center',
+        className,
       )}
     >
       {children}
@@ -48,8 +50,8 @@ export const ChatMessagesWrapper: React.FC<
   return (
     <div
       className={classNames(
-        "w-full border border-neutral-800 rounded-lg px-2 py-3 grow overflow-hidden",
-        className
+        'w-full border border-neutral-800 rounded-lg px-2 py-3 grow overflow-hidden',
+        className,
       )}
     >
       {children}
@@ -71,13 +73,13 @@ export const ChatGeneratingAnimation = ({
     const lastMessage = messages[messages.length - 1];
 
     if (
-      lastMessage.role === "user" ||
-      (lastMessage.role === "ai" && !lastMessage.message.length)
+      lastMessage.role === 'user' ||
+      (lastMessage.role === 'ai' && !lastMessage.message.length)
     ) {
-      return "Thinking...";
+      return 'Thinking...';
     }
 
-    return "Generating...";
+    return 'Generating...';
   };
 
   if (!isGenerating) return null;
@@ -97,28 +99,34 @@ interface ChatStatusProps {
   connectionStatus: BuildelRunStatus;
   className?: string;
 }
-export const ChatStatus = ({ connectionStatus, className }: ChatStatusProps) => {
+export const ChatStatus = ({
+  connectionStatus,
+  className,
+}: ChatStatusProps) => {
   const mappedStatusToText = useMemo(() => {
     switch (connectionStatus) {
-      case "starting":
-        return "Starting";
-      case "running":
-        return "Running";
+      case 'starting':
+        return 'Starting';
+      case 'running':
+        return 'Running';
       default:
-        return "Not running";
+        return 'Not running';
     }
   }, [connectionStatus]);
 
   return (
     <div
       title={mappedStatusToText}
-      className={classNames("py-0.5 px-1 bg-neutral-800 rounded flex gap-1 items-center", className)}
+      className={classNames(
+        'py-0.5 px-1 bg-neutral-800 rounded flex gap-1 items-center',
+        className,
+      )}
     >
       <div
-        className={classNames("w-[6px] h-[6px] rounded-full", {
-          "bg-red-500": connectionStatus === "idle",
-          "bg-green-500": connectionStatus === "running",
-          "bg-orange-500": connectionStatus === "starting",
+        className={classNames('w-[6px] h-[6px] rounded-full', {
+          'bg-red-500': connectionStatus === 'idle',
+          'bg-green-500': connectionStatus === 'running',
+          'bg-orange-500': connectionStatus === 'starting',
         })}
       />
 
@@ -138,8 +146,8 @@ export const IntroPanel = ({
   return (
     <article
       className={classNames(
-        "p-4 bg-neutral-900 rounded-xl border border-neutral-800 text-neutral-100 text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2",
-        className
+        'p-4 bg-neutral-900 rounded-xl border border-neutral-800 text-neutral-100 text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2',
+        className,
       )}
     >
       {children}

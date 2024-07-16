@@ -1,1 +1,1 @@
-export { action } from "~/components/pages/auth/logout/index.server";
+export { action } from '~/components/pages/auth/logout/index.server';

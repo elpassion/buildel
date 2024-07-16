@@ -1,35 +1,38 @@
+import Modal from 'react-modal';
+import type { LinksFunction } from '@remix-run/node';
 import {
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react";
-import { withSentry } from "@sentry/remix";
-import Modal from "react-modal";
-import { Toaster } from "~/components/toasts/Toaster";
-import type { LinksFunction } from "@remix-run/node";
-import "./tailwind.css";
-import { PageProgress } from "~/components/progressBar/PageProgress";
-import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
-import { ErrorBoundaryLayout } from "~/components/errorBoundaries/ErrorBoundaryLayout";
+} from '@remix-run/react';
+import { withSentry } from '@sentry/remix';
 
-Modal.setAppElement("#_root");
+import { Toaster } from '~/components/toasts/Toaster';
+
+import './tailwind.css';
+
+import { ErrorBoundaryLayout } from '~/components/errorBoundaries/ErrorBoundaryLayout';
+import { RootErrorBoundary } from '~/components/errorBoundaries/RootErrorBoundary';
+import { PageProgress } from '~/components/progressBar/PageProgress';
+
+Modal.setAppElement('#_root');
 
 export const links: LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
+    rel: 'preconnect',
+    href: 'https://fonts.gstatic.com',
+    crossOrigin: 'anonymous',
   },
   {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap",
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap',
   },
   {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap",
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap',
   },
 ];
 

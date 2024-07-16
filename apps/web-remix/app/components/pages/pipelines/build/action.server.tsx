@@ -1,24 +1,22 @@
-import { json } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
-import { validationError } from "remix-validated-form";
-import invariant from "tiny-invariant";
-import { UpdatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
-import { PipelineApi } from "~/api/pipeline/PipelineApi";
-import type {
-  JSONSchemaField} from "~/components/form/schema/SchemaParser";
-import {
-  generateZODSchema,
-} from "~/components/form/schema/SchemaParser";
-import { requireLogin } from "~/session.server";
-import { actionBuilder } from "~/utils.server";
-import type { ActionFunctionArgs} from "@remix-run/node";
+import { json } from '@remix-run/node';
+import type { ActionFunctionArgs } from '@remix-run/node';
+import { withZod } from '@remix-validated-form/with-zod';
+import { validationError } from 'remix-validated-form';
+import invariant from 'tiny-invariant';
+
+import { UpdatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
+import { PipelineApi } from '~/api/pipeline/PipelineApi';
+import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
+import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import { requireLogin } from '~/session.server';
+import { actionBuilder } from '~/utils.server';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
     put: async ({ params, request }, { fetch }) => {
       await requireLogin(request);
-      invariant(params.organizationId, "Missing organizationId");
-      invariant(params.pipelineId, "Missing pipelineId");
+      invariant(params.organizationId, 'Missing organizationId');
+      invariant(params.pipelineId, 'Missing pipelineId');
 
       const validator = withZod(UpdatePipelineSchema);
 
@@ -35,7 +33,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
               organization_id: params.organizationId!,
               pipeline_id: params.pipelineId!,
               block_name: block.name,
-            }
+            },
           );
           const validator = withZod(schema);
           const validatedBlock = await validator.validate(block);
@@ -44,7 +42,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
             return validatedBlock.data;
           }
           return block;
-        })
+        }),
       )) as any[];
 
       result.data.config.blocks = result.data.config.blocks.map((block, i) => {
@@ -61,7 +59,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       await pipelineApi.updatePipeline(
         params.organizationId,
         params.pipelineId,
-        result.data
+        result.data,
       );
 
       return json({});

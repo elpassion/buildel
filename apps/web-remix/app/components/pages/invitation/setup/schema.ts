@@ -1,4 +1,4 @@
-import z from "zod";
+import z from 'zod';
 
 export const schema = z
   .object({
@@ -8,5 +8,5 @@ export const schema = z
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
-    path: ["confirmPassword"],
+    path: ['confirmPassword'],
   });

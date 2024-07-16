@@ -1,1 +1,1 @@
-export { WebsiteChatbotPage as page, meta } from "./page";
+export { WebsiteChatbotPage as page, meta } from './page';

@@ -1,1 +1,1 @@
-export { PipelinesPage as page, meta } from "./page";
+export { PipelinesPage as page, meta } from './page';

@@ -1,4 +1,4 @@
-import { Server } from "mock-socket";
+import { Server } from 'mock-socket';
 
 type WebSocketServerTestArgs = {
   url: string;
@@ -6,7 +6,7 @@ type WebSocketServerTestArgs = {
 };
 
 const defaultArgs: WebSocketServerTestArgs = {
-  url: "ws://localhost:3000/super-api/socket/websocket",
+  url: 'ws://localhost:3000/super-api/socket/websocket',
 };
 
 export class WebSocketServerMock {
@@ -16,30 +16,30 @@ export class WebSocketServerMock {
 
     this.ws = new Server(url);
 
-    this.ws.on("connection", (socket) => {
-      socket.on("message", (data) => {
-        if (typeof data !== "string") return;
+    this.ws.on('connection', (socket) => {
+      socket.on('message', (data) => {
+        if (typeof data !== 'string') return;
 
         const parsedData = JSON.parse(data);
         const [channelId, refId, topicName, eventName, payload] = parsedData;
 
         onMessage?.(payload);
 
-        if (eventName === "phx_join") {
+        if (eventName === 'phx_join') {
           socket.send(
             JSON.stringify([
               channelId,
               refId,
               topicName,
-              "phx_reply",
-              { response: { run: { id: 123 } }, status: "ok" },
+              'phx_reply',
+              { response: { run: { id: 123 } }, status: 'ok' },
             ]),
           );
         }
       });
 
       setInterval(() => {
-        socket.send(JSON.stringify([null, null, "phoenix", "heartbeat", {}]));
+        socket.send(JSON.stringify([null, null, 'phoenix', 'heartbeat', {}]));
       }, 30000);
     });
   }

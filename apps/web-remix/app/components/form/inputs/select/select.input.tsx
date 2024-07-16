@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Option } from "rc-select";
-import { ClientOnly } from "remix-utils/client-only";
-import { useDebounce, useIsMounted } from "usehooks-ts";
-import AsyncSelectInputComponent from "./select.input-impl.client";
-import type {
-  SelectInputProps,
-} from "./select.input-impl.client";
+import React, { useCallback, useEffect, useState } from 'react';
+import { Option } from 'rc-select';
+import { ClientOnly } from 'remix-utils/client-only';
+import { useDebounce, useIsMounted } from 'usehooks-ts';
+
+import AsyncSelectInputComponent from './select.input-impl.client';
+import type { SelectInputProps } from './select.input-impl.client';
 
 export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
   return (
@@ -22,10 +21,10 @@ export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
 export interface AsyncSelectInputProps<T = {}>
   extends Omit<
     SelectInputProps,
-    "options" | "loading" | "onSearch" | "searchValue"
+    'options' | 'loading' | 'onSearch' | 'searchValue'
   > {
   fetchOptions: (
-    search: string
+    search: string,
   ) => Promise<({ value: string; label: string } & T)[]>;
   onOptionsFetch?: (options: ({ value: string; label: string } & T)[]) => void;
 }
@@ -37,10 +36,10 @@ export const AsyncSelectInput = <T = {},>({
 }: AsyncSelectInputProps<T>) => {
   const isMounted = useIsMounted();
   const [loading, setLoading] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState('');
   const debouncedSearch = useDebounce(searchValue, 500);
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
-    []
+    [],
   );
 
   const loadOptions = useCallback(() => {

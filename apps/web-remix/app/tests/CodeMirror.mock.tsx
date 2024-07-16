@@ -1,8 +1,8 @@
-import React from "react";
-import { vi } from "vitest";
-import type { ReactCodeMirrorProps } from "@uiw/react-codemirror";
+import React from 'react';
+import type { ReactCodeMirrorProps } from '@uiw/react-codemirror';
+import { vi } from 'vitest';
 
-vi.mock("@uiw/react-codemirror", () => ({
+vi.mock('@uiw/react-codemirror', () => ({
   default: (props: ReactCodeMirrorProps) => {
     return (
       <textarea

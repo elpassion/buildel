@@ -1,45 +1,46 @@
-import z from "zod";
-import type { fetchTyped } from "~/utils/fetch.server";
-import {
-  SignUpDisabledResponse
-} from "./auth.contracts";
+import z from 'zod';
+
+import type { fetchTyped } from '~/utils/fetch.server';
+
+import { SignUpDisabledResponse } from './auth.contracts';
 import type {
   ISignInSchema,
   ISignUpSchema,
-  SignUpInvitation} from "./auth.contracts";
+  SignUpInvitation,
+} from './auth.contracts';
 
 export class AuthApi {
   constructor(private client: typeof fetchTyped) {}
 
-  signIn(user: ISignInSchema["user"]) {
+  signIn(user: ISignInSchema['user']) {
     return this.client(z.any(), `/users/log_in`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({ user }),
     });
   }
 
-  signUp(user: ISignUpSchema["user"]) {
+  signUp(user: ISignUpSchema['user']) {
     return this.client(z.any(), `/users/register`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({ user }),
     });
   }
 
   signUpInvitation(user: z.TypeOf<typeof SignUpInvitation>) {
     return this.client(z.any(), `/users/register/invitation`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({ user }),
     });
   }
 
   signUpDisabled() {
     return this.client(SignUpDisabledResponse, `/users/register`, {
-      method: "GET",
+      method: 'GET',
     });
   }
   resetPassword(email: string) {
     return this.client(z.any(), `/users/password/reset`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({ email }),
     });
   }
@@ -50,7 +51,7 @@ export class AuthApi {
     password_confirmation: string;
   }) {
     return this.client(z.any(), `/users/password/reset`, {
-      method: "PUT",
+      method: 'PUT',
       body: JSON.stringify(params),
     });
   }

@@ -1,4 +1,4 @@
-import { Toaster as ReactHotToaster } from "react-hot-toast";
+import { Toaster as ReactHotToaster } from 'react-hot-toast';
 
 export const Toaster = () => (
   <ReactHotToaster
@@ -6,7 +6,7 @@ export const Toaster = () => (
     gutter={4}
     toastOptions={{
       duration: 4000,
-      className: "!bg-transparent !p-0 !shadow-none",
+      className: '!bg-transparent !p-0 !shadow-none',
     }}
     containerClassName="-mt-1"
   />

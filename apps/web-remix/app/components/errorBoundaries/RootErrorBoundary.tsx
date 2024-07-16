@@ -1,6 +1,7 @@
-import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
-import { GlobalNotFound } from "./GlobalNotFound";
-import { GlobalRuntime } from "./GlobalRuntime";
+import { isRouteErrorResponse, useRouteError } from '@remix-run/react';
+
+import { GlobalNotFound } from './GlobalNotFound';
+import { GlobalRuntime } from './GlobalRuntime';
 
 export function RootErrorBoundary() {
   const error = useRouteError();

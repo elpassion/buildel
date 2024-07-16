@@ -1,5 +1,5 @@
-export { page as default } from "~/components/pages/settings/organization";
+export { page as default } from '~/components/pages/settings/organization';
 export {
   loader,
   action,
-} from "~/components/pages/settings/organization/index.server";
+} from '~/components/pages/settings/organization/index.server';

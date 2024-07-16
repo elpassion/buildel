@@ -1,11 +1,12 @@
-import { useFetcher } from "@remix-run/react";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import type { IInvitation } from "~/api/organization/organization.contracts";
-import { IconButton } from "~/components/iconButton";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
-import { confirm } from "~/components/modal/confirm";
-import { dayjs } from "~/utils/Dayjs";
+import { useFetcher } from '@remix-run/react';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import type { IInvitation } from '~/api/organization/organization.contracts';
+import { IconButton } from '~/components/iconButton';
+import { EmptyMessage, ItemList } from '~/components/list/ItemList';
+import { confirm } from '~/components/modal/confirm';
+import { dayjs } from '~/utils/Dayjs';
 
 interface InvitationsListProps {
   invitations: IInvitation[];
@@ -16,12 +17,11 @@ export function InvitationsList({ invitations }: InvitationsListProps) {
   const handleDelete = async (invitationId: number) => {
     confirm({
       onConfirm: async () =>
-        fetcher.submit({ invitationId }, { method: "DELETE" }),
-      confirmText: "Delete invitation",
+        fetcher.submit({ invitationId }, { method: 'DELETE' }),
+      confirmText: 'Delete invitation',
       children: (
         <p className="text-neutral-100 text-sm">
-          You are about to delete the invitation. This action is
-          irreversible.
+          You are about to delete the invitation. This action is irreversible.
         </p>
       ),
     });
@@ -58,7 +58,7 @@ export const InvitationsListItem = ({
   return (
     <article
       className={classNames(
-        "group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white grid grid-cols-[130px_1fr_60px] gap-4 text-sm"
+        'group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white grid grid-cols-[130px_1fr_60px] gap-4 text-sm',
       )}
     >
       <p>{dayjs(invitation.expires_at).format()}</p>

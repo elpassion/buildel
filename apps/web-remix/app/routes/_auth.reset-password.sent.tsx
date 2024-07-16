@@ -1,5 +1,5 @@
-import { Link } from "@remix-run/react";
-import type { MetaFunction } from "@remix-run/react";
+import { Link } from '@remix-run/react';
+import type { MetaFunction } from '@remix-run/react';
 
 export function loader() {
   return {};
@@ -12,10 +12,10 @@ export default function ResetPasswordSent() {
         Reset password instructions successfully sent!
       </h1>
       <p className="text-center text-neutral-100">
-        Go back to{" "}
+        Go back to{' '}
         <Link
           to={{
-            pathname: "/login",
+            pathname: '/login',
           }}
           className="text-primary-500"
         >
@@ -29,7 +29,7 @@ export default function ResetPasswordSent() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Reset Password Sent!",
+      title: 'Reset Password Sent!',
     },
   ];
 };

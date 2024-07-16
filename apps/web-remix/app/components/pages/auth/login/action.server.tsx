@@ -1,13 +1,15 @@
-import { redirect } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
-import { validationError } from "remix-validated-form";
-import { AuthApi } from "~/api/auth/AuthApi";
-import { CurrentUserResponse } from "~/api/CurrentUserApi";
-import { setCurrentUser } from "~/utils/currentUser.server";
-import { routes } from "~/utils/routes.utils";
-import { actionBuilder } from "~/utils.server";
-import { schema } from "./schema";
-import type { ActionFunctionArgs} from "@remix-run/node";
+import { redirect } from '@remix-run/node';
+import type { ActionFunctionArgs } from '@remix-run/node';
+import { withZod } from '@remix-validated-form/with-zod';
+import { validationError } from 'remix-validated-form';
+
+import { AuthApi } from '~/api/auth/AuthApi';
+import { CurrentUserResponse } from '~/api/CurrentUserApi';
+import { actionBuilder } from '~/utils.server';
+import { setCurrentUser } from '~/utils/currentUser.server';
+import { routes } from '~/utils/routes.utils';
+
+import { schema } from './schema';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
@@ -22,9 +24,9 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const response = await authApi.signIn(result.data.user);
 
-      const authCookie = response.headers.get("Set-Cookie")!;
+      const authCookie = response.headers.get('Set-Cookie')!;
 
-      const meResponse = await fetch(CurrentUserResponse, "/users/me", {
+      const meResponse = await fetch(CurrentUserResponse, '/users/me', {
         headers: {
           Cookie: authCookie,
         },
@@ -33,8 +35,8 @@ export async function action(actionArgs: ActionFunctionArgs) {
       const sessionCookie = await setCurrentUser(request, meResponse.data);
 
       const headers = new Headers();
-      headers.append("Set-Cookie", authCookie);
-      headers.append("Set-Cookie", sessionCookie);
+      headers.append('Set-Cookie', authCookie);
+      headers.append('Set-Cookie', sessionCookie);
 
       const redirectTo = result.data.redirectTo || routes.dashboard;
 

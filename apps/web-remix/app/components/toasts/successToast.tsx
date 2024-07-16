@@ -1,16 +1,17 @@
-import { toast } from "react-hot-toast";
-import { SuccessToast } from "./ui/SuccessToast";
-import type { ToastProps } from "./Toast.interface";
+import { toast } from 'react-hot-toast';
+
+import type { ToastProps } from './Toast.interface';
+import { SuccessToast } from './ui/SuccessToast';
 
 export const successToast = (props?: ToastProps | string) => {
-  if (typeof props === "string") {
+  if (typeof props === 'string') {
     return toast((t) => (
       <SuccessToast title={props} onClose={() => toast.dismiss(t.id)} />
     ));
   }
 
   const { title, options, ...rest } = {
-    title: "Success",
+    title: 'Success',
     ...props,
   };
 
@@ -22,6 +23,6 @@ export const successToast = (props?: ToastProps | string) => {
         {...rest}
       />
     ),
-    options
+    options,
   );
 };

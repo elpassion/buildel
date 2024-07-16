@@ -1,9 +1,10 @@
-import React from "react";
-import * as ReactDom from "react-dom/client";
-import { ConfirmationModal } from "./ConfirmationModal";
-import type { ConfirmationModalProps } from "./ConfirmationModal";
+import React from 'react';
+import * as ReactDom from 'react-dom/client';
 
-export type ConfirmProps = Omit<ConfirmationModalProps, "isOpen" | "onClose">;
+import { ConfirmationModal } from './ConfirmationModal';
+import type { ConfirmationModalProps } from './ConfirmationModal';
+
+export type ConfirmProps = Omit<ConfirmationModalProps, 'isOpen' | 'onClose'>;
 
 export function confirm(config: ConfirmProps) {
   let destroyFn: (() => void) | null = null;
@@ -21,7 +22,7 @@ export function confirm(config: ConfirmProps) {
   }
 
   function close() {
-    if (typeof destroyFn === "function") {
+    if (typeof destroyFn === 'function') {
       destroyFn();
     }
   }
@@ -31,7 +32,7 @@ export function confirm(config: ConfirmProps) {
 
 function domRender(
   element: React.ReactNode,
-  container: DocumentFragment | Element
+  container: DocumentFragment | Element,
 ) {
   const root = ReactDom.createRoot(container);
 

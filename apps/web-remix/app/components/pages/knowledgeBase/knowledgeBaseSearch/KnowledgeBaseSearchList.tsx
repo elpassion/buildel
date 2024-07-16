@@ -1,6 +1,7 @@
-import React from "react";
-import type { IKnowledgeBaseSearchChunk } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
+import React from 'react';
+
+import type { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { EmptyMessage, ItemList } from '~/components/list/ItemList';
 
 interface KnowledgeBaseSearchListProps {
   items: IKnowledgeBaseSearchChunk[];
@@ -37,10 +38,10 @@ function KnowledgeBaseSearchListItem({
     <article className="p-3 bg-neutral-850 rounded-lg text-sm">
       {item.keywords.length ? (
         <p className="font-bold text-neutral-100">
-          {item.keywords.join(" - ")}
+          {item.keywords.join(' - ')}
         </p>
       ) : (
-        ""
+        ''
       )}
 
       <p className="text-neutral-100 mt-2">{item.content}</p>
@@ -53,7 +54,7 @@ function KnowledgeBaseSearchListItem({
         </p>
       </div>
       <p className="mt-2 font-bold text-neutral-100">
-        Page: {item.pages.join(", ")}
+        Page: {item.pages.join(', ')}
       </p>
     </article>
   );

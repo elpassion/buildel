@@ -1,25 +1,27 @@
-import React from "react";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
 import {
   Link,
   Outlet,
   useLoaderData,
   useMatch,
   useNavigate,
-} from "@remix-run/react";
-import classNames from "classnames";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
-import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
+} from '@remix-run/react';
+import classNames from 'classnames';
+
+import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
+import { CodePreviewWrapper } from '~/components/interfaces/CodePreview/CodePreviewWrapper';
+import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
 import {
   InterfaceSectionHeader,
   InterfaceSectionHeaderParagraph,
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
-} from "~/components/interfaces/InterfaceSection";
-import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/interfaces/InterfaceSection';
+import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
 
 export function KnowledgeBaseCollectionInterface() {
   const { organizationId, collectionName, collectionId, apiUrl } =
@@ -27,7 +29,7 @@ export function KnowledgeBaseCollectionInterface() {
   const navigate = useNavigate();
 
   const matchSearch = useMatch(
-    routes.collectionInterfaceSearch(organizationId, collectionName)
+    routes.collectionInterfaceSearch(organizationId, collectionName),
   );
   const isSidebarOpen = !!matchSearch;
 
@@ -58,14 +60,14 @@ export function KnowledgeBaseCollectionInterface() {
             <div className="text-white text-sm">
               <p className="lg:mt-4 mb-2">
                 Ensure you replace the baseURL with our API's URL and include
-                your{" "}
+                your{' '}
                 <Link
                   to={routes.organizationSettings(organizationId)}
                   className="text-primary-500 hover:underline"
                   target="_blank"
                 >
                   API key
-                </Link>{" "}
+                </Link>{' '}
                 as the bearer token in the Authorization header.
               </p>
             </div>
@@ -96,14 +98,14 @@ export function KnowledgeBaseCollectionInterface() {
             <div className="text-white text-sm">
               <p className="lg:mt-4 mb-2">
                 Ensure you replace the baseURL with our API's URL and include
-                your{" "}
+                your{' '}
                 <Link
                   to={routes.organizationSettings(organizationId)}
                   className="text-primary-500 hover:underline"
                   target="_blank"
                 >
                   API key
-                </Link>{" "}
+                </Link>{' '}
                 as the bearer token in the Authorization header.
               </p>
             </div>
@@ -135,14 +137,14 @@ export function KnowledgeBaseCollectionInterface() {
             <div className="text-white text-sm">
               <p className="lg:mt-4 mb-2">
                 Ensure you replace the baseURL with our API's URL and include
-                your{" "}
+                your{' '}
                 <Link
                   to={routes.organizationSettings(organizationId)}
                   className="text-primary-500 hover:underline"
                   target="_blank"
                 >
                   API key
-                </Link>{" "}
+                </Link>{' '}
                 as the bearer token in the Authorization header.
               </p>
             </div>
@@ -166,7 +168,7 @@ export function KnowledgeBaseCollectionInterface() {
       </div>
 
       <ActionSidebar
-        className={classNames("!bg-neutral-950 md:w-[550px]")}
+        className={classNames('!bg-neutral-950 md:w-[550px]')}
         isOpen={isSidebarOpen}
         onClose={handleClose}
         overlay

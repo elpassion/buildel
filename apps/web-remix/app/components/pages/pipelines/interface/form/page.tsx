@@ -1,22 +1,24 @@
-import React from "react";
-import { useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
-import { CodePreviewOptions } from "~/components/interfaces/CodePreview/CodePreviewOptions";
-import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { useFetcher, useLoaderData, useSearchParams } from '@remix-run/react';
+
+import { CodePreviewOptions } from '~/components/interfaces/CodePreview/CodePreviewOptions';
+import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
 import {
   InterfaceSectionHeader,
   InterfaceSectionHeaderParagraph,
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
-} from "~/components/interfaces/InterfaceSection";
-import { BasicLink } from "~/components/link/BasicLink";
+} from '~/components/interfaces/InterfaceSection';
+import { BasicLink } from '~/components/link/BasicLink';
 import type {
   IInterfaceConfig,
   IPipeline,
-} from "~/components/pages/pipelines/pipeline.types";
-import { routes } from "~/utils/routes.utils";
-import { InterfaceConfigForm } from "./InterfaceConfigForm";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/pages/pipelines/pipeline.types';
+import { routes } from '~/utils/routes.utils';
+
+import { InterfaceConfigForm } from './InterfaceConfigForm';
+import type { loader } from './loader.server';
 
 export function FormPage() {
   const updateFetcher = useFetcher<IPipeline>();
@@ -28,13 +30,13 @@ export function FormPage() {
   const websiteFormUrl = `${pageUrl}${routes.formPreview(
     organizationId,
     pipelineId,
-    Object.fromEntries(searchParams.entries())
+    Object.fromEntries(searchParams.entries()),
   )}`;
 
   const handleUpdate = (interfaceConfig: IInterfaceConfig) => {
     updateFetcher.submit(interfaceConfig, {
-      method: "PATCH",
-      encType: "application/json",
+      method: 'PATCH',
+      encType: 'application/json',
     });
   };
 
@@ -52,7 +54,7 @@ export function FormPage() {
           to={routes.formPreview(
             organizationId,
             pipelineId,
-            Object.fromEntries(searchParams.entries())
+            Object.fromEntries(searchParams.entries()),
           )}
           target="_blank"
           className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
@@ -102,8 +104,8 @@ export function FormPage() {
               options={[
                 {
                   id: 1,
-                  framework: "Html",
-                  language: "html",
+                  framework: 'Html',
+                  language: 'html',
                   value: `<iframe
   src="${websiteFormUrl}"
   width="600"
@@ -114,8 +116,8 @@ export function FormPage() {
                 },
                 {
                   id: 2,
-                  framework: "React",
-                  language: "html",
+                  framework: 'React',
+                  language: 'html',
                   value: `<iframe
   src="${websiteFormUrl}"
   width="600"
@@ -139,7 +141,7 @@ export function FormPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Form",
+      title: 'Form',
     },
   ];
 };

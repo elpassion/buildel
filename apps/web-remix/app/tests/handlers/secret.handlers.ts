@@ -1,5 +1,6 @@
-import { HttpResponse, http } from "msw";
-import type { ISecretKey } from "~/components/pages/secrets/variables.types";
+import { http, HttpResponse } from 'msw';
+
+import type { ISecretKey } from '~/components/pages/secrets/variables.types';
 
 export class SecretsHandlers {
   private secrets: Map<string | number, ISecretKey> = new Map();
@@ -9,47 +10,47 @@ export class SecretsHandlers {
   }
 
   getSecretsHandler() {
-    return http.get("/super-api/organizations/:organizationId/secrets", () => {
+    return http.get('/super-api/organizations/:organizationId/secrets', () => {
       return HttpResponse.json<{ data: ISecretKey[] }>(
         { data: [...this.secrets.values()] },
-        { status: 200 }
+        { status: 200 },
       );
     });
   }
 
   createHandler() {
     return http.post<any, { name: string; value: string }>(
-      "/super-api/organizations/:organizationId/secrets",
+      '/super-api/organizations/:organizationId/secrets',
       async ({ request }) => {
         const data = await request.json();
         const transformed: ISecretKey = {
           id: data.value,
           name: data.name,
-          created_at: "07/02/2024 11:35",
-          updated_at: "07/02/2024 11:35",
+          created_at: '07/02/2024 11:35',
+          updated_at: '07/02/2024 11:35',
         };
 
         this.secrets.set(data.value, transformed);
 
         return HttpResponse.json({ data: transformed }, { status: 200 });
-      }
+      },
     );
   }
 
   deleteHandler() {
     return http.delete(
-      "/super-api/organizations/:organizationId/secrets/:secretId",
+      '/super-api/organizations/:organizationId/secrets/:secretId',
       async ({ params }) => {
         this.secrets.delete(params.secretId.toString());
 
         return HttpResponse.json({}, { status: 200 });
-      }
+      },
     );
   }
 
   updateHandler() {
     return http.put(
-      "/super-api/organizations/:organizationId/secrets/:secretId",
+      '/super-api/organizations/:organizationId/secrets/:secretId',
       async ({ params, request }) => {
         const secret = this.secrets.get(params.secretId.toString());
 
@@ -58,16 +59,16 @@ export class SecretsHandlers {
             {},
             {
               status: 404,
-            }
+            },
           );
         }
 
         this.secrets.set(params.secretId.toString(), {
           ...secret,
-          updated_at: "2024-01-01T13:00:00",
+          updated_at: '2024-01-01T13:00:00',
         });
         return HttpResponse.json({}, { status: 200 });
-      }
+      },
     );
   }
 

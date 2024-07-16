@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import { useAudioVisualize } from "~/components/audioRecorder/useAudioVisualize";
-import { errorToast } from "~/components/toasts/errorToast";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
+import { errorToast } from '~/components/toasts/errorToast';
+
 interface AudioOutputProps {
   audio?: Blob | string | null;
 }
@@ -26,7 +28,7 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
         setIsPlaying(false);
       }
     } catch {
-      errorToast({ description: "The element has no supported sources." });
+      errorToast({ description: 'The element has no supported sources.' });
     }
   };
 
@@ -49,7 +51,7 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
 
   const audioUrl = useMemo(() => {
     if (!audio) return;
-    if (typeof audio === "string") {
+    if (typeof audio === 'string') {
       return audio;
     }
 
@@ -70,9 +72,9 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
       <button
         disabled={isDisabled}
         onClick={handleReset}
-        className={classNames("text-xs", {
-          "text-neutral-200 hover:text-primary-500": !isDisabled,
-          "text-neutral-400": isDisabled,
+        className={classNames('text-xs', {
+          'text-neutral-200 hover:text-primary-500': !isDisabled,
+          'text-neutral-400': isDisabled,
         })}
       >
         Back to beginning
@@ -93,21 +95,21 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
         <button
           type="button"
           className={classNames(
-            "w-6 h-6 flex items-center justify-center bg-neutral-500 rounded-md",
+            'w-6 h-6 flex items-center justify-center bg-neutral-500 rounded-md',
             {
-              "text-neutral-50": !isPlaying && !isDisabled,
-              "text-red-400": isPlaying,
-              "bg-neutral-700 text-neutral-400": isDisabled,
-            }
+              'text-neutral-50': !isPlaying && !isDisabled,
+              'text-red-400': isPlaying,
+              'bg-neutral-700 text-neutral-400': isDisabled,
+            },
           )}
           disabled={isDisabled}
           onClick={handlePlay}
         >
-          <Icon iconName={isPlaying ? "pause" : "play"} size="xs" />
+          <Icon iconName={isPlaying ? 'pause' : 'play'} size="xs" />
         </button>
         <div
           className={classNames(
-            "relative after:absolute after:content-[''] after:w-full after:h-[1px] after:bg-neutral-400 after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2"
+            "relative after:absolute after:content-[''] after:w-full after:h-[1px] after:bg-neutral-400 after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2",
           )}
         >
           <canvas ref={canvasRef} width={235} height={36} />

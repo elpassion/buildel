@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
-import { useLoaderData } from "@remix-run/react";
-import { useInView } from "react-intersection-observer";
-import type { IMemoryChunk } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { LoadMoreButton } from "~/components/pagination/LoadMoreButton";
-import { useInfiniteFetch } from "~/components/pagination/useInfiniteFetch";
-import { routes } from "~/utils/routes.utils";
-import { MemoryChunksList } from "./MemoryChunksList";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+import React, { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
+import type { MetaFunction } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+
+import type { IMemoryChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
+import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
+import { MemoryChunksList } from './MemoryChunksList';
 
 export function CollectionMemory() {
   const { ref: fetchNextRef, inView } = useInView();

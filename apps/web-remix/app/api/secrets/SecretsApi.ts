@@ -1,11 +1,9 @@
-import { z } from "zod";
-import type { fetchTyped } from "~/utils/fetch.server";
-import {
-  SecretKeyListResponse,
-  SecretKeyResponse,
-} from "./secrets.contracts";
-import type {
-  ICreateUpdateSecretSchema} from "./secrets.contracts";
+import { z } from 'zod';
+
+import type { fetchTyped } from '~/utils/fetch.server';
+
+import { SecretKeyListResponse, SecretKeyResponse } from './secrets.contracts';
+import type { ICreateUpdateSecretSchema } from './secrets.contracts';
 
 export class SecretsApi {
   constructor(private client: typeof fetchTyped) {}
@@ -13,7 +11,7 @@ export class SecretsApi {
   async getSecrets(organizationId: string | number) {
     return this.client(
       SecretKeyListResponse,
-      `/organizations/${organizationId}/secrets`
+      `/organizations/${organizationId}/secrets`,
     );
   }
 
@@ -21,29 +19,29 @@ export class SecretsApi {
     return this.client(
       z.any(),
       `/organizations/${organizationId}/secrets/${name}`,
-      { method: "DELETE" }
+      { method: 'DELETE' },
     );
   }
 
   async updateSecret(
     organizationId: string | number,
-    data: ICreateUpdateSecretSchema
+    data: ICreateUpdateSecretSchema,
   ) {
     return this.client(
       z.any(),
       `/organizations/${organizationId}/secrets/${data.name}`,
-      { method: "PUT", body: JSON.stringify({ value: data.value }) }
+      { method: 'PUT', body: JSON.stringify({ value: data.value }) },
     );
   }
 
   async createSecret(
     organizationId: string | number,
-    data: ICreateUpdateSecretSchema
+    data: ICreateUpdateSecretSchema,
   ) {
     return this.client(
       SecretKeyResponse,
       `/organizations/${organizationId}/secrets`,
-      { method: "POST", body: JSON.stringify(data) }
+      { method: 'POST', body: JSON.stringify(data) },
     );
   }
 }

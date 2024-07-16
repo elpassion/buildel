@@ -1,17 +1,19 @@
-import React, { useCallback, useEffect, useMemo } from "react";
-import { useFetcher } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Modal } from "@elpassion/taco/Modal";
-import { Field } from "~/components/form/fields/field.context";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import { IconButton } from "~/components/iconButton";
-import type { IPipeline } from "~/components/pages/pipelines/pipeline.types";
-import { successToast } from "~/components/toasts/successToast";
-import { useModal } from "~/hooks/useModal";
-import { routes } from "~/utils/routes.utils";
-import { updatePipelineNameSchema } from "./schema";
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useFetcher } from '@remix-run/react';
+import { Modal } from '@elpassion/taco/Modal';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { Field } from '~/components/form/fields/field.context';
+import { TextInputField } from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
+import { IconButton } from '~/components/iconButton';
+import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
+import { successToast } from '~/components/toasts/successToast';
+import { useModal } from '~/hooks/useModal';
+import { routes } from '~/utils/routes.utils';
+
+import { updatePipelineNameSchema } from './schema';
 
 interface EditPipelineNameFormProps {
   defaultValues: IPipeline;
@@ -30,20 +32,20 @@ export function EditPipelineNameForm({
       const pipeline = { ...defaultValues, name: data.name };
 
       updateFetcher.submit(pipeline, {
-        method: "PUT",
-        encType: "application/json",
+        method: 'PUT',
+        encType: 'application/json',
         action:
           routes.pipelineBuild(pipeline.organization_id, pipeline.id) +
-          "?index",
+          '?index',
       });
     },
-    [defaultValues]
+    [defaultValues],
   );
 
   useEffect(() => {
     if (updateFetcher.data) {
       closeModal();
-      successToast({ description: "Workflow name has been changed" });
+      successToast({ description: 'Workflow name has been changed' });
     }
   }, [updateFetcher]);
 
@@ -60,13 +62,13 @@ export function EditPipelineNameForm({
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        closeButtonProps={{ iconName: "x", "aria-label": "Close" }}
+        closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
         header={
           <header className="p-1 text-white mr-3">
             <p className="text-3xl mb-4">Edit name</p>
 
             <p className="text-sm text-neutral-400">
-              Edit <span className="font-bold">{defaultValues.name}</span>{" "}
+              Edit <span className="font-bold">{defaultValues.name}</span>{' '}
               workflow.
             </p>
           </header>

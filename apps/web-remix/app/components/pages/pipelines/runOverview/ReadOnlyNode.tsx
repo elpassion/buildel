@@ -1,10 +1,9 @@
 import {
   CustomNode,
   CustomNodeBody,
-  CustomNodeHeader
-} from "../CustomNodes/CustomNode";
-import type {
-  CustomNodeProps} from "../CustomNodes/CustomNode";
+  CustomNodeHeader,
+} from '../CustomNodes/CustomNode';
+import type { CustomNodeProps } from '../CustomNodes/CustomNode';
 
 export interface ReadOnlyNodeProps extends CustomNodeProps {
   isConnectable?: boolean;

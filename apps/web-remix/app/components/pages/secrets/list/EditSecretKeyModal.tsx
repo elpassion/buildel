@@ -1,15 +1,18 @@
-import React, { useMemo } from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Modal } from "@elpassion/taco/Modal";
-import { CreateUpdateSecretSchema } from "~/api/secrets/secrets.contracts";
-import { Field } from "~/components/form/fields/field.context";
+import React, { useMemo } from 'react';
+import { Modal } from '@elpassion/taco/Modal';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { CreateUpdateSecretSchema } from '~/api/secrets/secrets.contracts';
+import { Field } from '~/components/form/fields/field.context';
 import {
   PasswordInputField,
   TextInputField,
-} from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import type { ISecretKey } from "../variables.types";
+} from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
+
+import type { ISecretKey } from '../variables.types';
+
 interface EditSecretModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -27,13 +30,13 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      closeButtonProps={{ iconName: "x", "aria-label": "Close" }}
+      closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
       header={
         <header className="p-1 text-white">
           <p className="text-3xl mb-4">Edit Secret</p>
 
           <p className="text-sm text-neutral-400">
-            Edit your <span className="font-bold">{initialData.name}</span>{" "}
+            Edit your <span className="font-bold">{initialData.name}</span>{' '}
             secret.
           </p>
         </header>

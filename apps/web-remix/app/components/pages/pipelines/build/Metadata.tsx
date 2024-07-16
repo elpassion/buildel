@@ -1,23 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { z } from "zod";
-import { Icon } from "@elpassion/taco";
+import React, { useEffect, useState } from 'react';
+import { Icon } from '@elpassion/taco';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+import { z } from 'zod';
+
 import {
   Dropdown,
   DropdownPopup,
   DropdownTrigger,
-} from "~/components/dropdown/Dropdown";
-import { useDropdown } from "~/components/dropdown/DropdownContext";
-import { EditorField } from "~/components/form/fields/editor.field";
-import { Field } from "~/components/form/fields/field.context";
-import { SubmitButton } from "~/components/form/submit";
-import type {
-  Metadata as IMetadata} from "~/components/pages/pipelines/RunPipelineProvider";
-import {
-  useRunPipeline
-} from "~/components/pages/pipelines/RunPipelineProvider";
-import { successToast } from "~/components/toasts/successToast";
+} from '~/components/dropdown/Dropdown';
+import { useDropdown } from '~/components/dropdown/DropdownContext';
+import { EditorField } from '~/components/form/fields/editor.field';
+import { Field } from '~/components/form/fields/field.context';
+import { SubmitButton } from '~/components/form/submit';
+import type { Metadata as IMetadata } from '~/components/pages/pipelines/RunPipelineProvider';
+import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
+import { successToast } from '~/components/toasts/successToast';
 
 export const Metadata = () => {
   const { metadata, setMetadata } = useRunPipeline();
@@ -52,7 +50,7 @@ const metadataSchema = z.object({
     try {
       return JSON.parse(str);
     } catch (e) {
-      ctx.addIssue({ code: "custom", message: "Invalid JSON" });
+      ctx.addIssue({ code: 'custom', message: 'Invalid JSON' });
       return z.NEVER;
     }
   }),
@@ -71,14 +69,14 @@ function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
 
   const handleOnSubmit = (
     data: MetadataSchema,
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
 
     if (!data.value) return onSubmit({});
     onSubmit(data.value);
 
-    successToast({ description: "Metadata configured" });
+    successToast({ description: 'Metadata configured' });
     hide();
   };
 

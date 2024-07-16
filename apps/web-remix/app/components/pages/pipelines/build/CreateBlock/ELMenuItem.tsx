@@ -1,6 +1,7 @@
-import React from "react";
-import { Icon } from "@elpassion/taco";
-import { useEl } from "~/components/pages/pipelines/EL/ELProvider";
+import React from 'react';
+import { Icon } from '@elpassion/taco';
+
+import { useEl } from '~/components/pages/pipelines/EL/ELProvider';
 
 export const ELMenuItem: React.FC = () => {
   const { show } = useEl();

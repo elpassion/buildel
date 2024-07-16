@@ -1,12 +1,12 @@
-import type { PropsWithChildren } from "react";
-import React from "react";
+import type { PropsWithChildren } from 'react';
+import React from 'react';
 import {
+  isRouteErrorResponse,
   Links,
   Meta,
   Scripts,
-  isRouteErrorResponse,
   useRouteError,
-} from "@remix-run/react";
+} from '@remix-run/react';
 
 export const ErrorBoundaryLayout: React.FC<
   PropsWithChildren<{ className?: string }>
@@ -14,8 +14,8 @@ export const ErrorBoundaryLayout: React.FC<
   const error = useRouteError();
   const getTitle = () => {
     if (isRouteErrorResponse(error)) {
-      if (error.status === 404) return "Not Found";
-      return "Something went wrong";
+      if (error.status === 404) return 'Not Found';
+      return 'Something went wrong';
     }
   };
   return (

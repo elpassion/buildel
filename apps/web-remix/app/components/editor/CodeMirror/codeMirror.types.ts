@@ -2,6 +2,6 @@ export type Suggestion = {
   label: string;
   type?: string;
   info?: string;
-  variant?: "primary" | "secondary";
+  variant?: 'primary' | 'secondary';
   matchAll?: boolean;
 };

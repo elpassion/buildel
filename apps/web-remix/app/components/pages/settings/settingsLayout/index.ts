@@ -1,1 +1,1 @@
-export { SettingsLayout as page } from "./page";
+export { SettingsLayout as page } from './page';

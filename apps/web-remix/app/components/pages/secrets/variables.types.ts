@@ -1,5 +1,6 @@
-import type { SecretKey, SecretKeyList } from "~/api/secrets/secrets.contracts";
-import type { z } from "zod";
+import type { z } from 'zod';
+
+import type { SecretKey, SecretKeyList } from '~/api/secrets/secrets.contracts';
 
 export type ISecretKey = z.TypeOf<typeof SecretKey>;
 

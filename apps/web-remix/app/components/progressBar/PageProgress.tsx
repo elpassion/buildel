@@ -2,6 +2,7 @@ import type React from 'react';
 import { useEffect } from 'react';
 import { useNavigation } from '@remix-run/react';
 import NProgress from 'nprogress';
+
 import 'nprogress/nprogress.css';
 import './pageProgress.css';
 

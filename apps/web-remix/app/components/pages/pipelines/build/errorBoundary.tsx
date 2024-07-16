@@ -1,5 +1,5 @@
-import React from "react";
-import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
+import React from 'react';
+import { isRouteErrorResponse, useRouteError } from '@remix-run/react';
 
 export const BuildErrorBoundary = () => {
   const error = useRouteError();

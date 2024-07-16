@@ -1,3 +1,5 @@
+import type { Connection } from '@xyflow/react';
+
 import type {
   IBlockConfig,
   IConfigConnection,
@@ -6,13 +8,12 @@ import type {
   IHandle,
   INode,
   IPipelineConfig,
-} from "./pipeline.types";
-import type { Connection } from "@xyflow/react";
+} from './pipeline.types';
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
     id: block.name,
-    type: "custom",
+    type: 'custom',
     position: block.position ?? {
       x: 100,
       y: 100,
@@ -30,7 +31,7 @@ export function getEdges(pipeline: IPipelineConfig): IEdge[] {
       sourceHandle: connection.from.output_name,
       target: connection.to.block_name,
       targetHandle: connection.to.input_name,
-      type: "default",
+      type: 'default',
       data: connection,
     };
   });
@@ -38,23 +39,23 @@ export function getEdges(pipeline: IPipelineConfig): IEdge[] {
 
 export function isValidConnection(
   pipeline: IPipelineConfig,
-  connection: Connection
+  connection: Connection,
 ) {
   const sourceBlock = pipeline.blocks.find(
-    (block) => block.name === connection.source
+    (block) => block.name === connection.source,
   );
   const targetBlock = pipeline.blocks.find(
-    (block) => block.name === connection.target
+    (block) => block.name === connection.target,
   );
 
   if (
     !sourceBlock ||
     !targetBlock ||
     sourceBlock.block_type?.outputs.find(
-      (output) => output.name === connection.sourceHandle
+      (output) => output.name === connection.sourceHandle,
     )?.type !==
       targetBlock.block_type?.inputs.find(
-        (input) => input.name === connection.targetHandle
+        (input) => input.name === connection.targetHandle,
       )?.type
   )
     return false;
@@ -63,11 +64,11 @@ export function isValidConnection(
 
 export function toPipelineConfig(
   nodes: INode[],
-  edges: IEdge[]
+  edges: IEdge[],
 ): IPipelineConfig {
   return {
     blocks: nodes.map((node) => ({ ...node.data, position: node.position })),
-    version: "1",
+    version: '1',
     connections: edges.map((edge) => {
       return {
         from: {
@@ -93,30 +94,30 @@ export function getBlockHandles(block: IBlockConfig): IHandle[] {
     ...blockType.inputs
       .filter((input) => !input.public)
       .map((input) => ({
-        type: "target" as const,
+        type: 'target' as const,
         id: input.name,
         data: input,
       })),
     ...blockType.outputs
       .filter((output) => !output.public)
       .map((output) => ({
-        type: "source" as const,
+        type: 'source' as const,
         id: output.name,
         data: output,
       })),
     ...blockType.ios
       .filter((output) => !output.public)
-      .filter((output) => output.type === "worker")
+      .filter((output) => output.type === 'worker')
       .map((output) => ({
-        type: "source" as const,
+        type: 'source' as const,
         id: output.name,
         data: output,
       })),
     ...blockType.ios
       .filter((output) => !output.public)
-      .filter((output) => output.type === "controller")
+      .filter((output) => output.type === 'controller')
       .map((output) => ({
-        type: "target" as const,
+        type: 'target' as const,
         id: output.name,
         data: output,
       })),
@@ -130,13 +131,13 @@ export function getBlockFields(block: IBlockConfig): IField[] {
     ...blockType.inputs
       .filter((input) => input.public)
       .map((input) => ({
-        type: "input" as const,
+        type: 'input' as const,
         data: input,
       })),
     ...blockType.outputs
       .filter((output) => output.public)
       .map((output) => ({
-        type: "output" as const,
+        type: 'output' as const,
         data: output,
       })),
   ];
@@ -144,14 +145,14 @@ export function getBlockFields(block: IBlockConfig): IField[] {
 
 export function getAllBlockTypes(
   config: IPipelineConfig,
-  type: string
+  type: string,
 ): IBlockConfig[] {
   return config.blocks.filter((block) => block.type === type);
 }
 
 export function getLastBlockNumber(blocks: IBlockConfig[]) {
   const nrs = blocks
-    .map((block) => block.name.split("_"))
+    .map((block) => block.name.split('_'))
     .map((part) => Number.parseInt(part[part.length - 1]))
     .filter((n) => !isNaN(n));
 
@@ -160,13 +161,13 @@ export function getLastBlockNumber(blocks: IBlockConfig[]) {
 
 export function reverseToolConnections(
   connections: IConfigConnection[],
-  blockName: string
+  blockName: string,
 ) {
   return connections
     .filter(
       (connection) =>
         connection.from.block_name === blockName &&
-        connection.to.input_name === "tool"
+        connection.to.input_name === 'tool',
     )
     .map(reverseConnection);
 }

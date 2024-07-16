@@ -1,11 +1,13 @@
-import userEvent from "@testing-library/user-event";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { screen } from "../render";
+import userEvent from '@testing-library/user-event';
+
+import { ButtonHandle } from '~/tests/handles/Button.handle';
+
+import { screen } from '../render';
 
 export class SelectHandle {
   constructor(
     public readonly selectElement: HTMLInputElement,
-    protected readonly id: string
+    protected readonly id: string,
   ) {}
 
   static async fromTestId(testId: string): Promise<SelectHandle> {
@@ -17,7 +19,7 @@ export class SelectHandle {
   }
 
   async openSelect() {
-    const input = this.selectElement.querySelector("input");
+    const input = this.selectElement.querySelector('input');
 
     if (!input) throw new Error(`Input in ${this.id} select does not exist`);
 
@@ -51,7 +53,7 @@ export class SelectHandle {
 
   private getSelectInput() {
     return this.selectElement.querySelector(
-      ".rc-select-selection-item"
+      '.rc-select-selection-item',
     ) as HTMLDivElement;
   }
 }

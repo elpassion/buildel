@@ -1,5 +1,6 @@
-import React from "react";
-import type { IconProps } from "~/icons/icons.types";
+import React from 'react';
+
+import type { IconProps } from '~/icons/icons.types';
 
 export const Google: React.FC<IconProps> = ({ className }) => {
   return (
@@ -8,7 +9,7 @@ export const Google: React.FC<IconProps> = ({ className }) => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 48 48"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      style={{ display: "block" }}
+      style={{ display: 'block' }}
       className={className}
     >
       <path

@@ -1,15 +1,16 @@
-import React from "react";
-import { useNavigation } from "@remix-run/react";
-import { Google } from "~/icons/Google";
+import React from 'react';
+import { useNavigation } from '@remix-run/react';
 
-type GoogleButtonContent = "Sign in with Google" | "Sign up with Google";
+import { Google } from '~/icons/Google';
+
+type GoogleButtonContent = 'Sign in with Google' | 'Sign up with Google';
 
 export const GoogleButton: React.FC<{ content?: GoogleButtonContent }> = ({
-  content = "Sign in with Google",
+  content = 'Sign in with Google',
 }) => {
   const { state } = useNavigation();
 
-  const disabled = state !== "idle";
+  const disabled = state !== 'idle';
 
   return (
     <button

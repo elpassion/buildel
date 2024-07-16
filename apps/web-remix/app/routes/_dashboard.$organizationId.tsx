@@ -1,48 +1,49 @@
-import type { PropsWithChildren} from "react";
-import { useCallback, useRef, useState } from "react";
-import { json } from "@remix-run/node";
+import type { PropsWithChildren } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { json } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
 import {
   Link,
   Outlet,
   useFetcher,
   useLoaderData,
   useNavigate,
-} from "@remix-run/react";
-import classNames from "classnames";
-import { ClientOnly } from "remix-utils/client-only";
-import invariant from "tiny-invariant";
-import { useOnClickOutside } from "usehooks-ts";
-import { Avatar, Button, Icon, IconButton } from "@elpassion/taco";
-import { OrganizationApi } from "~/api/organization/OrganizationApi";
-import { MenuClient } from "~/components/menu/Menu.client";
-import { MenuItem } from "~/components/menu/MenuItem";
-import { PageOverlay } from "~/components/overlay/PageOverlay";
+} from '@remix-run/react';
+import { Avatar, Button, Icon, IconButton } from '@elpassion/taco';
+import classNames from 'classnames';
+import type { MenuInfo } from 'rc-menu/es/interface';
+import { ClientOnly } from 'remix-utils/client-only';
+import invariant from 'tiny-invariant';
+import { useOnClickOutside } from 'usehooks-ts';
+
+import { OrganizationApi } from '~/api/organization/OrganizationApi';
+import { MenuClient } from '~/components/menu/Menu.client';
+import { MenuItem } from '~/components/menu/MenuItem';
+import { PageOverlay } from '~/components/overlay/PageOverlay';
 import {
   NavMobileSidebar,
   NavSidebar,
   NavSidebarContext,
   SidebarLink,
-} from "~/components/sidebar/NavSidebar";
-import { useServerToasts } from "~/hooks/useServerToasts";
-import { requireLogin } from "~/session.server";
-import { getCurrentUser } from "~/utils/currentUser.server";
-import { routes } from "~/utils/routes.utils";
-import { getServerToast, setOrganizationId } from "~/utils/toast.server";
-import { loaderBuilder } from "~/utils.server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import type { MenuInfo } from "rc-menu/es/interface";
+} from '~/components/sidebar/NavSidebar';
+import { useServerToasts } from '~/hooks/useServerToasts';
+import { requireLogin } from '~/session.server';
+import { loaderBuilder } from '~/utils.server';
+import { getCurrentUser } from '~/utils/currentUser.server';
+import { routes } from '~/utils/routes.utils';
+import { getServerToast, setOrganizationId } from '~/utils/toast.server';
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
 
-    invariant(params.organizationId, "organizationId not found");
+    invariant(params.organizationId, 'organizationId not found');
     const organizationApi = new OrganizationApi(fetch);
 
     const organizationsResponse = await organizationApi.getOrganizations();
 
     const organization = organizationsResponse.data.data.find(
-      (org) => org.id === Number(params.organizationId)
+      (org) => org.id === Number(params.organizationId),
     );
 
     let { cookie, ...toasts } = await getServerToast(request);
@@ -50,7 +51,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
     if (!organization) {
       throw new Response(null, {
         status: 404,
-        statusText: "Not Found",
+        statusText: 'Not Found',
       });
     }
 
@@ -67,9 +68,9 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
       },
       {
         headers: {
-          "Set-Cookie": cookie,
+          'Set-Cookie': cookie,
         },
-      }
+      },
     );
   })(loaderArgs);
 }
@@ -136,10 +137,10 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
   return (
     <SidebarContentWrapper
       className={classNames(
-        "gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]",
+        'gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]',
         {
-          "!px-0": !isCollapsed,
-        }
+          '!px-0': !isCollapsed,
+        },
       )}
     >
       <div className="flex flex-col gap-1">
@@ -215,7 +216,7 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
     <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 pl-2 pr-1">
       <PageOverlay
         isShow={showMenu}
-        className={classNames({ "!z-[20]": showMenu })}
+        className={classNames({ '!z-[20]': showMenu })}
       />
 
       <div ref={menuRef}>
@@ -232,7 +233,7 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
                 {organization.name}
               </span>
               <Icon
-                iconName={showMenu ? "chevron-up" : "chevron-down"}
+                iconName={showMenu ? 'chevron-up' : 'chevron-down'}
                 className="text-xl"
               />
             </>
@@ -297,7 +298,7 @@ function LogoutButton() {
       icon={<Icon iconName="log-out" />}
       className="!text-neutral-100 hover:!bg-neutral-700"
       onClick={() => {
-        logout.submit({}, { method: "DELETE", action: "/logout" });
+        logout.submit({}, { method: 'DELETE', action: '/logout' });
       }}
     />
   );
@@ -311,7 +312,7 @@ export function SidebarContentWrapper({
   className,
 }: SidebarContentWrapperProps) {
   return (
-    <div className={classNames("flex flex-col px-[10px]", className)}>
+    <div className={classNames('flex flex-col px-[10px]', className)}>
       {children}
     </div>
   );

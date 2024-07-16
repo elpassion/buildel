@@ -1,16 +1,17 @@
-import type { ReactNode} from "react";
-import React, { useEffect } from "react";
-import { NavLink, useLocation } from "@remix-run/react";
-import classNames from "classnames";
-import kebabCase from "lodash.kebabcase";
-import type { SidebarProps} from "@elpassion/taco";
-import { Sidebar } from "@elpassion/taco";
-import { PageOverlay } from "~/components/overlay/PageOverlay";
-import { Tooltip } from "~/components/tooltip/Tooltip";
-import type { RemixNavLinkProps } from "@remix-run/react/dist/components";
+import type { ReactNode } from 'react';
+import React, { useEffect } from 'react';
+import { NavLink, useLocation } from '@remix-run/react';
+import type { RemixNavLinkProps } from '@remix-run/react/dist/components';
+import type { SidebarProps } from '@elpassion/taco';
+import { Sidebar } from '@elpassion/taco';
+import classNames from 'classnames';
+import kebabCase from 'lodash.kebabcase';
+
+import { PageOverlay } from '~/components/overlay/PageOverlay';
+import { Tooltip } from '~/components/tooltip/Tooltip';
 
 export const NavSidebar: React.FC<
-  Omit<SidebarProps, "collapsed" | "onCollapse">
+  Omit<SidebarProps, 'collapsed' | 'onCollapse'>
 > = ({ children, ...props }) => {
   const { collapsed, toggleCollapse } = useNavSidebarContext();
   return (
@@ -30,7 +31,7 @@ export const NavSidebar: React.FC<
 };
 
 export const NavMobileSidebar: React.FC<
-  Omit<SidebarProps, "collapsed" | "onCollapse">
+  Omit<SidebarProps, 'collapsed' | 'onCollapse'>
 > = ({ children, ...props }) => {
   const { isOpen, closeSidebar } = useNavSidebarContext();
   const location = useLocation();
@@ -48,10 +49,10 @@ export const NavMobileSidebar: React.FC<
       <div className="lg:hidden">
         <Sidebar
           className={classNames(
-            "fixed top-0 left-0 !h-screen rounded-r-[1.25rem] z-50 transition duration-200 ease-[cubic-bezier(0.25, 1, 0.5, 1)]",
+            'fixed top-0 left-0 !h-screen rounded-r-[1.25rem] z-50 transition duration-200 ease-[cubic-bezier(0.25, 1, 0.5, 1)]',
             {
-              "-translate-x-full pointer-events-none": !isOpen,
-            }
+              '-translate-x-full pointer-events-none': !isOpen,
+            },
           )}
           collapseButton={false}
           collapsed={false}
@@ -116,13 +117,13 @@ export function SidebarMenuItem({
     <div
       id={id}
       className={classNames(
-        "flex items-center space-x-2 p-2 rounded-lg text-neutral-100 hover:bg-neutral-700 transition",
+        'flex items-center space-x-2 p-2 rounded-lg text-neutral-100 hover:bg-neutral-700 transition',
         {
-          "bg-transparent": !isActive,
-          "bg-neutral-700": isActive,
-          "w-full": !onlyIcon,
-          "w-9 h-9": onlyIcon,
-        }
+          'bg-transparent': !isActive,
+          'bg-neutral-700': isActive,
+          'w-full': !onlyIcon,
+          'w-9 h-9': onlyIcon,
+        },
       )}
       {...rest}
     >
@@ -153,7 +154,7 @@ export const useNavSidebarContext = () => {
 
   if (!ctx) {
     throw new Error(
-      "useNavSidebarContext must be used inside NavSidebarContextProvider"
+      'useNavSidebarContext must be used inside NavSidebarContextProvider',
     );
   }
 

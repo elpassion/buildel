@@ -1,9 +1,10 @@
-import { json } from "@remix-run/node";
-import { Outlet, useLoaderData } from "@remix-run/react";
-import { useServerToasts } from "~/hooks/useServerToasts";
-import { getServerToast } from "~/utils/toast.server";
-import { loaderBuilder } from "~/utils.server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import { Outlet, useLoaderData } from '@remix-run/react';
+
+import { useServerToasts } from '~/hooks/useServerToasts';
+import { loaderBuilder } from '~/utils.server';
+import { getServerToast } from '~/utils/toast.server';
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }) => {
@@ -13,9 +14,9 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
       { toasts },
       {
         headers: {
-          "Set-Cookie": cookie,
+          'Set-Cookie': cookie,
         },
-      }
+      },
     );
   })(loaderArgs);
 }

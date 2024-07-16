@@ -1,11 +1,12 @@
-import React from "react";
-import { useLoaderData } from "@remix-run/react";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+
+import type { loader } from './loader.server';
 import {
   PipelineRunCostsList,
   PipelineRunCostsListHeader,
-} from "./RunsCostsList";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from './RunsCostsList';
 
 export function PipelineRunCosts() {
   const { pipelineRun } = useLoaderData<typeof loader>();

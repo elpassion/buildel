@@ -1,16 +1,17 @@
-import React, { useMemo } from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { InterfaceConfig } from "~/api/pipeline/pipeline.contracts";
-import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
-import { Field } from "~/components/form/fields/field.context";
-import { SelectField } from "~/components/form/fields/select.field";
-import { SubmitButton } from "~/components/form/submit";
+import React, { useMemo } from 'react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { InterfaceConfig } from '~/api/pipeline/pipeline.contracts';
+import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
+import { Field } from '~/components/form/fields/field.context';
+import { SelectField } from '~/components/form/fields/select.field';
+import { SubmitButton } from '~/components/form/submit';
 import type {
   IBlockConfig,
   IInterfaceConfig,
   IPipeline,
-} from "~/components/pages/pipelines/pipeline.types";
+} from '~/components/pages/pipelines/pipeline.types';
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;
@@ -24,10 +25,10 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   const validator = useMemo(() => withZod(InterfaceConfig), []);
 
   const inputs = pipeline.config.blocks.filter((block) =>
-    ["text_input", "file_input"].includes(block.type),
+    ['text_input', 'file_input'].includes(block.type),
   );
   const outputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_output",
+    (block) => block.type === 'text_output',
   );
 
   const handleOnSubmit = (
@@ -40,15 +41,15 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
       return {
         name: parsed.name,
         type: parsed.type,
-      }
-    })
+      };
+    });
     const outputs = data.form.outputs.map((output) => {
       const parsed = JSON.parse(output as unknown as string);
       return {
         name: parsed.name,
         type: parsed.type,
-      }
-    })
+      };
+    });
 
     const body = {
       ...pipeline.interface_config,
@@ -56,7 +57,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
         inputs,
         outputs,
         public: data.form.public,
-      }
+      },
     };
     onSubmit(body);
   };
@@ -108,8 +109,12 @@ function toSelectOption(item: IBlockConfig) {
 function toSelectDefaults(data: IInterfaceConfig) {
   return {
     form: {
-      inputs: data.form.inputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
-      outputs: data.form.outputs.map(item => JSON.stringify({ name: item.name, type: item.type })),
+      inputs: data.form.inputs.map((item) =>
+        JSON.stringify({ name: item.name, type: item.type }),
+      ),
+      outputs: data.form.outputs.map((item) =>
+        JSON.stringify({ name: item.name, type: item.type }),
+      ),
       public: data.form.public,
     },
   };

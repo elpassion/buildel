@@ -1,1 +1,1 @@
-export { loader } from "~/components/pages/home/index.server";
+export { loader } from '~/components/pages/home/index.server';

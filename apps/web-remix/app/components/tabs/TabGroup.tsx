@@ -1,10 +1,5 @@
-import type {
-  PropsWithChildren} from "react";
-import React, {
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import type { PropsWithChildren } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 interface ITabsContext {
   activeTabId?: string;
@@ -45,7 +40,7 @@ export const useTabsContext = () => {
 
   if (!ctx) {
     throw new Error(
-      "useTabsContext have to be used inside TabsContextProvider"
+      'useTabsContext have to be used inside TabsContextProvider',
     );
   }
 

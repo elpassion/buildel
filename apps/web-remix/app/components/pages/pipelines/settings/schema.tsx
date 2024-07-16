@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { zfd } from "zod-form-data";
+import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
 export const updatePipelineNameSchema = z.object({
   name: z.string().min(2),
@@ -10,7 +10,7 @@ export const updatePipelineSettingsSchema = z.object({
   logs_enabled: z.union([
     zfd.checkbox(),
     z.boolean(),
-    z.string().transform((val) => val === "true"),
+    z.string().transform((val) => val === 'true'),
   ]),
 });
 

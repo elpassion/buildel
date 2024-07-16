@@ -1,33 +1,43 @@
-import type {
-  ComponentType,
-  FunctionComponent,
-  ReactNode} from "react";
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
+import type { ComponentType, FunctionComponent, ReactNode } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   useLocation,
   useNavigate,
   useOutlet,
   useSearchParams,
-} from "@remix-run/react";
+} from '@remix-run/react';
 import {
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
   Background,
   BackgroundVariant,
   Controls,
   ReactFlow,
   ReactFlowProvider,
-  addEdge,
-  applyEdgeChanges,
-  applyNodeChanges
-} from "@xyflow/react";
-import classNames from "classnames";
-import { useEventListener } from "usehooks-ts";
-import { useUndoRedo } from "~/hooks/useUndoRedo";
-import { buildUrlWithParams } from "~/utils/url";
+} from '@xyflow/react';
+import type {
+  Connection,
+  Edge,
+  EdgeChange,
+  EdgeProps,
+  NodeChange,
+  NodeProps,
+} from '@xyflow/react';
+import classNames from 'classnames';
+import { useEventListener } from 'usehooks-ts';
+
+import { useUndoRedo } from '~/hooks/useUndoRedo';
+import { buildUrlWithParams } from '~/utils/url';
+
+import type { CustomEdgeProps } from './CustomEdges/CustomEdge';
+import type { CustomNodeProps } from './CustomNodes/CustomNode';
+import type {
+  IBlockConfig,
+  IEdge,
+  IExtendedPipeline,
+  INode,
+} from './pipeline.types';
 import {
   getAllBlockTypes,
   getEdges,
@@ -35,30 +45,16 @@ import {
   getNodes,
   isValidConnection,
   toPipelineConfig,
-} from "./PipelineFlow.utils";
-import { RunPipelineProvider } from "./RunPipelineProvider";
-import { useCopyPasteNode } from "./useCopyPasteNode";
-import { useDraggableNodes } from "./useDraggableNodes";
-import type { CustomEdgeProps } from "./CustomEdges/CustomEdge";
-import type { CustomNodeProps } from "./CustomNodes/CustomNode";
-import type {
-  IBlockConfig,
-  IEdge,
-  IExtendedPipeline,
-  INode,
-} from "./pipeline.types";
-import type {
-  Connection,
-  Edge,
-  EdgeChange,
-  EdgeProps,
-  NodeChange,
-  NodeProps} from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
+} from './PipelineFlow.utils';
+import { RunPipelineProvider } from './RunPipelineProvider';
+import { useCopyPasteNode } from './useCopyPasteNode';
+import { useDraggableNodes } from './useDraggableNodes';
+
+import '@xyflow/react/dist/style.css';
 
 interface BuilderProps {
   alias?: string;
-  type?: "readOnly" | "editable";
+  type?: 'readOnly' | 'editable';
   className?: string;
   pipeline: IExtendedPipeline;
   CustomNode: ComponentType<CustomNodeProps>;
@@ -77,8 +73,8 @@ interface BuilderProps {
 export const Builder = ({
   pipeline,
   children,
-  alias = "latest",
-  type = "editable",
+  alias = 'latest',
+  type = 'editable',
   CustomNode,
   CustomEdge,
   className,
@@ -95,7 +91,7 @@ export const Builder = ({
     },
   });
 
-  useEventListener("keydown", (e) => {
+  useEventListener('keydown', (e) => {
     if (
       e.target instanceof HTMLInputElement ||
       e.target instanceof HTMLTextAreaElement ||
@@ -106,19 +102,19 @@ export const Builder = ({
 
     if (
       (e.ctrlKey || e.metaKey) &&
-      (e.key === "z" || e.key === "Z") &&
+      (e.key === 'z' || e.key === 'Z') &&
       e.shiftKey
     ) {
       redo();
-    } else if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+    } else if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
       undo();
     }
   });
 
   const onNodesChange = useCallback(
     (changes: NodeChange<INode>[]) => {
-      if (type === "readOnly") return;
-      if (["select", "position", "dimensions"].includes(changes[0].type)) {
+      if (type === 'readOnly') return;
+      if (['select', 'position', 'dimensions'].includes(changes[0].type)) {
         updateCurrent((state) => ({
           ...state,
           nodes: applyNodeChanges(changes, state.nodes),
@@ -130,13 +126,13 @@ export const Builder = ({
         }));
       }
     },
-    [type]
+    [type],
   );
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange<IEdge>[]) => {
-      if (type === "readOnly") return;
-      if (["select"].includes(changes[0].type)) {
+      if (type === 'readOnly') return;
+      if (['select'].includes(changes[0].type)) {
         updateCurrent((state) => ({
           ...state,
           edges: applyEdgeChanges(changes, state.edges),
@@ -148,7 +144,7 @@ export const Builder = ({
         }));
       }
     },
-    [type]
+    [type],
   );
 
   const onConnect = useCallback((params: Connection) => {
@@ -159,7 +155,7 @@ export const Builder = ({
           id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
           ...params,
         },
-        state.edges
+        state.edges,
       ),
     }));
   }, []);
@@ -177,10 +173,10 @@ export const Builder = ({
 
       return isValidConnection(
         toPipelineConfig(flowState.nodes, flowState.edges),
-        connection
+        connection,
       );
     },
-    [flowState]
+    [flowState],
   );
 
   const handleDelete = useCallback((node: IBlockConfig) => {
@@ -189,7 +185,7 @@ export const Builder = ({
       edges: state.edges.filter(
         (ed) =>
           ed.data?.from.block_name !== node.name &&
-          ed.data?.to.block_name !== node.name
+          ed.data?.to.block_name !== node.name,
       ),
     }));
   }, []);
@@ -198,7 +194,7 @@ export const Builder = ({
     async (created: IBlockConfig) => {
       const sameBlockTypes = getAllBlockTypes(
         toPipelineConfig(flowState.nodes, flowState.edges),
-        created.type
+        created.type,
       );
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${created.type.toLowerCase()}_${nameNum}`;
@@ -207,7 +203,7 @@ export const Builder = ({
 
       const newBlock: INode = {
         id: name,
-        type: "custom",
+        type: 'custom',
         position: created.position ?? { x: 100, y: 100 },
         data: { ...created, name },
         selected: false,
@@ -218,14 +214,14 @@ export const Builder = ({
         nodes: [...state.nodes, newBlock],
       }));
     },
-    [flowState.nodes]
+    [flowState.nodes],
   );
 
   useEffect(() => {
     if (location.state?.reset) {
       navigate(
-        buildUrlWithParams(".", Object.fromEntries(searchParams.entries())),
-        { state: null }
+        buildUrlWithParams('.', Object.fromEntries(searchParams.entries())),
+        { state: null },
       );
 
       setFlowState({
@@ -267,10 +263,10 @@ export const Builder = ({
       <CustomNode
         {...props}
         onDelete={handleDelete}
-        disabled={type === "readOnly"}
+        disabled={type === 'readOnly'}
       />
     ),
-    [handleDelete]
+    [handleDelete],
   );
 
   const nodeTypes = useMemo(() => {
@@ -282,10 +278,10 @@ export const Builder = ({
       <CustomEdge
         {...props}
         onDelete={handleDeleteEdge}
-        disabled={type === "readOnly"}
+        disabled={type === 'readOnly'}
       />
     ),
-    [handleDeleteEdge, type]
+    [handleDeleteEdge, type],
   );
 
   const edgeTypes = useMemo(() => {
@@ -295,7 +291,7 @@ export const Builder = ({
   return (
     <div
       data-testid="workflow-builder"
-      className={classNames("relative pt-5 w-full", className)}
+      className={classNames('relative pt-5 w-full', className)}
       ref={reactFlowWrapper}
     >
       <RunPipelineProvider
@@ -307,11 +303,11 @@ export const Builder = ({
       >
         <ReactFlowProvider>
           <ReactFlow<INode, IEdge>
-            edgesUpdatable={type !== "readOnly"}
-            edgesFocusable={type !== "readOnly"}
-            nodesDraggable={type !== "readOnly"}
-            nodesConnectable={type !== "readOnly"}
-            nodesFocusable={type !== "readOnly"}
+            edgesUpdatable={type !== 'readOnly'}
+            edgesFocusable={type !== 'readOnly'}
+            nodesDraggable={type !== 'readOnly'}
+            nodesConnectable={type !== 'readOnly'}
+            nodesFocusable={type !== 'readOnly'}
             nodes={flowState.nodes}
             edges={flowState.edges}
             onMouseMove={onMouseMove}

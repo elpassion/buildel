@@ -1,22 +1,23 @@
-import { json, redirect } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
-import { validationError } from "remix-validated-form";
-import invariant from "tiny-invariant";
-import { CreateUpdateSecretSchema } from "~/api/secrets/secrets.contracts";
-import { SecretsApi } from "~/api/secrets/SecretsApi";
-import { requireLogin } from "~/session.server";
-import { assert } from "~/utils/assert";
-import { routes } from "~/utils/routes.utils";
-import { setServerToast } from "~/utils/toast.server";
-import { actionBuilder } from "~/utils.server";
-import type { ActionFunctionArgs} from "@remix-run/node";
+import { json, redirect } from '@remix-run/node';
+import type { ActionFunctionArgs } from '@remix-run/node';
+import { withZod } from '@remix-validated-form/with-zod';
+import { validationError } from 'remix-validated-form';
+import invariant from 'tiny-invariant';
+
+import { CreateUpdateSecretSchema } from '~/api/secrets/secrets.contracts';
+import { SecretsApi } from '~/api/secrets/SecretsApi';
+import { requireLogin } from '~/session.server';
+import { actionBuilder } from '~/utils.server';
+import { assert } from '~/utils/assert';
+import { routes } from '~/utils/routes.utils';
+import { setServerToast } from '~/utils/toast.server';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
     delete: async ({ params, request }, { fetch }) => {
       await requireLogin(request);
-      invariant(params.organizationId, "Missing organizationId");
-      const name = (await request.formData()).get("name");
+      invariant(params.organizationId, 'Missing organizationId');
+      const name = (await request.formData()).get('name');
 
       assert(name);
 
@@ -28,19 +29,19 @@ export async function action(actionArgs: ActionFunctionArgs) {
         {},
         {
           headers: {
-            "Set-Cookie": await setServerToast(request, {
+            'Set-Cookie': await setServerToast(request, {
               success: {
-                title: "Secret deleted",
+                title: 'Secret deleted',
                 description: `You've successfully deleted the secret`,
               },
             }),
           },
-        }
+        },
       );
     },
     put: async ({ params, request }, { fetch }) => {
       await requireLogin(request);
-      invariant(params.organizationId, "Missing organizationId");
+      invariant(params.organizationId, 'Missing organizationId');
 
       const validator = withZod(CreateUpdateSecretSchema);
 
@@ -54,9 +55,9 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       return redirect(routes.secrets(params.organizationId), {
         headers: {
-          "Set-Cookie": await setServerToast(request, {
+          'Set-Cookie': await setServerToast(request, {
             success: {
-              title: "Secret updated",
+              title: 'Secret updated',
               description: `You've successfully updated secret`,
             },
           }),

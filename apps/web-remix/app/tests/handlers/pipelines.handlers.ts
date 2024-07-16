@@ -1,19 +1,19 @@
-import { HttpResponse, http } from "msw";
+import { http, HttpResponse } from 'msw';
+
 import type {
-  IAliasResponse,
   IAliasesResponse,
+  IAliasResponse,
   IPipelineDetailsResponse,
   IPipelineResponse,
-  IPipelinesResponse} from "~/api/pipeline/pipeline.contracts";
-import {
-  PipelineDetailsResponse,
-} from "~/api/pipeline/pipeline.contracts";
-import type { IPipeline } from "~/components/pages/pipelines/pipeline.types";
-import { aliasFixture } from "~/tests/fixtures/alias.fixtures";
+  IPipelinesResponse,
+} from '~/api/pipeline/pipeline.contracts';
+import { PipelineDetailsResponse } from '~/api/pipeline/pipeline.contracts';
+import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
+import { aliasFixture } from '~/tests/fixtures/alias.fixtures';
 import {
   pipelineDetailsFixture,
   pipelineFixture,
-} from "~/tests/fixtures/pipeline.fixtures";
+} from '~/tests/fixtures/pipeline.fixtures';
 
 export class PipelineHandlers {
   private pipelines: Map<number, IPipeline> = new Map();
@@ -26,42 +26,42 @@ export class PipelineHandlers {
 
   getPipelinesHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines",
+      '/super-api/organizations/:organizationId/pipelines',
       () => {
         return HttpResponse.json<IPipelinesResponse>(
           {
             data: [...this.pipelines.values()],
           },
-          { status: 200 }
+          { status: 200 },
         );
-      }
+      },
     );
   }
 
   getPipelineDetails() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/details",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/details',
       () => {
         return HttpResponse.json<{ data: IPipelineDetailsResponse }>(
           { data: pipelineDetailsFixture() },
-          { status: 200 }
+          { status: 200 },
         );
-      }
+      },
     );
   }
 
   getPipelinesErrorHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines",
+      '/super-api/organizations/:organizationId/pipelines',
       () => {
         return HttpResponse.json<IPipelinesResponse>(null, { status: 500 });
-      }
+      },
     );
   }
 
   getPipelineHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId',
       ({ params }) => {
         const pipeline = this.pipelines.get(Number(params.pipelineId));
 
@@ -70,32 +70,32 @@ export class PipelineHandlers {
             {},
             {
               status: 404,
-            }
+            },
           );
         }
 
         return HttpResponse.json<{ data: IPipelineResponse }>(
           { data: pipeline },
-          { status: 200 }
+          { status: 200 },
         );
-      }
+      },
     );
   }
 
   getPipelineErrorHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId',
       () => {
         return HttpResponse.json<{ data: IPipelineResponse }>(null, {
           status: 500,
         });
-      }
+      },
     );
   }
 
   updateHandler() {
     return http.put<any, { pipeline: IPipeline }>(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId',
       async ({ request, params }) => {
         const data = await request.json();
         const pipelineId = Number(params.pipelineId);
@@ -107,7 +107,7 @@ export class PipelineHandlers {
             {},
             {
               status: 404,
-            }
+            },
           );
         }
 
@@ -116,22 +116,22 @@ export class PipelineHandlers {
         this.pipelines.set(pipelineId, updated);
 
         return HttpResponse.json({ data: updated }, { status: 200 });
-      }
+      },
     );
   }
 
   updateErrorHandler() {
     return http.put(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId',
       async () => {
         return HttpResponse.json(null, { status: 404 });
-      }
+      },
     );
   }
 
   deleteHandler() {
     return http.delete(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId',
       ({ params }) => {
         const { pipelineId } = params;
 
@@ -144,37 +144,37 @@ export class PipelineHandlers {
         this.pipelines.delete(id);
 
         return HttpResponse.json(null);
-      }
+      },
     );
   }
 
   deleteErrorHandler() {
     return http.delete(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId',
       () => {
         return HttpResponse.json(null, { status: 404 });
-      }
+      },
     );
   }
 
   createHandler() {
     return http.post(
-      "/super-api/organizations/:organizationId/pipelines",
+      '/super-api/organizations/:organizationId/pipelines',
       async () => {
         return HttpResponse.json(
           { data: pipelineFixture({ id: this.pipelines.size + 1 }) },
-          { status: 201 }
+          { status: 201 },
         );
-      }
+      },
     );
   }
 
   createErrorHandler() {
     return http.post(
-      "/super-api/organizations/:organizationId/pipelines",
+      '/super-api/organizations/:organizationId/pipelines',
       async () => {
         return HttpResponse.json(null, { status: 404 });
-      }
+      },
     );
   }
 
@@ -200,7 +200,7 @@ export class AliasHandlers {
 
     aliasFixture({
       id: 2,
-      name: "alias",
+      name: 'alias',
       config: {
         ...aliasFixture().config,
         blocks: [aliasFixture().config.blocks[0]],
@@ -211,7 +211,7 @@ export class AliasHandlers {
 
   updateHandler() {
     return http.patch<any, { alias: IAliasResponse }>(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId',
       async ({ request, params }) => {
         const data = await request.json();
         const aliasId = Number(params.aliasId);
@@ -223,7 +223,7 @@ export class AliasHandlers {
             {},
             {
               status: 404,
-            }
+            },
           );
         }
 
@@ -232,13 +232,13 @@ export class AliasHandlers {
         this.aliases.set(aliasId, updated);
 
         return HttpResponse.json({ data: updated }, { status: 200 });
-      }
+      },
     );
   }
 
   createHandler() {
     return http.post<any, { alias: IAliasResponse }>(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases',
       async ({ request }) => {
         const { alias } = await request.json();
 
@@ -250,15 +250,15 @@ export class AliasHandlers {
           { data: alias },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
   deleteHandler() {
     return http.delete(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId',
       async ({ params }) => {
         const { aliasId } = params;
 
@@ -268,15 +268,15 @@ export class AliasHandlers {
           {},
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
   getAliasHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases/:aliasId',
       ({ params }) => {
         const { aliasId } = params;
         const alias = this.aliases.get(Number(aliasId));
@@ -286,7 +286,7 @@ export class AliasHandlers {
             {},
             {
               status: 404,
-            }
+            },
           );
         }
 
@@ -294,15 +294,15 @@ export class AliasHandlers {
           { data: alias },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
   getAliasesHandler() {
     return http.get(
-      "/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases",
+      '/super-api/organizations/:organizationId/pipelines/:pipelineId/aliases',
       () => {
         return HttpResponse.json<{ data: IAliasesResponse }>(
           {
@@ -310,9 +310,9 @@ export class AliasHandlers {
           },
           {
             status: 200,
-          }
+          },
         );
-      }
+      },
     );
   }
 
@@ -334,13 +334,13 @@ export class AliasHandlers {
 export function pipelineFixtureWithUnfilledBlock() {
   return pipelineFixture({
     id: 555,
-    name: "empty-block",
+    name: 'empty-block',
     config: {
       ...pipelineFixture().config,
       connections: [],
       blocks: [
         {
-          name: "chat_123321",
+          name: 'chat_123321',
           opts: {},
           inputs: [],
           connections: [],
@@ -348,7 +348,7 @@ export function pipelineFixtureWithUnfilledBlock() {
             x: 327,
             y: -952,
           },
-          type: "chat",
+          type: 'chat',
         },
       ],
     },

@@ -1,6 +1,6 @@
-import React, { useContext } from "react";
-import { useField } from "remix-validated-form";
-import type { ValidationBehaviorOptions } from "remix-validated-form/browser/internal/getInputProps";
+import React, { useContext } from 'react';
+import { useField } from 'remix-validated-form';
+import type { ValidationBehaviorOptions } from 'remix-validated-form/browser/internal/getInputProps';
 
 export function Field({
   children,
@@ -36,10 +36,10 @@ interface UseFieldContextProps {
 export const useFieldContext = (args?: UseFieldContextProps) => {
   const context = useContext(FieldContext);
   if (!context)
-    throw new Error("You tried to use a field without using <Field />");
+    throw new Error('You tried to use a field without using <Field />');
 
   const fieldProps = useField(context.name, {
-    validationBehavior: args?.validationBehavior ?? { initial: "onSubmit" },
+    validationBehavior: args?.validationBehavior ?? { initial: 'onSubmit' },
   });
 
   return { ...context, ...fieldProps };

@@ -1,15 +1,16 @@
-import { Params } from "@remix-run/react";
-import { buildUrlWithParams } from "~/utils/url";
+import { Params } from '@remix-run/react';
+
+import { buildUrlWithParams } from '~/utils/url';
 
 type RouteParam = Record<string, string | number>;
 
 export const routes = {
-  dashboard: "/",
-  login: "/login",
-  register: "/register",
-  resetPassowrd: () => "/reset-password",
-  resetPasswordSent: () => "/reset-password/sent",
-  organizations: "/organizations",
+  dashboard: '/',
+  login: '/login',
+  register: '/register',
+  resetPassowrd: () => '/reset-password',
+  resetPasswordSent: () => '/reset-password/sent',
+  organizations: '/organizations',
   organization: (organizationId: OrganizationId) => `/${organizationId}`,
   newOrganization: () => `${routes.organizations}/new`,
   settings: (organizationId: OrganizationId) =>
@@ -221,7 +222,7 @@ export const routes = {
       organizationId,
       collectionName,
     )}/${encodeURIComponent(memoryId)}/chunks?file_name=${encodeURIComponent(
-      file_name || "",
+      file_name || '',
     )}`,
   collectionFilesNew: (
     organizationId: OrganizationId,

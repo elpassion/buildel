@@ -1,11 +1,13 @@
-import { Outlet, useLoaderData, useSearchParams } from "@remix-run/react";
-import { AppNavbar } from "~/components/navbar/AppNavbar";
-import { FilledTabLink } from "~/components/tabs/FilledTabLink";
-import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
-import { TabGroup } from "~/components/tabs/TabGroup";
-import { routes } from "~/utils/routes.utils";
-import { AliasSelect, CreateAliasForm, RestoreWorkflow } from "./Aliases";
-import type { loader } from "./loader.server";
+import { Outlet, useLoaderData, useSearchParams } from '@remix-run/react';
+
+import { AppNavbar } from '~/components/navbar/AppNavbar';
+import { FilledTabLink } from '~/components/tabs/FilledTabLink';
+import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
+import { TabGroup } from '~/components/tabs/TabGroup';
+import { routes } from '~/utils/routes.utils';
+
+import { AliasSelect, CreateAliasForm, RestoreWorkflow } from './Aliases';
+import type { loader } from './loader.server';
 
 export function PipelineLayout() {
   const { pipeline, aliases, aliasId } = useLoaderData<typeof loader>();
@@ -21,9 +23,9 @@ export function PipelineLayout() {
             <div className="flex gap-2 items-center">
               <AliasSelect aliases={aliases} value={aliasId} />
 
-              {aliasId !== "latest" && <RestoreWorkflow pipeline={pipeline} />}
+              {aliasId !== 'latest' && <RestoreWorkflow pipeline={pipeline} />}
 
-              {aliasId === "latest" && (
+              {aliasId === 'latest' && (
                 <CreateAliasForm pipeline={pipeline} aliases={aliases} />
               )}
             </div>
@@ -38,7 +40,7 @@ export function PipelineLayout() {
               to={routes.pipelineBuild(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams)
+                Object.fromEntries(searchParams),
               )}
             >
               Build
@@ -47,7 +49,7 @@ export function PipelineLayout() {
               to={routes.pipelineRuns(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams)
+                Object.fromEntries(searchParams),
               )}
             >
               Overview
@@ -56,7 +58,7 @@ export function PipelineLayout() {
               to={routes.pipelineInterface(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams)
+                Object.fromEntries(searchParams),
               )}
             >
               Interface
@@ -65,7 +67,7 @@ export function PipelineLayout() {
               to={routes.pipelineSettings(
                 pipeline.organization_id,
                 pipeline.id,
-                Object.fromEntries(searchParams)
+                Object.fromEntries(searchParams),
               )}
             >
               Settings

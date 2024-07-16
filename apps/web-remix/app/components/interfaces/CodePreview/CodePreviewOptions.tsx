@@ -1,13 +1,15 @@
-import React, { useMemo, useRef, useState } from "react";
-import { ClientOnly } from "remix-utils/client-only";
-import { useOnClickOutside } from "usehooks-ts";
-import { Icon } from "@elpassion/taco";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import type { EditorLanguage } from "~/components/editor/CodeMirror/CodeMirror";
-import { MenuClient } from "~/components/menu/Menu.client";
-import { MenuItem } from "~/components/menu/MenuItem";
-import { CodePreviewWrapper } from "./CodePreviewWrapper";
-import type { MenuInfo } from "rc-menu/es/interface";
+import React, { useMemo, useRef, useState } from 'react';
+import { Icon } from '@elpassion/taco';
+import type { MenuInfo } from 'rc-menu/es/interface';
+import { ClientOnly } from 'remix-utils/client-only';
+import { useOnClickOutside } from 'usehooks-ts';
+
+import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
+import type { EditorLanguage } from '~/components/editor/CodeMirror/CodeMirror';
+import { MenuClient } from '~/components/menu/Menu.client';
+import { MenuItem } from '~/components/menu/MenuItem';
+
+import { CodePreviewWrapper } from './CodePreviewWrapper';
 
 interface CodePreviewOptionsProps {
   options: {
@@ -45,8 +47,8 @@ export const CodePreviewOptions: React.FC<CodePreviewOptionsProps> = ({
 
   return (
     <CodePreviewWrapper
-      language={activeOption?.language ?? "tsx"}
-      value={activeOption?.value ?? ""}
+      language={activeOption?.language ?? 'tsx'}
+      value={activeOption?.value ?? ''}
       height={activeOption?.height ?? 60}
     >
       {() => (
@@ -80,7 +82,7 @@ export const CodePreviewOptions: React.FC<CodePreviewOptionsProps> = ({
             </button>
           </div>
 
-          <CopyCodeButton value={activeOption?.value ?? ""} />
+          <CopyCodeButton value={activeOption?.value ?? ''} />
         </>
       )}
     </CodePreviewWrapper>

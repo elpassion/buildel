@@ -1,23 +1,22 @@
-import React, { useCallback, useState } from "react";
-import { useFetcher, useLoaderData } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import z from "zod";
-import { UpdatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { EditorField } from "~/components/form/fields/editor.field";
-import { Field as FormField } from "~/components/form/fields/field.context";
-import type {
-  JSONSchemaField} from "~/components/form/schema/SchemaParser";
-import {
-  generateZODSchema
-} from "~/components/form/schema/SchemaParser";
-import { SubmitButton } from "~/components/form/submit";
-import type { IPipeline } from "~/components/pages/pipelines/pipeline.types";
-import { successToast } from "~/components/toasts/successToast";
-import { routes } from "~/utils/routes.utils";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+import React, { useCallback, useState } from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { useFetcher, useLoaderData } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+import z from 'zod';
+
+import { UpdatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
+import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
+import { EditorField } from '~/components/form/fields/editor.field';
+import { Field as FormField } from '~/components/form/fields/field.context';
+import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
+import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import { SubmitButton } from '~/components/form/submit';
+import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
+import { successToast } from '~/components/toasts/successToast';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
 
 const schema = z.object({
   configuration: z.string(),
@@ -33,17 +32,17 @@ export function SettingsConfigurationPage() {
   const handleUpdatePipeline = useCallback(
     (pipeline: IPipeline) => {
       updateFetcher.submit(pipeline, {
-        method: "PUT",
-        encType: "application/json",
-        action: routes.pipelineBuild(organizationId, pipelineId) + "?index",
+        method: 'PUT',
+        encType: 'application/json',
+        action: routes.pipelineBuild(organizationId, pipelineId) + '?index',
       });
     },
-    [updateFetcher]
+    [updateFetcher],
   );
 
   const handleOnSubmit = async (
     data: { configuration: string },
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
     setErrors({});
@@ -64,7 +63,7 @@ export function SettingsConfigurationPage() {
               organization_id: organizationId,
               pipeline_id: pipelineId,
               block_name: block.name,
-            }
+            },
           );
 
           const validator = withZod(schema);
@@ -74,7 +73,7 @@ export function SettingsConfigurationPage() {
             return validatedBlock.data;
           }
           return block;
-        })
+        }),
       )) as any[];
 
       result.data.config.blocks = result.data.config.blocks.map((block, i) => {
@@ -85,10 +84,10 @@ export function SettingsConfigurationPage() {
       });
 
       handleUpdatePipeline(result.data as IPipeline);
-      successToast({ description: "Configuration updated" });
+      successToast({ description: 'Configuration updated' });
     } catch (e) {
       console.log(e);
-      setErrors({ configuration: "Invalid JSON configuration" });
+      setErrors({ configuration: 'Invalid JSON configuration' });
     }
   };
 
@@ -146,7 +145,7 @@ export function SettingsConfigurationPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Configuration",
+      title: 'Configuration',
     },
   ];
 };

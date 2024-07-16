@@ -1,21 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { useLoaderData } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { v4 as uuidv4 } from "uuid";
-import z from "zod";
-import { EditorField } from "~/components/form/fields/editor.field";
-import { Field as FormField } from "~/components/form/fields/field.context";
-import { generateZODSchema } from "~/components/form/schema/SchemaParser";
-import { SubmitButton } from "~/components/form/submit";
-import type { loader } from "~/components/pages/pipelines/build/loader.server";
-import type { IBlockConfig } from "~/components/pages/pipelines/pipeline.types";
-import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider";
+import React, { useEffect, useState } from 'react';
+import { useLoaderData } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+import { v4 as uuidv4 } from 'uuid';
+import z from 'zod';
+
+import { EditorField } from '~/components/form/fields/editor.field';
+import { Field as FormField } from '~/components/form/fields/field.context';
+import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import { SubmitButton } from '~/components/form/submit';
+import type { loader } from '~/components/pages/pipelines/build/loader.server';
+import type { IBlockConfig } from '~/components/pages/pipelines/pipeline.types';
+import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
 import {
   ActionSidebar,
   ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
-import { usePasteConfig } from "./PasteBlockConfigProvider";
+} from '~/components/sidebar/ActionSidebar';
+
+import { usePasteConfig } from './PasteBlockConfigProvider';
 
 export function PasteBlockConfiguration({
   onSubmit,
@@ -49,7 +51,7 @@ export function PasteBlockConfiguration({
       <PasteBlockConfigurationForm
         key={formKey}
         onSubmit={handleOnSubmit}
-        disabled={runStatus !== "idle"}
+        disabled={runStatus !== 'idle'}
       />
     </ActionSidebar>
   );
@@ -74,7 +76,7 @@ export function PasteBlockConfigurationForm({
 
   const handleOnSubmit = async (
     data: { configuration: string },
-    e: React.FormEvent<HTMLFormElement>
+    e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
     setErrors({});
@@ -105,7 +107,7 @@ export function PasteBlockConfigurationForm({
 
       if (result.error) {
         return setErrors({
-          configuration: "There is an error in block configuration",
+          configuration: 'There is an error in block configuration',
         });
       }
 
@@ -113,7 +115,7 @@ export function PasteBlockConfigurationForm({
       e.currentTarget?.reset();
     } catch (e) {
       console.log(e);
-      setErrors({ configuration: "Invalid configuration" });
+      setErrors({ configuration: 'Invalid configuration' });
     }
   };
 

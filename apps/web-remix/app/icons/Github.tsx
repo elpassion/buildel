@@ -1,5 +1,6 @@
-import React from "react";
-import type { IconProps } from "~/icons/icons.types";
+import React from 'react';
+
+import type { IconProps } from '~/icons/icons.types';
 
 export const Github: React.FC<IconProps> = ({ className }) => {
   return (
@@ -10,7 +11,7 @@ export const Github: React.FC<IconProps> = ({ className }) => {
       version="1.1"
       viewBox="0 0 100 100"
       xmlnsXlink="http://www.w3.org/1999/xlink"
-      style={{ display: "block" }}
+      style={{ display: 'block' }}
       className={className}
     >
       <path

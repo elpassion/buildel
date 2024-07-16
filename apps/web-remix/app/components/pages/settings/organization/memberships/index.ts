@@ -1,1 +1,1 @@
-export { MembershipsPage as page } from "./page";
+export { MembershipsPage as page } from './page';

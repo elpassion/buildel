@@ -1,23 +1,25 @@
-import React from "react";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
 import {
   Link,
   Outlet,
   useLoaderData,
   useMatch,
   useNavigate,
-} from "@remix-run/react";
-import { Button } from "@elpassion/taco";
-import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
-import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
+} from '@remix-run/react';
+import { Button } from '@elpassion/taco';
+
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import {
   ActionSidebar,
   ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
-import { HelpfulIcon } from "~/components/tooltip/HelpfulIcon";
-import { routes } from "~/utils/routes.utils";
-import { SecretKeyList } from "./SecretKeyList";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/sidebar/ActionSidebar';
+import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
+import { SecretKeyList } from './SecretKeyList';
 
 export function SecretListPage() {
   const navigate = useNavigate();
@@ -78,7 +80,7 @@ export function SecretListPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Secrets",
+      title: 'Secrets',
     },
   ];
 };

@@ -1,31 +1,32 @@
-import React, { useMemo, useState } from "react";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import invariant from "tiny-invariant";
-import { z } from "zod";
-import type { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
-import { PipelineApi } from "~/api/pipeline/PipelineApi";
-import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
-import { Field } from "~/components/form/fields/field.context";
-import { SmallFileInputField } from "~/components/form/fields/file.field";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
+import React, { useMemo, useState } from 'react';
+import { json } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+import invariant from 'tiny-invariant';
+import { z } from 'zod';
+
+import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
+import { PipelineApi } from '~/api/pipeline/PipelineApi';
+import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
+import { Field } from '~/components/form/fields/field.context';
+import { SmallFileInputField } from '~/components/form/fields/file.field';
+import { TextInputField } from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
 import {
   NodeClearButton,
   NodeCopyButton,
   NodeDownloadButton,
-} from "~/components/pages/pipelines/CustomNodes/NodeActionButtons";
-import { UnauthorizedError } from "~/utils/errors";
-import type { ParsedResponse } from "~/utils/fetch.server";
-import { loaderBuilder } from "~/utils.server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+} from '~/components/pages/pipelines/CustomNodes/NodeActionButtons';
+import { loaderBuilder } from '~/utils.server';
+import { UnauthorizedError } from '~/utils/errors';
+import type { ParsedResponse } from '~/utils/fetch.server';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
-    invariant(params.organizationId, "organizationId not found");
-    invariant(params.pipelineId, "pipelineId not found");
+    invariant(params.organizationId, 'organizationId not found');
+    invariant(params.pipelineId, 'pipelineId not found');
 
     const pipelineApi = new PipelineApi(fetch);
 
@@ -39,7 +40,7 @@ export async function loader(args: LoaderFunctionArgs) {
     if (!pipeline) {
       pipeline = await pipelineApi.getPublicPipeline(
         params.organizationId,
-        params.pipelineId
+        params.pipelineId,
       );
     }
 
@@ -68,24 +69,24 @@ export default function WebsiteForm() {
     const inputs = Object.entries(data)
       .filter(([blockName, value]) => {
         if (!value) return false;
-        if (typeof value !== "string" && !files[blockName]) return false;
+        if (typeof value !== 'string' && !files[blockName]) return false;
         return true;
       })
       .map(([key, value]) => ({
         name: key,
-        input: "input",
+        input: 'input',
         value: value,
       }));
 
     const response = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs`,
       {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({}),
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
         },
-      }
+      },
     );
     const {
       data: { id },
@@ -98,21 +99,21 @@ export default function WebsiteForm() {
       formData.append(`initial_inputs[${index}][input_name]`, input.input);
       formData.append(
         `initial_inputs[${index}][data]`,
-        input.value as string | File
+        input.value as string | File,
       );
     });
 
     pipeline.interface_config.form.outputs.forEach((output, index) => {
       formData.append(`wait_for_outputs[${index}][block_name]`, output.name);
-      formData.append(`wait_for_outputs[${index}][output_name]`, "output");
+      formData.append(`wait_for_outputs[${index}][output_name]`, 'output');
     });
 
     const runResponse = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/start`,
       {
-        method: "POST",
+        method: 'POST',
         body: formData,
-      }
+      },
     );
 
     const runResponseData = await runResponse.json();
@@ -129,8 +130,8 @@ export default function WebsiteForm() {
     await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/stop`,
       {
-        method: "POST",
-      }
+        method: 'POST',
+      },
     );
   };
 
@@ -147,10 +148,10 @@ export default function WebsiteForm() {
             {pipeline.interface_config.form.inputs.map((input) => {
               return (
                 <Field name={input.name} key={input.name}>
-                  {input.type === "text_input" && (
+                  {input.type === 'text_input' && (
                     <TextInputField className="w-full" label={input.name} />
                   )}
-                  {input.type === "file_input" && (
+                  {input.type === 'file_input' && (
                     <div className="flex text-white justify-start items-center gap-2 bg-neutral-800 rounded-lg w-full">
                       <SmallFileInputField
                         multiple={false}
@@ -211,7 +212,7 @@ export function FormInterfaceOutput({
         <NodeClearButton onClear={() => {}} />
       </div>
       <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-        <ChatMarkdown>{payload ?? ""}</ChatMarkdown>
+        <ChatMarkdown>{payload ?? ''}</ChatMarkdown>
       </div>
     </div>
   );

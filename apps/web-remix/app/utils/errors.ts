@@ -2,7 +2,7 @@ export class ValidationError<T> extends Error {
   constructor(
     public readonly fieldErrors: {
       [P in allKeys<T>]: string;
-    }
+    },
   ) {
     super();
   }
@@ -10,19 +10,19 @@ export class ValidationError<T> extends Error {
 
 export class UnknownAPIError extends Error {
   constructor() {
-    super("Unknown API error");
+    super('Unknown API error');
   }
 }
 
 export class UnauthorizedError extends Error {
   constructor() {
-    super("Unauthorized");
+    super('Unauthorized');
   }
 }
 
 export class NotFoundError extends Error {
   constructor() {
-    super("Not found");
+    super('Not found');
   }
 }
 

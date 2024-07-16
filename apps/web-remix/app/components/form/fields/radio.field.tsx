@@ -1,11 +1,9 @@
-import React, { forwardRef, useEffect } from "react";
-import { useControlField } from "remix-validated-form";
-import { useFieldContext } from "~/components/form/fields/field.context";
-import type {
-  RadioInputProps} from "~/components/form/inputs/radio.input";
-import {
-  RadioInput
-} from "~/components/form/inputs/radio.input";
+import React, { forwardRef, useEffect } from 'react';
+import { useControlField } from 'remix-validated-form';
+
+import { useFieldContext } from '~/components/form/fields/field.context';
+import type { RadioInputProps } from '~/components/form/inputs/radio.input';
+import { RadioInput } from '~/components/form/inputs/radio.input';
 
 export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
   ({ defaultValue, onChange, ...props }, ref) => {
@@ -30,7 +28,7 @@ export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
     return (
       <RadioInput
         {...props}
-        {...getInputProps({ type: "radio", id: props.id })}
+        {...getInputProps({ type: 'radio', id: props.id })}
         ref={ref}
         checked={formValue === props.value}
         onChange={(e) => {
@@ -40,5 +38,5 @@ export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
         }}
       />
     );
-  }
+  },
 );

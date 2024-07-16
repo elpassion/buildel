@@ -1,14 +1,16 @@
-import * as React from "react";
-import { Link, useLoaderData } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Field, HiddenField } from "~/components/form/fields/field.context";
-import { FieldError } from "~/components/form/fields/field.error";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import { schema } from "./schema";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+import * as React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { Link, useLoaderData } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { FieldError } from '~/components/form/fields/field.error';
+import { TextInputField } from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
+
+import type { loader } from './loader.server';
+import { schema } from './schema';
 
 export function SetPasswordPage() {
   const validator = React.useMemo(() => withZod(schema), []);
@@ -17,13 +19,13 @@ export function SetPasswordPage() {
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
       <h1 className="text-center text-3xl font-bold text-neutral-100">
-        Set new password{" "}
+        Set new password{' '}
       </h1>
       <p className="text-center text-neutral-100">
         Go back to
         <Link
           to={{
-            pathname: "/login",
+            pathname: '/login',
           }}
           className="text-primary-500"
         >
@@ -68,7 +70,7 @@ export function SetPasswordPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Reset Password",
+      title: 'Reset Password',
     },
   ];
 };

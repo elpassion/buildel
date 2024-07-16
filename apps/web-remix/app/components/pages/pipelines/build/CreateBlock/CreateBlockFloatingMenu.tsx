@@ -1,17 +1,19 @@
-import React, { useMemo } from "react";
-import { useLoaderData } from "@remix-run/react";
-import startCase from "lodash.startcase";
-import { ClientOnly } from "remix-utils/client-only";
-import { MenuClient } from "~/components/menu/Menu.client";
+import React, { useMemo } from 'react';
+import { useLoaderData } from '@remix-run/react';
+import startCase from 'lodash.startcase';
+import { ClientOnly } from 'remix-utils/client-only';
+
+import { MenuClient } from '~/components/menu/Menu.client';
 import type {
   IBlockConfig,
   IBlockType,
   IBlockTypes,
-} from "~/components/pages/pipelines/pipeline.types";
-import { CreateBlockDraggableItem } from "./CreateBlockDraggableItem";
-import { GroupSubMenu } from "./GroupSubMenu";
-import { PasteConfigItem } from "./PasteConfigItem";
-import type { loader } from "../loader.server";
+} from '~/components/pages/pipelines/pipeline.types';
+
+import type { loader } from '../loader.server';
+import { CreateBlockDraggableItem } from './CreateBlockDraggableItem';
+import { GroupSubMenu } from './GroupSubMenu';
+import { PasteConfigItem } from './PasteConfigItem';
 
 interface CreateBlockFloatingMenuProps {
   onCreate: (node: IBlockConfig) => void;
@@ -24,17 +26,20 @@ export const CreateBlockFloatingMenu: React.FC<
 
   const blockGroups = useMemo(
     () =>
-      blockTypes.reduce((groups, blockType) => {
-        blockType.groups.forEach((group) => {
-          if (!groups[group]) {
-            groups[group] = [] as IBlockTypes;
-          }
-          groups[group].push(blockType as IBlockType);
-        });
+      blockTypes.reduce(
+        (groups, blockType) => {
+          blockType.groups.forEach((group) => {
+            if (!groups[group]) {
+              groups[group] = [] as IBlockTypes;
+            }
+            groups[group].push(blockType as IBlockType);
+          });
 
-        return groups;
-      }, {} as Record<string, IBlockTypes>),
-    [blockTypes]
+          return groups;
+        },
+        {} as Record<string, IBlockTypes>,
+      ),
+    [blockTypes],
   );
 
   const SubMenuItems = ({ group }: { group: string }) => {

@@ -1,9 +1,11 @@
-import type { ReactNode } from "react";
-import React from "react";
-import { ClientOnly } from "remix-utils/client-only";
-import { CodePreviewClient } from "./CodePreview.client";
-import type { CodePreviewProps } from "./CodePreview.client";
-interface CodePreviewWrapperProps extends Omit<CodePreviewProps, "children"> {
+import type { ReactNode } from 'react';
+import React from 'react';
+import { ClientOnly } from 'remix-utils/client-only';
+
+import { CodePreviewClient } from './CodePreview.client';
+import type { CodePreviewProps } from './CodePreview.client';
+
+interface CodePreviewWrapperProps extends Omit<CodePreviewProps, 'children'> {
   children?: (value: string) => ReactNode;
 }
 

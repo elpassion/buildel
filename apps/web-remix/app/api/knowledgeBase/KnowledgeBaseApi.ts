@@ -1,6 +1,9 @@
 import { z } from 'zod';
+
 import type { PaginationQueryParams } from '~/components/pagination/usePagination';
 import type { fetchTyped } from '~/utils/fetch.server';
+import { buildUrlWithParams } from '~/utils/url';
+
 import {
   KnowledgeBaseCollectionCostResponse,
   KnowledgeBaseCollectionFromListResponse,
@@ -13,7 +16,6 @@ import type {
   CreateCollectionSchema,
   UpdateCollectionSchema,
 } from './knowledgeApi.contracts';
-import { buildUrlWithParams } from '~/utils/url';
 
 type DateQueryParams = {
   start_date: string;

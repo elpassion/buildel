@@ -1,8 +1,15 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const IOType = z.object({
   name: z.string(),
-  type: z.enum(["audio", "text", "file", "file_temporary", "worker", "controller"]),
+  type: z.enum([
+    'audio',
+    'text',
+    'file',
+    'file_temporary',
+    'worker',
+    'controller',
+  ]),
   public: z.boolean(),
 });
 
@@ -68,7 +75,7 @@ export const UpdateBlockConfig = z.object({
         .default({
           reset: true,
         }),
-    })
+    }),
   ),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),

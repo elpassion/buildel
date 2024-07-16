@@ -1,1 +1,1 @@
-export { PipelineLayout as page } from "./page";
+export { PipelineLayout as page } from './page';

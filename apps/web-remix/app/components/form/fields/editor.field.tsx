@@ -1,19 +1,17 @@
-import type { PropsWithChildren, ReactNode } from "react";
-import React, { forwardRef } from "react";
-import classNames from "classnames";
-import { useControlField } from "remix-validated-form";
-import { useBoolean } from "usehooks-ts";
-import { Icon, InputText, Label } from "@elpassion/taco";
-import { Modal } from "@elpassion/taco/Modal";
+import type { PropsWithChildren, ReactNode } from 'react';
+import React, { forwardRef } from 'react';
+import { Icon, InputText, Label } from '@elpassion/taco';
+import { Modal } from '@elpassion/taco/Modal';
+import classNames from 'classnames';
+import { useControlField } from 'remix-validated-form';
+import { useBoolean } from 'usehooks-ts';
+
 import {
   HiddenField,
   useFieldContext,
-} from "~/components/form/fields/field.context";
-import type {
-  EditorInputProps} from "~/components/form/inputs/editor.input";
-import {
-  EditorInput,
-} from "~/components/form/inputs/editor.input";
+} from '~/components/form/fields/field.context';
+import type { EditorInputProps } from '~/components/form/inputs/editor.input';
+import { EditorInput } from '~/components/form/inputs/editor.input';
 
 type EditorFieldProps = Partial<
   EditorInputProps & {
@@ -43,7 +41,7 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
       onChange?.(v);
     };
 
-    const currentValue = value ?? defaultValue ?? "";
+    const currentValue = value ?? defaultValue ?? '';
 
     const currentError = propsError ?? error;
 
@@ -97,10 +95,10 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
         </div>
       </>
     );
-  }
+  },
 );
 
-interface MaximizedEditorProps extends Omit<EditorFieldProps, "onChange"> {
+interface MaximizedEditorProps extends Omit<EditorFieldProps, 'onChange'> {
   value?: string;
   isOpen: boolean;
   onChange: (value?: string) => void;
@@ -130,8 +128,8 @@ function MaximizedEditor({
           )}
         </header>
       }
-      closeButtonProps={{ iconName: "minimize-2", "aria-label": "Close" }}
-      className={classNames("max-w-[900px] w-full min-w-[300px] mx-2")}
+      closeButtonProps={{ iconName: 'minimize-2', 'aria-label': 'Close' }}
+      className={classNames('max-w-[900px] w-full min-w-[300px] mx-2')}
       onClose={close}
       isOpen={isOpen}
     >

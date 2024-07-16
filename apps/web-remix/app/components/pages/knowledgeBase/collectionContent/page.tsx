@@ -1,12 +1,20 @@
-import React from "react";
-import { Outlet, useLoaderData, useMatch, useNavigate, useSearchParams } from "@remix-run/react";
-import classNames from "classnames";
-import { Modal } from "@elpassion/taco/Modal";
-import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
-import { KnowledgeBaseFileList } from "./KnowledgeBaseFileList";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import {
+  Outlet,
+  useLoaderData,
+  useMatch,
+  useNavigate,
+  useSearchParams,
+} from '@remix-run/react';
+import { Modal } from '@elpassion/taco/Modal';
+import classNames from 'classnames';
+
+import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
+import { routes } from '~/utils/routes.utils';
+
+import { KnowledgeBaseFileList } from './KnowledgeBaseFileList';
+import type { loader } from './loader.server';
 
 export function KnowledgeBaseContentPage() {
   const { fileList, organizationId, collectionName } =
@@ -40,9 +48,11 @@ export function KnowledgeBaseContentPage() {
       <Modal
         isOpen={isDetails}
         header={
-          <h3 className="text-white font-medium text-xl">{searchParams.get("file_name")}</h3>
+          <h3 className="text-white font-medium text-xl">
+            {searchParams.get('file_name')}
+          </h3>
         }
-        closeButtonProps={{ iconName: "x", "aria-label": "Close" }}
+        closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
         onClose={handleClose}
         className="w-full max-w-3xl"
       >
@@ -52,8 +62,8 @@ export function KnowledgeBaseContentPage() {
       </Modal>
 
       <ActionSidebar
-        className={classNames("!bg-neutral-950", {
-          "md:w-[550px]": matchSearch,
+        className={classNames('!bg-neutral-950', {
+          'md:w-[550px]': matchSearch,
         })}
         isOpen={isSidebarOpen}
         onClose={handleClose}

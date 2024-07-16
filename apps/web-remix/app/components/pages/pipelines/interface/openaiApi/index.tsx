@@ -1,1 +1,1 @@
-export { OpenAIApiPage as page, meta } from "./page";
+export { OpenAIApiPage as page, meta } from './page';

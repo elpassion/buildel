@@ -1,17 +1,19 @@
-import React from "react";
-import { Link, useLoaderData } from "@remix-run/react";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
-import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { Link, useLoaderData } from '@remix-run/react';
+
+import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
+import { CodePreviewWrapper } from '~/components/interfaces/CodePreview/CodePreviewWrapper';
+import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
 import {
   InterfaceSectionHeader,
   InterfaceSectionHeaderParagraph,
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
-} from "~/components/interfaces/InterfaceSection";
-import { routes } from "~/utils/routes.utils";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/interfaces/InterfaceSection';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
 
 export function OpenAIApiPage() {
   const { organizationId, apiUrl } = useLoaderData<typeof loader>();
@@ -39,14 +41,14 @@ export function OpenAIApiPage() {
         <div className="p-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
           <div className="text-white text-sm">
             <p className="lg:mt-4 mb-2">
-              Ensure you replace the baseURL with our API's URL and include your{" "}
+              Ensure you replace the baseURL with our API's URL and include your{' '}
               <Link
                 to={routes.organizationSettings(organizationId)}
                 className="text-primary-500 hover:underline"
                 target="_blank"
               >
                 API key
-              </Link>{" "}
+              </Link>{' '}
               as the bearer token in the Authorization header.
             </p>
             <p>
@@ -87,7 +89,7 @@ console.log(completion.choices[0]);`}
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "OpenAI Api",
+      title: 'OpenAI Api',
     },
   ];
 };

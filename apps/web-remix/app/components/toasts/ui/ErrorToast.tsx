@@ -1,5 +1,6 @@
-import { Icon, SmallToast } from "@elpassion/taco";
-import type { ToastProps } from "../Toast.interface";
+import { Icon, SmallToast } from '@elpassion/taco';
+
+import type { ToastProps } from '../Toast.interface';
 
 export const ErrorToast = ({
   icon,

@@ -1,12 +1,13 @@
-import React, { useMemo } from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Button } from "@elpassion/taco";
-import { CreatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
-import { Field, HiddenField } from "~/components/form/fields/field.context";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import type { MetaFunction } from "@remix-run/node";
+import React, { useMemo } from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { Button } from '@elpassion/taco';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
+import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { TextInputField } from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
 
 export function NewPipelinePage() {
   const validator = useMemo(() => withZod(CreatePipelineSchema), []);
@@ -34,7 +35,7 @@ export function NewPipelinePage() {
 
         <HiddenField name="pipeline.config.connections" value="[]" />
 
-        <HiddenField name="pipeline.config.blocks" value={"[]"} />
+        <HiddenField name="pipeline.config.blocks" value={'[]'} />
       </div>
       <SubmitButton size="sm" hierarchy="primary">
         Create workflow
@@ -46,7 +47,7 @@ export function NewPipelinePage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "New Pipeline",
+      title: 'New Pipeline',
     },
   ];
 };

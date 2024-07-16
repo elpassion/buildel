@@ -1,10 +1,12 @@
-import { useCallback, useMemo } from "react";
-import { getBezierPath } from "@xyflow/react";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import { useRunPipelineEdge } from "../RunPipelineProvider";
-import type { EdgeProps} from "@xyflow/react";
-import "./customEdges.styles.css";
+import { useCallback, useMemo } from 'react';
+import { Icon } from '@elpassion/taco';
+import { getBezierPath } from '@xyflow/react';
+import type { EdgeProps } from '@xyflow/react';
+import classNames from 'classnames';
+
+import { useRunPipelineEdge } from '../RunPipelineProvider';
+
+import './customEdges.styles.css';
 
 export interface CustomEdgeProps extends EdgeProps {
   onDelete: (id: string) => void;
@@ -36,10 +38,10 @@ export function CustomEdge({
   });
 
   const statusStyles = useMemo(() => {
-    return status === "running"
+    return status === 'running'
       ? {
           strokeDasharray: 5,
-          animation: "dashdraw 0.2s linear infinite",
+          animation: 'dashdraw 0.2s linear infinite',
         }
       : {};
   }, [status]);
@@ -65,8 +67,8 @@ export function CustomEdge({
         onClick={handlePathClick}
         style={{
           ...style,
-          strokeWidth: "1",
-          stroke: selected ? "#DE8411" : "#ccc",
+          strokeWidth: '1',
+          stroke: selected ? '#DE8411' : '#ccc',
           ...statusStyles,
         }}
       />
@@ -90,13 +92,13 @@ export function CustomEdge({
         requiredExtensions="http://www.w3.org/1999/xhtml"
       >
         <button
-          disabled={status !== "idle" || disabled}
+          disabled={status !== 'idle' || disabled}
           onClick={handleDelete}
           className={classNames(
-            "absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-white text-xs flex justify-center items-center bg-red-700 w-4 h-4 rounded-full outline outline-3 outline-red-500/30",
+            'absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-white text-xs flex justify-center items-center bg-red-700 w-4 h-4 rounded-full outline outline-3 outline-red-500/30',
             {
-              "opacity-0": status !== "idle" || disabled,
-            }
+              'opacity-0': status !== 'idle' || disabled,
+            },
           )}
         >
           <Icon iconName="x" />

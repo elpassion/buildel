@@ -1,1 +1,1 @@
-export { CollectionSettingsPage as page, meta } from "./page";
+export { CollectionSettingsPage as page, meta } from './page';

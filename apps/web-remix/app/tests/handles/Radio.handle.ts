@@ -1,6 +1,7 @@
-import userEvent from "@testing-library/user-event";
-import { screen } from "../render";
-import type { Matcher } from "../render";
+import userEvent from '@testing-library/user-event';
+
+import { screen } from '../render';
+import type { Matcher } from '../render';
 
 export class RadioHandle {
   constructor(public readonly radioElement: HTMLInputElement) {}
@@ -10,11 +11,11 @@ export class RadioHandle {
   }
 
   static async fromRole(name?: string): Promise<RadioHandle> {
-    return new RadioHandle(await screen.findByRole("radio", { name }));
+    return new RadioHandle(await screen.findByRole('radio', { name }));
   }
 
   isDisabled(): boolean {
-    return this.radioElement.hasAttribute("disabled");
+    return this.radioElement.hasAttribute('disabled');
   }
 
   isChecked(): boolean {

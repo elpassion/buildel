@@ -1,16 +1,18 @@
-import React from "react";
-import { describe, test } from "vitest";
-import { action } from "~/components/pages/auth/login/action.server";
-import { loader } from "~/components/pages/auth/login/loader.server";
-import { LoginPage } from "~/components/pages/auth/login/page";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { InputHandle } from "~/tests/handles/Input.handle";
-import { act, render, screen, waitFor } from "~/tests/render";
-import { server } from "~/tests/server.mock";
-import { setupRoutes } from "~/tests/setup.tests";
-import type { RoutesProps} from "~/tests/setup.tests";
-import { errorHandlers, handlers } from "./login.handlers";
-import { handlers as registerHandlers } from "./register.handlers";
+import React from 'react';
+import { describe, test } from 'vitest';
+
+import { action } from '~/components/pages/auth/login/action.server';
+import { loader } from '~/components/pages/auth/login/loader.server';
+import { LoginPage } from '~/components/pages/auth/login/page';
+import { ButtonHandle } from '~/tests/handles/Button.handle';
+import { InputHandle } from '~/tests/handles/Input.handle';
+import { act, render, screen, waitFor } from '~/tests/render';
+import { server } from '~/tests/server.mock';
+import { setupRoutes } from '~/tests/setup.tests';
+import type { RoutesProps } from '~/tests/setup.tests';
+
+import { errorHandlers, handlers } from './login.handlers';
+import { handlers as registerHandlers } from './register.handlers';
 
 describe(LoginPage.name, () => {
   const setupServer = server([...handlers, ...registerHandlers]);
@@ -19,8 +21,8 @@ describe(LoginPage.name, () => {
   afterEach(() => setupServer.resetHandlers());
   afterAll(() => setupServer.close());
 
-  test("should sign in user correctly", async () => {
-    const page = new LoginObject().render({ initialEntries: ["/login"] });
+  test('should sign in user correctly', async () => {
+    const page = new LoginObject().render({ initialEntries: ['/login'] });
     await page.fillInputs();
 
     await page.submit();
@@ -28,18 +30,18 @@ describe(LoginPage.name, () => {
     await waitFor(() => screen.findByText(/Homepage/i));
   });
 
-  test("should display error if fields not filled in", async () => {
-    const page = new LoginObject().render({ initialEntries: ["/login"] });
+  test('should display error if fields not filled in', async () => {
+    const page = new LoginObject().render({ initialEntries: ['/login'] });
 
     await page.submit();
 
     await waitFor(() => screen.findByText(/Invalid email/i));
   });
 
-  test("should display validation errors", async () => {
+  test('should display validation errors', async () => {
     setupServer.use(...errorHandlers);
 
-    const page = new LoginObject().render({ initialEntries: ["/login"] });
+    const page = new LoginObject().render({ initialEntries: ['/login'] });
     await page.fillInputs();
 
     await page.submit();
@@ -47,9 +49,9 @@ describe(LoginPage.name, () => {
     await waitFor(() => screen.findByText(/Invalid username or password/i));
   });
 
-  test("should redirect user at correct url after signing in", async () => {
+  test('should redirect user at correct url after signing in', async () => {
     const page = new LoginObject().render({
-      initialEntries: ["/login?redirectTo=/organization/2"],
+      initialEntries: ['/login?redirectTo=/organization/2'],
     });
     await page.fillInputs();
 
@@ -63,17 +65,17 @@ class LoginObject {
   render(props?: RoutesProps) {
     const Routes = setupRoutes([
       {
-        path: "/login",
+        path: '/login',
         Component: LoginPage,
         action,
         loader,
       },
       {
-        path: "/",
+        path: '/',
         Component: () => <p>Homepage</p>,
       },
       {
-        path: "/organization/:organizationId",
+        path: '/organization/:organizationId',
         Component: () => <p>Organization</p>,
       },
     ]);
@@ -94,8 +96,8 @@ class LoginObject {
   async fillInputs() {
     const { emailInput, passwordInput } = await this.getElements();
 
-    await emailInput.type("test@gmail.com");
-    await passwordInput.type("password");
+    await emailInput.type('test@gmail.com');
+    await passwordInput.type('password');
 
     return this;
   }

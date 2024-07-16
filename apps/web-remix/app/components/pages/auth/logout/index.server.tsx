@@ -1,1 +1,1 @@
-export { action } from "./action.server";
+export { action } from './action.server';

@@ -1,18 +1,19 @@
-import { useCallback, useMemo } from "react";
-import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
-import { Icon } from "@elpassion/taco";
-import { IconButton } from "~/components/iconButton";
-import { confirm } from "~/components/modal/confirm";
-import type { IBlockConfig } from "~/components/pages/pipelines/pipeline.types";
-import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider";
-import { routes } from "~/utils/routes.utils";
+import { useCallback, useMemo } from 'react';
+import { useNavigate, useParams, useSearchParams } from '@remix-run/react';
+import { Icon } from '@elpassion/taco';
+
+import { IconButton } from '~/components/iconButton';
+import { confirm } from '~/components/modal/confirm';
+import type { IBlockConfig } from '~/components/pages/pipelines/pipeline.types';
+import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
+import { routes } from '~/utils/routes.utils';
+
 import {
   CustomNode,
   CustomNodeBody,
-  CustomNodeHeader
-} from "../CustomNodes/CustomNode";
-import type {
-  CustomNodeProps} from "../CustomNodes/CustomNode";
+  CustomNodeHeader,
+} from '../CustomNodes/CustomNode';
+import type { CustomNodeProps } from '../CustomNodes/CustomNode';
 
 export function BuilderNode(props: CustomNodeProps) {
   return (
@@ -64,11 +65,11 @@ function BuilderNodeHeaderActions({
   const handleEdit = useCallback(() => {
     navigate(
       routes.pipelineEditBlock(
-        organizationId ?? "",
-        pipelineId ?? "",
+        organizationId ?? '',
+        pipelineId ?? '',
         data.name,
-        Object.fromEntries(searchParams)
-      )
+        Object.fromEntries(searchParams),
+      ),
     );
   }, [data, searchParams]);
 
@@ -89,7 +90,7 @@ function BuilderNodeHeaderActions({
         icon={<Icon iconName="settings" />}
         aria-label={`Edit block: ${data.name}`}
         onClick={handleEdit}
-        disabled={runStatus !== "idle"}
+        disabled={runStatus !== 'idle'}
       />
 
       <IconButton
@@ -97,7 +98,7 @@ function BuilderNodeHeaderActions({
         aria-label={`Delete block: ${data.name}`}
         icon={<Icon iconName="trash" />}
         onClick={handleDelete}
-        disabled={runStatus !== "idle" || disabled}
+        disabled={runStatus !== 'idle' || disabled}
       />
     </div>
   );

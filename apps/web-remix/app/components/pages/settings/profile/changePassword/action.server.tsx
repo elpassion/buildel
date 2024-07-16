@@ -1,14 +1,16 @@
 import { json, redirect } from '@remix-run/node';
+import type { ActionFunctionArgs } from '@remix-run/node';
 import { withZod } from '@remix-validated-form/with-zod';
 import { validationError } from 'remix-validated-form';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
+
 import { requireLogin } from '~/session.server';
+import { actionBuilder } from '~/utils.server';
 import { routes } from '~/utils/routes.utils';
 import { setServerToast } from '~/utils/toast.server';
-import { actionBuilder } from '~/utils.server';
+
 import { changePasswordSchema } from './schema';
-import type { ActionFunctionArgs } from '@remix-run/node';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

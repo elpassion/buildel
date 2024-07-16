@@ -1,9 +1,10 @@
+import type { z } from 'zod';
+
 import type {
   APIKey,
   Membership,
   Organization,
-} from "~/api/organization/organization.contracts";
-import type { z } from "zod";
+} from '~/api/organization/organization.contracts';
 
 export type IAPIKey = z.TypeOf<typeof APIKey>;
 

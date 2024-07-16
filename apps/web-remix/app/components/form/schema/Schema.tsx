@@ -1,5 +1,6 @@
-import { assert } from "~/utils/assert";
-import type { JSONSchemaField } from "./SchemaParser";
+import { assert } from '~/utils/assert';
+
+import type { JSONSchemaField } from './SchemaParser';
 
 export function Schema({
   schema,
@@ -18,13 +19,13 @@ export function Schema({
     asyncCreatableSelect: React.FC<FieldProps>;
   };
 }) {
-  assert(schema.type === "object");
+  assert(schema.type === 'object');
 
   return <Field field={schema} name={name} schema={schema} fields={fields} />;
 }
 
 export function Field({ field, name, schema, fields }: FieldProps) {
-  if (field.type === "string") {
+  if (field.type === 'string') {
     return (
       <fields.string
         field={field}
@@ -34,7 +35,7 @@ export function Field({ field, name, schema, fields }: FieldProps) {
       />
     );
   }
-  if (field.type === "number" || field.type === "integer") {
+  if (field.type === 'number' || field.type === 'integer') {
     return (
       <fields.number
         field={field}
@@ -43,10 +44,10 @@ export function Field({ field, name, schema, fields }: FieldProps) {
         fields={fields}
       />
     );
-  } else if (field.type === "object") {
+  } else if (field.type === 'object') {
     return Object.entries(field.properties).map(([propertyKey, value]) => {
       const fieldKey =
-        name === null || name === "" ? propertyKey : `${name}.${propertyKey}`;
+        name === null || name === '' ? propertyKey : `${name}.${propertyKey}`;
 
       return (
         <div key={fieldKey}>
@@ -59,7 +60,7 @@ export function Field({ field, name, schema, fields }: FieldProps) {
         </div>
       );
     });
-  } else if (field.type === "boolean") {
+  } else if (field.type === 'boolean') {
     return (
       <fields.boolean
         field={field}
@@ -68,12 +69,12 @@ export function Field({ field, name, schema, fields }: FieldProps) {
         fields={fields}
       />
     );
-  } else if (field.type === "array") {
+  } else if (field.type === 'array') {
     return (
       <fields.array field={field} name={name} schema={schema} fields={fields} />
     );
   }
-  console.warn("Unknown field type", field);
+  console.warn('Unknown field type', field);
   return null;
 }
 

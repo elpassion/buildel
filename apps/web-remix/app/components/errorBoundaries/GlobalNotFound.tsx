@@ -1,7 +1,8 @@
-import React from "react";
-import { Link } from "@remix-run/react";
-import { routes } from "~/utils/routes.utils";
-import type { ErrorResponse } from "@remix-run/node";
+import React from 'react';
+import type { ErrorResponse } from '@remix-run/node';
+import { Link } from '@remix-run/react';
+
+import { routes } from '~/utils/routes.utils';
 
 interface GlobalNotFoundProps {
   error: ErrorResponse;

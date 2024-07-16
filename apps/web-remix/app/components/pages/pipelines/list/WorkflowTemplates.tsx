@@ -1,17 +1,15 @@
-import type { PropsWithChildren, ReactNode } from "react";
-import React, { useMemo } from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import classNames from "classnames";
-import { ValidatedForm } from "remix-validated-form";
-import { Icon } from "@elpassion/taco";
-import type {
-  IWorkflowTemplate} from "~/api/organization/organization.contracts";
-import {
-  CreateFromTemplateSchema
-} from "~/api/organization/organization.contracts";
-import { HiddenField } from "~/components/form/fields/field.context";
-import { SubmitButton } from "~/components/form/submit";
-import { ItemList } from "~/components/list/ItemList";
+import type { PropsWithChildren, ReactNode } from 'react';
+import React, { useMemo } from 'react';
+import { Icon } from '@elpassion/taco';
+import { withZod } from '@remix-validated-form/with-zod';
+import classNames from 'classnames';
+import { ValidatedForm } from 'remix-validated-form';
+
+import type { IWorkflowTemplate } from '~/api/organization/organization.contracts';
+import { CreateFromTemplateSchema } from '~/api/organization/organization.contracts';
+import { HiddenField } from '~/components/form/fields/field.context';
+import { SubmitButton } from '~/components/form/submit';
+import { ItemList } from '~/components/list/ItemList';
 
 interface WorkflowTemplatesProps extends PropsWithChildren {
   className?: string;
@@ -24,8 +22,8 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = ({
   return (
     <article
       className={classNames(
-        "flex-grow bg-neutral-900 p-4 text-white rounded-lg",
-        className
+        'flex-grow bg-neutral-900 p-4 text-white rounded-lg',
+        className,
       )}
     >
       {children}
@@ -43,7 +41,7 @@ export function WorkflowTemplatesList({
 }: WorkflowTemplatesListProps) {
   const formattedTemplates = useMemo(
     () => items.map((template) => ({ ...template, id: template.name })),
-    []
+    [],
   );
   return (
     <ItemList
@@ -106,7 +104,7 @@ export function WorkflowTemplatesHeader({
   subheading,
 }: WorkflowTemplatesHeaderProps) {
   return (
-    <header className={classNames("text-white mb-4 flex flex-col", className)}>
+    <header className={classNames('text-white mb-4 flex flex-col', className)}>
       <h3 className="text-lg font-medium">{heading}</h3>
       <p className="text-xs">{subheading}</p>
     </header>

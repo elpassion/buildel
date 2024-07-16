@@ -1,8 +1,8 @@
-import { isNotNil } from "~/utils/guards";
+import { isNotNil } from '~/utils/guards';
 
 export function buildUrlWithParams(
   baseUrl: string,
-  params?: Record<string, string | number | undefined>
+  params?: Record<string, string | number | undefined>,
 ) {
   let url = baseUrl;
 
@@ -12,12 +12,12 @@ export function buildUrlWithParams(
     .filter(([, value]) => isNotNil(value))
     .map(
       ([key, value]) =>
-        `${encodeURIComponent(key)}=${encodeURIComponent(value!)}`
+        `${encodeURIComponent(key)}=${encodeURIComponent(value!)}`,
     )
-    .join("&");
+    .join('&');
 
   if (queryString.length > 0) {
-    url += (baseUrl.includes("?") ? "&" : "?") + queryString;
+    url += (baseUrl.includes('?') ? '&' : '?') + queryString;
   }
 
   return url;

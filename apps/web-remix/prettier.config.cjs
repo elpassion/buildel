@@ -1,17 +1,23 @@
 const path = require('path');
 
+/** @type {import("prettier").Config} */
 module.exports = {
   ...require(path.resolve(__dirname, '../../prettier.config.base.cjs')),
   plugins: [
-    ...require(path.resolve(__dirname, '../../prettier.config.base.cjs')).plugins || [],
     "@ianvs/prettier-plugin-sort-imports"
   ],
   importOrder: [
-    '<BUILTIN_MODULES>',
+    '^react$',
+    '^react(.*)$',
+    '^@remix-run/(.*)$',
     '<THIRD_PARTY_MODULES>',
-    '^[.]',
+    '<BUILTIN_MODULES>',
+    '',
+    '^@/(.*)$',
+    '^~/(.*)$',
+    '',
+    '^[./]',
+    '',
+    "^(?!.*[.]css$)[./].*$", ".css$"
   ],
-  importOrderSeparation: true,
-  importOrderSortSpecifiers: true,
-
 };

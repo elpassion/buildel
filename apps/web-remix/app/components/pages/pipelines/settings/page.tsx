@@ -1,27 +1,29 @@
-import React from "react";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
 import {
   Outlet,
   useLoaderData,
   useMatch,
   useNavigate,
   useSearchParams,
-} from "@remix-run/react";
-import { BasicLink } from "~/components/link/BasicLink";
-import { OrganizationAvatar } from "~/components/pages/settings/organization/AboutOrganization";
+} from '@remix-run/react';
+
+import { BasicLink } from '~/components/link/BasicLink';
+import { OrganizationAvatar } from '~/components/pages/settings/organization/AboutOrganization';
 import {
   Section,
   SectionContent,
   SectionHeading,
-} from "~/components/pages/settings/settingsLayout/PageLayout";
+} from '~/components/pages/settings/settingsLayout/PageLayout';
 import {
   ActionSidebar,
   ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
-import { EditPipelineNameForm } from "./EditPipelineNameForm";
-import { EditPipelineSettingsForm } from "./EditPipelineSettingsForm";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/sidebar/ActionSidebar';
+import { routes } from '~/utils/routes.utils';
+
+import { EditPipelineNameForm } from './EditPipelineNameForm';
+import { EditPipelineSettingsForm } from './EditPipelineSettingsForm';
+import type { loader } from './loader.server';
 
 export function SettingsPage() {
   const { pipeline, organizationId, pipelineId } =
@@ -30,7 +32,7 @@ export function SettingsPage() {
 
   const navigate = useNavigate();
   const match = useMatch(
-    routes.pipelineSettingsConfiguration(organizationId, pipelineId)
+    routes.pipelineSettingsConfiguration(organizationId, pipelineId),
   );
   const isSidebarOpen = !!match;
 
@@ -39,8 +41,8 @@ export function SettingsPage() {
       routes.pipelineSettings(
         organizationId,
         pipelineId,
-        Object.fromEntries(searchParams.entries())
-      )
+        Object.fromEntries(searchParams.entries()),
+      ),
     );
   };
 
@@ -54,7 +56,7 @@ export function SettingsPage() {
             to={routes.pipelineSettingsConfiguration(
               organizationId,
               pipelineId,
-              Object.fromEntries(searchParams.entries())
+              Object.fromEntries(searchParams.entries()),
             )}
           >
             Workflow configuration
@@ -94,7 +96,7 @@ export function SettingsPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Settings",
+      title: 'Settings',
     },
   ];
 };

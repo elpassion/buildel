@@ -1,27 +1,29 @@
-import * as React from "react";
-import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Field, HiddenField } from "~/components/form/fields/field.context";
-import { FieldError } from "~/components/form/fields/field.error";
+import * as React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { Form, Link, useLoaderData, useSearchParams } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { FieldError } from '~/components/form/fields/field.error';
 import {
   PasswordInputField,
   TextInputField,
-} from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import { GithubButton } from "~/components/githubAuth/GithubButton";
-import { GoogleButton } from "~/components/googleAuth/GoogleButton";
-import { SocialSignInForm } from "~/components/socialAuth/SocialSignInForm";
-import { routes } from "~/utils/routes.utils";
-import { schema } from "./schema";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
+import { GithubButton } from '~/components/githubAuth/GithubButton';
+import { GoogleButton } from '~/components/googleAuth/GoogleButton';
+import { SocialSignInForm } from '~/components/socialAuth/SocialSignInForm';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
+import { schema } from './schema';
 
 export function LoginPage() {
   const { googleLoginEnabled, signupEnabled } = useLoaderData<typeof loader>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo");
+  const redirectTo = searchParams.get('redirectTo');
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
@@ -30,16 +32,16 @@ export function LoginPage() {
       </h1>
       {signupEnabled && (
         <p className="text-center text-neutral-100">
-          Don't have an account?{" "}
+          Don't have an account?{' '}
           <Link
             to={{
-              pathname: "/register",
+              pathname: '/register',
               search: searchParams.toString(),
             }}
             className="text-primary-500"
           >
             Sign up
-          </Link>{" "}
+          </Link>{' '}
           for an account now.
         </p>
       )}
@@ -93,7 +95,7 @@ export function LoginPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Login",
+      title: 'Login',
     },
   ];
 };

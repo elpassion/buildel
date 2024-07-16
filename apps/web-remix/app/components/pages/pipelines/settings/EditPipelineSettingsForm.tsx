@@ -1,19 +1,18 @@
-import React, { useCallback, useEffect, useMemo } from "react";
-import { useFetcher } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Field } from "~/components/form/fields/field.context";
-import { SubmitButton } from "~/components/form/submit";
-import type { IPipeline } from "~/components/pages/pipelines/pipeline.types";
-import { successToast } from "~/components/toasts/successToast";
-import { routes } from "~/utils/routes.utils";
-import { BudgetLimitField } from "./BudgetLimitField";
-import { LogsToggleField } from "./LogsToggleField";
-import {
-  updatePipelineSettingsSchema,
-} from "./schema";
-import type {
-  UpdatePipelineSettingsSchema} from "./schema";
+import React, { useCallback, useEffect, useMemo } from 'react';
+import { useFetcher } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { Field } from '~/components/form/fields/field.context';
+import { SubmitButton } from '~/components/form/submit';
+import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
+import { successToast } from '~/components/toasts/successToast';
+import { routes } from '~/utils/routes.utils';
+
+import { BudgetLimitField } from './BudgetLimitField';
+import { LogsToggleField } from './LogsToggleField';
+import { updatePipelineSettingsSchema } from './schema';
+import type { UpdatePipelineSettingsSchema } from './schema';
 
 interface EditPipelineSettingsFormProps {
   defaultValues: IPipeline;
@@ -27,7 +26,7 @@ export function EditPipelineSettingsForm({
   const handleOnSubmit = useCallback(
     (
       data: UpdatePipelineSettingsSchema,
-      e: React.FormEvent<HTMLFormElement>
+      e: React.FormEvent<HTMLFormElement>,
     ) => {
       e.preventDefault();
 
@@ -38,19 +37,19 @@ export function EditPipelineSettingsForm({
       };
 
       updateFetcher.submit(pipeline, {
-        method: "PUT",
-        encType: "application/json",
+        method: 'PUT',
+        encType: 'application/json',
         action:
           routes.pipelineBuild(pipeline.organization_id, pipeline.id) +
-          "?index",
+          '?index',
       });
     },
-    [defaultValues]
+    [defaultValues],
   );
 
   useEffect(() => {
     if (updateFetcher.data) {
-      successToast({ description: "Workflow settings have been changed" });
+      successToast({ description: 'Workflow settings have been changed' });
     }
   }, [updateFetcher.data]);
 

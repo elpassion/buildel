@@ -1,1 +1,1 @@
-export { AcceptPage as page, meta } from "./page";
+export { AcceptPage as page, meta } from './page';

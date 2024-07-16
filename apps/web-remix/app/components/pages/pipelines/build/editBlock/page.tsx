@@ -1,28 +1,30 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
+import type { MetaFunction } from '@remix-run/node';
 import {
   useFetcher,
   useLoaderData,
   useNavigate,
   useSearchParams,
-} from "@remix-run/react";
+} from '@remix-run/react';
+
 import type {
   IBlockConfig,
   IConfigConnection,
   INode,
   IPipeline,
-} from "~/components/pages/pipelines/pipeline.types";
+} from '~/components/pages/pipelines/pipeline.types';
 import {
   getEdges,
   getNodes,
   reverseToolConnections,
   toPipelineConfig,
-} from "~/components/pages/pipelines/PipelineFlow.utils";
-import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
-import { BlockInputList } from "./BlockInputList";
-import { EditBlockForm } from "./EditBlockForm";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/pages/pipelines/PipelineFlow.utils';
+import { ActionSidebarHeader } from '~/components/sidebar/ActionSidebar';
+import { routes } from '~/utils/routes.utils';
+
+import { BlockInputList } from './BlockInputList';
+import { EditBlockForm } from './EditBlockForm';
+import type { loader } from './loader.server';
 
 type IExtendedBlockConfig = IBlockConfig & { oldName: string };
 
@@ -41,19 +43,19 @@ export function EditBlockPage() {
       routes.pipelineBuild(
         organizationId,
         pipelineId,
-        Object.fromEntries(searchParams.entries())
+        Object.fromEntries(searchParams.entries()),
       ),
-      { state: { reset: true } }
+      { state: { reset: true } },
     );
   };
 
   const handleSubmit = (
     updatedBlock: IExtendedBlockConfig,
-    connections: IConfigConnection[]
+    connections: IConfigConnection[],
   ) => {
     const updatedNodes = nodes.map((node) => updateNode(node, updatedBlock));
     const updatedConnections = connections.map((connection) =>
-      updateConnection(connection, updatedBlock)
+      updateConnection(connection, updatedBlock),
     );
 
     updateFetcher.submit(
@@ -65,10 +67,10 @@ export function EditBlockPage() {
         },
       },
       {
-        method: "PUT",
-        encType: "application/json",
+        method: 'PUT',
+        encType: 'application/json',
         action: routes.pipelineBuild(pipeline.organization_id, pipeline.id),
-      }
+      },
     );
   };
 
@@ -97,7 +99,7 @@ export function EditBlockPage() {
         <BlockInputList
           connections={[
             ...pipeline.config.connections.filter(
-              (connection) => connection.to.block_name === block.name
+              (connection) => connection.to.block_name === block.name,
             ),
             ...reverseToolConnections(pipeline.config.connections, block.name),
           ]}
@@ -110,14 +112,14 @@ export function EditBlockPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Block",
+      title: 'Block',
     },
   ];
 };
 
 function updateConnectionEnd<T>(
   end: { block_name: string } & T,
-  updated: IExtendedBlockConfig
+  updated: IExtendedBlockConfig,
 ) {
   return {
     ...end,
@@ -128,7 +130,7 @@ function updateConnectionEnd<T>(
 
 function updateConnection(
   connection: IConfigConnection,
-  updated: IExtendedBlockConfig
+  updated: IExtendedBlockConfig,
 ) {
   return {
     ...connection,

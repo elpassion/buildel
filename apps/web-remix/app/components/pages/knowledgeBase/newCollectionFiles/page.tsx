@@ -1,20 +1,22 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import type { MetaFunction } from '@remix-run/node';
 import {
   Form,
   useLoaderData,
   useNavigate,
   useRevalidator,
-} from "@remix-run/react";
-import { Button } from "@elpassion/taco";
-import { FileUpload } from "~/components/fileUpload/FileUpload";
-import type { IFileUpload } from "~/components/fileUpload/fileUpload.types";
-import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
-import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
-import { errorToast } from "~/components/toasts/errorToast";
-import { loadingToast } from "~/components/toasts/loadingToast";
-import { routes } from "~/utils/routes.utils";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '@remix-run/react';
+import { Button } from '@elpassion/taco';
+
+import { FileUpload } from '~/components/fileUpload/FileUpload';
+import type { IFileUpload } from '~/components/fileUpload/fileUpload.types';
+import { FileUploadListPreview } from '~/components/fileUpload/FileUploadListPreview';
+import { ActionSidebarHeader } from '~/components/sidebar/ActionSidebar';
+import { errorToast } from '~/components/toasts/errorToast';
+import { loadingToast } from '~/components/toasts/loadingToast';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
 
 type IExtendedFileUpload = IFileUpload & { file: File };
 export function NewCollectionFilesPage() {
@@ -25,7 +27,7 @@ export function NewCollectionFilesPage() {
   const [items, setItems] = useState<IExtendedFileUpload[]>([]);
 
   const isUploading = items.some(
-    (fileUpload) => fileUpload.status === "uploading",
+    (fileUpload) => fileUpload.status === 'uploading',
   );
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -38,7 +40,7 @@ export function NewCollectionFilesPage() {
         file_name: file.name,
         file_size: file.size,
         file_type: file.type,
-        status: "done",
+        status: 'done',
         file,
       };
     });
@@ -51,7 +53,7 @@ export function NewCollectionFilesPage() {
 
   const handleUpdateStatus = (
     id: number | string,
-    status: "done" | "error" | "uploading",
+    status: 'done' | 'error' | 'uploading',
   ) => {
     setItems((prev) =>
       prev.map((fileUpload) => {
@@ -67,22 +69,22 @@ export function NewCollectionFilesPage() {
   const handleUploadFile = async (fileUpload: IExtendedFileUpload) => {
     async function createFile(fileUpload: IExtendedFileUpload) {
       const formData = new FormData();
-      formData.append("file", fileUpload.file);
-      formData.append("collection_name", collectionName);
+      formData.append('file', fileUpload.file);
+      formData.append('collection_name', collectionName);
 
-      handleUpdateStatus(fileUpload.id, "uploading");
+      handleUpdateStatus(fileUpload.id, 'uploading');
 
       const res = await fetch(
         `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/files`,
         {
           body: formData,
-          method: "POST",
+          method: 'POST',
         },
       );
 
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body?.errors?.detail ?? "Something went wrong!");
+        throw new Error(body?.errors?.detail ?? 'Something went wrong!');
       }
 
       return res.json();
@@ -95,16 +97,16 @@ export function NewCollectionFilesPage() {
 
       if (!res.ok) {
         const body = await res.json();
-        errorToast("Something went wrong!");
-        handleUpdateStatus(fileUpload.id, "error");
-        throw new Error(body?.errors?.detail ?? "Something went wrong!");
+        errorToast('Something went wrong!');
+        handleUpdateStatus(fileUpload.id, 'error');
+        throw new Error(body?.errors?.detail ?? 'Something went wrong!');
       }
 
       const data = await res.json();
 
-      if (data.data.status === "success") {
+      if (data.data.status === 'success') {
         return data;
-      } else if (data.data.status === "error") {
+      } else if (data.data.status === 'error') {
         throw new Error();
       } else {
         return new Promise((resolve, reject) => {
@@ -120,18 +122,18 @@ export function NewCollectionFilesPage() {
         `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
         {
           headers: {
-            "content-type": "application/json",
+            'content-type': 'application/json',
           },
           body: JSON.stringify({
             file_id: fileId,
           }),
-          method: "POST",
+          method: 'POST',
         },
       );
 
       if (!res.ok) {
         const body = await res.json();
-        throw new Error(body?.errors?.detail ?? "Something went wrong!");
+        throw new Error(body?.errors?.detail ?? 'Something went wrong!');
       }
     }
 
@@ -141,45 +143,52 @@ export function NewCollectionFilesPage() {
       } = await createFile(fileUpload);
       await refreshFileStatus(fileId);
       await createMemory(fileId);
-      handleUpdateStatus(fileUpload.id, "done");
+      handleUpdateStatus(fileUpload.id, 'done');
       revalidator.revalidate();
       removeFile(fileUpload.id);
     } catch (e) {
-      handleUpdateStatus(fileUpload.id, "error");
+      handleUpdateStatus(fileUpload.id, 'error');
       throw e;
     }
   };
 
   const handleUploadFiles = async () => {
-    loadingToast(async () => {
-      const results = await Promise.allSettled(items.map(handleUploadFile))
+    loadingToast(
+      async () => {
+        const results = await Promise.allSettled(items.map(handleUploadFile));
 
-      const successCount = results.filter(result => result.status === "fulfilled").length;
-      const errorCount = results.filter(result => result.status === "rejected").length;
+        const successCount = results.filter(
+          (result) => result.status === 'fulfilled',
+        ).length;
+        const errorCount = results.filter(
+          (result) => result.status === 'rejected',
+        ).length;
 
-      if (errorCount === 0) {
-        return Promise.resolve({
-          title: "Files processed successfully",
-          description: `You can now view the files in the collection.`,
-        });
-      } else if (successCount === 0) {
-        return Promise.reject({
-          title: "Files processing failed",
-          description: "Please try again later.",
-        });
-      } else {
-        return Promise.resolve({
-          title: "Partial success",
-          description: `${successCount} file(s) processed successfully, ${errorCount} file(s) failed.`,
-          backgroundColor: "bg-yellow-500",
-        });
-      }
-    }, {
-      loading: {
-        title: "Files are still processing...",
-        description: "Please do not close or refresh the app.",
-      }
-    });
+        if (errorCount === 0) {
+          return Promise.resolve({
+            title: 'Files processed successfully',
+            description: `You can now view the files in the collection.`,
+          });
+        } else if (successCount === 0) {
+          return Promise.reject({
+            title: 'Files processing failed',
+            description: 'Please try again later.',
+          });
+        } else {
+          return Promise.resolve({
+            title: 'Partial success',
+            description: `${successCount} file(s) processed successfully, ${errorCount} file(s) failed.`,
+            backgroundColor: 'bg-yellow-500',
+          });
+        }
+      },
+      {
+        loading: {
+          title: 'Files are still processing...',
+          description: 'Please do not close or refresh the app.',
+        },
+      },
+    );
   };
 
   const handleClose = () => {
@@ -217,7 +226,7 @@ export function NewCollectionFilesPage() {
           onClick={handleUploadFiles}
           isLoading={isUploading}
         >
-          Add {items.length > 0 ? items.length : ""} knowledge items
+          Add {items.length > 0 ? items.length : ''} knowledge items
         </Button>
       </Form>
     </>
@@ -227,7 +236,7 @@ export function NewCollectionFilesPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "New collection files",
+      title: 'New collection files',
     },
   ];
 };

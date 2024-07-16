@@ -1,6 +1,7 @@
-import userEvent from "@testing-library/user-event";
-import { screen } from "../render";
-import type { Matcher } from "../render";
+import userEvent from '@testing-library/user-event';
+
+import { screen } from '../render';
+import type { Matcher } from '../render';
 
 export class FileInputHandle {
   constructor(public readonly fileInputElement: HTMLInputElement) {}
@@ -14,11 +15,11 @@ export class FileInputHandle {
   }
 
   static async fromRole(name?: string): Promise<FileInputHandle> {
-    return new FileInputHandle(await screen.findByRole("textbox", { name }));
+    return new FileInputHandle(await screen.findByRole('textbox', { name }));
   }
 
   isDisabled(): boolean {
-    return this.fileInputElement.hasAttribute("disabled");
+    return this.fileInputElement.hasAttribute('disabled');
   }
 
   async upload(file: File | File[]) {

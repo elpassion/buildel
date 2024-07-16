@@ -9,6 +9,7 @@
     "dev": "node ./server.mjs",
     "dependencies:up": "echo 'No dependencies'",
     "lint": "eslint './**/*.{js,jsx,ts,tsx}'",
+    "prettier": "prettier --write './**/*.{js,jsx,ts,tsx}'",
     "test": "vitest",
     "start": "cross-env NODE_ENV=production node ./server.mjs",
     "typecheck": "tsc"

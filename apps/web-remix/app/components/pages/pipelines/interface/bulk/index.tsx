@@ -1,1 +1,1 @@
-export { BulkPage as page, meta } from "./page";
+export { BulkPage as page, meta } from './page';

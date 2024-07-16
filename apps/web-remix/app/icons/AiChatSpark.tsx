@@ -1,5 +1,6 @@
-import React from "react";
-import type { IconProps } from "~/icons/icons.types";
+import React from 'react';
+
+import type { IconProps } from '~/icons/icons.types';
 
 export const AiChatSpark: React.FC<IconProps> = ({ className }) => {
   return (

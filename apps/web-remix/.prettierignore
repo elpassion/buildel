@@ -4,4 +4,4 @@ public/
 tokens/
 pnpm-lock.yaml
 package.json
-vit.config.ts
+vite.config.ts

@@ -1,10 +1,13 @@
-import React from "react";
-import { Link, useLoaderData } from "@remix-run/react";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { CodePreviewOptions } from "~/components/interfaces/CodePreview/CodePreviewOptions";
-import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
-import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
-import { routes } from "~/utils/routes.utils";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { Link, useLoaderData } from '@remix-run/react';
+
+import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
+import { CodePreviewOptions } from '~/components/interfaces/CodePreview/CodePreviewOptions';
+import { CodePreviewWrapper } from '~/components/interfaces/CodePreview/CodePreviewWrapper';
+import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
+import { routes } from '~/utils/routes.utils';
+
 import {
   PreviewConnector,
   PreviewSection,
@@ -13,9 +16,8 @@ import {
   PreviewSectionHeading,
   PreviewSectionStep,
   PreviewSectionText,
-} from "../PreviewSection";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '../PreviewSection';
+import type { loader } from './loader.server';
 
 export function ClientSDKPage() {
   const { organizationId, pipelineId } = useLoaderData<typeof loader>();
@@ -66,19 +68,19 @@ export function ClientSDKPage() {
           <div className="space-y-2">
             <PreviewSectionText>
               To authenticate with our API via the SDK, it’s essential to secure
-              your socket connection at the backend. Our{" "}
+              your socket connection at the backend. Our{' '}
               <strong>@buildel/buildel-auth</strong> package simplifies this
               process.
             </PreviewSectionText>
             <PreviewSectionText>
-              Set up an HTTP endpoint on your server and use the{" "}
+              Set up an HTTP endpoint on your server and use the{' '}
               <Link
                 to={routes.organizationSettings(organizationId)}
                 className="text-primary-500 hover:underline"
                 target="_blank"
               >
                 API key
-              </Link>{" "}
+              </Link>{' '}
               to hash your socket connection.
             </PreviewSectionText>
           </div>
@@ -86,9 +88,9 @@ export function ClientSDKPage() {
           <CodePreviewOptions
             options={[
               {
-                language: "tsx",
+                language: 'tsx',
                 id: 0,
-                framework: "Next.js",
+                framework: 'Next.js',
                 value: `import { BuildelAuth } from "@buildel/buildel-auth";
 
 export async function POST(request: Request) {
@@ -103,9 +105,9 @@ export async function POST(request: Request) {
                 height: 210,
               },
               {
-                language: "tsx",
+                language: 'tsx',
                 id: 1,
-                framework: "Remix",
+                framework: 'Remix',
                 value: `import { BuildelAuth } from "@buildel/buildel-auth"
 
 export async function action({ request }: ActionFunctionArgs) {
@@ -283,7 +285,7 @@ run.push("your_block_name:input", 'sample payload');`}
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Client SDK",
+      title: 'Client SDK',
     },
   ];
 };

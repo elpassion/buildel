@@ -1,19 +1,17 @@
-import type { ReactNode} from "react";
-import React, { forwardRef, useCallback } from "react";
-import { useControlField } from "remix-validated-form";
-import { useIsMounted } from "usehooks-ts";
-import { InputText, Label } from "@elpassion/taco";
-import type { IAsyncSelectItem } from "~/api/AsyncSelectApi";
-import { asyncSelectApi } from "~/api/AsyncSelectApi";
+import type { ReactNode } from 'react';
+import React, { forwardRef, useCallback } from 'react';
+import { InputText, Label } from '@elpassion/taco';
+import { useControlField } from 'remix-validated-form';
+import { useIsMounted } from 'usehooks-ts';
+
+import type { IAsyncSelectItem } from '~/api/AsyncSelectApi';
+import { asyncSelectApi } from '~/api/AsyncSelectApi';
 import {
   HiddenField,
   useFieldContext,
-} from "~/components/form/fields/field.context";
-import type {
-  AsyncSelectInputProps} from "~/components/form/inputs/select/select.input";
-import {
-  AsyncSelectInput,
-} from "~/components/form/inputs/select/select.input";
+} from '~/components/form/fields/field.context';
+import type { AsyncSelectInputProps } from '~/components/form/inputs/select/select.input';
+import { AsyncSelectInput } from '~/components/form/inputs/select/select.input';
 
 export interface AsyncSelectFieldProps extends Partial<AsyncSelectInputProps> {
   url: string;
@@ -29,18 +27,18 @@ export const AsyncSelectField = forwardRef<
 >(
   (
     { url, defaultValue, label, supportingText, errorMessage, ...props },
-    _ref
+    _ref,
   ) => {
     const isMounted = useIsMounted();
     const { name, getInputProps } = useFieldContext({
       validationBehavior: {
-        initial: "onBlur",
-        whenTouched: "onBlur",
-        whenSubmitted: "onBlur",
+        initial: 'onBlur',
+        whenTouched: 'onBlur',
+        whenSubmitted: 'onBlur',
       },
     });
     const [selectedId, setSelectedId] = useControlField<string | undefined>(
-      name
+      name,
     );
 
     const fetcher = useCallback(async () => {
@@ -57,7 +55,7 @@ export const AsyncSelectField = forwardRef<
 
     return (
       <>
-        <HiddenField value={selectedId ?? ""} {...getInputProps()} />
+        <HiddenField value={selectedId ?? ''} {...getInputProps()} />
         <Label text={label} />
         <AsyncSelectInput
           onBlur={getInputProps().onBlur}
@@ -75,7 +73,7 @@ export const AsyncSelectField = forwardRef<
         />
       </>
     );
-  }
+  },
 );
 export function toSelectOption(item: IAsyncSelectItem) {
   return {

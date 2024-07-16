@@ -1,4 +1,5 @@
-import React from "react";
+import React from 'react';
+
 interface LoadMoreButtonProps {
   onClick: () => void;
   hasNextPage: boolean;
@@ -16,7 +17,7 @@ export const LoadMoreButton: React.FC<LoadMoreButtonProps> = ({
       disabled={!hasNextPage}
       className="text-neutral-200 disabled:text-neutral-400 text-sm"
     >
-      {isFetching ? "Fetching..." : hasNextPage ? "Fetch" : "No more data"}
+      {isFetching ? 'Fetching...' : hasNextPage ? 'Fetch' : 'No more data'}
     </button>
   );
 };

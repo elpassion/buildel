@@ -1,27 +1,29 @@
-import React from "react";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
 import {
   Link,
   Outlet,
   useLoaderData,
   useMatch,
   useNavigate,
-} from "@remix-run/react";
-import { Button } from "@elpassion/taco";
-import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
+} from '@remix-run/react';
+import { Button } from '@elpassion/taco';
+
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import {
   ActionSidebar,
   ActionSidebarHeader,
-} from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
-import { PipelinesList } from "./PipelinesList";
-import { PipelinesNavbar } from "./PipelinesNavbar";
+} from '~/components/sidebar/ActionSidebar';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
+import { PipelinesList } from './PipelinesList';
+import { PipelinesNavbar } from './PipelinesNavbar';
 import {
   WorkflowTemplates,
   WorkflowTemplatesHeader,
   WorkflowTemplatesList,
-} from "./WorkflowTemplates";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from './WorkflowTemplates';
 
 export function PipelinesPage() {
   const { pipelines, organizationId } = useLoaderData<typeof loader>();
@@ -81,7 +83,7 @@ export function PipelinesPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Workflows",
+      title: 'Workflows',
     },
   ];
 };

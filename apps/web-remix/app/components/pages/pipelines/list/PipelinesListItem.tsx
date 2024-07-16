@@ -1,17 +1,19 @@
-import type { PropsWithChildren} from "react";
-import React, { useMemo } from "react";
-import { useFetcher } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import classNames from "classnames";
-import { ValidatedForm } from "remix-validated-form";
-import { Icon } from "@elpassion/taco";
-import { CreatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
-import { HiddenField } from "~/components/form/fields/field.context";
-import { IconButton } from "~/components/iconButton";
-import { confirm } from "~/components/modal/confirm";
-import { Duplicate } from "~/icons/Duplicate";
-import { routes } from "~/utils/routes.utils";
-import type { IPipeline } from "../pipeline.types";
+import type { PropsWithChildren } from 'react';
+import React, { useMemo } from 'react';
+import { useFetcher } from '@remix-run/react';
+import { Icon } from '@elpassion/taco';
+import { withZod } from '@remix-validated-form/with-zod';
+import classNames from 'classnames';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
+import { HiddenField } from '~/components/form/fields/field.context';
+import { IconButton } from '~/components/iconButton';
+import { confirm } from '~/components/modal/confirm';
+import { Duplicate } from '~/icons/Duplicate';
+import { routes } from '~/utils/routes.utils';
+
+import type { IPipeline } from '../pipeline.types';
 
 interface PipelinesListItemProps extends PropsWithChildren {
   className?: string;
@@ -23,8 +25,8 @@ export const PipelinesListItem = ({
   return (
     <article
       className={classNames(
-        "group bg-neutral-800 px-6 py-4 rounded-lg text-basic-white hover:bg-neutral-850 transition cursor-pointer",
-        className
+        'group bg-neutral-800 px-6 py-4 rounded-lg text-basic-white hover:bg-neutral-850 transition cursor-pointer',
+        className,
       )}
     >
       {children}
@@ -44,8 +46,8 @@ export const PipelineListItemHeader = ({
     e.preventDefault();
     confirm({
       onConfirm: async () =>
-        fetcher.submit({ pipelineId: pipeline.id }, { method: "delete" }),
-      confirmText: "Delete workflow",
+        fetcher.submit({ pipelineId: pipeline.id }, { method: 'delete' }),
+      confirmText: 'Delete workflow',
       children: (
         <p className="text-neutral-100 text-sm">
           You are about to delete the "{pipeline.name}” workflow from your
@@ -98,7 +100,7 @@ function DuplicateForm({ pipeline }: DuplicateFormProps) {
       validator={validator}
       action={routes.pipelinesNew(pipeline.organization_id)}
     >
-      <HiddenField name="pipeline.name" value={pipeline.name + " copy"} />
+      <HiddenField name="pipeline.name" value={pipeline.name + ' copy'} />
 
       <HiddenField name="pipeline.config.version" value="1" />
 

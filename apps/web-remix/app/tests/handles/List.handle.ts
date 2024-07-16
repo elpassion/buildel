@@ -1,5 +1,5 @@
-import type { Matcher} from "~/tests/render";
-import { screen } from "~/tests/render";
+import type { Matcher } from '~/tests/render';
+import { screen } from '~/tests/render';
 
 export class ListHandle {
   constructor(public readonly listElement: HTMLUListElement) {}

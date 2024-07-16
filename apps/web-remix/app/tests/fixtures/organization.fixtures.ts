@@ -1,7 +1,7 @@
-import type { IOrganization } from "~/api/organization/organization.contracts";
+import type { IOrganization } from '~/api/organization/organization.contracts';
 
 export const organizationFixture = (
-  override?: Partial<IOrganization>
+  override?: Partial<IOrganization>,
 ): IOrganization => {
-  return { id: 1, name: "New org", ...override };
+  return { id: 1, name: 'New org', ...override };
 };

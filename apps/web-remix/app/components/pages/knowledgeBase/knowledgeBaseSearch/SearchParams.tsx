@@ -1,11 +1,12 @@
-import type { PropsWithChildren } from "react";
-import React from "react";
-import { Icon } from "@elpassion/taco";
+import type { PropsWithChildren } from 'react';
+import React from 'react';
+import { Icon } from '@elpassion/taco';
+
 import {
   Dropdown,
   DropdownPopup,
   DropdownTrigger,
-} from "~/components/dropdown/Dropdown";
+} from '~/components/dropdown/Dropdown';
 
 export const SearchParams: React.FC<PropsWithChildren> = ({ children }) => {
   return (

@@ -1,1 +1,1 @@
-export { KnowledgeBaseCollectionLayout as page, meta } from "./page";
+export { KnowledgeBaseCollectionLayout as page, meta } from './page';

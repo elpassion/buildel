@@ -1,27 +1,25 @@
-import React from "react";
-import { describe, expect, test, vi } from "vitest";
-import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
-import { loader as builderLoader } from "~/components/pages/pipelines/build/loader.server";
-import { PipelineBuilder } from "~/components/pages/pipelines/build/page";
+import React from 'react';
+import { describe, expect, test, vi } from 'vitest';
+
+import { RootErrorBoundary } from '~/components/errorBoundaries/RootErrorBoundary';
+import { loader as builderLoader } from '~/components/pages/pipelines/build/loader.server';
+import { PipelineBuilder } from '~/components/pages/pipelines/build/page';
 import {
   pipelineFixture,
   simplePipelineFixture,
-} from "~/tests/fixtures/pipeline.fixtures";
-import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
-import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
-import { BlockHandle } from "~/tests/handles/Block.handle";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { TextareaHandle } from "~/tests/handles/Textarea.handle";
-import { act, render, screen, waitFor } from "~/tests/render";
-import { server } from "~/tests/server.mock";
-import type {
-  RoutesProps} from "~/tests/setup.tests";
-import {
-  loaderWithSession,
-  setupRoutes,
-} from "~/tests/setup.tests";
-import { WebSocketServerMock } from "~/tests/WebSocketServerMock";
-import { runHandlers } from "./pipeline-run.handlers";
+} from '~/tests/fixtures/pipeline.fixtures';
+import { handlers as blockTypesHandlers } from '~/tests/handlers/blockTypes.handlers';
+import { PipelineHandlers } from '~/tests/handlers/pipelines.handlers';
+import { BlockHandle } from '~/tests/handles/Block.handle';
+import { ButtonHandle } from '~/tests/handles/Button.handle';
+import { TextareaHandle } from '~/tests/handles/Textarea.handle';
+import { act, render, screen, waitFor } from '~/tests/render';
+import { server } from '~/tests/server.mock';
+import type { RoutesProps } from '~/tests/setup.tests';
+import { loaderWithSession, setupRoutes } from '~/tests/setup.tests';
+import { WebSocketServerMock } from '~/tests/WebSocketServerMock';
+
+import { runHandlers } from './pipeline-run.handlers';
 
 const handlers = () => [
   ...runHandlers(),
@@ -29,7 +27,7 @@ const handlers = () => [
   ...new PipelineHandlers([simplePipelineFixture()]).handlers,
 ];
 
-describe("Pipeline workflow run", () => {
+describe('Pipeline workflow run', () => {
   const onMessageMock = vi.fn();
   const setupServer = server(handlers());
   const wsServer = new WebSocketServerMock({ onMessage: onMessageMock });
@@ -46,13 +44,13 @@ describe("Pipeline workflow run", () => {
     wsServer.close();
   });
 
-  test("should enable Send buttons when workflow is running", async () => {
+  test('should enable Send buttons when workflow is running', async () => {
     const page = new PipelineRunObject().render({
-      initialEntries: ["/2/pipelines/1/build"],
+      initialEntries: ['/2/pipelines/1/build'],
     });
 
     const startButton = await page.startWorkflowButton();
-    const textInputSendButton = await page.sendMessageButton("text_input_1");
+    const textInputSendButton = await page.sendMessageButton('text_input_1');
 
     expect(textInputSendButton.isDisabled()).toBe(true);
 
@@ -63,41 +61,41 @@ describe("Pipeline workflow run", () => {
     });
   });
 
-  test("should render streamed block output", async () => {
+  test('should render streamed block output', async () => {
     const page = new PipelineRunObject().render({
-      initialEntries: ["/1/pipelines/1/build"],
+      initialEntries: ['/1/pipelines/1/build'],
     });
 
     const startButton = await page.startWorkflowButton();
     await startButton.click();
 
-    const textInputTextarea = await page.textBlockInput("text_input_1-input");
-    const textInputSendButton = await page.sendMessageButton("text_input_1");
+    const textInputTextarea = await page.textBlockInput('text_input_1-input');
+    const textInputSendButton = await page.sendMessageButton('text_input_1');
 
-    await textInputTextarea.type("new message");
+    await textInputTextarea.type('new message');
     await textInputSendButton.click();
-    expect(onMessageMock).toHaveBeenCalledWith("new message");
+    expect(onMessageMock).toHaveBeenCalledWith('new message');
 
     await act(async () => {
       wsServer.send({
-        topicName: "pipelines:1:1",
-        eventName: "output:text_output_1:output",
-        payload: { message: "Hey" },
+        topicName: 'pipelines:1:1',
+        eventName: 'output:text_output_1:output',
+        payload: { message: 'Hey' },
       });
       wsServer.send({
-        topicName: "pipelines:1:1",
-        eventName: "output:text_output_1:output",
-        payload: { message: " HO" },
+        topicName: 'pipelines:1:1',
+        eventName: 'output:text_output_1:output',
+        payload: { message: ' HO' },
       });
     });
 
-    await screen.findByText("Hey HO");
+    await screen.findByText('Hey HO');
   });
 
-  test("should display error when workflow is invalid", async () => {
+  test('should display error when workflow is invalid', async () => {
     setupServer.use(...new PipelineHandlers([pipelineFixture()]).handlers);
     const page = new PipelineRunObject().render({
-      initialEntries: ["/1/pipelines/1/build"],
+      initialEntries: ['/1/pipelines/1/build'],
     });
 
     const startButton = await page.startWorkflowButton();
@@ -107,24 +105,24 @@ describe("Pipeline workflow run", () => {
     await screen.findByText(/Required/i);
   });
 
-  test("should toggle block activeness", async () => {
+  test('should toggle block activeness', async () => {
     const page = new PipelineRunObject().render({
-      initialEntries: ["/1/pipelines/1/build"],
+      initialEntries: ['/1/pipelines/1/build'],
     });
 
     const startButton = await page.startWorkflowButton();
     await startButton.click();
 
     const textOutputBlock = await BlockHandle.fromLabelText(
-      "Block: text_output_1"
+      'Block: text_output_1',
     );
 
     expect(textOutputBlock.isActive).toBe(false);
 
     await act(async () => {
       wsServer.send({
-        topicName: "pipelines:1:1",
-        eventName: "start:text_output_1",
+        topicName: 'pipelines:1:1',
+        eventName: 'start:text_output_1',
         payload: {},
       });
     });
@@ -133,8 +131,8 @@ describe("Pipeline workflow run", () => {
 
     await act(async () => {
       wsServer.send({
-        topicName: "pipelines:1:1",
-        eventName: "stop:text_output_1",
+        topicName: 'pipelines:1:1',
+        eventName: 'stop:text_output_1',
         payload: {},
       });
     });
@@ -142,26 +140,26 @@ describe("Pipeline workflow run", () => {
     expect(textOutputBlock.isActive).toBe(false);
   });
 
-  test("should display Block Run errors", async () => {
+  test('should display Block Run errors', async () => {
     const page = new PipelineRunObject().render({
-      initialEntries: ["/1/pipelines/1/build"],
+      initialEntries: ['/1/pipelines/1/build'],
     });
 
     const startButton = await page.startWorkflowButton();
     await startButton.click();
 
     const textOutputBlock = await BlockHandle.fromLabelText(
-      "Block: text_output_1"
+      'Block: text_output_1',
     );
 
     expect(textOutputBlock.isValid).toBe(true);
 
     await act(async () => {
       wsServer.send({
-        topicName: "pipelines:1:1",
-        eventName: "error:text_output_1",
+        topicName: 'pipelines:1:1',
+        eventName: 'error:text_output_1',
         payload: {
-          errors: ["Ups! Block error occurred"],
+          errors: ['Ups! Block error occurred'],
         },
       });
     });
@@ -170,9 +168,9 @@ describe("Pipeline workflow run", () => {
     await screen.findByText(/The workflow run failed due to an error/i);
   });
 
-  test("should send metadata through socket", async () => {
+  test('should send metadata through socket', async () => {
     const page = new PipelineRunObject().render({
-      initialEntries: ["/1/pipelines/1/build"],
+      initialEntries: ['/1/pipelines/1/build'],
     });
     const startButton = await page.startWorkflowButton();
 
@@ -193,7 +191,7 @@ describe("Pipeline workflow run", () => {
         auth: expect.any(String),
         user_data: expect.any(Object),
         initial_inputs: expect.any(Array),
-        alias: "latest",
+        alias: 'latest',
         metadata: { test: 123 },
       });
     });
@@ -204,11 +202,11 @@ class PipelineRunObject {
   render(props?: RoutesProps) {
     const Routes = setupRoutes([
       {
-        path: "/",
+        path: '/',
         ErrorBoundary: RootErrorBoundary,
         children: [
           {
-            path: "/:organizationId/pipelines/:pipelineId/build",
+            path: '/:organizationId/pipelines/:pipelineId/build',
             Component: PipelineBuilder,
             loader: loaderWithSession(builderLoader),
           },
@@ -222,7 +220,7 @@ class PipelineRunObject {
   }
 
   async startWorkflowButton() {
-    return ButtonHandle.fromRole("Start workflow");
+    return ButtonHandle.fromRole('Start workflow');
   }
 
   async sendMessageButton(blockName: string) {
@@ -234,14 +232,14 @@ class PipelineRunObject {
   }
 
   async metadataDropdownTrigger() {
-    return ButtonHandle.fromRole("Open metadata editor");
+    return ButtonHandle.fromRole('Open metadata editor');
   }
 
   async metadataEditor() {
-    return TextareaHandle.fromTestId("value-editor");
+    return TextareaHandle.fromTestId('value-editor');
   }
 
   async metadataSubmit() {
-    return ButtonHandle.fromRole("Set");
+    return ButtonHandle.fromRole('Set');
   }
 }

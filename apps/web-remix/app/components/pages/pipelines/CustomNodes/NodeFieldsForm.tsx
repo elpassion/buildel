@@ -1,19 +1,21 @@
-import React, { useCallback } from "react";
-import { Button } from "@elpassion/taco";
+import React, { useCallback } from 'react';
+import { Button } from '@elpassion/taco';
+
 import {
   KnowledgeBaseFileListResponse,
   KnowledgeBaseFileResponse,
-} from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { FileUpload } from "~/components/fileUpload/FileUpload";
-import type { IFile } from "~/components/fileUpload/fileUpload.types";
-import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
-import { TextareaInput } from "~/components/form/inputs/textarea.input";
+} from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { FileUpload } from '~/components/fileUpload/FileUpload';
+import type { IFile } from '~/components/fileUpload/fileUpload.types';
+import { FileUploadListPreview } from '~/components/fileUpload/FileUploadListPreview';
+import { TextareaInput } from '~/components/form/inputs/textarea.input';
 import type {
   IBlockConfig,
   IField,
-} from "~/components/pages/pipelines/pipeline.types";
-import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
-import { AudioFieldTabs } from "./AudioFieldTabs";
+} from '~/components/pages/pipelines/pipeline.types';
+
+import { useRunPipeline, useRunPipelineNode } from '../RunPipelineProvider';
+import { AudioFieldTabs } from './AudioFieldTabs';
 
 interface NodeFieldsFormProps {
   fields: IField[];
@@ -58,12 +60,12 @@ export function NodeFieldsForm({
 
   const uploadFile = useCallback(
     async (file: File): Promise<IFile> => {
-      console.log("uploading");
+      console.log('uploading');
       async function createFile(fileUpload: File) {
         const formData = new FormData();
-        formData.append("file", fileUpload);
+        formData.append('file', fileUpload);
         formData.append(
-          "collection_name",
+          'collection_name',
           block.opts.knowledge || `${pipelineId}_${blockName}`,
         );
 
@@ -71,13 +73,13 @@ export function NodeFieldsForm({
           `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/files`,
           {
             body: formData,
-            method: "POST",
+            method: 'POST',
           },
         );
 
         if (!res.ok) {
           const body = await res.json();
-          throw new Error(body?.errors?.detail ?? "Something went wrong!");
+          throw new Error(body?.errors?.detail ?? 'Something went wrong!');
         }
 
         return res.json();
@@ -90,14 +92,14 @@ export function NodeFieldsForm({
 
         if (!res.ok) {
           const body = await res.json();
-          throw new Error(body?.errors?.detail ?? "Something went wrong!");
+          throw new Error(body?.errors?.detail ?? 'Something went wrong!');
         }
 
         const data = await res.json();
 
-        if (data.data.status === "success") {
+        if (data.data.status === 'success') {
           return data;
-        } else if (data.data.status === "error") {
+        } else if (data.data.status === 'error') {
           throw new Error();
         } else {
           return new Promise((resolve, reject) => {
@@ -113,18 +115,18 @@ export function NodeFieldsForm({
           `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories`,
           {
             headers: {
-              "content-type": "application/json",
+              'content-type': 'application/json',
             },
             body: JSON.stringify({
               file_id: fileId,
             }),
-            method: "POST",
+            method: 'POST',
           },
         );
 
         if (!res.ok) {
           const body = await res.json();
-          throw new Error(body?.errors?.detail ?? "Something went wrong!");
+          throw new Error(body?.errors?.detail ?? 'Something went wrong!');
         }
 
         return res;
@@ -137,7 +139,7 @@ export function NodeFieldsForm({
       const response = await createMemory(fileId);
       return {
         ...KnowledgeBaseFileResponse.parse(await response.json()),
-        status: "done",
+        status: 'done',
       };
     },
     [block.opts],
@@ -146,25 +148,25 @@ export function NodeFieldsForm({
   const uploadFileTemporary = useCallback(
     async (file: File): Promise<IFile> => {
       const formData = new FormData();
-      formData.append("file", file);
-      formData.append("block_name", blockName);
-      formData.append("input_name", "input");
+      formData.append('file', file);
+      formData.append('block_name', blockName);
+      formData.append('input_name', 'input');
 
       const response = await fetch(
         `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${runId}/input_file`,
         {
           body: formData,
-          method: "POST",
+          method: 'POST',
         },
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.errors?.detail ?? "Something went wrong!");
+        throw new Error(data?.errors?.detail ?? 'Something went wrong!');
       }
 
-      return { ...KnowledgeBaseFileResponse.parse(data), status: "done" };
+      return { ...KnowledgeBaseFileResponse.parse(data), status: 'done' };
     },
     [block.opts, runId],
   );
@@ -177,12 +179,12 @@ export function NodeFieldsForm({
           body: JSON.stringify({
             file_id: id,
             block_name: blockName,
-            input_name: "input",
+            input_name: 'input',
           }),
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
-          method: "DELETE",
+          method: 'DELETE',
         },
       );
     },
@@ -194,7 +196,7 @@ export function NodeFieldsForm({
       return fetch(
         `/super-api/organizations/${organizationId}/memory_collections/${block.opts.knowledge}/memories/${id}`,
         {
-          method: "DELETE",
+          method: 'DELETE',
         },
       );
     },
@@ -209,7 +211,7 @@ export function NodeFieldsForm({
 
     return KnowledgeBaseFileListResponse.parse(response).map((file) => ({
       ...file,
-      status: "done",
+      status: 'done',
     }));
   }, [block.opts]);
 
@@ -234,7 +236,7 @@ export function NodeFieldsForm({
 
         return {
           id: Math.random(),
-          status: "done" as const,
+          status: 'done' as const,
           file_type: file.type,
           file_name: file.name,
           file_size: file.size,
@@ -243,7 +245,7 @@ export function NodeFieldsForm({
         console.error(err);
         return {
           id: Math.random(),
-          status: "error" as const,
+          status: 'error' as const,
           file_type: file.type,
           file_name: file.name,
           file_size: file.size,
@@ -257,7 +259,7 @@ export function NodeFieldsForm({
     (field: IField) => {
       const { type, name } = field.data;
 
-      if (type === "text") {
+      if (type === 'text') {
         return (
           <div>
             <div className="bg-neutral-900 w-fit text-xs px-2 py-0.5 rounded !rounded-bl-none text-primary-500">
@@ -275,7 +277,7 @@ export function NodeFieldsForm({
             />
           </div>
         );
-      } else if (type === "file") {
+      } else if (type === 'file') {
         return (
           <FileUpload
             multiple
@@ -295,7 +297,7 @@ export function NodeFieldsForm({
             )}
           />
         );
-      } else if (type === "file_temporary") {
+      } else if (type === 'file_temporary') {
         return (
           <FileUpload
             multiple
@@ -303,7 +305,7 @@ export function NodeFieldsForm({
             name={name}
             onUpload={uploadFileTemporary}
             onRemove={removeFileTemporary}
-            disabled={status !== "running" || disabled}
+            disabled={status !== 'running' || disabled}
             preview={(props) => (
               <FileUploadListPreview
                 {...props}
@@ -314,7 +316,7 @@ export function NodeFieldsForm({
             )}
           />
         );
-      } else if (type === "audio") {
+      } else if (type === 'audio') {
         return (
           <AudioFieldTabs
             disabled={disabled}
@@ -336,12 +338,12 @@ export function NodeFieldsForm({
         <React.Fragment key={field.type}>{renderInput(field)}</React.Fragment>
       ))}
 
-      {fields.length > 0 && fields[0].data.type === "text" ? (
+      {fields.length > 0 && fields[0].data.type === 'text' ? (
         <Button
           aria-label={`Send message from: ${blockName}`}
           type="submit"
           size="xs"
-          disabled={status !== "running"}
+          disabled={status !== 'running'}
           className="!text-xs mt-2"
           isFluid
         >

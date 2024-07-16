@@ -1,13 +1,7 @@
-import {
-  Decoration,
-  RangeSetBuilder,
-  ViewPlugin
-} from "@uiw/react-codemirror";
-import type { Suggestion } from "../codeMirror.types";
-import type {
-  EditorView,
-  RangeSet,
-  ViewUpdate} from "@uiw/react-codemirror";
+import { Decoration, RangeSetBuilder, ViewPlugin } from '@uiw/react-codemirror';
+import type { EditorView, RangeSet, ViewUpdate } from '@uiw/react-codemirror';
+
+import type { Suggestion } from '../codeMirror.types';
 
 export const suggestionHighlighter = (suggestions: Suggestion[]) =>
   ViewPlugin.fromClass(
@@ -26,12 +20,12 @@ export const suggestionHighlighter = (suggestions: Suggestion[]) =>
     },
     {
       decorations: (v) => v.decorations,
-    }
+    },
   );
 
 function suggestionDecorations(
   view: EditorView,
-  suggestions: Suggestion[]
+  suggestions: Suggestion[],
 ): RangeSet<Decoration> {
   let builder = new RangeSetBuilder();
 
@@ -45,16 +39,16 @@ function suggestionDecorations(
       const endPos = startPos + match[0].length;
 
       const current = suggestions.find((sug) => {
-        const a = sug.label.split(".");
-        const b = match![1].split(".");
+        const a = sug.label.split('.');
+        const b = match![1].split('.');
 
         if (a[0] === b[0] && sug.matchAll) return sug;
         return sug.label === match![1];
       });
 
       const className = current
-        ? `valid-suggestion-${current.variant ?? "primary"}`
-        : "invalid-suggestion";
+        ? `valid-suggestion-${current.variant ?? 'primary'}`
+        : 'invalid-suggestion';
 
       const deco = Decoration.mark({ class: className });
 

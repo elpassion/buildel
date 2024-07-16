@@ -1,10 +1,10 @@
-import type { AnchorHTMLAttributes} from "react";
-import React, { useEffect, useRef } from "react";
-import classNames from "classnames";
-import Markdown from "markdown-to-jsx";
-import mermaid from "mermaid";
-import { z } from "zod";
-import type { MarkdownToJSX } from "markdown-to-jsx";
+import type { AnchorHTMLAttributes } from 'react';
+import React, { useEffect, useRef } from 'react';
+import classNames from 'classnames';
+import Markdown from 'markdown-to-jsx';
+import type { MarkdownToJSX } from 'markdown-to-jsx';
+import mermaid from 'mermaid';
+import { z } from 'zod';
 
 interface ChatMarkdownProps {
   [key: string]: any;
@@ -83,7 +83,7 @@ function Strong({
   ...rest
 }: React.ParamHTMLAttributes<HTMLDivElement>) {
   return (
-    <strong className={classNames("font-bold text-white", className)} {...rest}>
+    <strong className={classNames('font-bold text-white', className)} {...rest}>
       {children}
     </strong>
   );
@@ -96,7 +96,7 @@ function Paragraph({
 }: React.ParamHTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={classNames("my-2 break-words whitespace-pre-wrap", className)}
+      className={classNames('my-2 break-words whitespace-pre-wrap', className)}
       {...rest}
     >
       {children}
@@ -111,7 +111,7 @@ function Span({
 }: React.ParamHTMLAttributes<HTMLSpanElement>) {
   return (
     <span
-      className={classNames(" break-words whitespace-pre-wrap", className)}
+      className={classNames(' break-words whitespace-pre-wrap', className)}
       {...rest}
     >
       {children}
@@ -126,7 +126,7 @@ function Div({
 }: React.ParamHTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={classNames("break-words whitespace-pre-wrap", className)}
+      className={classNames('break-words whitespace-pre-wrap', className)}
       {...rest}
     >
       {children}
@@ -142,7 +142,7 @@ function H6({
   return (
     <h6
       className={classNames(
-        "break-words whitespace-pre-wrap text-neutral-100",
+        'break-words whitespace-pre-wrap text-neutral-100',
         className,
       )}
       {...rest}
@@ -159,7 +159,7 @@ function H5({
   return (
     <h5
       className={classNames(
-        "break-words whitespace-pre-wrap text-sm text-neutral-100",
+        'break-words whitespace-pre-wrap text-sm text-neutral-100',
         className,
       )}
       {...rest}
@@ -177,7 +177,7 @@ function H4({
   return (
     <h4
       className={classNames(
-        "break-words whitespace-pre-wrap text-base text-neutral-100",
+        'break-words whitespace-pre-wrap text-base text-neutral-100',
         className,
       )}
       {...rest}
@@ -195,7 +195,7 @@ function H3({
   return (
     <h3
       className={classNames(
-        "break-words whitespace-pre-wrap text-lg text-neutral-100",
+        'break-words whitespace-pre-wrap text-lg text-neutral-100',
         className,
       )}
       {...rest}
@@ -213,7 +213,7 @@ function H2({
   return (
     <h2
       className={classNames(
-        "break-words whitespace-pre-wrap text-xl text-neutral-100",
+        'break-words whitespace-pre-wrap text-xl text-neutral-100',
         className,
       )}
       {...rest}
@@ -231,7 +231,7 @@ function H1({
   return (
     <h2
       className={classNames(
-        "break-words whitespace-pre-wrap text-2xl text-neutral-100",
+        'break-words whitespace-pre-wrap text-2xl text-neutral-100',
         className,
       )}
       {...rest}
@@ -248,7 +248,7 @@ function Li({
 }: React.ParamHTMLAttributes<HTMLLIElement>) {
   return (
     <li
-      className={classNames("!m-0 marker:text-neutral-100", className)}
+      className={classNames('!m-0 marker:text-neutral-100', className)}
       {...rest}
     >
       {children}
@@ -263,7 +263,7 @@ function Link({
 }: AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
     <a
-      className={classNames("text-primary-500", className)}
+      className={classNames('text-primary-500', className)}
       target="_blank"
       rel="noreferrer"
       {...rest}
@@ -285,7 +285,7 @@ function Pre({
   return (
     <pre
       className={classNames(
-        "my-1 bg-neutral-900 break-words whitespace-pre-wrap",
+        'my-1 bg-neutral-900 break-words whitespace-pre-wrap',
         className,
       )}
       {...rest}
@@ -305,19 +305,19 @@ function Code({
   ...rest
 }: React.ParamHTMLAttributes<HTMLPreElement>) {
   const codeRef = useRef<HTMLElement>(null);
-  const isMermaidCode = className?.includes("lang-mermaid");
+  const isMermaidCode = className?.includes('lang-mermaid');
   if (isMermaidCode) {
     mermaid.initialize({
-      theme: "dark",
+      theme: 'dark',
     });
     mermaid.run({
       nodes: [codeRef.current!],
     });
   }
-  if (className?.includes("lang-buildel_message_attachments")) {
+  if (className?.includes('lang-buildel_message_attachments')) {
     try {
       const attachments = MessageAttachments.parse(
-        JSON.parse((children || "").toString()),
+        JSON.parse((children || '').toString()),
       );
       return attachments.map((attachment) => {
         return <div key={attachment.id}>{attachment.file_name}</div>;
@@ -325,13 +325,13 @@ function Code({
     } catch (e) {
       console.error(e);
     }
-    return "Uploaded files";
+    return 'Uploaded files';
   }
   return (
     <code
       ref={codeRef}
       className={classNames(
-        "my-1 bg-neutral-900 break-words whitespace-pre-wrap text-neutral-100",
+        'my-1 bg-neutral-900 break-words whitespace-pre-wrap text-neutral-100',
         className,
       )}
       {...rest}

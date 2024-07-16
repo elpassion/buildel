@@ -1,15 +1,13 @@
-import React from "react";
-import { useLoaderData } from "@remix-run/react";
-import { useControlField, useFormContext } from "remix-validated-form";
-import { InputText, Label } from "@elpassion/taco";
-import { useFieldContext } from "~/components/form/fields/field.context";
-import type {
-  NumberInputProps} from "~/components/form/inputs/number.input";
-import {
-  NumberInput
-} from "~/components/form/inputs/number.input";
-import { ToggleInput } from "~/components/form/inputs/toggle.input";
-import type { loader } from "~/components/pages/pipelines/settings/loader.server";
+import React from 'react';
+import { useLoaderData } from '@remix-run/react';
+import { InputText, Label } from '@elpassion/taco';
+import { useControlField, useFormContext } from 'remix-validated-form';
+
+import { useFieldContext } from '~/components/form/fields/field.context';
+import type { NumberInputProps } from '~/components/form/inputs/number.input';
+import { NumberInput } from '~/components/form/inputs/number.input';
+import { ToggleInput } from '~/components/form/inputs/toggle.input';
+import type { loader } from '~/components/pages/pipelines/settings/loader.server';
 
 export const BudgetLimitField: React.FC<Partial<NumberInputProps>> = ({
   supportingText,

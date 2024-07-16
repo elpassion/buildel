@@ -1,15 +1,16 @@
-import React from "react";
-import { useNavigation } from "@remix-run/react";
-import { Github } from "~/icons/Github";
+import React from 'react';
+import { useNavigation } from '@remix-run/react';
 
-type GithubButtonContent = "Sign in with Github" | "Sign up with Github";
+import { Github } from '~/icons/Github';
+
+type GithubButtonContent = 'Sign in with Github' | 'Sign up with Github';
 
 export const GithubButton: React.FC<{ content?: GithubButtonContent }> = ({
-  content = "Sign in with GitHub",
+  content = 'Sign in with GitHub',
 }) => {
   const { state } = useNavigation();
 
-  const disabled = state !== "idle";
+  const disabled = state !== 'idle';
 
   return (
     <button

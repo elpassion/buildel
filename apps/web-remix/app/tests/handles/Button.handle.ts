@@ -1,12 +1,13 @@
-import userEvent from "@testing-library/user-event";
-import { act, findByLabelText, screen } from "../render";
-import type { Matcher} from "../render";
+import userEvent from '@testing-library/user-event';
+
+import { act, findByLabelText, screen } from '../render';
+import type { Matcher } from '../render';
 
 export class ButtonHandle {
   constructor(public readonly buttonElement: HTMLButtonElement) {}
 
   static async fromRole(name?: string): Promise<ButtonHandle> {
-    return new ButtonHandle(await screen.findByRole("button", { name }));
+    return new ButtonHandle(await screen.findByRole('button', { name }));
   }
 
   static async fromLabelText(label: Matcher): Promise<ButtonHandle> {
@@ -15,7 +16,7 @@ export class ButtonHandle {
 
   static async fromLabelTextAndContainer(
     label: Matcher,
-    container: HTMLElement
+    container: HTMLElement,
   ): Promise<ButtonHandle> {
     return new ButtonHandle(await findByLabelText(container, label));
   }
@@ -25,7 +26,7 @@ export class ButtonHandle {
   }
 
   isDisabled(): boolean {
-    return this.buttonElement.hasAttribute("disabled");
+    return this.buttonElement.hasAttribute('disabled');
   }
 
   async click() {

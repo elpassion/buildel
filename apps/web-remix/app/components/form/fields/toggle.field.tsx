@@ -1,11 +1,9 @@
-import React, { forwardRef } from "react";
-import { useControlField } from "remix-validated-form";
-import { useFieldContext } from "~/components/form/fields/field.context";
-import type {
-  ToggleInputProps} from "~/components/form/inputs/toggle.input";
-import {
-  ToggleInput
-} from "~/components/form/inputs/toggle.input";
+import React, { forwardRef } from 'react';
+import { useControlField } from 'remix-validated-form';
+
+import { useFieldContext } from '~/components/form/fields/field.context';
+import type { ToggleInputProps } from '~/components/form/inputs/toggle.input';
+import { ToggleInput } from '~/components/form/inputs/toggle.input';
 
 export const ToggleInputField = forwardRef<
   HTMLInputElement,

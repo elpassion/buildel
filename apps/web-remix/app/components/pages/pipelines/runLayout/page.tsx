@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {
   Link,
   Outlet,
@@ -6,16 +6,18 @@ import {
   useLoaderData,
   useNavigate,
   useSearchParams,
-} from "@remix-run/react";
-import { Button, Icon } from "@elpassion/taco";
-import { confirm } from "~/components/modal/confirm";
-import { AppNavbar } from "~/components/navbar/AppNavbar";
-import { FilledTabLink } from "~/components/tabs/FilledTabLink";
-import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
-import { TabGroup } from "~/components/tabs/TabGroup";
-import { successToast } from "~/components/toasts/successToast";
-import { routes } from "~/utils/routes.utils";
-import type { loader } from "./loader.server";
+} from '@remix-run/react';
+import { Button, Icon } from '@elpassion/taco';
+
+import { confirm } from '~/components/modal/confirm';
+import { AppNavbar } from '~/components/navbar/AppNavbar';
+import { FilledTabLink } from '~/components/tabs/FilledTabLink';
+import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
+import { TabGroup } from '~/components/tabs/TabGroup';
+import { successToast } from '~/components/toasts/successToast';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
 
 export function PipelineRunLayout() {
   const navigate = useNavigate();
@@ -30,12 +32,12 @@ export function PipelineRunLayout() {
         fetcher.submit(
           { ...pipeline, config: { ...pipelineRun.config } },
           {
-            method: "PUT",
-            encType: "application/json",
-            action: routes.pipelineBuild(organizationId, pipelineId) + "?index",
-          }
+            method: 'PUT',
+            encType: 'application/json',
+            action: routes.pipelineBuild(organizationId, pipelineId) + '?index',
+          },
         ),
-      confirmText: "Restore Run",
+      confirmText: 'Restore Run',
       children: (
         <p className="text-neutral-100 text-sm">
           You are about to restore pipeline run configuration. This action is
@@ -46,8 +48,8 @@ export function PipelineRunLayout() {
   };
 
   useEffect(() => {
-    if (fetcher.state === "idle" && fetcher.data) {
-      successToast({ description: "Configuration restored!" });
+    if (fetcher.state === 'idle' && fetcher.data) {
+      successToast({ description: 'Configuration restored!' });
       navigate(routes.pipelineBuild(organizationId, pipelineId));
     }
   }, [fetcher]);
@@ -61,7 +63,7 @@ export function PipelineRunLayout() {
               to={routes.pipelineRuns(
                 organizationId,
                 pipelineId,
-                Object.fromEntries(searchParams.entries())
+                Object.fromEntries(searchParams.entries()),
               )}
             >
               <Icon iconName="arrow-left" className="text-2xl" />
@@ -84,7 +86,7 @@ export function PipelineRunLayout() {
                   organizationId,
                   pipelineId,
                   runId,
-                  Object.fromEntries(searchParams.entries())
+                  Object.fromEntries(searchParams.entries()),
                 )}
               >
                 Overview
@@ -94,7 +96,7 @@ export function PipelineRunLayout() {
                   organizationId,
                   pipelineId,
                   runId,
-                  Object.fromEntries(searchParams.entries())
+                  Object.fromEntries(searchParams.entries()),
                 )}
               >
                 Costs details
@@ -104,7 +106,7 @@ export function PipelineRunLayout() {
                   organizationId,
                   pipelineId,
                   runId,
-                  Object.fromEntries(searchParams.entries())
+                  Object.fromEntries(searchParams.entries()),
                 )}
               >
                 Logs

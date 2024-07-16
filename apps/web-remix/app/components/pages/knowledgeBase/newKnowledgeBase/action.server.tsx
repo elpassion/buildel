@@ -1,20 +1,21 @@
-import { redirect } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
-import { validationError } from "remix-validated-form";
-import invariant from "tiny-invariant";
-import { z } from "zod";
-import { CreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { KnowledgeBaseApi } from "~/api/knowledgeBase/KnowledgeBaseApi";
-import { routes } from "~/utils/routes.utils";
-import { setServerToast } from "~/utils/toast.server";
-import { actionBuilder } from "~/utils.server";
-import type { ActionFunctionArgs} from "@remix-run/node";
+import { redirect } from '@remix-run/node';
+import type { ActionFunctionArgs } from '@remix-run/node';
+import { withZod } from '@remix-validated-form/with-zod';
+import { validationError } from 'remix-validated-form';
+import invariant from 'tiny-invariant';
+import { z } from 'zod';
+
+import { CreateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { KnowledgeBaseApi } from '~/api/knowledgeBase/KnowledgeBaseApi';
+import { actionBuilder } from '~/utils.server';
+import { routes } from '~/utils/routes.utils';
+import { setServerToast } from '~/utils/toast.server';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
     post: async ({ params, request }, { fetch }) => {
       const validator = withZod(CreateCollectionSchema);
-      invariant(params.organizationId, "organizationId not found");
+      invariant(params.organizationId, 'organizationId not found');
 
       const result = await validator.validate(await request.formData());
 
@@ -24,7 +25,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       await knowledgeBaseApi.createCollection(
         params.organizationId,
-        result.data
+        result.data,
       );
 
       const collectionName = result.data.collection_name;
@@ -33,14 +34,14 @@ export async function action(actionArgs: ActionFunctionArgs) {
         routes.collectionFiles(params.organizationId, collectionName),
         {
           headers: {
-            "Set-Cookie": await setServerToast(request, {
+            'Set-Cookie': await setServerToast(request, {
               success: {
-                title: "Collection created",
+                title: 'Collection created',
                 description: `You've created ${collectionName} collection`,
               },
             }),
           },
-        }
+        },
       );
     },
   })(actionArgs);

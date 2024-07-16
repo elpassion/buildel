@@ -1,42 +1,44 @@
-import { json } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
-import invariant from "tiny-invariant";
-import { z } from "zod";
-import { OrganizationResponse } from "~/api/organization/organization.contracts";
-import { requireLogin } from "~/session.server";
-import { setServerToast } from "~/utils/toast.server";
-import { actionBuilder } from "~/utils.server";
-import { schema } from "./schema";
-import type { ActionFunctionArgs} from "@remix-run/node";
+import { json } from '@remix-run/node';
+import type { ActionFunctionArgs } from '@remix-run/node';
+import { withZod } from '@remix-validated-form/with-zod';
+import invariant from 'tiny-invariant';
+import { z } from 'zod';
+
+import { OrganizationResponse } from '~/api/organization/organization.contracts';
+import { requireLogin } from '~/session.server';
+import { actionBuilder } from '~/utils.server';
+import { setServerToast } from '~/utils/toast.server';
+
+import { schema } from './schema';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
     post: async ({ params, request }, { fetch }) => {
-      invariant(params.organizationId, "organizationId not found");
+      invariant(params.organizationId, 'organizationId not found');
       await requireLogin(request);
 
       const res = await fetch(
         z.any(),
         `/organizations/${params.organizationId}/api_key`,
-        { method: "POST" }
+        { method: 'POST' },
       );
 
       return json(
         { key: res.data },
         {
           headers: {
-            "Set-Cookie": await setServerToast(request, {
+            'Set-Cookie': await setServerToast(request, {
               success: {
-                title: "API Key created",
+                title: 'API Key created',
                 description: `You've successfully generated API Key!`,
               },
             }),
           },
-        }
+        },
       );
     },
     put: async ({ params, request }, { fetch }) => {
-      invariant(params.organizationId, "organizationId not found");
+      invariant(params.organizationId, 'organizationId not found');
       await requireLogin(request);
 
       const validator = withZod(schema);
@@ -47,23 +49,23 @@ export async function action(actionArgs: ActionFunctionArgs) {
         OrganizationResponse,
         `/organizations/${params.organizationId}`,
         {
-          method: "PUT",
+          method: 'PUT',
           body: JSON.stringify(result.data),
-        }
+        },
       );
 
       return json(
         {},
         {
           headers: {
-            "Set-Cookie": await setServerToast(request, {
+            'Set-Cookie': await setServerToast(request, {
               success: {
-                title: "Organization updated",
+                title: 'Organization updated',
                 description: `You've successfully updated organization name!`,
               },
             }),
           },
-        }
+        },
       );
     },
   })(actionArgs);

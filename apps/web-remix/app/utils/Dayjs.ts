@@ -1,15 +1,16 @@
-import originalDayjs from "dayjs";
-import localeData from "dayjs/plugin/localeData";
-import type { Dayjs as OriginalDayjs } from "dayjs";
+import originalDayjs from 'dayjs';
+import type { Dayjs as OriginalDayjs } from 'dayjs';
+import localeData from 'dayjs/plugin/localeData';
+
 originalDayjs.extend(localeData);
 
 export class Dayjs {
   private instance: OriginalDayjs;
-  private defaultFormat = "DD/MM/YYYY HH:mm";
+  private defaultFormat = 'DD/MM/YYYY HH:mm';
 
   constructor(date: originalDayjs.ConfigType) {
-    if (typeof date === "string" && !date.endsWith("Z")) {
-      date += "Z"; // adding "Z" at the end of the date lets dayjs know that this date should be treated as UTC date and format date in the LOCAL timezone
+    if (typeof date === 'string' && !date.endsWith('Z')) {
+      date += 'Z'; // adding "Z" at the end of the date lets dayjs know that this date should be treated as UTC date and format date in the LOCAL timezone
     }
 
     this.instance = originalDayjs(date);
@@ -37,32 +38,32 @@ export class Dayjs {
 
   add(
     value: number,
-    unit?: originalDayjs.ManipulateType | undefined
+    unit?: originalDayjs.ManipulateType | undefined,
   ): OriginalDayjs {
     return this.instance.add(value, unit);
   }
 
   addMonth(value: number) {
-    return this.add(value, "month");
+    return this.add(value, 'month');
   }
 
   subtract(
     value: number,
-    unit?: originalDayjs.ManipulateType | undefined
+    unit?: originalDayjs.ManipulateType | undefined,
   ): OriginalDayjs {
     return this.instance.subtract(value, unit);
   }
 
   subtractMonth(value: number) {
-    return this.subtract(value, "month");
+    return this.subtract(value, 'month');
   }
 
   get startOfMonth() {
-    return this.startOf("month");
+    return this.startOf('month');
   }
 
   get endOfMonth() {
-    return this.endOf("month");
+    return this.endOf('month');
   }
 }
 

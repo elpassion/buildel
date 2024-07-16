@@ -1,15 +1,16 @@
-import { json, redirect } from "@remix-run/node";
-import { requireNotLogin } from "~/session.server";
-import { routes } from "~/utils/routes.utils";
-import { loaderBuilder } from "~/utils.server";
-import type { LoaderFunctionArgs} from "@remix-run/node";
+import { json, redirect } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
+
+import { requireNotLogin } from '~/session.server';
+import { loaderBuilder } from '~/utils.server';
+import { routes } from '~/utils/routes.utils';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }) => {
     await requireNotLogin(request);
 
     const url = new URL(request.url);
-    const token = url.searchParams.get("token");
+    const token = url.searchParams.get('token');
 
     if (!token) {
       return redirect(routes.login);

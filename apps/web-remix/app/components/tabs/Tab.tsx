@@ -1,6 +1,7 @@
-import type { PropsWithChildren} from "react";
-import React, { useCallback } from "react";
-import { useTabsContext } from "~/components/tabs/TabGroup";
+import type { PropsWithChildren } from 'react';
+import React, { useCallback } from 'react';
+
+import { useTabsContext } from '~/components/tabs/TabGroup';
 
 interface TabProps extends PropsWithChildren {
   tabId: string;
@@ -15,7 +16,7 @@ export const Tab: React.FC<TabProps> = ({ children, tabId }) => {
 export interface TabButtonProps extends PropsWithChildren {
   tabId: string;
   className?: string;
-  component?: "link" | "button";
+  component?: 'link' | 'button';
 }
 export const TabButton: React.FC<TabButtonProps> = ({
   children,

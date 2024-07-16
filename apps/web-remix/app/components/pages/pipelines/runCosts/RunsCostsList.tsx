@@ -1,8 +1,10 @@
-import React from "react";
-import classNames from "classnames";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
-import { dayjs } from "~/utils/Dayjs";
-import type { IPipelineCost, IPipelineCosts } from "../pipeline.types";
+import React from 'react';
+import classNames from 'classnames';
+
+import { EmptyMessage, ItemList } from '~/components/list/ItemList';
+import { dayjs } from '~/utils/Dayjs';
+
+import type { IPipelineCost, IPipelineCosts } from '../pipeline.types';
 
 interface PipelineRunCostsListProps {
   items: IPipelineCosts;
@@ -23,12 +25,12 @@ export const PipelineRunCostsList: React.FC<PipelineRunCostsListProps> = ({
 };
 
 const LIST_LAYOUT_STYLES =
-  "grid gap-1 grid-cols-[2fr_2fr_2fr_1fr_1fr] md:gap-2 md:grid-cols-[3fr_2fr_2fr_1fr_1fr]";
+  'grid gap-1 grid-cols-[2fr_2fr_2fr_1fr_1fr] md:gap-2 md:grid-cols-[3fr_2fr_2fr_1fr_1fr]';
 
 export const PipelineRunCostsListHeader = () => {
   return (
     <header
-      className={classNames("text-white text-xs py-2 px-6", LIST_LAYOUT_STYLES)}
+      className={classNames('text-white text-xs py-2 px-6', LIST_LAYOUT_STYLES)}
     >
       <p>Block</p>
       <p>Time</p>
@@ -49,8 +51,8 @@ export const PipelineRunCostsItem: React.FC<PipelineRunCostsItemProps> = ({
   return (
     <article
       className={classNames(
-        "group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 max-w-full items-center md:gap-2",
-        LIST_LAYOUT_STYLES
+        'group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 max-w-full items-center md:gap-2',
+        LIST_LAYOUT_STYLES,
       )}
     >
       <header className="max-w-full truncate">
@@ -60,7 +62,7 @@ export const PipelineRunCostsItem: React.FC<PipelineRunCostsItemProps> = ({
       </header>
 
       <p className="text-white text-sm">
-        {dayjs(data.created_at).format("DD MMM HH:mm")}
+        {dayjs(data.created_at).format('DD MMM HH:mm')}
       </p>
 
       <p className="text-white text-sm">{Number(data.amount).toFixed(10)}</p>

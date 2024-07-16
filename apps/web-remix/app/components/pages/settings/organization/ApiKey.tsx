@@ -1,18 +1,20 @@
-import React, { useState } from "react";
-import { useFetcher } from "@remix-run/react";
-import classNames from "classnames";
-import { Button } from "@elpassion/taco";
-import { TextInput } from "~/components/form/inputs/text.input";
-import { confirm } from "~/components/modal/confirm";
-import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
-import type { IAPIKey } from "./organization.types";
+import React, { useState } from 'react';
+import { useFetcher } from '@remix-run/react';
+import { Button } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import { TextInput } from '~/components/form/inputs/text.input';
+import { confirm } from '~/components/modal/confirm';
+import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
+
+import type { IAPIKey } from './organization.types';
 
 interface ApiKeyProps {
   apiKey: IAPIKey;
 }
 export const ApiKey: React.FC<ApiKeyProps> = ({ apiKey }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const { copy, isCopied } = useCopyToClipboard(apiKey.key ?? "");
+  const { copy, isCopied } = useCopyToClipboard(apiKey.key ?? '');
   const fetcher = useFetcher();
 
   const onFocus = () => {
@@ -23,10 +25,10 @@ export const ApiKey: React.FC<ApiKeyProps> = ({ apiKey }) => {
   };
 
   const handleGenerate = () => {
-    if (!apiKey.key) return fetcher.submit({}, { method: "post" });
+    if (!apiKey.key) return fetcher.submit({}, { method: 'post' });
 
     confirm({
-      onConfirm: async () => fetcher.submit({}, { method: "post" }),
+      onConfirm: async () => fetcher.submit({}, { method: 'post' }),
       children: (
         <p className="text-neutral-100 text-sm">
           You are about to regenerate the API Key. This action is irreversible.
@@ -47,12 +49,12 @@ export const ApiKey: React.FC<ApiKeyProps> = ({ apiKey }) => {
         <div className="flex gap-2 items-center">
           <TextInput
             placeholder="Generate API Key..."
-            value={apiKey.key ?? ""}
+            value={apiKey.key ?? ''}
             className="w-[300px]"
             onFocus={onFocus}
             onBlur={onBlur}
             onChange={() => {}}
-            type={isFocused ? "text" : "password"}
+            type={isFocused ? 'text' : 'password'}
           />
           <CopyButton
             onClick={copy}
@@ -65,10 +67,10 @@ export const ApiKey: React.FC<ApiKeyProps> = ({ apiKey }) => {
           size="xs"
           variant="outlined"
           className="!h-[42px] !w-fit"
-          isLoading={fetcher.state !== "idle"}
+          isLoading={fetcher.state !== 'idle'}
           onClick={handleGenerate}
         >
-          {apiKey.key ? "Regenerate" : "Generate"}
+          {apiKey.key ? 'Regenerate' : 'Generate'}
         </Button>
       </div>
     </section>
@@ -89,11 +91,11 @@ function CopyButton({ onClick, isCopied, disabled }: CopyButtonProps) {
       size="xs"
       disabled={disabled}
       onClick={onClick}
-      className={classNames("!h-[42px]", {
-        "!text-green-600": isCopied,
+      className={classNames('!h-[42px]', {
+        '!text-green-600': isCopied,
       })}
     >
-      {isCopied ? "Copied" : "Copy"}
+      {isCopied ? 'Copied' : 'Copy'}
     </Button>
   );
 }

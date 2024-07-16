@@ -1,8 +1,9 @@
-import { useEffect } from "react";
-import { errorToast } from "~/components/toasts/errorToast";
-import { successToast } from "~/components/toasts/successToast";
-import { warningToast } from "~/components/toasts/warningToast";
-import type { SessionFlashData } from "~/session.server";
+import { useEffect } from 'react';
+
+import { errorToast } from '~/components/toasts/errorToast';
+import { successToast } from '~/components/toasts/successToast';
+import { warningToast } from '~/components/toasts/warningToast';
+import type { SessionFlashData } from '~/session.server';
 
 export function useServerToasts(toasts: Partial<SessionFlashData>) {
   useEffect(() => {

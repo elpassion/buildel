@@ -1,5 +1,5 @@
-import { screen } from "../render";
-import type { Matcher } from "../render";
+import { screen } from '../render';
+import type { Matcher } from '../render';
 
 export class BlockHandle {
   constructor(public readonly blockElement: HTMLDivElement) {}
@@ -13,10 +13,10 @@ export class BlockHandle {
   }
 
   get isActive(): boolean {
-    return this.blockElement.getAttribute("data-active") === "true";
+    return this.blockElement.getAttribute('data-active') === 'true';
   }
 
   get isValid(): boolean {
-    return this.blockElement.getAttribute("data-valid") === "true";
+    return this.blockElement.getAttribute('data-valid') === 'true';
   }
 }

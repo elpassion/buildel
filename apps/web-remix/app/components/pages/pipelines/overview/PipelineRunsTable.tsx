@@ -1,22 +1,23 @@
-import React, { useMemo } from "react";
-import { Link } from "@remix-run/react";
+import React, { useMemo } from 'react';
+import { Link } from '@remix-run/react';
+import { Indicator } from '@elpassion/taco';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { Indicator } from "@elpassion/taco";
-import { IconButton } from "~/components/iconButton";
-import { EmptyMessage } from "~/components/list/ItemList";
-import { StopRunForm } from "~/components/pages/pipelines/overview/StopRunForm";
+} from '@tanstack/react-table';
+
+import { IconButton } from '~/components/iconButton';
+import { EmptyMessage } from '~/components/list/ItemList';
+import { StopRunForm } from '~/components/pages/pipelines/overview/StopRunForm';
 import type {
   IPipelineRun,
   IPipelineRuns,
-} from "~/components/pages/pipelines/pipeline.types";
-import { Tooltip } from "~/components/tooltip/Tooltip";
-import { dayjs } from "~/utils/Dayjs";
-import { routes } from "~/utils/routes.utils";
+} from '~/components/pages/pipelines/pipeline.types';
+import { Tooltip } from '~/components/tooltip/Tooltip';
+import { dayjs } from '~/utils/Dayjs';
+import { routes } from '~/utils/routes.utils';
 
 interface PipelineRunsTableProps {
   data: IPipelineRuns;
@@ -33,57 +34,57 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
 }) => {
   const columns = useMemo(
     () => [
-      columnHelper.accessor("created_at", {
-        header: "Date",
-        id: "created_at",
-        cell: (info) => dayjs(info.getValue()).format("DD MMM HH:mm"),
+      columnHelper.accessor('created_at', {
+        header: 'Date',
+        id: 'created_at',
+        cell: (info) => dayjs(info.getValue()).format('DD MMM HH:mm'),
       }),
-      columnHelper.accessor("status", {
-        id: "status",
+      columnHelper.accessor('status', {
+        id: 'status',
         cell: (info) => (
           <Indicator
-            type={info.getValue() !== "finished" ? "warning" : "success"}
+            type={info.getValue() !== 'finished' ? 'warning' : 'success'}
             variant="badge"
             text={info.getValue()}
           />
         ),
-        header: "Status",
+        header: 'Status',
       }),
-      columnHelper.accessor("costs", {
-        header: "Run costs ($)",
-        id: "costs",
+      columnHelper.accessor('costs', {
+        header: 'Run costs ($)',
+        id: 'costs',
         cell: (info) =>
           info
             .getValue()
             .reduce((acc, curr) => acc + Number(curr.data.amount), 0)
             .toFixed(10),
       }),
-      columnHelper.accessor("costs", {
-        header: "Input tokens",
-        id: "input_tokens",
+      columnHelper.accessor('costs', {
+        header: 'Input tokens',
+        id: 'input_tokens',
         cell: (info) =>
           info
             .getValue()
             .reduce((acc, curr) => acc + Number(curr.data.input_tokens), 0),
       }),
-      columnHelper.accessor("costs", {
-        header: "Output tokens",
-        id: "output_tokens",
+      columnHelper.accessor('costs', {
+        header: 'Output tokens',
+        id: 'output_tokens',
         cell: (info) =>
           info
             .getValue()
             .reduce((acc, curr) => acc + Number(curr.data.output_tokens), 0),
       }),
 
-      columnHelper.accessor("status", {
-        header: "",
-        id: "action",
+      columnHelper.accessor('status', {
+        header: '',
+        id: 'action',
         maxSize: 20,
         cell: (info) => {
           const id = info.row.original.id;
           return (
             <div className="flex gap-3 items-center justify-end">
-              {info.getValue() === "running" ? <StopRunForm id={id} /> : null}
+              {info.getValue() === 'running' ? <StopRunForm id={id} /> : null}
 
               <Link
                 id={`run-link-${id}`}
@@ -109,7 +110,7 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
         },
       }),
     ],
-    []
+    [],
   );
 
   const tableData = useMemo(() => {
@@ -134,7 +135,7 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
               >
                 {flexRender(
                   header.column.columnDef.header,
-                  header.getContext()
+                  header.getContext(),
                 )}
               </th>
             ))}

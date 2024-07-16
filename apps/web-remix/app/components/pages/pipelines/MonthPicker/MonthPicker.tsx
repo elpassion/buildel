@@ -1,14 +1,16 @@
-import React from "react";
-import { useNavigate } from "@remix-run/react";
-import { Icon } from "@elpassion/taco";
+import React from 'react';
+import { useNavigate } from '@remix-run/react';
+import { Icon } from '@elpassion/taco';
+
 import {
   DatepickerInput,
   DatepickerInputFallback,
-} from "~/components/form/inputs/datepicker.input";
-import { PaginationButton } from "~/components/pagination/Pagination";
-import { dayjs } from "~/utils/Dayjs";
-import { buildUrlWithParams } from "~/utils/url";
-import "./monthPicker.styles.css";
+} from '~/components/form/inputs/datepicker.input';
+import { PaginationButton } from '~/components/pagination/Pagination';
+import { dayjs } from '~/utils/Dayjs';
+import { buildUrlWithParams } from '~/utils/url';
+
+import './monthPicker.styles.css';
 
 interface MonthPickerProps {
   date: Date;

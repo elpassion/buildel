@@ -1,10 +1,12 @@
-import React from "react";
-import classNames from "classnames";
-import { BasicLink } from "~/components/link/BasicLink";
-import { ItemList } from "~/components/list/ItemList";
-import { routes } from "~/utils/routes.utils";
-import { PipelineListItemHeader, PipelinesListItem } from "./PipelinesListItem";
-import type { IPipeline } from "../pipeline.types";
+import React from 'react';
+import classNames from 'classnames';
+
+import { BasicLink } from '~/components/link/BasicLink';
+import { ItemList } from '~/components/list/ItemList';
+import { routes } from '~/utils/routes.utils';
+
+import type { IPipeline } from '../pipeline.types';
+import { PipelineListItemHeader, PipelinesListItem } from './PipelinesListItem';
 
 interface PipelinesListProps {
   pipelines: IPipeline[];
@@ -26,7 +28,7 @@ export const PipelinesList: React.FC<PipelinesListProps> = ({
           </PipelinesListItem>
         </BasicLink>
       )}
-      className={classNames("flex flex-col gap-2", className)}
+      className={classNames('flex flex-col gap-2', className)}
     />
   );
 };

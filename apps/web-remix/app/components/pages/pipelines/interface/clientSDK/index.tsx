@@ -1,1 +1,1 @@
-export { ClientSDKPage as page, meta } from "./page";
+export { ClientSDKPage as page, meta } from './page';

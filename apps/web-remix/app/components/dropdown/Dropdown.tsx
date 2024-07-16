@@ -1,17 +1,16 @@
-import type { PropsWithChildren} from "react";
-import React, { useRef } from "react";
+import type { PropsWithChildren } from 'react';
+import React, { useRef } from 'react';
 import {
   autoUpdate,
   flip,
   offset as floatingOffset,
   useFloating,
-} from "@floating-ui/react-dom";
-import classNames from "classnames";
-import { useBoolean, useOnClickOutside } from "usehooks-ts";
-import { DropdownContext, useDropdown } from "./DropdownContext";
-import type {
-  OffsetOptions,
-  Placement} from "@floating-ui/react-dom";
+} from '@floating-ui/react-dom';
+import type { OffsetOptions, Placement } from '@floating-ui/react-dom';
+import classNames from 'classnames';
+import { useBoolean, useOnClickOutside } from 'usehooks-ts';
+
+import { DropdownContext, useDropdown } from './DropdownContext';
 
 interface DropdownProps {
   defaultShown?: boolean;
@@ -22,7 +21,7 @@ interface DropdownProps {
 export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   children,
   defaultShown,
-  placement = "bottom-start",
+  placement = 'bottom-start',
   offset = 5,
 }) => {
   const floatingContext = useFloating({
@@ -73,12 +72,12 @@ export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
       ref={context.refs.setFloating}
       style={context.floatingStyles}
       className={classNames(
-        "transition-opacity",
+        'transition-opacity',
         {
-          "opacity-0 pointer-events-none": !isShown,
-          "opacity-100 pointer-events-auto": isShown,
+          'opacity-0 pointer-events-none': !isShown,
+          'opacity-100 pointer-events-auto': isShown,
         },
-        className
+        className,
       )}
     >
       {children}
@@ -92,7 +91,7 @@ export const DropdownTrigger: React.FC<
   const { toggle, context } = useDropdown();
 
   const handleOnClick = (
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     toggle();
     onClick?.(e);

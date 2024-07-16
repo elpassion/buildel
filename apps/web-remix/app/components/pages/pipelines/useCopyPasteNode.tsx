@@ -1,9 +1,11 @@
-import type { RefObject} from "react";
-import { useCallback, useRef } from "react";
-import { useEventListener } from "usehooks-ts";
-import { BlockConfig } from "~/api/blockType/blockType.contracts";
-import type { IBlockConfig, IEdge, INode } from "./pipeline.types";
-import type { ReactFlowInstance } from "@xyflow/react";
+import type { RefObject } from 'react';
+import { useCallback, useRef } from 'react';
+import type { ReactFlowInstance } from '@xyflow/react';
+import { useEventListener } from 'usehooks-ts';
+
+import { BlockConfig } from '~/api/blockType/blockType.contracts';
+
+import type { IBlockConfig, IEdge, INode } from './pipeline.types';
 
 interface UseCopyPasteNodeArgs {
   onPaste: (config: IBlockConfig) => Promise<void>;
@@ -20,10 +22,10 @@ export const useCopyPasteNode = ({
 }: UseCopyPasteNodeArgs) => {
   const mousePosition = useRef({ clientX: 0, clientY: 0 });
   const reactFlowInstance = useRef<ReactFlowInstance<INode, IEdge> | null>(
-    null
+    null,
   );
 
-  useEventListener("keydown", (e) => {
+  useEventListener('keydown', (e) => {
     if (
       e.target instanceof HTMLInputElement ||
       e.target instanceof HTMLTextAreaElement ||
@@ -33,7 +35,7 @@ export const useCopyPasteNode = ({
     }
 
     if (e.ctrlKey || e.metaKey) {
-      if (e.key === "c") {
+      if (e.key === 'c') {
         const selectedNode = nodes.find((node) => node.selected);
 
         if (selectedNode) {
@@ -41,7 +43,7 @@ export const useCopyPasteNode = ({
         }
       }
 
-      if (e.code === "KeyV") {
+      if (e.code === 'KeyV') {
         const reactFlowBounds = wrapper.current?.getBoundingClientRect();
 
         const position = reactFlowInstance.current?.screenToFlowPosition({
@@ -75,7 +77,7 @@ export const useCopyPasteNode = ({
     (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       mousePosition.current = { clientX: e.clientX, clientY: e.clientY };
     },
-    []
+    [],
   );
 
   return { onInit, onMouseMove };

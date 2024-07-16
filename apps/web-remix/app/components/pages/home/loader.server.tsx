@@ -1,10 +1,11 @@
-import { redirect } from "@remix-run/node";
-import { OrganizationApi } from "~/api/organization/OrganizationApi";
-import { requireLogin } from "~/session.server";
-import { routes } from "~/utils/routes.utils";
-import { getOrganizationId } from "~/utils/toast.server";
-import { loaderBuilder } from "~/utils.server";
-import type { LoaderFunctionArgs} from "@remix-run/node";
+import { redirect } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
+
+import { OrganizationApi } from '~/api/organization/OrganizationApi';
+import { requireLogin } from '~/session.server';
+import { loaderBuilder } from '~/utils.server';
+import { routes } from '~/utils/routes.utils';
+import { getOrganizationId } from '~/utils/toast.server';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {
@@ -15,10 +16,10 @@ export async function loader(args: LoaderFunctionArgs) {
     const { data: organizations } = await organizationApi.getOrganizations();
 
     const organizationId = await getOrganizationId(
-      request.headers.get("Cookie") || ""
+      request.headers.get('Cookie') || '',
     );
     const savedOrganizationIndex = organizations.data.findIndex(
-      (org) => org.id === organizationId
+      (org) => org.id === organizationId,
     );
     const organization = organizations.data.at(savedOrganizationIndex);
 

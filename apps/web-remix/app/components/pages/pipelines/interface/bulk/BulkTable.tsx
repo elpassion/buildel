@@ -1,11 +1,13 @@
-import type { Dispatch, SetStateAction } from "react";
-import { Link } from "@remix-run/react";
-import classNames from "classnames";
-import { Icon, IconButton } from "@elpassion/taco";
-import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
-import { TextareaInput } from "~/components/form/inputs/textarea.input";
-import { routes } from "~/utils/routes.utils";
-import type { ITest } from "./page";
+import type { Dispatch, SetStateAction } from 'react';
+import { Link } from '@remix-run/react';
+import { Icon, IconButton } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
+import { TextareaInput } from '~/components/form/inputs/textarea.input';
+import { routes } from '~/utils/routes.utils';
+
+import type { ITest } from './page';
 
 interface BulkTableProps {
   selectedInputs: string[];
@@ -61,10 +63,10 @@ export const BulkTable: React.FC<BulkTableProps> = ({
             <tr
               key={test.id}
               className={classNames(
-                "[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden",
+                '[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden',
                 {
-                  "bg-primary-500": test.status === "running",
-                  "bg-neutral-8800": test.status === "done",
+                  'bg-primary-500': test.status === 'running',
+                  'bg-neutral-8800': test.status === 'done',
                 },
               )}
               aria-label="pipeline run"

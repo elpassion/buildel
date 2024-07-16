@@ -1,13 +1,15 @@
-import type { DragEvent} from "react";
-import React, { useCallback } from "react";
-import { useReactFlow } from "@xyflow/react";
-import classNames from "classnames";
-import startCase from "lodash.startcase";
-import { Icon, IconButton } from "@elpassion/taco";
-import type { BlockType } from "~/api/blockType/blockType.contracts";
-import { useRunPipeline } from "../../RunPipelineProvider";
-import type { IBlockConfig, IBlockType } from "../../pipeline.types";
-import type { z } from "zod";
+import type { DragEvent } from 'react';
+import React, { useCallback } from 'react';
+import { Icon, IconButton } from '@elpassion/taco';
+import { useReactFlow } from '@xyflow/react';
+import classNames from 'classnames';
+import startCase from 'lodash.startcase';
+import type { z } from 'zod';
+
+import type { BlockType } from '~/api/blockType/blockType.contracts';
+
+import type { IBlockConfig, IBlockType } from '../../pipeline.types';
+import { useRunPipeline } from '../../RunPipelineProvider';
 
 interface CreateBlockDraggableItemProps {
   onCreate: (node: IBlockConfig) => void;
@@ -21,10 +23,10 @@ export const CreateBlockDraggableItem: React.FC<
   const { status: runStatus } = useRunPipeline();
   const onDragStart = (
     event: DragEvent<HTMLDivElement>,
-    block: z.TypeOf<typeof BlockType>
+    block: z.TypeOf<typeof BlockType>,
   ) => {
-    event.dataTransfer.setData("application/reactflow", JSON.stringify(block));
-    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData('application/reactflow', JSON.stringify(block));
+    event.dataTransfer.effectAllowed = 'move';
   };
 
   const onClickAdd = useCallback(
@@ -36,7 +38,7 @@ export const CreateBlockDraggableItem: React.FC<
       });
 
       onCreate({
-        name: "",
+        name: '',
         opts: {},
         inputs: [],
         type: block.type,
@@ -45,7 +47,7 @@ export const CreateBlockDraggableItem: React.FC<
         connections: [],
       });
     },
-    [onCreate, reactFlowInstance]
+    [onCreate, reactFlowInstance],
   );
 
   return (
@@ -53,14 +55,14 @@ export const CreateBlockDraggableItem: React.FC<
       id="draggable-block-item"
       key={data.type}
       className={classNames(
-        "min-w-[100px] bg-neutral-850 py-2 pl-3 pr-2 text-white flex justify-between items-center transition text-xs",
+        'min-w-[100px] bg-neutral-850 py-2 pl-3 pr-2 text-white flex justify-between items-center transition text-xs',
         {
-          "opacity-70": runStatus !== "idle",
-          "cursor-grab hover:bg-neutral-950 hover:drop-shadow-md":
-            runStatus === "idle",
-        }
+          'opacity-70': runStatus !== 'idle',
+          'cursor-grab hover:bg-neutral-950 hover:drop-shadow-md':
+            runStatus === 'idle',
+        },
       )}
-      draggable={runStatus === "idle"}
+      draggable={runStatus === 'idle'}
       onDragStart={(event) => {
         onDragStart(event, data);
       }}
@@ -73,7 +75,7 @@ export const CreateBlockDraggableItem: React.FC<
         className="!w-5 !h-5 !rounded"
         onClick={() => onClickAdd(data)}
         icon={<Icon iconName="plus" />}
-        disabled={runStatus !== "idle"}
+        disabled={runStatus !== 'idle'}
       />
     </div>
   );

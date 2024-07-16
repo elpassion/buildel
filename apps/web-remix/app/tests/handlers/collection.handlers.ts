@@ -1,12 +1,14 @@
-import { HttpResponse, http } from "msw";
+import { http, HttpResponse } from 'msw';
+
 import type {
   ICreateCollectionSchema,
   IUpdateCollectionSchema,
-} from "~/api/knowledgeBase/knowledgeApi.contracts";
+} from '~/api/knowledgeBase/knowledgeApi.contracts';
 import type {
   IKnowledgeBaseCollection,
   IKnowledgeBaseFile,
-} from "~/components/pages/knowledgeBase/knowledgeBase.types";
+} from '~/components/pages/knowledgeBase/knowledgeBase.types';
+
 export class CollectionHandlers {
   private collections: Map<number, IKnowledgeBaseCollection> = new Map();
 
@@ -18,7 +20,7 @@ export class CollectionHandlers {
 
   getCollections() {
     return http.get(
-      "/super-api/organizations/:organizationId/memory_collections",
+      '/super-api/organizations/:organizationId/memory_collections',
       () => {
         return HttpResponse.json<{ data: IKnowledgeBaseCollection[] }>(
           { data: [...this.collections.values()] },
@@ -32,7 +34,7 @@ export class CollectionHandlers {
 
   createCollection() {
     return http.post<any, ICreateCollectionSchema>(
-      "/super-api/organizations/:organizationId/memory_collections",
+      '/super-api/organizations/:organizationId/memory_collections',
       async ({ request }) => {
         const data = await request.json();
 
@@ -55,7 +57,7 @@ export class CollectionHandlers {
 
   updateCollection() {
     return http.put<any, IUpdateCollectionSchema>(
-      "/super-api/organizations/:organizationId/memory_collections/:collectionId",
+      '/super-api/organizations/:organizationId/memory_collections/:collectionId',
       async ({ request, params }) => {
         const data = await request.json();
         const { collectionId } = params;
@@ -93,7 +95,7 @@ export class CollectionHandlers {
 
   deleteHandler() {
     return http.delete(
-      "/super-api/organizations/:organizationId/memory_collections/:collectionId",
+      '/super-api/organizations/:organizationId/memory_collections/:collectionId',
       async ({ params }) => {
         const { collectionId } = params;
 
@@ -129,7 +131,7 @@ export class CollectionMemoriesHandlers {
 
   getCollectionMemories() {
     return http.get(
-      "/super-api/organizations/:organizationId/memory_collections/:collectionId/memories",
+      '/super-api/organizations/:organizationId/memory_collections/:collectionId/memories',
       () => {
         return HttpResponse.json<{ data: IKnowledgeBaseFile[] }>(
           { data: [...this.collectionMemories.values()] },
@@ -143,10 +145,10 @@ export class CollectionMemoriesHandlers {
 
   createCollectionMemory() {
     return http.post(
-      "/super-api/organizations/:organizationId/memory_collections/:collectionId/memories",
+      '/super-api/organizations/:organizationId/memory_collections/:collectionId/memories',
       async ({ request }) => {
         const data = await request.formData();
-        const file = data.get("file") as File;
+        const file = data.get('file') as File;
 
         const newMemory = {
           id: this.collectionMemories.size + 1,
@@ -169,12 +171,12 @@ export class CollectionMemoriesHandlers {
 
   createCollectionMemoryFailed() {
     return http.post(
-      "/super-api/organizations/:organizationId/memory_collections/:collectionId/memories",
+      '/super-api/organizations/:organizationId/memory_collections/:collectionId/memories',
       async () => {
         return HttpResponse.json(
           {
             errors: {
-              detail: "Invalid API key provided for embeddings model",
+              detail: 'Invalid API key provided for embeddings model',
             },
           },
           {
@@ -187,7 +189,7 @@ export class CollectionMemoriesHandlers {
 
   deleteCollectionMemory() {
     return http.delete(
-      "/super-api/organizations/:organizationId/memory_collections/:collectionId/memories/:memoryId",
+      '/super-api/organizations/:organizationId/memory_collections/:collectionId/memories/:memoryId',
       ({ params }) => {
         const { memoryId } = params;
 

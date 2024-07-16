@@ -1,18 +1,19 @@
-import { json } from "@remix-run/node";
-import invariant from "tiny-invariant";
-import { KnowledgeBaseCollectionFromListResponse } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { KnowledgeBaseApi } from "~/api/knowledgeBase/KnowledgeBaseApi";
-import { getParamsPagination } from "~/components/pagination/usePagination";
-import { requireLogin } from "~/session.server";
-import { loaderBuilder } from "~/utils.server";
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from '@remix-run/node';
+import type { LoaderFunctionArgs } from '@remix-run/node';
+import invariant from 'tiny-invariant';
+
+import { KnowledgeBaseCollectionFromListResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { KnowledgeBaseApi } from '~/api/knowledgeBase/KnowledgeBaseApi';
+import { getParamsPagination } from '~/components/pagination/usePagination';
+import { requireLogin } from '~/session.server';
+import { loaderBuilder } from '~/utils.server';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
     await requireLogin(request);
-    invariant(params.organizationId, "organizationId not found");
-    invariant(params.collectionName, "collectionName not found");
-    invariant(params.memoryId, "collectionName not found");
+    invariant(params.organizationId, 'organizationId not found');
+    invariant(params.collectionName, 'collectionName not found');
+    invariant(params.memoryId, 'collectionName not found');
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
@@ -20,18 +21,18 @@ export async function loader(args: LoaderFunctionArgs) {
       data: { id: collectionId },
     } = await knowledgeBaseApi.getCollectionByName(
       params.organizationId,
-      params.collectionName
+      params.collectionName,
     );
 
     const { page, per_page, search } = getParamsPagination(
-      new URL(request.url).searchParams
+      new URL(request.url).searchParams,
     );
 
     const { data: chunks } = await knowledgeBaseApi.getMemoryChunk(
       params.organizationId,
       collectionId,
       params.memoryId,
-      { page, per_page, search }
+      { page, per_page, search },
     );
 
     const totalItems = chunks.meta.total;

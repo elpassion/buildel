@@ -1,1 +1,1 @@
-export { KnowledgeBaseOverviewPage as page, meta } from "./page";
+export { KnowledgeBaseOverviewPage as page, meta } from './page';

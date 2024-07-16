@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
-import classNames from "classnames";
-import { createPortal } from "react-dom";
-import { assert } from "~/utils/assert";
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import classNames from 'classnames';
+
+import { assert } from '~/utils/assert';
 
 interface PageOverlayProps {
   className?: string;
@@ -11,7 +12,7 @@ interface PageOverlayProps {
 }
 export function PageOverlay({
   className,
-  containerId = "_root",
+  containerId = '_root',
   onClick,
   isShow,
 }: PageOverlayProps) {
@@ -30,14 +31,14 @@ export function PageOverlay({
     <div
       onClick={onClick}
       className={classNames(
-        "fixed top-0 left-0 right-0 bottom-0 bg-black/80 transition ease-[cubic-bezier(0.25, 1, 0.5, 1)]",
+        'fixed top-0 left-0 right-0 bottom-0 bg-black/80 transition ease-[cubic-bezier(0.25, 1, 0.5, 1)]',
         {
-          "opacity-0 pointer-events-none -z-[40]": !isShow,
-          "opacity-1 pointer-events-auto z-[40]": isShow,
+          'opacity-0 pointer-events-none -z-[40]': !isShow,
+          'opacity-1 pointer-events-auto z-[40]': isShow,
         },
-        className
+        className,
       )}
     />,
-    root
+    root,
   );
 }

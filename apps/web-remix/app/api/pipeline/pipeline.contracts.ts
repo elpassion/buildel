@@ -1,13 +1,14 @@
-import { z } from "zod";
-import { zfd } from "zod-form-data";
+import { z } from 'zod';
+import { zfd } from 'zod-form-data';
+
 import {
   BlockConfig,
   ConfigConnection,
   ExtendedBlockConfig,
   UpdateBlockConfig,
-} from "~/api/blockType/blockType.contracts";
-import type { IInterfaceConfigFormProperty } from "~/components/pages/pipelines/pipeline.types";
-import { PaginationMeta } from "~/components/pagination/pagination.types";
+} from '~/api/blockType/blockType.contracts';
+import type { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
+import { PaginationMeta } from '~/components/pagination/pagination.types';
 
 export const InterfaceConfigFormProperty = z.object({
   name: z.string(),
@@ -19,7 +20,7 @@ export const InterfaceConfigForm = z.object({
       z
         .string()
         .transform(
-          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[]
+          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[],
         ),
       z.array(InterfaceConfigFormProperty),
     ])
@@ -29,13 +30,13 @@ export const InterfaceConfigForm = z.object({
       z
         .string()
         .transform(
-          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[]
+          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[],
         ),
       z.array(InterfaceConfigFormProperty),
     ])
     .default([]),
   public: z
-    .union([z.boolean(), z.string().transform((v) => v === "on")])
+    .union([z.boolean(), z.string().transform((v) => v === 'on')])
     .optional()
     .default(false),
 });
@@ -76,7 +77,7 @@ export const Pipeline = z.object({
               outputs: [],
               public: false,
             },
-          }
+          },
     )
     .default({}),
   config: z.object({
@@ -105,7 +106,7 @@ export const PipelinePublic = z.object({
               outputs: [],
               public: false,
             },
-          }
+          },
     )
     .default({
       webchat: {
@@ -158,7 +159,7 @@ export const Alias = z.object({
               outputs: [],
               public: false,
             },
-          }
+          },
     )
     .default({
       webchat: {

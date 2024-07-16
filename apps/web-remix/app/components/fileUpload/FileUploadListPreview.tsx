@@ -1,15 +1,17 @@
-import React, { useCallback } from "react";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import { IconButton } from "~/components/iconButton";
-import { ItemList } from "~/components/list/ItemList";
-import { Tooltip } from "~/components/tooltip/Tooltip";
-import { isUploadError } from "./fileUpload.types";
-import type { IFileUpload, IPreviewProps} from "./fileUpload.types";
+import React, { useCallback } from 'react';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import { IconButton } from '~/components/iconButton';
+import { ItemList } from '~/components/list/ItemList';
+import { Tooltip } from '~/components/tooltip/Tooltip';
+
+import { isUploadError } from './fileUpload.types';
+import type { IFileUpload, IPreviewProps } from './fileUpload.types';
 
 interface FileUploadListPreviewProps
-  extends Omit<IPreviewProps, "remove">,
-  React.HTMLProps<HTMLUListElement> {
+  extends Omit<IPreviewProps, 'remove'>,
+    React.HTMLProps<HTMLUListElement> {
   remove?: (id: string | number) => Promise<void>;
   disabled?: boolean;
   className?: string;
@@ -24,8 +26,8 @@ export function FileUploadListPreview({
   return (
     <ItemList
       className={classNames(
-        "flex flex-col items-center gap-1 overflow-y-auto",
-        className
+        'flex flex-col items-center gap-1 overflow-y-auto',
+        className,
       )}
       itemClassName="w-full"
       items={fileList}
@@ -47,7 +49,7 @@ export function FileUploadListItem({
   onRemove,
   disabled,
 }: FileUploadListItemProps) {
-  const isDisabled = file.status === "uploading" || disabled;
+  const isDisabled = file.status === 'uploading' || disabled;
 
   const handleRemove = useCallback(() => {
     onRemove?.(file.id);
@@ -57,11 +59,11 @@ export function FileUploadListItem({
     <article
       data-tooltip-id={`${file.id}`}
       className={classNames(
-        "flex justify-between gap-2 w-full py-1 px-2 bg-neutral-600 hover:bg-neutral-700 transition rounded-md cursor-default",
+        'flex justify-between gap-2 w-full py-1 px-2 bg-neutral-600 hover:bg-neutral-700 transition rounded-md cursor-default',
         {
-          "text-white": file.status !== "error",
-          "text-red-500": file.status === "error",
-        }
+          'text-white': file.status !== 'error',
+          'text-red-500': file.status === 'error',
+        },
       )}
     >
       <div className="flex gap-1 grow max-w-[90%]">
@@ -75,9 +77,9 @@ export function FileUploadListItem({
             {file.file_name}
           </h6>
           <span
-            className={classNames("text-[10px]", {
-              "text-white": file.status !== "error",
-              "text-red-500": file.status === "error",
+            className={classNames('text-[10px]', {
+              'text-white': file.status !== 'error',
+              'text-red-500': file.status === 'error',
             })}
           >
             {renderSize(file.file_size)}
@@ -100,13 +102,13 @@ export function FileUploadListItem({
           icon={
             <Icon
               className={classNames(
-                "flex items-center justify-center origin-center w-5 h-5 !leading-5",
+                'flex items-center justify-center origin-center w-5 h-5 !leading-5',
                 {
-                  "animate-spin": file.status === "uploading",
-                  "text-red-500": file.status === "error",
-                }
+                  'animate-spin': file.status === 'uploading',
+                  'text-red-500': file.status === 'error',
+                },
               )}
-              iconName={file.status === "uploading" ? "loader" : "x"}
+              iconName={file.status === 'uploading' ? 'loader' : 'x'}
             />
           }
           aria-label={`Delete file: ${file.file_name}`}
@@ -119,8 +121,8 @@ export function FileUploadListItem({
 }
 
 function renderTypeIcon(fileType: string) {
-  if (fileType.startsWith("audio/")) return "file" as const;
-  return "file-text" as const;
+  if (fileType.startsWith('audio/')) return 'file' as const;
+  return 'file-text' as const;
 }
 function renderSize(size: number) {
   if (size < 1000) return `${size.toFixed(0)} B`;
@@ -134,5 +136,5 @@ function handleErrorMessages(e: unknown) {
     return e.message;
   }
 
-  return "Something went wrong!";
+  return 'Something went wrong!';
 }

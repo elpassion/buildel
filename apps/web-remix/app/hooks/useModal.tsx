@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState } from 'react';
 
 export function useModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);

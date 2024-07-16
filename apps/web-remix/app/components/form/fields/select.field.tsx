@@ -1,13 +1,14 @@
-import type { ReactNode } from "react";
-import React, { forwardRef } from "react";
-import { useControlField, useFormContext } from "remix-validated-form";
-import { InputText, Label } from "@elpassion/taco";
+import type { ReactNode } from 'react';
+import React, { forwardRef } from 'react';
+import { InputText, Label } from '@elpassion/taco';
+import { useControlField, useFormContext } from 'remix-validated-form';
+
 import {
   HiddenField,
   useFieldContext,
-} from "~/components/form/fields/field.context";
-import { SelectInput } from "~/components/form/inputs/select/select.input";
-import type { SelectInputProps } from "~/components/form/inputs/select/select.input-impl.client";
+} from '~/components/form/fields/field.context';
+import { SelectInput } from '~/components/form/inputs/select/select.input';
+import type { SelectInputProps } from '~/components/form/inputs/select/select.input-impl.client';
 
 interface SelectFieldProps extends SelectInputProps {
   label?: ReactNode;
@@ -33,7 +34,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           value={
             Array.isArray(selectedId)
               ? JSON.stringify(selectedId)
-              : selectedId ?? ""
+              : selectedId ?? ''
           }
           {...getInputProps()}
         />

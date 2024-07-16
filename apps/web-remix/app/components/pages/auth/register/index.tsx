@@ -1,1 +1,1 @@
-export { RegisterPage as page, meta } from "./page";
+export { RegisterPage as page, meta } from './page';

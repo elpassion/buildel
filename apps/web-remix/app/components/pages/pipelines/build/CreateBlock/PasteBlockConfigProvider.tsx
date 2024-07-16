@@ -1,6 +1,6 @@
-import type { PropsWithChildren} from "react";
-import React, { useMemo } from "react";
-import { useBoolean } from "usehooks-ts";
+import type { PropsWithChildren } from 'react';
+import React, { useMemo } from 'react';
+import { useBoolean } from 'usehooks-ts';
 
 interface IPasteBlockConfigContext {
   isShown: boolean;
@@ -9,7 +9,7 @@ interface IPasteBlockConfigContext {
 }
 
 const PasteBlockConfigContext = React.createContext<IPasteBlockConfigContext>(
-  undefined!
+  undefined!,
 );
 
 export const PasteBlockConfigProvider: React.FC<PropsWithChildren<{}>> = ({
@@ -23,7 +23,7 @@ export const PasteBlockConfigProvider: React.FC<PropsWithChildren<{}>> = ({
       show,
       hide,
     }),
-    [show, hide, isShown]
+    [show, hide, isShown],
   );
 
   return (
@@ -38,7 +38,7 @@ export function usePasteConfig() {
 
   if (!ctx)
     throw new Error(
-      "usePasteConfig have to be used inside PasteBlockConfigProvider"
+      'usePasteConfig have to be used inside PasteBlockConfigProvider',
     );
 
   return ctx;

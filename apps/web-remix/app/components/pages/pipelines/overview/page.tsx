@@ -1,11 +1,13 @@
-import { useLoaderData } from "@remix-run/react";
-import { MonthPicker } from "~/components/pages/pipelines/MonthPicker/MonthPicker";
-import { PipelineRunsTable } from "~/components/pages/pipelines/overview/PipelineRunsTable";
-import { Pagination } from "~/components/pagination/Pagination";
-import { dayjs } from "~/utils/Dayjs";
-import { routes } from "~/utils/routes.utils";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+
+import { MonthPicker } from '~/components/pages/pipelines/MonthPicker/MonthPicker';
+import { PipelineRunsTable } from '~/components/pages/pipelines/overview/PipelineRunsTable';
+import { Pagination } from '~/components/pagination/Pagination';
+import { dayjs } from '~/utils/Dayjs';
+import { routes } from '~/utils/routes.utils';
+
+import type { loader } from './loader.server';
 
 export function OverviewPage() {
   const {
@@ -22,7 +24,7 @@ export function OverviewPage() {
     <section className="pt-5 pb-1">
       <header className="w-full flex items-center justify-between py-2 mb-4">
         <p className="text-white">
-          <span className="text-neutral-100">Summary cost ($):</span>{" "}
+          <span className="text-neutral-100">Summary cost ($):</span>{' '}
           {details.total_cost}
         </p>
 
@@ -60,7 +62,7 @@ export function OverviewPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Pipeline overview",
+      title: 'Pipeline overview',
     },
   ];
 };

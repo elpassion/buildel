@@ -1,7 +1,8 @@
-import type { RefObject} from "react";
-import { useCallback, useEffect, useRef } from "react";
-import isEqual from "lodash.isequal";
-import { assert } from "~/utils/assert";
+import type { RefObject } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import isEqual from 'lodash.isequal';
+
+import { assert } from '~/utils/assert';
 
 export interface OptionsType {
   barHeightFactor: number;
@@ -20,7 +21,7 @@ const BASE_OPTIONS: OptionsType = {
 
 export const useAudioVisualize = (
   canvas: RefObject<HTMLCanvasElement>,
-  args?: Partial<OptionsType>
+  args?: Partial<OptionsType>,
 ) => {
   const { barHeightFactor, barPositionFactor, fftSize, onError, ...rest } = {
     ...BASE_OPTIONS,
@@ -34,12 +35,12 @@ export const useAudioVisualize = (
     MediaElementAudioSourceNode | MediaStreamAudioSourceNode | null
   >(null);
   const audioSourceOriginal = useRef<HTMLAudioElement | MediaStream | null>(
-    null
+    null,
   );
 
   const handleClearCanvas = () => {
     if (!canvas.current) return;
-    const canvasContext = canvas.current?.getContext("2d");
+    const canvasContext = canvas.current?.getContext('2d');
     canvasContext?.clearRect(0, 0, canvas.current.width, canvas.current.height);
   };
 
@@ -50,8 +51,8 @@ export const useAudioVisualize = (
   }, []);
 
   const drawAudio = useCallback(() => {
-    const canvasContext = canvas.current?.getContext("2d");
-    assert(canvasContext, "Failed to get canvas context");
+    const canvasContext = canvas.current?.getContext('2d');
+    assert(canvasContext, 'Failed to get canvas context');
 
     function draw() {
       assert(audioAnalyzerRef.current);
@@ -59,7 +60,7 @@ export const useAudioVisualize = (
       assert(canvasContext);
 
       const frequencyBinCountArray = new Uint8Array(
-        audioAnalyzerRef.current.fftSize / 2
+        audioAnalyzerRef.current.fftSize / 2,
       );
 
       const barCount = canvas.current.width / 2;
@@ -70,7 +71,7 @@ export const useAudioVisualize = (
 
       const centerY = canvas.current.height / 2;
 
-      canvasContext.fillStyle = "#F5C07A";
+      canvasContext.fillStyle = '#F5C07A';
 
       for (let i = 0; i < barCount; i++) {
         const barPosition = i * barPositionFactor;
@@ -81,7 +82,7 @@ export const useAudioVisualize = (
           barPosition,
           centerY - barHeight / 2,
           barWidth,
-          barHeight / 2
+          barHeight / 2,
         );
         canvasContext.fillRect(barPosition, centerY, barWidth, barHeight / 2);
       }
@@ -116,7 +117,7 @@ export const useAudioVisualize = (
     (source: HTMLAudioElement | MediaStream) => {
       assert(
         window.AudioContext,
-        "Web Audio API is not supported in this browser"
+        'Web Audio API is not supported in this browser',
       );
 
       audioContextRef.current = new window.AudioContext();
@@ -134,11 +135,11 @@ export const useAudioVisualize = (
 
       audioSourceRef.current.connect(audioAnalyzerRef.current);
     },
-    [fftSize]
+    [fftSize],
   );
   const visualizeAudio = useCallback(
     async (source: HTMLAudioElement | MediaStream) => {
-      if (typeof window === "undefined") return;
+      if (typeof window === 'undefined') return;
       try {
         if (!isEqual(source, audioSourceOriginal.current)) {
           await disconnectSources();
@@ -153,7 +154,7 @@ export const useAudioVisualize = (
         onError?.(err);
       }
     },
-    [drawAudio, disconnectSources, createMediaAnalyzer, onError]
+    [drawAudio, disconnectSources, createMediaAnalyzer, onError],
   );
 
   useEffect(() => {
@@ -171,7 +172,7 @@ export const useAudioVisualize = (
 };
 
 function isSourceNode(
-  source: HTMLAudioElement | MediaStream
+  source: HTMLAudioElement | MediaStream,
 ): source is MediaStream {
   return (source as MediaStream).getTracks !== undefined;
 }

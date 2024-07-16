@@ -1,5 +1,5 @@
-import type { PropsWithChildren } from "react";
-import React from "react";
+import type { PropsWithChildren } from 'react';
+import React from 'react';
 
 export const PreviewSection: React.FC<PropsWithChildren> = ({ children }) => {
   return <section className="relative py-4">{children}</section>;

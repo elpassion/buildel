@@ -1,15 +1,17 @@
-import { useMemo } from "react";
-import { useNavigation } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { CreateUpdateSecretSchema } from "~/api/secrets/secrets.contracts";
-import { Field } from "~/components/form/fields/field.context";
+import { useMemo } from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { useNavigation } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { CreateUpdateSecretSchema } from '~/api/secrets/secrets.contracts';
+import { Field } from '~/components/form/fields/field.context';
 import {
   PasswordInputField,
   TextInputField,
-} from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import type { MetaFunction } from "@remix-run/node";
+} from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
+
 export function NewSecret() {
   const validator = useMemo(() => withZod(CreateUpdateSecretSchema), []);
 
@@ -49,7 +51,7 @@ export function NewSecret() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "New Secret",
+      title: 'New Secret',
     },
   ];
 };

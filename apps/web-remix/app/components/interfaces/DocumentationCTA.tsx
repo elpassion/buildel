@@ -1,6 +1,6 @@
-import React from "react";
-import { Link } from "@remix-run/react";
-import { Button } from "@elpassion/taco";
+import React from 'react';
+import { Link } from '@remix-run/react';
+import { Button } from '@elpassion/taco';
 
 export const DocumentationCTA: React.FC = () => {
   return (

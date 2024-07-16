@@ -1,14 +1,15 @@
-import type { ICurrentUser } from "~/api/CurrentUserApi";
-import { commitSession, getSession } from "~/session.server";
-import { UnauthorizedError } from "./errors";
+import type { ICurrentUser } from '~/api/CurrentUserApi';
+import { commitSession, getSession } from '~/session.server';
+
+import { UnauthorizedError } from './errors';
 
 export async function setCurrentUser(
   request: Request,
-  user: ICurrentUser
+  user: ICurrentUser,
 ): Promise<string> {
-  const session = await getSession(request.headers.get("Cookie")!);
+  const session = await getSession(request.headers.get('Cookie')!);
 
-  session.set("user", user);
+  session.set('user', user);
 
   return await commitSession(session);
 }
@@ -16,8 +17,8 @@ export async function setCurrentUser(
 export async function getCurrentUser(request: Request): Promise<{
   user: ICurrentUser;
 }> {
-  const session = await getSession(request.headers.get("Cookie")!);
-  const user = session.get("user");
+  const session = await getSession(request.headers.get('Cookie')!);
+  const user = session.get('user');
 
   if (!user) {
     throw new UnauthorizedError();
@@ -29,8 +30,8 @@ export async function getCurrentUser(request: Request): Promise<{
 export async function getCurrentUserOrNull(request: Request): Promise<{
   user: ICurrentUser | null;
 }> {
-  const session = await getSession(request.headers.get("Cookie") || "");
-  const user = session.get("user") ?? null;
+  const session = await getSession(request.headers.get('Cookie') || '');
+  const user = session.get('user') ?? null;
 
   return { user };
 }

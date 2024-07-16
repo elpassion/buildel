@@ -1,1 +1,1 @@
-export { HTTPApiPage as page, meta } from "./page";
+export { HTTPApiPage as page, meta } from './page';

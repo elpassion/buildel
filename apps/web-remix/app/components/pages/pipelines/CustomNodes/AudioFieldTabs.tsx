@@ -1,12 +1,14 @@
-import React, { useState } from "react";
-import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
-import { FileUpload } from "~/components/fileUpload/FileUpload";
-import type { IFile } from "~/components/fileUpload/fileUpload.types";
-import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
-import { RadioInput } from "~/components/form/inputs/radio.input";
-import { Tab } from "~/components/tabs/Tab";
-import { TabGroup } from "~/components/tabs/TabGroup";
-import { useRunPipeline } from "../RunPipelineProvider";
+import React, { useState } from 'react';
+
+import { AudioRecorder } from '~/components/audioRecorder/AudioRecorder';
+import { FileUpload } from '~/components/fileUpload/FileUpload';
+import type { IFile } from '~/components/fileUpload/fileUpload.types';
+import { FileUploadListPreview } from '~/components/fileUpload/FileUploadListPreview';
+import { RadioInput } from '~/components/form/inputs/radio.input';
+import { Tab } from '~/components/tabs/Tab';
+import { TabGroup } from '~/components/tabs/TabGroup';
+
+import { useRunPipeline } from '../RunPipelineProvider';
 
 interface AudioFieldTabsProps {
   onChunk: (chunk: Blob, name: string) => void;
@@ -22,7 +24,7 @@ export function AudioFieldTabs({
   disabled = false,
 }: AudioFieldTabsProps) {
   const { status } = useRunPipeline();
-  const [activeTab, setActiveTab] = useState("microphone");
+  const [activeTab, setActiveTab] = useState('microphone');
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
     e.preventDefault();
@@ -37,7 +39,7 @@ export function AudioFieldTabs({
           id="audio-upload-mic"
           name="audio-upload"
           label="Microphone"
-          checked={activeTab === "microphone"}
+          checked={activeTab === 'microphone'}
           onChange={onChange}
         />
 
@@ -47,7 +49,7 @@ export function AudioFieldTabs({
           id="audio-upload-upload"
           name="audio-upload"
           label="File upload"
-          checked={activeTab === "upload"}
+          checked={activeTab === 'upload'}
           onChange={onChange}
         />
       </div>
@@ -59,7 +61,7 @@ export function AudioFieldTabs({
         <p className="text-xs font-bold text-white mb-1">Audio stream</p>
         <AudioRecorder
           onChunk={(e) => onChunk(e.data, name)}
-          disabled={status !== "running" || disabled}
+          disabled={status !== 'running' || disabled}
         />
       </Tab>
 
@@ -74,7 +76,7 @@ export function AudioFieldTabs({
           preview={(props) => (
             <FileUploadListPreview {...props} className="max-h-[110px]" />
           )}
-          disabled={status !== "running" || disabled}
+          disabled={status !== 'running' || disabled}
           accept="audio/*"
         />
       </Tab>

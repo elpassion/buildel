@@ -1,14 +1,16 @@
-import * as React from "react";
-import { useLoaderData } from "@remix-run/react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm } from "remix-validated-form";
-import { Field, HiddenField } from "~/components/form/fields/field.context";
-import { FieldError } from "~/components/form/fields/field.error";
-import { PasswordInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
-import { schema } from "./schema";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+import * as React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { ValidatedForm } from 'remix-validated-form';
+
+import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { FieldError } from '~/components/form/fields/field.error';
+import { PasswordInputField } from '~/components/form/fields/text.field';
+import { SubmitButton } from '~/components/form/submit';
+
+import type { loader } from './loader.server';
+import { schema } from './schema';
 
 export function SetupPage() {
   const { token } = useLoaderData<typeof loader>();
@@ -59,7 +61,7 @@ export function SetupPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Setup",
+      title: 'Setup',
     },
   ];
 };

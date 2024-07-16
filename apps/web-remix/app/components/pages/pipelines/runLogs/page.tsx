@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
-import { useFetcher, useLoaderData } from "@remix-run/react";
-import { useInView } from "react-intersection-observer";
-import { Label } from "@elpassion/taco";
-import type { IPipelineRunLog } from "~/api/pipeline/pipeline.contracts";
-import { SelectInput } from "~/components/form/inputs/select/select.input";
-import { LoadMoreButton } from "~/components/pagination/LoadMoreButton";
-import { routes } from "~/utils/routes.utils";
-import { buildUrlWithParams } from "~/utils/url";
-import { usePipelineRunLogs } from "../usePipelineRunLogs";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+import { useEffect, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import type { MetaFunction } from '@remix-run/node';
+import { useFetcher, useLoaderData } from '@remix-run/react';
+import { Label } from '@elpassion/taco';
+
+import type { IPipelineRunLog } from '~/api/pipeline/pipeline.contracts';
+import { SelectInput } from '~/components/form/inputs/select/select.input';
+import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
+import { routes } from '~/utils/routes.utils';
+import { buildUrlWithParams } from '~/utils/url';
+
+import { usePipelineRunLogs } from '../usePipelineRunLogs';
+import type { loader } from './loader.server';
 
 export function PipelineRunLogs() {
   const fetcher = useFetcher();
@@ -37,7 +39,7 @@ export function PipelineRunLogs() {
   );
 
   const fetchNextPage = () => {
-    if (fetcher.state !== "idle") return;
+    if (fetcher.state !== 'idle') return;
 
     const urlWithParams = buildUrlWithParams(
       routes.pipelineRunLogs(
@@ -72,7 +74,7 @@ export function PipelineRunLogs() {
   }, [inView, after]);
 
   useEffect(() => {
-    if (status === "open") {
+    if (status === 'open') {
       listenToLogs({
         block_name: blockName,
       });
@@ -83,7 +85,7 @@ export function PipelineRunLogs() {
     <div className="mt-2">
       <Label text="Filter by block" />
       <SelectInput
-      placeholder="Select..."
+        placeholder="Select..."
         options={pipelineRun.config.blocks.map((block) => ({
           id: block.name,
           value: block.name,
@@ -121,7 +123,7 @@ export function PipelineRunLogs() {
         ))}
         <div className="flex justify-center mt-5" ref={fetchNextRef}>
           <LoadMoreButton
-            isFetching={fetcher.state !== "idle"}
+            isFetching={fetcher.state !== 'idle'}
             hasNextPage={!!after}
             onClick={fetchNextPage}
           />
@@ -138,7 +140,7 @@ const Log = ({ log }: { log: any }) => {
       <span className="text-yellow-500 mr-2">{log?.context}</span>
       <span className="text-purple-500 mr-2">{log?.block_name}</span>
       <span className="text-gray-300 mr-2">{log?.message}</span>
-      <span className="text-green-300">{log?.message_types?.join(" -> ")}</span>
+      <span className="text-green-300">{log?.message_types?.join(' -> ')}</span>
     </p>
   );
 };

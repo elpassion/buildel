@@ -1,1 +1,1 @@
-export { CollectionMemory as page, meta } from "./page";
+export { CollectionMemory as page, meta } from './page';

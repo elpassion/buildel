@@ -1,15 +1,17 @@
-import React, { useMemo } from "react";
+import React, { useMemo } from 'react';
+import { Indicator } from '@elpassion/taco';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { Indicator } from "@elpassion/taco";
-import { EmptyMessage } from "~/components/list/ItemList";
-import { HelpfulIcon } from "~/components/tooltip/HelpfulIcon";
-import { dayjs } from "~/utils/Dayjs";
-import type { IKnowledgeBaseCollectionCost } from "../knowledgeBase.types";
+} from '@tanstack/react-table';
+
+import { EmptyMessage } from '~/components/list/ItemList';
+import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
+import { dayjs } from '~/utils/Dayjs';
+
+import type { IKnowledgeBaseCollectionCost } from '../knowledgeBase.types';
 
 interface CollectionCostsTableProps {
   data: IKnowledgeBaseCollectionCost[];
@@ -22,37 +24,35 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
 }) => {
   const columns = useMemo(
     () => [
-      columnHelper.accessor("created_at", {
-        header: "Date",
-        id: "created_at",
-        cell: (info) => dayjs(info.getValue()).format("DD MMM HH:mm"),
+      columnHelper.accessor('created_at', {
+        header: 'Date',
+        id: 'created_at',
+        cell: (info) => dayjs(info.getValue()).format('DD MMM HH:mm'),
       }),
-      columnHelper.accessor("cost_type", {
-        id: "cost_type",
+      columnHelper.accessor('cost_type', {
+        id: 'cost_type',
         cell: (info) => (
           <Indicator
-            type={info.getValue() === "query" ? "success" : "processing"}
+            type={info.getValue() === 'query' ? 'success' : 'processing'}
             variant="badge"
             text={info.getValue()}
           />
         ),
-        header: "Cost type",
+        header: 'Cost type',
       }),
-      columnHelper.accessor("amount", {
-        header: "Collection costs ($)",
-        id: "amount",
-        cell: (info) =>
-          info
-            .getValue(),
+      columnHelper.accessor('amount', {
+        header: 'Collection costs ($)',
+        id: 'amount',
+        cell: (info) => info.getValue(),
       }),
-      columnHelper.accessor("description", {
-        header: "Description",
-        id: "description",
+      columnHelper.accessor('description', {
+        header: 'Description',
+        id: 'description',
         cell: (info) => {
-          const value = info.getValue()
+          const value = info.getValue();
 
-          return value.length > 20
-            ? <>
+          return value.length > 20 ? (
+            <>
               {`${value.slice(0, 17)}... `}
               <HelpfulIcon
                 id={`inputs-helpful-icon`}
@@ -60,25 +60,24 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
                 size="sm"
                 place="right"
               />
-            </> : value
+            </>
+          ) : (
+            value
+          );
         },
       }),
-      columnHelper.accessor("input_tokens", {
-        header: "Input tokens",
-        id: "input_tokens",
-        cell: (info) =>
-          info
-            .getValue()
+      columnHelper.accessor('input_tokens', {
+        header: 'Input tokens',
+        id: 'input_tokens',
+        cell: (info) => info.getValue(),
       }),
-      columnHelper.accessor("output_tokens", {
-        header: "Output tokens",
-        id: "output_tokens",
-        cell: (info) =>
-          info
-            .getValue()
-      })
+      columnHelper.accessor('output_tokens', {
+        header: 'Output tokens',
+        id: 'output_tokens',
+        cell: (info) => info.getValue(),
+      }),
     ],
-    []
+    [],
   );
 
   const tableData = useMemo(() => {
@@ -103,7 +102,7 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
               >
                 {flexRender(
                   header.column.columnDef.header,
-                  header.getContext()
+                  header.getContext(),
                 )}
               </th>
             ))}

@@ -1,21 +1,22 @@
-import React from "react";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import { Tooltip } from "~/components/tooltip/Tooltip";
-import type { ITooltip } from "react-tooltip";
+import React from 'react';
+import type { ITooltip } from 'react-tooltip';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import { Tooltip } from '~/components/tooltip/Tooltip';
 
 interface HelpfulIconProps {
   text: string;
   id: string;
   className?: string;
-  place?: ITooltip["place"];
-  size?: "md" | "xl" | "sm";
+  place?: ITooltip['place'];
+  size?: 'md' | 'xl' | 'sm';
 }
 
 export function HelpfulIcon({
   className,
-  place = "bottom",
-  size = "xl",
+  place = 'bottom',
+  size = 'xl',
   text,
   id,
 }: HelpfulIconProps) {
@@ -31,13 +32,13 @@ export function HelpfulIcon({
         id={`${id}-helpful-icon`}
         iconName="help-circle"
         className={classNames(
-          "text-primary-500  cursor-pointer",
+          'text-primary-500  cursor-pointer',
           {
-            "text-xl": size === "xl",
-            "text-md": size === "md",
-            "text-sm": size === "sm",
+            'text-xl': size === 'xl',
+            'text-md': size === 'md',
+            'text-sm': size === 'sm',
           },
-          className
+          className,
         )}
       />
     </>

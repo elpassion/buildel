@@ -1,12 +1,14 @@
-import React, { useState } from "react";
-import { useFetcher } from "@remix-run/react";
-import { Icon } from "@elpassion/taco";
-import { IconButton } from "~/components/iconButton";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
-import { confirm } from "~/components/modal/confirm";
-import { dayjs } from "~/utils/Dayjs";
-import { EditSecretKeyModal } from "./EditSecretKeyModal";
-import type { ISecretKey, ISecretKeyList } from "../variables.types";
+import React, { useState } from 'react';
+import { useFetcher } from '@remix-run/react';
+import { Icon } from '@elpassion/taco';
+
+import { IconButton } from '~/components/iconButton';
+import { EmptyMessage, ItemList } from '~/components/list/ItemList';
+import { confirm } from '~/components/modal/confirm';
+import { dayjs } from '~/utils/Dayjs';
+
+import type { ISecretKey, ISecretKeyList } from '../variables.types';
+import { EditSecretKeyModal } from './EditSecretKeyModal';
 
 interface SecretKeyListProps {
   items: ISecretKeyList;
@@ -18,8 +20,8 @@ export const SecretKeyList: React.FC<SecretKeyListProps> = ({ items }) => {
   const handleDelete = async (secretKey: ISecretKey) => {
     confirm({
       onConfirm: async () =>
-        fetcher.submit({ name: secretKey.name }, { method: "DELETE" }),
-      confirmText: "Delete Key",
+        fetcher.submit({ name: secretKey.name }, { method: 'DELETE' }),
+      confirmText: 'Delete Key',
       children: (
         <p className="text-neutral-100 text-sm">
           You are about to delete the "{secretKey.name}” Secret. This action is

@@ -1,1 +1,1 @@
-export { NewPipelinePage as page, meta } from "./page";
+export { NewPipelinePage as page, meta } from './page';

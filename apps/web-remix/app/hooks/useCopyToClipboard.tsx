@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
-import { useCopyToClipboard as tsHooksUseCopyCoClipboard } from "usehooks-ts";
+import { useCallback, useEffect, useState } from 'react';
+import { useCopyToClipboard as tsHooksUseCopyCoClipboard } from 'usehooks-ts';
+
 export function useCopyToClipboard(text: string) {
   const [_value, copy] = tsHooksUseCopyCoClipboard();
   const [isCopied, setIsCopied] = useState(false);

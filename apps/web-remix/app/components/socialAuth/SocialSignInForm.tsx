@@ -1,7 +1,7 @@
-import type { PropsWithChildren } from "react";
-import React from "react";
-import { Form } from "@remix-run/react";
-import classNames from "classnames";
+import type { PropsWithChildren } from 'react';
+import React from 'react';
+import { Form } from '@remix-run/react';
+import classNames from 'classnames';
 
 interface SocialSignInFormProps {
   className?: string;
@@ -15,7 +15,7 @@ export const SocialSignInForm: React.FC<
     <Form
       action={action}
       method="post"
-      className={classNames("w-full", className)}
+      className={classNames('w-full', className)}
     >
       {children}
     </Form>

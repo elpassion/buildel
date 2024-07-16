@@ -1,11 +1,13 @@
-import React from "react";
-import { Link, useFetcher, useNavigate } from "@remix-run/react";
-import { Icon } from "@elpassion/taco";
-import { IconButton } from "~/components/iconButton";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
-import { confirm } from "~/components/modal/confirm";
-import { routes } from "~/utils/routes.utils";
-import type { IKnowledgeBaseCollection } from "../knowledgeBase.types";
+import React from 'react';
+import { Link, useFetcher, useNavigate } from '@remix-run/react';
+import { Icon } from '@elpassion/taco';
+
+import { IconButton } from '~/components/iconButton';
+import { EmptyMessage, ItemList } from '~/components/list/ItemList';
+import { confirm } from '~/components/modal/confirm';
+import { routes } from '~/utils/routes.utils';
+
+import type { IKnowledgeBaseCollection } from '../knowledgeBase.types';
 
 interface KnowledgeBaseCollectionListProps {
   items: IKnowledgeBaseCollection[];
@@ -21,9 +23,9 @@ export const KnowledgeBaseCollectionList: React.FC<
       onConfirm: async () =>
         fetcher.submit(
           { collectionName: collection.name },
-          { method: "DELETE" }
+          { method: 'DELETE' },
         ),
-      confirmText: "Delete collection",
+      confirmText: 'Delete collection',
       children: (
         <p className="text-neutral-100 text-sm">
           You are about to delete the "{collection.name}” collection from your

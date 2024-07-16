@@ -1,7 +1,8 @@
-import React from "react";
-import { useLoaderData } from "@remix-run/react";
-import { AppNavbar } from "~/components/navbar/AppNavbar";
-import type { loader } from "~/components/pages/pipelines/list/loader.server";
+import React from 'react';
+import { useLoaderData } from '@remix-run/react';
+
+import { AppNavbar } from '~/components/navbar/AppNavbar';
+import type { loader } from '~/components/pages/pipelines/list/loader.server';
 
 export const PipelinesNavbar = () => {
   return (

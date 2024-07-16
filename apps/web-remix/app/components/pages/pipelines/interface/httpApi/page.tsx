@@ -1,8 +1,11 @@
-import React from "react";
-import { useLoaderData } from "@remix-run/react";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
-import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
+import React from 'react';
+import type { MetaFunction } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
+
+import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
+import { CodePreviewWrapper } from '~/components/interfaces/CodePreview/CodePreviewWrapper';
+import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
+
 import {
   PreviewConnector,
   PreviewSection,
@@ -11,9 +14,8 @@ import {
   PreviewSectionHeading,
   PreviewSectionStep,
   PreviewSectionText,
-} from "../PreviewSection";
-import type { loader } from "./loader.server";
-import type { MetaFunction } from "@remix-run/node";
+} from '../PreviewSection';
+import type { loader } from './loader.server';
 
 export function HTTPApiPage() {
   const { organizationId, pipelineId, apiUrl } = useLoaderData<typeof loader>();
@@ -150,7 +152,7 @@ export function HTTPApiPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Client SDK",
+      title: 'Client SDK',
     },
   ];
 };

@@ -1,9 +1,10 @@
-import type { Suggestion } from "../codeMirror.types";
-import type { CompletionContext } from "@codemirror/autocomplete";
+import type { CompletionContext } from '@codemirror/autocomplete';
+
+import type { Suggestion } from '../codeMirror.types';
 
 export function completions(
   context: CompletionContext,
-  suggestions: Suggestion[]
+  suggestions: Suggestion[],
 ) {
   let word = context.matchBefore(/\w*/);
 

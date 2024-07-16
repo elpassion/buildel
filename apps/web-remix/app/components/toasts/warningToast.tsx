@@ -1,16 +1,17 @@
-import { toast } from "react-hot-toast";
-import { WarningToast } from "./ui/WarningToast";
-import type { ToastProps } from "./Toast.interface";
+import { toast } from 'react-hot-toast';
+
+import type { ToastProps } from './Toast.interface';
+import { WarningToast } from './ui/WarningToast';
 
 export const warningToast = (props?: ToastProps | string) => {
-  if (typeof props === "string") {
+  if (typeof props === 'string') {
     return toast((t) => (
       <WarningToast title={props} onClose={() => toast.dismiss(t.id)} />
     ));
   }
 
   const { title, options, ...rest } = {
-    title: "Warning",
+    title: 'Warning',
     ...props,
   };
 
@@ -22,6 +23,6 @@ export const warningToast = (props?: ToastProps | string) => {
         {...rest}
       />
     ),
-    options
+    options,
   );
 };

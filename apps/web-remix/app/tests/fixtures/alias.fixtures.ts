@@ -1,28 +1,28 @@
-import type { IPipelineAlias } from "~/components/pages/pipelines/pipeline.types";
+import type { IPipelineAlias } from '~/components/pages/pipelines/pipeline.types';
 
 export const aliasFixture = (
-  override?: Partial<IPipelineAlias>
+  override?: Partial<IPipelineAlias>,
 ): IPipelineAlias => {
   return {
     id: 1,
-    name: "AI Chat",
+    name: 'AI Chat',
     interface_config: {
       webchat: {
-        inputs: [{ name: "text_input_1", type: "text_input" }],
-        outputs: [{ name: "text_output_1", type: "text_output" }],
+        inputs: [{ name: 'text_input_1', type: 'text_input' }],
+        outputs: [{ name: 'text_output_1', type: 'text_output' }],
         public: false,
       },
       form: {
-        inputs: [{ name: "text_input_1", type: "text_input" }],
-        outputs: [{ name: "text_output_1", type: "text_output" }],
+        inputs: [{ name: 'text_input_1', type: 'text_input' }],
+        outputs: [{ name: 'text_output_1', type: 'text_output' }],
         public: false,
       },
     },
     config: {
-      version: "1",
+      version: '1',
       blocks: [
         {
-          name: "text_input_1",
+          name: 'text_input_1',
           opts: {},
           inputs: [],
           connections: [],
@@ -30,32 +30,32 @@ export const aliasFixture = (
             x: -44,
             y: -846,
           },
-          type: "text_input",
+          type: 'text_input',
         },
         {
-          name: "chat_123321",
+          name: 'chat_123321',
           opts: {
-            api_key: "open ai",
-            api_type: "openai",
-            chat_memory_type: "full",
-            description: "",
-            endpoint: "https://api.openai.com/v1",
+            api_key: 'open ai',
+            api_type: 'openai',
+            chat_memory_type: 'full',
+            description: '',
+            endpoint: 'https://api.openai.com/v1',
             messages: [],
-            model: "gpt-3.5-turbo",
-            prompt_template: "{{text_input_1:output}}",
-            system_message: "1",
+            model: 'gpt-3.5-turbo',
+            prompt_template: '{{text_input_1:output}}',
+            system_message: '1',
             temperature: 0.7,
           },
-          inputs: ["text_input_1:output->input?reset=true"],
+          inputs: ['text_input_1:output->input?reset=true'],
           connections: [
             {
               from: {
-                block_name: "text_input_1",
-                output_name: "output",
+                block_name: 'text_input_1',
+                output_name: 'output',
               },
               to: {
-                block_name: "chat_1",
-                input_name: "input",
+                block_name: 'chat_1',
+                input_name: 'input',
               },
               opts: {
                 reset: true,
@@ -66,23 +66,23 @@ export const aliasFixture = (
             x: 327,
             y: -952,
           },
-          type: "chat",
+          type: 'chat',
         },
         {
-          name: "text_output_1",
+          name: 'text_output_1',
           opts: {
             stream_timeout: 500,
           },
-          inputs: ["chat_1:output->input?reset=true"],
+          inputs: ['chat_1:output->input?reset=true'],
           connections: [
             {
               from: {
-                block_name: "chat_1",
-                output_name: "output",
+                block_name: 'chat_1',
+                output_name: 'output',
               },
               to: {
-                block_name: "text_output_1",
-                input_name: "input",
+                block_name: 'text_output_1',
+                input_name: 'input',
               },
               opts: {
                 reset: true,
@@ -93,18 +93,18 @@ export const aliasFixture = (
             x: 764,
             y: -837,
           },
-          type: "text_output",
+          type: 'text_output',
         },
       ],
       connections: [
         {
           from: {
-            block_name: "text_input_1",
-            output_name: "output",
+            block_name: 'text_input_1',
+            output_name: 'output',
           },
           to: {
-            block_name: "chat_123321",
-            input_name: "input",
+            block_name: 'chat_123321',
+            input_name: 'input',
           },
           opts: {
             reset: true,
@@ -112,12 +112,12 @@ export const aliasFixture = (
         },
         {
           from: {
-            block_name: "chat_123321",
-            output_name: "output",
+            block_name: 'chat_123321',
+            output_name: 'output',
           },
           to: {
-            block_name: "text_output_1",
-            input_name: "input",
+            block_name: 'text_output_1',
+            input_name: 'input',
           },
           opts: {
             reset: true,

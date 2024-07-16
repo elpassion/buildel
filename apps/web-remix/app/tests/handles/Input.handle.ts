@@ -1,6 +1,7 @@
-import userEvent from "@testing-library/user-event";
-import { findByLabelText, screen } from "../render";
-import type { Matcher} from "../render";
+import userEvent from '@testing-library/user-event';
+
+import { findByLabelText, screen } from '../render';
+import type { Matcher } from '../render';
 
 export class InputHandle {
   constructor(public readonly inputElement: HTMLInputElement) {}
@@ -11,7 +12,7 @@ export class InputHandle {
 
   static async fromLabelTextAndContainer(
     label: Matcher,
-    container: HTMLElement
+    container: HTMLElement,
   ): Promise<InputHandle> {
     return new InputHandle(await findByLabelText(container, label));
   }
@@ -21,11 +22,11 @@ export class InputHandle {
   }
 
   static async fromRole(name?: string): Promise<InputHandle> {
-    return new InputHandle(await screen.findByRole("textbox", { name }));
+    return new InputHandle(await screen.findByRole('textbox', { name }));
   }
 
   isDisabled(): boolean {
-    return this.inputElement.hasAttribute("disabled");
+    return this.inputElement.hasAttribute('disabled');
   }
 
   async type(text: string) {

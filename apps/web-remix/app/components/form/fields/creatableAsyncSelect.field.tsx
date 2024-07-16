@@ -1,45 +1,33 @@
-import type {
-  FormEvent,
-  PropsWithChildren,
-  ReactNode} from "react";
-import React, {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-import { withZod } from "@remix-validated-form/with-zod";
-import { ValidatedForm, useControlField } from "remix-validated-form";
-import { InputText, Label } from "@elpassion/taco";
-import { Modal } from "@elpassion/taco/Modal";
-import { asyncSelectApi } from "~/api/AsyncSelectApi";
-import type { IAsyncSelectItem } from "~/api/AsyncSelectApi";
-import { toSelectOption } from "~/components/form/fields/asyncSelect.field";
+import type { FormEvent, PropsWithChildren, ReactNode } from 'react';
+import React, { forwardRef, useCallback, useEffect, useState } from 'react';
+import { InputText, Label } from '@elpassion/taco';
+import { Modal } from '@elpassion/taco/Modal';
+import { withZod } from '@remix-validated-form/with-zod';
+import { useControlField, ValidatedForm } from 'remix-validated-form';
+
+import { asyncSelectApi } from '~/api/AsyncSelectApi';
+import type { IAsyncSelectItem } from '~/api/AsyncSelectApi';
+import { toSelectOption } from '~/components/form/fields/asyncSelect.field';
 import {
   HiddenField,
   useFieldContext,
-} from "~/components/form/fields/field.context";
-import type {
-  AsyncSelectInputProps} from "~/components/form/inputs/select/select.input";
-import {
-  AsyncSelectInput
-} from "~/components/form/inputs/select/select.input";
-import type { FieldProps} from "~/components/form/schema/Schema";
-import { Schema } from "~/components/form/schema/Schema";
+} from '~/components/form/fields/field.context';
+import type { AsyncSelectInputProps } from '~/components/form/inputs/select/select.input';
+import { AsyncSelectInput } from '~/components/form/inputs/select/select.input';
+import type { FieldProps } from '~/components/form/schema/Schema';
+import { Schema } from '~/components/form/schema/Schema';
 import {
   ArrayField,
   BooleanField,
   NumberField,
   StringField,
-} from "~/components/form/schema/SchemaFields";
-import {
-  generateZODSchema
-} from "~/components/form/schema/SchemaParser";
-import type {
-  JSONSchemaField} from "~/components/form/schema/SchemaParser";
-import { successToast } from "~/components/toasts/successToast";
-import { useModal } from "~/hooks/useModal";
-import { SubmitButton } from "../submit";
+} from '~/components/form/schema/SchemaFields';
+import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
+import { successToast } from '~/components/toasts/successToast';
+import { useModal } from '~/hooks/useModal';
+
+import { SubmitButton } from '../submit';
 
 export interface CreatableAsyncSelectFieldProps
   extends Partial<AsyncSelectInputProps> {
@@ -54,7 +42,7 @@ export interface CreatableAsyncSelectFieldProps
   }: {
     onCreate: (
       data: Record<string, any>,
-      e: FormEvent<HTMLFormElement>
+      e: FormEvent<HTMLFormElement>,
     ) => void;
   }) => ReactNode;
 }
@@ -74,13 +62,13 @@ export const CreatableAsyncSelectField = forwardRef<
       renderForm,
       ...props
     },
-    _ref
+    _ref,
   ) => {
     const { name, getInputProps, validate } = useFieldContext({
       validationBehavior: {
-        initial: "onBlur",
-        whenTouched: "onBlur",
-        whenSubmitted: "onBlur",
+        initial: 'onBlur',
+        whenTouched: 'onBlur',
+        whenSubmitted: 'onBlur',
       },
     });
     const { isModalOpen, openModal, closeModal } = useModal();
@@ -94,17 +82,17 @@ export const CreatableAsyncSelectField = forwardRef<
 
     const handleCreate = async (
       data: Record<string, any>,
-      e: FormEvent<HTMLFormElement>
+      e: FormEvent<HTMLFormElement>,
     ) => {
       e.preventDefault();
       try {
         const newItem = await asyncSelectApi.createData(
           url,
-          data as IAsyncSelectItem
+          data as IAsyncSelectItem,
         );
 
         handleSetSelectedId(newItem.id.toString());
-        successToast({ title: "Success", description: "Item created!" });
+        successToast({ title: 'Success', description: 'Item created!' });
         closeModal();
       } catch (e) {
         console.error(e);
@@ -119,7 +107,7 @@ export const CreatableAsyncSelectField = forwardRef<
 
     return (
       <>
-        <HiddenField value={selectedId ?? ""} {...getInputProps()} />
+        <HiddenField value={selectedId ?? ''} {...getInputProps()} />
 
         <div className="flex justify-between items-end">
           <Label text={label} labelFor={name} />
@@ -176,7 +164,7 @@ export const CreatableAsyncSelectField = forwardRef<
         </Modal>
       </>
     );
-  }
+  },
 );
 
 interface CreatableAsyncFormProps {

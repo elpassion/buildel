@@ -1,4 +1,4 @@
-export type MessageRole = "ai" | "user";
+export type MessageRole = 'ai' | 'user';
 export interface IMessage {
   id: string;
   role: MessageRole;
@@ -6,4 +6,4 @@ export interface IMessage {
   created_at: Date;
 }
 
-export type ChatSize = "sm" | "md";
+export type ChatSize = 'sm' | 'md';

@@ -1,21 +1,22 @@
-import { json } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
-import { validationError } from "remix-validated-form";
-import invariant from "tiny-invariant";
-import { InterfaceConfig } from "~/api/pipeline/pipeline.contracts";
-import { PipelineApi } from "~/api/pipeline/PipelineApi";
-import { requireLogin } from "~/session.server";
-import { setServerToast } from "~/utils/toast.server";
-import { actionBuilder } from "~/utils.server";
-import type { ActionFunctionArgs} from "@remix-run/node";
+import { json } from '@remix-run/node';
+import type { ActionFunctionArgs } from '@remix-run/node';
+import { withZod } from '@remix-validated-form/with-zod';
+import { validationError } from 'remix-validated-form';
+import invariant from 'tiny-invariant';
+
+import { InterfaceConfig } from '~/api/pipeline/pipeline.contracts';
+import { PipelineApi } from '~/api/pipeline/PipelineApi';
+import { requireLogin } from '~/session.server';
+import { actionBuilder } from '~/utils.server';
+import { setServerToast } from '~/utils/toast.server';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
     // @ts-ignore
     patch: async ({ params, request }, { fetch }) => {
       await requireLogin(request);
-      invariant(params.organizationId, "Missing organizationId");
-      invariant(params.pipelineId, "Missing pipelineId");
+      invariant(params.organizationId, 'Missing organizationId');
+      invariant(params.pipelineId, 'Missing pipelineId');
 
       const validator = withZod(InterfaceConfig);
 
@@ -26,7 +27,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       const pipelineApi = new PipelineApi(fetch);
       const aliasId = pipelineApi.getAliasFromUrl(request.url);
 
-      const isLatestPipeline = !aliasId || aliasId === "latest";
+      const isLatestPipeline = !aliasId || aliasId === 'latest';
 
       const body = {
         interface_config: result.data,
@@ -47,9 +48,9 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       return json(res.data, {
         headers: {
-          "Set-Cookie": await setServerToast(request, {
+          'Set-Cookie': await setServerToast(request, {
             success: {
-              title: "Alias updated",
+              title: 'Alias updated',
               description: `You've successfully updated workflow alias`,
             },
           }),

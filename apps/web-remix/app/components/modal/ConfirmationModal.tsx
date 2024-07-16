@@ -1,9 +1,11 @@
-import React from "react";
-import classNames from "classnames";
-import type { ModalProps } from "@elpassion/taco";
-import { Button } from "@elpassion/taco";
-import { Modal } from "@elpassion/taco/Modal";
-import { SubmitButton } from "../form/submit";
+import React from 'react';
+import type { ModalProps } from '@elpassion/taco';
+import { Button } from '@elpassion/taco';
+import { Modal } from '@elpassion/taco/Modal';
+import classNames from 'classnames';
+
+import { SubmitButton } from '../form/submit';
+
 export interface ConfirmationModalProps extends ModalProps {
   onConfirm?: () => Promise<void>;
   onCancel?: () => Promise<void>;
@@ -16,8 +18,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   className,
   onConfirm,
   onCancel,
-  cancelText = "Cancel",
-  confirmText = "Confirm",
+  cancelText = 'Cancel',
+  confirmText = 'Confirm',
   onClose,
   ...props
 }) => {
@@ -33,8 +35,8 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   return (
     <Modal
       header={props.header ?? <ConfirmationModalHeader />}
-      closeButtonProps={{ iconName: "x", "aria-label": "Close" }}
-      className={classNames("max-w-[500px] min-w-[300px] mx-2", className)}
+      closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
+      className={classNames('max-w-[500px] min-w-[300px] mx-2', className)}
       onClose={onClose}
       {...props}
     >

@@ -1,9 +1,10 @@
-import React, { forwardRef, useRef } from "react";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import { useFieldContext } from "~/components/form/fields/field.context";
-import type { TextInputProps } from "~/components/form/inputs/text.input";
-import { TextInput } from "~/components/form/inputs/text.input";
+import React, { forwardRef, useRef } from 'react';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import { useFieldContext } from '~/components/form/fields/field.context';
+import type { TextInputProps } from '~/components/form/inputs/text.input';
+import { TextInput } from '~/components/form/inputs/text.input';
 
 export const TextInputField = forwardRef<
   HTMLInputElement,
@@ -31,7 +32,7 @@ export const PasswordInputField = forwardRef<
   HTMLInputElement,
   Partial<TextInputProps>
 >((props, ref) => {
-  return <TextInputField ref={ref} type={"password"} {...props} />;
+  return <TextInputField ref={ref} type={'password'} {...props} />;
 });
 
 export function ResettableTextInputField({
@@ -42,7 +43,7 @@ export function ResettableTextInputField({
 
   const onReset = () => {
     if (inputRef.current) {
-      inputRef.current.value = (props.defaultValue ?? "") as string;
+      inputRef.current.value = (props.defaultValue ?? '') as string;
     }
   };
 
@@ -76,7 +77,7 @@ function ResettableFieldResetButton({
       onClick={onClick}
       aria-label="Reset to default value"
       title="Reset to default value"
-      className={classNames("text-neutral-200")}
+      className={classNames('text-neutral-200')}
     >
       <Icon iconName="refresh-ccw" />
     </button>

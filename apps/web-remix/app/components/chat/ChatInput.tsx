@@ -1,7 +1,7 @@
-import React, { useMemo, useRef, useState } from "react";
-import classNames from "classnames";
-import { useBoolean, useIsomorphicLayoutEffect } from "usehooks-ts";
-import { Icon } from "@elpassion/taco";
+import React, { useMemo, useRef, useState } from 'react';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+import { useBoolean, useIsomorphicLayoutEffect } from 'usehooks-ts';
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
@@ -20,7 +20,7 @@ export function ChatInput({
 }: ChatInputProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
   const {
     value: isFocused,
     setTrue: setFocus,
@@ -48,25 +48,25 @@ export function ChatInput({
   const handleOnSubmit = () => {
     if (isDisabled) return;
     onSubmit(value);
-    setValue("");
+    setValue('');
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey && !e.altKey && !e.ctrlKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !e.altKey && !e.ctrlKey) {
       e.preventDefault();
       handleOnSubmit();
     }
-    if (e.key === "Enter" && (e.altKey || e.ctrlKey)) {
-      setValue((prev) => prev + "\n");
+    if (e.key === 'Enter' && (e.altKey || e.ctrlKey)) {
+      setValue((prev) => prev + '\n');
     }
   };
 
   return (
     <div
       className={classNames(
-        "relative w-full overflow-hidden rounded-xl border border-neutral-700 bg-neutral-900 flex items-center max-h-[112px] min-h-fit h-auto shrink-0 w-full flex-col",
+        'relative w-full overflow-hidden rounded-xl border border-neutral-700 bg-neutral-900 flex items-center max-h-[112px] min-h-fit h-auto shrink-0 w-full flex-col',
         {
-          "outline outline-2 outline-offset-1 outline-secondary-500": isFocused,
+          'outline outline-2 outline-offset-1 outline-secondary-500': isFocused,
         },
       )}
     >
@@ -100,8 +100,8 @@ export function ChatInput({
           >
             <Icon
               size="none"
-              iconName={generating ? "loader" : "send"}
-              className={classNames("text-sm", { "animate-spin": generating })}
+              iconName={generating ? 'loader' : 'send'}
+              className={classNames('text-sm', { 'animate-spin': generating })}
             />
           </button>
         </form>
@@ -116,9 +116,9 @@ function useAutosizeTextArea(
 ) {
   useIsomorphicLayoutEffect(() => {
     if (textAreaRef) {
-      textAreaRef.style.height = "0px";
+      textAreaRef.style.height = '0px';
       const scrollHeight = textAreaRef.scrollHeight;
-      textAreaRef.style.height = scrollHeight + "px";
+      textAreaRef.style.height = scrollHeight + 'px';
     }
   }, [textAreaRef, value]);
 }

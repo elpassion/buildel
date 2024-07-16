@@ -1,9 +1,10 @@
-import type { HTMLProps } from "react";
-import React from "react";
-import classNames from "classnames";
-import { Icon } from "@elpassion/taco";
-import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
-import { useDownloadFile } from "~/hooks/useDownloadFile";
+import type { HTMLProps } from 'react';
+import React from 'react';
+import { Icon } from '@elpassion/taco';
+import classNames from 'classnames';
+
+import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
+import { useDownloadFile } from '~/hooks/useDownloadFile';
 
 export function NodeCopyButton({ text }: { text: string }) {
   const { copy, isCopied } = useCopyToClipboard(text);
@@ -11,8 +12,8 @@ export function NodeCopyButton({ text }: { text: string }) {
   return (
     <NodeActionButton className="w-[52px]" onClick={copy}>
       {isCopied ? null : <Icon iconName="copy" />}
-      <span className={classNames({ "text-green-600": isCopied })}>
-        {isCopied ? "Copied!" : "Copy"}
+      <span className={classNames({ 'text-green-600': isCopied })}>
+        {isCopied ? 'Copied!' : 'Copy'}
       </span>
     </NodeActionButton>
   );
@@ -53,8 +54,8 @@ export function NodeActionButton({
   return (
     <button
       className={classNames(
-        "text-xs text-neutral-100 rounded px-1 py-[2px] flex items-center gap-1 hover:text-primary-500",
-        className
+        'text-xs text-neutral-100 rounded px-1 py-[2px] flex items-center gap-1 hover:text-primary-500',
+        className,
       )}
       {...rest}
     >

@@ -1,17 +1,19 @@
-import React, { useCallback } from "react";
-import { useBoolean } from "usehooks-ts";
-import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
-import { ToggleInput } from "~/components/form/inputs/toggle.input";
-import { useRunPipelineNode } from "../RunPipelineProvider";
-import { AudioOutput } from "./AudioOutput";
-import { FileOutput } from "./FileOutput";
+import React, { useCallback } from 'react';
+import { useBoolean } from 'usehooks-ts';
+
+import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
+import { ToggleInput } from '~/components/form/inputs/toggle.input';
+
+import type { IBlockConfig, IField } from '../pipeline.types';
+import { useRunPipelineNode } from '../RunPipelineProvider';
+import type { IEvent } from '../RunPipelineProvider';
+import { AudioOutput } from './AudioOutput';
+import { FileOutput } from './FileOutput';
 import {
   NodeClearButton,
   NodeCopyButton,
   NodeDownloadButton,
-} from "./NodeActionButtons";
-import type { IBlockConfig, IField } from "../pipeline.types";
-import type { IEvent} from "../RunPipelineProvider";
+} from './NodeActionButtons';
 
 interface NodeFieldsOutputProps {
   fields: IField[];
@@ -27,7 +29,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
 
       const fieldEvents = getFieldEvents(events, field.data.name);
 
-      if (type === "text") {
+      if (type === 'text') {
         const text = checkIfStringPayloads(fieldEvents)
           ? concatStringFieldsOutputs(fieldEvents)
           : concatJsonFieldsOutputs(fieldEvents);
@@ -39,12 +41,12 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
             onClear={clearBlockEvents}
           />
         );
-      } else if (type === "audio") {
+      } else if (type === 'audio') {
         const audio =
           fieldEvents.length > 0 ? getAudioOutput(fieldEvents) : null;
 
         return <AudioOutput audio={audio} />;
-      } else if (type === "file") {
+      } else if (type === 'file') {
         const files =
           fieldEvents.length > 0 ? fieldEvents.map(getFileOutput) : [];
 
@@ -53,7 +55,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
 
       return <span>Unsupported output type - {type}</span>;
     },
-    [events]
+    [events],
   );
 
   return (
@@ -72,30 +74,30 @@ function getFieldEvents(events: IEvent[], outputName: string) {
 }
 
 function concatStringFieldsOutputs(events: IEvent[]) {
-  return events.map((ev) => ev.payload.message).join("");
+  return events.map((ev) => ev.payload.message).join('');
 }
 
 function concatJsonFieldsOutputs(events: IEvent[]) {
   try {
     return JSON.stringify(events.map((ev) => ev.payload.message));
   } catch (err) {
-    return "Something went wrong...";
+    return 'Something went wrong...';
   }
 }
 
 function checkIfStringPayloads(events: IEvent[]) {
-  return events.every((ev) => typeof ev.payload.message === "string");
+  return events.every((ev) => typeof ev.payload.message === 'string');
 }
 
 function getAudioOutput(events: IEvent[]) {
   return new Blob(
     events.map((event) => event.payload),
-    { type: "audio/mp3" }
+    { type: 'audio/mp3' },
   );
 }
 
 function getFileOutput(event: IEvent) {
-  return new Blob([event.payload], { type: "file" });
+  return new Blob([event.payload], { type: 'file' });
 }
 
 interface TextOutputProps {
