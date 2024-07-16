@@ -9,6 +9,8 @@ import {
 import { AudioOutput } from "./AudioOutput";
 import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 import { FileOutput } from "./FileOutput";
+import { useBoolean } from "usehooks-ts";
+import { ToggleInput } from "~/components/form/inputs/toggle.input";
 
 interface NodeFieldsOutputProps {
   fields: IField[];
@@ -30,18 +32,11 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
           : concatJsonFieldsOutputs(fieldEvents);
 
         return (
-          <>
-            <div className="mb-1 flex gap-1">
-              <NodeCopyButton text={text} />
-
-              <NodeDownloadButton blockName={block.name} text={text} />
-
-              <NodeClearButton onClear={() => clearBlockEvents(block.name)} />
-            </div>
-            <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
-              <ChatMarkdown>{text}</ChatMarkdown>
-            </div>
-          </>
+          <TextOutput
+            content={text}
+            blockName={block.name}
+            onClear={clearBlockEvents}
+          />
         );
       } else if (type === "audio") {
         const audio =
@@ -99,8 +94,40 @@ function getAudioOutput(events: IEvent[]) {
 }
 
 function getFileOutput(event: IEvent) {
-  return new Blob(
-    [event.payload],
-    { type: "file" }
+  return new Blob([event.payload], { type: "file" });
+}
+
+interface TextOutputProps {
+  content: string;
+  blockName: string;
+  onClear: (blockName: string) => void;
+}
+
+function TextOutput({ content, blockName, onClear }: TextOutputProps) {
+  const { value: isRaw, toggle: toggleRaw } = useBoolean(false);
+
+  return (
+    <>
+      <div className="mb-1 flex gap-1">
+        <label className="flex gap-1 items-center">
+          <span className="text-xs text-neutral-100">Raw</span>
+          <ToggleInput
+            size="sm"
+            value={`${isRaw}`}
+            checked={isRaw}
+            onChange={toggleRaw}
+          />
+        </label>
+
+        <NodeCopyButton text={content} />
+
+        <NodeDownloadButton blockName={blockName} text={content} />
+
+        <NodeClearButton onClear={() => onClear(blockName)} />
+      </div>
+      <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+        {isRaw ? content : <ChatMarkdown>{content}</ChatMarkdown>}
+      </div>
+    </>
   );
 }
