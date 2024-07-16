@@ -78,7 +78,7 @@ export function FileUpload({
                   return { ...res, status: "done" };
                 }
                 return file;
-              }),
+              })
             );
           })
           .catch((e) => {
@@ -88,12 +88,12 @@ export function FileUpload({
                   return { ...file, status: "error", error: e };
                 }
                 return file;
-              }),
+              })
             );
           });
       });
     },
-    [onUpload, onChange],
+    [onUpload, onChange]
   );
 
   const handleRemove = useCallback(
@@ -108,7 +108,7 @@ export function FileUpload({
         console.error(err);
       }
     },
-    [onRemove],
+    [onRemove]
   );
 
   const handleSelectFiles = useCallback(() => {
@@ -156,11 +156,11 @@ export function FileUpload({
 export function useFilesUpload({
   organizationId,
   pipelineId,
-  runId
+  runId,
 }: {
   organizationId: number;
   pipelineId: number;
-  runId: number;
+  runId: number | string;
 }): {
   fileList: IFileUpload[];
   uploadFile: (file: File, fileBlockName?: string | null) => Promise<void>;
@@ -185,7 +185,7 @@ export function useFilesUpload({
         {
           body: formData,
           method: "POST",
-        },
+        }
       );
       const data = await response.json();
 
@@ -200,7 +200,7 @@ export function useFilesUpload({
 
       return fileUpload;
     },
-    [organizationId, pipelineId, runId],
+    [organizationId, pipelineId, runId]
   );
 
   const removeFileRequest = useCallback(
@@ -217,10 +217,10 @@ export function useFilesUpload({
           headers: {
             "Content-Type": "application/json",
           },
-        },
+        }
       );
     },
-    [organizationId, pipelineId, runId],
+    [organizationId, pipelineId, runId]
   );
 
   const uploadFile = async (file: File, fileBlockName?: string | null) => {
@@ -243,7 +243,7 @@ export function useFilesUpload({
             return { ...res, status: "done" };
           }
           return file;
-        }),
+        })
       );
     } catch (e) {
       setFileList((prev) =>
@@ -252,7 +252,7 @@ export function useFilesUpload({
             return { ...file, status: "error", error: e };
           }
           return file;
-        }),
+        })
       );
     } finally {
       if (!inputRef.current) return;
@@ -272,7 +272,7 @@ export function useFilesUpload({
         console.error(err);
       }
     },
-    [removeFileRequest, setFileList],
+    [removeFileRequest, setFileList]
   );
 
   const clearFiles = useCallback(() => {

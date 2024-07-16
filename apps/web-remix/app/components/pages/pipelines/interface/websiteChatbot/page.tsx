@@ -13,7 +13,6 @@ import {
 import {
   IInterfaceConfig,
   IPipeline,
-  IWebchatInterfaceConfig,
 } from "~/components/pages/pipelines/pipeline.types";
 import { InterfaceConfigForm } from "./InterfaceConfigForm";
 import { loader } from "./loader.server";
@@ -25,14 +24,13 @@ export function WebsiteChatbotPage() {
 
   const { organizationId, pipelineId, pageUrl, pipeline, aliasId } =
     useLoaderData<typeof loader>();
-
   const websiteChatUrl = `${pageUrl}${routes.chatPreview(
     organizationId,
     pipelineId,
     Object.fromEntries(searchParams.entries())
   )}`;
 
-  const handleUpdate = (interfaceConfig: IWebchatInterfaceConfig) => {
+  const handleUpdate = (interfaceConfig: IInterfaceConfig) => {
     updateFetcher.submit(interfaceConfig, {
       method: "PATCH",
       encType: "application/json",

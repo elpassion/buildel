@@ -1,14 +1,22 @@
 import { IPipelineAlias } from "~/components/pages/pipelines/pipeline.types";
 
 export const aliasFixture = (
-  override?: Partial<IPipelineAlias>,
+  override?: Partial<IPipelineAlias>
 ): IPipelineAlias => {
   return {
     id: 1,
     name: "AI Chat",
     interface_config: {
-      input: "text_input_1",
-      output: "text_output_1",
+      webchat: {
+        inputs: [{ name: "text_input_1", type: "text_input" }],
+        outputs: [{ name: "text_output_1", type: "text_output" }],
+        public: false,
+      },
+      form: {
+        inputs: [{ name: "text_input_1", type: "text_input" }],
+        outputs: [{ name: "text_output_1", type: "text_output" }],
+        public: false,
+      },
     },
     config: {
       version: "1",

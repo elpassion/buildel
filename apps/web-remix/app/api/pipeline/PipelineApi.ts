@@ -17,6 +17,7 @@ import {
 } from "./pipeline.contracts";
 import { PaginationQueryParams } from "~/components/pagination/usePagination";
 import { buildUrlWithParams } from "~/utils/url";
+import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
 
 type DateQueryParams = {
   start_date: string;
@@ -24,7 +25,7 @@ type DateQueryParams = {
 };
 
 export class PipelineApi {
-  constructor(private client: typeof fetchTyped) { }
+  constructor(private client: typeof fetchTyped) {}
 
   getPipeline(organizationId: string | number, pipelineId: string | number) {
     return this.client(
@@ -159,7 +160,7 @@ export class PipelineApi {
     organizationId: string | number,
     pipelineId: string | number,
     aliasId: string | number
-  ) {
+  ): Promise<IPipeline> {
     const pipeline = await this.getPipeline(organizationId, pipelineId);
 
     if (aliasId !== "latest") {
@@ -280,9 +281,9 @@ export class PipelineApi {
     pipelineId: string | number,
     runId: string | number,
     args: {
-      block_name?: string,
-      after?: string,
-      per_page?: string | number
+      block_name?: string;
+      after?: string;
+      per_page?: string | number;
     }
   ) {
     const url = buildUrlWithParams(
@@ -290,9 +291,6 @@ export class PipelineApi {
       { block_name: args.block_name, after: args.after }
     );
 
-    return this.client(
-      PipelineRunLogsResponse,
-      url
-    );
+    return this.client(PipelineRunLogsResponse, url);
   }
 }

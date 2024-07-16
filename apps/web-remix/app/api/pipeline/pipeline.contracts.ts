@@ -12,17 +12,25 @@ import { IInterfaceConfigFormProperty } from "~/components/pages/pipelines/pipel
 export const InterfaceConfigFormProperty = z.object({
   name: z.string(),
   type: z.string(),
-})
+});
 export const InterfaceConfigForm = z.object({
   inputs: z
     .union([
-      z.string().transform((value) => JSON.parse(value) as IInterfaceConfigFormProperty[]),
+      z
+        .string()
+        .transform(
+          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[]
+        ),
       z.array(InterfaceConfigFormProperty),
     ])
     .default([]),
   outputs: z
     .union([
-      z.string().transform((value) => JSON.parse(value) as IInterfaceConfigFormProperty[]),
+      z
+        .string()
+        .transform(
+          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[]
+        ),
       z.array(InterfaceConfigFormProperty),
     ])
     .default([]),
@@ -58,17 +66,17 @@ export const Pipeline = z.object({
       c
         ? c
         : {
-          webchat: {
-            inputs: [],
-            outputs: [],
-            public: false,
-          },
-          form: {
-            inputs: [],
-            outputs: [],
-            public: false,
-          },
-        },
+            webchat: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+            form: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+          }
     )
     .default({}),
   config: z.object({
@@ -87,17 +95,17 @@ export const PipelinePublic = z.object({
       c
         ? c
         : {
-          webchat: {
-            inputs: [],
-            outputs: [],
-            public: false,
-          },
-          form: {
-            inputs: [],
-            outputs: [],
-            public: false,
-          },
-        },
+            webchat: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+            form: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+          }
     )
     .default({
       webchat: {
@@ -134,7 +142,36 @@ export const Alias = z.object({
     blocks: z.array(BlockConfig),
     connections: z.array(ConfigConnection).default([]),
   }),
-  interface_config: z.union([InterfaceConfig, z.null()]),
+  interface_config: z
+    .union([InterfaceConfig, z.null()])
+    .transform((c) =>
+      c
+        ? c
+        : {
+            webchat: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+            form: {
+              inputs: [],
+              outputs: [],
+              public: false,
+            },
+          }
+    )
+    .default({
+      webchat: {
+        inputs: [],
+        outputs: [],
+        public: false,
+      },
+      form: {
+        inputs: [],
+        outputs: [],
+        public: false,
+      },
+    }),
 });
 
 export const AliasResponse = z

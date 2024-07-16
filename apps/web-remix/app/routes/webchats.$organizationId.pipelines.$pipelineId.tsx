@@ -40,7 +40,7 @@ export async function loader(args: LoaderFunctionArgs) {
     if (!pipeline) {
       pipeline = await pipelineApi.getPublicPipeline(
         params.organizationId,
-        params.pipelineId,
+        params.pipelineId
       );
     }
 
@@ -67,8 +67,14 @@ export default function WebsiteChat() {
     messages,
     runId,
   } = useChat({
-    input: pipeline.interface_config.webchat.inputs.filter(input => input.type === "text_input")[0]?.name ?? "",
-    output: pipeline.interface_config.webchat.outputs.filter(output => output.type === "text_output")[0].name ?? "",
+    input:
+      pipeline.interface_config.webchat.inputs.filter(
+        (input) => input.type === "text_input"
+      )[0]?.name ?? "",
+    output:
+      pipeline.interface_config.webchat.outputs.filter(
+        (output) => output.type === "text_output"
+      )[0].name ?? "",
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
     useAuth: !(pipeline.interface_config.webchat.public ?? false),
@@ -84,7 +90,7 @@ export default function WebsiteChat() {
   } = useFilesUpload({
     organizationId: parseInt(organizationId),
     pipelineId: parseInt(pipelineId),
-    runId: runId
+    runId: runId as string,
   });
 
   const onSubmit = useCallback(
@@ -93,7 +99,7 @@ export default function WebsiteChat() {
         .map((file) =>
           file.status === "done"
             ? { id: file.id, file_name: file.file_name }
-            : null,
+            : null
         )
         .filter((f) => !!f);
       const filesString = files.length
@@ -105,16 +111,18 @@ ${JSON.stringify(files)}
       pushMessage(`${filesString}${value}`);
       clearFiles();
     },
-    [fileList, pushMessage, clearFiles],
+    [fileList, pushMessage, clearFiles]
   );
 
   useEffect(() => {
     // todo change it
     setTimeout(() => {
       startRun({
-        alias, initial_inputs: [], metadata: {
+        alias,
+        initial_inputs: [],
+        metadata: {
           interface: "webchat",
-        }
+        },
       });
     }, 500);
 
@@ -158,12 +166,22 @@ ${JSON.stringify(files)}
                         {
                           "border-neutral-700": file.status === "done",
                           "border-neutral-900": file.status !== "done",
-                        },
+                        }
                       )}
                       key={file.id}
                     >
                       {file.file_name}
-                      <button type="button" onClick={() => removeFile(file.id, pipeline.interface_config.webchat.inputs.filter(input => input.type === "file_input")[0]?.name ?? "")}>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          removeFile(
+                            file.id,
+                            pipeline.interface_config.webchat.inputs.filter(
+                              (input) => input.type === "file_input"
+                            )[0]?.name ?? ""
+                          )
+                        }
+                      >
                         <Icon iconName="trash" />
                       </button>
                     </div>
@@ -182,7 +200,12 @@ ${JSON.stringify(files)}
                   className="hidden"
                   onChange={(e) => {
                     [...(e.target.files || [])].forEach((file) => {
-                      uploadFile(file, pipeline.interface_config.webchat.inputs.filter(input => input.type === "file_input")[0]?.name ?? "");
+                      uploadFile(
+                        file,
+                        pipeline.interface_config.webchat.inputs.filter(
+                          (input) => input.type === "file_input"
+                        )[0]?.name ?? ""
+                      );
                     });
                   }}
                 />

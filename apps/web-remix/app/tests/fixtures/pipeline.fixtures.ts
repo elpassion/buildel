@@ -10,8 +10,16 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
     budget_limit: null,
     logs_enabled: false,
     interface_config: {
-      input: "text_input_1",
-      output: "text_output_1",
+      webchat: {
+        inputs: [{ name: "text_input_1", type: "text_input" }],
+        outputs: [{ name: "text_output_1", type: "text_output" }],
+        public: false,
+      },
+      form: {
+        inputs: [{ name: "text_input_1", type: "text_input" }],
+        outputs: [{ name: "text_output_1", type: "text_output" }],
+        public: false,
+      },
     },
     config: {
       version: "1",
@@ -138,7 +146,7 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
 };
 
 export const pipelineDetailsFixture = (
-  override?: Partial<IPipelineDetails>,
+  override?: Partial<IPipelineDetails>
 ): IPipelineDetails => {
   return {
     total_cost: 123,
@@ -147,7 +155,7 @@ export const pipelineDetailsFixture = (
 };
 
 export const simplePipelineFixture = (
-  override?: Partial<IPipeline>,
+  override?: Partial<IPipeline>
 ): IPipeline => {
   return {
     id: 1,
@@ -157,8 +165,16 @@ export const simplePipelineFixture = (
     logs_enabled: false,
     runs_count: 2,
     interface_config: {
-      input: "text_input_1",
-      output: "text_output_1",
+      webchat: {
+        inputs: [{ name: "text_input_1", type: "text_input" }],
+        outputs: [{ name: "text_output_1", type: "text_output" }],
+        public: false,
+      },
+      form: {
+        inputs: [{ name: "text_input_1", type: "text_input" }],
+        outputs: [{ name: "text_output_1", type: "text_output" }],
+        public: false,
+      },
     },
     config: {
       version: "1",
