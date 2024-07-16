@@ -54,6 +54,7 @@ export function FormPage() {
             pipelineId,
             Object.fromEntries(searchParams.entries())
           )}
+          target="_blank"
           className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
         >
           Open preview
