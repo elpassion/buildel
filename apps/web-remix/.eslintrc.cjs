@@ -8,8 +8,10 @@ module.exports = {
     path.resolve(__dirname, '../../eslint.config.common.cjs')
   ],
   rules: {
+    "sort-imports": "off",
     "import/order": "off",
     "no-useless-constructor": "off",
-    "react-hooks/exhaustive-deps": 'off',
+    "react-hooks/exhaustive-deps": "off",
+    "no-loop-func": "off"
   }
 };

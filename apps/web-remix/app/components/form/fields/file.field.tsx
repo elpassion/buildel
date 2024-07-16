@@ -1,4 +1,4 @@
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef } from 'react';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
 

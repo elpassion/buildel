@@ -21,10 +21,6 @@ import {
 import type { IBlockConfig } from '../../pipeline.types';
 import { BulkTable } from './BulkTable';
 import type { loader } from './loader.server';
-
-
-
-
 import { schema } from './schema';
 
 export interface ITest {

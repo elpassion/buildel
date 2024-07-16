@@ -4,8 +4,9 @@ const path = require('path');
 module.exports = {
   ...require(path.resolve(__dirname, '../../prettier.config.base.cjs')),
   plugins: [
-    "@ianvs/prettier-plugin-sort-imports"
+    path.resolve(__dirname, 'node_modules/@ianvs/prettier-plugin-sort-imports/lib/src/index.js')
   ],
+  importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"],
   importOrder: [
     '^react$',
     '^react(.*)$',
