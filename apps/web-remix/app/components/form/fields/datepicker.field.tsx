@@ -1,10 +1,11 @@
 import React from "react";
 import { useControlField } from "remix-validated-form";
-import {
-  DatepickerInput,
-  DatepickerInputProps,
-} from "~/components/form/inputs/datepicker.input";
 import { useFieldContext } from "~/components/form/fields/field.context";
+import type {
+  DatepickerInputProps} from "~/components/form/inputs/datepicker.input";
+import {
+  DatepickerInput
+} from "~/components/form/inputs/datepicker.input";
 
 export const DatepickerField: React.FC<
   Omit<DatepickerInputProps, "onChange" | "selected">

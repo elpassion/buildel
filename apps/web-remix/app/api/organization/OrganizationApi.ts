@@ -1,17 +1,18 @@
-import { fetchTyped } from "~/utils/fetch.server";
+import z from "zod";
+import type { fetchTyped } from "~/utils/fetch.server";
 import {
-  CreateOrganizationSchema,
+  APIKeyResponse,
+  CreateFromTemplateResponse,
+  InvitationResponse,
+  InvitationsResponse,
+  MembershipsResponse,
   OrganizationResponse,
   OrganizationsResponse,
-  MembershipsResponse,
-  APIKeyResponse,
-  InvitationsResponse,
-  InvitationResponse,
   WorkflowTemplatesResponse,
-  ICreateFromTemplateSchema,
-  CreateFromTemplateResponse,
 } from "./organization.contracts";
-import z from "zod";
+import type {
+  CreateOrganizationSchema,
+  ICreateFromTemplateSchema} from "./organization.contracts";
 
 export class OrganizationApi {
   constructor(private client: typeof fetchTyped) {}

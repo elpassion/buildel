@@ -1,13 +1,14 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
-import { z } from "zod";
-import invariant from "tiny-invariant";
-import { validationError } from "remix-validated-form";
+import { redirect } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
-import { actionBuilder } from "~/utils.server";
+import { validationError } from "remix-validated-form";
+import invariant from "tiny-invariant";
+import { z } from "zod";
+import { CreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
+import { KnowledgeBaseApi } from "~/api/knowledgeBase/KnowledgeBaseApi";
 import { routes } from "~/utils/routes.utils";
 import { setServerToast } from "~/utils/toast.server";
-import { KnowledgeBaseApi } from "~/api/knowledgeBase/KnowledgeBaseApi";
-import { CreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
+import { actionBuilder } from "~/utils.server";
+import type { ActionFunctionArgs} from "@remix-run/node";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

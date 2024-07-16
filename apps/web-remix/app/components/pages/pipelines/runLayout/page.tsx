@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { Button, Icon } from "@elpassion/taco";
 import {
   Link,
   Outlet,
@@ -8,14 +7,15 @@ import {
   useNavigate,
   useSearchParams,
 } from "@remix-run/react";
-import { AppNavbar } from "~/components/navbar/AppNavbar";
-import { routes } from "~/utils/routes.utils";
-import { TabGroup } from "~/components/tabs/TabGroup";
-import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
-import { FilledTabLink } from "~/components/tabs/FilledTabLink";
-import { loader } from "./loader.server";
+import { Button, Icon } from "@elpassion/taco";
 import { confirm } from "~/components/modal/confirm";
+import { AppNavbar } from "~/components/navbar/AppNavbar";
+import { FilledTabLink } from "~/components/tabs/FilledTabLink";
+import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
+import { TabGroup } from "~/components/tabs/TabGroup";
 import { successToast } from "~/components/toasts/successToast";
+import { routes } from "~/utils/routes.utils";
+import type { loader } from "./loader.server";
 
 export function PipelineRunLayout() {
   const navigate = useNavigate();

@@ -1,12 +1,13 @@
-import { ActionFunctionArgs, json } from "@remix-run/node";
-import invariant from "tiny-invariant";
-import { actionBuilder } from "~/utils.server";
-import { setServerToast } from "~/utils/toast.server";
-import { OrganizationResponse } from "~/api/organization/organization.contracts";
-import { z } from "zod";
-import { requireLogin } from "~/session.server";
+import { json } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
+import invariant from "tiny-invariant";
+import { z } from "zod";
+import { OrganizationResponse } from "~/api/organization/organization.contracts";
+import { requireLogin } from "~/session.server";
+import { setServerToast } from "~/utils/toast.server";
+import { actionBuilder } from "~/utils.server";
 import { schema } from "./schema";
+import type { ActionFunctionArgs} from "@remix-run/node";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

@@ -1,11 +1,13 @@
-import React, { ReactNode, useEffect } from "react";
+import type { ReactNode} from "react";
+import React, { useEffect } from "react";
+import { NavLink, useLocation } from "@remix-run/react";
 import classNames from "classnames";
 import kebabCase from "lodash.kebabcase";
-import { RemixNavLinkProps } from "@remix-run/react/dist/components";
-import { NavLink, useLocation } from "@remix-run/react";
-import { SidebarProps, Sidebar } from "@elpassion/taco";
+import type { SidebarProps} from "@elpassion/taco";
+import { Sidebar } from "@elpassion/taco";
 import { PageOverlay } from "~/components/overlay/PageOverlay";
 import { Tooltip } from "~/components/tooltip/Tooltip";
+import type { RemixNavLinkProps } from "@remix-run/react/dist/components";
 
 export const NavSidebar: React.FC<
   Omit<SidebarProps, "collapsed" | "onCollapse">

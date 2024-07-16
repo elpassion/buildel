@@ -1,12 +1,13 @@
+import { redirect } from "@remix-run/node";
 import z from "zod";
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { OAuth2Client } from "~/clients/OAuth2Client";
 import { CurrentUserResponse } from "~/api/CurrentUserApi";
+import { OAuth2Client } from "~/clients/OAuth2Client";
+import { assert } from "~/utils/assert";
 import { setCurrentUser } from "~/utils/currentUser.server";
 import { routes } from "~/utils/routes.utils";
-import { loaderBuilder } from "~/utils.server";
-import { assert } from "~/utils/assert";
 import { setServerToast } from "~/utils/toast.server";
+import { loaderBuilder } from "~/utils.server";
+import type { LoaderFunctionArgs} from "@remix-run/node";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {

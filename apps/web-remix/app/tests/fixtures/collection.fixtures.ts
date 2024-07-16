@@ -1,4 +1,4 @@
-import { IKnowledgeBaseCollection } from "~/components/pages/knowledgeBase/knowledgeBase.types";
+import type { IKnowledgeBaseCollection } from "~/components/pages/knowledgeBase/knowledgeBase.types";
 
 export const collectionFixture = (
   override?: Partial<IKnowledgeBaseCollection>,

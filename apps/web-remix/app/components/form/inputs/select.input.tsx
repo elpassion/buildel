@@ -1,5 +1,6 @@
-import { SelectDropdown, ISelectDropdownProps } from "@elpassion/taco/Dropdown";
 import React from "react";
+import type { ISelectDropdownProps } from "@elpassion/taco/Dropdown";
+import { SelectDropdown } from "@elpassion/taco/Dropdown";
 
 export type SelectInputProps = ISelectDropdownProps;
 

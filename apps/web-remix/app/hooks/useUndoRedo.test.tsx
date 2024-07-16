@@ -1,6 +1,6 @@
-import { test, describe, expect, beforeEach } from "vitest";
-import { renderHook, act } from "~/tests/render";
+import { beforeEach, describe, expect, test } from "vitest";
 import { useUndoRedo } from "~/hooks/useUndoRedo";
+import { act, renderHook } from "~/tests/render";
 describe("useUndoRedo", () => {
   let result: any;
 

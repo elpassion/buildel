@@ -1,16 +1,18 @@
-import React, { ReactNode, useMemo, useRef } from "react";
-import { ClientOnly } from "remix-utils/client-only";
+import type { ReactNode} from "react";
+import React, { useMemo, useRef } from "react";
 import { autocompletion } from "@codemirror/autocomplete";
-import { xcodeDark } from "@uiw/codemirror-themes-all";
 import { langs } from "@uiw/codemirror-extensions-langs";
+import { xcodeDark } from "@uiw/codemirror-themes-all";
 import ReactCodeMirror, {
-  ReactCodeMirrorRef,
-  EditorView,
-  ReactCodeMirrorProps,
+  EditorView
 } from "@uiw/react-codemirror";
-import { suggestionHighlighter } from "./extensions/suggestionHighlighter";
+import { ClientOnly } from "remix-utils/client-only";
 import { completions } from "./extensions/completions";
-import { Suggestion } from "./codeMirror.types";
+import { suggestionHighlighter } from "./extensions/suggestionHighlighter";
+import type { Suggestion } from "./codeMirror.types";
+import type {
+  ReactCodeMirrorProps,
+  ReactCodeMirrorRef} from "@uiw/react-codemirror";
 import "./codeMirror.styles.css";
 
 export type EditorLanguage = "tsx" | "json" | "shell" | "html" | "custom";

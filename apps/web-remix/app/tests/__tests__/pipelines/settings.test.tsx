@@ -1,28 +1,29 @@
 import React from "react";
-import { test, describe, expect } from "vitest";
+import { describe, expect, test } from "vitest";
+import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
+import { action as buildAction } from "~/components/pages/pipelines/build/action.server";
+import { loader as settingsConfigurtionLoader } from "~/components/pages/pipelines/settings/configuration/loader.server";
+import { SettingsConfigurationPage } from "~/components/pages/pipelines/settings/configuration/page";
+import { loader as settingsLoader } from "~/components/pages/pipelines/settings/loader.server";
+import { SettingsPage } from "~/components/pages/pipelines/settings/page";
+import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
+import { runFixture } from "~/tests/fixtures/run.fixtures";
+import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
+import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
+import { RunHandlers } from "~/tests/handlers/run.handlers";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { InputHandle } from "~/tests/handles/Input.handle";
+import { LinkHandle } from "~/tests/handles/Link.handle";
+import { TextareaHandle } from "~/tests/handles/Textarea.handle";
+import { render, screen } from "~/tests/render";
+import { server } from "~/tests/server.mock";
 import {
   actionWithSession,
   loaderWithSession,
-  RoutesProps,
   setupRoutes,
 } from "~/tests/setup.tests";
-import { render, screen } from "~/tests/render";
-import { server } from "~/tests/server.mock";
-import { SettingsPage } from "~/components/pages/pipelines/settings/page";
-import { loader as settingsLoader } from "~/components/pages/pipelines/settings/loader.server";
-import { SettingsConfigurationPage } from "~/components/pages/pipelines/settings/configuration/page";
-import { loader as settingsConfigurtionLoader } from "~/components/pages/pipelines/settings/configuration/loader.server";
-import { RunHandlers } from "~/tests/handlers/run.handlers";
-import { runFixture } from "~/tests/fixtures/run.fixtures";
-import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
-import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
-import { handlers as blockTypesHandlers } from "~/tests/handlers/blockTypes.handlers";
-import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
-import { action as buildAction } from "~/components/pages/pipelines/build/action.server";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { InputHandle } from "~/tests/handles/Input.handle";
-import { TextareaHandle } from "~/tests/handles/Textarea.handle";
-import { LinkHandle } from "~/tests/handles/Link.handle";
+import type {
+  RoutesProps} from "~/tests/setup.tests";
 
 const handlers = () => [
   ...blockTypesHandlers(),

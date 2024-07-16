@@ -1,5 +1,4 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -7,16 +6,17 @@ import {
   useMatch,
   useNavigate,
 } from "@remix-run/react";
+import { Button } from "@elpassion/taco";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
-import { loader } from "./loader.server";
-import { Button } from "@elpassion/taco";
-import { KnowledgeBaseCollectionList } from "./KnowledgeBaseCollectionList";
-import { routes } from "~/utils/routes.utils";
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
+import { routes } from "~/utils/routes.utils";
+import { KnowledgeBaseCollectionList } from "./KnowledgeBaseCollectionList";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function KnowledgeBasePage() {
   const { organizationId, collections } = useLoaderData<typeof loader>();

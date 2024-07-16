@@ -1,17 +1,18 @@
+import { useCallback, useMemo } from "react";
+import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
+import { Icon } from "@elpassion/taco";
+import { IconButton } from "~/components/iconButton";
+import { confirm } from "~/components/modal/confirm";
+import type { IBlockConfig } from "~/components/pages/pipelines/pipeline.types";
+import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider";
+import { routes } from "~/utils/routes.utils";
 import {
   CustomNode,
   CustomNodeBody,
-  CustomNodeHeader,
-  CustomNodeProps,
+  CustomNodeHeader
 } from "../CustomNodes/CustomNode";
-import { IBlockConfig } from "~/components/pages/pipelines/pipeline.types";
-import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider";
-import { useCallback, useMemo } from "react";
-import { IconButton } from "~/components/iconButton";
-import { Icon } from "@elpassion/taco";
-import { useNavigate, useParams, useSearchParams } from "@remix-run/react";
-import { confirm } from "~/components/modal/confirm";
-import { routes } from "~/utils/routes.utils";
+import type {
+  CustomNodeProps} from "../CustomNodes/CustomNode";
 
 export function BuilderNode(props: CustomNodeProps) {
   return (

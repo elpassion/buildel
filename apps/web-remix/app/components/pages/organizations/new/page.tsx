@@ -1,11 +1,11 @@
-import { MetaFunction } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
 import { useMemo } from "react";
+import { withZod } from "@remix-validated-form/with-zod";
 import { ValidatedForm } from "remix-validated-form";
+import { CreateOrganizationSchema } from "~/api/organization/organization.contracts";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { CreateOrganizationSchema } from "~/api/organization/organization.contracts";
 import { SubmitButton } from "~/components/form/submit";
+import type { MetaFunction } from "@remix-run/node";
 
 export function NewOrganizationPage() {
   const validator = useMemo(() => withZod(CreateOrganizationSchema), []);

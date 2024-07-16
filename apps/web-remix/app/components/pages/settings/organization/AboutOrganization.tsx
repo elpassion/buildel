@@ -2,19 +2,19 @@ import React, { useMemo } from "react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { ValidatedForm } from "remix-validated-form";
 import { Avatar } from "@elpassion/taco";
+import { Modal } from "@elpassion/taco/Modal";
+import { Field } from "~/components/form/fields/field.context";
+import { TextInputField } from "~/components/form/fields/text.field";
+import { SubmitButton } from "~/components/form/submit";
 import { IconButton } from "~/components/iconButton";
+import { useModal } from "~/hooks/useModal";
 import {
   Section,
   SectionContent,
   SectionHeading,
 } from "../settingsLayout/PageLayout";
-import { Modal } from "@elpassion/taco/Modal";
-import { useModal } from "~/hooks/useModal";
-import { IOrganization } from "./organization.types";
 import { schema } from "./schema";
-import { Field } from "~/components/form/fields/field.context";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SubmitButton } from "~/components/form/submit";
+import type { IOrganization } from "./organization.types";
 interface AboutOrganizationProps {
   organization: IOrganization;
 }

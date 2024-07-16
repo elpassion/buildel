@@ -1,22 +1,23 @@
 import React, { useCallback, useState } from "react";
-import z from "zod";
-import { MetaFunction } from "@remix-run/node";
-import { ValidatedForm } from "remix-validated-form";
-import { withZod } from "@remix-validated-form/with-zod";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
-import { Field as FormField } from "~/components/form/fields/field.context";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { routes } from "~/utils/routes.utils";
-import {
-  generateZODSchema,
-  JSONSchemaField,
-} from "~/components/form/schema/SchemaParser";
-import { successToast } from "~/components/toasts/successToast";
+import { withZod } from "@remix-validated-form/with-zod";
+import { ValidatedForm } from "remix-validated-form";
+import z from "zod";
 import { UpdatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
-import { loader } from "./loader.server";
-import { SubmitButton } from "~/components/form/submit";
+import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import { EditorField } from "~/components/form/fields/editor.field";
+import { Field as FormField } from "~/components/form/fields/field.context";
+import type {
+  JSONSchemaField} from "~/components/form/schema/SchemaParser";
+import {
+  generateZODSchema
+} from "~/components/form/schema/SchemaParser";
+import { SubmitButton } from "~/components/form/submit";
+import type { IPipeline } from "~/components/pages/pipelines/pipeline.types";
+import { successToast } from "~/components/toasts/successToast";
+import { routes } from "~/utils/routes.utils";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 const schema = z.object({
   configuration: z.string(),

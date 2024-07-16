@@ -1,12 +1,12 @@
-import { withZod } from "@remix-validated-form/with-zod";
 import React, { useMemo } from "react";
+import { withZod } from "@remix-validated-form/with-zod";
 import { ValidatedForm } from "remix-validated-form";
 import { InterfaceConfig } from "~/api/pipeline/pipeline.contracts";
 import { CheckboxInputField } from "~/components/form/fields/checkbox.field";
 import { Field } from "~/components/form/fields/field.context";
 import { SelectField } from "~/components/form/fields/select.field";
 import { SubmitButton } from "~/components/form/submit";
-import {
+import type {
   IBlockConfig,
   IInterfaceConfig,
   IPipeline,

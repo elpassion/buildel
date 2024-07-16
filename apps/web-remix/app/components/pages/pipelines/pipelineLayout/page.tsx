@@ -5,7 +5,7 @@ import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
 import { TabGroup } from "~/components/tabs/TabGroup";
 import { routes } from "~/utils/routes.utils";
 import { AliasSelect, CreateAliasForm, RestoreWorkflow } from "./Aliases";
-import { loader } from "./loader.server";
+import type { loader } from "./loader.server";
 
 export function PipelineLayout() {
   const { pipeline, aliases, aliasId } = useLoaderData<typeof loader>();

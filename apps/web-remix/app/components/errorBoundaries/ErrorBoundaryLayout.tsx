@@ -1,9 +1,10 @@
-import React, { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
+import React from "react";
 import {
-  isRouteErrorResponse,
   Links,
   Meta,
   Scripts,
+  isRouteErrorResponse,
   useRouteError,
 } from "@remix-run/react";
 

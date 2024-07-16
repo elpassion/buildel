@@ -1,12 +1,13 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { withZod } from "@remix-validated-form/with-zod";
 import { validationError } from "remix-validated-form";
 import invariant from "tiny-invariant";
-import { actionBuilder } from "~/utils.server";
-import { routes } from "~/utils/routes.utils";
-import { setServerToast } from "~/utils/toast.server";
 import { CreateInvitationSchema } from "~/api/organization/organization.contracts";
 import { OrganizationApi } from "~/api/organization/OrganizationApi";
+import { routes } from "~/utils/routes.utils";
+import { setServerToast } from "~/utils/toast.server";
+import { actionBuilder } from "~/utils.server";
+import type { ActionFunctionArgs} from "@remix-run/node";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

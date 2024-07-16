@@ -1,14 +1,15 @@
-import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import invariant from "tiny-invariant";
-import { loaderBuilder } from "~/utils.server";
-import { requireLogin } from "~/session.server";
-import { getParamsPagination } from "~/components/pagination/usePagination";
 import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import {
   DEFAULT_END_DATE,
   DEFAULT_START_DATE,
 } from "~/components/pages/pipelines/MonthPicker/monthPicker.utils";
+import { getParamsPagination } from "~/components/pagination/usePagination";
+import { requireLogin } from "~/session.server";
+import { loaderBuilder } from "~/utils.server";
 import { DateFilterSchema } from "./schema";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {

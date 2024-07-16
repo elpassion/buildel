@@ -1,4 +1,5 @@
-import { screen, Matcher } from "../render";
+import { screen } from "../render";
+import type { Matcher } from "../render";
 
 export class BlockHandle {
   constructor(public readonly blockElement: HTMLDivElement) {}

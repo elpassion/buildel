@@ -1,13 +1,13 @@
 import React, { useMemo, useRef, useState } from "react";
-import type { MenuInfo } from "rc-menu/es/interface";
+import { ClientOnly } from "remix-utils/client-only";
 import { useOnClickOutside } from "usehooks-ts";
 import { Icon } from "@elpassion/taco";
+import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
+import type { EditorLanguage } from "~/components/editor/CodeMirror/CodeMirror";
 import { MenuClient } from "~/components/menu/Menu.client";
 import { MenuItem } from "~/components/menu/MenuItem";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import { CodePreviewWrapper } from "./CodePreviewWrapper";
-import { ClientOnly } from "remix-utils/client-only";
-import { EditorLanguage } from "~/components/editor/CodeMirror/CodeMirror";
+import type { MenuInfo } from "rc-menu/es/interface";
 
 interface CodePreviewOptionsProps {
   options: {

@@ -1,6 +1,7 @@
+import type { PropsWithChildren, ReactNode } from "react";
+import React from "react";
 import classNames from "classnames";
 import { SubMenu as RcSubMenu } from "rc-menu";
-import React, { PropsWithChildren, ReactNode } from "react";
 import "./createBlockSubMenu.styles.css";
 import "rc-menu/assets/index.css";
 

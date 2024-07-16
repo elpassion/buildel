@@ -1,14 +1,14 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
 import { Link, Outlet, useLoaderData, useMatch } from "@remix-run/react";
+import { Button } from "@elpassion/taco";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { AppNavbar } from "~/components/navbar/AppNavbar";
-import { loader } from "./loader.server";
-import { Button } from "@elpassion/taco";
-import { routes } from "~/utils/routes.utils";
-import { TabGroup } from "~/components/tabs/TabGroup";
-import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
 import { FilledTabLink } from "~/components/tabs/FilledTabLink";
+import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
+import { TabGroup } from "~/components/tabs/TabGroup";
+import { routes } from "~/utils/routes.utils";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function KnowledgeBaseCollectionLayout() {
   const { organizationId, collectionName } = useLoaderData<typeof loader>();

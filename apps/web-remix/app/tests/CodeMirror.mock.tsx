@@ -1,6 +1,6 @@
 import React from "react";
 import { vi } from "vitest";
-import { ReactCodeMirrorProps } from "@uiw/react-codemirror";
+import type { ReactCodeMirrorProps } from "@uiw/react-codemirror";
 
 vi.mock("@uiw/react-codemirror", () => ({
   default: (props: ReactCodeMirrorProps) => {

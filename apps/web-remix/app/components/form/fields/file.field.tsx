@@ -1,6 +1,7 @@
 import React, { forwardRef, useRef } from "react";
 import { useFieldContext } from "~/components/form/fields/field.context";
-import { SmallFileInput, SmallFileInputProps } from "../inputs/file.input";
+import { SmallFileInput } from "../inputs/file.input";
+import type { SmallFileInputProps } from "../inputs/file.input";
 
 export const SmallFileInputField = forwardRef<
   HTMLInputElement,

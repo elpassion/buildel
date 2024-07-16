@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect } from "react";
-import { ChatWrapper } from "~/components/chat/ChatWrapper";
-import { ChatHeading } from "~/components/chat/ChatHeading";
-import { ChatMessages } from "~/components/chat/ChatMessages";
-import { ChatInput } from "~/components/chat/ChatInput";
-import { useChat } from "~/components/chat/useChat";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import classNames from "classnames";
+import invariant from "tiny-invariant";
+import { Icon } from "@elpassion/taco";
+import type { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import {
   ChatGeneratingAnimation,
   ChatHeader,
@@ -11,17 +13,16 @@ import {
   ChatStatus,
   IntroPanel,
 } from "~/components/chat/Chat.components";
-import classNames from "classnames";
-import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { loaderBuilder } from "~/utils.server";
-import invariant from "tiny-invariant";
-import { useLoaderData } from "@remix-run/react";
-import { PipelineApi } from "~/api/pipeline/PipelineApi";
-import { UnauthorizedError } from "~/utils/errors";
-import { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
-import { ParsedResponse } from "~/utils/fetch.server";
+import { ChatHeading } from "~/components/chat/ChatHeading";
+import { ChatInput } from "~/components/chat/ChatInput";
+import { ChatMessages } from "~/components/chat/ChatMessages";
+import { ChatWrapper } from "~/components/chat/ChatWrapper";
+import { useChat } from "~/components/chat/useChat";
 import { useFilesUpload } from "~/components/fileUpload/FileUpload";
-import { Icon } from "@elpassion/taco";
+import { UnauthorizedError } from "~/utils/errors";
+import type { ParsedResponse } from "~/utils/fetch.server";
+import { loaderBuilder } from "~/utils.server";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {

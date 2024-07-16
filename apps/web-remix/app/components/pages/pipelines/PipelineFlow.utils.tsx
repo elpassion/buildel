@@ -1,13 +1,13 @@
-import { Connection } from "@xyflow/react";
-import {
-  IPipelineConfig,
-  INode,
+import type {
+  IBlockConfig,
+  IConfigConnection,
   IEdge,
   IField,
-  IBlockConfig,
   IHandle,
-  IConfigConnection,
+  INode,
+  IPipelineConfig,
 } from "./pipeline.types";
+import type { Connection } from "@xyflow/react";
 
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({

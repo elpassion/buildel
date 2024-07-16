@@ -1,6 +1,6 @@
 import userEvent from "@testing-library/user-event";
-import { screen } from "../render";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { screen } from "../render";
 
 export class SelectHandle {
   constructor(

@@ -1,9 +1,10 @@
-import React, { PropsWithChildren, useMemo, useRef, useState } from "react";
-import { ItemList } from "~/components/list/ItemList";
-import { HelpfulIcon } from "~/components/tooltip/HelpfulIcon";
-import { IConfigConnection } from "~/components/pages/pipelines/pipeline.types";
-import { Checkbox } from "@elpassion/taco";
+import type { PropsWithChildren} from "react";
+import React, { useMemo, useRef, useState } from "react";
 import classNames from "classnames";
+import { Checkbox } from "@elpassion/taco";
+import { ItemList } from "~/components/list/ItemList";
+import type { IConfigConnection } from "~/components/pages/pipelines/pipeline.types";
+import { HelpfulIcon } from "~/components/tooltip/HelpfulIcon";
 import { useInputs } from "./EditBlockForm";
 
 interface BlockInputListProps {

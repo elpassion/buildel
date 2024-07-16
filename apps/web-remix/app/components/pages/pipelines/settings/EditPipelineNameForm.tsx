@@ -1,17 +1,17 @@
-import { useModal } from "~/hooks/useModal";
 import React, { useCallback, useEffect, useMemo } from "react";
+import { useFetcher } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
-import { IconButton } from "~/components/iconButton";
-import { Modal } from "@elpassion/taco/Modal";
 import { ValidatedForm } from "remix-validated-form";
+import { Modal } from "@elpassion/taco/Modal";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
-import { updatePipelineNameSchema } from "./schema";
-import { successToast } from "~/components/toasts/successToast";
 import { SubmitButton } from "~/components/form/submit";
-import { useFetcher } from "@remix-run/react";
+import { IconButton } from "~/components/iconButton";
+import type { IPipeline } from "~/components/pages/pipelines/pipeline.types";
+import { successToast } from "~/components/toasts/successToast";
+import { useModal } from "~/hooks/useModal";
 import { routes } from "~/utils/routes.utils";
+import { updatePipelineNameSchema } from "./schema";
 
 interface EditPipelineNameFormProps {
   defaultValues: IPipeline;

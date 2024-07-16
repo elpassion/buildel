@@ -1,10 +1,11 @@
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
-import { actionBuilder } from "~/utils.server";
-import { requireLogin } from "~/session.server";
+import { json, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
-import { setServerToast } from "~/utils/toast.server";
-import { assert } from "~/utils/assert";
 import { OrganizationApi } from "~/api/organization/OrganizationApi";
+import { requireLogin } from "~/session.server";
+import { assert } from "~/utils/assert";
+import { setServerToast } from "~/utils/toast.server";
+import { actionBuilder } from "~/utils.server";
+import type { ActionFunctionArgs} from "@remix-run/node";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

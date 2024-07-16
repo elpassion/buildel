@@ -1,13 +1,12 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-
-import { loader } from "./loader.server";
-import { routes } from "~/utils/routes.utils";
-import { CollectionCostsTable } from "./CollectionCostsTable";
 import { Pagination } from "~/components/pagination/Pagination";
 import { dayjs } from "~/utils/Dayjs";
+import { routes } from "~/utils/routes.utils";
 import { MonthPicker } from "../../pipelines/MonthPicker/MonthPicker";
+import { CollectionCostsTable } from "./CollectionCostsTable";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 
 export function KnowledgeBaseOverviewPage() {

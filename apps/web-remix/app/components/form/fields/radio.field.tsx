@@ -1,10 +1,11 @@
 import React, { forwardRef, useEffect } from "react";
-import { useFieldContext } from "~/components/form/fields/field.context";
-import {
-  RadioInput,
-  RadioInputProps,
-} from "~/components/form/inputs/radio.input";
 import { useControlField } from "remix-validated-form";
+import { useFieldContext } from "~/components/form/fields/field.context";
+import type {
+  RadioInputProps} from "~/components/form/inputs/radio.input";
+import {
+  RadioInput
+} from "~/components/form/inputs/radio.input";
 
 export const RadioField = forwardRef<HTMLInputElement, RadioInputProps>(
   ({ defaultValue, onChange, ...props }, ref) => {

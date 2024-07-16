@@ -1,5 +1,6 @@
-import { Avatar, Button, Icon, IconButton } from "@elpassion/taco";
-import { json, LoaderFunctionArgs } from "@remix-run/node";
+import type { PropsWithChildren} from "react";
+import { useCallback, useRef, useState } from "react";
+import { json } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -8,10 +9,10 @@ import {
   useNavigate,
 } from "@remix-run/react";
 import classNames from "classnames";
-import type { MenuInfo } from "rc-menu/es/interface";
-import { PropsWithChildren, useCallback, useRef, useState } from "react";
+import { ClientOnly } from "remix-utils/client-only";
 import invariant from "tiny-invariant";
 import { useOnClickOutside } from "usehooks-ts";
+import { Avatar, Button, Icon, IconButton } from "@elpassion/taco";
 import { OrganizationApi } from "~/api/organization/OrganizationApi";
 import { MenuClient } from "~/components/menu/Menu.client";
 import { MenuItem } from "~/components/menu/MenuItem";
@@ -24,11 +25,12 @@ import {
 } from "~/components/sidebar/NavSidebar";
 import { useServerToasts } from "~/hooks/useServerToasts";
 import { requireLogin } from "~/session.server";
-import { loaderBuilder } from "~/utils.server";
 import { getCurrentUser } from "~/utils/currentUser.server";
 import { routes } from "~/utils/routes.utils";
 import { getServerToast, setOrganizationId } from "~/utils/toast.server";
-import { ClientOnly } from "remix-utils/client-only";
+import { loaderBuilder } from "~/utils.server";
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { MenuInfo } from "rc-menu/es/interface";
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {

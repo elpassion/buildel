@@ -1,6 +1,3 @@
-import { withSentry } from "@sentry/remix";
-import type { LinksFunction } from "@remix-run/node";
-import Modal from "react-modal";
 import {
   Links,
   Meta,
@@ -8,7 +5,10 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { withSentry } from "@sentry/remix";
+import Modal from "react-modal";
 import { Toaster } from "~/components/toasts/Toaster";
+import type { LinksFunction } from "@remix-run/node";
 import "./tailwind.css";
 import { PageProgress } from "~/components/progressBar/PageProgress";
 import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";

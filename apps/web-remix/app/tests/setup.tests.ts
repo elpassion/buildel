@@ -1,13 +1,14 @@
-import { createRemixStub, RemixStubProps } from "@remix-run/testing";
-import {
-  LoaderFunctionArgs,
-  LoaderFunction,
-  ActionFunction,
-  ActionFunctionArgs,
-} from "@remix-run/node";
-import { ICurrentUser } from "~/api/CurrentUserApi";
+import { createRemixStub } from "@remix-run/testing";
+import type { ICurrentUser } from "~/api/CurrentUserApi";
 import { setCurrentUser } from "~/utils/currentUser.server";
 import { setOrganizationId } from "~/utils/toast.server";
+import type {
+  ActionFunction,
+  ActionFunctionArgs,
+  LoaderFunction,
+  LoaderFunctionArgs,
+} from "@remix-run/node";
+import type { RemixStubProps } from "@remix-run/testing";
 
 type RemixRoutesProps = Parameters<typeof createRemixStub>;
 

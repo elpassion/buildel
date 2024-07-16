@@ -1,5 +1,5 @@
-import { http, HttpResponse } from "msw";
-import { ISecretKey } from "~/components/pages/secrets/variables.types";
+import { HttpResponse, http } from "msw";
+import type { ISecretKey } from "~/components/pages/secrets/variables.types";
 
 export class SecretsHandlers {
   private secrets: Map<string | number, ISecretKey> = new Map();

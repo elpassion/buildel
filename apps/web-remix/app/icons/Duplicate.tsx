@@ -1,5 +1,5 @@
 import React from "react";
-import { IconProps } from "./icons.types";
+import type { IconProps } from "./icons.types";
 
 export const Duplicate: React.FC<IconProps> = ({ className }) => {
   return (

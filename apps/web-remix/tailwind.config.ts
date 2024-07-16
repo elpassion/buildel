@@ -1,12 +1,12 @@
 import { join } from "path";
+import merge from "lodash.merge";
 import {
-  initDefaultTheme,
   colorsTokenHelpers,
+  initDefaultTheme,
   radiusTokenHelpers,
 } from "@elpassion/taco";
-import merge from "lodash.merge";
-import colorsJson from "./tokens/colors.json";
 import radiusJson from "./tokens/borderRadius.json";
+import colorsJson from "./tokens/colors.json";
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 const { getColorsConfig, getComponentsColorConfig } = colorsTokenHelpers;

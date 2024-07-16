@@ -1,30 +1,31 @@
-import { useMemo, useState } from "react";
-import { ValidatedForm } from "remix-validated-form";
-import { MetaFunction, useLoaderData } from "@remix-run/react";
-import { v4 as uuidv4 } from "uuid";
-import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
-import { loader } from "./loader.server";
-import { Button, Icon, IconButton } from "@elpassion/taco";
-import { SmallFileInput } from "~/components/form/inputs/file.input";
-import Papa from "papaparse";
-import { Field } from "~/components/form/fields/field.context";
-import { withZod } from "@remix-validated-form/with-zod";
-import { schema } from "./schema";
-import { IBlockConfig } from "../../pipeline.types";
+import { useMemo, useState } from 'react';
+import { useLoaderData } from '@remix-run/react';
+import { withZod } from '@remix-validated-form/with-zod';
+import Papa from 'papaparse';
+import { ValidatedForm } from 'remix-validated-form';
+import { v4 as uuidv4 } from 'uuid';
+import { Button, Icon, IconButton } from '@elpassion/taco';
+import { Field } from '~/components/form/fields/field.context';
+import { SelectField } from '~/components/form/fields/select.field';
+import { SmallFileInput } from '~/components/form/inputs/file.input';
+import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
 import {
   InterfaceSectionHeader,
   InterfaceSectionHeaderParagraph,
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
-} from "~/components/interfaces/InterfaceSection";
-import { SelectField } from "~/components/form/fields/select.field";
-import { BulkTable } from "./BulkTable";
+} from '~/components/interfaces/InterfaceSection';
+import { BulkTable } from './BulkTable';
+import { schema } from './schema';
+import type { loader } from './loader.server';
+import type { IBlockConfig } from '../../pipeline.types';
+import type { MetaFunction } from '@remix-run/react';
 
 export interface ITest {
   id: string;
   inputs: Record<string, string>;
   outputs: Record<string, string>;
-  status: "pending" | "running" | "done";
+  status: 'pending' | 'running' | 'done';
   run?: number;
 }
 
@@ -41,24 +42,24 @@ export function BulkPage() {
   >([]);
 
   const inputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_input"
+    (block) => block.type === 'text_input',
   );
 
   const outputs = pipeline.config.blocks.filter(
-    (block) => block.type === "text_output"
+    (block) => block.type === 'text_output',
   );
 
   function generateNewTest() {
     return {
       id: uuidv4(),
-      status: "pending" as const,
+      status: 'pending' as const,
       inputs: selectedInputs.reduce(
-        (acc, input) => ({ ...acc, [input]: "" }),
-        {}
+        (acc, input) => ({ ...acc, [input]: '' }),
+        {},
       ),
       outputs: selectedOutputs.reduce(
-        (acc, output) => ({ ...acc, [output]: "" }),
-        {}
+        (acc, output) => ({ ...acc, [output]: '' }),
+        {},
       ),
     };
   }
@@ -70,40 +71,40 @@ export function BulkPage() {
     const response = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs`,
       {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({}),
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
         },
-      }
+      },
     );
     const {
       data: { id },
     } = await response.json();
 
     setTests((tests) =>
-      tests.map((t) => (t.id === test.id ? { ...t, run: id } : t))
+      tests.map((t) => (t.id === test.id ? { ...t, run: id } : t)),
     );
 
     const runResponse = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/start`,
       {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({
           initial_inputs: Object.entries(test.inputs).map(([name, value]) => ({
             block_name: name,
-            input_name: "input",
+            input_name: 'input',
             data: value,
           })),
           wait_for_outputs: selectedOutputs.map((output) => ({
             block_name: output,
-            output_name: "output",
+            output_name: 'output',
           })),
         }),
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
         },
-      }
+      },
     );
 
     const data = await runResponse.json();
@@ -113,20 +114,20 @@ export function BulkPage() {
         ...acc,
         [output.block_name]: output.data,
       }),
-      {}
+      {},
     );
 
     setTests((tests) =>
       tests.map((t) =>
-        t.id === test.id ? { ...t, outputs: newOutputs, status: "done" } : t
-      )
+        t.id === test.id ? { ...t, outputs: newOutputs, status: 'done' } : t,
+      ),
     );
 
     const runStopResponse = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/stop`,
       {
-        method: "POST",
-      }
+        method: 'POST',
+      },
     );
 
     const {
@@ -138,7 +139,7 @@ export function BulkPage() {
 
   const handleOnSubmit = async (e: any) => {
     e.preventDefault();
-    setTests((tests) => tests.map((t) => ({ ...t, status: "running" })));
+    setTests((tests) => tests.map((t) => ({ ...t, status: 'running' })));
     tests.map((test) => {
       handleOnSubmitTest(test);
     });
@@ -155,14 +156,14 @@ export function BulkPage() {
   };
 
   function download(filename: string, text: string) {
-    const element = document.createElement("a");
+    const element = document.createElement('a');
     element.setAttribute(
-      "href",
-      "data:text/csv;charset=utf-8," + encodeURIComponent(text)
+      'href',
+      'data:text/csv;charset=utf-8,' + encodeURIComponent(text),
     );
-    element.setAttribute("download", filename);
+    element.setAttribute('download', filename);
 
-    element.style.display = "none";
+    element.style.display = 'none';
     document.body.appendChild(element);
 
     element.click();
@@ -172,9 +173,9 @@ export function BulkPage() {
 
   const handleChangeNewSelectedInputs = (
     newSelected: string[],
-    type: "inputs" | "outputs"
+    type: 'inputs' | 'outputs',
   ) => {
-    if (type === "inputs") {
+    if (type === 'inputs') {
       setSelectedInputs(newSelected);
       setTests((tests) =>
         tests.map((test) => ({
@@ -182,14 +183,14 @@ export function BulkPage() {
           inputs: newSelected.reduce(
             (acc, input) => ({
               ...acc,
-              [input]: "",
+              [input]: '',
             }),
-            {}
+            {},
           ),
-        }))
+        })),
       );
     }
-    if (type === "outputs") {
+    if (type === 'outputs') {
       setSelectedOutputs(newSelected);
       setTests((tests) =>
         tests.map((test) => ({
@@ -197,11 +198,11 @@ export function BulkPage() {
           outputs: newSelected.reduce(
             (acc, output) => ({
               ...acc,
-              [output]: "",
+              [output]: '',
             }),
-            {}
+            {},
           ),
-        }))
+        })),
       );
     }
   };
@@ -234,10 +235,10 @@ export function BulkPage() {
                           ...inputs,
                           [input]: result[input] || value,
                         }),
-                        {}
+                        {},
                       );
                       return { ...test, inputs: newInputs };
-                    })
+                    }),
                   );
                 },
               });
@@ -245,7 +246,7 @@ export function BulkPage() {
           />
 
           <Button
-            disabled={tests.some((test) => test.status !== "done")}
+            disabled={tests.some((test) => test.status !== 'done')}
             onClick={exportCSV}
             className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
           >
@@ -253,7 +254,7 @@ export function BulkPage() {
           </Button>
 
           <Button
-            disabled={tests.some((test) => test.status === "running")}
+            disabled={tests.some((test) => test.status === 'running')}
             onClick={handleOnSubmit}
             className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
           >
@@ -284,13 +285,13 @@ export function BulkPage() {
                   mode="multiple"
                   onSelect={(selected: string) => {
                     const newSelectedInputs = [...selectedInputs, selected];
-                    handleChangeNewSelectedInputs(newSelectedInputs, "inputs");
+                    handleChangeNewSelectedInputs(newSelectedInputs, 'inputs');
                   }}
                   onDeselect={(deselected: string) => {
                     const newSelectedInputs = selectedInputs.filter(
-                      (item) => item !== deselected
+                      (item) => item !== deselected,
                     );
-                    handleChangeNewSelectedInputs(newSelectedInputs, "inputs");
+                    handleChangeNewSelectedInputs(newSelectedInputs, 'inputs');
                   }}
                 />
               </Field>
@@ -304,16 +305,16 @@ export function BulkPage() {
                     const newSelectedOutputs = [...selectedOutputs, selected];
                     handleChangeNewSelectedInputs(
                       newSelectedOutputs,
-                      "outputs"
+                      'outputs',
                     );
                   }}
                   onDeselect={(selected: string) => {
                     const newSelectedOutputs = selectedOutputs.filter(
-                      (item) => item !== selected
+                      (item) => item !== selected,
                     );
                     handleChangeNewSelectedInputs(
                       newSelectedOutputs,
-                      "outputs"
+                      'outputs',
                     );
                   }}
                 />
@@ -359,7 +360,7 @@ export function BulkPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: "Client SDK",
+      title: 'Client SDK',
     },
   ];
 };

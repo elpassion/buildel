@@ -1,21 +1,21 @@
 import * as React from "react";
-import { MetaFunction } from "@remix-run/node";
-import { useSearchParams, Link, useLoaderData, Form } from "@remix-run/react";
-import { ValidatedForm } from "remix-validated-form";
+import { Form, Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
-import { schema } from "./schema";
+import { ValidatedForm } from "remix-validated-form";
 import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { FieldError } from "~/components/form/fields/field.error";
-import { SubmitButton } from "~/components/form/submit";
 import {
   PasswordInputField,
   TextInputField,
 } from "~/components/form/fields/text.field";
-import { loader } from "./loader.server";
-import { GoogleButton } from "~/components/googleAuth/GoogleButton";
-import { routes } from "~/utils/routes.utils";
-import { SocialSignInForm } from "~/components/socialAuth/SocialSignInForm";
+import { SubmitButton } from "~/components/form/submit";
 import { GithubButton } from "~/components/githubAuth/GithubButton";
+import { GoogleButton } from "~/components/googleAuth/GoogleButton";
+import { SocialSignInForm } from "~/components/socialAuth/SocialSignInForm";
+import { routes } from "~/utils/routes.utils";
+import { schema } from "./schema";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function LoginPage() {
   const { googleLoginEnabled, signupEnabled } = useLoaderData<typeof loader>();

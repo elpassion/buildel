@@ -1,15 +1,15 @@
-import { MetaFunction } from "@remix-run/node";
-import { useFetcher, useLoaderData } from "@remix-run/react";
-import { loader } from "./loader.server";
-import { usePipelineRunLogs } from "../usePipelineRunLogs";
 import { useEffect, useState } from "react";
-import { SelectInput } from "~/components/form/inputs/select/select.input";
-import { buildUrlWithParams } from "~/utils/url";
-import { routes } from "~/utils/routes.utils";
-import { IPipelineRunLog } from "~/api/pipeline/pipeline.contracts";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import { useInView } from "react-intersection-observer";
-import { LoadMoreButton } from "~/components/pagination/LoadMoreButton";
 import { Label } from "@elpassion/taco";
+import type { IPipelineRunLog } from "~/api/pipeline/pipeline.contracts";
+import { SelectInput } from "~/components/form/inputs/select/select.input";
+import { LoadMoreButton } from "~/components/pagination/LoadMoreButton";
+import { routes } from "~/utils/routes.utils";
+import { buildUrlWithParams } from "~/utils/url";
+import { usePipelineRunLogs } from "../usePipelineRunLogs";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function PipelineRunLogs() {
   const fetcher = useFetcher();

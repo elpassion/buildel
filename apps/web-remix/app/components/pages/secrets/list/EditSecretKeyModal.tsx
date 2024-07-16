@@ -1,16 +1,15 @@
 import React, { useMemo } from "react";
+import { withZod } from "@remix-validated-form/with-zod";
 import { ValidatedForm } from "remix-validated-form";
 import { Modal } from "@elpassion/taco/Modal";
-import { withZod } from "@remix-validated-form/with-zod";
-
+import { CreateUpdateSecretSchema } from "~/api/secrets/secrets.contracts";
 import { Field } from "~/components/form/fields/field.context";
 import {
   PasswordInputField,
   TextInputField,
 } from "~/components/form/fields/text.field";
-import { ISecretKey } from "../variables.types";
-import { CreateUpdateSecretSchema } from "~/api/secrets/secrets.contracts";
 import { SubmitButton } from "~/components/form/submit";
+import type { ISecretKey } from "../variables.types";
 interface EditSecretModalProps {
   isOpen: boolean;
   onClose: () => void;

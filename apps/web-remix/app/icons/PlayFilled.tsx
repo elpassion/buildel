@@ -1,5 +1,5 @@
 import React from "react";
-import { IconProps } from "~/icons/icons.types";
+import type { IconProps } from "~/icons/icons.types";
 
 export const PlayFilled: React.FC<IconProps> = ({ className }) => {
   return (

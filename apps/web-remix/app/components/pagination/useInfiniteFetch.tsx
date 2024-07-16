@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { FetcherWithComponents, useFetcher } from "@remix-run/react";
-import { SerializeFrom } from "@remix-run/node";
-import { Pagination, usePagination } from "./usePagination";
+import { useFetcher } from "@remix-run/react";
 import { buildUrlWithParams } from "~/utils/url";
+import { usePagination } from "./usePagination";
+import type { Pagination} from "./usePagination";
+import type { SerializeFrom } from "@remix-run/node";
+import type { FetcherWithComponents} from "@remix-run/react";
 
 interface UseInfiniteFetchProps<T, R> {
   initialData?: T[];

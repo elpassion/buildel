@@ -1,8 +1,8 @@
 import React from "react";
-import { Tooltip } from "~/components/tooltip/Tooltip";
-import { Icon } from "@elpassion/taco";
 import classNames from "classnames";
-import { ITooltip } from "react-tooltip";
+import { Icon } from "@elpassion/taco";
+import { Tooltip } from "~/components/tooltip/Tooltip";
+import type { ITooltip } from "react-tooltip";
 
 interface HelpfulIconProps {
   text: string;

@@ -1,8 +1,9 @@
 import { useCallback, useMemo } from "react";
-import { EdgeProps, getBezierPath } from "@xyflow/react";
+import { getBezierPath } from "@xyflow/react";
+import classNames from "classnames";
 import { Icon } from "@elpassion/taco";
 import { useRunPipelineEdge } from "../RunPipelineProvider";
-import classNames from "classnames";
+import type { EdgeProps} from "@xyflow/react";
 import "./customEdges.styles.css";
 
 export interface CustomEdgeProps extends EdgeProps {

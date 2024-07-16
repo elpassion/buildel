@@ -1,8 +1,8 @@
 import { toast } from "react-hot-toast";
-import { ToastProps } from "./Toast.interface";
-import { SuccessToast } from "./ui/SuccessToast";
 import { ErrorToast } from "./ui/ErrorToast";
 import { LoadingToast } from "./ui/LoadingToast";
+import { SuccessToast } from "./ui/SuccessToast";
+import type { ToastProps } from "./Toast.interface";
 
 type LoadingToastProps = {
     success?: ToastProps;

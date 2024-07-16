@@ -1,6 +1,6 @@
-import { defineConfig } from "vitest/config";
 import { resolve } from "path";
 import dotenv from "dotenv";
+import { defineConfig } from "vitest/config";
 
 dotenv.config({ path: ".env.test" });
 

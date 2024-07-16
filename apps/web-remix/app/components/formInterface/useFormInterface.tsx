@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { errorToast } from "~/components/toasts/errorToast";
 import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
-import { IInterfaceConfigFormProperty } from "../pages/pipelines/pipeline.types";
+import { errorToast } from "~/components/toasts/errorToast";
+import type { IInterfaceConfigFormProperty } from "../pages/pipelines/pipeline.types";
 
 interface UseFormInterfaceProps {
     inputs: IInterfaceConfigFormProperty[];

@@ -1,11 +1,11 @@
 import React from "react";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { Link, useFetcher, useNavigate } from "@remix-run/react";
-import { routes } from "~/utils/routes.utils";
-import { IKnowledgeBaseCollection } from "../knowledgeBase.types";
-import { confirm } from "~/components/modal/confirm";
-import { IconButton } from "~/components/iconButton";
 import { Icon } from "@elpassion/taco";
+import { IconButton } from "~/components/iconButton";
+import { EmptyMessage, ItemList } from "~/components/list/ItemList";
+import { confirm } from "~/components/modal/confirm";
+import { routes } from "~/utils/routes.utils";
+import type { IKnowledgeBaseCollection } from "../knowledgeBase.types";
 
 interface KnowledgeBaseCollectionListProps {
   items: IKnowledgeBaseCollection[];

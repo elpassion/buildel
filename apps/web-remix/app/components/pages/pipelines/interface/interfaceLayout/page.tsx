@@ -1,11 +1,11 @@
 import React from "react";
 import { Outlet, useLoaderData, useSearchParams } from "@remix-run/react";
-import { loader } from "./loader.server";
 import {
   OutlinedTabLink,
   OutlinedTabsWrapper,
 } from "~/components/tabs/OutlinedTabs";
 import { routes } from "~/utils/routes.utils";
+import type { loader } from "./loader.server";
 
 export function InterfaceLayout() {
   const { pipelineId, organizationId } = useLoaderData<typeof loader>();

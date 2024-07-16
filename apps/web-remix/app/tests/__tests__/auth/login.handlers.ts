@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 
 export const handlers = [
   http.post("/super-api/users/log_in", () => {

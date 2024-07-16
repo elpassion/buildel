@@ -1,25 +1,26 @@
 import React, { useMemo, useState } from "react";
-import { json, LoaderFunctionArgs } from "@remix-run/node";
-import { loaderBuilder } from "~/utils.server";
-import invariant from "tiny-invariant";
+import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { PipelineApi } from "~/api/pipeline/PipelineApi";
-import { UnauthorizedError } from "~/utils/errors";
-import { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
-import { ParsedResponse } from "~/utils/fetch.server";
-import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
+import { ValidatedForm } from "remix-validated-form";
+import invariant from "tiny-invariant";
 import { z } from "zod";
-import { SubmitButton } from "~/components/form/submit";
+import type { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
+import { PipelineApi } from "~/api/pipeline/PipelineApi";
+import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 import { Field } from "~/components/form/fields/field.context";
+import { SmallFileInputField } from "~/components/form/fields/file.field";
 import { TextInputField } from "~/components/form/fields/text.field";
+import { SubmitButton } from "~/components/form/submit";
 import {
   NodeClearButton,
   NodeCopyButton,
   NodeDownloadButton,
 } from "~/components/pages/pipelines/CustomNodes/NodeActionButtons";
-import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
-import { SmallFileInputField } from "~/components/form/fields/file.field";
+import { UnauthorizedError } from "~/utils/errors";
+import type { ParsedResponse } from "~/utils/fetch.server";
+import { loaderBuilder } from "~/utils.server";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {

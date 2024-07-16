@@ -1,10 +1,10 @@
-import { z } from "zod";
-import {
+import type {
   KnowledgeBaseCollection,
+  KnowledgeBaseCollectionCost,
   KnowledgeBaseFile,
-  KnowledgeBaseFileList,
-  KnowledgeBaseCollectionCost
+  KnowledgeBaseFileList
 } from "~/api/knowledgeBase/knowledgeApi.contracts";
+import type { z } from "zod";
 
 export type IKnowledgeBaseFile = z.TypeOf<typeof KnowledgeBaseFile>;
 

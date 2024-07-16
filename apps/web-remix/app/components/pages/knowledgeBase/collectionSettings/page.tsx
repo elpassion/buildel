@@ -1,22 +1,22 @@
 import React, { useMemo, useState } from "react";
-import { MetaFunction } from "@remix-run/node";
-import { ValidatedForm } from "remix-validated-form";
-import { withZod } from "@remix-validated-form/with-zod";
-import { Field, HiddenField } from "~/components/form/fields/field.context";
-import { UpdateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { NumberInputField } from "~/components/form/fields/number.field";
-import { SubmitButton } from "~/components/form/submit";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
+import { withZod } from "@remix-validated-form/with-zod";
+import { ValidatedForm } from "remix-validated-form";
+import { UpdateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
+import { Field, HiddenField } from "~/components/form/fields/field.context";
+import { NumberInputField } from "~/components/form/fields/number.field";
+import { TextInputField } from "~/components/form/fields/text.field";
+import { SubmitButton } from "~/components/form/submit";
 import {
   ApiTypesRadioGroupField,
   ModelSelectField,
   SecretSelectField,
 } from "~/components/pages/knowledgeBase/KnowledgeBaseFields";
-import { loader } from "./loader.server";
+import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
+import { routes } from "~/utils/routes.utils";
 import { SectionContent } from "../../settings/settingsLayout/PageLayout";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function CollectionSettingsPage() {
   const { organizationId, collection } = useLoaderData<typeof loader>();

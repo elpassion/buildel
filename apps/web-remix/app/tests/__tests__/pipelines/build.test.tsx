@@ -1,48 +1,50 @@
 import React from "react";
-import { test, describe, expect } from "vitest";
-import {
-  render,
-  screen,
-  waitFor,
-  fireEvent,
-  Matcher,
-  findByText,
-} from "~/tests/render";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { InputHandle } from "~/tests/handles/Input.handle";
 import userEvent from "@testing-library/user-event";
-import { server } from "~/tests/server.mock";
-import {
-  actionWithSession,
-  loaderWithSession,
-  RoutesProps,
-  setupRoutes,
-} from "~/tests/setup.tests";
-import { loader as editBlockLoader } from "~/components/pages/pipelines/build/editBlock/loader.server";
+import { describe, expect, test } from "vitest";
 import { action as buildAction } from "~/components/pages/pipelines/build/action.server";
-import { loader as buildLoader } from "~/components/pages/pipelines/build/loader.server";
+import { loader as editBlockLoader } from "~/components/pages/pipelines/build/editBlock/loader.server";
 import { EditBlockPage } from "~/components/pages/pipelines/build/editBlock/page";
-import { PipelineBuilder } from "~/components/pages/pipelines/build/page";
-import { PipelineLayout } from "~/components/pages/pipelines/pipelineLayout/page";
 import { BuildErrorBoundary } from "~/components/pages/pipelines/build/errorBoundary";
+import { loader as buildLoader } from "~/components/pages/pipelines/build/loader.server";
+import { PipelineBuilder } from "~/components/pages/pipelines/build/page";
 import {
-  loader as layoutLoader,
   action as layoutAction,
+  loader as layoutLoader,
 } from "~/components/pages/pipelines/pipelineLayout/index.server";
+import { PipelineLayout } from "~/components/pages/pipelines/pipelineLayout/page";
+import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
 import {
   PipelineHandlers,
   pipelineFixtureWithUnfilledBlock,
 } from "~/tests/handlers/pipelines.handlers";
-import { TextareaHandle } from "~/tests/handles/Textarea.handle";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { InputHandle } from "~/tests/handles/Input.handle";
+import { ListHandle } from "~/tests/handles/List.handle";
+import { RadioHandle } from "~/tests/handles/Radio.handle";
 import {
   CreatableSelectHandle,
   SelectHandle,
 } from "~/tests/handles/SelectHandle";
-import { RadioHandle } from "~/tests/handles/Radio.handle";
-import { pipelineFixture } from "~/tests/fixtures/pipeline.fixtures";
-import { ListHandle } from "~/tests/handles/List.handle";
-import { buildHandlers } from "./build.handlers";
+import { TextareaHandle } from "~/tests/handles/Textarea.handle";
+import {
+  findByText,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "~/tests/render";
+import type {
+  Matcher} from "~/tests/render";
+import { server } from "~/tests/server.mock";
+import {
+  actionWithSession,
+  loaderWithSession,
+  setupRoutes,
+} from "~/tests/setup.tests";
+import type {
+  RoutesProps} from "~/tests/setup.tests";
 import { WebSocketClientMock } from "~/tests/WebSocketClientMock";
+import { buildHandlers } from "./build.handlers";
 
 describe(PipelineBuilder.name, () => {
   const setupServer = server([...buildHandlers()]);

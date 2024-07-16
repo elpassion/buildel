@@ -1,20 +1,20 @@
 import React, { useState } from "react";
-import { MetaFunction } from "@remix-run/node";
-import { Button } from "@elpassion/taco";
 import {
   Form,
   useLoaderData,
   useNavigate,
   useRevalidator,
 } from "@remix-run/react";
-import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
-import { IFileUpload } from "~/components/fileUpload/fileUpload.types";
+import { Button } from "@elpassion/taco";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
-import { loader } from "./loader.server";
-import { errorToast } from "~/components/toasts/errorToast";
-import { routes } from "~/utils/routes.utils";
+import type { IFileUpload } from "~/components/fileUpload/fileUpload.types";
+import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
 import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
+import { errorToast } from "~/components/toasts/errorToast";
 import { loadingToast } from "~/components/toasts/loadingToast";
+import { routes } from "~/utils/routes.utils";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 type IExtendedFileUpload = IFileUpload & { file: File };
 export function NewCollectionFilesPage() {

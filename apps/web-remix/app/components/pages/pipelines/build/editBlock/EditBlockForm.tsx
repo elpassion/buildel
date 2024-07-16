@@ -1,19 +1,22 @@
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
-import { z } from "zod";
-import { FieldProps, Schema } from "~/components/form/schema/Schema";
-import { ValidatedForm, useFormContext } from "remix-validated-form";
+import type { ReactNode} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { withZod } from "@remix-validated-form/with-zod";
+import { ValidatedForm, useFormContext } from "remix-validated-form";
+import type { ExtendedBlockConfig } from "~/api/blockType/blockType.contracts";
+import type { Suggestion } from "~/components/editor/CodeMirror/codeMirror.types";
 import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
 import {
   CreatableAsyncForm,
   CreatableAsyncSelectField,
 } from "~/components/form/fields/creatableAsyncSelect.field";
-import { assert } from "~/utils/assert";
-import { TextInputField } from "~/components/form/fields/text.field";
 import { EditorField } from "~/components/form/fields/editor.field";
-import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
-import { successToast } from "~/components/toasts/successToast";
-import { ExtendedBlockConfig } from "~/api/blockType/blockType.contracts";
+import {
+  Field as FormField,
+  HiddenField,
+} from "~/components/form/fields/field.context";
+import { TextInputField } from "~/components/form/fields/text.field";
+import type { FieldProps} from "~/components/form/schema/Schema";
+import { Schema } from "~/components/form/schema/Schema";
 import {
   ArrayField,
   BooleanField,
@@ -21,17 +24,16 @@ import {
   StringField,
 } from "~/components/form/schema/SchemaFields";
 import { generateZODSchema } from "~/components/form/schema/SchemaParser";
-import {
+import { SubmitButton } from "~/components/form/submit";
+import type {
   IBlockConfig,
   IConfigConnection,
 } from "~/components/pages/pipelines/pipeline.types";
-import {
-  Field as FormField,
-  HiddenField,
-} from "~/components/form/fields/field.context";
-import { SubmitButton } from "~/components/form/submit";
 import { reverseToolConnections } from "~/components/pages/pipelines/PipelineFlow.utils";
-import { Suggestion } from "~/components/editor/CodeMirror/codeMirror.types";
+import { successToast } from "~/components/toasts/successToast";
+import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
+import { assert } from "~/utils/assert";
+import type { z } from "zod";
 
 export function EditBlockForm({
   onSubmit,

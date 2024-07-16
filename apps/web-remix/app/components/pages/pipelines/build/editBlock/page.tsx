@@ -1,28 +1,28 @@
 import React, { useEffect } from "react";
-import { MetaFunction } from "@remix-run/node";
 import {
   useFetcher,
   useLoaderData,
   useNavigate,
   useSearchParams,
 } from "@remix-run/react";
-import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
+import type {
+  IBlockConfig,
+  IConfigConnection,
+  INode,
+  IPipeline,
+} from "~/components/pages/pipelines/pipeline.types";
 import {
   getEdges,
   getNodes,
   reverseToolConnections,
   toPipelineConfig,
 } from "~/components/pages/pipelines/PipelineFlow.utils";
-import {
-  IBlockConfig,
-  IConfigConnection,
-  INode,
-  IPipeline,
-} from "~/components/pages/pipelines/pipeline.types";
-import { EditBlockForm } from "./EditBlockForm";
+import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
+import { routes } from "~/utils/routes.utils";
 import { BlockInputList } from "./BlockInputList";
-import { loader } from "./loader.server";
+import { EditBlockForm } from "./EditBlockForm";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 type IExtendedBlockConfig = IBlockConfig & { oldName: string };
 

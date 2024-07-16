@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
+import classNames from "classnames";
 import type { IconButtonProps as TacoIconButtonProps } from "@elpassion/taco";
 import { IconButton as TacoIconButton } from "@elpassion/taco";
-import classNames from "classnames";
 
 export type IconButtonProps = TacoIconButtonProps & {
   onlyIcon?: boolean;

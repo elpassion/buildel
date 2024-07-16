@@ -1,3 +1,5 @@
+import { StrictMode, startTransition, useEffect } from "react";
+import { RemixBrowser, useLocation, useMatches } from "@remix-run/react";
 import * as Sentry from "@sentry/remix";
 /**
  * By default, Remix will handle hydrating your app on the client for you.
@@ -5,8 +7,6 @@ import * as Sentry from "@sentry/remix";
  * For more information, see https://remix.run/file-conventions/entry.client
  */
 
-import { RemixBrowser, useLocation, useMatches } from "@remix-run/react";
-import { startTransition, StrictMode, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
 
 Sentry.init({

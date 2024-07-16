@@ -1,4 +1,4 @@
-import { IWorkflowTemplate } from "~/api/organization/organization.contracts";
+import type { IWorkflowTemplate } from "~/api/organization/organization.contracts";
 
 export const templateFixture = (
   override?: Partial<IWorkflowTemplate>

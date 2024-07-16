@@ -1,13 +1,13 @@
 import { z } from "zod";
+import { zfd } from "zod-form-data";
 import {
   BlockConfig,
   ConfigConnection,
   ExtendedBlockConfig,
   UpdateBlockConfig,
 } from "~/api/blockType/blockType.contracts";
+import type { IInterfaceConfigFormProperty } from "~/components/pages/pipelines/pipeline.types";
 import { PaginationMeta } from "~/components/pagination/pagination.types";
-import { zfd } from "zod-form-data";
-import { IInterfaceConfigFormProperty } from "~/components/pages/pipelines/pipeline.types";
 
 export const InterfaceConfigFormProperty = z.object({
   name: z.string(),

@@ -1,13 +1,12 @@
 import React from "react";
 import { Outlet, useLoaderData } from "@remix-run/react";
-
-import { TabGroup } from "~/components/tabs/TabGroup";
-import { FilledTabLink } from "~/components/tabs/FilledTabLink";
-import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
+import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
+import { FilledTabLink } from "~/components/tabs/FilledTabLink";
 import { FilledTabsWrapper } from "~/components/tabs/FilledTabsWrapper";
+import { TabGroup } from "~/components/tabs/TabGroup";
 import { routes } from "~/utils/routes.utils";
-import { loader } from "./loader.server";
+import type { loader } from "./loader.server";
 
 export function SettingsLayout() {
   const { organizationId } = useLoaderData<typeof loader>();

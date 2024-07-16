@@ -1,4 +1,4 @@
-import { ISecretKey } from "~/components/pages/secrets/variables.types";
+import type { ISecretKey } from "~/components/pages/secrets/variables.types";
 
 export const secretFixture = (override?: Partial<ISecretKey>): ISecretKey => {
   return {

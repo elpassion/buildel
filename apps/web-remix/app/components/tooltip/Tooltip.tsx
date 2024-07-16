@@ -1,6 +1,7 @@
 import React from "react";
-import { Tooltip as ReactTooltip, ITooltip } from "react-tooltip";
 import classNames from "classnames";
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import type { ITooltip } from "react-tooltip";
 
 export const Tooltip: React.FC<ITooltip> = ({
   children,

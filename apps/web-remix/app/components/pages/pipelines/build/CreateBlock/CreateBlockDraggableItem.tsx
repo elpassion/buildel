@@ -1,12 +1,13 @@
-import React, { DragEvent, useCallback } from "react";
+import type { DragEvent} from "react";
+import React, { useCallback } from "react";
+import { useReactFlow } from "@xyflow/react";
 import classNames from "classnames";
 import startCase from "lodash.startcase";
-import { useReactFlow } from "@xyflow/react";
-import { z } from "zod";
 import { Icon, IconButton } from "@elpassion/taco";
-import { BlockType } from "~/api/blockType/blockType.contracts";
+import type { BlockType } from "~/api/blockType/blockType.contracts";
 import { useRunPipeline } from "../../RunPipelineProvider";
-import { IBlockConfig, IBlockType } from "../../pipeline.types";
+import type { IBlockConfig, IBlockType } from "../../pipeline.types";
+import type { z } from "zod";
 
 interface CreateBlockDraggableItemProps {
   onCreate: (node: IBlockConfig) => void;

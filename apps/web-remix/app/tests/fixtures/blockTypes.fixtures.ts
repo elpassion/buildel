@@ -1,4 +1,4 @@
-import { IBlockTypes } from "~/api/blockType/blockType.contracts";
+import type { IBlockTypes } from "~/api/blockType/blockType.contracts";
 
 export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
   return [

@@ -1,12 +1,12 @@
-import { http, HttpResponse } from "msw";
-import {
-  IKnowledgeBaseCollection,
-  IKnowledgeBaseFile,
-} from "~/components/pages/knowledgeBase/knowledgeBase.types";
-import {
+import { HttpResponse, http } from "msw";
+import type {
   ICreateCollectionSchema,
   IUpdateCollectionSchema,
 } from "~/api/knowledgeBase/knowledgeApi.contracts";
+import type {
+  IKnowledgeBaseCollection,
+  IKnowledgeBaseFile,
+} from "~/components/pages/knowledgeBase/knowledgeBase.types";
 export class CollectionHandlers {
   private collections: Map<number, IKnowledgeBaseCollection> = new Map();
 

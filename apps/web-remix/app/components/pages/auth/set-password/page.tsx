@@ -1,14 +1,14 @@
-import { MetaFunction } from "@remix-run/node";
+import * as React from "react";
 import { Link, useLoaderData } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
-import * as React from "react";
 import { ValidatedForm } from "remix-validated-form";
 import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { FieldError } from "~/components/form/fields/field.error";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { SubmitButton } from "~/components/form/submit";
 import { schema } from "./schema";
-import { loader } from "./loader.server";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function SetPasswordPage() {
   const validator = React.useMemo(() => withZod(schema), []);

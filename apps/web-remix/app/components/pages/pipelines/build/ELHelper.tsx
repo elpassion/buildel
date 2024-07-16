@@ -1,12 +1,6 @@
 import React, { useEffect } from "react";
 import classNames from "classnames";
-import { useEl } from "~/components/pages/pipelines/EL/ELProvider";
-import { MessageRole } from "~/components/chat/chat.types";
-import { useChat } from "~/components/chat/useChat";
-import { ChatHeading } from "~/components/chat/ChatHeading";
-import { ChatMessages } from "~/components/chat/ChatMessages";
-import { ChatInput } from "~/components/chat/ChatInput";
-import { ChatWrapper } from "~/components/chat/ChatWrapper";
+import { Icon } from "@elpassion/taco";
 import {
   ChatCloseButton,
   ChatGeneratingAnimation,
@@ -14,7 +8,13 @@ import {
   ChatMessagesWrapper,
   ChatStatus,
 } from "~/components/chat/Chat.components";
-import { Icon } from "@elpassion/taco";
+import type { MessageRole } from "~/components/chat/chat.types";
+import { ChatHeading } from "~/components/chat/ChatHeading";
+import { ChatInput } from "~/components/chat/ChatInput";
+import { ChatMessages } from "~/components/chat/ChatMessages";
+import { ChatWrapper } from "~/components/chat/ChatWrapper";
+import { useChat } from "~/components/chat/useChat";
+import { useEl } from "~/components/pages/pipelines/EL/ELProvider";
 
 const INITIAL_MESSAGES = [
   {

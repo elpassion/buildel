@@ -1,4 +1,4 @@
-import { IPipelineAlias } from "~/components/pages/pipelines/pipeline.types";
+import type { IPipelineAlias } from "~/components/pages/pipelines/pipeline.types";
 
 export const aliasFixture = (
   override?: Partial<IPipelineAlias>

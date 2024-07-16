@@ -1,38 +1,33 @@
-import React, {
+import type {
   ComponentType,
   FunctionComponent,
-  ReactNode,
+  ReactNode} from "react";
+import React, {
   useCallback,
   useEffect,
   useMemo,
   useRef,
 } from "react";
-import classNames from "classnames";
-import { useEventListener } from "usehooks-ts";
-import {
-  ReactFlow,
-  addEdge,
-  Background,
-  BackgroundVariant,
-  Connection,
-  Controls,
-  EdgeProps,
-  ReactFlowProvider,
-  NodeChange,
-  EdgeChange,
-  NodeProps,
-  applyEdgeChanges,
-  applyNodeChanges,
-  Edge,
-} from "@xyflow/react";
 import {
   useLocation,
   useNavigate,
   useOutlet,
   useSearchParams,
 } from "@remix-run/react";
-import { buildUrlWithParams } from "~/utils/url";
+import {
+  Background,
+  BackgroundVariant,
+  Controls,
+  ReactFlow,
+  ReactFlowProvider,
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges
+} from "@xyflow/react";
+import classNames from "classnames";
+import { useEventListener } from "usehooks-ts";
 import { useUndoRedo } from "~/hooks/useUndoRedo";
+import { buildUrlWithParams } from "~/utils/url";
 import {
   getAllBlockTypes,
   getEdges,
@@ -41,18 +36,24 @@ import {
   isValidConnection,
   toPipelineConfig,
 } from "./PipelineFlow.utils";
-import {
+import { RunPipelineProvider } from "./RunPipelineProvider";
+import { useCopyPasteNode } from "./useCopyPasteNode";
+import { useDraggableNodes } from "./useDraggableNodes";
+import type { CustomEdgeProps } from "./CustomEdges/CustomEdge";
+import type { CustomNodeProps } from "./CustomNodes/CustomNode";
+import type {
   IBlockConfig,
   IEdge,
   IExtendedPipeline,
   INode,
 } from "./pipeline.types";
-import { CustomNodeProps } from "./CustomNodes/CustomNode";
-import { useDraggableNodes } from "./useDraggableNodes";
-import { RunPipelineProvider } from "./RunPipelineProvider";
-import { CustomEdgeProps } from "./CustomEdges/CustomEdge";
-import { useCopyPasteNode } from "./useCopyPasteNode";
-
+import type {
+  Connection,
+  Edge,
+  EdgeChange,
+  EdgeProps,
+  NodeChange,
+  NodeProps} from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
 interface BuilderProps {

@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "@elpassion/taco";
 import {
   Link,
   Outlet,
@@ -7,13 +6,14 @@ import {
   useMatch,
   useNavigate,
 } from "@remix-run/react";
+import { Button } from "@elpassion/taco";
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
 import { routes } from "~/utils/routes.utils";
 import { InvitationsList } from "./InvitationsList";
-import { loader } from "./loader.server";
+import type { loader } from "./loader.server";
 
 export function InvitationsPage() {
   const { organizationId, invitations } = useLoaderData<typeof loader>();

@@ -1,7 +1,8 @@
 import React from "react";
+import type {
+  DatepickerProps} from "~/components/datepicker/Datepicker";
 import {
-  Datepicker,
-  DatepickerProps,
+  Datepicker
 } from "~/components/datepicker/Datepicker";
 import "./datepicker.styles.css";
 import classNames from "classnames";

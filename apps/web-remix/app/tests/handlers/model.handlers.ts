@@ -1,6 +1,6 @@
-import { http, HttpResponse } from "msw";
-import { IAsyncSelectItem, IAsyncSelectItemList } from "~/api/AsyncSelectApi";
-import { IFixtureAsyncSelectModel } from "~/tests/fixtures/models.fixtures";
+import { HttpResponse, http } from "msw";
+import type { IAsyncSelectItem, IAsyncSelectItemList } from "~/api/AsyncSelectApi";
+import type { IFixtureAsyncSelectModel } from "~/tests/fixtures/models.fixtures";
 
 //@todo handle filtering by api type
 export class EmbeddingsHandlers {

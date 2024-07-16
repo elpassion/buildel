@@ -1,7 +1,8 @@
-import { json, LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { requireNotLogin } from "~/session.server";
-import { loaderBuilder } from "~/utils.server";
 import { routes } from "~/utils/routes.utils";
+import { loaderBuilder } from "~/utils.server";
+import type { LoaderFunctionArgs} from "@remix-run/node";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }) => {

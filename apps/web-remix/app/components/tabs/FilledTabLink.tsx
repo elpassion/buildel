@@ -1,7 +1,8 @@
 import React from "react";
+import { NavLink } from "@remix-run/react";
 import classNames from "classnames";
+import type { NavLinkProps } from "@remix-run/react";
 
-import { NavLink, NavLinkProps } from "@remix-run/react";
 
 export const FilledTabLink: React.FC<{ className?: string } & NavLinkProps> = ({
   children,

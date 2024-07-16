@@ -1,8 +1,9 @@
-import { ActionFunctionArgs, redirect } from "@remix-run/node";
-import { actionBuilder } from "~/utils.server";
+import { redirect } from "@remix-run/node";
 import { z } from "zod";
-import { routes } from "~/utils/routes.utils";
 import { logout } from "~/session.server";
+import { routes } from "~/utils/routes.utils";
+import { actionBuilder } from "~/utils.server";
+import type { ActionFunctionArgs} from "@remix-run/node";
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

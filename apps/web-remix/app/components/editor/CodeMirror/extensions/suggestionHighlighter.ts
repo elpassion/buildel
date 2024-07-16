@@ -1,12 +1,13 @@
 import {
   Decoration,
+  RangeSetBuilder,
+  ViewPlugin
+} from "@uiw/react-codemirror";
+import type { Suggestion } from "../codeMirror.types";
+import type {
   EditorView,
   RangeSet,
-  RangeSetBuilder,
-  ViewPlugin,
-  ViewUpdate,
-} from "@uiw/react-codemirror";
-import { Suggestion } from "../codeMirror.types";
+  ViewUpdate} from "@uiw/react-codemirror";
 
 export const suggestionHighlighter = (suggestions: Suggestion[]) =>
   ViewPlugin.fromClass(

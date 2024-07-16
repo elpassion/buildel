@@ -1,11 +1,11 @@
-import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { routes } from "~/utils/routes.utils";
-import { dayjs } from "~/utils/Dayjs";
-import { loader } from "./loader.server";
 import { MonthPicker } from "~/components/pages/pipelines/MonthPicker/MonthPicker";
 import { PipelineRunsTable } from "~/components/pages/pipelines/overview/PipelineRunsTable";
 import { Pagination } from "~/components/pagination/Pagination";
+import { dayjs } from "~/utils/Dayjs";
+import { routes } from "~/utils/routes.utils";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function OverviewPage() {
   const {

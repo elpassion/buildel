@@ -1,5 +1,4 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -7,17 +6,18 @@ import {
   useMatch,
   useNavigate,
 } from "@remix-run/react";
-import { loader } from "./loader.server";
 import { Button } from "@elpassion/taco";
-import { SecretKeyList } from "./SecretKeyList";
-import { routes } from "~/utils/routes.utils";
+import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
+import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
-import { AppNavbar, AppNavbarHeading } from "~/components/navbar/AppNavbar";
-import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import { HelpfulIcon } from "~/components/tooltip/HelpfulIcon";
+import { routes } from "~/utils/routes.utils";
+import { SecretKeyList } from "./SecretKeyList";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function SecretListPage() {
   const navigate = useNavigate();

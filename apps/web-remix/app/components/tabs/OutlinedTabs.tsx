@@ -1,6 +1,8 @@
-import React, { PropsWithChildren } from "react";
-import { NavLink, NavLinkProps } from "@remix-run/react";
+import type { PropsWithChildren } from "react";
+import React from "react";
+import { NavLink } from "@remix-run/react";
 import classNames from "classnames";
+import type { NavLinkProps } from "@remix-run/react";
 
 export const OutlinedTabsWrapper: React.FC<PropsWithChildren> = ({
   children,

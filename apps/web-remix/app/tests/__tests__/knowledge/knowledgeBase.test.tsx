@@ -1,40 +1,41 @@
 import React from "react";
-import { test, describe, expect } from "vitest";
-import {
-  actionWithSession,
-  loaderWithSession,
-  RoutesProps,
-  setupRoutes,
-} from "~/tests/setup.tests";
-import { render, screen, waitFor } from "~/tests/render";
-import { server } from "~/tests/server.mock";
-import { loader as listLoader } from "~/components/pages/knowledgeBase/list/loader.server";
-import { action as listAction } from "~/components/pages/knowledgeBase/list/action.server";
-import { ListHandle } from "~/tests/handles/List.handle";
-import { InputHandle } from "~/tests/handles/Input.handle";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { KnowledgeBasePage } from "~/components/pages/knowledgeBase/list/page";
-import { NewKnowledgeBasePage } from "~/components/pages/knowledgeBase/newKnowledgeBase/page";
-import { loader as newCollectionLoader } from "~/components/pages/knowledgeBase/newKnowledgeBase/loader.server";
-import { action as newCollectionAction } from "~/components/pages/knowledgeBase/newKnowledgeBase/action.server";
-import { CollectionSettingsPage } from "~/components/pages/knowledgeBase/collectionSettings/page";
-import { loader as collectionSettingsLoader } from "~/components/pages/knowledgeBase/collectionSettings/loader.server";
-import { action as collectionSettingsAction } from "~/components/pages/knowledgeBase/collectionSettings/action.server";
-import { KnowledgeBaseContentPage } from "~/components/pages/knowledgeBase/collectionContent/page";
-import { loader as collectionLoader } from "~/components/pages/knowledgeBase/collectionContent/loader.server";
+import { describe, expect, test } from "vitest";
+import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
 import { action as collectionAction } from "~/components/pages/knowledgeBase/collectionContent/action.server";
-import { KnowledgeBaseCollectionLayout } from "~/components/pages/knowledgeBase/collectionLayout/page";
+import { loader as collectionLoader } from "~/components/pages/knowledgeBase/collectionContent/loader.server";
+import { KnowledgeBaseContentPage } from "~/components/pages/knowledgeBase/collectionContent/page";
 import { loader as collectionLayoutLoader } from "~/components/pages/knowledgeBase/collectionLayout/loader.server";
-import { NewCollectionFilesPage } from "~/components/pages/knowledgeBase/newCollectionFiles/page";
+import { KnowledgeBaseCollectionLayout } from "~/components/pages/knowledgeBase/collectionLayout/page";
+import { action as collectionSettingsAction } from "~/components/pages/knowledgeBase/collectionSettings/action.server";
+import { loader as collectionSettingsLoader } from "~/components/pages/knowledgeBase/collectionSettings/loader.server";
+import { CollectionSettingsPage } from "~/components/pages/knowledgeBase/collectionSettings/page";
+import { action as listAction } from "~/components/pages/knowledgeBase/list/action.server";
+import { loader as listLoader } from "~/components/pages/knowledgeBase/list/loader.server";
+import { KnowledgeBasePage } from "~/components/pages/knowledgeBase/list/page";
 import { loader as newCollectionFilesLoader } from "~/components/pages/knowledgeBase/newCollectionFiles/loader.server";
-import { SelectHandle } from "~/tests/handles/SelectHandle";
-import { knowledgeBaseHandlers } from "./knowledgeBase.handlers";
+import { NewCollectionFilesPage } from "~/components/pages/knowledgeBase/newCollectionFiles/page";
+import { action as newCollectionAction } from "~/components/pages/knowledgeBase/newKnowledgeBase/action.server";
+import { loader as newCollectionLoader } from "~/components/pages/knowledgeBase/newKnowledgeBase/loader.server";
+import { NewKnowledgeBasePage } from "~/components/pages/knowledgeBase/newKnowledgeBase/page";
 import {
   CollectionHandlers,
   CollectionMemoriesHandlers,
 } from "~/tests/handlers/collection.handlers";
-import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { FileInputHandle } from "~/tests/handles/FileInput.handle";
+import { InputHandle } from "~/tests/handles/Input.handle";
+import { ListHandle } from "~/tests/handles/List.handle";
+import { SelectHandle } from "~/tests/handles/SelectHandle";
+import { render, screen, waitFor } from "~/tests/render";
+import { server } from "~/tests/server.mock";
+import type {
+  RoutesProps} from "~/tests/setup.tests";
+import {
+  actionWithSession,
+  loaderWithSession,
+  setupRoutes,
+} from "~/tests/setup.tests";
+import { knowledgeBaseHandlers } from "./knowledgeBase.handlers";
 
 describe.skip("KnowledgeBase", () => {
   const setupServer = server([...knowledgeBaseHandlers()]);

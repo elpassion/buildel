@@ -1,10 +1,11 @@
 import React, { useCallback } from "react";
 import classNames from "classnames";
 import { Icon } from "@elpassion/taco";
-import { ItemList } from "~/components/list/ItemList";
-import { IFileUpload, IPreviewProps, isUploadError } from "./fileUpload.types";
 import { IconButton } from "~/components/iconButton";
+import { ItemList } from "~/components/list/ItemList";
 import { Tooltip } from "~/components/tooltip/Tooltip";
+import { isUploadError } from "./fileUpload.types";
+import type { IFileUpload, IPreviewProps} from "./fileUpload.types";
 
 interface FileUploadListPreviewProps
   extends Omit<IPreviewProps, "remove">,

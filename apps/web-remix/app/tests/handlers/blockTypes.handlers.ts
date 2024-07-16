@@ -1,6 +1,6 @@
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
+import type { IBlockTypesResponse } from "~/api/blockType/blockType.contracts";
 import { blockTypesFixture } from "~/tests/fixtures/blockTypes.fixtures";
-import { IBlockTypesResponse } from "~/api/blockType/blockType.contracts";
 
 export const handlers = () => {
   return [

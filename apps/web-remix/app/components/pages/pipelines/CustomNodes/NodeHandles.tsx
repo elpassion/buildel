@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import startCase from "lodash.startcase";
 import { Handle, Position } from "@xyflow/react";
-import { IHandle } from "../pipeline.types";
 import classNames from "classnames";
+import startCase from "lodash.startcase";
+import type { IHandle } from "../pipeline.types";
 
 interface HandleProps {
   handle: IHandle;

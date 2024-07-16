@@ -1,5 +1,6 @@
 import React from "react";
-import { Textarea, TextareaProps } from "@elpassion/taco";
+import type { TextareaProps } from "@elpassion/taco";
+import { Textarea } from "@elpassion/taco";
 
 export type TextareaInputProps = TextareaProps;
 export const TextareaInput: React.FC<TextareaInputProps> = ({

@@ -1,4 +1,4 @@
-import { ICurrentUser } from "~/api/CurrentUserApi";
+import type { ICurrentUser } from "~/api/CurrentUserApi";
 import { commitSession, getSession } from "~/session.server";
 import { UnauthorizedError } from "./errors";
 

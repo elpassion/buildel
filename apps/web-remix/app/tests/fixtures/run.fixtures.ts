@@ -1,4 +1,4 @@
-import { IPipelineRun } from "~/components/pages/pipelines/pipeline.types";
+import type { IPipelineRun } from "~/components/pages/pipelines/pipeline.types";
 import { runCostFixture } from "~/tests/fixtures/runCost.fixtures";
 
 export const runFixture = (override?: Partial<IPipelineRun>): IPipelineRun => {

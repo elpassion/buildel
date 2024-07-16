@@ -1,13 +1,14 @@
-import { PropsWithChildren, useCallback, useMemo } from "react";
-import startCase from "lodash.startcase";
+import type { PropsWithChildren} from "react";
+import { useCallback, useMemo } from "react";
 import classNames from "classnames";
+import startCase from "lodash.startcase";
 import { Badge, Icon } from "@elpassion/taco";
-import { useRunPipelineNode } from "../RunPipelineProvider";
 import { getBlockFields, getBlockHandles } from "../PipelineFlow.utils";
-import { IBlockConfig } from "../pipeline.types";
-import { InputHandle, OutputHandle, ToolHandle } from "./NodeHandles";
+import { useRunPipelineNode } from "../RunPipelineProvider";
 import { NodeFieldsForm } from "./NodeFieldsForm";
 import { NodeFieldsOutput } from "./NodeFieldsOutput";
+import { InputHandle, OutputHandle, ToolHandle } from "./NodeHandles";
+import type { IBlockConfig } from "../pipeline.types";
 
 export interface CustomNodeProps extends PropsWithChildren {
   data: IBlockConfig;

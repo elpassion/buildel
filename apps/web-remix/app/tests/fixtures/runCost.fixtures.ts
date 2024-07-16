@@ -1,4 +1,4 @@
-import { IPipelineCost } from "~/components/pages/pipelines/pipeline.types";
+import type { IPipelineCost } from "~/components/pages/pipelines/pipeline.types";
 
 export const runCostFixture = (
   override?: Partial<IPipelineCost>

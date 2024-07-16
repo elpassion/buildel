@@ -1,7 +1,8 @@
 import React from "react";
 import { vscodeDark } from "@uiw/codemirror-themes-all";
+import type {
+  CodeMirrorProps} from "~/components/editor/CodeMirror/CodeMirror";
 import {
-  CodeMirrorProps,
   CodeMirror,
 } from "~/components/editor/CodeMirror/CodeMirror";
 export interface CodePreviewProps

@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event";
-import { screen, Matcher, findByLabelText } from "../render";
+import { findByLabelText, screen } from "../render";
+import type { Matcher} from "../render";
 
 export class InputHandle {
   constructor(public readonly inputElement: HTMLInputElement) {}

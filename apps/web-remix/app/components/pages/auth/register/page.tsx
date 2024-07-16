@@ -1,7 +1,6 @@
-import { MetaFunction } from "@remix-run/node";
+import * as React from "react";
 import { Link, useLoaderData, useSearchParams } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
-import * as React from "react";
 import { ValidatedForm } from "remix-validated-form";
 import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { FieldError } from "~/components/form/fields/field.error";
@@ -9,12 +8,13 @@ import {
   PasswordInputField,
   TextInputField,
 } from "~/components/form/fields/text.field";
-import { schema } from "./schema";
 import { SubmitButton } from "~/components/form/submit";
-import { loader } from "./loader.server";
+import { GithubButton } from "~/components/githubAuth/GithubButton";
 import { GoogleButton } from "~/components/googleAuth/GoogleButton";
 import { SocialSignInForm } from "~/components/socialAuth/SocialSignInForm";
-import { GithubButton } from "~/components/githubAuth/GithubButton";
+import { schema } from "./schema";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function RegisterPage() {
   const { googleLoginEnabled } = useLoaderData<typeof loader>();

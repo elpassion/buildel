@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { assert } from "~/utils/assert";
 import {
-  BuildelRunLogs,
-  BuildelSocket,
-  BuildelRunLogsJoinArgs,
-  ConnectionState,
+  BuildelSocket
 } from "@buildel/buildel";
+import { assert } from "~/utils/assert";
+import type {
+  BuildelRunLogs,
+  BuildelRunLogsJoinArgs,
+  ConnectionState} from "@buildel/buildel";
 
 export function usePipelineRunLogs(
   organizationId: number,

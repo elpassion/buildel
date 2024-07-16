@@ -1,10 +1,11 @@
-import React, { PropsWithChildren, useMemo } from "react";
+import type { PropsWithChildren} from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
+import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 import { ItemList } from "~/components/list/ItemList";
 import { ClientOnly } from "~/utils/ClientOnly";
 import { dayjs } from "~/utils/Dayjs";
-import { ChatSize, IMessage, MessageRole } from "./chat.types";
-import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
+import type { ChatSize, IMessage, MessageRole } from "./chat.types";
 
 interface ChatMessagesProps {
   messages: IMessage[];

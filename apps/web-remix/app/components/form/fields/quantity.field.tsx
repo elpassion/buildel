@@ -1,8 +1,9 @@
 import React, { forwardRef } from "react";
 import { useFieldContext } from "~/components/form/fields/field.context";
+import type {
+  QuantityInputProps} from "~/components/form/inputs/quantity.input";
 import {
-  QuantityInput,
-  QuantityInputProps,
+  QuantityInput
 } from "~/components/form/inputs/quantity.input";
 
 export const QuantityInputField = forwardRef<

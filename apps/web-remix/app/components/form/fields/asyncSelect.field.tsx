@@ -1,16 +1,19 @@
-import React, { forwardRef, ReactNode, useCallback } from "react";
+import type { ReactNode} from "react";
+import React, { forwardRef, useCallback } from "react";
 import { useControlField } from "remix-validated-form";
+import { useIsMounted } from "usehooks-ts";
 import { InputText, Label } from "@elpassion/taco";
-import { asyncSelectApi, IAsyncSelectItem } from "~/api/AsyncSelectApi";
+import type { IAsyncSelectItem } from "~/api/AsyncSelectApi";
+import { asyncSelectApi } from "~/api/AsyncSelectApi";
 import {
   HiddenField,
   useFieldContext,
 } from "~/components/form/fields/field.context";
+import type {
+  AsyncSelectInputProps} from "~/components/form/inputs/select/select.input";
 import {
-  AsyncSelectInputProps,
   AsyncSelectInput,
 } from "~/components/form/inputs/select/select.input";
-import { useIsMounted } from "usehooks-ts";
 
 export interface AsyncSelectFieldProps extends Partial<AsyncSelectInputProps> {
   url: string;

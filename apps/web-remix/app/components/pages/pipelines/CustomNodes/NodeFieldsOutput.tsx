@@ -1,16 +1,17 @@
 import React, { useCallback } from "react";
-import { IEvent, useRunPipelineNode } from "../RunPipelineProvider";
-import { IBlockConfig, IField } from "../pipeline.types";
+import { useBoolean } from "usehooks-ts";
+import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
+import { ToggleInput } from "~/components/form/inputs/toggle.input";
+import { useRunPipelineNode } from "../RunPipelineProvider";
+import { AudioOutput } from "./AudioOutput";
+import { FileOutput } from "./FileOutput";
 import {
   NodeClearButton,
   NodeCopyButton,
   NodeDownloadButton,
 } from "./NodeActionButtons";
-import { AudioOutput } from "./AudioOutput";
-import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
-import { FileOutput } from "./FileOutput";
-import { useBoolean } from "usehooks-ts";
-import { ToggleInput } from "~/components/form/inputs/toggle.input";
+import type { IBlockConfig, IField } from "../pipeline.types";
+import type { IEvent} from "../RunPipelineProvider";
 
 interface NodeFieldsOutputProps {
   fields: IField[];

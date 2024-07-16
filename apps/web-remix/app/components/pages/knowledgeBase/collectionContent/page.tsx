@@ -1,13 +1,12 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
 import { Outlet, useLoaderData, useMatch, useNavigate, useSearchParams } from "@remix-run/react";
-
-import { KnowledgeBaseFileList } from "./KnowledgeBaseFileList";
-import { loader } from "./loader.server";
+import classNames from "classnames";
 import { Modal } from "@elpassion/taco/Modal";
 import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
-import classNames from "classnames";
 import { routes } from "~/utils/routes.utils";
+import { KnowledgeBaseFileList } from "./KnowledgeBaseFileList";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function KnowledgeBaseContentPage() {
   const { fileList, organizationId, collectionName } =

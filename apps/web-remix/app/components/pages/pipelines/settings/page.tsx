@@ -6,9 +6,8 @@ import {
   useNavigate,
   useSearchParams,
 } from "@remix-run/react";
-import { MetaFunction } from "@remix-run/node";
-import { EditPipelineNameForm } from "./EditPipelineNameForm";
-import { routes } from "~/utils/routes.utils";
+import { BasicLink } from "~/components/link/BasicLink";
+import { OrganizationAvatar } from "~/components/pages/settings/organization/AboutOrganization";
 import {
   Section,
   SectionContent,
@@ -18,10 +17,11 @@ import {
   ActionSidebar,
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
-import { OrganizationAvatar } from "~/components/pages/settings/organization/AboutOrganization";
-import { BasicLink } from "~/components/link/BasicLink";
+import { routes } from "~/utils/routes.utils";
+import { EditPipelineNameForm } from "./EditPipelineNameForm";
 import { EditPipelineSettingsForm } from "./EditPipelineSettingsForm";
-import { loader } from "./loader.server";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function SettingsPage() {
   const { pipeline, organizationId, pipelineId } =

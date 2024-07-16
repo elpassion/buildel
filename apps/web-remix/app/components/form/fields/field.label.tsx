@@ -1,4 +1,5 @@
-import React, { forwardRef, LabelHTMLAttributes } from "react";
+import type { LabelHTMLAttributes } from "react";
+import React, { forwardRef } from "react";
 import { useFieldContext } from "~/components/form/fields/field.context";
 
 export const FieldLabel = forwardRef<

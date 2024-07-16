@@ -1,6 +1,7 @@
 import React from "react";
-import { MenuItem as RcMenuItem, MenuItemProps } from "rc-menu";
 import classNames from "classnames";
+import { MenuItem as RcMenuItem } from "rc-menu";
+import type { MenuItemProps } from "rc-menu";
 
 export const MenuItem: React.FC<MenuItemProps> = ({ className, ...rest }) => {
   return (

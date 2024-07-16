@@ -1,4 +1,5 @@
-import React, { PropsWithChildren, useCallback } from "react";
+import type { PropsWithChildren} from "react";
+import React, { useCallback } from "react";
 import { useTabsContext } from "~/components/tabs/TabGroup";
 
 interface TabProps extends PropsWithChildren {

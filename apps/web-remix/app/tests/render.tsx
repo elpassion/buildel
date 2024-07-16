@@ -1,8 +1,10 @@
-import React, { ReactElement } from "react";
+import type { ReactElement } from "react";
+import React from "react";
+import { render } from "@testing-library/react";
 import Modal from "react-modal";
-import { Toaster } from "~/components/toasts/Toaster";
-import { render, RenderOptions } from "@testing-library/react";
 import { NavSidebarContext } from "~/components/sidebar/NavSidebar";
+import { Toaster } from "~/components/toasts/Toaster";
+import type { RenderOptions } from "@testing-library/react";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   Modal.setAppElement("div");

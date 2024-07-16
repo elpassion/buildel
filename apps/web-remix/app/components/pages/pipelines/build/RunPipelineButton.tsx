@@ -1,8 +1,8 @@
 import React from "react";
 import { Button } from "@elpassion/taco";
-import { useRunPipeline } from "../RunPipelineProvider";
-import { PlayFilled } from "~/icons/PlayFilled";
 import { errorToast } from "~/components/toasts/errorToast";
+import { PlayFilled } from "~/icons/PlayFilled";
+import { useRunPipeline } from "../RunPipelineProvider";
 
 export const RunPipelineButton: React.FC = () => {
   const { status, stopRun, startRun, isValid } = useRunPipeline();

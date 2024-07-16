@@ -1,8 +1,8 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
 import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
+import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 import {
   PreviewConnector,
   PreviewSection,
@@ -12,8 +12,8 @@ import {
   PreviewSectionStep,
   PreviewSectionText,
 } from "../PreviewSection";
-import { loader } from "./loader.server";
-import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function HTTPApiPage() {
   const { organizationId, pipelineId, apiUrl } = useLoaderData<typeof loader>();

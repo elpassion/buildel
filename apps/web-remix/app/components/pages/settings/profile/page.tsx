@@ -1,5 +1,3 @@
-import { Button } from "@elpassion/taco";
-import { MetaFunction } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -7,6 +5,7 @@ import {
   useMatch,
   useNavigate,
 } from "@remix-run/react";
+import { Button } from "@elpassion/taco";
 import {
   ActionSidebar,
   ActionSidebarHeader,
@@ -17,7 +16,8 @@ import {
   SectionContent,
   SectionHeading,
 } from "../settingsLayout/PageLayout";
-import { loader } from "./loader.server";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function ProfileSettingsPage() {
   const { organization } = useLoaderData<typeof loader>();

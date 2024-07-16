@@ -1,4 +1,5 @@
-import React, { forwardRef, ReactNode } from "react";
+import type { ReactNode } from "react";
+import React, { forwardRef } from "react";
 import { useControlField, useFormContext } from "remix-validated-form";
 import { InputText, Label } from "@elpassion/taco";
 import {
@@ -6,7 +7,7 @@ import {
   useFieldContext,
 } from "~/components/form/fields/field.context";
 import { SelectInput } from "~/components/form/inputs/select/select.input";
-import { SelectInputProps } from "~/components/form/inputs/select/select.input-impl.client";
+import type { SelectInputProps } from "~/components/form/inputs/select/select.input-impl.client";
 
 interface SelectFieldProps extends SelectInputProps {
   label?: ReactNode;

@@ -1,6 +1,7 @@
-import { Button, ButtonProps } from "@elpassion/taco";
 import { useNavigation } from "@remix-run/react";
 import { useFormContext } from "remix-validated-form";
+import type { ButtonProps } from "@elpassion/taco";
+import { Button } from "@elpassion/taco";
 
 export function SubmitButton(props: ButtonProps) {
   const { isSubmitting } = useFormContext();

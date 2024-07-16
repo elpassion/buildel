@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { dayjs } from "~/utils/Dayjs";
-import { IPipelineCost, IPipelineCosts } from "../pipeline.types";
+import type { IPipelineCost, IPipelineCosts } from "../pipeline.types";
 
 interface PipelineRunCostsListProps {
   items: IPipelineCosts;

@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event";
-import { screen, Matcher } from "../render";
+import { screen } from "../render";
+import type { Matcher } from "../render";
 
 export class LinkHandle {
   constructor(public readonly linkElement: HTMLButtonElement) {}

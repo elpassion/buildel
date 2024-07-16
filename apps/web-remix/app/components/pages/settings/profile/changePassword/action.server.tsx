@@ -1,18 +1,19 @@
-import { ActionFunctionArgs, json, redirect } from "@remix-run/node";
-import { withZod } from "@remix-validated-form/with-zod";
-import invariant from "tiny-invariant";
-import { z } from "zod";
-import { requireLogin } from "~/session.server";
-import { actionBuilder } from "~/utils.server";
-import { changePasswordSchema } from "./schema";
-import { validationError } from "remix-validated-form";
-import { routes } from "~/utils/routes.utils";
-import { setServerToast } from "~/utils/toast.server";
+import { json, redirect } from '@remix-run/node';
+import { withZod } from '@remix-validated-form/with-zod';
+import { validationError } from 'remix-validated-form';
+import invariant from 'tiny-invariant';
+import { z } from 'zod';
+import { requireLogin } from '~/session.server';
+import { routes } from '~/utils/routes.utils';
+import { setServerToast } from '~/utils/toast.server';
+import { actionBuilder } from '~/utils.server';
+import { changePasswordSchema } from './schema';
+import type { ActionFunctionArgs } from '@remix-run/node';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
     post: async ({ params, request }, { fetch }) => {
-      invariant(params.organizationId, "organizationId not found");
+      invariant(params.organizationId, 'organizationId not found');
       await requireLogin(request);
 
       const validator = withZod(changePasswordSchema);
@@ -22,15 +23,15 @@ export async function action(actionArgs: ActionFunctionArgs) {
       if (result.error) return validationError(result.error);
 
       await fetch(z.any(), `/users/password`, {
-        method: "PUT",
+        method: 'PUT',
         body: JSON.stringify(result.data),
       });
 
       return redirect(routes.profileSettings(params.organizationId), {
         headers: {
-          "Set-Cookie": await setServerToast(request, {
+          'Set-Cookie': await setServerToast(request, {
             success: {
-              title: "Password changed",
+              title: 'Password changed',
               description: `Password successfully changed.`,
             },
           }),

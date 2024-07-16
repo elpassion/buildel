@@ -1,15 +1,15 @@
 import React, { useMemo } from "react";
-import { useFormContext, ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
-import { Field } from "~/components/form/fields/field.context";
-import { TextInputField } from "~/components/form/fields/text.field";
-import { SearchSchema } from "./schema";
-import { IconButton } from "~/components/iconButton";
 import classNames from "classnames";
-import { SearchParams } from "./SearchParams";
+import { ValidatedForm, useFormContext } from "remix-validated-form";
+import { Field } from "~/components/form/fields/field.context";
 import { NumberInputField } from "~/components/form/fields/number.field";
+import { TextInputField } from "~/components/form/fields/text.field";
 import { ToggleInputField } from "~/components/form/fields/toggle.field";
+import { IconButton } from "~/components/iconButton";
 import { ExtendChunksField } from "./ExtendChunksToggleField";
+import { SearchSchema } from "./schema";
+import { SearchParams } from "./SearchParams";
 
 interface KnowledgeBaseSearchFormProps {
   defaultValue?: string;

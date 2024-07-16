@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useFetcher } from "@remix-run/react";
-import { Button } from "@elpassion/taco";
 import classNames from "classnames";
-import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
+import { Button } from "@elpassion/taco";
 import { TextInput } from "~/components/form/inputs/text.input";
 import { confirm } from "~/components/modal/confirm";
-import { IAPIKey } from "./organization.types";
+import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";
+import type { IAPIKey } from "./organization.types";
 
 interface ApiKeyProps {
   apiKey: IAPIKey;

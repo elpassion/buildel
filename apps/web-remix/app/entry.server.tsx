@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/remix";
 /**
  * By default, Remix will handle generating the HTTP Response for you.
  * You are free to delete this file if you'd like to, but if you ever want it revealed again, you can run `npx remix reveal` ✨
@@ -6,7 +5,12 @@ import * as Sentry from "@sentry/remix";
  */
 
 import { PassThrough } from "node:stream";
-
+import { createReadableStreamFromReadable } from "@remix-run/node";
+import { RemixServer } from "@remix-run/react";
+import * as Sentry from "@sentry/remix";
+import etag from "etag";
+import isbot from "isbot";
+import { renderToPipeableStream } from "react-dom/server";
 import type {
   ActionFunctionArgs,
   AppLoadContext,
@@ -14,11 +18,6 @@ import type {
   EntryContext,
   LoaderFunctionArgs,
 } from "@remix-run/node";
-import { createReadableStreamFromReadable } from "@remix-run/node";
-import { RemixServer } from "@remix-run/react";
-import etag from "etag";
-import isbot from "isbot";
-import { renderToPipeableStream } from "react-dom/server";
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,

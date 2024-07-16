@@ -1,16 +1,16 @@
 import React from "react";
+import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import { Icon } from "@elpassion/taco";
+import { IconButton } from "~/components/iconButton";
+import { BasicLink } from "~/components/link/BasicLink";
 import { ItemList } from "~/components/list/ItemList";
-import {
+import { confirm } from "~/components/modal/confirm";
+import { routes } from "~/utils/routes.utils";
+import type { loader } from "./loader.server";
+import type {
   IKnowledgeBaseFile,
   IKnowledgeBaseFileList,
 } from "../knowledgeBase.types";
-import { Icon } from "@elpassion/taco";
-import { IconButton } from "~/components/iconButton";
-import { confirm } from "~/components/modal/confirm";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
-import { BasicLink } from "~/components/link/BasicLink";
-import { routes } from "~/utils/routes.utils";
-import { loader } from "./loader.server";
 
 interface KnowledgeBaseFileListProps {
   items: IKnowledgeBaseFileList;

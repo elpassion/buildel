@@ -1,4 +1,5 @@
-import React, { HTMLProps } from "react";
+import type { HTMLProps } from "react";
+import React from "react";
 import classNames from "classnames";
 import { Icon } from "@elpassion/taco";
 import { useCopyToClipboard } from "~/hooks/useCopyToClipboard";

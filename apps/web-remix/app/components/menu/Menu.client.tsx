@@ -1,6 +1,7 @@
-import RcMenu, { MenuProps } from "rc-menu";
 import React from "react";
 import classNames from "classnames";
+import RcMenu from "rc-menu";
+import type { MenuProps } from "rc-menu";
 import "rc-menu/assets/index.css";
 
 export const MenuClient: React.FC<MenuProps> = ({

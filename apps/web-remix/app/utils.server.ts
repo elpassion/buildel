@@ -1,12 +1,11 @@
 import {
-  ActionFunctionArgs,
-  LoaderFunctionArgs,
   json,
-  redirect,
-  TypedResponse,
+  redirect
 } from "@remix-run/node";
 import merge from "lodash.merge";
 import { validationError } from "remix-validated-form";
+import { logout } from "~/session.server";
+import { getCurrentUserOrNull } from "./utils/currentUser.server";
 import {
   NotFoundError,
   UnauthorizedError,
@@ -15,8 +14,10 @@ import {
 } from "./utils/errors";
 import { fetchTyped } from "./utils/fetch.server";
 import { setServerToast } from "./utils/toast.server";
-import { logout } from "~/session.server";
-import { getCurrentUserOrNull } from "./utils/currentUser.server";
+import type {
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+  TypedResponse} from "@remix-run/node";
 
 export const loaderBuilder =
   <T>(

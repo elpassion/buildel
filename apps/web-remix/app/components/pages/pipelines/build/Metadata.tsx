@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Icon } from "@elpassion/taco";
-import {
-  useRunPipeline,
-  Metadata as IMetadata,
-} from "~/components/pages/pipelines/RunPipelineProvider";
-import { z } from "zod";
 import { withZod } from "@remix-validated-form/with-zod";
 import { ValidatedForm } from "remix-validated-form";
-import { Field } from "~/components/form/fields/field.context";
-import { SubmitButton } from "~/components/form/submit";
-import { successToast } from "~/components/toasts/successToast";
-import { useDropdown } from "~/components/dropdown/DropdownContext";
-import { EditorField } from "~/components/form/fields/editor.field";
+import { z } from "zod";
+import { Icon } from "@elpassion/taco";
 import {
   Dropdown,
   DropdownPopup,
   DropdownTrigger,
 } from "~/components/dropdown/Dropdown";
+import { useDropdown } from "~/components/dropdown/DropdownContext";
+import { EditorField } from "~/components/form/fields/editor.field";
+import { Field } from "~/components/form/fields/field.context";
+import { SubmitButton } from "~/components/form/submit";
+import type {
+  Metadata as IMetadata} from "~/components/pages/pipelines/RunPipelineProvider";
+import {
+  useRunPipeline
+} from "~/components/pages/pipelines/RunPipelineProvider";
+import { successToast } from "~/components/toasts/successToast";
 
 export const Metadata = () => {
   const { metadata, setMetadata } = useRunPipeline();

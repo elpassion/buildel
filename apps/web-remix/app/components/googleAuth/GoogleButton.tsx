@@ -1,6 +1,6 @@
 import React from "react";
-import { Google } from "~/icons/Google";
 import { useNavigation } from "@remix-run/react";
+import { Google } from "~/icons/Google";
 
 type GoogleButtonContent = "Sign in with Google" | "Sign up with Google";
 

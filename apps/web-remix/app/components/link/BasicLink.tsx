@@ -1,5 +1,6 @@
 import React from "react";
-import { Link, LinkProps } from "@remix-run/react";
+import { Link } from "@remix-run/react";
+import type { LinkProps } from "@remix-run/react";
 
 export const BasicLink: React.FC<LinkProps> = ({ children, ...props }) => {
   return (

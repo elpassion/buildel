@@ -1,10 +1,11 @@
 import React, { forwardRef } from "react";
-import { useFieldContext } from "~/components/form/fields/field.context";
-import {
-  CheckboxInput,
-  CheckboxInputProps,
-} from "~/components/form/inputs/checkbox.input";
 import { useControlField } from "remix-validated-form";
+import { useFieldContext } from "~/components/form/fields/field.context";
+import type {
+  CheckboxInputProps} from "~/components/form/inputs/checkbox.input";
+import {
+  CheckboxInput
+} from "~/components/form/inputs/checkbox.input";
 
 export const CheckboxInputField = forwardRef<
   HTMLInputElement,

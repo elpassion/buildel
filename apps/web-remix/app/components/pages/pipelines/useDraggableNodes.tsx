@@ -1,9 +1,10 @@
-import { DragEvent, RefObject, useCallback, useState } from "react";
-import { ReactFlowInstance } from "@xyflow/react";
-import { z } from "zod";
+import type { DragEvent, RefObject} from "react";
+import { useCallback, useState } from "react";
+import type { BlockType } from "~/api/blockType/blockType.contracts";
 import { assert } from "~/utils/assert";
-import { IBlockConfig, IEdge, INode } from "./pipeline.types";
-import { BlockType } from "~/api/blockType/blockType.contracts";
+import type { IBlockConfig, IEdge, INode } from "./pipeline.types";
+import type { ReactFlowInstance } from "@xyflow/react";
+import type { z } from "zod";
 
 interface IUseDraggableNodes {
   wrapper: RefObject<HTMLDivElement>;

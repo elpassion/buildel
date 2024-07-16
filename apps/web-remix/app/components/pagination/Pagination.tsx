@@ -1,12 +1,14 @@
-import React, { ButtonHTMLAttributes } from "react";
-import {
-  DEFAULT_PAGINATION,
-  Pagination as UsePaginationProps,
-} from "./usePagination";
+import type { ButtonHTMLAttributes } from "react";
+import React from "react";
+import { useNavigate } from "@remix-run/react";
 import classNames from "classnames";
 import { Icon } from "@elpassion/taco";
-import { useNavigate } from "@remix-run/react";
 import { buildUrlWithParams } from "~/utils/url";
+import {
+  DEFAULT_PAGINATION
+} from "./usePagination";
+import type {
+  Pagination as UsePaginationProps} from "./usePagination";
 
 interface PaginationProps {
   pagination: Partial<UsePaginationProps>;

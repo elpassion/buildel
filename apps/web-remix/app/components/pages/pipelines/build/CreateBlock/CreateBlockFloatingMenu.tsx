@@ -1,17 +1,17 @@
 import React, { useMemo } from "react";
 import { useLoaderData } from "@remix-run/react";
 import startCase from "lodash.startcase";
-import { loader } from "../loader.server";
-import {
+import { ClientOnly } from "remix-utils/client-only";
+import { MenuClient } from "~/components/menu/Menu.client";
+import type {
   IBlockConfig,
   IBlockType,
   IBlockTypes,
 } from "~/components/pages/pipelines/pipeline.types";
-import { MenuClient } from "~/components/menu/Menu.client";
-import { GroupSubMenu } from "./GroupSubMenu";
 import { CreateBlockDraggableItem } from "./CreateBlockDraggableItem";
+import { GroupSubMenu } from "./GroupSubMenu";
 import { PasteConfigItem } from "./PasteConfigItem";
-import { ClientOnly } from "remix-utils/client-only";
+import type { loader } from "../loader.server";
 
 interface CreateBlockFloatingMenuProps {
   onCreate: (node: IBlockConfig) => void;

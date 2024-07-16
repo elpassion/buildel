@@ -1,5 +1,4 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -7,21 +6,22 @@ import {
   useMatch,
   useNavigate,
 } from "@remix-run/react";
-import { routes } from "~/utils/routes.utils";
 import { Button } from "@elpassion/taco";
-import { loader } from "./loader.server";
-import { PipelinesNavbar } from "./PipelinesNavbar";
-import { PipelinesList } from "./PipelinesList";
-import {
-  WorkflowTemplates,
-  WorkflowTemplatesHeader,
-  WorkflowTemplatesList,
-} from "./WorkflowTemplates";
 import { PageContentWrapper } from "~/components/layout/PageContentWrapper";
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
+import { routes } from "~/utils/routes.utils";
+import { PipelinesList } from "./PipelinesList";
+import { PipelinesNavbar } from "./PipelinesNavbar";
+import {
+  WorkflowTemplates,
+  WorkflowTemplatesHeader,
+  WorkflowTemplatesList,
+} from "./WorkflowTemplates";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function PipelinesPage() {
   const { pipelines, organizationId } = useLoaderData<typeof loader>();

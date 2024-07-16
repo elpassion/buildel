@@ -1,5 +1,6 @@
+import type {
+  PropsWithChildren} from "react";
 import React, {
-  PropsWithChildren,
   useCallback,
   useMemo,
   useState,

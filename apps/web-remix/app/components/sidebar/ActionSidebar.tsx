@@ -1,4 +1,5 @@
-import React, { PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
+import React from "react";
 import classNames from "classnames";
 import startCase from "lodash.startcase";
 import { Icon, IconButton } from "@elpassion/taco";

@@ -1,28 +1,29 @@
 import React from "react";
-import { test, describe } from "vitest";
+import { Outlet } from "@remix-run/react";
+import { describe, test } from "vitest";
+import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
+import { loader as homeLoader } from "~/components/pages/home/loader.server";
+import { action as newOrganizationAction } from "~/components/pages/organizations/new/action.server";
+import { loader as newOrganizationLoader } from "~/components/pages/organizations/new/loader.server";
+import { NewOrganizationPage } from "~/components/pages/organizations/new/page";
+import { loader as organizationLoader } from "~/components/pages/organizations/show/loader.server";
+import { action as pipelinesAction } from "~/components/pages/pipelines/list/action.server";
+import { loader as pipelinesLoader } from "~/components/pages/pipelines/list/loader.server";
+import { PipelinesPage } from "~/components/pages/pipelines/list/page";
+import { organizationFixture } from "~/tests/fixtures/organization.fixtures";
+import { OrganizationHandlers } from "~/tests/handlers/organization.handlers";
+import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { InputHandle } from "~/tests/handles/Input.handle";
+import { render, screen } from "~/tests/render";
+import { server } from "~/tests/server.mock";
+import type {
+  RoutesProps} from "~/tests/setup.tests";
 import {
   actionWithSession,
   loaderWithSession,
-  RoutesProps,
   setupRoutes,
 } from "~/tests/setup.tests";
-import { Outlet } from "@remix-run/react";
-import { render, screen } from "~/tests/render";
-import { server } from "~/tests/server.mock";
-import { loader as pipelinesLoader } from "~/components/pages/pipelines/list/loader.server";
-import { action as pipelinesAction } from "~/components/pages/pipelines/list/action.server";
-import { loader as newOrganizationLoader } from "~/components/pages/organizations/new/loader.server";
-import { action as newOrganizationAction } from "~/components/pages/organizations/new/action.server";
-import { loader as organizationLoader } from "~/components/pages/organizations/show/loader.server";
-import { NewOrganizationPage } from "~/components/pages/organizations/new/page";
-import { OrganizationHandlers } from "~/tests/handlers/organization.handlers";
-import { loader as homeLoader } from "~/components/pages/home/loader.server";
-import { organizationFixture } from "~/tests/fixtures/organization.fixtures";
-import { PipelineHandlers } from "~/tests/handlers/pipelines.handlers";
-import { PipelinesPage } from "~/components/pages/pipelines/list/page";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
-import { InputHandle } from "~/tests/handles/Input.handle";
-import { RootErrorBoundary } from "~/components/errorBoundaries/RootErrorBoundary";
 
 const handlers = () => [
   ...new PipelineHandlers().handlers,

@@ -1,5 +1,5 @@
 import React, { forwardRef } from "react";
-import { InputNumberProps } from "@elpassion/taco";
+import type { InputNumberProps } from "@elpassion/taco";
 import { useFieldContext } from "~/components/form/fields/field.context";
 import { NumberInput } from "../inputs/number.input";
 

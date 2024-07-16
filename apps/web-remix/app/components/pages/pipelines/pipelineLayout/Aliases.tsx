@@ -1,34 +1,35 @@
-import React, { PropsWithChildren, useEffect, useMemo, useState } from "react";
-import { ItemList } from "~/components/list/ItemList";
-import { Icon } from "@elpassion/taco";
-import classNames from "classnames";
-import z from "zod";
-import { ValidatedForm } from "remix-validated-form";
-import { withZod } from "@remix-validated-form/with-zod";
-import { HiddenField } from "~/components/form/fields/field.context";
-import { BasicLink } from "~/components/link/BasicLink";
+import type { PropsWithChildren} from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   useFetcher,
   useLocation,
   useNavigate,
   useSearchParams,
 } from "@remix-run/react";
-import {
-  IPipeline,
-  IPipelineAlias,
-} from "~/components/pages/pipelines/pipeline.types";
-import { routes } from "~/utils/routes.utils";
-import { confirm } from "~/components/modal/confirm";
+import { withZod } from "@remix-validated-form/with-zod";
+import classNames from "classnames";
+import { ValidatedForm } from "remix-validated-form";
+import z from "zod";
+import { Icon } from "@elpassion/taco";
 import {
   Dropdown,
   DropdownPopup,
   DropdownTrigger,
 } from "~/components/dropdown/Dropdown";
 import { useDropdown } from "~/components/dropdown/DropdownContext";
+import { HiddenField } from "~/components/form/fields/field.context";
 import { IconButton } from "~/components/iconButton";
-import { ISecretKey } from "~/components/pages/secrets/variables.types";
-import { EditSecretKeyModal } from "~/components/pages/secrets/list/EditSecretKeyModal";
+import { BasicLink } from "~/components/link/BasicLink";
+import { ItemList } from "~/components/list/ItemList";
+import { confirm } from "~/components/modal/confirm";
+import type {
+  IPipeline,
+  IPipelineAlias,
+} from "~/components/pages/pipelines/pipeline.types";
 import { EditAliasNameModal } from "~/components/pages/pipelines/pipelineLayout/EditAliasNameModal";
+import { EditSecretKeyModal } from "~/components/pages/secrets/list/EditSecretKeyModal";
+import { ISecretKey } from "~/components/pages/secrets/variables.types";
+import { routes } from "~/utils/routes.utils";
 
 interface AliasSelectProps {
   aliases: IPipelineAlias[];

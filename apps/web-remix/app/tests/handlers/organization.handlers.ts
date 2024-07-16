@@ -1,5 +1,5 @@
-import { http, HttpResponse } from "msw";
-import {
+import { HttpResponse, http } from "msw";
+import type {
   ICreateFromTemplateResponse,
   ICreateOrganizationSchema,
   IOrganization,

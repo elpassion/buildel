@@ -1,16 +1,17 @@
-import React, { PropsWithChildren, useRef } from "react";
+import type { PropsWithChildren} from "react";
+import React, { useRef } from "react";
 import {
+  autoUpdate,
+  flip,
   offset as floatingOffset,
   useFloating,
-  flip,
-  Placement,
-  OffsetOptions,
-  autoUpdate,
 } from "@floating-ui/react-dom";
-import { useBoolean, useOnClickOutside } from "usehooks-ts";
 import classNames from "classnames";
-
+import { useBoolean, useOnClickOutside } from "usehooks-ts";
 import { DropdownContext, useDropdown } from "./DropdownContext";
+import type {
+  OffsetOptions,
+  Placement} from "@floating-ui/react-dom";
 
 interface DropdownProps {
   defaultShown?: boolean;

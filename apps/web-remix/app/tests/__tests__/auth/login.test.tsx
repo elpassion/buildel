@@ -1,13 +1,14 @@
 import React from "react";
-import { test, describe } from "vitest";
-import { RoutesProps, setupRoutes } from "~/tests/setup.tests";
+import { describe, test } from "vitest";
+import { action } from "~/components/pages/auth/login/action.server";
+import { loader } from "~/components/pages/auth/login/loader.server";
+import { LoginPage } from "~/components/pages/auth/login/page";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
-import { render, screen, waitFor, act } from "~/tests/render";
+import { act, render, screen, waitFor } from "~/tests/render";
 import { server } from "~/tests/server.mock";
-import { LoginPage } from "~/components/pages/auth/login/page";
-import { loader } from "~/components/pages/auth/login/loader.server";
-import { action } from "~/components/pages/auth/login/action.server";
+import { setupRoutes } from "~/tests/setup.tests";
+import type { RoutesProps} from "~/tests/setup.tests";
 import { errorHandlers, handlers } from "./login.handlers";
 import { handlers as registerHandlers } from "./register.handlers";
 

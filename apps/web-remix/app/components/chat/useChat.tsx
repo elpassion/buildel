@@ -1,9 +1,9 @@
 import { useState } from "react";
 import cloneDeep from "lodash.clonedeep";
 import { v4 as uuidv4 } from "uuid";
-import { errorToast } from "~/components/toasts/errorToast";
 import { usePipelineRun } from "~/components/pages/pipelines/usePipelineRun";
-import { IMessage, MessageRole } from "./chat.types";
+import { errorToast } from "~/components/toasts/errorToast";
+import type { IMessage, MessageRole } from "./chat.types";
 
 interface UseChatProps {
   input: string;

@@ -1,8 +1,9 @@
-import { RefObject, useCallback, useRef } from "react";
+import type { RefObject} from "react";
+import { useCallback, useRef } from "react";
 import { useEventListener } from "usehooks-ts";
-import { IBlockConfig, IEdge, INode } from "./pipeline.types";
-import { ReactFlowInstance } from "@xyflow/react";
 import { BlockConfig } from "~/api/blockType/blockType.contracts";
+import type { IBlockConfig, IEdge, INode } from "./pipeline.types";
+import type { ReactFlowInstance } from "@xyflow/react";
 
 interface UseCopyPasteNodeArgs {
   onPaste: (config: IBlockConfig) => Promise<void>;

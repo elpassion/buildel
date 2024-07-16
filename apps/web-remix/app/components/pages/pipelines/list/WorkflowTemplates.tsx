@@ -1,16 +1,17 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import React, { useMemo } from "react";
-import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import classNames from "classnames";
+import { ValidatedForm } from "remix-validated-form";
 import { Icon } from "@elpassion/taco";
-import { ItemList } from "~/components/list/ItemList";
-import { SubmitButton } from "~/components/form/submit";
+import type {
+  IWorkflowTemplate} from "~/api/organization/organization.contracts";
 import {
-  CreateFromTemplateSchema,
-  IWorkflowTemplate,
+  CreateFromTemplateSchema
 } from "~/api/organization/organization.contracts";
 import { HiddenField } from "~/components/form/fields/field.context";
+import { SubmitButton } from "~/components/form/submit";
+import { ItemList } from "~/components/list/ItemList";
 
 interface WorkflowTemplatesProps extends PropsWithChildren {
   className?: string;

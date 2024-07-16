@@ -1,15 +1,16 @@
-import { Button } from "@elpassion/taco";
+import type {
+  ReactNode} from "react";
 import React, {
-  ReactNode,
   useCallback,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { IFile, IFileUpload, IPreviewProps } from "./fileUpload.types";
-import { assert } from "~/utils/assert";
 import classNames from "classnames";
+import { Button } from "@elpassion/taco";
 import { KnowledgeBaseFileResponse } from "~/api/knowledgeBase/knowledgeApi.contracts";
+import { assert } from "~/utils/assert";
+import type { IFile, IFileUpload, IPreviewProps } from "./fileUpload.types";
 
 export interface FileUploadProps extends React.HTMLProps<HTMLInputElement> {
   preview?: (props: IPreviewProps) => ReactNode;

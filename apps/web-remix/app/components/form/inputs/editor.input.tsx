@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import classNames from "classnames";
+import type {
+  CodeMirrorProps} from "~/components/editor/CodeMirror/CodeMirror";
 import {
-  CodeMirrorProps,
   Editor,
 } from "~/components/editor/CodeMirror/CodeMirror";
-import classNames from "classnames";
 
 export type EditorInputProps = CodeMirrorProps;
 

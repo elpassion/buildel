@@ -1,8 +1,9 @@
 import React, { forwardRef, useRef } from "react";
 import classNames from "classnames";
 import { Icon } from "@elpassion/taco";
-import { TextInput, TextInputProps } from "~/components/form/inputs/text.input";
 import { useFieldContext } from "~/components/form/fields/field.context";
+import type { TextInputProps } from "~/components/form/inputs/text.input";
+import { TextInput } from "~/components/form/inputs/text.input";
 
 export const TextInputField = forwardRef<
   HTMLInputElement,

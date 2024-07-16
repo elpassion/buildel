@@ -1,15 +1,15 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
-import { ApiKey } from "./ApiKey";
-import { AboutOrganization } from "./AboutOrganization";
 import { Outlet, useLoaderData } from "@remix-run/react";
-import { routes } from "~/utils/routes.utils";
-import { TabGroup } from "~/components/tabs/TabGroup";
 import {
   OutlinedTabLink,
   OutlinedTabsWrapper,
 } from "~/components/tabs/OutlinedTabs";
-import { loader } from "./loader.server";
+import { TabGroup } from "~/components/tabs/TabGroup";
+import { routes } from "~/utils/routes.utils";
+import { AboutOrganization } from "./AboutOrganization";
+import { ApiKey } from "./ApiKey";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function OrganizationSettingsPage() {
   const { apiKey, organization } = useLoaderData<typeof loader>();

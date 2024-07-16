@@ -1,11 +1,11 @@
-import classNames from "classnames";
+import type { Dispatch, SetStateAction } from "react";
 import { Link } from "@remix-run/react";
+import classNames from "classnames";
 import { Icon, IconButton } from "@elpassion/taco";
 import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 import { TextareaInput } from "~/components/form/inputs/textarea.input";
-import { Dispatch, SetStateAction } from "react";
 import { routes } from "~/utils/routes.utils";
-import { ITest } from "./page";
+import type { ITest } from "./page";
 
 interface BulkTableProps {
   selectedInputs: string[];

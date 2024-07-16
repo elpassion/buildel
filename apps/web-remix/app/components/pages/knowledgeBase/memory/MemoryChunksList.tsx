@@ -1,6 +1,6 @@
 import React from "react";
+import type { IMemoryChunk } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
-import { IMemoryChunk } from "~/api/knowledgeBase/knowledgeApi.contracts";
 
 interface MemoryChunksListProps {
   items: IMemoryChunk[];

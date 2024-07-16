@@ -1,6 +1,6 @@
 import { toast } from "react-hot-toast";
-import { ToastProps } from "./Toast.interface";
 import { SuccessToast } from "./ui/SuccessToast";
+import type { ToastProps } from "./Toast.interface";
 
 export const successToast = (props?: ToastProps | string) => {
   if (typeof props === "string") {

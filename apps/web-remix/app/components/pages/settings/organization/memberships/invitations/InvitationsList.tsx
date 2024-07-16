@@ -1,10 +1,10 @@
-import classNames from "classnames";
-import { confirm } from "~/components/modal/confirm";
-import { Icon } from "@elpassion/taco";
-import { EmptyMessage, ItemList } from "~/components/list/ItemList";
-import { IconButton } from "~/components/iconButton";
-import { IInvitation } from "~/api/organization/organization.contracts";
 import { useFetcher } from "@remix-run/react";
+import classNames from "classnames";
+import { Icon } from "@elpassion/taco";
+import type { IInvitation } from "~/api/organization/organization.contracts";
+import { IconButton } from "~/components/iconButton";
+import { EmptyMessage, ItemList } from "~/components/list/ItemList";
+import { confirm } from "~/components/modal/confirm";
 import { dayjs } from "~/utils/Dayjs";
 
 interface InvitationsListProps {

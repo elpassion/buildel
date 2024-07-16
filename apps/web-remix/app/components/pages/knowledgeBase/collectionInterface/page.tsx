@@ -1,6 +1,4 @@
 import React from "react";
-import classNames from "classnames";
-import { MetaFunction } from "@remix-run/node";
 import {
   Link,
   Outlet,
@@ -8,18 +6,20 @@ import {
   useMatch,
   useNavigate,
 } from "@remix-run/react";
-import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
-import { routes } from "~/utils/routes.utils";
-import { loader } from "./loader.server";
+import classNames from "classnames";
+import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
+import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
+import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 import {
   InterfaceSectionHeader,
   InterfaceSectionHeaderParagraph,
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
 } from "~/components/interfaces/InterfaceSection";
-import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
-import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
+import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
+import { routes } from "~/utils/routes.utils";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function KnowledgeBaseCollectionInterface() {
   const { organizationId, collectionName, collectionId, apiUrl } =

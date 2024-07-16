@@ -1,17 +1,17 @@
 import React from "react";
-import { routes } from "~/utils/routes.utils";
-import { MetaFunction } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
-import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
 import { CopyCodeButton } from "~/components/actionButtons/CopyCodeButton";
-import {
-  InterfaceSectionWrapper,
-  InterfaceSectionHeading,
-  InterfaceSectionHeaderParagraph,
-  InterfaceSectionHeader,
-} from "~/components/interfaces/InterfaceSection";
-import { loader } from "./loader.server";
+import { CodePreviewWrapper } from "~/components/interfaces/CodePreview/CodePreviewWrapper";
 import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
+import {
+  InterfaceSectionHeader,
+  InterfaceSectionHeaderParagraph,
+  InterfaceSectionHeading,
+  InterfaceSectionWrapper,
+} from "~/components/interfaces/InterfaceSection";
+import { routes } from "~/utils/routes.utils";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function OpenAIApiPage() {
   const { organizationId, apiUrl } = useLoaderData<typeof loader>();

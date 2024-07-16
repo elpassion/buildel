@@ -1,5 +1,5 @@
-import { redirect, createCookieSessionStorage } from "@remix-run/node";
-import { ICurrentUser } from "~/api/CurrentUserApi";
+import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import type { ICurrentUser } from "~/api/CurrentUserApi";
 import { setServerToast } from "~/utils/toast.server";
 
 type SessionData = {

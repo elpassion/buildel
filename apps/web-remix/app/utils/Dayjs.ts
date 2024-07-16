@@ -1,5 +1,6 @@
-import originalDayjs, { Dayjs as OriginalDayjs } from "dayjs";
+import originalDayjs from "dayjs";
 import localeData from "dayjs/plugin/localeData";
+import type { Dayjs as OriginalDayjs } from "dayjs";
 originalDayjs.extend(localeData);
 
 export class Dayjs {

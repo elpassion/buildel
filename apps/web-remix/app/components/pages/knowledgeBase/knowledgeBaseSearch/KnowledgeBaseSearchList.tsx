@@ -1,6 +1,6 @@
 import React from "react";
+import type { IKnowledgeBaseSearchChunk } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
-import { IKnowledgeBaseSearchChunk } from "~/api/knowledgeBase/knowledgeApi.contracts";
 
 interface KnowledgeBaseSearchListProps {
   items: IKnowledgeBaseSearchChunk[];

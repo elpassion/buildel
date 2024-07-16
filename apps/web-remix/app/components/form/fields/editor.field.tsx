@@ -1,15 +1,17 @@
-import React, { forwardRef, PropsWithChildren, ReactNode } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
+import React, { forwardRef } from "react";
 import classNames from "classnames";
-import { useBoolean } from "usehooks-ts";
 import { useControlField } from "remix-validated-form";
-import { Modal } from "@elpassion/taco/Modal";
+import { useBoolean } from "usehooks-ts";
 import { Icon, InputText, Label } from "@elpassion/taco";
+import { Modal } from "@elpassion/taco/Modal";
 import {
   HiddenField,
   useFieldContext,
 } from "~/components/form/fields/field.context";
+import type {
+  EditorInputProps} from "~/components/form/inputs/editor.input";
 import {
-  EditorInputProps,
   EditorInput,
 } from "~/components/form/inputs/editor.input";
 

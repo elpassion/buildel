@@ -1,10 +1,11 @@
-import { Option } from "rc-select";
 import React, { useCallback, useEffect, useState } from "react";
+import { Option } from "rc-select";
+import { ClientOnly } from "remix-utils/client-only";
 import { useDebounce, useIsMounted } from "usehooks-ts";
-import AsyncSelectInputComponent, {
+import AsyncSelectInputComponent from "./select.input-impl.client";
+import type {
   SelectInputProps,
 } from "./select.input-impl.client";
-import { ClientOnly } from "remix-utils/client-only";
 
 export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
   return (

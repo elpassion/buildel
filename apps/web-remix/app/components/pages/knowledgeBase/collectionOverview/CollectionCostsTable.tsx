@@ -6,10 +6,10 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Indicator } from "@elpassion/taco";
-import { dayjs } from "~/utils/Dayjs";
 import { EmptyMessage } from "~/components/list/ItemList";
-import { IKnowledgeBaseCollectionCost } from "../knowledgeBase.types";
 import { HelpfulIcon } from "~/components/tooltip/HelpfulIcon";
+import { dayjs } from "~/utils/Dayjs";
+import type { IKnowledgeBaseCollectionCost } from "../knowledgeBase.types";
 
 interface CollectionCostsTableProps {
   data: IKnowledgeBaseCollectionCost[];

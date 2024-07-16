@@ -1,17 +1,17 @@
 import React, { useMemo, useState } from "react";
-import { MetaFunction } from "@remix-run/node";
-import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
-import { Field } from "~/components/form/fields/field.context";
+import { ValidatedForm } from "remix-validated-form";
 import { CreateCollectionSchema } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { TextInputField } from "~/components/form/fields/text.field";
+import { Field } from "~/components/form/fields/field.context";
 import { NumberInputField } from "~/components/form/fields/number.field";
+import { TextInputField } from "~/components/form/fields/text.field";
 import { SubmitButton } from "~/components/form/submit";
 import {
   ApiTypesRadioGroupField,
   ModelSelectField,
   SecretSelectField,
 } from "~/components/pages/knowledgeBase/KnowledgeBaseFields";
+import type { MetaFunction } from "@remix-run/node";
 
 export function NewKnowledgeBasePage() {
   const validator = useMemo(() => withZod(CreateCollectionSchema), []);

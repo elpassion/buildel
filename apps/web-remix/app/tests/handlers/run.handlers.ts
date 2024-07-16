@@ -1,9 +1,9 @@
-import { http, HttpResponse } from "msw";
-import {
+import { HttpResponse, http } from "msw";
+import type {
   IPipelineRun,
   IPipelineRuns,
 } from "~/components/pages/pipelines/pipeline.types";
-import { IPaginationMeta } from "~/components/pagination/pagination.types";
+import type { IPaginationMeta } from "~/components/pagination/pagination.types";
 
 export class RunHandlers {
   private runs: Map<number | string, IPipelineRun> = new Map();

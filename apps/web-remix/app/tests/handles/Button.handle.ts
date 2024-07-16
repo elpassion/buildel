@@ -1,5 +1,6 @@
 import userEvent from "@testing-library/user-event";
-import { screen, Matcher, act, findByLabelText } from "../render";
+import { act, findByLabelText, screen } from "../render";
+import type { Matcher} from "../render";
 
 export class ButtonHandle {
   constructor(public readonly buttonElement: HTMLButtonElement) {}

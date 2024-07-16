@@ -1,6 +1,7 @@
-import * as ReactDom from "react-dom/client";
-import { ConfirmationModal, ConfirmationModalProps } from "./ConfirmationModal";
 import React from "react";
+import * as ReactDom from "react-dom/client";
+import { ConfirmationModal } from "./ConfirmationModal";
+import type { ConfirmationModalProps } from "./ConfirmationModal";
 
 export type ConfirmProps = Omit<ConfirmationModalProps, "isOpen" | "onClose">;
 

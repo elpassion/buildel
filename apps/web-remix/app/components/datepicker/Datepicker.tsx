@@ -1,6 +1,8 @@
-import React, { ReactNode } from "react";
-import ReactDatePicker, { ReactDatePickerProps } from "react-datepicker";
+import type { ReactNode } from "react";
+import React from "react";
+import ReactDatePicker from "react-datepicker";
 import { ClientOnly } from "remix-utils/client-only";
+import type { ReactDatePickerProps } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const DatepickerClient: React.FC<ReactDatePickerProps> = (props) => {

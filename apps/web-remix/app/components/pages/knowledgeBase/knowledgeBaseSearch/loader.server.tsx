@@ -1,9 +1,10 @@
-import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import invariant from "tiny-invariant";
-import { loaderBuilder } from "~/utils.server";
-import { requireLogin } from "~/session.server";
+import type { IKnowledgeBaseSearchChunk, IKnowledgeBaseSearchChunkMeta } from "~/api/knowledgeBase/knowledgeApi.contracts";
 import { KnowledgeBaseApi } from "~/api/knowledgeBase/KnowledgeBaseApi";
-import { IKnowledgeBaseSearchChunk, IKnowledgeBaseSearchChunkMeta } from "~/api/knowledgeBase/knowledgeApi.contracts";
+import { requireLogin } from "~/session.server";
+import { loaderBuilder } from "~/utils.server";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {

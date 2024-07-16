@@ -1,11 +1,11 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
+import { useLoaderData, useNavigate } from "@remix-run/react";
 import { ActionSidebarHeader } from "~/components/sidebar/ActionSidebar";
 import { routes } from "~/utils/routes.utils";
-import { useLoaderData, useNavigate } from "@remix-run/react";
 import { KnowledgeBaseSearchForm } from "./KnowledgeBaseSearchForm";
 import { KnowledgeBaseSearchList } from "./KnowledgeBaseSearchList";
-import { loader } from "./loader.server";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function KnowledgeBaseSearch() {
   const navigate = useNavigate();

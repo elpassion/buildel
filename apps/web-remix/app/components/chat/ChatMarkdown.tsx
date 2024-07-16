@@ -1,8 +1,10 @@
-import React, { AnchorHTMLAttributes, useEffect, useRef } from "react";
-import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
+import type { AnchorHTMLAttributes} from "react";
+import React, { useEffect, useRef } from "react";
 import classNames from "classnames";
+import Markdown from "markdown-to-jsx";
 import mermaid from "mermaid";
 import { z } from "zod";
+import type { MarkdownToJSX } from "markdown-to-jsx";
 
 interface ChatMarkdownProps {
   [key: string]: any;

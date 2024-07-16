@@ -1,18 +1,19 @@
-import { http, HttpResponse } from "msw";
-import {
-  IAliasesResponse,
+import { HttpResponse, http } from "msw";
+import type {
   IAliasResponse,
+  IAliasesResponse,
   IPipelineDetailsResponse,
   IPipelineResponse,
-  IPipelinesResponse,
+  IPipelinesResponse} from "~/api/pipeline/pipeline.contracts";
+import {
   PipelineDetailsResponse,
 } from "~/api/pipeline/pipeline.contracts";
+import type { IPipeline } from "~/components/pages/pipelines/pipeline.types";
+import { aliasFixture } from "~/tests/fixtures/alias.fixtures";
 import {
   pipelineDetailsFixture,
   pipelineFixture,
 } from "~/tests/fixtures/pipeline.fixtures";
-import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
-import { aliasFixture } from "~/tests/fixtures/alias.fixtures";
 
 export class PipelineHandlers {
   private pipelines: Map<number, IPipeline> = new Map();

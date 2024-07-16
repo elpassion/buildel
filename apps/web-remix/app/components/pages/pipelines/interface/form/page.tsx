@@ -1,22 +1,22 @@
 import React from "react";
-import { MetaFunction } from "@remix-run/node";
-import { routes } from "~/utils/routes.utils";
 import { useFetcher, useLoaderData, useSearchParams } from "@remix-run/react";
-import { BasicLink } from "~/components/link/BasicLink";
 import { CodePreviewOptions } from "~/components/interfaces/CodePreview/CodePreviewOptions";
+import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
 import {
-  InterfaceSectionWrapper,
-  InterfaceSectionHeading,
-  InterfaceSectionHeaderParagraph,
   InterfaceSectionHeader,
+  InterfaceSectionHeaderParagraph,
+  InterfaceSectionHeading,
+  InterfaceSectionWrapper,
 } from "~/components/interfaces/InterfaceSection";
-import {
+import { BasicLink } from "~/components/link/BasicLink";
+import type {
   IInterfaceConfig,
   IPipeline,
 } from "~/components/pages/pipelines/pipeline.types";
+import { routes } from "~/utils/routes.utils";
 import { InterfaceConfigForm } from "./InterfaceConfigForm";
-import { loader } from "./loader.server";
-import { DocumentationCTA } from "~/components/interfaces/DocumentationCTA";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function FormPage() {
   const updateFetcher = useFetcher<IPipeline>();

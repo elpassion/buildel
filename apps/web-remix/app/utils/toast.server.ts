@@ -1,4 +1,5 @@
-import { commitSession, getSession, SessionToast } from "~/session.server";
+import type { SessionToast } from "~/session.server";
+import { commitSession, getSession } from "~/session.server";
 
 export async function setServerToast(
   request: Request,

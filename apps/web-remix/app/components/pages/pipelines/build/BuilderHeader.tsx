@@ -1,10 +1,11 @@
-import React, { PropsWithChildren, useCallback, useEffect } from "react";
-import { Icon } from "@elpassion/taco";
-import { RunPipelineButton } from "./RunPipelineButton";
-import { useRunPipeline } from "../RunPipelineProvider";
-import { IPipelineConfig } from "~/components/pages/pipelines/pipeline.types";
+import type { PropsWithChildren} from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDebounce, useIsFirstRender } from "usehooks-ts";
+import { Icon } from "@elpassion/taco";
+import type { IPipelineConfig } from "~/components/pages/pipelines/pipeline.types";
+import { useRunPipeline } from "../RunPipelineProvider";
 import { Metadata } from "./Metadata";
+import { RunPipelineButton } from "./RunPipelineButton";
 
 export const BuilderHeader: React.FC<PropsWithChildren> = ({ children }) => {
   return (

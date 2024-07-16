@@ -1,5 +1,5 @@
-import { CompletionContext } from "@codemirror/autocomplete";
-import { Suggestion } from "../codeMirror.types";
+import type { Suggestion } from "../codeMirror.types";
+import type { CompletionContext } from "@codemirror/autocomplete";
 
 export function completions(
   context: CompletionContext,

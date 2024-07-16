@@ -1,5 +1,5 @@
 import React from "react";
-import { UseFloatingReturn } from "@floating-ui/react-dom";
+import type { UseFloatingReturn } from "@floating-ui/react-dom";
 
 export interface IDropdownContext {
   show: () => void;

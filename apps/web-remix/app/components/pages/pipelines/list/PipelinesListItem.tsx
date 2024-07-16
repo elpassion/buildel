@@ -1,16 +1,17 @@
-import { Icon } from "@elpassion/taco";
-import { IPipeline } from "../pipeline.types";
-import React, { PropsWithChildren, useMemo } from "react";
+import type { PropsWithChildren} from "react";
+import React, { useMemo } from "react";
+import { useFetcher } from "@remix-run/react";
+import { withZod } from "@remix-validated-form/with-zod";
 import classNames from "classnames";
+import { ValidatedForm } from "remix-validated-form";
+import { Icon } from "@elpassion/taco";
+import { CreatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
+import { HiddenField } from "~/components/form/fields/field.context";
 import { IconButton } from "~/components/iconButton";
 import { confirm } from "~/components/modal/confirm";
-import { useFetcher } from "@remix-run/react";
-import { routes } from "~/utils/routes.utils";
-import { ValidatedForm } from "remix-validated-form";
-import { HiddenField } from "~/components/form/fields/field.context";
-import { withZod } from "@remix-validated-form/with-zod";
-import { CreatePipelineSchema } from "~/api/pipeline/pipeline.contracts";
 import { Duplicate } from "~/icons/Duplicate";
+import { routes } from "~/utils/routes.utils";
+import type { IPipeline } from "../pipeline.types";
 
 interface PipelinesListItemProps extends PropsWithChildren {
   className?: string;

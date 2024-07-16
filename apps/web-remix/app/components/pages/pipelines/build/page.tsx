@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import { MetaFunction } from "@remix-run/node";
 import {
   Outlet,
   useFetcher,
@@ -9,21 +8,22 @@ import {
   useRevalidator,
   useSearchParams,
 } from "@remix-run/react";
-import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
+import isEqual from "lodash.isequal";
+import { AliasNode } from "~/components/pages/pipelines/build/AliasNode";
 import { ELProvider } from "~/components/pages/pipelines/EL/ELProvider";
+import { ActionSidebar } from "~/components/sidebar/ActionSidebar";
 import { routes } from "~/utils/routes.utils";
-import { IPipeline, IPipelineConfig } from "../pipeline.types";
-import { toPipelineConfig } from "../PipelineFlow.utils";
-import { CustomEdge } from "../CustomEdges/CustomEdge";
 import { Builder } from "../Builder";
-import { PasteBlockConfigProvider } from "./CreateBlock/PasteBlockConfigProvider";
-import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
-import { PasteBlockConfiguration } from "./CreateBlock/PastConfigSidebar";
+import { CustomEdge } from "../CustomEdges/CustomEdge";
+import { toPipelineConfig } from "../PipelineFlow.utils";
 import { BuilderHeader, SaveChangesButton } from "./BuilderHeader";
 import { BuilderNode } from "./BuilderNode";
-import { loader } from "./loader.server";
-import { AliasNode } from "~/components/pages/pipelines/build/AliasNode";
-import isEqual from "lodash.isequal";
+import { CreateBlockFloatingMenu } from "./CreateBlock/CreateBlockFloatingMenu";
+import { PasteBlockConfiguration } from "./CreateBlock/PastConfigSidebar";
+import { PasteBlockConfigProvider } from "./CreateBlock/PasteBlockConfigProvider";
+import type { loader } from "./loader.server";
+import type { IPipeline, IPipelineConfig } from "../pipeline.types";
+import type { MetaFunction } from "@remix-run/node";
 
 export function PipelineBuilder() {
   const revalidator = useRevalidator();

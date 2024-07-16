@@ -1,7 +1,9 @@
-import React, { PropsWithChildren } from "react";
-import { Navbar, NavbarProps } from "@elpassion/taco";
-import { useNavSidebarContext } from "~/components/sidebar/NavSidebar";
+import type { PropsWithChildren } from "react";
+import React from "react";
 import classNames from "classnames";
+import type { NavbarProps } from "@elpassion/taco";
+import { Navbar } from "@elpassion/taco";
+import { useNavSidebarContext } from "~/components/sidebar/NavSidebar";
 
 export const AppNavbar: React.FC<
   Omit<NavbarProps, "wrapperClassName" | "menuClassName" | "onMenuClick">

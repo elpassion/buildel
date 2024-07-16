@@ -1,20 +1,21 @@
 import React from "react";
-import { test, describe } from "vitest";
-import { RoutesProps, setupRoutes } from "~/tests/setup.tests";
-import { render, screen } from "~/tests/render";
-import { server } from "~/tests/server.mock";
-import { ResetPasswordPage } from "~/components/pages/auth/reset-password/page";
-import { action as resetPasswordAction } from "~/components/pages/auth/reset-password/action.server";
-import { LoginPage } from "~/components/pages/auth/login/page";
+import { describe, test } from "vitest";
 import { loader as loginLoader } from "~/components/pages/auth/login/loader.server";
-import { SetPasswordPage } from "~/components/pages/auth/set-password/page";
+import { LoginPage } from "~/components/pages/auth/login/page";
+import { action as resetPasswordAction } from "~/components/pages/auth/reset-password/action.server";
+import { ResetPasswordPage } from "~/components/pages/auth/reset-password/page";
 import { action as setPasswordAction } from "~/components/pages/auth/set-password/action.server";
 import { loader as setPasswordLoader } from "~/components/pages/auth/set-password/loader.server";
-import { handlers, notMatchHandler } from "./reset-password.handlers";
-import { InputHandle } from "~/tests/handles/Input.handle";
-import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { SetPasswordPage } from "~/components/pages/auth/set-password/page";
 import ResetPasswordSent from "~/routes/_auth.reset-password.sent";
+import { ButtonHandle } from "~/tests/handles/Button.handle";
+import { InputHandle } from "~/tests/handles/Input.handle";
+import { render, screen } from "~/tests/render";
+import { server } from "~/tests/server.mock";
+import { setupRoutes } from "~/tests/setup.tests";
+import type { RoutesProps} from "~/tests/setup.tests";
 import { handlers as registerHandlers } from "./register.handlers";
+import { handlers, notMatchHandler } from "./reset-password.handlers";
 
 describe("Reset password flow", () => {
   const setupServer = server([...handlers, ...registerHandlers]);

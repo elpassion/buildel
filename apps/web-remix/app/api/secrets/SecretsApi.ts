@@ -1,10 +1,11 @@
-import { fetchTyped } from "~/utils/fetch.server";
+import { z } from "zod";
+import type { fetchTyped } from "~/utils/fetch.server";
 import {
-  ICreateUpdateSecretSchema,
   SecretKeyListResponse,
   SecretKeyResponse,
 } from "./secrets.contracts";
-import { z } from "zod";
+import type {
+  ICreateUpdateSecretSchema} from "./secrets.contracts";
 
 export class SecretsApi {
   constructor(private client: typeof fetchTyped) {}

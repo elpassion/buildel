@@ -1,13 +1,14 @@
 import React from "react";
-import { test, describe } from "vitest";
-import { RoutesProps, setupRoutes } from "~/tests/setup.tests";
+import { describe, test } from "vitest";
+import { action } from "~/components/pages/auth/register/action.server";
+import { loader } from "~/components/pages/auth/register/loader.server";
+import { RegisterPage } from "~/components/pages/auth/register/page";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
 import { render, screen } from "~/tests/render";
 import { server } from "~/tests/server.mock";
-import { RegisterPage } from "~/components/pages/auth/register/page";
-import { loader } from "~/components/pages/auth/register/loader.server";
-import { action } from "~/components/pages/auth/register/action.server";
+import { setupRoutes } from "~/tests/setup.tests";
+import type { RoutesProps} from "~/tests/setup.tests";
 import { errorHandlers, handlers } from "./register.handlers";
 
 describe(RegisterPage.name, () => {

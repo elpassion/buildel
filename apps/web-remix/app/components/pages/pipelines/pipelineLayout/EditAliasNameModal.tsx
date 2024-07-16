@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
+import { withZod } from "@remix-validated-form/with-zod";
 import { ValidatedForm } from "remix-validated-form";
 import { Modal } from "@elpassion/taco/Modal";
-import { withZod } from "@remix-validated-form/with-zod";
+import { UpdateAliasSchema } from "~/api/pipeline/pipeline.contracts";
 import { Field, HiddenField } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
 import { SubmitButton } from "~/components/form/submit";
-import { IPipelineAlias } from "~/components/pages/pipelines/pipeline.types";
-import { UpdateAliasSchema } from "~/api/pipeline/pipeline.contracts";
+import type { IPipelineAlias } from "~/components/pages/pipelines/pipeline.types";
 
 interface EditAliasNameModalProps {
   isOpen: boolean;

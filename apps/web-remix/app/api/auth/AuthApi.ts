@@ -1,11 +1,12 @@
-import { fetchTyped } from "~/utils/fetch.server";
+import z from "zod";
+import type { fetchTyped } from "~/utils/fetch.server";
 import {
+  SignUpDisabledResponse
+} from "./auth.contracts";
+import type {
   ISignInSchema,
   ISignUpSchema,
-  SignUpDisabledResponse,
-  SignUpInvitation,
-} from "./auth.contracts";
-import z from "zod";
+  SignUpInvitation} from "./auth.contracts";
 
 export class AuthApi {
   constructor(private client: typeof fetchTyped) {}

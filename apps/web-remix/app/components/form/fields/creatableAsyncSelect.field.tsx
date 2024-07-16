@@ -1,40 +1,45 @@
-import React, {
+import type {
   FormEvent,
-  forwardRef,
   PropsWithChildren,
-  ReactNode,
+  ReactNode} from "react";
+import React, {
+  forwardRef,
   useCallback,
   useEffect,
   useState,
 } from "react";
 import { withZod } from "@remix-validated-form/with-zod";
-import { useControlField, ValidatedForm } from "remix-validated-form";
+import { ValidatedForm, useControlField } from "remix-validated-form";
 import { InputText, Label } from "@elpassion/taco";
-import { toSelectOption } from "~/components/form/fields/asyncSelect.field";
-import { asyncSelectApi, IAsyncSelectItem } from "~/api/AsyncSelectApi";
-import { successToast } from "~/components/toasts/successToast";
 import { Modal } from "@elpassion/taco/Modal";
-import { useModal } from "~/hooks/useModal";
+import { asyncSelectApi } from "~/api/AsyncSelectApi";
+import type { IAsyncSelectItem } from "~/api/AsyncSelectApi";
+import { toSelectOption } from "~/components/form/fields/asyncSelect.field";
 import {
   HiddenField,
   useFieldContext,
 } from "~/components/form/fields/field.context";
+import type {
+  AsyncSelectInputProps} from "~/components/form/inputs/select/select.input";
 import {
-  generateZODSchema,
-  JSONSchemaField,
-} from "~/components/form/schema/SchemaParser";
-import {
-  AsyncSelectInput,
-  AsyncSelectInputProps,
+  AsyncSelectInput
 } from "~/components/form/inputs/select/select.input";
-import { SubmitButton } from "../submit";
-import { FieldProps, Schema } from "~/components/form/schema/Schema";
+import type { FieldProps} from "~/components/form/schema/Schema";
+import { Schema } from "~/components/form/schema/Schema";
 import {
   ArrayField,
   BooleanField,
   NumberField,
   StringField,
 } from "~/components/form/schema/SchemaFields";
+import {
+  generateZODSchema
+} from "~/components/form/schema/SchemaParser";
+import type {
+  JSONSchemaField} from "~/components/form/schema/SchemaParser";
+import { successToast } from "~/components/toasts/successToast";
+import { useModal } from "~/hooks/useModal";
+import { SubmitButton } from "../submit";
 
 export interface CreatableAsyncSelectFieldProps
   extends Partial<AsyncSelectInputProps> {

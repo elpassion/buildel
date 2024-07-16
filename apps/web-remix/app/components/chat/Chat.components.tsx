@@ -1,8 +1,9 @@
-import React, { PropsWithChildren, useMemo } from "react";
-import { Icon } from "@elpassion/taco";
-import { IMessage } from "~/components/chat/chat.types";
-import { BuildelRunStatus } from "@buildel/buildel";
+import type { PropsWithChildren} from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
+import { Icon } from "@elpassion/taco";
+import type { IMessage } from "~/components/chat/chat.types";
+import type { BuildelRunStatus } from "@buildel/buildel";
 interface ChatCloseButtonProps {
   onClick: () => void;
 }

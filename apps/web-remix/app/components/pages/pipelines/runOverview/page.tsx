@@ -1,9 +1,9 @@
-import { MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { Builder } from "../Builder";
 import { CustomEdge } from "../CustomEdges/CustomEdge";
 import { ReadOnlyNode } from "./ReadOnlyNode";
-import { loader } from "./loader.server";
+import type { loader } from "./loader.server";
+import type { MetaFunction } from "@remix-run/node";
 
 export function PipelineRunOverview() {
   const { pipeline, pipelineRun } = useLoaderData<typeof loader>();

@@ -1,23 +1,24 @@
 import React from "react";
-import { test, describe, expect } from "vitest";
-import {
-  loaderWithSession,
-  RoutesProps,
-  setupRoutes,
-} from "~/tests/setup.tests";
-import { render, screen } from "~/tests/render";
-import { server } from "~/tests/server.mock";
-import { SecretListPage } from "~/components/pages/secrets/list/page";
-import { loader as secretsLoader } from "~/components/pages/secrets/list/loader.server";
+import { describe, expect, test } from "vitest";
 import { action as secretsAction } from "~/components/pages/secrets/list/action.server";
-import { NewSecret } from "~/components/pages/secrets/newSecret/page";
-import { loader as newSecretLoader } from "~/components/pages/secrets/newSecret/loader.server";
+import { loader as secretsLoader } from "~/components/pages/secrets/list/loader.server";
+import { SecretListPage } from "~/components/pages/secrets/list/page";
 import { action as newSecretAction } from "~/components/pages/secrets/newSecret/action.server";
-import { SecretsHandlers } from "~/tests/handlers/secret.handlers";
+import { loader as newSecretLoader } from "~/components/pages/secrets/newSecret/loader.server";
+import { NewSecret } from "~/components/pages/secrets/newSecret/page";
 import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
-import { ListHandle } from "~/tests/handles/List.handle";
+import { SecretsHandlers } from "~/tests/handlers/secret.handlers";
 import { ButtonHandle } from "~/tests/handles/Button.handle";
 import { InputHandle } from "~/tests/handles/Input.handle";
+import { ListHandle } from "~/tests/handles/List.handle";
+import { render, screen } from "~/tests/render";
+import { server } from "~/tests/server.mock";
+import {
+  loaderWithSession,
+  setupRoutes,
+} from "~/tests/setup.tests";
+import type {
+  RoutesProps} from "~/tests/setup.tests";
 
 const handlers = () => [
   ...new SecretsHandlers([

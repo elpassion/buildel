@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { IFile } from "~/components/fileUpload/fileUpload.types";
-import { TabGroup } from "~/components/tabs/TabGroup";
-import { RadioInput } from "~/components/form/inputs/radio.input";
-import { Tab } from "~/components/tabs/Tab";
 import { AudioRecorder } from "~/components/audioRecorder/AudioRecorder";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
+import type { IFile } from "~/components/fileUpload/fileUpload.types";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
+import { RadioInput } from "~/components/form/inputs/radio.input";
+import { Tab } from "~/components/tabs/Tab";
+import { TabGroup } from "~/components/tabs/TabGroup";
 import { useRunPipeline } from "../RunPipelineProvider";
 
 interface AudioFieldTabsProps {

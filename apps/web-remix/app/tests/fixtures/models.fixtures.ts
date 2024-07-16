@@ -1,4 +1,4 @@
-import { IAsyncSelectItem } from "~/api/AsyncSelectApi";
+import type { IAsyncSelectItem } from "~/api/AsyncSelectApi";
 
 export interface IFixtureAsyncSelectModel extends IAsyncSelectItem {
   type: string;

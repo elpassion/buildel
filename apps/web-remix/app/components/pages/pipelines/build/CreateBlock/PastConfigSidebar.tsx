@@ -1,21 +1,21 @@
-import { IBlockConfig } from "~/components/pages/pipelines/pipeline.types";
 import React, { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider";
-import z from "zod";
-import { withZod } from "@remix-validated-form/with-zod";
 import { useLoaderData } from "@remix-run/react";
-import { loader } from "~/components/pages/pipelines/build/loader.server";
-import { generateZODSchema } from "~/components/form/schema/SchemaParser";
+import { withZod } from "@remix-validated-form/with-zod";
 import { ValidatedForm } from "remix-validated-form";
+import { v4 as uuidv4 } from "uuid";
+import z from "zod";
+import { EditorField } from "~/components/form/fields/editor.field";
 import { Field as FormField } from "~/components/form/fields/field.context";
+import { generateZODSchema } from "~/components/form/schema/SchemaParser";
+import { SubmitButton } from "~/components/form/submit";
+import type { loader } from "~/components/pages/pipelines/build/loader.server";
+import type { IBlockConfig } from "~/components/pages/pipelines/pipeline.types";
+import { useRunPipeline } from "~/components/pages/pipelines/RunPipelineProvider";
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from "~/components/sidebar/ActionSidebar";
 import { usePasteConfig } from "./PasteBlockConfigProvider";
-import { SubmitButton } from "~/components/form/submit";
-import { EditorField } from "~/components/form/fields/editor.field";
 
 export function PasteBlockConfiguration({
   onSubmit,

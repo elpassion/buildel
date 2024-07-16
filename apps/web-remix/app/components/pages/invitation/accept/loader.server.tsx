@@ -1,11 +1,12 @@
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
-import { requireLogin } from "~/session.server";
-import { loaderBuilder } from "~/utils.server";
-import { OrganizationApi } from "~/api/organization/OrganizationApi";
+import { redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
+import { OrganizationApi } from "~/api/organization/OrganizationApi";
+import { requireLogin } from "~/session.server";
+import { ValidationError } from "~/utils/errors";
 import { routes } from "~/utils/routes.utils";
 import { setServerToast } from "~/utils/toast.server";
-import { ValidationError } from "~/utils/errors";
+import { loaderBuilder } from "~/utils.server";
+import type { LoaderFunctionArgs} from "@remix-run/node";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {

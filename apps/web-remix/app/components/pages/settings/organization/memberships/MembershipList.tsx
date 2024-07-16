@@ -1,6 +1,6 @@
-import { IMembership } from "~/components/pages/settings/organization/organization.types";
-import { ItemList } from "~/components/list/ItemList";
 import classNames from "classnames";
+import { ItemList } from "~/components/list/ItemList";
+import type { IMembership } from "~/components/pages/settings/organization/organization.types";
 
 interface MembershipListProps {
   memberships: IMembership[];

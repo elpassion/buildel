@@ -61,4 +61,4 @@ function DownloadButton({ blob }: { blob: Blob }) {
             <Icon iconName="download" size="xs" />
         </button>
     );
-};
+}

@@ -1,5 +1,5 @@
-import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
-import { IPipelineDetails } from "~/api/pipeline/pipeline.contracts";
+import type { IPipelineDetails } from "~/api/pipeline/pipeline.contracts";
+import type { IPipeline } from "~/components/pages/pipelines/pipeline.types";
 
 export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
   return {

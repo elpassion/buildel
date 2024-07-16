@@ -1,14 +1,14 @@
 import React from "react";
+import { useLoaderData } from "@remix-run/react";
 import { useFormContext } from "remix-validated-form";
+import { InputText } from "@elpassion/taco";
+import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
 import {
-  Field as FormField,
   Field,
+  Field as FormField,
 } from "~/components/form/fields/field.context";
 import { RadioField } from "~/components/form/fields/radio.field";
-import { InputText } from "@elpassion/taco";
-import { useLoaderData } from "@remix-run/react";
-import { loader } from "~/components/pages/knowledgeBase/newKnowledgeBase/loader.server";
-import { AsyncSelectField } from "~/components/form/fields/asyncSelect.field";
+import type { loader } from "~/components/pages/knowledgeBase/newKnowledgeBase/loader.server";
 
 interface ApiTypesRadioGroupFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

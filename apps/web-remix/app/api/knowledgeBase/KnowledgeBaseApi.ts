@@ -1,18 +1,19 @@
-import { fetchTyped } from "~/utils/fetch.server";
-import { buildUrlWithParams } from "~/utils/url";
+import { z } from 'zod';
+import type { PaginationQueryParams } from '~/components/pagination/usePagination';
+import type { fetchTyped } from '~/utils/fetch.server';
 import {
+  KnowledgeBaseCollectionCostResponse,
   KnowledgeBaseCollectionFromListResponse,
   KnowledgeBaseCollectionListResponse,
   KnowledgeBaseFileListResponse,
+  KnowledgeBaseSearchChunkResponse,
   MemoryChunksResponse,
+} from './knowledgeApi.contracts';
+import type {
   CreateCollectionSchema,
   UpdateCollectionSchema,
-  KnowledgeBaseSearchChunkResponse,
-  IKnowledgeBaseSearchChunk,
-  KnowledgeBaseCollectionCostResponse,
-} from "./knowledgeApi.contracts";
-import { PaginationQueryParams } from "~/components/pagination/usePagination";
-import { z } from "zod";
+} from './knowledgeApi.contracts';
+import { buildUrlWithParams } from '~/utils/url';
 
 type DateQueryParams = {
   start_date: string;
@@ -20,54 +21,54 @@ type DateQueryParams = {
 };
 
 export class KnowledgeBaseApi {
-  constructor(private client: typeof fetchTyped) { }
+  constructor(private client: typeof fetchTyped) {}
 
   async getCollections(organizationId: string | number) {
     return this.client(
       KnowledgeBaseCollectionListResponse,
-      `/organizations/${organizationId}/memory_collections`
+      `/organizations/${organizationId}/memory_collections`,
     );
   }
 
   async getCollectionByName(
     organizationId: string | number,
-    collectionName: string | number
+    collectionName: string | number,
   ) {
     return this.client(
       KnowledgeBaseCollectionFromListResponse,
-      `/organizations/${organizationId}/memory_collections?collection_name=${collectionName}`
+      `/organizations/${organizationId}/memory_collections?collection_name=${collectionName}`,
     );
   }
 
   async deleteCollection(
     organizationId: string | number,
-    collectionId: string | number
+    collectionId: string | number,
   ) {
     return this.client(
       z.any(),
       `/organizations/${organizationId}/memory_collections/${collectionId}`,
-      { method: "DELETE" }
+      { method: 'DELETE' },
     );
   }
 
   async getCollectionMemories(
     organizationId: string | number,
-    collectionId: string | number
+    collectionId: string | number,
   ) {
     return this.client(
       KnowledgeBaseFileListResponse,
-      `/organizations/${organizationId}/memory_collections/${collectionId}/memories`
+      `/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
     );
   }
 
   async getCollectionCosts(
     organizationId: string | number,
     collectionId: string | number,
-    pagination?: DateQueryParams & PaginationQueryParams
+    pagination?: DateQueryParams & PaginationQueryParams,
   ) {
     const url = buildUrlWithParams(
       `/organizations/${organizationId}/memory_collections/${collectionId}/costs`,
-      { ...pagination }
+      { ...pagination },
     );
 
     return this.client(KnowledgeBaseCollectionCostResponse, url);
@@ -76,11 +77,17 @@ export class KnowledgeBaseApi {
   async searchCollectionChunks(
     organizationId: string | number,
     collectionId: string | number,
-    params: { query?: string, limit?: number, token_limit?: number, extend_neighbors: string, extend_parents: string }
+    params: {
+      query?: string;
+      limit?: number;
+      token_limit?: number;
+      extend_neighbors: string;
+      extend_parents: string;
+    },
   ) {
     const urlWithParams = buildUrlWithParams(
       `/organizations/${organizationId}/memory_collections/${collectionId}/search`,
-      params
+      params,
     );
 
     return this.client(KnowledgeBaseSearchChunkResponse, urlWithParams);
@@ -89,35 +96,35 @@ export class KnowledgeBaseApi {
   async deleteCollectionMemory(
     organizationId: string | number,
     collectionId: string | number,
-    memoryId: string | number
+    memoryId: string | number,
   ) {
     return this.client(
       z.any(),
       `/organizations/${organizationId}/memory_collections/${collectionId}/memories/${memoryId}`,
-      { method: "DELETE" }
+      { method: 'DELETE' },
     );
   }
 
   async createCollection(
     organizationId: string | number,
-    data: z.TypeOf<typeof CreateCollectionSchema>
+    data: z.TypeOf<typeof CreateCollectionSchema>,
   ) {
     return this.client(
       z.any(),
       `/organizations/${organizationId}/memory_collections`,
-      { method: "POST", body: JSON.stringify(data) }
+      { method: 'POST', body: JSON.stringify(data) },
     );
   }
 
   async updateCollection(
     organizationId: string | number,
     collectionId: string | number,
-    data: z.TypeOf<typeof UpdateCollectionSchema>
+    data: z.TypeOf<typeof UpdateCollectionSchema>,
   ) {
     return this.client(
       z.any(),
       `/organizations/${organizationId}/memory_collections/${collectionId}`,
-      { method: "PUT", body: JSON.stringify(data) }
+      { method: 'PUT', body: JSON.stringify(data) },
     );
   }
 
@@ -125,11 +132,11 @@ export class KnowledgeBaseApi {
     organizationId: string | number,
     collectionId: string | number,
     memoryId: string | number,
-    pagination?: PaginationQueryParams
+    pagination?: PaginationQueryParams,
   ) {
     const url = buildUrlWithParams(
       `/organizations/${organizationId}/memory_collections/${collectionId}/memories/${memoryId}/chunks`,
-      { ...pagination }
+      { ...pagination },
     );
 
     return this.client(MemoryChunksResponse, url);

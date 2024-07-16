@@ -1,17 +1,17 @@
 import React, { useCallback } from "react";
 import { Button } from "@elpassion/taco";
 import {
-  IBlockConfig,
-  IField,
-} from "~/components/pages/pipelines/pipeline.types";
-import { IFile } from "~/components/fileUpload/fileUpload.types";
-import {
   KnowledgeBaseFileListResponse,
   KnowledgeBaseFileResponse,
 } from "~/api/knowledgeBase/knowledgeApi.contracts";
-import { TextareaInput } from "~/components/form/inputs/textarea.input";
 import { FileUpload } from "~/components/fileUpload/FileUpload";
+import type { IFile } from "~/components/fileUpload/fileUpload.types";
 import { FileUploadListPreview } from "~/components/fileUpload/FileUploadListPreview";
+import { TextareaInput } from "~/components/form/inputs/textarea.input";
+import type {
+  IBlockConfig,
+  IField,
+} from "~/components/pages/pipelines/pipeline.types";
 import { useRunPipeline, useRunPipelineNode } from "../RunPipelineProvider";
 import { AudioFieldTabs } from "./AudioFieldTabs";
 

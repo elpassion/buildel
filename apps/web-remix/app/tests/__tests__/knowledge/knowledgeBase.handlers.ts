@@ -1,17 +1,17 @@
-import { SecretsHandlers } from "~/tests/handlers/secret.handlers";
-import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
-import {
-  EmbeddingsHandlers,
-  ModelsHandlers,
-} from "~/tests/handlers/model.handlers";
-import { modelFixture } from "~/tests/fixtures/models.fixtures";
+import { collectionFixture } from "~/tests/fixtures/collection.fixtures";
+import { collectionMemoryFixtures } from "~/tests/fixtures/collectionMemory.fixtures";
 import { embeddingFixture } from "~/tests/fixtures/embedding.fixtures";
+import { modelFixture } from "~/tests/fixtures/models.fixtures";
+import { secretFixture } from "~/tests/fixtures/secrets.fixtures";
 import {
   CollectionHandlers,
   CollectionMemoriesHandlers,
 } from "~/tests/handlers/collection.handlers";
-import { collectionMemoryFixtures } from "~/tests/fixtures/collectionMemory.fixtures";
-import { collectionFixture } from "~/tests/fixtures/collection.fixtures";
+import {
+  EmbeddingsHandlers,
+  ModelsHandlers,
+} from "~/tests/handlers/model.handlers";
+import { SecretsHandlers } from "~/tests/handlers/secret.handlers";
 
 export const knowledgeBaseHandlers = () => [
   ...new SecretsHandlers([

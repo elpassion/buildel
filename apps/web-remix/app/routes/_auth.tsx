@@ -1,8 +1,9 @@
-import { json, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Outlet, useLoaderData } from "@remix-run/react";
-import { loaderBuilder } from "~/utils.server";
-import { getServerToast } from "~/utils/toast.server";
 import { useServerToasts } from "~/hooks/useServerToasts";
+import { getServerToast } from "~/utils/toast.server";
+import { loaderBuilder } from "~/utils.server";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 
 export async function loader(loaderArgs: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }) => {

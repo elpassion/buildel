@@ -1,12 +1,12 @@
 import React, { useState } from "react";
+import { useFetcher } from "@remix-run/react";
 import { Icon } from "@elpassion/taco";
+import { IconButton } from "~/components/iconButton";
 import { EmptyMessage, ItemList } from "~/components/list/ItemList";
 import { confirm } from "~/components/modal/confirm";
-import { IconButton } from "~/components/iconButton";
-import { EditSecretKeyModal } from "./EditSecretKeyModal";
-import { ISecretKeyList, ISecretKey } from "../variables.types";
-import { useFetcher } from "@remix-run/react";
 import { dayjs } from "~/utils/Dayjs";
+import { EditSecretKeyModal } from "./EditSecretKeyModal";
+import type { ISecretKey, ISecretKeyList } from "../variables.types";
 
 interface SecretKeyListProps {
   items: ISecretKeyList;

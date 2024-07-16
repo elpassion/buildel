@@ -1,18 +1,19 @@
 import React, { useCallback, useEffect, useMemo } from "react";
+import { useFetcher } from "@remix-run/react";
 import { withZod } from "@remix-validated-form/with-zod";
 import { ValidatedForm } from "remix-validated-form";
-import { useFetcher } from "@remix-run/react";
 import { Field } from "~/components/form/fields/field.context";
-import { IPipeline } from "~/components/pages/pipelines/pipeline.types";
-import { successToast } from "~/components/toasts/successToast";
 import { SubmitButton } from "~/components/form/submit";
+import type { IPipeline } from "~/components/pages/pipelines/pipeline.types";
+import { successToast } from "~/components/toasts/successToast";
 import { routes } from "~/utils/routes.utils";
 import { BudgetLimitField } from "./BudgetLimitField";
 import { LogsToggleField } from "./LogsToggleField";
 import {
-  UpdatePipelineSettingsSchema,
   updatePipelineSettingsSchema,
 } from "./schema";
+import type {
+  UpdatePipelineSettingsSchema} from "./schema";
 
 interface EditPipelineSettingsFormProps {
   defaultValues: IPipeline;

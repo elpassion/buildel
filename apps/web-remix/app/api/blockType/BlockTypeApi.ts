@@ -1,5 +1,6 @@
-import { fetchTyped } from "~/utils/fetch.server";
-import { BlockTypesResponse, IBlockTypesResponse } from "./blockType.contracts";
+import type { fetchTyped } from "~/utils/fetch.server";
+import { BlockTypesResponse } from "./blockType.contracts";
+import type { IBlockTypesResponse } from "./blockType.contracts";
 
 let cache: undefined | IBlockTypesResponse = undefined;
 

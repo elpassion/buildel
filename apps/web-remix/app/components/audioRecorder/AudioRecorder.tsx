@@ -1,12 +1,13 @@
 import React, { useCallback, useRef, useState } from "react";
-import { Icon } from "@elpassion/taco";
 import classNames from "classnames";
-import { useAudioVisualize } from "~/components/audioRecorder/useAudioVisualize";
-import {
-  useAudioRecorder,
+import { Icon } from "@elpassion/taco";
+import type {
   UseAudioRecorderCb,
-  UseAudioRecorderProps,
+  UseAudioRecorderProps} from "~/components/audioRecorder/useAudioRecorder";
+import {
+  useAudioRecorder
 } from "~/components/audioRecorder/useAudioRecorder";
+import { useAudioVisualize } from "~/components/audioRecorder/useAudioVisualize";
 
 export type MediaRecorderState = "inactive" | "recording";
 

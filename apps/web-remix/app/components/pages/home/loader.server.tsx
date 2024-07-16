@@ -1,9 +1,10 @@
-import { LoaderFunctionArgs, redirect } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { OrganizationApi } from "~/api/organization/OrganizationApi";
 import { requireLogin } from "~/session.server";
-import { loaderBuilder } from "~/utils.server";
 import { routes } from "~/utils/routes.utils";
 import { getOrganizationId } from "~/utils/toast.server";
-import { OrganizationApi } from "~/api/organization/OrganizationApi";
+import { loaderBuilder } from "~/utils.server";
+import type { LoaderFunctionArgs} from "@remix-run/node";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {

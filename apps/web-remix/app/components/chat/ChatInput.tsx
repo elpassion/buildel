@@ -1,7 +1,7 @@
-import { Icon } from "@elpassion/taco";
-import classNames from "classnames";
 import React, { useMemo, useRef, useState } from "react";
+import classNames from "classnames";
 import { useBoolean, useIsomorphicLayoutEffect } from "usehooks-ts";
+import { Icon } from "@elpassion/taco";
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
