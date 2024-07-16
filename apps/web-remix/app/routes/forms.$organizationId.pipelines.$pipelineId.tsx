@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { loaderBuilder } from "~/utils.server";
 import invariant from "tiny-invariant";
@@ -7,17 +7,19 @@ import { PipelineApi } from "~/api/pipeline/PipelineApi";
 import { UnauthorizedError } from "~/utils/errors";
 import { IPipelinePublicResponse } from "~/api/pipeline/pipeline.contracts";
 import { ParsedResponse } from "~/utils/fetch.server";
-import { useFormInterface } from "~/components/formInterface/useFormInterface";
 import { ValidatedForm } from "remix-validated-form";
 import { withZod } from "@remix-validated-form/with-zod";
 import { z } from "zod";
 import { SubmitButton } from "~/components/form/submit";
 import { Field } from "~/components/form/fields/field.context";
 import { TextInputField } from "~/components/form/fields/text.field";
-import { NodeClearButton, NodeCopyButton, NodeDownloadButton } from "~/components/pages/pipelines/CustomNodes/NodeActionButtons";
+import {
+  NodeClearButton,
+  NodeCopyButton,
+  NodeDownloadButton,
+} from "~/components/pages/pipelines/CustomNodes/NodeActionButtons";
 import { ChatMarkdown } from "~/components/chat/ChatMarkdown";
 import { SmallFileInputField } from "~/components/form/fields/file.field";
-import { ChatStatus } from "~/components/chat/Chat.components";
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -36,7 +38,7 @@ export async function loader(args: LoaderFunctionArgs) {
     if (!pipeline) {
       pipeline = await pipelineApi.getPublicPipeline(
         params.organizationId,
-        params.pipelineId,
+        params.pipelineId
       );
     }
 
@@ -64,15 +66,15 @@ export default function WebsiteForm() {
 
     const inputs = Object.entries(data)
       .filter(([blockName, value]) => {
-        if (!value) return false
-        if (typeof value !== "string" && !files[blockName]) return false
-        return true
+        if (!value) return false;
+        if (typeof value !== "string" && !files[blockName]) return false;
+        return true;
       })
       .map(([key, value]) => ({
         name: key,
         input: "input",
-        value: value
-      }))
+        value: value,
+      }));
 
     const response = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs`,
@@ -82,7 +84,7 @@ export default function WebsiteForm() {
         headers: {
           "content-type": "application/json",
         },
-      },
+      }
     );
     const {
       data: { id },
@@ -93,7 +95,10 @@ export default function WebsiteForm() {
     inputs.forEach((input, index) => {
       formData.append(`initial_inputs[${index}][block_name]`, input.name);
       formData.append(`initial_inputs[${index}][input_name]`, input.input);
-      formData.append(`initial_inputs[${index}][data]`, input.value as string | File);
+      formData.append(
+        `initial_inputs[${index}][data]`,
+        input.value as string | File
+      );
     });
 
     pipeline.interface_config.form.outputs.forEach((output, index) => {
@@ -106,8 +111,7 @@ export default function WebsiteForm() {
       {
         method: "POST",
         body: formData,
-
-      },
+      }
     );
 
     const runResponseData = await runResponse.json();
@@ -115,17 +119,19 @@ export default function WebsiteForm() {
     runResponseData.outputs.forEach((output: any) => {
       setOutputs((prev) => ({
         ...prev,
-        [output.block_name]: prev[output.block_name] ? prev[output.block_name] + output.data : output.data,
+        [output.block_name]: prev[output.block_name]
+          ? prev[output.block_name] + output.data
+          : output.data,
       }));
-    })
+    });
 
     await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/stop`,
       {
         method: "POST",
-      },
-    )
-  }
+      }
+    );
+  };
 
   return (
     <div className="flex justify-center items-center h-screen h-screen w-full">
@@ -137,15 +143,11 @@ export default function WebsiteForm() {
           className="w-full"
         >
           <div className="flex flex-col items-start w-full gap-5">
-            {pipeline.interface_config.form.inputs.map(input => {
-
+            {pipeline.interface_config.form.inputs.map((input) => {
               return (
                 <Field name={input.name} key={input.name}>
                   {input.type === "text_input" && (
-                    <TextInputField
-                      className="w-full"
-                      label={input.name}
-                    />
+                    <TextInputField className="w-full" label={input.name} />
                   )}
                   {input.type === "file_input" && (
                     <div className="flex text-white justify-start items-center gap-2 bg-neutral-800 rounded-lg w-full">
@@ -153,39 +155,35 @@ export default function WebsiteForm() {
                         multiple={false}
                         buttonText={input.name}
                         onChange={async (e) => {
-                          const file = e.target.files?.[0]
-                          if (!file) return
+                          const file = e.target.files?.[0];
+                          if (!file) return;
 
-                          setFiles(prev => ({
+                          setFiles((prev) => ({
                             ...prev,
-                            [input.name]: file
-                          }))
+                            [input.name]: file,
+                          }));
                         }}
                       />
                       <p>{files[input.name]?.name}</p>
                     </div>
                   )}
                 </Field>
-              )
+              );
             })}
-
           </div>
 
           <SubmitButton size="sm" variant="filled" className="mt-6 mb-6">
             Submit
           </SubmitButton>
 
-          {
-            pipeline.interface_config.form.outputs.map(output => (
-              <FormInterfaceOutput
-                key={output.name}
-                blockName={output.name}
-                blockType={output.type}
-                payload={outputs[output.name]}
-              />
-            ))
-          }
-
+          {pipeline.interface_config.form.outputs.map((output) => (
+            <FormInterfaceOutput
+              key={output.name}
+              blockName={output.name}
+              blockType={output.type}
+              payload={outputs[output.name]}
+            />
+          ))}
         </ValidatedForm>
       </div>
       <div id="_root"></div>
@@ -193,7 +191,15 @@ export default function WebsiteForm() {
   );
 }
 
-export function FormInterfaceOutput({ payload, blockName, blockType }: { payload: string, blockName: string, blockType: string }) {
+export function FormInterfaceOutput({
+  payload,
+  blockName,
+  blockType,
+}: {
+  payload: string;
+  blockName: string;
+  blockType: string;
+}) {
   return (
     <div>
       <div className="mb-1 flex gap-1">
@@ -201,11 +207,11 @@ export function FormInterfaceOutput({ payload, blockName, blockType }: { payload
 
         <NodeDownloadButton blockName={blockName} text={payload} />
 
-        <NodeClearButton onClear={() => { }} />
+        <NodeClearButton onClear={() => {}} />
       </div>
       <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
         <ChatMarkdown>{payload ?? ""}</ChatMarkdown>
       </div>
     </div>
-  )
+  );
 }
