@@ -371,7 +371,7 @@ defmodule Buildel.VectorDB.EctoAdapter do
     embedding_column = "embedding_#{embedding_size}" |> String.to_atom()
 
     embeddings_query =
-      if supports_halfvec?(),
+      if supports_halfvec?() && embedding_size == 3072,
         do:
           from(c in Chunk,
             where:
