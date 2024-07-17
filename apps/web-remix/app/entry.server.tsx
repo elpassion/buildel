@@ -10,6 +10,7 @@ import type {
   ActionFunctionArgs,
   DataFunctionArgs,
   EntryContext,
+  HandleDocumentRequestFunction,
   LoaderFunctionArgs,
 } from '@remix-run/node';
 import { RemixServer } from '@remix-run/react';
@@ -17,6 +18,8 @@ import * as Sentry from '@sentry/remix';
 import etag from 'etag';
 import isbot from 'isbot';
 import { PassThrough } from 'node:stream';
+
+import { NonceProvider } from '~/utils/nonce-provider';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -31,23 +34,32 @@ export function handleError(error: unknown, { request }: DataFunctionArgs) {
 const ABORT_DELAY = 5_000;
 
 export default function handleRequest(
-  request: Request,
-  responseStatusCode: number,
-  responseHeaders: Headers,
-  remixContext: EntryContext,
+  ...args: Parameters<HandleDocumentRequestFunction>
 ) {
+  const [
+    request,
+    responseStatusCode,
+    responseHeaders,
+    remixContext,
+    loadContext,
+  ] = args;
+
+  const nonce = (loadContext.cspNonce ?? '') as string;
+
   return isbot(request.headers.get('user-agent'))
     ? handleBotRequest(
         request,
         responseStatusCode,
         responseHeaders,
         remixContext,
+        nonce,
       )
     : handleBrowserRequest(
         request,
         responseStatusCode,
         responseHeaders,
         remixContext,
+        nonce,
       );
 }
 
@@ -56,15 +68,18 @@ function handleBotRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
+  nonce: string,
 ) {
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const { pipe, abort } = renderToPipeableStream(
-      <RemixServer
-        context={remixContext}
-        url={request.url}
-        abortDelay={ABORT_DELAY}
-      />,
+      <NonceProvider value={nonce}>
+        <RemixServer
+          context={remixContext}
+          url={request.url}
+          abortDelay={ABORT_DELAY}
+        />
+      </NonceProvider>,
       {
         onAllReady() {
           shellRendered = true;
@@ -105,15 +120,18 @@ function handleBrowserRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   remixContext: EntryContext,
+  nonce: string,
 ) {
   return new Promise((resolve, reject) => {
     let shellRendered = false;
     const { pipe, abort } = renderToPipeableStream(
-      <RemixServer
-        context={remixContext}
-        url={request.url}
-        abortDelay={ABORT_DELAY}
-      />,
+      <NonceProvider value={nonce}>
+        <RemixServer
+          context={remixContext}
+          url={request.url}
+          abortDelay={ABORT_DELAY}
+        />
+      </NonceProvider>,
       {
         onShellReady() {
           shellRendered = true;

@@ -16,6 +16,7 @@ import './tailwind.css';
 import { ErrorBoundaryLayout } from '~/components/errorBoundaries/ErrorBoundaryLayout';
 import { RootErrorBoundary } from '~/components/errorBoundaries/RootErrorBoundary';
 import { PageProgress } from '~/components/progressBar/PageProgress';
+import { useNonce } from '~/utils/nonce-provider';
 
 Modal.setAppElement('#_root');
 
@@ -36,7 +37,13 @@ export const links: LinksFunction = () => [
   },
 ];
 
-function App() {
+function Document({
+  children,
+  nonce,
+}: {
+  children: React.ReactNode;
+  nonce: string;
+}) {
   return (
     <html lang="en">
       <head>
@@ -45,27 +52,39 @@ function App() {
         <Meta />
         <Links />
         <script
+          nonce={nonce}
           defer
           data-domain="app.buildel.ai"
           src="/statistics/script.js"
         ></script>
       </head>
       <body className="bg-neutral-950">
-        <Toaster />
-        <PageProgress />
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
+        {children}
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
       </body>
     </html>
+  );
+}
+
+function App() {
+  const nonce = useNonce();
+
+  return (
+    <Document nonce={nonce}>
+      <Toaster />
+      <PageProgress />
+      <Outlet />
+    </Document>
   );
 }
 
 export default withSentry(App);
 
 export function ErrorBoundary() {
+  const nonce = useNonce();
   return (
-    <ErrorBoundaryLayout className="bg-neutral-950 text-white">
+    <ErrorBoundaryLayout nonce={nonce} className="bg-neutral-950 text-white">
       <RootErrorBoundary />
     </ErrorBoundaryLayout>
   );

@@ -9,8 +9,8 @@ import {
 } from '@remix-run/react';
 
 export const ErrorBoundaryLayout: React.FC<
-  PropsWithChildren<{ className?: string }>
-> = ({ children, className }) => {
+  PropsWithChildren<{ className?: string; nonce: string }>
+> = ({ children, nonce, className }) => {
   const error = useRouteError();
   const getTitle = () => {
     if (isRouteErrorResponse(error)) {
@@ -27,7 +27,7 @@ export const ErrorBoundaryLayout: React.FC<
       </head>
       <body className={className}>
         {children}
-        <Scripts />
+        <Scripts nonce={nonce} />
       </body>
     </html>
   );
