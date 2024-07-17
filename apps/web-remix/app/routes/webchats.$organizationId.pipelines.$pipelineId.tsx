@@ -76,7 +76,7 @@ export default function WebsiteChat() {
     output:
       pipeline.interface_config.webchat.outputs.filter(
         (output) => output.type === 'text_output',
-      )[0].name ?? '',
+      )[0]?.name ?? '',
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
     useAuth: !(pipeline.interface_config.webchat.public ?? false),
