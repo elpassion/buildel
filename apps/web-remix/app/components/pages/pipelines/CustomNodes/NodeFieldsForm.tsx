@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { Button } from '@elpassion/taco';
 
 import {
   KnowledgeBaseFileListResponse,
@@ -13,6 +12,7 @@ import type {
   IBlockConfig,
   IField,
 } from '~/components/pages/pipelines/pipeline.types';
+import { Button } from '~/components/ui/button';
 
 import { useRunPipeline, useRunPipelineNode } from '../RunPipelineProvider';
 import { AudioFieldTabs } from './AudioFieldTabs';
@@ -342,9 +342,9 @@ export function NodeFieldsForm({
         <Button
           aria-label={`Send message from: ${blockName}`}
           type="submit"
-          size="xs"
+          size="xxs"
           disabled={status !== 'running'}
-          className="!text-xs mt-2"
+          className=" mt-2"
           isFluid
         >
           Send

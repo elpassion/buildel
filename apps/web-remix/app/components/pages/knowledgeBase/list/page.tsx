@@ -7,7 +7,6 @@ import {
   useMatch,
   useNavigate,
 } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
@@ -15,6 +14,7 @@ import {
   ActionSidebar,
   ActionSidebarHeader,
 } from '~/components/sidebar/ActionSidebar';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import { KnowledgeBaseCollectionList } from './KnowledgeBaseCollectionList';

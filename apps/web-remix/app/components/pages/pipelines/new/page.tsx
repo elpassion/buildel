@@ -36,9 +36,7 @@ export function NewPipelinePage() {
 
         <HiddenField name="pipeline.config.blocks" value={'[]'} />
       </div>
-      <SubmitButton size="sm" hierarchy="primary">
-        Create workflow
-      </SubmitButton>
+      <SubmitButton size="sm">Create workflow</SubmitButton>
     </ValidatedForm>
   );
 }

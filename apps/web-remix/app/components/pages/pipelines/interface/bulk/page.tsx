@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/react';
-import { Button, Icon, IconButton } from '@elpassion/taco';
+import { Icon, IconButton } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
 import Papa from 'papaparse';
 import { ValidatedForm } from 'remix-validated-form';
@@ -17,6 +17,7 @@ import {
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
 } from '~/components/interfaces/InterfaceSection';
+import { Button } from '~/components/ui/button';
 
 import type { IBlockConfig } from '../../pipeline.types';
 import { BulkTable } from './BulkTable';

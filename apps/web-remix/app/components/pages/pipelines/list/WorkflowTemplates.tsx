@@ -80,8 +80,8 @@ function WorkflowTemplatesListItem({ item }: ITemplateItem) {
       <HiddenField name="template_name" value={item.template_name} />
 
       <SubmitButton
-        size="xs"
-        className="opacity-0 group-hover:opacity-100"
+        size="xxs"
+        className="!opacity-0 group-hover:!opacity-100"
         aria-label={`Create workflow: ${item.name}`}
       >
         <div className="flex gap-1 items-center">

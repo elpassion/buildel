@@ -6,7 +6,6 @@ import {
   useNavigate,
   useRevalidator,
 } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
 
 import { FileUpload } from '~/components/fileUpload/FileUpload';
 import type { IFileUpload } from '~/components/fileUpload/fileUpload.types';
@@ -14,6 +13,7 @@ import { FileUploadListPreview } from '~/components/fileUpload/FileUploadListPre
 import { ActionSidebarHeader } from '~/components/sidebar/ActionSidebar';
 import { errorToast } from '~/components/toasts/errorToast';
 import { loadingToast } from '~/components/toasts/loadingToast';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -219,7 +219,7 @@ export function NewCollectionFilesPage() {
           />
         </div>
         <Button
-          ariaLabel="Upload knowledge items"
+          aria-label="Upload knowledge items"
           isFluid
           size="sm"
           disabled={!items.length || isUploading}

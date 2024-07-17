@@ -89,9 +89,7 @@ export function NewKnowledgeBasePage() {
           />
         </Field>
       </div>
-      <SubmitButton hierarchy="primary" size="sm">
-        Create collection
-      </SubmitButton>
+      <SubmitButton size="sm">Create collection</SubmitButton>
     </ValidatedForm>
   );
 }

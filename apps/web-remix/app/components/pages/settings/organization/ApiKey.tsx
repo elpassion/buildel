@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
 import classNames from 'classnames';
 
 import { TextInput } from '~/components/form/inputs/text.input';
 import { confirm } from '~/components/modal/confirm';
+import { Button } from '~/components/ui/button';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 
 import type { IAPIKey } from './organization.types';
@@ -38,9 +38,9 @@ export const ApiKey: React.FC<ApiKeyProps> = ({ apiKey }) => {
   };
 
   return (
-    <section className="text-white">
-      <h2 className="text-lg">API Key</h2>
-      <p className="text-xs">
+    <section>
+      <h2 className="text-lg text-white">API Key</h2>
+      <p className="text-xs text-white">
         This is your workspace API key. It's required in order to use the Sync
         API endpoints and authorize webhooks.
       </p>
@@ -65,7 +65,6 @@ export const ApiKey: React.FC<ApiKeyProps> = ({ apiKey }) => {
 
         <Button
           size="xs"
-          variant="outlined"
           className="!h-[42px] !w-fit"
           isLoading={fetcher.state !== 'idle'}
           onClick={handleGenerate}
@@ -86,8 +85,7 @@ function CopyButton({ onClick, isCopied, disabled }: CopyButtonProps) {
   return (
     <Button
       type="button"
-      variant="outlined"
-      hierarchy="secondary"
+      variant="outline"
       size="xs"
       disabled={disabled}
       onClick={onClick}

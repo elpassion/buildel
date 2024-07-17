@@ -173,7 +173,7 @@ export default function WebsiteForm() {
             })}
           </div>
 
-          <SubmitButton size="sm" variant="filled" className="mt-6 mb-6">
+          <SubmitButton size="sm" className="mt-6 mb-6">
             Submit
           </SubmitButton>
 

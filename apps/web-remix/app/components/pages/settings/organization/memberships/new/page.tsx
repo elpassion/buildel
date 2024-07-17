@@ -29,9 +29,7 @@ export function NewMembershipPage() {
           />
         </Field>
       </div>
-      <SubmitButton size="sm" hierarchy="primary">
-        Invite member
-      </SubmitButton>
+      <SubmitButton size="sm">Invite member</SubmitButton>
     </ValidatedForm>
   );
 }

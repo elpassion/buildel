@@ -132,9 +132,8 @@ export function SettingsConfigurationPage() {
       <SubmitButton
         isFluid
         size="sm"
-        variant="filled"
         className="mt-6"
-        ariaLabel="Save configuration"
+        aria-label="Save configuration"
       >
         Save
       </SubmitButton>

@@ -9,7 +9,7 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react';
-import { Avatar, Button, Icon, IconButton } from '@elpassion/taco';
+import { Avatar, Icon, IconButton } from '@elpassion/taco';
 import classNames from 'classnames';
 import type { MenuInfo } from 'rc-menu/es/interface';
 import { ClientOnly } from 'remix-utils/client-only';
@@ -26,6 +26,7 @@ import {
   NavSidebarContext,
   SidebarLink,
 } from '~/components/sidebar/NavSidebar';
+import { Button } from '~/components/ui/button';
 import { useServerToasts } from '~/hooks/useServerToasts';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';

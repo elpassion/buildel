@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from '@elpassion/taco';
 import classNames from 'classnames';
 
 import { KnowledgeBaseFileResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { Button } from '~/components/ui/button';
 import { assert } from '~/utils/assert';
 
 import type { IFile, IFileUpload, IPreviewProps } from './fileUpload.types';
@@ -133,7 +133,7 @@ export function FileUpload({
         <Button
           onClick={handleSelectFiles}
           size="xs"
-          variant="outlined"
+          variant="outline"
           className="!text-xs"
           disabled={disabled}
           isFluid

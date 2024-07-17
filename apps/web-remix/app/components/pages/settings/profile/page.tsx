@@ -6,12 +6,12 @@ import {
   useMatch,
   useNavigate,
 } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
 
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from '~/components/sidebar/ActionSidebar';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import {

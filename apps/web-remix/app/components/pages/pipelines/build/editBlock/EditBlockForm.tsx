@@ -335,8 +335,7 @@ export function EditBlockForm({
       <SubmitButton
         isFluid
         size="sm"
-        variant="filled"
-        className="mt-6"
+        className="mt-6 py-1.5"
         disabled={disabled}
       >
         Save changes

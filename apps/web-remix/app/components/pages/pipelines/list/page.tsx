@@ -7,13 +7,13 @@ import {
   useMatch,
   useNavigate,
 } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from '~/components/sidebar/ActionSidebar';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -51,7 +51,6 @@ export function PipelinesPage() {
         />
         <Outlet />
       </ActionSidebar>
-
       <PageContentWrapper className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_400px]">
         {pipelines.data.length > 0 ? (
           <>

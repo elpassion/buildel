@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Button, Icon, IconButton } from '@elpassion/taco';
+import { Icon, IconButton } from '@elpassion/taco';
 import { useFieldArray, useFormContext } from 'remix-validated-form';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
@@ -11,6 +11,7 @@ import {
   ResettableTextInputField,
 } from '~/components/form/fields/text.field';
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
+import { Button } from '~/components/ui/button';
 import { assert } from '~/utils/assert';
 
 import { Field } from './Schema';
@@ -231,8 +232,8 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
       ))}
       <Button
         type="button"
-        size="xs"
-        hierarchy="secondary"
+        size="xxs"
+        variant="secondary"
         onClick={() => push({})}
         className="mt-2"
       >

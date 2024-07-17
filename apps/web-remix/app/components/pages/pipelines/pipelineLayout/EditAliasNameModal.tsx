@@ -52,11 +52,7 @@ export const EditAliasNameModal: React.FC<EditAliasNameModalProps> = ({
             <TextInputField label="Name" data-testid="alias-name" />
           </Field>
 
-          <SubmitButton
-            size="sm"
-            hierarchy="primary"
-            className="mt-6 ml-auto mr-0"
-          >
+          <SubmitButton size="sm" className="mt-6 ml-auto mr-0">
             Save
           </SubmitButton>
         </ValidatedForm>

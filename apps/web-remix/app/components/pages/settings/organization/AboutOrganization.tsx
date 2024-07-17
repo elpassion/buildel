@@ -103,9 +103,7 @@ function EditOrganizationName({ organization }: EditOrganizationNameProps) {
               />
             </Field>
 
-            <SubmitButton size="lg" className="mt-4 ml-auto mr-0">
-              Save
-            </SubmitButton>
+            <SubmitButton className="mt-4 ml-auto mr-0">Save</SubmitButton>
           </ValidatedForm>
         </div>
       </Modal>

@@ -91,7 +91,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
         </Field>
       </div>
 
-      <SubmitButton size="sm" variant="filled" className="mt-6">
+      <SubmitButton size="sm" className="mt-6">
         Save changes
       </SubmitButton>
     </ValidatedForm>

@@ -39,9 +39,7 @@ export function ChangePasswordPage() {
           </p>
         </SectionContent>
       </Section>
-      <SubmitButton size="sm" hierarchy="primary">
-        Change password
-      </SubmitButton>
+      <SubmitButton size="sm">Change password</SubmitButton>
     </ValidatedForm>
   );
 }

@@ -138,13 +138,7 @@ export function PasteBlockConfigurationForm({
         </FormField>
       </div>
 
-      <SubmitButton
-        isFluid
-        size="sm"
-        variant="filled"
-        className="mt-6"
-        disabled={disabled}
-      >
+      <SubmitButton isFluid size="sm" className="mt-6" disabled={disabled}>
         Add block
       </SubmitButton>
     </ValidatedForm>

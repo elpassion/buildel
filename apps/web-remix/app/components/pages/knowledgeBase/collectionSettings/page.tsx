@@ -77,9 +77,7 @@ export function CollectionSettingsPage() {
               <SecretSelectField />
             </div>
           </div>
-          <SubmitButton hierarchy="primary" size="sm">
-            Update collection
-          </SubmitButton>
+          <SubmitButton size="sm">Update collection</SubmitButton>
         </ValidatedForm>
       </SectionContent>
     </>

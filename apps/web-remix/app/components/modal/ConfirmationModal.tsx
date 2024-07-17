@@ -1,8 +1,9 @@
 import React from 'react';
 import type { ModalProps } from '@elpassion/taco';
-import { Button } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import classNames from 'classnames';
+
+import { Button } from '~/components/ui/button';
 
 export interface ConfirmationModalProps extends ModalProps {
   onConfirm?: () => Promise<void>;
@@ -41,14 +42,18 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       {children}
 
       <div className="flex gap-2 justify-end">
-        <Button size="md" type="button" variant="ghost" onClick={handleCancel}>
+        <Button
+          size="sm"
+          type="button"
+          variant="outline"
+          onClick={handleCancel}
+        >
           {cancelText}
         </Button>
         <Button
           type="submit"
-          size="md"
-          variant="filled"
-          hierarchy="destructive"
+          size="sm"
+          variant="destructive"
           onClick={handleConfirm}
         >
           {confirmText}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
+
+import { Button } from '~/components/ui/button';
 
 export const DocumentationCTA: React.FC = () => {
   return (
@@ -10,7 +11,7 @@ export const DocumentationCTA: React.FC = () => {
       </h3>
 
       <Link to="https://docs.buildel.ai/docs/intro" target="_blank">
-        <Button hierarchy="secondary" tabIndex={-1}>
+        <Button variant="secondary" tabIndex={-1}>
           Documentation
         </Button>
       </Link>

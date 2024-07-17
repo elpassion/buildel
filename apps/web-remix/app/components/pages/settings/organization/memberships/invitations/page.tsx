@@ -6,12 +6,12 @@ import {
   useMatch,
   useNavigate,
 } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
 
 import {
   ActionSidebar,
   ActionSidebarHeader,
 } from '~/components/sidebar/ActionSidebar';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import { InvitationsList } from './InvitationsList';
@@ -49,7 +49,7 @@ export function InvitationsPage() {
           to={routes.organizationInvitationsNew(organizationId)}
           className="block w-fit"
         >
-          <Button tabIndex={0} size="sm">
+          <Button tabIndex={0} size="xs">
             New Member
           </Button>
         </Link>

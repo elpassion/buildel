@@ -7,7 +7,7 @@ import {
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import { Button, Icon } from '@elpassion/taco';
+import { Icon } from '@elpassion/taco';
 
 import { confirm } from '~/components/modal/confirm';
 import { AppNavbar } from '~/components/navbar/AppNavbar';
@@ -15,6 +15,7 @@ import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
 import { TabGroup } from '~/components/tabs/TabGroup';
 import { successToast } from '~/components/toasts/successToast';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -113,12 +114,7 @@ export function PipelineRunLayout() {
               </FilledTabLink>
             </FilledTabsWrapper>
 
-            <Button
-              size="xs"
-              hierarchy="primary"
-              variant="outlined"
-              onClick={handleRestoreRun}
-            >
+            <Button size="xxs" variant="ghost" onClick={handleRestoreRun}>
               Convert as latest
             </Button>
           </div>

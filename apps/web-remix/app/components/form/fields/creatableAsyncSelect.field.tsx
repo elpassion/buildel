@@ -215,13 +215,7 @@ export function CreatableAsyncForm({
         }}
       />
 
-      <SubmitButton
-        size="sm"
-        variant="filled"
-        className="mt-6"
-        isFluid
-        aria-label="create new"
-      >
+      <SubmitButton isFluid size="sm" className="mt-6" aria-label="create new">
         Create new
       </SubmitButton>
     </ValidatedForm>

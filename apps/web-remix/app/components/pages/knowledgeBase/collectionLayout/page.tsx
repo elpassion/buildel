@@ -1,13 +1,13 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Link, Outlet, useLoaderData, useMatch } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { AppNavbar } from '~/components/navbar/AppNavbar';
 import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
 import { TabGroup } from '~/components/tabs/TabGroup';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
