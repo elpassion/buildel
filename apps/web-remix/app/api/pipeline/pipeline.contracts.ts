@@ -54,6 +54,37 @@ export const InterfaceConfig = z.object({
   }),
 });
 
+export const SafeInterfaceConfig = z
+  .union([InterfaceConfig, z.null()])
+  .transform((c) =>
+    c
+      ? c
+      : {
+          webchat: {
+            inputs: [],
+            outputs: [],
+            public: false,
+          },
+          form: {
+            inputs: [],
+            outputs: [],
+            public: false,
+          },
+        },
+  )
+  .default({
+    webchat: {
+      inputs: [],
+      outputs: [],
+      public: false,
+    },
+    form: {
+      inputs: [],
+      outputs: [],
+      public: false,
+    },
+  });
+
 export const Pipeline = z.object({
   id: z.number(),
   name: z.string(),
@@ -61,25 +92,7 @@ export const Pipeline = z.object({
   runs_count: z.number(),
   budget_limit: z.union([zfd.numeric(), z.null()]),
   logs_enabled: z.boolean(),
-  interface_config: z
-    .union([InterfaceConfig, z.null()])
-    .transform((c) =>
-      c
-        ? c
-        : {
-            webchat: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
-            form: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
-          },
-    )
-    .default({}),
+  interface_config: SafeInterfaceConfig,
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),
@@ -90,36 +103,7 @@ export const Pipeline = z.object({
 export const PipelinePublic = z.object({
   id: z.number(),
   name: z.string(),
-  interface_config: z
-    .union([InterfaceConfig, z.null()])
-    .transform((c) =>
-      c
-        ? c
-        : {
-            webchat: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
-            form: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
-          },
-    )
-    .default({
-      webchat: {
-        inputs: [],
-        outputs: [],
-        public: false,
-      },
-      form: {
-        inputs: [],
-        outputs: [],
-        public: false,
-      },
-    }),
+  interface_config: SafeInterfaceConfig,
 });
 
 export const ExtendedPipeline = z.object({
@@ -127,7 +111,7 @@ export const ExtendedPipeline = z.object({
   name: z.string(),
   organization_id: z.number(),
   runs_count: z.number(),
-  interface_config: z.union([InterfaceConfig, z.null()]),
+  interface_config: SafeInterfaceConfig,
   config: z.object({
     version: z.string(),
     blocks: z.array(ExtendedBlockConfig),
@@ -143,36 +127,7 @@ export const Alias = z.object({
     blocks: z.array(BlockConfig),
     connections: z.array(ConfigConnection).default([]),
   }),
-  interface_config: z
-    .union([InterfaceConfig, z.null()])
-    .transform((c) =>
-      c
-        ? c
-        : {
-            webchat: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
-            form: {
-              inputs: [],
-              outputs: [],
-              public: false,
-            },
-          },
-    )
-    .default({
-      webchat: {
-        inputs: [],
-        outputs: [],
-        public: false,
-      },
-      form: {
-        inputs: [],
-        outputs: [],
-        public: false,
-      },
-    }),
+  interface_config: SafeInterfaceConfig,
 });
 
 export const AliasResponse = z
@@ -308,7 +263,7 @@ export const UpdatePipelineSchema = z.object({
   name: z.string().min(1),
   budget_limit: z.union([zfd.numeric(), z.null()]),
   logs_enabled: z.boolean(),
-  interface_config: z.union([InterfaceConfig, z.null()]),
+  interface_config: SafeInterfaceConfig,
   config: z.object({
     version: z.string(),
     blocks: z.array(UpdateBlockConfig),
