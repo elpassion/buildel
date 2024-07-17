@@ -92,27 +92,14 @@ await app.addHook('onRequest', async (request,reply) => {
   const nonce = crypto.randomBytes(16).toString("hex");
   request.loadContext = { cspNonce: nonce }; // add nonce to request context
 
+  const isIframeAllowed = request.url.startsWith('/webchats') || request.url.startsWith('/forms');
 
-
-  const csp = `
-    script-src 'self' 'nonce-${nonce}';
-    img-src 'self' data:;
-    font-src 'self' https://fonts.gstatic.com https://elpassion-design-system.s3.eu-west-1.amazonaws.com https://cdnjs.cloudflare.com;
-    connect-src 'self' ${process.env.NODE_ENV ==='development' ? 'ws:' : ''} ${process.env.API_URL} https://plausible.io;
-    style-src 'unsafe-inline' 'self' https://fonts.googleapis.com;
-    style-src-elem 'unsafe-inline' 'self' https://fonts.googleapis.com;
-    object-src 'none';
-    frame-src 'self';
-    base-uri 'self';
-    form-action 'self';
-    frame-ancestors 'self';
-    upgrade-insecure-requests;
-  `.replace(/\s{2,}/g, ' ').trim();
+  const csp = createCSP(nonce, isIframeAllowed);
 
   reply.header('Content-Security-Policy', csp);
   reply.header('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   reply.header('X-Content-Type-Options', 'nosniff');
-  reply.header('X-Frame-Options', 'DENY');
+  reply.header('X-Frame-Options', 'SAMEORIGIN');
   reply.header('X-XSS-Protection', '1; mode=block');
 });
 
@@ -164,3 +151,30 @@ console.log(`✅ metrics ready: ${metricsAddrers}`);
 // if (process.env.NODE_ENV === "development") {
 //   await broadcastDevReady(initialBuild);
 // }
+
+
+
+
+function createCSP(nonce, isIframeAllowed) {
+  let csp = `
+    script-src 'self' 'nonce-${nonce}';
+    img-src 'self' data:;
+    font-src 'self' https://fonts.gstatic.com https://elpassion-design-system.s3.eu-west-1.amazonaws.com https://cdnjs.cloudflare.com;
+    connect-src 'self' ${process.env.NODE_ENV ==='development' ? 'ws:' : ''} ${process.env.API_URL} https://plausible.io;
+    style-src 'unsafe-inline' 'self' https://fonts.googleapis.com;
+    style-src-elem 'unsafe-inline' 'self' https://fonts.googleapis.com;
+    object-src 'none';
+    frame-src 'self';
+    base-uri 'self';
+    form-action 'self';
+    upgrade-insecure-requests;
+  `.replace(/\s{2,}/g, ' ').trim();
+
+  if (isIframeAllowed) {
+    csp += " frame-ancestors *;";
+  } else {
+    csp += " frame-ancestors 'self';";
+  }
+
+  return csp;
+}
