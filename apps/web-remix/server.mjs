@@ -100,6 +100,7 @@ await app.addHook('onRequest', async (request,reply) => {
   reply.header('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
   reply.header('X-Content-Type-Options', 'nosniff');
   reply.header('X-Frame-Options', 'SAMEORIGIN');
+  reply.header('Permissions-Policy', 'geolocation=*, microphone=*, camera=*, fullscreen=*');
   reply.header('X-XSS-Protection', '1; mode=block');
 });
 
