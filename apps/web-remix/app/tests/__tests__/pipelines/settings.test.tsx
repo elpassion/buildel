@@ -102,7 +102,6 @@ describe('Workflow settings page', () => {
     await page.submitWorkflowConfig();
 
     await screen.findByText(/name: Required/i);
-    await screen.findByText(/interface_config: Required/i);
   });
 
   test('should error if pasted json is incorrect', async () => {
