@@ -218,21 +218,11 @@ defmodule Buildel.Blocks.DocumentTool do
           args["document_id"]
         )
 
-      state
-      # respond_to_tool(
-      #   state,
-      #   "tool",
-      #   {:text, "Document name: #{memory.file_name}\n\n#{memory.content |> String.trim()}"}
-      # )
+      {"Document name: #{memory.file_name}\n\n#{memory.content |> String.trim()}", state}
     rescue
       _ ->
         send_error(state, "Failed to retrieve the document")
-        state
-        # respond_to_tool(
-        #   state,
-        #   "tool",
-        #   {:text, "Failed to retrieve document"}
-        # )
+        {"Failed to retrieve document", state}
     end
   end
 
