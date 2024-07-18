@@ -224,7 +224,7 @@ export function BulkPage() {
         <div className="flex ml-auto gap-2">
           <SmallFileInput
             multiple={false}
-            buttonText="Add from CSV"
+            // buttonText="Add from CSV"
             onChange={async (e) => {
               const file = e.target.files?.[0];
               if (!file) return;

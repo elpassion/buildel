@@ -160,7 +160,6 @@ export default function WebsiteForm() {
                     <div className="flex text-white justify-start items-center gap-2 bg-neutral-800 rounded-lg w-full">
                       <SmallFileInputField
                         multiple={false}
-                        buttonText={input.name}
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
@@ -171,6 +170,7 @@ export default function WebsiteForm() {
                           }));
                         }}
                       />
+
                       <p>{files[input.name]?.name}</p>
                     </div>
                   )}

@@ -7,8 +7,8 @@ import type { SmallFileInputProps } from '../inputs/file.input';
 
 export const SmallFileInputField = forwardRef<
   HTMLInputElement,
-  Partial<SmallFileInputProps>
->(({ errorMessage, ...props }) => {
+  SmallFileInputProps
+>(({ ...props }) => {
   const { name, getInputProps, error } = useFieldContext();
 
   return (
@@ -19,7 +19,6 @@ export const SmallFileInputField = forwardRef<
       aria-errormessage={error ? `${name}-error` : undefined}
       aria-label={name}
       autoComplete={name}
-      errorMessage={errorMessage ?? error}
       {...getInputProps()}
       {...props}
     />

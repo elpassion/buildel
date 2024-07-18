@@ -117,14 +117,17 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
   if (field.enumPresentAs === 'checkbox') {
     return field.enum.map((value, index) => (
       <FormField key={`${name}.${index}`} name={name}>
-        <CheckboxInput
-          name={name}
-          key={value}
-          label={value}
-          id={`${name}.${index}`}
-          value={value}
-          error={!!error}
-        />
+        <Label className="flex gap-1 items-center">
+          <CheckboxInput
+            name={name}
+            key={value}
+            id={`${name}.${index}`}
+            value={value}
+            // error={!!error}
+          />
+
+          <span>{value}</span>
+        </Label>
       </FormField>
     ));
   }
@@ -181,18 +184,21 @@ export function ArrayField({ field, name, fields, schema }: FieldProps) {
 export function BooleanField({ field, name }: FieldProps) {
   assert(name);
   assert(field.type === 'boolean');
-  const { fieldErrors } = useFormContext();
+  // const { fieldErrors } = useFormContext();
 
-  const error = fieldErrors[name] ?? undefined;
+  // const error = fieldErrors[name] ?? undefined;
 
   return (
     <FormField name={name}>
-      <CheckboxInputField
-        id={name}
-        label={field.title}
-        defaultChecked={field.default}
-        error={!!error}
-      />
+      <Label>
+        <CheckboxInputField
+          id={name}
+          defaultChecked={field.default}
+          // error={!!error}
+        />
+
+        <span>{field.title}</span>
+      </Label>
     </FormField>
   );
 }

@@ -12,6 +12,7 @@ import type {
   IInterfaceConfig,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
+import { Label } from '~/components/ui/label';
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;
@@ -87,7 +88,11 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
         </Field>
 
         <Field name="form.public">
-          <CheckboxInputField label="Public" />
+          <Label className="flex gap-1 items-center">
+            <CheckboxInputField />
+
+            <span>Public</span>
+          </Label>
         </Field>
       </div>
 

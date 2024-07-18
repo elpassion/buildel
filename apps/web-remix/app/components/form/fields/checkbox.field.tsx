@@ -1,4 +1,5 @@
 import React, { forwardRef } from 'react';
+import type * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { useControlField } from 'remix-validated-form';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
@@ -6,8 +7,8 @@ import type { CheckboxInputProps } from '~/components/form/inputs/checkbox.input
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 
 export const CheckboxInputField = forwardRef<
-  HTMLInputElement,
-  Partial<CheckboxInputProps>
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  CheckboxInputProps
 >((props, ref) => {
   const { name, getInputProps, validate } = useFieldContext();
   const [formValue, setFormValue] = useControlField<boolean>(name);
@@ -15,11 +16,13 @@ export const CheckboxInputField = forwardRef<
   return (
     <CheckboxInput
       ref={ref}
+      name={name}
+      id={name}
       {...props}
-      {...getInputProps({ type: 'checkbox', id: props.id })}
+      onBlur={getInputProps({ type: 'checkbox' }).onBlur}
       checked={formValue}
-      onChange={(e) => {
-        setFormValue(e.target.checked);
+      onCheckedChange={(value) => {
+        setFormValue(value as boolean);
         validate();
       }}
     />
