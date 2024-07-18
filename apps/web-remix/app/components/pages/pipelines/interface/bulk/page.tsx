@@ -31,12 +31,17 @@ export interface ITest {
   run?: number;
 }
 
+export interface ISelectedInput {
+  name: string;
+  type: string;
+}
+
 export function BulkPage() {
   const { organizationId, pipelineId, pipeline } =
     useLoaderData<typeof loader>();
 
   const validator = useMemo(() => withZod(schema), []);
-  const [selectedInputs, setSelectedInputs] = useState<string[]>([]);
+  const [selectedInputs, setSelectedInputs] = useState<ISelectedInput[]>([]);
   const [selectedOutputs, setSelectedOutputs] = useState<string[]>([]);
   const [tests, setTests] = useState<ITest[]>(() => [generateNewTest()]);
   const [summaryRunCost, setSummaryRunCost] = useState<
@@ -44,7 +49,7 @@ export function BulkPage() {
   >([]);
 
   const inputs = pipeline.config.blocks.filter(
-    (block) => block.type === 'text_input',
+    (block) => ['text_input', 'file_input'].includes(block.type),
   );
 
   const outputs = pipeline.config.blocks.filter(
@@ -56,7 +61,7 @@ export function BulkPage() {
       id: uuidv4(),
       status: 'pending' as const,
       inputs: selectedInputs.reduce(
-        (acc, input) => ({ ...acc, [input]: '' }),
+        (acc, input) => ({ ...acc, [input.name]: '' }),
         {},
       ),
       outputs: selectedOutputs.reduce(
@@ -173,40 +178,35 @@ export function BulkPage() {
     document.body.removeChild(element);
   }
 
-  const handleChangeNewSelectedInputs = (
-    newSelected: string[],
-    type: 'inputs' | 'outputs',
-  ) => {
-    if (type === 'inputs') {
-      setSelectedInputs(newSelected);
-      setTests((tests) =>
-        tests.map((test) => ({
-          ...test,
-          inputs: newSelected.reduce(
-            (acc, input) => ({
-              ...acc,
-              [input]: '',
-            }),
-            {},
-          ),
-        })),
-      );
-    }
-    if (type === 'outputs') {
-      setSelectedOutputs(newSelected);
-      setTests((tests) =>
-        tests.map((test) => ({
-          ...test,
-          outputs: newSelected.reduce(
-            (acc, output) => ({
-              ...acc,
-              [output]: '',
-            }),
-            {},
-          ),
-        })),
-      );
-    }
+  const handleChangeNewSelectedInputs = (newSelected: ISelectedInput[]) => {
+    setSelectedInputs(newSelected);
+    setTests((tests) =>
+      tests.map((test) => ({
+        ...test,
+        inputs: newSelected.reduce(
+          (acc, input) => ({
+            ...acc,
+            [input.name]: '',
+          }),
+          {},
+        ),
+      })),
+    );
+  };
+  const handleChangeNewSelectedOutputs = (newSelected: string[]) => {
+    setSelectedOutputs(newSelected);
+    setTests((tests) =>
+      tests.map((test) => ({
+        ...test,
+        outputs: newSelected.reduce(
+          (acc, output) => ({
+            ...acc,
+            [output]: '',
+          }),
+          {},
+        ),
+      })),
+    );
   };
 
   return (
@@ -286,14 +286,21 @@ export function BulkPage() {
                   label="Inputs"
                   mode="multiple"
                   onSelect={(selected: string) => {
-                    const newSelectedInputs = [...selectedInputs, selected];
-                    handleChangeNewSelectedInputs(newSelectedInputs, 'inputs');
+                    const selectedType = inputs.find(
+                      (input) => input.name === selected,
+                    )?.type || "";
+
+                    const newSelectedInputs = [
+                      ...selectedInputs,
+                      { name: selected, type: selectedType },
+                    ];
+                    handleChangeNewSelectedInputs(newSelectedInputs);
                   }}
                   onDeselect={(deselected: string) => {
                     const newSelectedInputs = selectedInputs.filter(
-                      (item) => item !== deselected,
+                      (item) => item.name !== deselected,
                     );
-                    handleChangeNewSelectedInputs(newSelectedInputs, 'inputs');
+                    handleChangeNewSelectedInputs(newSelectedInputs);
                   }}
                 />
               </Field>
@@ -305,19 +312,13 @@ export function BulkPage() {
                   mode="multiple"
                   onSelect={(selected: string) => {
                     const newSelectedOutputs = [...selectedOutputs, selected];
-                    handleChangeNewSelectedInputs(
-                      newSelectedOutputs,
-                      'outputs',
-                    );
+                    handleChangeNewSelectedOutputs(newSelectedOutputs);
                   }}
                   onDeselect={(selected: string) => {
                     const newSelectedOutputs = selectedOutputs.filter(
                       (item) => item !== selected,
                     );
-                    handleChangeNewSelectedInputs(
-                      newSelectedOutputs,
-                      'outputs',
-                    );
+                    handleChangeNewSelectedOutputs(newSelectedOutputs);
                   }}
                 />
               </Field>

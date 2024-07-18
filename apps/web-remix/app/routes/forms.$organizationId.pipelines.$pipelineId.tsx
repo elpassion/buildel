@@ -136,7 +136,7 @@ export default function WebsiteForm() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen h-screen w-full">
+    <div className="flex justify-center items-center h-screen w-full">
       <div className="flex flex-col w-[820px] bg-neutral-900 p-2 rounded-lg">
         <ValidatedForm
           validator={validator}

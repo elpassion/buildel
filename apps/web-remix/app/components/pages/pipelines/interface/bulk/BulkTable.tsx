@@ -7,10 +7,11 @@ import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { TextareaInput } from '~/components/form/inputs/textarea.input';
 import { routes } from '~/utils/routes.utils';
 
-import type { ITest } from './page';
+import type { ISelectedInput, ITest } from './page';
+import { SmallFileInput } from '~/components/form/inputs/file.input';
 
 interface BulkTableProps {
-  selectedInputs: string[];
+  selectedInputs: ISelectedInput[];
   selectedOutputs: string[];
   tests: ITest[];
   setTests: Dispatch<SetStateAction<ITest[]>>;
@@ -33,12 +34,12 @@ export const BulkTable: React.FC<BulkTableProps> = ({
     <table className="w-full table-auto">
       <thead className="text-left text-white text-xs bg-neutral-800">
         <tr className="rounded-xl overflow-hidden">
-          {selectedInputs?.map((input: string) => (
+          {selectedInputs?.map((input: ISelectedInput) => (
             <th
-              key={input}
+              key={input.name}
               className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
             >
-              {input}
+              {input.name}
             </th>
           ))}
           {selectedOutputs?.map((output: string) => (
@@ -72,31 +73,50 @@ export const BulkTable: React.FC<BulkTableProps> = ({
               aria-label="pipeline run"
             >
               {selectedInputs.map((input) => (
-                <td key={input} className="py-3 px-5 text-neutral-100 text-sm">
-                  <TextareaInput
-                    id={input}
-                    key={input}
-                    value={test.inputs[input]}
-                    areaClassName="min-h-full !resize-y"
-                    onChange={(e) => {
-                      e.preventDefault();
-                      const value = e.target.value;
+                <td
+                  key={input.name}
+                  className="py-3 px-5 text-neutral-100 text-sm"
+                >
+                  {input.type === 'text_input' ? (
+                    <TextareaInput
+                      id={input.name}
+                      key={input.name}
+                      value={test.inputs[input.name]}
+                      areaClassName="min-h-full !resize-y"
+                      onChange={(e) => {
+                        e.preventDefault();
+                        const value = e.target.value;
 
-                      setTests((tests) =>
-                        tests.map((t) =>
-                          test.id === t.id
-                            ? {
-                                ...test,
-                                inputs: {
-                                  ...test.inputs,
-                                  [input]: value,
-                                },
-                              }
-                            : t,
-                        ),
-                      );
-                    }}
-                  />
+                        setTests((tests) =>
+                          tests.map((t) =>
+                            test.id === t.id
+                              ? {
+                                  ...test,
+                                  inputs: {
+                                    ...test.inputs,
+                                    [input.name]: value,
+                                  },
+                                }
+                              : t,
+                          ),
+                        );
+                      }}
+                    />
+                  ) : (
+                    <SmallFileInput
+                        multiple={false}
+                        buttonText={input.name}
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+
+                          // setFiles((prev) => ({
+                          //   ...prev,
+                          //   [input.name]: file,
+                          // }));
+                        }}
+                      />
+                  )}
                 </td>
               ))}
               {selectedOutputs.map((output) => (
