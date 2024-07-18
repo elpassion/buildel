@@ -10,7 +10,7 @@ import { PageOverlay } from '~/components/overlay/PageOverlay';
 interface ActionSidebarProps extends PropsWithChildren {
   className?: string;
   isOpen: boolean;
-  onClose?: () => void;
+  onClose?: (value: boolean) => void;
   overlay?: boolean;
   overlayClassName?: string;
 }
@@ -28,7 +28,7 @@ export const ActionSidebar: React.FC<ActionSidebarProps> = ({
       {overlay ? (
         <PageOverlay
           isShow={isOpen}
-          onClick={onClose}
+          onClick={() => onClose?.(false)}
           className={classNames(overlayClassName)}
         />
       ) : null}

@@ -1,13 +1,5 @@
-import { Toaster as ReactHotToaster } from 'react-hot-toast';
+import { Toaster as Sooner } from '~/components/ui/sonner';
 
 export const Toaster = () => (
-  <ReactHotToaster
-    position="top-right"
-    gutter={4}
-    toastOptions={{
-      duration: 4000,
-      className: '!bg-transparent !p-0 !shadow-none',
-    }}
-    containerClassName="-mt-1"
-  />
+  <Sooner position="top-right" duration={3000} closeButton />
 );

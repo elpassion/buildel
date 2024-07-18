@@ -1,4 +1,3 @@
-import Modal from 'react-modal';
 import type { LinksFunction } from '@remix-run/node';
 import {
   Links,
@@ -17,8 +16,6 @@ import { ErrorBoundaryLayout } from '~/components/errorBoundaries/ErrorBoundaryL
 import { RootErrorBoundary } from '~/components/errorBoundaries/RootErrorBoundary';
 import { PageProgress } from '~/components/progressBar/PageProgress';
 import { useNonce } from '~/utils/nonce-provider';
-
-Modal.setAppElement('#_root');
 
 export const links: LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

@@ -166,17 +166,17 @@ export function NewCollectionFilesPage() {
 
         if (errorCount === 0) {
           return Promise.resolve({
-            title: 'Files processed successfully',
+            title: 'Files processed successfully.',
             description: `You can now view the files in the collection.`,
           });
         } else if (successCount === 0) {
           return Promise.reject({
-            title: 'Files processing failed',
+            title: 'Files processing failed.',
             description: 'Please try again later.',
           });
         } else {
           return Promise.resolve({
-            title: 'Partial success',
+            title: 'Partial success.',
             description: `${successCount} file(s) processed successfully, ${errorCount} file(s) failed.`,
             backgroundColor: 'bg-yellow-500',
           });
