@@ -7,6 +7,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { ExternalLink } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { EmptyMessage } from '~/components/list/ItemList';
@@ -93,7 +94,7 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
                 <IconButton
                   tabIndex={-1}
                   aria-label="Go to run overview"
-                  iconName="external-link"
+                  icon={<ExternalLink />}
                   size="xs"
                   onlyIcon
                 />

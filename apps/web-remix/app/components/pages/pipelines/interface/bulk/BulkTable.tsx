@@ -1,11 +1,12 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Link } from '@remix-run/react';
-import { Icon, IconButton } from '@elpassion/taco';
 import classNames from 'classnames';
+import { ExternalLink, Trash } from 'lucide-react';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { SmallFileInput } from '~/components/form/inputs/file.input';
 import { TextareaInput } from '~/components/form/inputs/textarea.input';
+import { IconButton } from '~/components/iconButton';
 import { routes } from '~/utils/routes.utils';
 
 import type { ISelectedInput, ITest } from './page';
@@ -134,12 +135,12 @@ export const BulkTable: React.FC<BulkTableProps> = ({
               {isTrashIconColumnVisible && (
                 <td className="w-7 py-3 text-neutral-100 text-sm">
                   <IconButton
-                    size="xs"
-                    variant="basic"
+                    size="xxs"
+                    variant="secondary"
                     aria-label={`Remove item`}
                     className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
                     title={`Remove item`}
-                    icon={<Icon iconName="trash" />}
+                    icon={<Trash />}
                     onClick={() =>
                       setTests((tests) =>
                         tests.filter(({ id }) => id !== test.id),
@@ -160,10 +161,10 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                   >
                     <IconButton
                       className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
-                      variant="basic"
+                      variant="secondary"
                       aria-label="Go to run overview"
-                      icon={<Icon iconName="external-link" />}
-                      size="xs"
+                      icon={<ExternalLink />}
+                      size="xxs"
                     />
                   </Link>
                 </td>

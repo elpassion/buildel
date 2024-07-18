@@ -4,6 +4,7 @@ import { useFetcher } from '@remix-run/react';
 import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
 import classNames from 'classnames';
+import { Trash } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
@@ -73,12 +74,12 @@ export const PipelineListItemHeader = ({
           <DuplicateForm pipeline={pipeline} />
 
           <IconButton
-            size="xs"
+            size="xxs"
             variant="ghost"
             aria-label={`Remove workflow: ${pipeline.name}`}
             className="opacity-0 group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500"
             title={`Remove workflow: ${pipeline.name}`}
-            icon={<Icon iconName="trash" />}
+            icon={<Trash />}
             onClick={handleDelete}
           />
         </div>
@@ -110,12 +111,12 @@ function DuplicateForm({ pipeline }: DuplicateFormProps) {
       />
 
       <IconButton
-        size="xs"
+        size="xxs"
         variant="ghost"
         aria-label={`Duplicate workflow: ${pipeline.name}`}
         className="opacity-0 group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500"
         title={`Duplicate workflow: ${pipeline.name}`}
-        icon={<Duplicate className="w-3.5 h-3.5" />}
+        icon={<Duplicate />}
       />
     </ValidatedForm>
   );

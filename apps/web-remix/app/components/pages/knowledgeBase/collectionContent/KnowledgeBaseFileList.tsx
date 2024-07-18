@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useFetcher, useLoaderData } from '@remix-run/react';
 import { Icon } from '@elpassion/taco';
+import { Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { BasicLink } from '~/components/link/BasicLink';
@@ -100,11 +101,11 @@ export const KnowledgeBaseFileListItem: React.FC<
         onClick={(e) => e.preventDefault()}
       >
         <IconButton
-          size="xs"
+          size="xxs"
           variant="ghost"
           aria-label={`Delete file: ${data.file_name}`}
           className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500"
-          icon={<Icon iconName="trash" />}
+          icon={<Trash />}
           onClick={handleDelete}
         />
       </div>

@@ -9,6 +9,7 @@ import {
 import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
 import classNames from 'classnames';
+import { FilePenLine, Trash } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 import z from 'zod';
 
@@ -182,7 +183,8 @@ export const AliasListItem = ({
         <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100">
           <IconButton
             onlyIcon
-            iconName="edit"
+            size="xs"
+            icon={<FilePenLine />}
             aria-label={`Edit alias: ${data.name}`}
             onClick={handleOnEdit}
           />
@@ -190,7 +192,8 @@ export const AliasListItem = ({
           {!isActive ? (
             <IconButton
               onlyIcon
-              iconName="trash"
+              size="xs"
+              icon={<Trash />}
               onClick={onDelete}
               aria-label={`Delete alias: ${data.name}`}
             />

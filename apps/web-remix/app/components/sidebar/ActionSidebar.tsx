@@ -1,9 +1,10 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import { Icon, IconButton } from '@elpassion/taco';
 import classNames from 'classnames';
 import startCase from 'lodash.startcase';
+import { X } from 'lucide-react';
 
+import { IconButton } from '~/components/iconButton';
 import { PageOverlay } from '~/components/overlay/PageOverlay';
 
 interface ActionSidebarProps extends PropsWithChildren {
@@ -74,13 +75,15 @@ export function ActionSidebarHeader({
           <p className="text-neutral-100 text-xs">{subheading}</p>
         ) : null}
       </div>
-      <IconButton
-        size="sm"
-        variant="outlined"
-        onClick={onClose}
-        aria-label="Close sidebar"
-        icon={<Icon iconName="x" />}
-      />
+      <div className="min-w-7">
+        <IconButton
+          size="sm"
+          variant="ghost"
+          onClick={onClose}
+          aria-label="Close sidebar"
+          icon={<X />}
+        />
+      </div>
     </header>
   );
 }

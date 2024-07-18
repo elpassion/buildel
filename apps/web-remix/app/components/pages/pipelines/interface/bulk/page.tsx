@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/react';
-import { Icon, IconButton } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
+import { Plus } from 'lucide-react';
 import Papa from 'papaparse';
 import { ValidatedForm } from 'remix-validated-form';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Field } from '~/components/form/fields/field.context';
 import { SelectField } from '~/components/form/fields/select.field';
 import { SmallFileInput } from '~/components/form/inputs/file.input';
+import { IconButton } from '~/components/iconButton';
 import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
 import {
   InterfaceSectionHeader,
@@ -340,12 +341,12 @@ export function BulkPage() {
                 pipelineId={pipelineId}
               />
               <IconButton
-                size="xs"
-                variant="basic"
+                size="xxs"
+                variant="secondary"
                 aria-label={`Add item`}
                 className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
                 title={`Add item`}
-                icon={<Icon iconName="plus" />}
+                icon={<Plus />}
                 onClick={() =>
                   setTests((tests) => tests.concat([generateNewTest()]))
                 }

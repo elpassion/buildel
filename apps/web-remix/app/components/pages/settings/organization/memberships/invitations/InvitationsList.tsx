@@ -1,6 +1,7 @@
 import { useFetcher } from '@remix-run/react';
 import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { Trash } from 'lucide-react';
 
 import type { IInvitation } from '~/api/organization/organization.contracts';
 import { IconButton } from '~/components/iconButton';
@@ -58,7 +59,7 @@ export const InvitationsListItem = ({
   return (
     <article
       className={classNames(
-        'group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white grid grid-cols-[130px_1fr_60px] gap-4 text-sm',
+        'group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white grid grid-cols-[130px_1fr_32px] items-center gap-4 text-sm',
       )}
     >
       <p>{dayjs(invitation.expires_at).format()}</p>
@@ -66,12 +67,12 @@ export const InvitationsListItem = ({
       <p>{invitation.email}</p>
 
       <IconButton
-        size="xs"
+        size="xxs"
         variant="ghost"
         aria-label={`Delete invitation: ${invitation.email}`}
         className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
         title={`Delete invitation: ${invitation.email}`}
-        icon={<Icon iconName="trash" />}
+        icon={<Trash />}
         onClick={handleDelete}
       />
     </article>

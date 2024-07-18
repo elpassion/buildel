@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
 import { Modal } from '@elpassion/taco/Modal';
 import { withZod } from '@remix-validated-form/with-zod';
+import { Edit } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field } from '~/components/form/fields/field.context';
@@ -52,9 +53,9 @@ export function EditPipelineNameForm({
   return (
     <>
       <IconButton
-        iconName="edit-2"
+        icon={<Edit />}
+        size="xxs"
         variant="ghost"
-        size="sm"
         aria-label="Edit workflow name"
         onClick={openModal}
       />

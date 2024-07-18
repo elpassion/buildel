@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Avatar } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import { withZod } from '@remix-validated-form/with-zod';
+import { Edit } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field } from '~/components/form/fields/field.context';
@@ -66,7 +67,7 @@ function EditOrganizationName({ organization }: EditOrganizationNameProps) {
   return (
     <>
       <IconButton
-        iconName="edit-2"
+        icon={<Edit />}
         variant="ghost"
         size="sm"
         aria-label="Edit organization name"

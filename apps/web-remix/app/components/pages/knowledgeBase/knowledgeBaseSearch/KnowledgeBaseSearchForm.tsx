@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
 import classNames from 'classnames';
 import { useFormContext, ValidatedForm } from 'remix-validated-form';
@@ -83,7 +84,7 @@ function SearchButton() {
   return (
     <IconButton
       onlyIcon
-      iconName={isSubmitting ? 'loader' : 'search'}
+      icon={<Icon iconName={isSubmitting ? 'loader' : 'search'} />}
       aria-label="Search"
       className={classNames({ 'animate-spin': isSubmitting })}
     />

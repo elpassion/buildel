@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Icon, IconButton } from '@elpassion/taco';
+import { Trash } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'remix-validated-form';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
@@ -11,6 +11,7 @@ import {
   ResettableTextInputField,
 } from '~/components/form/fields/text.field';
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
+import { IconButton } from '~/components/iconButton';
 import { Button } from '~/components/ui/button';
 import { assert } from '~/utils/assert';
 
@@ -219,9 +220,10 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
             schema={schema}
           />
           <IconButton
+            size="xxs"
             variant="ghost"
             aria-label="Remove field"
-            icon={<Icon iconName="trash" />}
+            icon={<Trash />}
             disabled={rhfFields.length <= field.minItems}
             onClick={(e) => {
               e.preventDefault();

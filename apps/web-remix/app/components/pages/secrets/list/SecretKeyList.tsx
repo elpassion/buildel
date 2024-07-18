@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useFetcher } from '@remix-run/react';
 import { Icon } from '@elpassion/taco';
+import { Edit, Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
@@ -99,14 +100,14 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
 
       <p className="text-white">{dayjs(data.updated_at).format()}</p>
 
-      <div className="flex gap-1 items-center">
+      <div className="flex gap-1 items-center min-w-[64px]">
         <IconButton
           size="xs"
           variant="ghost"
           aria-label={`Edit secret: ${data.name}`}
           className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500 lg:opacity-0"
           title={`Edit Secret: ${data.name}`}
-          icon={<Icon iconName="edit" />}
+          icon={<Edit />}
           onClick={handleEdit}
         />
 
@@ -116,7 +117,7 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
           aria-label={`Delete secret: ${data.name}`}
           className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
           title={`Delete Secret: ${data.name}`}
-          icon={<Icon iconName="trash" />}
+          icon={<Trash />}
           onClick={handleDelete}
         />
       </div>

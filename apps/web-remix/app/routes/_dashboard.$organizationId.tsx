@@ -9,14 +9,16 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react';
-import { Avatar, Icon, IconButton } from '@elpassion/taco';
+import { Avatar, Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { LogOut } from 'lucide-react';
 import type { MenuInfo } from 'rc-menu/es/interface';
 import { ClientOnly } from 'remix-utils/client-only';
 import invariant from 'tiny-invariant';
 import { useOnClickOutside } from 'usehooks-ts';
 
 import { OrganizationApi } from '~/api/organization/OrganizationApi';
+import { IconButton } from '~/components/iconButton';
 import { MenuClient } from '~/components/menu/Menu.client';
 import { MenuItem } from '~/components/menu/MenuItem';
 import { PageOverlay } from '~/components/overlay/PageOverlay';
@@ -294,9 +296,9 @@ function LogoutButton() {
   return (
     <IconButton
       size="sm"
-      variant="basic"
+      variant="ghost"
       aria-label="Logout"
-      icon={<Icon iconName="log-out" />}
+      icon={<LogOut />}
       className="!text-neutral-100 hover:!bg-neutral-700"
       onClick={() => {
         logout.submit({}, { method: 'DELETE', action: '/logout' });

@@ -1,12 +1,13 @@
 import type { DragEvent } from 'react';
 import React, { useCallback } from 'react';
-import { Icon, IconButton } from '@elpassion/taco';
 import { useReactFlow } from '@xyflow/react';
 import classNames from 'classnames';
 import startCase from 'lodash.startcase';
+import { Plus } from 'lucide-react';
 import type { z } from 'zod';
 
 import type { BlockType } from '~/api/blockType/blockType.contracts';
+import { IconButton } from '~/components/iconButton';
 
 import type { IBlockConfig, IBlockType } from '../../pipeline.types';
 import { useRunPipeline } from '../../RunPipelineProvider';
@@ -69,13 +70,13 @@ export const CreateBlockDraggableItem: React.FC<
     >
       <span>{startCase(data.type)}</span>
       <IconButton
-        size="xs"
+        size="xxxs"
+        variant="secondary"
         data-testid={`Add block: ${data.type}`}
         aria-label={`Add block: ${data.type}`}
-        className="!w-5 !h-5 !rounded"
         onClick={() => onClickAdd(data)}
-        icon={<Icon iconName="plus" />}
         disabled={runStatus !== 'idle'}
+        icon={<Plus />}
       />
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
+import { CircleStop } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { HiddenField } from '~/components/form/fields/field.context';
@@ -21,7 +22,7 @@ export const StopRunForm: React.FC<StopRunFormProps> = ({ id }) => {
       <IconButton
         id={`stop-run-${id}`}
         aria-label="Stop run"
-        iconName="stop-circle"
+        icon={<CircleStop />}
         size="xs"
         onlyIcon
       />
