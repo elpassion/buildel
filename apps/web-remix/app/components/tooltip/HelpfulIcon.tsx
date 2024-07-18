@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ITooltip } from 'react-tooltip';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { CircleHelp } from 'lucide-react';
 
 import { Tooltip } from '~/components/tooltip/Tooltip';
 
@@ -28,15 +28,15 @@ export function HelpfulIcon({
         className="!text-xs max-w-[350px] "
         place={place}
       />
-      <Icon
+
+      <CircleHelp
         id={`${id}-helpful-icon`}
-        iconName="help-circle"
         className={classNames(
           'text-primary-500  cursor-pointer',
           {
-            'text-xl': size === 'xl',
-            'text-md': size === 'md',
-            'text-sm': size === 'sm',
+            'w-6 h-6': size === 'xl',
+            'w-5 h-5': size === 'md',
+            'w-3.5 h-3.5': size === 'sm',
           },
           className,
         )}

@@ -1,5 +1,4 @@
 import React, { forwardRef, ReactNode } from 'react';
-import { Label } from '@elpassion/taco';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';

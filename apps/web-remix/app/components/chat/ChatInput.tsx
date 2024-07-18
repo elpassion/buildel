@@ -1,7 +1,9 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { Loader, Send } from 'lucide-react';
 import { useBoolean, useIsomorphicLayoutEffect } from 'usehooks-ts';
+
+import { cn } from '~/utils/cn';
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
@@ -98,11 +100,13 @@ export function ChatInput({
             disabled={isDisabled}
             className="absolute bottom-[4.5px] right-2 text-white w-6 h-6 rounded-full bg-secondary-600 hover:bg-secondary-500 flex justify-center items-center disabled:bg-neutral-800 disabled:text-neutral-300"
           >
-            <Icon
-              size="none"
-              iconName={generating ? 'loader' : 'send'}
-              className={classNames('text-sm', { 'animate-spin': generating })}
-            />
+            {generating ? (
+              <Loader
+                className={cn('w-3 h-3', { 'animate-spin': generating })}
+              />
+            ) : (
+              <Send className={cn('w-3 h-3')} />
+            )}
           </button>
         </form>
       </div>

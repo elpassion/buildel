@@ -1,5 +1,4 @@
 import { useFetcher } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
 import { Trash } from 'lucide-react';
 

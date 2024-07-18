@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { Layers2 } from 'lucide-react';
 
 import {
   ChatCloseButton,
@@ -92,7 +92,7 @@ export const ELHelper: React.FC<ELHelperProps> = ({
         <ChatHeader>
           <div className="flex gap-2 items-center">
             <ChatHeading>
-              <Icon size="xs" iconName="two-layers" />
+              <Layers2 className="w-4 h-4" />
               <div className="text-white">Ask EL</div>
             </ChatHeading>
             <ChatStatus connectionStatus={connectionStatus} />

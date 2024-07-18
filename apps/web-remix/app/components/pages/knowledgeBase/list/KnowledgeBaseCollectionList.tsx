@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useFetcher } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
+import { Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
@@ -84,7 +84,7 @@ export const KnowledgeBaseCollectionListItem: React.FC<
           aria-label={`Remove collection: ${data.name}`}
           className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
           title={`Remove collection: ${data.name}`}
-          icon={<Icon iconName="trash" />}
+          icon={<Trash />}
           onClick={handleDelete}
         />
       </div>

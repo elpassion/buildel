@@ -1,7 +1,7 @@
 import type { HTMLProps } from 'react';
 import React from 'react';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { Copy, Download, Trash } from 'lucide-react';
 
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { useDownloadFile } from '~/hooks/useDownloadFile';
@@ -11,7 +11,7 @@ export function NodeCopyButton({ text }: { text: string }) {
 
   return (
     <NodeActionButton className="w-[52px]" onClick={copy}>
-      {isCopied ? null : <Icon iconName="copy" />}
+      {isCopied ? null : <Copy className="w-3.5 h-3.5" />}
       <span className={classNames({ 'text-green-600': isCopied })}>
         {isCopied ? 'Copied!' : 'Copy'}
       </span>
@@ -30,7 +30,7 @@ export function NodeDownloadButton({
 
   return (
     <NodeActionButton onClick={handleDownload}>
-      <Icon iconName="download" />
+      <Download className="w-3.5 h-3.5" />
       <span>Download</span>
     </NodeActionButton>
   );
@@ -39,7 +39,7 @@ export function NodeDownloadButton({
 export function NodeClearButton({ onClear }: { onClear: () => void }) {
   return (
     <NodeActionButton onClick={onClear}>
-      <Icon iconName="trash" />
+      <Trash className="w-3.5 h-3.5" />
       <span>Clear</span>
     </NodeActionButton>
   );

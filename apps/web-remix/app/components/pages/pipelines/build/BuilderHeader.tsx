@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect } from 'react';
-import { Icon } from '@elpassion/taco';
+import { CircleCheck, Loader } from 'lucide-react';
 import { useDebounce, useIsFirstRender } from 'usehooks-ts';
 
 import type { IPipelineConfig } from '~/components/pages/pipelines/pipeline.types';
@@ -58,12 +58,12 @@ export function SaveChangesButton({
       {isSaving ? (
         <SavingStatusWrapper>
           <span>Saving changes</span>
-          <Icon iconName="loader" className="animate-spin" />
+          <Loader className="animate-spin w-4 h-4" />
         </SavingStatusWrapper>
       ) : (
         <SavingStatusWrapper>
           <span>All changes saved</span>
-          <Icon iconName="check-circle" />
+          <CircleCheck className="w-4 h-4" />
         </SavingStatusWrapper>
       )}
     </div>

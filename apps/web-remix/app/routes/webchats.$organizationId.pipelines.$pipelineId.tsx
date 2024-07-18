@@ -2,8 +2,8 @@ import React, { useCallback, useEffect } from 'react';
 import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { Trash, Upload } from 'lucide-react';
 import invariant from 'tiny-invariant';
 
 import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
@@ -184,7 +184,7 @@ ${JSON.stringify(files)}
                           )
                         }
                       >
-                        <Icon iconName="trash" />
+                        <Trash className="w-4 h-4" />
                       </button>
                     </div>
                   );
@@ -195,7 +195,7 @@ ${JSON.stringify(files)}
           prefix={
             pipeline.interface_config.webchat.inputs[1] && (
               <label className="text-white pl-2 cursor-pointer">
-                <Icon iconName="upload" />
+                <Upload className="w-4 h-4" />
                 <input
                   ref={inputRef}
                   type="file"

@@ -1,4 +1,4 @@
-import { Icon } from '@elpassion/taco';
+import { Download } from 'lucide-react';
 
 import { ItemList } from '~/components/list/ItemList';
 
@@ -52,7 +52,7 @@ function DownloadButton({ blob }: { blob: Blob }) {
 
   return (
     <button onClick={downloadFile}>
-      <Icon iconName="download" size="xs" />
+      <Download className="w-3.5 h-3.5" />
     </button>
   );
 }

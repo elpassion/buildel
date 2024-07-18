@@ -1,10 +1,11 @@
 import React, { useCallback } from 'react';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { File, FileText, Loader, X } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { ItemList } from '~/components/list/ItemList';
 import { Tooltip } from '~/components/tooltip/Tooltip';
+import { cn } from '~/utils/cn';
 
 import { isUploadError } from './fileUpload.types';
 import type { IFileUpload, IPreviewProps } from './fileUpload.types';
@@ -67,11 +68,8 @@ export function FileUploadListItem({
       )}
     >
       <div className="flex gap-1 grow max-w-[90%]">
-        <Icon
-          size="xs"
-          iconName={renderTypeIcon(file.file_type)}
-          className="mt-0.5 w-4 h-4 !text-sm"
-        />
+        {renderTypeIcon(file.file_type)}
+
         <div className="flex flex-col w-full max-w-[95%]">
           <h6 className="whitespace-nowrap text-xs truncate">
             {file.file_name}
@@ -100,16 +98,25 @@ export function FileUploadListItem({
         <IconButton
           onlyIcon
           icon={
-            <Icon
-              className={classNames(
-                'flex items-center justify-center origin-center w-5 h-5 !leading-5',
-                {
-                  'animate-spin': file.status === 'uploading',
-                  'text-red-500': file.status === 'error',
-                },
-              )}
-              iconName={file.status === 'uploading' ? 'loader' : 'x'}
-            />
+            file.status === 'uploading' ? (
+              <Loader
+                className={cn(
+                  'flex items-center justify-center origin-center w-4 h-4 !leading-5',
+                  {
+                    'animate-spin': file.status === 'uploading',
+                  },
+                )}
+              />
+            ) : (
+              <X
+                className={cn(
+                  'flex items-center justify-center origin-center w-4 h-4 !leading-5',
+                  {
+                    'text-red-500': file.status === 'error',
+                  },
+                )}
+              />
+            )
           }
           aria-label={`Delete file: ${file.file_name}`}
           disabled={isDisabled}
@@ -121,8 +128,9 @@ export function FileUploadListItem({
 }
 
 function renderTypeIcon(fileType: string) {
-  if (fileType.startsWith('audio/')) return 'file' as const;
-  return 'file-text' as const;
+  if (fileType.startsWith('audio/'))
+    return <File className="mt-0.5 w-4 h-4 !text-sm" />;
+  return <FileText className="mt-0.5 w-4 h-4 !text-sm" />;
 }
 function renderSize(size: number) {
   if (size < 1000) return `${size.toFixed(0)} B`;

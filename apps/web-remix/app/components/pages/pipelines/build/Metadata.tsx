@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
+import { FileText } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 import { z } from 'zod';
 
@@ -40,7 +40,7 @@ function MetadataTrigger() {
       aria-label="Open metadata editor"
       className="bg-neutral-950 text-neutral-100 w-8 h-8 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition"
     >
-      <Icon iconName="file-text" />
+      <FileText className="w-4 h-4" />
     </DropdownTrigger>
   );
 }

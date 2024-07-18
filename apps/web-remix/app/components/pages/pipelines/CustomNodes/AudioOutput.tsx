@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { Pause, Play } from 'lucide-react';
 
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
 import { errorToast } from '~/components/toasts/errorToast';
@@ -105,7 +105,11 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
           disabled={isDisabled}
           onClick={handlePlay}
         >
-          <Icon iconName={isPlaying ? 'pause' : 'play'} size="xs" />
+          {isPlaying ? (
+            <Pause className="w-3.5 h-3.5" />
+          ) : (
+            <Play className="w-3.5 h-3.5" />
+          )}
         </button>
         <div
           className={classNames(

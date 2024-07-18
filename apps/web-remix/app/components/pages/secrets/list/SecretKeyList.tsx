@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
 import { Edit, Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';

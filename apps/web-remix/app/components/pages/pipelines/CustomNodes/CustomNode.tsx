@@ -1,8 +1,9 @@
 import type { PropsWithChildren } from 'react';
 import { useCallback, useMemo } from 'react';
-import { Badge, Icon } from '@elpassion/taco';
+import { Badge } from '@elpassion/taco';
 import classNames from 'classnames';
 import startCase from 'lodash.startcase';
+import { AlertCircle } from 'lucide-react';
 
 import type { IBlockConfig } from '../pipeline.types';
 import { getBlockFields, getBlockHandles } from '../PipelineFlow.utils';
@@ -56,7 +57,7 @@ export function CustomNode({
       </section>
       {errors.length === 0 ? null : (
         <p className="text-red-500 flex gap-1 items-center mt-2">
-          <Icon iconName="alert-circle" className="text-sm" />
+          <AlertCircle className="w-3.5 h-3.5" />
           <span className="text-xs">
             {errors.length === 1
               ? errors[0]

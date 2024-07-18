@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
+import { Settings, Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { confirm } from '~/components/modal/confirm';
@@ -86,17 +86,19 @@ function BuilderNodeHeaderActions({
       {/*</div>*/}
 
       <IconButton
+        size="xxs"
         onlyIcon
-        icon={<Icon iconName="settings" />}
+        icon={<Settings />}
         aria-label={`Edit block: ${data.name}`}
         onClick={handleEdit}
         disabled={runStatus !== 'idle'}
       />
 
       <IconButton
+        size="xxs"
         onlyIcon
         aria-label={`Delete block: ${data.name}`}
-        icon={<Icon iconName="trash" />}
+        icon={<Trash />}
         onClick={handleDelete}
         disabled={runStatus !== 'idle' || disabled}
       />

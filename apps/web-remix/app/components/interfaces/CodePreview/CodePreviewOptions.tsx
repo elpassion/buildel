@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Icon } from '@elpassion/taco';
+import { ChevronDown } from 'lucide-react';
 import type { MenuInfo } from 'rc-menu/es/interface';
 import { ClientOnly } from 'remix-utils/client-only';
 import { useOnClickOutside } from 'usehooks-ts';
@@ -78,7 +78,7 @@ export const CodePreviewOptions: React.FC<CodePreviewOptionsProps> = ({
               className="flex gap-1 items-center text-neutral-300 px-2 py-1 text-sm"
             >
               <span>{activeOption?.framework}</span>
-              <Icon iconName="chevron-down" />
+              <ChevronDown className="w-4 h-4" />
             </button>
           </div>
 

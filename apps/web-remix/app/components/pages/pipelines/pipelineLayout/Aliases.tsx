@@ -6,10 +6,9 @@ import {
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
 import classNames from 'classnames';
-import { FilePenLine, Trash } from 'lucide-react';
+import { ChevronDown, ChevronUp, FilePenLine, Trash } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 import z from 'zod';
 
@@ -76,7 +75,11 @@ function AliasTrigger({
             ({name})
           </span>
         </span>
-        <Icon iconName={isShown ? 'chevron-up' : 'chevron-down'} />
+        {isShown ? (
+          <ChevronUp className="w-4 h-4" />
+        ) : (
+          <ChevronDown className="w-4 h-4" />
+        )}
       </div>
     </DropdownTrigger>
   );

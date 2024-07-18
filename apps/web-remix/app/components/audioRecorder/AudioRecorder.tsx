@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { CirclePause, Mic } from 'lucide-react';
 
 import type {
   UseAudioRecorderCb,
@@ -80,9 +80,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   });
 
   const ButtonIcon = useCallback(() => {
-    if (status === 'recording') return <Icon iconName="pause" size="xs" />;
+    if (status === 'recording') return <CirclePause className="w-4 h-4" />;
 
-    return <Icon iconName="mic" size="xs" />;
+    return <Mic className="w-4 h-4" />;
   }, [status]);
 
   const handleRecord = useCallback(async () => {

@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
 import classNames from 'classnames';
 import { Trash } from 'lucide-react';

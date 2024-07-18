@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link, useFetcher, useLoaderData } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
-import { Trash } from 'lucide-react';
+import { File, Plus, Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { BasicLink } from '~/components/link/BasicLink';
@@ -64,7 +63,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
           to={routes.collectionFilesNew(organizationId, collectionName)}
           className="bg-neutral-900 transition rounded-lg py-2 px-6 w-full text-neutral-600 hover:text-neutral-300 flex flex-col items-center justify-center h-[80px] border border-neutral-800 hover:border-neutral-700"
         >
-          <Icon iconName="plus" className="text-xl" />
+          <Plus />
           <p className="font-medium">Add new memory file</p>
         </Link>
       </li>
@@ -91,7 +90,7 @@ export const KnowledgeBaseFileListItem: React.FC<
         </h3>
 
         <p className="text-xs text-white flex gap-2">
-          <Icon iconName="file" />{' '}
+          <File className="w-4 h-4" />{' '}
           <span className="uppercase">{data.file_type}</span>
         </p>
       </header>

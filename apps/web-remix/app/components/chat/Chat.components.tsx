@@ -1,8 +1,8 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
 import type { BuildelRunStatus } from '@buildel/buildel';
-import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
+import { X } from 'lucide-react';
 
 import type { IMessage } from '~/components/chat/chat.types';
 
@@ -15,7 +15,7 @@ export const ChatCloseButton: React.FC<ChatCloseButtonProps> = ({
 }) => {
   return (
     <button onClick={onClick} className="text-neutral-200 hover:text-white">
-      <Icon iconName="x" />
+      <X className="w-5 h-5" />
     </button>
   );
 };

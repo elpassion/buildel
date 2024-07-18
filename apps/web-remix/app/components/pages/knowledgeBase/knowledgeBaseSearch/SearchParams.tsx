@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import { Icon } from '@elpassion/taco';
+import { Settings } from 'lucide-react';
 
 import {
   Dropdown,
@@ -27,7 +27,7 @@ function SearchParamsTrigger() {
       aria-label="Open search params editor"
       className="bg-neutral-800 text-neutral-100 w-10 h-10 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition"
     >
-      <Icon iconName="settings" />
+      <Settings className="w-5 h-5" />
     </DropdownTrigger>
   );
 }

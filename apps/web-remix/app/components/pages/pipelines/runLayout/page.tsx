@@ -7,7 +7,7 @@ import {
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
+import { ArrowLeft } from 'lucide-react';
 
 import { confirm } from '~/components/modal/confirm';
 import { AppNavbar } from '~/components/navbar/AppNavbar';
@@ -67,7 +67,7 @@ export function PipelineRunLayout() {
                 Object.fromEntries(searchParams.entries()),
               )}
             >
-              <Icon iconName="arrow-left" className="text-2xl" />
+              <ArrowLeft className="w-6 h-6" />
             </Link>
             <div>
               <h2 className="text-2xl font-medium">Run history</h2>

@@ -1,8 +1,8 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { useMemo } from 'react';
-import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
 import classNames from 'classnames';
+import { ArrowRight } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
 import type { IWorkflowTemplate } from '~/api/organization/organization.contracts';
@@ -86,7 +86,7 @@ function WorkflowTemplatesListItem({ item }: ITemplateItem) {
       >
         <div className="flex gap-1 items-center">
           <span className="text-xs">Build</span>
-          <Icon iconName="arrow-right" className="text-sm" />
+          <ArrowRight className="w-3.5 h-3.5" />
         </div>
       </SubmitButton>
     </ValidatedForm>

@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react';
-import { Icon } from '@elpassion/taco';
 import { getBezierPath } from '@xyflow/react';
 import type { EdgeProps } from '@xyflow/react';
 import classNames from 'classnames';
@@ -7,6 +6,8 @@ import classNames from 'classnames';
 import { useRunPipelineEdge } from '../RunPipelineProvider';
 
 import './customEdges.styles.css';
+
+import { X } from 'lucide-react';
 
 export interface CustomEdgeProps extends EdgeProps {
   onDelete: (id: string) => void;
@@ -101,7 +102,7 @@ export function CustomEdge({
             },
           )}
         >
-          <Icon iconName="x" />
+          <X className="w-3.5 h-3.5" />
         </button>
       </foreignObject>
     </>

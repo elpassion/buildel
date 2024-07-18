@@ -1,11 +1,11 @@
 import React, { forwardRef, useRef } from 'react';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { RefreshCcw } from 'lucide-react';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import type { TextInputProps } from '~/components/form/inputs/text.input';
 import { TextInput } from '~/components/form/inputs/text.input';
+import { IconButton } from '~/components/iconButton';
 
 export interface TextInputFieldProps extends TextInputProps {}
 
@@ -76,14 +76,14 @@ function ResettableFieldResetButton({
   onClick,
 }: ResettableFieldResetButtonProps) {
   return (
-    <button
+    <IconButton
+      onlyIcon
+      size="xxs"
       type="button"
       onClick={onClick}
       aria-label="Reset to default value"
       title="Reset to default value"
-      className={classNames('text-neutral-200')}
-    >
-      <Icon iconName="refresh-ccw" />
-    </button>
+      icon={<RefreshCcw />}
+    />
   );
 }
