@@ -126,7 +126,8 @@ defmodule Buildel.Blocks.Browser do
             properties: %{
               url: %{
                 type: "string",
-                description: "The URL to browse."
+                description:
+                  "The URL to browse. Pass full URL including protocol like https://url.com"
               }
             },
             required: ["url"]
