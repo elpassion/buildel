@@ -40,7 +40,7 @@ export function PipelineRunLayout() {
         ),
       confirmText: 'Restore Run',
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to restore pipeline run configuration. This action is
           irreversible.
         </p>

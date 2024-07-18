@@ -12,7 +12,8 @@ export const MemoryChunksList: React.FC<MemoryChunksListProps> = ({
 }) => {
   return (
     <ItemList
-      itemClassName="py-3 border-b border-neutral-800"
+      className="max-w-full"
+      itemClassName="py-3 border-b border-neutral-800 max-w-full"
       items={items}
       emptyText={<EmptyMessage>There are no chunks yet...</EmptyMessage>}
       renderItem={(item) => <MemoryChunksListItem data={item} />}
@@ -28,9 +29,9 @@ export const MemoryChunksListItem: React.FC<MemoryChunksListItemProps> = ({
   data,
 }) => {
   return (
-    <div>
-      <p className="font-bold text-neutral-100">{data.keywords.join(' - ')}</p>
-      <pre className="text-neutral-100 text-sm break-words">
+    <div className="w-full">
+      <p className="font-bold">{data.keywords.join(' - ')}</p>
+      <pre className="text-sm break-all whitespace-break-spaces">
         {data.content.trim()}
       </pre>
     </div>

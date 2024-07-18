@@ -23,7 +23,7 @@ export const SecretKeyList: React.FC<SecretKeyListProps> = ({ items }) => {
         fetcher.submit({ name: secretKey.name }, { method: 'DELETE' }),
       confirmText: 'Delete Key',
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to delete the "{secretKey.name}” Secret. This action is
           irreversible.
         </p>

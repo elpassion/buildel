@@ -1,7 +1,5 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { forwardRef } from 'react';
-import { Modal } from '@elpassion/taco/Modal';
-import classNames from 'classnames';
 import { Maximize2 } from 'lucide-react';
 import { useControlField } from 'remix-validated-form';
 import { useBoolean } from 'usehooks-ts';
@@ -15,6 +13,14 @@ import { FieldMessage } from '~/components/form/fields/field.message';
 import type { EditorInputProps } from '~/components/form/inputs/editor.input';
 import { EditorInput } from '~/components/form/inputs/editor.input';
 import { IconButton } from '~/components/iconButton';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 
 type EditorFieldProps = Partial<
   EditorInputProps & {
@@ -35,7 +41,11 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
     ...props
   }) => {
     const { name, getInputProps, validate, error } = useFieldContext();
-    const { value: isShown, setTrue: show, setFalse: hide } = useBoolean(false);
+    const {
+      value: isShown,
+      setTrue: show,
+      setValue: toggle,
+    } = useBoolean(false);
     const [value, setValue] = useControlField<string | undefined>(name);
 
     const handleOnChange = (v: string | undefined) => {
@@ -87,7 +97,7 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
             supportingText={supportingText}
             value={currentValue}
             isOpen={isShown}
-            close={hide}
+            onOpenChange={toggle}
             error={currentError}
             onChange={handleOnChange}
             {...props}
@@ -102,14 +112,14 @@ interface MaximizedEditorProps extends Omit<EditorFieldProps, 'onChange'> {
   value?: string;
   isOpen: boolean;
   onChange: (value?: string) => void;
-  close: () => void;
+  onOpenChange: (value: boolean) => void;
 }
 
 function MaximizedEditor({
   children: _,
   value,
   isOpen,
-  close,
+  onOpenChange,
   error,
   label,
   supportingText,
@@ -119,31 +129,30 @@ function MaximizedEditor({
   const { name } = useFieldContext();
 
   return (
-    <Modal
-      header={
-        <header>
-          {label && <h3 className="text-white font-medium text-xl">{label}</h3>}
-          {supportingText && (
-            <p className="text-white text-sm">{supportingText}</p>
-          )}
-        </header>
-      }
-      closeButtonProps={{ iconName: 'minimize-2', 'aria-label': 'Close' }}
-      className={classNames('max-w-[900px] w-full min-w-[300px] mx-2')}
-      onClose={close}
-      isOpen={isOpen}
-    >
-      <div className="p-2">
-        <EditorInput
-          id={`${name}-editor`}
-          value={value}
-          onChange={onChange}
-          height="500px"
-          {...rest}
-        />
+    <>
+      <DialogDrawer open={isOpen} onOpenChange={onOpenChange}>
+        <DialogDrawerContent>
+          <DialogDrawerHeader>
+            {label && <DialogDrawerTitle>{label}</DialogDrawerTitle>}
+            {supportingText && (
+              <DialogDrawerDescription>
+                {supportingText}
+              </DialogDrawerDescription>
+            )}
+          </DialogDrawerHeader>
+          <DialogDrawerBody>
+            <EditorInput
+              id={`${name}-editor`}
+              value={value}
+              onChange={onChange}
+              height="500px"
+              {...rest}
+            />
 
-        <FieldMessage error={error}>{supportingText}</FieldMessage>
-      </div>
-    </Modal>
+            <FieldMessage error={error}>{supportingText}</FieldMessage>
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
+    </>
   );
 }

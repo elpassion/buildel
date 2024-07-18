@@ -276,7 +276,7 @@ export const RestoreWorkflow = ({ pipeline }: RestoreWorkflowProps) => {
           action: routes.pipelineBuild(pipeline.organization_id, pipeline.id),
         }),
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to restore the workflow to previous version. This action
           is irreversible.
         </p>

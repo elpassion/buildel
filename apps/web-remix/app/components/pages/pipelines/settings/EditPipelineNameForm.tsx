@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { Modal } from '@elpassion/taco/Modal';
 import { withZod } from '@remix-validated-form/with-zod';
 import { Edit } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
@@ -13,6 +12,15 @@ import { SubmitButton } from '~/components/form/submit';
 import { IconButton } from '~/components/iconButton';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { successToast } from '~/components/toasts/successToast';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerFooter,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { useModal } from '~/hooks/useModal';
 import { routes } from '~/utils/routes.utils';
 
@@ -24,7 +32,7 @@ interface EditPipelineNameFormProps {
 export function EditPipelineNameForm({
   defaultValues,
 }: EditPipelineNameFormProps) {
-  const { isModalOpen, openModal, closeModal } = useModal();
+  const { isModalOpen, openModal, closeModal, changeOpen } = useModal();
   const validator = useMemo(() => withZod(updatePipelineNameSchema), []);
 
   const updateFetcher = useFetcher<IPipeline>();
@@ -61,42 +69,43 @@ export function EditPipelineNameForm({
         aria-label="Edit workflow name"
         onClick={openModal}
       />
+      <DialogDrawer open={isModalOpen} onOpenChange={changeOpen}>
+        <DialogDrawerContent>
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>Edit name</DialogDrawerTitle>
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
-        header={
-          <header className="p-1 text-white mr-3">
-            <p className="text-3xl mb-4">Edit name</p>
-
-            <p className="text-sm text-neutral-400">
+            <DialogDrawerDescription>
               Edit <span className="font-bold">{defaultValues.name}</span>{' '}
               workflow.
-            </p>
-          </header>
-        }
-      >
-        <div className="p-1 w-[330px] md:w-[450px]">
-          <ValidatedForm
-            method="put"
-            noValidate
-            validator={validator}
-            onSubmit={handleOnSubmit}
-            defaultValues={{ name: defaultValues.name }}
-          >
-            <Field name="name">
-              <FieldLabel>Pipeline name</FieldLabel>
-              <TextInputField placeholder="Acme" />
-              <FieldMessage>This will be visible only to you</FieldMessage>
-            </Field>
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+          <DialogDrawerBody>
+            <ValidatedForm
+              method="put"
+              noValidate
+              validator={validator}
+              onSubmit={handleOnSubmit}
+              defaultValues={{ name: defaultValues.name }}
+            >
+              <Field name="name">
+                <FieldLabel>Pipeline name</FieldLabel>
+                <TextInputField placeholder="Acme" />
+                <FieldMessage>This will be visible only to you</FieldMessage>
+              </Field>
 
-            <SubmitButton type="submit" size="lg" className="mt-4 ml-auto mr-0">
-              Save
-            </SubmitButton>
-          </ValidatedForm>
-        </div>
-      </Modal>
+              <DialogDrawerFooter>
+                <SubmitButton
+                  type="submit"
+                  size="lg"
+                  className="mt-4 ml-auto mr-0"
+                >
+                  Save
+                </SubmitButton>
+              </DialogDrawerFooter>
+            </ValidatedForm>
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
     </>
   );
 }

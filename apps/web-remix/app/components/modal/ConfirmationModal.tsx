@@ -1,15 +1,25 @@
 import React from 'react';
-import type { ModalProps } from '@elpassion/taco';
-import { Modal } from '@elpassion/taco/Modal';
 import classNames from 'classnames';
 
 import { Button } from '~/components/ui/button';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerFooter,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 
-export interface ConfirmationModalProps extends ModalProps {
+export interface ConfirmationModalProps {
   onConfirm?: () => Promise<void>;
   onCancel?: () => Promise<void>;
   confirmText?: React.ReactNode;
   cancelText?: React.ReactNode;
+  isOpen: boolean;
+  onClose: () => void;
+  className?: string;
+  children: React.ReactNode;
 }
 
 export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -32,41 +42,45 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   };
 
   return (
-    <Modal
-      header={props.header ?? <ConfirmationModalHeader />}
-      closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
-      className={classNames('max-w-[500px] min-w-[300px] mx-2', className)}
-      onClose={onClose}
-      {...props}
+    <DialogDrawer
+      open={props.isOpen}
+      onOpenChange={(value) => {
+        if (value) return;
+        onClose();
+      }}
     >
-      {children}
+      <DialogDrawerContent
+        className={classNames(
+          'md:max-w-[500px] md:min-w-[300px] mx-2',
+          className,
+        )}
+      >
+        <DialogDrawerHeader>
+          <DialogDrawerTitle>Are you sure?</DialogDrawerTitle>
+        </DialogDrawerHeader>
+        <DialogDrawerBody>
+          <div className="w-full mb-4">{children}</div>
 
-      <div className="flex gap-2 justify-end">
-        <Button
-          size="sm"
-          type="button"
-          variant="outline"
-          onClick={handleCancel}
-        >
-          {cancelText}
-        </Button>
-        <Button
-          type="submit"
-          size="sm"
-          variant="destructive"
-          onClick={handleConfirm}
-        >
-          {confirmText}
-        </Button>
-      </div>
-    </Modal>
+          <DialogDrawerFooter>
+            <Button
+              size="sm"
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+            >
+              {cancelText}
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              variant="destructive"
+              onClick={handleConfirm}
+            >
+              {confirmText}
+            </Button>
+          </DialogDrawerFooter>
+        </DialogDrawerBody>
+      </DialogDrawerContent>
+    </DialogDrawer>
   );
 };
-
-export function ConfirmationModalHeader() {
-  return (
-    <header className="flex justify-between gap-2 items-center">
-      <h3 className="text-white font-medium text-xl">Are you sure?</h3>
-    </header>
-  );
-}

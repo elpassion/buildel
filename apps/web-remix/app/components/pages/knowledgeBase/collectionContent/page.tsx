@@ -7,10 +7,16 @@ import {
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import { Modal } from '@elpassion/taco/Modal';
 import classNames from 'classnames';
 
 import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import { KnowledgeBaseFileList } from './KnowledgeBaseFileList';
@@ -37,7 +43,8 @@ export function KnowledgeBaseContentPage() {
   const [searchParams] = useSearchParams();
   const isDetails = !!matchDetails;
 
-  const handleClose = () => {
+  const handleClose = (value?: boolean) => {
+    if (value) return;
     navigate(routes.collectionFiles(organizationId, collectionName));
   };
 
@@ -45,21 +52,20 @@ export function KnowledgeBaseContentPage() {
     <>
       <KnowledgeBaseFileList items={fileList} />
 
-      <Modal
-        isOpen={isDetails}
-        header={
-          <h3 className="text-white font-medium text-xl">
-            {searchParams.get('file_name')}
-          </h3>
-        }
-        closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
-        onClose={handleClose}
-        className="w-full max-w-3xl"
-      >
-        <div className="max-h-[70vh] p-2">
-          <Outlet />
-        </div>
-      </Modal>
+      <DialogDrawer open={isDetails} onOpenChange={handleClose}>
+        <DialogDrawerContent className="md:min-w-[700px]">
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>
+              {searchParams.get('file_name')}
+            </DialogDrawerTitle>
+          </DialogDrawerHeader>
+          <DialogDrawerBody>
+            <div className="max-h-[70vh] p-2">
+              <Outlet />
+            </div>
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
 
       <ActionSidebar
         className={classNames('!bg-neutral-950', {

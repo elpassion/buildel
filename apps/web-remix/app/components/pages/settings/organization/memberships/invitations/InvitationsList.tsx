@@ -14,13 +14,14 @@ interface InvitationsListProps {
 
 export function InvitationsList({ invitations }: InvitationsListProps) {
   const fetcher = useFetcher();
+
   const handleDelete = async (invitationId: number) => {
     confirm({
       onConfirm: async () =>
         fetcher.submit({ invitationId }, { method: 'DELETE' }),
       confirmText: 'Delete invitation',
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to delete the invitation. This action is irreversible.
         </p>
       ),

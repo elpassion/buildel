@@ -35,7 +35,7 @@ export function CollectionMemory() {
   }, [inView]);
 
   return (
-    <section className="w-full">
+    <section className="w-full max-w-full">
       <MemoryChunksList items={data} />
 
       <div className="flex justify-center mt-5" ref={fetchNextRef}>

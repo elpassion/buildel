@@ -27,7 +27,7 @@ export const KnowledgeBaseCollectionList: React.FC<
         ),
       confirmText: 'Delete collection',
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to delete the "{collection.name}” collection from your
           knowledge base. This action is irreversible.
         </p>

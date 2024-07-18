@@ -29,7 +29,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
         fetcher.submit({ memoryId: file.id }, { method: 'delete' }),
       confirmText: 'Delete item',
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to delete the{' '}
           <span className="block font-bold max-w-full truncate">
             "{file.file_name}”

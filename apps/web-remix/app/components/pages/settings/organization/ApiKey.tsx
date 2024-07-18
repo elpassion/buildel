@@ -30,7 +30,7 @@ export const ApiKey: React.FC<ApiKeyProps> = ({ apiKey }) => {
     confirm({
       onConfirm: async () => fetcher.submit({}, { method: 'post' }),
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to regenerate the API Key. This action is irreversible.
         </p>
       ),

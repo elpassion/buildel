@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { Modal } from '@elpassion/taco/Modal';
 import { withZod } from '@remix-validated-form/with-zod';
 import { Edit } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
@@ -11,6 +10,15 @@ import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { IconButton } from '~/components/iconButton';
 import { Avatar, AvatarFallback } from '~/components/ui/avatar';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerFooter,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { useModal } from '~/hooks/useModal';
 
 import {
@@ -59,7 +67,7 @@ interface EditOrganizationNameProps {
   organization: IOrganization;
 }
 function EditOrganizationName({ organization }: EditOrganizationNameProps) {
-  const { isModalOpen, openModal, closeModal } = useModal();
+  const { isModalOpen, openModal, closeModal, changeOpen } = useModal();
   const validator = useMemo(() => withZod(schema), []);
 
   return (
@@ -72,38 +80,36 @@ function EditOrganizationName({ organization }: EditOrganizationNameProps) {
         onClick={openModal}
       />
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
-        header={
-          <header className="p-1 text-white mr-3">
-            <p className="text-3xl mb-4">Edit name</p>
+      <DialogDrawer open={isModalOpen} onOpenChange={changeOpen}>
+        <DialogDrawerContent>
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>Edit name</DialogDrawerTitle>
 
-            <p className="text-sm text-neutral-400">
+            <DialogDrawerDescription>
               Edit <span className="font-bold">{organization.name}</span>{' '}
               organization.
-            </p>
-          </header>
-        }
-      >
-        <div className="p-1 w-[330px] md:w-[450px]">
-          <ValidatedForm
-            method="put"
-            noValidate
-            validator={validator}
-            onSubmit={closeModal}
-          >
-            <Field name="organization.name">
-              <FieldLabel>Organization name</FieldLabel>
-              <TextInputField placeholder="Acme" />
-              <FieldMessage>This will be visible only to you</FieldMessage>
-            </Field>
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+          <DialogDrawerBody>
+            <ValidatedForm
+              method="put"
+              noValidate
+              validator={validator}
+              onSubmit={closeModal}
+            >
+              <Field name="organization.name">
+                <FieldLabel>Organization name</FieldLabel>
+                <TextInputField placeholder="Acme" />
+                <FieldMessage>This will be visible only to you</FieldMessage>
+              </Field>
 
-            <SubmitButton className="mt-4 ml-auto mr-0">Save</SubmitButton>
-          </ValidatedForm>
-        </div>
-      </Modal>
+              <DialogDrawerFooter>
+                <SubmitButton className="mt-4 ml-auto mr-0">Save</SubmitButton>
+              </DialogDrawerFooter>
+            </ValidatedForm>
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
     </>
   );
 }

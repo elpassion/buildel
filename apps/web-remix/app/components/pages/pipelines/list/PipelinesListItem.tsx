@@ -49,7 +49,7 @@ export const PipelineListItemHeader = ({
         fetcher.submit({ pipelineId: pipeline.id }, { method: 'delete' }),
       confirmText: 'Delete workflow',
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to delete the "{pipeline.name}” workflow from your
           organisation. This action is irreversible.
         </p>
