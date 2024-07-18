@@ -118,7 +118,7 @@ function TextOutput({ content, blockName, onClear }: TextOutputProps) {
             size="sm"
             value={`${isRaw}`}
             checked={isRaw}
-            onChange={toggleRaw}
+            onCheckedChange={toggleRaw}
           />
         </label>
 

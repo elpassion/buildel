@@ -50,9 +50,8 @@ export const BudgetLimitField: React.FC<BudgetLimitFieldProps> = ({
         <div className="flex gap-2">
           <FieldLabel className="!m-0">{label}</FieldLabel>
           <ToggleInput
-            autoComplete={name}
             checked={value !== null}
-            onChange={onCheck}
+            onCheckedChange={onCheck}
             value=""
           />
         </div>
