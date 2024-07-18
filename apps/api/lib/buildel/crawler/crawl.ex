@@ -105,7 +105,7 @@ defmodule Buildel.Crawler.Crawl do
   defp request(crawl) do
     %{url: url, depth: depth} = crawl.pending_pages |> List.first()
 
-    case HTTPoison.get(url) do
+    case HTTPoison.get(url, [], follow_redirect: true) do
       {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
       when status_code >= 200 and status_code < 400 ->
         crawl = success_page(crawl, url, body)

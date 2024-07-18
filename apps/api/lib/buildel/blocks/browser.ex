@@ -80,38 +80,37 @@ defmodule Buildel.Blocks.Browser do
         |> Enum.join(" ")
 
       state = output(state, "output", {:text, content})
-      # state = respond_to_tool(state, "tool", {:text, content})
 
-      output(state, "file_output", {:binary, path}, %{
-        metadata: %{
-          file_id: UUID.uuid4(),
-          file_name: url,
-          file_type: "text/html"
-        }
-      })
+      state =
+        output(state, "file_output", {:binary, path}, %{
+          metadata: %{
+            file_id: UUID.uuid4(),
+            file_name: url,
+            file_type: "text/html"
+          }
+        })
+
+      {content, state}
     else
       {:error, %Crawler.Crawl{} = crawl} ->
         send_error(state, crawl.error)
-        state |> send_stream_stop()
-
-      # |> respond_to_tool("tool", {:text, to_string(crawl.error)})
+        state = state |> send_stream_stop()
+        {to_string(crawl.error), state}
 
       {:ok, %Crawler.Crawl{}} ->
         send_error(state, "No content found")
-        state |> send_stream_stop()
-
-      # |> respond_to_tool("tool", {:text, "No content found"})
+        state = state |> send_stream_stop()
+        {"No content found", state}
 
       {:error, reason} ->
         send_error(state, reason)
-        state |> send_stream_stop()
-
-      # |> respond_to_tool("tool", {:text, to_string(reason)})
+        state = state |> send_stream_stop()
+        {to_string(reason), state}
 
       _ ->
         send_error(state, "Unknown error")
-        state |> send_stream_stop()
-        #  |> respond_to_tool("tool", {:text, "Unknown error"})
+        state = state |> send_stream_stop()
+        {"Unknown error", state}
     end
   end
 
@@ -146,7 +145,8 @@ defmodule Buildel.Blocks.Browser do
 
   @impl true
   def handle_input("url", {_topic, :text, text, _metadata}, state) do
-    url(text, state)
+    {_content, state} = url(text, state)
+    state
   end
 
   @impl true
