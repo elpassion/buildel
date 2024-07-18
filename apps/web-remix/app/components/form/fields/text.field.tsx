@@ -3,17 +3,21 @@ import { Icon } from '@elpassion/taco';
 import classNames from 'classnames';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
 import type { TextInputProps } from '~/components/form/inputs/text.input';
 import { TextInput } from '~/components/form/inputs/text.input';
 
+export interface TextInputFieldProps extends TextInputProps {}
+
 export const TextInputField = forwardRef<
   HTMLInputElement,
-  Partial<TextInputProps>
->(({ errorMessage, ...props }, ref) => {
+  Partial<TextInputFieldProps>
+>(({ ...props }, ref) => {
   const { name, getInputProps, error } = useFieldContext();
 
   return (
     <TextInput
+      id={name}
       name={name}
       ref={ref}
       aria-invalid={error ? true : undefined}
@@ -21,7 +25,6 @@ export const TextInputField = forwardRef<
       aria-errormessage={error ? `${name}-error` : undefined}
       aria-label={name}
       autoComplete={name}
-      errorMessage={errorMessage ?? error}
       {...props}
       {...getInputProps()}
     />
@@ -30,7 +33,7 @@ export const TextInputField = forwardRef<
 TextInputField.displayName = 'TextInputField';
 export const PasswordInputField = forwardRef<
   HTMLInputElement,
-  Partial<TextInputProps>
+  Partial<TextInputFieldProps>
 >((props, ref) => {
   return <TextInputField ref={ref} type={'password'} {...props} />;
 });
@@ -40,7 +43,7 @@ PasswordInputField.displayName = 'PasswordInputField';
 export function ResettableTextInputField({
   label,
   ...props
-}: Partial<TextInputProps>) {
+}: Partial<TextInputFieldProps> & { label: string }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const onReset = () => {
@@ -52,17 +55,16 @@ export function ResettableTextInputField({
   const canReset = !!props.defaultValue;
 
   return (
-    <TextInputField
-      ref={inputRef}
-      label={
+    <>
+      <FieldLabel>
         <div className="flex gap-2 justify-between items-center">
           <span>{label}</span>
 
           {canReset ? <ResettableFieldResetButton onClick={onReset} /> : null}
         </div>
-      }
-      {...props}
-    />
+      </FieldLabel>
+      <TextInputField ref={inputRef} {...props} />
+    </>
   );
 }
 

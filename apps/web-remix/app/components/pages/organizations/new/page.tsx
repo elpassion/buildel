@@ -5,6 +5,7 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateOrganizationSchema } from '~/api/organization/organization.contracts';
 import { Field } from '~/components/form/fields/field.context';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 
@@ -28,10 +29,8 @@ export function NewOrganizationPage() {
         >
           <div className="max-w-s form-control w-full">
             <Field name="organization.name">
-              <TextInputField
-                placeholder="Name"
-                supportingText="This will be visible only to you"
-              />
+              <TextInputField placeholder="Name" />
+              <FieldMessage>This will be visible only to you</FieldMessage>
             </Field>
           </div>
           <SubmitButton size="lg" className="mt-8 mx-auto">

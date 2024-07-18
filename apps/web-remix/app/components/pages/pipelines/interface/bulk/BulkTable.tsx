@@ -1,6 +1,5 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Link } from '@remix-run/react';
-import classNames from 'classnames';
 import { ExternalLink, Trash } from 'lucide-react';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
@@ -77,7 +76,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
               {selectedInputs.map((input) => (
                 <td
                   key={input.name}
-                  className="py-3 px-5 text-neutral-100 text-sm"
+                  className="py-3 px-5 text-muted-foreground text-sm"
                 >
                   {input.type === 'text_input' ? (
                     <TextareaInput
@@ -127,7 +126,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
               {selectedOutputs.map((output) => (
                 <td
                   key={output}
-                  className="py-3 px-5 text-neutral-100 text-sm"
+                  className="py-3 px-5 text-muted-foreground text-sm"
                 >
                   <ChatMarkdown>{test.outputs[output]}</ChatMarkdown>
                 </td>

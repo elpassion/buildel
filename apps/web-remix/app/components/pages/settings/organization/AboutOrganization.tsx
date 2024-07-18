@@ -6,6 +6,8 @@ import { Edit } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { IconButton } from '~/components/iconButton';
@@ -97,11 +99,9 @@ function EditOrganizationName({ organization }: EditOrganizationNameProps) {
             onSubmit={closeModal}
           >
             <Field name="organization.name">
-              <TextInputField
-                label="Organization name"
-                placeholder="Acme"
-                supportingText="This will be visible only to you"
-              />
+              <FieldLabel>Organization name</FieldLabel>
+              <TextInputField placeholder="Acme" />
+              <FieldMessage>This will be visible only to you</FieldMessage>
             </Field>
 
             <SubmitButton className="mt-4 ml-auto mr-0">Save</SubmitButton>

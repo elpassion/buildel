@@ -6,6 +6,8 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { UpdateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import {
@@ -40,14 +42,16 @@ export function CollectionSettingsPage() {
 
           <div className="max-w-s w-full grow overflow-y-auto p-1 flex flex-col gap-2 space-y-1">
             <Field name="name">
+              <FieldLabel>Name</FieldLabel>
               <TextInputField
                 disabled
                 type="text"
                 autoFocus
-                label="Name"
                 placeholder="eg. My Collection"
-                supportingText="It will help you identify the collection in BUILDEL"
               />
+              <FieldMessage>
+                It will help you identify the collection in BUILDEL
+              </FieldMessage>
             </Field>
 
             <div>
@@ -59,13 +63,11 @@ export function CollectionSettingsPage() {
 
             <div>
               <Field name="embeddings.endpoint">
-                <TextInputField
-                  disabled
-                  type="text"
-                  label={'Endpoint'}
-                  name={'endpoint'}
-                  supportingText="API endpoint used for retrieving embeddings"
-                />
+                <FieldLabel>Endpoint</FieldLabel>
+                <TextInputField disabled type="text" name={'endpoint'} />
+                <FieldMessage>
+                  API endpoint used for retrieving embeddings
+                </FieldMessage>
               </Field>
             </div>
 

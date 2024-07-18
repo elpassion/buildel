@@ -5,7 +5,8 @@ import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field } from '~/components/form/fields/field.context';
-import { FieldError } from '~/components/form/fields/field.error';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 
@@ -38,16 +39,13 @@ export function ResetPasswordPage() {
         className="w-full max-w-md"
       >
         <Field name="global">
-          <FieldError />
+          <FieldMessage />
         </Field>
         <div className="form-control w-full mb-4">
           <Field name="email">
-            <TextInputField
-              aria-label="email"
-              type="email"
-              label="Email address"
-              autoFocus
-            />
+            <FieldLabel>Email address</FieldLabel>
+            <TextInputField aria-label="email" type="email" autoFocus />
+            <FieldMessage />
           </Field>
         </div>
         <SubmitButton isFluid>Send instructions</SubmitButton>

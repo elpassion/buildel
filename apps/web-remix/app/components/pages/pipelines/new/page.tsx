@@ -5,6 +5,8 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
 import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 
@@ -20,14 +22,16 @@ export function NewPipelinePage() {
     >
       <div className="max-w-s w-full grow overflow-y-auto p-1">
         <Field name="pipeline.name">
+          <FieldLabel>Name</FieldLabel>
           <TextInputField
             type="text"
             autoFocus
             placeholder="eg. Text To Speech"
-            supportingText="It will help you identify the workflow in BUILDEL"
-            label="Name"
             aria-label="Name"
           />
+          <FieldMessage>
+            It will help you identify the workflow in BUILDEL
+          </FieldMessage>
         </Field>
 
         <HiddenField name="pipeline.config.version" value="1" />

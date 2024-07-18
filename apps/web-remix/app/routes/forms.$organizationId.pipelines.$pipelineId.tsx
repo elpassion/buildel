@@ -11,6 +11,8 @@ import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts'
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { SmallFileInputField } from '~/components/form/fields/file.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
@@ -148,7 +150,11 @@ export default function WebsiteForm() {
               return (
                 <Field name={input.name} key={input.name}>
                   {input.type === 'text_input' && (
-                    <TextInputField className="w-full" label={input.name} />
+                    <div className="w-full">
+                      <FieldLabel>{input.name}</FieldLabel>
+                      <TextInputField className="w-full" />
+                      <FieldMessage />
+                    </div>
                   )}
                   {input.type === 'file_input' && (
                     <div className="flex text-white justify-start items-center gap-2 bg-neutral-800 rounded-lg w-full">

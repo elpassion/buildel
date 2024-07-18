@@ -5,6 +5,8 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { UpdateAliasSchema } from '~/api/pipeline/pipeline.contracts';
 import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import type { IPipelineAlias } from '~/components/pages/pipelines/pipeline.types';
@@ -49,7 +51,9 @@ export const EditAliasNameModal: React.FC<EditAliasNameModalProps> = ({
           <HiddenField name="id" value={initialData.id} />
 
           <Field name="name">
-            <TextInputField label="Name" data-testid="alias-name" />
+            <FieldLabel>Name</FieldLabel>
+            <TextInputField data-testid="alias-name" />
+            <FieldMessage />
           </Field>
 
           <SubmitButton size="sm" className="mt-6 ml-auto mr-0">

@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import { useFormContext, ValidatedForm } from 'remix-validated-form';
 
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { NumberInputField } from '~/components/form/fields/number.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { IconButton } from '~/components/iconButton';
@@ -32,19 +34,20 @@ export const KnowledgeBaseSearchForm: React.FC<
     >
       <SearchParams>
         <Field name="limit">
-          <NumberInputField
-            label="Results limit"
-            placeholder="eg. 10"
-            supportingText="Limit the number of results returned by the search. Default is 10."
-          />
+          <FieldLabel>Results limit</FieldLabel>
+          <NumberInputField placeholder="eg. 10" />
+          <FieldMessage>
+            Limit the number of results returned by the search. Default is 10.
+          </FieldMessage>
         </Field>
 
         <Field name="token_limit">
-          <NumberInputField
-            label="Tokens limit"
-            placeholder="eg. 500"
-            supportingText="Limit the number of tokens returned by the search. Disabled by default."
-          />
+          <FieldLabel>Tokens limit</FieldLabel>
+          <NumberInputField placeholder="eg. 500" />
+          <FieldMessage>
+            Limit the number of tokens returned by the search. Disabled by
+            default.
+          </FieldMessage>
         </Field>
 
         <Field name="extend_neighbors">
@@ -64,10 +67,8 @@ export const KnowledgeBaseSearchForm: React.FC<
 
       <Field name="query">
         <div className="relative w-full">
-          <TextInputField
-            placeholder="Ask a question..."
-            inputClassName="!pr-8"
-          />
+          <TextInputField placeholder="Ask a question..." className="!pr-8" />
+          <FieldMessage />
 
           <div className="absolute top-[21px] right-3 -translate-y-1/2">
             <SearchButton />

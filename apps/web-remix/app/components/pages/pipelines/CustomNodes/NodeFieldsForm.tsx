@@ -268,7 +268,6 @@ export function NodeFieldsForm({
             <TextareaInput
               data-testid={`${blockName}-${name}`}
               style={{ borderTopLeftRadius: 0 }}
-              label=""
               id={name}
               name={name}
               placeholder={`Input text to test the workflow`}

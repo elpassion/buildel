@@ -4,6 +4,8 @@ import { useFieldArray, useFormContext } from 'remix-validated-form';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field as FormField } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { QuantityInputField } from '~/components/form/fields/quantity.field';
 import { RadioField } from '~/components/form/fields/radio.field';
 import {
@@ -30,12 +32,9 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
     if ('presentAs' in field && field.presentAs === 'password') {
       return (
         <FormField name={name}>
-          <PasswordInputField
-            id={name}
-            supportingText={field.description}
-            label={field.title}
-            errorMessage={error}
-          />
+          <FieldLabel>{field.title}</FieldLabel>
+          <PasswordInputField id={name} />
+          <FieldMessage error={error}>{field.description}</FieldMessage>
         </FormField>
       );
     }
@@ -84,11 +83,10 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       <FormField name={name}>
         <ResettableTextInputField
           id={name}
-          supportingText={field.description}
-          label={field.title}
-          errorMessage={error}
           defaultValue={defaultValue}
+          label={field.title}
         />
+        <FieldMessage error={error}>{field.description}</FieldMessage>
       </FormField>
     );
   }

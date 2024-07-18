@@ -5,6 +5,8 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateUpdateSecretSchema } from '~/api/secrets/secrets.contracts';
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import {
   PasswordInputField,
   TextInputField,
@@ -23,26 +25,27 @@ export function NewSecret() {
     >
       <div className="p-1 w-full space-y-6 grow overflow-y-auto">
         <Field name="name">
+          <FieldLabel>Name your Secret</FieldLabel>
           <TextInputField
             autoFocus
             placeholder="e.g. my open ai key"
             type="text"
-            label="Name your Secret"
-            supportingText="It will help you identify the key in BUILDEL"
           />
+          <FieldMessage>
+            It will help you identify the key in BUILDEL
+          </FieldMessage>
         </Field>
 
         <Field name="value">
-          <PasswordInputField
-            label="Enter the Secret key"
-            placeholder="Type or paste in your token key"
-            supportingText="The actual token key that will authorise you in the external system, such as Open AI."
-          />
+          <FieldLabel>Enter the Secret key</FieldLabel>
+          <PasswordInputField placeholder="Type or paste in your token key" />
+          <FieldMessage>
+            The actual token key that will authorise you in the external system,
+            such as Open AI.
+          </FieldMessage>
         </Field>
       </div>
-      <SubmitButton size="sm" hierarchy="primary">
-        Save the Secret
-      </SubmitButton>
+      <SubmitButton size="sm">Save the Secret</SubmitButton>
     </ValidatedForm>
   );
 }

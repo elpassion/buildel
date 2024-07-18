@@ -4,6 +4,8 @@ import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 
@@ -22,13 +24,19 @@ export function ChangePasswordPage() {
     >
       <div className="max-w-s w-full grow overflow-y-auto p-1">
         <Field name="current_password">
-          <TextInputField type="password" autoFocus label="Current password" />
+          <FieldLabel>Current password</FieldLabel>
+          <TextInputField type="password" autoFocus />
+          <FieldMessage />
         </Field>
         <Field name="password">
-          <TextInputField type="password" label="New password" />
+          <FieldLabel>New password</FieldLabel>
+          <TextInputField type="password" />
+          <FieldMessage />
         </Field>
         <Field name="password_confirmation">
-          <TextInputField type="password" label="Confirm password" />
+          <FieldLabel>Confirm password</FieldLabel>
+          <TextInputField type="password" />
+          <FieldMessage />
         </Field>
       </div>
       <Section>

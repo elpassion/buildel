@@ -5,6 +5,8 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateUpdateSecretSchema } from '~/api/secrets/secrets.contracts';
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import {
   PasswordInputField,
   TextInputField,
@@ -57,12 +59,15 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
           </Field>
 
           <Field name="value">
+            <FieldLabel>Enter Secret</FieldLabel>
             <PasswordInputField
               autoFocus
-              label="Enter Secret"
               placeholder="Type or paste in your secret key"
-              supportingText="The actual token key that will authorise you in the external system, such as Open AI."
             />
+            <FieldMessage>
+              The actual token key that will authorise you in the external
+              system, such as Open AI.
+            </FieldMessage>
           </Field>
 
           <SubmitButton size="sm" className="mt-6 ml-auto mr-0">

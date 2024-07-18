@@ -5,7 +5,8 @@ import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
-import { FieldError } from '~/components/form/fields/field.error';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import {
   PasswordInputField,
   TextInputField,
@@ -49,24 +50,23 @@ export function RegisterPage() {
         className="w-full max-w-md"
       >
         <Field name="global">
-          <FieldError />
+          <FieldMessage />
         </Field>
 
         <HiddenField name="redirectTo" value={redirectTo ?? undefined} />
 
         <div className="form-control w-full mb-4">
           <Field name="user.email">
-            <TextInputField
-              aria-label="email"
-              type="email"
-              autoFocus
-              label="Email address"
-            />
+            <FieldLabel>Email address</FieldLabel>
+            <TextInputField aria-label="email" type="email" autoFocus />
+            <FieldMessage />
           </Field>
         </div>
         <div className="max-w-s form-control w-full mb-6">
           <Field name="user.password">
-            <PasswordInputField aria-label="password" label="Password" />
+            <FieldLabel>Password</FieldLabel>
+            <PasswordInputField aria-label="password" />
+            <FieldMessage />
           </Field>
         </div>
         <SubmitButton isFluid>Register</SubmitButton>

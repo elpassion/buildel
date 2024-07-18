@@ -5,6 +5,8 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateInvitationSchema } from '~/api/organization/organization.contracts';
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 
@@ -20,13 +22,13 @@ export function NewMembershipPage() {
     >
       <div className="max-w-s w-full grow overflow-y-auto p-1">
         <Field name="invitation.email">
+          <FieldLabel>Email</FieldLabel>
           <TextInputField
             type="email"
             autoFocus
             placeholder="eg. test@example.com"
-            supportingText="Email of the user to be registered"
-            label="Email"
           />
+          <FieldMessage>Email of the user to be registered</FieldMessage>
         </Field>
       </div>
       <SubmitButton size="sm">Invite member</SubmitButton>

@@ -5,7 +5,8 @@ import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
-import { FieldError } from '~/components/form/fields/field.error';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 
@@ -40,24 +41,26 @@ export function SetPasswordPage() {
         className="w-full max-w-md"
       >
         <Field name="global">
-          <FieldError />
+          <FieldMessage />
         </Field>
         <div className="form-control w-full mb-4">
           <Field name="password">
+            <FieldLabel>New password</FieldLabel>
             <TextInputField
               type="password"
-              label="New password"
               autoFocus
               data-testid="new-password"
             />
+            <FieldMessage />
           </Field>
           <Field name="password_confirmation">
+            <FieldLabel>Confirm new password</FieldLabel>
             <TextInputField
               type="password"
-              label="Confirm new password"
               data-testid="new-password-confirmation"
               autoFocus
             />
+            <FieldMessage />
           </Field>
           <HiddenField name="token" value={token} />
         </div>

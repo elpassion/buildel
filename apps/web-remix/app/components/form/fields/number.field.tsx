@@ -1,13 +1,12 @@
 import React, { forwardRef } from 'react';
-import type { InputNumberProps } from '@elpassion/taco';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
-
-import { NumberInput } from '../inputs/number.input';
+import type { TextInputFieldProps } from '~/components/form/fields/text.field';
+import { NumberInput } from '~/components/form/inputs/number.input';
 
 export const NumberInputField = forwardRef<
   HTMLInputElement,
-  Partial<InputNumberProps>
+  Omit<TextInputFieldProps, 'type'>
 >((props, ref) => {
   const { name, getInputProps, error } = useFieldContext();
   return (
@@ -18,7 +17,6 @@ export const NumberInputField = forwardRef<
       aria-describedby={`${name}-error`}
       aria-errormessage={error ? `${name}-error` : undefined}
       autoComplete={name}
-      errorMessage={error}
       {...props}
       {...getInputProps()}
     />

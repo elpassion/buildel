@@ -16,6 +16,8 @@ import {
   Field as FormField,
   HiddenField,
 } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import type { FieldProps } from '~/components/form/schema/Schema';
 import { Schema } from '~/components/form/schema/Schema';
@@ -301,13 +303,11 @@ export function EditBlockForm({
           </div>
 
           <FormField name="name">
-            <TextInputField
-              name="name"
-              label="Name"
-              supportingText="The name of the chat."
-              defaultValue={blockConfig.name}
-              errorMessage={fieldsErrors.name}
-            />
+            <FieldLabel>Name</FieldLabel>
+            <TextInputField name="name" defaultValue={blockConfig.name} />
+            <FieldMessage error={fieldsErrors.name}>
+              The name of the chat.
+            </FieldMessage>
           </FormField>
           <HiddenField
             name="inputs"
