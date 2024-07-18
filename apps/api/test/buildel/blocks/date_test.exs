@@ -6,7 +6,7 @@ defmodule Buildel.Blocks.DateTest do
     assert Date.options() == %{
              type: "date",
              description: "An utility block that returns the current date and time (UTC).",
-             groups: ["utils", "inputs / outputs"],
+             groups: ["utils", "inputs / outputs", "tools"],
              inputs: [Block.text_input()],
              outputs: [Block.text_output()],
              ios: [Block.io("tool", "worker")],
