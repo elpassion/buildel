@@ -1,9 +1,10 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useMemo } from 'react';
-import { Badge } from '@elpassion/taco';
+import React, { useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import startCase from 'lodash.startcase';
 import { AlertCircle } from 'lucide-react';
+
+import { Badge } from '~/components/ui/badge';
 
 import type { IBlockConfig } from '../pipeline.types';
 import { getBlockFields, getBlockHandles } from '../PipelineFlow.utils';
@@ -84,7 +85,8 @@ export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
         <h3 className="text-xs font-medium capitalize text-neutral-50">
           {startCase(data.type)}
         </h3>
-        <Badge size="xs" text={data.name} />
+
+        <Badge variant="secondary">{data.name}</Badge>
       </div>
 
       {children}

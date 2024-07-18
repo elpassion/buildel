@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Link } from '@remix-run/react';
-import { Indicator } from '@elpassion/taco';
 import {
   createColumnHelper,
   flexRender,
@@ -17,6 +16,7 @@ import type {
   IPipelineRuns,
 } from '~/components/pages/pipelines/pipeline.types';
 import { Tooltip } from '~/components/tooltip/Tooltip';
+import { Badge } from '~/components/ui/badge';
 import { dayjs } from '~/utils/Dayjs';
 import { routes } from '~/utils/routes.utils';
 
@@ -43,11 +43,13 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
       columnHelper.accessor('status', {
         id: 'status',
         cell: (info) => (
-          <Indicator
-            type={info.getValue() !== 'finished' ? 'warning' : 'success'}
-            variant="badge"
-            text={info.getValue()}
-          />
+          <Badge
+            variant={
+              info.getValue() !== 'finished' ? 'destructive' : 'secondary'
+            }
+          >
+            {info.getValue()}
+          </Badge>
         ),
         header: 'Status',
       }),

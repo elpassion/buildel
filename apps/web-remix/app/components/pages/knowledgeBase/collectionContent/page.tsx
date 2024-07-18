@@ -60,7 +60,7 @@ export function KnowledgeBaseContentPage() {
             </DialogDrawerTitle>
           </DialogDrawerHeader>
           <DialogDrawerBody>
-            <div className="max-h-[70vh] p-2">
+            <div className="max-h-[70vh] p-2 overflow-auto">
               <Outlet />
             </div>
           </DialogDrawerBody>

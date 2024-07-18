@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { Indicator } from '@elpassion/taco';
 import {
   createColumnHelper,
   flexRender,
@@ -9,6 +8,7 @@ import {
 
 import { EmptyMessage } from '~/components/list/ItemList';
 import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
+import { Badge } from '~/components/ui/badge';
 import { dayjs } from '~/utils/Dayjs';
 
 import type { IKnowledgeBaseCollectionCost } from '../knowledgeBase.types';
@@ -32,11 +32,11 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
       columnHelper.accessor('cost_type', {
         id: 'cost_type',
         cell: (info) => (
-          <Indicator
-            type={info.getValue() === 'query' ? 'success' : 'processing'}
-            variant="badge"
-            text={info.getValue()}
-          />
+          <Badge
+            variant={info.getValue() !== 'query' ? 'default' : 'secondary'}
+          >
+            {info.getValue()}
+          </Badge>
         ),
         header: 'Cost type',
       }),
