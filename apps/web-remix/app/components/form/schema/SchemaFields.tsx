@@ -7,7 +7,10 @@ import { Field as FormField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { QuantityInputField } from '~/components/form/fields/quantity.field';
-import { RadioField } from '~/components/form/fields/radio.field';
+import {
+  RadioField,
+  RadioGroupField,
+} from '~/components/form/fields/radio.field';
 import {
   PasswordInputField,
   ResettableTextInputField,
@@ -15,6 +18,7 @@ import {
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 import { IconButton } from '~/components/iconButton';
 import { Button } from '~/components/ui/button';
+import { Label } from '~/components/ui/label';
 import { assert } from '~/utils/assert';
 
 import { Field } from './Schema';
@@ -94,21 +98,18 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
     return (
       <FormField name={name}>
         <div className="space-y-3">
-          <label htmlFor={name} className="text-white text-sm font-medium">
-            {field.title}
-          </label>
-          {field.enum.map((value, index) => (
-            <RadioField
-              key={value}
-              id={name + index}
-              name={name}
-              errorMessage={error ?? undefined}
-              label={value}
-              value={value}
-              defaultValue={field.default}
-              className="!mt-3"
-            />
-          ))}
+          <FieldLabel htmlFor={name}>{field.title}</FieldLabel>
+
+          <RadioGroupField defaultValue={field.default}>
+            {field.enum.map((value) => (
+              <Label key={value} className="flex gap-1 items-center">
+                <RadioField id={value} value={value} />
+
+                <span>{value}</span>
+              </Label>
+            ))}
+          </RadioGroupField>
+          <FieldMessage error={error} />
         </div>
       </FormField>
     );

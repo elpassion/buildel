@@ -26,6 +26,7 @@
     "@floating-ui/react-dom": "^2.0.8",
     "@mcansh/remix-fastify": "^3.2.2",
     "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-radio-group": "^1.2.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-toggle": "^1.1.0",

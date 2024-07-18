@@ -1,5 +1,5 @@
-import type { RadioProps } from '@elpassion/taco';
-import { Radio } from '@elpassion/taco';
+import type { RadioGroupItemProps } from '~/components/ui/radio-group';
+import { RadioGroupItem } from '~/components/ui/radio-group';
 
-export type RadioInputProps = RadioProps;
-export const RadioInput = Radio;
+export type RadioInputProps = RadioGroupItemProps;
+export const RadioInput = RadioGroupItem;

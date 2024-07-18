@@ -23,7 +23,7 @@ export function NewKnowledgeBasePage() {
   const onValueChange = (name: string, value: unknown) => {
     setWatchedValues((prev) => ({ ...prev, [name]: value }));
   };
-
+  console.log(_);
   return (
     <ValidatedForm
       validator={validator}
