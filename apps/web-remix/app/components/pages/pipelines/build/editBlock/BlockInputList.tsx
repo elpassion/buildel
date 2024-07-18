@@ -1,8 +1,8 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo, useRef, useState } from 'react';
-import { Checkbox } from '@elpassion/taco';
 import classNames from 'classnames';
 
+import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 import { ItemList } from '~/components/list/ItemList';
 import type { IConfigConnection } from '~/components/pages/pipelines/pipeline.types';
 import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
@@ -61,24 +61,24 @@ function BlockInputItem({ data }: IItem) {
   const [resettable, setResettable] = useState(data.opts.reset);
   const { updateInputReset } = useInputs();
 
-  const onCheckedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateInputReset(data, e.target.checked);
-    setResettable(e.target.checked);
+  const onCheckedChange = (checked: boolean) => {
+    updateInputReset(data, checked);
+    setResettable(checked);
   };
 
   return (
     <div className="relative" ref={wrapperRef}>
       <Badge className="cursor-pointer">
-        <Checkbox
+        <CheckboxInput
           size="sm"
           checked={resettable}
-          onChange={onCheckedChange}
+          onCheckedChange={onCheckedChange}
           id={`${data.from.block_name}-resettable`}
         />
 
         <label
           htmlFor={`${data.from.block_name}-resettable`}
-          className="cursor-pointer"
+          className="cursor-pointer ml-1"
         >
           <BadgeText variant={resettable ? 'primary' : 'secondary'}>
             {data.from.block_name}

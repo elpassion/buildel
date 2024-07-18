@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { Avatar } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import { withZod } from '@remix-validated-form/with-zod';
 import { Edit } from 'lucide-react';
@@ -11,6 +10,7 @@ import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { IconButton } from '~/components/iconButton';
+import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { useModal } from '~/hooks/useModal';
 
 import {
@@ -47,13 +47,9 @@ interface OrganizationAvatarProps {
 export function OrganizationAvatar({ name }: OrganizationAvatarProps) {
   return (
     <div className="flex gap-2 items-center">
-      <Avatar
-        name={name}
-        contentType="text"
-        shape="circle"
-        className="!bg-neutral-950 !text-white"
-        size="sm"
-      />
+      <Avatar className="rounded-full">
+        <AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
+      </Avatar>
       <h3 className="text-sm font-medium">{name}</h3>
     </div>
   );
