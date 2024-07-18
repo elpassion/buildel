@@ -27,8 +27,8 @@ export default function Layout() {
   useServerToasts(toasts);
 
   return (
-    <main className="w-full min-h-screen flex justify-center items-center bg-neutral-950 p-2">
-      <div className="w-full max-w-xl px-6 py-8 bg-neutral-850 rounded-xl">
+    <main className="w-full min-h-screen flex justify-center items-center bg-white p-2 text-foreground">
+      <div className="w-full max-w-xl px-6 py-8 rounded-xl">
         <Outlet />
       </div>
     </main>

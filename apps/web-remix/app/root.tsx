@@ -55,7 +55,7 @@ function Document({
           src="/statistics/script.js"
         ></script>
       </head>
-      <body className="bg-neutral-950">
+      <body className="bg-white text-foreground">
         {children}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
@@ -81,7 +81,7 @@ export default withSentry(App);
 export function ErrorBoundary() {
   const nonce = useNonce();
   return (
-    <ErrorBoundaryLayout nonce={nonce} className="bg-neutral-950 text-white">
+    <ErrorBoundaryLayout nonce={nonce} className="bg-white text-foreground">
       <RootErrorBoundary />
     </ErrorBoundaryLayout>
   );

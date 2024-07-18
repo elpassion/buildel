@@ -28,18 +28,16 @@ export function LoginPage() {
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
-      <h1 className="text-center text-3xl font-bold text-neutral-100">
-        Sign in to account
-      </h1>
+      <h1 className="text-center text-3xl font-bold ">Sign in to account</h1>
       {signupEnabled && (
-        <p className="text-center text-neutral-100">
+        <p className="text-center text-muted-foreground">
           Don't have an account?{' '}
           <Link
             to={{
               pathname: '/register',
               search: searchParams.toString(),
             }}
-            className="text-primary-500"
+            className="text-foreground"
           >
             Sign up
           </Link>{' '}
@@ -51,35 +49,39 @@ export function LoginPage() {
         validator={validator}
         method="post"
         noValidate
-        className="w-full max-w-md"
+        className="w-full max-w-md mt-10"
       >
-        <Field name="global">
-          <FieldMessage />
-        </Field>
         <div className="form-control w-full mb-4">
           <Field name="user.email">
             <FieldLabel>Email address</FieldLabel>
             <TextInputField aria-label="email" type="email" autoFocus />
-            <FieldMessage>Hello world</FieldMessage>
+            <FieldMessage />
           </Field>
         </div>
-        <div className="max-w-s form-control w-full mb-6">
+        <div className="max-w-s form-control w-full mb-2">
           <Field name="user.password">
             <FieldLabel>Password</FieldLabel>
             <PasswordInputField aria-label="password" />
             <FieldMessage />
           </Field>
         </div>
+
+        <div className="mb-4">
+          <Field name="global">
+            <FieldMessage />
+          </Field>
+        </div>
+
         <HiddenField name="redirectTo" value={redirectTo ?? undefined} />
         <SubmitButton isFluid>Log in</SubmitButton>
       </ValidatedForm>
-      <Link to={routes.resetPassowrd()} className="mt-2 text-neutral-100">
+      <Link to={routes.resetPassowrd()} className="mt-2 text-muted-foreground">
         Forgot your password? Reset it here.
       </Link>
 
       {googleLoginEnabled && (
         <>
-          <span className="my-3 text-neutral-300 text-sm">Or</span>
+          <span className="my-3 text-muted-foreground text-sm">Or</span>
           <SocialSignInForm action="/auth/google" className="max-w-md mb-4">
             <GoogleButton />
           </SocialSignInForm>

@@ -32,7 +32,7 @@ export const FieldMessage = React.forwardRef<
       id={name}
       className={cn(
         'text-sm font-medium mt-1',
-        { 'text-red-500': isError, 'text-neutral-300': !isError },
+        { 'text-red-500': isError, 'text-muted-foreground': !isError },
         className,
       )}
       {...props}

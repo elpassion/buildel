@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigation } from '@remix-run/react';
 
+import { Button } from '~/components/ui/button';
 import { Google } from '~/icons/Google';
 
 type GoogleButtonContent = 'Sign in with Google' | 'Sign up with Google';
@@ -13,14 +14,16 @@ export const GoogleButton: React.FC<{ content?: GoogleButtonContent }> = ({
   const disabled = state !== 'idle';
 
   return (
-    <button
+    <Button
       type="submit"
       disabled={disabled}
-      className="flex items-center justify-center gap-[10px] w-full text-[#1f1f1f] bg-[#F2F2F2] px-3 py-[10px] rounded-lg font-['Roboto'] font-medium"
+      isFluid
+      className="flex gap-[10px] items-center"
+      variant="secondary"
     >
       <Google className="w-6 h-6" />
 
       <div className="text-sm">{content}</div>
-    </button>
+    </Button>
   );
 };

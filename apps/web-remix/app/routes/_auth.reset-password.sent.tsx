@@ -8,16 +8,16 @@ export function loader() {
 export default function ResetPasswordSent() {
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
-      <h1 className="text-center text-3xl font-bold text-neutral-100">
+      <h1 className="text-center text-3xl font-bold">
         Reset password instructions successfully sent!
       </h1>
-      <p className="text-center text-neutral-100">
+      <p className="text-center text-muted-foreground">
         Go back to{' '}
         <Link
           to={{
             pathname: '/login',
           }}
-          className="text-primary-500"
+          className="text-foreground"
         >
           Sign In
         </Link>
