@@ -12,7 +12,7 @@ defmodule Buildel.Blocks.CSVSearch do
     %{
       type: "csv_search",
       description: "Used for SQL searching and retrieval of information from CSV files",
-      groups: ["file", "memory"],
+      groups: ["file", "memory", "tools"],
       inputs: [
         Block.file_input("input", false),
         Block.text_input("query")
@@ -75,10 +75,8 @@ defmodule Buildel.Blocks.CSVSearch do
      )}
   end
 
-  @impl true
-  def handle_cast({:query, {:text, query}}, state) do
+  defp do_query(state, query) do
     state = send_stream_start(state)
-
     {_, repo_pid} = state[:repo]
 
     with :ok <- Buildel.CSVSearch.SQLFilter.is_safe_sql(query),
@@ -91,9 +89,7 @@ defmodule Buildel.Blocks.CSVSearch do
         state
         |> output("output", {:text, response})
 
-      # |> respond_to_tool("tool", {:text, response})
-
-      {:noreply, state}
+      {response, state}
     else
       :error ->
         send_error(state, "Invalid SQL query")
@@ -102,9 +98,7 @@ defmodule Buildel.Blocks.CSVSearch do
           state
           |> send_stream_stop()
 
-        # |> respond_to_tool("tool", {:text, "Invalid SQL query"})
-
-        {:reply, "Invalid SQL query", state}
+        {"Invalid SQL query", state}
 
       {:error, %Exqlite.Error{} = error} ->
         send_error(state, error.message)
@@ -113,9 +107,7 @@ defmodule Buildel.Blocks.CSVSearch do
           state
           |> send_stream_stop()
 
-        # |> respond_to_tool("tool", {:text, error.message})
-
-        {:noreply, state}
+        {error.message, state}
 
       _ ->
         send_error(state, "Unknown error")
@@ -124,10 +116,14 @@ defmodule Buildel.Blocks.CSVSearch do
           state
           |> send_stream_stop()
 
-        # |> respond_to_tool("tool", {:text, "Unknown error"})
-
-        {:noreply, state}
+        {"Unknown error", state}
     end
+  end
+
+  @impl true
+  def handle_cast({:query, {:text, query}}, state) do
+    {_response, state} = do_query(state, query)
+    {:noreply, state}
   end
 
   def handle_cast({:delete_file, file_id}, state) do
@@ -253,8 +249,7 @@ defmodule Buildel.Blocks.CSVSearch do
 
   @impl true
   def handle_tool("tool", "query", {_name, :text, args, _}, state) do
-    query(self(), {:text, args["query"]})
-    state
+    do_query(state, args["query"])
   end
 
   defp build_call_formatter(value, args) do
