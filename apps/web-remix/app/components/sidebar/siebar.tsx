@@ -117,10 +117,10 @@ export const Sidebar = (props: SidebarProps) => {
   }, [parentCollapsed]);
 
   const sidebarStyles = useCallback(() => {
-    const baseStyles = 'z-30 h-screen transition-all bg-sidebar-base';
+    const baseStyles = 'z-30 h-screen transition-all bg-neutral-850';
 
-    const tabletStyles = classNames(baseStyles, 'w-sidebar-widthNarrow');
-    const desktopStyles = classNames(baseStyles, 'w-sidebar-widthWide');
+    const tabletStyles = classNames(baseStyles, 'w-[80px]');
+    const desktopStyles = classNames(baseStyles, 'w-[278px]');
 
     const variantStyles = {
       wide: desktopStyles,

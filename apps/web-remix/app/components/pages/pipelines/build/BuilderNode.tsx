@@ -54,7 +54,7 @@ function BuilderNodeHeaderActions({
     confirm({
       onConfirm: async () => onDelete(data),
       children: (
-        <p className="text-white">
+        <p className="text-sm">
           You are about to delete the "{data.name}" block from your workflow.
           This action is irreversible.
         </p>
