@@ -11,6 +11,8 @@ import { Menu, X } from 'lucide-react';
 import type { IconButtonProps } from '~/components/iconButton';
 import { cn } from '~/utils/cn';
 
+//Navbar copied from Taco
+
 export interface MenuButtonProps
   extends Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
   isOpen?: boolean;
@@ -46,7 +48,7 @@ const MenuButton: FC<MenuButtonProps> = ({
 }) => {
   return (
     <button
-      className={cn('aspect-square w-navbar-widthMenuButton', className)}
+      className={cn('aspect-square w-6', className)}
       {...rest}
       aria-label={isOpen ? closeButtonAriaLabel : openButtonAriaLabel}
     >
@@ -100,15 +102,12 @@ export const Navbar: FC<NavbarProps> = (props) => {
 
   return (
     <div
-      className={cn(
-        'h-fit w-full bg-navbar-base shadow-navbar-shadowBase',
-        wrapperClassName,
-      )}
+      className={cn('h-fit w-full bg-transparent', wrapperClassName)}
       data-testid="navbar"
     >
       <header
         className={cn(
-          'flex min-h-smNavbar w-full items-center gap-navbar-gapHeader px-navbar-paddingHorizontal py-navbar-paddingVertical lg:px-navbar-paddingHorizontalLarge lg:py-navbar-paddingVertical',
+          'flex min-h-[60px] w-full items-center gap-2 px-4 py-3 lg:px-8',
           className,
         )}
       >

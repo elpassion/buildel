@@ -2,12 +2,12 @@ import type { ReactNode } from 'react';
 import React, { useEffect } from 'react';
 import { NavLink, useLocation } from '@remix-run/react';
 import type { RemixNavLinkProps } from '@remix-run/react/dist/components';
-import type { SidebarProps } from '@elpassion/taco';
-import { Sidebar } from '@elpassion/taco';
 import classNames from 'classnames';
 import kebabCase from 'lodash.kebabcase';
 
 import { PageOverlay } from '~/components/overlay/PageOverlay';
+import type { SidebarProps } from '~/components/sidebar/sidebar.types';
+import { Sidebar } from '~/components/sidebar/siebar';
 import { Tooltip } from '~/components/tooltip/Tooltip';
 
 export const NavSidebar: React.FC<
@@ -19,7 +19,7 @@ export const NavSidebar: React.FC<
       <Sidebar
         collapseButton
         className="sticky top-0 !h-[calc(100vh-32px)] rounded-[1.25rem]"
-        collapseBtnClassName="absolute top-[60px] !z-10 -right-2"
+        collapseButtonClassName="absolute top-[60px] !z-10 -right-2"
         collapsed={collapsed}
         onCollapse={toggleCollapse}
         {...props}
