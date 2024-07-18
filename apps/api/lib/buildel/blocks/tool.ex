@@ -37,17 +37,21 @@ defmodule Buildel.Blocks.Tool do
           message = Jason.decode!(message_json)
           info = {topic, :text, message, metadata}
 
-          {response, state} = handle_tool(input, tool_name, info, state)
+          case handle_tool(input, tool_name, info, state) do
+            {nil, state} ->
+              state
 
-          send(
-            send_to,
-            {:response, :text, response, %{message_id: message_id}}
-          )
-
-          state
+            {response, state} ->
+              respond_to_tool(send_to, message_id, response)
+              state
+          end
         else
           state
         end
+      end
+
+      def respond_to_tool(send_to, message_id, response) do
+        send(send_to, {:response, :text, response, %{message_id: message_id}})
       end
     end
   end

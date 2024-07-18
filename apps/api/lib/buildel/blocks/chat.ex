@@ -196,11 +196,11 @@ defmodule Buildel.Blocks.Chat do
 
   # Client
 
-  def send_message(pid, {:text, _text} = message) do
-    GenServer.cast(pid, {:send_message, message})
+  def send_message(pid, {:text, _text, metadata} = message) do
+    GenServer.cast(pid, {:send_message, message, metadata})
   end
 
-  defp save_input_and_send_message(pid, {topic, :text, message, _metadata}) do
+  defp save_input_and_send_message(pid, {topic, :text, message, metadata}) do
     %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
 
     GenServer.cast(
@@ -208,7 +208,7 @@ defmodule Buildel.Blocks.Chat do
       {:save_input, %{block_name: block, message: {:text, message}, output_name: output}}
     )
 
-    GenServer.cast(pid, {:send_message, {:text, message}})
+    GenServer.cast(pid, {:send_message, {:text, message, metadata}})
   end
 
   defp save_text_chunk(pid, chunk) do
@@ -305,7 +305,7 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_cast({:send_message, {:text, _text}}, state) do
+  def handle_cast({:send_message, {:text, _text, metadata}}, state) do
     state = send_stream_start(state)
 
     content =
@@ -318,22 +318,33 @@ defmodule Buildel.Blocks.Chat do
     state = update_in(state.chat_memory, &ChatMemory.add_user_message(&1, %{content: content}))
 
     with {:ok, message, state} <- chat_task(state) do
-      # state = respond_to_tool(state, "chat", {:text, message.content})
+      if metadata && metadata[:send_to] && metadata[:message_id],
+        do: respond_to_tool(metadata.send_to, metadata.message_id, message.content)
+
       {:noreply, cleanup_inputs(state)}
     else
       {:error, :not_all_inputs_filled, state} ->
-        # respond_to_tool(
-        #   state,
-        #   "chat",
-        #   {:text, "ERROR: Not all inputs required to answer question are filled"}
-        # )
-        state =
-          state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
+        if metadata && metadata[:send_to] && metadata[:message_id],
+          do:
+            respond_to_tool(
+              metadata.send_to,
+              metadata.message_id,
+              "ERROR: Not all inputs required to answer question are filled"
+            )
+
+        state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
 
         {:noreply, state}
 
       {:error, _reason, state} ->
-        # state = respond_to_tool(state, "chat", {:text, "ERROR: Something went wrong"})
+        if metadata && metadata[:send_to] && metadata[:message_id],
+          do:
+            respond_to_tool(
+              metadata.send_to,
+              metadata.message_id,
+              "ERROR: Something went wrong"
+            )
+
         state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
         {:noreply, state}
     end
@@ -538,7 +549,7 @@ defmodule Buildel.Blocks.Chat do
       ) do
     %{"message" => message} = message
     info = {topic, :text, message, metadata}
-    update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
+    {nil, update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))}
   end
 
   defp chat_task(state) do
