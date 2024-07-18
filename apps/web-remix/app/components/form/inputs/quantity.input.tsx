@@ -1,5 +1,6 @@
-import type { InputQuantityProps } from '@elpassion/taco';
-import { InputQuantity } from '@elpassion/taco';
+import type { NumberInputProps } from '~/components/form/inputs/number.input';
+import { NumberInput } from '~/components/form/inputs/number.input';
 
-export type QuantityInputProps = InputQuantityProps;
-export const QuantityInput = InputQuantity;
+//todo add quantity input
+export type QuantityInputProps = NumberInputProps;
+export const QuantityInput = NumberInput;

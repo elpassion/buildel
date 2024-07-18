@@ -25,6 +25,7 @@
     "@fastify/static": "^7.0.1",
     "@floating-ui/react-dom": "^2.0.8",
     "@mcansh/remix-fastify": "^3.2.2",
+    "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-radio-group": "^1.2.0",

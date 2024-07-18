@@ -141,16 +141,16 @@ export function NumberField({ field, name }: FieldProps) {
   const error = fieldErrors[name] ?? undefined;
   return (
     <FormField name={name}>
+      <FieldLabel>{field.title}</FieldLabel>
       <QuantityInputField
         id={name}
-        errorMessage={error}
-        label={field.title}
         // supportingText={field.description}
         min={field.minimum}
         max={field.maximum}
         defaultValue={field.default}
         step={field.step}
       />
+      <FieldMessage error={error} />
     </FormField>
   );
 }

@@ -1,6 +1,5 @@
 import type { FormEvent, PropsWithChildren, ReactNode } from 'react';
 import React, { forwardRef, useCallback, useEffect, useState } from 'react';
-import { InputText, Label } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import { withZod } from '@remix-validated-form/with-zod';
 import { useControlField, ValidatedForm } from 'remix-validated-form';
@@ -12,6 +11,8 @@ import {
   HiddenField,
   useFieldContext,
 } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import type { AsyncSelectInputProps } from '~/components/form/inputs/select/select.input';
 import { AsyncSelectInput } from '~/components/form/inputs/select/select.input';
 import type { FieldProps } from '~/components/form/schema/Schema';
@@ -109,7 +110,7 @@ export const CreatableAsyncSelectField = forwardRef<
         <HiddenField value={selectedId ?? ''} {...getInputProps()} />
 
         <div className="flex justify-between items-end">
-          <Label text={label} labelFor={name} />
+          <FieldLabel>{label}</FieldLabel>
 
           <button
             className="text-primary-500 text-sm mb-[6px] bg-transparent"
@@ -130,11 +131,7 @@ export const CreatableAsyncSelectField = forwardRef<
           onBlur={getInputProps().onBlur}
           {...props}
         />
-
-        <InputText
-          text={errorMessage ?? supportingText}
-          error={!!errorMessage}
-        />
+        <FieldMessage error={errorMessage}>{supportingText}</FieldMessage>
 
         <Modal
           isOpen={isModalOpen}

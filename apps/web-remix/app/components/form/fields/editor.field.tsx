@@ -1,8 +1,8 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { forwardRef } from 'react';
-import { Icon, InputText, Label } from '@elpassion/taco';
 import { Modal } from '@elpassion/taco/Modal';
 import classNames from 'classnames';
+import { Maximize2 } from 'lucide-react';
 import { useControlField } from 'remix-validated-form';
 import { useBoolean } from 'usehooks-ts';
 
@@ -10,8 +10,11 @@ import {
   HiddenField,
   useFieldContext,
 } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import type { EditorInputProps } from '~/components/form/inputs/editor.input';
 import { EditorInput } from '~/components/form/inputs/editor.input';
+import { IconButton } from '~/components/iconButton';
 
 type EditorFieldProps = Partial<
   EditorInputProps & {
@@ -49,15 +52,15 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
       <>
         <HiddenField value={currentValue} {...getInputProps()} />
         <div className="flex justify-between items-center">
-          <Label text={label} />
+          <FieldLabel>{label}</FieldLabel>
 
-          <button
+          <IconButton
+            size="xxs"
+            onlyIcon
+            icon={<Maximize2 />}
             type="button"
             onClick={show}
-            className="text-neutral-100 text-sm"
-          >
-            <Icon iconName="maximize-2" />
-          </button>
+          />
         </div>
         <EditorInput
           value={currentValue}
@@ -67,10 +70,7 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
           {...props}
         />
 
-        <InputText
-          text={currentError ?? supportingText}
-          error={!!currentError}
-        />
+        <FieldMessage error={currentError}>{supportingText}</FieldMessage>
 
         <div
           onClick={(e) => {
@@ -142,7 +142,7 @@ function MaximizedEditor({
           {...rest}
         />
 
-        <InputText text={error ?? supportingText} error={!!error} />
+        <FieldMessage error={error}>{supportingText}</FieldMessage>
       </div>
     </Modal>
   );

@@ -9,9 +9,16 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react';
-import { Avatar, Icon } from '@elpassion/taco';
 import classNames from 'classnames';
-import { LogOut } from 'lucide-react';
+import {
+  Briefcase,
+  ChevronDown,
+  ChevronUp,
+  Key,
+  Layers,
+  LogOut,
+  Settings,
+} from 'lucide-react';
 import type { MenuInfo } from 'rc-menu/es/interface';
 import { ClientOnly } from 'remix-utils/client-only';
 import invariant from 'tiny-invariant';
@@ -28,6 +35,7 @@ import {
   NavSidebarContext,
   SidebarLink,
 } from '~/components/sidebar/NavSidebar';
+import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { useServerToasts } from '~/hooks/useServerToasts';
 import { requireLogin } from '~/session.server';
@@ -149,33 +157,21 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
       <div className="flex flex-col gap-1">
         <SidebarLink
           to={routes.pipelines(organization.id)}
-          icon={
-            <Icon
-              iconName="three-layers"
-              className="w-5 h-5 text-center leading-5"
-            />
-          }
+          icon={<Layers className="min-w-4 w-4 h-4 text-center leading-5" />}
           text="Workflows"
           onlyIcon={isCollapsed}
         />
 
         <SidebarLink
           to={routes.knowledgeBase(organization.id)}
-          icon={
-            <Icon
-              iconName="briefcase"
-              className="w-5 h-5 text-center leading-5"
-            />
-          }
+          icon={<Briefcase className="min-w-4 w-4 h-4 text-center leading-5" />}
           text="Knowledge Base"
           onlyIcon={isCollapsed}
         />
 
         <SidebarLink
           to={routes.secrets(organization.id)}
-          icon={
-            <Icon iconName="key" className="w-5 h-5 text-center leading-5" />
-          }
+          icon={<Key className="min-w-4 w-4 h-4 text-center leading-5" />}
           onlyIcon={isCollapsed}
           text="Secrets"
         />
@@ -183,9 +179,7 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
 
       <SidebarLink
         to={routes.settings(organization.id)}
-        icon={
-          <Icon iconName="settings" className="w-5 h-5 text-center leading-5" />
-        }
+        icon={<Settings className="min-w-4 w-4 h-4 text-center leading-5" />}
         text="Settings"
         onlyIcon={isCollapsed}
       />
@@ -228,17 +222,21 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
           className="w-full h-10 overflow-hidden flex justify-between items-center text-neutral-100 rounded-lg"
         >
           {isCollapsed && (
-            <Avatar name={name} contentType="text" shape="square" size="md" />
+            <Avatar>
+              <AvatarFallback>{name.slice(0, 1)}</AvatarFallback>
+            </Avatar>
+            // <Avatar name={name} contentType="text" shape="square" size="md" />
           )}
           {!isCollapsed && (
             <>
               <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">
                 {organization.name}
               </span>
-              <Icon
-                iconName={showMenu ? 'chevron-up' : 'chevron-down'}
-                className="text-xl"
-              />
+              {showMenu ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
             </>
           )}
         </button>
