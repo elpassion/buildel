@@ -167,7 +167,7 @@ function createCSP(nonce, isIframeAllowed) {
     object-src 'none';
     frame-src 'self';
     base-uri 'self';
-    form-action 'self';
+    form-action 'self' https://www.googleapis.com https://accounts.google.com https://github.com;
     upgrade-insecure-requests;
   `.replace(/\s{2,}/g, ' ').trim();
 
