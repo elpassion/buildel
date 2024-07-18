@@ -102,11 +102,12 @@ export default function WebsiteForm() {
         input.value as string | File,
       );
     });
-
+    console.log('1', formData);
     pipeline.interface_config.form.outputs.forEach((output, index) => {
       formData.append(`wait_for_outputs[${index}][block_name]`, output.name);
       formData.append(`wait_for_outputs[${index}][output_name]`, 'output');
     });
+    console.log('2', formData);
 
     const runResponse = await fetch(
       `/super-api/organizations/${organizationId}/pipelines/${pipelineId}/runs/${id}/start`,

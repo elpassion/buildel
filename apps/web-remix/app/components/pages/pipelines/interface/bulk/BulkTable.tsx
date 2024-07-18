@@ -1,14 +1,14 @@
-import type { Dispatch, SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Link } from '@remix-run/react';
 import { Icon, IconButton } from '@elpassion/taco';
 import classNames from 'classnames';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
+import { SmallFileInput } from '~/components/form/inputs/file.input';
 import { TextareaInput } from '~/components/form/inputs/textarea.input';
 import { routes } from '~/utils/routes.utils';
 
 import type { ISelectedInput, ITest } from './page';
-import { SmallFileInput } from '~/components/form/inputs/file.input';
 
 interface BulkTableProps {
   selectedInputs: ISelectedInput[];
@@ -27,6 +27,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
   organizationId,
   pipelineId,
 }) => {
+  const [files, setFiles] = useState<Record<string, File>>({});
   const isTrashIconColumnVisible = tests.length > 1;
   const isRunLinkIconColumnVisible = tests.find((test) => test?.run);
 
@@ -103,19 +104,22 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                       }}
                     />
                   ) : (
-                    <SmallFileInput
+                    <>
+                      <SmallFileInput
                         multiple={false}
                         buttonText={input.name}
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
 
-                          // setFiles((prev) => ({
-                          //   ...prev,
-                          //   [input.name]: file,
-                          // }));
+                          setFiles((prev) => ({
+                            ...prev,
+                            [input.name]: file,
+                          }));
                         }}
                       />
+                      <p>{files[input.name]?.name}</p>
+                    </>
                   )}
                 </td>
               ))}
