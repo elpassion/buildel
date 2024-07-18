@@ -39,34 +39,23 @@ defmodule Buildel.Blocks.Date do
     }
   end
 
-  def get_date(pid, {:text, _text} = args) do
-    GenServer.cast(pid, {:date, args})
+  defp get_date() do
+    DateTime.utc_now() |> DateTime.to_string()
   end
 
   @impl true
-  def handle_cast({:date, {:text, _args}}, state) do
+  def handle_input("input", {_name, :text, _args, _metadata}, state) do
     state = send_stream_start(state)
-
-    date = DateTime.utc_now() |> DateTime.to_string()
-
-    state =
-      state
-      |> output("output", {:text, date})
-      |> respond_to_tool("tool", {:text, date})
-
-    {:noreply, state}
+    date = get_date()
+    output(state, "output", {:text, date})
   end
 
   @impl true
-  def handle_input("input", {_name, :text, args, _metadata}, state) do
-    get_date(self(), {:text, args})
-    state
-  end
-
-  @impl true
-  def handle_tool("tool", "date", {_name, :text, args, _metadata}, state) do
-    get_date(self(), {:text, args})
-    state
+  def handle_tool("tool", "date", {_name, :text, _args, _metadata}, state) do
+    state = send_stream_start(state)
+    date = get_date()
+    state = output(state, "output", {:text, date})
+    {date, state}
   end
 
   @impl true

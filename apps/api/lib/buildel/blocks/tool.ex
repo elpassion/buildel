@@ -15,11 +15,7 @@ defmodule Buildel.Blocks.Tool do
     "#{block_name}::#{tool_name}"
   end
 
-  defmacro __using__(block_opts \\ []) do
-    parallel =
-      block_opts
-      |> Keyword.get(:parallel, [])
-
+  defmacro __using__(_block_opts \\ []) do
     quote do
       @behaviour Buildel.Blocks.ToolBehaviour
 
