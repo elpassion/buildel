@@ -144,13 +144,17 @@ defmodule Buildel.Clients.Chat do
 
       {:ok, chain, message}
     else
-      {:error, "context_length_exceeded"} ->
-        on_error.(:context_length_exceeded)
-        {:error, :context_length_exceeded}
+      {:error, _chain, reason} ->
+        if String.contains?(reason, "maximum context length") do
+          on_error.(:context_length_exceeded)
+          {:error, :context_length_exceeded}
+        else
+          on_error.(reason)
+          {:error, reason}
+        end
 
-      {:error, reason} ->
-        on_error.(reason)
-        {:error, reason}
+      _ ->
+        {:error, "unknown error"}
     end
   end
 
