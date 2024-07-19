@@ -117,7 +117,8 @@ export const Sidebar = (props: SidebarProps) => {
   }, [parentCollapsed]);
 
   const sidebarStyles = useCallback(() => {
-    const baseStyles = 'z-30 h-screen transition-all bg-neutral-850';
+    const baseStyles =
+      'z-30 h-screen transition-all bg-white border border-neutral-100';
 
     const tabletStyles = classNames(baseStyles, 'w-[80px]');
     const desktopStyles = classNames(baseStyles, 'w-[278px]');

@@ -9,6 +9,7 @@ import { PageOverlay } from '~/components/overlay/PageOverlay';
 import type { SidebarProps } from '~/components/sidebar/sidebar.types';
 import { Sidebar } from '~/components/sidebar/siebar';
 import { Tooltip } from '~/components/tooltip/Tooltip';
+import { cn } from '~/utils/cn';
 
 export const NavSidebar: React.FC<
   Omit<SidebarProps, 'collapsed' | 'onCollapse'>
@@ -18,7 +19,7 @@ export const NavSidebar: React.FC<
     <div className="hidden lg:block md:p-4">
       <Sidebar
         collapseButton
-        className="sticky top-0 !h-[calc(100vh-32px)] rounded-[1.25rem]"
+        className="sticky top-0 !h-[calc(100vh-32px)] rounded-xl"
         collapseButtonClassName="absolute top-[60px] !z-10 -right-2"
         collapsed={collapsed}
         onCollapse={toggleCollapse}
@@ -116,18 +117,27 @@ export function SidebarMenuItem({
   return (
     <div
       id={id}
-      className={classNames(
-        'flex items-center space-x-2 p-2 rounded-lg text-neutral-100 hover:bg-neutral-700 transition',
+      className={cn(
+        'group flex items-center space-x-2 rounded-lg transition ',
         {
-          'bg-transparent': !isActive,
-          'bg-neutral-700': isActive,
-          'w-full': !onlyIcon,
-          'w-9 h-9': onlyIcon,
+          'text-muted-foreground hover:text-foreground': !isActive,
+          'w-full ': !onlyIcon,
         },
       )}
       {...rest}
     >
-      {icon}
+      <div
+        className={cn(
+          'border border-neutral-100 min-w-9 w-9 min-h-9 h-9 rounded-lg flex justify-center items-center flex-shrink-0',
+          {
+            'bg-transparent text-muted-foreground group-hover:text-foreground':
+              !isActive,
+            'bg-foreground text-white group-hover:bg-foreground/80': isActive,
+          },
+        )}
+      >
+        {icon}
+      </div>
 
       {text && !onlyIcon && (
         <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">

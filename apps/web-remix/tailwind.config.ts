@@ -144,8 +144,6 @@ const customConfig = {
   },
 };
 
-console.log(customConfig.extend.colors);
-
 const shadcnConfig = {
   container: {
     center: true,

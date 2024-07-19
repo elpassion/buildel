@@ -106,7 +106,18 @@ export default function Layout() {
   }, []);
 
   return (
-    <div id="_root" className="grid h-screen grid-cols-[auto_1fr]">
+    <div
+      id="_root"
+      className="grid h-screen grid-cols-[auto_1fr] max-w-screen-2xl mx-auto"
+    >
+      <div className="bg-blue-500 z-0 h-[136px] absolute top-0 left-0 right-0 overflow-hidden">
+        <img
+          src="/bacgkround-blur.png"
+          alt="background"
+          className="object-cover bg-no-repeat h-full w-full"
+        />
+      </div>
+
       <NavSidebarContext.Provider
         value={{
           collapsed,
@@ -130,7 +141,7 @@ export default function Layout() {
           <SidebarMainContent />
         </NavMobileSidebar>
 
-        <main className="col-span-2 flex min-h-screen flex-col overflow-x-auto pb-5 lg:col-auto">
+        <main className="relative col-span-2 flex min-h-screen flex-col overflow-x-auto pb-5 lg:col-auto">
           <Outlet />
         </main>
       </NavSidebarContext.Provider>
@@ -148,13 +159,13 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
   return (
     <SidebarContentWrapper
       className={classNames(
-        'gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]',
+        'gap-2 mt-4 mb-3 transition-all justify-between h-[calc(100%-28px)]',
         {
           '!px-0': !isCollapsed,
         },
       )}
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <SidebarLink
           to={routes.pipelines(organization.id)}
           icon={<Layers className="min-w-4 w-4 h-4 text-center leading-5" />}
@@ -210,7 +221,7 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
   }, []);
 
   return (
-    <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 pl-2 pr-1">
+    <SidebarContentWrapper className="border-b border-neutral-100 py-4 mt-1 pl-2 pr-1">
       <PageOverlay
         isShow={showMenu}
         className={classNames({ '!z-[20]': showMenu })}
@@ -219,7 +230,7 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
       <div ref={menuRef}>
         <button
           onClick={handleOpen}
-          className="w-full h-10 overflow-hidden flex justify-between items-center text-neutral-100 rounded-lg"
+          className="w-full h-10 overflow-hidden flex justify-between items-center text-foreground rounded-lg"
         >
           {isCollapsed && (
             <Avatar>
@@ -276,7 +287,7 @@ function NewOrganizationLink() {
 
 function SidebarBottomContent({ isCollapsed }: SidebarContentProps) {
   return (
-    <SidebarContentWrapper className="border-t border-neutral-400 py-3 !flex-row justify-between">
+    <SidebarContentWrapper className="border-t border-neutral-100 py-3 !flex-row justify-between">
       {!isCollapsed && (
         <div className="flex flex-col text-xs text-white">
           {/*<p>Majkel Ward</p>*/}
@@ -297,7 +308,7 @@ function LogoutButton() {
       variant="ghost"
       aria-label="Logout"
       icon={<LogOut />}
-      className="!text-neutral-100 hover:!bg-neutral-700"
+      className="!text-muted-foreground hover:!text-foreground"
       onClick={() => {
         logout.submit({}, { method: 'DELETE', action: '/logout' });
       }}
