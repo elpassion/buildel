@@ -1,10 +1,22 @@
 import React, { useState } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { Edit, Trash } from 'lucide-react';
+import { Edit, EllipsisVertical, Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
 import { confirm } from '~/components/modal/confirm';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
 import { dayjs } from '~/utils/Dayjs';
 
 import type { ISecretKey, ISecretKeyList } from '../variables.types';
@@ -42,7 +54,7 @@ export const SecretKeyList: React.FC<SecretKeyListProps> = ({ items }) => {
   return (
     <>
       <ItemList
-        className="grid grid-cols-1 gap-2"
+        className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
         items={items}
         aria-label="Secret list"
         emptyText={<EmptyMessage>There is no Secrets yet...</EmptyMessage>}
@@ -77,49 +89,56 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
   onDelete,
   onEdit,
 }) => {
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDelete = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     e.preventDefault();
     onDelete(data);
   };
 
-  const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleEdit = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     e.preventDefault();
     onEdit(data);
   };
 
   return (
-    <article className="group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 grid grid-cols-1 gap-1 max-w-full items-center md:gap-2 md:grid-cols-[1fr_300px_60px] ">
-      <header className="max-w-full truncate">
-        <h3 className="text-lg font-medium text-white truncate max-w-full">
-          {data.name}
-        </h3>
-      </header>
+    <Card>
+      <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
+        <div>
+          <CardTitle className="line-clamp-2">{data.name}</CardTitle>
+          <CardDescription>{dayjs(data.updated_at).format()}</CardDescription>
+        </div>
 
-      <p className="text-white">{dayjs(data.updated_at).format()}</p>
-
-      <div className="flex gap-1 items-center min-w-[64px]">
-        <IconButton
-          size="xs"
-          variant="ghost"
-          aria-label={`Edit secret: ${data.name}`}
-          className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500 lg:opacity-0"
-          title={`Edit Secret: ${data.name}`}
-          icon={<Edit />}
-          onClick={handleEdit}
-        />
-
-        <IconButton
-          size="xs"
-          variant="ghost"
-          aria-label={`Delete secret: ${data.name}`}
-          className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
-          title={`Delete Secret: ${data.name}`}
-          icon={<Trash />}
-          onClick={handleDelete}
-        />
-      </div>
-    </article>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild className="text-muted-foreground">
+            <IconButton
+              variant="ghost"
+              size="xs"
+              icon={<EllipsisVertical className="w-4 h-4" />}
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem
+              onClick={handleEdit}
+              className="flex gap-1 items-center"
+              aria-label={`Edit secret: ${data.name}`}
+              title={`Edit Secret: ${data.name}`}
+            >
+              <Edit className="w-4 h-4" />
+              <span>Edit</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="flex gap-1 items-center text-red-500"
+              onClick={handleDelete}
+              title={`Delete Secret: ${data.name}`}
+              aria-label={`Delete secret: ${data.name}`}
+            >
+              <Trash className="w-4 h-4" />
+              <span>Delete</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </CardHeader>
+    </Card>
   );
 };

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
@@ -12,6 +12,7 @@ import {
   TextInputField,
 } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
+import { DialogDrawerFooter } from '~/components/ui/dialog-drawer';
 
 export function NewSecret() {
   const validator = useMemo(() => withZod(CreateUpdateSecretSchema), []);
@@ -21,31 +22,38 @@ export function NewSecret() {
       noValidate
       validator={validator}
       method="post"
-      className="grow flex flex-col gap-2 h-[70%]"
+      className="grow flex flex-col gap-2"
     >
       <div className="p-1 w-full space-y-6 grow overflow-y-auto">
-        <Field name="name">
-          <FieldLabel>Name your Secret</FieldLabel>
-          <TextInputField
-            autoFocus
-            placeholder="e.g. my open ai key"
-            type="text"
-          />
-          <FieldMessage>
-            It will help you identify the key in BUILDEL
-          </FieldMessage>
-        </Field>
+        <div>
+          <Field name="name">
+            <FieldLabel>Name your Secret</FieldLabel>
+            <TextInputField
+              autoFocus
+              placeholder="e.g. my open ai key"
+              type="text"
+            />
+            <FieldMessage>
+              It will help you identify the key in BUILDEL
+            </FieldMessage>
+          </Field>
+        </div>
 
-        <Field name="value">
-          <FieldLabel>Enter the Secret key</FieldLabel>
-          <PasswordInputField placeholder="Type or paste in your token key" />
-          <FieldMessage>
-            The actual token key that will authorise you in the external system,
-            such as Open AI.
-          </FieldMessage>
-        </Field>
+        <div>
+          <Field name="value">
+            <FieldLabel>Enter the Secret key</FieldLabel>
+            <PasswordInputField placeholder="Type or paste in your token key" />
+            <FieldMessage>
+              The actual token key that will authorise you in the external
+              system, such as Open AI.
+            </FieldMessage>
+          </Field>
+        </div>
       </div>
-      <SubmitButton size="sm">Save the Secret</SubmitButton>
+
+      <DialogDrawerFooter>
+        <SubmitButton size="sm">Save the Secret</SubmitButton>
+      </DialogDrawerFooter>
     </ValidatedForm>
   );
 }

@@ -32,7 +32,7 @@ export function HelpfulIcon({
       <CircleHelp
         id={`${id}-helpful-icon`}
         className={classNames(
-          'text-primary-500  cursor-pointer',
+          'cursor-pointer',
           {
             'w-6 h-6': size === 'xl',
             'w-5 h-5': size === 'md',

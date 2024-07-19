@@ -12,6 +12,7 @@ import { IconButton } from '~/components/iconButton';
 import { confirm } from '~/components/modal/confirm';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,16 +31,7 @@ export const PipelinesListItem = ({
   children,
   className,
 }: PipelinesListItemProps) => {
-  return (
-    <article
-      className={classNames(
-        'h-full group bg-white border border-neutral-100 pl-6 pr-4 py-4 rounded-lg text-foreground transition cursor-pointer hover:border-blue-200 flex flex-col gap-5 justify-between',
-        className,
-      )}
-    >
-      {children}
-    </article>
-  );
+  return <Card className={classNames('h-full', className)}>{children}</Card>;
 };
 
 interface PipelineListItemHeaderProps {
@@ -66,12 +58,10 @@ export const PipelineListItemHeader = ({
   };
 
   return (
-    <header className="flex items-center justify-between">
-      <h2 className="text-lg font-bold text-foreground group-hover:text-blue-500 transition line-clamp-2">
-        {pipeline.name}
-      </h2>
+    <CardHeader className="flex flex-row gap-4 items-center justify-between">
+      <CardTitle className="line-clamp-2">{pipeline.name}</CardTitle>
 
-      <div onClick={(e) => e.stopPropagation()}>
+      <div className="w-fit h-fit" onClick={(e) => e.stopPropagation()}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild className="text-muted-foreground">
             <IconButton
@@ -94,7 +84,7 @@ export const PipelineListItemHeader = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </header>
+    </CardHeader>
   );
 };
 
@@ -105,7 +95,7 @@ export const PipelineListItemContent = ({
   pipeline,
 }: PipelineListItemContentProps) => {
   return (
-    <main>
+    <CardContent>
       <Badge
         variant="secondary"
         className="flex gap-1 items-center w-fit text-muted-foreground"
@@ -113,7 +103,7 @@ export const PipelineListItemContent = ({
         <PlayCircle className="w-4 h-4  " />
         <span>{pipeline.runs_count} runs</span>
       </Badge>
-    </main>
+    </CardContent>
   );
 };
 

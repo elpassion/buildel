@@ -9,6 +9,7 @@ import {
 } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import {
   ActionSidebar,
@@ -16,6 +17,13 @@ import {
 } from '~/components/sidebar/ActionSidebar';
 import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
 import { Button } from '~/components/ui/button';
+import {
+  DialogDrawer,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -27,7 +35,8 @@ export function SecretListPage() {
   const match = useMatch(routes.secretsNew(organizationId));
   const isSidebarOpen = !!match;
 
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = (value: boolean) => {
+    if (value) return;
     navigate(routes.secrets(organizationId));
   };
 
@@ -44,31 +53,34 @@ export function SecretListPage() {
             />
           </AppNavbarHeading>
         }
-      />
-      <ActionSidebar
-        className="!bg-neutral-950"
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
       >
-        <ActionSidebarHeader
-          heading="New Secret"
-          subheading="Enter your Secret to use them in multiple workflows."
-          onClose={handleCloseSidebar}
-        />
-        <Outlet />
-      </ActionSidebar>
+        <Button asChild className="hidden w-fit ml-auto mr-0 lg:flex">
+          <BasicLink to={routes.secretsNew(organizationId)}>
+            New Secret
+          </BasicLink>
+        </Button>
+      </AppNavbar>
+
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
+        <DialogDrawerContent>
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>New Secret</DialogDrawerTitle>
+            <DialogDrawerDescription>
+              Enter your Secret to use them in multiple workflows.
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+
+          <Outlet />
+        </DialogDrawerContent>
+      </DialogDrawer>
 
       <PageContentWrapper>
-        <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
-          <Link
-            to={routes.secretsNew(organizationId)}
-            aria-label="Add new secret"
-          >
-            <Button size="sm" tabIndex={0}>
+        <div className="mb-3 flex gap-2 justify-end items-center lg:hidden">
+          <Button asChild size="sm">
+            <BasicLink to={routes.secretsNew(organizationId)}>
               New Secret
-            </Button>
-          </Link>
+            </BasicLink>
+          </Button>
         </div>
 
         <SecretKeyList items={secrets} />

@@ -37,7 +37,7 @@ export const EmptyMessage: React.FC<
   PropsWithChildren<{ className?: string }>
 > = ({ children, className }) => {
   return (
-    <span className={classNames('text-sm text-white', className)}>
+    <span className={classNames('text-sm text-muted-foreground', className)}>
       {children}
     </span>
   );
