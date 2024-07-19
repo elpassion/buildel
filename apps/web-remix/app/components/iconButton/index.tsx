@@ -13,40 +13,37 @@ export type IconButtonProps = Omit<ButtonProps, 'size' | 'children'> & {
   icon: ReactNode;
 };
 
-export const IconButton: React.FC<IconButtonProps> = ({
-  onlyIcon = false,
-  className,
-  size,
-  icon,
-  ...props
-}) => {
-  const additionalClassNames = useMemo(() => {
-    if (onlyIcon) {
-      return '!p-0 !bg-transparent !w-fit !h-fit !border-none !text-neutral-200 hover:!text-primary-500 disabled:!text-neutral-400 transition';
-    }
-    return '';
-  }, [onlyIcon]);
+export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ onlyIcon = false, className, size, icon, ...props }, ref) => {
+    const additionalClassNames = useMemo(() => {
+      if (onlyIcon) {
+        return '!bg-transparent !border-none  transition';
+      }
+      return '';
+    }, [onlyIcon]);
 
-  const modifiedIcon = isValidElement(icon)
-    ? cloneElement(icon, {
-        // @ts-ignore
-        className: cn(
-          getIconSize(size),
-          (icon as ReactElement).props.className,
-        ),
-      })
-    : icon;
+    const modifiedIcon = isValidElement(icon)
+      ? cloneElement(icon, {
+          // @ts-ignore
+          className: cn(
+            getIconSize(size),
+            (icon as ReactElement).props.className,
+          ),
+        })
+      : icon;
 
-  return (
-    <Button
-      {...props}
-      size="icon"
-      className={cn(additionalClassNames, getSize(size), className)}
-    >
-      {modifiedIcon}
-    </Button>
-  );
-};
+    return (
+      <Button
+        ref={ref}
+        size="icon"
+        className={cn(additionalClassNames, getSize(size), className)}
+        {...props}
+      >
+        {modifiedIcon}
+      </Button>
+    );
+  },
+);
 
 function getSize(size?: IconButtonSize) {
   switch (size) {

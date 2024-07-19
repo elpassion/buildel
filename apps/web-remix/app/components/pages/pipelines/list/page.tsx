@@ -63,7 +63,7 @@ export function PipelinesPage() {
               <Button
                 asChild
                 size="sm"
-                className="mb-1 w-fit ml-auto mr-0 flex lg:hidden"
+                className="mb-3 w-fit ml-auto mr-0 flex lg:hidden"
               >
                 <BasicLink
                   to={routes.pipelinesNew(organizationId)}
