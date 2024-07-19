@@ -14,7 +14,8 @@ defmodule BuildelWeb.WorkflowTemplateJSON do
   defp data(workflow_template) do
     %{
       name: workflow_template.name,
-      template_name: workflow_template.template_name
+      template_name: workflow_template.template_name,
+      template_description: workflow_template.template_description
     }
   end
 end

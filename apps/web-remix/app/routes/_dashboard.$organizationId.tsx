@@ -106,10 +106,7 @@ export default function Layout() {
   }, []);
 
   return (
-    <div
-      id="_root"
-      className="grid h-screen grid-cols-[auto_1fr] max-w-screen-2xl mx-auto"
-    >
+    <div id="_root" className="grid h-screen grid-cols-[auto_1fr] ">
       <div className="bg-blue-500 z-0 h-[136px] absolute top-0 left-0 right-0 overflow-hidden">
         <img
           src="/bacgkround-blur.png"

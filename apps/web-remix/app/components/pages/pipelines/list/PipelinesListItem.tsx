@@ -25,7 +25,7 @@ export const PipelinesListItem = ({
   return (
     <article
       className={classNames(
-        'group bg-neutral-800 px-6 py-4 rounded-lg text-basic-white hover:bg-neutral-850 transition cursor-pointer',
+        'h-full group bg-white border border-neutral-100 px-6 py-4 rounded-lg text-foreground transition cursor-pointer hover:border-blue-200 flex flex-col gap-5 justify-between',
         className,
       )}
     >
@@ -58,12 +58,12 @@ export const PipelineListItemHeader = ({
   };
 
   return (
-    <header className="flex items-start">
-      <h2 className="flex basis-1/2 text-lg font-medium">{pipeline.name}</h2>
+    <header className="flex items-center justify-between">
+      <h2 className="text-lg font-bold text-foreground group-hover:text-blue-500 transition line-clamp-2">
+        {pipeline.name}
+      </h2>
 
-      <div className="flex items-center basis-1/2 justify-between">
-        <p className="text-sm">{pipeline.runs_count} runs</p>
-
+      <div className="flex items-center justify-between">
         <div
           className="flex gap-1"
           onClick={(e) => {
@@ -84,6 +84,19 @@ export const PipelineListItemHeader = ({
         </div>
       </div>
     </header>
+  );
+};
+
+interface PipelineListItemContentProps {
+  pipeline: IPipeline;
+}
+export const PipelineListItemContent = ({
+  pipeline,
+}: PipelineListItemContentProps) => {
+  return (
+    <main>
+      <p className="text-sm">{pipeline.runs_count} runs</p>
+    </main>
   );
 };
 

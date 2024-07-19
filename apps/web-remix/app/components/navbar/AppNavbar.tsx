@@ -13,7 +13,7 @@ export const AppNavbar: React.FC<
   return (
     <Navbar
       menuClassName="lg:hidden !text-white min-w-[24px]"
-      wrapperClassName="py-2 md:px-2"
+      wrapperClassName="pt-4 pb-2 md:px-2 md:pb-2 md:pt-6"
       onMenuClick={openSidebar}
       isMenuOpen={isOpen}
       {...rest}
@@ -31,7 +31,12 @@ export const AppNavbarHeading = ({
   className,
 }: AppNavbarHeadingProps) => {
   return (
-    <h1 className={classNames('text-2xl font-medium text-white', className)}>
+    <h1
+      className={classNames(
+        'text-2xl md:text-3xl font-medium text-white',
+        className,
+      )}
+    >
       {children}
     </h1>
   );

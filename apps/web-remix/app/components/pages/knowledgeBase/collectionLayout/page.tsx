@@ -3,7 +3,7 @@ import type { MetaFunction } from '@remix-run/node';
 import { Link, Outlet, useLoaderData, useMatch } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
-import { AppNavbar } from '~/components/navbar/AppNavbar';
+import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
 import { TabGroup } from '~/components/tabs/TabGroup';
@@ -26,9 +26,7 @@ export function KnowledgeBaseCollectionLayout() {
     <>
       <AppNavbar
         leftContent={
-          <h1 className="text-2xl font-medium text-white">
-            {collectionName} Database
-          </h1>
+          <AppNavbarHeading>{collectionName} Database</AppNavbarHeading>
         }
       />
 
