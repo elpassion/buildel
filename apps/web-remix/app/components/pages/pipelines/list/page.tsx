@@ -4,11 +4,14 @@ import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
-import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from '~/components/sidebar/ActionSidebar';
 import { Button } from '~/components/ui/button';
+import {
+  DialogDrawer,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -26,7 +29,8 @@ export function PipelinesPage() {
   const navigate = useNavigate();
   const match = useMatch(`${organizationId}/pipelines/new`);
   const isSidebarOpen = !!match;
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = (value: boolean) => {
+    if (value) return;
     navigate(routes.pipelines(organizationId));
   };
 
@@ -43,19 +47,19 @@ export function PipelinesPage() {
         </Button>
       </PipelinesNavbar>
 
-      <ActionSidebar
-        className="!bg-neutral-950"
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
-      >
-        <ActionSidebarHeader
-          heading="Create a new workflow"
-          subheading="Any workflow can contain many Blocks and use your Knowledge Base."
-          onClose={handleCloseSidebar}
-        />
-        <Outlet />
-      </ActionSidebar>
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
+        <DialogDrawerContent>
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>Create a new workflow</DialogDrawerTitle>
+            <DialogDrawerDescription>
+              Any workflow can contain many Blocks and use your Knowledge Base.
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+
+          <Outlet />
+        </DialogDrawerContent>
+      </DialogDrawer>
+
       <PageContentWrapper className="grid grid-cols-1 gap-8 lg:grid-cols-1">
         {pipelines.data.length > 0 ? (
           <>
@@ -130,10 +134,7 @@ function TemplatesWithoutPipelines({
 
       <div>
         <h3 className="text-muted-foreground mb-3">Choose from templates</h3>
-        <WorkflowTemplatesList
-          items={templates}
-          organizationId={organizationId}
-        />
+        <WorkflowTemplatesList items={templates} />
 
         <div className="relative w-full h-[0.5px] bg-neutral-200 my-8">
           <span className="block absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white w-14 text-center text-muted-foreground">
@@ -142,7 +143,7 @@ function TemplatesWithoutPipelines({
         </div>
 
         <BasicLink
-          to={routes.pipelinesNew(organizationId)}
+          to={routes.pipelinesNew(organizationId) + '?step=form'}
           aria-label="Create new workflow"
         >
           <DefaultTemplateItem />

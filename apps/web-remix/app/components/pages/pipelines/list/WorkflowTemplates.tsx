@@ -33,11 +33,11 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = ({
 
 interface WorkflowTemplatesListProps {
   items: IWorkflowTemplate[];
-  organizationId: string;
+  action?: string;
 }
 export function WorkflowTemplatesList({
   items,
-  organizationId,
+  action,
 }: WorkflowTemplatesListProps) {
   const formattedTemplates = useMemo(
     () => items.map((template) => ({ ...template, id: template.name })),
@@ -48,25 +48,23 @@ export function WorkflowTemplatesList({
       className="flex flex-col gap-2"
       items={formattedTemplates}
       renderItem={(item) => (
-        <WorkflowTemplatesListItem
-          item={item}
-          organizationId={organizationId}
-        />
+        <WorkflowTemplatesListItem action={action} item={item} />
       )}
     />
   );
 }
 
 interface ITemplateItem {
-  organizationId: string;
   item: IWorkflowTemplate;
+  action?: string;
 }
-function WorkflowTemplatesListItem({ item }: ITemplateItem) {
+function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
   const ref = useRef<HTMLFormElement>(null);
   const validator = useMemo(() => withZod(CreateFromTemplateSchema), []);
   return (
     <ValidatedForm
       formRef={ref}
+      action={action}
       method="POST"
       validator={validator}
       onClick={() => ref.current?.submit()}
@@ -101,9 +99,14 @@ function WorkflowTemplatesListItem({ item }: ITemplateItem) {
   );
 }
 
-export function DefaultTemplateItem() {
+export function DefaultTemplateItem({ className }: { className?: string }) {
   return (
-    <div className="group p-4 flex items-center justify-between gap-2 bg-white border border-neutral-100 h-[80px] rounded-xl transition hover:border-blue-200 cursor-pointer">
+    <div
+      className={cn(
+        'group p-4 flex items-center justify-between gap-2 bg-white border border-neutral-100 h-[80px] rounded-xl transition hover:border-blue-200 cursor-pointer',
+        className,
+      )}
+    >
       <div className="flex gap-3">
         <div
           className={cn(
