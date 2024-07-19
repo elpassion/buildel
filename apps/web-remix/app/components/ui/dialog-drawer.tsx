@@ -122,7 +122,7 @@ const DialogDrawerHeader = ({
   const Component = isDesktop ? DialogHeader : DrawerHeader;
 
   return (
-    <Component className={className} {...props}>
+    <Component className={cn('px-1', className)} {...props}>
       {children}
     </Component>
   );

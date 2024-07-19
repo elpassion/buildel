@@ -1,26 +1,18 @@
 import React, { useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import {
-  Form,
-  useLoaderData,
-  useNavigate,
-  useRevalidator,
-} from '@remix-run/react';
+import { Form, useLoaderData, useRevalidator } from '@remix-run/react';
 
 import { FileUpload } from '~/components/fileUpload/FileUpload';
 import type { IFileUpload } from '~/components/fileUpload/fileUpload.types';
 import { FileUploadListPreview } from '~/components/fileUpload/FileUploadListPreview';
-import { ActionSidebarHeader } from '~/components/sidebar/ActionSidebar';
 import { errorToast } from '~/components/toasts/errorToast';
 import { loadingToast } from '~/components/toasts/loadingToast';
 import { Button } from '~/components/ui/button';
-import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
 
 type IExtendedFileUpload = IFileUpload & { file: File };
 export function NewCollectionFilesPage() {
-  const navigate = useNavigate();
   const revalidator = useRevalidator();
   const { organizationId, collectionName, collectionId } =
     useLoaderData<typeof loader>();
@@ -191,45 +183,33 @@ export function NewCollectionFilesPage() {
     );
   };
 
-  const handleClose = () => {
-    navigate(routes.collectionFiles(organizationId, collectionName));
-  };
-
   return (
-    <>
-      <ActionSidebarHeader
-        heading="New knowledge items"
-        subheading={`Upload files to add to ${collectionName} Database.`}
-        onClose={handleClose}
+    <Form className="grow flex flex-col gap-2 p-1">
+      <FileUpload
+        multiple
+        name="files"
+        className="!gap-2"
+        labelText="Browse files to upload"
+        fileList={items}
+        onChange={onChange}
+        onRemove={removeFile}
+        preview={({ fileList }) => (
+          <FileUploadListPreview fileList={fileList} remove={removeFile} />
+        )}
       />
 
-      <Form className="grow flex flex-col gap-2 h-[70%]">
-        <div className="grow overflow-y-auto">
-          <FileUpload
-            multiple
-            name="files"
-            className="!gap-6"
-            labelText="Browse files to upload"
-            fileList={items}
-            onChange={onChange}
-            onRemove={removeFile}
-            preview={({ fileList }) => (
-              <FileUploadListPreview fileList={fileList} remove={removeFile} />
-            )}
-          />
-        </div>
-        <Button
-          aria-label="Upload knowledge items"
-          isFluid
-          size="sm"
-          disabled={!items.length || isUploading}
-          onClick={handleUploadFiles}
-          isLoading={isUploading}
-        >
-          Add {items.length > 0 ? items.length : ''} knowledge items
-        </Button>
-      </Form>
-    </>
+      <Button
+        aria-label="Upload knowledge items"
+        isFluid
+        size="sm"
+        disabled={!items.length || isUploading}
+        onClick={handleUploadFiles}
+        isLoading={isUploading}
+        className="mt-4"
+      >
+        Add {items.length > 0 ? items.length : ''} knowledge items
+      </Button>
+    </Form>
   );
 }
 

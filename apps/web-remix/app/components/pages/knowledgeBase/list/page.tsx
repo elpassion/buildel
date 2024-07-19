@@ -58,7 +58,7 @@ export function KnowledgeBasePage() {
         </DialogDrawerContent>
       </DialogDrawer>
 
-      <PageContentWrapper>
+      <PageContentWrapper className="mt-6">
         <div className="mb-3 flex justify-end lg:hidden">
           <Button size="sm" asChild>
             <BasicLink to={routes.knowledgeBaseNew(organizationId)}>

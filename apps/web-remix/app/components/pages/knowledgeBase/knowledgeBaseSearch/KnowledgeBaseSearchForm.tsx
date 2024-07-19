@@ -30,7 +30,7 @@ export const KnowledgeBaseSearchForm: React.FC<
       validator={validator}
       defaultValues={{ query: defaultValue }}
       noValidate
-      className="flex gap-2 w-full "
+      className="flex gap-2 w-full"
     >
       <SearchParams>
         <Field name="limit">
@@ -70,7 +70,7 @@ export const KnowledgeBaseSearchForm: React.FC<
           <TextInputField placeholder="Ask a question..." className="!pr-8" />
           <FieldMessage />
 
-          <div className="absolute top-[21px] right-3 -translate-y-1/2">
+          <div className="absolute top-[21px] right-1 -translate-y-1/2">
             <SearchButton />
           </div>
         </div>
@@ -85,7 +85,8 @@ function SearchButton() {
   return (
     <IconButton
       onlyIcon
-      size="xs"
+      variant="ghost"
+      size="xxs"
       icon={isSubmitting ? <Loader /> : <Search />}
       aria-label="Search"
       className={classNames({ 'animate-spin': isSubmitting })}

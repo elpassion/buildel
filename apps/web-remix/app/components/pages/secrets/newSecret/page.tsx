@@ -23,7 +23,7 @@ export function NewSecret() {
       method="post"
       className="grow flex flex-col gap-2"
     >
-      <div className="p-1 w-full space-y-6 grow overflow-y-auto">
+      <div className="p-1 w-full space-y-6">
         <div>
           <Field name="name">
             <FieldLabel>Name your Secret</FieldLabel>

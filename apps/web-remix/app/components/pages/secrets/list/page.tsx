@@ -77,7 +77,7 @@ export function SecretListPage() {
         </DialogDrawerContent>
       </DialogDrawer>
 
-      <PageContentWrapper>
+      <PageContentWrapper className="mt-6">
         <div className="mb-3 flex gap-2 justify-end items-center lg:hidden">
           <Button asChild size="sm">
             <BasicLink to={routes.secretsNew(organizationId)}>

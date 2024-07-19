@@ -7,16 +7,16 @@ import {
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import classNames from 'classnames';
 
-import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
 import {
   DialogDrawer,
   DialogDrawerBody,
   DialogDrawerContent,
+  DialogDrawerDescription,
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import { KnowledgeBaseFileList } from './KnowledgeBaseFileList';
@@ -34,14 +34,13 @@ export function KnowledgeBaseContentPage() {
   const matchSearch = useMatch(
     routes.collectionSearch(organizationId, collectionName),
   );
-  const isSidebarOpen = !!matchNew || !!matchSearch;
-
   const matchDetails = useMatch(
     `:organizationId/knowledge-base/:collectionName/content/:memoryId/chunks`,
   );
 
+  const isSidebarOpen = !!matchNew || !!matchSearch || !!matchDetails;
+
   const [searchParams] = useSearchParams();
-  const isDetails = !!matchDetails;
 
   const handleClose = (value?: boolean) => {
     if (value) return;
@@ -52,31 +51,31 @@ export function KnowledgeBaseContentPage() {
     <>
       <KnowledgeBaseFileList items={fileList} />
 
-      <DialogDrawer open={isDetails} onOpenChange={handleClose}>
-        <DialogDrawerContent className="md:min-w-[700px]">
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleClose}>
+        <DialogDrawerContent
+          className={cn({
+            'md:min-w-[700px]': matchDetails ?? matchSearch,
+            'lg:min-w-[900px]': matchDetails,
+          })}
+        >
           <DialogDrawerHeader>
             <DialogDrawerTitle>
-              {searchParams.get('file_name')}
+              {matchDetails && searchParams.get('file_name')}
+              {matchNew && 'Create New File'}
+              {matchSearch && 'Ask a question to your knowledge base'}
             </DialogDrawerTitle>
+
+            <DialogDrawerDescription>
+              {matchNew && 'Upload files to a Knowledge base.'}
+              {matchSearch &&
+                "Let's ask your knowledge base some questions so you can see how your chatbot will answer and where it'll take it's information from."}
+            </DialogDrawerDescription>
           </DialogDrawerHeader>
           <DialogDrawerBody>
-            <div className="max-h-[70vh] p-2 overflow-auto">
-              <Outlet />
-            </div>
+            <Outlet />
           </DialogDrawerBody>
         </DialogDrawerContent>
       </DialogDrawer>
-
-      <ActionSidebar
-        className={classNames('!bg-neutral-950', {
-          'md:w-[550px]': matchSearch,
-        })}
-        isOpen={isSidebarOpen}
-        onClose={handleClose}
-        overlay
-      >
-        <Outlet />
-      </ActionSidebar>
     </>
   );
 }

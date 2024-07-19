@@ -1,11 +1,24 @@
 import React from 'react';
 import { Link, useFetcher, useLoaderData } from '@remix-run/react';
-import { File, Plus, Trash } from 'lucide-react';
+import { EllipsisVertical, File, Plus, Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { BasicLink } from '~/components/link/BasicLink';
 import { ItemList } from '~/components/list/ItemList';
 import { confirm } from '~/components/modal/confirm';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
 import { routes } from '~/utils/routes.utils';
 
 import type {
@@ -43,7 +56,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
   return (
     <ItemList
       aria-label="Collection files"
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 lg:grid-cols-3"
+      className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
       items={items}
       renderItem={(item) => (
         <BasicLink
@@ -59,12 +72,15 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
       )}
     >
       <li>
-        <Link
-          to={routes.collectionFilesNew(organizationId, collectionName)}
-          className="bg-neutral-900 transition rounded-lg py-2 px-6 w-full text-neutral-600 hover:text-neutral-300 flex flex-col items-center justify-center h-[80px] border border-neutral-800 hover:border-neutral-700"
-        >
-          <Plus />
-          <p className="font-medium">Add new memory file</p>
+        <Link to={routes.collectionFilesNew(organizationId, collectionName)}>
+          <Card className="bg-muted">
+            <CardContent className="min-h-[90px] pt-3 h-full flex justify-center items-center flex-col">
+              <CardDescription className="text-sm group-hover:text-foreground transition">
+                <Plus className="mx-auto" />
+                <span className="font-medium">Add new memory file</span>
+              </CardDescription>
+            </CardContent>
+          </Card>
         </Link>
       </li>
     </ItemList>
@@ -83,31 +99,40 @@ export const KnowledgeBaseFileListItem: React.FC<
     onDelete(data);
   };
   return (
-    <article className="relative group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6">
-      <header>
-        <h3 className="text-lg font-medium text-white mb-1 max-w-[90%] truncate">
-          {data.file_name}
-        </h3>
+    <Card>
+      <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
+        <CardTitle className="line-clamp-2">{data.file_name}</CardTitle>
 
-        <p className="text-xs text-white flex gap-2">
+        <div onClick={(e) => e.preventDefault()}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className="text-muted-foreground">
+              <IconButton
+                variant="ghost"
+                size="xs"
+                icon={<EllipsisVertical className="w-4 h-4" />}
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem
+                className="flex gap-1 items-center text-red-500"
+                onClick={handleDelete}
+                title={`Delete file: ${data.file_name}`}
+                aria-label={`Delete file: ${data.file_name}`}
+              >
+                <Trash className="w-4 h-4" />
+                <span>Delete</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <CardDescription className="flex gap-1 items-center">
           <File className="w-4 h-4" />{' '}
           <span className="uppercase">{data.file_type}</span>
-        </p>
-      </header>
-
-      <div
-        className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition"
-        onClick={(e) => e.preventDefault()}
-      >
-        <IconButton
-          size="xxs"
-          variant="ghost"
-          aria-label={`Delete file: ${data.file_name}`}
-          className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500"
-          icon={<Trash />}
-          onClick={handleDelete}
-        />
-      </div>
-    </article>
+        </CardDescription>
+      </CardContent>
+    </Card>
   );
 };

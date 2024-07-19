@@ -2,6 +2,12 @@ import React from 'react';
 
 import type { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from '~/components/ui/card';
 
 interface KnowledgeBaseSearchListProps {
   items: IKnowledgeBaseSearchChunk[];
@@ -35,27 +41,30 @@ function KnowledgeBaseSearchListItem({
   item,
 }: KnowledgeBaseSearchListItemProps) {
   return (
-    <article className="p-3 bg-neutral-850 rounded-lg text-sm">
-      {item.keywords.length ? (
-        <p className="font-bold text-neutral-100">
-          {item.keywords.join(' - ')}
-        </p>
-      ) : (
-        ''
-      )}
+    <Card>
+      <CardHeader>
+        {item.keywords.length ? (
+          <CardDescription>{item.keywords.join(' - ')}</CardDescription>
+        ) : (
+          ''
+        )}
+      </CardHeader>
+      <CardContent>
+        <CardDescription className="text-foreground">
+          {item.content}
+        </CardDescription>
 
-      <p className="text-neutral-100 mt-2">{item.content}</p>
+        <div className="mt-2 flex gap-2 justify-between">
+          <CardDescription>{item.file_name}</CardDescription>
 
-      <div className="mt-2 flex gap-2 justify-between text-neutral-100 ">
-        <p className="font-bold">{item.file_name}</p>
-
-        <p className="font-bold">
-          Score: {(item.similarity * 100).toFixed(0)}%
-        </p>
-      </div>
-      <p className="mt-2 font-bold text-neutral-100">
-        Page: {item.pages.join(', ')}
-      </p>
-    </article>
+          <CardDescription>
+            Score: {(item.similarity * 100).toFixed(0)}%
+          </CardDescription>
+        </div>
+        <CardDescription className="mt-2">
+          Page: {item.pages.join(', ')}
+        </CardDescription>
+      </CardContent>
+    </Card>
   );
 }

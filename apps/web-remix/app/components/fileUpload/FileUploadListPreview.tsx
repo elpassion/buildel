@@ -60,9 +60,9 @@ export function FileUploadListItem({
     <article
       data-tooltip-id={`${file.id}`}
       className={classNames(
-        'flex justify-between gap-2 w-full py-1 px-2 bg-neutral-600 hover:bg-neutral-700 transition rounded-md cursor-default',
+        'flex justify-between gap-2 w-full py-1 px-2 border border-input bg-white hover:bg-muted transition rounded-md cursor-default',
         {
-          'text-white': file.status !== 'error',
+          'text-foreground': file.status !== 'error',
           'text-red-500': file.status === 'error',
         },
       )}
@@ -76,7 +76,7 @@ export function FileUploadListItem({
           </h6>
           <span
             className={classNames('text-[10px]', {
-              'text-white': file.status !== 'error',
+              'text-muted-foreground': file.status !== 'error',
               'text-red-500': file.status === 'error',
             })}
           >
@@ -96,7 +96,7 @@ export function FileUploadListItem({
 
       {onRemove && (
         <IconButton
-          onlyIcon
+          size="xxxs"
           icon={
             file.status === 'uploading' ? (
               <Loader
@@ -118,6 +118,7 @@ export function FileUploadListItem({
               />
             )
           }
+          variant="ghost"
           aria-label={`Delete file: ${file.file_name}`}
           disabled={isDisabled}
           onClick={handleRemove}

@@ -63,7 +63,7 @@ export function PipelinesPage() {
         </DialogDrawerContent>
       </DialogDrawer>
 
-      <PageContentWrapper className="grid grid-cols-1 gap-8 lg:grid-cols-1">
+      <PageContentWrapper className="grid grid-cols-1 gap-8 mt-6 lg:grid-cols-1">
         {pipelines.data.length > 0 ? (
           <>
             <div className="flex-grow order-2 lg:order-1">
