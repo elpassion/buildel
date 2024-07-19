@@ -12,7 +12,6 @@ import {
   TextInputField,
 } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
-import { DialogDrawerFooter } from '~/components/ui/dialog-drawer';
 
 export function NewSecret() {
   const validator = useMemo(() => withZod(CreateUpdateSecretSchema), []);
@@ -51,9 +50,7 @@ export function NewSecret() {
         </div>
       </div>
 
-      <DialogDrawerFooter>
-        <SubmitButton size="sm">Save the Secret</SubmitButton>
-      </DialogDrawerFooter>
+      <SubmitButton size="sm">Save the Secret</SubmitButton>
     </ValidatedForm>
   );
 }

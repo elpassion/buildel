@@ -19,6 +19,7 @@ import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
+  DialogDrawerBody,
   DialogDrawerContent,
   DialogDrawerDescription,
   DialogDrawerHeader,
@@ -70,7 +71,9 @@ export function SecretListPage() {
             </DialogDrawerDescription>
           </DialogDrawerHeader>
 
-          <Outlet />
+          <DialogDrawerBody>
+            <Outlet />
+          </DialogDrawerBody>
         </DialogDrawerContent>
       </DialogDrawer>
 

@@ -62,21 +62,23 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
               onClose();
             }}
           >
-            <Field name="name">
-              <TextInputField type="hidden" />
-            </Field>
+            <div className="p-1">
+              <Field name="name">
+                <TextInputField type="hidden" />
+              </Field>
 
-            <Field name="value">
-              <FieldLabel>Enter Secret</FieldLabel>
-              <PasswordInputField
-                autoFocus
-                placeholder="Type or paste in your secret key"
-              />
-              <FieldMessage>
-                The actual token key that will authorise you in the external
-                system, such as Open AI.
-              </FieldMessage>
-            </Field>
+              <Field name="value">
+                <FieldLabel>Enter Secret</FieldLabel>
+                <PasswordInputField
+                  autoFocus
+                  placeholder="Type or paste in your secret key"
+                />
+                <FieldMessage>
+                  The actual token key that will authorise you in the external
+                  system, such as Open AI.
+                </FieldMessage>
+              </Field>
+            </div>
 
             <DialogDrawerFooter>
               <SubmitButton size="sm" className="mt-6 ml-auto mr-0">

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { PropsWithChildren } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { cn } from '~/utils/cn';
@@ -12,6 +13,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from './dialog';
@@ -22,6 +24,7 @@ import {
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
+  DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
 } from './drawer';
@@ -89,7 +92,7 @@ const DialogDrawerContent = ({
   const Component = isDesktop ? DialogContent : DrawerContent;
 
   return (
-    <Component className={className} {...props}>
+    <Component className={cn('max-h-[96vh]', className)} {...props}>
       {children}
     </Component>
   );
@@ -146,7 +149,13 @@ const DialogDrawerBody = ({
   ...props
 }: DialogDrawerProps & React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <div className={cn('px-4 md:px-0', className)} {...props}>
+    <div
+      className={cn(
+        'overflow-y-auto md:max-h-[76vh] px-4 pb-4 md:px-0 md:pb-0',
+        className,
+      )}
+      {...props}
+    >
       {children}
     </div>
   );

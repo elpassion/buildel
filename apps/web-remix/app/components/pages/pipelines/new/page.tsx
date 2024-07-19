@@ -16,17 +16,13 @@ import {
   WorkflowTemplatesList,
 } from '~/components/pages/pipelines/list/WorkflowTemplates';
 import type { loader } from '~/components/pages/pipelines/new/loader.server';
-import { DialogDrawerFooter } from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 export function NewPipelinePage() {
   const { step } = useLoaderData<typeof loader>();
 
-  return (
-    <div className="px-4 pb-3 md:pb-0 md:px-0">
-      {step === 'form' ? <NameFormStep /> : <TemplatesStep />}
-    </div>
-  );
+  if (step === 'form') return <NameFormStep />;
+  return <TemplatesStep />;
 }
 
 export const meta: MetaFunction = () => {
@@ -68,9 +64,7 @@ function NameFormStep() {
         <HiddenField name="pipeline.config.blocks" value={'[]'} />
       </div>
 
-      <DialogDrawerFooter>
-        <SubmitButton size="sm">Create workflow</SubmitButton>
-      </DialogDrawerFooter>
+      <SubmitButton size="sm">Create workflow</SubmitButton>
     </ValidatedForm>
   );
 }

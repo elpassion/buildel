@@ -7,6 +7,7 @@ import { BasicLink } from '~/components/link/BasicLink';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
+  DialogDrawerBody,
   DialogDrawerContent,
   DialogDrawerDescription,
   DialogDrawerHeader,
@@ -56,7 +57,9 @@ export function PipelinesPage() {
             </DialogDrawerDescription>
           </DialogDrawerHeader>
 
-          <Outlet />
+          <DialogDrawerBody>
+            <Outlet />
+          </DialogDrawerBody>
         </DialogDrawerContent>
       </DialogDrawer>
 

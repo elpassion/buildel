@@ -58,7 +58,7 @@ export const PipelineListItemHeader = ({
   };
 
   return (
-    <CardHeader className="flex flex-row gap-4 items-center justify-between">
+    <CardHeader className="flex flex-row gap-4 items-center justify-between space-y-0">
       <CardTitle className="line-clamp-2">{pipeline.name}</CardTitle>
 
       <div className="w-fit h-fit" onClick={(e) => e.stopPropagation()}>

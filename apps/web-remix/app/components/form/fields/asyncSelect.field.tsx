@@ -27,7 +27,7 @@ export const AsyncSelectField = forwardRef<
   AsyncSelectFieldProps
 >(
   (
-    { url, defaultValue, label, supportingText, errorMessage, ...props },
+    { url, id, defaultValue, label, supportingText, errorMessage, ...props },
     _ref,
   ) => {
     const isMounted = useIsMounted();
@@ -59,13 +59,15 @@ export const AsyncSelectField = forwardRef<
         <HiddenField value={selectedId ?? ''} {...getInputProps()} />
         <FieldLabel>{label}</FieldLabel>
         <AsyncSelectInput
+          id={id ?? name}
           onBlur={getInputProps().onBlur}
           placeholder="Select..."
           fetchOptions={fetcher}
           defaultValue={defaultValue}
           onChange={setSelectedId}
           value={selectedId}
-          data-testid={props.id}
+          data-testid={id}
+          getPopupContainer={(node) => node.parentNode}
           {...props}
         />
         <FieldMessage error={errorMessage}>{supportingText}</FieldMessage>
