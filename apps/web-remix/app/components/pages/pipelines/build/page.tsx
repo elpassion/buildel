@@ -71,7 +71,7 @@ export function PipelineBuilder() {
         alias={aliasId}
         key="flow-readOnly"
         type="readOnly"
-        className="h-[calc(100vh_-_128px)]"
+        className="h-[calc(100vh_-_64px)] pt-0"
         pipeline={pipeline}
         CustomNode={AliasNode}
         CustomEdge={CustomEdge}

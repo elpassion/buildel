@@ -6,6 +6,7 @@ import { BlockTypeApi } from '~/api/blockType/BlockTypeApi';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
+import { getServerToast } from '~/utils/toast.server';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request, params }, { fetch }) => {
@@ -43,15 +44,21 @@ export async function loader(args: LoaderFunctionArgs) {
       ),
     }));
 
-    return json({
-      pipeline: pipeline.data,
-      pipelineRun: {
-        ...pipelineRun.data,
-        config: { ...pipelineRun.data.config, blocks },
+    const { cookie, ...toasts } = await getServerToast(request);
+
+    return json(
+      {
+        toasts,
+        pipeline: pipeline.data,
+        pipelineRun: {
+          ...pipelineRun.data,
+          config: { ...pipelineRun.data.config, blocks },
+        },
+        runId: params.runId,
+        pipelineId: params.pipelineId,
+        organizationId: params.organizationId,
       },
-      runId: params.runId,
-      pipelineId: params.pipelineId,
-      organizationId: params.organizationId,
-    });
+      { headers: { 'Set-Cookie': cookie } },
+    );
   })(args);
 }

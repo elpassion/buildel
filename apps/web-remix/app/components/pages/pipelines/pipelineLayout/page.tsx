@@ -7,10 +7,12 @@ import {
 } from '@remix-run/react';
 import { ChevronLeft } from 'lucide-react';
 
+import { PipelineLayoutHeader } from '~/components/pages/pipelines/PipelineLayoutHeader';
 import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
 import { TabGroup } from '~/components/tabs/TabGroup';
 import { Button } from '~/components/ui/button';
+import { useServerToasts } from '~/hooks/useServerToasts';
 import { routes } from '~/utils/routes.utils';
 
 import { AliasSelect, CreateAliasForm, RestoreWorkflow } from './Aliases';
@@ -18,9 +20,11 @@ import type { loader } from './loader.server';
 
 export function PipelineLayout() {
   const navigate = useNavigate();
-  const { pipeline, organizationId, aliases, aliasId } =
+  const { toasts, pipeline, organizationId, aliases, aliasId } =
     useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
+
+  useServerToasts(toasts);
 
   const backToWorkflows = () => {
     navigate(routes.pipelines(organizationId));
@@ -29,7 +33,7 @@ export function PipelineLayout() {
   return (
     <>
       <TabGroup>
-        <header className="w-full h-16 bg-white border-b border-input px-4 py-2 flex gap-2 justify-between items-center">
+        <PipelineLayoutHeader>
           <div className="flex gap-2 items-center">
             <Button
               variant="secondary"
@@ -90,7 +94,7 @@ export function PipelineLayout() {
               <CreateAliasForm pipeline={pipeline} aliases={aliases} />
             )}
           </div>
-        </header>
+        </PipelineLayoutHeader>
 
         <Outlet />
       </TabGroup>

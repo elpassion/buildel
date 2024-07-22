@@ -50,7 +50,7 @@ export const ChatMessagesWrapper: React.FC<
   return (
     <div
       className={classNames(
-        'w-full border border-neutral-800 rounded-lg px-2 py-3 grow overflow-hidden',
+        'w-full border border-input rounded-lg px-2 py-3 grow overflow-hidden',
         className,
       )}
     >
@@ -85,7 +85,7 @@ export const ChatGeneratingAnimation = ({
   if (!isGenerating) return null;
   return (
     <div className="flex gap-0.5 items-center">
-      <span className="text-[10px] text-neutral-400 mr-1">
+      <span className="text-[10px] text-muted-foreground mr-1">
         {renderMessage()}
       </span>
       <div className="w-1 h-1 rounded-full bg-secondary-400 animate-bounce" />
@@ -118,19 +118,21 @@ export const ChatStatus = ({
     <div
       title={mappedStatusToText}
       className={classNames(
-        'py-0.5 px-1 bg-neutral-800 rounded flex gap-1 items-center',
+        'py-0.5 px-1 bg-white rounded flex gap-1 items-center',
         className,
       )}
     >
       <div
-        className={classNames('w-[6px] h-[6px] rounded-full', {
+        className={classNames('w-[6px] h-[6px] rounded-full ', {
           'bg-red-500': connectionStatus === 'idle',
           'bg-green-500': connectionStatus === 'running',
           'bg-orange-500': connectionStatus === 'starting',
         })}
       />
 
-      <span className="text-xs text-neutral-400">{mappedStatusToText}</span>
+      <span className="text-xs text-muted-foreground">
+        {mappedStatusToText}
+      </span>
     </div>
   );
 };

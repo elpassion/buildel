@@ -137,8 +137,8 @@ export default function WebsiteForm() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen w-full">
-      <div className="flex flex-col w-[820px] bg-neutral-900 p-2 rounded-lg">
+    <div className="flex justify-center items-center h-screen w-full text-foreground">
+      <div className="flex flex-col w-[820px] bg-muted p-2 rounded-lg">
         <ValidatedForm
           validator={validator}
           noValidate
@@ -157,7 +157,7 @@ export default function WebsiteForm() {
                     </div>
                   )}
                   {input.type === 'file_input' && (
-                    <div className="flex text-white justify-start items-center gap-2 bg-neutral-800 rounded-lg w-full">
+                    <div className="flex text-foreground justify-start items-center gap-2 rounded-lg w-full">
                       <SmallFileInputField
                         multiple={false}
                         onChange={async (e) => {
@@ -215,7 +215,7 @@ export function FormInterfaceOutput({
 
         <NodeClearButton onClear={() => {}} />
       </div>
-      <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+      <div className="bg-white w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-input rounded-md py-2 px-[10px]">
         <ChatMarkdown>{payload ?? ''}</ChatMarkdown>
       </div>
     </div>

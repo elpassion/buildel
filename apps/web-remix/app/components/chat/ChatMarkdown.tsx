@@ -99,7 +99,10 @@ function Paragraph({
 }: React.ParamHTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={classNames('my-2 break-words whitespace-pre-wrap', className)}
+      className={classNames(
+        'my-2 break-words whitespace-pre-wrap text-sm',
+        className,
+      )}
       {...rest}
     >
       {children}
@@ -114,7 +117,10 @@ function Span({
 }: React.ParamHTMLAttributes<HTMLSpanElement>) {
   return (
     <span
-      className={classNames(' break-words whitespace-pre-wrap', className)}
+      className={classNames(
+        'text-sm break-words whitespace-pre-wrap',
+        className,
+      )}
       {...rest}
     >
       {children}

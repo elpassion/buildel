@@ -47,7 +47,7 @@ function MessageTime({ message }: { message: IMessage }) {
   return (
     <span
       className={classNames(
-        'block w-fit text-[10px] text-neutral-300 mt-[2px]',
+        'block w-fit text-[10px] text-muted-foreground mt-[2px]',
         {
           'ml-auto mr-1': message.role === 'user',
         },
@@ -66,10 +66,10 @@ function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
   return (
     <article
       className={classNames(
-        'w-full max-w-[60%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5 prose ',
+        'bg-white w-full max-w-[60%] min-h-[30px] rounded-t-xl border border-input px-2 py-1.5 prose ',
         {
-          'bg-neutral-800 rounded-br-xl': role === 'ai',
-          'bg-neutral-900 rounded-bl-xl ml-auto mr-0': role !== 'ai',
+          'rounded-br-xl': role === 'ai',
+          'rounded-bl-xl ml-auto mr-0': role !== 'ai',
         },
       )}
     >
