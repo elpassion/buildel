@@ -54,7 +54,7 @@ export function NodeActionButton({
   return (
     <button
       className={classNames(
-        'text-xs text-neutral-100 rounded px-1 py-[2px] flex items-center gap-1 hover:text-primary-500',
+        'text-xs text-muted-foreground rounded px-1 py-[2px] flex items-center gap-1 hover:text-foreground',
         className,
       )}
       {...rest}

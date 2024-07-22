@@ -120,7 +120,7 @@ export function FileUpload({
   return (
     <div className={classNames('flex flex-col gap-2', className)}>
       <label htmlFor={rest.id}>
-        <span className="text-white text-xs font-medium">{labelText}</span>
+        <span className="text-foreground text-xs font-medium">{labelText}</span>
         <input
           name={name}
           type="file"

@@ -60,26 +60,26 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         </DialogDrawerHeader>
         <DialogDrawerBody>
           <div className="w-full mb-4">{children}</div>
-
-          <DialogDrawerFooter>
-            <Button
-              size="sm"
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-            >
-              {cancelText}
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              variant="destructive"
-              onClick={handleConfirm}
-            >
-              {confirmText}
-            </Button>
-          </DialogDrawerFooter>
         </DialogDrawerBody>
+
+        <DialogDrawerFooter>
+          <Button
+            size="sm"
+            type="button"
+            variant="outline"
+            onClick={handleCancel}
+          >
+            {cancelText}
+          </Button>
+          <Button
+            type="submit"
+            size="sm"
+            variant="destructive"
+            onClick={handleConfirm}
+          >
+            {confirmText}
+          </Button>
+        </DialogDrawerFooter>
       </DialogDrawerContent>
     </DialogDrawer>
   );

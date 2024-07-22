@@ -74,7 +74,7 @@ function BuilderNodeHeaderActions({
   }, [data, searchParams]);
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-1 items-center">
       {/*<div className="w-4 h-[22px]">*/}
       {/*  <CopyCodeButton*/}
       {/*    value={JSON.stringify({*/}
@@ -87,7 +87,6 @@ function BuilderNodeHeaderActions({
 
       <IconButton
         size="xxs"
-        onlyIcon
         icon={<Settings />}
         aria-label={`Edit block: ${data.name}`}
         onClick={handleEdit}
@@ -96,7 +95,6 @@ function BuilderNodeHeaderActions({
 
       <IconButton
         size="xxs"
-        onlyIcon
         aria-label={`Delete block: ${data.name}`}
         icon={<Trash />}
         onClick={handleDelete}

@@ -24,7 +24,7 @@ export function FileOutputListItem({ file }: FileOutputListItemProps) {
   return (
     <article
       data-tooltip-id={`${file.id}`}
-      className="flex justify-between gap-2 w-full py-1 px-2 bg-neutral-600 hover:bg-neutral-700 transition rounded-md cursor-default text-white items-center"
+      className="flex justify-between gap-2 w-full py-1 px-2 bg-muted transition rounded-md cursor-default text-foreground items-center"
     >
       <div className="flex gap-1 grow max-w-[90%]">
         <div className="flex flex-col w-full max-w-[95%]">

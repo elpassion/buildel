@@ -15,8 +15,6 @@ export const TextareaInput: React.FC<TextareaInputProps> = ({
       style={{
         fontSize: '12px',
         lineHeight: '16px',
-        backgroundColor: '#454545',
-        color: 'white',
         padding: '8px 10px',
         resize: 'none',
         ...style,

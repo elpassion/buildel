@@ -83,7 +83,10 @@ function Strong({
   ...rest
 }: React.ParamHTMLAttributes<HTMLDivElement>) {
   return (
-    <strong className={classNames('font-bold text-white', className)} {...rest}>
+    <strong
+      className={classNames('font-bold text-foreground', className)}
+      {...rest}
+    >
       {children}
     </strong>
   );
@@ -142,7 +145,7 @@ function H6({
   return (
     <h6
       className={classNames(
-        'break-words whitespace-pre-wrap text-neutral-100',
+        'break-words whitespace-pre-wrap text-muted-foreground',
         className,
       )}
       {...rest}
@@ -159,7 +162,7 @@ function H5({
   return (
     <h5
       className={classNames(
-        'break-words whitespace-pre-wrap text-sm text-neutral-100',
+        'break-words whitespace-pre-wrap text-sm text-muted-foreground',
         className,
       )}
       {...rest}
@@ -177,7 +180,7 @@ function H4({
   return (
     <h4
       className={classNames(
-        'break-words whitespace-pre-wrap text-base text-neutral-100',
+        'break-words whitespace-pre-wrap text-base text-muted-foreground',
         className,
       )}
       {...rest}
@@ -195,7 +198,7 @@ function H3({
   return (
     <h3
       className={classNames(
-        'break-words whitespace-pre-wrap text-lg text-neutral-100',
+        'break-words whitespace-pre-wrap text-lg text-muted-foreground',
         className,
       )}
       {...rest}
@@ -213,7 +216,7 @@ function H2({
   return (
     <h2
       className={classNames(
-        'break-words whitespace-pre-wrap text-xl text-neutral-100',
+        'break-words whitespace-pre-wrap text-xl text-muted-foreground',
         className,
       )}
       {...rest}
@@ -231,7 +234,7 @@ function H1({
   return (
     <h2
       className={classNames(
-        'break-words whitespace-pre-wrap text-2xl text-neutral-100',
+        'break-words whitespace-pre-wrap text-2xl text-muted-foreground',
         className,
       )}
       {...rest}
@@ -248,7 +251,7 @@ function Li({
 }: React.ParamHTMLAttributes<HTMLLIElement>) {
   return (
     <li
-      className={classNames('!m-0 marker:text-neutral-100', className)}
+      className={classNames('!m-0 marker:text-muted-foreground', className)}
       {...rest}
     >
       {children}
@@ -263,7 +266,10 @@ function Link({
 }: AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
     <a
-      className={classNames('text-primary-500', className)}
+      className={classNames(
+        'text-foreground font-bold hover:underline',
+        className,
+      )}
       target="_blank"
       rel="noreferrer"
       {...rest}
@@ -285,7 +291,7 @@ function Pre({
   return (
     <pre
       className={classNames(
-        'my-1 bg-neutral-900 break-words whitespace-pre-wrap',
+        'my-1 bg-primary text-primary-foreground break-words whitespace-pre-wrap',
         className,
       )}
       {...rest}
@@ -308,7 +314,7 @@ function Code({
   const isMermaidCode = className?.includes('lang-mermaid');
   if (isMermaidCode) {
     mermaid.initialize({
-      theme: 'dark',
+      theme: 'default',
     });
     mermaid.run({
       nodes: [codeRef.current!],
@@ -331,7 +337,7 @@ function Code({
     <code
       ref={codeRef}
       className={classNames(
-        'my-1 bg-neutral-900 break-words whitespace-pre-wrap text-neutral-100',
+        'my-1 bg-primary break-words whitespace-pre-wrap text-primary-foreground',
         className,
       )}
       {...rest}

@@ -30,7 +30,7 @@ export function AudioFieldTabs({
 
   return (
     <TabGroup activeTab={activeTab}>
-      <div className="flex gap-2 pb-3 mb-3 mt-1 w-[280px] border-b-[1px] border-neutral-600">
+      <div className="flex gap-2 pb-3 mb-3 mt-1 w-[280px] border-b-[1px] border-input">
         <RadioGroup
           value={activeTab}
           onValueChange={setActiveTab}
@@ -59,10 +59,10 @@ export function AudioFieldTabs({
       </div>
 
       <Tab tabId="microphone">
-        <p className="text-[10px] text-white mb-3">
+        <p className="text-[10px] text-muted-foreground mb-3">
           You need to start the workflow first in order to stream audio.
         </p>
-        <p className="text-xs font-bold text-white mb-1">Audio stream</p>
+        <p className="text-xs font-medium text-foreground mb-1">Audio stream</p>
         <AudioRecorder
           onChunk={(e) => onChunk(e.data, name)}
           disabled={status !== 'running' || disabled}
@@ -70,7 +70,7 @@ export function AudioFieldTabs({
       </Tab>
 
       <Tab tabId="upload">
-        <p className="text-[10px] text-white mb-2">
+        <p className="text-[10px] text-muted-foreground mb-2">
           You need to start the workflow first in order to upload audio.
         </p>
         <FileUpload

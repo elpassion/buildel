@@ -113,7 +113,7 @@ function TextOutput({ content, blockName, onClear }: TextOutputProps) {
     <>
       <div className="mb-1 flex gap-1">
         <label className="flex gap-1 items-center">
-          <span className="text-xs text-neutral-100">Raw</span>
+          <span className="text-xs text-muted-foreground">Raw</span>
           <ToggleInput
             size="sm"
             value={`${isRaw}`}
@@ -128,7 +128,7 @@ function TextOutput({ content, blockName, onClear }: TextOutputProps) {
 
         <NodeClearButton onClear={() => onClear(blockName)} />
       </div>
-      <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+      <div className="text-foreground w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-input rounded-md py-2 px-[10px] text-xs">
         {isRaw ? content : <ChatMarkdown>{content}</ChatMarkdown>}
       </div>
     </>

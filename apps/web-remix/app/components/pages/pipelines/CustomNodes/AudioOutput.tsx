@@ -4,6 +4,7 @@ import { Pause, Play } from 'lucide-react';
 
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
 import { errorToast } from '~/components/toasts/errorToast';
+import { Button } from '~/components/ui/button';
 
 interface AudioOutputProps {
   audio?: Blob | string | null;
@@ -72,15 +73,15 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
       <button
         disabled={isDisabled}
         onClick={handleReset}
-        className={classNames('text-xs', {
-          'text-neutral-200 hover:text-primary-500': !isDisabled,
-          'text-neutral-400': isDisabled,
+        className={classNames('text-xs text-muted-foreground', {
+          'hover:text-foreground': !isDisabled,
+          'opacity-50': isDisabled,
         })}
       >
         Back to beginning
       </button>
 
-      <div className="bg-neutral-850 rounded-lg flex gap-2 items-center px-2 py-1">
+      <div className="bg-muted rounded-lg flex gap-2 items-center px-2 py-1">
         {audioUrl && (
           <audio
             key={audioUrl}
@@ -95,11 +96,10 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
         <button
           type="button"
           className={classNames(
-            'w-6 h-6 flex items-center justify-center bg-neutral-500 rounded-md',
+            'w-6 h-6 flex items-center justify-center bg-primary rounded-md text-primary-foreground',
             {
-              'text-neutral-50': !isPlaying && !isDisabled,
-              'text-red-400': isPlaying,
-              'bg-neutral-700 text-neutral-400': isDisabled,
+              'text-red-500': isPlaying,
+              'opacity-50': isDisabled,
             },
           )}
           disabled={isDisabled}
@@ -113,7 +113,7 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
         </button>
         <div
           className={classNames(
-            "relative after:absolute after:content-[''] after:w-full after:h-[1px] after:bg-neutral-400 after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2",
+            "relative after:absolute after:content-[''] after:w-full after:h-[0.5px] after:bg-primary after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2",
           )}
         >
           <canvas ref={canvasRef} width={235} height={36} />
