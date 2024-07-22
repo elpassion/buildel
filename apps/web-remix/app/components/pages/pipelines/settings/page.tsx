@@ -15,10 +15,6 @@ import {
   SectionContent,
   SectionHeading,
 } from '~/components/pages/settings/settingsLayout/PageLayout';
-import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from '~/components/sidebar/ActionSidebar';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,

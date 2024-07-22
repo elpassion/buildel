@@ -56,11 +56,10 @@ export const CreateBlockDraggableItem: React.FC<
       id="draggable-block-item"
       key={data.type}
       className={classNames(
-        'min-w-[100px] bg-neutral-850 py-2 pl-3 pr-2 text-white flex justify-between items-center transition text-xs',
+        'w-full min-w-[100px] bg-white py-2 pl-3 pr-2 text-foreground flex justify-between items-center transition text-xs rounded-lg',
         {
           'opacity-70': runStatus !== 'idle',
-          'cursor-grab hover:bg-neutral-950 hover:drop-shadow-md':
-            runStatus === 'idle',
+          'cursor-grab hover:drop-shadow': runStatus === 'idle',
         },
       )}
       draggable={runStatus === 'idle'}

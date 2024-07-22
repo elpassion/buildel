@@ -9,10 +9,12 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 import isEqual from 'lodash.isequal';
+import { ChevronLeft } from 'lucide-react';
 
 import { AliasNode } from '~/components/pages/pipelines/build/AliasNode';
 import { ELProvider } from '~/components/pages/pipelines/EL/ELProvider';
 import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import { Builder } from '../Builder';
@@ -22,8 +24,6 @@ import { toPipelineConfig } from '../PipelineFlow.utils';
 import { BuilderHeader, SaveChangesButton } from './BuilderHeader';
 import { BuilderNode } from './BuilderNode';
 import { CreateBlockFloatingMenu } from './CreateBlock/CreateBlockFloatingMenu';
-import { PasteBlockConfiguration } from './CreateBlock/PastConfigSidebar';
-import { PasteBlockConfigProvider } from './CreateBlock/PasteBlockConfigProvider';
 import type { loader } from './loader.server';
 
 export function PipelineBuilder() {
@@ -59,6 +59,10 @@ export function PipelineBuilder() {
     );
   };
 
+  const backToWorkflows = () => {
+    navigate(routes.pipelines(organizationId));
+  };
+
   const isDisabled = aliasId !== 'latest';
 
   if (isDisabled) {
@@ -78,14 +82,19 @@ export function PipelineBuilder() {
   }
 
   return (
-    <>
+    <div id="_root">
+      <header className="w-full h-16 bg-white px-4 py-2 flex justify-between items-center">
+        <Button variant="secondary" size="icon" onClick={backToWorkflows}>
+          <ChevronLeft />
+        </Button>
+      </header>
       <Builder
         alias={aliasId}
         key="flow-editable"
         pipeline={pipeline}
         CustomNode={BuilderNode}
         CustomEdge={CustomEdge}
-        className="h-[calc(100vh_-_128px)]"
+        className="h-[calc(100vh_-_64px)] pt-0"
       >
         {({ edges, nodes, onBlockCreate }) => (
           <>
@@ -98,16 +107,7 @@ export function PipelineBuilder() {
             </BuilderHeader>
 
             <ELProvider>
-              {/*<ELHelper*/}
-              {/*  pipelineId={pipelineId}*/}
-              {/*  organizationId={organizationId}*/}
-              {/*  onBlockCreate={handleRevalidate}*/}
-              {/*/>*/}
-              <PasteBlockConfigProvider>
-                <CreateBlockFloatingMenu onCreate={onBlockCreate} />
-
-                <PasteBlockConfiguration onSubmit={onBlockCreate} />
-              </PasteBlockConfigProvider>
+              <CreateBlockFloatingMenu onCreate={onBlockCreate} />
             </ELProvider>
           </>
         )}
@@ -121,7 +121,7 @@ export function PipelineBuilder() {
       >
         <Outlet />
       </ActionSidebar>
-    </>
+    </div>
   );
 }
 

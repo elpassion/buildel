@@ -22,7 +22,7 @@ export const BuildErrorBoundary = () => {
 };
 
 function NotFound() {
-  return <p className="text-white text-sm">Page not found...</p>;
+  return <p className="text-foreground text-sm">Page not found...</p>;
 }
 
 function Runtime() {

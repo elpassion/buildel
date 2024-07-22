@@ -3,6 +3,7 @@ import React from 'react';
 import { errorToast } from '~/components/toasts/errorToast';
 import { Button } from '~/components/ui/button';
 import { PlayFilled } from '~/icons/PlayFilled';
+import { cn } from '~/utils/cn';
 
 import { useRunPipeline } from '../RunPipelineProvider';
 
@@ -33,7 +34,7 @@ export const RunPipelineButton: React.FC = () => {
         aria-label={isRunning ? 'Stop workflow' : 'Start workflow'}
         onClick={handleRun}
         size="xs"
-        className="w-fit"
+        variant={isRunning ? 'destructive' : 'default'}
       >
         <div className="flex gap-1 items-center">
           {isRunning ? 'Stop' : 'Start'}
