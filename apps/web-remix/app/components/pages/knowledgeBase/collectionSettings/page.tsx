@@ -16,7 +16,6 @@ import {
   SecretSelectField,
 } from '~/components/pages/knowledgeBase/KnowledgeBaseFields';
 
-import { SectionContent } from '../../settings/settingsLayout/PageLayout';
 import type { loader } from './loader.server';
 
 export function CollectionSettingsPage() {
@@ -30,38 +29,33 @@ export function CollectionSettingsPage() {
 
   return (
     <>
-      <SectionContent>
-        <ValidatedForm
-          noValidate
-          method="put"
-          validator={validator}
-          className="w-full grow flex flex-col gap-2 h-[70%]"
-          defaultValues={collection}
-        >
-          <HiddenField name="id" value={collection.id} />
+      <ValidatedForm
+        noValidate
+        method="put"
+        validator={validator}
+        className="w-full grow flex flex-col gap-2 mt-10"
+        defaultValues={collection}
+      >
+        <HiddenField name="id" value={collection.id} />
 
-          <div className="max-w-s w-full grow overflow-y-auto p-1 flex flex-col gap-2 space-y-1">
-            <Field name="name">
-              <FieldLabel>Name</FieldLabel>
-              <TextInputField
-                disabled
-                type="text"
-                autoFocus
-                placeholder="eg. My Collection"
-              />
-              <FieldMessage>
-                It will help you identify the collection in BUILDEL
-              </FieldMessage>
-            </Field>
-
-            <div>
-              <ApiTypesRadioGroupField
-                disabled
-                onChange={(e) => onValueChange(e.target.name, e.target.value)}
-              />
+        <div className="max-w-s w-full grow overflow-y-auto p-1 flex flex-col gap-5 space-y-1">
+          <div className="flex gap-5 flex-col items-center justify-between md:flex-row">
+            <div className="w-full">
+              <Field name="name">
+                <FieldLabel>Name</FieldLabel>
+                <TextInputField
+                  disabled
+                  type="text"
+                  autoFocus
+                  placeholder="eg. My Collection"
+                />
+                <FieldMessage>
+                  It will help you identify the collection in BUILDEL
+                </FieldMessage>
+              </Field>
             </div>
 
-            <div>
+            <div className="w-full">
               <Field name="embeddings.endpoint">
                 <FieldLabel>Endpoint</FieldLabel>
                 <TextInputField disabled type="text" name={'endpoint'} />
@@ -70,18 +64,29 @@ export function CollectionSettingsPage() {
                 </FieldMessage>
               </Field>
             </div>
+          </div>
 
-            <div>
+          <div className="flex gap-5 flex-col items-center justify-between md:flex-row">
+            <div className="w-full">
               <ModelSelectField disabled />
             </div>
 
-            <div>
+            <div className="w-full">
               <SecretSelectField />
             </div>
           </div>
-          <SubmitButton size="sm">Update collection</SubmitButton>
-        </ValidatedForm>
-      </SectionContent>
+
+          <div>
+            <ApiTypesRadioGroupField
+              disabled
+              onChange={(e) => onValueChange(e.target.name, e.target.value)}
+            />
+          </div>
+        </div>
+        <SubmitButton className="mt-10 max-w-[200px]" size="sm">
+          Update collection
+        </SubmitButton>
+      </ValidatedForm>
     </>
   );
 }

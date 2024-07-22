@@ -7,7 +7,6 @@ import {
   useMatch,
   useNavigate,
 } from '@remix-run/react';
-import classNames from 'classnames';
 
 import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
 import { CodePreviewWrapper } from '~/components/interfaces/CodePreview/CodePreviewWrapper';
@@ -18,7 +17,15 @@ import {
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
 } from '~/components/interfaces/InterfaceSection';
-import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -33,13 +40,14 @@ export function KnowledgeBaseCollectionInterface() {
   );
   const isSidebarOpen = !!matchSearch;
 
-  const handleClose = () => {
+  const handleClose = (value?: boolean) => {
+    if (value) return;
     navigate(routes.collectionInterface(organizationId, collectionName));
   };
 
   return (
     <>
-      <div>
+      <div className="mt-10">
         <div>
           <h2 className="text-lg text-foreground font-bold">HTTP API</h2>
           <p className="text-muted-foreground text-xs mb-6 max-w-lg">
@@ -167,14 +175,29 @@ export function KnowledgeBaseCollectionInterface() {
         <DocumentationCTA />
       </div>
 
-      <ActionSidebar
-        className={classNames('!bg-neutral-950 md:w-[550px]')}
-        isOpen={isSidebarOpen}
-        onClose={handleClose}
-        overlay
-      >
-        <Outlet />
-      </ActionSidebar>
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleClose}>
+        <DialogDrawerContent
+          className={cn({
+            'md:min-w-[700px]': matchSearch,
+          })}
+        >
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>
+              Ask a question to your knowledge base
+            </DialogDrawerTitle>
+
+            <DialogDrawerDescription>
+              Let's ask your knowledge base some questions so you can see how
+              your chatbot will answer and where it'll take it's information
+              from.
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+
+          <DialogDrawerBody>
+            <Outlet />
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
     </>
   );
 }

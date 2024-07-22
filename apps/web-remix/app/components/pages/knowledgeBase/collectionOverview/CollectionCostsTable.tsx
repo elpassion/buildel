@@ -7,6 +7,15 @@ import {
 } from '@tanstack/react-table';
 
 import { EmptyMessage } from '~/components/list/ItemList';
+import {
+  Table,
+  TableBody,
+  TableBodyCell,
+  TableBodyRow,
+  TableHead,
+  TableHeadCell,
+  TableHeadRow,
+} from '~/components/table/table.components';
 import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
 import { Badge } from '~/components/ui/badge';
 import { dayjs } from '~/utils/Dayjs';
@@ -91,26 +100,23 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
   });
 
   return (
-    <table className="w-full">
-      <thead className="text-left text-muted-foreground text-xs bg-muted">
+    <Table className="w-full">
+      <TableHead>
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id} className="rounded-xl overflow-hidden">
+          <TableHeadRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th
-                key={header.id}
-                className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
-              >
+              <TableHeadCell key={header.id}>
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext(),
                 )}
-              </th>
+              </TableHeadCell>
             ))}
-          </tr>
+          </TableHeadRow>
         ))}
-      </thead>
+      </TableHead>
 
-      <tbody>
+      <TableBody>
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
@@ -119,19 +125,15 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
           </tr>
         ) : null}
         {table.getRowModel().rows.map((row) => (
-          <tr
-            key={row.id}
-            className="[&:not(:first-child)]:border-t border-input"
-            aria-label="pipeline run"
-          >
+          <TableBodyRow key={row.id} aria-label="pipeline run">
             {row.getVisibleCells().map((cell) => (
-              <td key={cell.id} className="py-3 px-5 text-foreground text-sm">
+              <TableBodyCell key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </td>
+              </TableBodyCell>
             ))}
-          </tr>
+          </TableBodyRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 };

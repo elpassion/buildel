@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLoaderData } from '@remix-run/react';
+import type { RenderDOMFunc } from 'rc-select/es/interface';
 import { useFormContext } from 'remix-validated-form';
 
 import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
@@ -43,9 +44,13 @@ export function ApiTypesRadioGroupField({
 
 interface ModelSelectFieldProps {
   disabled?: boolean;
+  getPopupContainer?: RenderDOMFunc;
 }
 
-export function ModelSelectField({ disabled }: ModelSelectFieldProps) {
+export function ModelSelectField({
+  disabled,
+  getPopupContainer,
+}: ModelSelectFieldProps) {
   const { organizationId } = useLoaderData<typeof loader>();
   const { fieldErrors } = useFormContext();
 
@@ -58,12 +63,17 @@ export function ModelSelectField({ disabled }: ModelSelectFieldProps) {
         supportingText="The model to use for the embeddings."
         errorMessage={fieldErrors['embeddings.model']}
         disabled={disabled}
+        getPopupContainer={getPopupContainer}
       />
     </FormField>
   );
 }
 
-export function SecretSelectField() {
+export function SecretSelectField({
+  getPopupContainer,
+}: {
+  getPopupContainer?: RenderDOMFunc;
+}) {
   const { organizationId } = useLoaderData<typeof loader>();
   const { fieldErrors } = useFormContext();
 
@@ -75,6 +85,7 @@ export function SecretSelectField() {
         id="secret"
         supportingText="The secret to use for the embeddings."
         errorMessage={fieldErrors['embeddings.secret_name']}
+        getPopupContainer={getPopupContainer}
       />
     </FormField>
   );

@@ -70,11 +70,11 @@ export function NewKnowledgeBasePage() {
         </div>
 
         <div>
-          <ModelSelectField />
+          <ModelSelectField getPopupContainer={(node) => node.parentNode} />
         </div>
 
         <div>
-          <SecretSelectField />
+          <SecretSelectField getPopupContainer={(node) => node.parentNode} />
         </div>
 
         <div>

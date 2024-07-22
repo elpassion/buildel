@@ -30,7 +30,10 @@ const LIST_LAYOUT_STYLES =
 export const PipelineRunCostsListHeader = () => {
   return (
     <header
-      className={classNames('text-white text-xs py-2 px-6', LIST_LAYOUT_STYLES)}
+      className={classNames(
+        'text-muted-foreground text-xs py-2 px-6',
+        LIST_LAYOUT_STYLES,
+      )}
     >
       <p>Block</p>
       <p>Time</p>
@@ -51,25 +54,23 @@ export const PipelineRunCostsItem: React.FC<PipelineRunCostsItemProps> = ({
   return (
     <article
       className={classNames(
-        'group bg-neutral-800 hover:bg-neutral-850 transition rounded-lg py-4 px-6 max-w-full items-center md:gap-2',
+        'group bg-muted text-foreground transition rounded-lg py-4 px-6 max-w-full items-center md:gap-2',
         LIST_LAYOUT_STYLES,
       )}
     >
       <header className="max-w-full truncate">
-        <h3 className="text-lg font-medium text-white truncate max-w-full">
+        <h3 className="text-lg font-medium  truncate max-w-full">
           {data.description}
         </h3>
       </header>
 
-      <p className="text-white text-sm">
-        {dayjs(data.created_at).format('DD MMM HH:mm')}
-      </p>
+      <p className="text-sm">{dayjs(data.created_at).format('DD MMM HH:mm')}</p>
 
-      <p className="text-white text-sm">{Number(data.amount).toFixed(10)}</p>
+      <p className="text-sm">{Number(data.amount).toFixed(10)}</p>
 
-      <p className="text-white text-sm">{Number(data.input_tokens)}</p>
+      <p className="text-sm">{Number(data.input_tokens)}</p>
 
-      <p className="text-white text-sm">{Number(data.output_tokens)}</p>
+      <p className="text-sm">{Number(data.output_tokens)}</p>
     </article>
   );
 };

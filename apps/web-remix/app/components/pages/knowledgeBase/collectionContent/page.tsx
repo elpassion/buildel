@@ -48,7 +48,7 @@ export function KnowledgeBaseContentPage() {
   };
 
   return (
-    <>
+    <div className="mt-5">
       <KnowledgeBaseFileList items={fileList} />
 
       <DialogDrawer open={isSidebarOpen} onOpenChange={handleClose}>
@@ -76,7 +76,7 @@ export function KnowledgeBaseContentPage() {
           </DialogDrawerBody>
         </DialogDrawerContent>
       </DialogDrawer>
-    </>
+    </div>
   );
 }
 
