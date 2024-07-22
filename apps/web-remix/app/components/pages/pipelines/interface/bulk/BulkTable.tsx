@@ -83,7 +83,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                       id={input.name}
                       key={input.name}
                       value={test.inputs[input.name]}
-                      areaClassName="min-h-full !resize-y"
+                      areaClassName="min-h-full !resize-y min-w-[120px]"
                       onChange={(e) => {
                         e.preventDefault();
                         const value = e.target.value;
@@ -126,7 +126,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
               {selectedOutputs.map((output) => (
                 <td
                   key={output}
-                  className="py-3 px-5 text-neutral-100 text-sm w-[40%]"
+                  className="py-3 px-5 text-neutral-100 text-sm"
                 >
                   <ChatMarkdown>{test.outputs[output]}</ChatMarkdown>
                 </td>
