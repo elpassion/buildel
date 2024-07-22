@@ -53,7 +53,13 @@ export async function loader(args: LoaderFunctionArgs) {
     }
 
     return json({
-      query,
+      queryMetadata: {
+        query,
+        limit: limit ? parseInt(limit) : undefined,
+        token_limit: token_limit ? parseInt(token_limit) : undefined,
+        extend_neighbors: extend_neighbors === 'on' ? true : false,
+        extend_parents: extend_parents === 'on' ? true : false,
+      },
       chunks,
       metadata,
       organizationId: params.organizationId,

@@ -3,6 +3,7 @@ import { withZod } from '@remix-validated-form/with-zod';
 import classNames from 'classnames';
 import { Loader, Search } from 'lucide-react';
 import { useFormContext, ValidatedForm } from 'remix-validated-form';
+import type { z } from 'zod';
 
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
@@ -16,7 +17,7 @@ import { SearchSchema } from './schema';
 import { SearchParams } from './SearchParams';
 
 interface KnowledgeBaseSearchFormProps {
-  defaultValue?: string;
+  defaultValue?: Partial<z.TypeOf<typeof SearchSchema>>;
 }
 
 export const KnowledgeBaseSearchForm: React.FC<
@@ -28,14 +29,17 @@ export const KnowledgeBaseSearchForm: React.FC<
     <ValidatedForm
       method="GET"
       validator={validator}
-      defaultValues={{ query: defaultValue }}
+      defaultValues={defaultValue}
       noValidate
       className="flex gap-2 w-full"
     >
       <SearchParams>
         <Field name="limit">
           <FieldLabel>Results limit</FieldLabel>
-          <NumberInputField placeholder="eg. 10" />
+          <NumberInputField
+            placeholder="eg. 10"
+            defaultValue={defaultValue?.limit}
+          />
           <FieldMessage>
             Limit the number of results returned by the search. Default is 10.
           </FieldMessage>
@@ -43,7 +47,10 @@ export const KnowledgeBaseSearchForm: React.FC<
 
         <Field name="token_limit">
           <FieldLabel>Tokens limit</FieldLabel>
-          <NumberInputField placeholder="eg. 500" />
+          <NumberInputField
+            placeholder="eg. 500"
+            defaultValue={defaultValue?.token_limit}
+          />
           <FieldMessage>
             Limit the number of tokens returned by the search. Disabled by
             default.
@@ -52,6 +59,7 @@ export const KnowledgeBaseSearchForm: React.FC<
 
         <Field name="extend_neighbors">
           <ExtendChunksField
+            defaultChecked={defaultValue?.extend_neighbors}
             label="Extend neighbors"
             supportingText="Extend the search to include neighbor chunks"
           />
@@ -59,6 +67,7 @@ export const KnowledgeBaseSearchForm: React.FC<
 
         <Field name="extend_parents">
           <ExtendChunksField
+            defaultChecked={defaultValue?.extend_parents}
             label="Extend parents"
             supportingText="Extend the search to include the whole context of the parent chunk"
           />
@@ -89,7 +98,9 @@ function SearchButton() {
       size="xxs"
       icon={isSubmitting ? <Loader /> : <Search />}
       aria-label="Search"
-      className={classNames({ 'animate-spin': isSubmitting })}
+      className={classNames('text-muted-foreground', {
+        'animate-spin': isSubmitting,
+      })}
     />
   );
 }

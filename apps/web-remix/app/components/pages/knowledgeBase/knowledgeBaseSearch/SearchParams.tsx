@@ -5,7 +5,7 @@ import { Settings } from 'lucide-react';
 import { IconButton } from '~/components/iconButton';
 import {
   Popover,
-  PopoverContent,
+  PopoverContentWithoutPortal,
   PopoverTrigger,
 } from '~/components/ui/popover';
 
@@ -18,7 +18,8 @@ export const SearchParams: React.FC<PropsWithChildren> = ({ children }) => {
           icon={<Settings className="w-5 h-5 text-foreground" />}
         />
       </PopoverTrigger>
-      <PopoverContent>{children}</PopoverContent>
+
+      <PopoverContentWithoutPortal>{children}</PopoverContentWithoutPortal>
     </Popover>
   );
 };

@@ -8,14 +8,14 @@ import { FieldMessage } from '~/components/form/fields/field.message';
 
 export const ExtendChunksField = forwardRef<
   HTMLInputElement,
-  { label: ReactNode; supportingText: ReactNode }
->(({ label, supportingText }) => {
+  { label: ReactNode; supportingText: ReactNode; defaultChecked?: boolean }
+>(({ label, supportingText, defaultChecked }) => {
   const { error } = useFieldContext();
 
   return (
     <div>
       <div className="flex gap-2 w-full h-10 items-center justify-start">
-        <CheckboxInputField />
+        <CheckboxInputField defaultChecked={defaultChecked} />
         <FieldLabel className="mb-0">{label}</FieldLabel>
       </div>
 

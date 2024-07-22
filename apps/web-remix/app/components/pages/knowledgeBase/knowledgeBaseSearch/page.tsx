@@ -7,7 +7,7 @@ import { KnowledgeBaseSearchList } from './KnowledgeBaseSearchList';
 import type { loader } from './loader.server';
 
 export function KnowledgeBaseSearch() {
-  const { chunks, metadata, query } = useLoaderData<typeof loader>();
+  const { chunks, metadata, queryMetadata } = useLoaderData<typeof loader>();
 
   return (
     <div className="p-1">
@@ -15,10 +15,10 @@ export function KnowledgeBaseSearch() {
         Total tokens: {metadata.total_tokens}
       </p>
 
-      <KnowledgeBaseSearchForm defaultValue={query ?? ''} />
+      <KnowledgeBaseSearchForm defaultValue={queryMetadata} />
 
       <div className="mt-4">
-        <KnowledgeBaseSearchList items={chunks} query={query} />
+        <KnowledgeBaseSearchList items={chunks} query={queryMetadata.query} />
       </div>
     </div>
   );

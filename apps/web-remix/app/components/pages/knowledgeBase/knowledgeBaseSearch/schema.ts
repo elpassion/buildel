@@ -6,4 +6,5 @@ export const SearchSchema = z.object({
   limit: zfd.numeric(z.number().int().min(0).optional()),
   token_limit: zfd.numeric(z.number().int().min(0).optional()),
   extend_neighbors: zfd.checkbox(),
+  extend_parents: zfd.checkbox(),
 });

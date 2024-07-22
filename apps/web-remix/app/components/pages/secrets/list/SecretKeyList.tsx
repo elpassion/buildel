@@ -7,6 +7,7 @@ import { EmptyMessage, ItemList } from '~/components/list/ItemList';
 import { confirm } from '~/components/modal/confirm';
 import {
   Card,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -106,7 +107,6 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
       <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
         <div>
           <CardTitle className="line-clamp-2">{data.name}</CardTitle>
-          <CardDescription>{dayjs(data.updated_at).format()}</CardDescription>
         </div>
 
         <DropdownMenu>
@@ -139,6 +139,10 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
+
+      <CardContent>
+        <CardDescription>{dayjs(data.updated_at).format()}</CardDescription>
+      </CardContent>
     </Card>
   );
 };
