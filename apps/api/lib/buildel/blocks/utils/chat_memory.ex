@@ -35,23 +35,41 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
     add_message(chat_memory, %{role: "assistant", content: content})
   end
 
-  def add_tool_call_message(%__MODULE__{} = chat_memory, %{
-        tool_name: tool_name,
-        arguments: arguments
+  def add_tool_calls_message(%__MODULE__{} = chat_memory, %{
+        tool_calls: tool_calls
       }) do
     add_message(chat_memory, %{
       role: "tool_call",
-      tool_name: tool_name,
-      arguments: arguments,
-      content: nil
+      content: nil,
+      tool_calls:
+        tool_calls
+        |> Enum.map(fn tool_call ->
+          %{
+            tool_name: tool_call.name,
+            arguments: tool_call.arguments,
+            call_id: tool_call.call_id,
+            content: nil
+          }
+        end)
     })
   end
 
-  def add_tool_result_message(%__MODULE__{} = chat_memory, %{
-        tool_name: tool_name,
-        content: content
+  def add_tool_results_message(%__MODULE__{} = chat_memory, %{
+        tool_results: tool_results
       }) do
-    add_message(chat_memory, %{role: "tool", tool_name: tool_name, content: content})
+    add_message(chat_memory, %{
+      role: "tool",
+      content: nil,
+      tool_results:
+        tool_results
+        |> Enum.map(fn tool_result ->
+          %{
+            tool_name: tool_result.name,
+            call_id: tool_result.tool_call_id,
+            content: tool_result.content
+          }
+        end)
+    })
   end
 
   def add_assistant_chunk(

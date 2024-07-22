@@ -8,7 +8,7 @@ defmodule Buildel.Blocks.CSVSearchTest do
     assert CSVSearch.options() == %{
              type: "csv_search",
              description: "Used for SQL searching and retrieval of information from CSV files",
-             groups: ["file", "memory"],
+             groups: ["file", "memory", "tools"],
              inputs: [
                Block.file_input("input", false),
                Block.text_input("query")

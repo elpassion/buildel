@@ -110,20 +110,16 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   # Client
 
-  def query(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:query, text})
+  def query(pid, {:text, _text} = text, metadata \\ %{}) do
+    GenServer.cast(pid, {:query, text, metadata})
   end
 
-  def query_sync(pid, {:text, _text} = text) do
-    GenServer.call(pid, {:query, text})
+  def parent(pid, {:text, _text} = text, metadata \\ %{}) do
+    GenServer.cast(pid, {:parent, text, metadata})
   end
 
-  def parent(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:parent, text})
-  end
-
-  def related(pid, {:text, _text} = text) do
-    GenServer.cast(pid, {:related, text})
+  def related(pid, {:text, _text} = text, metadata \\ %{}) do
+    GenServer.cast(pid, {:related, text, metadata})
   end
 
   def add_file(pid, file) do
@@ -161,102 +157,31 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   @impl true
-  def handle_cast({:query, {:text, query}}, state) do
+  def handle_cast({:query, {:text, query}, _metadata}, state) do
     state = send_stream_start(state)
-    token_limit = state.opts |> Map.get(:token_limit, 0)
+    result = do_query(state, query)
+    state = output(state, "output", {:text, result})
+    {:noreply, state}
+  end
 
-    params =
-      MemoryCollectionSearch.Params.from_map(%{
-        search_query: query,
-        where: state.where,
-        limit: state[:opts] |> Map.get(:limit, 3),
-        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
-        extend_neighbors: state.opts |> Map.get(:extend_neighbors, false) != false,
-        extend_parents: state.opts |> Map.get(:extend_parents, false) != false,
-        token_limit:
-          if token_limit == 0 do
-            nil
-          else
-            token_limit
-          end
-      })
+  def handle_cast({:parent, {:text, chunk_id}, _metadata}, state) do
+    state = send_stream_start(state)
+    result = do_parent(state, chunk_id)
+    state = output(state, "output", {:text, result})
+    {:noreply, state}
+  end
 
-    %{collection_id: collection_id} =
-      Buildel.Memories.context_from_organization_collection_name(state[:collection])
-
-    {result, _total_tokens, embeddings_tokens} =
-      MemoryCollectionSearch.new(%{
-        vector_db: state.vector_db,
-        organization_collection_name: state[:collection]
-      })
-      |> MemoryCollectionSearch.search(params)
-
-    block_context().create_run_and_collection_cost(
-      state[:context_id],
-      state[:block_name],
-      embeddings_tokens,
-      collection_id
-    )
-
-    result =
-      result
-      |> Enum.map(&DocumentSearchJSON.show/1)
-      |> Jason.encode!()
+  def handle_cast({:related, {:text, chunk_id}, _metadata}, state) do
+    result = do_related(state, chunk_id)
 
     state =
       state
       |> output("output", {:text, result})
-      |> respond_to_tool("tool", {:text, result})
 
     {:noreply, state}
   end
 
-  def handle_cast({:parent, {:text, chunk_id}}, state) do
-    result =
-      MemoryCollectionSearch.new(%{
-        vector_db: state.vector_db,
-        organization_collection_name: state[:collection]
-      })
-      |> MemoryCollectionSearch.parent(chunk_id)
-      |> then(&DocumentSearchJSON.show/1)
-      |> Jason.encode!()
-
-    state = state |> respond_to_tool("tool", {:text, result}) |> output("output", {:text, result})
-    {:noreply, state}
-  end
-
-  def handle_cast({:related, {:text, chunk_id}}, state) do
-    chunk = Buildel.VectorDB.get_by_id(state.vector_db, state[:collection], chunk_id)
-
-    params =
-      MemoryCollectionSearch.Params.from_map(%{
-        search_query: Map.get(chunk, "embedding"),
-        where: state.where,
-        limit: 2,
-        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
-        extend_neighbors: false,
-        extend_parents: false,
-        token_limit: nil
-      })
-
-    {result, _total_tokens, _embeddings_tokens} =
-      MemoryCollectionSearch.new(%{
-        vector_db: state.vector_db,
-        organization_collection_name: state[:collection]
-      })
-      |> MemoryCollectionSearch.search(params)
-
-    result =
-      result
-      |> Enum.at(1)
-      |> then(&DocumentSearchJSON.show/1)
-      |> Jason.encode!()
-
-    state = state |> respond_to_tool("tool", {:text, result}) |> output("output", {:text, result})
-    {:noreply, state}
-  end
-
-  def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
+  def handle_cast({:add_file, {:binary, file_path}, metadata}, state) do
     state = send_stream_start(state)
 
     %{organization_id: organization_id, collection_id: collection_id} =
@@ -335,6 +260,84 @@ defmodule Buildel.Blocks.DocumentSearch do
 
         {:noreply, state}
     end
+  end
+
+  defp do_query(state, query) do
+    token_limit = state.opts |> Map.get(:token_limit, 0)
+
+    params =
+      MemoryCollectionSearch.Params.from_map(%{
+        search_query: query,
+        where: state.where,
+        limit: state[:opts] |> Map.get(:limit, 3),
+        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
+        extend_neighbors: state.opts |> Map.get(:extend_neighbors, false) != false,
+        extend_parents: state.opts |> Map.get(:extend_parents, false) != false,
+        token_limit:
+          if token_limit == 0 do
+            nil
+          else
+            token_limit
+          end
+      })
+
+    %{collection_id: collection_id} =
+      Buildel.Memories.context_from_organization_collection_name(state[:collection])
+
+    {result, _total_tokens, embeddings_tokens} =
+      MemoryCollectionSearch.new(%{
+        vector_db: state.vector_db,
+        organization_collection_name: state[:collection]
+      })
+      |> MemoryCollectionSearch.search(params)
+
+    block_context().create_run_and_collection_cost(
+      state[:context_id],
+      state[:block_name],
+      embeddings_tokens,
+      collection_id
+    )
+
+    result
+    |> Enum.map(&DocumentSearchJSON.show/1)
+    |> Jason.encode!()
+  end
+
+  defp do_parent(state, chunk_id) do
+    MemoryCollectionSearch.new(%{
+      vector_db: state.vector_db,
+      organization_collection_name: state[:collection]
+    })
+    |> MemoryCollectionSearch.parent(chunk_id)
+    |> then(&DocumentSearchJSON.show/1)
+    |> Jason.encode!()
+  end
+
+  defp do_related(state, chunk_id) do
+    chunk = Buildel.VectorDB.get_by_id(state.vector_db, state[:collection], chunk_id)
+
+    params =
+      MemoryCollectionSearch.Params.from_map(%{
+        search_query: Map.get(chunk, "embedding"),
+        where: state.where,
+        limit: 2,
+        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
+        extend_neighbors: false,
+        extend_parents: false,
+        token_limit: nil
+      })
+
+    {result, _total_tokens, _embeddings_tokens} =
+      MemoryCollectionSearch.new(%{
+        vector_db: state.vector_db,
+        organization_collection_name: state[:collection]
+      })
+      |> MemoryCollectionSearch.search(params)
+
+    result
+    |> Enum.at(1)
+    |> then(&DocumentSearchJSON.show/1)
+    |> Jason.encode!()
   end
 
   @impl true
@@ -431,18 +434,24 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   @impl true
   def handle_tool("tool", "query", {_name, :text, args, _metadata}, state) do
-    query(self(), {:text, args["query"]})
-    state
+    state |> send_stream_start("output")
+    response = do_query(state, args["query"])
+    state |> send_stream_stop("output")
+    {response, state}
   end
 
   def handle_tool("tool", "parent", {_name, :text, args, _metadata}, state) do
-    parent(self(), {:text, args["chunk_id"]})
-    state
+    state = state |> send_stream_start("output")
+    response = do_parent(state, args["chunk_id"])
+    state = state |> send_stream_stop("output")
+    {response, state}
   end
 
   def handle_tool("tool", "related", {_name, :text, args, _metadata}, state) do
-    related(self(), {:text, args["chunk_id"]})
-    state
+    state = state |> send_stream_start("output")
+    response = do_related(state, args["chunk_id"])
+    state = state |> send_stream_stop("output")
+    {response, state}
   end
 
   defp build_call_formatter(value, args) do

@@ -4,8 +4,7 @@ defmodule Buildel.Blocks.ApiCallTool do
   alias Buildel.Blocks.Utils.Injectable
   alias Buildel.FlattenMap
   use Buildel.Blocks.Block
-  use Buildel.Blocks.Tool, parallel: ["request"]
-
+  use Buildel.Blocks.Tool
   # Config
 
   @impl true
@@ -179,11 +178,9 @@ defmodule Buildel.Blocks.ApiCallTool do
         state
       ) do
     state = send_stream_start(state)
-    response = call_api(state, args)
-
-    state
-    |> output("response", {:text, response |> Jason.encode!()})
-    |> respond_to_tool("tool", {:text, response |> Jason.encode!()})
+    response = call_api(state, args) |> Jason.encode!()
+    state = output(state, "response", {:text, response})
+    {response, state}
   end
 
   defp call_api(state, args) do

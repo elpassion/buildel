@@ -16,6 +16,7 @@ defmodule BuildelWeb.OrganizationModelController do
     %{id: "gpt-4-turbo-preview", name: "GPT-4 Turbo Preview", api_type: "openai"},
     %{id: "gpt-4-turbo", name: "GPT-4 Turbo", api_type: "openai"},
     %{id: "gpt-4o", name: "GPT-4o", api_type: "openai"},
+    %{id: "gpt-4o-mini", name: "GPT-4o mini", api_type: "openai"},
     %{id: "azure", name: "Azure", api_type: "azure"},
     %{id: "gemini-pro", name: "Gemini Pro", api_type: "google"},
     %{id: "gemini-1.5-pro-latest", name: "Gemini 1.5 Pro", api_type: "google"},

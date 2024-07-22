@@ -17,14 +17,14 @@ end
 
 defmodule Buildel.Clients.Chat do
   require Logger
-  alias Buildel.Langchain.TokenUsage
-  alias Buildel.Langchain.ChatModels.ChatMistralAI
-  alias Buildel.LangChain.ChatModels.ChatGoogleAI
+  alias LangChain.Message.ToolResult
+  alias LangChain.Message.ToolCall
   alias Buildel.Clients.ChatBehaviour
-  alias Buildel.LangChain.Chains.LLMChain
-  alias Buildel.LangChain.ChatModels.ChatOpenAI
+  alias Langchain.ChatModels.ChatMistralAI
+  alias LangChain.ChatModels.ChatOpenAI
+  alias LangChain.ChatModels.ChatGoogleAI
   alias LangChain.Message
-  alias LangChain.MessageDelta
+  alias LangChain.Chains.LLMChain
 
   @behaviour ChatBehaviour
 
@@ -49,7 +49,30 @@ defmodule Buildel.Clients.Chat do
       |> Map.put_new(:endpoint, "https://api.openai.com/v1")
       |> Map.put_new(:response_format, "text")
 
-    llm = get_llm(opts)
+    handler = %{
+      on_llm_new_delta: fn _model, delta ->
+        case delta do
+          %LangChain.MessageDelta{status: :incomplete, content: content, tool_calls: nil}
+          when is_binary(content) ->
+            on_content.(content)
+
+          _ ->
+            nil
+        end
+      end,
+      on_llm_token_usage: fn _model, usage ->
+        token_summary = %Buildel.Langchain.ChatTokenSummary{
+          input_tokens: usage.input,
+          output_tokens: usage.output,
+          model: model,
+          endpoint: opts.endpoint
+        }
+
+        on_cost.(token_summary)
+      end
+    }
+
+    llm = get_llm(opts, [handler])
 
     messages =
       context.messages
@@ -64,84 +87,74 @@ defmodule Buildel.Clients.Chat do
           Message.new_user!(message.content)
 
         %{role: "tool"} = message ->
-          Message.new_function!(message.tool_name, message.content)
+          Message.new_tool_result!(%{
+            tool_results:
+              message.tool_results
+              |> Enum.map(
+                &ToolResult.new!(%{
+                  name: &1.tool_name,
+                  content: &1.content,
+                  tool_call_id: &1.call_id
+                })
+              )
+          })
 
         %{role: "tool_call"} = message ->
-          Message.new_function_call!(message.tool_name, Jason.encode!(message.arguments))
+          Message.new_assistant!(%{
+            tool_calls:
+              message.tool_calls
+              |> Enum.map(
+                &ToolCall.new!(%{
+                  name: &1.tool_name,
+                  arguments: &1.arguments,
+                  call_id: &1.call_id
+                })
+              )
+          })
       end)
-
-    callback_fn = fn
-      %MessageDelta{content: nil} ->
-        nil
-
-      %MessageDelta{} = data ->
-        on_content.(data.content)
-
-      %Message{function_name: nil} ->
-        nil
-
-      %Message{function_name: function_name, content: content, arguments: nil}
-      when is_binary(function_name) and is_binary(content) ->
-        %{response_formatter: response_formatter} =
-          tools |> Enum.find(fn tool -> tool.function.name == function_name end)
-
-        on_tool_content.(function_name, content, response_formatter.(content))
-
-      %Message{function_name: function_name, arguments: arguments}
-      when is_binary(function_name) ->
-        case tools |> Enum.find(fn tool -> tool.function.name == function_name end) do
-          nil ->
-            Logger.debug("Tool not found: #{function_name}")
-            nil
-
-          %{call_formatter: call_formatter} ->
-            on_tool_call.(function_name, arguments, call_formatter.(arguments))
-        end
-
-      %Message{} ->
-        nil
-
-      %TokenUsage{} = usage ->
-        token_summary = %Buildel.Langchain.ChatTokenSummary{
-          input_tokens: usage.prompt_tokens,
-          output_tokens: usage.completion_tokens,
-          model: model,
-          endpoint: llm.endpoint
-        }
-
-        on_cost.(token_summary)
-        nil
-
-      {:error, reason} ->
-        on_error.(reason)
-        nil
-    end
 
     with {:ok, chain, message} <-
            LLMChain.new!(%{
              llm: llm,
              custom_context: context
            })
-           |> LLMChain.add_functions(tools |> Enum.map(& &1.function))
+           |> LLMChain.add_tools(tools |> Enum.map(& &1.function))
            |> LLMChain.add_messages(messages)
-           |> LLMChain.run(
-             while_needs_response: true,
-             callback_fn: fn message ->
-               opts.on_message.(message)
-               callback_fn.(message)
+           |> LLMChain.add_callback(%{
+             on_retries_exceeded: fn _chain ->
+               nil
+             end,
+             on_message_processing_error: fn _chain, _message ->
+               nil
+             end,
+             on_error_message_created: fn _chain, _message ->
+               nil
+             end,
+             on_tool_response_created: fn _chain, message ->
+               on_tool_content.(message.tool_results)
+             end,
+             on_message_processed: fn _chain, message ->
+               if Message.is_tool_call?(message) do
+                 on_tool_call.(message.tool_calls)
+               end
              end
-           ) do
+           })
+           |> LLMChain.run(mode: :while_needs_response) do
       on_end.()
 
       {:ok, chain, message}
     else
-      {:error, "context_length_exceeded"} ->
-        on_error.(:context_length_exceeded)
-        {:error, :context_length_exceeded}
+      {:error, _chain, reason} ->
+        if String.contains?(reason, "maximum context length") do
+          on_error.(:context_length_exceeded)
+          {:error, :context_length_exceeded}
+        else
+          on_error.(reason)
+          {:error, reason}
+        end
 
-      {:error, reason} ->
-        on_error.(reason)
-        {:error, reason}
+      _ ->
+        {:error, "unknown error"}
     end
   end
 
@@ -201,48 +214,52 @@ defmodule Buildel.Clients.Chat do
     []
   end
 
-  defp get_llm(%{api_type: "mistral"} = opts) do
+  defp get_llm(%{api_type: "mistral"} = opts, callbacks) do
     ChatMistralAI.new!(%{
       model: opts.model,
       temperature: opts.temperature,
       stream: true,
       api_key: opts.api_key,
       endpoint: opts.endpoint <> "/chat/completions",
-      json_response: opts.response_format == "json"
+      json_response: opts.response_format == "json",
+      callbacks: callbacks
     })
   end
 
-  defp get_llm(%{api_type: "openai"} = opts) do
+  defp get_llm(%{api_type: "openai"} = opts, callbacks) do
     ChatOpenAI.new!(%{
       model: opts.model,
       temperature: opts.temperature,
       stream: true,
       api_key: opts.api_key,
-      api_type: opts.api_type,
       endpoint: opts.endpoint <> "/chat/completions",
-      json_response: opts.response_format == "json"
+      json_response: opts.response_format == "json",
+      stream_options: %{include_usage: true},
+      callbacks: callbacks
     })
   end
 
-  defp get_llm(%{api_type: "azure"} = opts) do
+  defp get_llm(%{api_type: "azure"} = opts, callbacks) do
     ChatOpenAI.new!(%{
       model: opts.model,
       temperature: opts.temperature,
       stream: true,
       api_key: opts.api_key,
-      api_type: opts.api_type,
       endpoint: opts.endpoint <> "/chat/completions?api-version=2024-02-01",
-      json_response: opts.response_format == "json"
+      json_response: opts.response_format == "json",
+      stream_options: %{include_usage: true},
+      callbacks: callbacks
     })
   end
 
-  defp get_llm(%{api_type: "google"} = opts) do
+  defp get_llm(%{api_type: "google"} = opts, callbacks) do
     ChatGoogleAI.new!(%{
       api_key: opts.api_key,
       model: opts.model,
       stream: true,
       temperature: opts.temperature,
-      endpoint: opts.endpoint
+      endpoint: opts.endpoint,
+      callbacks: callbacks
     })
   end
 end

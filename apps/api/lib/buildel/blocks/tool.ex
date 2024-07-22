@@ -15,11 +15,7 @@ defmodule Buildel.Blocks.Tool do
     "#{block_name}::#{tool_name}"
   end
 
-  defmacro __using__(block_opts \\ []) do
-    parallel =
-      block_opts
-      |> Keyword.get(:parallel, [])
-
+  defmacro __using__(_block_opts \\ []) do
     quote do
       @behaviour Buildel.Blocks.ToolBehaviour
 
@@ -32,36 +28,30 @@ defmodule Buildel.Blocks.Tool do
       def handle_input(
             input,
             {topic, :text, message_json,
-             %{tool_name: tool_name, message_id: message_id} = metadata},
+             %{tool_name: tool_name, message_id: message_id, send_to: send_to} = metadata},
             %{block: %{name: block_name}} = state
           ) do
         [target_block, tool_name] = tool_name |> String.split("::")
 
         if target_block == block_name do
           message = Jason.decode!(message_json)
-          state = state |> Map.put(:message_id, message_id)
           info = {topic, :text, message, metadata}
 
-          if unquote(parallel) |> Enum.member?(tool_name) do
-            Task.start(fn -> handle_tool(input, tool_name, info, state) end)
-            state
-          else
-            handle_tool(input, tool_name, info, state)
+          case handle_tool(input, tool_name, info, state) do
+            {nil, state} ->
+              state
+
+            {response, state} ->
+              respond_to_tool(send_to, message_id, response)
+              state
           end
         else
           state
         end
       end
 
-      def respond_to_tool(state, tool_name, {:text, content}) do
-        if state[:message_id],
-          do:
-            output(
-              state,
-              tool_name,
-              {:text, content}
-            ),
-          else: state
+      def respond_to_tool(send_to, message_id, response) do
+        send(send_to, {:response, :text, response, %{message_id: message_id}})
       end
     end
   end

@@ -196,11 +196,11 @@ defmodule Buildel.Blocks.Chat do
 
   # Client
 
-  def send_message(pid, {:text, _text} = message) do
-    GenServer.cast(pid, {:send_message, message})
+  def send_message(pid, {:text, _text, metadata} = message) do
+    GenServer.cast(pid, {:send_message, message, metadata})
   end
 
-  defp save_input_and_send_message(pid, {topic, :text, message, _metadata}) do
+  defp save_input_and_send_message(pid, {topic, :text, message, metadata}) do
     %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
 
     GenServer.cast(
@@ -208,7 +208,7 @@ defmodule Buildel.Blocks.Chat do
       {:save_input, %{block_name: block, message: {:text, message}, output_name: output}}
     )
 
-    GenServer.cast(pid, {:send_message, {:text, message}})
+    GenServer.cast(pid, {:send_message, {:text, message, metadata}})
   end
 
   defp save_text_chunk(pid, chunk) do
@@ -219,12 +219,12 @@ defmodule Buildel.Blocks.Chat do
     GenServer.cast(pid, {:finish_chat_message})
   end
 
-  defp save_tool_call(pid, tool_name, arguments) do
-    GenServer.cast(pid, {:save_tool_call, tool_name, arguments})
+  defp save_tool_calls(pid, tool_calls) do
+    GenServer.cast(pid, {:save_tool_calls, tool_calls})
   end
 
-  defp save_tool_result(pid, tool_name, content) do
-    GenServer.cast(pid, {:save_tool_result, tool_name, content})
+  defp save_tool_results(pid, tool_results) do
+    GenServer.cast(pid, {:save_tool_results, tool_results})
   end
 
   defp save_usage(pid, usage) do
@@ -305,7 +305,7 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_cast({:send_message, {:text, _text}}, state) do
+  def handle_cast({:send_message, {:text, _text, metadata}}, state) do
     state = send_stream_start(state)
 
     content =
@@ -318,22 +318,33 @@ defmodule Buildel.Blocks.Chat do
     state = update_in(state.chat_memory, &ChatMemory.add_user_message(&1, %{content: content}))
 
     with {:ok, message, state} <- chat_task(state) do
-      state = respond_to_tool(state, "chat", {:text, message.content})
+      if metadata && metadata[:send_to] && metadata[:message_id],
+        do: respond_to_tool(metadata.send_to, metadata.message_id, message.content)
+
       {:noreply, cleanup_inputs(state)}
     else
       {:error, :not_all_inputs_filled, state} ->
-        state =
-          respond_to_tool(
-            state,
-            "chat",
-            {:text, "ERROR: Not all inputs required to answer question are filled"}
-          )
+        if metadata && metadata[:send_to] && metadata[:message_id],
+          do:
+            respond_to_tool(
+              metadata.send_to,
+              metadata.message_id,
+              "ERROR: Not all inputs required to answer question are filled"
+            )
 
         state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
+
         {:noreply, state}
 
       {:error, _reason, state} ->
-        state = respond_to_tool(state, "chat", {:text, "ERROR: Something went wrong"})
+        if metadata && metadata[:send_to] && metadata[:message_id],
+          do:
+            respond_to_tool(
+              metadata.send_to,
+              metadata.message_id,
+              "ERROR: Something went wrong"
+            )
+
         state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
         {:noreply, state}
     end
@@ -356,22 +367,20 @@ defmodule Buildel.Blocks.Chat do
   end
 
   @impl true
-  def handle_cast({:save_tool_call, tool_name, arguments}, state) do
+  def handle_cast({:save_tool_calls, tool_calls}, state) do
     chat_memory =
-      ChatMemory.add_tool_call_message(state.chat_memory, %{
-        tool_name: tool_name,
-        arguments: arguments
+      ChatMemory.add_tool_calls_message(state.chat_memory, %{
+        tool_calls: tool_calls
       })
 
     {:noreply, %{state | chat_memory: chat_memory}}
   end
 
   @impl true
-  def handle_cast({:save_tool_result, tool_name, content}, state) do
+  def handle_cast({:save_tool_results, tool_results}, state) do
     chat_memory =
-      ChatMemory.add_tool_result_message(state.chat_memory, %{
-        tool_name: tool_name,
-        content: content
+      ChatMemory.add_tool_results_message(state.chat_memory, %{
+        tool_results: tool_results
       })
 
     {:noreply, %{state | chat_memory: chat_memory}}
@@ -540,7 +549,7 @@ defmodule Buildel.Blocks.Chat do
       ) do
     %{"message" => message} = message
     info = {topic, :text, message, metadata}
-    update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
+    {nil, update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))}
   end
 
   defp chat_task(state) do
@@ -583,15 +592,31 @@ defmodule Buildel.Blocks.Chat do
 
                save_text_chunk(pid, text_chunk)
              end,
-             on_tool_call: fn tool_name, arguments, message ->
-               output(state, "output", {:text, message}, %{stream_stop: :none})
+             on_tool_call: fn tool_calls ->
+               tool_calls
+               |> Enum.map(fn tool_call ->
+                 %{call_formatter: call_formatter} =
+                   tools |> Enum.find(fn tool -> tool.function.name == tool_call.name end)
 
-               save_tool_call(pid, tool_name, arguments)
+                 output(state, "output", {:text, call_formatter.(tool_call.arguments)}, %{
+                   stream_stop: :none
+                 })
+               end)
+
+               save_tool_calls(pid, tool_calls)
              end,
-             on_tool_content: fn tool_name, content, message ->
-               output(state, "output", {:text, message}, %{stream_stop: :none})
+             on_tool_content: fn tool_results ->
+               tool_results
+               |> Enum.map(fn tool_result ->
+                 %{response_formatter: response_formatter} =
+                   tools |> Enum.find(fn tool -> tool.function.name == tool_result.name end)
 
-               save_tool_result(pid, tool_name, content)
+                 output(state, "output", {:text, response_formatter.(tool_result.content)}, %{
+                   stream_stop: :none
+                 })
+               end)
+
+               save_tool_results(pid, tool_results)
              end,
              on_cost: fn token_summary ->
                chat_cost = Buildel.Costs.CostCalculator.calculate_chat_cost(token_summary)
