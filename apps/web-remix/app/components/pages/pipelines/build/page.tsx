@@ -9,11 +9,9 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 import isEqual from 'lodash.isequal';
-import { ChevronLeft } from 'lucide-react';
 
 import { AliasNode } from '~/components/pages/pipelines/build/AliasNode';
 import { ELProvider } from '~/components/pages/pipelines/EL/ELProvider';
-import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
   DialogDrawerContent,

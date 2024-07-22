@@ -1,5 +1,4 @@
 import React, { useMemo, useRef, useState } from 'react';
-import classNames from 'classnames';
 import { Loader, Send } from 'lucide-react';
 import { useBoolean, useIsomorphicLayoutEffect } from 'usehooks-ts';
 

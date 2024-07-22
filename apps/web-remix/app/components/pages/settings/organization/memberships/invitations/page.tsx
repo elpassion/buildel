@@ -7,10 +7,6 @@ import {
   useNavigate,
 } from '@remix-run/react';
 
-import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from '~/components/sidebar/ActionSidebar';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,

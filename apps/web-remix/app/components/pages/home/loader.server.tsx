@@ -5,7 +5,7 @@ import { OrganizationApi } from '~/api/organization/OrganizationApi';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
 import { routes } from '~/utils/routes.utils';
-import { getOrganizationId, getServerToast } from '~/utils/toast.server';
+import { getOrganizationId } from '~/utils/toast.server';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ request }, { fetch }) => {

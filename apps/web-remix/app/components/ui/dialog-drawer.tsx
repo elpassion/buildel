@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { PropsWithChildren } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { cn } from '~/utils/cn';
@@ -13,7 +12,6 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from './dialog';
@@ -24,7 +22,6 @@ import {
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
-  DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
 } from './drawer';

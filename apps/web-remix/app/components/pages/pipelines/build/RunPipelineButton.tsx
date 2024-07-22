@@ -3,7 +3,6 @@ import React from 'react';
 import { errorToast } from '~/components/toasts/errorToast';
 import { Button } from '~/components/ui/button';
 import { PlayFilled } from '~/icons/PlayFilled';
-import { cn } from '~/utils/cn';
 
 import { useRunPipeline } from '../RunPipelineProvider';
 

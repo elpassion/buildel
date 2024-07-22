@@ -4,7 +4,6 @@ import { Pause, Play } from 'lucide-react';
 
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
 import { errorToast } from '~/components/toasts/errorToast';
-import { Button } from '~/components/ui/button';
 
 interface AudioOutputProps {
   audio?: Blob | string | null;

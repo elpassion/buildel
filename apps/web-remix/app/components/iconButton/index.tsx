@@ -78,3 +78,4 @@ function getIconSize(size?: IconButtonSize) {
       return 'h-5 w-5';
   }
 }
+IconButton.displayName = 'IconButton';

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { Link, Outlet, useLoaderData, useMatch } from '@remix-run/react';
+import { Outlet, useLoaderData, useMatch } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
