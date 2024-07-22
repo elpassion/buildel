@@ -8,6 +8,7 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { OrganizationAvatar } from '~/components/pages/settings/organization/AboutOrganization';
 import {
@@ -54,7 +55,7 @@ export function SettingsPage() {
   };
 
   return (
-    <>
+    <PageContentWrapper className="py-10">
       <Section>
         <div className="flex gap-3 justify-between items-center mb-4">
           <SectionHeading>About Workflow</SectionHeading>
@@ -98,7 +99,7 @@ export function SettingsPage() {
           </DialogDrawerBody>
         </DialogDrawerContent>
       </DialogDrawer>
-    </>
+    </PageContentWrapper>
   );
 }
 

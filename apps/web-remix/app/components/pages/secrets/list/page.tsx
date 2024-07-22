@@ -1,20 +1,10 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import {
-  Link,
-  Outlet,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-} from '@remix-run/react';
+import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
-import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from '~/components/sidebar/ActionSidebar';
 import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
 import { Button } from '~/components/ui/button';
 import {

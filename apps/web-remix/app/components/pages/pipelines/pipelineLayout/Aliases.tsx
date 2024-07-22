@@ -165,7 +165,8 @@ export const AliasListItem = ({
   return (
     <div
       className={classNames(
-        'bg-muted text-foreground group flex justify-between items-center gap-2 text-sm py-2 px-1.5 rounded hover:pl-2 transition-all',
+        'text-foreground group flex justify-between items-center gap-2 text-sm py-2 px-1.5 rounded hover:pl-2 transition-all hover:bg-muted',
+        { 'bg-muted': isActive, 'bg-white': !isActive },
       )}
     >
       <div className="flex gap-2 items-center">
