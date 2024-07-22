@@ -9,6 +9,7 @@ import {
 import { ChevronLeft } from 'lucide-react';
 
 import { confirm } from '~/components/modal/confirm';
+import { PipelineLayoutHeader } from '~/components/pages/pipelines/PipelineLayoutHeader';
 import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
 import { TabGroup } from '~/components/tabs/TabGroup';
@@ -62,7 +63,7 @@ export function PipelineRunLayout() {
 
   return (
     <TabGroup>
-      <header className="w-full h-16 bg-white border-b border-input px-4 py-2 flex gap-2 justify-between items-center">
+      <PipelineLayoutHeader>
         <div className="flex gap-2 items-center">
           <Button
             variant="secondary"
@@ -109,10 +110,10 @@ export function PipelineRunLayout() {
           </FilledTabsWrapper>
         </div>
 
-        <Button size="xs" onClick={handleRestoreRun}>
+        <Button size="xs" onClick={handleRestoreRun} className="w-fit">
           Convert as latest
         </Button>
-      </header>
+      </PipelineLayoutHeader>
 
       <Outlet />
     </TabGroup>

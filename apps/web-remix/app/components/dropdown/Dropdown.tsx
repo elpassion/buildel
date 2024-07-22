@@ -19,6 +19,8 @@ interface DropdownProps {
   defaultShown?: boolean;
   placement?: Placement;
   offset?: OffsetOptions;
+  shown?: boolean;
+  onClose?: () => void;
 }
 
 export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
@@ -26,6 +28,8 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   defaultShown,
   placement = 'bottom-start',
   offset = 5,
+  shown,
+  onClose,
 }) => {
   const floatingContext = useFloating({
     placement,
@@ -48,11 +52,20 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
     setFalse();
   };
 
-  useOnClickOutside(wrapperRef, hide);
+  useOnClickOutside(floatingContext.refs.floating, () => {
+    hide();
+    onClose?.();
+  });
 
   return (
     <DropdownContext.Provider
-      value={{ isShown, hide, show, toggle, context: floatingContext }}
+      value={{
+        isShown: shown ?? isShown,
+        hide,
+        show,
+        toggle,
+        context: floatingContext,
+      }}
     >
       <div ref={wrapperRef} className="relative">
         {children}

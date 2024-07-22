@@ -12,7 +12,7 @@ export const FilledTabLink: React.FC<{ className?: string } & NavLinkProps> = ({
     <NavLink
       className={({ isActive }) =>
         classNames(
-          'text-sm rounded py-1 px-3 hover:bg-background flex justify-center items-center',
+          'text-sm rounded py-1 px-3 hover:bg-background flex justify-center items-center whitespace-nowrap',
           {
             'bg-background text-foreground': isActive,
             'text-muted-foreground': !isActive,

@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import {
@@ -13,22 +14,21 @@ import classNames from 'classnames';
 import {
   Briefcase,
   ChevronDown,
-  ChevronUp,
   Key,
   Layers,
   LogOut,
   Settings,
 } from 'lucide-react';
-import type { MenuInfo } from 'rc-menu/es/interface';
 import { ClientOnly } from 'remix-utils/client-only';
 import invariant from 'tiny-invariant';
-import { useOnClickOutside } from 'usehooks-ts';
 
 import { OrganizationApi } from '~/api/organization/OrganizationApi';
+import {
+  Dropdown,
+  DropdownPopup,
+  DropdownTrigger,
+} from '~/components/dropdown/Dropdown';
 import { IconButton } from '~/components/iconButton';
-import { MenuClient } from '~/components/menu/Menu.client';
-import { MenuItem } from '~/components/menu/MenuItem';
-import { PageOverlay } from '~/components/overlay/PageOverlay';
 import {
   NavMobileSidebar,
   NavSidebar,
@@ -37,6 +37,10 @@ import {
 } from '~/components/sidebar/NavSidebar';
 import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
+import {
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '~/components/ui/dropdown-menu';
 import { useServerToasts } from '~/hooks/useServerToasts';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
@@ -210,61 +214,67 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
     setShowMenu(true);
   }, []);
 
-  useOnClickOutside(menuRef, handleClose);
-
-  const handleChangeRoute = useCallback((menu: MenuInfo) => {
-    navigate(routes.pipelines(menu.key));
+  const handleChangeRoute = useCallback((id: number) => {
+    navigate(routes.pipelines(id));
     handleClose();
   }, []);
 
   return (
     <SidebarContentWrapper className="border-b border-neutral-100 py-4 mt-1 pl-2 pr-1">
-      <PageOverlay
-        isShow={showMenu}
-        className={classNames({ '!z-[20]': showMenu })}
-      />
-
       <div ref={menuRef}>
-        <button
-          onClick={handleOpen}
-          className="w-full h-10 overflow-hidden flex justify-between items-center text-foreground rounded-lg"
-        >
-          {isCollapsed && (
-            <Avatar>
-              <AvatarFallback>{name.slice(0, 1)}</AvatarFallback>
-            </Avatar>
-            // <Avatar name={name} contentType="text" shape="square" size="md" />
-          )}
-          {!isCollapsed && (
-            <>
-              <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">
-                {organization.name}
-              </span>
-              {showMenu ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
+        <Dropdown shown={showMenu} onClose={handleClose} placement="bottom-end">
+          <DropdownTrigger
+            onClick={handleOpen}
+            className="w-full p-0 overflow-hidden flex justify-between items-center bg-transparent hover:bg-transparent rounded-lg"
+            variant="secondary"
+          >
+            {isCollapsed && (
+              <Avatar>
+                <AvatarFallback>{name.slice(0, 1)}</AvatarFallback>
+              </Avatar>
+            )}
+            {!isCollapsed && (
+              <>
+                <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">
+                  {organization.name}
+                </span>
+
                 <ChevronDown className="w-4 h-4" />
-              )}
-            </>
-          )}
-        </button>
+              </>
+            )}
+          </DropdownTrigger>
 
-        <ClientOnly fallback={null}>
-          {() => (
-            <MenuClient
-              hidden={!showMenu}
-              activeKey={`${organization.id}`}
-              className="min-w-[248px] absolute z-[51] top-[60px] left-[30%] max-h-[400px] overflow-y-auto md:left-[85%]"
-              onClick={handleChangeRoute}
-            >
-              <NewOrganizationLink />
-
-              {organizations.map((org) => {
-                return <MenuItem key={`${org.id}`}>{org.name}</MenuItem>;
-              })}
-            </MenuClient>
-          )}
-        </ClientOnly>
+          <ClientOnly fallback={null}>
+            {() =>
+              createPortal(
+                <DropdownPopup className="min-w-[250px] z-[70] bg-white border border-input rounded-lg overflow-hidden p-2 lg:min-w-[350px]">
+                  <DropdownMenuLabel>Organizations</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="flex flex-col gap-1">
+                    {organizations.map((org) => {
+                      return (
+                        <Button
+                          size="xs"
+                          variant={
+                            organization.id === org.id ? 'secondary' : 'ghost'
+                          }
+                          className="text-left justify-start  text-foreground"
+                          key={`${org.id}`}
+                          onClick={() => handleChangeRoute(org.id)}
+                        >
+                          {org.name}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <NewOrganizationLink />
+                </DropdownPopup>,
+                document.body,
+              )
+            }
+          </ClientOnly>
+        </Dropdown>
       </div>
     </SidebarContentWrapper>
   );
@@ -272,12 +282,10 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
 
 function NewOrganizationLink() {
   return (
-    <div className="w-full pl-6 py-2">
-      <Link to={routes.newOrganization()}>
-        <Button tabIndex={0} size="xs">
-          Create new
-        </Button>
-      </Link>
+    <div className="w-full py-2">
+      <Button size="xs" asChild>
+        <Link to={routes.newOrganization()}>Create new</Link>
+      </Button>
     </div>
   );
 }
