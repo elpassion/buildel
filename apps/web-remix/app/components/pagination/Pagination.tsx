@@ -43,7 +43,7 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className="flex gap-2 items-center">
-      <p className="text-sm text-neutral-200">
+      <p className="text-sm text-muted-foreground">
         page {currentPage} of {totalPages}
       </p>
 
@@ -69,7 +69,7 @@ export function PaginationButton({
     <button
       className={classNames(
         className,
-        'flex items-center h-[30px] gap-1 px-2 py-1 rounded-lg bg-transparent border border-neutral-800 text-neutral-100 text-sm disabled:bg-neutral-900 disabled:text-neutral-500 hover:text-white hover:bg-neutral-900 transition',
+        'flex items-center h-[30px] gap-1 px-2 py-1 rounded-lg bg-transparent border border-input text-foreground text-sm hover:bg-muted transition disabled:pointer-events-none disabled:opacity-50',
       )}
       {...rest}
     >

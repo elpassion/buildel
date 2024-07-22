@@ -12,7 +12,7 @@ export const InterfaceSectionWrapper: React.FC<
   return (
     <article
       className={classNames(
-        'bg-transparent border border-neutral-800 rounded-xl',
+        'bg-transparent border border-input rounded-xl',
         className,
       )}
     >
@@ -31,7 +31,7 @@ export const InterfaceSectionHeader: React.FC<
   return (
     <header
       className={classNames(
-        'w-full bg-neutral-900 px-6 py-4 rounded-t-xl',
+        'w-full bg-muted px-6 py-4 rounded-t-xl',
         className,
       )}
     >
@@ -43,11 +43,11 @@ export const InterfaceSectionHeader: React.FC<
 export const InterfaceSectionHeading: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  return <h3 className="text-white text-sm">{children}</h3>;
+  return <h3 className="text-foreground text-sm font-medium">{children}</h3>;
 };
 
 export const InterfaceSectionHeaderParagraph: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  return <p className="text-neutral-100 text-xs">{children}</p>;
+  return <p className="text-muted-foreground text-xs">{children}</p>;
 };

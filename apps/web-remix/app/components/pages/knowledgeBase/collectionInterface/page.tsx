@@ -41,8 +41,8 @@ export function KnowledgeBaseCollectionInterface() {
     <>
       <div>
         <div>
-          <h2 className="text-lg text-white font-medium">HTTP API</h2>
-          <p className="text-white text-xs mb-6 max-w-lg">
+          <h2 className="text-lg text-foreground font-bold">HTTP API</h2>
+          <p className="text-muted-foreground text-xs mb-6 max-w-lg">
             Access our HTTP API to manage Knowledge Base with capabilities such
             as searching, adding, modifying, and removing documents.
           </p>
@@ -57,13 +57,13 @@ export function KnowledgeBaseCollectionInterface() {
           </InterfaceSectionHeader>
 
           <div className="p-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
-            <div className="text-white text-sm">
+            <div className="text-foreground text-sm">
               <p className="lg:mt-4 mb-2">
                 Ensure you replace the baseURL with our API's URL and include
                 your{' '}
                 <Link
                   to={routes.organizationSettings(organizationId)}
-                  className="text-primary-500 hover:underline"
+                  className="font-bold hover:underline"
                   target="_blank"
                 >
                   API key
@@ -95,13 +95,13 @@ export function KnowledgeBaseCollectionInterface() {
           </InterfaceSectionHeader>
 
           <div className="p-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
-            <div className="text-white text-sm">
+            <div className="text-foreground text-sm">
               <p className="lg:mt-4 mb-2">
                 Ensure you replace the baseURL with our API's URL and include
                 your{' '}
                 <Link
                   to={routes.organizationSettings(organizationId)}
-                  className="text-primary-500 hover:underline"
+                  className="font-bold hover:underline"
                   target="_blank"
                 >
                   API key
@@ -134,13 +134,13 @@ export function KnowledgeBaseCollectionInterface() {
           </InterfaceSectionHeader>
 
           <div className="p-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
-            <div className="text-white text-sm">
+            <div className="text-foreground text-sm">
               <p className="lg:mt-4 mb-2">
                 Ensure you replace the baseURL with our API's URL and include
                 your{' '}
                 <Link
                   to={routes.organizationSettings(organizationId)}
-                  className="text-primary-500 hover:underline"
+                  className="font-bold hover:underline"
                   target="_blank"
                 >
                   API key

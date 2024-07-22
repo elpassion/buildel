@@ -15,7 +15,7 @@ export function CopyCodeButton({ value }: { value: string }) {
       onClick={copy}
       icon={isCopied ? <Check /> : <Copy />}
       className={classNames('h-fit', {
-        '!text-neutral-300': !isCopied,
+        '!text-foreground': !isCopied,
         '!text-green-500': isCopied,
       })}
     />

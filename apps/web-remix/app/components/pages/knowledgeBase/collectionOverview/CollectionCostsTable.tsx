@@ -33,7 +33,7 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
         id: 'cost_type',
         cell: (info) => (
           <Badge
-            variant={info.getValue() !== 'query' ? 'default' : 'secondary'}
+            variant={info.getValue() !== 'query' ? 'secondary' : 'outline'}
           >
             {info.getValue()}
           </Badge>
@@ -92,7 +92,7 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
 
   return (
     <table className="w-full">
-      <thead className="text-left text-white text-xs bg-neutral-800">
+      <thead className="text-left text-muted-foreground text-xs bg-muted">
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id} className="rounded-xl overflow-hidden">
             {headerGroup.headers.map((header) => (
@@ -121,11 +121,11 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
         {table.getRowModel().rows.map((row) => (
           <tr
             key={row.id}
-            className="[&:not(:first-child)]:border-t border-neutral-800"
+            className="[&:not(:first-child)]:border-t border-input"
             aria-label="pipeline run"
           >
             {row.getVisibleCells().map((cell) => (
-              <td key={cell.id} className="py-3 px-5 text-neutral-100 text-sm">
+              <td key={cell.id} className="py-3 px-5 text-foreground text-sm">
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>
             ))}

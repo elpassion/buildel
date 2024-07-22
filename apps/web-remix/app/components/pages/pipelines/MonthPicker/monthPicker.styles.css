@@ -1,5 +1,5 @@
 .react-datepicker__input-container input{
-  @apply !bg-transparent !border-neutral-800 !text-neutral-100 hover:!text-white !text-sm
+  @apply !bg-transparent !border-input !text-foreground !text-sm
 }
 
 .react-datepicker__input-container input:focus{
@@ -7,5 +7,14 @@
 }
 
 .react-datepicker-year-header{
-  @apply text-neutral-100
+  @apply !text-foreground !bg-muted
+}
+
+.react-datepicker__month-text{
+  @apply !text-foreground
+}
+
+
+.react-datepicker__day--keyboard-selected, .react-datepicker__month-text--keyboard-selected {
+  @apply !bg-primary !text-primary-foreground
 }

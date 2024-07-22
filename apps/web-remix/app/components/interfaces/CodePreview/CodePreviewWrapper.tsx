@@ -16,7 +16,7 @@ export const CodePreviewWrapper: React.FC<CodePreviewWrapperProps> = ({
 }) => {
   return (
     <div>
-      <div className="flex gap-2 justify-end items-center px-1">
+      <div className="flex gap-2 justify-end items-center px-1 mb-1">
         {children?.(props.value)}
       </div>
 
