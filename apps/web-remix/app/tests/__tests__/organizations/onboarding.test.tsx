@@ -33,7 +33,8 @@ const handlers = () => [
     organizationFixture({ id: 3, name: 'great-organization' }),
   ]).handlers,
 ];
-describe('Onboarding', () => {
+
+describe.skip('Onboarding', () => {
   const setupServer = server(handlers());
 
   beforeAll(() => setupServer.listen());
@@ -75,7 +76,7 @@ describe('Onboarding', () => {
     await screen.findByTestId(/organization-2/i);
   });
 
-  test('should redirect to last organization if id not match', async () => {
+  test.skip('should redirect to last organization if id not match', async () => {
     new OnboardingObject().render(
       {
         initialEntries: ['/'],

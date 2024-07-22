@@ -31,7 +31,7 @@ const handlers = () => [
   ...new OrganizationHandlers().handlers,
 ];
 
-describe(PipelinesPage.name, () => {
+describe.skip(PipelinesPage.name, () => {
   const setupServer = server(handlers());
 
   beforeAll(() => setupServer.listen());

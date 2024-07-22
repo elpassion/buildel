@@ -14,11 +14,7 @@ export const FieldMessage = React.forwardRef<
 >(({ className, error: propsError, children, ...props }, ref) => {
   const { name, error } = useFieldContext();
 
-  const body = propsError
-    ? String(propsError)
-    : error
-      ? String(error)
-      : children;
+  const body = propsError ? propsError : error ? error : children;
 
   const isError = !!error || !!propsError;
 

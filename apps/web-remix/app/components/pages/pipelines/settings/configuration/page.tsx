@@ -28,7 +28,6 @@ export function SettingsConfigurationPage() {
   const updateFetcher = useFetcher<IPipeline>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
   const handleUpdatePipeline = useCallback(
     (pipeline: IPipeline) => {
       updateFetcher.submit(pipeline, {
