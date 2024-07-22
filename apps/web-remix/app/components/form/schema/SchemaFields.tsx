@@ -102,7 +102,10 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
 
           <RadioGroupField defaultValue={field.default}>
             {field.enum.map((value) => (
-              <Label key={value} className="flex gap-1 items-center">
+              <Label
+                key={value}
+                className="flex gap-1 items-center text-muted-foreground"
+              >
                 <RadioField id={value} value={value} />
 
                 <span>{value}</span>

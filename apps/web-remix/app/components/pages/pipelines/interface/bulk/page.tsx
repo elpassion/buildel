@@ -344,7 +344,7 @@ export function BulkPage() {
                 size="xxs"
                 variant="secondary"
                 aria-label={`Add item`}
-                className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+                className="mt-4 ml-4"
                 title={`Add item`}
                 icon={<Plus />}
                 onClick={() =>

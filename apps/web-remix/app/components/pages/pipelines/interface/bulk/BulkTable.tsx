@@ -34,7 +34,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
 
   return (
     <table className="w-full table-auto">
-      <thead className="text-left text-white text-xs bg-neutral-800">
+      <thead className="text-left text-muted-foreground text-xs bg-muted">
         <tr className="rounded-xl overflow-hidden">
           {selectedInputs?.map((input: ISelectedInput) => (
             <th
@@ -66,10 +66,10 @@ export const BulkTable: React.FC<BulkTableProps> = ({
             <tr
               key={test.id}
               className={cn(
-                '[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden',
+                '[&:not(:first-child)]:border-t border-input rounded-sm overflow-hidden',
                 {
-                  'bg-primary-500': test.status === 'running',
-                  'bg-neutral-8800': test.status === 'done',
+                  'bg-orange-500': test.status === 'running',
+                  'bg-muted': test.status === 'done',
                 },
               )}
               aria-label="pipeline run"
@@ -133,12 +133,11 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                 </td>
               ))}
               {isTrashIconColumnVisible && (
-                <td className="w-7 py-3 text-neutral-100 text-sm">
+                <td className="w-7 py-3 text-muted-foreground text-sm">
                   <IconButton
                     size="xxs"
                     variant="secondary"
                     aria-label={`Remove item`}
-                    className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
                     title={`Remove item`}
                     icon={<Trash />}
                     onClick={() =>
@@ -160,8 +159,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                     )}
                   >
                     <IconButton
-                      className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
-                      variant="secondary"
+                      variant="outline"
                       aria-label="Go to run overview"
                       icon={<ExternalLink />}
                       size="xxs"
