@@ -5,6 +5,7 @@ import { useFetcher, useLoaderData } from '@remix-run/react';
 
 import type { IPipelineRunLog } from '~/api/pipeline/pipeline.contracts';
 import { SelectInput } from '~/components/form/inputs/select/select.input';
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { Label } from '~/components/ui/label';
 import { routes } from '~/utils/routes.utils';
@@ -82,7 +83,7 @@ export function PipelineRunLogs() {
   }, [status]);
 
   return (
-    <div className="mt-2">
+    <PageContentWrapper className="mt-10">
       <Label>Filter by block</Label>
       <SelectInput
         placeholder="Select..."
@@ -129,7 +130,7 @@ export function PipelineRunLogs() {
           />
         </div>
       </div>
-    </div>
+    </PageContentWrapper>
   );
 }
 

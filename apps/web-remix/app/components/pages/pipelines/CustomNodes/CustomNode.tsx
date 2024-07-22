@@ -110,7 +110,7 @@ export function CustomNodeBody({
   disabled,
 }: CustomNodeBodyProps) {
   const handles = useMemo(() => getBlockHandles(data), [data]);
-
+  console.log(data);
   const inputsHandles = useMemo(
     () =>
       handles

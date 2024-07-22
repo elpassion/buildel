@@ -1,16 +1,14 @@
 import React, { useEffect } from 'react';
 import {
-  Link,
   Outlet,
   useFetcher,
   useLoaderData,
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import { ArrowLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 
 import { confirm } from '~/components/modal/confirm';
-import { AppNavbar } from '~/components/navbar/AppNavbar';
 import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
 import { TabGroup } from '~/components/tabs/TabGroup';
@@ -48,6 +46,10 @@ export function PipelineRunLayout() {
     });
   };
 
+  const backToOverview = () => {
+    navigate(routes.pipelineRuns(organizationId, pipelineId));
+  };
+
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data) {
       successToast({ description: 'Configuration restored!' });
@@ -56,31 +58,41 @@ export function PipelineRunLayout() {
   }, [fetcher]);
 
   return (
-    <div>
-      <AppNavbar
-        leftContent={
-          <div className="flex gap-2 text-white">
-            <Link
-              to={routes.pipelineRuns(
-                organizationId,
-                pipelineId,
-                Object.fromEntries(searchParams.entries()),
-              )}
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </Link>
-            <div>
-              <h2 className="text-2xl font-medium">Run history</h2>
-              <h1 className="text-sm font-medium">{pipeline.name}</h1>
-            </div>
-          </div>
-        }
-      />
+    <>
+      {/*<AppNavbar*/}
+      {/*  leftContent={*/}
+      {/*    <div className="flex gap-2 text-white">*/}
+      {/*      <Link*/}
+      {/*        to={routes.pipelineRuns(*/}
+      {/*          organizationId,*/}
+      {/*          pipelineId,*/}
+      {/*          Object.fromEntries(searchParams.entries()),*/}
+      {/*        )}*/}
+      {/*      >*/}
+      {/*        <ArrowLeft className="w-6 h-6" />*/}
+      {/*      </Link>*/}
+      {/*      <div>*/}
+      {/*        <h2 className="text-2xl font-medium">Run history</h2>*/}
+      {/*        <h1 className="text-sm font-medium">{pipeline.name}</h1>*/}
+      {/*      </div>*/}
+      {/*    </div>*/}
+      {/*  }*/}
+      {/*/>*/}
 
-      <div className="px-4 md:px-6 lg:px-10">
-        <TabGroup>
-          <div className="flex justify-between items-center">
-            <FilledTabsWrapper>
+      <TabGroup>
+        <header className="w-full h-16 bg-white border-b border-input px-4 py-2 flex gap-2 justify-between items-center">
+          <div className="flex gap-2 items-center">
+            <Button
+              variant="secondary"
+              size="xs"
+              onClick={backToOverview}
+              className="flex gap-2 items-center max-w-[250px]"
+            >
+              <ChevronLeft className="min-w-5 w-4 h-4 flex-shrink-0" />
+              <span className="truncate">{pipeline.name}</span>
+            </Button>
+
+            <FilledTabsWrapper size="xs">
               <FilledTabLink
                 end
                 to={routes.pipelineRun(
@@ -113,17 +125,15 @@ export function PipelineRunLayout() {
                 Logs
               </FilledTabLink>
             </FilledTabsWrapper>
-
-            <Button size="xxs" variant="ghost" onClick={handleRestoreRun}>
-              Convert as latest
-            </Button>
           </div>
 
-          <div className="mt-10">
-            <Outlet />
-          </div>
-        </TabGroup>
-      </div>
-    </div>
+          <Button size="xs" onClick={handleRestoreRun}>
+            Convert as latest
+          </Button>
+        </header>
+      </TabGroup>
+
+      <Outlet />
+    </>
   );
 }
