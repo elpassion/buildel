@@ -209,6 +209,7 @@ export function EditBlockForm({
 
                 return replacedValue || optKey;
               })}
+            getPopupContainer={(node) => node.parentNode}
           />
         </FormField>
       );
@@ -268,6 +269,7 @@ export function EditBlockForm({
                 )}
               />
             )}
+            getPopupContainer={(node) => node.parentNode}
           />
         </FormField>
       );
@@ -281,7 +283,7 @@ export function EditBlockForm({
       validator={validator}
       defaultValues={blockConfig}
       onSubmit={handleUpdate}
-      className="w-full grow flex flex-col h-[70vh]"
+      className="w-full grow flex flex-col"
       onChange={(e: any) => {
         setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));
       }}
@@ -291,7 +293,7 @@ export function EditBlockForm({
         connections={connections}
         updateInputReset={updateInputReset}
       >
-        <div className="space-y-4 grow overflow-y-auto px-1">
+        <div className="space-y-4 grow">
           <div className="flex justify-end">
             <CopyConfigurationButton
               value={JSON.stringify({
@@ -302,13 +304,16 @@ export function EditBlockForm({
             />
           </div>
 
-          <FormField name="name">
-            <FieldLabel>Name</FieldLabel>
-            <TextInputField name="name" defaultValue={blockConfig.name} />
-            <FieldMessage error={fieldsErrors.name}>
-              The name of the chat.
-            </FieldMessage>
-          </FormField>
+          <div>
+            <FormField name="name">
+              <FieldLabel>Name</FieldLabel>
+              <TextInputField name="name" defaultValue={blockConfig.name} />
+              <FieldMessage error={fieldsErrors.name}>
+                The name of the chat.
+              </FieldMessage>
+            </FormField>
+          </div>
+
           <HiddenField
             name="inputs"
             value={JSON.stringify(blockConfig.inputs)}
@@ -411,7 +416,7 @@ function CopyConfigurationButton({ value }: CopyConfigurationButtonProps) {
     <button
       onClick={copy}
       type="button"
-      className="self-end text-sm text-neutral-100 underline bg-transparent !border-none hover:text-primary-500"
+      className="self-end text-xs text-muted-foreground underline bg-transparent !border-none hover:text-foreground"
     >
       Copy configuration
     </button>

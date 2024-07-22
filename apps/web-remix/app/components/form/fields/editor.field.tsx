@@ -66,7 +66,7 @@ export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
 
           <IconButton
             size="xxs"
-            onlyIcon
+            variant="ghost"
             icon={<Maximize2 />}
             type="button"
             onClick={show}
@@ -131,7 +131,7 @@ function MaximizedEditor({
   return (
     <>
       <DialogDrawer open={isOpen} onOpenChange={onOpenChange}>
-        <DialogDrawerContent>
+        <DialogDrawerContent className="md:max-w-[90%] md:w-[700px] lg:w-[1000px]">
           <DialogDrawerHeader>
             {label && <DialogDrawerTitle>{label}</DialogDrawerTitle>}
             {supportingText && (
@@ -141,15 +141,17 @@ function MaximizedEditor({
             )}
           </DialogDrawerHeader>
           <DialogDrawerBody>
-            <EditorInput
-              id={`${name}-editor`}
-              value={value}
-              onChange={onChange}
-              height="500px"
-              {...rest}
-            />
+            <div className="py-2">
+              <EditorInput
+                id={`${name}-editor`}
+                value={value}
+                onChange={onChange}
+                height="500px"
+                {...rest}
+              />
 
-            <FieldMessage error={error}>{supportingText}</FieldMessage>
+              <FieldMessage error={error}>{supportingText}</FieldMessage>
+            </div>
           </DialogDrawerBody>
         </DialogDrawerContent>
       </DialogDrawer>

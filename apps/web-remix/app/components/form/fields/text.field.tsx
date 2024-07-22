@@ -77,7 +77,7 @@ function ResettableFieldResetButton({
 }: ResettableFieldResetButtonProps) {
   return (
     <IconButton
-      onlyIcon
+      variant="ghost"
       size="xxs"
       type="button"
       onClick={onClick}

@@ -120,7 +120,7 @@ export const CreatableAsyncSelectField = forwardRef<
           <FieldLabel>{label}</FieldLabel>
 
           <button
-            className="text-primary-500 text-sm mb-[6px] bg-transparent"
+            className="text-foreground text-sm mb-[6px] bg-transparent"
             onClick={openModal}
             type="button"
             data-testid={`${props.id}-create-button`}

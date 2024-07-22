@@ -25,10 +25,9 @@ export const EditorInput: React.FC<EditorInputProps> = ({
 
   return (
     <div
-      className={classNames(
-        'overflow-hidden border border-neutral-200 rounded-lg',
-        { 'ring-[3px] ring-primary-700 ring-offset-1': isFocused },
-      )}
+      className={classNames('overflow-hidden border border-input rounded-lg', {
+        'outline-none ring-2 ring-ring ring-offset-2': isFocused,
+      })}
     >
       <Editor onFocus={handleFocus} onBlur={handleBlur} {...rest} />
     </div>

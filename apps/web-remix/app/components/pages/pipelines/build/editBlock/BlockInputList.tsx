@@ -33,7 +33,7 @@ export const BlockInputList: React.FC<BlockInputListProps> = ({
   return (
     <div>
       <div className="flex gap-2 items-center mb-2">
-        <h4 className="font-medium text-white text-xs">Inputs</h4>
+        <h4 className="font-medium text-muted-foreground text-xs">Inputs</h4>
         <HelpfulIcon
           id={`inputs-helpful-icon`}
           text="Check if the input must be resubmitted for each workflow execution."
@@ -103,7 +103,7 @@ function Badge({
     <div
       onClick={onClick}
       className={classNames(
-        'bg-neutral-800 px-2 py-1 rounded-md flex items-center',
+        'bg-muted text-foreground px-2 py-1 rounded-md flex items-center',
         className,
       )}
     >
@@ -123,8 +123,8 @@ function BadgeText({
   return (
     <p
       className={classNames('text-xs', {
-        'text-primary-500': variant === 'primary',
-        'text-secondary-500': variant === 'secondary',
+        'text-orange-500': variant === 'primary',
+        'text-blue-500': variant === 'secondary',
       })}
     >
       {children}

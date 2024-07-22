@@ -13,8 +13,11 @@ import { ChevronLeft } from 'lucide-react';
 
 import { AliasNode } from '~/components/pages/pipelines/build/AliasNode';
 import { ELProvider } from '~/components/pages/pipelines/EL/ELProvider';
-import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
 import { Button } from '~/components/ui/button';
+import {
+  DialogDrawer,
+  DialogDrawerContent,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import { Builder } from '../Builder';
@@ -49,7 +52,8 @@ export function PipelineBuilder() {
     [updateFetcher, pipeline],
   );
 
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = (value: boolean) => {
+    if (value) return;
     navigate(
       routes.pipelineBuild(
         organizationId,
@@ -113,14 +117,11 @@ export function PipelineBuilder() {
         )}
       </Builder>
 
-      <ActionSidebar
-        overlay
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        className="md:w-[460px] lg:w-[550px]"
-      >
-        <Outlet />
-      </ActionSidebar>
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
+        <DialogDrawerContent className="md:max-w-[700px] md:w-[600px] lg:w-[700px]">
+          <Outlet />
+        </DialogDrawerContent>
+      </DialogDrawer>
     </div>
   );
 }

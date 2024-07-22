@@ -10,6 +10,9 @@ import type { OffsetOptions, Placement } from '@floating-ui/react-dom';
 import classNames from 'classnames';
 import { useBoolean, useOnClickOutside } from 'usehooks-ts';
 
+import type { ButtonProps } from '~/components/ui/button';
+import { Button } from '~/components/ui/button';
+
 import { DropdownContext, useDropdown } from './DropdownContext';
 
 interface DropdownProps {
@@ -85,9 +88,12 @@ export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
   );
 };
 
-export const DropdownTrigger: React.FC<
-  React.ButtonHTMLAttributes<HTMLButtonElement>
-> = ({ children, className, onClick, ...rest }) => {
+export const DropdownTrigger: React.FC<ButtonProps> = ({
+  children,
+  className,
+  onClick,
+  ...rest
+}) => {
   const { toggle, context } = useDropdown();
 
   const handleOnClick = (
@@ -98,13 +104,13 @@ export const DropdownTrigger: React.FC<
   };
 
   return (
-    <button
+    <Button
       ref={context.refs.setReference}
       className={classNames(className)}
       onClick={handleOnClick}
       {...rest}
     >
       {children}
-    </button>
+    </Button>
   );
 };
