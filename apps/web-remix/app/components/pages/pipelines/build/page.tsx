@@ -63,10 +63,6 @@ export function PipelineBuilder() {
     );
   };
 
-  const backToWorkflows = () => {
-    navigate(routes.pipelines(organizationId));
-  };
-
   const isDisabled = aliasId !== 'latest';
 
   if (isDisabled) {
@@ -86,12 +82,7 @@ export function PipelineBuilder() {
   }
 
   return (
-    <div id="_root">
-      <header className="w-full h-16 bg-white px-4 py-2 flex justify-between items-center">
-        <Button variant="secondary" size="icon" onClick={backToWorkflows}>
-          <ChevronLeft />
-        </Button>
-      </header>
+    <>
       <Builder
         alias={aliasId}
         key="flow-editable"
@@ -122,7 +113,7 @@ export function PipelineBuilder() {
           <Outlet />
         </DialogDrawerContent>
       </DialogDrawer>
-    </div>
+    </>
   );
 }
 

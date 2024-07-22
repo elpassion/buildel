@@ -3,7 +3,7 @@ import React from 'react';
 
 import { cn } from '~/utils/cn';
 
-export type TabsSize = 'sm' | 'lg';
+export type TabsSize = 'xs' | 'sm' | 'lg';
 
 export const FilledTabsWrapper: React.FC<
   PropsWithChildren<{ size?: TabsSize }>
@@ -22,6 +22,8 @@ export const FilledTabsWrapper: React.FC<
 
 export function getTabWrapperSize(size?: TabsSize) {
   switch (size) {
+    case 'xs':
+      return 'min-h-8 h-8';
     case 'sm':
       return 'min-h-9 h-9';
     case 'lg':
