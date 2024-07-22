@@ -7,11 +7,11 @@ import {
   useFloating,
 } from '@floating-ui/react-dom';
 import type { OffsetOptions, Placement } from '@floating-ui/react-dom';
-import classNames from 'classnames';
 import { useBoolean, useOnClickOutside } from 'usehooks-ts';
 
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
+import { cn } from '~/utils/cn';
 
 import { DropdownContext, useDropdown } from './DropdownContext';
 
@@ -87,7 +87,7 @@ export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
     <div
       ref={context.refs.setFloating}
       style={context.floatingStyles}
-      className={classNames(
+      className={cn(
         'transition-opacity',
         {
           'opacity-0 pointer-events-none': !isShown,
@@ -119,7 +119,7 @@ export const DropdownTrigger: React.FC<ButtonProps> = ({
   return (
     <Button
       ref={context.refs.setReference}
-      className={classNames(className)}
+      className={cn(className)}
       onClick={handleOnClick}
       {...rest}
     >

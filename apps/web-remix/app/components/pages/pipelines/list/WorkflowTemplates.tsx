@@ -1,7 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { useMemo, useRef } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
-import classNames from 'classnames';
 import { PlusCircle } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
@@ -21,7 +20,7 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = ({
 }) => {
   return (
     <article
-      className={classNames(
+      className={cn(
         'flex-grow bg-white border border-neutral-100 px-4 py-8 rounded-3xl flex flex-col gap-6 md:flex-row md:gap-14 md:justify-between md:p-16',
         className,
       )}
@@ -157,7 +156,7 @@ export function WorkflowTemplatesHeader({
 }: WorkflowTemplatesHeaderProps) {
   return (
     <header
-      className={classNames(
+      className={cn(
         'flex flex-col gap-4 md:gap-6 md:text-left md:max-w-[280px]',
         className,
       )}

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import classNames from 'classnames';
 
 import type { CodeMirrorProps } from '~/components/editor/CodeMirror/CodeMirror';
 import { Editor } from '~/components/editor/CodeMirror/CodeMirror';
+import { cn } from '~/utils/cn';
 
 export type EditorInputProps = CodeMirrorProps;
 
@@ -25,7 +25,7 @@ export const EditorInput: React.FC<EditorInputProps> = ({
 
   return (
     <div
-      className={classNames('overflow-hidden border border-input rounded-lg', {
+      className={cn('overflow-hidden border border-input rounded-lg', {
         'outline-none ring-2 ring-ring ring-offset-2': isFocused,
       })}
     >

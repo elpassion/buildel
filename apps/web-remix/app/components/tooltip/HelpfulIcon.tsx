@@ -1,9 +1,9 @@
 import React from 'react';
 import type { ITooltip } from 'react-tooltip';
-import classNames from 'classnames';
 import { CircleHelp } from 'lucide-react';
 
 import { Tooltip } from '~/components/tooltip/Tooltip';
+import { cn } from '~/utils/cn';
 
 interface HelpfulIconProps {
   text: string;
@@ -31,7 +31,7 @@ export function HelpfulIcon({
 
       <CircleHelp
         id={`${id}-helpful-icon`}
-        className={classNames(
+        className={cn(
           'cursor-pointer',
           {
             'w-6 h-6': size === 'xl',

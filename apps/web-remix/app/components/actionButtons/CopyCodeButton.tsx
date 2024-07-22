@@ -1,9 +1,9 @@
 import React from 'react';
-import classNames from 'classnames';
 import { Check, Copy } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
+import { cn } from '~/utils/cn';
 
 export function CopyCodeButton({ value }: { value: string }) {
   const { copy, isCopied } = useCopyToClipboard(value ?? '');
@@ -14,7 +14,7 @@ export function CopyCodeButton({ value }: { value: string }) {
       type="button"
       onClick={copy}
       icon={isCopied ? <Check /> : <Copy />}
-      className={classNames('h-fit', {
+      className={cn('h-fit', {
         '!text-foreground': !isCopied,
         '!text-green-500': isCopied,
       })}

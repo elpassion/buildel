@@ -1,5 +1,4 @@
 import React, { useCallback, useRef, useState } from 'react';
-import classNames from 'classnames';
 import { CirclePause, Mic } from 'lucide-react';
 
 import type {
@@ -8,6 +7,7 @@ import type {
 } from '~/components/audioRecorder/useAudioRecorder';
 import { useAudioRecorder } from '~/components/audioRecorder/useAudioRecorder';
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
+import { cn } from '~/utils/cn';
 
 export type MediaRecorderState = 'inactive' | 'recording';
 
@@ -101,7 +101,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       <button
         disabled={disabled}
         type="button"
-        className={classNames(
+        className={cn(
           'w-6 h-6 flex items-center justify-center bg-primary rounded-md ',
           {
             'text-primary-foreground': status !== 'recording',
@@ -116,7 +116,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       </button>
 
       <div
-        className={classNames(
+        className={cn(
           'relative after:absolute after:w-full after:h-[0.5px] after:bg-primary after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2',
           {
             "after:content-['']": status === 'inactive',

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useFetcher } from '@remix-run/react';
-import classNames from 'classnames';
 
 import { TextInput } from '~/components/form/inputs/text.input';
 import { confirm } from '~/components/modal/confirm';
 import { Button } from '~/components/ui/button';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
+import { cn } from '~/utils/cn';
 
 import type { IAPIKey } from './organization.types';
 
@@ -89,7 +89,7 @@ function CopyButton({ onClick, isCopied, disabled }: CopyButtonProps) {
       size="xs"
       disabled={disabled}
       onClick={onClick}
-      className={classNames('!h-[42px]', {
+      className={cn('!h-[42px]', {
         '!text-green-600': isCopied,
       })}
     >

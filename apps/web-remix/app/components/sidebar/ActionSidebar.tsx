@@ -1,11 +1,11 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import classNames from 'classnames';
 import startCase from 'lodash.startcase';
 import { X } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { PageOverlay } from '~/components/overlay/PageOverlay';
+import { cn } from '~/utils/cn';
 
 interface ActionSidebarProps extends PropsWithChildren {
   className?: string;
@@ -29,11 +29,11 @@ export const ActionSidebar: React.FC<ActionSidebarProps> = ({
         <PageOverlay
           isShow={isOpen}
           onClick={() => onClose?.(false)}
-          className={classNames(overlayClassName)}
+          className={cn(overlayClassName)}
         />
       ) : null}
       <aside
-        className={classNames(
+        className={cn(
           'fixed z-50 inset-0 bg-neutral-850 px-4 py-8 w-full transition-opacity duration-300 ease-[cubic-bezier(0.25, 1, 0.5, 1)] flex flex-col sm:w-[360px] sm:transition sm:left-auto sm:right-4 sm:inset-y-4 sm:rounded-xl',
           {
             'translate-x-0 opacity-100 pointer-events-auto': isOpen,
@@ -62,7 +62,7 @@ export function ActionSidebarHeader({
 }: ActionSidebarHeaderProps) {
   return (
     <header
-      className={classNames(
+      className={cn(
         'flex justify-between gap-1 mb-6 pb-6 border-b border-neutral-100',
         className,
       )}

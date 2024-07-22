@@ -1,5 +1,4 @@
 import React from 'react';
-import classNames from 'classnames';
 
 import { Button } from '~/components/ui/button';
 import {
@@ -10,6 +9,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { cn } from '~/utils/cn';
 
 export interface ConfirmationModalProps {
   onConfirm?: () => Promise<void>;
@@ -50,10 +50,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       }}
     >
       <DialogDrawerContent
-        className={classNames(
-          'md:max-w-[500px] md:min-w-[300px] mx-2',
-          className,
-        )}
+        className={cn('md:max-w-[500px] md:min-w-[300px] mx-2', className)}
       >
         <DialogDrawerHeader>
           <DialogDrawerTitle>Are you sure?</DialogDrawerTitle>

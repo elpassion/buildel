@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import React, { useEffect } from 'react';
 import { NavLink, useLocation } from '@remix-run/react';
 import type { RemixNavLinkProps } from '@remix-run/react/dist/components';
-import classNames from 'classnames';
 import kebabCase from 'lodash.kebabcase';
 
 import { PageOverlay } from '~/components/overlay/PageOverlay';
@@ -49,7 +48,7 @@ export const NavMobileSidebar: React.FC<
       />
       <div className="lg:hidden">
         <Sidebar
-          className={classNames(
+          className={cn(
             'fixed top-0 left-0 !h-screen rounded-r-[1.25rem] z-50 transition duration-200 ease-[cubic-bezier(0.25, 1, 0.5, 1)]',
             {
               '-translate-x-full pointer-events-none': !isOpen,

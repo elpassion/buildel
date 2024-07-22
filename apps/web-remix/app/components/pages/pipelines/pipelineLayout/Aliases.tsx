@@ -7,7 +7,6 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
-import classNames from 'classnames';
 import { ChevronDown, ChevronUp, FilePenLine, Trash } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 import z from 'zod';
@@ -29,6 +28,7 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { EditAliasNameModal } from '~/components/pages/pipelines/pipelineLayout/EditAliasNameModal';
 import { Button } from '~/components/ui/button';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 interface AliasSelectProps {
@@ -67,7 +67,7 @@ function AliasTrigger({
       <div className="flex gap-1 items-center">
         <span className="block max-w-[250px] truncate">
           Aliases{' '}
-          <span className={classNames({ 'font-bold': value !== 'latest' })}>
+          <span className={cn({ 'font-bold': value !== 'latest' })}>
             ({name})
           </span>
         </span>
@@ -164,7 +164,7 @@ export const AliasListItem = ({
 
   return (
     <div
-      className={classNames(
+      className={cn(
         'text-foreground group flex justify-between items-center gap-2 text-sm py-2 px-1.5 rounded hover:pl-2 transition-all hover:bg-muted',
         { 'bg-muted': isActive, 'bg-white': !isActive },
       )}

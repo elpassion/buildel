@@ -1,8 +1,8 @@
 import React from 'react';
-import classNames from 'classnames';
 
 import { BasicLink } from '~/components/link/BasicLink';
 import { ItemList } from '~/components/list/ItemList';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import type { IPipeline } from '../pipeline.types';
@@ -33,7 +33,7 @@ export const PipelinesList: React.FC<PipelinesListProps> = ({
           </PipelinesListItem>
         </BasicLink>
       )}
-      className={classNames(
+      className={cn(
         'grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
         className,
       )}

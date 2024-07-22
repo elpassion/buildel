@@ -1,9 +1,9 @@
 import type { ButtonHTMLAttributes } from 'react';
 import React from 'react';
 import { useNavigate } from '@remix-run/react';
-import classNames from 'classnames';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+import { cn } from '~/utils/cn';
 import { buildUrlWithParams } from '~/utils/url';
 
 import { DEFAULT_PAGINATION } from './usePagination';
@@ -67,7 +67,7 @@ export function PaginationButton({
 }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
-      className={classNames(
+      className={cn(
         className,
         'flex items-center h-[30px] gap-1 px-2 py-1 rounded-lg bg-transparent border border-input text-foreground text-sm hover:bg-muted transition disabled:pointer-events-none disabled:opacity-50',
       )}

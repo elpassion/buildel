@@ -1,10 +1,10 @@
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useMemo } from 'react';
-import classNames from 'classnames';
 import startCase from 'lodash.startcase';
 import { AlertCircle } from 'lucide-react';
 
 import { Badge } from '~/components/ui/badge';
+import { cn } from '~/utils/cn';
 
 import type { IBlockConfig } from '../pipeline.types';
 import { getBlockFields, getBlockHandles } from '../PipelineFlow.utils';
@@ -43,7 +43,7 @@ export function CustomNode({
         data-testid="builder-block"
         data-active={status}
         data-valid={isValid}
-        className={classNames(
+        className={cn(
           'min-h-[100px] min-w-[250px] max-w-[500px] break-words rounded-lg bg-white drop-shadow-sm transition border nowheel',
           borderStyles(),
           {
@@ -77,7 +77,7 @@ export interface CustomNodeHeaderProps extends PropsWithChildren {
 export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
   return (
     <header
-      className={classNames(
+      className={cn(
         'relative flex items-center justify-between py-2 px-3 rounded-t-lg bg-primary text-primary-foreground gap-2',
       )}
     >
@@ -192,7 +192,7 @@ export function CustomNodeBody({
 function NodeWorkingIcon({ isWorking }: { isWorking: boolean }) {
   return (
     <div
-      className={classNames(
+      className={cn(
         'animate-ping w-2 h-2 rounded-full bg-primary-500 flex justify-center items-center absolute z-10 -top-1 -right-1',
         {
           hidden: !isWorking,

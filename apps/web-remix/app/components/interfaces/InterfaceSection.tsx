@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import classNames from 'classnames';
+
+import { cn } from '~/utils/cn';
 
 interface InterfaceSectionWrapperProps {
   className?: string;
@@ -11,10 +12,7 @@ export const InterfaceSectionWrapper: React.FC<
 > = ({ className, children }) => {
   return (
     <article
-      className={classNames(
-        'bg-transparent border border-input rounded-xl',
-        className,
-      )}
+      className={cn('bg-transparent border border-input rounded-xl', className)}
     >
       {children}
     </article>
@@ -29,12 +27,7 @@ export const InterfaceSectionHeader: React.FC<
   PropsWithChildren<InterfaceSectionHeaderProps>
 > = ({ children, className }) => {
   return (
-    <header
-      className={classNames(
-        'w-full bg-muted px-6 py-4 rounded-t-xl',
-        className,
-      )}
-    >
+    <header className={cn('w-full bg-muted px-6 py-4 rounded-t-xl', className)}>
       {children}
     </header>
   );

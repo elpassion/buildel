@@ -1,10 +1,10 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import classNames from 'classnames';
 
 import type { NavbarProps } from '~/components/navbar/navbar';
 import Navbar from '~/components/navbar/navbar';
 import { useNavSidebarContext } from '~/components/sidebar/NavSidebar';
+import { cn } from '~/utils/cn';
 
 export const AppNavbar: React.FC<
   Omit<NavbarProps, 'wrapperClassName' | 'menuClassName' | 'onMenuClick'>
@@ -32,10 +32,7 @@ export const AppNavbarHeading = ({
 }: AppNavbarHeadingProps) => {
   return (
     <h1
-      className={classNames(
-        'text-2xl md:text-3xl font-medium text-white',
-        className,
-      )}
+      className={cn('text-2xl md:text-3xl font-medium text-white', className)}
     >
       {children}
     </h1>

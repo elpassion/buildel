@@ -49,7 +49,6 @@
     "@xyflow/react": "^12.0.1",
     "chokidar": "^3.5.3",
     "class-variance-authority": "^0.7.0",
-    "classnames": "^2.3.2",
     "clsx": "^2.1.1",
     "compression": "^1.7.4",
     "cookie": "^0.5.0",

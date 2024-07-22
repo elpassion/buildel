@@ -2,7 +2,6 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { NavLink } from '@remix-run/react';
 import type { NavLinkProps } from '@remix-run/react';
-import classNames from 'classnames';
 
 import { cn } from '~/utils/cn';
 
@@ -21,7 +20,7 @@ export const OutlinedTabLink = ({ children, ...rest }: NavLinkProps) => {
     <NavLink
       prefetch="intent"
       className={({ isActive }) =>
-        classNames('text-sm pb-2 px-3 whitespace-nowrap', {
+        cn('text-sm pb-2 px-3 whitespace-nowrap', {
           'border-b-2 border-primary text-foreground': isActive,
           'text-muted-foreground': !isActive,
         })

@@ -5,7 +5,7 @@ import { Datepicker } from '~/components/datepicker/Datepicker';
 
 import './datepicker.styles.css';
 
-import classNames from 'classnames';
+import { cn } from '~/utils/cn';
 
 export type DatepickerInputProps = DatepickerProps;
 
@@ -16,7 +16,7 @@ export const DatepickerInputFallback = ({
 }) => {
   return (
     <div
-      className={classNames(
+      className={cn(
         'w-full bg-white rounded-lg h-[42px] border border-input relative',
         className,
       )}

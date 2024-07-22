@@ -1,7 +1,6 @@
-import classNames from 'classnames';
-
 import { ItemList } from '~/components/list/ItemList';
 import type { IMembership } from '~/components/pages/settings/organization/organization.types';
+import { cn } from '~/utils/cn';
 
 interface MembershipListProps {
   memberships: IMembership[];
@@ -25,7 +24,7 @@ interface MembershipListItemProps {
 export const MembershipListItem = ({ membership }: MembershipListItemProps) => {
   return (
     <article
-      className={classNames(
+      className={cn(
         'group bg-muted px-4 py-4 rounded-lg text-foreground text-sm',
       )}
     >

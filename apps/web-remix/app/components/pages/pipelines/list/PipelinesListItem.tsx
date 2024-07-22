@@ -2,7 +2,6 @@ import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
-import classNames from 'classnames';
 import { EllipsisVertical, PlayCircle, Trash } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
@@ -20,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 import { Duplicate } from '~/icons/Duplicate';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import type { IPipeline } from '../pipeline.types';
@@ -31,7 +31,7 @@ export const PipelinesListItem = ({
   children,
   className,
 }: PipelinesListItemProps) => {
-  return <Card className={classNames('h-full', className)}>{children}</Card>;
+  return <Card className={cn('h-full', className)}>{children}</Card>;
 };
 
 interface PipelineListItemHeaderProps {

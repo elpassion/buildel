@@ -10,7 +10,6 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react';
-import classNames from 'classnames';
 import {
   Briefcase,
   ChevronDown,
@@ -44,6 +43,7 @@ import {
 import { useServerToasts } from '~/hooks/useServerToasts';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
+import { cn } from '~/utils/cn';
 import { getCurrentUser } from '~/utils/currentUser.server';
 import { routes } from '~/utils/routes.utils';
 import { getServerToast, setOrganizationId } from '~/utils/toast.server';
@@ -159,7 +159,7 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
 
   return (
     <SidebarContentWrapper
-      className={classNames(
+      className={cn(
         'gap-2 mt-4 mb-3 transition-all justify-between h-[calc(100%-28px)]',
         {
           '!px-0': !isCollapsed,
@@ -329,8 +329,6 @@ export function SidebarContentWrapper({
   className,
 }: SidebarContentWrapperProps) {
   return (
-    <div className={classNames('flex flex-col px-[10px]', className)}>
-      {children}
-    </div>
+    <div className={cn('flex flex-col px-[10px]', className)}>{children}</div>
   );
 }

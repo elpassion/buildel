@@ -6,6 +6,7 @@ import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { SmallFileInput } from '~/components/form/inputs/file.input';
 import { TextareaInput } from '~/components/form/inputs/textarea.input';
 import { IconButton } from '~/components/iconButton';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import type { ISelectedInput, ITest } from './page';
@@ -64,7 +65,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
           return (
             <tr
               key={test.id}
-              className={classNames(
+              className={cn(
                 '[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden',
                 {
                   'bg-primary-500': test.status === 'running',

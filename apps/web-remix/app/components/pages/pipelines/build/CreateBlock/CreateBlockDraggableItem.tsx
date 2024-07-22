@@ -1,13 +1,13 @@
 import type { DragEvent } from 'react';
 import React, { useCallback } from 'react';
 import { useReactFlow } from '@xyflow/react';
-import classNames from 'classnames';
 import startCase from 'lodash.startcase';
 import { Plus } from 'lucide-react';
 import type { z } from 'zod';
 
 import type { BlockType } from '~/api/blockType/blockType.contracts';
 import { IconButton } from '~/components/iconButton';
+import { cn } from '~/utils/cn';
 
 import type { IBlockConfig, IBlockType } from '../../pipeline.types';
 import { useRunPipeline } from '../../RunPipelineProvider';
@@ -55,7 +55,7 @@ export const CreateBlockDraggableItem: React.FC<
     <div
       id="draggable-block-item"
       key={data.type}
-      className={classNames(
+      className={cn(
         'w-full min-w-[100px] bg-white py-2 pl-3 pr-2 text-foreground flex justify-between items-center transition text-xs rounded-lg',
         {
           'opacity-70': runStatus !== 'idle',

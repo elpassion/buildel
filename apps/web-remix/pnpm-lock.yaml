@@ -110,9 +110,6 @@ importers:
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
-      classnames:
-        specifier: ^2.3.2
-        version: 2.5.1
       clsx:
         specifier: ^2.1.1
         version: 2.1.1

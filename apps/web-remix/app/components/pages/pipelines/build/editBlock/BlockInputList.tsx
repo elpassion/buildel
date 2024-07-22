@@ -1,11 +1,11 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo, useRef, useState } from 'react';
-import classNames from 'classnames';
 
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 import { ItemList } from '~/components/list/ItemList';
 import type { IConfigConnection } from '~/components/pages/pipelines/pipeline.types';
 import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
+import { cn } from '~/utils/cn';
 
 import { useInputs } from './EditBlockForm';
 
@@ -102,7 +102,7 @@ function Badge({
   return (
     <div
       onClick={onClick}
-      className={classNames(
+      className={cn(
         'bg-muted text-foreground px-2 py-1 rounded-md flex items-center',
         className,
       )}
@@ -122,7 +122,7 @@ function BadgeText({
 }: PropsWithChildren<BadgeTextProps>) {
   return (
     <p
-      className={classNames('text-xs', {
+      className={cn('text-xs', {
         'text-orange-500': variant === 'primary',
         'text-blue-500': variant === 'secondary',
       })}

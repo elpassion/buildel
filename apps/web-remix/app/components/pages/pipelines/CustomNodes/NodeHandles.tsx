@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import classNames from 'classnames';
 import startCase from 'lodash.startcase';
+
+import { cn } from '~/utils/cn';
 
 import type { IHandle } from '../pipeline.types';
 
@@ -44,7 +45,7 @@ export function InputHandle({
         isConnectable={isConnectable}
         style={{ top: (index + 1) * 25 }}
         data-testid={`${blockName}-${handle.data.name}-handle`}
-        className={classNames(
+        className={cn(
           '!border-1 !border-orange-500 !w-[10px] !h-[10px] !-translate-x-[50%]',
           handleTypeClassName,
         )}
@@ -86,7 +87,7 @@ export function OutputHandle({
         id={handle.id}
         data-testid={`${blockName}-${handle.data.name}-handle`}
         data-name={handle.data.name}
-        className={classNames(
+        className={cn(
           '!border-1 !border-blue-500 !w-[10px] !h-[10px] !translate-x-[40%]',
           handleTypeClassName,
         )}
@@ -114,7 +115,7 @@ export function ToolHandle({
   return (
     <>
       <span
-        className={classNames(
+        className={cn(
           'absolute text-[10px] -translate-x-1/2 text-muted-foreground left-1/2',
         )}
         style={{
@@ -131,7 +132,7 @@ export function ToolHandle({
         isConnectable={isConnectable}
         id={handle.id}
         data-testid={`${blockName}-${handle.data.name}-handle`}
-        className={classNames(
+        className={cn(
           '!border-1 !w-[10px] !h-[10px] !rotate-45 !-translate-x-1/2',
           handleTypeClassName,
         )}

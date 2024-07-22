@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import classNames from 'classnames';
 import { File, FileText, Loader, X } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
@@ -26,7 +25,7 @@ export function FileUploadListPreview({
 }: FileUploadListPreviewProps) {
   return (
     <ItemList
-      className={classNames(
+      className={cn(
         'flex flex-col items-center gap-1 overflow-y-auto',
         className,
       )}
@@ -59,7 +58,7 @@ export function FileUploadListItem({
   return (
     <article
       data-tooltip-id={`${file.id}`}
-      className={classNames(
+      className={cn(
         'flex justify-between gap-2 w-full py-1 px-2 border border-input bg-white hover:bg-muted transition rounded-md cursor-default',
         {
           'text-foreground': file.status !== 'error',
@@ -75,7 +74,7 @@ export function FileUploadListItem({
             {file.file_name}
           </h6>
           <span
-            className={classNames('text-[10px]', {
+            className={cn('text-[10px]', {
               'text-muted-foreground': file.status !== 'error',
               'text-red-500': file.status === 'error',
             })}

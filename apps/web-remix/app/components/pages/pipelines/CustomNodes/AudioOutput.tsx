@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import classNames from 'classnames';
 import { Pause, Play } from 'lucide-react';
 
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
 import { errorToast } from '~/components/toasts/errorToast';
+import { cn } from '~/utils/cn';
 
 interface AudioOutputProps {
   audio?: Blob | string | null;
@@ -72,7 +72,7 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
       <button
         disabled={isDisabled}
         onClick={handleReset}
-        className={classNames('text-xs text-muted-foreground', {
+        className={cn('text-xs text-muted-foreground', {
           'hover:text-foreground': !isDisabled,
           'opacity-50': isDisabled,
         })}
@@ -94,7 +94,7 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
 
         <button
           type="button"
-          className={classNames(
+          className={cn(
             'w-6 h-6 flex items-center justify-center bg-primary rounded-md text-primary-foreground',
             {
               'text-red-500': isPlaying,
@@ -111,7 +111,7 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
           )}
         </button>
         <div
-          className={classNames(
+          className={cn(
             "relative after:absolute after:content-[''] after:w-full after:h-[0.5px] after:bg-primary after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2",
           )}
         >

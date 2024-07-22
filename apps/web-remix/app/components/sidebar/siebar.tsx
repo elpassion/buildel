@@ -6,13 +6,13 @@ import {
   useMemo,
   useState,
 } from 'react';
-import classNames from 'classnames';
 import { ChevronRight } from 'lucide-react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
 //Sidebar copied from Taco
 
 import { IconButton } from '~/components/iconButton';
+import { cn } from '~/utils/cn';
 
 import type {
   CollapseButtonProps,
@@ -120,8 +120,8 @@ export const Sidebar = (props: SidebarProps) => {
     const baseStyles =
       'z-30 h-screen transition-all bg-white border border-neutral-100';
 
-    const tabletStyles = classNames(baseStyles, 'w-[80px]');
-    const desktopStyles = classNames(baseStyles, 'w-[278px]');
+    const tabletStyles = cn(baseStyles, 'w-[80px]');
+    const desktopStyles = cn(baseStyles, 'w-[278px]');
 
     const variantStyles = {
       wide: desktopStyles,
@@ -142,7 +142,7 @@ export const Sidebar = (props: SidebarProps) => {
   return (
     <SidebarContext.Provider value={contextValue}>
       <div
-        className={classNames(sidebarStyles(), className)}
+        className={cn(sidebarStyles(), className)}
         tabIndex={tabIndex}
         aria-expanded={!collapsed}
         data-testid={testId}
@@ -183,7 +183,7 @@ function ToggleButton({
   }
 
   return (
-    <div className={classNames(className)}>
+    <div className={cn(className)}>
       <IconButton
         size="xxs"
         variant="secondary"
@@ -191,7 +191,7 @@ function ToggleButton({
         aria-label={isCollapsed ? collapsedAriaLabel : notCollapsedAriaLabel}
         icon={
           <ChevronRight
-            className={classNames({
+            className={cn({
               'rotate-180': !isCollapsed,
             })}
           />

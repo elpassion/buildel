@@ -1,7 +1,7 @@
 import React from 'react';
-import classNames from 'classnames';
 
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
+import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
 
 import type { IPipelineCost, IPipelineCosts } from '../pipeline.types';
@@ -30,7 +30,7 @@ const LIST_LAYOUT_STYLES =
 export const PipelineRunCostsListHeader = () => {
   return (
     <header
-      className={classNames(
+      className={cn(
         'text-muted-foreground text-xs py-2 px-6',
         LIST_LAYOUT_STYLES,
       )}
@@ -53,7 +53,7 @@ export const PipelineRunCostsItem: React.FC<PipelineRunCostsItemProps> = ({
 }) => {
   return (
     <article
-      className={classNames(
+      className={cn(
         'group bg-muted text-foreground transition rounded-lg py-4 px-6 max-w-full items-center md:gap-2',
         LIST_LAYOUT_STYLES,
       )}

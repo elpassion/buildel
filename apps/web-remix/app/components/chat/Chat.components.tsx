@@ -1,10 +1,10 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
 import type { BuildelRunStatus } from '@buildel/buildel';
-import classNames from 'classnames';
 import { X } from 'lucide-react';
 
 import type { IMessage } from '~/components/chat/chat.types';
+import { cn } from '~/utils/cn';
 
 interface ChatCloseButtonProps {
   onClick: () => void;
@@ -30,10 +30,7 @@ export const ChatHeader: React.FC<PropsWithChildren<ChatHeaderProps>> = ({
 }) => {
   return (
     <header
-      className={classNames(
-        'flex justify-between gap-2 items-center',
-        className,
-      )}
+      className={cn('flex justify-between gap-2 items-center', className)}
     >
       {children}
     </header>
@@ -49,7 +46,7 @@ export const ChatMessagesWrapper: React.FC<
 > = ({ children, className }) => {
   return (
     <div
-      className={classNames(
+      className={cn(
         'w-full border border-input rounded-lg px-2 py-3 grow overflow-hidden',
         className,
       )}
@@ -117,13 +114,13 @@ export const ChatStatus = ({
   return (
     <div
       title={mappedStatusToText}
-      className={classNames(
+      className={cn(
         'py-0.5 px-1 bg-white rounded flex gap-1 items-center',
         className,
       )}
     >
       <div
-        className={classNames('w-[6px] h-[6px] rounded-full ', {
+        className={cn('w-[6px] h-[6px] rounded-full ', {
           'bg-red-500': connectionStatus === 'idle',
           'bg-green-500': connectionStatus === 'running',
           'bg-orange-500': connectionStatus === 'starting',
@@ -147,7 +144,7 @@ export const IntroPanel = ({
 }: PropsWithChildren<IntroPanelProps>) => {
   return (
     <article
-      className={classNames(
+      className={cn(
         'p-4 bg-neutral-900 rounded-xl border border-neutral-800 text-neutral-100 text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2',
         className,
       )}

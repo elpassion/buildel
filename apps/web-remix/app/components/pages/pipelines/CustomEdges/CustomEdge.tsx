@@ -1,13 +1,14 @@
 import { useCallback, useMemo } from 'react';
 import { getBezierPath } from '@xyflow/react';
 import type { EdgeProps } from '@xyflow/react';
-import classNames from 'classnames';
 
 import { useRunPipelineEdge } from '../RunPipelineProvider';
 
 import './customEdges.styles.css';
 
 import { X } from 'lucide-react';
+
+import { cn } from '~/utils/cn';
 
 export interface CustomEdgeProps extends EdgeProps {
   onDelete: (id: string) => void;
@@ -95,7 +96,7 @@ export function CustomEdge({
         <button
           disabled={status !== 'idle' || disabled}
           onClick={handleDelete}
-          className={classNames(
+          className={cn(
             'absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 text-white text-xs flex justify-center items-center bg-red-700 w-4 h-4 rounded-full outline outline-3 outline-red-500/30',
             {
               'opacity-0': status !== 'idle' || disabled,
