@@ -21,8 +21,8 @@ export function HTTPApiPage() {
   const { organizationId, pipelineId, apiUrl } = useLoaderData<typeof loader>();
   return (
     <div>
-      <h2 className="text-lg text-white font-medium">HTTP Api</h2>
-      <p className="text-white text-xs mb-6">
+      <h2 className="text-lg text-foreground font-medium">HTTP Api</h2>
+      <p className="text-muted-foreground text-xs mb-6">
         Access our Buildel API easily with our HTTP Api.
       </p>
 

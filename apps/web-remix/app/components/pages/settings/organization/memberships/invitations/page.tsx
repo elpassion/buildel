@@ -12,6 +12,14 @@ import {
   ActionSidebarHeader,
 } from '~/components/sidebar/ActionSidebar';
 import { Button } from '~/components/ui/button';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import { InvitationsList } from './InvitationsList';
@@ -24,25 +32,27 @@ export function InvitationsPage() {
   const match = useMatch(routes.organizationInvitationsNew(organizationId));
   const isSidebarOpen = !!match;
 
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = (value: boolean) => {
+    if (value) return;
     navigate(routes.organizationInvitations(organizationId));
   };
 
   return (
     <>
-      <ActionSidebar
-        className="!bg-neutral-950"
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
-      >
-        <ActionSidebarHeader
-          heading="Invite user"
-          subheading="Send invitation to your organziation."
-          onClose={handleCloseSidebar}
-        />
-        <Outlet />
-      </ActionSidebar>
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
+        <DialogDrawerContent>
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>Invite user</DialogDrawerTitle>
+            <DialogDrawerDescription>
+              Send invitation to your organziation.
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+
+          <DialogDrawerBody>
+            <Outlet />
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
 
       <div className="flex flex-col gap-4 items-end">
         <Link

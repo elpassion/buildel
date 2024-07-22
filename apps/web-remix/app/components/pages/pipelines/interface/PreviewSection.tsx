@@ -24,14 +24,14 @@ export const PreviewSectionHeader: React.FC<PropsWithChildren> = ({
 export const PreviewSectionHeading: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  return <h3 className="font-medium">{children}</h3>;
+  return <h3 className="font-medium text-foreground">{children}</h3>;
 };
 
 export const PreviewSectionStep: React.FC<PropsWithChildren> = ({
   children,
 }) => {
   return (
-    <div className="bg-neutral-950 border-2 border-secondary-400 rounded-lg w-7 h-7 flex justify-center items-center text-secondary-400 text-xs">
+    <div className="bg-primary border-2 border-primary rounded-lg w-7 h-7 flex justify-center items-center text-primary-foreground text-xs">
       {children}
     </div>
   );
@@ -50,5 +50,5 @@ export const PreviewSectionContent: React.FC<PropsWithChildren> = ({
 export const PreviewSectionText: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  return <p className="text-white text-sm pl-[37px]">{children}</p>;
+  return <p className="text-foreground text-sm pl-[37px]">{children}</p>;
 };

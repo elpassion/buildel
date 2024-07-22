@@ -26,7 +26,7 @@ export const MembershipListItem = ({ membership }: MembershipListItemProps) => {
   return (
     <article
       className={classNames(
-        'group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white text-sm',
+        'group bg-muted px-4 py-4 rounded-lg text-foreground text-sm',
       )}
     >
       {membership.user.email}

@@ -59,7 +59,7 @@ export const InvitationsListItem = ({
   return (
     <article
       className={classNames(
-        'group bg-neutral-800 px-4 py-4 rounded-lg text-basic-white grid grid-cols-[130px_1fr_32px] items-center gap-4 text-sm',
+        'group bg-muted px-4 py-4 rounded-lg text-foreground grid grid-cols-[130px_1fr_32px] items-center gap-4 text-sm',
       )}
     >
       <p>{dayjs(invitation.expires_at).format()}</p>
@@ -68,9 +68,9 @@ export const InvitationsListItem = ({
 
       <IconButton
         size="xxs"
-        variant="ghost"
+        variant="secondary"
+        className="hover:bg-primary hover:text-primary-foreground"
         aria-label={`Delete invitation: ${invitation.email}`}
-        className="group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500 lg:opacity-0"
         title={`Delete invitation: ${invitation.email}`}
         icon={<Trash />}
         onClick={handleDelete}

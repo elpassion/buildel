@@ -32,7 +32,7 @@ export function PipelineLayout() {
           </div>
         }
       />
-      <div className="px-4 md:px-6 lg:px-10">
+      <div className="mt-6 px-4 md:px-6 lg:px-10">
         <TabGroup>
           <FilledTabsWrapper>
             <FilledTabLink
@@ -74,7 +74,9 @@ export function PipelineLayout() {
             </FilledTabLink>
           </FilledTabsWrapper>
 
-          <Outlet />
+          <div className="mt-10">
+            <Outlet />
+          </div>
         </TabGroup>
       </div>
     </>

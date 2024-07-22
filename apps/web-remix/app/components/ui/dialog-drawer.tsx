@@ -156,7 +156,7 @@ const DialogDrawerBody = ({
       )}
       {...props}
     >
-      {children}
+      <div className="px-1">{children}</div>
     </div>
   );
 };

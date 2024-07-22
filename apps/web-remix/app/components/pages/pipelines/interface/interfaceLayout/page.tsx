@@ -15,8 +15,8 @@ export function InterfaceLayout() {
 
   return (
     <div className="pt-5">
-      <div className="mt-5 mb-12">
-        <OutlinedTabsWrapper>
+      <div className="mt-0 mb-12">
+        <OutlinedTabsWrapper className="overflow-x-auto">
           <OutlinedTabLink
             to={routes.pipelineClientSDK(
               organizationId,

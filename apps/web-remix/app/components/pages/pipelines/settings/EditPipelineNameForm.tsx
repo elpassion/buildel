@@ -64,7 +64,7 @@ export function EditPipelineNameForm({
     <>
       <IconButton
         icon={<Edit />}
-        size="xxs"
+        size="sm"
         variant="ghost"
         aria-label="Edit workflow name"
         onClick={openModal}

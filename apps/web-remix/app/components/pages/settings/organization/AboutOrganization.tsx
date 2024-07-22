@@ -38,7 +38,7 @@ export const AboutOrganization: React.FC<AboutOrganizationProps> = ({
 }) => {
   return (
     <Section>
-      <SectionHeading>About Organization</SectionHeading>
+      <SectionHeading className="mb-1">About Organization</SectionHeading>
 
       <SectionContent>
         <OrganizationAvatar name={organization.name} />
@@ -75,7 +75,6 @@ function EditOrganizationName({ organization }: EditOrganizationNameProps) {
       <IconButton
         icon={<Edit />}
         variant="ghost"
-        size="sm"
         aria-label="Edit organization name"
         onClick={openModal}
       />

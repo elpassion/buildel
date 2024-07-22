@@ -215,8 +215,8 @@ export function BulkPage() {
     <div>
       <div className="flex flex-col gap-3 mb-6 md:justify-between md:flex-row md:items-center">
         <div>
-          <h2 className="text-lg text-white font-medium">Bulk</h2>
-          <p className="text-white text-xs">
+          <h2 className="text-lg text-foreground font-medium">Bulk</h2>
+          <p className="text-muted-foreground text-xs">
             Run multiple workflows at once in parallel.
           </p>
         </div>
@@ -250,17 +250,17 @@ export function BulkPage() {
           />
 
           <Button
+            variant="secondary"
             disabled={tests.some((test) => test.status !== 'done')}
             onClick={exportCSV}
-            className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
           >
             Export CSV
           </Button>
 
           <Button
+            variant="secondary"
             disabled={tests.some((test) => test.status === 'running')}
             onClick={handleOnSubmit}
-            className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
           >
             Run bulk
           </Button>

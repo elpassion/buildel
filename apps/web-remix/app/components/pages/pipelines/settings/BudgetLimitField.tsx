@@ -37,7 +37,6 @@ export const BudgetLimitField: React.FC<BudgetLimitFieldProps> = ({
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.valueAsNumber);
     propOnChange?.(e);
     setValue(e.target.valueAsNumber);
   };
@@ -47,16 +46,17 @@ export const BudgetLimitField: React.FC<BudgetLimitFieldProps> = ({
         className="flex gap-2 justify-between items-center mb-2"
         onClick={(e) => e.preventDefault()}
       >
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center mb-1">
           <FieldLabel className="!m-0">{label}</FieldLabel>
           <ToggleInput
+            size="sm"
             checked={value !== null}
             onCheckedChange={onCheck}
             value=""
           />
         </div>
 
-        <p className="text-xs text-neutral-100">
+        <p className="text-xs text-muted-foreground">
           Currently ($): {details.total_cost}
         </p>
       </div>

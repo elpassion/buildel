@@ -39,8 +39,8 @@ export const ApiKey: React.FC<ApiKeyProps> = ({ apiKey }) => {
 
   return (
     <section>
-      <h2 className="text-lg text-white">API Key</h2>
-      <p className="text-xs text-white">
+      <h2 className="text-lg text-foreground">API Key</h2>
+      <p className="text-xs text-muted-foreground">
         This is your workspace API key. It's required in order to use the Sync
         API endpoints and authorize webhooks.
       </p>

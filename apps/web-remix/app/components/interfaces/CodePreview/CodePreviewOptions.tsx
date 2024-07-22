@@ -1,13 +1,14 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
-import type { MenuInfo } from 'rc-menu/es/interface';
-import { ClientOnly } from 'remix-utils/client-only';
-import { useOnClickOutside } from 'usehooks-ts';
 
 import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
 import type { EditorLanguage } from '~/components/editor/CodeMirror/CodeMirror';
-import { MenuClient } from '~/components/menu/Menu.client';
-import { MenuItem } from '~/components/menu/MenuItem';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
 
 import { CodePreviewWrapper } from './CodePreviewWrapper';
 
@@ -25,25 +26,15 @@ export const CodePreviewOptions: React.FC<CodePreviewOptionsProps> = ({
   options,
 }) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [showMenu, setShowMenu] = useState(false);
   const [activeKey, setActiveKey] = useState(options[0].id.toString());
 
-  const handleShow = () => {
-    setShowMenu(true);
-  };
-  const handleClose = () => {
-    setShowMenu(false);
-  };
-  const onChange = (menu: MenuInfo) => {
-    setActiveKey(menu.key);
-    handleClose();
+  const onChange = (value: string) => {
+    setActiveKey(value);
   };
 
   const activeOption = useMemo(() => {
     return options.find((opt) => opt.id.toString() === activeKey);
   }, [activeKey, options]);
-
-  useOnClickOutside(wrapperRef, handleClose);
 
   return (
     <CodePreviewWrapper
@@ -53,33 +44,24 @@ export const CodePreviewOptions: React.FC<CodePreviewOptionsProps> = ({
     >
       {() => (
         <>
-          <div className="relative w-fit" ref={wrapperRef}>
-            <ClientOnly>
-              {() => (
-                <MenuClient
-                  hidden={!showMenu}
-                  activeKey={activeKey}
-                  className="w-[200px] absolute z-10 -top-10 right-0"
-                  onClick={onChange}
-                >
-                  {options.map((option) => {
-                    return (
-                      <MenuItem key={`${option.id}`}>
-                        {option.framework}
-                      </MenuItem>
-                    );
-                  })}
-                </MenuClient>
-              )}
-            </ClientOnly>
-
-            <button
-              onClick={handleShow}
-              className="flex gap-1 items-center text-neutral-300 px-2 py-1 text-sm"
-            >
-              <span>{activeOption?.framework}</span>
-              <ChevronDown className="w-4 h-4" />
-            </button>
+          <div className="relative w-fit mb-1" ref={wrapperRef}>
+            <Select value={activeKey} onValueChange={onChange}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Theme" />
+              </SelectTrigger>
+              <SelectContent>
+                {options.map((option) => {
+                  return (
+                    <SelectItem
+                      value={option.id.toString()}
+                      key={`${option.id}`}
+                    >
+                      {option.framework}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </div>
 
           <CopyCodeButton value={activeOption?.value ?? ''} />

@@ -119,7 +119,9 @@ export function PipelineRunLayout() {
             </Button>
           </div>
 
-          <Outlet />
+          <div className="mt-10">
+            <Outlet />
+          </div>
         </TabGroup>
       </div>
     </div>

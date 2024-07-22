@@ -19,9 +19,12 @@ export const LogsToggleField = forwardRef<
 
   return (
     <div>
-      <div className="flex gap-2" onClick={(e) => e.preventDefault()}>
-        <FieldLabel>{label}</FieldLabel>
-        <ToggleInputField {...props} />
+      <div
+        className="flex gap-2 items-center mb-1"
+        onClick={(e) => e.preventDefault()}
+      >
+        <FieldLabel className="mb-0">{label}</FieldLabel>
+        <ToggleInputField size="sm" {...props} />
       </div>
 
       <FieldMessage className="!mt-0" error={error}>

@@ -22,31 +22,35 @@ export function ChangePasswordPage() {
       noValidate
       className="w-full grow flex flex-col gap-2 h-[70%]"
     >
-      <div className="max-w-s w-full grow overflow-y-auto p-1">
-        <Field name="current_password">
-          <FieldLabel>Current password</FieldLabel>
-          <TextInputField type="password" autoFocus />
-          <FieldMessage />
-        </Field>
-        <Field name="password">
-          <FieldLabel>New password</FieldLabel>
-          <TextInputField type="password" />
-          <FieldMessage />
-        </Field>
-        <Field name="password_confirmation">
-          <FieldLabel>Confirm password</FieldLabel>
-          <TextInputField type="password" />
-          <FieldMessage />
-        </Field>
+      <div className="max-w-s w-full grow overflow-y-auto p-1 flex flex-col gap-4">
+        <div>
+          <Field name="current_password">
+            <FieldLabel>Current password</FieldLabel>
+            <TextInputField type="password" autoFocus />
+            <FieldMessage />
+          </Field>
+        </div>
+        <div>
+          <Field name="password">
+            <FieldLabel>New password</FieldLabel>
+            <TextInputField type="password" />
+            <FieldMessage />
+          </Field>
+        </div>
+        <div>
+          <Field name="password_confirmation">
+            <FieldLabel>Confirm password</FieldLabel>
+            <TextInputField type="password" />
+            <FieldMessage />
+          </Field>
+        </div>
       </div>
-      <Section>
-        <SectionContent>
-          <p className="text-red-500">
-            This operation will log out all your currently logged in devices
-            with this one included.
-          </p>
-        </SectionContent>
-      </Section>
+
+      <p className="text-red-500 text-sm">
+        This operation will log out all your currently logged in devices with
+        this one included.
+      </p>
+
       <SubmitButton size="sm">Change password</SubmitButton>
     </ValidatedForm>
   );
