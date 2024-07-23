@@ -112,9 +112,10 @@ function getNodeHeaderStyles(type: string) {
     case 'text_output':
     case 'text_input':
     case 'collect_all_text':
+      return 'bg-zinc-200 text-foreground';
     case 'file_output':
     case 'file_input':
-      return 'bg-zinc-200 text-foreground';
+      return 'bg-slate-200 text-foreground';
     case 'document_search':
     case 'document_tool':
     case 'csv_search':
