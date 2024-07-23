@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 import startCase from 'lodash.startcase';
 
@@ -92,47 +91,34 @@ function NodeReadonlyItem({ properties, id, data }: NodeReadonlyItemProps) {
       />
     );
   }
-
+  const isEditor = properties.presentAs === 'editor';
   return (
-    <NodeReadonlyStringItem
+    <NodeReadonlyItemWrapper
       className={cn({
-        'border-t border-input pt-2': properties.presentAs === 'editor',
+        'border-t border-input pt-2': isEditor,
       })}
-      value={data[id]}
-      label={id}
-    />
+      show={!!data[id]}
+    >
+      <NodeReadonlyItemTitle>{startCase(id)}</NodeReadonlyItemTitle>
+      <NodeReadonlyItemValue className={cn({ 'line-clamp-2': isEditor })}>
+        {data[id]}
+      </NodeReadonlyItemValue>
+    </NodeReadonlyItemWrapper>
   );
 }
 
-interface NodeReadonlyStringProps {
-  label: string;
-  value: ReactNode;
-  className?: string;
-}
-function NodeReadonlyStringItem({
-  value,
-  label,
-  className,
-}: NodeReadonlyStringProps) {
-  if (!value) return;
-  return (
-    <div className={cn('flex flex-col', className)}>
-      <span className="text-xs text-muted-foreground">{startCase(label)}</span>
-      <p className="text-sm text-foreground line-clamp-2 break-all">{value}</p>
-    </div>
-  );
-}
-
-interface NodeReadonlyAsyncItemProps extends NodeReadonlyStringProps {
+interface NodeReadonlyAsyncItemProps {
   url: string;
+  value: string;
   context: Record<string, any>;
+  label: string;
 }
 
 function NodeReadonlyAsyncItem({
   url,
   value,
   context,
-  ...rest
+  label,
 }: NodeReadonlyAsyncItemProps) {
   const organizationId = useOrganizationId();
   const pipelineId = usePipelineId();
@@ -164,7 +150,56 @@ function NodeReadonlyAsyncItem({
     });
   }, [url, value]);
 
-  return <NodeReadonlyStringItem value={finalValue} {...rest} />;
+  return (
+    <NodeReadonlyItemWrapper show={!!finalValue}>
+      <NodeReadonlyItemTitle>{startCase(label)}</NodeReadonlyItemTitle>
+      <NodeReadonlyItemValue>{finalValue}</NodeReadonlyItemValue>
+    </NodeReadonlyItemWrapper>
+  );
+}
+
+function NodeReadonlyItemWrapper({
+  className,
+  children,
+  show,
+  ...rest
+}: React.HTMLAttributes<HTMLDivElement> & { show?: boolean }) {
+  if (!show) return;
+  return (
+    <div className={cn('flex flex-col', className)} {...rest}>
+      {children}
+    </div>
+  );
+}
+
+function NodeReadonlyItemTitle({
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className={cn('text-xs text-muted-foreground', className)} {...rest}>
+      {children}
+    </span>
+  );
+}
+
+function NodeReadonlyItemValue({
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  return (
+    <p
+      className={cn(
+        'text-sm text-foreground line-clamp-1 break-all',
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </p>
+  );
 }
 
 const isObjectField = (
