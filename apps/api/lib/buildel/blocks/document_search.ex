@@ -50,6 +50,7 @@ defmodule Buildel.Blocks.DocumentSearch do
               Jason.OrderedObject.new(
                 knowledge:
                   memory_schema(%{
+                    "readonly" => true,
                     "title" => "Knowledge",
                     "description" => "The knowledge to use for retrieval.",
                     "default" => ""

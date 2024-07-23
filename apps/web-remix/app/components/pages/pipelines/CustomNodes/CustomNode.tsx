@@ -3,6 +3,8 @@ import React, { useCallback, useMemo } from 'react';
 import startCase from 'lodash.startcase';
 import { AlertCircle } from 'lucide-react';
 
+import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
+import { NodeReadonlyFields } from '~/components/pages/pipelines/CustomNodes/NodeReadonlyFields';
 import { Badge } from '~/components/ui/badge';
 import { cn } from '~/utils/cn';
 
@@ -145,6 +147,11 @@ export function CustomNodeBody({
 
   return (
     <div className="p-2 nodrag">
+      <NodeReadonlyFields
+        schema={data.block_type?.schema as JSONSchemaField}
+        data={data.opts}
+      />
+
       {inputsFields.length > 0 ? (
         <NodeFieldsForm
           block={data}

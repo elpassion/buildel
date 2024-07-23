@@ -158,12 +158,14 @@ export function generateZODSchema(
   return z.any();
 }
 
+export type JSONSchemaObjectField = {
+  type: 'object';
+  properties: { [key: string]: JSONSchemaField };
+  required?: string[];
+};
+
 export type JSONSchemaField =
-  | {
-      type: 'object';
-      properties: { [key: string]: JSONSchemaField };
-      required?: string[];
-    }
+  | JSONSchemaObjectField
   | {
       type: 'string';
       title: string;
@@ -175,6 +177,7 @@ export type JSONSchemaField =
         pattern: string;
         errorMessage: string;
       };
+      readonly?: boolean;
       defaultWhen?: Record<string, Record<string, string>>;
     }
   | {
@@ -195,6 +198,7 @@ export type JSONSchemaField =
       minLength?: number;
       maxLength?: number;
       default?: string;
+      readonly?: boolean;
     }
   | {
       type: 'string';
@@ -205,6 +209,7 @@ export type JSONSchemaField =
       enum: string[];
       enumPresentAs: 'checkbox' | 'radio';
       default?: string;
+      readonly?: boolean;
     }
   | {
       type: 'string';
@@ -222,6 +227,7 @@ export type JSONSchemaField =
       url: string;
       default?: string;
       schema: JSONSchemaField;
+      readonly?: boolean;
     }
   | {
       type: 'number' | 'integer';
@@ -231,6 +237,7 @@ export type JSONSchemaField =
       maximum?: number;
       step?: number;
       default?: number;
+      readonly?: boolean;
     }
   | {
       type: 'array';

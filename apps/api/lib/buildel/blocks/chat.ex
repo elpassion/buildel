@@ -71,7 +71,8 @@ defmodule Buildel.Blocks.Chat do
                   "description" => "The API type to use for the chat.",
                   "enum" => ["openai", "azure", "google", "mistral"],
                   "enumPresentAs" => "radio",
-                  "default" => "openai"
+                  "default" => "openai",
+                  "readonly" => true,
                 },
                 endpoint: %{
                   "type" => "string",
@@ -86,7 +87,7 @@ defmodule Buildel.Blocks.Chat do
                       "mistral" => "https://api.mistral.ai/v1"
                     }
                   },
-                  "minLength" => 1
+                  "minLength" => 1,
                 },
                 model: %{
                   "type" => "string",
@@ -95,7 +96,8 @@ defmodule Buildel.Blocks.Chat do
                   "url" =>
                     "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
                   "presentAs" => "async-select",
-                  "minLength" => 1
+                  "minLength" => 1,
+                  "readonly" => true,
                 },
                 chat_memory_type: %{
                   "type" => "string",
@@ -113,7 +115,8 @@ defmodule Buildel.Blocks.Chat do
                   "default" => 0.7,
                   "minimum" => 0.0,
                   "maximum" => 2.0,
-                  "step" => 0.1
+                  "step" => 0.1,
+                  "readonly" => true,
                 },
                 response_format: %{
                   "type" => "string",
@@ -130,6 +133,7 @@ defmodule Buildel.Blocks.Chat do
                   }),
                 system_message:
                   EditorField.new(%{
+                    readonly:  true,
                     title: "System message",
                     description: "The message to start the conversation with.",
                     minLength: 1,

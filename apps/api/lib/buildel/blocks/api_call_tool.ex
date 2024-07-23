@@ -38,14 +38,16 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "description" => "The HTTP method to use for the request.",
                   "enum" => ["GET", "POST", "PUT", "PATCH", "DELETE"],
                   "enumPresentAs" => "radio",
-                  "default" => "GET"
+                  "default" => "GET",
+                  "readonly" => true
                 },
                 url: %{
                   "type" => "string",
                   "title" => "URL",
                   "description" =>
                     "The URL to send the request to. If you want to use a variable, use `{{variable_name}}`. Notice the double curly braces!",
-                  "minLength" => 1
+                  "minLength" => 1,
+                  "readonly" => true,
                 },
                 description: %{
                   "type" => "string",

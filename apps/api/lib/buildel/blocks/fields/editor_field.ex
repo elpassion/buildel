@@ -51,6 +51,7 @@ defmodule Buildel.Blocks.Fields.EditorField do
     field :description, :string
     field :default, :string
     field :min_length, :integer, default: 0
+    field :readonly, :boolean, default: false
     field :editor_language, Ecto.Enum, default: :custom, values: ~w(json custom)a
 
     field :suggestions, {:array, :map},
@@ -72,7 +73,8 @@ defmodule Buildel.Blocks.Fields.EditorField do
           description: field.description,
           default: field.default,
           min_length: field.min_length,
-          suggestions: field.suggestions
+          suggestions: field.suggestions,
+          readonly: field.readonly
         },
         opts
       )
@@ -83,7 +85,7 @@ defmodule Buildel.Blocks.Fields.EditorField do
 
   @type t :: %EditorField{}
 
-  @create_fields ~w(title description default min_length editor_language suggestions)a
+  @create_fields ~w(title description default min_length editor_language suggestions readonly)a
   @required_fields ~w(title description)a
 
   @spec new(attrs :: map()) :: t

@@ -366,16 +366,18 @@ defmodule Buildel.Blocks.Block do
       end
 
       defp memory_schema(
-             %{"default" => default, "title" => title, "description" => description} \\ %{
+             %{"default" => default, "title" => title, "description" => description, "readonly" => readonly} \\ %{
                "default" => "{{pipeline_id}}_{{block_name}}",
                "title" => "Persist in",
-               "description" => "Memory collection to use."
+               "description" => "Memory collection to use.",
+               "readonly" => false
              }
            ) do
         %{
           "type" => "string",
           "title" => title,
           "description" => description,
+          "readonly" => readonly,
           "url" => "/api/organizations/{{organization_id}}/memory_collections",
           "presentAs" => "async-creatable-select",
           "schema" => %{
