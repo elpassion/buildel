@@ -192,7 +192,7 @@ export function CreatableAsyncForm({
     <ValidatedForm
       // @ts-ignore
       validator={validator}
-      className="w-full grow flex flex-col"
+      className="w-full grow flex flex-col space-y-4"
       onSubmit={onCreate}
       onChange={(e: any) => {
         setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));

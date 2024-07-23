@@ -293,7 +293,7 @@ export function EditBlockForm({
         connections={connections}
         updateInputReset={updateInputReset}
       >
-        <div className="space-y-4 grow">
+        <div className="space-y-5 grow">
           <div className="flex justify-end">
             <CopyConfigurationButton
               value={JSON.stringify({

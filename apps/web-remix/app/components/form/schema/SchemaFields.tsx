@@ -97,23 +97,24 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
   if (field.enumPresentAs === 'radio') {
     return (
       <FormField name={name}>
-        <div className="space-y-3">
-          <FieldLabel htmlFor={name}>{field.title}</FieldLabel>
+        <FieldLabel className="mb-1" htmlFor={name}>
+          {field.title}
+        </FieldLabel>
+        <FieldMessage className="mt-0 mb-3" error={error}>
+          {field.description}
+        </FieldMessage>
+        <RadioGroupField defaultValue={field.default}>
+          {field.enum.map((value) => (
+            <Label
+              key={value}
+              className="flex gap-1 items-center text-muted-foreground"
+            >
+              <RadioField id={value} value={value} />
 
-          <RadioGroupField defaultValue={field.default}>
-            {field.enum.map((value) => (
-              <Label
-                key={value}
-                className="flex gap-1 items-center text-muted-foreground"
-              >
-                <RadioField id={value} value={value} />
-
-                <span>{value}</span>
-              </Label>
-            ))}
-          </RadioGroupField>
-          <FieldMessage error={error} />
-        </div>
+              <span>{value}</span>
+            </Label>
+          ))}
+        </RadioGroupField>
       </FormField>
     );
   }
@@ -153,7 +154,7 @@ export function NumberField({ field, name }: FieldProps) {
         defaultValue={field.default}
         step={field.step}
       />
-      <FieldMessage error={error} />
+      <FieldMessage error={error}>{field.description}</FieldMessage>
     </FormField>
   );
 }
