@@ -5,6 +5,7 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateOrganizationSchema } from '~/api/organization/organization.contracts';
 import { Field } from '~/components/form/fields/field.context';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 
@@ -13,10 +14,10 @@ export function NewOrganizationPage() {
 
   return (
     <div className="min-h-screen w-full flex justify-center items-center p-2">
-      <div className="bg-neutral-850 w-full max-w-lg rounded-lg p-6 sm:p-10 md:p-14">
-        <div className="flex flex-col gap-2 text-white mb-8">
-          <h1 className="text-xl font-medium">Name your organisation</h1>
-          <p className="text-sm">
+      <div className="w-full max-w-lg rounded-lg text-center">
+        <div className="flex flex-col gap-2 mb-8">
+          <h1 className="text-2xl font-bold  ">Name your organisation</h1>
+          <p className="text-base text-muted-foreground">
             You will be able to work in multiple organisations.
           </p>
         </div>
@@ -28,13 +29,11 @@ export function NewOrganizationPage() {
         >
           <div className="max-w-s form-control w-full">
             <Field name="organization.name">
-              <TextInputField
-                placeholder="Name"
-                supportingText="This will be visible only to you"
-              />
+              <TextInputField placeholder="Type organization’s name" />
+              <FieldMessage>This will be visible only to you</FieldMessage>
             </Field>
           </div>
-          <SubmitButton size="lg" className="mt-8 mx-auto">
+          <SubmitButton size="lg" className="mt-14 mx-auto">
             Create organisation
           </SubmitButton>
         </ValidatedForm>

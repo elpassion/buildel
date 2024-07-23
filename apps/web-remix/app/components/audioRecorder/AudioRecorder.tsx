@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { CirclePause, Mic } from 'lucide-react';
 
 import type {
   UseAudioRecorderCb,
@@ -8,6 +7,7 @@ import type {
 } from '~/components/audioRecorder/useAudioRecorder';
 import { useAudioRecorder } from '~/components/audioRecorder/useAudioRecorder';
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
+import { cn } from '~/utils/cn';
 
 export type MediaRecorderState = 'inactive' | 'recording';
 
@@ -80,9 +80,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   });
 
   const ButtonIcon = useCallback(() => {
-    if (status === 'recording') return <Icon iconName="pause" size="xs" />;
+    if (status === 'recording') return <CirclePause className="w-4 h-4" />;
 
-    return <Icon iconName="mic" size="xs" />;
+    return <Mic className="w-4 h-4" />;
   }, [status]);
 
   const handleRecord = useCallback(async () => {
@@ -95,19 +95,19 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   }, [status, stop, handleClear, start]);
 
   return (
-    <div className="flex gap-2 items-center bg-neutral-850 rounded-lg w-fit px-2 py-1">
+    <div className="flex gap-2 items-center bg-muted rounded-lg w-fit px-2 py-1">
       <audio key={audioUrl} src={audioUrl} ref={audioRef} controls hidden />
 
       <button
         disabled={disabled}
         type="button"
-        className={classNames(
-          'w-6 h-6 flex items-center justify-center bg-neutral-500 rounded-md ',
+        className={cn(
+          'w-6 h-6 flex items-center justify-center bg-primary rounded-md ',
           {
-            'text-neutral-50': status !== 'recording',
-            'text-red-400': status === 'recording',
-            'bg-neutral-500 hover:bg-neutral-400': !disabled,
-            'bg-neutral-700 !text-neutral-400': disabled,
+            'text-primary-foreground': status !== 'recording',
+            'text-red-500': status === 'recording',
+            'hover:bg-primary/90': !disabled,
+            'opacity-50': disabled,
           },
         )}
         onClick={handleRecord}
@@ -116,8 +116,8 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       </button>
 
       <div
-        className={classNames(
-          'relative after:absolute after:w-full after:h-[1px] after:bg-neutral-400 after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2',
+        className={cn(
+          'relative after:absolute after:w-full after:h-[0.5px] after:bg-primary after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2',
           {
             "after:content-['']": status === 'inactive',
             'after:content-none': status !== 'inactive',

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
+import { FileText } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 import { z } from 'zod';
 
@@ -24,7 +24,7 @@ export const Metadata = () => {
     <Dropdown>
       <MetadataTrigger />
 
-      <DropdownPopup className="min-w-[250px] z-[11] bg-neutral-850 border border-neutral-800 rounded-lg overflow-hidden p-2 lg:min-w-[350px]">
+      <DropdownPopup className="min-w-[250px] z-[11] bg-white border border-input rounded-lg overflow-hidden p-2 lg:min-w-[350px]">
         <MetadataForm
           defaultValue={JSON.stringify(metadata)}
           onSubmit={setMetadata}
@@ -38,9 +38,10 @@ function MetadataTrigger() {
   return (
     <DropdownTrigger
       aria-label="Open metadata editor"
-      className="bg-neutral-950 text-neutral-100 w-8 h-8 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition"
+      className="w-8 h-8 p-0"
+      variant="default"
     >
-      <Icon iconName="file-text" />
+      <FileText className="w-4 h-4" />
     </DropdownTrigger>
   );
 }
@@ -102,8 +103,10 @@ function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
         />
       </Field>
 
-      <div className="flex justify-end w-full">
-        <SubmitButton size="xs">Set</SubmitButton>
+      <div className="flex justify-end w-full mt-2">
+        <SubmitButton size="xs" isFluid>
+          Set
+        </SubmitButton>
       </div>
     </ValidatedForm>
   );

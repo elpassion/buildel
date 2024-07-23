@@ -1,3 +1,4 @@
+import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import {
   Link,
@@ -6,12 +7,15 @@ import {
   useMatch,
   useNavigate,
 } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
 
+import { Button } from '~/components/ui/button';
 import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from '~/components/sidebar/ActionSidebar';
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import {
@@ -32,18 +36,18 @@ export function ProfileSettingsPage() {
   };
   return (
     <>
-      <ActionSidebar
-        className="!bg-neutral-950"
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
-      >
-        <ActionSidebarHeader
-          heading="Change password"
-          onClose={handleCloseSidebar}
-        />
-        <Outlet />
-      </ActionSidebar>
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
+        <DialogDrawerContent>
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>Change password</DialogDrawerTitle>
+          </DialogDrawerHeader>
+
+          <DialogDrawerBody>
+            <Outlet />
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
+
       <div className="flex flex-col gap-9">
         <Section>
           <SectionHeading>Password</SectionHeading>

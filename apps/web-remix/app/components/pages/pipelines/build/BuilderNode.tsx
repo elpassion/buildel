@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
+import { Settings, Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { confirm } from '~/components/modal/confirm';
@@ -54,7 +54,7 @@ function BuilderNodeHeaderActions({
     confirm({
       onConfirm: async () => onDelete(data),
       children: (
-        <p className="text-white">
+        <p className="text-sm">
           You are about to delete the "{data.name}" block from your workflow.
           This action is irreversible.
         </p>
@@ -74,7 +74,7 @@ function BuilderNodeHeaderActions({
   }, [data, searchParams]);
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-1 items-center">
       {/*<div className="w-4 h-[22px]">*/}
       {/*  <CopyCodeButton*/}
       {/*    value={JSON.stringify({*/}
@@ -86,17 +86,17 @@ function BuilderNodeHeaderActions({
       {/*</div>*/}
 
       <IconButton
-        onlyIcon
-        icon={<Icon iconName="settings" />}
+        size="xxs"
+        icon={<Settings />}
         aria-label={`Edit block: ${data.name}`}
         onClick={handleEdit}
         disabled={runStatus !== 'idle'}
       />
 
       <IconButton
-        onlyIcon
+        size="xxs"
         aria-label={`Delete block: ${data.name}`}
-        icon={<Icon iconName="trash" />}
+        icon={<Trash />}
         onClick={handleDelete}
         disabled={runStatus !== 'idle' || disabled}
       />

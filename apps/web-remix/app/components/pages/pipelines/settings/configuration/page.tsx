@@ -28,7 +28,6 @@ export function SettingsConfigurationPage() {
   const updateFetcher = useFetcher<IPipeline>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
   const handleUpdatePipeline = useCallback(
     (pipeline: IPipeline) => {
       updateFetcher.submit(pipeline, {
@@ -132,9 +131,8 @@ export function SettingsConfigurationPage() {
       <SubmitButton
         isFluid
         size="sm"
-        variant="filled"
         className="mt-6"
-        ariaLabel="Save configuration"
+        aria-label="Save configuration"
       >
         Save
       </SubmitButton>

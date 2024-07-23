@@ -1,9 +1,10 @@
 import React from 'react';
-import classNames from 'classnames';
 import RcMenu from 'rc-menu';
 import type { MenuProps } from 'rc-menu';
 
 import 'rc-menu/assets/index.css';
+
+import { cn } from '~/utils/cn';
 
 export const MenuClient: React.FC<MenuProps> = ({
   className,
@@ -12,8 +13,8 @@ export const MenuClient: React.FC<MenuProps> = ({
 }) => {
   return (
     <RcMenu
-      className={classNames(
-        'border border-neutral-100 bg-neutral-700 !rounded-lg !shadow-none !p-0 overflow-hidden divide-y divide-solid',
+      className={cn(
+        'border border-input bg-white !rounded-xl !shadow-none !p-1 overflow-hidden',
         className,
       )}
       {...rest}

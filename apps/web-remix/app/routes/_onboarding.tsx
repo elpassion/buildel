@@ -11,7 +11,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Layout() {
   return (
-    <div id="_root" className="bg-neutral-950 min-h-screen w-full">
+    <div id="_root" className="bg-white min-h-screen w-full text-foreground">
       <Outlet />
     </div>
   );

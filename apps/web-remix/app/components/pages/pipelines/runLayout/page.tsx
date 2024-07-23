@@ -1,20 +1,21 @@
 import React, { useEffect } from 'react';
 import {
-  Link,
   Outlet,
   useFetcher,
   useLoaderData,
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import { Button, Icon } from '@elpassion/taco';
+import { ChevronLeft } from 'lucide-react';
 
 import { confirm } from '~/components/modal/confirm';
-import { AppNavbar } from '~/components/navbar/AppNavbar';
+import { PipelineLayoutHeader } from '~/components/pages/pipelines/PipelineLayoutHeader';
 import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
 import { TabGroup } from '~/components/tabs/TabGroup';
 import { successToast } from '~/components/toasts/successToast';
+import { Button } from '~/components/ui/button';
+import { useServerToasts } from '~/hooks/useServerToasts';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -23,8 +24,10 @@ export function PipelineRunLayout() {
   const navigate = useNavigate();
   const fetcher = useFetcher();
   const [searchParams] = useSearchParams();
-  const { pipeline, pipelineRun, runId, pipelineId, organizationId } =
+  const { toasts, pipeline, pipelineRun, runId, pipelineId, organizationId } =
     useLoaderData<typeof loader>();
+
+  useServerToasts(toasts);
 
   const handleRestoreRun = () => {
     confirm({
@@ -39,12 +42,16 @@ export function PipelineRunLayout() {
         ),
       confirmText: 'Restore Run',
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to restore pipeline run configuration. This action is
           irreversible.
         </p>
       ),
     });
+  };
+
+  const backToOverview = () => {
+    navigate(routes.pipelineRuns(organizationId, pipelineId));
   };
 
   useEffect(() => {
@@ -55,77 +62,60 @@ export function PipelineRunLayout() {
   }, [fetcher]);
 
   return (
-    <div>
-      <AppNavbar
-        leftContent={
-          <div className="flex gap-2 text-white">
-            <Link
-              to={routes.pipelineRuns(
+    <TabGroup>
+      <PipelineLayoutHeader>
+        <div className="flex gap-2 items-center">
+          <Button
+            variant="secondary"
+            size="xs"
+            onClick={backToOverview}
+            className="flex gap-2 items-center max-w-[250px]"
+          >
+            <ChevronLeft className="min-w-5 w-4 h-4 flex-shrink-0" />
+            <span className="truncate">{pipeline.name}</span>
+          </Button>
+
+          <FilledTabsWrapper size="xs">
+            <FilledTabLink
+              end
+              to={routes.pipelineRun(
                 organizationId,
                 pipelineId,
+                runId,
                 Object.fromEntries(searchParams.entries()),
               )}
             >
-              <Icon iconName="arrow-left" className="text-2xl" />
-            </Link>
-            <div>
-              <h2 className="text-2xl font-medium">Run history</h2>
-              <h1 className="text-sm font-medium">{pipeline.name}</h1>
-            </div>
-          </div>
-        }
-      />
-
-      <div className="px-4 md:px-6 lg:px-10">
-        <TabGroup>
-          <div className="flex justify-between items-center">
-            <FilledTabsWrapper>
-              <FilledTabLink
-                end
-                to={routes.pipelineRun(
-                  organizationId,
-                  pipelineId,
-                  runId,
-                  Object.fromEntries(searchParams.entries()),
-                )}
-              >
-                Overview
-              </FilledTabLink>
-              <FilledTabLink
-                to={routes.pipelineRunCosts(
-                  organizationId,
-                  pipelineId,
-                  runId,
-                  Object.fromEntries(searchParams.entries()),
-                )}
-              >
-                Costs details
-              </FilledTabLink>
-              <FilledTabLink
-                to={routes.pipelineRunLogs(
-                  organizationId,
-                  pipelineId,
-                  runId,
-                  Object.fromEntries(searchParams.entries()),
-                )}
-              >
-                Logs
-              </FilledTabLink>
-            </FilledTabsWrapper>
-
-            <Button
-              size="xs"
-              hierarchy="primary"
-              variant="outlined"
-              onClick={handleRestoreRun}
+              Overview
+            </FilledTabLink>
+            <FilledTabLink
+              to={routes.pipelineRunCosts(
+                organizationId,
+                pipelineId,
+                runId,
+                Object.fromEntries(searchParams.entries()),
+              )}
             >
-              Convert as latest
-            </Button>
-          </div>
+              Costs details
+            </FilledTabLink>
+            <FilledTabLink
+              to={routes.pipelineRunLogs(
+                organizationId,
+                pipelineId,
+                runId,
+                Object.fromEntries(searchParams.entries()),
+              )}
+            >
+              Logs
+            </FilledTabLink>
+          </FilledTabsWrapper>
+        </div>
 
-          <Outlet />
-        </TabGroup>
-      </div>
-    </div>
+        <Button size="xs" onClick={handleRestoreRun} className="w-fit">
+          Convert as latest
+        </Button>
+      </PipelineLayoutHeader>
+
+      <Outlet />
+    </TabGroup>
   );
 }

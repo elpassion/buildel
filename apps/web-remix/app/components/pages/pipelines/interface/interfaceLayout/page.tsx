@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, useLoaderData, useSearchParams } from '@remix-run/react';
 
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import {
   OutlinedTabLink,
   OutlinedTabsWrapper,
@@ -14,9 +15,9 @@ export function InterfaceLayout() {
   const [searchParams] = useSearchParams();
 
   return (
-    <div className="pt-5">
-      <div className="mt-5 mb-12">
-        <OutlinedTabsWrapper>
+    <PageContentWrapper className="py-10">
+      <div className="mt-0 mb-12">
+        <OutlinedTabsWrapper className="overflow-x-auto">
           <OutlinedTabLink
             to={routes.pipelineClientSDK(
               organizationId,
@@ -80,6 +81,6 @@ export function InterfaceLayout() {
       </div>
 
       <Outlet />
-    </div>
+    </PageContentWrapper>
   );
 }

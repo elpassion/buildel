@@ -1,10 +1,10 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
 import type { BuildelRunStatus } from '@buildel/buildel';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { X } from 'lucide-react';
 
 import type { IMessage } from '~/components/chat/chat.types';
+import { cn } from '~/utils/cn';
 
 interface ChatCloseButtonProps {
   onClick: () => void;
@@ -15,7 +15,7 @@ export const ChatCloseButton: React.FC<ChatCloseButtonProps> = ({
 }) => {
   return (
     <button onClick={onClick} className="text-neutral-200 hover:text-white">
-      <Icon iconName="x" />
+      <X className="w-5 h-5" />
     </button>
   );
 };
@@ -30,10 +30,7 @@ export const ChatHeader: React.FC<PropsWithChildren<ChatHeaderProps>> = ({
 }) => {
   return (
     <header
-      className={classNames(
-        'flex justify-between gap-2 items-center',
-        className,
-      )}
+      className={cn('flex justify-between gap-2 items-center', className)}
     >
       {children}
     </header>
@@ -49,8 +46,8 @@ export const ChatMessagesWrapper: React.FC<
 > = ({ children, className }) => {
   return (
     <div
-      className={classNames(
-        'w-full border border-neutral-800 rounded-lg px-2 py-3 grow overflow-hidden',
+      className={cn(
+        'w-full border border-input rounded-lg px-2 py-3 grow overflow-hidden',
         className,
       )}
     >
@@ -85,7 +82,7 @@ export const ChatGeneratingAnimation = ({
   if (!isGenerating) return null;
   return (
     <div className="flex gap-0.5 items-center">
-      <span className="text-[10px] text-neutral-400 mr-1">
+      <span className="text-[10px] text-muted-foreground mr-1">
         {renderMessage()}
       </span>
       <div className="w-1 h-1 rounded-full bg-secondary-400 animate-bounce" />
@@ -117,20 +114,22 @@ export const ChatStatus = ({
   return (
     <div
       title={mappedStatusToText}
-      className={classNames(
-        'py-0.5 px-1 bg-neutral-800 rounded flex gap-1 items-center',
+      className={cn(
+        'py-0.5 px-1 bg-white rounded flex gap-1 items-center',
         className,
       )}
     >
       <div
-        className={classNames('w-[6px] h-[6px] rounded-full', {
+        className={cn('w-[6px] h-[6px] rounded-full ', {
           'bg-red-500': connectionStatus === 'idle',
           'bg-green-500': connectionStatus === 'running',
           'bg-orange-500': connectionStatus === 'starting',
         })}
       />
 
-      <span className="text-xs text-neutral-400">{mappedStatusToText}</span>
+      <span className="text-xs text-muted-foreground">
+        {mappedStatusToText}
+      </span>
     </div>
   );
 };
@@ -145,8 +144,8 @@ export const IntroPanel = ({
 }: PropsWithChildren<IntroPanelProps>) => {
   return (
     <article
-      className={classNames(
-        'p-4 bg-neutral-900 rounded-xl border border-neutral-800 text-neutral-100 text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2',
+      className={cn(
+        'p-4 bg-neutral-white rounded-xl border border-input text-foreground text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2',
         className,
       )}
     >

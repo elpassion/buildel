@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import {
@@ -9,26 +10,40 @@ import {
   useLoaderData,
   useNavigate,
 } from '@remix-run/react';
-import { Avatar, Button, Icon, IconButton } from '@elpassion/taco';
-import classNames from 'classnames';
-import type { MenuInfo } from 'rc-menu/es/interface';
+import {
+  Briefcase,
+  ChevronDown,
+  Key,
+  Layers,
+  LogOut,
+  Settings,
+} from 'lucide-react';
 import { ClientOnly } from 'remix-utils/client-only';
 import invariant from 'tiny-invariant';
-import { useOnClickOutside } from 'usehooks-ts';
 
 import { OrganizationApi } from '~/api/organization/OrganizationApi';
-import { MenuClient } from '~/components/menu/Menu.client';
-import { MenuItem } from '~/components/menu/MenuItem';
-import { PageOverlay } from '~/components/overlay/PageOverlay';
+import {
+  Dropdown,
+  DropdownPopup,
+  DropdownTrigger,
+} from '~/components/dropdown/Dropdown';
+import { IconButton } from '~/components/iconButton';
 import {
   NavMobileSidebar,
   NavSidebar,
   NavSidebarContext,
   SidebarLink,
 } from '~/components/sidebar/NavSidebar';
+import { Avatar, AvatarFallback } from '~/components/ui/avatar';
+import { Button } from '~/components/ui/button';
+import {
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '~/components/ui/dropdown-menu';
 import { useServerToasts } from '~/hooks/useServerToasts';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
+import { cn } from '~/utils/cn';
 import { getCurrentUser } from '~/utils/currentUser.server';
 import { routes } from '~/utils/routes.utils';
 import { getServerToast, setOrganizationId } from '~/utils/toast.server';
@@ -95,7 +110,15 @@ export default function Layout() {
   }, []);
 
   return (
-    <div id="_root" className="grid h-screen grid-cols-[auto_1fr]">
+    <div id="_root" className="grid h-screen grid-cols-[auto_1fr] ">
+      <div className="bg-blue-500 z-0 h-[170px] fixed top-0 left-0 right-0 overflow-hidden">
+        <img
+          src="/bacgkround-blur.png"
+          alt="background"
+          className="object-cover bg-no-repeat h-full w-full"
+        />
+      </div>
+
       <NavSidebarContext.Provider
         value={{
           collapsed,
@@ -119,7 +142,7 @@ export default function Layout() {
           <SidebarMainContent />
         </NavMobileSidebar>
 
-        <main className="col-span-2 flex min-h-screen flex-col overflow-x-auto pb-5 lg:col-auto">
+        <main className="relative col-span-2 flex min-h-screen flex-col overflow-x-auto pb-5 lg:col-auto">
           <Outlet />
         </main>
       </NavSidebarContext.Provider>
@@ -136,43 +159,31 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
 
   return (
     <SidebarContentWrapper
-      className={classNames(
-        'gap-2 mt-2 transition-all justify-between h-[calc(100%-8px)]',
+      className={cn(
+        'gap-2 mt-4 mb-3 transition-all justify-between h-[calc(100%-28px)]',
         {
           '!px-0': !isCollapsed,
         },
       )}
     >
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-2">
         <SidebarLink
           to={routes.pipelines(organization.id)}
-          icon={
-            <Icon
-              iconName="three-layers"
-              className="w-5 h-5 text-center leading-5"
-            />
-          }
+          icon={<Layers className="min-w-4 w-4 h-4 text-center leading-5" />}
           text="Workflows"
           onlyIcon={isCollapsed}
         />
 
         <SidebarLink
           to={routes.knowledgeBase(organization.id)}
-          icon={
-            <Icon
-              iconName="briefcase"
-              className="w-5 h-5 text-center leading-5"
-            />
-          }
+          icon={<Briefcase className="min-w-4 w-4 h-4 text-center leading-5" />}
           text="Knowledge Base"
           onlyIcon={isCollapsed}
         />
 
         <SidebarLink
           to={routes.secrets(organization.id)}
-          icon={
-            <Icon iconName="key" className="w-5 h-5 text-center leading-5" />
-          }
+          icon={<Key className="min-w-4 w-4 h-4 text-center leading-5" />}
           onlyIcon={isCollapsed}
           text="Secrets"
         />
@@ -180,9 +191,7 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
 
       <SidebarLink
         to={routes.settings(organization.id)}
-        icon={
-          <Icon iconName="settings" className="w-5 h-5 text-center leading-5" />
-        }
+        icon={<Settings className="min-w-4 w-4 h-4 text-center leading-5" />}
         text="Settings"
         onlyIcon={isCollapsed}
       />
@@ -205,57 +214,67 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
     setShowMenu(true);
   }, []);
 
-  useOnClickOutside(menuRef, handleClose);
-
-  const handleChangeRoute = useCallback((menu: MenuInfo) => {
-    navigate(routes.pipelines(menu.key));
+  const handleChangeRoute = useCallback((id: number) => {
+    navigate(routes.pipelines(id));
     handleClose();
   }, []);
 
   return (
-    <SidebarContentWrapper className="border-b border-neutral-400 py-4 mt-1 pl-2 pr-1">
-      <PageOverlay
-        isShow={showMenu}
-        className={classNames({ '!z-[20]': showMenu })}
-      />
-
+    <SidebarContentWrapper className="border-b border-neutral-100 py-4 mt-1 pl-2 pr-1">
       <div ref={menuRef}>
-        <button
-          onClick={handleOpen}
-          className="w-full h-10 overflow-hidden flex justify-between items-center text-neutral-100 rounded-lg"
-        >
-          {isCollapsed && (
-            <Avatar name={name} contentType="text" shape="square" size="md" />
-          )}
-          {!isCollapsed && (
-            <>
-              <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">
-                {organization.name}
-              </span>
-              <Icon
-                iconName={showMenu ? 'chevron-up' : 'chevron-down'}
-                className="text-xl"
-              />
-            </>
-          )}
-        </button>
+        <Dropdown shown={showMenu} onClose={handleClose} placement="bottom-end">
+          <DropdownTrigger
+            onClick={handleOpen}
+            className="w-full p-0 overflow-hidden flex justify-between items-center bg-transparent hover:bg-transparent rounded-lg"
+            variant="secondary"
+          >
+            {isCollapsed && (
+              <Avatar>
+                <AvatarFallback>{name.slice(0, 1)}</AvatarFallback>
+              </Avatar>
+            )}
+            {!isCollapsed && (
+              <>
+                <span className="block max-w-[80%] text-sm font-medium whitespace-nowrap truncate">
+                  {organization.name}
+                </span>
 
-        <ClientOnly fallback={null}>
-          {() => (
-            <MenuClient
-              hidden={!showMenu}
-              activeKey={`${organization.id}`}
-              className="min-w-[248px] absolute z-[51] top-[60px] left-[30%] max-h-[400px] overflow-y-auto md:left-[85%]"
-              onClick={handleChangeRoute}
-            >
-              <NewOrganizationLink />
+                <ChevronDown className="w-4 h-4" />
+              </>
+            )}
+          </DropdownTrigger>
 
-              {organizations.map((org) => {
-                return <MenuItem key={`${org.id}`}>{org.name}</MenuItem>;
-              })}
-            </MenuClient>
-          )}
-        </ClientOnly>
+          <ClientOnly fallback={null}>
+            {() =>
+              createPortal(
+                <DropdownPopup className="min-w-[250px] z-[70] bg-white border border-input rounded-lg overflow-hidden p-2 lg:min-w-[350px]">
+                  <DropdownMenuLabel>Organizations</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="flex flex-col gap-1">
+                    {organizations.map((org) => {
+                      return (
+                        <Button
+                          size="xs"
+                          variant={
+                            organization.id === org.id ? 'secondary' : 'ghost'
+                          }
+                          className="text-left justify-start  text-foreground"
+                          key={`${org.id}`}
+                          onClick={() => handleChangeRoute(org.id)}
+                        >
+                          {org.name}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <NewOrganizationLink />
+                </DropdownPopup>,
+                document.body,
+              )
+            }
+          </ClientOnly>
+        </Dropdown>
       </div>
     </SidebarContentWrapper>
   );
@@ -263,19 +282,17 @@ function SidebarTopContent({ isCollapsed }: SidebarContentProps) {
 
 function NewOrganizationLink() {
   return (
-    <div className="w-full pl-6 py-2">
-      <Link to={routes.newOrganization()}>
-        <Button tabIndex={0} size="xs">
-          Create new
-        </Button>
-      </Link>
+    <div className="w-full py-2">
+      <Button size="xs" asChild>
+        <Link to={routes.newOrganization()}>Create new</Link>
+      </Button>
     </div>
   );
 }
 
 function SidebarBottomContent({ isCollapsed }: SidebarContentProps) {
   return (
-    <SidebarContentWrapper className="border-t border-neutral-400 py-3 !flex-row justify-between">
+    <SidebarContentWrapper className="border-t border-neutral-100 py-3 !flex-row justify-between">
       {!isCollapsed && (
         <div className="flex flex-col text-xs text-white">
           {/*<p>Majkel Ward</p>*/}
@@ -293,10 +310,10 @@ function LogoutButton() {
   return (
     <IconButton
       size="sm"
-      variant="basic"
+      variant="ghost"
       aria-label="Logout"
-      icon={<Icon iconName="log-out" />}
-      className="!text-neutral-100 hover:!bg-neutral-700"
+      icon={<LogOut />}
+      className="!text-muted-foreground hover:!text-foreground"
       onClick={() => {
         logout.submit({}, { method: 'DELETE', action: '/logout' });
       }}
@@ -312,8 +329,6 @@ export function SidebarContentWrapper({
   className,
 }: SidebarContentWrapperProps) {
   return (
-    <div className={classNames('flex flex-col px-[10px]', className)}>
-      {children}
-    </div>
+    <div className={cn('flex flex-col px-[10px]', className)}>{children}</div>
   );
 }

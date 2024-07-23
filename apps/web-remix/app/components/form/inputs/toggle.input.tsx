@@ -1,5 +1,5 @@
-import type { ToggleProps } from '@elpassion/taco';
-import { Toggle } from '@elpassion/taco';
+import type { SwitchProps } from '~/components/ui/switch';
+import { Switch } from '~/components/ui/switch';
 
-export type ToggleInputProps = ToggleProps;
-export const ToggleInput = Toggle;
+export type ToggleInputProps = SwitchProps;
+export const ToggleInput = Switch;

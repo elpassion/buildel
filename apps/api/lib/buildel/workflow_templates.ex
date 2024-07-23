@@ -2,19 +2,23 @@ defmodule Buildel.WorkflowTemplates do
   @available_templates [
     %{
       name: "AI Chat",
-      template_name: "ai_chat"
+      template_name: "ai_chat",
+      template_description: "Basic workflow with any of supported models"
     },
     %{
       name: "Speech To Text",
-      template_name: "speech_to_text"
+      template_name: "speech_to_text",
+      template_description: "Allows to upload MP3 file and receive transcription"
     },
     %{
       name: "Text To Speech",
-      template_name: "text_to_speech"
+      template_name: "text_to_speech",
+      template_description: "Allow to generate MP3 file from provided text"
     },
     %{
       name: "Knowledge Search To Text",
-      template_name: "knowledge_search_to_text"
+      template_name: "knowledge_search_to_text",
+      template_description: "Allows to analyse given documents and receive i.e. summary or answer questions"
     }
   ]
 

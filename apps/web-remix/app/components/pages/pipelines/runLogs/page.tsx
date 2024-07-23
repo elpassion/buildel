@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
 import { useFetcher, useLoaderData } from '@remix-run/react';
-import { Label } from '@elpassion/taco';
 
 import type { IPipelineRunLog } from '~/api/pipeline/pipeline.contracts';
 import { SelectInput } from '~/components/form/inputs/select/select.input';
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
+import { Label } from '~/components/ui/label';
 import { routes } from '~/utils/routes.utils';
 import { buildUrlWithParams } from '~/utils/url';
 
@@ -82,8 +83,8 @@ export function PipelineRunLogs() {
   }, [status]);
 
   return (
-    <div className="mt-2">
-      <Label text="Filter by block" />
+    <PageContentWrapper className="mt-10">
+      <Label>Filter by block</Label>
       <SelectInput
         placeholder="Select..."
         options={pipelineRun.config.blocks.map((block) => ({
@@ -129,7 +130,7 @@ export function PipelineRunLogs() {
           />
         </div>
       </div>
-    </div>
+    </PageContentWrapper>
   );
 }
 

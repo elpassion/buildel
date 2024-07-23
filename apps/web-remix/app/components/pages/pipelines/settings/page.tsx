@@ -8,6 +8,7 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { OrganizationAvatar } from '~/components/pages/settings/organization/AboutOrganization';
 import {
@@ -15,10 +16,15 @@ import {
   SectionContent,
   SectionHeading,
 } from '~/components/pages/settings/settingsLayout/PageLayout';
+import { Button } from '~/components/ui/button';
 import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from '~/components/sidebar/ActionSidebar';
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import { EditPipelineNameForm } from './EditPipelineNameForm';
@@ -36,7 +42,9 @@ export function SettingsPage() {
   );
   const isSidebarOpen = !!match;
 
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = (value: boolean) => {
+    if (value) return;
+
     navigate(
       routes.pipelineSettings(
         organizationId,
@@ -47,20 +55,21 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="mt-10">
+    <PageContentWrapper className="py-10">
       <Section>
-        <div className="flex gap-3 justify-between items-center">
+        <div className="flex gap-3 justify-between items-center mb-4">
           <SectionHeading>About Workflow</SectionHeading>
-          <BasicLink
-            className="text-sm underline text-neutral-200 hover:text-primary-500"
-            to={routes.pipelineSettingsConfiguration(
-              organizationId,
-              pipelineId,
-              Object.fromEntries(searchParams.entries()),
-            )}
-          >
-            Workflow configuration
-          </BasicLink>
+          <Button asChild variant="secondary">
+            <BasicLink
+              to={routes.pipelineSettingsConfiguration(
+                organizationId,
+                pipelineId,
+                Object.fromEntries(searchParams.entries()),
+              )}
+            >
+              Workflow configuration
+            </BasicLink>
+          </Button>
         </div>
 
         <div className="flex flex-col gap-6">
@@ -76,20 +85,21 @@ export function SettingsPage() {
         </div>
       </Section>
 
-      <ActionSidebar
-        className="!bg-neutral-950 md:!w-[550px]"
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
-      >
-        <ActionSidebarHeader
-          heading="Workflow configuration"
-          subheading="Any workflow can contain many Blocks and use your Knowledge Base."
-          onClose={handleCloseSidebar}
-        />
-        <Outlet />
-      </ActionSidebar>
-    </div>
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
+        <DialogDrawerContent className="md:min-w-[700px]">
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>Workflow configuration</DialogDrawerTitle>
+            <DialogDrawerDescription>
+              Any workflow can contain many Blocks and use your Knowledge Base.
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+
+          <DialogDrawerBody>
+            <Outlet />
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
+    </PageContentWrapper>
   );
 }
 

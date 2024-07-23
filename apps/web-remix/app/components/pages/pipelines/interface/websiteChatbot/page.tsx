@@ -15,6 +15,7 @@ import type {
   IInterfaceConfig,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import { InterfaceConfigForm } from './InterfaceConfigForm';
@@ -43,22 +44,25 @@ export function WebsiteChatbotPage() {
     <div>
       <div className="flex flex-col gap-3 mb-6 md:justify-between md:flex-row md:items-center">
         <div>
-          <h2 className="text-lg text-white font-medium">Website Chatbot</h2>
-          <p className="text-white text-xs">
+          <h2 className="text-lg text-foreground font-medium">
+            Website Chatbot
+          </h2>
+          <p className="text-muted-foreground text-xs">
             Share your Chatbot through url or embed into page.
           </p>
         </div>
 
-        <BasicLink
-          to={routes.chatPreview(
-            organizationId,
-            pipelineId,
-            Object.fromEntries(searchParams.entries()),
-          )}
-          className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
-        >
-          Open preview
-        </BasicLink>
+        <Button asChild variant="secondary">
+          <BasicLink
+            to={routes.chatPreview(
+              organizationId,
+              pipelineId,
+              Object.fromEntries(searchParams.entries()),
+            )}
+          >
+            Open preview
+          </BasicLink>
+        </Button>
       </div>
 
       <InterfaceSectionWrapper className="mb-8">
@@ -87,7 +91,7 @@ export function WebsiteChatbotPage() {
         </InterfaceSectionHeader>
 
         <div className="p-6 grid grid-cols-1 gap-3 lg:grid-cols-2">
-          <div className="text-white text-sm">
+          <div className="text-foreground text-sm">
             <p className="lg:mt-4 mb-2">
               Use this code snippet to deploy the form in your application.
             </p>

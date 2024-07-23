@@ -1,9 +1,10 @@
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect } from 'react';
-import { Icon } from '@elpassion/taco';
+import { CircleCheck, Loader } from 'lucide-react';
 import { useDebounce, useIsFirstRender } from 'usehooks-ts';
 
 import type { IPipelineConfig } from '~/components/pages/pipelines/pipeline.types';
+import { cn } from '~/utils/cn';
 
 import { useRunPipeline } from '../RunPipelineProvider';
 import { Metadata } from './Metadata';
@@ -11,7 +12,7 @@ import { RunPipelineButton } from './RunPipelineButton';
 
 export const BuilderHeader: React.FC<PropsWithChildren> = ({ children }) => {
   return (
-    <header className="absolute top-8 left-4 right-4 z-10 flex justify-between pointer-events-none">
+    <header className="absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none">
       <div className="flex gap-2 items-center pointer-events-auto">
         <RunPipelineButton />
 
@@ -58,21 +59,31 @@ export function SaveChangesButton({
       {isSaving ? (
         <SavingStatusWrapper>
           <span>Saving changes</span>
-          <Icon iconName="loader" className="animate-spin" />
+          <Loader className="animate-spin w-4 h-4" />
         </SavingStatusWrapper>
       ) : (
-        <SavingStatusWrapper>
+        <SavingStatusWrapper className="text-green-500">
           <span>All changes saved</span>
-          <Icon iconName="check-circle" />
+          <CircleCheck className="w-4 h-4" />
         </SavingStatusWrapper>
       )}
     </div>
   );
 }
 
-function SavingStatusWrapper({ children }: PropsWithChildren) {
+function SavingStatusWrapper({
+  children,
+  className,
+  ...rest
+}: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className="bg-neutral-950 text-neutral-100 px-2 py-1 rounded-lg text-sm flex gap-1 items-center">
+    <div
+      className={cn(
+        'text-foreground px-2 py-1 rounded-lg text-sm flex gap-1 items-center',
+        className,
+      )}
+      {...rest}
+    >
       {children}
     </div>
   );

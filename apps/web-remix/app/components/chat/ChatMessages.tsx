@@ -1,10 +1,10 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
-import classNames from 'classnames';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { ItemList } from '~/components/list/ItemList';
 import { ClientOnly } from '~/utils/ClientOnly';
+import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
 
 import type { ChatSize, IMessage, MessageRole } from './chat.types';
@@ -23,7 +23,7 @@ export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
 
   return (
     <ItemList
-      className={classNames(
+      className={cn(
         'flex flex-col-reverse gap-2 min-w-full w-full h-[97%] overflow-y-auto pr-1 prose',
       )}
       itemClassName="w-full"
@@ -46,12 +46,9 @@ export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
 function MessageTime({ message }: { message: IMessage }) {
   return (
     <span
-      className={classNames(
-        'block w-fit text-[10px] text-neutral-300 mt-[2px]',
-        {
-          'ml-auto mr-1': message.role === 'user',
-        },
-      )}
+      className={cn('block w-fit text-[10px] text-muted-foreground mt-[2px]', {
+        'ml-auto mr-1': message.role === 'user',
+      })}
     >
       {dayjs(message.created_at).format('HH:mm')}
     </span>
@@ -65,11 +62,11 @@ interface ChatMessageProps {
 function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
   return (
     <article
-      className={classNames(
-        'w-full max-w-[60%] min-h-[30px] rounded-t-xl border border-neutral-600 px-2 py-1.5 prose ',
+      className={cn(
+        'bg-white w-full max-w-[60%] min-h-[30px] rounded-t-xl border border-input px-2 py-1.5 prose ',
         {
-          'bg-neutral-800 rounded-br-xl': role === 'ai',
-          'bg-neutral-900 rounded-bl-xl ml-auto mr-0': role !== 'ai',
+          'rounded-br-xl': role === 'ai',
+          'rounded-bl-xl ml-auto mr-0': role !== 'ai',
         },
       )}
     >

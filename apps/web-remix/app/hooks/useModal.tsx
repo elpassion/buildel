@@ -11,9 +11,14 @@ export function useModal() {
     setIsModalOpen(false);
   }, []);
 
+  const changeOpen = (value: boolean) => {
+    setIsModalOpen(value);
+  };
+
   return {
     isModalOpen,
     openModal,
     closeModal,
+    changeOpen,
   };
 }

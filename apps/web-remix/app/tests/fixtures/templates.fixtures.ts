@@ -6,6 +6,7 @@ export const templateFixture = (
   return {
     name: 'Speech To Text',
     template_name: 'speech_to_text',
+    template_description: 'Sample',
     ...override,
   };
 };

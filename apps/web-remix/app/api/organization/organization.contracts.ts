@@ -79,6 +79,7 @@ export const APIKeyResponse = z
 export const WorkflowTemplate = z.object({
   name: z.string(),
   template_name: z.string(),
+  template_description: z.string(),
 });
 
 export type IWorkflowTemplate = z.TypeOf<typeof WorkflowTemplate>;

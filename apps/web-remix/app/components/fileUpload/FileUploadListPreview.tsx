@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { File, FileText, Loader, X } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { ItemList } from '~/components/list/ItemList';
 import { Tooltip } from '~/components/tooltip/Tooltip';
+import { cn } from '~/utils/cn';
 
 import { isUploadError } from './fileUpload.types';
 import type { IFileUpload, IPreviewProps } from './fileUpload.types';
@@ -25,7 +25,7 @@ export function FileUploadListPreview({
 }: FileUploadListPreviewProps) {
   return (
     <ItemList
-      className={classNames(
+      className={cn(
         'flex flex-col items-center gap-1 overflow-y-auto',
         className,
       )}
@@ -58,27 +58,24 @@ export function FileUploadListItem({
   return (
     <article
       data-tooltip-id={`${file.id}`}
-      className={classNames(
-        'flex justify-between gap-2 w-full py-1 px-2 bg-neutral-600 hover:bg-neutral-700 transition rounded-md cursor-default',
+      className={cn(
+        'flex justify-between gap-2 w-full py-1 px-2 border border-input bg-white hover:bg-muted transition rounded-md cursor-default',
         {
-          'text-white': file.status !== 'error',
+          'text-foreground': file.status !== 'error',
           'text-red-500': file.status === 'error',
         },
       )}
     >
       <div className="flex gap-1 grow max-w-[90%]">
-        <Icon
-          size="xs"
-          iconName={renderTypeIcon(file.file_type)}
-          className="mt-0.5 w-4 h-4 !text-sm"
-        />
+        {renderTypeIcon(file.file_type)}
+
         <div className="flex flex-col w-full max-w-[95%]">
           <h6 className="whitespace-nowrap text-xs truncate">
             {file.file_name}
           </h6>
           <span
-            className={classNames('text-[10px]', {
-              'text-white': file.status !== 'error',
+            className={cn('text-[10px]', {
+              'text-muted-foreground': file.status !== 'error',
               'text-red-500': file.status === 'error',
             })}
           >
@@ -98,19 +95,29 @@ export function FileUploadListItem({
 
       {onRemove && (
         <IconButton
-          onlyIcon
+          size="xxxs"
           icon={
-            <Icon
-              className={classNames(
-                'flex items-center justify-center origin-center w-5 h-5 !leading-5',
-                {
-                  'animate-spin': file.status === 'uploading',
-                  'text-red-500': file.status === 'error',
-                },
-              )}
-              iconName={file.status === 'uploading' ? 'loader' : 'x'}
-            />
+            file.status === 'uploading' ? (
+              <Loader
+                className={cn(
+                  'flex items-center justify-center origin-center w-4 h-4 !leading-5',
+                  {
+                    'animate-spin': file.status === 'uploading',
+                  },
+                )}
+              />
+            ) : (
+              <X
+                className={cn(
+                  'flex items-center justify-center origin-center w-4 h-4 !leading-5',
+                  {
+                    'text-red-500': file.status === 'error',
+                  },
+                )}
+              />
+            )
           }
+          variant="ghost"
           aria-label={`Delete file: ${file.file_name}`}
           disabled={isDisabled}
           onClick={handleRemove}
@@ -121,8 +128,9 @@ export function FileUploadListItem({
 }
 
 function renderTypeIcon(fileType: string) {
-  if (fileType.startsWith('audio/')) return 'file' as const;
-  return 'file-text' as const;
+  if (fileType.startsWith('audio/'))
+    return <File className="mt-0.5 w-4 h-4 !text-sm" />;
+  return <FileText className="mt-0.5 w-4 h-4 !text-sm" />;
 }
 function renderSize(size: number) {
   if (size < 1000) return `${size.toFixed(0)} B`;

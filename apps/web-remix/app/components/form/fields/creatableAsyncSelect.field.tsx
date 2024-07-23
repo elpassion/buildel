@@ -1,7 +1,5 @@
 import type { FormEvent, PropsWithChildren, ReactNode } from 'react';
 import React, { forwardRef, useCallback, useEffect, useState } from 'react';
-import { InputText, Label } from '@elpassion/taco';
-import { Modal } from '@elpassion/taco/Modal';
 import { withZod } from '@remix-validated-form/with-zod';
 import { useControlField, ValidatedForm } from 'remix-validated-form';
 
@@ -12,6 +10,8 @@ import {
   HiddenField,
   useFieldContext,
 } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import type { AsyncSelectInputProps } from '~/components/form/inputs/select/select.input';
 import { AsyncSelectInput } from '~/components/form/inputs/select/select.input';
 import type { FieldProps } from '~/components/form/schema/Schema';
@@ -25,6 +25,14 @@ import {
 import { generateZODSchema } from '~/components/form/schema/SchemaParser';
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
 import { successToast } from '~/components/toasts/successToast';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { useModal } from '~/hooks/useModal';
 
 import { SubmitButton } from '../submit';
@@ -70,7 +78,7 @@ export const CreatableAsyncSelectField = forwardRef<
         whenSubmitted: 'onBlur',
       },
     });
-    const { isModalOpen, openModal, closeModal } = useModal();
+    const { isModalOpen, openModal, closeModal, changeOpen } = useModal();
 
     const [selectedId, setSelectedId] = useControlField<string>(name);
 
@@ -109,10 +117,10 @@ export const CreatableAsyncSelectField = forwardRef<
         <HiddenField value={selectedId ?? ''} {...getInputProps()} />
 
         <div className="flex justify-between items-end">
-          <Label text={label} labelFor={name} />
+          <FieldLabel>{label}</FieldLabel>
 
           <button
-            className="text-primary-500 text-sm mb-[6px] bg-transparent"
+            className="text-foreground text-sm mb-[6px] bg-transparent"
             onClick={openModal}
             type="button"
             data-testid={`${props.id}-create-button`}
@@ -130,37 +138,29 @@ export const CreatableAsyncSelectField = forwardRef<
           onBlur={getInputProps().onBlur}
           {...props}
         />
+        <FieldMessage error={errorMessage}>{supportingText}</FieldMessage>
 
-        <InputText
-          text={errorMessage ?? supportingText}
-          error={!!errorMessage}
-        />
+        <DialogDrawer open={isModalOpen} onOpenChange={changeOpen}>
+          <DialogDrawerContent data-testid={`${name}-modal`}>
+            <DialogDrawerHeader>
+              <DialogDrawerTitle>{label}</DialogDrawerTitle>
 
-        <Modal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          testId={`${name}-modal`}
-          overlayClassName="!z-[60]"
-          className="w-[90%] min-w-[340px] md:min-w-[500px]"
-          header={
-            <header className="p-1 text-white">
-              <p className="text-2xl mb-2">{label}</p>
-              <p className="text-sm text-neutral-400">{supportingText}</p>
-            </header>
-          }
-        >
-          <div
-            className="p-1"
-            onSubmit={(e) => {
-              e.stopPropagation();
-            }}
-            onChange={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            {renderForm({ onCreate: handleCreate })}
-          </div>
-        </Modal>
+              <DialogDrawerDescription>
+                {supportingText}
+              </DialogDrawerDescription>
+            </DialogDrawerHeader>
+            <DialogDrawerBody
+              onSubmit={(e) => {
+                e.stopPropagation();
+              }}
+              onChange={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              {renderForm({ onCreate: handleCreate })}
+            </DialogDrawerBody>
+          </DialogDrawerContent>
+        </DialogDrawer>
       </>
     );
   },
@@ -215,13 +215,7 @@ export function CreatableAsyncForm({
         }}
       />
 
-      <SubmitButton
-        size="sm"
-        variant="filled"
-        className="mt-6"
-        isFluid
-        aria-label="create new"
-      >
+      <SubmitButton isFluid size="sm" className="mt-6" aria-label="create new">
         Create new
       </SubmitButton>
     </ValidatedForm>

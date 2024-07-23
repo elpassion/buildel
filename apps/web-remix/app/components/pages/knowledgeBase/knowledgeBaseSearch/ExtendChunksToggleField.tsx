@@ -1,27 +1,27 @@
+import type { ReactNode } from 'react';
 import React, { forwardRef } from 'react';
-import { InputText } from '@elpassion/taco';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { useFieldContext } from '~/components/form/fields/field.context';
-import type { ToggleInputProps } from '~/components/form/inputs/toggle.input';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 
 export const ExtendChunksField = forwardRef<
   HTMLInputElement,
-  Partial<ToggleInputProps>
->(({ label, supportingText }) => {
+  { label: ReactNode; supportingText: ReactNode; defaultChecked?: boolean }
+>(({ label, supportingText, defaultChecked }) => {
   const { error } = useFieldContext();
 
   return (
     <div>
       <div className="flex gap-2 w-full h-10 items-center justify-start">
-        <CheckboxInputField label={label} />
+        <CheckboxInputField defaultChecked={defaultChecked} />
+        <FieldLabel className="mb-0">{label}</FieldLabel>
       </div>
 
-      <InputText
-        className="!mt-0"
-        text={error ?? supportingText}
-        error={!!error}
-      />
+      <FieldMessage className="!mt-0" error={error}>
+        {supportingText}
+      </FieldMessage>
     </div>
   );
 });

@@ -1,16 +1,24 @@
 import React, { useEffect } from 'react';
-import { Button, Icon, IconButton } from '@elpassion/taco';
+import { Trash } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'remix-validated-form';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field as FormField } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { QuantityInputField } from '~/components/form/fields/quantity.field';
-import { RadioField } from '~/components/form/fields/radio.field';
+import {
+  RadioField,
+  RadioGroupField,
+} from '~/components/form/fields/radio.field';
 import {
   PasswordInputField,
   ResettableTextInputField,
 } from '~/components/form/fields/text.field';
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
+import { IconButton } from '~/components/iconButton';
+import { Button } from '~/components/ui/button';
+import { Label } from '~/components/ui/label';
 import { assert } from '~/utils/assert';
 
 import { Field } from './Schema';
@@ -28,12 +36,9 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
     if ('presentAs' in field && field.presentAs === 'password') {
       return (
         <FormField name={name}>
-          <PasswordInputField
-            id={name}
-            supportingText={field.description}
-            label={field.title}
-            errorMessage={error}
-          />
+          <FieldLabel>{field.title}</FieldLabel>
+          <PasswordInputField id={name} />
+          <FieldMessage error={error}>{field.description}</FieldMessage>
         </FormField>
       );
     }
@@ -82,11 +87,10 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       <FormField name={name}>
         <ResettableTextInputField
           id={name}
-          supportingText={field.description}
-          label={field.title}
-          errorMessage={error}
           defaultValue={defaultValue}
+          label={field.title}
         />
+        <FieldMessage error={error}>{field.description}</FieldMessage>
       </FormField>
     );
   }
@@ -94,21 +98,21 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
     return (
       <FormField name={name}>
         <div className="space-y-3">
-          <label htmlFor={name} className="text-white text-sm font-medium">
-            {field.title}
-          </label>
-          {field.enum.map((value, index) => (
-            <RadioField
-              key={value}
-              id={name + index}
-              name={name}
-              errorMessage={error ?? undefined}
-              label={value}
-              value={value}
-              defaultValue={field.default}
-              className="!mt-3"
-            />
-          ))}
+          <FieldLabel htmlFor={name}>{field.title}</FieldLabel>
+
+          <RadioGroupField defaultValue={field.default}>
+            {field.enum.map((value) => (
+              <Label
+                key={value}
+                className="flex gap-1 items-center text-muted-foreground"
+              >
+                <RadioField id={value} value={value} />
+
+                <span>{value}</span>
+              </Label>
+            ))}
+          </RadioGroupField>
+          <FieldMessage error={error} />
         </div>
       </FormField>
     );
@@ -116,14 +120,17 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
   if (field.enumPresentAs === 'checkbox') {
     return field.enum.map((value, index) => (
       <FormField key={`${name}.${index}`} name={name}>
-        <CheckboxInput
-          name={name}
-          key={value}
-          label={value}
-          id={`${name}.${index}`}
-          value={value}
-          error={!!error}
-        />
+        <Label className="flex gap-1 items-center">
+          <CheckboxInput
+            name={name}
+            key={value}
+            id={`${name}.${index}`}
+            value={value}
+            // error={!!error}
+          />
+
+          <span>{value}</span>
+        </Label>
       </FormField>
     ));
   }
@@ -137,16 +144,16 @@ export function NumberField({ field, name }: FieldProps) {
   const error = fieldErrors[name] ?? undefined;
   return (
     <FormField name={name}>
+      <FieldLabel>{field.title}</FieldLabel>
       <QuantityInputField
         id={name}
-        errorMessage={error}
-        label={field.title}
         // supportingText={field.description}
         min={field.minimum}
         max={field.maximum}
         defaultValue={field.default}
         step={field.step}
       />
+      <FieldMessage error={error} />
     </FormField>
   );
 }
@@ -180,18 +187,21 @@ export function ArrayField({ field, name, fields, schema }: FieldProps) {
 export function BooleanField({ field, name }: FieldProps) {
   assert(name);
   assert(field.type === 'boolean');
-  const { fieldErrors } = useFormContext();
+  // const { fieldErrors } = useFormContext();
 
-  const error = fieldErrors[name] ?? undefined;
+  // const error = fieldErrors[name] ?? undefined;
 
   return (
     <FormField name={name}>
-      <CheckboxInputField
-        id={name}
-        label={field.title}
-        defaultChecked={field.default}
-        error={!!error}
-      />
+      <Label>
+        <CheckboxInputField
+          id={name}
+          defaultChecked={field.default}
+          // error={!!error}
+        />
+
+        <span>{field.title}</span>
+      </Label>
     </FormField>
   );
 }
@@ -218,9 +228,10 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
             schema={schema}
           />
           <IconButton
+            size="xxs"
             variant="ghost"
             aria-label="Remove field"
-            icon={<Icon iconName="trash" />}
+            icon={<Trash />}
             disabled={rhfFields.length <= field.minItems}
             onClick={(e) => {
               e.preventDefault();
@@ -231,8 +242,8 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
       ))}
       <Button
         type="button"
-        size="xs"
-        hierarchy="secondary"
+        size="xxs"
+        variant="secondary"
         onClick={() => push({})}
         className="mt-2"
       >

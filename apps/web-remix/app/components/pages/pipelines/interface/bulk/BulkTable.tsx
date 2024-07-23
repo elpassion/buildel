@@ -1,11 +1,12 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import { Link } from '@remix-run/react';
-import { Icon, IconButton } from '@elpassion/taco';
-import classNames from 'classnames';
+import { ExternalLink, Trash } from 'lucide-react';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { SmallFileInput } from '~/components/form/inputs/file.input';
 import { TextareaInput } from '~/components/form/inputs/textarea.input';
+import { IconButton } from '~/components/iconButton';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import type { ISelectedInput, ITest } from './page';
@@ -33,7 +34,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
 
   return (
     <table className="w-full table-auto">
-      <thead className="text-left text-white text-xs bg-neutral-800">
+      <thead className="text-left text-muted-foreground text-xs bg-muted">
         <tr className="rounded-xl overflow-hidden">
           {selectedInputs?.map((input: ISelectedInput) => (
             <th
@@ -64,11 +65,11 @@ export const BulkTable: React.FC<BulkTableProps> = ({
           return (
             <tr
               key={test.id}
-              className={classNames(
-                '[&:not(:first-child)]:border-t border-neutral-800 rounded-sm overflow-hidden',
+              className={cn(
+                '[&:not(:first-child)]:border-t border-input rounded-sm overflow-hidden',
                 {
-                  'bg-primary-500': test.status === 'running',
-                  'bg-neutral-8800': test.status === 'done',
+                  'bg-orange-500': test.status === 'running',
+                  'bg-muted': test.status === 'done',
                 },
               )}
               aria-label="pipeline run"
@@ -76,14 +77,14 @@ export const BulkTable: React.FC<BulkTableProps> = ({
               {selectedInputs.map((input) => (
                 <td
                   key={input.name}
-                  className="py-3 px-5 text-neutral-100 text-sm"
+                  className="py-3 px-5 text-muted-foreground text-sm"
                 >
                   {input.type === 'text_input' ? (
                     <TextareaInput
                       id={input.name}
                       key={input.name}
                       value={test.inputs[input.name]}
-                      areaClassName="min-h-full !resize-y min-w-[120px]"
+                      className="min-h-full !resize-y min-w-[120px]"
                       onChange={(e) => {
                         e.preventDefault();
                         const value = e.target.value;
@@ -107,7 +108,6 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                     <>
                       <SmallFileInput
                         multiple={false}
-                        buttonText={input.name}
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
@@ -126,20 +126,19 @@ export const BulkTable: React.FC<BulkTableProps> = ({
               {selectedOutputs.map((output) => (
                 <td
                   key={output}
-                  className="py-3 px-5 text-neutral-100 text-sm"
+                  className="py-3 px-5 text-muted-foreground text-sm"
                 >
                   <ChatMarkdown>{test.outputs[output]}</ChatMarkdown>
                 </td>
               ))}
               {isTrashIconColumnVisible && (
-                <td className="w-7 py-3 text-neutral-100 text-sm">
+                <td className="w-7 py-3 text-muted-foreground text-sm">
                   <IconButton
-                    size="xs"
-                    variant="basic"
+                    size="xxs"
+                    variant="secondary"
                     aria-label={`Remove item`}
-                    className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
                     title={`Remove item`}
-                    icon={<Icon iconName="trash" />}
+                    icon={<Trash />}
                     onClick={() =>
                       setTests((tests) =>
                         tests.filter(({ id }) => id !== test.id),
@@ -159,11 +158,10 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                     )}
                   >
                     <IconButton
-                      className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4"
-                      variant="basic"
+                      variant="outline"
                       aria-label="Go to run overview"
-                      icon={<Icon iconName="external-link" />}
-                      size="xs"
+                      icon={<ExternalLink />}
+                      size="xxs"
                     />
                   </Link>
                 </td>

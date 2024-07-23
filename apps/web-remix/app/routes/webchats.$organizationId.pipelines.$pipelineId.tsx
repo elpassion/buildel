@@ -2,8 +2,7 @@ import React, { useCallback, useEffect } from 'react';
 import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { Trash, Upload } from 'lucide-react';
 import invariant from 'tiny-invariant';
 
 import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
@@ -22,6 +21,7 @@ import { ChatWrapper } from '~/components/chat/ChatWrapper';
 import { useChat } from '~/components/chat/useChat';
 import { useFilesUpload } from '~/components/fileUpload/FileUpload';
 import { loaderBuilder } from '~/utils.server';
+import { cn } from '~/utils/cn';
 import { UnauthorizedError } from '~/utils/errors';
 import type { ParsedResponse } from '~/utils/fetch.server';
 
@@ -163,7 +163,7 @@ ${JSON.stringify(files)}
                 {fileList.map((file) => {
                   return (
                     <div
-                      className={classNames(
+                      className={cn(
                         'text-white px-1 border rounded-md flex items-center gap-1',
                         {
                           'border-neutral-700': file.status === 'done',
@@ -184,7 +184,7 @@ ${JSON.stringify(files)}
                           )
                         }
                       >
-                        <Icon iconName="trash" />
+                        <Trash className="w-4 h-4" />
                       </button>
                     </div>
                   );
@@ -195,7 +195,7 @@ ${JSON.stringify(files)}
           prefix={
             pipeline.interface_config.webchat.inputs[1] && (
               <label className="text-white pl-2 cursor-pointer">
-                <Icon iconName="upload" />
+                <Upload className="w-4 h-4" />
                 <input
                   ref={inputRef}
                   type="file"
@@ -216,7 +216,7 @@ ${JSON.stringify(files)}
           }
         />
 
-        <IntroPanel className={classNames({ hidden: !!messages.length })}>
+        <IntroPanel className={cn({ hidden: !!messages.length })}>
           <p>Ask me anything!</p>
         </IntroPanel>
       </ChatWrapper>

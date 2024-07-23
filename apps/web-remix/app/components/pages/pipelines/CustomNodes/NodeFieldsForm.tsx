@@ -1,5 +1,4 @@
 import React, { useCallback } from 'react';
-import { Button } from '@elpassion/taco';
 
 import {
   KnowledgeBaseFileListResponse,
@@ -13,6 +12,7 @@ import type {
   IBlockConfig,
   IField,
 } from '~/components/pages/pipelines/pipeline.types';
+import { Button } from '~/components/ui/button';
 
 import { useRunPipeline, useRunPipelineNode } from '../RunPipelineProvider';
 import { AudioFieldTabs } from './AudioFieldTabs';
@@ -60,7 +60,6 @@ export function NodeFieldsForm({
 
   const uploadFile = useCallback(
     async (file: File): Promise<IFile> => {
-      console.log('uploading');
       async function createFile(fileUpload: File) {
         const formData = new FormData();
         formData.append('file', fileUpload);
@@ -262,13 +261,12 @@ export function NodeFieldsForm({
       if (type === 'text') {
         return (
           <div>
-            <div className="bg-neutral-900 w-fit text-xs px-2 py-0.5 rounded !rounded-bl-none text-primary-500">
+            <div className="bg-muted w-fit text-xs px-2 py-0.5 rounded border border-input !rounded-bl-none text-foreground">
               {name}
             </div>
             <TextareaInput
               data-testid={`${blockName}-${name}`}
               style={{ borderTopLeftRadius: 0 }}
-              label=""
               id={name}
               name={name}
               placeholder={`Input text to test the workflow`}
@@ -342,9 +340,9 @@ export function NodeFieldsForm({
         <Button
           aria-label={`Send message from: ${blockName}`}
           type="submit"
-          size="xs"
+          size="xxs"
           disabled={status !== 'running'}
-          className="!text-xs mt-2"
+          className=" mt-2"
           isFluid
         >
           Send

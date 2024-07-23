@@ -1,21 +1,23 @@
 import React from 'react';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { Check, Copy } from 'lucide-react';
 
+import { IconButton } from '~/components/iconButton';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
+import { cn } from '~/utils/cn';
 
 export function CopyCodeButton({ value }: { value: string }) {
   const { copy, isCopied } = useCopyToClipboard(value ?? '');
   return (
-    <button
+    <IconButton
+      size="xxs"
+      onlyIcon
       type="button"
       onClick={copy}
-      className={classNames({
-        'text-neutral-300': !isCopied,
-        'text-green-500': isCopied,
+      icon={isCopied ? <Check /> : <Copy />}
+      className={cn('h-fit', {
+        '!text-foreground': !isCopied,
+        '!text-green-500': isCopied,
       })}
-    >
-      <Icon iconName={isCopied ? 'check' : 'copy'} />
-    </button>
+    />
   );
 }

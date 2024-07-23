@@ -1,9 +1,6 @@
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import type { ToastProps } from './Toast.interface';
-import { ErrorToast } from './ui/ErrorToast';
-import { LoadingToast } from './ui/LoadingToast';
-import { SuccessToast } from './ui/SuccessToast';
 
 type LoadingToastProps = {
   success?: ToastProps;
@@ -22,39 +19,23 @@ export const loadingToast = (
   return toast.promise(
     callback(),
     {
-      loading: (
-        <LoadingToast
-          {...loading}
-          withCloseButton={false}
-          onClose={() => toast.dismiss()}
-        />
-      ),
-      success: (data) => (
-        <SuccessToast
-          title={data?.title || success?.title}
-          description={data?.description || success?.description}
-          backgroundColor={data?.backgroundColor || success?.backgroundColor}
-          onClose={() => toast.dismiss()}
-        />
-      ),
-      error: (data) => (
-        <ErrorToast
-          title={data?.title || error?.title}
-          description={data?.description || error?.description}
-          onClose={() => toast.dismiss()}
-        />
-      ),
+      loading: `${loading?.title} ${loading?.description}`,
+      success: (data) =>
+        `${data?.title || success?.title} ${data?.description || success?.description}`,
+      error: (data) =>
+        `${data?.title || error?.title} ${data?.description || error?.description}`,
+      duration: Infinity,
     },
-    {
-      loading: {
-        duration: Infinity,
-      },
-      success: {
-        duration: 5000,
-      },
-      error: {
-        duration: 5000,
-      },
-    },
+    // {
+    //   loading: {
+    //     duration: Infinity,
+    //   },
+    //   success: {
+    //     duration: 5000,
+    //   },
+    //   error: {
+    //     duration: 5000,
+    //   },
+    // },
   );
 };

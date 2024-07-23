@@ -1,16 +1,25 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
-import classNames from 'classnames';
+import { EllipsisVertical, PlayCircle, Trash } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
 import { HiddenField } from '~/components/form/fields/field.context';
 import { IconButton } from '~/components/iconButton';
 import { confirm } from '~/components/modal/confirm';
+import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
 import { Duplicate } from '~/icons/Duplicate';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import type { IPipeline } from '../pipeline.types';
@@ -22,16 +31,7 @@ export const PipelinesListItem = ({
   children,
   className,
 }: PipelinesListItemProps) => {
-  return (
-    <article
-      className={classNames(
-        'group bg-neutral-800 px-6 py-4 rounded-lg text-basic-white hover:bg-neutral-850 transition cursor-pointer',
-        className,
-      )}
-    >
-      {children}
-    </article>
-  );
+  return <Card className={cn('h-full', className)}>{children}</Card>;
 };
 
 interface PipelineListItemHeaderProps {
@@ -42,14 +42,14 @@ export const PipelineListItemHeader = ({
 }: PipelineListItemHeaderProps) => {
   const fetcher = useFetcher();
 
-  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDelete = async (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     confirm({
       onConfirm: async () =>
         fetcher.submit({ pipelineId: pipeline.id }, { method: 'delete' }),
       confirmText: 'Delete workflow',
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to delete the "{pipeline.name}” workflow from your
           organisation. This action is irreversible.
         </p>
@@ -58,32 +58,52 @@ export const PipelineListItemHeader = ({
   };
 
   return (
-    <header className="flex items-start">
-      <h2 className="flex basis-1/2 text-lg font-medium">{pipeline.name}</h2>
+    <CardHeader className="flex flex-row gap-4 items-center justify-between space-y-0">
+      <CardTitle className="line-clamp-2">{pipeline.name}</CardTitle>
 
-      <div className="flex items-center basis-1/2 justify-between">
-        <p className="text-sm">{pipeline.runs_count} runs</p>
-
-        <div
-          className="flex gap-1"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <DuplicateForm pipeline={pipeline} />
-
-          <IconButton
-            size="xs"
-            variant="ghost"
-            aria-label={`Remove workflow: ${pipeline.name}`}
-            className="opacity-0 group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-red-500"
-            title={`Remove workflow: ${pipeline.name}`}
-            icon={<Icon iconName="trash" />}
-            onClick={handleDelete}
-          />
-        </div>
+      <div className="w-fit h-fit" onClick={(e) => e.stopPropagation()}>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild className="text-muted-foreground">
+            <IconButton
+              variant="ghost"
+              size="xs"
+              icon={<EllipsisVertical className="w-4 h-4" />}
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DuplicateForm pipeline={pipeline} />
+            <DropdownMenuItem
+              className="w-full flex gap-1 items-center text-red-500"
+              onClick={handleDelete}
+              aria-label={`Remove workflow: ${pipeline.name}`}
+              title={`Remove workflow: ${pipeline.name}`}
+            >
+              <Trash className="w-4 h-4" />
+              <span>Delete</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-    </header>
+    </CardHeader>
+  );
+};
+
+interface PipelineListItemContentProps {
+  pipeline: IPipeline;
+}
+export const PipelineListItemContent = ({
+  pipeline,
+}: PipelineListItemContentProps) => {
+  return (
+    <CardContent>
+      <Badge
+        variant="secondary"
+        className="flex gap-1 items-center w-fit text-muted-foreground"
+      >
+        <PlayCircle className="w-4 h-4  " />
+        <span>{pipeline.runs_count} runs</span>
+      </Badge>
+    </CardContent>
   );
 };
 
@@ -109,14 +129,16 @@ function DuplicateForm({ pipeline }: DuplicateFormProps) {
         value={JSON.stringify(pipeline.config.blocks)}
       />
 
-      <IconButton
+      <Button
         size="xs"
         variant="ghost"
+        className="w-full flex gap-1 justify-start items-center "
         aria-label={`Duplicate workflow: ${pipeline.name}`}
-        className="opacity-0 group-hover:opacity-100 !bg-neutral-700 !text-white !text-sm hover:!text-primary-500"
         title={`Duplicate workflow: ${pipeline.name}`}
-        icon={<Duplicate className="w-3.5 h-3.5" />}
-      />
+      >
+        <Duplicate className="w-4 h-4" />
+        <span>Duplicate</span>
+      </Button>
     </ValidatedForm>
   );
 }

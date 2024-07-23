@@ -7,8 +7,11 @@ import {
   useFloating,
 } from '@floating-ui/react-dom';
 import type { OffsetOptions, Placement } from '@floating-ui/react-dom';
-import classNames from 'classnames';
 import { useBoolean, useOnClickOutside } from 'usehooks-ts';
+
+import type { ButtonProps } from '~/components/ui/button';
+import { Button } from '~/components/ui/button';
+import { cn } from '~/utils/cn';
 
 import { DropdownContext, useDropdown } from './DropdownContext';
 
@@ -16,6 +19,8 @@ interface DropdownProps {
   defaultShown?: boolean;
   placement?: Placement;
   offset?: OffsetOptions;
+  shown?: boolean;
+  onClose?: () => void;
 }
 
 export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
@@ -23,6 +28,8 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   defaultShown,
   placement = 'bottom-start',
   offset = 5,
+  shown,
+  onClose,
 }) => {
   const floatingContext = useFloating({
     placement,
@@ -45,11 +52,20 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
     setFalse();
   };
 
-  useOnClickOutside(wrapperRef, hide);
+  useOnClickOutside(floatingContext.refs.floating, () => {
+    hide();
+    onClose?.();
+  });
 
   return (
     <DropdownContext.Provider
-      value={{ isShown, hide, show, toggle, context: floatingContext }}
+      value={{
+        isShown: shown ?? isShown,
+        hide,
+        show,
+        toggle,
+        context: floatingContext,
+      }}
     >
       <div ref={wrapperRef} className="relative">
         {children}
@@ -71,7 +87,7 @@ export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
     <div
       ref={context.refs.setFloating}
       style={context.floatingStyles}
-      className={classNames(
+      className={cn(
         'transition-opacity',
         {
           'opacity-0 pointer-events-none': !isShown,
@@ -85,9 +101,12 @@ export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
   );
 };
 
-export const DropdownTrigger: React.FC<
-  React.ButtonHTMLAttributes<HTMLButtonElement>
-> = ({ children, className, onClick, ...rest }) => {
+export const DropdownTrigger: React.FC<ButtonProps> = ({
+  children,
+  className,
+  onClick,
+  ...rest
+}) => {
   const { toggle, context } = useDropdown();
 
   const handleOnClick = (
@@ -98,13 +117,13 @@ export const DropdownTrigger: React.FC<
   };
 
   return (
-    <button
+    <Button
       ref={context.refs.setReference}
-      className={classNames(className)}
+      className={cn(className)}
       onClick={handleOnClick}
       {...rest}
     >
       {children}
-    </button>
+    </Button>
   );
 };

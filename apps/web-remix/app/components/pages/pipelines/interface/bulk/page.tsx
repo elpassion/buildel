@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/react';
-import { Button, Icon, IconButton } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
+import { Plus } from 'lucide-react';
 import Papa from 'papaparse';
 import { ValidatedForm } from 'remix-validated-form';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Field } from '~/components/form/fields/field.context';
 import { SelectField } from '~/components/form/fields/select.field';
 import { SmallFileInput } from '~/components/form/inputs/file.input';
+import { IconButton } from '~/components/iconButton';
 import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
 import {
   InterfaceSectionHeader,
@@ -17,6 +18,7 @@ import {
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
 } from '~/components/interfaces/InterfaceSection';
+import { Button } from '~/components/ui/button';
 
 import type { IBlockConfig } from '../../pipeline.types';
 import { BulkTable } from './BulkTable';
@@ -213,8 +215,8 @@ export function BulkPage() {
     <div>
       <div className="flex flex-col gap-3 mb-6 md:justify-between md:flex-row md:items-center">
         <div>
-          <h2 className="text-lg text-white font-medium">Bulk</h2>
-          <p className="text-white text-xs">
+          <h2 className="text-lg text-foreground font-medium">Bulk</h2>
+          <p className="text-muted-foreground text-xs">
             Run multiple workflows at once in parallel.
           </p>
         </div>
@@ -222,7 +224,7 @@ export function BulkPage() {
         <div className="flex ml-auto gap-2">
           <SmallFileInput
             multiple={false}
-            buttonText="Add from CSV"
+            // buttonText="Add from CSV"
             onChange={async (e) => {
               const file = e.target.files?.[0];
               if (!file) return;
@@ -248,17 +250,17 @@ export function BulkPage() {
           />
 
           <Button
+            variant="secondary"
             disabled={tests.some((test) => test.status !== 'done')}
             onClick={exportCSV}
-            className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
           >
             Export CSV
           </Button>
 
           <Button
+            variant="secondary"
             disabled={tests.some((test) => test.status === 'running')}
             onClick={handleOnSubmit}
-            className="px-2 py-1 bg-primary-500 hover:bg-primary-600 rounded-md w-fit"
           >
             Run bulk
           </Button>
@@ -327,7 +329,9 @@ export function BulkPage() {
           {(selectedInputs.length > 0 || selectedOutputs.length > 0) && (
             <>
               <p className="text-white">
-                <span className="text-neutral-100">Summary cost ($): </span>
+                <span className="text-muted-foreground">
+                  Summary cost ($):{' '}
+                </span>
                 {summaryRunCost.reduce((acc, runCost) => acc + runCost.cost, 0)}
               </p>
               <BulkTable
@@ -339,12 +343,12 @@ export function BulkPage() {
                 pipelineId={pipelineId}
               />
               <IconButton
-                size="xs"
-                variant="basic"
+                size="xxs"
+                variant="secondary"
                 aria-label={`Add item`}
-                className="!bg-neutral-700 !text-white !text-sm hover:!text-red-500 mt-4 ml-4"
+                className="mt-4 ml-4"
                 title={`Add item`}
-                icon={<Icon iconName="plus" />}
+                icon={<Plus />}
                 onClick={() =>
                   setTests((tests) => tests.concat([generateNewTest()]))
                 }

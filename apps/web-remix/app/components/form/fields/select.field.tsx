@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react';
 import React, { forwardRef } from 'react';
-import { InputText, Label } from '@elpassion/taco';
 import { useControlField, useFormContext } from 'remix-validated-form';
 
 import {
   HiddenField,
   useFieldContext,
 } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { SelectInput } from '~/components/form/inputs/select/select.input';
 import type { SelectInputProps } from '~/components/form/inputs/select/select.input-impl.client';
 
@@ -38,7 +39,7 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           }
           {...getInputProps()}
         />
-        <Label text={label} />
+        <FieldLabel>{label}</FieldLabel>
         <SelectInput
           id={name}
           options={options}
@@ -47,10 +48,9 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
           onChange={setSelectedId}
           {...props}
         />
-        <InputText
-          text={errorMessage || fieldErrors[name] || supportingText}
-          error={!!(errorMessage || fieldErrors[name])}
-        />
+        <FieldMessage error={errorMessage || fieldErrors[name]}>
+          {supportingText}
+        </FieldMessage>
       </div>
     );
   },

@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import classNames from 'classnames';
+
+import { cn } from '~/utils/cn';
 
 interface InterfaceSectionWrapperProps {
   className?: string;
@@ -11,10 +12,7 @@ export const InterfaceSectionWrapper: React.FC<
 > = ({ className, children }) => {
   return (
     <article
-      className={classNames(
-        'bg-transparent border border-neutral-800 rounded-xl',
-        className,
-      )}
+      className={cn('bg-transparent border border-input rounded-xl', className)}
     >
       {children}
     </article>
@@ -29,12 +27,7 @@ export const InterfaceSectionHeader: React.FC<
   PropsWithChildren<InterfaceSectionHeaderProps>
 > = ({ children, className }) => {
   return (
-    <header
-      className={classNames(
-        'w-full bg-neutral-900 px-6 py-4 rounded-t-xl',
-        className,
-      )}
-    >
+    <header className={cn('w-full bg-muted px-6 py-4 rounded-t-xl', className)}>
       {children}
     </header>
   );
@@ -43,11 +36,11 @@ export const InterfaceSectionHeader: React.FC<
 export const InterfaceSectionHeading: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  return <h3 className="text-white text-sm">{children}</h3>;
+  return <h3 className="text-foreground text-sm font-medium">{children}</h3>;
 };
 
 export const InterfaceSectionHeaderParagraph: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  return <p className="text-neutral-100 text-xs">{children}</p>;
+  return <p className="text-muted-foreground text-xs">{children}</p>;
 };

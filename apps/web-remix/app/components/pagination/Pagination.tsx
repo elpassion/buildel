@@ -1,9 +1,9 @@
 import type { ButtonHTMLAttributes } from 'react';
 import React from 'react';
 import { useNavigate } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+import { cn } from '~/utils/cn';
 import { buildUrlWithParams } from '~/utils/url';
 
 import { DEFAULT_PAGINATION } from './usePagination';
@@ -43,18 +43,18 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className="flex gap-2 items-center">
-      <p className="text-sm text-neutral-200">
+      <p className="text-sm text-muted-foreground">
         page {currentPage} of {totalPages}
       </p>
 
       <PaginationButton disabled={!hasPreviousPage} onClick={onPrev}>
-        <Icon iconName="chevron-left" />
+        <ChevronLeft className="w-4 h-4" />
         <span>Previous</span>
       </PaginationButton>
 
       <PaginationButton disabled={!hasNextPage} onClick={onNext}>
         <span>Next</span>
-        <Icon iconName="chevron-right" />
+        <ChevronRight className="w-4 h-4" />
       </PaginationButton>
     </div>
   );
@@ -67,9 +67,9 @@ export function PaginationButton({
 }: ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
-      className={classNames(
+      className={cn(
         className,
-        'flex items-center gap-1 px-2 py-1 rounded-lg bg-transparent border border-neutral-800 text-neutral-100 text-sm disabled:bg-neutral-900 disabled:text-neutral-500 hover:text-white hover:bg-neutral-900 transition',
+        'flex items-center h-[30px] gap-1 px-2 py-1 rounded-lg bg-transparent border border-input text-foreground text-sm hover:bg-muted transition disabled:pointer-events-none disabled:opacity-50',
       )}
       {...rest}
     >

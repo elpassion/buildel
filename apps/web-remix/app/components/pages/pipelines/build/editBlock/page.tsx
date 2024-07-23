@@ -19,7 +19,12 @@ import {
   reverseToolConnections,
   toPipelineConfig,
 } from '~/components/pages/pipelines/PipelineFlow.utils';
-import { ActionSidebarHeader } from '~/components/sidebar/ActionSidebar';
+import {
+  DialogDrawerBody,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import { BlockInputList } from './BlockInputList';
@@ -82,29 +87,35 @@ export function EditBlockPage() {
 
   return (
     <>
-      <ActionSidebarHeader
-        heading={block.name}
-        subheading={block.block_type?.description}
-        onClose={closeSidebar}
-      />
+      <DialogDrawerHeader>
+        <DialogDrawerTitle>{block.name}</DialogDrawerTitle>
+        <DialogDrawerDescription>
+          {block.block_type?.description}
+        </DialogDrawerDescription>
+      </DialogDrawerHeader>
 
-      <EditBlockForm
-        onSubmit={handleSubmit}
-        blockConfig={block}
-        organizationId={pipeline.organization_id}
-        pipelineId={pipeline.id}
-        nodesNames={nodes.map((node) => node.data.name)}
-        connections={pipeline.config.connections}
-      >
-        <BlockInputList
-          connections={[
-            ...pipeline.config.connections.filter(
-              (connection) => connection.to.block_name === block.name,
-            ),
-            ...reverseToolConnections(pipeline.config.connections, block.name),
-          ]}
-        />
-      </EditBlockForm>
+      <DialogDrawerBody>
+        <EditBlockForm
+          onSubmit={handleSubmit}
+          blockConfig={block}
+          organizationId={pipeline.organization_id}
+          pipelineId={pipeline.id}
+          nodesNames={nodes.map((node) => node.data.name)}
+          connections={pipeline.config.connections}
+        >
+          <BlockInputList
+            connections={[
+              ...pipeline.config.connections.filter(
+                (connection) => connection.to.block_name === block.name,
+              ),
+              ...reverseToolConnections(
+                pipeline.config.connections,
+                block.name,
+              ),
+            ]}
+          />
+        </EditBlockForm>
+      </DialogDrawerBody>
     </>
   );
 }

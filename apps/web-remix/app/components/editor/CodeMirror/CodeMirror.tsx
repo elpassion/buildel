@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import React, { useMemo, useRef } from 'react';
 import { autocompletion } from '@codemirror/autocomplete';
 import { langs } from '@uiw/codemirror-extensions-langs';
-import { xcodeDark } from '@uiw/codemirror-themes-all';
+import { basicLight } from '@uiw/codemirror-themes-all';
 import ReactCodeMirror, { EditorView } from '@uiw/react-codemirror';
 import type {
   ReactCodeMirrorProps,
@@ -71,7 +71,7 @@ export const CodeMirror: React.FC<CodeMirrorProps> = ({
       ref={editorRef}
       value={value}
       onChange={onChange}
-      theme={xcodeDark}
+      theme={basicLight}
       extensions={extensions}
       basicSetup={{
         lineNumbers: false,
@@ -95,7 +95,7 @@ const ClientCodeMirror: React.FC<CodeMirrorProps> = ({
           loading ?? (
             <div
               style={{ minHeight: height }}
-              className="w-full border border-neutral-200"
+              className="w-full border border-input"
             />
           )
         }

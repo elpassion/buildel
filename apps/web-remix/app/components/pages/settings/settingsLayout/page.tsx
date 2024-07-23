@@ -23,7 +23,7 @@ export function SettingsLayout() {
         }
       />
 
-      <PageContentWrapper className="!ml-0">
+      <PageContentWrapper className="!ml-auto mt-5">
         <TabGroup>
           <FilledTabsWrapper>
             <FilledTabLink to={routes.organizationSettings(organizationId)}>
@@ -34,7 +34,7 @@ export function SettingsLayout() {
             </FilledTabLink>
           </FilledTabsWrapper>
 
-          <div className="pt-10">
+          <div className="mt-10">
             <Outlet />
           </div>
         </TabGroup>

@@ -13,7 +13,6 @@ import type {
 import type { loader } from '../loader.server';
 import { CreateBlockDraggableItem } from './CreateBlockDraggableItem';
 import { GroupSubMenu } from './GroupSubMenu';
-import { PasteConfigItem } from './PasteConfigItem';
 
 interface CreateBlockFloatingMenuProps {
   onCreate: (node: IBlockConfig) => void;
@@ -46,7 +45,7 @@ export const CreateBlockFloatingMenu: React.FC<
     return (
       <div
         data-testid={`submenu-${group}`}
-        className="rounded-lg overflow-hidden drop-shadow-md border border-neutral-100 divide-y divide-solid"
+        className="rounded-xl bg-white overflow-hidden drop-shadow border border-input p-0.5 flex flex-col gap-[2px] justify-center items-center"
       >
         {blockGroups[group].map((block) => (
           <CreateBlockDraggableItem
@@ -60,27 +59,27 @@ export const CreateBlockFloatingMenu: React.FC<
   };
 
   return (
-    <div className="absolute top-1/2 -translate-y-1/2 right-4 h-auto">
+    <div className="absolute top-1/2 -translate-y-1/2 left-4 h-auto">
       <ClientOnly fallback={null}>
         {() => (
-          <MenuClient expandIcon={null}>
-            {/*<ELMenuItem />*/}
+          <div className="bg-black/5 p-[2px] rounded-xl">
+            <MenuClient expandIcon={null}>
+              {/*<ELMenuItem />*/}
 
-            {Object.keys(blockGroups).map((group) => (
-              <GroupSubMenu
-                key={group}
-                title={
-                  <span className="truncate w-full text-center">
-                    {startCase(group)}
-                  </span>
-                }
-              >
-                <SubMenuItems group={group} />
-              </GroupSubMenu>
-            ))}
-
-            <PasteConfigItem />
-          </MenuClient>
+              {Object.keys(blockGroups).map((group) => (
+                <GroupSubMenu
+                  key={group}
+                  title={
+                    <span className="truncate w-full text-center">
+                      {startCase(group)}
+                    </span>
+                  }
+                >
+                  <SubMenuItems group={group} />
+                </GroupSubMenu>
+              ))}
+            </MenuClient>
+          </div>
         )}
       </ClientOnly>
     </div>

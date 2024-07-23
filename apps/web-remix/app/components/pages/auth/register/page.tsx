@@ -5,7 +5,8 @@ import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
-import { FieldError } from '~/components/form/fields/field.error';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import {
   PasswordInputField,
   TextInputField,
@@ -26,17 +27,17 @@ export function RegisterPage() {
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
-      <h1 className="text-center text-3xl font-bold text-neutral-100">
+      <h1 className="text-center text-3xl font-bold text-foreground">
         Register for an account
       </h1>
-      <p className="text-center text-neutral-100">
+      <p className="text-center text-muted-foreground">
         Already registered?{' '}
         <Link
           to={{
             pathname: '/login',
             search: searchParams.toString(),
           }}
-          className="text-primary-500"
+          className="text-foreground"
         >
           Sign in
         </Link>{' '}
@@ -46,35 +47,36 @@ export function RegisterPage() {
         validator={validator}
         method="post"
         noValidate
-        className="w-full max-w-md"
+        className="w-full max-w-md mt-10"
       >
-        <Field name="global">
-          <FieldError />
-        </Field>
-
         <HiddenField name="redirectTo" value={redirectTo ?? undefined} />
 
         <div className="form-control w-full mb-4">
           <Field name="user.email">
-            <TextInputField
-              aria-label="email"
-              type="email"
-              autoFocus
-              label="Email address"
-            />
+            <FieldLabel>Email address</FieldLabel>
+            <TextInputField aria-label="email" type="email" autoFocus />
+            <FieldMessage />
           </Field>
         </div>
-        <div className="max-w-s form-control w-full mb-6">
+        <div className="max-w-s form-control w-full mb-2">
           <Field name="user.password">
-            <PasswordInputField aria-label="password" label="Password" />
+            <FieldLabel>Password</FieldLabel>
+            <PasswordInputField aria-label="password" />
+            <FieldMessage />
           </Field>
         </div>
+        <div className="mb-4">
+          <Field name="global">
+            <FieldMessage />
+          </Field>
+        </div>
+
         <SubmitButton isFluid>Register</SubmitButton>
       </ValidatedForm>
 
       {googleLoginEnabled && (
         <>
-          <span className="my-3 text-neutral-300 text-sm">Or</span>
+          <span className="my-3 text-muted-foreground text-sm">Or</span>
           <SocialSignInForm action="/auth/google" className="max-w-md mb-4">
             <GoogleButton content="Sign up with Google" />
           </SocialSignInForm>

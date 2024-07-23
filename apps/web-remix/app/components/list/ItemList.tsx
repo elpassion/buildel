@@ -1,6 +1,7 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import React from 'react';
-import classNames from 'classnames';
+
+import { cn } from '~/utils/cn';
 
 interface ItemListProps<T> {
   items: T[];
@@ -37,7 +38,7 @@ export const EmptyMessage: React.FC<
   PropsWithChildren<{ className?: string }>
 > = ({ children, className }) => {
   return (
-    <span className={classNames('text-sm text-white', className)}>
+    <span className={cn('text-sm text-muted-foreground', className)}>
       {children}
     </span>
   );

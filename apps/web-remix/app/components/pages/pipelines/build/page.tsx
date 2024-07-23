@@ -12,7 +12,10 @@ import isEqual from 'lodash.isequal';
 
 import { AliasNode } from '~/components/pages/pipelines/build/AliasNode';
 import { ELProvider } from '~/components/pages/pipelines/EL/ELProvider';
-import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
+import {
+  DialogDrawer,
+  DialogDrawerContent,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import { Builder } from '../Builder';
@@ -22,8 +25,6 @@ import { toPipelineConfig } from '../PipelineFlow.utils';
 import { BuilderHeader, SaveChangesButton } from './BuilderHeader';
 import { BuilderNode } from './BuilderNode';
 import { CreateBlockFloatingMenu } from './CreateBlock/CreateBlockFloatingMenu';
-import { PasteBlockConfiguration } from './CreateBlock/PastConfigSidebar';
-import { PasteBlockConfigProvider } from './CreateBlock/PasteBlockConfigProvider';
 import type { loader } from './loader.server';
 
 export function PipelineBuilder() {
@@ -49,7 +50,8 @@ export function PipelineBuilder() {
     [updateFetcher, pipeline],
   );
 
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = (value: boolean) => {
+    if (value) return;
     navigate(
       routes.pipelineBuild(
         organizationId,
@@ -67,7 +69,7 @@ export function PipelineBuilder() {
         alias={aliasId}
         key="flow-readOnly"
         type="readOnly"
-        className="h-[calc(100vh_-_128px)]"
+        className="h-[calc(100vh_-_64px)] pt-0"
         pipeline={pipeline}
         CustomNode={AliasNode}
         CustomEdge={CustomEdge}
@@ -85,7 +87,7 @@ export function PipelineBuilder() {
         pipeline={pipeline}
         CustomNode={BuilderNode}
         CustomEdge={CustomEdge}
-        className="h-[calc(100vh_-_128px)]"
+        className="h-[calc(100vh_-_64px)] pt-0"
       >
         {({ edges, nodes, onBlockCreate }) => (
           <>
@@ -98,29 +100,17 @@ export function PipelineBuilder() {
             </BuilderHeader>
 
             <ELProvider>
-              {/*<ELHelper*/}
-              {/*  pipelineId={pipelineId}*/}
-              {/*  organizationId={organizationId}*/}
-              {/*  onBlockCreate={handleRevalidate}*/}
-              {/*/>*/}
-              <PasteBlockConfigProvider>
-                <CreateBlockFloatingMenu onCreate={onBlockCreate} />
-
-                <PasteBlockConfiguration onSubmit={onBlockCreate} />
-              </PasteBlockConfigProvider>
+              <CreateBlockFloatingMenu onCreate={onBlockCreate} />
             </ELProvider>
           </>
         )}
       </Builder>
 
-      <ActionSidebar
-        overlay
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        className="md:w-[460px] lg:w-[550px]"
-      >
-        <Outlet />
-      </ActionSidebar>
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
+        <DialogDrawerContent className="md:max-w-[700px] md:w-[600px] lg:w-[700px]">
+          <Outlet />
+        </DialogDrawerContent>
+      </DialogDrawer>
     </>
   );
 }

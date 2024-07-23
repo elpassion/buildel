@@ -2,13 +2,14 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { NavLink } from '@remix-run/react';
 import type { NavLinkProps } from '@remix-run/react';
-import classNames from 'classnames';
 
-export const OutlinedTabsWrapper: React.FC<PropsWithChildren> = ({
-  children,
-}) => {
+import { cn } from '~/utils/cn';
+
+export const OutlinedTabsWrapper: React.FC<
+  PropsWithChildren<{ className?: string }>
+> = ({ children, className }) => {
   return (
-    <ul className="flex gap-2 border-b border-neutral-600 w-full">
+    <ul className={cn('flex gap-2 border-b input w-full', className)}>
       {children}
     </ul>
   );
@@ -19,9 +20,9 @@ export const OutlinedTabLink = ({ children, ...rest }: NavLinkProps) => {
     <NavLink
       prefetch="intent"
       className={({ isActive }) =>
-        classNames('text-sm pb-2 px-3', {
-          'border-b-2 border-white text-white': isActive,
-          'text-neutral-300': !isActive,
+        cn('text-sm pb-2 px-3 whitespace-nowrap', {
+          'border-b-2 border-primary text-foreground': isActive,
+          'text-muted-foreground': !isActive,
         })
       }
       {...rest}

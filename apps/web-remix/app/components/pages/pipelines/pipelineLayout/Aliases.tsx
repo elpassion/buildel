@@ -6,9 +6,8 @@ import {
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
 import { withZod } from '@remix-validated-form/with-zod';
-import classNames from 'classnames';
+import { ChevronDown, ChevronUp, FilePenLine, Trash } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 import z from 'zod';
 
@@ -28,6 +27,8 @@ import type {
   IPipelineAlias,
 } from '~/components/pages/pipelines/pipeline.types';
 import { EditAliasNameModal } from '~/components/pages/pipelines/pipelineLayout/EditAliasNameModal';
+import { Button } from '~/components/ui/button';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 interface AliasSelectProps {
@@ -47,7 +48,7 @@ export const AliasSelect = ({ aliases, value }: AliasSelectProps) => {
     <Dropdown placement="bottom-end">
       <AliasTrigger name={name} value={value} />
 
-      <DropdownPopup className="min-w-[250px] absolute z-[11] top-full translate-y-[4px] right-0 bg-neutral-850 border border-neutral-800 rounded-lg overflow-hidden p-1 transition">
+      <DropdownPopup className="min-w-[250px] absolute z-[11] top-full translate-y-[4px] right-0 bg-white border border-input rounded-lg overflow-hidden p-1 transition">
         <div className="overflow-y-auto max-h-[300px]">
           <AliasList data={aliases} />
         </div>
@@ -62,20 +63,19 @@ function AliasTrigger({
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { isShown } = useDropdown();
   return (
-    <DropdownTrigger
-      aria-label="Select aliases"
-      className="px-2 py-1 text-neutral-100 text-sm border border-neutral-800 rounded-lg transition bg-transparent hover:bg-neutral-900"
-    >
+    <DropdownTrigger aria-label="Select aliases" variant="outline" size="xs">
       <div className="flex gap-1 items-center">
-        <span>
+        <span className="block max-w-[250px] truncate">
           Aliases{' '}
-          <span
-            className={classNames({ 'text-primary-500': value !== 'latest' })}
-          >
+          <span className={cn({ 'font-bold': value !== 'latest' })}>
             ({name})
           </span>
         </span>
-        <Icon iconName={isShown ? 'chevron-up' : 'chevron-down'} />
+        {isShown ? (
+          <ChevronUp className="w-4 h-4" />
+        ) : (
+          <ChevronDown className="w-4 h-4" />
+        )}
       </div>
     </DropdownTrigger>
   );
@@ -164,9 +164,9 @@ export const AliasListItem = ({
 
   return (
     <div
-      className={classNames(
-        'group flex justify-between items-center gap-2 text-neutral-100 text-sm py-2 px-1.5 rounded hover:pl-2 hover:bg-neutral-950 transition-all',
-        { 'bg-neutral-850': !isActive, 'bg-neutral-950': isActive },
+      className={cn(
+        'text-foreground group flex justify-between items-center gap-2 text-sm py-2 px-1.5 rounded hover:pl-2 transition-all hover:bg-muted',
+        { 'bg-muted': isActive, 'bg-white': !isActive },
       )}
     >
       <div className="flex gap-2 items-center">
@@ -179,18 +179,20 @@ export const AliasListItem = ({
       </div>
 
       {data.id !== 'latest' && (
-        <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100">
+        <div className="flex items-center opacity-0 group-hover:opacity-100">
           <IconButton
-            onlyIcon
-            iconName="edit"
+            size="xxs"
+            variant="ghost"
+            icon={<FilePenLine />}
             aria-label={`Edit alias: ${data.name}`}
             onClick={handleOnEdit}
           />
 
           {!isActive ? (
             <IconButton
-              onlyIcon
-              iconName="trash"
+              size="xxs"
+              variant="ghost"
+              icon={<Trash />}
               onClick={onDelete}
               aria-label={`Delete alias: ${data.name}`}
             />
@@ -203,7 +205,7 @@ export const AliasListItem = ({
 
 function AliasListItemBadge({ children }: PropsWithChildren) {
   return (
-    <div className="px-1 bg-neutral-800 text-neutral-300 text-xs !leading-[20px] rounded-sm">
+    <div className="px-1 bg-primary text-primary-foreground text-xs !leading-[20px] rounded-sm">
       {children}
     </div>
   );
@@ -242,13 +244,9 @@ export const CreateAliasForm = ({
         value={JSON.stringify(pipeline.config.connections)}
       />
 
-      <button
-        type="submit"
-        data-testid="create-alias"
-        className="bg-secondary-500 hover:bg-secondary-600 rounded-lg text-neutral-100 px-2 py-1 text-sm transition"
-      >
+      <Button type="submit" data-testid="create-alias" size="xs">
         Create alias
-      </button>
+      </Button>
     </ValidatedForm>
   );
 };
@@ -270,7 +268,7 @@ export const RestoreWorkflow = ({ pipeline }: RestoreWorkflowProps) => {
           action: routes.pipelineBuild(pipeline.organization_id, pipeline.id),
         }),
       children: (
-        <p className="text-neutral-100 text-sm">
+        <p className="text-sm">
           You are about to restore the workflow to previous version. This action
           is irreversible.
         </p>
@@ -285,13 +283,9 @@ export const RestoreWorkflow = ({ pipeline }: RestoreWorkflowProps) => {
   }, [updateFetcher.data]);
 
   return (
-    <button
-      type="button"
-      onClick={onSubmit}
-      className="border border-neutral-800 rounded-lg text-neutral-100 px-2 py-1 text-sm transition bg-transparent hover:bg-neutral-900"
-    >
+    <Button variant="destructive" type="button" onClick={onSubmit} size="xs">
       Restore
-    </button>
+    </Button>
   );
 };
 

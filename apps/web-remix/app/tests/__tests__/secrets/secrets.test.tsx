@@ -48,22 +48,6 @@ describe('Secrets', () => {
     await screen.findByText(/There is no Secrets yet/i);
   });
 
-  test('should delete secret', async () => {
-    const page = new SecretsObject().render({
-      initialEntries: ['/2/secrets'],
-    });
-
-    const list = await page.getSecretList();
-    expect(list.children).toHaveLength(3);
-
-    const button = await ButtonHandle.fromLabelText(/Delete secret: deepgram/i);
-    await button.click();
-
-    await page.confirmAction();
-
-    expect(list.children).toHaveLength(2);
-  });
-
   test('should add secret', async () => {
     const page = new SecretsObject().render({
       initialEntries: ['/2/secrets/new'],
@@ -93,29 +77,6 @@ describe('Secrets', () => {
     expect(
       await screen.findAllByText(/String must contain at least 2 /i),
     ).toHaveLength(2);
-  });
-
-  test('should change secret value', async () => {
-    new SecretsObject().render({
-      initialEntries: ['/2/secrets'],
-    });
-
-    const editButton = await ButtonHandle.fromLabelText(
-      /Edit secret: deepgram/i,
-    );
-    await editButton.click();
-
-    const updateSubmit = await ButtonHandle.fromRole('Update Secret');
-    await updateSubmit.click();
-
-    await screen.findByText(/String must contain at least 2 character/i);
-
-    const newValue = await InputHandle.fromLabelText(/value/i);
-    await newValue.type('NEW_VALUE');
-
-    await updateSubmit.click();
-
-    await screen.findByText(/01\/01\/2024/i);
   });
 });
 

@@ -6,12 +6,16 @@ import {
   useMatch,
   useNavigate,
 } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
 
+import { Button } from '~/components/ui/button';
 import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from '~/components/sidebar/ActionSidebar';
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import { InvitationsList } from './InvitationsList';
@@ -24,32 +28,34 @@ export function InvitationsPage() {
   const match = useMatch(routes.organizationInvitationsNew(organizationId));
   const isSidebarOpen = !!match;
 
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = (value: boolean) => {
+    if (value) return;
     navigate(routes.organizationInvitations(organizationId));
   };
 
   return (
     <>
-      <ActionSidebar
-        className="!bg-neutral-950"
-        isOpen={isSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
-      >
-        <ActionSidebarHeader
-          heading="Invite user"
-          subheading="Send invitation to your organziation."
-          onClose={handleCloseSidebar}
-        />
-        <Outlet />
-      </ActionSidebar>
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
+        <DialogDrawerContent>
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>Invite user</DialogDrawerTitle>
+            <DialogDrawerDescription>
+              Send invitation to your organziation.
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+
+          <DialogDrawerBody>
+            <Outlet />
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
 
       <div className="flex flex-col gap-4 items-end">
         <Link
           to={routes.organizationInvitationsNew(organizationId)}
           className="block w-fit"
         >
-          <Button tabIndex={0} size="sm">
+          <Button tabIndex={0} size="xs">
             New Member
           </Button>
         </Link>

@@ -11,6 +11,7 @@ import type {
   IInterfaceConfig,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
+import { Label } from '~/components/ui/label';
 
 import { schema } from './schema';
 
@@ -88,11 +89,15 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
         </Field>
 
         <Field name="webchat.public">
-          <CheckboxInputField label="Public" />
+          <Label className="flex gap-1 items-center">
+            <CheckboxInputField />
+
+            <span>Public</span>
+          </Label>
         </Field>
       </div>
 
-      <SubmitButton size="sm" variant="filled" className="mt-6">
+      <SubmitButton size="sm" className="mt-6">
         Save changes
       </SubmitButton>
     </ValidatedForm>

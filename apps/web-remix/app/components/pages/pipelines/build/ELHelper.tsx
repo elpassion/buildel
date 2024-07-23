@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { Layers2 } from 'lucide-react';
 
 import {
   ChatCloseButton,
@@ -16,6 +15,7 @@ import { ChatMessages } from '~/components/chat/ChatMessages';
 import { ChatWrapper } from '~/components/chat/ChatWrapper';
 import { useChat } from '~/components/chat/useChat';
 import { useEl } from '~/components/pages/pipelines/EL/ELProvider';
+import { cn } from '~/utils/cn';
 
 const INITIAL_MESSAGES = [
   {
@@ -80,19 +80,16 @@ export const ELHelper: React.FC<ELHelperProps> = ({
 
   return (
     <div
-      className={classNames(
-        'absolute top-8 z-10 right-0 transition md:right-4',
-        {
-          'opacity-0 pointer-events-none scale-90': !isShown,
-          'opacity-100 pointer-events-auto scale-100': isShown,
-        },
-      )}
+      className={cn('absolute top-8 z-10 right-0 transition md:right-4', {
+        'opacity-0 pointer-events-none scale-90': !isShown,
+        'opacity-100 pointer-events-auto scale-100': isShown,
+      })}
     >
       <ChatWrapper className="!w-[440px]">
         <ChatHeader>
           <div className="flex gap-2 items-center">
             <ChatHeading>
-              <Icon size="xs" iconName="two-layers" />
+              <Layers2 className="w-4 h-4" />
               <div className="text-white">Ask EL</div>
             </ChatHeading>
             <ChatStatus connectionStatus={connectionStatus} />
@@ -102,7 +99,7 @@ export const ELHelper: React.FC<ELHelperProps> = ({
         </ChatHeader>
 
         <ChatMessagesWrapper
-          className={classNames({
+          className={cn({
             'h-[300px]': !!messages.length,
             'h-[180px]': !messages.length,
           })}

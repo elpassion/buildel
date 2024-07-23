@@ -23,8 +23,8 @@ export function ClientSDKPage() {
   const { organizationId, pipelineId } = useLoaderData<typeof loader>();
   return (
     <div>
-      <h2 className="text-lg text-white font-medium">Client SDK</h2>
-      <p className="text-white text-xs mb-6">
+      <h2 className="text-lg text-foreground font-medium">Client SDK</h2>
+      <p className="text-muted-foreground text-xs mb-6">
         Access our Buildel API easily with our client SDK.
       </p>
 
@@ -76,7 +76,7 @@ export function ClientSDKPage() {
               Set up an HTTP endpoint on your server and use the{' '}
               <Link
                 to={routes.organizationSettings(organizationId)}
-                className="text-primary-500 hover:underline"
+                className="font-bold hover:underline"
                 target="_blank"
               >
                 API key

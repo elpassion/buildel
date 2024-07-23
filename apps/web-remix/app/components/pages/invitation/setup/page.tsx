@@ -5,7 +5,8 @@ import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
-import { FieldError } from '~/components/form/fields/field.error';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { PasswordInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 
@@ -32,21 +33,22 @@ export function SetupPage() {
         className="w-full max-w-md"
       >
         <Field name="global">
-          <FieldError />
+          <FieldMessage />
         </Field>
 
         <div className="max-w-s form-control w-full mb-6">
           <Field name="password">
-            <PasswordInputField aria-label="password" label="Password" />
+            <FieldLabel>Password</FieldLabel>
+            <PasswordInputField aria-label="password" />
+            <FieldMessage />
           </Field>
         </div>
 
         <div className="max-w-s form-control w-full mb-6">
           <Field name="confirmPassword">
-            <PasswordInputField
-              aria-label="confirm password"
-              label="Repeat password"
-            />
+            <FieldLabel>Repeat password</FieldLabel>
+            <PasswordInputField aria-label="confirm password" />
+            <FieldMessage />
           </Field>
         </div>
 

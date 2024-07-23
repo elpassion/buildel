@@ -5,6 +5,8 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { NumberInputField } from '~/components/form/fields/number.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
@@ -21,13 +23,12 @@ export function NewKnowledgeBasePage() {
   const onValueChange = (name: string, value: unknown) => {
     setWatchedValues((prev) => ({ ...prev, [name]: value }));
   };
-
   return (
     <ValidatedForm
       validator={validator}
       method="post"
       noValidate
-      className="w-full grow flex flex-col gap-2 h-[70%]"
+      className="w-full grow flex flex-col gap-2"
       defaultValues={{
         embeddings: {
           api_type: 'openai',
@@ -37,16 +38,20 @@ export function NewKnowledgeBasePage() {
         chunk_overlap: 0,
       }}
     >
-      <div className="max-w-s w-full grow overflow-y-auto p-1 flex flex-col gap-2 space-y-1">
-        <Field name="collection_name">
-          <TextInputField
-            type="text"
-            autoFocus
-            label="Name"
-            placeholder="eg. My Collection"
-            supportingText="It will help you identify the collection in BUILDEL"
-          />
-        </Field>
+      <div className="max-w-s w-full grow flex flex-col gap-3 space-y-1">
+        <div>
+          <Field name="collection_name">
+            <FieldLabel>Name</FieldLabel>
+            <TextInputField
+              type="text"
+              autoFocus
+              placeholder="eg. My Collection"
+            />
+            <FieldMessage>
+              It will help you identify the collection in BUILDEL
+            </FieldMessage>
+          </Field>
+        </div>
 
         <div>
           <ApiTypesRadioGroupField
@@ -56,42 +61,44 @@ export function NewKnowledgeBasePage() {
 
         <div>
           <Field name="embeddings.endpoint">
-            <TextInputField
-              type="text"
-              label={'Endpoint'}
-              name={'endpoint'}
-              supportingText="API endpoint used for retrieving embeddings"
-            />
+            <FieldLabel>Endpoint</FieldLabel>
+            <TextInputField type="text" name="endpoint" />
+            <FieldMessage>
+              API endpoint used for retrieving embeddings
+            </FieldMessage>
           </Field>
         </div>
 
         <div>
-          <ModelSelectField />
+          <ModelSelectField getPopupContainer={(node) => node.parentNode} />
         </div>
 
         <div>
-          <SecretSelectField />
+          <SecretSelectField getPopupContainer={(node) => node.parentNode} />
         </div>
 
-        <Field name="chunk_size">
-          <NumberInputField
-            label="Chunk size"
-            placeholder="eg. 1000"
-            supportingText="Size of the generated chunks in the collection."
-          />
-        </Field>
+        <div>
+          <Field name="chunk_size">
+            <FieldLabel>Chunk size</FieldLabel>
+            <NumberInputField placeholder="eg. 1000" />
+            <FieldMessage>
+              Size of the generated chunks in the collection.
+            </FieldMessage>
+          </Field>
+        </div>
 
-        <Field name="chunk_overlap">
-          <NumberInputField
-            label="Chunk overlap"
-            placeholder="eg. 50"
-            supportingText="Overlap between the generated chunks in the collection."
-          />
-        </Field>
+        <div>
+          <Field name="chunk_overlap">
+            <FieldLabel>Chunk overlap</FieldLabel>
+            <NumberInputField placeholder="eg. 50" />
+            <FieldMessage>
+              Overlap between the generated chunks in the collection.
+            </FieldMessage>
+          </Field>
+        </div>
       </div>
-      <SubmitButton hierarchy="primary" size="sm">
-        Create collection
-      </SubmitButton>
+
+      <SubmitButton size="sm">Create collection</SubmitButton>
     </ValidatedForm>
   );
 }

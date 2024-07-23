@@ -1,20 +1,19 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import {
-  Link,
-  Outlet,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-} from '@remix-run/react';
-import { Button } from '@elpassion/taco';
+import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
+import { Button } from '~/components/ui/button';
 import {
-  ActionSidebar,
-  ActionSidebarHeader,
-} from '~/components/sidebar/ActionSidebar';
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
 import { KnowledgeBaseCollectionList } from './KnowledgeBaseCollectionList';
@@ -26,12 +25,8 @@ export function KnowledgeBasePage() {
   const matchNew = useMatch(routes.knowledgeBaseNew(organizationId));
   const isNewSidebarOpen = !!matchNew;
 
-  const matchEdit = useMatch(
-    '/:organizationId/knowledge-base/:collectionName/edit',
-  );
-  const isEditSidebarOpen = !!matchEdit;
-
-  const handleCloseSidebar = () => {
+  const handleCloseSidebar = (value: boolean) => {
+    if (value) return;
     navigate(routes.knowledgeBase(organizationId));
   };
 
@@ -39,34 +34,37 @@ export function KnowledgeBasePage() {
     <>
       <AppNavbar
         leftContent={<AppNavbarHeading>Knowledge base</AppNavbarHeading>}
-      />
-
-      <ActionSidebar
-        className="!bg-neutral-950"
-        isOpen={isNewSidebarOpen || isEditSidebarOpen}
-        onClose={handleCloseSidebar}
-        overlay
       >
-        {isNewSidebarOpen && (
-          <ActionSidebarHeader
-            heading="Create a new collection"
-            subheading="Any collection can contain many files and be used in your workflows"
-            onClose={handleCloseSidebar}
-          />
-        )}
-        <Outlet />
-      </ActionSidebar>
+        <Button asChild className="w-fit ml-auto mr-0 hidden lg:flex">
+          <BasicLink to={routes.knowledgeBaseNew(organizationId)}>
+            New collection
+          </BasicLink>
+        </Button>
+      </AppNavbar>
 
-      <PageContentWrapper>
-        <div className="mt-5 mb-6 flex gap-2 justify-end items-center">
-          <Link
-            to={routes.knowledgeBaseNew(organizationId)}
-            aria-label="Go to new collection page"
-          >
-            <Button size="sm" tabIndex={0}>
+      <DialogDrawer open={isNewSidebarOpen} onOpenChange={handleCloseSidebar}>
+        <DialogDrawerContent>
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>Create a new collection</DialogDrawerTitle>
+            <DialogDrawerDescription>
+              Any collection can contain many files and be used in your
+              workflows
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+
+          <DialogDrawerBody>
+            <Outlet />
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
+
+      <PageContentWrapper className="mt-6">
+        <div className="mb-3 flex justify-end lg:hidden">
+          <Button size="sm" asChild>
+            <BasicLink to={routes.knowledgeBaseNew(organizationId)}>
               New collection
-            </Button>
-          </Link>
+            </BasicLink>
+          </Button>
         </div>
 
         <KnowledgeBaseCollectionList

@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import React, { forwardRef, useCallback } from 'react';
-import { InputText, Label } from '@elpassion/taco';
 import { useControlField } from 'remix-validated-form';
 import { useIsMounted } from 'usehooks-ts';
 
@@ -10,6 +9,8 @@ import {
   HiddenField,
   useFieldContext,
 } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import type { AsyncSelectInputProps } from '~/components/form/inputs/select/select.input';
 import { AsyncSelectInput } from '~/components/form/inputs/select/select.input';
 
@@ -26,7 +27,7 @@ export const AsyncSelectField = forwardRef<
   AsyncSelectFieldProps
 >(
   (
-    { url, defaultValue, label, supportingText, errorMessage, ...props },
+    { url, id, defaultValue, label, supportingText, errorMessage, ...props },
     _ref,
   ) => {
     const isMounted = useIsMounted();
@@ -56,21 +57,20 @@ export const AsyncSelectField = forwardRef<
     return (
       <>
         <HiddenField value={selectedId ?? ''} {...getInputProps()} />
-        <Label text={label} />
+        <FieldLabel>{label}</FieldLabel>
         <AsyncSelectInput
+          id={id ?? name}
           onBlur={getInputProps().onBlur}
           placeholder="Select..."
           fetchOptions={fetcher}
           defaultValue={defaultValue}
           onChange={setSelectedId}
           value={selectedId}
-          data-testid={props.id}
+          data-testid={id}
+          getPopupContainer={(node) => node.parentNode}
           {...props}
         />
-        <InputText
-          text={errorMessage ?? supportingText}
-          error={!!errorMessage}
-        />
+        <FieldMessage error={errorMessage}>{supportingText}</FieldMessage>
       </>
     );
   },

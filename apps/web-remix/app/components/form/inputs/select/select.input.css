@@ -3,36 +3,36 @@
 }
 
 .rc-select .rc-select-selector {
-  @apply rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !bg-neutral-800;
+  @apply rounded-md !border-[1.5px] !border-input !overflow-hidden !bg-white;
 }
 
 .rc-select-focused .rc-select-selector {
-  @apply outline outline-offset-[2px] outline-[2px] outline-primary-500 !border-neutral-200;
+  @apply outline outline-offset-[2px] outline-[2px] outline-secondary-foreground !border-input;
 }
 
 .rc-select .rc-select-selector .rc-select-selection-search-input {
-  @apply !bg-neutral-800 !shadow-none !ring-0 !text-white !text-sm !h-[40px] !outline-none;
+  @apply !bg-white !shadow-none !ring-0 !text-foreground !text-sm !h-[40px] !outline-none;
 }
 
 .rc-select .rc-select-selection-placeholder {
-  @apply !text-neutral-100  !opacity-100;
+  @apply !text-muted-foreground  !opacity-100;
 }
 
 .rc-select .rc-select-selection-item,
 .rc-select .rc-select-selection-placeholder {
-  @apply !top-1/2 !left-3 -translate-y-1/2 !text-sm !text-white;
+  @apply !top-1/2 !left-3 -translate-y-1/2 !text-sm !text-foreground;
 }
 
 .rc-select .rc-select-clear {
-  @apply !text-white !text-sm !cursor-pointer !absolute !top-1/2 right-3 -translate-y-1/2;
+  @apply !text-foreground !text-sm !cursor-pointer !absolute !top-1/2 right-3 -translate-y-1/2;
 }
 
 .rc-select-dropdown {
-  @apply !min-h-fit !bg-neutral-700 !rounded-lg !border-[1.5px] !border-neutral-200 !overflow-hidden !z-[61];
+  @apply !min-h-fit !bg-white !rounded-lg !border-[1.5px] !border-input !overflow-hidden !z-[61];
 }
 
 .rc-select-dropdown .rc-select-item-empty {
-  @apply !text-neutral-100 !my-2 !text-sm;
+  @apply !text-muted-foreground !my-2 !text-sm;
 }
 
 .rc-select-dropdown .rc-select-item-option {
@@ -40,15 +40,15 @@
 }
 
 .rc-select-dropdown .rc-select-item-option .rc-select-item-option-content {
-  @apply !text-white !text-sm !py-2;
+  @apply !text-foreground !text-sm !py-2;
 }
 
 .rc-select-dropdown .rc-select-item-option-active {
-  @apply !bg-neutral-800;
+  @apply !bg-primary-foreground;
 }
 
 .rc-select-dropdown .rc-select-item-option-selected {
-  @apply !bg-neutral-900;
+  @apply !bg-accent;
 }
 
 .rc-select-dropdown
@@ -67,7 +67,7 @@
 }
 
 .rc-select-multiple .rc-select-selector .rc-select-selection-item {
-  @apply px-2 py-1.5 m-0 flex gap-3 cursor-pointer bg-neutral-300;
+  @apply px-2 py-1.5 m-0 flex gap-3 cursor-pointer bg-muted;
 }
 
 .rc-select-multiple .rc-select-selector .rc-select-selection-overflow-item {

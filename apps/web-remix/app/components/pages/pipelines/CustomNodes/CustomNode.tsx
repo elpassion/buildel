@@ -1,8 +1,10 @@
 import type { PropsWithChildren } from 'react';
-import { useCallback, useMemo } from 'react';
-import { Badge, Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import React, { useCallback, useMemo } from 'react';
 import startCase from 'lodash.startcase';
+import { AlertCircle } from 'lucide-react';
+
+import { Badge } from '~/components/ui/badge';
+import { cn } from '~/utils/cn';
 
 import type { IBlockConfig } from '../pipeline.types';
 import { getBlockFields, getBlockHandles } from '../PipelineFlow.utils';
@@ -30,8 +32,8 @@ export function CustomNode({
 
   const borderStyles = useCallback(() => {
     if (!isValid) return 'border-red-500';
-    if (selected) return 'border-primary-700';
-    return 'border-neutral-900';
+    if (selected) return 'border-orange-500';
+    return 'border-input';
   }, [isValid, selected]);
 
   return (
@@ -41,12 +43,12 @@ export function CustomNode({
         data-testid="builder-block"
         data-active={status}
         data-valid={isValid}
-        className={classNames(
-          'min-h-[100px] min-w-[250px] max-w-[500px] break-words rounded bg-neutral-800 drop-shadow-sm transition border nowheel',
+        className={cn(
+          'min-h-[100px] min-w-[250px] max-w-[500px] break-words rounded-lg bg-white drop-shadow-sm transition border nowheel',
           borderStyles(),
           {
             'scale-110': status,
-            'border-primary-700': status,
+            'border-orange-500': status,
           },
           className,
         )}
@@ -56,7 +58,7 @@ export function CustomNode({
       </section>
       {errors.length === 0 ? null : (
         <p className="text-red-500 flex gap-1 items-center mt-2">
-          <Icon iconName="alert-circle" className="text-sm" />
+          <AlertCircle className="w-3.5 h-3.5" />
           <span className="text-xs">
             {errors.length === 1
               ? errors[0]
@@ -75,15 +77,21 @@ export interface CustomNodeHeaderProps extends PropsWithChildren {
 export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
   return (
     <header
-      className={classNames(
-        'relative flex items-center justify-between p-2 rounded-t bg-neutral-900 gap-2',
+      className={cn(
+        'relative flex items-center justify-between py-2 px-3 rounded-t-lg bg-primary text-primary-foreground gap-2',
       )}
     >
       <div className="flex items-center gap-2">
-        <h3 className="text-xs font-medium capitalize text-neutral-50">
+        <h3 className="text-xs font-medium capitalize">
           {startCase(data.type)}
         </h3>
-        <Badge size="xs" text={data.name} />
+
+        <Badge
+          variant="secondary"
+          className="px-2 py-0 text-xs font-normal text-foreground"
+        >
+          {data.name}
+        </Badge>
       </div>
 
       {children}
@@ -184,7 +192,7 @@ export function CustomNodeBody({
 function NodeWorkingIcon({ isWorking }: { isWorking: boolean }) {
   return (
     <div
-      className={classNames(
+      className={cn(
         'animate-ping w-2 h-2 rounded-full bg-primary-500 flex justify-center items-center absolute z-10 -top-1 -right-1',
         {
           hidden: !isWorking,

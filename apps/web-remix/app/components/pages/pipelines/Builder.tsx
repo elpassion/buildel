@@ -24,7 +24,6 @@ import type {
   NodeChange,
   NodeProps,
 } from '@xyflow/react';
-import classNames from 'classnames';
 import { useEventListener } from 'usehooks-ts';
 
 import { useUndoRedo } from '~/hooks/useUndoRedo';
@@ -51,6 +50,8 @@ import { useCopyPasteNode } from './useCopyPasteNode';
 import { useDraggableNodes } from './useDraggableNodes';
 
 import '@xyflow/react/dist/style.css';
+
+import { cn } from '~/utils/cn';
 
 interface BuilderProps {
   alias?: string;
@@ -291,7 +292,7 @@ export const Builder = ({
   return (
     <div
       data-testid="workflow-builder"
-      className={classNames('relative pt-5 w-full', className)}
+      className={cn('relative pt-5 w-full', className)}
       ref={reactFlowWrapper}
     >
       <RunPipelineProvider
@@ -336,8 +337,8 @@ export const Builder = ({
             <Background
               variant={BackgroundVariant.Dots}
               gap={20}
-              color="#666"
-              className="!bg-black rounded-lg"
+              color="#aaa"
+              className="!bg-muted"
             />
             <Controls showInteractive={false} />
           </ReactFlow>

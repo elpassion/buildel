@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from '@elpassion/taco';
-import classNames from 'classnames';
 
 import { KnowledgeBaseFileResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { Button } from '~/components/ui/button';
 import { assert } from '~/utils/assert';
+import { cn } from '~/utils/cn';
 
 import type { IFile, IFileUpload, IPreviewProps } from './fileUpload.types';
 
@@ -118,9 +118,9 @@ export function FileUpload({
   }, [handleFetchFiles]);
 
   return (
-    <div className={classNames('flex flex-col gap-2', className)}>
+    <div className={cn('flex flex-col gap-2', className)}>
       <label htmlFor={rest.id}>
-        <span className="text-white text-xs font-medium">{labelText}</span>
+        <span className="text-foreground text-xs font-medium">{labelText}</span>
         <input
           name={name}
           type="file"
@@ -133,7 +133,7 @@ export function FileUpload({
         <Button
           onClick={handleSelectFiles}
           size="xs"
-          variant="outlined"
+          variant="outline"
           className="!text-xs"
           disabled={disabled}
           isFluid

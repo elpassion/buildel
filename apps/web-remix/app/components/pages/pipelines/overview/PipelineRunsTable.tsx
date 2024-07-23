@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import { Link } from '@remix-run/react';
-import { Indicator } from '@elpassion/taco';
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { ExternalLink } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
 import { EmptyMessage } from '~/components/list/ItemList';
@@ -15,7 +15,17 @@ import type {
   IPipelineRun,
   IPipelineRuns,
 } from '~/components/pages/pipelines/pipeline.types';
+import {
+  Table,
+  TableBody,
+  TableBodyCell,
+  TableBodyRow,
+  TableHead,
+  TableHeadCell,
+  TableHeadRow,
+} from '~/components/table/table.components';
 import { Tooltip } from '~/components/tooltip/Tooltip';
+import { Badge } from '~/components/ui/badge';
 import { dayjs } from '~/utils/Dayjs';
 import { routes } from '~/utils/routes.utils';
 
@@ -42,11 +52,11 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
       columnHelper.accessor('status', {
         id: 'status',
         cell: (info) => (
-          <Indicator
-            type={info.getValue() !== 'finished' ? 'warning' : 'success'}
-            variant="badge"
-            text={info.getValue()}
-          />
+          <Badge
+            variant={info.getValue() !== 'finished' ? 'destructive' : 'outline'}
+          >
+            {info.getValue()}
+          </Badge>
         ),
         header: 'Status',
       }),
@@ -92,10 +102,10 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
               >
                 <IconButton
                   tabIndex={-1}
+                  variant="secondary"
                   aria-label="Go to run overview"
-                  iconName="external-link"
-                  size="xs"
-                  onlyIcon
+                  icon={<ExternalLink />}
+                  size="xxs"
                 />
               </Link>
 
@@ -124,26 +134,23 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
   });
 
   return (
-    <table className="w-full">
-      <thead className="text-left text-white text-xs bg-neutral-800">
+    <Table>
+      <TableHead>
         {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id} className="rounded-xl overflow-hidden">
+          <TableHeadRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th
-                key={header.id}
-                className="py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg"
-              >
+              <TableHeadCell key={header.id}>
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext(),
                 )}
-              </th>
+              </TableHeadCell>
             ))}
-          </tr>
+          </TableHeadRow>
         ))}
-      </thead>
+      </TableHead>
 
-      <tbody>
+      <TableBody>
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
@@ -152,19 +159,15 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
           </tr>
         ) : null}
         {table.getRowModel().rows.map((row) => (
-          <tr
-            key={row.id}
-            className="[&:not(:first-child)]:border-t border-neutral-800"
-            aria-label="pipeline run"
-          >
+          <TableBodyRow key={row.id} aria-label="pipeline run">
             {row.getVisibleCells().map((cell) => (
-              <td key={cell.id} className="py-3 px-5 text-neutral-100 text-sm">
+              <TableBodyCell key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </td>
+              </TableBodyCell>
             ))}
-          </tr>
+          </TableBodyRow>
         ))}
-      </tbody>
-    </table>
+      </TableBody>
+    </Table>
   );
 };

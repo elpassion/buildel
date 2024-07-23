@@ -1,18 +1,18 @@
 import type { HTMLProps } from 'react';
 import React from 'react';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { Copy, Download, Trash } from 'lucide-react';
 
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { useDownloadFile } from '~/hooks/useDownloadFile';
+import { cn } from '~/utils/cn';
 
 export function NodeCopyButton({ text }: { text: string }) {
   const { copy, isCopied } = useCopyToClipboard(text);
 
   return (
     <NodeActionButton className="w-[52px]" onClick={copy}>
-      {isCopied ? null : <Icon iconName="copy" />}
-      <span className={classNames({ 'text-green-600': isCopied })}>
+      {isCopied ? null : <Copy className="w-3.5 h-3.5" />}
+      <span className={cn({ 'text-green-600': isCopied })}>
         {isCopied ? 'Copied!' : 'Copy'}
       </span>
     </NodeActionButton>
@@ -30,7 +30,7 @@ export function NodeDownloadButton({
 
   return (
     <NodeActionButton onClick={handleDownload}>
-      <Icon iconName="download" />
+      <Download className="w-3.5 h-3.5" />
       <span>Download</span>
     </NodeActionButton>
   );
@@ -39,7 +39,7 @@ export function NodeDownloadButton({
 export function NodeClearButton({ onClear }: { onClear: () => void }) {
   return (
     <NodeActionButton onClick={onClear}>
-      <Icon iconName="trash" />
+      <Trash className="w-3.5 h-3.5" />
       <span>Clear</span>
     </NodeActionButton>
   );
@@ -53,8 +53,8 @@ export function NodeActionButton({
 }: HTMLProps<HTMLButtonElement>) {
   return (
     <button
-      className={classNames(
-        'text-xs text-neutral-100 rounded px-1 py-[2px] flex items-center gap-1 hover:text-primary-500',
+      className={cn(
+        'text-xs text-muted-foreground rounded px-1 py-[2px] flex items-center gap-1 hover:text-foreground',
         className,
       )}
       {...rest}

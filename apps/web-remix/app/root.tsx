@@ -1,4 +1,3 @@
-import Modal from 'react-modal';
 import type { LinksFunction } from '@remix-run/node';
 import {
   Links,
@@ -17,8 +16,6 @@ import { ErrorBoundaryLayout } from '~/components/errorBoundaries/ErrorBoundaryL
 import { RootErrorBoundary } from '~/components/errorBoundaries/RootErrorBoundary';
 import { PageProgress } from '~/components/progressBar/PageProgress';
 import { useNonce } from '~/utils/nonce-provider';
-
-Modal.setAppElement('#_root');
 
 export const links: LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -58,7 +55,7 @@ function Document({
           src="/statistics/script.js"
         ></script>
       </head>
-      <body className="bg-neutral-950">
+      <body className="bg-white text-foreground">
         {children}
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
@@ -84,7 +81,7 @@ export default withSentry(App);
 export function ErrorBoundary() {
   const nonce = useNonce();
   return (
-    <ErrorBoundaryLayout nonce={nonce} className="bg-neutral-950 text-white">
+    <ErrorBoundaryLayout nonce={nonce} className="bg-white text-foreground">
       <RootErrorBoundary />
     </ErrorBoundaryLayout>
   );

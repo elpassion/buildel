@@ -1,7 +1,8 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { Icon } from '@elpassion/taco';
-import classNames from 'classnames';
+import { Loader, Send } from 'lucide-react';
 import { useBoolean, useIsomorphicLayoutEffect } from 'usehooks-ts';
+
+import { cn } from '~/utils/cn';
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
@@ -63,10 +64,10 @@ export function ChatInput({
 
   return (
     <div
-      className={classNames(
-        'relative w-full overflow-hidden rounded-xl border border-neutral-700 bg-neutral-900 flex items-center max-h-[112px] min-h-fit h-auto shrink-0 w-full flex-col',
+      className={cn(
+        'relative overflow-hidden rounded-xl border border-input bg-white flex items-center max-h-[112px] min-h-fit h-auto shrink-0 w-full flex-col',
         {
-          'outline outline-2 outline-offset-1 outline-secondary-500': isFocused,
+          'outline-none ring-2 ring-ring ring-offset-2': isFocused,
         },
       )}
     >
@@ -84,7 +85,7 @@ export function ChatInput({
           <textarea
             ref={textareaRef}
             disabled={disabled}
-            className="bg-transparent !border-0 !ring-0 w-full text-sm text-neutral-200 py-1.5 pl-2 pr-8 placeholder:text-neutral-600 !outline-0 focus:!border-none resize-none max-h-[112px]"
+            className="bg-transparent !border-0 !ring-0 w-full text-sm text-foreground py-1.5 pl-2 pr-8 placeholder:text-muted-foreground !outline-0 focus:!border-none resize-none max-h-[112px]"
             placeholder="Ask a question..."
             rows={1}
             value={value}
@@ -96,13 +97,15 @@ export function ChatInput({
 
           <button
             disabled={isDisabled}
-            className="absolute bottom-[4.5px] right-2 text-white w-6 h-6 rounded-full bg-secondary-600 hover:bg-secondary-500 flex justify-center items-center disabled:bg-neutral-800 disabled:text-neutral-300"
+            className="absolute bottom-[4.5px] right-1.5 text-white w-6 h-6 rounded-full bg-primary hover:bg-primary/90 flex justify-center items-center disabled:opacity-30 disabled:pointer-events-none"
           >
-            <Icon
-              size="none"
-              iconName={generating ? 'loader' : 'send'}
-              className={classNames('text-sm', { 'animate-spin': generating })}
-            />
+            {generating ? (
+              <Loader
+                className={cn('w-3 h-3', { 'animate-spin': generating })}
+              />
+            ) : (
+              <Send className={cn('w-3 h-3')} />
+            )}
           </button>
         </form>
       </div>

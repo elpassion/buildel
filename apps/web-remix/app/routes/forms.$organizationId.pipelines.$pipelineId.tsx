@@ -11,6 +11,8 @@ import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts'
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { SmallFileInputField } from '~/components/form/fields/file.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
@@ -135,8 +137,8 @@ export default function WebsiteForm() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen w-full">
-      <div className="flex flex-col w-[820px] bg-neutral-900 p-2 rounded-lg">
+    <div className="flex justify-center items-center h-screen w-full text-foreground">
+      <div className="flex flex-col w-[820px] bg-muted p-2 rounded-lg">
         <ValidatedForm
           validator={validator}
           noValidate
@@ -148,13 +150,16 @@ export default function WebsiteForm() {
               return (
                 <Field name={input.name} key={input.name}>
                   {input.type === 'text_input' && (
-                    <TextInputField className="w-full" label={input.name} />
+                    <div className="w-full">
+                      <FieldLabel>{input.name}</FieldLabel>
+                      <TextInputField className="w-full" />
+                      <FieldMessage />
+                    </div>
                   )}
                   {input.type === 'file_input' && (
-                    <div className="flex text-white justify-start items-center gap-2 bg-neutral-800 rounded-lg w-full">
+                    <div className="flex text-foreground justify-start items-center gap-2 rounded-lg w-full">
                       <SmallFileInputField
                         multiple={false}
-                        buttonText={input.name}
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
@@ -165,6 +170,7 @@ export default function WebsiteForm() {
                           }));
                         }}
                       />
+
                       <p>{files[input.name]?.name}</p>
                     </div>
                   )}
@@ -173,7 +179,7 @@ export default function WebsiteForm() {
             })}
           </div>
 
-          <SubmitButton size="sm" variant="filled" className="mt-6 mb-6">
+          <SubmitButton size="sm" className="mt-6 mb-6">
             Submit
           </SubmitButton>
 
@@ -209,7 +215,7 @@ export function FormInterfaceOutput({
 
         <NodeClearButton onClear={() => {}} />
       </div>
-      <div className="w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-neutral-200 rounded-md py-2 px-[10px]">
+      <div className="bg-white w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-input rounded-md py-2 px-[10px]">
         <ChatMarkdown>{payload ?? ''}</ChatMarkdown>
       </div>
     </div>

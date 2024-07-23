@@ -7,6 +7,8 @@ import { FileUploadListPreview } from '~/components/fileUpload/FileUploadListPre
 import { RadioInput } from '~/components/form/inputs/radio.input';
 import { Tab } from '~/components/tabs/Tab';
 import { TabGroup } from '~/components/tabs/TabGroup';
+import { Label } from '~/components/ui/label';
+import { RadioGroup } from '~/components/ui/radio-group';
 
 import { useRunPipeline } from '../RunPipelineProvider';
 
@@ -25,40 +27,42 @@ export function AudioFieldTabs({
 }: AudioFieldTabsProps) {
   const { status } = useRunPipeline();
   const [activeTab, setActiveTab] = useState('microphone');
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setActiveTab(e.target.value);
-  };
+
   return (
     <TabGroup activeTab={activeTab}>
-      <div className="flex gap-2 pb-3 mb-3 mt-1 w-[280px] border-b-[1px] border-neutral-600">
-        <RadioInput
-          size="sm"
-          value="microphone"
-          id="audio-upload-mic"
-          name="audio-upload"
-          label="Microphone"
-          checked={activeTab === 'microphone'}
-          onChange={onChange}
-        />
+      <div className="flex gap-2 pb-3 mb-3 mt-1 w-[280px] border-b-[1px] border-input">
+        <RadioGroup
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex gap-2 items-center"
+        >
+          <Label className="flex gap-1 items-center">
+            <RadioInput
+              value="microphone"
+              id="audio-upload"
+              checked={activeTab === 'microphone'}
+            />
 
-        <RadioInput
-          size="sm"
-          value="upload"
-          id="audio-upload-upload"
-          name="audio-upload"
-          label="File upload"
-          checked={activeTab === 'upload'}
-          onChange={onChange}
-        />
+            <span>Microphone</span>
+          </Label>
+
+          <Label className="flex gap-1 items-center">
+            <RadioInput
+              value="upload"
+              id="audio-upload"
+              checked={activeTab === 'upload'}
+            />
+
+            <span>File upload</span>
+          </Label>
+        </RadioGroup>
       </div>
 
       <Tab tabId="microphone">
-        <p className="text-[10px] text-white mb-3">
+        <p className="text-[10px] text-muted-foreground mb-3">
           You need to start the workflow first in order to stream audio.
         </p>
-        <p className="text-xs font-bold text-white mb-1">Audio stream</p>
+        <p className="text-xs font-medium text-foreground mb-1">Audio stream</p>
         <AudioRecorder
           onChunk={(e) => onChunk(e.data, name)}
           disabled={status !== 'running' || disabled}
@@ -66,7 +70,7 @@ export function AudioFieldTabs({
       </Tab>
 
       <Tab tabId="upload">
-        <p className="text-[10px] text-white mb-2">
+        <p className="text-[10px] text-muted-foreground mb-2">
           You need to start the workflow first in order to upload audio.
         </p>
         <FileUpload

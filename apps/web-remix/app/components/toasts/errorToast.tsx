@@ -1,24 +1,16 @@
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 import type { ToastProps } from './Toast.interface';
-import { ErrorToast } from './ui/ErrorToast';
 
 export const errorToast = (props?: ToastProps | string) => {
   if (typeof props === 'string') {
-    return toast((t) => (
-      <ErrorToast title={props} onClose={() => toast.dismiss(t.id)} />
-    ));
+    return toast.success(props);
   }
 
-  const { title, options, ...rest } = {
+  const { title, ...rest } = {
     title: 'Error',
     ...props,
   };
 
-  return toast(
-    (t) => (
-      <ErrorToast title={title} onClose={() => toast.dismiss(t.id)} {...rest} />
-    ),
-    options,
-  );
+  return toast.success(title, rest);
 };

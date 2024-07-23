@@ -1,13 +1,14 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { Link, Outlet, useLoaderData, useMatch } from '@remix-run/react';
-import { Button } from '@elpassion/taco';
+import { Outlet, useLoaderData, useMatch } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
-import { AppNavbar } from '~/components/navbar/AppNavbar';
+import { BasicLink } from '~/components/link/BasicLink';
+import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
 import { TabGroup } from '~/components/tabs/TabGroup';
+import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -26,15 +27,17 @@ export function KnowledgeBaseCollectionLayout() {
     <>
       <AppNavbar
         leftContent={
-          <h1 className="text-2xl font-medium text-white">
-            {collectionName} Database
-          </h1>
+          <AppNavbarHeading>{collectionName} Database</AppNavbarHeading>
         }
-      />
+      >
+        <Button asChild className="w-fit ml-auto mr-0 hidden lg:flex">
+          <BasicLink to={linkToSearch}>Ask a question</BasicLink>
+        </Button>
+      </AppNavbar>
 
-      <PageContentWrapper>
+      <PageContentWrapper className="mt-6">
         <TabGroup>
-          <div className="flex gap-2 justify-between items-center mt-5">
+          <div className="flex gap-2 justify-between items-center flex-wrap">
             <FilledTabsWrapper>
               <FilledTabLink
                 to={routes.collectionFiles(organizationId, collectionName)}
@@ -58,14 +61,12 @@ export function KnowledgeBaseCollectionLayout() {
               </FilledTabLink>
             </FilledTabsWrapper>
 
-            <Link to={linkToSearch}>
-              <Button size="sm" tabIndex={0}>
-                Ask a question
-              </Button>
-            </Link>
+            <Button asChild className="w-fit lg:hidden">
+              <BasicLink to={linkToSearch}>Ask a question</BasicLink>
+            </Button>
           </div>
 
-          <div className="pt-6">
+          <div className="pt-3 lg:pt-6">
             <Outlet />
           </div>
         </TabGroup>

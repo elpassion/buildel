@@ -1,20 +1,21 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import type { NavbarProps } from '@elpassion/taco';
-import { Navbar } from '@elpassion/taco';
-import classNames from 'classnames';
 
+import type { NavbarProps } from '~/components/navbar/navbar';
+import Navbar from '~/components/navbar/navbar';
 import { useNavSidebarContext } from '~/components/sidebar/NavSidebar';
+import { cn } from '~/utils/cn';
 
 export const AppNavbar: React.FC<
   Omit<NavbarProps, 'wrapperClassName' | 'menuClassName' | 'onMenuClick'>
 > = ({ children, ...rest }) => {
-  const { openSidebar } = useNavSidebarContext();
+  const { openSidebar, isOpen } = useNavSidebarContext();
   return (
     <Navbar
       menuClassName="lg:hidden !text-white min-w-[24px]"
-      wrapperClassName="py-2 md:px-2"
+      wrapperClassName="pt-4 pb-2 md:px-2 md:pb-2 md:pt-6"
       onMenuClick={openSidebar}
+      isMenuOpen={isOpen}
       {...rest}
     >
       {children}
@@ -30,7 +31,9 @@ export const AppNavbarHeading = ({
   className,
 }: AppNavbarHeadingProps) => {
   return (
-    <h1 className={classNames('text-2xl font-medium text-white', className)}>
+    <h1
+      className={cn('text-2xl md:text-3xl font-medium text-white', className)}
+    >
       {children}
     </h1>
   );

@@ -15,7 +15,7 @@ export const ToggleInputField = forwardRef<
   return (
     <ToggleInput
       name={name}
-      onChange={setValue}
+      onCheckedChange={setValue}
       checked={currentVal}
       value={currentVal.toString()}
       {...props}

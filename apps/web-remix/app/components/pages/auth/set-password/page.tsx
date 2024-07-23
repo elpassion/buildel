@@ -5,7 +5,8 @@ import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
-import { FieldError } from '~/components/form/fields/field.error';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 
@@ -18,16 +19,14 @@ export function SetPasswordPage() {
 
   return (
     <div className="my-auto flex flex-col w-full justify-center items-center">
-      <h1 className="text-center text-3xl font-bold text-neutral-100">
-        Set new password{' '}
-      </h1>
-      <p className="text-center text-neutral-100">
+      <h1 className="text-center text-3xl font-bold">Set new password </h1>
+      <p className="text-center text-muted-foreground">
         Go back to
         <Link
           to={{
             pathname: '/login',
           }}
-          className="text-primary-500"
+          className="text-foreground"
         >
           Sign In
         </Link>
@@ -37,27 +36,29 @@ export function SetPasswordPage() {
         validator={validator}
         method="post"
         noValidate
-        className="w-full max-w-md"
+        className="w-full max-w-md mt-10"
       >
         <Field name="global">
-          <FieldError />
+          <FieldMessage />
         </Field>
         <div className="form-control w-full mb-4">
           <Field name="password">
+            <FieldLabel>New password</FieldLabel>
             <TextInputField
               type="password"
-              label="New password"
               autoFocus
               data-testid="new-password"
             />
+            <FieldMessage />
           </Field>
           <Field name="password_confirmation">
+            <FieldLabel>Confirm new password</FieldLabel>
             <TextInputField
               type="password"
-              label="Confirm new password"
               data-testid="new-password-confirmation"
               autoFocus
             />
+            <FieldMessage />
           </Field>
           <HiddenField name="token" value={token} />
         </div>

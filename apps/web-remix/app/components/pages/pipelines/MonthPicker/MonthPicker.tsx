@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from '@remix-run/react';
-import { Icon } from '@elpassion/taco';
 
 import {
   DatepickerInput,
@@ -11,6 +10,8 @@ import { dayjs } from '~/utils/Dayjs';
 import { buildUrlWithParams } from '~/utils/url';
 
 import './monthPicker.styles.css';
+
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface MonthPickerProps {
   date: Date;
@@ -54,7 +55,7 @@ export const MonthPicker = ({ date, loaderUrl }: MonthPickerProps) => {
   return (
     <div className="flex gap-1 items-center">
       <PaginationButton onClick={prevMonth}>
-        <Icon iconName="chevron-left" />
+        <ChevronLeft className="w-3.5 h-3.5" />
       </PaginationButton>
 
       <DatepickerInput
@@ -64,12 +65,12 @@ export const MonthPicker = ({ date, loaderUrl }: MonthPickerProps) => {
         dateFormat="MMMM"
         className="h-[30px]"
         fallback={
-          <DatepickerInputFallback className="!h-[30px] !bg-transparent !border-neutral-800" />
+          <DatepickerInputFallback className="!h-[30px] !bg-transparent !border-input" />
         }
       />
 
       <PaginationButton onClick={nextMonth}>
-        <Icon iconName="chevron-right" />
+        <ChevronRight className="w-3.5 h-3.5" />
       </PaginationButton>
     </div>
   );

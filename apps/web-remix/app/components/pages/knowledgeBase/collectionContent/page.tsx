@@ -7,10 +7,16 @@ import {
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import { Modal } from '@elpassion/taco/Modal';
-import classNames from 'classnames';
 
-import { ActionSidebar } from '~/components/sidebar/ActionSidebar';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import { KnowledgeBaseFileList } from './KnowledgeBaseFileList';
@@ -28,50 +34,49 @@ export function KnowledgeBaseContentPage() {
   const matchSearch = useMatch(
     routes.collectionSearch(organizationId, collectionName),
   );
-  const isSidebarOpen = !!matchNew || !!matchSearch;
-
   const matchDetails = useMatch(
     `:organizationId/knowledge-base/:collectionName/content/:memoryId/chunks`,
   );
 
-  const [searchParams] = useSearchParams();
-  const isDetails = !!matchDetails;
+  const isSidebarOpen = !!matchNew || !!matchSearch || !!matchDetails;
 
-  const handleClose = () => {
+  const [searchParams] = useSearchParams();
+
+  const handleClose = (value?: boolean) => {
+    if (value) return;
     navigate(routes.collectionFiles(organizationId, collectionName));
   };
 
   return (
-    <>
+    <div className="mt-5">
       <KnowledgeBaseFileList items={fileList} />
 
-      <Modal
-        isOpen={isDetails}
-        header={
-          <h3 className="text-white font-medium text-xl">
-            {searchParams.get('file_name')}
-          </h3>
-        }
-        closeButtonProps={{ iconName: 'x', 'aria-label': 'Close' }}
-        onClose={handleClose}
-        className="w-full max-w-3xl"
-      >
-        <div className="max-h-[70vh] p-2">
-          <Outlet />
-        </div>
-      </Modal>
+      <DialogDrawer open={isSidebarOpen} onOpenChange={handleClose}>
+        <DialogDrawerContent
+          className={cn({
+            'md:min-w-[700px]': matchDetails ?? matchSearch,
+            'lg:min-w-[900px]': matchDetails,
+          })}
+        >
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>
+              {matchDetails && searchParams.get('file_name')}
+              {matchNew && 'Create New File'}
+              {matchSearch && 'Ask a question to your knowledge base'}
+            </DialogDrawerTitle>
 
-      <ActionSidebar
-        className={classNames('!bg-neutral-950', {
-          'md:w-[550px]': matchSearch,
-        })}
-        isOpen={isSidebarOpen}
-        onClose={handleClose}
-        overlay
-      >
-        <Outlet />
-      </ActionSidebar>
-    </>
+            <DialogDrawerDescription>
+              {matchNew && 'Upload files to a Knowledge base.'}
+              {matchSearch &&
+                "Let's ask your knowledge base some questions so you can see how your chatbot will answer and where it'll take it's information from."}
+            </DialogDrawerDescription>
+          </DialogDrawerHeader>
+          <DialogDrawerBody>
+            <Outlet />
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
+    </div>
   );
 }
 

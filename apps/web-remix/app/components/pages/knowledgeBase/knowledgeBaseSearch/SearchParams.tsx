@@ -1,33 +1,25 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
-import { Icon } from '@elpassion/taco';
+import { Settings } from 'lucide-react';
 
+import { IconButton } from '~/components/iconButton';
 import {
-  Dropdown,
-  DropdownPopup,
-  DropdownTrigger,
-} from '~/components/dropdown/Dropdown';
+  Popover,
+  PopoverContentWithoutPortal,
+  PopoverTrigger,
+} from '~/components/ui/popover';
 
 export const SearchParams: React.FC<PropsWithChildren> = ({ children }) => {
   return (
-    <Dropdown>
-      <SearchParamsTrigger />
+    <Popover>
+      <PopoverTrigger asChild>
+        <IconButton
+          variant="secondary"
+          icon={<Settings className="w-5 h-5 text-foreground" />}
+        />
+      </PopoverTrigger>
 
-      <DropdownPopup className="min-w-[250px] z-[11] bg-neutral-850 border border-neutral-800 rounded-lg overflow-hidden p-2 lg:min-w-[350px]">
-        {children}
-      </DropdownPopup>
-    </Dropdown>
+      <PopoverContentWithoutPortal>{children}</PopoverContentWithoutPortal>
+    </Popover>
   );
 };
-
-function SearchParamsTrigger() {
-  return (
-    <DropdownTrigger
-      type="button"
-      aria-label="Open search params editor"
-      className="bg-neutral-800 text-neutral-100 w-10 h-10 rounded-lg text-sm flex items-center justify-center hover:bg-neutral-900 transition"
-    >
-      <Icon iconName="settings" />
-    </DropdownTrigger>
-  );
-}

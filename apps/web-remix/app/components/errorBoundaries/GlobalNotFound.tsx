@@ -14,7 +14,7 @@ export const GlobalNotFound: React.FC<GlobalNotFoundProps> = ({ error }) => {
       <h2 className="text-6xl font-bold">{error.status}</h2>
       <p className="font-medium text-xl">Ooops!</p>
       <h1 className="font-medium text-xl">Page Not Found</h1>
-      <Link to={routes.dashboard} className="mt-1 text-primary-500 font-bold">
+      <Link to={routes.dashboard} className="mt-1 text-foreground font-bold">
         Back to homepage
       </Link>
     </section>

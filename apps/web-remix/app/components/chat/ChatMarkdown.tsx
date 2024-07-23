@@ -1,10 +1,11 @@
 import type { AnchorHTMLAttributes } from 'react';
 import React, { useEffect, useRef } from 'react';
-import classNames from 'classnames';
 import Markdown from 'markdown-to-jsx';
 import type { MarkdownToJSX } from 'markdown-to-jsx';
 import mermaid from 'mermaid';
 import { z } from 'zod';
+
+import { cn } from '~/utils/cn';
 
 interface ChatMarkdownProps {
   [key: string]: any;
@@ -83,7 +84,7 @@ function Strong({
   ...rest
 }: React.ParamHTMLAttributes<HTMLDivElement>) {
   return (
-    <strong className={classNames('font-bold text-white', className)} {...rest}>
+    <strong className={cn('font-bold text-foreground', className)} {...rest}>
       {children}
     </strong>
   );
@@ -96,7 +97,7 @@ function Paragraph({
 }: React.ParamHTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={classNames('my-2 break-words whitespace-pre-wrap', className)}
+      className={cn('my-2 break-words whitespace-pre-wrap text-sm', className)}
       {...rest}
     >
       {children}
@@ -111,7 +112,7 @@ function Span({
 }: React.ParamHTMLAttributes<HTMLSpanElement>) {
   return (
     <span
-      className={classNames(' break-words whitespace-pre-wrap', className)}
+      className={cn('text-sm break-words whitespace-pre-wrap', className)}
       {...rest}
     >
       {children}
@@ -125,10 +126,7 @@ function Div({
   ...rest
 }: React.ParamHTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={classNames('break-words whitespace-pre-wrap', className)}
-      {...rest}
-    >
+    <div className={cn('break-words whitespace-pre-wrap', className)} {...rest}>
       {children}
     </div>
   );
@@ -141,8 +139,8 @@ function H6({
 }: React.ParamHTMLAttributes<HTMLHeadingElement>) {
   return (
     <h6
-      className={classNames(
-        'break-words whitespace-pre-wrap text-neutral-100',
+      className={cn(
+        'break-words whitespace-pre-wrap text-muted-foreground',
         className,
       )}
       {...rest}
@@ -158,8 +156,8 @@ function H5({
 }: React.ParamHTMLAttributes<HTMLHeadingElement>) {
   return (
     <h5
-      className={classNames(
-        'break-words whitespace-pre-wrap text-sm text-neutral-100',
+      className={cn(
+        'break-words whitespace-pre-wrap text-sm text-muted-foreground',
         className,
       )}
       {...rest}
@@ -176,8 +174,8 @@ function H4({
 }: React.ParamHTMLAttributes<HTMLHeadingElement>) {
   return (
     <h4
-      className={classNames(
-        'break-words whitespace-pre-wrap text-base text-neutral-100',
+      className={cn(
+        'break-words whitespace-pre-wrap text-base text-muted-foreground',
         className,
       )}
       {...rest}
@@ -194,8 +192,8 @@ function H3({
 }: React.ParamHTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={classNames(
-        'break-words whitespace-pre-wrap text-lg text-neutral-100',
+      className={cn(
+        'break-words whitespace-pre-wrap text-lg text-muted-foreground',
         className,
       )}
       {...rest}
@@ -212,8 +210,8 @@ function H2({
 }: React.ParamHTMLAttributes<HTMLHeadingElement>) {
   return (
     <h2
-      className={classNames(
-        'break-words whitespace-pre-wrap text-xl text-neutral-100',
+      className={cn(
+        'break-words whitespace-pre-wrap text-xl text-muted-foreground',
         className,
       )}
       {...rest}
@@ -230,8 +228,8 @@ function H1({
 }: React.ParamHTMLAttributes<HTMLHeadingElement>) {
   return (
     <h2
-      className={classNames(
-        'break-words whitespace-pre-wrap text-2xl text-neutral-100',
+      className={cn(
+        'break-words whitespace-pre-wrap text-2xl text-muted-foreground',
         className,
       )}
       {...rest}
@@ -248,7 +246,7 @@ function Li({
 }: React.ParamHTMLAttributes<HTMLLIElement>) {
   return (
     <li
-      className={classNames('!m-0 marker:text-neutral-100', className)}
+      className={cn('!m-0 marker:text-muted-foreground', className)}
       {...rest}
     >
       {children}
@@ -263,7 +261,7 @@ function Link({
 }: AnchorHTMLAttributes<HTMLAnchorElement>) {
   return (
     <a
-      className={classNames('text-primary-500', className)}
+      className={cn('text-foreground font-bold hover:underline', className)}
       target="_blank"
       rel="noreferrer"
       {...rest}
@@ -284,8 +282,8 @@ function Pre({
 
   return (
     <pre
-      className={classNames(
-        'my-1 bg-neutral-900 break-words whitespace-pre-wrap',
+      className={cn(
+        'my-1 bg-primary text-primary-foreground break-words whitespace-pre-wrap',
         className,
       )}
       {...rest}
@@ -308,7 +306,7 @@ function Code({
   const isMermaidCode = className?.includes('lang-mermaid');
   if (isMermaidCode) {
     mermaid.initialize({
-      theme: 'dark',
+      theme: 'default',
     });
     mermaid.run({
       nodes: [codeRef.current!],
@@ -330,8 +328,8 @@ function Code({
   return (
     <code
       ref={codeRef}
-      className={classNames(
-        'my-1 bg-neutral-900 break-words whitespace-pre-wrap text-neutral-100',
+      className={cn(
+        'my-1 bg-primary break-words whitespace-pre-wrap text-primary-foreground',
         className,
       )}
       {...rest}
@@ -346,5 +344,5 @@ function Image({
   className,
   ...rest
 }: React.ImgHTMLAttributes<HTMLImageElement>) {
-  return <img alt={alt} className={classNames(className)} {...rest} />;
+  return <img alt={alt} className={cn(className)} {...rest} />;
 }
