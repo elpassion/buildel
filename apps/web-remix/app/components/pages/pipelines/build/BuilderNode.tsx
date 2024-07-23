@@ -74,7 +74,7 @@ function BuilderNodeHeaderActions({
   }, [data, searchParams]);
 
   return (
-    <div className="flex gap-1 items-center">
+    <div className="flex items-center">
       {/*<div className="w-4 h-[22px]">*/}
       {/*  <CopyCodeButton*/}
       {/*    value={JSON.stringify({*/}
@@ -86,19 +86,23 @@ function BuilderNodeHeaderActions({
       {/*</div>*/}
 
       <IconButton
-        size="xxs"
+        size="xs"
         icon={<Settings />}
         aria-label={`Edit block: ${data.name}`}
         onClick={handleEdit}
         disabled={runStatus !== 'idle'}
+        className="text-inherit"
+        onlyIcon
       />
 
       <IconButton
-        size="xxs"
+        size="xs"
         aria-label={`Delete block: ${data.name}`}
         icon={<Trash />}
         onClick={handleDelete}
         disabled={runStatus !== 'idle' || disabled}
+        className="text-inherit"
+        onlyIcon
       />
     </div>
   );

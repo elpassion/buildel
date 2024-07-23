@@ -80,7 +80,8 @@ export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
   return (
     <header
       className={cn(
-        'relative flex items-center justify-between py-2 px-3 rounded-t-lg bg-primary text-primary-foreground gap-2',
+        'relative flex items-center justify-between py-2 px-3 rounded-t-lg gap-2',
+        getNodeHeaderStyles(data.type),
       )}
     >
       <div className="flex items-center gap-2">
@@ -99,6 +100,29 @@ export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
       {children}
     </header>
   );
+}
+
+function getNodeHeaderStyles(type: string) {
+  switch (type) {
+    case 'chat':
+      return 'bg-blue-100 text-foreground';
+    case 'audio_output':
+    case 'audio_input':
+      return 'bg-violet-100 text-foreground';
+    case 'text_output':
+    case 'text_input':
+    case 'collect_all_text':
+    case 'file_output':
+    case 'file_input':
+      return 'bg-zinc-200 text-foreground';
+    case 'document_search':
+    case 'document_tool':
+    case 'csv_search':
+      return 'bg-teal-100 text-foreground';
+
+    default:
+      return 'bg-primary text-primary-foreground';
+  }
 }
 
 interface CustomNodeBodyProps {
