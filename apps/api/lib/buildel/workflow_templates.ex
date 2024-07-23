@@ -8,12 +8,12 @@ defmodule Buildel.WorkflowTemplates do
     %{
       name: "Speech To Text",
       template_name: "speech_to_text",
-      template_description: "Allows to upload MP3 file and receive transcription"
+      template_description: "Allows to upload audio file and receive transcription"
     },
     %{
       name: "Text To Speech",
       template_name: "text_to_speech",
-      template_description: "Allow to generate MP3 file from provided text"
+      template_description: "Allows to generate audio files from provided text"
     },
     %{
       name: "Knowledge Search To Text",
