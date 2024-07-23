@@ -84,7 +84,7 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                       id={input.name}
                       key={input.name}
                       value={test.inputs[input.name]}
-                      areaClassName="min-h-full !resize-y min-w-[120px]"
+                      className="min-h-full !resize-y min-w-[120px]"
                       onChange={(e) => {
                         e.preventDefault();
                         const value = e.target.value;
@@ -108,7 +108,6 @@ export const BulkTable: React.FC<BulkTableProps> = ({
                     <>
                       <SmallFileInput
                         multiple={false}
-                        buttonText={input.name}
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file) return;
