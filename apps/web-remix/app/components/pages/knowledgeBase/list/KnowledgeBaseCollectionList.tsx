@@ -54,7 +54,11 @@ export const KnowledgeBaseCollectionList: React.FC<
       aria-label="Memory collections list"
       className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
       items={items}
-      emptyText={<EmptyMessage>There is no Collections yet...</EmptyMessage>}
+      emptyText={
+        <EmptyMessage className="block mt-14 md:mt-20">
+          There is no Collections yet...
+        </EmptyMessage>
+      }
       renderItem={(item) => (
         <BasicLink to={routes.collectionFiles(organizationId, item.name)}>
           <KnowledgeBaseCollectionListItem

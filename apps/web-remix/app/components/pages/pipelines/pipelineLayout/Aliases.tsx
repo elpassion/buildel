@@ -244,12 +244,7 @@ export const CreateAliasForm = ({
         value={JSON.stringify(pipeline.config.connections)}
       />
 
-      <Button
-        variant="secondary"
-        type="submit"
-        data-testid="create-alias"
-        size="xs"
-      >
+      <Button type="submit" data-testid="create-alias" size="xs">
         Create alias
       </Button>
     </ValidatedForm>

@@ -38,7 +38,7 @@ export function NewKnowledgeBasePage() {
         chunk_overlap: 0,
       }}
     >
-      <div className="max-w-s w-full grow overflow-y-auto p-1 flex flex-col gap-3 space-y-1">
+      <div className="max-w-s w-full grow flex flex-col gap-3 space-y-1">
         <div>
           <Field name="collection_name">
             <FieldLabel>Name</FieldLabel>

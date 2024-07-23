@@ -25,7 +25,7 @@ export function OverviewPage() {
     <PageContentWrapper>
       <section className="pt-5 pb-1">
         <header className="w-full flex items-center justify-between py-2 mb-4">
-          <p className="text-foreground">
+          <p className="text-foreground text-lg">
             <span className="text-muted-foreground">Summary cost ($):</span>{' '}
             {details.total_cost}
           </p>

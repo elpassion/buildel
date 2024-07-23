@@ -6,9 +6,11 @@ export const Table = ({
   ...rest
 }: React.HTMLAttributes<HTMLTableElement>) => {
   return (
-    <table className={cn('w-full', className)} {...rest}>
-      {children}
-    </table>
+    <div className="border border-input rounded-lg">
+      <table className={cn('w-full', className)} {...rest}>
+        {children}
+      </table>
+    </div>
   );
 };
 
@@ -19,10 +21,7 @@ export const TableHead = ({
 }: React.HTMLAttributes<HTMLTableSectionElement>) => {
   return (
     <thead
-      className={cn(
-        'text-left text-muted-foreground text-xs bg-muted',
-        className,
-      )}
+      className={cn('text-left text-muted-foreground text-xs', className)}
       {...rest}
     >
       {children}
@@ -36,7 +35,13 @@ export const TableHeadRow = ({
   ...rest
 }: React.HTMLAttributes<HTMLTableRowElement>) => {
   return (
-    <tr className={cn('rounded-xl overflow-hidden', className)} {...rest}>
+    <tr
+      className={cn(
+        'rounded-xl overflow-hidden border-b border-input',
+        className,
+      )}
+      {...rest}
+    >
       {children}
     </tr>
   );
@@ -50,7 +55,7 @@ export const TableHeadCell = ({
   return (
     <th
       className={cn(
-        'py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg',
+        'py-3 px-5 first:rounded-tl-lg first:rounded-bl-lg last:rounded-tr-lg last:rounded-br-lg font-normal',
         className,
       )}
       {...rest}

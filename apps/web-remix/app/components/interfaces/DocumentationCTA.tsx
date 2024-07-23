@@ -10,7 +10,7 @@ export const DocumentationCTA: React.FC = () => {
         Check out our documentation for more information.
       </h3>
 
-      <Button variant="outline" asChild>
+      <Button variant="default" asChild>
         <Link to="https://docs.buildel.ai/docs/intro" target="_blank">
           Documentation
         </Link>

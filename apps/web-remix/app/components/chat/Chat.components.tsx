@@ -145,7 +145,7 @@ export const IntroPanel = ({
   return (
     <article
       className={cn(
-        'p-4 bg-neutral-900 rounded-xl border border-neutral-800 text-neutral-100 text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2',
+        'p-4 bg-neutral-white rounded-xl border border-input text-foreground text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2',
         className,
       )}
     >

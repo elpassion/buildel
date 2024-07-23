@@ -329,7 +329,9 @@ export function BulkPage() {
           {(selectedInputs.length > 0 || selectedOutputs.length > 0) && (
             <>
               <p className="text-white">
-                <span className="text-neutral-100">Summary cost ($): </span>
+                <span className="text-muted-foreground">
+                  Summary cost ($):{' '}
+                </span>
                 {summaryRunCost.reduce((acc, runCost) => acc + runCost.cost, 0)}
               </p>
               <BulkTable

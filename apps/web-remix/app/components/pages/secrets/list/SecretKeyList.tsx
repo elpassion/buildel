@@ -58,7 +58,11 @@ export const SecretKeyList: React.FC<SecretKeyListProps> = ({ items }) => {
         className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
         items={items}
         aria-label="Secret list"
-        emptyText={<EmptyMessage>There is no Secrets yet...</EmptyMessage>}
+        emptyText={
+          <EmptyMessage className="block mt-14 md:mt-20">
+            There is no Secrets yet...
+          </EmptyMessage>
+        }
         renderItem={(item) => (
           <SecretKeyItem
             data={item}

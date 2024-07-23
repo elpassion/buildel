@@ -7,7 +7,7 @@ export const PreviewSection: React.FC<PropsWithChildren> = ({ children }) => {
 
 export const PreviewConnector = () => {
   return (
-    <div className="w-[1px] bg-neutral-600 h-[calc(100%-36px)] absolute top-12 left-[14px]" />
+    <div className="w-[1px] bg-muted h-[calc(100%-36px)] absolute top-12 left-[14px]" />
   );
 };
 
