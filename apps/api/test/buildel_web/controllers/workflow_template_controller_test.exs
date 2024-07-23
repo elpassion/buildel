@@ -29,12 +29,13 @@ defmodule BuildelWeb.WorkflowTemplateControllerTest do
       response = json_response(conn, 200)
 
       assert [
-               %{"name" => "AI Chat", "template_name" => "ai_chat"},
-               %{"name" => "Speech To Text", "template_name" => "speech_to_text"},
-               %{"name" => "Text To Speech", "template_name" => "text_to_speech"},
+               %{"name" => "AI Chat", "template_name" => "ai_chat", "template_description" => "Basic workflow with any of supported models"},
+               %{"name" => "Speech To Text", "template_name" => "speech_to_text", "template_description" => "Allows to upload audio file and receive transcription"},
+               %{"name" => "Text To Speech", "template_name" => "text_to_speech", "template_description" => "Allows to generate audio files from provided text"},
                %{
                  "name" => "Knowledge Search To Text",
-                 "template_name" => "knowledge_search_to_text"
+                 "template_name" => "knowledge_search_to_text",
+                 "template_description" => "Allows to analyse given documents and receive i.e. summary or answer questions"
                }
              ] == response["data"]
 
