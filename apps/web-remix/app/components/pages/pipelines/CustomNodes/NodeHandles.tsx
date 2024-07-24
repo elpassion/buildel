@@ -23,9 +23,10 @@ export function InputHandle({
     switch (handle.data.type) {
       case 'text':
         return '!rounded-[1px] !bg-orange-500';
-      case 'audio':
       case 'file':
         return '!rounded-full !bg-orange-500';
+      case 'audio':
+        return '!rounded !bg-orange-500';
     }
   }, [handle.data.type]);
 
@@ -64,9 +65,10 @@ export function OutputHandle({
     switch (handle.data.type) {
       case 'text':
         return '!rounded-[1px] !bg-blue-500';
-      case 'audio':
       case 'file':
         return '!rounded-full !bg-blue-500';
+      case 'audio':
+        return '!rounded !bg-blue-500';
     }
   }, [handle.data.type]);
 

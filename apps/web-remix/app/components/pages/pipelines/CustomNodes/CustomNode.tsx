@@ -105,13 +105,13 @@ export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
 function getNodeHeaderStyles(group: string) {
   switch (group) {
     case 'llms':
-      return 'bg-blue-100 text-foreground';
+      return 'bg-slate-200 text-foreground';
     case 'audio':
       return 'bg-violet-100 text-foreground';
     case 'text':
       return 'bg-zinc-200 text-foreground';
     case 'file':
-      return 'bg-slate-200 text-foreground';
+      return 'bg-blue-100 text-foreground';
     case 'tools':
       return 'bg-sky-200 text-foreground';
     case 'utils':
