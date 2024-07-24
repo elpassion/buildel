@@ -56,9 +56,12 @@ export function isValidConnection(
     )?.type !==
       targetBlock.block_type?.inputs.find(
         (input) => input.name === connection.targetHandle,
-      )?.type
-  )
+      )?.type ||
+    sourceBlock.name === targetBlock.name
+  ) {
     return false;
+  }
+
   return true;
 }
 
