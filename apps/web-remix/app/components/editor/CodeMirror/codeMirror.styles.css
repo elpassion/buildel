@@ -7,7 +7,7 @@
 }
 
 .invalid-suggestion, .invalid-suggestion * {
-  @apply !text-red-500
+  @apply !text-yellow-500
 }
 
 .cm-scroller {

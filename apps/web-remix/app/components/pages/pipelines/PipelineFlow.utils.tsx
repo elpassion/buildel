@@ -67,7 +67,30 @@ export function toPipelineConfig(
   edges: IEdge[],
 ): IPipelineConfig {
   return {
-    blocks: nodes.map((node) => ({ ...node.data, position: node.position })),
+    blocks: nodes.map((node) => ({
+      ...node.data,
+      connections: edges
+        .filter(
+          (edge) =>
+            edge.source === node.data.name || edge.target === node.data.name,
+        )
+        .map((edge) => {
+          return {
+            from: {
+              block_name: edge.source,
+              output_name: edge.sourceHandle!,
+            },
+            to: {
+              block_name: edge.target,
+              input_name: edge.targetHandle!,
+            },
+            opts: {
+              reset: edge.data?.opts?.reset ?? true,
+            },
+          };
+        }),
+      position: node.position,
+    })),
     version: '1',
     connections: edges.map((edge) => {
       return {

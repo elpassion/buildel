@@ -7,6 +7,11 @@ import type {
   JSONSchemaField,
   JSONSchemaObjectField,
 } from '~/components/form/schema/SchemaParser';
+import {
+  NodeReadonlyItemTitle,
+  NodeReadonlyItemValue,
+  NodeReadonlyItemWrapper,
+} from '~/components/pages/pipelines/CustomNodes/NodeReadonly.components';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
 import { cn } from '~/utils/cn';
@@ -65,7 +70,7 @@ export const NodeReadonlyFields = ({
   }, [properties]);
 
   return (
-    <ul className="flex gap-x-4 flex-wrap max-w-[250px] w-fit">
+    <ul className="flex gap-x-4 flex-wrap max-w-[350px] w-fit">
       {renderProperties}
     </ul>
   );
@@ -155,50 +160,6 @@ function NodeReadonlyAsyncItem({
       <NodeReadonlyItemTitle>{startCase(label)}</NodeReadonlyItemTitle>
       <NodeReadonlyItemValue>{finalValue}</NodeReadonlyItemValue>
     </NodeReadonlyItemWrapper>
-  );
-}
-
-function NodeReadonlyItemWrapper({
-  className,
-  children,
-  show,
-  ...rest
-}: React.HTMLAttributes<HTMLDivElement> & { show?: boolean }) {
-  if (!show) return;
-  return (
-    <div className={cn('flex flex-col', className)} {...rest}>
-      {children}
-    </div>
-  );
-}
-
-function NodeReadonlyItemTitle({
-  className,
-  children,
-  ...rest
-}: React.HTMLAttributes<HTMLSpanElement>) {
-  return (
-    <span className={cn('text-xs text-muted-foreground', className)} {...rest}>
-      {children}
-    </span>
-  );
-}
-
-function NodeReadonlyItemValue({
-  className,
-  children,
-  ...rest
-}: React.HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p
-      className={cn(
-        'text-sm text-foreground line-clamp-1 break-all',
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </p>
   );
 }
 

@@ -153,6 +153,19 @@ export const Builder = ({
       ...state,
       edges: addEdge(
         {
+          data: {
+            from: {
+              block_name: params.source,
+              output_name: params.sourceHandle!,
+            },
+            to: {
+              block_name: params.target,
+              input_name: params.targetHandle!,
+            },
+            opts: {
+              reset: true,
+            },
+          },
           id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,
           ...params,
         },

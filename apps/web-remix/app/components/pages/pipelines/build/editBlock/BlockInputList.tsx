@@ -123,7 +123,7 @@ function BadgeText({
   return (
     <p
       className={cn('text-xs', {
-        'text-orange-500': variant === 'primary',
+        'text-yellow-500': variant === 'primary',
         'text-blue-500': variant === 'secondary',
       })}
     >

@@ -4,6 +4,7 @@ import startCase from 'lodash.startcase';
 import { AlertCircle } from 'lucide-react';
 
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
+import { NodePromptInputs } from '~/components/pages/pipelines/CustomNodes/NodePromptInputs';
 import { NodeReadonlyFields } from '~/components/pages/pipelines/CustomNodes/NodeReadonlyFields';
 import { Badge } from '~/components/ui/badge';
 import { cn } from '~/utils/cn';
@@ -217,6 +218,13 @@ export function CustomNodeBody({
           blockName={data.name}
         />
       ))}
+
+      {data.type === 'chat' && (
+        <NodePromptInputs
+          className="border-t border-input mt-1 pt-2"
+          data={data}
+        />
+      )}
     </div>
   );
 }
