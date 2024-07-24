@@ -13,7 +13,7 @@ defmodule Buildel.Blocks.ChatTest do
                Block.text_output("message_output")
              ],
              schema: Chat.schema(),
-             groups: ["text", "llms"],
+             groups: ["llms", "text"],
              ios: [
                %{name: "tool", public: false, type: "controller"},
                %{name: "chat", public: false, type: "worker"}

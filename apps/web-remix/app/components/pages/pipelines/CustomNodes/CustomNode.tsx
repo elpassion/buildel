@@ -82,7 +82,7 @@ export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
     <header
       className={cn(
         'relative flex items-center justify-between py-2 px-3 rounded-t-lg gap-2',
-        getNodeHeaderStyles(data.type),
+        getNodeHeaderStyles(data.block_type?.groups[0] ?? ''),
       )}
     >
       <div className="flex items-center gap-2">
@@ -103,31 +103,24 @@ export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
   );
 }
 
-function getNodeHeaderStyles(type: string) {
-  switch (type) {
-    case 'chat':
+function getNodeHeaderStyles(group: string) {
+  switch (group) {
+    case 'llms':
       return 'bg-blue-100 text-foreground';
-    case 'audio_output':
-    case 'audio_input':
+    case 'audio':
       return 'bg-violet-100 text-foreground';
-    case 'text_output':
-    case 'text_input':
-    case 'collect_all_text':
+    case 'text':
       return 'bg-zinc-200 text-foreground';
-    case 'file_output':
-    case 'file_input':
+    case 'file':
       return 'bg-slate-200 text-foreground';
-    case 'document_search':
-    case 'document_tool':
-    case 'csv_search':
-      return 'bg-teal-100 text-foreground';
-    case 'api_call_tool':
-    case 'webhook_output':
+    case 'tools':
       return 'bg-sky-200 text-foreground';
-    case 'timer':
-    case 'date':
+    case 'utils':
       return 'bg-purple-100 text-foreground';
-
+    case 'memory':
+      return 'bg-teal-100 text-foreground';
+    case 'inputs / outputs':
+      return 'bg-zinc-100 text-foreground';
     default:
       return 'bg-primary text-primary-foreground';
   }

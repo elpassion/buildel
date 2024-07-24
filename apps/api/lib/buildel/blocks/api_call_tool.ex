@@ -12,7 +12,7 @@ defmodule Buildel.Blocks.ApiCallTool do
     %{
       type: "api_call_tool",
       description: "Tool used to call HTTP APIs.",
-      groups: ["text", "tools"],
+      groups: ["tools", "text"],
       inputs: [Block.text_input("args")],
       outputs: [Block.text_output("response")],
       ios: [Block.io("tool", "worker")],
