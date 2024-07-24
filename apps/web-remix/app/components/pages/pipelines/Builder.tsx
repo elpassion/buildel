@@ -321,9 +321,9 @@ const BuilderInstance = ({
     onConnectStart,
     position,
     isOpen,
-    onClose: onDropdownClose,
-    connectParams,
-  } = useNodeDropdown();
+    create,
+    blockGroups,
+  } = useNodeDropdown({ onConnect, onCreate: onBlockCreate });
 
   return (
     <div
@@ -335,11 +335,9 @@ const BuilderInstance = ({
       <CreateNodeDropdown
         ref={dropdownRef}
         open={isOpen}
-        onClose={onDropdownClose}
         position={position}
-        connectParams={connectParams}
-        onCreate={onBlockCreate}
-        onConnect={onConnect}
+        blockGroups={blockGroups}
+        create={create}
       />
 
       <RunPipelineProvider
