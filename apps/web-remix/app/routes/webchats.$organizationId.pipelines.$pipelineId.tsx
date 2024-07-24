@@ -164,10 +164,10 @@ ${JSON.stringify(files)}
                   return (
                     <div
                       className={cn(
-                        'text-white px-1 border rounded-md flex items-center gap-1',
+                        'px-1 border border-input rounded-md flex items-center gap-1',
                         {
-                          'border-neutral-700': file.status === 'done',
-                          'border-neutral-900': file.status !== 'done',
+                          'text-foreground': file.status === 'done',
+                          'text-muted-foreground ': file.status !== 'done',
                         },
                       )}
                       key={file.id}
@@ -194,7 +194,7 @@ ${JSON.stringify(files)}
           }
           prefix={
             pipeline.interface_config.webchat.inputs[1] && (
-              <label className="text-white pl-2 cursor-pointer">
+              <label className="pl-2 cursor-pointer">
                 <Upload className="w-4 h-4" />
                 <input
                   ref={inputRef}
