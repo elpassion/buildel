@@ -123,8 +123,10 @@ function getNodeHeaderStyles(type: string) {
       return 'bg-teal-100 text-foreground';
     case 'api_call_tool':
     case 'webhook_output':
-    case 'timer':
       return 'bg-sky-200 text-foreground';
+    case 'timer':
+    case 'date':
+      return 'bg-purple-100 text-foreground';
 
     default:
       return 'bg-primary text-primary-foreground';
