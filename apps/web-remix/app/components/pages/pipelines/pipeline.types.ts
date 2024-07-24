@@ -69,6 +69,8 @@ export interface IHandle {
   data: z.TypeOf<typeof IOType>;
 }
 
+export type IIOType = z.TypeOf<typeof IOType>;
+
 export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
 
 export type IBlockType = z.TypeOf<typeof BlockType>;

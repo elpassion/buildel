@@ -53,6 +53,9 @@ import '@xyflow/react/dist/style.css';
 
 import { cn } from '~/utils/cn';
 
+import { CreateNodeDropdown } from './CreateNodeDropdown/CreateNodeDropdown';
+import { useNodeDropdown } from './CreateNodeDropdown/useNodeDropdown';
+
 interface BuilderProps {
   alias?: string;
   type?: 'readOnly' | 'editable';
@@ -67,11 +70,19 @@ interface BuilderProps {
   }: {
     nodes: INode[];
     edges: IEdge[];
-    onBlockCreate: (created: IBlockConfig) => Promise<void>;
+    onBlockCreate: (created: IBlockConfig) => Promise<unknown>;
   }) => ReactNode;
 }
 
-export const Builder = ({
+export const Builder = (props: BuilderProps) => {
+  return (
+    <ReactFlowProvider>
+      <BuilderInstance {...props} />
+    </ReactFlowProvider>
+  );
+};
+
+const BuilderInstance = ({
   pipeline,
   children,
   alias = 'latest',
@@ -227,6 +238,8 @@ export const Builder = ({
         ...state,
         nodes: [...state.nodes, newBlock],
       }));
+
+      return newBlock;
     },
     [flowState.nodes],
   );
@@ -302,6 +315,16 @@ export const Builder = ({
     return { default: DefaultEdge };
   }, [DefaultEdge]);
 
+  const {
+    ref: dropdownRef,
+    onConnectEnd,
+    onConnectStart,
+    position,
+    isOpen,
+    onClose: onDropdownClose,
+    connectParams,
+  } = useNodeDropdown();
+
   return (
     <div
       id="react-flow-wrapper"
@@ -309,6 +332,16 @@ export const Builder = ({
       className={cn('relative pt-5 w-full', className)}
       ref={reactFlowWrapper}
     >
+      <CreateNodeDropdown
+        ref={dropdownRef}
+        open={isOpen}
+        onClose={onDropdownClose}
+        position={position}
+        connectParams={connectParams}
+        onCreate={onBlockCreate}
+        onConnect={onConnect}
+      />
+
       <RunPipelineProvider
         alias={alias}
         pipeline={{
@@ -316,53 +349,53 @@ export const Builder = ({
           config: toPipelineConfig(flowState.nodes, flowState.edges),
         }}
       >
-        <ReactFlowProvider>
-          <ReactFlow<INode, IEdge>
-            edgesUpdatable={type !== 'readOnly'}
-            edgesFocusable={type !== 'readOnly'}
-            nodesDraggable={type !== 'readOnly'}
-            nodesConnectable={type !== 'readOnly'}
-            nodesFocusable={type !== 'readOnly'}
-            nodes={flowState.nodes}
-            edges={flowState.edges}
-            onMouseMove={onMouseMove}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            //@ts-ignore
-            nodeTypes={nodeTypes}
-            edgeTypes={edgeTypes}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onNodeDragStart={onNodeDragStartStop}
-            onNodeDragStop={onNodeDragStartStop}
-            // onBlur={handleOnSave}
-            isValidConnection={handleIsValidConnection}
-            onInit={(instance) => {
-              onInitCopyPaste(instance);
-              onInitDraggable(instance);
-            }}
-            fitViewOptions={{
-              minZoom: 0.5,
-              maxZoom: 1,
-            }}
-            fitView
-          >
-            <Background
-              variant={BackgroundVariant.Dots}
-              gap={20}
-              color="#aaa"
-              className="!bg-muted"
-            />
-            <Controls showInteractive={false} />
-          </ReactFlow>
+        <ReactFlow<INode, IEdge>
+          edgesUpdatable={type !== 'readOnly'}
+          edgesFocusable={type !== 'readOnly'}
+          nodesDraggable={type !== 'readOnly'}
+          nodesConnectable={type !== 'readOnly'}
+          nodesFocusable={type !== 'readOnly'}
+          nodes={flowState.nodes}
+          edges={flowState.edges}
+          onMouseMove={onMouseMove}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onConnectStart={onConnectStart}
+          onConnectEnd={onConnectEnd}
+          //@ts-ignore
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          onNodeDragStart={onNodeDragStartStop}
+          onNodeDragStop={onNodeDragStartStop}
+          // onBlur={handleOnSave}
+          isValidConnection={handleIsValidConnection}
+          onInit={(instance) => {
+            onInitCopyPaste(instance);
+            onInitDraggable(instance);
+          }}
+          fitViewOptions={{
+            minZoom: 0.5,
+            maxZoom: 1,
+          }}
+          fitView
+        >
+          <Background
+            variant={BackgroundVariant.Dots}
+            gap={20}
+            color="#aaa"
+            className="!bg-muted"
+          />
+          <Controls showInteractive={false} />
+        </ReactFlow>
 
-          {children?.({
-            nodes: flowState.nodes,
-            edges: flowState.edges,
-            onBlockCreate,
-          })}
-        </ReactFlowProvider>
+        {children?.({
+          nodes: flowState.nodes,
+          edges: flowState.edges,
+          onBlockCreate,
+        })}
       </RunPipelineProvider>
     </div>
   );

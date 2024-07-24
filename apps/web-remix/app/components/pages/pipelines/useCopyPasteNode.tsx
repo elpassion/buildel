@@ -8,7 +8,7 @@ import { BlockConfig } from '~/api/blockType/blockType.contracts';
 import type { IBlockConfig, IEdge, INode } from './pipeline.types';
 
 interface UseCopyPasteNodeArgs {
-  onPaste: (config: IBlockConfig) => Promise<void>;
+  onPaste: (config: IBlockConfig) => Promise<unknown>;
   nodes: INode[];
   wrapper: RefObject<HTMLElement>;
   allowCopyPaste?: (e: KeyboardEvent) => boolean;
