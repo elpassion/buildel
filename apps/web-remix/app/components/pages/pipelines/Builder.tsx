@@ -304,6 +304,7 @@ export const Builder = ({
 
   return (
     <div
+      id="react-flow-wrapper"
       data-testid="workflow-builder"
       className={cn('relative pt-5 w-full', className)}
       ref={reactFlowWrapper}

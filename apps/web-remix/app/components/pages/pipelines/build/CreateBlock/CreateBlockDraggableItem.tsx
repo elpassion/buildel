@@ -8,6 +8,7 @@ import type { z } from 'zod';
 import type { BlockType } from '~/api/blockType/blockType.contracts';
 import { IconButton } from '~/components/iconButton';
 import { cn } from '~/utils/cn';
+import { getRandomNumber } from '~/utils/numbers';
 
 import type { IBlockConfig, IBlockType } from '../../pipeline.types';
 import { useRunPipeline } from '../../RunPipelineProvider';
@@ -32,10 +33,19 @@ export const CreateBlockDraggableItem: React.FC<
 
   const onClickAdd = useCallback(
     (block: z.TypeOf<typeof BlockType>) => {
+      const wrapper = document.querySelector<HTMLDivElement>(
+        '#react-flow-wrapper',
+      );
+
+      const rect = wrapper?.getBoundingClientRect();
       const { x, y } = reactFlowInstance.getViewport();
+
+      const centerX = rect ? rect.left + rect.width / 2 : x / 2;
+      const centerY = rect ? rect.top + rect.height / 2 : y / 2;
+
       const position = reactFlowInstance.screenToFlowPosition({
-        x: (x / 2) * Math.random(),
-        y: (y / 2) * Math.random(),
+        x: centerX * getRandomNumber(0.9, 1.1),
+        y: centerY * getRandomNumber(0.9, 1.1),
       });
 
       onCreate({
