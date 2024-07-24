@@ -121,6 +121,10 @@ function getNodeHeaderStyles(type: string) {
     case 'document_tool':
     case 'csv_search':
       return 'bg-teal-100 text-foreground';
+    case 'api_call_tool':
+    case 'webhook_output':
+    case 'timer':
+      return 'bg-sky-200 text-foreground';
 
     default:
       return 'bg-primary text-primary-foreground';
