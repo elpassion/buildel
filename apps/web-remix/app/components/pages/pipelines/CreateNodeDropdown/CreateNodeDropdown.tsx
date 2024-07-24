@@ -1,11 +1,9 @@
 import React from 'react';
-import type { Position } from '@xyflow/react';
 import startCase from 'lodash.startcase';
 
 import type {
   IBlockType,
   IBlockTypes,
-  IIOType,
 } from '~/components/pages/pipelines/pipeline.types';
 import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
