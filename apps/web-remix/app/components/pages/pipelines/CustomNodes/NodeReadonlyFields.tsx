@@ -7,6 +7,7 @@ import type {
   JSONSchemaField,
   JSONSchemaObjectField,
 } from '~/components/form/schema/SchemaParser';
+import { NodePromptInputs } from '~/components/pages/pipelines/CustomNodes/NodePromptInputs';
 import {
   NodeReadonlyItemTitle,
   NodeReadonlyItemValue,
@@ -97,17 +98,27 @@ function NodeReadonlyItem({ properties, id, data }: NodeReadonlyItemProps) {
     );
   }
   const isEditor = properties.presentAs === 'editor';
+
+  if (isEditor) {
+    return (
+      <NodeReadonlyItemWrapper
+        className={cn('border-t border-input pt-2')}
+        show={!!data[id]}
+      >
+        <NodeReadonlyItemTitle>{startCase(id)}</NodeReadonlyItemTitle>
+        <NodeReadonlyItemValue className={cn('line-clamp-2')}>
+          {data[id]}
+        </NodeReadonlyItemValue>
+
+        <NodePromptInputs template={data[id]} className="mt-1" />
+      </NodeReadonlyItemWrapper>
+    );
+  }
+
   return (
-    <NodeReadonlyItemWrapper
-      className={cn({
-        'border-t border-input pt-2': isEditor,
-      })}
-      show={!!data[id]}
-    >
+    <NodeReadonlyItemWrapper show={!!data[id]}>
       <NodeReadonlyItemTitle>{startCase(id)}</NodeReadonlyItemTitle>
-      <NodeReadonlyItemValue className={cn({ 'line-clamp-2': isEditor })}>
-        {data[id]}
-      </NodeReadonlyItemValue>
+      <NodeReadonlyItemValue>{data[id]}</NodeReadonlyItemValue>
     </NodeReadonlyItemWrapper>
   );
 }

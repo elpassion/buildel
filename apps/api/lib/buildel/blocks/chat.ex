@@ -181,6 +181,7 @@ defmodule Buildel.Blocks.Chat do
                 },
                 prompt_template:
                   EditorField.new(%{
+                    readonly:  true,
                     title: "Prompt template",
                     description:
                       "The template to use for the prompt. Pass `{{input_name:output}}` to use the input value.",

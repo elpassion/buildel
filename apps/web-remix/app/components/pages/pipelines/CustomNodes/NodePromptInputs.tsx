@@ -1,22 +1,21 @@
 import React, { useMemo } from 'react';
 import { useEdges } from '@xyflow/react';
 
-import { NodeReadonlyItemTitle } from '~/components/pages/pipelines/CustomNodes/NodeReadonly.components';
 import type { IConfigConnection } from '~/components/pages/pipelines/pipeline.types';
 import { cn } from '~/utils/cn';
 import { isNotNil } from '~/utils/guards';
 
 interface NodePromptInputsProps {
   className?: string;
-  data: Record<string, any>;
+  template?: string;
 }
 
 export const NodePromptInputs = ({
   className,
-  data,
+  template,
 }: NodePromptInputsProps) => {
   const edges = useEdges();
-  const promptTemplate = data?.opts?.prompt_template ?? '';
+  const promptTemplate = template ?? '';
 
   const connections = useMemo(() => {
     return edges
@@ -28,7 +27,7 @@ export const NodePromptInputs = ({
     return removeDuplicates(getInputsFromTemplate(promptTemplate)).map(
       splitInput,
     );
-  }, [data]);
+  }, [promptTemplate]);
 
   const notConnectedInputs = useMemo(() => {
     return inputs.filter((input) => {
@@ -40,8 +39,6 @@ export const NodePromptInputs = ({
 
   return (
     <div className={cn('flex flex-col max-w-[350px]', className)}>
-      <NodeReadonlyItemTitle>Prompt Inputs</NodeReadonlyItemTitle>
-
       <ul className="mt-1 flex gap-1 flex-wrap">
         {inputs.map(([block_name, output_name]) => (
           <li key={block_name + output_name}>
@@ -51,7 +48,7 @@ export const NodePromptInputs = ({
                 connections,
               )}
             >
-              {block_name}:{output_name}
+              {connectInput(block_name, output_name)}
             </NodePromptInput>
           </li>
         ))}
@@ -61,7 +58,11 @@ export const NodePromptInputs = ({
         <div className="mt-2 py-1 px-2 rounded border border-yellow-500 bg-yellow-500/10 text-[10px] text-yellow-600">
           Node(s){' '}
           <span className="font-bold">
-            {notConnectedInputs.map(([block_name]) => block_name).join(', ')}
+            {notConnectedInputs
+              .map(([block_name, output_name]) =>
+                connectInput(block_name, output_name),
+              )
+              .join(', ')}
           </span>{' '}
           used but not connected!
         </div>
@@ -107,7 +108,26 @@ function splitInput(input: string) {
   return input.split(':') as [string, string];
 }
 
+function connectInput(block_name: string, output_name: string) {
+  if (output_name) {
+    return `${block_name}:${output_name}`;
+  }
+
+  return block_name;
+}
+
 function checkIfInputIsConnected(
+  input: [string, string],
+  connections: IConfigConnection[],
+) {
+  if (input[0].includes('metadata') || input[0].includes('secrets')) {
+    return true;
+  }
+
+  return checkInputConnection(input, connections);
+}
+
+function checkInputConnection(
   input: [string, string],
   connections: IConfigConnection[],
 ) {
