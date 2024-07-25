@@ -138,9 +138,12 @@ function checkInputConnection(
 ) {
   return connections.some((connection) => {
     return (
-      connection.from.block_name === input[0] &&
-      connection.from.output_name === input[1] &&
-      connection.to.block_name === blockName
+      (connection.from.block_name === input[0] &&
+        connection.from.output_name === input[1] &&
+        connection.to.block_name === blockName) ||
+      (connection.to.block_name === input[0] &&
+        connection.to.input_name === input[1] &&
+        connection.from.block_name === blockName)
     );
   });
 }
