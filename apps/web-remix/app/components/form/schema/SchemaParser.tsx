@@ -192,6 +192,12 @@ export type JSONSchemaField =
       type: 'string';
       title: string;
       description: string;
+      presentAs: 'wysiwyg';
+    }
+  | {
+      type: 'string';
+      title: string;
+      description: string;
       presentAs: 'editor';
       editorLanguage: 'json' | 'custom';
       suggestions: { value: string; description: string; type: string }[];
