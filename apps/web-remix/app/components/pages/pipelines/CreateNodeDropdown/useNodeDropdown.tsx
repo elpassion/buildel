@@ -18,6 +18,12 @@ import { errorToast } from '~/components/toasts/errorToast';
 export interface Position {
   x: number;
   y: number;
+  target?:
+    | 'pane'
+    | 'handle-top'
+    | 'handle-bottom'
+    | 'handle-left'
+    | 'handle-right';
 }
 
 interface UseNodeDropdownArgs {
@@ -31,7 +37,8 @@ export const useNodeDropdown = ({
 }: UseNodeDropdownArgs) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+  const connectParamsRef = useRef<OnConnectStartParams | null>(null);
   const [connectParams, setConnectParams] =
     useState<OnConnectStartParams | null>(null);
   const flowInstance = useReactFlow<INode, IEdge>();
@@ -42,19 +49,53 @@ export const useNodeDropdown = ({
   const onClose = () => {
     close();
     setConnectParams(null);
+    connectParamsRef.current = null;
   };
 
-  const onConnectStart = (_: unknown, params: OnConnectStartParams) => {
+  useOnClickOutside(dropdownRef, onClose);
+
+  const onConnectStart = (e: any, params: OnConnectStartParams) => {
     setConnectParams(params);
+    connectParamsRef.current = params;
   };
 
   const onConnectEnd = (e: MouseEvent | TouchEvent) => {
-    if (e.target instanceof HTMLElement) {
+    if (e.target instanceof HTMLElement && isMouseEvent(e)) {
       const isPanTarget = e.target.classList.contains('react-flow__pane');
+      const isHandleTarget = e.target.classList.contains('react-flow__handle');
+      if (isPanTarget) {
+        setPosition({ x: e.clientX, y: e.clientY - 100, target: 'pane' });
+      } else if (isHandleTarget) {
+        if (e.target.dataset['nodeid'] !== connectParamsRef.current?.nodeId) {
+          return;
+        }
 
-      if (!isPanTarget || !isMouseEvent(e)) return;
+        const isLeftHandle = e.target.classList.contains(
+          'react-flow__handle-left',
+        );
+        const isRightHandle = e.target.classList.contains(
+          'react-flow__handle-right',
+        );
+        const isTopHandle = e.target.classList.contains(
+          'react-flow__handle-top',
+        );
 
-      setPosition({ x: e.clientX, y: e.clientY - 100 });
+        if (isLeftHandle) {
+          setPosition({
+            x: e.clientX - 200,
+            y: e.clientY,
+            target: 'handle-left',
+          });
+        } else if (isRightHandle) {
+          setPosition({ x: e.clientX, y: e.clientY, target: 'handle-right' });
+        } else if (isTopHandle) {
+          setPosition({ x: e.clientX, y: e.clientY, target: 'handle-top' });
+        } else {
+          setPosition({ x: e.clientX, y: e.clientY, target: 'handle-bottom' });
+        }
+      } else {
+        return;
+      }
 
       open();
     }
@@ -64,9 +105,17 @@ export const useNodeDropdown = ({
     if (isOpen) {
       document.body.style.pointerEvents = 'none';
       document.body.setAttribute('data-scroll-locked', '1');
+      document
+        .querySelectorAll('.react-flow__node, .react-flow__handle')
+        .forEach(
+          (node) => ((node as HTMLElement).style.pointerEvents = 'none'),
+        );
     } else {
       document.body.style.removeProperty('pointer-events');
       document.body.removeAttribute('data-scroll-locked');
+      document
+        .querySelectorAll('.react-flow__node, .react-flow__handle')
+        .forEach((node) => ((node as HTMLElement).style.pointerEvents = 'all'));
     }
   }, [isOpen]);
 
@@ -211,8 +260,6 @@ export const useNodeDropdown = ({
     [filteredBlockTypes],
   );
 
-  useOnClickOutside(dropdownRef, onClose);
-
   return {
     onConnectEnd,
     onConnectStart,
@@ -224,7 +271,7 @@ export const useNodeDropdown = ({
   };
 };
 
-function isMouseEvent(e: MouseEvent | TouchEvent): e is MouseEvent {
+function isMouseEvent(e?: MouseEvent | TouchEvent): e is MouseEvent {
   return e instanceof MouseEvent;
 }
 
@@ -233,7 +280,17 @@ function getHandle(ios: IIOType[], handle: { type: string }) {
 }
 
 function getNodePosition(position: Position) {
-  return { ...position, x: position.x - 100 };
+  if (!position.target || position.target === 'pane') {
+    return { ...position, x: position.x - 100 };
+  } else if (position.target === 'handle-left') {
+    return { ...position, x: position.x - 200 };
+  } else if (position.target === 'handle-right') {
+    return { ...position, x: position.x + 100 };
+  } else if (position.target === 'handle-top') {
+    return { ...position, y: position.y - 200 };
+  } else {
+    return { ...position, y: position.y + 100 };
+  }
 }
 
 function leaveOneGroup(blockTypes: IBlockTypes) {
