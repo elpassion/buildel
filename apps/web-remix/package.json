@@ -17,6 +17,7 @@
   "dependencies": {
     "@buildel/buildel": "^0.2.7",
     "@codemirror/autocomplete": "^6.15.0",
+    "@dagrejs/dagre": "^1.1.3",
     "@fastify/early-hints": "^1.0.1",
     "@fastify/helmet": "^11.1.1",
     "@fastify/http-proxy": "^9.4.0",
