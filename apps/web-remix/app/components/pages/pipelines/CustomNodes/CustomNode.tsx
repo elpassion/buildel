@@ -34,7 +34,7 @@ export function CustomNode({
 
   const borderStyles = useCallback(() => {
     if (!isValid) return 'border-red-500';
-    if (selected) return 'border-orange-500';
+    if (selected) return 'border-blue-400';
     return 'border-input';
   }, [isValid, selected]);
 

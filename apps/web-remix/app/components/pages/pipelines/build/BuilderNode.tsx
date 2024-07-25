@@ -17,7 +17,7 @@ import type { CustomNodeProps } from '../CustomNodes/CustomNode';
 
 export function BuilderNode(props: CustomNodeProps) {
   return (
-    <CustomNode {...props} className="hover:border-primary-700">
+    <CustomNode {...props} className="hover:border-blue-700">
       <CustomNodeHeader data={props.data}>
         <BuilderNodeHeaderActions
           data={props.data}
