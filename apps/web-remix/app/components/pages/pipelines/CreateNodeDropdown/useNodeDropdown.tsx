@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import type { Connection, OnConnectStartParams } from '@xyflow/react';
-import { useNodesData, useReactFlow } from '@xyflow/react';
+import { useReactFlow } from '@xyflow/react';
 import { useBoolean, useOnClickOutside } from 'usehooks-ts';
 
 import type { loader } from '~/components/pages/pipelines/build/loader.server';
@@ -35,28 +35,32 @@ export const useNodeDropdown = ({
   onCreate,
   onConnect,
 }: UseNodeDropdownArgs) => {
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
-  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
   const connectParamsRef = useRef<OnConnectStartParams | null>(null);
-  const [connectParams, setConnectParams] =
-    useState<OnConnectStartParams | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
+
+  const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+  const [node, setNode] = useState<INode | null>(null);
+
   const flowInstance = useReactFlow<INode, IEdge>();
-  const node = useNodesData<INode>(connectParams?.nodeId ?? '');
 
   const { blockTypes } = useLoaderData<typeof loader>();
 
   const onClose = () => {
     close();
-    setConnectParams(null);
+    setNode(null);
     connectParamsRef.current = null;
   };
 
   useOnClickOutside(dropdownRef, onClose);
 
-  const onConnectStart = (e: any, params: OnConnectStartParams) => {
-    setConnectParams(params);
+  const onConnectStart = (_: unknown, params: OnConnectStartParams) => {
     connectParamsRef.current = params;
+
+    if (params.nodeId) {
+      setNode(flowInstance.getNode(params.nodeId) ?? null);
+    }
   };
 
   const onConnectEnd = (e: MouseEvent | TouchEvent) => {
@@ -120,29 +124,32 @@ export const useNodeDropdown = ({
   }, [isOpen]);
 
   const nodeHandle = useMemo(() => {
-    if (!node || !connectParams) return;
+    if (!node || !connectParamsRef.current) return;
 
     if (
-      connectParams.handleId === 'tool' ||
-      connectParams.handleId === 'chat'
+      connectParamsRef.current.handleId === 'tool' ||
+      connectParamsRef.current.handleId === 'chat'
     ) {
       return node.data.block_type?.ios.find(
-        (handle) => handle.name === connectParams.handleId && !handle.public,
+        (handle) =>
+          handle.name === connectParamsRef.current!.handleId && !handle.public,
       );
-    } else if (connectParams.handleType === 'target') {
+    } else if (connectParamsRef.current.handleType === 'target') {
       return node.data.block_type?.inputs.find(
-        (handle) => handle.name === connectParams.handleId && !handle.public,
+        (handle) =>
+          handle.name === connectParamsRef.current!.handleId && !handle.public,
       );
     } else {
       return node.data.block_type?.outputs.find(
-        (handle) => handle.name === connectParams.handleId && !handle.public,
+        (handle) =>
+          handle.name === connectParamsRef.current!.handleId && !handle.public,
       );
     }
-  }, [node, connectParams]);
+  }, [node]);
 
   const create = async (block: IBlockType) => {
     try {
-      if (!node || !connectParams || !nodeHandle) return;
+      if (!node || !connectParamsRef.current || !nodeHandle) return;
 
       const createdNode = await onCreate({
         name: '',
@@ -162,8 +169,8 @@ export const useNodeDropdown = ({
         if (!handle) throw new Error('Cannot create connection');
 
         connection = {
-          target: connectParams.nodeId ?? node.id,
-          targetHandle: connectParams.handleId,
+          target: connectParamsRef.current.nodeId ?? node.id,
+          targetHandle: connectParamsRef.current.handleId,
           source: createdNode.id,
           sourceHandle: handle.name,
         };
@@ -172,19 +179,19 @@ export const useNodeDropdown = ({
         if (!handle) throw new Error('Cannot create connection');
 
         connection = {
-          source: connectParams.nodeId ?? node.id,
-          sourceHandle: connectParams.handleId,
+          source: connectParamsRef.current.nodeId ?? node.id,
+          sourceHandle: connectParamsRef.current.handleId,
           target: createdNode.id,
           targetHandle: handle.name,
         };
-      } else if (connectParams.handleType === 'source') {
+      } else if (connectParamsRef.current.handleType === 'source') {
         const handle = getHandle(block.inputs, nodeHandle);
 
         if (!handle) throw new Error('Cannot create connection');
 
         connection = {
-          source: connectParams.nodeId ?? node.id,
-          sourceHandle: connectParams.handleId,
+          source: connectParamsRef.current.nodeId ?? node.id,
+          sourceHandle: connectParamsRef.current.handleId,
           target: createdNode.id,
           targetHandle: handle.name,
         };
@@ -194,8 +201,8 @@ export const useNodeDropdown = ({
         if (!handle) throw new Error('Cannot create connection');
 
         connection = {
-          target: connectParams.nodeId ?? node.id,
-          targetHandle: connectParams.handleId,
+          target: connectParamsRef.current.nodeId ?? node.id,
+          targetHandle: connectParamsRef.current.handleId,
           source: createdNode.id,
           sourceHandle: handle.name,
         };
@@ -215,7 +222,7 @@ export const useNodeDropdown = ({
   };
 
   const filteredBlockTypes = useMemo(() => {
-    if (!nodeHandle || !connectParams) return [];
+    if (!nodeHandle || !connectParamsRef.current) return [];
 
     if (nodeHandle.type === 'controller') {
       return blockTypes.filter((block) =>
@@ -227,7 +234,7 @@ export const useNodeDropdown = ({
           (output) => output.type === 'controller' && !output.public,
         ),
       );
-    } else if (connectParams.handleType === 'target') {
+    } else if (connectParamsRef.current.handleType === 'target') {
       return blockTypes.filter((block) =>
         block.outputs.some(
           (output) => output.type === nodeHandle.type && !output.public,
@@ -240,7 +247,7 @@ export const useNodeDropdown = ({
         ),
       );
     }
-  }, [connectParams, nodeHandle, blockTypes]);
+  }, [nodeHandle, blockTypes]);
 
   const blockGroups = useMemo(
     () =>
