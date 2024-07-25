@@ -125,9 +125,6 @@ function NodeReadonlyItem({
         </NodeReadonlyItemTitle>
 
         <NodeReadonlyItemTextarea value={data[id]} />
-        {/*<NodeReadonlyItemValue className={cn('line-clamp-2')}>*/}
-        {/*  {data[id]}*/}
-        {/*</NodeReadonlyItemValue>*/}
 
         <NodePromptInputs
           template={data[id]}
