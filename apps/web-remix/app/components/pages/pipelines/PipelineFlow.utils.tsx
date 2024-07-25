@@ -13,7 +13,7 @@ import type {
 export function getNodes(pipeline: IPipelineConfig): INode[] {
   return pipeline.blocks.map((block) => ({
     id: block.name,
-    type: 'custom',
+    type: getNodeType(block.type),
     position: block.position ?? {
       x: 100,
       y: 100,
@@ -194,4 +194,9 @@ function reverseConnection(connection: IConfigConnection) {
       output_name: connection.to.input_name,
     },
   };
+}
+
+export function getNodeType(blockType: string) {
+  if (blockType === 'comment') return 'comment';
+  return 'custom';
 }

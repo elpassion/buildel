@@ -41,6 +41,7 @@ import {
   getEdges,
   getLastBlockNumber,
   getNodes,
+  getNodeType,
   isValidConnection,
   toPipelineConfig,
 } from './PipelineFlow.utils';
@@ -51,6 +52,7 @@ import { useDraggableNodes } from './useDraggableNodes';
 import '@xyflow/react/dist/style.css';
 
 import { BuilderControls } from '~/components/pages/pipelines/BuilderControls';
+import { CommentNode } from '~/components/pages/pipelines/CommentNode/CommentNode';
 import { cn } from '~/utils/cn';
 
 import { CreateNodeDropdown } from './CreateNodeDropdown/CreateNodeDropdown';
@@ -228,7 +230,7 @@ const BuilderInstance = ({
 
       const newBlock: INode = {
         id: name,
-        type: 'custom',
+        type: getNodeType(created.type),
         position: created.position ?? { x: 100, y: 100 },
         data: { ...created, name },
         selected: false,
@@ -297,7 +299,7 @@ const BuilderInstance = ({
   );
 
   const nodeTypes = useMemo(() => {
-    return { custom: PipelineNode };
+    return { custom: PipelineNode, comment: CommentNode };
   }, [PipelineNode]);
 
   const DefaultEdge = useCallback(

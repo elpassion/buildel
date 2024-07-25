@@ -41,6 +41,11 @@ export const ConfigConnection = z.object({
     }),
 });
 
+export const BlockMeasured = z.object({
+  width: z.number().optional(),
+  height: z.number().optional(),
+});
+
 export const BlockConfig = z.object({
   name: z.string(),
   opts: z.record(z.string(), z.any()),
@@ -48,9 +53,7 @@ export const BlockConfig = z.object({
   connections: z.array(ConfigConnection).default([]),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
-  measured: z
-    .object({ width: z.number().optional(), height: z.number().optional() })
-    .optional(),
+  measured: BlockMeasured.optional(),
 });
 
 export const ExtendedBlockConfig = BlockConfig.extend({
@@ -81,6 +84,7 @@ export const UpdateBlockConfig = z.object({
     }),
   ),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
+  measured: BlockMeasured.optional(),
   type: z.string(),
   block_type: BlockType.optional(),
 });
