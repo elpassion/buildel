@@ -1,6 +1,8 @@
 import React from 'react';
+import { useEventListener } from 'usehooks-ts';
 
 import { errorToast } from '~/components/toasts/errorToast';
+import { Tooltip } from '~/components/tooltip/Tooltip';
 import { Button } from '~/components/ui/button';
 import { PlayFilled } from '~/icons/PlayFilled';
 
@@ -25,11 +27,18 @@ export const RunPipelineButton: React.FC = () => {
     }
   };
 
+  useEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'enter' || e.key === 'Enter')) {
+      handleRun();
+    }
+  });
+
   const isRunning = status !== 'idle';
 
   return (
     <div className="flex items-center gap-2 pointer-events-auto">
       <Button
+        id="run-workflow"
         aria-label={isRunning ? 'Stop workflow' : 'Start workflow'}
         onClick={handleRun}
         size="xs"
@@ -40,6 +49,14 @@ export const RunPipelineButton: React.FC = () => {
           {status === 'idle' && <PlayFilled className="w-3 h-3" />}
         </div>
       </Button>
+
+      <Tooltip
+        noArrow
+        anchorSelect={`#run-workflow`}
+        content="cmd + Enter"
+        className="!text-xs max-w-[350px] "
+        place="bottom"
+      />
     </div>
   );
 };
