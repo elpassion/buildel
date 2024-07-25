@@ -33,8 +33,8 @@ export function InputHandle({
   return (
     <>
       <span
-        className="absolute right-full -translate-y-[15%] -translate-x-[12px] text-[10px] text-muted-foreground"
-        style={{ top: (index + 1) * 25 }}
+        className="absolute right-full -translate-y-[50%] -translate-x-[12px] text-[10px] text-muted-foreground"
+        style={{ top: (index + 1) * 35 }}
       >
         {startCase(handle.data.name.replace(/_input/g, ' '))}
       </span>
@@ -44,13 +44,19 @@ export function InputHandle({
         type={handle.type}
         position={Position.Left}
         isConnectable={isConnectable}
-        style={{ top: (index + 1) * 25 }}
+        style={{ top: (index + 1) * 35 }}
         data-testid={`${blockName}-${handle.data.name}-handle`}
         className={cn(
-          '!border-1 !border-orange-500 !w-[10px] !h-[10px] !-translate-x-[50%]',
-          handleTypeClassName,
+          '!bg-transparent !w-[30px] !h-[30px] !border-none !rounded flex justify-center items-center group',
         )}
-      />
+      >
+        <div
+          className={cn(
+            '!border-1 !border-orange-500 !w-[10px] !h-[10px] pointer-events-none group-hover:scale-125 transition-transform duration-100 ease-in-out',
+            handleTypeClassName,
+          )}
+        />
+      </Handle>
     </>
   );
 }
@@ -75,8 +81,8 @@ export function OutputHandle({
   return (
     <>
       <div
-        className="absolute left-full -translate-y-[15%] translate-x-[12px] text-[10px] text-muted-foreground"
-        style={{ top: (index + 1) * 25 }}
+        className="absolute left-full -translate-y-[50%] translate-x-[12px] text-[10px] text-muted-foreground"
+        style={{ top: (index + 1) * 35 }}
       >
         {startCase(handle.data.name.replace(/_output/g, ' '))}
       </div>
@@ -85,15 +91,21 @@ export function OutputHandle({
         type={handle.type}
         position={Position.Right}
         isConnectable={isConnectable}
-        style={{ top: (index + 1) * 25 }}
+        style={{ top: (index + 1) * 35 }}
         id={handle.id}
         data-testid={`${blockName}-${handle.data.name}-handle`}
         data-name={handle.data.name}
         className={cn(
-          '!border-1 !border-blue-500 !w-[10px] !h-[10px] !translate-x-[40%]',
-          handleTypeClassName,
+          '!bg-transparent !w-[30px] !h-[30px] !border-none !rounded flex justify-center items-center group',
         )}
-      />
+      >
+        <div
+          className={cn(
+            '!border-1 !border-blue-500 !w-[10px] !h-[10px] pointer-events-none group-hover:scale-125 transition-transform duration-100 ease-in-out',
+            handleTypeClassName,
+          )}
+        />
+      </Handle>
     </>
   );
 }
@@ -135,10 +147,16 @@ export function ToolHandle({
         id={handle.id}
         data-testid={`${blockName}-${handle.data.name}-handle`}
         className={cn(
-          '!border-1 !w-[10px] !h-[10px] !rotate-45 !-translate-x-1/2',
-          handleTypeClassName,
+          '!bg-transparent !w-[30px] !h-[30px] !border-none !rounded flex justify-center items-center group',
         )}
-      />
+      >
+        <div
+          className={cn(
+            '!border-1 !w-[10px] !h-[10px] !rotate-45 pointer-events-none group-hover:scale-125 transition-transform duration-100 ease-in-out',
+            handleTypeClassName,
+          )}
+        />
+      </Handle>
     </>
   );
 }
