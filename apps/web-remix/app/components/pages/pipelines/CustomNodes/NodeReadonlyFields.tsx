@@ -9,6 +9,7 @@ import type {
 } from '~/components/form/schema/SchemaParser';
 import { NodePromptInputs } from '~/components/pages/pipelines/CustomNodes/NodePromptInputs';
 import {
+  NodeReadonlyItemTextarea,
   NodeReadonlyItemTitle,
   NodeReadonlyItemValue,
   NodeReadonlyItemWrapper,
@@ -119,10 +120,14 @@ function NodeReadonlyItem({
         className={cn('border-t border-input pt-2')}
         show={!!data[id]}
       >
-        <NodeReadonlyItemTitle>{startCase(id)}</NodeReadonlyItemTitle>
-        <NodeReadonlyItemValue className={cn('line-clamp-2')}>
-          {data[id]}
-        </NodeReadonlyItemValue>
+        <NodeReadonlyItemTitle className="mb-1">
+          {startCase(id)}
+        </NodeReadonlyItemTitle>
+
+        <NodeReadonlyItemTextarea value={data[id]} />
+        {/*<NodeReadonlyItemValue className={cn('line-clamp-2')}>*/}
+        {/*  {data[id]}*/}
+        {/*</NodeReadonlyItemValue>*/}
 
         <NodePromptInputs
           template={data[id]}

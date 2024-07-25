@@ -1,5 +1,7 @@
 import React from 'react';
 
+import type { TextareaInputProps } from '~/components/form/inputs/textarea.input';
+import { TextareaInput } from '~/components/form/inputs/textarea.input';
 import { cn } from '~/utils/cn';
 
 export function NodeReadonlyItemWrapper({
@@ -43,5 +45,18 @@ export function NodeReadonlyItemValue({
     >
       {children}
     </p>
+  );
+}
+
+export function NodeReadonlyItemTextarea({
+  className,
+  ...rest
+}: TextareaInputProps) {
+  return (
+    <TextareaInput
+      disabled
+      className={cn('disabled:opacity-100 disabled:cursor-default', className)}
+      {...rest}
+    />
   );
 }
