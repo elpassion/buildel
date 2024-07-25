@@ -23,7 +23,9 @@ defmodule BuildelWeb.OrganizationModelController do
     %{id: "mistral-tiny", name: "Mistral Tiny", api_type: "mistral"},
     %{id: "mistral-small-latest", name: "Mistral Small", api_type: "mistral"},
     %{id: "mistral-medium-latest", name: "Mistral Medium", api_type: "mistral"},
-    %{id: "mistral-large-latest", name: "Mistral Large", api_type: "mistral"}
+    %{id: "mistral-large-latest", name: "Mistral Large", api_type: "mistral"},
+    %{id: "claude-3-5-sonnet-20240620", name: "Claude 3.5 Sonnet", api_type: "anthropic"},
+    %{id: "claude-3-haiku-20240307", name: "Claude 3 Haiku", api_type: "anthropic"}
   ]
 
   def index(conn, %{

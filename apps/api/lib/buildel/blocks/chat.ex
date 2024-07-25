@@ -19,7 +19,7 @@ defmodule Buildel.Blocks.Chat do
       type: "chat",
       description:
         "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
-      groups: ["llms", "text" ],
+      groups: ["llms", "text"],
       inputs: [Block.text_input()],
       outputs: [
         Block.text_output("output"),
@@ -69,10 +69,10 @@ defmodule Buildel.Blocks.Chat do
                   "type" => "string",
                   "title" => "Model API type",
                   "description" => "The API type to use for the chat.",
-                  "enum" => ["openai", "azure", "google", "mistral"],
+                  "enum" => ["openai", "azure", "google", "mistral", "anthropic"],
                   "enumPresentAs" => "radio",
                   "default" => "openai",
-                  "readonly" => true,
+                  "readonly" => true
                 },
                 endpoint: %{
                   "type" => "string",
@@ -84,10 +84,11 @@ defmodule Buildel.Blocks.Chat do
                       "azure" =>
                         "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}",
                       "google" => "https://generativelanguage.googleapis.com/v1beta/models",
-                      "mistral" => "https://api.mistral.ai/v1"
+                      "mistral" => "https://api.mistral.ai/v1",
+                      "anthropic" => "https://api.anthropic.com/v1"
                     }
                   },
-                  "minLength" => 1,
+                  "minLength" => 1
                 },
                 model: %{
                   "type" => "string",
@@ -97,7 +98,7 @@ defmodule Buildel.Blocks.Chat do
                     "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
                   "presentAs" => "async-select",
                   "minLength" => 1,
-                  "readonly" => true,
+                  "readonly" => true
                 },
                 chat_memory_type: %{
                   "type" => "string",
@@ -116,7 +117,7 @@ defmodule Buildel.Blocks.Chat do
                   "minimum" => 0.0,
                   "maximum" => 2.0,
                   "step" => 0.1,
-                  "readonly" => true,
+                  "readonly" => true
                 },
                 response_format: %{
                   "type" => "string",
@@ -133,7 +134,7 @@ defmodule Buildel.Blocks.Chat do
                   }),
                 system_message:
                   EditorField.new(%{
-                    readonly:  true,
+                    readonly: true,
                     title: "System message",
                     description: "The message to start the conversation with.",
                     minLength: 1,
@@ -181,7 +182,7 @@ defmodule Buildel.Blocks.Chat do
                 },
                 prompt_template:
                   EditorField.new(%{
-                    readonly:  true,
+                    readonly: true,
                     title: "Prompt template",
                     description:
                       "The template to use for the prompt. Pass `{{input_name:output}}` to use the input value.",

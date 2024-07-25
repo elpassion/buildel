@@ -23,6 +23,7 @@ defmodule Buildel.Clients.Chat do
   alias Langchain.ChatModels.ChatMistralAI
   alias LangChain.ChatModels.ChatOpenAI
   alias LangChain.ChatModels.ChatGoogleAI
+  alias LangChain.ChatModels.ChatAnthropic
   alias LangChain.Message
   alias LangChain.Chains.LLMChain
 
@@ -222,6 +223,17 @@ defmodule Buildel.Clients.Chat do
       api_key: opts.api_key,
       endpoint: opts.endpoint <> "/chat/completions",
       json_response: opts.response_format == "json",
+      callbacks: callbacks
+    })
+  end
+
+  defp get_llm(%{api_type: "anthropic"} = opts, callbacks) do
+    ChatAnthropic.new!(%{
+      model: opts.model,
+      temperature: opts.temperature,
+      stream: true,
+      api_key: opts.api_key,
+      endpoint: opts.endpoint <> "/messages",
       callbacks: callbacks
     })
   end
