@@ -15,6 +15,8 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { errorToast } from '~/components/toasts/errorToast';
 
+import { leaveOneGroup } from './createNodeDropdownt.utils';
+
 export interface Position {
   x: number;
   y: number;
@@ -105,6 +107,17 @@ export const useNodeDropdown = ({
     }
   };
 
+  const onContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.preventDefault();
+
+    setPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
+
+    open();
+  };
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.pointerEvents = 'none';
@@ -149,8 +162,6 @@ export const useNodeDropdown = ({
 
   const create = async (block: IBlockType) => {
     try {
-      if (!node || !connectParamsRef.current || !nodeHandle) return;
-
       const createdNode = await onCreate({
         name: '',
         opts: {},
@@ -160,6 +171,8 @@ export const useNodeDropdown = ({
         position: flowInstance.screenToFlowPosition(getNodePosition(position)),
         connections: [],
       });
+
+      if (!node || !connectParamsRef.current || !nodeHandle) return onClose();
 
       let connection: Connection | null = null;
 
@@ -222,7 +235,7 @@ export const useNodeDropdown = ({
   };
 
   const filteredBlockTypes = useMemo(() => {
-    if (!nodeHandle || !connectParamsRef.current) return [];
+    if (!nodeHandle || !connectParamsRef.current) return blockTypes;
 
     if (nodeHandle.type === 'controller') {
       return blockTypes.filter((block) =>
@@ -270,11 +283,12 @@ export const useNodeDropdown = ({
   return {
     onConnectEnd,
     onConnectStart,
+    onContextMenu,
+    ref: dropdownRef,
+    blockGroups,
     position,
     isOpen,
-    ref: dropdownRef,
     create,
-    blockGroups,
   };
 };
 
@@ -298,11 +312,4 @@ function getNodePosition(position: Position) {
   } else {
     return { ...position, y: position.y + 100 };
   }
-}
-
-function leaveOneGroup(blockTypes: IBlockTypes) {
-  return blockTypes.map((type) => ({
-    ...type,
-    groups: type.groups.slice(0, 1),
-  }));
 }

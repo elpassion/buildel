@@ -319,6 +319,7 @@ const BuilderInstance = ({
     ref: dropdownRef,
     onConnectEnd,
     onConnectStart,
+    onContextMenu,
     position,
     isOpen,
     create,
@@ -328,6 +329,7 @@ const BuilderInstance = ({
   return (
     <div
       id="react-flow-wrapper"
+      onContextMenu={onContextMenu}
       data-testid="workflow-builder"
       className={cn('relative pt-5 w-full', className)}
       ref={reactFlowWrapper}
