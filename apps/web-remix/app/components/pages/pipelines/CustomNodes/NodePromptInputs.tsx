@@ -8,11 +8,13 @@ import { isNotNil } from '~/utils/guards';
 interface NodePromptInputsProps {
   className?: string;
   template?: string;
+  blockName: string;
 }
 
 export const NodePromptInputs = ({
   className,
   template,
+  blockName,
 }: NodePromptInputsProps) => {
   const edges = useEdges();
   const promptTemplate = template ?? '';
@@ -31,7 +33,7 @@ export const NodePromptInputs = ({
 
   const notConnectedInputs = useMemo(() => {
     return inputs.filter((input) => {
-      return !checkIfInputIsConnected(input, connections);
+      return !checkIfInputIsConnected(input, connections, blockName);
     });
   }, [inputs, edges]);
 
@@ -46,6 +48,7 @@ export const NodePromptInputs = ({
               isConnected={checkIfInputIsConnected(
                 [block_name, output_name],
                 connections,
+                blockName,
               )}
             >
               {connectInput(block_name, output_name)}
@@ -119,22 +122,25 @@ function connectInput(block_name: string, output_name: string) {
 function checkIfInputIsConnected(
   input: [string, string],
   connections: IConfigConnection[],
+  blockName: string,
 ) {
   if (input[0].includes('metadata') || input[0].includes('secrets')) {
     return true;
   }
 
-  return checkInputConnection(input, connections);
+  return checkInputConnection(input, connections, blockName);
 }
 
 function checkInputConnection(
   input: [string, string],
   connections: IConfigConnection[],
+  blockName: string,
 ) {
   return connections.some((connection) => {
     return (
       connection.from.block_name === input[0] &&
-      connection.from.output_name === input[1]
+      connection.from.output_name === input[1] &&
+      connection.to.block_name === blockName
     );
   });
 }

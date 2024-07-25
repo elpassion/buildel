@@ -20,12 +20,14 @@ import { cn } from '~/utils/cn';
 interface NodeReadonlyFieldsProps {
   schema?: JSONSchemaField;
   data: Record<string, unknown>;
+  blockName: string;
 }
 
 //@todo fixed JSONSchemaField typing in app
 export const NodeReadonlyFields = ({
   schema,
   data,
+  blockName,
 }: NodeReadonlyFieldsProps) => {
   const properties = useMemo(() => {
     //@ts-ignore
@@ -64,7 +66,12 @@ export const NodeReadonlyFields = ({
             'basis-full': properties[key].presentAs === 'editor',
           })}
         >
-          <NodeReadonlyItem properties={properties[key]} data={data} id={key} />
+          <NodeReadonlyItem
+            properties={properties[key]}
+            blockName={blockName}
+            data={data}
+            id={key}
+          />
         </li>
       );
     });
@@ -81,9 +88,15 @@ interface NodeReadonlyItemProps {
   properties: Record<string, any>;
   data: Record<string, any>;
   id: string;
+  blockName: string;
 }
 
-function NodeReadonlyItem({ properties, id, data }: NodeReadonlyItemProps) {
+function NodeReadonlyItem({
+  properties,
+  id,
+  data,
+  blockName,
+}: NodeReadonlyItemProps) {
   if (
     properties.presentAs === 'async-creatable-select' ||
     properties.presentAs === 'async-select'
@@ -97,6 +110,7 @@ function NodeReadonlyItem({ properties, id, data }: NodeReadonlyItemProps) {
       />
     );
   }
+
   const isEditor = properties.presentAs === 'editor';
 
   if (isEditor) {
@@ -110,7 +124,11 @@ function NodeReadonlyItem({ properties, id, data }: NodeReadonlyItemProps) {
           {data[id]}
         </NodeReadonlyItemValue>
 
-        <NodePromptInputs template={data[id]} className="mt-1" />
+        <NodePromptInputs
+          template={data[id]}
+          className="mt-1"
+          blockName={blockName}
+        />
       </NodeReadonlyItemWrapper>
     );
   }

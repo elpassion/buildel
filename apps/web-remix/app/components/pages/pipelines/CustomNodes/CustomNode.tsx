@@ -174,6 +174,7 @@ export function CustomNodeBody({
       <NodeReadonlyFields
         schema={data.block_type?.schema as JSONSchemaField}
         data={data.opts}
+        blockName={data.name}
       />
 
       {inputsFields.length > 0 ? (
