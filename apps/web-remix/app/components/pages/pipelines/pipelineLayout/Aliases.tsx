@@ -48,7 +48,7 @@ export const AliasSelect = ({ aliases, value }: AliasSelectProps) => {
     <Dropdown placement="bottom-end">
       <AliasTrigger name={name} value={value} />
 
-      <DropdownPopup className="min-w-[250px] absolute z-[11] top-full translate-y-[4px] right-0 bg-white border border-input rounded-lg overflow-hidden p-1 transition">
+      <DropdownPopup className="min-w-[250px] max-w-[250px] absolute z-[11] top-full translate-y-[4px] right-0 bg-white border border-input rounded-lg overflow-hidden p-1 transition">
         <div className="overflow-y-auto max-h-[300px]">
           <AliasList data={aliases} />
         </div>

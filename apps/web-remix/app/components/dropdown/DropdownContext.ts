@@ -7,6 +7,12 @@ export interface IDropdownContext {
   toggle: () => void;
   isShown: boolean;
   context: UseFloatingReturn;
+  getReferenceProps?: (
+    userProps?: React.HTMLProps<Element>,
+  ) => Record<string, unknown>;
+  getFloatingProps?: (
+    userProps?: React.HTMLProps<HTMLElement>,
+  ) => Record<string, unknown>;
 }
 
 export const DropdownContext = React.createContext<

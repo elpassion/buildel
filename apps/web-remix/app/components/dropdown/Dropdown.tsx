@@ -1,10 +1,16 @@
 import type { PropsWithChildren } from 'react';
-import React, { useRef } from 'react';
+import React from 'react';
+import {
+  FloatingPortal,
+  safePolygon,
+  useFloating,
+  useHover,
+  useInteractions,
+} from '@floating-ui/react';
 import {
   autoUpdate,
   flip,
   offset as floatingOffset,
-  useFloating,
 } from '@floating-ui/react-dom';
 import type { OffsetOptions, Placement } from '@floating-ui/react-dom';
 import { useBoolean, useOnClickOutside } from 'usehooks-ts';
@@ -21,6 +27,7 @@ interface DropdownProps {
   offset?: OffsetOptions;
   shown?: boolean;
   onClose?: () => void;
+  showOnHover?: boolean;
 }
 
 export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
@@ -30,19 +37,32 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   offset = 5,
   shown,
   onClose,
+  showOnHover = false,
 }) => {
-  const floatingContext = useFloating({
-    placement,
-    middleware: [floatingOffset(offset), flip()],
-    whileElementsMounted: autoUpdate,
-  });
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const {
     value: isShown,
     setTrue,
     setFalse,
     toggle,
+    setValue,
   } = useBoolean(defaultShown ?? false);
+
+  const floatingContext = useFloating({
+    placement,
+    middleware: [floatingOffset(offset), flip()],
+    whileElementsMounted: autoUpdate,
+    open: isShown,
+    onOpenChange: setValue,
+  });
+
+  const hover = useHover(floatingContext.context, {
+    enabled: showOnHover,
+    handleClose: safePolygon({
+      requireIntent: false,
+    }),
+  });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
 
   const show = () => {
     setTrue();
@@ -65,11 +85,11 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
         show,
         toggle,
         context: floatingContext,
+        getFloatingProps,
+        getReferenceProps,
       }}
     >
-      <div ref={wrapperRef} className="relative">
-        {children}
-      </div>
+      {children}
     </DropdownContext.Provider>
   );
 };
@@ -82,13 +102,15 @@ export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
   children,
   className,
 }) => {
-  const { isShown, context } = useDropdown();
+  const { isShown, context, getFloatingProps } = useDropdown();
+
   return (
     <div
       ref={context.refs.setFloating}
       style={context.floatingStyles}
+      {...getFloatingProps?.()}
       className={cn(
-        'transition-opacity',
+        'transition-opacity ',
         {
           'opacity-0 pointer-events-none': !isShown,
           'opacity-100 pointer-events-auto': isShown,
@@ -107,7 +129,7 @@ export const DropdownTrigger: React.FC<ButtonProps> = ({
   onClick,
   ...rest
 }) => {
-  const { toggle, context } = useDropdown();
+  const { toggle, context, getReferenceProps } = useDropdown();
 
   const handleOnClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -121,9 +143,12 @@ export const DropdownTrigger: React.FC<ButtonProps> = ({
       ref={context.refs.setReference}
       className={cn(className)}
       onClick={handleOnClick}
+      {...getReferenceProps?.()}
       {...rest}
     >
       {children}
     </Button>
   );
 };
+
+export const DropdownPortal = FloatingPortal;
