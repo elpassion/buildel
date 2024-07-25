@@ -12,7 +12,6 @@ import {
   applyNodeChanges,
   Background,
   BackgroundVariant,
-  Controls,
   ReactFlow,
   ReactFlowProvider,
 } from '@xyflow/react';
@@ -51,6 +50,7 @@ import { useDraggableNodes } from './useDraggableNodes';
 
 import '@xyflow/react/dist/style.css';
 
+import { BuilderControls } from '~/components/pages/pipelines/BuilderControls';
 import { cn } from '~/utils/cn';
 
 import { CreateNodeDropdown } from './CreateNodeDropdown/CreateNodeDropdown';
@@ -388,7 +388,12 @@ const BuilderInstance = ({
             color="#aaa"
             className="!bg-muted"
           />
-          <Controls showInteractive={false} />
+
+          <BuilderControls
+            nodes={flowState.nodes}
+            edges={flowState.edges}
+            setFlowData={setFlowState}
+          />
         </ReactFlow>
 
         {children?.({

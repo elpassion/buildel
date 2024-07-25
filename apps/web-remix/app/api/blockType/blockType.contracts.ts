@@ -48,6 +48,9 @@ export const BlockConfig = z.object({
   connections: z.array(ConfigConnection).default([]),
   position: z.object({ x: z.number(), y: z.number() }).optional(),
   type: z.string(),
+  measured: z
+    .object({ width: z.number().optional(), height: z.number().optional() })
+    .optional(),
 });
 
 export const ExtendedBlockConfig = BlockConfig.extend({

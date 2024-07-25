@@ -35,6 +35,7 @@ export interface INode {
   type?: string;
   position: { x: number; y: number };
   selected: boolean;
+  measured?: { width?: number; height?: number };
   data: IBlockConfig;
 }
 

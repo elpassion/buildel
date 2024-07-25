@@ -20,6 +20,7 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
     },
     selected: false,
     data: block,
+    measured: block.measured,
   }));
 }
 
@@ -70,7 +71,11 @@ export function toPipelineConfig(
   edges: IEdge[],
 ): IPipelineConfig {
   return {
-    blocks: nodes.map((node) => ({ ...node.data, position: node.position })),
+    blocks: nodes.map((node) => ({
+      ...node.data,
+      position: node.position,
+      measured: node.measured,
+    })),
     version: '1',
     connections: edges.map((edge) => {
       return {
