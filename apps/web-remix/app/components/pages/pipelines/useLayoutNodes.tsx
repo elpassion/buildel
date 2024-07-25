@@ -33,8 +33,8 @@ export const useLayoutNodes = ({
     const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
     g.setGraph({
       rankdir: direction ?? 'TR',
-      nodesep: 100,
-      ranksep: 100,
+      nodesep: 60,
+      ranksep: 60,
     });
 
     edges.forEach((edge) => g.setEdge(edge.source, edge.target));
