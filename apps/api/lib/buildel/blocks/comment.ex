@@ -5,8 +5,7 @@ defmodule Buildel.Blocks.Comment do
   def options() do
     %{
       type: "comment",
-      description:
-        "This module is crafted for the seamless intake and transmission of textual data.",
+      description: "",
       groups: ["utils"],
       inputs: [],
       outputs: [],
@@ -25,11 +24,15 @@ defmodule Buildel.Blocks.Comment do
         "opts" => options_schema(%{
           "required" => [],
           "properties" => Jason.OrderedObject.new(
-            api_type: %{
+            content: %{
               "type" => "string",
-              "title" => "Model API type",
-              "description" => "The API type to use for the chat.",
-              "presentAs" => "wysiwyg",
+              "title" => "",
+              "description" => "",
+            },
+            color: %{
+              "type" => "string",
+              "title" => "",
+              "description" => "",
             }
           )
         })
