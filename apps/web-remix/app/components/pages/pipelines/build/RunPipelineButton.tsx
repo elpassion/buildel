@@ -28,6 +28,20 @@ export const RunPipelineButton: React.FC = () => {
   };
 
   useEventListener('keydown', (e) => {
+    if (
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement
+    ) {
+      return;
+    }
+
+    if (
+      e.target instanceof HTMLElement &&
+      e.target.classList.contains('tiptap')
+    ) {
+      return;
+    }
+
     if ((e.ctrlKey || e.metaKey) && (e.key === 'enter' || e.key === 'Enter')) {
       handleRun();
     }
