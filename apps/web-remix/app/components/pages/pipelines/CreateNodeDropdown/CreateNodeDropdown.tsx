@@ -11,6 +11,7 @@ import type {
   IBlockType,
   IBlockTypes,
 } from '~/components/pages/pipelines/pipeline.types';
+import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
 import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
 
@@ -25,6 +26,8 @@ export const CreateNodeDropdown = React.forwardRef<
   HTMLDivElement,
   CreateNodeDropdownProps
 >(({ position, open, create, blockGroups }, ref) => {
+  const { status: runStatus } = useRunPipeline();
+
   const groupsWithSingleItem = useMemo(() => {
     return Object.entries(blockGroups).filter(
       ([_, value]) => value.length === 1,
@@ -35,7 +38,7 @@ export const CreateNodeDropdown = React.forwardRef<
     return Object.entries(blockGroups).filter(([_, value]) => value.length > 1);
   }, [blockGroups]);
 
-  if (!open) return null;
+  if (!open || runStatus !== 'idle') return null;
 
   return (
     <div

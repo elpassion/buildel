@@ -4,7 +4,10 @@ import { NodeResizer, useReactFlow } from '@xyflow/react';
 
 import { CommentEditor } from '~/components/pages/pipelines/CommentNode/CommentEditor';
 import type { IBlockConfig } from '~/components/pages/pipelines/pipeline.types';
-import { useRunPipelineNode } from '~/components/pages/pipelines/RunPipelineProvider';
+import {
+  useRunPipeline,
+  useRunPipelineNode,
+} from '~/components/pages/pipelines/RunPipelineProvider';
 import { cn } from '~/utils/cn';
 
 import { CommentNodeToolbar, DEFAULT_COLOR } from './CommentNodeToolbar';
@@ -31,6 +34,7 @@ export function CommentNode({
   id,
 }: CommentNodeProps) {
   const { updateNode } = useReactFlow();
+  const { status: runStatus } = useRunPipeline();
   const [currentColor, setCurrentColor] = useState(
     data.opts['color'] ?? DEFAULT_COLOR,
   );
@@ -47,6 +51,8 @@ export function CommentNode({
     if (color) setCurrentColor(color);
   };
 
+  const isDisabled = runStatus !== 'idle' || disabled;
+
   return (
     <section
       aria-label={`Block: ${data.name}`}
@@ -55,12 +61,15 @@ export function CommentNode({
       style={{ width: width, height: height, backgroundColor: currentColor }}
       className={cn(
         'min-w-[180px] min-h-[100px] w-full h-full break-words rounded-lg transition border border-transparent nowheel hover:border-blue-700',
-        { 'border-blue-400 nodrag cursor-default border': selected },
+        {
+          'border-blue-400 cursor-default border': selected,
+          nodrag: selected || isDisabled,
+        },
         className,
       )}
     >
       <NodeResizer
-        isVisible={draggable && !disabled}
+        isVisible={draggable && !isDisabled}
         minWidth={180}
         minHeight={100}
         lineClassName="!border-none"
@@ -77,10 +86,10 @@ export function CommentNode({
           triggerFocus={selected}
           onBlur={update}
           content={data.opts['content']}
-          disabled={disabled}
+          disabled={isDisabled}
         >
           <CommentNodeToolbar
-            visible={selected}
+            visible={!isDisabled && selected}
             onChange={update}
             color={currentColor}
           />

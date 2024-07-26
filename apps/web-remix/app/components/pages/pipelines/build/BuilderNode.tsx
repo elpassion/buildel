@@ -7,6 +7,7 @@ import { IconButton } from '~/components/iconButton';
 import { confirm } from '~/components/modal/confirm';
 import type { IBlockConfig } from '~/components/pages/pipelines/pipeline.types';
 import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import {
@@ -17,8 +18,13 @@ import {
 import type { CustomNodeProps } from '../CustomNodes/CustomNode';
 
 export function BuilderNode(props: CustomNodeProps) {
+  const { status: runStatus } = useRunPipeline();
+
   return (
-    <CustomNode {...props} className="hover:border-blue-700">
+    <CustomNode
+      {...props}
+      className={cn('hover:border-blue-700', { nodrag: runStatus !== 'idle' })}
+    >
       <CustomNodeHeader data={props.data}>
         <BuilderNodeHeaderActions data={props.data} disabled={props.disabled} />
       </CustomNodeHeader>

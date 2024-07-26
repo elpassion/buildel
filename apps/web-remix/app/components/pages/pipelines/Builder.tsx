@@ -320,14 +320,6 @@ const BuilderInstance = ({
       className={cn('relative pt-5 w-full', className)}
       ref={reactFlowWrapper}
     >
-      <CreateNodeDropdown
-        ref={dropdownRef}
-        open={isOpen}
-        position={position}
-        blockGroups={blockGroups}
-        create={create}
-      />
-
       <RunPipelineProvider
         alias={alias}
         pipeline={{
@@ -335,6 +327,14 @@ const BuilderInstance = ({
           config: toPipelineConfig(flowState.nodes, flowState.edges),
         }}
       >
+        <CreateNodeDropdown
+          ref={dropdownRef}
+          open={isOpen}
+          position={position}
+          blockGroups={blockGroups}
+          create={create}
+        />
+
         <ReactFlow<INode, IEdge>
           edgesUpdatable={type !== 'readOnly'}
           edgesFocusable={type !== 'readOnly'}

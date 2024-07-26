@@ -52,7 +52,14 @@ export const CommentEditor = ({
     if (triggerFocus && !disabled) {
       editor?.view.focus();
     }
-  }, [triggerFocus]);
+  }, [triggerFocus, disabled]);
+
+  useEffect(() => {
+    if (!editor) return;
+
+    if (disabled) editor.setOptions({ editable: false });
+    else editor.setOptions({ editable: true });
+  }, [disabled]);
 
   return (
     <WysiwygContext.Provider value={editor}>
