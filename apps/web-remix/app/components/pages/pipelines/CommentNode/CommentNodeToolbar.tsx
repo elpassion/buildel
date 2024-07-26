@@ -96,8 +96,8 @@ function ToolbarButton({
 }: ButtonProps & { active?: boolean }) {
   return (
     <Button
-      variant={active ? 'default' : 'ghost'}
-      className={cn('rounded-none', className)}
+      variant="ghost"
+      className={cn('rounded-none', { 'bg-black/10': active }, className)}
       {...rest}
     >
       {children}
