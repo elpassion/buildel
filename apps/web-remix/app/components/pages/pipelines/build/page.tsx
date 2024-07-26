@@ -10,8 +10,11 @@ import {
 } from '@remix-run/react';
 import isEqual from 'lodash.isequal';
 
-import { AliasNode } from '~/components/pages/pipelines/build/AliasNode';
 import { ELProvider } from '~/components/pages/pipelines/EL/ELProvider';
+import { BuilderCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/BuilderCommentNode';
+import { ReadonlyCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/ReadonlyCommentNode';
+import { AliasCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/AliasCustomNode';
+import { BuilderCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/BuilderCustomNode';
 import {
   DialogDrawer,
   DialogDrawerContent,
@@ -23,7 +26,6 @@ import { CustomEdge } from '../CustomEdges/CustomEdge';
 import type { IPipeline, IPipelineConfig } from '../pipeline.types';
 import { toPipelineConfig } from '../PipelineFlow.utils';
 import { BuilderHeader, SaveChangesButton } from './BuilderHeader';
-import { BuilderNode } from './BuilderNode';
 import { CreateBlockFloatingMenu } from './CreateBlock/CreateBlockFloatingMenu';
 import type { loader } from './loader.server';
 
@@ -71,8 +73,8 @@ export function PipelineBuilder() {
         type="readOnly"
         className="h-[calc(100vh_-_64px)] pt-0"
         pipeline={pipeline}
-        CustomNode={AliasNode}
-        CustomEdge={CustomEdge}
+        CustomNodes={{ custom: AliasCustomNode, comment: ReadonlyCommentNode }}
+        CustomEdges={{ default: CustomEdge }}
       >
         {() => <BuilderHeader />}
       </Builder>
@@ -85,8 +87,8 @@ export function PipelineBuilder() {
         alias={aliasId}
         key="flow-editable"
         pipeline={pipeline}
-        CustomNode={BuilderNode}
-        CustomEdge={CustomEdge}
+        CustomNodes={{ custom: BuilderCustomNode, comment: BuilderCommentNode }}
+        CustomEdges={{ default: CustomEdge }}
         className="h-[calc(100vh_-_64px)] pt-0"
       >
         {({ edges, nodes, onBlockCreate }) => (

@@ -1,4 +1,4 @@
-import type { ComponentType, FunctionComponent, ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   useLocation,
@@ -29,7 +29,7 @@ import { useUndoRedo } from '~/hooks/useUndoRedo';
 import { buildUrlWithParams } from '~/utils/url';
 
 import type { CustomEdgeProps } from './CustomEdges/CustomEdge';
-import type { CustomNodeProps } from './CustomNodes/CustomNode';
+import type { CustomNodeProps } from './Nodes/CustomNodes/CustomNode';
 import type {
   IBlockConfig,
   IEdge,
@@ -52,7 +52,6 @@ import { useDraggableNodes } from './useDraggableNodes';
 import '@xyflow/react/dist/style.css';
 
 import { BuilderControls } from '~/components/pages/pipelines/BuilderControls';
-import { CommentNode } from '~/components/pages/pipelines/CommentNode/CommentNode';
 import { cn } from '~/utils/cn';
 
 import { CreateNodeDropdown } from './CreateNodeDropdown/CreateNodeDropdown';
@@ -63,8 +62,8 @@ interface BuilderProps {
   type?: 'readOnly' | 'editable';
   className?: string;
   pipeline: IExtendedPipeline;
-  CustomNode: ComponentType<CustomNodeProps>;
-  CustomEdge: ComponentType<CustomEdgeProps>;
+  CustomNodes: Record<string, ComponentType<CustomNodeProps>>;
+  CustomEdges: Record<string, ComponentType<CustomEdgeProps>>;
   children?: ({
     nodes,
     edges,
@@ -89,8 +88,8 @@ const BuilderInstance = ({
   children,
   alias = 'latest',
   type = 'editable',
-  CustomNode,
-  CustomEdge,
+  CustomNodes,
+  CustomEdges,
   className,
 }: BuilderProps) => {
   const outletData = useOutlet();
@@ -269,33 +268,29 @@ const BuilderInstance = ({
     onDrop: onBlockCreate,
   });
 
-  const PipelineNode: FunctionComponent<NodeProps<INode>> = useCallback(
-    (props: NodeProps<INode>) => (
-      <CustomNode {...props} disabled={type === 'readOnly'} />
-    ),
-    [],
-  );
-
   const nodeTypes = useMemo(() => {
-    return {
-      custom: PipelineNode,
-      comment: (props: NodeProps<INode>) => (
-        //@ts-ignore
-        <CommentNode {...props} disabled={type === 'readOnly'} />
-      ),
-    };
-  }, [PipelineNode]);
-
-  const DefaultEdge = useCallback(
-    (props: EdgeProps) => (
-      <CustomEdge {...props} disabled={type === 'readOnly'} />
-    ),
-    [type],
-  );
+    return Object.entries(CustomNodes).reduce(
+      (acc, [key, Node]) => {
+        return {
+          ...acc,
+          [key]: (props) => <Node {...props} disabled={type === 'readOnly'} />,
+        };
+      },
+      {} as Record<string, ComponentType<NodeProps<INode>>>,
+    );
+  }, []);
 
   const edgeTypes = useMemo(() => {
-    return { default: DefaultEdge };
-  }, [DefaultEdge]);
+    return Object.entries(CustomEdges).reduce(
+      (acc, [key, Edge]) => {
+        return {
+          ...acc,
+          [key]: (props) => <Edge {...props} disabled={type === 'readOnly'} />,
+        };
+      },
+      {} as Record<string, ComponentType<EdgeProps>>,
+    );
+  }, []);
 
   const {
     ref: dropdownRef,
@@ -351,6 +346,7 @@ const BuilderInstance = ({
           onConnectEnd={onConnectEnd}
           //@ts-ignore
           nodeTypes={nodeTypes}
+          //@ts-ignore
           edgeTypes={edgeTypes}
           onDrop={onDrop}
           onDragOver={onDragOver}

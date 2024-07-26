@@ -7,16 +7,17 @@ import type {
   JSONSchemaField,
   JSONSchemaObjectField,
 } from '~/components/form/schema/SchemaParser';
-import { NodePromptInputs } from '~/components/pages/pipelines/CustomNodes/NodePromptInputs';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { usePipelineId } from '~/hooks/usePipelineId';
+import { cn } from '~/utils/cn';
+
+import { NodePromptInputs } from './NodePromptInputs';
 import {
   NodeReadonlyItemTextarea,
   NodeReadonlyItemTitle,
   NodeReadonlyItemValue,
   NodeReadonlyItemWrapper,
-} from '~/components/pages/pipelines/CustomNodes/NodeReadonly.components';
-import { useOrganizationId } from '~/hooks/useOrganizationId';
-import { usePipelineId } from '~/hooks/usePipelineId';
-import { cn } from '~/utils/cn';
+} from './NodeReadonly.components';
 
 interface NodeReadonlyFieldsProps {
   schema?: JSONSchemaField;

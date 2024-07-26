@@ -4,7 +4,7 @@ import startCase from 'lodash.startcase';
 
 import { cn } from '~/utils/cn';
 
-import type { IHandle } from '../pipeline.types';
+import type { IHandle } from '../../pipeline.types';
 
 interface HandleProps {
   handle: IHandle;

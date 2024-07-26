@@ -20,7 +20,7 @@ import {
   NodeClearButton,
   NodeCopyButton,
   NodeDownloadButton,
-} from '~/components/pages/pipelines/CustomNodes/NodeActionButtons';
+} from '~/components/pages/pipelines/Nodes/CustomNodes/NodeActionButtons';
 import { loaderBuilder } from '~/utils.server';
 import { UnauthorizedError } from '~/utils/errors';
 import type { ParsedResponse } from '~/utils/fetch.server';

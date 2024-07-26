@@ -14,7 +14,7 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { Button } from '~/components/ui/button';
 
-import { useRunPipeline, useRunPipelineNode } from '../RunPipelineProvider';
+import { useRunPipeline, useRunPipelineNode } from '../../RunPipelineProvider';
 import { AudioFieldTabs } from './AudioFieldTabs';
 
 interface NodeFieldsFormProps {

@@ -4,9 +4,9 @@ import { useBoolean } from 'usehooks-ts';
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { ToggleInput } from '~/components/form/inputs/toggle.input';
 
-import type { IBlockConfig, IField } from '../pipeline.types';
-import { useRunPipelineNode } from '../RunPipelineProvider';
-import type { IEvent } from '../RunPipelineProvider';
+import type { IBlockConfig, IField } from '../../pipeline.types';
+import { useRunPipelineNode } from '../../RunPipelineProvider';
+import type { IEvent } from '../../RunPipelineProvider';
 import { AudioOutput } from './AudioOutput';
 import { FileOutput } from './FileOutput';
 import {

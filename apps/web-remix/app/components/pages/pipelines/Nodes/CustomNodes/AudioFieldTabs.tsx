@@ -10,7 +10,7 @@ import { TabGroup } from '~/components/tabs/TabGroup';
 import { Label } from '~/components/ui/label';
 import { RadioGroup } from '~/components/ui/radio-group';
 
-import { useRunPipeline } from '../RunPipelineProvider';
+import { useRunPipeline } from '../../RunPipelineProvider';
 
 interface AudioFieldTabsProps {
   onChunk: (chunk: Blob, name: string) => void;

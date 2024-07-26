@@ -1,16 +1,12 @@
-import {
-  CustomNode,
-  CustomNodeBody,
-  CustomNodeHeader,
-} from '../CustomNodes/CustomNode';
-import type { CustomNodeProps } from '../CustomNodes/CustomNode';
+import { CustomNode, CustomNodeBody, CustomNodeHeader } from './CustomNode';
+import type { CustomNodeProps } from './CustomNode';
 
-export interface ReadOnlyNodeProps extends CustomNodeProps {
+export interface ReadonlyCustomNodeProps extends CustomNodeProps {
   isConnectable?: boolean;
   disabled?: boolean;
 }
 
-export function ReadOnlyNode(props: ReadOnlyNodeProps) {
+export function ReadonlyCustomNode(props: ReadonlyCustomNodeProps) {
   return (
     <CustomNode {...props}>
       <CustomNodeHeader data={props.data} />

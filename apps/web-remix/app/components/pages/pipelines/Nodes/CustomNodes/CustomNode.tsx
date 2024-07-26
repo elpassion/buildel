@@ -4,16 +4,16 @@ import startCase from 'lodash.startcase';
 import { AlertCircle } from 'lucide-react';
 
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
-import { NodeReadonlyFields } from '~/components/pages/pipelines/CustomNodes/NodeReadonlyFields';
 import { Badge } from '~/components/ui/badge';
 import { cn } from '~/utils/cn';
 
-import type { IBlockConfig } from '../pipeline.types';
-import { getBlockFields, getBlockHandles } from '../PipelineFlow.utils';
-import { useRunPipelineNode } from '../RunPipelineProvider';
+import type { IBlockConfig } from '../../pipeline.types';
+import { getBlockFields, getBlockHandles } from '../../PipelineFlow.utils';
+import { useRunPipelineNode } from '../../RunPipelineProvider';
 import { NodeFieldsForm } from './NodeFieldsForm';
 import { NodeFieldsOutput } from './NodeFieldsOutput';
 import { InputHandle, OutputHandle, ToolHandle } from './NodeHandles';
+import { NodeReadonlyFields } from './NodeReadonlyFields';
 
 export interface CustomNodeProps extends PropsWithChildren {
   data: IBlockConfig;

@@ -17,7 +17,7 @@ import {
 } from '../CustomNodes/CustomNode';
 import type { CustomNodeProps } from '../CustomNodes/CustomNode';
 
-export function BuilderNode(props: CustomNodeProps) {
+export function BuilderCustomNode(props: CustomNodeProps) {
   const { status: runStatus } = useRunPipeline();
 
   return (

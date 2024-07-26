@@ -5,11 +5,11 @@ import {
 } from '../CustomNodes/CustomNode';
 import type { CustomNodeProps } from '../CustomNodes/CustomNode';
 
-export interface AliasNodeProps extends CustomNodeProps {
+export interface AliasCustomNodeProps extends CustomNodeProps {
   isConnectable?: boolean;
 }
 
-export function AliasNode(props: AliasNodeProps) {
+export function AliasCustomNode(props: AliasCustomNodeProps) {
   return (
     <CustomNode {...props}>
       <CustomNodeHeader data={props.data} />
