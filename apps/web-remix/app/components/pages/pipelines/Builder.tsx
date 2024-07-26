@@ -28,7 +28,7 @@ import { useEventListener } from 'usehooks-ts';
 import { useUndoRedo } from '~/hooks/useUndoRedo';
 import { buildUrlWithParams } from '~/utils/url';
 
-import type { CustomEdgeProps } from './CustomEdges/CustomEdge';
+import type { CustomEdgeProps } from './Edges/CustomEdges/CustomEdge';
 import type { CustomNodeProps } from './Nodes/CustomNodes/CustomNode';
 import type {
   IBlockConfig,

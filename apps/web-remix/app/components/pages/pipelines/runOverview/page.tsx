@@ -5,7 +5,7 @@ import { ReadonlyCommentNode } from '~/components/pages/pipelines/Nodes/CommentN
 import { ReadonlyCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/ReadonlyCustomNode';
 
 import { Builder } from '../Builder';
-import { CustomEdge } from '../CustomEdges/CustomEdge';
+import { CustomEdge } from '../Edges/CustomEdges/CustomEdge';
 import type { loader } from './loader.server';
 
 export function PipelineRunOverview() {

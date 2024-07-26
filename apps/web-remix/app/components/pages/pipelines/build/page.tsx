@@ -22,7 +22,7 @@ import {
 import { routes } from '~/utils/routes.utils';
 
 import { Builder } from '../Builder';
-import { CustomEdge } from '../CustomEdges/CustomEdge';
+import { CustomEdge } from '../Edges/CustomEdges/CustomEdge';
 import type { IPipeline, IPipelineConfig } from '../pipeline.types';
 import { toPipelineConfig } from '../PipelineFlow.utils';
 import { BuilderHeader, SaveChangesButton } from './BuilderHeader';

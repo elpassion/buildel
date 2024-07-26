@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { getBezierPath, useReactFlow } from '@xyflow/react';
 import type { EdgeProps } from '@xyflow/react';
 
-import { useRunPipelineEdge } from '../RunPipelineProvider';
+import { useRunPipelineEdge } from '../../RunPipelineProvider';
 
 import './customEdges.styles.css';
 
