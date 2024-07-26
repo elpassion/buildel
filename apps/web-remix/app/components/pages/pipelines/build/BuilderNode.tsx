@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useNavigate, useParams, useSearchParams } from '@remix-run/react';
+import { useReactFlow } from '@xyflow/react';
 import { Settings, Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
@@ -19,11 +20,7 @@ export function BuilderNode(props: CustomNodeProps) {
   return (
     <CustomNode {...props} className="hover:border-blue-700">
       <CustomNodeHeader data={props.data}>
-        <BuilderNodeHeaderActions
-          data={props.data}
-          disabled={props.disabled}
-          onDelete={props.onDelete}
-        />
+        <BuilderNodeHeaderActions data={props.data} disabled={props.disabled} />
       </CustomNodeHeader>
 
       <CustomNodeBody
@@ -38,21 +35,22 @@ export function BuilderNode(props: CustomNodeProps) {
 interface BuilderNodeHeaderActionsProps {
   data: IBlockConfig;
   disabled?: boolean;
-  onDelete: (block: IBlockConfig) => void;
 }
 function BuilderNodeHeaderActions({
   data,
   disabled,
-  onDelete,
 }: BuilderNodeHeaderActionsProps) {
   const navigate = useNavigate();
   const { status: runStatus } = useRunPipeline();
   const [searchParams] = useSearchParams();
   const { organizationId, pipelineId } = useParams();
+  const { deleteElements } = useReactFlow();
 
   const handleDelete = useCallback(() => {
     confirm({
-      onConfirm: async () => onDelete(data),
+      onConfirm: async () => {
+        await deleteElements({ nodes: [{ id: data.name }] });
+      },
       children: (
         <p className="text-sm">
           You are about to delete the "{data.name}" block from your workflow.

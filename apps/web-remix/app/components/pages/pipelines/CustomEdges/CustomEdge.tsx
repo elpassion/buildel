@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { getBezierPath } from '@xyflow/react';
+import { getBezierPath, useReactFlow } from '@xyflow/react';
 import type { EdgeProps } from '@xyflow/react';
 
 import { useRunPipelineEdge } from '../RunPipelineProvider';
@@ -11,7 +11,6 @@ import { X } from 'lucide-react';
 import { cn } from '~/utils/cn';
 
 export interface CustomEdgeProps extends EdgeProps {
-  onDelete: (id: string) => void;
   disabled?: boolean;
 }
 
@@ -26,10 +25,10 @@ export function CustomEdge({
   targetPosition,
   selected,
   style = {},
-  onDelete,
   disabled = false,
 }: CustomEdgeProps) {
   const { status } = useRunPipelineEdge();
+  const { deleteElements } = useReactFlow();
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -48,8 +47,8 @@ export function CustomEdge({
       : {};
   }, [status]);
 
-  const handleDelete = useCallback(() => {
-    onDelete(id);
+  const handleDelete = useCallback(async () => {
+    await deleteElements({ edges: [{ id }] });
   }, []);
 
   const handlePathClick = (e: React.MouseEvent<SVGPathElement, MouseEvent>) => {

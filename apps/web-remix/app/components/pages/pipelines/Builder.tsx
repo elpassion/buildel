@@ -187,13 +187,6 @@ const BuilderInstance = ({
     }));
   }, []);
 
-  const handleDeleteEdge = useCallback((id: string) => {
-    setFlowState((state) => ({
-      ...state,
-      edges: state.edges.filter((edge) => edge.id !== id),
-    }));
-  }, []);
-
   const handleIsValidConnection = useCallback(
     (connection: Connection | Edge) => {
       if (!isConnection(connection)) return false;
@@ -205,17 +198,6 @@ const BuilderInstance = ({
     },
     [flowState],
   );
-
-  const handleDelete = useCallback((node: IBlockConfig) => {
-    setFlowState((state) => ({
-      nodes: state.nodes.filter((nd) => nd.id !== node.name),
-      edges: state.edges.filter(
-        (ed) =>
-          ed.data?.from.block_name !== node.name &&
-          ed.data?.to.block_name !== node.name,
-      ),
-    }));
-  }, []);
 
   const onBlockCreate = useCallback(
     async (created: IBlockConfig) => {
@@ -289,13 +271,9 @@ const BuilderInstance = ({
 
   const PipelineNode: FunctionComponent<NodeProps<INode>> = useCallback(
     (props: NodeProps<INode>) => (
-      <CustomNode
-        {...props}
-        onDelete={handleDelete}
-        disabled={type === 'readOnly'}
-      />
+      <CustomNode {...props} disabled={type === 'readOnly'} />
     ),
-    [handleDelete],
+    [],
   );
 
   const nodeTypes = useMemo(() => {
@@ -304,13 +282,9 @@ const BuilderInstance = ({
 
   const DefaultEdge = useCallback(
     (props: EdgeProps) => (
-      <CustomEdge
-        {...props}
-        onDelete={handleDeleteEdge}
-        disabled={type === 'readOnly'}
-      />
+      <CustomEdge {...props} disabled={type === 'readOnly'} />
     ),
-    [handleDeleteEdge, type],
+    [type],
   );
 
   const edgeTypes = useMemo(() => {
