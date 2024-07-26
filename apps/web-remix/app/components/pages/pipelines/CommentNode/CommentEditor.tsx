@@ -25,6 +25,7 @@ interface CommentEditorProps {
   triggerFocus?: boolean;
   onBlur?: (props: UpdateProps) => void;
   content?: string;
+  disabled?: boolean;
 }
 
 export const CommentEditor = ({
@@ -32,8 +33,10 @@ export const CommentEditor = ({
   onBlur,
   children,
   content,
+  disabled,
 }: PropsWithChildren<CommentEditorProps>) => {
   const editor = useEditor({
+    editable: !disabled,
     extensions,
     content: content ?? '',
     onBlur: (props) => onBlur?.({ content: props.editor.getHTML() }),
@@ -46,7 +49,7 @@ export const CommentEditor = ({
   });
 
   useEffect(() => {
-    if (triggerFocus) {
+    if (triggerFocus && !disabled) {
       editor?.view.focus();
     }
   }, [triggerFocus]);
@@ -55,7 +58,11 @@ export const CommentEditor = ({
     <WysiwygContext.Provider value={editor}>
       {children}
 
-      <EditorContent editor={editor} className={cn('w-full h-full')} />
+      <EditorContent
+        disabled={disabled}
+        editor={editor}
+        className={cn('w-full h-full')}
+      />
     </WysiwygContext.Provider>
   );
 };

@@ -277,7 +277,13 @@ const BuilderInstance = ({
   );
 
   const nodeTypes = useMemo(() => {
-    return { custom: PipelineNode, comment: CommentNode };
+    return {
+      custom: PipelineNode,
+      comment: (props: NodeProps<INode>) => (
+        //@ts-ignore
+        <CommentNode {...props} disabled={type === 'readOnly'} />
+      ),
+    };
   }, [PipelineNode]);
 
   const DefaultEdge = useCallback(
@@ -300,7 +306,11 @@ const BuilderInstance = ({
     isOpen,
     create,
     blockGroups,
-  } = useNodeDropdown({ onConnect, onCreate: onBlockCreate });
+  } = useNodeDropdown({
+    onConnect,
+    onCreate: onBlockCreate,
+    disabled: type === 'readOnly',
+  });
 
   return (
     <div

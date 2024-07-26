@@ -31,11 +31,13 @@ export interface Position {
 interface UseNodeDropdownArgs {
   onConnect: (connection: Connection) => void;
   onCreate: (created: IBlockConfig) => Promise<INode>;
+  disabled?: boolean;
 }
 
 export const useNodeDropdown = ({
   onCreate,
   onConnect,
+  disabled,
 }: UseNodeDropdownArgs) => {
   const connectParamsRef = useRef<OnConnectStartParams | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,8 @@ export const useNodeDropdown = ({
   useOnClickOutside(dropdownRef, onClose);
 
   const onConnectStart = (_: unknown, params: OnConnectStartParams) => {
+    if (disabled) return;
+
     connectParamsRef.current = params;
 
     if (params.nodeId) {
@@ -66,6 +70,8 @@ export const useNodeDropdown = ({
   };
 
   const onConnectEnd = (e: MouseEvent | TouchEvent) => {
+    if (disabled) return;
+
     if (e.target instanceof HTMLElement && isMouseEvent(e)) {
       const isPanTarget = e.target.classList.contains('react-flow__pane');
       const isHandleTarget = e.target.classList.contains('react-flow__handle');
@@ -108,7 +114,15 @@ export const useNodeDropdown = ({
   };
 
   const onContextMenu = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (disabled) return;
+
     e.preventDefault();
+
+    if (e.target instanceof HTMLElement) {
+      const isPanTarget = e.target.classList.contains('react-flow__pane');
+
+      if (!isPanTarget) return;
+    }
 
     setPosition({
       x: e.clientX,

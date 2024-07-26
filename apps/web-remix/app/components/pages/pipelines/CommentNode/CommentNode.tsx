@@ -77,6 +77,7 @@ export function CommentNode({
           triggerFocus={selected}
           onBlur={update}
           content={data.opts['content']}
+          disabled={disabled}
         >
           <CommentNodeToolbar
             visible={selected}
