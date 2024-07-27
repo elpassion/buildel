@@ -4,6 +4,7 @@ import type { Connection, OnConnectStartParams } from '@xyflow/react';
 import { useReactFlow } from '@xyflow/react';
 import { useBoolean, useOnClickOutside } from 'usehooks-ts';
 
+import { confirm } from '~/components/modal/confirm';
 import type { loader } from '~/components/pages/pipelines/build/loader.server';
 import type {
   IBlockConfig,
@@ -15,13 +16,14 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { errorToast } from '~/components/toasts/errorToast';
 
-import { leaveOneGroup } from './createNodeDropdownt.utils';
+import { leaveOneGroup } from './nodeDropdownt.utils';
 
 export interface Position {
   x: number;
   y: number;
   target?:
     | 'pane'
+    | 'node'
     | 'handle-top'
     | 'handle-bottom'
     | 'handle-left'
@@ -33,6 +35,10 @@ interface UseNodeDropdownArgs {
   onCreate: (created: IBlockConfig) => Promise<INode>;
   disabled?: boolean;
 }
+
+type NodeDropdownActionOption = { type: string };
+
+export type NodeDropdownOption = IBlockType | NodeDropdownActionOption;
 
 export const useNodeDropdown = ({
   onCreate,
@@ -120,19 +126,39 @@ export const useNodeDropdown = ({
 
     if (e.target instanceof HTMLElement) {
       const isPanTarget = e.target.classList.contains('react-flow__pane');
+      if (isPanTarget) {
+        setPosition({
+          x: e.clientX,
+          y: e.clientY,
+          target: 'pane',
+        });
+        open();
+      }
 
-      if (!isPanTarget) return;
+      const nodeTarget = getParentWithClass(e.target, 'react-flow__node');
+
+      if (nodeTarget) {
+        const nodeId = nodeTarget.dataset['id'];
+
+        if (!nodeId) return;
+
+        const node = flowInstance.getNode(nodeId) ?? null;
+
+        if (!node) return;
+
+        setPosition({
+          x: e.clientX,
+          y: e.clientY,
+          target: 'node',
+        });
+        setNode(node);
+        open();
+      }
     }
-
-    setPosition({
-      x: e.clientX,
-      y: e.clientY,
-    });
-
-    open();
   };
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
     if (isOpen) {
       document.body.style.pointerEvents = 'none';
       document.body.setAttribute('data-scroll-locked', '1');
@@ -248,6 +274,59 @@ export const useNodeDropdown = ({
     }
   };
 
+  const remove = async () => {
+    if (!node) return;
+
+    try {
+      confirm({
+        onConfirm: async () => {
+          await flowInstance.deleteElements({ nodes: [{ id: node.id }] });
+        },
+        children: (
+          <p className="text-sm">
+            You are about to delete the "{node.id}" block from your workflow.
+            This action is irreversible.
+          </p>
+        ),
+      });
+
+      onClose();
+    } catch {
+      errorToast({ description: 'Cannot delete block' });
+    }
+  };
+
+  const duplicate = async () => {
+    if (!node) return;
+
+    try {
+      await onCreate({
+        ...node,
+        name: '',
+        inputs: [],
+        opts: node.data.opts,
+        type: node.data.type,
+        block_type: node.data.block_type,
+        position: flowInstance.screenToFlowPosition(getNodePosition(position)),
+        connections: [],
+      });
+
+      onClose();
+    } catch {
+      errorToast({ description: 'Cannot delete block' });
+    }
+  };
+
+  const onClick = async (option: NodeDropdownOption) => {
+    if (isBlockTypeOption(option)) {
+      await create(option);
+    } else if (option.type === 'delete') {
+      await remove();
+    } else if (option.type === 'duplicate') {
+      await duplicate();
+    }
+  };
+
   const filteredBlockTypes = useMemo(() => {
     if (!nodeHandle || !connectParamsRef.current) return blockTypes;
 
@@ -276,7 +355,7 @@ export const useNodeDropdown = ({
     }
   }, [nodeHandle, blockTypes]);
 
-  const blockGroups = useMemo(
+  const blockOptions = useMemo(
     () =>
       leaveOneGroup(filteredBlockTypes).reduce(
         (groups, blockType) => {
@@ -294,15 +373,22 @@ export const useNodeDropdown = ({
     [filteredBlockTypes],
   );
 
+  const utilsOptions = useMemo(() => {
+    return {
+      duplicate: [{ type: 'duplicate' }],
+      delete: [{ type: 'delete' }],
+    };
+  }, []);
+
   return {
     onConnectEnd,
     onConnectStart,
     onContextMenu,
     ref: dropdownRef,
-    blockGroups,
+    options: position.target === 'node' ? utilsOptions : blockOptions,
     position,
     isOpen,
-    create,
+    onClick,
   };
 };
 
@@ -317,6 +403,8 @@ function getHandle(ios: IIOType[], handle: { type: string }) {
 function getNodePosition(position: Position) {
   if (!position.target || position.target === 'pane') {
     return { ...position, x: position.x - 100 };
+  } else if (position.target === 'node') {
+    return { ...position, x: position.x + 200 };
   } else if (position.target === 'handle-left') {
     return { ...position, x: position.x - 200 };
   } else if (position.target === 'handle-right') {
@@ -326,4 +414,20 @@ function getNodePosition(position: Position) {
   } else {
     return { ...position, y: position.y + 100 };
   }
+}
+
+function getParentWithClass(
+  element: Element,
+  className: string,
+): HTMLElement | null {
+  if (!element.parentElement) return null;
+
+  if (element.parentElement.classList.contains(className))
+    return element.parentElement;
+
+  return element.closest(`.${className}`);
+}
+
+function isBlockTypeOption(option: NodeDropdownOption): option is IBlockType {
+  return (option as IBlockType).schema !== undefined;
 }

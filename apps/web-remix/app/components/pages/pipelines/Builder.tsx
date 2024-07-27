@@ -47,8 +47,8 @@ import '@xyflow/react/dist/style.css';
 import { BuilderControls } from '~/components/pages/pipelines/BuilderControls';
 import { cn } from '~/utils/cn';
 
-import { CreateNodeDropdown } from './CreateNodeDropdown/CreateNodeDropdown';
-import { useNodeDropdown } from './CreateNodeDropdown/useNodeDropdown';
+import { NodeDropdown } from './NodeDropdown/NodeDropdown';
+import { useNodeDropdown } from './NodeDropdown/useNodeDropdown';
 
 interface BuilderProps {
   alias?: string;
@@ -174,7 +174,7 @@ const BuilderInstance = ({
   const onNodesChange = useCallback(
     (changes: NodeChange<INode>[]) => {
       if (type === 'readOnly') return;
-      if (['select', 'position', 'dimensions'].includes(changes[0].type)) {
+      if (['select', 'position', 'dimensions'].includes(changes[0]?.type)) {
         updateCurrent((state) => ({
           ...state,
           nodes: applyNodeChanges(changes, state.nodes),
@@ -262,6 +262,7 @@ const BuilderInstance = ({
         position: created.position ?? { x: 100, y: 100 },
         data: { ...created, name },
         selected: false,
+        measured: created.measured,
       };
 
       setFlowState((state) => ({
@@ -316,8 +317,8 @@ const BuilderInstance = ({
     onContextMenu,
     position,
     isOpen,
-    create,
-    blockGroups,
+    onClick,
+    options,
   } = useNodeDropdown({
     onConnect,
     onCreate: onBlockCreate,
@@ -332,12 +333,12 @@ const BuilderInstance = ({
       className={cn('relative pt-5 w-full', className)}
       ref={reactFlowWrapper}
     >
-      <CreateNodeDropdown
+      <NodeDropdown
         ref={dropdownRef}
         open={isOpen}
         position={position}
-        blockGroups={blockGroups}
-        create={create}
+        options={options}
+        onClick={onClick}
       />
 
       <ReactFlow<INode, IEdge>
