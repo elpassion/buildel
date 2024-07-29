@@ -14,6 +14,33 @@ defmodule BuildelWeb.DatasetController do
 
   tags ["dataset"]
 
+  operation :show,
+    summary: "Get organization dataset",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      id: [in: :path, description: "Dataset ID", type: :string]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Datasets.ShowResponse},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def show(conn, _params) do
+    %{organization_id: organization_id, id: dataset_id} = conn.params
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, dataset} <-
+           Buildel.Datasets.get_organization_dataset(organization, dataset_id) do
+      render(conn, :show, dataset: dataset)
+    end
+  end
+
   operation :index,
     summary: "List organization datasets",
     parameters: [

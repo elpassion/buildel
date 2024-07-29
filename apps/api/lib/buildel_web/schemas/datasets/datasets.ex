@@ -31,6 +31,19 @@ defmodule BuildelWeb.Schemas.Datasets do
     })
   end
 
+  defmodule ShowResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "DatasetShowResponse",
+      type: :object,
+      properties: %{
+        data: BuildelWeb.Schemas.Datasets.Dataset
+      },
+      required: [:data]
+    })
+  end
+
   defmodule CreateDatasetRequest do
     require OpenApiSpex
 
