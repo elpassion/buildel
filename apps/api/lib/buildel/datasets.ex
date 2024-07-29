@@ -1,5 +1,6 @@
 defmodule Buildel.Datasets do
   import Ecto.Query, warn: false
+  alias Buildel.Datasets.DatasetRow
   alias Buildel.Organizations.Organization
   alias Buildel.Datasets.Dataset
   alias Buildel.Repo
@@ -40,6 +41,31 @@ defmodule Buildel.Datasets do
          |> Repo.one() do
       nil -> {:error, :not_found}
       dataset -> {:ok, dataset}
+    end
+  end
+
+  def create_organization_dataset(%Organization{} = organization, attrs \\ %{}) do
+    with {:ok, dataset_file} <- Buildel.Datasets.DatasetFile.get(attrs.file_id) do
+      case create_dataset(Map.put(attrs, :organization_id, organization.id)) do
+        {:ok, dataset} ->
+          time = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+          rows =
+            dataset_file.rows
+            |> Enum.map(fn row ->
+              row
+              |> Map.put(:dataset_id, dataset.id)
+              |> Map.put(:inserted_at, time)
+              |> Map.put(:updated_at, time)
+            end)
+
+          {_inserted_records, nil} = Buildel.Repo.insert_all(DatasetRow, rows)
+
+          {:ok, dataset}
+
+        e ->
+          e
+      end
     end
   end
 end
