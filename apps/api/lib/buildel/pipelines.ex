@@ -31,10 +31,6 @@ defmodule Buildel.Pipelines do
     Repo.delete(pipeline)
   end
 
-  def change_pipeline(%Pipeline{} = pipeline, attrs \\ %{}) do
-    Pipeline.changeset(pipeline, attrs)
-  end
-
   def list_organization_pipelines(%Organization{} = organization) do
     from(p in Pipeline, where: p.organization_id == ^organization.id, order_by: [desc: p.id])
     |> Repo.all()

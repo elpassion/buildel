@@ -55,11 +55,6 @@ defmodule Buildel.PipelinesTest do
       assert_raise Ecto.NoResultsError, fn -> Pipelines.get_pipeline!(pipeline.id) end
     end
 
-    test "change_pipeline/1 returns a pipeline changeset" do
-      pipeline = pipeline_fixture()
-      assert %Ecto.Changeset{} = Pipelines.change_pipeline(pipeline)
-    end
-
     test "list_organization_pipelines/1 returns all pipelines for given organization" do
       organization = organization_fixture()
       pipeline = pipeline_fixture(organization_id: organization.id)
