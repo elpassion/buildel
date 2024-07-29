@@ -26,7 +26,7 @@ export const DatasetsList: React.FC<DatasetsListProps> = ({
         </EmptyMessage>
       }
       renderItem={(item) => (
-        <BasicLink to={routes.collectionFiles(organizationId, item.name)}>
+        <BasicLink to={routes.dataset(organizationId, item.id)}>
           <DatasetsListItem data={item} organizationId={organizationId} />
         </BasicLink>
       )}
