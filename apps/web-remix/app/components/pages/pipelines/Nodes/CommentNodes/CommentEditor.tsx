@@ -66,8 +66,8 @@ export const CommentEditor = ({
       {children}
 
       <EditorContent
-        disabled={disabled}
         editor={editor}
+        disabled={disabled}
         className={cn('w-full h-full')}
       />
     </WysiwygContext.Provider>

@@ -9,9 +9,16 @@ import {
 } from '~/components/dropdown/Dropdown';
 import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
 import { Button } from '~/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { cn } from '~/utils/cn';
 
 import type { NodeDropdownOption } from './useNodeDropdown';
+import { isBlockTypeOption } from './useNodeDropdown';
 
 interface NodeDropdownProps {
   position: { x: number; y: number };
@@ -46,15 +53,26 @@ export const NodeDropdown = React.forwardRef<HTMLDivElement, NodeDropdownProps>(
           {groupsWithSingleItem.map(([group, options]) => {
             return (
               <li key={group}>
-                <Button
-                  isFluid
-                  size="xxs"
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => onClick(options[0])}
-                >
-                  {startCase(options[0].type)}
-                </Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        isFluid
+                        size="xxs"
+                        variant="ghost"
+                        className="justify-start"
+                        onClick={() => onClick(options[0])}
+                      >
+                        {startCase(options[0].type)}
+                      </Button>
+                    </TooltipTrigger>
+                    {isBlockTypeOption(options[0]) && (
+                      <TooltipContent side="right" className="max-w-[400px]">
+                        {options[0].description}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
               </li>
             );
           })}
@@ -77,16 +95,29 @@ export const NodeDropdown = React.forwardRef<HTMLDivElement, NodeDropdownProps>(
                   <div className="bg-white border border-input rounded-md w-fit p-1 max-w-[200px]">
                     {options.map((option) => {
                       return (
-                        <Button
-                          key={option.type}
-                          isFluid
-                          size="xxs"
-                          variant="ghost"
-                          className="justify-start"
-                          onClick={() => onClick(option)}
-                        >
-                          {startCase(option.type)}
-                        </Button>
+                        <TooltipProvider key={option.type}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                isFluid
+                                size="xxs"
+                                variant="ghost"
+                                className="justify-start"
+                                onClick={() => onClick(option)}
+                              >
+                                {startCase(option.type)}
+                              </Button>
+                            </TooltipTrigger>
+                            {isBlockTypeOption(options[0]) && (
+                              <TooltipContent
+                                side="right"
+                                className="max-w-[400px]"
+                              >
+                                {options[0].description}
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        </TooltipProvider>
                       );
                     })}
                   </div>

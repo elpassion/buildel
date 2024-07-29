@@ -428,6 +428,8 @@ function getParentWithClass(
   return element.closest(`.${className}`);
 }
 
-function isBlockTypeOption(option: NodeDropdownOption): option is IBlockType {
+export function isBlockTypeOption(
+  option: NodeDropdownOption,
+): option is IBlockType {
   return (option as IBlockType).schema !== undefined;
 }
