@@ -1,5 +1,6 @@
 import React, { forwardRef, useRef } from 'react';
 import { RefreshCcw } from 'lucide-react';
+import type { ValidationBehaviorOptions } from 'remix-validated-form/browser/internal/getInputProps';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
@@ -11,9 +12,13 @@ export interface TextInputFieldProps extends TextInputProps {}
 
 export const TextInputField = forwardRef<
   HTMLInputElement,
-  Partial<TextInputFieldProps>
->(({ ...props }, ref) => {
-  const { name, getInputProps, error } = useFieldContext();
+  Partial<TextInputFieldProps> & {
+    validationBehavior?: Partial<ValidationBehaviorOptions>;
+  }
+>(({ validationBehavior, ...props }, ref) => {
+  const { name, getInputProps, error } = useFieldContext({
+    validationBehavior,
+  });
 
   return (
     <TextInput

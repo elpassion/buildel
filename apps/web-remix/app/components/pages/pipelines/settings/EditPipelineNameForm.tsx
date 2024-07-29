@@ -24,7 +24,7 @@ import {
 import { useModal } from '~/hooks/useModal';
 import { routes } from '~/utils/routes.utils';
 
-import { updatePipelineNameSchema } from './schema';
+import { updatePipelineNameSchema } from '../schema';
 
 interface EditPipelineNameFormProps {
   defaultValues: IPipeline;

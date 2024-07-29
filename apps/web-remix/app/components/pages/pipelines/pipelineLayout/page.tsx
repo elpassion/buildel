@@ -7,6 +7,7 @@ import {
 } from '@remix-run/react';
 import { ChevronLeft } from 'lucide-react';
 
+import { PipelineName } from '~/components/pages/pipelines/pipelineLayout/PipelineName';
 import { PipelineLayoutHeader } from '~/components/pages/pipelines/PipelineLayoutHeader';
 import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
@@ -33,7 +34,7 @@ export function PipelineLayout() {
   return (
     <>
       <TabGroup>
-        <PipelineLayoutHeader>
+        <PipelineLayoutHeader className="lg:grid lg:grid-cols-[360px_1fr_360px]">
           <div className="flex gap-2 items-center">
             <Button
               variant="secondary"
@@ -85,7 +86,11 @@ export function PipelineLayout() {
             </FilledTabsWrapper>
           </div>
 
-          <div className="flex gap-2 items-center">
+          <div className="hidden lg:flex lg:justify-center">
+            <PipelineName pipeline={pipeline} />
+          </div>
+
+          <div className="flex gap-2 items-center lg:justify-end">
             <AliasSelect aliases={aliases} value={aliasId} />
 
             {aliasId !== 'latest' && <RestoreWorkflow pipeline={pipeline} />}

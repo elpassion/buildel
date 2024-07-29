@@ -29,7 +29,7 @@ export const FieldContext = React.createContext<{
   error?: string[] | null;
 } | null>(null);
 
-interface UseFieldContextProps {
+export interface UseFieldContextProps {
   validationBehavior?: Partial<ValidationBehaviorOptions>;
 }
 

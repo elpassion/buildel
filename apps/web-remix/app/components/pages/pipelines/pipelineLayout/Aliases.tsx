@@ -65,7 +65,7 @@ function AliasTrigger({
   return (
     <DropdownTrigger aria-label="Select aliases" variant="outline" size="xs">
       <div className="flex gap-1 items-center">
-        <span className="block max-w-[250px] truncate">
+        <span className="block max-w-[200px] truncate">
           Aliases{' '}
           <span className={cn({ 'font-bold': value !== 'latest' })}>
             ({name})
