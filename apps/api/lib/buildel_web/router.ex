@@ -203,6 +203,12 @@ defmodule BuildelWeb.Router do
       only: [:index]
     )
 
+    resources(
+      "/organizations/:organization_id/datasets/files",
+      DatasetFilesController,
+      only: [:show, :create]
+    )
+
     post("/organizations/:organization_id/tools/chunks", OrganizationToolChunkController, :create)
     post("/organizations/:organization_id/tools/crawls", OrganizationToolCrawlController, :create)
 

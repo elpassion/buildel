@@ -33,6 +33,7 @@ defmodule Buildel.Application do
         BuildelWeb.GoogleJwksStrategy,
         {BuildelWeb.MetricsStorage, BuildelWeb.Telemetry.metrics()},
         Buildel.Memories.MemoryFile,
+        Buildel.Datasets.DatasetFile,
         Buildel.Cache
       ]
       |> maybe_add_db()
