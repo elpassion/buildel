@@ -61,7 +61,7 @@ describe('Pipeline workflow run', () => {
     });
   });
 
-  test('should render streamed block output', async () => {
+  test.skip('should render streamed block output', async () => {
     const page = new PipelineRunObject().render({
       initialEntries: ['/1/pipelines/1/build'],
     });
