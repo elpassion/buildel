@@ -13,6 +13,7 @@ import {
 import {
   Briefcase,
   ChevronDown,
+  FolderCog,
   Key,
   Layers,
   LogOut,
@@ -186,6 +187,13 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
           icon={<Key className="min-w-4 w-4 h-4 text-center leading-5" />}
           onlyIcon={isCollapsed}
           text="Secrets"
+        />
+
+        <SidebarLink
+          to={routes.datasets(organization.id)}
+          icon={<FolderCog className="min-w-4 w-4 h-4 text-center leading-5" />}
+          onlyIcon={isCollapsed}
+          text="Datasets"
         />
       </div>
 

@@ -248,8 +248,15 @@ export const routes = {
       `/forms${routes.pipeline(organizationId, pipelineId)}`,
       params,
     ),
+  datasets: (organizationId: OrganizationId) =>
+    `${routes.organization(organizationId)}/datasets`,
+  datasetsNew: (organizationId: OrganizationId) =>
+    `${routes.datasets(organizationId)}/new`,
+  dataset: (organizationId: OrganizationId, datasetId: DatasetId) =>
+    `${routes.datasets(organizationId)}/${datasetId}`,
 };
 
 type OrganizationId = string | number;
 type PipelineId = string | number;
 type RunId = string | number;
+type DatasetId = string | number;
