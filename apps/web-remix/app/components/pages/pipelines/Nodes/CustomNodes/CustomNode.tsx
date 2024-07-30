@@ -80,7 +80,8 @@ export function CustomNode({
 }
 
 function getMinHeight(handles: number) {
-  return (handles || 1) * 35 + 30;
+  const height = (handles || 1) * 35 + 30;
+  return height < 90 ? 90 : height;
 }
 
 export interface CustomNodeHeaderProps extends PropsWithChildren {
