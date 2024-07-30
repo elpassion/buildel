@@ -23,7 +23,7 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
       |> Enum.map(fn block ->
         case Buildel.Blocks.type(block["type"]) do
           nil -> nil
-          type -> type.options()
+          type -> Map.put(type.options(), :name, block["name"])
         end
       end)
       |> Enum.filter(fn
@@ -35,12 +35,18 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
       data:
         Enum.reduce(blocks_opts, %{inputs: [], outputs: [], ios: []}, fn item, acc ->
           %{
-            inputs: acc.inputs ++ item.inputs,
-            outputs: acc.outputs ++ item.outputs,
-            ios: acc.ios ++ item.ios
+            inputs: acc.inputs ++ concat_block_name(item.inputs, item.name),
+            outputs: acc.outputs ++ concat_block_name(item.outputs, item.name),
+            ios: acc.ios ++ concat_block_name(item.ios, item.name)
           }
         end)
     }
+  end
+
+  defp concat_block_name(block_types, block_name) do
+    Enum.map(block_types, fn block_type ->
+      Map.update!(block_type, :name, fn name -> block_name <> ":" <> name end)
+    end)
   end
 
   defp data(%Pipeline{} = pipeline) do
