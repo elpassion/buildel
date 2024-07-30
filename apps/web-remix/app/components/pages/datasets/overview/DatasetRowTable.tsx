@@ -85,7 +85,9 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
-              <EmptyMessage>There are no dataset rows yet...</EmptyMessage>
+              <EmptyMessage className="px-5">
+                There are no dataset rows yet...
+              </EmptyMessage>
             </td>
           </tr>
         ) : null}
