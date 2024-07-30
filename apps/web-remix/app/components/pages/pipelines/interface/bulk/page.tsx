@@ -50,8 +50,8 @@ export function BulkPage() {
     { id: string; cost: number }[]
   >([]);
 
-  const inputs = pipeline.config.blocks.filter(
-    (block) => ['text_input', 'file_input'].includes(block.type),
+  const inputs = pipeline.config.blocks.filter((block) =>
+    ['text_input', 'file_input'].includes(block.type),
   );
 
   const outputs = pipeline.config.blocks.filter(
@@ -288,9 +288,9 @@ export function BulkPage() {
                   label="Inputs"
                   mode="multiple"
                   onSelect={(selected: string) => {
-                    const selectedType = inputs.find(
-                      (input) => input.name === selected,
-                    )?.type || "";
+                    const selectedType =
+                      inputs.find((input) => input.name === selected)?.type ||
+                      '';
 
                     const newSelectedInputs = [
                       ...selectedInputs,
@@ -367,7 +367,7 @@ export function BulkPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: 'Client SDK',
+      title: 'Bulk',
     },
   ];
 };

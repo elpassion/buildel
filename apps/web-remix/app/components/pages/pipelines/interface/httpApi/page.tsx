@@ -152,7 +152,7 @@ export function HTTPApiPage() {
 export const meta: MetaFunction = () => {
   return [
     {
-      title: 'Client SDK',
+      title: 'HTTP Api',
     },
   ];
 };
