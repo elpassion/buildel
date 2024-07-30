@@ -89,6 +89,65 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
     end
   end
 
+  describe "ios" do
+    setup [:create_pipeline]
+
+    test_requires_authentication %{conn: conn, organization: organization, pipeline: pipeline} do
+      get(conn, ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/ios")
+    end
+
+    test "Returns 404 when pipeline does not exist", %{
+      conn: conn,
+      organization: organization
+    } do
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/123123/ios"
+        )
+
+      assert json_response(conn, 404)
+    end
+
+    test "Shows organization pipeline ios", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+
+      run_fixture(%{pipeline_id: pipeline.id})
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{organization_id}/pipelines/#{pipeline.id}/ios"
+        )
+
+      response = json_response(conn, 200)
+
+      assert %{
+               "inputs" => [
+                 %{"name" => "input", "public" => true, "type" => "audio"},
+                 %{"name" => "input", "public" => false, "type" => "audio"},
+                 %{"name" => "input", "public" => false, "type" => "text"},
+                 %{"name" => "input", "public" => false, "type" => "audio"}
+               ],
+               "ios" => [],
+               "outputs" => [
+                 %{"name" => "output", "public" => false, "type" => "audio"},
+                 %{"name" => "output", "public" => false, "type" => "text"},
+                 %{"name" => "json_output", "public" => false, "type" => "text"},
+                 %{"name" => "output", "public" => true, "type" => "text"},
+                 %{"name" => "output", "public" => true, "type" => "audio"}
+               ]
+             } = response["data"]
+
+      assert_schema(response, "PipelineIosResponse", api_spec)
+    end
+  end
+
   describe "index" do
     test_requires_authentication %{conn: conn, organization: organization} do
       get(conn, ~p"/api/organizations/#{organization.id}/pipelines")

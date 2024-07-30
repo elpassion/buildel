@@ -108,6 +108,41 @@ defmodule BuildelWeb.OrganizationPipelineController do
     }
   end
 
+  operation :ios,
+    summary: "Show pipeline ios",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      pipeline_id: [in: :path, description: "Pipeline ID", type: :integer, required: true]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Pipelines.IosRespnse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def ios(conn, _params) do
+    %{"organization_id" => organization_id, "pipeline_id" => pipeline_id} = conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Pipeline{} = pipeline} <-
+           Pipelines.get_organization_pipeline(organization, pipeline_id) do
+      render(conn, :ios, pipeline: pipeline)
+    end
+  end
+
   operation :index,
     summary: "List user organization pipelines",
     parameters: [

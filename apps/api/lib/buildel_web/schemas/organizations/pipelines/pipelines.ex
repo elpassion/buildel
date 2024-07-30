@@ -91,6 +91,35 @@ defmodule BuildelWeb.Schemas.Pipelines do
     })
   end
 
+  defmodule IosRespnse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "PipelineIosResponse",
+      type: :object,
+      properties: %{
+        data: %Schema{
+          type: :object,
+          properties: %{
+            inputs: %Schema{
+              type: :array,
+              description: "Inputs list",
+              items: %Schema{type: :object}
+            },
+            outputs: %Schema{
+              type: :array,
+              description: "Outputs list",
+              items: %Schema{type: :object}
+            },
+            ios: %Schema{type: :array, description: "Ios list", items: %Schema{type: :object}}
+          },
+          required: [:inputs, :outputs, :ios]
+        }
+      },
+      required: [:data]
+    })
+  end
+
   defmodule DetailsResponse do
     require OpenApiSpex
 

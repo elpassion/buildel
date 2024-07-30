@@ -17,6 +17,32 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
     }
   end
 
+  def ios(%{pipeline: %Pipeline{} = pipeline}) do
+    blocks_opts =
+      Map.get(pipeline.config, "blocks", [])
+      |> Enum.map(fn block ->
+        case Buildel.Blocks.type(block["type"]) do
+          nil -> nil
+          type -> type.options()
+        end
+      end)
+      |> Enum.filter(fn
+        nil -> false
+        _ -> true
+      end)
+
+    %{
+      data:
+        Enum.reduce(blocks_opts, %{inputs: [], outputs: [], ios: []}, fn item, acc ->
+          %{
+            inputs: acc.inputs ++ item.inputs,
+            outputs: acc.outputs ++ item.outputs,
+            ios: acc.ios ++ item.ios
+          }
+        end)
+    }
+  end
+
   defp data(%Pipeline{} = pipeline) do
     %{
       id: pipeline.id,
