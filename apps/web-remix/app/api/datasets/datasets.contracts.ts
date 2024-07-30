@@ -11,7 +11,7 @@ export const DatasetRow = z.object({
   id: z.union([z.number(), z.string()]),
   index: z.union([z.number(), z.string()]),
   created_at: z.string(),
-  data: z.any(),
+  data: z.record(z.any()),
 });
 
 export const DatasetsResponse = z

@@ -6,8 +6,8 @@ export const Table = ({
   ...rest
 }: React.HTMLAttributes<HTMLTableElement>) => {
   return (
-    <div className="border border-input rounded-lg">
-      <table className={cn('w-full', className)} {...rest}>
+    <div className={cn('border border-input rounded-lg', className)}>
+      <table className={cn('w-full')} {...rest}>
         {children}
       </table>
     </div>

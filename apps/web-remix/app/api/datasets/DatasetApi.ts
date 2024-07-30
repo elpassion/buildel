@@ -1,6 +1,8 @@
 import type { z } from 'zod';
 
+import type { PaginationQueryParams } from '~/components/pagination/usePagination';
 import type { fetchTyped } from '~/utils/fetch.server';
+import { buildUrlWithParams } from '~/utils/url';
 
 import type { CreateDatasetSchema } from './datasets.contracts';
 import {
@@ -43,10 +45,13 @@ export class DatasetApi {
   async getDatasetRows(
     organizationId: string | number,
     datasetId: string | number,
+    pagination?: PaginationQueryParams,
   ) {
-    return this.client(
-      DatasetRowsResponse,
+    const url = buildUrlWithParams(
       `/organizations/${organizationId}/datasets/${datasetId}/rows`,
+      { ...pagination },
     );
+
+    return this.client(DatasetRowsResponse, url);
   }
 }
