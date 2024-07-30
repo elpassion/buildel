@@ -33,7 +33,7 @@ export function InputHandle({
   return (
     <>
       <span
-        className="absolute right-full -translate-y-[50%] -translate-x-[12px] text-[10px] text-muted-foreground"
+        className="absolute right-full -translate-y-[50%] -translate-x-[12px] text-[10px] text-muted-foreground text-nowrap whitespace-nowrap"
         style={{ top: (index + 1) * 35 }}
       >
         {startCase(handle.data.name.replace(/_input/g, ' '))}
@@ -81,7 +81,7 @@ export function OutputHandle({
   return (
     <>
       <div
-        className="absolute left-full -translate-y-[50%] translate-x-[12px] text-[10px] text-muted-foreground"
+        className="absolute left-full -translate-y-[50%] translate-x-[12px] text-[10px] text-muted-foreground text-nowrap whitespace-nowrap"
         style={{ top: (index + 1) * 35 }}
       >
         {startCase(handle.data.name.replace(/_output/g, ' '))}

@@ -20,6 +20,7 @@ export const BlockType = z.object({
   inputs: z.array(IOType),
   outputs: z.array(IOType),
   ios: z.array(IOType),
+  dynamic_ios: z.union([z.string(), z.null()]),
   schema: z.record(z.string(), z.any()),
 });
 
@@ -98,3 +99,13 @@ export const BlockTypesResponse = z.object({
 export type IBlockTypes = z.TypeOf<typeof BlockTypes>;
 
 export type IBlockTypesResponse = z.TypeOf<typeof BlockTypesResponse>;
+
+export const DynamicIOs = z.object({
+  inputs: z.array(IOType),
+  outputs: z.array(IOType),
+  ios: z.array(IOType),
+});
+
+export const DynamicIOsResponse = z.object({
+  data: DynamicIOs,
+});

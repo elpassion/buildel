@@ -1,6 +1,6 @@
 import type { fetchTyped } from '~/utils/fetch.server';
 
-import { BlockTypesResponse } from './blockType.contracts';
+import { BlockTypesResponse, DynamicIOsResponse } from './blockType.contracts';
 import type { IBlockTypesResponse } from './blockType.contracts';
 
 let cache: undefined | IBlockTypesResponse = undefined;
@@ -16,5 +16,9 @@ export class BlockTypeApi {
     setTimeout(() => (cache = undefined), 1000 * 60 * 5);
 
     return response.data;
+  }
+
+  getBlockDynamicIOs(url: string) {
+    return this.client(DynamicIOsResponse, url);
   }
 }
