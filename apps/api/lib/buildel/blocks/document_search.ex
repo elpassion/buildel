@@ -24,6 +24,7 @@ defmodule Buildel.Blocks.DocumentSearch do
       ],
       outputs: [Block.text_output()],
       ios: [Block.io("tool", "worker")],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

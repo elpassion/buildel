@@ -366,7 +366,12 @@ defmodule Buildel.Blocks.Block do
       end
 
       defp memory_schema(
-             %{"default" => default, "title" => title, "description" => description, "readonly" => readonly} \\ %{
+             %{
+               "default" => default,
+               "title" => title,
+               "description" => description,
+               "readonly" => readonly
+             } \\ %{
                "default" => "{{pipeline_id}}_{{block_name}}",
                "title" => "Persist in",
                "description" => "Memory collection to use.",
@@ -487,6 +492,7 @@ defmodule Buildel.Blocks.BlockBehaviour do
               inputs: [%{name: String.t(), type: String.t(), public: boolean()}],
               outputs: [%{name: String.t(), type: String.t(), public: boolean()}],
               ios: [%{name: String.t(), type: String.t(), public: boolean()}],
+              dynamic_ios: String.t() | nil,
               schema: map(),
               description: String.t()
             }

@@ -18,6 +18,7 @@ defmodule Buildel.Blocks.Browser do
       ],
       outputs: [Block.text_output(), Block.file_output("file_output")],
       ios: [Block.io("tool", "worker")],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

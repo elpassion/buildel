@@ -19,6 +19,7 @@ defmodule Buildel.Blocks.CSVSearch do
       ],
       outputs: [Block.text_output()],
       ios: [Block.io("tool", "worker")],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

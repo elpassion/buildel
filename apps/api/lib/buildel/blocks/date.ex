@@ -12,6 +12,7 @@ defmodule Buildel.Blocks.Date do
       inputs: [Block.text_input()],
       outputs: [Block.text_output()],
       ios: [Block.io("tool", "worker")],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

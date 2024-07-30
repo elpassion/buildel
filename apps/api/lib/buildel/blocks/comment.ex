@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.Comment do
       inputs: [],
       outputs: [],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end
@@ -21,21 +22,23 @@ defmodule Buildel.Blocks.Comment do
       "required" => ["name"],
       "properties" => %{
         "name" => name_schema(),
-        "opts" => options_schema(%{
-          "required" => [],
-          "properties" => Jason.OrderedObject.new(
-            content: %{
-              "type" => "string",
-              "title" => "",
-              "description" => "",
-            },
-            color: %{
-              "type" => "string",
-              "title" => "",
-              "description" => "",
-            }
-          )
-        })
+        "opts" =>
+          options_schema(%{
+            "required" => [],
+            "properties" =>
+              Jason.OrderedObject.new(
+                content: %{
+                  "type" => "string",
+                  "title" => "",
+                  "description" => ""
+                },
+                color: %{
+                  "type" => "string",
+                  "title" => "",
+                  "description" => ""
+                }
+              )
+          })
       }
     }
   end

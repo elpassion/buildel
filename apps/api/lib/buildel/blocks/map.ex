@@ -13,6 +13,7 @@ defmodule Buildel.Blocks.MapInputs do
       inputs: [Block.text_input()],
       outputs: [Block.text_output()],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

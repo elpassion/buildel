@@ -11,6 +11,7 @@ defmodule Buildel.Blocks.IF do
       inputs: [Block.text_input()],
       outputs: [Block.text_output("true"), Block.text_output("false")],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

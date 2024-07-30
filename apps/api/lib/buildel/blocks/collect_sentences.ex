@@ -16,6 +16,7 @@ defmodule Buildel.Blocks.CollectSentences do
       inputs: [Block.text_input()],
       outputs: [sentences_output()],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

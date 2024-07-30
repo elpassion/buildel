@@ -25,6 +25,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
       ],
       outputs: [],
       ios: [Block.io("tool", "worker")],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

@@ -16,6 +16,7 @@ defmodule Buildel.Blocks.ApiCallTool do
       inputs: [Block.text_input("args")],
       outputs: [Block.text_output("response")],
       ios: [Block.io("tool", "worker")],
+      dynamic_ios: nil,
       schema: schema()
     }
   end
@@ -47,7 +48,7 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "description" =>
                     "The URL to send the request to. If you want to use a variable, use `{{variable_name}}`. Notice the double curly braces!",
                   "minLength" => 1,
-                  "readonly" => true,
+                  "readonly" => true
                 },
                 description: %{
                   "type" => "string",

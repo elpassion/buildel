@@ -29,7 +29,8 @@ defmodule Buildel.Blocks do
     Browser,
     FileOutput,
     Date,
-    Comment
+    Comment,
+    WorkflowCall
   }
 
   @names_to_blocks_map %{
@@ -59,7 +60,8 @@ defmodule Buildel.Blocks do
     "browser" => Browser,
     "file_output" => FileOutput,
     "date" => Date,
-    "comment" => Comment
+    "comment" => Comment,
+    "workflow_call" => WorkflowCall
   }
 
   @blocks_to_names_map %{
@@ -89,7 +91,8 @@ defmodule Buildel.Blocks do
     Browser => "browser",
     FileOutput => "file_output",
     Date => "date",
-    Comment => "comment"
+    Comment => "comment",
+    WorkflowCall => "workflow_call"
   }
 
   def list_types() do

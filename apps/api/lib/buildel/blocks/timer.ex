@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.Timer do
       inputs: [Block.text_input("start")],
       outputs: [Block.text_output("on_stop")],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

@@ -18,6 +18,7 @@ defmodule Buildel.Blocks.FileSpeechToText do
         Block.text_output("srt_output")
       ],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

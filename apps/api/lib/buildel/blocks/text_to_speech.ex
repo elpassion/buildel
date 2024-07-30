@@ -12,6 +12,7 @@ defmodule Buildel.Blocks.TextToSpeech do
       inputs: [Block.text_input()],
       outputs: [Block.audio_output()],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

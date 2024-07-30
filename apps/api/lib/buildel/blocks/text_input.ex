@@ -11,6 +11,7 @@ defmodule Buildel.Blocks.TextInput do
       inputs: [Block.text_input("input", true)],
       outputs: [Block.text_output()],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

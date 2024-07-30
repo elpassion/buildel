@@ -22,6 +22,7 @@ defmodule Buildel.Blocks.HuggingFaceChat do
         Block.text_output("message_output")
       ],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

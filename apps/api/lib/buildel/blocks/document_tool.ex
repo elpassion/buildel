@@ -14,7 +14,7 @@ defmodule Buildel.Blocks.DocumentTool do
       type: "document_tool",
       description:
         "It's a powerful tool for applications requiring quick and precise access to specific documents stored in Buildel's knowledge bases.",
-      groups: ["tools", "text" ],
+      groups: ["tools", "text"],
       inputs: [
         Block.file_input("input", false),
         Block.file_input("files", true)
@@ -23,6 +23,7 @@ defmodule Buildel.Blocks.DocumentTool do
         Block.text_output("output", false)
       ],
       ios: [Block.io("tool", "worker")],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

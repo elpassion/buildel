@@ -11,6 +11,7 @@ defmodule Buildel.Blocks.WebhookOutput do
       inputs: [Block.text_input()],
       outputs: [],
       ios: [],
+      dynamic_ios: nil,
       schema: schema()
     }
   end

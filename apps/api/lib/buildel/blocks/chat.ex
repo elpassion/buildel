@@ -26,6 +26,7 @@ defmodule Buildel.Blocks.Chat do
         Block.text_output("message_output")
       ],
       ios: [Block.io("tool", "controller"), Block.io("chat", "worker")],
+      dynamic_ios: nil,
       schema: schema()
     }
   end
