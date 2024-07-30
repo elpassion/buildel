@@ -24,6 +24,7 @@ export function InputHandle({
       case 'text':
         return '!rounded-[1px] !bg-orange-500';
       case 'file':
+      case 'file_temporary':
         return '!rounded-full !bg-orange-500';
       case 'audio':
         return '!rounded !bg-orange-500';
@@ -72,6 +73,7 @@ export function OutputHandle({
       case 'text':
         return '!rounded-[1px] !bg-blue-500';
       case 'file':
+      case 'file_temporary':
         return '!rounded-full !bg-blue-500';
       case 'audio':
         return '!rounded !bg-blue-500';
