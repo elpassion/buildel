@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 
-import type { PaginationQueryParams } from '~/components/pagination/usePagination';
+import { PaginationQueryParams } from '~/components/pagination/usePagination';
 import type { fetchTyped } from '~/utils/fetch.server';
 import { buildUrlWithParams } from '~/utils/url';
 

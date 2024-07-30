@@ -4,6 +4,7 @@ import { PaginationMeta } from '~/components/pagination/pagination.types';
 
 export const Dataset = z.object({
   id: z.union([z.number(), z.string()]),
+  created_at: z.string(),
   name: z.string(),
 });
 

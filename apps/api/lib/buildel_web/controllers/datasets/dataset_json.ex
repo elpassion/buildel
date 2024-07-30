@@ -12,7 +12,8 @@ defmodule BuildelWeb.DatasetJSON do
   defp data(%Dataset{} = dataset) do
     %{
       id: dataset.id,
-      name: dataset.name
+      name: dataset.name,
+      created_at: dataset.inserted_at
     }
   end
 end

@@ -3,7 +3,14 @@ import React from 'react';
 import { BasicLink } from '~/components/link/BasicLink';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
 import type { IDataset } from '~/components/pages/datasets/dataset.types';
-import { Card, CardHeader, CardTitle } from '~/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card';
+import { dayjs } from '~/utils/Dayjs';
 import { routes } from '~/utils/routes.utils';
 
 interface DatasetsListProps {
@@ -45,6 +52,10 @@ export const DatasetsListItem: React.FC<DatasetsListItemProps> = ({ data }) => {
       <CardHeader>
         <CardTitle className="line-clamp-2">{data.name}</CardTitle>
       </CardHeader>
+
+      <CardContent>
+        <CardDescription>{dayjs(data.created_at).format()}</CardDescription>
+      </CardContent>
     </Card>
   );
 };
