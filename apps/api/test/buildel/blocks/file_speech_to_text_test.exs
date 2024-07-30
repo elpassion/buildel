@@ -15,7 +15,8 @@ defmodule Buildel.Blocks.FileSpeechToTextTest do
              ],
              schema: FileSpeechToText.schema(),
              groups: ["audio", "text"],
-             ios: []
+             ios: [],
+             dynamic_ios: nil
            }
   end
 

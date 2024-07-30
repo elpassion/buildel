@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.IFTest do
              inputs: [Block.text_input()],
              outputs: [Block.text_output("true"), Block.text_output("false")],
              ios: [],
-             schema: IF.schema()
+             schema: IF.schema(),
+             dynamic_ios: nil
            }
   end
 

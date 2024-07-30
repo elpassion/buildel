@@ -14,7 +14,8 @@ defmodule Buildel.Blocks.BrowserTest do
              ],
              outputs: [Block.text_output(), Block.file_output("file_output")],
              ios: [Block.io("tool", "worker")],
-             schema: Browser.schema()
+             schema: Browser.schema(),
+             dynamic_ios: nil
            }
   end
 

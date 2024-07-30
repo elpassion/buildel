@@ -12,7 +12,8 @@ defmodule Buildel.Blocks.FileInputTest do
                inputs: [Block.file_temporary_input("input", true)],
                outputs: [Block.file_output()],
                ios: [],
-               schema: FileInput.schema()
+               schema: FileInput.schema(),
+               dynamic_ios: nil
              }
     end
 

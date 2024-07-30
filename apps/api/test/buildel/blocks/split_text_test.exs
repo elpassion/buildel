@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.SplitTextTest do
              inputs: [Block.text_input()],
              outputs: [Block.text_output("output")],
              ios: [],
-             schema: SplitText.schema()
+             schema: SplitText.schema(),
+             dynamic_ios: nil
            }
   end
 

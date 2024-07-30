@@ -11,6 +11,7 @@ defmodule Buildel.Blocks.ApiCallToolTest do
              inputs: [Block.text_input("args")],
              outputs: [Block.text_output("response")],
              ios: [Block.io("tool", "worker")],
+             dynamic_ios: nil,
              schema: ApiCallTool.schema(),
              type: "api_call_tool"
            }

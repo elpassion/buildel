@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.MapInputsTest do
              outputs: [Block.text_output("output")],
              schema: MapInputs.schema(),
              groups: ["text", "utils"],
-             ios: []
+             ios: [],
+             dynamic_ios: nil
            }
   end
 

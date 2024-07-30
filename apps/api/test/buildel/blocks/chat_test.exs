@@ -17,7 +17,8 @@ defmodule Buildel.Blocks.ChatTest do
              ios: [
                %{name: "tool", public: false, type: "controller"},
                %{name: "chat", public: false, type: "worker"}
-             ]
+             ],
+             dynamic_ios: nil
            }
   end
 

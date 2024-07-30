@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.MapListTest do
              inputs: [Block.text_input("list")],
              outputs: [Block.text_output()],
              ios: [],
-             schema: MapList.schema()
+             schema: MapList.schema(),
+             dynamic_ios: nil
            }
   end
 

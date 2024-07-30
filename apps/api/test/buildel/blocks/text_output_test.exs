@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.TextOutputTest do
              outputs: [Block.text_output("output", true)],
              schema: TextOutput.schema(),
              groups: ["text", "inputs / outputs"],
-             ios: []
+             ios: [],
+             dynamic_ios: nil
            }
   end
 

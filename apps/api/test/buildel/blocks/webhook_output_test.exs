@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.WebhookOutputTest do
              outputs: [],
              schema: WebhookOutput.schema(),
              groups: ["inputs / outputs"],
-             ios: []
+             ios: [],
+             dynamic_ios: nil
            }
   end
 

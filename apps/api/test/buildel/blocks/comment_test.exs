@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.CommentTest do
                outputs: [],
                schema: Comment.schema(),
                groups: ["utils"],
-               ios: []
+               ios: [],
+               dynamic_ios: nil
              }
     end
 

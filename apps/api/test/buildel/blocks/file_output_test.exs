@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.FileOutputTest do
              inputs: [Block.file_input()],
              outputs: [Block.file_output("output", true)],
              ios: [],
-             schema: FileOutput.schema()
+             schema: FileOutput.schema(),
+             dynamic_ios: nil
            }
   end
 

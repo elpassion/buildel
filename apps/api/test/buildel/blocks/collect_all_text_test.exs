@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.CollectAllTextTest do
              outputs: [Block.text_output("output")],
              schema: CollectAllText.schema(),
              groups: ["text", "utils"],
-             ios: []
+             ios: [],
+             dynamic_ios: nil
            }
   end
 

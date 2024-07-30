@@ -12,7 +12,8 @@ defmodule Buildel.Blocks.TextInputTest do
                outputs: [Block.text_output("output")],
                schema: TextInput.schema(),
                groups: ["text", "inputs / outputs"],
-               ios: []
+               ios: [],
+               dynamic_ios: nil
              }
     end
 

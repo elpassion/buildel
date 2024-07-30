@@ -10,6 +10,7 @@ defmodule Buildel.Blocks.AudioOutputTest do
              inputs: [Block.audio_output("input")],
              outputs: [Block.audio_output("output", true)],
              schema: AudioOutput.schema(),
+             dynamic_ios: nil,
              groups: ["audio", "inputs / outputs"],
              ios: []
            }

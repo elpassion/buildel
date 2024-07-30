@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.DateTest do
              inputs: [Block.text_input()],
              outputs: [Block.text_output()],
              ios: [Block.io("tool", "worker")],
-             schema: Date.schema()
+             schema: Date.schema(),
+             dynamic_ios: nil
            }
   end
 

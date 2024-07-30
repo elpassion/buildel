@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.TimerTest do
              outputs: [Block.text_output("on_stop")],
              schema: Timer.schema(),
              groups: ["utils"],
-             ios: []
+             ios: [],
+             dynamic_ios: nil
            }
   end
 

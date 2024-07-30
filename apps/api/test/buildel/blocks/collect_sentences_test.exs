@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.CollectSentencesTest do
              outputs: [Block.text_output("sentences_output")],
              schema: CollectSentences.schema(),
              groups: ["text", "utils"],
-             ios: []
+             ios: [],
+             dynamic_ios: nil
            }
   end
 

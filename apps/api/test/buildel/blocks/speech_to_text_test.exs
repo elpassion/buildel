@@ -11,7 +11,8 @@ defmodule Buildel.Blocks.SpeechToTextTest do
              outputs: [Block.text_output("output"), Block.text_output("json_output")],
              schema: SpeechToText.schema(),
              groups: ["audio", "text"],
-             ios: []
+             ios: [],
+             dynamic_ios: nil
            }
   end
 
