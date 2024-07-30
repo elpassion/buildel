@@ -209,7 +209,7 @@ export function EditBlockForm({
 
                 return replacedValue || optKey;
               })}
-            getPopupContainer={(node) => node.parentNode}
+            getPopupContainer={(node) => node.parentNode.parentNode}
           />
         </FormField>
       );
