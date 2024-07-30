@@ -31,6 +31,13 @@ export function CustomNode({
 }: CustomNodeProps) {
   const { status, isValid, errors } = useRunPipelineNode(data);
 
+  const maxHandlesLength = useMemo(() => {
+    return Math.max(
+      data.block_type?.inputs.length ?? 0,
+      data.block_type?.outputs.length ?? 0,
+    );
+  }, [data.block_type]);
+
   const borderStyles = useCallback(() => {
     if (!isValid) return 'border-red-500';
     if (selected) return 'border-blue-400';
@@ -53,6 +60,7 @@ export function CustomNode({
           },
           className,
         )}
+        style={{ minHeight: getMinHeight(maxHandlesLength) }}
       >
         <NodeWorkingIcon isWorking={status} />
         {children}
@@ -69,6 +77,10 @@ export function CustomNode({
       )}
     </>
   );
+}
+
+function getMinHeight(handles: number) {
+  return (handles || 1) * 35 + 30;
 }
 
 export interface CustomNodeHeaderProps extends PropsWithChildren {
