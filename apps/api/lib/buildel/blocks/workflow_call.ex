@@ -59,7 +59,92 @@ defmodule Buildel.Blocks.WorkflowCall do
   end
 
   @impl true
-  def handle_input("input", {_name, :text, text, _metadata}, state) do
+  def handle_input(input_name, {_name, type, data, metadata} = payload, state) do
+    IO.inspect(input_name)
+    IO.inspect(payload, label: "payload")
+    [block_name, input_name] = String.split(input_name, ":")
+
+    %{global: organization_id} = block_context().context_from_context_id(state[:context_id])
+    run = create_and_start_run(organization_id, state.workflow_id, %{})
+    listen_to_outputs(run) |> IO.inspect(label: "listen_to_outputs")
+
+    opts = Map.merge(%{stream_stop: :send, metadata: metadata}, %{})
+
+    Buildel.BlockPubSub.broadcast_to_io(
+      Pipelines.Worker.context_id(run),
+      block_name,
+      input_name,
+      {type, data},
+      opts.metadata
+      |> Map.put_new_lazy(:message_id, fn -> state[:message_id] || UUID.uuid4() end)
+    )
+
+    pipeline = Pipelines.get_pipeline!(state.workflow_id)
+
+    %{data: %{outputs: outputs}} =
+      BuildelWeb.OrganizationPipelineJSON.ios(%{pipeline: pipeline})
+
+    public_outputs =
+      outputs
+      |> Enum.filter(fn output -> output.public end)
+      |> Enum.map(fn output ->
+        [block_name, output_name] = String.split(output.name, ":")
+
+        %{
+          block_name: block_name,
+          output_name: output_name,
+          topic:
+            BlockPubSub.io_topic(
+              Pipelines.Worker.context_id(run),
+              block_name,
+              output_name
+            ),
+          data: nil,
+          finished: false
+        }
+      end)
+
+    IO.inspect(public_outputs, label: "public_outputs")
+
+    results =
+      Enum.reduce_while(Stream.repeatedly(fn -> nil end), public_outputs, fn _, outputs ->
+        outputs = receive_output(outputs)
+
+        outputs =
+          outputs
+          |> Enum.map(fn output ->
+            case output.data do
+              nil ->
+                output
+
+              data ->
+                case output.finished do
+                  false ->
+                    IO.inspect(data, label: "data")
+                    output(state, output.block_name <> ":" <> output.output_name, {:text, data})
+                    Map.put(output, :finished, true)
+
+                  true ->
+                    output
+                end
+            end
+          end)
+
+        if Enum.any?(outputs, &(&1.data == nil)) do
+          {:cont, outputs}
+        else
+          {:halt, outputs}
+        end
+      end)
+
+    state
+    # output(state, "text_output_2:output", {:text, data})
+  end
+
+  @impl true
+  def handle_input("input", {_name, :text, text, _metadata} = payload, state) do
+    IO.inspect(payload, label: "payload")
+    IO.inspect(state, label: "state")
     # %{global: organization_id} = block_context().context_from_context_id(state[:context_id])
     # run = create_and_start_run(organization_id, state.workflow_id, %{})
     # listen_to_outputs(run) |> IO.inspect(label: "listen_to_outputs")
