@@ -109,3 +109,5 @@ export const DynamicIOs = z.object({
 export const DynamicIOsResponse = z.object({
   data: DynamicIOs,
 });
+
+export type IDynamicIOsResponse = z.TypeOf<typeof DynamicIOsResponse>;

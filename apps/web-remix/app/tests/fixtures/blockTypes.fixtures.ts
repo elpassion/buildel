@@ -6,6 +6,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       type: 'api_call_tool',
       description: 'Tool used to call HTTP APIs.',
       groups: ['text', 'tools'],
+      dynamic_ios: null,
       inputs: [
         {
           name: 'args',
@@ -102,6 +103,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'audio_input',
       description:
         'A specialized block designed for capturing and streaming audio data.',
@@ -150,6 +152,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'audio_output',
       description:
         "It's designed to work seamlessly with other audio-related blocks in Buildel, ensuring smooth and flexible audio output capabilities in applications.",
@@ -210,6 +213,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'chat',
       description:
         "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
@@ -417,6 +421,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'collect_all_text',
       description:
         'This module specializes in accumulating and consolidating text input from streaming sources.',
@@ -477,6 +482,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'collect_sentences',
       description:
         'This module segmenting and extracting individual sentences from continuous text streams.',
@@ -537,6 +543,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'create_block_tool',
       description: 'Used to create block in workflow abc',
       groups: ['el', 'tools'],
@@ -601,6 +608,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'document_search',
       description:
         'Used for efficient searching and retrieval of information from a collection of documents inside Buildel Knowledge Base.',
@@ -757,6 +765,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'document_tool',
       description:
         "It's a powerful tool for applications requiring quick and precise access to specific documents stored in Buildel's knowledge bases.",
@@ -881,6 +890,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'file_input',
       description:
         'A streamlined module designed for the efficient handling and transmission of file data.',
@@ -929,6 +939,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'file_speech_to_text',
       description:
         'This module expertly transcribes audio content into text, offering multiple output formats including plain text, JSON, and SRT.',
@@ -1052,6 +1063,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'hugging_face_chat',
       description:
         'This module integrates advanced Hugging Face language models to provide dynamic and intelligent chat functionalities.',
@@ -1212,6 +1224,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'if',
       description:
         'Use this block to compare the input to a condition and forward the input to the true or false output',
@@ -1284,6 +1297,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'map_inputs',
       description:
         'Used to map the latest inputs and combine them based on a specified template.',
@@ -1351,6 +1365,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'speech_to_text',
       description:
         'This module is adept at transcribing audio data into text, offering outputs in both plain text and JSON formats.',
@@ -1469,6 +1484,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'split_text',
       description:
         "It's an essential utility for processing large texts, enabling efficient text handling and manipulation in Buildel applications.",
@@ -1537,6 +1553,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'text_input',
       description:
         'This module is crafted for the seamless intake and transmission of textual data.',
@@ -1592,6 +1609,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'text_output',
       description: 'A versatile module designed to output text data.',
       groups: ['text', 'inputs / outputs'],
@@ -1661,6 +1679,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'text_to_speech',
       description:
         'This module enables seamless conversion of textual data into audio format, leveraging the ElevenLabs API',
@@ -1749,6 +1768,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       },
     },
     {
+      dynamic_ios: null,
       type: 'webhook_output',
       description:
         'This module is adept at forwarding text data to specified webhook URLs, facilitating seamless external integrations.',
