@@ -107,8 +107,16 @@ function removeDuplicates(arr: string[]) {
   return [...new Set(arr)];
 }
 
-function splitInput(input: string) {
-  return input.split(':') as [string, string];
+function splitInput(input: string): [string, string] {
+  const index = input.indexOf(':');
+  if (index === -1) {
+    return [input, ''];
+  }
+
+  const firstPart = input.substring(0, index);
+  const secondPart = input.substring(index + 1);
+
+  return [firstPart, secondPart];
 }
 
 function connectInput(block_name: string, output_name: string) {
