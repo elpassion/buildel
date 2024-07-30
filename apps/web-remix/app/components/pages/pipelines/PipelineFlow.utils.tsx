@@ -105,18 +105,20 @@ function checkIfEdgeExist(edge: IEdge, nodes: INode[]) {
   const sourceNode = nodes.find((node) => {
     return (
       node.id === edge.source &&
-      node.data.block_type?.outputs.find(
+      (!!node.data.block_type?.outputs.find(
         (output) => output.name === edge.sourceHandle,
-      )
+      ) ||
+        !!node.data.block_type?.ios.find((io) => io.name === edge.sourceHandle))
     );
   });
 
   const targetNode = nodes.find((node) => {
     return (
       node.id === edge.target &&
-      node.data.block_type?.inputs.find(
+      (!!node.data.block_type?.inputs.find(
         (input) => input.name === edge.targetHandle,
-      )
+      ) ||
+        !!node.data.block_type?.ios.find((io) => io.name === edge.targetHandle))
     );
   });
 
