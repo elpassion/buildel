@@ -25,7 +25,7 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
 }
 
 export function getEdges(pipeline: IPipelineConfig): IEdge[] {
-  return pipeline.connections.map((connection) => {
+  const edges = pipeline.connections.map((connection) => {
     return {
       id: `${connection.from.block_name}:${connection.from.output_name}-${connection.to.block_name}:${connection.to.input_name}`,
       source: connection.from.block_name,
@@ -36,6 +36,10 @@ export function getEdges(pipeline: IPipelineConfig): IEdge[] {
       data: connection,
     };
   });
+
+  const nodes = getNodes(pipeline);
+
+  return edges.filter((edge) => checkIfEdgeExist(edge, nodes));
 }
 
 export function isValidConnection(
@@ -77,22 +81,46 @@ export function toPipelineConfig(
       measured: node.measured,
     })),
     version: '1',
-    connections: edges.map((edge) => {
-      return {
-        from: {
-          block_name: edge.source,
-          output_name: edge.sourceHandle!,
-        },
-        to: {
-          block_name: edge.target,
-          input_name: edge.targetHandle!,
-        },
-        opts: {
-          reset: edge.data?.opts?.reset ?? true,
-        },
-      };
-    }),
+    connections: edges
+      .filter((edge) => checkIfEdgeExist(edge, nodes))
+      .map((edge) => {
+        return {
+          from: {
+            block_name: edge.source,
+            output_name: edge.sourceHandle!,
+          },
+          to: {
+            block_name: edge.target,
+            input_name: edge.targetHandle!,
+          },
+          opts: {
+            reset: edge.data?.opts?.reset ?? true,
+          },
+        };
+      }),
   };
+}
+
+function checkIfEdgeExist(edge: IEdge, nodes: INode[]) {
+  const sourceNode = nodes.find((node) => {
+    return (
+      node.id === edge.source &&
+      node.data.block_type?.outputs.find(
+        (output) => output.name === edge.sourceHandle,
+      )
+    );
+  });
+
+  const targetNode = nodes.find((node) => {
+    return (
+      node.id === edge.target &&
+      node.data.block_type?.inputs.find(
+        (input) => input.name === edge.targetHandle,
+      )
+    );
+  });
+
+  return !!targetNode && !!sourceNode;
 }
 
 export function getBlockHandles(block: IBlockConfig): IHandle[] {
