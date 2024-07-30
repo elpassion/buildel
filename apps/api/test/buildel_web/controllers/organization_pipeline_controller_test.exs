@@ -129,18 +129,18 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
 
       assert %{
                "inputs" => [
-                 %{"name" => "input", "public" => true, "type" => "audio"},
-                 %{"name" => "input", "public" => false, "type" => "audio"},
-                 %{"name" => "input", "public" => false, "type" => "text"},
-                 %{"name" => "input", "public" => false, "type" => "audio"}
+                 %{"name" => "random_block:input", "public" => true, "type" => "audio"},
+                 %{"name" => "random_block_2:input", "public" => false, "type" => "audio"},
+                 %{"name" => "random_block_3:input", "public" => false, "type" => "text"},
+                 %{"name" => "random_block_4:input", "public" => false, "type" => "audio"}
                ],
                "ios" => [],
                "outputs" => [
-                 %{"name" => "output", "public" => false, "type" => "audio"},
-                 %{"name" => "output", "public" => false, "type" => "text"},
-                 %{"name" => "json_output", "public" => false, "type" => "text"},
-                 %{"name" => "output", "public" => true, "type" => "text"},
-                 %{"name" => "output", "public" => true, "type" => "audio"}
+                 %{"name" => "random_block:output", "public" => false, "type" => "audio"},
+                 %{"name" => "random_block_2:output", "public" => false, "type" => "text"},
+                 %{"name" => "random_block_2:json_output", "public" => false, "type" => "text"},
+                 %{"name" => "random_block_3:output", "public" => true, "type" => "text"},
+                 %{"name" => "random_block_4:output", "public" => true, "type" => "audio"}
                ]
              } = response["data"]
 
