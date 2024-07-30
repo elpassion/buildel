@@ -38,13 +38,21 @@ export async function loader(args: LoaderFunctionArgs) {
         );
         if (!blockType) return block;
 
-        if (blockType.dynamic_ios && block.opts.workflow) {
-          const { data: dynamicIOs } = await blockTypeApi.getBlockDynamicIOs(
-            prepareIOsUrl(blockType.dynamic_ios, {
-              organization_id: params.organizationId as string,
-              'opts.workflow': block.opts.workflow,
-            }),
-          );
+        if (blockType.dynamic_ios) {
+          const url = prepareIOsUrl(blockType.dynamic_ios, {
+            organization_id: params.organizationId as string,
+            ...mapOpts(block.opts),
+          });
+
+          if (!url) {
+            return {
+              ...block,
+              block_type: blockType,
+            };
+          }
+
+          const { data: dynamicIOs } =
+            await blockTypeApi.getBlockDynamicIOs(url);
 
           const inputs = getPublicIOs(dynamicIOs.data.inputs).map(prepareIO);
           const outputs = getPublicIOs(dynamicIOs.data.outputs).map(prepareIO);
@@ -86,7 +94,26 @@ function prepareIO(io: IIOType) {
 }
 
 function prepareIOsUrl(url: string, context: Record<string, string>) {
-  return url
-    .replace(/{{(.*?)}}/g, (_, key) => context[key])
-    .replace('/api', '');
+  let allReplaced = true;
+
+  const readyUrl = url.replace('/api', '').replace(/{{(.*?)}}/g, (_, key) => {
+    const replaced = context[key];
+
+    if (replaced === undefined) {
+      allReplaced = false;
+    }
+
+    return replaced;
+  });
+
+  return allReplaced ? readyUrl : null;
+}
+
+function mapOpts(opts: Record<string, any>) {
+  return Object.entries(opts).reduce(
+    (acc, [key, value]) => {
+      return { ...acc, [`opts.${key}`]: value };
+    },
+    {} as Record<string, any>,
+  );
 }
