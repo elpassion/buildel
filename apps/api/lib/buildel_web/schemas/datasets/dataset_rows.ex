@@ -38,4 +38,35 @@ defmodule BuildelWeb.Schemas.DatasetRows do
       required: [:data]
     })
   end
+
+  defmodule CreateDatasetRowRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "DatasetCreateRowRequest",
+      type: :object,
+      properties: %{
+        data: %Schema{
+          type: :object,
+          description: "Data to be inserted into the dataset",
+          additionalProperties: true,
+          properties: %{}
+        }
+      },
+      required: [:data]
+    })
+  end
+
+  defmodule CreateDatasetRowResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "DatasetCreateRowResponse",
+      type: :object,
+      properties: %{
+        data: DatasetRow
+      },
+      required: [:data]
+    })
+  end
 end

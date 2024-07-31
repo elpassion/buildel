@@ -27,10 +27,36 @@ defmodule Buildel.Datasets.Rows do
     {:ok, results, count}
   end
 
+  def create_row(%Dataset{} = dataset, attrs \\ %{}) do
+    %DatasetRow{}
+    |> DatasetRow.changeset(attrs |> Map.put(:dataset_id, dataset.id))
+    |> Repo.insert()
+  end
+
+  def get_dataset_row(%Dataset{} = dataset, row_id) do
+    DatasetRow
+    |> where([r], r.dataset_id == ^dataset.id and r.id == ^row_id)
+    |> Repo.one()
+    |> then(fn
+      nil -> {:error, :not_found}
+      dataset_row -> dataset_row
+    end)
+  end
+
+  def delete_row(%DatasetRow{} = dataset_row) do
+    Repo.delete(dataset_row)
+  end
+
+  def update_row(%DatasetRow{} = dataset_row, attrs) do
+    dataset_row
+    |> DatasetRow.changeset(attrs)
+    |> Repo.update()
+  end
+
   defp build_query(dataset_id, %Params{}) do
     from(c in DatasetRow,
       where: c.dataset_id == ^dataset_id,
-      order_by: [asc: c.index]
+      order_by: [asc: c.id]
     )
   end
 

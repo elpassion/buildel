@@ -12,10 +12,10 @@ defmodule Buildel.Datasets.DatasetRow do
   end
 
   @doc false
-  def changeset(invitation, attrs) do
-    invitation
+  def changeset(row, attrs) do
+    row
     |> cast(attrs, [:index, :data, :dataset_id])
-    |> validate_required([:index, :data, :dataset_id])
+    |> validate_required([:data, :dataset_id])
     |> assoc_constraint(:dataset)
   end
 end

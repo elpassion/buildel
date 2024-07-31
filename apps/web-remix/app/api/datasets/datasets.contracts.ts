@@ -10,7 +10,7 @@ export const Dataset = z.object({
 
 export const DatasetRow = z.object({
   id: z.union([z.number(), z.string()]),
-  index: z.union([z.number(), z.string()]),
+  index: z.union([z.number(), z.string(), z.null()]),
   created_at: z.string(),
   data: z.record(z.any()),
 });

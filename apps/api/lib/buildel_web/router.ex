@@ -224,7 +224,7 @@ defmodule BuildelWeb.Router do
     resources(
       "/organizations/:organization_id/datasets/:dataset_id/rows",
       DatasetRowsController,
-      only: [:index]
+      only: [:index, :create, :show, :delete, :update]
     )
 
     post("/organizations/:organization_id/tools/chunks", OrganizationToolChunkController, :create)
