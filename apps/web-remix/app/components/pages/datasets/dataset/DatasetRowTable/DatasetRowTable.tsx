@@ -7,7 +7,6 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import startCase from 'lodash.startcase';
 
 import { EmptyMessage } from '~/components/list/ItemList';
 import type { IDatasetRow } from '~/components/pages/datasets/dataset.types';
