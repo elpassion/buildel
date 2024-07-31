@@ -94,20 +94,20 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   );
 };
 
-interface DropdownPopupProps {
-  className?: string;
-}
+export type DropdownPopupProps = React.HTMLAttributes<HTMLDivElement>;
 
-export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
+export const DropdownPopup: React.FC<DropdownPopupProps> = ({
   children,
   className,
+  style,
+  ...rest
 }) => {
   const { isShown, context, getFloatingProps } = useDropdown();
 
   return (
     <div
       ref={context.refs.setFloating}
-      style={context.floatingStyles}
+      style={{ ...style, ...context.floatingStyles }}
       {...getFloatingProps?.()}
       className={cn(
         'transition-opacity ',
@@ -117,6 +117,7 @@ export const DropdownPopup: React.FC<PropsWithChildren<DropdownPopupProps>> = ({
         },
         className,
       )}
+      {...rest}
     >
       {children}
     </div>
