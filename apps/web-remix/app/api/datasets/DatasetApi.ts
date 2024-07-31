@@ -7,6 +7,7 @@ import { buildUrlWithParams } from '~/utils/url';
 import type { CreateDatasetSchema } from './datasets.contracts';
 import {
   DatasetResponse,
+  DatasetRowResponse,
   DatasetRowsResponse,
   DatasetsResponse,
 } from './datasets.contracts';
@@ -66,6 +67,18 @@ export class DatasetApi {
     return this.client(DatasetRowsResponse, url);
   }
 
+  async getDatasetRow(
+    organizationId: string | number,
+    datasetId: string | number,
+    rowId: string | number,
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/datasets/${datasetId}/rows/${rowId}`,
+    );
+
+    return this.client(DatasetRowResponse, url);
+  }
+
   async deleteDatasetRow(
     organizationId: string | number,
     datasetId: string | number,
@@ -75,6 +88,19 @@ export class DatasetApi {
       z.any(),
       `/organizations/${organizationId}/datasets/${datasetId}/rows/${rowId}`,
       { method: 'DELETE' },
+    );
+  }
+
+  async updateDatasetRow(
+    organizationId: string | number,
+    datasetId: string | number,
+    rowId: string | number,
+    data: Record<string, any>,
+  ) {
+    return this.client(
+      DatasetRowResponse,
+      `/organizations/${organizationId}/datasets/${datasetId}/rows/${rowId}`,
+      { method: 'PUT', body: JSON.stringify({ data }) },
     );
   }
 }

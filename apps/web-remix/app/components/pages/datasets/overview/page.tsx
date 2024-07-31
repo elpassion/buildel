@@ -1,6 +1,6 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import { Outlet, useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
@@ -32,6 +32,8 @@ export function DatasetPage() {
           />
         </div>
       </PageContentWrapper>
+
+      <Outlet />
     </>
   );
 }

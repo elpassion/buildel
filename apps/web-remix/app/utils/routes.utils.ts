@@ -261,9 +261,20 @@ export const routes = {
       `${routes.datasets(organizationId)}/${datasetId}`,
       params,
     ),
+  datasetRow: (
+    organizationId: OrganizationId,
+    datasetId: DatasetId,
+    rowId: RowId,
+    params: RouteParam = {},
+  ) =>
+    buildUrlWithParams(
+      `${routes.dataset(organizationId, datasetId)}/${rowId}`,
+      params,
+    ),
 };
 
 type OrganizationId = string | number;
 type PipelineId = string | number;
 type RunId = string | number;
 type DatasetId = string | number;
+type RowId = string | number;

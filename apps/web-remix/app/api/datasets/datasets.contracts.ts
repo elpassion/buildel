@@ -25,6 +25,10 @@ export const DatasetResponse = z
   .object({ data: Dataset })
   .transform((res) => ({ data: res.data }));
 
+export const DatasetRowResponse = z
+  .object({ data: DatasetRow })
+  .transform((res) => ({ data: res.data }));
+
 export const DatasetRowsResponse = z
   .object({
     data: z.array(DatasetRow),
@@ -46,4 +50,15 @@ export const CreateDatasetFileUpload = z.object({
       (file: File) => file.type.includes('csv'),
       'File must be a CSV file',
     ),
+});
+
+export const UpdateDatasetRowSchema = z.object({
+  data: z.string({ required_error: 'Invalid json value' }).refine((value) => {
+    try {
+      JSON.parse(value);
+      return true;
+    } catch {
+      return false;
+    }
+  }, 'Invalid json value'),
 });
