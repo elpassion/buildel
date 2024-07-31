@@ -108,12 +108,12 @@ export const NodeDropdown = React.forwardRef<HTMLDivElement, NodeDropdownProps>(
                                 {startCase(option.type)}
                               </Button>
                             </TooltipTrigger>
-                            {isBlockTypeOption(options[0]) && (
+                            {isBlockTypeOption(option) && (
                               <TooltipContent
                                 side="right"
                                 className="max-w-[400px]"
                               >
-                                {options[0].description}
+                                {option.description}
                               </TooltipContent>
                             )}
                           </Tooltip>
