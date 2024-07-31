@@ -1,4 +1,6 @@
+import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
+import type { Column } from '@tanstack/react-table';
 import {
   createColumnHelper,
   flexRender,
@@ -54,13 +56,14 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
       ),
 
       columnHelper.accessor('data.row-actions', {
-        header: () => <div className="text-right">Actions</div>,
         id: 'row-actions',
+        header: () => <div className="text-right">Actions</div>,
         cell: (info) => (
           <div className="flex justify-end">
             <DatasetRowMenuDropdown data={info.row.original} />
           </div>
         ),
+        size: 100,
       }),
     ],
     [columnNames],
@@ -74,15 +77,28 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
     columns,
     data: tableData,
     getCoreRowModel: getCoreRowModel(),
+    initialState: {
+      columnPinning: {
+        right: ['row-actions'],
+      },
+    },
   });
 
   return (
-    <Table className={cn('w-full', className)}>
+    <Table
+      className={cn('w-full max-w-full overflow-x-auto', className)}
+      style={{
+        minWidth: table.getTotalSize(),
+      }}
+    >
       <TableHead>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableHeadRow key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <TableHeadCell key={header.id}>
+              <TableHeadCell
+                key={header.id}
+                style={{ ...getCommonPinningStyles(header.column) }}
+              >
                 {flexRender(
                   header.column.columnDef.header,
                   header.getContext(),
@@ -106,7 +122,10 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
         {table.getRowModel().rows.map((row) => (
           <TableBodyRow key={row.id} aria-label="pipeline run">
             {row.getVisibleCells().map((cell) => (
-              <TableBodyCell key={cell.id}>
+              <TableBodyCell
+                key={cell.id}
+                style={{ ...getCommonPinningStyles(cell.column) }}
+              >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableBodyCell>
             ))}
@@ -116,3 +135,27 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
     </Table>
   );
 };
+
+function getCommonPinningStyles(column: Column<IDatasetRow>): CSSProperties {
+  const isPinned = column.getIsPinned();
+
+  const isLastLeftPinnedColumn =
+    isPinned === 'left' && column.getIsLastColumn('left');
+  const isFirstRightPinnedColumn =
+    isPinned === 'right' && column.getIsFirstColumn('right');
+
+  return {
+    boxShadow: isLastLeftPinnedColumn
+      ? '-4px 0 4px -4px #ddd inset'
+      : isFirstRightPinnedColumn
+        ? '4px 0 4px -4px #ddd inset'
+        : undefined,
+    left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
+    right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
+    opacity: isPinned ? 0.95 : 1,
+    position: isPinned ? 'sticky' : 'relative',
+    width: column.getSize(),
+    zIndex: isPinned ? 1 : 0,
+    backgroundColor: isPinned ? 'white' : 'transparent',
+  };
+}

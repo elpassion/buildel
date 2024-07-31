@@ -22,16 +22,14 @@ export function DatasetPage() {
         }
       />
 
-      <PageContentWrapper className="mt-[120px]">
-        <div className="pb-3 overflow-x-auto">
-          <DatasetRowTable data={datasetRows.data} className="min-w-[1000px]" />
+      <PageContentWrapper className="mt-[120px] pb-3">
+        <DatasetRowTable data={datasetRows.data} />
 
-          <div className="flex justify-end mt-4">
-            <Pagination
-              pagination={pagination}
-              loaderUrl={routes.dataset(organizationId, dataset.id)}
-            />
-          </div>
+        <div className="flex justify-end mt-4">
+          <Pagination
+            pagination={pagination}
+            loaderUrl={routes.dataset(organizationId, dataset.id)}
+          />
         </div>
       </PageContentWrapper>
     </>

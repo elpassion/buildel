@@ -135,7 +135,7 @@ export default function Layout() {
           <SidebarMainContent />
         </NavMobileSidebar>
 
-        <main className="col-span-2 lg:col-auto">
+        <main className="col-span-2 lg:col-start-2 w-full">
           <div className="bg-blue-500 z-0 h-[170px] absolute top-0 left-0 right-0 overflow-hidden">
             <img
               src="/bacgkround-blur.png"
@@ -144,7 +144,7 @@ export default function Layout() {
             />
           </div>
 
-          <div className="relative pb-5 flex min-h-screen flex-col">
+          <div className="relative pb-5 flex min-h-screen flex-col max-w-full w-full">
             <Outlet />
           </div>
         </main>

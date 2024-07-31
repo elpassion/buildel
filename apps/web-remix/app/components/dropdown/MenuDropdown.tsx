@@ -7,7 +7,12 @@ import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
 
 import type { DropdownPopupProps, DropdownProps } from './Dropdown';
-import { Dropdown, DropdownPopup, DropdownTrigger } from './Dropdown';
+import {
+  Dropdown,
+  DropdownPopup,
+  DropdownPortal,
+  DropdownTrigger,
+} from './Dropdown';
 
 const MenuDropdown = ({ ...rest }: PropsWithChildren<DropdownProps>) => {
   return <Dropdown placement="bottom" {...rest} />;
@@ -23,13 +28,15 @@ const MenuDropdownContent = ({ className, ...rest }: DropdownPopupProps) => {
   if (!isShown) return null;
 
   return (
-    <DropdownPopup
-      className={cn(
-        'min-w-fit z-[11] bg-white border border-input rounded-md overflow-hidden p-1 flex flex-col',
-        className,
-      )}
-      {...rest}
-    />
+    <DropdownPortal>
+      <DropdownPopup
+        className={cn(
+          'min-w-fit z-[11] bg-white border border-input rounded-md overflow-hidden p-1 flex flex-col',
+          className,
+        )}
+        {...rest}
+      />
+    </DropdownPortal>
   );
 };
 
