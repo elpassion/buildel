@@ -133,7 +133,7 @@ defmodule BuildelWeb.DatasetRowsController do
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, dataset} <- Buildel.Datasets.get_organization_dataset(organization, dataset_id),
          %DatasetRow{} = row <- Buildel.Datasets.Rows.get_dataset_row(dataset, id),
-         {:ok, _} <- Buildel.Datasets.Rows.update_row(row, %{data: conn.body_params.data}) do
+         {:ok, _} <- Buildel.Datasets.Rows.delete_row(row) do
       conn
       |> put_status(:ok)
       |> json(%{})
