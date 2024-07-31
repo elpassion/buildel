@@ -9,9 +9,9 @@ export class Dayjs {
   private defaultFormat = 'DD/MM/YYYY HH:mm';
 
   constructor(date: originalDayjs.ConfigType) {
-    if (typeof date === 'string' && !date.endsWith('Z')) {
-      date += 'Z'; // adding "Z" at the end of the date lets dayjs know that this date should be treated as UTC date and format date in the LOCAL timezone
-    }
+    // if (typeof date === 'string' && !date.endsWith('Z')) {
+    //   date += 'Z'; // adding "Z" at the end of the date lets dayjs know that this date should be treated as UTC date and format date in the LOCAL timezone
+    // }
 
     this.instance = originalDayjs(date);
   }
