@@ -77,7 +77,7 @@ defmodule Buildel.Blocks.WorkflowCall do
   @impl true
   def handle_input("stop_run", {_name, :text, _data, _metadata}, state) do
     Pipelines.Runner.stop_run(state[:run])
-    state
+    state |> Map.delete(:run)
   end
 
   @impl true
@@ -85,9 +85,14 @@ defmodule Buildel.Blocks.WorkflowCall do
     [block_name, input_name] = String.split(input_name, ":")
 
     %{global: organization_id} = block_context().context_from_context_id(state[:context_id])
-    run = create_and_start_run(organization_id, state.workflow_id, %{})
-    state = state |> Map.put(:run, run)
-    listen_to_outputs(run)
+
+    state =
+      state
+      |> Map.put_new_lazy(:run, fn ->
+        run = state[:run] || create_and_start_run(organization_id, state[:workflow_id], %{})
+        listen_to_outputs(run)
+        run
+      end)
 
     Buildel.BlockPubSub.broadcast_to_io(
       Pipelines.Worker.context_id(state[:run]),
@@ -119,14 +124,12 @@ defmodule Buildel.Blocks.WorkflowCall do
   end
 
   defp listen_to_outputs(run) do
-    # add listening only to outputs chosed in opts
     context_id = Pipelines.Worker.context_id(run)
 
     run
     |> Pipelines.blocks_for_run()
     |> Enum.map(fn block ->
       public_outputs = block.type.options.outputs |> Enum.filter(fn output -> output.public end)
-      # Buildel.BlockPubSub.subscribe_to_block(context_id, block.name)
 
       for output <- public_outputs do
         Buildel.BlockPubSub.subscribe_to_io(context_id, block.name, output.name)
