@@ -194,7 +194,7 @@ defmodule BuildelWeb.CollectionController do
     ],
     request_body: nil,
     responses: [
-      ok: {"created", "application/json", nil},
+      ok: {"deleted", "application/json", nil},
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
