@@ -1,6 +1,6 @@
-import type { z } from 'zod';
+import { z } from 'zod';
 
-import { PaginationQueryParams } from '~/components/pagination/usePagination';
+import type { PaginationQueryParams } from '~/components/pagination/usePagination';
 import type { fetchTyped } from '~/utils/fetch.server';
 import { buildUrlWithParams } from '~/utils/url';
 
@@ -28,6 +28,17 @@ export class DatasetApi {
     return this.client(
       DatasetResponse,
       `/organizations/${organizationId}/datasets/${datasetId}`,
+    );
+  }
+
+  async deleteDataset(
+    organizationId: string | number,
+    datasetId: string | number,
+  ) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/datasets/${datasetId}`,
+      { method: 'DELETE' },
     );
   }
 

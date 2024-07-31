@@ -1,7 +1,16 @@
 import React from 'react';
+import { useFetcher } from '@remix-run/react';
+import { EllipsisVertical, Trash } from 'lucide-react';
 
+import {
+  MenuDropdown,
+  MenuDropdownContent,
+  MenuDropdownItem,
+  MenuDropdownTrigger,
+} from '~/components/dropdown/MenuDropdown';
 import { BasicLink } from '~/components/link/BasicLink';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
+import { confirm } from '~/components/modal/confirm';
 import type { IDataset } from '~/components/pages/datasets/dataset.types';
 import {
   Card,
@@ -22,6 +31,22 @@ export const DatasetsList: React.FC<DatasetsListProps> = ({
   items,
   organizationId,
 }) => {
+  const fetcher = useFetcher();
+
+  const handleDelete = async (dataset: IDataset) => {
+    confirm({
+      onConfirm: async () =>
+        fetcher.submit({ datasetId: dataset.id }, { method: 'DELETE' }),
+      confirmText: 'Delete Dataset',
+      children: (
+        <p className="text-sm">
+          You are about to delete the "{dataset.name}” dataset. This action is
+          irreversible.
+        </p>
+      ),
+    });
+  };
+
   return (
     <ItemList
       aria-label="Memory collections list"
@@ -34,7 +59,11 @@ export const DatasetsList: React.FC<DatasetsListProps> = ({
       }
       renderItem={(item) => (
         <BasicLink to={routes.dataset(organizationId, item.id)}>
-          <DatasetsListItem data={item} organizationId={organizationId} />
+          <DatasetsListItem
+            data={item}
+            organizationId={organizationId}
+            onDelete={handleDelete}
+          />
         </BasicLink>
       )}
     />
@@ -44,13 +73,46 @@ export const DatasetsList: React.FC<DatasetsListProps> = ({
 interface DatasetsListItemProps {
   data: IDataset;
   organizationId: string;
+  onDelete: (dataset: IDataset) => void;
 }
 
-export const DatasetsListItem: React.FC<DatasetsListItemProps> = ({ data }) => {
+export const DatasetsListItem: React.FC<DatasetsListItemProps> = ({
+  data,
+  onDelete,
+}) => {
+  const deleteDataset = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    onDelete(data);
+  };
+
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
         <CardTitle className="line-clamp-2">{data.name}</CardTitle>
+
+        <MenuDropdown>
+          <MenuDropdownTrigger
+            className="w-8 h-8 p-0"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          >
+            <EllipsisVertical className="w-4 h-4" />
+          </MenuDropdownTrigger>
+
+          <MenuDropdownContent>
+            <MenuDropdownItem
+              icon={<Trash />}
+              variant="destructive"
+              onClick={deleteDataset}
+            >
+              <span>Delete</span>
+            </MenuDropdownItem>
+          </MenuDropdownContent>
+        </MenuDropdown>
       </CardHeader>
 
       <CardContent>
