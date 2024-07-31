@@ -69,7 +69,6 @@
     "fastify": "^4.28.1",
     "fastify-metrics": "^11.0.0",
     "google-auth-library": "^9.6.3",
-    "http-proxy-middleware": "^2.0.6",
     "isbot": "^3.6.8",
     "lodash.clonedeep": "^4.5.0",
     "lodash.get": "^4.4.2",
