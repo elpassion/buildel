@@ -112,14 +112,6 @@ export default function Layout() {
 
   return (
     <div id="_root" className="grid h-screen grid-cols-[auto_1fr] ">
-      <div className="bg-blue-500 z-0 h-[170px] fixed top-0 left-0 right-0 overflow-hidden">
-        <img
-          src="/bacgkround-blur.png"
-          alt="background"
-          className="object-cover bg-no-repeat h-full w-full"
-        />
-      </div>
-
       <NavSidebarContext.Provider
         value={{
           collapsed,
@@ -143,8 +135,18 @@ export default function Layout() {
           <SidebarMainContent />
         </NavMobileSidebar>
 
-        <main className="relative col-span-2 flex min-h-screen flex-col overflow-x-auto pb-5 lg:col-auto">
-          <Outlet />
+        <main className="col-span-2 lg:col-auto">
+          <div className="bg-blue-500 z-0 h-[170px] absolute top-0 left-0 right-0 overflow-hidden">
+            <img
+              src="/bacgkround-blur.png"
+              alt="background"
+              className="object-cover bg-no-repeat h-full w-full"
+            />
+          </div>
+
+          <div className="relative pb-5 flex min-h-screen flex-col">
+            <Outlet />
+          </div>
         </main>
       </NavSidebarContext.Provider>
     </div>

@@ -18,7 +18,7 @@ export const NavSidebar: React.FC<
     <div className="hidden lg:block md:p-4">
       <Sidebar
         collapseButton
-        className="sticky top-0 !h-[calc(100vh-32px)] rounded-xl"
+        className="sticky top-4 !h-[calc(100vh-32px)] rounded-xl"
         collapseButtonClassName="absolute top-[60px] !z-10 -right-2"
         collapsed={collapsed}
         onCollapse={toggleCollapse}
