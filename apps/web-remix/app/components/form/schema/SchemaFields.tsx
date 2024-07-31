@@ -194,7 +194,7 @@ export function BooleanField({ field, name }: FieldProps) {
 
   return (
     <FormField name={name}>
-      <Label>
+      <Label className="flex gap-1 items-center text-muted-foreground">
         <CheckboxInputField
           id={name}
           defaultChecked={field.default}
