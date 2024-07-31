@@ -65,4 +65,16 @@ export class DatasetApi {
 
     return this.client(DatasetRowsResponse, url);
   }
+
+  async deleteDatasetRow(
+    organizationId: string | number,
+    datasetId: string | number,
+    rowId: string | number,
+  ) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/datasets/${datasetId}/rows/${rowId}`,
+      { method: 'DELETE' },
+    );
+  }
 }

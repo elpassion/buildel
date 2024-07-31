@@ -21,6 +21,8 @@ import {
 import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
 
+import { DatasetRowMenuDropdown } from './DatasetRowMenuDropdown';
+
 interface DatasetRowTableProps {
   data: IDatasetRow[];
   className?: string;
@@ -50,6 +52,16 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
           cell: (info) => info.getValue(),
         }),
       ),
+
+      columnHelper.accessor('data.row-actions', {
+        header: () => <div className="text-right">Actions</div>,
+        id: 'row-actions',
+        cell: (info) => (
+          <div className="flex justify-end">
+            <DatasetRowMenuDropdown data={info.row.original} />
+          </div>
+        ),
+      }),
     ],
     [columnNames],
   );

@@ -4,7 +4,7 @@ import { useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
-import { DatasetRowTable } from '~/components/pages/datasets/overview/DatasetRowTable';
+import { DatasetRowTable } from '~/components/pages/datasets/overview/DatasetRowTable/DatasetRowTable';
 import { Pagination } from '~/components/pagination/Pagination';
 import { routes } from '~/utils/routes.utils';
 
