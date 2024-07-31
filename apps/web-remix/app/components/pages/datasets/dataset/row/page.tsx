@@ -7,18 +7,13 @@ import {
   useNavigate,
 } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
-import { useControlField, ValidatedForm } from 'remix-validated-form';
+import { ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
 import { UpdateDatasetRowSchema } from '~/api/datasets/datasets.contracts';
-import {
-  Field,
-  HiddenField,
-  useFieldContext,
-} from '~/components/form/fields/field.context';
+import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
-import { EditorInput } from '~/components/form/inputs/editor.input';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
@@ -31,10 +26,11 @@ import {
 } from '~/components/ui/dialog-drawer';
 import { routes } from '~/utils/routes.utils';
 
+import { DatasetRowEditorField } from '../DatasetRowEditorField';
 import type { loader } from './loader.server';
 
 export function DatasetRowPage() {
-  const { row, organizationId, datasetId, rowId } =
+  const { row, organizationId, datasetId, rowId, pagination } =
     useLoaderData<typeof loader>();
 
   const fetcher = useFetcher();
@@ -43,7 +39,7 @@ export function DatasetRowPage() {
   const isModalOpen = !!match;
 
   const closeModal = () => {
-    navigate(routes.dataset(organizationId, datasetId));
+    navigate(routes.dataset(organizationId, datasetId, pagination));
   };
 
   const onEdit = (
@@ -54,6 +50,8 @@ export function DatasetRowPage() {
 
     fetcher.submit({ data }, { method: 'PUT' });
   };
+
+  const validator = useMemo(() => withZod(UpdateDatasetRowSchema), []);
 
   return (
     <>
@@ -68,11 +66,19 @@ export function DatasetRowPage() {
 
           <DialogDrawerBody>
             <div className="py-1">
-              <DatasetRowForm
+              <ValidatedForm
                 id="dataset-row-form"
-                defaultValue={JSON.stringify(row.data)}
+                noValidate
+                validator={validator}
                 onSubmit={onEdit}
-              />
+                defaultValues={{ data: JSON.stringify(row.data) }}
+              >
+                <Field name="data">
+                  <FieldLabel>Data</FieldLabel>
+                  <DatasetRowEditorField />
+                  <FieldMessage />
+                </Field>
+              </ValidatedForm>
             </div>
           </DialogDrawerBody>
 
@@ -86,59 +92,6 @@ export function DatasetRowPage() {
           </DialogDrawerFooter>
         </DialogDrawerContent>
       </DialogDrawer>
-    </>
-  );
-}
-
-interface DatasetRowEditorProps {
-  defaultValue: string;
-  onSubmit: (
-    values: z.TypeOf<typeof UpdateDatasetRowSchema>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => void;
-  id?: string;
-}
-
-function DatasetRowForm({ defaultValue, id, onSubmit }: DatasetRowEditorProps) {
-  const validator = useMemo(() => withZod(UpdateDatasetRowSchema), []);
-
-  return (
-    <ValidatedForm
-      id={id}
-      noValidate
-      validator={validator}
-      onSubmit={onSubmit}
-      defaultValues={{ data: defaultValue }}
-    >
-      <Field name="data">
-        <FieldLabel>Data</FieldLabel>
-        <DatasetRowEditorField />
-        <FieldMessage />
-      </Field>
-    </ValidatedForm>
-  );
-}
-
-function DatasetRowEditorField() {
-  const { name, getInputProps, validate } = useFieldContext();
-  const [value, setValue] = useControlField<string | undefined>(name);
-
-  const handleOnChange = (v: string | undefined) => {
-    setValue(v);
-    validate();
-  };
-
-  const currentValue = value;
-
-  return (
-    <>
-      <HiddenField value={currentValue ?? ''} {...getInputProps()} />
-      <EditorInput
-        height="200px"
-        language="json"
-        value={currentValue}
-        onChange={handleOnChange}
-      />
     </>
   );
 }

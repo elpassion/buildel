@@ -35,7 +35,7 @@ export function DatasetsPage() {
       <AppNavbar leftContent={<AppNavbarHeading>Datasets</AppNavbarHeading>}>
         <Button asChild className="w-fit ml-auto mr-0 hidden lg:flex">
           <BasicLink to={routes.datasetsNew(organizationId)}>
-            New dataset
+            New Dataset
           </BasicLink>
         </Button>
       </AppNavbar>
@@ -60,7 +60,7 @@ export function DatasetsPage() {
         <div className="mb-3 flex justify-end lg:hidden">
           <Button size="sm" asChild>
             <BasicLink to={routes.knowledgeBaseNew(organizationId)}>
-              New dataset
+              New Dataset
             </BasicLink>
           </Button>
         </div>

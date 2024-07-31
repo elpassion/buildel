@@ -3,6 +3,7 @@ import type { LoaderFunctionArgs } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 
 import { DatasetApi } from '~/api/datasets/DatasetApi';
+import { getParamsPagination } from '~/components/pagination/usePagination';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
 
@@ -21,11 +22,16 @@ export async function loader(args: LoaderFunctionArgs) {
       params.rowId,
     );
 
+    const searchParams = new URL(request.url).searchParams;
+    const { page, per_page } = getParamsPagination(searchParams);
+    const pagination = { page, per_page };
+
     return json({
       organizationId: params.organizationId,
       datasetId: params.datasetId,
       rowId: params.rowId,
       row: datasetRow.data,
+      pagination,
     });
   })(args);
 }

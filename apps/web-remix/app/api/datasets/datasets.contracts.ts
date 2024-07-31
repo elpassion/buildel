@@ -53,12 +53,22 @@ export const CreateDatasetFileUpload = z.object({
 });
 
 export const UpdateDatasetRowSchema = z.object({
-  data: z.string({ required_error: 'Invalid json value' }).refine((value) => {
-    try {
-      JSON.parse(value);
-      return true;
-    } catch {
-      return false;
-    }
-  }, 'Invalid json value'),
+  data: z
+    .string({ required_error: 'Invalid json value' })
+    .refine(jsonValidator, 'Invalid json value'),
 });
+
+export const CreateDatasetRowSchema = z.object({
+  data: z
+    .string({ required_error: 'Invalid json value' })
+    .refine(jsonValidator, 'Invalid json value'),
+});
+
+function jsonValidator(value: string) {
+  try {
+    JSON.parse(value);
+    return true;
+  } catch {
+    return false;
+  }
+}

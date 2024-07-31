@@ -103,4 +103,16 @@ export class DatasetApi {
       { method: 'PUT', body: JSON.stringify({ data }) },
     );
   }
+
+  async createDatasetRow(
+    organizationId: string | number,
+    datasetId: string | number,
+    data: Record<string, any>,
+  ) {
+    return this.client(
+      DatasetRowResponse,
+      `/organizations/${organizationId}/datasets/${datasetId}/rows`,
+      { method: 'POST', body: JSON.stringify({ data }) },
+    );
+  }
 }

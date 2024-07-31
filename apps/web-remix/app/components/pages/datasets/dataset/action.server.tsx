@@ -35,7 +35,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
             'Set-Cookie': await setServerToast(request, {
               success: {
                 title: 'Row deleted',
-                description: `You've successfully deleted dataset row`,
+                description: `You've successfully deleted Dataset Row`,
               },
             }),
           },

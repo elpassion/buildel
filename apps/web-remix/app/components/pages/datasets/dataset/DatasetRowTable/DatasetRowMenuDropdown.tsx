@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFetcher, useNavigate } from '@remix-run/react';
+import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
 import { Edit, EllipsisVertical, Trash } from 'lucide-react';
 
 import {
@@ -10,8 +10,7 @@ import {
 } from '~/components/dropdown/MenuDropdown';
 import { confirm } from '~/components/modal/confirm';
 import type { IDatasetRow } from '~/components/pages/datasets/dataset.types';
-import { useDatasetId } from '~/hooks/useDatasetId';
-import { useOrganizationId } from '~/hooks/useOrganizationId';
+import type { loader } from '~/components/pages/datasets/dataset/loader.server';
 import { routes } from '~/utils/routes.utils';
 
 interface DatasetRowMenuDropdownProps {
@@ -21,8 +20,11 @@ interface DatasetRowMenuDropdownProps {
 export const DatasetRowMenuDropdown = ({
   data,
 }: DatasetRowMenuDropdownProps) => {
-  const datasetId = useDatasetId();
-  const organizationId = useOrganizationId();
+  const {
+    organizationId,
+    datasetId,
+    pagination: { page, per_page },
+  } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const fetcher = useFetcher();
 
@@ -40,7 +42,12 @@ export const DatasetRowMenuDropdown = ({
   };
 
   const editRow = () => {
-    navigate(routes.datasetRow(organizationId, datasetId, data.id));
+    navigate(
+      routes.datasetRow(organizationId, datasetId, data.id, {
+        page,
+        per_page,
+      }),
+    );
   };
 
   return (

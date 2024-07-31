@@ -49,7 +49,7 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
 
       ...columnNames.map((name) =>
         columnHelper.accessor(`data.${name}`, {
-          header: startCase(name),
+          header: name,
           id: name,
           cell: (info) => info.getValue(),
         }),
