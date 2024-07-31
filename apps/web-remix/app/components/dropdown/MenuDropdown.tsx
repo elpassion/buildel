@@ -1,14 +1,16 @@
-import type { ReactElement } from 'react';
+import type { PropsWithChildren, ReactElement } from 'react';
 import { cloneElement, isValidElement } from 'react';
 
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
 
-import type { DropdownPopupProps } from './Dropdown';
+import type { DropdownPopupProps, DropdownProps } from './Dropdown';
 import { Dropdown, DropdownPopup, DropdownTrigger } from './Dropdown';
 
-const MenuDropdown = Dropdown;
+const MenuDropdown = ({ ...rest }: PropsWithChildren<DropdownProps>) => {
+  return <Dropdown placement="bottom" {...rest} />;
+};
 
 const MenuDropdownTrigger = (props: ButtonProps) => {
   return <DropdownTrigger variant="ghost" size="sm" {...props} />;

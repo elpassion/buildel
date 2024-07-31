@@ -21,7 +21,7 @@ import { cn } from '~/utils/cn';
 
 import { DropdownContext, useDropdown } from './DropdownContext';
 
-interface DropdownProps {
+export interface DropdownProps {
   defaultShown?: boolean;
   placement?: Placement;
   offset?: OffsetOptions;
