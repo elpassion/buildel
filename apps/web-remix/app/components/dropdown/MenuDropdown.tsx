@@ -1,6 +1,7 @@
 import type { PropsWithChildren, ReactElement } from 'react';
 import { cloneElement, isValidElement } from 'react';
 
+import { useDropdown } from '~/components/dropdown/DropdownContext';
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
@@ -17,6 +18,10 @@ const MenuDropdownTrigger = (props: ButtonProps) => {
 };
 
 const MenuDropdownContent = ({ className, ...rest }: DropdownPopupProps) => {
+  const { isShown } = useDropdown();
+
+  if (!isShown) return null;
+
   return (
     <DropdownPopup
       className={cn(
