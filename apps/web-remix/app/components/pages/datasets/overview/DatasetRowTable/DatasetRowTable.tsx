@@ -57,7 +57,7 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
 
       columnHelper.accessor('data.row-actions', {
         id: 'row-actions',
-        header: () => <div className="text-right">Actions</div>,
+        header: '',
         cell: (info) => (
           <div className="flex justify-end">
             <DatasetRowMenuDropdown data={info.row.original} />
