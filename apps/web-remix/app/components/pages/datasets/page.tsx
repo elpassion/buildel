@@ -45,7 +45,8 @@ export function DatasetsPage() {
           <DialogDrawerHeader>
             <DialogDrawerTitle>Create a new dataset</DialogDrawerTitle>
             <DialogDrawerDescription>
-              Any dataset can contain many files and be used in your workflows
+              Compile examples and build datasets using data from production or
+              other available sources.
             </DialogDrawerDescription>
           </DialogDrawerHeader>
 

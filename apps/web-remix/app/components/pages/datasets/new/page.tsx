@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useFetcher, useLoaderData } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
+import { CircleHelp } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
@@ -13,6 +14,12 @@ import { SmallFileInputField } from '~/components/form/fields/file.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { errorToast } from '~/components/toasts/errorToast';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 
 import type { loader } from './loader.server';
 
@@ -120,8 +127,21 @@ export function NewDataset() {
 
       <div>
         <Field name="file">
-          <FieldLabel>File</FieldLabel>
-          <SmallFileInputField multiple={false} />
+          <FieldLabel className="flex gap-1 items-center">
+            <span>File</span>
+            <TooltipProvider>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger>
+                  <CircleHelp className="w-3.5 h-3.5" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  Upload file in CSV format. Remember that first row should
+                  contain column names.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </FieldLabel>
+          <SmallFileInputField multiple={false} accept=".csv" />
           <FieldMessage />
         </Field>
       </div>

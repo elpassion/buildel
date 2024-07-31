@@ -39,5 +39,11 @@ export const CreateDatasetSchema = z.object({
 
 export const CreateDatasetFileUpload = z.object({
   name: z.string().min(2),
-  file: z.any().refine((file: File) => file.size > 0, 'File is required'),
+  file: z
+    .any()
+    .refine((file: File) => file.size > 0, 'File is required')
+    .refine(
+      (file: File) => file.type.includes('csv'),
+      'File must be a CSV file',
+    ),
 });
