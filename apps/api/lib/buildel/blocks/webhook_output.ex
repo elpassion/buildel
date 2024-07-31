@@ -47,7 +47,7 @@ defmodule Buildel.Blocks.WebhookOutput do
       block_context().context_from_context_id(context_id)
       |> Map.put("metadata", opts.metadata)
 
-    {:ok, state |> Map.put(:context, context)}
+    {:ok, state |> Map.put(:api_context, context)}
   end
 
   defp send_text(content, state) do
@@ -67,13 +67,13 @@ defmodule Buildel.Blocks.WebhookOutput do
     {:ok, token} =
       block_context().create_run_auth_token(
         state[:context_id],
-        "#{state[:context] |> Jason.encode!()}::#{payload}"
+        "#{state[:api_context] |> Jason.encode!()}::#{payload}"
       )
 
     webhook().send_content(url, payload,
       Authorization: "Bearer #{token}",
       "X-Buildel-Topic": topic,
-      "X-Buildel-Context": state[:context] |> Jason.encode!()
+      "X-Buildel-Context": state[:api_context] |> Jason.encode!()
     )
 
     state |> send_stream_stop()

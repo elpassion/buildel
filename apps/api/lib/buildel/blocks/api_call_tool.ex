@@ -117,7 +117,7 @@ defmodule Buildel.Blocks.ApiCallTool do
     {:ok,
      state
      |> Map.put(:parameters, Jason.decode!(opts.parameters))
-     |> Map.put(:context, context)
+     |> Map.put(:api_context, context)
      |> Map.put(
        :available_metadata,
        Injectable.used_metadata_keys([opts.url, opts.headers, opts.call_formatter])
@@ -203,14 +203,14 @@ defmodule Buildel.Blocks.ApiCallTool do
     {:ok, token} =
       block_context().create_run_auth_token(
         state.context_id,
-        "#{Jason.encode!(state.context)}::#{payload}"
+        "#{Jason.encode!(state.api_context)}::#{payload}"
       )
 
     headers =
       headers ++
         [
           "X-Buildel-Topic": topic,
-          "X-Buildel-Context": Jason.encode!(state.context)
+          "X-Buildel-Context": Jason.encode!(state.api_context)
         ]
 
     headers =
