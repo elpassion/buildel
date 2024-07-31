@@ -93,6 +93,12 @@ defmodule Buildel.Blocks.Block do
 
       defoverridable handle_input: 3
 
+      def handle_external_input(_name, _payload, state) do
+        state
+      end
+
+      defoverridable handle_external_input: 3
+
       def create(%{name: name, opts: opts, connections: connections}) do
         %Block{
           name: name,
@@ -211,13 +217,20 @@ defmodule Buildel.Blocks.Block do
       end
 
       def handle_info({topic, message_type, value, metadata} = payload, state) do
-        state =
-          inputs_subscribed_to_topic(all_connections(state.block), topic)
-          |> Enum.reduce(state, fn input, state ->
-            handle_input(input.name, payload, state)
-          end)
+        context_id = BlockPubSub.io_from_topic(topic)
 
-        {:noreply, state}
+        if context_id.context == state.context.context_id do
+          state =
+            inputs_subscribed_to_topic(all_connections(state.block), topic)
+            |> Enum.reduce(state, fn input, state ->
+              handle_input(input.name, payload, state)
+            end)
+
+          {:noreply, state}
+        else
+          state = handle_external_input(topic, payload, state)
+          {:noreply, state}
+        end
       end
 
       defp inputs_subscribed_to_topic(connections, topic) do

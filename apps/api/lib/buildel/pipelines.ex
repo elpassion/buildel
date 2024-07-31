@@ -165,31 +165,95 @@ defmodule Buildel.Pipelines do
   def blocks_for_run(%Run{config: %{"blocks" => nil}}), do: []
 
   def blocks_for_run(%Run{config: %{"blocks" => blocks, "connections" => connections} = config}) do
+    workflow_calls_blocks_map =
+      blocks
+      |> Enum.filter(fn block -> block["type"] == "workflow_call" end)
+      |> Enum.reduce(%{}, fn block, acc ->
+        pipeline = get_pipeline(block["opts"]["workflow"])
+
+        blocks_map =
+          pipeline.config["blocks"] |> Enum.into(%{}, fn block -> {block["name"], block} end)
+
+        Map.put(acc, block["name"], blocks_map)
+      end)
+
     blocks_map = blocks |> Enum.into(%{}, fn block -> {block["name"], block} end)
 
     block_connections =
       connections
       |> Enum.reduce(%{}, fn connection, acc ->
-        from_block = blocks_map[connection["from"]["block_name"]]
+        dynamic_connection =
+          case [connection["from"]["output_name"], connection["to"]["input_name"]]
+               |> Enum.map(&String.split(&1, ":")) do
+            [output, _input] when length(output) > 1 -> :from
+            [_output, input] when length(input) > 1 -> :to
+            _ -> :none
+          end
+
+        {from_block, output_name, full_output_name} =
+          case dynamic_connection do
+            :from ->
+              [block_name, output_name] = connection["from"]["output_name"] |> String.split(":")
+
+              from_block =
+                blocks_map[connection["from"]["block_name"]]
+                |> Map.put(
+                  "type",
+                  workflow_calls_blocks_map[connection["from"]["block_name"]][
+                    block_name
+                  ]["type"]
+                )
+
+              # {from_block, output_name}
+              {from_block, output_name, connection["from"]["output_name"]}
+
+            _ ->
+              {blocks_map[connection["from"]["block_name"]], connection["from"]["output_name"],
+               connection["from"]["output_name"]}
+          end
+
         from_block_module = Buildel.Blocks.type(from_block["type"])
-        to_block = blocks_map[connection["to"]["block_name"]]
+
+        {to_block, input_name, full_input_name} =
+          case dynamic_connection do
+            :to ->
+              [block_name, input_name] =
+                connection["to"]["input_name"] |> String.split(":")
+
+              to_block =
+                blocks_map[connection["to"]["block_name"]]
+                |> Map.put(
+                  "type",
+                  workflow_calls_blocks_map[connection["to"]["block_name"]][
+                    block_name
+                  ]["type"]
+                )
+
+              # {to_block, input_name}
+              {to_block, input_name, connection["to"]["input_name"]}
+
+            _ ->
+              {blocks_map[connection["to"]["block_name"]], connection["to"]["input_name"],
+               connection["to"]["input_name"]}
+          end
+
         to_block_module = Buildel.Blocks.type(to_block["type"])
 
         output_type =
-          from_block_module.get_output(connection["from"]["output_name"]).type
+          from_block_module.get_output(output_name).type
 
         input_type =
-          to_block_module.get_input(connection["to"]["input_name"]).type
+          to_block_module.get_input(input_name).type
 
         connection = %Buildel.Blocks.Connection{
           from: %Buildel.Blocks.Output{
             block_name: from_block["name"],
-            name: connection["from"]["output_name"],
+            name: full_output_name,
             type: output_type
           },
           to: %Buildel.Blocks.Input{
             block_name: to_block["name"],
-            name: connection["to"]["input_name"],
+            name: full_input_name,
             type: input_type
           },
           opts: %{
