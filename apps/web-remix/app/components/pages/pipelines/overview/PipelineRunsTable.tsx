@@ -154,7 +154,9 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
-              <EmptyMessage>There are no pipeline runs...</EmptyMessage>
+              <EmptyMessage className="px-5">
+                There are no pipeline runs...
+              </EmptyMessage>
             </td>
           </tr>
         ) : null}
