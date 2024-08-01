@@ -62,7 +62,7 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
               onClose();
             }}
           >
-            <div className="p-1">
+            <div className="py-1">
               <Field name="name">
                 <TextInputField type="hidden" />
               </Field>
