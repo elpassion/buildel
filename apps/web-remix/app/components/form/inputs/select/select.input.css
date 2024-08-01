@@ -58,7 +58,7 @@
 }
 
 .rc-select.rc-select-multiple .rc-select-selector {
-  @apply flex-nowrap flex-row-reverse items-center px-4 py-1;
+  @apply flex-nowrap flex-row-reverse items-center px-2 h-10;
 }
 
 .rc-select.rc-select-multiple .rc-select-selection-placeholder,
@@ -67,7 +67,7 @@
 }
 
 .rc-select-multiple .rc-select-selector .rc-select-selection-item {
-  @apply px-2 py-1.5 m-0 flex gap-3 cursor-pointer bg-muted;
+  @apply px-1.5 py-1 m-0 flex gap-2 cursor-pointer bg-muted !text-xs;
 }
 
 .rc-select-multiple .rc-select-selector .rc-select-selection-overflow-item {
@@ -75,7 +75,7 @@
 }
 
 .rc-select-multiple .rc-select-selector .rc-select-selection-overflow {
-  @apply gap-3 items-center flex-nowrap overflow-x-scroll;
+  @apply gap-1 items-center flex-nowrap overflow-x-scroll;
 }
 
 .rc-select-multiple
