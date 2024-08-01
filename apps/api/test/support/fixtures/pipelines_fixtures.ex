@@ -231,6 +231,115 @@ defmodule Buildel.PipelinesFixtures do
     pipeline
   end
 
+  def pipeline_fixture(attrs, %{version: "4"}) do
+    {:ok, pipeline} =
+      attrs
+      |> Enum.into(%{
+        name: "some name",
+        organization_id: organization_fixture().id,
+        config: %{
+          "version" => "4",
+          "blocks" => [
+            %{
+              "name" => "text_input_10",
+              "type" => "text_input",
+              "opts" => %{},
+              "ios" => []
+            },
+            %{
+              "name" => "text_output_10",
+              "type" => "text_output",
+              "opts" => %{},
+              "ios" => []
+            }
+          ],
+          "connections" => [
+            %{
+              "from" => %{
+                "block_name" => "text_input_10",
+                "output_name" => "output"
+              },
+              "to" => %{
+                "block_name" => "text_output_10",
+                "input_name" => "input"
+              },
+              "opts" => %{
+                "reset" => true
+              }
+            }
+          ]
+        }
+      })
+      |> Buildel.Pipelines.create_pipeline()
+
+    pipeline
+  end
+
+  def pipeline_fixture(attrs, %{version: "5", sub_pipeline_id: sub_pipeline_id}) do
+    {:ok, pipeline} =
+      attrs
+      |> Enum.into(%{
+        name: "some name",
+        organization_id: organization_fixture().id,
+        config: %{
+          "version" => "5",
+          "blocks" => [
+            %{
+              "name" => "text_input_1",
+              "type" => "text_input",
+              "opts" => %{},
+              "ios" => []
+            },
+            %{
+              "name" => "workflow_call_1",
+              "type" => "workflow_call",
+              "opts" => %{
+                "workflow" => "#{sub_pipeline_id}"
+              },
+              "ios" => []
+            },
+            %{
+              "name" => "text_output_1",
+              "type" => "text_output",
+              "opts" => %{},
+              "ios" => []
+            }
+          ],
+          "connections" => [
+            %{
+              "from" => %{
+                "block_name" => "workflow_call_1",
+                "output_name" => "text_output_10:output"
+              },
+              "to" => %{
+                "block_name" => "text_output_1",
+                "input_name" => "input"
+              },
+              "opts" => %{
+                "reset" => true
+              }
+            },
+            %{
+              "from" => %{
+                "block_name" => "text_input_1",
+                "output_name" => "output"
+              },
+              "to" => %{
+                "block_name" => "workflow_call_1",
+                "input_name" => "text_input_10:input"
+              },
+              "opts" => %{
+                "reset" => true
+              }
+            }
+          ]
+        }
+      })
+      |> Buildel.Pipelines.create_pipeline()
+
+    pipeline
+  end
+
   def run_fixture(attrs \\ %{}, pipeline_config \\ %{version: "1"}, date \\ nil) do
     pipeline =
       case attrs[:pipeline_id] do

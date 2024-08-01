@@ -1,4 +1,5 @@
 defmodule Buildel.PipelinesTest do
+  alias Buildel.Blocks.WorkflowCall
   alias Buildel.Blocks.TextInput
   use Buildel.DataCase, async: true
   import Buildel.OrganizationsFixtures
@@ -370,6 +371,62 @@ defmodule Buildel.PipelinesTest do
                        to_type: "audio"
                      }
                    )
+                 ]
+               })
+             ]
+    end
+
+    test "blocks_for_run/1 returns correcct blocks in v5" do
+      pipeline_v4 = pipeline_fixture(%{}, %{version: "4"})
+
+      run =
+        run_fixture(%{}, %{
+          version: "5",
+          sub_pipeline_id: pipeline_v4.id
+        })
+
+      assert Pipelines.blocks_for_run(run) == [
+               TextInput.create(%{
+                 name: "text_input_1",
+                 opts: %{metadata: %{}},
+                 connections: []
+               }),
+               WorkflowCall.create(%{
+                 name: "workflow_call_1",
+                 opts: %{metadata: %{}, workflow: "#{pipeline_v4.id}"},
+                 connections: [
+                   %Buildel.Blocks.Connection{
+                     from: %Buildel.Blocks.Output{
+                       name: "output",
+                       block_name: "text_input_1",
+                       type: "text"
+                     },
+                     to: %Buildel.Blocks.Input{
+                       name: "text_input_10:input",
+                       block_name: "workflow_call_1",
+                       type: "text"
+                     },
+                     opts: %{reset: true}
+                   }
+                 ]
+               }),
+               TextOutput.create(%{
+                 name: "text_output_1",
+                 opts: %{metadata: %{}},
+                 connections: [
+                   %Buildel.Blocks.Connection{
+                     from: %Buildel.Blocks.Output{
+                       name: "text_output_10:output",
+                       block_name: "workflow_call_1",
+                       type: "text"
+                     },
+                     to: %Buildel.Blocks.Input{
+                       name: "input",
+                       block_name: "text_output_1",
+                       type: "text"
+                     },
+                     opts: %{reset: true}
+                   }
                  ]
                })
              ]
