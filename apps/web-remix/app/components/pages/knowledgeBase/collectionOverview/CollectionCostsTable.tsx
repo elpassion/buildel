@@ -120,7 +120,9 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
-              <EmptyMessage>There are no collection costs...</EmptyMessage>
+              <EmptyMessage className="px-5">
+                There are no collection costs...
+              </EmptyMessage>
             </td>
           </tr>
         ) : null}
