@@ -45,6 +45,7 @@ defmodule Buildel.Pipelines.Worker do
       for %Blocks.Block{type: type} = block <- blocks do
         block_id = block_id(run, block)
         context_id = context_id(run)
+
         context = %{
           block_id: block_id,
           context_id: context_id,

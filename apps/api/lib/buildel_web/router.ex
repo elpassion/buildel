@@ -222,6 +222,12 @@ defmodule BuildelWeb.Router do
     )
 
     resources(
+      "/organizations/:organization_id/experiments",
+      ExperimentController,
+      only: [:index, :show, :create, :delete]
+    )
+
+    resources(
       "/organizations/:organization_id/datasets/:dataset_id/rows",
       DatasetRowsController,
       only: [:index, :create, :show, :delete, :update]
