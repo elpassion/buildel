@@ -85,23 +85,23 @@ defmodule Buildel.Experiments.Runs do
 
       dataset_rows
       |> Enum.map(fn row ->
-        {:ok, run} =
-          Buildel.Pipelines.create_run(%{
-            pipeline_id: pipeline.id,
-            config: pipeline_config |> Map.put(:metadata, %{})
-          })
-
-        {:ok, run_row_run} =
-          create_run_row_run(%{
-            experiment_run_id: experiment_run.id,
-            run_id: run.id,
-            dataset_row_id: row.id
-          })
-
-        {:ok, run} = Pipelines.Runner.start_run(run)
-        context_id = Pipelines.Worker.context_id(run)
-
         Task.start(fn ->
+          {:ok, run} =
+            Buildel.Pipelines.create_run(%{
+              pipeline_id: pipeline.id,
+              config: pipeline_config |> Map.put(:metadata, %{})
+            })
+
+          {:ok, run_row_run} =
+            create_run_row_run(%{
+              experiment_run_id: experiment_run.id,
+              run_id: run.id,
+              dataset_row_id: row.id
+            })
+
+          {:ok, run} = Pipelines.Runner.start_run(run)
+          context_id = Pipelines.Worker.context_id(run)
+
           outputs =
             public_outputs
             |> Enum.map(fn output ->
@@ -125,6 +125,11 @@ defmodule Buildel.Experiments.Runs do
                 data: nil
               }
             end)
+
+          row.data
+          |> Enum.each(fn {block_name, data} ->
+            Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, "input", {:text, data})
+          end)
 
           outputs =
             Enum.reduce_while(Stream.repeatedly(fn -> nil end), outputs, fn _, outputs ->
@@ -154,12 +159,7 @@ defmodule Buildel.Experiments.Runs do
           run |> Pipelines.Runner.stop_run()
         end)
 
-        row.data
-        |> Enum.each(fn {block_name, data} ->
-          Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, "input", {:text, data})
-        end)
-
-        {:ok, run}
+        :ok
       end)
 
       {:ok, experiment_run}
