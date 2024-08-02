@@ -64,7 +64,10 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
   });
 
   return (
-    <Table>
+    <Table
+      className="overflow-x-auto"
+      style={{ minWidth: table.getTotalSize() }}
+    >
       <TableHead>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableHeadRow key={headerGroup.id}>

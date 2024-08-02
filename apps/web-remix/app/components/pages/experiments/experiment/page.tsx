@@ -20,7 +20,7 @@ export function ExperimentPage() {
     experimentRuns,
     pagination,
   } = useLoaderData<typeof loader>();
-  console.log(pagination);
+
   return (
     <>
       <AppNavbar

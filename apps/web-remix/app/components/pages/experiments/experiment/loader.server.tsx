@@ -34,7 +34,6 @@ export async function loader(args: LoaderFunctionArgs) {
       experimentRunsPromise,
     ]);
 
-    console.log(experimentRuns);
     const totalItems = experimentRuns.meta.total;
     const totalPages = Math.ceil(totalItems / per_page);
     const pagination = { page, per_page, search, totalItems, totalPages };
