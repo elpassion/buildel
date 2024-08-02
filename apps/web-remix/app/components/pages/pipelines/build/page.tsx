@@ -27,12 +27,13 @@ import type { IPipeline, IPipelineConfig } from '../pipeline.types';
 import { toPipelineConfig } from '../PipelineFlow.utils';
 import { BuilderHeader, SaveChangesButton } from './BuilderHeader';
 import { CreateBlockFloatingMenu } from './CreateBlock/CreateBlockFloatingMenu';
+import { FloatingChat } from './FloatingChatInterface/FloatingChat';
 import type { loader } from './loader.server';
 
 export function PipelineBuilder() {
   const updateFetcher = useFetcher<IPipeline>();
   const [searchParams] = useSearchParams();
-  const { pipeline, pipelineId, organizationId, aliasId } =
+  const { pipeline, pipelineId, organizationId, aliasId, pageUrl } =
     useLoaderData<typeof loader>();
 
   const navigate = useNavigate();
@@ -104,6 +105,11 @@ export function PipelineBuilder() {
             <ELProvider>
               <CreateBlockFloatingMenu onCreate={onBlockCreate} />
             </ELProvider>
+
+            <FloatingChat
+              webchatConfig={pipeline.interface_config.webchat}
+              chatUrl={`${pageUrl}/webchats/${organizationId}/pipelines/${pipelineId}?alias=latest`}
+            />
           </>
         )}
       </Builder>

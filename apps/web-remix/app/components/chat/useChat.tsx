@@ -3,7 +3,6 @@ import cloneDeep from 'lodash.clonedeep';
 import { v4 as uuidv4 } from 'uuid';
 
 import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
-import { errorToast } from '~/components/toasts/errorToast';
 
 import type { IMessage, MessageRole } from './chat.types';
 
@@ -79,12 +78,12 @@ export const useChat = ({
   };
 
   const onBlockError = () => {
-    errorToast({ description: 'Ups! Something went wrong' });
+    // errorToast({ description: 'Ups! Something went wrong' });
     setIsGenerating(false);
   };
 
   const onError = (error: string) => {
-    errorToast({ description: error });
+    // errorToast({ description: error });
     setIsGenerating(false);
   };
 
