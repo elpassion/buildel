@@ -1,8 +1,15 @@
 defmodule BuildelWeb.ExperimentRunJSON do
   alias Buildel.Experiments.Runs.Run
 
-  def index(%{runs: runs}) do
-    %{data: for(run <- runs, do: data(run))}
+  def index(%{runs: runs, pagination_params: pagination_params, total: total}) do
+    %{
+      data: for(run <- runs, do: data(run)),
+      meta: %{
+        total: total,
+        page: pagination_params.page,
+        per_page: pagination_params.per_page
+      }
+    }
   end
 
   def show(%{run: run}) do
