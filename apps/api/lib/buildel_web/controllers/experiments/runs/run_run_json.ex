@@ -1,6 +1,5 @@
 defmodule BuildelWeb.ExperimentRunRunJSON do
   alias Buildel.Experiments.Runs.RunRowRun
-  alias Buildel.Experiments.Runs.Run
 
   def index(%{runs: runs, pagination_params: pagination_params, total: total}) do
     %{
@@ -17,11 +16,12 @@ defmodule BuildelWeb.ExperimentRunRunJSON do
     %{data: data(run)}
   end
 
-  defp data(%Run{} = run) do
+  defp data(%RunRowRun{} = run) do
     %{
       id: run.id,
       status: run |> RunRowRun.status(),
-      created_at: run.inserted_at
+      created_at: run.inserted_at,
+      data: run.data
     }
   end
 end
