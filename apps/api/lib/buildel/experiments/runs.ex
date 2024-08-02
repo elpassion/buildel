@@ -24,4 +24,11 @@ defmodule Buildel.Experiments.Runs do
     |> Run.changeset(params)
     |> Repo.insert()
   end
+
+  def get_experiment_run(%Experiment{} = experiment, id) do
+    case from(r in Run, where: r.experiment_id == ^experiment.id and r.id == ^id) |> Repo.one() do
+      nil -> {:error, :not_found}
+      run -> {:ok, run}
+    end
+  end
 end
