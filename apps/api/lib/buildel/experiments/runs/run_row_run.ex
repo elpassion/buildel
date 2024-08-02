@@ -22,6 +22,14 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
     |> assoc_constraint(:experiment_run)
     |> assoc_constraint(:dataset_row)
     |> assoc_constraint(:run)
+    |> prepare_changes(fn changeset ->
+      if experiment_run_id = get_change(changeset, :experiment_run_id) do
+        query = from Run, where: [id: ^experiment_run_id]
+        changeset.repo.update_all(query, inc: [runs_count: 1])
+      end
+
+      changeset
+    end)
   end
 
   def finish(run_row_run, data) do

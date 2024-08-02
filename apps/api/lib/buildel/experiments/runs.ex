@@ -23,6 +23,22 @@ defmodule Buildel.Experiments.Runs do
     {:ok, results, experiment.runs_count}
   end
 
+  def list_experiment_run_runs(%Run{} = run, pagination_params) do
+    offset = pagination_params.page * pagination_params.per_page
+
+    results =
+      from(rrr in RunRowRun,
+        where: rrr.experiment_run_id == ^run.id,
+        order_by: [desc: rrr.inserted_at]
+      )
+      |> limit(^pagination_params.per_page)
+      |> offset(^offset)
+      |> Repo.all()
+      |> Repo.preload(:run)
+
+    {:ok, results, run.runs_count}
+  end
+
   def create_experiment_run(%Experiment{} = experiment, params \\ %{}) do
     case %Run{experiment_id: experiment.id}
          |> Run.changeset(params)

@@ -8,6 +8,8 @@ defmodule Buildel.Experiments.Runs.Run do
     belongs_to(:experiment, Experiment)
     field(:status, Ecto.Enum, values: [created: 0, running: 1, finished: 2], default: :created)
 
+    field(:runs_count, :integer, default: 0)
+
     timestamps()
   end
 
