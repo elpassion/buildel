@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
+import type { PaginationQueryParams } from '~/components/pagination/usePagination';
 import type { fetchTyped } from '~/utils/fetch.server';
+import { buildUrlWithParams } from '~/utils/url';
 
 import type { CreateExperimentSchema } from './experiments.contracts';
 import {
@@ -54,10 +56,23 @@ export class ExperimentsApi {
   async getExperimentRuns(
     organizationId: string | number,
     experimentId: string | number,
+    pagination?: PaginationQueryParams,
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/experiments/${experimentId}/runs`,
+      { ...pagination },
+    );
+    return this.client(ExperimentRunsResponse, url);
+  }
+
+  async runExperiment(
+    organizationId: string | number,
+    experimentId: string | number,
   ) {
     return this.client(
-      ExperimentRunsResponse,
+      z.any(),
       `/organizations/${organizationId}/experiments/${experimentId}/runs`,
+      { method: 'POST' },
     );
   }
 }

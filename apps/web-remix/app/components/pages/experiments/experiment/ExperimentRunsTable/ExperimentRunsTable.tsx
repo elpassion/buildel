@@ -40,7 +40,13 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
         id: 'status',
         cell: (info) => (
           <Badge
-            variant={info.getValue() !== 'finished' ? 'destructive' : 'outline'}
+            variant={
+              info.getValue() === 'finished'
+                ? 'destructive'
+                : info.getValue() === 'created'
+                  ? 'secondary'
+                  : 'outline'
+            }
           >
             {info.getValue()}
           </Badge>

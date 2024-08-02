@@ -13,6 +13,9 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.organizationId, 'organizationId not found');
     invariant(params.experimentId, 'experimentId not found');
 
+    const searchParams = new URL(request.url).searchParams;
+    const { page, per_page, search } = getParamsPagination(searchParams);
+
     const experimentsApi = new ExperimentsApi(fetch);
 
     const experimentPromise = experimentsApi.getExperiment(
@@ -23,6 +26,7 @@ export async function loader(args: LoaderFunctionArgs) {
     const experimentRunsPromise = experimentsApi.getExperimentRuns(
       params.organizationId,
       params.experimentId,
+      { page, per_page, search: search ?? '' },
     );
 
     const [{ data: experiment }, { data: experimentRuns }] = await Promise.all([
@@ -30,9 +34,7 @@ export async function loader(args: LoaderFunctionArgs) {
       experimentRunsPromise,
     ]);
 
-    const searchParams = new URL(request.url).searchParams;
-    const { page, per_page, search } = getParamsPagination(searchParams);
-
+    console.log(experimentRuns);
     const totalItems = experimentRuns.meta.total;
     const totalPages = Math.ceil(totalItems / per_page);
     const pagination = { page, per_page, search, totalItems, totalPages };

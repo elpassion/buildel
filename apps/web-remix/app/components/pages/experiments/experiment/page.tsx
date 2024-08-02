@@ -1,11 +1,11 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { Outlet, useLoaderData } from '@remix-run/react';
+import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
-import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Pagination } from '~/components/pagination/Pagination';
+import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
@@ -20,7 +20,7 @@ export function ExperimentPage() {
     experimentRuns,
     pagination,
   } = useLoaderData<typeof loader>();
-
+  console.log(pagination);
   return (
     <>
       <AppNavbar
@@ -28,20 +28,14 @@ export function ExperimentPage() {
           <AppNavbarHeading>Experiment {experiment.name}</AppNavbarHeading>
         }
       >
-        <Button asChild className="w-fit ml-auto mr-0 hidden lg:flex">
-          <BasicLink to={routes.experiment(organizationId, experimentId)}>
-            Run Experiment
-          </BasicLink>
-        </Button>
+        <ExperimentRunButton className="w-fit ml-auto mr-0 hidden lg:flex">
+          Run Experiment
+        </ExperimentRunButton>
       </AppNavbar>
 
       <PageContentWrapper className="mt-6 lg:mt-[120px] pb-3">
         <div className="mb-[56px] flex justify-end lg:hidden">
-          <Button size="sm" asChild>
-            <BasicLink to={routes.experiment(organizationId, experimentId)}>
-              Run Experiment
-            </BasicLink>
-          </Button>
+          <ExperimentRunButton size="sm">Run Experiment</ExperimentRunButton>
         </div>
 
         <ExperimentRunsTable data={experimentRuns} />
@@ -66,3 +60,17 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     },
   ];
 };
+
+function ExperimentRunButton({ children, ...props }: ButtonProps) {
+  const fetcher = useFetcher();
+
+  const onClick = () => {
+    fetcher.submit({}, { method: 'POST' });
+  };
+
+  return (
+    <Button {...props} onClick={onClick}>
+      {children}
+    </Button>
+  );
+}
