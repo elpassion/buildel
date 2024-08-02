@@ -42,10 +42,10 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
           <Badge
             variant={
               info.getValue() === 'finished'
-                ? 'destructive'
+                ? 'outline'
                 : info.getValue() === 'created'
                   ? 'secondary'
-                  : 'outline'
+                  : 'destructive'
             }
           >
             {info.getValue()}

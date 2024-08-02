@@ -286,6 +286,10 @@ export const routes = {
     `${routes.experiments(organizationId)}/new`,
   experiment: (organizationId: OrganizationId, experimentId: ExperimentId) =>
     `${routes.experiments(organizationId)}/${experimentId}`,
+  experimentRuns: (
+    organizationId: OrganizationId,
+    experimentId: ExperimentId,
+  ) => `${routes.experiment(organizationId, experimentId)}/runs`,
 };
 
 type OrganizationId = string | number;

@@ -43,7 +43,7 @@ export function ExperimentPage() {
         <div className="flex justify-end mt-4">
           <Pagination
             pagination={pagination}
-            loaderUrl={routes.experiment(organizationId, experimentId)}
+            loaderUrl={routes.experimentRuns(organizationId, experimentId)}
           />
         </div>
       </PageContentWrapper>
