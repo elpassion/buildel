@@ -82,7 +82,7 @@ export const useChat = ({
     setIsGenerating(false);
   };
 
-  const onError = (error: string) => {
+  const onError = () => {
     // errorToast({ description: error });
     setIsGenerating(false);
   };
