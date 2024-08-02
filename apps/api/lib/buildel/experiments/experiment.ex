@@ -9,6 +9,9 @@ defmodule Buildel.Experiments.Experiment do
     belongs_to(:pipeline, Buildel.Pipelines.Pipeline)
     belongs_to(:dataset, Buildel.Datasets.Dataset)
 
+    has_many(:runs, Buildel.Experiments.Runs.Run, on_delete: :delete_all)
+    field(:runs_count, :integer, default: 0)
+
     timestamps()
   end
 

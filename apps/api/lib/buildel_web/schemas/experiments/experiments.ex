@@ -67,4 +67,39 @@ defmodule BuildelWeb.Schemas.Experiments do
       required: [:experiment]
     })
   end
+
+  defmodule Runs do
+    defmodule Run do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "ExperimentRun",
+        type: :object,
+        properties: %{
+          id: %Schema{type: :integer, description: "Experiment Run ID"},
+          status: %Schema{
+            description: "Run status",
+            type: :string,
+            enum: ["created", "running", "finished"]
+          },
+          created_at: %Schema{type: :string, description: "Created at"}
+        },
+        required: [:id, :status, :created_at]
+      })
+    end
+
+    defmodule IndexResponse do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "ExperimentRunIndexResponse",
+        type: :object,
+        properties: %{
+          data: %Schema{type: :array, items: Run, description: "Runs list"},
+          meta: BuildelWeb.Schemas.Pagination.Meta
+        },
+        required: [:data, :meta]
+      })
+    end
+  end
 end
