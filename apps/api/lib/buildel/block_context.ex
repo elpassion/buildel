@@ -9,6 +9,7 @@ defmodule Buildel.BlockContextBehaviour do
   @callback get_vector_db(String.t(), String.t()) :: Buildel.VectorDB.t()
   @callback get_global_collection_name(String.t(), String.t()) :: {:ok, String.t()}
   @callback get_secret_from_context(String.t(), String.t()) :: {:ok, String.t()}
+  @callback get_dataset_from_context(String.t(), String.t()) :: any()
 end
 
 defmodule Buildel.BlockContext do
@@ -154,6 +155,18 @@ defmodule Buildel.BlockContext do
            Buildel.Organizations.get_organization!(organization_id),
          {:ok, secret} <- Buildel.Organizations.get_organization_secret(organization, secret_name) do
       secret.value
+    else
+      _ -> nil
+    end
+  end
+
+  @impl true
+  def get_dataset_from_context(context_id, dataset_id) do
+    with %{global: organization_id} = context_from_context_id(context_id),
+         %Buildel.Organizations.Organization{} = organization <-
+           Buildel.Organizations.get_organization!(organization_id),
+         {:ok, dataset} <- Buildel.Datasets.get_organization_dataset(organization, dataset_id) do
+      dataset
     else
       _ -> nil
     end

@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks do
+  alias Buildel.Blocks.DatasetOutput
   alias Buildel.Blocks.FileInput
 
   alias Buildel.Blocks.{
@@ -30,7 +31,8 @@ defmodule Buildel.Blocks do
     FileOutput,
     Date,
     Comment,
-    WorkflowCall
+    WorkflowCall,
+    DatasetOutput
   }
 
   @names_to_blocks_map %{
@@ -61,7 +63,8 @@ defmodule Buildel.Blocks do
     "file_output" => FileOutput,
     "date" => Date,
     "comment" => Comment,
-    "workflow_call" => WorkflowCall
+    "workflow_call" => WorkflowCall,
+    "dataset_output" => DatasetOutput
   }
 
   @blocks_to_names_map %{
@@ -92,7 +95,8 @@ defmodule Buildel.Blocks do
     FileOutput => "file_output",
     Date => "date",
     Comment => "comment",
-    WorkflowCall => "workflow_call"
+    WorkflowCall => "workflow_call",
+    DatasetOutput => "dataset_output"
   }
 
   def list_types() do

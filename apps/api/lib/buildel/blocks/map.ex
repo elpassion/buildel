@@ -66,7 +66,7 @@ defmodule Buildel.Blocks.MapInputs do
 
   @impl true
   def handle_input("input", {topic, :text, message, _metadata}, state) do
-    state |> save_latest_input_value(topic, message) |> combine()
+    state |> save_latest_input_value(topic, message |> String.trim()) |> combine()
   end
 
   defp interpolate_template_with_take_latest_messages(state, template) do

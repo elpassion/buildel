@@ -442,6 +442,45 @@ defmodule Buildel.Blocks.Block do
         }
       end
 
+      defp dataset_schema(
+             %{
+               "title" => title,
+               "description" => description,
+               "readonly" => readonly
+             } \\ %{
+               "title" => "Dataset",
+               "description" => "Dataset to interact with",
+               "readonly" => false
+             }
+           ) do
+        %{
+          "type" => "string",
+          "title" => title,
+          "description" => description,
+          "readonly" => readonly,
+          "url" => "/api/organizations/{{organization_id}}/datasets",
+          "presentAs" => "async-creatable-select",
+          "schema" => %{
+            "type" => "object",
+            "required" => ["dataset"],
+            "properties" => %{
+              "dataset" => %{
+                "type" => "object",
+                "properties" => %{
+                  "name" => %{
+                    "type" => "string",
+                    "title" => "Name",
+                    "description" => "The name for dataset.",
+                    "minLength" => 1
+                  }
+                },
+                "required" => ["name"]
+              }
+            }
+          }
+        }
+      end
+
       defp get_input(inputs, name) do
         %{block: block, io: output_name} = BlockPubSub.io_from_topic(name)
 
