@@ -152,12 +152,10 @@ defmodule Buildel.Experiments.Runs do
                 |> Map.put(output.block_name, output.data)
               end)
             )
-            |> IO.inspect(label: "finishing")
 
           {:ok, _run_row_run} =
             run_row_run
             |> RunRowRun.finish(data)
-            |> IO.inspect(label: "finished with #{inspect(data)}")
 
           run |> Pipelines.Runner.stop_run()
         end)

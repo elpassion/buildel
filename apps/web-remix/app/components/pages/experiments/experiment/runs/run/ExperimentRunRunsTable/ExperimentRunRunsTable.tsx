@@ -66,6 +66,8 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
           cell: (info) => {
             const value = info.getValue();
 
+            if (!value) return '';
+
             if (value.trim() === 'true') return '100%';
             if (value.trim() === 'false') return '0%';
 
