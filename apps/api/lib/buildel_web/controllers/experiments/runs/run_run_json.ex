@@ -21,7 +21,10 @@ defmodule BuildelWeb.ExperimentRunRunJSON do
       id: run.id,
       status: run |> RunRowRun.status(),
       created_at: run.inserted_at,
-      data: run.data
+      data: run.data,
+      run_id: run.run_id,
+      experiment_run_id: run.experiment_run_id,
+      dataset_row_id: run.dataset_row_id
     }
   end
 end

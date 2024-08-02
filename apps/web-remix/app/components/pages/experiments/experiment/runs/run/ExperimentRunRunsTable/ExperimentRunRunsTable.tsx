@@ -53,6 +53,16 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
         ),
         header: 'Status',
       }),
+      columnHelper.accessor('dataset_row_id', {
+        id: 'dataset_row_id',
+        cell: (info) => info.getValue()?.toString(),
+        header: 'Dataset Row ID',
+      }),
+      columnHelper.accessor('run_id', {
+        id: 'run_id',
+        cell: (info) => info.getValue()?.toString(),
+        header: 'Run ID',
+      }),
     ],
     [],
   );
