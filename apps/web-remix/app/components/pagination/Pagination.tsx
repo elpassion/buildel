@@ -19,7 +19,10 @@ export const Pagination: React.FC<PaginationProps> = ({
   loaderUrl,
 }) => {
   const navigate = useNavigate();
-  const { totalPages, page } = { ...DEFAULT_PAGINATION, ...pagination };
+  const { totalPages, page, per_page, totalItems } = {
+    ...DEFAULT_PAGINATION,
+    ...pagination,
+  };
   const hasNextPage = totalPages > page + 1;
   const hasPreviousPage = page > 0;
 
@@ -39,12 +42,15 @@ export const Pagination: React.FC<PaginationProps> = ({
     navigate(urlWithParams);
   };
 
-  const currentPage = totalPages > 0 ? page + 1 : 0;
+  const firstPageItem = totalItems === 0 ? 0 : page * per_page + 1;
+  const lastPageItem = (page + 1) * per_page;
 
   return (
     <div className="flex gap-2 items-center">
       <p className="text-sm text-muted-foreground">
-        page {currentPage} of {totalPages}
+        {firstPageItem}-
+        {totalItems - lastPageItem < 0 ? totalItems : lastPageItem} of{' '}
+        {totalItems}
       </p>
 
       <PaginationButton disabled={!hasPreviousPage} onClick={onPrev}>
