@@ -38,3 +38,16 @@ export const ExperimentRunsResponse = z
     meta: PaginationMeta,
   })
   .transform((res) => ({ data: res.data, meta: res.meta }));
+
+export const ExperimentRunRun = z.object({
+  id: z.union([z.number(), z.string()]),
+  created_at: z.string(),
+  status: z.enum(['running', 'finished', 'created']),
+});
+
+export const ExperimentRunRunsResponse = z
+  .object({
+    data: z.array(ExperimentRunRun),
+    meta: PaginationMeta,
+  })
+  .transform((res) => ({ data: res.data, meta: res.meta }));

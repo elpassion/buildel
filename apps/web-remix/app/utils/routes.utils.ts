@@ -289,7 +289,13 @@ export const routes = {
   experimentRuns: (
     organizationId: OrganizationId,
     experimentId: ExperimentId,
+
   ) => `${routes.experiment(organizationId, experimentId)}/runs`,
+  experimentRun: (
+    organizationId: OrganizationId,
+    experimentId: ExperimentId,
+    runId: RunId
+  ) => `${routes.experimentRuns(organizationId, experimentId)}/${runId}`,
 };
 
 type OrganizationId = string | number;
@@ -298,3 +304,4 @@ type RunId = string | number;
 type DatasetId = string | number;
 type RowId = string | number;
 type ExperimentId = string | number;
+type RunId = string | number;

@@ -7,6 +7,7 @@ import { buildUrlWithParams } from '~/utils/url';
 import type { CreateExperimentSchema } from './experiments.contracts';
 import {
   ExperimentResponse,
+  ExperimentRunRunsResponse,
   ExperimentRunsResponse,
   ExperimentsResponse,
 } from './experiments.contracts';
@@ -74,5 +75,18 @@ export class ExperimentsApi {
       `/organizations/${organizationId}/experiments/${experimentId}/runs`,
       { method: 'POST' },
     );
+  }
+
+  async getExperimentRunRuns(
+    organizationId: string | number,
+    experimentId: string | number,
+    runId: string | number,
+    pagination?: PaginationQueryParams,
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/experiments/${experimentId}/runs/${runId}/runs`,
+      { ...pagination },
+    );
+    return this.client(ExperimentRunRunsResponse, url);
   }
 }
