@@ -37,19 +37,15 @@ export const DatasetRowsResponse = z
   .transform((res) => ({ data: res.data, meta: res.meta }));
 
 export const CreateDatasetSchema = z.object({
-  file_id: z.union([z.number(), z.string()]),
+  file_id: z.union([z.number(), z.string()]).optional(),
   name: z.string().min(2),
 });
 
 export const CreateDatasetFileUpload = z.object({
   name: z.string().min(2),
-  file: z
-    .any()
-    .refine((file: File) => file.size > 0, 'File is required')
-    .refine(
-      (file: File) => file.type.includes('csv'),
-      'File must be a CSV file',
-    ),
+  file: z.any().refine((file: File) => {
+    return file.size > 0 ? file.type.includes('csv') : true;
+  }, 'File must be a CSV file'),
 });
 
 export const UpdateDatasetRowSchema = z.object({

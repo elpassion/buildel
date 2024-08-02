@@ -57,7 +57,7 @@ defmodule BuildelWeb.Schemas.Datasets do
             name: %Schema{type: :string, description: "Dataset name"},
             file_id: %Schema{type: :string, description: "Dataset File ID"}
           },
-          required: [:name, :file_id]
+          required: [:name]
         }
       },
       required: [:dataset]

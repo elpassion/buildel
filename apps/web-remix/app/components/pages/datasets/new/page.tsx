@@ -98,12 +98,19 @@ export function NewDataset() {
     e.preventDefault();
 
     try {
-      const fileId = await handleUploadFile({
-        name: data.name,
-        file: data.file as File,
-      });
+      if (!data.file || data.file.size === 0) {
+        fetcher.submit({ name: data.name }, { method: 'POST' });
+      } else {
+        const fileId = await handleUploadFile({
+          name: data.name,
+          file: data.file as File,
+        });
 
-      fetcher.submit({ file_id: fileId, name: data.name }, { method: 'POST' });
+        fetcher.submit(
+          { file_id: fileId, name: data.name },
+          { method: 'POST' },
+        );
+      }
     } catch {
       errorToast('Something went wrong!');
     }

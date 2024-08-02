@@ -44,7 +44,7 @@ defmodule Buildel.Datasets do
     end
   end
 
-  def create_organization_dataset(%Organization{} = organization, attrs \\ %{}) do
+  def create_organization_dataset(%Organization{} = organization, %{file_id: _} = attrs) do
     with {:ok, dataset_file} <- Buildel.Datasets.DatasetFile.get(attrs.file_id) do
       case create_dataset(Map.put(attrs, :organization_id, organization.id)) do
         {:ok, dataset} ->
@@ -67,5 +67,9 @@ defmodule Buildel.Datasets do
           e
       end
     end
+  end
+
+  def create_organization_dataset(%Organization{} = organization, attrs) do
+    create_dataset(Map.put(attrs, :organization_id, organization.id))
   end
 end
