@@ -13,6 +13,7 @@ import {
 import {
   Briefcase,
   ChevronDown,
+  FlaskConical,
   FolderCog,
   Key,
   Layers,
@@ -196,6 +197,15 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
           icon={<FolderCog className="min-w-4 w-4 h-4 text-center leading-5" />}
           onlyIcon={isCollapsed}
           text="Datasets"
+        />
+
+        <SidebarLink
+          to={routes.experiments(organization.id)}
+          icon={
+            <FlaskConical className="min-w-4 w-4 h-4 text-center leading-5" />
+          }
+          onlyIcon={isCollapsed}
+          text="Experiments"
         />
       </div>
 

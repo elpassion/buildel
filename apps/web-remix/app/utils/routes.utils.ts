@@ -280,6 +280,12 @@ export const routes = {
       `${routes.dataset(organizationId, datasetId)}/rows/new`,
       params,
     ),
+  experiments: (organizationId: OrganizationId) =>
+    `${routes.organization(organizationId)}/experiments`,
+  experimentsNew: (organizationId: OrganizationId) =>
+    `${routes.experiments(organizationId)}/new`,
+  experiment: (organizationId: OrganizationId, experimentId: ExperimentId) =>
+    `${routes.experiments(organizationId)}/${experimentId}`,
 };
 
 type OrganizationId = string | number;
@@ -287,3 +293,4 @@ type PipelineId = string | number;
 type RunId = string | number;
 type DatasetId = string | number;
 type RowId = string | number;
+type ExperimentId = string | number;
