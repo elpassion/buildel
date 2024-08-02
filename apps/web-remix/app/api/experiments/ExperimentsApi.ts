@@ -5,6 +5,7 @@ import type { fetchTyped } from '~/utils/fetch.server';
 import type { CreateExperimentSchema } from './experiments.contracts';
 import {
   ExperimentResponse,
+  ExperimentRunsResponse,
   ExperimentsResponse,
 } from './experiments.contracts';
 
@@ -47,6 +48,16 @@ export class ExperimentsApi {
       ExperimentResponse,
       `/organizations/${organizationId}/experiments`,
       { method: 'POST', body: JSON.stringify({ experiment: data }) },
+    );
+  }
+
+  async getExperimentRuns(
+    organizationId: string | number,
+    experimentId: string | number,
+  ) {
+    return this.client(
+      ExperimentRunsResponse,
+      `/organizations/${organizationId}/experiments/${experimentId}/runs`,
     );
   }
 }
