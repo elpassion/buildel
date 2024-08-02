@@ -1,4 +1,5 @@
 defmodule Buildel.Experiments.Runs do
+  alias Buildel.Experiments
   alias Buildel.Experiments.Runs.RunRowRun
   alias Buildel.BlockPubSub
   alias Buildel.Pipelines.Pipeline
@@ -162,7 +163,7 @@ defmodule Buildel.Experiments.Runs do
         :ok
       end)
 
-      {:ok, experiment_run}
+      experiment_run |> Experiments.Runs.Run.start()
     end
   end
 

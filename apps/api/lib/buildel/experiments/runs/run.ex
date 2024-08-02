@@ -28,4 +28,12 @@ defmodule Buildel.Experiments.Runs.Run do
       changeset
     end)
   end
+
+  def start(run) do
+    run |> update_status(:running) |> Buildel.Repo.update()
+  end
+
+  defp update_status(run, status) do
+    run |> cast(%{status: status}, [:status])
+  end
 end
