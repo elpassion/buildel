@@ -18,6 +18,12 @@ defmodule Buildel.Datasets.Rows do
     end
   end
 
+  def list_dataset_rows(%Dataset{} = dataset) do
+    DatasetRow
+    |> where([d], d.dataset_id == ^dataset.id)
+    |> Repo.all()
+  end
+
   def list_dataset_rows(%Dataset{} = dataset, %Params{} = params) do
     query = build_query(dataset.id, params)
 
