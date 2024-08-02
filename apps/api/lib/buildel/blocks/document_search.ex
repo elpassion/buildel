@@ -183,7 +183,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     {:noreply, state}
   end
 
-  def handle_cast({:add_file, {:binary, file_path}, metadata}, state) do
+  def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
     state = send_stream_start(state)
 
     %{organization_id: organization_id, collection_id: collection_id} =

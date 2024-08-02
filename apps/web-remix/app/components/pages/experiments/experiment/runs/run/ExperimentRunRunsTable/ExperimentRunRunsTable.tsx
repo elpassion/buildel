@@ -29,6 +29,12 @@ const columnHelper = createColumnHelper<IExperimentRunRun>();
 export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
   data,
 }) => {
+  const dynamicColumnNames = useMemo(() => {
+    if (data.length === 0) return [];
+
+    return Object.keys(data[0].data);
+  }, [data]);
+
   const columns = useMemo(
     () => [
       columnHelper.accessor('created_at', {
@@ -53,6 +59,25 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
         ),
         header: 'Status',
       }),
+      ...dynamicColumnNames.map((name) =>
+        columnHelper.accessor(`data.${name}`, {
+          header: name,
+          id: name,
+          cell: (info) => {
+            const value = info.getValue();
+
+            if (value.trim() === 'true') return '100%';
+            if (value.trim() === 'false') return '0%';
+
+            const num = Number(value);
+
+            if (Number.isInteger(num) && num >= 1 && num <= 100) {
+              return `${num}%`;
+            }
+            return info.getValue();
+          },
+        }),
+      ),
       columnHelper.accessor('dataset_row_id', {
         id: 'dataset_row_id',
         cell: (info) => info.getValue()?.toString(),
@@ -64,7 +89,7 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
         header: 'Run ID',
       }),
     ],
-    [],
+    [dynamicColumnNames],
   );
 
   const table = useReactTable({
