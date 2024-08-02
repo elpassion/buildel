@@ -101,5 +101,18 @@ defmodule BuildelWeb.Schemas.Experiments do
         required: [:data, :meta]
       })
     end
+
+    defmodule ShowResponse do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "ExperimentRunShowResponse",
+        type: :object,
+        properties: %{
+          data: Run
+        },
+        required: [:data]
+      })
+    end
   end
 end

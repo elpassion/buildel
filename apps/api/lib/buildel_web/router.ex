@@ -230,7 +230,7 @@ defmodule BuildelWeb.Router do
     resources(
       "/organizations/:organization_id/experiments/:experiment_id/runs",
       ExperimentRunController,
-      only: [:index]
+      only: [:index, :create]
     )
 
     resources(

@@ -18,4 +18,10 @@ defmodule Buildel.Experiments.Runs do
 
     {:ok, results, experiment.runs_count}
   end
+
+  def create_experiment_run(%Experiment{} = experiment, params \\ %{}) do
+    %Run{experiment_id: experiment.id}
+    |> Run.changeset(params)
+    |> Repo.insert()
+  end
 end

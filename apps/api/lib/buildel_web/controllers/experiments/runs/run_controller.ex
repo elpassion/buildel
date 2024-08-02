@@ -4,6 +4,7 @@ defmodule BuildelWeb.ExperimentRunController do
 
   import BuildelWeb.UserAuth
 
+  alias Buildel.Experiments.Runs
   alias Buildel.Experiments
   alias Buildel.Experiments.Experiment
   alias OpenApiSpex.Schema
@@ -60,6 +61,44 @@ defmodule BuildelWeb.ExperimentRunController do
              pagination_params
            ) do
       render(conn, :index, runs: runs, pagination_params: pagination_params, total: total)
+    end
+  end
+
+  operation :create,
+    summary: "Create experiment run",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ],
+      experiment_id: [in: :path, description: "Experiment ID", type: :integer, required: true]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Experiments.Runs.ShowResponse},
+      not_found: {"not_found", "application/json", BuildelWeb.Schemas.Errors.NotFoundResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def create(conn, _params) do
+    %{organization_id: organization_id, experiment_id: experiment_id} = conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, %Experiment{} = experiment} <-
+           Experiments.get_organization_experiment(organization, experiment_id),
+         {:ok, run} <-
+           Runs.create_experiment_run(experiment, %{}) do
+      render(conn, :show, run: run)
     end
   end
 end
