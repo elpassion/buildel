@@ -116,6 +116,7 @@ export const DatasetsListItem: React.FC<DatasetsListItemProps> = ({
       </CardHeader>
 
       <CardContent>
+        <CardDescription>Rows: {data.rows_count}</CardDescription>
         <CardDescription>{dayjs(data.created_at).format()}</CardDescription>
       </CardContent>
     </Card>

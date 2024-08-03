@@ -45,27 +45,29 @@ defmodule Buildel.Datasets do
   end
 
   def create_organization_dataset(%Organization{} = organization, %{file_id: _} = attrs) do
-    with {:ok, dataset_file} <- Buildel.Datasets.DatasetFile.get(attrs.file_id) do
-      case create_dataset(Map.put(attrs, :organization_id, organization.id)) do
-        {:ok, dataset} ->
-          time = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+    with {:ok, dataset_file} <- Buildel.Datasets.DatasetFile.get(attrs.file_id),
+         {:ok, dataset} <- create_dataset(Map.put(attrs, :organization_id, organization.id)) do
+      time = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
-          rows =
-            dataset_file.rows
-            |> Enum.map(fn row ->
-              row
-              |> Map.put(:dataset_id, dataset.id)
-              |> Map.put(:inserted_at, time)
-              |> Map.put(:updated_at, time)
-            end)
+      rows =
+        dataset_file.rows
+        |> Enum.map(fn row ->
+          row
+          |> Map.put(:dataset_id, dataset.id)
+          |> Map.put(:inserted_at, time)
+          |> Map.put(:updated_at, time)
+        end)
 
-          {_inserted_records, nil} = Buildel.Repo.insert_all(DatasetRow, rows)
+      {inserted_records, nil} = Buildel.Repo.insert_all(DatasetRow, rows)
 
-          {:ok, dataset}
+      query = from Dataset, where: [id: ^dataset.id]
 
-        e ->
-          e
-      end
+      Buildel.Repo.update_all(
+        query,
+        inc: [rows_count: inserted_records]
+      )
+
+      {:ok, dataset}
     end
   end
 
@@ -86,7 +88,14 @@ defmodule Buildel.Datasets do
           |> Map.put(:updated_at, time)
         end)
 
-      {_inserted_records, nil} = Buildel.Repo.insert_all(DatasetRow, rows)
+      {inserted_records, nil} = Buildel.Repo.insert_all(DatasetRow, rows)
+
+      query = from Dataset, where: [id: ^dataset.id]
+
+      Buildel.Repo.update_all(
+        query,
+        inc: [rows_count: inserted_records]
+      )
 
       {:ok, dataset}
     end

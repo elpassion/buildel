@@ -7,6 +7,8 @@ defmodule Buildel.Datasets.Dataset do
 
     belongs_to(:organization, Buildel.Organizations.Organization)
 
+    field(:rows_count, :integer, default: 0)
+
     timestamps()
   end
 

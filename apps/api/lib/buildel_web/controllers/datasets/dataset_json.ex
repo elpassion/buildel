@@ -13,6 +13,7 @@ defmodule BuildelWeb.DatasetJSON do
     %{
       id: dataset.id,
       name: dataset.name,
+      rows_count: dataset.rows_count,
       created_at: dataset.inserted_at
     }
   end
