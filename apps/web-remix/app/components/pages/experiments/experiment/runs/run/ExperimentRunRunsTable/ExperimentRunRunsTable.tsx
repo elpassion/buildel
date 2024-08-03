@@ -5,9 +5,15 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { z } from 'zod';
 
+import { ExperimentRunColumns } from '~/api/experiments/experiments.contracts';
 import { EmptyMessage } from '~/components/list/ItemList';
-import type { IExperimentRunRun } from '~/components/pages/experiments/experiments.types';
+import type {
+  IExperiment,
+  IExperimentRun,
+  IExperimentRunRun,
+} from '~/components/pages/experiments/experiments.types';
 import {
   Table,
   TableBody,
@@ -22,19 +28,15 @@ import { dayjs } from '~/utils/Dayjs';
 
 interface ExperimentRunRunsTableProps {
   data: IExperimentRunRun[];
+  dynamicColumns: IExperimentRun['columns'];
 }
 
 const columnHelper = createColumnHelper<IExperimentRunRun>();
 
 export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
   data,
+  dynamicColumns,
 }) => {
-  const dynamicColumnNames = useMemo(() => {
-    if (data.length === 0) return [];
-
-    return Object.keys(data[0].data);
-  }, [data]);
-
   const columns = useMemo(
     () => [
       columnHelper.accessor('created_at', {
@@ -59,9 +61,18 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
         ),
         header: 'Status',
       }),
-      ...dynamicColumnNames.map((name) =>
+      ...dynamicColumns.inputs.map((name) =>
         columnHelper.accessor(`data.${name}`, {
-          header: name,
+          header: `Input: ${name}`,
+          id: name,
+          cell: (info) => {
+            return info.getValue();
+          },
+        }),
+      ),
+      ...dynamicColumns.outputs.map((name) =>
+        columnHelper.accessor(`data.${name}`, {
+          header: `Evaluation: ${name}`,
           id: name,
           cell: (info) => {
             const value = info.getValue();
@@ -91,7 +102,7 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
         header: 'Run ID',
       }),
     ],
-    [dynamicColumnNames],
+    [],
   );
 
   const table = useReactTable({

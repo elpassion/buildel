@@ -20,6 +20,10 @@ defmodule BuildelWeb.ExperimentRunJSON do
     %{
       id: run.id,
       status: run.status,
+      columns: %{
+        inputs: run.inputs,
+        outputs: run.outputs
+      },
       created_at: run.inserted_at
     }
   end

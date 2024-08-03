@@ -24,6 +24,12 @@ export async function loader(args: LoaderFunctionArgs) {
       params.experimentId,
     );
 
+    const experimentRunPromise = experimentsApi.getExperimentRun(
+      params.organizationId,
+      params.experimentId,
+      params.runId,
+    );
+
     const experimentRunRunsPromise = experimentsApi.getExperimentRunRuns(
       params.organizationId,
       params.experimentId,
@@ -31,8 +37,15 @@ export async function loader(args: LoaderFunctionArgs) {
       { page, per_page, search: search ?? '' },
     );
 
-    const [{ data: experiment }, { data: experimentRunRuns }] =
-      await Promise.all([experimentPromise, experimentRunRunsPromise]);
+    const [
+      { data: experiment },
+      { data: experimentRunRuns },
+      { data: experimentRun },
+    ] = await Promise.all([
+      experimentPromise,
+      experimentRunRunsPromise,
+      experimentRunPromise,
+    ]);
 
     const totalItems = experimentRunRuns.meta.total;
     const totalPages = Math.ceil(totalItems / per_page);
@@ -43,6 +56,7 @@ export async function loader(args: LoaderFunctionArgs) {
       experimentId: params.experimentId,
       runId: params.runId,
       experiment: experiment.data,
+      experimentRun: experimentRun.data,
       experimentRunRuns: experimentRunRuns.data,
       pagination,
     });

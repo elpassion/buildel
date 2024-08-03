@@ -82,9 +82,17 @@ defmodule BuildelWeb.Schemas.Experiments do
             type: :string,
             enum: ["created", "running", "finished"]
           },
+          columns: %Schema{
+            type: :object,
+            properties: %{
+              inputs: %Schema{type: :array, items: %Schema{type: :string}},
+              outputs: %Schema{type: :array, items: %Schema{type: :string}}
+            },
+            required: [:inputs, :outputs]
+          },
           created_at: %Schema{type: :string, description: "Created at"}
         },
-        required: [:id, :status, :created_at]
+        required: [:id, :status, :created_at, :columns]
       })
     end
 

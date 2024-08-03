@@ -41,7 +41,7 @@ defmodule Buildel.Experiments do
          )
          |> Repo.one() do
       nil -> {:error, :not_found}
-      experiment -> {:ok, experiment}
+      experiment -> {:ok, experiment |> Repo.preload(:pipeline)}
     end
   end
 end

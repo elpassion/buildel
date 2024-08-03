@@ -15,6 +15,7 @@ export function ExperimentRunPage() {
     organizationId,
     experimentId,
     experiment,
+    experimentRun,
     experimentRunRuns,
     runId,
     pagination,
@@ -31,7 +32,10 @@ export function ExperimentRunPage() {
       />
 
       <PageContentWrapper className="mt-6 lg:mt-[120px] pb-3">
-        <ExperimentRunRunsTable data={experimentRunRuns} />
+        <ExperimentRunRunsTable
+          data={experimentRunRuns}
+          dynamicColumns={experimentRun.columns}
+        />
 
         <div className="flex justify-end mt-4">
           <Pagination

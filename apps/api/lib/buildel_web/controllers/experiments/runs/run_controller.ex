@@ -97,7 +97,7 @@ defmodule BuildelWeb.ExperimentRunController do
          {:ok, %Experiment{} = experiment} <-
            Experiments.get_organization_experiment(organization, experiment_id),
          {:ok, run} <-
-           Runs.create_experiment_run(experiment, %{}),
+           Runs.create_experiment_run(experiment),
          {:ok, run} <- Runs.start_run(run) do
       render(conn, :show, run: run)
     end

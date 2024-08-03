@@ -26,10 +26,20 @@ export const CreateExperimentSchema = z.object({
   name: z.string().min(2),
 });
 
+export const ExperimentRunColumns = z.object({
+  inputs: z.array(z.string()),
+  outputs: z.array(z.string()),
+});
+
 export const ExperimentRun = z.object({
   id: z.union([z.number(), z.string()]),
   created_at: z.string(),
   status: z.enum(['running', 'finished', 'created']),
+  columns: ExperimentRunColumns,
+});
+
+export const ExperimentRunResponse = z.object({
+  data: ExperimentRun,
 });
 
 export const ExperimentRunsResponse = z

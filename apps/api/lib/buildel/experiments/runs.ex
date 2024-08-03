@@ -40,9 +40,16 @@ defmodule Buildel.Experiments.Runs do
     {:ok, results, run.runs_count}
   end
 
-  def create_experiment_run(%Experiment{} = experiment, params \\ %{}) do
+  def create_experiment_run(%Experiment{} = experiment) do
+    pipeline_ios =
+      experiment.pipeline
+      |> Pipeline.ios(public: true)
+
     case %Run{experiment_id: experiment.id}
-         |> Run.changeset(params)
+         |> Run.changeset(%{
+           inputs: pipeline_ios.inputs |> Enum.map(& &1.block_name),
+           outputs: pipeline_ios.outputs |> Enum.map(& &1.block_name)
+         })
          |> Repo.insert() do
       {:ok, run} -> {:ok, run |> Repo.preload(experiment: [:dataset, :pipeline])}
       e -> e
@@ -62,27 +69,7 @@ defmodule Buildel.Experiments.Runs do
          %Pipeline{} = pipeline <- experiment_run.experiment.pipeline,
          {:ok, pipeline_config} <- Pipelines.get_pipeline_config(pipeline, "latest") do
       public_outputs =
-        Map.get(pipeline_config, "blocks", [])
-        |> Enum.map(fn block ->
-          case Buildel.Blocks.type(block["type"]) do
-            nil -> nil
-            type -> Map.put(type.options(), :name, block["name"])
-          end
-        end)
-        |> Enum.filter(fn
-          nil -> false
-          _ -> true
-        end)
-        |> Enum.flat_map(fn block ->
-          block.outputs
-          |> Enum.map(fn output ->
-            %{
-              block_name: block.name,
-              output: output
-            }
-          end)
-        end)
-        |> Enum.filter(& &1.output.public)
+        Pipeline.ios(pipeline, public: true).outputs
 
       dataset_rows
       |> Enum.map(fn row ->
