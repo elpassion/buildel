@@ -72,4 +72,23 @@ defmodule Buildel.Datasets do
   def create_organization_dataset(%Organization{} = organization, attrs) do
     create_dataset(Map.put(attrs, :organization_id, organization.id))
   end
+
+  def add_file_to_dataset(%Dataset{} = dataset, attrs) do
+    with {:ok, dataset_file} <- Buildel.Datasets.DatasetFile.get(attrs.file_id) do
+      time = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+      rows =
+        dataset_file.rows
+        |> Enum.map(fn row ->
+          row
+          |> Map.put(:dataset_id, dataset.id)
+          |> Map.put(:inserted_at, time)
+          |> Map.put(:updated_at, time)
+        end)
+
+      {_inserted_records, nil} = Buildel.Repo.insert_all(DatasetRow, rows)
+
+      {:ok, dataset}
+    end
+  end
 end

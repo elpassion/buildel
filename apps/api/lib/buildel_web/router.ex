@@ -221,6 +221,8 @@ defmodule BuildelWeb.Router do
       only: [:index, :show, :create, :delete, :update]
     )
 
+    post("/organizations/:organization_id/datasets/:id/files", DatasetController, :create_file)
+
     resources(
       "/organizations/:organization_id/experiments",
       ExperimentController,

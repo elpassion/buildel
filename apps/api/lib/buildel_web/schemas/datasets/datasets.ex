@@ -95,4 +95,25 @@ defmodule BuildelWeb.Schemas.Datasets do
       required: [:data]
     })
   end
+
+  defmodule Files do
+    defmodule CreateFileRequest do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "DatasetFileCreateRequest",
+        type: :object,
+        properties: %{
+          file: %Schema{
+            type: :object,
+            properties: %{
+              file_id: %Schema{type: :string, description: "Dataset File ID"}
+            },
+            required: [:file_id]
+          }
+        },
+        required: [:file]
+      })
+    end
+  end
 end
