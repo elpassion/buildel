@@ -76,14 +76,7 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
 
             if (!value) return '';
 
-            if (value.trim() === 'true') return '100%';
-            if (value.trim() === 'false') return '0%';
-
-            const num = Number(value);
-
-            if (Number.isInteger(num) && num >= 1 && num <= 100) {
-              return `${num}%`;
-            }
+            if (typeof value === 'number') return `${value}%`;
             return info.getValue();
           },
         }),

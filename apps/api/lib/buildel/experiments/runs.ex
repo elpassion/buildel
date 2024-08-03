@@ -135,8 +135,11 @@ defmodule Buildel.Experiments.Runs do
               row.data,
               outputs
               |> Enum.reduce(%{}, fn output, acc ->
+                output_data = output.data |> String.trim()
+                {_, evaluation} = calculate_evaluation(output_data)
+
                 acc
-                |> Map.put(output.block_name, output.data)
+                |> Map.put(output.block_name, evaluation)
               end)
             )
 
@@ -182,6 +185,17 @@ defmodule Buildel.Experiments.Runs do
 
       _other ->
         outputs
+    end
+  end
+
+  defp calculate_evaluation("true"), do: {:ok, 100}
+  defp calculate_evaluation("false"), do: {:ok, 0}
+
+  defp calculate_evaluation(text) do
+    with {int, ""} when int >= 0 and int <= 100 <- Integer.parse(text) do
+      {:ok, int}
+    else
+      _ -> {:error, text}
     end
   end
 end

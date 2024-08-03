@@ -54,7 +54,7 @@ export const ExperimentRunRun = z.object({
   id: z.union([z.number(), z.string()]),
   created_at: z.string(),
   status: z.enum(['running', 'finished', 'created']),
-  data: z.record(z.string(), z.string()),
+  data: z.record(z.string(), z.union([z.string(), z.number()])),
   run_id: z.union([z.number(), z.string()]),
   experiment_run_id: z.union([z.number(), z.string()]),
   dataset_row_id: z.union([z.number(), z.string()]),
