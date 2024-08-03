@@ -90,8 +90,12 @@ defmodule BuildelWeb.ExperimentController do
     experiment_attrs =
       Map.merge(conn.body_params.experiment, %{organization_id: organization_id})
 
-    with {:ok, _organization} <-
+    with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, _pipeline} <-
+           Buildel.Pipelines.get_organization_pipeline(organization, conn.body_params.pipeline_id),
+         {:ok, _dataset} <-
+           Buildel.Datasets.get_organization_dataset(organization, conn.body_params.dataset_id),
          {:ok, experiment} <-
            Buildel.Experiments.create_experiment(experiment_attrs) do
       conn
