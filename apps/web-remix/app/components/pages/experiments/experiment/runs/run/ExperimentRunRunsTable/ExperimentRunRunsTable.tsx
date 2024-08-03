@@ -5,12 +5,9 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { z } from 'zod';
 
-import { ExperimentRunColumns } from '~/api/experiments/experiments.contracts';
 import { EmptyMessage } from '~/components/list/ItemList';
 import type {
-  IExperiment,
   IExperimentRun,
   IExperimentRunRun,
 } from '~/components/pages/experiments/experiments.types';

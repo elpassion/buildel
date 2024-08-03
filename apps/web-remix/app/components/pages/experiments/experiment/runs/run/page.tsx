@@ -1,6 +1,5 @@
-import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { Outlet, useLoaderData } from '@remix-run/react';
+import { useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
