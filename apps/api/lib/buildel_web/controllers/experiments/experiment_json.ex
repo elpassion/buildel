@@ -13,6 +13,7 @@ defmodule BuildelWeb.ExperimentJSON do
     %{
       id: experiment.id,
       name: experiment.name,
+      runs_count: experiment.runs_count,
       pipeline_id: experiment.pipeline_id,
       dataset_id: experiment.dataset_id,
       created_at: experiment.inserted_at

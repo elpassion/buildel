@@ -37,6 +37,7 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
     |> cast(%{data: data}, [:data])
     |> prepare_changes(fn changeset ->
       run_id = run_row_run.experiment_run_id
+      empty_map = %{}
 
       query =
         from(r in Run,
@@ -46,7 +47,7 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
             not exists(
               from(rrr in __MODULE__,
                 where:
-                  parent_as(:run).id == rrr.run_id and is_nil(rrr.data) and
+                  parent_as(:run).id == rrr.experiment_run_id and rrr.data == ^empty_map and
                     rrr.id != ^run_row_run.id
               )
             )

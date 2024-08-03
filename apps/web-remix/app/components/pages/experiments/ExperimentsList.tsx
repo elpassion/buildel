@@ -114,6 +114,7 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
       </CardHeader>
 
       <CardContent>
+        <CardDescription>Runs: {data.runs_count}</CardDescription>
         <CardDescription>{dayjs(data.created_at).format()}</CardDescription>
       </CardContent>
     </Card>
