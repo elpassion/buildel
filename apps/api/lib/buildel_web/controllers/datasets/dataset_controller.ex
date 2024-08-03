@@ -130,4 +130,39 @@ defmodule BuildelWeb.DatasetController do
       |> json(%{})
     end
   end
+
+  operation :update,
+    summary: "Update a dataset",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      id: [in: :path, description: "Dataset ID", type: :integer]
+    ],
+    request_body:
+      {"dataset", "application/json", BuildelWeb.Schemas.Datasets.UpdateDatasetRequest},
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Datasets.CreateDatasetResponse},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def update(conn, _) do
+    %{organization_id: organization_id, id: dataset_id} = conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, dataset} <- Buildel.Datasets.get_organization_dataset(organization, dataset_id),
+         {:ok, dataset} <-
+           Buildel.Datasets.update_dataset(
+             dataset,
+             conn.body_params.dataset
+           ) do
+      conn
+      |> put_status(:ok)
+      |> render(:show, dataset: dataset)
+    end
+  end
 end

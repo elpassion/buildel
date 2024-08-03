@@ -218,7 +218,7 @@ defmodule BuildelWeb.Router do
     resources(
       "/organizations/:organization_id/datasets",
       DatasetController,
-      only: [:index, :show, :create, :delete]
+      only: [:index, :show, :create, :delete, :update]
     )
 
     resources(

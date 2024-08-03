@@ -64,6 +64,25 @@ defmodule BuildelWeb.Schemas.Datasets do
     })
   end
 
+  defmodule UpdateDatasetRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "DatasetUpdateRequest",
+      type: :object,
+      properties: %{
+        dataset: %Schema{
+          type: :object,
+          properties: %{
+            name: %Schema{type: :string, description: "Dataset name"}
+          },
+          required: [:name]
+        }
+      },
+      required: [:dataset]
+    })
+  end
+
   defmodule CreateDatasetResponse do
     require OpenApiSpex
 
