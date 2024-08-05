@@ -69,14 +69,25 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
       ),
       ...dynamicColumns.outputs.map((name) =>
         columnHelper.accessor(`data.${name}`, {
-          header: `Evaluation: ${name}`,
+          header: () => (
+            <span className="whitespace-nowrap">Evaluation: {name}</span>
+          ),
           id: name,
           cell: (info) => {
             const value = info.getValue();
 
             if (!value) return '';
 
-            if (typeof value === 'number') return `${value}%`;
+            if (typeof value === 'number')
+              return (
+                <Badge
+                  variant={
+                    value < 25 ? 'error' : value >= 75 ? 'success' : 'warning'
+                  }
+                >
+                  {value}%
+                </Badge>
+              );
             return info.getValue();
           },
         }),
