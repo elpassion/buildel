@@ -55,6 +55,8 @@ config :exla, :clients,
 config :nx, :default_defn_options, compiler: EXLA
 config :nx, :default_backend, EXLA.Backend
 
+config :req, :default_options, pool_timeout: 60_000
+
 config :buildel, :deepgram, Buildel.Clients.Deepgram
 config :buildel, :elevenlabs, Buildel.Clients.Elevenlabs
 config :buildel, :webhook, Buildel.Clients.Webhook
