@@ -269,7 +269,7 @@ export function EditBlockForm({
                 )}
               />
             )}
-            getPopupContainer={(node) => node.parentNode}
+            getPopupContainer={(node) => node.parentNode.parentNode}
           />
         </FormField>
       );
