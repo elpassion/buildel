@@ -7,6 +7,7 @@ import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Pagination } from '~/components/pagination/Pagination';
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
+import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { routes } from '~/utils/routes.utils';
 
 import { ExperimentRunsTable } from './ExperimentRunsTable/ExperimentRunsTable';
@@ -20,6 +21,10 @@ export function ExperimentPage() {
     experimentRuns,
     pagination,
   } = useLoaderData<typeof loader>();
+
+  const isRunning = experimentRuns.some((run) => run.status === 'running');
+
+  useRevalidateOnInterval({ enabled: isRunning, interval: 2000 });
 
   return (
     <>

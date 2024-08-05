@@ -37,6 +37,7 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
 }) => {
   const organizationId = useOrganizationId();
   const experimentId = useExperimentId();
+
   const columns = useMemo(
     () => [
       columnHelper.accessor('created_at', {

@@ -4,6 +4,7 @@ import { useLoaderData } from '@remix-run/react';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Pagination } from '~/components/pagination/Pagination';
+import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { routes } from '~/utils/routes.utils';
 
 import { ExperimentRunRunsTable } from './ExperimentRunRunsTable/ExperimentRunRunsTable';
@@ -19,6 +20,11 @@ export function ExperimentRunPage() {
     runId,
     pagination,
   } = useLoaderData<typeof loader>();
+
+  useRevalidateOnInterval({
+    enabled: experimentRun.status === 'running',
+    interval: 2000,
+  });
 
   return (
     <>
