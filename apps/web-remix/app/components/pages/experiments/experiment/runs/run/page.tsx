@@ -30,7 +30,7 @@ export function ExperimentRunPage() {
         }
       />
 
-      <PageContentWrapper className="mt-6 lg:mt-[120px] pb-3">
+      <PageContentWrapper className="mt-[120px] pb-3">
         <ExperimentRunRunsTable
           data={experimentRunRuns}
           dynamicColumns={experimentRun.columns}

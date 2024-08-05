@@ -53,7 +53,13 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
         id: 'status',
         cell: (info) => (
           <Badge
-            variant={info.getValue() !== 'finished' ? 'destructive' : 'outline'}
+            variant={
+              info.getValue() === 'finished'
+                ? 'secondary'
+                : info.getValue() === 'created'
+                  ? 'outline'
+                  : 'default'
+            }
           >
             {info.getValue()}
           </Badge>
