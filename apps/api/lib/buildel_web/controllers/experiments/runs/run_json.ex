@@ -20,6 +20,7 @@ defmodule BuildelWeb.ExperimentRunJSON do
     %{
       id: run.id,
       status: run.status,
+      runs_count: run.runs_count,
       columns: %{
         inputs: run.inputs,
         outputs: run.outputs

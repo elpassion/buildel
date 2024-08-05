@@ -35,6 +35,7 @@ export const ExperimentRunColumns = z.object({
 export const ExperimentRun = z.object({
   id: z.union([z.number(), z.string()]),
   created_at: z.string(),
+  runs_count: z.number().default(0),
   status: z.enum(['running', 'finished', 'created']),
   columns: ExperimentRunColumns,
 });
