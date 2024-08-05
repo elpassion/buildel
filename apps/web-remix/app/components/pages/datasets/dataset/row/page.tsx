@@ -1,11 +1,6 @@
 import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import {
-  useFetcher,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-} from '@remix-run/react';
+import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
@@ -30,16 +25,16 @@ import { DatasetRowEditorField } from '../DatasetRowEditorField';
 import type { loader } from './loader.server';
 
 export function DatasetRowPage() {
-  const { row, organizationId, datasetId, rowId, pagination } =
+  const { row, organizationId, datasetId, pagination } =
     useLoaderData<typeof loader>();
 
   const fetcher = useFetcher();
   const navigate = useNavigate();
-  const match = useMatch(routes.datasetRow(organizationId, datasetId, rowId));
-  const isModalOpen = !!match;
 
   const closeModal = () => {
-    navigate(routes.dataset(organizationId, datasetId, pagination));
+    navigate(routes.dataset(organizationId, datasetId, pagination), {
+      replace: true,
+    });
   };
 
   const onEdit = (
@@ -55,7 +50,7 @@ export function DatasetRowPage() {
 
   return (
     <>
-      <DialogDrawer open={isModalOpen} onOpenChange={closeModal}>
+      <DialogDrawer open={true} onOpenChange={closeModal}>
         <DialogDrawerContent className="md:w-[95%] md:max-w-[800px]">
           <DialogDrawerHeader>
             <DialogDrawerTitle>Dataset Row</DialogDrawerTitle>

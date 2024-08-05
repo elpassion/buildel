@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { useFetcher, useLoaderData } from '@remix-run/react';
+import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { CircleHelp } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
@@ -15,11 +15,20 @@ import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { errorToast } from '~/components/toasts/errorToast';
 import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+} from '~/components/ui/dialog-drawer';
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
 
@@ -116,47 +125,70 @@ export function NewDataset() {
     }
   };
 
+  const navigate = useNavigate();
+
+  const closeModal = (value: boolean) => {
+    if (value) return;
+    navigate(routes.datasets(organizationId), { replace: true });
+  };
+
   return (
-    <ValidatedForm
-      validator={validator}
-      method="post"
-      noValidate
-      className="w-full py-1 flex flex-col gap-4"
-      onSubmit={onSubmit}
-    >
-      <div>
-        <Field name="name">
-          <FieldLabel>Name</FieldLabel>
-          <TextInputField placeholder="Type a name..." />
-          <FieldMessage>It will help you identify the dataset</FieldMessage>
-        </Field>
-      </div>
+    <DialogDrawer open={true} onOpenChange={closeModal}>
+      <DialogDrawerContent>
+        <DialogDrawerHeader>
+          <DialogDrawerTitle>Create a new dataset</DialogDrawerTitle>
+          <DialogDrawerDescription>
+            Compile examples and build datasets using data from production or
+            other available sources.
+          </DialogDrawerDescription>
+        </DialogDrawerHeader>
 
-      <div>
-        <Field name="file">
-          <FieldLabel className="flex gap-1 items-center">
-            <span>File</span>
-            <TooltipProvider>
-              <Tooltip delayDuration={100}>
-                <TooltipTrigger>
-                  <CircleHelp className="w-3.5 h-3.5" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  Upload file in CSV format. Remember that first row should
-                  contain column names.
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </FieldLabel>
-          <SmallFileInputField multiple={false} accept=".csv" />
-          <FieldMessage />
-        </Field>
-      </div>
+        <DialogDrawerBody>
+          <ValidatedForm
+            validator={validator}
+            method="post"
+            noValidate
+            className="w-full py-1 flex flex-col gap-4"
+            onSubmit={onSubmit}
+          >
+            <div>
+              <Field name="name">
+                <FieldLabel>Name</FieldLabel>
+                <TextInputField placeholder="Type a name..." />
+                <FieldMessage>
+                  It will help you identify the dataset
+                </FieldMessage>
+              </Field>
+            </div>
 
-      <SubmitButton isFluid size="sm" className="mt-4">
-        Create dataset
-      </SubmitButton>
-    </ValidatedForm>
+            <div>
+              <Field name="file">
+                <FieldLabel className="flex gap-1 items-center">
+                  <span>File</span>
+                  <TooltipProvider>
+                    <Tooltip delayDuration={100}>
+                      <TooltipTrigger>
+                        <CircleHelp className="w-3.5 h-3.5" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        Upload file in CSV format. Remember that first row
+                        should contain column names.
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </FieldLabel>
+                <SmallFileInputField multiple={false} accept=".csv" />
+                <FieldMessage />
+              </Field>
+            </div>
+
+            <SubmitButton isFluid size="sm" className="mt-4">
+              Create dataset
+            </SubmitButton>
+          </ValidatedForm>
+        </DialogDrawerBody>
+      </DialogDrawerContent>
+    </DialogDrawer>
   );
 }
 

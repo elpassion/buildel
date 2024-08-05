@@ -1,11 +1,6 @@
 import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import {
-  useFetcher,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-} from '@remix-run/react';
+import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
@@ -34,11 +29,11 @@ export function DatasetRowNew() {
 
   const fetcher = useFetcher();
   const navigate = useNavigate();
-  const match = useMatch(routes.datasetRowNew(organizationId, datasetId));
-  const isModalOpen = !!match;
 
   const closeModal = () => {
-    navigate(routes.dataset(organizationId, datasetId, pagination));
+    navigate(routes.dataset(organizationId, datasetId, pagination), {
+      replace: true,
+    });
   };
 
   const onCreate = (
@@ -54,7 +49,7 @@ export function DatasetRowNew() {
 
   return (
     <>
-      <DialogDrawer open={isModalOpen} onOpenChange={closeModal}>
+      <DialogDrawer open={true} onOpenChange={closeModal}>
         <DialogDrawerContent className="md:w-[95%] md:max-w-[800px]">
           <DialogDrawerHeader>
             <DialogDrawerTitle>New Dataset Row</DialogDrawerTitle>
