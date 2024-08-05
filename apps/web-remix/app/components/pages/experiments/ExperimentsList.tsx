@@ -113,13 +113,20 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
         </MenuDropdown>
       </CardHeader>
 
-      <CardContent className="flex flex-row flex-wrap gap-2">
-        <CardDescription>Pipeline: {data.pipeline_id}</CardDescription>
-        <CardDescription>Dataset: {data.dataset_id}</CardDescription>
-        <CardDescription>Runs: {data.runs_count}</CardDescription>
-        <CardDescription className="w-full">
-          Created: {dayjs(data.created_at).format()}
+      <CardContent className="flex flex-row flex-wrap gap-x-2 gap-y-1">
+        <CardDescription className="line-clamp-1 w-full">
+          Pipeline: {data.pipeline.name}
         </CardDescription>
+
+        <CardDescription className="line-clamp-1 w-full">
+          Dataset: {data.dataset.name}
+        </CardDescription>
+
+        <CardDescription>
+          Created: {dayjs(data.created_at).format()},
+        </CardDescription>
+
+        <CardDescription>Runs: {data.runs_count}</CardDescription>
       </CardContent>
     </Card>
   );

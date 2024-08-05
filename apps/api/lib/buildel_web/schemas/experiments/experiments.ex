@@ -10,11 +10,17 @@ defmodule BuildelWeb.Schemas.Experiments do
       properties: %{
         id: %Schema{type: :integer, description: "Experiment ID"},
         name: %Schema{type: :string, description: "Experiment name"},
-        pipeline_id: %Schema{type: :integer, description: "Pipeline ID"},
-        dataset_id: %Schema{type: :integer, description: "Dataset ID"},
+        pipeline: %Schema{type: :object, properties: %{
+          id: %Schema{type: :integer, description: "Pipeline ID"},
+          name: %Schema{type: :string, description: "Pipeline name"}
+        }, required: [:id, :name]},
+        dataset: %Schema{type: :object, properties: %{
+          id: %Schema{type: :integer, description: "Dataset ID"},
+          name: %Schema{type: :string, description: "Dataset name"}
+        }, required: [:id, :name]},
         created_at: %Schema{type: :string, description: "Created at"}
       },
-      required: [:id, :name, :pipeline_id, :dataset_id, :created_at]
+      required: [:id, :name, :pipeline, :dataset, :created_at]
     })
   end
 

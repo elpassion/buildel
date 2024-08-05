@@ -5,8 +5,14 @@ import { PaginationMeta } from '~/components/pagination/pagination.types';
 export const Experiment = z.object({
   id: z.union([z.number(), z.string()]),
   runs_count: z.number().default(0),
-  dataset_id: z.union([z.number(), z.string()]),
-  pipeline_id: z.union([z.number(), z.string()]),
+  dataset: z.object({
+    id: z.union([z.number(), z.string()]),
+    name: z.string(),
+  }),
+  pipeline: z.object({
+    id: z.union([z.number(), z.string()]),
+    name: z.string(),
+  }),
   created_at: z.string(),
   name: z.string(),
 });

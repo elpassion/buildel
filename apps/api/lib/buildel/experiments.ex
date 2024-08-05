@@ -12,15 +12,21 @@ defmodule Buildel.Experiments do
   def get_experiment(id), do: Repo.get(Experiment, id)
 
   def create_experiment(attrs \\ %{}) do
-    %Experiment{}
-    |> Experiment.changeset(attrs)
-    |> Repo.insert()
+    case %Experiment{}
+         |> Experiment.changeset(attrs)
+         |> Repo.insert() do
+      {:ok, experiment} -> {:ok, experiment |> Repo.preload([:pipeline, :dataset])}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   def update_experiment(%Experiment{} = experiment, attrs) do
-    experiment
-    |> Experiment.changeset(attrs)
-    |> Repo.update()
+    case experiment
+         |> Membership.changeset(attrs)
+         |> Repo.update() do
+      {:ok, experiment} -> {:ok, experiment |> Repo.preload([:pipeline, :dataset])}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 
   def delete_experiment(%Experiment{} = experiment) do
@@ -33,6 +39,7 @@ defmodule Buildel.Experiments do
       order_by: [desc: d.inserted_at]
     )
     |> Repo.all()
+    |> Repo.preload([:pipeline, :dataset])
   end
 
   def get_organization_experiment(%Organization{} = organization, experiment_id) do
@@ -41,7 +48,7 @@ defmodule Buildel.Experiments do
          )
          |> Repo.one() do
       nil -> {:error, :not_found}
-      experiment -> {:ok, experiment |> Repo.preload(:pipeline)}
+      experiment -> {:ok, experiment |> Repo.preload([:pipeline, :dataset])}
     end
   end
 end

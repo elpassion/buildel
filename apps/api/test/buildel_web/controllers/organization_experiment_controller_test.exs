@@ -146,8 +146,8 @@ defmodule BuildelWeb.OrganizationExperimentControllerTest do
                "data" => %{
                  "name" => ^experiment_name,
                  "id" => _,
-                 "pipeline_id" => ^pipeline_id,
-                 "dataset_id" => ^dataset_id
+                 "pipeline" => %{ "id" => ^pipeline_id, "name" => _},
+                 "dataset" => %{ "id" => ^dataset_id, "name" => _},
                }
              } = response
 
