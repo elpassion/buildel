@@ -8,7 +8,7 @@ defmodule Buildel.Blocks.DatasetOutput do
       description: "Used to save data in datasets",
       groups: ["text", "inputs / outputs"],
       inputs: [Block.text_input()],
-      outputs: [],
+      outputs: [Block.text_output()],
       ios: [],
       dynamic_ios: nil,
       schema: schema()
@@ -50,12 +50,11 @@ defmodule Buildel.Blocks.DatasetOutput do
     case block_context().get_dataset_from_context(state.context_id, state.opts.dataset) do
       %Buildel.Datasets.Dataset{} = dataset ->
         Buildel.Datasets.Rows.create_row(dataset, %{data: Jason.decode!(text)})
+        output(state, "output", {:text, text})
 
       nil ->
-        nil
+        output(state, "output", {:text, text})
     end
-
-    state
   end
 
   def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do

@@ -5,10 +5,8 @@ defmodule BuildelWeb.ExperimentRunRunController do
   import BuildelWeb.UserAuth
 
   alias Buildel.Experiments.Runs.Run
-  alias Buildel.Experiments.Runs
   alias Buildel.Experiments
   alias Buildel.Experiments.Experiment
-  alias OpenApiSpex.Schema
   alias Buildel.Organizations
 
   action_fallback(BuildelWeb.FallbackController)

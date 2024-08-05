@@ -7,7 +7,6 @@ defmodule BuildelWeb.ExperimentRunController do
   alias Buildel.Experiments.Runs
   alias Buildel.Experiments
   alias Buildel.Experiments.Experiment
-  alias OpenApiSpex.Schema
   alias Buildel.Organizations
 
   action_fallback(BuildelWeb.FallbackController)
