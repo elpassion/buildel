@@ -1,3 +1,9 @@
+import type { ReactElement, ReactNode } from 'react';
+import React, { cloneElement, forwardRef, isValidElement } from 'react';
+
+import type { BasicLinkProps } from '~/components/link/BasicLink';
+import { BasicLink } from '~/components/link/BasicLink';
+import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
 
 export const Table = ({
@@ -106,3 +112,29 @@ export const TableBodyCell = ({
     </td>
   );
 };
+
+type ExternalLinkCellProps = Omit<BasicLinkProps, 'children'> & {
+  icon: ReactNode;
+};
+
+export const ExternalLinkCell = forwardRef<
+  HTMLButtonElement,
+  ExternalLinkCellProps
+>(({ className, icon, ...rest }, ref) => {
+  const modifiedIcon = isValidElement(icon)
+    ? cloneElement(icon, {
+        // @ts-ignore
+        className: cn('w-3.5 h-3.5', (icon as ReactElement).props.className),
+      })
+    : icon;
+
+  return (
+    <Button asChild variant="ghost" className="w-7 h-7 p-0" ref={ref}>
+      <BasicLink className={cn(className)} target="_blank" {...rest}>
+        {modifiedIcon}
+      </BasicLink>
+    </Button>
+  );
+});
+
+ExternalLinkCell.displayName = 'ExternalLinkCell';

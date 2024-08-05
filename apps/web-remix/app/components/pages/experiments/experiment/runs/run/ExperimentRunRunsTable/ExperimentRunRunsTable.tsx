@@ -5,16 +5,15 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ExternalLink } from 'lucide-react';
+import { FolderCog, Layers } from 'lucide-react';
 
-import type { BasicLinkProps } from '~/components/link/BasicLink';
-import { BasicLink } from '~/components/link/BasicLink';
 import { EmptyMessage } from '~/components/list/ItemList';
 import type {
   IExperimentRun,
   IExperimentRunRun,
 } from '~/components/pages/experiments/experiments.types';
 import {
+  ExternalLinkCell,
   Table,
   TableBody,
   TableBodyCell,
@@ -23,9 +22,9 @@ import {
   TableHeadCell,
   TableHeadRow,
 } from '~/components/table/table.components';
+import { getCommonPinningStyles } from '~/components/table/table.utils';
 import { Badge } from '~/components/ui/badge';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
-import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
 import { routes } from '~/utils/routes.utils';
 
@@ -100,41 +99,36 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
           },
         }),
       ),
-      columnHelper.accessor('dataset_row_id', {
-        id: 'dataset_row_id',
-        cell: (info) => {
-          const original = info.row.original;
-          return (
-            <ExternalLinkCell
-              to={routes.datasetRow(
-                organizationId,
-                original.dataset_id,
-                original.dataset_row_id,
-              )}
-            >
-              {original.dataset_row_id}
-            </ExternalLinkCell>
-          );
-        },
-        header: () => <ExternalLinkHeader>Dataset Row ID</ExternalLinkHeader>,
-      }),
       columnHelper.accessor('run_id', {
-        id: 'run_id',
+        id: 'run-actions',
         cell: (info) => {
           const original = info.row.original;
           return (
-            <ExternalLinkCell
-              to={routes.pipelineRun(
-                organizationId,
-                original.pipeline_id,
-                original.run_id,
-              )}
-            >
-              {original.run_id}
-            </ExternalLinkCell>
+            <div className="flex gap-1 justify-end items-center">
+              <ExternalLinkCell
+                title="View dataset row"
+                to={routes.datasetRow(
+                  organizationId,
+                  original.dataset_id,
+                  original.dataset_row_id,
+                )}
+                icon={<FolderCog />}
+              />
+
+              <ExternalLinkCell
+                title="View pipeline run"
+                to={routes.pipelineRun(
+                  organizationId,
+                  original.pipeline_id,
+                  original.run_id,
+                )}
+                icon={<Layers />}
+              />
+            </div>
           );
         },
-        header: () => <ExternalLinkHeader>Row ID</ExternalLinkHeader>,
+        header: '',
+        size: 100,
       }),
     ],
     [],
@@ -144,6 +138,11 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
     columns,
     data: data,
     getCoreRowModel: getCoreRowModel(),
+    initialState: {
+      columnPinning: {
+        right: ['run-actions'],
+      },
+    },
   });
 
   return (
@@ -157,7 +156,7 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
             {headerGroup.headers.map((header) => (
               <TableHeadCell
                 key={header.id}
-                style={{ width: header.column.getSize() }}
+                style={{ ...getCommonPinningStyles(header.column) }}
               >
                 {flexRender(
                   header.column.columnDef.header,
@@ -184,7 +183,7 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
             {row.getVisibleCells().map((cell) => (
               <TableBodyCell
                 key={cell.id}
-                style={{ width: cell.column.getSize() }}
+                style={{ ...getCommonPinningStyles(cell.column) }}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableBodyCell>
@@ -195,28 +194,3 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
     </Table>
   );
 };
-
-function ExternalLinkHeader({
-  children,
-  className,
-  ...rest
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={cn('flex gap-1 whitespace-nowrap', className)} {...rest}>
-      {children}
-      <ExternalLink className="w-3.5 h-3.5" />
-    </div>
-  );
-}
-
-function ExternalLinkCell({ children, className, ...rest }: BasicLinkProps) {
-  return (
-    <BasicLink
-      className={cn('hover:underline', className)}
-      target="_blank"
-      {...rest}
-    >
-      {children}
-    </BasicLink>
-  );
-}

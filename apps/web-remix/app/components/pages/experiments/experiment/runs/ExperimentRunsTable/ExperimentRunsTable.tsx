@@ -7,11 +7,10 @@ import {
 } from '@tanstack/react-table';
 import { ExternalLink } from 'lucide-react';
 
-import { IconButton } from '~/components/iconButton';
-import { BasicLink } from '~/components/link/BasicLink';
 import { EmptyMessage } from '~/components/list/ItemList';
 import type { IExperimentRun } from '~/components/pages/experiments/experiments.types';
 import {
+  ExternalLinkCell,
   Table,
   TableBody,
   TableBodyCell,
@@ -75,16 +74,12 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
           const id = info.row.original.id;
           return (
             <div className="flex justify-end">
-              <BasicLink
+              <ExternalLinkCell
+                target="_self"
+                title="View dataset row"
                 to={routes.experimentRun(organizationId, experimentId, id)}
-              >
-                <IconButton
-                  size="xxs"
-                  variant="ghost"
-                  icon={<ExternalLink />}
-                  tabIndex={-1}
-                />
-              </BasicLink>
+                icon={<ExternalLink />}
+              />
             </div>
           );
         },
