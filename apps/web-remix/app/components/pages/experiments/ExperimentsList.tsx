@@ -113,9 +113,13 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
         </MenuDropdown>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="flex flex-row flex-wrap gap-2">
+        <CardDescription>Pipeline: {data.pipeline_id}</CardDescription>
+        <CardDescription>Dataset: {data.dataset_id}</CardDescription>
         <CardDescription>Runs: {data.runs_count}</CardDescription>
-        <CardDescription>{dayjs(data.created_at).format()}</CardDescription>
+        <CardDescription className="w-full">
+          Created: {dayjs(data.created_at).format()}
+        </CardDescription>
       </CardContent>
     </Card>
   );
