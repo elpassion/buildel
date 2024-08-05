@@ -3,6 +3,7 @@ import React from 'react';
 import {
   FloatingPortal,
   safePolygon,
+  useDismiss,
   useFloating,
   useHover,
   useInteractions,
@@ -13,7 +14,7 @@ import {
   offset as floatingOffset,
 } from '@floating-ui/react-dom';
 import type { OffsetOptions, Placement } from '@floating-ui/react-dom';
-import { useBoolean, useOnClickOutside } from 'usehooks-ts';
+import { useBoolean } from 'usehooks-ts';
 
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
@@ -62,7 +63,20 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
     }),
   });
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+  const dismiss = useDismiss({
+    ...floatingContext.context,
+    onOpenChange: (value, e) => {
+      floatingContext.context.onOpenChange(value, e);
+      if (!value) {
+        onClose?.();
+      }
+    },
+  });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    hover,
+    dismiss,
+  ]);
 
   const show = () => {
     setTrue();
@@ -71,11 +85,6 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   const hide = () => {
     setFalse();
   };
-
-  useOnClickOutside(floatingContext.refs.floating, () => {
-    hide();
-    onClose?.();
-  });
 
   return (
     <DropdownContext.Provider
