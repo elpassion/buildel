@@ -24,7 +24,7 @@ export function ExperimentPage() {
 
   const isRunning = experimentRuns.some((run) => run.status === 'running');
 
-  useRevalidateOnInterval({ enabled: isRunning, interval: 2000 });
+  useRevalidateOnInterval({ enabled: isRunning });
 
   return (
     <>

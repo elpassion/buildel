@@ -23,7 +23,6 @@ export function ExperimentRunPage() {
 
   useRevalidateOnInterval({
     enabled: experimentRun.status === 'running',
-    interval: 2000,
   });
 
   return (

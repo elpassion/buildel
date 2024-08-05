@@ -8,7 +8,7 @@ interface Options {
 
 export function useRevalidateOnInterval({
   enabled = false,
-  interval = 1000,
+  interval = 1500,
 }: Options) {
   const revalidator = useRevalidator();
 
