@@ -16,6 +16,7 @@ import type {
   IPipelineRuns,
 } from '~/components/pages/pipelines/pipeline.types';
 import {
+  CellStatusBadge,
   Table,
   TableBody,
   TableBodyCell,
@@ -25,7 +26,6 @@ import {
   TableHeadRow,
 } from '~/components/table/table.components';
 import { Tooltip } from '~/components/tooltip/Tooltip';
-import { Badge } from '~/components/ui/badge';
 import { dayjs } from '~/utils/Dayjs';
 import { routes } from '~/utils/routes.utils';
 
@@ -52,17 +52,9 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
       columnHelper.accessor('status', {
         id: 'status',
         cell: (info) => (
-          <Badge
-            variant={
-              info.getValue() === 'finished'
-                ? 'secondary'
-                : info.getValue() === 'created'
-                  ? 'outline'
-                  : 'default'
-            }
-          >
+          <CellStatusBadge status={info.getValue()}>
             {info.getValue()}
-          </Badge>
+          </CellStatusBadge>
         ),
         header: 'Status',
       }),

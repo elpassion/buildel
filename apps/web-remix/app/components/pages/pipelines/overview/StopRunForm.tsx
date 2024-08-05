@@ -21,7 +21,7 @@ export const StopRunForm: React.FC<StopRunFormProps> = ({ id }) => {
 
       <IconButton
         id={`stop-run-${id}`}
-        variant="destructive"
+        variant="default"
         aria-label="Stop run"
         icon={<CircleStop />}
         size="xxs"

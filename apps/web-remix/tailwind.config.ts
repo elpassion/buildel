@@ -202,8 +202,14 @@ const shadcnConfig = {
         from: { height: 'var(--radix-accordion-content-height)' },
         to: { height: '0' },
       },
+      dotsLoading: {
+        '0%': { clipPath: 'inset(0 100% 0 0)' },
+        '100%': { clipPath: 'inset(0 -20% 0 0)' },
+      },
     },
+
     animation: {
+      dotsLoading: 'dotsLoading 1s steps(4) infinite',
       'accordion-down': 'accordion-down 0.2s ease-out',
       'accordion-up': 'accordion-up 0.2s ease-out',
     },

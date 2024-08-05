@@ -13,6 +13,7 @@ import type {
   IExperimentRunRun,
 } from '~/components/pages/experiments/experiments.types';
 import {
+  CellStatusBadge,
   ExternalLinkCell,
   Table,
   TableBody,
@@ -51,17 +52,9 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
       columnHelper.accessor('status', {
         id: 'status',
         cell: (info) => (
-          <Badge
-            variant={
-              info.getValue() === 'finished'
-                ? 'secondary'
-                : info.getValue() === 'created'
-                  ? 'outline'
-                  : 'default'
-            }
-          >
+          <CellStatusBadge status={info.getValue()}>
             {info.getValue()}
-          </Badge>
+          </CellStatusBadge>
         ),
         header: 'Status',
       }),

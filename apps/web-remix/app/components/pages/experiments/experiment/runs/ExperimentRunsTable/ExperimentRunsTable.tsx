@@ -10,6 +10,7 @@ import { ExternalLink } from 'lucide-react';
 import { EmptyMessage } from '~/components/list/ItemList';
 import type { IExperimentRun } from '~/components/pages/experiments/experiments.types';
 import {
+  CellStatusBadge,
   ExternalLinkCell,
   Table,
   TableBody,
@@ -19,7 +20,6 @@ import {
   TableHeadCell,
   TableHeadRow,
 } from '~/components/table/table.components';
-import { Badge } from '~/components/ui/badge';
 import { useExperimentId } from '~/hooks/useExperimentId';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { dayjs } from '~/utils/Dayjs';
@@ -46,19 +46,11 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
       }),
       columnHelper.accessor('status', {
         id: 'status',
-        cell: (info) => (
-          <Badge
-            variant={
-              info.getValue() === 'finished'
-                ? 'secondary'
-                : info.getValue() === 'created'
-                  ? 'outline'
-                  : 'default'
-            }
-          >
-            {info.getValue()}
-          </Badge>
-        ),
+        cell: (info) => {
+          const status = info.getValue();
+
+          return <CellStatusBadge status={status}>{status}</CellStatusBadge>;
+        },
         header: 'Status',
       }),
       columnHelper.accessor('runs_count', {

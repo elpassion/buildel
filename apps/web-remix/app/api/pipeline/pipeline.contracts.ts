@@ -161,7 +161,7 @@ export const PipelineRun = z.object({
   created_at: z.string(),
   costs: z.array(z.object({ data: PipelineCost })),
   id: z.number(),
-  status: z.string(),
+  status: z.enum(['running', 'finished', 'created']),
   config: z.object({
     version: z.string(),
     blocks: z.array(BlockConfig),

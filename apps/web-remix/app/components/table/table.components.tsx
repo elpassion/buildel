@@ -1,8 +1,15 @@
 import type { ReactElement, ReactNode } from 'react';
-import React, { cloneElement, forwardRef, isValidElement } from 'react';
+import React, {
+  cloneElement,
+  forwardRef,
+  isValidElement,
+  useMemo,
+} from 'react';
 
 import type { BasicLinkProps } from '~/components/link/BasicLink';
 import { BasicLink } from '~/components/link/BasicLink';
+import type { BadgeProps } from '~/components/ui/badge';
+import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
 
@@ -138,3 +145,24 @@ export const ExternalLinkCell = forwardRef<
 });
 
 ExternalLinkCell.displayName = 'ExternalLinkCell';
+
+export const CellStatusBadge = ({
+  status,
+  children,
+  ...rest
+}: Omit<BadgeProps, 'variant'> & {
+  status: 'finished' | 'running' | 'created';
+}) => {
+  const variant = useMemo(() => {
+    if (status === 'finished') return 'secondary';
+    if (status === 'created') return 'outline';
+    return 'default';
+  }, [status]);
+
+  return (
+    <Badge variant={variant} {...rest}>
+      {children}
+      {status === 'running' && <span className="animate-dotsLoading">...</span>}
+    </Badge>
+  );
+};
