@@ -6,10 +6,11 @@ defmodule Buildel.Experiments do
 
   def list_experiments do
     Repo.all(Experiment)
+    |> Repo.preload([:pipeline, :dataset])
   end
 
-  def get_experiment!(id), do: Repo.get!(Experiment, id)
-  def get_experiment(id), do: Repo.get(Experiment, id)
+  def get_experiment!(id), do: Repo.get!(Experiment, id) |> Repo.preload([:pipeline, :dataset])
+  def get_experiment(id), do: Repo.get(Experiment, id) |> Repo.preload([:pipeline, :dataset])
 
   def create_experiment(attrs \\ %{}) do
     case %Experiment{}
@@ -22,7 +23,7 @@ defmodule Buildel.Experiments do
 
   def update_experiment(%Experiment{} = experiment, attrs) do
     case experiment
-         |> Membership.changeset(attrs)
+         |> Experiment.changeset(attrs)
          |> Repo.update() do
       {:ok, experiment} -> {:ok, experiment |> Repo.preload([:pipeline, :dataset])}
       {:error, changeset} -> {:error, changeset}
