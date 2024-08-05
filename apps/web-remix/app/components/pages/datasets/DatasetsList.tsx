@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { EllipsisVertical, Trash } from 'lucide-react';
+import { withZod } from '@remix-validated-form/with-zod';
+import { Edit, EllipsisVertical, Trash } from 'lucide-react';
+import { ValidatedForm } from 'remix-validated-form';
+import { useBoolean } from 'usehooks-ts';
 
+import { UpdateDatasetSchema } from '~/api/datasets/datasets.contracts';
 import {
   MenuDropdown,
   MenuDropdownContent,
   MenuDropdownItem,
   MenuDropdownTrigger,
 } from '~/components/dropdown/MenuDropdown';
+import { Field, HiddenField } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
+import { TextInputField } from '~/components/form/fields/text.field';
 import { BasicLink } from '~/components/link/BasicLink';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
 import { confirm } from '~/components/modal/confirm';
 import type { IDataset } from '~/components/pages/datasets/dataset.types';
+import { Button } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -19,6 +28,16 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
+import {
+  DialogDrawer,
+  DialogDrawerBody,
+  DialogDrawerContent,
+  DialogDrawerDescription,
+  DialogDrawerFooter,
+  DialogDrawerHeader,
+  DialogDrawerTitle,
+  DialogDrawerTrigger,
+} from '~/components/ui/dialog-drawer';
 import { dayjs } from '~/utils/Dayjs';
 import { routes } from '~/utils/routes.utils';
 
@@ -80,6 +99,8 @@ export const DatasetsListItem: React.FC<DatasetsListItemProps> = ({
   data,
   onDelete,
 }) => {
+  const { value: isOpen, toggle, setValue, setFalse } = useBoolean(false);
+
   const deleteDataset = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -103,7 +124,50 @@ export const DatasetsListItem: React.FC<DatasetsListItemProps> = ({
             <EllipsisVertical className="w-4 h-4" />
           </MenuDropdownTrigger>
 
-          <MenuDropdownContent>
+          <MenuDropdownContent
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <DialogDrawer open={isOpen} onOpenChange={setValue}>
+              <MenuDropdownItem icon={<Edit />} onClick={toggle}>
+                Edit
+              </MenuDropdownItem>
+
+              <DialogDrawerContent>
+                <DialogDrawerHeader>
+                  <DialogDrawerTitle>Update Dataset</DialogDrawerTitle>
+                  <DialogDrawerDescription>
+                    Compile examples and build datasets using data from
+                    production or other available sources.
+                  </DialogDrawerDescription>
+                </DialogDrawerHeader>
+
+                <DialogDrawerBody>
+                  <DatasetEditForm
+                    data={data}
+                    id={`update-${data.name}-dataset-form`}
+                    onSubmit={setFalse}
+                  />
+                </DialogDrawerBody>
+
+                <DialogDrawerFooter>
+                  <Button variant="outline" onClick={toggle}>
+                    Cancel
+                  </Button>
+
+                  <DialogDrawerTrigger asChild>
+                    <Button
+                      type="submit"
+                      form={`update-${data.name}-dataset-form`}
+                    >
+                      Save
+                    </Button>
+                  </DialogDrawerTrigger>
+                </DialogDrawerFooter>
+              </DialogDrawerContent>
+            </DialogDrawer>
+
             <MenuDropdownItem
               icon={<Trash />}
               variant="destructive"
@@ -122,3 +186,31 @@ export const DatasetsListItem: React.FC<DatasetsListItemProps> = ({
     </Card>
   );
 };
+
+interface DatasetEditFormProps {
+  data: IDataset;
+  id?: string;
+  onSubmit?: () => void;
+}
+
+function DatasetEditForm({ data, id, onSubmit }: DatasetEditFormProps) {
+  const validator = useMemo(() => withZod(UpdateDatasetSchema), []);
+
+  return (
+    <ValidatedForm
+      id={id}
+      method="PUT"
+      validator={validator}
+      onSubmit={onSubmit}
+      defaultValues={{ name: data.name, id: data.id }}
+    >
+      <HiddenField name="id" value={data.id} />
+
+      <Field name="name">
+        <FieldLabel>Name</FieldLabel>
+        <TextInputField placeholder="Type a name..." />
+        <FieldMessage>It will help you identify the dataset</FieldMessage>
+      </Field>
+    </ValidatedForm>
+  );
+}

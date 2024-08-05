@@ -4,7 +4,10 @@ import type { PaginationQueryParams } from '~/components/pagination/usePaginatio
 import type { fetchTyped } from '~/utils/fetch.server';
 import { buildUrlWithParams } from '~/utils/url';
 
-import type { CreateDatasetSchema } from './datasets.contracts';
+import type {
+  CreateDatasetSchema,
+  UpdateDatasetSchema,
+} from './datasets.contracts';
 import {
   DatasetResponse,
   DatasetRowResponse,
@@ -51,6 +54,18 @@ export class DatasetApi {
       DatasetResponse,
       `/organizations/${organizationId}/datasets`,
       { method: 'POST', body: JSON.stringify({ dataset: data }) },
+    );
+  }
+
+  async updateDataset(
+    organizationId: string | number,
+    datasetId: string | number,
+    data: Omit<z.TypeOf<typeof UpdateDatasetSchema>, 'id'>,
+  ) {
+    return this.client(
+      DatasetResponse,
+      `/organizations/${organizationId}/datasets/${datasetId}`,
+      { method: 'PUT', body: JSON.stringify({ dataset: data }) },
     );
   }
 
