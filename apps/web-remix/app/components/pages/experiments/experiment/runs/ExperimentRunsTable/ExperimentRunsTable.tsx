@@ -20,6 +20,7 @@ import {
   TableHeadCell,
   TableHeadRow,
 } from '~/components/table/table.components';
+import { getCommonPinningStyles } from '~/components/table/table.utils';
 import { useExperimentId } from '~/hooks/useExperimentId';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { dayjs } from '~/utils/Dayjs';
@@ -60,7 +61,7 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
       }),
       columnHelper.accessor('id', {
         header: '',
-        id: 'actions',
+        id: 'run-actions',
         size: 50,
         cell: (info) => {
           const id = info.row.original.id;
@@ -68,7 +69,7 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
             <div className="flex justify-end">
               <ExternalLinkCell
                 target="_self"
-                title="View dataset row"
+                title="View experiment run"
                 to={routes.experimentRun(organizationId, experimentId, id)}
                 icon={<ExternalLink />}
               />
@@ -84,6 +85,11 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
     columns,
     data: data,
     getCoreRowModel: getCoreRowModel(),
+    initialState: {
+      columnPinning: {
+        right: ['run-actions'],
+      },
+    },
   });
 
   return (
@@ -97,7 +103,7 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
             {headerGroup.headers.map((header) => (
               <TableHeadCell
                 key={header.id}
-                style={{ width: header.column.getSize() }}
+                style={{ ...getCommonPinningStyles(header.column) }}
               >
                 {flexRender(
                   header.column.columnDef.header,
@@ -124,7 +130,7 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
             {row.getVisibleCells().map((cell) => (
               <TableBodyCell
                 key={cell.id}
-                style={{ width: cell.column.getSize() }}
+                style={{ ...getCommonPinningStyles(cell.column) }}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableBodyCell>
