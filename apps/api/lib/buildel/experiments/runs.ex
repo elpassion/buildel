@@ -35,7 +35,7 @@ defmodule Buildel.Experiments.Runs do
       |> limit(^pagination_params.per_page)
       |> offset(^offset)
       |> Repo.all()
-      |> Repo.preload(:run)
+      |> Repo.preload(dataset_row: [], run: [:pipeline])
 
     {:ok, results, run.runs_count}
   end

@@ -57,7 +57,9 @@ export const ExperimentRunRun = z.object({
   status: z.enum(['running', 'finished', 'created']),
   data: z.record(z.string(), z.union([z.string(), z.number()])),
   run_id: z.union([z.number(), z.string()]),
+  pipeline_id: z.union([z.number(), z.string()]).default(0),
   experiment_run_id: z.union([z.number(), z.string()]),
+  dataset_id: z.union([z.number(), z.string()]).default(0),
   dataset_row_id: z.union([z.number(), z.string()]),
 });
 
