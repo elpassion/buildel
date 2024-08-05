@@ -5,7 +5,10 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { ExternalLink } from 'lucide-react';
 
+import type { BasicLinkProps } from '~/components/link/BasicLink';
+import { BasicLink } from '~/components/link/BasicLink';
 import { EmptyMessage } from '~/components/list/ItemList';
 import type {
   IExperimentRun,
@@ -21,7 +24,10 @@ import {
   TableHeadRow,
 } from '~/components/table/table.components';
 import { Badge } from '~/components/ui/badge';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
+import { routes } from '~/utils/routes.utils';
 
 interface ExperimentRunRunsTableProps {
   data: IExperimentRunRun[];
@@ -34,6 +40,8 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
   data,
   dynamicColumns,
 }) => {
+  const organizationId = useOrganizationId();
+
   const columns = useMemo(
     () => [
       columnHelper.accessor('created_at', {
@@ -94,23 +102,39 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
       ),
       columnHelper.accessor('dataset_row_id', {
         id: 'dataset_row_id',
-        cell: (info) => info.getValue()?.toString(),
-        header: 'Dataset Row ID',
+        cell: (info) => {
+          const original = info.row.original;
+          return (
+            <ExternalLinkCell
+              to={routes.datasetRow(
+                organizationId,
+                original.dataset_id,
+                original.dataset_row_id,
+              )}
+            >
+              {original.dataset_row_id}
+            </ExternalLinkCell>
+          );
+        },
+        header: () => <ExternalLinkHeader>Dataset Row ID</ExternalLinkHeader>,
       }),
       columnHelper.accessor('run_id', {
         id: 'run_id',
-        cell: (info) => info.getValue()?.toString(),
-        header: 'Run ID',
-      }),
-      columnHelper.accessor('dataset_id', {
-        id: 'dataset_id',
-        cell: (info) => info.getValue()?.toString(),
-        header: 'Dataset ID',
-      }),
-      columnHelper.accessor('pipeline_id', {
-        id: 'pipeline_id',
-        cell: (info) => info.getValue()?.toString(),
-        header: 'Pipeline ID',
+        cell: (info) => {
+          const original = info.row.original;
+          return (
+            <ExternalLinkCell
+              to={routes.pipelineRun(
+                organizationId,
+                original.pipeline_id,
+                original.run_id,
+              )}
+            >
+              {original.run_id}
+            </ExternalLinkCell>
+          );
+        },
+        header: () => <ExternalLinkHeader>Row ID</ExternalLinkHeader>,
       }),
     ],
     [],
@@ -171,3 +195,28 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
     </Table>
   );
 };
+
+function ExternalLinkHeader({
+  children,
+  className,
+  ...rest
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={cn('flex gap-1 whitespace-nowrap', className)} {...rest}>
+      {children}
+      <ExternalLink className="w-3.5 h-3.5" />
+    </div>
+  );
+}
+
+function ExternalLinkCell({ children, className, ...rest }: BasicLinkProps) {
+  return (
+    <BasicLink
+      className={cn('hover:underline', className)}
+      target="_blank"
+      {...rest}
+    >
+      {children}
+    </BasicLink>
+  );
+}
