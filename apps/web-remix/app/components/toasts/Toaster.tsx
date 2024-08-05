@@ -1,5 +1,3 @@
 import { Toaster as Sooner } from '~/components/ui/sonner';
 
-export const Toaster = () => (
-  <Sooner position="top-right" duration={3000} closeButton />
-);
+export const Toaster = () => <Sooner position="bottom-right" duration={3000} />;

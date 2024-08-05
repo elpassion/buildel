@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
+import { errorToast } from '~/components/toasts/errorToast';
+import { successToast } from '~/components/toasts/successToast';
+import { warningToast } from '~/components/toasts/warningToast';
 import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
@@ -29,6 +32,17 @@ export function DatasetsPage() {
     if (value) return;
     navigate(routes.datasets(organizationId));
   };
+
+  useEffect(() => {
+    successToast({ title: 'Dataset created', duration: 10000 });
+    errorToast({ title: 'Dataset created', duration: 10000 });
+
+    warningToast({
+      title: 'Dataset created',
+      description: 'SDAdasd sadasdasdsa asdad adasd asdasasdd asdaś',
+      duration: 10000,
+    });
+  }, []);
 
   return (
     <>

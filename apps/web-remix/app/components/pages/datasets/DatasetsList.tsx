@@ -156,14 +156,12 @@ export const DatasetsListItem: React.FC<DatasetsListItemProps> = ({
                     Cancel
                   </Button>
 
-                  <DialogDrawerTrigger asChild>
-                    <Button
-                      type="submit"
-                      form={`update-${data.name}-dataset-form`}
-                    >
-                      Save
-                    </Button>
-                  </DialogDrawerTrigger>
+                  <Button
+                    type="submit"
+                    form={`update-${data.name}-dataset-form`}
+                  >
+                    Save
+                  </Button>
                 </DialogDrawerFooter>
               </DialogDrawerContent>
             </DialogDrawer>

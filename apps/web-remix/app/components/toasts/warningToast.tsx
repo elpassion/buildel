@@ -12,5 +12,11 @@ export const warningToast = (props?: ToastProps | string) => {
     ...props,
   };
 
-  return toast.warning(title, rest);
+  return toast.warning(title, {
+    action: {
+      label: 'Close',
+      onClick: () => {},
+    },
+    ...rest,
+  });
 };

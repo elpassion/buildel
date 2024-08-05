@@ -12,5 +12,11 @@ export const successToast = (props?: ToastProps | string) => {
     ...props,
   };
 
-  return toast.success(title, rest);
+  return toast.success(title, {
+    action: {
+      label: 'Close',
+      onClick: () => {},
+    },
+    ...rest,
+  });
 };
