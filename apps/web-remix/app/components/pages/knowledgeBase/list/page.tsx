@@ -24,7 +24,6 @@ export function KnowledgeBasePage() {
   const navigate = useNavigate();
   const matchNew = useMatch(routes.knowledgeBaseNew(organizationId));
   const isNewSidebarOpen = !!matchNew;
-
   const handleCloseSidebar = (value: boolean) => {
     if (value) return;
     navigate(routes.knowledgeBase(organizationId));

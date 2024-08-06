@@ -29,11 +29,13 @@ export function KnowledgeBaseContentPage() {
   const navigate = useNavigate();
 
   const matchNew = useMatch(
-    routes.collectionFilesNew(organizationId, collectionName),
+    `:organizationId/knowledge-base/:collectionName/content/new`,
   );
+
   const matchSearch = useMatch(
-    routes.collectionSearch(organizationId, collectionName),
+    `:organizationId/knowledge-base/:collectionName/content/search`,
   );
+
   const matchDetails = useMatch(
     `:organizationId/knowledge-base/:collectionName/content/:memoryId/chunks`,
   );

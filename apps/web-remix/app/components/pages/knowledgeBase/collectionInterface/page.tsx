@@ -36,7 +36,7 @@ export function KnowledgeBaseCollectionInterface() {
   const navigate = useNavigate();
 
   const matchSearch = useMatch(
-    routes.collectionInterfaceSearch(organizationId, collectionName),
+    `:organizationId/knowledge-base/:collectionName/interface/search`,
   );
   const isSidebarOpen = !!matchSearch;
 
