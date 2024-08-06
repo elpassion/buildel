@@ -1,23 +1,15 @@
 import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
-import startCase from 'lodash.startcase';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Pagination } from '~/components/pagination/Pagination';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '~/components/ui/card';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { routes } from '~/utils/routes.utils';
 
 import { ExperimentRunRunsTable } from './ExperimentRunRunsTable/ExperimentRunRunsTable';
 import type { loader } from './loader.server';
-import { RunRunsNumericChart } from './RunCharts/RunRunsNumericChart';
+import { RunRunsChartGrid } from './RunRunsCharts/RunRunsChartGrid';
 
 export function ExperimentRunPage() {
   const {
@@ -44,32 +36,11 @@ export function ExperimentRunPage() {
         }
       />
 
-      <PageContentWrapper className="mt-[120px] pb-3">
-        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {experimentRun.columns.outputs.map((column) => {
-            if (!isNumeric(experimentRunRuns[0]?.data?.[column])) return null;
-
-            return (
-              <Card key={column}>
-                <CardHeader>
-                  <CardTitle>{startCase(column)}</CardTitle>
-                  <CardDescription>
-                    Show the values of the{' '}
-                    <span className="font-bold">{column}</span> column in the
-                    experiment run runs.
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent>
-                  <RunRunsNumericChart
-                    column={column}
-                    data={experimentRunRuns}
-                  />
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+      <PageContentWrapper className="mt-[20px] pb-3">
+        <RunRunsChartGrid
+          data={experimentRunRuns}
+          columns={experimentRun.columns.outputs}
+        />
 
         <ExperimentRunRunsTable
           data={experimentRunRuns}
@@ -98,7 +69,3 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     },
   ];
 };
-
-function isNumeric(value: any) {
-  return !isNaN(parseFloat(value));
-}

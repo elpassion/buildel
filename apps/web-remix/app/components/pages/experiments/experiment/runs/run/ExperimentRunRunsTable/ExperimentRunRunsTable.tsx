@@ -44,6 +44,13 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
 
   const columns = useMemo(
     () => [
+      columnHelper.accessor('id', {
+        header: 'Id',
+        id: 'id',
+        cell: (info) => `#${info.getValue()}`,
+        size: 70,
+        maxSize: 70,
+      }),
       columnHelper.accessor('created_at', {
         header: 'Date',
         id: 'created_at',
@@ -172,7 +179,11 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
           </tr>
         ) : null}
         {table.getRowModel().rows.map((row) => (
-          <TableBodyRow key={row.id} aria-label="pipeline run">
+          <TableBodyRow
+            key={row.id}
+            aria-label="pipeline run"
+            data-row-key={row.original.id}
+          >
             {row.getVisibleCells().map((cell) => (
               <TableBodyCell
                 key={cell.id}

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+import type { CategoricalChartState } from 'recharts/types/chart/types';
 
 import type { IExperimentRunRun } from '~/components/pages/experiments/experiments.types';
 import type { ChartConfig } from '~/components/ui/chart';
@@ -19,11 +20,15 @@ const chartConfig = {
 interface RunRunsNumericChartProps {
   data: IExperimentRunRun[];
   column: keyof IExperimentRunRun['data'];
+  onMouseMove?: (state: CategoricalChartState) => void;
+  onMouseLeave?: () => void;
 }
 
 export function RunRunsNumericChart({
   data,
   column,
+  onMouseMove,
+  onMouseLeave,
 }: RunRunsNumericChartProps) {
   const chartData = useMemo(() => {
     return data.map((item) => {
@@ -35,9 +40,11 @@ export function RunRunsNumericChart({
   }, [data]);
 
   return (
-    <ChartContainer config={chartConfig} className="h-[200px] w-full">
+    <ChartContainer config={chartConfig} className="h-[180px] w-full">
       <AreaChart
         accessibilityLayer
+        onMouseMove={onMouseMove}
+        onMouseLeave={onMouseLeave}
         data={chartData}
         margin={{
           left: 12,
