@@ -438,21 +438,21 @@ defmodule Buildel.Blocks.DocumentSearch do
   def handle_tool("tool", "query", {_name, :text, args, _metadata}, state) do
     state |> send_stream_start("output")
     response = do_query(state, args["query"])
-    state |> send_stream_stop("output")
+    state = output(state, "output", {:text, response})
     {response, state}
   end
 
   def handle_tool("tool", "parent", {_name, :text, args, _metadata}, state) do
     state = state |> send_stream_start("output")
     response = do_parent(state, args["chunk_id"])
-    state = state |> send_stream_stop("output")
+    state = output(state, "output", {:text, response})
     {response, state}
   end
 
   def handle_tool("tool", "related", {_name, :text, args, _metadata}, state) do
     state = state |> send_stream_start("output")
     response = do_related(state, args["chunk_id"])
-    state = state |> send_stream_stop("output")
+    state = output(state, "output", {:text, response})
     {response, state}
   end
 
