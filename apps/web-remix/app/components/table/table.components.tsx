@@ -166,3 +166,19 @@ export const CellStatusBadge = ({
     </Badge>
   );
 };
+
+export const CellNumberBadge = ({
+  children,
+  className,
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <div
+      className={cn(
+        'bg-muted rounded px-1.5 py-0.5 text-foreground w-fit text-xs',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+};

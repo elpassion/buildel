@@ -10,6 +10,7 @@ import { ExternalLink } from 'lucide-react';
 import { EmptyMessage } from '~/components/list/ItemList';
 import type { IExperimentRun } from '~/components/pages/experiments/experiments.types';
 import {
+  CellNumberBadge,
   CellStatusBadge,
   ExternalLinkCell,
   Table,
@@ -57,7 +58,9 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
       columnHelper.accessor('runs_count', {
         header: 'Row Runs',
         id: 'runs',
-        cell: (info) => info.getValue()?.toString(),
+        cell: (info) => (
+          <CellNumberBadge>{info.getValue()?.toString()}</CellNumberBadge>
+        ),
       }),
       columnHelper.accessor('id', {
         header: '',
