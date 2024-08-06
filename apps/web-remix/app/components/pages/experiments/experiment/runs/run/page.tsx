@@ -36,11 +36,13 @@ export function ExperimentRunPage() {
         }
       />
 
-      <PageContentWrapper className="mt-[20px] pb-3">
-        <RunRunsChartGrid
-          data={experimentRunRuns}
-          columns={experimentRun.columns.outputs}
-        />
+      <PageContentWrapper className="mt-[100px] pb-3">
+        <div className="mb-4">
+          <RunRunsChartGrid
+            data={experimentRunRuns}
+            columns={experimentRun.columns.outputs}
+          />
+        </div>
 
         <ExperimentRunRunsTable
           data={experimentRunRuns}

@@ -28,7 +28,7 @@ export const useHighlightedRows = (data: { id: string | number }[]) => {
 
     if (!currentElement) return;
 
-    currentElement.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
+    currentElement.style.backgroundColor = 'rgba(0, 0, 0, 0.03)';
   };
 
   const onMouseLeave = () => {

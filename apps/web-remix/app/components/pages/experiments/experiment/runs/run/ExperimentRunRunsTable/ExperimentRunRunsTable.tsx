@@ -54,7 +54,11 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
       columnHelper.accessor('created_at', {
         header: 'Date',
         id: 'created_at',
-        cell: (info) => dayjs(info.getValue()).format('DD MMM HH:mm'),
+        cell: (info) => (
+          <span className="whitespace-nowrap">
+            {dayjs(info.getValue()).format('DD MMM HH:mm')}
+          </span>
+        ),
       }),
       columnHelper.accessor('status', {
         id: 'status',
@@ -67,7 +71,9 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
       }),
       ...dynamicColumns.inputs.map((name) =>
         columnHelper.accessor(`data.${name}`, {
-          header: `Input: ${name}`,
+          header: () => (
+            <span className="whitespace-nowrap">Input: ${name}</span>
+          ),
           id: name,
           cell: (info) => {
             return info.getValue();
