@@ -193,4 +193,61 @@ defmodule BuildelWeb.Schemas.Collections do
       required: [:id, :name, :size, :created_at, :status]
     })
   end
+
+  defmodule Graphs do
+    defmodule Node do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "CollectionGraphsNode",
+        type: :object,
+        properties: %{
+          id: %Schema{type: :string, description: "Node ID"}
+        },
+        required: [:id]
+      })
+    end
+
+    defmodule Link do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "CollectionGraphsLink",
+        type: :object,
+        properties: %{
+          source: %Schema{type: :string, description: "Node ID"},
+          target: %Schema{type: :string, description: "Node ID"},
+          similarity: %Schema{type: :number, description: "Similarity score"}
+        },
+        required: [:source, :target]
+      })
+    end
+
+    defmodule Graph do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "CollectionGraphsGraph",
+        type: :object,
+        properties: %{
+          nodes: %Schema{type: :array, type: :string, description: "Graph nodes"},
+          links: %Schema{type: :array, items: Link, description: "Graph links"}
+        },
+        required: [:nodes, :links]
+      })
+    end
+
+    defmodule ShowResponse do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "CollectionGraphsShowResponse",
+        type: :object,
+        properties: %{
+          data: Graph
+        },
+        required: [:data]
+      })
+    end
+  end
 end

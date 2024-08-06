@@ -89,6 +89,12 @@ defmodule Buildel.VectorDB do
     adapter.get_all_by_id(ids)
   end
 
+  def get_relations(%__MODULE__{adapter: adapter}, collection_name) do
+    {:ok, collection} = adapter.get_collection(collection_name)
+
+    adapter.get_relations(collection)
+  end
+
   def delete_all_with_metadata(%__MODULE__{adapter: adapter}, collection_name, metadata) do
     {:ok, collection} = adapter.get_collection(collection_name)
 
@@ -349,6 +355,17 @@ defmodule Buildel.VectorDB.EctoAdapter do
         "similarity" => 0.0
       }
     end)
+  end
+
+  def get_relations(collection) do
+    Buildel.Repo.all(
+      from c1 in Chunk,
+        join: c2 in Chunk,
+        on: c1.id < c2.id,
+        select:
+          {c1.id, c2.id, fragment("?::halfvec(3072) <-> ?", c1.embedding_3072, c2.embedding_3072)},
+        where: c1.collection_name == ^collection.name and c2.collection_name == ^collection.name
+    )
   end
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour

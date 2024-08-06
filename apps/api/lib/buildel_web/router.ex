@@ -180,6 +180,12 @@ defmodule BuildelWeb.Router do
     )
 
     get(
+      "/organizations/:organization_id/memory_collections/:memory_collection_id/graphs",
+      CollectionGraphController,
+      :graph
+    )
+
+    get(
       "/organizations/:organization_id/memory_collections/:id/search",
       CollectionController,
       :search
