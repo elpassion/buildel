@@ -23,11 +23,14 @@ import '@xyflow/react/dist/style.css';
 
 import { useLoaderData } from '@remix-run/react';
 
-import { NodePreview } from '~/components/pages/knowledgeBase/collectionGraph/components/NodePreview';
-import { NodePreviewSidebar } from '~/components/pages/knowledgeBase/collectionGraph/components/NodePreviewSidebar';
-
 import { toEmbeddingNodes } from './collectionGraph.utils';
 import { GenerateGraph } from './components/GenerateGraph';
+import { NodePreview } from './components/NodePreview';
+import {
+  NodePreviewSidebar,
+  NodePreviewSidebarContent,
+  NodePreviewSidebarHeader,
+} from './components/NodePreviewSidebar';
 
 const customNodes = {
   embedding: EmbeddingNode,
@@ -43,10 +46,14 @@ export function KnowledgeBaseGraphPage() {
     toEmbeddingNodes(graph.nodes),
   );
 
+  const clearActiveNode = () => {
+    setActiveNode(null);
+    setEdges([]);
+  };
+
   const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {
     if (params.nodes.length === 0) {
-      setActiveNode(null);
-      setEdges([]);
+      clearActiveNode();
       return;
     }
 
@@ -64,8 +71,16 @@ export function KnowledgeBaseGraphPage() {
           <GenerateGraph />
         </div>
 
-        <NodePreviewSidebar isOpen={!!deferredActiveNode}>
-          {deferredActiveNode && <NodePreview node={deferredActiveNode} />}
+        <NodePreviewSidebar
+          isOpen={!!deferredActiveNode}
+          onOpenChange={clearActiveNode}
+        >
+          <NodePreviewSidebarHeader>
+            <h3 className="font-semibold">Node Properties</h3>
+          </NodePreviewSidebarHeader>
+          <NodePreviewSidebarContent>
+            {deferredActiveNode && <NodePreview node={deferredActiveNode} />}
+          </NodePreviewSidebarContent>
         </NodePreviewSidebar>
 
         <ReactFlow<IEmbeddingNode>

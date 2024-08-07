@@ -15,10 +15,6 @@ interface NodePreviewProps {
 export const NodePreview = ({ node }: NodePreviewProps) => {
   return (
     <section>
-      <header className="mb-4">
-        <h3 className="font-semibold">Node properties</h3>
-      </header>
-
       <div className="flex flex-col divide-y">
         <NodePreviewRow>
           <NodePreviewRowHeading>
