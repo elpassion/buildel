@@ -84,7 +84,9 @@ defmodule Buildel.MixProject do
       {:floki, "~> 0.36.1"},
       {:ecto_sqlite3, "~> 0.13"},
       {:csv, "~> 3.2"},
-      {:paginator, "~> 1.2.0"}
+      {:paginator, "~> 1.2.0"},
+      {:scholar, "~> 0.3.0"},
+      {:flame, "~> 0.3.0"}
     ]
   end
 

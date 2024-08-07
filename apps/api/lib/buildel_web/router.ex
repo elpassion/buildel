@@ -182,7 +182,13 @@ defmodule BuildelWeb.Router do
     get(
       "/organizations/:organization_id/memory_collections/:memory_collection_id/graphs",
       CollectionGraphController,
-      :graph
+      :show
+    )
+
+    post(
+      "/organizations/:organization_id/memory_collections/:memory_collection_id/graphs",
+      CollectionGraphController,
+      :create
     )
 
     get(

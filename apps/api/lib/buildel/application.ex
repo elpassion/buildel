@@ -36,6 +36,7 @@ defmodule Buildel.Application do
         Buildel.Datasets.DatasetFile,
         Buildel.Cache
       ]
+      |> maybe_add_flame()
       |> maybe_add_db()
       |> maybe_add_bumblebee_embedding()
       |> maybe_add_python_workers()
@@ -57,6 +58,22 @@ defmodule Buildel.Application do
   def load_servings() do
     if should_add_bumblebee_embedding?() do
       Buildel.Clients.BumblebeeEmbeddings.serving()
+    end
+  end
+
+  defp maybe_add_flame(children) do
+    if System.get_env("SKIP_FLAME") do
+      children
+    else
+      children ++
+        [
+          {FLAME.Pool,
+           name: Buildel.CollectionGraphRunner,
+           min: 0,
+           max: 1,
+           max_concurrency: 1,
+           idle_shutdown_after: 30_000}
+        ]
     end
   end
 

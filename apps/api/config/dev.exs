@@ -96,3 +96,5 @@ config :open_api_spex, :cache_adapter, OpenApiSpex.Plug.NoneCache
 config :buildel,
        :registration_disabled,
        System.get_env("REGISTRATION_DISABLED") == "true" || false
+
+config :buildel, :skip_flame, System.get_env("SKIP_FLAME") == "true" || false

@@ -65,3 +65,5 @@ config :logger, level: :critical
 config :buildel,
        :registration_disabled,
        System.get_env("REGISTRATION_DISABLED") == "true" || false
+
+config :buildel, :skip_flame, System.get_env("SKIP_FLAME") == "true" || true
