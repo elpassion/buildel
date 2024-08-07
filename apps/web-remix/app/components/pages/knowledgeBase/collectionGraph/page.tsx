@@ -24,6 +24,7 @@ import '@xyflow/react/dist/style.css';
 import { useLoaderData } from '@remix-run/react';
 
 import { toEmbeddingNodes } from './collectionGraph.utils';
+import { GenerateGraph } from './components/GenerateGraph';
 
 const customNodes = {
   embedding: EmbeddingNode,
@@ -35,7 +36,7 @@ export function KnowledgeBaseGraphPage() {
   const deferredActiveNode = useDeferredValue(activeNode);
 
   const [edges, setEdges] = useEdgesState<Edge>([]);
-  const [nodes, _, onNodesChange] = useNodesState<IEmbeddingNode>(
+  const [nodes, setNodes, onNodesChange] = useNodesState<IEmbeddingNode>(
     toEmbeddingNodes(graph.nodes),
   );
 
@@ -50,35 +51,25 @@ export function KnowledgeBaseGraphPage() {
   }, []);
 
   useEffect(() => {
-    if (!deferredActiveNode) return;
-
-    const fetchEdges = async (node: IEmbeddingNode) => {
-      const data = nodes.filter(
-        (item) => item.data.memory_id === node.data.memory_id,
-      );
-
-      setEdges(
-        data.map((item) => ({
-          target: node.id,
-          source: item.id,
-          id: item.id + node.id,
-        })),
-      );
-    };
-
-    fetchEdges(deferredActiveNode);
-  }, [deferredActiveNode]);
+    setNodes(toEmbeddingNodes(graph.nodes));
+  }, [graph]);
 
   return (
     <ActiveNodeProvider value={{ activeNode: deferredActiveNode }}>
       <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3">
+        <div className="absolute top-4 right-4 z-[10] md:right-6 lg:right-10">
+          <GenerateGraph />
+        </div>
+
         <ReactFlow<IEmbeddingNode>
+          nodes={nodes}
+          edges={edges}
           nodesConnectable={false}
           nodesFocusable={false}
           nodesDraggable={false}
+          edgesFocusable={false}
+          edgesReconnectable={false}
           zoomOnDoubleClick={false}
-          nodes={nodes}
-          edges={edges}
           onNodesChange={onNodesChange}
           onSelectionChange={onSelectionChange}
           //@ts-ignore
@@ -87,8 +78,8 @@ export function KnowledgeBaseGraphPage() {
           maxZoom={10}
           fitView
           fitViewOptions={{
-            minZoom: 0.5,
-            maxZoom: 1,
+            minZoom: 0,
+            maxZoom: 5,
           }}
         >
           <Background />

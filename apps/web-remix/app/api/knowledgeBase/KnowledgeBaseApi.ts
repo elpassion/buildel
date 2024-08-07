@@ -157,4 +157,15 @@ export class KnowledgeBaseApi {
 
     return this.client(MemoryGraphResponse, url);
   }
+
+  async generateCollectionGraph(
+    organizationId: string | number,
+    collectionId: string | number,
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/memory_collections/${collectionId}/graphs`,
+    );
+
+    return this.client(MemoryGraphResponse, url, { method: 'POST' });
+  }
 }

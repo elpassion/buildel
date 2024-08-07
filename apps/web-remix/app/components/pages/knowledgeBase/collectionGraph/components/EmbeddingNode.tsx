@@ -20,8 +20,8 @@ export function EmbeddingNode(props: IEmbeddingNode) {
   const activeStyles = useMemo(() => {
     if (!activeNode) return;
 
-    if (isActive) return 'bg-lime-600';
-    if (isRelated) return 'bg-lime-300';
+    if (isActive) return props.data.base_color;
+    if (isRelated) return `${props.data.base_color} bg-opacity-80`;
 
     return 'bg-gray-200';
   }, [isActive, isRelated, activeNode]);
@@ -43,14 +43,14 @@ export function EmbeddingNode(props: IEmbeddingNode) {
       >
         <div
           className={cn(
-            'absolute top-1/2 left-[110%]  whitespace-nowrap -translate-y-1/2 hidden group-hover:block',
+            'absolute top-1/2 left-[110%] -translate-y-1/2 hidden group-hover:block whitespace-nowrap',
             {
               block: isActive || isRelated,
               'text-[10px]': isRelated && !isActive,
             },
           )}
         >
-          {props.data.content}
+          {props.data.content.slice(0, 50)}
         </div>
       </div>
       <Handle type="target" position={Position.Left} className="opacity-0" />

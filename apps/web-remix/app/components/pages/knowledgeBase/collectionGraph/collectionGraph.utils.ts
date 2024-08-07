@@ -9,7 +9,7 @@ export function toEmbeddingNodes(nodes: IMemoryNode[]): IEmbeddingNode[] {
       ...item,
       base_color: getColorForUid(item.memory_id.toString()),
     },
-    position: { x: item.point[0] * 30, y: item.point[1] * 30 },
+    position: { x: item.point[0] * 25, y: item.point[1] * 25 },
     id: item.id.toString(),
     type: 'embedding',
   }));
@@ -21,7 +21,9 @@ const bgColors = [
   'bg-stone-500',
   'bg-slate-500',
   'bg-violet-500',
-  'bg-indigo-500',
+  'bg-teal-500',
+  'bg-rose-500',
+  'bg-lime-500',
 ];
 
 function getColorForUid(uid: string): string {
