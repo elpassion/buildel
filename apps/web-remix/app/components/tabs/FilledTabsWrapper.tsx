@@ -6,12 +6,13 @@ import { cn } from '~/utils/cn';
 export type TabsSize = 'xs' | 'sm' | 'lg';
 
 export const FilledTabsWrapper: React.FC<
-  PropsWithChildren<{ size?: TabsSize }>
-> = ({ children, size }) => {
+  PropsWithChildren<{ size?: TabsSize; className?: string }>
+> = ({ children, size, className }) => {
   return (
     <div
       className={cn(
         'bg-muted flex gap-1 rounded w-fit p-1',
+        className,
         getTabWrapperSize(size),
       )}
     >

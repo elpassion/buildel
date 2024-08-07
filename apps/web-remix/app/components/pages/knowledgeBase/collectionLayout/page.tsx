@@ -38,33 +38,38 @@ export function KnowledgeBaseCollectionLayout() {
       <TabGroup>
         <PageContentWrapper className="mt-6">
           <div className="flex gap-2 justify-between items-center flex-wrap">
-            <FilledTabsWrapper>
-              <FilledTabLink
-                to={routes.collectionFiles(organizationId, collectionName)}
-              >
-                Content
-              </FilledTabLink>
-              <FilledTabLink
-                to={routes.collectionOverview(organizationId, collectionName)}
-              >
-                Overview
-              </FilledTabLink>
-              <FilledTabLink
-                to={routes.collectionInterface(organizationId, collectionName)}
-              >
-                Interface
-              </FilledTabLink>
-              <FilledTabLink
-                to={routes.collectionGraph(organizationId, collectionName)}
-              >
-                Graph
-              </FilledTabLink>
-              <FilledTabLink
-                to={routes.collectionSettings(organizationId, collectionName)}
-              >
-                Settings
-              </FilledTabLink>
-            </FilledTabsWrapper>
+            <div className="max-w-[60%]  overflow-x-auto">
+              <FilledTabsWrapper>
+                <FilledTabLink
+                  to={routes.collectionFiles(organizationId, collectionName)}
+                >
+                  Content
+                </FilledTabLink>
+                <FilledTabLink
+                  to={routes.collectionOverview(organizationId, collectionName)}
+                >
+                  Overview
+                </FilledTabLink>
+                <FilledTabLink
+                  to={routes.collectionInterface(
+                    organizationId,
+                    collectionName,
+                  )}
+                >
+                  Interface
+                </FilledTabLink>
+                <FilledTabLink
+                  to={routes.collectionGraph(organizationId, collectionName)}
+                >
+                  Graph
+                </FilledTabLink>
+                <FilledTabLink
+                  to={routes.collectionSettings(organizationId, collectionName)}
+                >
+                  Settings
+                </FilledTabLink>
+              </FilledTabsWrapper>
+            </div>
 
             <Button asChild className="w-fit lg:hidden">
               <BasicLink to={linkToSearch}>Ask a question</BasicLink>
