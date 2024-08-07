@@ -23,6 +23,9 @@ import '@xyflow/react/dist/style.css';
 
 import { useLoaderData } from '@remix-run/react';
 
+import { NodePreview } from '~/components/pages/knowledgeBase/collectionGraph/components/NodePreview';
+import { NodePreviewSidebar } from '~/components/pages/knowledgeBase/collectionGraph/components/NodePreviewSidebar';
+
 import { toEmbeddingNodes } from './collectionGraph.utils';
 import { GenerateGraph } from './components/GenerateGraph';
 
@@ -56,10 +59,14 @@ export function KnowledgeBaseGraphPage() {
 
   return (
     <ActiveNodeProvider value={{ activeNode: deferredActiveNode }}>
-      <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3">
+      <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden">
         <div className="absolute top-4 right-4 z-[10] md:right-6 lg:right-10">
           <GenerateGraph />
         </div>
+
+        <NodePreviewSidebar isOpen={!!deferredActiveNode}>
+          {deferredActiveNode && <NodePreview node={deferredActiveNode} />}
+        </NodePreviewSidebar>
 
         <ReactFlow<IEmbeddingNode>
           nodes={nodes}
