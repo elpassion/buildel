@@ -19,12 +19,7 @@ defmodule BuildelWeb.CollectionGraphController do
     summary: "Show collection graph",
     parameters: [
       organization_id: [in: :path, description: "Organization ID", type: :integer],
-      memory_collection_id: [in: :path, description: "Collection ID", type: :integer],
-      top_percentage: [
-        in: :query,
-        description: "Top percentage of similarities to percive as edge",
-        type: :number
-      ]
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer]
     ],
     request_body: nil,
     responses: [
@@ -38,19 +33,16 @@ defmodule BuildelWeb.CollectionGraphController do
   def graph(conn, _params) do
     %{
       organization_id: organization_id,
-      memory_collection_id: memory_collection_id,
-      top_percentage: top_percentage
+      memory_collection_id: memory_collection_id
     } = conn.params
 
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
-         {:ok, collection} <-
-           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
-         matrix <-
-           Buildel.MemoriesGraph.get_similarity_martix(organization, collection, top_percentage) do
-      render(conn, :show, matrix: matrix)
+         {:ok, _collection} <-
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id) do
+      render(conn, :show, nodes: %{})
     end
   end
 end

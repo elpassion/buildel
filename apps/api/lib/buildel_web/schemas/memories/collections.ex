@@ -202,24 +202,16 @@ defmodule BuildelWeb.Schemas.Collections do
         title: "CollectionGraphsNode",
         type: :object,
         properties: %{
-          id: %Schema{type: :string, description: "Node ID"}
+          id: %Schema{type: :string, description: "Chunk ID"},
+          memory_id: %Schema{type: :integer, description: "Memory ID"},
+          point: %Schema{
+            type: :array,
+            items: %Schema{type: :number},
+            description: "Point coordinates"
+          },
+          content: %Schema{type: :string, description: "Content"}
         },
-        required: [:id]
-      })
-    end
-
-    defmodule Link do
-      require OpenApiSpex
-
-      OpenApiSpex.schema(%{
-        title: "CollectionGraphsLink",
-        type: :object,
-        properties: %{
-          source: %Schema{type: :string, description: "Node ID"},
-          target: %Schema{type: :string, description: "Node ID"},
-          similarity: %Schema{type: :number, description: "Similarity score"}
-        },
-        required: [:source, :target]
+        required: [:id, :memory_id, :point, :content]
       })
     end
 
@@ -230,10 +222,9 @@ defmodule BuildelWeb.Schemas.Collections do
         title: "CollectionGraphsGraph",
         type: :object,
         properties: %{
-          nodes: %Schema{type: :array, type: :string, description: "Graph nodes"},
-          links: %Schema{type: :array, items: Link, description: "Graph links"}
+          nodes: %Schema{type: :array, items: Node, description: "Graph nodes"}
         },
-        required: [:nodes, :links]
+        required: [:nodes]
       })
     end
 
