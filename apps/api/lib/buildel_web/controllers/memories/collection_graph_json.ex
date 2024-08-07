@@ -3,6 +3,18 @@ defmodule BuildelWeb.CollectionGraphJSON do
     %{data: data(graph)}
   end
 
+  def state(%{state: state}) do
+    %{
+      data: %{
+        state:
+          case state do
+            nil -> :idle
+            _ -> :processing
+          end
+      }
+    }
+  end
+
   def data(graph) do
     %{
       nodes:

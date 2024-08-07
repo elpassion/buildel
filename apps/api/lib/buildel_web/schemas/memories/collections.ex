@@ -240,5 +240,27 @@ defmodule BuildelWeb.Schemas.Collections do
         required: [:data]
       })
     end
+
+    defmodule StateResponse do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "CollectionGraphsStateResponse",
+        type: :object,
+        properties: %{
+          data: %Schema{
+            type: :object,
+            properties: %{
+              state: %Schema{
+                type: :string,
+                description: "State of the graph processing"
+              }
+            },
+            required: [:state]
+          }
+        },
+        required: [:data]
+      })
+    end
   end
 end

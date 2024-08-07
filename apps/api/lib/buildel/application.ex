@@ -34,6 +34,7 @@ defmodule Buildel.Application do
         {BuildelWeb.MetricsStorage, BuildelWeb.Telemetry.metrics()},
         Buildel.Memories.MemoryFile,
         Buildel.Datasets.DatasetFile,
+        Buildel.MemoriesGraph,
         Buildel.Cache
       ]
       |> maybe_add_flame()
