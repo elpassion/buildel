@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useState,
+} from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import type { Edge, OnSelectionChangeParams } from '@xyflow/react';
 import {
@@ -9,34 +14,29 @@ import {
   useNodesState,
 } from '@xyflow/react';
 
-import test from '~/MICHALJESTSMIESZNY.json';
-import { getRandomNumber } from '~/utils/numbers';
-
 import { ActiveNodeProvider } from './activeNodeProvider';
-import type { EmbeddingNode } from './collectionGraph.types';
-import { EmbeddingCustomNode } from './components/EmbeddingCustomNode';
+import type { IEmbeddingNode } from './collectionGraph.types';
+import { EmbeddingNode } from './components/EmbeddingNode';
 import type { loader } from './loader.server';
 
 import '@xyflow/react/dist/style.css';
 
+import { useLoaderData } from '@remix-run/react';
+
+import { toEmbeddingNodes } from './collectionGraph.utils';
+
 const customNodes = {
-  embedding: EmbeddingCustomNode,
+  embedding: EmbeddingNode,
 };
 
 export function KnowledgeBaseGraphPage() {
-  const [activeNode, setActiveNode] = useState<EmbeddingNode | null>(null);
+  const { graph } = useLoaderData<typeof loader>();
+  const [activeNode, setActiveNode] = useState<IEmbeddingNode | null>(null);
+  const deferredActiveNode = useDeferredValue(activeNode);
 
   const [edges, setEdges] = useEdgesState<Edge>([]);
-  const [nodes, _, onNodesChange] = useNodesState<EmbeddingNode>(
-    test.map((item: any) => ({
-      id: item.id,
-      position: { x: item.point[0] * 30, y: item.point[1] * 30 },
-      data: {
-        ...item,
-        document_id: getRandomNumber(0, 3).toFixed(0).toString(),
-      },
-      type: 'embedding',
-    })),
+  const [nodes, _, onNodesChange] = useNodesState<IEmbeddingNode>(
+    toEmbeddingNodes(graph.nodes),
   );
 
   const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {
@@ -46,15 +46,15 @@ export function KnowledgeBaseGraphPage() {
       return;
     }
 
-    setActiveNode(params.nodes[0] as EmbeddingNode);
+    setActiveNode(params.nodes[0] as IEmbeddingNode);
   }, []);
 
   useEffect(() => {
-    if (!activeNode) return;
+    if (!deferredActiveNode) return;
 
-    const fetchEdges = async (node: EmbeddingNode) => {
+    const fetchEdges = async (node: IEmbeddingNode) => {
       const data = nodes.filter(
-        (item) => item.data.document_id === node.data.document_id,
+        (item) => item.data.memory_id === node.data.memory_id,
       );
 
       setEdges(
@@ -66,16 +66,17 @@ export function KnowledgeBaseGraphPage() {
       );
     };
 
-    fetchEdges(activeNode);
-  }, [activeNode]);
+    fetchEdges(deferredActiveNode);
+  }, [deferredActiveNode]);
 
   return (
-    <ActiveNodeProvider value={{ activeNode }}>
+    <ActiveNodeProvider value={{ activeNode: deferredActiveNode }}>
       <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3">
-        <ReactFlow<EmbeddingNode>
+        <ReactFlow<IEmbeddingNode>
           nodesConnectable={false}
           nodesFocusable={false}
           nodesDraggable={false}
+          zoomOnDoubleClick={false}
           nodes={nodes}
           edges={edges}
           onNodesChange={onNodesChange}
@@ -84,10 +85,14 @@ export function KnowledgeBaseGraphPage() {
           nodeTypes={customNodes}
           minZoom={-2}
           maxZoom={10}
+          fitView
+          fitViewOptions={{
+            minZoom: 0.5,
+            maxZoom: 1,
+          }}
         >
           <Background />
           <Controls />
-          {/*<SelectionChangeListener />*/}
         </ReactFlow>
       </div>
     </ActiveNodeProvider>

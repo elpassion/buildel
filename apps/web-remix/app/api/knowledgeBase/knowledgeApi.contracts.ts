@@ -143,34 +143,16 @@ export const KnowledgeBaseCollectionFromListResponse =
   });
 
 export const MemoryNode = z.object({
-  id: z.string(),
-  document: z.string(),
+  id: z.union([z.string(), z.number()]),
+  memory_id: z.union([z.string(), z.number()]),
+  content: z.string(),
   point: z.array(z.number(), z.number()),
-  document_id: z.string(),
 });
 
 export const MemoryGraphResponse = z
   .object({
-    data: z.array(MemoryNode),
+    data: z.object({
+      nodes: z.array(MemoryNode),
+    }),
   })
-  .transform((res) =>
-    res.data.map((item) => ({
-      ...item,
-      base_color: getColorForUid(item.document_id),
-    })),
-  );
-
-const bgColors = [
-  'bg-sky-500',
-  'bg-yellow-500',
-  'bg-stone-500',
-  'bg-slate-500',
-  'bg-violet-500',
-  'bg-indigo-500',
-];
-
-function getColorForUid(uid: string): string {
-  const hash = hashString(uid);
-  const colorIndex = Math.abs(hash) % bgColors.length;
-  return bgColors[colorIndex];
-}
+  .transform((res) => res.data);

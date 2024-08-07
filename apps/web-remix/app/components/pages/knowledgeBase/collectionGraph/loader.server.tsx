@@ -14,9 +14,22 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
+    const {
+      data: { id: collectionId },
+    } = await knowledgeBaseApi.getCollectionByName(
+      params.organizationId,
+      params.collectionName,
+    );
+
+    const graph = await knowledgeBaseApi.getCollectionGraph(
+      params.organizationId,
+      collectionId,
+    );
+
     return json({
       organizationId: params.organizationId,
       collectionName: params.collectionName,
+      graph: graph.data,
     });
   })(args);
 }

@@ -18,4 +18,4 @@ export type IKnowledgeBaseCollectionCost = z.TypeOf<
   typeof KnowledgeBaseCollectionCost
 >;
 
-export type IMemoryNode = z.TypeOf<typeof MemoryNode> & { base_color: string };
+export type IMemoryNode = z.TypeOf<typeof MemoryNode>;

@@ -2,12 +2,11 @@ import React, { useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
 import { cn } from '~/utils/cn';
-import { hashString } from '~/utils/stringHash';
 
 import { useActiveNode } from '../activeNodeProvider';
-import type { EmbeddingNode } from '../collectionGraph.types';
+import type { IEmbeddingNode } from '../collectionGraph.types';
 
-export function EmbeddingCustomNode(props: EmbeddingNode) {
+export function EmbeddingNode(props: IEmbeddingNode) {
   const { activeNode } = useActiveNode();
 
   const isActive = useMemo(() => {
@@ -15,7 +14,7 @@ export function EmbeddingCustomNode(props: EmbeddingNode) {
   }, [activeNode]);
 
   const isRelated = useMemo(() => {
-    return activeNode?.data.document_id === props.data.document_id;
+    return activeNode?.data.memory_id === props.data.memory_id;
   }, [activeNode]);
 
   const activeStyles = useMemo(() => {
@@ -38,8 +37,7 @@ export function EmbeddingCustomNode(props: EmbeddingNode) {
       <div
         className={cn(
           'group relative h-5 w-5 rounded-full hover:bg-purple-600',
-          props.data.base_color ?? 'bg-gray-200',
-          // getColorForUid(props.data.document_id),
+          props.data.base_color,
           activeStyles,
         )}
       >
@@ -52,7 +50,7 @@ export function EmbeddingCustomNode(props: EmbeddingNode) {
             },
           )}
         >
-          {props.data.document}
+          {props.data.content}
         </div>
       </div>
       <Handle type="target" position={Position.Left} className="opacity-0" />

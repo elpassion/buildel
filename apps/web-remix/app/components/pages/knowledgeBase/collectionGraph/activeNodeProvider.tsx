@@ -1,9 +1,9 @@
 import { createContext, useContext } from 'react';
 
-import type { EmbeddingNode } from './collectionGraph.types';
+import type { IEmbeddingNode } from './collectionGraph.types';
 
 interface IActiveNodeContext {
-  activeNode: EmbeddingNode | null;
+  activeNode: IEmbeddingNode | null;
 }
 
 export const ActiveNodeContext = createContext<IActiveNodeContext | null>(null);
