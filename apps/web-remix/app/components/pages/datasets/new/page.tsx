@@ -13,6 +13,7 @@ import { FieldMessage } from '~/components/form/fields/field.message';
 import { SmallFileInputField } from '~/components/form/fields/file.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
+import { useUploadDatasetFile } from '~/components/pages/datasets/useUploadDatasetFile';
 import { errorToast } from '~/components/toasts/errorToast';
 import {
   DialogDrawer,
@@ -34,68 +35,7 @@ import type { loader } from './loader.server';
 
 export function NewDataset() {
   const { organizationId } = useLoaderData<typeof loader>();
-
-  const handleUploadFile = async (data: {
-    name: string;
-    file: File;
-  }): Promise<string> => {
-    async function createFile(file: File) {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch(
-        `/super-api/organizations/${organizationId}/datasets/files`,
-        {
-          body: formData,
-          method: 'POST',
-        },
-      );
-
-      if (!res.ok) {
-        const body = await res.json();
-        throw new Error(body?.errors?.detail ?? 'Something went wrong!');
-      }
-
-      return res.json();
-    }
-
-    async function refreshFileStatus(fileId: string | number) {
-      const res = await fetch(
-        `/super-api/organizations/${organizationId}/datasets/files/${fileId}`,
-      );
-
-      if (!res.ok) {
-        const body = await res.json();
-        errorToast('Something went wrong!');
-        throw new Error(body?.errors?.detail ?? 'Something went wrong!');
-      }
-
-      const data = await res.json();
-
-      if (data.data.status === 'success') {
-        return data;
-      } else if (data.data.status === 'error') {
-        throw new Error();
-      } else {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            refreshFileStatus(fileId).then(resolve).catch(reject);
-          }, 1000);
-        });
-      }
-    }
-
-    try {
-      const {
-        data: { id: fileId },
-      } = await createFile(data.file);
-      await refreshFileStatus(fileId);
-
-      return fileId;
-    } catch (e) {
-      throw e;
-    }
-  };
+  const { uploadFile } = useUploadDatasetFile({ organizationId });
 
   const validator = useMemo(() => withZod(CreateDatasetFileUpload), []);
   const fetcher = useFetcher();
@@ -110,7 +50,7 @@ export function NewDataset() {
       if (!data.file || data.file.size === 0) {
         fetcher.submit({ name: data.name }, { method: 'POST' });
       } else {
-        const fileId = await handleUploadFile({
+        const fileId = await uploadFile({
           name: data.name,
           file: data.file as File,
         });

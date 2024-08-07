@@ -7,6 +7,7 @@ import { buildUrlWithParams } from '~/utils/url';
 import type {
   CreateDatasetSchema,
   UpdateDatasetSchema,
+  UploadDatasetFileSchema,
 } from './datasets.contracts';
 import {
   DatasetResponse,
@@ -66,6 +67,18 @@ export class DatasetApi {
       DatasetResponse,
       `/organizations/${organizationId}/datasets/${datasetId}`,
       { method: 'PUT', body: JSON.stringify({ dataset: data }) },
+    );
+  }
+
+  async uploadDatasetFile(
+    organizationId: string | number,
+    datasetId: string | number,
+    data: z.TypeOf<typeof UploadDatasetFileSchema>,
+  ) {
+    return this.client(
+      DatasetResponse,
+      `/organizations/${organizationId}/datasets/${datasetId}/files`,
+      { method: 'POST', body: JSON.stringify({ file: data }) },
     );
   }
 

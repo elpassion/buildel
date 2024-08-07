@@ -1,11 +1,15 @@
-import { json } from '@remix-run/node';
+import { json, redirect } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
+import { withZod } from '@remix-validated-form/with-zod';
+import { validationError } from 'remix-validated-form';
 import invariant from 'tiny-invariant';
 
 import { DatasetApi } from '~/api/datasets/DatasetApi';
+import { UploadDatasetFileSchema } from '~/api/datasets/datasets.contracts';
 import { requireLogin } from '~/session.server';
 import { actionBuilder } from '~/utils.server';
 import { assert } from '~/utils/assert';
+import { routes } from '~/utils/routes.utils';
 import { setServerToast } from '~/utils/toast.server';
 
 export async function action(actionArgs: ActionFunctionArgs) {
@@ -41,6 +45,35 @@ export async function action(actionArgs: ActionFunctionArgs) {
           },
         },
       );
+    },
+    post: async ({ params, request }, { fetch }) => {
+      invariant(params.organizationId, 'organizationId not found');
+      invariant(params.datasetId, 'Missing datasetId');
+
+      const validator = withZod(UploadDatasetFileSchema);
+
+      const result = await validator.validate(await request.formData());
+
+      if (result.error) return validationError(result.error);
+
+      const datasetApi = new DatasetApi(fetch);
+
+      const { data: dataset } = await datasetApi.uploadDatasetFile(
+        params.organizationId,
+        params.datasetId,
+        result.data,
+      );
+
+      return redirect(routes.dataset(params.organizationId, dataset.data.id), {
+        headers: {
+          'Set-Cookie': await setServerToast(request, {
+            success: {
+              title: 'Dataset updated',
+              description: `You've updated ${dataset.data.name} dataset`,
+            },
+          }),
+        },
+      });
     },
   })(actionArgs);
 }

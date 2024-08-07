@@ -47,6 +47,10 @@ export const UpdateDatasetSchema = z.object({
   id: z.union([z.number(), z.string()]),
 });
 
+export const UploadDatasetFileSchema = z.object({
+  file_id: z.union([z.number(), z.string()]),
+});
+
 export const CreateDatasetFileUpload = z.object({
   name: z.string().min(2),
   file: z.any().refine((file: File) => {
