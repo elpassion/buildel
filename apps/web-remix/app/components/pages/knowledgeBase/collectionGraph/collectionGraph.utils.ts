@@ -15,19 +15,22 @@ export function toEmbeddingNodes(nodes: IMemoryNode[]): IEmbeddingNode[] {
   }));
 }
 
-const bgColors = [
-  'bg-sky-500',
-  'bg-yellow-500',
-  'bg-stone-500',
-  'bg-slate-500',
-  'bg-violet-500',
-  'bg-teal-500',
-  'bg-rose-500',
-  'bg-lime-500',
-];
+const colors: Record<string, string> = {};
 
 function getColorForUid(uid: string): string {
-  const hash = hashString(uid);
-  const colorIndex = Math.abs(hash) % bgColors.length;
-  return bgColors[colorIndex];
+  if (colors[uid]) return colors[uid];
+
+  const rgb = generateRGBColor(hashString(uid));
+
+  colors[uid] = rgb;
+
+  return rgb;
+}
+
+function generateRGBColor(hash: number): string {
+  const r = Math.abs(hash * 0.7) % 240;
+  const g = Math.abs(hash * 5.3 * hash) % 240;
+  const b = Math.abs(hash * 8.3 * hash) % 240;
+
+  return `rgb(${r}, ${g}, ${b})`;
 }

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
@@ -17,13 +18,17 @@ export function EmbeddingNode(props: IEmbeddingNode) {
     return activeNode?.data.memory_id === props.data.memory_id;
   }, [activeNode]);
 
-  const activeStyles = useMemo(() => {
-    if (!activeNode) return;
+  const activeStyles = useMemo((): CSSProperties => {
+    if (!activeNode) return { backgroundColor: props.data.base_color };
 
-    if (isActive) return props.data.base_color;
-    if (isRelated) return `${props.data.base_color} bg-opacity-80`;
+    if (isActive) {
+      return { backgroundColor: props.data.base_color };
+    }
+    if (isRelated) {
+      return { backgroundColor: props.data.base_color, opacity: 0.8 };
+    }
 
-    return 'bg-gray-200';
+    return { backgroundColor: '#aaa', opacity: 0.5 };
   }, [isActive, isRelated, activeNode]);
 
   return (
@@ -35,24 +40,12 @@ export function EmbeddingNode(props: IEmbeddingNode) {
         className="opacity-0"
       />
       <div
+        style={activeStyles}
         className={cn(
-          'group relative h-5 w-5 rounded-full hover:bg-purple-600',
-          props.data.base_color,
-          activeStyles,
+          'group relative h-5 w-5 rounded-full hover:!bg-purple-600',
         )}
-      >
-        <div
-          className={cn(
-            'absolute top-1/2 left-[110%] -translate-y-1/2 hidden group-hover:block whitespace-nowrap',
-            {
-              block: isActive || isRelated,
-              'text-[10px]': isRelated && !isActive,
-            },
-          )}
-        >
-          {props.data.content.slice(0, 50)}
-        </div>
-      </div>
+      />
+
       <Handle type="target" position={Position.Left} className="opacity-0" />
     </>
   );
