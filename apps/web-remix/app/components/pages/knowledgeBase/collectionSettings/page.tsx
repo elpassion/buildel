@@ -10,6 +10,7 @@ import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import {
   ApiTypesRadioGroupField,
   ModelSelectField,
@@ -28,7 +29,7 @@ export function CollectionSettingsPage() {
   };
 
   return (
-    <>
+    <PageContentWrapper>
       <ValidatedForm
         noValidate
         method="put"
@@ -87,7 +88,7 @@ export function CollectionSettingsPage() {
           Update collection
         </SubmitButton>
       </ValidatedForm>
-    </>
+    </PageContentWrapper>
   );
 }
 

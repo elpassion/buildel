@@ -11,6 +11,7 @@ import {
   KnowledgeBaseFileListResponse,
   KnowledgeBaseSearchChunkResponse,
   MemoryChunksResponse,
+  MemoryGraphResponse,
 } from './knowledgeApi.contracts';
 import type {
   CreateCollectionSchema,
@@ -142,5 +143,18 @@ export class KnowledgeBaseApi {
     );
 
     return this.client(MemoryChunksResponse, url);
+  }
+
+  async getCollectionGraph(
+    organizationId: string | number,
+    collectionId: string | number,
+    pagination?: PaginationQueryParams,
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/memory_collections/${collectionId}/graphs`,
+      { ...pagination },
+    );
+
+    return this.client(MemoryGraphResponse, url);
   }
 }

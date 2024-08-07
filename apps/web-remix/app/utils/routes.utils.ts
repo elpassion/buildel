@@ -182,6 +182,10 @@ export const routes = {
     `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
       collectionName,
     )}/settings`,
+  collectionGraph: (organizationId: OrganizationId, collectionName: string) =>
+    `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
+      collectionName,
+    )}/graph`,
   collectionInterface: (
     organizationId: OrganizationId,
     collectionName: string,
@@ -289,12 +293,11 @@ export const routes = {
   experimentRuns: (
     organizationId: OrganizationId,
     experimentId: ExperimentId,
-
   ) => `${routes.experiment(organizationId, experimentId)}/runs`,
   experimentRun: (
     organizationId: OrganizationId,
     experimentId: ExperimentId,
-    runId: RunId
+    runId: RunId,
   ) => `${routes.experimentRuns(organizationId, experimentId)}/${runId}`,
 };
 
@@ -304,4 +307,3 @@ type RunId = string | number;
 type DatasetId = string | number;
 type RowId = string | number;
 type ExperimentId = string | number;
-type RunId = string | number;

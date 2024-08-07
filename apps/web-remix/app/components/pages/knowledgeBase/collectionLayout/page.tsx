@@ -35,8 +35,8 @@ export function KnowledgeBaseCollectionLayout() {
         </Button>
       </AppNavbar>
 
-      <PageContentWrapper className="mt-6">
-        <TabGroup>
+      <TabGroup>
+        <PageContentWrapper className="mt-6">
           <div className="flex gap-2 justify-between items-center flex-wrap">
             <FilledTabsWrapper>
               <FilledTabLink
@@ -55,6 +55,11 @@ export function KnowledgeBaseCollectionLayout() {
                 Interface
               </FilledTabLink>
               <FilledTabLink
+                to={routes.collectionGraph(organizationId, collectionName)}
+              >
+                Graph
+              </FilledTabLink>
+              <FilledTabLink
                 to={routes.collectionSettings(organizationId, collectionName)}
               >
                 Settings
@@ -65,12 +70,12 @@ export function KnowledgeBaseCollectionLayout() {
               <BasicLink to={linkToSearch}>Ask a question</BasicLink>
             </Button>
           </div>
+        </PageContentWrapper>
 
-          <div className="pt-3 lg:pt-6">
-            <Outlet />
-          </div>
-        </TabGroup>
-      </PageContentWrapper>
+        <div className="pt-3 lg:pt-6">
+          <Outlet />
+        </div>
+      </TabGroup>
     </>
   );
 }

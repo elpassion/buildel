@@ -8,6 +8,7 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import {
   DialogDrawer,
   DialogDrawerBody,
@@ -46,11 +47,13 @@ export function KnowledgeBaseContentPage() {
 
   const handleClose = (value?: boolean) => {
     if (value) return;
-    navigate(routes.collectionFiles(organizationId, collectionName));
+    navigate(routes.collectionFiles(organizationId, collectionName), {
+      replace: true,
+    });
   };
 
   return (
-    <div className="mt-5">
+    <PageContentWrapper className="mt-5">
       <KnowledgeBaseFileList items={fileList} />
 
       <DialogDrawer open={isSidebarOpen} onOpenChange={handleClose}>
@@ -78,7 +81,7 @@ export function KnowledgeBaseContentPage() {
           </DialogDrawerBody>
         </DialogDrawerContent>
       </DialogDrawer>
-    </div>
+    </PageContentWrapper>
   );
 }
 

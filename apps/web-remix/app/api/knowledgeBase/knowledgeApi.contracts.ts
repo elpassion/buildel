@@ -3,6 +3,7 @@ import { zfd } from 'zod-form-data';
 
 import { PaginationMeta } from '~/components/pagination/pagination.types';
 import { NotFoundError } from '~/utils/errors';
+import { hashString } from '~/utils/stringHash';
 
 export const MemoryChunk = z.object({
   id: z.string(),
@@ -140,3 +141,36 @@ export const KnowledgeBaseCollectionFromListResponse =
     }
     return collection;
   });
+
+export const MemoryNode = z.object({
+  id: z.string(),
+  document: z.string(),
+  point: z.array(z.number(), z.number()),
+  document_id: z.string(),
+});
+
+export const MemoryGraphResponse = z
+  .object({
+    data: z.array(MemoryNode),
+  })
+  .transform((res) =>
+    res.data.map((item) => ({
+      ...item,
+      base_color: getColorForUid(item.document_id),
+    })),
+  );
+
+const bgColors = [
+  'bg-sky-500',
+  'bg-yellow-500',
+  'bg-stone-500',
+  'bg-slate-500',
+  'bg-violet-500',
+  'bg-indigo-500',
+];
+
+function getColorForUid(uid: string): string {
+  const hash = hashString(uid);
+  const colorIndex = Math.abs(hash) % bgColors.length;
+  return bgColors[colorIndex];
+}

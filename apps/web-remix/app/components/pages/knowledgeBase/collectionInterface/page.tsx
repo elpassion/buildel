@@ -17,6 +17,7 @@ import {
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
 } from '~/components/interfaces/InterfaceSection';
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import {
   DialogDrawer,
   DialogDrawerBody,
@@ -42,11 +43,13 @@ export function KnowledgeBaseCollectionInterface() {
 
   const handleClose = (value?: boolean) => {
     if (value) return;
-    navigate(routes.collectionInterface(organizationId, collectionName));
+    navigate(routes.collectionInterface(organizationId, collectionName), {
+      replace: true,
+    });
   };
 
   return (
-    <>
+    <PageContentWrapper>
       <div className="mt-10">
         <div>
           <h2 className="text-lg text-foreground font-bold">HTTP API</h2>
@@ -198,7 +201,7 @@ export function KnowledgeBaseCollectionInterface() {
           </DialogDrawerBody>
         </DialogDrawerContent>
       </DialogDrawer>
-    </>
+    </PageContentWrapper>
   );
 }
 
