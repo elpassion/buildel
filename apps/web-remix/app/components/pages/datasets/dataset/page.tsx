@@ -11,6 +11,7 @@ import { routes } from '~/utils/routes.utils';
 
 import { DatasetRowTable } from './DatasetRowTable/DatasetRowTable';
 import type { loader } from './loader.server';
+import { UploadFileForm } from './UploadFileForm';
 
 export function DatasetPage() {
   const { organizationId, dataset, datasetRows, pagination } =
@@ -23,20 +24,25 @@ export function DatasetPage() {
           <AppNavbarHeading>Dataset {dataset.name}</AppNavbarHeading>
         }
       >
-        <Button asChild className="w-fit ml-auto mr-0 hidden lg:flex">
-          <BasicLink
-            to={routes.datasetRowNew(organizationId, dataset.id, {
-              page: pagination.page,
-              per_page: pagination.per_page,
-            })}
-          >
-            New Row
-          </BasicLink>
-        </Button>
+        <div className="gap-2 justify-end hidden lg:flex">
+          <UploadFileForm />
+          <Button asChild className="">
+            <BasicLink
+              to={routes.datasetRowNew(organizationId, dataset.id, {
+                page: pagination.page,
+                per_page: pagination.per_page,
+              })}
+            >
+              New Row
+            </BasicLink>
+          </Button>
+        </div>
       </AppNavbar>
 
       <PageContentWrapper className="mt-6 lg:mt-[120px] pb-3">
-        <div className="mb-[56px] flex justify-end lg:hidden">
+        <div className="mb-[56px] flex justify-end gap-2 lg:hidden">
+          <UploadFileForm size="sm" />
+
           <Button size="sm" asChild>
             <BasicLink
               to={routes.datasetRowNew(organizationId, dataset.id, {
