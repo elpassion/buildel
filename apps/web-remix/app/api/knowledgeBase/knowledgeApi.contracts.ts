@@ -3,7 +3,6 @@ import { zfd } from 'zod-form-data';
 
 import { PaginationMeta } from '~/components/pagination/pagination.types';
 import { NotFoundError } from '~/utils/errors';
-import { hashString } from '~/utils/stringHash';
 
 export const MemoryChunk = z.object({
   id: z.string(),
