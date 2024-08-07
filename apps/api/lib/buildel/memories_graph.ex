@@ -50,7 +50,6 @@ defmodule Buildel.MemoriesGraph do
   end
 
   def handle_cast({:remove, collection_id}, state) do
-    IO.inspect("Removing collection #{collection_id}")
     state = state |> State.remove_collection(collection_id)
 
     {:noreply, state}
