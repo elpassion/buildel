@@ -1,4 +1,3 @@
-import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
@@ -8,28 +7,28 @@ import { useActiveNode } from '../activeNodeProvider';
 import type { IEmbeddingNode } from '../collectionGraph.types';
 
 export function EmbeddingNode(props: IEmbeddingNode) {
-  const { activeNode } = useActiveNode();
+  const { activeNode, relatedNeighbours } = useActiveNode();
+
+  const isRelated = (id: string) => {
+    return relatedNeighbours.includes(id);
+  };
 
   const isActive = useMemo(() => {
     return activeNode?.id === props.id;
   }, [activeNode]);
 
-  const isRelated = useMemo(() => {
-    return activeNode?.data.memory_id === props.data.memory_id;
-  }, [activeNode]);
-
-  const activeStyles = useMemo((): CSSProperties => {
+  const activeStyles = () => {
     if (!activeNode) return { backgroundColor: props.data.base_color };
 
     if (isActive) {
       return { backgroundColor: props.data.base_color };
     }
-    if (isRelated) {
+    if (isRelated(props.id)) {
       return { backgroundColor: props.data.base_color, opacity: 0.8 };
     }
 
     return { backgroundColor: '#aaa', opacity: 0.5 };
-  }, [isActive, isRelated, activeNode]);
+  };
 
   return (
     <>
@@ -40,7 +39,7 @@ export function EmbeddingNode(props: IEmbeddingNode) {
         className="opacity-0"
       />
       <div
-        style={activeStyles}
+        style={activeStyles()}
         className={cn(
           'group relative h-5 w-5 rounded-full hover:!bg-purple-600',
         )}

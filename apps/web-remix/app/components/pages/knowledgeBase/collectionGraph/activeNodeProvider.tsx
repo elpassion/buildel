@@ -4,6 +4,7 @@ import type { IEmbeddingNode } from './collectionGraph.types';
 
 interface IActiveNodeContext {
   activeNode: IEmbeddingNode | null;
+  relatedNeighbours: string[];
 }
 
 export const ActiveNodeContext = createContext<IActiveNodeContext | null>(null);

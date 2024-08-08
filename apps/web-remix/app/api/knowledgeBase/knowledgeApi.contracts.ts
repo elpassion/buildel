@@ -166,3 +166,13 @@ export const MemoryGraphStateResponse = z
     data: MemoryGraphState,
   })
   .transform((res) => res.data);
+
+export const MemoryNodeRelated = z.object({
+  chunks: z.array(z.string()),
+});
+
+export const MemoryNodeRelatedResponse = z
+  .object({
+    data: MemoryNodeRelated,
+  })
+  .transform((res) => res.data);

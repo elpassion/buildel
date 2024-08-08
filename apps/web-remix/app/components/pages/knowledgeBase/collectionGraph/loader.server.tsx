@@ -33,6 +33,7 @@ export async function loader(args: LoaderFunctionArgs) {
     return json({
       organizationId: params.organizationId,
       collectionName: params.collectionName,
+      collectionId: collectionId,
       graph: graph.data,
       graphState: graphState.data,
     });

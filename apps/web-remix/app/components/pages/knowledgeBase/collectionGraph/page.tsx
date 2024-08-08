@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useDeferredValue,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import type { MetaFunction } from '@remix-run/node';
@@ -33,14 +34,22 @@ import type { loader } from './loader.server';
 
 import '@xyflow/react/dist/style.css';
 
+import { MemoryNodeRelatedResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { assert } from '~/utils/assert';
+
 const customNodes = {
   embedding: EmbeddingNode,
 };
 
 export function KnowledgeBaseGraphPage() {
-  const { graph, graphState } = useLoaderData<typeof loader>();
+  const abortController = useRef<AbortController | null>(null);
+  const { graph, graphState, collectionId, organizationId } =
+    useLoaderData<typeof loader>();
   const [activeNode, setActiveNode] = useState<IEmbeddingNode | null>(null);
   const deferredActiveNode = useDeferredValue(activeNode);
+
+  const [relatedNeighbours, setRelatedNeighbours] = useState<string[]>([]);
+  const deferredRelatedNeighbours = useDeferredValue(relatedNeighbours);
 
   const [edges, setEdges] = useEdgesState<Edge>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<IEmbeddingNode>(
@@ -51,6 +60,7 @@ export function KnowledgeBaseGraphPage() {
 
   const clearActiveNode = () => {
     setActiveNode(null);
+    setRelatedNeighbours([]);
     setEdges([]);
   };
 
@@ -63,6 +73,32 @@ export function KnowledgeBaseGraphPage() {
     setActiveNode(params.nodes[0] as IEmbeddingNode);
   }, []);
 
+  const fetchRelatedNeighbours = async () => {
+    assert(activeNode);
+
+    if (abortController.current) {
+      abortController.current.abort();
+    }
+
+    abortController.current = new AbortController();
+
+    try {
+      const res = await fetch(
+        `/super-api/organizations/${organizationId}/memory_collections/${collectionId}/graphs/related?chunk_id=${activeNode.id}&limit=5`,
+        { signal: abortController.current?.signal },
+      );
+
+      if (!res.ok) {
+        return;
+      }
+      const related = await res.json();
+
+      const { chunks } = MemoryNodeRelatedResponse.parse(related);
+
+      setRelatedNeighbours(chunks);
+    } catch {}
+  };
+
   useEffect(() => {
     const updated = toEmbeddingNodes(graph.nodes);
     if (isEqual(nodes, updated)) return;
@@ -70,8 +106,23 @@ export function KnowledgeBaseGraphPage() {
     setNodes(updated);
   }, [graph]);
 
+  useEffect(() => {
+    if (!activeNode) return;
+
+    fetchRelatedNeighbours();
+
+    return () => {
+      abortController.current?.abort();
+    };
+  }, [activeNode]);
+
   return (
-    <ActiveNodeProvider value={{ activeNode: deferredActiveNode }}>
+    <ActiveNodeProvider
+      value={{
+        activeNode: deferredActiveNode,
+        relatedNeighbours: deferredRelatedNeighbours,
+      }}
+    >
       <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden">
         <div className="absolute top-4 right-4 z-[10] md:right-6 lg:right-10">
           <GenerateGraph state={graphState} />
