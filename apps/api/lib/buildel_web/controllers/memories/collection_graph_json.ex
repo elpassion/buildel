@@ -12,7 +12,8 @@ defmodule BuildelWeb.CollectionGraphJSON do
         content: chunk.document,
         next: Map.get(chunk.metadata, "next"),
         prev: Map.get(chunk.metadata, "prev"),
-        file_name: Map.get(chunk.metadata, "file_name")
+        file_name: Map.get(chunk.metadata, "file_name"),
+        keywords: Map.get(chunk.metadata, "keywords")
       }
     }
   end

@@ -231,9 +231,14 @@ defmodule BuildelWeb.Schemas.Collections do
           content: %Schema{type: :string, description: "Content"},
           next: %Schema{type: :string, description: "Next chunk ID"},
           prev: %Schema{type: :string, description: "Previous chunk ID"},
-          file_name: %Schema{type: :string, description: "File name"}
+          file_name: %Schema{type: :string, description: "File name"},
+          keywords: %Schema{
+            type: :array,
+            items: %Schema{type: :string},
+            description: "Keywords"
+          }
         },
-        required: [:id, :memory_id, :point, :content, :file_name]
+        required: [:id, :memory_id, :point, :content, :file_name, :keywords]
       })
     end
 
