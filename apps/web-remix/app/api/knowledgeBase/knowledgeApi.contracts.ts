@@ -177,8 +177,8 @@ export const MemoryNodeRelatedResponse = z
 
 export const MemoryNodeDetails = MemoryNode.merge(
   z.object({
-    next: z.union([z.string(), z.number()]).optional(),
-    prev: z.union([z.string(), z.number()]).optional(),
+    next: z.union([z.string(), z.number()]).nullable().optional(),
+    prev: z.union([z.string(), z.number()]).nullable().optional(),
     file_name: z.string(),
     content: z.string(),
     keywords: z.array(z.string()).default([]),
