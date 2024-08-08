@@ -79,6 +79,43 @@ defmodule BuildelWeb.CollectionGraphController do
     end
   end
 
+  operation :related,
+    summary: "Show related graph nodes",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer],
+      chunk_id: [in: :query, description: "Chunk ID", type: :string],
+      limit: [in: :query, description: "Limit related nodes", type: :integer]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Collections.Graphs.RelatedResponse},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def related(conn, _params) do
+    %{
+      organization_id: organization_id,
+      memory_collection_id: memory_collection_id,
+      chunk_id: chunk_id,
+      limit: limit
+    } = conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
+         chunks <-
+           Buildel.MemoriesGraph.get_related_nodes(organization, collection, chunk_id, limit) do
+      render(conn, :related, chunks: chunks)
+    end
+  end
+
   operation :create,
     summary: "Generate collection graph",
     parameters: [

@@ -15,6 +15,14 @@ defmodule BuildelWeb.CollectionGraphJSON do
     }
   end
 
+  def related(%{chunks: chunks}) do
+    %{
+      data: %{
+        chunks: Enum.map(chunks, &Map.get(&1, "chunk_id"))
+      }
+    }
+  end
+
   def data(graph) do
     %{
       nodes:

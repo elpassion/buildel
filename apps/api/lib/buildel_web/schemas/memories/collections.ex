@@ -262,5 +262,28 @@ defmodule BuildelWeb.Schemas.Collections do
         required: [:data]
       })
     end
+
+    defmodule RelatedResponse do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "CollectionGraphsRelatedResponse",
+        type: :object,
+        properties: %{
+          data: %Schema{
+            type: :object,
+            properties: %{
+              related: %Schema{
+                type: :array,
+                items: %Schema{type: :string},
+                description: "Related nodes"
+              }
+            },
+            required: [:related]
+          }
+        },
+        required: [:data]
+      })
+    end
   end
 end

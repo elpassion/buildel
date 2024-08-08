@@ -1,6 +1,7 @@
 defmodule Buildel.MemoriesGraph do
   alias Buildel.Organizations.Organization
   alias Buildel.Memories.MemoryCollection
+  alias Buildel.Memories.MemoryCollectionSearch
 
   import Ecto.Query
 
@@ -84,6 +85,48 @@ defmodule Buildel.MemoriesGraph do
         metadata: metadata
       }
     end)
+  end
+
+  def get_related_nodes(
+        %Organization{} = organization,
+        %MemoryCollection{} = collection,
+        chunk_id,
+        limit \\ 5
+      ) do
+    collection_name = Buildel.Memories.organization_collection_name(organization, collection)
+
+    vector_db =
+      Buildel.VectorDB.new(%{
+        adapter: Buildel.VectorDB.EctoAdapter,
+        embeddings:
+          Buildel.Clients.Embeddings.new(%{
+            api_type: "test",
+            model: "",
+            api_key: "",
+            endpoint: ""
+          })
+      })
+
+    chunk = Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id)
+
+    params =
+      MemoryCollectionSearch.Params.from_map(%{
+        search_query: Map.get(chunk, "embedding"),
+        limit: limit,
+        extend_neighbors: false,
+        extend_parents: false,
+        token_limit: nil
+      })
+
+    {result, _total_tokens, _embeddings_tokens} =
+      MemoryCollectionSearch.new(%{
+        vector_db: vector_db,
+        organization_collection_name: collection_name
+      })
+      |> MemoryCollectionSearch.search(params)
+
+    result
+    |> Enum.drop(1)
   end
 
   def generate_and_save_graph(
