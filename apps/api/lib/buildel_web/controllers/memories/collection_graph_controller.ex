@@ -176,9 +176,13 @@ defmodule BuildelWeb.CollectionGraphController do
 
     case Application.fetch_env!(:buildel, :skip_flame) do
       true ->
-        conn
-        |> put_status(:created)
-        |> json(%{})
+        with {:ok, organization} <-
+               Buildel.Organizations.get_user_organization(user, organization_id),
+             {:ok, collection} <-
+               Buildel.Memories.get_organization_collection(organization, memory_collection_id),
+             graph <- Buildel.MemoriesGraph.get_graph(organization, collection) do
+          render(conn, :show, graph: graph)
+        end
 
       _ ->
         with {:ok, organization} <-
