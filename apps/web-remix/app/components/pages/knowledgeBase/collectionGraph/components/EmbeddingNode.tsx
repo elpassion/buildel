@@ -38,7 +38,7 @@ export function EmbeddingNode(props: IEmbeddingNode) {
       styles.opacity = 0.5;
       styles.backgroundColor = props.data.base_color;
     } else {
-      styles.opacity = 0.5;
+      styles.opacity = 0.2;
       styles.backgroundColor = '#aaa';
     }
 
@@ -50,8 +50,8 @@ export function EmbeddingNode(props: IEmbeddingNode) {
       <Handle
         id="a"
         type="source"
-        position={Position.Right}
-        className="opacity-0 !pointer-events-none"
+        position={Position.Top}
+        className="!top-1/2 !left-1/2 opacity-0 !pointer-events-none !w-[1px] !h-[1px]"
       />
       <div
         data-nodecircle={props.id}
@@ -63,8 +63,8 @@ export function EmbeddingNode(props: IEmbeddingNode) {
 
       <Handle
         type="target"
-        position={Position.Left}
-        className="opacity-0 !pointer-events-none"
+        position={Position.Top}
+        className="!top-1/2 !left-1/2 opacity-0 !pointer-events-none !w-[1px] !h-[1px]"
       />
     </>
   );

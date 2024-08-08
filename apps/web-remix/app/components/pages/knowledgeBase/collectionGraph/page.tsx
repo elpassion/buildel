@@ -1,21 +1,18 @@
 import React, { useCallback, useEffect } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
-import type { Edge, OnSelectionChangeParams } from '@xyflow/react';
-import {
-  Background,
-  Controls,
-  ReactFlow,
-  useEdgesState,
-  useNodesState,
-} from '@xyflow/react';
+import type { OnSelectionChangeParams } from '@xyflow/react';
+import { Background, ReactFlow, useNodesState } from '@xyflow/react';
 import isEqual from 'lodash.isequal';
 
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 
 import { ActiveNodeProvider } from './activeNodeProvider';
 import type { IEmbeddingNode } from './collectionGraph.types';
-import { toEmbeddingNodes } from './collectionGraph.utils';
+import {
+  generateActiveNodeEdges,
+  toEmbeddingNodes,
+} from './collectionGraph.utils';
 import { EmbeddingNode } from './components/EmbeddingNode';
 import { GenerateGraph } from './components/GenerateGraph';
 import {
@@ -46,7 +43,6 @@ export function KnowledgeBaseGraphPage() {
     nextNode,
   } = useLoaderData<typeof loader>();
 
-  const [edges] = useEdgesState<Edge>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState<IEmbeddingNode>(
     toEmbeddingNodes(graph.nodes),
   );
@@ -108,7 +104,7 @@ export function KnowledgeBaseGraphPage() {
 
         <ReactFlow<IEmbeddingNode>
           nodes={nodes}
-          edges={edges}
+          edges={generateActiveNodeEdges(activeChunk?.id, prevNode, nextNode)}
           nodesConnectable={false}
           nodesFocusable={false}
           nodesDraggable={false}
@@ -128,7 +124,6 @@ export function KnowledgeBaseGraphPage() {
           }}
         >
           <Background />
-          <Controls />
         </ReactFlow>
       </div>
     </ActiveNodeProvider>

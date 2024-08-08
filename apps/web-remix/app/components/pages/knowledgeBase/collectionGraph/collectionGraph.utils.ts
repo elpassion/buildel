@@ -1,7 +1,9 @@
+import type { Edge } from '@xyflow/react';
+
 import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 import { hashString } from '~/utils/stringHash';
 
-import type { IEmbeddingNode } from './collectionGraph.types';
+import type { IEmbeddingNode, IPrevNextNode } from './collectionGraph.types';
 
 export function toEmbeddingNodes(nodes: IMemoryNode[]): IEmbeddingNode[] {
   return nodes.map((item) => ({
@@ -13,6 +15,35 @@ export function toEmbeddingNodes(nodes: IMemoryNode[]): IEmbeddingNode[] {
     id: item.id.toString(),
     type: 'embedding',
   }));
+}
+
+export function generateActiveNodeEdges(
+  activeNodeId: IPrevNextNode,
+  prevNodeId: IPrevNextNode,
+  nextNodeId: IPrevNextNode,
+): Edge[] {
+  if (!activeNodeId) return [];
+  const edges: Edge[] = [];
+
+  if (prevNodeId) {
+    edges.push({
+      id: `${prevNodeId}-${activeNodeId}`,
+      source: prevNodeId.toString(),
+      target: activeNodeId.toString(),
+      type: 'straight',
+    });
+  }
+
+  if (nextNodeId) {
+    edges.push({
+      id: `${activeNodeId}-${nextNodeId}`,
+      source: activeNodeId.toString(),
+      target: nextNodeId.toString(),
+      type: 'straight',
+    });
+  }
+
+  return edges;
 }
 
 const colors: Record<string, string> = {};
