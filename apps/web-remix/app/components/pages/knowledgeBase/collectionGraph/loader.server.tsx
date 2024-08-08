@@ -25,11 +25,16 @@ export async function loader(args: LoaderFunctionArgs) {
       params.organizationId,
       collectionId,
     );
+    const graphState = await knowledgeBaseApi.getCollectionGraphState(
+      params.organizationId,
+      collectionId,
+    );
 
     return json({
       organizationId: params.organizationId,
       collectionName: params.collectionName,
       graph: graph.data,
+      graphState: graphState.data,
     });
   })(args);
 }

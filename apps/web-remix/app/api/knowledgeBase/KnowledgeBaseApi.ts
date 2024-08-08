@@ -12,6 +12,7 @@ import {
   KnowledgeBaseSearchChunkResponse,
   MemoryChunksResponse,
   MemoryGraphResponse,
+  MemoryGraphStateResponse,
 } from './knowledgeApi.contracts';
 import type {
   CreateCollectionSchema,
@@ -167,5 +168,16 @@ export class KnowledgeBaseApi {
     );
 
     return this.client(MemoryGraphResponse, url, { method: 'POST' });
+  }
+
+  async getCollectionGraphState(
+    organizationId: string | number,
+    collectionId: string | number,
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/memory_collections/${collectionId}/graphs/state`,
+    );
+
+    return this.client(MemoryGraphStateResponse, url);
   }
 }

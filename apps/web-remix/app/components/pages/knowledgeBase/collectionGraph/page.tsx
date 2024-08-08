@@ -5,6 +5,7 @@ import React, {
   useState,
 } from 'react';
 import type { MetaFunction } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
 import type { Edge, OnSelectionChangeParams } from '@xyflow/react';
 import {
   Background,
@@ -13,17 +14,14 @@ import {
   useEdgesState,
   useNodesState,
 } from '@xyflow/react';
+import isEqual from 'lodash.isequal';
+
+import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 
 import { ActiveNodeProvider } from './activeNodeProvider';
 import type { IEmbeddingNode } from './collectionGraph.types';
-import { EmbeddingNode } from './components/EmbeddingNode';
-import type { loader } from './loader.server';
-
-import '@xyflow/react/dist/style.css';
-
-import { useLoaderData } from '@remix-run/react';
-
 import { toEmbeddingNodes } from './collectionGraph.utils';
+import { EmbeddingNode } from './components/EmbeddingNode';
 import { GenerateGraph } from './components/GenerateGraph';
 import { NodePreview } from './components/NodePreview';
 import {
@@ -31,13 +29,16 @@ import {
   NodePreviewSidebarContent,
   NodePreviewSidebarHeader,
 } from './components/NodePreviewSidebar';
+import type { loader } from './loader.server';
+
+import '@xyflow/react/dist/style.css';
 
 const customNodes = {
   embedding: EmbeddingNode,
 };
 
 export function KnowledgeBaseGraphPage() {
-  const { graph } = useLoaderData<typeof loader>();
+  const { graph, graphState } = useLoaderData<typeof loader>();
   const [activeNode, setActiveNode] = useState<IEmbeddingNode | null>(null);
   const deferredActiveNode = useDeferredValue(activeNode);
 
@@ -45,6 +46,8 @@ export function KnowledgeBaseGraphPage() {
   const [nodes, setNodes, onNodesChange] = useNodesState<IEmbeddingNode>(
     toEmbeddingNodes(graph.nodes),
   );
+
+  useRevalidateOnInterval({ enabled: graphState.state !== 'idle' });
 
   const clearActiveNode = () => {
     setActiveNode(null);
@@ -61,14 +64,17 @@ export function KnowledgeBaseGraphPage() {
   }, []);
 
   useEffect(() => {
-    setNodes(toEmbeddingNodes(graph.nodes));
+    const updated = toEmbeddingNodes(graph.nodes);
+    if (isEqual(nodes, updated)) return;
+
+    setNodes(updated);
   }, [graph]);
 
   return (
     <ActiveNodeProvider value={{ activeNode: deferredActiveNode }}>
       <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden">
         <div className="absolute top-4 right-4 z-[10] md:right-6 lg:right-10">
-          <GenerateGraph />
+          <GenerateGraph state={graphState} />
         </div>
 
         <NodePreviewSidebar

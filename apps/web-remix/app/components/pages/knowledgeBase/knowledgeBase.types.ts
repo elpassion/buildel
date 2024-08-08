@@ -5,6 +5,7 @@ import type {
   KnowledgeBaseCollectionCost,
   KnowledgeBaseFile,
   KnowledgeBaseFileList,
+  MemoryGraphState,
   MemoryNode,
 } from '~/api/knowledgeBase/knowledgeApi.contracts';
 
@@ -19,3 +20,5 @@ export type IKnowledgeBaseCollectionCost = z.TypeOf<
 >;
 
 export type IMemoryNode = z.TypeOf<typeof MemoryNode>;
+
+export type IMemoryGraphState = z.TypeOf<typeof MemoryGraphState>;

@@ -156,3 +156,13 @@ export const MemoryGraphResponse = z
     }),
   })
   .transform((res) => res.data);
+
+export const MemoryGraphState = z.object({
+  state: z.enum(['processing', 'idle']),
+});
+
+export const MemoryGraphStateResponse = z
+  .object({
+    data: MemoryGraphState,
+  })
+  .transform((res) => res.data);
