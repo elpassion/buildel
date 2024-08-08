@@ -181,6 +181,7 @@ export const MemoryNodeDetails = MemoryNode.merge(
     prev: z.union([z.string(), z.number()]).optional(),
     file_name: z.string(),
     content: z.string(),
+    keywords: z.array(z.string()).default([]),
   }),
 );
 

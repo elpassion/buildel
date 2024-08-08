@@ -81,6 +81,16 @@ export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
 
         <NodePreviewRow>
           <NodePreviewRowHeading>
+            Keywords
+            <NodePreviewRowCopyButton value={details.keywords.toString()} />
+          </NodePreviewRowHeading>
+          <NodePreviewRowContent>
+            {details.keywords.toString()}
+          </NodePreviewRowContent>
+        </NodePreviewRow>
+
+        <NodePreviewRow>
+          <NodePreviewRowHeading>
             Content
             <NodePreviewRowCopyButton value={details.content} />
           </NodePreviewRowHeading>
