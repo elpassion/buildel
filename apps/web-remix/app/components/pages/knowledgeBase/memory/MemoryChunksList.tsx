@@ -30,6 +30,8 @@ export const MemoryChunksListItem: React.FC<MemoryChunksListItemProps> = ({
 }) => {
   return (
     <div className="w-full">
+      <p className="text-sm">id: {data.id}</p>
+
       <p className="font-bold">{data.keywords.join(' - ')}</p>
       <pre className="text-sm break-all whitespace-break-spaces">
         {data.content.trim()}

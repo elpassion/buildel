@@ -43,6 +43,7 @@ function KnowledgeBaseSearchListItem({
   return (
     <Card>
       <CardHeader>
+        <CardDescription>id: {item.id}</CardDescription>
         {item.keywords.length ? (
           <CardDescription>{item.keywords.join(' - ')}</CardDescription>
         ) : (
