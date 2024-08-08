@@ -1,9 +1,9 @@
 import { createContext, useContext } from 'react';
 
-import type { IEmbeddingNode } from './collectionGraph.types';
+import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 
 interface IActiveNodeContext {
-  activeNode: IEmbeddingNode | null;
+  activeNode: IMemoryNode | null;
   relatedNeighbours: string[];
 }
 

@@ -13,6 +13,8 @@ import {
   MemoryChunksResponse,
   MemoryGraphResponse,
   MemoryGraphStateResponse,
+  MemoryNodeDetailsResponse,
+  MemoryNodeRelatedResponse,
 } from './knowledgeApi.contracts';
 import type {
   CreateCollectionSchema,
@@ -179,5 +181,29 @@ export class KnowledgeBaseApi {
     );
 
     return this.client(MemoryGraphStateResponse, url);
+  }
+
+  async getRelatedNeighbours(
+    organizationId: string | number,
+    collectionId: string | number,
+    chunkId: string | number,
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/memory_collections/${collectionId}/graphs/related?chunk_id=${chunkId}&limit=5`,
+    );
+
+    return this.client(MemoryNodeRelatedResponse, url);
+  }
+
+  async getGraphChunkDetails(
+    organizationId: string | number,
+    collectionId: string | number,
+    chunkId: string | number,
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/memory_collections/${collectionId}/graphs/details?chunk_id=${chunkId}`,
+    );
+
+    return this.client(MemoryNodeDetailsResponse, url);
   }
 }

@@ -145,7 +145,6 @@ export const MemoryNode = z.object({
   id: z.union([z.string(), z.number()]),
   memory_id: z.union([z.string(), z.number()]),
   point: z.array(z.number(), z.number()),
-  file_name: z.string().optional(),
 });
 
 export const MemoryGraphResponse = z
@@ -173,5 +172,20 @@ export const MemoryNodeRelated = z.object({
 export const MemoryNodeRelatedResponse = z
   .object({
     data: MemoryNodeRelated,
+  })
+  .transform((res) => res.data);
+
+export const MemoryNodeDetails = MemoryNode.merge(
+  z.object({
+    next: z.union([z.string(), z.number()]).optional(),
+    prev: z.union([z.string(), z.number()]).optional(),
+    file_name: z.string(),
+    content: z.string(),
+  }),
+);
+
+export const MemoryNodeDetailsResponse = z
+  .object({
+    data: MemoryNodeDetails,
   })
   .transform((res) => res.data);

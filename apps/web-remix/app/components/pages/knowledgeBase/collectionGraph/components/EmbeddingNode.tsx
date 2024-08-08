@@ -36,7 +36,7 @@ export function EmbeddingNode(props: IEmbeddingNode) {
         id="a"
         type="source"
         position={Position.Right}
-        className="opacity-0"
+        className="opacity-0 !pointer-events-none"
       />
       <div
         style={activeStyles()}
@@ -45,7 +45,11 @@ export function EmbeddingNode(props: IEmbeddingNode) {
         )}
       />
 
-      <Handle type="target" position={Position.Left} className="opacity-0" />
+      <Handle
+        type="target"
+        position={Position.Left}
+        className="opacity-0 !pointer-events-none"
+      />
     </>
   );
 }

@@ -6,30 +6,38 @@ import { IconButton } from '~/components/iconButton';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { cn } from '~/utils/cn';
 
-import type { IEmbeddingNode } from '../collectionGraph.types';
+import type { IMemoryNodeDetails } from '../../collectionGraph.types';
 
 interface NodePreviewProps {
-  node: IEmbeddingNode;
+  details: IMemoryNodeDetails;
 }
 
-export const NodePreview = ({ node }: NodePreviewProps) => {
+export const NodePreview = ({ details }: NodePreviewProps) => {
   return (
     <section>
       <div className="flex flex-col divide-y">
         <NodePreviewRow>
           <NodePreviewRowHeading>
             Id
-            <NodePreviewRowCopyButton value={node.data.id} />
+            <NodePreviewRowCopyButton value={details.id} />
           </NodePreviewRowHeading>
-          <NodePreviewRowContent>{node.data.id}</NodePreviewRowContent>
+          <NodePreviewRowContent>{details.id}</NodePreviewRowContent>
+        </NodePreviewRow>
+
+        <NodePreviewRow>
+          <NodePreviewRowHeading>
+            File name
+            <NodePreviewRowCopyButton value={details.file_name} />
+          </NodePreviewRowHeading>
+          <NodePreviewRowContent>{details.file_name}</NodePreviewRowContent>
         </NodePreviewRow>
 
         <NodePreviewRow>
           <NodePreviewRowHeading>
             Content
-            <NodePreviewRowCopyButton value={node.data.content} />
+            <NodePreviewRowCopyButton value={details.content} />
           </NodePreviewRowHeading>
-          <NodePreviewRowContent>{node.data.content}</NodePreviewRowContent>
+          <NodePreviewRowContent>{details.content}</NodePreviewRowContent>
         </NodePreviewRow>
       </div>
     </section>
