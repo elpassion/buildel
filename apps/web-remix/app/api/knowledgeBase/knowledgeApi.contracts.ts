@@ -144,7 +144,6 @@ export const KnowledgeBaseCollectionFromListResponse =
 export const MemoryNode = z.object({
   id: z.union([z.string(), z.number()]),
   memory_id: z.union([z.string(), z.number()]),
-  content: z.string(),
   point: z.array(z.number(), z.number()),
   file_name: z.string().optional(),
 });
