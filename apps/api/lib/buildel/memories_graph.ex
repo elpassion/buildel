@@ -149,12 +149,20 @@ defmodule Buildel.MemoriesGraph do
         %{id: record.id, point: point}
       end)
 
-    Enum.each(reduced_embeddings, fn %{id: id, point: point} ->
-      from(c in Buildel.VectorDB.EctoAdapter.Chunk,
-        where: c.id == ^id
+    Enum.reduce(reduced_embeddings, Ecto.Multi.new(), fn %{id: id, point: point}, multi ->
+      multi
+      |> Ecto.Multi.update_all(
+        id |> String.to_atom(),
+        fn _ ->
+          from(c in Buildel.VectorDB.EctoAdapter.Chunk,
+            where: c.id == ^id,
+            update: [set: [embedding_reduced_2: ^point]]
+          )
+        end,
+        []
       )
-      |> Repo.update_all(set: [embedding_reduced_2: point])
     end)
+    |> Buildel.Repo.transaction()
 
     :ok
   end
