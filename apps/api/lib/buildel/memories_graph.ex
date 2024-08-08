@@ -1,4 +1,5 @@
 defmodule Buildel.MemoriesGraph do
+  require Logger
   alias Buildel.Organizations.Organization
   alias Buildel.Memories.MemoryCollection
   alias Buildel.Memories.MemoryCollectionSearch
@@ -162,7 +163,11 @@ defmodule Buildel.MemoriesGraph do
 
     Task.async(fn ->
       FLAME.call(Buildel.CollectionGraphRunner, fn ->
-        reduce_dimensions(organization, collection)
+        case reduce_dimensions(organization, collection) do
+          :ok -> :ok
+          e -> Logger.debug("Failed to reduce dimensions: #{inspect(e)}")
+        end
+
         GenServer.cast(__MODULE__, {:remove, collection.id})
       end)
     end)
@@ -176,63 +181,69 @@ defmodule Buildel.MemoriesGraph do
        ) do
     collection_name = Buildel.Memories.organization_collection_name(organization, collection)
 
-    result =
-      Repo.all(
-        from c in Buildel.VectorDB.EctoAdapter.Chunk,
-          select: {c.embedding_3072, c.embedding_1536, c.embedding_384, c.id},
-          where: c.collection_name == ^collection_name
-      )
-      |> Enum.shuffle()
+    with result when result != [] <-
+           Repo.all(
+             from c in Buildel.VectorDB.EctoAdapter.Chunk,
+               select: {c.embedding_3072, c.embedding_1536, c.embedding_384, c.id},
+               where: c.collection_name == ^collection_name
+           )
+           |> Enum.shuffle() do
+      embeddings =
+        case Enum.at(result, 0) do
+          {_, nil, nil, _} ->
+            result |> Enum.map(fn {embedding, _, _, _id} -> Pgvector.to_list(embedding) end)
 
-    embeddings =
-      case Enum.at(result, 0) do
-        {_, nil, nil, _} ->
-          result |> Enum.map(fn {embedding, _, _, _id} -> Pgvector.to_list(embedding) end)
+          {nil, _, nil, _} ->
+            result |> Enum.map(fn {_, embedding, _, _id} -> Pgvector.to_list(embedding) end)
 
-        {nil, _, nil, _} ->
-          result |> Enum.map(fn {_, embedding, _, _id} -> Pgvector.to_list(embedding) end)
+          {nil, nil, _, _} ->
+            result |> Enum.map(fn {_, _, embedding, _id} -> Pgvector.to_list(embedding) end)
+        end
 
-        {nil, nil, _, _} ->
-          result |> Enum.map(fn {_, _, embedding, _id} -> Pgvector.to_list(embedding) end)
-      end
+      result =
+        result |> Enum.map(fn {_, _, _, id} -> %{id: id} end)
 
-    result =
-      result |> Enum.map(fn {_, _, _, id} -> %{id: id} end)
+      tensor_data = Nx.tensor(embeddings)
 
-    tensor_data = Nx.tensor(embeddings)
+      reduced_embeddings =
+        Scholar.Manifold.TSNE.fit(tensor_data,
+          key: Nx.Random.key(42),
+          num_components: 2,
+          perplexity: 15,
+          exaggeration: 10.0,
+          learning_rate: 500,
+          init: :random,
+          metric: :squared_euclidean
+        )
+        |> Nx.to_list()
+        |> Enum.with_index()
+        |> Enum.map(fn {point, index} ->
+          record = Enum.at(result, index)
+          %{id: record.id, point: point}
+        end)
 
-    reduced_embeddings =
-      Scholar.Manifold.TSNE.fit(tensor_data,
-        key: Nx.Random.key(42),
-        num_components: 2,
-        perplexity: 15,
-        exaggeration: 10.0,
-        learning_rate: 500,
-        init: :random,
-        metric: :squared_euclidean
-      )
-      |> Nx.to_list()
-      |> Enum.with_index()
-      |> Enum.map(fn {point, index} ->
-        record = Enum.at(result, index)
-        %{id: record.id, point: point}
+      Enum.reduce(reduced_embeddings, Ecto.Multi.new(), fn %{id: id, point: point}, multi ->
+        multi
+        |> Ecto.Multi.update_all(
+          id |> String.to_atom(),
+          fn _ ->
+            from(c in Buildel.VectorDB.EctoAdapter.Chunk,
+              where: c.id == ^id,
+              update: [set: [embedding_reduced_2: ^point]]
+            )
+          end,
+          []
+        )
       end)
+      |> Buildel.Repo.transaction()
 
-    Enum.reduce(reduced_embeddings, Ecto.Multi.new(), fn %{id: id, point: point}, multi ->
-      multi
-      |> Ecto.Multi.update_all(
-        id |> String.to_atom(),
-        fn _ ->
-          from(c in Buildel.VectorDB.EctoAdapter.Chunk,
-            where: c.id == ^id,
-            update: [set: [embedding_reduced_2: ^point]]
-          )
-        end,
-        []
-      )
-    end)
-    |> Buildel.Repo.transaction()
+      :ok
+    else
+      result when is_list(result) ->
+        :ok
 
-    :ok
+      e ->
+        e
+    end
   end
 end
