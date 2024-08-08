@@ -126,7 +126,7 @@ defmodule Buildel.MemoriesGraph do
         adapter: Buildel.VectorDB.EctoAdapter,
         embeddings:
           Buildel.Clients.Embeddings.new(%{
-            api_type: "test",
+            api_type: "openai",
             model: "",
             api_key: "",
             endpoint: ""
@@ -151,8 +151,7 @@ defmodule Buildel.MemoriesGraph do
       })
       |> MemoryCollectionSearch.search(params)
 
-    result
-    |> Enum.drop(1)
+    result |> Enum.drop(1)
   end
 
   def generate_and_save_graph(
