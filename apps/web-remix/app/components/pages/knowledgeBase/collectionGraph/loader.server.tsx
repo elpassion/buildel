@@ -5,6 +5,7 @@ import type { z } from 'zod';
 
 import type { MemoryNodeRelated } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { KnowledgeBaseApi } from '~/api/knowledgeBase/KnowledgeBaseApi';
+import type { IPrevNextNode } from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.types';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
 
@@ -23,14 +24,19 @@ export async function loader(args: LoaderFunctionArgs) {
       params.collectionName,
     );
 
-    const graph = await knowledgeBaseApi.getCollectionGraph(
+    const graphPromise = knowledgeBaseApi.getCollectionGraph(
       params.organizationId,
       collectionId,
     );
-    const graphState = await knowledgeBaseApi.getCollectionGraphState(
+    const graphStatePromise = knowledgeBaseApi.getCollectionGraphState(
       params.organizationId,
       collectionId,
     );
+
+    const [graph, graphState] = await Promise.all([
+      graphPromise,
+      graphStatePromise,
+    ]);
 
     const url = new URL(request.url);
     const chunk_id = url.searchParams.get('chunk_id');
@@ -39,15 +45,29 @@ export async function loader(args: LoaderFunctionArgs) {
       graph.data.nodes.find((node) => node.id === chunk_id) ?? null;
 
     let relatedNeighbours: z.TypeOf<typeof MemoryNodeRelated>['chunks'] = [];
+    let prevNode: IPrevNextNode = null;
+    let nextNode: IPrevNextNode = null;
 
     if (activeChunk) {
-      const { data } = await knowledgeBaseApi.getRelatedNeighbours(
+      const chunkDetailsPromise = knowledgeBaseApi.getGraphChunkDetails(
+        params.organizationId,
+        collectionId,
+        activeChunk.id,
+      );
+      const relatedNeighboursPromise = knowledgeBaseApi.getRelatedNeighbours(
         params.organizationId,
         collectionId,
         activeChunk.id,
       );
 
-      relatedNeighbours = data.chunks;
+      const [details, neighbours] = await Promise.all([
+        chunkDetailsPromise,
+        relatedNeighboursPromise,
+      ]);
+
+      relatedNeighbours = neighbours.data.chunks;
+      prevNode = details.data.prev;
+      nextNode = details.data.next;
     }
 
     return json({
@@ -58,6 +78,8 @@ export async function loader(args: LoaderFunctionArgs) {
       graphState: graphState.data,
       activeChunk,
       relatedNeighbours,
+      prevNode,
+      nextNode,
     });
   })(args);
 }

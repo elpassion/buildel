@@ -42,6 +42,8 @@ export function KnowledgeBaseGraphPage() {
     organizationId,
     activeChunk,
     relatedNeighbours,
+    prevNode,
+    nextNode,
   } = useLoaderData<typeof loader>();
 
   const [edges] = useEdgesState<Edge>([]);
@@ -62,7 +64,6 @@ export function KnowledgeBaseGraphPage() {
 
   const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {
     if (params.nodes.length === 0) return;
-
     const node = params.nodes[0] as IEmbeddingNode;
 
     navigate(
@@ -82,6 +83,8 @@ export function KnowledgeBaseGraphPage() {
   return (
     <ActiveNodeProvider
       value={{
+        prevNode,
+        nextNode,
         activeNode: activeChunk,
         relatedNeighbours: relatedNeighbours,
       }}

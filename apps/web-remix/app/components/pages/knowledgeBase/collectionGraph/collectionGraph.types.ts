@@ -7,3 +7,5 @@ import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase
 export type IEmbeddingNode = Node<IMemoryNode & { base_color: string }>;
 
 export type IMemoryNodeDetails = z.TypeOf<typeof MemoryNodeDetails>;
+
+export type IPrevNextNode = string | number | null | undefined;

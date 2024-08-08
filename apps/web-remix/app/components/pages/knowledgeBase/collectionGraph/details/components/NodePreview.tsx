@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Check, Copy } from 'lucide-react';
 
 import type { IconButtonProps } from '~/components/iconButton';
@@ -10,15 +10,54 @@ import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
-import type { IMemoryNodeDetails } from '../../collectionGraph.types';
+import type {
+  IMemoryNodeDetails,
+  IPrevNextNode,
+} from '../../collectionGraph.types';
 
 interface NodePreviewProps {
   details: IMemoryNodeDetails;
   collectionName: string;
 }
 
+const queryNode = (id: IPrevNextNode) => {
+  return document.querySelector<HTMLDivElement>(`[data-nodecircle="${id}"]`);
+};
+
+const clearStyles = (node: HTMLDivElement) => {
+  node.style.scale = '1';
+};
+
+const setStyles = (node: HTMLDivElement) => {
+  node.style.scale = '1.8';
+};
+
 export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
   const organizationId = useOrganizationId();
+
+  const onMouseEnter = useCallback((id: IPrevNextNode) => {
+    if (!id) return;
+    const node = queryNode(id);
+
+    if (!node) return;
+    setStyles(node);
+  }, []);
+
+  const onMouseLeave = useCallback((id: IPrevNextNode) => {
+    if (!id) return;
+    const node = queryNode(id);
+
+    if (!node) return;
+    clearStyles(node);
+  }, []);
+
+  const onClick = useCallback((id: IPrevNextNode) => {
+    if (!id) return;
+    const node = queryNode(id);
+
+    if (!node) return;
+    clearStyles(node);
+  }, []);
 
   return (
     <section>
@@ -28,7 +67,11 @@ export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
             Id
             <NodePreviewRowCopyButton value={details.id} />
           </NodePreviewRowHeading>
-          <NodePreviewRowContent className="line-clamp-1">
+          <NodePreviewRowContent
+            onMouseEnter={() => onMouseEnter(details.id)}
+            onMouseLeave={() => onMouseLeave(details.id)}
+            className="line-clamp-1 cursor-pointer"
+          >
             {details.id}
           </NodePreviewRowContent>
         </NodePreviewRow>
@@ -49,6 +92,9 @@ export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
             </NodePreviewRowHeading>
             <NodePreviewRowLink
               className="line-clamp-1"
+              onMouseEnter={() => onMouseEnter(details.prev)}
+              onMouseLeave={() => onMouseLeave(details.prev)}
+              onClick={() => onClick(details.prev)}
               to={routes.collectionGraphDetails(
                 organizationId,
                 collectionName,
@@ -68,6 +114,9 @@ export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
             </NodePreviewRowHeading>
             <NodePreviewRowLink
               className="line-clamp-1"
+              onMouseEnter={() => onMouseEnter(details.next)}
+              onMouseLeave={() => onMouseLeave(details.next)}
+              onClick={() => onClick(details.next)}
               to={routes.collectionGraphDetails(
                 organizationId,
                 collectionName,

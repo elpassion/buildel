@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
@@ -7,7 +8,7 @@ import { useActiveNode } from '../activeNodeProvider';
 import type { IEmbeddingNode } from '../collectionGraph.types';
 
 export function EmbeddingNode(props: IEmbeddingNode) {
-  const { activeNode, relatedNeighbours } = useActiveNode();
+  const { activeNode, relatedNeighbours, prevNode, nextNode } = useActiveNode();
 
   const isRelated = (id: string) => {
     return relatedNeighbours.includes(id);
@@ -17,18 +18,32 @@ export function EmbeddingNode(props: IEmbeddingNode) {
     return activeNode?.id === props.id;
   }, [activeNode]);
 
-  const activeStyles = () => {
-    if (!activeNode) return { backgroundColor: props.data.base_color };
+  const activeStyles = useMemo(() => {
+    if (!activeNode) {
+      return {
+        backgroundColor: props.data.base_color,
+        borderColor: props.data.base_color,
+      };
+    }
+
+    const styles: CSSProperties = {};
 
     if (isActive) {
-      return { backgroundColor: props.data.base_color };
-    }
-    if (isRelated(props.id)) {
-      return { backgroundColor: props.data.base_color, opacity: 0.5 };
+      styles.backgroundColor = props.data.base_color;
+    } else if (prevNode === props.id) {
+      styles.backgroundColor = 'black';
+    } else if (nextNode === props.id) {
+      styles.backgroundColor = 'red';
+    } else if (isRelated(props.id)) {
+      styles.opacity = 0.5;
+      styles.backgroundColor = props.data.base_color;
+    } else {
+      styles.opacity = 0.5;
+      styles.backgroundColor = '#aaa';
     }
 
-    return { backgroundColor: '#aaa', opacity: 0.5 };
-  };
+    return styles;
+  }, [isActive, prevNode, nextNode]);
 
   return (
     <>
@@ -39,9 +54,10 @@ export function EmbeddingNode(props: IEmbeddingNode) {
         className="opacity-0 !pointer-events-none"
       />
       <div
-        style={activeStyles()}
+        data-nodecircle={props.id}
+        style={activeStyles}
         className={cn(
-          'group relative h-5 w-5 rounded-full hover:!bg-purple-600',
+          'group relative h-6 w-6 rounded-full hover:!bg-purple-600',
         )}
       />
 
