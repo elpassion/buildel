@@ -208,10 +208,32 @@ defmodule BuildelWeb.Schemas.Collections do
             type: :array,
             items: %Schema{type: :number},
             description: "Point coordinates"
-          },
-          content: %Schema{type: :string, description: "Content"}
+          }
         },
         required: [:id, :memory_id, :point, :content]
+      })
+    end
+
+    defmodule NodeDetails do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "CollectionGraphsNodeDetails",
+        type: :object,
+        properties: %{
+          id: %Schema{type: :string, description: "Chunk ID"},
+          memory_id: %Schema{type: :integer, description: "Memory ID"},
+          point: %Schema{
+            type: :array,
+            items: %Schema{type: :number},
+            description: "Point coordinates"
+          },
+          content: %Schema{type: :string, description: "Content"},
+          next: %Schema{type: :string, description: "Next chunk ID"},
+          prev: %Schema{type: :string, description: "Previous chunk ID"},
+          file_name: %Schema{type: :string, description: "File name"}
+        },
+        required: [:id, :memory_id, :point, :content, :file_name]
       })
     end
 
@@ -281,6 +303,19 @@ defmodule BuildelWeb.Schemas.Collections do
             },
             required: [:related]
           }
+        },
+        required: [:data]
+      })
+    end
+
+    defmodule DetailsResponse do
+      require OpenApiSpex
+
+      OpenApiSpex.schema(%{
+        title: "CollectionGraphsDetailsResponse",
+        type: :object,
+        properties: %{
+          data: NodeDetails
         },
         required: [:data]
       })

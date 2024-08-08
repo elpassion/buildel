@@ -3,6 +3,20 @@ defmodule BuildelWeb.CollectionGraphJSON do
     %{data: data(graph)}
   end
 
+  def details(%{chunk: chunk}) do
+    %{
+      data: %{
+        id: chunk.id,
+        memory_id: Map.get(chunk.metadata, "memory_id"),
+        point: chunk.embedding_reduced_2,
+        content: chunk.document,
+        next: Map.get(chunk.metadata, "next"),
+        prev: Map.get(chunk.metadata, "prev"),
+        file_name: Map.get(chunk.metadata, "file_name")
+      }
+    }
+  end
+
   def state(%{state: state}) do
     %{
       data: %{
@@ -29,14 +43,12 @@ defmodule BuildelWeb.CollectionGraphJSON do
         Enum.map(graph, fn %{
                              embedding_reduced_2: embedding_reduced_2,
                              id: id,
-                             document: document,
                              metadata: metadata
                            } ->
           %{
             id: id,
             memory_id: Map.get(metadata, "memory_id"),
-            point: embedding_reduced_2,
-            content: String.slice(document, 0, 50)
+            point: embedding_reduced_2
           }
         end)
     }

@@ -87,6 +87,32 @@ defmodule Buildel.MemoriesGraph do
     end)
   end
 
+  def get_node_details(
+        %Organization{} = organization,
+        %MemoryCollection{} = collection,
+        chunk_id
+      ) do
+    collection_name = Buildel.Memories.organization_collection_name(organization, collection)
+
+    Repo.one(
+      from c in Buildel.VectorDB.EctoAdapter.Chunk,
+        select: %{
+          c
+          | embedding_1536: nil,
+            embedding_3072: nil,
+            embedding_384: nil
+        },
+        where: c.collection_name == ^collection_name and c.id == ^chunk_id
+    )
+    |> case do
+      nil ->
+        {:error, :not_found}
+
+      chunk ->
+        {:ok, %{chunk | embedding_reduced_2: Pgvector.to_list(chunk.embedding_reduced_2)}}
+    end
+  end
+
   def get_related_nodes(
         %Organization{} = organization,
         %MemoryCollection{} = collection,

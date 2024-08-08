@@ -116,6 +116,41 @@ defmodule BuildelWeb.CollectionGraphController do
     end
   end
 
+  operation :details,
+    summary: "Show graph node details",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer],
+      chunk_id: [in: :query, description: "Chunk ID", type: :string]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Collections.Graphs.DetailsResponse},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def details(conn, _params) do
+    %{
+      organization_id: organization_id,
+      memory_collection_id: memory_collection_id,
+      chunk_id: chunk_id
+    } = conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
+         {:ok, chunk} <-
+           Buildel.MemoriesGraph.get_node_details(organization, collection, chunk_id) do
+      render(conn, :details, chunk: chunk)
+    end
+  end
+
   operation :create,
     summary: "Generate collection graph",
     parameters: [
