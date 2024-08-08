@@ -205,7 +205,8 @@ defmodule Buildel.Memories.MemoryFile do
               save_chunks_to_file(chunks)
             end
           end,
-          max_concurrency: 15
+          max_concurrency: 15,
+          timeout: 5 * 60_000
         )
         |> Enum.reduce(file, fn {:ok, chunks_file}, file ->
           FileUpload.success(file, chunks_file)

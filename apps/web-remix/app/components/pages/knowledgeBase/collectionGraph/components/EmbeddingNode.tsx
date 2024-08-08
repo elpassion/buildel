@@ -24,7 +24,7 @@ export function EmbeddingNode(props: IEmbeddingNode) {
       return { backgroundColor: props.data.base_color };
     }
     if (isRelated(props.id)) {
-      return { backgroundColor: props.data.base_color, opacity: 0.8 };
+      return { backgroundColor: props.data.base_color, opacity: 0.5 };
     }
 
     return { backgroundColor: '#aaa', opacity: 0.5 };

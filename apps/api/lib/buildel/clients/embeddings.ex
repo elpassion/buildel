@@ -98,7 +98,7 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
            HTTPoison.post(
              endpoint,
              %{
-               input: inputs,
+               input: inputs |> cleanup_inputs(),
                model: model
              }
              |> Jason.encode!(),
@@ -124,6 +124,10 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
           %{"error" => %{"code" => "model_not_found"}} -> {:error, :model_not_found}
         end
     end
+  end
+
+  defp cleanup_inputs(inputs) do
+    inputs |> Enum.map(&String.replace(&1, " | ", " ", global: true))
   end
 
   def config(api_key \\ nil) do

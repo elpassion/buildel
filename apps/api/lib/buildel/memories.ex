@@ -101,8 +101,6 @@ defmodule Buildel.Memories do
         }
       })
 
-    IO.inspect("getting memory")
-
     with {:ok, file} <- Buildel.Memories.MemoryFile.get(file_id),
          {:ok, memory} <-
            %Buildel.Memories.Memory{}
@@ -115,13 +113,9 @@ defmodule Buildel.Memories do
              })
            )
            |> Buildel.Repo.insert() do
-      IO.inspect("saving chunks")
-
       Buildel.Memories.MemoryFile.FileUpload.chunks(file)
       |> Task.async_stream(
         fn chunks ->
-          IO.inspect("chunk")
-
           chunks =
             chunks
             |> put_in(
@@ -130,10 +124,7 @@ defmodule Buildel.Memories do
             )
             |> put_in([Access.all(), Access.key!(:metadata), :file_name], file.upload.filename)
 
-          IO.inspect("saving chunk")
-
           Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
-          IO.inspect("saved chunk")
         end,
         max_concurrency: 4,
         timeout: 60 * 1000
