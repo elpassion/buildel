@@ -157,6 +157,7 @@ defmodule Buildel.MemoriesGraph do
           select: {c.embedding_3072, c.embedding_1536, c.embedding_384, c.id},
           where: c.collection_name == ^collection_name
       )
+      |> Enum.shuffle()
 
     embeddings =
       case Enum.at(result, 0) do
