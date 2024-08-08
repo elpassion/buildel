@@ -5,6 +5,10 @@ import { hashString } from '~/utils/stringHash';
 
 import type { IEmbeddingNode, IPrevNextNode } from './collectionGraph.types';
 
+export const NEXT_NODE_COLOR = '#be123c';
+export const PREV_NODE_COLOR = '#000';
+export const SEARCH_NODE_COLOR = '#fde047';
+
 export function toEmbeddingNodes(nodes: IMemoryNode[]): IEmbeddingNode[] {
   return nodes.map((item) => ({
     data: {

@@ -22,6 +22,7 @@ export const GenerateGraph = ({ state }: GenerateGraphProps) => {
       size="sm"
       variant="outline"
       onClick={generateGraph}
+      className="pointer-events-auto"
       disabled={isLoading}
       isLoading={isLoading}
     >

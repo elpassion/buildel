@@ -6,6 +6,7 @@ import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase
 interface IActiveNodeContext {
   activeNode: IMemoryNode | null;
   relatedNeighbours: string[];
+  searchChunks: string[];
   prevNode: IPrevNextNode;
   nextNode: IPrevNextNode;
 }

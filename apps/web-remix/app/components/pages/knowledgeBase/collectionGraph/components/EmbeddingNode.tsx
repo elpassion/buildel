@@ -2,23 +2,38 @@ import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
+import {
+  NEXT_NODE_COLOR,
+  PREV_NODE_COLOR,
+  SEARCH_NODE_COLOR,
+} from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.utils';
 import { cn } from '~/utils/cn';
 
 import { useActiveNode } from '../activeNodeProvider';
 import type { IEmbeddingNode } from '../collectionGraph.types';
 
 export function EmbeddingNode(props: IEmbeddingNode) {
-  const { activeNode, relatedNeighbours, prevNode, nextNode } = useActiveNode();
+  const { activeNode, relatedNeighbours, prevNode, nextNode, searchChunks } =
+    useActiveNode();
+
+  const isSearched = (id: string) => {
+    return searchChunks.includes(id);
+  };
 
   const isRelated = (id: string) => {
     return relatedNeighbours.includes(id);
   };
-
   const isActive = useMemo(() => {
     return activeNode?.id === props.id;
   }, [activeNode]);
 
   const activeStyles = useMemo(() => {
+    if (isSearched(props.id)) {
+      return {
+        backgroundColor: SEARCH_NODE_COLOR,
+      };
+    }
+
     if (!activeNode) {
       return {
         backgroundColor: props.data.base_color,
@@ -31,9 +46,9 @@ export function EmbeddingNode(props: IEmbeddingNode) {
     if (isActive) {
       styles.backgroundColor = props.data.base_color;
     } else if (prevNode === props.id) {
-      styles.backgroundColor = 'black';
+      styles.backgroundColor = PREV_NODE_COLOR;
     } else if (nextNode === props.id) {
-      styles.backgroundColor = 'red';
+      styles.backgroundColor = NEXT_NODE_COLOR;
     } else if (isRelated(props.id)) {
       styles.opacity = 0.5;
       styles.backgroundColor = props.data.base_color;
@@ -43,7 +58,7 @@ export function EmbeddingNode(props: IEmbeddingNode) {
     }
 
     return styles;
-  }, [isActive, prevNode, nextNode]);
+  }, [isActive, prevNode, nextNode, searchChunks]);
 
   return (
     <>

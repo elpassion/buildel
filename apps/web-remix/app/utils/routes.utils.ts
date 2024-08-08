@@ -182,10 +182,17 @@ export const routes = {
     `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
       collectionName,
     )}/settings`,
-  collectionGraph: (organizationId: OrganizationId, collectionName: string) =>
-    `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
-      collectionName,
-    )}/graph`,
+  collectionGraph: (
+    organizationId: OrganizationId,
+    collectionName: string,
+    params: RouteParam = {},
+  ) =>
+    buildUrlWithParams(
+      `${routes.knowledgeBase(organizationId)}/${encodeURIComponent(
+        collectionName,
+      )}/graph`,
+      params,
+    ),
   collectionGraphDetails: (
     organizationId: OrganizationId,
     collectionName: string,

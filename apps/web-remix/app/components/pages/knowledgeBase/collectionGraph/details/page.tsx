@@ -6,9 +6,15 @@ import { NodePreview } from './components/NodePreview';
 import type { loader } from './loader.server';
 
 export function KnowledgeBaseGraphDetails() {
-  const { details, collectionName } = useLoaderData<typeof loader>();
+  const { details, collectionName, query } = useLoaderData<typeof loader>();
 
-  return <NodePreview details={details} collectionName={collectionName} />;
+  return (
+    <NodePreview
+      details={details}
+      collectionName={collectionName}
+      query={query}
+    />
+  );
 }
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {

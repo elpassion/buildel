@@ -26,6 +26,8 @@ import '@xyflow/react/dist/style.css';
 
 import { routes } from '~/utils/routes.utils';
 
+import { ChunksSearch } from './components/ChunksSearch';
+
 const customNodes = {
   embedding: EmbeddingNode,
 };
@@ -35,12 +37,14 @@ export function KnowledgeBaseGraphPage() {
   const {
     graph,
     graphState,
+    searchChunks,
     collectionName,
     organizationId,
     activeChunk,
     relatedNeighbours,
     prevNode,
     nextNode,
+    query,
   } = useLoaderData<typeof loader>();
 
   const [nodes, setNodes, onNodesChange] = useNodesState<IEmbeddingNode>(
@@ -53,21 +57,24 @@ export function KnowledgeBaseGraphPage() {
   const isNewSidebarOpen = !!matchDetails;
 
   const closeSidebar = () => {
-    navigate(routes.collectionGraph(organizationId, collectionName));
+    navigate(routes.collectionGraph(organizationId, collectionName, { query }));
   };
 
   useRevalidateOnInterval({ enabled: graphState.state !== 'idle' });
 
-  const onSelectionChange = useCallback((params: OnSelectionChangeParams) => {
-    if (params.nodes.length === 0) return;
-    const node = params.nodes[0] as IEmbeddingNode;
-
-    navigate(
-      routes.collectionGraphDetails(organizationId, collectionName, {
-        chunk_id: node.id,
-      }),
-    );
-  }, []);
+  const onSelectionChange = useCallback(
+    (params: OnSelectionChangeParams) => {
+      if (params.nodes.length === 0) return;
+      const node = params.nodes[0] as IEmbeddingNode;
+      navigate(
+        routes.collectionGraphDetails(organizationId, collectionName, {
+          chunk_id: node.id,
+          query,
+        }),
+      );
+    },
+    [query],
+  );
 
   useEffect(() => {
     const updated = toEmbeddingNodes(graph.nodes);
@@ -79,6 +86,7 @@ export function KnowledgeBaseGraphPage() {
   return (
     <ActiveNodeProvider
       value={{
+        searchChunks,
         prevNode,
         nextNode,
         activeNode: activeChunk,
@@ -86,7 +94,9 @@ export function KnowledgeBaseGraphPage() {
       }}
     >
       <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden">
-        <div className="absolute top-4 right-4 z-[10] md:right-6 lg:right-10">
+        <div className="flex justify-between items-center gap-6 absolute top-4 right-4 left-4 z-[12] md:right-6 md:left-4 lg:right-10 lg:left-10 pointer-events-none bg-transparent">
+          <ChunksSearch defaultValue={query} />
+
           <GenerateGraph state={graphState} />
         </div>
 

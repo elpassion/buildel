@@ -24,6 +24,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const url = new URL(request.url);
     const chunk_id = url.searchParams.get('chunk_id');
+    const query = url.searchParams.get('query') ?? '';
 
     if (!chunk_id) throw new NotFoundError();
 
@@ -38,6 +39,7 @@ export async function loader(args: LoaderFunctionArgs) {
       collectionName: params.collectionName,
       collectionId: collectionId,
       details: details,
+      query,
     });
   })(args);
 }

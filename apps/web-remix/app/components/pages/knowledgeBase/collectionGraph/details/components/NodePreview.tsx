@@ -5,6 +5,10 @@ import type { IconButtonProps } from '~/components/iconButton';
 import { IconButton } from '~/components/iconButton';
 import type { BasicLinkProps } from '~/components/link/BasicLink';
 import { BasicLink } from '~/components/link/BasicLink';
+import {
+  NEXT_NODE_COLOR,
+  PREV_NODE_COLOR,
+} from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.utils';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
@@ -18,6 +22,7 @@ import type {
 interface NodePreviewProps {
   details: IMemoryNodeDetails;
   collectionName: string;
+  query: string;
 }
 
 const queryNode = (id: IPrevNextNode) => {
@@ -32,7 +37,11 @@ const setStyles = (node: HTMLDivElement) => {
   node.style.scale = '1.8';
 };
 
-export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
+export const NodePreview = ({
+  details,
+  collectionName,
+  query,
+}: NodePreviewProps) => {
   const organizationId = useOrganizationId();
 
   const onMouseEnter = useCallback((id: IPrevNextNode) => {
@@ -87,7 +96,14 @@ export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
         {details.prev && (
           <NodePreviewRow>
             <NodePreviewRowHeading>
-              Prev
+              <div className="flex gap-1 justify-start items-center">
+                <div
+                  style={{ backgroundColor: PREV_NODE_COLOR }}
+                  className="w-1.5 h-1.5 rounded-full"
+                />
+                <span>Prev</span>
+              </div>
+
               <NodePreviewRowCopyButton value={details.prev} />
             </NodePreviewRowHeading>
             <NodePreviewRowLink
@@ -98,7 +114,7 @@ export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
               to={routes.collectionGraphDetails(
                 organizationId,
                 collectionName,
-                { chunk_id: details.prev },
+                { chunk_id: details.prev, query },
               )}
             >
               {details.prev}
@@ -109,7 +125,13 @@ export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
         {details.next && (
           <NodePreviewRow>
             <NodePreviewRowHeading>
-              Next
+              <div className="flex gap-1 justify-start items-center">
+                <div
+                  style={{ backgroundColor: NEXT_NODE_COLOR }}
+                  className={cn('w-1.5 h-1.5 rounded-full')}
+                />
+                <span>Next</span>
+              </div>
               <NodePreviewRowCopyButton value={details.next} />
             </NodePreviewRowHeading>
             <NodePreviewRowLink
@@ -120,7 +142,7 @@ export const NodePreview = ({ details, collectionName }: NodePreviewProps) => {
               to={routes.collectionGraphDetails(
                 organizationId,
                 collectionName,
-                { chunk_id: details.next },
+                { chunk_id: details.next, query },
               )}
             >
               {details.next}
