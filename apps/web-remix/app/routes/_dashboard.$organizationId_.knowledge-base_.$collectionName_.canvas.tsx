@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData, useLocation, useNavigate } from '@remix-run/react';
@@ -11,8 +17,16 @@ import {
   MemoryNodeRelated,
 } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { KnowledgeBaseApi } from '~/api/knowledgeBase/KnowledgeBaseApi';
-import { IPrevNextNode } from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.types';
-import { toEmbeddingNodes } from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.utils';
+import {
+  IEmbeddingNode,
+  IPrevNextNode,
+} from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.types';
+import {
+  NEXT_NODE_COLOR,
+  PREV_NODE_COLOR,
+  SEARCH_NODE_COLOR,
+  toEmbeddingNodes,
+} from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.utils';
 import { loaderBuilder } from '~/utils.server';
 import { cn } from '~/utils/cn';
 
@@ -125,17 +139,89 @@ export async function loader(args: LoaderFunctionArgs) {
 export default function Canvas() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { activeChunk, organizationId, graph } = useLoaderData<typeof loader>();
+  const {
+    activeChunk,
+    organizationId,
+    graph,
+    searchChunks,
+    nextNode,
+    prevNode,
+    relatedNeighbours,
+  } = useLoaderData<typeof loader>();
+
+  const isSearched = useCallback(
+    (id: string) => {
+      return searchChunks.map((searchChunk) => searchChunk).includes(id);
+    },
+    [searchChunks],
+  );
+  const isRelated = useCallback(
+    (id: string) => {
+      return relatedNeighbours.includes(id);
+    },
+    [relatedNeighbours],
+  );
+  const isActive = useCallback(
+    (id: string) => {
+      return activeChunk?.id === id;
+    },
+    [activeChunk],
+  );
+
+  const activeStyles = useCallback(
+    (node: IEmbeddingNode) => {
+      if (!activeChunk && searchChunks.length === 0) {
+        return {
+          backgroundColor: node.data.base_color,
+          borderColor: node.data.base_color,
+        };
+      } else if (
+        isSearched(node.data.id.toString()) ||
+        isActive(node.data.id.toString()) ||
+        prevNode === node.data.id.toString() ||
+        nextNode === node.data.id.toString()
+      ) {
+        return {
+          backgroundColor: node.data.base_color,
+          opacity: 1,
+        };
+      } else if (isRelated(node.data.id.toString())) {
+        return {
+          backgroundColor: node.data.base_color,
+          opacity: 0.5,
+        };
+      } else {
+        return {
+          backgroundColor: '#aaa',
+          opacity: 0.2,
+        };
+      }
+    },
+    [activeChunk, searchChunks, isSearched, isActive, isRelated],
+  );
+
+  const innerCircleColor = useCallback(
+    (node: IEmbeddingNode) => {
+      if (prevNode === node.data.id.toString()) return PREV_NODE_COLOR;
+      if (nextNode === node.data.id.toString()) return NEXT_NODE_COLOR;
+      if (isSearched(node.data.id.toString())) return SEARCH_NODE_COLOR;
+      return node.data.base_color;
+    },
+    [prevNode, nextNode, isSearched],
+  );
 
   const nodes = useMemo(() => {
     return {
-      nodes: toEmbeddingNodes(graph.nodes).map((node) => ({
-        ...node,
-        radius: 10,
-        x: node.data.point[0] * 50,
-        y: node.data.point[1] * 50,
-        color: node.data.base_color,
-      })),
+      nodes: toEmbeddingNodes(graph.nodes).map((node) => {
+        return {
+          ...node,
+          radius: 10,
+          x: node.data.point[0] * 50,
+          y: node.data.point[1] * 50,
+          color: activeStyles(node).backgroundColor,
+          borderColor: innerCircleColor(node),
+        };
+      }),
       links: [],
     };
   }, [graph.nodes]);
@@ -144,7 +230,7 @@ export default function Canvas() {
     <div className="flex justify-center items-center h-screen w-full">
       <div id="_root">
         <ClientOnly fallback={<div>Dupa</div>}>
-          {() => <CanvasGraph elements={nodes.nodes} />}
+          {() => <CanvasGraph elements={nodes.nodes} onClick={console.log} />}
         </ClientOnly>
       </div>
     </div>
@@ -155,17 +241,17 @@ interface CanvasElement<T> {
   x: number;
   y: number;
   color: string;
+  borderColor: string;
   radius: number;
   data: T;
 }
 
 interface CanvasGraphProps<T> {
   elements: CanvasElement<T>[];
+  onClick?: (element: CanvasElement<T>) => void;
 }
-function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
+function CanvasGraph<T = {}>({ elements, onClick }: CanvasGraphProps<T>) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // const { onMouseDown, onMouseUp, onMouseMove, onWheel, isDragging } =
-  //   useCanvas({ canvas: canvasRef.current, elements: nodes });
 
   const scaleRef = useRef<number>(1);
   const lastPosRef = useRef<{ x: number; y: number }>({
@@ -177,8 +263,9 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
     y: 0,
   });
   const [isDragging, setIsDragging] = useState<boolean>(false);
-
-  const paths = useRef<Path2D[]>([]);
+  const isMouseDown = useRef<boolean>(false);
+  const isDraggingRef = useRef<boolean>(false);
+  const hoveredNodeRef = useRef<CanvasElement<T> | null>(null);
 
   const getContext = (): CanvasRenderingContext2D | null => {
     return canvasRef.current ? canvasRef.current.getContext('2d') : null;
@@ -257,14 +344,20 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
         });
 
       elements.map((element) => {
-        const { x, y, radius, color } = element;
+        const { x, y, radius, color, borderColor } = element;
         const node = new Path2D();
         node.arc(x, y, radius, 0, 2 * Math.PI, false);
-
         const newColor = element === hovered ? '#000' : color;
+
+        ctx.strokeStyle = borderColor;
+        ctx.stroke(node);
+
         ctx.fillStyle = newColor;
         ctx.fill(node);
       });
+
+      hoveredNodeRef.current = hovered || null;
+
       ctx.restore();
     });
   };
@@ -274,7 +367,6 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
   }, [elements]);
 
   const onWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
-    e.preventDefault();
     if (!canvasRef.current) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
@@ -303,6 +395,7 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
 
   const onMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     setIsDragging(true);
+    isMouseDown.current = true;
     lastPosRef.current = { x: e.clientX, y: e.clientY };
   };
 
@@ -312,7 +405,8 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
   };
 
   const onDrag = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDragging) return;
+    if (!isMouseDown.current) return;
+    isDraggingRef.current = true;
 
     const dx = e.clientX - lastPosRef.current.x;
     const dy = e.clientY - lastPosRef.current.y;
@@ -336,7 +430,7 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
   };
 
   const onMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (isDragging) return;
+    if (isMouseDown.current) return;
     if (!canvasRef.current) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
@@ -359,14 +453,18 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
   };
 
   const onMouseUp = () => {
+    isMouseDown.current = false;
     setIsDragging(false);
+    if (!isDraggingRef.current && onClick && hoveredNodeRef.current) {
+      onClick(hoveredNodeRef.current);
+    }
+    isDraggingRef.current = false;
   };
 
   return (
     <canvas
       ref={canvasRef}
       onWheel={onWheel}
-      onClick={(e) => console.log(e)}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
