@@ -162,14 +162,18 @@ defmodule Buildel.MemoriesGraph do
     GenServer.cast(__MODULE__, {:add, collection})
 
     Task.async(fn ->
-      FLAME.call(Buildel.CollectionGraphRunner, fn ->
-        case reduce_dimensions(organization, collection) do
-          :ok -> :ok
-          e -> Logger.debug("Failed to reduce dimensions: #{inspect(e)}")
-        end
+      FLAME.call(
+        Buildel.CollectionGraphRunner,
+        fn ->
+          case reduce_dimensions(organization, collection) do
+            :ok -> :ok
+            e -> Logger.debug("Failed to reduce dimensions: #{inspect(e)}")
+          end
 
-        GenServer.cast(__MODULE__, {:remove, collection.id})
-      end)
+          GenServer.cast(__MODULE__, {:remove, collection.id})
+        end,
+        timeout: 5 * 60_000
+      )
     end)
 
     :ok
