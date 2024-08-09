@@ -109,7 +109,7 @@ export async function loader(args: LoaderFunctionArgs) {
       collectionId: collectionId,
       graph: graph.data,
       graphState: graphState.data,
-      searchChunks: graphSearchChunks.map((chunk) => chunk.id),
+      searchChunks: graphSearchChunks,
       activeChunk,
       relatedNeighbours,
       prevNode,

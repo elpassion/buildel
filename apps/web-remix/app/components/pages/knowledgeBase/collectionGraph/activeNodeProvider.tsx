@@ -1,12 +1,13 @@
 import { createContext, useContext } from 'react';
 
+import { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import type { IPrevNextNode } from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.types';
 import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 
 interface IActiveNodeContext {
   activeNode: IMemoryNode | null;
   relatedNeighbours: string[];
-  searchChunks: string[];
+  searchChunks: IKnowledgeBaseSearchChunk[];
   prevNode: IPrevNextNode;
   nextNode: IPrevNextNode;
 }

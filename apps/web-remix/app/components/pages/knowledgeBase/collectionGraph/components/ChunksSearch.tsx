@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { Loader, Search } from 'lucide-react';
@@ -53,12 +53,12 @@ export const ChunksSearch = ({ defaultValue }: ChunksSearchProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-[250px] pointer-events-auto">
+    <div className="relative w-full max-w-[350px] pointer-events-auto">
       <ValidatedForm
         validator={validator}
         defaultValues={{ query: defaultValue.query }}
         onSubmit={onSubmit}
-        className="flex gap-2 w-full"
+        className="flex gap-2 w-full items-start"
       >
         <SearchParams>
           <Field name="limit">
@@ -105,18 +105,48 @@ export const ChunksSearch = ({ defaultValue }: ChunksSearchProps) => {
             <TextInputField
               placeholder="Ask a question..."
               className="h-9 pr-8"
+              defaultValue={defaultValue.query}
             />
             <FieldMessage />
-          </div>
 
-          <div className="absolute top-[18px] right-1 -translate-y-1/2">
-            <SearchButton />
+            <div className="absolute top-[18px] right-1 -translate-y-1/2">
+              <SearchButton />
+            </div>
           </div>
         </Field>
+        <ClearButton />
       </ValidatedForm>
     </div>
   );
 };
+
+function ClearButton() {
+  const { getValues } = useFormContext();
+  const navigate = useNavigate();
+
+  const formData = getValues();
+
+  const query = formData.get('query');
+
+  return (
+    <IconButton
+      icon={'x'}
+      variant={'outline'}
+      size="sm"
+      disabled={!query}
+      onClick={(e) => {
+        e.preventDefault();
+        const url = new URL(window.location.href);
+        const searchParams = new URLSearchParams(url.search);
+        searchParams.delete('query');
+        navigate({
+          pathname: url.pathname,
+          search: searchParams.toString(),
+        });
+      }}
+    />
+  );
+}
 
 function SearchButton() {
   const { isSubmitting } = useFormContext();

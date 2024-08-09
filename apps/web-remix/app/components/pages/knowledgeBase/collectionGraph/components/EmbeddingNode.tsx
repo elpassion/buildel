@@ -17,7 +17,7 @@ export function EmbeddingNode(props: IEmbeddingNode) {
     useActiveNode();
 
   const isSearched = useMemo(() => {
-    return searchChunks.includes(props.id);
+    return searchChunks.map((searchChunk) => searchChunk.id).includes(props.id);
   }, [searchChunks]);
   const isRelated = useMemo(() => {
     return relatedNeighbours.includes(props.id);
