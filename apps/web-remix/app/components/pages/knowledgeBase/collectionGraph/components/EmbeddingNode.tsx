@@ -34,7 +34,7 @@ export function EmbeddingNode(props: IEmbeddingNode) {
       };
     }
 
-    if (!activeNode) {
+    if (!activeNode && searchChunks.length === 0) {
       return {
         backgroundColor: props.data.base_color,
         borderColor: props.data.base_color,
