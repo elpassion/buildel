@@ -104,16 +104,12 @@ export function KnowledgeBaseGraphPage() {
     (node: IMemoryNode) => {
       const id = node.id.toString();
       const baseColor = getColorForUid(node.memory_id.toString());
-      if (!activeChunk && searchChunks.length === 0) {
-        return {
-          backgroundColor: baseColor,
-          opacity: 1,
-        };
-      } else if (
+      if (
         isSearched(id) ||
         isActive(id) ||
         prevNode === id ||
-        nextNode === id
+        nextNode === id ||
+        (!activeChunk && searchChunks.length === 0)
       ) {
         return {
           backgroundColor: baseColor,
@@ -193,7 +189,7 @@ export function KnowledgeBaseGraphPage() {
           <h3 className="font-semibold">Node Properties</h3>
         </NodePreviewSidebarHeader>
         <NodePreviewSidebarContent>
-          <Outlet />
+          <Outlet context={{ onMouseOver, onMouseLeave }} />
         </NodePreviewSidebarContent>
       </NodePreviewSidebar>
       <ClientOnly fallback={<div>Dupa</div>}>

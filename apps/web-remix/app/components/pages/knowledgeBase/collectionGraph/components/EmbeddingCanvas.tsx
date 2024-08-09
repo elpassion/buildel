@@ -25,7 +25,6 @@ export function EmbeddingCanvas({
   hoveredElement,
 }: EmbeddingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
   const scaleRef = useRef<number>(1);
   const lastPosRef = useRef<{ x: number; y: number }>({
     x: 0,
@@ -123,7 +122,7 @@ export function EmbeddingCanvas({
         node.arc(
           x,
           y,
-          element === hovered ? radius + 2 : radius,
+          element === hovered ? radius + 5 : radius,
           0,
           2 * Math.PI,
           false,
@@ -145,8 +144,6 @@ export function EmbeddingCanvas({
   };
 
   useEffect(() => {
-    if (!hoveredElement) return;
-
     const ctx = getContext();
     if (ctx) {
       drawCanvas(
@@ -156,7 +153,7 @@ export function EmbeddingCanvas({
         offsetRef.current.y,
       );
     }
-  }, [hoveredElement]);
+  }, [hoveredElement, elements]);
 
   useEffect(() => {
     initializeCanvas();

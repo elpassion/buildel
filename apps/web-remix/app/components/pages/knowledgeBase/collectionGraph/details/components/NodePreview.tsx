@@ -1,4 +1,5 @@
 import React from 'react';
+import { useOutletContext } from '@remix-run/react';
 import { Check, Copy } from 'lucide-react';
 import type { z } from 'zod';
 
@@ -17,10 +18,7 @@ import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 import type { SearchSchema } from '../../../knowledgeBaseSearch/schema';
-import type {
-  IMemoryNodeDetails,
-  IPrevNextNode,
-} from '../../collectionGraph.types';
+import type { IMemoryNodeDetails } from '../../collectionGraph.types';
 
 interface NodePreviewProps {
   details: IMemoryNodeDetails;
@@ -28,23 +26,15 @@ interface NodePreviewProps {
   searchParams: Partial<z.TypeOf<typeof SearchSchema>>;
 }
 
-export const queryNode = (id: IPrevNextNode) => {
-  return document.querySelector<HTMLDivElement>(`[data-nodecircle="${id}"]`);
-};
-
-export const clearStyles = (node: HTMLDivElement) => {
-  node.style.scale = '1';
-};
-
-export const setStyles = (node: HTMLDivElement) => {
-  node.style.scale = '1.8';
-};
-
 export const NodePreview = ({
   details,
   collectionName,
   searchParams,
 }: NodePreviewProps) => {
+  const { onMouseLeave, onMouseOver } = useOutletContext<{
+    onMouseOver: (id: string) => void;
+    onMouseLeave: () => void;
+  }>();
   const organizationId = useOrganizationId();
 
   return (
@@ -55,7 +45,11 @@ export const NodePreview = ({
             Id
             <NodePreviewRowCopyButton value={details.id} />
           </NodePreviewRowHeading>
-          <NodePreviewRowContent className="line-clamp-1 cursor-pointer">
+          <NodePreviewRowContent
+            className="line-clamp-1 cursor-pointer"
+            onMouseEnter={() => onMouseOver(details.id.toString())}
+            onMouseLeave={onMouseLeave}
+          >
             {details.id}
           </NodePreviewRowContent>
         </NodePreviewRow>
@@ -91,6 +85,8 @@ export const NodePreview = ({
             </NodePreviewRowHeading>
             <NodePreviewRowLink
               className="line-clamp-1"
+              onMouseEnter={() => onMouseOver(details.prev!.toString())}
+              onMouseLeave={onMouseLeave}
               to={routes.collectionGraphDetails(
                 organizationId,
                 collectionName,
@@ -115,6 +111,8 @@ export const NodePreview = ({
               <NodePreviewRowCopyButton value={details.next} />
             </NodePreviewRowHeading>
             <NodePreviewRowLink
+              onMouseEnter={() => onMouseOver(details.next!.toString())}
+              onMouseLeave={onMouseLeave}
               className="line-clamp-1"
               to={routes.collectionGraphDetails(
                 organizationId,
