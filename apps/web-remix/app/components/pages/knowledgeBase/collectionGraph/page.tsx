@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
 import { ClientOnly } from 'remix-utils/client-only';
@@ -27,11 +27,6 @@ import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
 import { EmbeddingCanvas } from './components/EmbeddingCanvas';
-import {
-  clearStyles,
-  queryNode,
-  setStyles,
-} from './details/components/NodePreview';
 
 export function KnowledgeBaseGraphPage() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -150,23 +145,30 @@ export function KnowledgeBaseGraphPage() {
     [prevNode, nextNode, isSearched],
   );
 
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
+
   const nodes = useMemo(() => {
-    return {
-      nodes: graph.nodes.map((node) => {
-        const styles = activeStyles(node);
-        return {
-          ...node,
-          radius: 10,
-          x: node.point[0] * 50,
-          y: node.point[1] * 50,
-          color: styles.backgroundColor,
-          borderColor: innerCircleColor(node),
-          opacity: styles.opacity,
-        };
-      }),
-      links: [],
-    };
+    return graph.nodes.map((node) => {
+      const styles = activeStyles(node);
+      return {
+        ...node,
+        radius: 10,
+        x: node.point[0] * 50,
+        y: node.point[1] * 50,
+        color: styles.backgroundColor,
+        borderColor: innerCircleColor(node),
+        opacity: styles.opacity,
+      };
+    });
   }, [graph.nodes]);
+
+  const onMouseOver = useCallback((id: string) => {
+    setHoveredNode(id);
+  }, []);
+
+  const onMouseLeave = useCallback(() => {
+    setHoveredNode(null);
+  }, []);
 
   return (
     <div
@@ -179,6 +181,8 @@ export function KnowledgeBaseGraphPage() {
           <SearchChunksList
             searchChunks={searchChunks}
             onChunkSelect={selectNode}
+            onMouseOver={onMouseOver}
+            onMouseLeave={onMouseLeave}
           />
         </div>
         <GenerateGraph state={graphState} />
@@ -195,7 +199,8 @@ export function KnowledgeBaseGraphPage() {
       <ClientOnly fallback={<div>Dupa</div>}>
         {() => (
           <EmbeddingCanvas
-            elements={nodes.nodes}
+            elements={nodes}
+            hoveredElement={hoveredNode}
             onClick={onClick}
             wrapper={wrapperRef.current}
           />
@@ -208,24 +213,16 @@ export function KnowledgeBaseGraphPage() {
 function SearchChunksList({
   searchChunks,
   onChunkSelect,
+  onMouseOver,
+  onMouseLeave,
 }: {
   searchChunks: IKnowledgeBaseSearchChunk[];
   onChunkSelect: (id: string) => void;
+  onMouseOver: (id: string) => void;
+  onMouseLeave: () => void;
 }) {
   const onMouseEnter = useCallback((id: string) => {
-    if (!id) return;
-    const node = queryNode(id);
-
-    if (!node) return;
-    setStyles(node);
-  }, []);
-
-  const onMouseLeave = useCallback((id: string) => {
-    if (!id) return;
-    const node = queryNode(id);
-
-    if (!node) return;
-    clearStyles(node);
+    onMouseOver(id);
   }, []);
 
   return (
@@ -239,7 +236,7 @@ function SearchChunksList({
                 onChunkSelect(chunk.id);
               }}
               onMouseEnter={() => onMouseEnter(chunk.id)}
-              onMouseLeave={() => onMouseLeave(chunk.id)}
+              onMouseLeave={onMouseLeave}
               key={chunk.id}
             >
               <div className="whitespace-nowrap truncate w-full">

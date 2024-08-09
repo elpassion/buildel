@@ -14,6 +14,7 @@ export interface CanvasElement {
 
 interface EmbeddingCanvasProps {
   elements: CanvasElement[];
+  hoveredElement?: string | null;
   onClick?: (element: CanvasElement) => void;
   wrapper?: HTMLElement | null;
 }
@@ -21,6 +22,7 @@ export function EmbeddingCanvas({
   elements,
   onClick,
   wrapper,
+  hoveredElement,
 }: EmbeddingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -104,12 +106,13 @@ export function EmbeddingCanvas({
           const node = new Path2D();
           node.arc(x, y, radius, 0, 2 * Math.PI, false);
           const hovered =
-            !!mousePosition &&
-            ctx.isPointInPath(
-              node,
-              mousePosition?.offsetX,
-              mousePosition?.offsetY,
-            );
+            hoveredElement === element.id ||
+            (!!mousePosition &&
+              ctx.isPointInPath(
+                node,
+                mousePosition?.offsetX,
+                mousePosition?.offsetY,
+              ));
 
           return hovered;
         });
@@ -140,6 +143,20 @@ export function EmbeddingCanvas({
       ctx.restore();
     });
   };
+
+  useEffect(() => {
+    if (!hoveredElement) return;
+
+    const ctx = getContext();
+    if (ctx) {
+      drawCanvas(
+        ctx,
+        scaleRef.current,
+        offsetRef.current.x,
+        offsetRef.current.y,
+      );
+    }
+  }, [hoveredElement]);
 
   useEffect(() => {
     initializeCanvas();
