@@ -178,6 +178,8 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
   });
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
+  const paths = useRef<Path2D[]>([]);
+
   const getContext = (): CanvasRenderingContext2D | null => {
     return canvasRef.current ? canvasRef.current.getContext('2d') : null;
   };
@@ -228,21 +230,43 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
     scale: number,
     offsetX: number,
     offsetY: number,
+    mousePosition?: { offsetX: number; offsetY: number },
   ) => {
-    ctx.save();
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.translate(offsetX, offsetY);
-    ctx.scale(scale, scale);
+    window.requestAnimationFrame(() => {
+      ctx.save();
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.translate(offsetX, offsetY);
+      ctx.scale(scale, scale);
 
-    elements.forEach((element) => {
-      const { x, y, radius, color } = element;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, 2 * Math.PI, false);
-      ctx.fillStyle = color;
-      ctx.fill();
+      const hovered = elements
+        .slice()
+        .reverse()
+        .find((element) => {
+          const { x, y, radius } = element;
+          const node = new Path2D();
+          node.arc(x, y, radius, 0, 2 * Math.PI, false);
+          const hovered =
+            !!mousePosition &&
+            ctx.isPointInPath(
+              node,
+              mousePosition?.offsetX,
+              mousePosition?.offsetY,
+            );
+
+          return hovered;
+        });
+
+      elements.map((element) => {
+        const { x, y, radius, color } = element;
+        const node = new Path2D();
+        node.arc(x, y, radius, 0, 2 * Math.PI, false);
+
+        const newColor = element === hovered ? '#000' : color;
+        ctx.fillStyle = newColor;
+        ctx.fill(node);
+      });
+      ctx.restore();
     });
-
-    ctx.restore();
   };
 
   useEffect(() => {
@@ -270,7 +294,10 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
 
     const ctx = getContext();
     if (ctx) {
-      drawCanvas(ctx, newScale, newOffsetX, newOffsetY);
+      drawCanvas(ctx, newScale, newOffsetX, newOffsetY, {
+        offsetX: mouseX,
+        offsetY: mouseY,
+      });
     }
   };
 
@@ -280,6 +307,11 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
   };
 
   const onMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    onDrag(e);
+    onMove(e);
+  };
+
+  const onDrag = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDragging) return;
 
     const dx = e.clientX - lastPosRef.current.x;
@@ -299,6 +331,29 @@ function CanvasGraph<T = {}>({ elements }: CanvasGraphProps<T>) {
         scaleRef.current,
         offsetRef.current.x,
         offsetRef.current.y,
+      );
+    }
+  };
+
+  const onMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (isDragging) return;
+    if (!canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const ctx = getContext();
+    if (ctx) {
+      drawCanvas(
+        ctx,
+        scaleRef.current,
+        offsetRef.current.x,
+        offsetRef.current.y,
+        {
+          offsetX: mouseX,
+          offsetY: mouseY,
+        },
       );
     }
   };
