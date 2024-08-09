@@ -28,6 +28,11 @@ import { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.cont
 import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
+import {
+  clearStyles,
+  queryNode,
+  setStyles,
+} from './details/components/NodePreview';
 
 const customNodes = {
   embedding: EmbeddingNode,
@@ -167,6 +172,22 @@ function SearchChunksList({
   searchChunks: IKnowledgeBaseSearchChunk[];
   onChunkSelect: (id: string) => void;
 }) {
+  const onMouseEnter = useCallback((id: string) => {
+    if (!id) return;
+    const node = queryNode(id);
+
+    if (!node) return;
+    setStyles(node);
+  }, []);
+
+  const onMouseLeave = useCallback((id: string) => {
+    if (!id) return;
+    const node = queryNode(id);
+
+    if (!node) return;
+    clearStyles(node);
+  }, []);
+
   return (
     searchChunks.length > 0 && (
       <div className="relative w-full max-w-[350px] max-h-[200px] overflow-y-auto overflow-x-hidden pointer-events-auto bg-white border border-input p-2 rounded-lg flex flex-col">
@@ -177,6 +198,8 @@ function SearchChunksList({
               onClick={() => {
                 onChunkSelect(chunk.id);
               }}
+              onMouseEnter={() => onMouseEnter(chunk.id)}
+              onMouseLeave={() => onMouseLeave(chunk.id)}
               key={chunk.id}
             >
               <div className="whitespace-nowrap truncate w-full">

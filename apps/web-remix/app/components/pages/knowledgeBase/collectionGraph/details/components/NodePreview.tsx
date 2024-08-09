@@ -7,6 +7,7 @@ import { IconButton } from '~/components/iconButton';
 import type { BasicLinkProps } from '~/components/link/BasicLink';
 import { BasicLink } from '~/components/link/BasicLink';
 import {
+  getColorForUid,
   NEXT_NODE_COLOR,
   PREV_NODE_COLOR,
 } from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.utils';
@@ -27,15 +28,15 @@ interface NodePreviewProps {
   searchParams: Partial<z.TypeOf<typeof SearchSchema>>;
 }
 
-const queryNode = (id: IPrevNextNode) => {
+export const queryNode = (id: IPrevNextNode) => {
   return document.querySelector<HTMLDivElement>(`[data-nodecircle="${id}"]`);
 };
 
-const clearStyles = (node: HTMLDivElement) => {
+export const clearStyles = (node: HTMLDivElement) => {
   node.style.scale = '1';
 };
 
-const setStyles = (node: HTMLDivElement) => {
+export const setStyles = (node: HTMLDivElement) => {
   node.style.scale = '1.8';
 };
 
@@ -89,7 +90,15 @@ export const NodePreview = ({
 
         <NodePreviewRow>
           <NodePreviewRowHeading>
-            File name
+            <div className="flex gap-1 justify-start items-center">
+              <div
+                style={{
+                  backgroundColor: getColorForUid(details.memory_id.toString()),
+                }}
+                className="w-1.5 h-1.5 rounded-full"
+              />
+              <span>File name</span>
+            </div>
             <NodePreviewRowCopyButton value={details.file_name} />
           </NodePreviewRowHeading>
           <NodePreviewRowContent>{details.file_name}</NodePreviewRowContent>

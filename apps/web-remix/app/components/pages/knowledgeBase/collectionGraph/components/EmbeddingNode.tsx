@@ -30,37 +30,40 @@ export function EmbeddingNode(props: IEmbeddingNode) {
   }, [isActive, prevNode, nextNode]);
 
   const activeStyles = useMemo(() => {
-    if (isSearched) {
-      return {
-        backgroundColor: SEARCH_NODE_COLOR,
-      };
-    }
-
     if (!activeNode && searchChunks.length === 0) {
       return {
         backgroundColor: props.data.base_color,
         borderColor: props.data.base_color,
       };
-    }
-
-    const styles: CSSProperties = {};
-
-    if (isActive) {
-      styles.backgroundColor = props.data.base_color;
-    } else if (prevNode === props.id) {
-      styles.backgroundColor = PREV_NODE_COLOR;
-    } else if (nextNode === props.id) {
-      styles.backgroundColor = NEXT_NODE_COLOR;
+    } else if (
+      isSearched ||
+      isActive ||
+      prevNode === props.id ||
+      nextNode === props.id
+    ) {
+      return {
+        backgroundColor: props.data.base_color,
+        opacity: 1,
+      };
     } else if (isRelated) {
-      styles.opacity = 0.5;
-      styles.backgroundColor = props.data.base_color;
+      return {
+        backgroundColor: props.data.base_color,
+        opacity: 0.5,
+      };
     } else {
-      styles.opacity = 0.2;
-      styles.backgroundColor = '#aaa';
+      return {
+        backgroundColor: '#aaa',
+        opacity: 0.2,
+      };
     }
+  }, [activeNode, searchChunks, isSearched, isActive, isRelated]);
 
-    return styles;
-  }, [isActive, prevNode, nextNode, searchChunks, isSearched, isRelated]);
+  const innerCircleColor = useMemo(() => {
+    if (prevNode === props.id) return PREV_NODE_COLOR;
+    if (nextNode === props.id) return NEXT_NODE_COLOR;
+    if (isSearched) return SEARCH_NODE_COLOR;
+    return props.data.base_color;
+  }, [prevNode, nextNode, isSearched]);
 
   return (
     <>
@@ -77,7 +80,12 @@ export function EmbeddingNode(props: IEmbeddingNode) {
         className={cn(
           'group relative h-6 w-6 rounded-full hover:!bg-purple-600',
         )}
-      />
+      >
+        <div
+          className="absolute inset-1 rounded-full bg-[#facc15]"
+          style={{ backgroundColor: innerCircleColor }}
+        ></div>
+      </div>
 
       {hasHandles && (
         <Handle

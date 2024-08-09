@@ -54,7 +54,7 @@ const COLORS: Record<string, string> = {};
 const RESERVED_COLORS = [SEARCH_NODE_COLOR, PREV_NODE_COLOR, NEXT_NODE_COLOR];
 const colorThreshold = 0.1;
 
-function getColorForUid(uid: string): string {
+export function getColorForUid(uid: string): string {
   if (COLORS[uid]) return COLORS[uid];
 
   const hash = hashString(uid);
