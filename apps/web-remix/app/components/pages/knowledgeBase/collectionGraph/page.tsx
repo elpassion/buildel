@@ -192,7 +192,7 @@ export function KnowledgeBaseGraphPage() {
           <Outlet context={{ onMouseOver, onMouseLeave }} />
         </NodePreviewSidebarContent>
       </NodePreviewSidebar>
-      <ClientOnly fallback={<div>Dupa</div>}>
+      <ClientOnly fallback="">
         {() => (
           <EmbeddingCanvas
             elements={nodes}

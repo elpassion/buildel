@@ -87,6 +87,7 @@ export const NodePreview = ({
               className="line-clamp-1"
               onMouseEnter={() => onMouseOver(details.prev!.toString())}
               onMouseLeave={onMouseLeave}
+              onClick={onMouseLeave}
               to={routes.collectionGraphDetails(
                 organizationId,
                 collectionName,
@@ -113,6 +114,7 @@ export const NodePreview = ({
             <NodePreviewRowLink
               onMouseEnter={() => onMouseOver(details.next!.toString())}
               onMouseLeave={onMouseLeave}
+              onClick={onMouseLeave}
               className="line-clamp-1"
               to={routes.collectionGraphDetails(
                 organizationId,
