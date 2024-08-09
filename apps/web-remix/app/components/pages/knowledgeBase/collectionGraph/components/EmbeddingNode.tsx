@@ -1,5 +1,4 @@
-import type { CSSProperties } from 'react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 
 import {
