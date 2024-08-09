@@ -24,6 +24,7 @@ import type { loader } from './loader.server';
 
 import '@xyflow/react/dist/style.css';
 
+import { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
@@ -85,6 +86,18 @@ export function KnowledgeBaseGraphPage() {
     setNodes(updated);
   }, [graph]);
 
+  const selectNode = useCallback(
+    (nodeId: string) => {
+      navigate(
+        routes.collectionGraphDetails(organizationId, collectionName, {
+          chunk_id: nodeId,
+          ...searchParams,
+        }),
+      );
+    },
+    [searchParams],
+  );
+
   return (
     <ActiveNodeProvider
       value={{
@@ -96,9 +109,14 @@ export function KnowledgeBaseGraphPage() {
       }}
     >
       <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden">
-        <div className="flex justify-between items-center gap-6 absolute top-4 right-4 left-4 z-[12] md:right-6 md:left-4 lg:right-10 lg:left-10 pointer-events-none bg-transparent">
-          <ChunksSearch defaultValue={searchParams} />
-
+        <div className="flex justify-between items-start gap-6 absolute top-4 right-4 left-4 z-[12] md:right-6 md:left-4 lg:right-10 lg:left-10 pointer-events-none bg-transparent">
+          <div>
+            <ChunksSearch defaultValue={searchParams} />
+            <SearchChunksList
+              searchChunks={searchChunks}
+              onChunkSelect={selectNode}
+            />
+          </div>
           <GenerateGraph state={graphState} />
         </div>
 
@@ -139,6 +157,42 @@ export function KnowledgeBaseGraphPage() {
         </ReactFlow>
       </div>
     </ActiveNodeProvider>
+  );
+}
+
+function SearchChunksList({
+  searchChunks,
+  onChunkSelect,
+}: {
+  searchChunks: IKnowledgeBaseSearchChunk[];
+  onChunkSelect: (id: string) => void;
+}) {
+  return (
+    searchChunks.length > 0 && (
+      <div className="relative w-full max-w-[350px] max-h-[200px] overflow-y-auto overflow-x-hidden pointer-events-auto bg-white border border-input p-2 rounded-lg flex flex-col">
+        {searchChunks.map((chunk) => {
+          return (
+            <button
+              className="hover:bg-muted p-1 rounded-sm text-xs"
+              onClick={() => {
+                onChunkSelect(chunk.id);
+              }}
+              key={chunk.id}
+            >
+              <div className="whitespace-nowrap truncate w-full">
+                {chunk.file_name}
+              </div>
+              <div className="whitespace-nowrap truncate w-full">
+                {chunk.keywords.toString()}
+              </div>
+              <div className="whitespace-nowrap truncate w-full">
+                Pages: {chunk.pages.toString()}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    )
   );
 }
 
