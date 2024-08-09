@@ -53,7 +53,10 @@ export const ChunksSearch = ({ defaultValue }: ChunksSearchProps) => {
   };
 
   return (
-    <div className="relative w-full max-w-[350px] pointer-events-auto">
+    <div
+      className="relative w-full max-w-[350px] pointer-events-auto"
+      key={defaultValue.query}
+    >
       <ValidatedForm
         validator={validator}
         defaultValues={{ query: defaultValue.query }}
