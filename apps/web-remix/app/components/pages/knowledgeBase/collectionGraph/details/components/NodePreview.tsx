@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Check, Copy } from 'lucide-react';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import type { IconButtonProps } from '~/components/iconButton';
 import { IconButton } from '~/components/iconButton';
@@ -16,7 +16,7 @@ import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
-import { SearchSchema } from '../../../knowledgeBaseSearch/schema';
+import type { SearchSchema } from '../../../knowledgeBaseSearch/schema';
 import type {
   IMemoryNodeDetails,
   IPrevNextNode,

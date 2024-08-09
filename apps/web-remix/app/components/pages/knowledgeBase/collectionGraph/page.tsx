@@ -1,16 +1,15 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
 import { ClientOnly } from 'remix-utils/client-only';
 
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 
-import type { IEmbeddingNode } from './collectionGraph.types';
 import {
+  getColorForUid,
   NEXT_NODE_COLOR,
   PREV_NODE_COLOR,
   SEARCH_NODE_COLOR,
-  toEmbeddingNodes,
 } from './collectionGraph.utils';
 import { GenerateGraph } from './components/GenerateGraph';
 import {
@@ -23,6 +22,7 @@ import type { loader } from './loader.server';
 import '@xyflow/react/dist/style.css';
 
 import type { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
@@ -34,6 +34,7 @@ import {
 } from './details/components/NodePreview';
 
 export function KnowledgeBaseGraphPage() {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const {
     graph,
@@ -62,7 +63,7 @@ export function KnowledgeBaseGraphPage() {
   useRevalidateOnInterval({ enabled: graphState.state !== 'idle' });
 
   const onClick = useCallback(
-    (node: IEmbeddingNode) => {
+    (node: { id: string | number }) => {
       navigate(
         routes.collectionGraphDetails(organizationId, collectionName, {
           chunk_id: node.id,
@@ -105,25 +106,27 @@ export function KnowledgeBaseGraphPage() {
   );
 
   const activeStyles = useCallback(
-    (node: IEmbeddingNode) => {
+    (node: IMemoryNode) => {
+      const id = node.id.toString();
+      const baseColor = getColorForUid(node.memory_id.toString());
       if (!activeChunk && searchChunks.length === 0) {
         return {
-          backgroundColor: node.data.base_color,
+          backgroundColor: baseColor,
           opacity: 1,
         };
       } else if (
-        isSearched(node.data.id.toString()) ||
-        isActive(node.data.id.toString()) ||
-        prevNode === node.data.id.toString() ||
-        nextNode === node.data.id.toString()
+        isSearched(id) ||
+        isActive(id) ||
+        prevNode === id ||
+        nextNode === id
       ) {
         return {
-          backgroundColor: node.data.base_color,
+          backgroundColor: baseColor,
           opacity: 1,
         };
-      } else if (isRelated(node.data.id.toString())) {
+      } else if (isRelated(id)) {
         return {
-          backgroundColor: node.data.base_color,
+          backgroundColor: baseColor,
           opacity: 0.5,
         };
       } else {
@@ -137,24 +140,25 @@ export function KnowledgeBaseGraphPage() {
   );
 
   const innerCircleColor = useCallback(
-    (node: IEmbeddingNode) => {
-      if (prevNode === node.data.id.toString()) return PREV_NODE_COLOR;
-      if (nextNode === node.data.id.toString()) return NEXT_NODE_COLOR;
-      if (isSearched(node.data.id.toString())) return SEARCH_NODE_COLOR;
-      return node.data.base_color;
+    (node: IMemoryNode) => {
+      const baseColor = getColorForUid(node.memory_id.toString());
+      if (prevNode === node.id.toString()) return PREV_NODE_COLOR;
+      if (nextNode === node.id.toString()) return NEXT_NODE_COLOR;
+      if (isSearched(node.id.toString())) return SEARCH_NODE_COLOR;
+      return baseColor;
     },
     [prevNode, nextNode, isSearched],
   );
 
   const nodes = useMemo(() => {
     return {
-      nodes: toEmbeddingNodes(graph.nodes).map((node) => {
+      nodes: graph.nodes.map((node) => {
         const styles = activeStyles(node);
         return {
           ...node,
           radius: 10,
-          x: node.data.point[0] * 50,
-          y: node.data.point[1] * 50,
+          x: node.point[0] * 50,
+          y: node.point[1] * 50,
           color: styles.backgroundColor,
           borderColor: innerCircleColor(node),
           opacity: styles.opacity,
@@ -165,7 +169,10 @@ export function KnowledgeBaseGraphPage() {
   }, [graph.nodes]);
 
   return (
-    <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden">
+    <div
+      className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden"
+      ref={wrapperRef}
+    >
       <div className="flex justify-between items-start gap-6 absolute top-4 right-4 left-4 z-[12] md:right-6 md:left-4 lg:right-10 lg:left-10 pointer-events-none bg-transparent">
         <div>
           <ChunksSearch defaultValue={searchParams} />
@@ -186,7 +193,13 @@ export function KnowledgeBaseGraphPage() {
         </NodePreviewSidebarContent>
       </NodePreviewSidebar>
       <ClientOnly fallback={<div>Dupa</div>}>
-        {() => <EmbeddingCanvas elements={nodes.nodes} onClick={onClick} />}
+        {() => (
+          <EmbeddingCanvas
+            elements={nodes.nodes}
+            onClick={onClick}
+            wrapper={wrapperRef.current}
+          />
+        )}
       </ClientOnly>
     </div>
   );

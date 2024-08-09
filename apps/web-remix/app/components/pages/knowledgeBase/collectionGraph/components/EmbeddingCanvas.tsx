@@ -2,24 +2,26 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { cn } from '~/utils/cn';
 
-interface CanvasElement<T> {
+export interface CanvasElement {
+  id: string | number;
   x: number;
   y: number;
   color: string;
   borderColor: string;
   radius: number;
   opacity: number;
-  data: T;
 }
 
-interface EmbeddingCanvasProps<T> {
-  elements: CanvasElement<T>[];
-  onClick?: (element: CanvasElement<T>) => void;
+interface EmbeddingCanvasProps {
+  elements: CanvasElement[];
+  onClick?: (element: CanvasElement) => void;
+  wrapper?: HTMLElement | null;
 }
-export function EmbeddingCanvas<T = {}>({
+export function EmbeddingCanvas({
   elements,
   onClick,
-}: EmbeddingCanvasProps<T>) {
+  wrapper,
+}: EmbeddingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const scaleRef = useRef<number>(1);
@@ -34,7 +36,7 @@ export function EmbeddingCanvas<T = {}>({
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const isMouseDown = useRef<boolean>(false);
   const isDraggingRef = useRef<boolean>(false);
-  const hoveredNodeRef = useRef<CanvasElement<T> | null>(null);
+  const hoveredNodeRef = useRef<CanvasElement | null>(null);
 
   const getContext = (): CanvasRenderingContext2D | null => {
     return canvasRef.current ? canvasRef.current.getContext('2d') : null;
@@ -44,8 +46,8 @@ export function EmbeddingCanvas<T = {}>({
     if (!canvasRef.current) return;
 
     const { innerWidth: width, innerHeight: height } = window;
-    canvasRef.current.width = width;
-    canvasRef.current.height = height;
+    canvasRef.current.width = wrapper ? wrapper.offsetWidth : width;
+    canvasRef.current.height = wrapper ? wrapper.offsetHeight : height;
 
     const minX = Math.min(
       ...elements.map((element) => element.x - element.radius),
@@ -126,6 +128,7 @@ export function EmbeddingCanvas<T = {}>({
         const newColor = element === hovered ? '#000' : color;
         ctx.globalAlpha = opacity;
         ctx.strokeStyle = borderColor;
+
         ctx.stroke(node);
 
         ctx.fillStyle = newColor;

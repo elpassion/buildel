@@ -1,54 +1,8 @@
-import type { Edge } from '@xyflow/react';
-
-import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 import { hashString } from '~/utils/stringHash';
-
-import type { IEmbeddingNode, IPrevNextNode } from './collectionGraph.types';
 
 export const NEXT_NODE_COLOR = 'hsl(347, 81.8%, 42.7%)';
 export const PREV_NODE_COLOR = 'hsl(0, 0%, 0%)';
 export const SEARCH_NODE_COLOR = 'hsl(47.9 95.8% 53.1%)';
-
-export function toEmbeddingNodes(nodes: IMemoryNode[]): IEmbeddingNode[] {
-  return nodes.map((item) => ({
-    data: {
-      ...item,
-      base_color: getColorForUid(item.memory_id.toString()),
-    },
-    position: { x: item.point[0] * 50, y: item.point[1] * 50 },
-    id: item.id.toString(),
-    type: 'embedding',
-  }));
-}
-
-export function generateActiveNodeEdges(
-  activeNodeId: IPrevNextNode,
-  prevNodeId: IPrevNextNode,
-  nextNodeId: IPrevNextNode,
-): Edge[] {
-  if (!activeNodeId) return [];
-  const edges: Edge[] = [];
-
-  if (prevNodeId) {
-    edges.push({
-      id: `${prevNodeId}-${activeNodeId}`,
-      source: prevNodeId.toString(),
-      target: activeNodeId.toString(),
-      type: 'straight',
-    });
-  }
-
-  if (nextNodeId) {
-    edges.push({
-      id: `${activeNodeId}-${nextNodeId}`,
-      source: activeNodeId.toString(),
-      target: nextNodeId.toString(),
-      type: 'straight',
-    });
-  }
-
-  return edges;
-}
 
 const COLORS: Record<string, string> = {};
 const RESERVED_COLORS = [SEARCH_NODE_COLOR, PREV_NODE_COLOR, NEXT_NODE_COLOR];

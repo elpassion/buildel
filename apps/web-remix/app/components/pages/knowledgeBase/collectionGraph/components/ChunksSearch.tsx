@@ -4,7 +4,7 @@ import { useNavigate } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { Loader, Search } from 'lucide-react';
 import { useFormContext, ValidatedForm } from 'remix-validated-form';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';

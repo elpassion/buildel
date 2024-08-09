@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-import { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import type { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import type { IPrevNextNode } from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.types';
 import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 
