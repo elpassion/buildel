@@ -2,7 +2,7 @@ import { isNotNil } from '~/utils/guards';
 
 export function buildUrlWithParams(
   baseUrl: string,
-  params?: Record<string, string | number | undefined>,
+  params?: Record<string, string | number | boolean | undefined>,
 ) {
   let url = baseUrl;
 

@@ -87,8 +87,8 @@ export class KnowledgeBaseApi {
       query?: string;
       limit?: number;
       token_limit?: number;
-      extend_neighbors: string;
-      extend_parents: string;
+      extend_neighbors: string | boolean;
+      extend_parents: string | boolean;
     },
   ) {
     const urlWithParams = buildUrlWithParams(

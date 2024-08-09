@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { Check, Copy } from 'lucide-react';
+import { z } from 'zod';
 
 import type { IconButtonProps } from '~/components/iconButton';
 import { IconButton } from '~/components/iconButton';
@@ -14,6 +15,7 @@ import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
+import { SearchSchema } from '../../../knowledgeBaseSearch/schema';
 import type {
   IMemoryNodeDetails,
   IPrevNextNode,
@@ -22,7 +24,7 @@ import type {
 interface NodePreviewProps {
   details: IMemoryNodeDetails;
   collectionName: string;
-  query: string;
+  searchParams: Partial<z.TypeOf<typeof SearchSchema>>;
 }
 
 const queryNode = (id: IPrevNextNode) => {
@@ -40,7 +42,7 @@ const setStyles = (node: HTMLDivElement) => {
 export const NodePreview = ({
   details,
   collectionName,
-  query,
+  searchParams,
 }: NodePreviewProps) => {
   const organizationId = useOrganizationId();
 
@@ -114,7 +116,7 @@ export const NodePreview = ({
               to={routes.collectionGraphDetails(
                 organizationId,
                 collectionName,
-                { chunk_id: details.prev, query },
+                { chunk_id: details.prev, ...searchParams },
               )}
             >
               {details.prev}
@@ -142,7 +144,7 @@ export const NodePreview = ({
               to={routes.collectionGraphDetails(
                 organizationId,
                 collectionName,
-                { chunk_id: details.next, query },
+                { chunk_id: details.next, ...searchParams },
               )}
             >
               {details.next}

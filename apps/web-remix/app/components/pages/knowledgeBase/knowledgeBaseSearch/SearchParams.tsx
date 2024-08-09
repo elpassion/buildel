@@ -19,7 +19,9 @@ export const SearchParams: React.FC<PropsWithChildren> = ({ children }) => {
         />
       </PopoverTrigger>
 
-      <PopoverContentWithoutPortal>{children}</PopoverContentWithoutPortal>
+      <PopoverContentWithoutPortal align="start">
+        {children}
+      </PopoverContentWithoutPortal>
     </Popover>
   );
 };

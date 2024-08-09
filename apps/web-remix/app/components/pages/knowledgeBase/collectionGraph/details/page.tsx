@@ -6,13 +6,14 @@ import { NodePreview } from './components/NodePreview';
 import type { loader } from './loader.server';
 
 export function KnowledgeBaseGraphDetails() {
-  const { details, collectionName, query } = useLoaderData<typeof loader>();
+  const { details, collectionName, searchParams } =
+    useLoaderData<typeof loader>();
 
   return (
     <NodePreview
       details={details}
       collectionName={collectionName}
-      query={query}
+      searchParams={searchParams}
     />
   );
 }

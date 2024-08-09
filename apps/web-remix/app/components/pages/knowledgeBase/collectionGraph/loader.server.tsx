@@ -21,6 +21,15 @@ export async function loader(args: LoaderFunctionArgs) {
     const url = new URL(request.url);
     const chunk_id = url.searchParams.get('chunk_id');
     const query = url.searchParams.get('query') ?? '';
+    const limit = Number(url.searchParams.get('limit') ?? 10);
+    const token_limit =
+      typeof url.searchParams.get('token_limit') === 'string'
+        ? Number(url.searchParams.get('token_limit'))
+        : undefined;
+    const extend_neighbors =
+      url.searchParams.get('extend_neighbors') === 'true' ?? false;
+    const extend_parents =
+      url.searchParams.get('extend_parents') === 'true' ?? false;
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
@@ -76,16 +85,20 @@ export async function loader(args: LoaderFunctionArgs) {
 
     let graphSearchChunks: IKnowledgeBaseSearchChunk[] = [];
 
+    const searchParams = {
+      query,
+      limit,
+      token_limit,
+      extend_neighbors,
+      extend_parents,
+    };
+
     if (query) {
       const { data: searchChunks } =
         await knowledgeBaseApi.searchCollectionChunks(
           params.organizationId,
           collectionId,
-          {
-            query,
-            extend_neighbors: 'false',
-            extend_parents: 'false',
-          },
+          searchParams,
         );
       graphSearchChunks = searchChunks.data;
     }
@@ -101,7 +114,7 @@ export async function loader(args: LoaderFunctionArgs) {
       relatedNeighbours,
       prevNode,
       nextNode,
-      query,
+      searchParams,
     });
   })(args);
 }

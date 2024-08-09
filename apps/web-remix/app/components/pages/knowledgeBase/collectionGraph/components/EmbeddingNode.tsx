@@ -16,19 +16,21 @@ export function EmbeddingNode(props: IEmbeddingNode) {
   const { activeNode, relatedNeighbours, prevNode, nextNode, searchChunks } =
     useActiveNode();
 
-  const isSearched = (id: string) => {
-    return searchChunks.includes(id);
-  };
-
-  const isRelated = (id: string) => {
-    return relatedNeighbours.includes(id);
-  };
+  const isSearched = useMemo(() => {
+    return searchChunks.includes(props.id);
+  }, [searchChunks]);
+  const isRelated = useMemo(() => {
+    return relatedNeighbours.includes(props.id);
+  }, [relatedNeighbours]);
   const isActive = useMemo(() => {
     return activeNode?.id === props.id;
   }, [activeNode]);
+  const hasHandles = useMemo(() => {
+    return isActive || prevNode === props.id || nextNode === props.id;
+  }, [isActive, prevNode, nextNode]);
 
   const activeStyles = useMemo(() => {
-    if (isSearched(props.id)) {
+    if (isSearched) {
       return {
         backgroundColor: SEARCH_NODE_COLOR,
       };
@@ -49,7 +51,7 @@ export function EmbeddingNode(props: IEmbeddingNode) {
       styles.backgroundColor = PREV_NODE_COLOR;
     } else if (nextNode === props.id) {
       styles.backgroundColor = NEXT_NODE_COLOR;
-    } else if (isRelated(props.id)) {
+    } else if (isRelated) {
       styles.opacity = 0.5;
       styles.backgroundColor = props.data.base_color;
     } else {
@@ -58,16 +60,17 @@ export function EmbeddingNode(props: IEmbeddingNode) {
     }
 
     return styles;
-  }, [isActive, prevNode, nextNode, searchChunks]);
+  }, [isActive, prevNode, nextNode, searchChunks, isSearched, isRelated]);
 
   return (
     <>
-      <Handle
-        id="a"
-        type="source"
-        position={Position.Top}
-        className="!top-1/2 !left-1/2 opacity-0 !pointer-events-none !w-[1px] !h-[1px]"
-      />
+      {hasHandles && (
+        <Handle
+          type="source"
+          position={Position.Top}
+          className="!top-1/2 !left-1/2 opacity-0 !pointer-events-none !w-[1px] !h-[1px]"
+        />
+      )}
       <div
         data-nodecircle={props.id}
         style={activeStyles}
@@ -76,11 +79,13 @@ export function EmbeddingNode(props: IEmbeddingNode) {
         )}
       />
 
-      <Handle
-        type="target"
-        position={Position.Top}
-        className="!top-1/2 !left-1/2 opacity-0 !pointer-events-none !w-[1px] !h-[1px]"
-      />
+      {hasHandles && (
+        <Handle
+          type="target"
+          position={Position.Top}
+          className="!top-1/2 !left-1/2 opacity-0 !pointer-events-none !w-[1px] !h-[1px]"
+        />
+      )}
     </>
   );
 }

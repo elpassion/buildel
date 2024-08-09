@@ -15,7 +15,7 @@ export function toEmbeddingNodes(nodes: IMemoryNode[]): IEmbeddingNode[] {
       ...item,
       base_color: getColorForUid(item.memory_id.toString()),
     },
-    position: { x: item.point[0] * 35, y: item.point[1] * 35 },
+    position: { x: item.point[0] * 50, y: item.point[1] * 50 },
     id: item.id.toString(),
     type: 'embedding',
   }));

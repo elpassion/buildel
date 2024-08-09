@@ -44,7 +44,7 @@ export function KnowledgeBaseGraphPage() {
     relatedNeighbours,
     prevNode,
     nextNode,
-    query,
+    searchParams,
   } = useLoaderData<typeof loader>();
 
   const [nodes, setNodes, onNodesChange] = useNodesState<IEmbeddingNode>(
@@ -57,7 +57,9 @@ export function KnowledgeBaseGraphPage() {
   const isNewSidebarOpen = !!matchDetails;
 
   const closeSidebar = () => {
-    navigate(routes.collectionGraph(organizationId, collectionName, { query }));
+    navigate(
+      routes.collectionGraph(organizationId, collectionName, searchParams),
+    );
   };
 
   useRevalidateOnInterval({ enabled: graphState.state !== 'idle' });
@@ -69,11 +71,11 @@ export function KnowledgeBaseGraphPage() {
       navigate(
         routes.collectionGraphDetails(organizationId, collectionName, {
           chunk_id: node.id,
-          query,
+          ...searchParams,
         }),
       );
     },
-    [query],
+    [searchParams],
   );
 
   useEffect(() => {
@@ -95,7 +97,7 @@ export function KnowledgeBaseGraphPage() {
     >
       <div className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden">
         <div className="flex justify-between items-center gap-6 absolute top-4 right-4 left-4 z-[12] md:right-6 md:left-4 lg:right-10 lg:left-10 pointer-events-none bg-transparent">
-          <ChunksSearch defaultValue={query} />
+          <ChunksSearch defaultValue={searchParams} />
 
           <GenerateGraph state={graphState} />
         </div>
