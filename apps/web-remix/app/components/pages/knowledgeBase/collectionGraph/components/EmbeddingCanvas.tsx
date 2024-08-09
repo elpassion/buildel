@@ -24,6 +24,7 @@ export function EmbeddingCanvas({
   wrapper,
   hoveredElement,
 }: EmbeddingCanvasProps) {
+  const requestAnimationRef = useRef<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scaleRef = useRef<number>(1);
   const lastPosRef = useRef<{ x: number; y: number }>({
@@ -91,7 +92,7 @@ export function EmbeddingCanvas({
     offsetY: number,
     mousePosition?: { offsetX: number; offsetY: number },
   ) => {
-    window.requestAnimationFrame(() => {
+    requestAnimationRef.current = requestAnimationFrame(() => {
       ctx.save();
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.translate(offsetX, offsetY);
@@ -157,6 +158,11 @@ export function EmbeddingCanvas({
 
   useEffect(() => {
     initializeCanvas();
+
+    return () => {
+      if (!requestAnimationRef.current) return;
+      cancelAnimationFrame(requestAnimationRef.current);
+    };
   }, []);
 
   const onWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
