@@ -5,8 +5,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import { useLoaderData, useLocation, useNavigate } from '@remix-run/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import invariant from 'tiny-invariant';
@@ -346,7 +346,14 @@ function CanvasGraph<T = {}>({ elements, onClick }: CanvasGraphProps<T>) {
       elements.map((element) => {
         const { x, y, radius, color, borderColor } = element;
         const node = new Path2D();
-        node.arc(x, y, radius, 0, 2 * Math.PI, false);
+        node.arc(
+          x,
+          y,
+          radius + (element === hovered ? 2 : 0),
+          0,
+          2 * Math.PI,
+          false,
+        );
         const newColor = element === hovered ? '#000' : color;
 
         ctx.strokeStyle = borderColor;
