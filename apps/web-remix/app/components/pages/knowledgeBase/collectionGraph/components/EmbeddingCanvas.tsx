@@ -152,6 +152,7 @@ export function EmbeddingCanvas({
         ctx.globalAlpha = opacity;
         ctx.strokeStyle = borderColor;
 
+        ctx.lineWidth = 3;
         ctx.stroke(node);
 
         ctx.fillStyle = newColor;
