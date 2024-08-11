@@ -20,7 +20,7 @@ defmodule Buildel.Blocks.Chat do
       description:
         "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
       groups: ["llms", "text"],
-      inputs: [Block.text_input()],
+      inputs: [Block.text_input(), Block.image_input("image")],
       outputs: [
         Block.text_output("output"),
         Block.text_output("message_output")
@@ -218,6 +218,14 @@ defmodule Buildel.Blocks.Chat do
     GenServer.cast(pid, {:send_message, {:text, message, metadata}})
   end
 
+  defp save_image(pid, {_name, :binary, binary, metadata}) do
+    GenServer.cast(pid, {:save_image, {:binary, binary, metadata}})
+  end
+
+  defp remove_image(pid, {_name, :text, file_id, %{method: :delete}}) do
+    GenServer.cast(pid, {:remove_image, {:text, file_id}})
+  end
+
   defp save_text_chunk(pid, chunk) do
     GenServer.cast(pid, {:save_text_chunk, chunk})
   end
@@ -277,9 +285,21 @@ defmodule Buildel.Blocks.Chat do
      |> assign_take_latest()
      |> Map.put(
        :input_queue,
-       Buildel.Blocks.Utils.InputQueue.new([], fn input ->
-         save_input_and_send_message(self(), input)
-       end)
+       Buildel.Blocks.Utils.InputQueue.new(
+         [],
+         fn
+           {_name, :text, _file_id, %{method: :delete}} = info ->
+             remove_image(self(), info)
+             nil
+
+           {_name, :text, _message, _metadata} = info ->
+             save_input_and_send_message(self(), info)
+
+           {_name, :binary, _binary, _metadata} = info ->
+             save_image(self(), info)
+             nil
+         end
+       )
      )
      |> Map.put(:prompt_template, opts.prompt_template)
      |> Map.put(:api_key, api_key)
@@ -308,7 +328,8 @@ defmodule Buildel.Blocks.Chat do
          |> Map.put(secret, block_context().get_secret_from_context(state.context_id, secret))
        end)
      )
-     |> Map.put(:response_format, response_format)}
+     |> Map.put(:response_format, response_format)
+     |> Map.put(:images, [])}
   end
 
   @impl true
@@ -319,10 +340,12 @@ defmodule Buildel.Blocks.Chat do
       replace_input_strings_with_latest_inputs_values(state, state.prompt_template)
 
     content = fill_with_available_metadata_and_secrets(state, content)
+    message = %{content: content}
+    {:ok, message, state} = add_images_to_message(state, message)
 
     output(state, "message_output", {:text, content}, %{stream_stop: :none})
 
-    state = update_in(state.chat_memory, &ChatMemory.add_user_message(&1, %{content: content}))
+    state = update_in(state.chat_memory, &ChatMemory.add_user_message(&1, message))
 
     with {:ok, message, state} <- chat_task(state) do
       if metadata && metadata[:send_to] && metadata[:message_id],
@@ -409,6 +432,26 @@ defmodule Buildel.Blocks.Chat do
   @impl true
   def handle_cast({:save_usage, usage}, state) do
     {:noreply, %{state | usage: TokenUsage.add(state.usage, usage)}}
+  end
+
+  @impl true
+  def handle_cast({:save_image, {:binary, image_path, metadata}}, state) do
+    state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
+
+    {:noreply,
+     state
+     |> Map.update(:images, [], fn images ->
+       images ++ [metadata |> Map.put(:path, image_path)]
+     end)}
+  end
+
+  @impl true
+  def handle_cast({:remove_image, {:text, file_id}}, state) do
+    state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
+
+    {:noreply,
+     state
+     |> Map.update(:images, [], &Enum.reject(&1, fn image -> image.file_id == file_id end))}
   end
 
   @impl true
@@ -544,6 +587,16 @@ defmodule Buildel.Blocks.Chat do
 
   @impl true
   def handle_input("input", {_name, :text, _message, _metadata} = info, state) do
+    update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
+  end
+
+  @impl true
+  def handle_input("image", {_name, :binary, _binary, _metadata} = info, state) do
+    update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
+  end
+
+  @impl true
+  def handle_input("image", {_name, :text, _file_id, %{method: :delete}} = info, state) do
     update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.push(&1, info))
   end
 
@@ -695,17 +748,59 @@ defmodule Buildel.Blocks.Chat do
           message
 
         message ->
-          update_in(message.content, fn message ->
-            message = replace_input_strings_with_latest_inputs_values(state, message)
-            fill_with_available_metadata_and_secrets(state, message)
+          update_in(message.content, fn
+            content when is_binary(content) ->
+              content = replace_input_strings_with_latest_inputs_values(state, content)
+              fill_with_available_metadata_and_secrets(state, content)
+
+            content_list ->
+              content_list
+              |> Enum.map(fn
+                %{type: :text, content: content} = message ->
+                  content = replace_input_strings_with_latest_inputs_values(state, content)
+                  content = fill_with_available_metadata_and_secrets(state, content)
+                  %{message | content: content}
+
+                other ->
+                  other
+              end)
           end)
       end)
 
-    if Enum.all?(messages, &all_inputs_in_string_filled?(&1.content, state.connections)) do
+    text_contents =
+      messages
+      |> Enum.flat_map(fn
+        %{content: content} when is_binary(content) ->
+          [content]
+
+        %{content: content_list} ->
+          content_list |> Enum.filter(&is_binary(&1.content)) |> Enum.map(& &1.content)
+      end)
+
+    if Enum.all?(text_contents, &all_inputs_in_string_filled?(&1, state.connections)) do
       {:ok, messages}
     else
       {:error, :not_all_inputs_filled}
     end
+  end
+
+  defp add_images_to_message(%{images: []} = state, message) do
+    {:ok, message, state}
+  end
+
+  defp add_images_to_message(%{images: images} = state, %{content: content} = message) do
+    images =
+      images |> Enum.map(&%{type: :image, content: read_image(&1.path), media: &1.file_type})
+
+    message = %{message | content: images ++ [%{type: :text, content: content}]}
+
+    {:ok, message, %{state | images: []}}
+  end
+
+  defp read_image(image_path) do
+    image_path
+    |> File.read!()
+    |> Base.encode64()
   end
 
   defp fill_with_available_metadata_and_secrets(state, string) do

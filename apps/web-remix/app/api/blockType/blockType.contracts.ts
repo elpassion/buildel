@@ -9,6 +9,7 @@ export const IOType = z.object({
     'file_temporary',
     'worker',
     'controller',
+    'image',
   ]),
   public: z.boolean(),
 });

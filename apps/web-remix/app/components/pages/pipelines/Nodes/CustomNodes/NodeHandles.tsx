@@ -28,6 +28,8 @@ export function InputHandle({
         return '!rounded-full !bg-orange-500';
       case 'audio':
         return '!rounded !bg-orange-500';
+      case 'image':
+        return '!rounded !bg-red-500';
     }
   }, [handle.data.type]);
 
@@ -77,6 +79,8 @@ export function OutputHandle({
         return '!rounded-full !bg-blue-500';
       case 'audio':
         return '!rounded !bg-blue-500';
+      case 'image':
+        return '!rounded !bg-red-500';
     }
   }, [handle.data.type]);
 

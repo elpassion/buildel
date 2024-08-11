@@ -32,7 +32,8 @@ defmodule Buildel.Blocks do
     Date,
     Comment,
     WorkflowCall,
-    DatasetOutput
+    DatasetOutput,
+    ImageInput
   }
 
   @names_to_blocks_map %{
@@ -64,7 +65,8 @@ defmodule Buildel.Blocks do
     "date" => Date,
     "comment" => Comment,
     "workflow_call" => WorkflowCall,
-    "dataset_output" => DatasetOutput
+    "dataset_output" => DatasetOutput,
+    "image_input" => ImageInput
   }
 
   @blocks_to_names_map %{
@@ -96,7 +98,8 @@ defmodule Buildel.Blocks do
     Date => "date",
     Comment => "comment",
     WorkflowCall => "workflow_call",
-    DatasetOutput => "dataset_output"
+    DatasetOutput => "dataset_output",
+    ImageInput => "image_input"
   }
 
   def list_types() do

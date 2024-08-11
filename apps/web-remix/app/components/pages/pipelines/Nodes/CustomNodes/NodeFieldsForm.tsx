@@ -295,7 +295,7 @@ export function NodeFieldsForm({
             )}
           />
         );
-      } else if (type === 'file_temporary') {
+      } else if (type === 'file_temporary' || 'image') {
         return (
           <FileUpload
             multiple

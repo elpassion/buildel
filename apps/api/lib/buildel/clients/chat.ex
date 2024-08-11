@@ -17,6 +17,7 @@ end
 
 defmodule Buildel.Clients.Chat do
   require Logger
+  alias LangChain.Message.ContentPart
   alias LangChain.Message.ToolResult
   alias LangChain.Message.ToolCall
   alias Buildel.Clients.ChatBehaviour
@@ -84,8 +85,21 @@ defmodule Buildel.Clients.Chat do
         %{role: "system"} = message ->
           Message.new_system!(message.content)
 
-        %{role: "user"} = message ->
-          Message.new_user!(message.content)
+        %{role: "user", content: content} when is_binary(content) ->
+          Message.new_user!(content)
+
+        %{role: "user", content: content_list} ->
+          parts =
+            content_list
+            |> Enum.map(fn
+              %{type: :text, content: content} ->
+                ContentPart.text!(content)
+
+              %{type: :image, content: base64_image, media: media} ->
+                ContentPart.image!(base64_image, media: media, detail: "auto")
+            end)
+
+          Message.new_user!(parts)
 
         %{role: "tool"} = message ->
           Message.new_tool_result!(%{
@@ -113,6 +127,7 @@ defmodule Buildel.Clients.Chat do
               )
           })
       end)
+      |> IO.inspect()
 
     with {:ok, chain, message} <-
            LLMChain.new!(%{

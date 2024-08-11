@@ -32,6 +32,12 @@ defmodule Buildel.Blocks.Block do
   def file_temporary_input(name \\ "input", public \\ false),
     do: %{name: name, type: "file_temporary", public: public}
 
+  def image_input(name \\ "input", public \\ false),
+    do: %{name: name, type: "image", public: public}
+
+  def image_output(name \\ "output", public \\ false),
+    do: %{name: name, type: "image", public: public}
+
   def io(name \\ "tool", role \\ "controller"),
     do: %{name: name, type: role, public: false}
 
