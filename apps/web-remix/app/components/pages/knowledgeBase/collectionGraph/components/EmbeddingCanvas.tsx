@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { cn } from '~/utils/cn';
 
-export interface CanvasElement {
+export type CanvasElement<T> = T & {
   id: string | number;
   x: number;
   y: number;
@@ -10,27 +10,30 @@ export interface CanvasElement {
   borderColor: string;
   radius: number;
   opacity: number;
-}
+};
 
 export interface CanvasLink {
   source: string;
   target: string;
 }
 
-interface EmbeddingCanvasProps {
-  elements: CanvasElement[];
+interface EmbeddingCanvasProps<T> {
+  elements: CanvasElement<T>[];
   hoveredElement?: string | null;
-  onClick?: (element: CanvasElement) => void;
+  onClick?: (element: CanvasElement<T>) => void;
   wrapper?: HTMLElement | null;
   links?: CanvasLink[];
 }
-export function EmbeddingCanvas({
+
+type MousePosition = { offsetX: number; offsetY: number };
+
+export function EmbeddingCanvas<T>({
   elements,
   onClick,
   wrapper,
   hoveredElement,
   links,
-}: EmbeddingCanvasProps) {
+}: EmbeddingCanvasProps<T>) {
   const requestAnimationRef = useRef<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scaleRef = useRef<number>(1);
@@ -45,7 +48,7 @@ export function EmbeddingCanvas({
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const isMouseDown = useRef<boolean>(false);
   const isDraggingRef = useRef<boolean>(false);
-  const hoveredNodeRef = useRef<CanvasElement | null>(null);
+  const hoveredNodeRef = useRef<CanvasElement<T> | null>(null);
 
   const getContext = (): CanvasRenderingContext2D | null => {
     return canvasRef.current ? canvasRef.current.getContext('2d') : null;
@@ -92,74 +95,96 @@ export function EmbeddingCanvas({
     }
   };
 
+  const clearCanvas = (ctx: CanvasRenderingContext2D) => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  };
+
+  const findHoveredElement = (
+    ctx: CanvasRenderingContext2D,
+    mousePosition?: MousePosition,
+  ) => {
+    return elements
+      .slice()
+      .reverse()
+      .find((element) => {
+        const { x, y, radius } = element;
+        const node = new Path2D();
+        node.arc(x, y, radius, 0, 2 * Math.PI, false);
+        return (
+          hoveredElement === element.id ||
+          (!!mousePosition &&
+            ctx.isPointInPath(
+              node,
+              mousePosition?.offsetX,
+              mousePosition?.offsetY,
+            ))
+        );
+      });
+  };
+
+  const drawLinks = (ctx: CanvasRenderingContext2D) => {
+    (links ?? []).forEach((link) => {
+      const source = elements.find((element) => element.id === link.source);
+      const target = elements.find((element) => element.id === link.target);
+
+      if (!source || !target) return;
+
+      ctx.beginPath();
+      ctx.moveTo(source.x, source.y);
+      ctx.lineTo(target.x, target.y);
+      ctx.strokeStyle = '#aaa';
+      ctx.stroke();
+    });
+  };
+
+  const drawElements = (
+    ctx: CanvasRenderingContext2D,
+    hovered?: CanvasElement<T> | null,
+  ) => {
+    elements.forEach((element) => {
+      const { x, y, radius, color, borderColor, opacity } = element;
+      const node = new Path2D();
+
+      const isHovered = element === hovered;
+
+      const finalRadius = isHovered ? radius + 5 : radius;
+
+      node.arc(x, y, finalRadius, 0, 2 * Math.PI, false);
+
+      const newColor = isHovered ? '#000' : color;
+      ctx.globalAlpha = isHovered ? 1 : opacity;
+      ctx.strokeStyle = borderColor;
+
+      ctx.lineWidth = 3;
+      ctx.stroke(node);
+
+      ctx.fillStyle = newColor;
+      ctx.fill(node);
+    });
+  };
+
   const drawCanvas = (
     ctx: CanvasRenderingContext2D,
     scale: number,
     offsetX: number,
     offsetY: number,
-    mousePosition?: { offsetX: number; offsetY: number },
+    mousePosition?: MousePosition,
   ) => {
     requestAnimationRef.current = requestAnimationFrame(() => {
       ctx.save();
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+      clearCanvas(ctx);
+
       ctx.translate(offsetX, offsetY);
       ctx.scale(scale, scale);
 
-      const hovered = elements
-        .slice()
-        .reverse()
-        .find((element) => {
-          const { x, y, radius } = element;
-          const node = new Path2D();
-          node.arc(x, y, radius, 0, 2 * Math.PI, false);
-          const hovered =
-            hoveredElement === element.id ||
-            (!!mousePosition &&
-              ctx.isPointInPath(
-                node,
-                mousePosition?.offsetX,
-                mousePosition?.offsetY,
-              ));
+      drawLinks(ctx);
 
-          return hovered;
-        });
+      const hovered = findHoveredElement(ctx, mousePosition);
 
-      (links ?? []).forEach((link) => {
-        const source = elements.find((element) => element.id === link.source);
-        const target = elements.find((element) => element.id === link.target);
+      drawElements(ctx, hovered);
 
-        if (!source || !target) return;
-
-        ctx.beginPath();
-        ctx.moveTo(source.x, source.y);
-        ctx.lineTo(target.x, target.y);
-        ctx.strokeStyle = '#aaa';
-        ctx.stroke();
-      });
-
-      elements.forEach((element) => {
-        const { x, y, radius, color, borderColor, opacity } = element;
-        const node = new Path2D();
-        node.arc(
-          x,
-          y,
-          element === hovered ? radius + 5 : radius,
-          0,
-          2 * Math.PI,
-          false,
-        );
-        const newColor = element === hovered ? '#000' : color;
-        ctx.globalAlpha = opacity;
-        ctx.strokeStyle = borderColor;
-
-        ctx.lineWidth = 3;
-        ctx.stroke(node);
-
-        ctx.fillStyle = newColor;
-        ctx.fill(node);
-      });
-
-      hoveredNodeRef.current = hovered || null;
+      hoveredNodeRef.current = hovered ?? null;
 
       ctx.restore();
     });

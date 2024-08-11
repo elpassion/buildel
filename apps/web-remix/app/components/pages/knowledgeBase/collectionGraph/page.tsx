@@ -26,7 +26,7 @@ import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase
 import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
-import { CanvasLink, EmbeddingCanvas } from './components/EmbeddingCanvas';
+import { EmbeddingCanvas, type CanvasLink } from './components/EmbeddingCanvas';
 
 export function KnowledgeBaseGraphPage() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -58,7 +58,7 @@ export function KnowledgeBaseGraphPage() {
   useRevalidateOnInterval({ enabled: graphState.state !== 'idle' });
 
   const onClick = useCallback(
-    (node: { id: string | number }) => {
+    (node: IMemoryNode) => {
       navigate(
         routes.collectionGraphDetails(organizationId, collectionName, {
           chunk_id: node.id,
