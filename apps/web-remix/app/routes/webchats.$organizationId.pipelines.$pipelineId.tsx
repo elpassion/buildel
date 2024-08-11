@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
@@ -57,6 +57,24 @@ export async function loader(args: LoaderFunctionArgs) {
   })(args);
 }
 
+const SUPPORTED_IMAGE_TYPES = [
+  'image/png',
+  'image/jpeg',
+  'image/jpg',
+  'image/webp',
+  'image/gif',
+];
+const SUPPORTED_DOCUMENT_TYPES = [
+  'application/pdf',
+  'text/csv',
+  'text/css',
+  'text/html',
+  'application/json',
+  'text/plain',
+  'application/xml',
+  'text/xml',
+];
+
 export default function WebsiteChat() {
   const { pipelineId, organizationId, pipeline, alias } =
     useLoaderData<typeof loader>();
@@ -82,6 +100,25 @@ export default function WebsiteChat() {
     useAuth: !(pipeline.interface_config.webchat.public ?? false),
   });
 
+  const fileInput = useMemo(() => {
+    return pipeline.interface_config.webchat.inputs.find((input) => {
+      return input.type === 'file_input';
+    });
+  }, [pipeline.interface_config.webchat]);
+
+  const imageInput = useMemo(() => {
+    return pipeline.interface_config.webchat.inputs.find((input) => {
+      return input.type === 'image_input';
+    });
+  }, [pipeline.interface_config.webchat]);
+
+  const supportedTypes = useMemo(() => {
+    let types: string[] = [];
+    if (fileInput) types = SUPPORTED_DOCUMENT_TYPES;
+    if (imageInput) types = [...types, ...SUPPORTED_IMAGE_TYPES];
+    return types;
+  }, [fileInput, imageInput]);
+
   const {
     fileList,
     removeFile,
@@ -94,6 +131,17 @@ export default function WebsiteChat() {
     pipelineId: parseInt(pipelineId),
     runId: runId as string,
   });
+
+  const uploadFileToCorrectInput = (file: File) => {
+    if (SUPPORTED_IMAGE_TYPES.includes(file.type) && imageInput)
+      return uploadFile(file, imageInput.name);
+    if (SUPPORTED_DOCUMENT_TYPES.includes(file.type) && fileInput)
+      return uploadFile(file, fileInput.name);
+  };
+  const removeFileFromCorrectInput = (fileId: string | number) => {
+    if (imageInput) removeFile(fileId, imageInput.name);
+    if (fileInput) removeFile(fileId, fileInput.name);
+  };
 
   const onSubmit = useCallback(
     (value: string) => {
@@ -157,7 +205,7 @@ ${JSON.stringify(files)}
           disabled={connectionStatus !== 'running' || isUploading}
           generating={isGenerating}
           attachments={
-            pipeline.interface_config.webchat.inputs[1] &&
+            (!!fileInput || !!imageInput) &&
             fileList.length > 0 && (
               <div className="w-full flex gap-1 p-1 flex-wrap">
                 {fileList.map((file) => {
@@ -175,14 +223,7 @@ ${JSON.stringify(files)}
                       {file.file_name}
                       <button
                         type="button"
-                        onClick={() =>
-                          removeFile(
-                            file.id,
-                            pipeline.interface_config.webchat.inputs.filter(
-                              (input) => input.type === 'file_input',
-                            )[0]?.name ?? '',
-                          )
-                        }
+                        onClick={() => removeFileFromCorrectInput(file.id)}
                       >
                         <Trash className="w-4 h-4" />
                       </button>
@@ -193,21 +234,17 @@ ${JSON.stringify(files)}
             )
           }
           prefix={
-            pipeline.interface_config.webchat.inputs[1] && (
+            (!!fileInput || !!imageInput) && (
               <label className="pl-2 cursor-pointer">
                 <Upload className="w-4 h-4" />
                 <input
                   ref={inputRef}
                   type="file"
                   className="hidden"
+                  accept={supportedTypes.toString()}
                   onChange={(e) => {
                     [...(e.target.files || [])].forEach((file) => {
-                      uploadFile(
-                        file,
-                        pipeline.interface_config.webchat.inputs.filter(
-                          (input) => input.type === 'file_input',
-                        )[0]?.name ?? '',
-                      );
+                      uploadFileToCorrectInput(file);
                     });
                   }}
                 />
