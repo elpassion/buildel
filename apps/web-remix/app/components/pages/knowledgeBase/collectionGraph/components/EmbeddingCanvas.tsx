@@ -12,17 +12,24 @@ export interface CanvasElement {
   opacity: number;
 }
 
+export interface CanvasLink {
+  source: string;
+  target: string;
+}
+
 interface EmbeddingCanvasProps {
   elements: CanvasElement[];
   hoveredElement?: string | null;
   onClick?: (element: CanvasElement) => void;
   wrapper?: HTMLElement | null;
+  links?: CanvasLink[];
 }
 export function EmbeddingCanvas({
   elements,
   onClick,
   wrapper,
   hoveredElement,
+  links,
 }: EmbeddingCanvasProps) {
   const requestAnimationRef = useRef<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -116,6 +123,19 @@ export function EmbeddingCanvas({
 
           return hovered;
         });
+
+      (links ?? []).forEach((link) => {
+        const source = elements.find((element) => element.id === link.source);
+        const target = elements.find((element) => element.id === link.target);
+
+        if (!source || !target) return;
+
+        ctx.beginPath();
+        ctx.moveTo(source.x, source.y);
+        ctx.lineTo(target.x, target.y);
+        ctx.strokeStyle = '#aaa';
+        ctx.stroke();
+      });
 
       elements.forEach((element) => {
         const { x, y, radius, color, borderColor, opacity } = element;

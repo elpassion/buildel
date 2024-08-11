@@ -26,7 +26,7 @@ import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase
 import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
-import { EmbeddingCanvas } from './components/EmbeddingCanvas';
+import { CanvasLink, EmbeddingCanvas } from './components/EmbeddingCanvas';
 
 export function KnowledgeBaseGraphPage() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -166,6 +166,27 @@ export function KnowledgeBaseGraphPage() {
     setHoveredNode(null);
   }, []);
 
+  const links = useMemo(() => {
+    if (!activeChunk) return [];
+    const links: CanvasLink[] = [];
+
+    if (prevNode) {
+      links.push({
+        source: prevNode.toString(),
+        target: activeChunk.id.toString(),
+      });
+    }
+
+    if (nextNode) {
+      links.push({
+        source: activeChunk.id.toString(),
+        target: nextNode.toString(),
+      });
+    }
+
+    return links;
+  }, [prevNode, nextNode, activeChunk]);
+
   return (
     <div
       className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden"
@@ -197,6 +218,7 @@ export function KnowledgeBaseGraphPage() {
           <EmbeddingCanvas
             elements={nodes}
             hoveredElement={hoveredNode}
+            links={links}
             onClick={onClick}
             wrapper={wrapperRef.current}
           />
