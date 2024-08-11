@@ -9,7 +9,7 @@ defmodule Buildel.Blocks.TextOutput do
       description: "A versatile module designed to output text data.",
       groups: ["text", "inputs / outputs"],
       inputs: [Block.text_input()],
-      outputs: [Block.text_output("output", true)],
+      outputs: [Block.text_output("output", true), Block.text_output("forward")],
       ios: [],
       dynamic_ios: nil,
       schema: schema()
@@ -69,16 +69,17 @@ defmodule Buildel.Blocks.TextOutput do
   def handle_input("input", {_name, :text, text, _metadata}, state) do
     text =
       if state.filter do
-        Buildel.JQ.query!(text, state.filter)
+        Buildel.JQ.query!(text, state.filter) |> String.trim()
       else
         text
       end
 
     output(state, "output", {:text, text}, %{stream_stop: :schedule})
+    output(state, "forward", {:text, text}, %{stream_stop: :schedule})
   end
 
   def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do
-    state = send_stream_stop(state, "output")
+    state = send_stream_stop(state, "output") |> send_stream_stop("forward")
     {:noreply, state}
   end
 end

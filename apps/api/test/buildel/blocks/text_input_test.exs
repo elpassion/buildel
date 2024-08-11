@@ -8,7 +8,7 @@ defmodule Buildel.Blocks.TextInputTest do
                type: "text_input",
                description:
                  "This module is crafted for the seamless intake and transmission of textual data.",
-               inputs: [Block.text_input("input", true)],
+               inputs: [Block.text_input("input", true), Block.text_input("forward")],
                outputs: [Block.text_output("output")],
                schema: TextInput.schema(),
                groups: ["text", "inputs / outputs"],

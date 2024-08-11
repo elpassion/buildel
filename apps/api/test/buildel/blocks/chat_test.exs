@@ -7,7 +7,7 @@ defmodule Buildel.Blocks.ChatTest do
              description:
                "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
              type: "chat",
-             inputs: [Block.text_input("input")],
+             inputs: [Block.text_input("input"), Block.image_input("image")],
              outputs: [
                Block.text_output("output"),
                Block.text_output("message_output")

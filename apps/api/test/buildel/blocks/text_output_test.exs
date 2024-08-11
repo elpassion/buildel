@@ -7,7 +7,7 @@ defmodule Buildel.Blocks.TextOutputTest do
              description: "A versatile module designed to output text data.",
              type: "text_output",
              inputs: [Block.text_input("input")],
-             outputs: [Block.text_output("output", true)],
+             outputs: [Block.text_output("output", true), Block.text_output("forward")],
              schema: TextOutput.schema(),
              groups: ["text", "inputs / outputs"],
              ios: [],

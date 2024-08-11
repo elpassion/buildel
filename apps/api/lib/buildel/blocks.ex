@@ -33,7 +33,8 @@ defmodule Buildel.Blocks do
     Comment,
     WorkflowCall,
     DatasetOutput,
-    ImageInput
+    ImageInput,
+    HuggingFaceImageClassification
   }
 
   @names_to_blocks_map %{
@@ -66,7 +67,8 @@ defmodule Buildel.Blocks do
     "comment" => Comment,
     "workflow_call" => WorkflowCall,
     "dataset_output" => DatasetOutput,
-    "image_input" => ImageInput
+    "image_input" => ImageInput,
+    "hf_image_classification" => HuggingFaceImageClassification
   }
 
   @blocks_to_names_map %{
@@ -99,7 +101,8 @@ defmodule Buildel.Blocks do
     Comment => "comment",
     WorkflowCall => "workflow_call",
     DatasetOutput => "dataset_output",
-    ImageInput => "image_input"
+    ImageInput => "image_input",
+    HuggingFaceImageClassification => "hf_image_classification"
   }
 
   def list_types() do

@@ -46,4 +46,9 @@ defmodule Buildel.BlockContext.Mock do
   def get_secret_from_context(_context, key) do
     key
   end
+
+  @impl true
+  def get_dataset_from_context(_context, _dataset_id) do
+    nil
+  end
 end

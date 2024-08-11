@@ -140,6 +140,7 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
                  %{"name" => "random_block_2:output", "public" => false, "type" => "text"},
                  %{"name" => "random_block_2:json_output", "public" => false, "type" => "text"},
                  %{"name" => "random_block_3:output", "public" => true, "type" => "text"},
+                 %{"name" => "random_block_3:forward", "public" => false, "type" => "text"},
                  %{"name" => "random_block_4:output", "public" => true, "type" => "audio"}
                ]
              } = response["data"]

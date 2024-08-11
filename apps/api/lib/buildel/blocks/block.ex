@@ -283,7 +283,7 @@ defmodule Buildel.Blocks.Block do
           description:
             "The name of the block. Can only contain letters, numbers, and underscores. Cannot include spaces.",
           minLength: 2,
-          maxLength: 30,
+          maxLength: 50,
           pattern: "^[^<>: ?-]*$",
           regex: %{
             pattern: "^[^<>: ?-]*$",
