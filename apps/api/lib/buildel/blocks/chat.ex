@@ -769,6 +769,7 @@ defmodule Buildel.Blocks.Chat do
 
     text_contents =
       messages
+      |> Enum.reject(&is_nil(&1.content))
       |> Enum.flat_map(fn
         %{content: content} when is_binary(content) ->
           [content]
