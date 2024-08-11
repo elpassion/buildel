@@ -7,7 +7,7 @@ defmodule Buildel.Blocks.ImageInput do
       type: "image_input",
       description:
         "A streamlined module designed for the efficient handling and transmission of images.",
-      groups: ["file", "inputs / outputs"],
+      groups: ["image", "inputs / outputs"],
       inputs: [Block.image_input("input", true)],
       outputs: [Block.image_output()],
       ios: [],

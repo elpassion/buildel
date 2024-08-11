@@ -60,7 +60,8 @@ export interface IField {
       | 'file'
       | 'file_temporary'
       | 'worker'
-      | 'controller';
+      | 'controller'
+      | 'image';
   };
 }
 
