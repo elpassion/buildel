@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import {
   Outlet,
@@ -9,6 +9,7 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 import isEqual from 'lodash.isequal';
+import { useBoolean } from 'usehooks-ts';
 
 import { ELProvider } from '~/components/pages/pipelines/EL/ELProvider';
 import { BuilderCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/BuilderCommentNode';
@@ -53,6 +54,12 @@ export function PipelineBuilder() {
     [updateFetcher, pipeline],
   );
 
+  const {
+    value: isFloatingChatOpen,
+    toggle: toggleFloatingChat,
+    setFalse: closeFloatingChat,
+  } = useBoolean(false);
+
   const handleCloseSidebar = (value: boolean) => {
     if (value) return;
     navigate(
@@ -65,6 +72,8 @@ export function PipelineBuilder() {
   };
 
   const isDisabled = aliasId !== 'latest';
+
+  const key = JSON.stringify(pipeline);
 
   if (isDisabled) {
     return (
@@ -107,6 +116,10 @@ export function PipelineBuilder() {
             </ELProvider>
 
             <FloatingChat
+              key={key}
+              isOpen={isFloatingChatOpen}
+              toggle={toggleFloatingChat}
+              close={closeFloatingChat}
               webchatConfig={pipeline.interface_config.webchat}
               chatUrl={`${pageUrl}/webchats/${organizationId}/pipelines/${pipelineId}?alias=latest`}
             />

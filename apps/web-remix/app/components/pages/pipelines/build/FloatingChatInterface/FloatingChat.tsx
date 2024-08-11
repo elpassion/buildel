@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { MessageCircle, X } from 'lucide-react';
-import { useBoolean, useLocalStorage } from 'usehooks-ts';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { IconButton, IconButtonProps } from '~/components/iconButton';
 import { BasicLink } from '~/components/link/BasicLink';
@@ -14,11 +14,18 @@ import { hashString } from '~/utils/stringHash';
 interface FloatingChatProps {
   chatUrl: string;
   webchatConfig: IInterfaceConfigForm;
+  isOpen: boolean;
+  toggle: () => void;
+  close: () => void;
 }
 
-export const FloatingChat = ({ chatUrl, webchatConfig }: FloatingChatProps) => {
-  const { value: isOpen, toggle, setFalse: close } = useBoolean(false);
-
+export const FloatingChat = ({
+  chatUrl,
+  webchatConfig,
+  isOpen,
+  toggle,
+  close,
+}: FloatingChatProps) => {
   return (
     <div className="hidden fixed z-[51] top-0 bottom-0 left-0 right-0 pointer-events-none lg:block">
       <FloatingChatButton
