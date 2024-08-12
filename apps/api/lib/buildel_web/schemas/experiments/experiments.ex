@@ -105,7 +105,8 @@ defmodule BuildelWeb.Schemas.Experiments do
             required: [:inputs, :outputs]
           },
           created_at: %Schema{type: :string, description: "Created at"},
-          evaluations_avg: %Schema{type: :number, description: "Evaluations average"}
+          evaluations_avg: %Schema{type: :number, description: "Evaluations average"},
+          columns_avg: %Schema{type: :map, description: "Columns average"}
         },
         required: [:id, :status, :created_at, :columns]
       })

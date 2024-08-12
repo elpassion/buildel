@@ -82,12 +82,36 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
 
           evaluations_avg = (sum + evaluation_avg) / (count + 1)
 
-          changeset.repo.update_all(query, set: [evaluations_avg: evaluations_avg])
+          columns_avg = get_columns_avg(run_row_run.experiment_run_id, evaluations)
+
+          changeset.repo.update_all(query,
+            set: [evaluations_avg: evaluations_avg, columns_avg: columns_avg]
+          )
       end
 
       changeset
     end)
     |> Buildel.Repo.update()
+  end
+
+  defp get_columns_avg(experiment_run_id, evaluations) do
+    empty_map = %{}
+
+    result =
+      from(rrr in __MODULE__,
+        where:
+          rrr.experiment_run_id == ^experiment_run_id and
+            rrr.data != ^empty_map,
+        select: rrr.data
+      )
+      |> Buildel.Repo.all()
+
+    Enum.reduce(evaluations, %{}, fn {key, value}, acc ->
+      sum = Enum.sum(Enum.map(result, fn data -> data[key] end)) + value
+      count = Enum.count(result) + 1
+
+      Map.put(acc, key, sum / count)
+    end)
   end
 
   def status(run_row_run) do
