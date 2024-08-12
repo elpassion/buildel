@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import throttle from 'lodash.throttle';
 
 import { cn } from '~/utils/cn';
 
@@ -191,6 +192,10 @@ export function EmbeddingCanvas<T>({
   };
 
   useEffect(() => {
+    const resize = throttle(initializeCanvas, 80);
+
+    window.addEventListener('resize', resize);
+
     const ctx = getContext();
     if (ctx) {
       drawCanvas(
@@ -200,6 +205,10 @@ export function EmbeddingCanvas<T>({
         offsetRef.current.y,
       );
     }
+
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
   }, [hoveredElement, elements]);
 
   useEffect(() => {
