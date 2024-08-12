@@ -33,7 +33,7 @@ export function EvaluationsInTimeChart({
     return data.map((item) => {
       return {
         date: dayjs(item.created_at).format('DD MMM HH:mm'),
-        average: item.evaluations_avg,
+        average: item.evaluations_avg ?? 0,
         id: item.id,
       };
     });
