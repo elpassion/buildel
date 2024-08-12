@@ -10,14 +10,22 @@ defmodule BuildelWeb.Schemas.Experiments do
       properties: %{
         id: %Schema{type: :integer, description: "Experiment ID"},
         name: %Schema{type: :string, description: "Experiment name"},
-        pipeline: %Schema{type: :object, properties: %{
-          id: %Schema{type: :integer, description: "Pipeline ID"},
-          name: %Schema{type: :string, description: "Pipeline name"}
-        }, required: [:id, :name]},
-        dataset: %Schema{type: :object, properties: %{
-          id: %Schema{type: :integer, description: "Dataset ID"},
-          name: %Schema{type: :string, description: "Dataset name"}
-        }, required: [:id, :name]},
+        pipeline: %Schema{
+          type: :object,
+          properties: %{
+            id: %Schema{type: :integer, description: "Pipeline ID"},
+            name: %Schema{type: :string, description: "Pipeline name"}
+          },
+          required: [:id, :name]
+        },
+        dataset: %Schema{
+          type: :object,
+          properties: %{
+            id: %Schema{type: :integer, description: "Dataset ID"},
+            name: %Schema{type: :string, description: "Dataset name"}
+          },
+          required: [:id, :name]
+        },
         created_at: %Schema{type: :string, description: "Created at"}
       },
       required: [:id, :name, :pipeline, :dataset, :created_at]
@@ -145,7 +153,8 @@ defmodule BuildelWeb.Schemas.Experiments do
             enum: ["created", "running", "finished"]
           },
           created_at: %Schema{type: :string, description: "Created at"},
-          data: %Schema{type: :object, description: "Run data"}
+          data: %Schema{type: :object, description: "Run data"},
+          evaluation_avg: %Schema{type: :number, description: "Evaluation average"}
         },
         required: [:id, :status, :created_at]
       })

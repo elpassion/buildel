@@ -10,6 +10,7 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
     belongs_to(:run, Buildel.Pipelines.Run)
 
     field(:data, :map)
+    field(:evaluation_avg, :float)
 
     timestamps()
   end
@@ -33,8 +34,18 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
   end
 
   def finish(run_row_run, data) do
+    run = from(r in Run, where: r.id == ^run_row_run.experiment_run_id) |> Buildel.Repo.one()
+
+    evaluations =
+      Enum.filter(data, fn {key, value} ->
+        String.contains?(key, run.outputs) && is_integer(value)
+      end)
+
+    evaluation_avg =
+      Enum.reduce(evaluations, 0, fn {_, value}, acc -> acc + value end) / length(evaluations)
+
     run_row_run
-    |> cast(%{data: data}, [:data])
+    |> cast(%{data: data, evaluation_avg: evaluation_avg}, [:data, :evaluation_avg])
     |> prepare_changes(fn changeset ->
       run_id = run_row_run.experiment_run_id
       empty_map = %{}
