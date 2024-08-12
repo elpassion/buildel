@@ -12,9 +12,9 @@ import { TextInputField } from '~/components/form/fields/text.field';
 import { IconButton } from '~/components/iconButton';
 import { cn } from '~/utils/cn';
 
-import { ExtendChunksField } from './ExtendChunksToggleField';
-import { SearchSchema } from './schema';
-import { SearchParams } from './SearchParams';
+import { ExtendChunksField } from '../components/ExtendChunksToggleField';
+import { SearchParams } from '../components/SearchParams';
+import { SearchSchema } from '../search.schema';
 
 interface KnowledgeBaseSearchFormProps {
   defaultValue?: Partial<z.TypeOf<typeof SearchSchema>>;

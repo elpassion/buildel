@@ -21,12 +21,12 @@ import type { loader } from './loader.server';
 
 import '@xyflow/react/dist/style.css';
 
-import type { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
 import { EmbeddingCanvas, type CanvasLink } from './components/EmbeddingCanvas';
+import { SearchChunksList } from './components/SearchChunkList';
 
 export function KnowledgeBaseGraphPage() {
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -225,52 +225,6 @@ export function KnowledgeBaseGraphPage() {
         )}
       </ClientOnly>
     </div>
-  );
-}
-
-function SearchChunksList({
-  searchChunks,
-  onChunkSelect,
-  onMouseOver,
-  onMouseLeave,
-}: {
-  searchChunks: IKnowledgeBaseSearchChunk[];
-  onChunkSelect: (id: string) => void;
-  onMouseOver: (id: string) => void;
-  onMouseLeave: () => void;
-}) {
-  const onMouseEnter = useCallback((id: string) => {
-    onMouseOver(id);
-  }, []);
-
-  return (
-    searchChunks.length > 0 && (
-      <div className="relative w-full max-w-[350px] max-h-[200px] overflow-y-auto overflow-x-hidden pointer-events-auto bg-white border border-input p-2 rounded-lg flex flex-col">
-        {searchChunks.map((chunk) => {
-          return (
-            <button
-              className="hover:bg-muted p-1 rounded-sm text-xs"
-              onClick={() => {
-                onChunkSelect(chunk.id);
-              }}
-              onMouseEnter={() => onMouseEnter(chunk.id)}
-              onMouseLeave={onMouseLeave}
-              key={chunk.id}
-            >
-              <div className="whitespace-nowrap truncate w-full">
-                {chunk.file_name}
-              </div>
-              <div className="whitespace-nowrap truncate w-full">
-                {chunk.keywords.toString()}
-              </div>
-              <div className="whitespace-nowrap truncate w-full">
-                Pages: {chunk.pages.toString()}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    )
   );
 }
 
