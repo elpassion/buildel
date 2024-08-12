@@ -306,10 +306,12 @@ export function EmbeddingCanvas<T>({
     }
   };
 
-  const onMouseUp = () => {
+  const onMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
     isMouseDown.current = false;
     setIsDragging(false);
     if (!isDraggingRef.current && onClick && hoveredNodeRef.current) {
+      if (e.type === 'mouseleave') return;
+
       onClick(hoveredNodeRef.current);
     }
     isDraggingRef.current = false;
