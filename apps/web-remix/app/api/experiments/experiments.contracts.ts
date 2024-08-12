@@ -44,6 +44,7 @@ export const ExperimentRun = z.object({
   runs_count: z.number().default(0),
   status: z.enum(['running', 'finished', 'created']),
   columns: ExperimentRunColumns,
+  columns_avg: z.record(z.string(), z.number()),
   evaluations_avg: z.number().nullable().optional(),
 });
 

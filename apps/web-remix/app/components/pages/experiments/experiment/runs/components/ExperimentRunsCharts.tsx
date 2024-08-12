@@ -12,13 +12,14 @@ import {
 import type { loader } from '../loader.server';
 import { useHighlightedRows } from '../useHighlightedRows';
 import { EvaluationsInTimeChart } from './EvaluationsInTimeChart';
+import { ExperimentRunChartsGrid } from './ExperimentRunChart.components';
 
 export const ExperimentRunsCharts = () => {
   const { experimentRuns } = useLoaderData<typeof loader>();
   const { onMouseMove, onMouseLeave } = useHighlightedRows(experimentRuns);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    <ExperimentRunChartsGrid>
       <Card>
         <CardHeader>
           <CardTitle>Evaluations In Time</CardTitle>
@@ -35,6 +36,6 @@ export const ExperimentRunsCharts = () => {
           />
         </CardContent>
       </Card>
-    </div>
+    </ExperimentRunChartsGrid>
   );
 };
