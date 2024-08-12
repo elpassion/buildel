@@ -2,26 +2,26 @@ import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { Settings } from 'lucide-react';
 
-import { IconButton } from '~/components/iconButton';
 import {
-  Popover,
-  PopoverContentWithoutPortal,
-  PopoverTrigger,
-} from '~/components/ui/popover';
+  Dropdown,
+  DropdownPopup,
+  DropdownTrigger,
+} from '~/components/dropdown/Dropdown';
 
 export const SearchParams: React.FC<PropsWithChildren> = ({ children }) => {
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <IconButton
-          variant="secondary"
-          icon={<Settings className="w-5 h-5 text-foreground" />}
-        />
-      </PopoverTrigger>
+    <Dropdown>
+      <DropdownTrigger
+        type="button"
+        className="!min-w-[36px] w-9 h-9 flex justify-center items-center p-0"
+        variant="outline"
+      >
+        <Settings className="min-w-5 w-5 min-h-5 h-5 text-foreground" />
+      </DropdownTrigger>
 
-      <PopoverContentWithoutPortal align="start">
+      <DropdownPopup className="bg-white p-2 z-[12] rounded-lg border border-input">
         {children}
-      </PopoverContentWithoutPortal>
-    </Popover>
+      </DropdownPopup>
+    </Dropdown>
   );
 };

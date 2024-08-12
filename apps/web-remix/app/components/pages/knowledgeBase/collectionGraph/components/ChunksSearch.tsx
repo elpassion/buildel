@@ -2,7 +2,7 @@ import type { FormEvent } from 'react';
 import { useMemo } from 'react';
 import { useNavigate } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
-import { Loader, Search } from 'lucide-react';
+import { Loader, Search, X } from 'lucide-react';
 import { useFormContext, ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
@@ -54,14 +54,14 @@ export const ChunksSearch = ({ defaultValue }: ChunksSearchProps) => {
 
   return (
     <div
-      className="relative w-full max-w-[350px] pointer-events-auto"
+      className="relative w-full max-w-[400px] pointer-events-auto"
       key={defaultValue.query}
     >
       <ValidatedForm
         validator={validator}
         defaultValues={{ query: defaultValue.query }}
         onSubmit={onSubmit}
-        className="flex gap-2 w-full items-start"
+        className="flex gap-1 w-full items-start"
       >
         <SearchParams>
           <Field name="limit">
@@ -133,8 +133,8 @@ function ClearButton() {
 
   return (
     <IconButton
-      icon={'x'}
-      variant={'outline'}
+      icon={<X />}
+      variant="outline"
       size="sm"
       disabled={!query}
       onClick={(e) => {
