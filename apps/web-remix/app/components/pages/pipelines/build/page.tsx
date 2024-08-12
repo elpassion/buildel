@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import {
   Outlet,
