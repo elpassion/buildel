@@ -44,6 +44,7 @@ export const ExperimentRun = z.object({
   runs_count: z.number().default(0),
   status: z.enum(['running', 'finished', 'created']),
   columns: ExperimentRunColumns,
+  evaluations_avg: z.number().nullable().optional(),
 });
 
 export const ExperimentRunResponse = z.object({
@@ -67,6 +68,7 @@ export const ExperimentRunRun = z.object({
   experiment_run_id: z.union([z.number(), z.string()]),
   dataset_id: z.union([z.number(), z.string()]).default(0),
   dataset_row_id: z.union([z.number(), z.string()]),
+  evaluation_avg: z.number().nullable().optional(),
 });
 
 export const ExperimentRunRunsResponse = z

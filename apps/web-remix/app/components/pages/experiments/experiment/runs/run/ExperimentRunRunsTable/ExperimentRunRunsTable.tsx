@@ -105,6 +105,30 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
           },
         }),
       ),
+      columnHelper.accessor(`evaluation_avg`, {
+        header: () => (
+          <span className="whitespace-nowrap">Evaluation average</span>
+        ),
+        id: 'evaluation_avg',
+        cell: (info) => {
+          const value = info.getValue();
+
+          if (!value) return '';
+
+          if (typeof value === 'number')
+            return (
+              <Badge
+                variant={
+                  value < 25 ? 'error' : value >= 75 ? 'success' : 'warning'
+                }
+              >
+                {value}%
+              </Badge>
+            );
+          return info.getValue();
+        },
+      }),
+
       columnHelper.accessor('run_id', {
         id: 'run-actions',
         cell: (info) => {
