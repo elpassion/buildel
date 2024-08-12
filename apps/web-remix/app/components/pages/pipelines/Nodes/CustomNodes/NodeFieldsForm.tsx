@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import {
   KnowledgeBaseFileListResponse,
@@ -30,7 +30,7 @@ export function NodeFieldsForm({
 }: NodeFieldsFormProps) {
   const blockName = block.name;
   const { status, organizationId, pipelineId, runId } = useRunPipeline();
-  const { push, clearEvents } = useRunPipelineNode(block);
+  const { push, clearEvents, isValid } = useRunPipelineNode(block);
 
   const onSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -254,6 +254,10 @@ export function NodeFieldsForm({
     [uploadAudioChunk],
   );
 
+  const isDisabled = useMemo(() => {
+    return !isValid || disabled;
+  }, [isValid, disabled]);
+
   const renderInput = useCallback(
     (field: IField) => {
       const { type, name } = field.data;
@@ -279,12 +283,12 @@ export function NodeFieldsForm({
         return (
           <FileUpload
             multiple
-            id={name}
-            name={name}
+            id={`${blockName}-${name}`}
+            name={`${blockName}-${name}`}
             onUpload={uploadFile}
             onFetch={fetchFiles}
             onRemove={removeFile}
-            disabled={disabled}
+            disabled={isDisabled}
             preview={(props) => (
               <FileUploadListPreview
                 {...props}
@@ -299,17 +303,17 @@ export function NodeFieldsForm({
         return (
           <FileUpload
             multiple
-            id={name}
-            name={name}
+            id={`${blockName}-${name}`}
+            name={`${blockName}-${name}`}
             onUpload={uploadFileTemporary}
             onRemove={removeFileTemporary}
-            disabled={status !== 'running' || disabled}
+            disabled={status !== 'running' || isDisabled}
             preview={(props) => (
               <FileUploadListPreview
                 {...props}
                 aria-label={`${blockName} temporary list`}
                 className="max-h-[110px]"
-                disabled={disabled}
+                disabled={isDisabled}
               />
             )}
           />
@@ -317,8 +321,8 @@ export function NodeFieldsForm({
       } else if (type === 'audio') {
         return (
           <AudioFieldTabs
-            disabled={disabled}
-            name={field.data.name}
+            disabled={isDisabled}
+            name={`${blockName}-${field.data.name}`}
             onUpload={convertToBlobAndUpload}
             onChunk={uploadAudioChunk}
           />
@@ -327,7 +331,7 @@ export function NodeFieldsForm({
 
       return <span>Unsupported input type - {type}</span>;
     },
-    [fetchFiles, removeFile, uploadFile, status],
+    [fetchFiles, removeFile, uploadFile, status, isDisabled],
   );
 
   return (
