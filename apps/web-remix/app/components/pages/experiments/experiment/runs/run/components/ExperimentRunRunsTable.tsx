@@ -24,10 +24,11 @@ import {
   TableHeadRow,
 } from '~/components/table/table.components';
 import { getCommonPinningStyles } from '~/components/table/table.utils';
-import { Badge } from '~/components/ui/badge';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { dayjs } from '~/utils/Dayjs';
 import { routes } from '~/utils/routes.utils';
+
+import { EvaluationAverageCellBadge } from '../../components/EvaluationAverageCellBadge';
 
 interface ExperimentRunRunsTableProps {
   data: IExperimentRunRun[];
@@ -86,47 +87,15 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
             <span className="whitespace-nowrap">Evaluation: {name}</span>
           ),
           id: name,
-          cell: (info) => {
-            const value = info.getValue();
-
-            if (!value) return '';
-
-            if (typeof value === 'number')
-              return (
-                <Badge
-                  variant={
-                    value < 25 ? 'error' : value >= 75 ? 'success' : 'warning'
-                  }
-                >
-                  {value}%
-                </Badge>
-              );
-            return info.getValue();
-          },
+          cell: EvaluationAverageCellBadge,
         }),
       ),
       columnHelper.accessor(`evaluation_avg`, {
         header: () => (
-          <span className="whitespace-nowrap">Evaluation average</span>
+          <span className="whitespace-nowrap">Evaluation Average</span>
         ),
         id: 'evaluation_avg',
-        cell: (info) => {
-          const value = info.getValue();
-
-          if (!value) return '';
-
-          if (typeof value === 'number')
-            return (
-              <Badge
-                variant={
-                  value < 25 ? 'error' : value >= 75 ? 'success' : 'warning'
-                }
-              >
-                {value}%
-              </Badge>
-            );
-          return info.getValue();
-        },
+        cell: EvaluationAverageCellBadge,
       }),
 
       columnHelper.accessor('run_id', {

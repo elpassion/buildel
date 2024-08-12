@@ -4,7 +4,6 @@ import { useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
-import { RunEvaluationAverageChart } from '~/components/pages/experiments/experiment/runs/run/RunRunsCharts/RunEvaluationAverageChart';
 import { Pagination } from '~/components/pagination/Pagination';
 import {
   Card,
@@ -16,7 +15,8 @@ import {
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { routes } from '~/utils/routes.utils';
 
-import { ExperimentRunRunsTable } from './ExperimentRunRunsTable/ExperimentRunRunsTable';
+import { ExperimentRunRunsTable } from './components/ExperimentRunRunsTable';
+import { RunRunsEvaluationAverageChart } from './components/RunRunsEvaluationAverageChart';
 import type { loader } from './loader.server';
 
 export function ExperimentRunPage() {
@@ -44,24 +44,18 @@ export function ExperimentRunPage() {
         }
       />
 
-      <PageContentWrapper className="mt-[100px] pb-3">
-        <div className="mb-4 max-w-[350px]">
-          {/*<RunRunsChartGrid*/}
-          {/*  data={experimentRunRuns}*/}
-          {/*  columns={experimentRun.columns.outputs}*/}
-          {/*/>*/}
-
+      <PageContentWrapper className="mt-[120px] pb-3">
+        <div className="mb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader>
               <CardTitle>Evaluation Average</CardTitle>
               <CardDescription>
-                Average of the evaluation of all rows in the experiment run
-                runs.
+                Average of the evaluation of all rows in the experiment run.
               </CardDescription>
             </CardHeader>
 
             <CardContent>
-              <RunEvaluationAverageChart
+              <RunRunsEvaluationAverageChart
                 average={experimentRun.evaluations_avg ?? 0}
               />
             </CardContent>

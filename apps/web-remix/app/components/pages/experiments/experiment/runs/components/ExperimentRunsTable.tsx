@@ -8,6 +8,7 @@ import {
 import { ExternalLink } from 'lucide-react';
 
 import { EmptyMessage } from '~/components/list/ItemList';
+import { EvaluationAverageCellBadge } from '~/components/pages/experiments/experiment/runs/components/EvaluationAverageCellBadge';
 import type { IExperimentRun } from '~/components/pages/experiments/experiments.types';
 import {
   CellNumberBadge,
@@ -62,6 +63,14 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
           <CellNumberBadge>{info.getValue()?.toString()}</CellNumberBadge>
         ),
       }),
+      columnHelper.accessor(`evaluations_avg`, {
+        header: () => (
+          <span className="whitespace-nowrap">Evaluations Average</span>
+        ),
+        id: 'evaluations_avg',
+        cell: EvaluationAverageCellBadge,
+      }),
+
       columnHelper.accessor('id', {
         header: '',
         id: 'run-actions',
@@ -129,7 +138,11 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
           </tr>
         ) : null}
         {table.getRowModel().rows.map((row) => (
-          <TableBodyRow key={row.id} aria-label="pipeline run">
+          <TableBodyRow
+            key={row.id}
+            aria-label="pipeline run"
+            data-row-key={row.original.id}
+          >
             {row.getVisibleCells().map((cell) => (
               <TableBodyCell
                 key={cell.id}

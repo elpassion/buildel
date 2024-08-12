@@ -10,20 +10,20 @@ import {
 import type { ChartConfig } from '~/components/ui/chart';
 import { ChartContainer } from '~/components/ui/chart';
 
-interface RunEvaluationAverageChartProps {
+interface RunRunsEvaluationAverageChartProps {
   average: number;
 }
 
 const chartConfig = {
   average: {
     label: 'Evaluation Average',
-    color: 'hsl(var(--chart-2))',
+    color: 'hsl(var(--chart-1))',
   },
 } satisfies ChartConfig;
 
-export const RunEvaluationAverageChart = ({
+export const RunRunsEvaluationAverageChart = ({
   average,
-}: RunEvaluationAverageChartProps) => {
+}: RunRunsEvaluationAverageChartProps) => {
   const chartData = useMemo(() => {
     return [
       { data: 'average', average: average, fill: 'var(--color-average)' },
@@ -33,7 +33,7 @@ export const RunEvaluationAverageChart = ({
   return (
     <ChartContainer
       config={chartConfig}
-      className="mx-auto aspect-square max-h-[250px]"
+      className="mx-auto aspect-square max-h-[180px]"
     >
       <RadialBarChart
         data={chartData}

@@ -2,13 +2,14 @@ import { useMemo } from 'react';
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
 import type { CategoricalChartState } from 'recharts/types/chart/types';
 
-import type { IExperimentRunRun } from '~/components/pages/experiments/experiments.types';
+import type { IExperimentRun } from '~/components/pages/experiments/experiments.types';
 import type { ChartConfig } from '~/components/ui/chart';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from '~/components/ui/chart';
+import { dayjs } from '~/utils/Dayjs';
 
 const chartConfig = {
   column: {
@@ -17,24 +18,23 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-interface RunRunsNumericChartProps {
-  data: IExperimentRunRun[];
-  column: keyof IExperimentRunRun['data'];
+interface EvaluationsInTimeChartProps {
+  data: IExperimentRun[];
   onMouseMove?: (state: CategoricalChartState) => void;
   onMouseLeave?: () => void;
 }
 
-export function RunRunsNumericChart({
+export function EvaluationsInTimeChart({
   data,
-  column,
   onMouseMove,
   onMouseLeave,
-}: RunRunsNumericChartProps) {
+}: EvaluationsInTimeChartProps) {
   const chartData = useMemo(() => {
     return data.map((item) => {
       return {
+        date: dayjs(item.created_at).format('DD MMM HH:mm'),
+        average: item.evaluations_avg,
         id: item.id,
-        [column]: item.data[column],
       };
     });
   }, [data]);
@@ -52,13 +52,18 @@ export function RunRunsNumericChart({
         }}
       >
         <CartesianGrid vertical={false} />
-        <XAxis dataKey="id" tickLine={false} axisLine={false} tickMargin={8} />
+        <XAxis
+          dataKey="date"
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+        />
         <ChartTooltip
           cursor={true}
-          content={<ChartTooltipContent indicator="dot" hideLabel />}
+          content={<ChartTooltipContent indicator="dot" />}
         />
         <Area
-          dataKey={column}
+          dataKey="average"
           type="linear"
           fill="var(--color-column)"
           fillOpacity={0.4}

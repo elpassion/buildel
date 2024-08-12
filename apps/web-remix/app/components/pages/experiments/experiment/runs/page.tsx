@@ -8,9 +8,11 @@ import { Pagination } from '~/components/pagination/Pagination';
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
-import { ExperimentRunsTable } from './ExperimentRunsTable/ExperimentRunsTable';
+import { ExperimentRunsCharts } from './components/ExperimentRunsCharts';
+import { ExperimentRunsTable } from './components/ExperimentRunsTable';
 import type { loader } from './loader.server';
 
 export function ExperimentPage() {
@@ -41,6 +43,10 @@ export function ExperimentPage() {
       <PageContentWrapper className="mt-6 lg:mt-[120px] pb-3">
         <div className="mb-[56px] flex justify-end lg:hidden">
           <ExperimentRunButton size="sm">Run Experiment</ExperimentRunButton>
+        </div>
+
+        <div className={cn('mb-4', { hidden: experimentRuns.length === 0 })}>
+          <ExperimentRunsCharts />
         </div>
 
         <ExperimentRunsTable data={experimentRuns} />
