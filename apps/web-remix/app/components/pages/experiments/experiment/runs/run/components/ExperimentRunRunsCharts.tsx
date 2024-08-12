@@ -34,7 +34,8 @@ export const ExperimentRunRunsCharts = () => {
 
               <CardContent>
                 <RunRunsEvaluationAverageChart
-                  average={experimentRun.evaluations_avg ?? 0}
+                  average={+(experimentRun.evaluations_avg ?? 0).toFixed(2)}
+                  label="Evaluation Average"
                 />
               </CardContent>
             </Card>
@@ -43,14 +44,17 @@ export const ExperimentRunRunsCharts = () => {
               <Card key={column}>
                 <CardHeader>
                   <CardTitle>{startCase(column)}</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="h-10">
                     Values of the <span className="font-bold">{column}</span>{' '}
                     column in the experiment run.
                   </CardDescription>
                 </CardHeader>
 
                 <CardContent>
-                  <RunRunsEvaluationAverageChart average={data} />
+                  <RunRunsEvaluationAverageChart
+                    average={+data.toFixed(2)}
+                    label={column}
+                  />
                 </CardContent>
               </Card>
             ))}

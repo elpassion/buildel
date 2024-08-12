@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import startCase from 'lodash.startcase';
 import {
   Label,
   PolarGrid,
@@ -12,6 +13,7 @@ import { ChartContainer } from '~/components/ui/chart';
 
 interface RunRunsEvaluationAverageChartProps {
   average: number;
+  label?: string;
 }
 
 const chartConfig = {
@@ -23,6 +25,7 @@ const chartConfig = {
 
 export const RunRunsEvaluationAverageChart = ({
   average,
+  label,
 }: RunRunsEvaluationAverageChartProps) => {
   const chartData = useMemo(() => {
     return [
@@ -37,8 +40,8 @@ export const RunRunsEvaluationAverageChart = ({
     >
       <RadialBarChart
         data={chartData}
-        startAngle={0}
-        endAngle={100}
+        startAngle={360 - average * 3.6}
+        endAngle={360}
         innerRadius={80}
         outerRadius={110}
       >
@@ -68,13 +71,15 @@ export const RunRunsEvaluationAverageChart = ({
                     >
                       {chartData[0].average}%
                     </tspan>
-                    <tspan
-                      x={viewBox.cx}
-                      y={(viewBox.cy || 0) + 24}
-                      className="fill-muted-foreground"
-                    >
-                      Evaluation Average
-                    </tspan>
+                    {label && (
+                      <tspan
+                        x={viewBox.cx}
+                        y={(viewBox.cy || 0) + 24}
+                        className="fill-muted-foreground"
+                      >
+                        {startCase(label)}
+                      </tspan>
+                    )}
                   </text>
                 );
               }
