@@ -64,7 +64,26 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
             )
         )
 
-      changeset.repo.update_all(query, set: [status: :finished])
+      status_update = changeset.repo.update_all(query, set: [status: :finished])
+
+      case status_update do
+        {0, _} ->
+          nil
+
+        {1, _} ->
+          {count, sum} =
+            from(rrr in __MODULE__,
+              where:
+                rrr.experiment_run_id == ^run_row_run.experiment_run_id and
+                  not is_nil(rrr.evaluation_avg),
+              select: {count(rrr.evaluation_avg), sum(rrr.evaluation_avg)}
+            )
+            |> Buildel.Repo.one()
+
+          evaluations_avg = (sum + evaluation_avg) / (count + 1)
+
+          changeset.repo.update_all(query, set: [evaluations_avg: evaluations_avg])
+      end
 
       changeset
     end)

@@ -10,6 +10,7 @@ defmodule Buildel.Experiments.Runs.Run do
 
     field(:inputs, {:array, :string})
     field(:outputs, {:array, :string})
+    field(:evaluations_avg, :float)
 
     field(:runs_count, :integer, default: 0)
 
