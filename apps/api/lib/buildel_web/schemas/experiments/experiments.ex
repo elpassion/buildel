@@ -165,7 +165,7 @@ defmodule BuildelWeb.Schemas.Experiments do
       require OpenApiSpex
 
       OpenApiSpex.schema(%{
-        title: "ExperimentRunIndexResponse",
+        title: "ExperimentRunRunIndexResponse",
         type: :object,
         properties: %{
           data: %Schema{type: :array, items: Run, description: "Run Runs list"},
