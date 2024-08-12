@@ -33,7 +33,7 @@ export function EvaluationsInTimeChart({
     return data.map((item) => {
       return {
         date: dayjs(item.created_at).format('DD MMM HH:mm'),
-        average: item.evaluations_avg ?? 0,
+        average: item.evaluations_avg,
         id: item.id,
       };
     });
@@ -68,6 +68,8 @@ export function EvaluationsInTimeChart({
           fill="var(--color-column)"
           fillOpacity={0.4}
           stroke="var(--color-column)"
+          connectNulls
+          dot
         />
       </AreaChart>
     </ChartContainer>
