@@ -22,6 +22,7 @@ swap_size_mb = 512
   PAGE_URL = "https://app.buildel.ai"
   ECTO_IPV6 = true
   POOL_SIZE = 10
+  SKIP_FLAME = false
 
 [http_service]
   internal_port = 8080
