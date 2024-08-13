@@ -23,6 +23,7 @@ import '@xyflow/react/dist/style.css';
 
 import { useSearchedChunks } from '~/components/pages/knowledgeBase/collectionGraph/useSearchedChunks';
 import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
+import { errorToast } from '~/components/toasts/errorToast';
 import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
@@ -49,11 +50,13 @@ export function KnowledgeBaseGraphPage() {
     searchParams,
     organizationId,
     collectionId,
+    onError: () => errorToast('Ups! Something went wrong'),
   });
   const { neighbors: relatedNeighbours } = useRelatedChunks({
     organizationId,
     collectionId,
     activeChunk,
+    onError: () => errorToast('Ups! Something went wrong'),
   });
 
   const matchDetails = useMatch(

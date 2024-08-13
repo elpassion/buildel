@@ -8,12 +8,14 @@ type UseRelatedChunksArgs = {
   organizationId: string | number;
   collectionId: string | number;
   searchParams: Record<string, any>;
+  onError?: (err: unknown) => void;
 };
 
 export const useSearchedChunks = ({
   searchParams,
   organizationId,
   collectionId,
+  onError,
 }: UseRelatedChunksArgs) => {
   const abortController = useRef<AbortController | null>(null);
   const [searchChunks, setSearchChunks] = useState<IKnowledgeBaseSearchChunk[]>(
@@ -38,8 +40,11 @@ export const useSearchedChunks = ({
       const searched = KnowledgeBaseSearchChunkResponse.parse(await res.json());
 
       setSearchChunks(searched.data);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      if (!(err instanceof DOMException)) {
+        onError?.(err);
+        setSearchChunks([]);
+      }
     } finally {
       abortController.current = null;
     }
@@ -48,7 +53,7 @@ export const useSearchedChunks = ({
   useEffect(() => {
     if (!searchParams.query) return setSearchChunks([]);
     fetchSearchChunks(searchParams);
-  }, [searchParams]);
+  }, [JSON.stringify(searchParams)]);
 
   return { searchChunks };
 };

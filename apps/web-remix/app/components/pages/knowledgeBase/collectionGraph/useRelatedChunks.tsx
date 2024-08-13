@@ -7,12 +7,14 @@ type UseRelatedChunksArgs = {
   organizationId: string | number;
   collectionId: string | number;
   activeChunk: IMemoryNode | null;
+  onError?: (err: unknown) => void;
 };
 
 export const useRelatedChunks = ({
   activeChunk,
   organizationId,
   collectionId,
+  onError,
 }: UseRelatedChunksArgs) => {
   const abortController = useRef<AbortController | null>(null);
   const [relatedNeighbours, setRelatedNeighbours] = useState<string[]>([]);
@@ -33,8 +35,11 @@ export const useRelatedChunks = ({
 
       const related = MemoryNodeRelatedResponse.parse(await res.json());
       setRelatedNeighbours(related.chunks);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      if (!(err instanceof DOMException)) {
+        onError?.(err);
+        setRelatedNeighbours([]);
+      }
     } finally {
       abortController.current = null;
     }
@@ -44,7 +49,7 @@ export const useRelatedChunks = ({
     if (!activeChunk) return setRelatedNeighbours([]);
 
     fetchRelatedNeighbours(activeChunk);
-  }, [activeChunk]);
+  }, [activeChunk?.id]);
 
   return { neighbors: relatedNeighbours };
 };
