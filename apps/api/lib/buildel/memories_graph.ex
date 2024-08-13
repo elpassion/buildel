@@ -169,11 +169,11 @@ defmodule Buildel.MemoriesGraph do
             :ok -> :ok
             e -> Logger.debug("Failed to reduce dimensions: #{inspect(e)}")
           end
-
-          GenServer.cast(__MODULE__, {:remove, collection.id})
         end,
         timeout: 5 * 60_000
       )
+
+      GenServer.cast(__MODULE__, {:remove, collection.id})
     end)
 
     :ok
