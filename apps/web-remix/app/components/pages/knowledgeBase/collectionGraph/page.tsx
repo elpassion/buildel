@@ -21,28 +21,40 @@ import type { loader } from './loader.server';
 
 import '@xyflow/react/dist/style.css';
 
+import { useSearchedChunks } from '~/components/pages/knowledgeBase/collectionGraph/useSearchedChunks';
 import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
 import { EmbeddingCanvas, type CanvasLink } from './components/EmbeddingCanvas';
 import { SearchChunksList } from './components/SearchChunkList';
+import { useRelatedChunks } from './useRelatedChunks';
 
 export function KnowledgeBaseGraphPage() {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const {
+    collectionId,
     graph,
     graphState,
-    searchChunks,
     collectionName,
     organizationId,
     activeChunk,
-    relatedNeighbours,
     prevNode,
     nextNode,
     searchParams,
   } = useLoaderData<typeof loader>();
+
+  const { searchChunks } = useSearchedChunks({
+    searchParams,
+    organizationId,
+    collectionId,
+  });
+  const { neighbors: relatedNeighbours } = useRelatedChunks({
+    organizationId,
+    collectionId,
+    activeChunk,
+  });
 
   const matchDetails = useMatch(
     '/:organization_id/knowledge-base/:collection_name/graph/details',
@@ -156,7 +168,7 @@ export function KnowledgeBaseGraphPage() {
         opacity: styles.opacity,
       };
     });
-  }, [graph.nodes]);
+  }, [graph.nodes, activeStyles]);
 
   const onMouseOver = useCallback((id: string) => {
     setHoveredNode(id);

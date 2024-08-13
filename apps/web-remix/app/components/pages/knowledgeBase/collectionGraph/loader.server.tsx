@@ -1,12 +1,7 @@
 import { json } from '@remix-run/node';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import invariant from 'tiny-invariant';
-import type { z } from 'zod';
 
-import type {
-  IKnowledgeBaseSearchChunk,
-  MemoryNodeRelated,
-} from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { KnowledgeBaseApi } from '~/api/knowledgeBase/KnowledgeBaseApi';
 import type { IPrevNextNode } from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.types';
 import { requireLogin } from '~/session.server';
@@ -57,7 +52,6 @@ export async function loader(args: LoaderFunctionArgs) {
     const activeChunk =
       graph.data.nodes.find((node) => node.id === chunk_id) ?? null;
 
-    let relatedNeighbours: z.TypeOf<typeof MemoryNodeRelated>['chunks'] = [];
     let prevNode: IPrevNextNode = null;
     let nextNode: IPrevNextNode = null;
 
@@ -67,23 +61,12 @@ export async function loader(args: LoaderFunctionArgs) {
         collectionId,
         activeChunk.id,
       );
-      const relatedNeighboursPromise = knowledgeBaseApi.getRelatedNeighbours(
-        params.organizationId,
-        collectionId,
-        activeChunk.id,
-      );
 
-      const [details, neighbours] = await Promise.all([
-        chunkDetailsPromise,
-        relatedNeighboursPromise,
-      ]);
+      const [details] = await Promise.all([chunkDetailsPromise]);
 
-      relatedNeighbours = neighbours.data.chunks;
       prevNode = details.data.prev;
       nextNode = details.data.next;
     }
-
-    let graphSearchChunks: IKnowledgeBaseSearchChunk[] = [];
 
     const searchParams = {
       query,
@@ -93,25 +76,13 @@ export async function loader(args: LoaderFunctionArgs) {
       extend_parents,
     };
 
-    if (query) {
-      const { data: searchChunks } =
-        await knowledgeBaseApi.searchCollectionChunks(
-          params.organizationId,
-          collectionId,
-          searchParams,
-        );
-      graphSearchChunks = searchChunks.data;
-    }
-
     return json({
       organizationId: params.organizationId,
       collectionName: params.collectionName,
       collectionId: collectionId,
       graph: graph.data,
       graphState: graphState.data,
-      searchChunks: graphSearchChunks,
       activeChunk,
-      relatedNeighbours,
       prevNode,
       nextNode,
       searchParams,
