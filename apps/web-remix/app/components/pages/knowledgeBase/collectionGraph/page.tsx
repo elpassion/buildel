@@ -227,15 +227,17 @@ export function KnowledgeBaseGraphPage() {
         </NodePreviewSidebarContent>
       </NodePreviewSidebar>
       <ClientOnly fallback="">
-        {() => (
-          <EmbeddingCanvas
-            elements={nodes}
-            activeElement={hoveredNode}
-            links={links}
-            onClick={onClick}
-            wrapper={wrapperRef.current}
-          />
-        )}
+        {() =>
+          nodes.length > 0 ? (
+            <EmbeddingCanvas
+              elements={nodes}
+              activeElement={hoveredNode}
+              links={links}
+              onClick={onClick}
+              wrapper={wrapperRef.current}
+            />
+          ) : null
+        }
       </ClientOnly>
     </div>
   );

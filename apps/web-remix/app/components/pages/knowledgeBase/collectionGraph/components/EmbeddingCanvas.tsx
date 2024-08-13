@@ -62,6 +62,14 @@ export function EmbeddingCanvas<T>({
     canvasRef.current.width = wrapper ? wrapper.offsetWidth : width;
     canvasRef.current.height = wrapper ? wrapper.offsetHeight : height;
 
+    if (elements.length === 0) {
+      const ctx = getContext();
+      if (ctx) {
+        drawCanvas(ctx, 1, 0, 0);
+      }
+      return;
+    }
+
     const minX = Math.min(
       ...elements.map((element) => element.x - element.radius),
     );
