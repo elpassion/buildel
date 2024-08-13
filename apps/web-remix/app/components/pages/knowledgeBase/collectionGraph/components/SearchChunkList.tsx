@@ -19,7 +19,7 @@ export function SearchChunksList({
 
   return (
     searchChunks.length > 0 && (
-      <div className="relative w-full max-w-[350px] max-h-[200px] overflow-y-auto overflow-x-hidden pointer-events-auto bg-white border border-input p-2 rounded-lg flex flex-col">
+      <div className="relative top-1 w-full max-w-[350px] max-h-[200px] overflow-y-auto overflow-x-hidden pointer-events-auto bg-white border border-input p-2 rounded-lg flex flex-col">
         {searchChunks.map((chunk) => {
           return (
             <button

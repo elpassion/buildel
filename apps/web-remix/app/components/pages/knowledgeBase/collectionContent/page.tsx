@@ -9,6 +9,8 @@ import {
 } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { BasicLink } from '~/components/link/BasicLink';
+import { Button } from '~/components/ui/button';
 import {
   DialogDrawer,
   DialogDrawerBody,
@@ -54,6 +56,12 @@ export function KnowledgeBaseContentPage() {
 
   return (
     <PageContentWrapper className="mt-5">
+      <Button asChild className="w-fit ml-auto mr-0 flex mb-4">
+        <BasicLink to={routes.collectionSearch(organizationId, collectionName)}>
+          Ask a question
+        </BasicLink>
+      </Button>
+
       <KnowledgeBaseFileList items={fileList} />
 
       <DialogDrawer open={isSidebarOpen} onOpenChange={handleClose}>

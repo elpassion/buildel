@@ -205,7 +205,7 @@ export function KnowledgeBaseGraphPage() {
 
   return (
     <div
-      className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-3 overflow-hidden"
+      className="h-[calc(100vh_-_170px_-_34px_)] w-full relative lg:-top-2 overflow-hidden"
       ref={wrapperRef}
     >
       <div className="flex justify-between items-start gap-4 absolute top-4 right-4 left-4 z-[12] md:right-6 md:left-4 lg:right-10 lg:left-10 pointer-events-none bg-transparent">
