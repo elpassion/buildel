@@ -74,9 +74,9 @@ if config_env() == :prod do
 
   config :buildel,
          :registration_disabled,
-         System.get_env("REGISTRATION_DISABLED") == "true" || false
+         System.get_env("REGISTRATION_DISABLED", "false") == "true"
 
-  config :buildel, :skip_flame, System.get_env("SKIP_FLAME") == "true" || true
+  config :buildel, :skip_flame, System.get_env("SKIP_FLAME", "true") == "true"
 
   config :flame, :backend, FLAME.FlyBackend
   config :flame, FLAME.FlyBackend, token: System.get_env("FLY_API_TOKEN")

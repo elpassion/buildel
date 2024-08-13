@@ -22,9 +22,8 @@ export async function loader(args: LoaderFunctionArgs) {
         ? Number(url.searchParams.get('token_limit'))
         : undefined;
     const extend_neighbors =
-      url.searchParams.get('extend_neighbors') === 'true' ?? false;
-    const extend_parents =
-      url.searchParams.get('extend_parents') === 'true' ?? false;
+      url.searchParams.get('extend_neighbors') === 'true';
+    const extend_parents = url.searchParams.get('extend_parents') === 'true';
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
