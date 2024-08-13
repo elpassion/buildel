@@ -57,18 +57,25 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
       empty_map = %{}
 
       query =
-        from(r in Run,
-          as: :run,
-          where: [id: ^run_id],
-          where:
-            not exists(
-              from(rrr in __MODULE__,
-                where:
-                  parent_as(:run).id == rrr.experiment_run_id and rrr.data == ^empty_map and
-                    rrr.id != ^run_row_run.id
+        if run.runs_count === 1 do
+          from(r in Run,
+            as: :run,
+            where: [id: ^run_id]
+          )
+        else
+          from(r in Run,
+            as: :run,
+            where: [id: ^run_id],
+            where:
+              not exists(
+                from(rrr in __MODULE__,
+                  where:
+                    parent_as(:run).id == rrr.experiment_run_id and rrr.data == ^empty_map and
+                      rrr.id != ^run_row_run.id
+                )
               )
-            )
-        )
+          )
+        end
 
       status_update = changeset.repo.update_all(query, set: [status: :finished])
 
@@ -86,7 +93,11 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
             )
             |> Buildel.Repo.one()
 
-          evaluations_avg = (sum + evaluation_avg) / (count + 1)
+          evaluations_avg =
+            case sum do
+              nil -> 0
+              sum -> (sum + evaluation_avg) / (count + 1)
+            end
 
           columns_avg = get_columns_avg(run_row_run.experiment_run_id, evaluations)
 

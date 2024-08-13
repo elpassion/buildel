@@ -127,7 +127,6 @@ defmodule Buildel.Clients.Chat do
               )
           })
       end)
-      |> IO.inspect()
 
     with {:ok, chain, message} <-
            LLMChain.new!(%{

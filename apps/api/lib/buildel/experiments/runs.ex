@@ -71,9 +71,11 @@ defmodule Buildel.Experiments.Runs do
       public_outputs =
         Pipeline.ios(pipeline, public: true).outputs
 
-      dataset_rows
-      |> Enum.map(fn row ->
-        Task.start(fn ->
+      {:ok, experiment_run} = experiment_run |> Experiments.Runs.Run.start()
+
+      Task.start(fn ->
+        dataset_rows
+        |> Enum.map(fn row ->
           {:ok, run} =
             Buildel.Pipelines.create_run(%{
               pipeline_id: pipeline.id,
@@ -87,74 +89,92 @@ defmodule Buildel.Experiments.Runs do
               dataset_row_id: row.id
             })
 
-          {:ok, run} = Pipelines.Runner.start_run(run)
-          context_id = Pipelines.Worker.context_id(run)
+          {row, run, run_row_run}
+        end)
+        |> Task.async_stream(
+          fn {row, run, run_row_run} ->
+            {:ok, run} = Pipelines.Runner.start_run(run)
+            context_id = Pipelines.Worker.context_id(run)
 
-          outputs =
-            public_outputs
-            |> Enum.map(fn output ->
-              topic =
-                BlockPubSub.io_topic(
+            outputs =
+              public_outputs
+              |> Enum.map(fn output ->
+                topic =
+                  BlockPubSub.io_topic(
+                    context_id,
+                    output.block_name,
+                    output.output.name
+                  )
+
+                BlockPubSub.subscribe_to_io(
                   context_id,
                   output.block_name,
                   output.output.name
                 )
 
-              BlockPubSub.subscribe_to_io(
+                %{
+                  block_name: output.block_name,
+                  output_name: output.output.name,
+                  topic: topic,
+                  data: nil
+                }
+              end)
+
+            row.data
+            |> Enum.each(fn {block_name, data} ->
+              Buildel.BlockPubSub.broadcast_to_io(
                 context_id,
-                output.block_name,
-                output.output.name
+                block_name,
+                "input",
+                {:text, data}
+              )
+            end)
+
+            outputs =
+              Enum.reduce_while(Stream.repeatedly(fn -> nil end), outputs, fn _, outputs ->
+                outputs = receive_output(outputs)
+
+                if Enum.any?(outputs, &(&1.data == nil)) do
+                  {:cont, outputs}
+                else
+                  {:halt, outputs}
+                end
+              end)
+
+            data =
+              Map.merge(
+                row.data,
+                outputs
+                |> Enum.reduce(%{}, fn output, acc ->
+                  output_data =
+                    case is_binary(output.data) do
+                      true -> output.data |> String.trim()
+                      false -> output.data
+                    end
+
+                  {_, evaluation} = calculate_evaluation(output_data)
+
+                  acc
+                  |> Map.put(output.block_name, evaluation)
+                end)
               )
 
-              %{
-                block_name: output.block_name,
-                output_name: output.output.name,
-                topic: topic,
-                data: nil
-              }
-            end)
+            {:ok, _run_row_run} =
+              run_row_run
+              |> RunRowRun.finish(data)
 
-          row.data
-          |> Enum.each(fn {block_name, data} ->
-            Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, "input", {:text, data})
-          end)
+            run |> Pipelines.Runner.stop_run()
 
-          outputs =
-            Enum.reduce_while(Stream.repeatedly(fn -> nil end), outputs, fn _, outputs ->
-              outputs = receive_output(outputs)
-
-              if Enum.any?(outputs, &(&1.data == nil)) do
-                {:cont, outputs}
-              else
-                {:halt, outputs}
-              end
-            end)
-
-          data =
-            Map.merge(
-              row.data,
-              outputs
-              |> Enum.reduce(%{}, fn output, acc ->
-                output_data = output.data |> String.trim()
-                {_, evaluation} = calculate_evaluation(output_data)
-
-                acc
-                |> Map.put(output.block_name, evaluation)
-              end)
-            )
-
-          {:ok, _run_row_run} =
-            run_row_run
-            |> RunRowRun.finish(data)
-
-          run |> Pipelines.Runner.stop_run()
-        end)
-
-        :ok
+            :ok
+          end,
+          ordered: true,
+          max_concurrency: 10
+        )
+        |> Stream.run()
       end)
-
-      experiment_run |> Experiments.Runs.Run.start()
     end
+
+    {:ok, experiment_run}
   end
 
   def create_run_row_run(attrs) do
@@ -190,6 +210,10 @@ defmodule Buildel.Experiments.Runs do
 
   defp calculate_evaluation("true"), do: {:ok, 100}
   defp calculate_evaluation("false"), do: {:ok, 0}
+
+  defp calculate_evaluation(number) when is_integer(number), do: {:ok, number}
+
+  defp calculate_evaluation(number) when is_float(number), do: {:ok, number}
 
   defp calculate_evaluation(text) do
     with {int, ""} when int >= 0 and int <= 100 <- Integer.parse(text) do
