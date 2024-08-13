@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import throttle from 'lodash.throttle';
 
+import { assert } from '~/utils/assert';
 import { cn } from '~/utils/cn';
 
 export type CanvasElement<T> = T & {
@@ -28,6 +29,8 @@ interface EmbeddingCanvasProps<T> {
 
 type MousePosition = { offsetX: number; offsetY: number };
 
+const MIN_SCALE = 0.2;
+
 export function EmbeddingCanvas<T>({
   elements,
   onClick,
@@ -53,6 +56,32 @@ export function EmbeddingCanvas<T>({
 
   const getContext = (): CanvasRenderingContext2D | null => {
     return canvasRef.current ? canvasRef.current.getContext('2d') : null;
+  };
+
+  const getBackgroundStyles = (
+    scale: number,
+    offsetX: number,
+    offsetY: number,
+  ) => {
+    return {
+      backgroundImage: `radial-gradient(circle, rgba(0,0,0, 0.07) ${scale}px, transparent 1px)`,
+      backgroundSize: `${30 * scale}px ${30 * scale}px`,
+      backgroundPosition: `${offsetX}px ${offsetY}px`,
+    };
+  };
+
+  const updateBackground = (
+    scale: number,
+    offsetX: number,
+    offsetY: number,
+  ) => {
+    assert(canvasRef.current);
+
+    const styles = getBackgroundStyles(scale, offsetX, offsetY);
+
+    canvasRef.current.style.backgroundImage = styles.backgroundImage;
+    canvasRef.current.style.backgroundSize = styles.backgroundSize;
+    canvasRef.current.style.backgroundPosition = styles.backgroundPosition;
   };
 
   const initializeCanvas = () => {
@@ -88,7 +117,8 @@ export function EmbeddingCanvas<T>({
 
     const scaleX = canvasWidth / (maxX - minX);
     const scaleY = canvasHeight / (maxY - minY);
-    const initialScale = Math.min(scaleX, scaleY) * 0.9;
+    const tmpScale = Math.min(scaleX, scaleY) * 0.9;
+    const initialScale = tmpScale < MIN_SCALE ? MIN_SCALE : tmpScale;
 
     const offsetX =
       (canvasWidth - (maxX - minX) * initialScale) / 2 - minX * initialScale;
@@ -97,6 +127,8 @@ export function EmbeddingCanvas<T>({
 
     offsetRef.current = { x: offsetX, y: offsetY };
     scaleRef.current = initialScale;
+
+    updateBackground(initialScale, offsetX, offsetY);
 
     const ctx = getContext();
     if (ctx) {
@@ -236,7 +268,9 @@ export function EmbeddingCanvas<T>({
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    const newScale = scaleRef.current * (e.deltaY < 0 ? 1.2 : 0.8);
+    const newTmpScale = scaleRef.current * (e.deltaY < 0 ? 1.2 : 0.8);
+
+    const newScale = newTmpScale < MIN_SCALE ? MIN_SCALE : newTmpScale;
 
     const newOffsetX =
       mouseX - ((mouseX - offsetRef.current.x) / scaleRef.current) * newScale;
@@ -245,6 +279,8 @@ export function EmbeddingCanvas<T>({
 
     scaleRef.current = newScale;
     offsetRef.current = { x: newOffsetX, y: newOffsetY };
+
+    updateBackground(newScale, newOffsetX, newOffsetY);
 
     const ctx = getContext();
     if (ctx) {
@@ -279,6 +315,12 @@ export function EmbeddingCanvas<T>({
       x: offsetRef.current.x + dx,
       y: offsetRef.current.y + dy,
     };
+
+    updateBackground(
+      scaleRef.current,
+      offsetRef.current.x,
+      offsetRef.current.y,
+    );
 
     const ctx = getContext();
     if (ctx) {
@@ -325,6 +367,12 @@ export function EmbeddingCanvas<T>({
     isDraggingRef.current = false;
   };
 
+  const defaultBackgroundStyles = getBackgroundStyles(
+    scaleRef.current,
+    offsetRef.current.x,
+    offsetRef.current.y,
+  );
+
   return (
     <canvas
       ref={canvasRef}
@@ -337,6 +385,11 @@ export function EmbeddingCanvas<T>({
         'cursor-grabbing': isDragging,
         'cursor-grab': !isDragging,
       })}
+      style={{
+        backgroundImage: defaultBackgroundStyles.backgroundImage,
+        backgroundSize: defaultBackgroundStyles.backgroundSize,
+        backgroundPosition: defaultBackgroundStyles.backgroundPosition,
+      }}
     />
   );
 }
