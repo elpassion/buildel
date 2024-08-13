@@ -118,7 +118,7 @@ export function KnowledgeBaseGraphPage() {
       } else if (isRelated(id)) {
         return {
           backgroundColor: baseColor,
-          opacity: 0.5,
+          opacity: 0.8,
         };
       } else {
         return {
@@ -217,7 +217,7 @@ export function KnowledgeBaseGraphPage() {
         {() => (
           <EmbeddingCanvas
             elements={nodes}
-            hoveredElement={hoveredNode}
+            activeElement={hoveredNode}
             links={links}
             onClick={onClick}
             wrapper={wrapperRef.current}

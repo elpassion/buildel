@@ -20,7 +20,7 @@ export interface CanvasLink {
 
 interface EmbeddingCanvasProps<T> {
   elements: CanvasElement<T>[];
-  hoveredElement?: string | null;
+  activeElement?: string | null;
   onClick?: (element: CanvasElement<T>) => void;
   wrapper?: HTMLElement | null;
   links?: CanvasLink[];
@@ -32,7 +32,7 @@ export function EmbeddingCanvas<T>({
   elements,
   onClick,
   wrapper,
-  hoveredElement,
+  activeElement,
   links,
 }: EmbeddingCanvasProps<T>) {
   const requestAnimationRef = useRef<number | null>(null);
@@ -112,7 +112,7 @@ export function EmbeddingCanvas<T>({
         const node = new Path2D();
         node.arc(x, y, radius, 0, 2 * Math.PI, false);
         return (
-          hoveredElement === element.id ||
+          activeElement === element.id ||
           (!!mousePosition &&
             ctx.isPointInPath(
               node,
@@ -209,7 +209,7 @@ export function EmbeddingCanvas<T>({
     return () => {
       window.removeEventListener('resize', resize);
     };
-  }, [hoveredElement, elements]);
+  }, [activeElement, elements]);
 
   useEffect(() => {
     initializeCanvas();
