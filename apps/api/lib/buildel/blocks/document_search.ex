@@ -264,13 +264,13 @@ defmodule Buildel.Blocks.DocumentSearch do
     end
   end
 
-  defp do_query(state, query) do
+  defp do_query(state, query, tool_filters \\ %{}) do
     token_limit = state.opts |> Map.get(:token_limit, 0)
 
     params =
       MemoryCollectionSearch.Params.from_map(%{
         search_query: query,
-        where: state.where,
+        where: Map.merge(tool_filters, state.where),
         limit: state[:opts] |> Map.get(:limit, 3),
         similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
         extend_neighbors: state.opts |> Map.get(:extend_neighbors, false) != false,
@@ -349,13 +349,32 @@ defmodule Buildel.Blocks.DocumentSearch do
         function: %{
           name: "query",
           description:
-            "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function. CALL IT WITH FORMAT `{ \"query\": \"example query\" }`",
+            "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.
+            CALL IT WITH FORMAT `{ \"query\": \"example query\" }`
+            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries.",
           parameters_schema: %{
             type: "object",
             properties: %{
               query: %{
                 type: "string",
                 description: "The query to search for."
+              },
+              filters: %{
+                type: "object",
+                description: "The filters to apply to the search.",
+                properties: %{
+                  memory_id: %{
+                    type: "number",
+                    description: "The ID of a document to search in."
+                  },
+                  keywords: %{
+                    type: "array",
+                    items: %{
+                      type: "string"
+                    },
+                    description: "The keywords to search for."
+                  }
+                }
               }
             },
             required: ["query"]
@@ -437,7 +456,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   @impl true
   def handle_tool("tool", "query", {_name, :text, args, _metadata}, state) do
     state |> send_stream_start("output")
-    response = do_query(state, args["query"])
+    response = do_query(state, args["query"], args["filters"] || %{})
     state = output(state, "output", {:text, response})
     {response, state}
   end
