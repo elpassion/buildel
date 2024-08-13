@@ -75,21 +75,48 @@ defmodule Buildel.Experiments.Runs do
 
       Task.start(fn ->
         dataset_rows
-        |> Enum.map(fn row ->
-          {:ok, run} =
-            Buildel.Pipelines.create_run(%{
+        |> Enum.reduce(Ecto.Multi.new(), fn row, multi ->
+          changeset =
+            %Buildel.Pipelines.Run{}
+            |> Buildel.Pipelines.Run.changeset(%{
               pipeline_id: pipeline.id,
               config: pipeline_config |> Map.put(:metadata, %{})
             })
 
-          {:ok, run_row_run} =
-            create_run_row_run(%{
+          multi
+          |> Ecto.Multi.insert({:insert_pipeline_run, row.id}, changeset)
+          |> Ecto.Multi.insert({:insert_run_row_run, row.id}, fn changes ->
+            run = Map.get(changes, {:insert_pipeline_run, row.id})
+
+            %Buildel.Experiments.Runs.RunRowRun{}
+            |> Buildel.Experiments.Runs.RunRowRun.changeset(%{
               experiment_run_id: experiment_run.id,
               run_id: run.id,
               dataset_row_id: row.id
             })
+          end)
+        end)
+        |> Buildel.Repo.transaction()
+        |> then(fn {:ok, operations} ->
+          operations
+          |> Enum.group_by(fn {{_name, id}, _value} -> id end)
+          |> Enum.map(fn {id, changes} ->
+            row = dataset_rows |> Enum.find(&(&1.id == id))
 
-          {row, run, run_row_run}
+            {{_, _}, run} =
+              changes
+              |> Enum.find(fn {{name, _id}, _value} ->
+                name == :insert_pipeline_run
+              end)
+
+            {{_, _}, run_row_run} =
+              changes
+              |> Enum.find(fn {{name, _id}, _value} ->
+                name == :insert_run_row_run
+              end)
+
+            {row, run, run_row_run}
+          end)
         end)
         |> Task.async_stream(
           fn {row, run, run_row_run} ->
@@ -168,7 +195,8 @@ defmodule Buildel.Experiments.Runs do
             :ok
           end,
           ordered: true,
-          max_concurrency: 10
+          max_concurrency: 10,
+          timeout: 5 * 60_000
         )
         |> Stream.run()
       end)
