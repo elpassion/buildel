@@ -79,7 +79,13 @@ if config_env() == :prod do
   config :buildel, :skip_flame, System.get_env("SKIP_FLAME", "true") == "true"
 
   config :flame, :backend, FLAME.FlyBackend
-  config :flame, FLAME.FlyBackend, token: System.get_env("FLY_API_TOKEN")
+
+  config :flame, FLAME.FlyBackend,
+    token: System.get_env("FLY_API_TOKEN"),
+    env: %{
+      "DATABASE_URL" => System.fetch_env!("DATABASE_URL"),
+      "POOL_SIZE" => "1"
+    }
 
   if api_key = System.get_env("RESEND_API_KEY") do
     config :buildel, Buildel.Mailer,
