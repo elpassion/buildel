@@ -70,11 +70,15 @@ defmodule Buildel.Blocks.Browser do
              max_depth: 1,
              url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
            ),
-         {:ok, path} <- Temp.path(%{suffix: ".html"}),
-         :ok <- File.write(path, List.first(crawl.pages).body),
+         {:ok, path} <- Temp.path(%{suffix: ".md"}),
+         :ok <-
+           File.write(
+             path,
+             List.first(crawl.pages).body |> Html2Markdown.convert()
+           ),
          workflow <- Buildel.DocumentWorkflow.new(),
          document when is_list(document) <-
-           Buildel.DocumentWorkflow.read(workflow, {path, %{type: "text/html"}}) do
+           Buildel.DocumentWorkflow.read(workflow, {path, %{type: "text/markdown"}}) do
       content =
         Buildel.DocumentWorkflow.build_node_chunks(workflow, document)
         |> Enum.map(&Map.get(&1, :value))

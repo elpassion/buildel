@@ -73,6 +73,7 @@ const SUPPORTED_DOCUMENT_TYPES = [
   'text/plain',
   'application/xml',
   'text/xml',
+  'text/markdown',
 ];
 
 export default function WebsiteChat() {

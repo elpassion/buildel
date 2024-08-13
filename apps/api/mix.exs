@@ -86,7 +86,8 @@ defmodule Buildel.MixProject do
       {:csv, "~> 3.2"},
       {:paginator, "~> 1.2.0"},
       {:scholar, "~> 0.3.0"},
-      {:flame, "~> 0.3.0"}
+      {:flame, "~> 0.3.0"},
+      {:html2markdown, "~> 0.1.5"}
     ]
   end
 
