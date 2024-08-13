@@ -9,22 +9,22 @@ defmodule Buildel.MemoriesGraph do
   alias Buildel.Repo
 
   defmodule State do
-    defstruct collections: %{}
+    defstruct tasks: %{}
 
-    def new(collections \\ %{}) do
-      %State{collections: collections}
+    defmodule Task do
+      defstruct [:pid, :collection]
     end
 
-    def add_collection(%State{} = state, collection) do
-      %{state | collections: state.collections |> Map.put(collection.id, collection)}
+    def new(tasks \\ %{}) do
+      %State{tasks: tasks}
     end
 
-    def update_collection(%State{} = state, collection) do
-      %{state | collections: state.collections |> Map.put(collection.id, collection)}
+    def add(%State{} = state, %Task{} = task) do
+      %{state | tasks: state.tasks |> Map.put(task.collection.id, task)}
     end
 
-    def remove_collection(%State{} = state, collection_id) do
-      %{state | collections: state.collections |> Map.delete(collection_id)}
+    def remove(%State{} = state, collection_id) do
+      %{state | tasks: state.tasks |> Map.delete(collection_id)}
     end
   end
 
@@ -45,26 +45,34 @@ defmodule Buildel.MemoriesGraph do
 
   ########
 
-  def handle_cast({:add, collection}, state) do
-    state = state |> State.add_collection(collection)
+  def handle_cast({:add, task}, state) do
+    state = state |> State.add(task)
 
     {:noreply, state}
   end
 
   def handle_cast({:remove, collection_id}, state) do
-    state = state |> State.remove_collection(collection_id)
+    state = state |> State.remove(collection_id)
 
     {:noreply, state}
   end
 
   def handle_call({:get, collection_id}, _, state) do
     response =
-      case state.collections |> Map.get(collection_id) do
+      case state.tasks |> Map.get(collection_id) do
         nil -> {:ok, nil}
-        collection -> {:ok, collection}
+        task -> {:ok, task}
       end
 
     {:reply, response, state}
+  end
+
+  def stop_generating(collection_id) do
+    {:ok, %State.Task{} = task} = get_state(collection_id)
+    Task.Supervisor.terminate_child(Buildel.CollectionGraphTaskSupervisor, task.pid)
+    GenServer.cast(__MODULE__, {:remove, collection_id})
+
+    :ok
   end
 
   def get_graph(
@@ -159,22 +167,27 @@ defmodule Buildel.MemoriesGraph do
         %Organization{} = organization,
         %MemoryCollection{} = collection
       ) do
-    GenServer.cast(__MODULE__, {:add, collection})
-
-    Task.async(fn ->
-      FLAME.call(
-        Buildel.CollectionGraphRunner,
+    %Task{pid: pid} =
+      Task.Supervisor.async(
+        Buildel.CollectionGraphTaskSupervisor,
         fn ->
-          case reduce_dimensions(organization, collection) do
-            :ok -> :ok
-            e -> Logger.debug("Failed to reduce dimensions: #{inspect(e)}")
-          end
+          FLAME.call(
+            Buildel.CollectionGraphRunner,
+            fn ->
+              case reduce_dimensions(organization, collection) do
+                :ok -> :ok
+                e -> Logger.debug("Failed to reduce dimensions: #{inspect(e)}")
+              end
+            end,
+            timeout: 5 * 60_000
+          )
+
+          GenServer.cast(__MODULE__, {:remove, collection.id})
         end,
-        timeout: 5 * 60_000
+        shutdown: 5 * 60_000
       )
 
-      GenServer.cast(__MODULE__, {:remove, collection.id})
-    end)
+    GenServer.cast(__MODULE__, {:add, %State.Task{collection: collection, pid: pid}})
 
     :ok
   end

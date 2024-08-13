@@ -68,6 +68,7 @@ defmodule Buildel.Application do
     else
       children ++
         [
+          {Task.Supervisor, name: Buildel.CollectionGraphTaskSupervisor},
           {FLAME.Pool,
            name: Buildel.CollectionGraphRunner,
            min: 0,

@@ -209,6 +209,12 @@ defmodule BuildelWeb.Router do
       :create
     )
 
+    delete(
+      "/organizations/:organization_id/memory_collections/:memory_collection_id/graphs",
+      CollectionGraphController,
+      :stop
+    )
+
     get(
       "/organizations/:organization_id/memory_collections/:id/search",
       CollectionController,

@@ -200,4 +200,37 @@ defmodule BuildelWeb.CollectionGraphController do
         end
     end
   end
+
+  operation :stop,
+    summary: "Stop generating graph",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", nil},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def stop(conn, _params) do
+    %{
+      organization_id: organization_id,
+      memory_collection_id: memory_collection_id
+    } = conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
+         :ok <-
+           Buildel.MemoriesGraph.stop_generating(collection.id) do
+      conn |> put_status(:ok) |> json(%{})
+    end
+  end
 end
