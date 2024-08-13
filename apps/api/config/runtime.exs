@@ -84,7 +84,8 @@ if config_env() == :prod do
     token: System.get_env("FLY_API_TOKEN"),
     env: %{
       "DATABASE_URL" => System.fetch_env!("DATABASE_URL"),
-      "POOL_SIZE" => "1"
+      "POOL_SIZE" => "1",
+      "ECTO_IPV6" => "true"
     }
 
   if api_key = System.get_env("RESEND_API_KEY") do
