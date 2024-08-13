@@ -14,7 +14,8 @@ export const GenerateGraph = ({ state }: GenerateGraphProps) => {
   const isLoading = state.state !== 'idle';
 
   const generateGraph = () => {
-    fetcher.submit({}, { method: 'post' });
+    if (isLoading) fetcher.submit({}, { method: 'delete' });
+    else fetcher.submit({}, { method: 'post' });
   };
 
   return (
@@ -23,8 +24,6 @@ export const GenerateGraph = ({ state }: GenerateGraphProps) => {
       variant="outline"
       onClick={generateGraph}
       className="pointer-events-auto"
-      disabled={isLoading}
-      isLoading={isLoading}
     >
       {isLoading ? 'Generating...' : 'Generate Graph'}
     </Button>

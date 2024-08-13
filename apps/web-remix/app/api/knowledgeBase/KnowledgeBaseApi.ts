@@ -172,6 +172,17 @@ export class KnowledgeBaseApi {
     return this.client(MemoryGraphResponse, url, { method: 'POST' });
   }
 
+  async stopGraphGeneration(
+    organizationId: string | number,
+    collectionId: string | number,
+  ) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/memory_collections/${collectionId}/graphs`,
+    );
+
+    return this.client(z.any(), url, { method: 'delete' });
+  }
+
   async getCollectionGraphState(
     organizationId: string | number,
     collectionId: string | number,
