@@ -30,7 +30,7 @@ export const ExperimentRunsCharts = () => {
 
         <CardContent>
           <EvaluationsInTimeChart
-            data={experimentRuns}
+            data={experimentRuns.slice().reverse()}
             onMouseMove={onMouseMove}
             onMouseLeave={onMouseLeave}
           />
