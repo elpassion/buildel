@@ -42,7 +42,13 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
       end)
 
     evaluation_avg =
-      Enum.reduce(evaluations, 0, fn {_, value}, acc -> acc + value end) / length(evaluations)
+      case length(evaluations) do
+        0 ->
+          0
+
+        _ ->
+          Enum.reduce(evaluations, 0, fn {_, value}, acc -> acc + value end) / length(evaluations)
+      end
 
     run_row_run
     |> cast(%{data: data, evaluation_avg: evaluation_avg}, [:data, :evaluation_avg])
