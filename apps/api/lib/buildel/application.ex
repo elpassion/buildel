@@ -63,7 +63,7 @@ defmodule Buildel.Application do
   end
 
   defp maybe_add_flame(children) do
-    if System.get_env("SKIP_FLAME") do
+    if Application.get_env(:buildel, :skip_flame) do
       children
     else
       children ++
