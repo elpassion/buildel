@@ -128,7 +128,7 @@ function TextOutput({ content, blockName, onClear }: TextOutputProps) {
 
         <NodeClearButton onClear={() => onClear(blockName)} />
       </div>
-      <div className="text-foreground w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-input rounded-md py-2 px-[10px] text-xs">
+      <div className="select-text cursor-default text-foreground w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-input rounded-md py-2 px-[10px] text-xs">
         {isRaw ? content : <ChatMarkdown>{content}</ChatMarkdown>}
       </div>
     </>

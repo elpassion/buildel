@@ -344,7 +344,8 @@ const BuilderInstance = ({
       <ReactFlow<INode, IEdge>
         edgesUpdatable={!isDisabled}
         edgesFocusable={!isDisabled}
-        nodesDraggable={!isDisabled}
+        nodesDraggable={type === 'editable'}
+        elementsSelectable={!isDisabled}
         nodesConnectable={!isDisabled}
         nodesFocusable={!isDisabled}
         edgesReconnectable={!isDisabled}
