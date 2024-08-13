@@ -193,19 +193,19 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
         />
 
         <SidebarLink
-          to={routes.datasets(organization.id)}
-          icon={<FolderCog className="min-w-4 w-4 h-4 text-center leading-5" />}
-          onlyIcon={isCollapsed}
-          text="Datasets"
-        />
-
-        <SidebarLink
           to={routes.experiments(organization.id)}
           icon={
             <FlaskConical className="min-w-4 w-4 h-4 text-center leading-5" />
           }
           onlyIcon={isCollapsed}
           text="Experiments"
+        />
+
+        <SidebarLink
+          to={routes.datasets(organization.id)}
+          icon={<FolderCog className="min-w-4 w-4 h-4 text-center leading-5" />}
+          onlyIcon={isCollapsed}
+          text="Datasets"
         />
       </div>
 
