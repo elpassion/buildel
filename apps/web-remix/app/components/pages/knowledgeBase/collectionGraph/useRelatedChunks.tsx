@@ -41,7 +41,7 @@ export const useRelatedChunks = ({
   };
 
   useEffect(() => {
-    if (!activeChunk) return;
+    if (!activeChunk) return setRelatedNeighbours([]);
 
     fetchRelatedNeighbours(activeChunk);
   }, [activeChunk]);
