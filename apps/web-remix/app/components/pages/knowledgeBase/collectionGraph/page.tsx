@@ -158,11 +158,12 @@ export function KnowledgeBaseGraphPage() {
   const nodes = useMemo(() => {
     return graph.nodes.map((node) => {
       const styles = activeStyles(node);
+      const spaceRatio = getNodesSpace(graph.nodes.length);
       return {
         ...node,
         radius: 10,
-        x: node.point[0] * 50,
-        y: node.point[1] * 50,
+        x: node.point[0] * spaceRatio,
+        y: node.point[1] * spaceRatio,
         color: styles.backgroundColor,
         borderColor: innerCircleColor(node),
         opacity: styles.opacity,
@@ -247,3 +248,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     },
   ];
 };
+
+function getNodesSpace(size: number) {
+  return 25 + Math.floor(size / 1000) * 15;
+}
