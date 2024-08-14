@@ -40,6 +40,13 @@ defmodule Buildel.Blocks.Browser do
                   EditorField.call_formatter(%{
                     default: "{{config.block_name}} Browse 📑: \"{{config.args}}\"\n",
                     description: "How to format calling of api call through tool interface.",
+                    display_when: %{
+                      connections: %{
+                        tool_worker: %{
+                          min: 1
+                        }
+                      }
+                    },
                     minLength: 1
                   })
               )

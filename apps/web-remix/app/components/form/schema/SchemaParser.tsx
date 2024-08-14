@@ -164,6 +164,14 @@ export type JSONSchemaObjectField = {
   required?: string[];
 };
 
+export type Condition = {
+  min?: number;
+};
+
+export type DisplayWhen = {
+  [key: string]: Condition | DisplayWhen;
+};
+
 export type JSONSchemaField =
   | JSONSchemaObjectField
   | {
@@ -178,7 +186,6 @@ export type JSONSchemaField =
         errorMessage: string;
       };
       readonly?: boolean;
-      defaultWhen?: Record<string, Record<string, string>>;
     }
   | {
       type: 'string';
@@ -205,6 +212,7 @@ export type JSONSchemaField =
       maxLength?: number;
       default?: string;
       readonly?: boolean;
+      displayWhen: DisplayWhen;
     }
   | {
       type: 'string';
@@ -259,3 +267,25 @@ export type JSONSchemaField =
       description: string;
       default?: boolean;
     };
+
+export function checkDisplayWhenConditions(
+  conditions: DisplayWhen,
+  ctx: Record<string, any>,
+): boolean {
+  for (const key in conditions) {
+    const condition = conditions[key];
+
+    if (typeof condition === 'object' && !Array.isArray(condition)) {
+      if (!checkDisplayWhenConditions(condition as DisplayWhen, ctx[key])) {
+        return false;
+      }
+    } else {
+      if (key === 'min') {
+        if (ctx < condition) {
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+}

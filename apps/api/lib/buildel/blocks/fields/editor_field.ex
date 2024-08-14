@@ -53,6 +53,7 @@ defmodule Buildel.Blocks.Fields.EditorField do
     field :min_length, :integer, default: 0
     field :readonly, :boolean, default: false
     field :editor_language, Ecto.Enum, default: :custom, values: ~w(json custom)a
+    field :display_when, :map, default: %{}
 
     field :suggestions, {:array, :map},
       default: [
@@ -74,7 +75,8 @@ defmodule Buildel.Blocks.Fields.EditorField do
           default: field.default,
           min_length: field.min_length,
           suggestions: field.suggestions,
-          readonly: field.readonly
+          readonly: field.readonly,
+          displayWhen: field.display_when
         },
         opts
       )
@@ -85,7 +87,7 @@ defmodule Buildel.Blocks.Fields.EditorField do
 
   @type t :: %EditorField{}
 
-  @create_fields ~w(title description default min_length editor_language suggestions readonly)a
+  @create_fields ~w(title description default min_length editor_language suggestions display_when readonly)a
   @required_fields ~w(title description)a
 
   @spec new(attrs :: map()) :: t
@@ -108,6 +110,8 @@ defmodule Buildel.Blocks.Fields.EditorField do
           title: "Call formatter",
           description: "The formatter to use for presenting llm message.",
           default: "{{config.block_name}}: {{config.args}}",
+          display_when: %{
+          },
           suggestions: [
             Suggestion.new(%{
               value: "config.args",

@@ -131,7 +131,14 @@ defmodule Buildel.Blocks.Chat do
                 },
                 call_formatter:
                   EditorField.call_formatter(%{
-                    default: "@{{config.block_name}} 🗨️:  {{config.args}}\n"
+                    default: "@{{config.block_name}} 🗨️:  {{config.args}}\n",
+                    display_when: %{
+                      connections: %{
+                        chat_worker: %{
+                          min: 1
+                        }
+                      }
+                    },
                   }),
                 system_message:
                   EditorField.new(%{

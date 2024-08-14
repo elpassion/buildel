@@ -84,6 +84,13 @@ defmodule Buildel.Blocks.ApiCallTool do
                   EditorField.call_formatter(%{
                     default: "{{config.block_name}} API 🖥️: {{config.args}}\n",
                     description: "How to format calling of api call through tool interface.",
+                    display_when: %{
+                      connections: %{
+                        tool_worker: %{
+                          min: 1
+                        }
+                      }
+                    },
                     minLength: 1
                   }),
                 authorize: %{

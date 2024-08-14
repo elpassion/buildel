@@ -27,12 +27,16 @@ import {
   NumberField,
   StringField,
 } from '~/components/form/schema/SchemaFields';
-import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import {
+  checkDisplayWhenConditions,
+  generateZODSchema,
+} from '~/components/form/schema/SchemaParser';
 import { SubmitButton } from '~/components/form/submit';
 import type {
   IBlockConfig,
   IConfigConnection,
 } from '~/components/pages/pipelines/pipeline.types';
+import { IIOType } from '~/components/pages/pipelines/pipeline.types';
 import { reverseToolConnections } from '~/components/pages/pipelines/PipelineFlow.utils';
 import { successToast } from '~/components/toasts/successToast';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
@@ -152,6 +156,24 @@ export function EditBlockForm({
           ];
         },
       );
+
+      const ctxConnections = buildConnectionsForCtx(
+        [
+          ...(blockConfig.block_type?.inputs ?? []),
+          ...(blockConfig.block_type?.outputs ?? []),
+          ...(blockConfig.block_type?.ios ?? []),
+        ],
+        { connections, blockName: blockConfig.name },
+      );
+
+      const shouldDisplay = checkDisplayWhenConditions(
+        props.field.displayWhen,
+        {
+          connections: ctxConnections,
+        },
+      );
+
+      if (!shouldDisplay) return null;
 
       return (
         <FormField name={props.name!}>
@@ -420,5 +442,27 @@ function CopyConfigurationButton({ value }: CopyConfigurationButtonProps) {
     >
       Copy configuration
     </button>
+  );
+}
+
+function buildConnectionsForCtx(
+  connections: IIOType[],
+  ctx: { blockName: string; connections: IConfigConnection[] },
+) {
+  return connections.reduce(
+    (acc, curr) => {
+      const name = `${curr.name}_${curr.type}`;
+
+      const connections = ctx.connections.filter(
+        (conn) =>
+          (conn.from.block_name === ctx.blockName &&
+            conn.from.output_name === curr.name) ||
+          (conn.to.block_name === ctx.blockName &&
+            conn.to.input_name === curr.name),
+      );
+
+      return { ...acc, [name]: connections.length };
+    },
+    {} as Record<string, number>,
   );
 }
