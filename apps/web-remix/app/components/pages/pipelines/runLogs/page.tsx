@@ -33,7 +33,7 @@ export function PipelineRunLogs() {
     pipeline.organization_id,
     pipeline.id,
     pipelineRun.id,
-    () => {},
+    () => { },
     (payload) => {
       setLiveLogs((prev) => [...prev, payload.data]);
     },
@@ -87,6 +87,27 @@ export function PipelineRunLogs() {
     <PageContentWrapper className="mt-10">
       <Label>Filter by block</Label>
       <SelectInput
+        allowClear
+        onClear={() => {
+          const urlWithParams = buildUrlWithParams(
+            routes.pipelineRunLogs(
+              pipeline.organization_id,
+              pipeline.id,
+              pipelineRun.id,
+            )
+          );
+
+          stopListening().then(() =>
+            listenToLogs({
+              block_name: undefined,
+            }),
+          );
+          setLiveLogs([]);
+          setData([]);
+          setSelectedBlock(undefined);
+
+          fetcher.load(urlWithParams);
+        }}
         placeholder="Select..."
         options={pipelineRun.config.blocks.map((block) => ({
           id: block.name,
@@ -101,18 +122,18 @@ export function PipelineRunLogs() {
               pipelineRun.id,
             ),
             {
-              block_name: selected?.value ?? undefined,
+              block_name: selected ?? undefined,
             },
           );
 
           stopListening().then(() =>
             listenToLogs({
-              block_name: selected?.value ?? undefined,
+              block_name: selected ?? undefined,
             }),
           );
           setLiveLogs([]);
           setData([]);
-          setSelectedBlock(selected?.value);
+          setSelectedBlock(selected);
 
           fetcher.load(urlWithParams);
         }}
