@@ -12,6 +12,7 @@ defmodule BuildelWeb.MemoryJSON do
   defp data(%Memory{} = memory) do
     %{
       id: memory.id,
+      name: memory.file_name,
       file_name: memory.file_name,
       file_size: memory.file_size,
       file_type: memory.file_type,

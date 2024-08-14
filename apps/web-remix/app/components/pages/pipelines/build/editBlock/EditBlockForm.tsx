@@ -215,6 +215,7 @@ export function EditBlockForm({
       return (
         <FormField name={props.name!}>
           <AsyncSelectField
+            allowClear
             url={replacedUrl}
             id={`${props.name}`}
             data-testid={props.name}
@@ -380,7 +381,7 @@ function TriggerValidation() {
     const validateForm = async () => {
       try {
         await validate();
-      } catch {}
+      } catch { }
     };
 
     validateForm();
@@ -401,7 +402,7 @@ function generateSuggestions(connections: IConfigConnection[]): Suggestion[] {
 const InputsContext = React.createContext<{
   connections: IConfigConnection[];
   updateInputReset: (connection: IConfigConnection, value: boolean) => void;
-}>({ connections: [], updateInputReset: () => {} });
+}>({ connections: [], updateInputReset: () => { } });
 
 const InputsProvider: React.FC<{
   connections: IConfigConnection[];

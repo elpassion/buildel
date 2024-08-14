@@ -104,13 +104,21 @@ defmodule Buildel.Blocks.DocumentSearch do
                     },
                     minLength: 1
                   }),
-                where:
-                  EditorField.new(%{
-                    title: "Metadata",
-                    description: "The metadata of documents to include in retrieval.",
-                    default: "{}",
-                    editor_language: "json"
-                  })
+                keywords: %{
+                  "type" => "string",
+                  "title" => "Memory keywords",
+                  "description" =>
+                    "Filter the search to a specific keywords. Ex. [\"keyword1\", \"keyword2\"]"
+                },
+                memory_id: %{
+                  "type" => "string",
+                  "title" => "Memory file",
+                  "description" => "Filter the search to search in a specific document.",
+                  "url" =>
+                    "/api/organizations/{{organization_id}}/memory_collections/{{opts.knowledge}}/memories",
+                  "presentAs" => "async-select",
+                  "readonly" => true
+                }
               )
           })
       }
@@ -158,7 +166,20 @@ defmodule Buildel.Blocks.DocumentSearch do
      state
      |> Map.put(:vector_db, vector_db)
      |> Map.put(:collection, collection)
-     |> Map.put(:where, opts |> Map.get(:where, "{}") |> Jason.decode!())
+     |> Map.put(:where, %{
+       "memory_id" =>
+         case opts.memory_id do
+           nil -> nil
+           "" -> nil
+           memory_id -> String.to_integer(memory_id)
+         end,
+       "keywords" =>
+         case opts.keywords do
+           nil -> nil
+           "" -> nil
+           keywords -> Jason.decode!(keywords)
+         end
+     })
      |> Map.put(
        :call_formatter,
        opts |> Map.get(:call_formatter, "Database 📑: Search \"{{config.args}}\"\n")
