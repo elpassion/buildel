@@ -1,9 +1,9 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
+import { ClientOnly } from 'remix-utils/client-only';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { ItemList } from '~/components/list/ItemList';
-import { ClientOnly } from '~/utils/ClientOnly';
 import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
 
@@ -34,8 +34,8 @@ export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
             <ChatMarkdown>{msg.message}</ChatMarkdown>
           </ChatMessage>
 
-          <ClientOnly>
-            <MessageTime message={msg} />
+          <ClientOnly fallback={null}>
+            {() => <MessageTime message={msg} />}
           </ClientOnly>
         </>
       )}
