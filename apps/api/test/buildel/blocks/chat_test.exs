@@ -5,7 +5,7 @@ defmodule Buildel.Blocks.ChatTest do
   test "exposes options" do
     assert Chat.options() == %{
              description:
-               "Large Language Model chat block enabling advanced conversational interactions powered by OpenAI's cutting-edge language models.",
+               "Chat block for large language models, enabling advanced conversational interactions powered by cutting-edge language models from various providers.",
              type: "chat",
              inputs: [Block.text_input("input"), Block.image_input("image")],
              outputs: [
