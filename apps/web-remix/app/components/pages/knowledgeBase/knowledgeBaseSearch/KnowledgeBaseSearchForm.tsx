@@ -15,15 +15,25 @@ import { cn } from '~/utils/cn';
 import { ExtendChunksField } from '../components/ExtendChunksToggleField';
 import { SearchParams } from '../components/SearchParams';
 import { SearchSchema } from '../search.schema';
+import { SelectField } from '~/components/form/fields/select.field';
+import { IKnowledgeBaseFileListResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
 
 interface KnowledgeBaseSearchFormProps {
   defaultValue?: Partial<z.TypeOf<typeof SearchSchema>>;
+  fileList: IKnowledgeBaseFileListResponse;
 }
 
 export const KnowledgeBaseSearchForm: React.FC<
   KnowledgeBaseSearchFormProps
-> = ({ defaultValue }) => {
+> = ({ defaultValue, fileList }) => {
   const validator = useMemo(() => withZod(SearchSchema), []);
+  const memoryOptions = useMemo(() => {
+    return fileList.map(item => ({
+      id: item.id,
+      value: item.id,
+      label: item.file_name,
+    }));
+  }, []);
 
   return (
     <ValidatedForm
@@ -71,6 +81,17 @@ export const KnowledgeBaseSearchForm: React.FC<
             label="Extend parents"
             supportingText="Extend the search to include the whole context of the parent chunk"
           />
+        </Field>
+
+        <Field name="memory_id">
+          <FieldLabel>Memory</FieldLabel>
+          <SelectField
+            placeholder="Memory name"
+            options={memoryOptions}
+          />
+          <FieldMessage>
+            Filter the search to a specific memory file. Disabled by default.
+          </FieldMessage>
         </Field>
       </SearchParams>
 

@@ -7,4 +7,5 @@ export const SearchSchema = z.object({
   token_limit: zfd.numeric(z.number().int().min(0).optional()),
   extend_neighbors: zfd.checkbox(),
   extend_parents: zfd.checkbox(),
+  memory_id: zfd.numeric(z.number().int().min(0).optional()),
 });

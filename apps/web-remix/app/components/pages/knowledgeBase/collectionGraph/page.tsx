@@ -45,6 +45,7 @@ export function KnowledgeBaseGraphPage() {
     prevNode,
     nextNode,
     searchParams,
+    fileList
   } = useLoaderData<typeof loader>();
 
   const { searchChunks } = useSearchedChunks({
@@ -211,7 +212,7 @@ export function KnowledgeBaseGraphPage() {
     >
       <div className="flex justify-between items-start gap-4 absolute top-4 right-4 left-4 z-[12] md:right-6 md:left-4 lg:right-10 lg:left-10 pointer-events-none bg-transparent">
         <div>
-          <ChunksSearch defaultValue={searchParams} />
+          <ChunksSearch defaultValue={searchParams} fileList={fileList} />
           <SearchChunksList
             searchChunks={searchChunks}
             onChunkSelect={selectNode}

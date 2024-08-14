@@ -26,7 +26,8 @@ defmodule BuildelWeb.CollectionController do
       limit: [in: :query, description: "Results limit", type: :integer],
       token_limit: [in: :query, description: "Token limit", type: :integer],
       extend_neighbors: [in: :query, description: "Extend neighbor chunks", type: :boolean],
-      extend_parents: [in: :query, description: "Extend parent context", type: :boolean]
+      extend_parents: [in: :query, description: "Extend parent context", type: :boolean],
+      memory_id: [in: :query, description: "Memory ID", type: :integer]
     ],
     request_body: nil,
     responses: [
@@ -46,7 +47,13 @@ defmodule BuildelWeb.CollectionController do
       conn.params
 
     params =
-      MemoryCollectionSearch.Params.from_map(Map.put(conn.params, :search_query, search_query))
+      MemoryCollectionSearch.Params.from_map(
+        conn.params
+        |> Map.put(:search_query, search_query)
+        |> Map.put(:where, %{
+          "memory_id" => Map.get(conn.params, :memory_id)
+        })
+      )
 
     user = conn.assigns.current_user
 

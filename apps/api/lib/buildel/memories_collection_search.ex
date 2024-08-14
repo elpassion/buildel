@@ -62,7 +62,12 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
     ]
 
     def from_map(params) do
-      %__MODULE__{} |> struct(Map.merge(@default_params, params))
+      map = Map.merge(@default_params, params)
+
+      where =
+        Map.get(map, :where, %{}) |> Enum.filter(fn {_, value} -> value != nil end) |> Map.new()
+
+      %__MODULE__{} |> struct(map |> Map.put(:where, where))
     end
   end
 

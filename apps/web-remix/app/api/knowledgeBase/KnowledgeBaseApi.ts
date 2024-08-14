@@ -27,7 +27,7 @@ type DateQueryParams = {
 };
 
 export class KnowledgeBaseApi {
-  constructor(private client: typeof fetchTyped) {}
+  constructor(private client: typeof fetchTyped) { }
 
   async getCollections(organizationId: string | number) {
     return this.client(
@@ -89,6 +89,7 @@ export class KnowledgeBaseApi {
       token_limit?: number;
       extend_neighbors: string | boolean;
       extend_parents: string | boolean;
+      memory_id?: number;
     },
   ) {
     const urlWithParams = buildUrlWithParams(

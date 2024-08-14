@@ -17,16 +17,26 @@ import { cn } from '~/utils/cn';
 import { ExtendChunksField } from '../../components/ExtendChunksToggleField';
 import { SearchParams } from '../../components/SearchParams';
 import { SearchSchema } from '../../search.schema';
+import { IKnowledgeBaseFileListResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { SelectField } from '~/components/form/fields/select.field';
 
 interface ChunksSearchProps {
   defaultValue: Partial<z.TypeOf<typeof SearchSchema>>;
+  fileList: IKnowledgeBaseFileListResponse;
 }
 
 const schema = SearchSchema;
 
-export const ChunksSearch = ({ defaultValue }: ChunksSearchProps) => {
+export const ChunksSearch = ({ defaultValue, fileList }: ChunksSearchProps) => {
   const navigate = useNavigate();
   const validator = useMemo(() => withZod(schema), []);
+  const memoryOptions = useMemo(() => {
+    return fileList.map(item => ({
+      id: item.id,
+      value: item.id,
+      label: item.file_name,
+    }));
+  }, []);
 
   const onSubmit = async (
     values: z.TypeOf<typeof schema>,
@@ -45,6 +55,9 @@ export const ChunksSearch = ({ defaultValue }: ChunksSearchProps) => {
       searchParams.delete('token_limit');
     searchParams.set('extend_neighbors', values.extend_neighbors.toString());
     searchParams.set('extend_parents', values.extend_parents.toString());
+    searchParams.set('memory_id', values.memory_id?.toString() ?? '');
+    if (searchParams.get('memory_id') === '')
+      searchParams.delete('memory_id');
 
     navigate({
       pathname: url.pathname,
@@ -101,6 +114,19 @@ export const ChunksSearch = ({ defaultValue }: ChunksSearchProps) => {
               label="Extend parents"
               supportingText="Extend the search to include the whole context of the parent chunk"
             />
+          </Field>
+
+          <Field name="memory_id">
+            <FieldLabel>Memory</FieldLabel>
+            <SelectField
+              placeholder="Memory name"
+              options={memoryOptions}
+              defaultValue={defaultValue.memory_id}
+              allowClear
+            />
+            <FieldMessage>
+              Filter the search to a specific memory file. Disabled by default.
+            </FieldMessage>
           </Field>
         </SearchParams>
         <Field name="query">

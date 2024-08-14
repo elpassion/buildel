@@ -125,6 +125,8 @@ export const KnowledgeBaseFileListResponse = z
   })
   .transform((res) => res.data);
 
+export type IKnowledgeBaseFileListResponse = z.TypeOf<typeof KnowledgeBaseFileListResponse>;
+
 export const KnowledgeBaseCollectionListResponse = z
   .object({
     data: KnowledgeBaseCollectionList,

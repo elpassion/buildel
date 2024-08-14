@@ -23,6 +23,7 @@ export async function loader(args: LoaderFunctionArgs) {
     const extend_neighbors =
       url.searchParams.get('extend_neighbors') ?? undefined;
     const extend_parents = url.searchParams.get('extend_parents') ?? undefined;
+    const memory_id = url.searchParams.get('memory_id') ?? undefined;
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
@@ -31,6 +32,11 @@ export async function loader(args: LoaderFunctionArgs) {
     } = await knowledgeBaseApi.getCollectionByName(
       params.organizationId,
       params.collectionName,
+    );
+
+    const knowledgeBase = await knowledgeBaseApi.getCollectionMemories(
+      params.organizationId,
+      collectionId,
     );
 
     let chunks: IKnowledgeBaseSearchChunk[] = [];
@@ -45,6 +51,7 @@ export async function loader(args: LoaderFunctionArgs) {
           token_limit: token_limit ? parseInt(token_limit) : undefined,
           extend_neighbors: extend_neighbors === 'on' ? 'true' : 'false',
           extend_parents: extend_parents === 'on' ? 'true' : 'false',
+          memory_id: memory_id ? parseInt(memory_id) : undefined,
         },
       );
 
@@ -59,11 +66,13 @@ export async function loader(args: LoaderFunctionArgs) {
         token_limit: token_limit ? parseInt(token_limit) : undefined,
         extend_neighbors: extend_neighbors === 'on' ? true : false,
         extend_parents: extend_parents === 'on' ? true : false,
+        memory_id: memory_id ? parseInt(memory_id) : undefined,
       },
       chunks,
       metadata,
       organizationId: params.organizationId,
       collectionName: params.collectionName,
+      fileList: knowledgeBase.data,
     });
   })(args);
 }

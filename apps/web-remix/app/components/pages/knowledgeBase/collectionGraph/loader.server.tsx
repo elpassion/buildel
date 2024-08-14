@@ -24,6 +24,7 @@ export async function loader(args: LoaderFunctionArgs) {
     const extend_neighbors =
       url.searchParams.get('extend_neighbors') === 'true';
     const extend_parents = url.searchParams.get('extend_parents') === 'true';
+    const memory_id = url.searchParams.get('memory_id') ? Number(url.searchParams.get('memory_id')) : undefined;
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
@@ -39,6 +40,11 @@ export async function loader(args: LoaderFunctionArgs) {
       collectionId,
     );
     const graphStatePromise = knowledgeBaseApi.getCollectionGraphState(
+      params.organizationId,
+      collectionId,
+    );
+
+    const knowledgeBase = await knowledgeBaseApi.getCollectionMemories(
       params.organizationId,
       collectionId,
     );
@@ -73,6 +79,7 @@ export async function loader(args: LoaderFunctionArgs) {
       token_limit,
       extend_neighbors,
       extend_parents,
+      memory_id,
     };
 
     return json({
@@ -85,6 +92,7 @@ export async function loader(args: LoaderFunctionArgs) {
       prevNode,
       nextNode,
       searchParams,
+      fileList: knowledgeBase.data,
     });
   })(args);
 }
