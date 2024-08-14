@@ -24,11 +24,12 @@ const schema = z.object({
 });
 
 export function SettingsConfigurationPage() {
-  const { pipeline, organizationId, pipelineId } =
+  const { pipeline, organizationId, pipelineId, blockTypes } =
     useLoaderData<typeof loader>();
   const updateFetcher = useFetcher<IPipeline>();
   const validator = React.useMemo(() => withZod(schema), []);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
   const handleUpdatePipeline = useCallback(
     (pipeline: IPipeline) => {
       updateFetcher.submit(pipeline, {
@@ -56,6 +57,10 @@ export function SettingsConfigurationPage() {
 
       const validatedBlocks = (await Promise.all(
         result.data.config.blocks.map(async (block) => {
+          block.block_type = blockTypes.find(
+            (blockType) => blockType.type === block.type,
+          );
+
           const schema = generateZODSchema(
             block.block_type!.schema as JSONSchemaField,
             false,

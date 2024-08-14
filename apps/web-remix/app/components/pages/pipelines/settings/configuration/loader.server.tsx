@@ -27,18 +27,9 @@ export async function loader(args: LoaderFunctionArgs) {
       blockTypesPromise,
     ]);
 
-    const blocks = pipeline.data.config.blocks.map((block) => ({
-      ...block,
-      block_type: blockTypes.data.find(
-        (blockType) => blockType.type === block.type,
-      ),
-    }));
-
     return json({
-      pipeline: {
-        ...pipeline.data,
-        config: { ...pipeline.data.config, blocks },
-      },
+      pipeline: pipeline.data,
+      blockTypes: blockTypes.data,
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
     });
