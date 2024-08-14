@@ -354,34 +354,37 @@ defmodule Buildel.Blocks.Block do
         )
       end
 
-      defp secret_schema(%{"title" => title, "description" => description}) do
-        %{
-          "type" => "string",
-          "title" => title,
-          "description" => description,
-          "url" => "/api/organizations/{{organization_id}}/secrets",
-          "presentAs" => "async-creatable-select",
-          "minLength" => 1,
-          "schema" => %{
-            "type" => "object",
-            "required" => ["name", "value"],
-            "properties" => %{
-              "name" => %{
-                "type" => "string",
-                "title" => "Name",
-                "description" => "The name for the secret.",
-                "minLength" => 1
-              },
-              "value" => %{
-                "type" => "string",
-                "title" => "Value",
-                "description" => "The value of the secret.",
-                "presentAs" => "password",
-                "minLength" => 1
+      defp secret_schema(%{} = attrs \\ %{}) do
+        Map.merge(
+          %{
+            "type" => "string",
+            "title" => "Secret",
+            "description" => "Select from your secrets",
+            "url" => "/api/organizations/{{organization_id}}/secrets",
+            "presentAs" => "async-creatable-select",
+            "minLength" => 1,
+            "schema" => %{
+              "type" => "object",
+              "required" => ["name", "value"],
+              "properties" => %{
+                "name" => %{
+                  "type" => "string",
+                  "title" => "Name",
+                  "description" => "The name for the secret.",
+                  "minLength" => 1
+                },
+                "value" => %{
+                  "type" => "string",
+                  "title" => "Value",
+                  "description" => "The value of the secret.",
+                  "presentAs" => "password",
+                  "minLength" => 1
+                }
               }
             }
-          }
-        }
+          },
+          attrs
+        )
       end
 
       defp memory_schema(

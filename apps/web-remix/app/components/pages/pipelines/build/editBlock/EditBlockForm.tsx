@@ -5,6 +5,7 @@ import { useFormContext, ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
 import type { ExtendedBlockConfig } from '~/api/blockType/blockType.contracts';
+import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import type { Suggestion } from '~/components/editor/CodeMirror/codeMirror.types';
 import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 import {
@@ -167,7 +168,7 @@ export function EditBlockForm({
       );
 
       const shouldDisplay = checkDisplayWhenConditions(
-        props.field.displayWhen,
+        props.field.displayWhen ?? {},
         {
           connections: ctxConnections,
         },
@@ -252,14 +253,28 @@ export function EditBlockForm({
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const { fieldErrors, getValues } = useFormContext();
 
+      const values = getValues();
+
       const replacedUrl = props.field.url
         .replace('{{organization_id}}', organizationId.toString())
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
-          const values = getValues();
-
           const replacedValue = values.get(optKey);
           return replacedValue || optKey;
         });
+
+      let description = props.field.description;
+
+      if ('descriptionWhen' in props.field && props.field.descriptionWhen) {
+        const defaultKey = Object.keys(props.field.descriptionWhen)[0];
+        const defaultFieldDescription = values.get(defaultKey);
+
+        if (typeof defaultFieldDescription === 'string') {
+          description =
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            // @ts-ignore
+            props.field.descriptionWhen[defaultKey][defaultFieldDescription];
+        }
+      }
 
       return (
         <FormField name={props.name!}>
@@ -268,7 +283,7 @@ export function EditBlockForm({
             schema={props.field.schema}
             id={`${props.name}`}
             label={props.field.title}
-            supportingText={props.field.description}
+            supportingText={<ChatMarkdown>{description}</ChatMarkdown>}
             errorMessage={fieldErrors[props.name!]}
             dropdownClassName={`${props.name}-dropdown`}
             data-testid={props.name}
@@ -381,7 +396,7 @@ function TriggerValidation() {
     const validateForm = async () => {
       try {
         await validate();
-      } catch { }
+      } catch {}
     };
 
     validateForm();
@@ -402,7 +417,7 @@ function generateSuggestions(connections: IConfigConnection[]): Suggestion[] {
 const InputsContext = React.createContext<{
   connections: IConfigConnection[];
   updateInputReset: (connection: IConfigConnection, value: boolean) => void;
-}>({ connections: [], updateInputReset: () => { } });
+}>({ connections: [], updateInputReset: () => {} });
 
 const InputsProvider: React.FC<{
   connections: IConfigConnection[];

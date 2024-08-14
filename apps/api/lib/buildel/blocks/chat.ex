@@ -64,7 +64,16 @@ defmodule Buildel.Blocks.Chat do
                 api_key:
                   secret_schema(%{
                     "title" => "API key",
-                    "description" => "OpenAI API key to use for the chat."
+                    "description" => "API key to use for the chat.",
+                    "descriptionWhen" =>%{
+                      "opts.api_type" => %{
+                        "openai" => "[OpenAI API key](https://platform.openai.com/api-keys) to use for the chat.",
+                        "azure" => "Azure API key to use for the chat.",
+                        "google" => "Google API key to use for the chat.",
+                        "mistral" => "[Mistral API key](https://console.mistral.ai/api-keys/) to use for the chat.",
+                        "anthropic" => "[Anthropic API key](https://www.anthropic.com/api) to use for the chat."
+                      }
+                    }
                   }),
                 api_type: %{
                   "type" => "string",

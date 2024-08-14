@@ -178,6 +178,7 @@ export type JSONSchemaField =
       type: 'string';
       title: string;
       description: string;
+      descriptionWhen?: Record<string, Record<string, string>>;
       minLength?: number;
       maxLength?: number;
       default?: string;
@@ -186,6 +187,7 @@ export type JSONSchemaField =
         errorMessage: string;
       };
       readonly?: boolean;
+      defaultWhen?: Record<string, Record<string, string>>;
     }
   | {
       type: 'string';
@@ -212,7 +214,7 @@ export type JSONSchemaField =
       maxLength?: number;
       default?: string;
       readonly?: boolean;
-      displayWhen: DisplayWhen;
+      displayWhen?: DisplayWhen;
     }
   | {
       type: 'string';
