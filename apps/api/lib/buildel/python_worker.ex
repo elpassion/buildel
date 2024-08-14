@@ -39,6 +39,19 @@ defmodule Buildel.PythonWorker do
     |> Task.await(@timeout)
   end
 
+  def reduce_dimensions(path) do
+    Task.async(fn ->
+      :poolboy.transaction(
+        :python_worker,
+        fn pid ->
+          GenServer.call(pid, {:reduce_dimensions, path}, @timeout)
+        end,
+        @timeout
+      )
+    end)
+    |> Task.await(@timeout)
+  end
+
   #############
   # Callbacks #
   #############
@@ -68,5 +81,14 @@ defmodule Buildel.PythonWorker do
     result = Jason.decode!(result)
     Logger.debug("[#{__MODULE__}] Handled call")
     {:reply, {:ok, result}, pid}
+  end
+
+  def handle_call({:reduce_dimensions, path}, _from, pid) do
+    result = :python.call(pid, :umap_script, :reduce_dimensions, [path])
+    # IO.inspect("reading file...")
+    # result = File.read!(path) |> Jason.decode!()
+    IO.inspect("Back to worker")
+    Logger.debug("[#{__MODULE__}] Handled call")
+    {:reply, {:ok, []}, pid}
   end
 end

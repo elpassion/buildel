@@ -108,14 +108,10 @@ defmodule Buildel.Application do
   end
 
   defp maybe_add_python_workers(children) do
-    if Application.get_env(:buildel, :file_loader) == Buildel.FileLoaderUnstructuredLocalAdapter do
-      children ++
-        [
-          :poolboy.child_spec(:worker, python_poolboy_config())
-        ]
-    else
-      children
-    end
+    children ++
+      [
+        :poolboy.child_spec(:worker, python_poolboy_config())
+      ]
   end
 
   defp should_add_bumblebee_embedding?() do
