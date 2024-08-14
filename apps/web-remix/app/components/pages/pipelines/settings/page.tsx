@@ -52,6 +52,7 @@ export function SettingsPage() {
         pipelineId,
         Object.fromEntries(searchParams.entries()),
       ),
+      { replace: true },
     );
   };
 

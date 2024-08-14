@@ -51,7 +51,7 @@ export function EditBlockPage() {
         pipelineId,
         Object.fromEntries(searchParams.entries()),
       ),
-      { state: { reset: true } },
+      { state: { reset: true }, replace: true },
     );
   };
 
