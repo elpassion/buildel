@@ -6,6 +6,7 @@ import { useLoaderData } from '@remix-run/react';
 import type { IMemoryChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -49,10 +50,10 @@ export function CollectionMemory() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = () => {
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(() => {
   return [
     {
       title: `Memory`,
     },
   ];
-};
+});

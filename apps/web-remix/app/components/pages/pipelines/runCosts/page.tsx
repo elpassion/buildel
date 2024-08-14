@@ -3,6 +3,7 @@ import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { metaWithDefaults } from '~/utils/metadata';
 
 import type { loader } from './loader.server';
 import {
@@ -26,10 +27,10 @@ export function PipelineRunCosts() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: `Costs details`,
     },
   ];
-};
+});

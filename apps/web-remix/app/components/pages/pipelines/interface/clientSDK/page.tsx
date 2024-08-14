@@ -6,6 +6,7 @@ import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
 import { CodePreviewOptions } from '~/components/interfaces/CodePreview/CodePreviewOptions';
 import { CodePreviewWrapper } from '~/components/interfaces/CodePreview/CodePreviewWrapper';
 import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import {
@@ -282,10 +283,10 @@ run.push("your_block_name:input", 'sample payload');`}
     </div>
   );
 }
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Client SDK',
     },
   ];
-};
+});

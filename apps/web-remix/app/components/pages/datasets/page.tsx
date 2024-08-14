@@ -6,6 +6,7 @@ import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Button } from '~/components/ui/button';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { DatasetsList } from './DatasetsList';
@@ -41,10 +42,10 @@ export function DatasetsPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Datasets',
     },
   ];
-};
+});

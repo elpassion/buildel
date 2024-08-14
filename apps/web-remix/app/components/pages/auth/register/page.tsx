@@ -15,6 +15,7 @@ import { SubmitButton } from '~/components/form/submit';
 import { GithubButton } from '~/components/githubAuth/GithubButton';
 import { GoogleButton } from '~/components/googleAuth/GoogleButton';
 import { SocialSignInForm } from '~/components/socialAuth/SocialSignInForm';
+import { metaWithDefaults } from '~/utils/metadata';
 
 import type { loader } from './loader.server';
 import { schema } from './schema';
@@ -89,10 +90,10 @@ export function RegisterPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Register',
     },
   ];
-};
+});

@@ -9,6 +9,7 @@ import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { cn } from '~/utils/cn';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { ExperimentRunsCharts } from './components/ExperimentRunsCharts';
@@ -64,13 +65,15 @@ export function ExperimentPage() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    {
-      title: `Experiment ${data?.experiment.name}`,
-    },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(
+  ({ data }) => {
+    return [
+      {
+        title: `Experiment ${data?.experiment.name}`,
+      },
+    ];
+  },
+);
 
 function ExperimentRunButton({ children, ...props }: ButtonProps) {
   const fetcher = useFetcher();

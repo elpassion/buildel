@@ -2,6 +2,8 @@ import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 
+import { metaWithDefaults } from '~/utils/metadata';
+
 import { KnowledgeBaseSearchForm } from './KnowledgeBaseSearchForm';
 import { KnowledgeBaseSearchList } from './KnowledgeBaseSearchList';
 import type { loader } from './loader.server';
@@ -24,10 +26,10 @@ export function KnowledgeBaseSearch() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Knowledge Base Search',
     },
   ];
-};
+});

@@ -19,6 +19,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { DatasetRowEditorField } from '../DatasetRowEditorField';
@@ -91,10 +92,12 @@ export function DatasetRowPage() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    {
-      title: `Row | ID ${data?.rowId}`,
-    },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(
+  ({ data }) => {
+    return [
+      {
+        title: `Row | ID ${data?.rowId}`,
+      },
+    ];
+  },
+);

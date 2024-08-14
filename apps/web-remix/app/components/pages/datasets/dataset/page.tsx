@@ -7,6 +7,7 @@ import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Pagination } from '~/components/pagination/Pagination';
 import { Button } from '~/components/ui/button';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { DatasetRowTable } from './DatasetRowTable/DatasetRowTable';
@@ -70,10 +71,12 @@ export function DatasetPage() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    {
-      title: `Dataset ${data?.dataset.name}`,
-    },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(
+  ({ data }) => {
+    return [
+      {
+        title: `Dataset ${data?.dataset.name}`,
+      },
+    ];
+  },
+);

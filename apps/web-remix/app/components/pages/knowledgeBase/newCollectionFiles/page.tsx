@@ -8,6 +8,7 @@ import { FileUploadListPreview } from '~/components/fileUpload/FileUploadListPre
 import { errorToast } from '~/components/toasts/errorToast';
 import { loadingToast } from '~/components/toasts/loadingToast';
 import { Button } from '~/components/ui/button';
+import { metaWithDefaults } from '~/utils/metadata';
 
 import type { loader } from './loader.server';
 
@@ -213,10 +214,10 @@ export function NewCollectionFilesPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'New collection files',
     },
   ];
-};
+});

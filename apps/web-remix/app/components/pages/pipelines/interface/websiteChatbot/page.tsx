@@ -16,6 +16,7 @@ import type {
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
 import { Button } from '~/components/ui/button';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { InterfaceConfigForm } from './InterfaceConfigForm';
@@ -140,10 +141,10 @@ export function WebsiteChatbotPage() {
     </div>
   );
 }
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Website Chatbot',
     },
   ];
-};
+});

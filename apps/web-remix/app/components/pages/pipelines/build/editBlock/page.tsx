@@ -25,6 +25,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { BlockInputList } from './BlockInputList';
@@ -120,13 +121,13 @@ export function EditBlockPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Block',
     },
   ];
-};
+});
 
 function updateConnectionEnd<T>(
   end: { block_name: string } & T,

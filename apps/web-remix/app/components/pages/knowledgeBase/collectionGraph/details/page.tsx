@@ -2,6 +2,8 @@ import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 
+import { metaWithDefaults } from '~/utils/metadata';
+
 import { NodePreview } from './components/NodePreview';
 import type { loader } from './loader.server';
 
@@ -18,10 +20,12 @@ export function KnowledgeBaseGraphDetails() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    {
-      title: `${data?.collectionName} Graph Details`,
-    },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(
+  ({ data }) => {
+    return [
+      {
+        title: `${data?.collectionName} Graph Details`,
+      },
+    ];
+  },
+);

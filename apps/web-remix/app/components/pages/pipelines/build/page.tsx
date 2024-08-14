@@ -20,6 +20,7 @@ import {
   DialogDrawer,
   DialogDrawerContent,
 } from '~/components/ui/dialog-drawer';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { Builder } from '../Builder';
@@ -136,10 +137,10 @@ export function PipelineBuilder() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Build',
     },
   ];
-};
+});

@@ -27,6 +27,7 @@ import {
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
 import { cn } from '~/utils/cn';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -205,10 +206,12 @@ export function KnowledgeBaseCollectionInterface() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    {
-      title: `${data?.collectionName} Interface`,
-    },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(
+  ({ data }) => {
+    return [
+      {
+        title: `${data?.collectionName} Interface`,
+      },
+    ];
+  },
+);

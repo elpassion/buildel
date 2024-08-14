@@ -18,6 +18,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { DatasetRowEditorField } from '../DatasetRowEditorField';
@@ -87,10 +88,10 @@ export function DatasetRowNew() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = () => {
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(() => {
   return [
     {
       title: `New Dataset Row`,
     },
   ];
-};
+});

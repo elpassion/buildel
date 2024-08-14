@@ -1,6 +1,8 @@
 import { Link } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/react';
 
+import { metaWithDefaults } from '~/utils/metadata';
+
 export function loader() {
   return {};
 }
@@ -26,10 +28,10 @@ export default function ResetPasswordSent() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Reset Password Sent!',
     },
   ];
-};
+});

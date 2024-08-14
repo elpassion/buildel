@@ -5,6 +5,7 @@ import { useLoaderData } from '@remix-run/react';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { Pagination } from '~/components/pagination/Pagination';
 import { dayjs } from '~/utils/Dayjs';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { MonthPicker } from '../../pipelines/MonthPicker/MonthPicker';
@@ -60,10 +61,12 @@ export function KnowledgeBaseOverviewPage() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    {
-      title: `${data?.collectionName} overview`,
-    },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(
+  ({ data }) => {
+    return [
+      {
+        title: `${data?.collectionName} overview`,
+      },
+    ];
+  },
+);

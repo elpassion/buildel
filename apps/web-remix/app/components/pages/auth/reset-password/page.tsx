@@ -9,6 +9,7 @@ import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
+import { metaWithDefaults } from '~/utils/metadata';
 
 import { schema } from './schema';
 
@@ -52,10 +53,10 @@ export function ResetPasswordPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Reset Password',
     },
   ];
-};
+});

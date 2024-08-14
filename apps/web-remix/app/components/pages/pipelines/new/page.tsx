@@ -16,6 +16,7 @@ import {
   WorkflowTemplatesList,
 } from '~/components/pages/pipelines/list/WorkflowTemplates';
 import type { loader } from '~/components/pages/pipelines/new/loader.server';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 export function NewPipelinePage() {
@@ -25,13 +26,13 @@ export function NewPipelinePage() {
   return <TemplatesStep />;
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'New Pipeline',
     },
   ];
-};
+});
 
 function NameFormStep() {
   const validator = useMemo(() => withZod(CreatePipelineSchema), []);

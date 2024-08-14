@@ -14,6 +14,7 @@ import { generateZODSchema } from '~/components/form/schema/SchemaParser';
 import { SubmitButton } from '~/components/form/submit';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { successToast } from '~/components/toasts/successToast';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -140,10 +141,10 @@ export function SettingsConfigurationPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Configuration',
     },
   ];
-};
+});

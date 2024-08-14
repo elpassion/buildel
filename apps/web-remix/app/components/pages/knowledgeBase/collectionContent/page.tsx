@@ -20,6 +20,7 @@ import {
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
 import { cn } from '~/utils/cn';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { KnowledgeBaseFileList } from './KnowledgeBaseFileList';
@@ -93,10 +94,12 @@ export function KnowledgeBaseContentPage() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    {
-      title: `${data?.collectionName} database`,
-    },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(
+  ({ data }) => {
+    return [
+      {
+        title: `${data?.collectionName} database`,
+      },
+    ];
+  },
+);

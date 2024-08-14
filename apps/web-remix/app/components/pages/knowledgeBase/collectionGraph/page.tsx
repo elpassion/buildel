@@ -24,6 +24,7 @@ import '@xyflow/react/dist/style.css';
 import { useSearchedChunks } from '~/components/pages/knowledgeBase/collectionGraph/useSearchedChunks';
 import type { IMemoryNode } from '~/components/pages/knowledgeBase/knowledgeBase.types';
 import { errorToast } from '~/components/toasts/errorToast';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { ChunksSearch } from './components/ChunksSearch';
@@ -246,13 +247,15 @@ export function KnowledgeBaseGraphPage() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    {
-      title: `${data?.collectionName} Graph`,
-    },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(
+  ({ data }) => {
+    return [
+      {
+        title: `${data?.collectionName} Graph`,
+      },
+    ];
+  },
+);
 
 function getNodesSpace(size: number) {
   return 25 + Math.floor(size / 1000) * 15;

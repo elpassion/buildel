@@ -15,6 +15,7 @@ import {
   ModelSelectField,
   SecretSelectField,
 } from '~/components/pages/knowledgeBase/KnowledgeBaseFields';
+import { metaWithDefaults } from '~/utils/metadata';
 
 export function NewKnowledgeBasePage() {
   const validator = useMemo(() => withZod(CreateCollectionSchema), []);
@@ -103,10 +104,10 @@ export function NewKnowledgeBasePage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'New Knowledge Base',
     },
   ];
-};
+});

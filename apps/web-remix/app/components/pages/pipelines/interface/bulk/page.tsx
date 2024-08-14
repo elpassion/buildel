@@ -19,6 +19,7 @@ import {
   InterfaceSectionWrapper,
 } from '~/components/interfaces/InterfaceSection';
 import { Button } from '~/components/ui/button';
+import { metaWithDefaults } from '~/utils/metadata';
 
 import type { IBlockConfig } from '../../pipeline.types';
 import { BulkTable } from './BulkTable';
@@ -364,13 +365,13 @@ export function BulkPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Bulk',
     },
   ];
-};
+});
 
 function toSelectOption(item: IBlockConfig) {
   return {

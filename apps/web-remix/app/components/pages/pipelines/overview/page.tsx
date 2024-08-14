@@ -6,6 +6,7 @@ import { MonthPicker } from '~/components/pages/pipelines/MonthPicker/MonthPicke
 import { PipelineRunsTable } from '~/components/pages/pipelines/overview/PipelineRunsTable';
 import { Pagination } from '~/components/pagination/Pagination';
 import { dayjs } from '~/utils/Dayjs';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -62,10 +63,10 @@ export function OverviewPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Pipeline overview',
     },
   ];
-};
+});

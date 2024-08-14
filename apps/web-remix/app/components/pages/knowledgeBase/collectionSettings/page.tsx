@@ -16,6 +16,7 @@ import {
   ModelSelectField,
   SecretSelectField,
 } from '~/components/pages/knowledgeBase/KnowledgeBaseFields';
+import { metaWithDefaults } from '~/utils/metadata';
 
 import type { loader } from './loader.server';
 
@@ -92,10 +93,10 @@ export function CollectionSettingsPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Collection settings',
     },
   ];
-};
+});

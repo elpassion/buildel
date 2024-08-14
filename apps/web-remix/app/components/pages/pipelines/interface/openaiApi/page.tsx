@@ -11,6 +11,7 @@ import {
   InterfaceSectionHeading,
   InterfaceSectionWrapper,
 } from '~/components/interfaces/InterfaceSection';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -86,10 +87,10 @@ console.log(completion.choices[0]);`}
     </div>
   );
 }
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'OpenAI Api',
     },
   ];
-};
+});

@@ -15,6 +15,7 @@ import { SubmitButton } from '~/components/form/submit';
 import { GithubButton } from '~/components/githubAuth/GithubButton';
 import { GoogleButton } from '~/components/googleAuth/GoogleButton';
 import { SocialSignInForm } from '~/components/socialAuth/SocialSignInForm';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
@@ -94,10 +95,10 @@ export function LoginPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Login',
     },
   ];
-};
+});

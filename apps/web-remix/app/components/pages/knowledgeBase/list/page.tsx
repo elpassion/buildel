@@ -14,6 +14,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { KnowledgeBaseCollectionList } from './KnowledgeBaseCollectionList';
@@ -75,10 +76,10 @@ export function KnowledgeBasePage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Knowledge base',
     },
   ];
-};
+});

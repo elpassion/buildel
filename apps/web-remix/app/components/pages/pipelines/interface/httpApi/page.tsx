@@ -5,6 +5,7 @@ import { useLoaderData } from '@remix-run/react';
 import { CopyCodeButton } from '~/components/actionButtons/CopyCodeButton';
 import { CodePreviewWrapper } from '~/components/interfaces/CodePreview/CodePreviewWrapper';
 import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
+import { metaWithDefaults } from '~/utils/metadata';
 
 import {
   PreviewConnector,
@@ -149,10 +150,10 @@ export function HTTPApiPage() {
     </div>
   );
 }
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'HTTP Api',
     },
   ];
-};
+});

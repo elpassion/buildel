@@ -6,6 +6,7 @@ import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Pagination } from '~/components/pagination/Pagination';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { ExperimentRunRunsCharts } from './components/ExperimentRunRunsCharts';
@@ -62,10 +63,12 @@ export function ExperimentRunPage() {
   );
 }
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  return [
-    {
-      title: `Experiment Run ${data?.runId}`,
-    },
-  ];
-};
+export const meta: MetaFunction<typeof loader> = metaWithDefaults(
+  ({ data }) => {
+    return [
+      {
+        title: `Experiment Run ${data?.runId}`,
+      },
+    ];
+  },
+);

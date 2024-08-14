@@ -8,6 +8,7 @@ import { SelectInput } from '~/components/form/inputs/select/select.input';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { Label } from '~/components/ui/label';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 import { buildUrlWithParams } from '~/utils/url';
 
@@ -146,10 +147,10 @@ const Log = ({ log }: { log: any }) => {
   );
 };
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: `Run logs`,
     },
   ];
-};
+});

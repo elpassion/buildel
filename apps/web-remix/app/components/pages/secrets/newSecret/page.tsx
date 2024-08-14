@@ -12,6 +12,7 @@ import {
   TextInputField,
 } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
+import { metaWithDefaults } from '~/utils/metadata';
 
 export function NewSecret() {
   const validator = useMemo(() => withZod(CreateUpdateSecretSchema), []);
@@ -55,10 +56,10 @@ export function NewSecret() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'New Secret',
     },
   ];
-};
+});

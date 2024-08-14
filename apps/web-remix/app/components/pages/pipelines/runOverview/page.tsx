@@ -3,6 +3,7 @@ import { useLoaderData } from '@remix-run/react';
 
 import { ReadonlyCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/ReadonlyCommentNode';
 import { ReadonlyCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/ReadonlyCustomNode';
+import { metaWithDefaults } from '~/utils/metadata';
 
 import { Builder } from '../Builder';
 import { CustomEdge } from '../Edges/CustomEdges/CustomEdge';
@@ -22,10 +23,10 @@ export function PipelineRunOverview() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: `Run overview`,
     },
   ];
-};
+});
