@@ -40,13 +40,11 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   onClose,
   showOnHover = false,
 }) => {
-  const {
-    value: isShown,
-    setTrue,
-    setFalse,
-    toggle,
-    setValue,
-  } = useBoolean(defaultShown ?? false);
+  const { value, setTrue, setFalse, toggle, setValue } = useBoolean(
+    defaultShown ?? false,
+  );
+
+  const isShown = shown ?? value;
 
   const floatingContext = useFloating({
     placement,
@@ -89,7 +87,7 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   return (
     <DropdownContext.Provider
       value={{
-        isShown: shown ?? isShown,
+        isShown: isShown,
         hide,
         show,
         toggle,
@@ -119,7 +117,7 @@ export const DropdownPopup: React.FC<DropdownPopupProps> = ({
       style={{ ...style, ...context.floatingStyles }}
       {...getFloatingProps?.()}
       className={cn(
-        'transition-opacity ',
+        'transition-opacity',
         {
           'opacity-0 pointer-events-none': !isShown,
           'opacity-100 pointer-events-auto': isShown,
