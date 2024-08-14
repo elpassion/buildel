@@ -249,22 +249,21 @@ defmodule Buildel.MemoriesGraph do
           {nil, nil, embedding, id} ->
             %{embedding: Pgvector.to_list(embedding), id: id}
         end)
-        |> Stream.map(&Jason.encode!(&1))
+        |> Stream.map(fn file -> Jason.encode!(file) <> "\n" end)
         |> Stream.into(File.stream!(path, [:write, :utf8]))
         |> Stream.run()
       end)
 
     IO.inspect("dupa")
 
-    reduced_embeddings =
-      Buildel.PythonWorker.reduce_dimensions(path)
+    Buildel.PythonWorker.reduce_dimensions(path)
 
     IO.inspect("Reduced embeddings. Saving...")
 
     reduced_embeddings =
       File.read!(path)
       |> Jason.decode!()
-      |> Enum.map(fn %{embedding: embedding, id: id} ->
+      |> Enum.map(fn %{"embedding" => embedding, "id" => id} ->
         %{id: id, point: embedding}
       end)
 
