@@ -142,7 +142,7 @@ pnpm dev
 - [Website](https://buildel.ai/) overview of the product.
 - [Buildel App](https://app.buildel.ai/) hosted version of the Buildel.
 - [Discord](https://discord.gg/SUXs7FyRT2) for support and discussions with the community and the team.
-- [Github](https://github.com/elpassion/buildel) for source code, project board, issues, and pull requests.
+- [GitHub](https://github.com/elpassion/buildel) for source code, project board, issues, and pull requests.
 - [Swagger](https://buildel.ai/) for API documentation.
 
 ## Community
