@@ -83,6 +83,16 @@ export function PipelineRunLogs() {
     }
   }, [status]);
 
+  if (data.length === 0 && liveLogs.length === 0) {
+    return (
+      <PageContentWrapper className="mt-10">
+        <p className="text-center text-red-500">
+          No logs found for this run. You can enable logs in the pipeline settings.
+        </p>
+      </PageContentWrapper>
+    );
+  }
+
   return (
     <PageContentWrapper className="mt-10">
       <Label>Filter by block</Label>
