@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.MapInputs do
   require Logger
+  alias Buildel.Blocks.Fields.EditorField
   use Buildel.Blocks.Block
   use Buildel.Blocks.Utils.TakeLatest
 
@@ -30,12 +31,13 @@ defmodule Buildel.Blocks.MapInputs do
           options_schema(%{
             "required" => ["template"],
             "properties" => %{
-              "template" => %{
-                "type" => "string",
-                "title" => "Template",
-                "description" => "Output string from combined inputs.",
-                "minLength" => 1
-              }
+              "template" =>
+                EditorField.new(%{
+                  title: "template",
+                  description: "Output string from combined inputs.",
+                  type: "string",
+                  minLength: 1
+                })
             }
           })
       }
