@@ -1,7 +1,6 @@
 defmodule Buildel.Experiments.Runs do
   alias Buildel.Experiments
   alias Buildel.Experiments.Runs.RunRowRun
-  alias Buildel.BlockPubSub
   alias Buildel.Pipelines.Pipeline
   alias Buildel.Pipelines
   alias Buildel.Experiments.Experiment
@@ -22,6 +21,16 @@ defmodule Buildel.Experiments.Runs do
       |> Repo.all()
 
     {:ok, results, experiment.runs_count}
+  end
+
+  def list_experiment_run_runs(%Run{} = run) do
+    results =
+      from(rrr in RunRowRun,
+        where: rrr.experiment_run_id == ^run.id
+      )
+      |> Repo.all()
+
+    results
   end
 
   def list_experiment_run_runs(%Run{} = run, pagination_params) do
@@ -56,6 +65,13 @@ defmodule Buildel.Experiments.Runs do
     end
   end
 
+  def get_run(id) do
+    case from(r in Run, where: r.id == ^id) |> Repo.one() do
+      nil -> {:error, :not_found}
+      run -> {:ok, run |> Repo.preload(experiment: [:dataset, :pipeline])}
+    end
+  end
+
   def get_experiment_run(%Experiment{} = experiment, id) do
     case from(r in Run, where: r.experiment_id == ^experiment.id and r.id == ^id) |> Repo.one() do
       nil -> {:error, :not_found}
@@ -68,14 +84,21 @@ defmodule Buildel.Experiments.Runs do
            experiment_run.experiment.dataset |> Buildel.Datasets.Rows.list_dataset_rows(),
          %Pipeline{} = pipeline <- experiment_run.experiment.pipeline,
          {:ok, pipeline_config} <- Pipelines.get_pipeline_config(pipeline, "latest") do
-      public_outputs =
-        Pipeline.ios(pipeline, public: true).outputs
+      multi = Ecto.Multi.new()
 
-      {:ok, experiment_run} = experiment_run |> Experiments.Runs.Run.start()
+      multi =
+        Ecto.Multi.one(multi, :experiment_run, fn _ ->
+          from(er in Run, where: er.id == ^experiment_run.id)
+        end)
 
-      Task.start(fn ->
+      multi =
+        Ecto.Multi.update(multi, :start_experiment_run, fn %{experiment_run: experiment_run} ->
+          Run.update_status(experiment_run, :running)
+        end)
+
+      {experiment_run, operations} =
         dataset_rows
-        |> Enum.reduce(Ecto.Multi.new(), fn row, multi ->
+        |> Enum.reduce(multi, fn row, multi ->
           changeset =
             %Buildel.Pipelines.Run{}
             |> Buildel.Pipelines.Run.changeset(%{
@@ -85,7 +108,8 @@ defmodule Buildel.Experiments.Runs do
 
           multi
           |> Ecto.Multi.insert({:insert_pipeline_run, row.id}, changeset)
-          |> Ecto.Multi.insert({:insert_run_row_run, row.id}, fn changes ->
+          |> Ecto.Multi.insert({:insert_run_row_run, row.id}, fn %{experiment_run: experiment_run} =
+                                                                   changes ->
             run = Map.get(changes, {:insert_pipeline_run, row.id})
 
             %Buildel.Experiments.Runs.RunRowRun{}
@@ -98,108 +122,36 @@ defmodule Buildel.Experiments.Runs do
         end)
         |> Buildel.Repo.transaction()
         |> then(fn {:ok, operations} ->
-          operations
-          |> Enum.group_by(fn {{_name, id}, _value} -> id end)
-          |> Enum.map(fn {id, changes} ->
-            row = dataset_rows |> Enum.find(&(&1.id == id))
+          operations = operations |> Map.delete(:experiment_run)
 
-            {{_, _}, run} =
-              changes
-              |> Enum.find(fn {{name, _id}, _value} ->
-                name == :insert_pipeline_run
-              end)
+          {experiment_run, operations} =
+            operations |> Map.pop(:start_experiment_run)
 
-            {{_, _}, run_row_run} =
-              changes
-              |> Enum.find(fn {{name, _id}, _value} ->
-                name == :insert_run_row_run
-              end)
+          operations =
+            operations
+            |> Enum.group_by(fn {{_name, id}, _value} -> id end)
+            |> Enum.map(fn {id, changes} ->
+              row = dataset_rows |> Enum.find(&(&1.id == id))
 
-            {row, run, run_row_run}
-          end)
-        end)
-        |> Task.async_stream(
-          fn {row, run, run_row_run} ->
-            {:ok, run} = Pipelines.Runner.start_run(run)
-            context_id = Pipelines.Worker.context_id(run)
+              {{_, _}, run} =
+                changes
+                |> Enum.find(fn {{name, _id}, _value} ->
+                  name == :insert_pipeline_run
+                end)
 
-            outputs =
-              public_outputs
-              |> Enum.map(fn output ->
-                topic =
-                  BlockPubSub.io_topic(
-                    context_id,
-                    output.block_name,
-                    output.output.name
-                  )
+              {{_, _}, run_row_run} =
+                changes
+                |> Enum.find(fn {{name, _id}, _value} ->
+                  name == :insert_run_row_run
+                end)
 
-                BlockPubSub.subscribe_to_io(
-                  context_id,
-                  output.block_name,
-                  output.output.name
-                )
-
-                %{
-                  block_name: output.block_name,
-                  output_name: output.output.name,
-                  topic: topic,
-                  data: nil
-                }
-              end)
-
-            row.data
-            |> Enum.each(fn {block_name, data} ->
-              Buildel.BlockPubSub.broadcast_to_io(
-                context_id,
-                block_name,
-                "input",
-                {:text, data}
-              )
+              {row, run, run_row_run}
             end)
 
-            outputs =
-              Enum.reduce_while(Stream.repeatedly(fn -> nil end), outputs, fn _, outputs ->
-                outputs = receive_output(outputs)
+          {experiment_run, operations}
+        end)
 
-                if Enum.any?(outputs, &(&1.data == nil)) do
-                  {:cont, outputs}
-                else
-                  {:halt, outputs}
-                end
-              end)
-
-            data =
-              Map.merge(
-                row.data,
-                outputs
-                |> Enum.reduce(%{}, fn output, acc ->
-                  output_data =
-                    case is_binary(output.data) do
-                      true -> output.data |> String.trim()
-                      false -> output.data
-                    end
-
-                  {_, evaluation} = calculate_evaluation(output_data)
-
-                  acc
-                  |> Map.put(output.block_name, evaluation)
-                end)
-              )
-
-            {:ok, _run_row_run} =
-              run_row_run
-              |> RunRowRun.finish(data)
-
-            run |> Pipelines.Runner.stop_run()
-
-            :ok
-          end,
-          ordered: true,
-          max_concurrency: 10,
-          timeout: 5 * 60_000
-        )
-        |> Stream.run()
-      end)
+      Buildel.Experiments.Runner.run(experiment_run, operations, pipeline)
     end
 
     {:ok, experiment_run}
@@ -209,45 +161,5 @@ defmodule Buildel.Experiments.Runs do
     %Buildel.Experiments.Runs.RunRowRun{}
     |> Buildel.Experiments.Runs.RunRowRun.changeset(attrs)
     |> Repo.insert()
-  end
-
-  defp receive_output([]), do: []
-
-  defp receive_output(outputs) do
-    topics = outputs |> Enum.map(& &1[:topic])
-
-    receive do
-      {topic, type, data, _metadata} when type != :start_stream and type != :stop_stream ->
-        if topic in topics do
-          outputs
-          |> update_in(
-            [
-              Access.at(Enum.find_index(outputs, fn output -> output[:topic] == topic end)),
-              :data
-            ],
-            fn _ -> data end
-          )
-        else
-          outputs
-        end
-
-      _other ->
-        outputs
-    end
-  end
-
-  defp calculate_evaluation("true"), do: {:ok, 100}
-  defp calculate_evaluation("false"), do: {:ok, 0}
-
-  defp calculate_evaluation(number) when is_integer(number), do: {:ok, number}
-
-  defp calculate_evaluation(number) when is_float(number), do: {:ok, number}
-
-  defp calculate_evaluation(text) do
-    with {int, ""} when int >= 0 and int <= 100 <- Integer.parse(text) do
-      {:ok, int}
-    else
-      _ -> {:error, text}
-    end
   end
 end

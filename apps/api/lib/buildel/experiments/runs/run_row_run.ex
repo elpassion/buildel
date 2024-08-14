@@ -1,4 +1,5 @@
 defmodule Buildel.Experiments.Runs.RunRowRun do
+  alias Buildel.Experiments.Runs.RunRowRun
   alias Buildel.Experiments.Runs.Run
   use Ecto.Schema
   import Ecto.Changeset
@@ -31,6 +32,15 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
 
       changeset
     end)
+  end
+
+  def finish(%RunRowRun{data: data} = rrr, _) when data != %{} and not is_nil(data),
+    do: {:ok, rrr}
+
+  def finish(%RunRowRun{data: data} = rrr, %{}) when data != %{} and not is_nil(data) do
+    rrr
+    |> cast(%{data: %{}, evaluation_avg: 0}, [:data, :evaluation_avg])
+    |> Buildel.Repo.update()
   end
 
   def finish(run_row_run, data) do

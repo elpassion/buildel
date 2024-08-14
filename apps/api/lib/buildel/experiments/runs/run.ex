@@ -1,4 +1,5 @@
 defmodule Buildel.Experiments.Runs.Run do
+  alias Buildel.Experiments.Runs.Run
   alias Buildel.Experiments.Experiment
   use Ecto.Schema
   import Ecto.Changeset
@@ -21,7 +22,7 @@ defmodule Buildel.Experiments.Runs.Run do
   @doc false
   def changeset(run, attrs) do
     run
-    |> cast(attrs, [:experiment_id, :inputs, :outputs])
+    |> cast(attrs, [:experiment_id, :inputs, :outputs, :evaluations_avg, :columns_avg])
     |> validate_required([:experiment_id, :inputs, :outputs])
     |> validate_length(:inputs, min: 1)
     |> validate_length(:outputs, min: 1)
@@ -40,7 +41,24 @@ defmodule Buildel.Experiments.Runs.Run do
     run |> update_status(:running) |> Buildel.Repo.update()
   end
 
-  defp update_status(run, status) do
+  def finish(%Run{status: status} = run) when status != :finished do
+    run |> update_status(:finished) |> Buildel.Repo.update()
+  end
+
+  def finish(run) do
+    {:ok, run}
+  end
+
+  def update_status(run, :finished) do
+    run
+    |> cast(%{status: :finished, evaluations_avg: 0, columns_avg: %{}}, [
+      :status,
+      :evaluations_avg,
+      :columns_avg
+    ])
+  end
+
+  def update_status(run, status) do
     run |> cast(%{status: status}, [:status])
   end
 end

@@ -66,11 +66,19 @@ defmodule Buildel.LogsAggregator do
   end
 
   defp save_aggregated_logs(aggregated_logs) do
-    Repo.insert_all(
-      Buildel.Pipelines.AggregatedLog,
-      aggregated_logs |> Enum.map(&create_db_aggregated_log/1),
-      returning: true
+    aggregated_logs
+    |> Enum.map(&create_db_aggregated_log/1)
+    |> Enum.chunk_every(5_000)
+    |> Enum.map(
+      &Repo.insert_all(
+        Buildel.Pipelines.AggregatedLog,
+        &1,
+        returning: true
+      )
     )
+    |> Enum.reduce({0, []}, fn {_, logs}, {0, acc} ->
+      {0, acc ++ logs}
+    end)
   end
 
   defp create_db_aggregated_log(%AggregatedLog{} = log) do

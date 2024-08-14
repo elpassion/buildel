@@ -27,6 +27,9 @@ defmodule Buildel.Application do
         BuildelWeb.Endpoint,
         # Start a worker by calling: Buildel.Worker.start_link(arg)
         Buildel.Pipelines.Runner,
+        {Task.Supervisor, name: Buildel.TaskSupervisor},
+        {Buildel.Experiments.Runner, name: Buildel.Experiments.Runner},
+        :poolboy.child_spec(:worker, Buildel.Experiments.Runner.poolboy_config()),
         # Start the vault used for encryption
         Buildel.Vault,
         # JWKS storage
@@ -68,7 +71,6 @@ defmodule Buildel.Application do
     else
       children ++
         [
-          {Task.Supervisor, name: Buildel.CollectionGraphTaskSupervisor},
           {FLAME.Pool,
            name: Buildel.CollectionGraphRunner,
            min: 0,

@@ -69,7 +69,7 @@ defmodule Buildel.MemoriesGraph do
 
   def stop_generating(collection_id) do
     {:ok, %State.Task{} = task} = get_state(collection_id)
-    Task.Supervisor.terminate_child(Buildel.CollectionGraphTaskSupervisor, task.pid)
+    Task.Supervisor.terminate_child(Buildel.TaskSupervisor, task.pid)
     GenServer.cast(__MODULE__, {:remove, collection_id})
 
     :ok
@@ -169,7 +169,7 @@ defmodule Buildel.MemoriesGraph do
       ) do
     %Task{pid: pid} =
       Task.Supervisor.async(
-        Buildel.CollectionGraphTaskSupervisor,
+        Buildel.TaskSupervisor,
         fn ->
           FLAME.call(
             Buildel.CollectionGraphRunner,
