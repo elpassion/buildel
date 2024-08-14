@@ -7,6 +7,7 @@ import {
   OutlinedTabsWrapper,
 } from '~/components/tabs/OutlinedTabs';
 import { TabGroup } from '~/components/tabs/TabGroup';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { AboutOrganization } from './AboutOrganization';
@@ -47,10 +48,10 @@ export function OrganizationSettingsPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Organization settings',
     },
   ];
-};
+});

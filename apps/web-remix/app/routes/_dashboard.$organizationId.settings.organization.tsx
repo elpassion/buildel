@@ -1,4 +1,7 @@
-export { page as default } from '~/components/pages/settings/organization';
+export {
+  page as default,
+  meta,
+} from '~/components/pages/settings/organization';
 export {
   loader,
   action,

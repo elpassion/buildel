@@ -16,6 +16,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import {
@@ -64,10 +65,10 @@ export function ProfileSettingsPage() {
   );
 }
 
-export const meta: MetaFunction = () => {
+export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
       title: 'Profile settings',
     },
   ];
-};
+});
