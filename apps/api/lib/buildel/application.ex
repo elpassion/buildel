@@ -12,42 +12,51 @@ defmodule Buildel.Application do
     })
 
     children =
-      [
-        # Start the Telemetry supervisor
-        BuildelWeb.Telemetry,
-        # Start the PubSub system
-        {Phoenix.PubSub, name: Buildel.PubSub},
-        # Start Finch
-        {Finch, name: Buildel.Finch},
-        # Start the Logs system
-        Buildel.Logs,
-        Buildel.Logs.DBPipelineLogger,
-        Buildel.LogsAggregator,
-        # Start the Endpoint (http/https)
-        BuildelWeb.Endpoint,
-        # Start a worker by calling: Buildel.Worker.start_link(arg)
-        Buildel.Pipelines.Runner,
-        {Task.Supervisor, name: Buildel.TaskSupervisor},
-        {Buildel.Experiments.Runner, name: Buildel.Experiments.Runner},
-        :poolboy.child_spec(:worker, Buildel.Experiments.Runner.poolboy_config()),
-        # Start the vault used for encryption
-        Buildel.Vault,
-        # JWKS storage
-        BuildelWeb.GoogleJwksStrategy,
-        {BuildelWeb.MetricsStorage, BuildelWeb.Telemetry.metrics()},
-        Buildel.Memories.MemoryFile,
-        Buildel.Datasets.DatasetFile,
-        Buildel.MemoriesGraph,
-        Buildel.Cache
-      ]
-      |> maybe_add_flame()
-      |> maybe_add_db()
-      |> maybe_add_bumblebee_embedding()
-      |> maybe_add_python_workers()
+      if Application.get_env(:buildel, :flame_worker) == true do
+        [
+          Buildel.Repo,
+          Buildel.MemoriesGraph,
+          :poolboy.child_spec(:worker, python_poolboy_config())
+        ]
+      else
+        [
+          # Start the Telemetry supervisor
+          BuildelWeb.Telemetry,
+          # Start the PubSub system
+          {Phoenix.PubSub, name: Buildel.PubSub},
+          # Start Finch
+          {Finch, name: Buildel.Finch},
+          # Start the Logs system
+          Buildel.Logs,
+          Buildel.Logs.DBPipelineLogger,
+          Buildel.LogsAggregator,
+          # Start the Endpoint (http/https)
+          BuildelWeb.Endpoint,
+          # Start a worker by calling: Buildel.Worker.start_link(arg)
+          Buildel.Pipelines.Runner,
+          {Task.Supervisor, name: Buildel.TaskSupervisor},
+          {Buildel.Experiments.Runner, name: Buildel.Experiments.Runner},
+          :poolboy.child_spec(:worker, Buildel.Experiments.Runner.poolboy_config()),
+          # Start the vault used for encryption
+          Buildel.Vault,
+          # JWKS storage
+          BuildelWeb.GoogleJwksStrategy,
+          {BuildelWeb.MetricsStorage, BuildelWeb.Telemetry.metrics()},
+          Buildel.Memories.MemoryFile,
+          Buildel.Datasets.DatasetFile,
+          Buildel.MemoriesGraph,
+          Buildel.Cache
+        ]
+        |> maybe_add_flame()
+        |> maybe_add_db()
+        |> maybe_add_bumblebee_embedding()
+        |> maybe_add_python_workers()
+      end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Buildel.Supervisor]
+
     Supervisor.start_link(children, opts)
   end
 
@@ -108,7 +117,8 @@ defmodule Buildel.Application do
   end
 
   defp maybe_add_python_workers(children) do
-    if Application.get_env(:buildel, :file_loader) == Buildel.FileLoaderUnstructuredLocalAdapter do
+    if Application.get_env(:buildel, :file_loader) == Buildel.FileLoaderUnstructuredLocalAdapter ||
+         Application.get_env(:buildel, :flame_worker) == :dev do
       children ++
         [
           :poolboy.child_spec(:worker, python_poolboy_config())

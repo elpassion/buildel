@@ -192,75 +192,63 @@ defmodule Buildel.MemoriesGraph do
     :ok
   end
 
-  defp reduce_dimensions(
-         %Organization{} = organization,
-         %MemoryCollection{} = collection
-       ) do
+  def reduce_dimensions(
+        %Organization{} = organization,
+        %MemoryCollection{} = collection
+      ) do
     collection_name = Buildel.Memories.organization_collection_name(organization, collection)
+    path = Temp.path!()
 
-    with result when result != [] <-
-           Repo.all(
-             from c in Buildel.VectorDB.EctoAdapter.Chunk,
-               select: {c.embedding_3072, c.embedding_1536, c.embedding_384, c.id},
-               where: c.collection_name == ^collection_name
-           )
-           |> Enum.shuffle() do
-      embeddings =
-        case Enum.at(result, 0) do
-          {_, nil, nil, _} ->
-            result |> Enum.map(fn {embedding, _, _, _id} -> Pgvector.to_list(embedding) end)
+    query =
+      from c in Buildel.VectorDB.EctoAdapter.Chunk,
+        select: %{
+          embedding:
+            fragment("COALESCE (embedding_3072, embedding_1536, embedding_384) as embedding"),
+          id: c.id
+        },
+        where: c.collection_name == ^collection_name
 
-          {nil, _, nil, _} ->
-            result |> Enum.map(fn {_, embedding, _, _id} -> Pgvector.to_list(embedding) end)
+    IO.inspect("before stream")
 
-          {nil, nil, _, _} ->
-            result |> Enum.map(fn {_, _, embedding, _id} -> Pgvector.to_list(embedding) end)
-        end
+    file = File.stream!(path, [:write, :utf8, :line])
 
-      result =
-        result |> Enum.map(fn {_, _, _, id} -> %{id: id} end)
-
-      tensor_data = Nx.tensor(embeddings)
-
-      reduced_embeddings =
-        Scholar.Manifold.TSNE.fit(tensor_data,
-          key: Nx.Random.key(42),
-          num_components: 2,
-          perplexity: 15,
-          exaggeration: 10.0,
-          learning_rate: 500,
-          init: :random,
-          metric: :squared_euclidean
-        )
-        |> Nx.to_list()
-        |> Enum.with_index()
-        |> Enum.map(fn {point, index} ->
-          record = Enum.at(result, index)
-          %{id: record.id, point: point}
-        end)
-
-      Enum.reduce(reduced_embeddings, Ecto.Multi.new(), fn %{id: id, point: point}, multi ->
-        multi
-        |> Ecto.Multi.update_all(
-          id |> String.to_atom(),
-          fn _ ->
-            from(c in Buildel.VectorDB.EctoAdapter.Chunk,
-              where: c.id == ^id,
-              update: [set: [embedding_reduced_2: ^point]]
-            )
-          end,
-          []
-        )
+    Buildel.Repo.transaction(fn ->
+      query
+      |> Buildel.Repo.stream(max_rows: 100)
+      |> Stream.flat_map(fn %{embedding: embedding, id: id} ->
+        [Jason.encode_to_iodata!(%{embedding: Pgvector.to_list(embedding), id: id}), "\n"]
       end)
-      |> Buildel.Repo.transaction()
+      |> Stream.into(file)
+      |> Stream.run()
+    end)
 
-      :ok
-    else
-      result when is_list(result) ->
-        :ok
+    IO.inspect("after stream")
 
-      e ->
-        e
-    end
+    Buildel.PythonWorker.reduce_dimensions(path)
+
+    IO.inspect("Reduced embeddings. Saving...")
+
+    File.stream!(path, encoding: :utf8)
+    |> Stream.map(fn row ->
+      Jason.decode!(row, keys: :atoms!)
+    end)
+    |> Enum.reduce(Ecto.Multi.new(), fn %{id: id, embedding: embedding}, multi ->
+      multi
+      |> Ecto.Multi.update_all(
+        {:insert, id},
+        fn _ ->
+          from(c in Buildel.VectorDB.EctoAdapter.Chunk,
+            where: c.id == ^id,
+            update: [set: [embedding_reduced_2: ^embedding]]
+          )
+        end,
+        []
+      )
+    end)
+    |> Buildel.Repo.transaction()
+
+    IO.inspect("Saved reduced embeddings")
+
+    :ok
   end
 end
