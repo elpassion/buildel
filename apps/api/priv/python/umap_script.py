@@ -4,7 +4,8 @@ import json
 
 def reduce_dimensions(path):
     n_neighbors=15
-    min_dist=0.5
+    min_dist=0.75
+    spread=3
     n_components=2
     # read file and parse json
     print("Loading data...")
@@ -16,7 +17,7 @@ def reduce_dimensions(path):
             data_entry = json.loads(line)
             data.append(data_entry)
     print("Starting UMAP reduction...")
-    reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist, n_components=n_components, metric='euclidean')
+    reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist, spread=spread, n_components=n_components, metric='euclidean')
     embeddings = map(lambda x: x['embedding'], data)
     embedding = reducer.fit_transform(list(embeddings))
     print("UMAP reduction complete.")
