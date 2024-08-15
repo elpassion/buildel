@@ -91,7 +91,7 @@ defmodule Buildel.Application do
            name: Buildel.CollectionGraphRunner,
            min: 0,
            max: 1,
-           max_concurrency: 1,
+           max_concurrency: 2,
            idle_shutdown_after: 30_000}
         ]
     end
