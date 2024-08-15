@@ -14,12 +14,8 @@ defmodule Buildel.Application do
     is_worker =
       Application.get_env(:buildel, :flame_worker, System.get_env("IS_FLAME", "false") == "true")
 
-    IO.inspect(is_worker, label: "IS_WORKER")
-
     children =
       if is_worker == true do
-        IO.inspect("Starting as python worker")
-
         [
           :poolboy.child_spec(:worker_p, python_poolboy_config()),
           Buildel.Repo,

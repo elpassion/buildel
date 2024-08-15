@@ -85,8 +85,6 @@ defmodule Buildel.PythonWorker do
 
   def handle_call({:reduce_dimensions, path}, _from, pid) do
     :python.call(pid, :umap_script, :reduce_dimensions, [path])
-    # IO.inspect("reading file...")
-    # result = File.read!(path) |> Jason.decode!()
     IO.inspect("Back to worker")
     Logger.debug("[#{__MODULE__}] Handled call")
     {:reply, {:ok, []}, pid}
