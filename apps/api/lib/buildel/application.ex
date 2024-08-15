@@ -11,11 +11,13 @@ defmodule Buildel.Application do
       config: %{metadata: [:file, :line]}
     })
 
-    IO.inspect("STARTING")
-    IO.inspect(Application.get_env(:buildel, :flame_worker))
+    is_worker =
+      Application.get_env(:buildel, :flame_worker, System.get_env("IS_FLAME", "false") == "true")
+
+    IO.inspect(is_worker, label: "IS_WORKER")
 
     children =
-      if Application.get_env(:buildel, :flame_worker) == true do
+      if is_worker == true do
         IO.inspect("Starting as python worker")
 
         [
