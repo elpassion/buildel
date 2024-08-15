@@ -215,8 +215,8 @@ defmodule Buildel.MemoriesGraph do
     Buildel.Repo.transaction(fn ->
       query
       |> Buildel.Repo.stream(max_rows: 100)
-      |> Stream.map(fn %{embedding: embedding, id: id} ->
-        Jason.encode!(%{embedding: Pgvector.to_list(embedding), id: id}) <> "\n"
+      |> Stream.flat_map(fn %{embedding: embedding, id: id} ->
+        [Jason.encode_to_iodata!(%{embedding: Pgvector.to_list(embedding), id: id}), "\n"]
       end)
       |> Stream.into(file)
       |> Stream.run()
