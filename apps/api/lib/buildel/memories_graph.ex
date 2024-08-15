@@ -230,31 +230,28 @@ defmodule Buildel.MemoriesGraph do
 
     query =
       from c in Buildel.VectorDB.EctoAdapter.Chunk,
-        select: {c.embedding_3072, c.embedding_1536, c.embedding_384, c.id},
+        select: %{
+          embedding:
+            fragment("COALESCE (embedding_3072, embedding_1536, embedding_384) as embedding"),
+          id: c.id
+        },
         where: c.collection_name == ^collection_name
 
     IO.inspect("before stream")
 
-    stream =
-      Buildel.Repo.transaction(fn ->
-        query
-        |> Buildel.Repo.stream()
-        |> Stream.map(fn
-          {embedding, nil, nil, id} ->
-            %{embedding: Pgvector.to_list(embedding), id: id}
+    file = File.stream!(path, [:write, :utf8])
 
-          {nil, embedding, nil, id} ->
-            %{embedding: Pgvector.to_list(embedding), id: id}
-
-          {nil, nil, embedding, id} ->
-            %{embedding: Pgvector.to_list(embedding), id: id}
-        end)
-        |> Stream.map(fn file -> Jason.encode!(file) <> "\n" end)
-        |> Stream.into(File.stream!(path, [:write, :utf8]))
-        |> Stream.run()
+    Buildel.Repo.transaction(fn ->
+      query
+      |> Buildel.Repo.stream(max_rows: 100)
+      |> Stream.map(fn %{embedding: embedding, id: id} ->
+        Jason.encode!(%{embedding: Pgvector.to_list(embedding), id: id}) <> "\n"
       end)
+      |> Stream.into(file)
+      |> Stream.run()
+    end)
 
-    IO.inspect("dupa")
+    IO.inspect("after stream")
 
     Buildel.PythonWorker.reduce_dimensions(path)
 
@@ -266,8 +263,6 @@ defmodule Buildel.MemoriesGraph do
       |> Enum.map(fn %{"embedding" => embedding, "id" => id} ->
         %{id: id, point: embedding}
       end)
-
-    IO.inspect("Reduced embeddings. Saving...")
 
     Enum.reduce(reduced_embeddings, Ecto.Multi.new(), fn %{id: id, point: point}, multi ->
       multi

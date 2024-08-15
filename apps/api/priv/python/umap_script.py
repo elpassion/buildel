@@ -17,7 +17,6 @@ def reduce_dimensions(path):
             data.append(data_entry)
     print("Starting UMAP reduction...")
     reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist, n_components=n_components, metric='euclidean')
-    print(data[0]['embedding'])
     embeddings = map(lambda x: x['embedding'], data)
     embedding = reducer.fit_transform(list(embeddings))
     print("UMAP reduction complete.")
