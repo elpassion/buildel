@@ -8,6 +8,8 @@ if log_level = System.get_env("LOG_LEVEL") do
   config :logger, level: String.to_atom(log_level)
 end
 
+IO.inspect(config_env())
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -81,6 +83,8 @@ if config_env() == :prod do
   config :build, :flame_worker, System.get_env("IS_FLAME", "false") == "true"
 
   config :flame, :backend, FLAME.FlyBackend
+
+  IO.inspect(System.get_env("IS_FLAME"), label: "IS_FLAME")
 
   config :flame, FLAME.FlyBackend,
     token: System.get_env("FLY_API_TOKEN"),
