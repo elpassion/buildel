@@ -16,7 +16,7 @@ defmodule Buildel.Application do
         [
           Buildel.Repo,
           Buildel.MemoriesGraph,
-          :poolboy.child_spec(:worker, python_poolboy_config())
+          :poolboy.child_spec(:python_worker, python_poolboy_config())
         ]
       else
         [
@@ -121,7 +121,7 @@ defmodule Buildel.Application do
          Application.get_env(:buildel, :flame_worker) == :dev do
       children ++
         [
-          :poolboy.child_spec(:worker, python_poolboy_config())
+          :poolboy.child_spec(:python_worker, python_poolboy_config())
         ]
     else
       children
