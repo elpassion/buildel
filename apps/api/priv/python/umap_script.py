@@ -23,7 +23,9 @@ def reduce_dimensions(path):
  
     with open(path, "w") as outfile:
         changed_data = [{'embedding': e, 'id': data[index]['id']} for index, e in enumerate(embedding.tolist())]
-        json.dump(changed_data, outfile)
+        for row in changed_data:
+            json.dump(row, outfile)
+            outfile.write("\n")
 
     print("UMAP saved to file.")
     return "ok"

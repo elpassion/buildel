@@ -163,35 +163,6 @@ defmodule Buildel.MemoriesGraph do
     result |> Enum.drop(1)
   end
 
-  defmodule Umap do
-    def start_link do
-      {:ok, pid} =
-        :python.start_link(python: ~c"python3", python_path: ~c"./lib/buildel/")
-
-      {:ok, pid}
-    end
-
-    def reduce_dimensions(data, opts \\ []) do
-      {:ok, pid} = start_link()
-
-      n_neighbors = Keyword.get(opts, :n_neighbors, 15)
-      min_dist = Keyword.get(opts, :min_dist, 0.1)
-      n_components = Keyword.get(opts, :n_components, 2)
-      metric = Keyword.get(opts, :metric, "euclidean")
-
-      try do
-        :python.call(pid, :umap_script, :reduce_dimensions, [
-          n_neighbors,
-          min_dist,
-          n_components
-        ])
-        |> IO.inspect()
-      rescue
-        e -> e |> IO.inspect()
-      end
-    end
-  end
-
   def generate_and_save_graph(
         %Organization{} = organization,
         %MemoryCollection{} = collection
@@ -239,7 +210,7 @@ defmodule Buildel.MemoriesGraph do
 
     IO.inspect("before stream")
 
-    file = File.stream!(path, [:write, :utf8])
+    file = File.stream!(path, [:write, :utf8, :line])
 
     Buildel.Repo.transaction(fn ->
       query
@@ -257,21 +228,18 @@ defmodule Buildel.MemoriesGraph do
 
     IO.inspect("Reduced embeddings. Saving...")
 
-    reduced_embeddings =
-      File.read!(path)
-      |> Jason.decode!()
-      |> Enum.map(fn %{"embedding" => embedding, "id" => id} ->
-        %{id: id, point: embedding}
-      end)
-
-    Enum.reduce(reduced_embeddings, Ecto.Multi.new(), fn %{id: id, point: point}, multi ->
+    File.stream!(path, encoding: :utf8)
+    |> Stream.map(fn row ->
+      Jason.decode!(row, keys: :atoms!)
+    end)
+    |> Enum.reduce(Ecto.Multi.new(), fn %{id: id, embedding: embedding}, multi ->
       multi
       |> Ecto.Multi.update_all(
-        id |> String.to_atom(),
+        {:insert, id},
         fn _ ->
           from(c in Buildel.VectorDB.EctoAdapter.Chunk,
             where: c.id == ^id,
-            update: [set: [embedding_reduced_2: ^point]]
+            update: [set: [embedding_reduced_2: ^embedding]]
           )
         end,
         []
