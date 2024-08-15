@@ -92,7 +92,8 @@ if config_env() == :prod do
       "DATABASE_URL" => System.fetch_env!("DATABASE_URL"),
       "POOL_SIZE" => "1",
       "ECTO_IPV6" => "true",
-      "IS_FLAME" => "true"
+      "IS_FLAME" => "true",
+      "NUMBA_CACHE_DIR" => "/tmp"
     }
 
   if api_key = System.get_env("RESEND_API_KEY") do
