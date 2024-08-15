@@ -13,10 +13,12 @@ defmodule Buildel.Application do
 
     children =
       if Application.get_env(:buildel, :flame_worker) == true do
+        IO.inspect("Starting as python worker")
+
         [
+          :poolboy.child_spec(:worker_p, python_poolboy_config()),
           Buildel.Repo,
-          Buildel.MemoriesGraph,
-          :poolboy.child_spec(:python_worker, python_poolboy_config())
+          Buildel.MemoriesGraph
         ]
       else
         [
@@ -121,7 +123,7 @@ defmodule Buildel.Application do
          Application.get_env(:buildel, :flame_worker) == :dev do
       children ++
         [
-          :poolboy.child_spec(:python_worker, python_poolboy_config())
+          :poolboy.child_spec(:worker_p, python_poolboy_config())
         ]
     else
       children
