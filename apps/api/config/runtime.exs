@@ -78,6 +78,8 @@ if config_env() == :prod do
 
   config :buildel, :skip_flame, System.get_env("SKIP_FLAME", "true") == "true"
 
+  config :build, :flame_worker, System.get_env("IS_FLAME", "false") == "true"
+
   config :flame, :backend, FLAME.FlyBackend
 
   config :flame, FLAME.FlyBackend,
@@ -85,7 +87,8 @@ if config_env() == :prod do
     env: %{
       "DATABASE_URL" => System.fetch_env!("DATABASE_URL"),
       "POOL_SIZE" => "1",
-      "ECTO_IPV6" => "true"
+      "ECTO_IPV6" => "true",
+      "IS_FLAME" => "true"
     }
 
   if api_key = System.get_env("RESEND_API_KEY") do
