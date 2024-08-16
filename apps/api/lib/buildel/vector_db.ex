@@ -205,10 +205,10 @@ defmodule Buildel.VectorDB.EctoAdapter.Chunk do
     field :embedding_3072, Pgvector.Ecto.Vector
     field :embedding_1536, Pgvector.Ecto.Vector
     field :embedding_384, Pgvector.Ecto.Vector
-    field :embedding_reduced_2, Pgvector.Ecto.Vector
     field :document, :string
     field :metadata, :map
     field :similarity, :float, virtual: true
+    field :point, {:array, :float}, virtual: true
 
     timestamps()
   end

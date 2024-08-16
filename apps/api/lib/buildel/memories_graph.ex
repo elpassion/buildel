@@ -95,7 +95,7 @@ defmodule Buildel.MemoriesGraph do
     |> Enum.map(fn {point, id, document, metadata} ->
       %{
         id: id,
-        embedding_reduced_2: point,
+        point: point,
         document: document,
         metadata: metadata
       }
@@ -103,28 +103,30 @@ defmodule Buildel.MemoriesGraph do
   end
 
   def get_node_details(
-        %Organization{} = organization,
-        %MemoryCollection{} = collection,
+        %Organization{} = _organization,
+        %MemoryCollection{} = _collection,
         chunk_id
       ) do
-    collection_name = Buildel.Memories.organization_collection_name(organization, collection)
-
-    Repo.one(
-      from c in Buildel.VectorDB.EctoAdapter.Chunk,
-        select: %{
-          c
-          | embedding_1536: nil,
-            embedding_3072: nil,
-            embedding_384: nil
-        },
-        where: c.collection_name == ^collection_name and c.id == ^chunk_id
+    Buildel.VectorDB.EctoAdapter.Chunk
+    |> where(id: ^chunk_id)
+    |> join(:left, [c], p in Buildel.VectorDB.EctoAdapter.MemoryGraphPoint, on: p.id == c.id)
+    |> select(
+      [c],
+      %{
+        c
+        | embedding_1536: nil,
+          embedding_3072: nil,
+          embedding_384: nil
+      }
     )
+    |> select_merge([_c, p], %{point: p.point})
+    |> Repo.one()
     |> case do
       nil ->
         {:error, :not_found}
 
       chunk ->
-        {:ok, %{chunk | embedding_reduced_2: Pgvector.to_list(chunk.embedding_reduced_2)}}
+        {:ok, chunk}
     end
   end
 

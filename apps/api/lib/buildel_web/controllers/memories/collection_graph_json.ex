@@ -8,7 +8,7 @@ defmodule BuildelWeb.CollectionGraphJSON do
       data: %{
         id: chunk.id,
         memory_id: Map.get(chunk.metadata, "memory_id"),
-        point: chunk.embedding_reduced_2,
+        point: chunk.point,
         content: chunk.document,
         next: Map.get(chunk.metadata, "next"),
         prev: Map.get(chunk.metadata, "prev"),
@@ -42,14 +42,14 @@ defmodule BuildelWeb.CollectionGraphJSON do
     %{
       nodes:
         Enum.map(graph, fn %{
-                             embedding_reduced_2: embedding_reduced_2,
+                             point: point,
                              id: id,
                              metadata: metadata
                            } ->
           %{
             id: id,
             memory_id: Map.get(metadata, "memory_id"),
-            point: embedding_reduced_2
+            point: point
           }
         end)
     }
