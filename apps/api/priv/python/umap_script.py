@@ -7,6 +7,8 @@ database_url = os.environ.get('DATABASE_URL', "postgres://postgres:postgres@loca
 
 conn = psycopg2.connect(database_url)
 
+collection_reducers = dict()
+
 def reduce_dimensions(collection_name):
     n_neighbors=15
     min_dist=0.75
@@ -26,9 +28,17 @@ def reduce_dimensions(collection_name):
     data = cursor.fetchall()
     embeddings = [e[0][1:-1].split(",") for e in data]
     print("Starting UMAP reduction...")
-    reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist, spread=spread, n_components=n_components, metric='euclidean')
-    embedding = reducer.fit_transform(list(embeddings))
-    
+    reducer = collection_reducers.get(collection_name)
+    if (reducer != None):
+        print("GOT PREVIOUS REDUCER")
+        embedding = reducer.transform(list(embeddings))
+    else:
+        print("NEW REDUCER")
+        reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist, spread=spread, n_components=n_components, metric='euclidean')
+        embedding = reducer.fit_transform(list(embeddings))
+
+    collection_reducers[collection_name] = reducer
+
     print("Deleting previous graph...")
     cursor.execute(
         """

@@ -83,15 +83,12 @@ defmodule Buildel.Experiments.Runs do
            experiment_run.experiment.dataset |> Buildel.Datasets.Rows.list_dataset_rows(),
          %Pipeline{} = pipeline <- experiment_run.experiment.pipeline,
          {:ok, pipeline_config} <- Pipelines.get_pipeline_config(pipeline, "latest") do
-      multi = Ecto.Multi.new()
-
       multi =
-        Ecto.Multi.one(multi, :experiment_run, fn _ ->
+        Ecto.Multi.new()
+        |> Ecto.Multi.one(:experiment_run, fn _ ->
           from(er in Run, where: er.id == ^experiment_run.id)
         end)
-
-      multi =
-        Ecto.Multi.update(multi, :start_experiment_run, fn %{experiment_run: experiment_run} ->
+        |> Ecto.Multi.update(:start_experiment_run, fn %{experiment_run: experiment_run} ->
           Run.update_status(experiment_run, :running)
         end)
 
