@@ -81,15 +81,21 @@ defmodule Buildel.MemoriesGraph do
       ) do
     collection_name = Buildel.Memories.organization_collection_name(organization, collection)
 
-    Repo.all(
+    query =
       from c in Buildel.VectorDB.EctoAdapter.Chunk,
-        select: {c.embedding_reduced_2, c.id, c.document, c.metadata},
-        where: c.collection_name == ^collection_name and not is_nil(c.embedding_reduced_2)
-    )
-    |> Enum.map(fn {embedding_reduced_2, id, document, metadata} ->
+        where: c.collection_name == ^collection_name,
+        join: p in Buildel.VectorDB.EctoAdapter.MemoryGraphPoint,
+        on: p.id == c.id
+
+    query =
+      from [c, p] in query,
+        select: {p.point, c.id, c.document, c.metadata}
+
+    Repo.all(query)
+    |> Enum.map(fn {point, id, document, metadata} ->
       %{
         id: id,
-        embedding_reduced_2: Pgvector.to_list(embedding_reduced_2),
+        embedding_reduced_2: point,
         document: document,
         metadata: metadata
       }
@@ -197,55 +203,8 @@ defmodule Buildel.MemoriesGraph do
         %MemoryCollection{} = collection
       ) do
     collection_name = Buildel.Memories.organization_collection_name(organization, collection)
-    path = Temp.path!()
 
-    query =
-      from c in Buildel.VectorDB.EctoAdapter.Chunk,
-        select: %{
-          embedding:
-            fragment("COALESCE (embedding_3072, embedding_1536, embedding_384) as embedding"),
-          id: c.id
-        },
-        where: c.collection_name == ^collection_name
-
-    IO.inspect("before stream")
-
-    file = File.stream!(path, [:write, :utf8, :line])
-
-    Buildel.Repo.transaction(fn ->
-      query
-      |> Buildel.Repo.stream(max_rows: 100)
-      |> Stream.flat_map(fn %{embedding: embedding, id: id} ->
-        [Jason.encode_to_iodata!(%{embedding: Pgvector.to_list(embedding), id: id}), "\n"]
-      end)
-      |> Stream.into(file)
-      |> Stream.run()
-    end)
-
-    IO.inspect("after stream")
-
-    Buildel.PythonWorker.reduce_dimensions(path)
-
-    IO.inspect("Reduced embeddings. Saving...")
-
-    File.stream!(path, encoding: :utf8)
-    |> Stream.map(fn row ->
-      Jason.decode!(row, keys: :atoms!)
-    end)
-    |> Enum.reduce(Ecto.Multi.new(), fn %{id: id, embedding: embedding}, multi ->
-      multi
-      |> Ecto.Multi.update_all(
-        {:insert, id},
-        fn _ ->
-          from(c in Buildel.VectorDB.EctoAdapter.Chunk,
-            where: c.id == ^id,
-            update: [set: [embedding_reduced_2: ^embedding]]
-          )
-        end,
-        []
-      )
-    end)
-    |> Buildel.Repo.transaction()
+    Buildel.PythonWorker.reduce_dimensions(collection_name)
 
     IO.inspect("Saved reduced embeddings")
 

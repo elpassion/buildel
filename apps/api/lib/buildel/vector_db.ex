@@ -184,6 +184,16 @@ defmodule Buildel.VectorDB.QdrantAdapter do
   end
 end
 
+defmodule Buildel.VectorDB.EctoAdapter.MemoryGraphPoint do
+  use Ecto.Schema
+  @primary_key {:id, Ecto.UUID, autogenerate: true}
+
+  schema "memories_graph_points" do
+    field :graph_name, :string
+    field :point, {:array, :float}
+  end
+end
+
 defmodule Buildel.VectorDB.EctoAdapter.Chunk do
   use Ecto.Schema
   import Ecto.Changeset
