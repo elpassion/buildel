@@ -131,6 +131,8 @@ defmodule Buildel.Memories do
       )
       |> Stream.run()
 
+      Buildel.MemoriesGraph.generate_and_save_graph(organization, collection, memory)
+
       {:ok, memory}
     end
   end
@@ -217,6 +219,8 @@ defmodule Buildel.Memories do
         |> put_in([Access.all(), Access.key!(:metadata), :file_name], metadata.file_name)
 
       Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
+
+      Buildel.MemoriesGraph.generate_and_save_graph(organization, collection, memory)
 
       {:ok, memory}
     else

@@ -173,40 +173,54 @@ defmodule Buildel.MemoriesGraph do
 
   def generate_and_save_graph(
         %Organization{} = organization,
-        %MemoryCollection{} = collection
+        %MemoryCollection{} = collection,
+        memory \\ nil
       ) do
-    %Task{pid: pid} =
-      Task.Supervisor.async(
-        Buildel.TaskSupervisor,
-        fn ->
-          FLAME.call(
-            Buildel.CollectionGraphRunner,
-            fn ->
-              case reduce_dimensions(organization, collection) do
-                :ok -> :ok
-                e -> Logger.debug("Failed to reduce dimensions: #{inspect(e)}")
-              end
-            end,
-            timeout: 5 * 60_000
-          )
+    collection_name = Buildel.Memories.organization_collection_name(organization, collection)
 
-          GenServer.cast(__MODULE__, {:remove, collection.id})
-        end,
-        shutdown: 5 * 60_000
-      )
+    should_build =
+      !memory ||
+        (memory &&
+           Buildel.VectorDB.EctoAdapter.MemoryGraphPoint
+           |> where(graph_name: ^collection_name)
+           |> Buildel.Repo.exists?())
 
-    GenServer.cast(__MODULE__, {:add, %State.Task{collection: collection, pid: pid}})
+    if should_build do
+      %Task{pid: pid} =
+        Task.Supervisor.async(
+          Buildel.TaskSupervisor,
+          fn ->
+            FLAME.call(
+              Buildel.CollectionGraphRunner,
+              fn ->
+                case reduce_dimensions(organization, collection, memory) do
+                  :ok -> :ok
+                  e -> Logger.debug("Failed to reduce dimensions: #{inspect(e)}")
+                end
+              end,
+              timeout: 5 * 60_000
+            )
+
+            GenServer.cast(__MODULE__, {:remove, collection.id})
+          end,
+          shutdown: 5 * 60_000
+        )
+
+      GenServer.cast(__MODULE__, {:add, %State.Task{collection: collection, pid: pid}})
+    end
 
     :ok
   end
 
   def reduce_dimensions(
         %Organization{} = organization,
-        %MemoryCollection{} = collection
+        %MemoryCollection{} = collection,
+        memory
       ) do
     collection_name = Buildel.Memories.organization_collection_name(organization, collection)
+    memory_id = if memory, do: memory.id, else: nil
 
-    Buildel.PythonWorker.reduce_dimensions(collection_name)
+    Buildel.PythonWorker.reduce_dimensions(collection_name, memory_id)
 
     IO.inspect("Saved reduced embeddings")
 
