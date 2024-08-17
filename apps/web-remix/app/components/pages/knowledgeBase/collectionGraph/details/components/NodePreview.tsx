@@ -32,7 +32,10 @@ export const NodePreview = ({
   searchParams,
 }: NodePreviewProps) => {
   const { onMouseLeave, onMouseOver } = useOutletContext<{
-    onMouseOver: (id: string) => void;
+    onMouseOver: (
+      id: string,
+      options?: { highlightAllMemoryNodes?: string | number },
+    ) => void;
     onMouseLeave: () => void;
   }>();
   const organizationId = useOrganizationId();
@@ -46,8 +49,10 @@ export const NodePreview = ({
             <NodePreviewRowCopyButton value={details.id} />
           </NodePreviewRowHeading>
           <NodePreviewRowContent
-            className="line-clamp-1 cursor-pointer"
-            onMouseEnter={() => onMouseOver(details.id.toString())}
+            className="line-clamp-1 font-semibold cursor-pointer"
+            onMouseEnter={() => {
+              onMouseOver(details.id.toString());
+            }}
             onMouseLeave={onMouseLeave}
           >
             {details.id}
@@ -67,7 +72,17 @@ export const NodePreview = ({
             </div>
             <NodePreviewRowCopyButton value={details.file_name} />
           </NodePreviewRowHeading>
-          <NodePreviewRowContent>{details.file_name}</NodePreviewRowContent>
+          <NodePreviewRowContent
+            className="font-semibold cursor-pointer"
+            onMouseEnter={() => {
+              onMouseOver(details.id.toString(), {
+                highlightAllMemoryNodes: details.memory_id,
+              });
+            }}
+            onMouseLeave={onMouseLeave}
+          >
+            {details.file_name}
+          </NodePreviewRowContent>
         </NodePreviewRow>
 
         {details.prev && (

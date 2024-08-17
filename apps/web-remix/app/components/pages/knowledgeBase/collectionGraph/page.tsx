@@ -45,7 +45,7 @@ export function KnowledgeBaseGraphPage() {
     prevNode,
     nextNode,
     searchParams,
-    fileList
+    fileList,
   } = useLoaderData<typeof loader>();
 
   const { searchChunks } = useSearchedChunks({
@@ -60,6 +60,7 @@ export function KnowledgeBaseGraphPage() {
     activeChunk,
     onError: () => errorToast('Ups! Something went wrong'),
   });
+  const [hoveredNodes, setHoveredNodes] = useState<(string | number)[]>([]);
 
   const matchDetails = useMatch(
     '/:organization_id/knowledge-base/:collection_name/graph/details',
@@ -106,9 +107,9 @@ export function KnowledgeBaseGraphPage() {
   );
   const isRelated = useCallback(
     (id: string) => {
-      return relatedNeighbours.includes(id);
+      return relatedNeighbours.includes(id) || hoveredNodes.includes(id);
     },
-    [relatedNeighbours],
+    [relatedNeighbours, hoveredNodes],
   );
   const isActive = useCallback(
     (id: string) => {
@@ -176,12 +177,25 @@ export function KnowledgeBaseGraphPage() {
     });
   }, [graph.nodes, activeStyles]);
 
-  const onMouseOver = useCallback((id: string) => {
-    setHoveredNode(id);
-  }, []);
+  const onMouseOver = useCallback(
+    (
+      id: string,
+      options: { highlightAllMemoryNodes?: string | number } = {},
+    ) => {
+      setHoveredNode(id);
+      if (options.highlightAllMemoryNodes) {
+        const newNodes = nodes
+          .filter((node) => node.memory_id == options.highlightAllMemoryNodes)
+          .map((node) => node.id);
+        setHoveredNodes(newNodes);
+      }
+    },
+    [],
+  );
 
   const onMouseLeave = useCallback(() => {
     setHoveredNode(null);
+    setHoveredNodes([]);
   }, []);
 
   const links = useMemo(() => {
