@@ -12,13 +12,17 @@ database_url = os.environ.get('DATABASE_URL', "postgres://postgres:postgres@loca
 
 conn = psycopg2.connect(database_url)
 
-if os.path.isfile('/tmp/reducers'):
-    with open('/tmp/reducers', "rb") as input_file:
-        collection_reducers = pickle.load(input_file)
-else:
-    collection_reducers = dict()
-    with open('/tmp/reducers', "wb") as output_file:
-        pickle.dump(collection_reducers, output_file)
+def save_reducer(cursor, collection_name, reducer):
+    cursor.execute("DELETE FROM memories_graph_reducers WHERE graph_name = %s", (collection_name,))
+    cursor.execute("INSERT INTO memories_graph_reducers (graph_name, reducer) VALUES(%s, %s)", (collection_name, pickle.dumps(reducer)))
+
+def get_reducer(cursor, collection_name):
+    cursor.execute("SELECT reducer FROM memories_graph_reducers WHERE graph_name = %s", (collection_name,))
+    result = cursor.fetchone()
+    if (result == None):
+        return None
+    else:
+        return pickle.loads(result[0])
 
 SAMPLE_SIZE = 1500
 
@@ -34,7 +38,7 @@ def reduce_dimensions(collection_name, memory_id):
     else:
         memory_id = None
     cursor = conn.cursor()
-    reducer = collection_reducers.get(collection_name)
+    reducer = get_reducer(cursor, collection_name)
     is_adding = reducer != None and memory_id != None and reducer._raw_data.shape[0] >= SAMPLE_SIZE 
     if (is_adding):
       cursor.execute(
@@ -78,9 +82,7 @@ def reduce_dimensions(collection_name, memory_id):
 
 
     print("Dumping new reducers")
-    collection_reducers[collection_name] = reducer
-    with open('/tmp/reducers', "wb") as output_file:
-        pickle.dump(collection_reducers, output_file)
+    save_reducer(cursor, collection_name, reducer)
 
     print("Deleting previous graph...")
     print(datetime.datetime.now())
