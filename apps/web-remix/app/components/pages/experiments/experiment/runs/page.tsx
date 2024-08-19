@@ -8,18 +8,15 @@ import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Pagination } from '~/components/pagination/Pagination';
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '~/components/ui/card';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
+import {
+  DatasetCard,
+  WorkflowCard,
+} from './components/ExperimentCard.components';
 import { ExperimentRunsCharts } from './components/ExperimentRunsCharts';
 import { ExperimentRunsTable } from './components/ExperimentRunsTable';
 import type { loader } from './loader.server';
@@ -36,7 +33,7 @@ export function ExperimentPage() {
   const isRunning = experimentRuns.some((run) => run.status === 'running');
 
   useRevalidateOnInterval({ enabled: isRunning });
-  console.log(experiment);
+
   return (
     <>
       <AppNavbar
@@ -60,58 +57,14 @@ export function ExperimentPage() {
               className="block grow"
               to={routes.pipelineBuild(organizationId, experiment.pipeline.id)}
             >
-              <Card className="h-full flex flex-col">
-                <CardHeader>
-                  <CardTitle>Workflow</CardTitle>
-                  <CardDescription>
-                    The pipeline used for the experiment.
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="grow flex flex-col justify-end">
-                  <CardParagraph title={experiment.pipeline.name}>
-                    ID:{' '}
-                    <CardParagraphAccent>
-                      {experiment.pipeline.id}
-                    </CardParagraphAccent>
-                  </CardParagraph>
-                  <CardParagraph title={experiment.pipeline.name}>
-                    Name:{' '}
-                    <CardParagraphAccent>
-                      {experiment.pipeline.name}
-                    </CardParagraphAccent>
-                  </CardParagraph>
-                </CardContent>
-              </Card>
+              <WorkflowCard data={experiment.pipeline} />
             </BasicLink>
 
             <BasicLink
               className="block grow"
               to={routes.dataset(organizationId, experiment.dataset.id)}
             >
-              <Card className="h-full flex flex-col">
-                <CardHeader>
-                  <CardTitle>Dataset</CardTitle>
-                  <CardDescription>
-                    The dataset used for the experiment.
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="grow flex flex-col justify-end">
-                  <CardParagraph title={experiment.dataset.name}>
-                    ID:{' '}
-                    <CardParagraphAccent>
-                      {experiment.dataset.id}
-                    </CardParagraphAccent>
-                  </CardParagraph>
-                  <CardParagraph title={experiment.dataset.name}>
-                    Name:{' '}
-                    <CardParagraphAccent>
-                      {experiment.dataset.name}
-                    </CardParagraphAccent>
-                  </CardParagraph>
-                </CardContent>
-              </Card>
+              <DatasetCard data={experiment.dataset} />
             </BasicLink>
           </div>
 
@@ -156,32 +109,5 @@ function ExperimentRunButton({ children, ...props }: ButtonProps) {
     <Button {...props} onClick={onClick}>
       {children}
     </Button>
-  );
-}
-
-function CardParagraph({
-  className,
-  children,
-  ...rest
-}: React.HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p
-      className={cn('line-clamp-1 text-sm text-muted-foreground', className)}
-      {...rest}
-    >
-      {children}
-    </p>
-  );
-}
-
-function CardParagraphAccent({
-  className,
-  children,
-  ...rest
-}: React.HTMLAttributes<HTMLSpanElement>) {
-  return (
-    <span className={cn('text-foreground', className)} {...rest}>
-      {children}
-    </span>
   );
 }

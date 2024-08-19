@@ -23,8 +23,10 @@ export const ExperimentRunRunsCharts = () => {
     <ExperimentRunRunsChartsFilter data={experimentRun.columns_avg}>
       {(data) => {
         return (
-          <ExperimentRunChartsGrid className={cn('mt-2')}>
-            <Card>
+          <ExperimentRunChartsGrid
+            className={cn('mt-2 flex gap-4 items-center overflow-x-auto')}
+          >
+            <Card className="w-[250px] shrink-0">
               <CardHeader>
                 <CardTitle>Evaluation Average</CardTitle>
                 <CardDescription>
@@ -41,7 +43,7 @@ export const ExperimentRunRunsCharts = () => {
             </Card>
 
             {data.map(({ data, column }) => (
-              <Card key={column}>
+              <Card key={column} className="w-[250px] shrink-0">
                 <CardHeader>
                   <CardTitle>{startCase(column)}</CardTitle>
                   <CardDescription className="h-10">

@@ -3,7 +3,12 @@ import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
+import {
+  DatasetCard,
+  WorkflowCard,
+} from '~/components/pages/experiments/experiment/runs/components/ExperimentCard.components';
 import { Pagination } from '~/components/pagination/Pagination';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { metaWithDefaults } from '~/utils/metadata';
@@ -39,8 +44,26 @@ export function ExperimentRunPage() {
       />
 
       <PageContentWrapper className="mt-[120px] pb-3">
-        <div className="mb-4">
-          <ExperimentRunRunsCharts />
+        <div className="grid grid-cols-1 gap-4 mb-8">
+          <div className="w-full flex flex-col sm:flex-row gap-4 h-full shrink-0">
+            <BasicLink
+              className="block grow"
+              to={routes.pipelineBuild(organizationId, experiment.pipeline.id)}
+            >
+              <WorkflowCard data={experiment.pipeline} />
+            </BasicLink>
+
+            <BasicLink
+              className="block grow"
+              to={routes.dataset(organizationId, experiment.dataset.id)}
+            >
+              <DatasetCard data={experiment.dataset} />
+            </BasicLink>
+          </div>
+
+          <div className="grow">
+            <ExperimentRunRunsCharts />
+          </div>
         </div>
 
         <ExperimentRunRunsTable

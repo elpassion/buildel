@@ -34,7 +34,9 @@ export const ExperimentRunRunsChartsFilter = <T = number,>({
     }));
   }, [data]);
 
-  const [activeCharts, setActiveCharts] = useState<string[]>([]);
+  const [activeCharts, setActiveCharts] = useState<string[]>(
+    charts.slice(0, 2).map((chart) => chart.id),
+  );
 
   const isActive = (id: string) => {
     return activeCharts.includes(id);
