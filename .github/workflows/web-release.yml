@@ -37,7 +37,7 @@ jobs:
           if [ "${{ github.event_name }}" == "release" ]; then
             docker build -t ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }} -t ghcr.io/${{ github.repository }}/web-remix:latest .
           else
-            docker build -t ghcr.io/${{ github.repository }}/web-remix:latest .
+            docker build -t ghcr.io/${{ github.repository }}/web-remix:alpha .
           fi
 
       - name: Log in to GitHub Container Registry
@@ -46,9 +46,14 @@ jobs:
       - name: Push Docker image to GHCR
         run: |
           if [ "${{ github.event_name }}" == "release" ]; then
+            is_latest=$(gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name == "${{ github.event.release.tag_name }}"')
+            if [ "$is_latest" == "true" ]; then
+              docker push ghcr.io/${{ github.repository }}/web-remix:latest
+            fi
             docker push ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}
+          else
+            docker push ghcr.io/${{ github.repository }}/web-remix:alpha
           fi
-          docker push ghcr.io/${{ github.repository }}/web-remix:latest
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
         if: ${{ github.event_name == 'push' }}
