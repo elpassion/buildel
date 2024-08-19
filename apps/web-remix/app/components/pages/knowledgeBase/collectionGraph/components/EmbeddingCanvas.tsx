@@ -297,19 +297,38 @@ export function EmbeddingCanvas<T>({
     lastPosRef.current = { x: e.clientX, y: e.clientY };
   };
 
-  const onMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    onDrag(e);
-    onMove(e);
+  const onTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+    const touch = e.touches[0];
+
+    setIsDragging(true);
+    isMouseDown.current = true;
+    lastPosRef.current = { x: touch.clientX, y: touch.clientY };
   };
 
-  const onDrag = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const onMouseMove = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
+    if (isTouchEvent(e)) {
+      const touch = e.touches[0];
+
+      onDrag(touch.clientX, touch.clientY);
+      onMove(touch.clientX, touch.clientY);
+    } else {
+      onDrag(e.clientX, e.clientY);
+      onMove(e.clientX, e.clientY);
+    }
+  };
+
+  const onDrag = (clientX: number, clientY: number) => {
     if (!isMouseDown.current) return;
     isDraggingRef.current = true;
 
-    const dx = e.clientX - lastPosRef.current.x;
-    const dy = e.clientY - lastPosRef.current.y;
+    const dx = clientX - lastPosRef.current.x;
+    const dy = clientY - lastPosRef.current.y;
 
-    lastPosRef.current = { x: e.clientX, y: e.clientY };
+    lastPosRef.current = { x: clientX, y: clientY };
 
     offsetRef.current = {
       x: offsetRef.current.x + dx,
@@ -333,13 +352,13 @@ export function EmbeddingCanvas<T>({
     }
   };
 
-  const onMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const onMove = (clientX: number, clientY: number) => {
     if (isMouseDown.current) return;
     if (!canvasRef.current) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    const mouseX = clientX - rect.left;
+    const mouseY = clientY - rect.top;
 
     const ctx = getContext();
     if (ctx) {
@@ -356,12 +375,16 @@ export function EmbeddingCanvas<T>({
     }
   };
 
-  const onMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const onMouseUp = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
     isMouseDown.current = false;
     setIsDragging(false);
+
     if (!isDraggingRef.current && onClick && hoveredNodeRef.current) {
       if (e.type === 'mouseleave') return;
-
       onClick(hoveredNodeRef.current);
     }
     isDraggingRef.current = false;
@@ -379,8 +402,11 @@ export function EmbeddingCanvas<T>({
       onWheel={onWheel}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
+      onTouchMove={onMouseMove}
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseUp}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onMouseUp}
       className={cn('relative top-0 left-0', {
         'cursor-grabbing': isDragging,
         'cursor-grab': !isDragging,
@@ -392,4 +418,10 @@ export function EmbeddingCanvas<T>({
       }}
     />
   );
+}
+
+function isTouchEvent(
+  e: React.MouseEvent | React.TouchEvent,
+): e is React.TouchEvent {
+  return 'touches' in e;
 }
