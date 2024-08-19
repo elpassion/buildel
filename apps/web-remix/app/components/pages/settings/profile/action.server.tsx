@@ -1,15 +1,17 @@
-import { redirect } from '@remix-run/node';
+import { json } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
 import { withZod } from '@remix-validated-form/with-zod';
 import { validationError } from 'remix-validated-form';
 
 import { CurrentUserApi, UpdateUserSchema } from '~/api/CurrentUserApi';
+import { commitSession, getSession } from '~/session.server';
 import { actionBuilder } from '~/utils.server';
-import { setCurrentUser } from '~/utils/currentUser.server';
-import { routes } from '~/utils/routes.utils';
+import { setServerToast } from '~/utils/toast.server';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({
+    //eslint-disable-next-line
+    //@ts-ignore
     put: async ({ request }, { fetch }) => {
       const validator = withZod(UpdateUserSchema);
 
@@ -21,13 +23,24 @@ export async function action(actionArgs: ActionFunctionArgs) {
 
       const meResponse = await currentUserApi.updateUser(result.data);
 
-      const sessionCookie = await setCurrentUser(request, meResponse.data);
-
-      throw redirect(routes.dashboard, {
-        headers: {
-          'Set-Cookie': sessionCookie,
+      const toastsCookie = await setServerToast(request, {
+        success: {
+          title: 'Settings updated',
+          description: `You've successfully updated profile settings`,
         },
       });
+
+      const session = await getSession(toastsCookie);
+      session.set('user', meResponse.data);
+
+      return json(
+        { user: meResponse.data },
+        {
+          headers: {
+            'Set-Cookie': await commitSession(session),
+          },
+        },
+      );
     },
   })(actionArgs);
 }

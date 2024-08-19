@@ -24,10 +24,11 @@ import {
   SectionContent,
   SectionHeading,
 } from '../settingsLayout/PageLayout';
+import { PreferencesForm } from './components/PreferencesForm';
 import type { loader } from './loader.server';
 
 export function ProfileSettingsPage() {
-  const { organization } = useLoaderData<typeof loader>();
+  const { organization, user } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const match = useMatch(routes.profileSettingsChangePassword(organization.id));
   const isSidebarOpen = !!match;
@@ -49,7 +50,7 @@ export function ProfileSettingsPage() {
         </DialogDrawerContent>
       </DialogDrawer>
 
-      <div className="flex flex-col gap-9">
+      <div className="flex flex-col gap-8">
         <Section>
           <SectionHeading>Password</SectionHeading>
           <SectionContent>
@@ -59,6 +60,16 @@ export function ProfileSettingsPage() {
               </Button>
             </Link>
           </SectionContent>
+        </Section>
+
+        <Section>
+          <SectionHeading>Preferences</SectionHeading>
+          <p className="text-sm text-muted-foreground max-w-[650px] mb-4">
+            Decide how you'd like to stay informed by selecting the options
+            below. Your choices will guide our communication with you.
+          </p>
+
+          <PreferencesForm defaultValues={user} />
         </Section>
       </div>
     </>

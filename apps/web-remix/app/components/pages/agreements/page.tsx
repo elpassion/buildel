@@ -31,7 +31,7 @@ export function AgreementsPage() {
 
         <ValidatedForm
           validator={validator}
-          method="post"
+          method="put"
           noValidate
           className="w-full"
           defaultValues={{
