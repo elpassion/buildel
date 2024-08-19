@@ -20,13 +20,18 @@
 
 .rc-select .rc-select-selection-item,
 .rc-select .rc-select-selection-placeholder {
-  @apply !top-1/2 !left-3 -translate-y-1/2 !text-sm !text-foreground;
+  @apply !top-1/2 !left-3 -translate-y-1/2 !text-sm ;
+}
+.rc-select .rc-select-selection-item {
+  @apply max-w-full line-clamp-1 !text-foreground
 }
 
 .rc-select .rc-select-clear {
-  @apply !text-foreground !text-sm !cursor-pointer !absolute !top-1/2 right-3 -translate-y-1/2;
+  @apply !text-muted-foreground !text-xs !cursor-pointer !absolute !top-1/2 right-3 -translate-y-1/2;
 }
-
+.rc-select .rc-select-clear svg{
+  @apply w-3.5 h-3.5
+}
 .rc-select-dropdown {
   @apply !min-h-fit !bg-white !rounded-lg !border-[1.5px] !border-input !overflow-hidden !z-[61];
 }
