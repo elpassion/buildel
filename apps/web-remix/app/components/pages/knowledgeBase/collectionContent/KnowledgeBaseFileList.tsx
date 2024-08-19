@@ -101,7 +101,9 @@ export const KnowledgeBaseFileListItem: React.FC<
   return (
     <Card>
       <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
-        <CardTitle className="line-clamp-2">{data.file_name}</CardTitle>
+        <CardTitle className="line-clamp-2" title={data.file_name}>
+          {data.file_name}
+        </CardTitle>
 
         <div onClick={(e) => e.preventDefault()}>
           <DropdownMenu>
