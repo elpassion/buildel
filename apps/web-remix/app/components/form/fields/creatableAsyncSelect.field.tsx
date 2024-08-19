@@ -82,7 +82,7 @@ export const CreatableAsyncSelectField = forwardRef<
 
     const [selectedId, setSelectedId] = useControlField<string>(name);
 
-    const handleSetSelectedId = (id: string) => {
+    const onChange = (id: string) => {
       setSelectedId(id);
       validate();
     };
@@ -98,7 +98,7 @@ export const CreatableAsyncSelectField = forwardRef<
           data as IAsyncSelectItem,
         );
 
-        handleSetSelectedId(newItem.id.toString());
+        onChange(newItem.id.toString());
         successToast({ title: 'Success', description: 'Item created!' });
         closeModal();
       } catch (e) {
@@ -133,7 +133,7 @@ export const CreatableAsyncSelectField = forwardRef<
           placeholder="Select..."
           fetchOptions={fetcher}
           defaultValue={defaultValue}
-          onChange={setSelectedId}
+          onChange={onChange}
           value={selectedId}
           onBlur={getInputProps().onBlur}
           {...props}

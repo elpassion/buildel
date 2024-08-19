@@ -31,7 +31,7 @@ export const AsyncSelectField = forwardRef<
     _ref,
   ) => {
     const isMounted = useIsMounted();
-    const { name, getInputProps } = useFieldContext({
+    const { name, getInputProps, validate } = useFieldContext({
       validationBehavior: {
         initial: 'onBlur',
         whenTouched: 'onBlur',
@@ -41,6 +41,11 @@ export const AsyncSelectField = forwardRef<
     const [selectedId, setSelectedId] = useControlField<string | undefined>(
       name,
     );
+
+    const onChange = (id: string) => {
+      setSelectedId(id);
+      validate();
+    };
 
     const fetcher = useCallback(async () => {
       return asyncSelectApi
@@ -64,7 +69,7 @@ export const AsyncSelectField = forwardRef<
           placeholder="Select..."
           fetchOptions={fetcher}
           defaultValue={defaultValue}
-          onChange={setSelectedId}
+          onChange={onChange}
           value={selectedId}
           data-testid={id}
           getPopupContainer={(node) => node.parentNode}
