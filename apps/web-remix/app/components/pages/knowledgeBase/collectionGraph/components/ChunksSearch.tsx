@@ -6,10 +6,12 @@ import { Loader, Search, X } from 'lucide-react';
 import { useFormContext, ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
+import type { IKnowledgeBaseFileListResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { NumberInputField } from '~/components/form/fields/number.field';
+import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { IconButton } from '~/components/iconButton';
 import { cn } from '~/utils/cn';
@@ -17,8 +19,6 @@ import { cn } from '~/utils/cn';
 import { ExtendChunksField } from '../../components/ExtendChunksToggleField';
 import { SearchParams } from '../../components/SearchParams';
 import { SearchSchema } from '../../search.schema';
-import { IKnowledgeBaseFileListResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
-import { SelectField } from '~/components/form/fields/select.field';
 
 interface ChunksSearchProps {
   defaultValue: Partial<z.TypeOf<typeof SearchSchema>>;
@@ -31,7 +31,7 @@ export const ChunksSearch = ({ defaultValue, fileList }: ChunksSearchProps) => {
   const navigate = useNavigate();
   const validator = useMemo(() => withZod(schema), []);
   const memoryOptions = useMemo(() => {
-    return fileList.map(item => ({
+    return fileList.map((item) => ({
       id: item.id,
       value: item.id,
       label: item.file_name,
@@ -56,8 +56,7 @@ export const ChunksSearch = ({ defaultValue, fileList }: ChunksSearchProps) => {
     searchParams.set('extend_neighbors', values.extend_neighbors.toString());
     searchParams.set('extend_parents', values.extend_parents.toString());
     searchParams.set('memory_id', values.memory_id?.toString() ?? '');
-    if (searchParams.get('memory_id') === '')
-      searchParams.delete('memory_id');
+    if (searchParams.get('memory_id') === '') searchParams.delete('memory_id');
 
     navigate({
       pathname: url.pathname,

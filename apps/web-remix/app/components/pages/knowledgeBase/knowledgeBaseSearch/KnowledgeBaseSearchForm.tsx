@@ -4,10 +4,12 @@ import { Loader, Search } from 'lucide-react';
 import { useFormContext, ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
+import type { IKnowledgeBaseFileListResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { NumberInputField } from '~/components/form/fields/number.field';
+import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { IconButton } from '~/components/iconButton';
 import { cn } from '~/utils/cn';
@@ -15,8 +17,6 @@ import { cn } from '~/utils/cn';
 import { ExtendChunksField } from '../components/ExtendChunksToggleField';
 import { SearchParams } from '../components/SearchParams';
 import { SearchSchema } from '../search.schema';
-import { SelectField } from '~/components/form/fields/select.field';
-import { IKnowledgeBaseFileListResponse } from '~/api/knowledgeBase/knowledgeApi.contracts';
 
 interface KnowledgeBaseSearchFormProps {
   defaultValue?: Partial<z.TypeOf<typeof SearchSchema>>;
@@ -28,7 +28,7 @@ export const KnowledgeBaseSearchForm: React.FC<
 > = ({ defaultValue, fileList }) => {
   const validator = useMemo(() => withZod(SearchSchema), []);
   const memoryOptions = useMemo(() => {
-    return fileList.map(item => ({
+    return fileList.map((item) => ({
       id: item.id,
       value: item.id,
       label: item.file_name,
@@ -86,8 +86,10 @@ export const KnowledgeBaseSearchForm: React.FC<
         <Field name="memory_id">
           <FieldLabel>Memory</FieldLabel>
           <SelectField
+            allowClear
             placeholder="Memory name"
             options={memoryOptions}
+            getPopupContainer={(node) => node.parentElement}
           />
           <FieldMessage>
             Filter the search to a specific memory file. Disabled by default.
