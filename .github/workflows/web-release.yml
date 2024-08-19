@@ -5,6 +5,8 @@ on:
       - main
     paths:
       - "apps/web-remix/**"
+  release:
+    types: [published]
 
 defaults:
   run:
@@ -29,7 +31,28 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+
+      - name: Build Docker image
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            docker build -t ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }} -t ghcr.io/${{ github.repository }}/web-remix:latest .
+          else
+            docker build -t ghcr.io/${{ github.repository }}/web-remix:latest .
+          fi
+
+      - name: Log in to GitHub Container Registry
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push Docker image to GHCR
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            docker push ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}
+          fi
+          docker push ghcr.io/${{ github.repository }}/web-remix:latest
+
       - uses: superfly/flyctl-actions/setup-flyctl@master
+        if: ${{ github.event_name == 'push' }}
       - run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.BUILDEL_WEB__FLY_API_TOKEN }}
+        if: ${{ github.event_name == 'push' }}

@@ -5,6 +5,9 @@ on:
       - main
     paths:
       - "apps/api/**"
+  release:
+    types: [published]
+
 defaults:
   run:
     working-directory: apps/api
@@ -67,13 +70,26 @@ jobs:
           POSTGRES_PASSWORD: postgres
 
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/api:${{ github.sha }} .
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            docker build -t ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }} -t ghcr.io/${{ github.repository }}/api:latest .
+          else
+            docker build -t ghcr.io/${{ github.repository }}/api:latest .
+          fi
+
       - name: Log in to GitHub Container Registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
       - name: Push Docker image to GHCR
-        run: docker push ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            docker push ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }}
+          fi
+          docker push ghcr.io/${{ github.repository }}/api:latest
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
+        if: ${{ github.event_name == 'push' }}
       - run: flyctl deploy --remote-only
         env:
           FLY_API_TOKEN: ${{ secrets.BUILDEL_API__FLY_API_TOKEN }}
+        if: ${{ github.event_name == 'push' }}
