@@ -7,6 +7,7 @@ defmodule Buildel.Accounts.User do
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
+    field :marketing_agreement, :boolean
 
     has_many(:invitations, Buildel.Organizations.Invitation)
 
@@ -124,6 +125,12 @@ defmodule Buildel.Accounts.User do
     |> cast(attrs, [:password])
     |> validate_confirmation(:password, message: "does not match password")
     |> validate_password(opts)
+  end
+
+  def update_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:marketing_agreement])
+    |> validate_required([:marketing_agreement])
   end
 
   @doc """

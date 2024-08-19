@@ -233,6 +233,10 @@ defmodule Buildel.Accounts do
     end
   end
 
+  def update_user(user, attrs) do
+    user |> User.update_changeset(attrs) |> Repo.update()
+  end
+
   ## Session
 
   @doc """

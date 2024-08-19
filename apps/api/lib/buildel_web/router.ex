@@ -293,6 +293,7 @@ defmodule BuildelWeb.Router do
     )
 
     get("/users/me", UserController, :me)
+    put("/users", UserController, :update)
     post("/users/log_in", UserSessionController, :create)
     post("/users/google/log_in", UserSessionController, :create_google)
     post("/users/github/log_in", UserSessionController, :create_github)

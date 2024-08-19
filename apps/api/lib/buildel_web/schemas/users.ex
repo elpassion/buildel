@@ -8,9 +8,32 @@ defmodule BuildelWeb.Schemas.Users do
       title: "User",
       type: :object,
       properties: %{
-        id: %Schema{type: :integer, description: "User ID"}
+        id: %Schema{type: :integer, description: "User ID"},
+        marketing_agreement: %Schema{
+          type: :boolean,
+          description: "Marketing agreement",
+          example: true,
+          nullable: true
+        }
       },
-      required: [:id]
+      required: [:id, :marketing_agreement]
+    })
+  end
+
+  defmodule UpdateRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "UserUpdateRequest",
+      type: :object,
+      properties: %{
+        marketing_agreement: %Schema{
+          type: :boolean,
+          description: "Marketing agreement",
+          example: true
+        }
+      },
+      required: [:marketing_agreement]
     })
   end
 

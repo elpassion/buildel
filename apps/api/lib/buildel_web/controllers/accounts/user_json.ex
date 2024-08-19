@@ -7,7 +7,8 @@ defmodule BuildelWeb.UserJSON do
 
   defp data(%User{} = user) do
     %{
-      id: user.id
+      id: user.id,
+      marketing_agreement: user.marketing_agreement
     }
   end
 end
