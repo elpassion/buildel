@@ -42,9 +42,7 @@ export const PreferencesForm = ({ defaultValues }: PreferencesFormProps) => {
         </Field>
       </div>
 
-      <SubmitButton size="lg" className="mt-4 mx-auto">
-        Save
-      </SubmitButton>
+      <SubmitButton className="mt-4 mx-auto">Save</SubmitButton>
     </ValidatedForm>
   );
 };
