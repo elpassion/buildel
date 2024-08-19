@@ -4,6 +4,7 @@ type RouteParam = Record<string, string | number | boolean>;
 
 export const routes = {
   dashboard: '/',
+  agreements: '/agreements',
   login: '/login',
   register: '/register',
   resetPassowrd: () => '/reset-password',
