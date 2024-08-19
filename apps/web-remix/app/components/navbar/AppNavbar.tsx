@@ -25,14 +25,17 @@ export const AppNavbar: React.FC<
 
 interface AppNavbarHeadingProps extends PropsWithChildren {
   className?: string;
+  title?: string;
 }
 export const AppNavbarHeading = ({
   children,
   className,
+  title,
 }: AppNavbarHeadingProps) => {
   return (
     <h1
       className={cn('text-2xl md:text-3xl font-medium text-white', className)}
+      title={title}
     >
       {children}
     </h1>

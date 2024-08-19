@@ -5,7 +5,16 @@ import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
+import { BreadcrumbWrapper } from '~/components/pages/experiments/components/Breadcrumb.components';
 import { Pagination } from '~/components/pagination/Pagination';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '~/components/ui/breadcrumb';
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
@@ -38,7 +47,9 @@ export function ExperimentPage() {
     <>
       <AppNavbar
         leftContent={
-          <AppNavbarHeading>Experiment {experiment.name}</AppNavbarHeading>
+          <AppNavbarHeading className="line-clamp-1" title={experiment.name}>
+            Experiment {experiment.name}
+          </AppNavbarHeading>
         }
       >
         <ExperimentRunButton className="w-fit ml-auto mr-0 hidden lg:flex">
@@ -46,8 +57,24 @@ export function ExperimentPage() {
         </ExperimentRunButton>
       </AppNavbar>
 
-      <PageContentWrapper className="mt-6 lg:mt-[120px] pb-3">
-        <div className="mb-[56px] flex justify-end lg:hidden">
+      <BreadcrumbWrapper>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink to={routes.experiments(organizationId)}>
+                Experiments
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{experiment.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </BreadcrumbWrapper>
+
+      <PageContentWrapper className="pt-[110px] pb-3">
+        <div className="mb-6 flex justify-end lg:hidden">
           <ExperimentRunButton size="sm">Run Experiment</ExperimentRunButton>
         </div>
 

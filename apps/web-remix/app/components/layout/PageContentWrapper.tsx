@@ -3,7 +3,7 @@ import React from 'react';
 
 import { cn } from '~/utils/cn';
 
-interface PageContentWrapperProps extends PropsWithChildren {
+export interface PageContentWrapperProps extends PropsWithChildren {
   className?: string;
 }
 
