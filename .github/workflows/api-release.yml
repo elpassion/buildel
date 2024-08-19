@@ -65,6 +65,14 @@ jobs:
           POSTGRES_PORT: 5432
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+
+      - name: Build Docker image
+        run: docker build -t ghcr.io/${{ github.repository }}/api:${{ github.sha }} .
+      - name: Log in to GitHub Container Registry
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Push Docker image to GHCR
+        run: docker push ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy --remote-only
         env:
