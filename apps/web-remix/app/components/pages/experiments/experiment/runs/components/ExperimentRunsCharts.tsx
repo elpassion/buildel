@@ -19,7 +19,7 @@ export const ExperimentRunsCharts = () => {
   const { onMouseMove, onMouseLeave } = useHighlightedRows(experimentRuns);
 
   return (
-    <ExperimentRunChartsGrid>
+    <ExperimentRunChartsGrid className="!grid-cols-1">
       <Card>
         <CardHeader>
           <CardTitle>Evaluations In Time</CardTitle>

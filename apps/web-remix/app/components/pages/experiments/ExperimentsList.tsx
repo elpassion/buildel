@@ -115,7 +115,7 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
 
       <CardContent className="flex flex-row flex-wrap gap-x-2 gap-y-1">
         <CardDescription className="line-clamp-1 w-full">
-          Pipeline: {data.pipeline.name}
+          Workflow: {data.pipeline.name}
         </CardDescription>
 
         <CardDescription className="line-clamp-1 w-full">

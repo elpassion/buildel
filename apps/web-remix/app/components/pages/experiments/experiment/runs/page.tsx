@@ -3,10 +3,18 @@ import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Pagination } from '~/components/pagination/Pagination';
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
@@ -28,7 +36,7 @@ export function ExperimentPage() {
   const isRunning = experimentRuns.some((run) => run.status === 'running');
 
   useRevalidateOnInterval({ enabled: isRunning });
-
+  console.log(experiment);
   return (
     <>
       <AppNavbar
@@ -46,8 +54,70 @@ export function ExperimentPage() {
           <ExperimentRunButton size="sm">Run Experiment</ExperimentRunButton>
         </div>
 
-        <div className={cn('mb-4', { hidden: experimentRuns.length === 0 })}>
-          <ExperimentRunsCharts />
+        <div className="grid grid-cols-1 gap-4 mb-8 lg:grid-cols-[1fr_2fr]">
+          <div className="flex flex-col sm:flex-row gap-4 h-full lg:flex-col">
+            <BasicLink
+              className="block grow"
+              to={routes.pipelineBuild(organizationId, experiment.pipeline.id)}
+            >
+              <Card className="h-full flex flex-col">
+                <CardHeader>
+                  <CardTitle>Workflow</CardTitle>
+                  <CardDescription>
+                    The pipeline used for the experiment.
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="grow flex flex-col justify-end">
+                  <CardParagraph title={experiment.pipeline.name}>
+                    ID:{' '}
+                    <CardParagraphAccent>
+                      {experiment.pipeline.id}
+                    </CardParagraphAccent>
+                  </CardParagraph>
+                  <CardParagraph title={experiment.pipeline.name}>
+                    Name:{' '}
+                    <CardParagraphAccent>
+                      {experiment.pipeline.name}
+                    </CardParagraphAccent>
+                  </CardParagraph>
+                </CardContent>
+              </Card>
+            </BasicLink>
+
+            <BasicLink
+              className="block grow"
+              to={routes.dataset(organizationId, experiment.dataset.id)}
+            >
+              <Card className="h-full flex flex-col">
+                <CardHeader>
+                  <CardTitle>Dataset</CardTitle>
+                  <CardDescription>
+                    The dataset used for the experiment.
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="grow flex flex-col justify-end">
+                  <CardParagraph title={experiment.dataset.name}>
+                    ID:{' '}
+                    <CardParagraphAccent>
+                      {experiment.dataset.id}
+                    </CardParagraphAccent>
+                  </CardParagraph>
+                  <CardParagraph title={experiment.dataset.name}>
+                    Name:{' '}
+                    <CardParagraphAccent>
+                      {experiment.dataset.name}
+                    </CardParagraphAccent>
+                  </CardParagraph>
+                </CardContent>
+              </Card>
+            </BasicLink>
+          </div>
+
+          <div className={cn('w-full')}>
+            <ExperimentRunsCharts />
+          </div>
         </div>
 
         <ExperimentRunsTable data={experimentRuns} />
@@ -86,5 +156,32 @@ function ExperimentRunButton({ children, ...props }: ButtonProps) {
     <Button {...props} onClick={onClick}>
       {children}
     </Button>
+  );
+}
+
+function CardParagraph({
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  return (
+    <p
+      className={cn('line-clamp-1 text-sm text-muted-foreground', className)}
+      {...rest}
+    >
+      {children}
+    </p>
+  );
+}
+
+function CardParagraphAccent({
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className={cn('text-foreground', className)} {...rest}>
+      {children}
+    </span>
   );
 }
