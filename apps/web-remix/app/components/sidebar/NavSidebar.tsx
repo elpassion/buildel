@@ -49,7 +49,7 @@ export const NavMobileSidebar: React.FC<
       <div className="lg:hidden">
         <Sidebar
           className={cn(
-            'fixed top-0 left-0 !h-screen rounded-r-[1.25rem] z-50 transition duration-200 ease-[cubic-bezier(0.25, 1, 0.5, 1)]',
+            'fixed top-0 left-0 !h-[100dvh] rounded-r-[1.25rem] z-50 transition duration-200 ease-[cubic-bezier(0.25, 1, 0.5, 1)]',
             {
               '-translate-x-full pointer-events-none': !isOpen,
             },

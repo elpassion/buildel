@@ -118,7 +118,7 @@ export const Sidebar = (props: SidebarProps) => {
 
   const sidebarStyles = useCallback(() => {
     const baseStyles =
-      'z-30 h-screen transition-all bg-white border border-neutral-100';
+      'z-30 h-[100dvh] transition-all bg-white border border-neutral-100';
 
     const tabletStyles = cn(baseStyles, 'w-[80px]');
     const desktopStyles = cn(baseStyles, 'w-[278px]');
