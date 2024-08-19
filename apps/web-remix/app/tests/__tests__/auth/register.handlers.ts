@@ -1,5 +1,7 @@
 import { http, HttpResponse } from 'msw';
 
+import type { ICurrentUser } from '~/api/CurrentUserApi';
+
 export const handlers = [
   http.post('/super-api/users/register', () => {
     return HttpResponse.json(null, {
@@ -23,7 +25,10 @@ export const handlers = [
   }),
 
   http.get('/super-api/users/me', () => {
-    return HttpResponse.json({ data: { id: 1 } }, { status: 200 });
+    return HttpResponse.json(
+      { data: { id: 1, marketing_agreement: false } as ICurrentUser },
+      { status: 200 },
+    );
   }),
 ];
 
