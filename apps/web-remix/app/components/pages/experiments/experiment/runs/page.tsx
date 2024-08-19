@@ -6,15 +6,8 @@ import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { BreadcrumbWrapper } from '~/components/pages/experiments/components/Breadcrumb.components';
+import { Breadcrumbs } from '~/components/pages/experiments/components/Breadcrumbs';
 import { Pagination } from '~/components/pagination/Pagination';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '~/components/ui/breadcrumb';
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
@@ -58,19 +51,15 @@ export function ExperimentPage() {
       </AppNavbar>
 
       <BreadcrumbWrapper>
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink to={routes.experiments(organizationId)}>
-                Experiments
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{experiment.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <Breadcrumbs
+          pathConfig={{
+            experimentId: experiment.name,
+            experiments: {
+              url: routes.experiments(organizationId),
+              content: 'Experiments',
+            },
+          }}
+        />
       </BreadcrumbWrapper>
 
       <PageContentWrapper className="pt-[110px] pb-3">

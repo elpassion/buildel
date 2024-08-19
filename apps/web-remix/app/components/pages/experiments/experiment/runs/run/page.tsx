@@ -6,19 +6,12 @@ import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { BreadcrumbWrapper } from '~/components/pages/experiments/components/Breadcrumb.components';
+import { Breadcrumbs } from '~/components/pages/experiments/components/Breadcrumbs';
 import {
   DatasetCard,
   WorkflowCard,
 } from '~/components/pages/experiments/experiment/runs/components/ExperimentCard.components';
 import { Pagination } from '~/components/pagination/Pagination';
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '~/components/ui/breadcrumb';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
@@ -53,27 +46,19 @@ export function ExperimentRunPage() {
       />
 
       <BreadcrumbWrapper>
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink to={routes.experiments(organizationId)}>
-                Experiments
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink
-                to={routes.experiment(organizationId, experiment.id)}
-              >
-                {experiment.name}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Run: {experimentRun.id}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <Breadcrumbs
+          pathConfig={{
+            runId: `Run: ${experimentRun.id}`,
+            experimentId: {
+              url: routes.experiment(organizationId, experimentId),
+              content: experiment.name,
+            },
+            experiments: {
+              url: routes.experiments(organizationId),
+              content: 'Experiments',
+            },
+          }}
+        />
       </BreadcrumbWrapper>
 
       <PageContentWrapper className="mt-[120px] pb-3">
