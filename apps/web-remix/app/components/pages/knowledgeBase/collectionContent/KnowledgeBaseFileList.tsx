@@ -77,7 +77,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
             <CardContent className="min-h-[90px] pt-3 h-full flex justify-center items-center flex-col">
               <CardDescription className="text-sm group-hover:text-foreground transition">
                 <Plus className="mx-auto" />
-                <span className="font-medium">Add new memory file</span>
+                <span className="font-medium">Add new memory</span>
               </CardDescription>
             </CardContent>
           </Card>

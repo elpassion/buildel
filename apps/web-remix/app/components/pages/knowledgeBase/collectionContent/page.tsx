@@ -75,12 +75,12 @@ export function KnowledgeBaseContentPage() {
           <DialogDrawerHeader>
             <DialogDrawerTitle>
               {matchDetails && searchParams.get('file_name')}
-              {matchNew && 'Create New File'}
+              {matchNew && 'Create New Memory'}
               {matchSearch && 'Ask a question to your knowledge base'}
             </DialogDrawerTitle>
 
             <DialogDrawerDescription>
-              {matchNew && 'Upload files to a Knowledge base.'}
+              {matchNew && 'Upload documents to a Knowledge base.'}
               {matchSearch &&
                 "Let's ask your knowledge base some questions so you can see how your chatbot will answer and where it'll take it's information from."}
             </DialogDrawerDescription>
