@@ -163,6 +163,7 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
         level =
           case item["level"] do
             false -> 0
+            true -> 0
             level -> level
           end
 
