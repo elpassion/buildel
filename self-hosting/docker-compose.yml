@@ -1,0 +1,52 @@
+version: "3.5"
+
+services:
+  database:
+    image: pgvector/pgvector:0.7.2-pg15
+    ports:
+      - "54321:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./init-database.sql:/docker-entrypoint-initdb.d/init-database.sql
+      - pg_data:/var/lib/postgresql/data/
+      - ./postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+
+  nlm:
+    image: ghcr.io/nlmatics/nlm-ingestor:latest
+    ports:
+      - "5010:5001"
+  
+  web-remix:
+    image: ghcr.io/elpassion/buildel/web-remix:latest
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      - API_URL=http://api:4000
+      - PORT=3000
+      - METRICS_PORT=3010
+      - PAGE_URL=http://127.0.0.1:3000
+      - SENTRY_DSN=string
+      - SESSION_SECRET=secret
+      - GOOGLE_CLIENT_ID=google_client_id
+      - GOOGLE_CLIENT_SECRET=secret
+      - GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
+
+  api:
+    image: ghcr.io/elpassion/buildel/api:latest
+    command: ["sh", "-c", "/app/bin/migrate && /app/bin/server"]
+    restart: always
+    depends_on:
+      - nlm
+      - database
+    ports:
+      - 4000:4000
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@database:5432/postgres
+      - SECRET_KEY_BASE=PaafDvUuWck9JFCo7x4kCA99Zarse36TmQvoZe/iW6L1ohmH31luAd4q2RI4mlU4
+      - ENCRYPTION_KEY=SXgbxNqc73TsknZpgmCNS51pJAinwb4EA3dnd8kYdup=
+
+volumes:
+  pg_data:

@@ -4,6 +4,7 @@
     "build": "mix release",
     "dev": "mix phx.server",
     "dependencies:up": "mix dependencies.up",
+    "dependencies:stop": "mix dependencies.stop",
     "lint": "mix format --check-formatted",
     "test": "mix test",
     "postinstall": "mix deps.get"

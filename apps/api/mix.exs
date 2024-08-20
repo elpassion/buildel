@@ -105,6 +105,9 @@ defmodule Buildel.MixProject do
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "dependencies.up": [
         "cmd \"docker-compose -p buildel -f .docker/dev/docker-compose-dependencies.yml up\""
+      ],
+      "dependencies.stop": [
+        "cmd \"docker-compose -p buildel -f .docker/dev/docker-compose-dependencies.yml stop\""
       ]
     ]
   end
