@@ -39,3 +39,4 @@ export const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
     );
   },
 );
+TabButton.displayName = 'TabButton';

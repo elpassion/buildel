@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import {
   Outlet,
@@ -101,7 +101,3 @@ export const meta: MetaFunction<typeof loader> = metaWithDefaults(
     ];
   },
 );
-
-function isPointerEvent(e: Event) {
-  return e instanceof PointerEvent;
-}

@@ -5,11 +5,11 @@ import { useMediaQuery } from 'usehooks-ts';
 
 import { cn } from '~/utils/cn';
 
+import type { DialogContentProps } from './dialog';
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogContentProps,
   DialogDescription,
   DialogFooter,
   DialogHeader,
