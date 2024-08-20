@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
@@ -7,9 +7,9 @@ import Papa from 'papaparse';
 import { ValidatedForm } from 'remix-validated-form';
 import { v4 as uuidv4 } from 'uuid';
 
+import { SmallFileUpload } from '~/components/fileUpload/SmallFileUpload';
 import { Field } from '~/components/form/fields/field.context';
 import { SelectField } from '~/components/form/fields/select.field';
-import { SmallFileInput } from '~/components/form/inputs/file.input';
 import { IconButton } from '~/components/iconButton';
 import { DocumentationCTA } from '~/components/interfaces/DocumentationCTA';
 import {
@@ -223,11 +223,8 @@ export function BulkPage() {
         </div>
 
         <div className="flex ml-auto gap-2">
-          <SmallFileInput
-            multiple={false}
-            // buttonText="Add from CSV"
-            onChange={async (e) => {
-              const file = e.target.files?.[0];
+          <SmallFileUpload
+            onChange={async (file) => {
               if (!file) return;
               Papa.parse(file, {
                 header: true,
@@ -248,7 +245,9 @@ export function BulkPage() {
                 },
               });
             }}
-          />
+          >
+            Add from CSV
+          </SmallFileUpload>
 
           <Button
             variant="secondary"
