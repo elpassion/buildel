@@ -73,7 +73,9 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
 
   defp process_page(page, organization, collection) do
     Task.async(fn ->
+      # html instead of markdown because https://github.com/nlmatics/nlm-ingestor/issues/83
       path = Temp.path!(%{suffix: ".html"})
+      # page.body |> Html2Markdown.convert()
       File.write!(path, page.body)
 
       Buildel.Memories.create_organization_memory(organization, collection, %{
