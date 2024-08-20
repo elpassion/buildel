@@ -49,7 +49,7 @@ export const Breadcrumbs = ({ pathConfig }: BreadcrumbProps) => {
             config !== null && typeof config === 'object' ? config.url : '';
 
           return (
-            <>
+            <React.Fragment key={urlPart}>
               <BreadcrumbItem>
                 {index === urlParts.length - 1 ? (
                   <BreadcrumbPage>{content}</BreadcrumbPage>
@@ -58,7 +58,7 @@ export const Breadcrumbs = ({ pathConfig }: BreadcrumbProps) => {
                 )}
               </BreadcrumbItem>
               {index < urlParts.length - 1 && <BreadcrumbSeparator />}
-            </>
+            </React.Fragment>
           );
         })}
       </BreadcrumbList>
