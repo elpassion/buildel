@@ -34,7 +34,9 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
 
   def create(conn, _params) do
     %{organization_id: organization_id} = conn.params
-    %{url: url} = conn.body_params
+
+    %{url: url, max_depth: max_depth, memory_collection_id: memory_collection_id} =
+      conn.body_params
 
     uri = URI.parse(url)
 
@@ -43,17 +45,17 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, collection} <-
-           Buildel.Memories.get_organization_collection(organization, 6),
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
          {:ok, crawl} <-
            Crawler.crawl(url,
-             max_depth: 3,
+             max_depth: max_depth,
              url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
            ) do
       crawl.pages
       |> Enum.map(fn page ->
         Task.async(fn ->
-          path = Temp.path!(%{suffix: ".html"})
-          File.write!(path, page.body)
+          path = Temp.path!(%{suffix: ".md"})
+          File.write!(path, page.body |> Html2Markdown.convert())
 
           Buildel.Memories.create_organization_memory(organization, collection, %{
             path: path,

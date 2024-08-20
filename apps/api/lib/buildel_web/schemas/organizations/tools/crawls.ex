@@ -37,9 +37,19 @@ defmodule BuildelWeb.Schemas.Crawls do
       title: "CrawlCreateRequest",
       type: :object,
       properties: %{
-        url: %Schema{type: :string, description: "Starting URL"}
+        url: %Schema{type: :string, description: "Starting URL"},
+        max_depth: %Schema{
+          type: :integer,
+          description: "Maximum depth to crawl",
+          default: 1,
+          maximum: 3
+        },
+        memory_collection_id: %Schema{
+          type: :integer,
+          description: "Memory collection ID to store the crawl results"
+        }
       },
-      required: [:url]
+      required: [:url, :memory_collection_id]
     })
   end
 end
