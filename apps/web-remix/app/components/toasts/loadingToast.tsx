@@ -24,7 +24,6 @@ export const loadingToast = (
         `${data?.title || success?.title} ${data?.description || success?.description}`,
       error: (data) =>
         `${data?.title || error?.title} ${data?.description || error?.description}`,
-      duration: Infinity,
     },
     // {
     //   loading: {
