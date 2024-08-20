@@ -318,23 +318,40 @@ export function EmbeddingCanvas<T>({
       | React.TouchEvent<HTMLCanvasElement>,
   ) => {
     if (isTouchEvent(e)) {
-      if (e.touches.length === 2 && touchDistance.current) {
+      if (
+        e.touches.length === 2 &&
+        touchDistance.current &&
+        canvasRef.current
+      ) {
         const newDistance = getTouchDistance(e.touches);
         const scaleFactor = Math.sqrt(newDistance / touchDistance.current);
 
-        scaleRef.current = Math.min(
+        const newScale = Math.min(
           Math.max(scaleRef.current * scaleFactor, MIN_SCALE),
           MAX_SCALE,
         );
 
+        const rect = canvasRef.current.getBoundingClientRect();
+        const touchCenterX =
+          (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left;
+        const touchCenterY =
+          (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top;
+
+        const offsetX =
+          touchCenterX -
+          (touchCenterX - offsetRef.current.x) * (newScale / scaleRef.current);
+        const offsetY =
+          touchCenterY -
+          (touchCenterY - offsetRef.current.y) * (newScale / scaleRef.current);
+
+        scaleRef.current = newScale;
+        offsetRef.current = { x: offsetX, y: offsetY };
+
+        updateBackground(scaleRef.current, offsetX, offsetY);
+
         const ctx = getContext();
         if (ctx) {
-          drawCanvas(
-            ctx,
-            scaleRef.current,
-            offsetRef.current.x,
-            offsetRef.current.y,
-          );
+          drawCanvas(ctx, scaleRef.current, offsetX, offsetY);
         }
       } else {
         const touch = e.touches[0];

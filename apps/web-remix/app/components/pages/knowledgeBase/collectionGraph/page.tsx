@@ -245,6 +245,7 @@ export function KnowledgeBaseGraphPage() {
           <Outlet context={{ onMouseOver, onMouseLeave }} />
         </NodePreviewSidebarContent>
       </NodePreviewSidebar>
+
       <ClientOnly fallback="">
         {() =>
           nodes.length > 0 ? (
