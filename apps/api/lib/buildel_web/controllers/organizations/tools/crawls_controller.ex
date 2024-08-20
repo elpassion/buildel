@@ -45,32 +45,44 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, collection} <-
-           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
-         {:ok, crawl} <-
-           Crawler.crawl(url,
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id) do
+      case Crawler.crawl(url,
              max_depth: max_depth,
              url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
            ) do
-      crawl.pages
-      |> Enum.map(fn page ->
-        Task.async(fn ->
-          path = Temp.path!(%{suffix: ".md"})
-          File.write!(path, page.body |> Html2Markdown.convert())
+        {:ok, crawl} ->
+          crawl.pages
+          |> Enum.map(&process_page(&1, organization, collection))
+          |> Task.await_many()
 
-          Buildel.Memories.create_organization_memory(organization, collection, %{
-            path: path,
-            type: "text/html",
-            name: page.url
-          })
+          conn
+          |> put_status(:created)
+          |> render(:show, crawls: [])
 
-          nil
-        end)
-      end)
-      |> Task.await_many()
+        {:error, %Crawler.Crawl{error: :not_all_pages_successful, pages: pages}} ->
+          pages
+          |> Enum.map(&process_page(&1, organization, collection))
+          |> Task.await_many()
 
-      conn
-      |> put_status(:created)
-      |> render(:show, crawls: [])
+          conn
+          |> put_status(:created)
+          |> render(:show, crawls: [])
+      end
     end
+  end
+
+  defp process_page(page, organization, collection) do
+    Task.async(fn ->
+      path = Temp.path!(%{suffix: ".html"})
+      File.write!(path, page.body)
+
+      Buildel.Memories.create_organization_memory(organization, collection, %{
+        path: path,
+        type: "text/html",
+        name: page.url
+      })
+
+      nil
+    end)
   end
 end
