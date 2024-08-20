@@ -110,4 +110,18 @@ export class OrganizationApi {
       { method: 'POST', body: JSON.stringify(data) },
     );
   }
+
+  crawl(
+    organizationId: string | number,
+    data: { url: string; memory_collection_id: string; max_depth?: number },
+  ) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/tools/crawls`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
+  }
 }

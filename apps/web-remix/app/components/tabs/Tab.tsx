@@ -18,20 +18,24 @@ export interface TabButtonProps extends PropsWithChildren {
   className?: string;
   component?: 'link' | 'button';
 }
-export const TabButton: React.FC<TabButtonProps> = ({
-  children,
-  className,
-  tabId,
-}) => {
-  const { setActiveTab } = useTabsContext();
+export const TabButton = React.forwardRef<HTMLButtonElement, TabButtonProps>(
+  ({ children, className, tabId, ...rest }, ref) => {
+    const { setActiveTab } = useTabsContext();
 
-  const handleSetActiveTab = useCallback(() => {
-    setActiveTab(tabId);
-  }, [setActiveTab, tabId]);
+    const handleSetActiveTab = useCallback(() => {
+      setActiveTab(tabId);
+    }, [setActiveTab, tabId]);
 
-  return (
-    <button type="button" className={className} onClick={handleSetActiveTab}>
-      {children}
-    </button>
-  );
-};
+    return (
+      <button
+        ref={ref}
+        type="button"
+        className={className}
+        onClick={handleSetActiveTab}
+        {...rest}
+      >
+        {children}
+      </button>
+    );
+  },
+);
