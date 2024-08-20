@@ -167,7 +167,7 @@ defmodule Buildel.Pipelines do
   def blocks_for_run(%Run{config: %{"blocks" => blocks, "connections" => connections} = config}) do
     workflow_calls_blocks_map =
       blocks
-      |> Enum.filter(fn block -> block["type"] == "workflow_call" end)
+      |> Enum.filter(fn block -> block["type"] == Buildel.Blocks.WorkflowCall.options().type end)
       |> Enum.reduce(%{}, fn block, acc ->
         pipeline = get_pipeline(block["opts"]["workflow"])
 
