@@ -30,6 +30,7 @@ interface EmbeddingCanvasProps<T> {
 type MousePosition = { offsetX: number; offsetY: number };
 
 const MIN_SCALE = 0.2;
+const MAX_SCALE = 10;
 
 export function EmbeddingCanvas<T>({
   elements,
@@ -49,6 +50,9 @@ export function EmbeddingCanvas<T>({
     x: 0,
     y: 0,
   });
+
+  const touchDistance = useRef<number>(0);
+
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const isMouseDown = useRef<boolean>(false);
   const isDraggingRef = useRef<boolean>(false);
@@ -270,7 +274,7 @@ export function EmbeddingCanvas<T>({
 
     const newTmpScale = scaleRef.current * (e.deltaY < 0 ? 1.2 : 0.8);
 
-    const newScale = newTmpScale < MIN_SCALE ? MIN_SCALE : newTmpScale;
+    const newScale = Math.min(Math.max(newTmpScale, MIN_SCALE), MAX_SCALE);
 
     const newOffsetX =
       mouseX - ((mouseX - offsetRef.current.x) / scaleRef.current) * newScale;
@@ -298,11 +302,14 @@ export function EmbeddingCanvas<T>({
   };
 
   const onTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
-    const touch = e.touches[0];
-
-    setIsDragging(true);
-    isMouseDown.current = true;
-    lastPosRef.current = { x: touch.clientX, y: touch.clientY };
+    if (e.touches.length === 2) {
+      touchDistance.current = getTouchDistance(e.touches);
+    } else {
+      const touch = e.touches[0];
+      setIsDragging(true);
+      isMouseDown.current = true;
+      lastPosRef.current = { x: touch.clientX, y: touch.clientY };
+    }
   };
 
   const onMouseMove = (
@@ -311,10 +318,29 @@ export function EmbeddingCanvas<T>({
       | React.TouchEvent<HTMLCanvasElement>,
   ) => {
     if (isTouchEvent(e)) {
-      const touch = e.touches[0];
+      if (e.touches.length === 2 && touchDistance.current) {
+        const newDistance = getTouchDistance(e.touches);
+        const scaleFactor = Math.sqrt(newDistance / touchDistance.current);
 
-      onDrag(touch.clientX, touch.clientY);
-      onMove(touch.clientX, touch.clientY);
+        scaleRef.current = Math.min(
+          Math.max(scaleRef.current * scaleFactor, MIN_SCALE),
+          MAX_SCALE,
+        );
+
+        const ctx = getContext();
+        if (ctx) {
+          drawCanvas(
+            ctx,
+            scaleRef.current,
+            offsetRef.current.x,
+            offsetRef.current.y,
+          );
+        }
+      } else {
+        const touch = e.touches[0];
+        onDrag(touch.clientX, touch.clientY);
+        onMove(touch.clientX, touch.clientY);
+      }
     } else {
       onDrag(e.clientX, e.clientY);
       onMove(e.clientX, e.clientY);
@@ -407,7 +433,7 @@ export function EmbeddingCanvas<T>({
       onMouseLeave={onMouseUp}
       onTouchStart={onTouchStart}
       onTouchEnd={onMouseUp}
-      className={cn('relative top-0 left-0', {
+      className={cn('relative top-0 left-0 touch-none', {
         'cursor-grabbing': isDragging,
         'cursor-grab': !isDragging,
       })}
@@ -424,4 +450,11 @@ function isTouchEvent(
   e: React.MouseEvent | React.TouchEvent,
 ): e is React.TouchEvent {
   return 'touches' in e;
+}
+
+function getTouchDistance(touches: React.TouchList) {
+  const [touch1, touch2] = Array.from(touches);
+  const dx = touch2.clientX - touch1.clientX;
+  const dy = touch2.clientY - touch1.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
 }
