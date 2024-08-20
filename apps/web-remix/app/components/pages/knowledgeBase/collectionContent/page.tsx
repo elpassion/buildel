@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import {
   Outlet,
@@ -50,9 +50,7 @@ export function KnowledgeBaseContentPage() {
 
   const handleClose = (value?: boolean) => {
     if (value) return;
-    navigate(routes.collectionFiles(organizationId, collectionName), {
-      replace: true,
-    });
+    navigate(routes.collectionFiles(organizationId, collectionName));
   };
 
   return (
@@ -103,3 +101,7 @@ export const meta: MetaFunction<typeof loader> = metaWithDefaults(
     ];
   },
 );
+
+function isPointerEvent(e: Event) {
+  return e instanceof PointerEvent;
+}

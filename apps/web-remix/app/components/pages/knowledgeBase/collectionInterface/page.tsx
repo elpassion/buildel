@@ -44,9 +44,7 @@ export function KnowledgeBaseCollectionInterface() {
 
   const handleClose = (value?: boolean) => {
     if (value) return;
-    navigate(routes.collectionInterface(organizationId, collectionName), {
-      replace: true,
-    });
+    navigate(routes.collectionInterface(organizationId, collectionName));
   };
 
   return (

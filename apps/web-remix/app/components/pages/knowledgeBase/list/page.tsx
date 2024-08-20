@@ -27,7 +27,7 @@ export function KnowledgeBasePage() {
   const isNewSidebarOpen = !!matchNew;
   const handleCloseSidebar = (value: boolean) => {
     if (value) return;
-    navigate(routes.knowledgeBase(organizationId), { replace: true });
+    navigate(routes.knowledgeBase(organizationId));
   };
 
   return (

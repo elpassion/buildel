@@ -32,9 +32,7 @@ export function DatasetRowNew() {
   const navigate = useNavigate();
 
   const closeModal = () => {
-    navigate(routes.dataset(organizationId, datasetId, pagination), {
-      replace: true,
-    });
+    navigate(routes.dataset(organizationId, datasetId, pagination));
   };
 
   const onCreate = (

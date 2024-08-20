@@ -69,7 +69,6 @@ export function PipelineBuilder() {
         pipelineId,
         Object.fromEntries(searchParams.entries()),
       ),
-      { replace: true },
     );
   };
 

@@ -9,6 +9,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogContentProps,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -84,7 +85,7 @@ const DialogDrawerContent = ({
   className,
   children,
   ...props
-}: DialogDrawerProps) => {
+}: DialogDrawerProps & Pick<DialogContentProps, 'onInteractOutside'>) => {
   const isDesktop = useMediaQuery(desktop);
   const Component = isDesktop ? DialogContent : DrawerContent;
 

@@ -70,7 +70,7 @@ export function NewDataset() {
 
   const closeModal = (value: boolean) => {
     if (value) return;
-    navigate(routes.datasets(organizationId), { replace: true });
+    navigate(routes.datasets(organizationId));
   };
 
   return (
