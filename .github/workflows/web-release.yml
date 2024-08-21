@@ -32,14 +32,38 @@ jobs:
       - run: pnpm test
       - run: pnpm build
 
-      - name: Build and Push Docker Image
-        uses: ./.github/actions/docker-build-push
-        with:
-          context: apps/web-remix
-          dockerfile: apps/web-remix/Dockerfile
-          image_name: ghcr.io/${{ github.repository }}/web-remix
-          tag: ${{ github.event_name == 'release' && github.event.release.tag_name || 'alpha' }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            docker build \
+            -t ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }} \
+            -t ghcr.io/${{ github.repository }}/web-remix:latest .
+            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}:cache \
+            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}:cache,mode=max 
+          else
+            docker build \
+            -t ghcr.io/${{ github.repository }}/web-remix:alpha . \
+            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:alpha:cache \
+            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:alpha:cache,mode=max 
+          fi
+
+      - name: Log in to GitHub Container Registry
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push Docker image to GHCR
+        run: |
+          if [ "${{ github.event_name }}" == "release" ]; then
+            is_latest=$(gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name == "${{ github.event.release.tag_name }}"')
+            if [ "$is_latest" == "true" ]; then
+              docker push ghcr.io/${{ github.repository }}/web-remix:latest
+            fi
+            docker push ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}
+          else
+            docker push ghcr.io/${{ github.repository }}/web-remix:alpha
+          fi
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
         if: ${{ github.event_name == 'push' }}
