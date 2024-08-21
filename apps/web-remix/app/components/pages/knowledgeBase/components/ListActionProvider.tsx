@@ -97,10 +97,10 @@ export const FloatingListActions = ({ onDelete }: FloatingListActionsProps) => {
   return (
     <div
       className={cn(
-        '!p-2 fixed z-[5] bg-white bottom-2 left-1/2 -translate-x-1/2 border border-input w-[95%] max-w-[400px] rounded-lg flex gap-2 items-center justify-between',
+        '!p-2 fixed z-[5] bg-white bottom-2 left-1/2 -translate-x-1/2 border border-input w-[95%] max-w-[400px] rounded-lg flex gap-2 items-center justify-between transition-all',
         {
-          'opacity-100 pointer-events-auto': showActions,
-          'opacity-0 pointer-events-none': !showActions,
+          'opacity-100 pointer-events-auto -translate-y-[0] ': showActions,
+          'opacity-0 pointer-events-none translate-y-full ': !showActions,
         },
       )}
     >
