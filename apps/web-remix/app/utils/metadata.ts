@@ -20,6 +20,13 @@ export const metaWithDefaults = <
       return m;
     });
 
-    return [...meta];
+    return [
+      {
+        name: 'description',
+        content:
+          'Automate AI workflows effortlessly with our modular, no-code platform. Perfect for developers and non-coders alike. Open-source and community-driven!',
+      },
+      ...meta,
+    ];
   };
 };
