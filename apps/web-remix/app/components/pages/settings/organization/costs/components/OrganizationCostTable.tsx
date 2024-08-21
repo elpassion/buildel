@@ -45,7 +45,7 @@ export const OrganizationCostTable: React.FC<OrganizationCostTableProps> = ({
           const type = info.getValue();
           if (!type) return 'unknown';
 
-          return type;
+          return type === 'collection' ? 'Collection' : 'Workflow';
         },
       }),
       columnHelper.accessor('created_at', {
