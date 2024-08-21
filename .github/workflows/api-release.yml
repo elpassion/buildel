@@ -104,10 +104,10 @@ jobs:
         with:
           context: apps/api
           tags: |
-            ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+            ghcr.io/${{ github.repository }}/api:${{ github.sha }},ghcr.io/${{ github.repository }}/api:alpha
           push: ${{ github.event_name == 'push' || github.event_name == 'release' }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/api:${{ github.sha }}-cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/api:${{ github.sha }}-cache,mode=max
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/api:alpha-cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/api:alpha-cache,mode=max
 
       - name: Push Docker image to GHCR
         if: ${{ github.event_name == 'release' }}
@@ -120,8 +120,3 @@ jobs:
             docker tag ghcr.io/${{ github.repository }}/api:${{ github.sha }} ghcr.io/${{ github.repository }}/api:latest
             docker push ghcr.io/${{ github.repository }}/api:latest
           fi
-      - name: Push Docker image to GHCR
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          docker tag ghcr.io/${{ github.repository }}/api:${{ github.sha }} ghcr.io/${{ github.repository }}/api:alpha
-          docker push ghcr.io/${{ github.repository }}/api:alpha
