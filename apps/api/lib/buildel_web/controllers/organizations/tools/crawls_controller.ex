@@ -53,7 +53,7 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
         {:ok, crawl} ->
           crawl.pages
           |> Enum.map(&process_page(&1, organization, collection))
-          |> Task.await_many()
+          |> Task.await_many(60_000)
 
           conn
           |> put_status(:created)
@@ -62,7 +62,7 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
         {:error, %Crawler.Crawl{error: :not_all_pages_successful, pages: pages}} ->
           pages
           |> Enum.map(&process_page(&1, organization, collection))
-          |> Task.await_many()
+          |> Task.await_many(60_000)
 
           conn
           |> put_status(:created)
