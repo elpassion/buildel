@@ -14,7 +14,7 @@ defmodule BuildelWeb.Schemas.OrganizationCosts do
         output_tokens: %Schema{type: :integer, description: "Output tokens"},
         created_at: %Schema{type: :string, description: "Cost creation date"},
         description: %Schema{type: :string, description: "Cost description"},
-        cost_type: %Schema{type: :string, description: "Cost type"},
+        cost_type: %Schema{type: :string, description: "Cost type", nullable: true},
         type: %Schema{type: :string, description: "Cost type"},
         pipeline_id: %Schema{type: :integer, description: "Pipeline ID", nullable: true},
         run_id: %Schema{type: :integer, description: "Run ID", nullable: true},
