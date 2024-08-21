@@ -1,4 +1,5 @@
 name: API Release
+
 on:
   push:
     branches:
@@ -75,34 +76,33 @@ jobs:
       - name: Log in to GitHub Container Registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Build Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          tags: |
+            ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+          push: ${{ github.event_name == 'push' || github.event_name == 'release' }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/api:${{ github.sha }}-cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/api:${{ github.sha }}-cache,mode=max
+
+      - name: Push Docker image to GHCR
+        if: ${{ github.event_name == 'release' }}
         run: |
-          if [ "${{ github.event_name }}" == "release" ]; then
-            docker buildx build \
-            -t ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }} \
-            -t ghcr.io/${{ github.repository }}/api:latest . \
-            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/api/${{ github.event.release.tag_name }}:cache \
-            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/api/:${{ github.event.release.tag_name }}:cache,mode=max \
-            --push
-          else
-            docker buildx build \
-            -t ghcr.io/${{ github.repository }}/api:alpha . \
-            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/api/alpha:cache \
-            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/api/alpha:cache,mode=max \
-            --push
+          docker tag ghcr.io/${{ github.repository }}/api:${{ github.sha }} ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }}
+          docker push ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }}
+          
+          is_latest=$(gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name == "${{ github.event.release.tag_name }}"')
+          if [ "$is_latest" == "true" ]; then
+            docker tag ghcr.io/${{ github.repository }}/api:${{ github.sha }} ghcr.io/${{ github.repository }}/api:latest
+            docker push ghcr.io/${{ github.repository }}/api:latest
           fi
 
       - name: Push Docker image to GHCR
+        if: ${{ github.event_name == 'push' }}
         run: |
-          if [ "${{ github.event_name }}" == "release" ]; then
-            is_latest=$(gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name == "${{ github.event.release.tag_name }}"')
-            if [ "$is_latest" == "true" ]; then
-              docker push ghcr.io/${{ github.repository }}/api:latest
-            fi
-            docker push ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }}
-          else
-            docker push ghcr.io/${{ github.repository }}/api:alpha
-          fi
+          docker tag ghcr.io/${{ github.repository }}/api:${{ github.sha }} ghcr.io/${{ github.repository }}/api:alpha
+          docker push ghcr.io/${{ github.repository }}/api:alpha
 
       - uses: superfly/flyctl-actions/setup-flyctl@master
         if: ${{ github.event_name == 'push' }}
