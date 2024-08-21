@@ -1,6 +1,8 @@
 import z from 'zod';
 
+import type { PaginationQueryParams } from '~/components/pagination/usePagination';
 import type { fetchTyped } from '~/utils/fetch.server';
+import { buildUrlWithParams } from '~/utils/url';
 
 import {
   APIKeyResponse,
@@ -8,6 +10,7 @@ import {
   InvitationResponse,
   InvitationsResponse,
   MembershipsResponse,
+  OrganizationCostResponse,
   OrganizationResponse,
   OrganizationsResponse,
   WorkflowTemplatesResponse,
@@ -98,6 +101,16 @@ export class OrganizationApi {
       WorkflowTemplatesResponse,
       `/organizations/${organizationId}/workflow_templates`,
     );
+  }
+
+  getCosts(
+    organizationId: string | number,
+    pagination?: PaginationQueryParams,
+  ) {
+    const url = buildUrlWithParams(`/organizations/${organizationId}/costs`, {
+      ...pagination,
+    });
+    return this.client(OrganizationCostResponse, url);
   }
 
   createFromTemplate(

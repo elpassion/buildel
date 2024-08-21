@@ -32,10 +32,15 @@ export function OrganizationSettingsPage() {
             >
               Members
             </OutlinedTabLink>
+
             <OutlinedTabLink
               to={routes.organizationInvitations(organization.id)}
             >
               Invitations
+            </OutlinedTabLink>
+
+            <OutlinedTabLink to={routes.organizationCosts(organization.id)}>
+              Costs
             </OutlinedTabLink>
           </OutlinedTabsWrapper>
 

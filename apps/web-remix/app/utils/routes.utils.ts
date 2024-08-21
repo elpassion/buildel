@@ -18,6 +18,14 @@ export const routes = {
     `${routes.settings(organizationId)}/organization`,
   organizationInvitations: (organizationId: OrganizationId) =>
     `${routes.organizationSettings(organizationId)}/invitations`,
+  organizationCosts: (
+    organizationId: OrganizationId,
+    params: RouteParam = {},
+  ) =>
+    buildUrlWithParams(
+      `${routes.organizationSettings(organizationId)}/costs`,
+      params,
+    ),
   organizationInvitationsNew: (organizationId: OrganizationId) =>
     `${routes.organizationInvitations(organizationId)}/new`,
   profileSettings: (organizationId: OrganizationId) =>

@@ -149,7 +149,7 @@ export type IAliasesResponse = z.TypeOf<typeof AliasesResponse>;
 export const PipelineCost = z.object({
   amount: z.string(),
   created_at: z.string(),
-  description: z.string(),
+  description: z.string().nullable(),
   input_tokens: z.number(),
   output_tokens: z.number(),
   id: z.number(),

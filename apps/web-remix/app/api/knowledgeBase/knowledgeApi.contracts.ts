@@ -99,7 +99,7 @@ export const KnowledgeBaseCollectionCost = z.object({
   id: z.number(),
   amount: z.string(),
   cost_type: z.string(),
-  description: z.string(),
+  description: z.string().nullable(),
   input_tokens: z.number(),
   output_tokens: z.number(),
   created_at: z.string(),
@@ -125,7 +125,9 @@ export const KnowledgeBaseFileListResponse = z
   })
   .transform((res) => res.data);
 
-export type IKnowledgeBaseFileListResponse = z.TypeOf<typeof KnowledgeBaseFileListResponse>;
+export type IKnowledgeBaseFileListResponse = z.TypeOf<
+  typeof KnowledgeBaseFileListResponse
+>;
 
 export const KnowledgeBaseCollectionListResponse = z
   .object({

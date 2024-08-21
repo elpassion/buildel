@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+import { KnowledgeBaseCollectionCost } from '~/api/knowledgeBase/knowledgeApi.contracts';
+import { PipelineCost } from '~/api/pipeline/pipeline.contracts';
+import { PaginationMeta } from '~/components/pagination/pagination.types';
+
 export const Organization = z.object({
   id: z.number(),
   name: z.string(),
@@ -105,3 +109,40 @@ export const CreateFromTemplateResponse = z
 export type ICreateFromTemplateResponse = z.TypeOf<
   typeof CreateFromTemplateResponse
 >;
+
+const OrganizationPipelineCost = PipelineCost.extend({
+  type: z.literal('pipeline'),
+  pipeline_id: z.number().nullable(),
+  run_id: z.number().nullable(),
+});
+
+const OrganizationCollectionCost = KnowledgeBaseCollectionCost.extend({
+  type: z.literal('collection'),
+  memory_collection_id: z.number().nullable(),
+  memory_collection_name: z.string().nullable(),
+});
+
+const OrganizationNullableCost = PipelineCost.extend({
+  type: z.literal(null),
+});
+
+type IOrganizationCollectionCost = z.TypeOf<typeof OrganizationCollectionCost>;
+
+export const OrganizationCost = z.discriminatedUnion('type', [
+  OrganizationCollectionCost,
+  OrganizationPipelineCost,
+  OrganizationNullableCost,
+]);
+
+export type IOrganizationCost = z.TypeOf<typeof OrganizationCost>;
+
+export const OrganizationCostResponse = z.object({
+  data: z.array(OrganizationCost),
+  meta: PaginationMeta,
+});
+
+export function isOrganizationCollectionCost(
+  cost: IOrganizationCost,
+): cost is IOrganizationCollectionCost {
+  return cost.type === 'collection';
+}
