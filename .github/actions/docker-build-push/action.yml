@@ -1,4 +1,3 @@
-# .github/actions/docker-build-push/action.yml
 name: "Docker Build and Push"
 description: "Build and push Docker image to GitHub Container Registry with caching"
 inputs:
@@ -23,18 +22,22 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
     - name: Log in to GitHub Container Registry
       shell: bash
       run: echo "${{ inputs.github_token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-    - name: Build Docker image
+    - name: Build Docker image with caching
       shell: bash
       run: |
-        docker build \
+        docker buildx build \
           --file ${{ inputs.dockerfile }} \
           --tag ${{ inputs.image_name }}:${{ inputs.tag }} \
-          --cache-from type=registry,ref=${{ inputs.image_name }}:buildcache \
-          --cache-to type=registry,ref=${{ inputs.image_name }}:buildcache,mode=max \
+          --cache-from=type=registry,ref=${{ inputs.image_name }}:cache \
+          --cache-to=type=registry,ref=${{ inputs.image_name }}:cache,mode=max \
+          --push \
           ${{ inputs.context }}
 
     - name: Push Docker image
