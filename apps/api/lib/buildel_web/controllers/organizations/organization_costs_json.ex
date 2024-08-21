@@ -18,6 +18,7 @@ defmodule BuildelWeb.OrganizationCostsJSON do
       output_tokens: cost.output_tokens,
       created_at: cost.inserted_at,
       description: cost.description,
+      cost_type: cost.cost_type,
       type: cost.type,
       pipeline_id: cost.pipeline_id,
       run_id: cost.run_id,
