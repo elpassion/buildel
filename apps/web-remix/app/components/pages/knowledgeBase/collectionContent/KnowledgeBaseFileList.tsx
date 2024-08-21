@@ -19,8 +19,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
+import {
+  FloatingListActions,
+  FloatingListCheckbox,
+  ListActionProvider,
+  useListAction,
+} from '../components/ListActionProvider';
 import type {
   IKnowledgeBaseFile,
   IKnowledgeBaseFileList,
@@ -39,7 +46,10 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
   const handleDelete = (file: IKnowledgeBaseFile) => {
     confirm({
       onConfirm: async () =>
-        fetcher.submit({ memoryId: file.id }, { method: 'delete' }),
+        fetcher.submit(
+          { memoryId: file.id },
+          { method: 'delete', encType: 'application/json' },
+        ),
       confirmText: 'Delete item',
       children: (
         <p className="text-sm">
@@ -54,36 +64,57 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
   };
 
   return (
-    <ItemList
-      aria-label="Collection files"
-      className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-      items={items}
-      renderItem={(item) => (
-        <BasicLink
-          to={routes.collectionMemory(
-            organizationId,
-            collectionName,
-            item.id,
-            item.file_name,
-          )}
-        >
-          <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
-        </BasicLink>
-      )}
-    >
-      <li>
-        <Link to={routes.collectionFilesNew(organizationId, collectionName)}>
-          <Card className="bg-muted">
-            <CardContent className="min-h-[90px] pt-3 h-full flex justify-center items-center flex-col">
-              <CardDescription className="text-sm group-hover:text-foreground transition">
-                <Plus className="mx-auto" />
-                <span className="font-medium">Add new memory</span>
-              </CardDescription>
-            </CardContent>
-          </Card>
-        </Link>
-      </li>
-    </ItemList>
+    <ListActionProvider>
+      <ItemList
+        aria-label="Collection files"
+        className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        items={items}
+        renderItem={(item) => (
+          <BasicLink
+            to={routes.collectionMemory(
+              organizationId,
+              collectionName,
+              item.id,
+              item.file_name,
+            )}
+          >
+            <KnowledgeBaseFileListItem data={item} onDelete={handleDelete} />
+          </BasicLink>
+        )}
+      >
+        <li>
+          <Link to={routes.collectionFilesNew(organizationId, collectionName)}>
+            <Card className="bg-muted">
+              <CardContent className="min-h-[90px] pt-3 h-full flex justify-center items-center flex-col">
+                <CardDescription className="text-sm group-hover:text-foreground transition">
+                  <Plus className="mx-auto" />
+                  <span className="font-medium">Add new memory</span>
+                </CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
+        </li>
+      </ItemList>
+
+      <FloatingListActions
+        onDelete={(fetcher, ids) => {
+          confirm({
+            children: (
+              <p className="text-sm">
+                You are about to delete the {ids.length} file(s) from your
+                collection. This action is irreversible.
+              </p>
+            ),
+            onConfirm: async () => {
+              fetcher.submit(
+                { memoryIds: ids, intent: 'DELETE_MANY' },
+                { method: 'delete', encType: 'application/json' },
+              );
+            },
+          });
+        }}
+      />
+    </ListActionProvider>
   );
 };
 
@@ -95,13 +126,28 @@ interface KnowledgeBaseFileListItemProps {
 export const KnowledgeBaseFileListItem: React.FC<
   KnowledgeBaseFileListItemProps
 > = ({ data, onDelete }) => {
+  const { isSelected, removeItem } = useListAction();
+
   const handleDelete = () => {
+    removeItem(data.id.toString());
     onDelete(data);
   };
+
+  const isChecked = isSelected(data.id.toString());
+
   return (
-    <Card>
+    <Card
+      className={cn('group relative', {
+        'border-red-200': isChecked,
+      })}
+    >
       <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
-        <CardTitle className="line-clamp-2" title={data.file_name}>
+        <FloatingListCheckbox itemId={data.id.toString()} />
+
+        <CardTitle
+          className={cn('line-clamp-2', { 'text-red-500': isChecked })}
+          title={data.file_name}
+        >
           {data.file_name}
         </CardTitle>
 
@@ -111,7 +157,13 @@ export const KnowledgeBaseFileListItem: React.FC<
               <IconButton
                 variant="ghost"
                 size="xs"
-                icon={<EllipsisVertical className="w-4 h-4" />}
+                icon={
+                  <EllipsisVertical
+                    className={cn('w-4 h-4 group-hover:text-muted-foreground', {
+                      'text-red-400': isChecked,
+                    })}
+                  />
+                }
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -130,7 +182,14 @@ export const KnowledgeBaseFileListItem: React.FC<
       </CardHeader>
 
       <CardContent>
-        <CardDescription className="flex gap-1 items-center">
+        <CardDescription
+          className={cn(
+            'flex gap-1 items-center group-hover:text-muted-foreground',
+            {
+              'text-red-400': isChecked,
+            },
+          )}
+        >
           <File className="w-4 h-4" />{' '}
           <span className="uppercase">{data.file_type}</span>
         </CardDescription>
