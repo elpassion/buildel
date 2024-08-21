@@ -73,7 +73,7 @@ jobs:
         uses: ./.github/actions/docker-build-push
         with:
           context: .
-          dockerfile: Dockerfile
+          dockerfile: apps/api/Dockerfile
           image_name: ghcr.io/${{ github.repository }}/api
           tag: ${{ github.event_name == 'release' && github.event.release.tag_name || 'alpha' }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
