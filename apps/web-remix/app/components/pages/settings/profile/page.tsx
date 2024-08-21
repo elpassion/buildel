@@ -19,11 +19,7 @@ import {
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
-import {
-  Section,
-  SectionContent,
-  SectionHeading,
-} from '../settingsLayout/PageLayout';
+import { Section, SectionHeading } from '../settingsLayout/PageLayout';
 import { PreferencesForm } from './components/PreferencesForm';
 import type { loader } from './loader.server';
 
@@ -50,16 +46,15 @@ export function ProfileSettingsPage() {
         </DialogDrawerContent>
       </DialogDrawer>
 
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-6">
         <Section>
-          <SectionHeading>Password</SectionHeading>
-          <SectionContent>
-            <Link to={routes.profileSettingsChangePassword(organization.id)}>
-              <Button tabIndex={0} size="sm">
-                Change password
-              </Button>
-            </Link>
-          </SectionContent>
+          <SectionHeading className="mb-1">Password</SectionHeading>
+
+          <Link to={routes.profileSettingsChangePassword(organization.id)}>
+            <Button tabIndex={0} size="sm">
+              Change password
+            </Button>
+          </Link>
         </Section>
 
         <Section>

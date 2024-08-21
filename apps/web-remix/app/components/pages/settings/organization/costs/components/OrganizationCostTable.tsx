@@ -185,13 +185,13 @@ function CostTableActionColumn({ data }: { data: IOrganizationCost }) {
     );
   }
 
-  if (!data.pipeline_id) return null;
+  if (!data.pipeline_id || !data.run_id) return null;
 
   return (
     <div className="flex justify-end">
       <ExternalLinkCell
         title="View workflow"
-        to={routes.pipelineBuild(organizationId, data.pipeline_id)}
+        to={routes.pipelineRun(organizationId, data.pipeline_id, data.run_id)}
         icon={<Layers />}
       />
     </div>
