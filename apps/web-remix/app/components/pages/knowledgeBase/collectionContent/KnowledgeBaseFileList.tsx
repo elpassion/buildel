@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useFetcher, useLoaderData } from '@remix-run/react';
+import { Link, useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
 import { EllipsisVertical, File, Plus, Trash } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
@@ -19,6 +19,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
+import { useCollectionName } from '~/hooks/useCollectionName';
+import { useLongPress } from '~/hooks/useLongPress';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
@@ -43,6 +46,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
 }) => {
   const fetcher = useFetcher();
   const { organizationId, collectionName } = useLoaderData<typeof loader>();
+
   const handleDelete = (file: IKnowledgeBaseFile) => {
     confirm({
       onConfirm: async () =>
@@ -126,7 +130,30 @@ interface KnowledgeBaseFileListItemProps {
 export const KnowledgeBaseFileListItem: React.FC<
   KnowledgeBaseFileListItemProps
 > = ({ data, onDelete }) => {
-  const { isSelected, removeItem } = useListAction();
+  const navigate = useNavigate();
+  const organizationId = useOrganizationId();
+  const collectionName = useCollectionName();
+  const { isSelected, removeItem, toggleSelection } = useListAction();
+
+  const handlers = useLongPress({
+    onLongPress: (e) => {
+      if (e.type === 'mousedown') return;
+
+      toggleSelection(data.id.toString());
+    },
+    onClick: (e) => {
+      if (e.type === 'mouseup') return;
+
+      navigate(
+        routes.collectionMemory(
+          organizationId,
+          collectionName,
+          data.id,
+          data.file_name,
+        ),
+      );
+    },
+  });
 
   const handleDelete = () => {
     removeItem(data.id.toString());
@@ -137,6 +164,7 @@ export const KnowledgeBaseFileListItem: React.FC<
 
   return (
     <Card
+      {...handlers}
       className={cn('group relative', {
         'border-red-200': isChecked,
       })}
