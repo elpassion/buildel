@@ -79,7 +79,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: apps/api
           tags: |
             ghcr.io/${{ github.repository }}/api:${{ github.sha }}
           push: ${{ github.event_name == 'push' || github.event_name == 'release' }}

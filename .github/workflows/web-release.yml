@@ -41,7 +41,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: apps/web-remix
           tags: |
             ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }}
           push: ${{ github.event_name == 'push' || github.event_name == 'release' }}
