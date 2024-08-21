@@ -305,6 +305,10 @@ defmodule BuildelWeb.Router do
     resources("/organizations", OrganizationController, only: [:index, :create, :show])
     put("/organizations/:id", OrganizationController, :update)
 
+    resources("/organizations/:organization_id/costs", OrganizationCostsController,
+      only: [:index]
+    )
+
     get("/organizations/:id/api_key", OrganizationController, :get_api_key)
     post("/organizations/:id/api_key", OrganizationController, :reset_api_key)
 
