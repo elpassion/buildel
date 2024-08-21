@@ -15,10 +15,16 @@ defmodule BuildelWeb.Schemas.OrganizationCosts do
         created_at: %Schema{type: :string, description: "Cost creation date"},
         description: %Schema{type: :string, description: "Cost description"},
         type: %Schema{type: :string, description: "Cost type"},
+        pipeline_id: %Schema{type: :integer, description: "Pipeline ID", nullable: true},
         run_id: %Schema{type: :integer, description: "Run ID", nullable: true},
         memory_collection_id: %Schema{
           type: :integer,
           description: "Memory collection ID",
+          nullable: true
+        },
+        memory_collection_name: %Schema{
+          type: :string,
+          description: "Memory collection name",
           nullable: true
         }
       },
@@ -30,8 +36,10 @@ defmodule BuildelWeb.Schemas.OrganizationCosts do
         :created_at,
         :description,
         :type,
+        :pipeline_id,
         :run_id,
-        :memory_collection_id
+        :memory_collection_id,
+        :memory_collection_name
       ]
     })
   end

@@ -2,9 +2,27 @@ defmodule Buildel.OrganizationCosts do
   import Ecto.Query, warn: false
   alias Buildel.Costs.Cost
   alias Buildel.Memories.MemoryCollectionCost
+  alias Buildel.Memories.MemoryCollection
   alias Buildel.Pipelines.RunCost
+  alias Buildel.Pipelines.Run
   alias Buildel.Repo
   alias Buildel.Organizations.Organization
+
+  defmodule OrganizationCost do
+    defstruct [
+      :id,
+      :amount,
+      :pipeline_id,
+      :run_id,
+      :memory_collection_id,
+      :memory_collection_name,
+      :description,
+      :type,
+      :inserted_at,
+      :input_tokens,
+      :output_tokens
+    ]
+  end
 
   defmodule Params do
     @default_params %{
@@ -23,7 +41,9 @@ defmodule Buildel.OrganizationCosts do
   def list_organization_costs(%Organization{} = organization, %Params{} = params) do
     query = build_query(organization.id, params)
 
-    results = fetch_rows(query, params)
+    results =
+      fetch_rows(query, params) |> Enum.map(fn cost -> %OrganizationCost{} |> struct(cost) end)
+
     count = count_rows(query)
 
     {:ok, results, count}
@@ -34,14 +54,20 @@ defmodule Buildel.OrganizationCosts do
       where: c.organization_id == ^organization_id,
       left_join: mc in MemoryCollectionCost,
       on: mc.cost_id == c.id,
+      left_join: m in MemoryCollection,
+      on: m.id == mc.memory_collection_id,
       left_join: rc in RunCost,
       on: rc.cost_id == c.id,
+      left_join: r in Run,
+      on: r.id == rc.run_id,
       order_by: [desc: c.inserted_at],
       select: %{
         id: c.id,
         amount: c.amount,
+        pipeline_id: r.pipeline_id,
         run_id: rc.run_id,
         memory_collection_id: mc.memory_collection_id,
+        memory_collection_name: m.collection_name,
         description: coalesce(mc.description, rc.description),
         type:
           fragment(

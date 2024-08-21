@@ -10,7 +10,7 @@ defmodule BuildelWeb.OrganizationCostsJSON do
     }
   end
 
-  defp data(cost) do
+  defp data(%Buildel.OrganizationCosts.OrganizationCost{} = cost) do
     %{
       id: cost.id,
       amount: cost.amount,
@@ -19,8 +19,10 @@ defmodule BuildelWeb.OrganizationCostsJSON do
       created_at: cost.inserted_at,
       description: cost.description,
       type: cost.type,
+      pipeline_id: cost.pipeline_id,
       run_id: cost.run_id,
-      memory_collection_id: cost.memory_collection_id
+      memory_collection_id: cost.memory_collection_id,
+      memory_collection_name: cost.memory_collection_name
     }
   end
 end
