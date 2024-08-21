@@ -71,7 +71,7 @@ export function KnowledgeBaseContentPage() {
           })}
         >
           <DialogDrawerHeader>
-            <DialogDrawerTitle>
+            <DialogDrawerTitle className="break-words">
               {matchDetails && searchParams.get('file_name')}
               {matchNew && 'Create New Memory'}
               {matchSearch && 'Ask a question to your knowledge base'}
