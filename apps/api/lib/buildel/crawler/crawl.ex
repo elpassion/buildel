@@ -105,9 +105,9 @@ defmodule Buildel.Crawler.Crawl do
   defp request(crawl) do
     %{url: url, depth: depth} = crawl.pending_pages |> List.first()
 
-    case HTTPoison.get(url, [], follow_redirect: true) do
-      {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
-      when status_code >= 200 and status_code < 400 ->
+    case Req.get(url, []) do
+      {:ok, %Req.Response{status: status, body: body}}
+      when status >= 200 and status < 400 ->
         crawl = success_page(crawl, url, body)
 
         find_linked_pages(body, depth + 1, url)
