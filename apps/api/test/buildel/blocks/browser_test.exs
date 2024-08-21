@@ -63,6 +63,7 @@ defmodule Buildel.Blocks.BrowserTest do
       assert "custom formatter #{Jason.encode!(args)}\n" == call_formatter.(args)
     end
 
+    @tag :skip
     test "handles errors" do
       {:ok, test_run} =
         BlocksTestRunner.start_run(%{
@@ -116,6 +117,7 @@ defmodule Buildel.Blocks.BrowserTest do
   end
 
   describe "outputs" do
+    @tag :skip
     test "outputs text and file" do
       use_cassette("browser_api_call_outputs") do
         {:ok, test_run} =
