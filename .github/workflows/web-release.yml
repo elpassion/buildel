@@ -41,14 +41,14 @@ jobs:
             docker build \
             -t ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }} \
             -t ghcr.io/${{ github.repository }}/web-remix:latest .
-            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}:cache \
-            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}:cache,mode=max \
+            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix/${{ github.event.release.tag_name }}:cache \
+            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix/${{ github.event.release.tag_name }}:cache,mode=max \
             --push
           else
             docker build \
             -t ghcr.io/${{ github.repository }}/web-remix:alpha . \
-            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:alpha:cache \
-            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:alpha:cache,mode=max \
+            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix/alpha:cache \
+            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/web-remix/alpha:cache,mode=max \
             --push
           fi
 

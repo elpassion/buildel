@@ -78,14 +78,14 @@ jobs:
             docker buildx build \
             -t ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }} \
             -t ghcr.io/${{ github.repository }}/api:latest . \
-            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }}:cache \
-            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }}:cache,mode=max \
+            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/api/${{ github.event.release.tag_name }}:cache \
+            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/api/:${{ github.event.release.tag_name }}:cache,mode=max \
             --push
           else
             docker buildx build \
             -t ghcr.io/${{ github.repository }}/api:alpha . \
-            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/api:alpha:cache \
-            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/api:alpha:cache,mode=max \
+            --cache-from=type=registry,ref=ghcr.io/${{ github.repository }}/api/alpha:cache \
+            --cache-to=type=registry,ref=ghcr.io/${{ github.repository }}/api/alpha:cache,mode=max \
             --push
           fi
 
