@@ -1,3 +1,4 @@
+# .github/actions/docker-build-push/action.yml
 name: "Docker Build and Push"
 description: "Build and push Docker image to GitHub Container Registry with caching"
 inputs:
@@ -15,13 +16,16 @@ inputs:
   tag:
     description: "The tag of the Docker image"
     required: true
+  github_token:
+    description: "GitHub token to authenticate with the GitHub Container Registry"
+    required: true
 
 runs:
   using: "composite"
   steps:
     - name: Log in to GitHub Container Registry
       shell: bash
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+      run: echo "${{ inputs.github_token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
     - name: Build Docker image
       shell: bash
