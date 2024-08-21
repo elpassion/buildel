@@ -1,0 +1,45 @@
+name: "Docker Build and Push"
+description: "Build and push Docker image to GitHub Container Registry with caching"
+inputs:
+  context:
+    description: "The build context"
+    required: true
+    default: "."
+  dockerfile:
+    description: "The Dockerfile to use"
+    required: true
+    default: "Dockerfile"
+  image_name:
+    description: "The name of the Docker image"
+    required: true
+  tag:
+    description: "The tag of the Docker image"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Log in to GitHub Container Registry
+      shell: bash
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+    - name: Build Docker image
+      shell: bash
+      run: |
+        docker build \
+          --file ${{ inputs.dockerfile }} \
+          --tag ${{ inputs.image_name }}:${{ inputs.tag }} \
+          --cache-from type=registry,ref=${{ inputs.image_name }}:buildcache \
+          --cache-to type=registry,ref=${{ inputs.image_name }}:buildcache,mode=max \
+          ${{ inputs.context }}
+
+    - name: Push Docker image
+      shell: bash
+      run: |
+        docker push ${{ inputs.image_name }}:${{ inputs.tag }}
+        if [[ "${{ inputs.tag }}" != "alpha" ]]; then
+          is_latest=$(gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name == "${{ inputs.tag }}"')
+          if [ "$is_latest" == "true" ]; then
+            docker push ${{ inputs.image_name }}:latest
+          fi
+        fi
