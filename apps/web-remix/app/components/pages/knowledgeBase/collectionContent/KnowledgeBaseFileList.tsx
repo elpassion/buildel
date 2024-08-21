@@ -139,10 +139,26 @@ export const KnowledgeBaseFileListItem: React.FC<
     onLongPress: (e) => {
       if (e.type === 'mousedown') return;
 
+      //eslint-disable-next-line
+      //@ts-ignore
+      const closest = e.target?.closest?.(
+        '[data-state], [role="menuitem"]',
+      ) as HTMLElement | null;
+
+      if (closest) return;
+
       toggleSelection(data.id.toString());
     },
     onClick: (e) => {
       if (e.type === 'mouseup') return;
+
+      //eslint-disable-next-line
+      //@ts-ignore
+      const closest = e.target?.closest?.(
+        '[data-state], [role="menuitem"]',
+      ) as HTMLElement | null;
+
+      if (closest) return;
 
       navigate(
         routes.collectionMemory(
@@ -165,7 +181,7 @@ export const KnowledgeBaseFileListItem: React.FC<
   return (
     <Card
       {...handlers}
-      className={cn('group relative', {
+      className={cn('group relative select-none lg:select-auto', {
         'border-red-200': isChecked,
       })}
     >
@@ -198,6 +214,7 @@ export const KnowledgeBaseFileListItem: React.FC<
               <DropdownMenuItem
                 className="flex gap-1 items-center text-red-500"
                 onClick={handleDelete}
+                onTouchStart={(e) => e.stopPropagation()}
                 title={`Delete file: ${data.file_name}`}
                 aria-label={`Delete file: ${data.file_name}`}
               >
