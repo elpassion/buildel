@@ -72,8 +72,8 @@ jobs:
       - name: Build and Push Docker Image
         uses: ./.github/actions/docker-build-push
         with:
-          context: .
-          dockerfile: apps/api/Dockerfile
+          context: apps/api
+          dockerfile: Dockerfile
           image_name: ghcr.io/${{ github.repository }}/api
           tag: ${{ github.event_name == 'release' && github.event.release.tag_name || 'alpha' }}
           github_token: ${{ secrets.GITHUB_TOKEN }}

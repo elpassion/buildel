@@ -35,8 +35,8 @@ jobs:
       - name: Build and Push Docker Image
         uses: ./.github/actions/docker-build-push
         with:
-          context: .
-          dockerfile: apps/web-remix/Dockerfile
+          context: apps/web-remix
+          dockerfile: Dockerfile
           image_name: ghcr.io/${{ github.repository }}/web-remix
           tag: ${{ github.event_name == 'release' && github.event.release.tag_name || 'alpha' }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
