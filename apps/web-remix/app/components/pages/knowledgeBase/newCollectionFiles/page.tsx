@@ -7,7 +7,6 @@ import { TabGroup } from '~/components/tabs/TabGroup';
 import { Button } from '~/components/ui/button';
 import { metaWithDefaults } from '~/utils/metadata';
 
-import { CollectionCrawlForm } from './components/CollectionCrawlForm';
 import { CollectionFilesUploadForm } from './components/CollectionFilesUploadForm';
 
 export function NewCollectionFilesPage() {

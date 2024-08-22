@@ -1,5 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
+import {
+  useFetcher,
+  useLoaderData,
+  useNavigate,
+  useRevalidator,
+} from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 import { z } from 'zod';
@@ -46,6 +51,7 @@ interface DiscoverPagesTreeProps {
 function DiscoverPagesTree({ nodes }: DiscoverPagesTreeProps) {
   const { organizationId, collectionId, collectionName } =
     useLoaderData<typeof loader>();
+  const revalidate = useRevalidator();
   const navigate = useNavigate();
   const [checkedNodes, setCheckedNodes] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,13 +85,14 @@ function DiscoverPagesTree({ nodes }: DiscoverPagesTreeProps) {
       await Promise.all(
         checkedNodes.map((url) => {
           return crawlWebsite({
-            url: `https://${url}`,
+            url,
             memory_collection_id: collectionId.toString(),
             max_depth: 1,
           });
         }),
       );
       successToast('Website(s) crawled successfully');
+      revalidate.revalidate();
       navigate(routes.collectionFiles(organizationId, collectionName));
     } catch (error) {
       if (error instanceof Error) {
@@ -176,10 +183,10 @@ function prepareNodes(urls: string[]) {
   const nodes: PageTreeNode[] = [];
 
   for (const url of urls) {
-    const { pathname, host } = extractUrl(url);
+    const { pathname, host, protocol } = extractUrl(url);
     const pathParts = splitPathname(pathname);
 
-    addNodeToTree(nodes, pathParts, host);
+    addNodeToTree(nodes, pathParts, `${protocol}//${host}`);
   }
 
   return nodes;
