@@ -31,7 +31,10 @@ export const DatasetRowMenuDropdown = ({
   const deleteRow = async () => {
     confirm({
       onConfirm: async () =>
-        fetcher.submit({ rowId: data.id }, { method: 'DELETE' }),
+        fetcher.submit(
+          { rowId: data.id },
+          { method: 'DELETE', encType: 'application/json' },
+        ),
       confirmText: 'Delete Row',
       children: (
         <p className="text-sm">

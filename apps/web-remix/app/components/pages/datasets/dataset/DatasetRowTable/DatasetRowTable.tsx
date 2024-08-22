@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   createColumnHelper,
   flexRender,
@@ -6,8 +6,10 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
+import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 import { EmptyMessage } from '~/components/list/ItemList';
 import type { IDatasetRow } from '~/components/pages/datasets/dataset.types';
+import { useListAction } from '~/components/pages/knowledgeBase/components/ListActionProvider';
 import {
   Table,
   TableBody,
@@ -31,6 +33,8 @@ interface DatasetRowTableProps {
 const columnHelper = createColumnHelper<IDatasetRow>();
 
 export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
+  const { setSelected } = useListAction();
+
   const columnNames = useMemo(() => {
     if (data.length === 0) return [];
 
@@ -39,6 +43,49 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
 
   const columns = useMemo(
     () => [
+      {
+        id: 'select',
+        header: ({ table }) => {
+          const rows = table.getRowModel().rows;
+          if (rows.length === 0) return null;
+
+          const checked = table.getIsAllRowsSelected();
+          const indeterminate = table.getIsSomeRowsSelected();
+          return (
+            <div className="flex justify-center items-center">
+              <CheckboxInput
+                size="sm"
+                checked={indeterminate ? 'indeterminate' : checked}
+                onCheckedChange={(value) => {
+                  table.toggleAllRowsSelected(
+                    value === 'indeterminate' ? true : value,
+                  );
+                }}
+              />
+            </div>
+          );
+        },
+        cell: ({ row }) => {
+          const checked = row.getIsSelected();
+          const indeterminate = row.getIsSomeSelected();
+          const disabled = !row.getCanSelect();
+
+          return (
+            <div className="flex justify-center items-center">
+              <CheckboxInput
+                size="sm"
+                disabled={disabled}
+                checked={indeterminate ? 'indeterminate' : checked}
+                onCheckedChange={(value) => {
+                  row.toggleSelected(value === 'indeterminate' ? true : value);
+                }}
+              />
+            </div>
+          );
+        },
+        size: 20,
+        enableResizing: false,
+      },
       columnHelper.accessor('created_at', {
         header: 'Date',
         id: 'created_at',
@@ -61,7 +108,8 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
             <DatasetRowMenuDropdown data={info.row.original} />
           </div>
         ),
-        size: 100,
+        enableResizing: false,
+        size: 70,
       }),
     ],
     [columnNames],
@@ -75,12 +123,23 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
     columns,
     data: tableData,
     getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id.toString(),
+    manualPagination: true,
+    enableRowSelection: true,
     initialState: {
       columnPinning: {
         right: ['row-actions'],
       },
     },
   });
+
+  useEffect(() => {
+    setSelected(
+      table
+        .getSelectedRowModel()
+        .flatRows.map((row) => row.original.id.toString()),
+    );
+  }, [JSON.stringify(table.getSelectedRowModel().flatRows)]);
 
   return (
     <Table

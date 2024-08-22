@@ -20,6 +20,7 @@ export const getCommonPinningStyles = <T>(column: Column<T>): CSSProperties => {
     opacity: isPinned ? 0.95 : 1,
     position: isPinned ? 'sticky' : 'relative',
     width: column.getSize(),
+    maxWidth: column.getSize(),
     zIndex: isPinned ? 1 : 0,
     backgroundColor: isPinned ? 'white' : 'transparent',
   };

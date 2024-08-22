@@ -14,6 +14,7 @@ interface IListActionContext {
   selectedItems: string[];
   clearSelection: () => void;
   removeItem: (id: string) => void;
+  setSelected: (ids: string[]) => void;
 }
 
 const ListActionContext = createContext<IListActionContext | undefined>(
@@ -48,6 +49,10 @@ export const ListActionProvider = ({
     });
   };
 
+  const setSelected = (ids: string[]) => {
+    setSelectedItems(ids);
+  };
+
   const isSelected = (id: string) => selectedItems.includes(id);
 
   return (
@@ -56,6 +61,7 @@ export const ListActionProvider = ({
         toggleSelection,
         isSelected,
         selectedItems,
+        setSelected,
         clearSelection,
         removeItem,
         showActions: selectedItems.length > 0,

@@ -4,9 +4,14 @@ import { Outlet, useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
+import { confirm } from '~/components/modal/confirm';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { BreadcrumbWrapper } from '~/components/pages/experiments/components/Breadcrumb.components';
 import { Breadcrumbs } from '~/components/pages/experiments/components/Breadcrumbs';
+import {
+  FloatingListActions,
+  ListActionProvider,
+} from '~/components/pages/knowledgeBase/components/ListActionProvider';
 import { Pagination } from '~/components/pagination/Pagination';
 import { Button } from '~/components/ui/button';
 import { metaWithDefaults } from '~/utils/metadata';
@@ -70,7 +75,28 @@ export function DatasetPage() {
           </Button>
         </div>
 
-        <DatasetRowTable data={datasetRows.data} />
+        <ListActionProvider>
+          <DatasetRowTable data={datasetRows.data} />
+
+          <FloatingListActions
+            onDelete={(fetcher, ids) => {
+              confirm({
+                children: (
+                  <p className="text-sm">
+                    You are about to delete the {ids.length} Dataset Rows from
+                    your. This action is irreversible.
+                  </p>
+                ),
+                onConfirm: async () => {
+                  fetcher.submit(
+                    { rowIds: ids, intent: 'DELETE_MANY' },
+                    { method: 'delete', encType: 'application/json' },
+                  );
+                },
+              });
+            }}
+          />
+        </ListActionProvider>
 
         <div className="flex justify-end mt-4">
           <Pagination
