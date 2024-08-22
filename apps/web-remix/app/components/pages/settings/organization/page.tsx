@@ -38,10 +38,6 @@ export function OrganizationSettingsPage() {
             >
               Invitations
             </OutlinedTabLink>
-
-            <OutlinedTabLink to={routes.organizationCosts(organization.id)}>
-              Costs
-            </OutlinedTabLink>
           </OutlinedTabsWrapper>
 
           <div className="pt-8">

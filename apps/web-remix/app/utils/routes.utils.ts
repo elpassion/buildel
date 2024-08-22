@@ -11,6 +11,11 @@ export const routes = {
   resetPasswordSent: () => '/reset-password/sent',
   organizations: '/organizations',
   organization: (organizationId: OrganizationId) => `/${organizationId}`,
+  organizationCosts: (
+    organizationId: OrganizationId,
+    params: RouteParam = {},
+  ) =>
+    buildUrlWithParams(`${routes.organization(organizationId)}/costs`, params),
   newOrganization: () => `${routes.organizations}/new`,
   settings: (organizationId: OrganizationId) =>
     `${routes.organization(organizationId)}/settings`,
@@ -18,14 +23,7 @@ export const routes = {
     `${routes.settings(organizationId)}/organization`,
   organizationInvitations: (organizationId: OrganizationId) =>
     `${routes.organizationSettings(organizationId)}/invitations`,
-  organizationCosts: (
-    organizationId: OrganizationId,
-    params: RouteParam = {},
-  ) =>
-    buildUrlWithParams(
-      `${routes.organizationSettings(organizationId)}/costs`,
-      params,
-    ),
+
   organizationInvitationsNew: (organizationId: OrganizationId) =>
     `${routes.organizationInvitations(organizationId)}/new`,
   profileSettings: (organizationId: OrganizationId) =>

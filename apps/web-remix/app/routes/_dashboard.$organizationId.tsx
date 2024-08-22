@@ -13,6 +13,7 @@ import {
 import {
   Briefcase,
   ChevronDown,
+  CircleDollarSign,
   FlaskConical,
   FolderCog,
   Key,
@@ -206,6 +207,15 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
           icon={<FolderCog className="min-w-4 w-4 h-4 text-center leading-5" />}
           onlyIcon={isCollapsed}
           text="Datasets"
+        />
+
+        <SidebarLink
+          to={routes.organizationCosts(organization.id)}
+          icon={
+            <CircleDollarSign className="min-w-4 w-4 h-4 text-center leading-5" />
+          }
+          onlyIcon={isCollapsed}
+          text="Costs"
         />
       </div>
 

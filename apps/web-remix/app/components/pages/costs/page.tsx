@@ -1,7 +1,9 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import { Outlet, useLoaderData } from '@remix-run/react';
 
+import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
+import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { Pagination } from '~/components/pagination/Pagination';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
@@ -14,14 +16,20 @@ export function CostsPage() {
 
   return (
     <>
-      <OrganizationCostTable data={costs} />
+      <AppNavbar leftContent={<AppNavbarHeading>Costs</AppNavbarHeading>} />
 
-      <div className="flex justify-end mt-4">
-        <Pagination
-          pagination={pagination}
-          loaderUrl={routes.organizationCosts(organizationId)}
-        />
-      </div>
+      <Outlet />
+
+      <PageContentWrapper className="mt-[110px] pb-3">
+        <OrganizationCostTable data={costs} />
+
+        <div className="flex justify-end mt-4">
+          <Pagination
+            pagination={pagination}
+            loaderUrl={routes.organizationCosts(organizationId)}
+          />
+        </div>
+      </PageContentWrapper>
     </>
   );
 }
