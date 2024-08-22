@@ -39,6 +39,7 @@ jobs:
     needs: test
 
     steps:
+      - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
         if: ${{ github.event_name == 'push' }}
       - run: flyctl deploy --remote-only
@@ -73,7 +74,7 @@ jobs:
         run: |
           docker tag ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }} ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}
           docker push ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}
-          
+
           is_latest=$(gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name == "${{ github.event.release.tag_name }}"')
           if [ "$is_latest" == "true" ]; then
             docker tag ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }} ghcr.io/${{ github.repository }}/web-remix:latest
@@ -86,4 +87,3 @@ jobs:
           docker tag ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }} ghcr.io/${{ github.repository }}/web-remix:alpha
           docker push ghcr.io/${{ github.repository }}/web-remix:alpha
 
-    
