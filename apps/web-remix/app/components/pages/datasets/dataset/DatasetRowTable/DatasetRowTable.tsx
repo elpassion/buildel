@@ -33,7 +33,7 @@ interface DatasetRowTableProps {
 const columnHelper = createColumnHelper<IDatasetRow>();
 
 export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
-  const { setSelected } = useListAction();
+  const { setSelected, selectedItems } = useListAction();
 
   const columnNames = useMemo(() => {
     if (data.length === 0) return [];
@@ -140,6 +140,10 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
         .flatRows.map((row) => row.original.id.toString()),
     );
   }, [JSON.stringify(table.getSelectedRowModel().flatRows)]);
+
+  useEffect(() => {
+    if (selectedItems.length === 0) return table.toggleAllRowsSelected(false);
+  }, [selectedItems]);
 
   return (
     <Table
