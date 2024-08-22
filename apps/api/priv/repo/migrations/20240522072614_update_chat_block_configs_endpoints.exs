@@ -5,7 +5,7 @@ defmodule Buildel.Repo.Migrations.UpdateChatBlockConfigsEndpoints do
 
   def up do
     Buildel.Repo.transaction(fn ->
-      Buildel.Repo.all(Buildel.Pipelines.Pipeline)
+      Buildel.Repo.all({"pipelines", Buildel.Pipelines.Pipeline})
       |> Enum.map(fn pipeline ->
         Pipeline.changeset(pipeline, %{config: update_endpoint(pipeline.config)})
         |> Buildel.Repo.update!()
