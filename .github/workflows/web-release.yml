@@ -84,9 +84,3 @@ jobs:
             docker push ghcr.io/${{ github.repository }}/web-remix:latest
           fi
 
-      - name: Push Docker image to GHCR
-        if: ${{ github.event_name == 'push' }}
-        run: |
-          docker tag ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }} ghcr.io/${{ github.repository }}/web-remix:alpha
-          docker push ghcr.io/${{ github.repository }}/web-remix:alpha
-
