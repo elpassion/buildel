@@ -5,6 +5,8 @@ import { Outlet, useLoaderData } from '@remix-run/react';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
+import { BreadcrumbWrapper } from '~/components/pages/experiments/components/Breadcrumb.components';
+import { Breadcrumbs } from '~/components/pages/experiments/components/Breadcrumbs';
 import { Pagination } from '~/components/pagination/Pagination';
 import { Button } from '~/components/ui/button';
 import { metaWithDefaults } from '~/utils/metadata';
@@ -40,7 +42,19 @@ export function DatasetPage() {
         </div>
       </AppNavbar>
 
-      <PageContentWrapper className="mt-6 lg:mt-[120px] pb-3">
+      <BreadcrumbWrapper>
+        <Breadcrumbs
+          pathConfig={{
+            datasetId: dataset.name,
+            datasets: {
+              url: routes.datasets(organizationId),
+              content: 'Datasets',
+            },
+          }}
+        />
+      </BreadcrumbWrapper>
+
+      <PageContentWrapper className="mt-[110px] pb-3">
         <div className="mb-[56px] flex justify-end gap-2 lg:hidden">
           <UploadFileForm size="sm" />
 
