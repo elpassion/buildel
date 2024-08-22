@@ -62,25 +62,27 @@ jobs:
       - name: Log in to GitHub Container Registry
         run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+      - name: Set up tags
+        id: set-tags
+        run: |
+          
+          if [ "${{ github.event_name }}" == "push" ]; then
+          echo "tags=ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }},ghcr.io/${{ github.repository }}/web-remix:alpha" >> $GITHUB_ENV
+          fi
+        
+          if [ "${{ github.event_name }}" == "release" ]; then
+            if [ "$is_latest" == "true" ]; then
+              echo "tags=ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }},ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }},ghcr.io/${{ github.repository }}/web-remix:latest" >> $GITHUB_ENV
+            else
+              echo "tags=ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }},ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+            fi
+          fi
+    
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
           context: apps/web-remix
-          tags: |
-            ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }},ghcr.io/${{ github.repository }}/web-remix:alpha
+          tags: ${{ env.tags }}
           push: ${{ github.event_name == 'push' || github.event_name == 'release' }}
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:alpha-cache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/web-remix:alpha-cache,mode=max
-
-      - name: Push Docker image to GHCR
-        if: ${{ github.event_name == 'release' }}
-        run: |
-          docker tag ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }} ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}
-          docker push ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}
-
-          is_latest=$(gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name == "${{ github.event.release.tag_name }}"')
-          if [ "$is_latest" == "true" ]; then
-            docker tag ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }} ghcr.io/${{ github.repository }}/web-remix:latest
-            docker push ghcr.io/${{ github.repository }}/web-remix:latest
-          fi
-
