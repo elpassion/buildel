@@ -14,6 +14,22 @@ defmodule BuildelWeb.Schemas.Crawls do
     })
   end
 
+  defmodule SitemapResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "CrawlSitemapResponse",
+      type: :object,
+      properties: %{
+        data: %Schema{
+          type: :array,
+          items: %Schema{type: :string}
+        }
+      },
+      required: [:data]
+    })
+  end
+
   defmodule ShowResponse do
     require OpenApiSpex
 

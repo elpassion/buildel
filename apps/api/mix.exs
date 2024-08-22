@@ -87,7 +87,8 @@ defmodule Buildel.MixProject do
       {:paginator, "~> 1.2.0"},
       {:scholar, "~> 0.3.0"},
       {:flame, "~> 0.3.0"},
-      {:html2markdown, "~> 0.1.5"}
+      {:html2markdown, "~> 0.1.5"},
+      {:sweet_xml, "~> 0.7"}
     ]
   end
 
