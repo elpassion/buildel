@@ -19,8 +19,8 @@ import type { ICrawlSchema } from '~/components/pages/knowledgeBase/newCollectio
 import type { loader } from '~/components/pages/knowledgeBase/newCollectionFiles/loader.server';
 import { errorToast } from '~/components/toasts/errorToast';
 import { successToast } from '~/components/toasts/successToast';
-import type { TreeNodeType } from '~/components/treeSelect/TreeSelect';
-import { TreeSelect } from '~/components/treeSelect/TreeSelect';
+import { CheckboxTree } from '~/components/treeSelect/CheckboxTree';
+import type { TreeNodeType } from '~/components/treeSelect/Tree.types';
 import { Button } from '~/components/ui/button';
 import { routes } from '~/utils/routes.utils';
 
@@ -35,7 +35,6 @@ export const DiscoverPages = () => {
     if (fetcher.data.pages.length <= 0) {
       return <EmptyMessage>No pages found</EmptyMessage>;
     }
-
     const nodes = prepareNodes([...new Set(fetcher.data.pages)]);
 
     return <DiscoverPagesTree nodes={nodes} />;
@@ -106,7 +105,7 @@ function DiscoverPagesTree({ nodes }: DiscoverPagesTreeProps) {
   return (
     <div>
       <div className="max-h-[350px] overflow-y-auto">
-        <TreeSelect
+        <CheckboxTree
           nodes={nodes}
           onCheckedChange={setCheckedNodes}
           defaultExpanded={expandedNode}
@@ -177,80 +176,103 @@ function DiscoverButton() {
   );
 }
 
-type PageTreeNode = TreeNodeType<{ url: string }>;
-
+type PageTreeNode = TreeNodeType<{
+  url: string;
+  segment: string;
+  host: string;
+  protocol: string;
+}>;
 function prepareNodes(urls: string[]) {
-  const nodes: PageTreeNode[] = [];
+  if (urls.length === 0) return [];
 
-  for (const url of urls) {
+  const { host, protocol } = extractUrl(urls[0]);
+  const rootUrl = `${protocol}//${host}`;
+
+  const root: PageTreeNode = {
+    value: '_group',
+    segment: rootUrl,
+    label: rootUrl,
+    url: rootUrl,
+    children: [],
+    host,
+    protocol,
+  };
+
+  urls.forEach((url) => {
     const { pathname, host, protocol } = extractUrl(url);
-    const pathParts = splitPathname(pathname);
+    const pathSegments = splitPathname(pathname);
 
-    addNodeToTree(nodes, pathParts, `${protocol}//${host}`);
-  }
+    let currentNode = root;
+    let accumulatedSegment = '';
 
-  return nodes;
+    pathSegments.forEach((segment) => {
+      accumulatedSegment += `/${segment}`;
+
+      if (!currentNode.children) {
+        currentNode.children = [];
+      }
+
+      let node = currentNode.children.find(
+        (child) => child.value === accumulatedSegment,
+      );
+      if (!node) {
+        node = {
+          segment: accumulatedSegment,
+          label: segment,
+          value: accumulatedSegment,
+          url: url,
+          children: [],
+          host,
+          protocol,
+        };
+        currentNode.children.push(node);
+      }
+
+      currentNode = node;
+    });
+  });
+
+  return [
+    {
+      ...root,
+      children: [
+        { ...root, children: [], label: '/', value: root.url },
+        ...(root.children ?? []).map(formatNode),
+      ],
+    },
+  ];
 }
 
-function addNodeToTree(
-  nodes: PageTreeNode[],
-  pathParts: string[],
-  url: string,
-) {
-  if (pathParts.length === 0) return;
-
-  let currentNode = nodes.find((node) => node.value === pathParts[0]);
-
-  const isRoot = pathParts[0] === '';
-
-  if (!currentNode) {
-    if (pathParts.length > 1) {
-      currentNode = {
-        url,
-        value: pathParts[0],
-        label: isRoot ? url : `/${pathParts[0]}`,
-        children: [
-          ...(isRoot
-            ? []
-            : [
-                {
-                  url: buildUrl(pathParts[0], url),
-                  value: buildUrl(pathParts[0], url),
-                  label: '/',
-                },
-              ]),
-        ],
-      };
-    } else {
-      currentNode = {
-        url: buildUrl(pathParts[0], url),
-        value: buildUrl(pathParts[0], url),
-        label: `/${pathParts[0]}`,
-      };
-    }
-
-    nodes.push(currentNode);
-  }
-
-  if (pathParts.length > 1) {
-    addNodeToTree(
-      currentNode.children!.sort((a, b) => a.label.length - b.label.length),
-      pathParts.slice(1),
-      buildUrl(pathParts[0], url),
-    );
+function formatNode(node: PageTreeNode): PageTreeNode {
+  if (node.children && node.children.length > 0) {
+    return {
+      ...node,
+      label: node.segment,
+      value: node.value + '_group',
+      children: [
+        {
+          host: node.host,
+          protocol: node.protocol,
+          label: '/',
+          segment: node.segment,
+          value: buildUrl(node.host, node.segment, node.protocol),
+          url: node.url,
+          children: [],
+        },
+        ...node.children.map(formatNode),
+      ],
+    };
+  } else {
+    return {
+      ...node,
+      label: `/${node.label}`,
+      value: buildUrl(node.host, node.segment, node.protocol),
+    };
   }
 }
 
 function splitPathname(pathname: string) {
-  return pathname.split('/');
-}
-
-function isEndsWithSlash(path: string) {
-  return path.endsWith('/');
-}
-
-function buildUrl(pathname: string, url: string) {
-  return isEndsWithSlash(url) ? url + pathname : url + '/' + pathname;
+  return pathname.split('/').filter(Boolean);
 }
 
 function extractUrl(url: string) {
@@ -261,4 +283,8 @@ function extractUrl(url: string) {
     host: urlObj.host,
     pathname: urlObj.pathname,
   };
+}
+
+function buildUrl(host: string, pathname: string, protocol: string) {
+  return `${protocol}//${host}${pathname}`;
 }
