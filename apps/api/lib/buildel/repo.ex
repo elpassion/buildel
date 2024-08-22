@@ -4,6 +4,30 @@ defmodule Buildel.Repo do
     adapter: Ecto.Adapters.Postgres
 
   use Paginator
+
+  def disable_soft_deletion(tables_rules, fun) do
+    transaction(fn ->
+      for {table, rule} <- tables_rules do
+        query!("ALTER TABLE #{quote_table(table)} DISABLE RULE #{rule}")
+      end
+
+      try do
+        fun.()
+      after
+        for {table, rule} <- tables_rules do
+          query!("ALTER TABLE #{quote_table(table)} ENABLE RULE #{rule}")
+        end
+      end
+    end)
+  end
+
+  defp quote_table(name) when is_binary(name) do
+    if String.contains?(name, "\"") do
+      raise "invalid table name"
+    end
+
+    [?", name, ?"]
+  end
 end
 
 defmodule Buildel.DynamicRepoSqlite do

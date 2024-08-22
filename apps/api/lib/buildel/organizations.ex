@@ -76,7 +76,15 @@ defmodule Buildel.Organizations do
   end
 
   def delete_organization(%Organization{} = organization) do
-    Repo.delete(organization)
+    Repo.disable_soft_deletion(
+      [
+        {"pipelines", "soft_deletion"}
+      ],
+      fn ->
+        Repo.delete(organization)
+      end
+    )
+    |> then(fn {:ok, result} -> result end)
   end
 
   def change_organization(%Organization{} = organization, attrs \\ %{}) do

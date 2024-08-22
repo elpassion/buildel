@@ -3,7 +3,7 @@ defmodule Buildel.Pipelines.Pipeline do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "pipelines" do
+  schema "visible_pipelines" do
     field(:name, :string)
     field(:config, :map)
     field(:interface_config, :map)
@@ -16,6 +16,7 @@ defmodule Buildel.Pipelines.Pipeline do
 
     belongs_to(:organization, Buildel.Organizations.Organization)
 
+    field(:deleted_at, :utc_datetime)
     timestamps()
   end
 

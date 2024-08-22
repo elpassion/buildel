@@ -12,6 +12,7 @@ defmodule Buildel.Pipelines.Run do
     field(:total_cost, :decimal, default: 0)
     field(:interface_config, :map, default: %{})
 
+    field(:deleted_at, :utc_datetime)
     timestamps()
   end
 

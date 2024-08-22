@@ -107,8 +107,18 @@ defmodule Buildel.LogsAggregator do
     {aggregated, unfinished_logs} =
       logs_list
       |> Enum.reduce({[], %{}}, fn log, {aggregated_list, current} ->
-        log_context = get_log_context(log)
-        message_type = log.message_type
+        log_context =
+          try do
+            get_log_context(log)
+          rescue
+            _ -> nil
+          end
+
+        message_type =
+          case log_context do
+            nil -> :skip
+            _ -> log.message_type
+          end
 
         default_log = %AggregatedLog{
           block_name: log.block_name,

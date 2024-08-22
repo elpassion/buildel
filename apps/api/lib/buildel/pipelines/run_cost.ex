@@ -9,6 +9,7 @@ defmodule Buildel.Pipelines.RunCost do
     belongs_to :cost, Buildel.Costs.Cost
     field :description, :string
 
+    field(:deleted_at, :utc_datetime)
     timestamps()
   end
 

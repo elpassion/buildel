@@ -28,7 +28,7 @@ defmodule Buildel.Pipelines do
   end
 
   def delete_pipeline(%Pipeline{} = pipeline) do
-    Repo.delete(pipeline)
+    Repo.delete(pipeline, allow_stale: true)
   end
 
   def list_organization_pipelines(%Organization{} = organization) do
