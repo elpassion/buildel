@@ -9,7 +9,6 @@ import {
 import { ExternalLink } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
-import { EmptyMessage } from '~/components/list/ItemList';
 import { StopRunForm } from '~/components/pages/pipelines/overview/StopRunForm';
 import type {
   IPipelineRun,
@@ -21,6 +20,7 @@ import {
   TableBody,
   TableBodyCell,
   TableBodyRow,
+  TableEmptyMessage,
   TableHead,
   TableHeadCell,
   TableHeadRow,
@@ -152,9 +152,9 @@ export const PipelineRunsTable: React.FC<PipelineRunsTableProps> = ({
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
-              <EmptyMessage className="px-5">
+              <TableEmptyMessage>
                 There are no pipeline runs...
-              </EmptyMessage>
+              </TableEmptyMessage>
             </td>
           </tr>
         ) : null}

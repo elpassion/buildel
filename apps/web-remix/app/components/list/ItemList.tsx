@@ -34,9 +34,9 @@ export const ItemList = <T extends { id: number | string }>({
   );
 };
 
-export const EmptyMessage: React.FC<
-  PropsWithChildren<{ className?: string }>
-> = ({ children, className }) => {
+export type EmptyMessageProps = React.HTMLAttributes<HTMLSpanElement>;
+
+export const EmptyMessage = ({ children, className }: EmptyMessageProps) => {
   return (
     <span className={cn('text-sm text-muted-foreground', className)}>
       {children}

@@ -8,6 +8,7 @@ import React, {
 
 import type { BasicLinkProps } from '~/components/link/BasicLink';
 import { BasicLink } from '~/components/link/BasicLink';
+import { EmptyMessage, EmptyMessageProps } from '~/components/list/ItemList';
 import type { BadgeProps } from '~/components/ui/badge';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -180,5 +181,17 @@ export const CellNumberBadge = ({
     >
       {children}
     </div>
+  );
+};
+
+export const TableEmptyMessage = ({
+  className,
+  children,
+  ...rest
+}: EmptyMessageProps) => {
+  return (
+    <EmptyMessage className={cn('px-5 whitespace-nowrap', className)} {...rest}>
+      {children}
+    </EmptyMessage>
   );
 };

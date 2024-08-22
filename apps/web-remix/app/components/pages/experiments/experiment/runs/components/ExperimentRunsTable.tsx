@@ -7,7 +7,6 @@ import {
 } from '@tanstack/react-table';
 import { ExternalLink } from 'lucide-react';
 
-import { EmptyMessage } from '~/components/list/ItemList';
 import { EvaluationAverageCellBadge } from '~/components/pages/experiments/experiment/runs/components/EvaluationAverageCellBadge';
 import type { IExperimentRun } from '~/components/pages/experiments/experiments.types';
 import {
@@ -18,6 +17,7 @@ import {
   TableBody,
   TableBodyCell,
   TableBodyRow,
+  TableEmptyMessage,
   TableHead,
   TableHeadCell,
   TableHeadRow,
@@ -131,9 +131,9 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
-              <EmptyMessage className="px-5">
+              <TableEmptyMessage>
                 There are no experiment runs yet...
-              </EmptyMessage>
+              </TableEmptyMessage>
             </td>
           </tr>
         ) : null}

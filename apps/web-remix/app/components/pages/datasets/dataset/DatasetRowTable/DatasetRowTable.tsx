@@ -7,7 +7,6 @@ import {
 } from '@tanstack/react-table';
 
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
-import { EmptyMessage } from '~/components/list/ItemList';
 import type { IDatasetRow } from '~/components/pages/datasets/dataset.types';
 import { useListAction } from '~/components/pages/knowledgeBase/components/ListActionProvider';
 import {
@@ -15,6 +14,7 @@ import {
   TableBody,
   TableBodyCell,
   TableBodyRow,
+  TableEmptyMessage,
   TableHead,
   TableHeadCell,
   TableHeadRow,
@@ -174,9 +174,9 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
-              <EmptyMessage className="px-5">
+              <TableEmptyMessage>
                 There are no dataset rows yet...
-              </EmptyMessage>
+              </TableEmptyMessage>
             </td>
           </tr>
         ) : null}

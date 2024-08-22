@@ -7,7 +7,6 @@ import {
 } from '@tanstack/react-table';
 import { FolderCog, Layers } from 'lucide-react';
 
-import { EmptyMessage } from '~/components/list/ItemList';
 import type {
   IExperimentRun,
   IExperimentRunRun,
@@ -19,6 +18,7 @@ import {
   TableBody,
   TableBodyCell,
   TableBodyRow,
+  TableEmptyMessage,
   TableHead,
   TableHeadCell,
   TableHeadRow,
@@ -171,9 +171,9 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
-              <EmptyMessage className="px-5">
+              <TableEmptyMessage>
                 There are no experiment run runs yet...
-              </EmptyMessage>
+              </TableEmptyMessage>
             </td>
           </tr>
         ) : null}

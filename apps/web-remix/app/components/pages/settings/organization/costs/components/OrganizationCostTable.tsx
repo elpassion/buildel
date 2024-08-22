@@ -9,13 +9,13 @@ import { FolderCog, Layers } from 'lucide-react';
 
 import type { IOrganizationCost } from '~/api/organization/organization.contracts';
 import { isOrganizationCollectionCost } from '~/api/organization/organization.contracts';
-import { EmptyMessage } from '~/components/list/ItemList';
 import {
   ExternalLinkCell,
   Table,
   TableBody,
   TableBodyCell,
   TableBodyRow,
+  TableEmptyMessage,
   TableHead,
   TableHeadCell,
   TableHeadRow,
@@ -141,9 +141,9 @@ export const OrganizationCostTable: React.FC<OrganizationCostTableProps> = ({
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
-              <EmptyMessage className="px-5 whitespace-nowrap text-nowrap">
+              <TableEmptyMessage>
                 There are no organization costs...
-              </EmptyMessage>
+              </TableEmptyMessage>
             </td>
           </tr>
         ) : null}

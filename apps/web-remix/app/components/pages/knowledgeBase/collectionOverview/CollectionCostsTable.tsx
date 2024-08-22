@@ -6,12 +6,12 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-import { EmptyMessage } from '~/components/list/ItemList';
 import {
   Table,
   TableBody,
   TableBodyCell,
   TableBodyRow,
+  TableEmptyMessage,
   TableHead,
   TableHeadCell,
   TableHeadRow,
@@ -120,9 +120,9 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
         {data.length === 0 ? (
           <tr>
             <td className="py-2 mx-auto">
-              <EmptyMessage className="px-5">
+              <TableEmptyMessage>
                 There are no collection costs...
-              </EmptyMessage>
+              </TableEmptyMessage>
             </td>
           </tr>
         ) : null}
