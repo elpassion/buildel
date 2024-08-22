@@ -108,6 +108,7 @@ jobs:
           fi
         
           if [ "${{ github.event_name }}" == "release" ]; then
+            is_latest=$(gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name == "${{ github.event.release.tag_name }}"')
             if [ "$is_latest" == "true" ]; then
               echo "tags=ghcr.io/${{ github.repository }}/api:${{ github.sha }},ghcr.io/${{ github.repository }}/api:${{ github.event.release.tag_name }},ghcr.io/${{ github.repository }}/api:latest" >> $GITHUB_ENV
             else
