@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { ChevronDown } from 'lucide-react';
 
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
@@ -22,10 +28,13 @@ export const TreeSelect = <T = {},>({
   onCheckedChange,
   defaultExpanded,
 }: TreeSelectProps<T>) => {
-  const [checkedNodes, setCheckedNodes] = useState<string[]>([]);
-  const [expandedNodes, setExpandedNodes] = useState<string[]>(
+  const [_checkedNodes, setCheckedNodes] = useState<string[]>([]);
+  const [_expandedNodes, setExpandedNodes] = useState<string[]>(
     defaultExpanded ?? [],
   );
+
+  const checkedNodes = useDeferredValue(_checkedNodes);
+  const expandedNodes = useDeferredValue(_expandedNodes);
 
   useEffect(() => {
     onCheckedChange?.(checkedNodes);
@@ -123,23 +132,30 @@ export const TreeSelect = <T = {},>({
     [expandedNodes],
   );
 
-  const value = useMemo(() => {
+  const expandedValue = useMemo(() => {
     return {
-      checkChecked: getCheckedState,
       checkExpanded: isExpanded,
-      toggleChecked,
       toggleExpanded,
     };
-  }, [toggleExpanded, toggleChecked]);
+  }, [toggleExpanded]);
+
+  const checkedValue = useMemo(() => {
+    return {
+      checkChecked: getCheckedState,
+      toggleChecked,
+    };
+  }, [toggleChecked]);
 
   return (
-    <TreeSelectContext.Provider value={value}>
-      <div className="flex flex-col gap-1">
-        {nodes.map((node) => (
-          <Node key={node.value} node={node} />
-        ))}
-      </div>
-    </TreeSelectContext.Provider>
+    <ExpandedNodesContext.Provider value={expandedValue}>
+      <CheckedNodesContext.Provider value={checkedValue}>
+        <div className="flex flex-col gap-1">
+          {nodes.map((node) => (
+            <Node key={node.value} node={node} />
+          ))}
+        </div>
+      </CheckedNodesContext.Provider>
+    </ExpandedNodesContext.Provider>
   );
 };
 
@@ -148,82 +164,105 @@ type NodeProps<T> = {
 };
 
 function Node<T>({ node }: NodeProps<T>) {
-  const { checkChecked, toggleChecked, checkExpanded, toggleExpanded } =
-    useTreeSelect();
+  return (
+    <>
+      <div className="flex items-center">
+        <NodeExpandButton node={node} />
+
+        <NodeCheckbox node={node} />
+      </div>
+
+      <NodeChildren node={node} />
+    </>
+  );
+}
+
+function NodeChildren<T>({ node }: NodeProps<T>) {
+  const { checkExpanded } = useExpandedNodes();
 
   const childrenExist = useMemo(() => {
     return hasChildren(node);
   }, [node.value]);
 
-  const checkedState = useMemo(() => {
-    console.log('checked');
-    return checkChecked(node);
-  }, [checkChecked]);
+  const expanded = useMemo(() => {
+    return checkExpanded(node);
+  }, [checkExpanded]);
+
+  if (!childrenExist || !expanded) return null;
+
+  return (
+    <NodeInnerWrapper>
+      {node.children?.map((child) => <Node key={child.value} node={child} />)}
+    </NodeInnerWrapper>
+  );
+}
+
+function NodeExpandButton<T>({ node }: NodeProps<T>) {
+  const { checkExpanded, toggleExpanded } = useExpandedNodes();
+
+  const childrenExist = useMemo(() => {
+    return hasChildren(node);
+  }, [node.value]);
 
   const expanded = useMemo(() => {
     return checkExpanded(node);
   }, [checkExpanded]);
+
+  return (
+    <div className="w-5 h-5 flex justify-center items-center shrink-0">
+      <IconButton
+        size="xxs"
+        variant="secondary"
+        className={cn({ hidden: !childrenExist })}
+        onlyIcon
+        icon={<ChevronDown className={cn({ 'rotate-180': expanded })} />}
+        onClick={() => toggleExpanded(node)}
+      />
+    </div>
+  );
+}
+
+function NodeCheckbox<T>({ node }: NodeProps<T>) {
+  const { checkChecked, toggleChecked } = useCheckedNodes();
+
+  const checkedState = useMemo(() => {
+    return checkChecked(node);
+  }, [checkChecked]);
+
+  const childrenExist = useMemo(() => {
+    return hasChildren(node);
+  }, [node.value]);
 
   const childrenCount = useMemo(() => {
     return childrenExist ? getAllChildrenCount(node) : 0;
   }, [node.value]);
 
   return (
-    <>
-      <div className="flex items-center">
-        <div className="w-5 h-5 flex justify-center items-center shrink-0">
-          <IconButton
-            size="xxs"
-            variant="secondary"
-            className={cn({ hidden: !childrenExist })}
-            onlyIcon
-            icon={<ChevronDown className={cn({ 'rotate-180': expanded })} />}
-            onClick={() => toggleExpanded(node)}
-          />
-        </div>
-
-        <label
-          className={cn(
-            'flex gap-[6px] items-center hover:bg-muted px-1 rounded cursor-pointer hover:text-foreground',
-            { 'text-[#999]': checkedState === 0 },
-          )}
-        >
-          <CheckboxInput
-            size="sm"
-            className={cn({ 'border-[#999]': checkedState === 0 })}
-            onCheckedChange={() => toggleChecked(node)}
-            checked={checkedState === 2 ? 'indeterminate' : checkedState === 1}
-          />
-          <span className="text-sm line-clamp-1" title={node.label}>
-            {node.label}
-          </span>
-
-          {childrenCount ? (
-            <span className="text-xs flex items-center gap-1 text-blue-500">
-              <div className="w-1 h-1 rounded-full bg-blue-500" />
-              {childrenCount} items
-            </span>
-          ) : null}
-        </label>
-      </div>
-
-      {childrenExist && expanded && (
-        <NodeInnerWrapper>
-          {node.children?.map((child) => (
-            <Node key={child.value} node={child} />
-          ))}
-        </NodeInnerWrapper>
+    <label
+      className={cn(
+        'flex gap-[6px] items-center hover:bg-muted px-1 rounded cursor-pointer hover:text-foreground',
+        { 'text-[#999]': checkedState === 0 },
       )}
-    </>
+    >
+      <CheckboxInput
+        size="sm"
+        className={cn({ 'border-[#999]': checkedState === 0 })}
+        onCheckedChange={() => toggleChecked(node)}
+        checked={checkedState === 2 ? 'indeterminate' : checkedState === 1}
+      />
+      <span className="text-sm line-clamp-1" title={node.label}>
+        {node.label}
+      </span>
+
+      {childrenCount ? (
+        <span className="text-xs flex items-center gap-1 text-blue-500">
+          <div className="w-1 h-1 rounded-full bg-blue-500" />
+          {childrenCount} items
+        </span>
+      ) : null}
+    </label>
   );
 }
-
-type TreeSelectContextType<T> = {
-  toggleChecked: (node: TreeNodeType<T>) => void;
-  toggleExpanded: (node: TreeNodeType<T>) => void;
-  checkChecked: (node: TreeNodeType<T>) => number;
-  checkExpanded: (node: TreeNodeType<T>) => boolean;
-};
 
 function NodeInnerWrapper({ children }: { children: React.ReactNode }) {
   return <div className="pl-6">{children}</div>;
@@ -252,16 +291,44 @@ function getNodeChildValues<T>(node: TreeNodeType<T>): string[] {
   return node.children?.flatMap(getNodeChildValues) ?? [];
 }
 
-const TreeSelectContext = React.createContext<
-  TreeSelectContextType<any> | undefined
+type CheckedNodesContextType<T> = {
+  toggleChecked: (node: TreeNodeType<T>) => void;
+  checkChecked: (node: TreeNodeType<T>) => number;
+};
+
+const CheckedNodesContext = React.createContext<
+  CheckedNodesContextType<any> | undefined
 >(undefined);
 
-function useTreeSelect<T>() {
-  const context = React.useContext(TreeSelectContext) as
-    | TreeSelectContextType<T>
+function useCheckedNodes<T>() {
+  const context = React.useContext(CheckedNodesContext) as
+    | CheckedNodesContextType<T>
     | undefined;
   if (!context) {
-    throw new Error('useTreeSelect must be used within a TreeSelectProvider');
+    throw new Error(
+      'useCheckedNodes must be used within a CheckedNodesContext',
+    );
+  }
+  return context;
+}
+
+type ExpandedNodesContextType<T> = {
+  toggleExpanded: (node: TreeNodeType<T>) => void;
+  checkExpanded: (node: TreeNodeType<T>) => boolean;
+};
+
+const ExpandedNodesContext = React.createContext<
+  ExpandedNodesContextType<any> | undefined
+>(undefined);
+
+function useExpandedNodes<T>() {
+  const context = React.useContext(ExpandedNodesContext) as
+    | ExpandedNodesContextType<T>
+    | undefined;
+  if (!context) {
+    throw new Error(
+      'useExpandedNodes must be used within a ExpandedNodesContext',
+    );
   }
   return context;
 }
