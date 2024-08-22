@@ -146,3 +146,7 @@ export function isOrganizationCollectionCost(
 ): cost is IOrganizationCollectionCost {
   return cost.type === 'collection';
 }
+
+export const CrawlSitemapResponse = z
+  .object({ data: z.array(z.string()) })
+  .transform((res) => res.data);

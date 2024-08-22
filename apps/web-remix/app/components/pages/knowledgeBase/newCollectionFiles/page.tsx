@@ -1,6 +1,7 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 
+import { DiscoverPages } from '~/components/pages/knowledgeBase/newCollectionFiles/components/DiscoverPages';
 import { Tab, TabButton } from '~/components/tabs/Tab';
 import { TabGroup } from '~/components/tabs/TabGroup';
 import { Button } from '~/components/ui/button';
@@ -38,7 +39,8 @@ export function NewCollectionFilesPage() {
         </Tab>
 
         <Tab tabId="crawl">
-          <CollectionCrawlForm />
+          <DiscoverPages />
+          {/*<CollectionCrawlForm />*/}
         </Tab>
       </TabGroup>
     </>

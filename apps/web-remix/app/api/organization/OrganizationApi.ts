@@ -6,6 +6,7 @@ import { buildUrlWithParams } from '~/utils/url';
 
 import {
   APIKeyResponse,
+  CrawlSitemapResponse,
   CreateFromTemplateResponse,
   InvitationResponse,
   InvitationsResponse,
@@ -136,5 +137,14 @@ export class OrganizationApi {
         body: JSON.stringify(data),
       },
     );
+  }
+
+  async discoverPages(organizationId: string | number, websiteUrl: string) {
+    const url = buildUrlWithParams(
+      `/organizations/${organizationId}/tools/crawls/sitemap`,
+      { url: websiteUrl },
+    );
+
+    return this.client(CrawlSitemapResponse, url);
   }
 }

@@ -16,7 +16,7 @@ import { successToast } from '~/components/toasts/successToast';
 
 import type { loader } from '../loader.server';
 
-const CrawlSchema = z.object({
+export const CrawlSchema = z.object({
   url: z.string().url(),
   memory_collection_id: z.string(),
   max_depth: zfd
@@ -28,7 +28,7 @@ const CrawlSchema = z.object({
     .optional(),
 });
 
-type ICrawlSchema = z.TypeOf<typeof CrawlSchema>;
+export type ICrawlSchema = z.TypeOf<typeof CrawlSchema>;
 
 export const CollectionCrawlForm = () => {
   const revalidator = useRevalidator();
