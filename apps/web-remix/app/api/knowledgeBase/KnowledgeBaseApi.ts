@@ -25,9 +25,8 @@ type DateQueryParams = {
   start_date: string;
   end_date: string;
 };
-
 export class KnowledgeBaseApi {
-  constructor(private client: typeof fetchTyped) { }
+  constructor(private client: typeof fetchTyped) {}
 
   async getCollections(organizationId: string | number) {
     return this.client(
