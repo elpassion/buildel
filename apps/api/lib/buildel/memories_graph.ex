@@ -178,14 +178,7 @@ defmodule Buildel.MemoriesGraph do
       ) do
     collection_name = Buildel.Memories.organization_collection_name(organization, collection)
 
-    should_build =
-      !memory ||
-        (memory &&
-           Buildel.VectorDB.EctoAdapter.MemoryGraphPoint
-           |> where(graph_name: ^collection_name)
-           |> Buildel.Repo.exists?())
-
-    if should_build do
+    if should_build?(memory, collection_name) do
       %Task{pid: pid} =
         Task.Supervisor.async(
           Buildel.TaskSupervisor,
@@ -225,5 +218,15 @@ defmodule Buildel.MemoriesGraph do
     IO.inspect("Saved reduced embeddings")
 
     :ok
+  end
+
+  defp should_build?(memory, collection_name) do
+    !memory || graph_exists?(collection_name)
+  end
+
+  defp graph_exists?(collection_name) do
+    Buildel.VectorDB.EctoAdapter.MemoryGraphPoint
+    |> where(graph_name: ^collection_name)
+    |> Buildel.Repo.exists?()
   end
 end

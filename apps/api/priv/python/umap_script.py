@@ -24,6 +24,20 @@ def get_reducer(cursor, collection_name):
     else:
         return pickle.loads(result[0])
 
+def memory_added_to_graph(cursor, memory_id):
+    cursor.execute(
+        """
+            SELECT COUNT(*) 
+            FROM memories_graph_points AS mgp
+            JOIN vector_collection_chunks AS vcc ON mgp.id = vcc.id
+            WHERE vcc.metadata @> %s
+        """,
+        (json.dumps({"memory_id": memory_id}),)
+    )
+    (count,) = cursor.fetchone()
+    return count > 0
+
+
 SAMPLE_SIZE = 1500
 
 def reduce_dimensions(collection_name, memory_id):
@@ -39,7 +53,11 @@ def reduce_dimensions(collection_name, memory_id):
         memory_id = None
     cursor = conn.cursor()
     reducer = get_reducer(cursor, collection_name)
-    is_adding = reducer != None and memory_id != None and reducer._raw_data.shape[0] >= SAMPLE_SIZE 
+    is_added = memory_id != None and memory_added_to_graph(cursor, memory_id)
+    if (is_added):
+        print("Already added")
+        return "ok"
+    is_adding = reducer != None and memory_id != None and reducer._raw_data.shape[0] >= SAMPLE_SIZE
     if (is_adding):
       cursor.execute(
         """
