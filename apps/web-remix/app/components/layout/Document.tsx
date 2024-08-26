@@ -18,7 +18,6 @@ export function Document({
         <Meta />
         <Links />
         <script
-          nonce={nonce}
           defer
           data-domain="app.buildel.ai"
           src="/statistics/script.js"
@@ -26,8 +25,8 @@ export function Document({
       </head>
       <body className="bg-white text-foreground">
         {children}
-        <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
+        <ScrollRestoration />
+        <Scripts />
       </body>
     </html>
   );
