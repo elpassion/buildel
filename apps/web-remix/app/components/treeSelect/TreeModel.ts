@@ -79,16 +79,12 @@ export class TreeModel<T> {
     const treeNode = this.nodes[node.value];
 
     if (this.isEveryChildChecked(treeNode)) {
-      console.log('EVERY CHILDREN CHECKED', treeNode.value);
       this.toggleChecked(treeNode.value, 1);
     } else if (this.isSomeChildChecked(treeNode)) {
-      console.log('SOME CHILDREN CHECKED', treeNode.value);
       this.toggleChecked(treeNode.value, 2);
     } else {
-      console.log('NO CHILDREN CHECKED', treeNode.value);
       this.toggleChecked(treeNode.value, 0);
     }
-    console.log(treeNode);
     if (treeNode.parent) {
       this.setParentChecked(treeNode.parent);
     }
