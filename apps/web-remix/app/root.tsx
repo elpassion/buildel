@@ -1,19 +1,13 @@
 import type { LinksFunction } from '@remix-run/node';
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from '@remix-run/react';
+import { Outlet } from '@remix-run/react';
 import { withSentry } from '@sentry/remix';
 
 import { Toaster } from '~/components/toasts/Toaster';
 
 import './tailwind.css';
 
-import { ErrorBoundaryLayout } from '~/components/errorBoundaries/ErrorBoundaryLayout';
 import { RootErrorBoundary } from '~/components/errorBoundaries/RootErrorBoundary';
+import { Document } from '~/components/layout/Document';
 import { PageProgress } from '~/components/progressBar/PageProgress';
 import { useNonce } from '~/utils/nonce-provider';
 
@@ -34,36 +28,6 @@ export const links: LinksFunction = () => [
   },
 ];
 
-function Document({
-  children,
-  nonce,
-}: {
-  children: React.ReactNode;
-  nonce: string;
-}) {
-  return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <Meta />
-        <Links />
-        <script
-          nonce={nonce}
-          defer
-          data-domain="app.buildel.ai"
-          src="/statistics/script.js"
-        ></script>
-      </head>
-      <body className="bg-white text-foreground">
-        {children}
-        <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
-      </body>
-    </html>
-  );
-}
-
 function App() {
   const nonce = useNonce();
 
@@ -81,8 +45,8 @@ export default withSentry(App);
 export function ErrorBoundary() {
   const nonce = useNonce();
   return (
-    <ErrorBoundaryLayout nonce={nonce} className="bg-white text-foreground">
+    <Document nonce={nonce}>
       <RootErrorBoundary />
-    </ErrorBoundaryLayout>
+    </Document>
   );
 }
