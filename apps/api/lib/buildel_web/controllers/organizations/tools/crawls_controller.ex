@@ -60,6 +60,80 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
     end
   end
 
+  operation :bulk_crawl,
+    summary: "Create bulk crawl",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer, required: true]
+    ],
+    request_body: {"crawl", "application/json", BuildelWeb.Schemas.Crawls.BulkCrawlRequest},
+    responses: [
+      ok: {"ok", "application/json", nil},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def bulk_crawl(conn, _params) do
+    %{organization_id: organization_id} = conn.params
+
+    %{urls: urls, memory_collection_id: memory_collection_id} =
+      conn.body_params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
+         :ok <- Buildel.Memories.Crawls.Runner.run(organization, collection, urls) do
+      conn
+      |> put_status(:ok)
+      |> json(%{})
+    end
+  end
+
+  operation :show_crawls,
+    summary: "Show remaining crawls",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer, required: true],
+      memory_collection_id: [
+        in: :query,
+        description: "Memory collection ID",
+        type: :integer,
+        required: true
+      ]
+    ],
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Crawls.CrawlsResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def show_crawls(conn, _params) do
+    %{organization_id: organization_id, memory_collection_id: memory_collection_id} = conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, memory_collection_id),
+         tasks <- Buildel.Memories.Crawls.Runner.get_remaining_tasks(collection.id) do
+      conn
+      |> put_status(:ok)
+      |> render(:show_crawls, tasks: tasks)
+    end
+  end
+
   operation :create,
     summary: "Create crawl",
     parameters: [

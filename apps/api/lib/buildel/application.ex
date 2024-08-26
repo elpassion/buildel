@@ -40,6 +40,8 @@ defmodule Buildel.Application do
           {Task.Supervisor, name: Buildel.TaskSupervisor},
           {Buildel.Experiments.Runner, name: Buildel.Experiments.Runner},
           :poolboy.child_spec(:worker, Buildel.Experiments.Runner.poolboy_config()),
+          {Buildel.Memories.Crawls.Runner, name: Buildel.Memories.Crawls.Runner},
+          :poolboy.child_spec(:worker_crawl, Buildel.Memories.Crawls.Runner.poolboy_config()),
           # Start the vault used for encryption
           Buildel.Vault,
           # JWKS storage

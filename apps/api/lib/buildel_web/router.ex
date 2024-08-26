@@ -286,6 +286,18 @@ defmodule BuildelWeb.Router do
     post("/organizations/:organization_id/tools/chunks", OrganizationToolChunkController, :create)
     post("/organizations/:organization_id/tools/crawls", OrganizationToolCrawlController, :create)
 
+    post(
+      "/organizations/:organization_id/tools/crawls/bulk",
+      OrganizationToolCrawlController,
+      :bulk_crawl
+    )
+
+    get(
+      "/organizations/:organization_id/tools/crawls",
+      OrganizationToolCrawlController,
+      :show_crawls
+    )
+
     get(
       "/organizations/:organization_id/tools/crawls/sitemap",
       OrganizationToolCrawlController,

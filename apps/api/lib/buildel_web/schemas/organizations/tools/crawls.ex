@@ -30,6 +30,22 @@ defmodule BuildelWeb.Schemas.Crawls do
     })
   end
 
+  defmodule CrawlsResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "CrawlCrawlsResponse",
+      type: :object,
+      properties: %{
+        data: %Schema{
+          type: :array,
+          items: %Schema{type: :string}
+        }
+      },
+      required: [:data]
+    })
+  end
+
   defmodule ShowResponse do
     require OpenApiSpex
 
@@ -59,6 +75,27 @@ defmodule BuildelWeb.Schemas.Crawls do
           description: "Maximum depth to crawl",
           default: 1,
           maximum: 3
+        },
+        memory_collection_id: %Schema{
+          type: :integer,
+          description: "Memory collection ID to store the crawl results"
+        }
+      },
+      required: [:url, :memory_collection_id]
+    })
+  end
+
+  defmodule BulkCrawlRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "CrawlBulkRequest",
+      type: :object,
+      properties: %{
+        urls: %Schema{
+          type: :array,
+          items: %Schema{type: :string},
+          description: "URLs to crawl"
         },
         memory_collection_id: %Schema{
           type: :integer,
