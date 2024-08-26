@@ -79,13 +79,16 @@ export class TreeModel<T> {
     const treeNode = this.nodes[node.value];
 
     if (this.isEveryChildChecked(treeNode)) {
+      console.log('EVERY CHILDREN CHECKED', treeNode.value);
       this.toggleChecked(treeNode.value, 1);
     } else if (this.isSomeChildChecked(treeNode)) {
+      console.log('SOME CHILDREN CHECKED', treeNode.value);
       this.toggleChecked(treeNode.value, 2);
     } else {
+      console.log('NO CHILDREN CHECKED', treeNode.value);
       this.toggleChecked(treeNode.value, 0);
     }
-
+    console.log(treeNode);
     if (treeNode.parent) {
       this.setParentChecked(treeNode.parent);
     }
@@ -135,14 +138,18 @@ export class TreeModel<T> {
   }
 
   private isEveryChildChecked(node: TreeNodeType<T>) {
-    return (node.children ?? []).every(
-      (child) => this.getNode(child.value).checked === 1,
-    );
+    return (node.children ?? []).every((child) => {
+      const childNode = this.getNode(child.value);
+
+      return childNode.checked === 1 || childNode.checked === 2;
+    });
   }
 
   private isSomeChildChecked(node: TreeNodeType<T>) {
-    return (node.children ?? []).some(
-      (child) => this.getNode(child.value).checked === 1,
-    );
+    return (node.children ?? []).some((child) => {
+      const childNode = this.getNode(child.value);
+
+      return childNode.checked === 1 || childNode.checked === 2;
+    });
   }
 }
