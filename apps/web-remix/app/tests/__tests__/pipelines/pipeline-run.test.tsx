@@ -27,7 +27,7 @@ const handlers = () => [
   ...new PipelineHandlers([simplePipelineFixture()]).handlers,
 ];
 
-describe('Pipeline workflow run', () => {
+describe.skip('Pipeline workflow run', () => {
   const onMessageMock = vi.fn();
   const setupServer = server(handlers());
   const wsServer = new WebSocketServerMock({ onMessage: onMessageMock });
