@@ -14,7 +14,7 @@ export const metaWithDefaults = <
       //@ts-ignore
       if (m['title']) {
         //@ts-ignore
-        return { ...m, title: `Buildel | ${m['title']}` };
+        return { ...m, title: `BuildEL | ${m['title']}` };
       }
 
       return m;
