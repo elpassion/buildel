@@ -8,6 +8,6 @@ defmodule BuildelWeb.OrganizationToolCrawlJSON do
   end
 
   def show_crawls(%{tasks: tasks}) do
-    %{data: Enum.map(tasks, fn {_, _, url} -> url end)}
+    %{data: Enum.map(tasks, fn {_, {_, url}} -> url end)}
   end
 end

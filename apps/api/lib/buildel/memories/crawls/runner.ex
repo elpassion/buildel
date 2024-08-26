@@ -42,7 +42,7 @@ defmodule Buildel.Memories.Crawls.Runner do
             Worker.run(url, organization, collection)
           end)
 
-        {task.ref, collection.id, url}
+        {task.ref, {collection.id, url}}
       end)
       |> Map.new()
 
@@ -69,7 +69,7 @@ defmodule Buildel.Memories.Crawls.Runner do
   end
 
   defp remaining_crawl_tasks(tasks, collection_id),
-    do: Enum.filter(tasks, fn {_, id, _} -> id == collection_id end)
+    do: Enum.filter(tasks, fn {_, {id, _}} -> id == collection_id end)
 
   defp cleanup_task(state, ref) do
     Process.demonitor(ref, [:flush])
