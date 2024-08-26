@@ -9,6 +9,13 @@ export default defineConfig({
   ssr: {
     noExternal: ['@elpassion/taco'],
   },
+  build:{
+    minify: false,
+    terserOptions: {
+      compress: false,
+      mangle: false,
+    }
+  },
   server: {
     port: 3000,
     watch: {
