@@ -92,23 +92,23 @@ await app.addHook('onRequest', async (request, reply) => {
   const nonce = crypto.randomBytes(16).toString('hex');
   request.loadContext = { cspNonce: nonce }; // add nonce to request context
 
-  // const isIframeAllowed =
-  //   request.url.startsWith('/webchats') || request.url.startsWith('/forms');
-  //
-  // const csp = createCSP(nonce, isIframeAllowed);
-  //
-  // reply.header('Content-Security-Policy', csp);
-  // reply.header(
-  //   'Strict-Transport-Security',
-  //   'max-age=63072000; includeSubDomains; preload',
-  // );
-  // reply.header('X-Content-Type-Options', 'nosniff');
-  // reply.header('X-Frame-Options', 'SAMEORIGIN');
-  // reply.header(
-  //   'Permissions-Policy',
-  //   'geolocation=*, microphone=*, camera=*, fullscreen=*',
-  // );
-  // reply.header('X-XSS-Protection', '1; mode=block');
+  const isIframeAllowed =
+    request.url.startsWith('/webchats') || request.url.startsWith('/forms');
+
+  const csp = createCSP(nonce, isIframeAllowed);
+
+  reply.header('Content-Security-Policy', csp);
+  reply.header(
+    'Strict-Transport-Security',
+    'max-age=63072000; includeSubDomains; preload',
+  );
+  reply.header('X-Content-Type-Options', 'nosniff');
+  reply.header('X-Frame-Options', 'SAMEORIGIN');
+  reply.header(
+    'Permissions-Policy',
+    'geolocation=*, microphone=*, camera=*, fullscreen=*',
+  );
+  reply.header('X-XSS-Protection', '1; mode=block');
 });
 
 await app.register(helmet, {

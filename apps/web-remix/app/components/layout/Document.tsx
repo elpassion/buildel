@@ -3,8 +3,6 @@ import { Links, Meta, Scripts, ScrollRestoration } from '@remix-run/react';
 
 export function Document({
   children,
-
-  //eslint-disable-next-line
   nonce,
 }: {
   children: React.ReactNode;
@@ -20,6 +18,7 @@ export function Document({
         <Meta />
         <Links />
         <script
+          nonce={nonce}
           defer
           data-domain="app.buildel.ai"
           src="/statistics/script.js"
@@ -27,8 +26,8 @@ export function Document({
       </head>
       <body className="bg-white text-foreground">
         {children}
-        <ScrollRestoration />
-        <Scripts />
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
       </body>
     </html>
   );
