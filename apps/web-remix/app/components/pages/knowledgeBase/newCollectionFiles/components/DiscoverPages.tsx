@@ -15,10 +15,9 @@ import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { EmptyMessage } from '~/components/list/ItemList';
-import type { ICrawlSchema } from '~/components/pages/knowledgeBase/newCollectionFiles/components/CollectionCrawlForm';
 import type { loader } from '~/components/pages/knowledgeBase/newCollectionFiles/loader.server';
 import { errorToast } from '~/components/toasts/errorToast';
-import { successToast } from '~/components/toasts/successToast';
+import { loadingToast } from '~/components/toasts/loadingToast';
 import { CheckboxTree } from '~/components/treeSelect/CheckboxTree';
 import type { TreeNodeType } from '~/components/treeSelect/Tree.types';
 import { Button } from '~/components/ui/button';
@@ -40,11 +39,21 @@ export const DiscoverPages = () => {
     return <DiscoverPagesTree nodes={nodes} />;
   }
 
-  return <DiscoverPagesForm onSubmit={onDiscover} />;
+  return (
+    <DiscoverPagesForm
+      onSubmit={onDiscover}
+      loading={fetcher.state !== 'idle'}
+    />
+  );
 };
 
 interface DiscoverPagesTreeProps {
   nodes: TreeNodeType[];
+}
+
+interface CrawlBulkData {
+  urls: string[];
+  memory_collection_id: string;
 }
 
 function DiscoverPagesTree({ nodes }: DiscoverPagesTreeProps) {
@@ -56,50 +65,92 @@ function DiscoverPagesTree({ nodes }: DiscoverPagesTreeProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const expandedNode = nodes[0].children?.length ? [nodes[0].value] : [];
 
-  // @todo Rewrite this on monday. Use batch crawl etc.
-  async function crawlWebsite(data: ICrawlSchema) {
-    const res = await fetch(
-      `/super-api/organizations/${organizationId}/tools/crawls`,
-      {
-        headers: {
-          'content-type': 'application/json',
+  const crawlUrls = async (data: CrawlBulkData) => {
+    async function crawl(data: CrawlBulkData) {
+      const res = await fetch(
+        `/super-api/organizations/${organizationId}/tools/crawls/bulk`,
+        {
+          headers: {
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(data),
+          method: 'POST',
         },
-        body: JSON.stringify(data),
-        method: 'POST',
-      },
-    );
+      );
 
-    if (!res.ok) {
-      const body = await res.json();
-      throw new Error(body?.errors?.detail ?? 'Something went wrong!');
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body?.errors?.detail ?? 'Something went wrong!');
+      }
+
+      return res.json();
     }
 
-    return res.json();
-  }
+    async function refreshCrawlState(memoryCollectionId: string) {
+      const res = await fetch(
+        `/super-api/organizations/${organizationId}/tools/crawls?memory_collection_id=${memoryCollectionId}`,
+      );
+
+      if (!res.ok) {
+        const body = await res.json();
+        errorToast('Something went wrong!');
+        throw new Error(body?.errors?.detail ?? 'Something went wrong!');
+      }
+
+      const data = await res.json();
+
+      if (data.data.length > 0) {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            refreshCrawlState(memoryCollectionId).then(resolve).catch(reject);
+          }, 1000);
+        });
+      } else {
+        return data;
+      }
+    }
+
+    try {
+      await crawl(data);
+      await refreshCrawlState(data.memory_collection_id);
+      revalidate.revalidate();
+      navigate(routes.collectionFiles(organizationId, collectionName));
+    } catch (e) {
+      throw e;
+    }
+  };
 
   const submit = async () => {
     setIsSubmitting(true);
 
-    try {
-      await Promise.all(
-        checkedNodes.map((url) => {
-          return crawlWebsite({
-            url,
+    loadingToast(
+      async () => {
+        try {
+          await crawlUrls({
             memory_collection_id: collectionId.toString(),
-            max_depth: 1,
+            urls: checkedNodes,
           });
-        }),
-      );
-      successToast('Website(s) crawled successfully');
-      revalidate.revalidate();
-      navigate(routes.collectionFiles(organizationId, collectionName));
-    } catch (error) {
-      if (error instanceof Error) {
-        errorToast(error.message);
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
+
+          return Promise.resolve({
+            title: 'Website(s) were crawled successfully.',
+            description: 'You can now view the files in the collection.',
+          });
+        } catch {
+          return Promise.reject({
+            title: 'Website(s) could not be crawled.',
+            description: 'Please try again later.',
+          });
+        } finally {
+          setIsSubmitting(false);
+        }
+      },
+      {
+        loading: {
+          title: "We're crawling the website(s).",
+          description: 'Please do not close or refresh the app.',
+        },
+      },
+    );
   };
 
   return (
@@ -136,9 +187,10 @@ const DiscoverSchema = z.object({
 
 interface DiscoverPagesFormProps {
   onSubmit: (values: z.TypeOf<typeof DiscoverSchema>) => void;
+  loading: boolean;
 }
 
-function DiscoverPagesForm({ onSubmit }: DiscoverPagesFormProps) {
+function DiscoverPagesForm({ onSubmit, loading }: DiscoverPagesFormProps) {
   const validator = useMemo(() => withZod(DiscoverSchema), []);
 
   const submit = (
@@ -156,7 +208,7 @@ function DiscoverPagesForm({ onSubmit }: DiscoverPagesFormProps) {
         <FieldLabel>Website</FieldLabel>
         <div className="relative w-full">
           <TextInputField className="w-full pr-[78px]" />
-          <DiscoverButton />
+          <DiscoverButton loading={loading} />
         </div>
         <FieldMessage>Enter the website URL to discover pages</FieldMessage>
       </Field>
@@ -164,14 +216,16 @@ function DiscoverPagesForm({ onSubmit }: DiscoverPagesFormProps) {
   );
 }
 
-function DiscoverButton() {
+function DiscoverButton({ loading }: { loading: boolean }) {
   return (
     <SubmitButton
+      disabled={loading}
+      isLoading={loading}
       variant="ghost"
       size="xxs"
       className="absolute top-1/2 right-2 -translate-y-1/2"
     >
-      Discover
+      {loading ? 'Loading...' : 'Discover'}
     </SubmitButton>
   );
 }
