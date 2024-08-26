@@ -3,6 +3,8 @@ import { Links, Meta, Scripts, ScrollRestoration } from '@remix-run/react';
 
 export function Document({
   children,
+
+  //eslint-disable-next-line
   nonce,
 }: {
   children: React.ReactNode;
