@@ -102,7 +102,7 @@ defmodule BuildelWeb.Schemas.Crawls do
           description: "Memory collection ID to store the crawl results"
         }
       },
-      required: [:url, :memory_collection_id]
+      required: [:urls, :memory_collection_id]
     })
   end
 end
