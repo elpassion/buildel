@@ -89,8 +89,8 @@
     "phoenix": "^1.7.7",
     "rc-menu": "^9.12.0",
     "rc-select": "^14.11.0",
-    "react": "18.3.0-canary-a870b2d54-20240314",
-    "react-dom": "18.3.0-canary-a870b2d54-20240314",
+    "react": "19.0.0-rc-b57d2823-20240822",
+    "react-dom": "19.0.0-rc-b57d2823-20240822",
     "react-datepicker": "^6.6.0",
     "react-intersection-observer": "^9.5.3",
     "react-tooltip": "^5.21.5",
@@ -109,8 +109,8 @@
     "zod-form-data": "^2.0.1"
   },
   "overrides": {
-    "react": "18.3.0-canary-a870b2d54-20240314",
-    "react-dom": "18.3.0-canary-a870b2d54-20240314"
+    "react": "19.0.0-rc-b57d2823-20240822",
+    "react-dom": "19.0.0-rc-b57d2823-20240822"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.3.1",
