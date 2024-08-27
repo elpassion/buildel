@@ -17,6 +17,22 @@ export function Document({
 
         <Meta />
         <Links />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+        />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap"
+        />
+
         <script
           nonce={nonce}
           defer
@@ -24,6 +40,7 @@ export function Document({
           src="/statistics/script.js"
         ></script>
       </head>
+
       <body className="bg-white text-foreground">
         {children}
         <ScrollRestoration nonce={nonce} />
