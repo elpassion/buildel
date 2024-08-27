@@ -1,6 +1,8 @@
 import React from 'react';
 import { Links, Meta, Scripts, ScrollRestoration } from '@remix-run/react';
 
+import { PageProgress } from '~/components/progressBar/PageProgress';
+
 export function Document({
   children,
   nonce,
@@ -43,6 +45,8 @@ export function Document({
 
       <body className="bg-white text-foreground">
         {children}
+        {/*<Toaster />*/}
+        <PageProgress />
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
       </body>
