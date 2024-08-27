@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { useMediaQuery } from 'usehooks-ts';

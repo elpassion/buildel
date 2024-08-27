@@ -1,5 +1,3 @@
-'use client';
-
 import { CircleAlert, CircleCheck, TriangleAlert } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Toaster as Sonner } from 'sonner';
