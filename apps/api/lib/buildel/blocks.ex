@@ -34,7 +34,8 @@ defmodule Buildel.Blocks do
     WorkflowCall,
     DatasetOutput,
     ImageInput,
-    HuggingFaceImageClassification
+    HuggingFaceImageClassification,
+    BraveSearch
   }
 
   @names_to_blocks_map %{
@@ -68,7 +69,8 @@ defmodule Buildel.Blocks do
     "workflow_call" => WorkflowCall,
     "dataset_output" => DatasetOutput,
     "image_input" => ImageInput,
-    "hf_image_classification" => HuggingFaceImageClassification
+    "hf_image_classification" => HuggingFaceImageClassification,
+    "brave_search" => BraveSearch
   }
 
   @blocks_to_names_map %{
@@ -102,7 +104,8 @@ defmodule Buildel.Blocks do
     WorkflowCall => "workflow_call",
     DatasetOutput => "dataset_output",
     ImageInput => "image_input",
-    HuggingFaceImageClassification => "hf_image_classification"
+    HuggingFaceImageClassification => "hf_image_classification",
+    BraveSearch => "brave_search"
   }
 
   def list_types() do
