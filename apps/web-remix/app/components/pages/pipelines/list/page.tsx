@@ -112,7 +112,7 @@ function TemplatesWithoutPipelines({
   const { templates } = useLoaderData<typeof loader>();
 
   return (
-    <WorkflowTemplates className="max-w-[862px] mx-auto w-full md:p-8 md:absolute md:top-1/3 md:left-1/2 md:-translate-y-1/2 md:-translate-x-1/2">
+    <WorkflowTemplates className="max-w-[862px] mx-auto w-full">
       <WorkflowTemplatesHeader
         heading={
           <span>
