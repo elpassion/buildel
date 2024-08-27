@@ -84,7 +84,9 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
       ...dynamicColumns.outputs.map((name) =>
         columnHelper.accessor(`data.${name}`, {
           header: () => (
-            <span className="whitespace-nowrap">Evaluation: {name}</span>
+            <span className="whitespace-nowrap line-clamp-1">
+              Evaluation: {name}
+            </span>
           ),
           id: name,
           cell: EvaluationAverageCellBadge,
@@ -92,7 +94,9 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
       ),
       columnHelper.accessor(`evaluation_avg`, {
         header: () => (
-          <span className="whitespace-nowrap">Evaluation Average</span>
+          <span className="whitespace-nowrap  line-clamp-1">
+            Evaluation Average
+          </span>
         ),
         id: 'evaluation_avg',
         cell: EvaluationAverageCellBadge,
