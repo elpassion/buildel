@@ -61,6 +61,15 @@ defmodule Buildel.Blocks.Chat do
                   "description" => "The description of the chat.",
                   "default" => "Chat with a large language model."
                 },
+                api_type: %{
+                  "type" => "string",
+                  "title" => "Model API type",
+                  "description" => "The API type to use for the chat.",
+                  "enum" => ["openai", "azure", "google", "mistral", "anthropic"],
+                  "enumPresentAs" => "radio",
+                  "default" => "openai",
+                  "readonly" => true
+                },
                 api_key:
                   secret_schema(%{
                     "title" => "API key",
@@ -75,13 +84,14 @@ defmodule Buildel.Blocks.Chat do
                       }
                     }
                   }),
-                api_type: %{
+                model: %{
                   "type" => "string",
-                  "title" => "Model API type",
-                  "description" => "The API type to use for the chat.",
-                  "enum" => ["openai", "azure", "google", "mistral", "anthropic"],
-                  "enumPresentAs" => "radio",
-                  "default" => "openai",
+                  "title" => "Model",
+                  "description" => "The model to use for the chat.",
+                  "url" =>
+                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
+                  "presentAs" => "async-select",
+                  "minLength" => 1,
                   "readonly" => true
                 },
                 endpoint: %{
@@ -99,16 +109,6 @@ defmodule Buildel.Blocks.Chat do
                     }
                   },
                   "minLength" => 1
-                },
-                model: %{
-                  "type" => "string",
-                  "title" => "Model",
-                  "description" => "The model to use for the chat.",
-                  "url" =>
-                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
-                  "presentAs" => "async-select",
-                  "minLength" => 1,
-                  "readonly" => true
                 },
                 chat_memory_type: %{
                   "type" => "string",

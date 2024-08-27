@@ -8,8 +8,18 @@ export function generateZODSchema(
 ): z.ZodSchema<unknown> {
   if (schema.type === 'string') {
     if ('enum' in schema) {
-      const nestedSchema = z.enum(schema.enum as any);
-      return isOptional ? nestedSchema.optional() : nestedSchema;
+      let nestedSchema = z.enum(schema.enum as any);
+
+      if (isOptional) {
+        //@ts-ignore
+        nestedSchema = nestedSchema.optional();
+      }
+      if ('default' in schema && schema.default !== undefined) {
+        //@ts-ignore
+        nestedSchema = nestedSchema.default(schema.default);
+      }
+
+      return nestedSchema;
     }
 
     let nestedSchema: z.ZodString | z.ZodOptional<z.ZodString> = z.string();
@@ -124,7 +134,7 @@ export function generateZODSchema(
         ...acc,
         [key]: generateZODSchema(
           value,
-          !(schema.required || []).includes(key),
+          !(schema.required || []).includes(key) || isOptional,
           context,
         ),
       };
@@ -290,4 +300,14 @@ export function checkDisplayWhenConditions(
     }
   }
   return true;
+}
+
+export function fillSchemaDefaults<T>(
+  schema: JSONSchemaField,
+  data: Record<string, any>,
+  ctx: Record<string, string> = {},
+): T {
+  const validateSchema = generateZODSchema(schema, true, ctx);
+
+  return validateSchema.parse(data) as T;
 }

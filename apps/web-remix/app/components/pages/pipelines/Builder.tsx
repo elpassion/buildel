@@ -44,7 +44,11 @@ import { useDraggableNodes } from './useDraggableNodes';
 
 import '@xyflow/react/dist/style.css';
 
+import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
+import { fillSchemaDefaults } from '~/components/form/schema/SchemaParser';
 import { BuilderControls } from '~/components/pages/pipelines/BuilderControls';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { usePipelineId } from '~/hooks/usePipelineId';
 import { cn } from '~/utils/cn';
 
 import { NodeDropdown } from './NodeDropdown/NodeDropdown';
@@ -144,8 +148,10 @@ const BuilderInstance = ({
   undo,
   redo,
 }: BuilderInstanceProps) => {
-  const { status: runStatus } = useRunPipeline();
+  const pipelineId = usePipelineId();
+  const organizationId = useOrganizationId();
   const outletData = useOutlet();
+  const { status: runStatus } = useRunPipeline();
   const reactFlowWrapper = useRef<HTMLDivElement | null>(null);
 
   const isDisabled = runStatus !== 'idle' || type === 'readOnly';
@@ -254,13 +260,22 @@ const BuilderInstance = ({
       const nameNum = getLastBlockNumber(sameBlockTypes) + 1;
       const name = `${created.type.toLowerCase()}_${nameNum}`;
 
-      created.opts.name = name;
-
       const newBlock: INode = {
         id: name,
         type: getNodeType(created.type),
         position: created.position ?? { x: 100, y: 100 },
-        data: { ...created, name },
+        data: {
+          ...created,
+          ...fillSchemaDefaults(
+            created.block_type!.schema as JSONSchemaField,
+            { ...created, name },
+            {
+              organization_id: organizationId,
+              pipeline_id: pipelineId,
+              block_name: name,
+            },
+          ),
+        },
         selected: false,
         measured: created.measured,
       };
