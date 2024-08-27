@@ -89,12 +89,13 @@
     "phoenix": "^1.7.7",
     "rc-menu": "^9.12.0",
     "rc-select": "^14.11.0",
-    "react": "^18.3.1",
+    "react": "19.0.0-rc-eb3ad065-20240822",
     "react-datepicker": "^6.6.0",
-    "react-dom": "^18.3.1",
+    "react-dom": "19.0.0-rc-eb3ad065-20240822",
     "react-intersection-observer": "^9.5.3",
     "react-tooltip": "^5.21.5",
-    "recharts": "^2.12.7",
+    "recharts": "2.13.0-alpha.4",
+    "is-react": "1.5.4",
     "remix-utils": "^7.5.0",
     "remix-validated-form": "^5.1.5",
     "sonner": "^1.5.0",
@@ -107,6 +108,13 @@
     "vaul": "^0.9.1",
     "zod": "^3.21.4",
     "zod-form-data": "^2.0.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.0.0-rc-eb3ad065-20240822",
+      "react-dom": "19.0.0-rc-eb3ad065-20240822",
+      "react-is": "19.0.0-rc-eb3ad065-20240822"
+    }
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.3.1",

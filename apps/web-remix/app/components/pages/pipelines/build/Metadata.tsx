@@ -12,10 +12,10 @@ import {
 import { useDropdown } from '~/components/dropdown/DropdownContext';
 import { EditorField } from '~/components/form/fields/editor.field';
 import { Field } from '~/components/form/fields/field.context';
-import { SubmitButton } from '~/components/form/submit';
 import type { Metadata as IMetadata } from '~/components/pages/pipelines/RunPipelineProvider';
 import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
 import { successToast } from '~/components/toasts/successToast';
+import { Button } from '~/components/ui/button';
 
 export const Metadata = () => {
   const { metadata, setMetadata } = useRunPipeline();
@@ -104,9 +104,9 @@ function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
       </Field>
 
       <div className="flex justify-end w-full mt-2">
-        <SubmitButton size="xs" isFluid>
+        <Button size="xs" isFluid>
           Set
-        </SubmitButton>
+        </Button>
       </div>
     </ValidatedForm>
   );

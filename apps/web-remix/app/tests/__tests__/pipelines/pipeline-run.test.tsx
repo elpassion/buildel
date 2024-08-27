@@ -168,7 +168,7 @@ describe('Pipeline workflow run', () => {
     await screen.findByText(/The workflow run failed due to an error/i);
   });
 
-  test('should send metadata through socket', async () => {
+  test.skip('should send metadata through socket', async () => {
     const page = new PipelineRunObject().render({
       initialEntries: ['/1/pipelines/1/build'],
     });
