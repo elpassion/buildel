@@ -34,7 +34,7 @@ defmodule Buildel.Blocks.MapInputs do
               "template" =>
                 EditorField.new(%{
                   title: "template",
-                  description: "Output string from combined inputs.",
+                  description: "JQ template for combining texts.",
                   type: "string",
                   minLength: 1
                 })
@@ -53,6 +53,7 @@ defmodule Buildel.Blocks.MapInputs do
 
   defp combine(state) do
     state = state |> send_stream_start()
+    fields = input_values(state)
 
     {state, message} =
       state |> interpolate_template_with_take_latest_messages(state[:opts].template)
@@ -62,6 +63,16 @@ defmodule Buildel.Blocks.MapInputs do
         state
 
       message ->
+    fields_json = fields |> Enum.map(fn
+          {field, nil} -> {field, nil}
+          {field, value} ->
+          case Jason.decode(value) do
+            {:ok, value} -> {field, value}
+            _ -> {field, value}
+          end
+        end) |> Enum.into(%{}) |> Jason.encode!()
+
+        message = Buildel.JQ.query!(fields_json, message)
         output(state, "output", {:text, message})
     end
   end
@@ -72,7 +83,7 @@ defmodule Buildel.Blocks.MapInputs do
   end
 
   defp interpolate_template_with_take_latest_messages(state, template) do
-    message = replace_input_strings_with_latest_inputs_values(state, template)
+    message = replace_input_strings_with_latest_inputs(state, template) |> String.trim()
 
     if all_inputs_in_string_filled?(message, state.connections) do
       {state |> cleanup_inputs(), message}

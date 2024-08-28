@@ -38,7 +38,7 @@ defmodule Buildel.Blocks.MapInputsTest do
           MapInputs.create(%{
             name: "test",
             opts: %{
-              template: "dupa",
+              template: "\"dupa\"",
               reset: false
             },
             connections: [
@@ -58,7 +58,7 @@ defmodule Buildel.Blocks.MapInputsTest do
     )
 
     assert_receive({^topic, :start_stream, nil, _})
-    assert_receive({^topic, :text, "dupa", _})
+    assert_receive({^topic, :text, "dupa\n", _})
     assert_receive({^topic, :stop_stream, nil, _})
   end
 
@@ -70,7 +70,7 @@ defmodule Buildel.Blocks.MapInputsTest do
           MapInputs.create(%{
             name: "test",
             opts: %{
-              template: "dupa {{text_input:output}}",
+              template: "\"dupa \\(.{{text_input:output}})\"",
               reset: false
             },
             connections: [
@@ -90,7 +90,7 @@ defmodule Buildel.Blocks.MapInputsTest do
     )
 
     assert_receive({^topic, :start_stream, nil, _})
-    assert_receive({^topic, :text, "dupa Hello darkness my old friend.", _})
+    assert_receive({^topic, :text, "dupa Hello darkness my old friend.\n", _})
     assert_receive({^topic, :stop_stream, nil, _})
   end
 
@@ -103,7 +103,7 @@ defmodule Buildel.Blocks.MapInputsTest do
           MapInputs.create(%{
             name: "test",
             opts: %{
-              template: "dupa {{text_input:output}} {{text_input_2:output}}"
+              template: "\"dupa \\(.{{text_input:output}}) \\(.{{text_input_2:output}})\"",
             },
             connections: [
               Blocks.Connection.from_connection_string(
@@ -126,10 +126,10 @@ defmodule Buildel.Blocks.MapInputsTest do
     refute_received({^topic, :text, _message, _})
     refute_received({^topic, :stop_stream, nil, _})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World"})
-    assert_receive({^topic, :text, "dupa Hello World", _})
+    assert_receive({^topic, :text, "dupa Hello World\n", _})
     assert_receive({^topic, :stop_stream, nil, _})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World 2"})
-    assert_receive({^topic, :text, "dupa Hello World 2", _})
+    assert_receive({^topic, :text, "dupa Hello World 2\n", _})
     assert_receive({^topic, :stop_stream, nil, _})
   end
 
@@ -142,7 +142,7 @@ defmodule Buildel.Blocks.MapInputsTest do
           MapInputs.create(%{
             name: "test",
             opts: %{
-              template: "dupa {{text_input:output}} {{text_input_2:output}}",
+              template: "\"dupa \\(.{{text_input:output}}) \\(.{{text_input_2:output}})\"",
               reset: true
             },
             connections: [
@@ -157,11 +157,11 @@ defmodule Buildel.Blocks.MapInputsTest do
 
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello"})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World"})
-    assert_receive({^topic, :text, "dupa Hello World", _})
+    assert_receive({^topic, :text, "dupa Hello World\n", _})
     assert_receive({^topic, :stop_stream, nil, _})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World 2"})
-    refute_receive({^topic, :text, "dupa Hello World 2", _})
+    refute_receive({^topic, :text, "dupa Hello World 2\n", _})
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello 2"})
-    assert_receive({^topic, :text, "dupa Hello 2 World 2", _})
+    assert_receive({^topic, :text, "dupa Hello 2 World 2\n", _})
   end
 end

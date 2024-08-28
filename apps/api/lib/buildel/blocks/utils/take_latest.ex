@@ -6,7 +6,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
     quote do
       import TakeLatest
 
-      defp input_values(state) do
+      def input_values(state) do
         state |> Map.get(tl_keyword())
       end
 
@@ -58,6 +58,17 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
         end)
       end
 
+      defp replace_input_strings_with_latest_inputs(state, template) do
+        state
+        |> input_values()
+        |> Enum.reduce(template, fn
+          {_input, nil}, template ->
+            template
+
+          {input, _text}, template ->
+            String.replace(template, "{{#{input}}}", "\"#{input}\"")
+        end)
+      end
       defp tl_keyword(), do: :take_latest_messages
 
       defp all_inputs_in_string_filled?(nil, connections), do: true
@@ -67,7 +78,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
           message,
           connections
           |> Enum.map(fn connection ->
-            "#{connection.from.block_name}:#{connection.from.name}"
+            "{{#{connection.from.block_name}:#{connection.from.name}}}"
           end)
         )
       end
