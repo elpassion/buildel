@@ -18,22 +18,26 @@ defmodule Buildel.WorkflowTemplates do
     %{
       name: "Knowledge Search To Text",
       template_name: "knowledge_search_to_text",
-      template_description: "Allows to analyse given documents and receive i.e. summary or answer questions"
+      template_description:
+        "Allows to analyse given documents and receive i.e. summary or answer questions"
     },
     %{
       name: "Spreadsheet AI Assistant",
       template_name: "spreadsheet_ai_assistant",
-      template_description: "Interact with a spreadsheet database using plain language. No need for SQL"
+      template_description:
+        "Interact with a spreadsheet database using plain language. No need for SQL"
     },
     %{
       name: "Text Classification",
       template_name: "text_classification_assistant",
-      template_description: "Text classifier assistant that convert text into one or more categories"
+      template_description:
+        "Text classifier assistant that convert text into one or more categories"
     },
     %{
       name: "Feedback Assistant",
       template_name: "text_feedback_assistant",
-      template_description: "Text feedback assistant that analyze the provided text and provide feedback"
+      template_description:
+        "Text feedback assistant that analyze the provided text and provide feedback"
     }
   ]
 
@@ -75,9 +79,34 @@ defmodule Buildel.WorkflowTemplates do
       organization_id: organization_id,
       config: %{
         blocks: [
-          generate_comment_block(%{name: "comment_1", measured: %{ width: 211, height: 100 }, position: %{x: -300.5609264532254, y: -467.5377471106992}, opts: %{color: "transparent", content: "<h3>1️⃣ Send an example essay in PDF format</h3>"}}),
-          generate_comment_block(%{name: "comment_2", measured: %{ width: 292, height: 100 }, position: %{x: 400.6049424336637, y: -608.8847889234336}, opts: %{color: "transparent", content: "<h3>2️⃣ The LLM will analyze it and prepare feedback for you.</h3>"}}),
-          generate_comment_block(%{name: "comment_3", measured: %{ width: 319, height: 139 }, position: %{x: 1268.9991028385389, y: -641.8534980811221}, opts: %{color: "transparent", content: "<h3>3️⃣ See the result here, or use the <em>form </em>interface.</h3><p class=\"!my-0\">You can access the <em>form</em> interface in the Interface tab.</p>"}}),
+          generate_comment_block(%{
+            name: "comment_1",
+            measured: %{width: 211, height: 100},
+            position: %{x: -300.5609264532254, y: -467.5377471106992},
+            opts: %{
+              color: "transparent",
+              content: "<h3>1️⃣ Send an example essay in PDF format</h3>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_2",
+            measured: %{width: 292, height: 100},
+            position: %{x: 400.6049424336637, y: -608.8847889234336},
+            opts: %{
+              color: "transparent",
+              content: "<h3>2️⃣ The LLM will analyze it and prepare feedback for you.</h3>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_3",
+            measured: %{width: 319, height: 139},
+            position: %{x: 1268.9991028385389, y: -641.8534980811221},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>3️⃣ See the result here, or use the <em>form </em>interface.</h3><p class=\"!my-0\">You can access the <em>form</em> interface in the Interface tab.</p>"
+            }
+          }),
           generate_file_input_block(%{
             position: %{x: -321.5846160748752, y: -360.6756965729587}
           }),
@@ -90,8 +119,10 @@ defmodule Buildel.WorkflowTemplates do
               api_type: "openai",
               endpoint: "https://api.openai.com/v1",
               model: "gpt-4o-mini",
-              system_message: "You are a Feedback Assistant.\n\nI will send you an essay, and your job is to prepare feedback for it.\n\nRemember to:\n\n- Be conversational.\n- Be brief.\n- Evaluate on multiple criteria.\n- Respond in bullet points and markdown.\n- Prepare an overall summary at the end.",
+              system_message:
+                "You are a Feedback Assistant.\n\nI will send you an essay, and your job is to prepare feedback for it.\n\nRemember to:\n\n- Be conversational.\n- Be brief.\n- Evaluate on multiple criteria.\n- Respond in bullet points and markdown.\n- Prepare an overall summary at the end.",
               prompt_template: "{{file_to_text_1:output}}",
+              chat_memory_type: "off"
             }
           }),
           generate_collect_all_text_block(%{
@@ -99,7 +130,7 @@ defmodule Buildel.WorkflowTemplates do
           }),
           generate_text_output_block(%{
             position: %{x: 1285.57960217244, y: -489.905306811496}
-          }),
+          })
         ],
         connections: [
           create_connection("file_input_1", "file_to_text_1"),
@@ -115,10 +146,9 @@ defmodule Buildel.WorkflowTemplates do
           outputs: [%{name: "text_output_1", type: "text_output"}],
           public: true
         }
-      },
+      }
     }
   end
-
 
   def generate_text_classification_assistant(organization_id) do
     %{
@@ -126,7 +156,16 @@ defmodule Buildel.WorkflowTemplates do
       organization_id: organization_id,
       config: %{
         blocks: [
-          generate_comment_block(%{name: "comment_1", measured: %{ width: 324, height: 231 }, position: %{x: 397, y: -767}, opts: %{color: "transparent", content: "<h3>The LLM will analyze the provided text and classify it.</h3><p class=\"!my-0\">The returned output will follow this format:</p><pre><code>{\n categories: string[],\n keywords: string[]\n}</code></pre>"}}),
+          generate_comment_block(%{
+            name: "comment_1",
+            measured: %{width: 324, height: 231},
+            position: %{x: 397, y: -767},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>The LLM will analyze the provided text and classify it.</h3><p class=\"!my-0\">The returned output will follow this format:</p><pre><code>{\n categories: string[],\n keywords: string[]\n}</code></pre>"
+            }
+          }),
           generate_text_input_block(%{position: %{x: -96, y: -501}}),
           generate_chat_block(%{
             position: %{x: 363, y: -500},
@@ -134,15 +173,18 @@ defmodule Buildel.WorkflowTemplates do
               api_type: "openai",
               endpoint: "https://api.openai.com/v1",
               model: "gpt-4o-mini",
-              system_message: "You are a text classification assistant.\n\nYour task is to assign one or more categories to the input text and output in json. \n\nAdditionally, you need to extract the keywords from the text that are related to the classification.",
+              system_message:
+                "You are a text classification assistant.\n\nYour task is to assign one or more categories to the input text and output in json. \n\nAdditionally, you need to extract the keywords from the text that are related to the classification.",
               prompt_template: "--- Text Data\n\n{{text_input_1:output}}\n\n---",
               messages: [
                 %{
-                  content: "The staff was great. The receptionists were very helpful and answered all our questions. The room was clean and bright, and the room service was always on time. Will be coming back! Thank you so much",
+                  content:
+                    "The staff was great. The receptionists were very helpful and answered all our questions. The room was clean and bright, and the room service was always on time. Will be coming back! Thank you so much",
                   role: "user"
                 },
                 %{
-                  content: "{\n  \"categories\":[\"customerfeedback\",\"hospitality\",\"hotelreview\"],\n  \"keywords\": [\"staff\",\"receptionists\",\"helpful\",\"clean\",\"bright\",\n    \"roomservice\", \"comingback\"]\n}",
+                  content:
+                    "{\n  \"categories\":[\"customerfeedback\",\"hospitality\",\"hotelreview\"],\n  \"keywords\": [\"staff\",\"receptionists\",\"helpful\",\"clean\",\"bright\",\n    \"roomservice\", \"comingback\"]\n}",
                   role: "assistant"
                 }
               ]
@@ -150,7 +192,7 @@ defmodule Buildel.WorkflowTemplates do
           }),
           generate_text_output_block(%{
             position: %{x: 909.8641992600402, y: -500.4424284352723}
-          }),
+          })
         ],
         connections: [
           create_connection("chat_1", "text_output_1"),
@@ -164,10 +206,9 @@ defmodule Buildel.WorkflowTemplates do
           outputs: [%{name: "text_output_1", type: "text_output"}],
           public: true
         }
-      },
+      }
     }
   end
-
 
   def generate_spreadsheet_ai_assistant_config(organization_id) do
     %{
@@ -175,9 +216,35 @@ defmodule Buildel.WorkflowTemplates do
       organization_id: organization_id,
       config: %{
         blocks: [
-          generate_comment_block(%{name: "comment_1", measured: %{ width: 444, height: 136 }, position: %{x: 72.70172870895723, y: 612.1249090138265}, opts: %{color: "transparent", content: "<h3>1️⃣ Upload a <em>csv </em>file.</h3><p class=\"!my-0\"><strong>Csv Search </strong>block will transform it to <strong><em>sql table</em></strong> which you can query using plain language.</p>"}}),
-          generate_comment_block(%{name: "comment_2", measured: %{ width: 420, height: 100 }, position: %{x: -444.12958728294683, y: 258.0269565163127}, opts: %{color: "transparent", content: "<h3>2️⃣ Ask a question related to uploaded csv</h3><p class=\"!my-0\"></p>"}}),
-          generate_comment_block(%{name: "comment_3", measured: %{ width: 317, height: 100 }, position: %{x: 608.9786421045233, y: -92.06833526716287}, opts: %{color: "transparent", content: "<h3>3️⃣ See the result here or use Chat interface at the bottom right corner 💬</h3>"}}),
+          generate_comment_block(%{
+            name: "comment_1",
+            measured: %{width: 444, height: 136},
+            position: %{x: 72.70172870895723, y: 612.1249090138265},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>1️⃣ Upload a <em>csv </em>file.</h3><p class=\"!my-0\"><strong>Csv Search </strong>block will transform it to <strong><em>sql table</em></strong> which you can query using plain language.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_2",
+            measured: %{width: 420, height: 100},
+            position: %{x: -444.12958728294683, y: 258.0269565163127},
+            opts: %{
+              color: "transparent",
+              content: "<h3>2️⃣ Ask a question related to uploaded csv</h3><p class=\"!my-0\"></p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_3",
+            measured: %{width: 317, height: 100},
+            position: %{x: 608.9786421045233, y: -92.06833526716287},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>3️⃣ See the result here or use Chat interface at the bottom right corner 💬</h3>"
+            }
+          }),
           generate_text_input_block(%{position: %{x: -379.55131538331705, y: 13.436342970687974}}),
           generate_chat_block(%{
             position: %{x: 97.85012452954305, y: 12.316129078621316},
@@ -185,7 +252,8 @@ defmodule Buildel.WorkflowTemplates do
               api_type: "openai",
               endpoint: "https://api.openai.com/v1",
               model: "gpt-4o-mini",
-              system_message: "You are a helpful assistant.\n\nI will ask you some questions, and your task is to answer them using the available tools.\n\nUse only the columns and tables that are available to you in the csv_search_1 tool.\n"
+              system_message:
+                "You are a helpful assistant.\n\nI will ask you some questions, and your task is to answer them using the available tools.\n\nUse only the columns and tables that are available to you in the csv_search_1 tool.\n"
             }
           }),
           generate_text_output_block(%{
@@ -208,11 +276,14 @@ defmodule Buildel.WorkflowTemplates do
       },
       interface_config: %{
         webchat: %{
-          inputs: [%{name: "file_input_1", type: "file_input"}, %{name: "text_input_1", type: "text_input"}],
+          inputs: [
+            %{name: "file_input_1", type: "file_input"},
+            %{name: "text_input_1", type: "text_input"}
+          ],
           outputs: [%{name: "text_output_1", type: "text_output"}],
           public: true
         }
-      },
+      }
     }
   end
 
@@ -347,7 +418,7 @@ defmodule Buildel.WorkflowTemplates do
         name: "comment_1",
         connections: [],
         inputs: [],
-        measured: %{ width: 420, height: 100 },
+        measured: %{width: 420, height: 100},
         opts: %{
           content: "Content of the comment block",
           color: "transparent"
