@@ -57,6 +57,26 @@ defmodule Buildel.DocumentWorkflow do
     }
   end
 
+  def get_content(path, file_metadata) do
+    document_loader =
+      Buildel.DocumentWorkflow.DocumentLoader.new(%{
+        adapter: Application.fetch_env!(:buildel, :document_loader)
+      })
+
+    with {:ok, result} <- DocumentProcessor.load_file(document_loader, path, file_metadata) do
+      content =
+        result
+        |> DocumentProcessor.get_blocks()
+        |> DocumentProcessor.map_to_structures()
+        |> DocumentProcessor.join()
+
+      {:ok, content}
+    else
+      :error ->
+        {:error, "Error reading file"}
+    end
+  end
+
   @spec read(t(), document()) :: struct_list()
   def read(_workflow, {path, file_metadata}) do
     document_loader =

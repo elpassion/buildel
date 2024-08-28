@@ -35,7 +35,8 @@ defmodule Buildel.Blocks do
     DatasetOutput,
     ImageInput,
     HuggingFaceImageClassification,
-    BraveSearch
+    BraveSearch,
+    FileToText
   }
 
   @names_to_blocks_map %{
@@ -70,7 +71,8 @@ defmodule Buildel.Blocks do
     "dataset_output" => DatasetOutput,
     "image_input" => ImageInput,
     "hf_image_classification" => HuggingFaceImageClassification,
-    "brave_search" => BraveSearch
+    "brave_search" => BraveSearch,
+    "file_to_text" => FileToText
   }
 
   @blocks_to_names_map %{
@@ -105,7 +107,8 @@ defmodule Buildel.Blocks do
     DatasetOutput => "dataset_output",
     ImageInput => "image_input",
     HuggingFaceImageClassification => "hf_image_classification",
-    BraveSearch => "brave_search"
+    BraveSearch => "brave_search",
+    FileToText => "file_to_text"
   }
 
   def list_types() do

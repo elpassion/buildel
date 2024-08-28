@@ -250,6 +250,13 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
     end)
   end
 
+  def join(list) do
+    Enum.map(list, fn item ->
+      item.value
+    end)
+    |> Enum.join(" ")
+  end
+
   defp get_parent_headers(item, structures_map, list) do
     parent_id = item.parent
 
