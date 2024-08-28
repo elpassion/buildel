@@ -17,8 +17,15 @@ import {
 } from '~/components/pages/pipelines/pipeline.types';
 import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
 import { Button } from '~/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { useBreakpoints } from '~/hooks/useBreakpoints';
 import { cn } from '~/utils/cn';
+import { buildDocsUrl } from '~/utils/docs';
 import { getRandomNumber } from '~/utils/numbers';
 
 import { loader } from '../loader.server';
@@ -210,24 +217,51 @@ function BlockItem({ data, group, onCreate }: BlockItemProps) {
   };
 
   return (
-    <div
-      key={data.block.type}
-      draggable={runStatus === 'idle'}
-      onDragStart={(event) => {
-        onDragStart(event, data.block);
-      }}
-      id="draggable-block-item"
-      className="w-full border border-input rounded-md p-2 flex gap-2 items-center hover:bg-muted cursor-pointer"
-      onClick={onClickAdd}
-    >
-      <img
-        className="w-3.5 h-3.5 shrink-0"
-        src={urlSrc}
-        alt={data.block.type}
-        onError={onImageError}
-      />
-      <h3 className="text-xs truncate text-foreground">{data.block.type}</h3>
-    </div>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            key={data.block.type}
+            draggable={runStatus === 'idle'}
+            onDragStart={(event) => {
+              onDragStart(event, data.block);
+            }}
+            id="draggable-block-item"
+            className="w-full border border-input rounded-md p-2 flex gap-2 items-center hover:bg-muted cursor-pointer"
+            onClick={onClickAdd}
+          >
+            <img
+              className="w-3.5 h-3.5 shrink-0"
+              src={urlSrc}
+              alt={data.block.type}
+              onError={onImageError}
+            />
+            <h3 className="text-xs truncate text-foreground">
+              {data.block.type}
+            </h3>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-[200px] text-sm">
+          <span>{data.block.description}</span>
+
+          <Button
+            variant="secondary"
+            size="xxs"
+            isFluid
+            className="mt-3 justify-start"
+            asChild
+          >
+            <a
+              href={buildDocsUrl(data.block.type)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View Docs
+            </a>
+          </Button>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
