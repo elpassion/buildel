@@ -40,6 +40,8 @@ defmodule Buildel.Blocks.BraveSearch do
                   "title" => "Country",
                   "description" => "The search query country, where the results come from.",
                   "default" => "us",
+                  "minLength" => 2,
+                  "maxLength" => 2,
                   "readonly" => true
                 },
                 limit: %{

@@ -9,7 +9,7 @@ defmodule Buildel.JQ do
     File.write!(tmp_path, payload, [:utf8])
 
     try do
-      case System.cmd("jq", ["-c", query, tmp_path]) do
+      case System.cmd("jq", ["-c", "-r", query, tmp_path]) do
         {shortened_payload, 0} -> shortened_payload
         {"", 5} -> payload
       end

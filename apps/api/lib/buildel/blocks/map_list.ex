@@ -41,12 +41,18 @@ defmodule Buildel.Blocks.MapList do
 
   defp do_map(list, state) do
     list
-    |> Enum.each(&output(state, "output", {:text, &1 |> Jason.encode!()}, %{stream_stop: :none}))
+    |> Enum.each(
+      &output(state, "output", {:text, &1 |> Jason.encode!()}, %{
+        stream_stop: :none,
+        stream_start: :none
+      })
+    )
   end
 
   @impl true
   def handle_input("list", {_name, :text, text, _metadata}, state) do
+    state = state |> send_stream_start()
     map(text, state)
-    state
+    state |> send_stream_stop()
   end
 end

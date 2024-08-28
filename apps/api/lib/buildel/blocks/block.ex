@@ -115,9 +115,13 @@ defmodule Buildel.Blocks.Block do
       end
 
       def output(state, output_name, payload, opts \\ %{}) do
-        opts = Map.merge(%{stream_stop: :send, metadata: %{}}, opts)
+        opts = Map.merge(%{stream_stop: :send, stream_start: :send, metadata: %{}}, opts)
 
-        state = send_stream_start(state, output_name)
+        state =
+          case opts.stream_start do
+            :send -> send_stream_start(state, output_name)
+            :none -> state
+          end
 
         Buildel.BlockPubSub.broadcast_to_io(
           state.block.context.context_id,
