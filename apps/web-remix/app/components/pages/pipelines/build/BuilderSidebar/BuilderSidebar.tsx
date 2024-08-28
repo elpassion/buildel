@@ -1,6 +1,6 @@
 import React from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
-import { useLocalStorage } from 'usehooks-ts';
+import { useEventListener, useLocalStorage } from 'usehooks-ts';
 
 import { IBlockConfig } from '~/components/pages/pipelines/pipeline.types';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
@@ -58,6 +58,30 @@ const BuilderSidebarClient = ({ onBlockCreate }: BuilderSidebarProps) => {
   };
 
   const isOpen = state === 'open' || state === 'keepOpen';
+
+  useEventListener('keydown', (e) => {
+    if (
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement
+    ) {
+      return;
+    }
+
+    if (
+      e.target instanceof HTMLElement &&
+      e.target.classList.contains('tiptap')
+    ) {
+      return;
+    }
+
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      onMouseOver();
+    }
+
+    if (e.key === 'Escape' || e.key === 'escape') {
+      onMouseLeave();
+    }
+  });
 
   return (
     <BuilderSidebarContext.Provider

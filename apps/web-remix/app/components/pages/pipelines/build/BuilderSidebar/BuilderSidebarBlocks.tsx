@@ -1,8 +1,14 @@
-import React, { DragEvent, useCallback, useMemo, useState } from 'react';
+import React, {
+  DragEvent,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { useLoaderData } from '@remix-run/react';
 import { useReactFlow } from '@xyflow/react';
 import { ChevronUp, Pin, X } from 'lucide-react';
-import { useBoolean, useDebounce } from 'usehooks-ts';
+import { useBoolean, useDebounce, useEventListener } from 'usehooks-ts';
 import { z } from 'zod';
 
 import { BlockType } from '~/api/blockType/blockType.contracts';
@@ -85,6 +91,7 @@ interface BlockGroupListProps {
 }
 
 function BlockGroupList({ blocks, onCreate }: BlockGroupListProps) {
+  const { searchValue } = useBlocksSearch();
   const blockGroups = useMemo(
     () =>
       blocks.reduce(
@@ -102,6 +109,26 @@ function BlockGroupList({ blocks, onCreate }: BlockGroupListProps) {
       ),
     [blocks],
   );
+
+  if (searchValue)
+    return (
+      <div className="flex flex-col gap-1 px-2 mt-2">
+        {blocks
+          .filter((block) =>
+            block.type
+              .replaceAll('_', ' ')
+              .toLowerCase()
+              .includes(searchValue.toLowerCase()),
+          )
+          .map((block) => (
+            <BlockItem
+              data={{ id: block.type, block }}
+              group={block.groups.at(0)!}
+              onCreate={onCreate}
+            />
+          ))}
+      </div>
+    );
 
   return (
     <ItemList
@@ -131,7 +158,10 @@ function BlockGroupItem({ data, onCreate }: BlockGroupItemProps) {
 
   const filteredBlocks = useMemo(() => {
     return data.blocks.filter((block) =>
-      block.type.replace('_', ' ').toLowerCase().includes(searchValue),
+      block.type
+        .replace('_', ' ')
+        .toLowerCase()
+        .includes(searchValue.toLowerCase()),
     );
   }, [data.blocks, searchValue]);
 
@@ -272,14 +302,38 @@ interface SearchInputProps {
   onClear: () => void;
 }
 function SearchInput({ value, onClear, onChange }: SearchInputProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEventListener('keydown', (e) => {
+    if (
+      e.target instanceof HTMLInputElement ||
+      e.target instanceof HTMLTextAreaElement
+    ) {
+      return;
+    }
+
+    if (
+      e.target instanceof HTMLElement &&
+      e.target.classList.contains('tiptap')
+    ) {
+      return;
+    }
+
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
+      inputRef.current?.focus();
+      console.log('SEARCH');
+    }
+  });
+
   return (
     <div className="relative grow">
       <TextInput
-        placeholder="Filter blocks..."
+        placeholder="Search for blocks (ctrl/cmd + k)"
         value={value}
         onChange={onChange}
         size="sm"
         className="pr-8"
+        ref={inputRef}
       />
       <IconButton
         type="button"
