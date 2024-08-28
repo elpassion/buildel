@@ -121,6 +121,7 @@ defmodule Buildel.Blocks.MapInputsTest do
 
     {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
 
+
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello"})
     assert_receive({^topic, :start_stream, nil, _})
     refute_received({^topic, :text, _message, _})
