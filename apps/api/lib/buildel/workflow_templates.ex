@@ -19,6 +19,11 @@ defmodule Buildel.WorkflowTemplates do
       name: "Knowledge Search To Text",
       template_name: "knowledge_search_to_text",
       template_description: "Allows to analyse given documents and receive i.e. summary or answer questions"
+    },
+    %{
+      name: "Spreadsheet AI Assistant",
+      template_name: "spreadsheet_ai_assistant",
+      template_description: "Interact with a spreadsheet database using plain language. No need for SQL"
     }
   ]
 
@@ -40,9 +45,60 @@ defmodule Buildel.WorkflowTemplates do
       "knowledge_search_to_text" ->
         {:ok, generate_document_search_template_config(organization_id)}
 
+      "spreadsheet_ai_assistant" ->
+        {:ok, generate_spreadsheet_ai_assistant_config(organization_id)}
+
       _ ->
         {:error, :not_found}
     end
+  end
+
+
+  def generate_spreadsheet_ai_assistant_config(organization_id) do
+    %{
+      name: "Spreadsheet AI Assistant",
+      organization_id: organization_id,
+      config: %{
+        blocks: [
+          generate_comment_block(%{name: "comment_1", measured: %{ width: 444, height: 136 }, position: %{x: 72.70172870895723, y: 612.1249090138265}, opts: %{color: "transparent", content: "<h3>1️⃣ Upload a <em>csv </em>file.</h3><p class=\"!my-0\"><strong>Csv Search </strong>block will transform it to <strong><em>sql table</em></strong> which you can query using plain language.</p>"}}),
+          generate_comment_block(%{name: "comment_2", measured: %{ width: 420, height: 100 }, position: %{x: -444.12958728294683, y: 258.0269565163127}, opts: %{color: "transparent", content: "<h3>2️⃣ Ask a question related to uploaded csv</h3><p class=\"!my-0\"></p>"}}),
+          generate_comment_block(%{name: "comment_3", measured: %{ width: 317, height: 100 }, position: %{x: 608.9786421045233, y: -92.06833526716287}, opts: %{color: "transparent", content: "<h3>3️⃣ See the result here or use Chat interface on the right down corner</h3>"}}),
+          generate_text_input_block(%{position: %{x: -379.55131538331705, y: 13.436342970687974}}),
+          generate_chat_block(%{
+            position: %{x: 97.85012452954305, y: 12.316129078621316},
+            opts: %{
+              api_type: "openai",
+              endpoint: "https://api.openai.com/v1",
+              model: "gpt-4o-mini",
+              system_message: "You are a helpful assistant.\n\nI will ask you some questions, and your task is to answer them using the available tools.\n\nUse only the columns and tables that are available to you in the csv_search_1 tool.\n"
+            }
+          }),
+          generate_text_output_block(%{
+            position: %{x: 623.2559677436357, y: 11.849821588457274}
+          }),
+          generate_csv_search_block(%{
+            position: %{x: 147.51618004216198, y: 487.51810456220926}
+          }),
+          generate_file_input_block(%{
+            position: %{x: -257.2287000627205, y: 489.40803075806616}
+          })
+        ],
+        connections: [
+          create_connection("chat_1", "text_output_1"),
+          create_tool_connection("csv_search_1", "chat_1"),
+          create_connection("file_input_1", "csv_search_1"),
+          create_connection("text_input_1", "chat_1")
+        ],
+        version: "1"
+      },
+      interface_config: %{
+        webchat: %{
+          inputs: [%{name: "file_input_1", type: "file_input"}, %{name: "text_input_1", type: "text_input"}],
+          outputs: [%{name: "text_output_1", type: "text_output"}],
+          public: true
+        }
+      },
+    }
   end
 
   def generate_document_search_template_config(organization_id) do
@@ -169,6 +225,24 @@ defmodule Buildel.WorkflowTemplates do
     }
   end
 
+  defp generate_comment_block(attrs) do
+    Map.merge(
+      %{
+        type: "comment",
+        name: "comment_1",
+        connections: [],
+        inputs: [],
+        measured: %{ width: 420, height: 100 },
+        opts: %{
+          content: "Content of the comment block",
+          color: "transparent"
+        },
+        position: %{x: 0, y: -500}
+      },
+      attrs
+    )
+  end
+
   defp generate_text_input_block(attrs) do
     Map.merge(
       %{
@@ -253,6 +327,34 @@ defmodule Buildel.WorkflowTemplates do
     )
   end
 
+  defp generate_csv_search_block(attrs) do
+    Map.merge(
+      %{
+        type: "csv_search",
+        name: "csv_search_1",
+        connections: [],
+        inputs: [],
+        opts: %{},
+        position: %{x: 400, y: -500}
+      },
+      attrs
+    )
+  end
+
+  defp generate_file_input_block(attrs) do
+    Map.merge(
+      %{
+        type: "file_input",
+        name: "file_input_1",
+        connections: [],
+        inputs: [],
+        opts: %{},
+        position: %{x: 400, y: -500}
+      },
+      attrs
+    )
+  end
+
   defp generate_chat_block(attrs) do
     Map.merge(
       %{
@@ -290,6 +392,20 @@ defmodule Buildel.WorkflowTemplates do
       to: %{
         block_name: to,
         input_name: "input"
+      },
+      opts: %{reset: true}
+    }
+  end
+
+  defp create_tool_connection(from, to) do
+    %{
+      from: %{
+        block_name: from,
+        output_name: "tool"
+      },
+      to: %{
+        block_name: to,
+        input_name: "tool"
       },
       opts: %{reset: true}
     }

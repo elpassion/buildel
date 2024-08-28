@@ -22,7 +22,6 @@ export function BuilderCommentNode({
   const [currentColor, setCurrentColor] = useState(
     data.opts['color'] ?? DEFAULT_COLOR,
   );
-
   const update = ({ color, content }: { color?: string; content?: string }) => {
     updateNode(id ?? data.name, {
       data: {

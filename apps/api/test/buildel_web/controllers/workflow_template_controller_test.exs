@@ -36,7 +36,8 @@ defmodule BuildelWeb.WorkflowTemplateControllerTest do
                  "name" => "Knowledge Search To Text",
                  "template_name" => "knowledge_search_to_text",
                  "template_description" => "Allows to analyse given documents and receive i.e. summary or answer questions"
-               }
+               },
+               %{"name" => "Spreadsheet AI Assistant", "template_description" => "Interact with a spreadsheet database using plain language. No need for SQL", "template_name" => "spreadsheet_ai_assistant"}
              ] == response["data"]
 
       assert_schema(response, "WorkflowTemplateIndexResponse", api_spec)
