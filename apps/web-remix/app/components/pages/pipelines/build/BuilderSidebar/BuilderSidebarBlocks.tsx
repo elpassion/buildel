@@ -242,6 +242,7 @@ function BlockItem({ data, group, onCreate }: BlockItemProps) {
           </div>
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-[200px] text-sm">
+          <p className="mb-1 font-semibold">{data.block.type}</p>
           <span>{data.block.description}</span>
 
           <Button
