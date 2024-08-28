@@ -8,10 +8,17 @@ import React, {
 
 import type { BasicLinkProps } from '~/components/link/BasicLink';
 import { BasicLink } from '~/components/link/BasicLink';
-import { EmptyMessage, EmptyMessageProps } from '~/components/list/ItemList';
+import type { EmptyMessageProps } from '~/components/list/ItemList';
+import { EmptyMessage } from '~/components/list/ItemList';
 import type { BadgeProps } from '~/components/ui/badge';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { cn } from '~/utils/cn';
 
 export const Table = ({
@@ -165,6 +172,51 @@ export const CellStatusBadge = ({
       {children}
       {status === 'running' && <span className="animate-dotsLoading">...</span>}
     </Badge>
+  );
+};
+
+export const CellText = ({
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLSpanElement>) => {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className={cn('line-clamp-3', className)} {...rest}>
+            {children}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className={cn('max-w-[400px]')}>
+          {children}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+export const CellHeader = ({
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLSpanElement>) => {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div
+            className={cn('whitespace-nowrap truncate w-full', className)}
+            {...rest}
+          >
+            {children}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top" className={cn('max-w-[400px]')}>
+          {children}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 

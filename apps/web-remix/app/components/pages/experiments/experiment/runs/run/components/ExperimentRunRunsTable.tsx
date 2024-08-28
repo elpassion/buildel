@@ -12,7 +12,9 @@ import type {
   IExperimentRunRun,
 } from '~/components/pages/experiments/experiments.types';
 import {
+  CellHeader,
   CellStatusBadge,
+  CellText,
   ExternalLinkCell,
   Table,
   TableBody,
@@ -72,32 +74,24 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
       }),
       ...dynamicColumns.inputs.map((name) =>
         columnHelper.accessor(`data.${name}`, {
-          header: () => (
-            <span className="whitespace-nowrap">Input: ${name}</span>
-          ),
+          header: () => <CellHeader>Input: ${name}</CellHeader>,
           id: name,
           cell: (info) => {
-            return info.getValue();
+            return <CellText>{info.getValue()}</CellText>;
           },
+          size: 250,
+          maxSize: 350,
         }),
       ),
       ...dynamicColumns.outputs.map((name) =>
         columnHelper.accessor(`data.${name}`, {
-          header: () => (
-            <span className="whitespace-nowrap line-clamp-1">
-              Evaluation: {name}
-            </span>
-          ),
+          header: () => <CellHeader>Evaluation: {name}</CellHeader>,
           id: name,
           cell: EvaluationAverageCellBadge,
         }),
       ),
       columnHelper.accessor(`evaluation_avg`, {
-        header: () => (
-          <span className="whitespace-nowrap  line-clamp-1">
-            Evaluation Average
-          </span>
-        ),
+        header: () => <CellHeader>Evaluation Average</CellHeader>,
         id: 'evaluation_avg',
         cell: EvaluationAverageCellBadge,
       }),
