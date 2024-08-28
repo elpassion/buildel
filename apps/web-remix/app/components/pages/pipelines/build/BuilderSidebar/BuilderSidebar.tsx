@@ -4,7 +4,6 @@ import { useLocalStorage } from 'usehooks-ts';
 
 import { IBlockConfig } from '~/components/pages/pipelines/pipeline.types';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
-import { usePipelineId } from '~/hooks/usePipelineId';
 import { cn } from '~/utils/cn';
 import { hashString } from '~/utils/stringHash';
 
@@ -30,10 +29,9 @@ export const BuilderSidebar = (props: BuilderSidebarProps) => {
 
 const BuilderSidebarClient = ({ onBlockCreate }: BuilderSidebarProps) => {
   const organizationId = useOrganizationId();
-  const pipelineId = usePipelineId();
 
   const [state, setState] = useLocalStorage<BuilderSidebarState>(
-    buildLSKey(organizationId, pipelineId),
+    buildLSKey(organizationId),
     'keepOpen',
   );
 
@@ -102,8 +100,6 @@ function HoverableLine() {
   );
 }
 
-function buildLSKey(organizationId: string, pipelineId: string) {
-  return hashString(
-    'builder-sidebar-' + organizationId + pipelineId,
-  ).toString();
+function buildLSKey(organizationId: string) {
+  return hashString('builder-sidebar-' + organizationId).toString();
 }
