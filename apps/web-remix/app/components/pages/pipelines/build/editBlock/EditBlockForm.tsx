@@ -124,7 +124,7 @@ export function EditBlockForm({
         (suggestion) => {
           if (suggestion.value === 'inputs.*') {
             return generateSuggestions([
-              ...connections,
+              ...filterBlockConnections(connections, blockConfig),
               ...reverseToolConnections(connections, blockConfig.name),
             ]);
           }
@@ -481,4 +481,11 @@ function buildConnectionsForCtx(
     },
     {} as Record<string, number>,
   );
+}
+
+function filterBlockConnections(
+  connections: IConfigConnection[],
+  blockConfig: IBlockConfig,
+) {
+  return connections.filter((conn) => conn.to.block_name === blockConfig.name);
 }
