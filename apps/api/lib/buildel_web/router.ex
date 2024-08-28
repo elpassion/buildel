@@ -233,6 +233,12 @@ defmodule BuildelWeb.Router do
       only: [:index, :create, :delete]
     )
 
+    delete(
+      "/organizations/:organization_id/memory_collections/:memory_collection_id/memories",
+      MemoryController,
+      :bulk_delete
+    )
+
     resources(
       "/organizations/:organization_id/memory_collections/:memory_collection_id/files",
       MemoryFilesController,

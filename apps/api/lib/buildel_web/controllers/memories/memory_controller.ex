@@ -109,12 +109,48 @@ defmodule BuildelWeb.MemoryController do
     ],
     security: [%{"authorization" => []}]
 
-  def delete(conn, %{organization_id: organization_id, id: id}) do
+  def delete(conn, %{
+        organization_id: organization_id,
+        memory_collection_id: memory_collection_id,
+        id: id
+      }) do
     user = conn.assigns.current_user
 
     with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
-         {:ok, _} <- Buildel.Memories.delete_organization_memory(organization, id) do
+         {:ok, _} <-
+           Buildel.Memories.delete_organization_memory(organization, memory_collection_id, id) do
+      conn |> put_status(:ok) |> json(%{})
+    end
+  end
+
+  operation :bulk_delete,
+    summary: "Bulk delete memories",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer]
+    ],
+    request_body:
+      {"bulk_delete", "application/json", BuildelWeb.Schemas.Memories.BulkDeleteRequest},
+    responses: [
+      ok: {"ok", "application/json", nil},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def bulk_delete(conn, %{
+        organization_id: organization_id,
+        memory_collection_id: memory_collection_id
+      }) do
+    user = conn.assigns.current_user
+    %{ids: ids} = conn.body_params
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, _} <-
+           Buildel.Memories.delete_organization_memory(organization, memory_collection_id, ids) do
       conn |> put_status(:ok) |> json(%{})
     end
   end

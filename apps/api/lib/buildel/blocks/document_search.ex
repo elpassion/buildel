@@ -278,7 +278,8 @@ defmodule Buildel.Blocks.DocumentSearch do
       memory =
         Buildel.Memories.get_collection_memory_by_file_uuid!(organization, collection_id, file_id)
 
-      {:ok, _} = Buildel.Memories.delete_organization_memory(organization, memory.id)
+      {:ok, _} =
+        Buildel.Memories.delete_organization_memory(organization, collection_id, memory.id)
 
       state = send_stream_stop(state)
       {:noreply, state}

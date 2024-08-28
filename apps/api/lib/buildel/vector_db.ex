@@ -100,6 +100,12 @@ defmodule Buildel.VectorDB do
 
     adapter.delete_all_with_metadata(collection, metadata)
   end
+
+  def delete_all_by_memory_ids(%__MODULE__{adapter: adapter}, collection_name, memory_ids) do
+    {:ok, collection} = adapter.get_collection(collection_name)
+
+    adapter.delete_all_by_memory_ids(collection, memory_ids)
+  end
 end
 
 defmodule Buildel.VectorDB.VectorDBAdapterBehaviour do
@@ -385,6 +391,17 @@ defmodule Buildel.VectorDB.EctoAdapter do
     Buildel.Repo.delete_all(
       from c in Chunk,
         where: c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata)
+    )
+
+    :ok
+  end
+
+  def delete_all_by_memory_ids(collection, memory_ids) do
+    Buildel.Repo.delete_all(
+      from c in Chunk,
+        where:
+          c.collection_name == ^collection.name and
+            fragment("? ->> 'memory_id' = ANY(?)", c.metadata, ^memory_ids)
     )
 
     :ok

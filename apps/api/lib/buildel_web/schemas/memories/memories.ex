@@ -60,4 +60,17 @@ defmodule BuildelWeb.Schemas.Memories do
       required: [:file_id]
     })
   end
+
+  defmodule BulkDeleteRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "MemoryBulkDeleteRequest",
+      type: :object,
+      properties: %{
+        ids: %Schema{type: :array, items: %Schema{type: :id}, description: "Memory IDs"}
+      },
+      required: [:ids]
+    })
+  end
 end

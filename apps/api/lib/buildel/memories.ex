@@ -240,6 +240,36 @@ defmodule Buildel.Memories do
 
   def delete_organization_memory(
         %Buildel.Organizations.Organization{} = organization,
+        collection_id,
+        ids
+      )
+      when is_list(ids) do
+    collection_name = organization_collection_name(organization.id, collection_id)
+
+    with vector_db <-
+           Buildel.VectorDB.new(%{
+             adapter: Buildel.VectorDB.EctoAdapter,
+             embeddings:
+               Buildel.Clients.Embeddings.new(%{
+                 api_type: "openai",
+                 model: "",
+                 api_key: "",
+                 endpoint: ""
+               })
+           }),
+         :ok <-
+           Buildel.VectorDB.delete_all_by_memory_ids(vector_db, collection_name, ids),
+         {:ok, _} <-
+           Buildel.Repo.delete_all(
+             from(m in Memory, where: m.id in ^ids and m.organization_id == ^organization.id)
+           ) do
+      {:ok, ids}
+    end
+  end
+
+  def delete_organization_memory(
+        %Buildel.Organizations.Organization{} = organization,
+        _collection_id,
         id
       ) do
     memory = get_organization_memory!(organization, id)
@@ -274,7 +304,7 @@ defmodule Buildel.Memories do
       ) do
     with {:ok, collection} <- get_organization_collection(organization, id) do
       memories = collection |> Buildel.Repo.preload(:memories) |> Map.get(:memories)
-      memories |> Enum.map(&delete_organization_memory(organization, &1.id))
+      memories |> Enum.map(&delete_organization_memory(organization, collection.id, &1.id))
 
       Buildel.Repo.delete(collection)
 
