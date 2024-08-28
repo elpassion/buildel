@@ -1,7 +1,7 @@
 import React, { DragEvent, useCallback, useMemo, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import { useReactFlow } from '@xyflow/react';
-import { ChevronUp, Layers, Pin, X } from 'lucide-react';
+import { ChevronUp, Pin, X } from 'lucide-react';
 import { useBoolean, useDebounce } from 'usehooks-ts';
 import { z } from 'zod';
 
@@ -149,7 +149,9 @@ function BlockGroupItem({ data, onCreate }: BlockGroupItemProps) {
           hidden: isCollapsed,
         })}
         items={filteredBlocks.map((block) => ({ id: block.type, block }))}
-        renderItem={(item) => <BlockItem data={item} onCreate={onCreate} />}
+        renderItem={(item) => (
+          <BlockItem data={item} group={data.id} onCreate={onCreate} />
+        )}
         aria-expanded={!isCollapsed}
         aria-hidden={isCollapsed}
       />
@@ -158,10 +160,12 @@ function BlockGroupItem({ data, onCreate }: BlockGroupItemProps) {
 }
 
 interface BlockItemProps {
+  group: string;
   data: { block: IBlockType; id: string };
   onCreate: (created: IBlockConfig) => Promise<unknown>;
 }
-function BlockItem({ data, onCreate }: BlockItemProps) {
+function BlockItem({ data, group, onCreate }: BlockItemProps) {
+  const [urlSrc, setUrlSrc] = useState(resolveIconPath(group));
   const reactFlowInstance = useReactFlow();
   const { status: runStatus } = useRunPipeline();
   const onDragStart = (
@@ -201,6 +205,10 @@ function BlockItem({ data, onCreate }: BlockItemProps) {
     });
   }, [onCreate, reactFlowInstance]);
 
+  const onImageError = () => {
+    setUrlSrc(resolveIconPath('default'));
+  };
+
   return (
     <div
       key={data.block.type}
@@ -212,7 +220,12 @@ function BlockItem({ data, onCreate }: BlockItemProps) {
       className="w-full border border-input rounded-md p-2 flex gap-2 items-center hover:bg-muted cursor-pointer"
       onClick={onClickAdd}
     >
-      <Layers className="text-foreground w-3.5 h-3.5 shrink-0" />
+      <img
+        className="w-3.5 h-3.5 shrink-0"
+        src={urlSrc}
+        alt={data.block.type}
+        onError={onImageError}
+      />
       <h3 className="text-xs truncate text-foreground">{data.block.type}</h3>
     </div>
   );
@@ -277,4 +290,8 @@ function PinButton() {
       className={cn({ '!text-blue-500': state === 'keepOpen' })}
     />
   );
+}
+
+function resolveIconPath(type: string) {
+  return `/block-types/${type.replace('/', '-')}.svg`;
 }
