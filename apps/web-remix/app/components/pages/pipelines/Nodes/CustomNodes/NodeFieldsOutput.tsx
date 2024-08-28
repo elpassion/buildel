@@ -46,7 +46,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
           fieldEvents.length > 0 ? getAudioOutput(fieldEvents) : null;
 
         return <AudioOutput audio={audio} />;
-      } else if (type === 'file') {
+      } else if (type === 'file' || type === 'image') {
         const files =
           fieldEvents.length > 0 ? fieldEvents.map(getFileOutput) : [];
 
