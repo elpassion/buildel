@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import type { CellContext } from '@tanstack/react-table';
 
+import { CellText } from '~/components/table/table.components';
 import { Badge } from '~/components/ui/badge';
 
 export const EvaluationAverageCellBadge = <TData, TValue>(
@@ -18,5 +19,5 @@ export const EvaluationAverageCellBadge = <TData, TValue>(
     );
   }
 
-  return info.getValue();
+  return <CellText>{info.getValue() as ReactNode}</CellText>;
 };
