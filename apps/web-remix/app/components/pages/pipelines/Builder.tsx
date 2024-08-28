@@ -70,6 +70,11 @@ interface BuilderProps {
     edges: IEdge[];
     onBlockCreate: (created: IBlockConfig) => Promise<unknown>;
   }) => ReactNode;
+  sidebar?: ({
+    onBlockCreate,
+  }: {
+    onBlockCreate: (created: IBlockConfig) => Promise<unknown>;
+  }) => ReactNode;
 }
 
 export const Builder = ({
@@ -147,6 +152,7 @@ const BuilderInstance = ({
   updateCurrent,
   undo,
   redo,
+  sidebar,
 }: BuilderInstanceProps) => {
   const pipelineId = usePipelineId();
   const organizationId = useOrganizationId();
@@ -341,77 +347,81 @@ const BuilderInstance = ({
   });
 
   return (
-    <div
-      id="react-flow-wrapper"
-      onContextMenu={onContextMenu}
-      data-testid="workflow-builder"
-      className={cn('relative pt-5 w-full', className)}
-      ref={reactFlowWrapper}
-    >
-      <NodeDropdown
-        ref={dropdownRef}
-        open={isOpen}
-        position={position}
-        options={options}
-        onClick={onClick}
-      />
-
-      <ReactFlow<INode, IEdge>
-        edgesUpdatable={!isDisabled}
-        edgesFocusable={!isDisabled}
-        nodesDraggable={type === 'editable'}
-        elementsSelectable={!isDisabled}
-        nodesConnectable={!isDisabled}
-        nodesFocusable={!isDisabled}
-        edgesReconnectable={!isDisabled}
-        nodes={flowState.nodes}
-        edges={flowState.edges}
-        onMouseMove={onMouseMove}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onConnectStart={onConnectStart}
-        onConnectEnd={onConnectEnd}
-        //@ts-ignore
-        nodeTypes={nodeTypes}
-        //@ts-ignore
-        edgeTypes={edgeTypes}
-        onDrop={onDrop}
-        onDragOver={onDragOver}
-        onNodeDragStart={onNodeDragStartStop}
-        onNodeDragStop={onNodeDragStartStop}
-        // onBlur={handleOnSave}
-        isValidConnection={handleIsValidConnection}
-        onInit={(instance) => {
-          onInitCopyPaste(instance);
-          onInitDraggable(instance);
-        }}
-        fitViewOptions={{
-          minZoom: 0.5,
-          maxZoom: 1,
-        }}
-        fitView
+    <>
+      <div
+        id="react-flow-wrapper"
+        onContextMenu={onContextMenu}
+        data-testid="workflow-builder"
+        className={cn('relative pt-5 w-full', className)}
+        ref={reactFlowWrapper}
       >
-        <Background
-          variant={BackgroundVariant.Dots}
-          gap={20}
-          color="#aaa"
-          className="!bg-muted"
+        {sidebar?.({ onBlockCreate })}
+
+        <NodeDropdown
+          ref={dropdownRef}
+          open={isOpen}
+          position={position}
+          options={options}
+          onClick={onClick}
         />
 
-        <BuilderControls
+        <ReactFlow<INode, IEdge>
+          edgesUpdatable={!isDisabled}
+          edgesFocusable={!isDisabled}
+          nodesDraggable={type === 'editable'}
+          elementsSelectable={!isDisabled}
+          nodesConnectable={!isDisabled}
+          nodesFocusable={!isDisabled}
+          edgesReconnectable={!isDisabled}
           nodes={flowState.nodes}
           edges={flowState.edges}
-          setFlowData={setFlowState}
-        />
-      </ReactFlow>
+          onMouseMove={onMouseMove}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onConnectStart={onConnectStart}
+          onConnectEnd={onConnectEnd}
+          //@ts-ignore
+          nodeTypes={nodeTypes}
+          //@ts-ignore
+          edgeTypes={edgeTypes}
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+          onNodeDragStart={onNodeDragStartStop}
+          onNodeDragStop={onNodeDragStartStop}
+          // onBlur={handleOnSave}
+          isValidConnection={handleIsValidConnection}
+          onInit={(instance) => {
+            onInitCopyPaste(instance);
+            onInitDraggable(instance);
+          }}
+          fitViewOptions={{
+            minZoom: 0.5,
+            maxZoom: 1,
+          }}
+          fitView
+        >
+          <Background
+            variant={BackgroundVariant.Dots}
+            gap={20}
+            color="#aaa"
+            className="!bg-muted"
+          />
 
-      {children?.({
-        nodes: flowState.nodes,
-        edges: flowState.edges,
-        onBlockCreate,
-      })}
-    </div>
+          <BuilderControls
+            nodes={flowState.nodes}
+            edges={flowState.edges}
+            setFlowData={setFlowState}
+          />
+        </ReactFlow>
+
+        {children?.({
+          nodes: flowState.nodes,
+          edges: flowState.edges,
+          onBlockCreate,
+        })}
+      </div>
+    </>
   );
 };
 

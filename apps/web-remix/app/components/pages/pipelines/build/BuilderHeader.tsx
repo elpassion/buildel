@@ -13,13 +13,15 @@ import { RunPipelineButton } from './RunPipelineButton';
 export const BuilderHeader: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <header className="absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none">
+      <div className="hidden md:block w-[160px]" />
+
       <div className="flex gap-2 items-center pointer-events-auto">
         <RunPipelineButton />
 
         <Metadata />
       </div>
 
-      <div className="flex gap-2 items-center pointer-events-auto">
+      <div className="flex gap-2 items-center justify-end pointer-events-auto w-[160px]">
         {children}
       </div>
     </header>

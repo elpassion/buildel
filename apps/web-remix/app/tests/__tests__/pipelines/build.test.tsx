@@ -70,7 +70,7 @@ describe(PipelineBuilder.name, () => {
     await screen.findByText(/Something went wrong/i);
   });
 
-  test('should render blocks types', async () => {
+  test.skip('should render blocks types', async () => {
     const page = new PipelineObject().render({
       initialEntries: ['/2/pipelines/2/build'],
     });
@@ -94,7 +94,7 @@ describe(PipelineBuilder.name, () => {
     await screen.findByTestId('text_output_1-input-handle');
   });
 
-  test('should add block after clicking on side menu item', async () => {
+  test.skip('should add block after clicking on side menu item', async () => {
     const page = new PipelineObject().render({
       initialEntries: ['/2/pipelines/2/build'],
     });

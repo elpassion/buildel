@@ -11,7 +11,7 @@ import {
 import isEqual from 'lodash.isequal';
 import { useBoolean } from 'usehooks-ts';
 
-import { ELProvider } from '~/components/pages/pipelines/EL/ELProvider';
+import { BuilderSidebar } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderSidebar';
 import { BuilderCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/BuilderCommentNode';
 import { ReadonlyCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/ReadonlyCommentNode';
 import { AliasCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/AliasCustomNode';
@@ -28,7 +28,6 @@ import { CustomEdge } from '../Edges/CustomEdges/CustomEdge';
 import type { IPipeline, IPipelineConfig } from '../pipeline.types';
 import { toPipelineConfig } from '../PipelineFlow.utils';
 import { BuilderHeader, SaveChangesButton } from './BuilderHeader';
-import { CreateBlockFloatingMenu } from './CreateBlock/CreateBlockFloatingMenu';
 import { FloatingChat } from './FloatingChatInterface/FloatingChat';
 import type { loader } from './loader.server';
 
@@ -101,6 +100,7 @@ export function PipelineBuilder() {
         CustomNodes={{ custom: BuilderCustomNode, comment: BuilderCommentNode }}
         CustomEdges={{ default: CustomEdge }}
         className="h-[calc(100vh_-_64px)] pt-0"
+        sidebar={BuilderSidebar}
       >
         {({ edges, nodes, onBlockCreate }) => (
           <>
@@ -111,10 +111,6 @@ export function PipelineBuilder() {
                 onSave={handleUpdatePipeline}
               />
             </BuilderHeader>
-
-            <ELProvider>
-              <CreateBlockFloatingMenu onCreate={onBlockCreate} />
-            </ELProvider>
 
             <FloatingChat
               key={key}

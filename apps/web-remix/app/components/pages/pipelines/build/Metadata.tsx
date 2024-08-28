@@ -21,7 +21,7 @@ export const Metadata = () => {
   const { metadata, setMetadata } = useRunPipeline();
 
   return (
-    <Dropdown>
+    <Dropdown placement="bottom">
       <MetadataTrigger />
 
       <DropdownPopup className="min-w-[250px] z-[11] bg-white border border-input rounded-lg overflow-hidden p-2 lg:min-w-[350px]">
