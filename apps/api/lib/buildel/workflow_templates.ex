@@ -29,6 +29,11 @@ defmodule Buildel.WorkflowTemplates do
       name: "Text Classification",
       template_name: "text_classification_assistant",
       template_description: "Text classifier assistant that convert text into one or more categories"
+    },
+    %{
+      name: "Feedback Assistant",
+      template_name: "text_feedback_assistant",
+      template_description: "Text feedback assistant that analyze the provided text and provide feedback"
     }
   ]
 
@@ -56,9 +61,62 @@ defmodule Buildel.WorkflowTemplates do
       "text_classification_assistant" ->
         {:ok, generate_text_classification_assistant(organization_id)}
 
+      "text_feedback_assistant" ->
+        {:ok, generate_text_feedback_assistant(organization_id)}
+
       _ ->
         {:error, :not_found}
     end
+  end
+
+  def generate_text_feedback_assistant(organization_id) do
+    %{
+      name: "Feedback Assistant",
+      organization_id: organization_id,
+      config: %{
+        blocks: [
+          generate_comment_block(%{name: "comment_1", measured: %{ width: 211, height: 100 }, position: %{x: -300.5609264532254, y: -467.5377471106992}, opts: %{color: "transparent", content: "<h3>1️⃣ Send an example essay in PDF format</h3>"}}),
+          generate_comment_block(%{name: "comment_2", measured: %{ width: 292, height: 100 }, position: %{x: 400.6049424336637, y: -608.8847889234336}, opts: %{color: "transparent", content: "<h3>2️⃣ The LLM will analyze it and prepare feedback for you.</h3>"}}),
+          generate_comment_block(%{name: "comment_3", measured: %{ width: 319, height: 139 }, position: %{x: 1268.9991028385389, y: -641.8534980811221}, opts: %{color: "transparent", content: "<h3>3️⃣ See the result here, or use the <em>form </em>interface.</h3><p class=\"!my-0\">You can access the <em>form</em> interface in the Interface tab.</p>"}}),
+          generate_file_input_block(%{
+            position: %{x: -321.5846160748752, y: -360.6756965729587}
+          }),
+          generate_file_to_text_block(%{
+            position: %{x: 14.354944980161505, y: -500.63494532199496}
+          }),
+          generate_chat_block(%{
+            position: %{x: 363, y: -500},
+            opts: %{
+              api_type: "openai",
+              endpoint: "https://api.openai.com/v1",
+              model: "gpt-4o-mini",
+              system_message: "You are a Feedback Assistant.\n\nI will send you an essay, and your job is to prepare feedback for it.\n\nRemember to:\n\n- Be conversational.\n- Be brief.\n- Evaluate on multiple criteria.\n- Respond in bullet points and markdown.\n- Prepare an overall summary at the end.",
+              prompt_template: "{{file_to_text_1:output}}",
+            }
+          }),
+          generate_collect_all_text_block(%{
+            position: %{x: 866.6742953609438, y: -384.35588667118367}
+          }),
+          generate_text_output_block(%{
+            position: %{x: 1285.57960217244, y: -489.905306811496}
+          }),
+        ],
+        connections: [
+          create_connection("file_input_1", "file_to_text_1"),
+          create_connection("file_to_text_1", "chat_1"),
+          create_connection("collect_all_text_1", "text_output_1"),
+          create_connection("chat_1", "collect_all_text_1")
+        ],
+        version: "1"
+      },
+      interface_config: %{
+        form: %{
+          inputs: [%{name: "file_input_1", type: "file_input"}],
+          outputs: [%{name: "text_output_1", type: "text_output"}],
+          public: true
+        }
+      },
+    }
   end
 
 
@@ -412,6 +470,20 @@ defmodule Buildel.WorkflowTemplates do
     )
   end
 
+  defp generate_file_to_text_block(attrs) do
+    Map.merge(
+      %{
+        type: "file_to_text",
+        name: "file_to_text_1",
+        connections: [],
+        inputs: [],
+        opts: %{},
+        position: %{x: 400, y: -500}
+      },
+      attrs
+    )
+  end
+
   defp generate_chat_block(attrs) do
     Map.merge(
       %{
@@ -421,6 +493,20 @@ defmodule Buildel.WorkflowTemplates do
         inputs: [],
         opts: %{},
         position: %{x: 400, y: -500}
+      },
+      attrs
+    )
+  end
+
+  defp generate_collect_all_text_block(attrs) do
+    Map.merge(
+      %{
+        type: "collect_all_text",
+        name: "collect_all_text_1",
+        connections: [],
+        inputs: [],
+        opts: %{},
+        position: %{x: 800, y: -500}
       },
       attrs
     )
