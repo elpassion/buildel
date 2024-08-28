@@ -1,16 +1,38 @@
 defmodule BuildelWeb.MemoryController do
   import BuildelWeb.UserAuth
+
   use BuildelWeb, :controller
-  use BuildelWeb.Validator
+  use OpenApiSpex.ControllerSpecs
 
   action_fallback(BuildelWeb.FallbackController)
 
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
+  plug OpenApiSpex.Plug.CastAndValidate,
+    json_render_error_v2: true,
+    render_error: BuildelWeb.ErrorRendererPlug
+
+  tags ["memory"]
+
+  operation :index,
+    summary: "Retrieve all memories in a collection",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Memories.IndexResponse},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
   def index(
         conn,
-        %{"organization_id" => organization_id, "memory_collection_id" => memory_collection_id}
+        %{organization_id: organization_id, memory_collection_id: memory_collection_id}
       ) do
     user = conn.assigns.current_user
 
@@ -24,19 +46,29 @@ defmodule BuildelWeb.MemoryController do
     end
   end
 
-  defparams :create do
-    required(:file_id, :string)
-  end
+  operation :create,
+    summary: "Create a memory",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer]
+    ],
+    request_body: {"memory", "application/json", BuildelWeb.Schemas.Memories.CreateRequest},
+    responses: [
+      ok: {"ok", "application/json", BuildelWeb.Schemas.Memories.ShowResponse},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
 
   def create(
         conn,
-        %{"organization_id" => organization_id, "memory_collection_id" => memory_collection_id} =
-          params
+        %{organization_id: organization_id, memory_collection_id: memory_collection_id}
       ) do
     user = conn.assigns.current_user
+    %{file_id: file_id} = conn.body_params
 
-    with {:ok, %{file_id: file_id}} <- validate(:create, params),
-         {:ok, organization} <-
+    with {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, collection} <-
            Buildel.Memories.get_organization_collection(organization, memory_collection_id),
@@ -61,7 +93,23 @@ defmodule BuildelWeb.MemoryController do
     end
   end
 
-  def delete(conn, %{"organization_id" => organization_id, "id" => id}) do
+  operation :delete,
+    summary: "Delete a memory",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      memory_collection_id: [in: :path, description: "Collection ID", type: :integer],
+      id: [in: :path, description: "Memory ID", type: :integer]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", nil},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def delete(conn, %{organization_id: organization_id, id: id}) do
     user = conn.assigns.current_user
 
     with {:ok, organization} <-

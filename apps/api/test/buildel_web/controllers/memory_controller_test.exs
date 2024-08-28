@@ -60,7 +60,7 @@ defmodule BuildelWeb.MemoryControllerTest do
 
       conn =
         post(
-          conn,
+          conn |> put_req_header("content-type", "application/json"),
           ~p"/api/organizations/#{organization.id}/memory_collections/#{collection.id}/memories",
           %{
             file_id: file.id,
