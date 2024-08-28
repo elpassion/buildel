@@ -143,6 +143,8 @@ export function getTemplateImageColor(name?: string) {
       return 'bg-yellow-500';
     case 'text_classification_assistant':
       return 'bg-purple-500';
+    case 'text_feedback_assistant':
+      return 'bg-teal-500';
     default:
       return 'bg-neutral-950';
   }
