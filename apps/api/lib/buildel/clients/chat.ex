@@ -11,7 +11,8 @@ defmodule Buildel.Clients.ChatBehaviour do
               model: String.t(),
               temperature: number(),
               tools: list(any()),
-              messages: list(map())
+              messages: list(map()),
+              max_tokens: any()
             }) :: :ok
 end
 
@@ -237,7 +238,8 @@ defmodule Buildel.Clients.Chat do
       api_key: opts.api_key,
       endpoint: opts.endpoint <> "/chat/completions",
       json_response: opts.response_format == "json",
-      callbacks: callbacks
+      callbacks: callbacks,
+      max_tokens: opts.max_tokens
     })
   end
 
@@ -248,7 +250,8 @@ defmodule Buildel.Clients.Chat do
       stream: true,
       api_key: opts.api_key,
       endpoint: opts.endpoint <> "/messages",
-      callbacks: callbacks
+      callbacks: callbacks,
+      max_tokens: opts.max_tokens
     })
   end
 
@@ -261,7 +264,8 @@ defmodule Buildel.Clients.Chat do
       endpoint: opts.endpoint <> "/chat/completions",
       json_response: opts.response_format == "json",
       stream_options: %{include_usage: true},
-      callbacks: callbacks
+      callbacks: callbacks,
+      max_tokens: opts.max_tokens
     })
   end
 
@@ -274,7 +278,8 @@ defmodule Buildel.Clients.Chat do
       endpoint: opts.endpoint <> "/chat/completions?api-version=2024-02-01",
       json_response: opts.response_format == "json",
       stream_options: %{include_usage: true},
-      callbacks: callbacks
+      callbacks: callbacks,
+      max_tokens: opts.max_tokens
     })
   end
 

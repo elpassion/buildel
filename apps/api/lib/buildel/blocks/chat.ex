@@ -74,13 +74,16 @@ defmodule Buildel.Blocks.Chat do
                   secret_schema(%{
                     "title" => "API key",
                     "description" => "API key to use for the chat.",
-                    "descriptionWhen" =>%{
+                    "descriptionWhen" => %{
                       "opts.api_type" => %{
-                        "openai" => "[OpenAI API key](https://platform.openai.com/api-keys) to use for the chat.",
+                        "openai" =>
+                          "[OpenAI API key](https://platform.openai.com/api-keys) to use for the chat.",
                         "azure" => "Azure API key to use for the chat.",
                         "google" => "Google API key to use for the chat.",
-                        "mistral" => "[Mistral API key](https://console.mistral.ai/api-keys/) to use for the chat.",
-                        "anthropic" => "[Anthropic API key](https://www.anthropic.com/api) to use for the chat."
+                        "mistral" =>
+                          "[Mistral API key](https://console.mistral.ai/api-keys/) to use for the chat.",
+                        "anthropic" =>
+                          "[Anthropic API key](https://www.anthropic.com/api) to use for the chat."
                       }
                     }
                   }),
@@ -129,6 +132,15 @@ defmodule Buildel.Blocks.Chat do
                   "step" => 0.1,
                   "readonly" => true
                 },
+                max_tokens: %{
+                  "type" => "number",
+                  "title" => "Maximum tokens",
+                  "description" =>
+                    "Maximum amount of tokens that can be generated in the chat completion.",
+                  "minimum" => 0.0,
+                  "step" => 1,
+                  "readonly" => true
+                },
                 response_format: %{
                   "type" => "string",
                   "title" => "Chat response format",
@@ -147,7 +159,7 @@ defmodule Buildel.Blocks.Chat do
                           min: 1
                         }
                       }
-                    },
+                    }
                   }),
                 system_message:
                   EditorField.new(%{
@@ -579,7 +591,8 @@ defmodule Buildel.Blocks.Chat do
           temperature: state[:opts].temperature,
           tools: tools,
           endpoint: state[:opts].endpoint,
-          api_type: state[:opts].api_type
+          api_type: state[:opts].api_type,
+          max_tokens: state.opts.max_tokens
         })
 
       message =
@@ -725,7 +738,8 @@ defmodule Buildel.Blocks.Chat do
              tools: tools,
              endpoint: state[:opts].endpoint,
              api_type: state[:opts].api_type,
-             response_format: state.response_format
+             response_format: state.response_format,
+             max_tokens: state.opts[:max_tokens]
            }) do
       {:ok, message, state}
     else
