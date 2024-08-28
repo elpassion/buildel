@@ -28,7 +28,6 @@ import { routes } from '~/utils/routes.utils';
 import {
   FloatingListActions,
   FloatingListCheckbox,
-  ListActionProvider,
   useListAction,
 } from '../components/ListActionProvider';
 import type {
@@ -68,7 +67,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
   };
 
   return (
-    <ListActionProvider>
+    <>
       <ItemList
         aria-label="Collection files"
         className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
@@ -118,7 +117,7 @@ export const KnowledgeBaseFileList: React.FC<KnowledgeBaseFileListProps> = ({
           });
         }}
       />
-    </ListActionProvider>
+    </>
   );
 };
 
