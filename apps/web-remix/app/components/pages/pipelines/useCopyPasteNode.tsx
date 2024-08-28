@@ -27,6 +27,9 @@ export const useCopyPasteNode = ({
 
   useEventListener('keydown', (e) => {
     if (
+      //eslint-disable-next-line
+      //@ts-ignore
+      e.target.editor !== undefined ||
       e.target instanceof HTMLInputElement ||
       e.target instanceof HTMLTextAreaElement ||
       !allowCopyPaste(e)
