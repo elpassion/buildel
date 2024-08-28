@@ -141,6 +141,8 @@ export function getTemplateImageColor(name?: string) {
       return 'bg-green-500';
     case 'spreadsheet_ai_assistant':
       return 'bg-yellow-500';
+    case 'text_classification_assistant':
+      return 'bg-purple-500';
     default:
       return 'bg-neutral-950';
   }

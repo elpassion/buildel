@@ -24,6 +24,11 @@ defmodule Buildel.WorkflowTemplates do
       name: "Spreadsheet AI Assistant",
       template_name: "spreadsheet_ai_assistant",
       template_description: "Interact with a spreadsheet database using plain language. No need for SQL"
+    },
+    %{
+      name: "Text Classification",
+      template_name: "text_classification_assistant",
+      template_description: "Text classifier assistant that convert text into one or more categories"
     }
   ]
 
@@ -48,9 +53,61 @@ defmodule Buildel.WorkflowTemplates do
       "spreadsheet_ai_assistant" ->
         {:ok, generate_spreadsheet_ai_assistant_config(organization_id)}
 
+      "text_classification_assistant" ->
+        {:ok, generate_text_classification_assistant(organization_id)}
+
       _ ->
         {:error, :not_found}
     end
+  end
+
+
+  def generate_text_classification_assistant(organization_id) do
+    %{
+      name: "Text Classification",
+      organization_id: organization_id,
+      config: %{
+        blocks: [
+          generate_comment_block(%{name: "comment_1", measured: %{ width: 324, height: 231 }, position: %{x: 397, y: -767}, opts: %{color: "transparent", content: "<h3>The LLM will analyze the provided text and classify it.</h3><p class=\"!my-0\">The returned output will follow this format:</p><pre><code>{\n categories: string[],\n keywords: string[]\n}</code></pre>"}}),
+          generate_text_input_block(%{position: %{x: -96, y: -501}}),
+          generate_chat_block(%{
+            position: %{x: 363, y: -500},
+            opts: %{
+              api_type: "openai",
+              endpoint: "https://api.openai.com/v1",
+              model: "gpt-4o-mini",
+              system_message: "You are a text classification assistant.\n\nYour task is to assign one or more categories to the input text and output in json. \n\nAdditionally, you need to extract the keywords from the text that are related to the classification.",
+              prompt_template: "--- Text Data\n\n{{text_input_1:output}}\n\n---",
+              messages: [
+                %{
+                  content: "The staff was great. The receptionists were very helpful and answered all our questions. The room was clean and bright, and the room service was always on time. Will be coming back! Thank you so much",
+                  role: "user"
+                },
+                %{
+                  content: "{\n  \"categories\":[\"customerfeedback\",\"hospitality\",\"hotelreview\"],\n  \"keywords\": [\"staff\",\"receptionists\",\"helpful\",\"clean\",\"bright\",\n    \"roomservice\", \"comingback\"]\n}",
+                  role: "assistant"
+                }
+              ]
+            }
+          }),
+          generate_text_output_block(%{
+            position: %{x: 909.8641992600402, y: -500.4424284352723}
+          }),
+        ],
+        connections: [
+          create_connection("chat_1", "text_output_1"),
+          create_connection("text_input_1", "chat_1")
+        ],
+        version: "1"
+      },
+      interface_config: %{
+        webchat: %{
+          inputs: [%{name: "text_input_1", type: "text_input"}],
+          outputs: [%{name: "text_output_1", type: "text_output"}],
+          public: true
+        }
+      },
+    }
   end
 
 
@@ -62,7 +119,7 @@ defmodule Buildel.WorkflowTemplates do
         blocks: [
           generate_comment_block(%{name: "comment_1", measured: %{ width: 444, height: 136 }, position: %{x: 72.70172870895723, y: 612.1249090138265}, opts: %{color: "transparent", content: "<h3>1️⃣ Upload a <em>csv </em>file.</h3><p class=\"!my-0\"><strong>Csv Search </strong>block will transform it to <strong><em>sql table</em></strong> which you can query using plain language.</p>"}}),
           generate_comment_block(%{name: "comment_2", measured: %{ width: 420, height: 100 }, position: %{x: -444.12958728294683, y: 258.0269565163127}, opts: %{color: "transparent", content: "<h3>2️⃣ Ask a question related to uploaded csv</h3><p class=\"!my-0\"></p>"}}),
-          generate_comment_block(%{name: "comment_3", measured: %{ width: 317, height: 100 }, position: %{x: 608.9786421045233, y: -92.06833526716287}, opts: %{color: "transparent", content: "<h3>3️⃣ See the result here or use Chat interface on the right down corner</h3>"}}),
+          generate_comment_block(%{name: "comment_3", measured: %{ width: 317, height: 100 }, position: %{x: 608.9786421045233, y: -92.06833526716287}, opts: %{color: "transparent", content: "<h3>3️⃣ See the result here or use Chat interface at the bottom right corner 💬</h3>"}}),
           generate_text_input_block(%{position: %{x: -379.55131538331705, y: 13.436342970687974}}),
           generate_chat_block(%{
             position: %{x: 97.85012452954305, y: 12.316129078621316},
