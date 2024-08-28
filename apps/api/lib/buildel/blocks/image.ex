@@ -1,5 +1,4 @@
 defmodule Buildel.Blocks.Image do
-  alias Buildel.Blocks.Fields.EditorField.Suggestion
   alias Buildel.Blocks.Fields.EditorField
   use Buildel.Blocks.Block
   use Buildel.Blocks.Tool

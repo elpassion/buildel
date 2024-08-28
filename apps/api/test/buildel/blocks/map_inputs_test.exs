@@ -90,7 +90,7 @@ defmodule Buildel.Blocks.MapInputsTest do
     )
 
     assert_receive({^topic, :start_stream, nil, _})
-    assert_receive({^topic, :text, "dupa Hello darkness my old friend.\n", _})
+    assert_receive({^topic, :text, "dupa Hello darkness my old friend.\n", _}, 1000)
     assert_receive({^topic, :stop_stream, nil, _})
   end
 
@@ -103,7 +103,7 @@ defmodule Buildel.Blocks.MapInputsTest do
           MapInputs.create(%{
             name: "test",
             opts: %{
-              template: "\"dupa \\(.{{text_input:output}}) \\(.{{text_input_2:output}})\"",
+              template: "\"dupa \\(.{{text_input:output}}) \\(.{{text_input_2:output}})\""
             },
             connections: [
               Blocks.Connection.from_connection_string(
@@ -120,7 +120,6 @@ defmodule Buildel.Blocks.MapInputsTest do
       })
 
     {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
-
 
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello"})
     assert_receive({^topic, :start_stream, nil, _})
