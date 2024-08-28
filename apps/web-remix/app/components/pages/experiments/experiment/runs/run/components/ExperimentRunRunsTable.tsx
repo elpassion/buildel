@@ -88,6 +88,8 @@ export const ExperimentRunRunsTable: React.FC<ExperimentRunRunsTableProps> = ({
           header: () => <CellHeader>Evaluation: {name}</CellHeader>,
           id: name,
           cell: EvaluationAverageCellBadge,
+          size: 200,
+          maxSize: 250,
         }),
       ),
       columnHelper.accessor(`evaluation_avg`, {
