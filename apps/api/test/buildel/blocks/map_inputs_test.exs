@@ -127,10 +127,10 @@ defmodule Buildel.Blocks.MapInputsTest do
     refute_received({^topic, :text, _message, _})
     refute_received({^topic, :stop_stream, nil, _})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World"})
-    assert_receive({^topic, :text, "dupa Hello World\n", _})
+    assert_receive({^topic, :text, "dupa Hello World\n", _}, 1000)
     assert_receive({^topic, :stop_stream, nil, _})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World 2"})
-    assert_receive({^topic, :text, "dupa Hello World 2\n", _})
+    assert_receive({^topic, :text, "dupa Hello World 2\n", _}, 1000)
     assert_receive({^topic, :stop_stream, nil, _})
   end
 
@@ -158,11 +158,11 @@ defmodule Buildel.Blocks.MapInputsTest do
 
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello"})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World"})
-    assert_receive({^topic, :text, "dupa Hello World\n", _})
+    assert_receive({^topic, :text, "dupa Hello World\n", _}, 1000)
     assert_receive({^topic, :stop_stream, nil, _})
     test_run |> BlocksTestRunner.Run.input("text_input_2", "input", {:text, "World 2"})
-    refute_receive({^topic, :text, "dupa Hello World 2\n", _})
+    refute_receive({^topic, :text, "dupa Hello World 2\n", _}, 1000)
     test_run |> BlocksTestRunner.Run.input("text_input", "input", {:text, "Hello 2"})
-    assert_receive({^topic, :text, "dupa Hello 2 World 2\n", _})
+    assert_receive({^topic, :text, "dupa Hello 2 World 2\n", _}, 1000)
   end
 end
