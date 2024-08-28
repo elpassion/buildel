@@ -8,7 +8,7 @@ defmodule Buildel.Blocks.Date do
     %{
       type: "date",
       description: "An utility block that returns the current date and time (UTC).",
-      groups: ["utils", "inputs / outputs", "tools"],
+      groups: ["utils", "tools"],
       inputs: [Block.text_input()],
       outputs: [Block.text_output()],
       ios: [Block.io("tool", "worker")],

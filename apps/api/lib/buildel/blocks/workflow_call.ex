@@ -10,7 +10,7 @@ defmodule Buildel.Blocks.WorkflowCall do
     %{
       type: "workflow_call",
       description: "A block that allows you to call a workflow from within another workflow.",
-      groups: ["tools"],
+      groups: ["tools", "utils"],
       inputs: [Block.text_input("stop_run")],
       outputs: [],
       ios: [],
