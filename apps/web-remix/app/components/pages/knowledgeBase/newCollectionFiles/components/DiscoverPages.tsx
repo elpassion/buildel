@@ -299,9 +299,10 @@ function prepareNodes(urls: string[]) {
 
 function formatNode(node: PageTreeNode): PageTreeNode {
   if (node.children && node.children.length > 0) {
+    const groupSegment = node.segment.split('/');
     return {
       ...node,
-      label: node.segment,
+      label: `/${groupSegment[groupSegment.length - 1]}`,
       value: node.value + '_group',
       children: [
         {
