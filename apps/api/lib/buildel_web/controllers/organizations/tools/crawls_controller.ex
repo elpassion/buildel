@@ -4,7 +4,6 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
 
   use OpenApiSpex.ControllerSpecs
   import BuildelWeb.UserAuth
-  import SweetXml
   action_fallback(BuildelWeb.FallbackController)
 
   plug(:fetch_current_user)
@@ -36,27 +35,19 @@ defmodule BuildelWeb.OrganizationToolCrawlController do
   def sitemap(conn, _params) do
     %{organization_id: organization_id, url: url} = conn.params
 
-    uri = URI.parse(url) |> URI.merge("/sitemap.xml")
-
     user = conn.assigns.current_user
 
     with {:ok, _organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
-         {:ok, %Req.Response{status: status, body: body}} when status >= 200 and status < 400 <-
-           Req.get(uri, []) do
-      list = body |> xpath(~x"//url/loc/text()"l) |> Enum.map(&to_string/1)
-
+         {:ok, list} <- Buildel.Sitemaps.get_sitemaps(url) do
       conn
       |> put_status(:ok)
       |> render(:sitemap, sitemap: list)
     else
-      {:ok, %Req.Response{}} ->
+      _ ->
         conn
         |> put_status(:ok)
         |> render(:sitemap, sitemap: [])
-
-      e ->
-        e
     end
   end
 
