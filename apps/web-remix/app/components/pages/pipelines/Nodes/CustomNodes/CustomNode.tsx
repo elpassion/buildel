@@ -1,11 +1,12 @@
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useMemo } from 'react';
 import startCase from 'lodash.startcase';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Info } from 'lucide-react';
 
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
 import { Badge } from '~/components/ui/badge';
 import { cn } from '~/utils/cn';
+import { buildDocsUrl } from '~/utils/docs';
 
 import type { IBlockConfig } from '../../pipeline.types';
 import { getBlockFields, getBlockHandles } from '../../PipelineFlow.utils';
@@ -109,7 +110,19 @@ export function CustomNodeHeader({ data, children }: CustomNodeHeaderProps) {
         </Badge>
       </div>
 
-      {children}
+      <div className="flex items-center">
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={buildDocsUrl(data.type)}
+          className="w-8 h-8 flex items-center justify-center"
+          aria-label={`View documentation for ${data.type} block`}
+        >
+          <Info className="w-4 h-4" />
+        </a>
+
+        {children}
+      </div>
     </header>
   );
 }
