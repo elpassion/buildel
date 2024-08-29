@@ -129,7 +129,7 @@ defmodule Buildel.Clients.Chat do
           })
       end)
 
-    with {:ok, chain, message} <-
+    with {:ok, chain} <-
            LLMChain.new!(%{
              llm: llm,
              custom_context: context
@@ -158,7 +158,7 @@ defmodule Buildel.Clients.Chat do
            |> LLMChain.run(mode: :while_needs_response) do
       on_end.()
 
-      {:ok, chain, message}
+      {:ok, chain, chain.last_message}
     else
       {:error, _chain, reason} ->
         if String.contains?(reason, "maximum context length") do
