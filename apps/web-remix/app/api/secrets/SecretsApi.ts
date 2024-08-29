@@ -3,15 +3,21 @@ import { z } from 'zod';
 import type { fetchTyped } from '~/utils/fetch.server';
 
 import { SecretKeyListResponse, SecretKeyResponse } from './secrets.contracts';
-import type { ICreateSecretSchema, IUpdateSecretSchema } from './secrets.contracts';
+import type {
+  ICreateSecretSchema,
+  IUpdateSecretSchema,
+} from './secrets.contracts';
 
 export class SecretsApi {
-  constructor(private client: typeof fetchTyped) { }
+  constructor(private client: typeof fetchTyped) {}
 
-  async getSecrets(organizationId: string | number) {
+  async getSecrets(
+    organizationId: string | number,
+    includeAliases: boolean = false,
+  ) {
     return this.client(
       SecretKeyListResponse,
-      `/organizations/${organizationId}/secrets`,
+      `/organizations/${organizationId}/secrets?include_aliases=${includeAliases}`,
     );
   }
 
@@ -30,7 +36,10 @@ export class SecretsApi {
     return this.client(
       z.any(),
       `/organizations/${organizationId}/secrets/${data.name}`,
-      { method: 'PUT', body: JSON.stringify({ value: data?.value, alias: data?.alias }) },
+      {
+        method: 'PUT',
+        body: JSON.stringify({ value: data?.value, alias: data?.alias }),
+      },
     );
   }
 

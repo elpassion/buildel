@@ -364,7 +364,7 @@ defmodule Buildel.Blocks.Block do
             "type" => "string",
             "title" => "Secret",
             "description" => "Select from your secrets",
-            "url" => "/api/organizations/{{organization_id}}/secrets",
+            "url" => "/api/organizations/{{organization_id}}/secrets?include_aliases=true",
             "presentAs" => "async-creatable-select",
             "minLength" => 1,
             "schema" => %{

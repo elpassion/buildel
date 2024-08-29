@@ -46,7 +46,13 @@ defmodule BuildelWeb.SecretController do
   operation :index,
     summary: "List user organization secrets",
     parameters: [
-      organization_id: [in: :path, description: "Organization ID", type: :integer, required: true]
+      organization_id: [in: :path, description: "Organization ID", type: :integer, required: true],
+      include_aliases: [
+        in: :query,
+        description: "Should endpoint return secret aliases",
+        type: :boolean,
+        required: false
+      ]
     ],
     request_body: nil,
     responses: [
@@ -68,7 +74,7 @@ defmodule BuildelWeb.SecretController do
            Buildel.Organizations.get_user_organization(user, organization_id),
          secrets <-
            Buildel.Organizations.list_organization_secrets(organization) do
-      render(conn, :index, secrets: secrets)
+      render(conn, :index, secrets: secrets, include_aliases: conn.params[:include_aliases])
     end
   end
 

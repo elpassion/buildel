@@ -1,6 +1,30 @@
 defmodule BuildelWeb.SecretJSON do
   alias Buildel.Secrets.Secret
 
+  def index(%{secrets: secrets, include_aliases: true}) do
+    data =
+      secrets
+      |> Enum.flat_map(fn secret ->
+        if secret.alias == nil do
+          [data(secret)]
+        else
+          [
+            data(secret),
+            %{
+              id: "__" <> secret.alias,
+              name: "Default for #{secret.alias} (#{secret.name})",
+              alias: nil,
+              created_at: secret.inserted_at,
+              updated_at: secret.updated_at
+            }
+          ]
+        end
+      end)
+      |> Enum.sort_by(&{:desc, &1.id |> String.downcase()})
+
+    %{data: data}
+  end
+
   def index(%{secrets: secrets}) do
     %{data: for(secret <- secrets, do: data(secret))}
   end
@@ -14,15 +38,9 @@ defmodule BuildelWeb.SecretJSON do
   end
 
   defp data(%Secret{} = secret) do
-    {id, name} =
-      case secret.alias do
-        "__" <> alias -> {secret.alias, "Default for #{alias} (#{secret.name})"}
-        _ -> {secret.name, secret.name}
-      end
-
     %{
-      id: id,
-      name: name,
+      id: secret.name,
+      name: secret.name,
       alias: secret.alias,
       created_at: secret.inserted_at,
       updated_at: secret.updated_at

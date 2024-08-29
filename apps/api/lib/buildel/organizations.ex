@@ -185,14 +185,6 @@ defmodule Buildel.Organizations do
     organization
     |> Repo.preload(:secrets)
     |> Map.get(:secrets)
-    |> Enum.flat_map(fn secret ->
-      if secret.alias != nil do
-        [secret, secret |> Map.put(:alias, "__" <> secret.alias)]
-      else
-        [secret]
-      end
-    end)
-    |> Enum.sort_by(& &1.alias)
   end
 
   def create_organization_secret(%Organization{} = organization, attrs \\ %{}) do
