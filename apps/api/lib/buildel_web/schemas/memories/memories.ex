@@ -68,7 +68,7 @@ defmodule BuildelWeb.Schemas.Memories do
       title: "MemoryBulkDeleteRequest",
       type: :object,
       properties: %{
-        ids: %Schema{type: :array, items: %Schema{type: :id}, description: "Memory IDs"}
+        ids: %Schema{type: :array, items: %Schema{type: :integer}, description: "Memory IDs"}
       },
       required: [:ids]
     })

@@ -258,8 +258,12 @@ defmodule Buildel.Memories do
                })
            }),
          :ok <-
-           Buildel.VectorDB.delete_all_by_memory_ids(vector_db, collection_name, ids),
-         {:ok, _} <-
+           Buildel.VectorDB.delete_all_by_memory_ids(
+             vector_db,
+             collection_name,
+             Enum.map(ids, &to_string/1)
+           ),
+         {_, nil} <-
            Buildel.Repo.delete_all(
              from(m in Memory, where: m.id in ^ids and m.organization_id == ^organization.id)
            ) do

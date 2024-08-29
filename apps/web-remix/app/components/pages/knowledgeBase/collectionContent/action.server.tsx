@@ -102,30 +102,11 @@ async function deleteMany(
   }
   const ids = result.data.memoryIds;
 
-  const promises = await Promise.allSettled(
-    ids.map((memoryId) => {
-      return knowledgeBaseApi.deleteCollectionMemory(
-        params.organizationId as string,
-        collectionId,
-        memoryId,
-      );
-    }),
+  await knowledgeBaseApi.bulkDeleteCollectionMemories(
+    params.organizationId as string,
+    collectionId,
+    ids
   );
-
-  const hasRejected = promises.some((p) => p.status === 'rejected');
-
-  if (hasRejected) {
-    return json(
-      {},
-      {
-        headers: {
-          'Set-Cookie': await setServerToast(request, {
-            error: 'Not all memories were deleted. Please try again.',
-          }),
-        },
-      },
-    );
-  }
 
   return json(
     {},

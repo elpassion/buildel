@@ -26,7 +26,7 @@ type DateQueryParams = {
   end_date: string;
 };
 export class KnowledgeBaseApi {
-  constructor(private client: typeof fetchTyped) {}
+  constructor(private client: typeof fetchTyped) { }
 
   async getCollections(organizationId: string | number) {
     return this.client(
@@ -108,6 +108,18 @@ export class KnowledgeBaseApi {
       z.any(),
       `/organizations/${organizationId}/memory_collections/${collectionId}/memories/${memoryId}`,
       { method: 'DELETE' },
+    );
+  }
+
+  async bulkDeleteCollectionMemories(
+    organizationId: string | number,
+    collectionId: string | number,
+    memoryIds: string[] | number[],
+  ) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/memory_collections/${collectionId}/memories`,
+      { method: 'DELETE', body: JSON.stringify({ ids: memoryIds }) },
     );
   }
 
