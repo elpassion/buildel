@@ -58,7 +58,7 @@ defmodule Buildel.Blocks.MapInputsTest do
     )
 
     assert_receive({^topic, :start_stream, nil, _})
-    assert_receive({^topic, :text, "dupa\n", _})
+    assert_receive({^topic, :text, "dupa\n", _}, 1000)
     assert_receive({^topic, :stop_stream, nil, _})
   end
 

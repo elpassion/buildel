@@ -29,7 +29,7 @@ defmodule BuildelWeb.Schemas.Embeddings do
           type: :array,
           items: %Schema{type: :string, description: "Chunk text"}
         },
-        memory_collection_id: %Schema{type: :number, description: "Memory collection id"}
+        memory_collection_id: %Schema{type: :integer, description: "Memory collection id"}
       },
       required: [:inputs, :memory_collection_id]
     })
