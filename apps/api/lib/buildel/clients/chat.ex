@@ -22,7 +22,7 @@ defmodule Buildel.Clients.Chat do
   alias LangChain.Message.ToolResult
   alias LangChain.Message.ToolCall
   alias Buildel.Clients.ChatBehaviour
-  alias Langchain.ChatModels.ChatMistralAI
+  alias LangChain.ChatModels.ChatMistralAI
   alias LangChain.ChatModels.ChatOpenAI
   alias LangChain.ChatModels.ChatGoogleAI
   alias LangChain.ChatModels.ChatAnthropic
