@@ -289,7 +289,6 @@ defmodule Buildel.Clients.Chat do
       model: opts.model,
       stream: true,
       temperature: opts.temperature,
-      endpoint: opts.endpoint,
       callbacks: callbacks
     })
   end
