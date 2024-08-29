@@ -110,10 +110,10 @@ function HoverableLine() {
   const { isOpen } = useBuilderSidebar();
 
   return (
-    <div className="w-3 h-full absolute top-0 left-0 z-[11] flex justify-center items-center">
+    <div className="w-5 h-full absolute top-0 left-0 z-[11] flex justify-center items-center">
       <div
         className={cn(
-          'h-6 w-1 bg-primary rounded-full transition-opacity delay-300',
+          'h-6 w-2 bg-primary rounded-full transition-opacity delay-300',
           {
             'opacity-0': isOpen,
             'opacity-100': !isOpen,
