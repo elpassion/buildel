@@ -20,12 +20,28 @@ export const SecretKeyListResponse = z
   })
   .transform((res) => res.data);
 
-export const CreateUpdateSecretSchema = z.object({
+export const CreateSecretSchema = z.object({
   name: z.string().min(2),
   value: z.string().min(2),
   alias: z.string().optional(),
 });
 
-export type ICreateUpdateSecretSchema = z.TypeOf<
-  typeof CreateUpdateSecretSchema
+export const UpdateSecretSchema = z.object({
+  name: z.string().min(2),
+  value: z
+    .string()
+    .transform((value) => (value === "" ? undefined : value))
+    .refine((value) => value === undefined || value.length >= 2, {
+      message: "Must be at least 2 characters long",
+    })
+    .optional(),
+  alias: z.string().optional(),
+});
+
+export type ICreateSecretSchema = z.TypeOf<
+  typeof CreateSecretSchema
+>;
+
+export type IUpdateSecretSchema = z.TypeOf<
+  typeof UpdateSecretSchema
 >;

@@ -141,6 +141,15 @@ defmodule BuildelWeb.SecretController do
       conn
       |> put_status(:created)
       |> render(:show, secret: secret)
+    else
+      {:error, :alias_not_found} ->
+        {:error,
+         changeset_for_errors(%{
+           alias: "Alias not found"
+         })}
+
+      e ->
+        e
     end
   end
 
@@ -197,9 +206,14 @@ defmodule BuildelWeb.SecretController do
 
     params = %{
       organization_id: organization_id,
-      name: name,
-      value: conn.body_params.value
+      name: name
     }
+
+    params =
+      case conn.body_params.value do
+        nil -> params
+        value -> Map.put(params, :value, value)
+      end
 
     with {:ok, alias} <- verify_alias(conn.body_params.alias),
          {:ok, organization} <-
@@ -212,6 +226,15 @@ defmodule BuildelWeb.SecretController do
       conn
       |> put_status(:ok)
       |> render(:show, secret: secret)
+    else
+      {:error, :alias_not_found} ->
+        {:error,
+         changeset_for_errors(%{
+           alias: "Alias not found"
+         })}
+
+      e ->
+        e
     end
   end
 
@@ -221,7 +244,19 @@ defmodule BuildelWeb.SecretController do
   defp verify_alias(alias) do
     case Buildel.Secrets.Aliases.aliases() |> Enum.member?(String.to_atom(alias)) do
       true -> {:ok, alias}
-      false -> {:error, "Alias not found"}
+      false -> {:error, :alias_not_found}
     end
+  end
+
+  defp changeset_for_errors(errors) do
+    %Ecto.Changeset{
+      action: :validate,
+      errors:
+        errors
+        |> Enum.map(fn {key, value} -> {key, {value, []}} end)
+        |> Enum.into(%{}),
+      changes: %{},
+      types: %{}
+    }
   end
 end

@@ -87,7 +87,7 @@ defmodule BuildelWeb.Schemas.Secrets do
         value: %Schema{type: :string, description: "Secret value"},
         alias: %Schema{type: :string, description: "Secret alias"}
       },
-      required: [:value]
+      required: []
     })
   end
 end

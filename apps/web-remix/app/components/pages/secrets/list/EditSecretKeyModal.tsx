@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
-import { CreateUpdateSecretSchema } from '~/api/secrets/secrets.contracts';
+import { UpdateSecretSchema } from '~/api/secrets/secrets.contracts';
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
@@ -38,7 +38,7 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
   initialData,
 }) => {
   const { organizationId } = useLoaderData<typeof loader>();
-  const validator = useMemo(() => withZod(CreateUpdateSecretSchema), []);
+  const validator = useMemo(() => withZod(UpdateSecretSchema), []);
 
   return (
     <DialogDrawer
@@ -93,6 +93,8 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
                     id="alias"
                     supportingText="The default provider for this secret"
                     defaultValue={initialData.alias}
+                    allowClear
+                    getPopupContainer={(triggerNode) => triggerNode.parentNode.parentNode}
                   />
                 </Field>
               </div>

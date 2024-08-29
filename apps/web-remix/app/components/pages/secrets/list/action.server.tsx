@@ -4,7 +4,7 @@ import { withZod } from '@remix-validated-form/with-zod';
 import { validationError } from 'remix-validated-form';
 import invariant from 'tiny-invariant';
 
-import { CreateUpdateSecretSchema } from '~/api/secrets/secrets.contracts';
+import { UpdateSecretSchema } from '~/api/secrets/secrets.contracts';
 import { SecretsApi } from '~/api/secrets/SecretsApi';
 import { requireLogin } from '~/session.server';
 import { actionBuilder } from '~/utils.server';
@@ -43,7 +43,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       await requireLogin(request);
       invariant(params.organizationId, 'Missing organizationId');
 
-      const validator = withZod(CreateUpdateSecretSchema);
+      const validator = withZod(UpdateSecretSchema);
 
       const result = await validator.validate(await request.formData());
 

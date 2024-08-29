@@ -121,6 +121,46 @@ defmodule BuildelWeb.SecretControllerTest do
 
       assert_schema(response, "SecretShowResponse", api_spec)
     end
+
+    test "overwrites alias", %{conn: conn, organization: organization} do
+      res =
+        get(conn, ~p"/api/organizations/#{organization}/secrets/aliases")
+
+      %{"data" => aliases} = json_response(res, 200)
+
+      alias = List.first(aliases)["id"]
+
+      first_secret =
+        post(conn, ~p"/api/organizations/#{organization}/secrets", %{
+          name: "name",
+          value: "value",
+          alias: alias
+        })
+
+      first_response = json_response(first_secret, 201)
+
+      %{"alias" => ^alias, "id" => id} = first_response["data"]
+
+      second_secret =
+        post(conn, ~p"/api/organizations/#{organization}/secrets", %{
+          name: "name2",
+          value: "value",
+          alias: alias
+        })
+
+      second_response = json_response(second_secret, 201)
+
+      %{"alias" => ^alias, "id" => id2} = second_response["data"]
+
+      res1 =
+        get(conn, ~p"/api/organizations/#{organization}/secrets/#{id}")
+
+      res2 =
+        get(conn, ~p"/api/organizations/#{organization}/secrets/#{id2}")
+
+      %{"alias" => nil} = json_response(res1, 200)["data"]
+      %{"alias" => ^alias} = json_response(res2, 200)["data"]
+    end
   end
 
   describe "delete" do
@@ -165,7 +205,9 @@ defmodule BuildelWeb.SecretControllerTest do
 
     test "validates input", %{conn: conn, organization: organization, secret: secret} do
       conn =
-        put(conn, ~p"/api/organizations/#{organization}/secrets/#{secret.name}", %{})
+        put(conn, ~p"/api/organizations/#{organization}/secrets/#{secret.name}", %{
+          alias: "dupa123"
+        })
 
       assert json_response(conn, 422)
     end
