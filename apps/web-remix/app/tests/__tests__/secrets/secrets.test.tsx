@@ -10,7 +10,6 @@ import { NewSecret } from '~/components/pages/secrets/newSecret/page';
 import { secretFixture } from '~/tests/fixtures/secrets.fixtures';
 import { SecretsHandlers } from '~/tests/handlers/secret.handlers';
 import { ButtonHandle } from '~/tests/handles/Button.handle';
-import { InputHandle } from '~/tests/handles/Input.handle';
 import { ListHandle } from '~/tests/handles/List.handle';
 import { render, screen } from '~/tests/render';
 import { server } from '~/tests/server.mock';
