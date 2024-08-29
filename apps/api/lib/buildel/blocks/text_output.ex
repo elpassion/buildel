@@ -74,8 +74,9 @@ defmodule Buildel.Blocks.TextOutput do
         text
       end
 
-    output(state, "output", {:text, text}, %{stream_stop: :schedule})
-    output(state, "forward", {:text, text}, %{stream_stop: :schedule})
+    state
+    |> output("output", {:text, text}, %{stream_stop: :schedule})
+    |> output("forward", {:text, text}, %{stream_stop: :schedule})
   end
 
   def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do
