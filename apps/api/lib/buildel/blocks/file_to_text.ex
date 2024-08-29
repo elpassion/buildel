@@ -34,6 +34,8 @@ defmodule Buildel.Blocks.FileToText do
 
   @impl true
   def handle_input("input", {_name, :binary, path, metadata}, state) do
+    state = send_stream_start(state, "output")
+
     with {:ok, content} <- Buildel.DocumentWorkflow.get_content(path, metadata) do
       output(state, "output", {:text, content})
     else
