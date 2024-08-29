@@ -13,9 +13,15 @@ import {
 } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { metaWithDefaults } from '~/utils/metadata';
+import { SelectInput } from '~/components/form/inputs/select/select.input';
+import { useLoaderData } from '@remix-run/react';
+import { loader } from './loader.server';
+import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 
 export function NewSecret() {
+  const { aliases, organizationId } = useLoaderData<typeof loader>();
   const validator = useMemo(() => withZod(CreateUpdateSecretSchema), []);
+
 
   return (
     <ValidatedForm
@@ -47,6 +53,17 @@ export function NewSecret() {
               The actual token key that will authorise you in the external
               system, such as Open AI.
             </FieldMessage>
+          </Field>
+        </div>
+
+        <div>
+          <Field name="alias">
+            <AsyncSelectField
+              url={`/api/organizations/${organizationId}/secrets/aliases`}
+              label="Default for:"
+              id="alias"
+              supportingText="The default provider for this secret"
+            />
           </Field>
         </div>
       </div>

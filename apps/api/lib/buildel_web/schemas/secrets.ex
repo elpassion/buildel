@@ -46,6 +46,22 @@ defmodule BuildelWeb.Schemas.Secrets do
     })
   end
 
+  defmodule AliasResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SecretAliasResponse",
+      type: :object,
+      properties: %{
+        data: %Schema{
+          type: :array,
+          items: %Schema{type: :string}
+        }
+      },
+      required: [:data]
+    })
+  end
+
   defmodule CreateSecretRequest do
     require OpenApiSpex
 
@@ -54,7 +70,8 @@ defmodule BuildelWeb.Schemas.Secrets do
       type: :object,
       properties: %{
         name: %Schema{type: :string, description: "Secret name"},
-        value: %Schema{type: :string, description: "Secret value"}
+        value: %Schema{type: :string, description: "Secret value"},
+        alias: %Schema{type: :string, description: "Secret alias"}
       },
       required: [:name, :value]
     })
@@ -67,7 +84,8 @@ defmodule BuildelWeb.Schemas.Secrets do
       title: "SecretUpdateRequest",
       type: :object,
       properties: %{
-        value: %Schema{type: :string, description: "Secret value"}
+        value: %Schema{type: :string, description: "Secret value"},
+        alias: %Schema{type: :string, description: "Secret alias"}
       },
       required: [:value]
     })

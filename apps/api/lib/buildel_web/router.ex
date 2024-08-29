@@ -336,6 +336,8 @@ defmodule BuildelWeb.Router do
     get("/organizations/:id/api_key", OrganizationController, :get_api_key)
     post("/organizations/:id/api_key", OrganizationController, :reset_api_key)
 
+    get("/organizations/:organization_id/secrets/aliases", SecretController, :aliases)
+
     resources("/organizations/:organization_id/secrets", SecretController,
       only: [:index, :create, :show, :update, :delete],
       param: "name"

@@ -22,6 +22,9 @@ import {
 } from '~/components/ui/dialog-drawer';
 
 import type { ISecretKey } from '../variables.types';
+import { useLoaderData } from '@remix-run/react';
+import { loader } from './loader.server';
+import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 
 interface EditSecretModalProps {
   isOpen: boolean;
@@ -34,6 +37,7 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
   onClose,
   initialData,
 }) => {
+  const { organizationId } = useLoaderData<typeof loader>();
   const validator = useMemo(() => withZod(CreateUpdateSecretSchema), []);
 
   return (
@@ -62,22 +66,36 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
               onClose();
             }}
           >
-            <div className="py-1">
+            <div className="py-1 gap-4 flex flex-col">
               <Field name="name">
                 <TextInputField type="hidden" />
               </Field>
 
-              <Field name="value">
-                <FieldLabel>Enter Secret</FieldLabel>
-                <PasswordInputField
-                  autoFocus
-                  placeholder="Type or paste in your secret key"
-                />
-                <FieldMessage>
-                  The actual token key that will authorise you in the external
-                  system, such as Open AI.
-                </FieldMessage>
-              </Field>
+              <div>
+                <Field name="value">
+                  <FieldLabel>Enter Secret</FieldLabel>
+                  <PasswordInputField
+                    autoFocus
+                    placeholder="Type or paste in your secret key"
+                  />
+                  <FieldMessage>
+                    The actual token key that will authorise you in the external
+                    system, such as Open AI.
+                  </FieldMessage>
+                </Field>
+              </div>
+
+              <div>
+                <Field name="alias">
+                  <AsyncSelectField
+                    url={`/api/organizations/${organizationId}/secrets/aliases`}
+                    label="Default for:"
+                    id="alias"
+                    supportingText="The default provider for this secret"
+                    defaultValue={initialData.alias}
+                  />
+                </Field>
+              </div>
             </div>
 
             <DialogDrawerFooter>

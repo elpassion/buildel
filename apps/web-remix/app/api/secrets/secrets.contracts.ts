@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const SecretKey = z.object({
   id: z.string(),
   name: z.string(),
+  alias: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
 });
@@ -22,6 +23,7 @@ export const SecretKeyListResponse = z
 export const CreateUpdateSecretSchema = z.object({
   name: z.string().min(2),
   value: z.string().min(2),
+  alias: z.string().optional(),
 });
 
 export type ICreateUpdateSecretSchema = z.TypeOf<

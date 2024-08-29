@@ -14,6 +14,35 @@ defmodule BuildelWeb.SecretController do
 
   tags ["secret"]
 
+  operation :aliases,
+    summary: "List secrets provider aliases",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer, required: true]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"secrets", "application/json", BuildelWeb.Schemas.Secrets.AliasResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def aliases(conn, _params) do
+    %{organization_id: organization_id} = conn.params
+    user = conn.assigns.current_user
+
+    with {:ok, _organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         aliases <-
+           Buildel.Secrets.Aliases.aliases() do
+      render(conn, :aliases, aliases: aliases)
+    end
+  end
+
   operation :index,
     summary: "List user organization secrets",
     parameters: [
@@ -101,10 +130,14 @@ defmodule BuildelWeb.SecretController do
       value: conn.body_params.value
     }
 
-    with {:ok, organization} <-
+    with {:ok, alias} <- verify_alias(conn.body_params.alias),
+         {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, secret} <-
-           Buildel.Organizations.create_organization_secret(organization, params) do
+           Buildel.Organizations.create_organization_secret(
+             organization,
+             params |> Map.put(:alias, alias)
+           ) do
       conn
       |> put_status(:created)
       |> render(:show, secret: secret)
@@ -168,13 +201,27 @@ defmodule BuildelWeb.SecretController do
       value: conn.body_params.value
     }
 
-    with {:ok, organization} <-
+    with {:ok, alias} <- verify_alias(conn.body_params.alias),
+         {:ok, organization} <-
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, secret} <-
-           Buildel.Organizations.update_organization_secret(organization, params) do
+           Buildel.Organizations.update_organization_secret(
+             organization,
+             params |> Map.put(:alias, alias)
+           ) do
       conn
       |> put_status(:ok)
       |> render(:show, secret: secret)
+    end
+  end
+
+  defp verify_alias(nil), do: {:ok, nil}
+  defp verify_alias(""), do: {:ok, nil}
+
+  defp verify_alias(alias) do
+    case Buildel.Secrets.Aliases.aliases() |> Enum.member?(String.to_atom(alias)) do
+      true -> {:ok, alias}
+      false -> {:error, "Alias not found"}
     end
   end
 end

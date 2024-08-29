@@ -6,7 +6,7 @@ import { SecretKeyListResponse, SecretKeyResponse } from './secrets.contracts';
 import type { ICreateUpdateSecretSchema } from './secrets.contracts';
 
 export class SecretsApi {
-  constructor(private client: typeof fetchTyped) {}
+  constructor(private client: typeof fetchTyped) { }
 
   async getSecrets(organizationId: string | number) {
     return this.client(
@@ -30,7 +30,7 @@ export class SecretsApi {
     return this.client(
       z.any(),
       `/organizations/${organizationId}/secrets/${data.name}`,
-      { method: 'PUT', body: JSON.stringify({ value: data.value }) },
+      { method: 'PUT', body: JSON.stringify({ value: data.value, alias: data?.alias }) },
     );
   }
 
@@ -42,6 +42,14 @@ export class SecretsApi {
       SecretKeyResponse,
       `/organizations/${organizationId}/secrets`,
       { method: 'POST', body: JSON.stringify(data) },
+    );
+  }
+
+  async getAliases(organizationId: string | number) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/secrets/aliases`,
+      { method: 'GET' },
     );
   }
 }
