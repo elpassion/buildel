@@ -159,6 +159,10 @@ defmodule Buildel.Organizations do
     get_organization_secret(organization.id, secret_name)
   end
 
+  def get_organization_secret(organization_id, "__" <> secret_name) do
+    get_organization_secret_by_alias(organization_id, secret_name)
+  end
+
   def get_organization_secret(organization_id, secret_name) do
     case Repo.get_by(Secret, name: secret_name, organization_id: organization_id) do
       nil -> {:error, :not_found}
@@ -166,8 +170,29 @@ defmodule Buildel.Organizations do
     end
   end
 
+  def get_organization_secret_by_alias(%Organization{} = organization, alias) do
+    get_organization_secret_by_alias(organization.id, alias)
+  end
+
+  def get_organization_secret_by_alias(organization_id, alias) do
+    case Repo.get_by(Secret, alias: alias, organization_id: organization_id) do
+      nil -> {:error, :not_found}
+      %Secret{} = secret -> {:ok, secret}
+    end
+  end
+
   def list_organization_secrets(%Organization{} = organization) do
-    organization |> Repo.preload(:secrets) |> Map.get(:secrets)
+    organization
+    |> Repo.preload(:secrets)
+    |> Map.get(:secrets)
+    |> Enum.flat_map(fn secret ->
+      if secret.alias != nil do
+        [secret, secret |> Map.put(:alias, "__" <> secret.alias)]
+      else
+        [secret]
+      end
+    end)
+    |> Enum.sort_by(& &1.alias)
   end
 
   def create_organization_secret(%Organization{} = organization, attrs \\ %{}) do

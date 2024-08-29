@@ -71,6 +71,7 @@ export const CreatableAsyncSelectField = forwardRef<
     },
     _ref,
   ) => {
+
     const { name, getInputProps, validate } = useFieldContext({
       validationBehavior: {
         initial: 'onBlur',
@@ -80,7 +81,19 @@ export const CreatableAsyncSelectField = forwardRef<
     });
     const { isModalOpen, openModal, closeModal, changeOpen } = useModal();
 
+    const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
     const [selectedId, setSelectedId] = useControlField<string>(name);
+
+
+    useEffect(() => {
+      if (defaultValue && options.some((opt) => opt.value === defaultValue) && !selectedId) {
+        setSelectedId(defaultValue);
+      }
+    }, [defaultValue, options, selectedId]);
+
+    const onOptionsFetch = (options: ({ value: string; label: string })[]) => {
+      setOptions(options)
+    }
 
     const onChange = (id: string) => {
       setSelectedId(id);
@@ -109,7 +122,9 @@ export const CreatableAsyncSelectField = forwardRef<
     const fetcher = useCallback(async () => {
       return asyncSelectApi
         .getData(url)
-        .then((opts) => opts.map(toSelectOption));
+        .then((opts) => {
+          return opts.map(toSelectOption)
+        });
     }, [url, isModalOpen]);
 
     return (
@@ -131,8 +146,9 @@ export const CreatableAsyncSelectField = forwardRef<
 
         <AsyncSelectInput
           placeholder="Select..."
+          onOptionsFetch={onOptionsFetch}
           fetchOptions={fetcher}
-          defaultValue={defaultValue}
+          // defaultValue={defaultValue}
           onChange={onChange}
           value={selectedId}
           onBlur={getInputProps().onBlur}

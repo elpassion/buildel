@@ -119,6 +119,7 @@ defmodule Buildel.WorkflowTemplates do
               api_type: "openai",
               endpoint: "https://api.openai.com/v1",
               model: "gpt-4o-mini",
+              api_key: "__openai",
               system_message:
                 "You are a Feedback Assistant.\n\nI will send you an essay, and your job is to prepare feedback for it.\n\nRemember to:\n\n- Be conversational.\n- Be brief.\n- Evaluate on multiple criteria.\n- Respond in bullet points and markdown.\n- Prepare an overall summary at the end.",
               prompt_template: "{{file_to_text_1:output}}",

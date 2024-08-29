@@ -85,6 +85,15 @@ defmodule Buildel.Blocks.Chat do
                         "anthropic" =>
                           "[Anthropic API key](https://www.anthropic.com/api) to use for the chat."
                       }
+                    },
+                    "defaultWhen" => %{
+                      "opts.api_type" => %{
+                        "openai" => "__openai",
+                        "azure" => "__azure",
+                        "google" => "__google",
+                        "mistral" => "__mistral",
+                        "anthropic" => "__anthropic"
+                      }
                     }
                   }),
                 model: %{

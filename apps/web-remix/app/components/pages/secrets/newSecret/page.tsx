@@ -13,13 +13,12 @@ import {
 } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { metaWithDefaults } from '~/utils/metadata';
-import { SelectInput } from '~/components/form/inputs/select/select.input';
 import { useLoaderData } from '@remix-run/react';
 import { loader } from './loader.server';
 import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 
 export function NewSecret() {
-  const { aliases, organizationId } = useLoaderData<typeof loader>();
+  const { organizationId } = useLoaderData<typeof loader>();
   const validator = useMemo(() => withZod(CreateSecretSchema), []);
 
 

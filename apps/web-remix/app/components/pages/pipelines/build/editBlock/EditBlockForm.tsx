@@ -276,6 +276,19 @@ export function EditBlockForm({
         }
       }
 
+      let defaultValue;
+
+
+      if ('defaultWhen' in props.field && props.field.defaultWhen) {
+        const formValues = getValues();
+        const defaultKey = Object.keys(props.field.defaultWhen)[0];
+        const defaultFieldValue = formValues.get(defaultKey);
+
+        if (typeof defaultFieldValue === 'string') {
+          defaultValue = (props.field.defaultWhen as any)[defaultKey][defaultFieldValue];
+        }
+      }
+
       return (
         <FormField name={props.name!}>
           <CreatableAsyncSelectField
@@ -287,7 +300,7 @@ export function EditBlockForm({
             errorMessage={fieldErrors[props.name!]}
             dropdownClassName={`${props.name}-dropdown`}
             data-testid={props.name}
-            defaultValue={props.field.default
+            defaultValue={defaultValue || props.field.default
               ?.replace('{{pipeline_id}}', pipelineId.toString())
               ?.replace('{{block_name}}', blockConfig.name)
               ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
@@ -396,7 +409,7 @@ function TriggerValidation() {
     const validateForm = async () => {
       try {
         await validate();
-      } catch {}
+      } catch { }
     };
 
     validateForm();
@@ -417,7 +430,7 @@ function generateSuggestions(connections: IConfigConnection[]): Suggestion[] {
 const InputsContext = React.createContext<{
   connections: IConfigConnection[];
   updateInputReset: (connection: IConfigConnection, value: boolean) => void;
-}>({ connections: [], updateInputReset: () => {} });
+}>({ connections: [], updateInputReset: () => { } });
 
 const InputsProvider: React.FC<{
   connections: IConfigConnection[];

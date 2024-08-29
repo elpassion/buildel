@@ -14,9 +14,15 @@ defmodule BuildelWeb.SecretJSON do
   end
 
   defp data(%Secret{} = secret) do
+    {id, name} =
+      case secret.alias do
+        "__" <> alias -> {secret.alias, "Default for #{alias} (#{secret.name})"}
+        _ -> {secret.name, secret.name}
+      end
+
     %{
-      id: secret.name,
-      name: secret.name,
+      id: id,
+      name: name,
       alias: secret.alias,
       created_at: secret.inserted_at,
       updated_at: secret.updated_at
