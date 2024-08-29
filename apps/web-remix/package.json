@@ -113,7 +113,8 @@
     "overrides": {
       "react": "19.0.0-rc-eb3ad065-20240822",
       "react-dom": "19.0.0-rc-eb3ad065-20240822",
-      "react-is": "19.0.0-rc-eb3ad065-20240822"
+      "react-is": "19.0.0-rc-eb3ad065-20240822",
+      "micromatch@<4.0.8": ">=4.0.8"
     }
   },
   "devDependencies": {
