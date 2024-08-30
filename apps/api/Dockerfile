@@ -30,9 +30,7 @@ RUN apt-get update -y && apt-get install -y build-essential git curl jq \
 WORKDIR /app
 
 # install hex + rebar
-RUN --mount=type=cache,id=hex,target=/root/.hex \
-  --mount=type=cache,id=mix,target=/root/.mix \
-  mix local.hex --force && mix local.rebar --force
+RUN mix local.hex --force && mix local.rebar --force
 
 # set build ENV
 ENV MIX_ENV="prod"
@@ -44,6 +42,9 @@ RUN --mount=type=cache,id=hex,target=/root/.hex \
   --mount=type=cache,id=mix,target=/root/.mix \
   mix deps.get --only $MIX_ENV
 RUN mkdir config
+
+# install hex again
+RUN mix local.hex --force && mix local.rebar --force
 
 # copy compile-time config files before we compile dependencies
 # to ensure any relevant config change will trigger the dependencies
