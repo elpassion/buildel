@@ -119,7 +119,7 @@ defmodule Buildel.Blocks do
   }
 
   def list_types() do
-    @names_to_blocks_map |> Map.values() |> Enum.map(fn block -> block.options end)
+    @names_to_blocks_map |> Map.values() |> Enum.map(fn block -> block.options() end)
   end
 
   def list_types_overviews() do

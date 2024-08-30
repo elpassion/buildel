@@ -123,6 +123,28 @@ defmodule Buildel.BlockContext do
     {:ok, collection, Buildel.Memories.organization_collection_name(organization, collection)}
   end
 
+  def create_memory(context_id, collection, file, metadata) do
+    %{global: organization_id} = context_from_context_id(context_id)
+    organization = Buildel.Organizations.get_organization!(organization_id)
+
+    Buildel.Memories.create_organization_memory(
+      organization,
+      collection,
+      file,
+      metadata
+    )
+  end
+
+  def delete_file(context_id, collection, file_id) do
+    %{global: organization_id} = context_from_context_id(context_id)
+    organization = Buildel.Organizations.get_organization!(organization_id)
+
+    memory =
+      Buildel.Memories.get_collection_memory_by_file_uuid!(organization, collection.id, file_id)
+
+    Buildel.Memories.delete_organization_memory(organization, collection.id, memory.id)
+  end
+
   @impl true
   def get_vector_db(context_id, collection_name) do
     %{global: organization_id} = context_from_context_id(context_id)

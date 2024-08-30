@@ -159,12 +159,13 @@ defmodule Buildel.Blocks.DocumentSearch do
       ) do
     {:ok, vector_db} = block_context().get_vector_db(context_id, opts.knowledge)
 
-    {:ok, _collection, collection_name} =
+    {:ok, collection, collection_name} =
       block_context().get_global_collection(context_id, opts.knowledge)
 
     {:ok,
      state
      |> Map.put(:vector_db, vector_db)
+     |> Map.put(:collection, collection)
      |> Map.put(:collection_name, collection_name)
      |> Map.put(:where, %{
        "memory_id" =>
@@ -214,18 +215,11 @@ defmodule Buildel.Blocks.DocumentSearch do
   def handle_cast({:add_file, {:binary, file_path, metadata}}, state) do
     state = send_stream_start(state)
 
-    %{organization_id: organization_id, collection_id: collection_id} =
-      Buildel.Memories.context_from_organization_collection_name(state.collection_name)
-
-    organization = Buildel.Organizations.get_organization!(organization_id)
-
     try do
-      with {:ok, collection} <-
-             Buildel.Memories.get_organization_collection(organization, collection_id),
-           {:ok, memory} <-
-             Buildel.Memories.create_organization_memory(
-               organization,
-               collection,
+      with {:ok, memory} <-
+             block_context().create_memory(
+               state.context_id,
+               state.collection,
                %{
                  path: file_path,
                  type: metadata |> Map.get(:file_type),
@@ -269,17 +263,8 @@ defmodule Buildel.Blocks.DocumentSearch do
   def handle_cast({:delete_file, file_id}, state) do
     state = send_stream_start(state)
 
-    %{organization_id: organization_id, collection_id: collection_id} =
-      Buildel.Memories.context_from_organization_collection_name(state.collection_name)
-
     try do
-      organization = Buildel.Organizations.get_organization!(organization_id)
-
-      memory =
-        Buildel.Memories.get_collection_memory_by_file_uuid!(organization, collection_id, file_id)
-
-      {:ok, _} =
-        Buildel.Memories.delete_organization_memory(organization, collection_id, memory.id)
+      {:ok, _} = block_context().delete_file(state.context_id, state.collection, file_id)
 
       state = send_stream_stop(state)
       {:noreply, state}
@@ -315,9 +300,6 @@ defmodule Buildel.Blocks.DocumentSearch do
           end
       })
 
-    %{collection_id: collection_id} =
-      Buildel.Memories.context_from_organization_collection_name(state.collection_name)
-
     {result, _total_tokens, embeddings_tokens} =
       MemoryCollectionSearch.new(%{
         vector_db: state.vector_db,
@@ -329,7 +311,7 @@ defmodule Buildel.Blocks.DocumentSearch do
       state[:context_id],
       state[:block_name],
       embeddings_tokens,
-      collection_id
+      state.collection.id
     )
 
     result

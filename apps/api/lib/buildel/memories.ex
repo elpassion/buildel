@@ -423,13 +423,4 @@ defmodule Buildel.Memories do
   def organization_collection_name(organization_id, collection_id) do
     "#{organization_id}_#{collection_id}"
   end
-
-  def context_from_organization_collection_name(organization_collection_name) do
-    [organization_id, collection_id] = String.split(organization_collection_name, "_")
-
-    %{
-      organization_id: organization_id,
-      collection_id: collection_id
-    }
-  end
 end
