@@ -159,13 +159,13 @@ defmodule Buildel.Blocks.DocumentSearch do
       ) do
     {:ok, vector_db} = block_context().get_vector_db(context_id, opts.knowledge)
 
-    {:ok, collection} =
-      block_context().get_global_collection_name(context_id, opts.knowledge)
+    {:ok, _collection, collection_name} =
+      block_context().get_global_collection(context_id, opts.knowledge)
 
     {:ok,
      state
      |> Map.put(:vector_db, vector_db)
-     |> Map.put(:collection, collection)
+     |> Map.put(:collection_name, collection_name)
      |> Map.put(:where, %{
        "memory_id" =>
          case opts.memory_id do
@@ -215,7 +215,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     state = send_stream_start(state)
 
     %{organization_id: organization_id, collection_id: collection_id} =
-      Buildel.Memories.context_from_organization_collection_name(state[:collection])
+      Buildel.Memories.context_from_organization_collection_name(state.collection_name)
 
     organization = Buildel.Organizations.get_organization!(organization_id)
 
@@ -270,7 +270,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     state = send_stream_start(state)
 
     %{organization_id: organization_id, collection_id: collection_id} =
-      Buildel.Memories.context_from_organization_collection_name(state[:collection])
+      Buildel.Memories.context_from_organization_collection_name(state.collection_name)
 
     try do
       organization = Buildel.Organizations.get_organization!(organization_id)
@@ -316,12 +316,12 @@ defmodule Buildel.Blocks.DocumentSearch do
       })
 
     %{collection_id: collection_id} =
-      Buildel.Memories.context_from_organization_collection_name(state[:collection])
+      Buildel.Memories.context_from_organization_collection_name(state.collection_name)
 
     {result, _total_tokens, embeddings_tokens} =
       MemoryCollectionSearch.new(%{
         vector_db: state.vector_db,
-        organization_collection_name: state[:collection]
+        organization_collection_name: state.collection_name
       })
       |> MemoryCollectionSearch.search(params)
 
@@ -340,7 +340,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   defp do_parent(state, chunk_id) do
     MemoryCollectionSearch.new(%{
       vector_db: state.vector_db,
-      organization_collection_name: state[:collection]
+      organization_collection_name: state.collection_name
     })
     |> MemoryCollectionSearch.parent(chunk_id)
     |> then(&DocumentSearchJSON.show/1)
@@ -348,7 +348,7 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   defp do_related(state, chunk_id) do
-    chunk = Buildel.VectorDB.get_by_id(state.vector_db, state[:collection], chunk_id)
+    chunk = Buildel.VectorDB.get_by_id(state.vector_db, state.collection_name, chunk_id)
 
     params =
       MemoryCollectionSearch.Params.from_map(%{
@@ -364,7 +364,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     {result, _total_tokens, _embeddings_tokens} =
       MemoryCollectionSearch.new(%{
         vector_db: state.vector_db,
-        organization_collection_name: state[:collection]
+        organization_collection_name: state.collection_name
       })
       |> MemoryCollectionSearch.search(params)
 

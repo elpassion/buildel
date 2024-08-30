@@ -7,7 +7,7 @@ defmodule Buildel.BlockContextBehaviour do
   @callback create_run_cost(String.t(), String.t(), costs_data()) ::
               {:ok, Buildel.Pipelines.RunCost.t()}
   @callback get_vector_db(String.t(), String.t()) :: Buildel.VectorDB.t()
-  @callback get_global_collection_name(String.t(), String.t()) :: {:ok, String.t()}
+  @callback get_global_collection(String.t(), String.t()) :: {:ok, any(), String.t()}
   @callback get_secret_from_context(String.t(), String.t()) :: {:ok, String.t()}
   @callback get_dataset_from_context(String.t(), String.t()) :: any()
 end
@@ -113,14 +113,14 @@ defmodule Buildel.BlockContext do
   end
 
   @impl true
-  def get_global_collection_name(context_id, collection_name) do
+  def get_global_collection(context_id, collection_name) do
     %{global: organization_id} = context_from_context_id(context_id)
     organization = Buildel.Organizations.get_organization!(organization_id)
 
     {:ok, collection} =
       Buildel.Memories.get_organization_collection(organization, collection_name)
 
-    {:ok, Buildel.Memories.organization_collection_name(organization, collection)}
+    {:ok, collection, Buildel.Memories.organization_collection_name(organization, collection)}
   end
 
   @impl true
