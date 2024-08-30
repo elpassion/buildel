@@ -299,7 +299,10 @@ defmodule Buildel.Blocks.DocumentSearch do
     params =
       MemoryCollectionSearch.Params.from_map(%{
         search_query: query,
-        where: Map.merge(tool_filters, state.where),
+        where:
+          Map.merge(tool_filters, state.where, fn _key, bot_value, set_value ->
+            if set_value, do: set_value, else: bot_value
+          end),
         limit: state[:opts] |> Map.get(:limit, 3),
         similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
         extend_neighbors: state.opts |> Map.get(:extend_neighbors, false) != false,
