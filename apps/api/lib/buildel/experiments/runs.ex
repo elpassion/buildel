@@ -7,6 +7,36 @@ defmodule Buildel.Experiments.Runs do
   import Ecto.Query, warn: false
   alias Buildel.Repo
 
+  def stream_experiment_runs_csv(conn, %Experiment{} = experiment) do
+    query =
+      from r in Run,
+        where: r.experiment_id == ^experiment.id,
+        order_by: [desc: r.inserted_at]
+
+    Repo.transaction(fn ->
+      Repo.stream(query)
+      |> Stream.map(fn row ->
+        Map.merge(row.columns_avg, %{
+          "evaluations_avg" => row.evaluations_avg,
+          "id" => row.id,
+          "created_at" => row.inserted_at,
+          "runs_count" => row.runs_count,
+          "status" => row.status
+        })
+      end)
+      |> CSV.Encoding.Encoder.encode(headers: true)
+      |> Enum.reduce_while(conn, fn chunk, conn ->
+        case Plug.Conn.chunk(conn, chunk) do
+          {:ok, conn} ->
+            {:cont, conn}
+
+          {:error, _reason} ->
+            {:halt, conn}
+        end
+      end)
+    end)
+  end
+
   def list_experiment_runs(%Experiment{} = experiment, pagination_params) do
     offset = pagination_params.page * pagination_params.per_page
 
@@ -22,17 +52,7 @@ defmodule Buildel.Experiments.Runs do
     {:ok, results, experiment.runs_count}
   end
 
-  def list_experiment_run_runs(%Run{} = run) do
-    results =
-      from(rrr in RunRowRun,
-        where: rrr.experiment_run_id == ^run.id
-      )
-      |> Repo.all()
-
-    results
-  end
-
-  def stream_csv(conn, %Run{} = run) do
+  def stream_run_runs_csv(conn, %Run{} = run) do
     query =
       from rrr in RunRowRun,
         where: rrr.experiment_run_id == ^run.id,
@@ -59,6 +79,16 @@ defmodule Buildel.Experiments.Runs do
         end
       end)
     end)
+  end
+
+  def list_experiment_run_runs(%Run{} = run) do
+    results =
+      from(rrr in RunRowRun,
+        where: rrr.experiment_run_id == ^run.id
+      )
+      |> Repo.all()
+
+    results
   end
 
   def list_experiment_run_runs(%Run{} = run, pagination_params) do
