@@ -46,6 +46,7 @@ export function BlockConfigPage() {
             blockConfig={block}
             organizationId={organizationId}
             pipelineId={pipelineRun.id}
+            connections={pipelineRun.config.connections}
           />
         </DialogDrawerBody>
       </DialogDrawerContent>
