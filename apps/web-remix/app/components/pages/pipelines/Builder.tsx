@@ -185,7 +185,7 @@ const BuilderInstance = ({
 
   const onNodesChange = useCallback(
     (changes: NodeChange<INode>[]) => {
-      if (type === 'readOnly') return;
+      if (isDisabled && changes[0]?.type !== 'select') return;
       if (['select', 'position', 'dimensions'].includes(changes[0]?.type)) {
         updateCurrent((state) => ({
           ...state,
@@ -198,12 +198,12 @@ const BuilderInstance = ({
         }));
       }
     },
-    [type],
+    [isDisabled],
   );
 
   const onEdgesChange = useCallback(
     (changes: EdgeChange<IEdge>[]) => {
-      if (type === 'readOnly') return;
+      if (isDisabled) return;
       if (['select'].includes(changes[0].type)) {
         updateCurrent((state) => ({
           ...state,
@@ -216,7 +216,7 @@ const BuilderInstance = ({
         }));
       }
     },
-    [type],
+    [isDisabled],
   );
 
   const onConnect = useCallback((params: Connection) => {
@@ -369,7 +369,7 @@ const BuilderInstance = ({
           edgesUpdatable={!isDisabled}
           edgesFocusable={!isDisabled}
           nodesDraggable={type === 'editable'}
-          elementsSelectable={!isDisabled}
+          // elementsSelectable={!isDisabled}
           nodesConnectable={!isDisabled}
           nodesFocusable={!isDisabled}
           edgesReconnectable={!isDisabled}
