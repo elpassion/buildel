@@ -5,6 +5,32 @@ defmodule Buildel.Datasets do
   alias Buildel.Datasets.Dataset
   alias Buildel.Repo
 
+  def stream_csv(conn, dataset_id) do
+    query =
+      from dr in DatasetRow,
+        where: dr.dataset_id == ^dataset_id
+
+    Repo.transaction(fn ->
+      Repo.stream(query)
+      |> Stream.map(fn row ->
+        Map.merge(row.data, %{
+          "id" => row.id,
+          "index" => row.index
+        })
+      end)
+      |> CSV.Encoding.Encoder.encode(headers: true)
+      |> Enum.reduce_while(conn, fn chunk, conn ->
+        case Plug.Conn.chunk(conn, chunk) do
+          {:ok, conn} ->
+            {:cont, conn}
+
+          {:error, _reason} ->
+            {:halt, conn}
+        end
+      end)
+    end)
+  end
+
   def list_datasets do
     Repo.all(Dataset)
   end

@@ -26,14 +26,18 @@ defmodule BuildelWeb.Router do
     plug(PutApiSpec, module: BuildelWeb.ApiSpec)
   end
 
+  pipeline :with_etag do
+    plug ETag.Plug
+  end
+
   scope "/" do
-    pipe_through(:browser)
+    pipe_through([:browser, :with_etag])
 
     get "/swaggerui", OpenApiSpex.Plug.SwaggerUI, path: "/api/openapi"
   end
 
   scope "/dev" do
-    pipe_through([:browser, :require_basic_auth])
+    pipe_through([:browser, :require_basic_auth, :with_etag])
 
     live_dashboard("/dashboard",
       metrics: BuildelWeb.Telemetry,
@@ -50,6 +54,14 @@ defmodule BuildelWeb.Router do
 
   scope "/api", BuildelWeb do
     pipe_through(:api)
+
+    get(
+      "/organizations/:organization_id/datasets/:dataset_id/rows/export",
+      DatasetRowsController,
+      :export
+    )
+
+    pipe_through(:with_etag)
 
     post("/add", CalculatorController, :add)
 

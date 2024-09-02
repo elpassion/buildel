@@ -35,7 +35,6 @@ defmodule BuildelWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug CORSPlug
-  plug ETag.Plug
   plug BuildelWeb.Router
   plug Sentry.PlugContext
 end

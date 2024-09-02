@@ -16,6 +16,41 @@ defmodule BuildelWeb.DatasetRowsController do
 
   tags ["dataset"]
 
+  operation :export,
+    summary: "Export dataset rows",
+    parameters: [
+      organization_id: [in: :path, description: "Organization ID", type: :integer],
+      dataset_id: [in: :path, description: "Dataset id", type: :integer]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"ok", "application/json", nil},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def export(conn, _) do
+    user = conn.assigns.current_user
+    %{organization_id: organization_id, dataset_id: dataset_id} = conn.params
+
+    conn =
+      conn
+      |> put_resp_content_type("text/csv")
+      |> put_resp_header(
+        "content-disposition",
+        "attachment; filename=\"dataset_#{dataset_id}.csv\""
+      )
+      |> send_chunked(200)
+
+    with {:ok, _organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, conn} <- Buildel.Datasets.stream_csv(conn, dataset_id) do
+      conn
+    end
+  end
+
   operation :index,
     summary: "List dataset rows",
     parameters:
