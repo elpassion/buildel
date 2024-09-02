@@ -9,10 +9,8 @@ import { AppNavbar, AppNavbarHeading } from '~/components/navbar/AppNavbar';
 import { BreadcrumbWrapper } from '~/components/pages/experiments/components/Breadcrumb.components';
 import { Breadcrumbs } from '~/components/pages/experiments/components/Breadcrumbs';
 import { Pagination } from '~/components/pagination/Pagination';
-import { errorToast } from '~/components/toasts/errorToast';
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
-import { downloadFile } from '~/hooks/useDownloadFile';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
@@ -38,23 +36,6 @@ export function ExperimentPage() {
   const isRunning = experimentRuns.some((run) => run.status === 'running');
 
   useRevalidateOnInterval({ enabled: isRunning });
-
-  const downloadCsv = async () => {
-    try {
-      const res = await fetch(
-        `/super-api/organizations/${organizationId}/experiments/${experimentId}/runs/export`,
-        { method: 'GET' },
-      );
-
-      if (!res.ok) throw new Error();
-
-      const blob = await res.blob();
-      downloadFile(blob, `experiment_${experimentId}.csv`);
-    } catch (err) {
-      console.log(err);
-      errorToast('Cannot download the file');
-    }
-  };
 
   return (
     <>
@@ -110,14 +91,13 @@ export function ExperimentPage() {
         </div>
 
         <div className="mb-3 flex justify-end">
-          <Button
-            size="xs"
-            variant="secondary"
-            className="gap-1"
-            onClick={downloadCsv}
-          >
-            <span>Export</span>
-            <Download className="w-4 h-4" />
+          <Button size="xs" variant="secondary" className="gap-1" asChild>
+            <a
+              href={`/super-api/organizations/${organizationId}/experiments/${experimentId}/runs/export`}
+            >
+              <span>Export</span>
+              <Download className="w-4 h-4" />
+            </a>
           </Button>
         </div>
 

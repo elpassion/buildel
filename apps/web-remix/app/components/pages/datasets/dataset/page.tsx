@@ -14,9 +14,7 @@ import {
   ListActionProvider,
 } from '~/components/pages/knowledgeBase/components/ListActionProvider';
 import { Pagination } from '~/components/pagination/Pagination';
-import { errorToast } from '~/components/toasts/errorToast';
 import { Button } from '~/components/ui/button';
-import { downloadFile } from '~/hooks/useDownloadFile';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -27,23 +25,6 @@ import { UploadFileForm } from './UploadFileForm';
 export function DatasetPage() {
   const { organizationId, dataset, datasetRows, pagination } =
     useLoaderData<typeof loader>();
-
-  const downloadCsv = async () => {
-    try {
-      const res = await fetch(
-        `/super-api/organizations/${organizationId}/datasets/${dataset.id}/rows/export`,
-        { method: 'GET' },
-      );
-
-      if (!res.ok) throw new Error();
-
-      const blob = await res.blob();
-      downloadFile(blob, `dataset_${dataset.id}.csv`);
-    } catch (err) {
-      console.log(err);
-      errorToast('Cannot download the file');
-    }
-  };
 
   return (
     <>
@@ -97,14 +78,13 @@ export function DatasetPage() {
 
         <ListActionProvider>
           <div className="mb-3 flex justify-end">
-            <Button
-              size="xs"
-              variant="secondary"
-              className="gap-1"
-              onClick={downloadCsv}
-            >
-              <span>Export</span>
-              <Download className="w-4 h-4" />
+            <Button size="xs" variant="secondary" className="gap-1" asChild>
+              <a
+                href={`/super-api/organizations/${organizationId}/datasets/${dataset.id}/rows/export`}
+              >
+                <span>Export</span>
+                <Download className="w-4 h-4" />
+              </a>
             </Button>
           </div>
 
