@@ -71,10 +71,3 @@
   }
 
 }
-
-
-
-.rc-menu-item-active{
-  @apply !bg-neutral-950
-}
-
