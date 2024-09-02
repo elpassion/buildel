@@ -153,17 +153,7 @@ interface BlockGroupItemProps {
 }
 
 function BlockGroupItem({ data, onCreate }: BlockGroupItemProps) {
-  const { searchValue } = useBlocksSearch();
   const { value: isCollapsed, toggle } = useBoolean(false);
-
-  const filteredBlocks = useMemo(() => {
-    return data.blocks.filter((block) =>
-      block.type
-        .replace('_', ' ')
-        .toLowerCase()
-        .includes(searchValue.toLowerCase()),
-    );
-  }, [data.blocks, searchValue]);
 
   return (
     <div className="border border-input rounded-md flex flex-col gap-1 overflow-hidden">
@@ -185,7 +175,7 @@ function BlockGroupItem({ data, onCreate }: BlockGroupItemProps) {
         className={cn('grid grid-cols-2 gap-2 px-1.5 pb-1.5', {
           hidden: isCollapsed,
         })}
-        items={filteredBlocks.map((block) => ({ id: block.type, block }))}
+        items={data.blocks.map((block) => ({ id: block.type, block }))}
         renderItem={(item) => (
           <BlockItem data={item} group={data.id} onCreate={onCreate} />
         )}
@@ -205,6 +195,7 @@ function BlockItem({ data, group, onCreate }: BlockItemProps) {
   const [urlSrc, setUrlSrc] = useState(resolveIconPath(group));
   const reactFlowInstance = useReactFlow();
   const { status: runStatus } = useRunPipeline();
+
   const onDragStart = (
     event: DragEvent<HTMLDivElement>,
     block: z.TypeOf<typeof BlockType>,
@@ -213,7 +204,11 @@ function BlockItem({ data, group, onCreate }: BlockItemProps) {
     event.dataTransfer.effectAllowed = 'move';
   };
 
+  const isRunning = runStatus !== 'idle';
+
   const onClickAdd = useCallback(() => {
+    if (isRunning) return;
+
     const { block } = data;
 
     const wrapper = document.querySelector<HTMLDivElement>(
@@ -240,7 +235,7 @@ function BlockItem({ data, group, onCreate }: BlockItemProps) {
       position: position,
       connections: [],
     });
-  }, [onCreate, reactFlowInstance]);
+  }, [onCreate, reactFlowInstance, isRunning]);
 
   const onImageError = () => {
     setUrlSrc(resolveIconPath('default'));
@@ -252,12 +247,17 @@ function BlockItem({ data, group, onCreate }: BlockItemProps) {
         <TooltipTrigger asChild>
           <div
             key={data.block.type}
-            draggable={runStatus === 'idle'}
+            draggable={!isRunning}
             onDragStart={(event) => {
               onDragStart(event, data.block);
             }}
             id="draggable-block-item"
-            className="w-full border border-input rounded-md p-2 flex gap-2 items-center hover:bg-muted cursor-pointer"
+            className={cn(
+              'w-full border border-input rounded-md p-2 flex gap-2 items-center',
+              {
+                'cursor-pointer hover:bg-muted': !isRunning,
+              },
+            )}
             onClick={onClickAdd}
           >
             <img
