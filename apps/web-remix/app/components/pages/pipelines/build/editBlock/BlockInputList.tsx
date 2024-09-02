@@ -3,11 +3,10 @@ import React, { useMemo, useRef, useState } from 'react';
 
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 import { ItemList } from '~/components/list/ItemList';
+import { useInputs } from '~/components/pages/pipelines/EditBlockForm';
 import type { IConfigConnection } from '~/components/pages/pipelines/pipeline.types';
 import { HelpfulIcon } from '~/components/tooltip/HelpfulIcon';
 import { cn } from '~/utils/cn';
-
-import { useInputs } from './EditBlockForm';
 
 interface BlockInputListProps {
   connections: IConfigConnection[];

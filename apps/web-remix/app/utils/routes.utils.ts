@@ -74,6 +74,27 @@ export const routes = {
       `${routes.pipelineRuns(organizationId, pipelineId)}/${runId}`,
       params,
     ),
+  pipelineRunOverview: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    runId: RunId,
+    params: RouteParam = {},
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineRun(organizationId, pipelineId, runId)}/overview`,
+      params,
+    ),
+  pipelineRunBlockConfig: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    runId: RunId,
+    blockName: string,
+    params: RouteParam = {},
+  ) =>
+    buildUrlWithParams(
+      `${routes.pipelineRunOverview(organizationId, pipelineId, runId)}/blocks/${blockName}`,
+      params,
+    ),
   pipelineRunCosts: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,

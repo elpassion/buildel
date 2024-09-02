@@ -78,7 +78,7 @@ export function PipelineRunLayout() {
           <FilledTabsWrapper size="xs">
             <FilledTabLink
               end
-              to={routes.pipelineRun(
+              to={routes.pipelineRunOverview(
                 organizationId,
                 pipelineId,
                 runId,

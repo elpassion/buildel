@@ -7,6 +7,7 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 
+import { EditBlockForm } from '~/components/pages/pipelines/EditBlockForm';
 import type {
   IBlockConfig,
   IConfigConnection,
@@ -29,7 +30,6 @@ import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import { BlockInputList } from './BlockInputList';
-import { EditBlockForm } from './EditBlockForm';
 import type { loader } from './loader.server';
 
 type IExtendedBlockConfig = IBlockConfig & { oldName: string };

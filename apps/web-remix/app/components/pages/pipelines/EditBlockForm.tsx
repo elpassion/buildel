@@ -36,8 +36,8 @@ import { SubmitButton } from '~/components/form/submit';
 import type {
   IBlockConfig,
   IConfigConnection,
+  IIOType,
 } from '~/components/pages/pipelines/pipeline.types';
-import { IIOType } from '~/components/pages/pipelines/pipeline.types';
 import { reverseToolConnections } from '~/components/pages/pipelines/PipelineFlow.utils';
 import { successToast } from '~/components/toasts/successToast';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
@@ -50,20 +50,20 @@ export function EditBlockForm({
   organizationId,
   pipelineId,
   disabled = false,
-  nodesNames,
-  connections: propsConnections,
+  nodesNames = [],
+  connections: propsConnections = [],
 }: {
-  organizationId: number;
+  organizationId: number | string;
   pipelineId: number;
   children?: ReactNode;
-  onSubmit: (
+  onSubmit?: (
     data: IBlockConfig & { oldName: string },
     connections: IConfigConnection[],
   ) => void;
   blockConfig: z.TypeOf<typeof ExtendedBlockConfig>;
   disabled?: boolean;
-  nodesNames: string[];
-  connections: IConfigConnection[];
+  nodesNames?: string[];
+  connections?: IConfigConnection[];
 }) {
   const schema = generateZODSchema(blockConfig.block_type?.schema as any);
   const validator = React.useMemo(() => withZod(schema), []);
@@ -110,7 +110,7 @@ export function EditBlockForm({
     ) {
       setFieldsErrors({ name: 'This block name is already in used' });
     } else {
-      onSubmit(newConfig, connections);
+      onSubmit?.(newConfig, connections);
     }
   };
 
