@@ -1,22 +1,58 @@
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect } from 'react';
+import { useNavigate, useSearchParams } from '@remix-run/react';
 import { CircleCheck, Loader } from 'lucide-react';
 import { useDebounce, useIsFirstRender } from 'usehooks-ts';
 
+import { EL } from '~/components/pages/pipelines/EL/EL';
+import { ELChat } from '~/components/pages/pipelines/EL/ELChat';
 import type { IPipelineConfig } from '~/components/pages/pipelines/pipeline.types';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { usePipelineId } from '~/hooks/usePipelineId';
 import { cn } from '~/utils/cn';
+import { routes } from '~/utils/routes.utils';
 
 import { useRunPipeline } from '../RunPipelineProvider';
 import { Metadata } from './Metadata';
 import { RunPipelineButton } from './RunPipelineButton';
 
 export const BuilderHeader: React.FC<PropsWithChildren> = ({ children }) => {
+  const pipelineId = usePipelineId();
+  const organizationId = useOrganizationId();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  // const revalidator = useRevalidator();
+
+  const onBlockCreate = (blockId: string, isWorking: boolean) => {
+    // console.log(blockId, isWorking);
+
+    if (blockId === 'chat_1' && isWorking === false) {
+      navigate(
+        routes.pipelineBuild(
+          organizationId,
+          pipelineId,
+          Object.fromEntries(searchParams.entries()),
+        ),
+        { state: { reset: true } },
+      );
+    }
+  };
+
   return (
     <header className="absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none">
       <div className="hidden md:block w-[160px]" />
 
       <div className="flex gap-2 items-center pointer-events-auto">
         <RunPipelineButton />
+
+        <EL>
+          <ELChat
+            onBlockStatusChange={onBlockCreate}
+            input="text_input_1"
+            output="text_output_1"
+            pipelineId={pipelineId}
+          />
+        </EL>
 
         <Metadata />
       </div>

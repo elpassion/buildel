@@ -18,6 +18,7 @@ interface UseChatProps {
   ) => void;
   onFinish?: () => void;
   useAuth?: boolean;
+  onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
 }
 
 export const useChat = ({
@@ -28,6 +29,7 @@ export const useChat = ({
   onBlockOutput: onBlockOutputProps,
   onFinish,
   useAuth,
+  onBlockStatusChange,
 }: UseChatProps) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -67,6 +69,7 @@ export const useChat = ({
   };
 
   const onStatusChange = (blockId: string, isWorking: boolean) => {
+    onBlockStatusChange?.(blockId, isWorking);
     if (blockId.includes(input) && isWorking) {
       setIsGenerating(true);
     }

@@ -10,6 +10,7 @@ interface ChatInputProps {
   disabled?: boolean;
   prefix?: React.ReactNode;
   attachments?: React.ReactNode;
+  placeholder?: string;
 }
 
 export function ChatInput({
@@ -18,6 +19,7 @@ export function ChatInput({
   disabled,
   prefix,
   attachments,
+  placeholder = 'Ask a question...',
 }: ChatInputProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -86,7 +88,7 @@ export function ChatInput({
             ref={textareaRef}
             disabled={disabled}
             className="bg-transparent !border-0 !ring-0 w-full text-sm text-foreground py-1.5 pl-2 pr-8 placeholder:text-muted-foreground !outline-0 focus:!border-none resize-none max-h-[112px]"
-            placeholder="Ask a question..."
+            placeholder={placeholder}
             rows={1}
             value={value}
             onFocus={onFocus}
