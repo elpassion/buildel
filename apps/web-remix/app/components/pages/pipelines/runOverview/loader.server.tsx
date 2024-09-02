@@ -3,6 +3,7 @@ import type { LoaderFunctionArgs } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 
 import { BlockTypeApi } from '~/api/blockType/BlockTypeApi';
+import { EnrichedPipelineApi } from '~/api/EnrichedPipelineApi';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
@@ -16,43 +17,34 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const pipelineApi = new PipelineApi(fetch);
     const blockTypeApi = new BlockTypeApi(fetch);
-
-    const blockTypesPromise = blockTypeApi.getBlockTypes();
-
-    const pipelinePromise = pipelineApi.getPipeline(
-      params.organizationId,
-      params.pipelineId,
+    const enrichedPipelineApi = new EnrichedPipelineApi(
+      pipelineApi,
+      blockTypeApi,
     );
 
-    const pipelineRunPromise = pipelineApi.getPipelineRun(
+    const aliasId = pipelineApi.getAliasFromUrl(request.url);
+
+    const enrichedPipelinePromise = enrichedPipelineApi.getEnrichedPipeline(
       params.organizationId,
       params.pipelineId,
-      params.runId,
+      aliasId,
     );
+    const enrichedPipelineRunPromise =
+      enrichedPipelineApi.getEnrichedPipelineRun(
+        params.organizationId,
+        params.pipelineId,
+        params.runId,
+      );
 
-    const [blockTypes, pipeline, pipelineRun] = await Promise.all([
-      blockTypesPromise,
-      pipelinePromise,
-      pipelineRunPromise,
+    const [{ pipeline, blockTypes }, { pipelineRun }] = await Promise.all([
+      enrichedPipelinePromise,
+      enrichedPipelineRunPromise,
     ]);
 
-    const blocks = pipelineRun.data.config.blocks.map((block) => ({
-      ...block,
-      block_type: blockTypes.data.find(
-        (blockType) => blockType.type === block.type,
-      ),
-    }));
-
     return json({
-      pipeline: {
-        ...pipeline.data,
-        config: { ...pipeline.data.config, blocks },
-      },
-      pipelineRun: {
-        ...pipelineRun.data,
-        config: { ...pipelineRun.data.config, blocks },
-      },
-      blockTypes: blockTypes.data,
+      blockTypes,
+      pipeline,
+      pipelineRun,
     });
   })(args);
 }
