@@ -8,12 +8,16 @@ export function useDownloadFile(
   return useCallback(() => {
     const textBlob = new Blob([value], { type: fileType });
 
-    const downloadLink = document.createElement('a');
-    downloadLink.href = window.URL.createObjectURL(textBlob);
-    downloadLink.download = fileName;
-
-    downloadLink.click();
-
-    window.URL.revokeObjectURL(downloadLink.href);
+    downloadFile(textBlob, fileName);
   }, [fileName, fileType, value]);
+}
+
+export function downloadFile(blob: Blob, fileName: string) {
+  const downloadLink = document.createElement('a');
+  downloadLink.href = window.URL.createObjectURL(blob);
+  downloadLink.download = fileName;
+
+  downloadLink.click();
+
+  window.URL.revokeObjectURL(downloadLink.href);
 }

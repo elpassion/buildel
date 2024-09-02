@@ -1,6 +1,7 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useLoaderData } from '@remix-run/react';
+import { Download } from 'lucide-react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
@@ -13,7 +14,9 @@ import {
   ListActionProvider,
 } from '~/components/pages/knowledgeBase/components/ListActionProvider';
 import { Pagination } from '~/components/pagination/Pagination';
+import { errorToast } from '~/components/toasts/errorToast';
 import { Button } from '~/components/ui/button';
+import { downloadFile } from '~/hooks/useDownloadFile';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -24,6 +27,23 @@ import { UploadFileForm } from './UploadFileForm';
 export function DatasetPage() {
   const { organizationId, dataset, datasetRows, pagination } =
     useLoaderData<typeof loader>();
+
+  const downloadCsv = async () => {
+    try {
+      const res = await fetch(
+        `/super-api/organizations/${organizationId}/datasets/${dataset.id}/rows/export`,
+        { method: 'GET' },
+      );
+
+      if (!res.ok) throw new Error();
+
+      const blob = await res.blob();
+      downloadFile(blob, `dataset_${dataset.id}.csv`);
+    } catch (err) {
+      console.log(err);
+      errorToast('Cannot download the file');
+    }
+  };
 
   return (
     <>
@@ -60,7 +80,7 @@ export function DatasetPage() {
       </BreadcrumbWrapper>
 
       <PageContentWrapper className="mt-[110px] pb-3">
-        <div className="mb-[56px] flex justify-end gap-2 lg:hidden">
+        <div className="mb-8 lg:mb-[56px] flex justify-end gap-2 lg:hidden">
           <UploadFileForm size="sm" />
 
           <Button size="sm" asChild>
@@ -76,6 +96,18 @@ export function DatasetPage() {
         </div>
 
         <ListActionProvider>
+          <div className="mb-3 flex justify-end">
+            <Button
+              size="xs"
+              variant="secondary"
+              className="gap-1"
+              onClick={downloadCsv}
+            >
+              <span>Export</span>
+              <Download className="w-4 h-4" />
+            </Button>
+          </div>
+
           <DatasetRowTable data={datasetRows.data} />
 
           <FloatingListActions

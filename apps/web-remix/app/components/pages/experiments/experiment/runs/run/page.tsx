@@ -1,6 +1,7 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
+import { Download } from 'lucide-react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
@@ -12,6 +13,9 @@ import {
   WorkflowCard,
 } from '~/components/pages/experiments/experiment/runs/components/ExperimentCard.components';
 import { Pagination } from '~/components/pagination/Pagination';
+import { errorToast } from '~/components/toasts/errorToast';
+import { Button } from '~/components/ui/button';
+import { downloadFile } from '~/hooks/useDownloadFile';
 import { useRevalidateOnInterval } from '~/hooks/useRevalidateOnInterval';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
@@ -34,6 +38,23 @@ export function ExperimentRunPage() {
   useRevalidateOnInterval({
     enabled: experimentRun.status === 'running',
   });
+
+  const downloadCsv = async () => {
+    try {
+      const res = await fetch(
+        `/super-api/organizations/${organizationId}/experiments/${experimentId}/runs/${experimentRun.id}/runs/export`,
+        { method: 'GET' },
+      );
+
+      if (!res.ok) throw new Error();
+
+      const blob = await res.blob();
+      downloadFile(blob, `experiment_run_${experimentId}.csv`);
+    } catch (err) {
+      console.log(err);
+      errorToast('Cannot download the file');
+    }
+  };
 
   return (
     <>
@@ -82,6 +103,18 @@ export function ExperimentRunPage() {
           <div className="grow">
             <ExperimentRunRunsCharts />
           </div>
+        </div>
+
+        <div className="mb-3 flex justify-end">
+          <Button
+            size="xs"
+            variant="secondary"
+            className="gap-1"
+            onClick={downloadCsv}
+          >
+            <span>Export</span>
+            <Download className="w-4 h-4" />
+          </Button>
         </div>
 
         <ExperimentRunRunsTable
