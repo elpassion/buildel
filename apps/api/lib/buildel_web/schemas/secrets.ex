@@ -69,7 +69,7 @@ defmodule BuildelWeb.Schemas.Secrets do
       title: "SecretCreateRequest",
       type: :object,
       properties: %{
-        name: %Schema{type: :string, description: "Secret name"},
+        name: %Schema{type: :string, description: "Secret name", pattern: "^(?!__).*"},
         value: %Schema{type: :string, description: "Secret value"},
         alias: %Schema{type: :string, description: "Secret alias"}
       },

@@ -113,6 +113,16 @@ defmodule BuildelWeb.SecretControllerTest do
       assert json_response(conn, 422)
     end
 
+    test "validates secret name", %{conn: conn, organization: organization} do
+      conn =
+        post(conn, ~p"/api/organizations/#{organization}/secrets", %{
+          name: "__name",
+          value: "value"
+        })
+
+      assert json_response(conn, 422)
+    end
+
     test "creates a secret", %{conn: conn, organization: organization, api_spec: api_spec} do
       conn =
         post(conn, ~p"/api/organizations/#{organization}/secrets", %{name: "name", value: "value"})
