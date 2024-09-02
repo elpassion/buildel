@@ -1,8 +1,10 @@
 import React, { useMemo } from 'react';
+import { useLoaderData } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { UpdateSecretSchema } from '~/api/secrets/secrets.contracts';
+import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
@@ -22,9 +24,7 @@ import {
 } from '~/components/ui/dialog-drawer';
 
 import type { ISecretKey } from '../variables.types';
-import { useLoaderData } from '@remix-run/react';
 import { loader } from './loader.server';
-import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 
 interface EditSecretModalProps {
   isOpen: boolean;
@@ -61,7 +61,10 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
             noValidate
             method="put"
             validator={validator}
-            defaultValues={initialData}
+            defaultValues={{
+              ...initialData,
+              alias: initialData.alias ?? undefined,
+            }}
             onSubmit={() => {
               onClose();
             }}
@@ -94,7 +97,9 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
                     supportingText="The default provider for this secret"
                     defaultValue={initialData.alias}
                     allowClear
-                    getPopupContainer={(triggerNode) => triggerNode.parentNode.parentNode}
+                    getPopupContainer={(triggerNode) =>
+                      triggerNode.parentNode.parentNode
+                    }
                   />
                 </Field>
               </div>
