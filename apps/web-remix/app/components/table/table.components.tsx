@@ -16,6 +16,7 @@ import { Button } from '~/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
+  TooltipPortal,
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
@@ -188,9 +189,11 @@ export const CellText = ({
             {children}
           </span>
         </TooltipTrigger>
-        <TooltipContent side="top" className={cn('max-w-[400px]')}>
-          {children}
-        </TooltipContent>
+        <TooltipPortal>
+          <TooltipContent side="top" className={cn('max-w-[400px]')}>
+            {children}
+          </TooltipContent>
+        </TooltipPortal>
       </Tooltip>
     </TooltipProvider>
   );
