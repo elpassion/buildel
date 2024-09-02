@@ -32,6 +32,35 @@ defmodule Buildel.Experiments.Runs do
     results
   end
 
+  def stream_csv(conn, %Run{} = run) do
+    query =
+      from rrr in RunRowRun,
+        where: rrr.experiment_run_id == ^run.id,
+        order_by: [desc: rrr.inserted_at]
+
+    Repo.transaction(fn ->
+      Repo.stream(query)
+      |> Stream.map(fn row ->
+        Map.merge(row.data, %{
+          "evaluation_avg" => row.evaluation_avg,
+          "id" => row.id,
+          "run_id" => row.run_id,
+          "created_at" => row.inserted_at
+        })
+      end)
+      |> CSV.Encoding.Encoder.encode(headers: true)
+      |> Enum.reduce_while(conn, fn chunk, conn ->
+        case Plug.Conn.chunk(conn, chunk) do
+          {:ok, conn} ->
+            {:cont, conn}
+
+          {:error, _reason} ->
+            {:halt, conn}
+        end
+      end)
+    end)
+  end
+
   def list_experiment_run_runs(%Run{} = run, pagination_params) do
     offset = pagination_params.page * pagination_params.per_page
 

@@ -61,6 +61,13 @@ defmodule BuildelWeb.Router do
       :export
     )
 
+    get(
+      "/organizations/:organization_id/experiments/:experiment_id/runs/:run_id/runs/export",
+      ExperimentRunRunController,
+      :export
+    )
+
+    ## Add etag plug
     pipe_through(:with_etag)
 
     post("/add", CalculatorController, :add)
