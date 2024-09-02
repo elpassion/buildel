@@ -10,6 +10,8 @@ import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 import type { IDatasetRow } from '~/components/pages/datasets/dataset.types';
 import { useListAction } from '~/components/pages/knowledgeBase/components/ListActionProvider';
 import {
+  CellHeader,
+  CellText,
   Table,
   TableBody,
   TableBodyCell,
@@ -94,9 +96,9 @@ export const DatasetRowTable = ({ data, className }: DatasetRowTableProps) => {
 
       ...columnNames.map((name) =>
         columnHelper.accessor(`data.${name}`, {
-          header: name,
+          header: () => <CellHeader>{name}</CellHeader>,
           id: name,
-          cell: (info) => info.getValue(),
+          cell: (info) => <CellText>{info.getValue()}</CellText>,
         }),
       ),
 
