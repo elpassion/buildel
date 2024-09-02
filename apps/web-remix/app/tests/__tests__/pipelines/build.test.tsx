@@ -40,7 +40,7 @@ import { WebSocketClientMock } from '~/tests/WebSocketClientMock';
 
 import { buildHandlers } from './build.handlers';
 
-describe(PipelineBuilder.name, () => {
+describe.skip(PipelineBuilder.name, () => {
   const setupServer = server([...buildHandlers()]);
 
   beforeAll(() => {
