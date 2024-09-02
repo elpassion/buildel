@@ -71,7 +71,6 @@ export const CreatableAsyncSelectField = forwardRef<
     },
     _ref,
   ) => {
-
     const { name, getInputProps, validate } = useFieldContext({
       validationBehavior: {
         initial: 'onBlur',
@@ -81,19 +80,24 @@ export const CreatableAsyncSelectField = forwardRef<
     });
     const { isModalOpen, openModal, closeModal, changeOpen } = useModal();
 
-    const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
+    const [options, setOptions] = useState<{ value: string; label: string }[]>(
+      [],
+    );
     const [selectedId, setSelectedId] = useControlField<string>(name);
 
-
     useEffect(() => {
-      if (defaultValue && options.some((opt) => opt.value === defaultValue) && !selectedId) {
+      if (
+        defaultValue &&
+        options.some((opt) => opt.value === defaultValue) &&
+        !selectedId
+      ) {
         setSelectedId(defaultValue);
       }
     }, [defaultValue, options, selectedId]);
 
-    const onOptionsFetch = (options: ({ value: string; label: string })[]) => {
-      setOptions(options)
-    }
+    const onOptionsFetch = (options: { value: string; label: string }[]) => {
+      setOptions(options);
+    };
 
     const onChange = (id: string) => {
       setSelectedId(id);
@@ -120,11 +124,9 @@ export const CreatableAsyncSelectField = forwardRef<
     };
 
     const fetcher = useCallback(async () => {
-      return asyncSelectApi
-        .getData(url)
-        .then((opts) => {
-          return opts.map(toSelectOption)
-        });
+      return asyncSelectApi.getData(url).then((opts) => {
+        return opts.map(toSelectOption);
+      });
     }, [url, isModalOpen]);
 
     return (
@@ -135,7 +137,8 @@ export const CreatableAsyncSelectField = forwardRef<
           <FieldLabel>{label}</FieldLabel>
 
           <button
-            className="text-foreground text-sm mb-[6px] bg-transparent"
+            disabled={props.disabled}
+            className="text-foreground text-sm mb-[6px] bg-transparent disabled:text-muted-foreground"
             onClick={openModal}
             type="button"
             data-testid={`${props.id}-create-button`}

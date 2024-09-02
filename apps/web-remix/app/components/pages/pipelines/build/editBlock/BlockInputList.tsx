@@ -11,10 +11,12 @@ import { useInputs } from './EditBlockForm';
 
 interface BlockInputListProps {
   connections: IConfigConnection[];
+  disabled?: boolean;
 }
 
 export const BlockInputList: React.FC<BlockInputListProps> = ({
   connections,
+  disabled,
 }) => {
   const formattedConnections: IItem[] = useMemo(
     () =>
@@ -45,7 +47,7 @@ export const BlockInputList: React.FC<BlockInputListProps> = ({
       <ItemList
         className="flex flex-wrap gap-2"
         items={formattedConnections}
-        renderItem={(item) => <BlockInputItem {...item} />}
+        renderItem={(item) => <BlockInputItem {...item} disabled={disabled} />}
       />
     </div>
   );
@@ -54,9 +56,10 @@ export const BlockInputList: React.FC<BlockInputListProps> = ({
 interface IItem {
   id: string;
   data: IConfigConnection;
+  disabled?: boolean;
 }
 
-function BlockInputItem({ data }: IItem) {
+function BlockInputItem({ data, disabled }: IItem) {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [resettable, setResettable] = useState(data.opts.reset);
   const { updateInputReset } = useInputs();
@@ -71,6 +74,7 @@ function BlockInputItem({ data }: IItem) {
       <Badge className="cursor-pointer">
         <CheckboxInput
           size="sm"
+          disabled={disabled}
           checked={resettable}
           onCheckedChange={onCheckedChange}
           id={`${data.from.block_name}-resettable`}

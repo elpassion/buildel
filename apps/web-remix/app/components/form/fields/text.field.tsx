@@ -57,7 +57,7 @@ export function ResettableTextInputField({
     }
   };
 
-  const canReset = !!props.defaultValue;
+  const canReset = !!props.defaultValue && !props.readOnly && !props.disabled;
 
   return (
     <>

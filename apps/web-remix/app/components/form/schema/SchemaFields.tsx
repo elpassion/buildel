@@ -37,7 +37,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
       return (
         <FormField name={name}>
           <FieldLabel>{field.title}</FieldLabel>
-          <PasswordInputField id={name} />
+          <PasswordInputField id={name} {...rest} />
           <FieldMessage error={error}>{field.description}</FieldMessage>
         </FormField>
       );
@@ -89,6 +89,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
           id={name}
           defaultValue={defaultValue}
           label={field.title}
+          readOnly={rest.disabled}
         />
         <FieldMessage error={error}>{field.description}</FieldMessage>
       </FormField>
@@ -109,7 +110,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
               key={value}
               className="flex gap-1 items-center text-muted-foreground"
             >
-              <RadioField id={value} value={value} />
+              <RadioField id={value} value={value} {...rest} />
 
               <span>{value}</span>
             </Label>
@@ -127,7 +128,8 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
             key={value}
             id={`${name}.${index}`}
             value={value}
-          // error={!!error}
+            {...rest}
+            // error={!!error}
           />
 
           <span>{value}</span>
@@ -137,7 +139,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
   }
 }
 
-export function NumberField({ field, name }: FieldProps) {
+export function NumberField({ field, name, ...rest }: FieldProps) {
   assert(name);
   assert(field.type === 'number' || field.type === 'integer');
   const { fieldErrors } = useFormContext();
@@ -153,13 +155,20 @@ export function NumberField({ field, name }: FieldProps) {
         max={field.maximum}
         defaultValue={field.default}
         step={field.step}
+        {...rest}
       />
       <FieldMessage error={error}>{field.description}</FieldMessage>
     </FormField>
   );
 }
 
-export function ArrayField({ field, name, fields, schema }: FieldProps) {
+export function ArrayField({
+  field,
+  name,
+  fields,
+  schema,
+  ...rest
+}: FieldProps) {
   assert(field.type === 'array');
   if ('enum' in field.items && field.items.enumPresentAs === 'checkbox') {
     return (
@@ -170,6 +179,7 @@ export function ArrayField({ field, name, fields, schema }: FieldProps) {
           name={name}
           schema={schema}
           fields={fields}
+          {...rest}
         />
       </>
     );
@@ -180,12 +190,13 @@ export function ArrayField({ field, name, fields, schema }: FieldProps) {
         name={name}
         fields={fields}
         schema={schema}
+        {...rest}
       />
     );
   }
 }
 
-export function BooleanField({ field, name }: FieldProps) {
+export function BooleanField({ field, name, ...rest }: FieldProps) {
   assert(name);
   assert(field.type === 'boolean');
   // const { fieldErrors } = useFormContext();
@@ -198,7 +209,8 @@ export function BooleanField({ field, name }: FieldProps) {
         <CheckboxInputField
           id={name}
           defaultChecked={field.default}
-        // error={!!error}
+          {...rest}
+          // error={!!error}
         />
 
         <span>{field.title}</span>
@@ -207,7 +219,7 @@ export function BooleanField({ field, name }: FieldProps) {
   );
 }
 
-function RealArrayField({ field, name, fields, schema }: FieldProps) {
+function RealArrayField({ field, name, fields, schema, ...rest }: FieldProps) {
   assert(field.type === 'array');
   const [rhfFields, { push, remove }] = useFieldArray(name!);
 
@@ -227,13 +239,14 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
             name={`${name}[${index}]`}
             fields={fields}
             schema={schema}
+            {...rest}
           />
           <IconButton
             size="xxs"
             variant="ghost"
             aria-label="Remove field"
             icon={<Trash />}
-            disabled={rhfFields.length <= field.minItems}
+            disabled={rhfFields.length <= field.minItems || rest.disabled}
             onClick={(e) => {
               e.preventDefault();
               remove(index);
@@ -247,6 +260,7 @@ function RealArrayField({ field, name, fields, schema }: FieldProps) {
         variant="secondary"
         onClick={() => push({})}
         className="mt-2"
+        disabled={rest.disabled}
       >
         Add item
       </Button>

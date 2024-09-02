@@ -6,7 +6,9 @@ export function Schema({
   schema,
   name,
   fields,
+  disabled,
 }: {
+  disabled?: boolean;
   schema: JSONSchemaField;
   name: string | null;
   fields: {
@@ -21,10 +23,18 @@ export function Schema({
 }) {
   assert(schema.type === 'object');
 
-  return <Field field={schema} name={name} schema={schema} fields={fields} />;
+  return (
+    <Field
+      field={schema}
+      name={name}
+      schema={schema}
+      fields={fields}
+      disabled={disabled}
+    />
+  );
 }
 
-export function Field({ field, name, schema, fields }: FieldProps) {
+export function Field({ field, name, schema, fields, disabled }: FieldProps) {
   if (field.type === 'string') {
     return (
       <fields.string
@@ -32,6 +42,7 @@ export function Field({ field, name, schema, fields }: FieldProps) {
         name={name}
         schema={schema}
         fields={fields}
+        disabled={disabled}
       />
     );
   }
@@ -42,6 +53,7 @@ export function Field({ field, name, schema, fields }: FieldProps) {
         name={name}
         schema={schema}
         fields={fields}
+        disabled={disabled}
       />
     );
   } else if (field.type === 'object') {
@@ -56,6 +68,7 @@ export function Field({ field, name, schema, fields }: FieldProps) {
             name={fieldKey}
             schema={schema}
             fields={fields}
+            disabled={disabled}
           />
         </div>
       );
@@ -67,11 +80,18 @@ export function Field({ field, name, schema, fields }: FieldProps) {
         name={name}
         schema={schema}
         fields={fields}
+        disabled={disabled}
       />
     );
   } else if (field.type === 'array') {
     return (
-      <fields.array field={field} name={name} schema={schema} fields={fields} />
+      <fields.array
+        field={field}
+        name={name}
+        schema={schema}
+        fields={fields}
+        disabled={disabled}
+      />
     );
   }
   console.warn('Unknown field type', field);
@@ -82,6 +102,7 @@ export interface FieldProps {
   field: JSONSchemaField;
   name: string | null;
   schema: JSONSchemaField;
+  disabled?: boolean;
   fields: {
     string: React.FC<FieldProps>;
     number: React.FC<FieldProps>;

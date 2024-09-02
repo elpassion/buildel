@@ -179,6 +179,7 @@ export function EditBlockForm({
       return (
         <FormField name={props.name!}>
           <EditorField
+            editable={!props.disabled}
             supportingText={props.field.description}
             language={props.field.editorLanguage}
             label={props.field.title}
@@ -217,6 +218,7 @@ export function EditBlockForm({
         <FormField name={props.name!}>
           <AsyncSelectField
             allowClear
+            disabled={props.disabled}
             url={replacedUrl}
             id={`${props.name}`}
             data-testid={props.name}
@@ -278,14 +280,15 @@ export function EditBlockForm({
 
       let defaultValue;
 
-
       if ('defaultWhen' in props.field && props.field.defaultWhen) {
         const formValues = getValues();
         const defaultKey = Object.keys(props.field.defaultWhen)[0];
         const defaultFieldValue = formValues.get(defaultKey);
 
         if (typeof defaultFieldValue === 'string') {
-          defaultValue = (props.field.defaultWhen as any)[defaultKey][defaultFieldValue];
+          defaultValue = (props.field.defaultWhen as any)[defaultKey][
+            defaultFieldValue
+          ];
         }
       }
 
@@ -293,6 +296,7 @@ export function EditBlockForm({
         <FormField name={props.name!}>
           <CreatableAsyncSelectField
             url={replacedUrl}
+            disabled={props.disabled}
             schema={props.field.schema}
             id={`${props.name}`}
             label={props.field.title}
@@ -300,15 +304,18 @@ export function EditBlockForm({
             errorMessage={fieldErrors[props.name!]}
             dropdownClassName={`${props.name}-dropdown`}
             data-testid={props.name}
-            defaultValue={defaultValue || props.field.default
-              ?.replace('{{pipeline_id}}', pipelineId.toString())
-              ?.replace('{{block_name}}', blockConfig.name)
-              ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
-                const values = getValues();
-                const replacedValue = values.get(optKey);
+            defaultValue={
+              defaultValue ||
+              props.field.default
+                ?.replace('{{pipeline_id}}', pipelineId.toString())
+                ?.replace('{{block_name}}', blockConfig.name)
+                ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
+                  const values = getValues();
+                  const replacedValue = values.get(optKey);
 
-                return replacedValue || optKey;
-              })}
+                  return replacedValue || optKey;
+                })
+            }
             renderForm={({ onCreate }) => (
               <CreatableAsyncForm
                 //@ts-ignore
@@ -358,7 +365,11 @@ export function EditBlockForm({
           <div>
             <FormField name="name">
               <FieldLabel>Name</FieldLabel>
-              <TextInputField name="name" defaultValue={blockConfig.name} />
+              <TextInputField
+                name="name"
+                defaultValue={blockConfig.name}
+                readOnly={disabled}
+              />
               <FieldMessage error={fieldsErrors.name}>
                 The name of the chat.
               </FieldMessage>
@@ -371,6 +382,7 @@ export function EditBlockForm({
           />
 
           <Schema
+            disabled={disabled}
             schema={blockConfig.block_type?.schema.properties.opts}
             name="opts"
             fields={{
@@ -409,7 +421,7 @@ function TriggerValidation() {
     const validateForm = async () => {
       try {
         await validate();
-      } catch { }
+      } catch {}
     };
 
     validateForm();
@@ -430,7 +442,7 @@ function generateSuggestions(connections: IConfigConnection[]): Suggestion[] {
 const InputsContext = React.createContext<{
   connections: IConfigConnection[];
   updateInputReset: (connection: IConfigConnection, value: boolean) => void;
-}>({ connections: [], updateInputReset: () => { } });
+}>({ connections: [], updateInputReset: () => {} });
 
 const InputsProvider: React.FC<{
   connections: IConfigConnection[];
