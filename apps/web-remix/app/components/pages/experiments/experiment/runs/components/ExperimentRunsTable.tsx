@@ -56,6 +56,11 @@ export const ExperimentRunsTable: React.FC<ExperimentRunsTableProps> = ({
         },
         header: 'Status',
       }),
+      columnHelper.accessor('total_cost', {
+        header: 'Total cost ($)',
+        id: 'cost',
+        cell: (info) => info.getValue()?.toString(),
+      }),
       columnHelper.accessor('runs_count', {
         header: 'Row Runs',
         id: 'runs',

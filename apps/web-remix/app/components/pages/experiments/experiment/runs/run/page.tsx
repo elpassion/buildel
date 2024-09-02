@@ -86,7 +86,12 @@ export function ExperimentRunPage() {
           </div>
         </div>
 
-        <div className="mb-3 flex justify-end">
+        <div className="mb-3 flex justify-between items-center">
+          <p className="text-sm text-muted-foreground">
+            Total cost:{' '}
+            <span className="text-foreground">{experimentRun.total_cost}$</span>
+          </p>
+
           <Button size="xs" variant="secondary" className="gap-1" asChild>
             <a
               href={`/super-api/organizations/${organizationId}/experiments/${experimentId}/runs/${experimentRun.id}/runs/export`}

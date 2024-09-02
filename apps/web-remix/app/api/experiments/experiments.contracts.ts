@@ -46,6 +46,7 @@ export const ExperimentRun = z.object({
   columns: ExperimentRunColumns,
   columns_avg: z.record(z.string(), z.number()),
   evaluations_avg: z.number().nullable().optional(),
+  total_cost: z.union([z.string(), z.string()]).nullable().optional(),
 });
 
 export const ExperimentRunResponse = z.object({
