@@ -106,6 +106,7 @@ defmodule BuildelWeb.Schemas.Experiments do
           },
           created_at: %Schema{type: :string, description: "Created at"},
           evaluations_avg: %Schema{type: :number, description: "Evaluations average"},
+          total_cost: %Schema{type: :number, description: "Total cost"},
           columns_avg: %Schema{type: :map, description: "Columns average"}
         },
         required: [:id, :status, :created_at, :columns]

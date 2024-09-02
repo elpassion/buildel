@@ -94,6 +94,8 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
           nil
 
         {1, _} ->
+          calculate_and_save_experiment_total_cost(changeset, run_row_run.experiment_run_id)
+
           {count, sum} =
             from(rrr in __MODULE__,
               where:
@@ -119,6 +121,30 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
       changeset
     end)
     |> Buildel.Repo.update()
+  end
+
+  defp calculate_and_save_experiment_total_cost(changeset, experiment_run_id) do
+    pipeline_run_ids =
+      Buildel.Repo.all(
+        from(r in Buildel.Experiments.Runs.RunRowRun,
+          where: r.experiment_run_id == ^experiment_run_id
+        )
+      )
+      |> Enum.map(& &1.run_id)
+
+    run_costs =
+      Buildel.Repo.all(from(r in Buildel.Pipelines.RunCost, where: r.run_id in ^pipeline_run_ids))
+      |> Buildel.Repo.preload(:cost)
+
+    total_cost =
+      Enum.reduce(run_costs, Decimal.new(0), fn run_cost, acc ->
+        Decimal.add(acc, run_cost.cost.amount)
+      end)
+
+    changeset.repo.update_all(
+      from(r in Buildel.Experiments.Runs.Run, where: r.id == ^experiment_run_id),
+      set: [total_cost: total_cost]
+    )
   end
 
   defp get_columns_avg(experiment_run_id, evaluations) do

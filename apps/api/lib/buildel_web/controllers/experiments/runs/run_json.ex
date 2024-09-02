@@ -27,6 +27,7 @@ defmodule BuildelWeb.ExperimentRunJSON do
       },
       created_at: run.inserted_at,
       evaluations_avg: run.evaluations_avg,
+      total_cost: run.total_cost,
       columns_avg: run.columns_avg
     }
   end

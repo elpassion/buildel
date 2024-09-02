@@ -14,6 +14,7 @@ defmodule Buildel.Experiments.Runs.Run do
     field(:evaluations_avg, :float)
     field(:columns_avg, :map)
 
+    field(:total_cost, :decimal, default: 0)
     field(:runs_count, :integer, default: 0)
 
     timestamps()
