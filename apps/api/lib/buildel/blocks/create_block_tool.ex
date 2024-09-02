@@ -3,9 +3,8 @@ defmodule Buildel.Blocks.CreateBlockTool do
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
   use Buildel.Blocks.Block
-  alias LangChain.Function
+  use Buildel.Blocks.Tool
   use BuildelWeb.Validator
-  use Buildel.Blocks.Utils.TakeLatest
   require Logger
 
   # Config
@@ -19,10 +18,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
       type: "create_block_tool",
       description: "Used to create block in workflow abc.",
       groups: ["el", "tools"],
-      inputs: [
-        Block.text_input("organization_id"),
-        Block.text_input("pipeline_id")
-      ],
+      inputs: [],
       outputs: [],
       ios: [Block.io("tool", "worker")],
       dynamic_ios: nil,
@@ -60,19 +56,12 @@ defmodule Buildel.Blocks.CreateBlockTool do
   # Server
 
   @impl true
-  def setup(%{type: __MODULE__} = state) do
-    {:ok, state |> assign_take_latest()}
-  end
-
-  @impl true
-  def handle_cast({:create_block, _arguments}, state) do
-    state = state |> send_stream_start()
-
-    # TODO: Add support for async calling
-
-    state = state |> schedule_stream_stop()
-
-    {:noreply, state}
+  def setup(%{type: __MODULE__, block_name: block_name} = state) do
+    if state.opts.metadata["pipeline_id"] do
+      {:ok, state}
+    else
+      {:stop, {:error, block_name, :pipeline_id_is_required}}
+    end
   end
 
   defparams(:create_block) do
@@ -85,12 +74,9 @@ defmodule Buildel.Blocks.CreateBlockTool do
     end
   end
 
-  @impl true
-  def handle_call({:create_block, arguments}, _caller, state) do
-    state = state |> send_stream_start()
-
-    with {:ok, organization_id} <- get_input_value(state, "organization_id"),
-         {:ok, pipeline_id} <- get_input_value(state, "pipeline_id"),
+  def create_block(state, arguments) do
+    with {:ok, organization_id} <- {:ok, state.context.context.global},
+         {:ok, pipeline_id} <- {:ok, state.opts.metadata["pipeline_id"]},
          {:ok, %{block: block_config}} <- validate(:create_block, arguments),
          block_type when is_atom(block_type) <- Blocks.type(block_config.type),
          :ok <-
@@ -107,68 +93,61 @@ defmodule Buildel.Blocks.CreateBlockTool do
              pipeline,
              Map.merge(block_config, %{connections: [], inputs: []})
            ) do
-      state = state |> send_stream_stop()
-      {:reply, "Created block", state}
+      {"Created block", state}
     else
       err ->
         Logger.error("Error creating block: #{inspect(err)}")
         state = state |> send_stream_stop()
 
-        {:reply, "Something went wrong.", state}
+        {"Something went wrong.", state}
     end
   end
 
   @impl true
-  def handle_call({:function, _}, _from, state) do
-    pid = self()
-
-    function =
-      Function.new!(%{
-        name: "CreateBlock",
-        description: "Create block based on provided name, opts and type",
-        parameters_schema: %{
-          type: "object",
-          properties: %{
-            block: %{
-              type: "object",
-              properties: %{
-                name: %{
-                  type: "string"
+  def tools(state) do
+    [
+      %{
+        function: %{
+          name: "CreateBlock",
+          description: "Create block based on provided name, opts and type",
+          parameters_schema: %{
+            type: "object",
+            properties: %{
+              block: %{
+                type: "object",
+                properties: %{
+                  name: %{
+                    type: "string"
+                  },
+                  opts: %{
+                    type: "object",
+                    description: "Block options. See block json schema for more details.",
+                    properties: %{},
+                    required: []
+                  },
+                  type: %{
+                    type: "string"
+                  }
                 },
-                opts: %{
-                  type: "object",
-                  description: "Block options. See block json schema for more details.",
-                  properties: %{},
-                  required: []
-                },
-                type: %{
-                  type: "string"
-                }
-              },
-              required: ["name", "type", "opts"]
-            }
-          },
-          required: ["block"]
+                required: ["name", "type", "opts"]
+              }
+            },
+            required: ["block"]
+          }
         },
-        function: fn args, _context ->
-          create_sync(pid, args)
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          "@EL 🗨️: Create block #{args["block"]["name"]}\n"
+        end,
+        response_formatter: fn response ->
+          "@EL 🤖: #{response}\n"
         end
-      })
-
-    {:reply,
-     %{
-       function: function,
-       call_formatter: fn args ->
-         "@EL 🗨️: Create block #{args["block"]["name"]}\n"
-       end,
-       response_formatter: fn response ->
-         "@EL 🤖: #{response}\n"
-       end
-     }, state}
+      }
+    ]
   end
 
   @impl true
-  def handle_input(_input_name, {name, :text, message, _metadata}, state) do
-    save_latest_input_value(state, name, message)
+  def handle_tool("tool", "CreateBlock", {_name, :text, args, _metadata}, state) do
+    create_block(state, args)
   end
 end
