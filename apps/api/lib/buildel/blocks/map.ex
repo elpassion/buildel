@@ -63,14 +63,20 @@ defmodule Buildel.Blocks.MapInputs do
         state
 
       message ->
-    fields_json = fields |> Enum.map(fn
-          {field, nil} -> {field, nil}
-          {field, value} ->
-          case Jason.decode(value) do
-            {:ok, value} -> {field, value}
-            _ -> {field, value}
-          end
-        end) |> Enum.into(%{}) |> Jason.encode!()
+        fields_json =
+          fields
+          |> Enum.map(fn
+            {field, nil} ->
+              {field, nil}
+
+            {field, value} ->
+              case Jason.decode(value) do
+                {:ok, value} -> {field, value}
+                _ -> {field, value}
+              end
+          end)
+          |> Enum.into(%{})
+          |> Jason.encode!()
 
         message = Buildel.JQ.query!(fields_json, message)
         output(state, "output", {:text, message})

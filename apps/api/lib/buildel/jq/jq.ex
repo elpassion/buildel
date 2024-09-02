@@ -6,7 +6,7 @@ defmodule Buildel.JQ do
   @spec query!(String.t(), String.t(), list()) :: any()
   def query!(payload, query, _options) do
     {:ok, tmp_path} = Temp.path()
-    File.write!(tmp_path, payload, [:utf8])
+    File.write!(tmp_path, payload)
 
     try do
       case System.cmd("jq", ["-c", "-r", query, tmp_path]) do

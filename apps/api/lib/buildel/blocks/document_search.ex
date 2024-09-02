@@ -110,7 +110,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "description" =>
                     "Filter the search to a specific keywords. Ex. [\"keyword1\", \"keyword2\"]"
                 },
-                memory_id: %{
+                document_id: %{
                   "type" => "string",
                   "title" => "Memory file",
                   "description" => "Filter the search to search in a specific document.",
@@ -168,14 +168,14 @@ defmodule Buildel.Blocks.DocumentSearch do
      |> Map.put(:collection, collection)
      |> Map.put(:collection_name, collection_name)
      |> Map.put(:where, %{
-       "memory_id" =>
-         case opts.memory_id do
+       "document_id" =>
+         case opts[:document_id] do
            nil -> nil
            "" -> nil
            memory_id -> String.to_integer(memory_id)
          end,
        "keywords" =>
-         case opts.keywords do
+         case opts[:keywords] do
            nil -> nil
            "" -> nil
            keywords -> Jason.decode!(keywords)
@@ -377,7 +377,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                 type: "object",
                 description: "The filters to apply to the search.",
                 properties: %{
-                  memory_id: %{
+                  document_id: %{
                     type: "number",
                     description: "The ID of a document to search in."
                   },
