@@ -75,6 +75,8 @@ defmodule Buildel.Blocks.CreateBlockTool do
   end
 
   def create_block(state, arguments) do
+    state = send_stream_start(state)
+
     with {:ok, organization_id} <- {:ok, state.context.context.global},
          {:ok, pipeline_id} <- {:ok, state.opts.metadata["pipeline_id"]},
          {:ok, %{block: block_config}} <- validate(:create_block, arguments),
@@ -93,6 +95,8 @@ defmodule Buildel.Blocks.CreateBlockTool do
              pipeline,
              Map.merge(block_config, %{connections: [], inputs: []})
            ) do
+
+      state = state |> send_stream_stop()
       {"Created block", state}
     else
       err ->

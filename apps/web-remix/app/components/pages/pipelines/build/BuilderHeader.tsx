@@ -24,9 +24,7 @@ export const BuilderHeader: React.FC<PropsWithChildren> = ({ children }) => {
   // const revalidator = useRevalidator();
 
   const onBlockCreate = (blockId: string, isWorking: boolean) => {
-    // console.log(blockId, isWorking);
-
-    if (blockId === 'chat_1' && isWorking === false) {
+    if (blockId === 'create_block_tool_1' && isWorking === false) {
       navigate(
         routes.pipelineBuild(
           organizationId,
