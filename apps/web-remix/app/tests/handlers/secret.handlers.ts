@@ -28,6 +28,7 @@ export class SecretsHandlers {
           name: data.name,
           created_at: '07/02/2024 11:35',
           updated_at: '07/02/2024 11:35',
+          alias: null,
         };
 
         this.secrets.set(data.value, transformed);
@@ -81,3 +82,11 @@ export class SecretsHandlers {
     ];
   }
 }
+
+export const secretAliasesHandles = () => {
+  return [
+    http.get('/super-api/organizations/2/secrets/aliases', () => {
+      return HttpResponse.json({ data: [] }, { status: 200 });
+    }),
+  ];
+};

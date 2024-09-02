@@ -8,8 +8,12 @@ import { action as newSecretAction } from '~/components/pages/secrets/newSecret/
 import { loader as newSecretLoader } from '~/components/pages/secrets/newSecret/loader.server';
 import { NewSecret } from '~/components/pages/secrets/newSecret/page';
 import { secretFixture } from '~/tests/fixtures/secrets.fixtures';
-import { SecretsHandlers } from '~/tests/handlers/secret.handlers';
+import {
+  secretAliasesHandles,
+  SecretsHandlers,
+} from '~/tests/handlers/secret.handlers';
 import { ButtonHandle } from '~/tests/handles/Button.handle';
+import { InputHandle } from '~/tests/handles/Input.handle';
 import { ListHandle } from '~/tests/handles/List.handle';
 import { render, screen } from '~/tests/render';
 import { server } from '~/tests/server.mock';
@@ -21,6 +25,7 @@ const handlers = () => [
     secretFixture(),
     secretFixture({ id: 'deepgram', name: 'deepgram' }),
   ]).handlers,
+  ...secretAliasesHandles(),
 ];
 
 describe('Secrets', () => {
@@ -47,36 +52,36 @@ describe('Secrets', () => {
     await screen.findByText(/There is no Secrets yet/i);
   });
 
-  // test('should add secret', async () => {
-  //   const page = new SecretsObject().render({
-  //     initialEntries: ['/2/secrets/new'],
-  //   });
+  test('should add secret', async () => {
+    const page = new SecretsObject().render({
+      initialEntries: ['/2/secrets/new'],
+    });
 
-  //   const name = await InputHandle.fromLabelText(/name/i);
-  //   await name.type('NEW');
+    const name = await InputHandle.fromLabelText(/name/i);
+    await name.type('NEW');
 
-  //   const value = await InputHandle.fromLabelText(/value/i);
-  //   await value.type('NEW');
+    const value = await InputHandle.fromLabelText(/value/i);
+    await value.type('NEW');
 
-  //   const submit = await ButtonHandle.fromRole('Save the Secret');
-  //   await submit.click();
+    const submit = await ButtonHandle.fromRole('Save the Secret');
+    await submit.click();
 
-  //   const list = await page.getSecretList();
-  //   expect(list.children).toHaveLength(4);
-  // });
+    const list = await page.getSecretList();
+    expect(list.children).toHaveLength(4);
+  });
 
-  // test('should show validation errors', async () => {
-  //   new SecretsObject().render({
-  //     initialEntries: ['/2/secrets/new'],
-  //   });
+  test('should show validation errors', async () => {
+    new SecretsObject().render({
+      initialEntries: ['/2/secrets/new'],
+    });
 
-  //   const submit = await ButtonHandle.fromRole('Save the Secret');
-  //   await submit.click();
+    const submit = await ButtonHandle.fromRole('Save the Secret');
+    await submit.click();
 
-  //   expect(
-  //     await screen.findAllByText(/String must contain at least 2 /i),
-  //   ).toHaveLength(2);
-  // });
+    expect(
+      await screen.findAllByText(/String must contain at least 2 /i),
+    ).toHaveLength(2);
+  });
 });
 
 class SecretsObject {
