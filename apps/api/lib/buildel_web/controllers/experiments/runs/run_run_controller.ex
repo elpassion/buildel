@@ -65,7 +65,7 @@ defmodule BuildelWeb.ExperimentRunRunController do
          {:ok, %Experiment{} = experiment} <-
            Experiments.get_organization_experiment(organization, experiment_id),
          {:ok, %Run{} = run} <- Experiments.Runs.get_experiment_run(experiment, run_id),
-         {:ok, conn} <- Experiments.Runs.stream_csv(conn, run) do
+         {:ok, conn} <- Experiments.Runs.stream_run_runs_csv(conn, run) do
       conn
     end
   end
