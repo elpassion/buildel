@@ -1,9 +1,11 @@
 import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
+import { useLoaderData } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateSecretSchema } from '~/api/secrets/secrets.contracts';
+import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
@@ -13,14 +15,12 @@ import {
 } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { metaWithDefaults } from '~/utils/metadata';
-import { useLoaderData } from '@remix-run/react';
+
 import { loader } from './loader.server';
-import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 
 export function NewSecret() {
   const { organizationId } = useLoaderData<typeof loader>();
   const validator = useMemo(() => withZod(CreateSecretSchema), []);
-
 
   return (
     <ValidatedForm
@@ -62,6 +62,7 @@ export function NewSecret() {
               label="Default for:"
               id="alias"
               supportingText="The default provider for this secret"
+              getPopupContainer={(node) => node.parentNode.parentNode}
             />
           </Field>
         </div>
