@@ -16,6 +16,7 @@ import { TextInput } from '~/components/form/inputs/text.input';
 import { IconButton } from '~/components/iconButton';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
 import { useBuilderSidebar } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderSidebar.context';
+import { leaveOneGroup } from '~/components/pages/pipelines/NodeDropdown/nodeDropdownt.utils';
 import {
   IBlockConfig,
   IBlockType,
@@ -51,7 +52,7 @@ export const BuilderSidebarBlocks = ({
 
   return (
     <BlockSearch>
-      <BlockGroupList blocks={blockTypes} onCreate={onCreate} />
+      <BlockGroupList blocks={leaveOneGroup(blockTypes)} onCreate={onCreate} />
     </BlockSearch>
   );
 };
@@ -121,11 +122,7 @@ function BlockGroupList({ blocks, onCreate }: BlockGroupListProps) {
               .includes(searchValue.toLowerCase()),
           )
           .map((block) => (
-            <BlockItem
-              data={{ id: block.type, block }}
-              group={block.groups.at(0)!}
-              onCreate={onCreate}
-            />
+            <BlockItem data={{ id: block.type, block }} onCreate={onCreate} />
           ))}
       </div>
     );
@@ -172,13 +169,11 @@ function BlockGroupItem({ data, onCreate }: BlockGroupItemProps) {
         emptyText={
           <EmptyMessage className="text-xs px-2">No blocks found</EmptyMessage>
         }
-        className={cn('grid grid-cols-2 gap-2 px-1.5 pb-1.5', {
+        className={cn('grid grid-cols-2 gap-1.5 px-1.5 pb-1.5', {
           hidden: isCollapsed,
         })}
         items={data.blocks.map((block) => ({ id: block.type, block }))}
-        renderItem={(item) => (
-          <BlockItem data={item} group={data.id} onCreate={onCreate} />
-        )}
+        renderItem={(item) => <BlockItem data={item} onCreate={onCreate} />}
         aria-expanded={!isCollapsed}
         aria-hidden={isCollapsed}
       />
@@ -187,12 +182,13 @@ function BlockGroupItem({ data, onCreate }: BlockGroupItemProps) {
 }
 
 interface BlockItemProps {
-  group: string;
   data: { block: IBlockType; id: string };
   onCreate: (created: IBlockConfig) => Promise<unknown>;
 }
-function BlockItem({ data, group, onCreate }: BlockItemProps) {
-  const [urlSrc, setUrlSrc] = useState(resolveIconPath(group));
+function BlockItem({ data, onCreate }: BlockItemProps) {
+  const [urlSrc, setUrlSrc] = useState(
+    resolveIconPath(`type/${data.block.type}`),
+  );
   const reactFlowInstance = useReactFlow();
   const { status: runStatus } = useRunPipeline();
 
@@ -381,6 +377,6 @@ function PinButton() {
   );
 }
 
-function resolveIconPath(type: string) {
-  return `/block-types/${type.replace('/', '-')}.svg`;
+function resolveIconPath(path: string) {
+  return `/block-types/${path}.svg`;
 }
