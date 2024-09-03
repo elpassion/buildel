@@ -38,7 +38,13 @@ defmodule Buildel.WorkflowTemplates do
       template_name: "text_feedback_assistant",
       template_description:
         "Text feedback assistant that analyze the provided text and provide feedback"
-    }
+    },
+    %{
+      name: "SEO Image for Article",
+      template_name: "seo_image_for_article",
+      template_description:
+        "Template that generates an image from the article content"
+    },
   ]
 
   def get_workflow_template_names() do
@@ -68,9 +74,120 @@ defmodule Buildel.WorkflowTemplates do
       "text_feedback_assistant" ->
         {:ok, generate_text_feedback_assistant(organization_id)}
 
+      "seo_image_for_article" ->
+        {:ok, generate_seo_image_for_article_template_config(organization_id)}
+
       _ ->
         {:error, :not_found}
     end
+  end
+
+  def generate_seo_image_for_article_template_config(organization_id) do
+    %{
+      name: "SEO Image for Article",
+      organization_id: organization_id,
+      config: %{
+        blocks: [
+          generate_comment_block(%{
+            name: "comment_1",
+            measured: %{width: 313, height: 105},
+            position: %{x: 222, y: 192},
+            opts: %{
+              color: "transparent",
+              content: "<h3>1️⃣ Send an article content</h3><p class=\"!my-0\">Send the content of the article that you want to generate an image for.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_2",
+            measured: %{width: 348, height: 112},
+            position: %{x: 751, y: 166},
+            opts: %{
+              color: "transparent",
+              content: "<h3>2️⃣ Article summary</h3><p class=\"!my-0\">LLM will summarize your article and prepare a prompt for an image generation tool.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_3",
+            measured: %{width: 313, height: 134},
+            position: %{x: 758, y: 931},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>3️⃣ Image generation</h3><p class=\"!my-0\">The image block will generate an image from the received prompt using the selected properties.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_4",
+            measured: %{width: 366, height: 130},
+            position: %{x: 1283, y: 691},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>4️⃣ Image output</h3><p class=\"!my-0\">You will receive the URL for the generated image here. You can also use the chat interface in the bottom right corner 💬</p>"
+            }
+          }),
+          generate_chat_block(%{
+            name: "article_summarizer",
+            position: %{x: 722, y: 315},
+            opts: %{
+              api_type: "openai",
+              endpoint: "https://api.openai.com/v1",
+              model: "gpt-4o-mini",
+              api_key: "__openai",
+              system_message:
+                "You are a helpful assistant specializing in creating SEO-friendly content. \n\nI will provide you with an article, and your task is to summarize it and create an optimized image suitable for SEO purposes using available tools.\n\nMake sure that summarization used for generating image is no longer than 1 sentence.\n\nPlease return only the image, ensuring it visually represents the key elements of the article.",
+              prompt_template: "{{article_input:output}}",
+              chat_memory_type: "off"
+            }
+          }),
+          generate_image_block(%{
+            name: "image_generator",
+            position: %{x: 737, y: 801},
+            opts: %{
+              api_type: "openai",
+              endpoint: "https://api.openai.com/v1",
+              model: "dall-e-2",
+              api_key: "__openai",
+              call_formatter: "{{config.block_name}} Generate image 📑: {{config.args}}\n",
+              quality: "standard",
+              size: "512x512",
+              style: "natural"
+            }
+          }),
+          generate_text_input_block(%{name: "article_input", position: %{x: 232, y: 314}}),
+          generate_text_output_block(%{
+            name: "image_output",
+            position: %{x: 1319.888504242735, y: 838.3725672410218},
+            opts: %{
+              jq_filter: ".",
+              stream_timeout: 5000000
+            }
+          }),
+          generate_text_output_block(%{
+            name: "text_output_2",
+            position: %{x: 1319, y: 313},
+            opts: %{
+              jq_filter: ".",
+              stream_timeout: 5000000
+            }
+          })
+        ],
+        connections: [
+          create_connection("article_input", "article_summarizer"),
+          create_tool_connection("image_generator", "article_summarizer"),
+          create_connection(%{block_name: "image_generator", output_name: "image_url"}, %{block_name: "image_output", input_name: "input"}),
+          create_connection("article_summarizer", "text_output_2")
+        ],
+        version: "1"
+      },
+      interface_config: %{
+        form: %{
+          inputs: [%{name: "article_input", type: "text_input"}],
+          outputs: [%{name: "image_output", type: "text_output"}],
+          public: true
+        }
+      }
+    }
   end
 
   def generate_text_feedback_assistant(organization_id) do
@@ -570,6 +687,20 @@ defmodule Buildel.WorkflowTemplates do
     )
   end
 
+  defp generate_image_block(attrs) do
+    Map.merge(
+      %{
+        type: "image",
+        name: "image_1",
+        connections: [],
+        inputs: [],
+        opts: %{},
+        position: %{x: 400, y: -500}
+      },
+      attrs
+    )
+  end
+
   defp generate_collect_all_text_block(attrs) do
     Map.merge(
       %{
@@ -596,6 +727,14 @@ defmodule Buildel.WorkflowTemplates do
       },
       attrs
     )
+  end
+
+  defp create_connection(%{block_name: _, output_name: _} = from, %{block_name: _, input_name: _} = to) do
+    %{
+      from: from,
+      to: to,
+      opts: %{reset: true}
+    }
   end
 
   defp create_connection(from, to) do
