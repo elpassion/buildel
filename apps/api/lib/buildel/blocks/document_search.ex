@@ -158,23 +158,12 @@ defmodule Buildel.Blocks.DocumentSearch do
         } = state
       ) do
     {:ok, vector_db} = block_context().get_vector_db(context_id, opts.knowledge)
-    %{global: organization_id} = block_context().context_from_context_id(context_id)
 
     {:ok, collection, collection_name} =
       block_context().get_global_collection(context_id, opts.knowledge)
 
-    organization = Buildel.Organizations.get_organization!(organization_id)
-
-    collection_files =
-      Buildel.Memories.list_organization_collection_memories(organization, collection)
-      |> Enum.map(fn memory ->
-        "#{memory.file_name} - #{memory.file_uuid}"
-      end)
-      |> Enum.join(" \n")
-
     {:ok,
      state
-     |> Map.put(:collection_files, collection_files)
      |> Map.put(:vector_db, vector_db)
      |> Map.put(:collection, collection)
      |> Map.put(:collection_name, collection_name)
@@ -376,9 +365,7 @@ defmodule Buildel.Blocks.DocumentSearch do
           description:
             "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.
             CALL IT WITH FORMAT `{ \"query\": \"example query\" }`
-            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries. You can use `document_id` property to narrow the search to the specific document\n\n
-            For additional context, here are the available file names and their corresponding document IDs:\n
-            #{state[:colleciton_files]}",
+            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries. You can use `document_id` property to narrow the search to the specific document",
           parameters_schema: %{
             type: "object",
             properties: %{
@@ -391,7 +378,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                 description: "The filters to apply to the search.",
                 properties: %{
                   document_id: %{
-                    type: "number",
+                    type: "string",
                     description: "The ID of a document to search in."
                   },
                   keywords: %{

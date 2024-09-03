@@ -39,7 +39,8 @@ defmodule Buildel.Blocks do
     BraveSearch,
     FileToText,
     Image,
-    ImageOutput
+    ImageOutput,
+    Knowledge
   }
 
   @names_to_blocks_map %{
@@ -77,7 +78,8 @@ defmodule Buildel.Blocks do
     "brave_search" => BraveSearch,
     "file_to_text" => FileToText,
     "image" => Image,
-    "image_output" => ImageOutput
+    "image_output" => ImageOutput,
+    "knowledge" => Knowledge
   }
 
   @blocks_to_names_map %{
@@ -115,7 +117,8 @@ defmodule Buildel.Blocks do
     BraveSearch => "brave_search",
     FileToText => "file_to_text",
     Image => "image",
-    ImageOutput => "image_output"
+    ImageOutput => "image_output",
+    Knowledge => "knowledge"
   }
 
   def list_types() do
