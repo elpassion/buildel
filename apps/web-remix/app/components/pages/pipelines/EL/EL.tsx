@@ -6,6 +6,12 @@ import {
   DropdownPopup,
   DropdownTrigger,
 } from '~/components/dropdown/Dropdown';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 
 interface ELProps {}
 
@@ -23,12 +29,21 @@ export const EL = ({ children }: PropsWithChildren<ELProps>) => {
 
 function ELTrigger() {
   return (
-    <DropdownTrigger
-      aria-label="Open EL"
-      className="w-8 h-8 p-0"
-      variant="default"
-    >
-      ✨
-    </DropdownTrigger>
+    <TooltipProvider>
+      <Tooltip delayDuration={500}>
+        <TooltipTrigger asChild>
+          <DropdownTrigger
+            aria-label="Open EL"
+            className="w-7 h-7 p-0"
+            variant="ghost"
+          >
+            ✨
+          </DropdownTrigger>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-[400px]" side="bottom">
+          Use EL to build sophisticated workflows that fulfill all your needs.
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }

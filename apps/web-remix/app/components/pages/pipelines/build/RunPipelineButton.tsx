@@ -2,8 +2,13 @@ import React from 'react';
 import { useEventListener } from 'usehooks-ts';
 
 import { errorToast } from '~/components/toasts/errorToast';
-import { Tooltip } from '~/components/tooltip/Tooltip';
 import { Button } from '~/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { PlayFilled } from '~/icons/PlayFilled';
 
 import { useRunPipeline } from '../RunPipelineProvider';
@@ -51,26 +56,27 @@ export const RunPipelineButton: React.FC = () => {
 
   return (
     <div className="flex items-center gap-2 pointer-events-auto">
-      <Button
-        id="run-workflow"
-        aria-label={isRunning ? 'Stop workflow' : 'Start workflow'}
-        onClick={handleRun}
-        size="xs"
-        variant={isRunning ? 'destructive' : 'default'}
-      >
-        <div className="flex gap-1 items-center">
-          {isRunning ? 'Stop' : 'Start'}
-          {status === 'idle' && <PlayFilled className="w-3 h-3" />}
-        </div>
-      </Button>
-
-      <Tooltip
-        noArrow
-        anchorSelect={`#run-workflow`}
-        content="cmd + Enter"
-        className="!text-xs max-w-[350px] "
-        place="bottom"
-      />
+      <TooltipProvider>
+        <Tooltip delayDuration={500}>
+          <TooltipTrigger asChild>
+            <Button
+              id="run-workflow"
+              aria-label={isRunning ? 'Stop workflow' : 'Start workflow'}
+              onClick={handleRun}
+              size="xxs"
+              variant={isRunning ? 'destructive' : 'default'}
+            >
+              <div className="flex gap-1 items-center">
+                {isRunning ? 'Stop' : 'Start'}
+                {status === 'idle' && <PlayFilled className="w-3 h-3" />}
+              </div>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-[400px]" side="bottom">
+            cmd + Enter
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 };

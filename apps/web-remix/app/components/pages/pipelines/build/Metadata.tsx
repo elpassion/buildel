@@ -16,6 +16,12 @@ import type { Metadata as IMetadata } from '~/components/pages/pipelines/RunPipe
 import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
 import { successToast } from '~/components/toasts/successToast';
 import { Button } from '~/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 
 export const Metadata = () => {
   const { metadata, setMetadata } = useRunPipeline();
@@ -36,13 +42,22 @@ export const Metadata = () => {
 
 function MetadataTrigger() {
   return (
-    <DropdownTrigger
-      aria-label="Open metadata editor"
-      className="w-8 h-8 p-0"
-      variant="default"
-    >
-      <FileText className="w-4 h-4" />
-    </DropdownTrigger>
+    <TooltipProvider>
+      <Tooltip delayDuration={500}>
+        <TooltipTrigger asChild>
+          <DropdownTrigger
+            aria-label="Open metadata editor"
+            className="w-7 h-7 p-0"
+            variant="ghost"
+          >
+            <FileText className="w-4 h-4" />
+          </DropdownTrigger>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-[400px]" side="bottom">
+          Configure metadata for the workflow.
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
