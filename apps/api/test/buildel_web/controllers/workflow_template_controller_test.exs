@@ -40,7 +40,8 @@ defmodule BuildelWeb.WorkflowTemplateControllerTest do
                %{"name" => "Spreadsheet AI Assistant", "template_description" => "Interact with a spreadsheet database using plain language. No need for SQL", "template_name" => "spreadsheet_ai_assistant"},
                %{"name" => "Text Classification", "template_description" => "Text classifier assistant that convert text into one or more categories", "template_name" => "text_classification_assistant"},
                %{"name" => "Feedback Assistant", "template_description" => "Text feedback assistant that analyze the provided text and provide feedback", "template_name" => "text_feedback_assistant"},
-               %{"name" => "SEO Image for Article", "template_description" => "Template that generates an image from the article content", "template_name" => "seo_image_for_article"}
+               %{"name" => "SEO Image for Article", "template_description" => "Template that generates an image from the article content", "template_name" => "seo_image_for_article"},
+               %{"name" => "Blog post generator", "template_description" => "Template that generates a blog post from the give topic", "template_name" => "blog_post_generator"}
              ] == response["data"]
 
       assert_schema(response, "WorkflowTemplateIndexResponse", api_spec)

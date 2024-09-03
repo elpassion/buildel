@@ -45,6 +45,12 @@ defmodule Buildel.WorkflowTemplates do
       template_description:
         "Template that generates an image from the article content"
     },
+    %{
+      name: "Blog post generator",
+      template_name: "blog_post_generator",
+      template_description:
+        "Template that generates a blog post from the give topic"
+    }
   ]
 
   def get_workflow_template_names() do
@@ -77,9 +83,106 @@ defmodule Buildel.WorkflowTemplates do
       "seo_image_for_article" ->
         {:ok, generate_seo_image_for_article_template_config(organization_id)}
 
+      "blog_post_generator" ->
+        {:ok, generate_blog_post_generator_template_config(organization_id)}
+
       _ ->
         {:error, :not_found}
     end
+  end
+
+  def generate_blog_post_generator_template_config(organization_id) do
+    %{
+      name: "Blog post generator",
+      organization_id: organization_id,
+      config: %{
+        blocks: [
+          generate_comment_block(%{
+            name: "comment_1",
+            measured: %{width: 372, height: 106},
+            position: %{x: 173, y: 270},
+            opts: %{
+              color: "transparent",
+              content: "<h3>1️⃣ Topic input</h3><p class=\"!my-0\">Write a topic for blog post generation.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_2",
+            measured: %{width: 411, height: 106},
+            position: %{x: 702.7882055060337, y: 250.44334678883854},
+            opts: %{
+              color: "transparent",
+              content: "<h3>2️⃣ Blog post generator</h3><p class=\"!my-0\">An LLM will search for materials on the internet using the Brave search engine and generate a blog post for you.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_3",
+            measured: %{width: 405, height: 128},
+            position: %{x: 1239, y: 245},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>3️⃣ Blog post output</h3><p class=\"!my-0\">You will receive the generated blog post here. You can also use the <em>chat interface</em> in the bottom right corner to interact with the workflow 💬</p>"
+            }
+          }),
+          generate_chat_block(%{
+            name: "blog_post_generator",
+            position: %{x: 724, y: 377},
+            opts: %{
+              api_type: "openai",
+              endpoint: "https://api.openai.com/v1",
+              model: "gpt-4o-mini",
+              api_key: "__openai",
+              system_message:
+                "You are a blog post generator. Create a well-researched and engaging blog post on the given topic. \n\nUse available tools for research and ensure the content is accurate and easy to read. \n\nStructure the post with an introduction, body, and conclusion.\n\nAt the end, generate table of contents.",
+              prompt_template: "---Topic---\n{{blog_post_topic:output}}",
+              chat_memory_type: "off"
+            }
+          }),
+          generate_brave_search_block(%{
+            name: "search_engine",
+            position: %{x: 747.8680072308515, y: 900.2799058805016},
+            opts: %{
+              call_formatter: "",
+              api_key: "__brave",
+              country: "us",
+              limit: 5
+            }
+          }),
+          generate_text_input_block(%{name: "blog_post_topic", position: %{x: 196.72755144278358, y: 380.09823605609165}}),
+          generate_text_output_block(%{
+            name: "blog_post_output",
+            position: %{x: 1280, y: 382},
+            opts: %{
+              jq_filter: ".",
+              stream_timeout: 5000000
+            }
+          }),
+          generate_text_output_block(%{
+            name: "text_output_2",
+            position: %{x: 1279.802409527933, y: 975.0012418893893},
+            opts: %{
+              jq_filter: ".",
+              stream_timeout: 5000000
+            }
+          })
+        ],
+        connections: [
+          create_connection("blog_post_topic", "blog_post_generator"),
+          create_tool_connection("search_engine", "blog_post_generator"),
+          create_connection("search_engine", "text_output_2"),
+          create_connection("blog_post_generator", "blog_post_output")
+        ],
+        version: "1"
+      },
+      interface_config: %{
+        form: %{
+          inputs: [%{name: "blog_post_topic", type: "text_input"}],
+          outputs: [%{name: "blog_post_output", type: "text_output"}],
+          public: true
+        }
+      }
+    }
   end
 
   def generate_seo_image_for_article_template_config(organization_id) do
@@ -692,6 +795,21 @@ defmodule Buildel.WorkflowTemplates do
       %{
         type: "image",
         name: "image_1",
+        connections: [],
+        inputs: [],
+        opts: %{},
+        position: %{x: 400, y: -500}
+      },
+      attrs
+    )
+  end
+
+
+  defp generate_brave_search_block(attrs) do
+    Map.merge(
+      %{
+        type: "brave_search",
+        name: "brave_search_1",
         connections: [],
         inputs: [],
         opts: %{},
