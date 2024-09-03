@@ -8,6 +8,8 @@ defmodule Buildel.Organizations.Organization do
     field(:api_key, Buildel.Encrypted.Binary)
     field(:api_key_hash, Cloak.Ecto.SHA256)
 
+    belongs_to(:el, Buildel.Pipelines.Pipeline)
+
     has_many(:memberships, Buildel.Organizations.Membership)
     has_many(:invitations, Buildel.Organizations.Invitation)
     has_many(:api_keys, Buildel.ApiKeys.ApiKey)
@@ -20,7 +22,7 @@ defmodule Buildel.Organizations.Organization do
   @doc false
   def changeset(organization, attrs) do
     organization
-    |> cast(attrs, [:name, :api_key])
+    |> cast(attrs, [:name, :api_key, :el_id])
     |> cast_assoc(:memberships)
     |> validate_required([:name, :api_key])
     |> put_hashed_fields()

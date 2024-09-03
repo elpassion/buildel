@@ -1,6 +1,5 @@
 defmodule BuildelWeb.OrganizationController do
   use BuildelWeb, :controller
-  use BuildelWeb.Validator
   use OpenApiSpex.ControllerSpecs
 
   import BuildelWeb.UserAuth
@@ -110,12 +109,6 @@ defmodule BuildelWeb.OrganizationController do
       forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
     ],
     security: [%{"authorization" => []}]
-
-  defparams :update do
-    required(:organization, :map) do
-      required(:name, :string)
-    end
-  end
 
   def update(conn, _params) do
     user = conn.assigns.current_user

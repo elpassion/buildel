@@ -55,7 +55,8 @@ defmodule BuildelWeb.Schemas.Organizations do
         organization: %Schema{
           type: :object,
           properties: %{
-            name: %Schema{type: :string, description: "Organization name", minLength: 2}
+            name: %Schema{type: :string, description: "Organization name", minLength: 2},
+            el_id: %Schema{type: :integer, description: "EL id"}
           },
           required: [:name]
         }
