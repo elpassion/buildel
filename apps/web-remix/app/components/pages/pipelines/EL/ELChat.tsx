@@ -16,6 +16,8 @@ import { cn } from '~/utils/cn';
 
 interface ELChatProps {
   pipelineId: string | number;
+  elId: string | number;
+  organizationId: string | number;
   output: string;
   input: string;
   onBlockOutput?: (
@@ -27,7 +29,9 @@ interface ELChatProps {
 }
 
 export const ELChat = ({
+  elId,
   pipelineId,
+  organizationId,
   input,
   output,
   onBlockOutput,
@@ -44,8 +48,8 @@ export const ELChat = ({
   } = useChat({
     input,
     output,
-    organizationId: 13,
-    pipelineId: 147,
+    organizationId: Number(organizationId),
+    pipelineId: Number(elId),
     onBlockOutput,
     onBlockStatusChange,
   });

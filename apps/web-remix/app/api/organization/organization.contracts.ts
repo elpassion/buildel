@@ -6,6 +6,7 @@ import { PaginationMeta } from '~/components/pagination/pagination.types';
 
 export const Organization = z.object({
   id: z.number(),
+  el_id: z.number().nullable().optional(),
   name: z.string(),
 });
 

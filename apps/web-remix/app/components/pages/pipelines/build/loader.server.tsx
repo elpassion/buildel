@@ -4,6 +4,7 @@ import invariant from 'tiny-invariant';
 
 import { BlockTypeApi } from '~/api/blockType/BlockTypeApi';
 import { EnrichedPipelineApi } from '~/api/EnrichedPipelineApi';
+import { OrganizationApi } from '~/api/organization/OrganizationApi';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
@@ -14,6 +15,7 @@ export async function loader(args: LoaderFunctionArgs) {
     invariant(params.organizationId, 'organizationId not found');
     invariant(params.pipelineId, 'pipelineId not found');
 
+    const organizationApi = new OrganizationApi(fetch);
     const blockTypeApi = new BlockTypeApi(fetch);
     const pipelineApi = new PipelineApi(fetch);
     const aliasId = pipelineApi.getAliasFromUrl(request.url);
@@ -23,12 +25,21 @@ export async function loader(args: LoaderFunctionArgs) {
       blockTypeApi,
     );
 
-    const { pipeline, blockTypes } =
+    const organizationPromise = organizationApi.getOrganization(
+      params.organizationId,
+    );
+
+    const enrichedPipelinePromise =
       await enrichedPipelineApi.getEnrichedPipeline(
         params.organizationId,
         params.pipelineId,
         aliasId,
       );
+
+    const [organization, { pipeline, blockTypes }] = await Promise.all([
+      organizationPromise,
+      enrichedPipelinePromise,
+    ]);
 
     return json({
       pipeline: pipeline,
@@ -37,6 +48,7 @@ export async function loader(args: LoaderFunctionArgs) {
       pipelineId: params.pipelineId,
       organizationId: params.organizationId,
       pageUrl: process.env.PAGE_URL,
+      organization: organization.data,
     });
   })(args);
 }

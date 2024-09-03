@@ -2,6 +2,7 @@ import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useLoaderData } from '@remix-run/react';
 
+import { ELSettings } from '~/components/pages/settings/organization/ELSettings';
 import {
   OutlinedTabLink,
   OutlinedTabsWrapper,
@@ -15,11 +16,13 @@ import { ApiKey } from './ApiKey';
 import type { loader } from './loader.server';
 
 export function OrganizationSettingsPage() {
-  const { apiKey, organization } = useLoaderData<typeof loader>();
+  const { apiKey, organization, pipelines } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex flex-col gap-9">
       <AboutOrganization organization={organization} />
+
+      <ELSettings organization={organization} pipelines={pipelines} />
 
       <ApiKey apiKey={apiKey} />
 

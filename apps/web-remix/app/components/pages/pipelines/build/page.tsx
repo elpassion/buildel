@@ -34,8 +34,14 @@ import type { loader } from './loader.server';
 export function PipelineBuilder() {
   const updateFetcher = useFetcher<IPipeline>();
   const [searchParams] = useSearchParams();
-  const { pipeline, pipelineId, organizationId, aliasId, pageUrl } =
-    useLoaderData<typeof loader>();
+  const {
+    pipeline,
+    pipelineId,
+    organizationId,
+    aliasId,
+    pageUrl,
+    organization,
+  } = useLoaderData<typeof loader>();
 
   const navigate = useNavigate();
   const match = useMatch(
@@ -104,7 +110,7 @@ export function PipelineBuilder() {
       >
         {({ edges, nodes, onBlockCreate }) => (
           <>
-            <BuilderHeader>
+            <BuilderHeader organization={organization}>
               <SaveChangesButton
                 config={toPipelineConfig(nodes, edges)}
                 isSaving={updateFetcher.state !== 'idle'}
