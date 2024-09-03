@@ -44,15 +44,17 @@ function MetadataTrigger() {
   return (
     <TooltipProvider>
       <Tooltip delayDuration={500}>
-        <TooltipTrigger asChild>
-          <DropdownTrigger
-            aria-label="Open metadata editor"
-            className="w-7 h-7 p-0"
-            variant="ghost"
-          >
+        <DropdownTrigger
+          aria-label="Open metadata editor"
+          className="w-7 h-7 p-0"
+          variant="ghost"
+          asChild
+        >
+          <TooltipTrigger>
             <FileText className="w-4 h-4" />
-          </DropdownTrigger>
-        </TooltipTrigger>
+          </TooltipTrigger>
+        </DropdownTrigger>
+
         <TooltipContent className="max-w-[400px]" side="bottom">
           Configure metadata for the workflow.
         </TooltipContent>

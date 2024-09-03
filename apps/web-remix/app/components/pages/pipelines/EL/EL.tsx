@@ -31,15 +31,14 @@ function ELTrigger() {
   return (
     <TooltipProvider>
       <Tooltip delayDuration={500}>
-        <TooltipTrigger asChild>
-          <DropdownTrigger
-            aria-label="Open EL"
-            className="w-7 h-7 p-0"
-            variant="ghost"
-          >
-            ✨
-          </DropdownTrigger>
-        </TooltipTrigger>
+        <DropdownTrigger
+          aria-label="Open EL"
+          className="w-7 h-7 p-0"
+          variant="ghost"
+          asChild
+        >
+          <TooltipTrigger>✨</TooltipTrigger>
+        </DropdownTrigger>
         <TooltipContent className="max-w-[400px]" side="bottom">
           Use EL to build sophisticated workflows that fulfill all your needs.
         </TooltipContent>
