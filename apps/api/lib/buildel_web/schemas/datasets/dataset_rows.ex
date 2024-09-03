@@ -69,4 +69,18 @@ defmodule BuildelWeb.Schemas.DatasetRows do
       required: [:data]
     })
   end
+
+
+  defmodule BulkDeleteRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "DatasetRowBulkDeleteRequest",
+      type: :object,
+      properties: %{
+        ids: %Schema{type: :array, items: %Schema{type: :integer}, description: "Row IDs"}
+      },
+      required: [:ids]
+    })
+  end
 end

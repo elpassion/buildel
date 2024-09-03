@@ -119,6 +119,18 @@ export class DatasetApi {
     );
   }
 
+  async bulkDeleteDatasetRows(
+    organizationId: string | number,
+    datasetId: string | number,
+    ids: (string | number)[],
+  ) {
+    return this.client(
+      z.any(),
+      `/organizations/${organizationId}/datasets/${datasetId}/rows`,
+      { method: 'DELETE', body: JSON.stringify({ ids }) },
+    );
+  }
+
   async updateDatasetRow(
     organizationId: string | number,
     datasetId: string | number,

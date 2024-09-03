@@ -288,6 +288,12 @@ defmodule BuildelWeb.Router do
       only: [:index, :show, :create, :delete, :update]
     )
 
+    delete(
+      "/organizations/:organization_id/datasets/:dataset_id/rows",
+      DatasetRowsController,
+      :bulk_delete
+    )
+
     post("/organizations/:organization_id/datasets/:id/files", DatasetController, :create_file)
 
     resources(

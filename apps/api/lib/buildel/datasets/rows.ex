@@ -62,6 +62,18 @@ defmodule Buildel.Datasets.Rows do
     end
   end
 
+  def bulk_delete_rows(dataset, ids) do
+    with {count, _} <- Repo.delete_all(from(d in DatasetRow, where: d.id in ^ids and d.dataset_id == ^dataset.id)) do
+      query = from Dataset, where: [id: ^dataset.id]
+
+      result = Buildel.Repo.update_all(
+        query,
+        inc: [rows_count: -count]
+      )
+      {:ok, dataset}
+    end
+  end
+
   def update_row(%DatasetRow{} = dataset_row, attrs) do
     dataset_row
     |> DatasetRow.changeset(attrs)

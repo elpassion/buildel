@@ -128,30 +128,11 @@ async function deleteMany(
   }
   const ids = result.data.rowIds;
 
-  const promises = await Promise.allSettled(
-    ids.map((rowId) => {
-      return datasetApi.deleteDatasetRow(
-        params.organizationId as string,
-        params.datasetId as string,
-        rowId,
-      );
-    }),
+  await datasetApi.bulkDeleteDatasetRows(
+    params.organizationId as string,
+    params.datasetId as string,
+    ids,
   );
-
-  const hasRejected = promises.some((p) => p.status === 'rejected');
-
-  if (hasRejected) {
-    return json(
-      {},
-      {
-        headers: {
-          'Set-Cookie': await setServerToast(request, {
-            error: 'Not all Dataset Rows were deleted. Please try again.',
-          }),
-        },
-      },
-    );
-  }
 
   return json(
     {},
