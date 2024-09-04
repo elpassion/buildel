@@ -259,12 +259,20 @@ defmodule Buildel.Blocks.Block do
 
       def get_input(input_name) do
         opts = options()
-        (opts.inputs ++ opts.ios) |> Enum.find(&(&1.name == input_name))
+
+        case (opts.inputs ++ opts.ios) |> Enum.find(&(&1.name == input_name)) do
+          nil -> {:error, :input_not_found}
+          input -> {:ok, input}
+        end
       end
 
       def get_output(output_name) do
         opts = options()
-        (opts.outputs ++ opts.ios) |> Enum.find(&(&1.name == output_name))
+
+        case (opts.outputs ++ opts.ios) |> Enum.find(&(&1.name == output_name)) do
+          nil -> {:error, :output_not_found}
+          output -> {:ok, output}
+        end
       end
 
       defoverridable handle_stream_stop: 2

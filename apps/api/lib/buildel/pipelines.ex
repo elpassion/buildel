@@ -204,7 +204,6 @@ defmodule Buildel.Pipelines do
                   ]["type"]
                 )
 
-              # {from_block, output_name}
               {from_block, output_name, connection["from"]["output_name"]}
 
             _ ->
@@ -239,11 +238,10 @@ defmodule Buildel.Pipelines do
 
         to_block_module = Buildel.Blocks.type(to_block["type"])
 
-        output_type =
-          from_block_module.get_output(output_name).type
+        {:ok, %{type: output_type}} = from_block_module.get_output(output_name)
 
-        input_type =
-          to_block_module.get_input(input_name).type
+        {:ok, %{type: input_type}} =
+          to_block_module.get_input(input_name)
 
         connection = %Buildel.Blocks.Connection{
           from: %Buildel.Blocks.Output{
@@ -334,6 +332,83 @@ defmodule Buildel.Pipelines do
               }
             ])
       )
+
+    pipeline = Ecto.Changeset.change(pipeline, config: new_config)
+
+    Repo.update(pipeline)
+  end
+
+  def create_connection(%Pipeline{} = pipeline, from, to) do
+    with blocks <- pipeline.config["blocks"],
+         blocks_map <- blocks |> Enum.into(%{}, fn block -> {block["name"], block} end),
+         from_block <- blocks_map[from["block_name"]],
+         from_block_module when not is_nil(from_block_module) <-
+           Buildel.Blocks.type(from_block["type"]),
+         to_block <- blocks_map[to["block_name"]],
+         to_block_module when not is_nil(to_block_module) <-
+           Buildel.Blocks.type(to_block["type"]),
+         {:ok, %{type: output_type}} <- from_block_module.get_output(from["output_name"]),
+         {:ok, %{type: input_type}} <-
+           to_block_module.get_input(to["input_name"]) do
+      connection = %Buildel.Blocks.Connection{
+        from: %Buildel.Blocks.Output{
+          block_name: from_block["name"],
+          name: from["output_name"],
+          type: output_type
+        },
+        to: %Buildel.Blocks.Input{
+          block_name: to_block["name"],
+          name: to["input_name"],
+          type: input_type
+        },
+        opts: %{
+          reset: true
+        }
+      }
+
+      new_config =
+        pipeline.config
+        |> Map.update("connections", [], fn connections ->
+          connections ++
+            [
+              %{
+                "from" => %{
+                  "block_name" => connection.from.block_name,
+                  "output_name" => connection.from.name
+                },
+                "opts" => %{"reset" => connection.opts.reset},
+                "to" => %{
+                  "block_name" => connection.to.block_name,
+                  "input_name" => connection.to.name
+                }
+              }
+            ]
+        end)
+
+      pipeline = Ecto.Changeset.change(pipeline, config: new_config)
+
+      Repo.update(pipeline)
+    else
+      nil ->
+        {:error, "Could not find block with specified name"}
+
+      e ->
+        e
+    end
+  end
+
+  def remove_connection(%Pipeline{} = pipeline, from, to) do
+    new_config =
+      pipeline.config
+      |> Map.update("connections", [], fn connections ->
+        connections
+        |> Enum.reject(fn connection ->
+          from["block_name"] == connection["from"]["block_name"] &&
+            from["output_name"] == connection["from"]["name"] &&
+            to["block_name"] == connection["to"]["block_name"] &&
+            to["output_name"] == connection["to"]["name"]
+        end)
+      end)
 
     pipeline = Ecto.Changeset.change(pipeline, config: new_config)
 
