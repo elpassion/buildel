@@ -10,6 +10,7 @@ import { FieldMessage } from '~/components/form/fields/field.message';
 import { SelectField } from '~/components/form/fields/select.field';
 import { SubmitButton } from '~/components/form/submit';
 import { IconButton } from '~/components/iconButton';
+import { BasicLink } from '~/components/link/BasicLink';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import {
   DialogDrawer,
@@ -21,6 +22,7 @@ import {
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
 import { useModal } from '~/hooks/useModal';
+import { routes } from '~/utils/routes.utils';
 
 import { Section, SectionHeading } from '../settingsLayout/PageLayout';
 import type { IOrganization } from './organization.types';
@@ -45,7 +47,13 @@ export const ELSettings: React.FC<ELSettingsProps> = ({
         <p className="text-sm text-muted-foreground">
           Selected workflow:{' '}
           {elWorkflow ? (
-            <span className="text-foreground">{elWorkflow.name}</span>
+            <BasicLink
+              to={routes.pipelineBuild(organization.id, elWorkflow.id)}
+              className="text-foreground hover:underline"
+              target="_blank"
+            >
+              {elWorkflow.name}
+            </BasicLink>
           ) : (
             <span className="text-yellow-500">Not set</span>
           )}
