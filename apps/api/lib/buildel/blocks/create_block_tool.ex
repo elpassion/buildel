@@ -95,7 +95,6 @@ defmodule Buildel.Blocks.CreateBlockTool do
              pipeline,
              Map.merge(block_config, %{connections: [], inputs: []})
            ) do
-
       state = state |> send_stream_stop()
       {"Created block", state}
     else
@@ -103,7 +102,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
         Logger.error("Error creating block: #{inspect(err)}")
         state = state |> send_stream_stop()
 
-        {"Something went wrong.", state}
+        {"Something went wrong. Could not create block because #{inspect(err)}", state}
     end
   end
 
