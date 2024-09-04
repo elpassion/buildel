@@ -48,11 +48,9 @@ export const BuilderHeader: React.FC<
         <EL>
           {elPipeline ? (
             <ELChat
-              onBlockStatusChange={onBlockCreate}
-              input="text_input_1"
-              output="text_output_1"
-              pipelineId={pipelineId}
               el={elPipeline}
+              onBlockStatusChange={onBlockCreate}
+              pipelineId={pipelineId}
               organizationId={organization.id}
             />
           ) : (

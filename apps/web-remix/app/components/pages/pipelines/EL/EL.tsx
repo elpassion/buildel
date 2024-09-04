@@ -12,12 +12,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { useBreakpoints } from '~/hooks/useBreakpoints';
 
 interface ELProps {}
 
 export const EL = ({ children }: PropsWithChildren<ELProps>) => {
+  const { isDesktop } = useBreakpoints();
   return (
-    <Dropdown placement="bottom">
+    <Dropdown placement={isDesktop ? 'bottom' : 'bottom-start'}>
       <ELTrigger />
 
       <DropdownPopup className="min-w-[100%] z-[11] bg-white border border-input rounded-lg overflow-hidden p-2 md:min-w-[450px] lg:min-w-[650px]">

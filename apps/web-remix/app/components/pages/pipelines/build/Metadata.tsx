@@ -22,12 +22,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { useBreakpoints } from '~/hooks/useBreakpoints';
 
 export const Metadata = () => {
+  const { isDesktop } = useBreakpoints();
   const { metadata, setMetadata } = useRunPipeline();
 
   return (
-    <Dropdown placement="bottom">
+    <Dropdown placement={isDesktop ? 'bottom' : 'bottom-start'}>
       <MetadataTrigger />
 
       <DropdownPopup className="min-w-[250px] z-[11] bg-white border border-input rounded-lg overflow-hidden p-2 lg:min-w-[350px]">
