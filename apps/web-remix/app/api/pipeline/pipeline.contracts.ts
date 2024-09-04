@@ -35,24 +35,28 @@ export const InterfaceConfigForm = z.object({
       z.array(InterfaceConfigFormProperty),
     ])
     .default([]),
-  description: z.string().optional().default('Ask me anything!'),
   public: z
     .union([z.boolean(), z.string().transform((v) => v === 'on')])
     .optional()
     .default(false),
 });
 
+export const InterfaceWebchatConfigForm = InterfaceConfigForm.extend({
+  description: z.string().optional().default('Ask me anything!'),
+  suggested_messages: z.array(z.string()).optional().default([]),
+});
+
 export const InterfaceConfig = z.object({
-  webchat: InterfaceConfigForm.optional().default({
+  webchat: InterfaceWebchatConfigForm.optional().default({
     inputs: [] as IInterfaceConfigFormProperty[],
     outputs: [] as IInterfaceConfigFormProperty[],
     description: 'Ask me anything!',
+    suggested_messages: [] as string[],
     public: false,
   }),
   form: InterfaceConfigForm.optional().default({
     inputs: [] as IInterfaceConfigFormProperty[],
     outputs: [] as IInterfaceConfigFormProperty[],
-    description: '',
     public: false,
   }),
 });
@@ -67,12 +71,12 @@ export const SafeInterfaceConfig = z
             inputs: [] as IInterfaceConfigFormProperty[],
             outputs: [] as IInterfaceConfigFormProperty[],
             description: 'Ask me anything!',
+            suggested_messages: [] as string[],
             public: false,
           },
           form: {
             inputs: [] as IInterfaceConfigFormProperty[],
             outputs: [] as IInterfaceConfigFormProperty[],
-            description: '',
             public: false,
           },
         },
@@ -82,12 +86,12 @@ export const SafeInterfaceConfig = z
       inputs: [] as IInterfaceConfigFormProperty[],
       outputs: [] as IInterfaceConfigFormProperty[],
       description: 'Ask me anything!',
+      suggested_messages: [] as string[],
       public: false,
     },
     form: {
       inputs: [] as IInterfaceConfigFormProperty[],
       outputs: [] as IInterfaceConfigFormProperty[],
-      description: '',
       public: false,
     },
   });

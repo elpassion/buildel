@@ -13,6 +13,8 @@ import {
   ChatMessagesWrapper,
   ChatStatus,
   IntroPanel,
+  SuggestedMessage,
+  SuggestedMessages,
 } from '~/components/chat/Chat.components';
 import { ChatHeading } from '~/components/chat/ChatHeading';
 import { ChatInput } from '~/components/chat/ChatInput';
@@ -199,6 +201,26 @@ ${JSON.stringify(files)}
             messages={messages}
             isGenerating={isGenerating}
           />
+
+          <SuggestedMessages
+            className={cn({
+              hidden:
+                !!messages.length ||
+                !pipeline.interface_config.webchat.suggested_messages.length,
+            })}
+          >
+            {pipeline.interface_config.webchat.suggested_messages.map(
+              (msg, index) => {
+                return (
+                  <SuggestedMessage
+                    key={index}
+                    onClick={onSubmit}
+                    content={msg}
+                  />
+                );
+              },
+            )}
+          </SuggestedMessages>
         </ChatMessagesWrapper>
 
         <ChatInput

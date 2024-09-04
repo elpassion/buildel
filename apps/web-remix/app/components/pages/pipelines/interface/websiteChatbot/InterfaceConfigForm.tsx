@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
+import { Trash } from 'lucide-react';
+import { FieldArray, ValidatedForm } from 'remix-validated-form';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field } from '~/components/form/fields/field.context';
@@ -8,11 +9,13 @@ import { FieldLabel } from '~/components/form/fields/field.label';
 import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
+import { IconButton } from '~/components/iconButton';
 import type {
   IBlockConfig,
   IInterfaceConfig,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
+import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 
 import { schema } from './schema';
@@ -61,6 +64,9 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
         inputs,
         outputs,
         description: data.webchat.description,
+        suggested_messages: data.webchat.suggested_messages.filter(
+          (msg) => !!msg,
+        ),
         public: data.webchat.public,
       },
     };
@@ -108,6 +114,12 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
             <TextInputField />
           </Field>
         </div>
+
+        <FieldArray<string> name="webchat.suggested_messages">
+          {(items, { push, remove }) => (
+            <SuggestedMessages items={items} onAdd={push} onRemove={remove} />
+          )}
+        </FieldArray>
       </div>
 
       <SubmitButton size="sm" className="mt-6">
@@ -116,6 +128,50 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     </ValidatedForm>
   );
 };
+
+interface SuggestedMessageProps {
+  items: { key: string; defaultValue: string }[];
+  onAdd: (item: string) => void;
+  onRemove: (index: number) => void;
+}
+function SuggestedMessages({ items, onAdd, onRemove }: SuggestedMessageProps) {
+  return (
+    <div className="w-full max-w-[835px]">
+      <Label className="mb-2 block">Suggested messages</Label>
+
+      <div className="flex flex-col gap-2">
+        {items.map((message, index) => (
+          <div key={index} className="flex gap-1 items-center w-full">
+            <Field name={`webchat.suggested_messages.${index}`}>
+              <TextInputField
+                placeholder="e.g. What are the best action movies?"
+                defaultValue={message.defaultValue}
+              />
+            </Field>
+
+            <IconButton
+              type="button"
+              size="xxs"
+              onClick={() => onRemove(index)}
+              variant="ghost"
+              icon={<Trash />}
+            />
+          </div>
+        ))}
+      </div>
+
+      <Button
+        onClick={() => onAdd('')}
+        type="button"
+        size="xxs"
+        variant="secondary"
+        className="mt-2"
+      >
+        Add message
+      </Button>
+    </div>
+  );
+}
 
 function toSelectOption(item: IBlockConfig) {
   return {
@@ -135,6 +191,7 @@ function toSelectDefaults(data: IInterfaceConfig) {
         JSON.stringify({ name: item.name, type: item.type }),
       ),
       description: data.webchat.description,
+      suggested_messages: data.webchat.suggested_messages,
       public: data.webchat.public,
     },
   };

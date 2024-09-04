@@ -176,7 +176,7 @@ defmodule Buildel.WorkflowTemplates do
         version: "1"
       },
       interface_config: %{
-        form: %{
+        webchat: %{
           inputs: [%{name: "blog_post_topic", type: "text_input"}],
           outputs: [%{name: "blog_post_output", type: "text_output"}],
           public: true

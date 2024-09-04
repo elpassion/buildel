@@ -47,7 +47,7 @@ export const ChatMessagesWrapper: React.FC<
   return (
     <div
       className={cn(
-        'w-full border border-input rounded-lg px-2 py-3 grow overflow-hidden',
+        'w-full border border-input rounded-lg px-2 py-3 grow overflow-hidden relative',
         className,
       )}
     >
@@ -145,11 +145,58 @@ export const IntroPanel = ({
   return (
     <article
       className={cn(
-        'p-4 bg-neutral-white rounded-xl border border-input text-foreground text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2',
+        'p-4 bg-neutral-white rounded-xl border border-input text-center text-foreground text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2',
         className,
       )}
     >
       {children}
     </article>
+  );
+};
+
+export const SuggestedMessages = ({
+  children,
+  className,
+  ...rest
+}: React.HTMLAttributes<HTMLUListElement>) => {
+  return (
+    <ul
+      className={cn(
+        'absolute bottom-2 left-2 right-2 flex gap-2 flex-wrap',
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </ul>
+  );
+};
+
+interface SuggestedMessageProps
+  extends Omit<React.HTMLAttributes<HTMLLIElement>, 'children' | 'onClick'> {
+  onClick: (message: string, e: React.MouseEvent<HTMLLIElement>) => void;
+  content: string;
+}
+
+export const SuggestedMessage = ({
+  className,
+  content,
+  onClick,
+  ...rest
+}: SuggestedMessageProps) => {
+  return (
+    <li
+      tabIndex={1}
+      onClick={(e) => onClick(content, e)}
+      className={cn(
+        'p-2 border border-input rounded-lg inline-flex justify-center items-center text-center text-sm w-[calc(33%_-_4px)] cursor-pointer hover:bg-neutral-100 transition ',
+        className,
+      )}
+      {...rest}
+    >
+      <div className="line-clamp-2 w-full" title={content}>
+        {content}
+      </div>
+    </li>
   );
 };
