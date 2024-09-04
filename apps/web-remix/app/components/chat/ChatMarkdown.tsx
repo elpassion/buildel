@@ -22,6 +22,12 @@ export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
     <Markdown
       options={{
         overrides: {
+          style: {
+            component: Span,
+          },
+          script: {
+            component: Span,
+          },
           p: {
             component: Paragraph,
           },
