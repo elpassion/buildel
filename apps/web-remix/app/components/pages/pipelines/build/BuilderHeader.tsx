@@ -7,7 +7,10 @@ import { useDebounce, useIsFirstRender } from 'usehooks-ts';
 import { IOrganization } from '~/api/organization/organization.contracts';
 import { EL } from '~/components/pages/pipelines/EL/EL';
 import { ELChat } from '~/components/pages/pipelines/EL/ELChat';
-import type { IPipelineConfig } from '~/components/pages/pipelines/pipeline.types';
+import type {
+  IPipeline,
+  IPipelineConfig,
+} from '~/components/pages/pipelines/pipeline.types';
 import { usePipelineId } from '~/hooks/usePipelineId';
 import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
@@ -17,8 +20,8 @@ import { Metadata } from './Metadata';
 import { RunPipelineButton } from './RunPipelineButton';
 
 export const BuilderHeader: React.FC<
-  PropsWithChildren<{ organization: IOrganization }>
-> = ({ children, organization }) => {
+  PropsWithChildren<{ organization: IOrganization; elPipeline?: IPipeline }>
+> = ({ children, organization, elPipeline }) => {
   const pipelineId = usePipelineId();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -43,13 +46,13 @@ export const BuilderHeader: React.FC<
 
       <div className="flex gap-1 items-center pointer-events-auto bg-white rounded-lg p-1 border border-input">
         <EL>
-          {organization.el_id ? (
+          {elPipeline ? (
             <ELChat
               onBlockStatusChange={onBlockCreate}
               input="text_input_1"
               output="text_output_1"
               pipelineId={pipelineId}
-              elId={organization.el_id}
+              el={elPipeline}
               organizationId={organization.id}
             />
           ) : (

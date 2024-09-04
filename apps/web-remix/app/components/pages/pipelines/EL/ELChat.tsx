@@ -12,11 +12,12 @@ import { ChatInput } from '~/components/chat/ChatInput';
 import { ChatMessages } from '~/components/chat/ChatMessages';
 import { ChatWrapper } from '~/components/chat/ChatWrapper';
 import { useChat } from '~/components/chat/useChat';
+import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { cn } from '~/utils/cn';
 
 interface ELChatProps {
   pipelineId: string | number;
-  elId: string | number;
+  el: IPipeline;
   organizationId: string | number;
   output: string;
   input: string;
@@ -29,7 +30,7 @@ interface ELChatProps {
 }
 
 export const ELChat = ({
-  elId,
+  el,
   pipelineId,
   organizationId,
   input,
@@ -49,7 +50,7 @@ export const ELChat = ({
     input,
     output,
     organizationId: Number(organizationId),
-    pipelineId: Number(elId),
+    pipelineId: Number(el.id),
     onBlockOutput,
     onBlockStatusChange,
   });
@@ -103,10 +104,7 @@ export const ELChat = ({
       />
 
       <IntroPanel className={cn('text-center', { hidden: !!messages.length })}>
-        <p>
-          It's EL here! I'm here to help you with block creation, but feel free
-          to ask me anything.
-        </p>
+        <p>{el.interface_config.webchat.description}</p>
       </IntroPanel>
     </ChatWrapper>
   );

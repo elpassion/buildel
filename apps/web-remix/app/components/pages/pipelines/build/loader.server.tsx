@@ -6,6 +6,7 @@ import { BlockTypeApi } from '~/api/blockType/BlockTypeApi';
 import { EnrichedPipelineApi } from '~/api/EnrichedPipelineApi';
 import { OrganizationApi } from '~/api/organization/OrganizationApi';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
+import { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
 
@@ -41,8 +42,19 @@ export async function loader(args: LoaderFunctionArgs) {
       enrichedPipelinePromise,
     ]);
 
+    let elPipeline: IPipeline | undefined;
+
+    if (organization.data.el_id) {
+      const elResponse = await pipelineApi.getPipeline(
+        params.organizationId,
+        organization.data.el_id,
+      );
+      elPipeline = elResponse.data;
+    }
+
     return json({
       pipeline: pipeline,
+      elPipeline: elPipeline,
       aliasId: aliasId,
       blockTypes: blockTypes,
       pipelineId: params.pipelineId,

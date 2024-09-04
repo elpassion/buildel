@@ -255,7 +255,7 @@ ${JSON.stringify(files)}
         />
 
         <IntroPanel className={cn({ hidden: !!messages.length })}>
-          <p>Ask me anything!</p>
+          <p>{pipeline.interface_config.webchat.description}</p>
         </IntroPanel>
       </ChatWrapper>
       <div id="_root"></div>

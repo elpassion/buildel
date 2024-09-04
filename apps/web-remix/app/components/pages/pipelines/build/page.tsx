@@ -41,6 +41,7 @@ export function PipelineBuilder() {
     aliasId,
     pageUrl,
     organization,
+    elPipeline,
   } = useLoaderData<typeof loader>();
 
   const navigate = useNavigate();
@@ -92,7 +93,7 @@ export function PipelineBuilder() {
         CustomNodes={{ custom: AliasCustomNode, comment: ReadonlyCommentNode }}
         CustomEdges={{ default: CustomEdge }}
       >
-        {() => <BuilderHeader />}
+        {() => <BuilderHeader organization={organization} />}
       </Builder>
     );
   }
@@ -110,7 +111,7 @@ export function PipelineBuilder() {
       >
         {({ edges, nodes, onBlockCreate }) => (
           <>
-            <BuilderHeader organization={organization}>
+            <BuilderHeader organization={organization} elPipeline={elPipeline}>
               <SaveChangesButton
                 config={toPipelineConfig(nodes, edges)}
                 isSaving={updateFetcher.state !== 'idle'}

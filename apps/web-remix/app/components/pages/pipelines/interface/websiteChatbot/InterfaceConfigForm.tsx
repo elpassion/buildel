@@ -4,7 +4,9 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field } from '~/components/form/fields/field.context';
+import { FieldLabel } from '~/components/form/fields/field.label';
 import { SelectField } from '~/components/form/fields/select.field';
+import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import type {
   IBlockConfig,
@@ -41,23 +43,24 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     const inputs = data.webchat.inputs.map((input) => {
       const parsed = JSON.parse(input as unknown as string);
       return {
-        name: parsed.name,
-        type: parsed.type,
+        name: parsed.name as string,
+        type: parsed.type as string,
       };
     });
     const outputs = data.webchat.outputs.map((output) => {
       const parsed = JSON.parse(output as unknown as string);
       return {
-        name: parsed.name,
-        type: parsed.type,
+        name: parsed.name as string,
+        type: parsed.type as string,
       };
     });
 
-    const body = {
+    const body: IInterfaceConfig = {
       ...pipeline.interface_config,
       webchat: {
         inputs,
         outputs,
+        description: data.webchat.description,
         public: data.webchat.public,
       },
     };
@@ -71,30 +74,40 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
       noValidate
       onSubmit={handleOnSubmit}
     >
-      <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-4 items-center max-w-screen-2xl">
-        <Field name="webchat.inputs">
-          <SelectField
-            options={inputs.map(toSelectOption)}
-            mode="multiple"
-            label="Input"
-          />
-        </Field>
+      <div className="flex flex-col gap-3">
+        <div className="w-full grid gap-3 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 items-center">
+          <Field name="webchat.inputs">
+            <SelectField
+              options={inputs.map(toSelectOption)}
+              mode="multiple"
+              label="Input"
+            />
+          </Field>
 
-        <Field name="webchat.outputs">
-          <SelectField
-            options={outputs.map(toSelectOption)}
-            mode="multiple"
-            label="Output"
-          />
-        </Field>
+          <Field name="webchat.outputs">
+            <SelectField
+              options={outputs.map(toSelectOption)}
+              mode="multiple"
+              label="Output"
+              className="!min-w-full"
+            />
+          </Field>
 
-        <Field name="webchat.public">
-          <Label className="flex gap-1 items-center">
-            <CheckboxInputField />
+          <Field name="webchat.public">
+            <Label className="flex gap-1 items-center">
+              <CheckboxInputField />
 
-            <span>Public</span>
-          </Label>
-        </Field>
+              <span>Public</span>
+            </Label>
+          </Field>
+        </div>
+
+        <div className="w-full max-w-[805px]">
+          <Field name="webchat.description">
+            <FieldLabel>Description</FieldLabel>
+            <TextInputField />
+          </Field>
+        </div>
       </div>
 
       <SubmitButton size="sm" className="mt-6">
@@ -121,6 +134,7 @@ function toSelectDefaults(data: IInterfaceConfig) {
       outputs: data.webchat.outputs.map((item) =>
         JSON.stringify({ name: item.name, type: item.type }),
       ),
+      description: data.webchat.description,
       public: data.webchat.public,
     },
   };

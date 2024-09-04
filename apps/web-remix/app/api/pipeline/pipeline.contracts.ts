@@ -35,6 +35,7 @@ export const InterfaceConfigForm = z.object({
       z.array(InterfaceConfigFormProperty),
     ])
     .default([]),
+  description: z.string().optional().default('Ask me anything!'),
   public: z
     .union([z.boolean(), z.string().transform((v) => v === 'on')])
     .optional()
@@ -45,11 +46,13 @@ export const InterfaceConfig = z.object({
   webchat: InterfaceConfigForm.optional().default({
     inputs: [] as IInterfaceConfigFormProperty[],
     outputs: [] as IInterfaceConfigFormProperty[],
+    description: 'Ask me anything!',
     public: false,
   }),
   form: InterfaceConfigForm.optional().default({
     inputs: [] as IInterfaceConfigFormProperty[],
     outputs: [] as IInterfaceConfigFormProperty[],
+    description: '',
     public: false,
   }),
 });
@@ -61,26 +64,30 @@ export const SafeInterfaceConfig = z
       ? c
       : {
           webchat: {
-            inputs: [],
-            outputs: [],
+            inputs: [] as IInterfaceConfigFormProperty[],
+            outputs: [] as IInterfaceConfigFormProperty[],
+            description: 'Ask me anything!',
             public: false,
           },
           form: {
-            inputs: [],
-            outputs: [],
+            inputs: [] as IInterfaceConfigFormProperty[],
+            outputs: [] as IInterfaceConfigFormProperty[],
+            description: '',
             public: false,
           },
         },
   )
   .default({
     webchat: {
-      inputs: [],
-      outputs: [],
+      inputs: [] as IInterfaceConfigFormProperty[],
+      outputs: [] as IInterfaceConfigFormProperty[],
+      description: 'Ask me anything!',
       public: false,
     },
     form: {
-      inputs: [],
-      outputs: [],
+      inputs: [] as IInterfaceConfigFormProperty[],
+      outputs: [] as IInterfaceConfigFormProperty[],
+      description: '',
       public: false,
     },
   });
