@@ -4,11 +4,13 @@ import { describe, expect, test, vi } from 'vitest';
 import { RootErrorBoundary } from '~/components/errorBoundaries/RootErrorBoundary';
 import { loader as builderLoader } from '~/components/pages/pipelines/build/loader.server';
 import { PipelineBuilder } from '~/components/pages/pipelines/build/page';
+import { organizationFixture } from '~/tests/fixtures/organization.fixtures';
 import {
   pipelineFixture,
   simplePipelineFixture,
 } from '~/tests/fixtures/pipeline.fixtures';
 import { handlers as blockTypesHandlers } from '~/tests/handlers/blockTypes.handlers';
+import { OrganizationHandlers } from '~/tests/handlers/organization.handlers';
 import { PipelineHandlers } from '~/tests/handlers/pipelines.handlers';
 import { BlockHandle } from '~/tests/handles/Block.handle';
 import { ButtonHandle } from '~/tests/handles/Button.handle';
@@ -22,6 +24,10 @@ import { WebSocketServerMock } from '~/tests/WebSocketServerMock';
 import { runHandlers } from './pipeline-run.handlers';
 
 const handlers = () => [
+  ...new OrganizationHandlers([
+    organizationFixture(),
+    organizationFixture({ id: 2 }),
+  ]).handlers,
   ...runHandlers(),
   ...blockTypesHandlers(),
   ...new PipelineHandlers([simplePipelineFixture()]).handlers,

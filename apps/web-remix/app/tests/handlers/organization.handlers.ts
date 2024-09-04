@@ -15,6 +15,32 @@ export class OrganizationHandlers {
     initials.forEach((org) => this.organizations.set(org.id, org));
   }
 
+  getOrganization() {
+    return http.get(
+      '/super-api/organizations/:organizationId',
+      ({ params }) => {
+        const id = Number(params.organizationId);
+        const organization = this.organizations.get(id);
+
+        if (!organization) {
+          return HttpResponse.json(
+            { error: 'Organization not found' },
+            {
+              status: 404,
+            },
+          );
+        }
+
+        return HttpResponse.json<{ data: IOrganization }>(
+          { data: organization },
+          {
+            status: 200,
+          },
+        );
+      },
+    );
+  }
+
   getOrganizations() {
     return http.get('/super-api/organizations', () => {
       return HttpResponse.json<{ data: IOrganization[] }>(
@@ -88,6 +114,7 @@ export class OrganizationHandlers {
 
   get handlers() {
     return [
+      this.getOrganization(),
       this.getOrganizations(),
       this.createOrganization(),
       this.getTemplates(),
