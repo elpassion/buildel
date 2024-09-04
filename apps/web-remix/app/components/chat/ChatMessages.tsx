@@ -37,24 +37,13 @@ export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
               <ChatMarkdown>{msg.message}</ChatMarkdown>
 
               {embedLinks.length > 0 ? (
-                <div>
-                  <p className="m-0 text-xs mt-1 text-muted-foreground">
+                <div className="flex gap-1">
+                  <p className="m-0 text-xs mt-1.5 text-muted-foreground shrink-0">
                     See more
                   </p>
                   <ul className="list-none p-0 flex gap-1 flex-wrap mt-0.5">
-                    {embedLinks.map((link, id) => (
-                      <li
-                        key={id}
-                        className="m-0 bg-secondary rounded border border-input text-xs px-1 py-0.5"
-                      >
-                        <a
-                          href={link.toString()}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {link.hostname}
-                        </a>
-                      </li>
+                    {embedLinks.map((link, idx) => (
+                      <EmbedLink key={idx} link={link} idx={idx} />
                     ))}
                   </ul>
                 </div>
@@ -100,6 +89,33 @@ function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
     >
       {children}
     </article>
+  );
+}
+
+interface EmbedLinkProps {
+  link: URL;
+  idx: number;
+}
+function EmbedLink({ link, idx }: EmbedLinkProps) {
+  return (
+    <li
+      key={idx}
+      className="m-0 rounded border border-input text-xs p-0 overflow-hidden group"
+    >
+      <a
+        href={link.toString()}
+        target="_blank"
+        rel="noreferrer"
+        className="gap-1 items-center flex no-underline p-0 group-hover:bg-secondary transition"
+      >
+        <span className="block w-5 text-center bg-secondary px-1 py-0.5 text-muted-foreground">
+          {idx + 1}
+        </span>
+        <span className="text-blue-500 pr-2 py-0.5 group-hover:underline">
+          {link.hostname}
+        </span>
+      </a>
+    </li>
   );
 }
 
