@@ -28,17 +28,45 @@ export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
       )}
       itemClassName="w-full"
       items={reversed}
-      renderItem={(msg) => (
-        <>
-          <ChatMessage role={msg.role}>
-            <ChatMarkdown>{msg.message}</ChatMarkdown>
-          </ChatMessage>
+      renderItem={(msg) => {
+        const embedLinks = matchLinks(msg.message);
 
-          <ClientOnly fallback={null}>
-            {() => <MessageTime message={msg} />}
-          </ClientOnly>
-        </>
-      )}
+        return (
+          <>
+            <ChatMessage role={msg.role}>
+              <ChatMarkdown>{msg.message}</ChatMarkdown>
+
+              {embedLinks.length > 0 ? (
+                <div>
+                  <p className="m-0 text-xs mt-1 text-muted-foreground">
+                    See more
+                  </p>
+                  <ul className="list-none p-0 flex gap-1 flex-wrap mt-0.5">
+                    {embedLinks.map((link, id) => (
+                      <li
+                        key={id}
+                        className="m-0 bg-secondary rounded border border-input text-xs px-1 py-0.5"
+                      >
+                        <a
+                          href={link.toString()}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {link.hostname}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </ChatMessage>
+
+            <ClientOnly fallback={null}>
+              {() => <MessageTime message={msg} />}
+            </ClientOnly>
+          </>
+        );
+      }}
     />
   );
 }
@@ -73,4 +101,25 @@ function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
       {children}
     </article>
   );
+}
+
+function matchLinks(message: string) {
+  const regex = /\[.*?]\((https?:\/\/[^)]+)\)/g;
+
+  return (
+    message
+      .match(regex)
+      ?.map((match) => match.match(/\((https?:\/\/[^)]+)\)/)?.[1] ?? '') ?? []
+  )
+    .filter(isValidUrl)
+    .map((url) => new URL(url));
+}
+
+function isValidUrl(string: string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
 }
