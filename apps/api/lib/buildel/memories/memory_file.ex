@@ -185,7 +185,8 @@ defmodule Buildel.Memories.MemoryFile do
                    Buildel.Costs.CostCalculator.calculate_embeddings_cost(
                      %Buildel.Langchain.EmbeddingsTokenSummary{
                        tokens: embeddings_tokens,
-                       model: collection.embeddings_model
+                       model: collection.embeddings_model,
+                       endpoint: collection.embeddings_endpoint
                      }
                    ),
                  {:ok, cost} <-
@@ -205,7 +206,7 @@ defmodule Buildel.Memories.MemoryFile do
               save_chunks_to_file(chunks)
             end
           end,
-          max_concurrency: 15,
+          max_concurrency: 1,
           timeout: 5 * 60_000
         )
         |> Enum.reduce(file, fn {:ok, chunks_file}, file ->

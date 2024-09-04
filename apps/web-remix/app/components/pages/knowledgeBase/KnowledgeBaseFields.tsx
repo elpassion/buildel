@@ -29,7 +29,7 @@ export function ApiTypesRadioGroupField({
     <Field name="embeddings.api_type">
       <FieldLabel>Embeddings API Type</FieldLabel>
       <RadioGroupField onChange={onChange}>
-        {['openai'].map((value) => (
+        {['openai', 'mistral'].map((value) => (
           <Label key={value} className="flex gap-1 items-center">
             <RadioField id={value} value={value} disabled={disabled} />
 
@@ -52,13 +52,15 @@ export function ModelSelectField({
   getPopupContainer,
 }: ModelSelectFieldProps) {
   const { organizationId } = useLoaderData<typeof loader>();
-  const { fieldErrors } = useFormContext();
+  const { fieldErrors, getValues } = useFormContext();
+
+  const api_type = getValues().get('embeddings.api_type');
 
   return (
     <FormField name="embeddings.model">
       <AsyncSelectField
         id="model"
-        url={`/api/organizations/${organizationId}/models/embeddings?api_type=openai`}
+        url={`/api/organizations/${organizationId}/models/embeddings?api_type=${api_type}`}
         label="Model"
         supportingText="The model to use for the embeddings."
         errorMessage={fieldErrors['embeddings.model']}

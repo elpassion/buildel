@@ -35,6 +35,9 @@ defmodule Buildel.Costs.CostCalculator do
       },
       {"https://api.openai.com/v1/embeddings", "text-embedding-3-large"} => %{
         token_price: Decimal.new("0.00013") |> Decimal.div(1000)
+      },
+      {"https://api.mistral.ai/v1/embeddings", "mistral-embed"} => %{
+        token_price: Decimal.new("0.0001") |> Decimal.div(1000)
       }
     }
     |> Map.get_lazy(api_model, fn ->

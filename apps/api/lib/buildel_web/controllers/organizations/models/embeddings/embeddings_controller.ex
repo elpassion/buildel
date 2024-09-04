@@ -24,6 +24,11 @@ defmodule BuildelWeb.OrganizationModelEmbeddingController do
       api_type: "openai",
       id: "text-embedding-3-large",
       name: "text-embedding-3-large"
+    },
+    %{
+      api_type: "mistral",
+      id: "mistral-embed",
+      name: "mistral-embed"
     }
   ]
 

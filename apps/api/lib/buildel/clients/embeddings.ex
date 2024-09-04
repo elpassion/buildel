@@ -38,6 +38,29 @@ defmodule Buildel.Clients.Embeddings do
     end
   end
 
+  def get_embeddings(
+        %__MODULE__{api_type: "mistral", model: model, api_key: api_key, endpoint: endpoint},
+        inputs
+      ) do
+    if inputs |> Enum.at(0) |> is_struct(Pgvector) do
+      {:ok, %{embeddings: inputs |> Enum.map(&Pgvector.to_list/1), embeddings_tokens: 0}}
+    else
+      Buildel.Cache.lookup(
+        "#{endpoint}#{model}#{inputs |> Enum.join(",")}"
+        |> then(&:crypto.hash(:sha256, &1))
+        |> Base.encode16(),
+        fn ->
+          Buildel.Clients.MistralEmbeddings.get_embeddings(%{
+            inputs: inputs,
+            api_key: api_key,
+            model: model,
+            endpoint: endpoint
+          })
+        end
+      )
+    end
+  end
+
   def get_embeddings(%__MODULE__{api_type: "test"}, inputs) do
     {:ok,
      %{
@@ -48,6 +71,10 @@ defmodule Buildel.Clients.Embeddings do
 
   def get_config(%__MODULE__{api_type: "openai", model: model}) do
     Buildel.Clients.OpenAIEmbeddings.model_config(model)
+  end
+
+  def get_config(%__MODULE__{api_type: "mistral", model: model}) do
+    Buildel.Clients.MistralEmbeddings.model_config(model)
   end
 
   def get_config(%__MODULE__{api_type: "test"}) do
@@ -138,6 +165,64 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
         recv_timeout: 100_000
       ]
     }
+  end
+end
+
+defmodule Buildel.Clients.MistralEmbeddings do
+  @behaviour Buildel.Clients.EmbeddingsAdapterBehaviour
+  use Buildel.Utils.TelemetryWrapper
+
+  @impl true
+  def model_config("mistral-embed") do
+    %{size: 1536, distance: "Cosine"}
+  end
+
+  @impl true
+  deftimed get_embeddings(%{inputs: inputs, api_key: api_key, model: model, endpoint: endpoint}),
+           [
+             :buildel,
+             :embeddings,
+             :generation
+           ] do
+    with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
+         when status_code >= 200 and status_code < 400 <-
+           HTTPoison.post(
+             endpoint,
+             %{
+               input: inputs |> cleanup_inputs(),
+               model: model
+             }
+             |> Jason.encode!(),
+             [
+               Authorization: "Bearer #{api_key}",
+               "api-key": api_key,
+               "content-type": "application/json"
+             ],
+             timeout: 60_000,
+             recv_timeout: 60_000
+           ),
+         {:ok, body} <- Jason.decode(body) do
+      {:ok,
+       %{
+         embeddings:
+           body["data"]
+           |> Enum.map(fn data ->
+             Enum.concat(data["embedding"], List.duplicate(0.0, 512))
+           end),
+         embeddings_tokens: body["usage"]["total_tokens"]
+       }}
+    else
+      {:ok, %HTTPoison.Response{body: body}} ->
+        case body |> Jason.decode!() do
+          %{"error" => %{"code" => "invalid_api_key"}} -> {:error, :invalid_api_key}
+          %{"error" => %{"code" => "insufficient_quota"}} -> {:error, :insufficient_quota}
+          %{"error" => %{"code" => "model_not_found"}} -> {:error, :model_not_found}
+        end
+    end
+  end
+
+  defp cleanup_inputs(inputs) do
+    inputs |> Enum.map(&String.replace(&1, " | ", " ", global: true))
   end
 end
 

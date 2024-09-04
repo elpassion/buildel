@@ -193,7 +193,8 @@ defmodule Buildel.Memories do
            Buildel.Costs.CostCalculator.calculate_embeddings_cost(
              %Buildel.Langchain.EmbeddingsTokenSummary{
                tokens: embeddings_tokens,
-               model: collection.embeddings_model
+               model: collection.embeddings_model,
+               endpoint: collection.embeddings_endpoint
              }
            ),
          {:ok, cost} <-
