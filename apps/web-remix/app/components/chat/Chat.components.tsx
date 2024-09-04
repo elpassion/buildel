@@ -158,9 +158,9 @@ export const SuggestedMessages = ({
   children,
   className,
   ...rest
-}: React.HTMLAttributes<HTMLUListElement>) => {
+}: React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <ul
+    <div
       className={cn(
         'absolute bottom-2 left-2 right-2 flex gap-2 flex-wrap',
         className,
@@ -168,13 +168,16 @@ export const SuggestedMessages = ({
       {...rest}
     >
       {children}
-    </ul>
+    </div>
   );
 };
 
 interface SuggestedMessageProps
-  extends Omit<React.HTMLAttributes<HTMLLIElement>, 'children' | 'onClick'> {
-  onClick: (message: string, e: React.MouseEvent<HTMLLIElement>) => void;
+  extends Omit<
+    React.HTMLAttributes<HTMLButtonElement>,
+    'children' | 'onClick'
+  > {
+  onClick: (message: string, e: React.MouseEvent<HTMLButtonElement>) => void;
   content: string;
 }
 
@@ -185,8 +188,7 @@ export const SuggestedMessage = ({
   ...rest
 }: SuggestedMessageProps) => {
   return (
-    <li
-      tabIndex={1}
+    <button
       onClick={(e) => onClick(content, e)}
       className={cn(
         'p-2 border border-input rounded-lg inline-flex justify-center items-center text-center text-sm w-[calc(33%_-_4px)] cursor-pointer hover:bg-neutral-100 transition ',
@@ -197,6 +199,6 @@ export const SuggestedMessage = ({
       <div className="line-clamp-2 w-full" title={content}>
         {content}
       </div>
-    </li>
+    </button>
   );
 };

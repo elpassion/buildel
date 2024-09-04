@@ -1,26 +1,12 @@
-import React, { useCallback, useEffect } from 'react';
+import React from 'react';
 
-import {
-  ChatGeneratingAnimation,
-  ChatHeader,
-  ChatMessagesWrapper,
-  ChatStatus,
-  IntroPanel,
-} from '~/components/chat/Chat.components';
-import { ChatHeading } from '~/components/chat/ChatHeading';
-import { ChatInput } from '~/components/chat/ChatInput';
-import { ChatMessages } from '~/components/chat/ChatMessages';
-import { ChatWrapper } from '~/components/chat/ChatWrapper';
-import { useChat } from '~/components/chat/useChat';
+import { Webchat } from '~/components/chat/Webchat';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
-import { cn } from '~/utils/cn';
 
 interface ELChatProps {
   pipelineId: string | number;
   el: IPipeline;
   organizationId: string | number;
-  output: string;
-  input: string;
   onBlockOutput?: (
     blockId: string,
     outputName: string,
@@ -33,79 +19,20 @@ export const ELChat = ({
   el,
   pipelineId,
   organizationId,
-  input,
-  output,
   onBlockOutput,
   onBlockStatusChange,
 }: ELChatProps) => {
-  // @todo org and pipelines id's for now
-  const {
-    isGenerating,
-    connectionStatus,
-    pushMessage,
-    stopRun,
-    startRun,
-    messages,
-  } = useChat({
-    input,
-    output,
-    organizationId: Number(organizationId),
-    pipelineId: Number(el.id),
-    onBlockOutput,
-    onBlockStatusChange,
-  });
-
-  const onSubmit = useCallback(
-    (value: string) => {
-      pushMessage(value);
-    },
-    [pushMessage],
-  );
-
-  useEffect(() => {
-    // todo change it
-    setTimeout(() => {
-      startRun({
-        initial_inputs: [],
-        metadata: {
-          pipeline_id: pipelineId,
-        },
-      });
-    }, 500);
-
-    return () => {
-      stopRun();
-    };
-  }, []);
-
   return (
-    <ChatWrapper className="max-w-[820px] h-[500px] !py-4 relative">
-      <ChatHeader className="mb-1">
-        <div className="flex gap-2 items-center">
-          <ChatHeading>✨</ChatHeading>
-          <ChatStatus connectionStatus={connectionStatus} />
-        </div>
-      </ChatHeader>
-
-      <ChatMessagesWrapper>
-        <ChatMessages messages={messages} />
-
-        <ChatGeneratingAnimation
-          messages={messages}
-          isGenerating={isGenerating}
-        />
-      </ChatMessagesWrapper>
-
-      <ChatInput
-        onSubmit={onSubmit}
-        disabled={connectionStatus !== 'running'}
-        generating={isGenerating}
-        placeholder="e.g. Create a block that will retrieve current weather in New York..."
-      />
-
-      <IntroPanel className={cn('text-center', { hidden: !!messages.length })}>
-        <p>{el.interface_config.webchat.description}</p>
-      </IntroPanel>
-    </ChatWrapper>
+    <Webchat
+      placeholder="e.g. Create a block that will retrieve current weather in New York..."
+      organizationId={organizationId.toString()}
+      onBlockStatusChange={onBlockStatusChange}
+      onBlockOutput={onBlockOutput}
+      pipelineId={el.id.toString()}
+      pipeline={el}
+      metadata={{
+        pipeline_id: pipelineId,
+      }}
+    />
   );
 };

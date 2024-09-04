@@ -20,7 +20,7 @@ export const EL = ({ children }: PropsWithChildren<ELProps>) => {
     <Dropdown placement="bottom">
       <ELTrigger />
 
-      <DropdownPopup className="min-w-[250px] z-[11] bg-white border border-input rounded-lg overflow-hidden p-2 md:min-w-[450px] lg:min-w-[650px]">
+      <DropdownPopup className="min-w-[100%] z-[11] bg-white border border-input rounded-lg overflow-hidden p-2 md:min-w-[450px] lg:min-w-[650px]">
         {children}
       </DropdownPopup>
     </Dropdown>
