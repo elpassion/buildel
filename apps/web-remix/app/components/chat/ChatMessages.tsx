@@ -1,8 +1,9 @@
 import type { PropsWithChildren } from 'react';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
+import { useTruncatedList } from '~/components/chat/useTruncatedList';
 import { ItemList } from '~/components/list/ItemList';
 import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
@@ -29,25 +30,12 @@ export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
       itemClassName="w-full"
       items={reversed}
       renderItem={(msg) => {
-        const embedLinks = matchLinks(msg.message);
-
         return (
           <>
             <ChatMessage role={msg.role}>
               <ChatMarkdown>{msg.message}</ChatMarkdown>
 
-              {embedLinks.length > 0 ? (
-                <div className="flex gap-1">
-                  <p className="m-0 text-xs mt-1.5 text-muted-foreground shrink-0">
-                    See more
-                  </p>
-                  <ul className="list-none p-0 flex gap-1 flex-wrap mt-0.5">
-                    {embedLinks.map((link, idx) => (
-                      <EmbedLink key={idx} link={link} idx={idx} />
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
+              <EmbedLinksList message={msg.message} />
             </ChatMessage>
 
             <ClientOnly fallback={null}>
@@ -89,6 +77,49 @@ function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
     >
       {children}
     </article>
+  );
+}
+
+interface EmbedLinksListProps {
+  message: string;
+}
+function EmbedLinksList({ message }: EmbedLinksListProps) {
+  const embedLinks = useMemo(() => {
+    return matchLinks(message);
+  }, [message]);
+
+  const listRef = useRef<HTMLUListElement>(null);
+  const { hiddenElements, toggleShowAll, showAll } = useTruncatedList(
+    listRef,
+    embedLinks.length,
+  );
+
+  if (embedLinks.length === 0) return null;
+
+  return (
+    <div className="flex gap-1 w-full">
+      <p className="m-0 text-xs mt-1.5 text-muted-foreground shrink-0">
+        See more
+      </p>
+      <ul
+        ref={listRef}
+        className="grow list-none p-0 flex gap-1 flex-wrap mt-0.5"
+      >
+        {embedLinks.map((link, idx) => (
+          <EmbedLink key={idx} link={link} idx={idx} />
+        ))}
+
+        {(hiddenElements > 0 || showAll) && (
+          <button
+            type="button"
+            onClick={toggleShowAll}
+            className="text-xs bg-transparent hover:text-foreground"
+          >
+            {showAll ? 'Hide' : `+ ${hiddenElements} more`}
+          </button>
+        )}
+      </ul>
+    </div>
   );
 }
 
