@@ -132,13 +132,12 @@ defmodule Buildel.Experiments.Runs.RunRowRun do
       )
       |> Enum.map(& &1.run_id)
 
-    run_costs =
-      Buildel.Repo.all(from(r in Buildel.Pipelines.RunCost, where: r.run_id in ^pipeline_run_ids))
-      |> Buildel.Repo.preload(:cost)
+    runs =
+      Buildel.Repo.all(from(r in Buildel.Pipelines.Run, where: r.id in ^pipeline_run_ids))
 
     total_cost =
-      Enum.reduce(run_costs, Decimal.new(0), fn run_cost, acc ->
-        Decimal.add(acc, run_cost.cost.amount)
+      Enum.reduce(runs, Decimal.new(0), fn run, acc ->
+        Decimal.add(acc, run.total_cost)
       end)
 
     changeset.repo.update_all(

@@ -365,7 +365,9 @@ defmodule Buildel.Blocks.DocumentSearch do
           description:
             "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.
             CALL IT WITH FORMAT `{ \"query\": \"example query\" }`
-            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries. You can use `document_id` property to narrow the search to the specific document",
+            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries.
+            You can use `document_id` property to narrow the search to the specific document.
+            DO NOT SET MORE THAN 2 KEYWORDS",
           parameters_schema: %{
             type: "object",
             properties: %{
@@ -386,7 +388,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                     items: %{
                       type: "string"
                     },
-                    description: "The keywords to search for."
+                    description: "The keywords to search for. Max 2 keywords"
                   }
                 }
               }
