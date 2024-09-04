@@ -83,7 +83,19 @@ export const CreatableAsyncSelectField = forwardRef<
     const [options, setOptions] = useState<{ value: string; label: string }[]>(
       [],
     );
-    const [selectedId, setSelectedId] = useControlField<string>(name);
+    const [selectedId, setSelectedId] = useControlField<string | undefined>(
+      name,
+    );
+
+    useEffect(() => {
+      const doesSelectedIdExist = options.some(
+        (opt) => opt.value === selectedId,
+      );
+
+      if (!doesSelectedIdExist) {
+        setSelectedId(undefined);
+      }
+    }, [options, selectedId]);
 
     useEffect(() => {
       if (
