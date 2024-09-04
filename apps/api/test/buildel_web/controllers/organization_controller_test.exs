@@ -28,7 +28,7 @@ defmodule BuildelWeb.OrganizationControllerTest do
       response = json_response(conn, 200)
 
       assert response["data"] == [
-               %{"id" => organization.id, "name" => organization.name}
+               %{"id" => organization.id, "name" => organization.name, "el_id" => nil}
              ]
 
       assert_schema(response, "OrganizationIndexResponse", api_spec)
@@ -55,7 +55,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
 
       assert response["data"] == %{
                "id" => organization.id,
-               "name" => organization.name
+               "name" => organization.name,
+               "el_id" => nil
              }
 
       assert_schema(response, "OrganizationShowResponse", api_spec)
@@ -78,7 +79,8 @@ defmodule BuildelWeb.OrganizationControllerTest do
       conn =
         post(conn, ~p"/api/organizations", organization: %{name: "some name"})
 
-      assert %{"id" => _id, "name" => "some name"} = json_response(conn, 201)["data"]
+      assert %{"id" => _id, "name" => "some name", "el_id" => nil} =
+               json_response(conn, 201)["data"]
     end
   end
 

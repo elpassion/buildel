@@ -153,7 +153,8 @@ defmodule BuildelWeb.UserRegistrationControllerTest do
                "data" => [
                  %{
                    "id" => organization.id,
-                   "name" => organization.name
+                   "name" => organization.name,
+                   "el_id" => nil
                  }
                ]
              }

@@ -72,8 +72,8 @@ defmodule Buildel.Blocks.Connection do
 
       from_block = blocks_map |> Map.get(from_block_name)
 
-      to_options = Buildel.Blocks.type(to_block["type"]).options
-      from_options = Buildel.Blocks.type(from_block["type"]).options
+      to_options = Buildel.Blocks.type(to_block["type"]).options()
+      from_options = Buildel.Blocks.type(from_block["type"]).options()
 
       to =
         (to_options[:inputs] ++ to_options[:ios])
@@ -100,14 +100,14 @@ defmodule Buildel.Blocks.Connection do
 
     block["connections"]
     |> Enum.map(fn connection ->
-      to_options = Buildel.Blocks.type(block["type"]).options
+      to_options = Buildel.Blocks.type(block["type"]).options()
 
       to =
         (to_options[:inputs] ++ to_options[:ios])
         |> Enum.find(fn %{name: name} -> name == connection["to"]["input_name"] end)
 
       from_block = blocks_map |> Map.get(connection["from"]["block_name"])
-      from_options = Buildel.Blocks.type(from_block["type"]).options
+      from_options = Buildel.Blocks.type(from_block["type"]).options()
 
       from =
         (from_options[:outputs] ++ from_options[:ios])
