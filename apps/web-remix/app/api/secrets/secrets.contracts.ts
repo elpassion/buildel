@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const SecretKey = z.object({
   id: z.string(),
   name: z.string(),
+  hidden_value: z.string().default('...'),
   alias: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),

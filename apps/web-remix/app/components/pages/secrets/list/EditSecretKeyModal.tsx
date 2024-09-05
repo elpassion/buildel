@@ -79,7 +79,10 @@ export const EditSecretKeyModal: React.FC<EditSecretModalProps> = ({
                   <FieldLabel>Enter Secret</FieldLabel>
                   <PasswordInputField
                     autoFocus
-                    placeholder="Type or paste in your secret key"
+                    placeholder={
+                      initialData.hidden_value ||
+                      `Type or paste in your secret key`
+                    }
                   />
                   <FieldMessage>
                     The actual token key that will authorise you in the external

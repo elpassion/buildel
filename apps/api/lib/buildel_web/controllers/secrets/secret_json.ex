@@ -41,9 +41,14 @@ defmodule BuildelWeb.SecretJSON do
     %{
       id: secret.name,
       name: secret.name,
+      hidden_value: value(secret.value),
       alias: secret.alias,
       created_at: secret.inserted_at,
       updated_at: secret.updated_at
     }
+  end
+
+  defp value(secret_value) do
+    "#{secret_value |> String.slice(0, 4)}...#{secret_value |> String.slice(-4, 4)}"
   end
 end

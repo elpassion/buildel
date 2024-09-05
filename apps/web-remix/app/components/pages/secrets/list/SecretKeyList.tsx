@@ -145,8 +145,11 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
       </CardHeader>
 
       <CardContent>
+        <CardDescription>Value: {data.hidden_value}</CardDescription>
         <CardDescription>{dayjs(data.updated_at).format()}</CardDescription>
-        {data.alias && <CardDescription>Default for: {data.alias}</CardDescription>}
+        {data.alias && (
+          <CardDescription>Default for: {data.alias}</CardDescription>
+        )}
       </CardContent>
     </Card>
   );
