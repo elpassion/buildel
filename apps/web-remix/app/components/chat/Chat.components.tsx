@@ -179,19 +179,26 @@ interface SuggestedMessageProps
   > {
   onClick: (message: string, e: React.MouseEvent<HTMLButtonElement>) => void;
   content: string;
+  disabled?: boolean;
 }
 
 export const SuggestedMessage = ({
   className,
   content,
   onClick,
+  disabled,
   ...rest
 }: SuggestedMessageProps) => {
   return (
     <button
+      disabled={disabled}
       onClick={(e) => onClick(content, e)}
       className={cn(
-        'p-2 border border-input rounded-lg inline-flex justify-center items-center text-center text-sm w-[calc(33%_-_4px)] cursor-pointer hover:bg-neutral-100 transition ',
+        'p-2 border border-input rounded-lg inline-flex justify-center items-center text-center text-sm w-[calc(33%_-_4px)] transition',
+        {
+          'cursor-pointer hover:bg-neutral-100': !disabled,
+          'opacity-70': disabled,
+        },
         className,
       )}
       {...rest}

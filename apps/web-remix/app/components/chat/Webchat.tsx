@@ -51,6 +51,7 @@ interface WebchatProps {
     payload: unknown,
   ) => void;
   onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
+  disabled?: boolean;
 }
 
 export const Webchat = ({
@@ -62,6 +63,7 @@ export const Webchat = ({
   placeholder,
   onBlockStatusChange,
   onBlockOutput,
+  disabled,
 }: WebchatProps) => {
   const {
     isGenerating,
@@ -197,6 +199,7 @@ ${JSON.stringify(files)}
             (msg, index) => {
               return (
                 <SuggestedMessage
+                  disabled={disabled}
                   key={index}
                   onClick={onSubmit}
                   content={msg}
@@ -209,7 +212,7 @@ ${JSON.stringify(files)}
 
       <ChatInput
         onSubmit={onSubmit}
-        disabled={connectionStatus !== 'running' || isUploading}
+        disabled={connectionStatus !== 'running' || isUploading || disabled}
         generating={isGenerating}
         placeholder={placeholder}
         attachments={
@@ -246,6 +249,7 @@ ${JSON.stringify(files)}
             <label className="pl-2 cursor-pointer">
               <Upload className="w-4 h-4" />
               <input
+                disabled={disabled}
                 ref={inputRef}
                 type="file"
                 className="hidden"
