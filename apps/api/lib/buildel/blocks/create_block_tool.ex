@@ -213,7 +213,7 @@ defmodule Buildel.Blocks.CreateBlockTool do
         function: %{
           name: "ConnectBlocks",
           description:
-            "Create a connection between blocks input and output. output_name and input_name are taken from options in block details. If you want to connect blocks as a tool for chat then you SHOULD use the IO input and output. It is usually called \"tool\" and THE CONNECTION IS ALWAYS from \"worker\" to \"controller\".",
+            "Create a connection between blocks input and output. output_name and input_name are taken from options in block details. If you want to connect blocks as a \"tool\" for \"chat\" then you have to use \"controller\" and \"worker\" ios not \"text\". It is usually called \"tool\" and the connection is FROM \"controller\" TO \"worker\".",
           parameters_schema: %{
             type: "object",
             properties: %{

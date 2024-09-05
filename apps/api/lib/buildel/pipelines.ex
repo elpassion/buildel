@@ -349,7 +349,8 @@ defmodule Buildel.Pipelines do
            Buildel.Blocks.type(to_block["type"]),
          {:ok, %{type: output_type}} <- from_block_module.get_output(from["output_name"]),
          {:ok, %{type: input_type}} <-
-           to_block_module.get_input(to["input_name"]) do
+           to_block_module.get_input(to["input_name"]),
+         {:ok, true} <- connection_valid?(output_type, input_type) do
       connection = %Buildel.Blocks.Connection{
         from: %Buildel.Blocks.Output{
           block_name: from_block["name"],
@@ -394,6 +395,22 @@ defmodule Buildel.Pipelines do
 
       e ->
         e
+    end
+  end
+
+  defp connection_valid?(from_type, to_type) do
+    cond do
+      from_type == "worker" && to_type == "controller" ->
+        {:ok, true}
+
+      (from_type == "worker" && to_type == "worker") || from_type == "controller" ->
+        {:error, :tool_connection_has_to_be_from_worker_to_controller}
+
+      from_type == to_type ->
+        {:ok, true}
+
+      true ->
+        {:error, :connection_types_do_not_match}
     end
   end
 
