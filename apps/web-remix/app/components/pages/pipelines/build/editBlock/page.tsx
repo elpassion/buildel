@@ -11,9 +11,11 @@ import { EditBlockForm } from '~/components/pages/pipelines/EditBlockForm';
 import type {
   IBlockConfig,
   IConfigConnection,
+  IInterfaceConfig,
   INode,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
+import { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
 import {
   getEdges,
   getNodes,
@@ -63,10 +65,15 @@ export function EditBlockPage() {
     const updatedConnections = connections.map((connection) =>
       updateConnection(connection, updatedBlock),
     );
+    const updatedInterfaces = validateInterfaceConfigs(
+      pipeline.interface_config,
+      updatedBlock,
+    );
 
     updateFetcher.submit(
       {
         ...pipeline,
+        interface_config: updatedInterfaces,
         config: {
           ...toPipelineConfig(updatedNodes, edges),
           connections: updatedConnections,
@@ -159,4 +166,37 @@ function updateNode(node: INode, updated: IExtendedBlockConfig) {
   }
 
   return node;
+}
+
+function validateInterfaceConfigs(
+  interfaces: IInterfaceConfig,
+  updated: IExtendedBlockConfig,
+): IInterfaceConfig {
+  const validate = validateInterfaceProperty(updated);
+
+  return {
+    ...interfaces,
+    webchat: {
+      ...interfaces.webchat,
+      inputs: interfaces.webchat.inputs.map(validate),
+      outputs: interfaces.webchat.outputs.map(validate),
+    },
+    form: {
+      ...interfaces.form,
+      inputs: interfaces.form.inputs.map(validate),
+      outputs: interfaces.form.outputs.map(validate),
+    },
+  };
+}
+
+function validateInterfaceProperty(updated: IExtendedBlockConfig) {
+  return (property: IInterfaceConfigFormProperty) => {
+    const updatedProperty: IInterfaceConfigFormProperty = { ...property };
+
+    if (property.name === updated.oldName) {
+      updatedProperty.name = updated.name;
+    }
+
+    return updatedProperty;
+  };
 }
