@@ -7,7 +7,7 @@
     "node": ">=19",
     "npm": "please-use-pnpm",
     "yarn": "please-use-pnpm",
-    "pnpm": "8"
+    "pnpm": "9"
   },
   "scripts": {
     "build": "concurrently \"pnpm run build:api\" \"pnpm run build:web\"",
@@ -16,16 +16,13 @@
     "lint": "concurrently \"pnpm run lint:api\" \"pnpm run lint:web\"",
     "test": "concurrently \"pnpm run test:api\" \"pnpm run test:web\"",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-
     "postinstall": "concurrently \"pnpm run install:api\" \"pnpm run install:web\"",
-
     "build:api": "cd ./apps/api && pnpm run build",
     "dev:api": "cd ./apps/api && pnpm run dev",
     "dependencies:up:api": "cd ./apps/api && pnpm run dependencies:up",
     "lint:api": "cd ./apps/api && pnpm run lint",
     "test:api": "cd ./apps/api && pnpm run test",
     "install:api": "cd ./apps/api && pnpm install",
-
     "build:web": "cd ./apps/web-remix && pnpm run build",
     "dev:web": "cd ./apps/web-remix && pnpm run dev",
     "dependencies:up:web": "cd ./apps/web-remix && pnpm run dependencies:up",
