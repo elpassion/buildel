@@ -214,6 +214,28 @@ export function EditBlockForm({
           return replacedValue || optKey;
         });
 
+      let defaultValue = props.field.default
+        ?.replace('{{pipeline_id}}', pipelineId.toString())
+        ?.replace('{{block_name}}', blockConfig.name)
+        ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
+          const values = getValues();
+          const replacedValue = values.get(optKey);
+
+          return replacedValue || optKey;
+        });
+
+      if ('defaultWhen' in props.field && props.field.defaultWhen) {
+        const formValues = getValues();
+        const defaultKey = Object.keys(props.field.defaultWhen)[0];
+        const defaultFieldValue = formValues.get(defaultKey);
+
+        if (typeof defaultFieldValue === 'string') {
+          defaultValue = (props.field.defaultWhen as any)[defaultKey][
+            defaultFieldValue
+          ];
+        }
+      }
+
       return (
         <FormField name={props.name!}>
           <AsyncSelectField
@@ -226,15 +248,7 @@ export function EditBlockForm({
             dropdownClassName={`${props.name}-dropdown`}
             supportingText={props.field.description}
             errorMessage={fieldErrors[props.name!]}
-            defaultValue={props.field.default
-              ?.replace('{{pipeline_id}}', pipelineId.toString())
-              ?.replace('{{block_name}}', blockConfig.name)
-              ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
-                const values = getValues();
-                const replacedValue = values.get(optKey);
-
-                return replacedValue || optKey;
-              })}
+            defaultValue={defaultValue}
             getPopupContainer={(node) => node.parentNode.parentNode}
           />
         </FormField>
@@ -278,7 +292,15 @@ export function EditBlockForm({
         }
       }
 
-      let defaultValue;
+      let defaultValue = props.field.default
+        ?.replace('{{pipeline_id}}', pipelineId.toString())
+        ?.replace('{{block_name}}', blockConfig.name)
+        ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
+          const values = getValues();
+          const replacedValue = values.get(optKey);
+
+          return replacedValue || optKey;
+        });
 
       if ('defaultWhen' in props.field && props.field.defaultWhen) {
         const formValues = getValues();
@@ -304,18 +326,7 @@ export function EditBlockForm({
             errorMessage={fieldErrors[props.name!]}
             dropdownClassName={`${props.name}-dropdown`}
             data-testid={props.name}
-            defaultValue={
-              defaultValue ||
-              props.field.default
-                ?.replace('{{pipeline_id}}', pipelineId.toString())
-                ?.replace('{{block_name}}', blockConfig.name)
-                ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
-                  const values = getValues();
-                  const replacedValue = values.get(optKey);
-
-                  return replacedValue || optKey;
-                })
-            }
+            defaultValue={defaultValue}
             renderForm={({ onCreate }) => (
               <CreatableAsyncForm
                 //@ts-ignore

@@ -43,15 +43,12 @@ defmodule BuildelWeb.OrganizationModelController do
       remote_models =
         Chat.get_models(%{endpoint: endpoint, api_key: secret.value, api_type: api_type})
 
-      local_models =
-        @models
-        |> Enum.filter(fn model -> model.api_type == api_type end)
-
-      models =
-        (local_models ++ remote_models)
-        |> Enum.uniq_by(& &1.id)
-
-      render(conn, :index, models: models)
+      if length(remote_models) == 0 do
+        {:error, :bad_request,
+         "Could not download models. Be sure your API type, key and endpoint options are correct."}
+      else
+        render(conn, :index, models: remote_models)
+      end
     end
   end
 

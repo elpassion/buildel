@@ -94,16 +94,14 @@ export const CreatableAsyncSelectField = forwardRef<
 
       if (!doesSelectedIdExist) {
         setSelectedId(undefined);
+        validate();
       }
     }, [options, selectedId]);
 
     useEffect(() => {
-      if (
-        defaultValue &&
-        options.some((opt) => opt.value === defaultValue) &&
-        !selectedId
-      ) {
+      if (defaultValue && options.some((opt) => opt.value === defaultValue)) {
         setSelectedId(defaultValue);
+        validate();
       }
     }, [defaultValue, options, selectedId]);
 
@@ -163,7 +161,7 @@ export const CreatableAsyncSelectField = forwardRef<
           placeholder="Select..."
           onOptionsFetch={onOptionsFetch}
           fetchOptions={fetcher}
-          // defaultValue={defaultValue}
+          defaultValue={defaultValue}
           onChange={onChange}
           value={selectedId}
           onBlur={getInputProps().onBlur}

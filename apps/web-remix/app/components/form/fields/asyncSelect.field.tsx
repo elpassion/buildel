@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import React, { forwardRef, useCallback } from 'react';
+import React, { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useControlField } from 'remix-validated-form';
 import { useIsMounted } from 'usehooks-ts';
 
@@ -41,6 +41,7 @@ export const AsyncSelectField = forwardRef<
     const [selectedId, setSelectedId] = useControlField<string | undefined>(
       name,
     );
+    const [apiError, setApiError] = useState<string | undefined>();
 
     const onChange = (id: string) => {
       setSelectedId(id);
@@ -50,10 +51,19 @@ export const AsyncSelectField = forwardRef<
     const fetcher = useCallback(async () => {
       return asyncSelectApi
         .getData(url)
+        .catch((e) => {
+          setApiError(e);
+          validate();
+          return [];
+        })
         .then((opts) => opts.map(toSelectOption))
         .then((opts) => {
           const curr = opts.find((o) => o.value === selectedId);
-          if (!curr && isMounted()) setSelectedId(undefined);
+          if (!curr && isMounted()) {
+            setSelectedId(undefined);
+            validate();
+          }
+          if (opts.length > 0) setApiError(undefined);
 
           return opts;
         });
@@ -75,7 +85,9 @@ export const AsyncSelectField = forwardRef<
           getPopupContainer={(node) => node.parentNode}
           {...props}
         />
-        <FieldMessage error={errorMessage}>{supportingText}</FieldMessage>
+        <FieldMessage error={apiError || errorMessage}>
+          {apiError || supportingText}
+        </FieldMessage>
       </>
     );
   },

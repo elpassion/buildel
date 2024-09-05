@@ -19,15 +19,31 @@ export const AsyncSelectItemListResponse = z
   })
   .transform((res) => res.data);
 
+export const AsyncSelectListErrorResponse = z
+  .object({
+    errors: z.object({
+      detail: z.string(),
+    }),
+  })
+  .transform((res) => res.errors.detail);
+
 export type IAsyncSelectItem = z.TypeOf<typeof AsyncSelectItem>;
 
 export type IAsyncSelectItemList = z.TypeOf<typeof AsyncSelectItemList>;
 
 export class AsyncSelectApi {
   async getData(url: string) {
-    return fetch(url.replace('/api', '/super-api'))
-      .then((res) => res.json())
-      .then((data) => AsyncSelectItemListResponse.parse(data));
+    try {
+      const response = await fetch(url.replace('/api', '/super-api'));
+      const json = await response.json();
+      if (!response.ok)
+        return Promise.reject(AsyncSelectListErrorResponse.parse(json));
+      return AsyncSelectItemListResponse.parse(json);
+    } catch (error) {
+      return Promise.reject(
+        'Could not return entities from specified endpoint',
+      );
+    }
   }
 
   async createData(url: string, item: IAsyncSelectItem) {

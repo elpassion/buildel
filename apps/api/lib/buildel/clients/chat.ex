@@ -226,8 +226,39 @@ defmodule Buildel.Clients.Chat do
     end
   end
 
-  def get_models(_) do
-    []
+  def get_models(%{api_type: "anthropic"}) do
+    [
+      %{
+        id: "claude-3-5-sonnet-20240620",
+        name: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+        api_type: "anthropic"
+      },
+      %{
+        id: "claude-3-opus-20240229",
+        name: "claude-3-opus-20240229",
+        api_type: "anthropic"
+      },
+      %{
+        id: "claude-3-sonnet-20240229",
+        name: "claude-3-sonnet-20240229",
+        api_type: "anthropic"
+      },
+      %{
+        id: "claude-3-haiku-20240307",
+        name: "claude-3-haiku-20240307",
+        api_type: "anthropic"
+      }
+    ]
+  end
+
+  def get_models(%{api_type: "azure"}) do
+    [
+      %{
+        id: "azure",
+        name: "azure",
+        api_type: "azure"
+      }
+    ]
   end
 
   defp get_llm(%{api_type: "mistral"} = opts, callbacks) do
