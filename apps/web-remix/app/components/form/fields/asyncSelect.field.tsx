@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import React, { forwardRef, useCallback, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useState } from 'react';
 import { useControlField } from 'remix-validated-form';
 import { useIsMounted } from 'usehooks-ts';
 
