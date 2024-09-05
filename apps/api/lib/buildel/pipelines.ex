@@ -318,24 +318,37 @@ defmodule Buildel.Pipelines do
   end
 
   def create_block(%Pipeline{} = pipeline, block_config) do
-    config = pipeline.config
+    with config <- pipeline.config,
+         {:ok, _} <- block_valid?(config, block_config) do
+      config = pipeline.config
 
-    new_config =
-      update_in(
-        config["blocks"],
-        &(&1 ++
-            [
-              %{
-                "name" => block_config.name,
-                "type" => block_config.type,
-                "opts" => block_config.opts
-              }
-            ])
-      )
+      new_config =
+        update_in(
+          config["blocks"],
+          &(&1 ++
+              [
+                %{
+                  "name" => block_config.name,
+                  "type" => block_config.type,
+                  "opts" => block_config.opts
+                }
+              ])
+        )
 
-    pipeline = Ecto.Changeset.change(pipeline, config: new_config)
+      pipeline = Ecto.Changeset.change(pipeline, config: new_config)
 
-    Repo.update(pipeline)
+      Repo.update(pipeline)
+    end
+  end
+
+  defp block_valid?(config, block_config) do
+    cond do
+      config["blocks"] |> Enum.any?(&(&1["name"] == block_config.name)) ->
+        {:error, :block_with_specified_name_already_exists}
+
+      true ->
+        {:ok, true}
+    end
   end
 
   def create_connection(%Pipeline{} = pipeline, from, to) do
