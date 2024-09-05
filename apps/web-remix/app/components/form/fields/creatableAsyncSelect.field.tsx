@@ -99,7 +99,11 @@ export const CreatableAsyncSelectField = forwardRef<
     }, [options, selectedId]);
 
     useEffect(() => {
-      if (defaultValue && options.some((opt) => opt.value === defaultValue)) {
+      if (
+        defaultValue &&
+        options.some((opt) => opt.value === defaultValue) &&
+        !selectedId
+      ) {
         setSelectedId(defaultValue);
         validate();
       }
