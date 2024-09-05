@@ -2,6 +2,10 @@ import React, { useCallback } from 'react';
 import { useBoolean } from 'usehooks-ts';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
+import {
+  addReferenceToLinks,
+  EmbedLinksList,
+} from '~/components/chat/ChatMessages';
 import { ToggleInput } from '~/components/form/inputs/toggle.input';
 
 import type { IBlockConfig, IField } from '../../pipeline.types';
@@ -108,6 +112,7 @@ interface TextOutputProps {
 
 function TextOutput({ content, blockName, onClear }: TextOutputProps) {
   const { value: isRaw, toggle: toggleRaw } = useBoolean(false);
+  const { message, links } = addReferenceToLinks(content);
 
   return (
     <>
@@ -129,7 +134,14 @@ function TextOutput({ content, blockName, onClear }: TextOutputProps) {
         <NodeClearButton onClear={() => onClear(blockName)} />
       </div>
       <div className="select-text cursor-default text-foreground w-full prose min-w-[280px] max-w-full overflow-y-auto resize min-h-[100px] max-h-[500px] border border-input rounded-md py-2 px-[10px] text-xs">
-        {isRaw ? content : <ChatMarkdown>{content}</ChatMarkdown>}
+        {isRaw ? (
+          content
+        ) : (
+          <>
+            <ChatMarkdown>{message}</ChatMarkdown>
+            <EmbedLinksList links={links} />
+          </>
+        )}
       </div>
     </>
   );

@@ -84,7 +84,7 @@ function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
 interface EmbedLinksListProps {
   links: URL[];
 }
-function EmbedLinksList({ links }: EmbedLinksListProps) {
+export function EmbedLinksList({ links }: EmbedLinksListProps) {
   const listRef = useRef<HTMLUListElement>(null);
   const { hiddenElements, toggleShowAll, showAll } = useTruncatedList(
     listRef,
@@ -136,7 +136,7 @@ function EmbedLink({ link, idx }: EmbedLinkProps) {
         rel="noreferrer"
         className="gap-1 items-center flex no-underline p-0 group-hover:bg-secondary transition"
       >
-        <span className="block w-5 text-center bg-secondary px-1 py-0.5 text-muted-foreground">
+        <span className="block w-5 text-center bg-secondary px-1 py-0.5 text-muted-foreground break-keep min-w-fit">
           {idx + 1}
         </span>
         <span className="text-blue-500 pr-2 py-0.5 group-hover:underline">
@@ -149,7 +149,7 @@ function EmbedLink({ link, idx }: EmbedLinkProps) {
 
 const LINK_REGEX = /\[.*?]\((https?:\/\/[^)]+)\)/g;
 
-function addReferenceToLinks(message: string) {
+export function addReferenceToLinks(message: string) {
   let linkIndex = 1;
   const links: URL[] = [];
 
