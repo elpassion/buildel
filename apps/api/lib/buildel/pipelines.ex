@@ -363,23 +363,22 @@ defmodule Buildel.Pipelines do
          {:ok, %{type: output_type}} <- from_block_module.get_output(from["output_name"]),
          {:ok, %{type: input_type}} <-
            to_block_module.get_input(to["input_name"]),
-         {:ok, true} <- connection_valid?(output_type, input_type) do
-      connection = %Buildel.Blocks.Connection{
-        from: %Buildel.Blocks.Output{
-          block_name: from_block["name"],
-          name: from["output_name"],
-          type: output_type
-        },
-        to: %Buildel.Blocks.Input{
-          block_name: to_block["name"],
-          name: to["input_name"],
-          type: input_type
-        },
-        opts: %{
-          reset: true
-        }
-      }
-
+         connection <- %Buildel.Blocks.Connection{
+           from: %Buildel.Blocks.Output{
+             block_name: from_block["name"],
+             name: from["output_name"],
+             type: output_type
+           },
+           to: %Buildel.Blocks.Input{
+             block_name: to_block["name"],
+             name: to["input_name"],
+             type: input_type
+           },
+           opts: %{
+             reset: true
+           }
+         },
+         {:ok, true} <- connection_valid?(pipeline.config, connection) do
       new_config =
         pipeline.config
         |> Map.update("connections", [], fn connections ->
@@ -411,20 +410,33 @@ defmodule Buildel.Pipelines do
     end
   end
 
-  defp connection_valid?(from_type, to_type) do
+  defp connection_valid?(config, %Buildel.Blocks.Connection{} = connection) do
     cond do
-      from_type == "worker" && to_type == "controller" ->
+      connection_already_exists?(config, connection) ->
+        {:error, :connection_already_exists}
+
+      connection.from.type == "worker" && connection.to.type == "controller" ->
         {:ok, true}
 
-      (from_type == "worker" && to_type == "worker") || from_type == "controller" ->
+      (connection.from.type == "worker" && connection.to.type == "worker") ||
+          connection.from.type == "controller" ->
         {:error, :tool_connection_has_to_be_from_worker_to_controller}
 
-      from_type == to_type ->
+      connection.from.type == connection.to.type ->
         {:ok, true}
 
       true ->
         {:error, :connection_types_do_not_match}
     end
+  end
+
+  defp connection_already_exists?(config, %Buildel.Blocks.Connection{} = connection) do
+    Enum.any?(config["connections"], fn existing_connection ->
+      existing_connection["from"]["block_name"] == connection.from.block_name &&
+        existing_connection["to"]["block_name"] == connection.to.block_name &&
+        existing_connection["from"]["output_name"] == connection.from.name &&
+        existing_connection["to"]["input_name"] == connection.to.name
+    end)
   end
 
   def remove_connection(%Pipeline{} = pipeline, from, to) do
