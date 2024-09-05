@@ -24,14 +24,17 @@ export const BuilderControls = ({
   setFlowData,
 }: BuilderControlsProps) => {
   const { fitView } = useReactFlow();
-  const { layout } = useLayoutNodes({ nodes, edges, setFlowData, fitView });
+  const { layout } = useLayoutNodes({ setFlowData, fitView });
 
   return (
     <Controls showInteractive={false}>
-      <ControlButton onClick={() => layout('LR')}>
+      <ControlButton
+        id="layout-left-right"
+        onClick={() => layout({ nodes, edges }, 'LR')}
+      >
         <UnfoldHorizontal />
       </ControlButton>
-      <ControlButton onClick={() => layout('BT')}>
+      <ControlButton onClick={() => layout({ nodes, edges }, 'BT')}>
         <UnfoldVertical />
       </ControlButton>
     </Controls>

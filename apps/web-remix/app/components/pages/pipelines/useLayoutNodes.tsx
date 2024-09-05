@@ -6,8 +6,6 @@ import type { IEdge, INode } from '~/components/pages/pipelines/pipeline.types';
 export type LayoutDirection = 'TB' | 'LR' | 'BT' | 'RL';
 
 export type UseLayoutNodesArgs = {
-  nodes: INode[];
-  edges: IEdge[];
   setFlowData: (
     cb:
       | { nodes: INode[]; edges: IEdge[] }
@@ -20,8 +18,6 @@ export type UseLayoutNodesArgs = {
 };
 
 export const useLayoutNodes = ({
-  nodes,
-  edges,
   setFlowData,
   fitView,
 }: UseLayoutNodesArgs) => {
@@ -46,7 +42,7 @@ export const useLayoutNodes = ({
       }),
     );
 
-    Dagre.layout(g, { rankdir: 'TR' });
+    Dagre.layout(g);
 
     return {
       nodes: nodes.map((node) => {
@@ -62,7 +58,10 @@ export const useLayoutNodes = ({
   };
 
   const layout = useCallback(
-    (direction: LayoutDirection) => {
+    (
+      { nodes, edges }: { nodes: INode[]; edges: IEdge[] },
+      direction: LayoutDirection,
+    ) => {
       const layouted = getLayoutedElements(nodes, edges, direction);
 
       setFlowData({ edges: [...layouted.edges], nodes: [...layouted.nodes] });
@@ -71,7 +70,7 @@ export const useLayoutNodes = ({
         fitView();
       });
     },
-    [nodes, edges],
+    [],
   );
 
   return { layout };

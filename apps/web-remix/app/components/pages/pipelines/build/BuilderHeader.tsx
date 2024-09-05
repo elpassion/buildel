@@ -35,7 +35,7 @@ export const BuilderHeader: React.FC<
           pipelineId,
           Object.fromEntries(searchParams.entries()),
         ),
-        { state: { reset: true } },
+        { state: { reset: true, layoutNodes: true } },
       );
     }
   };

@@ -14,6 +14,7 @@ import {
   BackgroundVariant,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
 } from '@xyflow/react';
 import type { Connection, Edge, EdgeChange, NodeChange } from '@xyflow/react';
 import { useEventListener } from 'usehooks-ts';
@@ -47,6 +48,7 @@ import '@xyflow/react/dist/style.css';
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
 import { fillSchemaDefaults } from '~/components/form/schema/SchemaParser';
 import { BuilderControls } from '~/components/pages/pipelines/BuilderControls';
+import { useLayoutNodes } from '~/components/pages/pipelines/useLayoutNodes';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
 import { cn } from '~/utils/cn';
@@ -82,29 +84,12 @@ export const Builder = ({
   pipeline,
   ...rest
 }: BuilderProps) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [flowState, setFlowState, { updateCurrent, undo, redo }] = useUndoRedo({
     initial: {
       nodes: getNodes(pipeline.config),
       edges: getEdges(pipeline.config),
     },
   });
-
-  useEffect(() => {
-    if (location.state?.reset) {
-      navigate(
-        buildUrlWithParams('.', Object.fromEntries(searchParams.entries())),
-        { state: null },
-      );
-
-      setFlowState({
-        nodes: getNodes(pipeline.config),
-        edges: getEdges(pipeline.config),
-      });
-    }
-  }, [pipeline, location, searchParams]);
 
   return (
     <ReactFlowProvider>
@@ -124,6 +109,8 @@ export const Builder = ({
           undo={undo}
           redo={redo}
         />
+
+        <StateRefresher pipeline={pipeline} setFlowData={setFlowState} />
       </RunPipelineProvider>
     </ReactFlowProvider>
   );
@@ -424,6 +411,49 @@ const BuilderInstance = ({
     </>
   );
 };
+
+interface StateRefresherProps {
+  pipeline: IExtendedPipeline;
+  setFlowData: (
+    cb:
+      | { nodes: INode[]; edges: IEdge[] }
+      | ((oldState: { nodes: INode[]; edges: IEdge[] }) => {
+          nodes: INode[];
+          edges: IEdge[];
+        }),
+  ) => void;
+}
+
+function StateRefresher({ setFlowData, pipeline }: StateRefresherProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { fitView } = useReactFlow();
+  const { layout } = useLayoutNodes({ setFlowData, fitView });
+
+  useEffect(() => {
+    if (location.state?.reset) {
+      const nodes = getNodes(pipeline.config);
+      const edges = getEdges(pipeline.config);
+
+      if (location.state.layoutNodes) {
+        layout({ nodes, edges }, 'LR');
+      } else {
+        setFlowData({
+          nodes,
+          edges,
+        });
+      }
+
+      navigate(
+        buildUrlWithParams('.', Object.fromEntries(searchParams.entries())),
+        { state: null },
+      );
+    }
+  }, [pipeline, location, searchParams]);
+
+  return null;
+}
 
 function isConnection(edge: Edge | Connection): edge is Connection {
   return (edge as Connection).source !== undefined;
