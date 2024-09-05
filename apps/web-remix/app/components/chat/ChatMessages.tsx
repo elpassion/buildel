@@ -30,12 +30,13 @@ export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
       itemClassName="w-full"
       items={reversed}
       renderItem={(msg) => {
+        const { message, links } = addReferenceToLinks(msg.message);
         return (
           <>
             <ChatMessage role={msg.role}>
-              <ChatMarkdown>{msg.message}</ChatMarkdown>
+              <ChatMarkdown>{message}</ChatMarkdown>
 
-              <EmbedLinksList message={msg.message} />
+              <EmbedLinksList links={links} />
             </ChatMessage>
 
             <ClientOnly fallback={null}>
@@ -81,20 +82,16 @@ function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
 }
 
 interface EmbedLinksListProps {
-  message: string;
+  links: URL[];
 }
-function EmbedLinksList({ message }: EmbedLinksListProps) {
-  const embedLinks = useMemo(() => {
-    return matchLinks(message);
-  }, [message]);
-
+function EmbedLinksList({ links }: EmbedLinksListProps) {
   const listRef = useRef<HTMLUListElement>(null);
   const { hiddenElements, toggleShowAll, showAll } = useTruncatedList(
     listRef,
-    embedLinks.length,
+    links.length,
   );
 
-  if (embedLinks.length === 0) return null;
+  if (links.length === 0) return null;
 
   return (
     <div className="flex gap-1 w-full">
@@ -105,7 +102,7 @@ function EmbedLinksList({ message }: EmbedLinksListProps) {
         ref={listRef}
         className="grow list-none p-0 flex gap-1 flex-wrap mt-0.5"
       >
-        {embedLinks.map((link, idx) => (
+        {links.map((link, idx) => (
           <EmbedLink key={idx} link={link} idx={idx} />
         ))}
 
@@ -150,16 +147,27 @@ function EmbedLink({ link, idx }: EmbedLinkProps) {
   );
 }
 
-function matchLinks(message: string) {
-  const regex = /\[.*?]\((https?:\/\/[^)]+)\)/g;
+const LINK_REGEX = /\[.*?]\((https?:\/\/[^)]+)\)/g;
 
-  return (
-    message
-      .match(regex)
-      ?.map((match) => match.match(/\((https?:\/\/[^)]+)\)/)?.[1] ?? '') ?? []
-  )
-    .filter(isValidUrl)
-    .map((url) => new URL(url));
+function addReferenceToLinks(message: string) {
+  let linkIndex = 1;
+  const links: URL[] = [];
+
+  const msg = message.replace(LINK_REGEX, (match) => {
+    const link = match.match(/\((https?:\/\/[^)]+)\)/)?.[1] ?? '';
+
+    if (!isValidUrl(link)) {
+      return match;
+    }
+
+    links.push(new URL(link));
+    const numberedLink = `${match} <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #f1f1f1; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">${linkIndex}</span>`;
+
+    linkIndex++;
+    return numberedLink;
+  });
+
+  return { message: msg, links };
 }
 
 function isValidUrl(string: string) {
