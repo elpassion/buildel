@@ -194,3 +194,14 @@ export const MemoryNodeDetailsResponse = z
     data: MemoryNodeDetails,
   })
   .transform((res) => res.data);
+
+export const TemporaryChunk = z.object({
+  id: z.string(),
+  content: z.string(),
+});
+
+export const TemporaryChunkResponse = z
+  .object({
+    data: TemporaryChunk,
+  })
+  .transform((res) => res.data);

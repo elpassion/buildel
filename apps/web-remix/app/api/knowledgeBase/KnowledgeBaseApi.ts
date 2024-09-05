@@ -15,6 +15,7 @@ import {
   MemoryGraphStateResponse,
   MemoryNodeDetailsResponse,
   MemoryNodeRelatedResponse,
+  TemporaryChunkResponse,
 } from './knowledgeApi.contracts';
 import type {
   CreateCollectionSchema,
@@ -26,7 +27,7 @@ type DateQueryParams = {
   end_date: string;
 };
 export class KnowledgeBaseApi {
-  constructor(private client: typeof fetchTyped) { }
+  constructor(private client: typeof fetchTyped) {}
 
   async getCollections(organizationId: string | number) {
     return this.client(
@@ -228,5 +229,11 @@ export class KnowledgeBaseApi {
     );
 
     return this.client(MemoryNodeDetailsResponse, url);
+  }
+
+  async getTemporaryChunk(chunkId: string | number) {
+    const url = buildUrlWithParams(`/knowledge-base/chunks/${chunkId}`);
+
+    return this.client(TemporaryChunkResponse, url);
   }
 }
