@@ -21,7 +21,7 @@ defmodule BuildelWeb.MemoryChunkController do
       [
         organization_id: [in: :path, description: "Organization ID", type: :integer],
         memory_collection_id: [in: :path, description: "Memory collection ID", type: :integer],
-        id: [in: :path, description: "Memory ID", type: :integer]
+        memory_id: [in: :path, description: "Memory ID", type: :integer]
       ] ++ BuildelWeb.Schemas.Pagination.default_params(),
     request_body: nil,
     responses: [
@@ -44,7 +44,7 @@ defmodule BuildelWeb.MemoryChunkController do
     %{
       organization_id: organization_id,
       memory_collection_id: _memory_collection_id,
-      id: memory_id
+      memory_id: memory_id
     } =
       conn.params
 

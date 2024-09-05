@@ -414,6 +414,30 @@ defmodule Buildel.Memories do
     )
   end
 
+  def get_organization_memory_chunk(
+        organization_id,
+        memory_collection_id,
+        chunk_id
+      ) do
+    vector_db =
+      Buildel.VectorDB.new(%{
+        adapter: Buildel.VectorDB.EctoAdapter,
+        embeddings:
+          Buildel.Clients.Embeddings.new(%{
+            api_type: "",
+            model: "",
+            api_key: "",
+            endpoint: ""
+          })
+      })
+
+    Buildel.VectorDB.get_by_id(
+      vector_db,
+      "#{organization_id}_#{memory_collection_id}",
+      chunk_id
+    )
+  end
+
   def organization_collection_name(
         %Buildel.Organizations.Organization{} = organization,
         %Buildel.Memories.MemoryCollection{} = collection

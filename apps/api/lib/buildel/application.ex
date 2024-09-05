@@ -50,6 +50,7 @@ defmodule Buildel.Application do
           Buildel.Memories.MemoryFile,
           Buildel.Datasets.DatasetFile,
           Buildel.MemoriesGraph,
+          Buildel.MemoriesAccess,
           Buildel.Cache
         ]
         |> maybe_add_flame()

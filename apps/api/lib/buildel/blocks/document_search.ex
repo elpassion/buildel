@@ -315,7 +315,7 @@ defmodule Buildel.Blocks.DocumentSearch do
     )
 
     result
-    |> Enum.map(&DocumentSearchJSON.show/1)
+    |> Enum.map(&DocumentSearchJSON.show(&1))
     |> Jason.encode!()
   end
 
@@ -325,7 +325,7 @@ defmodule Buildel.Blocks.DocumentSearch do
       organization_collection_name: state.collection_name
     })
     |> MemoryCollectionSearch.parent(chunk_id)
-    |> then(&DocumentSearchJSON.show/1)
+    |> then(&DocumentSearchJSON.show(&1))
     |> Jason.encode!()
   end
 
@@ -352,7 +352,7 @@ defmodule Buildel.Blocks.DocumentSearch do
 
     result
     |> Enum.at(1)
-    |> then(&DocumentSearchJSON.show/1)
+    |> then(&DocumentSearchJSON.show(&1))
     |> Jason.encode!()
   end
 
@@ -519,9 +519,18 @@ defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
             "memory_id" => memory_id
           } = metadata
       }) do
+    {:ok, chunk_temporary_uuid} =
+      Buildel.MemoriesAccess.add_chunk(%{
+        chunk_id: chunk_id,
+        memory_id: memory_id
+      })
+
     %{
       document_id: memory_id,
       document_name: filename,
+      url:
+        Application.get_env(:buildel, :page_url) <>
+          "/knowledge-base/chunks/#{chunk_temporary_uuid}",
       chunk_id: chunk_id,
       chunk: document |> String.trim(),
       pages: metadata |> Map.get("pages", []),

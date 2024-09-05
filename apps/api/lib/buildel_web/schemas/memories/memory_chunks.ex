@@ -28,4 +28,17 @@ defmodule BuildelWeb.Schemas.MemoryChunks do
       required: [:data, :meta]
     })
   end
+
+  defmodule ShowResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "MemoryChunkShowResponse",
+      type: :object,
+      properties: %{
+        data: MemoryChunk
+      },
+      required: [:data]
+    })
+  end
 end

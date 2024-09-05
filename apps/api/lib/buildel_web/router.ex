@@ -270,8 +270,14 @@ defmodule BuildelWeb.Router do
       only: [:show, :create]
     )
 
+    get(
+      "/knowledge-base/chunks/:chunk_temporary_uuid",
+      MemoryChunkPublicController,
+      :show
+    )
+
     resources(
-      "/organizations/:organization_id/memory_collections/:memory_collection_id/memories/:id/chunks",
+      "/organizations/:organization_id/memory_collections/:memory_collection_id/memories/:memory_id/chunks",
       MemoryChunkController,
       only: [:index]
     )
