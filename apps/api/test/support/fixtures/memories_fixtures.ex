@@ -44,7 +44,7 @@ defmodule Buildel.MemoriesFixtures do
           secret_name: api_key.name,
           api_type: "test",
           model: "text-embedding-ada-002",
-          endpoint: "test"
+          endpoint: "https://api.openai.com/v1/embeddings"
         }
       })
 
