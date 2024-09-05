@@ -8,6 +8,11 @@ import { UpdatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
 import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import {
+  IBlockConfig,
+  IInterfaceConfig,
+  IInterfaceConfigFormProperty,
+} from '~/components/pages/pipelines/pipeline.types';
 import { requireLogin } from '~/session.server';
 import { actionBuilder } from '~/utils.server';
 
@@ -55,6 +60,11 @@ export async function action(actionArgs: ActionFunctionArgs) {
         return finalBlock;
       });
 
+      result.data.interface_config = validateInterfaceConfigs(
+        result.data.interface_config,
+        result.data.config.blocks,
+      );
+
       const pipelineApi = new PipelineApi(fetch);
       await pipelineApi.updatePipeline(
         params.organizationId,
@@ -65,4 +75,31 @@ export async function action(actionArgs: ActionFunctionArgs) {
       return json({});
     },
   })(actionArgs);
+}
+
+function validateInterfaceConfigs(
+  interfaces: IInterfaceConfig,
+  blocks: IBlockConfig[],
+): IInterfaceConfig {
+  const validate = checkIfInterfaceBlockExist(blocks);
+
+  return {
+    ...interfaces,
+    webchat: {
+      ...interfaces.webchat,
+      inputs: interfaces.webchat.inputs.filter(validate),
+      outputs: interfaces.webchat.outputs.filter(validate),
+    },
+    form: {
+      ...interfaces.form,
+      inputs: interfaces.form.inputs.filter(validate),
+      outputs: interfaces.form.outputs.filter(validate),
+    },
+  };
+}
+
+function checkIfInterfaceBlockExist(blocks: IBlockConfig[]) {
+  return (property: IInterfaceConfigFormProperty) => {
+    return blocks.some((block) => block.name === property.name);
+  };
 }
