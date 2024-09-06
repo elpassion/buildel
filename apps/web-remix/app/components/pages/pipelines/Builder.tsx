@@ -432,7 +432,7 @@ function StateRefresher({ setFlowData, pipeline }: StateRefresherProps) {
   const { layout } = useLayoutNodes({ setFlowData, fitView });
 
   useEffect(() => {
-    if (location.state?.reset || location.state?._isRedirect) {
+    if (location.state?.reset) {
       const nodes = getNodes(pipeline.config);
       const edges = getEdges(pipeline.config);
 
