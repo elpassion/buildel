@@ -4,7 +4,10 @@ import { useControlField } from 'remix-validated-form';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
 import type { RadioInputProps } from '~/components/form/inputs/radio.input';
-import { RadioInput } from '~/components/form/inputs/radio.input';
+import {
+  RadioInput,
+  RadioTabInput,
+} from '~/components/form/inputs/radio.input';
 import type { RadioGroupProps } from '~/components/ui/radio-group';
 import { RadioGroup } from '~/components/ui/radio-group';
 
@@ -14,6 +17,13 @@ export const RadioField = forwardRef<HTMLButtonElement, RadioInputProps>(
   },
 );
 RadioField.displayName = 'RadioField';
+
+export const RadioTabField = forwardRef<HTMLButtonElement, RadioInputProps>(
+  ({ ...props }, ref) => {
+    return <RadioTabInput {...props} ref={ref} />;
+  },
+);
+RadioTabField.displayName = 'RadioTabField';
 
 export const RadioGroupField = forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Root>,

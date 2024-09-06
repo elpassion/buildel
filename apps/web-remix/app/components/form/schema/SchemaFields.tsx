@@ -8,8 +8,8 @@ import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { QuantityInputField } from '~/components/form/fields/quantity.field';
 import {
-  RadioField,
   RadioGroupField,
+  RadioTabField,
 } from '~/components/form/fields/radio.field';
 import {
   PasswordInputField,
@@ -104,16 +104,12 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
         <FieldMessage className="mt-0 mb-3" error={error}>
           {field.description}
         </FieldMessage>
-        <RadioGroupField defaultValue={field.default}>
+        <RadioGroupField
+          defaultValue={field.default}
+          className="flex gap-0 bg-secondary p-1 rounded-lg overflow-x-auto"
+        >
           {field.enum.map((value) => (
-            <Label
-              key={value}
-              className="flex gap-1 items-center text-muted-foreground"
-            >
-              <RadioField id={value} value={value} {...rest} />
-
-              <span>{value}</span>
-            </Label>
+            <RadioTabField id={value} value={value} {...rest} />
           ))}
         </RadioGroupField>
       </FormField>
