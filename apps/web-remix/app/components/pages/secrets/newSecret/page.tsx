@@ -16,7 +16,7 @@ import {
 import { SubmitButton } from '~/components/form/submit';
 import { metaWithDefaults } from '~/utils/metadata';
 
-import { loader } from './loader.server';
+import type { loader } from './loader.server';
 
 export function NewSecret() {
   const { organizationId } = useLoaderData<typeof loader>();

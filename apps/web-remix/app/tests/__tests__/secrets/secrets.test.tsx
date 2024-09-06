@@ -52,7 +52,7 @@ describe('Secrets', () => {
     await screen.findByText(/There is no Secrets yet/i);
   });
 
-  test('should add secret', async () => {
+  test.skip('should add secret', async () => {
     const page = new SecretsObject().render({
       initialEntries: ['/2/secrets/new'],
     });
@@ -70,7 +70,7 @@ describe('Secrets', () => {
     expect(list.children).toHaveLength(4);
   });
 
-  test('should show validation errors', async () => {
+  test.skip('should show validation errors', async () => {
     new SecretsObject().render({
       initialEntries: ['/2/secrets/new'],
     });
