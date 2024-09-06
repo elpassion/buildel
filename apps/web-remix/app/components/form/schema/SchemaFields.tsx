@@ -109,7 +109,7 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
           className="flex gap-0 bg-secondary p-1 rounded-lg overflow-x-auto"
         >
           {field.enum.map((value) => (
-            <RadioTabField id={value} value={value} {...rest} />
+            <RadioTabField key={value} id={value} value={value} {...rest} />
           ))}
         </RadioGroupField>
       </FormField>
