@@ -7,7 +7,7 @@ defmodule Buildel.Blocks.FileToElements do
       type: "file_to_elements",
       description:
         "Used for reading a content of a file and outputting it as a list of elements.",
-      groups: ["file", "inputs / outputs"],
+      groups: ["file"],
       inputs: [Block.file_input()],
       outputs: [Block.text_output()],
       ios: [],
@@ -37,8 +37,9 @@ defmodule Buildel.Blocks.FileToElements do
   def handle_input("input", {_name, :binary, path, metadata}, state) do
     state = send_stream_start(state, "output")
 
-    with {:ok, items} <- Buildel.DocumentWorkflow.read(path, metadata) do
-      output(state, "output", {:text, Jason.encode!(items)})
+    with document_workflow <- Buildel.DocumentWorkflow.new(),
+         items <- Buildel.DocumentWorkflow.read(document_workflow, {path, metadata}) do
+      output(state, "output", {:text, Jason.encode!(items)}, %{metadata: metadata})
     else
       {:error, "Error reading file"} ->
         send_error(state, "Error reading file")

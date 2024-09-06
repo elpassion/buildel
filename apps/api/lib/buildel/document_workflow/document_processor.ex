@@ -11,7 +11,17 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
             next: integer(),
             previous: integer()
           }
-    defstruct [:id, :value, :level, metadata: %{}, parent: nil, next: nil, previous: nil]
+    @derive Jason.Encoder
+    defstruct [
+      :id,
+      :value,
+      :level,
+      type: "header",
+      metadata: %{},
+      parent: nil,
+      next: nil,
+      previous: nil
+    ]
   end
 
   defmodule Paragraph do
@@ -26,7 +36,17 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
             next: integer(),
             previous: integer()
           }
-    defstruct [:id, :value, :level, :type, metadata: %{}, parent: nil, next: nil, previous: nil]
+    @derive Jason.Encoder
+    defstruct [
+      :id,
+      :value,
+      :level,
+      type: "paragraph",
+      metadata: %{},
+      parent: nil,
+      next: nil,
+      previous: nil
+    ]
   end
 
   defmodule ListItem do
@@ -41,7 +61,17 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
             next: integer(),
             previous: integer()
           }
-    defstruct [:id, :value, :level, :type, metadata: %{}, parent: nil, next: nil, previous: nil]
+    @derive Jason.Encoder
+    defstruct [
+      :id,
+      :value,
+      :level,
+      type: "list_item",
+      metadata: %{},
+      parent: nil,
+      next: nil,
+      previous: nil
+    ]
   end
 
   defmodule Table do
@@ -56,7 +86,17 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
             next: integer(),
             previous: integer()
           }
-    defstruct [:id, :value, :level, :type, metadata: %{}, parent: nil, next: nil, previous: nil]
+    @derive Jason.Encoder
+    defstruct [
+      :id,
+      :value,
+      :level,
+      type: "table",
+      metadata: %{},
+      parent: nil,
+      next: nil,
+      previous: nil
+    ]
 
     def from_item(id, level, metadata, %{"name" => name} = table) do
       table_rows = table["table_rows"] || []
@@ -149,6 +189,21 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
           file_metadata |> Map.put(:encoding, "utf_8")
         )
     end
+  end
+
+  def load_elements(elements) do
+    elements
+    |> Enum.map(fn element ->
+      blank =
+        case element.type do
+          "header" -> %Header{}
+          "paragraph" -> %Paragraph{}
+          "table" -> %Table{}
+          "list_item" -> %ListItem{}
+        end
+
+      Map.merge(blank, element)
+    end)
   end
 
   def get_blocks(list) do
@@ -250,11 +305,11 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
     end)
   end
 
-  def join(list) do
+  def join(list, joiner \\ " ") do
     Enum.map(list, fn item ->
       item.value
     end)
-    |> Enum.join(" ")
+    |> Enum.join(joiner)
   end
 
   defp get_parent_headers(item, structures_map, list) do

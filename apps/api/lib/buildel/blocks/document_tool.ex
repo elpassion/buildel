@@ -18,10 +18,13 @@ defmodule Buildel.Blocks.DocumentTool do
       groups: ["tools", "file", "text"],
       inputs: [
         Block.file_input("input", false),
-        Block.file_input("files", true)
+        Block.file_input("files", true),
+        Block.text_input("raw_file", false),
+        Block.text_input("raw_chunk", false)
       ],
       outputs: [
-        Block.text_output("output", false)
+        Block.text_output("output", false),
+        Block.text_output("memory", false)
       ],
       ios: [Block.io("tool", "worker")],
       dynamic_ios: nil,
@@ -124,6 +127,10 @@ defmodule Buildel.Blocks.DocumentTool do
     GenServer.cast(pid, {:add_file, file})
   end
 
+  def add_chunk(pid, chunk) do
+    GenServer.cast(pid, {:add_chunk, chunk})
+  end
+
   def delete_file(pid, file_id) do
     GenServer.cast(pid, {:delete_file, file_id})
   end
@@ -194,6 +201,129 @@ defmodule Buildel.Blocks.DocumentTool do
 
         {:noreply, state}
     end
+  end
+
+  @impl true
+  def handle_cast({:add_file, {:text, content, metadata}}, state) do
+    state = send_stream_start(state)
+
+    %{global: organization_id} = block_context().context_from_context_id(state[:context_id])
+    collection_id = state[:collection]
+
+    organization = Buildel.Organizations.get_organization!(organization_id)
+
+    with {:ok, collection} <-
+           Buildel.Memories.get_organization_collection(organization, collection_id),
+         {:ok, memory} <-
+           %Buildel.Memories.Memory{}
+           |> Buildel.Memories.Memory.changeset(%{
+             file_uuid: metadata.file_id,
+             file_name: metadata.file_name,
+             file_size: 0,
+             file_type: metadata.file_type,
+             content: content,
+             organization_id: organization.id,
+             collection_name: collection.collection_name,
+             memory_collection_id: collection.id
+           })
+           |> Buildel.Repo.insert() do
+      {:noreply,
+       output(state, "output", {:text, memory.content}, %{
+         metadata: metadata |> Map.put(:memory_id, memory.id)
+       })
+       |> output(
+         "memory",
+         {:text,
+          Jason.encode!(%{
+            id: memory.id,
+            collection_name: memory.collection_name,
+            memory_collection_id: memory.memory_collection_id,
+            file_name: memory.file_name
+          })}
+       )}
+    end
+  end
+
+  @impl true
+  def handle_cast({:add_chunk, {:text, chunks, metadata}}, state) do
+    state = send_stream_start(state)
+
+    %{global: organization_id} = block_context().context_from_context_id(state[:context_id])
+
+    organization = Buildel.Organizations.get_organization!(organization_id)
+
+    {:ok, collection, collection_name} =
+      block_context().get_global_collection(state.context_id, state.collection)
+
+    api_key =
+      block_context().get_secret_from_context(state.context_id, collection.embeddings_secret_name)
+
+    workflow =
+      Buildel.DocumentWorkflow.new(%{
+        embeddings:
+          Buildel.Clients.Embeddings.new(%{
+            api_type: collection.embeddings_api_type,
+            model: collection.embeddings_model,
+            api_key: api_key,
+            endpoint: collection.embeddings_endpoint
+          }),
+        collection_name: collection_name,
+        db_adapter: Buildel.VectorDB.EctoAdapter,
+        workflow_config: %{
+          chunk_size: collection.chunk_size,
+          chunk_overlap: collection.chunk_overlap
+        }
+      })
+
+    Enum.chunk_every(chunks, 20)
+    |> Task.async_stream(
+      fn chunks ->
+        with %{chunks: chunks, embeddings_tokens: embeddings_tokens} when is_list(chunks) <-
+               Buildel.DocumentWorkflow.generate_embeddings_for_chunks(workflow, chunks),
+             %{memory: %{id: memory_id, file_name: file_name}} <- List.first(chunks),
+             cost_amount <-
+               Buildel.Costs.CostCalculator.calculate_embeddings_cost(
+                 %Buildel.Langchain.EmbeddingsTokenSummary{
+                   tokens: embeddings_tokens,
+                   model: collection.embeddings_model,
+                   endpoint: collection.embeddings_endpoint
+                 }
+               ),
+             {:ok, cost} <-
+               Buildel.Organizations.create_organization_cost(
+                 organization,
+                 %{
+                   amount: cost_amount,
+                   input_tokens: embeddings_tokens,
+                   output_tokens: 0
+                 }
+               ),
+             {:ok, _} <-
+               Buildel.Memories.create_memory_collection_cost(collection, cost, %{
+                 cost_type: :file_upload,
+                 description: file_name
+               }) do
+          chunks =
+            chunks
+            |> put_in(
+              [Access.all(), Access.key!(:metadata), :memory_id],
+              memory_id
+            )
+            |> put_in([Access.all(), Access.key!(:metadata), :file_name], file_name)
+
+          Buildel.DocumentWorkflow.put_in_database(workflow, chunks)
+        end
+      end,
+      max_concurrency: 4,
+      timeout: 5 * 60_000
+    )
+    |> Stream.run()
+
+    state = output(state, "chunk", {:text, "ok"}, %{metadata: metadata})
+
+    state = send_stream_stop(state)
+
+    {:noreply, state}
   end
 
   def handle_cast({:delete_file, file_id}, state) do
@@ -286,6 +416,18 @@ defmodule Buildel.Blocks.DocumentTool do
   @impl true
   def handle_input("input", {_name, :binary, binary, metadata}, state) do
     add_file(self(), {:binary, binary, metadata})
+    state
+  end
+
+  @impl true
+  def handle_input("raw_file", {_name, :text, text, metadata}, state) do
+    add_file(self(), {:text, text, metadata})
+    state
+  end
+
+  @impl true
+  def handle_input("raw_chunk", {_name, :text, text, metadata}, state) do
+    add_chunk(self(), {:text, text |> Jason.decode!(keys: :atoms), metadata})
     state
   end
 

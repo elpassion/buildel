@@ -77,6 +77,10 @@ defmodule Buildel.DocumentWorkflow do
     end
   end
 
+  def join(chunks, joiner \\ " ") do
+    chunks |> DocumentProcessor.join(joiner)
+  end
+
   @spec read(t(), document()) :: struct_list()
   def read(_workflow, {path, file_metadata}) do
     document_loader =
@@ -107,18 +111,6 @@ defmodule Buildel.DocumentWorkflow do
     |> ChunkGenerator.add_neighbors()
     |> ChunkGenerator.add_parents(documents)
     |> ChunkGenerator.add_order()
-  end
-
-  @type keyword_node :: %{
-          binary() => [binary()]
-        }
-  @spec generate_keyword_nodes(t(), [ChunkGenerator.Chunk.t()]) :: keyword_node()
-  def generate_keyword_nodes(_workflow, chunks) do
-    Enum.reduce(chunks, %{}, fn %{id: id, metadata: %{keywords: keywords}}, acc ->
-      Enum.reduce(keywords, acc, fn keyword, acc ->
-        Map.update(acc, keyword, [id], fn ids -> [id | ids] end)
-      end)
-    end)
   end
 
   def generate_embeddings_for_chunks(workflow, chunks) do

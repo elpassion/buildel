@@ -19,6 +19,7 @@ defmodule Buildel.DocumentWorkflow.ChunkGenerator do
             embeddings: [float()],
             metadata: chunk_metadata()
           }
+    @derive Jason.Encoder
     defstruct [:id, :value, :embeddings, :metadata]
   end
 
