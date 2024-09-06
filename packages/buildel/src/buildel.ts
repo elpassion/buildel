@@ -20,7 +20,7 @@ export class BuildelSocket {
 
   constructor(
     private readonly organizationId: number,
-    options: BuildelSocketOptions = {}
+    options: BuildelSocketOptions = {},
   ) {
     this.authUrl = options.authUrl ?? "/super-api/channel_auth";
     this.socketUrl = options.socketUrl ?? "wss://api.buildel.ai/socket";
@@ -32,7 +32,8 @@ export class BuildelSocket {
       },
     });
     this.useAuth = options.useAuth ?? true;
-    this.onStatusChange = options.onStatusChange ?? ((_status: ConnectionState) => { });
+    this.onStatusChange =
+      options.onStatusChange ?? ((_status: ConnectionState) => {});
   }
 
   public async connect() {
@@ -72,19 +73,19 @@ export class BuildelSocket {
       onBlockOutput?: (
         blockId: string,
         outputName: string,
-        payload: unknown
+        payload: unknown,
       ) => void;
       onError: (error: string) => void;
       onBlockError?: (blockId: string, errors: string[]) => void;
       onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
       onStatusChange?: (status: BuildelRunStatus) => void;
-    }
+    },
   ) {
-    const onBlockOutput = handlers?.onBlockOutput ?? (() => { });
-    const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => { });
-    const onStatusChange = handlers?.onStatusChange ?? (() => { });
-    const onBlockError = handlers?.onBlockError ?? (() => { });
-    const onError = handlers?.onError ?? (() => { });
+    const onBlockOutput = handlers?.onBlockOutput ?? (() => {});
+    const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => {});
+    const onStatusChange = handlers?.onStatusChange ?? (() => {});
+    const onBlockError = handlers?.onBlockError ?? (() => {});
+    const onError = handlers?.onError ?? (() => {});
 
     return new BuildelRun(
       this.socket,
@@ -100,7 +101,7 @@ export class BuildelSocket {
         onStatusChange,
         onBlockError,
         onError,
-      }
+      },
     );
   }
 
@@ -108,21 +109,16 @@ export class BuildelSocket {
     pipelineId: number,
     runId: number,
     handlers?: {
-      onMessage: (
-        payload: unknown
-      ) => void;
-      onLogMessage: (
-        payload: unknown
-      ) => void;
+      onMessage: (payload: unknown) => void;
+      onLogMessage: (payload: unknown) => void;
       onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
       onError: (error: string) => void;
-    }
+    },
   ) {
-    const onMessage = handlers?.onMessage ?? (() => { });
-    const onLogMessage = handlers?.onLogMessage ?? (() => { });
-    const onStatusChange = handlers?.onStatusChange ?? (() => { });
-    const onError = handlers?.onError ?? (() => { });
-
+    const onMessage = handlers?.onMessage ?? (() => {});
+    const onLogMessage = handlers?.onLogMessage ?? (() => {});
+    const onStatusChange = handlers?.onStatusChange ?? (() => {});
+    const onError = handlers?.onError ?? (() => {});
 
     return new BuildelRunLogs(
       this.socket,
@@ -137,12 +133,11 @@ export class BuildelSocket {
         onMessage,
         onLogMessage,
         onStatusChange,
-        onError
-      }
+        onError,
+      },
     );
   }
 }
-
 
 export class BuildelRunLogs {
   private channel: Channel | null = null;
@@ -157,16 +152,12 @@ export class BuildelRunLogs {
     private readonly headers: Record<string, string>,
     private readonly useAuth: boolean,
     private readonly handlers: {
-      onMessage: (
-        payload: unknown
-      ) => void;
-      onLogMessage: (
-        payload: unknown
-      ) => void;
+      onMessage: (payload: unknown) => void;
+      onLogMessage: (payload: unknown) => void;
       onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
       onError: (error: string) => void;
-    }
-  ) { }
+    },
+  ) {}
 
   public async join(args: BuildelRunLogsJoinArgs) {
     if (this.status !== "idle") return;
@@ -178,7 +169,7 @@ export class BuildelRunLogs {
       {
         ...token,
         block_name: args.block_name,
-      }
+      },
     );
 
     this.channel.onMessage = (event: string, payload: any) => {
@@ -270,14 +261,14 @@ export class BuildelRun {
       onBlockOutput: (
         blockId: string,
         outputName: string,
-        payload: unknown
+        payload: unknown,
       ) => void;
       onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
       onStatusChange: (status: BuildelRunStatus) => void;
       onBlockError: (blockId: string, errors: string[]) => void;
       onError: (error: string) => void;
-    }
-  ) { }
+    },
+  ) {}
 
   public async start(args: BuildelRunStartArgs = { initial_inputs: [] }) {
     if (this.status !== "idle") return;
@@ -291,57 +282,32 @@ export class BuildelRun {
         initial_inputs: args.initial_inputs,
         alias: args.alias,
         metadata: args.metadata,
-      }
+      },
     );
 
-    this.channel.onMessage = (event: string, payload: any) => {
-      if (event === "phx_reply" && payload.status === "error") {
-        if (payload.response.errors) {
-          Object.keys(payload.response.errors).forEach((blockId) => {
-            this.handlers.onBlockError(
-              blockId,
-              payload.response.errors[blockId]
-            );
-          });
-        }
+    this.channel.onMessage = this.onMessage();
 
-        if (payload.response.reason) {
-          this.handlers.onError(payload.response.reason);
-        }
+    return this.joinChannel();
+  }
 
-        return this.stop();
-      }
-      if (event.startsWith("output:")) {
-        const [_, blockId, outputName] = event.split(":");
-        this.handlers.onBlockOutput(blockId, outputName, payload);
-      }
-      if (event.startsWith("start:")) {
-        const [_, blockId] = event.split(":");
-        this.handlers.onBlockStatusChange(blockId, true);
-      }
-      if (event.startsWith("stop:")) {
-        const [_, blockId] = event.split(":");
-        this.handlers.onBlockStatusChange(blockId, false);
-      }
-      if (event.startsWith("error:")) {
-        const [_, blockId] = event.split(":");
-        this.handlers.onBlockError(blockId, payload.errors);
-      }
-      return payload;
-    };
+  public async join(args: BuildelRunJoinArgs) {
+    if (this.status !== "idle") return;
 
-    return new Promise<BuildelRun>((resolve, reject) => {
-      assert(this.channel);
-      this.channel.join().receive("ok", response => {
-        this.runId = response.run.id;
-        resolve(this);
-        this.handlers.onStatusChange("running");
-      });
-      this.channel.onError((error) => {
-        reject(error);
-        this.handlers.onStatusChange("idle");
-      });
-    });
+    const token = await this.authenticateChannel(args.runId);
+
+    this.channel = this.socket.channel(
+      `pipelines:${this.organizationId}:${this.pipelineId}:${args.runId}`,
+      {
+        ...token,
+        initial_inputs: args.initial_inputs ?? [],
+        alias: args.alias,
+        metadata: args.metadata,
+      },
+    );
+
+    this.channel.onMessage = this.onMessage();
+
+    return this.joinChannel();
   }
 
   public async stop() {
@@ -382,7 +348,60 @@ export class BuildelRun {
     return this.channel.state === "joined" ? "running" : "starting";
   }
 
-  private async authenticateChannel() {
+  private joinChannel(): Promise<BuildelRun> {
+    return new Promise<BuildelRun>((resolve, reject) => {
+      assert(this.channel);
+      this.channel.join().receive("ok", (response) => {
+        this.runId = response.run.id;
+        resolve(this);
+        this.handlers.onStatusChange("running");
+      });
+      this.channel.onError((error) => {
+        reject(error);
+        this.handlers.onStatusChange("idle");
+      });
+    });
+  }
+
+  private onMessage() {
+    return (event: string, payload: any) => {
+      if (event === "phx_reply" && payload.status === "error") {
+        if (payload.response.errors) {
+          Object.keys(payload.response.errors).forEach((blockId) => {
+            this.handlers.onBlockError(
+              blockId,
+              payload.response.errors[blockId],
+            );
+          });
+        }
+
+        if (payload.response.reason) {
+          this.handlers.onError(payload.response.reason);
+        }
+
+        return this.stop();
+      }
+      if (event.startsWith("output:")) {
+        const [_, blockId, outputName] = event.split(":");
+        this.handlers.onBlockOutput(blockId, outputName, payload);
+      }
+      if (event.startsWith("start:")) {
+        const [_, blockId] = event.split(":");
+        this.handlers.onBlockStatusChange(blockId, true);
+      }
+      if (event.startsWith("stop:")) {
+        const [_, blockId] = event.split(":");
+        this.handlers.onBlockStatusChange(blockId, false);
+      }
+      if (event.startsWith("error:")) {
+        const [_, blockId] = event.split(":");
+        this.handlers.onBlockError(blockId, payload.errors);
+      }
+      return payload;
+    };
+  }
+
+  private async authenticateChannel(runId?: number) {
     if (!this.useAuth) return {};
 
     return await fetch(this.authUrl, {
@@ -394,7 +413,7 @@ export class BuildelRun {
       credentials: "include",
       body: JSON.stringify({
         socket_id: this.id,
-        channel_name: `pipelines:${this.organizationId}:${this.pipelineId}`,
+        channel_name: `pipelines:${this.organizationId}:${this.pipelineId}${runId ? `:${runId}` : ""}`,
       }),
     }).then((response) => response.json());
   }
@@ -408,8 +427,12 @@ export type BuildelRunStartArgs = {
   metadata?: Record<string, any>;
 };
 
+export type BuildelRunJoinArgs = BuildelRunStartArgs & {
+  runId: number;
+};
+
 export type BuildelRunLogsConnectionStatus = "idle" | "joining" | "joined";
 
 export type BuildelRunLogsJoinArgs = {
   block_name?: string;
-}
+};
