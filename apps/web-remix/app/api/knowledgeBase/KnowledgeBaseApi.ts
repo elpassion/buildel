@@ -16,6 +16,7 @@ import {
   MemoryNodeDetailsResponse,
   MemoryNodeRelatedResponse,
   TemporaryChunkResponse,
+  TemporaryMemoryResponse,
 } from './knowledgeApi.contracts';
 import type {
   CreateCollectionSchema,
@@ -237,5 +238,16 @@ export class KnowledgeBaseApi {
     );
 
     return this.client(TemporaryChunkResponse, url);
+  }
+
+  async getTemporaryMemory(
+    memoryId: string | number,
+    pagination?: PaginationQueryParams,
+  ) {
+    const url = buildUrlWithParams(`/knowledge-base/memories/${memoryId}`, {
+      ...pagination,
+    });
+
+    return this.client(TemporaryMemoryResponse, url);
   }
 }

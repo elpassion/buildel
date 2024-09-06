@@ -343,6 +343,9 @@ export const routes = {
     experimentId: ExperimentId,
     runId: RunId,
   ) => `${routes.experimentRuns(organizationId, experimentId)}/${runId}`,
+
+  temporaryMemory: (uuid: string, params: RouteParam = {}) =>
+    buildUrlWithParams(`/knowledge-base/memories/${uuid}`, params),
 };
 
 type OrganizationId = string | number;

@@ -205,3 +205,10 @@ export const TemporaryChunkResponse = z
     data: TemporaryChunk,
   })
   .transform((res) => res.data);
+
+export const TemporaryMemoryResponse = z
+  .object({
+    data: z.array(TemporaryChunk),
+    meta: PaginationMeta,
+  })
+  .transform((res) => ({ data: res.data, meta: res.meta }));
