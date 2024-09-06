@@ -48,7 +48,8 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
       where: %{},
       token_limit: nil,
       extend_neighbors: false,
-      extend_parents: false
+      extend_parents: false,
+      chunk_type: nil
     }
 
     defstruct [
@@ -58,7 +59,8 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
       :where,
       :token_limit,
       :extend_neighbors,
-      :extend_parents
+      :extend_parents,
+      :chunk_type
     ]
 
     def from_map(params) do
@@ -86,7 +88,8 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
              params.where,
              %{
                limit: params.limit,
-               similarity_threshhold: params.similarity_threshhold
+               similarity_threshhold: params.similarity_threshhold,
+               chunk_type: params.chunk_type
              }
            ) do
       extended_result =

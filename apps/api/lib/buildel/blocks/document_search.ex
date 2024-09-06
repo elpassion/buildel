@@ -118,6 +118,12 @@ defmodule Buildel.Blocks.DocumentSearch do
                     "/api/organizations/{{organization_id}}/memory_collections/{{opts.knowledge}}/memories",
                   "presentAs" => "async-select",
                   "readonly" => true
+                },
+                chunk_type: %{
+                  "type" => "string",
+                  "title" => "Chunk type",
+                  "description" => "Filter the search to a specific chunk type. Ex. \"chunk\"",
+                  "default" => "chunk"
                 }
               )
           })
@@ -280,10 +286,12 @@ defmodule Buildel.Blocks.DocumentSearch do
 
   defp do_query(state, query, tool_filters \\ %{}) do
     token_limit = state.opts |> Map.get(:token_limit, 0)
+    chunk_type = state.opts |> Map.get(:chunk_type)
 
     params =
       MemoryCollectionSearch.Params.from_map(%{
         search_query: query,
+        chunk_type: chunk_type,
         where:
           Map.merge(tool_filters, state.where, fn _key, bot_value, set_value ->
             if set_value, do: set_value, else: bot_value

@@ -57,7 +57,8 @@ defmodule Buildel.VectorDB do
            adapter.query(collection, metadata, %{
              query_embeddings: embeddings_list |> List.first(),
              limit: options.limit,
-             similarity_treshhold: options.similarity_threshhold
+             similarity_treshhold: options.similarity_threshhold,
+             chunk_type: options.chunk_type
            }) do
       %{result: results, embeddings_tokens: embeddings_tokens}
     end
@@ -215,6 +216,7 @@ defmodule Buildel.VectorDB.EctoAdapter.Chunk do
     field :metadata, :map
     field :similarity, :float, virtual: true
     field :point, {:array, :float}, virtual: true
+    field :chunk_type, :string
 
     timestamps()
   end
@@ -228,7 +230,8 @@ defmodule Buildel.VectorDB.EctoAdapter.Chunk do
       :embedding_1536,
       :embedding_384,
       :document,
-      :metadata
+      :metadata,
+      :chunk_type
     ])
     |> validate_required([
       :collection_name,
@@ -236,7 +239,8 @@ defmodule Buildel.VectorDB.EctoAdapter.Chunk do
       :embedding_1536,
       :embedding_384,
       :document,
-      :metadata
+      :metadata,
+      :chunk_type
     ])
     |> unique_constraint(:id)
   end
@@ -280,7 +284,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
           document: value,
           metadata: document.metadata,
           inserted_at: time,
-          updated_at: time
+          updated_at: time,
+          chunk_type: document[:chunk_type] || "chunk"
         }
       end)
 
@@ -411,7 +416,8 @@ defmodule Buildel.VectorDB.EctoAdapter do
   def query(collection, metadata, %{
         query_embeddings: query_embeddings,
         limit: limit,
-        similarity_treshhold: _similarity_treshhold
+        similarity_treshhold: _similarity_treshhold,
+        chunk_type: chunk_type
       }) do
     embedding_size = Enum.count(query_embeddings)
     embedding_column = "embedding_#{embedding_size}" |> String.to_atom()
@@ -454,6 +460,13 @@ defmodule Buildel.VectorDB.EctoAdapter do
                 embedding_3072: nil
             }
           )
+
+    embeddings_query =
+      if chunk_type == nil or chunk_type == "" do
+        embeddings_query
+      else
+        embeddings_query |> where(chunk_type: ^chunk_type)
+      end
 
     results =
       Buildel.Repo.all(embeddings_query)
