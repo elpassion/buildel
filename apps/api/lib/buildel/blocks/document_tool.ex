@@ -92,6 +92,24 @@ defmodule Buildel.Blocks.DocumentTool do
         response_formatter: fn _response ->
           ""
         end
+      },
+      %{
+        function: %{
+          name: "list",
+          description: "Retrieve documents list from knowledge base.",
+          parameters_schema: %{
+            type: "object",
+            properties: %{},
+            required: []
+          }
+        },
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          build_call_formatter(state.block.opts.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
+        end
       }
     ]
   end
@@ -235,6 +253,28 @@ defmodule Buildel.Blocks.DocumentTool do
         send_error(state, "Failed to retrieve the document")
         {"Failed to retrieve document", state}
     end
+  end
+
+  @impl true
+  def handle_tool("tool", "list", {_topic, :text, _args, _}, state) do
+    state = state |> send_stream_start()
+
+    %{global: organization_id} = block_context().context_from_context_id(state.context_id)
+    organization = Buildel.Organizations.get_organization!(organization_id)
+
+    {:ok, collection, _collection_name} =
+      block_context().get_global_collection(state.context_id, state.opts.knowledge)
+
+    collection_files =
+      Buildel.Memories.list_organization_collection_memories(organization, collection)
+      |> Enum.map(fn memory ->
+        %{
+          document_name: memory.file_name,
+          id: memory.file_uuid
+        }
+      end)
+
+    {collection_files |> Jason.encode!(), state}
   end
 
   @impl true
