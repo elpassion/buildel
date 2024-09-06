@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { BuildelSocket } from '@buildel/buildel';
 import type {
   BuildelRun,
+  BuildelRunJoinArgs,
   BuildelRunStartArgs,
   BuildelRunStatus,
 } from '@buildel/buildel';
@@ -29,6 +30,10 @@ export function usePipelineRun(
   const startRun = async (args: BuildelRunStartArgs) => {
     assert(run.current);
     await run.current.start(args);
+  };
+  const joinRun = async (args: BuildelRunJoinArgs) => {
+    assert(run.current);
+    await run.current.join(args);
   };
   const stopRun = async () => {
     assert(run.current);
@@ -62,6 +67,7 @@ export function usePipelineRun(
   return {
     status,
     startRun,
+    joinRun,
     stopRun,
     push,
     id: run.current?.runId,

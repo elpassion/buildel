@@ -36,6 +36,7 @@ interface IRunPipelineContext {
   clearBlockEvents: (blockName: string) => void;
   runId: string | null | undefined;
   status: 'idle' | 'starting' | 'running';
+  joinRun: (runId: number) => void;
   isValid: boolean;
   organizationId: number;
   pipelineId: number;
@@ -102,6 +103,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     status,
     startRun,
     stopRun,
+    joinRun,
     push,
     id: runId,
   } = usePipelineRun(
@@ -117,6 +119,14 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     setErrors({});
     await startRun({ initial_inputs: [], alias, metadata });
   }, [startRun, alias]);
+
+  const handleJoinRun = useCallback(
+    async (runId: number) => {
+      setErrors({});
+      await joinRun({ initial_inputs: [], alias, metadata, runId });
+    },
+    [joinRun, alias],
+  );
 
   const handlePush = useCallback(
     (topic: string, payload: any) => {
@@ -180,6 +190,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       isValid,
       organizationId: pipeline.organization_id,
       pipelineId: pipeline.id,
+      joinRun: handleJoinRun,
       errors,
       metadata,
       setMetadata,
@@ -189,6 +200,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       events,
       handlePush,
       handleStartRun,
+      handleJoinRun,
       status,
       stopRun,
       clearEvents,

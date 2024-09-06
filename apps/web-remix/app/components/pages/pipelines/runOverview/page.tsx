@@ -1,8 +1,11 @@
+import { useEffect } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useLoaderData } from '@remix-run/react';
 
 import { ReadonlyCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/ReadonlyCommentNode';
 import { ReadonlyCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/ReadonlyCustomNode';
+import type { IPipelineRun } from '~/components/pages/pipelines/pipeline.types';
+import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
 import { metaWithDefaults } from '~/utils/metadata';
 
 import { Builder } from '../Builder';
@@ -23,11 +26,31 @@ export function PipelineRunOverview() {
           comment: ReadonlyCommentNode,
         }}
         CustomEdges={{ default: CustomEdge }}
-      />
+      >
+        {() => <PipelineAutoRun pipelineRun={pipelineRun} />}
+      </Builder>
 
       <Outlet />
     </>
   );
+}
+
+interface PipelineAutoRunProps {
+  pipelineRun: IPipelineRun;
+}
+
+function PipelineAutoRun({ pipelineRun }: PipelineAutoRunProps) {
+  const { joinRun } = useRunPipeline();
+
+  useEffect(() => {
+    if (pipelineRun.status === 'running') {
+      setTimeout(() => {
+        joinRun(Number(pipelineRun.id));
+      }, 500);
+    }
+  }, []);
+
+  return null;
 }
 
 export const meta: MetaFunction = metaWithDefaults(() => {
