@@ -45,7 +45,9 @@ export const AsyncSelectField = forwardRef<
 
     const onChange = (id: string) => {
       setSelectedId(id);
-      validate();
+      try {
+        validate();
+      } catch (error) {}
     };
 
     const fetcher = useCallback(async () => {
