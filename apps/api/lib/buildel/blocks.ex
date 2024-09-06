@@ -40,7 +40,8 @@ defmodule Buildel.Blocks do
     FileToText,
     Image,
     ImageOutput,
-    Knowledge
+    Knowledge,
+    FileToElements
   }
 
   @names_to_blocks_map %{
@@ -79,7 +80,8 @@ defmodule Buildel.Blocks do
     "file_to_text" => FileToText,
     "image" => Image,
     "image_output" => ImageOutput,
-    "knowledge" => Knowledge
+    "knowledge" => Knowledge,
+    "file_to_elements" => FileToElements
   }
 
   @blocks_to_names_map %{
@@ -118,7 +120,8 @@ defmodule Buildel.Blocks do
     FileToText => "file_to_text",
     Image => "image",
     ImageOutput => "image_output",
-    Knowledge => "knowledge"
+    Knowledge => "knowledge",
+    FileToElements => "file_to_elements"
   }
 
   def list_types() do
