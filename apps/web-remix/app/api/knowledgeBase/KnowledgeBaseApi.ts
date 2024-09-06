@@ -232,7 +232,9 @@ export class KnowledgeBaseApi {
   }
 
   async getTemporaryChunk(chunkId: string | number) {
-    const url = buildUrlWithParams(`/knowledge-base/chunks/${chunkId}`);
+    const url = buildUrlWithParams(
+      `/knowledge-base/memories/chunks/${chunkId}`,
+    );
 
     return this.client(TemporaryChunkResponse, url);
   }
