@@ -530,7 +530,7 @@ defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
       document_name: filename,
       url:
         Application.get_env(:buildel, :page_url) <>
-          "/knowledge-base/chunks/#{chunk_temporary_uuid}",
+          "/knowledge-base/memories/chunks/#{chunk_temporary_uuid}",
       chunk_id: chunk_id,
       chunk: document |> String.trim(),
       pages: metadata |> Map.get("pages", []),

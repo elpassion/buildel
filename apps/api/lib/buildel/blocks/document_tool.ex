@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.DocumentTool do
   alias Buildel.Blocks.Fields.EditorField
+  alias Buildel.Blocks.DocumentTool.DocumentToolJSON
   use Buildel.Blocks.Block
   use Buildel.Blocks.Tool
 
@@ -228,7 +229,7 @@ defmodule Buildel.Blocks.DocumentTool do
           args["document_id"]
         )
 
-      {"Document name: #{memory.file_name}\n\n#{memory.content |> String.trim()}", state}
+      {DocumentToolJSON.show(%{memory: memory}) |> Jason.encode!(), state}
     rescue
       _ ->
         send_error(state, "Failed to retrieve the document")
@@ -263,5 +264,23 @@ defmodule Buildel.Blocks.DocumentTool do
       _, acc ->
         acc
     end)
+  end
+end
+
+defmodule Buildel.Blocks.DocumentTool.DocumentToolJSON do
+  def show(%{
+        memory: memory
+      }) do
+    {:ok, memory_temporary_uuid} =
+      Buildel.MemoriesAccess.add_chunk(%{
+        memory_id: memory.id
+      })
+
+    %{
+      content: "Document name: #{memory.file_name}\n\n#{memory.content |> String.trim()}",
+      url:
+        Application.get_env(:buildel, :page_url) <>
+          "/knowledge-base/memories/#{memory_temporary_uuid}"
+    }
   end
 end

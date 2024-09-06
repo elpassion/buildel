@@ -271,7 +271,13 @@ defmodule BuildelWeb.Router do
     )
 
     get(
-      "/knowledge-base/chunks/:chunk_temporary_uuid",
+      "/knowledge-base/memories/:memory_temporary_uuid",
+      MemoryChunkPublicController,
+      :index
+    )
+
+    get(
+      "/knowledge-base/memories/chunks/:chunk_temporary_uuid",
       MemoryChunkPublicController,
       :show
     )
