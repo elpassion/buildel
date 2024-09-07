@@ -285,7 +285,7 @@ defmodule Buildel.VectorDB.EctoAdapter do
           metadata: document.metadata,
           inserted_at: time,
           updated_at: time,
-          chunk_type: document[:chunk_type] || "chunk"
+          chunk_type: document |> Map.get(:chunk_type, "chunk")
         }
       end)
 

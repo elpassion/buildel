@@ -44,4 +44,6 @@ defmodule Buildel.Blocks.Utils.InputQueue do
 
     %__MODULE__{queue: [item | rest], process_item: process_item}
   end
+
+  def count(%__MODULE__{queue: queue}), do: length(queue)
 end
