@@ -427,7 +427,34 @@ defmodule Buildel.Blocks.DocumentTool do
 
   @impl true
   def handle_input("raw_chunk", {_name, :text, text, metadata}, state) do
-    add_chunk(self(), {:text, text |> Jason.decode!(keys: :atoms), metadata})
+    add_chunk(
+      self(),
+      {:text,
+       text
+       |> Jason.decode!(keys: :atoms)
+       |> Enum.map(fn chunk ->
+         metadata =
+           Map.merge(
+             %{
+               building_block_ids: [],
+               index: 0,
+               keywords: [],
+               next: nil,
+               prev: nil,
+               parent: nil,
+               pages: []
+             },
+             chunk |> Map.get(:metadata, %{})
+           )
+
+         Map.merge(
+           %{metadata: metadata, chunk_type: "chunk"},
+           chunk |> Map.drop([:metadata])
+         )
+         |> Map.put_new_lazy(:id, &UUID.uuid4/0)
+       end), metadata}
+    )
+
     state
   end
 

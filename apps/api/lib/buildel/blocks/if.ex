@@ -42,7 +42,7 @@ defmodule Buildel.Blocks.IF do
 
   defp compare(text_value, state) do
     output =
-      if text_value == state.opts.condition do
+      if to_string(text_value) == state.opts.condition do
         "true"
       else
         "false"
