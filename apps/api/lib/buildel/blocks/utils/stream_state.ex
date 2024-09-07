@@ -3,17 +3,30 @@ defmodule Buildel.Blocks.Utils.StreamState do
     quote do
       alias Buildel.BlockPubSub
 
+      defp stream_state(state) do
+        case state.outputs_stream_state
+             |> Enum.any?(fn {_, stream_state} -> stream_state == :streaming end) do
+          true -> :streaming
+          false -> :idle
+        end
+      end
+
+      defp set_stream_state(state, output, stream_state) do
+        update_in(state.outputs_stream_state, &Map.put(&1, output, stream_state))
+      end
+
       defp assign_stream_state(state, opts \\ %{}) do
         state
+        |> Map.put(:outputs_stream_state, %{})
         |> Map.put(:stream_state, :idle)
         |> Map.put(:stream_timer, nil)
         |> Map.put(:stream_timeout, Map.get(opts, :stream_timeout, stream_timeout()))
       end
 
       defp send_stream_start(state, output \\ "output") do
-        case state[:stream_state] do
+        case stream_state(state) do
           :idle ->
-            state = put_in(state[:stream_state], :streaming)
+            state = set_stream_state(state, output, :streaming)
 
             BlockPubSub.broadcast_to_io(
               state[:context_id],
@@ -36,9 +49,9 @@ defmodule Buildel.Blocks.Utils.StreamState do
       end
 
       defp send_stream_stop(state, output \\ "output") do
-        case state[:stream_state] do
+        case stream_state(state) do
           :streaming ->
-            state = put_in(state[:stream_state], :idle)
+            state = set_stream_state(state, output, :idle)
 
             BlockPubSub.broadcast_to_io(
               state[:context_id],
@@ -61,7 +74,7 @@ defmodule Buildel.Blocks.Utils.StreamState do
       end
 
       defp schedule_stream_stop(state, output \\ "output") do
-        if state[:stream_timer] && state[:stream_state] == :streaming do
+        if state[:stream_timer] && stream_state(state) == :streaming do
           Process.cancel_timer(state[:stream_timer])
         end
 
