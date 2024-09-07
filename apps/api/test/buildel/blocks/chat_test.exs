@@ -10,7 +10,8 @@ defmodule Buildel.Blocks.ChatTest do
              inputs: [Block.text_input("input"), Block.image_input("image")],
              outputs: [
                Block.text_output("output"),
-               Block.text_output("message_output")
+               Block.text_output("message_output"),
+               Block.text_output("queue")
              ],
              schema: Chat.schema(),
              groups: ["llms", "text"],

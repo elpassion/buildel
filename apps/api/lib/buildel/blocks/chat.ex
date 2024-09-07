@@ -23,7 +23,8 @@ defmodule Buildel.Blocks.Chat do
       inputs: [Block.text_input(), Block.image_input("image")],
       outputs: [
         Block.text_output("output"),
-        Block.text_output("message_output")
+        Block.text_output("message_output"),
+        Block.text_output("queue")
       ],
       ios: [Block.io("tool", "controller"), Block.io("chat", "worker")],
       dynamic_ios: nil,
@@ -457,12 +458,28 @@ defmodule Buildel.Blocks.Chat do
   def handle_cast({:finish_chat_message}, %{chat_memory: %ChatMemory{type: :off}} = state) do
     state = update_in(state.chat_memory, &ChatMemory.reset(&1))
     state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
+
+    state =
+      output(
+        state,
+        "queue",
+        {:text, Buildel.Blocks.Utils.InputQueue.count(state.input_queue) |> to_string()}
+      )
+
     {:noreply, state |> send_stream_stop()}
   end
 
   @impl true
   def handle_cast({:finish_chat_message}, state) do
     state = update_in(state.input_queue, &Buildel.Blocks.Utils.InputQueue.pop(&1))
+
+    state =
+      output(
+        state,
+        "queue",
+        {:text, Buildel.Blocks.Utils.InputQueue.count(state.input_queue) |> to_string()}
+      )
+
     {:noreply, state |> send_stream_stop()}
   end
 
