@@ -328,40 +328,48 @@ defmodule Buildel.Blocks.DocumentSearch do
   end
 
   defp do_parent(state, chunk_id) do
-    MemoryCollectionSearch.new(%{
-      vector_db: state.vector_db,
-      organization_collection_name: state.collection_name
-    })
-    |> MemoryCollectionSearch.parent(chunk_id)
-    |> then(&DocumentSearchJSON.show(&1))
-    |> Jason.encode!()
+    with parent when not is_nil(parent) <-
+           MemoryCollectionSearch.new(%{
+             vector_db: state.vector_db,
+             organization_collection_name: state.collection_name
+           })
+           |> MemoryCollectionSearch.parent(chunk_id) do
+      parent
+      |> then(&DocumentSearchJSON.show(&1))
+      |> Jason.encode!()
+    else
+      nil -> "Could not find parent chunk with id #{chunk_id}"
+    end
   end
 
   defp do_related(state, chunk_id) do
-    chunk = Buildel.VectorDB.get_by_id(state.vector_db, state.collection_name, chunk_id)
+    with chunk when not is_nil(chunk) <-
+           Buildel.VectorDB.get_by_id(state.vector_db, state.collection_name, chunk_id) do
+      params =
+        MemoryCollectionSearch.Params.from_map(%{
+          search_query: Map.get(chunk, "embedding"),
+          where: state.where,
+          limit: 2,
+          similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
+          extend_neighbors: false,
+          extend_parents: false,
+          token_limit: nil
+        })
 
-    params =
-      MemoryCollectionSearch.Params.from_map(%{
-        search_query: Map.get(chunk, "embedding"),
-        where: state.where,
-        limit: 2,
-        similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
-        extend_neighbors: false,
-        extend_parents: false,
-        token_limit: nil
-      })
+      {result, _total_tokens, _embeddings_tokens} =
+        MemoryCollectionSearch.new(%{
+          vector_db: state.vector_db,
+          organization_collection_name: state.collection_name
+        })
+        |> MemoryCollectionSearch.search(params)
 
-    {result, _total_tokens, _embeddings_tokens} =
-      MemoryCollectionSearch.new(%{
-        vector_db: state.vector_db,
-        organization_collection_name: state.collection_name
-      })
-      |> MemoryCollectionSearch.search(params)
-
-    result
-    |> Enum.at(1)
-    |> then(&DocumentSearchJSON.show(&1))
-    |> Jason.encode!()
+      result
+      |> Enum.at(1)
+      |> then(&DocumentSearchJSON.show(&1))
+      |> Jason.encode!()
+    else
+      _ -> "Could not find chunk with id #{chunk_id}"
+    end
   end
 
   @impl true

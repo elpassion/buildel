@@ -314,7 +314,7 @@ defmodule Buildel.VectorDB.EctoAdapter do
 
   def get_by_id(collection, chunk_id) do
     chunk =
-      Buildel.Repo.one!(
+      Buildel.Repo.one(
         from c in Chunk,
           where:
             c.collection_name == ^collection.name and
@@ -322,19 +322,23 @@ defmodule Buildel.VectorDB.EctoAdapter do
           order_by: fragment("metadata->>'index' ASC")
       )
 
-    embedding_column =
-      Map.keys(chunk)
-      |> Enum.filter(fn key -> !String.starts_with?(to_string(key), "embedding_reduced") end)
-      |> Enum.filter(fn key -> String.starts_with?(to_string(key), "embedding_") end)
-      |> Enum.filter(fn key -> chunk |> Map.get(key) |> is_struct(Pgvector) end)
-      |> List.first()
+    if chunk do
+      embedding_column =
+        Map.keys(chunk)
+        |> Enum.filter(fn key -> !String.starts_with?(to_string(key), "embedding_reduced") end)
+        |> Enum.filter(fn key -> String.starts_with?(to_string(key), "embedding_") end)
+        |> Enum.filter(fn key -> chunk |> Map.get(key) |> is_struct(Pgvector) end)
+        |> List.first()
 
-    %{
-      "document" => chunk.document,
-      "metadata" => chunk.metadata,
-      "chunk_id" => chunk.id,
-      "embedding" => chunk |> Map.get(embedding_column)
-    }
+      %{
+        "document" => chunk.document,
+        "metadata" => chunk.metadata,
+        "chunk_id" => chunk.id,
+        "embedding" => chunk |> Map.get(embedding_column)
+      }
+    else
+      nil
+    end
   end
 
   def get_all(collection, metadata, _params) do

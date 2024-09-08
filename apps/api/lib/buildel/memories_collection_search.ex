@@ -119,28 +119,29 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
         },
         chunk_id
       ) do
-    chunk = Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id)
+    with chunk when not is_nil(chunk) <-
+           Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id) do
+      parent_context =
+        Buildel.VectorDB.get_by_parent_id(
+          vector_db,
+          collection_name,
+          chunk["metadata"]["parent"]
+        )
+        |> Enum.map(fn chunk ->
+          %{
+            document: chunk["document"],
+            pages: chunk["metadata"]["pages"]
+          }
+        end)
 
-    parent_context =
-      Buildel.VectorDB.get_by_parent_id(
-        vector_db,
-        collection_name,
-        chunk["metadata"]["parent"]
-      )
-      |> Enum.map(fn chunk ->
-        %{
-          document: chunk["document"],
-          pages: chunk["metadata"]["pages"]
-        }
-      end)
+      combined_document = parent_context |> Enum.map_join(" ", & &1.document)
+      combined_pages = parent_context |> Enum.flat_map(& &1.pages) |> Enum.uniq()
 
-    combined_document = parent_context |> Enum.map_join(" ", & &1.document)
-    combined_pages = parent_context |> Enum.flat_map(& &1.pages) |> Enum.uniq()
-
-    chunk
-    |> Map.delete("embedding")
-    |> Map.put("document", combined_document)
-    |> Map.put("metadata", Map.put(chunk["metadata"], "pages", combined_pages))
+      chunk
+      |> Map.delete("embedding")
+      |> Map.put("document", combined_document)
+      |> Map.put("metadata", Map.put(chunk["metadata"], "pages", combined_pages))
+    end
   end
 
   defp extend_parents_query(

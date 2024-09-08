@@ -150,25 +150,28 @@ defmodule Buildel.MemoriesGraph do
           })
       })
 
-    chunk = Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id)
+    with chunk when not is_nil(chunk) <-
+           Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id) do
+      params =
+        MemoryCollectionSearch.Params.from_map(%{
+          search_query: Map.get(chunk, "embedding"),
+          limit: limit,
+          extend_neighbors: false,
+          extend_parents: false,
+          token_limit: nil
+        })
 
-    params =
-      MemoryCollectionSearch.Params.from_map(%{
-        search_query: Map.get(chunk, "embedding"),
-        limit: limit,
-        extend_neighbors: false,
-        extend_parents: false,
-        token_limit: nil
-      })
+      {result, _total_tokens, _embeddings_tokens} =
+        MemoryCollectionSearch.new(%{
+          vector_db: vector_db,
+          organization_collection_name: collection_name
+        })
+        |> MemoryCollectionSearch.search(params)
 
-    {result, _total_tokens, _embeddings_tokens} =
-      MemoryCollectionSearch.new(%{
-        vector_db: vector_db,
-        organization_collection_name: collection_name
-      })
-      |> MemoryCollectionSearch.search(params)
-
-    result |> Enum.drop(1)
+      result |> Enum.drop(1)
+    else
+      nil -> []
+    end
   end
 
   def generate_and_save_graph(
