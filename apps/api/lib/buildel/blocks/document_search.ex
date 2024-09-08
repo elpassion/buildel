@@ -327,6 +327,21 @@ defmodule Buildel.Blocks.DocumentSearch do
     |> Jason.encode!()
   end
 
+  defp do_get(state, chunk_id) do
+    with chunk when not is_nil(chunk_id) <-
+           MemoryCollectionSearch.new(%{
+             vector_db: state.vector_db,
+             organization_collection_name: state.collection_name
+           })
+           |> MemoryCollectionSearch.get(chunk_id) do
+      chunk
+      |> then(&DocumentSearchJSON.show(&1))
+      |> Jason.encode!()
+    else
+      nil -> "Could not find chunk with id #{chunk_id}"
+    end
+  end
+
   defp do_parent(state, chunk_id) do
     with parent when not is_nil(parent) <-
            MemoryCollectionSearch.new(%{
@@ -422,6 +437,29 @@ defmodule Buildel.Blocks.DocumentSearch do
       },
       %{
         function: %{
+          name: "get_source",
+          description: "Retrieve a source chunk by source_chunk_id",
+          parameters_schema: %{
+            type: "object",
+            properties: %{
+              source_chunk_id: %{
+                type: "string",
+                description: "source_chunk_id"
+              }
+            },
+            required: ["source_chunk_id"]
+          }
+        },
+        call_formatter: fn args ->
+          args = %{"config.args" => args, "config.block_name" => state.block.name}
+          build_call_formatter(state.call_formatter, args)
+        end,
+        response_formatter: fn _response ->
+          ""
+        end
+      },
+      %{
+        function: %{
           name: "parent",
           description: "Retrieve the parent context of a specified chunk",
           parameters_schema: %{
@@ -493,6 +531,14 @@ defmodule Buildel.Blocks.DocumentSearch do
     {response, state}
   end
 
+  @impl true
+  def handle_tool("tool", "get_source", {_name, :text, args, _metadata}, state) do
+    state |> send_stream_start("output")
+    response = do_get(state, args["source_chunk_id"])
+    state = output(state, "output", {:text, response})
+    {response, state}
+  end
+
   def handle_tool("tool", "parent", {_name, :text, args, _metadata}, state) do
     state = state |> send_stream_start("output")
     response = do_parent(state, args["chunk_id"])
@@ -535,9 +581,11 @@ defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
             "memory_id" => memory_id
           } = metadata
       }) do
+    from = metadata |> Map.get("from", nil)
+
     {:ok, chunk_temporary_uuid} =
       Buildel.MemoriesAccess.add_chunk(%{
-        chunk_id: chunk_id,
+        chunk_id: from || chunk_id,
         memory_id: memory_id
       })
 
@@ -550,7 +598,8 @@ defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
       chunk_id: chunk_id,
       chunk: document |> String.trim(),
       pages: metadata |> Map.get("pages", []),
-      keywords: metadata |> Map.get("keywords", [])
+      keywords: metadata |> Map.get("keywords", []),
+      source_chunk_id: from
     }
   end
 end

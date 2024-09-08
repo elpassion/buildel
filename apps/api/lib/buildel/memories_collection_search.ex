@@ -73,6 +73,10 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
     end
   end
 
+  def get(%__MODULE__{vector_db: vector_db, organization_collection_name: collection_name}, id) do
+    Buildel.VectorDB.get_by_id(vector_db, collection_name, id)
+  end
+
   def search(
         %__MODULE__{
           vector_db: vector_db,

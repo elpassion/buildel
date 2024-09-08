@@ -4,12 +4,16 @@ defmodule BuildelWeb.OrganizationToolChunkJSON do
   end
 
   def chunk(chunk) do
+    metadata =
+      chunk.metadata
+      |> Map.take([:parent, :next, :prev, :from, :file_name, :keywords, :pages])
+
+    metadata = metadata |> Map.put(:source, metadata.from) |> Map.delete(:from)
+
     %{
       id: chunk.id,
       text: chunk.value,
-      metadata:
-        chunk.metadata
-        |> Map.take([:parent, :next, :prev, :file_name, :keywords, :pages])
+      metadata: metadata
     }
   end
 end

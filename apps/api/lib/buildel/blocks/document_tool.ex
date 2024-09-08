@@ -442,6 +442,7 @@ defmodule Buildel.Blocks.DocumentTool do
                next: nil,
                prev: nil,
                parent: nil,
+               from: nil,
                pages: []
              },
              chunk |> Map.get(:metadata, %{})

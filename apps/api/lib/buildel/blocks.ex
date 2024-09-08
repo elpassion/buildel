@@ -42,7 +42,8 @@ defmodule Buildel.Blocks do
     ImageOutput,
     Knowledge,
     FileToElements,
-    ChunkSemantic
+    ChunkSemantic,
+    SplitBy
   }
 
   @names_to_blocks_map %{
@@ -83,7 +84,8 @@ defmodule Buildel.Blocks do
     "image_output" => ImageOutput,
     "knowledge" => Knowledge,
     "file_to_elements" => FileToElements,
-    "chunk_semantic" => ChunkSemantic
+    "chunk_semantic" => ChunkSemantic,
+    "split_by" => SplitBy
   }
 
   @blocks_to_names_map %{
@@ -124,7 +126,8 @@ defmodule Buildel.Blocks do
     ImageOutput => "image_output",
     Knowledge => "knowledge",
     FileToElements => "file_to_elements",
-    ChunkSemantic => "chunk_semantic"
+    ChunkSemantic => "chunk_semantic",
+    SplitBy => "split_by"
   }
 
   def list_types() do
