@@ -73,7 +73,7 @@ export const SafeInterfaceConfig = z
           webchat: {
             inputs: [] as IInterfaceConfigFormProperty[],
             outputs: [] as IInterfaceConfigFormProperty[],
-            description: 'Hello. How can I help you today?!',
+            description: 'Hello. How can I help you today?',
             suggested_messages: [] as string[],
             public: false,
           },
