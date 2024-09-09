@@ -171,102 +171,107 @@ ${JSON.stringify(files)}
   }, []);
 
   return (
-    <ChatWrapper className="max-w-[820px] h-[500px] !py-4 relative">
-      <ChatHeader className="mb-1">
-        <div className="flex gap-2 items-center">
-          <ChatHeading>{pipeline.name}</ChatHeading>
-          <ChatStatus connectionStatus={connectionStatus} />
-        </div>
+    <ChatWrapper className="h-full !py-4 relative">
+      <ChatHeader className="mb-4 lg:px-4 lg:py-2">
+        <ChatHeading>{pipeline.name}</ChatHeading>
+        <ChatStatus connectionStatus={connectionStatus} />
       </ChatHeader>
 
-      <ChatMessagesWrapper>
-        <ChatMessages messages={messages} />
+      <ChatMessagesWrapper className="mx-auto">
+        <ChatMessages messages={messages}>
+          <SuggestedMessages
+            className={cn('max-w-[820px] mx-auto', {
+              hidden:
+                !!messages.length ||
+                !pipeline.interface_config.webchat.suggested_messages.length,
+            })}
+          >
+            {pipeline.interface_config.webchat.suggested_messages.map(
+              (msg, index) => {
+                return (
+                  <SuggestedMessage
+                    disabled={disabled}
+                    key={index}
+                    onClick={onSubmit}
+                    content={msg}
+                  />
+                );
+              },
+            )}
+          </SuggestedMessages>
+
+          <IntroPanel
+            className={cn('max-w-[820px] mx-auto mt-10 lg:mt-20', {
+              hidden: !!messages.length,
+            })}
+          >
+            <p>{pipeline.interface_config.webchat.description}</p>
+          </IntroPanel>
+        </ChatMessages>
 
         <ChatGeneratingAnimation
           messages={messages}
           isGenerating={isGenerating}
         />
-
-        <SuggestedMessages
-          className={cn({
-            hidden:
-              !!messages.length ||
-              !pipeline.interface_config.webchat.suggested_messages.length,
-          })}
-        >
-          {pipeline.interface_config.webchat.suggested_messages.map(
-            (msg, index) => {
-              return (
-                <SuggestedMessage
-                  disabled={disabled}
-                  key={index}
-                  onClick={onSubmit}
-                  content={msg}
-                />
-              );
-            },
-          )}
-        </SuggestedMessages>
       </ChatMessagesWrapper>
 
-      <ChatInput
-        onSubmit={onSubmit}
-        disabled={connectionStatus !== 'running' || isUploading || disabled}
-        generating={isGenerating}
-        placeholder={placeholder}
-        attachments={
-          (!!fileInput || !!imageInput) &&
-          fileList.length > 0 && (
-            <div className="w-full flex gap-1 p-1 flex-wrap">
-              {fileList.map((file) => {
-                return (
-                  <div
-                    className={cn(
-                      'px-1 border border-input rounded-md flex items-center gap-1',
-                      {
-                        'text-foreground': file.status === 'done',
-                        'text-muted-foreground ': file.status !== 'done',
-                      },
-                    )}
-                    key={file.id}
-                  >
-                    {file.file_name}
-                    <button
-                      type="button"
-                      onClick={() => removeFileFromCorrectInput(file.id)}
+      <div className="px-3">
+        <ChatInput
+          className="max-w-[820px] mx-auto"
+          onSubmit={onSubmit}
+          disabled={connectionStatus !== 'running' || isUploading || disabled}
+          generating={isGenerating}
+          placeholder={placeholder}
+          attachments={
+            (!!fileInput || !!imageInput) &&
+            fileList.length > 0 && (
+              <div className="w-full flex gap-1 px-2 pt-2 pb-1 flex-wrap">
+                {fileList.map((file) => {
+                  return (
+                    <div
+                      className={cn(
+                        'px-1 border border-input rounded-md flex items-center gap-1 text-sm',
+                        {
+                          'text-foreground': file.status === 'done',
+                          'text-muted-foreground ': file.status !== 'done',
+                        },
+                      )}
+                      key={file.id}
                     >
-                      <Trash className="w-4 h-4" />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )
-        }
-        prefix={
-          (!!fileInput || !!imageInput) && (
-            <label className="pl-2 cursor-pointer">
-              <Upload className="w-4 h-4" />
-              <input
-                disabled={disabled}
-                ref={inputRef}
-                type="file"
-                className="hidden"
-                accept={supportedTypes.toString()}
-                onChange={(e) => {
-                  [...(e.target.files || [])].forEach((file) => {
-                    uploadFileToCorrectInput(file);
-                  });
-                }}
-              />
-            </label>
-          )
-        }
-      />
-
-      <IntroPanel className={cn({ hidden: !!messages.length })}>
-        <p>{pipeline.interface_config.webchat.description}</p>
-      </IntroPanel>
+                      {file.file_name}
+                      <button
+                        type="button"
+                        onClick={() => removeFileFromCorrectInput(file.id)}
+                      >
+                        <Trash className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )
+          }
+          prefix={
+            (!!fileInput || !!imageInput) && (
+              <label className="pl-4 cursor-pointer">
+                <Upload className="w-4 h-4" />
+                <input
+                  disabled={disabled}
+                  ref={inputRef}
+                  type="file"
+                  className="hidden"
+                  accept={supportedTypes.toString()}
+                  onChange={(e) => {
+                    [...(e.target.files || [])].forEach((file) => {
+                      uploadFileToCorrectInput(file);
+                    });
+                  }}
+                />
+              </label>
+            )
+          }
+        />
+      </div>
     </ChatWrapper>
   );
 };

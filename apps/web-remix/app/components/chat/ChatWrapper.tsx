@@ -13,10 +13,7 @@ export const ChatWrapper: React.FC<PropsWithChildren<ChatWrapperProps>> = ({
 }) => {
   return (
     <div
-      className={cn(
-        'w-full bg-muted rounded-lg py-2 px-3 border border-input flex flex-col gap-2',
-        className,
-      )}
+      className={cn('w-full rounded-lg py-2 flex flex-col gap-2', className)}
     >
       {children}
     </div>

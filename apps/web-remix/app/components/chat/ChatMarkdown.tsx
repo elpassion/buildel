@@ -289,7 +289,7 @@ function Pre({
   return (
     <pre
       className={cn(
-        'my-1 bg-primary text-primary-foreground break-words whitespace-pre-wrap',
+        'my-1 bg-primary text-primary-foreground break-words whitespace-pre-wrap p-2',
         className,
       )}
       {...rest}

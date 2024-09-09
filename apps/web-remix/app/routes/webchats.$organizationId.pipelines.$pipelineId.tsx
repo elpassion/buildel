@@ -48,7 +48,7 @@ export default function WebsiteChat() {
     useLoaderData<typeof loader>();
 
   return (
-    <div className="flex justify-center items-center h-screen w-full">
+    <div className="flex justify-center items-center h-screen w-full bg-secondary">
       <Webchat
         organizationId={organizationId}
         pipelineId={pipelineId}

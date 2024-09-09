@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo, useRef } from 'react';
+import { UserRound } from 'lucide-react';
 import { ClientOnly } from 'remix-utils/client-only';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
@@ -8,7 +9,7 @@ import { ItemList } from '~/components/list/ItemList';
 import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
 
-import type { ChatSize, IMessage, MessageRole } from './chat.types';
+import type { ChatSize, IMessage } from './chat.types';
 
 interface ChatMessagesProps {
   messages: IMessage[];
@@ -16,7 +17,11 @@ interface ChatMessagesProps {
   size?: ChatSize;
 }
 
-export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
+export function ChatMessages({
+  messages,
+  initialMessages,
+  children,
+}: PropsWithChildren<ChatMessagesProps>) {
   const reversed = useMemo(() => {
     if (!messages.length) return initialMessages ?? [];
     return messages.map((_, idx) => messages[messages.length - 1 - idx]);
@@ -25,36 +30,38 @@ export function ChatMessages({ messages, initialMessages }: ChatMessagesProps) {
   return (
     <ItemList
       className={cn(
-        'flex flex-col-reverse gap-2 min-w-full w-full h-[97%] overflow-y-auto pr-1 prose',
+        'flex flex-col-reverse gap-2 min-w-full w-full h-fit max-h-[97%] pr-1 prose overflow-y-auto',
       )}
-      itemClassName="w-full"
+      itemClassName="w-full pl-3 pr-1"
       items={reversed}
       renderItem={(msg) => {
         const { message, links } = addReferenceToLinks(msg.message);
         return (
           <>
-            <ChatMessage role={msg.role}>
+            <ChatMessage message={msg}>
               <ChatMarkdown>{message}</ChatMarkdown>
 
               <EmbedLinksList links={links} />
             </ChatMessage>
 
-            <ClientOnly fallback={null}>
-              {() => <MessageTime message={msg} />}
-            </ClientOnly>
+            <div className="pl-12 max-w-[820px] mx-auto">
+              <ClientOnly fallback={null}>
+                {() => <MessageTime message={msg} />}
+              </ClientOnly>
+            </div>
           </>
         );
       }}
-    />
+    >
+      {children}
+    </ItemList>
   );
 }
 
 function MessageTime({ message }: { message: IMessage }) {
   return (
     <span
-      className={cn('block w-fit text-[10px] text-muted-foreground mt-[2px]', {
-        'ml-auto mr-1': message.role === 'user',
-      })}
+      className={cn('block w-fit text-[10px] text-muted-foreground mt-[1px]')}
     >
       {dayjs(message.created_at).format('HH:mm')}
     </span>
@@ -62,21 +69,34 @@ function MessageTime({ message }: { message: IMessage }) {
 }
 
 interface ChatMessageProps {
-  role: MessageRole;
+  message: IMessage;
 }
 
-function ChatMessage({ role, children }: PropsWithChildren<ChatMessageProps>) {
+function ChatMessage({
+  message,
+  children,
+}: PropsWithChildren<ChatMessageProps>) {
   return (
     <article
       className={cn(
-        'bg-white w-full max-w-[60%] min-h-[30px] rounded-t-xl border border-input px-2 py-1.5 prose ',
-        {
-          'rounded-br-xl': role === 'ai',
-          'rounded-bl-xl ml-auto mr-0': role !== 'ai',
-        },
+        'w-full max-w-[820px] mx-auto prose text-foreground flex gap-4',
       )}
     >
-      {children}
+      <div className="w-8 flex justify-center shrink-0">
+        {message.role === 'ai' ? (
+          <span className="text-2xl">✨</span>
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-blue-500/60 text-white flex justify-center items-center">
+            <UserRound className="w-4 h-4" />
+          </div>
+        )}
+      </div>
+      <div>
+        <h4 className="mb-0 mt-1">
+          {message.role === 'ai' ? message.blockName : 'You'}
+        </h4>
+        {children}
+      </div>
     </article>
   );
 }

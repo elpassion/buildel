@@ -65,6 +65,7 @@
     "cookie": "^0.5.0",
     "cross-env": "^7.0.3",
     "dayjs": "^1.11.10",
+    "embla-carousel-react": "^8.2.1",
     "etag": "^1.8.1",
     "fastify": "^4.28.1",
     "fastify-metrics": "^11.0.0",

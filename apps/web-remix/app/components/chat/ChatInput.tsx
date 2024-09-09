@@ -4,6 +4,8 @@ import { useBoolean, useIsomorphicLayoutEffect } from 'usehooks-ts';
 
 import { cn } from '~/utils/cn';
 
+export type ChatInputSize = 'sm' | 'default';
+
 interface ChatInputProps {
   onSubmit: (message: string) => void;
   generating?: boolean;
@@ -11,6 +13,8 @@ interface ChatInputProps {
   prefix?: React.ReactNode;
   attachments?: React.ReactNode;
   placeholder?: string;
+  size?: ChatInputSize;
+  className?: string;
 }
 
 export function ChatInput({
@@ -20,6 +24,8 @@ export function ChatInput({
   prefix,
   attachments,
   placeholder = 'Ask a question...',
+  size = 'default',
+  className,
 }: ChatInputProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -64,13 +70,18 @@ export function ChatInput({
     }
   };
 
+  const hasNewLine = value.includes('\n');
+
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl border border-input bg-white flex items-center max-h-[112px] min-h-fit h-auto shrink-0 w-full flex-col',
+        'relative overflow-hidden border border-input bg-white flex items-center max-h-[112px] min-h-fit h-auto shrink-0 w-full flex-col',
         {
           'outline-none ring-2 ring-ring ring-offset-2': isFocused,
+          'rounded-2xl': size === 'sm' || hasNewLine || !!attachments,
+          'rounded-full': size === 'default' && !hasNewLine && !attachments,
         },
+        className,
       )}
     >
       {attachments}
@@ -87,7 +98,13 @@ export function ChatInput({
           <textarea
             ref={textareaRef}
             disabled={disabled}
-            className="bg-transparent !border-0 !ring-0 w-full text-sm text-foreground py-1.5 pl-2 pr-8 placeholder:text-muted-foreground !outline-0 focus:!border-none resize-none max-h-[112px]"
+            className={cn(
+              'bg-transparent !border-0 !ring-0 w-full text-foreground pr-8 placeholder:text-muted-foreground !outline-0 focus:!border-none resize-none max-h-[112px]',
+              {
+                'text-sm py-1.5 pl-2': size === 'sm',
+                'text-base py-3 pl-4': size === 'default',
+              },
+            )}
             placeholder={placeholder}
             rows={1}
             value={value}
@@ -99,14 +116,29 @@ export function ChatInput({
 
           <button
             disabled={isDisabled}
-            className="absolute bottom-[4.5px] right-1.5 text-white w-6 h-6 rounded-full bg-primary hover:bg-primary/90 flex justify-center items-center disabled:opacity-30 disabled:pointer-events-none"
+            className={cn(
+              'absolute text-white  rounded-full bg-primary hover:bg-primary/90 flex justify-center items-center disabled:opacity-30 disabled:pointer-events-none',
+              {
+                'bottom-[4.5px] right-1.5 w-6 h-6': size === 'sm',
+                'bottom-2 right-2 w-8 h-8': size === 'default',
+              },
+            )}
           >
             {generating ? (
               <Loader
-                className={cn('w-3 h-3', { 'animate-spin': generating })}
+                className={cn('w-4 h-4', {
+                  'animate-spin': generating,
+                  'w-4 h-4': size === 'default',
+                  'w-3 h-3': size === 'sm',
+                })}
               />
             ) : (
-              <Send className={cn('w-3 h-3')} />
+              <Send
+                className={cn('w-4 h-4', {
+                  'w-4 h-4': size === 'default',
+                  'w-3 h-3': size === 'sm',
+                })}
+              />
             )}
           </button>
         </form>

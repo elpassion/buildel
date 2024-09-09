@@ -4,6 +4,11 @@ import type { BuildelRunStatus } from '@buildel/buildel';
 import { X } from 'lucide-react';
 
 import type { IMessage } from '~/components/chat/chat.types';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from '~/components/ui/carousel';
 import { cn } from '~/utils/cn';
 
 interface ChatCloseButtonProps {
@@ -30,7 +35,7 @@ export const ChatHeader: React.FC<PropsWithChildren<ChatHeaderProps>> = ({
 }) => {
   return (
     <header
-      className={cn('flex justify-between gap-2 items-center', className)}
+      className={cn('flex justify-between gap-2 items-center px-3', className)}
     >
       {children}
     </header>
@@ -47,7 +52,7 @@ export const ChatMessagesWrapper: React.FC<
   return (
     <div
       className={cn(
-        'w-full border border-input rounded-lg px-2 py-3 grow overflow-hidden relative',
+        'w-full rounded-lg py-3 grow overflow-hidden relative',
         className,
       )}
     >
@@ -81,7 +86,7 @@ export const ChatGeneratingAnimation = ({
 
   if (!isGenerating) return null;
   return (
-    <div className="flex gap-0.5 items-center">
+    <div className="flex gap-0.5 items-center pl-[52px] max-w-[820px] mx-auto">
       <span className="text-[10px] text-muted-foreground mr-1">
         {renderMessage()}
       </span>
@@ -114,10 +119,7 @@ export const ChatStatus = ({
   return (
     <div
       title={mappedStatusToText}
-      className={cn(
-        'py-0.5 px-1 bg-white rounded flex gap-1 items-center',
-        className,
-      )}
+      className={cn('py-0.5 px-1 rounded flex gap-1 items-center', className)}
     >
       <div
         className={cn('w-[6px] h-[6px] rounded-full ', {
@@ -145,7 +147,7 @@ export const IntroPanel = ({
   return (
     <article
       className={cn(
-        'p-4 bg-neutral-white rounded-xl border border-input text-center text-foreground text-sm absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2',
+        'w-full max-w-[400px] text-center text-foreground text-2xl',
         className,
       )}
     >
@@ -161,13 +163,12 @@ export const SuggestedMessages = ({
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
-      className={cn(
-        'absolute bottom-2 left-2 right-2 flex gap-2 flex-wrap',
-        className,
-      )}
+      className={cn('flex gap-2 grow w-full pl-3 h-[160px]', className)}
       {...rest}
     >
-      {children}
+      <Carousel className="w-full h-full">
+        <CarouselContent>{children}</CarouselContent>
+      </Carousel>
     </div>
   );
 };
@@ -190,22 +191,24 @@ export const SuggestedMessage = ({
   ...rest
 }: SuggestedMessageProps) => {
   return (
-    <button
-      disabled={disabled}
-      onClick={(e) => onClick(content, e)}
-      className={cn(
-        'p-2 border border-input rounded-lg inline-flex justify-center items-center text-center text-sm w-[calc(33%_-_4px)] transition',
-        {
-          'cursor-pointer hover:bg-neutral-100': !disabled,
-          'opacity-70': disabled,
-        },
-        className,
-      )}
-      {...rest}
-    >
-      <div className="line-clamp-2 w-full" title={content}>
-        {content}
-      </div>
-    </button>
+    <CarouselItem className="min-w-[110px] basis-[40%] md:basis-[35%] lg:basis-[29%]">
+      <button
+        disabled={disabled}
+        onClick={(e) => onClick(content, e)}
+        className={cn(
+          'p-2 border border-input rounded-lg inline-flex justify-center items-center text-center text-sm shrink-0 h-[160px] transition w-full',
+          {
+            'cursor-pointer hover:bg-neutral-100': !disabled,
+            'opacity-70': disabled,
+          },
+          className,
+        )}
+        {...rest}
+      >
+        <div className="line-clamp-3 w-full" title={content}>
+          {content}
+        </div>
+      </button>
+    </CarouselItem>
   );
 };
