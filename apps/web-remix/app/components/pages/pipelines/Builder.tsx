@@ -432,11 +432,11 @@ function StateRefresher({ setFlowData, pipeline }: StateRefresherProps) {
   const { layout } = useLayoutNodes({ setFlowData, fitView });
 
   useEffect(() => {
-    if (location.state?.reset) {
+    if (location.state?.reset || searchParams.get('reset') === 'true') {
       const nodes = getNodes(pipeline.config);
       const edges = getEdges(pipeline.config);
 
-      if (location.state.layoutNodes) {
+      if (location.state?.layoutNodes) {
         layout({ nodes, edges }, 'LR');
       } else {
         setFlowData({
@@ -445,6 +445,7 @@ function StateRefresher({ setFlowData, pipeline }: StateRefresherProps) {
         });
       }
 
+      searchParams.delete('reset');
       navigate(
         buildUrlWithParams('.', Object.fromEntries(searchParams.entries())),
         { state: null },

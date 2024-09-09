@@ -3,6 +3,7 @@ import type { MetaFunction } from '@remix-run/node';
 import {
   useFetcher,
   useLoaderData,
+  useMatch,
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
@@ -23,7 +24,9 @@ import {
   toPipelineConfig,
 } from '~/components/pages/pipelines/PipelineFlow.utils';
 import {
+  DialogDrawer,
   DialogDrawerBody,
+  DialogDrawerContent,
   DialogDrawerDescription,
   DialogDrawerHeader,
   DialogDrawerTitle,
@@ -42,11 +45,17 @@ export function EditBlockPage() {
   const navigate = useNavigate();
   const updateFetcher = useFetcher<IPipeline>();
   const [searchParams] = useSearchParams();
+  const match = useMatch(
+    '/:organizationId/pipelines/:pipelineId/build/blocks/:blockName',
+  );
+  const isSidebarOpen = !!match;
 
   const nodes = getNodes(pipeline.config);
   const edges = getEdges(pipeline.config);
 
-  const closeSidebar = () => {
+  const closeSidebar = (value?: boolean) => {
+    if (value) return;
+
     navigate(
       routes.pipelineBuild(
         organizationId,
@@ -94,37 +103,39 @@ export function EditBlockPage() {
   }, [updateFetcher.data]);
 
   return (
-    <>
-      <DialogDrawerHeader>
-        <DialogDrawerTitle>{block.name}</DialogDrawerTitle>
-        <DialogDrawerDescription>
-          {block.block_type?.description}
-        </DialogDrawerDescription>
-      </DialogDrawerHeader>
+    <DialogDrawer open={isSidebarOpen} onOpenChange={closeSidebar}>
+      <DialogDrawerContent className="md:max-w-[700px] md:w-[600px] lg:w-[700px]">
+        <DialogDrawerHeader>
+          <DialogDrawerTitle>{block.name}</DialogDrawerTitle>
+          <DialogDrawerDescription>
+            {block.block_type?.description}
+          </DialogDrawerDescription>
+        </DialogDrawerHeader>
 
-      <DialogDrawerBody>
-        <EditBlockForm
-          onSubmit={handleSubmit}
-          blockConfig={block}
-          organizationId={pipeline.organization_id}
-          pipelineId={pipeline.id}
-          nodesNames={nodes.map((node) => node.data.name)}
-          connections={pipeline.config.connections}
-        >
-          <BlockInputList
-            connections={[
-              ...pipeline.config.connections.filter(
-                (connection) => connection.to.block_name === block.name,
-              ),
-              ...reverseToolConnections(
-                pipeline.config.connections,
-                block.name,
-              ),
-            ]}
-          />
-        </EditBlockForm>
-      </DialogDrawerBody>
-    </>
+        <DialogDrawerBody>
+          <EditBlockForm
+            onSubmit={handleSubmit}
+            blockConfig={block}
+            organizationId={pipeline.organization_id}
+            pipelineId={pipeline.id}
+            nodesNames={nodes.map((node) => node.data.name)}
+            connections={pipeline.config.connections}
+          >
+            <BlockInputList
+              connections={[
+                ...pipeline.config.connections.filter(
+                  (connection) => connection.to.block_name === block.name,
+                ),
+                ...reverseToolConnections(
+                  pipeline.config.connections,
+                  block.name,
+                ),
+              ]}
+            />
+          </EditBlockForm>
+        </DialogDrawerBody>
+      </DialogDrawerContent>
+    </DialogDrawer>
   );
 }
 

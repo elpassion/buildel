@@ -36,7 +36,9 @@ export async function loader(args: LoaderFunctionArgs) {
 
     if (!currentBlock) {
       return redirect(
-        routes.pipelineBuild(params.organizationId, params.pipelineId),
+        routes.pipelineBuild(params.organizationId, params.pipelineId, {
+          reset: true,
+        }),
       );
     }
 

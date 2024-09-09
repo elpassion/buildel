@@ -1,13 +1,6 @@
 import React, { useCallback } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import {
-  Outlet,
-  useFetcher,
-  useLoaderData,
-  useMatch,
-  useNavigate,
-  useSearchParams,
-} from '@remix-run/react';
+import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 import isEqual from 'lodash.isequal';
 import { useBoolean } from 'usehooks-ts';
 
@@ -16,12 +9,7 @@ import { BuilderCommentNode } from '~/components/pages/pipelines/Nodes/CommentNo
 import { ReadonlyCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/ReadonlyCommentNode';
 import { AliasCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/AliasCustomNode';
 import { BuilderCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/BuilderCustomNode';
-import {
-  DialogDrawer,
-  DialogDrawerContent,
-} from '~/components/ui/dialog-drawer';
 import { metaWithDefaults } from '~/utils/metadata';
-import { routes } from '~/utils/routes.utils';
 
 import { Builder } from '../Builder';
 import { CustomEdge } from '../Edges/CustomEdges/CustomEdge';
@@ -33,7 +21,6 @@ import type { loader } from './loader.server';
 
 export function PipelineBuilder() {
   const updateFetcher = useFetcher<IPipeline>();
-  const [searchParams] = useSearchParams();
   const {
     pipeline,
     pipelineId,
@@ -43,12 +30,6 @@ export function PipelineBuilder() {
     organization,
     elPipeline,
   } = useLoaderData<typeof loader>();
-
-  const navigate = useNavigate();
-  const match = useMatch(
-    '/:organizationId/pipelines/:pipelineId/build/blocks/:blockName',
-  );
-  const isSidebarOpen = !!match;
 
   const handleUpdatePipeline = useCallback(
     (config: IPipelineConfig) => {
@@ -66,17 +47,6 @@ export function PipelineBuilder() {
     toggle: toggleFloatingChat,
     setFalse: closeFloatingChat,
   } = useBoolean(false);
-
-  const handleCloseSidebar = (value: boolean) => {
-    if (value) return;
-    navigate(
-      routes.pipelineBuild(
-        organizationId,
-        pipelineId,
-        Object.fromEntries(searchParams.entries()),
-      ),
-    );
-  };
 
   const isDisabled = aliasId !== 'latest';
 
@@ -131,11 +101,7 @@ export function PipelineBuilder() {
         )}
       </Builder>
 
-      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
-        <DialogDrawerContent className="md:max-w-[700px] md:w-[600px] lg:w-[700px]">
-          <Outlet />
-        </DialogDrawerContent>
-      </DialogDrawer>
+      <Outlet />
     </>
   );
 }
