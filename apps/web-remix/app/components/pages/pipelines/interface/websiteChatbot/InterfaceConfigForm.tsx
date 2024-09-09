@@ -141,7 +141,7 @@ function SuggestedMessages({ items, onAdd, onRemove }: SuggestedMessageProps) {
 
       <div className="flex flex-col gap-2">
         {items.map((message, index) => (
-          <div key={index} className="flex gap-1 items-center w-full">
+          <div key={message.key} className="flex gap-1 items-center w-full">
             <Field name={`webchat.suggested_messages.${index}`}>
               <TextInputField
                 placeholder="e.g. What are the best action movies?"
