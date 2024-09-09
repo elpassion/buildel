@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Trash, Upload } from 'lucide-react';
 
-import { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
+import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
 import {
   ChatGeneratingAnimation,
   ChatHeader,
@@ -78,10 +78,9 @@ export const Webchat = ({
       pipeline.interface_config.webchat.inputs.filter(
         (input) => input.type === 'text_input',
       )[0]?.name ?? '',
-    output:
-      pipeline.interface_config.webchat.outputs.filter(
-        (output) => output.type === 'text_output',
-      )[0]?.name ?? '',
+    outputs: pipeline.interface_config.webchat.outputs.filter(
+      (output) => output.type === 'text_output',
+    ),
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
     useAuth: !(pipeline.interface_config.webchat.public ?? false),

@@ -6,9 +6,11 @@ import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
 
 import type { IMessage, MessageRole } from './chat.types';
 
+type IOType = { name: string; type: string };
+
 interface UseChatProps {
   input: string;
-  output: string;
+  outputs: IOType[];
   organizationId: number;
   pipelineId: number;
   onBlockOutput?: (
@@ -23,7 +25,7 @@ interface UseChatProps {
 
 export const useChat = ({
   input,
-  output,
+  outputs,
   organizationId,
   pipelineId,
   onBlockOutput: onBlockOutputProps,
@@ -32,24 +34,37 @@ export const useChat = ({
   onBlockStatusChange,
 }: UseChatProps) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [outputsGenerating, setOutputsGenerating] = useState(
+    outputs.reduce(
+      (acc, output) => {
+        acc[output.name] = false;
+        return acc;
+      },
+      {} as Record<string, boolean>,
+    ),
+  );
+
   const useAuthWithDefault = useAuth ?? true;
 
   const onBlockOutput = (
-    blockId: string,
-    _outputName: string,
+    blockName: string,
+    outputName: string,
     payload: unknown,
   ) => {
-    onBlockOutputProps?.(blockId, _outputName, payload);
-    // todo: just text_output for now
-    if (!blockId.includes(output)) return;
+    onBlockOutputProps?.(blockName, outputName, payload);
+    if (!Object.keys(outputsGenerating).includes(blockName)) return;
 
     setMessages((prev) => {
       const tmpPrev = cloneDeep(prev);
-      const lastMessage = tmpPrev[tmpPrev.length - 1];
+      const lastBlockMessageIdx = tmpPrev.findIndex(
+        (msg) =>
+          msg.blockName === blockName &&
+          msg.state === 'generating' &&
+          msg.role === 'ai',
+      );
 
-      if (lastMessage && lastMessage.role === 'ai') {
-        tmpPrev[tmpPrev.length - 1].message += (
+      if (lastBlockMessageIdx >= 0) {
+        tmpPrev[lastBlockMessageIdx].message += (
           payload as { message: string }
         ).message;
 
@@ -61,33 +76,60 @@ export const useChat = ({
         {
           id: uuidv4(),
           role: 'ai',
+          blockName: blockName,
+          outputName: outputName,
+          blockId: getBlockId(blockName, outputName),
           message: (payload as { message: string }).message,
           created_at: new Date(),
+          state: 'generating',
         },
       ];
     });
   };
 
-  const onStatusChange = (blockId: string, isWorking: boolean) => {
-    onBlockStatusChange?.(blockId, isWorking);
-    if (blockId.includes(input) && isWorking) {
-      setIsGenerating(true);
+  const onStatusChange = (blockName: string, isWorking: boolean) => {
+    onBlockStatusChange?.(blockName, isWorking);
+
+    if (Object.keys(outputsGenerating).includes(blockName)) {
+      setOutputsGenerating((prev) => {
+        return {
+          ...prev,
+          [blockName]: isWorking,
+        };
+      });
+
+      if (!isWorking) {
+        setMessages((prev) => {
+          const tmpPrev = cloneDeep(prev);
+          const lastBlockMessageIdx = tmpPrev.findIndex(
+            (msg) =>
+              msg.blockName === blockName &&
+              msg.state === 'generating' &&
+              msg.role === 'ai',
+          );
+
+          if (lastBlockMessageIdx >= 0) {
+            tmpPrev[lastBlockMessageIdx].state = 'done';
+          }
+
+          return tmpPrev;
+        });
+      }
     }
 
-    if (blockId.includes(output) && !isWorking) {
-      setIsGenerating(false);
+    if (Object.values(outputsGenerating).every((v) => !v)) {
       onFinish?.();
     }
   };
 
   const onBlockError = () => {
     // errorToast({ description: 'Ups! Something went wrong' });
-    setIsGenerating(false);
+    setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, false));
   };
 
   const onError = () => {
     // errorToast({ description: error });
-    setIsGenerating(false);
+    setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, false));
   };
 
   const { startRun, stopRun, push, status, id } = usePipelineRun(
@@ -107,26 +149,49 @@ export const useChat = ({
   const handlePush = (message: string) => {
     if (!message.trim()) return;
 
-    const newMessage = {
+    setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, true));
+
+    const newMessage: IMessage = {
       message,
       id: uuidv4(),
       role: 'user' as MessageRole,
       created_at: new Date(),
+      blockName: input,
+      outputName: 'input',
+      blockId: input + ':input',
+      state: 'done',
     };
 
     setMessages((prev) => [...prev, newMessage]);
 
-    push(input + ':input', message);
+    push(newMessage.blockId, message);
   };
 
   return {
     stopRun,
     messages,
     startRun,
-    isGenerating,
+    isGenerating: Object.values(outputsGenerating).some((v) => v),
     clearMessages,
     pushMessage: handlePush,
     connectionStatus: status,
     runId: id,
   };
 };
+
+function getBlockId(blockName: string, outputName: string) {
+  return `${blockName}:${outputName}`;
+}
+
+function setOutputsGeneratingValue(
+  outputs: Record<string, boolean>,
+  value: boolean,
+) {
+  return Object.entries(outputs).reduce(
+    (acc, [key]) => {
+      acc[key] = value;
+      return acc;
+    },
+    {} as Record<string, boolean>,
+  );
+}
