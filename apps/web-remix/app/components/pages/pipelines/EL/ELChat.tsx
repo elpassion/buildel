@@ -33,6 +33,8 @@ export const ELChat = ({
       onBlockOutput={onBlockOutput}
       pipelineId={el.id.toString()}
       pipeline={el}
+      size="sm"
+      className="!py-2"
       metadata={{
         pipeline_id: pipelineId,
       }}

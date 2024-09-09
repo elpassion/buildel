@@ -6,6 +6,7 @@ import invariant from 'tiny-invariant';
 
 import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
+import { chatSize } from '~/components/chat/chat.types';
 import { Webchat } from '~/components/chat/Webchat';
 import { loaderBuilder } from '~/utils.server';
 import { UnauthorizedError } from '~/utils/errors';
@@ -33,18 +34,22 @@ export async function loader(args: LoaderFunctionArgs) {
     }
 
     const alias = pipelineApi.getAliasFromUrl(request.url);
+    const searchParams = new URLSearchParams(request.url);
+
+    const size = chatSize.safeParse(searchParams.get('size'));
 
     return json({
       pipeline: pipeline.data,
       organizationId: params.organizationId as string,
       pipelineId: params.pipelineId as string,
+      chatSize: size.success ? size.data : 'default',
       alias,
     });
   })(args);
 }
 
 export default function WebsiteChat() {
-  const { pipelineId, organizationId, pipeline, alias } =
+  const { pipelineId, organizationId, pipeline, alias, chatSize } =
     useLoaderData<typeof loader>();
 
   return (
@@ -54,6 +59,7 @@ export default function WebsiteChat() {
         pipelineId={pipelineId}
         pipeline={pipeline}
         alias={alias}
+        size={chatSize}
       />
     </div>
   );

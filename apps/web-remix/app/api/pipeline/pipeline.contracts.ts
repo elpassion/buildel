@@ -42,7 +42,10 @@ export const InterfaceConfigForm = z.object({
 });
 
 export const InterfaceWebchatConfigForm = InterfaceConfigForm.extend({
-  description: z.string().optional().default('Ask me anything!'),
+  description: z
+    .string()
+    .optional()
+    .default('Hello. How can I help you today?'),
   suggested_messages: z.array(z.string()).optional().default([]),
 });
 
@@ -50,7 +53,7 @@ export const InterfaceConfig = z.object({
   webchat: InterfaceWebchatConfigForm.optional().default({
     inputs: [] as IInterfaceConfigFormProperty[],
     outputs: [] as IInterfaceConfigFormProperty[],
-    description: 'Ask me anything!',
+    description: 'Hello. How can I help you today?',
     suggested_messages: [] as string[],
     public: false,
   }),
@@ -70,7 +73,7 @@ export const SafeInterfaceConfig = z
           webchat: {
             inputs: [] as IInterfaceConfigFormProperty[],
             outputs: [] as IInterfaceConfigFormProperty[],
-            description: 'Ask me anything!',
+            description: 'Hello. How can I help you today?!',
             suggested_messages: [] as string[],
             public: false,
           },
@@ -85,7 +88,7 @@ export const SafeInterfaceConfig = z
     webchat: {
       inputs: [] as IInterfaceConfigFormProperty[],
       outputs: [] as IInterfaceConfigFormProperty[],
-      description: 'Ask me anything!',
+      description: 'Hello. How can I help you today?',
       suggested_messages: [] as string[],
       public: false,
     },

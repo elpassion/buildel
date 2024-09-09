@@ -95,7 +95,7 @@ export function PipelineBuilder() {
               toggle={toggleFloatingChat}
               close={closeFloatingChat}
               webchatConfig={pipeline.interface_config.webchat}
-              chatUrl={`${pageUrl}/webchats/${organizationId}/pipelines/${pipelineId}?alias=latest`}
+              chatUrl={`${pageUrl}/webchats/${organizationId}/pipelines/${pipelineId}?alias=latest&size=sm`}
             />
           </>
         )}

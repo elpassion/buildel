@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export type MessageRole = 'ai' | 'user';
 
 export interface IMessage {
@@ -11,4 +13,6 @@ export interface IMessage {
   state: 'generating' | 'done';
 }
 
-export type ChatSize = 'sm' | 'md';
+export const chatSize = z.enum(['sm', 'default']);
+
+export type ChatSize = z.TypeOf<typeof chatSize>;

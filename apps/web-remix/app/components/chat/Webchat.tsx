@@ -11,6 +11,7 @@ import {
   SuggestedMessage,
   SuggestedMessages,
 } from '~/components/chat/Chat.components';
+import type { ChatSize } from '~/components/chat/chat.types';
 import { ChatHeading } from '~/components/chat/ChatHeading';
 import { ChatInput } from '~/components/chat/ChatInput';
 import { ChatMessages } from '~/components/chat/ChatMessages';
@@ -52,6 +53,8 @@ interface WebchatProps {
   ) => void;
   onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
   disabled?: boolean;
+  size?: ChatSize;
+  className?: string;
 }
 
 export const Webchat = ({
@@ -64,6 +67,8 @@ export const Webchat = ({
   onBlockStatusChange,
   onBlockOutput,
   disabled,
+  size,
+  className,
 }: WebchatProps) => {
   const {
     isGenerating,
@@ -171,15 +176,16 @@ ${JSON.stringify(files)}
   }, []);
 
   return (
-    <ChatWrapper className="h-full !py-4 relative">
+    <ChatWrapper className={cn('h-full py-3 lg:py-4 relative', className)}>
       <ChatHeader className="mb-4 lg:px-4 lg:py-2">
         <ChatHeading>{pipeline.name}</ChatHeading>
         <ChatStatus connectionStatus={connectionStatus} />
       </ChatHeader>
 
       <ChatMessagesWrapper className="mx-auto">
-        <ChatMessages messages={messages}>
+        <ChatMessages messages={messages} size={size}>
           <SuggestedMessages
+            size={size}
             className={cn('max-w-[820px] mx-auto', {
               hidden:
                 !!messages.length ||
@@ -194,6 +200,7 @@ ${JSON.stringify(files)}
                     key={index}
                     onClick={onSubmit}
                     content={msg}
+                    size={size}
                   />
                 );
               },
@@ -201,8 +208,11 @@ ${JSON.stringify(files)}
           </SuggestedMessages>
 
           <IntroPanel
-            className={cn('max-w-[820px] mx-auto mt-10 lg:mt-20', {
+            size={size}
+            className={cn('max-w-[820px] mx-auto ', {
               hidden: !!messages.length,
+              'mt-10 lg:mt-20': size !== 'sm',
+              'mt-6 lg:mt-12': size === 'sm',
             })}
           >
             <p>{pipeline.interface_config.webchat.description}</p>
@@ -210,6 +220,7 @@ ${JSON.stringify(files)}
         </ChatMessages>
 
         <ChatGeneratingAnimation
+          size={size}
           messages={messages}
           isGenerating={isGenerating}
         />
@@ -217,6 +228,7 @@ ${JSON.stringify(files)}
 
       <div className="px-3">
         <ChatInput
+          size={size}
           className="max-w-[820px] mx-auto"
           onSubmit={onSubmit}
           disabled={connectionStatus !== 'running' || isUploading || disabled}
@@ -253,7 +265,12 @@ ${JSON.stringify(files)}
           }
           prefix={
             (!!fileInput || !!imageInput) && (
-              <label className="pl-4 cursor-pointer">
+              <label
+                className={cn('cursor-pointer', {
+                  'pl-2': size === 'sm',
+                  'pl-4': size !== 'sm',
+                })}
+              >
                 <Upload className="w-4 h-4" />
                 <input
                   disabled={disabled}

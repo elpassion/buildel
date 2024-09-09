@@ -2,9 +2,8 @@ import React, { useMemo, useRef, useState } from 'react';
 import { Loader, Send } from 'lucide-react';
 import { useBoolean, useIsomorphicLayoutEffect } from 'usehooks-ts';
 
+import type { ChatSize } from '~/components/chat/chat.types';
 import { cn } from '~/utils/cn';
-
-export type ChatInputSize = 'sm' | 'default';
 
 interface ChatInputProps {
   onSubmit: (message: string) => void;
@@ -13,7 +12,7 @@ interface ChatInputProps {
   prefix?: React.ReactNode;
   attachments?: React.ReactNode;
   placeholder?: string;
-  size?: ChatInputSize;
+  size?: ChatSize;
   className?: string;
 }
 

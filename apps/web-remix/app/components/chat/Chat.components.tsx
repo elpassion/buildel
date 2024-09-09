@@ -1,29 +1,14 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
 import type { BuildelRunStatus } from '@buildel/buildel';
-import { X } from 'lucide-react';
 
-import type { IMessage } from '~/components/chat/chat.types';
+import type { ChatSize, IMessage } from '~/components/chat/chat.types';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from '~/components/ui/carousel';
 import { cn } from '~/utils/cn';
-
-interface ChatCloseButtonProps {
-  onClick: () => void;
-}
-
-export const ChatCloseButton: React.FC<ChatCloseButtonProps> = ({
-  onClick,
-}) => {
-  return (
-    <button onClick={onClick} className="text-neutral-200 hover:text-white">
-      <X className="w-5 h-5" />
-    </button>
-  );
-};
 
 interface ChatHeaderProps {
   className?: string;
@@ -52,7 +37,7 @@ export const ChatMessagesWrapper: React.FC<
   return (
     <div
       className={cn(
-        'w-full rounded-lg py-3 grow overflow-hidden relative',
+        'w-full rounded-lg pt-2 grow overflow-hidden relative',
         className,
       )}
     >
@@ -64,11 +49,13 @@ export const ChatMessagesWrapper: React.FC<
 interface ChatGeneratingAnimationProps {
   messages: IMessage[];
   isGenerating: boolean;
+  size?: ChatSize;
 }
 
 export const ChatGeneratingAnimation = ({
   messages,
   isGenerating,
+  size,
 }: ChatGeneratingAnimationProps) => {
   const renderMessage = () => {
     if (!messages.length) return;
@@ -78,21 +65,29 @@ export const ChatGeneratingAnimation = ({
       lastMessage.role === 'user' ||
       (lastMessage.role === 'ai' && !lastMessage.message.length)
     ) {
-      return 'Thinking...';
+      return 'Thinking';
     }
 
-    return 'Generating...';
+    return 'Generating';
   };
 
   if (!isGenerating) return null;
   return (
-    <div className="flex gap-0.5 items-center pl-[52px] max-w-[820px] mx-auto">
-      <span className="text-[10px] text-muted-foreground mr-1">
-        {renderMessage()}
-      </span>
-      <div className="w-1 h-1 rounded-full bg-secondary-400 animate-bounce" />
-      <div className="w-1 h-1 rounded-full bg-secondary-800 animate-[bounce_1s_0.5s_ease-in-out_infinite]" />
-      <div className="w-1 h-1 rounded-full bg-secondary-600 animate-bounce" />
+    <div className="max-w-[820px] mx-auto ">
+      <div
+        className={cn('shrink-0', {
+          'w-8': size !== 'sm',
+          'w-7': size === 'sm',
+        })}
+      />
+      <div className={cn('flex gap-0.5 items-center pl-3 grow')}>
+        <span className="text-[10px] text-muted-foreground mr-1">
+          {renderMessage()}
+        </span>
+        <div className="w-1 h-1 rounded-full bg-secondary-400 animate-bounce" />
+        <div className="w-1 h-1 rounded-full bg-secondary-800 animate-[bounce_1s_0.5s_ease-in-out_infinite]" />
+        <div className="w-1 h-1 rounded-full bg-secondary-600 animate-bounce" />
+      </div>
     </div>
   );
 };
@@ -138,16 +133,19 @@ export const ChatStatus = ({
 
 interface IntroPanelProps {
   className?: string;
+  size?: ChatSize;
 }
 
 export const IntroPanel = ({
   children,
   className,
+  size,
 }: PropsWithChildren<IntroPanelProps>) => {
   return (
     <article
       className={cn(
-        'w-full max-w-[400px] text-center text-foreground text-2xl',
+        'w-full max-w-[400px] text-center text-foreground',
+        { 'text-xl': size === 'sm', 'text-2xl': size !== 'sm' },
         className,
       )}
     >
@@ -159,11 +157,16 @@ export const IntroPanel = ({
 export const SuggestedMessages = ({
   children,
   className,
+  size,
   ...rest
-}: React.HTMLAttributes<HTMLDivElement>) => {
+}: React.HTMLAttributes<HTMLDivElement> & { size?: ChatSize }) => {
   return (
     <div
-      className={cn('flex gap-2 grow w-full pl-3 h-[160px]', className)}
+      className={cn(
+        'flex gap-2 grow w-full pl-3 ',
+        { 'h-[120px]': size === 'sm', 'h-[160px]': size !== 'sm' },
+        className,
+      )}
       {...rest}
     >
       <Carousel className="w-full h-full">
@@ -181,6 +184,7 @@ interface SuggestedMessageProps
   onClick: (message: string, e: React.MouseEvent<HTMLButtonElement>) => void;
   content: string;
   disabled?: boolean;
+  size?: ChatSize;
 }
 
 export const SuggestedMessage = ({
@@ -188,6 +192,7 @@ export const SuggestedMessage = ({
   content,
   onClick,
   disabled,
+  size,
   ...rest
 }: SuggestedMessageProps) => {
   return (
@@ -196,8 +201,10 @@ export const SuggestedMessage = ({
         disabled={disabled}
         onClick={(e) => onClick(content, e)}
         className={cn(
-          'p-2 border border-input rounded-lg inline-flex justify-center items-center text-center text-sm shrink-0 h-[160px] transition w-full',
+          'p-2 border border-input rounded-lg inline-flex justify-center items-center text-center text-sm shrink-0 transition w-full',
           {
+            'h-[120px]': size === 'sm',
+            'h-[160px]': size !== 'sm',
             'cursor-pointer hover:bg-neutral-100': !disabled,
             'opacity-70': disabled,
           },

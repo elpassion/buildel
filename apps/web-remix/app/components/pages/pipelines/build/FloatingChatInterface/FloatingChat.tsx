@@ -164,10 +164,7 @@ function ChatWrapper({
       ref={wrapperRef}
       style={{ right: `${position.right}px`, bottom: `${position.bottom}px` }}
       className={cn(
-        'fixed pointer-events-auto w-fit h-fit min-w-[500px] min-h-[400px] bg-muted rounded-lg flex justify-center items-center',
-        {
-          'border border-input': !isConfigured,
-        },
+        'fixed pointer-events-auto w-fit h-fit min-w-[500px] min-h-[400px] bg-muted rounded-lg flex justify-center items-center border border-input overflow-hidden',
         className,
       )}
     >
@@ -181,7 +178,7 @@ function ChatWrapper({
       <IconButton
         icon={<X />}
         onClick={onClose}
-        className="absolute top-2 right-2"
+        className="absolute top-1 right-1"
         variant="outline"
         size="xxxs"
       />
@@ -210,5 +207,13 @@ function ChatErrorMessage() {
 }
 
 function ChatIframe({ chatUrl }: { chatUrl: string }) {
-  return <iframe src={chatUrl} width="600" height="500" title="chat" />;
+  return (
+    <iframe
+      src={chatUrl}
+      width="600"
+      height="500"
+      title="chat"
+      className="pt-1"
+    />
+  );
 }

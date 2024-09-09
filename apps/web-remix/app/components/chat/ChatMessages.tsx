@@ -21,6 +21,7 @@ export function ChatMessages({
   messages,
   initialMessages,
   children,
+  size,
 }: PropsWithChildren<ChatMessagesProps>) {
   const reversed = useMemo(() => {
     if (!messages.length) return initialMessages ?? [];
@@ -38,13 +39,18 @@ export function ChatMessages({
         const { message, links } = addReferenceToLinks(msg.message);
         return (
           <>
-            <ChatMessage message={msg}>
+            <ChatMessage message={msg} size={size}>
               <ChatMarkdown>{message}</ChatMarkdown>
 
               <EmbedLinksList links={links} />
             </ChatMessage>
 
-            <div className="pl-12 max-w-[820px] mx-auto">
+            <div
+              className={cn('max-w-[820px] mx-auto', {
+                'pl-12': size !== 'sm',
+                'pl-9': size === 'sm',
+              })}
+            >
               <ClientOnly fallback={null}>
                 {() => <MessageTime message={msg} />}
               </ClientOnly>
@@ -70,29 +76,50 @@ function MessageTime({ message }: { message: IMessage }) {
 
 interface ChatMessageProps {
   message: IMessage;
+  size?: ChatSize;
 }
 
 function ChatMessage({
   message,
+  size,
   children,
 }: PropsWithChildren<ChatMessageProps>) {
   return (
     <article
-      className={cn(
-        'w-full max-w-[820px] mx-auto prose text-foreground flex gap-4',
-      )}
+      className={cn('w-full max-w-[820px] mx-auto prose text-foreground flex', {
+        'gap-4': size !== 'sm',
+        'gap-2': size === 'sm',
+      })}
     >
-      <div className="w-8 flex justify-center shrink-0">
+      <div
+        className={cn('flex justify-center shrink-0', {
+          'w-8': size !== 'sm',
+          'w-7': size === 'sm',
+        })}
+      >
         {message.role === 'ai' ? (
           <span className="text-2xl">✨</span>
         ) : (
-          <div className="w-8 h-8 rounded-full bg-blue-500/60 text-white flex justify-center items-center">
+          <div
+            className={cn(
+              'w-full rounded-full bg-blue-500/60 text-white flex justify-center items-center',
+              {
+                'h-8': size !== 'sm',
+                'h-7': size === 'sm',
+              },
+            )}
+          >
             <UserRound className="w-4 h-4" />
           </div>
         )}
       </div>
       <div>
-        <h4 className="mb-0 mt-1">
+        <h4
+          className={cn('mb-0', {
+            'mt-1': size !== 'sm',
+            'mt-0.5': size === 'sm',
+          })}
+        >
           {message.role === 'ai' ? message.blockName : 'You'}
         </h4>
         {children}
