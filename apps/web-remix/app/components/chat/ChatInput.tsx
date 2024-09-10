@@ -257,7 +257,7 @@ function SendButton({
     >
       {generating ? (
         <Loader
-          className={cn('w-4 h-4', {
+          className={cn({
             'animate-spin': generating,
             'w-4 h-4': size === 'default',
             'w-3 h-3': size === 'sm',
@@ -265,7 +265,7 @@ function SendButton({
         />
       ) : (
         <Send
-          className={cn('w-4 h-4', {
+          className={cn({
             'w-4 h-4': size === 'default',
             'w-3 h-3': size === 'sm',
           })}
