@@ -217,35 +217,59 @@ export function ChatInput({
             />
           </div>
 
-          <button
+          <SendButton
             disabled={isDisabled}
-            className={cn(
-              'absolute text-white rounded-full bg-primary hover:bg-primary/90 flex justify-center items-center disabled:opacity-30 disabled:pointer-events-none',
-              {
-                'bottom-[6px] right-1.5 w-6 h-6': size === 'sm',
-                'bottom-2 right-2 w-8 h-8': size === 'default',
-              },
-            )}
-          >
-            {generating ? (
-              <Loader
-                className={cn('w-4 h-4', {
-                  'animate-spin': generating,
-                  'w-4 h-4': size === 'default',
-                  'w-3 h-3': size === 'sm',
-                })}
-              />
-            ) : (
-              <Send
-                className={cn('w-4 h-4', {
-                  'w-4 h-4': size === 'default',
-                  'w-3 h-3': size === 'sm',
-                })}
-              />
-            )}
-          </button>
+            generating={generating}
+            size={size}
+          />
         </form>
       </div>
     </div>
+  );
+}
+
+interface SendButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+  size?: ChatSize;
+  generating?: boolean;
+  disabled?: boolean;
+}
+
+function SendButton({
+  size,
+  generating,
+  disabled,
+  className,
+  ...rest
+}: SendButtonProps) {
+  return (
+    <button
+      disabled={disabled}
+      className={cn(
+        'absolute text-white rounded-full bg-primary hover:bg-primary/90 flex justify-center items-center disabled:opacity-30 disabled:pointer-events-none',
+        {
+          'bottom-[6px] right-1.5 w-6 h-6': size === 'sm',
+          'bottom-2 right-2 w-8 h-8': size === 'default',
+        },
+        className,
+      )}
+      {...rest}
+    >
+      {generating ? (
+        <Loader
+          className={cn('w-4 h-4', {
+            'animate-spin': generating,
+            'w-4 h-4': size === 'default',
+            'w-3 h-3': size === 'sm',
+          })}
+        />
+      ) : (
+        <Send
+          className={cn('w-4 h-4', {
+            'w-4 h-4': size === 'default',
+            'w-3 h-3': size === 'sm',
+          })}
+        />
+      )}
+    </button>
   );
 }

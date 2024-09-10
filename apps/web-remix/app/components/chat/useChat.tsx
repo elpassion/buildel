@@ -34,6 +34,7 @@ export const useChat = ({
   onBlockStatusChange,
 }: UseChatProps) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [outputsGenerating, setOutputsGenerating] = useState(
     outputs.reduce(
       (acc, output) => {
@@ -52,7 +53,7 @@ export const useChat = ({
     payload: unknown,
   ) => {
     onBlockOutputProps?.(blockName, outputName, payload);
-    console.log(blockName, outputName, payload);
+
     if (!Object.keys(outputsGenerating).includes(blockName)) return;
 
     setMessages((prev) => {
@@ -99,7 +100,9 @@ export const useChat = ({
         };
       });
 
-      if (!isWorking) {
+      if (isWorking) {
+        setIsGenerating(false);
+      } else {
         setMessages((prev) => {
           const tmpPrev = cloneDeep(prev);
           const lastBlockMessageIdx = tmpPrev.findIndex(
@@ -149,11 +152,8 @@ export const useChat = ({
 
   const handlePush = (message: string) => {
     if (!message.trim() || inputs.length <= 0) return;
+    const parsedMessage = retrieveMessagesFromText(message);
 
-    setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, true));
-
-    const parsedMessage = parseTextToObjects(message);
-    console.log(parsedMessage);
     const messages: IMessage[] = [];
 
     if (parsedMessage.length === 0) {
@@ -198,8 +198,10 @@ export const useChat = ({
       });
     }
 
+    setIsGenerating(true);
+
     setMessages((prev) => [...prev, ...messages]);
-    console.log(messages);
+
     messages.forEach((message) => {
       push(message.blockId, message.message);
     });
@@ -209,7 +211,8 @@ export const useChat = ({
     stopRun,
     messages,
     startRun,
-    isGenerating: Object.values(outputsGenerating).some((v) => v),
+    isGenerating:
+      isGenerating || Object.values(outputsGenerating).some((v) => v),
     clearMessages,
     pushMessage: handlePush,
     connectionStatus: status,
@@ -239,26 +242,40 @@ interface InputText {
   text: string;
 }
 
-const parseTextToObjects = (input: string): InputText[] => {
-  const regex = /(@\S+)\s+([^@]+)/g;
+function retrieveMessagesFromText(input: string): InputText[] {
+  const regex = /(@\S+)/g;
   const result: InputText[] = [];
-
   let lastIndex = 0;
+  let mentions: string[] = [];
 
   Array.from(input.matchAll(regex)).forEach((match) => {
     const mention = match[1];
-    const textPart = match[2].trim();
 
-    if (match.index! > lastIndex) {
-      const textBeforeMention = input.slice(lastIndex, match.index).trim();
-      if (textBeforeMention) {
-        result.push({ input: null, text: textBeforeMention });
-      }
+    if (mentions.length > 0) {
+      const textBetweenMentions = input.slice(lastIndex, match.index);
+      addTextToMentions(mentions, textBetweenMentions, result);
+      mentions = [];
     }
 
-    result.push({ input: mention.replace('@', ''), text: textPart });
+    mentions.push(mention);
     lastIndex = match.index! + match[0].length;
   });
 
+  const remainingText = input.slice(lastIndex);
+  addTextToMentions(mentions, remainingText, result);
+
   return result;
-};
+}
+
+function addTextToMentions(
+  mentions: string[],
+  text: string,
+  result: InputText[],
+) {
+  const cleanText = text.trim();
+  if (cleanText) {
+    mentions.forEach((mention) => {
+      result.push({ input: mention.replace('@', ''), text: cleanText });
+    });
+  }
+}
