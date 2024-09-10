@@ -138,7 +138,6 @@ export const Webchat = ({
 
   const onSubmit = useCallback(
     (value: string) => {
-      console.log('VALUE', value);
       const files = fileList
         .map((file) =>
           file.status === 'done'
