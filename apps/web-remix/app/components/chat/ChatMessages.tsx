@@ -216,9 +216,9 @@ function EmbedLink({ link, idx }: EmbedLinkProps) {
         href={link.toString()}
         target="_blank"
         rel="noreferrer"
-        className="gap-1 items-center flex no-underline p-0 group-hover:bg-secondary transition"
+        className="gap-1 items-center flex no-underline p-0 group-hover:bg-white/40 transition"
       >
-        <span className="block w-5 text-center bg-secondary px-1 py-0.5 text-muted-foreground break-keep min-w-fit">
+        <span className="block w-5 text-center bg-white/40 px-1 py-0.5 text-muted-foreground break-keep min-w-fit">
           {idx + 1}
         </span>
         <span className="text-blue-500 pr-2 py-0.5 group-hover:underline">
@@ -243,7 +243,7 @@ export function addReferenceToLinks(message: string) {
     }
 
     links.push(new URL(link));
-    const numberedLink = `${match} <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #f1f1f1; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">${linkIndex}</span>`;
+    const numberedLink = `${match} <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">${linkIndex}</span>`;
 
     linkIndex++;
     return numberedLink;
