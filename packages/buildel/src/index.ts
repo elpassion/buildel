@@ -7,6 +7,7 @@ import type {
   BuildelRunLogsConnectionStatus,
   BuildelRunLogsJoinArgs,
   BuildelRunJoinArgs,
+  BuildelSocketOptions,
 } from "./buildel.ts";
 
 export { BuildelSocket, BuildelRun, BuildelRunLogs };
@@ -18,4 +19,5 @@ export type {
   BuildelRunLogsJoinArgs,
   ConnectionState,
   BuildelRunJoinArgs,
+  BuildelSocketOptions,
 };

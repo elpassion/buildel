@@ -2,7 +2,7 @@ import { Channel, ConnectionState, Socket } from "phoenix";
 import { v4 } from "uuid";
 import { assert } from "./utils/assert.ts";
 
-interface BuildelSocketOptions {
+export interface BuildelSocketOptions {
   socketUrl?: string;
   authUrl?: string;
   headers?: Record<string, string>;
