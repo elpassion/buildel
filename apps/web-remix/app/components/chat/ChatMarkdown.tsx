@@ -252,7 +252,7 @@ function Li({
 }: React.ParamHTMLAttributes<HTMLLIElement>) {
   return (
     <li
-      className={cn('!m-0 marker:text-muted-foreground', className)}
+      className={cn('!m-0 marker:text-muted-foreground text-sm', className)}
       {...rest}
     >
       {children}
