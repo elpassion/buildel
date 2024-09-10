@@ -70,6 +70,9 @@ export const Webchat = ({
   size,
   className,
 }: WebchatProps) => {
+  const inputs = pipeline.interface_config.webchat.inputs.filter(
+    (input) => input.type === 'text_input',
+  );
   const {
     isGenerating,
     connectionStatus,
@@ -79,10 +82,7 @@ export const Webchat = ({
     messages,
     runId,
   } = useChat({
-    input:
-      pipeline.interface_config.webchat.inputs.filter(
-        (input) => input.type === 'text_input',
-      )[0]?.name ?? '',
+    inputs,
     outputs: pipeline.interface_config.webchat.outputs.filter(
       (output) => output.type === 'text_output',
     ),
@@ -138,6 +138,7 @@ export const Webchat = ({
 
   const onSubmit = useCallback(
     (value: string) => {
+      console.log('VALUE', value);
       const files = fileList
         .map((file) =>
           file.status === 'done'
@@ -234,6 +235,7 @@ ${JSON.stringify(files)}
           disabled={connectionStatus !== 'running' || isUploading || disabled}
           generating={isGenerating}
           placeholder={placeholder}
+          suggestions={inputs.map((input) => input.name)}
           attachments={
             (!!fileInput || !!imageInput) &&
             fileList.length > 0 && (

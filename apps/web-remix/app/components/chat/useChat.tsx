@@ -9,7 +9,7 @@ import type { IMessage, MessageRole } from './chat.types';
 type IOType = { name: string; type: string };
 
 interface UseChatProps {
-  input: string;
+  inputs: IOType[];
   outputs: IOType[];
   organizationId: number;
   pipelineId: number;
@@ -24,7 +24,7 @@ interface UseChatProps {
 }
 
 export const useChat = ({
-  input,
+  inputs,
   outputs,
   organizationId,
   pipelineId,
@@ -52,6 +52,7 @@ export const useChat = ({
     payload: unknown,
   ) => {
     onBlockOutputProps?.(blockName, outputName, payload);
+    console.log(blockName, outputName, payload);
     if (!Object.keys(outputsGenerating).includes(blockName)) return;
 
     setMessages((prev) => {
@@ -147,24 +148,61 @@ export const useChat = ({
   };
 
   const handlePush = (message: string) => {
-    if (!message.trim()) return;
+    if (!message.trim() || inputs.length <= 0) return;
 
     setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, true));
 
-    const newMessage: IMessage = {
-      message,
-      id: uuidv4(),
-      role: 'user' as MessageRole,
-      created_at: new Date(),
-      blockName: input,
-      outputName: 'input',
-      blockId: input + ':input',
-      state: 'done',
-    };
+    const parsedMessage = parseTextToObjects(message);
+    console.log(parsedMessage);
+    const messages: IMessage[] = [];
 
-    setMessages((prev) => [...prev, newMessage]);
+    if (parsedMessage.length === 0) {
+      messages.push({
+        message,
+        id: uuidv4(),
+        role: 'user' as MessageRole,
+        created_at: new Date(),
+        blockName: inputs[0].name,
+        outputName: 'input',
+        blockId: getBlockId(inputs[0].name, 'input'),
+        state: 'done',
+      });
+    } else {
+      parsedMessage.forEach((parsedMessage) => {
+        if (
+          parsedMessage.input &&
+          inputs.map((input) => input.name).includes(parsedMessage.input)
+        ) {
+          messages.push({
+            message: parsedMessage.text,
+            id: uuidv4(),
+            role: 'user' as MessageRole,
+            created_at: new Date(),
+            blockName: parsedMessage.input,
+            outputName: 'input',
+            blockId: getBlockId(parsedMessage.input, 'input'),
+            state: 'done',
+          });
+        } else {
+          messages.push({
+            message: parsedMessage.text,
+            id: uuidv4(),
+            role: 'user' as MessageRole,
+            created_at: new Date(),
+            blockName: inputs[0].name,
+            outputName: 'input',
+            blockId: getBlockId(inputs[0].name, 'input'),
+            state: 'done',
+          });
+        }
+      });
+    }
 
-    push(newMessage.blockId, message);
+    setMessages((prev) => [...prev, ...messages]);
+    console.log(messages);
+    messages.forEach((message) => {
+      push(message.blockId, message.message);
+    });
   };
 
   return {
@@ -195,3 +233,32 @@ function setOutputsGeneratingValue(
     {} as Record<string, boolean>,
   );
 }
+
+interface InputText {
+  input: string | null;
+  text: string;
+}
+
+const parseTextToObjects = (input: string): InputText[] => {
+  const regex = /(@\S+)\s+([^@]+)/g;
+  const result: InputText[] = [];
+
+  let lastIndex = 0;
+
+  Array.from(input.matchAll(regex)).forEach((match) => {
+    const mention = match[1];
+    const textPart = match[2].trim();
+
+    if (match.index! > lastIndex) {
+      const textBeforeMention = input.slice(lastIndex, match.index).trim();
+      if (textBeforeMention) {
+        result.push({ input: null, text: textBeforeMention });
+      }
+    }
+
+    result.push({ input: mention.replace('@', ''), text: textPart });
+    lastIndex = match.index! + match[0].length;
+  });
+
+  return result;
+};

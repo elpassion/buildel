@@ -71,3 +71,11 @@
   }
 
 }
+
+p.is-editor-empty:first-child::before {
+  @apply h-0 pointer-events-none float-left content-[attr(data-placeholder)] text-gray-500;
+}
+
+.tiptap .mention{
+  @apply text-blue-500;
+}
