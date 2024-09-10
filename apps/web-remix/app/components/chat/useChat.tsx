@@ -153,7 +153,7 @@ export const useChat = ({
   const handlePush = (message: string) => {
     if (!message.trim() || inputs.length <= 0) return;
     const parsedMessage = retrieveMessagesFromText(message);
-
+    console.log(message, parsedMessage);
     const messages: IMessage[] = [];
 
     if (parsedMessage.length === 0) {
@@ -248,34 +248,45 @@ function retrieveMessagesFromText(input: string): InputText[] {
   let lastIndex = 0;
   let mentions: string[] = [];
 
-  Array.from(input.matchAll(regex)).forEach((match) => {
+  Array.from(input.matchAll(regex)).forEach((match, index) => {
     const mention = match[1];
 
+    if (index === 0 && match.index! > 0) {
+      const textBeforeFirstMention = input.slice(0, match.index).trim();
+      if (textBeforeFirstMention) {
+        result.push(prepareInput(null, textBeforeFirstMention));
+      }
+    }
+
     if (mentions.length > 0) {
-      const textBetweenMentions = input.slice(lastIndex, match.index);
-      addTextToMentions(mentions, textBetweenMentions, result);
-      mentions = [];
+      const textAfterMentions = input.slice(lastIndex, match.index).trim();
+      if (textAfterMentions) {
+        mentions.forEach((m) => {
+          result.push(prepareInput(m, textAfterMentions));
+        });
+        mentions = [];
+      }
     }
 
     mentions.push(mention);
     lastIndex = match.index! + match[0].length;
   });
 
-  const remainingText = input.slice(lastIndex);
-  addTextToMentions(mentions, remainingText, result);
+  const remainingText = input.slice(lastIndex).trim();
+  if (mentions.length > 0 && remainingText) {
+    mentions.forEach((m) => {
+      result.push(prepareInput(m, remainingText));
+    });
+  } else if (remainingText) {
+    result.push(prepareInput(null, remainingText));
+  }
 
   return result;
 }
 
-function addTextToMentions(
-  mentions: string[],
-  text: string,
-  result: InputText[],
-) {
-  const cleanText = text.trim();
-  if (cleanText) {
-    mentions.forEach((mention) => {
-      result.push({ input: mention.replace('@', ''), text: cleanText });
-    });
-  }
+function prepareInput(input: string | null, text: string) {
+  return {
+    input: input ? input.replace('@', '') : null,
+    text,
+  };
 }

@@ -1,11 +1,14 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo, useRef } from 'react';
-import { UserRound } from 'lucide-react';
+import { Check, Copy, Download, UserRound } from 'lucide-react';
 import { ClientOnly } from 'remix-utils/client-only';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { useTruncatedList } from '~/components/chat/useTruncatedList';
+import { IconButton } from '~/components/iconButton';
 import { ItemList } from '~/components/list/ItemList';
+import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
+import { useDownloadFile } from '~/hooks/useDownloadFile';
 import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
 
@@ -38,24 +41,11 @@ export function ChatMessages({
       renderItem={(msg) => {
         const { message, links } = addReferenceToLinks(msg.message);
         return (
-          <>
-            <ChatMessage message={msg} size={size}>
-              <ChatMarkdown>{message}</ChatMarkdown>
+          <ChatMessage message={msg} size={size}>
+            <ChatMarkdown>{message}</ChatMarkdown>
 
-              <EmbedLinksList links={links} />
-            </ChatMessage>
-
-            <div
-              className={cn('max-w-[820px] mx-auto', {
-                'pl-12': size !== 'sm',
-                'pl-9': size === 'sm',
-              })}
-            >
-              <ClientOnly fallback={null}>
-                {() => <MessageTime message={msg} />}
-              </ClientOnly>
-            </div>
-          </>
+            <EmbedLinksList links={links} />
+          </ChatMessage>
         );
       }}
     >
@@ -114,17 +104,62 @@ function ChatMessage({
         )}
       </div>
       <div>
-        <h4
-          className={cn('mb-0', {
+        <header
+          className={cn({
             'mt-1': size !== 'sm',
             'mt-0.5': size === 'sm',
           })}
         >
-          {message.role === 'ai' ? message.blockName : 'You'}
-        </h4>
+          <h4 className={cn('my-0 line-clamp-1')} title={message.blockName}>
+            {message.role === 'ai' ? message.blockName : 'You'}
+          </h4>
+        </header>
+
         {children}
+
+        <ChatMessageFooter message={message} />
       </div>
     </article>
+  );
+}
+
+interface ChatMessageFooterProps {
+  message: IMessage;
+}
+
+function ChatMessageFooter({ message }: ChatMessageFooterProps) {
+  const { copy, isCopied } = useCopyToClipboard(message.message);
+  const download = useDownloadFile(message.message, `${message.blockName}.txt`);
+
+  return (
+    <footer className="flex items-center mt-1">
+      <ClientOnly fallback={null}>
+        {() => <MessageTime message={message} />}
+      </ClientOnly>
+
+      <IconButton
+        onlyIcon
+        size="xxxs"
+        type="button"
+        title="Copy"
+        onClick={copy}
+        icon={isCopied ? <Check /> : <Copy />}
+        className={cn('h-fit hover:text-foreground ml-1', {
+          'text-muted-foreground': !isCopied,
+          'text-green-500': isCopied,
+        })}
+      />
+
+      <IconButton
+        onlyIcon
+        size="xxxs"
+        type="button"
+        title="Copy"
+        onClick={download}
+        icon={<Download />}
+        className="text-muted-foreground hover:text-foreground"
+      />
+    </footer>
   );
 }
 
