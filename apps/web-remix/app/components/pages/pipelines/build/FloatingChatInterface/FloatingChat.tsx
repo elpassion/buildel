@@ -213,7 +213,7 @@ function ChatIframe({ chatUrl }: { chatUrl: string }) {
       width="600"
       height="500"
       title="chat"
-      className="pt-1"
+      className="py-1 px-1"
     />
   );
 }

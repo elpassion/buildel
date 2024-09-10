@@ -128,11 +128,13 @@ export const useChat = ({
 
   const onBlockError = () => {
     // errorToast({ description: 'Ups! Something went wrong' });
+    setIsGenerating(false);
     setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, false));
   };
 
   const onError = () => {
     // errorToast({ description: error });
+    setIsGenerating(false);
     setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, false));
   };
 
