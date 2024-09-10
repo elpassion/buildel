@@ -67,6 +67,7 @@ export function ChatInput({
   };
 
   const editor = useEditor({
+    immediatelyRender: false,
     editable: !disabled,
     extensions: [
       ...extensions,
