@@ -127,13 +127,11 @@ export const useChat = ({
   };
 
   const onBlockError = () => {
-    // errorToast({ description: 'Ups! Something went wrong' });
     setIsGenerating(false);
     setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, false));
   };
 
   const onError = () => {
-    // errorToast({ description: error });
     setIsGenerating(false);
     setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, false));
   };
@@ -154,54 +152,45 @@ export const useChat = ({
 
   const handlePush = (message: string) => {
     if (!message.trim() || inputs.length <= 0) return;
-    const parsedMessage = retrieveMessagesFromText(message);
     const messages: IMessage[] = [];
 
-    if (parsedMessage.length === 0) {
-      messages.push({
-        message,
-        id: uuidv4(),
-        role: 'user' as MessageRole,
-        created_at: new Date(),
-        blockName: inputs[0].name,
-        outputName: 'input',
-        blockId: getBlockId(inputs[0].name, 'input'),
-        state: 'done',
-      });
+    const { inputs: mentionInputs, text } = retrieveInputsFromMessage(message);
+
+    const baseMessage: IMessage = {
+      message: text,
+      id: uuidv4(),
+      role: 'user' as MessageRole,
+      created_at: new Date(),
+      blockName: inputs[0].name,
+      outputName: 'input',
+      blockId: getBlockId(inputs[0].name, 'input'),
+      state: 'done',
+    };
+
+    if (mentionInputs.length === 0) {
+      messages.push(baseMessage);
     } else {
-      parsedMessage.forEach((parsedMessage) => {
-        if (
-          parsedMessage.input &&
-          inputs.map((input) => input.name).includes(parsedMessage.input)
-        ) {
+      mentionInputs.forEach((mention) => {
+        if (inputs.map((input) => input.name).includes(mention)) {
           messages.push({
-            message: parsedMessage.text,
+            message: text,
             id: uuidv4(),
             role: 'user' as MessageRole,
             created_at: new Date(),
-            blockName: parsedMessage.input,
+            blockName: mention,
             outputName: 'input',
-            blockId: getBlockId(parsedMessage.input, 'input'),
+            blockId: getBlockId(mention, 'input'),
             state: 'done',
           });
         } else {
-          messages.push({
-            message: parsedMessage.text,
-            id: uuidv4(),
-            role: 'user' as MessageRole,
-            created_at: new Date(),
-            blockName: inputs[0].name,
-            outputName: 'input',
-            blockId: getBlockId(inputs[0].name, 'input'),
-            state: 'done',
-          });
+          messages.push(baseMessage);
         }
       });
     }
 
     setIsGenerating(true);
 
-    setMessages((prev) => [...prev, ...messages]);
+    setMessages((prev) => [...prev, baseMessage]);
 
     messages.forEach((message) => {
       push(message.blockId, message.message);
@@ -238,56 +227,15 @@ function setOutputsGeneratingValue(
   );
 }
 
-interface InputText {
-  input: string | null;
+function retrieveInputsFromMessage(message: string): {
+  inputs: string[];
   text: string;
-}
-
-function retrieveMessagesFromText(input: string): InputText[] {
+} {
   const regex = /(@\S+)/g;
-  const result: InputText[] = [];
-  let lastIndex = 0;
-  let mentions: string[] = [];
-
-  Array.from(input.matchAll(regex)).forEach((match, index) => {
-    const mention = match[1];
-
-    if (index === 0 && match.index! > 0) {
-      const textBeforeFirstMention = input.slice(0, match.index).trim();
-      if (textBeforeFirstMention) {
-        result.push(prepareInput(null, textBeforeFirstMention));
-      }
-    }
-
-    if (mentions.length > 0) {
-      const textAfterMentions = input.slice(lastIndex, match.index).trim();
-      if (textAfterMentions) {
-        mentions.forEach((m) => {
-          result.push(prepareInput(m, textAfterMentions));
-        });
-        mentions = [];
-      }
-    }
-
-    mentions.push(mention);
-    lastIndex = match.index! + match[0].length;
-  });
-
-  const remainingText = input.slice(lastIndex).trim();
-  if (mentions.length > 0 && remainingText) {
-    mentions.forEach((m) => {
-      result.push(prepareInput(m, remainingText));
-    });
-  } else if (remainingText) {
-    result.push(prepareInput(null, remainingText));
-  }
-
-  return result;
-}
-
-function prepareInput(input: string | null, text: string) {
   return {
-    input: input ? input.replace('@', '') : null,
-    text,
+    inputs: Array.from(message.matchAll(regex)).map((match) =>
+      match[1].replace('@', ''),
+    ),
+    text: message.replace(regex, '').trim(),
   };
 }
