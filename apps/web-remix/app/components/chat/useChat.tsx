@@ -153,7 +153,6 @@ export const useChat = ({
   const handlePush = (message: string) => {
     if (!message.trim() || inputs.length <= 0) return;
     const parsedMessage = retrieveMessagesFromText(message);
-    console.log(message, parsedMessage);
     const messages: IMessage[] = [];
 
     if (parsedMessage.length === 0) {
