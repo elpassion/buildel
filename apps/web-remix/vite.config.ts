@@ -19,6 +19,9 @@ export default defineConfig({
     tsconfigPaths(),
     remix({
       ignoredRouteFiles: ['**/.*'],
+      future: {
+        unstable_optimizeDeps: true,
+      },
     }),
   ],
 });
