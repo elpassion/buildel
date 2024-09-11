@@ -14,7 +14,7 @@ export const EvaluationAverageCellBadge = <TData, TValue>(
       <Badge
         variant={value < 25 ? 'error' : value >= 75 ? 'success' : 'warning'}
       >
-        {value}%
+        {value.toFixed(2)}%
       </Badge>
     );
   }
