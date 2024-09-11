@@ -34,7 +34,7 @@ defmodule Buildel.MemoriesAccess do
   end
 
   def add_chunk(attrs) do
-    temporary_id = UUID.uuid4()
+    temporary_id = Nanoid.generate(8)
     GenServer.cast(__MODULE__, {:add, temporary_id, struct(State.Chunk, attrs)})
 
     {:ok, temporary_id}

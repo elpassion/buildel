@@ -79,7 +79,7 @@ defmodule Buildel.Blocks.MapInputs do
           |> Jason.encode!()
 
         message = Buildel.JQ.query!(fields_json, message)
-        output(state, "output", {:text, message})
+        output(state, "output", {:text, message |> String.trim()})
     end
   end
 

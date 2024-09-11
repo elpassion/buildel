@@ -395,34 +395,31 @@ defmodule Buildel.Blocks.DocumentSearch do
           name: "query",
           description:
             "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.
-            CALL IT WITH FORMAT `{ \"query\": \"example query\" }`
-            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries.
-            You can use `document_id` property to narrow the search to the specific document.
-            DO NOT SET MORE THAN 2 KEYWORDS",
+            CALL IT WITH FORMAT `{ \"query\": \"example query\" }`",
           parameters_schema: %{
             type: "object",
             properties: %{
               query: %{
                 type: "string",
                 description: "The query to search for."
-              },
-              filters: %{
-                type: "object",
-                description: "The filters to apply to the search.",
-                properties: %{
-                  document_id: %{
-                    type: "string",
-                    description: "The ID of a document to search in."
-                  },
-                  keywords: %{
-                    type: "array",
-                    items: %{
-                      type: "string"
-                    },
-                    description: "The keywords to search for. Max 2 keywords"
-                  }
-                }
               }
+              # filters: %{
+              #   type: "object",
+              #   description: "The filters to apply to the search.",
+              #   properties: %{
+              #     document_id: %{
+              #       type: "string",
+              #       description: "The ID of a document to search in."
+              #     }
+              #     # keywords: %{
+              #     #   type: "array",
+              #     #   items: %{
+              #     #     type: "string"
+              #     #   },
+              #     #   description: "The keywords to search for. Max 2 keywords"
+              #     # }
+              #   }
+              # }
             },
             required: ["query"]
           }
@@ -435,29 +432,30 @@ defmodule Buildel.Blocks.DocumentSearch do
           ""
         end
       },
-      %{
-        function: %{
-          name: "get_source",
-          description: "Retrieve a source chunk by source_chunk_id",
-          parameters_schema: %{
-            type: "object",
-            properties: %{
-              source_chunk_id: %{
-                type: "string",
-                description: "source_chunk_id"
-              }
-            },
-            required: ["source_chunk_id"]
-          }
-        },
-        call_formatter: fn args ->
-          args = %{"config.args" => args, "config.block_name" => state.block.name}
-          build_call_formatter(state.call_formatter, args)
-        end,
-        response_formatter: fn _response ->
-          ""
-        end
-      },
+      # %{
+      #   function: %{
+      #     name: "get_source",
+      #     description: "Retrieve a source chunk by source_chunk_id",
+      #     parameters_schema: %{
+      #       type: "object",
+      #       properties: %{
+      #         source_chunk_id: %{
+      #           type: "string",
+      #           description: "source_chunk_id"
+      #         }
+      #       },
+      #       required: ["source_chunk_id"]
+      #     }
+      #   },
+      #   call_formatter: fn args ->
+      #     args = %{"config.args" => args, "config.block_name" => state.block.name}
+      #     # build_call_formatter(state.call_formatter, args)
+      #     "Pobieram fragment..."
+      #   end,
+      #   response_formatter: fn _response ->
+      #     ""
+      #   end
+      # },
       %{
         function: %{
           name: "parent",
@@ -582,6 +580,7 @@ defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
           } = metadata
       }) do
     from = metadata |> Map.get("from", nil)
+    IO.inspect(from)
 
     {:ok, chunk_temporary_uuid} =
       Buildel.MemoriesAccess.add_chunk(%{
@@ -594,12 +593,17 @@ defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
       document_name: filename,
       url:
         Application.get_env(:buildel, :page_url) <>
-          "/knowledge-base/memories/chunks/#{chunk_temporary_uuid}",
+          "/knowledge-base/#{chunk_temporary_uuid}",
       chunk_id: chunk_id,
       chunk: document |> String.trim(),
       pages: metadata |> Map.get("pages", []),
       keywords: metadata |> Map.get("keywords", []),
       source_chunk_id: from
     }
+  end
+
+  def show(els) do
+    IO.inspect(els, label: "DocumentSearchJSON")
+    %{}
   end
 end

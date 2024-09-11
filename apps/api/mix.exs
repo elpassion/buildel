@@ -88,7 +88,8 @@ defmodule Buildel.MixProject do
       {:scholar, "~> 0.3.0"},
       {:flame, "~> 0.3.0"},
       {:html2markdown, "~> 0.1.5"},
-      {:sweet_xml, "~> 0.7"}
+      {:sweet_xml, "~> 0.7"},
+      {:nanoid, "~> 2.1.0"}
     ]
   end
 

@@ -313,16 +313,15 @@ defmodule Buildel.VectorDB.EctoAdapter do
   end
 
   def get_by_id(collection, chunk_id) do
-    chunk =
-      Buildel.Repo.one(
-        from c in Chunk,
-          where:
-            c.collection_name == ^collection.name and
-              c.id == ^chunk_id,
-          order_by: fragment("metadata->>'index' ASC")
-      )
-
-    if chunk do
+    with {:ok, _} <- UUID.info(chunk_id),
+         %Chunk{} = chunk <-
+           Buildel.Repo.one(
+             from c in Chunk,
+               where:
+                 c.collection_name == ^collection.name and
+                   c.id == ^chunk_id,
+               order_by: fragment("metadata->>'index' ASC")
+           ) do
       embedding_column =
         Map.keys(chunk)
         |> Enum.filter(fn key -> String.starts_with?(to_string(key), "embedding_") end)
@@ -336,7 +335,7 @@ defmodule Buildel.VectorDB.EctoAdapter do
         "embedding" => chunk |> Map.get(embedding_column)
       }
     else
-      nil
+      _ -> nil
     end
   end
 

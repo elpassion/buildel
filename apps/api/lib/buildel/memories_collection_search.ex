@@ -124,12 +124,13 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
         chunk_id
       ) do
     with chunk when not is_nil(chunk) <-
-           Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id) do
+           Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id),
+         parent_id when is_binary(parent_id) <- chunk["metadata"]["parent"] do
       parent_context =
         Buildel.VectorDB.get_by_parent_id(
           vector_db,
           collection_name,
-          chunk["metadata"]["parent"]
+          parent_id
         )
         |> Enum.map(fn chunk ->
           %{
