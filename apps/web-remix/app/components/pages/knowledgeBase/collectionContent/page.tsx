@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import {
   Outlet,
@@ -61,6 +61,14 @@ export function KnowledgeBaseContentPage() {
     navigate(routes.collectionFiles(organizationId, collectionName));
   };
 
+  const dialogHeading = useMemo(() => {
+    if (matchDetails) return searchParams.get('file_name') ?? '';
+    if (matchNew) return 'Create New Memory';
+    if (matchSearch) return 'Ask a question to your knowledge base';
+
+    return '';
+  }, [matchDetails, matchNew, matchSearch]);
+
   return (
     <ListActionProvider>
       <PageContentWrapper className="mt-5">
@@ -85,11 +93,9 @@ export function KnowledgeBaseContentPage() {
               'lg:min-w-[900px]': matchDetails,
             })}
           >
-            <DialogDrawerHeader>
-              <DialogDrawerTitle className="break-words">
-                {matchDetails && searchParams.get('file_name')}
-                {matchNew && 'Create New Memory'}
-                {matchSearch && 'Ask a question to your knowledge base'}
+            <DialogDrawerHeader className="w-full line-clamp-1">
+              <DialogDrawerTitle className="break-all truncate max-w-[95%]">
+                <span title={dialogHeading}>{dialogHeading}</span>
               </DialogDrawerTitle>
 
               <DialogDrawerDescription>
