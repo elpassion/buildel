@@ -120,7 +120,7 @@ defmodule Buildel.FileLoaderNLMApiAdapter do
 
     with {:ok, %{body: result, status_code: 200}} <-
            HTTPoison.post(
-             "#{url()}/api/parseDocument?applyOcr=yes",
+             "#{url()}/api/parseDocument",
              {:multipart, form_data},
              headers,
              timeout: 60_000,

@@ -53,8 +53,7 @@ defmodule Buildel.DocumentWorkflow.DocumentLoaderAdapter do
 
     with {:ok, %{body: result, status: 200}} <-
            [
-             base_url:
-               "#{Application.fetch_env!(:buildel, :nlm_api_url)}/api/parseDocument?applyOcr=yes",
+             base_url: "#{Application.fetch_env!(:buildel, :nlm_api_url)}/api/parseDocument",
              headers: headers,
              body: Multipart.body_stream(multipart),
              connect_options: [
