@@ -5,7 +5,7 @@ defmodule Buildel.MemoriesAccess do
     defstruct chunks: %{}
 
     defmodule Chunk do
-      defstruct [:memory_id, :chunk_id]
+      defstruct [:memory_id, :chunk_id, :document]
     end
 
     def new(chunks \\ %{}) do

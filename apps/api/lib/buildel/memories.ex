@@ -433,7 +433,7 @@ defmodule Buildel.Memories do
 
     Buildel.VectorDB.get_by_id(
       vector_db,
-      "#{organization_id}_#{memory_collection_id}",
+      organization_collection_name(organization_id, memory_collection_id),
       chunk_id
     )
   end

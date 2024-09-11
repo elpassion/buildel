@@ -585,7 +585,8 @@ defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
     {:ok, chunk_temporary_uuid} =
       Buildel.MemoriesAccess.add_chunk(%{
         chunk_id: from || chunk_id,
-        memory_id: memory_id
+        memory_id: memory_id,
+        document: document
       })
 
     %{

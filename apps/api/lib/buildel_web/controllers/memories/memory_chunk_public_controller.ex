@@ -81,13 +81,13 @@ defmodule BuildelWeb.MemoryChunkPublicController do
     with {:ok, chunk} <-
            Buildel.MemoriesAccess.get_state(chunk_temporary_uuid),
          memory <- Buildel.Memories.get_memory!(chunk.memory_id),
-         chunk <-
+         retrieved_chunk <-
            Buildel.Memories.get_organization_memory_chunk(
              memory.organization_id,
              memory.memory_collection_id,
              chunk.chunk_id
            ) do
-      render(conn, :show, chunk: chunk)
+      render(conn, :show, chunk: %{retrieved_chunk | "document" => chunk.document})
     end
   end
 end
