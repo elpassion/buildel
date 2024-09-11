@@ -234,8 +234,10 @@ export const KnowledgeBaseFileListItem: React.FC<
             },
           )}
         >
-          <File className="w-4 h-4" />{' '}
-          <span className="uppercase">{data.file_type}</span>
+          <File className="w-4 h-4 shrink-0" />{' '}
+          <span className="uppercase line-clamp-1" title={data.file_type}>
+            {data.file_type}
+          </span>
         </CardDescription>
       </CardContent>
     </Card>
