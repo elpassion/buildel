@@ -402,24 +402,24 @@ defmodule Buildel.Blocks.DocumentSearch do
               query: %{
                 type: "string",
                 description: "The query to search for."
+              },
+              filters: %{
+                type: "object",
+                description: "The filters to apply to the search.",
+                properties: %{
+                  document_id: %{
+                    type: "string",
+                    description: "The ID of a document to search in."
+                  }
+                  # keywords: %{
+                  #   type: "array",
+                  #   items: %{
+                  #     type: "string"
+                  #   },
+                  #   description: "The keywords to search for. Max 2 keywords"
+                  # }
+                }
               }
-              # filters: %{
-              #   type: "object",
-              #   description: "The filters to apply to the search.",
-              #   properties: %{
-              #     document_id: %{
-              #       type: "string",
-              #       description: "The ID of a document to search in."
-              #     }
-              #     # keywords: %{
-              #     #   type: "array",
-              #     #   items: %{
-              #     #     type: "string"
-              #     #   },
-              #     #   description: "The keywords to search for. Max 2 keywords"
-              #     # }
-              #   }
-              # }
             },
             required: ["query"]
           }
