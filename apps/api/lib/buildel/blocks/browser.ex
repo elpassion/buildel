@@ -48,7 +48,14 @@ defmodule Buildel.Blocks.Browser do
                       }
                     },
                     minLength: 1
-                  })
+                  }),
+                host: %{
+                  "type" => "string",
+                  "title" => "Host",
+                  "description" => "The allowed host for the URL. Regex is supported.",
+                  "default" => "",
+                  "minLength" => 1
+                },
               )
           })
       }
@@ -158,13 +165,31 @@ defmodule Buildel.Blocks.Browser do
 
   @impl true
   def handle_input("url", {_topic, :text, text, _metadata}, state) do
-    {_content, state} = url(text, state)
-    state
+    with {:ok, true} <- does_url_match_host(text, Regex.compile!(state.opts.host)) do
+      {_content, state} = url(text, state)
+      state
+    else
+      {:ok, false} ->
+      send_error(state, "URL #{text} does not match host #{state.opts.host}")
+      state = state |> send_stream_stop()
+      state
+    end
   end
 
   @impl true
   def handle_tool("tool", "url", {_topic, :text, args, _}, state) do
-    url(args["url"], state)
+    url = args["url"]
+
+    with {:ok, true} <- does_url_match_host(url, Regex.compile!(state.opts.host)) do
+      url(url, state)
+    else
+      {:ok, false} ->
+      error_message = "URL #{url} does not match host #{state.opts.host}"
+
+      send_error(state, error_message)
+      state = state |> send_stream_stop()
+      {error_message, state}
+    end
   end
 
   defp build_call_formatter(value, args) do
@@ -182,5 +207,26 @@ defmodule Buildel.Blocks.Browser do
       _, acc ->
         acc
     end)
+  end
+
+  defp does_url_match_host(_, "") do
+    {:ok, true}
+  end
+
+  defp does_url_match_host(url, %Regex{} = host) do
+    case URI.parse(url) do
+      %URI{} = uri ->
+        if Regex.match?(host, uri.host) do
+          {:ok, true}
+        else
+          {:ok, false}
+        end
+      _ ->
+        {:ok, false}
+    end
+  end
+
+  defp does_url_match_host(_, _) do
+    {:ok, false}
   end
 end
