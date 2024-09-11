@@ -2,6 +2,7 @@ import React from 'react';
 
 import type { IMemoryChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
+import { cn } from '~/utils/cn';
 
 interface MemoryChunksListProps {
   items: IMemoryChunk[];
@@ -30,12 +31,22 @@ export const MemoryChunksListItem: React.FC<MemoryChunksListItemProps> = ({
 }) => {
   return (
     <div className="w-full">
-      <p className="text-sm">id: {data.id}</p>
-
+      <p className="text-sm text-muted-foreground">id: {data.id}</p>
       <p className="font-bold">{data.keywords.join(' - ')}</p>
+
       <pre className="text-sm break-all whitespace-break-spaces">
         {data.content.trim()}
       </pre>
+
+      <div className="mt-2 flex justify-end">
+        <p
+          className={cn('text-sm text-muted-foreground shrink-0', {
+            hidden: !data.pages.length,
+          })}
+        >
+          Page: {data.pages.join(', ')}
+        </p>
+      </div>
     </div>
   );
 };

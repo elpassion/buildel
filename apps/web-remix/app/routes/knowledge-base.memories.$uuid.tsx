@@ -63,6 +63,10 @@ export default function MemoryPage() {
 
   return (
     <main className="max-w-screen-lg mx-auto py-6 px-6">
+      {data?.[0]?.file_name ? (
+        <h1 className="text-xl font-bold mb-6">{data?.[0]?.file_name}</h1>
+      ) : null}
+
       <MemoryChunksList items={data} />
 
       <div className="flex justify-center mt-5" ref={fetchNextRef}>

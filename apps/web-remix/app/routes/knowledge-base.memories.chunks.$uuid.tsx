@@ -18,18 +18,18 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const knowledgeBaseApi = new KnowledgeBaseApi(fetch);
 
-    const { data: content } = await knowledgeBaseApi.getTemporaryChunk(
+    const { data: chunk } = await knowledgeBaseApi.getTemporaryChunk(
       params.uuid,
     );
 
-    return json({ content });
+    return json({ chunk });
   })(args);
 }
 
 export default function ChunkPage() {
-  const { content } = useLoaderData<typeof loader>();
-  const { copy, isCopied } = useCopyToClipboard(content.content);
-  const handleDownload = useDownloadFile(content.content, `${content.id}.txt`);
+  const { chunk } = useLoaderData<typeof loader>();
+  const { copy, isCopied } = useCopyToClipboard(chunk.content);
+  const handleDownload = useDownloadFile(chunk.content, `${chunk.id}.txt`);
 
   return (
     <main className="max-w-screen-lg mx-auto mt-8 px-6">
@@ -48,7 +48,36 @@ export default function ChunkPage() {
         </Button>
       </header>
 
-      <ChatMarkdown>{content.content}</ChatMarkdown>
+      <div
+        className={cn('flex flex-wrap gap-1 mb-2', {
+          hidden: chunk.keywords.length === 0,
+        })}
+      >
+        <span className="text-sm text-muted-foreground">Keywords:</span>
+        {chunk.keywords.map((keyword) => (
+          <p
+            key={keyword}
+            className="px-2 py-0.5 rounded-xl border border-input text-xs text-foreground"
+          >
+            {keyword}
+          </p>
+        ))}
+      </div>
+
+      <ChatMarkdown>{chunk.content}</ChatMarkdown>
+
+      <div className="mt-2 flex justify-between items-center gap-2 flex-wrap">
+        <h1
+          className="text-muted-foreground text-sm truncate"
+          title={chunk.file_name}
+        >
+          {chunk.file_name}
+        </h1>
+
+        <p className="text-sm text-muted-foreground shrink-0">
+          Page: {chunk.pages.join(', ')}
+        </p>
+      </div>
     </main>
   );
 }

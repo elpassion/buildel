@@ -8,6 +8,8 @@ export const MemoryChunk = z.object({
   id: z.string(),
   content: z.string(),
   keywords: z.array(z.string()).default([]),
+  file_name: z.string().optional(),
+  pages: z.array(z.number()).default([]),
 });
 
 export type IMemoryChunk = z.TypeOf<typeof MemoryChunk>;
@@ -198,6 +200,9 @@ export const MemoryNodeDetailsResponse = z
 export const TemporaryChunk = z.object({
   id: z.string(),
   content: z.string(),
+  keywords: z.array(z.string()).default([]),
+  file_name: z.string(),
+  pages: z.array(z.number()).default([]),
 });
 
 export const TemporaryChunkResponse = z
