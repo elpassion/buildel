@@ -196,7 +196,7 @@ ${JSON.stringify(files)}
               (msg, index) => {
                 return (
                   <SuggestedMessage
-                    disabled={disabled}
+                    disabled={disabled || connectionStatus !== 'running'}
                     key={index}
                     onClick={onSubmit}
                     content={msg}
