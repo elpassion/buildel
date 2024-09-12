@@ -41,12 +41,14 @@ defmodule Buildel.Blocks.MapList do
 
   defp do_map(list, state) do
     list
-    |> Enum.each(
-      &output(state, "output", {:text, &1 |> Jason.encode!()}, %{
+    |> Enum.each(fn item ->
+      item = if is_binary(item), do: item, else: item |> Jason.encode!()
+
+      output(state, "output", {:text, item}, %{
         stream_stop: :none,
         stream_start: :none
       })
-    )
+    end)
   end
 
   @impl true
