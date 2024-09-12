@@ -154,7 +154,8 @@ defmodule Buildel.MemoriesGraph do
            Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id) do
       params =
         MemoryCollectionSearch.Params.from_map(%{
-          search_query: Map.get(chunk, "embedding"),
+          search_query: Map.get(chunk, "document"),
+          search_embeddings: Map.get(chunk, "embedding"),
           limit: limit,
           extend_neighbors: false,
           extend_parents: false,

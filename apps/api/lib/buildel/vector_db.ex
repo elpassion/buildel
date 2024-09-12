@@ -40,6 +40,7 @@ defmodule Buildel.VectorDB do
              %__MODULE__{adapter: adapter, embeddings: embeddings},
              collection_name,
              query,
+             query_embeddings,
              metadata,
              options
            ),
@@ -51,10 +52,11 @@ defmodule Buildel.VectorDB do
     options = Map.merge(%{limit: 5, similarity_threshhold: 0}, options)
 
     with {:ok, %{embeddings: embeddings_list, embeddings_tokens: embeddings_tokens}} <-
-           Embeddings.get_embeddings(embeddings, [query]),
+           Embeddings.get_embeddings(embeddings, [query_embeddings || query]),
          {:ok, collection} <- adapter.get_collection(collection_name),
          {:ok, results} <-
            adapter.query(collection, metadata, %{
+             query: query,
              query_embeddings: embeddings_list |> List.first(),
              limit: options.limit,
              similarity_treshhold: options.similarity_threshhold,
@@ -416,6 +418,7 @@ defmodule Buildel.VectorDB.EctoAdapter do
 
   @impl Buildel.VectorDB.VectorDBAdapterBehaviour
   def query(collection, metadata, %{
+        query: query_string,
         query_embeddings: query_embeddings,
         limit: limit,
         similarity_treshhold: _similarity_treshhold,
@@ -424,55 +427,26 @@ defmodule Buildel.VectorDB.EctoAdapter do
     embedding_size = Enum.count(query_embeddings)
     embedding_column = "embedding_#{embedding_size}" |> String.to_atom()
 
-    embeddings_query =
-      if supports_halfvec?() && embedding_size == 3072,
-        do:
-          from(c in Chunk,
-            where:
-              c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
-            order_by:
-              fragment(
-                "?::halfvec(3072) <-> ?",
-                field(c, ^embedding_column),
-                ^query_embeddings
-              ),
-            limit: ^limit,
-            select: %{
-              c
-              | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings),
-                embedding_1536: nil,
-                embedding_3072: nil
-            }
-          ),
-        else:
-          from(c in Chunk,
-            where:
-              c.collection_name == ^collection.name and fragment("? @> ?", c.metadata, ^metadata),
-            order_by:
-              fragment(
-                "? <-> ?",
-                field(c, ^embedding_column),
-                ^query_embeddings
-              ),
-            limit: ^limit,
-            select: %{
-              c
-              | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings),
-                embedding_1536: nil,
-                embedding_3072: nil
-            }
-          )
+    query =
+      from(c in Chunk,
+        where:
+          c.collection_name == ^collection.name and
+            fragment("? @> ?", c.metadata, ^metadata),
+        limit: ^limit,
+        select: %{
+          c
+          | similarity: l2_distance(field(c, ^embedding_column), ^query_embeddings),
+            embedding_1536: nil,
+            embedding_3072: nil
+        }
+      )
+      |> order_by_embeddings_similar_to(query_embeddings)
+      |> where_chunk_type(chunk_type)
 
-    embeddings_query =
-      if chunk_type == nil or chunk_type == "" do
-        embeddings_query
-      else
-        embeddings_query |> where(chunk_type: ^chunk_type)
-      end
+    # |> where_keywords(query_string)
 
     results =
-      Buildel.Repo.all(embeddings_query)
-      # |> Enum.filter(&(&1.similarity > similarity_treshhold))
+      Buildel.Repo.all(query)
       |> Enum.map(fn chunk ->
         %{
           "document" => chunk.document,
@@ -495,6 +469,55 @@ defmodule Buildel.VectorDB.EctoAdapter do
         major = String.to_integer(major)
         minor = String.to_integer(minor)
         if major * 10 + minor >= 7, do: true, else: false
+    end
+  end
+
+  # defp where_keywords(query, query_string, language \\ "english") do
+  #   where(
+  #     query,
+  #     [c],
+  #     fragment(
+  #       "to_tsvector(lang_to_regconfig(?), ?) @@ websearch_to_tsquery(?::text::regconfig, ?)",
+  #       field(c, :language),
+  #       field(c, :document),
+  #       ^language,
+  #       ^query_string
+  #     )
+  #   )
+  # end
+
+  defp where_chunk_type(query, chunk_type) do
+    if chunk_type == nil or chunk_type == "" do
+      query
+    else
+      query |> where(chunk_type: ^chunk_type)
+    end
+  end
+
+  defp order_by_embeddings_similar_to(query, embeddings) do
+    embedding_size = Enum.count(embeddings)
+    embedding_column = "embedding_#{embedding_size}" |> String.to_atom()
+
+    if supports_halfvec?() && embedding_size == 3072 do
+      query
+      |> order_by(
+        [c],
+        fragment(
+          "?::halfvec(3072) <-> ?",
+          field(c, ^embedding_column),
+          ^embeddings
+        )
+      )
+    else
+      query
+      |> order_by(
+        [c],
+        fragment(
+          "? <-> ?",
+          field(c, ^embedding_column),
+          ^embeddings
+        )
+      )
     end
   end
 

@@ -16,49 +16,46 @@ defmodule Buildel.Clients.Embeddings do
   end
 
   def get_embeddings(
-        %__MODULE__{api_type: "openai", model: model, api_key: api_key, endpoint: endpoint},
-        inputs
+        %__MODULE__{},
+        [%Pgvector{} | _other_embeddings] = inputs
       ) do
-    if inputs |> Enum.at(0) |> is_struct(Pgvector) do
-      {:ok, %{embeddings: inputs |> Enum.map(&Pgvector.to_list/1), embeddings_tokens: 0}}
-    else
-      Buildel.Cache.lookup(
-        "#{endpoint}#{model}#{inputs |> Enum.join(",")}"
-        |> then(&:crypto.hash(:sha256, &1))
-        |> Base.encode16(),
-        fn ->
-          Buildel.Clients.OpenAIEmbeddings.get_embeddings(%{
-            inputs: inputs,
-            api_key: api_key,
-            model: model,
-            endpoint: endpoint
-          })
-        end
-      )
-    end
+    {:ok, %{embeddings: inputs |> Enum.map(&Pgvector.to_list/1), embeddings_tokens: 0}}
   end
 
   def get_embeddings(
-        %__MODULE__{api_type: "mistral", model: model, api_key: api_key, endpoint: endpoint},
+        %__MODULE__{api_type: "openai", model: model, api_key: api_key, endpoint: endpoint} =
+          client,
         inputs
       ) do
-    if inputs |> Enum.at(0) |> is_struct(Pgvector) do
-      {:ok, %{embeddings: inputs |> Enum.map(&Pgvector.to_list/1), embeddings_tokens: 0}}
-    else
-      Buildel.Cache.lookup(
-        "#{endpoint}#{model}#{inputs |> Enum.join(",")}"
-        |> then(&:crypto.hash(:sha256, &1))
-        |> Base.encode16(),
-        fn ->
-          Buildel.Clients.MistralEmbeddings.get_embeddings(%{
-            inputs: inputs,
-            api_key: api_key,
-            model: model,
-            endpoint: endpoint
-          })
-        end
-      )
-    end
+    Buildel.Cache.lookup(
+      create_cache_key(client, inputs),
+      fn ->
+        Buildel.Clients.OpenAIEmbeddings.get_embeddings(%{
+          inputs: inputs,
+          api_key: api_key,
+          model: model,
+          endpoint: endpoint
+        })
+      end
+    )
+  end
+
+  def get_embeddings(
+        %__MODULE__{api_type: "mistral", model: model, api_key: api_key, endpoint: endpoint} =
+          client,
+        inputs
+      ) do
+    Buildel.Cache.lookup(
+      create_cache_key(client, inputs),
+      fn ->
+        Buildel.Clients.MistralEmbeddings.get_embeddings(%{
+          inputs: inputs,
+          api_key: api_key,
+          model: model,
+          endpoint: endpoint
+        })
+      end
+    )
   end
 
   def get_embeddings(%__MODULE__{api_type: "test"}, inputs) do
@@ -79,6 +76,12 @@ defmodule Buildel.Clients.Embeddings do
 
   def get_config(%__MODULE__{api_type: "test"}) do
     %{size: 100, distance: "cosine"}
+  end
+
+  defp create_cache_key(%__MODULE__{endpoint: endpoint, model: model}, inputs) do
+    "#{endpoint}#{model}#{inputs |> Enum.join(",")}"
+    |> then(&:crypto.hash(:sha256, &1))
+    |> Base.encode16()
   end
 end
 
@@ -120,36 +123,35 @@ defmodule Buildel.Clients.OpenAIEmbeddings do
              :embeddings,
              :generation
            ] do
-    with {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
-         when status_code >= 200 and status_code < 400 <-
-           HTTPoison.post(
-             endpoint,
-             %{
-               input: inputs |> cleanup_inputs(),
-               model: model
-             }
-             |> Jason.encode!(),
-             [
-               Authorization: "Bearer #{api_key}",
-               "api-key": api_key,
-               "content-type": "application/json"
-             ],
-             timeout: 60_000,
-             recv_timeout: 60_000
-           ),
-         {:ok, body} <- Jason.decode(body) do
+    req =
+      Req.new(
+        url: endpoint,
+        json: %{
+          input: inputs |> cleanup_inputs(),
+          model: model
+        }
+      )
+      |> Req.Request.put_header("Authorization", "Bearer #{api_key}")
+      |> Req.Request.put_header("api-key", api_key)
+      |> Req.Request.put_header("content-type", "application/json")
+
+    with {:ok, %Req.Response{status: status, body: body}} when status >= 200 and status < 400 <-
+           Req.post(req) do
       {:ok,
        %{
          embeddings: body["data"] |> Enum.map(& &1["embedding"]),
          embeddings_tokens: body["usage"]["total_tokens"]
        }}
     else
-      {:ok, %HTTPoison.Response{body: body}} ->
-        case body |> Jason.decode!() do
+      {:ok, %Req.Response{body: body}} ->
+        case body do
           %{"error" => %{"code" => "invalid_api_key"}} -> {:error, :invalid_api_key}
           %{"error" => %{"code" => "insufficient_quota"}} -> {:error, :insufficient_quota}
           %{"error" => %{"code" => "model_not_found"}} -> {:error, :model_not_found}
         end
+
+      _unknown_error ->
+        {:error, :unknown_error}
     end
   end
 

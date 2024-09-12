@@ -362,7 +362,8 @@ defmodule Buildel.Blocks.DocumentSearch do
            Buildel.VectorDB.get_by_id(state.vector_db, state.collection_name, chunk_id) do
       params =
         MemoryCollectionSearch.Params.from_map(%{
-          search_query: Map.get(chunk, "embedding"),
+          search_query: Map.get(chunk, "document"),
+          search_embeddings: Map.get(chunk, "embedding"),
           where: state.where,
           limit: 2,
           similarity_threshhold: state[:opts] |> Map.get(:similarity_threshhold, 0.25),
@@ -580,7 +581,6 @@ defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
           } = metadata
       }) do
     from = metadata |> Map.get("from", nil)
-    IO.inspect(from)
 
     {:ok, chunk_temporary_uuid} =
       Buildel.MemoriesAccess.add_chunk(%{

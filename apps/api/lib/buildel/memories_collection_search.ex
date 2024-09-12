@@ -43,6 +43,7 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
   defmodule Params do
     @default_params %{
       search_query: "",
+      search_embeddings: nil,
       limit: 10,
       similarity_threshhold: 0,
       where: %{},
@@ -54,6 +55,7 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
 
     defstruct [
       :search_query,
+      :search_embeddings,
       :limit,
       :similarity_threshhold,
       :where,
@@ -89,6 +91,7 @@ defmodule Buildel.Memories.MemoryCollectionSearch do
              vector_db,
              collection_name,
              params.search_query,
+             params.search_embeddings,
              params.where,
              %{
                limit: params.limit,
