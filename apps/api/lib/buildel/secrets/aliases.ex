@@ -5,7 +5,8 @@ defmodule Buildel.Secrets.Aliases do
     :anthropic,
     :eleven_labs,
     :deepgram,
-    :brave
+    :brave,
+    :cohere
   ]
 
   def aliases do

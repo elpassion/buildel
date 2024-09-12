@@ -43,7 +43,8 @@ defmodule Buildel.Blocks do
     Knowledge,
     FileToElements,
     ChunkSemantic,
-    SplitBy
+    SplitBy,
+    Rerank
   }
 
   @names_to_blocks_map %{
@@ -85,7 +86,8 @@ defmodule Buildel.Blocks do
     "knowledge" => Knowledge,
     "file_to_elements" => FileToElements,
     "chunk_semantic" => ChunkSemantic,
-    "split_by" => SplitBy
+    "split_by" => SplitBy,
+    "rerank" => Rerank
   }
 
   @blocks_to_names_map %{
@@ -127,7 +129,8 @@ defmodule Buildel.Blocks do
     Knowledge => "knowledge",
     FileToElements => "file_to_elements",
     ChunkSemantic => "chunk_semantic",
-    SplitBy => "split_by"
+    SplitBy => "split_by",
+    Rerank => "rerank"
   }
 
   def list_types() do
