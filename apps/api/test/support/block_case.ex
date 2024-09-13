@@ -8,6 +8,7 @@ defmodule Buildel.BlockCase do
       alias Buildel.Blocks
       alias Buildel.BlockPubSub
       alias Buildel.BlocksTestRunner
+      alias Buildel.Blocks.Utils.Message
 
       alias Blocks.{Block, Connection}
     end
