@@ -9,14 +9,14 @@ defmodule Buildel.Blocks.NewTextInput do
 
   definput(:input, %{"type" => "string"}, public: true)
 
-  def handle_input(:input, %Message{} = message) do
-    output(:output, message)
+  def handle_input(:input, %Message{} = message, state) do
+    output(state, :output, message)
   end
 
   definput(:forward, %{"type" => "string"})
 
-  def handle_input(:forward, %Message{} = message) do
-    output(:output, message)
+  def handle_input(:forward, %Message{} = message, state) do
+    output(state, :output, message)
   end
 
   defoutput(:output, %{"type" => "string"})

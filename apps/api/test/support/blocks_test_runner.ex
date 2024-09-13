@@ -56,13 +56,15 @@ defmodule Buildel.BlocksTestRunner do
 
     children =
       for %Block{type: type} = block <- config.blocks do
-        block_id = block_id(context_id(self()), block)
+        block_id =
+          block_id(context_id(self()), block)
 
-        context = %{
-          block_id: block_id,
-          context_id: context_id,
-          context: context_from_context_id(context_id)
-        }
+        context =
+          %{
+            block_id: block_id,
+            context_id: context_id,
+            context: context_from_context_id(context_id)
+          }
 
         %{
           id: block_id |> String.to_atom(),

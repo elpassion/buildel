@@ -48,7 +48,7 @@ defmodule Buildel.Blocks.NewTextInputTest do
         type: :raw,
         message: ^text,
         topic: ^topic,
-        metadata: %{message_id: _}
+        metadata: %{}
       }
 
       assert_receive {^topic, :stop_stream, nil, _}
