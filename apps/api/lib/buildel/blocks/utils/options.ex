@@ -24,7 +24,7 @@ defmodule Buildel.Blocks.Utils.Options do
     %{options | dynamic_ios: dynamic_ios}
   end
 
-  def set_schema(options, options_schema) do
+  def set_schema(options, options_schema_properties) do
     %{
       options
       | schema: %{
@@ -32,7 +32,11 @@ defmodule Buildel.Blocks.Utils.Options do
           required: ["name", "opts"],
           properties: %{
             name: Schemas.name_schema(),
-            opts: options_schema
+            opts:
+              Schemas.options_schema(%{
+                required: options_schema_properties |> Keyword.keys(),
+                properties: options_schema_properties |> Jason.OrderedObject.new()
+              })
           }
         }
     }

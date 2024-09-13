@@ -6,6 +6,10 @@ defmodule Buildel.Blocks.BlockValidator do
       |> Jason.decode!()
       |> ExJsonSchema.Schema.resolve()
 
-    ExJsonSchema.Validator.validate(schema, block_config, error_formatter: false)
+    ExJsonSchema.Validator.validate(
+      schema,
+      block_config |> Jason.encode!() |> Jason.decode!(),
+      error_formatter: false
+    )
   end
 end

@@ -11,12 +11,14 @@ defmodule Buildel.Blocks.NewTextInput do
 
   def handle_input(:input, %Message{} = message, state) do
     output(state, :output, message)
+    state
   end
 
   definput(:forward, %{"type" => "string"})
 
   def handle_input(:forward, %Message{} = message, state) do
     output(state, :output, message)
+    state
   end
 
   defoutput(:output, %{"type" => "string"})

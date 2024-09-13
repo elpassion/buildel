@@ -11,11 +11,14 @@ defmodule Buildel.Blocks.NewBlock do
       import Buildel.Blocks.NewBlock.Definput
       import Buildel.Blocks.NewBlock.Defoutput
       import Buildel.Blocks.NewBlock.Defblock
+      import Buildel.Blocks.NewBlock.Defoption
 
       use Buildel.Blocks.NewBlock.Server
 
       @inputs []
       @outputs []
+
+      @schema_opts []
 
       @spec create(map) :: %Buildel.Blocks.Block{}
       def create(%{name: name, opts: opts, connections: connections}) do
@@ -53,7 +56,7 @@ defmodule Buildel.Blocks.NewBlock do
         |> Options.set_outputs(@outputs)
         |> Options.set_ios([])
         |> Options.set_dynamic_ios(nil)
-        |> Options.set_schema(%{})
+        |> Options.set_schema(@schema_opts)
       end
     end
   end
@@ -186,6 +189,22 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
   end
 end
 
+defmodule Buildel.Blocks.NewBlock.Defoption do
+  defmacro defoption(name, schema) do
+    quote do
+      case unquote(schema) do
+        %{} ->
+          ExJsonSchema.Schema.resolve(unquote(schema))
+
+        _ ->
+          throw("Invalid schema")
+      end
+
+      @schema_opts Keyword.put(@schema_opts, unquote(name), unquote(schema))
+    end
+  end
+end
+
 defmodule Buildel.Blocks.NewBlock.Server do
   alias Buildel.BlockPubSub
   alias Buildel.Blocks.Utils.Message
@@ -226,20 +245,38 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       @impl true
       def handle_info(%Message{topic: topic} = message, state) do
-        context_id = BlockPubSub.io_from_topic(topic)
+        context_id =
+          BlockPubSub.io_from_topic(topic)
 
         if context_id.context == state.block.context.context_id do
           state =
             inputs_subscribed_to_topic(all_connections(state.block), topic)
-            |> Enum.reduce(state, fn input, state ->
-              handle_input(input.name, message, state)
-            end)
+            |> Enum.reduce(
+              state,
+              fn
+                %{name: input}, state when is_atom(input) ->
+                  handle_input(input, message, state)
+
+                %{name: input}, state when is_binary(input) ->
+                  handle_input(input |> String.to_existing_atom(), message, state)
+              end
+            )
 
           {:noreply, state}
         else
           state = handle_external_input(topic, message, state)
           {:noreply, state}
         end
+      end
+
+      @impl true
+      def handle_info({_topic, :start_stream, nil, _metadata}, state) do
+        {:noreply, state}
+      end
+
+      @impl true
+      def handle_info({_topic, :stop_stream, nil, _metadata}, state) do
+        {:noreply, state}
       end
 
       def handle_external_input(_name, _payload, state) do
