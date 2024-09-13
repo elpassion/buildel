@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.Block do
   alias Buildel.BlockPubSub
   alias __MODULE__
 
-  defstruct [:name, :type, connections: [], opts: %{}, context: %{}]
+  defstruct [:name, :type, connections: [], opts: %{}, context: %{}, state: %{}]
 
   def set_context(
         block,
@@ -111,7 +111,8 @@ defmodule Buildel.Blocks.Block do
           name: name,
           type: __MODULE__,
           opts: opts,
-          connections: connections
+          connections: connections,
+          state: %{}
         }
       end
 

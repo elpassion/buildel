@@ -1,4 +1,79 @@
-defmodule Buildel.Definput do
+defmodule Buildel.Blocks.NewBlock do
+  defstruct [:name, :type, connections: [], opts: %{}, context: %{}, state: %{}]
+
+  @doc false
+  defmacro __using__(_opts) do
+    quote do
+      alias Buildel.Blocks.Utils.Message
+      alias Buildel.Blocks.Utils.Schemas
+      alias Buildel.Blocks.Utils.Options
+
+      import Buildel.Blocks.NewBlock.Definput
+      import Buildel.Blocks.NewBlock.Defoutput
+      import Buildel.Blocks.NewBlock.Defblock
+
+      @inputs []
+      @outputs []
+
+      def create(%{name: name, opts: opts, connections: connections}) do
+        %Buildel.Blocks.NewBlock{
+          name: name,
+          type: __MODULE__,
+          opts: opts,
+          connections: connections,
+          state: %{}
+        }
+      end
+
+      @before_compile Buildel.Blocks.NewBlock
+    end
+  end
+
+  defmacro __before_compile__(_) do
+    alias Buildel.Blocks.Utils.Options
+
+    quote do
+      def inputs do
+        @inputs
+      end
+
+      def outputs do
+        @outputs
+      end
+
+      def options do
+        @options
+        |> Options.set_inputs(@inputs)
+        |> Options.set_outputs(@outputs)
+        |> Options.set_ios([])
+        |> Options.set_dynamic_ios(nil)
+        |> Options.set_schema(%{})
+      end
+    end
+  end
+end
+
+defmodule Buildel.Blocks.NewBlock.Input do
+  defstruct [:name, :schema, public: false]
+end
+
+defmodule Buildel.Blocks.NewBlock.Output do
+  defstruct [:name, :schema, public: false]
+end
+
+defmodule Buildel.Blocks.NewBlock.Defblock do
+  defmacro defblock(type, options_list) do
+    quote do
+      @options Buildel.Blocks.Utils.Options.new(%{
+                 type: unquote(type),
+                 description: unquote(options_list)[:description],
+                 groups: unquote(options_list)[:groups]
+               })
+    end
+  end
+end
+
+defmodule Buildel.Blocks.NewBlock.Definput do
   alias Buildel.Blocks.Utils.Message
 
   defmacro definput(name, schema, options \\ []) do
@@ -17,7 +92,7 @@ defmodule Buildel.Definput do
       end
 
       @inputs [
-        %Buildel.NewBlock.Input{
+        %Buildel.Blocks.NewBlock.Input{
           name: unquote(name),
           schema: unquote(schema),
           public: options[:public]
@@ -53,7 +128,7 @@ defmodule Buildel.Definput do
   end
 end
 
-defmodule Buildel.Defoutput do
+defmodule Buildel.Blocks.NewBlock.Defoutput do
   alias Buildel.Blocks.Utils.Message
 
   defmacro defoutput(name, schema, _options \\ []) do
@@ -69,7 +144,9 @@ defmodule Buildel.Defoutput do
           throw("Invalid schema")
       end
 
-      @outputs [%Buildel.NewBlock.Input{name: unquote(name), schema: unquote(schema)} | @outputs]
+      @outputs [
+        %Buildel.Blocks.NewBlock.Output{name: unquote(name), schema: unquote(schema)} | @outputs
+      ]
 
       case unquote(schema) do
         %{} ->
@@ -94,89 +171,4 @@ defmodule Buildel.Defoutput do
       end
     end
   end
-end
-
-defmodule Buildel.Defblock do
-  alias Buildel.Blocks.Utils.Message
-
-  defmacro defblock(type, options_list) do
-    quote do
-      @options Buildel.Blocks.Utils.Options.new(%{
-                 type: unquote(type),
-                 description: unquote(options_list)[:description],
-                 groups: unquote(options_list)[:groups]
-               })
-    end
-  end
-end
-
-defmodule Buildel.NewBlock do
-  @doc false
-  defmacro __using__(_opts) do
-    quote do
-      alias Buildel.Blocks.Utils.Message
-      alias Buildel.Blocks.Utils.Schemas
-      alias Buildel.Blocks.Utils.Options
-
-      import Buildel.Definput
-      import Buildel.Defoutput
-      import Buildel.Defblock
-
-      @inputs []
-      @outputs []
-
-      @before_compile Buildel.NewBlock
-    end
-  end
-
-  defmacro __before_compile__(_) do
-    alias Buildel.Blocks.Utils.Options
-
-    quote do
-      def inputs do
-        @inputs
-      end
-
-      def outputs do
-        @outputs
-      end
-
-      def options do
-        @options
-        |> Options.set_inputs(@inputs)
-        |> Options.set_outputs(@outputs)
-        |> Options.set_ios([])
-        |> Options.set_dynamic_ios(nil)
-        |> Options.set_schema(%{})
-      end
-    end
-  end
-end
-
-defmodule Buildel.NewBlock.Input do
-  defstruct [:name, :schema, public: false]
-end
-
-defmodule Example do
-  use Buildel.NewBlock
-
-  defblock(:text_input,
-    description:
-      "This module is crafted for the seamless intake and transmission of textual data.",
-    groups: ["text", "inputs / outputs"]
-  )
-
-  definput(:input, %{"type" => "string"}, public: true)
-
-  def handle_input(:input, %Message{} = message) do
-    output(:output, message)
-  end
-
-  definput(:forward, %{"type" => "string"})
-
-  def handle_input(:forward, %Message{} = message) do
-    output(:output, message)
-  end
-
-  defoutput(:output, %{"type" => "string"})
 end
