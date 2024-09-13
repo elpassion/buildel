@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.TextInput do
   use Buildel.Blocks.Block
+  alias Buildel.Blocks.Utils.Message
 
   @impl true
   def options() do
@@ -29,6 +30,15 @@ defmodule Buildel.Blocks.TextInput do
   end
 
   @impl true
+  def handle_input("forward", %Message{} = message, state) do
+    output(state, "output", message)
+  end
+
+  @impl true
+  def handle_input("input", %Message{} = message, state) do
+    output(state, "output", message)
+  end
+
   def handle_input("forward", {_topic, :text, text, _metadata}, state) do
     output(state, "output", {:text, text})
   end

@@ -20,7 +20,7 @@ defmodule Buildel.Pipelines.RunCost do
     |> assoc_constraint(:run)
     |> assoc_constraint(:cost)
     |> prepare_changes(fn changeset ->
-      with run_id <- get_change(changeset, :run_id),
+      with run_id when is_number(run_id) <- get_change(changeset, :run_id),
            cost_id <- get_change(changeset, :cost_id),
            cost <- Buildel.Repo.get(Buildel.Costs.Cost, cost_id) do
         query = from Buildel.Pipelines.Run, where: [id: ^run_id]

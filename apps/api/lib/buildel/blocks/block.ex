@@ -64,6 +64,7 @@ defmodule Buildel.Blocks.Block do
       use Buildel.Blocks.Utils.Error
       alias Buildel.Blocks.Block
       alias Buildel.BlockPubSub
+      alias Buildel.Blocks.Utils.Message
       @behaviour Buildel.Blocks.BlockBehaviour
 
       @impl true
@@ -224,6 +225,23 @@ defmodule Buildel.Blocks.Block do
       def handle_info({:stop_stream, output}, state) do
         state = send_stream_stop(state, output)
         {:noreply, state}
+      end
+
+      def handle_info(%Message{topic: topic} = message, state) do
+        context_id = BlockPubSub.io_from_topic(topic)
+
+        if context_id.context == state.context.context_id do
+          state =
+            inputs_subscribed_to_topic(all_connections(state.block), topic)
+            |> Enum.reduce(state, fn input, state ->
+              handle_input(input.name, message, state)
+            end)
+
+          {:noreply, state}
+        else
+          state = handle_external_input(topic, message, state)
+          {:noreply, state}
+        end
       end
 
       def handle_info({topic, message_type, value, metadata} = payload, state) do

@@ -55,7 +55,7 @@ defmodule Buildel.Blocks.Browser do
                   "description" => "The allowed host for the URL. Regex is supported.",
                   "default" => "",
                   "minLength" => 1
-                },
+                }
               )
           })
       }
@@ -72,9 +72,7 @@ defmodule Buildel.Blocks.Browser do
        :call_formatter,
        opts |> Map.get(:call_formatter, "Browse 📑: \"{{config.args}}\"\n")
      )
-     |> Map.put(:host, opts |> Map.get(:host, ""))
-    }
-
+     |> Map.put(:host, opts |> Map.get(:host, ""))}
   end
 
   defp url(url, state) do
@@ -168,7 +166,6 @@ defmodule Buildel.Blocks.Browser do
 
   @impl true
   def handle_input("url", {_topic, :text, text, _metadata}, state) do
-
     url = String.trim(text, "\"")
 
     with {:ok, true} <- does_url_match_host(url, Regex.compile!(state.host)) do
@@ -176,9 +173,9 @@ defmodule Buildel.Blocks.Browser do
       state
     else
       {:ok, false} ->
-      send_error(state, "URL #{text} does not match host #{state.host}")
-      state = state |> send_stream_stop()
-      state
+        send_error(state, "URL #{text} does not match host #{state.host}")
+        state = state |> send_stream_stop()
+        state
     end
   end
 
@@ -190,11 +187,11 @@ defmodule Buildel.Blocks.Browser do
       url(url, state)
     else
       {:ok, false} ->
-      error_message = "URL #{url} does not match host #{state.host}"
+        error_message = "URL #{url} does not match host #{state.host}"
 
-      send_error(state, error_message)
-      state = state |> send_stream_stop()
-      {error_message, state}
+        send_error(state, error_message)
+        state = state |> send_stream_stop()
+        {error_message, state}
     end
   end
 
@@ -227,6 +224,7 @@ defmodule Buildel.Blocks.Browser do
         else
           {:ok, false}
         end
+
       _ ->
         {:ok, false}
     end

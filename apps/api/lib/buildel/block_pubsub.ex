@@ -1,6 +1,7 @@
 defmodule Buildel.BlockPubSub do
   require Logger
   alias Phoenix.PubSub
+  alias Buildel.Blocks.Utils.Message
 
   def broadcast_to_io(context_id, block_name, io_name, message, metadata \\ %{}) do
     topic = io_topic(context_id, block_name, io_name)
@@ -39,7 +40,7 @@ defmodule Buildel.BlockPubSub do
 
   def broadcast_to_block(context_id, block_name, message) do
     topic = block_topic(context_id, block_name)
-    broadcast(topic, message)
+    broadcast(topic, message, %{})
   end
 
   def subscribe_to_block(context_id, block_name) do
@@ -56,7 +57,19 @@ defmodule Buildel.BlockPubSub do
     block_topic(context_id, block_name) <> "::io::#{io_name}"
   end
 
-  defp broadcast(topic, {message_type, content} = message, metadata \\ %{}) do
+  defp broadcast(topic, %Message{} = message, metadata) do
+    Logger.debug(
+      "Broadcasting to topic: #{topic}, message: #{inspect(message)}, metadata: #{inspect(metadata)})"
+    )
+
+    Buildel.PubSub
+    |> PubSub.broadcast!(
+      topic,
+      message |> Message.set_topic(topic) |> Message.set_metadata(metadata)
+    )
+  end
+
+  defp broadcast(topic, {message_type, content} = message, metadata) do
     Logger.debug(
       "Broadcasting to topic: #{topic}, message: #{inspect(message)}, metadata: #{inspect(metadata)})"
     )
