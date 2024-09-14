@@ -35,5 +35,6 @@ defmodule Buildel.Blocks.NewTextOutput do
   def handle_input(:input, %Message{} = message, state) do
     output(state, :output, message)
     output(state, :forward, message)
+    {:ok, state}
   end
 end

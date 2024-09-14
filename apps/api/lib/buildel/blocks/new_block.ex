@@ -133,8 +133,12 @@ defmodule Buildel.Blocks.NewBlock.Definput do
       @spec input(any(), unquote(name), Message.t()) :: :ok | {:error, :invalid_input}
       def input(state, unquote(name), %Message{} = message) do
         case validate_input(unquote(name), message) do
-          :ok -> handle_input(unquote(name), message, state)
-          {:error, :invalid_input} -> {:error, :invalid_input, state}
+          :ok ->
+            handle_input(unquote(name), message, state)
+
+          {:error, :invalid_input} ->
+            send_error(state, :invalid_input)
+            {:error, :invalid_input, state}
         end
       end
     end
@@ -181,8 +185,12 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
 
       def output(state, unquote(name), %Message{} = message) do
         case validate_output(unquote(name), message) do
-          :ok -> handle_output(unquote(name), message, state)
-          {:error, :invalid_output} -> {:error, :invalid_output, state}
+          :ok ->
+            handle_output(unquote(name), message, state)
+
+          {:error, :invalid_output} ->
+            send_error(state, :invalid_output)
+            {:error, :invalid_output, state}
         end
       end
     end
@@ -251,14 +259,21 @@ defmodule Buildel.Blocks.NewBlock.Server do
         if context_id.context == state.block.context.context_id do
           state =
             inputs_subscribed_to_topic(all_connections(state.block), topic)
+            |> Enum.map(fn
+              %{name: input_name} = input when is_binary(input_name) ->
+                %{input | name: String.to_existing_atom(input_name)}
+
+              input ->
+                input
+            end)
             |> Enum.reduce(
               state,
               fn
-                %{name: input}, state when is_atom(input) ->
-                  handle_input(input, message, state)
-
-                %{name: input}, state when is_binary(input) ->
-                  handle_input(input |> String.to_existing_atom(), message, state)
+                %{name: input_name}, state ->
+                  case input(state, input_name, message) do
+                    {:ok, state} -> state
+                    {:error, _reason, state} -> state
+                  end
               end
             )
 
@@ -294,6 +309,8 @@ defmodule Buildel.Blocks.NewBlock.Server do
         )
 
         send_stream_stop(state, name)
+
+        {:ok, state}
       end
 
       defp send_stream_start(state, name) do
@@ -336,6 +353,14 @@ defmodule Buildel.Blocks.NewBlock.Server do
             {:stop_stream, nil}
           )
         end
+      end
+
+      defp send_error(state, error_message) do
+        BlockPubSub.broadcast_to_block(
+          state.block.context.context_id,
+          state.block.name,
+          {:error, [error_message]}
+        )
       end
 
       def all_connections(block) do

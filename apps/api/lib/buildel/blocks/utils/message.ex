@@ -16,7 +16,7 @@ defmodule Buildel.Blocks.Utils.Message do
       type: type,
       message: message,
       topic: nil,
-      metadata: nil
+      metadata: %{}
     }
   end
 

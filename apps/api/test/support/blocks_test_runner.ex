@@ -5,6 +5,7 @@ defmodule Buildel.BlocksTestRunner do
   use GenServer
 
   def start_run(config) do
+    config = add_test_inputs(config)
     {:ok, pid} = GenServer.start_link(__MODULE__, config)
 
     {:ok, %Run{pid: pid}}
@@ -48,6 +49,32 @@ defmodule Buildel.BlocksTestRunner do
       opts: %{},
       connections: []
     })
+  end
+
+  def test_text_input_connection(input_name) when is_atom(input_name),
+    do: test_text_input_connection(input_name |> to_string())
+
+  def test_text_input_connection(input_name),
+    do:
+      Buildel.Blocks.Connection.from_connection_string(
+        "TEST_INPUT:output->#{input_name}",
+        "text"
+      )
+
+  def test_text_input(run, message),
+    do: Run.input(run, "TEST_INPUT", :input, message)
+
+  defp add_test_inputs(config) do
+    update_in(config.blocks, fn blocks ->
+      blocks ++
+        [
+          Buildel.Blocks.NewRawInput.create(%{
+            name: "TEST_INPUT",
+            opts: %{},
+            connections: []
+          })
+        ]
+    end)
   end
 
   @impl true

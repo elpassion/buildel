@@ -19,39 +19,58 @@ defmodule Buildel.Blocks.NewTextInputTest do
     test "validates schema correctly" do
       assert :ok =
                Blocks.validate_block(NewTextInput, %{
-                 "name" => "test",
-                 "opts" => %{},
-                 "inputs" => []
+                 name: "test",
+                 opts: %{}
                })
 
       assert {:error, _} = Blocks.validate_block(NewTextInput, %{})
     end
+  end
 
-    test "broadcasts text" do
-      {:ok, test_run} =
+  describe "TextInput Run" do
+    setup [:create_run]
+
+    test "validates input", %{run: test_run} do
+      {:ok, _topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", :output)
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_block("test")
+      message = Message.new(:raw, %{})
+      test_run |> BlocksTestRunner.test_text_input(message)
+      assert_receive_error(topic, :invalid_input)
+    end
+
+    test "outputs text", %{run: test_run} do
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", :output)
+      text = "text"
+      message = Message.new(:raw, text)
+      test_run |> BlocksTestRunner.Run.input("test", :input, message)
+
+      assert_receive_message(topic, message)
+    end
+
+    test "forwards text", %{run: test_run} do
+      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", :output)
+      text = "text"
+      message = Message.new(:raw, text)
+      test_run |> BlocksTestRunner.test_text_input(message)
+
+      assert_receive_message(topic, message)
+    end
+
+    def create_run(_) do
+      {:ok, run} =
         BlocksTestRunner.start_run(%{
           blocks: [
             NewTextInput.create(%{
               name: "test",
               opts: %{},
-              connections: []
+              connections: [
+                BlocksTestRunner.test_text_input_connection(:forward)
+              ]
             })
           ]
         })
 
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
-      text = "text"
-      test_run |> BlocksTestRunner.Run.input("test", "input", Message.new(:raw, text))
-      assert_receive {^topic, :start_stream, nil, _}
-
-      assert_receive %Message{
-        type: :raw,
-        message: ^text,
-        topic: ^topic,
-        metadata: %{}
-      }
-
-      assert_receive {^topic, :stop_stream, nil, _}
+      %{run: run}
     end
   end
 end
