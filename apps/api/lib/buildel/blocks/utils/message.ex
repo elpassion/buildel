@@ -29,4 +29,8 @@ defmodule Buildel.Blocks.Utils.Message do
   def set_metadata(message, metadata) do
     %__MODULE__{message | metadata: metadata}
   end
+
+  def set_message(message, message_message) do
+    %__MODULE__{message | message: message_message}
+  end
 end

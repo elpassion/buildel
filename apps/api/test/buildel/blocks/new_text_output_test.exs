@@ -1,5 +1,4 @@
 defmodule Buildel.Blocks.NewTextOutputTest do
-  alias Buildel.Blocks.NewTextInput
   use Buildel.BlockCase, async: true
   alias Blocks.NewTextOutput
 
@@ -26,43 +25,66 @@ defmodule Buildel.Blocks.NewTextOutputTest do
                  }
                })
 
-      assert {:error, _} =
-               Blocks.validate_block(NewTextOutput, %{})
+      assert {:error, _} = Blocks.validate_block(NewTextOutput, %{})
+    end
+  end
+
+  describe "TextOutput Run" do
+    setup [:create_run]
+
+    test "validates input", %{run: test_run} do
+      message = Message.new(:raw, %{})
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test")
+      |> BlocksTestRunner.test_text_input(message)
+      |> assert_receive_error("test", :invalid_input)
     end
 
-    test "broadcasts text" do
-      {:ok, test_run} =
+    test "outputs text", %{run: test_run} do
+      message = Message.new(:raw, "text")
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test")
+      |> BlocksTestRunner.test_text_input(message)
+      |> assert_receive_message("test", :output, message)
+      |> assert_receive_message("test", :forward, message)
+    end
+
+    test "uses jq filter", %{run: test_run} do
+      message = Message.new(:raw, ~s({ "content": "hello" }))
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test_jq")
+      |> BlocksTestRunner.test_text_input(message)
+      |> assert_receive_message("test_jq", :output, message |> Message.set_message("hello"))
+      |> assert_receive_message("test_jq", :forward, message |> Message.set_message("hello"))
+    end
+
+    def create_run(_) do
+      {:ok, run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            NewTextInput.create(%{
-              name: "test_input",
-              opts: %{},
-              connections: []
-            }),
             NewTextOutput.create(%{
               name: "test",
               opts: %{},
               connections: [
-                Blocks.Connection.from_connection_string("test_input:output->input", "text")
+                BlocksTestRunner.test_text_input_connection(:input)
+              ]
+            }),
+            NewTextOutput.create(%{
+              name: "test_jq",
+              opts: %{
+                jq_filter: ".content"
+              },
+              connections: [
+                BlocksTestRunner.test_text_input_connection(:input)
               ]
             })
           ]
         })
 
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", "output")
-      text = "text"
-      test_run |> BlocksTestRunner.Run.input("test_input", :input, Message.new(:raw, text))
-
-      assert_receive {^topic, :start_stream, nil, _}
-
-      assert_receive %Message{
-        type: :raw,
-        message: ^text,
-        topic: ^topic,
-        metadata: %{}
-      }
-
-      assert_receive {^topic, :stop_stream, nil, _}
+      %{run: run}
     end
   end
 end

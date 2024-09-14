@@ -16,6 +16,7 @@ defmodule Buildel.BlockCase do
       def assert_receive_message(%Run{} = run, block_name, output_name, message, options \\ []) do
         topic = run.subscriptions["#{block_name}_#{output_name |> to_string()}"]
         assert_receive_message(topic, message, options)
+        run
       end
 
       def assert_receive_message(topic, %Message{} = message, options \\ []) do
