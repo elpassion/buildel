@@ -12,16 +12,6 @@ defmodule Buildel.Blocks.NewTextOutput do
   defoutput(:output, %{"type" => "string"}, public: true)
   defoutput(:forward, %{"type" => "string"})
 
-  defoption(:stream_timeout, %{
-    type: "number",
-    title: "Stop after (ms)",
-    description:
-      "Wait this many milliseconds after receiving the last chunk before stopping the stream.",
-    minimum: 500,
-    default: 500,
-    step: 1
-  })
-
   defoption(
     :jq_filter,
     EditorField.new(%{
@@ -35,14 +25,20 @@ defmodule Buildel.Blocks.NewTextOutput do
 
   def handle_input(:input, %Message{} = message, state) do
     with %Message{} = message <- filter_message(state, message) do
-      output(state, :output, message)
-      output(state, :forward, message)
+      output(state, :output, message, stream_stop: :schedule)
+      output(state, :forward, message, stream_stop: :schedule)
       {:ok, state}
     else
       {:error, error} ->
         send_error(state, error)
         {:ok, state}
     end
+  end
+
+  def handle_input_stream_stop(:input, state) do
+    send_stream_stop(state, :output)
+    send_stream_stop(state, :forward)
+    {:ok, state}
   end
 
   defp filter_message(state, message) do

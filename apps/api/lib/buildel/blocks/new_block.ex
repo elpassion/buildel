@@ -361,7 +361,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
         case options[:stream_start] do
           :send -> send_stream_start(state, name)
           :none -> nil
-          :schedule -> send_stream_start(state, name)
+          :schedule -> nil
         end
 
         Buildel.BlockPubSub.broadcast_to_io(
@@ -374,7 +374,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
         case options[:stream_stop] do
           :send -> send_stream_stop(state, name)
           :none -> nil
-          :schedule -> send_stream_stop(state, name)
+          :schedule -> nil
         end
 
         {:ok, state}
