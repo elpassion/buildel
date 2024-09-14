@@ -88,18 +88,10 @@ defmodule Buildel.Blocks.NewBlock.Definput do
 
   defmacro definput(name, schema, options \\ []) do
     quote do
-      {:ok, options} = unquote(options) |> Keyword.validate(public: false, type: :text)
+      {:ok, options} =
+        unquote(options) |> Keyword.validate(public: false, type: :text, schema: %{})
 
-      case unquote(schema) do
-        %{} ->
-          ExJsonSchema.Schema.resolve(unquote(schema))
-
-        :binary ->
-          nil
-
-        _ ->
-          throw("Invalid schema")
-      end
+      ExJsonSchema.Schema.resolve(unquote(schema))
 
       @inputs [
         %Buildel.Blocks.NewBlock.Input{
@@ -111,24 +103,12 @@ defmodule Buildel.Blocks.NewBlock.Definput do
         | @inputs
       ]
 
-      case unquote(schema) do
-        %{} ->
-          @spec validate_input(unquote(name), Message.t()) :: :ok | {:error, :invalid_input}
-          def validate_input(unquote(name), %Message{} = message) do
-            case ExJsonSchema.Validator.valid?(unquote(schema), message.message) do
-              true -> :ok
-              false -> {:error, :invalid_input}
-            end
-          end
-
-        :binary ->
-          @spec validate_input(unquote(name), Message.t()) :: :ok | {:error, :invalid_input}
-          def validate_input(unquote(name), %Message{} = message) do
-            case is_binary(message.message) do
-              true -> :ok
-              false -> {:error, :invalid_input}
-            end
-          end
+      @spec validate_input(unquote(name), Message.t()) :: :ok | {:error, :invalid_input}
+      def validate_input(unquote(name), %Message{} = message) do
+        case ExJsonSchema.Validator.valid?(unquote(schema), message.message) do
+          true -> :ok
+          false -> {:error, :invalid_input}
+        end
       end
 
       @spec input(any(), unquote(name), Message.t()) :: :ok | {:error, :invalid_input}
@@ -149,23 +129,23 @@ end
 defmodule Buildel.Blocks.NewBlock.Defoutput do
   alias Buildel.Blocks.Utils.Message
 
-  defmacro defoutput(name, schema, _options \\ []) do
+  defmacro defoutput(name, schema, options \\ []) do
     quote do
-      case unquote(schema) do
-        %{} ->
-          ExJsonSchema.Schema.resolve(unquote(schema))
+      {:ok, options} =
+        unquote(options) |> Keyword.validate(public: false, type: :text, schema: %{})
 
-        :binary ->
-          nil
-
-        _ ->
-          throw("Invalid schema")
-      end
+      ExJsonSchema.Schema.resolve(unquote(schema))
 
       existing_outputs = @outputs
 
       @outputs [
-        %Buildel.Blocks.NewBlock.Output{name: unquote(name), schema: unquote(schema)} | @outputs
+        %Buildel.Blocks.NewBlock.Output{
+          name: unquote(name),
+          schema: unquote(schema),
+          public: options[:public],
+          type: options[:type]
+        }
+        | @outputs
       ]
 
       if existing_outputs |> Enum.count() == 0 do
@@ -185,22 +165,11 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
         end
       end
 
-      case unquote(schema) do
-        %{} ->
-          defp validate_output(unquote(name), %Message{} = message) do
-            case ExJsonSchema.Validator.valid?(unquote(schema), message.message) do
-              true -> :ok
-              false -> {:error, :invalid_output}
-            end
-          end
-
-        :binary ->
-          defp validate_output(unquote(name), %Message{} = message) do
-            case is_binary(message.message) do
-              true -> :ok
-              false -> {:error, :invalid_output}
-            end
-          end
+      defp validate_output(unquote(name), %Message{} = message) do
+        case ExJsonSchema.Validator.valid?(unquote(schema), message.message) do
+          true -> :ok
+          false -> {:error, :invalid_output}
+        end
       end
     end
   end

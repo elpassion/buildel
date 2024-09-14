@@ -11,12 +11,12 @@ defmodule Buildel.Blocks.Utils.Message do
         }
 
   @spec new(type(), any()) :: %__MODULE__{}
-  def new(type, message) do
+  def new(type, message, metadata \\ %{}) do
     %__MODULE__{
       type: type,
       message: message,
       topic: nil,
-      metadata: %{}
+      metadata: metadata
     }
   end
 

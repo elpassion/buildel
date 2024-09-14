@@ -37,7 +37,7 @@ defmodule Buildel.Blocks.NewTextOutputTest do
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")
-      |> BlocksTestRunner.test_text_input(message)
+      |> BlocksTestRunner.test_input(message)
       |> assert_receive_error("test", :invalid_input)
     end
 
@@ -46,7 +46,7 @@ defmodule Buildel.Blocks.NewTextOutputTest do
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")
-      |> BlocksTestRunner.test_text_input(message)
+      |> BlocksTestRunner.test_input(message)
       |> assert_receive_message("test", :output, message)
       |> assert_receive_message("test", :forward, message)
     end
@@ -56,7 +56,7 @@ defmodule Buildel.Blocks.NewTextOutputTest do
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test_jq")
-      |> BlocksTestRunner.test_text_input(message)
+      |> BlocksTestRunner.test_input(message)
       |> assert_receive_message("test_jq", :output, message |> Message.set_message("hello"))
       |> assert_receive_message("test_jq", :forward, message |> Message.set_message("hello"))
     end
@@ -66,7 +66,7 @@ defmodule Buildel.Blocks.NewTextOutputTest do
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test_jq_error")
-      |> BlocksTestRunner.test_text_input(message)
+      |> BlocksTestRunner.test_input(message)
       |> assert_receive_error("test_jq_error", :failed_to_parse_message)
     end
 

@@ -1,33 +1,33 @@
-defmodule Buildel.Blocks.NewTextInputTest do
+defmodule Buildel.Blocks.NewFileInputTest do
   use Buildel.BlockCase, async: true
-  alias Blocks.NewTextInput
+  alias Blocks.NewFileInput
 
-  describe "TextInput" do
+  describe "FileInput" do
     test "exposes options" do
       assert %{
-               type: :text_input,
+               type: :file_input,
                description:
-                 "This module is crafted for the seamless intake and transmission of textual data.",
-               inputs: [_, _],
+                 "A streamlined module designed for the efficient handling and transmission of file data.",
+               groups: ["file", "inputs / outputs"],
+               inputs: [_],
                outputs: [_],
-               groups: ["text", "inputs / outputs"],
                ios: [],
                dynamic_ios: nil
-             } = NewTextInput.options()
+             } = NewFileInput.options()
     end
 
     test "validates schema correctly" do
       assert :ok =
-               Blocks.validate_block(NewTextInput, %{
+               Blocks.validate_block(NewFileInput, %{
                  name: "test",
                  opts: %{}
                })
 
-      assert {:error, _} = Blocks.validate_block(NewTextInput, %{})
+      assert {:error, _} = Blocks.validate_block(NewFileInput, %{})
     end
   end
 
-  describe "TextInput Run" do
+  describe "FileInput Run" do
     setup [:create_run]
 
     test "validates input", %{run: test_run} do
@@ -35,12 +35,13 @@ defmodule Buildel.Blocks.NewTextInputTest do
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")
-      |> BlocksTestRunner.test_input(message)
+      |> BlocksTestRunner.Run.input("test", :input, message)
       |> assert_receive_error("test", :invalid_input)
     end
 
-    test "outputs text", %{run: test_run} do
-      message = Message.new(:raw, "text")
+    test "outputs file", %{run: test_run} do
+      file = File.read!("test/support/fixtures/real.mp3")
+      message = Message.new(:raw, file)
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")
@@ -48,12 +49,12 @@ defmodule Buildel.Blocks.NewTextInputTest do
       |> assert_receive_message("test", :output, message)
     end
 
-    test "forwards text", %{run: test_run} do
-      message = Message.new(:raw, "text")
+    test "outputs delete file", %{run: test_run} do
+      message = Message.new(:raw, "test123", %{method: :delete})
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")
-      |> BlocksTestRunner.test_input(message)
+      |> BlocksTestRunner.Run.input("test", :input, message)
       |> assert_receive_message("test", :output, message)
     end
 
@@ -61,12 +62,10 @@ defmodule Buildel.Blocks.NewTextInputTest do
       {:ok, run} =
         BlocksTestRunner.start_run(%{
           blocks: [
-            NewTextInput.create(%{
+            NewFileInput.create(%{
               name: "test",
               opts: %{},
-              connections: [
-                BlocksTestRunner.test_text_input_connection(:forward)
-              ]
+              connections: []
             })
           ]
         })

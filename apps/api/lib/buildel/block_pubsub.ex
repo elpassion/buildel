@@ -65,7 +65,7 @@ defmodule Buildel.BlockPubSub do
     Buildel.PubSub
     |> PubSub.broadcast!(
       topic,
-      message |> Message.set_topic(topic) |> Message.set_metadata(metadata)
+      message |> Message.set_topic(topic)
     )
   end
 

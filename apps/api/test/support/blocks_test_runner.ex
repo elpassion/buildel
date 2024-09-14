@@ -61,7 +61,7 @@ defmodule Buildel.BlocksTestRunner do
         "text"
       )
 
-  def test_text_input(run, message),
+  def test_input(run, message),
     do: Run.input(run, "TEST_INPUT", :input, message)
 
   def subscribe_to_block(run, block_name) do

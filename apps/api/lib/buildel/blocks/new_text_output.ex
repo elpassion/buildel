@@ -9,6 +9,7 @@ defmodule Buildel.Blocks.NewTextOutput do
   )
 
   definput(:input, %{"type" => "string"})
+
   defoutput(:output, %{"type" => "string"}, public: true)
   defoutput(:forward, %{"type" => "string"})
 
