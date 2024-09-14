@@ -1,5 +1,9 @@
 defmodule Buildel.BlocksTestRunner.Run do
-  defstruct [:pid, :config]
+  defstruct [:pid, :config, subscriptions: %{}]
+
+  def add_subscriptions(run, subscriptions) do
+    %{run | subscriptions: Map.merge(run.subscriptions, subscriptions)}
+  end
 
   def subscribe_to_output(run, block, output_name) do
     Buildel.BlockPubSub.subscribe_to_io(
@@ -24,6 +28,8 @@ defmodule Buildel.BlocksTestRunner.Run do
       data,
       metadata
     )
+
+    run
   end
 
   def stop_stream(run, block_name, output_name) do

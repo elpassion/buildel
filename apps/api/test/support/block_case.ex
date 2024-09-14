@@ -1,4 +1,5 @@
 defmodule Buildel.BlockCase do
+  alias Buildel.BlocksTestRunner.Run
   use ExUnit.CaseTemplate
 
   using do
@@ -12,6 +13,11 @@ defmodule Buildel.BlockCase do
 
       alias Blocks.{Block, Connection}
 
+      def assert_receive_message(%Run{} = run, block_name, output_name, message, options \\ []) do
+        topic = run.subscriptions["#{block_name}_#{output_name |> to_string()}"]
+        assert_receive_message(topic, message, options)
+      end
+
       def assert_receive_message(topic, %Message{} = message, options \\ []) do
         options = Keyword.validate!(options, start_stream: :receive, stop_stream: :receive)
 
@@ -22,6 +28,11 @@ defmodule Buildel.BlockCase do
         assert_receive ^message
 
         if options[:stop_stream] == :receive, do: assert_receive({^topic, :stop_stream, nil, _})
+      end
+
+      def assert_receive_error(%Run{} = run, block_name, error) do
+        topic = run.subscriptions[block_name]
+        assert_receive_error(topic, error)
       end
 
       def assert_receive_error(topic, error) do

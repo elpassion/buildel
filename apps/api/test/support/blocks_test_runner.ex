@@ -8,7 +8,7 @@ defmodule Buildel.BlocksTestRunner do
     config = add_test_inputs(config)
     {:ok, pid} = GenServer.start_link(__MODULE__, config)
 
-    {:ok, %Run{pid: pid}}
+    {:ok, %Run{pid: pid, config: config}}
   end
 
   def block_id(context, block) do
@@ -63,6 +63,27 @@ defmodule Buildel.BlocksTestRunner do
 
   def test_text_input(run, message),
     do: Run.input(run, "TEST_INPUT", :input, message)
+
+  def subscribe_to_block(run, block_name) do
+    with %Buildel.Blocks.Block{} = block <-
+           run.config.blocks |> Enum.find(&(&1.name == block_name)) do
+      {:ok, block_topic} = Run.subscribe_to_block(run, block_name)
+
+      subscriptions =
+        block.type.outputs()
+        |> Enum.map(fn output ->
+          {:ok, topic} = Run.subscribe_to_output(run, block_name, output.name)
+          {"#{block_name}_#{output.name}", topic}
+        end)
+        |> Enum.into(%{})
+        |> Map.put(block_name, block_topic)
+
+      run |> Run.add_subscriptions(subscriptions)
+    else
+      nil ->
+        throw("Can't find block #{block_name}")
+    end
+  end
 
   defp add_test_inputs(config) do
     update_in(config.blocks, fn blocks ->

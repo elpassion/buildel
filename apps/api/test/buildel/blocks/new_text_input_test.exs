@@ -31,29 +31,30 @@ defmodule Buildel.Blocks.NewTextInputTest do
     setup [:create_run]
 
     test "validates input", %{run: test_run} do
-      {:ok, _topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", :output)
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_block("test")
       message = Message.new(:raw, %{})
-      test_run |> BlocksTestRunner.test_text_input(message)
-      assert_receive_error(topic, :invalid_input)
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test")
+      |> BlocksTestRunner.test_text_input(message)
+      |> assert_receive_error("test", :invalid_input)
     end
 
     test "outputs text", %{run: test_run} do
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", :output)
-      text = "text"
-      message = Message.new(:raw, text)
-      test_run |> BlocksTestRunner.Run.input("test", :input, message)
+      message = Message.new(:raw, "text")
 
-      assert_receive_message(topic, message)
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test")
+      |> BlocksTestRunner.Run.input("test", :input, message)
+      |> assert_receive_message("test", :output, message)
     end
 
     test "forwards text", %{run: test_run} do
-      {:ok, topic} = test_run |> BlocksTestRunner.Run.subscribe_to_output("test", :output)
-      text = "text"
-      message = Message.new(:raw, text)
-      test_run |> BlocksTestRunner.test_text_input(message)
+      message = Message.new(:raw, "text")
 
-      assert_receive_message(topic, message)
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test")
+      |> BlocksTestRunner.test_text_input(message)
+      |> assert_receive_message("test", :output, message)
     end
 
     def create_run(_) do
