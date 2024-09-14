@@ -34,26 +34,33 @@ defmodule Buildel.Blocks.NewTextOutput do
   )
 
   def handle_input(:input, %Message{} = message, state) do
-    message = filter_message(state, message)
-    output(state, :output, message)
-    output(state, :forward, message)
-    {:ok, state}
+    with %Message{} = message <- filter_message(state, message) do
+      output(state, :output, message)
+      output(state, :forward, message)
+      {:ok, state}
+    else
+      {:error, error} ->
+        send_error(state, error)
+        {:ok, state}
+    end
   end
 
   defp filter_message(state, message) do
     case option(state, :jq_filter) do
-      nil ->
-        message
+      nil -> message
+      "" -> message
+      "." -> message
+      filter -> jq(message, filter)
+    end
+  end
 
-      "" ->
-        message
+  defp jq(message, filter) do
+    case Buildel.JQ.query(message.message, filter) do
+      {:ok, new_message_message} ->
+        Message.set_message(message, new_message_message |> String.trim())
 
-      "." ->
-        message
-
-      filter ->
-        new_message_message = Buildel.JQ.query!(message.message, filter) |> String.trim()
-        Message.set_message(message, new_message_message)
+      error ->
+        error
     end
   end
 end

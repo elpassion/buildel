@@ -61,6 +61,15 @@ defmodule Buildel.Blocks.NewTextOutputTest do
       |> assert_receive_message("test_jq", :forward, message |> Message.set_message("hello"))
     end
 
+    test "sends error with invalid jq filter", %{run: test_run} do
+      message = Message.new(:raw, ~s({ "content": "hello" }))
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test_jq_error")
+      |> BlocksTestRunner.test_text_input(message)
+      |> assert_receive_error("test_jq_error", :failed_to_parse_message)
+    end
+
     def create_run(_) do
       {:ok, run} =
         BlocksTestRunner.start_run(%{
@@ -76,6 +85,15 @@ defmodule Buildel.Blocks.NewTextOutputTest do
               name: "test_jq",
               opts: %{
                 jq_filter: ".content"
+              },
+              connections: [
+                BlocksTestRunner.test_text_input_connection(:input)
+              ]
+            }),
+            NewTextOutput.create(%{
+              name: "test_jq_error",
+              opts: %{
+                jq_filter: "error"
               },
               connections: [
                 BlocksTestRunner.test_text_input_connection(:input)

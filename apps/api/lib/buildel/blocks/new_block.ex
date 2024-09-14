@@ -32,6 +32,7 @@ defmodule Buildel.Blocks.NewBlock do
       end
 
       @before_compile Buildel.Blocks.NewBlock
+      @before_compile Buildel.Blocks.NewBlock.Server
     end
   end
 
@@ -161,9 +162,28 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
           throw("Invalid schema")
       end
 
+      existing_outputs = @outputs
+
       @outputs [
         %Buildel.Blocks.NewBlock.Output{name: unquote(name), schema: unquote(schema)} | @outputs
       ]
+
+      if existing_outputs |> Enum.count() == 0 do
+        def output(state, name, message, options \\ [])
+      end
+
+      def output(state, unquote(name), %Message{} = message, options) do
+        {:ok, options} = Keyword.validate(options, stream_stop: :send, stream_start: :send)
+
+        case validate_output(unquote(name), message) do
+          :ok ->
+            handle_output(unquote(name), message, options, state)
+
+          {:error, :invalid_output} ->
+            send_error(state, :invalid_output)
+            {:error, :invalid_output, state}
+        end
+      end
 
       case unquote(schema) do
         %{} ->
@@ -181,17 +201,6 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
               false -> {:error, :invalid_output}
             end
           end
-      end
-
-      def output(state, unquote(name), %Message{} = message) do
-        case validate_output(unquote(name), message) do
-          :ok ->
-            handle_output(unquote(name), message, state)
-
-          {:error, :invalid_output} ->
-            send_error(state, :invalid_output)
-            {:error, :invalid_output, state}
-        end
       end
     end
   end
@@ -289,12 +298,58 @@ defmodule Buildel.Blocks.NewBlock.Server do
       end
 
       @impl true
-      def handle_info({_topic, :start_stream, nil, _metadata}, state) do
+      def handle_info({topic, :start_stream, nil, _metadata}, state) do
+        context_id =
+          BlockPubSub.io_from_topic(topic)
+
+        state =
+          inputs_subscribed_to_topic(all_connections(state.block), topic)
+          |> Enum.map(fn
+            %{name: input_name} = input when is_binary(input_name) ->
+              %{input | name: String.to_existing_atom(input_name)}
+
+            input ->
+              input
+          end)
+          |> Enum.reduce(
+            state,
+            fn
+              %{name: input_name}, state ->
+                case handle_input_stream_start(input_name, state) do
+                  {:ok, state} -> state
+                  {:error, _reason, state} -> state
+                end
+            end
+          )
+
         {:noreply, state}
       end
 
       @impl true
-      def handle_info({_topic, :stop_stream, nil, _metadata}, state) do
+      def handle_info({topic, :stop_stream, nil, _metadata}, state) do
+        context_id =
+          BlockPubSub.io_from_topic(topic)
+
+        state =
+          inputs_subscribed_to_topic(all_connections(state.block), topic)
+          |> Enum.map(fn
+            %{name: input_name} = input when is_binary(input_name) ->
+              %{input | name: String.to_existing_atom(input_name)}
+
+            input ->
+              input
+          end)
+          |> Enum.reduce(
+            state,
+            fn
+              %{name: input_name}, state ->
+                case handle_input_stream_stop(input_name, state) do
+                  {:ok, state} -> state
+                  {:error, _reason, state} -> state
+                end
+            end
+          )
+
         {:noreply, state}
       end
 
@@ -302,8 +357,12 @@ defmodule Buildel.Blocks.NewBlock.Server do
         state
       end
 
-      def handle_output(name, message, state) do
-        send_stream_start(state, name)
+      defp handle_output(name, message, options, state) do
+        case options[:stream_start] do
+          :send -> send_stream_start(state, name)
+          :none -> nil
+          :schedule -> send_stream_start(state, name)
+        end
 
         Buildel.BlockPubSub.broadcast_to_io(
           state.block.context.context_id,
@@ -312,7 +371,11 @@ defmodule Buildel.Blocks.NewBlock.Server do
           message
         )
 
-        send_stream_stop(state, name)
+        case options[:stream_stop] do
+          :send -> send_stream_stop(state, name)
+          :none -> nil
+          :schedule -> send_stream_stop(state, name)
+        end
 
         {:ok, state}
       end
@@ -407,6 +470,18 @@ defmodule Buildel.Blocks.NewBlock.Server do
             connection.from.name |> to_string() == output_name |> to_string()
         end)
         |> Enum.map(& &1.to)
+      end
+    end
+  end
+
+  defmacro __before_compile__(_) do
+    quote do
+      def handle_input_stream_start(input_name, state) do
+        {:ok, state}
+      end
+
+      def handle_input_stream_stop(input_name, state) do
+        {:ok, state}
       end
     end
   end
