@@ -1,21 +1,33 @@
 defmodule Buildel.JQ do
   require Logger
 
-  def query!(payload, query, options \\ [])
-
-  @spec query!(String.t(), String.t(), list()) :: any()
-  def query!(payload, query, _options) do
+  def query(payload, jquery) do
     {:ok, tmp_path} = Temp.path()
     File.write!(tmp_path, payload)
 
     try do
-      case System.cmd("jq", ["-c", "-r", query, tmp_path]) do
-        {shortened_payload, 0} -> shortened_payload
-        {"", 3} -> payload
-        {"", 5} -> payload
+      case System.cmd("jq", ["-c", "-r", jquery, tmp_path]) do
+        {shortened_payload, 0} -> {:ok, shortened_payload}
+        {"", 3} -> {:error, :failed_to_parse_message}
+        {"", 5} -> {:error, :failed_to_parse_message}
       end
+    catch
+      _ -> {:error, :failed_to_parse_message}
     after
       File.rm!(tmp_path)
+    end
+  end
+
+  def query!(payload, query, options \\ [])
+
+  @spec query!(String.t(), String.t(), list()) :: any()
+  def query!(payload, jquery, _options) do
+    case query(payload, jquery) do
+      {:ok, shortened_payload} ->
+        shortened_payload
+
+      {:error, _reason} ->
+        payload
     end
   end
 end

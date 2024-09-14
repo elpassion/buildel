@@ -209,6 +209,10 @@ defmodule Buildel.Blocks.NewBlock.Defoption do
       end
 
       @schema_opts Keyword.put(@schema_opts, unquote(name), unquote(schema))
+
+      def option(state, unquote(name)) do
+        state.block.opts[unquote(name)] || unquote(schema).default
+      end
     end
   end
 end

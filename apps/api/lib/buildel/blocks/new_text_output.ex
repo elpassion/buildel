@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.NewTextOutput do
+  alias Buildel.Blocks.Utils.Message
   alias Buildel.Blocks.Fields.EditorField
   use Buildel.Blocks.NewBlock
 
@@ -33,8 +34,26 @@ defmodule Buildel.Blocks.NewTextOutput do
   )
 
   def handle_input(:input, %Message{} = message, state) do
+    message = filter_message(state, message)
     output(state, :output, message)
     output(state, :forward, message)
     {:ok, state}
+  end
+
+  defp filter_message(state, message) do
+    case option(state, :jq_filter) do
+      nil ->
+        message
+
+      "" ->
+        message
+
+      "." ->
+        message
+
+      filter ->
+        new_message_message = Buildel.JQ.query!(message.message, filter) |> String.trim()
+        Message.set_message(message, new_message_message)
+    end
   end
 end
