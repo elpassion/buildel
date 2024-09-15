@@ -60,6 +60,64 @@ defmodule Buildel.Blocks.NewApiCallTool do
   )
 
   def handle_input(:args, %Message{} = message, state) do
-    {:ok, state}
+    send_stream_start(state, :output)
+
+    with {:ok, response} <- call_api(state, message.message) do
+      {:ok, state}
+    else
+      {:error, reason} ->
+        send_error(state, reason)
+        {:error, reason, state}
+    end
+  end
+
+  defp call_api(state, args) do
+    with {:ok, url} <- build_url(option(state, :url), args),
+         {:ok, headers} <- build_headers(option(state, :headers), args),
+         {:ok, response} <- request(option(state, :method), url, headers) do
+      {:ok, response}
+    else
+      error -> error
+    end
+  end
+
+  defp request(method, url, headers) do
+    request =
+      Req.new(
+        method: method,
+        url: url,
+        headers: headers
+      )
+
+    case Req.request(request) do
+      {:ok, %Req.Response{status: status, body: body}} ->
+        {:ok, %{status: status, body: body}}
+
+      {:error, %{reason: reason}} ->
+        {:error, reason}
+    end
+  end
+
+  defp build_url(url_template, _args) do
+    with {:ok, url} <- URI.new(url_template),
+         {:ok, _} <- validate_scheme(url.scheme) do
+      {:ok, url}
+    end
+  end
+
+  defp build_headers(headers_template, _args) do
+    with {:ok, headers} <- Jason.decode(headers_template) do
+      {:ok, headers}
+    else
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp validate_scheme(schema) do
+    case schema do
+      "http" -> {:ok, "http"}
+      "https" -> {:ok, "https"}
+      _ -> {:error, "Invalid schema"}
+    end
   end
 end

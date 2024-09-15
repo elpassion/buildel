@@ -15,4 +15,11 @@ defmodule Buildel.Utils do
   end
 
   def parse_id(_), do: {:error, :invalid_id}
+
+  defmacro success?(status_code) do
+    quote do
+      is_integer(unquote(status_code)) and unquote(status_code) >= 200 and
+        unquote(status_code) < 400
+    end
+  end
 end
