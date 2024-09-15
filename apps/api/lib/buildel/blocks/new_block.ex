@@ -45,11 +45,12 @@ defmodule Buildel.Blocks.NewBlock do
         @inputs
       end
 
-      @spec get_input(input_name :: String.t()) :: %Buildel.Blocks.NewBlock.Input{}
+      @spec get_input(String.t()) :: %Buildel.Blocks.NewBlock.Input{}
       def get_input(input_name) when is_binary(input_name) do
         get_input(input_name |> String.to_existing_atom())
       end
 
+      @spec get_input(term()) :: %Buildel.Blocks.NewBlock.Input{}
       def get_input(input_name) do
         @inputs
         |> Enum.find(fn input -> input.name == input_name end)
@@ -61,11 +62,12 @@ defmodule Buildel.Blocks.NewBlock do
         @outputs
       end
 
-      @spec get_output(output_name :: String.t()) :: %Buildel.Blocks.NewBlock.Output{}
+      @spec get_output(String.t()) :: %Buildel.Blocks.NewBlock.Output{}
       def get_output(output_name) when is_binary(output_name) do
         get_output(output_name |> String.to_existing_atom())
       end
 
+      @spec get_output(term()) :: %Buildel.Blocks.NewBlock.Output{}
       def get_output(output_name) do
         @outputs
         |> Enum.find(fn output -> output.name == output_name end)
@@ -110,7 +112,7 @@ end
 defmodule Buildel.Blocks.NewBlock.Definput do
   alias Buildel.Blocks.Utils.Message
 
-  defmacro definput(name, options \\ []) do
+  defmacro definput(name, options) do
     quote do
       {:ok, options} =
         unquote(options) |> Keyword.validate(public: false, type: :text, schema: %{})
