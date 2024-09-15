@@ -45,9 +45,31 @@ defmodule Buildel.Blocks.NewBlock do
         @inputs
       end
 
+      @spec get_input(input_name :: String.t()) :: %Buildel.Blocks.NewBlock.Input{}
+      def get_input(input_name) when is_binary(input_name) do
+        get_input(input_name |> String.to_existing_atom())
+      end
+
+      def get_input(input_name) do
+        @inputs
+        |> Enum.find(fn input -> input.name == input_name end)
+        |> then(&{:ok, &1})
+      end
+
       @spec outputs :: [%Buildel.Blocks.NewBlock.Output{}]
       def outputs do
         @outputs
+      end
+
+      @spec get_output(output_name :: String.t()) :: %Buildel.Blocks.NewBlock.Output{}
+      def get_output(output_name) when is_binary(output_name) do
+        get_output(output_name |> String.to_existing_atom())
+      end
+
+      def get_output(output_name) do
+        @outputs
+        |> Enum.find(fn output -> output.name == output_name end)
+        |> then(&{:ok, &1})
       end
 
       @spec options :: %Buildel.Blocks.Utils.Options{}
@@ -64,10 +86,12 @@ defmodule Buildel.Blocks.NewBlock do
 end
 
 defmodule Buildel.Blocks.NewBlock.Input do
+  @derive Jason.Encoder
   defstruct [:name, :schema, type: :text, public: false]
 end
 
 defmodule Buildel.Blocks.NewBlock.Output do
+  @derive Jason.Encoder
   defstruct [:name, :schema, type: :text, public: false]
 end
 

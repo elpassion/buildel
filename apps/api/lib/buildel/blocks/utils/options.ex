@@ -2,6 +2,7 @@ defmodule Buildel.Blocks.Utils.Options do
   alias Buildel.Blocks.Utils.Schemas
 
   @enforce_keys [:type, :description, :groups]
+  @derive Jason.Encoder
   defstruct [:type, :description, :groups, :inputs, :outputs, :ios, :dynamic_ios, :schema]
 
   def new(%{type: type, description: description, groups: groups}) do

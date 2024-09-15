@@ -30,7 +30,42 @@ defmodule Buildel.Blocks.Utils.Message do
     %__MODULE__{message | metadata: metadata}
   end
 
+  @spec set_message(t(), String.t()) :: t()
   def set_message(message, message_message) do
     %__MODULE__{message | message: message_message}
+  end
+
+  @spec block_name(t()) :: String.t() | nil
+  def block_name(message) do
+    case message.topic do
+      nil -> nil
+      topic -> io_from_topic(topic).block
+    end
+  end
+
+  @spec input_or_output_name(t()) :: String.t() | nil
+  def input_or_output_name(message) do
+    case message.topic do
+      nil -> nil
+      topic -> io_from_topic(topic).io
+    end
+  end
+
+  defp io_from_topic(topic) do
+    case topic |> String.split("::") do
+      ["context", context_id, "block", block_name, "io", output_name] ->
+        %{
+          context: context_id,
+          block: block_name,
+          io: output_name
+        }
+
+      ["context", context_id, "block", block_name] ->
+        %{
+          context: context_id,
+          block: block_name,
+          io: nil
+        }
+    end
   end
 end

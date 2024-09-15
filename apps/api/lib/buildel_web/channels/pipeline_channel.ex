@@ -3,6 +3,7 @@ defmodule BuildelWeb.PipelineChannel do
   use BuildelWeb.Validator
 
   require Logger
+  alias Buildel.Blocks.Utils.Message
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
 
@@ -150,10 +151,36 @@ defmodule BuildelWeb.PipelineChannel do
           end
 
         _ ->
-          {:text, data}
+          Message.new(:text, data)
       end
 
     Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{})
+  end
+
+  def handle_info(%Message{} = message, socket) do
+    Logger.debug("Channel Sending binary chunk to #{message.topic}")
+    if should_send_through_block?(socket, message), do: send_message(socket, message)
+
+    {:noreply, socket}
+  end
+
+  defp should_send_through_block?(socket, %Message{} = message) do
+    block_name = message |> Buildel.Blocks.Utils.Message.block_name()
+
+    interface_output_block_names =
+      Map.get(socket.assigns.run.interface_config, "outputs", [])
+      |> Enum.map(&Map.get(&1, "name"))
+
+    Enum.member?(interface_output_block_names, block_name) ||
+      Enum.count(interface_output_block_names) == 0
+  end
+
+  defp send_message(socket, %Message{} = message) do
+    block_name = message |> Buildel.Blocks.Utils.Message.block_name()
+    output_name = message |> Buildel.Blocks.Utils.Message.input_or_output_name()
+
+    socket
+    |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message.message})
   end
 
   def handle_info({output_name, :binary, chunk, _metadata}, socket) do
