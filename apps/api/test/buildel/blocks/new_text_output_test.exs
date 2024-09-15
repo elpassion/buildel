@@ -20,7 +20,7 @@ defmodule Buildel.Blocks.NewTextOutputTest do
                Blocks.validate_block(NewTextOutput, %{
                  name: "test",
                  opts: %{
-                   stream_timeout: 500,
+                   output_as: "String",
                    jq_filter: "."
                  }
                })
@@ -38,7 +38,10 @@ defmodule Buildel.Blocks.NewTextOutputTest do
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.test_input(message)
-      |> assert_receive_error("test", :invalid_input)
+      |> assert_receive_error(
+        "test",
+        ~s(Could not format message. If you are returning an object then format it as JSON in Text Output Block)
+      )
     end
 
     test "outputs text", %{run: test_run} do
@@ -52,13 +55,21 @@ defmodule Buildel.Blocks.NewTextOutputTest do
     end
 
     test "uses jq filter", %{run: test_run} do
-      message = Message.new(:raw, ~s({ "content": "hello" }))
+      message = Message.new(:raw, %{content: "hello"})
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test_jq")
       |> BlocksTestRunner.test_input(message)
-      |> assert_receive_message("test_jq", :output, message |> Message.set_message("hello"))
-      |> assert_receive_message("test_jq", :forward, message |> Message.set_message("hello"))
+      |> assert_receive_message(
+        "test_jq",
+        :output,
+        Message.new(:raw, ~s({"content2":"hello"}))
+      )
+      |> assert_receive_message(
+        "test_jq",
+        :forward,
+        Message.new(:raw, ~s({"content2":"hello"}))
+      )
     end
 
     test "sends error with invalid jq filter", %{run: test_run} do
@@ -84,7 +95,8 @@ defmodule Buildel.Blocks.NewTextOutputTest do
             NewTextOutput.create(%{
               name: "test_jq",
               opts: %{
-                jq_filter: ".content"
+                jq_filter: "{content2: .content}",
+                output_as: "JSON"
               },
               connections: [
                 BlocksTestRunner.test_text_input_connection(:input)
@@ -93,7 +105,8 @@ defmodule Buildel.Blocks.NewTextOutputTest do
             NewTextOutput.create(%{
               name: "test_jq_error",
               opts: %{
-                jq_filter: "error"
+                jq_filter: "error",
+                output_as: "JSON"
               },
               connections: [
                 BlocksTestRunner.test_text_input_connection(:input)

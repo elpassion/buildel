@@ -21,7 +21,7 @@ defmodule Buildel.Blocks.NewTextInputTest do
                Blocks.validate_block(NewTextInput, %{
                  name: "test",
                  opts: %{
-                   json: false
+                   output_as: "String"
                  }
                })
 
@@ -91,7 +91,7 @@ defmodule Buildel.Blocks.NewTextInputTest do
             NewTextInput.create(%{
               name: "test_json",
               opts: %{
-                json: true
+                output_as: "JSON"
               },
               connections: []
             })

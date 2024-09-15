@@ -15,7 +15,7 @@ defmodule Buildel.Blocks.NewTextInput do
   defoption(:output_as, %{
     type: "string",
     title: "Output as type",
-    description: "If set to true, the input will be parsed as JSON.",
+    description: "How other blocks should interpret the output.",
     enum: ["String", "JSON"],
     enumPresentAs: "radio",
     default: "String",

@@ -218,7 +218,7 @@ defmodule Buildel.Blocks.NewBlock.Defoption do
       @schema_opts Keyword.put(@schema_opts, unquote(name), unquote(schema))
 
       def option(state, unquote(name)) do
-        state.block.opts[unquote(name)] || unquote(schema)[:default]
+        state.block.opts[unquote(name)] || unquote(schema) |> Map.get(:default)
       end
     end
   end
