@@ -20,7 +20,9 @@ defmodule Buildel.Blocks.NewTextInputTest do
       assert :ok =
                Blocks.validate_block(NewTextInput, %{
                  name: "test",
-                 opts: %{}
+                 opts: %{
+                   json: false
+                 }
                })
 
       assert {:error, _} = Blocks.validate_block(NewTextInput, %{})
@@ -57,6 +59,24 @@ defmodule Buildel.Blocks.NewTextInputTest do
       |> assert_receive_message("test", :output, message)
     end
 
+    test "validates json", %{run: test_run} do
+      message = Message.new(:raw, "text")
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test_json")
+      |> BlocksTestRunner.Run.input("test_json", :input, message)
+      |> assert_receive_error("test_json", :invalid_input)
+    end
+
+    test "outputs json", %{run: test_run} do
+      message = Message.new(:raw, "{}")
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test_json")
+      |> BlocksTestRunner.Run.input("test_json", :input, message |> Message.set_message({}))
+      |> assert_receive_error("test_json", :invalid_input)
+    end
+
     def create_run(_) do
       {:ok, run} =
         BlocksTestRunner.start_run(%{
@@ -67,6 +87,13 @@ defmodule Buildel.Blocks.NewTextInputTest do
               connections: [
                 BlocksTestRunner.test_text_input_connection(:forward)
               ]
+            }),
+            NewTextInput.create(%{
+              name: "test_json",
+              opts: %{
+                json: true
+              },
+              connections: []
             })
           ]
         })

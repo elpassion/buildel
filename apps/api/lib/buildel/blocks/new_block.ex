@@ -81,7 +81,7 @@ defmodule Buildel.Blocks.NewBlock do
         |> Options.set_outputs(@outputs)
         |> Options.set_ios([])
         |> Options.set_dynamic_ios(nil)
-        |> Options.set_schema(@schema_opts)
+        |> Options.set_schema(@schema_opts |> Enum.reverse())
       end
     end
   end
@@ -218,7 +218,7 @@ defmodule Buildel.Blocks.NewBlock.Defoption do
       @schema_opts Keyword.put(@schema_opts, unquote(name), unquote(schema))
 
       def option(state, unquote(name)) do
-        state.block.opts[unquote(name)] || unquote(schema).default
+        state.block.opts[unquote(name)] || unquote(schema)[:default]
       end
     end
   end

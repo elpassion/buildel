@@ -10,15 +10,41 @@ defmodule Buildel.Blocks.NewTextInput do
   definput(:input, schema: %{"type" => "string"}, public: true)
   definput(:forward, schema: %{"type" => "string"})
 
-  defoutput(:output, schema: %{"type" => "string"})
+  defoutput(:output, schema: %{"anyOf" => [%{"type" => "string"}, %{}]})
+
+  defoption(:output_as, %{
+    type: "string",
+    title: "Output as type",
+    description: "If set to true, the input will be parsed as JSON.",
+    enum: ["String", "JSON"],
+    enumPresentAs: "radio",
+    default: "String",
+    readonly: true
+  })
 
   def handle_input(:input, %Message{} = message, state) do
-    output(state, :output, message)
-    {:ok, state}
+    case parse_message(message, option(state, :output_as)) do
+      %Message{} = message ->
+        output(state, :output, message)
+        {:ok, state}
+
+      {:error, :invalid_input} ->
+        send_error(state, :invalid_input)
+        {:ok, state}
+    end
   end
 
   def handle_input(:forward, %Message{} = message, state) do
     output(state, :output, message)
     {:ok, state}
+  end
+
+  defp parse_message(message, "String"), do: message
+
+  defp parse_message(message, "JSON") do
+    case Jason.decode(message.message) do
+      {:ok, message_message} -> Message.set_message(message, message_message)
+      {:error, _} -> {:error, :invalid_input}
+    end
   end
 end
