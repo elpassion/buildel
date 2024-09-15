@@ -281,7 +281,11 @@ defmodule Buildel.Blocks.NewBlock.Server do
             fn
               %{name: input_name}, state ->
                 case input(state, input_name, message) do
-                  {:ok, state} -> state
+                  {:ok, state} ->
+                    state
+
+                  {:error, _reason, state} ->
+                    state
                 end
             end
           )
@@ -369,6 +373,14 @@ defmodule Buildel.Blocks.NewBlock.Server do
       end
 
       defp send_stream_start(state, name) do
+        unless state.stream_state_pid |> StreamState.any_output_streaming?() do
+          BlockPubSub.broadcast_to_block(
+            state.block.context.context_id,
+            state.block.name,
+            {:start_stream, nil}
+          )
+        end
+
         unless state.stream_state_pid |> StreamState.output_streaming?(name) do
           state.stream_state_pid |> StreamState.start_output_streaming(name)
 
@@ -376,14 +388,6 @@ defmodule Buildel.Blocks.NewBlock.Server do
             state.block.context.context_id,
             state.block.name,
             name,
-            {:start_stream, nil}
-          )
-        end
-
-        unless state.stream_state_pid |> StreamState.any_output_streaming?() do
-          BlockPubSub.broadcast_to_block(
-            state.block.context.context_id,
-            state.block.name,
             {:start_stream, nil}
           )
         end
@@ -515,7 +519,7 @@ defmodule Buildel.Blocks.NewBlock.StreamState do
     end
 
     def any_output_streaming?(state) do
-      Enum.any?(state.output_states, fn _ -> true end)
+      Enum.any?(state.output_states, fn {_, output_streaming?} -> output_streaming? end)
     end
 
     def output_streaming?(state, output_id) do
