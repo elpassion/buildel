@@ -48,7 +48,7 @@ defmodule Buildel.Blocks.Date do
   end
 
   defp get_date() do
-    DateTime.utc_now() |> DateTime.to_string()
+    DateTime.utc_now() |> DateTime.to_iso8601()
   end
 
   @impl true

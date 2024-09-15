@@ -35,8 +35,15 @@ defmodule Buildel.Blocks.NewTextInput do
   end
 
   def handle_input(:forward, %Message{} = message, state) do
-    output(state, :output, message)
-    {:ok, state}
+    case parse_message(message, option(state, :output_as)) do
+      %Message{} = message ->
+        output(state, :output, message)
+        {:ok, state}
+
+      {:error, :invalid_input} ->
+        send_error(state, :invalid_input)
+        {:ok, state}
+    end
   end
 
   defp parse_message(message, "String"), do: message

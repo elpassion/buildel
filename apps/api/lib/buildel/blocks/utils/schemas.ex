@@ -32,4 +32,37 @@ defmodule Buildel.Blocks.Utils.Schemas do
       schema
     )
   end
+
+  def secret_schema(%{} = attrs \\ %{}) do
+    Map.merge(
+      %{
+        "type" => "string",
+        "title" => "Secret",
+        "description" => "Select from your secrets",
+        "url" => "/api/organizations/{{organization_id}}/secrets?include_aliases=true",
+        "presentAs" => "async-creatable-select",
+        "minLength" => 1,
+        "schema" => %{
+          "type" => "object",
+          "required" => ["name", "value"],
+          "properties" => %{
+            "name" => %{
+              "type" => "string",
+              "title" => "Name",
+              "description" => "The name for the secret.",
+              "minLength" => 1
+            },
+            "value" => %{
+              "type" => "string",
+              "title" => "Value",
+              "description" => "The value of the secret.",
+              "presentAs" => "password",
+              "minLength" => 1
+            }
+          }
+        }
+      },
+      attrs
+    )
+  end
 end
