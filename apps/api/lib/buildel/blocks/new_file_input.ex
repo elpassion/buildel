@@ -7,9 +7,9 @@ defmodule Buildel.Blocks.NewFileInput do
     groups: ["file", "inputs / outputs"]
   )
 
-  definput(:input, %{"type" => "string"}, public: true, type: :file_temporary)
+  definput(:input, schema: %{"type" => "string"}, public: true, type: :file_temporary)
 
-  defoutput(:output, %{"type" => "string"})
+  defoutput(:output, schema: %{"type" => "string"})
 
   def handle_input(:input, %Message{metadata: %{method: :delete}} = message, state) do
     output(state, :output, message)

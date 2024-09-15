@@ -86,32 +86,27 @@ end
 defmodule Buildel.Blocks.NewBlock.Definput do
   alias Buildel.Blocks.Utils.Message
 
-  defmacro definput(name, schema, options \\ []) do
+  defmacro definput(name, options \\ []) do
     quote do
       {:ok, options} =
         unquote(options) |> Keyword.validate(public: false, type: :text, schema: %{})
 
-      ExJsonSchema.Schema.resolve(unquote(schema))
+      ExJsonSchema.Schema.resolve(options[:schema])
 
       @inputs [
         %Buildel.Blocks.NewBlock.Input{
           name: unquote(name),
-          schema: unquote(schema),
+          schema: unquote(options[:schema]),
           public: options[:public],
           type: options[:type]
         }
         | @inputs
       ]
 
-      @spec validate_input(unquote(name), Message.t()) :: :ok | {:error, :invalid_input}
-      def validate_input(unquote(name), %Message{} = message) do
-        case ExJsonSchema.Validator.valid?(unquote(schema), message.message) do
-          true -> :ok
-          false -> {:error, :invalid_input}
-        end
-      end
+      @callback handle_input(unquote(name), Message.t(), any()) :: {:ok, any()}
 
-      @spec input(any(), unquote(name), Message.t()) :: :ok | {:error, :invalid_input}
+      @spec input(any(), unquote(name), Message.t()) ::
+              {:ok, any()} | {:error, :invalid_input, any()}
       def input(state, unquote(name), %Message{} = message) do
         case validate_input(unquote(name), message) do
           :ok ->
@@ -122,6 +117,14 @@ defmodule Buildel.Blocks.NewBlock.Definput do
             {:error, :invalid_input, state}
         end
       end
+
+      @spec validate_input(unquote(name), Message.t()) :: :ok | {:error, :invalid_input}
+      defp validate_input(unquote(name), %Message{} = message) do
+        case ExJsonSchema.Validator.valid?(unquote(options[:schema]), message.message) do
+          true -> :ok
+          false -> {:error, :invalid_input}
+        end
+      end
     end
   end
 end
@@ -129,19 +132,19 @@ end
 defmodule Buildel.Blocks.NewBlock.Defoutput do
   alias Buildel.Blocks.Utils.Message
 
-  defmacro defoutput(name, schema, options \\ []) do
+  defmacro defoutput(name, options \\ []) do
     quote do
       {:ok, options} =
         unquote(options) |> Keyword.validate(public: false, type: :text, schema: %{})
 
-      ExJsonSchema.Schema.resolve(unquote(schema))
+      ExJsonSchema.Schema.resolve(options[:schema])
 
       existing_outputs = @outputs
 
       @outputs [
         %Buildel.Blocks.NewBlock.Output{
           name: unquote(name),
-          schema: unquote(schema),
+          schema: unquote(options[:schema]),
           public: options[:public],
           type: options[:type]
         }
@@ -166,7 +169,7 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
       end
 
       defp validate_output(unquote(name), %Message{} = message) do
-        case ExJsonSchema.Validator.valid?(unquote(schema), message.message) do
+        case ExJsonSchema.Validator.valid?(unquote(options[:schema]), message.message) do
           true -> :ok
           false -> {:error, :invalid_output}
         end
@@ -238,32 +241,26 @@ defmodule Buildel.Blocks.NewBlock.Server do
         context_id =
           BlockPubSub.io_from_topic(topic)
 
-        if context_id.context == state.block.context.context_id do
-          state =
-            inputs_subscribed_to_topic(all_connections(state.block), topic)
-            |> Enum.map(fn
-              %{name: input_name} = input when is_binary(input_name) ->
-                %{input | name: String.to_existing_atom(input_name)}
+        state =
+          inputs_subscribed_to_topic(all_connections(state.block), topic)
+          |> Enum.map(fn
+            %{name: input_name} = input when is_binary(input_name) ->
+              %{input | name: String.to_existing_atom(input_name)}
 
-              input ->
-                input
-            end)
-            |> Enum.reduce(
-              state,
-              fn
-                %{name: input_name}, state ->
-                  case input(state, input_name, message) do
-                    {:ok, state} -> state
-                    {:error, _reason, state} -> state
-                  end
-              end
-            )
+            input ->
+              input
+          end)
+          |> Enum.reduce(
+            state,
+            fn
+              %{name: input_name}, state ->
+                case input(state, input_name, message) do
+                  {:ok, state} -> state
+                end
+            end
+          )
 
-          {:noreply, state}
-        else
-          state = handle_external_input(topic, message, state)
-          {:noreply, state}
-        end
+        {:noreply, state}
       end
 
       @impl true
@@ -284,10 +281,8 @@ defmodule Buildel.Blocks.NewBlock.Server do
             state,
             fn
               %{name: input_name}, state ->
-                case handle_input_stream_start(input_name, state) do
-                  {:ok, state} -> state
-                  {:error, _reason, state} -> state
-                end
+                {:ok, state} = handle_input_stream_start(input_name, state)
+                state
             end
           )
 
@@ -312,10 +307,8 @@ defmodule Buildel.Blocks.NewBlock.Server do
             state,
             fn
               %{name: input_name}, state ->
-                case handle_input_stream_stop(input_name, state) do
-                  {:ok, state} -> state
-                  {:error, _reason, state} -> state
-                end
+                {:ok, state} = handle_input_stream_stop(input_name, state)
+                state
             end
           )
 
@@ -445,10 +438,12 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
   defmacro __before_compile__(_) do
     quote do
+      @spec handle_input_stream_start(term(), any()) :: {:ok, any()}
       def handle_input_stream_start(input_name, state) do
         {:ok, state}
       end
 
+      @spec handle_input_stream_stop(term(), any()) :: {:ok, any()}
       def handle_input_stream_stop(input_name, state) do
         {:ok, state}
       end

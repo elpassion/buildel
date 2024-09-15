@@ -6,12 +6,12 @@ defmodule Buildel.Blocks.NewRawInput do
     groups: []
   )
 
-  definput(:input, %{}, public: true)
+  definput(:input, schema: %{}, public: true)
 
   def handle_input(:input, %Message{} = message, state) do
     output(state, :output, message)
     {:ok, state}
   end
 
-  defoutput(:output, %{})
+  defoutput(:output, schema: %{})
 end

@@ -8,10 +8,10 @@ defmodule Buildel.Blocks.NewTextOutput do
     groups: ["text", "inputs / outputs"]
   )
 
-  definput(:input, %{"type" => "string"})
+  definput(:input, schema: %{"type" => "string"})
 
-  defoutput(:output, %{"type" => "string"}, public: true)
-  defoutput(:forward, %{"type" => "string"})
+  defoutput(:output, schema: %{"type" => "string"}, public: true)
+  defoutput(:forward, schema: %{"type" => "string"})
 
   defoption(
     :jq_filter,

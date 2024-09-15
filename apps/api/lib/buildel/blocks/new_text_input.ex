@@ -7,10 +7,10 @@ defmodule Buildel.Blocks.NewTextInput do
     groups: ["text", "inputs / outputs"]
   )
 
-  definput(:input, %{"type" => "string"}, public: true)
-  definput(:forward, %{"type" => "string"})
+  definput(:input, schema: %{"type" => "string"}, public: true)
+  definput(:forward, schema: %{"type" => "string"})
 
-  defoutput(:output, %{"type" => "string"})
+  defoutput(:output, schema: %{"type" => "string"})
 
   def handle_input(:input, %Message{} = message, state) do
     output(state, :output, message)
