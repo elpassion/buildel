@@ -98,7 +98,7 @@ defmodule Buildel.Blocks.NewChat do
     "minimum" => 0.0,
     "step" => 1,
     "readonly" => true,
-    "default" => 99_999
+    "default" => 10_000
   })
 
   defoption(:response_format, %{

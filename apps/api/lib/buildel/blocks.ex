@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks do
+  alias Buildel.Blocks.NewCollect
   alias Buildel.Blocks.ImageOutput
   alias Buildel.Blocks.DatasetOutput
   alias Buildel.Blocks.FileInput
@@ -14,7 +15,7 @@ defmodule Buildel.Blocks do
     NewTextOutput,
     AudioOutput,
     CollectSentences,
-    CollectAllText,
+    NewCollect,
     BlockValidator,
     NewMap,
     SplitText,
@@ -53,7 +54,7 @@ defmodule Buildel.Blocks do
     "text_output" => NewTextOutput,
     "audio_output" => AudioOutput,
     "collect_sentences" => CollectSentences,
-    "collect_all_text" => CollectAllText,
+    "collect_all_text" => NewCollect,
     "map_inputs" => NewMap,
     "split_text" => SplitText,
     "file_input" => FileInput,
@@ -92,7 +93,7 @@ defmodule Buildel.Blocks do
     TextOutput => "text_output",
     AudioOutput => "audio_output",
     CollectSentences => "collect_sentences",
-    CollectAllText => "collect_all_text",
+    NewCollect => "collect_all_text",
     NewMap => "map_inputs",
     FileInput => "file_input",
     SplitText => "split_text",
