@@ -9,12 +9,40 @@ defmodule Buildel.Blocks.NewDate do
   definput(:input, schema: %{})
   defoutput(:output, schema: %{"type" => "string"})
 
+  defoption(:additive_type, %{
+    "type" => "string",
+    "title" => "Additive type",
+    "description" => "The type of additive to apply to the date.",
+    "enum" => ["none", "second", "minute", "hour", "day", "week", "month", "year"],
+    "enumPresentAs" => "radio",
+    "default" => "none",
+    "readonly" => true
+  })
+
+  defoption(:additive, %{
+    "type" => "number",
+    "title" => "Additive",
+    "description" => "The amount of additive to apply to the date.",
+    "step" => 1,
+    "default" => 0
+  })
+
   def handle_input(:input, %Message{}, state) do
-    output(state, :output, Message.new(:text, get_date()))
+    output(state, :output, Message.new(:text, get_date(state)))
     {:ok, state}
   end
 
-  defp get_date() do
-    DateTime.utc_now() |> DateTime.to_string()
+  defp get_date(state) do
+    DateTime.utc_now()
+    |> apply_additive(
+      option(state, :additive_type),
+      option(state, :additive)
+    )
+    |> DateTime.to_iso8601()
   end
+
+  defp apply_additive(date, "none", _), do: date
+
+  defp apply_additive(date, additive_type, additive),
+    do: date |> DateTime.shift([{additive_type |> String.to_existing_atom(), additive}])
 end

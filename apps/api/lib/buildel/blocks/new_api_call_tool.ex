@@ -99,11 +99,27 @@ defmodule Buildel.Blocks.NewApiCallTool do
     end
   end
 
-  defp build_url(url_template, _args) do
-    with {:ok, url} <- URI.new(url_template),
-         {:ok, _} <- validate_scheme(url.scheme) do
+  defp build_url(url_template, args) do
+    with {:ok, url} <- fill_url(url_template, args),
+         {:ok, uri} <- URI.new(url),
+         {:ok, _} <- validate_scheme(uri.scheme) do
       {:ok, url}
     end
+  end
+
+  defp fill_url(url, args) do
+    {:ok,
+     args
+     |> Enum.reduce(url, fn
+       {key, value}, acc when is_number(value) ->
+         String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+       {key, value}, acc when is_binary(value) ->
+         String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+       _, acc ->
+         acc
+     end)}
   end
 
   defp build_headers(headers_template, _args) do
