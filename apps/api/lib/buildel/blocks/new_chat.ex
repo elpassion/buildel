@@ -80,16 +80,6 @@ defmodule Buildel.Blocks.NewChat do
     "readonly" => true
   })
 
-  defoption(:chat_memory_type, %{
-    "type" => "string",
-    "title" => "Chat memory type",
-    "description" => "The chat memory type to use for the chat.",
-    "enum" => ["off", "full", "rolling"],
-    "enumPresentAs" => "radio",
-    "default" => "full",
-    "minLength" => 1
-  })
-
   defoption(:temperature, %{
     "type" => "number",
     "title" => "Temperature",
@@ -190,8 +180,138 @@ defmodule Buildel.Blocks.NewChat do
     })
   )
 
-  def handle_input(:input, %Message{} = _message, state) do
+  def handle_input(:input, %Message{} = message, state) do
+    with {:ok, state} <- save_input_message(state, message),
+         {:ok, _chat_messages, state} <- fill_chat_messages(state),
+         {:ok, state} <- start_chat_completion(state) do
+      state = reset_latest_messages(state)
+      {:ok, state}
+    else
+      {:error, :not_all_chat_messages_filled, state} ->
+        {:ok, state}
+    end
+  end
+
+  defp save_input_message(state, message) do
+    latest_messages =
+      state
+      |> Map.get_lazy(:latest_messages, fn -> initial_latest_messages(state) end)
+      |> Map.put(message.topic, message)
+
+    {:ok, state |> Map.put(:latest_messages, latest_messages)}
+  end
+
+  defp reset_latest_messages(state) do
+    state |> Map.put(:latest_messages, initial_latest_messages(state))
+  end
+
+  defp initial_latest_messages(state) do
+    state.block.connections
+    |> Enum.map(fn %{from: %{block_name: block_name, name: name}} ->
+      {Buildel.BlockPubSub.io_topic(state.context.context_id, block_name, name), nil}
+    end)
+    |> Enum.into(%{})
+  end
+
+  defp start_chat_completion(state) do
+    Task.start(chat_completion_task(state))
     {:ok, state}
+  end
+
+  defp chat_completion_task(state) do
+    fn ->
+      send_stream_start(state, :output)
+
+      {:ok, chat_messages, state} = fill_chat_messages(state)
+
+      chat().stream_chat(
+        messages: chat_messages,
+        model: option(state, :model),
+        api_key: secret(state, option(state, :api_key)),
+        temperature: option(state, :temperature),
+        endpoint: option(state, :endpoint),
+        api_type: option(state, :api_type),
+        response_format: option(state, :response_format),
+        max_tokens: option(state, :max_tokens),
+        on_content: fn text_chunk ->
+          output(state, :output, Message.new(:text, text_chunk), stream_stop: :none)
+        end,
+        on_end: fn ->
+          send_stream_stop(state, :output)
+        end,
+        on_error: fn error ->
+          send_error(state, error)
+          send_stream_stop(state, :output)
+        end
+      )
+    end
+  end
+
+  defp chat() do
+    Application.fetch_env!(:buildel, :chat)
+  end
+
+  defp secret(state, secret_id) do
+    Buildel.BlockContext.get_secret_from_context(state.block.context.context_id, secret_id)
+  end
+
+  defp initial_messages(state) do
+    [%{role: "system", content: option(state, :system_message)}] ++
+      option(state, :messages) ++
+      [%{role: "user", content: option(state, :prompt_template)}]
+  end
+
+  defp fill_chat_messages(state) do
+    with filled_chat_messages <-
+           initial_messages(state)
+           |> Enum.map(&fill_chat_message(latest_messages_to_inputs(state.latest_messages), &1)) do
+      if(Enum.member?(filled_chat_messages, :error)) do
+        {:error, :not_all_chat_messages_filled, state}
+      else
+        {:ok, filled_chat_messages, state}
+      end
+    end
+  end
+
+  defp latest_messages_to_inputs(latest_messages) do
+    latest_messages
+    |> Enum.map(fn {topic, message} ->
+      %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
+      {"#{block}:#{output}", message}
+    end)
+    |> Enum.into(%{})
+  end
+
+  defp fill_chat_message(_, :error) do
+    :error
+  end
+
+  defp fill_chat_message({input, nil}, chat_message) do
+    if String.contains?(chat_message.content, "{{#{input}}}"), do: :error, else: chat_message
+  end
+
+  defp fill_chat_message({input, %Message{type: :text} = message}, chat_message) do
+    %{
+      chat_message
+      | content: String.replace(chat_message.content, "{{#{input}}}", message.message)
+    }
+  end
+
+  defp fill_chat_message({input, %Message{type: :json} = message}, chat_message) do
+    %{
+      chat_message
+      | content:
+          String.replace(
+            chat_message.content,
+            "{{#{input}}}",
+            message.message |> Jason.encode!()
+          )
+    }
+  end
+
+  defp fill_chat_message(inputs, chat_message) do
+    inputs
+    |> Enum.reduce(chat_message, &fill_chat_message/2)
   end
 
   # require Logger
@@ -820,23 +940,6 @@ defmodule Buildel.Blocks.NewChat do
 
   #     {key, value}, acc when is_binary(value) ->
   #       String.replace(acc, "{{#{key}}}", value |> to_string())
-
-  #     _, acc ->
-  #       acc
-  #   end)
-  # end
-
-  # defp build_call_formatter(value, args) do
-  #   args
-  #   |> Enum.reduce(value, fn
-  #     {key, value}, acc when is_number(value) ->
-  #       String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
-
-  #     {key, value}, acc when is_binary(value) ->
-  #       String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
-
-  #     {key, value}, acc when is_map(value) ->
-  #       String.replace(acc, "{{#{key}}}", Jason.encode!(value))
 
   #     _, acc ->
   #       acc

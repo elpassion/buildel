@@ -2,7 +2,7 @@ defmodule Buildel.Blocks.Utils.Message do
   @enforce_keys [:type, :message]
   defstruct [:type, :message, :topic, :metadata]
 
-  @type type :: :text | :raw | :binary
+  @type type :: :text | :raw | :binary | :json
   @type t :: %__MODULE__{
           type: type(),
           message: String.t(),
@@ -18,6 +18,11 @@ defmodule Buildel.Blocks.Utils.Message do
       topic: nil,
       metadata: metadata
     }
+  end
+
+  @spec set_type(t(), type()) :: t()
+  def set_type(message, type) do
+    %__MODULE__{message | type: type}
   end
 
   @spec set_topic(t(), String.t()) :: t()

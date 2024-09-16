@@ -42,7 +42,7 @@ defmodule Buildel.Blocks.NewTextInputTest do
     end
 
     test "outputs text", %{run: test_run} do
-      message = Message.new(:raw, "text")
+      message = Message.new(:text, "text")
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")
@@ -51,7 +51,7 @@ defmodule Buildel.Blocks.NewTextInputTest do
     end
 
     test "forwards text", %{run: test_run} do
-      message = Message.new(:raw, "text")
+      message = Message.new(:text, "text")
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")

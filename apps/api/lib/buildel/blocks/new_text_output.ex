@@ -13,16 +13,6 @@ defmodule Buildel.Blocks.NewTextOutput do
   defoutput(:output, schema: %{"type" => "string"}, public: true)
   defoutput(:forward, schema: %{"type" => "string"})
 
-  defoption(:output_as, %{
-    type: "string",
-    title: "Output as type",
-    description: "How to format the output.",
-    enum: ["String", "JSON"],
-    enumPresentAs: "radio",
-    default: "String",
-    readonly: true
-  })
-
   defoption(
     :jq_filter,
     EditorField.new(%{
@@ -34,9 +24,18 @@ defmodule Buildel.Blocks.NewTextOutput do
     })
   )
 
-  def handle_input(:input, %Message{} = message, state) do
+  def handle_input(:input, %Message{type: :text} = message, state) do
+    if filter_enabled?(state),
+      do: send_error(state, "Did not apply filter because message is a String not a JSON.")
+
+    output(state, :output, message, stream_stop: :schedule)
+    output(state, :forward, message, stream_stop: :schedule)
+    {:ok, state}
+  end
+
+  def handle_input(:input, %Message{type: :json} = message, state) do
     with %Message{} = message <- filter_message(state, message),
-         %Message{} = message <- format_message(message, option(state, :output_as)) do
+         %Message{} = message <- format_message(message) do
       output(state, :output, message, stream_stop: :schedule)
       output(state, :forward, message, stream_stop: :schedule)
       {:ok, state}
@@ -53,38 +52,39 @@ defmodule Buildel.Blocks.NewTextOutput do
     {:ok, state}
   end
 
-  defp format_message(message, "String") do
-    message |> Message.set_message(message.message |> to_string())
-  rescue
-    _e ->
-      {:error,
-       "Could not format message. If you are returning an object then format it as JSON in Text Output Block"}
-  end
+  defp format_message(%Message{type: :text} = message), do: message
 
-  defp format_message(message, "JSON") do
+  defp format_message(%Message{type: :json} = message) do
     case Jason.encode(message.message) do
-      {:ok, message_message} -> Message.set_message(message, message_message)
-      {:error, _} -> {:error, :invalid_input}
+      {:ok, message_message} ->
+        Message.set_message(message, message_message) |> Message.set_type(:text)
+
+      {:error, _} ->
+        {:error, :invalid_input}
     end
   end
 
   defp filter_message(state, message) do
+    if filter_enabled?(state), do: jq(message, option(state, :jq_filter)), else: message
+  end
+
+  defp filter_enabled?(state) do
     case option(state, :jq_filter) do
-      nil -> message
-      "" -> message
-      "." -> message
-      filter -> jq(message, filter)
+      nil -> false
+      "" -> false
+      "." -> false
+      _filter -> true
     end
   end
 
-  defp jq(%Message{message: message_message} = message, filter) when is_binary(message_message) do
-    with {:ok, new_message_message} <- Buildel.JQ.query(message.message, filter),
-         {:ok, new_message_message} <- Jason.decode(new_message_message) do
-      Message.set_message(message, new_message_message)
+  defp jq(%Message{type: :text} = message, filter) do
+    with {:ok, message_message} <- Buildel.JQ.query(message.message, filter),
+         {:ok, message_message} <- Jason.decode(message_message) do
+      Message.set_message(message, message_message) |> Message.set_type(:json)
     end
   end
 
   defp jq(message, filter) do
-    jq(format_message(message, "JSON"), filter)
+    jq(format_message(message), filter)
   end
 end

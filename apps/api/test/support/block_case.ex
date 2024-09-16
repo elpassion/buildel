@@ -34,6 +34,8 @@ defmodule Buildel.BlockCase do
       def assert_receive_error(%Run{} = run, block_name, error) do
         topic = run.subscriptions[block_name]
         assert_receive_error(topic, error)
+
+        run
       end
 
       def assert_receive_error(topic, error) do

@@ -32,20 +32,8 @@ defmodule Buildel.Blocks.NewTextOutputTest do
   describe "TextOutput Run" do
     setup [:create_run]
 
-    test "validates input", %{run: test_run} do
-      message = Message.new(:raw, %{})
-
-      test_run
-      |> BlocksTestRunner.subscribe_to_block("test")
-      |> BlocksTestRunner.test_input(message)
-      |> assert_receive_error(
-        "test",
-        ~s(Could not format message. If you are returning an object then format it as JSON in Text Output Block)
-      )
-    end
-
     test "outputs text", %{run: test_run} do
-      message = Message.new(:raw, "text")
+      message = Message.new(:text, "text")
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")
@@ -55,7 +43,7 @@ defmodule Buildel.Blocks.NewTextOutputTest do
     end
 
     test "uses jq filter", %{run: test_run} do
-      message = Message.new(:raw, %{content: "hello"})
+      message = Message.new(:json, %{content: "hello"})
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test_jq")
@@ -63,22 +51,39 @@ defmodule Buildel.Blocks.NewTextOutputTest do
       |> assert_receive_message(
         "test_jq",
         :output,
-        Message.new(:raw, ~s({"content2":"hello"}))
+        Message.new(:text, ~s({"content2":"hello"}))
       )
       |> assert_receive_message(
         "test_jq",
         :forward,
-        Message.new(:raw, ~s({"content2":"hello"}))
+        Message.new(:text, ~s({"content2":"hello"}))
       )
     end
 
-    test "sends error with invalid jq filter", %{run: test_run} do
-      message = Message.new(:raw, ~s({ "content": "hello" }))
+    test "sends error when trying to apply filter with text", %{run: test_run} do
+      message = Message.new(:text, ~s({ "content": "hello" }))
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test_jq")
+      |> BlocksTestRunner.test_input(message)
+      |> assert_receive_error(
+        "test_jq",
+        "Did not apply filter because message is a String not a JSON."
+      )
+      |> assert_receive_message("test_jq", :output, message)
+      |> assert_receive_message("test_jq", :forward, message)
+    end
+
+    test "sends error with invalid jq filter with json", %{run: test_run} do
+      message = Message.new(:json, %{content: "hello"})
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test_jq_error")
       |> BlocksTestRunner.test_input(message)
-      |> assert_receive_error("test_jq_error", :failed_to_parse_message)
+      |> assert_receive_error(
+        "test_jq_error",
+        :failed_to_parse_message
+      )
     end
 
     def create_run(_) do

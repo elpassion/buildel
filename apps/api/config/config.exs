@@ -60,7 +60,7 @@ config :req, :default_options, pool_timeout: 60_000
 config :buildel, :deepgram, Buildel.Clients.Deepgram
 config :buildel, :elevenlabs, Buildel.Clients.Elevenlabs
 config :buildel, :webhook, Buildel.Clients.Webhook
-config :buildel, :chat, Buildel.Clients.Chat
+config :buildel, :chat, Buildel.Clients.NewChat
 config :buildel, :file_loader, Buildel.FileLoaderNLMApiAdapter
 config :buildel, :search_db, Buildel.SearchDB.EctoAdapter
 config :buildel, :block_context_resolver, Buildel.BlockContext

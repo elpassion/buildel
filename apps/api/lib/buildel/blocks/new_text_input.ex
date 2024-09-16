@@ -46,12 +46,15 @@ defmodule Buildel.Blocks.NewTextInput do
     end
   end
 
-  defp parse_message(message, "String"), do: message
+  defp parse_message(message, "String"), do: message |> Message.set_type(:text)
 
   defp parse_message(message, "JSON") do
     case Jason.decode(message.message) do
-      {:ok, message_message} -> Message.set_message(message, message_message)
-      {:error, _} -> {:error, :invalid_input}
+      {:ok, message_message} ->
+        message |> Message.set_message(message_message) |> Message.set_type(:json)
+
+      {:error, _} ->
+        {:error, :invalid_input}
     end
   end
 end

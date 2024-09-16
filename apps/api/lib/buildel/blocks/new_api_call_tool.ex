@@ -63,7 +63,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
     send_stream_start(state, :output)
 
     with {:ok, response} <- call_api(state, message.message) do
-      output(state, :output, Message.new(:raw, response))
+      output(state, :output, Message.new(:json, response))
       {:ok, state}
     else
       {:error, reason} ->
