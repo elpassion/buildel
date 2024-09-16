@@ -107,7 +107,7 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
   };
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
         <div>
           <CardTitle className="line-clamp-2">{data.name}</CardTitle>
@@ -144,7 +144,7 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
         </DropdownMenu>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="grow">
         <CardDescription>Value: {data.hidden_value}</CardDescription>
         <CardDescription>{dayjs(data.updated_at).format()}</CardDescription>
         {data.alias && (
