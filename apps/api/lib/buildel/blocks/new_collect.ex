@@ -15,7 +15,7 @@ defmodule Buildel.Blocks.NewCollect do
 
     state =
       state
-      |> Map.update(:acc, "", fn acc -> acc <> message end)
+      |> Map.update(:acc, message, fn acc -> acc <> message end)
 
     {:ok, state}
   end

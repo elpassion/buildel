@@ -4,6 +4,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
 
   import BuildelWeb.UserAuth
 
+  alias Buildel.Blocks.Utils.Message
   alias OpenApiSpex.Operation
   alias Buildel.BlockPubSub
   alias Buildel.Pipelines
@@ -294,7 +295,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     topics = outputs |> Enum.map(& &1[:topic])
 
     receive do
-      {topic, type, data, _metadata} when type != :start_stream and type != :stop_stream ->
+      %Message{topic: topic, message: message} ->
         if topic in topics do
           outputs
           |> update_in(
@@ -302,7 +303,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
               Access.at(Enum.find_index(outputs, fn output -> output[:topic] == topic end)),
               :data
             ],
-            fn _ -> data end
+            fn _ -> message end
           )
         else
           outputs
@@ -337,7 +338,12 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
         end
 
       _ ->
-        Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, {:text, data})
+        Buildel.BlockPubSub.broadcast_to_io(
+          context_id,
+          block_name,
+          input_name,
+          Message.new(:text, data)
+        )
     end
   end
 
