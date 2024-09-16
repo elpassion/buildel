@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { ClientOnly } from 'remix-utils/client-only';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { cn } from '~/utils/cn';
@@ -47,12 +46,7 @@ const DialogDrawer = ({ children, ...props }: DialogDrawerRootProps) => {
   const isDesktop = useMediaQuery(desktop);
   const Component = isDesktop ? Dialog : Drawer;
 
-  //@todo temp fix for "Warning: useLayoutEffect does nothing on the server..." until https://github.com/emilkowalski/vaul/pull/368 is merged
-  return (
-    <ClientOnly fallback={null}>
-      {() => <Component {...props}>{children}</Component>}
-    </ClientOnly>
-  );
+  return <Component {...props}>{children}</Component>;
 };
 
 const DialogDrawerTrigger = ({
