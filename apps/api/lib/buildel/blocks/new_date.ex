@@ -10,7 +10,7 @@ defmodule Buildel.Blocks.NewDate do
   defoutput(:output, schema: %{"type" => "string"})
 
   def handle_input(:input, %Message{}, state) do
-    output(state, :output, Message.new(:raw, get_date()))
+    output(state, :output, Message.new(:text, get_date()))
     {:ok, state}
   end
 

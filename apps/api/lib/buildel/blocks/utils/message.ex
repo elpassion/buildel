@@ -73,4 +73,16 @@ defmodule Buildel.Blocks.Utils.Message do
         }
     end
   end
+
+  defimpl Jason.Encoder, for: [__MODULE__] do
+    alias Buildel.Blocks.Utils.Message
+
+    def encode(%Message{type: :text} = message, opts) do
+      Jason.Encode.string(message.message, opts)
+    end
+
+    def encode(%Message{type: :json} = message, opts) do
+      Jason.Encode.value(message.message, opts)
+    end
+  end
 end

@@ -52,9 +52,7 @@ defmodule Buildel.Blocks.NewTextOutput do
     {:ok, state}
   end
 
-  defp format_message(%Message{type: :text} = message), do: message
-
-  defp format_message(%Message{type: :json} = message) do
+  defp format_message(%Message{} = message) do
     case Jason.encode(message.message) do
       {:ok, message_message} ->
         Message.set_message(message, message_message) |> Message.set_type(:text)
