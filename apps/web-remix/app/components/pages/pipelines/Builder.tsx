@@ -295,7 +295,7 @@ const BuilderInstance = ({
   }, []);
 
   const { onInit: onInitCopyPaste, onMouseMove } = useCopyPasteNode({
-    allowCopyPaste: () => !outletData,
+    allowCopyPaste: () => !outletData && runStatus === 'idle',
     wrapper: reactFlowWrapper,
     onPaste: onBlockCreate,
     nodes: flowState.nodes,
@@ -358,7 +358,7 @@ const BuilderInstance = ({
           nodesDraggable={type === 'editable'}
           // elementsSelectable={!isDisabled}
           nodesConnectable={!isDisabled}
-          nodesFocusable={!isDisabled}
+          // nodesFocusable={!isDisabled}
           edgesReconnectable={!isDisabled}
           nodes={flowState.nodes}
           edges={flowState.edges}
