@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
+import type { Blocker, Location } from '@remix-run/react';
+import { useBlocker } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { useFormContext, ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
@@ -33,6 +35,7 @@ import {
   generateZODSchema,
 } from '~/components/form/schema/SchemaParser';
 import { SubmitButton } from '~/components/form/submit';
+import { ConfirmationModal } from '~/components/modal/ConfirmationModal';
 import type {
   IBlockConfig,
   IConfigConnection,
@@ -70,11 +73,31 @@ export function EditBlockForm({
   const [connections, setConnections] =
     useState<IConfigConnection[]>(propsConnections);
   const [fieldsErrors, setFieldsErrors] = useState<Record<string, string>>({});
-  const [_latestValues, setLatestValues] = useState<Record<string, any>>({});
+  const [latestValues, setLatestValues] = useState<Record<string, any>>({});
 
   const clearFieldsErrors = () => {
     setFieldsErrors({});
   };
+
+  const shouldBlock = useCallback(
+    ({
+      currentLocation,
+      nextLocation,
+    }: {
+      currentLocation: Location;
+      nextLocation: Location;
+    }) => {
+      if (nextLocation.state?.reset) return false;
+
+      return (
+        Object.keys(latestValues).length > 0 &&
+        currentLocation.pathname !== nextLocation.pathname
+      );
+    },
+    [latestValues],
+  );
+
+  const blocker = useBlocker(shouldBlock);
 
   const updateInputReset = useCallback(
     (connection: IConfigConnection, reset: boolean) => {
@@ -102,8 +125,10 @@ export function EditBlockForm({
   ) => {
     e.preventDefault();
     clearFieldsErrors();
-    const newConfig = { oldName: blockConfig.name, ...blockConfig, ...data };
 
+    if (blocker.state === 'blocked') blocker.reset();
+
+    const newConfig = { oldName: blockConfig.name, ...blockConfig, ...data };
     if (
       newConfig.oldName !== newConfig.name &&
       nodesNames.includes(data.name)
@@ -358,6 +383,8 @@ export function EditBlockForm({
       }}
       noValidate
     >
+      <PageLeaveBlocker blocker={blocker} />
+
       <InputsProvider
         connections={connections}
         updateInputReset={updateInputReset}
@@ -524,4 +551,23 @@ function filterBlockConnections(
   blockConfig: IBlockConfig,
 ) {
   return connections.filter((conn) => conn.to.block_name === blockConfig.name);
+}
+
+interface PageLeaveBlockerProps {
+  blocker: Blocker;
+}
+
+function PageLeaveBlocker({ blocker }: PageLeaveBlockerProps) {
+  if (blocker.state !== 'blocked') return null;
+
+  return (
+    <ConfirmationModal
+      isOpen={true}
+      onClose={blocker.reset}
+      onConfirm={async () => blocker.proceed()}
+      onCancel={async () => blocker.reset()}
+    >
+      <p className="text-sm">You have unsaved changes that will be lost.</p>
+    </ConfirmationModal>
+  );
 }

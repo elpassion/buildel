@@ -62,6 +62,16 @@ export function EditBlockPage() {
         pipelineId,
         Object.fromEntries(searchParams.entries()),
       ),
+    );
+  };
+
+  const closeWithReset = () => {
+    navigate(
+      routes.pipelineBuild(
+        organizationId,
+        pipelineId,
+        Object.fromEntries(searchParams.entries()),
+      ),
       { state: { reset: true } },
     );
   };
@@ -98,7 +108,7 @@ export function EditBlockPage() {
 
   useEffect(() => {
     if (updateFetcher.data) {
-      closeSidebar();
+      closeWithReset();
     }
   }, [updateFetcher.data]);
 
