@@ -151,7 +151,10 @@ export function generateZODSchema(
   }
 
   if (schema.type === 'boolean') {
-    let nestedSchema = z.union([z.boolean(), z.string()]);
+    let nestedSchema = z.union([
+      z.boolean(),
+      z.string().transform((val) => val === 'on'),
+    ]);
 
     if (isOptional) {
       // @ts-ignore
