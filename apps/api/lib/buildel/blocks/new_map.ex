@@ -30,6 +30,9 @@ defmodule Buildel.Blocks.NewMap do
       output(state, :output, message)
       {:ok, state}
     else
+      {:error, :template_not_filled, state} ->
+        {:ok, state}
+
       {:error, reason, state} ->
         send_error(state, reason)
         {:ok, state}

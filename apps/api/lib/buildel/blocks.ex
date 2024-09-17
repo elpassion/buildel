@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks do
+  alias Buildel.Blocks.NewBrowserTool
   alias Buildel.Blocks.NewCollect
   alias Buildel.Blocks.ImageOutput
   alias Buildel.Blocks.DatasetOutput
@@ -28,7 +29,7 @@ defmodule Buildel.Blocks do
     MapList,
     Timer,
     CSVSearch,
-    Browser,
+    NewBrowserTool,
     FileOutput,
     NewDate,
     Comment,
@@ -67,7 +68,7 @@ defmodule Buildel.Blocks do
     "map_list" => MapList,
     "timer" => Timer,
     "csv_search" => CSVSearch,
-    "browser" => Browser,
+    "browser" => NewBrowserTool,
     "file_output" => FileOutput,
     "date" => NewDate,
     "comment" => Comment,
@@ -106,7 +107,7 @@ defmodule Buildel.Blocks do
     MapList => "map_list",
     Timer => "timer",
     CSVSearch => "csv_search",
-    Browser => "browser",
+    NewBrowserTool => "browser",
     FileOutput => "file_output",
     NewDate => "date",
     Comment => "comment",
