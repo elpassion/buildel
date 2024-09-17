@@ -3,13 +3,14 @@ import React from 'react';
 
 import { cn } from '~/utils/cn';
 
-interface ItemListProps<T> {
+interface ItemListProps<T> extends React.HTMLAttributes<HTMLUListElement> {
   items: T[];
   renderItem: (item: T, index: number) => ReactNode;
   className?: string;
   itemClassName?: string;
   emptyText?: ReactNode;
   children?: ReactNode;
+  suffix?: ReactNode;
 }
 
 export const ItemList = <T extends { id: number | string }>({
@@ -19,6 +20,7 @@ export const ItemList = <T extends { id: number | string }>({
   itemClassName,
   emptyText,
   children,
+  suffix,
   ...rest
 }: ItemListProps<T> & React.HTMLProps<HTMLUListElement>) => {
   return (
@@ -30,6 +32,7 @@ export const ItemList = <T extends { id: number | string }>({
           {renderItem(item, index)}
         </li>
       ))}
+      {suffix}
     </ul>
   );
 };

@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from 'react';
-import React, { useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useInView } from 'react-intersection-observer';
 import { Check, Copy, Download, UserRound } from 'lucide-react';
 import { ClientOnly } from 'remix-utils/client-only';
 
@@ -26,15 +27,34 @@ export function ChatMessages({
   children,
   size,
 }: PropsWithChildren<ChatMessagesProps>) {
+  const { ref: inViewRef, inView } = useInView({});
+  const bottomRef = useRef<HTMLDivElement>(null);
+
   const reversed = useMemo(() => {
     if (!messages.length) return initialMessages ?? [];
     return messages.map((_, idx) => messages[messages.length - 1 - idx]);
   }, [messages, initialMessages]);
 
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      //eslint-disable-next-line
+      //@ts-ignore
+      bottomRef.current = node;
+      inViewRef(node);
+    },
+    [inViewRef],
+  );
+
+  useEffect(() => {
+    if (!bottomRef.current || !inView) return;
+
+    bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, inView]);
+
   return (
     <ItemList
       className={cn(
-        'flex flex-col-reverse gap-2 min-w-full w-full h-fit max-h-[97%] pr-1 prose overflow-y-auto',
+        'relative flex flex-col-reverse gap-2 min-w-full w-full h-fit max-h-[97%] pr-1 prose overflow-y-auto',
       )}
       itemClassName="w-full pl-3 pr-1"
       items={reversed}
@@ -50,6 +70,11 @@ export function ChatMessages({
       }}
     >
       {children}
+
+      <div
+        ref={setRefs}
+        className="opacity-0 absolute border-0 left-0 w-10 h-10 shrink-0 bg-white pointer-events-none"
+      />
     </ItemList>
   );
 }
