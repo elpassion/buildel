@@ -39,7 +39,7 @@ defmodule Buildel.Blocks do
     HuggingFaceImageClassification,
     BraveSearch,
     FileToText,
-    Image,
+    NewImage,
     ImageOutput,
     Knowledge
   }
@@ -78,7 +78,7 @@ defmodule Buildel.Blocks do
     "hf_image_classification" => HuggingFaceImageClassification,
     "brave_search" => BraveSearch,
     "file_to_text" => FileToText,
-    "image" => Image,
+    "image" => NewImage,
     "image_output" => ImageOutput,
     "knowledge" => Knowledge
   }
@@ -117,7 +117,7 @@ defmodule Buildel.Blocks do
     HuggingFaceImageClassification => "hf_image_classification",
     BraveSearch => "brave_search",
     FileToText => "file_to_text",
-    Image => "image",
+    NewImage => "image",
     ImageOutput => "image_output",
     Knowledge => "knowledge"
   }

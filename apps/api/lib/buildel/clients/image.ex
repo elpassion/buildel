@@ -50,7 +50,7 @@ defmodule Buildel.Clients.Image do
 
     def generate_image(image_open_ai, prompt) do
       response =
-        Req.new(url: image_open_ai.endpoint <> "/images/generations")
+        Req.new(url: image_open_ai.endpoint <> "/images/generations", receive_timeout: 60_000)
         |> Req.Request.put_header("Authorization", "Bearer #{image_open_ai.api_key}")
         |> Req.post(
           json: %{
@@ -69,7 +69,7 @@ defmodule Buildel.Clients.Image do
         {:ok, %Req.Response{status: 400, body: %{"error" => %{"message" => message}}}} ->
           {:error, message}
 
-        _ ->
+        _e ->
           {:error, "Unknown error"}
       end
     end

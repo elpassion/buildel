@@ -31,6 +31,10 @@ defmodule Buildel.Blocks.NewBlock do
         }
       end
 
+      defp secret(state, secret_id) do
+        Buildel.BlockContext.get_secret_from_context(state.block.context.context_id, secret_id)
+      end
+
       @before_compile Buildel.Blocks.NewBlock
       @before_compile Buildel.Blocks.NewBlock.Server
     end

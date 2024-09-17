@@ -251,10 +251,6 @@ defmodule Buildel.Blocks.NewChat do
     Application.fetch_env!(:buildel, :chat)
   end
 
-  defp secret(state, secret_id) do
-    Buildel.BlockContext.get_secret_from_context(state.block.context.context_id, secret_id)
-  end
-
   defp initial_messages(state) do
     [%{role: "system", content: option(state, :system_message)}] ++
       option(state, :messages) ++
