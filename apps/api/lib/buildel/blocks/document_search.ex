@@ -57,6 +57,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                     "default" => ""
                   }),
                 limit: %{
+                  "readonly" => true,
                   "type" => "number",
                   "title" => "Limit",
                   "description" => "The maximum number of results to return.",
@@ -80,12 +81,14 @@ defmodule Buildel.Blocks.DocumentSearch do
                   "step" => 0.01
                 },
                 extend_neighbors: %{
+                  "readonly" => true,
                   "type" => "boolean",
                   "title" => "Extend neighbors",
                   "description" => "Extend the search to include neighbor chunks",
                   "default" => false
                 },
                 extend_parents: %{
+                  "readonly" => true,
                   "type" => "boolean",
                   "title" => "Extend parents",
                   "description" =>
