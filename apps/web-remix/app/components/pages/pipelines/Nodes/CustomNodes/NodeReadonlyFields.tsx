@@ -13,6 +13,7 @@ import { cn } from '~/utils/cn';
 
 import { NodePromptInputs } from './NodePromptInputs';
 import {
+  NodeReadonlyBooleanValue,
   NodeReadonlyItemTextarea,
   NodeReadonlyItemTitle,
   NodeReadonlyItemValue,
@@ -53,10 +54,11 @@ export const NodeReadonlyFields = ({
 
   const renderProperties = useMemo(() => {
     return Object.keys(properties).map((key) => {
-      // only string/number types right now
+      // only string/number/boolean types right now
       if (
         properties[key].type !== 'string' &&
-        properties[key].type !== 'number'
+        properties[key].type !== 'number' &&
+        properties[key].type !== 'boolean'
       ) {
         return null;
       }
@@ -118,7 +120,7 @@ function NodeReadonlyItem({
 
   if (isEditor) {
     return (
-      <NodeReadonlyItemWrapper className="pt-1" show={!!data[id]}>
+      <NodeReadonlyItemWrapper className="pt-1" show={showValue(data[id])}>
         <NodeReadonlyItemTitle className="mb-1">
           {startCase(id)}
         </NodeReadonlyItemTitle>
@@ -134,8 +136,17 @@ function NodeReadonlyItem({
     );
   }
 
+  if (properties.type === 'boolean') {
+    return (
+      <NodeReadonlyItemWrapper show={showValue(data[id])}>
+        <NodeReadonlyItemTitle>{startCase(id)}</NodeReadonlyItemTitle>
+        <NodeReadonlyBooleanValue value={data[id]} />
+      </NodeReadonlyItemWrapper>
+    );
+  }
+
   return (
-    <NodeReadonlyItemWrapper show={!!data[id]}>
+    <NodeReadonlyItemWrapper show={showValue(data[id])}>
       <NodeReadonlyItemTitle>{startCase(id)}</NodeReadonlyItemTitle>
       <NodeReadonlyItemValue>{data[id]}</NodeReadonlyItemValue>
     </NodeReadonlyItemWrapper>
@@ -198,3 +209,11 @@ const isObjectField = (
 ): schema is JSONSchemaObjectField => {
   return (schema as JSONSchemaObjectField)?.type === 'object';
 };
+
+function showValue(value: unknown) {
+  if (typeof value === 'boolean' || typeof value === 'number') {
+    return true;
+  }
+
+  return !!value;
+}

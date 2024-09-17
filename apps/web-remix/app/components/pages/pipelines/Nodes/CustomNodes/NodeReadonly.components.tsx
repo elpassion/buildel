@@ -48,6 +48,21 @@ export function NodeReadonlyItemValue({
   );
 }
 
+export function NodeReadonlyBooleanValue({
+  className,
+  value,
+  ...rest
+}: React.HTMLAttributes<HTMLParagraphElement> & { value: boolean }) {
+  return (
+    <NodeReadonlyItemValue
+      className={cn({ 'text-green-500': value }, className)}
+      {...rest}
+    >
+      {value ? 'Yes' : 'No'}
+    </NodeReadonlyItemValue>
+  );
+}
+
 export function NodeReadonlyItemTextarea({
   className,
   ...rest
