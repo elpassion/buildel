@@ -3,53 +3,62 @@ defmodule Buildel.WorkflowTemplates do
     %{
       name: "AI Chat",
       template_name: "ai_chat",
-      template_description: "Basic workflow with any of supported models"
+      template_description: "Basic workflow with any of supported models",
+      groups: ["popular", "chatbots"]
     },
     %{
       name: "Speech To Text",
       template_name: "speech_to_text",
-      template_description: "Allows to upload audio file and receive transcription"
+      template_description: "Allows to upload audio file and receive transcription",
+      groups: ["processing"]
     },
     %{
       name: "Text To Speech",
       template_name: "text_to_speech",
-      template_description: "Allows to generate audio files from provided text"
+      template_description: "Allows to generate audio files from provided text",
+      groups: ["processing"]
     },
     %{
       name: "Knowledge Search To Text",
       template_name: "knowledge_search_to_text",
       template_description:
-        "Allows to analyse given documents and receive i.e. summary or answer questions"
+        "Allows to analyse given documents and receive i.e. summary or answer questions",
+      groups: ["knowledge bases"]
     },
     %{
       name: "Spreadsheet AI Assistant",
       template_name: "spreadsheet_ai_assistant",
       template_description:
-        "Interact with a spreadsheet database using plain language. No need for SQL"
+        "Interact with a spreadsheet database using plain language. No need for SQL",
+      groups: ["analytics", "processing"]
     },
     %{
       name: "Text Classification",
       template_name: "text_classification_assistant",
       template_description:
-        "Text classifier assistant that convert text into one or more categories"
+        "Text classifier assistant that convert text into one or more categories",
+      groups: ["processing"]
     },
     %{
       name: "Feedback Assistant",
       template_name: "text_feedback_assistant",
       template_description:
-        "Text feedback assistant that analyze the provided text and provide feedback"
+        "Text feedback assistant that analyze the provided text and provide feedback",
+      groups: ["growth","popular"]
     },
     %{
       name: "SEO Image for Article",
       template_name: "seo_image_for_article",
       template_description:
-        "Template that generates an image from the article content"
+        "Template that generates an image from the article content",
+      groups: ["growth"]
     },
     %{
       name: "Blog post generator",
       template_name: "blog_post_generator",
       template_description:
-        "Template that generates a blog post from the give topic"
+        "Template that generates a blog post from the give topic",
+      groups: ["growth"]
     }
   ]
 

@@ -1,18 +1,10 @@
 import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { Outlet, useLoaderData, useMatch, useNavigate } from '@remix-run/react';
+import { Outlet, useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { Button } from '~/components/ui/button';
-import {
-  DialogDrawer,
-  DialogDrawerBody,
-  DialogDrawerContent,
-  DialogDrawerDescription,
-  DialogDrawerHeader,
-  DialogDrawerTitle,
-} from '~/components/ui/dialog-drawer';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -28,13 +20,6 @@ import {
 
 export function PipelinesPage() {
   const { pipelines, organizationId } = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
-  const match = useMatch(`${organizationId}/pipelines/new`);
-  const isSidebarOpen = !!match;
-  const handleCloseSidebar = (value: boolean) => {
-    if (value) return;
-    navigate(routes.pipelines(organizationId));
-  };
 
   return (
     <>
@@ -49,20 +34,7 @@ export function PipelinesPage() {
         </Button>
       </PipelinesNavbar>
 
-      <DialogDrawer open={isSidebarOpen} onOpenChange={handleCloseSidebar}>
-        <DialogDrawerContent>
-          <DialogDrawerHeader>
-            <DialogDrawerTitle>Create a new workflow</DialogDrawerTitle>
-            <DialogDrawerDescription>
-              Any workflow can contain many Blocks and use your Knowledge Base.
-            </DialogDrawerDescription>
-          </DialogDrawerHeader>
-
-          <DialogDrawerBody>
-            <Outlet />
-          </DialogDrawerBody>
-        </DialogDrawerContent>
-      </DialogDrawer>
+      <Outlet />
 
       <PageContentWrapper className="grid grid-cols-1 gap-8 mt-6 lg:grid-cols-1">
         {pipelines.data.length > 0 ? (
@@ -133,11 +105,13 @@ function TemplatesWithoutPipelines({
             </BasicLink>
           </span>
         }
-        className="text-center gap-2 md:mb-8"
+        className="text-center gap-2 md:mb-4"
       />
 
       <div>
-        <h3 className="text-muted-foreground mb-3">Choose from templates</h3>
+        <h3 className="text-muted-foreground mb-3 text-sm">
+          Choose from templates
+        </h3>
         <WorkflowTemplatesList items={templates} />
 
         <div className="relative w-full h-[0.5px] bg-neutral-200 my-8">

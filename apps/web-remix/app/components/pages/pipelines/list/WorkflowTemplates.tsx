@@ -21,7 +21,7 @@ export const WorkflowTemplates: React.FC<WorkflowTemplatesProps> = ({
   return (
     <article
       className={cn(
-        'flex-grow bg-white border border-neutral-100 px-4 py-8 rounded-3xl flex flex-col gap-6 md:flex-row md:gap-14 md:justify-between md:p-16',
+        'flex-grow bg-white border border-neutral-100 px-4 py-8 rounded-3xl flex flex-col gap-4 md:justify-between md:p-16',
         className,
       )}
     >
@@ -40,11 +40,11 @@ export function WorkflowTemplatesList({
 }: WorkflowTemplatesListProps) {
   const formattedTemplates = useMemo(
     () => items.map((template) => ({ ...template, id: template.name })),
-    [],
+    [items],
   );
   return (
     <ItemList
-      className="flex flex-col gap-2"
+      className="grid grid-cols-1 md:grid-cols-2 gap-3"
       items={formattedTemplates}
       renderItem={(item) => (
         <WorkflowTemplatesListItem action={action} item={item} />
@@ -67,7 +67,7 @@ function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
       method="POST"
       validator={validator}
       onClick={() => ref.current?.submit()}
-      className="group p-2 flex items-center justify-between gap-2 bg-white border border-neutral-100 h-[80px] rounded-xl transition hover:border-blue-200 cursor-pointer md:p-4"
+      className="group p-2 flex items-center justify-between gap-2 bg-white border border-neutral-100 h-[85px] rounded-xl transition hover:border-blue-200 cursor-pointer md:p-4"
     >
       <div className="flex gap-3">
         <div
@@ -77,7 +77,7 @@ function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
           )}
         >
           <img
-            src={resolveImageUrl(item.template_name)}
+            src={resolveTemplateImageUrl(item.template_name)}
             alt={`${item.name} icon`}
             className="text-foreground w-4"
           />
@@ -87,7 +87,10 @@ function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
           <h4 className="group-hover:text-blue-500 text-base font-bold mb-1 transition">
             {item.name}
           </h4>
-          <p className="text-xs text-muted-foreground">
+          <p
+            className="text-xs text-muted-foreground line-clamp-2"
+            title={item.template_description}
+          >
             {item.template_description}
           </p>
         </div>
@@ -166,10 +169,7 @@ export function WorkflowTemplatesHeader({
 }: WorkflowTemplatesHeaderProps) {
   return (
     <header
-      className={cn(
-        'flex flex-col gap-4 md:gap-6 md:text-left md:max-w-[280px]',
-        className,
-      )}
+      className={cn('flex flex-col gap-4 md:gap-6 md:text-left', className)}
     >
       <h3 className="text-xl md:text-3xl font-medium">{heading}</h3>
       <p className="text-sm md:text-base text-muted-foreground">{subheading}</p>
@@ -177,6 +177,6 @@ export function WorkflowTemplatesHeader({
   );
 }
 
-function resolveImageUrl(name: string) {
+export function resolveTemplateImageUrl(name: string) {
   return `/templates/${name}.svg`;
 }
