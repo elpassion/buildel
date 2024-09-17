@@ -64,8 +64,9 @@ export const NodeReadonlyFields = ({
       return (
         <li
           key={key}
-          className={cn('py-1', {
-            'basis-full': properties[key].presentAs === 'editor',
+          className={cn('pt-1 [&:not(:last-child)]:pb-3', {
+            'basis-full [&:not(:first-child)]:border-t border-input':
+              properties[key].presentAs === 'editor',
           })}
         >
           <NodeReadonlyItem
@@ -80,7 +81,7 @@ export const NodeReadonlyFields = ({
   }, [properties]);
 
   return (
-    <ul className="flex gap-x-4 flex-wrap max-w-[350px] w-fit">
+    <ul className="flex gap-x-4 flex-wrap max-w-[350px] w-full">
       {renderProperties}
     </ul>
   );
@@ -117,10 +118,7 @@ function NodeReadonlyItem({
 
   if (isEditor) {
     return (
-      <NodeReadonlyItemWrapper
-        className={cn('border-t border-input pt-2')}
-        show={!!data[id]}
-      >
+      <NodeReadonlyItemWrapper className="pt-1" show={!!data[id]}>
         <NodeReadonlyItemTitle className="mb-1">
           {startCase(id)}
         </NodeReadonlyItemTitle>

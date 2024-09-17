@@ -12,7 +12,7 @@ export function NodeReadonlyItemWrapper({
 }: React.HTMLAttributes<HTMLDivElement> & { show?: boolean }) {
   if (!show) return;
   return (
-    <div className={cn('flex flex-col', className)} {...rest}>
+    <div className={cn('flex flex-col w-full', className)} {...rest}>
       {children}
     </div>
   );
