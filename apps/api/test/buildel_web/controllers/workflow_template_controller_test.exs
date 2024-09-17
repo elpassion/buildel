@@ -29,19 +29,20 @@ defmodule BuildelWeb.WorkflowTemplateControllerTest do
       response = json_response(conn, 200)
 
       assert [
-               %{"name" => "AI Chat", "template_name" => "ai_chat", "template_description" => "Basic workflow with any of supported models"},
-               %{"name" => "Speech To Text", "template_name" => "speech_to_text", "template_description" => "Allows to upload audio file and receive transcription"},
-               %{"name" => "Text To Speech", "template_name" => "text_to_speech", "template_description" => "Allows to generate audio files from provided text"},
+               %{"name" => "AI Chat", "template_name" => "ai_chat", "template_description" => "Basic workflow with any of supported models", "groups" => ["popular", "chatbots"]},
+               %{"name" => "Speech To Text", "template_name" => "speech_to_text", "template_description" => "Allows to upload audio file and receive transcription", "groups" => ["processing"]},
+               %{"name" => "Text To Speech", "template_name" => "text_to_speech", "template_description" => "Allows to generate audio files from provided text", "groups" => ["processing"]},
                %{
                  "name" => "Knowledge Search To Text",
                  "template_name" => "knowledge_search_to_text",
-                 "template_description" => "Allows to analyse given documents and receive i.e. summary or answer questions"
+                 "template_description" => "Allows to analyse given documents and receive i.e. summary or answer questions",
+                  "groups" => ["knowledge bases"]
                },
-               %{"name" => "Spreadsheet AI Assistant", "template_description" => "Interact with a spreadsheet database using plain language. No need for SQL", "template_name" => "spreadsheet_ai_assistant"},
-               %{"name" => "Text Classification", "template_description" => "Text classifier assistant that convert text into one or more categories", "template_name" => "text_classification_assistant"},
-               %{"name" => "Feedback Assistant", "template_description" => "Text feedback assistant that analyze the provided text and provide feedback", "template_name" => "text_feedback_assistant"},
-               %{"name" => "SEO Image for Article", "template_description" => "Template that generates an image from the article content", "template_name" => "seo_image_for_article"},
-               %{"name" => "Blog post generator", "template_description" => "Template that generates a blog post from the give topic", "template_name" => "blog_post_generator"}
+               %{"name" => "Spreadsheet AI Assistant", "template_description" => "Interact with a spreadsheet database using plain language. No need for SQL", "template_name" => "spreadsheet_ai_assistant", "groups" => ["analytics", "processing"]},
+               %{"name" => "Text Classification", "template_description" => "Text classifier assistant that convert text into one or more categories", "template_name" => "text_classification_assistant", "groups" => ["processing"]},
+               %{"name" => "Feedback Assistant", "template_description" => "Text feedback assistant that analyze the provided text and provide feedback", "template_name" => "text_feedback_assistant", "groups" => ["growth", "popular"]},
+               %{"name" => "SEO Image for Article", "template_description" => "Template that generates an image from the article content", "template_name" => "seo_image_for_article", "groups" => ["growth"]},
+               %{"name" => "Blog post generator", "template_description" => "Template that generates a blog post from the give topic", "template_name" => "blog_post_generator", "groups" => ["growth"]}
              ] == response["data"]
 
       assert_schema(response, "WorkflowTemplateIndexResponse", api_spec)
