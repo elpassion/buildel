@@ -198,6 +198,7 @@ export type JSONSchemaField =
       };
       readonly?: boolean;
       defaultWhen?: Record<string, Record<string, string>>;
+      displayWhen?: DisplayWhen;
     }
   | {
       type: 'string';
@@ -206,12 +207,14 @@ export type JSONSchemaField =
       minLength?: number;
       maxLength?: number;
       presentAs: 'password';
+      displayWhen?: DisplayWhen;
     }
   | {
       type: 'string';
       title: string;
       description: string;
       presentAs: 'wysiwyg';
+      displayWhen?: DisplayWhen;
     }
   | {
       type: 'string';
@@ -236,6 +239,7 @@ export type JSONSchemaField =
       enumPresentAs: 'checkbox' | 'radio';
       default?: string;
       readonly?: boolean;
+      displayWhen?: DisplayWhen;
     }
   | {
       type: 'string';
@@ -244,6 +248,7 @@ export type JSONSchemaField =
       presentAs: 'async-select';
       url: string;
       default?: string;
+      displayWhen?: DisplayWhen;
     }
   | {
       type: 'string';
@@ -254,6 +259,7 @@ export type JSONSchemaField =
       default?: string;
       schema: JSONSchemaField;
       readonly?: boolean;
+      displayWhen?: DisplayWhen;
     }
   | {
       type: 'number' | 'integer';

@@ -75,6 +75,8 @@ export function EditBlockForm({
   const [fieldsErrors, setFieldsErrors] = useState<Record<string, string>>({});
   const [latestValues, setLatestValues] = useState<Record<string, any>>({});
 
+  const shouldDisplay = shouldDisplayField(blockConfig, connections);
+
   const clearFieldsErrors = () => {
     setFieldsErrors({});
   };
@@ -183,23 +185,7 @@ export function EditBlockForm({
         },
       );
 
-      const ctxConnections = buildConnectionsForCtx(
-        [
-          ...(blockConfig.block_type?.inputs ?? []),
-          ...(blockConfig.block_type?.outputs ?? []),
-          ...(blockConfig.block_type?.ios ?? []),
-        ],
-        { connections, blockName: blockConfig.name },
-      );
-
-      const shouldDisplay = checkDisplayWhenConditions(
-        props.field.displayWhen ?? {},
-        {
-          connections: ctxConnections,
-        },
-      );
-
-      if (!shouldDisplay) return null;
+      if (!shouldDisplay(props.field.displayWhen)) return null;
 
       return (
         <FormField name={props.name!}>
@@ -260,6 +246,8 @@ export function EditBlockForm({
           ];
         }
       }
+
+      if (!shouldDisplay(props.field.displayWhen)) return null;
 
       return (
         <FormField name={props.name!}>
@@ -338,6 +326,8 @@ export function EditBlockForm({
           ];
         }
       }
+
+      if (!shouldDisplay(props.field.displayWhen)) return null;
 
       return (
         <FormField name={props.name!}>
@@ -524,10 +514,39 @@ function CopyConfigurationButton({ value }: CopyConfigurationButtonProps) {
   );
 }
 
-function buildConnectionsForCtx(
-  connections: IIOType[],
-  ctx: { blockName: string; connections: IConfigConnection[] },
+function shouldDisplayField(
+  blockConfig: IBlockConfig,
+  connections: IConfigConnection[],
 ) {
+  return (
+    displayWhen: Record<string, Record<string, any>> = {},
+    ctx: Record<string, any> = {},
+  ) => {
+    const ctxConnections = buildConnectionsForCtx(
+      [
+        ...(blockConfig.block_type?.inputs ?? []),
+        ...(blockConfig.block_type?.outputs ?? []),
+        ...(blockConfig.block_type?.ios ?? []),
+      ],
+      {
+        connections,
+        blockName: blockConfig.name,
+        ...ctx,
+      },
+    );
+
+    return checkDisplayWhenConditions(displayWhen, {
+      connections: ctxConnections,
+      ...ctx,
+    });
+  };
+}
+type DisplayWhenCtx = {
+  blockName: string;
+  connections: IConfigConnection[];
+} & Record<string, any>;
+
+function buildConnectionsForCtx(connections: IIOType[], ctx: DisplayWhenCtx) {
   return connections.reduce(
     (acc, curr) => {
       const name = `${curr.name}_${curr.type}`;
