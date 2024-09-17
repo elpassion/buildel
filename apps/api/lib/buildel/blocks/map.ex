@@ -33,6 +33,7 @@ defmodule Buildel.Blocks.MapInputs do
             "properties" => %{
               "template" =>
                 EditorField.new(%{
+                  readonly: true,
                   title: "template",
                   description: "JQ template for combining texts.",
                   type: "string",
