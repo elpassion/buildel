@@ -32,7 +32,7 @@ defmodule Buildel.Blocks.Date do
                 call_formatter:
                   EditorField.call_formatter(%{
                     default: "Date 📑: ",
-                    display_when: %{
+                    displayWhen: %{
                       connections: %{
                         tool_worker: %{
                           min: 1

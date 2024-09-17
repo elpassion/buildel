@@ -63,7 +63,7 @@ defmodule Buildel.Blocks.BraveSearch do
                   EditorField.call_formatter(%{
                     default: "{{config.block_name}} Search 📑: \"{{config.args}}\"\n",
                     description: "How to format calling of api call through tool interface.",
-                    display_when: %{
+                    displayWhen: %{
                       connections: %{
                         tool_worker: %{
                           min: 1

@@ -270,6 +270,7 @@ export type JSONSchemaField =
       step?: number;
       default?: number;
       readonly?: boolean;
+      displayWhen?: DisplayWhen;
     }
   | {
       type: 'array';
@@ -278,12 +279,14 @@ export type JSONSchemaField =
       items: JSONSchemaField;
       minItems: number;
       default?: unknown[];
+      displayWhen?: DisplayWhen;
     }
   | {
       type: 'boolean';
       title: string;
       description: string;
       default?: boolean;
+      displayWhen?: DisplayWhen;
     };
 
 export function checkDisplayWhenConditions(

@@ -123,7 +123,7 @@ defmodule Buildel.Blocks.Image do
                   EditorField.call_formatter(%{
                     default: "{{config.block_name}} Generate image 📑: \"{{config.args}}\"\n",
                     description: "How to format calling of api call through tool interface.",
-                    display_when: %{
+                    displayWhen: %{
                       connections: %{
                         tool_worker: %{
                           min: 1

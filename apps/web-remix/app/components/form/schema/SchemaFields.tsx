@@ -24,13 +24,21 @@ import { assert } from '~/utils/assert';
 import { Field } from './Schema';
 import type { FieldProps } from './Schema';
 
-export function StringField({ field, name, fields, ...rest }: FieldProps) {
+export function StringField({
+  field,
+  shouldDisplay,
+  name,
+  fields,
+  ...rest
+}: FieldProps) {
   assert(name);
   assert(field.type === 'string');
 
   const { fieldErrors, getValues } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
+
+  if (shouldDisplay && !shouldDisplay(field)) return null;
 
   if (!('enum' in field)) {
     if ('presentAs' in field && field.presentAs === 'password') {
@@ -135,12 +143,19 @@ export function StringField({ field, name, fields, ...rest }: FieldProps) {
   }
 }
 
-export function NumberField({ field, name, ...rest }: FieldProps) {
+export function NumberField({
+  field,
+  shouldDisplay,
+  name,
+  ...rest
+}: FieldProps) {
   assert(name);
   assert(field.type === 'number' || field.type === 'integer');
   const { fieldErrors } = useFormContext();
 
   const error = fieldErrors[name] ?? undefined;
+
+  if (shouldDisplay && !shouldDisplay(field)) return null;
   return (
     <FormField name={name}>
       <FieldLabel>{field.title}</FieldLabel>
@@ -163,9 +178,12 @@ export function ArrayField({
   name,
   fields,
   schema,
+  shouldDisplay,
   ...rest
 }: FieldProps) {
   assert(field.type === 'array');
+
+  if (shouldDisplay && !shouldDisplay(field)) return null;
   if ('enum' in field.items && field.items.enumPresentAs === 'checkbox') {
     return (
       <>
@@ -192,12 +210,18 @@ export function ArrayField({
   }
 }
 
-export function BooleanField({ field, name, ...rest }: FieldProps) {
+export function BooleanField({
+  field,
+  shouldDisplay,
+  name,
+  ...rest
+}: FieldProps) {
   assert(name);
   assert(field.type === 'boolean');
   // const { fieldErrors } = useFormContext();
 
   // const error = fieldErrors[name] ?? undefined;
+  if (shouldDisplay && !shouldDisplay(field)) return null;
 
   return (
     <FormField name={name}>
@@ -215,7 +239,14 @@ export function BooleanField({ field, name, ...rest }: FieldProps) {
   );
 }
 
-function RealArrayField({ field, name, fields, schema, ...rest }: FieldProps) {
+function RealArrayField({
+  field,
+  name,
+  fields,
+  shouldDisplay,
+  schema,
+  ...rest
+}: FieldProps) {
   assert(field.type === 'array');
   const [rhfFields, { push, remove }] = useFieldArray(name!);
 
@@ -224,6 +255,8 @@ function RealArrayField({ field, name, fields, schema, ...rest }: FieldProps) {
 
     push({});
   }, [push, rhfFields.length]);
+
+  if (shouldDisplay && !shouldDisplay(field)) return null;
 
   return (
     <div>

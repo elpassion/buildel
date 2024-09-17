@@ -7,9 +7,11 @@ export function Schema({
   name,
   fields,
   disabled,
+  shouldDisplay,
 }: {
   disabled?: boolean;
   schema: JSONSchemaField;
+  shouldDisplay?: (schema: JSONSchemaField) => boolean;
   name: string | null;
   fields: {
     string: React.FC<FieldProps>;
@@ -30,11 +32,19 @@ export function Schema({
       schema={schema}
       fields={fields}
       disabled={disabled}
+      shouldDisplay={shouldDisplay}
     />
   );
 }
 
-export function Field({ field, name, schema, fields, disabled }: FieldProps) {
+export function Field({
+  field,
+  name,
+  schema,
+  fields,
+  disabled,
+  shouldDisplay,
+}: FieldProps) {
   if (field.type === 'string') {
     return (
       <fields.string
@@ -43,6 +53,7 @@ export function Field({ field, name, schema, fields, disabled }: FieldProps) {
         schema={schema}
         fields={fields}
         disabled={disabled}
+        shouldDisplay={shouldDisplay}
       />
     );
   }
@@ -54,6 +65,7 @@ export function Field({ field, name, schema, fields, disabled }: FieldProps) {
         schema={schema}
         fields={fields}
         disabled={disabled}
+        shouldDisplay={shouldDisplay}
       />
     );
   } else if (field.type === 'object') {
@@ -69,6 +81,7 @@ export function Field({ field, name, schema, fields, disabled }: FieldProps) {
             schema={schema}
             fields={fields}
             disabled={disabled}
+            shouldDisplay={shouldDisplay}
           />
         </div>
       );
@@ -81,6 +94,7 @@ export function Field({ field, name, schema, fields, disabled }: FieldProps) {
         schema={schema}
         fields={fields}
         disabled={disabled}
+        shouldDisplay={shouldDisplay}
       />
     );
   } else if (field.type === 'array') {
@@ -91,6 +105,7 @@ export function Field({ field, name, schema, fields, disabled }: FieldProps) {
         schema={schema}
         fields={fields}
         disabled={disabled}
+        shouldDisplay={shouldDisplay}
       />
     );
   }
@@ -103,6 +118,7 @@ export interface FieldProps {
   name: string | null;
   schema: JSONSchemaField;
   disabled?: boolean;
+  shouldDisplay?: (schema: JSONSchemaField) => boolean;
   fields: {
     string: React.FC<FieldProps>;
     number: React.FC<FieldProps>;

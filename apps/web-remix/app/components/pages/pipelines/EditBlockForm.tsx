@@ -33,6 +33,7 @@ import {
 import {
   checkDisplayWhenConditions,
   generateZODSchema,
+  JSONSchemaField,
 } from '~/components/form/schema/SchemaParser';
 import { SubmitButton } from '~/components/form/submit';
 import { ConfirmationModal } from '~/components/modal/ConfirmationModal';
@@ -185,8 +186,6 @@ export function EditBlockForm({
         },
       );
 
-      if (!shouldDisplay(props.field.displayWhen)) return null;
-
       return (
         <FormField name={props.name!}>
           <EditorField
@@ -246,8 +245,6 @@ export function EditBlockForm({
           ];
         }
       }
-
-      if (!shouldDisplay(props.field.displayWhen)) return null;
 
       return (
         <FormField name={props.name!}>
@@ -327,8 +324,6 @@ export function EditBlockForm({
         }
       }
 
-      if (!shouldDisplay(props.field.displayWhen)) return null;
-
       return (
         <FormField name={props.name!}>
           <CreatableAsyncSelectField
@@ -360,6 +355,13 @@ export function EditBlockForm({
     },
     [blockConfig.name, organizationId, pipelineId],
   );
+
+  const shouldFieldBeDisplayed = (field: JSONSchemaField) => {
+    if ('displayWhen' in field) {
+      return shouldDisplay(field.displayWhen);
+    }
+    return true;
+  };
 
   return (
     <ValidatedForm
@@ -412,6 +414,7 @@ export function EditBlockForm({
           <Schema
             disabled={disabled}
             schema={blockConfig.block_type?.schema.properties.opts}
+            shouldDisplay={shouldFieldBeDisplayed}
             name="opts"
             fields={{
               string: StringField,

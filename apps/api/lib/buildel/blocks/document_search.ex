@@ -98,7 +98,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                 call_formatter:
                   EditorField.call_formatter(%{
                     default: "Database 📑: Search \"{{config.args}}\"\n",
-                    display_when: %{
+                    displayWhen: %{
                       connections: %{
                         tool_worker: %{
                           min: 1
