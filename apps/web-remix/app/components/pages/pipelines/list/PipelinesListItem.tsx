@@ -295,16 +295,45 @@ function PipelineItemInterfaceBadge({
   ...rest
 }: BadgeProps & { interfaceConfig: IInterfaceConfigForm }) {
   return (
-    <Badge
-      variant="secondary"
-      className={cn('text-[10px] py-0.5 px-1.5', className)}
-      {...rest}
-    >
-      {interfaceConfig.public ? (
-        <LockOpen className="w-2.5 h-2.5 mr-1" />
-      ) : null}
-      {children}
-    </Badge>
+    <TooltipProvider>
+      <Tooltip delayDuration={500}>
+        <TooltipTrigger>
+          <Badge
+            variant="secondary"
+            className={cn('text-[10px] py-0.5 px-1.5', className)}
+            {...rest}
+          >
+            {interfaceConfig.public ? (
+              <LockOpen className="w-2.5 h-2.5 mr-1" />
+            ) : null}
+            {children}
+          </Badge>
+        </TooltipTrigger>
+
+        <TooltipContent side="top" className="text-xs max-w-[300px]">
+          <p className="text-xs">
+            <span className="text-muted-foreground mr-2 w-[50px] inline-block">
+              Inputs:
+            </span>
+            {interfaceConfig.inputs.map((input) => input.name).join(', ')}
+          </p>
+
+          <p className="text-xs">
+            <span className="text-muted-foreground mr-2 w-[50px] inline-block">
+              Outputs:
+            </span>
+            {interfaceConfig.outputs.map((input) => input.name).join(', ')}
+          </p>
+
+          <p className="text-xs">
+            <span className="text-muted-foreground mr-2 w-[50px] inline-block">
+              Access:
+            </span>
+            {interfaceConfig.public ? 'public' : 'private'}
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
