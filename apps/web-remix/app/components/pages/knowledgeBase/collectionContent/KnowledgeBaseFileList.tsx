@@ -180,7 +180,7 @@ export const KnowledgeBaseFileListItem: React.FC<
   return (
     <Card
       {...handlers}
-      className={cn('group relative select-none lg:select-auto', {
+      className={cn('group relative select-none lg:select-auto min-h-[94px]', {
         'border-red-200': isChecked,
       })}
     >
@@ -234,8 +234,10 @@ export const KnowledgeBaseFileListItem: React.FC<
             },
           )}
         >
-          <File className="w-4 h-4" />{' '}
-          <span className="uppercase">{data.file_type}</span>
+          <File className="w-4 h-4 shrink-0" />{' '}
+          <span className="uppercase truncate" title={data.file_type}>
+            {data.file_type}
+          </span>
         </CardDescription>
       </CardContent>
     </Card>
