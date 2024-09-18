@@ -76,6 +76,74 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = 'CardFooter';
 
+function CardContentColumnWrapper({
+  children,
+  className,
+  ...rest
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn(
+        'flex gap-5 shrink-0 w-full justify-between items-center py-2 xl:gap-1 xl:flex-col xl:items-start xl:py-0 xl:justify-start',
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
+function CardContentColumnTitle({
+  children,
+  className,
+  ...rest
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  return (
+    <p
+      className={cn(
+        'text-xs text-neutral-300 shrink-0 whitespace-nowrap',
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </p>
+  );
+}
+
+function CardContentColumnValue({
+  children,
+  className,
+  ...rest
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  return (
+    <p className={cn('text-sm text-foreground', className)} {...rest}>
+      {children}
+    </p>
+  );
+}
+
+function CardContentBooleanValue({
+  children,
+  className,
+  value,
+  ...rest
+}: React.HTMLAttributes<HTMLParagraphElement> & { value: boolean }) {
+  return (
+    <CardContentColumnValue
+      className={cn(
+        'flex gap-1 items-center',
+        { 'text-neutral-400': !value },
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </CardContentColumnValue>
+  );
+}
+
 export {
   Card,
   CardHeader,
@@ -83,4 +151,8 @@ export {
   CardTitle,
   CardDescription,
   CardContent,
+  CardContentColumnTitle,
+  CardContentBooleanValue,
+  CardContentColumnValue,
+  CardContentColumnWrapper,
 };

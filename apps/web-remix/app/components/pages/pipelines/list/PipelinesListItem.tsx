@@ -20,7 +20,16 @@ import { resolveBlockTypeIconPath } from '~/components/pages/pipelines/blockType
 import type { BadgeProps } from '~/components/ui/badge';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardContentBooleanValue,
+  CardContentColumnTitle,
+  CardContentColumnValue,
+  CardContentColumnWrapper,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -139,9 +148,9 @@ export const PipelineListItemContent = ({
   return (
     <CardContent className="border-t border-input">
       <div className="grid grid-cols-1 divide-y xl:divide-y-0 xl:grid-cols-[3fr_3fr_2fr_5fr_2fr] pt-3">
-        <PipelinesItemColumnWrapper>
-          <PipelinesItemColumnTitle>Logs</PipelinesItemColumnTitle>
-          <PipelinesItemColumnBooleanValue value={pipeline.logs_enabled}>
+        <CardContentColumnWrapper>
+          <CardContentColumnTitle>Logs</CardContentColumnTitle>
+          <CardContentBooleanValue value={pipeline.logs_enabled}>
             {pipeline.logs_enabled ? (
               <>
                 <CircleCheck className="w-3.5 h-3.5" /> Enabled
@@ -151,40 +160,38 @@ export const PipelineListItemContent = ({
                 <CircleX className="w-3.5 h-3.5" /> Disabled
               </>
             )}
-          </PipelinesItemColumnBooleanValue>
-        </PipelinesItemColumnWrapper>
+          </CardContentBooleanValue>
+        </CardContentColumnWrapper>
 
-        <PipelinesItemColumnWrapper>
-          <PipelinesItemColumnTitle>Budget limit</PipelinesItemColumnTitle>
-          <PipelinesItemColumnBooleanValue value={!!pipeline.budget_limit}>
+        <CardContentColumnWrapper>
+          <CardContentColumnTitle>Budget limit</CardContentColumnTitle>
+          <CardContentBooleanValue value={!!pipeline.budget_limit}>
             {pipeline.budget_limit ? (
               MonetaryValue.format(pipeline.budget_limit)
             ) : (
               <span>None</span>
             )}
-          </PipelinesItemColumnBooleanValue>
-        </PipelinesItemColumnWrapper>
+          </CardContentBooleanValue>
+        </CardContentColumnWrapper>
 
-        <PipelinesItemColumnWrapper>
-          <PipelinesItemColumnTitle>Runs</PipelinesItemColumnTitle>
-          <PipelinesItemColumnValue>
-            {pipeline.runs_count}
-          </PipelinesItemColumnValue>
-        </PipelinesItemColumnWrapper>
+        <CardContentColumnWrapper>
+          <CardContentColumnTitle>Runs</CardContentColumnTitle>
+          <CardContentColumnValue>{pipeline.runs_count}</CardContentColumnValue>
+        </CardContentColumnWrapper>
 
-        <PipelinesItemColumnWrapper className="overflow-hidden relative">
-          <PipelinesItemColumnTitle>Blocks</PipelinesItemColumnTitle>
+        <CardContentColumnWrapper className="overflow-hidden relative">
+          <CardContentColumnTitle>Blocks</CardContentColumnTitle>
 
           {pipeline.config.blocks.length > 0 ? (
             <PipelineItemBlockList pipeline={pipeline} />
           ) : (
-            <PipelinesItemColumnBooleanValue value={false}>
+            <CardContentBooleanValue value={false}>
               None
-            </PipelinesItemColumnBooleanValue>
+            </CardContentBooleanValue>
           )}
 
           <div className="absolute h-6 w-8 right-0 bottom-0 bg-gradient-to-r from-transparent to-white pointer-events-none" />
-        </PipelinesItemColumnWrapper>
+        </CardContentColumnWrapper>
       </div>
     </CardContent>
   );
@@ -223,68 +230,6 @@ function DuplicateForm({ pipeline }: DuplicateFormProps) {
         <span>Duplicate</span>
       </Button>
     </ValidatedForm>
-  );
-}
-
-function PipelinesItemColumnWrapper({
-  children,
-  className,
-  ...rest
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div
-      className={cn(
-        'flex gap-5 shrink-0 w-full justify-between items-center py-2 xl:gap-1 xl:flex-col xl:items-start xl:py-0 xl:justify-start',
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </div>
-  );
-}
-
-function PipelinesItemColumnTitle({
-  children,
-  className,
-  ...rest
-}: React.HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p className={cn('text-xs text-neutral-300 shrink-0', className)} {...rest}>
-      {children}
-    </p>
-  );
-}
-
-function PipelinesItemColumnValue({
-  children,
-  className,
-  ...rest
-}: React.HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p className={cn('text-sm text-foreground', className)} {...rest}>
-      {children}
-    </p>
-  );
-}
-
-function PipelinesItemColumnBooleanValue({
-  children,
-  className,
-  value,
-  ...rest
-}: React.HTMLAttributes<HTMLParagraphElement> & { value: boolean }) {
-  return (
-    <PipelinesItemColumnValue
-      className={cn(
-        'flex gap-1 items-center',
-        { 'text-neutral-400': !value },
-        className,
-      )}
-      {...rest}
-    >
-      {children}
-    </PipelinesItemColumnValue>
   );
 }
 

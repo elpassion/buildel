@@ -9,7 +9,9 @@ import { confirm } from '~/components/modal/confirm';
 import {
   Card,
   CardContent,
-  CardDescription,
+  CardContentColumnTitle,
+  CardContentColumnValue,
+  CardContentColumnWrapper,
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
@@ -52,7 +54,7 @@ export const KnowledgeBaseCollectionList: React.FC<
   return (
     <ItemList
       aria-label="Memory collections list"
-      className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      className="grid gap-4 grid-cols-1"
       items={items}
       emptyText={
         <EmptyMessage className="block mt-14 md:mt-20">
@@ -118,14 +120,50 @@ export const KnowledgeBaseCollectionListItem: React.FC<
         </div>
       </CardHeader>
 
-      <CardContent>
-        <div className="flex gap-x-2 flex-wrap">
-          <CardDescription className="text-nowrap whitespace-nowrap">
-            Chunk size:{data.chunk_size}
-          </CardDescription>
-          <CardDescription className="text-nowrap whitespace-nowrap">
-            Chunk overlap:{data.chunk_overlap}
-          </CardDescription>
+      <CardContent className="border-t border-input">
+        <div className="grid grid-cols-1 divide-y xl:divide-y-0 xl:grid-cols-[3fr_4fr_2fr_2fr_2fr_2fr_2fr] pt-3">
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Model</CardContentColumnTitle>
+            <CardContentColumnValue>
+              {data.embeddings.model}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
+
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Endpoint</CardContentColumnTitle>
+            <CardContentColumnValue
+              className="line-clamp-1"
+              title={data.embeddings.endpoint}
+            >
+              {data.embeddings.endpoint}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
+
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Api type</CardContentColumnTitle>
+            <CardContentColumnValue>
+              {data.embeddings.api_type}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
+
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Secret name</CardContentColumnTitle>
+            <CardContentColumnValue>
+              {data.embeddings.secret_name}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
+
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Chunk size</CardContentColumnTitle>
+            <CardContentColumnValue>{data.chunk_size}</CardContentColumnValue>
+          </CardContentColumnWrapper>
+
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Chunk overlap</CardContentColumnTitle>
+            <CardContentColumnValue>
+              {data.chunk_overlap}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
         </div>
       </CardContent>
     </Card>
