@@ -161,7 +161,13 @@ export const PipelineListItemContent = ({
         <PipelinesItemColumnWrapper className="overflow-hidden relative">
           <PipelinesItemColumnTitle>Blocks</PipelinesItemColumnTitle>
 
-          <PipelineItemBlockList pipeline={pipeline} />
+          {pipeline.config.blocks.length > 0 ? (
+            <PipelineItemBlockList pipeline={pipeline} />
+          ) : (
+            <PipelinesItemColumnBooleanValue value={false}>
+              None
+            </PipelinesItemColumnBooleanValue>
+          )}
 
           <div className="absolute h-6 w-8 right-0 bottom-0 bg-gradient-to-r from-transparent to-white pointer-events-none" />
         </PipelinesItemColumnWrapper>
