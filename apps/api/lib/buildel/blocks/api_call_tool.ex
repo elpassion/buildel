@@ -54,7 +54,15 @@ defmodule Buildel.Blocks.ApiCallTool do
                   "type" => "string",
                   "title" => "Description",
                   "description" => "The description of the API call.",
-                  "minLength" => 1
+                  "minLength" => 1,
+                  "default" => "Tool to call HTTP APIs.",
+                  "displayWhen" => %{
+                    connections: %{
+                      tool_worker: %{
+                        min: 1
+                      }
+                    }
+                  },
                 },
                 parameters:
                   EditorField.new(%{
