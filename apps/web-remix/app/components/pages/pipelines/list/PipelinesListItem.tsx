@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useFetcher } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { CircleCheck, CircleX, EllipsisVertical, Trash } from 'lucide-react';
@@ -9,6 +9,7 @@ import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
 import { HiddenField } from '~/components/form/fields/field.context';
 import { IconButton } from '~/components/iconButton';
 import { confirm } from '~/components/modal/confirm';
+import { resolveBlockTypeIconPath } from '~/components/pages/pipelines/blockTypes.utils';
 import type { BadgeProps } from '~/components/ui/badge';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -19,12 +20,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { Duplicate } from '~/icons/Duplicate';
 import { cn } from '~/utils/cn';
 import { MonetaryValue } from '~/utils/MonetaryValue';
 import { routes } from '~/utils/routes.utils';
 
-import type { IInterfaceConfigForm, IPipeline } from '../pipeline.types';
+import type {
+  IBlockConfig,
+  IInterfaceConfigForm,
+  IPipeline,
+} from '../pipeline.types';
 
 interface PipelinesListItemProps extends PropsWithChildren {
   className?: string;
@@ -112,7 +123,7 @@ export const PipelineListItemContent = ({
 }: PipelineListItemContentProps) => {
   return (
     <CardContent className="border-t border-input">
-      <div className="grid grid-cols-1 divide-y xl:divide-y-0 xl:grid-cols-[3fr_3fr_2fr_2fr_2fr_2fr] pt-3">
+      <div className="grid grid-cols-1 divide-y xl:divide-y-0 xl:grid-cols-[3fr_3fr_2fr_5fr_2fr] pt-3">
         <PipelinesItemColumnWrapper>
           <PipelinesItemColumnTitle>Logs</PipelinesItemColumnTitle>
           <PipelinesItemColumnBooleanValue value={pipeline.logs_enabled}>
@@ -146,11 +157,12 @@ export const PipelineListItemContent = ({
           </PipelinesItemColumnValue>
         </PipelinesItemColumnWrapper>
 
-        <PipelinesItemColumnWrapper>
+        <PipelinesItemColumnWrapper className="overflow-hidden relative">
           <PipelinesItemColumnTitle>Blocks</PipelinesItemColumnTitle>
-          <PipelinesItemColumnValue>
-            {pipeline.config.blocks.length}
-          </PipelinesItemColumnValue>
+
+          <PipelineItemBlockList pipeline={pipeline} />
+
+          <div className="absolute h-6 w-8 right-0 bottom-0 bg-gradient-to-r from-transparent to-white pointer-events-none" />
         </PipelinesItemColumnWrapper>
       </div>
     </CardContent>
@@ -201,7 +213,7 @@ function PipelinesItemColumnWrapper({
   return (
     <div
       className={cn(
-        'flex gap-1 justify-between items-center py-2 xl:flex-col xl:items-start xl:py-0 xl:justify-start',
+        'flex gap-5 shrink-0 w-full justify-between items-center py-2 xl:gap-1 xl:flex-col xl:items-start xl:py-0 xl:justify-start',
         className,
       )}
       {...rest}
@@ -217,7 +229,7 @@ function PipelinesItemColumnTitle({
   ...rest
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn('text-xs text-neutral-300', className)} {...rest}>
+    <p className={cn('text-xs text-neutral-300 shrink-0', className)} {...rest}>
       {children}
     </p>
   );
@@ -268,6 +280,55 @@ function PipelineItemInterfaceBadge({
     >
       {children}
     </Badge>
+  );
+}
+
+interface PipelineItemBlockListProps {
+  pipeline: IPipeline;
+}
+
+function PipelineItemBlockList({ pipeline }: PipelineItemBlockListProps) {
+  return (
+    <ul className="flex -space-x-2">
+      {pipeline.config.blocks.map((block) => (
+        <PipelineItemBlockListBlock block={block} key={block.name} />
+      ))}
+    </ul>
+  );
+}
+interface PipelineItemBlockListBlockProps {
+  block: IBlockConfig;
+}
+function PipelineItemBlockListBlock({
+  block,
+}: PipelineItemBlockListBlockProps) {
+  const [urlSrc, setUrlSrc] = useState(
+    resolveBlockTypeIconPath(`type/${block.type}`),
+  );
+
+  const onImageError = () => {
+    setUrlSrc(resolveBlockTypeIconPath('default'));
+  };
+
+  return (
+    <TooltipProvider>
+      <Tooltip delayDuration={500}>
+        <TooltipTrigger>
+          <li className="w-6 h-6 rounded-full bg-white border border-input flex justify-center items-center">
+            <img
+              src={urlSrc}
+              alt={block.type}
+              onError={onImageError}
+              className="w-3.5 h-3.5"
+            />
+          </li>
+        </TooltipTrigger>
+
+        <TooltipContent side="top" className="text-xs">
+          {block.type}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 

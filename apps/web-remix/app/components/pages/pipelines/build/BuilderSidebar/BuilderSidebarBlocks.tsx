@@ -15,6 +15,7 @@ import { BlockType } from '~/api/blockType/blockType.contracts';
 import { TextInput } from '~/components/form/inputs/text.input';
 import { IconButton } from '~/components/iconButton';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
+import { resolveBlockTypeIconPath } from '~/components/pages/pipelines/blockTypes.utils';
 import { useBuilderSidebar } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderSidebar.context';
 import { leaveOneGroup } from '~/components/pages/pipelines/NodeDropdown/nodeDropdownt.utils';
 import {
@@ -187,7 +188,7 @@ interface BlockItemProps {
 }
 function BlockItem({ data, onCreate }: BlockItemProps) {
   const [urlSrc, setUrlSrc] = useState(
-    resolveIconPath(`type/${data.block.type}`),
+    resolveBlockTypeIconPath(`type/${data.block.type}`),
   );
   const reactFlowInstance = useReactFlow();
   const { status: runStatus } = useRunPipeline();
@@ -234,7 +235,7 @@ function BlockItem({ data, onCreate }: BlockItemProps) {
   }, [onCreate, reactFlowInstance, isRunning]);
 
   const onImageError = () => {
-    setUrlSrc(resolveIconPath('default'));
+    setUrlSrc(resolveBlockTypeIconPath('default'));
   };
 
   return (
@@ -375,8 +376,4 @@ function PinButton() {
       className={cn({ '!text-blue-500': state === 'keepOpen' })}
     />
   );
-}
-
-function resolveIconPath(path: string) {
-  return `/block-types/${path}.svg`;
 }
