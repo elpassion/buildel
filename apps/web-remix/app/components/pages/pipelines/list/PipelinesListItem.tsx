@@ -21,6 +21,7 @@ import {
 } from '~/components/ui/dropdown-menu';
 import { Duplicate } from '~/icons/Duplicate';
 import { cn } from '~/utils/cn';
+import { MonetaryValue } from '~/utils/MonetaryValue';
 import { routes } from '~/utils/routes.utils';
 
 import type { IInterfaceConfigForm, IPipeline } from '../pipeline.types';
@@ -131,7 +132,7 @@ export const PipelineListItemContent = ({
           <PipelinesItemColumnTitle>Budget limit</PipelinesItemColumnTitle>
           <PipelinesItemColumnBooleanValue value={!!pipeline.budget_limit}>
             {pipeline.budget_limit ? (
-              pipeline.budget_limit + '$'
+              MonetaryValue.format(pipeline.budget_limit)
             ) : (
               <span>None</span>
             )}
