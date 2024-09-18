@@ -13,6 +13,7 @@ defmodule Buildel.Blocks.NewMap do
   defoption(
     :template,
     EditorField.new(%{
+      readonly: true,
       title: "template",
       description: "JQ template for combining texts.",
       type: "string",

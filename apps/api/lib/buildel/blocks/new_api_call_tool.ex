@@ -38,7 +38,8 @@ defmodule Buildel.Blocks.NewApiCallTool do
         "Valid JSONSchema definition of the parameters passed to api call. Always pass a JSON object schema. i.e. `{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}, \"required\": [\"name\"]}`.",
       editorLanguage: "json",
       default: "{\"type\": \"object\", \"properties\": {}, \"required\": []}",
-      minLength: 1
+      minLength: 1,
+      readonly: true
     })
   )
 
