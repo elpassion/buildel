@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { useFetcher } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { CircleCheck, CircleX, EllipsisVertical, Trash } from 'lucide-react';
+import { ClientOnly } from 'remix-utils/client-only';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
@@ -315,12 +316,20 @@ function PipelineItemBlockListBlock({
       <Tooltip delayDuration={500}>
         <TooltipTrigger>
           <li className="w-6 h-6 rounded-full bg-white border border-input flex justify-center items-center">
-            <img
-              src={urlSrc}
-              alt={block.type}
-              onError={onImageError}
-              className="w-3.5 h-3.5"
-            />
+            <ClientOnly
+              fallback={
+                <div className="w-3.5 h-3.5 bg-secondary rounded-full" />
+              }
+            >
+              {() => (
+                <img
+                  src={urlSrc}
+                  alt={block.type}
+                  onError={onImageError}
+                  className="w-3.5 h-3.5"
+                />
+              )}
+            </ClientOnly>
           </li>
         </TooltipTrigger>
 
