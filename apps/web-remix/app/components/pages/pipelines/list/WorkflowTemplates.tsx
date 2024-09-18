@@ -152,6 +152,8 @@ export function getTemplateImageColor(name?: string) {
       return 'bg-emerald-500';
     case 'blog_post_generator':
       return 'bg-rose-500';
+    case 'search_and_scrape':
+      return 'bg-cyan-500';
     default:
       return 'bg-neutral-950';
   }
