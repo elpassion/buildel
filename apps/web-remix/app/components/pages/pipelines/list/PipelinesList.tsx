@@ -27,16 +27,13 @@ export const PipelinesList: React.FC<PipelinesListProps> = ({
       items={pipelines}
       renderItem={(item) => (
         <BasicLink to={routes.pipelineBuild(item.organization_id, item.id)}>
-          <PipelinesListItem className="flex flex-col gap-1">
+          <PipelinesListItem className="flex flex-col">
             <PipelineListItemHeader pipeline={item} />
             <PipelineListItemContent pipeline={item} />
           </PipelinesListItem>
         </BasicLink>
       )}
-      className={cn(
-        'grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-        className,
-      )}
+      className={cn('grid gap-4 grid-cols-1 sm:grid-cols-2', className)}
     />
   );
 };
