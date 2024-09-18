@@ -69,6 +69,7 @@ export const NodeReadonlyFields = ({
           className={cn('pt-1 [&:not(:last-child)]:pb-3', {
             'basis-full [&:not(:first-child)]:border-t border-input':
               properties[key].presentAs === 'editor',
+            hidden: !showValue(data[key]),
           })}
         >
           <NodeReadonlyItem
