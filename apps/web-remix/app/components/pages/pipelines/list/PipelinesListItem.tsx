@@ -2,7 +2,13 @@ import type { PropsWithChildren } from 'react';
 import React, { useMemo, useState } from 'react';
 import { useFetcher } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
-import { CircleCheck, CircleX, EllipsisVertical, Trash } from 'lucide-react';
+import {
+  CircleCheck,
+  CircleX,
+  EllipsisVertical,
+  LockOpen,
+  Trash,
+} from 'lucide-react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { ValidatedForm } from 'remix-validated-form';
 
@@ -80,11 +86,19 @@ export const PipelineListItemHeader = ({
 
         <div className="flex gap-2 items-center">
           {isInterfaceInitialized(pipeline.interface_config.webchat) && (
-            <PipelineItemInterfaceBadge>Webchat</PipelineItemInterfaceBadge>
+            <PipelineItemInterfaceBadge
+              interfaceConfig={pipeline.interface_config.webchat}
+            >
+              Webchat
+            </PipelineItemInterfaceBadge>
           )}
 
           {isInterfaceInitialized(pipeline.interface_config.form) && (
-            <PipelineItemInterfaceBadge>Form</PipelineItemInterfaceBadge>
+            <PipelineItemInterfaceBadge
+              interfaceConfig={pipeline.interface_config.form}
+            >
+              Form
+            </PipelineItemInterfaceBadge>
           )}
         </div>
       </div>
@@ -277,14 +291,18 @@ function PipelinesItemColumnBooleanValue({
 function PipelineItemInterfaceBadge({
   children,
   className,
+  interfaceConfig,
   ...rest
-}: BadgeProps) {
+}: BadgeProps & { interfaceConfig: IInterfaceConfigForm }) {
   return (
     <Badge
       variant="secondary"
       className={cn('text-[10px] py-0.5 px-1.5', className)}
       {...rest}
     >
+      {interfaceConfig.public ? (
+        <LockOpen className="w-2.5 h-2.5 mr-1" />
+      ) : null}
       {children}
     </Badge>
   );
