@@ -121,10 +121,13 @@ export const KnowledgeBaseCollectionListItem: React.FC<
       </CardHeader>
 
       <CardContent className="border-t border-input">
-        <div className="grid grid-cols-1 divide-y xl:divide-y-0 xl:grid-cols-[3fr_4fr_2fr_2fr_2fr_2fr_2fr] pt-3">
+        <div className="grid grid-cols-1 divide-y xl:divide-y-0 xl:grid-cols-[3fr_4fr_2fr_3fr_2fr_2fr_2fr] pt-3">
           <CardContentColumnWrapper>
             <CardContentColumnTitle>Model</CardContentColumnTitle>
-            <CardContentColumnValue>
+            <CardContentColumnValue
+              className="line-clamp-1"
+              title={data.embeddings.model}
+            >
               {data.embeddings.model}
             </CardContentColumnValue>
           </CardContentColumnWrapper>
@@ -148,7 +151,10 @@ export const KnowledgeBaseCollectionListItem: React.FC<
 
           <CardContentColumnWrapper>
             <CardContentColumnTitle>Secret name</CardContentColumnTitle>
-            <CardContentColumnValue>
+            <CardContentColumnValue
+              className="line-clamp-1"
+              title={data.embeddings.secret_name}
+            >
               {data.embeddings.secret_name}
             </CardContentColumnValue>
           </CardContentColumnWrapper>
