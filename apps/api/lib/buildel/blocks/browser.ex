@@ -169,8 +169,10 @@ defmodule Buildel.Blocks.Browser do
   @impl true
   def handle_input("url", {_topic, :text, text, _metadata}, state) do
 
-    with {:ok, true} <- does_url_match_host(text, Regex.compile!(state.host)) do
-      {_content, state} = url(text, state)
+    url = String.trim(text, "\"")
+
+    with {:ok, true} <- does_url_match_host(url, Regex.compile!(state.host)) do
+      {_content, state} = url(url, state)
       state
     else
       {:ok, false} ->
