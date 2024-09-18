@@ -59,6 +59,13 @@ defmodule Buildel.WorkflowTemplates do
       template_description:
         "Template that generates a blog post from the give topic",
       groups: ["growth"]
+    },
+    %{
+      name: "Search and Scrape",
+      template_name: "search_and_scrape",
+      template_description:
+        "Template that searches the internet for a query and scrapes the content",
+      groups: ["popular", "growth"]
     }
   ]
 
@@ -95,9 +102,138 @@ defmodule Buildel.WorkflowTemplates do
       "blog_post_generator" ->
         {:ok, generate_blog_post_generator_template_config(organization_id)}
 
+      "search_and_scrape" ->
+        {:ok, generate_search_and_scrape_template_config(organization_id)}
+
       _ ->
         {:error, :not_found}
     end
+  end
+
+  def generate_search_and_scrape_template_config(organization_id) do
+    %{
+      name: "Search and Scrape",
+      organization_id: organization_id,
+      config: %{
+        blocks: [
+          generate_comment_block(%{
+            name: "comment_1",
+            measured: %{width: 230, height: 100},
+            position: %{x: -121.24787886864982, y: 230.63889411432467},
+            opts: %{
+              color: "transparent",
+              content: "<h3>1️⃣ Text Input</h3><p class=\"!my-0\">Enter a search query</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_2",
+            measured: %{width: 305, height: 105},
+            position: %{x: 287.99307302793346, y: -78.24009774892772},
+            opts: %{
+              color: "transparent",
+              content: "<h3>2️⃣ Brave Search</h3><p class=\"!my-0\">Brave Search searches the internet for a query and returns an array of results.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_3",
+            measured: %{width: 317, height: 109},
+            position: %{x: 714.2155877031837, y: 245},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>3️⃣ Map Inputs</h3><p class=\"!my-0\">In Map Inputs, we use JQ to extract only the URLs from Brave's response.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_4",
+            measured: %{width: 370, height: 128},
+            position: %{x: 1070.3339033870263, y: -77.22111286110174},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>4️⃣ Map List</h3><p class=\"!my-0\">Next, the Map List block transforms one signal from Map Inputs into five separate signals. Each URL is a single signal passed to the Browser.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_5",
+            measured: %{width: 346, height: 114},
+            position: %{x: 1441.3698720704103, y: 171.55787888040948},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>5️⃣ Browser</h3><p class=\"!my-0\">The Browser block scrapes the provided URLs and passes the content to the output.</p>"
+            }
+          }),
+          generate_comment_block(%{
+            name: "comment_6",
+            measured: %{width: 325, height: 109},
+            position: %{x: 1853.4131390492578, y: -107.39708808104105},
+            opts: %{
+              color: "transparent",
+              content:
+                "<h3>6️⃣ Text Output</h3><p class=\"!my-0\">See the result here or use Chat interface at the bottom right corner 💬</p>"
+            }
+          }),
+          generate_text_output_block(%{
+            name: "Scrapper",
+            position: %{x: 1867.73091954023, y: 13.438390804597702},
+            opts: %{
+              jq_filter: ".",
+              stream_timeout: 5000
+            }
+          }),
+          generate_browser_block(%{
+            name: "browser_1",
+            position: %{x: 1490.444252873563, y: 63.28080459770115},
+          }),
+          generate_map_list_block(%{
+            name: "map_list_1",
+            position: %{x: 1120.7393103448276, y: 64.71919540229885},
+          }),
+          generate_map_inputs_block(%{
+            name: "map_inputs_1",
+            opts: %{
+               template: ".{{brave_search_1:output}} | map(.url)"
+            },
+            position: %{x: 722, y: 8},
+          }),
+          generate_text_input_block(%{name: "text_input_1", position: %{x: -121.67643678160921, y: -2.5616091954022977}}),
+          generate_brave_search_block(%{
+            name: "brave_search_1",
+            position: %{x: 279.24057471264365, y: 45.595977011494256},
+            opts: %{
+              call_formatter: "",
+              api_key: "__brave",
+              country: "us",
+              limit: 5
+            }
+          }),
+
+        ],
+        connections: [
+          create_connection(%{block_name: "text_input_1", output_name: "output"}, %{block_name: "brave_search_1", input_name: "query"}),
+          create_connection("brave_search_1", "map_inputs_1"),
+          create_connection(%{block_name: "map_inputs_1", output_name: "output"}, %{block_name: "map_list_1", input_name: "list"}),
+          create_connection("browser_1", "Scrapper"),
+          create_connection(%{block_name: "map_list_1", output_name: "output"}, %{block_name: "browser_1", input_name: "url"}),
+        ],
+        version: "1"
+      },
+      interface_config: %{
+        webchat: %{
+          inputs: [%{name: "text_input_1", type: "text_input"}],
+          outputs: [%{name: "Scrapper", type: "text_output"}],
+          description: "Hello. How can I help you today?",
+          public: true,
+          suggested_messages: [
+            "What is BuildEL?",
+            "Claude vs ChatGPT",
+            "5 most useful AI Tools",
+            "What was the Cold War?"
+          ]
+        }
+      }
+    }
   end
 
   def generate_blog_post_generator_template_config(organization_id) do
@@ -799,6 +935,37 @@ defmodule Buildel.WorkflowTemplates do
     )
   end
 
+  defp generate_map_list_block(attrs) do
+    Map.merge(
+      %{
+        type: "map_list",
+        name: "map_list_1",
+        connections: [],
+        inputs: [],
+        opts: %{},
+        position: %{x: 400, y: -500}
+      },
+      attrs
+    )
+  end
+
+
+  defp generate_map_inputs_block(attrs) do
+    Map.merge(
+      %{
+        type: "map_inputs",
+        name: "map_inputs_1",
+        connections: [],
+        inputs: [],
+        opts: %{
+          template: "."
+        },
+        position: %{x: 400, y: -500}
+      },
+      attrs
+    )
+  end
+
   defp generate_image_block(attrs) do
     Map.merge(
       %{
@@ -807,6 +974,23 @@ defmodule Buildel.WorkflowTemplates do
         connections: [],
         inputs: [],
         opts: %{},
+        position: %{x: 400, y: -500}
+      },
+      attrs
+    )
+  end
+
+  defp generate_browser_block(attrs) do
+    Map.merge(
+      %{
+        type: "browser",
+        name: "browser_1",
+        connections: [],
+        inputs: [],
+        opts: %{
+          call_formatter: "{{config.block_name}} Browse 📑: \"{{config.args}}\"\n",
+          host: ""
+        },
         position: %{x: 400, y: -500}
       },
       attrs
