@@ -15,7 +15,9 @@ import type { IExperiment } from '~/components/pages/experiments/experiments.typ
 import {
   Card,
   CardContent,
-  CardDescription,
+  CardContentColumnTitle,
+  CardContentColumnValue,
+  CardContentColumnWrapper,
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
@@ -48,7 +50,7 @@ export const ExperimentsList: React.FC<ExperimentsListProps> = ({ items }) => {
   return (
     <ItemList
       aria-label="Experiments List"
-      className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      className="grid gap-4 grid-cols-1 md:grid-cols-2"
       items={items}
       emptyText={
         <EmptyMessage className="block mt-14 md:mt-20">
@@ -84,7 +86,7 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
 
     onDelete(data);
   };
-
+  console.log(data);
   return (
     <Card>
       <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
@@ -113,20 +115,40 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
         </MenuDropdown>
       </CardHeader>
 
-      <CardContent className="flex flex-row flex-wrap gap-x-2 gap-y-1">
-        <CardDescription className="line-clamp-1 w-full">
-          Workflow: {data.pipeline.name}
-        </CardDescription>
+      <CardContent className="border-t border-input">
+        <div className="grid grid-cols-1 divide-y xl:divide-y-0 xl:grid-cols-[3fr_3fr_1fr_3fr] pt-3">
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Workflow</CardContentColumnTitle>
+            <CardContentColumnValue
+              className="line-clamp-1"
+              title={data.pipeline.name}
+            >
+              {data.pipeline.name}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
 
-        <CardDescription className="line-clamp-1 w-full">
-          Dataset: {data.dataset.name}
-        </CardDescription>
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Dataset</CardContentColumnTitle>
+            <CardContentColumnValue
+              className="line-clamp-1"
+              title={data.dataset.name}
+            >
+              {data.dataset.name}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
 
-        <CardDescription>
-          Created: {dayjs(data.created_at).format()},
-        </CardDescription>
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Runs</CardContentColumnTitle>
+            <CardContentColumnValue>{data.runs_count}</CardContentColumnValue>
+          </CardContentColumnWrapper>
 
-        <CardDescription>Runs: {data.runs_count}</CardDescription>
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Created</CardContentColumnTitle>
+            <CardContentColumnValue>
+              {dayjs(data.created_at).format()}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
+        </div>
       </CardContent>
     </Card>
   );
