@@ -190,7 +190,7 @@ export const PipelineListItemContent = ({
             </CardContentBooleanValue>
           )}
 
-          <div className="absolute h-6 w-8 right-0 bottom-0 bg-gradient-to-r from-transparent to-white pointer-events-none" />
+          <div className="absolute h-6 w-8 right-0 bottom-2 bg-gradient-to-r from-transparent to-white pointer-events-none xl:bottom-0" />
         </CardContentColumnWrapper>
       </div>
     </CardContent>
@@ -312,7 +312,7 @@ function PipelineItemBlockListBlock({
   return (
     <TooltipProvider>
       <Tooltip delayDuration={500}>
-        <TooltipTrigger>
+        <TooltipTrigger asChild>
           <li className="w-6 h-6 rounded-full bg-white border border-input flex justify-center items-center">
             <ClientOnly
               fallback={
