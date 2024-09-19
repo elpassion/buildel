@@ -24,7 +24,9 @@ import { Button } from '~/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
+  CardContentColumnTitle,
+  CardContentColumnValue,
+  CardContentColumnWrapper,
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
@@ -176,9 +178,20 @@ export const DatasetsListItem: React.FC<DatasetsListItemProps> = ({
         </MenuDropdown>
       </CardHeader>
 
-      <CardContent>
-        <CardDescription>Rows: {data.rows_count}</CardDescription>
-        <CardDescription>{dayjs(data.created_at).format()}</CardDescription>
+      <CardContent className="border-t border-input">
+        <div className="grid grid-cols-1 divide-y xl:divide-y-0 xl:grid-cols-[1fr_3fr_3fr] pt-3">
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Rows</CardContentColumnTitle>
+            <CardContentColumnValue>{data.rows_count}</CardContentColumnValue>
+          </CardContentColumnWrapper>
+
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Created</CardContentColumnTitle>
+            <CardContentColumnValue>
+              {dayjs(data.created_at).format()}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
+        </div>
       </CardContent>
     </Card>
   );
