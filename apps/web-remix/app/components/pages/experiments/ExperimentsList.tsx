@@ -86,7 +86,7 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
 
     onDelete(data);
   };
-  console.log(data);
+
   return (
     <Card>
       <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
