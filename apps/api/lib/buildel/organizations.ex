@@ -183,7 +183,7 @@ defmodule Buildel.Organizations do
 
   def list_organization_secrets(%Organization{} = organization) do
     organization
-    |> Repo.preload(:secrets)
+    |> Repo.preload([secrets: (from s in Secret, order_by: [desc: s.inserted_at])])
     |> Map.get(:secrets)
   end
 
