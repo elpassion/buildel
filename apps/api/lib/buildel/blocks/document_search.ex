@@ -385,14 +385,14 @@ defmodule Buildel.Blocks.DocumentSearch do
                   document_id: %{
                     type: "string",
                     description: "The ID of a document to search in."
-                  },
-                  keywords: %{
-                    type: "array",
-                    items: %{
-                      type: "string"
-                    },
-                    description: "The keywords to search for. Max 2 keywords"
                   }
+                  # keywords: %{
+                  #   type: "array",
+                  #   items: %{
+                  #     type: "string"
+                  #   },
+                  #   description: "The keywords to search for. Max 2 keywords"
+                  # }
                 }
               }
             },
