@@ -8,7 +8,9 @@ import { confirm } from '~/components/modal/confirm';
 import {
   Card,
   CardContent,
-  CardDescription,
+  CardContentColumnTitle,
+  CardContentColumnValue,
+  CardContentColumnWrapper,
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
@@ -144,12 +146,37 @@ export const SecretKeyItem: React.FC<SecretKeyItemProps> = ({
         </DropdownMenu>
       </CardHeader>
 
-      <CardContent className="grow">
-        <CardDescription>Value: {data.hidden_value}</CardDescription>
-        <CardDescription>{dayjs(data.updated_at).format()}</CardDescription>
-        {data.alias && (
-          <CardDescription>Default for: {data.alias}</CardDescription>
-        )}
+      <CardContent className="border-t border-input">
+        <div className="grid grid-cols-1 divide-y xl:divide-y-0 xl:grid-cols-[2fr_3fr_3fr] pt-3">
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Value</CardContentColumnTitle>
+            <CardContentColumnValue
+              className="line-clamp-1"
+              title={data.hidden_value}
+            >
+              {data.hidden_value}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
+
+          <CardContentColumnWrapper>
+            <CardContentColumnTitle>Updated</CardContentColumnTitle>
+            <CardContentColumnValue>
+              {dayjs(data.updated_at).format()}
+            </CardContentColumnValue>
+          </CardContentColumnWrapper>
+
+          {data.alias ? (
+            <CardContentColumnWrapper>
+              <CardContentColumnTitle>Default for</CardContentColumnTitle>
+              <CardContentColumnValue
+                className="line-clamp-1"
+                title={data.alias}
+              >
+                {data.alias}
+              </CardContentColumnValue>
+            </CardContentColumnWrapper>
+          ) : null}
+        </div>
       </CardContent>
     </Card>
   );
