@@ -527,7 +527,7 @@ defmodule Buildel.Blocks.NewBlock.StreamState do
     end
 
     def output_streaming?(state, output_id) do
-      get_in(state.output_states[output_id]) || false
+      get_in(state.output_states, output_id) || false
     end
 
     def start_output_streaming(state, output_id) do
