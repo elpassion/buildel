@@ -31,8 +31,8 @@ defmodule Buildel.Application do
           {Finch, name: Buildel.Finch},
           # Start the Logs system
           Buildel.Logs,
-          Buildel.Logs.DBPipelineLogger,
-          Buildel.LogsAggregator,
+          # Buildel.Logs.DBPipelineLogger,
+          # Buildel.LogsAggregator,
           # Start the Endpoint (http/https)
           BuildelWeb.Endpoint,
           # Start a worker by calling: Buildel.Worker.start_link(arg)
