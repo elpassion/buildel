@@ -211,7 +211,7 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
     {related_list, _new_parents_by_level, _new_previous_by_level, temp_next_updates} =
       Enum.reduce(list, {[], %{}, nil, %{}}, fn item,
                                                 {acc, parents, previous_id, temp_next_updates} ->
-        parent_id = Map.get(parents, item.level - 1)
+        parent_id = get_parent(parents, item.level)
 
         # parent needs to be fixed. It does not take into account that there might be a not direct level parent f.e.
         # [{lvl: 1}, {lvl: 1}, {lvl: 0}, {lvl: 2}]
@@ -238,6 +238,12 @@ defmodule Buildel.DocumentWorkflow.DocumentProcessor do
       Map.put(item, :next, next_id)
     end)
   end
+
+  defp get_parent(parents, item_level) when is_integer(item_level) do
+    Map.get(parents, item_level - 1)
+  end
+
+  defp get_parent(_, _), do: nil
 
   @spec map_with_headers_metadata(list()) :: [Header.t() | Paragraph.t() | ListItem.t()]
   def map_with_headers_metadata(list) do
