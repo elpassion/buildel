@@ -28,9 +28,15 @@ defmodule Buildel.Blocks.NewTextOutput do
     if filter_enabled?(state),
       do: send_error(state, "Did not apply filter because message is a String not a JSON.")
 
-    output(state, :output, message, stream_stop: :schedule)
-    output(state, :forward, message, stream_stop: :schedule)
-    {:ok, state}
+    with %Message{} = message <- format_message(message) do
+      output(state, :output, message, stream_stop: :schedule)
+      output(state, :forward, message, stream_stop: :schedule)
+      {:ok, state}
+    else
+      {:error, error} ->
+        send_error(state, error)
+        {:ok, state}
+    end
   end
 
   def handle_input(:input, %Message{type: :json} = message, state) do
@@ -53,7 +59,7 @@ defmodule Buildel.Blocks.NewTextOutput do
   end
 
   defp format_message(%Message{} = message) do
-    case Jason.encode(message.message) do
+    case Message.to_string(message) do
       {:ok, message_message} ->
         Message.set_message(message, message_message) |> Message.set_type(:text)
 
