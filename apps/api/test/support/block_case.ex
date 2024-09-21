@@ -1,4 +1,5 @@
 defmodule Buildel.BlockCase do
+  alias Buildel.Blocks.Utils.Message
   alias Buildel.BlocksTestRunner.Run
   use ExUnit.CaseTemplate
 
@@ -26,7 +27,19 @@ defmodule Buildel.BlockCase do
 
         if options[:start_stream] == :receive, do: assert_receive({^topic, :start_stream, nil, _})
 
-        assert_receive ^message
+        message_topic = message.topic
+        message_type = message.type
+        message_message = message.message
+        message_parents = message.parents
+        message_metadata = message.metadata
+
+        assert_receive %Message{
+          topic: ^message_topic,
+          type: message_type,
+          message: message_message,
+          parents: [message_parents | _],
+          metadata: message_metadata
+        }
 
         if options[:stop_stream] == :receive, do: assert_receive({^topic, :stop_stream, nil, _})
       end
