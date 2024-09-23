@@ -10,8 +10,8 @@ import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { IconButton } from '~/components/iconButton';
+import { toSelectOption } from '~/components/pages/pipelines/interface/interface.utils';
 import type {
-  IBlockConfig,
   IInterfaceConfig,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
@@ -171,14 +171,6 @@ function SuggestedMessages({ items, onAdd, onRemove }: SuggestedMessageProps) {
       </Button>
     </div>
   );
-}
-
-function toSelectOption(item: IBlockConfig) {
-  return {
-    id: item.name.toString(),
-    value: JSON.stringify({ name: item.name, type: item.type }),
-    label: item.name,
-  };
 }
 
 function toSelectDefaults(data: IInterfaceConfig) {
