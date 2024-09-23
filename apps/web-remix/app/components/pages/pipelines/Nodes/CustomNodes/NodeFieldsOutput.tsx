@@ -152,7 +152,9 @@ interface AudioStreamOutputProps {
 
 function AudioStreamOutput({ events }: AudioStreamOutputProps) {
   const [key, setKey] = useState(uuidv4());
-  const audio = events.length > 0 ? getAudioOutput(events) : null;
+  //@todo fix this sh...
+  const audio =
+    events.length > 0 ? getAudioOutput([events[events.length - 1]]) : null;
 
   const audioUrl = useMemo(() => {
     if (!audio) return;
@@ -161,19 +163,17 @@ function AudioStreamOutput({ events }: AudioStreamOutputProps) {
     }
 
     return URL.createObjectURL(audio);
-  }, [JSON.stringify(audio)]);
-
-  useEffect(() => {
-    if (!audioUrl) return;
-
-    return () => {
-      URL.revokeObjectURL(audioUrl);
-    };
-  }, [audioUrl]);
+  }, [JSON.stringify(events)]);
 
   useEffect(() => {
     setKey(uuidv4());
-  }, [JSON.stringify(audio)]);
+    return () => {
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
+    };
+  }, [audioUrl]);
 
+  if (!audioUrl) return;
   return <AudioOutput key={key} audio={audioUrl} />;
 }
