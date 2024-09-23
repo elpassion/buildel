@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
@@ -51,22 +51,17 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
     clearCanvas();
   };
 
-  const audioUrl = useMemo(() => {
-    if (!audio) return;
-    return audio;
-  }, [audio]);
-
   useEffect(() => {
     const id = setTimeout(() => {
       handlePlay();
-    }, 200);
+    }, 500);
 
     return () => {
       clearTimeout(id);
     };
-  }, [audioUrl]);
+  }, [audio]);
 
-  const isDisabled = !audioUrl;
+  const isDisabled = !audio;
 
   return (
     <div className="flex flex-col items-start gap-1">
@@ -82,10 +77,10 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
       </button>
 
       <div className="bg-muted rounded-lg flex gap-2 items-center px-2 py-1">
-        {audioUrl && (
+        {audio && (
           <audio
-            key={audioUrl}
-            src={audioUrl}
+            // key={audio}
+            src={audio}
             ref={audioRef}
             onEnded={handleEnd}
             controls
