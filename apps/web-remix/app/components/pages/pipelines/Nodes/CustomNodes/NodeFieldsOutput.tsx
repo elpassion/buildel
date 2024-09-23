@@ -94,6 +94,8 @@ function checkIfStringPayloads(events: IEvent[]) {
 }
 
 function getAudioOutput(events: IEvent[]) {
+
+  console.log(events)
   return new Blob(
     events.map((event) => event.payload),
     { type: 'audio/mp3' },

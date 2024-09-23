@@ -1,15 +1,15 @@
-defmodule Buildel.Blocks.SpeechToText do
+defmodule Buildel.Blocks.NewTextToSpeech do
   use Buildel.Blocks.Block
 
   @impl true
   def options() do
     %{
-      type: "speech_to_text",
+      type: "new_text_to_speech",
       description:
         "This module is adept at transcribing audio data into text, offering outputs in both plain text and JSON formats.",
       groups: ["audio", "text"],
-      inputs: [Block.audio_input()],
-      outputs: [Block.text_output(), Block.text_output("json_output")],
+      inputs: [Block.text_input()],
+      outputs: [Block.audio_output()],
       ios: [],
       dynamic_ios: nil,
       schema: schema()
@@ -46,9 +46,9 @@ defmodule Buildel.Blocks.SpeechToText do
                 "title" => "Model",
                 "description" =>
                   "Model allows you to supply a model to use to process submitted audio.",
-                "enum" => ["base", "enhanced"],
+                "enum" => ["aura-asteria-en", "enhanced"],
                 "enumPresentAs" => "radio",
-                "default" => "base"
+                "default" => "aura-asteria-en"
               },
               timeout: %{
                 "type" => "number",
@@ -76,13 +76,14 @@ defmodule Buildel.Blocks.SpeechToText do
     api_key = block_context().get_secret_from_context(context_id, opts.api_key)
 
     lang = Map.get(opts, :language, "en")
-    model = Map.get(opts, :model, "base")
+    model = Map.get(opts, :model, "aura-asteria-en")
 
-    case deepgram().listen!(api_key, %{stream_to: self(), language: lang, model: model}) do
+    case deepgram().speak!(api_key, %{stream_to: self(), language: lang, model: model}) do
       {:ok, deepgram_pid} ->
         {:ok, state |> Map.put(:deepgram_pid, deepgram_pid)}
 
-      {:error, _reason} ->
+      {:error, reason} ->
+        IO.inspect(reason |> WebSockex.RequestError.message())
         {:stop, {:error, block_name, :incorrect_api_key}}
     end
   end
@@ -93,12 +94,17 @@ defmodule Buildel.Blocks.SpeechToText do
     state
   end
 
-  defp transcript(chunk, state) do
+  defp speak(chunk, state) do
     state = state |> send_stream_start()
 
-    state |> Map.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
+    state |> Map.get(:deepgram_pid) |> deepgram().generate_speech(chunk)
 
     state
+  end
+
+  def handle_info({:audio, binary}, state) do
+    state = state |> output("output", {:binary, binary})
+    {:noreply, state}
   end
 
   @impl true
@@ -107,7 +113,7 @@ defmodule Buildel.Blocks.SpeechToText do
   end
 
   def handle_info({:transcript, %{message: text, is_final: true}}, state) do
-    state = output(state, "output", {:text, text})
+    state = output(state, "output", {:binary, text})
     {:noreply, state}
   end
 
@@ -116,8 +122,13 @@ defmodule Buildel.Blocks.SpeechToText do
     {:noreply, state}
   end
 
-  def handle_input("input", {_name, :binary, chunk, _metadata}, state) do
-    transcript(chunk, state)
+  def handle_input("input", {_name, :text, chunk, _metadata}, state) do
+    speak(chunk, state)
+  end
+
+  def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do
+    state |> Map.get(:deepgram_pid) |> deepgram().flush()
+    {:noreply, state}
   end
 
   defp deepgram() do

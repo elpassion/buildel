@@ -10,6 +10,7 @@ interface AudioOutputProps {
 }
 
 export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
+  console.log(audio)
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -27,7 +28,8 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
         audioRef.current.pause();
         setIsPlaying(false);
       }
-    } catch {
+    } catch (e) {
+      console.log("ten", e)
       errorToast({ description: 'The element has no supported sources.' });
     }
   };
