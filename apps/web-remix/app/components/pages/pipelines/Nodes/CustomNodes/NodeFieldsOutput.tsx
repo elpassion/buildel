@@ -90,12 +90,12 @@ function checkIfStringPayloads(events: IEvent[]) {
   return events.every((ev) => typeof ev.payload.message === 'string');
 }
 
-function getAudioOutput(events: IEvent[]) {
-  return new Blob(
-    events.map((event) => event.payload),
-    { type: 'audio/mp3' },
-  );
-}
+// function getAudioOutput(events: IEvent[]) {
+//   return new Blob(
+//     events.map((event) => event.payload),
+//     { type: 'audio/mp3' },
+//   );
+// }
 
 function getFileOutput(event: IEvent) {
   return new Blob([event.payload], { type: 'file' });
