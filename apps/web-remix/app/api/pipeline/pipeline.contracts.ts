@@ -62,6 +62,11 @@ export const InterfaceConfig = z.object({
     outputs: [] as IInterfaceConfigFormProperty[],
     public: false,
   }),
+  voice: InterfaceConfigForm.optional().default({
+    inputs: [] as IInterfaceConfigFormProperty[],
+    outputs: [] as IInterfaceConfigFormProperty[],
+    public: false,
+  }),
 });
 
 export const SafeInterfaceConfig = z
@@ -82,6 +87,11 @@ export const SafeInterfaceConfig = z
             outputs: [] as IInterfaceConfigFormProperty[],
             public: false,
           },
+          voice: {
+            inputs: [] as IInterfaceConfigFormProperty[],
+            outputs: [] as IInterfaceConfigFormProperty[],
+            public: false,
+          },
         },
   )
   .default({
@@ -93,6 +103,11 @@ export const SafeInterfaceConfig = z
       public: false,
     },
     form: {
+      inputs: [] as IInterfaceConfigFormProperty[],
+      outputs: [] as IInterfaceConfigFormProperty[],
+      public: false,
+    },
+    voice: {
       inputs: [] as IInterfaceConfigFormProperty[],
       outputs: [] as IInterfaceConfigFormProperty[],
       public: false,
