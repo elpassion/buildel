@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback } from 'react';
 import { useBoolean } from 'usehooks-ts';
-import { v4 as uuidv4 } from 'uuid';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import {
@@ -57,7 +56,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
 
       return <span>Unsupported output type - {type}</span>;
     },
-    [events],
+    [events.length],
   );
 
   return (
@@ -151,29 +150,5 @@ interface AudioStreamOutputProps {
 }
 
 function AudioStreamOutput({ events }: AudioStreamOutputProps) {
-  const [key, setKey] = useState(uuidv4());
-  //@todo fix this sh...
-  const audio =
-    events.length > 0 ? getAudioOutput([events[events.length - 1]]) : null;
-
-  const audioUrl = useMemo(() => {
-    if (!audio) return;
-    if (typeof audio === 'string') {
-      return audio;
-    }
-
-    return URL.createObjectURL(audio);
-  }, [JSON.stringify(events)]);
-
-  useEffect(() => {
-    setKey(uuidv4());
-    return () => {
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
-      }
-    };
-  }, [audioUrl]);
-
-  if (!audioUrl) return;
-  return <AudioOutput key={key} audio={audioUrl} />;
+  return <AudioOutput events={events} />;
 }
