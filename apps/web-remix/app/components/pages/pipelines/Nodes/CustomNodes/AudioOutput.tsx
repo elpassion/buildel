@@ -6,7 +6,7 @@ import { errorToast } from '~/components/toasts/errorToast';
 import { cn } from '~/utils/cn';
 
 interface AudioOutputProps {
-  audio?: Blob | string | null;
+  audio?: string | null;
 }
 
 export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
@@ -53,17 +53,16 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
 
   const audioUrl = useMemo(() => {
     if (!audio) return;
-    if (typeof audio === 'string') {
-      return audio;
-    }
-
-    return URL.createObjectURL(audio);
+    return audio;
   }, [audio]);
 
   useEffect(() => {
-    if (!audioUrl) return;
+    const id = setTimeout(() => {
+      handlePlay();
+    }, 200);
+
     return () => {
-      URL.revokeObjectURL(audioUrl);
+      clearTimeout(id);
     };
   }, [audioUrl]);
 
