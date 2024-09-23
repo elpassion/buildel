@@ -5,9 +5,9 @@ import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
 
 export async function loader(args: LoaderFunctionArgs) {
-  return loaderBuilder(async ({ request, params, ...rest }, helpers) => {
+  return loaderBuilder(async ({ request, ...rest }, helpers) => {
     await requireLogin(request);
 
-    return interfaceLoader({ request, params, ...rest }, helpers);
+    return interfaceLoader({ request, ...rest }, helpers);
   })(args);
 }
