@@ -48,24 +48,26 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({ events }) => {
   const processAudioEvents = (audioEvents: IEvent[]) => {
     if (!sourceBufferRef.current || !mediaSourceRef.current) return;
 
-    audioEvents.forEach((event, index) => {
-      if (index >= lastIndex.current) {
-        const audioChunk = new Uint8Array(event.payload);
+    for (
+      let index = lastIndex.current + 1;
+      index < audioEvents.length;
+      index++
+    ) {
+      const event = audioEvents[index];
+      const audioChunk = new Uint8Array(event.payload);
 
-        if (
-          !sourceBufferRef.current?.updating &&
-          mediaSourceRef.current?.readyState === 'open'
-        ) {
-          try {
-            sourceBufferRef.current?.appendBuffer(audioChunk);
-          } catch (e) {
-            console.error(e);
-          }
+      if (
+        !sourceBufferRef.current.updating &&
+        mediaSourceRef.current.readyState === 'open'
+      ) {
+        try {
+          sourceBufferRef.current.appendBuffer(audioChunk);
+          lastIndex.current = index;
+        } catch (error) {
+          console.error('Error appending buffer:', error);
         }
-
-        lastIndex.current = index + 1;
       }
-    });
+    }
   };
 
   useEffect(() => {
