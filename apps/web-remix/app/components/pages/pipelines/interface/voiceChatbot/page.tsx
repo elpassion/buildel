@@ -144,7 +144,7 @@ export function VoiceChatbotPage() {
 export const meta: MetaFunction = metaWithDefaults(() => {
   return [
     {
-      title: 'Form',
+      title: 'Voice Chatbot',
     },
   ];
 });
