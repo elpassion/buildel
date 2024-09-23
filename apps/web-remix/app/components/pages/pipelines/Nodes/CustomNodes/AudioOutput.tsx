@@ -1,118 +1,87 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Pause, Play } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
 
-import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
-import { errorToast } from '~/components/toasts/errorToast';
-import { cn } from '~/utils/cn';
+import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
 
 interface AudioOutputProps {
-  audio?: string | null;
+  events: IEvent[];
 }
 
-export const AudioOutput: React.FC<AudioOutputProps> = ({ audio }) => {
-  console.log(audio)
+export const AudioOutput: React.FC<AudioOutputProps> = ({ events }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const { visualizeAudio, stopVisualization, clearCanvas } =
-    useAudioVisualize(canvasRef);
+  const mediaSourceRef = useRef<MediaSource | null>(null);
+  const sourceBufferRef = useRef<SourceBuffer | null>(null);
+  const lastIndex = useRef<number>(-1);
 
-  const handlePlay = async () => {
+  useEffect(() => {
     if (!audioRef.current) return;
-    try {
-      if (audioRef.current.paused) {
-        await audioRef.current.play();
-        await visualizeAudio(audioRef.current);
-        setIsPlaying(true);
-      } else {
-        audioRef.current.pause();
-        setIsPlaying(false);
+
+    const mediaSource = new MediaSource();
+    mediaSourceRef.current = mediaSource;
+
+    audioRef.current.src = URL.createObjectURL(mediaSource);
+
+    const onSourceOpen = () => {
+      if (!mediaSourceRef.current) return;
+
+      const sourceBuffer = mediaSourceRef.current.addSourceBuffer('audio/mpeg');
+      sourceBufferRef.current = sourceBuffer;
+
+      // sourceBuffer.addEventListener('updateend', () => {
+      //   if (
+      //     mediaSourceRef.current &&
+      //     mediaSourceRef.current.readyState === 'open'
+      //   ) {
+      //     console.log('CLOSE AA');
+      //   }
+      // });
+
+      processAudioEvents(events);
+    };
+
+    mediaSource.addEventListener('sourceopen', onSourceOpen);
+
+    return () => {
+      mediaSource.removeEventListener('sourceopen', onSourceOpen);
+    };
+  }, []);
+
+  const processAudioEvents = (audioEvents: IEvent[]) => {
+    if (!sourceBufferRef.current || !mediaSourceRef.current) return;
+
+    audioEvents.forEach((event, index) => {
+      if (index >= lastIndex.current) {
+        const audioChunk = new Uint8Array(event.payload);
+
+        if (
+          !sourceBufferRef.current?.updating &&
+          mediaSourceRef.current?.readyState === 'open'
+        ) {
+          try {
+            sourceBufferRef.current?.appendBuffer(audioChunk);
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        lastIndex.current = index + 1;
       }
-    } catch (e) {
-      console.log("ten", e)
-      errorToast({ description: 'The element has no supported sources.' });
-    }
-  };
-
-  const handleEnd = () => {
-    setIsPlaying(false);
-  };
-
-  const handleReset = async () => {
-    if (!audioRef.current) return;
-
-    if (!audioRef.current.paused) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    }
-
-    audioRef.current.currentTime = 0;
-    stopVisualization();
-    clearCanvas();
+    });
   };
 
   useEffect(() => {
-    const id = setTimeout(() => {
-      handlePlay();
-    }, 500);
+    processAudioEvents(events);
 
     return () => {
-      clearTimeout(id);
+      if (sourceBufferRef.current) {
+        sourceBufferRef.current.abort();
+      }
     };
-  }, [audio]);
-
-  const isDisabled = !audio;
+  }, [events]);
 
   return (
     <div className="flex flex-col items-start gap-1">
-      <button
-        disabled={isDisabled}
-        onClick={handleReset}
-        className={cn('text-xs text-muted-foreground', {
-          'hover:text-foreground': !isDisabled,
-          'opacity-50': isDisabled,
-        })}
-      >
-        Back to beginning
-      </button>
-
-      <div className="bg-muted rounded-lg flex gap-2 items-center px-2 py-1">
-        {audio && (
-          <audio
-            // key={audio}
-            src={audio}
-            ref={audioRef}
-            onEnded={handleEnd}
-            controls
-            hidden
-          />
-        )}
-
-        <button
-          type="button"
-          className={cn(
-            'w-6 h-6 flex items-center justify-center bg-primary rounded-md text-primary-foreground',
-            {
-              'text-red-500': isPlaying,
-              'opacity-50': isDisabled,
-            },
-          )}
-          disabled={isDisabled}
-          onClick={handlePlay}
-        >
-          {isPlaying ? (
-            <Pause className="w-3.5 h-3.5" />
-          ) : (
-            <Play className="w-3.5 h-3.5" />
-          )}
-        </button>
-        <div
-          className={cn(
-            "relative after:absolute after:content-[''] after:w-full after:h-[0.5px] after:bg-primary after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2",
-          )}
-        >
-          <canvas ref={canvasRef} width={235} height={36} />
-        </div>
+      <div>
+        <audio ref={audioRef} controls autoPlay />
       </div>
     </div>
   );
