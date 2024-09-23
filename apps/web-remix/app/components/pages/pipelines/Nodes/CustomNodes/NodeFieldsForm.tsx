@@ -321,7 +321,7 @@ export function NodeFieldsForm({
         return (
           <AudioFieldTabs
             disabled={isDisabled}
-            name={`${blockName}-${field.data.name}`}
+            name={`${field.data.name}`}
             onUpload={convertToBlobAndUpload}
             onChunk={uploadAudioChunk}
           />
