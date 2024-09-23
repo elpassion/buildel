@@ -185,8 +185,15 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
         def output(state, name, message, options \\ [])
       end
 
+      def output(state, unquote(name) = output, %Message{sent?: true} = message, options) do
+        message = message |> Message.from_message()
+        output(state, output, message, options)
+      end
+
       def output(state, unquote(name), %Message{} = message, options) do
         {:ok, options} = Keyword.validate(options, stream_stop: :send, stream_start: :send)
+
+        message = message |> Message.set_sent()
 
         case validate_output(unquote(name), message) do
           :ok ->

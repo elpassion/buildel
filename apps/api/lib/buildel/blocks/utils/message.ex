@@ -1,6 +1,6 @@
 defmodule Buildel.Blocks.Utils.Message do
-  @enforce_keys [:id, :type, :message]
-  defstruct [:id, :type, :message, :topic, :metadata]
+  @enforce_keys [:id, :type, :message, :sent?, :parents]
+  defstruct [:id, :type, :message, :topic, :metadata, :sent?, :parents]
 
   @type type :: :text | :raw | :binary | :json
   @type t :: %__MODULE__{
@@ -8,7 +8,9 @@ defmodule Buildel.Blocks.Utils.Message do
           type: type(),
           message: String.t(),
           topic: String.t() | nil,
-          metadata: any() | nil
+          metadata: any() | nil,
+          parents: [String.t()],
+          sent?: boolean()
         }
 
   @spec new(type(), any()) :: %__MODULE__{}
@@ -18,8 +20,15 @@ defmodule Buildel.Blocks.Utils.Message do
       type: type,
       message: message,
       topic: nil,
-      metadata: metadata
+      parents: [],
+      metadata: metadata,
+      sent?: false
     }
+  end
+
+  @spec from_message(t()) :: t()
+  def from_message(message) do
+    %{message | parents: message.parents ++ [message.id], id: UUID.uuid4(), sent?: false}
   end
 
   @spec set_type(t(), type()) :: t()
@@ -56,6 +65,11 @@ defmodule Buildel.Blocks.Utils.Message do
       nil -> nil
       topic -> io_from_topic(topic).io
     end
+  end
+
+  @spec set_sent(t()) :: t()
+  def set_sent(message) do
+    %{message | sent?: true}
   end
 
   defp io_from_topic(topic) do
