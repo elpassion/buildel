@@ -1,9 +1,10 @@
 defmodule Buildel.Blocks.Utils.Message do
-  @enforce_keys [:type, :message]
-  defstruct [:type, :message, :topic, :metadata]
+  @enforce_keys [:id, :type, :message]
+  defstruct [:id, :type, :message, :topic, :metadata]
 
   @type type :: :text | :raw | :binary | :json
   @type t :: %__MODULE__{
+          id: String.t(),
           type: type(),
           message: String.t(),
           topic: String.t() | nil,
@@ -13,6 +14,7 @@ defmodule Buildel.Blocks.Utils.Message do
   @spec new(type(), any()) :: %__MODULE__{}
   def new(type, message, metadata \\ %{}) do
     %__MODULE__{
+      id: UUID.uuid4(),
       type: type,
       message: message,
       topic: nil,
@@ -73,6 +75,9 @@ defmodule Buildel.Blocks.Utils.Message do
         }
     end
   end
+
+  def to_string(%__MODULE__{type: :text, message: message}), do: {:ok, message}
+  def to_string(%__MODULE__{type: :json, message: message}), do: Jason.encode(message)
 
   defimpl Jason.Encoder, for: [__MODULE__] do
     alias Buildel.Blocks.Utils.Message

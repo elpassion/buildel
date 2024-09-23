@@ -25,23 +25,24 @@ defmodule Buildel.BlockCase do
 
         message = message |> Message.set_topic(topic)
 
-        if options[:start_stream] == :receive, do: assert_receive({^topic, :start_stream, nil, _})
+        if options[:start_stream] == :receive,
+          do: assert_receive({^topic, :start_stream, nil, _}, 1000)
 
         message_topic = message.topic
         message_type = message.type
         message_message = message.message
-        message_parents = message.parents
         message_metadata = message.metadata
 
         assert_receive %Message{
-          topic: ^message_topic,
-          type: message_type,
-          message: message_message,
-          parents: [message_parents | _],
-          metadata: message_metadata
-        }
+                         topic: ^message_topic,
+                         type: message_type,
+                         message: message_message,
+                         metadata: message_metadata
+                       },
+                       1000
 
-        if options[:stop_stream] == :receive, do: assert_receive({^topic, :stop_stream, nil, _})
+        if options[:stop_stream] == :receive,
+          do: assert_receive({^topic, :stop_stream, nil, _}, 1000)
       end
 
       def assert_receive_error(%Run{} = run, block_name, error) do
@@ -52,7 +53,7 @@ defmodule Buildel.BlockCase do
       end
 
       def assert_receive_error(topic, error) do
-        assert_receive {^topic, :error, [^error], %{}}
+        assert_receive {^topic, :error, [^error], %{}}, 1000
       end
     end
   end

@@ -81,14 +81,11 @@ defmodule Buildel.Blocks.NewTextOutput do
     end
   end
 
-  defp jq(%Message{type: :text} = message, filter) do
-    with {:ok, message_message} <- Buildel.JQ.query(message.message, filter),
+  defp jq(%Message{} = message, filter) do
+    with %Message{} = message <- format_message(message),
+         {:ok, message_message} <- Buildel.JQ.query(message.message, filter),
          {:ok, message_message} <- Jason.decode(message_message) do
       Message.set_message(message, message_message) |> Message.set_type(:json)
     end
-  end
-
-  defp jq(message, filter) do
-    jq(format_message(message), filter)
   end
 end
