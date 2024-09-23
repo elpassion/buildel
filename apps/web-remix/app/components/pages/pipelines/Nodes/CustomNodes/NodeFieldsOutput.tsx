@@ -1,5 +1,6 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useBoolean } from 'usehooks-ts';
+import { v4 as uuidv4 } from 'uuid';
 
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import {
@@ -25,7 +26,7 @@ interface NodeFieldsOutputProps {
 }
 
 export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
-  const { events, clearBlockEvents } = useRunPipelineNode(block);
+  const { events, clearBlockEvents, status } = useRunPipelineNode(block);
 
   const renderOutput = useCallback(
     (field: IField) => {
@@ -46,10 +47,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
           />
         );
       } else if (type === 'audio') {
-        const audio =
-          fieldEvents.length > 0 ? getAudioOutput(fieldEvents) : null;
-
-        return <AudioOutput audio={audio} />;
+        return <AudioStreamOutput events={events} status={status} />;
       } else if (type === 'file' || type === 'image') {
         const files =
           fieldEvents.length > 0 ? fieldEvents.map(getFileOutput) : [];
@@ -145,4 +143,37 @@ function TextOutput({ content, blockName, onClear }: TextOutputProps) {
       </div>
     </>
   );
+}
+
+interface AudioStreamOutputProps {
+  events: IEvent[];
+  status: boolean;
+}
+
+function AudioStreamOutput({ events }: AudioStreamOutputProps) {
+  const [key, setKey] = useState(uuidv4());
+  const audio = events.length > 0 ? getAudioOutput(events) : null;
+
+  const audioUrl = useMemo(() => {
+    if (!audio) return;
+    if (typeof audio === 'string') {
+      return audio;
+    }
+
+    return URL.createObjectURL(audio);
+  }, [JSON.stringify(audio)]);
+
+  useEffect(() => {
+    if (!audioUrl) return;
+
+    return () => {
+      URL.revokeObjectURL(audioUrl);
+    };
+  }, [audioUrl]);
+
+  useEffect(() => {
+    setKey(uuidv4());
+  }, [JSON.stringify(audio)]);
+
+  return <AudioOutput key={key} audio={audioUrl} />;
 }
