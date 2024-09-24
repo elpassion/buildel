@@ -172,7 +172,7 @@ export default function WebsiteChat() {
 
   return (
     <div className="relative flex justify-center flex-col items-center h-[100dvh] w-full bg-secondary">
-      <div className="absolute top-1 right-1">
+      <div className="absolute top-3 right-3">
         <ChatStatus connectionStatus={runStatus} />
       </div>
 
