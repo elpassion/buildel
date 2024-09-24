@@ -160,12 +160,7 @@ export default function WebsiteChat() {
 
       <div className="grow flex justify-center items-center">
         <audio ref={audioRef} controls autoPlay hidden />
-        <canvas
-          ref={canvasRef}
-          width={320}
-          height={320}
-          className="animate-pulse"
-        />
+        <canvas ref={canvasRef} width={320} height={320} />
       </div>
 
       <div className="py-4 px-6">
