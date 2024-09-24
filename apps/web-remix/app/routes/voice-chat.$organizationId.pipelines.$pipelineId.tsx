@@ -5,16 +5,13 @@ import { Mic, X } from 'lucide-react';
 import invariant from 'tiny-invariant';
 
 import type { MediaRecorderState } from '~/components/audioRecorder/AudioRecorder';
-import {
-  useAudioRecorder,
+import type {
   UseAudioRecorderCb,
   UseAudioRecorderCbOptions,
   UseAudioRecorderChunkCb,
 } from '~/components/audioRecorder/useAudioRecorder';
-import {
-  useAudioVisualize,
-  useAudioVisualizeCircle,
-} from '~/components/audioRecorder/useAudioVisualize';
+import { useAudioRecorder } from '~/components/audioRecorder/useAudioRecorder';
+import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
 import { ChatStatus } from '~/components/chat/Chat.components';
 import { publicInterfaceLoader } from '~/components/pages/pipelines/interface/interface.loader.server';
 import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
@@ -39,7 +36,9 @@ export default function WebsiteChat() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mediaSourceRef = useRef<MediaSource | null>(null);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
-  const { visualizeAudio } = useAudioVisualizeCircle(canvasRef);
+  const { visualizeAudio } = useAudioVisualize(canvasRef, {
+    renderBars: drawChatCircle,
+  });
 
   const input = pipeline.interface_config.voice.inputs.find(
     (input) => input.type === 'audio_input',
@@ -64,7 +63,7 @@ export default function WebsiteChat() {
     Number(organizationId),
     Number(pipelineId),
     onBlockOutput,
-    (a, b) => console.log('STATUS CHANGE', a, b),
+    () => {},
     () => {},
     () => {},
     pipeline.interface_config.voice.public,
@@ -85,44 +84,6 @@ export default function WebsiteChat() {
 
     push(topic, chunk.data);
   };
-
-  useEffect(() => {
-    setTimeout(() => {
-      startRun({
-        alias,
-        initial_inputs: [],
-        metadata: {
-          interface: 'voice',
-        },
-      });
-    }, 500);
-
-    return () => {
-      stopRun();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!audioRef.current) return;
-
-    const mediaSource = new MediaSource();
-    mediaSourceRef.current = mediaSource;
-
-    audioRef.current.src = URL.createObjectURL(mediaSource);
-
-    const onSourceOpen = async () => {
-      if (!mediaSourceRef.current) return;
-
-      sourceBufferRef.current =
-        mediaSourceRef.current.addSourceBuffer('audio/mpeg');
-    };
-
-    mediaSource.addEventListener('sourceopen', onSourceOpen);
-
-    return () => {
-      mediaSource.removeEventListener('sourceopen', onSourceOpen);
-    };
-  }, []);
 
   const processAudioEvents = (audioEvents: IEvent[]) => {
     if (!sourceBufferRef.current || !mediaSourceRef.current) return;
@@ -145,6 +106,69 @@ export default function WebsiteChat() {
       }
     }
   };
+
+  const drawStaticCircle = () => {
+    if (!canvasRef.current) return;
+
+    const canvasContext = canvasRef.current?.getContext('2d');
+
+    if (!canvasContext) return;
+
+    canvasContext.clearRect(
+      0,
+      0,
+      canvasRef.current.width,
+      canvasRef.current.height,
+    );
+
+    const centerX = canvasRef.current.width / 2;
+    const centerY = canvasRef.current.height / 2;
+
+    canvasContext.fillStyle = '#111';
+    canvasContext.beginPath();
+    canvasContext.arc(centerX, centerY, 70, 0, Math.PI * 2);
+    canvasContext.fill();
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      startRun({
+        alias,
+        initial_inputs: [],
+        metadata: {
+          interface: 'voice',
+        },
+      });
+    }, 500);
+
+    return () => {
+      stopRun();
+    };
+  }, []);
+
+  useEffect(() => {
+    drawStaticCircle();
+
+    if (!audioRef.current) return;
+
+    const mediaSource = new MediaSource();
+    mediaSourceRef.current = mediaSource;
+
+    audioRef.current.src = URL.createObjectURL(mediaSource);
+
+    const onSourceOpen = async () => {
+      if (!mediaSourceRef.current) return;
+
+      sourceBufferRef.current =
+        mediaSourceRef.current.addSourceBuffer('audio/mpeg');
+    };
+
+    mediaSource.addEventListener('sourceopen', onSourceOpen);
+
+    return () => {
+      mediaSource.removeEventListener('sourceopen', onSourceOpen);
+    };
+  }, []);
 
   return (
     <div className="relative flex justify-center flex-col items-center h-[100dvh] w-full bg-secondary">
@@ -183,8 +207,12 @@ interface SpeakingRowProps {
 
 function SpeakingRow({ status, ...rest }: SpeakingRowProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { visualizeAudio, clearCanvas, stopVisualization } =
-    useAudioVisualize(canvasRef);
+  const { visualizeAudio, clearCanvas, stopVisualization } = useAudioVisualize(
+    canvasRef,
+    {
+      renderBars: drawCircleBars,
+    },
+  );
 
   const onChunk = (e: BlobEvent, args: UseAudioRecorderCbOptions) => {
     rest.onChunk?.(e, args);
@@ -236,7 +264,7 @@ function SpeakingRow({ status, ...rest }: SpeakingRowProps) {
         type="button"
         onClick={startStop}
         className={cn(
-          'w-12 h-12 flex items-center text-white justify-center bg-primary rounded-full ',
+          'w-12 h-12 flex items-center text-white justify-center bg-primary rounded-full',
           {
             'bg-red-500': status === 'recording',
           },
@@ -246,4 +274,64 @@ function SpeakingRow({ status, ...rest }: SpeakingRowProps) {
       </button>
     </div>
   );
+}
+
+function drawCircleBars(
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  frequencyBinCountArray: Uint8Array,
+) {
+  const circleCount = 6;
+  const barWidth = 15;
+  const radius = barWidth / 2;
+  const barSpacing = canvas.width / circleCount;
+
+  for (let i = 0; i < circleCount; i++) {
+    const barHeight =
+      15 + (frequencyBinCountArray[i] / 255) * (canvas.height - 15);
+
+    const x = barSpacing * i + barSpacing / 2 - barWidth / 2;
+    const y = canvas.height - barHeight;
+
+    ctx.beginPath();
+    ctx.moveTo(x, y + radius);
+    ctx.lineTo(x, canvas.height - radius);
+    ctx.quadraticCurveTo(x, canvas.height, x + radius, canvas.height);
+    ctx.lineTo(x + barWidth - radius, canvas.height);
+    ctx.quadraticCurveTo(
+      x + barWidth,
+      canvas.height,
+      x + barWidth,
+      canvas.height - radius,
+    );
+    ctx.lineTo(x + barWidth, y + radius);
+    ctx.quadraticCurveTo(x + barWidth, y, x + barWidth - radius, y);
+    ctx.lineTo(x + radius, y);
+    ctx.quadraticCurveTo(x, y, x, y + radius);
+    ctx.fillStyle = '#111';
+    ctx.fill();
+  }
+}
+
+function drawChatCircle(
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  frequencyBinCountArray: Uint8Array,
+) {
+  const averageFrequency =
+    frequencyBinCountArray.reduce((a, b) => a + b, 0) /
+    frequencyBinCountArray.length;
+
+  const baseRadius = 70;
+
+  const maxGrowth = canvas.width - baseRadius;
+  const radius = baseRadius + (averageFrequency / 255) * maxGrowth;
+
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+
+  ctx.fillStyle = '#111';
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.fill();
 }
