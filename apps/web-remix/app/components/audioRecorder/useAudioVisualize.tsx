@@ -10,7 +10,7 @@ export interface OptionsType {
   barHeightFactor: number;
   barWidth: number;
   barPositionFactor: number;
-  barColor: string;
+  color: string;
   fftSize: number;
   onError?: (err: unknown) => void;
   renderBars?: AudioVisualizeRender;
@@ -21,7 +21,7 @@ const BASE_OPTIONS: OptionsType = {
   barHeightFactor: 1,
   barPositionFactor: 4,
   fftSize: 1024,
-  barColor: '#F5C07A',
+  color: '#F5C07A',
 };
 
 export const useAudioVisualize = (
@@ -163,16 +163,21 @@ export const useAudioVisualize = (
   };
 };
 
+export type AudioVisualizeRenderArgs = Omit<
+  OptionsType,
+  'onError' | 'fftSize' | 'barFactory'
+>;
+
 export function canvasBarFactory(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   frequencyBinCountArray: Uint8Array,
-  rest: Omit<OptionsType, 'onError' | 'fftSize' | 'barFactory'>,
+  rest: AudioVisualizeRenderArgs,
 ) {
   const centerY = canvas.height / 2;
   const barCount = canvas.width / 2;
 
-  ctx.fillStyle = rest.barColor;
+  ctx.fillStyle = rest.color;
 
   for (let i = 0; i < barCount; i++) {
     const barPosition = i * rest.barPositionFactor;
