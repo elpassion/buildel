@@ -3,7 +3,7 @@ defmodule Buildel.JQ do
 
   def query(payload, jquery) do
     {:ok, tmp_path} = Temp.path()
-    :ok = File.write(tmp_path, payload) |> IO.inspect(label: "path")
+    :ok = File.write(tmp_path, payload)
 
     try do
       case System.cmd("jq", ["-c", "-r", jquery, tmp_path]) do
