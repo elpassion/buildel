@@ -5,8 +5,16 @@ import { Mic, X } from 'lucide-react';
 import invariant from 'tiny-invariant';
 
 import type { MediaRecorderState } from '~/components/audioRecorder/AudioRecorder';
-import { useAudioRecorder } from '~/components/audioRecorder/useAudioRecorder';
-import { useAudioVisualizeCircle } from '~/components/audioRecorder/useAudioVisualize';
+import {
+  useAudioRecorder,
+  UseAudioRecorderCb,
+  UseAudioRecorderCbOptions,
+  UseAudioRecorderChunkCb,
+} from '~/components/audioRecorder/useAudioRecorder';
+import {
+  useAudioVisualize,
+  useAudioVisualizeCircle,
+} from '~/components/audioRecorder/useAudioVisualize';
 import { ChatStatus } from '~/components/chat/Chat.components';
 import { publicInterfaceLoader } from '~/components/pages/pipelines/interface/interface.loader.server';
 import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
@@ -78,20 +86,6 @@ export default function WebsiteChat() {
     push(topic, chunk.data);
   };
 
-  const { stop, start } = useAudioRecorder({
-    onStop: onStop,
-    onStart: onStart,
-    onChunk: onChunk,
-  });
-
-  const startStop = async () => {
-    if (status === 'recording') {
-      await stop();
-    } else {
-      await start();
-    }
-  };
-
   useEffect(() => {
     setTimeout(() => {
       startRun({
@@ -160,23 +154,96 @@ export default function WebsiteChat() {
 
       <div className="grow flex justify-center items-center">
         <audio ref={audioRef} controls autoPlay hidden />
-        <canvas ref={canvasRef} width={320} height={320} />
+        <canvas
+          ref={canvasRef}
+          width={320}
+          height={320}
+          className="animate-scale"
+        />
       </div>
 
       <div className="py-4 px-6">
-        <button
-          type="button"
-          className={cn(
-            'w-12 h-12 flex items-center text-white justify-center bg-primary rounded-full ',
-            {
-              'bg-red-500': status === 'recording',
-            },
-          )}
-          onClick={startStop}
-        >
-          {status === 'recording' ? <X /> : <Mic />}
-        </button>
+        <SpeakingRow
+          status={status}
+          onStop={onStop}
+          onStart={onStart}
+          onChunk={onChunk}
+        />
       </div>
+    </div>
+  );
+}
+
+interface SpeakingRowProps {
+  status: MediaRecorderState;
+  onChunk?: UseAudioRecorderChunkCb;
+  onStop?: UseAudioRecorderCb;
+  onStart?: UseAudioRecorderCb;
+}
+
+function SpeakingRow({ status, ...rest }: SpeakingRowProps) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const { visualizeAudio, clearCanvas, stopVisualization } =
+    useAudioVisualize(canvasRef);
+
+  const onChunk = (e: BlobEvent, args: UseAudioRecorderCbOptions) => {
+    rest.onChunk?.(e, args);
+  };
+
+  const onStop = (
+    e: Event,
+    chunks: Blob[],
+    args: UseAudioRecorderCbOptions,
+  ) => {
+    rest.onStop?.(e, chunks, args);
+
+    stopVisualization();
+    clearCanvas();
+  };
+
+  const onStart = (e: Event, blob: Blob[], args: UseAudioRecorderCbOptions) => {
+    rest.onStart?.(e, blob, args);
+
+    if (!args.mediaStream) return;
+
+    visualizeAudio(args.mediaStream);
+  };
+
+  const { stop, start } = useAudioRecorder({
+    onChunk: onChunk,
+    onStop: onStop,
+    onStart: onStart,
+  });
+
+  const startStop = async () => {
+    if (status === 'recording') {
+      await stop();
+    } else {
+      await start();
+    }
+  };
+
+  return (
+    <div className="flex gap-2 flex-col items-center min-h-[124px] justify-end">
+      <canvas
+        ref={canvasRef}
+        width={100}
+        height={36}
+        className={cn({ hidden: status !== 'recording' })}
+      />
+
+      <button
+        type="button"
+        onClick={startStop}
+        className={cn(
+          'w-12 h-12 flex items-center text-white justify-center bg-primary rounded-full ',
+          {
+            'bg-red-500': status === 'recording',
+          },
+        )}
+      >
+        {status === 'recording' ? <X /> : <Mic />}
+      </button>
     </div>
   );
 }
