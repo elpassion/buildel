@@ -9,7 +9,7 @@ import {
 import { ToggleInput } from '~/components/form/inputs/toggle.input';
 
 import type { IBlockConfig, IField } from '../../pipeline.types';
-import { useRunPipelineNode } from '../../RunPipelineProvider';
+import { useRunPipeline, useRunPipelineNode } from '../../RunPipelineProvider';
 import type { IEvent } from '../../RunPipelineProvider';
 import { AudioOutput } from './AudioOutput';
 import { FileOutput } from './FileOutput';
@@ -150,5 +150,7 @@ interface AudioStreamOutputProps {
 }
 
 function AudioStreamOutput({ events }: AudioStreamOutputProps) {
-  return <AudioOutput events={events} />;
+  const { status } = useRunPipeline();
+
+  return <AudioOutput events={events} disabled={status !== 'running'} />;
 }
