@@ -42,7 +42,8 @@ defmodule Buildel.Blocks do
     ImageOutput,
     Knowledge,
     NewTextToSpeech,
-    NewTextToSpeechElevenlabs
+    NewTextToSpeechElevenlabs,
+    NewCollectAllText
   }
 
   @names_to_blocks_map %{
@@ -83,7 +84,8 @@ defmodule Buildel.Blocks do
     "image_output" => ImageOutput,
     "knowledge" => Knowledge,
     "new_text_to_speech" => NewTextToSpeech,
-    "new_text_to_speech_elevenlabs" => NewTextToSpeechElevenlabs
+    "new_text_to_speech_elevenlabs" => NewTextToSpeechElevenlabs,
+    "new_collect_all_text" => NewCollectAllText
   }
 
   @blocks_to_names_map %{
@@ -124,7 +126,8 @@ defmodule Buildel.Blocks do
     ImageOutput => "image_output",
     Knowledge => "knowledge",
     NewTextToSpeech => "new_text_to_speech",
-    NewTextToSpeechElevenlabs => "new_text_to_speech_elevenlabs"
+    NewTextToSpeechElevenlabs => "new_text_to_speech_elevenlabs",
+    NewCollectAllText => "new_collect_all_text"
   }
 
   def list_types() do

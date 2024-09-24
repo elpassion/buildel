@@ -55,7 +55,6 @@ defmodule Buildel.Clients.Elevenlabs do
          text: text <> " "
        })}
     )
-    |> IO.inspect()
   end
 
   def flush(pid) do
