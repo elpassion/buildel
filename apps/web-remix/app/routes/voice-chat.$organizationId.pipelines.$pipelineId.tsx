@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { LoaderFunctionArgs } from '@remix-run/node';
-import { Mic } from 'lucide-react';
+import { useLoaderData } from '@remix-run/react';
+import { Mic, X } from 'lucide-react';
 import invariant from 'tiny-invariant';
 
-import { MediaRecorderState } from '~/components/audioRecorder/AudioRecorder';
+import type { MediaRecorderState } from '~/components/audioRecorder/AudioRecorder';
 import { useAudioRecorder } from '~/components/audioRecorder/useAudioRecorder';
+import { useAudioVisualizeCircle } from '~/components/audioRecorder/useAudioVisualize';
+import { ChatStatus } from '~/components/chat/Chat.components';
 import { publicInterfaceLoader } from '~/components/pages/pipelines/interface/interface.loader.server';
+import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
+import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
 import { loaderBuilder } from '~/utils.server';
 import { cn } from '~/utils/cn';
 
@@ -19,22 +24,64 @@ export async function loader(args: LoaderFunctionArgs) {
 }
 
 export default function WebsiteChat() {
+  const { pipelineId, organizationId, pipeline, alias } =
+    useLoaderData<typeof loader>();
   const [status, setStatus] = useState<MediaRecorderState>('inactive');
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const mediaSourceRef = useRef<MediaSource | null>(null);
+  const sourceBufferRef = useRef<SourceBuffer | null>(null);
+  const { visualizeAudio } = useAudioVisualizeCircle(canvasRef);
+
+  const input = pipeline.interface_config.voice.inputs.find(
+    (input) => input.type === 'audio_input',
+  );
+
+  const output = pipeline.interface_config.voice.outputs.find(
+    (input) => input.type === 'audio_output',
+  );
+
+  const onBlockOutput = (blockId: string, outputName: string, payload: any) => {
+    if (blockId === output?.name) {
+      processAudioEvents([{ block: blockId, output: outputName, payload }]);
+    }
+  };
+
+  const {
+    push,
+    startRun,
+    stopRun,
+    status: runStatus,
+  } = usePipelineRun(
+    Number(organizationId),
+    Number(pipelineId),
+    onBlockOutput,
+    (a, b) => console.log('STATUS CHANGE', a, b),
+    () => {},
+    () => {},
+    pipeline.interface_config.voice.public,
+  );
 
   const onStart = () => {
     setStatus('recording');
-    console.log('START');
   };
 
   const onStop = () => {
     setStatus('inactive');
-    console.log('STOP');
+  };
+
+  const onChunk = (chunk: BlobEvent) => {
+    if (!input) return;
+
+    const topic = `${input.name}:input`;
+
+    push(topic, chunk.data);
   };
 
   const { stop, start } = useAudioRecorder({
     onStop: onStop,
     onStart: onStart,
-    onChunk: (chunk) => console.log('CHUNK', chunk),
+    onChunk: onChunk,
   });
 
   const startStop = async () => {
@@ -45,22 +92,96 @@ export default function WebsiteChat() {
     }
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      startRun({
+        alias,
+        initial_inputs: [],
+        metadata: {
+          interface: 'voice',
+        },
+      });
+    }, 500);
+
+    return () => {
+      stopRun();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    const mediaSource = new MediaSource();
+    mediaSourceRef.current = mediaSource;
+
+    audioRef.current.src = URL.createObjectURL(mediaSource);
+
+    const onSourceOpen = async () => {
+      if (!mediaSourceRef.current) return;
+
+      sourceBufferRef.current =
+        mediaSourceRef.current.addSourceBuffer('audio/mpeg');
+    };
+
+    mediaSource.addEventListener('sourceopen', onSourceOpen);
+
+    return () => {
+      mediaSource.removeEventListener('sourceopen', onSourceOpen);
+    };
+  }, []);
+
+  const processAudioEvents = (audioEvents: IEvent[]) => {
+    if (!sourceBufferRef.current || !mediaSourceRef.current) return;
+
+    for (const event of audioEvents) {
+      const audioChunk = new Uint8Array(event.payload);
+      if (
+        !sourceBufferRef.current.updating &&
+        mediaSourceRef.current.readyState === 'open'
+      ) {
+        try {
+          sourceBufferRef.current.appendBuffer(audioChunk);
+
+          if (audioRef.current) {
+            visualizeAudio(audioRef.current);
+          }
+        } catch (error) {
+          console.error('Error appending buffer:', error);
+        }
+      }
+    }
+  };
+
   return (
-    <div className="flex justify-center items-center h-[100dvh] w-full bg-secondary">
-      VOICE CHAT
-      <button
-        type="button"
-        className={cn(
-          'w-6 h-6 flex items-center justify-center bg-primary rounded-md ',
-          {
-            'text-primary-foreground': status !== 'recording',
-            'text-red-500': status === 'recording',
-          },
-        )}
-        onClick={startStop}
-      >
-        <Mic />
-      </button>
+    <div className="relative flex justify-center flex-col items-center h-[100dvh] w-full bg-secondary">
+      <div className="absolute top-1 right-1">
+        <ChatStatus connectionStatus={runStatus} />
+      </div>
+
+      <div className="grow flex justify-center items-center">
+        <audio ref={audioRef} controls autoPlay hidden />
+        <canvas
+          ref={canvasRef}
+          width={320}
+          height={320}
+          className="animate-pulse"
+        />
+      </div>
+
+      <div className="py-4 px-6">
+        <button
+          type="button"
+          className={cn(
+            'w-12 h-12 flex items-center text-white justify-center bg-primary rounded-full ',
+            {
+              'bg-red-500': status === 'recording',
+            },
+          )}
+          onClick={startStop}
+        >
+          {status === 'recording' ? <X /> : <Mic />}
+        </button>
+      </div>
     </div>
   );
 }
