@@ -183,7 +183,7 @@ defmodule Buildel.Blocks.NewChat do
   def handle_input(:input, %Message{} = message, state) do
     with {:ok, state} <- save_input_message(state, message),
          {:ok, _chat_messages, state} <- fill_chat_messages(state),
-         {:ok, state} <- start_chat_completion(state) do
+         {:ok, state} <- start_chat_completion(state, message) do
       state = reset_latest_messages(state)
       {:ok, state}
     else
@@ -213,12 +213,12 @@ defmodule Buildel.Blocks.NewChat do
     |> Enum.into(%{})
   end
 
-  defp start_chat_completion(state) do
-    Task.start(chat_completion_task(state))
+  defp start_chat_completion(state, message) do
+    Task.start(chat_completion_task(state, message))
     {:ok, state}
   end
 
-  defp chat_completion_task(state) do
+  defp chat_completion_task(state, message) do
     fn ->
       send_stream_start(state, :output)
 
@@ -234,7 +234,14 @@ defmodule Buildel.Blocks.NewChat do
         response_format: option(state, :response_format),
         max_tokens: option(state, :max_tokens),
         on_content: fn text_chunk ->
-          output(state, :output, Message.new(:text, text_chunk), stream_stop: :none)
+          output(
+            state,
+            :output,
+            Message.from_message(message)
+            |> Message.set_type(:text)
+            |> Message.set_message(text_chunk),
+            stream_stop: :none
+          )
         end,
         on_end: fn ->
           send_stream_stop(state, :output)

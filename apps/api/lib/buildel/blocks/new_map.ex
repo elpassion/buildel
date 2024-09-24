@@ -26,9 +26,17 @@ defmodule Buildel.Blocks.NewMap do
     with {:ok, state} <- save_input_message(state, message),
          {:ok, filter, state} <- fill_filter_template(state),
          {:ok, latest_messages_json} <- build_latest_messages_json(state),
-         {:ok, %Message{} = message, state} <-
+         {:ok, %Message{} = new_message, state} <-
            filter_messages(state, latest_messages_json, filter) do
-      output(state, :output, message)
+      output(
+        state,
+        :output,
+        message
+        |> Message.from_message()
+        |> Message.set_type(new_message.type)
+        |> Message.set_message(new_message.message)
+      )
+
       {:ok, state}
     else
       {:error, :template_not_filled, state} ->

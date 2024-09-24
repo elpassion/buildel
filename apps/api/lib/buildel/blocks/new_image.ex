@@ -99,7 +99,15 @@ defmodule Buildel.Blocks.NewImage do
     send_stream_start(state, :image_url)
 
     with {:ok, image_url, state} <- generate_image(state, message) do
-      output(state, :image_url, Message.new(:text, image_url))
+      output(
+        state,
+        :image_url,
+        message
+        |> Message.from_message()
+        |> Message.set_type(:text)
+        |> Message.set_message(image_url)
+      )
+
       send_stream_stop(state, :image_url)
       {:ok, state}
     else

@@ -27,8 +27,16 @@ defmodule Buildel.Blocks.NewDate do
     "default" => 0
   })
 
-  def handle_input(:input, %Message{}, state) do
-    output(state, :output, Message.new(:text, get_date(state)))
+  def handle_input(:input, %Message{} = message, state) do
+    output(
+      state,
+      :output,
+      message
+      |> Message.from_message()
+      |> Message.set_type(:text)
+      |> Message.set_message(get_date(state))
+    )
+
     {:ok, state}
   end
 

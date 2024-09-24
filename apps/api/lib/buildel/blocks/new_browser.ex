@@ -15,7 +15,7 @@ defmodule Buildel.Blocks.NewBrowserTool do
 
   defoutput(:output, schema: %{})
 
-  def handle_input(:url, %Message{type: :json, message: message_message}, state)
+  def handle_input(:url, %Message{type: :json, message: message_message} = message, state)
       when is_list(message_message) do
     send_stream_start(state, :output)
 
@@ -35,9 +35,13 @@ defmodule Buildel.Blocks.NewBrowserTool do
     output(
       state,
       :output,
-      Message.new(
-        :json,
-        pages |> Enum.map(fn {status, body} -> "#{status}\n#{body}" end) |> Enum.reverse()
+      message
+      |> Message.from_message()
+      |> Message.set_type(:json)
+      |> Message.set_message(
+        pages
+        |> Enum.map(fn {status, body} -> "#{status}\n#{body}" end)
+        |> Enum.reverse()
       )
     )
 
@@ -48,7 +52,15 @@ defmodule Buildel.Blocks.NewBrowserTool do
     send_stream_start(state, :output)
 
     with {:ok, response, state} <- visit_url(state, message.message) do
-      output(state, :output, Message.new(:json, response))
+      output(
+        state,
+        :output,
+        message
+        |> Message.from_message()
+        |> Message.set_type(:json)
+        |> Message.set_message(response)
+      )
+
       {:ok, state}
     else
       {:error, reason, state} ->
