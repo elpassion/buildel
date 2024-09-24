@@ -17,7 +17,7 @@ defmodule Buildel.Blocks.NewBrowserTool do
 
   def handle_input(:url, %Message{type: :json, message: message_message} = message, state)
       when is_list(message_message) do
-    send_stream_start(state, :output)
+    send_stream_start(state, :output, message)
 
     %{state: state, pages: pages} =
       Enum.reduce(message_message, %{state: state, pages: []}, fn url,
@@ -49,7 +49,7 @@ defmodule Buildel.Blocks.NewBrowserTool do
   end
 
   def handle_input(:url, %Message{} = message, state) do
-    send_stream_start(state, :output)
+    send_stream_start(state, :output, message)
 
     with {:ok, response, state} <- visit_url(state, message.message) do
       output(
@@ -65,7 +65,7 @@ defmodule Buildel.Blocks.NewBrowserTool do
     else
       {:error, reason, state} ->
         send_error(state, reason)
-        send_stream_stop(state, :output)
+        send_stream_stop(state, :output, message)
         {:error, reason, state}
     end
   end

@@ -26,7 +26,7 @@ defmodule Buildel.BlockCase do
         message = message |> Message.set_topic(topic)
 
         if options[:start_stream] == :receive,
-          do: assert_receive({^topic, :start_stream, nil, _}, 1000)
+          do: assert_receive({^topic, :start_stream, %Message{}, _}, 1000)
 
         message_topic = message.topic
         message_type = message.type
@@ -42,7 +42,7 @@ defmodule Buildel.BlockCase do
                        1000
 
         if options[:stop_stream] == :receive,
-          do: assert_receive({^topic, :stop_stream, nil, _}, 1000)
+          do: assert_receive({^topic, :stop_stream, %Message{}, _}, 1000)
       end
 
       def assert_receive_error(%Run{} = run, block_name, error) do

@@ -96,7 +96,7 @@ defmodule Buildel.Blocks.NewImage do
   })
 
   def handle_input(:input, %Message{} = message, state) do
-    send_stream_start(state, :image_url)
+    send_stream_start(state, :image_url, message)
 
     with {:ok, image_url, state} <- generate_image(state, message) do
       output(
@@ -108,7 +108,7 @@ defmodule Buildel.Blocks.NewImage do
         |> Message.set_message(image_url)
       )
 
-      send_stream_stop(state, :image_url)
+      send_stream_stop(state, :image_url, message)
       {:ok, state}
     else
       {:error, error, state} ->

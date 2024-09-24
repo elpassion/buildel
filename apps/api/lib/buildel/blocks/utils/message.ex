@@ -46,7 +46,7 @@ defmodule Buildel.Blocks.Utils.Message do
     %__MODULE__{message | metadata: metadata}
   end
 
-  @spec set_message(t(), String.t()) :: t()
+  @spec set_message(t(), any()) :: t()
   def set_message(message, message_message) do
     %__MODULE__{message | message: message_message}
   end

@@ -220,7 +220,7 @@ defmodule Buildel.Blocks.NewChat do
 
   defp chat_completion_task(state, message) do
     fn ->
-      send_stream_start(state, :output)
+      send_stream_start(state, :output, message)
 
       {:ok, chat_messages, state} = fill_chat_messages(state)
 
@@ -244,11 +244,11 @@ defmodule Buildel.Blocks.NewChat do
           )
         end,
         on_end: fn ->
-          send_stream_stop(state, :output)
+          send_stream_stop(state, :output, message)
         end,
         on_error: fn error ->
           send_error(state, error)
-          send_stream_stop(state, :output)
+          send_stream_stop(state, :output, message)
         end
       )
     end

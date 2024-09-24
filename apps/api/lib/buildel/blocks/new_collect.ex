@@ -11,7 +11,7 @@ defmodule Buildel.Blocks.NewCollect do
   defoutput(:output, schema: %{})
 
   def handle_input(:input, %Message{type: :text} = message, state) do
-    send_stream_start(state, :output)
+    send_stream_start(state, :output, message)
 
     state =
       state
@@ -22,9 +22,9 @@ defmodule Buildel.Blocks.NewCollect do
     {:ok, state}
   end
 
-  def handle_input_stream_stop(:input, state) do
+  def handle_input_stream_stop(:input, message, state) do
     output(state, :output, state.acc)
-    send_stream_stop(state, :output)
+    send_stream_stop(state, :output, message)
     state = state |> Map.delete(:acc)
     {:ok, state}
   end

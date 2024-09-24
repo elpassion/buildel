@@ -61,7 +61,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
   )
 
   def handle_input(:args, %Message{} = message, state) do
-    send_stream_start(state, :output)
+    send_stream_start(state, :output, message)
 
     with {:ok, response} <- call_api(state, message.message) do
       output(

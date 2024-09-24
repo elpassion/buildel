@@ -52,9 +52,9 @@ defmodule Buildel.Blocks.NewTextOutput do
     end
   end
 
-  def handle_input_stream_stop(:input, state) do
-    send_stream_stop(state, :output)
-    send_stream_stop(state, :forward)
+  def handle_input_stream_stop(:input, message, state) do
+    send_stream_stop(state, :output, message)
+    send_stream_stop(state, :forward, message)
     {:ok, state}
   end
 

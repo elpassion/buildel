@@ -305,7 +305,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
       end
 
       @impl true
-      def handle_info({topic, :start_stream, nil, _metadata}, state) do
+      def handle_info({topic, :start_stream, message, _metadata}, state) do
         context_id =
           BlockPubSub.io_from_topic(topic)
 
@@ -322,7 +322,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
             state,
             fn
               %{name: input_name}, state ->
-                {:ok, state} = handle_input_stream_start(input_name, state)
+                {:ok, state} = handle_input_stream_start(input_name, message, state)
                 state
             end
           )
@@ -331,7 +331,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
       end
 
       @impl true
-      def handle_info({topic, :stop_stream, nil, _metadata}, state) do
+      def handle_info({topic, :stop_stream, message, _metadata}, state) do
         context_id =
           BlockPubSub.io_from_topic(topic)
 
@@ -348,7 +348,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
             state,
             fn
               %{name: input_name}, state ->
-                {:ok, state} = handle_input_stream_stop(input_name, state)
+                {:ok, state} = handle_input_stream_stop(input_name, message, state)
                 state
             end
           )
@@ -362,7 +362,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       defp handle_output(name, message, options, state) do
         case options[:stream_start] do
-          :send -> send_stream_start(state, name)
+          :send -> send_stream_start(state, name, message)
           :none -> nil
           :schedule -> nil
         end
@@ -375,7 +375,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
         )
 
         case options[:stream_stop] do
-          :send -> send_stream_stop(state, name)
+          :send -> send_stream_stop(state, name, message)
           :none -> nil
           :schedule -> nil
         end
@@ -383,7 +383,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
         {:ok, state}
       end
 
-      defp send_stream_start(state, name) do
+      defp send_stream_start(state, name, message) do
         unless state.stream_state_pid |> StreamState.any_output_streaming?() do
           BlockPubSub.broadcast_to_block(
             state.block.context.context_id,
@@ -399,12 +399,12 @@ defmodule Buildel.Blocks.NewBlock.Server do
             state.block.context.context_id,
             state.block.name,
             name,
-            {:start_stream, nil}
+            {:start_stream, message}
           )
         end
       end
 
-      defp send_stream_stop(state, name) do
+      defp send_stream_stop(state, name, message) do
         if state.stream_state_pid |> StreamState.output_streaming?(name) do
           state.stream_state_pid |> StreamState.stop_output_streaming(name)
 
@@ -412,7 +412,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
             state.block.context.context_id,
             state.block.name,
             name,
-            {:stop_stream, nil}
+            {:stop_stream, message}
           )
         end
 
@@ -479,13 +479,13 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
   defmacro __before_compile__(_) do
     quote do
-      @spec handle_input_stream_start(term(), any()) :: {:ok, any()}
-      def handle_input_stream_start(input_name, state) do
+      @spec handle_input_stream_start(term(), any(), any()) :: {:ok, any()}
+      def handle_input_stream_start(input_name, _message, state) do
         {:ok, state}
       end
 
-      @spec handle_input_stream_stop(term(), any()) :: {:ok, any()}
-      def handle_input_stream_stop(input_name, state) do
+      @spec handle_input_stream_stop(term(), any(), any()) :: {:ok, any()}
+      def handle_input_stream_stop(input_name, _message, state) do
         {:ok, state}
       end
     end
