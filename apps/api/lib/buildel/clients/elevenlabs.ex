@@ -32,7 +32,7 @@ defmodule Buildel.Clients.Elevenlabs do
     )
   end
 
-  @wss_url "wss://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM/stream-input?model_id=eleven_turbo_v2_5"
+  @wss_url "wss://api.elevenlabs.io/v1/text-to-speech/cgSgspJ2msm6clMCkdW9/stream-input?model_id=eleven_turbo_v2_5"
   def speak(state, opts \\ []) do
     WebSockex.start_link(@wss_url, __MODULE__, state, opts)
   end
@@ -62,6 +62,21 @@ defmodule Buildel.Clients.Elevenlabs do
     IO.inspect("Flushing", label: "Flushing: ")
 
     WebSockex.send_frame(pid, {:text, Jason.encode!(%{text: " ", flush: true})})
+  end
+
+  @impl true
+  def handle_frame({:text, text}, state) do
+    message = Jason.decode!(text)
+
+    case message do
+      %{"audio" => nil} ->
+        nil
+
+      %{"audio" => audio} ->
+        send(state.stream_to, {:audio_chunk, Base.decode64!(audio)})
+    end
+
+    {:ok, state}
   end
 
   def disconnect(pid) do

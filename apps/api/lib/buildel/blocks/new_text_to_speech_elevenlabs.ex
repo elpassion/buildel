@@ -102,6 +102,11 @@ defmodule Buildel.Blocks.NewTextToSpeechElevenlabs do
     state
   end
 
+  def handle_info({:audio_chunk, binary}, state) do
+    state = state |> output("output", {:binary, binary}, %{metadata: %{}})
+    {:noreply, state}
+  end
+
   def handle_input("input", {_name, :text, chunk, _metadata}, state) do
     speak(chunk, state)
   end
