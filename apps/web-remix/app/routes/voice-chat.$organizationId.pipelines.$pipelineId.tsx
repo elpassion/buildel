@@ -253,12 +253,17 @@ function SpeakingRow({ status, ...rest }: SpeakingRowProps) {
 
   return (
     <div className="flex gap-2 flex-col items-center min-h-[124px] justify-end">
-      <canvas
-        ref={canvasRef}
-        width={100}
-        height={36}
-        className={cn({ hidden: status !== 'recording' })}
-      />
+      <div
+        className={cn('flex flex-col gap-1 items-center', {
+          hidden: status !== 'recording',
+        })}
+      >
+        <div className="flex items-end">
+          <Mic className="w-5 h-5" />
+          <canvas ref={canvasRef} width={80} height={36} />
+        </div>
+        <p className="text-muted-foreground text-xs">Start speaking</p>
+      </div>
 
       <button
         type="button"
@@ -281,7 +286,7 @@ function drawCircleBars(
   ctx: CanvasRenderingContext2D,
   frequencyBinCountArray: Uint8Array,
 ) {
-  const circleCount = 6;
+  const circleCount = 5;
   const barWidth = 15;
   const radius = barWidth / 2;
   const barSpacing = canvas.width / circleCount;
