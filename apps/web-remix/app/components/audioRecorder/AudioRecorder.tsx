@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { CirclePause, Mic } from 'lucide-react';
 
 import type {
@@ -70,6 +70,12 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     [handleClear, visualizeAudio, onStart],
   );
 
+  useEffect(() => {
+    if (disabled) {
+      handleClear();
+    }
+  }, [disabled]);
+
   const { stop, start } = useAudioRecorder({
     onStop: handleOnStop,
     onStart: handleOnStart,
@@ -117,7 +123,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
       <div
         className={cn(
-          'relative after:absolute after:w-full after:h-[0.5px] after:bg-primary after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2',
+          'relative after:absolute after:w-full after:h-[0.1px] after:bg-primary/30 after:top-1/2 after:left-0 after:right-0 after:-translate-y-1/2',
           {
             "after:content-['']": status === 'inactive',
             'after:content-none': status !== 'inactive',

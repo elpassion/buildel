@@ -9,7 +9,7 @@ import {
 import { ToggleInput } from '~/components/form/inputs/toggle.input';
 
 import type { IBlockConfig, IField } from '../../pipeline.types';
-import { useRunPipelineNode } from '../../RunPipelineProvider';
+import { useRunPipeline, useRunPipelineNode } from '../../RunPipelineProvider';
 import type { IEvent } from '../../RunPipelineProvider';
 import { AudioOutput } from './AudioOutput';
 import { FileOutput } from './FileOutput';
@@ -90,14 +90,12 @@ function checkIfStringPayloads(events: IEvent[]) {
   return events.every((ev) => typeof ev.payload.message === 'string');
 }
 
-function getAudioOutput(events: IEvent[]) {
-
-  console.log(events)
-  return new Blob(
-    events.map((event) => event.payload),
-    { type: 'audio/mp3' },
-  );
-}
+// function getAudioOutput(events: IEvent[]) {
+//   return new Blob(
+//     events.map((event) => event.payload),
+//     { type: 'audio/mp3' },
+//   );
+// }
 
 function getFileOutput(event: IEvent) {
   return new Blob([event.payload], { type: 'file' });
@@ -152,5 +150,7 @@ interface AudioStreamOutputProps {
 }
 
 function AudioStreamOutput({ events }: AudioStreamOutputProps) {
-  return <AudioOutput events={events} />;
+  const { status } = useRunPipeline();
+
+  return <AudioOutput events={events} disabled={status !== 'running'} />;
 }

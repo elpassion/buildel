@@ -4,12 +4,16 @@ import isEqual from 'lodash.isequal';
 
 import { assert } from '~/utils/assert';
 
+export type AudioVisualizeRender = typeof canvasBarFactory;
+
 export interface OptionsType {
   barHeightFactor: number;
   barWidth: number;
   barPositionFactor: number;
+  barColor: string;
   fftSize: number;
   onError?: (err: unknown) => void;
+  renderBars?: AudioVisualizeRender;
 }
 
 const BASE_OPTIONS: OptionsType = {
@@ -17,13 +21,19 @@ const BASE_OPTIONS: OptionsType = {
   barHeightFactor: 1,
   barPositionFactor: 4,
   fftSize: 1024,
+  barColor: '#F5C07A',
 };
 
 export const useAudioVisualize = (
   canvas: RefObject<HTMLCanvasElement>,
   args?: Partial<OptionsType>,
 ) => {
-  const { barHeightFactor, barPositionFactor, fftSize, onError, ...rest } = {
+  const {
+    fftSize,
+    onError,
+    renderBars = canvasBarFactory,
+    ...rest
+  } = {
     ...BASE_OPTIONS,
     ...args,
   };
@@ -63,36 +73,18 @@ export const useAudioVisualize = (
         audioAnalyzerRef.current.fftSize / 2,
       );
 
-      const barCount = canvas.current.width / 2;
-
       audioAnalyzerRef.current.getByteFrequencyData(frequencyBinCountArray);
 
       handleClearCanvas();
 
-      const centerY = canvas.current.height / 2;
-
-      canvasContext.fillStyle = '#F5C07A';
-
-      for (let i = 0; i < barCount; i++) {
-        const barPosition = i * barPositionFactor;
-        const barWidth = rest.barWidth;
-        const barHeight = (frequencyBinCountArray[i] / 6) * barHeightFactor;
-
-        canvasContext.fillRect(
-          barPosition,
-          centerY - barHeight / 2,
-          barWidth,
-          barHeight / 2,
-        );
-        canvasContext.fillRect(barPosition, centerY, barWidth, barHeight / 2);
-      }
+      renderBars(canvas.current, canvasContext, frequencyBinCountArray, rest);
 
       animationFrameRef.current = requestAnimationFrame(draw);
     }
     draw();
   }, [
-    barHeightFactor,
-    barPositionFactor,
+    rest.barHeightFactor,
+    rest.barPositionFactor,
     canvas,
     handleClearCanvas,
     rest.barWidth,
@@ -170,6 +162,28 @@ export const useAudioVisualize = (
     clearCanvas: handleClearCanvas,
   };
 };
+
+export function canvasBarFactory(
+  canvas: HTMLCanvasElement,
+  ctx: CanvasRenderingContext2D,
+  frequencyBinCountArray: Uint8Array,
+  rest: Omit<OptionsType, 'onError' | 'fftSize' | 'barFactory'>,
+) {
+  const centerY = canvas.height / 2;
+  const barCount = canvas.width / 2;
+
+  ctx.fillStyle = rest.barColor;
+
+  for (let i = 0; i < barCount; i++) {
+    const barPosition = i * rest.barPositionFactor;
+    const barWidth = rest.barWidth;
+    const barHeight = (frequencyBinCountArray[i] / 6) * rest.barHeightFactor;
+
+    ctx.fillRect(barPosition, centerY - barHeight / 2, barWidth, barHeight / 2);
+
+    ctx.fillRect(barPosition, centerY, barWidth, barHeight / 2);
+  }
+}
 
 function isSourceNode(
   source: HTMLAudioElement | MediaStream,
