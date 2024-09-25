@@ -164,7 +164,7 @@ defmodule BuildelWeb.PipelineChannel do
     run = socket.assigns.run
 
     interface_output_block_names =
-      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
+      Map.get(run.interface_config, "outputs", []) ++ Map.get(run.interface_config, "inputs", [])  |> Enum.map(&Map.get(&1, "name"))
 
     case interface_output_block_names do
       [] ->
@@ -189,7 +189,7 @@ defmodule BuildelWeb.PipelineChannel do
     run = socket.assigns.run
 
     interface_output_block_names =
-      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
+      Map.get(run.interface_config, "outputs", []) ++ Map.get(run.interface_config, "inputs", [])  |> Enum.map(&Map.get(&1, "name"))
 
     case interface_output_block_names do
       [] ->
