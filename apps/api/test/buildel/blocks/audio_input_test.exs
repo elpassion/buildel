@@ -6,8 +6,8 @@ defmodule Buildel.Blocks.AudioInputTest do
     assert AudioInput.options() == %{
              description: "A specialized block designed for capturing and streaming audio data.",
              type: "audio_input",
-             inputs: [Block.audio_input("input", true)],
-             outputs: [Block.audio_output("output")],
+             inputs: [Block.audio_input("input", true), Block.text_input("mute"), Block.audio_input("unmute")],
+             outputs: [Block.audio_output("output"), Block.text_output("status", true)],
              schema: AudioInput.schema(),
              groups: ["audio", "inputs / outputs"],
              ios: [],
