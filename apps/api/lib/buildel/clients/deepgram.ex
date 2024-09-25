@@ -87,6 +87,8 @@ defmodule Buildel.Clients.Deepgram do
     alternatives = message |> get_in(["channel", "alternatives"])
     is_final = message |> get_in(["is_final"])
 
+    if is_final, do: send(state.stream_to, {:end})
+
     message =
       case alternatives do
         [first_alternative | _] -> first_alternative |> get_in(["transcript"])
