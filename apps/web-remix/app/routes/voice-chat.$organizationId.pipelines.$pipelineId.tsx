@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import { Mic, X } from 'lucide-react';
@@ -16,6 +16,7 @@ import { ChatStatus } from '~/components/chat/Chat.components';
 import { publicInterfaceLoader } from '~/components/pages/pipelines/interface/interface.loader.server';
 import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
 import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
+import { Button } from '~/components/ui/button';
 import { loaderBuilder } from '~/utils.server';
 import { cn } from '~/utils/cn';
 
@@ -28,10 +29,18 @@ export async function loader(args: LoaderFunctionArgs) {
   })(args);
 }
 
+type MuteStatus = 'muted' | 'unmuted';
+type RecordingStatus = MediaRecorderState | MuteStatus;
+
 export default function WebsiteChat() {
   const { pipelineId, organizationId, pipeline, alias } =
     useLoaderData<typeof loader>();
-  const [status, setStatus] = useState<MediaRecorderState>('inactive');
+
+  const [recordingStatus, setRecordingStatus] =
+    useState<MediaRecorderState>('inactive');
+  const [mutedStatus, setMutedStatus] = useState<MuteStatus>('unmuted');
+  const [isEnd, setIsEnd] = useState(true);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mediaSourceRef = useRef<MediaSource | null>(null);
@@ -39,6 +48,12 @@ export default function WebsiteChat() {
   const { visualizeAudio } = useAudioVisualize(canvasRef, {
     renderBars: drawChatCircle,
   });
+
+  const speakingStatus = useMemo(() => {
+    if (recordingStatus === 'inactive') return 'inactive';
+    if (!isEnd || mutedStatus === 'muted') return 'muted';
+    return 'recording';
+  }, [recordingStatus, isEnd, mutedStatus]);
 
   const input = pipeline.interface_config.voice.inputs.find(
     (input) => input.type === 'audio_input',
@@ -51,6 +66,10 @@ export default function WebsiteChat() {
   const onBlockOutput = (blockId: string, outputName: string, payload: any) => {
     if (blockId === output?.name) {
       processAudioEvents([{ block: blockId, output: outputName, payload }]);
+      setIsEnd(false);
+    }
+    if (blockId === input?.name) {
+      setMutedStatus(payload.message);
     }
   };
 
@@ -70,11 +89,11 @@ export default function WebsiteChat() {
   );
 
   const onStart = () => {
-    setStatus('recording');
+    setRecordingStatus('recording');
   };
 
   const onStop = () => {
-    setStatus('inactive');
+    setRecordingStatus('inactive');
   };
 
   const onChunk = (chunk: BlobEvent) => {
@@ -163,10 +182,24 @@ export default function WebsiteChat() {
         mediaSourceRef.current.addSourceBuffer('audio/mpeg');
     };
 
+    const onTimeUpdate = async () => {
+      const buffered = audioRef.current!.buffered;
+
+      if (
+        buffered.length > 0 &&
+        audioRef.current!.currentTime >=
+          buffered.end(buffered.length - 1) - 0.15
+      ) {
+        setIsEnd(true);
+      }
+    };
+
     mediaSource.addEventListener('sourceopen', onSourceOpen);
+    audioRef.current?.addEventListener('timeupdate', onTimeUpdate);
 
     return () => {
       mediaSource.removeEventListener('sourceopen', onSourceOpen);
+      audioRef.current?.removeEventListener('timeupdate', onTimeUpdate);
     };
   }, []);
 
@@ -188,7 +221,8 @@ export default function WebsiteChat() {
 
       <div className="py-4 px-6">
         <SpeakingRow
-          status={status}
+          disabled={runStatus !== 'running'}
+          status={speakingStatus}
           onStop={onStop}
           onStart={onStart}
           onChunk={onChunk}
@@ -199,13 +233,14 @@ export default function WebsiteChat() {
 }
 
 interface SpeakingRowProps {
-  status: MediaRecorderState;
+  status: RecordingStatus;
   onChunk?: UseAudioRecorderChunkCb;
   onStop?: UseAudioRecorderCb;
   onStart?: UseAudioRecorderCb;
+  disabled?: boolean;
 }
 
-function SpeakingRow({ status, ...rest }: SpeakingRowProps) {
+function SpeakingRow({ status, disabled, ...rest }: SpeakingRowProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { visualizeAudio, clearCanvas, stopVisualization } = useAudioVisualize(
     canvasRef,
@@ -243,40 +278,76 @@ function SpeakingRow({ status, ...rest }: SpeakingRowProps) {
     onStart: onStart,
   });
 
+  const isRecording = status === 'recording' || status === 'muted';
+
   const startStop = async () => {
-    if (status === 'recording') {
+    if (isRecording) {
       await stop();
     } else {
       await start();
     }
   };
 
+  const isMuted = status === 'muted';
+
   return (
     <div className="flex gap-2 flex-col items-center min-h-[124px] justify-end">
       <div
         className={cn('flex flex-col gap-1 items-center', {
-          hidden: status !== 'recording',
+          hidden: status === 'inactive',
         })}
       >
-        <div className="flex items-end">
-          <Mic className="w-5 h-5" />
-          <canvas ref={canvasRef} width={80} height={36} />
+        <div className="relative flex items-end transition-all w-[200px]">
+          <Mic
+            className={cn(
+              'absolute bottom-0 -translate-x-1/2 w-5 h-5 transition-all',
+              {
+                'left-[calc(50%_-_40px)]': !isMuted,
+                'left-1/2 text-gray-400': isMuted,
+              },
+            )}
+          />
+          <canvas
+            ref={canvasRef}
+            width={80}
+            height={36}
+            className={cn('shrink-0 min-w-[80px] min-h-[36px]', {
+              'absolute bottom-0 left-[calc(50%_+_10px)] -translate-x-1/2 w-5 h-5 transition-all':
+                !isMuted,
+              'opacity-0 pointer-events-none': isMuted,
+            })}
+          />
         </div>
-        <p className="text-muted-foreground text-xs">Start speaking</p>
+        <p
+          className={cn('text-muted-foreground text-xs transition-all', {
+            'pointer-events-none opacity-0': isMuted,
+          })}
+        >
+          Start speaking
+        </p>
+
+        {/*<Mic*/}
+        {/*  className={cn(*/}
+        {/*    'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 transition-opacity',*/}
+        {/*    {*/}
+        {/*      'opacity-0': status !== 'muted',*/}
+        {/*      'opacity-100': status === 'muted',*/}
+        {/*    },*/}
+        {/*  )}*/}
+        {/*/>*/}
       </div>
 
-      <button
+      <Button
         type="button"
+        disabled={disabled}
         onClick={startStop}
+        variant={isRecording ? 'destructive' : 'default'}
         className={cn(
-          'w-12 h-12 flex items-center text-white justify-center bg-primary rounded-full',
-          {
-            'bg-red-500': status === 'recording',
-          },
+          'w-12 h-12 flex items-center text-white justify-center rounded-full p-0',
         )}
       >
-        {status === 'recording' ? <X /> : <Mic />}
-      </button>
+        {status !== 'inactive' ? <X /> : <Mic />}
+      </Button>
     </div>
   );
 }
