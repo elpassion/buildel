@@ -107,7 +107,7 @@ defmodule Buildel.Blocks.CollectAllText do
 
   defp save_text_chunk(text_chunk, %{join_as: "string"} = state) do
     state = state |> send_stream_start("output")
-    text = state[:acc] <> " " <> text_chunk
+    text = state[:acc] <> text_chunk
 
     state |> Map.put(:acc, text)
   end
