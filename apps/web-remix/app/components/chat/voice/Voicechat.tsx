@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef } from 'react';
 import { Mic, X } from 'lucide-react';
 
-import type { MediaRecorderState } from '~/components/audioRecorder/AudioRecorder';
 import type {
   UseAudioRecorderCb,
   UseAudioRecorderCbOptions,
@@ -10,11 +9,15 @@ import type {
 import { useAudioRecorder } from '~/components/audioRecorder/useAudioRecorder';
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
 import { ChatStatus } from '~/components/chat/Chat.components';
-import type {
-  VoicechatMuteStatus,
-  VoicechatProps,
-  VoicechatRecordingStatus,
-} from '~/components/chat/voice/voicechat.types';
+import type { VoicechatStatus } from '~/components/chat/voice/voicechat.reducer';
+import {
+  DEFAULT_VOICECHAT_STATE,
+  listen,
+  record,
+  stop,
+  voicechatReducer,
+} from '~/components/chat/voice/voicechat.reducer';
+import type { VoicechatProps } from '~/components/chat/voice/voicechat.types';
 import {
   drawChatCircle,
   drawCircleBars,
@@ -31,11 +34,10 @@ export function Voicechat({
   alias,
   metadata,
 }: VoicechatProps) {
-  const [recordingStatus, setRecordingStatus] =
-    useState<MediaRecorderState>('inactive');
-  const [mutedStatus, setMutedStatus] =
-    useState<VoicechatMuteStatus>('unmuted');
-  const [isEnd, setIsEnd] = useState(true);
+  const [state, dispatch] = useReducer(
+    voicechatReducer,
+    DEFAULT_VOICECHAT_STATE,
+  );
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -44,12 +46,6 @@ export function Voicechat({
   const { visualizeAudio } = useAudioVisualize(canvasRef, {
     renderBars: drawChatCircle,
   });
-
-  const speakingStatus = useMemo(() => {
-    if (recordingStatus === 'inactive') return 'inactive';
-    if (!isEnd || mutedStatus === 'muted') return 'muted';
-    return 'recording';
-  }, [recordingStatus, isEnd, mutedStatus]);
 
   const input = pipeline.interface_config.voice.inputs.find(
     (input) => input.type === 'audio_input',
@@ -62,10 +58,22 @@ export function Voicechat({
   const onBlockOutput = (blockId: string, outputName: string, payload: any) => {
     if (blockId === output?.name) {
       processAudioEvents([{ block: blockId, output: outputName, payload }]);
-      setIsEnd(false);
     }
     if (blockId === input?.name) {
-      setMutedStatus(payload.message);
+      if (payload.message === 'muted') {
+        dispatch(listen());
+      } else {
+        if (!audioRef.current) return;
+        const buffered = audioRef.current.buffered;
+
+        if (
+          buffered.length === 0 ||
+          audioRef.current.currentTime >=
+            buffered.end(buffered.length - 1) - 0.15
+        ) {
+          dispatch(record());
+        }
+      }
     }
   };
 
@@ -85,11 +93,11 @@ export function Voicechat({
   );
 
   const onStart = () => {
-    setRecordingStatus('recording');
+    dispatch(record());
   };
 
   const onStop = () => {
-    setRecordingStatus('inactive');
+    dispatch(stop());
   };
 
   const onChunk = (chunk: BlobEvent) => {
@@ -187,7 +195,7 @@ export function Voicechat({
         audioRef.current!.currentTime >=
           buffered.end(buffered.length - 1) - 0.15
       ) {
-        setIsEnd(true);
+        dispatch(record());
       }
     };
 
@@ -219,7 +227,7 @@ export function Voicechat({
       <div className="py-4 px-6">
         <SpeakingRow
           disabled={runStatus !== 'running'}
-          status={speakingStatus}
+          status={state.status}
           onStop={onStop}
           onStart={onStart}
           onChunk={onChunk}
@@ -230,7 +238,7 @@ export function Voicechat({
 }
 
 interface SpeakingRowProps {
-  status: VoicechatRecordingStatus;
+  status: VoicechatStatus;
   onChunk?: UseAudioRecorderChunkCb;
   onStop?: UseAudioRecorderCb;
   onStart?: UseAudioRecorderCb;
@@ -275,17 +283,17 @@ function SpeakingRow({ status, disabled, ...rest }: SpeakingRowProps) {
     onStart: onStart,
   });
 
-  const isRecording = status === 'recording' || status === 'muted';
+  const isActive = status === 'recording' || status === 'listening';
 
   const startStop = async () => {
-    if (isRecording) {
+    if (isActive) {
       await stop();
     } else {
       await start();
     }
   };
 
-  const isMuted = status === 'muted';
+  const isListening = status === 'listening';
 
   return (
     <div className="flex gap-2 flex-col items-center min-h-[124px] justify-end">
@@ -299,8 +307,8 @@ function SpeakingRow({ status, disabled, ...rest }: SpeakingRowProps) {
             className={cn(
               'absolute bottom-0 -translate-x-1/2 w-5 h-5 transition-all',
               {
-                'left-[calc(50%_-_40px)]': !isMuted,
-                'left-1/2 text-gray-400': isMuted,
+                'left-[calc(50%_-_40px)]': !isListening,
+                'left-1/2 text-gray-400': isListening,
               },
             )}
           />
@@ -310,14 +318,14 @@ function SpeakingRow({ status, disabled, ...rest }: SpeakingRowProps) {
             height={36}
             className={cn('shrink-0 min-w-[80px] min-h-[36px]', {
               'absolute bottom-0 left-[calc(50%_+_10px)] -translate-x-1/2 w-5 h-5 transition-all':
-                !isMuted,
-              'opacity-0 pointer-events-none': isMuted,
+                !isListening,
+              'opacity-0 pointer-events-none': isListening,
             })}
           />
         </div>
         <p
           className={cn('text-muted-foreground text-xs transition-all', {
-            'pointer-events-none opacity-0': isMuted,
+            'pointer-events-none opacity-0': isListening,
           })}
         >
           Start speaking
@@ -328,7 +336,7 @@ function SpeakingRow({ status, disabled, ...rest }: SpeakingRowProps) {
         type="button"
         disabled={disabled}
         onClick={startStop}
-        variant={isRecording ? 'destructive' : 'default'}
+        variant={isActive ? 'destructive' : 'default'}
         className={cn(
           'w-12 h-12 flex items-center text-white justify-center rounded-full p-0',
         )}
