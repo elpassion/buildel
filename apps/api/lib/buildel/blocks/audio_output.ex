@@ -31,7 +31,6 @@ defmodule Buildel.Blocks.AudioOutput do
 
   @impl true
   def handle_input("input", {_topic, :binary, chunk, metadata}, state) do
-    IO.inspect(chunk, label: "chunk")
     output(state, "output", {:binary, chunk}, %{metadata: metadata})
   end
 end
