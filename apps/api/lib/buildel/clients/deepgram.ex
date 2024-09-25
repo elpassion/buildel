@@ -86,6 +86,9 @@ defmodule Buildel.Clients.Deepgram do
 
     alternatives = message |> get_in(["channel", "alternatives"])
     is_final = message |> get_in(["is_final"])
+    speech_final = message |> get_in(["speech_final"])
+
+    is_final = is_final && speech_final
 
     if is_final, do: send(state.stream_to, {:end})
 
@@ -108,7 +111,7 @@ defmodule Buildel.Clients.Deepgram do
   end
 
   @impl true
-  @http_url "https://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true"
+  @http_url "https://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true&endpointing=500"
   def transcribe_file(
         token \\ nil,
         file,
