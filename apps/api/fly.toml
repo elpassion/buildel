@@ -15,7 +15,7 @@ swap_size_mb = 512
   release_command = "/app/bin/migrate"
 
 [env]
-  PHX_HOST = "api.buildel.ai"
+  PHX_HOST = "https://buildel-api.fly.dev"
   PORT = "8080"
   SEARCH_DB_URL = "http://buildel-searchdb.fly.dev"
   NLM_API_URL = "https://buildel-nlm-ingestor.fly.dev"
