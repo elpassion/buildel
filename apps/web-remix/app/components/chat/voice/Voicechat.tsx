@@ -1,10 +1,8 @@
 import React, { useEffect, useReducer, useRef } from 'react';
-import type { BuildelRunStatus } from '@buildel/buildel';
 import { Mic, Pause } from 'lucide-react';
 
 import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
 import type {
-  UseAudioRecorderCb,
   UseAudioRecorderCbOptions,
   UseAudioRecorderChunkCb,
 } from '~/components/audioRecorder/useAudioRecorder';
@@ -28,26 +26,12 @@ import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
 
 interface VoicechatProps {
-  runStatus: BuildelRunStatus;
   audioRef: React.RefObject<HTMLAudioElement>;
   canvasRef: React.RefObject<HTMLCanvasElement>;
-  status: VoicechatStatus;
-  onStop: UseAudioRecorderCb;
-  onStart: UseAudioRecorderCb;
-  onChunk: UseAudioRecorderChunkCb;
-  disabled?: boolean;
+  children?: React.ReactNode;
 }
 
-export function Voicechat({
-  runStatus,
-  canvasRef,
-  audioRef,
-  onStop,
-  onStart,
-  onChunk,
-  status,
-  disabled,
-}: VoicechatProps) {
+export function Voicechat({ canvasRef, audioRef, children }: VoicechatProps) {
   return (
     <div className="relative flex justify-center flex-col items-center h-[100dvh] w-full bg-secondary">
       <div className="grow flex justify-center items-center">
@@ -60,72 +44,33 @@ export function Voicechat({
         />
       </div>
 
-      <div className="py-4 px-6">
-        <SpeakingRow
-          disabled={disabled ?? runStatus !== 'running'}
-          status={status}
-          onStop={onStop}
-          onStart={onStart}
-          onChunk={onChunk}
-        />
-      </div>
+      {children}
     </div>
   );
 }
 
 interface SpeakingRowProps {
   status: VoicechatStatus;
-  onChunk?: UseAudioRecorderChunkCb;
-  onStop?: UseAudioRecorderCb;
-  onStart?: UseAudioRecorderCb;
+  onStop?: () => Promise<void>;
+  onStart?: () => Promise<void>;
   disabled?: boolean;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
 }
 
-function SpeakingRow({ status, disabled, ...rest }: SpeakingRowProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const { visualizeAudio, clearCanvas, stopVisualization } = useAudioVisualize(
-    canvasRef,
-    {
-      renderBars: drawCircleBars,
-    },
-  );
-
-  const onChunk = (e: BlobEvent, args: UseAudioRecorderCbOptions) => {
-    rest.onChunk?.(e, args);
-  };
-
-  const onStop = (
-    e: Event,
-    chunks: Blob[],
-    args: UseAudioRecorderCbOptions,
-  ) => {
-    rest.onStop?.(e, chunks, args);
-
-    stopVisualization();
-    clearCanvas();
-  };
-
-  const onStart = (e: Event, blob: Blob[], args: UseAudioRecorderCbOptions) => {
-    rest.onStart?.(e, blob, args);
-
-    if (!args.mediaStream) return;
-
-    visualizeAudio(args.mediaStream);
-  };
-
-  const { stop, start } = useAudioRecorder({
-    onChunk: onChunk,
-    onStop: onStop,
-    onStart: onStart,
-  });
-
+export function SpeakingRow({
+  status,
+  disabled,
+  canvasRef,
+  onStop,
+  onStart,
+}: SpeakingRowProps) {
   const isActive = status === 'recording' || status === 'listening';
 
   const startStop = async () => {
     if (isActive) {
-      await stop();
+      await onStop?.();
     } else {
-      await start();
+      await onStart?.();
     }
   };
 
@@ -185,9 +130,10 @@ function SpeakingRow({ status, disabled, ...rest }: SpeakingRowProps) {
 
 interface UseVoicechatProps {
   pipeline: IPipelinePublicResponse;
+  onChunk: UseAudioRecorderChunkCb;
 }
 
-export function useVoicechat({ pipeline }: UseVoicechatProps) {
+export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   const eventsQueue = useRef<ArrayBuffer[]>([]);
 
   const [state, dispatch] = useReducer(
@@ -196,10 +142,20 @@ export function useVoicechat({ pipeline }: UseVoicechatProps) {
   );
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mediaSourceRef = useRef<MediaSource | null>(null);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
-  const { visualizeAudio } = useAudioVisualize(canvasRef, {
+  const dotCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const talkingCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const {
+    visualizeAudio: visualizeTalking,
+    clearCanvas: clearTalkingCanvas,
+    stopVisualization: stopTalkingVisualization,
+  } = useAudioVisualize(talkingCanvasRef, {
+    renderBars: drawCircleBars,
+  });
+
+  const { visualizeAudio: visualizeDot } = useAudioVisualize(dotCanvasRef, {
     renderBars: drawChatCircle,
   });
 
@@ -211,8 +167,6 @@ export function useVoicechat({ pipeline }: UseVoicechatProps) {
     (input) => input.type === 'audio_output',
   );
   const onBlockOutput = (blockId: string, outputName: string, payload: any) => {
-    console.log('EVENTS', payload);
-
     if (blockId === output?.name) {
       processAudioEvents([{ block: blockId, output: outputName, payload }]);
     }
@@ -234,13 +188,30 @@ export function useVoicechat({ pipeline }: UseVoicechatProps) {
     }
   };
 
-  const onStart = () => {
+  const onStart = (
+    _e: Event,
+    _chunks: Blob[],
+    args: UseAudioRecorderCbOptions,
+  ) => {
     dispatch(record());
+
+    if (!args.mediaStream) return;
+
+    visualizeTalking(args.mediaStream);
   };
 
   const onStop = () => {
     dispatch(stop());
+
+    stopTalkingVisualization();
+    clearTalkingCanvas();
   };
+
+  const { stop: stopRecording, start: startRecording } = useAudioRecorder({
+    onChunk: onChunk,
+    onStop: onStop,
+    onStart: onStart,
+  });
 
   const processAudioEvents = (audioEvents: IEvent[]) => {
     if (!sourceBufferRef.current || !mediaSourceRef.current) return;
@@ -266,8 +237,6 @@ export function useVoicechat({ pipeline }: UseVoicechatProps) {
 
         if (nextChunk) {
           sourceBufferRef.current.appendBuffer(nextChunk);
-
-          console.log('PAUSED', audioRef.current?.paused);
           if (audioRef.current?.paused) return;
 
           setTimeout(async () => {
@@ -278,7 +247,7 @@ export function useVoicechat({ pipeline }: UseVoicechatProps) {
               }
 
               await audioRef.current.play();
-              await visualizeAudio(audioRef.current);
+              await visualizeDot(audioRef.current);
             }
           }, 50);
         }
@@ -289,21 +258,21 @@ export function useVoicechat({ pipeline }: UseVoicechatProps) {
   };
 
   const drawStaticCircle = () => {
-    if (!canvasRef.current) return;
+    if (!dotCanvasRef.current) return;
 
-    const canvasContext = canvasRef.current?.getContext('2d');
+    const canvasContext = dotCanvasRef.current?.getContext('2d');
 
     if (!canvasContext) return;
 
     canvasContext.clearRect(
       0,
       0,
-      canvasRef.current.width,
-      canvasRef.current.height,
+      dotCanvasRef.current.width,
+      dotCanvasRef.current.height,
     );
 
-    const centerX = canvasRef.current.width / 2;
-    const centerY = canvasRef.current.height / 2;
+    const centerX = dotCanvasRef.current.width / 2;
+    const centerY = dotCanvasRef.current.height / 2;
 
     canvasContext.fillStyle = '#111';
     canvasContext.beginPath();
@@ -354,8 +323,9 @@ export function useVoicechat({ pipeline }: UseVoicechatProps) {
 
   const onDiscard = () => {
     if (!audioRef.current) return;
-    onStop();
     audioRef.current.pause();
+
+    stopRecording();
   };
 
   const onRestore = () => {
@@ -370,13 +340,14 @@ export function useVoicechat({ pipeline }: UseVoicechatProps) {
 
   return {
     onBlockOutput,
-    startRecording: onStart,
-    stopRecording: onStop,
+    startRecording: startRecording,
+    stopRecording: stopRecording,
     discard: onDiscard,
     restore: onRestore,
     state,
     audioRef,
-    canvasRef,
+    dotCanvasRef,
+    talkingCanvasRef,
     audioInput: input,
     audioOutput: output,
     isAudioConfigured: !!input && !!output,

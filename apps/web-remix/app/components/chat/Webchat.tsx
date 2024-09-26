@@ -19,7 +19,11 @@ import { ChatInput } from '~/components/chat/ChatInput';
 import { ChatMessages } from '~/components/chat/ChatMessages';
 import { ChatWrapper } from '~/components/chat/ChatWrapper';
 import { useChat } from '~/components/chat/useChat';
-import { useVoicechat, Voicechat } from '~/components/chat/voice/Voicechat';
+import {
+  SpeakingRow,
+  useVoicechat,
+  Voicechat,
+} from '~/components/chat/voice/Voicechat';
 import { WebchatVoiceModal } from '~/components/chat/WebchatVoiceModal';
 import { useFilesUpload } from '~/components/fileUpload/FileUpload';
 import { Button } from '~/components/ui/button';
@@ -201,6 +205,13 @@ ${JSON.stringify(files)}
     };
   }, []);
 
+  const onAudioChunk = (chunk: BlobEvent) => {
+    if (!audioInput || isAudioDisabled) return;
+
+    const topic = `${audioInput.name}:input`;
+    push(topic, chunk.data);
+  };
+
   const {
     onBlockOutput: audioOnBlockOutput,
     startRecording,
@@ -208,20 +219,20 @@ ${JSON.stringify(files)}
     restore,
     discard,
     audioRef,
-    canvasRef,
+    dotCanvasRef,
+    talkingCanvasRef,
     state: audioState,
     isAudioConfigured,
     audioInput,
-  } = useVoicechat({ pipeline });
+  } = useVoicechat({ pipeline, onChunk: onAudioChunk });
 
   const isAudioDisabled = !isAudioConfigured || !isAudioChat || disabled;
 
-  const onAudioChunk = (chunk: BlobEvent) => {
-    if (!audioInput || isAudioDisabled) return;
-
-    const topic = `${audioInput.name}:input`;
-    push(topic, chunk.data);
-  };
+  useEffect(() => {
+    if (isAudioChat && audioRef.current) {
+      audioRef.current.autoplay = true;
+    }
+  }, []);
 
   const onCloseAudioChat = () => {
     discard();
@@ -389,16 +400,17 @@ ${JSON.stringify(files)}
       </ChatWrapper>
 
       <WebchatVoiceModal isOpen={isAudioChat}>
-        <Voicechat
-          status={audioState.status}
-          runStatus={connectionStatus}
-          disabled={isAudioDisabled}
-          audioRef={audioRef}
-          canvasRef={canvasRef}
-          onStop={stopRecording}
-          onStart={startRecording}
-          onChunk={onAudioChunk}
-        />
+        <Voicechat audioRef={audioRef} canvasRef={dotCanvasRef}>
+          <div className="py-4 px-6">
+            <SpeakingRow
+              disabled={disabled ?? connectionStatus !== 'running'}
+              onStop={stopRecording}
+              onStart={startRecording}
+              canvasRef={talkingCanvasRef}
+              status={audioState.status}
+            />
+          </div>
+        </Voicechat>
       </WebchatVoiceModal>
     </>
   );
