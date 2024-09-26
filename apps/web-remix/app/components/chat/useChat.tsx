@@ -54,6 +54,24 @@ export const useChat = ({
   ) => {
     onBlockOutputProps?.(blockName, outputName, payload);
 
+    const input = inputs.find((input) => input.name === blockName);
+
+    if (input) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          message: (payload as { message: string }).message,
+          id: uuidv4(),
+          role: 'user' as MessageRole,
+          created_at: new Date(),
+          blockName: input.name,
+          outputName: 'input',
+          blockId: getBlockId(input.name, 'input'),
+          state: 'done',
+        },
+      ]);
+    }
+
     if (!Object.keys(outputsGenerating).includes(blockName)) return;
 
     setMessages((prev) => {
@@ -188,13 +206,11 @@ export const useChat = ({
       });
     }
 
-    setIsGenerating(true);
-
-    setMessages((prev) => [...prev, baseMessage]);
-
     messages.forEach((message) => {
       push(message.blockId, message.message);
     });
+
+    setIsGenerating(true);
   };
 
   return {
