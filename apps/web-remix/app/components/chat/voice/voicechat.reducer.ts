@@ -8,6 +8,9 @@ type Action =
       };
     }
   | {
+      type: 'UNMUTE';
+    }
+  | {
       type: 'RESET';
     };
 
@@ -25,6 +28,11 @@ export const voicechatReducer = (state: State, action: Action): State => {
       return {
         ...state,
         status: action.payload.data,
+      };
+    case 'UNMUTE':
+      return {
+        ...state,
+        status: state.status === 'inactive' ? 'inactive' : 'recording',
       };
     case 'RESET':
       return DEFAULT_VOICECHAT_STATE;
@@ -55,5 +63,11 @@ export const listen = () => {
     payload: {
       data: 'listening',
     },
+  } as const;
+};
+
+export const unmute = () => {
+  return {
+    type: 'UNMUTE',
   } as const;
 };

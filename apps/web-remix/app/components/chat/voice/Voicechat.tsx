@@ -15,6 +15,7 @@ import {
   listen,
   record,
   stop,
+  unmute,
   voicechatReducer,
 } from '~/components/chat/voice/voicechat.reducer';
 import type { VoicechatProps } from '~/components/chat/voice/voicechat.types';
@@ -72,7 +73,7 @@ export function Voicechat({
           audioRef.current.currentTime >=
             buffered.end(buffered.length - 1) - 0.15
         ) {
-          dispatch(record());
+          dispatch(unmute());
         }
       }
     }
@@ -218,7 +219,7 @@ export function Voicechat({
         audioRef.current!.currentTime >=
           buffered.end(buffered.length - 1) - 0.15
       ) {
-        dispatch(record());
+        dispatch(unmute());
       }
     };
 
