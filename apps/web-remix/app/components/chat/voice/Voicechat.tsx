@@ -132,12 +132,12 @@ export function Voicechat({
         const nextChunk = eventsQueue.current.shift();
 
         if (nextChunk) {
-          sourceBufferRef.current!.appendBuffer(nextChunk);
+          sourceBufferRef.current.appendBuffer(nextChunk);
 
           if (audioRef.current) {
             if (audioRef.current?.readyState === 2) {
               audioRef.current.currentTime =
-                audioRef.current.currentTime + 0.05;
+                audioRef.current.currentTime + 0.001;
             }
             await audioRef.current.play();
             await visualizeAudio(audioRef.current);
