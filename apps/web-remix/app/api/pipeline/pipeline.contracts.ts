@@ -47,22 +47,39 @@ export const InterfaceWebchatConfigForm = InterfaceConfigForm.extend({
     .optional()
     .default('Hello. How can I help you today?'),
   suggested_messages: z.array(z.string()).optional().default([]),
+  audio_inputs: z
+    .union([
+      z
+        .string()
+        .transform(
+          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[],
+        ),
+      z.array(InterfaceConfigFormProperty),
+    ])
+    .default([]),
+  audio_outputs: z
+    .union([
+      z
+        .string()
+        .transform(
+          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[],
+        ),
+      z.array(InterfaceConfigFormProperty),
+    ])
+    .default([]),
 });
 
 export const InterfaceConfig = z.object({
   webchat: InterfaceWebchatConfigForm.optional().default({
     inputs: [] as IInterfaceConfigFormProperty[],
     outputs: [] as IInterfaceConfigFormProperty[],
+    audio_inputs: [] as IInterfaceConfigFormProperty[],
+    audio_outputs: [] as IInterfaceConfigFormProperty[],
     description: 'Hello. How can I help you today?',
     suggested_messages: [] as string[],
     public: false,
   }),
   form: InterfaceConfigForm.optional().default({
-    inputs: [] as IInterfaceConfigFormProperty[],
-    outputs: [] as IInterfaceConfigFormProperty[],
-    public: false,
-  }),
-  voice: InterfaceConfigForm.optional().default({
     inputs: [] as IInterfaceConfigFormProperty[],
     outputs: [] as IInterfaceConfigFormProperty[],
     public: false,
@@ -78,16 +95,13 @@ export const SafeInterfaceConfig = z
           webchat: {
             inputs: [] as IInterfaceConfigFormProperty[],
             outputs: [] as IInterfaceConfigFormProperty[],
+            audio_outputs: [] as IInterfaceConfigFormProperty[],
+            audio_inputs: [] as IInterfaceConfigFormProperty[],
             description: 'Hello. How can I help you today?',
             suggested_messages: [] as string[],
             public: false,
           },
           form: {
-            inputs: [] as IInterfaceConfigFormProperty[],
-            outputs: [] as IInterfaceConfigFormProperty[],
-            public: false,
-          },
-          voice: {
             inputs: [] as IInterfaceConfigFormProperty[],
             outputs: [] as IInterfaceConfigFormProperty[],
             public: false,
@@ -98,16 +112,13 @@ export const SafeInterfaceConfig = z
     webchat: {
       inputs: [] as IInterfaceConfigFormProperty[],
       outputs: [] as IInterfaceConfigFormProperty[],
+      audio_outputs: [] as IInterfaceConfigFormProperty[],
+      audio_inputs: [] as IInterfaceConfigFormProperty[],
       description: 'Hello. How can I help you today?',
       suggested_messages: [] as string[],
       public: false,
     },
     form: {
-      inputs: [] as IInterfaceConfigFormProperty[],
-      outputs: [] as IInterfaceConfigFormProperty[],
-      public: false,
-    },
-    voice: {
       inputs: [] as IInterfaceConfigFormProperty[],
       outputs: [] as IInterfaceConfigFormProperty[],
       public: false,

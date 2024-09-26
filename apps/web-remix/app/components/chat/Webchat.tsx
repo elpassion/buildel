@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { Trash, Upload } from 'lucide-react';
+import { useLocation, useNavigate } from '@remix-run/react';
+import { Headphones, Trash, Upload, X } from 'lucide-react';
 
 import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
 import {
@@ -12,13 +13,18 @@ import {
   SuggestedMessages,
 } from '~/components/chat/Chat.components';
 import type { ChatSize } from '~/components/chat/chat.types';
+import { isWebchatConfigured } from '~/components/chat/chat.utils';
 import { ChatHeading } from '~/components/chat/ChatHeading';
 import { ChatInput } from '~/components/chat/ChatInput';
 import { ChatMessages } from '~/components/chat/ChatMessages';
 import { ChatWrapper } from '~/components/chat/ChatWrapper';
 import { useChat } from '~/components/chat/useChat';
+import { useVoicechat, Voicechat } from '~/components/chat/voice/Voicechat';
+import { WebchatVoiceModal } from '~/components/chat/WebchatVoiceModal';
 import { useFilesUpload } from '~/components/fileUpload/FileUpload';
+import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
+import { routes } from '~/utils/routes.utils';
 
 const SUPPORTED_IMAGE_TYPES = [
   'image/png',
@@ -55,6 +61,7 @@ interface WebchatProps {
   disabled?: boolean;
   size?: ChatSize;
   className?: string;
+  isAudioChat?: boolean;
 }
 
 export const Webchat = ({
@@ -65,27 +72,46 @@ export const Webchat = ({
   metadata,
   placeholder,
   onBlockStatusChange,
-  onBlockOutput,
+  onBlockOutput: propsOnBlockOutput,
   disabled,
   size,
   className,
+  isAudioChat = false,
 }: WebchatProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const inputs = pipeline.interface_config.webchat.inputs.filter(
     (input) => input.type === 'text_input',
   );
+
+  const outputs = pipeline.interface_config.webchat.outputs.filter(
+    (output) => output.type === 'text_output',
+  );
+
+  const webchatConfigured = isWebchatConfigured(pipeline);
+
+  const onBlockOutput = (
+    blockId: string,
+    outputName: string,
+    payload: unknown,
+  ) => {
+    propsOnBlockOutput?.(blockId, outputName, payload);
+
+    audioOnBlockOutput(blockId, outputName, payload);
+  };
+
   const {
     isGenerating,
     connectionStatus,
     pushMessage,
+    push,
     stopRun,
     startRun,
     messages,
     runId,
   } = useChat({
     inputs,
-    outputs: pipeline.interface_config.webchat.outputs.filter(
-      (output) => output.type === 'text_output',
-    ),
+    outputs,
     organizationId: organizationId as unknown as number,
     pipelineId: pipelineId as unknown as number,
     useAuth: !(pipeline.interface_config.webchat.public ?? false),
@@ -175,121 +201,205 @@ ${JSON.stringify(files)}
     };
   }, []);
 
+  const {
+    onBlockOutput: audioOnBlockOutput,
+    startRecording,
+    stopRecording,
+    restore,
+    discard,
+    audioRef,
+    canvasRef,
+    state: audioState,
+    isAudioConfigured,
+    audioInput,
+  } = useVoicechat({ pipeline });
+
+  const isAudioDisabled = !isAudioConfigured || !isAudioChat || disabled;
+
+  const onAudioChunk = (chunk: BlobEvent) => {
+    if (!audioInput || isAudioDisabled) return;
+
+    const topic = `${audioInput.name}:input`;
+    push(topic, chunk.data);
+  };
+
+  const onCloseAudioChat = () => {
+    discard();
+
+    navigate(
+      routes.chatPreview(organizationId, pipelineId, {
+        ...Object.fromEntries(new URLSearchParams(location.search).entries()),
+        audio: false,
+      }),
+    );
+  };
+
+  const onOpenAudioChat = () => {
+    restore();
+
+    navigate(
+      routes.chatPreview(organizationId, pipelineId, {
+        ...Object.fromEntries(new URLSearchParams(location.search).entries()),
+        audio: true,
+      }),
+    );
+  };
+
   return (
-    <ChatWrapper className={cn('h-full py-3 lg:py-4 relative', className)}>
-      <ChatHeader className="mb-4 lg:px-4 lg:py-2">
-        <ChatHeading>{pipeline.name}</ChatHeading>
-        <ChatStatus connectionStatus={connectionStatus} />
-      </ChatHeader>
+    <>
+      <ChatWrapper className={cn('h-full py-3 lg:py-4 relative', className)}>
+        <ChatHeader className="relative z-[5] mb-4 lg:px-4 lg:py-2">
+          <ChatHeading>{pipeline.name}</ChatHeading>
 
-      <ChatMessagesWrapper className="mx-auto">
-        <ChatMessages messages={messages} size={size}>
-          <SuggestedMessages
-            size={size}
-            className={cn('max-w-[820px] mx-auto', {
-              hidden:
-                !!messages.length ||
-                !pipeline.interface_config.webchat.suggested_messages.length,
-            })}
-          >
-            {pipeline.interface_config.webchat.suggested_messages.map(
-              (msg, index) => {
-                return (
-                  <SuggestedMessage
-                    disabled={disabled || connectionStatus !== 'running'}
-                    key={index}
-                    onClick={onSubmit}
-                    content={msg}
-                    size={size}
-                  />
-                );
-              },
-            )}
-          </SuggestedMessages>
-
-          <IntroPanel
-            size={size}
-            className={cn('max-w-[820px] mx-auto ', {
-              hidden: !!messages.length,
-              'mt-10 lg:mt-20': size !== 'sm',
-              'mt-6 lg:mt-12': size === 'sm',
-            })}
-          >
-            <p>{pipeline.interface_config.webchat.description}</p>
-          </IntroPanel>
-        </ChatMessages>
-
-        <ChatGeneratingAnimation
-          size={size}
-          messages={messages}
-          isGenerating={isGenerating}
-        />
-      </ChatMessagesWrapper>
-
-      <div className="px-3">
-        <ChatInput
-          size={size}
-          className="max-w-[820px] mx-auto"
-          onSubmit={onSubmit}
-          disabled={connectionStatus !== 'running' || isUploading || disabled}
-          generating={isGenerating}
-          placeholder={placeholder}
-          suggestions={inputs.map((input) => input.name)}
-          attachments={
-            (!!fileInput || !!imageInput) &&
-            fileList.length > 0 && (
-              <div className="w-full flex gap-1 px-2 pt-2 pb-1 flex-wrap">
-                {fileList.map((file) => {
-                  return (
-                    <div
-                      className={cn(
-                        'px-1 border border-input rounded-md flex items-center gap-1 text-sm',
-                        {
-                          'text-foreground': file.status === 'done',
-                          'text-muted-foreground ': file.status !== 'done',
-                        },
-                      )}
-                      key={file.id}
-                    >
-                      {file.file_name}
-                      <button
-                        type="button"
-                        onClick={() => removeFileFromCorrectInput(file.id)}
-                      >
-                        <Trash className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            )
-          }
-          prefix={
-            (!!fileInput || !!imageInput) && (
-              <label
-                className={cn('cursor-pointer', {
-                  'pl-2': size === 'sm',
-                  'pl-4': size !== 'sm',
-                })}
+          <div className="flex gap-2 items-center">
+            <ChatStatus connectionStatus={connectionStatus} />
+            {webchatConfigured && isAudioChat ? (
+              <Button
+                className="p-0 rounded-full h-6"
+                size="xs"
+                variant="ghost"
+                onClick={onCloseAudioChat}
               >
-                <Upload className="w-4 h-4" />
-                <input
-                  disabled={disabled}
-                  ref={inputRef}
-                  type="file"
-                  className="hidden"
-                  accept={supportedTypes.toString()}
-                  onChange={(e) => {
-                    [...(e.target.files || [])].forEach((file) => {
-                      uploadFileToCorrectInput(file);
-                    });
-                  }}
-                />
-              </label>
-            )
-          }
+                <X className="w-5 h-5" />
+              </Button>
+            ) : null}
+          </div>
+        </ChatHeader>
+
+        <ChatMessagesWrapper className="mx-auto">
+          <ChatMessages messages={messages} size={size}>
+            <SuggestedMessages
+              size={size}
+              className={cn('max-w-[820px] mx-auto', {
+                hidden:
+                  !!messages.length ||
+                  !pipeline.interface_config.webchat.suggested_messages.length,
+              })}
+            >
+              {pipeline.interface_config.webchat.suggested_messages.map(
+                (msg, index) => {
+                  return (
+                    <SuggestedMessage
+                      disabled={disabled || connectionStatus !== 'running'}
+                      key={index}
+                      onClick={onSubmit}
+                      content={msg}
+                      size={size}
+                    />
+                  );
+                },
+              )}
+            </SuggestedMessages>
+
+            <IntroPanel
+              size={size}
+              className={cn('max-w-[820px] mx-auto ', {
+                hidden: !!messages.length,
+                'mt-10 lg:mt-20': size !== 'sm',
+                'mt-6 lg:mt-12': size === 'sm',
+              })}
+            >
+              <p>{pipeline.interface_config.webchat.description}</p>
+            </IntroPanel>
+          </ChatMessages>
+
+          <ChatGeneratingAnimation
+            size={size}
+            messages={messages}
+            isGenerating={isGenerating}
+          />
+        </ChatMessagesWrapper>
+
+        <div className="px-3">
+          <div className="max-w-[820px] mx-auto flex justify-center items-center gap-2 px-2">
+            <ChatInput
+              size={size}
+              onSubmit={onSubmit}
+              disabled={
+                connectionStatus !== 'running' || isUploading || disabled
+              }
+              generating={isGenerating}
+              placeholder={placeholder}
+              suggestions={inputs.map((input) => input.name)}
+              attachments={
+                (!!fileInput || !!imageInput) &&
+                fileList.length > 0 && (
+                  <div className="w-full flex gap-1 px-2 pt-2 pb-1 flex-wrap">
+                    {fileList.map((file) => {
+                      return (
+                        <div
+                          className={cn(
+                            'px-1 border border-input rounded-md flex items-center gap-1 text-sm',
+                            {
+                              'text-foreground': file.status === 'done',
+                              'text-muted-foreground ': file.status !== 'done',
+                            },
+                          )}
+                          key={file.id}
+                        >
+                          {file.file_name}
+                          <button
+                            type="button"
+                            onClick={() => removeFileFromCorrectInput(file.id)}
+                          >
+                            <Trash className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )
+              }
+              prefix={
+                (!!fileInput || !!imageInput) && (
+                  <label
+                    className={cn('cursor-pointer', {
+                      'pl-2': size === 'sm',
+                      'pl-4': size !== 'sm',
+                    })}
+                  >
+                    <Upload className="w-4 h-4" />
+                    <input
+                      disabled={disabled}
+                      ref={inputRef}
+                      type="file"
+                      className="hidden"
+                      accept={supportedTypes.toString()}
+                      onChange={(e) => {
+                        [...(e.target.files || [])].forEach((file) => {
+                          uploadFileToCorrectInput(file);
+                        });
+                      }}
+                    />
+                  </label>
+                )
+              }
+            />
+            {isAudioConfigured ? (
+              <Button
+                variant="ghost"
+                className="p-0 rounded-full shrink-0"
+                onClick={onOpenAudioChat}
+              >
+                <Headphones className="w-6 h-6" />
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      </ChatWrapper>
+
+      <WebchatVoiceModal isOpen={isAudioChat}>
+        <Voicechat
+          status={audioState.status}
+          runStatus={connectionStatus}
+          disabled={isAudioDisabled}
+          audioRef={audioRef}
+          canvasRef={canvasRef}
+          onStop={stopRecording}
+          onStart={startRecording}
+          onChunk={onAudioChunk}
         />
-      </div>
-    </ChatWrapper>
+      </WebchatVoiceModal>
+    </>
   );
 };

@@ -223,6 +223,7 @@ export const useChat = ({
     pushMessage: handlePush,
     connectionStatus: status,
     runId: id,
+    push,
   };
 };
 
