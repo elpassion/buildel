@@ -34,6 +34,7 @@ export function Voicechat({
   alias,
   metadata,
 }: VoicechatProps) {
+  const eventsQueue = useRef<ArrayBuffer[]>([]);
   const [state, dispatch] = useReducer(
     voicechatReducer,
     DEFAULT_VOICECHAT_STATE,
@@ -113,19 +114,37 @@ export function Voicechat({
 
     for (const event of audioEvents) {
       const audioChunk = new Uint8Array(event.payload);
-      if (
-        !sourceBufferRef.current.updating &&
-        mediaSourceRef.current.readyState === 'open'
-      ) {
-        try {
-          sourceBufferRef.current.appendBuffer(audioChunk);
+      eventsQueue.current.push(audioChunk);
+    }
+
+    appendToBuffer();
+  };
+
+  const appendToBuffer = async () => {
+    if (!sourceBufferRef.current || !mediaSourceRef.current) return;
+
+    if (sourceBufferRef.current.updating) {
+      return;
+    }
+
+    if (eventsQueue.current.length > 0) {
+      try {
+        const nextChunk = eventsQueue.current.shift();
+
+        if (nextChunk) {
+          sourceBufferRef.current!.appendBuffer(nextChunk);
 
           if (audioRef.current) {
-            visualizeAudio(audioRef.current);
+            if (audioRef.current?.readyState === 2) {
+              audioRef.current.currentTime =
+                audioRef.current.currentTime + 0.05;
+            }
+            await audioRef.current.play();
+            await visualizeAudio(audioRef.current);
           }
-        } catch (error) {
-          console.error('Error appending buffer:', error);
         }
+      } catch (error) {
+        console.error('Error appending buffer:', error);
       }
     }
   };
@@ -185,6 +204,8 @@ export function Voicechat({
 
       sourceBufferRef.current =
         mediaSourceRef.current.addSourceBuffer('audio/mpeg');
+
+      sourceBufferRef.current?.addEventListener('updateend', appendToBuffer);
     };
 
     const onTimeUpdate = async () => {
@@ -205,6 +226,7 @@ export function Voicechat({
     return () => {
       mediaSource.removeEventListener('sourceopen', onSourceOpen);
       audioRef.current?.removeEventListener('timeupdate', onTimeUpdate);
+      sourceBufferRef.current?.removeEventListener('updateend', appendToBuffer);
     };
   }, []);
 
@@ -215,7 +237,7 @@ export function Voicechat({
       </div>
 
       <div className="grow flex justify-center items-center">
-        <audio ref={audioRef} controls autoPlay hidden />
+        <audio ref={audioRef} controls hidden autoPlay />
         <canvas
           ref={canvasRef}
           width={320}
