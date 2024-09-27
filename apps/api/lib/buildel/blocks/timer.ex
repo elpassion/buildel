@@ -7,7 +7,7 @@ defmodule Buildel.Blocks.Timer do
       type: "timer",
       description: "Used to emit a message after a specified time period.",
       groups: ["utils"],
-      inputs: [Block.text_input("start")],
+      inputs: [Block.text_input("start"), Block.text_input("stop")],
       outputs: [Block.text_output("on_stop")],
       ios: [],
       dynamic_ios: nil,
@@ -45,22 +45,39 @@ defmodule Buildel.Blocks.Timer do
     {:ok, state |> Map.put(:timer, nil)}
   end
 
-  defp start(state) do
+  defp start(state, text) do
     if state.timer, do: Process.cancel_timer(state.timer)
     state = send_stream_start(state, "on_stop")
     timer = Process.send_after(self(), {:stop}, state.opts.time)
-    Map.put(state, :timer, timer)
+    Map.put(state, :timer, timer) |> Map.put(:text, text)
+  end
+
+  defp stop_timer(state) do
+    if state.timer, do: Process.cancel_timer(state.timer)
+    Map.put(state, :timer, nil)
   end
 
   @impl true
-  def handle_input("start", {_name, :text, _text, _metadata}, state) do
-    start(state)
+  def handle_input("start", {name, :text, text, _metadata}, state) do
+    start(state, text)
+  end
+
+  @impl true
+  def handle_input("stop", {_name, :text, _text, _metadata}, state) do
+    stop_timer(state)
   end
 
   @impl true
   def handle_info({:stop}, state) do
     state = state |> Map.put(:timer, nil)
-    BlockPubSub.broadcast_to_io(state.context_id, state.block_name, "on_stop", {:text, "0"})
+
+    BlockPubSub.broadcast_to_io(
+      state.context_id,
+      state.block_name,
+      "on_stop",
+      {:text, state |> Map.get(:text)}
+    )
+
     state = send_stream_stop(state, "on_stop")
     {:noreply, state}
   end

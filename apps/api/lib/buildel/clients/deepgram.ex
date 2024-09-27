@@ -111,7 +111,7 @@ defmodule Buildel.Clients.Deepgram do
   end
 
   @impl true
-  @http_url "https://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true&endpointing=500"
+  @http_url "https://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true"
   def transcribe_file(
         token \\ nil,
         file,

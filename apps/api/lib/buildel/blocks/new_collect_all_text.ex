@@ -79,7 +79,6 @@ defmodule Buildel.Blocks.NewCollectAllText do
 
   @impl true
   def handle_input("drain", {_name, :text, _message, _metadata}, state) do
-    IO.inspect(state)
     drain_text(state)
   end
 
