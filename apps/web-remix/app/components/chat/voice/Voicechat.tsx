@@ -132,7 +132,7 @@ export function SpeakingRow({
 
       <Button
         type="button"
-        disabled={disabled}
+        disabled={disabled || isListening}
         onClick={startStop}
         variant={isActive ? 'destructive' : 'default'}
         className={cn(
