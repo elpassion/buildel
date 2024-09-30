@@ -14,7 +14,6 @@ import {
   listen,
   record,
   stop,
-  unmute,
   voicechatReducer,
 } from '~/components/chat/voice/voicechat.reducer';
 import {
@@ -23,6 +22,7 @@ import {
 } from '~/components/chat/voice/Voicechat.utils';
 import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
 import { Button } from '~/components/ui/button';
+import { assert } from '~/utils/assert';
 import { cn } from '~/utils/cn';
 
 interface VoicechatProps {
@@ -141,6 +141,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     DEFAULT_VOICECHAT_STATE,
   );
 
+  const isStoppedByUser = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const mediaSourceRef = useRef<MediaSource | null>(null);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
@@ -152,6 +153,8 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     _chunks: Blob[],
     args: UseAudioRecorderCbOptions,
   ) => {
+    isStoppedByUser.current = false;
+
     dispatch(record());
 
     if (!args.mediaStream) return;
@@ -159,16 +162,17 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     visualizeTalking(args.mediaStream);
   };
 
-  const onStop = () => {
-    dispatch(stop());
-
-    stopTalkingVisualization();
-    clearTalkingCanvas();
+  const onResume = () => {
+    dispatch(record());
   };
 
-  const { pause: pauseRecording, resume: resumeRecording, stop: stopRecording, start: startRecording } = useAudioRecorder({
+  const {
+    pause: pauseRecording,
+    resume: resumeRecording,
+    start: startAudioRecording,
+  } = useAudioRecorder({
     onChunk: onChunk,
-    onStop: onStop,
+    onResume: onResume,
     onStart: onStart,
   });
 
@@ -206,16 +210,15 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
         if (
           buffered.length === 0 ||
           audioRef.current.currentTime >=
-          buffered.end(buffered.length - 1) - 0.15
+            buffered.end(buffered.length - 1) - 0.15
         ) {
-          dispatch(unmute());
-          resumeRecording();
+          if (!isStoppedByUser.current) {
+            resumeRecording();
+          }
         }
       }
     }
   };
-
-
 
   const processAudioEvents = (audioEvents: IEvent[]) => {
     if (!sourceBufferRef.current || !mediaSourceRef.current) return;
@@ -309,10 +312,11 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
       if (
         buffered.length > 0 &&
         audioRef.current!.currentTime >=
-        buffered.end(buffered.length - 1) - 0.15
+          buffered.end(buffered.length - 1) - 0.15
       ) {
-        dispatch(unmute());
-        resumeRecording();
+        if (!isStoppedByUser.current) {
+          resumeRecording();
+        }
       }
     };
 
@@ -326,19 +330,41 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     };
   }, []);
 
+  const stopRecording = async () => {
+    isStoppedByUser.current = true;
+
+    await pauseRecording();
+
+    dispatch(stop());
+
+    stopTalkingVisualization();
+    clearTalkingCanvas();
+  };
+
+  const startRecording = async () => {
+    await startAudioRecording();
+  };
+
   const onDiscard = () => {
     if (!audioRef.current) return;
     audioRef.current.pause();
 
-    pauseRecording();
+    stopRecording();
   };
 
-  const onRestore = () => {
-    if (!audioRef.current) return;
+  const rewindAtEnd = () => {
+    assert(audioRef.current, 'Audio ref not found');
+
     audioRef.current.currentTime =
       audioRef.current.buffered.length > 0
         ? audioRef.current.buffered.end(audioRef.current.buffered.length - 1)
         : 0;
+  };
+
+  const onRestore = () => {
+    if (!audioRef.current) return;
+
+    rewindAtEnd();
 
     audioRef.current.play();
   };
@@ -346,7 +372,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   return {
     onBlockOutput,
     startRecording: startRecording,
-    stopRecording: pauseRecording,
+    stopRecording: stopRecording,
     discard: onDiscard,
     restore: onRestore,
     state,
