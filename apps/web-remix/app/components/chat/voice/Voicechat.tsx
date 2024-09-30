@@ -158,13 +158,14 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     DEFAULT_VOICECHAT_STATE,
   );
 
-  const isStoppedByUser = useRef(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const mediaSourceRef = useRef<MediaSource | null>(null);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
   const dotCanvasImageRef = useRef<HTMLImageElement | null>(null);
   const dotCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const talkingCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const isStoppedByUser = useRef(false);
 
   const onStart = (
     _e: Event,
@@ -180,14 +181,23 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     visualizeTalking(args.mediaStream);
   };
 
-  const onResume = () => {
+  const onResume = (
+    _e: Event,
+    _chunks: Blob[],
+    args: UseAudioRecorderCbOptions,
+  ) => {
     dispatch(record());
+
+    if (!args.mediaStream) return;
+
+    visualizeTalking(args.mediaStream);
   };
 
   const {
     pause: pauseRecording,
     resume: resumeRecording,
     start: startAudioRecording,
+    mediaRecorder,
   } = useAudioRecorder({
     onChunk: onChunk,
     onResume: onResume,
@@ -359,7 +369,11 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   };
 
   const startRecording = async () => {
-    await startAudioRecording();
+    if (mediaRecorder && mediaRecorder.state === 'paused') {
+      await resumeRecording();
+    } else {
+      await startAudioRecording();
+    }
   };
 
   const onDiscard = () => {

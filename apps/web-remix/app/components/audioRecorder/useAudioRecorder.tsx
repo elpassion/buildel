@@ -191,5 +191,6 @@ export const useAudioRecorder = (props?: UseAudioRecorderProps) => {
     stop: stopRecording,
     pause: pauseRecording,
     resume: resumeRecording,
+    mediaRecorder: mediaRecorder.current,
   };
 };
