@@ -212,6 +212,25 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     renderBars: drawCircleBars,
   });
 
+  const stopRecording = async () => {
+    isStoppedByUser.current = true;
+
+    await pauseRecording();
+
+    dispatch(stop());
+
+    stopTalkingVisualization();
+    clearTalkingCanvas();
+  };
+
+  const stopOrResume = async () => {
+    if (!isStoppedByUser.current) {
+      resumeRecording();
+    } else {
+      stopRecording();
+    }
+  };
+
   const { visualizeAudio: visualizeDot } = useAudioVisualize(dotCanvasRef, {
     renderBars: (canvas, ctx, frequencyBinCountArray) =>
       drawChatCircle(
@@ -246,9 +265,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
           audioRef.current.currentTime >=
             buffered.end(buffered.length - 1) - 0.15
         ) {
-          if (!isStoppedByUser.current) {
-            resumeRecording();
-          }
+          stopOrResume();
         }
       }
     }
@@ -323,9 +340,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
         audioRef.current!.currentTime >=
           buffered.end(buffered.length - 1) - 0.15
       ) {
-        if (!isStoppedByUser.current) {
-          resumeRecording();
-        }
+        stopOrResume();
       }
     };
 
@@ -356,17 +371,6 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
       );
     };
   }, []);
-
-  const stopRecording = async () => {
-    isStoppedByUser.current = true;
-
-    await pauseRecording();
-
-    dispatch(stop());
-
-    stopTalkingVisualization();
-    clearTalkingCanvas();
-  };
 
   const startRecording = async () => {
     if (mediaRecorder && mediaRecorder.state === 'paused') {
