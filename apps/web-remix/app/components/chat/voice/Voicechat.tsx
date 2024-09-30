@@ -162,6 +162,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const mediaSourceRef = useRef<MediaSource | null>(null);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
+  const dotCanvasImageRef = useRef<HTMLImageElement | null>(null);
   const dotCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const talkingCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -202,7 +203,13 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   });
 
   const { visualizeAudio: visualizeDot } = useAudioVisualize(dotCanvasRef, {
-    renderBars: drawChatCircle,
+    renderBars: (canvas, ctx, frequencyBinCountArray) =>
+      drawChatCircle(
+        canvas,
+        ctx,
+        frequencyBinCountArray,
+        dotCanvasImageRef.current,
+      ),
   });
 
   const input = pipeline.interface_config.webchat.audio_inputs.find(
@@ -281,32 +288,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     }
   };
 
-  const drawStaticCircle = () => {
-    if (!dotCanvasRef.current) return;
-
-    const canvasContext = dotCanvasRef.current?.getContext('2d');
-
-    if (!canvasContext) return;
-
-    canvasContext.clearRect(
-      0,
-      0,
-      dotCanvasRef.current.width,
-      dotCanvasRef.current.height,
-    );
-
-    const centerX = dotCanvasRef.current.width / 2;
-    const centerY = dotCanvasRef.current.height / 2;
-
-    canvasContext.fillStyle = '#111';
-    canvasContext.beginPath();
-    canvasContext.arc(centerX, centerY, 70, 0, Math.PI * 2);
-    canvasContext.fill();
-  };
-
   useEffect(() => {
-    drawStaticCircle();
-
     if (!audioRef.current) return;
 
     const mediaSource = new MediaSource();
@@ -344,6 +326,24 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
       mediaSource.removeEventListener('sourceopen', onSourceOpen);
       audioRef.current?.removeEventListener('timeupdate', onTimeUpdate);
       sourceBufferRef.current?.removeEventListener('updateend', appendToBuffer);
+    };
+  }, []);
+
+  useEffect(() => {
+    const ctx = dotCanvasRef.current?.getContext('2d');
+
+    dotCanvasImageRef.current = new Image();
+    dotCanvasImageRef.current.src = '/icons/star.svg';
+
+    dotCanvasImageRef.current.onload = () => {
+      if (!dotCanvasRef.current || !ctx) return;
+
+      drawChatCircle(
+        dotCanvasRef.current,
+        ctx,
+        new Uint8Array(5),
+        dotCanvasImageRef.current,
+      );
     };
   }, []);
 

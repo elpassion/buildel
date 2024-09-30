@@ -39,6 +39,7 @@ export function drawChatCircle(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   frequencyBinCountArray: Uint8Array,
+  image?: HTMLImageElement | null,
 ) {
   const averageFrequency =
     frequencyBinCountArray.reduce((a, b) => a + b, 0) /
@@ -52,8 +53,26 @@ export function drawChatCircle(
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
 
-  ctx.fillStyle = '#111';
+  const gradient = ctx.createLinearGradient(
+    centerX - radius,
+    centerY + radius,
+    centerX + radius,
+    centerY - radius,
+  );
+
+  gradient.addColorStop(0, '#4776E6');
+  gradient.addColorStop(0.6, '#4776E6');
+  gradient.addColorStop(0.8, '#8E54E9');
+  gradient.addColorStop(1, '#8546e7');
+
+  ctx.fillStyle = gradient;
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
   ctx.fill();
+
+  if (image) {
+    const imgX = centerX - radius / 2;
+    const imgY = centerY - radius / 2;
+    ctx.drawImage(image, imgX, imgY, radius, radius);
+  }
 }
