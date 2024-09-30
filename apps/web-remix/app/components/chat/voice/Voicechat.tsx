@@ -369,7 +369,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     stopRecording();
   };
 
-  const rewindAtEnd = () => {
+  const fastForwardToEnd = () => {
     assert(audioRef.current, 'Audio ref not found');
 
     audioRef.current.currentTime =
@@ -381,7 +381,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   const onRestore = () => {
     if (!audioRef.current) return;
 
-    rewindAtEnd();
+    fastForwardToEnd();
 
     audioRef.current.play();
   };
