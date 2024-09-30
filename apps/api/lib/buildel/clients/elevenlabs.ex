@@ -38,7 +38,7 @@ defmodule Buildel.Clients.Elevenlabs do
   end
 
   def generate_speech(pid, text) do
-    IO.inspect(text, label: "text: ")
+    # IO.inspect(text, label: "text: ")
 
     WebSockex.send_frame(
       pid,
@@ -68,6 +68,9 @@ defmodule Buildel.Clients.Elevenlabs do
     message = Jason.decode!(text)
 
     case message do
+      %{"error" => _, "code" => 1008} ->
+        send(state.stream_to, {:reconnect})
+
       %{"audio" => nil} ->
         nil
 

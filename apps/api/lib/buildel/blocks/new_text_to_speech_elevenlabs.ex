@@ -77,7 +77,7 @@ defmodule Buildel.Blocks.NewTextToSpeechElevenlabs do
 
     lang = Map.get(opts, :language, "en")
     model = Map.get(opts, :model, "aura-asteria-en")
-    state =  state |> Map.put(:stream_timeout, 1500)
+    state = state |> Map.put(:stream_timeout, 1500)
 
     case elevenlabs().speak!(api_key, %{stream_to: self()}) |> IO.inspect() do
       {:ok, elevenlabs_pid} ->
@@ -101,6 +101,24 @@ defmodule Buildel.Blocks.NewTextToSpeechElevenlabs do
     state |> Map.get(:elevenlabs_pid) |> elevenlabs().generate_speech(chunk)
 
     state
+  end
+
+  def handle_info({:reconnect}, state) do
+    state[:elevenlabs_pid] |> elevenlabs().disconnect()
+
+    api_key = block_context().get_secret_from_context(state.context_id, state.opts.api_key)
+
+    state =
+      case elevenlabs().speak!(api_key, %{stream_to: self()}) do
+        {:ok, elevenlabs_pid} ->
+          state |> Map.put(:elevenlabs_pid, elevenlabs_pid)
+
+        {:error, _reason} ->
+          state |> send_error(:incorrect_api_key)
+          state
+      end
+
+    {:noreply, state}
   end
 
   def handle_info({:audio_chunk, binary}, state) do

@@ -90,9 +90,9 @@ defmodule Buildel.Clients.Deepgram do
 
     alternatives = message |> get_in(["channel", "alternatives"])
     is_final = message |> get_in(["is_final"])
-    speech_final = message |> get_in(["speech_final"])
+    # speech_final = message |> get_in(["speech_final"])
 
-    is_final = is_final && speech_final
+    is_final = is_final
 
     if is_final, do: send(state.stream_to, {:end})
 
