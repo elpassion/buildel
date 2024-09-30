@@ -29,12 +29,23 @@ interface VoicechatProps {
   audioRef: React.RefObject<HTMLAudioElement>;
   canvasRef: React.RefObject<HTMLCanvasElement>;
   children?: React.ReactNode;
+  transcription?: React.ReactNode;
 }
 
-export function Voicechat({ canvasRef, audioRef, children }: VoicechatProps) {
+export function Voicechat({
+  canvasRef,
+  audioRef,
+  children,
+  transcription,
+}: VoicechatProps) {
   return (
     <div className="relative flex justify-center flex-col items-center h-[100dvh] w-full bg-secondary">
-      <div className="grow flex justify-center items-center">
+      <div
+        className={cn('grow flex flex-col  items-center', {
+          'justify-end md:justify-center': !!transcription,
+          'justify-center': !transcription,
+        })}
+      >
         <audio ref={audioRef} controls hidden />
         <canvas
           ref={canvasRef}
@@ -42,6 +53,12 @@ export function Voicechat({ canvasRef, audioRef, children }: VoicechatProps) {
           height={320}
           className="animate-scale"
         />
+
+        {transcription ? (
+          <div className="px-4 h-[150px] overflow-y-auto py-4 md:h-[200px]">
+            {transcription}
+          </div>
+        ) : null}
       </div>
 
       {children}

@@ -12,7 +12,7 @@ import {
   SuggestedMessage,
   SuggestedMessages,
 } from '~/components/chat/Chat.components';
-import type { ChatSize } from '~/components/chat/chat.types';
+import type { ChatSize, IMessage } from '~/components/chat/chat.types';
 import { isWebchatConfigured } from '~/components/chat/chat.utils';
 import { ChatHeading } from '~/components/chat/ChatHeading';
 import { ChatInput } from '~/components/chat/ChatInput';
@@ -112,6 +112,7 @@ export const Webchat = ({
     stopRun,
     startRun,
     messages,
+    latestAiMessage,
     runId,
   } = useChat({
     inputs,
@@ -322,7 +323,7 @@ ${JSON.stringify(files)}
         </ChatMessagesWrapper>
 
         <div className="px-3">
-          <div className="max-w-[820px] mx-auto flex justify-center items-center gap-2 px-2">
+          <div className="max-w-[820px] mx-auto flex justify-center items-center gap-1 px-2">
             <ChatInput
               size={size}
               onSubmit={onSubmit}
@@ -400,7 +401,11 @@ ${JSON.stringify(files)}
       </ChatWrapper>
 
       <WebchatVoiceModal isOpen={isAudioChat}>
-        <Voicechat audioRef={audioRef} canvasRef={dotCanvasRef}>
+        <Voicechat
+          audioRef={audioRef}
+          canvasRef={dotCanvasRef}
+          transcription={<VoiceChatTranscription message={latestAiMessage} />}
+        >
           <div className="py-4 px-6">
             <SpeakingRow
               disabled={disabled ?? connectionStatus !== 'running'}
@@ -415,3 +420,11 @@ ${JSON.stringify(files)}
     </>
   );
 };
+
+function VoiceChatTranscription({ message }: { message?: IMessage }) {
+  return (
+    <div className="max-w-[800px] text-center">
+      <p className="text-sm text-muted-foreground">{message?.message}</p>
+    </div>
+  );
+}

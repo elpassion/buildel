@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import cloneDeep from 'lodash.clonedeep';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -213,9 +213,14 @@ export const useChat = ({
     setIsGenerating(true);
   };
 
+  const latestAiMessage = useMemo(() => {
+    return getLatestAiMessage(messages);
+  }, [messages]);
+
   return {
     stopRun,
     messages,
+    latestAiMessage,
     startRun,
     isGenerating:
       isGenerating || Object.values(outputsGenerating).some((v) => v),
@@ -255,4 +260,11 @@ function retrieveInputsFromMessage(message: string): {
     ),
     text: message.replace(regex, '').trim(),
   };
+}
+
+function getLatestAiMessage(messages: IMessage[]) {
+  return ([] as IMessage[])
+    .concat(messages)
+    .reverse()
+    .find((msg) => msg.role === 'ai');
 }
