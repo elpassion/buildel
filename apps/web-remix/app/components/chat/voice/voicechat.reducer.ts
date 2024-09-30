@@ -14,15 +14,18 @@ type Action =
       type: 'RESET';
     };
 
-type State = {
+export type VoicechatReducerState = {
   status: VoicechatStatus;
 };
 
-export const DEFAULT_VOICECHAT_STATE: State = {
+export const DEFAULT_VOICECHAT_STATE: VoicechatReducerState = {
   status: 'inactive',
 };
 
-export const voicechatReducer = (state: State, action: Action): State => {
+export const voicechatReducer = (
+  state: VoicechatReducerState,
+  action: Action,
+): VoicechatReducerState => {
   switch (action.type) {
     case 'SET_STATUS':
       return {

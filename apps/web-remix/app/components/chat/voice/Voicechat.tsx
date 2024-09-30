@@ -8,7 +8,10 @@ import type {
 } from '~/components/audioRecorder/useAudioRecorder';
 import { useAudioRecorder } from '~/components/audioRecorder/useAudioRecorder';
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
-import type { VoicechatStatus } from '~/components/chat/voice/voicechat.reducer';
+import type {
+  VoicechatReducerState,
+  VoicechatStatus,
+} from '~/components/chat/voice/voicechat.reducer';
 import {
   DEFAULT_VOICECHAT_STATE,
   listen,
@@ -22,6 +25,7 @@ import {
 } from '~/components/chat/voice/Voicechat.utils';
 import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
 import { Button } from '~/components/ui/button';
+import { useSound } from '~/hooks/useSound';
 import { assert } from '~/utils/assert';
 import { cn } from '~/utils/cn';
 
@@ -157,6 +161,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     voicechatReducer,
     DEFAULT_VOICECHAT_STATE,
   );
+  const prevStateRef = useRef<VoicechatReducerState>(state);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const mediaSourceRef = useRef<MediaSource | null>(null);
@@ -164,28 +169,15 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   const dotCanvasImageRef = useRef<HTMLImageElement | null>(null);
   const dotCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const talkingCanvasRef = useRef<HTMLCanvasElement | null>(null);
-
   const isStoppedByUser = useRef(false);
-
-  const onStart = (
-    _e: Event,
-    _chunks: Blob[],
-    args: UseAudioRecorderCbOptions,
-  ) => {
-    isStoppedByUser.current = false;
-
-    dispatch(record());
-
-    if (!args.mediaStream) return;
-
-    visualizeTalking(args.mediaStream);
-  };
 
   const onResume = (
     _e: Event,
     _chunks: Blob[],
     args: UseAudioRecorderCbOptions,
   ) => {
+    isStoppedByUser.current = false;
+
     dispatch(record());
 
     if (!args.mediaStream) return;
@@ -201,7 +193,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   } = useAudioRecorder({
     onChunk: onChunk,
     onResume: onResume,
-    onStart: onStart,
+    onStart: onResume,
   });
 
   const {
@@ -371,6 +363,23 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
       );
     };
   }, []);
+
+  const { play: playSound } = useSound({
+    src: '/sounds/toggle.mp3',
+  });
+
+  useEffect(() => {
+    if (
+      (prevStateRef.current.status === 'listening' &&
+        state.status === 'recording') ||
+      (prevStateRef.current.status === 'recording' &&
+        state.status === 'listening')
+    ) {
+      playSound();
+    }
+
+    prevStateRef.current = state;
+  }, [state.status]);
 
   const startRecording = async () => {
     if (mediaRecorder && mediaRecorder.state === 'paused') {
