@@ -147,6 +147,31 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   const dotCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const talkingCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const onStart = (
+    _e: Event,
+    _chunks: Blob[],
+    args: UseAudioRecorderCbOptions,
+  ) => {
+    dispatch(record());
+
+    if (!args.mediaStream) return;
+
+    visualizeTalking(args.mediaStream);
+  };
+
+  const onStop = () => {
+    dispatch(stop());
+
+    stopTalkingVisualization();
+    clearTalkingCanvas();
+  };
+
+  const { pause: pauseRecording, resume: resumeRecording, stop: stopRecording, start: startRecording } = useAudioRecorder({
+    onChunk: onChunk,
+    onStop: onStop,
+    onStart: onStart,
+  });
+
   const {
     visualizeAudio: visualizeTalking,
     clearCanvas: clearTalkingCanvas,
@@ -173,6 +198,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     if (blockId === input?.name) {
       if (payload.message === 'muted') {
         dispatch(listen());
+        pauseRecording();
       } else {
         if (!audioRef.current) return;
         const buffered = audioRef.current.buffered;
@@ -180,38 +206,16 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
         if (
           buffered.length === 0 ||
           audioRef.current.currentTime >=
-            buffered.end(buffered.length - 1) - 0.15
+          buffered.end(buffered.length - 1) - 0.15
         ) {
           dispatch(unmute());
+          resumeRecording();
         }
       }
     }
   };
 
-  const onStart = (
-    _e: Event,
-    _chunks: Blob[],
-    args: UseAudioRecorderCbOptions,
-  ) => {
-    dispatch(record());
 
-    if (!args.mediaStream) return;
-
-    visualizeTalking(args.mediaStream);
-  };
-
-  const onStop = () => {
-    dispatch(stop());
-
-    stopTalkingVisualization();
-    clearTalkingCanvas();
-  };
-
-  const { stop: stopRecording, start: startRecording } = useAudioRecorder({
-    onChunk: onChunk,
-    onStop: onStop,
-    onStart: onStart,
-  });
 
   const processAudioEvents = (audioEvents: IEvent[]) => {
     if (!sourceBufferRef.current || !mediaSourceRef.current) return;
@@ -305,9 +309,10 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
       if (
         buffered.length > 0 &&
         audioRef.current!.currentTime >=
-          buffered.end(buffered.length - 1) - 0.15
+        buffered.end(buffered.length - 1) - 0.15
       ) {
         dispatch(unmute());
+        resumeRecording();
       }
     };
 
@@ -325,7 +330,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     if (!audioRef.current) return;
     audioRef.current.pause();
 
-    stopRecording();
+    pauseRecording();
   };
 
   const onRestore = () => {
@@ -341,7 +346,7 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   return {
     onBlockOutput,
     startRecording: startRecording,
-    stopRecording: stopRecording,
+    stopRecording: pauseRecording,
     discard: onDiscard,
     restore: onRestore,
     state,

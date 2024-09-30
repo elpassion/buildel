@@ -80,6 +80,7 @@ defmodule Buildel.Blocks.SpeechToText do
 
     case deepgram().listen!(api_key, %{stream_to: self(), language: lang, model: model}) do
       {:ok, deepgram_pid} ->
+        Process.send_after(self(), {:keep_alive}, 5000)
         {:ok, state |> Map.put(:deepgram_pid, deepgram_pid)}
 
       {:error, _reason} ->
@@ -99,6 +100,13 @@ defmodule Buildel.Blocks.SpeechToText do
     state |> Map.get(:deepgram_pid) |> deepgram().transcribe_audio({:binary, chunk})
 
     state
+  end
+
+  @impl true
+  def handle_info({:keep_alive}, state) do
+    deepgram().keep_alive(state.deepgram_pid)
+    Process.send_after(self(), {:keep_alive}, 5000)
+    {:noreply, state}
   end
 
   @impl true

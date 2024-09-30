@@ -7,7 +7,11 @@ defmodule Buildel.Blocks.Timer do
       type: "timer",
       description: "Used to emit a message after a specified time period.",
       groups: ["utils"],
-      inputs: [Block.text_input("start"), Block.text_input("stop")],
+      inputs: [
+        Block.text_input("start"),
+        Block.text_input("stop"),
+        Block.audio_input("stop_audio")
+      ],
       outputs: [Block.text_output("on_stop")],
       ios: [],
       dynamic_ios: nil,
@@ -64,6 +68,11 @@ defmodule Buildel.Blocks.Timer do
 
   @impl true
   def handle_input("stop", {_name, :text, _text, _metadata}, state) do
+    stop_timer(state)
+  end
+
+  @impl true
+  def handle_input("stop_audio", {_name, _, _text, _metadata}, state) do
     stop_timer(state)
   end
 

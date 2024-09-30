@@ -35,6 +35,10 @@ defmodule Buildel.Clients.Deepgram do
     WebSockex.send_frame(pid, {:binary, audio})
   end
 
+  def keep_alive(pid) do
+    WebSockex.send_frame(pid, {:text, Jason.encode!(%{type: "KeepAlive"})})
+  end
+
   def generate_speech(pid, text) do
     IO.inspect(text, label: "text: ")
 
