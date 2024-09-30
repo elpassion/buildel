@@ -152,9 +152,14 @@ export function SpeakingRow({
 interface UseVoicechatProps {
   pipeline: IPipelinePublicResponse;
   onChunk: UseAudioRecorderChunkCb;
+  audioEnabled?: boolean;
 }
 
-export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
+export function useVoicechat({
+  pipeline,
+  onChunk,
+  audioEnabled = true,
+}: UseVoicechatProps) {
   const eventsQueue = useRef<ArrayBuffer[]>([]);
 
   const [state, dispatch] = useReducer(
@@ -270,8 +275,6 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
       const audioChunk = new Uint8Array(event.payload);
       eventsQueue.current.push(audioChunk);
     }
-
-    appendToBuffer();
   };
 
   const appendToBuffer = async () => {
@@ -287,7 +290,8 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
 
         if (nextChunk) {
           sourceBufferRef.current.appendBuffer(nextChunk);
-          if (audioRef.current?.paused) return;
+
+          if (!audioEnabled) return;
 
           setTimeout(async () => {
             if (audioRef.current) {
@@ -297,7 +301,6 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
               }
 
               await audioRef.current.play();
-              await visualizeDot(audioRef.current);
             }
           }, 50);
         }
@@ -308,6 +311,16 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
   };
 
   useEffect(() => {
+    const id = setInterval(() => {
+      appendToBuffer();
+    }, 150);
+
+    return () => {
+      clearInterval(id);
+    };
+  }, [audioEnabled]);
+
+  useEffect(() => {
     if (!audioRef.current) return;
 
     const mediaSource = new MediaSource();
@@ -315,13 +328,21 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
 
     audioRef.current.src = URL.createObjectURL(mediaSource);
 
+    const visualizeDotCanvas = () => {
+      assert(audioRef.current, 'Audio ref not found');
+      visualizeDot(audioRef.current);
+    };
+
     const onSourceOpen = async () => {
       if (!mediaSourceRef.current) return;
 
       sourceBufferRef.current =
         mediaSourceRef.current.addSourceBuffer('audio/mpeg');
 
-      sourceBufferRef.current?.addEventListener('updateend', appendToBuffer);
+      sourceBufferRef.current?.addEventListener(
+        'updateend',
+        visualizeDotCanvas,
+      );
     };
 
     const onTimeUpdate = async () => {
@@ -342,7 +363,10 @@ export function useVoicechat({ pipeline, onChunk }: UseVoicechatProps) {
     return () => {
       mediaSource.removeEventListener('sourceopen', onSourceOpen);
       audioRef.current?.removeEventListener('timeupdate', onTimeUpdate);
-      sourceBufferRef.current?.removeEventListener('updateend', appendToBuffer);
+      sourceBufferRef.current?.removeEventListener(
+        'updateend',
+        visualizeDotCanvas,
+      );
     };
   }, []);
 

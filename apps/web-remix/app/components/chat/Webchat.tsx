@@ -225,7 +225,11 @@ ${JSON.stringify(files)}
     state: audioState,
     isAudioConfigured,
     audioInput,
-  } = useVoicechat({ pipeline, onChunk: onAudioChunk });
+  } = useVoicechat({
+    pipeline,
+    onChunk: onAudioChunk,
+    audioEnabled: isAudioChat,
+  });
 
   const isAudioDisabled = !isAudioConfigured || !isAudioChat || disabled;
 
