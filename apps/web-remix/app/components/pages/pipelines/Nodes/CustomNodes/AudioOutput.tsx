@@ -4,6 +4,7 @@ import { Pause, Play } from 'lucide-react';
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
 import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
 import { errorToast } from '~/components/toasts/errorToast';
+import { assert } from '~/utils/assert';
 import { cn } from '~/utils/cn';
 
 interface AudioOutputProps {
@@ -19,7 +20,8 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const mediaSourceRef = useRef<MediaSource | null>(null);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
-  const lastIndex = useRef<number>(-1);
+  const latestTakenIndex = useRef<number>(-1);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const { visualizeAudio, clearCanvas } = useAudioVisualize(canvasRef);
 
@@ -31,28 +33,25 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({
 
     audioRef.current.src = URL.createObjectURL(mediaSource);
 
+    const visualize = () => {
+      assert(audioRef.current);
+      visualizeAudio(audioRef.current);
+    };
+
     const onSourceOpen = async () => {
       if (!mediaSourceRef.current) return;
 
-      const sourceBuffer = mediaSourceRef.current.addSourceBuffer('audio/mpeg');
-      sourceBufferRef.current = sourceBuffer;
+      sourceBufferRef.current =
+        mediaSourceRef.current.addSourceBuffer('audio/mpeg');
 
-      // sourceBuffer.addEventListener('updateend', () => {
-      //   if (
-      //     mediaSourceRef.current &&
-      //     mediaSourceRef.current.readyState === 'open'
-      //   ) {
-      //     console.log('CLOSE AA');
-      //   }
-      // });
-
-      processAudioEvents(events);
+      sourceBufferRef.current?.addEventListener('updateend', visualize);
     };
 
     mediaSource.addEventListener('sourceopen', onSourceOpen);
 
     return () => {
       mediaSource.removeEventListener('sourceopen', onSourceOpen);
+      sourceBufferRef.current?.removeEventListener('updateend', visualize);
     };
   }, []);
 
@@ -60,7 +59,7 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({
     if (!sourceBufferRef.current || !mediaSourceRef.current) return;
 
     for (
-      let index = lastIndex.current + 1;
+      let index = latestTakenIndex.current + 1;
       index < audioEvents.length;
       index++
     ) {
@@ -73,11 +72,11 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({
       ) {
         try {
           sourceBufferRef.current.appendBuffer(audioChunk);
-          lastIndex.current = index;
+          latestTakenIndex.current = index;
 
           if (audioRef.current && !disabled) {
             audioRef.current.play();
-            visualizeAudio(audioRef.current);
+
             setIsPlaying(true);
           }
         } catch (error) {
@@ -104,14 +103,23 @@ export const AudioOutput: React.FC<AudioOutputProps> = ({
   };
 
   useEffect(() => {
-    processAudioEvents(events);
+    if (disabled) return;
+
+    if (events.length < latestTakenIndex.current) {
+      latestTakenIndex.current = -1;
+    }
+
+    const id = setInterval(() => {
+      processAudioEvents(events);
+    }, 150);
 
     return () => {
+      clearInterval(id);
       if (sourceBufferRef.current) {
         sourceBufferRef.current.abort();
       }
     };
-  }, [events]);
+  }, [events, disabled]);
 
   useEffect(() => {
     if (disabled) {
