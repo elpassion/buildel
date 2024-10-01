@@ -326,8 +326,16 @@ ${JSON.stringify(files)}
           />
         </ChatMessagesWrapper>
 
-        <div className="px-3">
-          <div className="max-w-[820px] mx-auto flex justify-center items-center gap-1 px-2">
+        <div>
+          <div
+            className={cn(
+              'max-w-[820px] mx-auto grow grid  justify-center items-center gap-1 px-2',
+              {
+                'grid-cols-1': !isAudioConfigured,
+                'grid-cols-[1fr_min-content]': isAudioConfigured,
+              },
+            )}
+          >
             <ChatInput
               size={size}
               onSubmit={onSubmit}
@@ -393,11 +401,19 @@ ${JSON.stringify(files)}
             />
             {isAudioConfigured ? (
               <Button
-                variant="ghost"
-                className="p-0 rounded-full shrink-0"
+                variant="outline"
+                className={cn('p-0 rounded-full shrink-0', {
+                  'h-[48px] w-[48px]': size === 'default',
+                  'h-[36px] w-[36px]': size === 'sm',
+                })}
                 onClick={onOpenAudioChat}
               >
-                <Headphones className="w-6 h-6" />
+                <Headphones
+                  className={cn({
+                    'w-6 h-6': size === 'default',
+                    'w-5 h-5': size === 'sm',
+                  })}
+                />
               </Button>
             ) : null}
           </div>
