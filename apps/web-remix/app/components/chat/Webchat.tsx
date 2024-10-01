@@ -420,23 +420,25 @@ ${JSON.stringify(files)}
         </div>
       </ChatWrapper>
 
-      <WebchatVoiceModal isOpen={isAudioChat}>
-        <Voicechat
-          audioRef={audioRef}
-          canvasRef={dotCanvasRef}
-          transcription={<VoiceChatTranscription message={latestAiMessage} />}
-        >
-          <div className="py-4 px-6">
-            <SpeakingRow
-              disabled={disabled ?? connectionStatus !== 'running'}
-              onStop={stopRecording}
-              onStart={startRecording}
-              canvasRef={talkingCanvasRef}
-              status={audioState.status}
-            />
-          </div>
-        </Voicechat>
-      </WebchatVoiceModal>
+      {isAudioConfigured ? (
+        <WebchatVoiceModal isOpen={isAudioChat}>
+          <Voicechat
+            audioRef={audioRef}
+            canvasRef={dotCanvasRef}
+            transcription={<VoiceChatTranscription message={latestAiMessage} />}
+          >
+            <div className="py-4 px-6">
+              <SpeakingRow
+                disabled={disabled ?? connectionStatus !== 'running'}
+                onStop={stopRecording}
+                onStart={startRecording}
+                canvasRef={talkingCanvasRef}
+                status={audioState.status}
+              />
+            </div>
+          </Voicechat>
+        </WebchatVoiceModal>
+      ) : null}
     </>
   );
 };
