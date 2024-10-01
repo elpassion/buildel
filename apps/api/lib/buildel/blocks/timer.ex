@@ -59,10 +59,11 @@ defmodule Buildel.Blocks.Timer do
   defp stop_timer(state) do
     if state.timer, do: Process.cancel_timer(state.timer)
     Map.put(state, :timer, nil)
+    send_stream_stop(state, "on_stop")
   end
 
   @impl true
-  def handle_input("start", {name, :text, text, _metadata}, state) do
+  def handle_input("start", {_name, :text, text, _metadata}, state) do
     start(state, text)
   end
 

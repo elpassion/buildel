@@ -1,6 +1,5 @@
 defmodule Buildel.Clients.DeepgramBehaviour do
   @callback listen!(String.t(), %{stream_to: pid}) :: {:ok, pid} | {:error, term}
-  @callback speak!(String.t(), %{stream_to: pid}) :: {:ok, pid} | {:error, term}
   @callback disconnect(pid) :: :ok
   @callback transcribe_audio(pid, {:binary, binary}) :: :ok
   @callback transcribe_file(String.t(), any(), map()) :: :ok
@@ -18,13 +17,6 @@ defmodule Buildel.Clients.Deepgram do
     listen(state, extra_headers: [{"Authorization", "token #{token}"}], debug: [:trace])
   end
 
-  def speak!(token, state \\ %{}) do
-    speak(state,
-      extra_headers: [Authorization: "token #{token}", "content-type": "application/json"],
-      debug: [:trace]
-    )
-  end
-
   @impl DeepgramBehaviour
   def disconnect(pid) do
     GenServer.stop(pid)
@@ -39,23 +31,7 @@ defmodule Buildel.Clients.Deepgram do
     WebSockex.send_frame(pid, {:text, Jason.encode!(%{type: "KeepAlive"})})
   end
 
-  def generate_speech(pid, text) do
-    IO.inspect(text, label: "text: ")
-
-    WebSockex.send_frame(
-      pid,
-      {:text,
-       Jason.encode!(%{
-         type: "Speak",
-         text: text
-       })}
-    )
-    |> IO.inspect()
-  end
-
   def flush(pid) do
-    IO.inspect("Flushing", label: "Flushing: ")
-
     WebSockex.send_frame(pid, {:text, Jason.encode!(%{type: "Flush"})})
   end
 
@@ -64,15 +40,6 @@ defmodule Buildel.Clients.Deepgram do
     %{language: lang, model: model} = state
 
     url = build_url(@wss_url, [{:language, lang}, {:model, model}])
-
-    WebSockex.start_link(url, __MODULE__, state, opts)
-  end
-
-  @wss_url "wss://api.deepgram.com/v1/speak?encoding=linear16"
-  def speak(state \\ %{model: "aura-asteria-en"}, opts \\ []) do
-    %{model: model} = state
-
-    url = build_url(@wss_url, [{:model, model}]) |> IO.inspect()
 
     WebSockex.start_link(url, __MODULE__, state, opts)
   end
@@ -103,8 +70,6 @@ defmodule Buildel.Clients.Deepgram do
       end
 
     if message, do: send(state.stream_to, {:transcript, %{message: message, is_final: is_final}})
-
-    IO.inspect("dupa")
 
     {:ok, state}
   end
