@@ -15,7 +15,7 @@ defmodule Buildel.Blocks.AudioInput do
         Block.audio_input("unmute"),
         Block.text_input("trigger")
       ],
-      outputs: [Block.audio_output(), Block.text_output("status", true)],
+      outputs: [Block.audio_output(), Block.text_output("status", true, false)],
       ios: [],
       dynamic_ios: nil,
       schema: schema()

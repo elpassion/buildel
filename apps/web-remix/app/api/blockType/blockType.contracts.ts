@@ -12,6 +12,7 @@ export const IOType = z.object({
     'image',
   ]),
   public: z.boolean(),
+  visible: z.boolean(),
 });
 
 export const BlockType = z.object({

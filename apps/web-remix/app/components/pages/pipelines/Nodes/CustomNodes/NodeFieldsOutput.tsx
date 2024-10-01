@@ -29,10 +29,11 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
 
   const renderOutput = useCallback(
     (field: IField) => {
-      const { type } = field.data;
+      const { type, visible } = field.data;
 
       const fieldEvents = getFieldEvents(events, field.data.name);
 
+      if (visible === false) return null;
       if (type === 'text') {
         const text = checkIfStringPayloads(fieldEvents)
           ? concatStringFieldsOutputs(fieldEvents)

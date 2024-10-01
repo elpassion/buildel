@@ -9,7 +9,7 @@ defmodule Buildel.Blocks.TextInput do
         "This module is crafted for the seamless intake and transmission of textual data.",
       groups: ["text", "inputs / outputs"],
       inputs: [Block.text_input("input", true), Block.text_input("forward")],
-      outputs: [Block.text_output(), Block.text_output("forward", true)],
+      outputs: [Block.text_output("output", false), Block.text_output("forward", true, false)],
       ios: [],
       dynamic_ios: nil,
       schema: schema()
