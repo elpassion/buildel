@@ -78,6 +78,8 @@ defmodule Buildel.Blocks.SpeechToText do
     lang = Map.get(opts, :language, "en")
     model = Map.get(opts, :model, "base")
 
+    state = state |> Map.put(:stream_to, self())
+
     case deepgram().listen!(api_key, %{stream_to: self(), language: lang, model: model}) do
       {:ok, deepgram_pid} ->
         Process.send_after(self(), {:keep_alive}, 5000)

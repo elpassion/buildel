@@ -44,12 +44,6 @@ defmodule Buildel.Clients.Deepgram do
     WebSockex.start_link(url, __MODULE__, state, opts)
   end
 
-  def handle_frame({:binary, binary}, state) do
-    send(state.stream_to, {:audio, binary})
-
-    {:ok, state}
-  end
-
   @impl true
   def handle_frame({:text, text}, state) do
     message = Jason.decode!(text)

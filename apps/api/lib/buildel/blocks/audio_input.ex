@@ -12,8 +12,7 @@ defmodule Buildel.Blocks.AudioInput do
       inputs: [
         Block.audio_input("input", true),
         Block.text_input("mute"),
-        Block.audio_input("unmute"),
-        Block.text_input("trigger")
+        Block.audio_input("unmute")
       ],
       outputs: [Block.audio_output(), Block.text_output("status", true, false)],
       ios: [],
@@ -29,18 +28,7 @@ defmodule Buildel.Blocks.AudioInput do
       "required" => ["name", "opts"],
       "properties" => %{
         "name" => name_schema(),
-        "opts" =>
-          options_schema(%{
-            "required" => ["store_audio"],
-            "properties" => %{
-              store_audio: %{
-                "type" => "boolean",
-                "title" => "Store audio",
-                "description" => "Store audio",
-                "default" => false
-              }
-            }
-          })
+        "opts" => options_schema()
       }
     }
   end
@@ -56,40 +44,17 @@ defmodule Buildel.Blocks.AudioInput do
     if state[:mute] do
       state
     else
-      state =
-        if state.opts[:store_audio] do
-          audio = Map.get(state, :audio)
-
-          if audio do
-            Map.put(state, :audio, audio ++ chunk)
-          else
-            state |> Map.put(:audio, chunk)
-          end
-        else
-          state
-        end
-
       output(state, "output", {:binary, chunk}, %{metadata: metadata})
     end
   end
 
   @impl true
-  def handle_input("trigger", {_topic, :text, _, metadata}, state) do
-    if state[:mute] do
-      state
-    else
-      audio = state.audio
-      output(state, "output", {:binary, audio}, %{metadata: metadata})
-    end
-  end
-
-  @impl true
-  def handle_input("mute", {_topic, :text, chunk, metadata}, state) do
+  def handle_input("mute", {_topic, :text, _chunk, metadata}, state) do
     state |> Map.put(:mute, true) |> output("status", {:text, "muted"}, %{metadata: metadata})
   end
 
   @impl true
-  def handle_input("unmute", {_topic, :binary, chunk, metadata}, state) do
+  def handle_input("unmute", {_topic, :binary, _chunk, metadata}, state) do
     state |> Map.put(:mute, false) |> output("status", {:text, "unmuted"}, %{metadata: metadata})
   end
 end
