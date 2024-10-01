@@ -41,7 +41,6 @@ defmodule Buildel.Blocks do
     Image,
     ImageOutput,
     Knowledge,
-    NewCollectAllText,
     CollectAllAudio
   }
 
@@ -82,7 +81,6 @@ defmodule Buildel.Blocks do
     "image" => Image,
     "image_output" => ImageOutput,
     "knowledge" => Knowledge,
-    "new_collect_all_text" => NewCollectAllText,
     "collect_all_audio" => CollectAllAudio
   }
 
@@ -123,7 +121,6 @@ defmodule Buildel.Blocks do
     Image => "image",
     ImageOutput => "image_output",
     Knowledge => "knowledge",
-    NewCollectAllText => "new_collect_all_text",
     CollectAllAudio => "collect_all_audio"
   }
 

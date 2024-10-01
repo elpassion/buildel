@@ -4,16 +4,14 @@ defmodule Buildel.ClientMocks.Elevenlabs do
 
   @impl ElevenlabsBehaviour
   def speak!(_api_key, state) do
-    {:ok, state.stream_to} |> IO.inspect()
+    {:ok, state.stream_to}
   end
 
   @impl ElevenlabsBehaviour
   def generate_speech(pid, _text) do
-    IO.inspect("Generating speech")
-
     send(
       pid,
-      {:audio_chunk, File.read!("test/support/fixtures/real.mp3")} |> IO.inspect()
+      {:audio_chunk, File.read!("test/support/fixtures/real.mp3")}
     )
 
     :ok

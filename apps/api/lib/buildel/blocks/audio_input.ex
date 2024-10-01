@@ -79,7 +79,6 @@ defmodule Buildel.Blocks.AudioInput do
       state
     else
       audio = state.audio
-      IO.inspect(audio)
       output(state, "output", {:binary, audio}, %{metadata: metadata})
     end
   end

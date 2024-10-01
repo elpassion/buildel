@@ -70,8 +70,6 @@ defmodule Buildel.Blocks.TextToSpeech do
   defp speak(chunk, state) do
     state = state |> send_stream_start()
 
-    IO.inspect(state |> Map.get(:elevenlabs_pid))
-
     state |> Map.get(:elevenlabs_pid) |> elevenlabs().generate_speech(chunk)
 
     state
@@ -96,7 +94,6 @@ defmodule Buildel.Blocks.TextToSpeech do
   end
 
   def handle_info({:audio_chunk, binary}, state) do
-    IO.inspect("AUDIO CHUNK")
     state = state |> output("output", {:binary, binary}, %{metadata: %{}, stream_stop: :schedule})
     {:noreply, state}
   end

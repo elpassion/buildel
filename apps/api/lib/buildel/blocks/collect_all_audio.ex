@@ -51,7 +51,6 @@ defmodule Buildel.Blocks.CollectAllAudio do
 
   defp drain_audio(state) do
     if state[:audio] == <<>> && !state[:draining_again] do
-      IO.inspect("Draining again")
       drain_again(state)
     else
       audio = state[:audio]
