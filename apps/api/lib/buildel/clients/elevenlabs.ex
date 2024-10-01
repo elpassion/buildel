@@ -32,7 +32,7 @@ defmodule Buildel.Clients.Elevenlabs do
     )
   end
 
-  @wss_url "wss://api.elevenlabs.io/v1/text-to-speech/cgSgspJ2msm6clMCkdW9/stream-input?model_id=eleven_turbo_v2_5&inactivity_timeout=180"
+  @wss_url "wss://api.elevenlabs.io/v1/text-to-speech/W35ccm4COCtmAxWULDPL/stream-input?model_id=eleven_turbo_v2_5&inactivity_timeout=180"
   def speak(state, opts \\ []) do
     WebSockex.start_link(@wss_url, __MODULE__, state, opts)
   end
