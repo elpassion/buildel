@@ -1,5 +1,6 @@
 defmodule Buildel.Clients.ElevenlabsBehaviour do
-  @callback synthesize(String.t(), String.t()) :: %HTTPoison.AsyncResponse{}
+  @callback speak!(String.t(), %{stream_to: pid}) :: {:ok, pid} | {:error, term}
+  @callback generate_speech(pid, String.t()) :: :ok
 end
 
 defmodule Buildel.Clients.Elevenlabs do
@@ -9,25 +10,9 @@ defmodule Buildel.Clients.Elevenlabs do
   use WebSockex
 
   @impl ElevenlabsBehaviour
-  def synthesize(text, api_key \\ nil) do
-    HTTPoison.post!(
-      "https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM/stream?optimize_streaming_latency=2",
-      Jason.encode!(%{
-        "text" => text,
-        "model_id" => "eleven_monolingual_v1",
-        "voice_settings" => %{"stability" => 0, "similarity_boost" => 0}
-      }),
-      [
-        {"Content-Type", "application/json"},
-        {"xi-api-key", api_key || System.get_env("ELEVENLABS_API_KEY")}
-      ],
-      stream_to: self()
-    )
-  end
-
-  def speak!(token, state \\ %{}) do
+  def speak!(api_key, state \\ %{}) do
     speak(state,
-      extra_headers: ["xi-api-key": token, "content-type": "application/json"],
+      extra_headers: ["xi-api-key": api_key, "content-type": "application/json"],
       debug: [:trace]
     )
   end
@@ -37,9 +22,8 @@ defmodule Buildel.Clients.Elevenlabs do
     WebSockex.start_link(@wss_url, __MODULE__, state, opts)
   end
 
+  @impl ElevenlabsBehaviour
   def generate_speech(pid, text) do
-    # IO.inspect(text, label: "text: ")
-
     WebSockex.send_frame(
       pid,
       {:text,
@@ -58,8 +42,6 @@ defmodule Buildel.Clients.Elevenlabs do
   end
 
   def flush(pid) do
-    IO.inspect("Flushing", label: "Flushing: ")
-
     WebSockex.send_frame(pid, {:text, Jason.encode!(%{text: " ", flush: true})})
   end
 

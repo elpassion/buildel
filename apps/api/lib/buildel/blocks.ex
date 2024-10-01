@@ -41,7 +41,6 @@ defmodule Buildel.Blocks do
     Image,
     ImageOutput,
     Knowledge,
-    NewTextToSpeechElevenlabs,
     NewCollectAllText,
     CollectAllAudio
   }
@@ -83,7 +82,6 @@ defmodule Buildel.Blocks do
     "image" => Image,
     "image_output" => ImageOutput,
     "knowledge" => Knowledge,
-    "new_text_to_speech_elevenlabs" => NewTextToSpeechElevenlabs,
     "new_collect_all_text" => NewCollectAllText,
     "collect_all_audio" => CollectAllAudio
   }
@@ -125,7 +123,6 @@ defmodule Buildel.Blocks do
     Image => "image",
     ImageOutput => "image_output",
     Knowledge => "knowledge",
-    NewTextToSpeechElevenlabs => "new_text_to_speech_elevenlabs",
     NewCollectAllText => "new_collect_all_text",
     CollectAllAudio => "collect_all_audio"
   }
