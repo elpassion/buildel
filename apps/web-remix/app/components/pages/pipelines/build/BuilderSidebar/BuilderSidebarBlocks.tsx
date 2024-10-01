@@ -187,11 +187,16 @@ interface BlockItemProps {
   onCreate: (created: IBlockConfig) => Promise<unknown>;
 }
 function BlockItem({ data, onCreate }: BlockItemProps) {
-  const [urlSrc, setUrlSrc] = useState(
-    resolveBlockTypeIconPath(`type/${data.block.type}`),
-  );
   const reactFlowInstance = useReactFlow();
   const { status: runStatus } = useRunPipeline();
+
+  const imageRef = React.useRef<HTMLImageElement>(null);
+
+  const onImageError = () => {
+    if (!imageRef.current) return;
+
+    imageRef.current.src = resolveBlockTypeIconPath('default');
+  };
 
   const onDragStart = (
     event: DragEvent<HTMLDivElement>,
@@ -234,10 +239,6 @@ function BlockItem({ data, onCreate }: BlockItemProps) {
     });
   }, [onCreate, reactFlowInstance, isRunning]);
 
-  const onImageError = () => {
-    setUrlSrc(resolveBlockTypeIconPath('default'));
-  };
-
   return (
     <TooltipProvider>
       <Tooltip>
@@ -258,8 +259,9 @@ function BlockItem({ data, onCreate }: BlockItemProps) {
             onClick={onClickAdd}
           >
             <img
+              ref={imageRef}
               className="w-3.5 h-3.5 shrink-0"
-              src={urlSrc}
+              src={resolveBlockTypeIconPath(`type/${data.block.type}`)}
               alt={data.block.type}
               onError={onImageError}
             />

@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import {
@@ -301,12 +301,12 @@ interface PipelineItemBlockListBlockProps {
 function PipelineItemBlockListBlock({
   block,
 }: PipelineItemBlockListBlockProps) {
-  const [urlSrc, setUrlSrc] = useState(
-    resolveBlockTypeIconPath(`type/${block.type}`),
-  );
+  const imageRef = React.useRef<HTMLImageElement>(null);
 
   const onImageError = () => {
-    setUrlSrc(resolveBlockTypeIconPath('default'));
+    if (!imageRef.current) return;
+
+    imageRef.current.src = resolveBlockTypeIconPath('default');
   };
 
   return (
@@ -321,10 +321,11 @@ function PipelineItemBlockListBlock({
             >
               {() => (
                 <img
-                  src={urlSrc}
+                  src={resolveBlockTypeIconPath(`type/${block.type}`)}
                   alt={block.type}
                   onError={onImageError}
                   className="w-3.5 h-3.5"
+                  ref={imageRef}
                 />
               )}
             </ClientOnly>
