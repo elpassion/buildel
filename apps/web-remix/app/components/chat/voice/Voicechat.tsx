@@ -25,6 +25,7 @@ import {
 } from '~/components/chat/voice/Voicechat.utils';
 import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
 import { Button } from '~/components/ui/button';
+import type { UseSoundArgs } from '~/hooks/useSound';
 import { useSound } from '~/hooks/useSound';
 import { assert } from '~/utils/assert';
 import { cn } from '~/utils/cn';
@@ -166,15 +167,26 @@ export function useVoicechat({
     voicechatReducer,
     DEFAULT_VOICECHAT_STATE,
   );
-  const prevStateRef = useRef<VoicechatReducerState>(state);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const mediaSourceRef = useRef<MediaSource | null>(null);
   const sourceBufferRef = useRef<SourceBuffer | null>(null);
-  const dotCanvasImageRef = useRef<HTMLImageElement | null>(null);
-  const dotCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
   const talkingCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const isStoppedByUser = useRef(false);
+
+  useVoicechatSound(state, {
+    src: '/sounds/toggle.mp3',
+  });
+
+  const { canvasRef: dotCanvasRef, visualizeDot } = useVisualizeVoicechatDot();
+  const {
+    visualizeAudio: visualizeTalking,
+    clearCanvas: clearTalkingCanvas,
+    stopVisualization: stopTalkingVisualization,
+  } = useAudioVisualize(talkingCanvasRef, {
+    renderBars: drawCircleBars,
+  });
 
   const onResume = (
     _e: Event,
@@ -201,14 +213,6 @@ export function useVoicechat({
     onStart: onResume,
   });
 
-  const {
-    visualizeAudio: visualizeTalking,
-    clearCanvas: clearTalkingCanvas,
-    stopVisualization: stopTalkingVisualization,
-  } = useAudioVisualize(talkingCanvasRef, {
-    renderBars: drawCircleBars,
-  });
-
   const stopRecording = async () => {
     isStoppedByUser.current = true;
 
@@ -228,16 +232,6 @@ export function useVoicechat({
     }
   };
 
-  const { visualizeAudio: visualizeDot } = useAudioVisualize(dotCanvasRef, {
-    renderBars: (canvas, ctx, frequencyBinCountArray) =>
-      drawChatCircle(
-        canvas,
-        ctx,
-        frequencyBinCountArray,
-        dotCanvasImageRef.current,
-      ),
-  });
-
   const input = pipeline.interface_config.webchat.audio_inputs.find(
     (input) => input.type === 'audio_input',
   );
@@ -245,6 +239,7 @@ export function useVoicechat({
   const output = pipeline.interface_config.webchat.audio_outputs.find(
     (input) => input.type === 'audio_output',
   );
+
   const onBlockOutput = (blockId: string, outputName: string, payload: any) => {
     if (blockId === output?.name) {
       processAudioEvents([{ block: blockId, output: outputName, payload }]);
@@ -370,41 +365,6 @@ export function useVoicechat({
     };
   }, []);
 
-  useEffect(() => {
-    const ctx = dotCanvasRef.current?.getContext('2d');
-
-    dotCanvasImageRef.current = new Image();
-    dotCanvasImageRef.current.src = '/icons/star.svg';
-
-    dotCanvasImageRef.current.onload = () => {
-      if (!dotCanvasRef.current || !ctx) return;
-
-      drawChatCircle(
-        dotCanvasRef.current,
-        ctx,
-        new Uint8Array(5),
-        dotCanvasImageRef.current,
-      );
-    };
-  }, []);
-
-  const { play: playSound } = useSound({
-    src: '/sounds/toggle.mp3',
-  });
-
-  useEffect(() => {
-    if (
-      (prevStateRef.current.status === 'listening' &&
-        state.status === 'recording') ||
-      (prevStateRef.current.status === 'recording' &&
-        state.status === 'listening')
-    ) {
-      playSound();
-    }
-
-    prevStateRef.current = state;
-  }, [state.status]);
-
   const startRecording = async () => {
     if (mediaRecorder && mediaRecorder.state === 'paused') {
       await resumeRecording();
@@ -451,4 +411,59 @@ export function useVoicechat({
     audioOutput: output,
     isAudioConfigured: !!input && !!output,
   };
+}
+
+function useVisualizeVoicechatDot() {
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const { visualizeAudio: visualizeDot } = useAudioVisualize(canvasRef, {
+    renderBars: (canvas, ctx, frequencyBinCountArray) =>
+      drawChatCircle(canvas, ctx, frequencyBinCountArray, imageRef.current),
+  });
+
+  useEffect(() => {
+    const ctx = canvasRef.current?.getContext('2d');
+
+    imageRef.current = new Image();
+    imageRef.current.src = '/icons/star.svg';
+
+    imageRef.current.onload = () => {
+      if (!canvasRef.current || !ctx) return;
+
+      drawChatCircle(
+        canvasRef.current,
+        ctx,
+        new Uint8Array(5),
+        imageRef.current,
+      );
+    };
+  }, []);
+
+  return {
+    visualizeDot,
+    canvasRef: canvasRef,
+  };
+}
+
+function useVoicechatSound(
+  state: VoicechatReducerState,
+  soundArgs: UseSoundArgs,
+) {
+  const prevStateRef = useRef<VoicechatReducerState>(state);
+
+  const { play: playSound } = useSound(soundArgs);
+
+  useEffect(() => {
+    if (
+      (prevStateRef.current.status === 'listening' &&
+        state.status === 'recording') ||
+      (prevStateRef.current.status === 'recording' &&
+        state.status === 'listening')
+    ) {
+      playSound();
+    }
+
+    prevStateRef.current = state;
+  }, [state.status]);
 }

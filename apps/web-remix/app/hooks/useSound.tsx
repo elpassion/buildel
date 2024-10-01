@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 
 import { assert } from '~/utils/assert';
 
-interface UseSoundArgs {
+export interface UseSoundArgs {
   src: string;
 }
 
