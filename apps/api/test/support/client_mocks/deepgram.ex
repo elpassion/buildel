@@ -22,7 +22,7 @@ defmodule Buildel.ClientMocks.Deepgram do
 
   @impl DeepgramBehaviour
   def listen!(_, state) do
-    {:ok, state.stream_to}
+    GenServer.start_link(__MODULE__, state, [])
   end
 
   def init(state) do

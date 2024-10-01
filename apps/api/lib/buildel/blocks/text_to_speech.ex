@@ -51,6 +51,7 @@ defmodule Buildel.Blocks.TextToSpeech do
       ) do
     api_key = block_context().get_secret_from_context(context_id, opts.api_key)
     state = state |> Map.put(:stream_to, self())
+    IO.inspect(self(), label: "tts")
 
     case elevenlabs().speak!(api_key, %{stream_to: self()}) do
       {:ok, elevenlabs_pid} ->
@@ -94,6 +95,7 @@ defmodule Buildel.Blocks.TextToSpeech do
   end
 
   def handle_info({:audio_chunk, binary}, state) do
+    IO.inspect("audio_chunk")
     state = state |> output("output", {:binary, binary}, %{metadata: %{}, stream_stop: :schedule})
     {:noreply, state}
   end
