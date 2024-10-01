@@ -290,6 +290,8 @@ export function useVoicechat({
 
         if (nextChunk) {
           sourceBufferRef.current.appendBuffer(nextChunk);
+          // append to buffer but do not play
+          if (!audioEnabled) return;
 
           setTimeout(async () => {
             if (audioRef.current) {
@@ -309,7 +311,6 @@ export function useVoicechat({
   };
 
   useEffect(() => {
-    if (!audioEnabled) return;
     const id = setInterval(() => {
       appendToBuffer();
     }, 150);
