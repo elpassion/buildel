@@ -246,7 +246,10 @@ export const PipelineResponse = z
     return response.data;
   });
 
-export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
+export const PipelinesResponse = z.object({
+  data: z.array(Pipeline),
+  meta: PaginationMeta,
+});
 
 export type IPipelinesResponse = z.TypeOf<typeof PipelinesResponse>;
 

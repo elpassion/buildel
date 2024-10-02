@@ -4,6 +4,7 @@ import invariant from 'tiny-invariant';
 
 import { OrganizationApi } from '~/api/organization/OrganizationApi';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
+import { getParamsPagination } from '~/components/pagination/usePagination';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
 
@@ -15,15 +16,37 @@ export async function loader(args: LoaderFunctionArgs) {
     const pipelineApi = new PipelineApi(fetch);
     const organizationApi = new OrganizationApi(fetch);
 
-    const pipelines = await pipelineApi.getPipelines(params.organizationId);
-    const { data: templates } = await organizationApi.getTemplates(
+    const searchParams = new URL(request.url).searchParams;
+
+    if (!searchParams.has('page')) {
+      searchParams.set('per_page', '30');
+    }
+
+    const { page, per_page, search } = getParamsPagination(searchParams);
+
+    const pipelinesPromise = pipelineApi.getPipelines(params.organizationId, {
+      page,
+      per_page,
+      search,
+    });
+
+    const templatesPromise = organizationApi.getTemplates(
       params.organizationId,
     );
 
+    const [{ data: pipelines }, templates] = await Promise.all([
+      pipelinesPromise,
+      templatesPromise,
+    ]);
+
+    const totalItems = pipelines.meta.total;
+    const totalPages = Math.ceil(totalItems / per_page);
+
     return json({
-      templates,
+      templates: templates.data,
       pipelines: pipelines.data,
       organizationId: params.organizationId,
+      pagination: { page, per_page, search, totalItems, totalPages },
     });
   })(args);
 }

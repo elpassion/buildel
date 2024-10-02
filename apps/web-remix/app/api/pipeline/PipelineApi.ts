@@ -180,11 +180,16 @@ export class PipelineApi {
     return pipeline.data;
   }
 
-  getPipelines(organizationId: string | number) {
-    return this.client(
-      PipelinesResponse,
+  getPipelines(
+    organizationId: string | number,
+    queryParams?: PaginationQueryParams,
+  ) {
+    const url = buildUrlWithParams(
       `/organizations/${organizationId}/pipelines`,
+      { ...queryParams },
     );
+
+    return this.client(PipelinesResponse, url);
   }
 
   deletePipeline(organizationId: string | number, pipelineId: string | number) {

@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
+import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
+import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
+import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
 import { Button } from '~/components/ui/button';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -19,7 +24,7 @@ import {
 } from './WorkflowTemplates';
 
 export function PipelinesPage() {
-  const { pipelines, organizationId } = useLoaderData<typeof loader>();
+  const { pagination, organizationId } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -37,28 +42,11 @@ export function PipelinesPage() {
       <Outlet />
 
       <PageContentWrapper className="grid grid-cols-1 gap-8 mt-6 lg:grid-cols-1">
-        {pipelines.data.length > 0 ? (
-          <>
-            <div className="flex-grow order-2 lg:order-1">
-              <Button
-                asChild
-                size="sm"
-                className="mb-3 w-fit ml-auto mr-0 flex lg:hidden"
-              >
-                <BasicLink
-                  to={routes.pipelinesNew(organizationId)}
-                  aria-label="Create new workflow"
-                >
-                  New Workflow
-                </BasicLink>
-              </Button>
-
-              <PipelinesList pipelines={pipelines.data} />
-            </div>
-          </>
+        {pagination.totalItems > 0 ? (
+          <ContentWithPipelines key={routes.pipelines(organizationId)} />
         ) : null}
 
-        {pipelines.data.length === 0 ? (
+        {pagination.totalItems === 0 ? (
           <TemplatesWithoutPipelines organizationId={organizationId} />
         ) : null}
       </PageContentWrapper>
@@ -128,5 +116,56 @@ function TemplatesWithoutPipelines({
         </BasicLink>
       </div>
     </WorkflowTemplates>
+  );
+}
+
+function ContentWithPipelines() {
+  const { ref: fetchNextRef, inView } = useInView();
+  const { pipelines, pagination } = useLoaderData<typeof loader>();
+
+  const organizationId = useOrganizationId();
+
+  const { hasNextPage, data, fetchNextPage, isFetchingNextPage } =
+    useInfiniteFetch<IPipeline, typeof loader>({
+      pagination,
+      initialData: pipelines,
+      loaderUrl: routes.pipelines(organizationId),
+      dataExtractor: (response) => response.data?.pipelines,
+    });
+
+  useEffect(() => {
+    if (inView && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, isFetchingNextPage]);
+
+  return (
+    <>
+      <div className="flex-grow order-2 lg:order-1">
+        <Button
+          asChild
+          size="sm"
+          className="mb-3 w-fit ml-auto mr-0 flex lg:hidden"
+        >
+          <BasicLink
+            to={routes.pipelinesNew(organizationId)}
+            aria-label="Create new workflow"
+          >
+            New Workflow
+          </BasicLink>
+        </Button>
+
+        <PipelinesList pipelines={data} />
+
+        <div className="flex justify-center mt-5" ref={fetchNextRef}>
+          <LoadMoreButton
+            isFetching={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            onClick={fetchNextPage}
+            className="text-xs"
+          />
+        </div>
+      </div>
+    </>
   );
 }
