@@ -11,6 +11,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'args',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -18,6 +19,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'response',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -25,6 +27,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'tool',
           type: 'worker',
+          visible: true,
           public: false,
         },
       ],
@@ -112,6 +115,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'audio',
+          visible: true,
           public: true,
         },
       ],
@@ -119,6 +123,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'audio',
+          visible: true,
           public: false,
         },
       ],
@@ -161,6 +166,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'audio',
+          visible: true,
           public: false,
         },
       ],
@@ -168,6 +174,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'audio',
+          visible: true,
           public: true,
         },
       ],
@@ -222,6 +229,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -229,11 +237,13 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'text',
+          visible: true,
           public: false,
         },
         {
           name: 'message_output',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -241,11 +251,13 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'tool',
           type: 'controller',
+          visible: true,
           public: false,
         },
         {
           name: 'chat',
           type: 'worker',
+          visible: true,
           public: false,
         },
       ],
@@ -430,6 +442,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -437,6 +450,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -492,12 +506,14 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
           name: 'input',
           type: 'text',
           public: false,
+          visible: true,
         },
       ],
       outputs: [
         {
           name: 'sentences_output',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -551,11 +567,13 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'organization_id',
           type: 'text',
+          visible: true,
           public: false,
         },
         {
           name: 'pipeline_id',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -564,6 +582,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'tool',
           type: 'worker',
+          visible: true,
           public: false,
         },
       ],
@@ -618,10 +637,12 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
           name: 'files',
           type: 'file',
           public: true,
+          visible: true,
         },
         {
           name: 'query',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -629,6 +650,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -636,6 +658,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'tool',
           type: 'worker',
+          visible: true,
           public: false,
         },
       ],
@@ -776,6 +799,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'tool',
           type: 'worker',
+          visible: true,
           public: false,
         },
       ],
@@ -899,6 +923,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'file',
+          visible: true,
           public: true,
         },
       ],
@@ -907,6 +932,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
           name: 'output',
           type: 'file',
           public: false,
+          visible: true,
         },
       ],
       ios: [],
@@ -948,6 +974,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'audio',
+          visible: true,
           public: false,
         },
       ],
@@ -955,16 +982,19 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'text',
+          visible: true,
           public: false,
         },
         {
           name: 'json_output',
           type: 'text',
+          visible: true,
           public: false,
         },
         {
           name: 'srt_output',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -1072,6 +1102,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -1079,12 +1110,14 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'text',
+          visible: true,
           public: false,
         },
         {
           name: 'message_output',
           type: 'text',
           public: false,
+          visible: true,
         },
       ],
       ios: [],
@@ -1233,6 +1266,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -1240,12 +1274,14 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'true',
           type: 'text',
+          visible: true,
           public: false,
         },
         {
           name: 'false',
           type: 'text',
           public: false,
+          visible: true,
         },
       ],
       ios: [],
@@ -1305,6 +1341,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       inputs: [
         {
           name: 'input',
+          visible: true,
           type: 'text',
           public: false,
         },
@@ -1313,6 +1350,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -1374,6 +1412,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'audio',
+          visible: true,
           public: false,
         },
       ],
@@ -1382,11 +1421,13 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
           name: 'output',
           type: 'text',
           public: false,
+          visible: true,
         },
         {
           name: 'json_output',
           type: 'text',
           public: false,
+          visible: true,
         },
       ],
       ios: [],
@@ -1493,6 +1534,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -1501,6 +1543,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
           name: 'output',
           type: 'text',
           public: false,
+          visible: true,
         },
       ],
       ios: [],
@@ -1562,6 +1605,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'text',
+          visible: true,
           public: true,
         },
       ],
@@ -1569,6 +1613,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -1617,6 +1662,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -1624,6 +1670,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'text',
+          visible: true,
           public: true,
         },
       ],
@@ -1688,6 +1735,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'input',
           type: 'text',
+          visible: true,
           public: false,
         },
       ],
@@ -1695,6 +1743,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
         {
           name: 'output',
           type: 'audio',
+          visible: true,
           public: false,
         },
       ],
@@ -1776,6 +1825,7 @@ export const blockTypesFixture = (blocks: IBlockTypes = []): IBlockTypes => {
       inputs: [
         {
           name: 'input',
+          visible: true,
           type: 'text',
           public: false,
         },

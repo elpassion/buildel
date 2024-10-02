@@ -13,6 +13,10 @@ export const pipelineFixture = (override?: Partial<IPipeline>): IPipeline => {
       webchat: {
         inputs: [{ name: 'text_input_1', type: 'text_input' }],
         outputs: [{ name: 'text_output_1', type: 'text_output' }],
+        audio_outputs: [],
+        audio_inputs: [],
+        suggested_messages: [],
+        description: 'Hello. How can I help you today?',
         public: false,
       },
       form: {
@@ -168,6 +172,10 @@ export const simplePipelineFixture = (
       webchat: {
         inputs: [{ name: 'text_input_1', type: 'text_input' }],
         outputs: [{ name: 'text_output_1', type: 'text_output' }],
+        audio_outputs: [],
+        audio_inputs: [],
+        suggested_messages: [],
+        description: 'Hello. How can I help you today?',
         public: false,
       },
       form: {
