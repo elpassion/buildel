@@ -240,15 +240,47 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
       assert json_response(conn, 200)["data"] == []
     end
 
-    test "lists all organization pipelines", %{
+    test "lists all organization pipelines if no pagination params provided", %{
       conn: conn,
       organization: organization,
       api_spec: api_spec
     } do
       organization_id = organization.id
       pipeline_fixture(%{organization_id: organization_id})
+      pipeline_fixture(%{organization_id: organization_id})
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines")
       response = json_response(conn, 200)
+
+      %{
+        "meta" => %{
+          "total" => 2,
+          "page" => 1,
+          "per_page" => 2
+        }
+      } = response
+
+      assert_schema(response, "PipelineIndexResponse", api_spec)
+    end
+
+    test "lists paginated organization pipelines", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      pipeline_fixture(%{organization_id: organization_id})
+      pipeline_fixture(%{organization_id: organization_id})
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines?page=1&per_page=1")
+      response = json_response(conn, 200)
+
+      %{
+        "meta" => %{
+          "total" => 2,
+          "page" => 1,
+          "per_page" => 1
+        }
+      } = response
+
       assert_schema(response, "PipelineIndexResponse", api_spec)
     end
   end

@@ -175,37 +175,35 @@ defmodule BuildelWeb.DatasetRowsController do
     end
   end
 
-
-
   operation :bulk_delete,
     summary: "Bulk delete dataset rows",
     parameters: [
       organization_id: [in: :path, description: "Organization ID", type: :integer],
-      dataset_id: [in: :path, description: "Dataset id", type: :integer],
+      dataset_id: [in: :path, description: "Dataset id", type: :integer]
     ],
     request_body:
-       {"bulk_delete", "application/json", BuildelWeb.Schemas.DatasetRows.BulkDeleteRequest},
+      {"bulk_delete", "application/json", BuildelWeb.Schemas.DatasetRows.BulkDeleteRequest},
     responses: [
       ok: {"ok", "application/json", nil},
       unauthorized:
         {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
-      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
     ],
     security: [%{"authorization" => []}]
+
   def bulk_delete(conn, _) do
     %{organization_id: organization_id, dataset_id: dataset_id} = conn.params
     %{ids: ids} = conn.body_params
 
-
-   with {:ok, organization} <- Buildel.Organizations.get_user_organization(conn.assigns.current_user, organization_id),
-        {:ok, dataset} <- Buildel.Datasets.get_organization_dataset(organization, dataset_id),
-        {:ok,_} <- Buildel.Datasets.Rows.bulk_delete_rows(dataset, ids) do
-          conn
-          |> put_status(:ok)
-          |> json(%{})
-      end
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(conn.assigns.current_user, organization_id),
+         {:ok, dataset} <- Buildel.Datasets.get_organization_dataset(organization, dataset_id),
+         {:ok, _} <- Buildel.Datasets.Rows.bulk_delete_rows(dataset, ids) do
+      conn
+      |> put_status(:ok)
+      |> json(%{})
+    end
   end
-
 
   operation :update,
     summary: "Update dataset row",

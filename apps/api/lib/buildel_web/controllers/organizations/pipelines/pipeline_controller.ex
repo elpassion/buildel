@@ -145,9 +145,19 @@ defmodule BuildelWeb.OrganizationPipelineController do
 
   operation :index,
     summary: "List user organization pipelines",
-    parameters: [
-      organization_id: [in: :path, description: "Organization ID", type: :integer, required: true]
-    ],
+    parameters:
+      [
+        organization_id: [
+          in: :path,
+          description: "Organization ID",
+          type: :integer,
+          required: true
+        ]
+      ] ++
+        BuildelWeb.Schemas.Pagination.default_params(%{
+          page: nil,
+          per_page: nil
+        }),
     request_body: nil,
     responses: [
       ok: {"success", "application/json", BuildelWeb.Schemas.Pipelines.IndexResponse},
@@ -164,9 +174,12 @@ defmodule BuildelWeb.OrganizationPipelineController do
     %{"organization_id" => organization_id} = conn.params
     user = conn.assigns.current_user
 
+    params =
+      Pipelines.ListParams.from_map(conn.params)
+
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
-         pipelines <- Pipelines.list_organization_pipelines(organization) do
-      render(conn, :index, pipelines: pipelines)
+         {:ok, pipelines, count} <- Pipelines.list_organization_pipelines(organization, params) do
+      render(conn, :index, pipelines: pipelines, params: params, total: count)
     end
   end
 

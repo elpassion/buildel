@@ -70,7 +70,6 @@ defmodule BuildelWeb.Schemas.DatasetRows do
     })
   end
 
-
   defmodule BulkDeleteRequest do
     require OpenApiSpex
 

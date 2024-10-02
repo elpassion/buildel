@@ -72,9 +72,10 @@ defmodule BuildelWeb.Schemas.Pipelines do
         data: %Schema{
           type: :array,
           items: BuildelWeb.Schemas.Pipelines.Pipeline
-        }
+        },
+        meta: BuildelWeb.Schemas.Pagination.Meta
       },
-      required: [:data]
+      required: [:data, :meta]
     })
   end
 

@@ -8,6 +8,28 @@ defmodule Buildel.Pipelines do
   alias Buildel.Pipelines.Pipeline
   alias Buildel.Organizations.Organization
 
+  defmodule ListParams do
+    defstruct [:page, :per_page]
+
+    def from_map(params) do
+      %__MODULE__{}
+      |> struct(%{
+        page:
+          Map.get(params, "page", nil)
+          |> then(fn
+            nil -> nil
+            page -> String.to_integer(page)
+          end),
+        per_page:
+          Map.get(params, "per_page", nil)
+          |> then(fn
+            nil -> nil
+            per_page -> String.to_integer(per_page)
+          end)
+      })
+    end
+  end
+
   def list_pipelines do
     Repo.all(Pipeline)
   end
@@ -31,9 +53,26 @@ defmodule Buildel.Pipelines do
     Repo.delete(pipeline, allow_stale: true)
   end
 
-  def list_organization_pipelines(%Organization{} = organization) do
-    from(p in Pipeline, where: p.organization_id == ^organization.id, order_by: [desc: p.id])
-    |> Repo.all()
+  def list_organization_pipelines(
+        %Organization{} = organization,
+        %ListParams{} = params
+      ) do
+    query =
+      from(p in Pipeline, where: p.organization_id == ^organization.id, order_by: [desc: p.id])
+
+    items =
+      case params do
+        %{page: nil, per_page: nil} ->
+          query |> Repo.all()
+
+        %{page: page, per_page: per_page} ->
+          offset = page * per_page
+          query |> limit(^per_page) |> offset(^offset) |> Repo.all()
+      end
+
+    count = query |> Repo.aggregate(:count, :id)
+
+    {:ok, items, count}
   end
 
   def get_organization_pipeline(%Organization{} = organization, id) do
