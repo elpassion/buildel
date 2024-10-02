@@ -16,6 +16,7 @@ import type { ChatSize, IMessage } from '~/components/chat/chat.types';
 import { isWebchatConfigured } from '~/components/chat/chat.utils';
 import { ChatHeading } from '~/components/chat/ChatHeading';
 import { ChatInput } from '~/components/chat/ChatInput';
+import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { ChatMessages } from '~/components/chat/ChatMessages';
 import { ChatWrapper } from '~/components/chat/ChatWrapper';
 import { useChat } from '~/components/chat/useChat';
@@ -445,8 +446,8 @@ ${JSON.stringify(files)}
 
 function VoiceChatTranscription({ message }: { message?: IMessage }) {
   return (
-    <div className="max-w-[800px] text-center">
-      <p className="text-sm text-muted-foreground">{message?.message}</p>
+    <div className="max-w-[800px] text-center text-muted-foreground text-sm">
+      {message ? <ChatMarkdown>{message.message}</ChatMarkdown> : null}
     </div>
   );
 }
