@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
-import { useFetcher } from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import {
   CircleCheck,
@@ -15,7 +14,6 @@ import { ValidatedForm } from 'remix-validated-form';
 import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
 import { HiddenField } from '~/components/form/fields/field.context';
 import { IconButton } from '~/components/iconButton';
-import { confirm } from '~/components/modal/confirm';
 import { resolveBlockTypeIconPath } from '~/components/pages/pipelines/blockTypes.utils';
 import type { BadgeProps } from '~/components/ui/badge';
 import { Badge } from '~/components/ui/badge';
@@ -65,25 +63,14 @@ export const PipelinesListItem = ({
 
 interface PipelineListItemHeaderProps {
   pipeline: IPipeline;
+  onDelete?: (pipeline: IPipeline, e: React.MouseEvent<HTMLDivElement>) => void;
 }
 export const PipelineListItemHeader = ({
   pipeline,
+  onDelete,
 }: PipelineListItemHeaderProps) => {
-  const fetcher = useFetcher();
-
   const handleDelete = async (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    confirm({
-      onConfirm: async () =>
-        fetcher.submit({ pipelineId: pipeline.id }, { method: 'delete' }),
-      confirmText: 'Delete workflow',
-      children: (
-        <p className="text-sm">
-          You are about to delete the "{pipeline.name}” workflow from your
-          organisation. This action is irreversible.
-        </p>
-      ),
-    });
+    onDelete?.(pipeline, e);
   };
 
   return (

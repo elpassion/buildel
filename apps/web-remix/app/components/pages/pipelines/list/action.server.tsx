@@ -46,6 +46,8 @@ export async function action(actionArgs: ActionFunctionArgs) {
         },
       );
     },
+    // eslint-disable-next-line
+    // @ts-ignore
     delete: async ({ params, request }, { fetch }) => {
       await requireLogin(request);
       invariant(params.organizationId, 'Missing organizationId');
@@ -60,7 +62,7 @@ export async function action(actionArgs: ActionFunctionArgs) {
       );
 
       return json(
-        {},
+        { pipelineId },
         {
           headers: {
             'Set-Cookie': await setServerToast(request, {

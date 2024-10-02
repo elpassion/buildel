@@ -31,7 +31,7 @@ export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
     if (fetcher.state !== 'idle') return;
     goToNext?.();
   };
-
+  console.log(page, data);
   useEffect(() => {
     if (data[page] !== undefined) return;
 
@@ -53,11 +53,16 @@ export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
   }, [fetcher.data]);
 
   const mergedData = useMemo(() => {
-    return Object.values(data).reduce(
-      (acc, curr) => [...acc, ...curr],
-      [] as T[],
-    );
+    return merge(data);
   }, [data]);
+
+  const updateData = (cb: (data: T[]) => T[]) => {
+    setData((prev) => {
+      const newData = cb(merge(prev));
+
+      return splitByPage(newData, per_page);
+    });
+  };
 
   return {
     page,
@@ -67,5 +72,30 @@ export const useInfiniteFetch = <T, R>(args: UseInfiniteFetchProps<T, R>) => {
     fetchNextPage,
     isFetchingNextPage: fetcher.state !== 'idle',
     data: mergedData,
+    updateData,
   };
 };
+
+function merge<T>(data: Record<number, T[]>): T[] {
+  return Object.values(data).reduce(
+    (acc, curr) => [...acc, ...curr],
+    [] as T[],
+  );
+}
+
+function splitByPage<T>(data: T[], per_page: number): Record<number, T[]> {
+  return data.reduce(
+    (acc, curr, index) => {
+      const page = Math.floor(index / per_page);
+
+      if (!acc[page]) {
+        acc[page] = [];
+      }
+
+      acc[page].push(curr);
+
+      return acc;
+    },
+    {} as Record<number, T[]>,
+  );
+}

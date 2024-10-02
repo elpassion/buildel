@@ -1,20 +1,27 @@
 import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
-import { Outlet, useLoaderData } from '@remix-run/react';
+import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
+import { ItemList } from '~/components/list/ItemList';
+import { confirm } from '~/components/modal/confirm';
+import {
+  PipelineListItemContent,
+  PipelineListItemHeader,
+  PipelinesListItem,
+} from '~/components/pages/pipelines/list/PipelinesListItem';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
 import { Button } from '~/components/ui/button';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
 import type { loader } from './loader.server';
-import { PipelinesList } from './PipelinesList';
 import { PipelinesNavbar } from './PipelinesNavbar';
 import {
   DefaultTemplateItem,
@@ -125,7 +132,7 @@ function ContentWithPipelines() {
 
   const organizationId = useOrganizationId();
 
-  const { hasNextPage, data, fetchNextPage, isFetchingNextPage } =
+  const { hasNextPage, data, fetchNextPage, isFetchingNextPage, updateData } =
     useInfiniteFetch<IPipeline, typeof loader>({
       pagination,
       initialData: pipelines,
@@ -133,11 +140,42 @@ function ContentWithPipelines() {
       dataExtractor: (response) => response.data?.pipelines,
     });
 
+  const deleteFetcher = useFetcher<{ pipelineId: string }>();
+
+  const deletePipeline = async (
+    pipeline: IPipeline,
+    e: React.MouseEvent<HTMLDivElement>,
+  ) => {
+    e.preventDefault();
+
+    confirm({
+      onConfirm: async () =>
+        deleteFetcher.submit({ pipelineId: pipeline.id }, { method: 'delete' }),
+      confirmText: 'Delete workflow',
+      children: (
+        <p className="text-sm">
+          You are about to delete the "{pipeline.name}” workflow from your
+          organisation. This action is irreversible.
+        </p>
+      ),
+    });
+  };
+
   useEffect(() => {
-    if (inView && !isFetchingNextPage) {
+    if (inView && !isFetchingNextPage && hasNextPage) {
       fetchNextPage();
     }
-  }, [inView, isFetchingNextPage]);
+  }, [inView, isFetchingNextPage, hasNextPage]);
+
+  useEffect(() => {
+    if (deleteFetcher.data && deleteFetcher.state === 'idle') {
+      updateData(() =>
+        data.filter((item) => {
+          return item.id.toString() !== deleteFetcher.data!.pipelineId;
+        }),
+      );
+    }
+  }, [deleteFetcher.state]);
 
   return (
     <>
@@ -155,7 +193,22 @@ function ContentWithPipelines() {
           </BasicLink>
         </Button>
 
-        <PipelinesList pipelines={data} />
+        <ItemList
+          aria-label="Workflows list"
+          items={data}
+          renderItem={(item) => (
+            <BasicLink to={routes.pipelineBuild(item.organization_id, item.id)}>
+              <PipelinesListItem className="flex flex-col">
+                <PipelineListItemHeader
+                  pipeline={item}
+                  onDelete={deletePipeline}
+                />
+                <PipelineListItemContent pipeline={item} />
+              </PipelinesListItem>
+            </BasicLink>
+          )}
+          className={cn('grid gap-4 grid-cols-1 sm:grid-cols-2')}
+        />
 
         <div className="flex justify-center mt-5" ref={fetchNextRef}>
           <LoadMoreButton
