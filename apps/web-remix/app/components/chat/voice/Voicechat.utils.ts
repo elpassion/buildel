@@ -53,19 +53,7 @@ export function drawChatCircle(
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
 
-  const gradient = ctx.createLinearGradient(
-    centerX - radius,
-    centerY + radius,
-    centerX + radius,
-    centerY - radius,
-  );
-
-  gradient.addColorStop(0, '#4776E6');
-  gradient.addColorStop(0.6, '#4776E6');
-  gradient.addColorStop(0.8, '#8E54E9');
-  gradient.addColorStop(1, '#8546e7');
-
-  ctx.fillStyle = gradient;
+  ctx.fillStyle = '#111';
   ctx.beginPath();
   ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
   ctx.fill();
