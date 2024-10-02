@@ -8,7 +8,11 @@ defmodule Buildel.Blocks.SpeechToTextTest do
                "This module is adept at transcribing audio data into text, offering outputs in both plain text and JSON formats.",
              type: "speech_to_text",
              inputs: [Block.audio_input("input")],
-             outputs: [Block.text_output("output"), Block.text_output("json_output")],
+             outputs: [
+               Block.text_output("output"),
+               Block.text_output("json_output"),
+               Block.text_output("end")
+             ],
              schema: SpeechToText.schema(),
              groups: ["audio", "text"],
              ios: [],

@@ -86,7 +86,15 @@ defmodule Buildel.Blocks.MapInputs do
 
   @impl true
   def handle_input("input", {topic, :text, message, _metadata}, state) do
-    state |> save_latest_input_value(topic, message |> String.trim()) |> combine()
+    state
+    |> save_latest_input_value(
+      topic,
+      case is_binary(message) do
+        true -> message |> String.trim()
+        false -> message |> Jason.encode!()
+      end
+    )
+    |> combine()
   end
 
   defp interpolate_template_with_take_latest_messages(state, template) do

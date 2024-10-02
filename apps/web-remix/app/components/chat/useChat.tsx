@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import cloneDeep from 'lodash.clonedeep';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -53,6 +53,24 @@ export const useChat = ({
     payload: unknown,
   ) => {
     onBlockOutputProps?.(blockName, outputName, payload);
+
+    const input = inputs.find((input) => input.name === blockName);
+
+    if (input) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          message: (payload as { message: string }).message,
+          id: uuidv4(),
+          role: 'user' as MessageRole,
+          created_at: new Date(),
+          blockName: input.name,
+          outputName: 'input',
+          blockId: getBlockId(input.name, 'input'),
+          state: 'done',
+        },
+      ]);
+    }
 
     if (!Object.keys(outputsGenerating).includes(blockName)) return;
 
@@ -188,18 +206,21 @@ export const useChat = ({
       });
     }
 
-    setIsGenerating(true);
-
-    setMessages((prev) => [...prev, baseMessage]);
-
     messages.forEach((message) => {
       push(message.blockId, message.message);
     });
+
+    setIsGenerating(true);
   };
+
+  const latestAiMessage = useMemo(() => {
+    return getLatestAiMessage(messages);
+  }, [messages]);
 
   return {
     stopRun,
     messages,
+    latestAiMessage,
     startRun,
     isGenerating:
       isGenerating || Object.values(outputsGenerating).some((v) => v),
@@ -207,6 +228,7 @@ export const useChat = ({
     pushMessage: handlePush,
     connectionStatus: status,
     runId: id,
+    push,
   };
 };
 
@@ -238,4 +260,11 @@ function retrieveInputsFromMessage(message: string): {
     ),
     text: message.replace(regex, '').trim(),
   };
+}
+
+function getLatestAiMessage(messages: IMessage[]) {
+  return ([] as IMessage[])
+    .concat(messages)
+    .reverse()
+    .find((msg) => msg.role === 'ai');
 }

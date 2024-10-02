@@ -18,6 +18,14 @@ defmodule BuildelWeb.ChannelAuthController do
     required(:socket_id, :string)
   end
 
+  defp parse_ids([organization_id, pipeline_id]) do
+    {organization_id, pipeline_id, nil}
+  end
+
+  defp parse_ids([organization_id, pipeline_id, run_id]) do
+    {organization_id, pipeline_id, run_id}
+  end
+
   def create(
         conn,
         %{"channel_name" => "pipelines:" <> _organization_pipeline_id = _channel_name} = params
@@ -30,8 +38,7 @@ defmodule BuildelWeb.ChannelAuthController do
             socket_id: socket_id
           }} <- validate(:create, params),
          ids <- String.split(organization_pipeline_id, ":"),
-         {organization_id, pipeline_id, runId} <- parse_ids(ids),
-
+         {organization_id, pipeline_id, _runId} <- parse_ids(ids),
          {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = _pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id) do
@@ -56,14 +63,6 @@ defmodule BuildelWeb.ChannelAuthController do
       err ->
         err
     end
-  end
-
-  defp parse_ids([organization_id, pipeline_id]) do
-    {organization_id, pipeline_id, nil}
-  end
-
-  defp parse_ids([organization_id, pipeline_id, run_id]) do
-    {organization_id, pipeline_id, run_id}
   end
 
   def create(

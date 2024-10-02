@@ -27,7 +27,7 @@ defmodule Buildel.Blocks.CollectAllText do
         "inputs" => inputs_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["drain_signal", "join_as", "reset_signal"],
+            "required" => ["drain_signal", "join_as"],
             "properties" =>
               Jason.OrderedObject.new(
                 join_as: %{
@@ -79,7 +79,6 @@ defmodule Buildel.Blocks.CollectAllText do
 
   @impl true
   def handle_input("drain", {_name, :text, _message, _metadata}, state) do
-    IO.inspect(state)
     drain_text(state)
   end
 
@@ -107,7 +106,7 @@ defmodule Buildel.Blocks.CollectAllText do
 
   defp save_text_chunk(text_chunk, %{join_as: "string"} = state) do
     state = state |> send_stream_start("output")
-    text = state[:acc] <> text_chunk
+    text = state[:acc] <> " " <> text_chunk
 
     state |> Map.put(:acc, text)
   end

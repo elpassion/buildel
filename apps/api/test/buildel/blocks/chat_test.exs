@@ -15,8 +15,8 @@ defmodule Buildel.Blocks.ChatTest do
              schema: Chat.schema(),
              groups: ["llms", "text"],
              ios: [
-               %{name: "tool", public: false, type: "controller"},
-               %{name: "chat", public: false, type: "worker"}
+               %{name: "tool", public: false, type: "controller", visible: true},
+               %{name: "chat", public: false, type: "worker", visible: true}
              ],
              dynamic_ios: nil
            }

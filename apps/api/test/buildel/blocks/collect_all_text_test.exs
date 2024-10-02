@@ -7,7 +7,11 @@ defmodule Buildel.Blocks.CollectAllTextTest do
              type: "collect_all_text",
              description:
                "This module specializes in accumulating and consolidating text input from streaming sources.",
-             inputs: [Block.text_input(), Block.text_input("drain"), Block.text_input("reset")],
+             inputs: [
+               Block.text_input("input"),
+               Block.text_input("drain"),
+               Block.text_input("reset")
+             ],
              outputs: [Block.text_output("output")],
              schema: CollectAllText.schema(),
              groups: ["text", "utils"],
@@ -22,8 +26,7 @@ defmodule Buildel.Blocks.CollectAllTextTest do
                "name" => "test",
                "opts" => %{
                  "drain_signal" => "any",
-                 "join_as" => "string",
-                 "reset_signal" => "any"
+                 "join_as" => "string"
                },
                "inputs" => []
              })

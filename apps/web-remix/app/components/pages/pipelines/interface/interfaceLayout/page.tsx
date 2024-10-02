@@ -49,16 +49,6 @@ export function InterfaceLayout() {
           </OutlinedTabLink>
 
           <OutlinedTabLink
-            to={routes.pipelineVoiceChatbot(
-              organizationId,
-              pipelineId,
-              Object.fromEntries(searchParams.entries()),
-            )}
-          >
-            Voice Chatbot
-          </OutlinedTabLink>
-
-          <OutlinedTabLink
             to={routes.pipelineForm(
               organizationId,
               pipelineId,

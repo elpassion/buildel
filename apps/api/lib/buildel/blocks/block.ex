@@ -11,35 +11,35 @@ defmodule Buildel.Blocks.Block do
     %{block | context: context}
   end
 
-  def audio_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "audio", public: public}
+  def audio_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "audio", public: public, visible: visible }
 
-  def audio_output(name \\ "output", public \\ false),
-    do: %{name: name, type: "audio", public: public}
+  def audio_output(name \\ "output", public \\ false, visible \\ true),
+    do: %{name: name, type: "audio", public: public, visible: visible}
 
-  def text_output(name \\ "output", public \\ false),
-    do: %{name: name, type: "text", public: public}
+  def text_output(name \\ "output", public \\ false, visible \\ true),
+    do: %{name: name, type: "text", public: public, visible: visible}
 
-  def text_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "text", public: public}
+  def text_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "text", public: public, visible: visible}
 
-  def file_output(name \\ "output", public \\ false),
-    do: %{name: name, type: "file", public: public}
+  def file_output(name \\ "output", public \\ false, visible \\ true),
+    do: %{name: name, type: "file", public: public, visible: visible}
 
-  def file_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "file", public: public}
+  def file_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "file", public: public, visible: visible}
 
-  def file_temporary_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "file_temporary", public: public}
+  def file_temporary_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "file_temporary", public: public, visible: visible}
 
-  def image_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "image", public: public}
+  def image_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "image", public: public, visible: visible}
 
-  def image_output(name \\ "output", public \\ false),
-    do: %{name: name, type: "image", public: public}
+  def image_output(name \\ "output", public \\ false, visible \\ true),
+    do: %{name: name, type: "image", public: public, visible: visible}
 
-  def io(name \\ "tool", role \\ "controller"),
-    do: %{name: name, type: role, public: false}
+  def io(name \\ "tool", role \\ "controller", visible \\ true),
+    do: %{name: name, type: role, public: false, visible: visible}
 
   def name(pid) do
     GenServer.call(pid, :name)

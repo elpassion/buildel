@@ -9,7 +9,7 @@ defmodule Buildel.Blocks.SpeechToText do
         "This module is adept at transcribing audio data into text, offering outputs in both plain text and JSON formats.",
       groups: ["audio", "text"],
       inputs: [Block.audio_input()],
-      outputs: [Block.text_output(), Block.text_output("json_output")],
+      outputs: [Block.text_output(), Block.text_output("json_output"), Block.text_output("end")],
       ios: [],
       dynamic_ios: nil,
       schema: schema()
@@ -46,7 +46,7 @@ defmodule Buildel.Blocks.SpeechToText do
                 "title" => "Model",
                 "description" =>
                   "Model allows you to supply a model to use to process submitted audio.",
-                "enum" => ["base", "enhanced"],
+                "enum" => ["base", "enhanced", "nova-2-phonecall"],
                 "enumPresentAs" => "radio",
                 "default" => "base"
               },
@@ -78,8 +78,11 @@ defmodule Buildel.Blocks.SpeechToText do
     lang = Map.get(opts, :language, "en")
     model = Map.get(opts, :model, "base")
 
-    case deepgram().connect!(api_key, %{stream_to: self(), language: lang, model: model}) do
+    state = state |> Map.put(:stream_to, self())
+
+    case deepgram().listen!(api_key, %{stream_to: self(), language: lang, model: model}) do
       {:ok, deepgram_pid} ->
+        Process.send_after(self(), {:keep_alive}, 5000)
         {:ok, state |> Map.put(:deepgram_pid, deepgram_pid)}
 
       {:error, _reason} ->
@@ -102,11 +105,24 @@ defmodule Buildel.Blocks.SpeechToText do
   end
 
   @impl true
+  def handle_info({:keep_alive}, state) do
+    deepgram().keep_alive(state.deepgram_pid)
+    Process.send_after(self(), {:keep_alive}, 5000)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info({:end}, state) do
+    state = state |> output("end", {:text, ""})
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_info({:transcript, %{message: "", is_final: _}}, state) do
     {:noreply, state}
   end
 
-  def handle_info({:transcript, %{message: text, is_final: true}}, state) do
+  def handle_info({:transcript, %{message: text}}, state) do
     state = output(state, "output", {:text, text})
     {:noreply, state}
   end

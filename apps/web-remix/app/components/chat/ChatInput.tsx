@@ -208,7 +208,8 @@ export function ChatInput({
         >
           <div
             className={cn('w-full h-full', {
-              'min-h-[48px]': size !== 'sm',
+              'min-h-[48px]': size === 'default',
+              'min-h-[36px]': size === 'sm',
             })}
           >
             <EditorContent

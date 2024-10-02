@@ -142,15 +142,7 @@ export const routes = {
       `${routes.pipelineInterface(organizationId, pipelineId)}/website-chatbot`,
       params,
     ),
-  pipelineVoiceChatbot: (
-    organizationId: OrganizationId,
-    pipelineId: PipelineId,
-    params: RouteParam = {},
-  ) =>
-    buildUrlWithParams(
-      `${routes.pipelineInterface(organizationId, pipelineId)}/voice-chatbot`,
-      params,
-    ),
+
   pipelineForm: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,

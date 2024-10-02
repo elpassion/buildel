@@ -38,6 +38,13 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     (block) => block.type === 'text_output',
   );
 
+  const audioInputs = pipeline.config.blocks.filter((block) =>
+    ['audio_input'].includes(block.type),
+  );
+  const audioOutputs = pipeline.config.blocks.filter((block) =>
+    ['audio_output'].includes(block.type),
+  );
+
   const handleOnSubmit = (
     data: IInterfaceConfig,
     e: React.FormEvent<HTMLFormElement>,
@@ -58,11 +65,29 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
       };
     });
 
+    const audio_inputs = data.webchat.audio_inputs.map((input) => {
+      const parsed = JSON.parse(input as unknown as string);
+      return {
+        name: parsed.name as string,
+        type: parsed.type as string,
+      };
+    });
+
+    const audio_outputs = data.webchat.audio_outputs.map((output) => {
+      const parsed = JSON.parse(output as unknown as string);
+      return {
+        name: parsed.name as string,
+        type: parsed.type as string,
+      };
+    });
+
     const body: IInterfaceConfig = {
       ...pipeline.interface_config,
       webchat: {
         inputs,
         outputs,
+        audio_inputs,
+        audio_outputs,
         description: data.webchat.description,
         suggested_messages: data.webchat.suggested_messages.filter(
           (msg) => !!msg,
@@ -105,6 +130,25 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 
               <span>Public</span>
             </Label>
+          </Field>
+        </div>
+
+        <div className="w-full grid gap-3 grid-cols-1 sm:grid-cols-2  md:grid-cols-3 items-center">
+          <Field name="webchat.audio_inputs">
+            <SelectField
+              options={audioInputs.map(toSelectOption)}
+              mode="multiple"
+              label="Audio Inputs"
+            />
+          </Field>
+
+          <Field name="webchat.audio_outputs">
+            <SelectField
+              options={audioOutputs.map(toSelectOption)}
+              mode="multiple"
+              label="Audio Outputs"
+              className="!min-w-full"
+            />
           </Field>
         </div>
 
@@ -180,6 +224,12 @@ function toSelectDefaults(data: IInterfaceConfig) {
         JSON.stringify({ name: item.name, type: item.type }),
       ),
       outputs: data.webchat.outputs.map((item) =>
+        JSON.stringify({ name: item.name, type: item.type }),
+      ),
+      audio_inputs: data.webchat.audio_inputs.map((item) =>
+        JSON.stringify({ name: item.name, type: item.type }),
+      ),
+      audio_outputs: data.webchat.audio_outputs.map((item) =>
         JSON.stringify({ name: item.name, type: item.type }),
       ),
       description: data.webchat.description,
