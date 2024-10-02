@@ -9,6 +9,7 @@ defmodule Buildel.Pipelines.Pipeline do
     field(:interface_config, :map)
     field(:budget_limit, :decimal)
     field(:logs_enabled, :boolean, default: false)
+    field(:favorite, :boolean, default: false)
 
     has_many(:runs, Buildel.Pipelines.Run, on_delete: :delete_all)
     has_many(:pipeline_aliases, Buildel.Pipelines.Alias, on_delete: :delete_all)
@@ -29,7 +30,8 @@ defmodule Buildel.Pipelines.Pipeline do
       :interface_config,
       :organization_id,
       :budget_limit,
-      :logs_enabled
+      :logs_enabled,
+      :favorite
     ])
     |> validate_required([:name, :config, :organization_id])
     |> assoc_constraint(:organization)

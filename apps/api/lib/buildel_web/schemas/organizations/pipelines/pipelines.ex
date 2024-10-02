@@ -25,12 +25,13 @@ defmodule BuildelWeb.Schemas.Pipelines do
         name: %Schema{type: :string, description: "Pipeline name"},
         budget_limit: %Schema{type: :number, description: "Pipeline budget limit", nullable: true},
         logs_enabled: %Schema{type: :boolean, description: "Pipeline logs toggle"},
+        favorite: %Schema{type: :boolean, description: "Pipeline favorite toggle"},
         organization_id: %Schema{type: :integer, description: "Organization ID"},
         interface_config: %Schema{type: :object, description: "Interface config", nullable: true},
         runs_count: %Schema{type: :integer, description: "Runs count"},
         config: PipelineConfig
       },
-      required: [:id, :name, :organization_id, :runs_count, :config, :logs_enabled]
+      required: [:id, :name, :organization_id, :runs_count, :config, :logs_enabled, :favorite]
     })
   end
 

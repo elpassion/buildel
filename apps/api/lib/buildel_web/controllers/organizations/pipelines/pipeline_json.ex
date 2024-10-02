@@ -75,6 +75,7 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
       name: pipeline.name,
       budget_limit: pipeline.budget_limit,
       logs_enabled: pipeline.logs_enabled,
+      favorite: pipeline.favorite,
       organization_id: pipeline.organization_id,
       interface_config: pipeline.interface_config,
       runs_count: pipeline.runs_count,

@@ -90,6 +90,12 @@ defmodule BuildelWeb.Router do
       param: "pipeline_id"
     )
 
+    post(
+      "/organizations/:organization_id/pipelines/:pipeline_id/favorite",
+      OrganizationPipelineController,
+      :favorite
+    )
+
     get(
       "/organizations/:organization_id/pipelines/:pipeline_id/details",
       OrganizationPipelineController,

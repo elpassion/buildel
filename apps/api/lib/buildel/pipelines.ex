@@ -9,7 +9,7 @@ defmodule Buildel.Pipelines do
   alias Buildel.Organizations.Organization
 
   defmodule ListParams do
-    defstruct [:page, :per_page]
+    defstruct [:page, :per_page, :favorites]
 
     def from_map(params) do
       %__MODULE__{}
@@ -25,7 +25,8 @@ defmodule Buildel.Pipelines do
           |> then(fn
             nil -> nil
             per_page -> String.to_integer(per_page)
-          end)
+          end),
+        favorites: Map.get(params, "favorites", nil) == "true"
       })
     end
   end
@@ -49,6 +50,18 @@ defmodule Buildel.Pipelines do
     |> Repo.update()
   end
 
+  def toggle_pipeline_favorite(%Pipeline{} = pipeline) do
+    from(p in Pipeline,
+      where: p.id == ^pipeline.id,
+      update: [set: [favorite: fragment("NOT favorite")]]
+    )
+    |> Repo.update_all([])
+    |> case do
+      {1, _} -> {:ok, pipeline |> Map.update!(:favorite, &(!&1))}
+      _ -> {:error, :not_found}
+    end
+  end
+
   def delete_pipeline(%Pipeline{} = pipeline) do
     Repo.delete(pipeline, allow_stale: true)
   end
@@ -59,6 +72,12 @@ defmodule Buildel.Pipelines do
       ) do
     query =
       from(p in Pipeline, where: p.organization_id == ^organization.id, order_by: [desc: p.id])
+      |> then(fn q ->
+        case params.favorites do
+          true -> q |> where([p], p.favorite == true)
+          _ -> q
+        end
+      end)
 
     items =
       case params do
