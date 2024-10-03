@@ -66,6 +66,11 @@ defmodule Buildel.Pipelines do
     Repo.delete(pipeline, allow_stale: true)
   end
 
+  def list_organization_pipelines(%Organization{} = organization) do
+    from(p in Pipeline, where: p.organization_id == ^organization.id, order_by: [desc: p.id])
+    |> Repo.all()
+  end
+
   def list_organization_pipelines(
         %Organization{} = organization,
         %ListParams{} = params
