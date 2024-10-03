@@ -190,7 +190,7 @@ interface DuplicateFormProps {
 
 function DuplicateForm({ pipeline }: DuplicateFormProps) {
   const validator = useMemo(() => withZod(CreatePipelineSchema), []);
-
+  console.log(pipeline);
   return (
     <ValidatedForm
       method="POST"
@@ -198,9 +198,11 @@ function DuplicateForm({ pipeline }: DuplicateFormProps) {
       action={routes.pipelinesNew(pipeline.organization_id)}
     >
       <HiddenField name="pipeline.name" value={pipeline.name + ' copy'} />
-
       <HiddenField name="pipeline.config.version" value="1" />
-
+      <HiddenField
+        name="pipeline.config.connections"
+        value={JSON.stringify(pipeline.config.connections)}
+      />
       <HiddenField
         name="pipeline.config.blocks"
         value={JSON.stringify(pipeline.config.blocks)}
