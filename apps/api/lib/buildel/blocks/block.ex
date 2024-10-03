@@ -12,7 +12,7 @@ defmodule Buildel.Blocks.Block do
   end
 
   def audio_input(name \\ "input", public \\ false, visible \\ true),
-    do: %{name: name, type: "audio", public: public, visible: visible }
+    do: %{name: name, type: "audio", public: public, visible: visible}
 
   def audio_output(name \\ "output", public \\ false, visible \\ true),
     do: %{name: name, type: "audio", public: public, visible: visible}
@@ -73,6 +73,12 @@ defmodule Buildel.Blocks.Block do
           all_connections(block)
         )
 
+        BlockPubSub.subscribe_to_io(
+          block.context.context_id,
+          "supervisor",
+          "output"
+        )
+
         state |> assign_stream_state(block.opts) |> setup()
       end
 
@@ -98,6 +104,13 @@ defmodule Buildel.Blocks.Block do
       end
 
       defoverridable handle_input: 3
+
+      @impl true
+      def handle_on_workflow_started(_payload, state) do
+        state
+      end
+
+      defoverridable handle_on_workflow_started: 2
 
       def handle_external_input(_name, _payload, state) do
         state
@@ -223,6 +236,12 @@ defmodule Buildel.Blocks.Block do
 
       def handle_info({:stop_stream, output}, state) do
         state = send_stream_stop(state, output)
+        {:noreply, state}
+      end
+
+      def handle_info({_topic, :workflow_started, _, _} = message, state) do
+        state = handle_on_workflow_started(message, state)
+
         {:noreply, state}
       end
 
@@ -573,4 +592,5 @@ defmodule Buildel.Blocks.BlockBehaviour do
   @callback cast(pid, any()) :: :ok
   @callback setup(any()) :: {:ok, any()} | {:error, any()}
   @callback handle_input(String.t(), {String.t(), atom(), any(), map()}, map()) :: map()
+  @callback handle_on_workflow_started({String.t(), atom(), any(), map()}, map()) :: map()
 end
