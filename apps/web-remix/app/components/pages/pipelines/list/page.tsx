@@ -2,22 +2,17 @@ import React, { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
+import { BookmarkCheck } from 'lucide-react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
-import { ItemList } from '~/components/list/ItemList';
 import { confirm } from '~/components/modal/confirm';
-import {
-  PipelineListItemContent,
-  PipelineListItemHeader,
-  PipelinesListItem,
-} from '~/components/pages/pipelines/list/PipelinesListItem';
+import { PipelinesList } from '~/components/pages/pipelines/list/PipelinesList';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
 import { Button } from '~/components/ui/button';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
-import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -128,7 +123,7 @@ function TemplatesWithoutPipelines({
 
 function ContentWithPipelines() {
   const { ref: fetchNextRef, inView } = useInView();
-  const { pipelines, pagination } = useLoaderData<typeof loader>();
+  const { pipelines, pagination, favorites } = useLoaderData<typeof loader>();
 
   const organizationId = useOrganizationId();
 
@@ -141,7 +136,6 @@ function ContentWithPipelines() {
     });
 
   const deleteFetcher = useFetcher<{ pipelineId: string }>();
-
   const deletePipeline = async (
     pipeline: IPipeline,
     e: React.MouseEvent<HTMLDivElement>,
@@ -160,13 +154,6 @@ function ContentWithPipelines() {
       ),
     });
   };
-
-  useEffect(() => {
-    if (inView && !isFetchingNextPage && hasNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, isFetchingNextPage, hasNextPage]);
-
   useEffect(() => {
     if (deleteFetcher.data && deleteFetcher.state === 'idle') {
       updateData(() =>
@@ -176,6 +163,40 @@ function ContentWithPipelines() {
       );
     }
   }, [deleteFetcher.state]);
+
+  const toggleFavoriteFetcher = useFetcher<IPipeline>();
+  const toggleFavorite = async (
+    pipeline: IPipeline,
+    e: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    formData.set('pipelineId', pipeline.id.toString());
+    formData.set('intent', 'TOGGLE_FAVORITE');
+
+    toggleFavoriteFetcher.submit(formData, { method: 'post' });
+  };
+  useEffect(() => {
+    if (toggleFavoriteFetcher.data && toggleFavoriteFetcher.state === 'idle') {
+      updateData(() =>
+        data.map((item) => {
+          if (item.id === toggleFavoriteFetcher.data!.id) {
+            return toggleFavoriteFetcher.data as IPipeline;
+          }
+
+          return item;
+        }),
+      );
+    }
+  }, [toggleFavoriteFetcher.state]);
+
+  useEffect(() => {
+    if (inView && !isFetchingNextPage && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, isFetchingNextPage, hasNextPage]);
 
   return (
     <>
@@ -193,21 +214,30 @@ function ContentWithPipelines() {
           </BasicLink>
         </Button>
 
-        <ItemList
-          aria-label="Workflows list"
-          items={data}
-          renderItem={(item) => (
-            <BasicLink to={routes.pipelineBuild(item.organization_id, item.id)}>
-              <PipelinesListItem className="flex flex-col">
-                <PipelineListItemHeader
-                  pipeline={item}
-                  onDelete={deletePipeline}
-                />
-                <PipelineListItemContent pipeline={item} />
-              </PipelinesListItem>
-            </BasicLink>
-          )}
-          className={cn('grid gap-4 grid-cols-1 sm:grid-cols-2')}
+        {favorites.length > 0 ? (
+          <div className="-mt-11 lg:mt-auto">
+            <h2 className="text-white mb-3 text-base flex gap-1 items-center capitalize">
+              <BookmarkCheck className="w-5 h-5" />{' '}
+              <span>Pinned workflows</span>
+            </h2>
+
+            <PipelinesList
+              pipelines={favorites}
+              onDelete={deletePipeline}
+              onToggleFavorite={toggleFavorite}
+              aria-label="Favorite workflows"
+            />
+
+            <h2 className="text-foreground mt-14 mb-3 text-base flex gap-1 items-center capitalize">
+              Your workflows
+            </h2>
+          </div>
+        ) : null}
+
+        <PipelinesList
+          pipelines={data}
+          onDelete={deletePipeline}
+          onToggleFavorite={toggleFavorite}
         />
 
         <div className="flex justify-center mt-5" ref={fetchNextRef}>

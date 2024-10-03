@@ -30,14 +30,21 @@ export async function loader(args: LoaderFunctionArgs) {
       search,
     });
 
+    const favoritesPipelinesPromise = pipelineApi.getPipelines(
+      params.organizationId,
+      { favorites: true },
+    );
+
     const templatesPromise = organizationApi.getTemplates(
       params.organizationId,
     );
 
-    const [{ data: pipelines }, templates] = await Promise.all([
-      pipelinesPromise,
-      templatesPromise,
-    ]);
+    const [{ data: pipelines }, { data: favorites }, templates] =
+      await Promise.all([
+        pipelinesPromise,
+        favoritesPipelinesPromise,
+        templatesPromise,
+      ]);
 
     const totalItems = pipelines.meta.total;
     const totalPages = Math.ceil(totalItems / per_page);
@@ -45,6 +52,7 @@ export async function loader(args: LoaderFunctionArgs) {
     return json({
       templates: templates.data,
       pipelines: pipelines.data,
+      favorites: favorites.data,
       organizationId: params.organizationId,
       pagination: { page, per_page, search, totalItems, totalPages },
     });

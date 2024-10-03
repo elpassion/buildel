@@ -182,7 +182,7 @@ export class PipelineApi {
 
   getPipelines(
     organizationId: string | number,
-    queryParams?: PaginationQueryParams,
+    queryParams?: Partial<PaginationQueryParams> & { favorites?: boolean },
   ) {
     const url = buildUrlWithParams(
       `/organizations/${organizationId}/pipelines`,
@@ -267,6 +267,16 @@ export class PipelineApi {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ alias: data }),
+      },
+    );
+  }
+
+  toggleFavorite(organizationId: string | number, pipelineId: string | number) {
+    return this.client(
+      PipelineResponse,
+      `/organizations/${organizationId}/pipelines/${pipelineId}/favorite`,
+      {
+        method: 'POST',
       },
     );
   }

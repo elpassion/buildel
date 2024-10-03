@@ -132,6 +132,7 @@ export const Pipeline = z.object({
   runs_count: z.number(),
   budget_limit: z.union([zfd.numeric(), z.null()]),
   logs_enabled: z.boolean(),
+  favorite: z.boolean().optional(),
   interface_config: SafeInterfaceConfig,
   config: z.object({
     version: z.string(),
