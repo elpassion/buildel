@@ -135,62 +135,29 @@ function ContentWithPipelines() {
       dataExtractor: (response) => response.data?.pipelines,
     });
 
-  const deleteFetcher = useFetcher<{ pipelineId: string }>();
-  const deletePipeline = async (
-    pipeline: IPipeline,
-    e: React.MouseEvent<HTMLDivElement>,
-  ) => {
-    e.preventDefault();
-
-    confirm({
-      onConfirm: async () =>
-        deleteFetcher.submit({ pipelineId: pipeline.id }, { method: 'delete' }),
-      confirmText: 'Delete workflow',
-      children: (
-        <p className="text-sm">
-          You are about to delete the "{pipeline.name}” workflow from your
-          organisation. This action is irreversible.
-        </p>
-      ),
-    });
+  const onDelete = (pipelineId: string) => {
+    updateData((currentData) =>
+      currentData.filter((item) => {
+        return item.id.toString() !== pipelineId;
+      }),
+    );
   };
-  useEffect(() => {
-    if (deleteFetcher.data && deleteFetcher.state === 'idle') {
-      updateData(() =>
-        data.filter((item) => {
-          return item.id.toString() !== deleteFetcher.data!.pipelineId;
-        }),
-      );
-    }
-  }, [deleteFetcher.state]);
 
-  const toggleFavoriteFetcher = useFetcher<IPipeline>();
-  const toggleFavorite = async (
-    pipeline: IPipeline,
-    e: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    e.preventDefault();
+  const { action: deleteWorkflow } = useDeleteWorkflow({ onDelete });
 
-    const formData = new FormData();
+  const onToggle = (pipeline: IPipeline) => {
+    updateData((currentData) =>
+      currentData.map((item) => {
+        if (item.id === pipeline.id) {
+          return pipeline;
+        }
 
-    formData.set('pipelineId', pipeline.id.toString());
-    formData.set('intent', 'TOGGLE_FAVORITE');
-
-    toggleFavoriteFetcher.submit(formData, { method: 'post' });
+        return item;
+      }),
+    );
   };
-  useEffect(() => {
-    if (toggleFavoriteFetcher.data && toggleFavoriteFetcher.state === 'idle') {
-      updateData(() =>
-        data.map((item) => {
-          if (item.id === toggleFavoriteFetcher.data!.id) {
-            return toggleFavoriteFetcher.data as IPipeline;
-          }
 
-          return item;
-        }),
-      );
-    }
-  }, [toggleFavoriteFetcher.state]);
+  const { action: toggleWorkflow } = useToggleWorkflow({ onToggle });
 
   useEffect(() => {
     if (inView && !isFetchingNextPage && hasNextPage) {
@@ -223,8 +190,8 @@ function ContentWithPipelines() {
 
             <PipelinesList
               pipelines={favorites}
-              onDelete={deletePipeline}
-              onToggleFavorite={toggleFavorite}
+              onDelete={deleteWorkflow}
+              onToggleFavorite={toggleWorkflow}
               aria-label="Favorite workflows"
             />
 
@@ -236,8 +203,8 @@ function ContentWithPipelines() {
 
         <PipelinesList
           pipelines={data}
-          onDelete={deletePipeline}
-          onToggleFavorite={toggleFavorite}
+          onDelete={deleteWorkflow}
+          onToggleFavorite={toggleWorkflow}
         />
 
         <div className="flex justify-center mt-5" ref={fetchNextRef}>
@@ -251,4 +218,71 @@ function ContentWithPipelines() {
       </div>
     </>
   );
+}
+
+function useDeleteWorkflow({
+  onDelete,
+}: {
+  onDelete: (pipelineId: string) => void;
+}) {
+  const deleteFetcher = useFetcher<{ pipelineId: string }>();
+
+  const action = async (
+    pipeline: IPipeline,
+    e: React.MouseEvent<HTMLDivElement>,
+  ) => {
+    e.preventDefault();
+
+    confirm({
+      onConfirm: async () =>
+        deleteFetcher.submit({ pipelineId: pipeline.id }, { method: 'delete' }),
+      confirmText: 'Delete workflow',
+      children: (
+        <p className="text-sm">
+          You are about to delete the "{pipeline.name}” workflow from your
+          organisation. This action is irreversible.
+        </p>
+      ),
+    });
+  };
+
+  useEffect(() => {
+    if (deleteFetcher.data && deleteFetcher.state === 'idle') {
+      onDelete(deleteFetcher.data.pipelineId);
+    }
+  }, [deleteFetcher]);
+
+  return { action };
+}
+
+function useToggleWorkflow({
+  onToggle,
+}: {
+  onToggle: (pipeline: IPipeline) => void;
+}) {
+  const toggleFavoriteFetcher = useFetcher<IPipeline>();
+
+  const action = async (
+    pipeline: IPipeline,
+    e: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    onToggle({ ...pipeline, favorite: !pipeline.favorite });
+
+    formData.set('pipelineId', pipeline.id.toString());
+    formData.set('intent', 'TOGGLE_FAVORITE');
+
+    toggleFavoriteFetcher.submit(formData, { method: 'post' });
+  };
+
+  useEffect(() => {
+    if (toggleFavoriteFetcher.data && toggleFavoriteFetcher.state === 'idle') {
+      onToggle(toggleFavoriteFetcher.data);
+    }
+  }, [toggleFavoriteFetcher]);
+
+  return { action };
 }
