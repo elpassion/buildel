@@ -16,7 +16,7 @@ defaults:
 jobs:
   test:
     name: Test
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
 
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: test
 
     steps:
@@ -49,7 +49,7 @@ jobs:
 
   docker:
     name: Docker
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: test
 
     steps:
