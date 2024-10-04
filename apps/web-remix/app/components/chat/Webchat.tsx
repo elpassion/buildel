@@ -271,20 +271,22 @@ ${JSON.stringify(files)}
             className={cn('max-w-[820px] mx-auto', {
               hidden:
                 !!messages.length ||
-                !pipeline.interface_config.suggested_messages.length,
+                !(pipeline.interface_config.suggested_messages || []).length,
             })}
           >
-            {pipeline.interface_config.suggested_messages.map((msg, index) => {
-              return (
-                <SuggestedMessage
-                  disabled={disabled}
-                  key={index}
-                  onClick={onSubmit}
-                  content={msg}
-                  size={size}
-                />
-              );
-            })}
+            {(pipeline.interface_config.suggested_messages || []).map(
+              (msg, index) => {
+                return (
+                  <SuggestedMessage
+                    disabled={disabled}
+                    key={index}
+                    onClick={onSubmit}
+                    content={msg}
+                    size={size}
+                  />
+                );
+              },
+            )}
           </SuggestedMessages>
 
           <IntroPanel
