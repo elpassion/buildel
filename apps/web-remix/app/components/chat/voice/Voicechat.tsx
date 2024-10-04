@@ -74,7 +74,7 @@ export function Voicechat({
     connectionStatus,
   } = useVoicechat({
     pipeline,
-    audioEnabled: isOpen,
+    audioEnabled: isOpen && !disabled,
     socketArgs,
   });
 
