@@ -44,6 +44,7 @@ export const useAudioRecorder = (props?: UseAudioRecorderProps) => {
 
   const requestPermissions = useCallback(async () => {
     if (typeof window === 'undefined') return;
+
     assert(navigator.mediaDevices, 'MediaDevices not supported');
 
     const stream = await navigator.mediaDevices.getUserMedia({
