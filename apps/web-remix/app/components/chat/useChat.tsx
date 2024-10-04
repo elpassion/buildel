@@ -4,6 +4,7 @@ import type {
   BuildelRunRunConfig,
 } from '@buildel/buildel';
 
+import type { UsePipelineRunSocketArgs } from '~/components/pages/pipelines/usePipelineRun';
 import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
 
 import {
@@ -15,8 +16,11 @@ import {
   send,
   statusChange,
 } from './chat.reducer';
-import type { IMessage, MessageTextPayload } from './chat.types';
-import { WebchatPipelineConfig } from './chat.types';
+import type {
+  IMessage,
+  MessageTextPayload,
+  WebchatPipelineConfig,
+} from './chat.types';
 
 interface UseChatProps {
   organizationId: number;
@@ -27,9 +31,8 @@ interface UseChatProps {
     payload: unknown,
   ) => void;
   onFinish?: () => void;
-  useAuth?: boolean;
   onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
-  authUrl?: string;
+  socketArgs?: UsePipelineRunSocketArgs;
 }
 
 export const useChat = ({
@@ -37,9 +40,8 @@ export const useChat = ({
   pipelineId,
   onBlockOutput: onBlockOutputProps,
   onFinish,
-  useAuth,
   onBlockStatusChange,
-  authUrl,
+  socketArgs,
 }: UseChatProps) => {
   const [state, dispatch] = useReducer(chatReducer, {
     status: 'loading',
@@ -48,7 +50,7 @@ export const useChat = ({
     outputsStatus: {},
   });
 
-  const useAuthWithDefault = useAuth ?? true;
+  const useAuthWithDefault = socketArgs?.useAuth ?? true;
 
   const onBlockOutput = (
     blockName: string,
@@ -91,8 +93,7 @@ export const useChat = ({
     dispatch(connect({ ...pipeline, ...run, run_id } as WebchatPipelineConfig));
   };
 
-  const { startRun, stopRun, push, status } = usePipelineRun({
-    useAuth: useAuthWithDefault,
+  const { startRun, stopRun, push, joinRun, status } = usePipelineRun({
     onBlockStatusChange: onStatusChange,
     onConnect,
     organizationId,
@@ -100,7 +101,10 @@ export const useChat = ({
     onBlockOutput,
     onBlockError,
     onError,
-    authUrl,
+    socketArgs: {
+      ...socketArgs,
+      useAuth: useAuthWithDefault,
+    },
   });
 
   const handlePush = (message: string) => {
@@ -169,6 +173,7 @@ export const useChat = ({
     isError,
     stopRun,
     startRun,
+    joinRun,
     isLoading,
     isGenerating,
     latestAiMessage,

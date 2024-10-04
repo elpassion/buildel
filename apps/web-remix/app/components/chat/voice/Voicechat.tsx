@@ -9,6 +9,7 @@ import type {
   ChatSize,
   IMessage,
   WebchatPipelineConfig,
+  WebchatRunArgs,
 } from '~/components/chat/chat.types';
 import { ChatHeading } from '~/components/chat/ChatHeading';
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
@@ -28,6 +29,7 @@ import {
   drawCircleBars,
 } from '~/components/chat/voice/Voicechat.utils';
 import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
+import type { UsePipelineRunSocketArgs } from '~/components/pages/pipelines/usePipelineRun';
 import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
 import { Button } from '~/components/ui/button';
 import type { UseSoundArgs } from '~/hooks/useSound';
@@ -40,11 +42,11 @@ interface VoicechatProps {
   onClose: () => void;
   onOpen: () => void;
   pipeline: WebchatPipelineConfig;
-  metadata?: Record<string, unknown>;
-  alias?: string;
   disabled?: boolean;
   size?: ChatSize;
   transcription?: IMessage;
+  socketArgs?: UsePipelineRunSocketArgs;
+  runArgs?: WebchatRunArgs;
 }
 
 export function Voicechat({
@@ -53,10 +55,10 @@ export function Voicechat({
   onClose,
   disabled,
   pipeline,
-  metadata,
-  alias,
+  runArgs,
   size,
   transcription,
+  socketArgs,
 }: VoicechatProps) {
   const {
     joinRun,
@@ -73,6 +75,7 @@ export function Voicechat({
   } = useVoicechat({
     pipeline,
     audioEnabled: isOpen,
+    socketArgs,
   });
 
   const onCloseAudioChat = () => {
@@ -90,11 +93,11 @@ export function Voicechat({
   useEffect(() => {
     setTimeout(() => {
       joinRun({
-        alias,
+        alias: runArgs?.alias,
         runId: pipeline.run_id,
         initial_inputs: [],
         metadata: {
-          ...metadata,
+          ...runArgs?.metadata,
           interface: 'webchat',
         },
       });
@@ -192,7 +195,7 @@ const VoicechateModal = ({
   return (
     <div
       className={cn(
-        'w-full h-[100dvh] bg-white fixed top-0 left-0 right-0 bottom-0 transition-all',
+        'w-full h-[100dvh] bg-secondary fixed top-0 left-0 right-0 bottom-0 transition-all',
         { 'opacity-0 pointer-events-none': !isOpen },
         className,
       )}
@@ -338,11 +341,13 @@ export function SpeakingRow({
 interface UseVoicechatProps {
   pipeline: WebchatPipelineConfig;
   audioEnabled?: boolean;
+  socketArgs?: UsePipelineRunSocketArgs;
 }
 
 export function useVoicechat({
   pipeline,
   audioEnabled = true,
+  socketArgs,
 }: UseVoicechatProps) {
   const eventsQueue = useRef<ArrayBuffer[]>([]);
 
@@ -420,6 +425,7 @@ export function useVoicechat({
     organizationId: pipeline.organization_id,
     pipelineId: pipeline.id,
     onBlockOutput,
+    socketArgs,
   });
 
   const onAudioChunk = (chunk: BlobEvent) => {

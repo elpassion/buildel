@@ -73,7 +73,7 @@ defmodule BuildelWeb.PipelineChannel do
         %{run:
         %{
           id: run.id,
-          interface_config: run.interface_config
+          interface_config: run_interface
         },
         pipeline: %{
           id: pipeline.id,

@@ -11,8 +11,9 @@ import {
   SuggestedMessages,
 } from '~/components/chat/Chat.components';
 import type {
-  ChatSize,
   IMessage,
+  WebchatBaseProps,
+  WebchatInterface,
   WebchatPipelineConfig,
 } from '~/components/chat/chat.types';
 import { isAudioConfigured } from '~/components/chat/chat.utils';
@@ -44,18 +45,6 @@ const SUPPORTED_DOCUMENT_TYPES = [
   'text/markdown',
 ];
 
-type WebchatInterface = 'chat' | 'voice';
-
-interface WebchatBaseProps {
-  defaultInterface?: WebchatInterface;
-  size?: ChatSize;
-  disabled?: boolean;
-  placeholder?: string;
-  className?: string;
-  alias?: string;
-  metadata?: Record<string, unknown>;
-}
-
 interface WebchatProps extends WebchatBaseProps {
   pipelineId: string;
   organizationId: string;
@@ -65,18 +54,16 @@ interface WebchatProps extends WebchatBaseProps {
     payload: unknown,
   ) => void;
   onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
-  authUrl?: string;
 }
 
 export const Webchat = ({
-  alias,
   pipelineId,
   organizationId,
-  metadata,
   onBlockStatusChange,
   onBlockOutput: propsOnBlockOutput,
   disabled,
-  authUrl,
+  socketArgs,
+  runArgs,
   ...rest
 }: WebchatProps) => {
   const onBlockOutput = (
@@ -93,6 +80,7 @@ export const Webchat = ({
     pushMessage,
     stopRun,
     startRun,
+    joinRun,
     messages,
     latestAiMessage,
     isLoading,
@@ -103,20 +91,28 @@ export const Webchat = ({
     pipelineId: pipelineId as unknown as number,
     onBlockStatusChange,
     onBlockOutput,
-    authUrl,
+    socketArgs,
   });
 
   useEffect(() => {
-    // todo change it
     setTimeout(() => {
-      startRun({
-        alias,
+      const args = {
+        alias: runArgs?.alias,
         initial_inputs: [],
         metadata: {
-          ...metadata,
+          ...runArgs?.metadata,
           interface: 'webchat',
         },
-      });
+      };
+
+      if (runArgs?.id) {
+        joinRun({
+          runId: runArgs.id,
+          ...args,
+        });
+      } else {
+        startRun(args);
+      }
     }, 500);
 
     return () => {
@@ -142,8 +138,8 @@ export const Webchat = ({
         disabled={disabled || connectionStatus !== 'running'}
         isGenerating={isGenerating}
         latestAiMessage={latestAiMessage}
-        alias={alias}
-        metadata={metadata}
+        runArgs={runArgs}
+        socketArgs={socketArgs}
         {...rest}
       />
     </ChatWrapper>
@@ -168,6 +164,7 @@ function WebchatContent({
   disabled,
   isGenerating,
   latestAiMessage,
+  socketArgs,
   ...rest
 }: WebchatContentProps) {
   const [view, setView] = useState<WebchatInterface>(() =>
@@ -385,6 +382,7 @@ ${JSON.stringify(files)}
               onClose={closeVoiceChat}
               disabled={disabled}
               size={size}
+              socketArgs={socketArgs}
               {...rest}
             />
           ) : null}

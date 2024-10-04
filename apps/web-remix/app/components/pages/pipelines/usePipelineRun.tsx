@@ -7,9 +7,12 @@ import type {
   BuildelRunRunConfig,
   BuildelRunStartArgs,
   BuildelRunStatus,
+  BuildelSocketOptions,
 } from '@buildel/buildel';
 
 import { assert } from '~/utils/assert';
+
+export type UsePipelineRunSocketArgs = BuildelSocketOptions;
 
 export type UsePipelineRunArgs = {
   organizationId: number;
@@ -26,20 +29,18 @@ export type UsePipelineRunArgs = {
     pipeline: BuildelRunPipelineConfig,
   ) => void;
   onError?: (error: string) => void;
-  useAuth?: boolean;
-  authUrl?: string;
+  socketArgs?: UsePipelineRunSocketArgs;
 };
 
 export function usePipelineRun({
-  useAuth = true,
   onBlockStatusChange = () => {},
   onBlockError = () => {},
   onError = () => {},
   onBlockOutput = () => {},
   onConnect = () => {},
   organizationId,
-  authUrl,
   pipelineId,
+  socketArgs = { useAuth: true },
 }: UsePipelineRunArgs) {
   const buildel = useRef<BuildelSocket>();
   const run = useRef<BuildelRun>();
@@ -66,8 +67,7 @@ export function usePipelineRun({
   useEffect(() => {
     buildel.current = new BuildelSocket(organizationId, {
       socketUrl: '/super-api/socket',
-      authUrl,
-      useAuth,
+      ...socketArgs,
     });
     buildel.current.connect().then((buildel) => {
       run.current = buildel.run(pipelineId, {

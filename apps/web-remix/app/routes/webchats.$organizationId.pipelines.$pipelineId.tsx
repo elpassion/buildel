@@ -27,14 +27,22 @@ export async function loader(args: LoaderFunctionArgs) {
       pipelineId: params.pipelineId,
       chatSize: size.success ? size.data : 'default',
       isAudioChat: searchParams.get('audio') === 'true',
+      runId: params.runId ? Number(params.runId) : undefined,
       authUrl: searchParams.get('authUrl') ?? '/super-api/channel_auth',
     });
   })(args);
 }
 
 export default function WebsiteChat() {
-  const { pipelineId, organizationId, alias, chatSize, isAudioChat, authUrl } =
-    useLoaderData<typeof loader>();
+  const {
+    pipelineId,
+    organizationId,
+    alias,
+    chatSize,
+    isAudioChat,
+    authUrl,
+    runId,
+  } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex justify-center items-center h-[100dvh] w-full bg-secondary">
@@ -42,9 +50,14 @@ export default function WebsiteChat() {
         defaultInterface={isAudioChat ? 'voice' : 'chat'}
         organizationId={organizationId}
         pipelineId={pipelineId}
-        alias={alias}
         size={chatSize}
-        authUrl={authUrl}
+        runArgs={{
+          alias,
+          id: runId,
+        }}
+        socketArgs={{
+          authUrl,
+        }}
       />
     </div>
   );
