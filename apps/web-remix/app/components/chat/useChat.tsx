@@ -46,6 +46,7 @@ export const useChat = ({
   const [state, dispatch] = useReducer(chatReducer, {
     status: 'loading',
     pipelineConfig: null,
+    error: null,
     messages: [],
     outputsStatus: {},
   });
@@ -78,12 +79,13 @@ export const useChat = ({
     }
   };
 
-  const onBlockError = () => {
-    dispatch(error());
+  const onBlockError = (blockId: string, errors: string[]) => {
+    console.error(blockId, errors);
+    // dispatch(error());
   };
 
-  const onError = () => {
-    dispatch(error());
+  const onError = (err: string) => {
+    dispatch(error(err));
   };
 
   const onConnect = (
@@ -171,6 +173,7 @@ export const useChat = ({
   return {
     push,
     isError,
+    error: state.error,
     stopRun,
     startRun,
     joinRun,

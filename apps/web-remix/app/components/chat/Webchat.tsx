@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Trash, Upload } from 'lucide-react';
+import { LoaderCircle, Trash, Upload } from 'lucide-react';
 
 import {
   ChatGeneratingAnimation,
@@ -85,6 +85,7 @@ export const Webchat = ({
     latestAiMessage,
     isLoading,
     isError,
+    error: chatError,
     pipeline,
   } = useChat({
     organizationId: organizationId as unknown as number,
@@ -120,8 +121,11 @@ export const Webchat = ({
     };
   }, []);
 
-  if (isLoading) return <p>LOADING...</p>;
-  if (isError || !pipeline) return <p>ERROR</p>;
+  if (isLoading)
+    return <LoaderCircle className="animate-spin ease-in-out duration-300" />;
+  if (chatError) return <p className="text-foreground text-sm">{chatError}</p>;
+  if (isError || !pipeline)
+    return <p className="text-foreground text-sm">Something went wrong</p>;
 
   return (
     <ChatWrapper className={cn('h-full py-3 lg:py-4 relative', rest.className)}>

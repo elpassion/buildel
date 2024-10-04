@@ -1,4 +1,5 @@
 import cloneDeep from 'lodash.clonedeep';
+import startCase from 'lodash.startcase';
 import { v4 as uuidv4 } from 'uuid';
 
 import type {
@@ -17,6 +18,9 @@ type Action =
     }
   | {
       type: 'ERROR';
+      payload: {
+        error: string | null;
+      };
     }
   | {
       type: 'SEND_MESSAGE';
@@ -47,6 +51,7 @@ export type ChatStatus =
 export type ChatOutputStatus = 'idle' | 'generating';
 
 export type ChatReducerState = {
+  error: null | string;
   status: ChatStatus;
   pipelineConfig: WebchatPipelineConfig | null;
   outputsStatus: Record<string, ChatOutputStatus>;
@@ -61,6 +66,7 @@ export const chatReducer = (
     case 'CONNECT':
       return {
         ...state,
+        error: null,
         pipelineConfig: action.payload.data,
         status: 'connected',
         outputsStatus: toOutputStatus(
@@ -70,6 +76,7 @@ export const chatReducer = (
     case 'ERROR':
       return {
         ...state,
+        error: action.payload.error,
         status: 'errored',
         outputsStatus: setEveryOutputStatus(state.outputsStatus, 'idle'),
       };
@@ -132,9 +139,12 @@ export const connect = (config: WebchatPipelineConfig) => {
   } as const;
 };
 
-export const error = () => {
+export const error = (err: string | null = null) => {
   return {
     type: 'ERROR',
+    payload: {
+      error: err ? startCase(err) : null,
+    },
   } as const;
 };
 
