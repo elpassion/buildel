@@ -473,6 +473,12 @@ defmodule Buildel.Pipelines do
     end
   end
 
+  def get_pipeline_run_logs(run) do
+    from(l in Buildel.Pipelines.Log, where: l.run_id == ^run.id, order_by: [asc: l.inserted_at])
+    |> Repo.all()
+    |> Repo.preload(run: :pipeline)
+  end
+
   defp connection_valid?(config, %Buildel.Blocks.Connection{} = connection) do
     cond do
       connection_already_exists?(config, connection) ->

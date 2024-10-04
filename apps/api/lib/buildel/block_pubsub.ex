@@ -61,8 +61,17 @@ defmodule Buildel.BlockPubSub do
       "Broadcasting to topic: #{topic}, message: #{inspect(message)}, metadata: #{inspect(metadata)})"
     )
 
-    Buildel.PubSub
-    |> PubSub.broadcast!("buildel::logger", {topic, message_type, content, metadata})
+    case message_type do
+      :workflow_started ->
+        nil
+
+      _ ->
+        Buildel.PubSub
+        |> PubSub.broadcast!(
+          "buildel::logger",
+          {topic, message_type, content, metadata, NaiveDateTime.utc_now()}
+        )
+    end
 
     Buildel.PubSub
     |> PubSub.broadcast!(topic, {topic, message_type, content, metadata})
