@@ -319,6 +319,7 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
 
     test "requires organization membership", %{conn: conn} do
       another_organization = organization_fixture()
+
       another_pipeline = pipeline_fixture(%{organization_id: another_organization.id})
 
       conn =
