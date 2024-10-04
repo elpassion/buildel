@@ -1,3 +1,7 @@
+import type {
+  BuildelRunPipelineConfig,
+  BuildelRunRunWebchatConfig,
+} from '@buildel/buildel';
 import { z } from 'zod';
 
 export type MessageRole = 'ai' | 'user';
@@ -16,3 +20,14 @@ export interface IMessage {
 export const chatSize = z.enum(['sm', 'default']);
 
 export type ChatSize = z.TypeOf<typeof chatSize>;
+
+export type WebchatPipelineConfig = BuildelRunPipelineConfig & {
+  run_id: number;
+  interface_config: BuildelRunRunWebchatConfig;
+};
+
+export type MessageTextPayload = {
+  message: string;
+};
+
+export type IOType = { name: string; type: string };

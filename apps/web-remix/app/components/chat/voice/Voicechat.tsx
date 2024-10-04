@@ -1,13 +1,17 @@
 import React, { useEffect, useReducer, useRef } from 'react';
-import { Mic, Pause } from 'lucide-react';
+import { Headphones, Mic, Pause, X } from 'lucide-react';
 
-import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
-import type {
-  UseAudioRecorderCbOptions,
-  UseAudioRecorderChunkCb,
-} from '~/components/audioRecorder/useAudioRecorder';
+import type { UseAudioRecorderCbOptions } from '~/components/audioRecorder/useAudioRecorder';
 import { useAudioRecorder } from '~/components/audioRecorder/useAudioRecorder';
 import { useAudioVisualize } from '~/components/audioRecorder/useAudioVisualize';
+import { ChatHeader, ChatStatus } from '~/components/chat/Chat.components';
+import type {
+  ChatSize,
+  IMessage,
+  WebchatPipelineConfig,
+} from '~/components/chat/chat.types';
+import { ChatHeading } from '~/components/chat/ChatHeading';
+import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import type {
   VoicechatReducerState,
   VoicechatStatus,
@@ -24,6 +28,7 @@ import {
   drawCircleBars,
 } from '~/components/chat/voice/Voicechat.utils';
 import type { IEvent } from '~/components/pages/pipelines/RunPipelineProvider';
+import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
 import { Button } from '~/components/ui/button';
 import type { UseSoundArgs } from '~/hooks/useSound';
 import { useSound } from '~/hooks/useSound';
@@ -31,41 +36,221 @@ import { assert } from '~/utils/assert';
 import { cn } from '~/utils/cn';
 
 interface VoicechatProps {
-  audioRef: React.RefObject<HTMLAudioElement>;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
-  children?: React.ReactNode;
-  transcription?: React.ReactNode;
+  isOpen: boolean;
+  onClose: () => void;
+  onOpen: () => void;
+  pipeline: WebchatPipelineConfig;
+  metadata?: Record<string, unknown>;
+  alias?: string;
+  disabled?: boolean;
+  size?: ChatSize;
+  transcription?: IMessage;
 }
 
 export function Voicechat({
-  canvasRef,
-  audioRef,
-  children,
+  isOpen,
+  onOpen,
+  onClose,
+  disabled,
+  pipeline,
+  metadata,
+  alias,
+  size,
   transcription,
 }: VoicechatProps) {
+  const {
+    joinRun,
+    stopRun,
+    startRecording,
+    stopRecording,
+    restore,
+    discard,
+    audioRef,
+    dotCanvasRef,
+    talkingCanvasRef,
+    state: audioState,
+    connectionStatus,
+  } = useVoicechat({
+    pipeline,
+    audioEnabled: isOpen,
+  });
+
+  const onCloseAudioChat = () => {
+    discard();
+
+    onClose();
+  };
+
+  const onOpenAudioChat = () => {
+    restore();
+
+    onOpen();
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      joinRun({
+        alias,
+        runId: pipeline.run_id,
+        initial_inputs: [],
+        metadata: {
+          ...metadata,
+          interface: 'webchat',
+        },
+      });
+    }, 500);
+
+    return () => {
+      stopRun();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && audioRef.current) {
+      audioRef.current.autoplay = true;
+    }
+  }, []);
+
+  const isDisabled = disabled ?? connectionStatus !== 'running';
+
   return (
-    <div className="relative flex justify-center flex-col items-center h-[100dvh] w-full bg-secondary">
-      <div
-        className={cn('grow flex flex-col  items-center', {
-          'justify-end md:justify-center': !!transcription,
-          'justify-center': !transcription,
+    <>
+      <Button
+        variant="outline"
+        className={cn('p-0 rounded-full shrink-0', {
+          'h-[48px] w-[48px]': size === 'default',
+          'h-[36px] w-[36px]': size === 'sm',
         })}
+        onClick={onOpenAudioChat}
       >
-        <audio ref={audioRef} controls hidden />
-        <canvas
-          ref={canvasRef}
-          width={320}
-          height={320}
-          className="animate-scale"
+        <Headphones
+          className={cn({
+            'w-6 h-6': size === 'default',
+            'w-5 h-5': size === 'sm',
+          })}
         />
+      </Button>
 
-        {transcription ? (
-          <div className="px-4 h-[150px] overflow-y-auto py-4 md:h-[200px]">
-            {transcription}
+      <VoicechateModal isOpen={isOpen}>
+        <VoicechatWrapper>
+          <ChatHeader className="w-full mb-4 lg:px-4 lg:py-2">
+            <ChatHeading>{pipeline.name}</ChatHeading>
+
+            <div className="flex gap-2 items-center">
+              <ChatStatus connectionStatus={connectionStatus} />
+
+              <Button
+                className="p-0 rounded-full h-6"
+                size="xs"
+                variant="ghost"
+                onClick={onCloseAudioChat}
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+          </ChatHeader>
+
+          <VoicechatDot
+            audioRef={audioRef}
+            canvasRef={dotCanvasRef}
+            transcription={<VoiceChatTranscription message={transcription} />}
+          />
+
+          <div className="py-4 px-6">
+            <SpeakingRow
+              disabled={isDisabled}
+              onStop={stopRecording}
+              onStart={startRecording}
+              canvasRef={talkingCanvasRef}
+              status={audioState.status}
+            />
           </div>
-        ) : null}
-      </div>
+        </VoicechatWrapper>
+      </VoicechateModal>
+    </>
+  );
+}
 
+function VoiceChatTranscription({ message }: { message?: IMessage }) {
+  return (
+    <div className="max-w-[800px] text-center text-muted-foreground text-sm">
+      {message ? <ChatMarkdown>{message.message}</ChatMarkdown> : null}
+    </div>
+  );
+}
+
+interface VoicechateModalProps {
+  isOpen: boolean;
+}
+
+const VoicechateModal = ({
+  isOpen,
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLDivElement> & VoicechateModalProps) => {
+  return (
+    <div
+      className={cn(
+        'w-full h-[100dvh] bg-white fixed top-0 left-0 right-0 bottom-0 transition-all',
+        { 'opacity-0 pointer-events-none': !isOpen },
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+};
+
+interface VoicechatDotProps {
+  audioRef: React.RefObject<HTMLAudioElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
+  transcription?: React.ReactNode;
+}
+
+export function VoicechatDot({
+  canvasRef,
+  audioRef,
+  transcription,
+}: VoicechatDotProps) {
+  return (
+    <div
+      className={cn('grow flex flex-col  items-center', {
+        'justify-end md:justify-center': !!transcription,
+        'justify-center': !transcription,
+      })}
+    >
+      <audio ref={audioRef} controls hidden />
+      <canvas
+        ref={canvasRef}
+        width={320}
+        height={320}
+        className="animate-scale"
+      />
+
+      {transcription ? (
+        <div className="px-4 h-[150px] overflow-y-auto py-4 md:h-[200px]">
+          {transcription}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function VoicechatWrapper({
+  children,
+  className,
+  ...rest
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn(
+        'relative flex justify-center flex-col items-center h-[100dvh] w-full bg-secondary pt-3 lg:pt-4',
+        className,
+      )}
+      {...rest}
+    >
       {children}
     </div>
   );
@@ -151,14 +336,12 @@ export function SpeakingRow({
 }
 
 interface UseVoicechatProps {
-  pipeline: IPipelinePublicResponse;
-  onChunk: UseAudioRecorderChunkCb;
+  pipeline: WebchatPipelineConfig;
   audioEnabled?: boolean;
 }
 
 export function useVoicechat({
   pipeline,
-  onChunk,
   audioEnabled = true,
 }: UseVoicechatProps) {
   const eventsQueue = useRef<ArrayBuffer[]>([]);
@@ -202,41 +385,11 @@ export function useVoicechat({
     visualizeTalking(args.mediaStream);
   };
 
-  const {
-    pause: pauseRecording,
-    resume: resumeRecording,
-    start: startAudioRecording,
-    mediaRecorder,
-  } = useAudioRecorder({
-    onChunk: onChunk,
-    onResume: onResume,
-    onStart: onResume,
-  });
-
-  const stopRecording = async () => {
-    isStoppedByUser.current = true;
-
-    await pauseRecording();
-
-    dispatch(stop());
-
-    stopTalkingVisualization();
-    clearTalkingCanvas();
-  };
-
-  const stopOrResume = async () => {
-    if (!isStoppedByUser.current) {
-      resumeRecording();
-    } else {
-      stopRecording();
-    }
-  };
-
-  const input = pipeline.interface_config.webchat.audio_inputs.find(
+  const input = pipeline.interface_config.audio_inputs.find(
     (input) => input.type === 'audio_input',
   );
 
-  const output = pipeline.interface_config.webchat.audio_outputs.find(
+  const output = pipeline.interface_config.audio_outputs.find(
     (input) => input.type === 'audio_output',
   );
 
@@ -260,6 +413,49 @@ export function useVoicechat({
           stopOrResume();
         }
       }
+    }
+  };
+
+  const { joinRun, startRun, stopRun, push, status } = usePipelineRun({
+    organizationId: pipeline.organization_id,
+    pipelineId: pipeline.id,
+    onBlockOutput,
+  });
+
+  const onAudioChunk = (chunk: BlobEvent) => {
+    if (!input) return;
+
+    const topic = `${input.name}:input`;
+    push(topic, chunk.data);
+  };
+
+  const {
+    pause: pauseRecording,
+    resume: resumeRecording,
+    start: startAudioRecording,
+    mediaRecorder,
+  } = useAudioRecorder({
+    onChunk: onAudioChunk,
+    onResume: onResume,
+    onStart: onResume,
+  });
+
+  const stopRecording = async () => {
+    isStoppedByUser.current = true;
+
+    await pauseRecording();
+
+    dispatch(stop());
+
+    stopTalkingVisualization();
+    clearTalkingCanvas();
+  };
+
+  const stopOrResume = async () => {
+    if (!isStoppedByUser.current) {
+      resumeRecording();
+    } else {
+      stopRecording();
     }
   };
 
@@ -351,7 +547,6 @@ export function useVoicechat({
         stopOrResume();
       }
     };
-
     mediaSource.addEventListener('sourceopen', onSourceOpen);
     audioRef.current?.addEventListener('timeupdate', onTimeUpdate);
 
@@ -398,7 +593,6 @@ export function useVoicechat({
   };
 
   return {
-    onBlockOutput,
     startRecording: startRecording,
     stopRecording: stopRecording,
     discard: onDiscard,
@@ -407,9 +601,11 @@ export function useVoicechat({
     audioRef,
     dotCanvasRef,
     talkingCanvasRef,
-    audioInput: input,
     audioOutput: output,
-    isAudioConfigured: !!input && !!output,
+    connectionStatus: status,
+    joinRun,
+    startRun,
+    stopRun,
   };
 }
 

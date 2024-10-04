@@ -461,7 +461,7 @@ export type BuildelRunPipelineConfigProperty = {
 
 export type BuildelRunPipelineConfig = {
   id: number;
-  name: number;
+  name: string;
   organization_id: number;
 };
 
