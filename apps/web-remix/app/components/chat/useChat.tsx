@@ -21,6 +21,7 @@ interface UseChatProps {
   onFinish?: () => void;
   useAuth?: boolean;
   onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
+  authUrl?: string;
 }
 
 export const useChat = ({
@@ -32,6 +33,7 @@ export const useChat = ({
   onFinish,
   useAuth,
   onBlockStatusChange,
+  authUrl,
 }: UseChatProps) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -154,15 +156,17 @@ export const useChat = ({
     setOutputsGenerating(setOutputsGeneratingValue(outputsGenerating, false));
   };
 
-  const { startRun, stopRun, push, status, id } = usePipelineRun(
+  const { startRun, stopRun, push, status, id } = usePipelineRun({
+    useAuth: useAuthWithDefault,
+    onBlockStatusChange: onStatusChange,
+    onConnect: (run, pipeline) => console.log(run, pipeline),
     organizationId,
     pipelineId,
     onBlockOutput,
-    onStatusChange,
     onBlockError,
     onError,
-    useAuthWithDefault,
-  );
+    authUrl,
+  });
 
   const clearMessages = () => {
     setMessages([]);

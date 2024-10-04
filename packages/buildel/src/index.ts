@@ -8,6 +8,12 @@ import type {
   BuildelRunLogsJoinArgs,
   BuildelRunJoinArgs,
   BuildelSocketOptions,
+  BuildelRunRunConfig,
+  BuildelRunPipelineConfig,
+  BuildelRunPipelineConfigProperty,
+  BuildelRunRunBaseConfig,
+  BuildelRunRunFormConfig,
+  BuildelRunRunWebchatConfig,
 } from "./buildel.ts";
 
 export { BuildelSocket, BuildelRun, BuildelRunLogs };
@@ -20,4 +26,10 @@ export type {
   ConnectionState,
   BuildelRunJoinArgs,
   BuildelSocketOptions,
+  BuildelRunRunConfig,
+  BuildelRunPipelineConfig,
+  BuildelRunPipelineConfigProperty,
+  BuildelRunRunFormConfig,
+  BuildelRunRunWebchatConfig,
+  BuildelRunRunBaseConfig,
 };

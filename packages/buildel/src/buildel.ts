@@ -70,6 +70,10 @@ export class BuildelSocket {
   public run(
     pipelineId: number,
     handlers?: {
+      onConnect: (
+        run: BuildelRunRunConfig,
+        pipeline: BuildelRunPipelineConfig,
+      ) => void;
       onBlockOutput?: (
         blockId: string,
         outputName: string,
@@ -81,6 +85,7 @@ export class BuildelSocket {
       onStatusChange?: (status: BuildelRunStatus) => void;
     },
   ) {
+    const onConnect = handlers?.onConnect ?? (() => {});
     const onBlockOutput = handlers?.onBlockOutput ?? (() => {});
     const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => {});
     const onStatusChange = handlers?.onStatusChange ?? (() => {});
@@ -96,6 +101,7 @@ export class BuildelSocket {
       this.headers,
       this.useAuth,
       {
+        onConnect,
         onBlockOutput,
         onBlockStatusChange,
         onStatusChange,
@@ -258,6 +264,10 @@ export class BuildelRun {
     private readonly headers: Record<string, string>,
     private readonly useAuth: boolean,
     private readonly handlers: {
+      onConnect: (
+        run: BuildelRunRunConfig,
+        pipeline: BuildelRunPipelineConfig,
+      ) => void;
       onBlockOutput: (
         blockId: string,
         outputName: string,
@@ -381,6 +391,7 @@ export class BuildelRun {
 
         return this.stop();
       }
+
       if (event.startsWith("output:")) {
         const [_, blockId, outputName] = event.split(":");
         this.handlers.onBlockOutput(blockId, outputName, payload);
@@ -396,6 +407,12 @@ export class BuildelRun {
       if (event.startsWith("error:")) {
         const [_, blockId] = event.split(":");
         this.handlers.onBlockError(blockId, payload.errors);
+      }
+      if (event === "phx_reply" && payload.response) {
+        this.handlers.onConnect(
+          payload.response.run,
+          payload.response.pipeline,
+        );
       }
       return payload;
     };
@@ -435,4 +452,35 @@ export type BuildelRunLogsConnectionStatus = "idle" | "joining" | "joined";
 
 export type BuildelRunLogsJoinArgs = {
   block_name?: string;
+};
+
+export type BuildelRunPipelineConfigProperty = {
+  name: string;
+  type: string;
+};
+
+export type BuildelRunPipelineConfig = {
+  id: number;
+  name: number;
+  organization_id: number;
+};
+
+export type BuildelRunRunBaseConfig = {
+  inputs: BuildelRunPipelineConfigProperty[];
+  outputs: BuildelRunPipelineConfigProperty[];
+  public: boolean;
+};
+
+export type BuildelRunRunFormConfig = BuildelRunRunBaseConfig;
+
+export type BuildelRunRunWebchatConfig = BuildelRunRunBaseConfig & {
+  audio_outputs: BuildelRunPipelineConfigProperty[];
+  audio_inputs: BuildelRunPipelineConfigProperty[];
+  description: string;
+  suggested_messages: string[];
+};
+
+export type BuildelRunRunConfig = {
+  id: number;
+  interface_config: BuildelRunRunWebchatConfig | BuildelRunRunFormConfig;
 };

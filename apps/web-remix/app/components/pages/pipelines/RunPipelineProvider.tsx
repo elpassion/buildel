@@ -106,14 +106,14 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     joinRun,
     push,
     id: runId,
-  } = usePipelineRun(
-    pipeline.organization_id,
-    pipeline.id,
-    onMessage,
-    onStatusChange,
+  } = usePipelineRun({
+    organizationId: pipeline.organization_id,
+    pipelineId: pipeline.id,
+    onBlockOutput: onMessage,
+    onBlockStatusChange: onStatusChange,
     onBlockError,
     onError,
-  );
+  });
 
   const handleStartRun = useCallback(async () => {
     setErrors({});

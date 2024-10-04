@@ -69,8 +69,17 @@ defmodule BuildelWeb.PipelineChannel do
       initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
 
       listen_to_outputs(run)
-
-      {:ok, %{run: %{id: run.id}},
+      {:ok,
+        %{run:
+        %{
+          id: run.id,
+          interface_config: run.interface_config
+        },
+        pipeline: %{
+          id: pipeline.id,
+          organization_id: pipeline.organization_id,
+          name: pipeline.name,
+      }},
        socket |> assign(:run, run) |> assign(:joined_existing, run_id != nil)}
     else
       {:error, :invalid_id} ->

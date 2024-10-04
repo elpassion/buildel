@@ -66,13 +66,21 @@ export async function loader(args: LoaderFunctionArgs) {
       pipelineId: params.pipelineId,
       chatSize: size.success ? size.data : 'default',
       isAudioChat,
+      authUrl: searchParams.get('authUrl') ?? '/super-api/channel_auth',
     });
   })(args);
 }
 
 export default function WebsiteChat() {
-  const { pipelineId, organizationId, pipeline, alias, chatSize, isAudioChat } =
-    useLoaderData<typeof loader>();
+  const {
+    pipelineId,
+    organizationId,
+    pipeline,
+    alias,
+    chatSize,
+    isAudioChat,
+    authUrl,
+  } = useLoaderData<typeof loader>();
 
   return (
     <div className="flex justify-center items-center h-[100dvh] w-full bg-secondary">
@@ -83,6 +91,7 @@ export default function WebsiteChat() {
         pipeline={pipeline}
         alias={alias}
         size={chatSize}
+        authUrl={authUrl}
       />
     </div>
   );

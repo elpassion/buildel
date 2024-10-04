@@ -67,6 +67,7 @@ interface WebchatProps {
   size?: ChatSize;
   className?: string;
   isAudioChat?: boolean;
+  authUrl?: string;
 }
 
 export const Webchat = ({
@@ -82,6 +83,7 @@ export const Webchat = ({
   size,
   className,
   isAudioChat = false,
+  authUrl,
 }: WebchatProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -123,6 +125,7 @@ export const Webchat = ({
     useAuth: !(pipeline.interface_config.webchat.public ?? false),
     onBlockStatusChange,
     onBlockOutput,
+    authUrl,
   });
 
   const fileInput = useMemo(() => {
