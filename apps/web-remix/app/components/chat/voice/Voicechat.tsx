@@ -390,11 +390,11 @@ export function useVoicechat({
     visualizeTalking(args.mediaStream);
   };
 
-  const input = pipeline.interface_config.audio_inputs.find(
+  const input = pipeline.interface_config.audio_inputs?.find(
     (input) => input.type === 'audio_input',
   );
 
-  const output = pipeline.interface_config.audio_outputs.find(
+  const output = pipeline.interface_config.audio_outputs?.find(
     (input) => input.type === 'audio_output',
   );
 

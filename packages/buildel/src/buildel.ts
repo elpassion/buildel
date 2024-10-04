@@ -474,8 +474,8 @@ export type BuildelRunRunBaseConfig = {
 export type BuildelRunRunFormConfig = BuildelRunRunBaseConfig;
 
 export type BuildelRunRunWebchatConfig = BuildelRunRunBaseConfig & {
-  audio_outputs: BuildelRunPipelineConfigProperty[];
-  audio_inputs: BuildelRunPipelineConfigProperty[];
+  audio_outputs?: BuildelRunPipelineConfigProperty[];
+  audio_inputs?: BuildelRunPipelineConfigProperty[];
   description: string;
   suggested_messages: string[];
 };
