@@ -78,11 +78,13 @@ export class BuildelSocket {
         blockId: string,
         outputName: string,
         payload: unknown,
+        metadata: BuildelRunOutputMetadata,
       ) => void;
       onError: (error: string) => void;
       onBlockError?: (blockId: string, errors: string[]) => void;
       onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
       onStatusChange?: (status: BuildelRunStatus) => void;
+      onHistory?: (events: BuildelRunHistoryEvent[]) => void;
     },
   ) {
     const onConnect = handlers?.onConnect ?? (() => {});
@@ -91,6 +93,7 @@ export class BuildelSocket {
     const onStatusChange = handlers?.onStatusChange ?? (() => {});
     const onBlockError = handlers?.onBlockError ?? (() => {});
     const onError = handlers?.onError ?? (() => {});
+    const onHistory = handlers?.onHistory ?? (() => {});
 
     return new BuildelRun(
       this.socket,
@@ -107,6 +110,7 @@ export class BuildelSocket {
         onStatusChange,
         onBlockError,
         onError,
+        onHistory,
       },
     );
   }
@@ -268,10 +272,12 @@ export class BuildelRun {
         run: BuildelRunRunConfig,
         pipeline: BuildelRunPipelineConfig,
       ) => void;
+      onHistory: (events: BuildelRunHistoryEvent[]) => void;
       onBlockOutput: (
         blockId: string,
         outputName: string,
         payload: unknown,
+        metadata: BuildelRunOutputMetadata,
       ) => void;
       onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
       onStatusChange: (status: BuildelRunStatus) => void;
@@ -352,6 +358,13 @@ export class BuildelRun {
     }
   }
 
+  public async loadHistory() {
+    if (this.status !== "running") return;
+    assert(this.channel);
+
+    this.channel.push("history", {});
+  }
+
   public get status(): BuildelRunStatus {
     if (this.socket.connectionState() !== "open" || this.channel === null)
       return "idle";
@@ -394,7 +407,13 @@ export class BuildelRun {
 
       if (event.startsWith("output:")) {
         const [_, blockId, outputName] = event.split(":");
-        this.handlers.onBlockOutput(blockId, outputName, payload);
+
+        if (typeof payload === "object" && payload instanceof ArrayBuffer) {
+          const { metadata, chunk } = this.decodeBinaryMessage(payload);
+          this.handlers.onBlockOutput(blockId, outputName, chunk, metadata);
+        } else {
+          this.handlers.onBlockOutput(blockId, outputName, payload, {});
+        }
       }
       if (event.startsWith("start:")) {
         const [_, blockId] = event.split(":");
@@ -413,6 +432,34 @@ export class BuildelRun {
           payload.response.run,
           payload.response.pipeline,
         );
+      }
+      if (event === "history") {
+        this.handlers.onHistory(payload.events);
+
+        payload.events.forEach((event: BuildelRunHistoryEvent) => {
+          switch (event.type) {
+            case "start_stream":
+              return this.handlers.onBlockStatusChange(event.block, true);
+            case "stop_stream":
+              return this.handlers.onBlockStatusChange(event.block, false);
+            case "text":
+              return this.handlers.onBlockOutput(
+                event.block,
+                event.io,
+                {
+                  message: event.message,
+                },
+                { created_at: event.created_at },
+              );
+            case "binary":
+              return this.handlers.onBlockOutput(
+                event.block,
+                event.io,
+                event.message,
+                { created_at: event.created_at },
+              );
+          }
+        });
       }
       return payload;
     };
@@ -433,6 +480,27 @@ export class BuildelRun {
         channel_name: `pipelines:${this.organizationId}:${this.pipelineId}${runId ? `:${runId}` : ""}`,
       }),
     }).then((response) => response.json());
+  }
+
+  private decodeBinaryMessage(buffer: ArrayBuffer) {
+    const view = new DataView(buffer);
+
+    const metadataSize = view.getUint32(0, false);
+
+    const metadataStart = 4;
+    const metadataEnd = metadataStart + metadataSize;
+    const metadataBytes = new Uint8Array(
+      buffer.slice(metadataStart, metadataEnd),
+    );
+
+    const metadata = JSON.parse(new TextDecoder().decode(metadataBytes));
+    const chunk = new Uint8Array(buffer.slice(metadataEnd));
+
+    return {
+      metadataSize,
+      metadata,
+      chunk,
+    };
   }
 }
 
@@ -484,3 +552,37 @@ export type BuildelRunRunConfig = {
   id: number;
   interface_config: BuildelRunRunWebchatConfig | BuildelRunRunFormConfig;
 };
+
+export type BuildelRunOutputMetadata = {
+  created_at?: string;
+};
+
+export type HistoryEvent = {
+  block: string;
+  created_at: string;
+  io: string;
+};
+
+export type HistoryStartStreamEvent = HistoryEvent & {
+  type: "start_stream";
+};
+
+export type HistoryStopStreamEvent = HistoryEvent & {
+  type: "stop_stream";
+};
+
+export type HistoryTextEvent = HistoryEvent & {
+  type: "text";
+  message: string;
+};
+
+export type HistoryBinaryEvent = HistoryEvent & {
+  type: "binary";
+  message: any;
+};
+
+export type BuildelRunHistoryEvent =
+  | HistoryStartStreamEvent
+  | HistoryStopStreamEvent
+  | HistoryTextEvent
+  | HistoryBinaryEvent;

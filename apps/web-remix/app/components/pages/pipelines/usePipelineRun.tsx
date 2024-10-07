@@ -3,6 +3,7 @@ import { BuildelSocket } from '@buildel/buildel';
 import type {
   BuildelRun,
   BuildelRunJoinArgs,
+  BuildelRunOutputMetadata,
   BuildelRunPipelineConfig,
   BuildelRunRunConfig,
   BuildelRunStartArgs,
@@ -21,7 +22,9 @@ export type UsePipelineRunArgs = {
     blockId: string,
     outputName: string,
     payload: unknown,
+    metadata: BuildelRunOutputMetadata,
   ) => void;
+  onHistory?: (events: any[]) => void;
   onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
   onBlockError?: (blockId: string, errors: string[]) => void;
   onConnect?: (
@@ -38,6 +41,7 @@ export function usePipelineRun({
   onError = () => {},
   onBlockOutput = () => {},
   onConnect = () => {},
+  onHistory = () => {},
   organizationId,
   pipelineId,
   socketArgs = { useAuth: true },
@@ -63,6 +67,10 @@ export function usePipelineRun({
     assert(run.current);
     run.current.push(topic, payload);
   };
+  const loadHistory = () => {
+    assert(run.current);
+    return run.current.loadHistory();
+  };
 
   useEffect(() => {
     buildel.current = new BuildelSocket(organizationId, {
@@ -77,6 +85,7 @@ export function usePipelineRun({
         onStatusChange: setStatus,
         onBlockError: onBlockError,
         onError: onError,
+        onHistory: onHistory,
       });
     });
     return () => {
@@ -91,6 +100,7 @@ export function usePipelineRun({
     joinRun,
     stopRun,
     push,
+    loadHistory,
     id: run.current?.runId,
   };
 }

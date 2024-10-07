@@ -14,6 +14,12 @@ import type {
   BuildelRunRunBaseConfig,
   BuildelRunRunFormConfig,
   BuildelRunRunWebchatConfig,
+  BuildelRunOutputMetadata,
+  BuildelRunHistoryEvent,
+  HistoryTextEvent,
+  HistoryBinaryEvent,
+  HistoryStartStreamEvent,
+  HistoryStopStreamEvent
 } from "./buildel.ts";
 
 export { BuildelSocket, BuildelRun, BuildelRunLogs };
@@ -32,4 +38,10 @@ export type {
   BuildelRunRunFormConfig,
   BuildelRunRunWebchatConfig,
   BuildelRunRunBaseConfig,
+  BuildelRunOutputMetadata,
+  BuildelRunHistoryEvent,
+  HistoryTextEvent,
+  HistoryBinaryEvent,
+  HistoryStartStreamEvent,
+  HistoryStopStreamEvent
 };
