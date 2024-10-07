@@ -1,5 +1,6 @@
 import { useMemo, useReducer } from 'react';
 import type {
+  BuildelRunHandlers,
   BuildelRunOutputMetadata,
   BuildelRunPipelineConfig,
   BuildelRunRunConfig,
@@ -23,27 +24,24 @@ import type {
   WebchatPipelineConfig,
 } from './chat.types';
 
-interface UseChatProps {
+type UseChatProps = Partial<BuildelRunHandlers> & {
   organizationId: number;
   pipelineId: number;
-  onBlockOutput?: (
-    blockId: string,
-    outputName: string,
-    payload: unknown,
-    metadata: BuildelRunOutputMetadata,
-  ) => void;
   onFinish?: () => void;
-  onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
   socketArgs?: UsePipelineRunSocketArgs;
-}
+};
 
 export const useChat = ({
   organizationId,
   pipelineId,
-  onBlockOutput: onBlockOutputProps,
   onFinish,
-  onBlockStatusChange,
   socketArgs,
+  onBlockStatusChange: onBlockStatusChangeProps,
+  onBlockOutput: onBlockOutputProps,
+  onBlockError: onBlockErrorProps,
+  onError: onErrorProps,
+  onConnect: onConnectProps,
+  ...rest
 }: UseChatProps) => {
   const [state, dispatch] = useReducer(chatReducer, {
     status: 'loading',
@@ -73,8 +71,8 @@ export const useChat = ({
     );
   };
 
-  const onStatusChange = (blockName: string, isWorking: boolean) => {
-    onBlockStatusChange?.(blockName, isWorking);
+  const onBlockStatusChange = (blockName: string, isWorking: boolean) => {
+    onBlockStatusChangeProps?.(blockName, isWorking);
 
     dispatch(statusChange(blockName, isWorking));
 
@@ -84,11 +82,15 @@ export const useChat = ({
   };
 
   const onBlockError = (blockId: string, errors: string[]) => {
+    onBlockErrorProps?.(blockId, errors);
+
     console.error(blockId, errors);
     // dispatch(error());
   };
 
   const onError = (err: string) => {
+    onErrorProps?.(err);
+
     dispatch(error(err));
   };
 
@@ -96,6 +98,8 @@ export const useChat = ({
     { id: run_id, ...run }: BuildelRunRunConfig,
     pipeline: BuildelRunPipelineConfig,
   ) => {
+    onConnectProps?.({ id: run_id, ...run }, pipeline);
+
     dispatch(connect({ ...pipeline, ...run, run_id } as WebchatPipelineConfig));
 
     setTimeout(() => {
@@ -105,13 +109,14 @@ export const useChat = ({
 
   const { startRun, stopRun, push, joinRun, status, loadHistory } =
     usePipelineRun({
-      onBlockStatusChange: onStatusChange,
-      onConnect,
       organizationId,
       pipelineId,
+      onConnect,
+      onBlockStatusChange,
       onBlockOutput,
       onBlockError,
       onError,
+      ...rest,
       socketArgs: {
         ...socketArgs,
         useAuth: useAuthWithDefault,

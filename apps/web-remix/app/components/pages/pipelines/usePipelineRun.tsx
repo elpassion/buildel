@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { BuildelSocket } from '@buildel/buildel';
 import type {
   BuildelRun,
+  BuildelRunHandlers,
   BuildelRunJoinArgs,
-  BuildelRunOutputMetadata,
-  BuildelRunPipelineConfig,
-  BuildelRunRunConfig,
   BuildelRunStartArgs,
   BuildelRunStatus,
   BuildelSocketOptions,
@@ -15,36 +13,17 @@ import { assert } from '~/utils/assert';
 
 export type UsePipelineRunSocketArgs = BuildelSocketOptions;
 
-export type UsePipelineRunArgs = {
+export type UsePipelineRunArgs = Partial<BuildelRunHandlers> & {
   organizationId: number;
   pipelineId: number;
-  onBlockOutput?: (
-    blockId: string,
-    outputName: string,
-    payload: unknown,
-    metadata: BuildelRunOutputMetadata,
-  ) => void;
-  onHistory?: (events: any[]) => void;
-  onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
-  onBlockError?: (blockId: string, errors: string[]) => void;
-  onConnect?: (
-    run: BuildelRunRunConfig,
-    pipeline: BuildelRunPipelineConfig,
-  ) => void;
-  onError?: (error: string) => void;
   socketArgs?: UsePipelineRunSocketArgs;
 };
 
 export function usePipelineRun({
-  onBlockStatusChange = () => {},
-  onBlockError = () => {},
-  onError = () => {},
-  onBlockOutput = () => {},
-  onConnect = () => {},
-  onHistory = () => {},
   organizationId,
   pipelineId,
   socketArgs = { useAuth: true },
+  ...rest
 }: UsePipelineRunArgs) {
   const buildel = useRef<BuildelSocket>();
   const run = useRef<BuildelRun>();
@@ -79,13 +58,8 @@ export function usePipelineRun({
     });
     buildel.current.connect().then((buildel) => {
       run.current = buildel.run(pipelineId, {
-        onConnect,
-        onBlockOutput,
-        onBlockStatusChange,
         onStatusChange: setStatus,
-        onBlockError: onBlockError,
-        onError: onError,
-        onHistory: onHistory,
+        ...rest,
       });
     });
     return () => {

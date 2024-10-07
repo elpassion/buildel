@@ -1,14 +1,18 @@
 import { Channel, ConnectionState, Socket } from "phoenix";
 import { v4 } from "uuid";
 import { assert } from "./utils/assert.ts";
+import type {
+  BuildelRunStatus,
+  BuildelRunStartArgs,
+  BuildelRunLogsConnectionStatus,
+  BuildelRunLogsJoinArgs,
+  BuildelRunJoinArgs,
+  BuildelSocketOptions,
+  BuildelRunHistoryEvent,
+  BuildelRunHandlers,
+  BuildelRunLogsHandlers,
+} from "./buildel.types.ts";
 
-export interface BuildelSocketOptions {
-  socketUrl?: string;
-  authUrl?: string;
-  headers?: Record<string, string>;
-  useAuth?: boolean;
-  onStatusChange?: (status: ConnectionState) => void;
-}
 export class BuildelSocket {
   private readonly socket: Socket;
   private readonly id: string;
@@ -67,26 +71,7 @@ export class BuildelSocket {
     return this.socket.connectionState();
   }
 
-  public run(
-    pipelineId: number,
-    handlers?: {
-      onConnect: (
-        run: BuildelRunRunConfig,
-        pipeline: BuildelRunPipelineConfig,
-      ) => void;
-      onBlockOutput?: (
-        blockId: string,
-        outputName: string,
-        payload: unknown,
-        metadata: BuildelRunOutputMetadata,
-      ) => void;
-      onError: (error: string) => void;
-      onBlockError?: (blockId: string, errors: string[]) => void;
-      onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
-      onStatusChange?: (status: BuildelRunStatus) => void;
-      onHistory?: (events: BuildelRunHistoryEvent[]) => void;
-    },
-  ) {
+  public run(pipelineId: number, handlers?: Partial<BuildelRunHandlers>) {
     const onConnect = handlers?.onConnect ?? (() => {});
     const onBlockOutput = handlers?.onBlockOutput ?? (() => {});
     const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => {});
@@ -118,12 +103,7 @@ export class BuildelSocket {
   public logs(
     pipelineId: number,
     runId: number,
-    handlers?: {
-      onMessage: (payload: unknown) => void;
-      onLogMessage: (payload: unknown) => void;
-      onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
-      onError: (error: string) => void;
-    },
+    handlers?: Partial<BuildelRunLogsHandlers>,
   ) {
     const onMessage = handlers?.onMessage ?? (() => {});
     const onLogMessage = handlers?.onLogMessage ?? (() => {});
@@ -161,12 +141,7 @@ export class BuildelRunLogs {
     private readonly authUrl: string,
     private readonly headers: Record<string, string>,
     private readonly useAuth: boolean,
-    private readonly handlers: {
-      onMessage: (payload: unknown) => void;
-      onLogMessage: (payload: unknown) => void;
-      onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
-      onError: (error: string) => void;
-    },
+    private readonly handlers: BuildelRunLogsHandlers,
   ) {}
 
   public async join(args: BuildelRunLogsJoinArgs) {
@@ -267,23 +242,7 @@ export class BuildelRun {
     private readonly authUrl: string,
     private readonly headers: Record<string, string>,
     private readonly useAuth: boolean,
-    private readonly handlers: {
-      onConnect: (
-        run: BuildelRunRunConfig,
-        pipeline: BuildelRunPipelineConfig,
-      ) => void;
-      onHistory: (events: BuildelRunHistoryEvent[]) => void;
-      onBlockOutput: (
-        blockId: string,
-        outputName: string,
-        payload: unknown,
-        metadata: BuildelRunOutputMetadata,
-      ) => void;
-      onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
-      onStatusChange: (status: BuildelRunStatus) => void;
-      onBlockError: (blockId: string, errors: string[]) => void;
-      onError: (error: string) => void;
-    },
+    private readonly handlers: BuildelRunHandlers,
   ) {}
 
   public async start(args: BuildelRunStartArgs = { initial_inputs: [] }) {
@@ -503,86 +462,3 @@ export class BuildelRun {
     };
   }
 }
-
-export type BuildelRunStatus = "idle" | "starting" | "running";
-
-export type BuildelRunStartArgs = {
-  initial_inputs?: { name: string; value: string }[];
-  alias?: string;
-  metadata?: Record<string, any>;
-};
-
-export type BuildelRunJoinArgs = BuildelRunStartArgs & {
-  runId: number;
-};
-
-export type BuildelRunLogsConnectionStatus = "idle" | "joining" | "joined";
-
-export type BuildelRunLogsJoinArgs = {
-  block_name?: string;
-};
-
-export type BuildelRunPipelineConfigProperty = {
-  name: string;
-  type: string;
-};
-
-export type BuildelRunPipelineConfig = {
-  id: number;
-  name: string;
-  organization_id: number;
-};
-
-export type BuildelRunRunBaseConfig = {
-  inputs: BuildelRunPipelineConfigProperty[];
-  outputs: BuildelRunPipelineConfigProperty[];
-  public: boolean;
-};
-
-export type BuildelRunRunFormConfig = BuildelRunRunBaseConfig;
-
-export type BuildelRunRunWebchatConfig = BuildelRunRunBaseConfig & {
-  audio_outputs?: BuildelRunPipelineConfigProperty[];
-  audio_inputs?: BuildelRunPipelineConfigProperty[];
-  description?: string;
-  suggested_messages?: string[];
-};
-
-export type BuildelRunRunConfig = {
-  id: number;
-  interface_config: BuildelRunRunWebchatConfig | BuildelRunRunFormConfig;
-};
-
-export type BuildelRunOutputMetadata = {
-  created_at?: string;
-};
-
-export type HistoryEvent = {
-  block: string;
-  created_at: string;
-  io: string;
-};
-
-export type HistoryStartStreamEvent = HistoryEvent & {
-  type: "start_stream";
-};
-
-export type HistoryStopStreamEvent = HistoryEvent & {
-  type: "stop_stream";
-};
-
-export type HistoryTextEvent = HistoryEvent & {
-  type: "text";
-  message: string;
-};
-
-export type HistoryBinaryEvent = HistoryEvent & {
-  type: "binary";
-  message: any;
-};
-
-export type BuildelRunHistoryEvent =
-  | HistoryStartStreamEvent
-  | HistoryStopStreamEvent
-  | HistoryTextEvent
-  | HistoryBinaryEvent;

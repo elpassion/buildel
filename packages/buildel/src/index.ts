@@ -16,11 +16,23 @@ import type {
   BuildelRunRunWebchatConfig,
   BuildelRunOutputMetadata,
   BuildelRunHistoryEvent,
+  HistoryEvent,
   HistoryTextEvent,
   HistoryBinaryEvent,
   HistoryStartStreamEvent,
-  HistoryStopStreamEvent
-} from "./buildel.ts";
+  HistoryStopStreamEvent,
+  OnError,
+  OnConnect,
+  OnBlockOutput,
+  OnBlockStatusChange,
+  OnHistory,
+  OnBlockError,
+  OnStatusChange,
+  OnLogMessage,
+  OnLogStatusChange,
+  BuildelRunLogsHandlers,
+  BuildelRunHandlers,
+} from "./buildel.types.ts";
 
 export { BuildelSocket, BuildelRun, BuildelRunLogs };
 
@@ -40,8 +52,20 @@ export type {
   BuildelRunRunBaseConfig,
   BuildelRunOutputMetadata,
   BuildelRunHistoryEvent,
+  HistoryEvent,
   HistoryTextEvent,
   HistoryBinaryEvent,
   HistoryStartStreamEvent,
-  HistoryStopStreamEvent
+  HistoryStopStreamEvent,
+  OnError,
+  OnConnect,
+  OnBlockOutput,
+  OnBlockStatusChange,
+  OnHistory,
+  OnBlockError,
+  OnStatusChange,
+  OnLogMessage,
+  OnLogStatusChange,
+  BuildelRunLogsHandlers,
+  BuildelRunHandlers,
 };
