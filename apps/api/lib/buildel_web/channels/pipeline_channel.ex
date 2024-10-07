@@ -69,18 +69,19 @@ defmodule BuildelWeb.PipelineChannel do
       initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
 
       listen_to_outputs(run)
+
       {:ok,
-        %{run:
-        %{
-          id: run.id,
-          interface_config: run_interface
-        },
-        pipeline: %{
-          id: pipeline.id,
-          organization_id: pipeline.organization_id,
-          name: pipeline.name,
-      }},
-       socket |> assign(:run, run) |> assign(:joined_existing, run_id != nil)}
+       %{
+         run: %{
+           id: run.id,
+           interface_config: run_interface
+         },
+         pipeline: %{
+           id: pipeline.id,
+           organization_id: pipeline.organization_id,
+           name: pipeline.name
+         }
+       }, socket |> assign(:run, run) |> assign(:joined_existing, run_id != nil)}
     else
       {:error, :invalid_id} ->
         {:error, %{reason: "not_found"}}
@@ -202,8 +203,13 @@ defmodule BuildelWeb.PipelineChannel do
     Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{})
   end
 
-  def handle_info({output_name, :binary, chunk, _metadata}, socket) do
+  def handle_info({output_name, :binary, chunk, metadata}, socket) do
     Logger.debug("Channel Sending binary chunk to #{output_name}")
+
+    metadata_json = Jason.encode!(metadata)
+    metadata_size = byte_size(metadata_json)
+    size_bin = <<metadata_size::32>>
+    combined_binary = size_bin <> metadata_json <> chunk
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
 
@@ -218,12 +224,19 @@ defmodule BuildelWeb.PipelineChannel do
 
     case interface_output_block_names do
       [] ->
-        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+        socket
+        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, combined_binary})
+
         {:noreply, socket}
 
       block_names ->
         if Enum.member?(block_names, block_name) do
-          socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+          socket
+          |> Phoenix.Channel.push(
+            "output:#{block_name}:#{output_name}",
+            {:binary, combined_binary}
+          )
+
           {:noreply, socket}
         else
           {:noreply, socket}
