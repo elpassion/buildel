@@ -19,6 +19,9 @@ type Action =
       };
     }
   | {
+      type: 'LOAD_HISTORY';
+    }
+  | {
       type: 'ERROR';
       payload: {
         error: string | null;
@@ -71,11 +74,13 @@ export const chatReducer = (
         ...state,
         error: null,
         pipelineConfig: action.payload.data,
-        status: 'connected',
         outputsStatus: toOutputStatus(
           action.payload.data.interface_config.outputs,
         ),
       };
+    case 'LOAD_HISTORY': {
+      return { ...state, status: 'connected' };
+    }
     case 'ERROR':
       return {
         ...state,
@@ -140,6 +145,12 @@ export const connect = (config: WebchatPipelineConfig) => {
     payload: {
       data: config,
     },
+  } as const;
+};
+
+export const loadHistory = () => {
+  return {
+    type: 'LOAD_HISTORY',
   } as const;
 };
 

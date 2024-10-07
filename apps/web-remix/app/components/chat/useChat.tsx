@@ -1,6 +1,7 @@
 import { useMemo, useReducer } from 'react';
 import type {
   BuildelRunHandlers,
+  BuildelRunHistoryEvent,
   BuildelRunOutputMetadata,
   BuildelRunPipelineConfig,
   BuildelRunRunConfig,
@@ -14,6 +15,7 @@ import {
   connect,
   error,
   getBlockId,
+  loadHistory,
   messageReceive,
   send,
   statusChange,
@@ -41,6 +43,7 @@ export const useChat = ({
   onBlockError: onBlockErrorProps,
   onError: onErrorProps,
   onConnect: onConnectProps,
+  onHistory: onHistoryProps,
   ...rest
 }: UseChatProps) => {
   const [state, dispatch] = useReducer(chatReducer, {
@@ -103,25 +106,38 @@ export const useChat = ({
     dispatch(connect({ ...pipeline, ...run, run_id } as WebchatPipelineConfig));
 
     setTimeout(() => {
-      loadHistory();
+      triggerHistory();
     }, 0);
   };
 
-  const { startRun, stopRun, push, joinRun, status, loadHistory } =
-    usePipelineRun({
-      organizationId,
-      pipelineId,
-      onConnect,
-      onBlockStatusChange,
-      onBlockOutput,
-      onBlockError,
-      onError,
-      ...rest,
-      socketArgs: {
-        ...socketArgs,
-        useAuth: useAuthWithDefault,
-      },
-    });
+  const onHistory = (events: BuildelRunHistoryEvent[]) => {
+    onHistoryProps?.(events);
+
+    dispatch(loadHistory());
+  };
+
+  const {
+    startRun,
+    stopRun,
+    push,
+    joinRun,
+    status,
+    loadHistory: triggerHistory,
+  } = usePipelineRun({
+    organizationId,
+    pipelineId,
+    onConnect,
+    onBlockStatusChange,
+    onBlockOutput,
+    onBlockError,
+    onError,
+    onHistory,
+    ...rest,
+    socketArgs: {
+      ...socketArgs,
+      useAuth: useAuthWithDefault,
+    },
+  });
 
   const handlePush = (message: string) => {
     if (!message.trim() || !state.pipelineConfig) return;
