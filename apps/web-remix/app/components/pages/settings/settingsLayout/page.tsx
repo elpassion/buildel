@@ -32,6 +32,9 @@ export function SettingsLayout() {
             <FilledTabLink to={routes.profileSettings(organizationId)}>
               Your Profile
             </FilledTabLink>
+            <FilledTabLink to={routes.billing(organizationId)}>
+              Billing
+            </FilledTabLink>
           </FilledTabsWrapper>
 
           <div className="mt-10">
