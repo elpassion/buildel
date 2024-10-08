@@ -12,7 +12,7 @@ import {
   SubscriptionHeader,
   SubscriptionTitle,
   UsageProgress,
-} from './components/SubscriptionDetailsCard';
+} from './components/SubscriptionCard';
 import type { loader } from './loader.server';
 
 export function ProfileSettingsPage() {
