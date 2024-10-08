@@ -171,7 +171,7 @@ defmodule Buildel.Blocks.DocumentSearch do
      |> Map.put(:collection, collection)
      |> Map.put(:collection_name, collection_name)
      |> Map.put(:where, %{
-       "document_id" =>
+       "memory_id" =>
          case opts[:document_id] do
            nil -> nil
            "" -> nil
