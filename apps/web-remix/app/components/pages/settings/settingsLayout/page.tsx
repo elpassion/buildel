@@ -37,7 +37,7 @@ export function SettingsLayout() {
             </FilledTabLink>
           </FilledTabsWrapper>
 
-          <div className="mt-10">
+          <div className="mt-12 lg:mt-20">
             <Outlet />
           </div>
         </TabGroup>

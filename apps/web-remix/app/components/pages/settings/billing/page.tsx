@@ -4,6 +4,7 @@ import { useLoaderData } from '@remix-run/react';
 
 import { metaWithDefaults } from '~/utils/metadata';
 
+import { BillingPlanList } from './components/BillingPlan';
 import {
   ManageSubscriptionButton,
   SubscriptionCard,
@@ -16,7 +17,7 @@ import {
 import type { loader } from './loader.server';
 
 export function ProfileSettingsPage() {
-  const { user } = useLoaderData<typeof loader>();
+  const { user, plans } = useLoaderData<typeof loader>();
 
   return (
     <>
@@ -32,6 +33,14 @@ export function ProfileSettingsPage() {
           <UsageProgress usage={199} maxUsage={1000} />
         </SubscriptionContent>
       </SubscriptionCard>
+
+      <section className="mt-20">
+        <h1 className="text-4xl font-semibold mb-10">
+          Choose a plan that’s right for you!
+        </h1>
+
+        <BillingPlanList plans={plans} />
+      </section>
     </>
   );
 }
