@@ -1,5 +1,5 @@
 import React from 'react';
-import type { LoaderFunctionArgs } from '@remix-run/node';
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import invariant from 'tiny-invariant';
@@ -8,6 +8,7 @@ import { PipelineApi } from '~/api/pipeline/PipelineApi';
 import { chatSize } from '~/components/chat/chat.types';
 import { Webchat } from '~/components/chat/Webchat';
 import { loaderBuilder } from '~/utils.server';
+import { metaWithDefaults } from '~/utils/metadata';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ params, request }, { fetch }) => {
@@ -62,3 +63,11 @@ export default function WebsiteChat() {
     </div>
   );
 }
+
+export const meta: MetaFunction = metaWithDefaults(() => {
+  return [
+    {
+      title: 'Webchat',
+    },
+  ];
+});
