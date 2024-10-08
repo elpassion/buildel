@@ -40,6 +40,10 @@ export function ProfileSettingsPage() {
         </h1>
 
         <BillingPlanList plans={plans} />
+
+        <p className="text-xs mt-6 text-muted-foreground">
+          * A run is defined as an execution of a BuildEL workflow.
+        </p>
       </section>
     </>
   );

@@ -19,7 +19,12 @@ export function BillingPlanList({ plans }: BillingPlanListProps) {
     <ItemList
       className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
       items={plans}
-      renderItem={(item) => <BillingPlanListItem data={item} />}
+      renderItem={(item) => (
+        <BillingPlanListItem
+          data={item}
+          recommended={item.id === 'prod_Qza6Tpx9c9QG6g'}
+        />
+      )}
     />
   );
 }
@@ -29,23 +34,39 @@ type BillingPlanListItemProps = Omit<
   'children'
 > & {
   data: ISubscriptionProduct;
+  recommended?: boolean;
 };
 
 function BillingPlanListItem({
   data,
   className,
+  recommended,
   ...rest
 }: BillingPlanListItemProps) {
   return (
     <article
       className={cn(
-        'rounded-lg border border-input p-4 grow min-h-[600px]',
+        'relative rounded-lg border p-4 grow min-h-[600px] overflow-hidden',
+        { 'border-primary': recommended, 'border-input': !recommended },
         className,
       )}
       {...rest}
     >
+      {recommended ? (
+        <div className="absolute top-0 right-0 bg-primary text-white text-sm px-3 py-1 rounded-bl-lg">
+          Most popular
+        </div>
+      ) : null}
+
       <div className="h-[100px]">
-        <h3 className="text-base font-normal">{data.name}</h3>
+        <h3
+          className={cn('text-base', {
+            'font-semibold': recommended,
+            'font-normal': !recommended,
+          })}
+        >
+          {data.name}
+        </h3>
       </div>
 
       <p className="mb-2">
@@ -55,11 +76,16 @@ function BillingPlanListItem({
         <span className="text-muted-foreground text-sm">/month</span>
       </p>
 
-      <p className="text-sm text-muted-foreground line-clamp-2 h-10 mb-3">
+      <p className="text-sm text-muted-foreground line-clamp-2 h-10 mb-6">
         {data.description}
       </p>
 
-      <Button isFluid size="sm" variant="outline" className="mb-10">
+      <Button
+        isFluid
+        size="sm"
+        variant={recommended ? 'default' : 'outline'}
+        className="mb-10"
+      >
         Subscribe
       </Button>
 
