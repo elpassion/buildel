@@ -28,6 +28,8 @@ export const routes = {
     `${routes.organizationInvitations(organizationId)}/new`,
   profileSettings: (organizationId: OrganizationId) =>
     `${routes.settings(organizationId)}/profile`,
+  billing: (organizationId: OrganizationId) =>
+    `${routes.settings(organizationId)}/billing`,
   profileSettingsChangePassword: (organizationId: OrganizationId) =>
     `${routes.profileSettings(organizationId)}/change-password`,
   pipelines: (organizationId: OrganizationId) =>
