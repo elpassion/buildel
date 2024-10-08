@@ -100,3 +100,5 @@ config :buildel,
        System.get_env("REGISTRATION_DISABLED", "false") == "true"
 
 config :buildel, :skip_flame, System.get_env("SKIP_FLAME", "false") == "true"
+
+config :buildel, :stripe_api_key, System.get_env("STRIPE_API_KEY")

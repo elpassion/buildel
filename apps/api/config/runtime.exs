@@ -82,6 +82,8 @@ if config_env() == :prod do
 
   config :flame, :backend, FLAME.FlyBackend
 
+  config :buildel, :stripe_api_key, System.get_env("STRIPE_API_KEY")
+
   config :flame, FLAME.FlyBackend,
     token: System.get_env("FLY_API_TOKEN"),
     env: %{

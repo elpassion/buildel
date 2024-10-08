@@ -378,6 +378,12 @@ defmodule BuildelWeb.Router do
     resources("/organizations", OrganizationController, only: [:index, :create, :show])
     put("/organizations/:id", OrganizationController, :update)
 
+    get(
+      "/organizations/:organization_id/subscriptions/products",
+      OrganizationSubscriptionController,
+      :list_products
+    )
+
     resources("/organizations/:organization_id/costs", OrganizationCostsController,
       only: [:index]
     )
