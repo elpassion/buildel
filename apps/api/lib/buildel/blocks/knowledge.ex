@@ -104,7 +104,7 @@ defmodule Buildel.Blocks.Knowledge do
       |> Enum.map(fn memory ->
         %{
           file_name: memory.file_name,
-          id: memory.file_uuid
+          id: memory.id
         }
       end)
 
