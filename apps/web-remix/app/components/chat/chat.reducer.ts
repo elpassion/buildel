@@ -92,7 +92,7 @@ export const chatReducer = (
       return { ...state, status: 'generating' };
 
     case 'STATUS_CHANGE':
-      if (Object.keys(state.outputsStatus).includes(action.payload.blockName)) {
+      if (state.outputsStatus.hasOwnProperty(action.payload.blockName)) {
         return {
           ...state,
           messages: updateLatestAiMessageStatus(state.messages, action.payload),
