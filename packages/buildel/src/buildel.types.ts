@@ -59,6 +59,8 @@ export type BuildelRunRunConfig = {
 
 export type BuildelRunOutputMetadata = {
   created_at?: string;
+  message_id?: string;
+  _broadcast_date?: string;
 };
 
 export type HistoryEvent = {

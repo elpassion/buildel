@@ -371,7 +371,12 @@ export class BuildelRun {
           const { metadata, chunk } = this.decodeBinaryMessage(payload);
           this.handlers.onBlockOutput(blockId, outputName, chunk, metadata);
         } else {
-          this.handlers.onBlockOutput(blockId, outputName, payload, {});
+          this.handlers.onBlockOutput(
+            blockId,
+            outputName,
+            { message: payload.message },
+            { ...payload.metadata, created_at: payload.created_at },
+          );
         }
       }
       if (event.startsWith("start:")) {
@@ -452,12 +457,13 @@ export class BuildelRun {
       buffer.slice(metadataStart, metadataEnd),
     );
 
-    const metadata = JSON.parse(new TextDecoder().decode(metadataBytes));
+    const payload = JSON.parse(new TextDecoder().decode(metadataBytes));
+
     const chunk = new Uint8Array(buffer.slice(metadataEnd));
 
     return {
       metadataSize,
-      metadata,
+      metadata: { ...payload?.metadata, created_at: payload?.created_at },
       chunk,
     };
   }
