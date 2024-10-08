@@ -15,6 +15,7 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
       name: product.name,
       description: product.description,
       active: product.active,
+      features: features(product.features),
       price: price(product.price)
     }
   end
@@ -27,5 +28,11 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
       amount: price.amount,
       currency: price.currency
     }
+  end
+
+  defp features(features)do
+    for %Stripe.Feature{name: name} <- features do
+      %{name: name}
+    end
   end
 end

@@ -20,16 +20,25 @@ defmodule Buildel.Clients.Stripe do
     defstruct [:id, :currency, :amount]
   end
 
+  defmodule Feature do
+    @type t :: %__MODULE__{
+      name: binary()
+    }
+
+    defstruct [:name]
+  end
+
   defmodule Product do
     @type t :: %__MODULE__{
             id: binary(),
             name: binary(),
             description: binary(),
             active: boolean(),
-            price: Price.t() | nil
+            price: Price.t() | nil,
+            features: [Feature.t()]
           }
 
-    defstruct [:id, :name, :description, :active, :price]
+    defstruct [:id, :name, :description, :active, :price, :features]
   end
 
   @impl Buildel.Clients.StripeBehaviour
@@ -89,13 +98,15 @@ defmodule Buildel.Clients.Stripe do
                             "name" => name,
                             "description" => description,
                             "active" => active,
-                            "default_price" => price
+                            "default_price" => price,
+                            "features" => features
                           } ->
       %Product{
         id: id,
         name: name,
         description: description,
         active: active,
+        features: map_features(features),
         price: map_price(price)
       }
     end)
@@ -114,4 +125,11 @@ defmodule Buildel.Clients.Stripe do
       amount: amount
     }
   end
+
+  defp map_features(features) do
+    Enum.map(features, fn %{"name" => name} ->
+      %Feature{name: name}
+    end)
+  end
+
 end

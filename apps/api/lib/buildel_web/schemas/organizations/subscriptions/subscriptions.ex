@@ -27,7 +27,18 @@ defmodule BuildelWeb.Schemas.Subscriptions do
         name: %Schema{type: :string, description: "Product name"},
         description: %Schema{type: :string, description: "Product description"},
         active: %Schema{type: :boolean, description: "Product active status"},
-        price: Price
+        price: Price,
+        features: %Schema{
+          type: :array,
+          items: %Schema{
+            type: :object,
+            properties: %{
+              name: %Schema{type: :string, description: "Feature name"}
+            },
+            required: [:name]
+          },
+          description: "List of product features"
+        }
       },
       required: [:id, :name, :description, :active]
     })
