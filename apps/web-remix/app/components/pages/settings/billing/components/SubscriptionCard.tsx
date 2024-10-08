@@ -1,8 +1,9 @@
 import React from 'react';
-import { Sparkle, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 import { Badge } from '~/components/ui/badge';
-import { Button, ButtonProps } from '~/components/ui/button';
+import type { ButtonProps } from '~/components/ui/button';
+import { Button } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -43,7 +44,7 @@ export function ManageSubscriptionButton({ className, ...rest }: ButtonProps) {
       size="xs"
       variant="outline"
       className={cn(
-        'gap-2 items-center bg-green-500/5 text-green-500 border-green-500/30 hover:text-green-500 hover:bg-green-500/10',
+        'gap-2 items-center bg-green-500/5 text-green-500 border-green-500/10 hover:text-green-500 hover:bg-green-500/10',
         className,
       )}
       {...rest}
