@@ -1,5 +1,8 @@
 import { useMemo, useReducer } from 'react';
 import type {
+  BuildelRunHandlers,
+  BuildelRunHistoryEvent,
+  BuildelRunOutputMetadata,
   BuildelRunPipelineConfig,
   BuildelRunRunConfig,
 } from '@buildel/buildel';
@@ -12,6 +15,7 @@ import {
   connect,
   error,
   getBlockId,
+  loadHistory,
   messageReceive,
   send,
   statusChange,
@@ -22,26 +26,25 @@ import type {
   WebchatPipelineConfig,
 } from './chat.types';
 
-interface UseChatProps {
+type UseChatProps = Partial<BuildelRunHandlers> & {
   organizationId: number;
   pipelineId: number;
-  onBlockOutput?: (
-    blockId: string,
-    outputName: string,
-    payload: unknown,
-  ) => void;
   onFinish?: () => void;
-  onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
   socketArgs?: UsePipelineRunSocketArgs;
-}
+};
 
 export const useChat = ({
   organizationId,
   pipelineId,
-  onBlockOutput: onBlockOutputProps,
   onFinish,
-  onBlockStatusChange,
   socketArgs,
+  onBlockStatusChange: onBlockStatusChangeProps,
+  onBlockOutput: onBlockOutputProps,
+  onBlockError: onBlockErrorProps,
+  onError: onErrorProps,
+  onConnect: onConnectProps,
+  onHistory: onHistoryProps,
+  ...rest
 }: UseChatProps) => {
   const [state, dispatch] = useReducer(chatReducer, {
     status: 'loading',
@@ -57,20 +60,22 @@ export const useChat = ({
     blockName: string,
     outputName: string,
     payload: unknown,
+    metadata: BuildelRunOutputMetadata,
   ) => {
-    onBlockOutputProps?.(blockName, outputName, payload);
+    onBlockOutputProps?.(blockName, outputName, payload, metadata);
 
     dispatch(
       messageReceive(
         blockName,
         outputName,
         (payload as MessageTextPayload).message,
+        metadata,
       ),
     );
   };
 
-  const onStatusChange = (blockName: string, isWorking: boolean) => {
-    onBlockStatusChange?.(blockName, isWorking);
+  const onBlockStatusChange = (blockName: string, isWorking: boolean) => {
+    onBlockStatusChangeProps?.(blockName, isWorking);
 
     dispatch(statusChange(blockName, isWorking));
 
@@ -80,11 +85,15 @@ export const useChat = ({
   };
 
   const onBlockError = (blockId: string, errors: string[]) => {
+    onBlockErrorProps?.(blockId, errors);
+
     console.error(blockId, errors);
     // dispatch(error());
   };
 
   const onError = (err: string) => {
+    onErrorProps?.(err);
+
     dispatch(error(err));
   };
 
@@ -92,17 +101,38 @@ export const useChat = ({
     { id: run_id, ...run }: BuildelRunRunConfig,
     pipeline: BuildelRunPipelineConfig,
   ) => {
+    onConnectProps?.({ id: run_id, ...run }, pipeline);
+
     dispatch(connect({ ...pipeline, ...run, run_id } as WebchatPipelineConfig));
+
+    setTimeout(() => {
+      triggerHistory();
+    }, 0);
   };
 
-  const { startRun, stopRun, push, joinRun, status } = usePipelineRun({
-    onBlockStatusChange: onStatusChange,
-    onConnect,
+  const onHistory = (events: BuildelRunHistoryEvent[]) => {
+    onHistoryProps?.(events);
+
+    dispatch(loadHistory());
+  };
+
+  const {
+    startRun,
+    stopRun,
+    push,
+    joinRun,
+    status,
+    loadHistory: triggerHistory,
+  } = usePipelineRun({
     organizationId,
     pipelineId,
+    onConnect,
+    onBlockStatusChange,
     onBlockOutput,
     onBlockError,
     onError,
+    onHistory,
+    ...rest,
     socketArgs: {
       ...socketArgs,
       useAuth: useAuthWithDefault,

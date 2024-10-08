@@ -3,8 +3,41 @@ defmodule BuildelWeb.PipelineChannel do
   use BuildelWeb.Validator
 
   require Logger
+  alias EarmarkParser.Message
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
+
+  defmodule Message do
+    alias Buildel.Encrypted.Binary
+
+    defmodule Binary do
+      def new(chunk, metadata) do
+        {:binary, combine_binary_metadata(chunk, metadata)}
+      end
+
+      defp combine_binary_metadata(chunk, metadata) do
+        metadata_json =
+          Jason.encode!(%{
+            metadata: metadata,
+            created_at: Map.get(metadata, "_broadcast_date")
+          })
+
+        metadata_size = byte_size(metadata_json)
+        size_bin = <<metadata_size::32>>
+        size_bin <> metadata_json <> chunk
+      end
+    end
+
+    defmodule Text do
+      def new(message, metadata) do
+        %{
+          message: message,
+          metadata: metadata,
+          created_at: Map.get(metadata, "_broadcast_date")
+        }
+      end
+    end
+  end
 
   defparams :join do
     required(:auth, :string)
@@ -69,18 +102,19 @@ defmodule BuildelWeb.PipelineChannel do
       initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
 
       listen_to_outputs(run)
+
       {:ok,
-        %{run:
-        %{
-          id: run.id,
-          interface_config: run_interface
-        },
-        pipeline: %{
-          id: pipeline.id,
-          organization_id: pipeline.organization_id,
-          name: pipeline.name,
-      }},
-       socket |> assign(:run, run) |> assign(:joined_existing, run_id != nil)}
+       %{
+         run: %{
+           id: run.id,
+           interface_config: run_interface
+         },
+         pipeline: %{
+           id: pipeline.id,
+           organization_id: pipeline.organization_id,
+           name: pipeline.name
+         }
+       }, socket |> assign(:run, run) |> assign(:joined_existing, run_id != nil)}
     else
       {:error, :invalid_id} ->
         {:error, %{reason: "not_found"}}
@@ -202,7 +236,7 @@ defmodule BuildelWeb.PipelineChannel do
     Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{})
   end
 
-  def handle_info({output_name, :binary, chunk, _metadata}, socket) do
+  def handle_info({output_name, :binary, chunk, metadata}, socket) do
     Logger.debug("Channel Sending binary chunk to #{output_name}")
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
@@ -216,14 +250,20 @@ defmodule BuildelWeb.PipelineChannel do
          Map.get(run.interface_config, "audio_inputs", []))
       |> Enum.map(&Map.get(&1, "name"))
 
+    message = Message.Binary.new(chunk, metadata)
+
     case interface_output_block_names do
       [] ->
-        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+        socket
+        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+
         {:noreply, socket}
 
       block_names ->
         if Enum.member?(block_names, block_name) do
-          socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+          socket
+          |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+
           {:noreply, socket}
         else
           {:noreply, socket}
@@ -231,10 +271,12 @@ defmodule BuildelWeb.PipelineChannel do
     end
   end
 
-  def handle_info({output_name, :text, message, _metadata}, socket) do
+  def handle_info({output_name, :text, message, metadata}, socket) do
     Logger.debug("Channel Sending text chunk to #{output_name}")
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
+
+    message = Message.Text.new(message, metadata)
 
     run = socket.assigns.run
 
@@ -247,13 +289,13 @@ defmodule BuildelWeb.PipelineChannel do
 
     case interface_output_block_names do
       [] ->
-        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
+        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
         {:noreply, socket}
 
       block_names ->
         if Enum.member?(block_names, block_name) do
           socket
-          |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
+          |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
 
           {:noreply, socket}
         else

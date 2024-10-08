@@ -95,7 +95,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     });
   }, []);
 
-  const onStatusChange = useCallback((block: string, status: boolean) => {
+  const onBlockStatusChange = useCallback((block: string, status: boolean) => {
     setBlockStatuses((prev) => ({ ...prev, [block]: status }));
   }, []);
 
@@ -110,7 +110,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     organizationId: pipeline.organization_id,
     pipelineId: pipeline.id,
     onBlockOutput: onMessage,
-    onBlockStatusChange: onStatusChange,
+    onBlockStatusChange,
     onBlockError,
     onError,
   });

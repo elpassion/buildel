@@ -477,9 +477,7 @@ export function useVoicechat({
   const appendToBuffer = async () => {
     if (!sourceBufferRef.current || !mediaSourceRef.current) return;
 
-    if (sourceBufferRef.current.updating) {
-      return;
-    }
+    if (sourceBufferRef.current.updating) return;
 
     if (eventsQueue.current.length > 0) {
       try {

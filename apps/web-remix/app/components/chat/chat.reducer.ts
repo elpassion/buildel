@@ -1,3 +1,4 @@
+import type { BuildelRunOutputMetadata } from '@buildel/buildel';
 import cloneDeep from 'lodash.clonedeep';
 import startCase from 'lodash.startcase';
 import { v4 as uuidv4 } from 'uuid';
@@ -8,6 +9,7 @@ import type {
   MessageRole,
   WebchatPipelineConfig,
 } from '~/components/chat/chat.types';
+import { dayjs } from '~/utils/Dayjs';
 
 type Action =
   | {
@@ -15,6 +17,9 @@ type Action =
       payload: {
         data: WebchatPipelineConfig;
       };
+    }
+  | {
+      type: 'LOAD_HISTORY';
     }
   | {
       type: 'ERROR';
@@ -38,6 +43,7 @@ type Action =
         blockName: string;
         outputName: string;
         message: string;
+        metadata: BuildelRunOutputMetadata;
       };
     };
 
@@ -68,11 +74,13 @@ export const chatReducer = (
         ...state,
         error: null,
         pipelineConfig: action.payload.data,
-        status: 'connected',
         outputsStatus: toOutputStatus(
           action.payload.data.interface_config.outputs,
         ),
       };
+    case 'LOAD_HISTORY': {
+      return { ...state, status: 'connected' };
+    }
     case 'ERROR':
       return {
         ...state,
@@ -84,7 +92,7 @@ export const chatReducer = (
       return { ...state, status: 'generating' };
 
     case 'STATUS_CHANGE':
-      if (Object.keys(state.outputsStatus).includes(action.payload.blockName)) {
+      if (state.outputsStatus.hasOwnProperty(action.payload.blockName)) {
         return {
           ...state,
           messages: updateLatestAiMessageStatus(state.messages, action.payload),
@@ -100,7 +108,7 @@ export const chatReducer = (
         return state;
       }
     case 'MESSAGE_RECEIVE':
-      const { blockName, outputName, message } = action.payload;
+      const { blockName, outputName, message, metadata } = action.payload;
       const pipelineConfig = state.pipelineConfig;
 
       if (!pipelineConfig) return state;
@@ -110,7 +118,7 @@ export const chatReducer = (
           ...state,
           messages: [
             ...state.messages,
-            buildUserMessage(blockName, outputName, message),
+            buildUserMessage(blockName, outputName, message, metadata),
           ],
         };
       }
@@ -122,6 +130,7 @@ export const chatReducer = (
             blockName,
             outputName,
             message,
+            metadata,
           }),
         };
       }
@@ -136,6 +145,12 @@ export const connect = (config: WebchatPipelineConfig) => {
     payload: {
       data: config,
     },
+  } as const;
+};
+
+export const loadHistory = () => {
+  return {
+    type: 'LOAD_HISTORY',
   } as const;
 };
 
@@ -168,6 +183,7 @@ export const messageReceive = (
   blockName: string,
   outputName: string,
   message: string,
+  metadata: BuildelRunOutputMetadata,
 ) => {
   return {
     type: 'MESSAGE_RECEIVE',
@@ -175,6 +191,7 @@ export const messageReceive = (
       blockName,
       outputName,
       message,
+      metadata,
     },
   } as const;
 };
@@ -211,7 +228,12 @@ function setEveryOutputStatus(
 
 function upsertAiMessage(
   messages: IMessage[],
-  args: { blockName: string; outputName: string; message: string },
+  args: {
+    blockName: string;
+    outputName: string;
+    message: string;
+    metadata: BuildelRunOutputMetadata;
+  },
 ) {
   const idx = getNotFinishedBlockMessageIdx(messages, args.blockName);
 
@@ -225,7 +247,12 @@ function upsertAiMessage(
 
   return [
     ...messages,
-    buildAiMessage(args.blockName, args.outputName, args.message),
+    buildAiMessage(
+      args.blockName,
+      args.outputName,
+      args.message,
+      args.metadata,
+    ),
   ];
 }
 
@@ -268,12 +295,13 @@ function buildUserMessage(
   blockName: string,
   outputName: string,
   message: string,
+  metadata: BuildelRunOutputMetadata,
 ): IMessage {
   return {
     message: message,
     id: uuidv4(),
     role: 'user' as MessageRole,
-    created_at: new Date(),
+    created_at: getDateOfMessage(metadata),
     blockName: blockName,
     blockId: getBlockId(blockName, outputName),
     outputName: outputName,
@@ -285,6 +313,7 @@ function buildAiMessage(
   blockName: string,
   outputName: string,
   message: string,
+  metadata: BuildelRunOutputMetadata,
 ): IMessage {
   return {
     id: uuidv4(),
@@ -293,7 +322,13 @@ function buildAiMessage(
     outputName: outputName,
     blockId: getBlockId(blockName, outputName),
     message: message,
-    created_at: new Date(),
+    created_at: getDateOfMessage(metadata),
     state: 'generating',
   };
+}
+
+function getDateOfMessage(metadata: BuildelRunOutputMetadata) {
+  return metadata.created_at
+    ? dayjs(metadata.created_at + 'Z').toDate()
+    : new Date();
 }

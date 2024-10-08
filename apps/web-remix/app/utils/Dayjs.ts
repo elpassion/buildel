@@ -28,6 +28,10 @@ export class Dayjs {
     return this.instance.toISOString();
   }
 
+  toDate() {
+    return this.instance.toDate();
+  }
+
   startOf(unit: originalDayjs.OpUnitType): originalDayjs.Dayjs {
     return this.instance.startOf(unit);
   }
