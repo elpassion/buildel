@@ -383,7 +383,7 @@ defmodule Buildel.Blocks.DocumentSearch do
                 description: "The filters to apply to the search.",
                 properties: %{
                   memory_id: %{
-                    type: "string",
+                    type: "number",
                     description: "The ID of a document to search in."
                   }
                   # keywords: %{
