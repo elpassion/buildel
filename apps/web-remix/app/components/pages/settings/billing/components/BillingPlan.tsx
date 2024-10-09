@@ -29,20 +29,26 @@ export function BillingPlanFilters({
   const [isYearly, setIsYearly] = React.useState(true);
 
   const recurringPlans = useMemo(() => {
-    return plans.reduce((acc, plan) => {
-      const yearly = plan.prices.find(
-        (price) => price.recurring?.interval === 'year',
-      );
-      const monthly = plan.prices.find(
-        (price) => price.recurring?.interval === 'month',
-      );
+    return plans
+      .reduce((acc, plan) => {
+        const yearly = plan.prices.find(
+          (price) => price.recurring?.interval === 'year',
+        );
+        const monthly = plan.prices.find(
+          (price) => price.recurring?.interval === 'month',
+        );
 
-      if (!yearly || !monthly) {
-        return acc;
-      } else {
-        return [...acc, { ...plan, defaultPrice: isYearly ? yearly : monthly }];
-      }
-    }, [] as BillingPlan[]);
+        if (!yearly || !monthly) {
+          return acc;
+        } else {
+          return [
+            ...acc,
+            { ...plan, defaultPrice: isYearly ? yearly : monthly },
+          ];
+        }
+      }, [] as BillingPlan[])
+      .slice()
+      .sort((a, b) => a.defaultPrice.amount - b.defaultPrice.amount);
   }, [plans, isYearly]);
 
   return (
