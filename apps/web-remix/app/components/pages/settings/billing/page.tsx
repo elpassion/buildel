@@ -4,7 +4,7 @@ import { useLoaderData } from '@remix-run/react';
 
 import { metaWithDefaults } from '~/utils/metadata';
 
-import { BillingPlanList } from './components/BillingPlan';
+import { BillingPlanFilters, BillingPlanList } from './components/BillingPlan';
 import { UsageProgress } from './components/BillingProgress';
 import {
   ManageSubscriptionButton,
@@ -35,11 +35,9 @@ export function ProfileSettingsPage() {
       </SubscriptionCard>
 
       <section className="mt-20">
-        <h1 className="text-4xl font-semibold mb-10">
-          Choose a plan that’s right for you!
-        </h1>
-
-        <BillingPlanList plans={plans} />
+        <BillingPlanFilters plans={plans}>
+          {(filteredPlans) => <BillingPlanList plans={filteredPlans} />}
+        </BillingPlanFilters>
 
         <p className="text-xs mt-6 text-muted-foreground">
           * A run is defined as an execution of a BuildEL workflow.
