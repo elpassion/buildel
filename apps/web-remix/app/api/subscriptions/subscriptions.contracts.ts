@@ -2,10 +2,15 @@ import { z } from 'zod';
 
 import { MonetaryValue } from '~/utils/MonetaryValue';
 
+export const SubscriptionPriceRecurring = z.object({
+  interval: z.any(),
+});
+
 export const SubscriptionPrice = z.object({
   amount: z.number(),
   currency: z.string(),
   id: z.string(),
+  recurring: SubscriptionPriceRecurring.nullable(),
 });
 
 export const SubscriptionFeature = z.object({
@@ -21,7 +26,7 @@ export const SubscriptionProduct = z.object({
   description: z.string(),
   id: z.string(),
   name: z.string(),
-  price: SubscriptionPrice,
+  prices: z.array(SubscriptionPrice),
   features: z.array(SubscriptionFeature),
   metadata: SubscriptionMetadata,
 });
