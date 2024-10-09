@@ -98,7 +98,7 @@ function BillingPlanListItem({
   return (
     <article
       className={cn(
-        'relative rounded-lg border p-4 grow min-h-[600px] overflow-hidden',
+        'relative rounded-lg border p-4 grow h-[600px] overflow-hidden',
         { 'border-primary': recommended, 'border-input': !recommended },
         className,
       )}
@@ -121,14 +121,20 @@ function BillingPlanListItem({
         </h3>
       </div>
 
-      <p className="mb-2">
+      <p>
         <span className="text-4xl font-bold">
           {stripePrice(data.defaultPrice).format({ maximumFractionDigits: 0 })}
         </span>
         <span className="text-muted-foreground text-sm">/month</span>
+        {data.defaultPrice.recurring?.interval === 'year' ? (
+          <span className="text-xs text-muted-foreground italic whitespace-nowrap">
+            {' '}
+            (billed annually)
+          </span>
+        ) : null}
       </p>
 
-      <p className="text-sm text-muted-foreground line-clamp-2 h-10 mb-6">
+      <p className="text-sm text-muted-foreground line-clamp-2 h-10 mb-6 mt-2">
         {data.description}
       </p>
 
