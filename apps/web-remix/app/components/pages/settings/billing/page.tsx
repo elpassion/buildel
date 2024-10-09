@@ -5,6 +5,7 @@ import { useLoaderData } from '@remix-run/react';
 import { metaWithDefaults } from '~/utils/metadata';
 
 import { BillingPlanList } from './components/BillingPlan';
+import { UsageProgress } from './components/BillingProgress';
 import {
   ManageSubscriptionButton,
   SubscriptionCard,
@@ -12,7 +13,6 @@ import {
   SubscriptionCurrentPlan,
   SubscriptionHeader,
   SubscriptionTitle,
-  UsageProgress,
 } from './components/SubscriptionCard';
 import type { loader } from './loader.server';
 

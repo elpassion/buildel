@@ -37,7 +37,7 @@ function BillingPlanListItem({
   ...rest
 }: BillingPlanListItemProps) {
   const { recommended } = data.metadata;
-
+  console.log(data);
   return (
     <article
       className={cn(
@@ -66,7 +66,7 @@ function BillingPlanListItem({
 
       <p className="mb-2">
         <span className="text-4xl font-bold">
-          {stripePrice(data.price).format({ maximumFractionDigits: 0 })}
+          {stripePrice(data.prices[0]).format({ maximumFractionDigits: 0 })}
         </span>
         <span className="text-muted-foreground text-sm">/month</span>
       </p>
