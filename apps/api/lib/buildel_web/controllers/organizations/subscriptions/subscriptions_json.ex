@@ -16,22 +16,35 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
       description: product.description,
       active: product.active,
       features: features(product.features),
-      price: price(product.price),
+      prices: prices(product.prices),
       metadata: metadata(product.metadata)
     }
   end
 
-  defp price(nil), do: nil
+  defp prices([]), do: []
 
-  defp price(%Stripe.Price{} = price) do
+  defp prices(prices) do
+    Enum.map(prices, &price/1)
+  end
+
+  defp price(%Stripe.Price{recurring: recurring} = price) do
     %{
       id: price.id,
+      currency: price.currency,
       amount: price.amount,
-      currency: price.currency
+      recurring: recurring(recurring)
     }
   end
 
-  defp features(features)do
+  defp recurring(nil), do: nil
+
+  defp recurring(recurring) do
+    %{
+      interval: recurring.interval
+    }
+  end
+
+  defp features(features) do
     for %Stripe.Feature{name: name} <- features do
       %{name: name}
     end

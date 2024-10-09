@@ -10,12 +10,18 @@ defmodule BuildelWeb.Schemas.Subscriptions do
       properties: %{
         id: %Schema{type: :string, description: "Price ID"},
         amount: %Schema{type: :number, description: "Price amount"},
-        currency: %Schema{type: :string, description: "Price currency"}
+        currency: %Schema{type: :string, description: "Price currency"},
+        recurring: %Schema{
+          type: :object,
+          properties: %{
+            interval: %Schema{type: :string, description: "Price interval"}
+          },
+          required: [:interval]
+        }
       },
       required: [:id, :amount, :currency]
     })
   end
-
 
   defmodule Metadata do
     require OpenApiSpex
@@ -41,7 +47,11 @@ defmodule BuildelWeb.Schemas.Subscriptions do
         name: %Schema{type: :string, description: "Product name"},
         description: %Schema{type: :string, description: "Product description"},
         active: %Schema{type: :boolean, description: "Product active status"},
-        price: Price,
+        prices: %Schema{
+          type: :array,
+          items: Price,
+          description: "List of product prices"
+        },
         metadata: Metadata,
         features: %Schema{
           type: :array,
