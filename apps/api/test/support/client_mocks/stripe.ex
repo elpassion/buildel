@@ -10,22 +10,32 @@ defmodule Buildel.ClientMocks.Stripe do
          name: "Product 1",
          description: "Description 1",
          active: true,
-         price: %Buildel.Clients.Stripe.Price{
-           id: "price_1",
-           currency: "usd",
-           amount: 1000
-         }
+         prices: [
+           %Buildel.Clients.Stripe.Price{
+             id: "price_1",
+             currency: "usd",
+             amount: 1000,
+             recurring: %{
+               interval: "month"
+             }
+           }
+         ]
        },
        %Buildel.Clients.Stripe.Product{
          id: "prod_2",
          name: "Product 2",
          description: "Description 2",
          active: true,
-         price: %Buildel.Clients.Stripe.Price{
-           id: "price_2",
-           currency: "usd",
-           amount: 2000
-         }
+         prices: [
+           %Buildel.Clients.Stripe.Price{
+             id: "price_2",
+             currency: "usd",
+             amount: 2000,
+             recurring: %{
+               interval: "month"
+             }
+           }
+         ]
        }
      ]}
   end
