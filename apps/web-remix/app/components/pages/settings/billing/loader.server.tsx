@@ -20,6 +20,9 @@ export async function loader(args: LoaderFunctionArgs) {
       params.organizationId,
     );
 
-    return json({ user, plans: plans.data });
+    return json({
+      user,
+      plans: plans.data,
+    });
   })(args);
 }
