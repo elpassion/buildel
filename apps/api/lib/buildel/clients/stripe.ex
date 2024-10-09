@@ -11,27 +11,32 @@ defmodule Buildel.Clients.Stripe do
   @behaviour Buildel.Clients.StripeBehaviour
 
   defmodule Price do
+    @type recurring :: %{
+            interval: binary()
+          }
+
     @type t :: %__MODULE__{
             id: binary(),
             amount: integer(),
-            currency: binary()
+            currency: binary(),
+            recurring: recurring() | nil
           }
 
-    defstruct [:id, :currency, :amount]
+    defstruct [:id, :currency, :amount, :recurring]
   end
 
   defmodule Metadata do
     @type t :: %__MODULE__{
-                 recommended: boolean()
-               }
+            recommended: boolean()
+          }
 
     defstruct [:recommended]
   end
 
   defmodule Feature do
     @type t :: %__MODULE__{
-      name: binary()
-    }
+            name: binary()
+          }
 
     defstruct [:name]
   end
@@ -42,17 +47,17 @@ defmodule Buildel.Clients.Stripe do
             name: binary(),
             description: binary(),
             active: boolean(),
-            price: Price.t() | nil,
+            prices: [Price.t()] | nil,
             features: [Feature.t()],
             metadata: Metadata.t() | nil
           }
 
-    defstruct [:id, :name, :description, :active, :price, :features, :metadata]
+    defstruct [:id, :name, :description, :active, :prices, :features, :metadata]
   end
 
   @impl Buildel.Clients.StripeBehaviour
   def list_products(attrs \\ %{}) do
-    url = "/products?expand[]=data.default_price"
+    url = "/products?"
 
     url =
       Enum.reduce(Map.to_list(attrs), url, fn
@@ -63,14 +68,21 @@ defmodule Buildel.Clients.Stripe do
           url
       end)
 
-    with {:ok, %Req.Response{body: body, status: 200}} <-
-           request(url) do
-      {:ok, body["data"] |> map_products()}
-    end
-  end
+    with {:ok, %Req.Response{body: products, status: 200}} <-
+           request(url),
+         {:ok, %Req.Response{body: prices, status: 200}} <-
+           request("/prices") do
+      {:ok, map_products(products["data"], prices["data"])}
+    else
+      {:ok, %Req.Response{status: 404}} ->
+        {:error, :not_found}
 
-  def get_price(price_id) do
-    request(price_id)
+      {:error, reason} ->
+        {:error, reason}
+
+      e ->
+        e
+    end
   end
 
   def new(options \\ []) when is_list(options) do
@@ -101,13 +113,12 @@ defmodule Buildel.Clients.Stripe do
   defp parse_url("evt_" <> _ = id), do: "/events/#{id}"
   defp parse_url(url) when is_binary(url), do: url
 
-  defp map_products(products) do
+  defp map_products(products, prices) do
     Enum.map(products, fn %{
                             "id" => id,
                             "name" => name,
                             "description" => description,
                             "active" => active,
-                            "default_price" => price,
                             "features" => features,
                             "metadata" => metadata
                           } ->
@@ -117,10 +128,20 @@ defmodule Buildel.Clients.Stripe do
         description: description,
         active: active,
         features: map_features(features),
-        price: map_price(price),
+        prices: map_prices(id, prices),
         metadata: map_metadata(metadata)
       }
     end)
+  end
+
+  defp map_prices(product_id, prices) do
+    prices =
+      Enum.filter(prices, fn
+        %{"product" => ^product_id} -> true
+        _ -> false
+      end)
+
+    Enum.map(prices, &map_price/1)
   end
 
   defp map_price(nil), do: nil
@@ -128,14 +149,15 @@ defmodule Buildel.Clients.Stripe do
   defp map_price(%{
          "id" => id,
          "currency" => currency,
-         "unit_amount" => amount
+         "unit_amount" => amount,
+         "recurring" => recurring
        }) do
-    %Price{
-      id: id,
-      currency: currency,
-      amount: amount
-    }
+    %Price{id: id, currency: currency, amount: amount, recurring: map_recurring(recurring)}
   end
+
+  defp map_recurring(nil), do: nil
+
+  defp map_recurring(%{"interval" => interval}), do: %{interval: interval}
 
   defp map_features(features) do
     Enum.map(features, fn %{"name" => name} ->
