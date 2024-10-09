@@ -16,7 +16,8 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
       description: product.description,
       active: product.active,
       features: features(product.features),
-      price: price(product.price)
+      price: price(product.price),
+      metadata: metadata(product.metadata)
     }
   end
 
@@ -34,5 +35,11 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
     for %Stripe.Feature{name: name} <- features do
       %{name: name}
     end
+  end
+
+  defp metadata(%Stripe.Metadata{} = metadata) do
+    %{
+      recommended: metadata.recommended
+    }
   end
 end
