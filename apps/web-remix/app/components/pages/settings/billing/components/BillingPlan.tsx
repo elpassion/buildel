@@ -1,17 +1,74 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Dot } from 'lucide-react';
 
 import { stripePrice } from '~/api/subscriptions/subscriptions.contracts';
 import type {
   ISubscriptionFeature,
+  ISubscriptionPrice,
   ISubscriptionProduct,
 } from '~/api/subscriptions/subscriptions.types';
+import { ToggleInput } from '~/components/form/inputs/toggle.input';
 import { ItemList } from '~/components/list/ItemList';
 import { Button } from '~/components/ui/button';
+import { Label } from '~/components/ui/label';
 import { cn } from '~/utils/cn';
 
-interface BillingPlanListProps {
+interface BillingPlan extends ISubscriptionProduct {
+  defaultPrice: ISubscriptionPrice;
+}
+
+interface BillingPlanFiltersProps {
   plans: ISubscriptionProduct[];
+  children: (plans: BillingPlan[]) => React.ReactNode;
+}
+
+export function BillingPlanFilters({
+  plans,
+  children,
+}: BillingPlanFiltersProps) {
+  const [isYearly, setIsYearly] = React.useState(true);
+
+  const recurringPlans = useMemo(() => {
+    return plans.reduce((acc, plan) => {
+      const yearly = plan.prices.find(
+        (price) => price.recurring?.interval === 'year',
+      );
+      const monthly = plan.prices.find(
+        (price) => price.recurring?.interval === 'month',
+      );
+
+      if (!yearly || !monthly) {
+        return acc;
+      } else {
+        return [...acc, { ...plan, defaultPrice: isYearly ? yearly : monthly }];
+      }
+    }, [] as BillingPlan[]);
+  }, [plans, isYearly]);
+
+  return (
+    <>
+      <div className="flex flex-col items-center text-center mb-10 md:mb-16">
+        <h1 className="text-4xl font-semibold mb-6">
+          Choose a plan that’s right for you!
+        </h1>
+
+        <Label className="flex gap-2 items-center">
+          <span>Monthly</span>
+          <ToggleInput checked={isYearly} onCheckedChange={setIsYearly} />
+          <span>Yearly</span>
+          <span className="italic text-xs text-green-500 mt-0.5 font-normal">
+            Save with yearly
+          </span>
+        </Label>
+      </div>
+
+      {children(recurringPlans)}
+    </>
+  );
+}
+
+interface BillingPlanListProps {
+  plans: BillingPlan[];
 }
 
 export function BillingPlanList({ plans }: BillingPlanListProps) {
@@ -28,7 +85,7 @@ type BillingPlanListItemProps = Omit<
   React.HTMLAttributes<HTMLDivElement>,
   'children'
 > & {
-  data: ISubscriptionProduct;
+  data: BillingPlan;
 };
 
 function BillingPlanListItem({
@@ -37,7 +94,7 @@ function BillingPlanListItem({
   ...rest
 }: BillingPlanListItemProps) {
   const { recommended } = data.metadata;
-  console.log(data);
+
   return (
     <article
       className={cn(
@@ -66,7 +123,7 @@ function BillingPlanListItem({
 
       <p className="mb-2">
         <span className="text-4xl font-bold">
-          {stripePrice(data.prices[0]).format({ maximumFractionDigits: 0 })}
+          {stripePrice(data.defaultPrice).format({ maximumFractionDigits: 0 })}
         </span>
         <span className="text-muted-foreground text-sm">/month</span>
       </p>
