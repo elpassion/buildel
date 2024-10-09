@@ -2,6 +2,7 @@ import React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 
 import { DiscoverPages } from '~/components/pages/knowledgeBase/newCollectionFiles/components/DiscoverPages';
+import { ScrapePage } from '~/components/pages/knowledgeBase/newCollectionFiles/components/ScrapePage';
 import { Tab, TabButton } from '~/components/tabs/Tab';
 import { TabGroup } from '~/components/tabs/TabGroup';
 import { Button } from '~/components/ui/button';
@@ -31,6 +32,14 @@ export function NewCollectionFilesPage() {
           >
             <TabButton tabId="crawl">Crawl</TabButton>
           </Button>
+          <Button
+            size="xxs"
+            variant={activeTab === 'scrape' ? 'outline' : 'secondary'}
+            asChild
+            className="grow"
+          >
+            <TabButton tabId="scrape">Scrape</TabButton>
+          </Button>
         </div>
 
         <Tab tabId="files">
@@ -39,7 +48,10 @@ export function NewCollectionFilesPage() {
 
         <Tab tabId="crawl">
           <DiscoverPages />
-          {/*<CollectionCrawlForm />*/}
+        </Tab>
+
+        <Tab tabId="scrape">
+          <ScrapePage />
         </Tab>
       </TabGroup>
     </>
