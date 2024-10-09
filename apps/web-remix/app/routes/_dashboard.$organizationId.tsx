@@ -31,6 +31,7 @@ import {
   DropdownTrigger,
 } from '~/components/dropdown/Dropdown';
 import { IconButton } from '~/components/iconButton';
+import { UsageCircleProgress } from '~/components/pages/settings/billing/components/BillingProgress';
 import {
   NavMobileSidebar,
   NavSidebar,
@@ -219,12 +220,16 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
         />
       </div>
 
-      <SidebarLink
-        to={routes.settings(organization.id)}
-        icon={<Settings className="min-w-4 w-4 h-4 text-center leading-5" />}
-        text="Settings"
-        onlyIcon={isCollapsed}
-      />
+      <div className="flex flex-col gap-3">
+        <UsageCircleProgress usage={321} maxUsage={1000} />
+
+        <SidebarLink
+          to={routes.settings(organization.id)}
+          icon={<Settings className="min-w-4 w-4 h-4 text-center leading-5" />}
+          text="Settings"
+          onlyIcon={isCollapsed}
+        />
+      </div>
     </SidebarContentWrapper>
   );
 }
