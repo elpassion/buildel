@@ -2,7 +2,7 @@ import React from 'react';
 import { Dot } from 'lucide-react';
 
 import { stripePrice } from '~/api/subscriptions/subscriptions.contracts';
-import {
+import type {
   ISubscriptionFeature,
   ISubscriptionProduct,
 } from '~/api/subscriptions/subscriptions.types';
@@ -19,12 +19,7 @@ export function BillingPlanList({ plans }: BillingPlanListProps) {
     <ItemList
       className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
       items={plans}
-      renderItem={(item) => (
-        <BillingPlanListItem
-          data={item}
-          recommended={item.id === 'prod_Qza6Tpx9c9QG6g'}
-        />
-      )}
+      renderItem={(item) => <BillingPlanListItem data={item} />}
     />
   );
 }
@@ -34,15 +29,15 @@ type BillingPlanListItemProps = Omit<
   'children'
 > & {
   data: ISubscriptionProduct;
-  recommended?: boolean;
 };
 
 function BillingPlanListItem({
   data,
   className,
-  recommended,
   ...rest
 }: BillingPlanListItemProps) {
+  const { recommended } = data.metadata;
+
   return (
     <article
       className={cn(
