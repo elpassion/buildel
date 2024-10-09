@@ -221,7 +221,7 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
       </div>
 
       <div className="flex flex-col gap-3">
-        <UsageCircleProgress usage={321} maxUsage={1000} />
+        <SidebarUsageProgress isCollapsed={isCollapsed} />
 
         <SidebarLink
           to={routes.settings(organization.id)}
@@ -231,6 +231,44 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
         />
       </div>
     </SidebarContentWrapper>
+  );
+}
+
+function SidebarUsageProgress({ isCollapsed }: { isCollapsed?: boolean }) {
+  return (
+    <div className="grid grid-cols-1 grid-rows-1 items-end">
+      <div
+        className={cn('transition-opacity col-start-1 row-start-1', {
+          'opacity-100': isCollapsed,
+          'opacity-0 pointer-events-none': !isCollapsed,
+        })}
+      >
+        <UsageCircleProgress usage={321} maxUsage={1000} />
+      </div>
+
+      <div
+        className={cn(
+          'transition-opacity bg-muted rounded-lg col-start-1 row-start-1 p-2 flex gap-2 justify-between items-end',
+          {
+            'opacity-100': !isCollapsed,
+            'opacity-0 pointer-events-none': isCollapsed,
+          },
+        )}
+      >
+        <div className="text-xs grow flex flex-col gap-1">
+          <p className="flex gap-1 justify-between items-center">
+            <span>Total</span>
+            <span>1000</span>
+          </p>
+          <p className="flex gap-1 justify-between items-center">
+            <span>Remaining</span>
+            <span>{1000 - 321}</span>
+          </p>
+        </div>
+
+        <UsageCircleProgress usage={321} maxUsage={1000} />
+      </div>
+    </div>
   );
 }
 

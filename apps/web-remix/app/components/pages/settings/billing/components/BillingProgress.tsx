@@ -85,7 +85,7 @@ export function UsageCircleProgress({
   return (
     <ChartContainer
       config={chartConfig}
-      className="mx-auto aspect-square h-[36px] w-[36px]"
+      className="aspect-square h-[36px] w-[36px]"
     >
       <RadialBarChart
         data={chartData}
