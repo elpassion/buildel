@@ -12,6 +12,10 @@ export const SubscriptionFeature = z.object({
   name: z.string(),
 });
 
+export const SubscriptionMetadata = z.object({
+  recommended: z.boolean(),
+});
+
 export const SubscriptionProduct = z.object({
   active: z.boolean(),
   description: z.string(),
@@ -19,6 +23,7 @@ export const SubscriptionProduct = z.object({
   name: z.string(),
   price: SubscriptionPrice,
   features: z.array(SubscriptionFeature),
+  metadata: SubscriptionMetadata,
 });
 
 export const SubscriptionProductsResponse = z
