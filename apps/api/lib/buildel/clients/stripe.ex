@@ -20,6 +20,14 @@ defmodule Buildel.Clients.Stripe do
     defstruct [:id, :currency, :amount]
   end
 
+  defmodule Metadata do
+    @type t :: %__MODULE__{
+                 recommended: boolean()
+               }
+
+    defstruct [:recommended]
+  end
+
   defmodule Feature do
     @type t :: %__MODULE__{
       name: binary()
@@ -35,10 +43,11 @@ defmodule Buildel.Clients.Stripe do
             description: binary(),
             active: boolean(),
             price: Price.t() | nil,
-            features: [Feature.t()]
+            features: [Feature.t()],
+            metadata: Metadata.t() | nil
           }
 
-    defstruct [:id, :name, :description, :active, :price, :features]
+    defstruct [:id, :name, :description, :active, :price, :features, :metadata]
   end
 
   @impl Buildel.Clients.StripeBehaviour
@@ -99,7 +108,8 @@ defmodule Buildel.Clients.Stripe do
                             "description" => description,
                             "active" => active,
                             "default_price" => price,
-                            "features" => features
+                            "features" => features,
+                            "metadata" => metadata
                           } ->
       %Product{
         id: id,
@@ -107,7 +117,8 @@ defmodule Buildel.Clients.Stripe do
         description: description,
         active: active,
         features: map_features(features),
-        price: map_price(price)
+        price: map_price(price),
+        metadata: map_metadata(metadata)
       }
     end)
   end
@@ -132,4 +143,11 @@ defmodule Buildel.Clients.Stripe do
     end)
   end
 
+  defp map_metadata(nil), do: nil
+
+  defp map_metadata(%{"recommended" => recommended}) do
+    %Metadata{recommended: !!recommended}
+  end
+
+  defp map_metadata(%{}), do: %Metadata{recommended: false}
 end

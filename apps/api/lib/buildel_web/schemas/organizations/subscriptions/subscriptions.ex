@@ -16,6 +16,20 @@ defmodule BuildelWeb.Schemas.Subscriptions do
     })
   end
 
+
+  defmodule Metadata do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionMetadata",
+      type: :object,
+      properties: %{
+        recommended: %Schema{type: :boolean, description: "Metadata recommended status"}
+      },
+      required: [:recommended]
+    })
+  end
+
   defmodule Product do
     require OpenApiSpex
 
@@ -28,6 +42,7 @@ defmodule BuildelWeb.Schemas.Subscriptions do
         description: %Schema{type: :string, description: "Product description"},
         active: %Schema{type: :boolean, description: "Product active status"},
         price: Price,
+        metadata: Metadata,
         features: %Schema{
           type: :array,
           items: %Schema{
