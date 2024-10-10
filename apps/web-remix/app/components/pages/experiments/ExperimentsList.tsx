@@ -112,7 +112,6 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
 
         <MenuDropdown>
           <MenuDropdownTrigger
-            disabled={disabled}
             className="w-8 h-8 p-0"
             onClick={(e) => {
               e.stopPropagation();
