@@ -2,6 +2,8 @@ import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
 import {
+  Bookmark,
+  BookmarkCheck,
   CircleCheck,
   CircleX,
   EllipsisVertical,
@@ -64,13 +66,22 @@ export const PipelinesListItem = ({
 interface PipelineListItemHeaderProps {
   pipeline: IPipeline;
   onDelete?: (pipeline: IPipeline, e: React.MouseEvent<HTMLDivElement>) => void;
+  onToggleFavorite?: (
+    pipeline: IPipeline,
+    e: React.MouseEvent<HTMLDivElement>,
+  ) => void;
 }
 export const PipelineListItemHeader = ({
   pipeline,
   onDelete,
+  onToggleFavorite,
 }: PipelineListItemHeaderProps) => {
   const handleDelete = async (e: React.MouseEvent<HTMLDivElement>) => {
     onDelete?.(pipeline, e);
+  };
+
+  const handleToggleFavorite = async (e: React.MouseEvent<HTMLDivElement>) => {
+    onToggleFavorite?.(pipeline, e);
   };
 
   return (
@@ -110,6 +121,20 @@ export const PipelineListItemHeader = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DuplicateForm pipeline={pipeline} />
+
+            <DropdownMenuItem
+              className="w-full flex gap-1 items-center cursor-pointer text-muted-foreground font-medium"
+              onClick={handleToggleFavorite}
+            >
+              {pipeline.favorite ? (
+                <BookmarkCheck className="w-4 h-4" />
+              ) : (
+                <Bookmark className="w-4 h-4" />
+              )}
+
+              <span>{pipeline.favorite ? 'Unpin' : 'Pin'}</span>
+            </DropdownMenuItem>
+
             <DropdownMenuItem
               className="w-full flex gap-1 items-center text-red-500"
               onClick={handleDelete}

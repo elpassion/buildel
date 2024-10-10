@@ -264,7 +264,7 @@ function useToggleWorkflow({
 
   const action = async (
     pipeline: IPipeline,
-    e: React.MouseEvent<HTMLButtonElement>,
+    e: React.MouseEvent<HTMLDivElement>,
   ) => {
     e.preventDefault();
 
