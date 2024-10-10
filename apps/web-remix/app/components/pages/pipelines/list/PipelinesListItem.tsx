@@ -10,13 +10,15 @@ import {
   LockOpen,
   Trash,
 } from 'lucide-react';
-import { ClientOnly } from 'remix-utils/client-only';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
 import { HiddenField } from '~/components/form/fields/field.context';
 import { IconButton } from '~/components/iconButton';
-import { resolveBlockTypeIconPath } from '~/components/pages/pipelines/blockTypes.utils';
+import {
+  WorkflowBlockList,
+  WorkflowBlockListOverflow,
+} from '~/components/pages/pipelines/components/WorkflowBlockList';
 import type { BadgeProps } from '~/components/ui/badge';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -47,11 +49,7 @@ import { cn } from '~/utils/cn';
 import { MonetaryValue } from '~/utils/MonetaryValue';
 import { routes } from '~/utils/routes.utils';
 
-import type {
-  IBlockConfig,
-  IInterfaceConfigForm,
-  IPipeline,
-} from '../pipeline.types';
+import type { IInterfaceConfigForm, IPipeline } from '../pipeline.types';
 
 interface PipelinesListItemProps extends PropsWithChildren {
   className?: string;
@@ -195,14 +193,14 @@ export const PipelineListItemContent = ({
           <CardContentColumnTitle>Blocks</CardContentColumnTitle>
 
           {pipeline.config.blocks.length > 0 ? (
-            <PipelineItemBlockList pipeline={pipeline} />
+            <WorkflowBlockList blocks={pipeline.config.blocks} />
           ) : (
             <CardContentBooleanValue value={false}>
               None
             </CardContentBooleanValue>
           )}
 
-          <div className="absolute h-6 w-8 right-0 bottom-2 bg-gradient-to-r from-transparent to-white pointer-events-none xl:bottom-0" />
+          <WorkflowBlockListOverflow />
         </CardContentColumnWrapper>
       </div>
     </CardContent>
@@ -215,7 +213,7 @@ interface DuplicateFormProps {
 
 function DuplicateForm({ pipeline }: DuplicateFormProps) {
   const validator = useMemo(() => withZod(CreatePipelineSchema), []);
-  console.log(pipeline);
+
   return (
     <ValidatedForm
       method="POST"
@@ -290,64 +288,6 @@ function PipelineItemInterfaceBadge({
             </span>
             {interfaceConfig.public ? 'public' : 'private'}
           </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}
-
-interface PipelineItemBlockListProps {
-  pipeline: IPipeline;
-}
-
-function PipelineItemBlockList({ pipeline }: PipelineItemBlockListProps) {
-  return (
-    <ul className="flex -space-x-2">
-      {pipeline.config.blocks.map((block) => (
-        <PipelineItemBlockListBlock block={block} key={block.name} />
-      ))}
-    </ul>
-  );
-}
-interface PipelineItemBlockListBlockProps {
-  block: IBlockConfig;
-}
-function PipelineItemBlockListBlock({
-  block,
-}: PipelineItemBlockListBlockProps) {
-  const imageRef = React.useRef<HTMLImageElement>(null);
-
-  const onImageError = () => {
-    if (!imageRef.current) return;
-
-    imageRef.current.src = resolveBlockTypeIconPath('default');
-  };
-
-  return (
-    <TooltipProvider>
-      <Tooltip delayDuration={500}>
-        <TooltipTrigger asChild>
-          <li className="w-6 h-6 rounded-full bg-white border border-input flex justify-center items-center">
-            <ClientOnly
-              fallback={
-                <div className="w-3.5 h-3.5 bg-secondary rounded-full" />
-              }
-            >
-              {() => (
-                <img
-                  src={resolveBlockTypeIconPath(`type/${block.type}`)}
-                  alt={block.type}
-                  onError={onImageError}
-                  className="w-3.5 h-3.5"
-                  ref={imageRef}
-                />
-              )}
-            </ClientOnly>
-          </li>
-        </TooltipTrigger>
-
-        <TooltipContent side="top" className="text-xs">
-          {block.type}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { KnowledgeBaseCollectionCost } from '~/api/knowledgeBase/knowledgeApi.contracts';
-import { PipelineCost } from '~/api/pipeline/pipeline.contracts';
+import { Pipeline, PipelineCost } from '~/api/pipeline/pipeline.contracts';
 import { PaginationMeta } from '~/components/pagination/pagination.types';
 
 export const Organization = z.object({
@@ -86,6 +86,11 @@ export const WorkflowTemplate = z.object({
   template_name: z.string(),
   template_description: z.string(),
   groups: z.array(z.string()),
+  template_config: Pipeline.pick({
+    config: true,
+    name: true,
+    interface_config: true,
+  }),
 });
 
 export type IWorkflowTemplate = z.TypeOf<typeof WorkflowTemplate>;
