@@ -3,8 +3,16 @@ defmodule Buildel.Clients.StripeBehaviour do
           active: boolean()
         }
 
+  @type create_checkout_session_params :: %{
+          price_id: binary(),
+          organization_id: binary(),
+          customer_id: binary()
+        }
+
   @callback list_products(list_products_params()) ::
               {:ok, [Buildel.Clients.Stripe.Product.t()]} | {:error, term}
+  @callback create_checkout_session(create_checkout_session_params()) ::
+              {:ok, Buildel.Clients.Stripe.Session.t()} | {:error, term}
 end
 
 defmodule Buildel.Clients.Stripe do
@@ -53,6 +61,60 @@ defmodule Buildel.Clients.Stripe do
           }
 
     defstruct [:id, :name, :description, :active, :prices, :features, :metadata]
+  end
+
+  defmodule Session do
+    @type t :: %__MODULE__{
+            id: binary(),
+            customer: binary() | nil,
+            url: binary()
+          }
+
+    defstruct [:id, :customer, :url]
+  end
+
+  @impl Buildel.Clients.StripeBehaviour
+  def create_checkout_session(%{
+        price_id: price_id,
+        customer_id: _customer_id,
+        organization_id: organization_id
+      }) do
+    url = "/checkout/sessions"
+
+    body = %{
+      "client_reference_id" => organization_id,
+      "line_items[0][price]" => price_id,
+      "line_items[0][quantity]" => 1,
+      "mode" => "subscription",
+      "success_url" =>
+        Application.get_env(:buildel, :page_url) <>
+          "/#{organization_id}/settings/billing?result=success&session_id={CHECKOUT_SESSION_ID}'",
+      "cancel_url" =>
+        Application.get_env(:buildel, :page_url) <>
+          "/#{organization_id}/settings/billing?result=cancel"
+    }
+
+    with {:ok, %Req.Response{body: session, status: 200}} <-
+           request(url, form: body) do
+      {:ok, map_session(session)}
+    else
+      {:ok, %Req.Response{status: 404}} ->
+        {:error, :not_found}
+
+      {:error, reason} ->
+        {:error, reason}
+
+      e ->
+        e
+    end
+  end
+
+  def get_customer(id) do
+    request(id)
+  end
+
+  def create_customer(email) do
+    request("/customers", form: %{"email" => email})
   end
 
   @impl Buildel.Clients.StripeBehaviour
@@ -112,6 +174,10 @@ defmodule Buildel.Clients.Stripe do
   defp parse_url("inv_" <> _ = id), do: "/invoices/#{id}"
   defp parse_url("evt_" <> _ = id), do: "/events/#{id}"
   defp parse_url(url) when is_binary(url), do: url
+
+  defp map_session(%{"id" => id, "customer" => customer, "url" => url}) do
+    %Session{id: id, customer: customer, url: url}
+  end
 
   defp map_products(products, prices) do
     Enum.map(products, fn %{
