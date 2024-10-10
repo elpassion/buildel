@@ -69,44 +69,63 @@ defmodule Buildel.WorkflowTemplates do
     }
   ]
 
-  def get_workflow_template_names() do
-    @available_templates
+  def get_workflow_template_names(organization_id) do
+    templates = @available_templates |> Enum.map(fn template ->
+       case get_template_config(template[:template_name], organization_id) do
+         nil ->
+           nil
+         template_config ->
+          template |> Map.put(:template_config, template_config)
+       end
+    end)
+
+    {:ok, templates |> Enum.filter(& &1 != nil)}
   end
 
   def create_pipeline_config_from_template(organization_id, template_name) do
+    case get_template_config(template_name, organization_id) do
+      nil ->
+        {:error, :not_found}
+
+      template_config ->
+        {:ok, template_config}
+    end
+  end
+
+  def get_template_config(template_name, organization_id) do
     case template_name do
       "ai_chat" ->
-        {:ok, generate_ai_chat_template_config(organization_id)}
+        generate_ai_chat_template_config(organization_id)
 
       "speech_to_text" ->
-        {:ok, generate_speech_to_text_template_config(organization_id)}
+        generate_speech_to_text_template_config(organization_id)
 
       "text_to_speech" ->
-        {:ok, generate_text_to_speech_template_config(organization_id)}
+        generate_text_to_speech_template_config(organization_id)
 
       "knowledge_search_to_text" ->
-        {:ok, generate_document_search_template_config(organization_id)}
+        generate_document_search_template_config(organization_id)
 
       "spreadsheet_ai_assistant" ->
-        {:ok, generate_spreadsheet_ai_assistant_config(organization_id)}
+        generate_spreadsheet_ai_assistant_config(organization_id)
 
       "text_classification_assistant" ->
-        {:ok, generate_text_classification_assistant(organization_id)}
+        generate_text_classification_assistant(organization_id)
 
       "text_feedback_assistant" ->
-        {:ok, generate_text_feedback_assistant(organization_id)}
+        generate_text_feedback_assistant(organization_id)
 
       "seo_image_for_article" ->
-        {:ok, generate_seo_image_for_article_template_config(organization_id)}
+        generate_seo_image_for_article_template_config(organization_id)
 
       "blog_post_generator" ->
-        {:ok, generate_blog_post_generator_template_config(organization_id)}
+        generate_blog_post_generator_template_config(organization_id)
 
       "search_and_scrape" ->
-        {:ok, generate_search_and_scrape_template_config(organization_id)}
+        generate_search_and_scrape_template_config(organization_id)
 
       _ ->
-        {:error, :not_found}
+        nil
     end
   end
 
