@@ -14,15 +14,23 @@ defmodule BuildelWeb.ExperimentJSON do
       id: experiment.id,
       name: experiment.name,
       runs_count: experiment.runs_count,
-      pipeline: %{
-        id: experiment.pipeline.id,
-        name: experiment.pipeline.name
-      },
+      pipeline: map_pipeline(experiment.pipeline),
       dataset: %{
         id: experiment.dataset.id,
         name: experiment.dataset.name
       },
       created_at: experiment.inserted_at
+    }
+  end
+
+  defp map_pipeline(nil) do
+    nil
+  end
+
+  defp map_pipeline(%{"id": id, "name": name}) do
+    %{
+      id: id,
+      name: name
     }
   end
 end
