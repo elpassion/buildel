@@ -1,6 +1,21 @@
 defmodule BuildelWeb.Schemas.Subscriptions do
   alias OpenApiSpex.Schema
 
+  defmodule Session do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionSession",
+      type: :object,
+      properties: %{
+        id: %Schema{type: :string, description: "Checkout session ID"},
+        customer: %Schema{type: :string, description: "Customer ID"},
+        url: %Schema{type: :string, description: "Checkout session URL"}
+      },
+      required: [:id, :url]
+    })
+  end
+
   defmodule Price do
     require OpenApiSpex
 
@@ -80,6 +95,32 @@ defmodule BuildelWeb.Schemas.Subscriptions do
           type: :array,
           items: Product
         }
+      },
+      required: [:data]
+    })
+  end
+
+  defmodule CreateCheckoutSessionRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionCreateCheckoutSessionRequest",
+      type: :object,
+      properties: %{
+        price_id: %Schema{type: :string, description: "Price ID"}
+      },
+      required: [:price_id]
+    })
+  end
+
+  defmodule CreateCheckoutSessionResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionCreateCheckoutSessionResponse",
+      type: :object,
+      properties: %{
+        data: Session
       },
       required: [:data]
     })

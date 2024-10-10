@@ -9,6 +9,20 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
     }
   end
 
+  def create(%{session: session}) do
+    %{
+      data: session(session)
+    }
+  end
+
+  defp session(%Stripe.Session{} = session) do
+    %{
+      session_id: session.id,
+      customer_id: session.customer,
+      url: session.url
+    }
+  end
+
   defp product(%Stripe.Product{} = product) do
     %{
       id: product.id,

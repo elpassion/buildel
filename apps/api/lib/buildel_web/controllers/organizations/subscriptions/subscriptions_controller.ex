@@ -55,4 +55,47 @@ defmodule BuildelWeb.OrganizationSubscriptionController do
       render(conn, :list_products, products: products)
     end
   end
+
+  operation :create,
+    summary: "Create checkout session",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ]
+    ],
+    request_body:
+      {"session", "application/json",
+       BuildelWeb.Schemas.Subscriptions.CreateCheckoutSessionRequest},
+    responses: [
+      ok:
+        {"success", "application/json",
+         BuildelWeb.Schemas.Subscriptions.CreateCheckoutSessionResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def create(conn, _params) do
+    %{"organization_id" => organization_id} = conn.params
+    %{"price_id" => price_id} = conn.body_params
+
+    user = conn.assigns.current_user
+
+    with {:ok, _organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, session} <-
+           Stripe.create_checkout_session(%{
+             price_id: price_id,
+             organization_id: organization_id,
+             customer_id: nil
+           }) do
+      render(conn, :create, session: session)
+    end
+  end
 end
