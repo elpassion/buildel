@@ -384,6 +384,12 @@ defmodule BuildelWeb.Router do
       :list_products
     )
 
+    post(
+      "/organizations/:organization_id/subscriptions/checkout",
+      OrganizationSubscriptionController,
+      :create
+    )
+
     resources("/organizations/:organization_id/costs", OrganizationCostsController,
       only: [:index]
     )
