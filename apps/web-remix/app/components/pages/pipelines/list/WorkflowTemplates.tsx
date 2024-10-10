@@ -8,6 +8,10 @@ import type { IWorkflowTemplate } from '~/api/organization/organization.contract
 import { CreateFromTemplateSchema } from '~/api/organization/organization.contracts';
 import { HiddenField } from '~/components/form/fields/field.context';
 import { ItemList } from '~/components/list/ItemList';
+import {
+  WorkflowBlockList,
+  WorkflowBlockListOverflow,
+} from '~/components/pages/pipelines/components/WorkflowBlockList';
 import { cn } from '~/utils/cn';
 
 interface WorkflowTemplatesProps extends PropsWithChildren {
@@ -67,12 +71,12 @@ function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
       method="POST"
       validator={validator}
       onClick={() => ref.current?.submit()}
-      className="group p-2 flex items-center justify-between gap-2 bg-white border border-neutral-100 h-[85px] rounded-xl transition hover:border-blue-200 cursor-pointer md:p-4"
+      className="group p-2 bg-white border border-neutral-100  rounded-xl transition hover:border-blue-200 cursor-pointer h-[110px] md:p-4 md:h-[116px]"
     >
-      <div className="flex gap-3">
+      <div className="grid grid-cols-[40px_1fr] gap-3">
         <div
           className={cn(
-            'min-w-10 w-10 h-10 bg-orange-400 rounded-xl flex-shrink-0 flex justify-center items-center',
+            'min-w-full w-full h-10 bg-orange-400 rounded-xl flex-shrink-0 flex justify-center items-center',
             getTemplateImageColor(item.template_name),
           )}
         >
@@ -83,7 +87,7 @@ function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
           />
         </div>
 
-        <div>
+        <div className="min-w-0">
           <h4 className="group-hover:text-blue-500 text-base font-bold mb-1 transition">
             {item.name}
           </h4>
@@ -93,6 +97,12 @@ function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
           >
             {item.template_description}
           </p>
+
+          <div className="relative overflow-y-auto mt-1">
+            <WorkflowBlockList blocks={item.template_config.config.blocks} />
+
+            <WorkflowBlockListOverflow className="bottom-0" />
+          </div>
         </div>
       </div>
 
