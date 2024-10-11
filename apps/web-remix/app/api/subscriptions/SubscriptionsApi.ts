@@ -1,6 +1,9 @@
 import type { fetchTyped } from '~/utils/fetch.server';
 
-import { SubscriptionProductsResponse } from './subscriptions.contracts';
+import {
+  CheckoutResponse,
+  SubscriptionProductsResponse,
+} from './subscriptions.contracts';
 
 export class SubscriptionsApi {
   constructor(private client: typeof fetchTyped) {}
@@ -9,6 +12,14 @@ export class SubscriptionsApi {
     return this.client(
       SubscriptionProductsResponse,
       `/organizations/${organizationId}/subscriptions/products`,
+    );
+  }
+
+  async checkout(organizationId: string | number, data: { price_id: string }) {
+    return this.client(
+      CheckoutResponse,
+      `/organizations/${organizationId}/subscriptions/checkout`,
+      { method: 'post', body: JSON.stringify(data) },
     );
   }
 }

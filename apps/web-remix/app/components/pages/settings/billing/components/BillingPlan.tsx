@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
+import { withZod } from '@remix-validated-form/with-zod';
 import { Dot } from 'lucide-react';
+import { ValidatedForm } from 'remix-validated-form';
 
 import { stripePrice } from '~/api/subscriptions/subscriptions.contracts';
 import type {
@@ -7,9 +9,11 @@ import type {
   ISubscriptionPrice,
   ISubscriptionProduct,
 } from '~/api/subscriptions/subscriptions.types';
+import { HiddenField } from '~/components/form/fields/field.context';
 import { ToggleInput } from '~/components/form/inputs/toggle.input';
+import { SubmitButton } from '~/components/form/submit';
 import { ItemList } from '~/components/list/ItemList';
-import { Button } from '~/components/ui/button';
+import { checkoutSchema } from '~/components/pages/settings/billing/schema';
 import { Label } from '~/components/ui/label';
 import { cn } from '~/utils/cn';
 
@@ -99,6 +103,7 @@ function BillingPlanListItem({
   className,
   ...rest
 }: BillingPlanListItemProps) {
+  const validator = useMemo(() => withZod(checkoutSchema), []);
   const { recommended } = data.metadata;
 
   return (
@@ -144,14 +149,18 @@ function BillingPlanListItem({
         {data.description}
       </p>
 
-      <Button
-        isFluid
-        size="sm"
-        variant={recommended ? 'default' : 'outline'}
-        className="mb-10"
-      >
-        Subscribe
-      </Button>
+      <ValidatedForm method="POST" validator={validator} noValidate>
+        <HiddenField name="priceId" value={data.defaultPrice.id} />
+
+        <SubmitButton
+          isFluid
+          size="sm"
+          variant={recommended ? 'default' : 'outline'}
+          className="mb-10"
+        >
+          Subscribe
+        </SubmitButton>
+      </ValidatedForm>
 
       <ItemList
         className="flex flex-col gap-2"
