@@ -7,6 +7,7 @@ interface LoadMoreButtonProps {
   hasNextPage: boolean;
   isFetching: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 export const LoadMoreButton: React.FC<LoadMoreButtonProps> = ({
@@ -14,11 +15,12 @@ export const LoadMoreButton: React.FC<LoadMoreButtonProps> = ({
   onClick,
   hasNextPage,
   className,
+  disabled,
 }) => {
   return (
     <button
       onClick={onClick}
-      disabled={!hasNextPage}
+      disabled={disabled || !hasNextPage}
       className={cn(
         'text-neutral-200 disabled:text-neutral-400 text-sm',
         className,

@@ -1,48 +1,27 @@
-import { useEffect, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+import { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { useFetcher, useLoaderData } from '@remix-run/react';
+import { useLoaderData, useNavigate } from '@remix-run/react';
 
-import type { IPipelineRunLog } from '~/api/pipeline/pipeline.contracts';
-import { SelectInput } from '~/components/form/inputs/select/select.input';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
-import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
+import { BasicLink } from '~/components/link/BasicLink';
+import { EmptyMessage } from '~/components/list/ItemList';
+import {
+  RunLogs,
+  RunLogsFilter,
+} from '~/components/pages/pipelines/components/RunLogs';
 import { Label } from '~/components/ui/label';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 import { buildUrlWithParams } from '~/utils/url';
 
-import { usePipelineRunLogs } from '../usePipelineRunLogs';
 import type { loader } from './loader.server';
 
 export function PipelineRunLogs() {
-  const fetcher = useFetcher();
-  const { ref: fetchNextRef, inView } = useInView();
-  const { pipeline, pipelineRun, pipelineRunLogs, blockName } =
+  const navigate = useNavigate();
+  const { pipeline, blockName, pipelineRun, pagination, logs } =
     useLoaderData<typeof loader>();
-  const [liveLogs, setLiveLogs] = useState<any[]>([]);
-  const [data, setData] = useState<IPipelineRunLog[]>(pipelineRunLogs.data);
-  const [after, setAfter] = useState<string | null | undefined>(
-    pipelineRunLogs.meta.after,
-  );
-  const [selectedBlock, setSelectedBlock] = useState<string | null | undefined>(
-    blockName,
-  );
 
-  const { status, listenToLogs, stopListening } = usePipelineRunLogs(
-    pipeline.organization_id,
-    pipeline.id,
-    pipelineRun.id,
-    () => {},
-    (payload) => {
-      setLiveLogs((prev) => [...prev, payload.data]);
-    },
-    (error) => console.error(error),
-  );
-
-  const fetchNextPage = () => {
-    if (fetcher.state !== 'idle') return;
-
+  const onFilter = (blockName?: string) => {
     const urlWithParams = buildUrlWithParams(
       routes.pipelineRunLogs(
         pipeline.organization_id,
@@ -50,134 +29,67 @@ export function PipelineRunLogs() {
         pipelineRun.id,
       ),
       {
-        after: after ?? undefined,
-        block_name: selectedBlock ?? undefined,
+        block_name: blockName,
       },
     );
 
-    fetcher.load(urlWithParams);
+    navigate(urlWithParams);
   };
 
-  useEffect(() => {
-    const newData = (fetcher.data as any)?.pipelineRunLogs;
+  const onBlockSelect = (blockName: string) => {
+    onFilter(blockName);
+  };
 
-    if (newData) {
-      setAfter(newData.meta.after);
-      if (newData.data.length > 0) {
-        setData((prev) => [...prev, ...newData.data]);
-      }
-    }
-  }, [fetcher.data]);
+  const onClear = () => {
+    onFilter();
+  };
 
-  useEffect(() => {
-    if (inView && after) {
-      fetchNextPage();
-    }
-  }, [inView, after]);
+  const options = useMemo(() => {
+    return pipelineRun.config.blocks.map((block) => ({
+      value: block.name,
+      label: block.name,
+    }));
+  }, [pipelineRun.config.blocks]);
 
-  useEffect(() => {
-    if (status === 'open') {
-      listenToLogs({
-        block_name: blockName,
-      });
-    }
-  }, [status]);
-
-  if (data.length === 0 && liveLogs.length === 0) {
+  if (pagination.total === 0) {
     return (
-      <PageContentWrapper className="mt-10">
-        <p className="text-center text-red-500">
-          No logs found for this run. You can enable logs in the pipeline
-          settings.
-        </p>
-      </PageContentWrapper>
+      <EmptyMessage className="block mx-auto mt-10 text-center w-fit max-w-[350px]">
+        No logs found for this run. You can enable logs in the workflow{' '}
+        <BasicLink
+          target="_blank"
+          className="font-semibold text-foreground hover:underline"
+          to={routes.pipelineSettings(pipeline.organization_id, pipeline.id)}
+        >
+          settings
+        </BasicLink>
+        .
+      </EmptyMessage>
     );
   }
 
   return (
     <PageContentWrapper className="mt-10">
-      <Label>Filter by block</Label>
-      <SelectInput
-        allowClear
-        onClear={() => {
-          const urlWithParams = buildUrlWithParams(
-            routes.pipelineRunLogs(
-              pipeline.organization_id,
-              pipeline.id,
-              pipelineRun.id,
-            ),
-          );
+      <Label>
+        <span>Filter by block</span>
+        <RunLogsFilter
+          value={blockName}
+          onSelect={onBlockSelect}
+          onClear={onClear}
+          options={options}
+        />
+      </Label>
 
-          stopListening().then(() =>
-            listenToLogs({
-              block_name: undefined,
-            }),
-          );
-          setLiveLogs([]);
-          setData([]);
-          setSelectedBlock(undefined);
-
-          fetcher.load(urlWithParams);
-        }}
-        placeholder="Select..."
-        options={pipelineRun.config.blocks.map((block) => ({
-          id: block.name,
-          value: block.name,
-          label: block.name,
-        }))}
-        onSelect={(selected: any) => {
-          const urlWithParams = buildUrlWithParams(
-            routes.pipelineRunLogs(
-              pipeline.organization_id,
-              pipeline.id,
-              pipelineRun.id,
-            ),
-            {
-              block_name: selected ?? undefined,
-            },
-          );
-
-          stopListening().then(() =>
-            listenToLogs({
-              block_name: selected ?? undefined,
-            }),
-          );
-          setLiveLogs([]);
-          setData([]);
-          setSelectedBlock(selected);
-
-          fetcher.load(urlWithParams);
-        }}
+      <RunLogs
+        key={blockName}
+        defaultLogs={logs}
+        defaultAfter={pagination.after}
+        pipelineId={pipeline.id}
+        organizationId={pipeline.organization_id}
+        runId={pipelineRun.id}
       />
-
-      <div className="mt-2 bg-gray-800 text-gray-400 font-mono p-4 h-96 overflow-y-auto rounded-lg flex flex-col-reverse">
-        \{liveLogs.map((log) => <Log key={log.id} log={log} />).reverse()}
-        {data.map((log) => (
-          <Log key={log.id} log={log} />
-        ))}
-        <div className="flex justify-center mt-5" ref={fetchNextRef}>
-          <LoadMoreButton
-            isFetching={fetcher.state !== 'idle'}
-            hasNextPage={!!after}
-            onClick={fetchNextPage}
-          />
-        </div>
-      </div>
     </PageContentWrapper>
   );
 }
-
-const Log = ({ log }: { log: any }) => {
-  return (
-    <p className="mb-2">
-      <span className="text-cyan-400 mr-2">{log?.created_at}</span>
-      <span className="text-yellow-500 mr-2">{log?.context}</span>
-      <span className="text-purple-500 mr-2">{log?.block_name}</span>
-      <span className="text-gray-300 mr-2">{log?.message}</span>
-      <span className="text-green-300">{log?.message_types?.join(' -> ')}</span>
-    </p>
-  );
-};
 
 export const meta: MetaFunction = metaWithDefaults(() => {
   return [

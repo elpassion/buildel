@@ -50,16 +50,18 @@ export async function loader(args: LoaderFunctionArgs) {
       },
     );
 
-    const [{ pipeline }, { pipelineRun }, pipelineRunLogs] = await Promise.all([
-      pipelinePromise,
-      pipelineRunPromise,
-      pipelineRunLogsPromise,
-    ]);
+    const [{ pipeline }, { pipelineRun }, { data: pipelineRunLogs }] =
+      await Promise.all([
+        pipelinePromise,
+        pipelineRunPromise,
+        pipelineRunLogsPromise,
+      ]);
 
     return json({
       pipeline,
       pipelineRun,
-      pipelineRunLogs: pipelineRunLogs.data,
+      logs: pipelineRunLogs.data,
+      pagination: pipelineRunLogs.meta,
       blockName,
     });
   })(args);
