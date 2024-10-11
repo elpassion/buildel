@@ -21,7 +21,7 @@ import type { loader } from './loader.server';
 
 const TOAST_DURATION = 10000;
 
-export function ProfileSettingsPage() {
+export function BillingPage() {
   const { plans } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
 
