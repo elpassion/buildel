@@ -37,6 +37,18 @@ export const SubscriptionProductsResponse = z
     data: res.data,
   }));
 
+export const Checkout = z.object({
+  customer: z.string().nullish(),
+  id: z.string().nullish(),
+  url: z.string(),
+});
+
+export const CheckoutResponse = z
+  .object({ data: Checkout })
+  .transform((res) => ({
+    data: res.data,
+  }));
+
 export class StripePrice extends MonetaryValue {
   private readonly _id: string;
   constructor(price: z.TypeOf<typeof SubscriptionPrice>) {
