@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type { OnConnect } from '@buildel/buildel';
 import { LoaderCircle, Trash, Upload } from 'lucide-react';
 
 import {
@@ -54,6 +55,7 @@ interface WebchatProps extends WebchatBaseProps {
     payload: unknown,
   ) => void;
   onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
+  onConnect?: OnConnect;
 }
 
 export const Webchat = ({
@@ -64,6 +66,7 @@ export const Webchat = ({
   disabled,
   socketArgs,
   runArgs,
+  onConnect,
   ...rest
 }: WebchatProps) => {
   const onBlockOutput = (
@@ -92,6 +95,7 @@ export const Webchat = ({
     pipelineId: pipelineId as unknown as number,
     onBlockStatusChange,
     onBlockOutput,
+    onConnect,
     socketArgs,
   });
 

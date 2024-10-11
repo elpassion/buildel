@@ -1,7 +1,8 @@
 import React from 'react';
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import { useLoaderData, useNavigate } from '@remix-run/react';
+import type { OnConnect } from '@buildel/buildel';
 import invariant from 'tiny-invariant';
 
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
@@ -35,6 +36,7 @@ export async function loader(args: LoaderFunctionArgs) {
 }
 
 export default function WebsiteChat() {
+  const navigate = useNavigate();
   const {
     pipelineId,
     organizationId,
@@ -45,12 +47,17 @@ export default function WebsiteChat() {
     runId,
   } = useLoaderData<typeof loader>();
 
+  const onConnect: OnConnect = (config) => {
+    navigate(config.id.toString(), { replace: true });
+  };
+
   return (
     <div className="flex justify-center items-center h-[100dvh] w-full bg-secondary">
       <Webchat
         defaultInterface={isAudioChat ? 'voice' : 'chat'}
         organizationId={organizationId}
         pipelineId={pipelineId}
+        onConnect={onConnect}
         size={chatSize}
         runArgs={{
           alias,
