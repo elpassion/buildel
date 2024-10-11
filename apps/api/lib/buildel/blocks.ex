@@ -2,6 +2,10 @@ defmodule Buildel.Blocks do
   alias Buildel.Blocks.NewFileInput
   alias Buildel.Blocks.NewBrowserTool
   alias Buildel.Blocks.NewCollect
+  alias Buildel.Blocks.CodeTool
+  alias Buildel.Blocks.ImageOutput
+  alias Buildel.Blocks.DatasetOutput
+  alias Buildel.Blocks.FileInput
 
   alias Buildel.Blocks.{
     NewAudioInput,
@@ -85,7 +89,8 @@ defmodule Buildel.Blocks do
     "knowledge" => Knowledge,
     "collect_all_audio" => CollectAllAudio,
     "sharepoint_client" => SharepointClient,
-    "video" => Video
+    "video" => Video,
+    "code_interpreter" => CodeTool
   }
 
   @blocks_to_names_map %{
@@ -127,7 +132,8 @@ defmodule Buildel.Blocks do
     Knowledge => "knowledge",
     CollectAllAudio => "collect_all_audio",
     SharepointClient => "sharepoint_client",
-    Video => "video"
+    Video => "video",
+    CodeTool => "code_interpreter"
   }
 
   def list_types() do
