@@ -11,54 +11,19 @@ import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 import { hashString } from '~/utils/stringHash';
 
-interface FloatingChatProps {
-  chatUrl: string;
-  webchatConfig: IInterfaceConfigForm;
-  isOpen: boolean;
-  toggle: () => void;
-  close: () => void;
-}
-
-export const FloatingChat = ({
-  chatUrl,
-  webchatConfig,
-  isOpen,
-  toggle,
-  close,
-}: FloatingChatProps) => {
-  return (
-    <div className="hidden fixed z-[51] top-0 bottom-0 left-0 right-0 pointer-events-none lg:block">
-      <FloatingChatButton
-        className="absolute bottom-4 right-4 pointer-events-auto"
-        onClick={toggle}
-      />
-
-      {isOpen && (
-        <Chat chatUrl={chatUrl} config={webchatConfig} onClose={close} />
-      )}
-    </div>
-  );
-};
-
-function Chat({
-  config,
-  chatUrl,
-  onClose,
-}: {
+export interface FloatingChatProps {
   config: IInterfaceConfigForm;
   chatUrl: string;
-  onClose: () => void;
-}) {
-  const isConfigured = config.inputs.length > 0 && config.outputs.length > 0;
-
-  return (
-    <ChatWrapper config={config} onClose={onClose}>
-      {isConfigured ? <ChatIframe chatUrl={chatUrl} /> : <ChatErrorMessage />}
-    </ChatWrapper>
-  );
 }
 
-function FloatingChatButton({
+export function FloatingChat({ config, chatUrl }: FloatingChatProps) {
+  const isConfigured = config.inputs.length > 0 && config.outputs.length > 0;
+
+  if (!isConfigured) return <ChatErrorMessage />;
+  return <ChatIframe chatUrl={chatUrl} />;
+}
+
+export function FloatingChatButton({
   disabled,
   ...props
 }: Omit<IconButtonProps, 'icon'>) {
@@ -74,14 +39,12 @@ function FloatingChatButton({
 
 interface ChatWrapperProps {
   onClose: () => void;
-  config: IInterfaceConfigForm;
   className?: string;
 }
 
-function ChatWrapper({
+export function FloatingChatWrapper({
   children,
   onClose,
-  config,
   className,
 }: PropsWithChildren<ChatWrapperProps>) {
   const organizationId = useOrganizationId();
@@ -95,8 +58,6 @@ function ChatWrapper({
     ).toString(),
     { right: 16, bottom: 16 },
   );
-
-  const isConfigured = config.inputs.length > 0 && config.outputs.length > 0;
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (e.button !== 0) return;

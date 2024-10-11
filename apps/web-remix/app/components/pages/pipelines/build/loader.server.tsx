@@ -59,7 +59,7 @@ export async function loader(args: LoaderFunctionArgs) {
       blockTypes: blockTypes,
       pipelineId: params.pipelineId,
       organizationId: params.organizationId,
-      pageUrl: process.env.PAGE_URL,
+      pageUrl: process.env.PAGE_URL ?? '',
       organization: organization.data,
     });
   })(args);
