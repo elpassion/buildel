@@ -288,13 +288,14 @@ export const routes = {
       `/webchats${routes.pipeline(organizationId, pipelineId)}`,
       params,
     ),
-  voiceChatPreview: (
+  chatPreviewRun: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
+    runId: RunId,
     params: RouteParam = {},
   ) =>
     buildUrlWithParams(
-      `/voice-chat${routes.pipeline(organizationId, pipelineId)}`,
+      `${routes.chatPreview(organizationId, pipelineId)}/${runId}`,
       params,
     ),
   formPreview: (

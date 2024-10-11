@@ -1,7 +1,7 @@
 import React from 'react';
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { useLoaderData, useNavigate } from '@remix-run/react';
+import { useLoaderData, useNavigate, useSearchParams } from '@remix-run/react';
 import type { OnConnect } from '@buildel/buildel';
 import invariant from 'tiny-invariant';
 
@@ -10,6 +10,7 @@ import { chatSize } from '~/components/chat/chat.types';
 import { Webchat } from '~/components/chat/Webchat';
 import { loaderBuilder } from '~/utils.server';
 import { metaWithDefaults } from '~/utils/metadata';
+import { routes } from '~/utils/routes.utils';
 
 export async function loader(args: LoaderFunctionArgs) {
   return loaderBuilder(async ({ params, request }, { fetch }) => {
@@ -37,6 +38,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
 export default function WebsiteChat() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {
     pipelineId,
     organizationId,
@@ -48,7 +50,17 @@ export default function WebsiteChat() {
   } = useLoaderData<typeof loader>();
 
   const onConnect: OnConnect = (config) => {
-    navigate(config.id.toString(), { replace: true });
+    navigate(
+      routes.chatPreviewRun(
+        organizationId,
+        pipelineId,
+        config.id,
+        Object.fromEntries(searchParams.entries()),
+      ),
+      {
+        replace: true,
+      },
+    );
   };
 
   return (
