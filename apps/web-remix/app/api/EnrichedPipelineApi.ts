@@ -17,7 +17,7 @@ export class EnrichedPipelineApi {
   async getEnrichedPipeline(
     organizationId: string | number,
     pipelineId: string | number,
-    aliasId: string | number,
+    aliasId: string | number = 'latest',
   ): Promise<{ pipeline: IExtendedPipeline; blockTypes: IBlockTypes }> {
     const blockTypesPromise = this.blockTypeApi.getBlockTypes();
     const pipelinePromise = this.pipelineApi.getAliasedPipeline(

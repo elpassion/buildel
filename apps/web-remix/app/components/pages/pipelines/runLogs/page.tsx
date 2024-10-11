@@ -33,7 +33,7 @@ export function PipelineRunLogs() {
     pipeline.organization_id,
     pipeline.id,
     pipelineRun.id,
-    () => { },
+    () => {},
     (payload) => {
       setLiveLogs((prev) => [...prev, payload.data]);
     },
@@ -87,7 +87,8 @@ export function PipelineRunLogs() {
     return (
       <PageContentWrapper className="mt-10">
         <p className="text-center text-red-500">
-          No logs found for this run. You can enable logs in the pipeline settings.
+          No logs found for this run. You can enable logs in the pipeline
+          settings.
         </p>
       </PageContentWrapper>
     );
@@ -104,7 +105,7 @@ export function PipelineRunLogs() {
               pipeline.organization_id,
               pipeline.id,
               pipelineRun.id,
-            )
+            ),
           );
 
           stopListening().then(() =>
