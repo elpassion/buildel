@@ -346,7 +346,7 @@ export const PipelineRunLogsResponse = z.object({
   data: z.array(PipelineRunLog),
   meta: z.object({
     after: z.string().nullish(),
-    totalItems: z.number().nullish(),
+    total: z.number().nullish(),
   }),
 });
 
