@@ -403,6 +403,8 @@ defmodule BuildelWeb.Router do
     post("/users/register/invitation", UserRegistrationController, :invitation_create)
     get("/users/register", UserRegistrationController, :check)
     post("/users/register", UserRegistrationController, :create)
+
+    get("/files", OrganizationPipelineRunFileController, :show)
   end
 
   scope "/api" do

@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks do
+  alias Buildel.Blocks.CodeTool
   alias Buildel.Blocks.ImageOutput
   alias Buildel.Blocks.DatasetOutput
   alias Buildel.Blocks.FileInput
@@ -81,7 +82,8 @@ defmodule Buildel.Blocks do
     "image" => Image,
     "image_output" => ImageOutput,
     "knowledge" => Knowledge,
-    "collect_all_audio" => CollectAllAudio
+    "collect_all_audio" => CollectAllAudio,
+    "code_interpreter" => CodeTool
   }
 
   @blocks_to_names_map %{
@@ -121,7 +123,8 @@ defmodule Buildel.Blocks do
     Image => "image",
     ImageOutput => "image_output",
     Knowledge => "knowledge",
-    CollectAllAudio => "collect_all_audio"
+    CollectAllAudio => "collect_all_audio",
+    CodeTool => "code_interpreter"
   }
 
   def list_types() do
