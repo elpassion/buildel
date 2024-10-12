@@ -44,6 +44,8 @@ const SUPPORTED_DOCUMENT_TYPES = [
   'application/xml',
   'text/xml',
   'text/markdown',
+  'text/javascript',
+  'video/mpeg',
 ];
 
 interface WebchatProps extends WebchatBaseProps {
