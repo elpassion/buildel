@@ -145,8 +145,7 @@ defmodule Buildel.Blocks.CodeTool do
           description: """
           CREATE FILES BEFORE EVALUATING THEM.
           Evaluates a Deno compatible typescript .ts file (DOES NOT ALLOW EVALUATING ANY OTHER FILES THAN .ts) and returns the result of script.
-          Use npm packages! prefix package with `npm:` like so: `import * as emoji from "npm:node-emoji";`
-          Do not use deno packages. Only npm.
+          Use npm packages or deno packages! prefix package with `npm:` like so: `import * as emoji from "npm:node-emoji";`
           Use the `import` syntax from ESModules NOT CommonJS. Avoid `require` syntax.
           The base folder is #{state.dir_path}.
           If you create any files during the process use markdown to reference them.
@@ -178,10 +177,46 @@ defmodule Buildel.Blocks.CodeTool do
           """
         end,
         response_formatter: fn response ->
+          %{status: _status, output: output} = Jason.decode!(response, keys: :atoms)
+
           """
             <details>
               <summary>Code run result</summary>
-              #{response}
+              ```console
+              #{output}
+              ```
+            </details>
+          """
+        end
+      },
+      %{
+        function: %{
+          name: "test_deno",
+          description: """
+          Runs all tests in folder using Deno.test.
+          """,
+          parameters_schema: %{
+            type: "object",
+            properties: %{},
+            required: []
+          }
+        },
+        call_formatter: fn _args ->
+          """
+          <details>
+            <summary>Running tests...</summary>
+          </details>
+          """
+        end,
+        response_formatter: fn response ->
+          %{status: _status, output: output} = Jason.decode!(response, keys: :atoms)
+
+          """
+            <details>
+              <summary>Test run result</summary>
+              ```console
+              #{output}
+              ```
             </details>
           """
         end
@@ -217,6 +252,13 @@ defmodule Buildel.Blocks.CodeTool do
   end
 
   @impl true
+  def handle_tool("tool", "test_deno", {_name, :text, _args, _}, state) do
+    content = test_deno(state, %{})
+
+    {content, state}
+  end
+
+  @impl true
   def handle_tool("tool", "install_npm_package", {_name, :text, args, _}, state) do
     content = install_package(state, %{name: args["name"]})
 
@@ -230,7 +272,6 @@ defmodule Buildel.Blocks.CodeTool do
       content
       |> String.replace(~s|\\n|, ~s|\n|)
       |> String.replace(~s|\\"|, ~s|\"|)
-      |> IO.inspect()
 
     File.write!(Path.join(folder_path, name) |> IO.inspect(), content || "")
   end
@@ -264,7 +305,18 @@ defmodule Buildel.Blocks.CodeTool do
     |> then(fn {output, status} ->
       %{output: output, status: status} |> Jason.encode!()
     end)
-    |> IO.inspect()
+  end
+
+  defp test_deno(state, _opts) do
+    folder_path = state.dir_path
+
+    System.cmd("deno", ["test"],
+      stderr_to_stdout: true,
+      cd: folder_path
+    )
+    |> then(fn {output, status} ->
+      %{output: output, status: status} |> Jason.encode!()
+    end)
   end
 
   defp install_package(state, %{name: name}) do
