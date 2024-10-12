@@ -110,13 +110,14 @@ defmodule Buildel.Blocks.CodeTool do
         function: %{
           name: "read_file",
           description:
-            "Reads a file with a given name. The base folder your file will be read fromi is #{state.dir_path}",
+            "Reads a file with a given name. The base folder your file will be read from is #{state.dir_path}.",
           parameters_schema: %{
             type: "object",
             properties: %{
               name: %{
                 type: "string",
-                description: "The name of file to create with extension. ie: abc.txt"
+                description:
+                  "The name of file to create with extension. ie: abc.txt.  DO NOT SPECIFY PATH. ONLY FILE NAME"
               }
             },
             required: ["name"]
@@ -130,7 +131,6 @@ defmodule Buildel.Blocks.CodeTool do
           <details>
             <summary>Reading file [#{path}](#{url})</summary>
             ```
-            #{File.read!(path)}
             ```
           </details>
           """
@@ -171,7 +171,6 @@ defmodule Buildel.Blocks.CodeTool do
           <details>
             <summary>Running file [#{path}](#{url})</summary>
             ```
-            #{File.read!(path)}
             ```
           </details>
           """
@@ -197,7 +196,9 @@ defmodule Buildel.Blocks.CodeTool do
           """,
           parameters_schema: %{
             type: "object",
-            properties: %{},
+            properties: %{
+              dummy: %{type: "string"}
+            },
             required: []
           }
         },
