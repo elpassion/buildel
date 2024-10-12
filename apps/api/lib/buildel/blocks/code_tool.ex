@@ -146,6 +146,8 @@ defmodule Buildel.Blocks.CodeTool do
           CREATE FILES BEFORE EVALUATING THEM.
           Evaluates a Deno compatible typescript .ts file (DOES NOT ALLOW EVALUATING ANY OTHER FILES THAN .ts) and returns the result of script.
           Use npm packages! prefix package with `npm:` like so: `import * as emoji from "npm:node-emoji";`
+          Do not use deno packages. Only npm.
+          Use the `import` syntax from ESModules NOT CommonJS. Avoid `require` syntax.
           The base folder is #{state.dir_path}.
           If you create any files during the process use markdown to reference them.
           Do it in an EXACT FORM '[FILE_NAME](/super-api/files?path=#{state.dir_path}/FILE_NAME)' where FILE_NAME is the name of the file.
@@ -224,7 +226,13 @@ defmodule Buildel.Blocks.CodeTool do
   defp create_file(state, %{name: name, content: content}) do
     folder_path = state.dir_path
 
-    File.write!(Path.join(folder_path, name), content || "")
+    content =
+      content
+      |> String.replace(~s|\\n|, ~s|\n|)
+      |> String.replace(~s|\\"|, ~s|\"|)
+      |> IO.inspect()
+
+    File.write!(Path.join(folder_path, name) |> IO.inspect(), content || "")
   end
 
   defp read_file(state, %{name: name}) do
