@@ -267,6 +267,8 @@ function Link({
   className,
   ...rest
 }: AnchorHTMLAttributes<HTMLAnchorElement>) {
+  if (rest.href && rest.href.startsWith('sandbox:/'))
+    rest.href = rest.href.replace('sandbox:', '/super-api/files?path=');
   return (
     <a
       className={cn('text-foreground font-bold hover:underline', className)}
