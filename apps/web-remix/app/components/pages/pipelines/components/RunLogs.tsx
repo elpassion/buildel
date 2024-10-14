@@ -147,12 +147,21 @@ export function RunLogsFilter({
 }
 
 const Log = ({ log }: { log: any }) => {
+  const isError = log?.message_types?.includes('error');
+
   return (
     <p className="mb-2">
       <span className="text-cyan-400 mr-2">{log?.created_at}</span>
       <span className="text-yellow-500 mr-2">{log?.context}</span>
       <span className="text-purple-500 mr-2">{log?.block_name}</span>
-      <span className="text-gray-300 mr-2">{log?.message}</span>
+      <span
+        className={cn('mr-2', {
+          'text-red-500': isError,
+          'text-gray-300': !isError,
+        })}
+      >
+        {log?.message}
+      </span>
       <span className="text-green-300">{log?.message_types?.join(' -> ')}</span>
     </p>
   );
