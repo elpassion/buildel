@@ -170,7 +170,13 @@ const Log = ({
   const isError = log?.message_types?.includes('error');
 
   return (
-    <p className={cn({ 'mb-2': size === 'md' })}>
+    <p
+      className={cn({
+        'mb-2': size === 'md',
+        'hover:bg-muted': variant === 'light',
+        'hover:bg-gray-700': variant === 'dark',
+      })}
+    >
       <span
         className={cn('text-cyan-400 mr-2 whitespace-nowrap', getLogSize(size))}
       >
