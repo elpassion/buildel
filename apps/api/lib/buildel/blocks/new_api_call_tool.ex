@@ -2,6 +2,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
   alias Buildel.Blocks.Fields.EditorField
   alias EditorField.Suggestion
   use Buildel.Blocks.NewBlock
+  use Buildel.Blocks.NewBlock.HttpApi
 
   defblock(:api_call_tool,
     description: "Tool used to call HTTP APIs.",
@@ -99,7 +100,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
         headers: headers
       )
 
-    case Req.request(request) do
+    case httpApi().request(request) do
       {:ok, %Req.Response{status: status, body: body}} ->
         {:ok, %{status: status, body: body}}
 
@@ -120,10 +121,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
     {:ok,
      args
      |> Enum.reduce(url, fn
-       {key, value}, acc when is_number(value) ->
-         String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
-
-       {key, value}, acc when is_binary(value) ->
+       {key, value}, acc when is_number(value) or is_binary(value) ->
          String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
 
        _, acc ->

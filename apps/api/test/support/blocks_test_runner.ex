@@ -116,6 +116,11 @@ defmodule Buildel.BlocksTestRunner do
     end)
   end
 
+  def with_api_responding(run, mock) do
+    Buildel.ClientMocks.HttpApi.set_mock(mock)
+    run
+  end
+
   @impl true
   def init(config) do
     context_id = context_id(self())

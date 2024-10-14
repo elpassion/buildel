@@ -4,7 +4,6 @@ defmodule Buildel.Blocks do
   alias Buildel.Blocks.NewCollect
   alias Buildel.Blocks.ImageOutput
   alias Buildel.Blocks.DatasetOutput
-  alias Buildel.Blocks.FileInput
 
   alias Buildel.Blocks.{
     AudioInput,

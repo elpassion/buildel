@@ -571,3 +571,13 @@ defmodule Buildel.Blocks.NewBlock.StreamState do
     end
   end
 end
+
+defmodule Buildel.Blocks.NewBlock.HttpApi do
+  defmacro __using__(_opts) do
+    quote do
+      def httpApi() do
+        Application.fetch_env!(:buildel, :http_api)
+      end
+    end
+  end
+end

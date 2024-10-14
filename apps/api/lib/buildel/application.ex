@@ -57,6 +57,7 @@ defmodule Buildel.Application do
         |> maybe_add_db()
         |> maybe_add_bumblebee_embedding()
         |> maybe_add_python_workers()
+        |> maybe_add_http_api()
       end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -129,6 +130,14 @@ defmodule Buildel.Application do
         [
           :poolboy.child_spec(:worker_p, python_poolboy_config())
         ]
+    else
+      children
+    end
+  end
+
+  defp maybe_add_http_api(children) do
+    if Application.get_env(:buildel, :http_api) == Buildel.ClientMocks.HttpApi do
+      children ++ [Buildel.ClientMocks.HttpApi]
     else
       children
     end

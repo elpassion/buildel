@@ -163,25 +163,6 @@ defmodule BuildelWeb.PipelineChannel do
     {:noreply, socket}
   end
 
-  defp should_send_through_block?(socket, %Message{} = message) do
-    block_name = message |> Buildel.Blocks.Utils.Message.block_name()
-
-    interface_output_block_names =
-      Map.get(socket.assigns.run.interface_config, "outputs", [])
-      |> Enum.map(&Map.get(&1, "name"))
-
-    Enum.member?(interface_output_block_names, block_name) ||
-      Enum.count(interface_output_block_names) == 0
-  end
-
-  defp send_message(socket, %Message{} = message) do
-    block_name = message |> Buildel.Blocks.Utils.Message.block_name()
-    output_name = message |> Buildel.Blocks.Utils.Message.input_or_output_name()
-
-    socket
-    |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message.message})
-  end
-
   def handle_info({output_name, :binary, chunk, _metadata}, socket) do
     Logger.debug("Channel Sending binary chunk to #{output_name}")
 
@@ -268,6 +249,25 @@ defmodule BuildelWeb.PipelineChannel do
     end
 
     {:noreply, socket}
+  end
+
+  defp should_send_through_block?(socket, %Message{} = message) do
+    block_name = message |> Buildel.Blocks.Utils.Message.block_name()
+
+    interface_output_block_names =
+      Map.get(socket.assigns.run.interface_config, "outputs", [])
+      |> Enum.map(&Map.get(&1, "name"))
+
+    Enum.member?(interface_output_block_names, block_name) ||
+      Enum.count(interface_output_block_names) == 0
+  end
+
+  defp send_message(socket, %Message{} = message) do
+    block_name = message |> Buildel.Blocks.Utils.Message.block_name()
+    output_name = message |> Buildel.Blocks.Utils.Message.input_or_output_name()
+
+    socket
+    |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message.message})
   end
 
   defp parse_topic(topic) do
