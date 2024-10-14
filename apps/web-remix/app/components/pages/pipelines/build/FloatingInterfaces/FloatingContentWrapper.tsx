@@ -1,52 +1,27 @@
 import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
-import { MessageCircle, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { IconButton, IconButtonProps } from '~/components/iconButton';
-import { BasicLink } from '~/components/link/BasicLink';
-import { IInterfaceConfigForm } from '~/components/pages/pipelines/pipeline.types';
+import { IconButton } from '~/components/iconButton';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
 import { cn } from '~/utils/cn';
-import { routes } from '~/utils/routes.utils';
 import { hashString } from '~/utils/stringHash';
 
-export interface FloatingChatProps {
-  config: IInterfaceConfigForm;
-  chatUrl: string;
-}
-
-export function FloatingChat({ config, chatUrl }: FloatingChatProps) {
-  const isConfigured = config.inputs.length > 0 && config.outputs.length > 0;
-
-  if (!isConfigured) return <ChatErrorMessage />;
-  return <ChatIframe chatUrl={chatUrl} />;
-}
-
-export function FloatingChatButton({
-  disabled,
-  ...props
-}: Omit<IconButtonProps, 'icon'>) {
-  return (
-    <IconButton
-      disabled={disabled}
-      icon={<MessageCircle />}
-      {...props}
-      variant="outline"
-    />
-  );
-}
-
-interface ChatWrapperProps {
+interface FloatingContentWrapperProps {
   onClose: () => void;
   className?: string;
+  suffix?: string;
+  defaultPosition?: { right: number; bottom: number };
 }
 
-export function FloatingChatWrapper({
+export function FloatingDynamicWrapper({
   children,
   onClose,
   className,
-}: PropsWithChildren<ChatWrapperProps>) {
+  suffix = 'chat',
+  defaultPosition = { right: 16, bottom: 16 },
+}: PropsWithChildren<FloatingContentWrapperProps>) {
   const organizationId = useOrganizationId();
   const pipelineId = usePipelineId();
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -54,9 +29,9 @@ export function FloatingChatWrapper({
   const [dragging, setDragging] = useState(false);
   const [position, setPosition] = useLocalStorage(
     hashString(
-      `buildel-${organizationId}-${pipelineId}-chat-position`,
+      `buildel-${organizationId}-${pipelineId}-${suffix}-position`,
     ).toString(),
-    { right: 16, bottom: 16 },
+    defaultPosition,
   );
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -125,7 +100,7 @@ export function FloatingChatWrapper({
       ref={wrapperRef}
       style={{ right: `${position.right}px`, bottom: `${position.bottom}px` }}
       className={cn(
-        'fixed pointer-events-auto w-fit h-fit min-w-[500px] min-h-[400px] bg-muted rounded-lg flex justify-center items-center border border-input overflow-hidden',
+        'fixed z-[2] pointer-events-auto w-fit h-fit min-w-[500px] min-h-[400px] bg-muted rounded-lg flex justify-center items-center border border-input overflow-hidden',
         className,
       )}
     >
@@ -144,37 +119,5 @@ export function FloatingChatWrapper({
         size="xxxs"
       />
     </div>
-  );
-}
-
-function ChatErrorMessage() {
-  const organizationId = useOrganizationId();
-  const pipelineId = usePipelineId();
-
-  return (
-    <p className="text-sm max-w-[400px] text-center">
-      You do not have inputs and outputs configured for this pipeline. Check the
-      interface configuration{' '}
-      <BasicLink
-        target="_blank"
-        to={routes.pipelineWebsiteChatbot(organizationId, pipelineId)}
-        className="font-bold hover:underline"
-      >
-        here
-      </BasicLink>
-      .
-    </p>
-  );
-}
-
-function ChatIframe({ chatUrl }: { chatUrl: string }) {
-  return (
-    <iframe
-      src={chatUrl}
-      width="600"
-      height="500"
-      title="chat"
-      className="py-1 px-1"
-    />
   );
 }

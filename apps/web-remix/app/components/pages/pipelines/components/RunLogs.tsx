@@ -4,16 +4,16 @@ import { useFetcher } from '@remix-run/react';
 
 import type { IPipelineRunLog } from '~/api/pipeline/pipeline.contracts';
 import { SelectInput } from '~/components/form/inputs/select/select.input';
+import { BasicLink } from '~/components/link/BasicLink';
+import { EmptyMessage } from '~/components/list/ItemList';
 import type { loader } from '~/components/pages/pipelines/runLogs/loader.server';
-import {
-  fetchOlder,
-  log,
-  runLogsReducer,
-} from '~/components/pages/pipelines/runLogs/runLogs.reducer';
 import { usePipelineRunLogs } from '~/components/pages/pipelines/usePipelineRunLogs';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 import { buildUrlWithParams } from '~/utils/url';
+
+import { fetchOlder, log, runLogsReducer } from './runLogs.reducer';
 
 interface LogsProps {
   defaultLogs: IPipelineRunLog[];
@@ -22,6 +22,7 @@ interface LogsProps {
   runId: number;
   pipelineId: number;
   organizationId: number;
+  className?: string;
 }
 
 export function RunLogs({
@@ -31,6 +32,7 @@ export function RunLogs({
   pipelineId,
   organizationId,
   runId,
+  className,
 }: LogsProps) {
   const fetcher = useFetcher<typeof loader>();
   const { ref: fetchNextRef, inView } = useInView();
@@ -48,7 +50,7 @@ export function RunLogs({
     console.error(error);
   };
 
-  const { status, listenToLogs, stopListening } = usePipelineRunLogs(
+  const { status, listenToLogs } = usePipelineRunLogs(
     organizationId,
     pipelineId,
     runId,
@@ -87,14 +89,15 @@ export function RunLogs({
         block_name: blockName,
       });
     }
-
-    return () => {
-      stopListening();
-    };
   }, [status]);
 
   return (
-    <div className="mt-2 bg-gray-800 text-gray-400 font-mono p-4 h-[65vh] max-h-[450px] overflow-y-auto rounded-lg flex flex-col-reverse">
+    <div
+      className={cn(
+        'bg-gray-800 text-gray-400 font-mono p-4 h-[65vh] max-h-[450px] overflow-y-auto rounded-lg flex flex-col-reverse',
+        className,
+      )}
+    >
       <ul className="flex flex-col-reverse">
         {state.logs
           .map((log) => (
@@ -154,3 +157,30 @@ const Log = ({ log }: { log: any }) => {
     </p>
   );
 };
+
+interface LogsEmptyMessageProps {
+  organizationId: number;
+  pipelineId: number;
+  className?: string;
+}
+export function LogsEmptyMessage({
+  organizationId,
+  className,
+  pipelineId,
+}: LogsEmptyMessageProps) {
+  return (
+    <EmptyMessage
+      className={cn('block mx-auto text-center w-fit max-w-[350px]', className)}
+    >
+      No logs found for this run. You can enable logs in the workflow{' '}
+      <BasicLink
+        target="_blank"
+        className="font-semibold text-foreground hover:underline"
+        to={routes.pipelineSettings(organizationId, pipelineId)}
+      >
+        settings
+      </BasicLink>
+      .
+    </EmptyMessage>
+  );
+}

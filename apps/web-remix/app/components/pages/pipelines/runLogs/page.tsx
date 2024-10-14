@@ -3,9 +3,8 @@ import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
-import { BasicLink } from '~/components/link/BasicLink';
-import { EmptyMessage } from '~/components/list/ItemList';
 import {
+  LogsEmptyMessage,
   RunLogs,
   RunLogsFilter,
 } from '~/components/pages/pipelines/components/RunLogs';
@@ -53,23 +52,17 @@ export function PipelineRunLogs() {
 
   if (pagination.total === 0) {
     return (
-      <EmptyMessage className="block mx-auto mt-10 text-center w-fit max-w-[350px]">
-        No logs found for this run. You can enable logs in the workflow{' '}
-        <BasicLink
-          target="_blank"
-          className="font-semibold text-foreground hover:underline"
-          to={routes.pipelineSettings(pipeline.organization_id, pipeline.id)}
-        >
-          settings
-        </BasicLink>
-        .
-      </EmptyMessage>
+      <LogsEmptyMessage
+        organizationId={pipeline.organization_id}
+        pipelineId={pipeline.id}
+        className="mt-10"
+      />
     );
   }
 
   return (
     <PageContentWrapper className="mt-10">
-      <Label>
+      <Label className="block mb-2">
         <span>Filter by block</span>
         <RunLogsFilter
           value={blockName}
