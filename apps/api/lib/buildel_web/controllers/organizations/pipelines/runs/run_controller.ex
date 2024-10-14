@@ -328,12 +328,12 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
             run,
             block_name,
             input_name,
-            {:binary, file |> Map.get(:path)},
-            %{
+            Message.new(:file, %{
+              path: file |> Map.get(:path),
               file_id: UUID.uuid4(),
               file_name: file |> Map.get(:filename),
               file_type: file |> Map.get(:content_type)
-            }
+            })
           )
         end
 
@@ -500,12 +500,12 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
              run,
              block_name,
              input_name,
-             {:binary, file |> Map.get(:path)},
-             %{
-               file_id: file_id,
+             Message.new(:file, %{
+               path: file |> Map.get(:path),
+               file_id: UUID.uuid4(),
                file_name: file |> Map.get(:filename),
                file_type: file |> Map.get(:content_type)
-             }
+             })
            ) do
       render(conn, :input_file,
         file: %{
@@ -568,9 +568,14 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, run} <- Pipelines.get_running_pipeline_run(pipeline, id),
          {:ok, run} <-
-           Pipelines.Runner.cast_run(run, block_name, input_name, {:text, file_id}, %{
-             method: :delete
-           }) do
+           Pipelines.Runner.cast_run(
+             run,
+             block_name,
+             input_name,
+             Message.new(:file, %{file_id: file_id}, %{
+               method: :delete
+             })
+           ) do
       render(conn, :show, run: run)
     else
       {:error, :not_running} -> {:error, :bad_request}

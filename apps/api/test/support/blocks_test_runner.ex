@@ -61,8 +61,21 @@ defmodule Buildel.BlocksTestRunner do
         "text"
       )
 
+  def test_text_input_2_connection(input_name) when is_atom(input_name),
+    do: test_text_input_2_connection(input_name |> to_string())
+
+  def test_text_input_2_connection(input_name),
+    do:
+      Buildel.Blocks.Connection.from_connection_string(
+        "TEST_INPUT_2:output->#{input_name}",
+        "text"
+      )
+
   def test_input(run, message),
     do: Run.input(run, "TEST_INPUT", :input, message)
+
+  def test_input_2(run, message),
+    do: Run.input(run, "TEST_INPUT_2", :input, message)
 
   def subscribe_to_block(run, block_name) do
     with %Buildel.Blocks.Block{} = block <-
@@ -91,6 +104,11 @@ defmodule Buildel.BlocksTestRunner do
         [
           Buildel.Blocks.NewRawInput.create(%{
             name: "TEST_INPUT",
+            opts: %{},
+            connections: []
+          }),
+          Buildel.Blocks.NewRawInput.create(%{
+            name: "TEST_INPUT_2",
             opts: %{},
             connections: []
           })

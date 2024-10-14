@@ -135,6 +135,8 @@ defmodule BuildelWeb.PipelineChannel do
     data =
       case data do
         {:binary, content} ->
+          IO.inspect("TEST")
+
           block_type =
             run.interface_config
             |> Map.get("inputs", [])
@@ -142,12 +144,9 @@ defmodule BuildelWeb.PipelineChannel do
             |> Map.get("type")
 
           if block_type == "file_input" do
-            {:ok, path} = Temp.path()
-            File.write!(path, content)
-
-            {:binary, path}
+            Message.new(:file, content)
           else
-            data
+            Message.new(:text, data)
           end
 
         _ ->

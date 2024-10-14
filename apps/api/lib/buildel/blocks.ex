@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks do
+  alias Buildel.Blocks.NewFileInput
   alias Buildel.Blocks.NewBrowserTool
   alias Buildel.Blocks.NewCollect
   alias Buildel.Blocks.ImageOutput
@@ -38,7 +39,7 @@ defmodule Buildel.Blocks do
     ImageInput,
     HuggingFaceImageClassification,
     BraveSearch,
-    FileToText,
+    NewFileToText,
     NewImage,
     ImageOutput,
     Knowledge
@@ -58,7 +59,7 @@ defmodule Buildel.Blocks do
     "collect_all_text" => NewCollect,
     "map_inputs" => NewMap,
     "split_text" => SplitText,
-    "file_input" => FileInput,
+    "file_input" => NewFileInput,
     "webhook_output" => WebhookOutput,
     "document_search" => DocumentSearch,
     "if" => IF,
@@ -77,7 +78,7 @@ defmodule Buildel.Blocks do
     "image_input" => ImageInput,
     "hf_image_classification" => HuggingFaceImageClassification,
     "brave_search" => BraveSearch,
-    "file_to_text" => FileToText,
+    "file_to_text" => NewFileToText,
     "image" => NewImage,
     "image_output" => ImageOutput,
     "knowledge" => Knowledge
@@ -96,7 +97,7 @@ defmodule Buildel.Blocks do
     CollectSentences => "collect_sentences",
     NewCollect => "collect_all_text",
     NewMap => "map_inputs",
-    FileInput => "file_input",
+    NewFileInput => "file_input",
     SplitText => "split_text",
     DocumentSearch => "document_search",
     WebhookOutput => "webhook_output",
@@ -116,7 +117,7 @@ defmodule Buildel.Blocks do
     ImageInput => "image_input",
     HuggingFaceImageClassification => "hf_image_classification",
     BraveSearch => "brave_search",
-    FileToText => "file_to_text",
+    NewFileToText => "file_to_text",
     NewImage => "image",
     ImageOutput => "image_output",
     Knowledge => "knowledge"

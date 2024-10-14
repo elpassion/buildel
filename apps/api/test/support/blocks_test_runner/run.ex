@@ -39,6 +39,8 @@ defmodule Buildel.BlocksTestRunner.Run do
       output_name,
       {:stop_stream, nil}
     )
+
+    run
   end
 
   def start_stream(run, block_name, output_name) do
@@ -48,6 +50,8 @@ defmodule Buildel.BlocksTestRunner.Run do
       output_name,
       {:start_stream, nil}
     )
+
+    run
   end
 
   def get_tools(run, block_name) do

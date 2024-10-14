@@ -393,7 +393,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
         end
 
         unless state.stream_state_pid |> StreamState.output_streaming?(name) do
-          state.stream_state_pid |> StreamState.start_output_streaming(name)
+          state.stream_state_pid |> StreamState.start_output_streaming(name, message)
 
           BlockPubSub.broadcast_to_io(
             state.block.context.context_id,
@@ -406,7 +406,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       defp send_stream_stop(state, name, message) do
         if state.stream_state_pid |> StreamState.output_streaming?(name) do
-          state.stream_state_pid |> StreamState.stop_output_streaming(name)
+          state.stream_state_pid |> StreamState.stop_output_streaming(name, message)
 
           BlockPubSub.broadcast_to_io(
             state.block.context.context_id,
@@ -508,12 +508,12 @@ defmodule Buildel.Blocks.NewBlock.StreamState do
     Agent.get(pid, &State.any_output_streaming?(&1))
   end
 
-  def start_output_streaming(pid, output_id) do
-    Agent.update(pid, &State.start_output_streaming(&1, output_id))
+  def start_output_streaming(pid, output_id, message) do
+    Agent.update(pid, &State.start_output_streaming(&1, output_id, message))
   end
 
-  def stop_output_streaming(pid, output_id) do
-    Agent.update(pid, &State.stop_output_streaming(&1, output_id))
+  def stop_output_streaming(pid, output_id, message) do
+    Agent.update(pid, &State.stop_output_streaming(&1, output_id, message))
   end
 
   defmodule State do
@@ -526,23 +526,48 @@ defmodule Buildel.Blocks.NewBlock.StreamState do
     end
 
     def add_output(state, output_id) do
-      put_in(state.output_states[output_id], false)
+      put_in(state.output_states[output_id], %{})
     end
 
     def any_output_streaming?(state) do
-      Enum.any?(state.output_states, fn {_, output_streaming?} -> output_streaming? end)
+      Enum.any?(state.output_states, fn {_, output_streams} ->
+        output_streams
+        |> Enum.any?(fn {_, output_streaming?} -> output_streaming? end)
+      end)
     end
 
     def output_streaming?(state, output_id) do
-      get_in(state.output_states, [output_id]) || false
+      get_in(state.output_states, [output_id])
+      |> Enum.any?(fn {_, output_streaming?} -> output_streaming? end)
     end
 
-    def start_output_streaming(state, output_id) do
-      put_in(state.output_states[output_id], true)
+    def start_output_streaming(state, output_id, message) do
+      streams =
+        case state.output_states[output_id] do
+          nil -> %{}
+          streams -> streams
+        end
+        |> Map.put(message, true)
+
+      put_in(state.output_states[output_id], streams)
     end
 
-    def stop_output_streaming(state, output_id) do
-      put_in(state.output_states[output_id], false)
+    def stop_output_streaming(state, output_id, message) do
+      streams =
+        case state.output_states[output_id] do
+          nil -> %{}
+          streams -> streams
+        end
+        |> Enum.map(fn {key, value} ->
+          if value == false || key.id == message.id || key.parents |> Enum.member?(message.id) do
+            {key, false}
+          else
+            {key, true}
+          end
+        end)
+        |> Enum.into(%{})
+
+      put_in(state.output_states[output_id], streams)
     end
   end
 end
