@@ -110,7 +110,8 @@ defmodule Buildel.Crawler.Crawl do
     %{url: url, depth: depth} = crawl.pending_pages |> List.first()
 
     request = %Req.Request{
-      url: URI.parse(url)
+      url: URI.parse(url),
+      method: "GET"
     }
 
     case crawl.client.request(request) do

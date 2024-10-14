@@ -135,8 +135,6 @@ defmodule BuildelWeb.PipelineChannel do
     data =
       case data do
         {:binary, content} ->
-          IO.inspect("TEST")
-
           block_type =
             run.interface_config
             |> Map.get("inputs", [])
