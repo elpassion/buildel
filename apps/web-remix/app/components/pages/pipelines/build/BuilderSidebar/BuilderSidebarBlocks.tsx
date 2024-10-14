@@ -7,7 +7,7 @@ import React, {
 } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import { useReactFlow } from '@xyflow/react';
-import { ChevronUp, Pin, X } from 'lucide-react';
+import { ChevronUp, X } from 'lucide-react';
 import { useBoolean, useDebounce, useEventListener } from 'usehooks-ts';
 import { z } from 'zod';
 
@@ -16,7 +16,7 @@ import { TextInput } from '~/components/form/inputs/text.input';
 import { IconButton } from '~/components/iconButton';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
 import { resolveBlockTypeIconPath } from '~/components/pages/pipelines/blockTypes.utils';
-import { useBuilderSidebar } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderSidebar.context';
+import { PinButton } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderSidebar';
 import { leaveOneGroup } from '~/components/pages/pipelines/NodeDropdown/nodeDropdownt.utils';
 import {
   IBlockConfig,
@@ -31,7 +31,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { useBreakpoints } from '~/hooks/useBreakpoints';
 import { cn } from '~/utils/cn';
 import { buildDocsUrl } from '~/utils/docs';
 import { getRandomNumber } from '~/utils/numbers';
@@ -346,36 +345,5 @@ function SearchInput({ value, onClear, onChange }: SearchInputProps) {
         })}
       />
     </div>
-  );
-}
-
-function PinButton() {
-  const { state, isOpen, onPinClick, onClose } = useBuilderSidebar();
-  const { isDesktop } = useBreakpoints();
-
-  if (!isDesktop) {
-    return (
-      <IconButton
-        icon={<X />}
-        size="sm"
-        variant="secondary"
-        onClick={onClose}
-        title="Close"
-        aria-label="Close"
-      />
-    );
-  }
-
-  return (
-    <IconButton
-      icon={<Pin />}
-      size="sm"
-      variant="ghost"
-      onClick={onPinClick}
-      title="Auto close"
-      aria-label="Auto close"
-      data-checked={isOpen}
-      className={cn({ '!text-blue-500': state === 'keepOpen' })}
-    />
   );
 }

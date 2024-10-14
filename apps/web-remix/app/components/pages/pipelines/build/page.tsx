@@ -1,33 +1,30 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
 import isEqual from 'lodash.isequal';
 import { useBoolean } from 'usehooks-ts';
 
+import { BuilderBottomSidebar } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderBottomSidebar';
 import { BuilderSidebar } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderSidebar';
 import { FloatingBoard } from '~/components/pages/pipelines/build/FloatingInterfaces/FloatingBoard';
 import { FloatingDynamicWrapper } from '~/components/pages/pipelines/build/FloatingInterfaces/FloatingContentWrapper';
-import { RunLogs } from '~/components/pages/pipelines/components/RunLogs';
 import { BuilderCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/BuilderCommentNode';
 import { ReadonlyCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/ReadonlyCommentNode';
 import { AliasCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/AliasCustomNode';
 import { BuilderCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/BuilderCustomNode';
 import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
 import { metaWithDefaults } from '~/utils/metadata';
-import { routes } from '~/utils/routes.utils';
 
 import { Builder } from '../Builder';
 import { CustomEdge } from '../Edges/CustomEdges/CustomEdge';
 import type { IPipeline, IPipelineConfig } from '../pipeline.types';
 import { IExtendedPipeline } from '../pipeline.types';
 import { toPipelineConfig } from '../PipelineFlow.utils';
-import type { loader as logsLoader } from '../runLogs/loader.server';
 import { BuilderHeader, SaveChangesButton } from './BuilderHeader';
 import {
   FloatingChat,
   FloatingChatButton,
 } from './FloatingInterfaces/FloatingChat';
-import { FloatingLogsButton } from './FloatingInterfaces/FloatingLogs';
 import type { loader } from './loader.server';
 
 export function PipelineBuilder() {
@@ -75,7 +72,7 @@ export function PipelineBuilder() {
         className="h-[calc(100vh_-_64px)] pt-0"
         sidebar={BuilderSidebar}
       >
-        {({ edges, nodes, onBlockCreate }) => (
+        {({ edges, nodes }) => (
           <>
             <BuilderHeader organization={organization} elPipeline={elPipeline}>
               <SaveChangesButton
@@ -87,8 +84,9 @@ export function PipelineBuilder() {
 
             <FloatingBoard>
               <BuilderFloatingChat pipeline={pipeline} pageUrl={pageUrl} />
-              <BuilderFloatingLogs pipeline={pipeline} />
             </FloatingBoard>
+
+            <BuilderBottomSidebar pipeline={pipeline} />
           </>
         )}
       </Builder>
@@ -140,94 +138,6 @@ function BuilderFloatingChat({ pipeline, pageUrl }: BuilderFloatingChatProps) {
         </FloatingDynamicWrapper>
       ) : null}
     </>
-  );
-}
-
-interface BuilderFloatingLogsProps {
-  pipeline: IExtendedPipeline;
-}
-
-function BuilderFloatingLogs({ pipeline }: BuilderFloatingLogsProps) {
-  const { status, startRun } = useRunPipeline();
-
-  const { value: isOpen, setFalse: close, setTrue: open } = useBoolean(false);
-
-  const toggle = () => {
-    if (!isOpen) {
-      if (status === 'idle') {
-        startRun();
-      }
-
-      open();
-    } else {
-      close();
-    }
-  };
-
-  return (
-    <>
-      <FloatingLogsButton
-        className="absolute bottom-[185px] right-[15px] pointer-events-auto"
-        onClick={toggle}
-      />
-
-      {isOpen ? (
-        <FloatingDynamicWrapper
-          suffix="logs"
-          defaultPosition={{ right: 16, bottom: 32 }}
-          onClose={close}
-        >
-          <FloatingLogsContent pipeline={pipeline} />
-        </FloatingDynamicWrapper>
-      ) : null}
-    </>
-  );
-}
-
-function FloatingLogsContent({ pipeline }: BuilderFloatingLogsProps) {
-  const { status, runId } = useRunPipeline();
-
-  const isStarting = status === 'starting';
-  const isIdle = status === 'idle';
-  const fetcher = useFetcher<typeof logsLoader>();
-  const [key, setKey] = useState(Date.now());
-
-  useEffect(() => {
-    if (runId && !fetcher.data) {
-      fetcher.load(
-        routes.pipelineRunLogs(pipeline.organization_id, pipeline.id, runId),
-      );
-    }
-  }, [status]);
-
-  useEffect(() => {
-    if (fetcher.data && fetcher.state === 'idle') {
-      setKey(Date.now());
-    }
-  }, [fetcher.state]);
-
-  if (isStarting) {
-    return <span className="text-xs text-muted-foreground">Starting...</span>;
-  }
-
-  if (isIdle || !runId) {
-    return (
-      <span className="text-xs text-muted-foreground">
-        Workflow is not running...
-      </span>
-    );
-  }
-
-  return (
-    <RunLogs
-      key={key}
-      defaultLogs={fetcher.data?.logs ?? []}
-      defaultAfter={fetcher.data?.pagination.after}
-      runId={Number(runId)}
-      pipelineId={pipeline.id}
-      organizationId={pipeline.organization_id}
-      className="max-w-[950px] min-w-[950px] max-h-[400px]"
-    />
   );
 }
 

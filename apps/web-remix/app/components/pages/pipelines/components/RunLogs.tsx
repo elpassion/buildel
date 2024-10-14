@@ -15,6 +15,9 @@ import { buildUrlWithParams } from '~/utils/url';
 
 import { fetchOlder, log, runLogsReducer } from './runLogs.reducer';
 
+export type LogsVariant = 'dark' | 'light';
+export type LogsSize = 'sm' | 'md';
+
 interface LogsProps {
   defaultLogs: IPipelineRunLog[];
   defaultAfter?: string | null;
@@ -23,6 +26,8 @@ interface LogsProps {
   pipelineId: number;
   organizationId: number;
   className?: string;
+  variant?: LogsVariant;
+  size?: LogsSize;
 }
 
 export function RunLogs({
@@ -33,6 +38,8 @@ export function RunLogs({
   organizationId,
   runId,
   className,
+  variant = 'dark',
+  size = 'md',
 }: LogsProps) {
   const fetcher = useFetcher<typeof loader>();
   const { ref: fetchNextRef, inView } = useInView();
@@ -75,7 +82,7 @@ export function RunLogs({
     if (fetcher.state === 'idle' && fetcher.data) {
       dispatch(fetchOlder(fetcher.data.logs, fetcher.data.pagination.after));
     }
-  }, [fetcher.data]);
+  }, [fetcher.state]);
 
   useEffect(() => {
     if (inView && state.after && fetcher.state === 'idle') {
@@ -94,7 +101,11 @@ export function RunLogs({
   return (
     <div
       className={cn(
-        'bg-gray-800 text-gray-400 font-mono p-4 h-[65vh] max-h-[450px] overflow-y-auto rounded-lg flex flex-col-reverse',
+        'p-4 h-[65vh] max-h-[450px] overflow-y-auto rounded-lg flex flex-col-reverse',
+        {
+          'bg-gray-800 text-gray-400': variant === 'dark',
+          'bg-[#fbfbfb] text-foreground': variant === 'light',
+        },
         className,
       )}
     >
@@ -102,19 +113,20 @@ export function RunLogs({
         {state.logs
           .map((log) => (
             <li key={log.id}>
-              <Log log={log} />
+              <Log log={log} variant={variant} size={size} />
             </li>
           ))
           .slice()
           .reverse()}
       </ul>
 
-      <div className="flex justify-center mt-5" ref={fetchNextRef}>
+      <div className="flex justify-center" ref={fetchNextRef}>
         <LoadMoreButton
           isFetching={fetcher.state !== 'idle'}
           disabled={fetcher.state !== 'idle'}
           hasNextPage={!!state.after}
           onClick={fetchNextPage}
+          className={cn({ 'text-xs': size === 'sm' })}
         />
       </div>
     </div>
@@ -146,26 +158,58 @@ export function RunLogsFilter({
   );
 }
 
-const Log = ({ log }: { log: any }) => {
+const Log = ({
+  log,
+  variant,
+  size,
+}: {
+  log: any;
+  variant: LogsVariant;
+  size: LogsSize;
+}) => {
   const isError = log?.message_types?.includes('error');
 
   return (
-    <p className="mb-2">
-      <span className="text-cyan-400 mr-2">{log?.created_at}</span>
-      <span className="text-yellow-500 mr-2">{log?.context}</span>
-      <span className="text-purple-500 mr-2">{log?.block_name}</span>
+    <p className={cn({ 'mb-2': size === 'md' })}>
       <span
-        className={cn('mr-2', {
-          'text-red-500': isError,
-          'text-gray-300': !isError,
-        })}
+        className={cn('text-cyan-400 mr-2 whitespace-nowrap', getLogSize(size))}
+      >
+        {log?.created_at}
+      </span>
+      <span className={cn('text-yellow-500 mr-2', getLogSize(size))}>
+        {log?.context}
+      </span>
+      <span className={cn('text-purple-500 mr-2', getLogSize(size))}>
+        {log?.block_name}
+      </span>
+      <span
+        className={cn(
+          'mr-2',
+          {
+            'text-red-500': isError,
+            'text-gray-300': !isError && variant === 'dark',
+            'text-muted-foreground': !isError && variant === 'light',
+          },
+          getLogSize(size),
+        )}
       >
         {log?.message}
       </span>
-      <span className="text-green-300">{log?.message_types?.join(' -> ')}</span>
+      <span className={cn('text-green-400', getLogSize(size))}>
+        {log?.message_types?.join(' -> ')}
+      </span>
     </p>
   );
 };
+
+function getLogSize(size: LogsSize) {
+  switch (size) {
+    case 'sm':
+      return 'text-xs';
+    case 'md':
+      return 'text-base';
+  }
+}
 
 interface LogsEmptyMessageProps {
   organizationId: number;
