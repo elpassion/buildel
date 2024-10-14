@@ -35,9 +35,8 @@ defmodule Buildel.BlockCase do
 
         assert_receive %Message{
                          topic: ^message_topic,
-                         type: message_type,
-                         message: message_message,
-                         metadata: message_metadata
+                         type: ^message_type,
+                         message: ^message_message
                        },
                        1000
 

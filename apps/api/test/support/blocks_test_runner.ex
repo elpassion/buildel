@@ -121,6 +121,11 @@ defmodule Buildel.BlocksTestRunner do
     run
   end
 
+  def with_datetime_set_to(run, datetime) do
+    Buildel.ClientMocks.Clock.set_mock(fn _ -> datetime end)
+    run
+  end
+
   @impl true
   def init(config) do
     context_id = context_id(self())

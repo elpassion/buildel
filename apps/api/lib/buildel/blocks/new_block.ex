@@ -229,7 +229,8 @@ defmodule Buildel.Blocks.NewBlock.Defoption do
       @schema_opts Keyword.put(@schema_opts, unquote(name), unquote(schema))
 
       def option(state, unquote(name)) do
-        state.block.opts[unquote(name)] || unquote(schema) |> Map.get(:default)
+        state.block.opts[unquote(name)] ||
+          unquote(schema) |> Map.get(:default, Map.get(unquote(schema), "default"))
       end
     end
   end
@@ -577,6 +578,16 @@ defmodule Buildel.Blocks.NewBlock.HttpApi do
     quote do
       def httpApi() do
         Application.fetch_env!(:buildel, :http_api)
+      end
+    end
+  end
+end
+
+defmodule Buildel.Blocks.NewBlock.Clock do
+  defmacro __using__(_opts) do
+    quote do
+      def clock() do
+        Application.fetch_env!(:buildel, :clock)
       end
     end
   end

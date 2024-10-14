@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.NewDate do
   use Buildel.Blocks.NewBlock
+  use Buildel.Blocks.NewBlock.Clock
 
   defblock(:date,
     description: "An utility block that returns the current date and time (UTC).",
@@ -41,7 +42,7 @@ defmodule Buildel.Blocks.NewDate do
   end
 
   defp get_date(state) do
-    DateTime.utc_now()
+    clock().utc_now()
     |> apply_additive(
       option(state, :additive_type),
       option(state, :additive)

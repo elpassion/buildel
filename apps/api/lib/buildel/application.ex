@@ -58,6 +58,7 @@ defmodule Buildel.Application do
         |> maybe_add_bumblebee_embedding()
         |> maybe_add_python_workers()
         |> maybe_add_http_api()
+        |> maybe_add_clock()
       end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -138,6 +139,14 @@ defmodule Buildel.Application do
   defp maybe_add_http_api(children) do
     if Application.get_env(:buildel, :http_api) == Buildel.ClientMocks.HttpApi do
       children ++ [Buildel.ClientMocks.HttpApi]
+    else
+      children
+    end
+  end
+
+  defp maybe_add_clock(children) do
+    if Application.get_env(:buildel, :clock) == Buildel.ClientMocks.Clock do
+      children ++ [Buildel.ClientMocks.Clock]
     else
       children
     end

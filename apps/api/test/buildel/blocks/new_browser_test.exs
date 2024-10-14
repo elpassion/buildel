@@ -42,7 +42,13 @@ defmodule Buildel.Blocks.NewBrowserTest do
       end)
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.test_input(message)
-      |> assert_receive_message("test", :output, Message.new(:json, "hello"))
+      |> assert_receive_message(
+        "test",
+        :output,
+        Message.from_message(message)
+        |> Message.set_type(:json)
+        |> Message.set_message(" Para1 header1 li11 li12 header2 li2 header3")
+      )
     end
 
     def create_run(_) do
