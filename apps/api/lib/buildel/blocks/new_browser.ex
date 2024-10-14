@@ -1,6 +1,7 @@
 defmodule Buildel.Blocks.NewBrowserTool do
   alias Buildel.Crawler
   use Buildel.Blocks.NewBlock
+  use Buildel.Blocks.NewBlock.HttpApi
 
   defblock(:browser,
     description: "Used for browsing a website and extracting information",
@@ -87,7 +88,8 @@ defmodule Buildel.Blocks.NewBrowserTool do
     with {:ok, crawl} when length(crawl.pages) != 0 <-
            Crawler.crawl(url,
              max_depth: 1,
-             url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
+             url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end,
+             client: httpApi()
            ),
          {:ok, path} <- Temp.path(%{suffix: ".md"}),
          :ok <-

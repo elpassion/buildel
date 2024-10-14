@@ -1,13 +1,16 @@
 defmodule Buildel.Crawler do
   alias Buildel.Crawler.Crawl
   alias Buildel.Crawler.Page
+  alias Buildel.Clients.HttpApi
 
   def crawl(url, opts \\ []) when is_binary(url) do
-    max_depth = Keyword.get(opts, :max_depth, 1)
-    url_filter = Keyword.get(opts, :url_filter, fn _ -> true end)
+    opts = Keyword.validate!(opts, max_depth: 1, url_filter: fn _ -> true end, client: HttpApi)
+    max_depth = Keyword.get(opts, :max_depth)
+    url_filter = Keyword.get(opts, :url_filter)
+    client = Keyword.get(opts, :client)
 
     crawl =
-      Crawl.new(start_url: url, max_depth: max_depth, url_filter: url_filter)
+      Crawl.new(start_url: url, max_depth: max_depth, url_filter: url_filter, client: client)
       |> Crawl.add_page(Page.new(url: url))
       |> Crawl.start()
 

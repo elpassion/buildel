@@ -9,6 +9,7 @@ defmodule Buildel.Crawler.Crawl do
     :start_url,
     :error,
     :url_filter,
+    :client,
     pages: [],
     pending_pages: [],
     processed_urls: [],
@@ -19,6 +20,7 @@ defmodule Buildel.Crawler.Crawl do
     start_url = Keyword.get(opts, :start_url)
     max_depth = Keyword.get(opts, :max_depth)
     url_filter = Keyword.get(opts, :url_filter)
+    client = Keyword.get(opts, :client)
 
     case URI.parse(start_url) do
       %URI{scheme: nil} ->
@@ -28,7 +30,8 @@ defmodule Buildel.Crawler.Crawl do
           error: :invalid_url,
           start_url: start_url,
           max_depth: max_depth,
-          url_filter: url_filter
+          url_filter: url_filter,
+          client: client
         }
 
       _ ->
@@ -37,7 +40,8 @@ defmodule Buildel.Crawler.Crawl do
           status: :pending,
           start_url: start_url,
           max_depth: max_depth,
-          url_filter: url_filter
+          url_filter: url_filter,
+          client: client
         }
     end
   end
@@ -105,7 +109,11 @@ defmodule Buildel.Crawler.Crawl do
   defp request(crawl) do
     %{url: url, depth: depth} = crawl.pending_pages |> List.first()
 
-    case Req.get(url, []) do
+    request = %Req.Request{
+      url: URI.parse(url)
+    }
+
+    case crawl.client.request(request) do
       {:ok, %Req.Response{status: status, body: body}}
       when status >= 200 and status < 400 ->
         crawl = success_page(crawl, url, body)
