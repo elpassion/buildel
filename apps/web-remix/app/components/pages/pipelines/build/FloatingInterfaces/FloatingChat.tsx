@@ -6,6 +6,7 @@ import { BasicLink } from '~/components/link/BasicLink';
 import { IInterfaceConfigForm } from '~/components/pages/pipelines/pipeline.types';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
+import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
 export interface FloatingChatProps {
@@ -22,6 +23,7 @@ export function FloatingChat({ config, chatUrl }: FloatingChatProps) {
 
 export function FloatingChatButton({
   disabled,
+  className,
   ...props
 }: Omit<IconButtonProps, 'icon'>) {
   return (
@@ -30,8 +32,9 @@ export function FloatingChatButton({
       icon={<MessageCircle />}
       {...props}
       variant="outline"
-      size="sm"
+      size="xxs"
       title="Chat"
+      className={cn('rounded', className)}
     />
   );
 }

@@ -2,9 +2,11 @@ import React from 'react';
 import { Logs } from 'lucide-react';
 
 import { IconButton, IconButtonProps } from '~/components/iconButton';
+import { cn } from '~/utils/cn';
 
 export function FloatingLogsButton({
   disabled,
+  className,
   ...props
 }: Omit<IconButtonProps, 'icon'>) {
   return (
@@ -13,8 +15,9 @@ export function FloatingLogsButton({
       icon={<Logs />}
       {...props}
       variant="outline"
-      size="sm"
+      size="xxs"
       title="Logs"
+      className={cn('rounded', className)}
     />
   );
 }

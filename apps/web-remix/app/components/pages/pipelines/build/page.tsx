@@ -130,7 +130,7 @@ function BuilderFloatingChat({ pipeline, pageUrl }: BuilderFloatingChatProps) {
   return (
     <>
       <FloatingChatButton
-        className="absolute bottom-4 right-4 pointer-events-auto"
+        className="absolute bottom-[152px] right-[15px] pointer-events-auto"
         onClick={toggle}
       />
 
@@ -167,7 +167,7 @@ function BuilderFloatingLogs({ pipeline }: BuilderFloatingLogsProps) {
   return (
     <>
       <FloatingLogsButton
-        className="absolute bottom-14 right-4 pointer-events-auto"
+        className="absolute bottom-[185px] right-[15px] pointer-events-auto"
         onClick={toggle}
       />
 
