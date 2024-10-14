@@ -76,7 +76,12 @@ const BuilderBottomSidebarClient = ({
     <BuilderSidebarContext.Provider
       value={{ isOpen, state, onPinClick, onClose }}
     >
-      <div onMouseOver={onMouseOver} onMouseLeave={onMouseLeave}>
+      <div
+        id="builder-bottom-sidebar"
+        onMouseOver={onMouseOver}
+        onMouseLeave={onMouseLeave}
+        data-state={isOpen ? 'open' : 'close'}
+      >
         <HoverableBottomLine />
 
         <div

@@ -19,6 +19,7 @@ import { BuilderSidebarBlocks } from './BuilderSidebarBlocks';
 
 interface BuilderSidebarProps {
   onBlockCreate: (created: IBlockConfig) => Promise<unknown>;
+  contentClassName?: string;
 }
 
 // Bypass for getting rid of the hydration error when using the LS
@@ -30,7 +31,10 @@ export const BuilderSidebar = (props: BuilderSidebarProps) => {
   );
 };
 
-const BuilderSidebarClient = ({ onBlockCreate }: BuilderSidebarProps) => {
+const BuilderSidebarClient = ({
+  onBlockCreate,
+  contentClassName,
+}: BuilderSidebarProps) => {
   const organizationId = useOrganizationId();
 
   const [state, setState] = useLocalStorage<BuilderSidebarState>(
@@ -94,8 +98,10 @@ const BuilderSidebarClient = ({ onBlockCreate }: BuilderSidebarProps) => {
         <HoverableLine />
 
         <div
+          id="builder-sidebar-content"
           className={cn(
             'absolute top-0 left-0 z-[11] h-full w-[320px] border-r border-input py-4 px-2 bg-white transition-transform ease-in-out',
+            contentClassName,
             {
               '-translate-x-full': !isOpen,
               'translate-x-0': isOpen,
