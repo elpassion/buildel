@@ -272,6 +272,8 @@ defmodule Buildel.Blocks.CodeTool do
     content =
       content
       |> String.replace(~s|\\n|, ~s|\n|)
+      |> String.replace(~s|\\n|, ~s|\n|)
+      |> String.replace(~s|\\"|, ~s|\"|)
       |> String.replace(~s|\\"|, ~s|\"|)
 
     File.write!(Path.join(folder_path, name) |> IO.inspect(), content || "")
@@ -299,7 +301,7 @@ defmodule Buildel.Blocks.CodeTool do
   defp eval_deno(state, %{name: name}) do
     folder_path = state.dir_path
 
-    System.cmd("deno", ["run", "--allow-write=./", "--allow-read=./", name],
+    System.cmd("deno", ["run", "--allow-write=./", "--allow-read=./", "--quiet", name],
       stderr_to_stdout: true,
       cd: folder_path
     )
