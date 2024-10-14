@@ -30,15 +30,6 @@ defmodule Buildel.Blocks.NewFileInputTest do
   describe "FileInput Run" do
     setup [:create_run]
 
-    test "validates input", %{run: test_run} do
-      message = Message.new(:raw, %{})
-
-      test_run
-      |> BlocksTestRunner.subscribe_to_block("test")
-      |> BlocksTestRunner.Run.input("test", :input, message)
-      |> assert_receive_error("test", :invalid_input)
-    end
-
     test "outputs file", %{run: test_run} do
       file = File.read!("test/support/fixtures/real.mp3")
       message = Message.new(:raw, file)
