@@ -84,3 +84,9 @@ p.is-editor-empty:first-child::before {
 :root:has(#builder-bottom-sidebar[data-state="open"]) #builder-sidebar-content{
   @apply h-[calc(100%-200px)] pb-0;
 }
+
+:root:has(#builder-bottom-sidebar[data-state="open"]) :is(#builder-floating-chat-btn, .react-flow__controls) {
+  @apply -translate-y-[200px] transition
+}
+
+

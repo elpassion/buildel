@@ -128,6 +128,7 @@ function BuilderFloatingChat({ pipeline, pageUrl }: BuilderFloatingChatProps) {
   return (
     <>
       <FloatingChatButton
+        id="builder-floating-chat-btn"
         className="absolute bottom-[152px] right-[15px] pointer-events-auto"
         onClick={toggle}
       />
