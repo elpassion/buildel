@@ -8,7 +8,7 @@ export function FloatingBoard({
   return (
     <div
       className={cn(
-        'hidden fixed z-[51] top-0 bottom-0 left-0 right-0 pointer-events-none lg:block',
+        'hidden fixed z-[50] top-0 bottom-0 left-0 right-0 pointer-events-none lg:block',
         className,
       )}
       {...rest}

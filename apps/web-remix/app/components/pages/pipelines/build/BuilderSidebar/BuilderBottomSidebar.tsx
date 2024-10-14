@@ -20,6 +20,7 @@ import {
   BuilderSidebarState,
   useBuilderSidebar,
 } from './BuilderSidebar.context';
+import { useResizeElement } from './useResizeElement';
 
 interface BuilderBottomSidebarProps {
   pipeline: IExtendedPipeline;
@@ -39,6 +40,7 @@ const BuilderBottomSidebarClient = ({
 }: BuilderBottomSidebarProps) => {
   const organizationId = useOrganizationId();
   const { isDesktop } = useBreakpoints();
+  const { ref, onMousedown } = useResizeElement<HTMLDivElement>();
 
   const [state, setState] = useLocalStorage<BuilderSidebarState>(
     buildLSKey(organizationId),
@@ -81,18 +83,27 @@ const BuilderBottomSidebarClient = ({
         onMouseOver={onMouseOver}
         onMouseLeave={onMouseLeave}
         data-state={isOpen ? 'open' : 'close'}
+        className="relative"
       >
         <HoverableBottomLine />
 
         <div
+          ref={ref}
           className={cn(
-            'fixed translate-y-full bottom-0 left-0 z-[52] w-full h-[200px] border-t border-input bg-white transition-transform ease-in-out',
+            'resize-y fixed translate-y-full bottom-0 left-0 z-[50] w-full h-[200px] min-h-[200px] max-h-[50vh] border-t border-input bg-white transition-transform ease-in-out',
             {
               'translate-y-full': !isOpen,
               'translate-y-0': isOpen,
             },
           )}
         >
+          <div
+            className="absolute -top-2.5 left-0 right-0 bg-transparent py-2 group cursor-row-resize"
+            onMouseDown={onMousedown}
+          >
+            <div className="w-full h-[2px] bg-transparent group-hover:bg-blue-500" />
+          </div>
+
           <header className="flex gap-2 justify-between items-center border-b border-input px-2 py-1">
             <h4 className="text-xs">Logs</h4>
             <PinButton />
