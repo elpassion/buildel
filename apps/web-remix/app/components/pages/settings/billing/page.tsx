@@ -22,7 +22,7 @@ import type { loader } from './loader.server';
 const TOAST_DURATION = 10000;
 
 export function BillingPage() {
-  const { plans } = useLoaderData<typeof loader>();
+  const { plans, subscription } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
@@ -62,13 +62,16 @@ export function BillingPage() {
       <SubscriptionCard>
         <SubscriptionHeader>
           <SubscriptionTitle />
-          <ManageSubscriptionButton />
+          <ManageSubscriptionButton customerId={subscription.customer_id} />
         </SubscriptionHeader>
 
         <SubscriptionContent>
           <SubscriptionCurrentPlan />
 
-          <UsageProgress usage={199} maxUsage={1000} />
+          <UsageProgress
+            usage={199}
+            maxUsage={subscription.features.runs_limit}
+          />
         </SubscriptionContent>
       </SubscriptionCard>
 

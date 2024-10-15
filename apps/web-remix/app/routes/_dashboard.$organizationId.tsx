@@ -25,6 +25,8 @@ import { ClientOnly } from 'remix-utils/client-only';
 import invariant from 'tiny-invariant';
 
 import { OrganizationApi } from '~/api/organization/OrganizationApi';
+import type { ISubscription } from '~/api/subscriptions/subscriptions.types';
+import { SubscriptionsApi } from '~/api/subscriptions/SubscriptionsApi';
 import {
   Dropdown,
   DropdownPopup,
@@ -58,8 +60,17 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 
     invariant(params.organizationId, 'organizationId not found');
     const organizationApi = new OrganizationApi(fetch);
+    const subscriptionsApi = new SubscriptionsApi(fetch);
 
-    const organizationsResponse = await organizationApi.getOrganizations();
+    const subscriptionPromise = subscriptionsApi.subscription(
+      params.organizationId,
+    );
+    const organizationsPromise = organizationApi.getOrganizations();
+
+    const [{ data: subscription }, organizationsResponse] = await Promise.all([
+      subscriptionPromise,
+      organizationsPromise,
+    ]);
 
     const organization = organizationsResponse.data.data.find(
       (org) => org.id === Number(params.organizationId),
@@ -84,6 +95,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
         toasts,
         organization: organization,
         organizations: organizationsResponse.data.data,
+        subscription: subscription.data,
       },
       {
         headers: {
@@ -95,7 +107,7 @@ export async function loader(loaderArgs: LoaderFunctionArgs) {
 }
 
 export default function Layout() {
-  const { toasts } = useLoaderData<typeof loader>();
+  const { toasts, subscription } = useLoaderData<typeof loader>();
   const [collapsed, setCollapsed] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -128,14 +140,17 @@ export default function Layout() {
           topContent={<SidebarTopContent isCollapsed={collapsed} />}
           bottomContent={<SidebarBottomContent isCollapsed={collapsed} />}
         >
-          <SidebarMainContent isCollapsed={collapsed} />
+          <SidebarMainContent
+            isCollapsed={collapsed}
+            subscription={subscription}
+          />
         </NavSidebar>
 
         <NavMobileSidebar
           topContent={<SidebarTopContent />}
           bottomContent={<SidebarBottomContent />}
         >
-          <SidebarMainContent />
+          <SidebarMainContent subscription={subscription} />
         </NavMobileSidebar>
 
         <main className="col-span-2 lg:col-start-2 w-full">
@@ -160,7 +175,10 @@ interface SidebarContentProps {
   isCollapsed?: boolean;
 }
 
-function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
+function SidebarMainContent({
+  isCollapsed,
+  subscription,
+}: SidebarContentProps & { subscription: ISubscription }) {
   const { organization } = useLoaderData<typeof loader>();
 
   return (
@@ -221,7 +239,10 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
       </div>
 
       <div className="flex flex-col gap-3">
-        <SidebarUsageProgress isCollapsed={isCollapsed} />
+        <SidebarUsageProgress
+          isCollapsed={isCollapsed}
+          subscription={subscription}
+        />
 
         <SidebarLink
           to={routes.settings(organization.id)}
@@ -234,7 +255,13 @@ function SidebarMainContent({ isCollapsed }: SidebarContentProps) {
   );
 }
 
-function SidebarUsageProgress({ isCollapsed }: { isCollapsed?: boolean }) {
+function SidebarUsageProgress({
+  isCollapsed,
+  subscription,
+}: {
+  isCollapsed?: boolean;
+  subscription: ISubscription;
+}) {
   return (
     <div className="grid grid-cols-1 grid-rows-1 items-end">
       <div
@@ -243,7 +270,10 @@ function SidebarUsageProgress({ isCollapsed }: { isCollapsed?: boolean }) {
           'opacity-0 pointer-events-none': !isCollapsed,
         })}
       >
-        <UsageCircleProgress usage={321} maxUsage={1000} />
+        <UsageCircleProgress
+          usage={321}
+          maxUsage={subscription.features.runs_limit}
+        />
       </div>
 
       <div
