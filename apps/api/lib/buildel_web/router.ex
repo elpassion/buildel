@@ -402,6 +402,12 @@ defmodule BuildelWeb.Router do
       :create
     )
 
+    post(
+      "/subscriptions/webhook",
+      OrganizationSubscriptionWebhookController,
+      :webhook
+    )
+
     resources("/organizations/:organization_id/costs", OrganizationCostsController,
       only: [:index]
     )

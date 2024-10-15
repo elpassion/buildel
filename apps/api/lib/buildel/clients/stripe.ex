@@ -109,12 +109,24 @@ defmodule Buildel.Clients.Stripe do
     end
   end
 
+  def get_subscription("sub_" <> id) do
+    request("sub_#{id}")
+  end
+
   def get_customer(id) do
     request(id)
   end
 
+  def get_product("prod_" <> id) do
+    request("prod_#{id}")
+  end
+
   def create_customer(email) do
     request("/customers", form: %{"email" => email})
+  end
+
+  def list_product_features(product_id) do
+    request("#{product_id}/features")
   end
 
   @impl Buildel.Clients.StripeBehaviour

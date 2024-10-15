@@ -102,3 +102,5 @@ config :buildel,
 config :buildel, :skip_flame, System.get_env("SKIP_FLAME", "false") == "true"
 
 config :buildel, :stripe_api_key, System.get_env("STRIPE_API_KEY")
+
+config :buildel, :stripe_webhook_secret, System.get_env("STRIPE_WEBHOOK_SECRET")
