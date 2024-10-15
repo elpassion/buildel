@@ -26,6 +26,8 @@ export const useCopyPasteNode = ({
   );
 
   useEventListener('keydown', (e) => {
+    if (window.getSelection()?.toString()) return;
+
     if (
       //eslint-disable-next-line
       //@ts-ignore
