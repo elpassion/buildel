@@ -1,5 +1,6 @@
-import React, { forwardRef, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
 import { RefreshCcw } from 'lucide-react';
+import { useControlField } from 'remix-validated-form';
 import type { ValidationBehaviorOptions } from 'remix-validated-form/browser/internal/getInputProps';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
@@ -30,12 +31,13 @@ export const TextInputField = forwardRef<
       aria-errormessage={error ? `${name}-error` : undefined}
       aria-label={name}
       autoComplete={name}
-      {...props}
       {...getInputProps()}
+      {...props}
     />
   );
 });
 TextInputField.displayName = 'TextInputField';
+
 export const PasswordInputField = forwardRef<
   HTMLInputElement,
   Partial<TextInputFieldProps>
@@ -47,17 +49,41 @@ PasswordInputField.displayName = 'PasswordInputField';
 
 export function ResettableTextInputField({
   label,
+  defaultValue,
   ...props
 }: Partial<TextInputFieldProps> & { label: string }) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { name } = useFieldContext({
+    validationBehavior: {
+      initial: 'onChange',
+      whenTouched: 'onChange',
+      whenSubmitted: 'onChange',
+    },
+  });
+
+  const [value, setValue] = useControlField<string | undefined>(name);
+
+  useEffect(() => {
+    if (typeof defaultValue === 'string') {
+      updateAndValidate(defaultValue);
+    }
+  }, [defaultValue]);
 
   const onReset = () => {
-    if (inputRef.current) {
-      inputRef.current.value = (props.defaultValue ?? '') as string;
+    if (typeof defaultValue === 'string') {
+      updateAndValidate(defaultValue);
     }
   };
 
-  const canReset = !!props.defaultValue && !props.readOnly && !props.disabled;
+  const updateAndValidate = (newValue: string) => {
+    setValue(newValue);
+  };
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
+  const canReset = !!defaultValue && !props.readOnly && !props.disabled;
 
   return (
     <>
@@ -68,7 +94,12 @@ export function ResettableTextInputField({
           {canReset ? <ResettableFieldResetButton onClick={onReset} /> : null}
         </div>
       </FieldLabel>
-      <TextInputField ref={inputRef} {...props} />
+      <TextInputField
+        ref={inputRef}
+        onChange={onChange}
+        value={value}
+        {...props}
+      />
     </>
   );
 }
