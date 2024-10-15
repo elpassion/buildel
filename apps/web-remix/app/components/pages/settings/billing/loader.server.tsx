@@ -16,13 +16,20 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const { user } = await getCurrentUser(request);
 
-    const { data: plans } = await subscriptionsApi.getProducts(
+    const plansPromise = subscriptionsApi.getProducts(params.organizationId);
+    const subscriptionPromise = subscriptionsApi.subscription(
       params.organizationId,
     );
+
+    const [{ data: subscription }, { data: plans }] = await Promise.all([
+      subscriptionPromise,
+      plansPromise,
+    ]);
 
     return json({
       user,
       plans: plans.data,
+      subscription: subscription.data,
     });
   })(args);
 }

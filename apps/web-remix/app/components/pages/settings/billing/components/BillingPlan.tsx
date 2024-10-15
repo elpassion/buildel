@@ -151,6 +151,7 @@ function BillingPlanListItem({
 
       <ValidatedForm method="POST" validator={validator} noValidate>
         <HiddenField name="priceId" value={data.defaultPrice.id} />
+        <HiddenField name="intent" value="CHECKOUT" />
 
         <SubmitButton
           isFluid
