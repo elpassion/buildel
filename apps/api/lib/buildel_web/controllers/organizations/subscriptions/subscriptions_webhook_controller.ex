@@ -66,7 +66,6 @@ defmodule BuildelWeb.OrganizationSubscriptionWebhookController do
         nil
 
       subscription ->
-        IO.inspect(subscription, label: "subscription")
         Subscriptions.renew_subscription(subscription, data)
     end
   end
@@ -74,6 +73,20 @@ defmodule BuildelWeb.OrganizationSubscriptionWebhookController do
   defp process_webhook(%{"type" => "invoice.payment_failed", "data" => %{"object" => data}}) do
     subscription = Subscriptions.get_subscription_by_subscription_id!(data["subscription"])
     Subscriptions.cancel_subscription(subscription)
+  end
+
+  defp process_webhook(%{"type" => "customer.subscription.updated", "data" => %{"object" => data}}) do
+    subscription = Subscriptions.get_subscription_by_subscription_id!(data["id"])
+
+    case data["cancel_at_period_end"] do
+      true ->
+        Subscriptions.cancel_subscription(subscription)
+
+      false ->
+        Subscriptions.renew_subscription(subscription, %{
+          "period_end" => data["current_period_end"]
+        })
+    end
   end
 
   defp process_webhook(%{"type" => type}) do

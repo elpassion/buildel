@@ -18,9 +18,10 @@ defmodule Buildel.Subscriptions.Plan do
       status: subscription |> Buildel.Subscriptions.Subscription.status(),
       interval: subscription.interval,
       end_date: subscription.end_date,
+      customer_id: subscription.customer_id,
       features:
         Enum.reduce(@application_features, %{}, fn {feature, _}, acc ->
-          acc |> Map.put(feature, subscription.features[feature])
+          acc |> Map.put(feature, subscription.features[to_string(feature)])
         end)
     }
   end
@@ -31,6 +32,7 @@ defmodule Buildel.Subscriptions.Plan do
       status: :active,
       interval: :month,
       end_date: nil,
+      customer_id: nil,
       features:
         Enum.reduce(@application_features, %{}, fn {feature, value}, acc ->
           acc |> Map.put(feature, value)

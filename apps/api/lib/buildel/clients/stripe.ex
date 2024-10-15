@@ -63,7 +63,7 @@ defmodule Buildel.Clients.Stripe do
     defstruct [:id, :name, :description, :active, :prices, :features, :metadata]
   end
 
-  defmodule Session do
+  defmodule CheckoutSession do
     @type t :: %__MODULE__{
             id: binary(),
             customer: binary() | nil,
@@ -71,6 +71,38 @@ defmodule Buildel.Clients.Stripe do
           }
 
     defstruct [:id, :customer, :url]
+  end
+
+  defmodule PortalSession do
+    @type t :: %__MODULE__{
+            id: binary(),
+            customer: binary(),
+            url: binary()
+          }
+
+    defstruct [:id, :customer, :url]
+  end
+
+  def create_portal_session(customer_id) do
+    url = "/billing_portal/sessions"
+
+    body = %{
+      "customer" => customer_id
+    }
+
+    with {:ok, %Req.Response{body: session, status: 200}} <-
+           request(url, form: body) do
+      {:ok, map_portal_session(session)}
+    else
+      {:ok, %Req.Response{status: 404}} ->
+        {:error, :not_found}
+
+      {:error, reason} ->
+        {:error, reason}
+
+      e ->
+        e
+    end
   end
 
   @impl Buildel.Clients.StripeBehaviour
@@ -96,7 +128,7 @@ defmodule Buildel.Clients.Stripe do
 
     with {:ok, %Req.Response{body: session, status: 200}} <-
            request(url, form: body) do
-      {:ok, map_session(session)}
+      {:ok, map_checkout_session(session)}
     else
       {:ok, %Req.Response{status: 404}} ->
         {:error, :not_found}
@@ -187,8 +219,12 @@ defmodule Buildel.Clients.Stripe do
   defp parse_url("evt_" <> _ = id), do: "/events/#{id}"
   defp parse_url(url) when is_binary(url), do: url
 
-  defp map_session(%{"id" => id, "customer" => customer, "url" => url}) do
-    %Session{id: id, customer: customer, url: url}
+  defp map_portal_session(%{"id" => id, "customer" => customer, "url" => url}) do
+    %PortalSession{id: id, customer: customer, url: url}
+  end
+
+  defp map_checkout_session(%{"id" => id, "customer" => customer, "url" => url}) do
+    %CheckoutSession{id: id, customer: customer, url: url}
   end
 
   defp map_products(products, prices) do

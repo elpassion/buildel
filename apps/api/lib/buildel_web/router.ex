@@ -397,6 +397,12 @@ defmodule BuildelWeb.Router do
     )
 
     post(
+      "/organizations/:organization_id/subscriptions/portal",
+      OrganizationSubscriptionController,
+      :create_portal_session
+    )
+
+    post(
       "/subscriptions/webhook",
       OrganizationSubscriptionWebhookController,
       :webhook

@@ -16,6 +16,21 @@ defmodule BuildelWeb.Schemas.Subscriptions do
     })
   end
 
+  defmodule PortalSession do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionPortalSession",
+      type: :object,
+      properties: %{
+        session_id: %Schema{type: :string, description: "Portal session ID"},
+        customer_id: %Schema{type: :string, description: "Customer ID"},
+        url: %Schema{type: :string, description: "Portal session URL"}
+      },
+      required: [:id, :customer_id, :url]
+    })
+  end
+
   defmodule Price do
     require OpenApiSpex
 
@@ -95,6 +110,7 @@ defmodule BuildelWeb.Schemas.Subscriptions do
         status: %Schema{type: :string, description: "Plan status"},
         interval: %Schema{type: :string, description: "Plan interval"},
         end_date: %Schema{type: :string, description: "Plan end date", nullable: true},
+        customer_id: %Schema{type: :string, description: "Customer ID", nullable: true},
         features: %Schema{
           type: :object,
           properties: %{
@@ -119,7 +135,7 @@ defmodule BuildelWeb.Schemas.Subscriptions do
           ]
         }
       },
-      required: [:type, :status, :interval, :end_date, :features]
+      required: [:type, :status, :interval, :end_date, :features, :customer_id]
     })
   end
 
@@ -165,6 +181,19 @@ defmodule BuildelWeb.Schemas.Subscriptions do
     })
   end
 
+  defmodule CreatePortalSessionRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionCreatePortalSessionRequest",
+      type: :object,
+      properties: %{
+        customer_id: %Schema{type: :string, description: "Customer ID"}
+      },
+      required: [:customer_id]
+    })
+  end
+
   defmodule CreateCheckoutSessionResponse do
     require OpenApiSpex
 
@@ -173,6 +202,19 @@ defmodule BuildelWeb.Schemas.Subscriptions do
       type: :object,
       properties: %{
         data: Session
+      },
+      required: [:data]
+    })
+  end
+
+  defmodule CreatePortalSessionResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionCreatePortalSessionResponse",
+      type: :object,
+      properties: %{
+        data: PortalSession
       },
       required: [:data]
     })
