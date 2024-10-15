@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.NewDateTest do
-  use Buildel.BlockCase, async: true
+  use Buildel.BlockCase
   alias Blocks.NewDate
 
   test "exposes options" do

@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.NewApiCallToolTest do
-  use Buildel.BlockCase, async: true
+  use Buildel.BlockCase
   alias Blocks.NewApiCallTool
 
   describe "ApiCallTool" do
