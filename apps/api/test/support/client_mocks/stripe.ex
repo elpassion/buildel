@@ -2,7 +2,17 @@ defmodule Buildel.ClientMocks.Stripe do
   @behaviour Buildel.Clients.StripeBehaviour
 
   @impl Buildel.Clients.StripeBehaviour
-  def list_products(attrs \\ %{}) do
+  def create_checkout_session(_attrs \\ %{}) do
+    {:ok,
+     %Buildel.Clients.Stripe.Session{
+       id: "session_1",
+       customer: "customer_1",
+       url: "http://example.com"
+     }}
+  end
+
+  @impl Buildel.Clients.StripeBehaviour
+  def list_products(_attrs \\ %{}) do
     {:ok,
      [
        %Buildel.Clients.Stripe.Product{

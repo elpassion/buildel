@@ -2,18 +2,44 @@ defmodule Buildel.Subscriptions.Plan do
   require Logger
 
   @application_features [
-    :runs_limit,
-    :workflows_limit,
-    :knowledge_bases_limit,
-    :datasets_limit,
-    :experiments_limit,
-    :seats_limit,
-    :el_included,
-    :dedicated_support
+    runs_limit: 1000,
+    workflows_limit: 5,
+    knowledge_bases_limit: 3,
+    datasets_limit: 3,
+    experiments_limit: 1,
+    seats_limit: 1,
+    el_included: false,
+    dedicated_support: false
   ]
 
+  def from_db(%Buildel.Subscriptions.Subscription{} = subscription) do
+    %{
+      type: subscription.type,
+      status: subscription |> Buildel.Subscriptions.Subscription.status(),
+      interval: subscription.interval,
+      end_date: subscription.end_date,
+      features:
+        Enum.reduce(@application_features, %{}, fn {feature, _}, acc ->
+          acc |> Map.put(feature, subscription.features[feature])
+        end)
+    }
+  end
+
+  def from_db(nil) do
+    %{
+      type: :free,
+      status: :active,
+      interval: :month,
+      end_date: nil,
+      features:
+        Enum.reduce(@application_features, %{}, fn {feature, value}, acc ->
+          acc |> Map.put(feature, value)
+        end)
+    }
+  end
+
   def map_to_application_features(features, plan) do
-    Enum.reduce(@application_features, %{}, fn app_feature, acc ->
+    Enum.reduce(@application_features, %{}, fn {app_feature, _}, acc ->
       feature =
         Enum.find(features, fn feature ->
           feature["entitlement_feature"]["lookup_key"] == to_string(app_feature)

@@ -15,6 +15,22 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
     }
   end
 
+  def show(%{plan: plan}) do
+    %{
+      data: plan(plan)
+    }
+  end
+
+  defp plan(plan) do
+    %{
+      status: plan.status,
+      type: plan.type,
+      interval: plan.interval,
+      end_date: plan.end_date,
+      features: plan.features
+    }
+  end
+
   defp session(%Stripe.Session{} = session) do
     %{
       session_id: session.id,

@@ -84,6 +84,58 @@ defmodule BuildelWeb.Schemas.Subscriptions do
     })
   end
 
+  defmodule Plan do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionPlan",
+      type: :object,
+      properties: %{
+        type: %Schema{type: :string, description: "Plan ID"},
+        status: %Schema{type: :string, description: "Plan status"},
+        interval: %Schema{type: :string, description: "Plan interval"},
+        end_date: %Schema{type: :string, description: "Plan end date", nullable: true},
+        features: %Schema{
+          type: :object,
+          properties: %{
+            runs_limit: %Schema{type: :integer, description: "Runs limit"},
+            workflows_limit: %Schema{type: :integer, description: "Workflows limit"},
+            knowledge_bases_limit: %Schema{type: :integer, description: "Knowledge bases limit"},
+            datasets_limit: %Schema{type: :integer, description: "Datasets limit"},
+            experiments_limit: %Schema{type: :integer, description: "Experiments limit"},
+            seats_limit: %Schema{type: :integer, description: "Seats limit"},
+            el_included: %Schema{type: :boolean, description: "EL included"},
+            dedicated_support: %Schema{type: :boolean, description: "Dedicated support"}
+          },
+          required: [
+            :runs_limit,
+            :workflows_limit,
+            :knowledge_bases_limit,
+            :datasets_limit,
+            :experiments_limit,
+            :seats_limit,
+            :el_included,
+            :dedicated_support
+          ]
+        }
+      },
+      required: [:type, :status, :interval, :end_date, :features]
+    })
+  end
+
+  defmodule ShowPlanResponse do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionShowPlanResponse",
+      type: :object,
+      properties: %{
+        data: Plan
+      },
+      required: [:data]
+    })
+  end
+
   defmodule ListProductsResponse do
     require OpenApiSpex
 
