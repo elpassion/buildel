@@ -46,7 +46,7 @@ defmodule Buildel.Blocks.SpeechToText do
                 "title" => "Model",
                 "description" =>
                   "Model allows you to supply a model to use to process submitted audio.",
-                "enum" => ["base", "enhanced", "nova-2-phonecall"],
+                "enum" => ["base", "enhanced", "nova-2-phonecall", "nova-2"],
                 "enumPresentAs" => "radio",
                 "default" => "base"
               },

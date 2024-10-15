@@ -8,8 +8,8 @@ defmodule BuildelWeb.Schemas.Subscriptions do
       title: "SubscriptionSession",
       type: :object,
       properties: %{
-        id: %Schema{type: :string, description: "Checkout session ID"},
-        customer: %Schema{type: :string, description: "Customer ID"},
+        session_id: %Schema{type: :string, description: "Checkout session ID"},
+        customer_id: %Schema{type: :string, description: "Customer ID"},
         url: %Schema{type: :string, description: "Checkout session URL"}
       },
       required: [:id, :url]
@@ -123,6 +123,21 @@ defmodule BuildelWeb.Schemas.Subscriptions do
         data: Session
       },
       required: [:data]
+    })
+  end
+
+  defmodule WebhookRequest do
+    require OpenApiSpex
+
+    OpenApiSpex.schema(%{
+      title: "SubscriptionWebhookRequest",
+      type: :object,
+      properties: %{
+        id: %Schema{type: :string, description: "Webhook ID"},
+        type: %Schema{type: :string, description: "Webhook event"},
+        data: %Schema{type: :object, description: "Webhook data"}
+      },
+      required: []
     })
   end
 end
