@@ -132,4 +132,42 @@ defmodule BuildelWeb.OrganizationSubscriptionController do
       render(conn, :create, session: session)
     end
   end
+
+  operation :create_portal_session,
+    summary: "Create portal session",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ]
+    ],
+    request_body:
+      {"session", "application/json", BuildelWeb.Schemas.Subscriptions.CreatePortalSessionRequest},
+    responses: [
+      ok:
+        {"success", "application/json",
+         BuildelWeb.Schemas.Subscriptions.CreatePortalSessionResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def create_portal_session(conn, _params) do
+    %{"organization_id" => organization_id} = conn.params
+    %{"customer_id" => customer_id} = conn.body_params
+
+    user = conn.assigns.current_user
+
+    with {:ok, _organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, session} <-
+           Stripe.create_portal_session(customer_id) do
+      render(conn, :create_portal_session, session: session)
+    end
+  end
 end

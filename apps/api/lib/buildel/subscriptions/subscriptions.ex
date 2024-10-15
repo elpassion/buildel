@@ -30,9 +30,8 @@ defmodule Buildel.Subscriptions do
       attrs = %{
         subscription_id: attrs["subscription"],
         customer_id: attrs["customer"],
-        start_date:
-          body["current_period_start"] |> DateTime.from_unix!() |> DateTime.to_iso8601(),
-        end_date: body["current_period_end"] |> DateTime.from_unix!() |> DateTime.to_iso8601(),
+        start_date: body["current_period_start"] |> DateTime.from_unix!(),
+        end_date: body["current_period_end"] |> DateTime.from_unix!(),
         type: String.downcase(product_name),
         interval: product["plan"]["interval"],
         features: features,
@@ -46,7 +45,8 @@ defmodule Buildel.Subscriptions do
   def renew_subscription(subscription, attrs) do
     subscription
     |> Subscription.changeset(%{
-      end_date: attrs["period_end"] |> DateTime.from_unix!() |> DateTime.to_iso8601()
+      cancel_at_period_end: false,
+      end_date: attrs["period_end"] |> DateTime.from_unix!()
     })
     |> Repo.update()
   end

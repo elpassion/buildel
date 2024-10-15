@@ -15,6 +15,12 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
     }
   end
 
+  def create_portal_session(%{session: session}) do
+    %{
+      data: portal_session(session)
+    }
+  end
+
   def show(%{plan: plan}) do
     %{
       data: plan(plan)
@@ -27,11 +33,20 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
       type: plan.type,
       interval: plan.interval,
       end_date: plan.end_date,
+      customer_id: plan.customer_id,
       features: plan.features
     }
   end
 
-  defp session(%Stripe.Session{} = session) do
+  defp session(%Stripe.CheckoutSession{} = session) do
+    %{
+      session_id: session.id,
+      customer_id: session.customer,
+      url: session.url
+    }
+  end
+
+  defp portal_session(%Stripe.PortalSession{} = session) do
     %{
       session_id: session.id,
       customer_id: session.customer,
