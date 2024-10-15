@@ -11,6 +11,12 @@ defmodule Buildel.Subscriptions do
 
   def get_subscription_by_subscription_id(id), do: Repo.get_by(Subscription, subscription_id: id)
 
+  def get_subscription_plan(organization_id) do
+    subscription = Repo.one(from s in Subscription, where: s.organization_id == ^organization_id)
+
+    {:ok, Plan.from_db(subscription)}
+  end
+
   def create_subscription(attrs, organization_id) do
     with {:ok, %{body: body}} <- Stripe.get_subscription(attrs["subscription"]),
          product = List.first(body["items"]["data"]),

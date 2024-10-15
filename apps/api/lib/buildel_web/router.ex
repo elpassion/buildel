@@ -391,6 +391,12 @@ defmodule BuildelWeb.Router do
     put("/organizations/:id", OrganizationController, :update)
 
     get(
+      "/organizations/:organization_id/subscriptions",
+      OrganizationSubscriptionController,
+      :show
+    )
+
+    get(
       "/organizations/:organization_id/subscriptions/products",
       OrganizationSubscriptionController,
       :list_products

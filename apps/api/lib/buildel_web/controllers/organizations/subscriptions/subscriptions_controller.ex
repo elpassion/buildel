@@ -5,6 +5,7 @@ defmodule BuildelWeb.OrganizationSubscriptionController do
   import BuildelWeb.UserAuth
 
   alias Buildel.Clients.Stripe
+  alias Buildel.Subscriptions
 
   alias Buildel.Organizations
 
@@ -19,6 +20,39 @@ defmodule BuildelWeb.OrganizationSubscriptionController do
     replace_params: false
 
   tags ["subscriptions"]
+
+  operation :show,
+    summary: "Show organization subscription plan",
+    parameters: [
+      organization_id: [
+        in: :path,
+        description: "Organization ID",
+        type: :integer,
+        required: true
+      ]
+    ],
+    request_body: nil,
+    responses: [
+      ok: {"success", "application/json", BuildelWeb.Schemas.Subscriptions.ShowPlanResponse},
+      unprocessable_entity:
+        {"unprocessable entity", "application/json",
+         BuildelWeb.Schemas.Errors.UnprocessableEntity},
+      unauthorized:
+        {"unauthorized", "application/json", BuildelWeb.Schemas.Errors.UnauthorizedResponse},
+      forbidden: {"forbidden", "application/json", BuildelWeb.Schemas.Errors.ForbiddenResponse}
+    ],
+    security: [%{"authorization" => []}]
+
+  def show(conn, _params) do
+    %{"organization_id" => organization_id} = conn.params
+
+    user = conn.assigns.current_user
+
+    with {:ok, _organization} <- Organizations.get_user_organization(user, organization_id),
+         {:ok, plan} <- Subscriptions.get_subscription_plan(organization_id) do
+      render(conn, :show, plan: plan)
+    end
+  end
 
   operation :list_products,
     summary: "List products",
