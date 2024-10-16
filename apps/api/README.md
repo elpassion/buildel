@@ -33,5 +33,6 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 
 ## WS
 
+
 1. Join a channel to communicate with run: topic - pipeline_runs:#{:run_id}
 2. ppush "get_blocks" - %{ blocks: [%{ context: %{ inputs: [%{ name: "input", type: "audio", id: "context:pipeline_runs.1:block:random_block:io:input" }], outputs: [%{ name: "output", type: "text", id: "context:pipeline_runs.1:block:random_block:io:output" }] } }] }
