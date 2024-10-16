@@ -20,6 +20,7 @@ export interface IEvent {
   block: string;
   output: string;
   payload: any;
+  metadata: any;
 }
 interface IRunPipelineContext {
   events: IEvent[];
@@ -65,8 +66,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   );
 
   const onMessage = useCallback(
-    (block: string, output: string, payload: any) =>
-      setEvents((events) => [...events, { block, output, payload }]),
+    (block: string, output: string, payload: any, metadata: any) => setEvents((events) => [...events, { block, output, payload, metadata }]),
     [],
   );
 

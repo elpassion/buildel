@@ -3,7 +3,10 @@ import { Download } from 'lucide-react';
 import { ItemList } from '~/components/list/ItemList';
 
 interface FileOutputProps {
-  files: Blob[];
+  files: {
+    content: Blob;
+    name: string;
+  }[];
 }
 
 export const FileOutput: React.FC<FileOutputProps> = ({ files }) => {
@@ -11,14 +14,14 @@ export const FileOutput: React.FC<FileOutputProps> = ({ files }) => {
     <ItemList
       className="flex flex-col items-center gap-1 overflow-y-auto"
       itemClassName="w-full"
-      items={files.map((file, index) => ({ id: index, file }))}
+      items={files.map((file, index) => ({ id: index, file: file.content, name: file.name }))}
       renderItem={(file) => <FileOutputListItem file={file} />}
     />
   );
 };
 
 interface FileOutputListItemProps {
-  file: { id: number; file: Blob };
+  file: { id: number; file: Blob, name: string };
 }
 export function FileOutputListItem({ file }: FileOutputListItemProps) {
   return (
@@ -29,21 +32,21 @@ export function FileOutputListItem({ file }: FileOutputListItemProps) {
       <div className="flex gap-1 grow max-w-[90%]">
         <div className="flex flex-col w-full max-w-[95%]">
           <h6 className="whitespace-nowrap text-xs truncate">
-            {'foo file name'}
+            {file.name}
           </h6>
         </div>
       </div>
-      <DownloadButton blob={file.file} />
+      <DownloadButton blob={file.file} name={file.name} />
     </article>
   );
 }
 
-function DownloadButton({ blob }: { blob: Blob }) {
+function DownloadButton({ blob, name }: { blob: Blob, name: string }) {
   const downloadFile = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'file.txt';
+    a.download = name;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

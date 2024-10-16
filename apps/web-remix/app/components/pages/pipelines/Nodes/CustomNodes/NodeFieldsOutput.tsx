@@ -99,7 +99,10 @@ function checkIfStringPayloads(events: IEvent[]) {
 // }
 
 function getFileOutput(event: IEvent) {
-  return new Blob([event.payload], { type: 'file' });
+  return {
+    content: new Blob([event.payload], { type: event.metadata.file_type }),
+    name: event.metadata.file_name,
+  };
 }
 
 interface TextOutputProps {
