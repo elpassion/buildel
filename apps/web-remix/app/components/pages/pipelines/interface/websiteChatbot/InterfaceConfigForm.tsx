@@ -10,6 +10,7 @@ import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { IconButton } from '~/components/iconButton';
+import { BasicLink } from '~/components/link/BasicLink';
 import { toSelectOption } from '~/components/pages/pipelines/interface/interface.utils';
 import type {
   IInterfaceConfig,
@@ -17,6 +18,7 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
+import { routes } from '~/utils/routes.utils';
 
 import { schema } from './schema';
 
@@ -158,6 +160,17 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
             <TextInputField />
           </Field>
         </div>
+
+        <p className="text-sm">
+          <BasicLink
+            target="_blank"
+            className="font-semibold hover:underline"
+            to={routes.pipelineSettings(pipeline.organization_id, pipeline.id)}
+          >
+            Enable logs
+          </BasicLink>{' '}
+          to view the chatbot's history.
+        </p>
 
         <FieldArray<string> name="webchat.suggested_messages">
           {(items, { push, remove }) => (
