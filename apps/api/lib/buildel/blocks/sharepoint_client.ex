@@ -29,42 +29,49 @@ defmodule Buildel.Blocks.SharepointClient do
         "name" => name_schema(),
         "opts" =>
           options_schema(%{
-            "required" => ["client_secret", "client_id", "tenant_id"],
-            "properties" => %{
-              "client_secret" =>
-                secret_schema(%{
-                  "title" => "Client secret",
-                  "description" => "Azure app client secret"
-                }),
-              "client_id" => %{
-                "type" => "string",
-                "title" => "Client ID",
-                "description" => "Azure app client ID",
-                "default" => "",
-                "minLength" => 1
-              },
-              "tenant_id" => %{
-                "type" => "string",
-                "title" => "Tenant ID",
-                "description" => "Azure app tenant ID",
-                "default" => "",
-                "minLength" => 1
-              },
-              "site_id" => %{
-                "type" => "string",
-                "title" => "Site ID",
-                "description" => "SharePoint site ID",
-                "default" => "",
-                "minLength" => 1
-              },
-              "drive_id" => %{
-                "type" => "string",
-                "title" => "Drive ID",
-                "description" => "SharePoint drive ID",
-                "default" => "",
-                "minLength" => 1
-              }
-            }
+            "required" => ["client_secret", "client_id", "tenant_id", "site", "drive"],
+            "properties" =>
+              Jason.OrderedObject.new(
+                client_secret:
+                  secret_schema(%{
+                    "title" => "Client secret",
+                    "description" => "Azure app client secret"
+                  }),
+                client_id: %{
+                  "type" => "string",
+                  "title" => "Client ID",
+                  "description" => "Azure app client ID",
+                  "default" => "",
+                  "minLength" => 1
+                },
+                tenant_id: %{
+                  "type" => "string",
+                  "title" => "Tenant ID",
+                  "description" => "Azure app tenant ID",
+                  "default" => "",
+                  "minLength" => 1
+                },
+                site: %{
+                  "type" => "string",
+                  "title" => "Site",
+                  "description" => "SharePoint site ID",
+                  "url" =>
+                    "/api/organizations/{{organization_id}}/tools/sharepoint/sites?client_id={{opts.client_id}}&secret_name={{opts.client_secret}}&tenant_id={{opts.tenant_id}}",
+                  "presentAs" => "async-select",
+                  "minLength" => 1,
+                  "readonly" => true
+                },
+                drive: %{
+                  "type" => "string",
+                  "title" => "Drive",
+                  "description" => "SharePoint drive ID",
+                  "url" =>
+                    "/api/organizations/{{organization_id}}/tools/sharepoint/drives?client_id={{opts.client_id}}&secret_name={{opts.client_secret}}&tenant_id={{opts.tenant_id}}&site_id={{opts.site}}",
+                  "presentAs" => "async-select",
+                  "minLength" => 1,
+                  "readonly" => true
+                }
+              )
           })
       }
     }
@@ -86,8 +93,8 @@ defmodule Buildel.Blocks.SharepointClient do
     {:ok,
      state
      |> Map.put(:access_token, access_token)
-     |> Map.put(:site_id, opts.site_id)
-     |> Map.put(:drive_id, opts.drive_id)}
+     |> Map.put(:site_id, opts.site)
+     |> Map.put(:drive_id, opts.drive)}
   end
 
   defp get_access_token(client_id, client_secret, tenant_id) do

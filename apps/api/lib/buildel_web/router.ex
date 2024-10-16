@@ -365,6 +365,18 @@ defmodule BuildelWeb.Router do
       :create
     )
 
+    get(
+      "/organizations/:organization_id/tools/sharepoint/sites",
+      OrganizationToolSharepointController,
+      :list_sites
+    )
+
+    get(
+      "/organizations/:organization_id/tools/sharepoint/drives",
+      OrganizationToolSharepointController,
+      :list_drives
+    )
+
     get("/users/me", UserController, :me)
     put("/users", UserController, :update)
     post("/users/log_in", UserSessionController, :create)
