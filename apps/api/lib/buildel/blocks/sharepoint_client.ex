@@ -159,17 +159,20 @@ defmodule Buildel.Blocks.SharepointClient do
   def handle_input("create", {_name, :binary, path, metadata}, state) do
     content = File.read!(path)
 
-    {:ok, res} = upload_document(content, metadata.file_name, state)
+    with {:ok, res} <- upload_document(content, metadata.file_name, state) do
+      document = %{
+        "name" => res["name"],
+        "id" => res["id"],
+        "size" => res["size"],
+        "mime_type" => res["file"]["mimeType"],
+        "download_url" => res["@microsoft.graph.downloadUrl"]
+      }
 
-    document = %{
-      "name" => res["name"],
-      "id" => res["id"],
-      "size" => res["size"],
-      "mime_type" => res["file"]["mimeType"],
-      "download_url" => res["@microsoft.graph.downloadUrl"]
-    }
-
-    state |> output("create", {:text, Jason.encode!(document)})
+      state |> output("create", {:text, Jason.encode!(document)})
+    else
+      {:error, reason} ->
+        state |> send_error(reason)
+    end
   end
 
   defp upload_document(file_content, file_path, state) do
@@ -185,8 +188,11 @@ defmodule Buildel.Blocks.SharepointClient do
       {:ok, %Req.Response{status: 201, body: body}} ->
         {:ok, body}
 
-      {:ok, %Req.Response{body: reason}} ->
-        {:error, reason}
+      {:ok, %Req.Response{status: 200, body: body}} ->
+        {:ok, body}
+
+      {:error, %Req.Response{body: reason}} ->
+        {:ok, reason}
 
       {:error, reason} ->
         {:error, reason}
