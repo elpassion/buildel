@@ -65,6 +65,27 @@ defmodule Buildel.Blocks.NewMapTest do
       )
     end
 
+    test "resets inputs correctly", %{run: test_run} do
+      message = Message.new(:text, "test")
+      message_2 = Message.new(:text, "test_2")
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test_multiple_inputs")
+      |> BlocksTestRunner.test_input(message)
+      |> BlocksTestRunner.test_input_2(message)
+      |> BlocksTestRunner.test_input_2(message_2)
+      |> refute_receive_message(
+        "test_multiple_inputs",
+        :output,
+        message
+        |> Message.from_message()
+        |> Message.set_type(:json)
+        |> Message.set_message(%{"input_1" => "test", "input_2" => "test_2"}),
+        start_stream: :none,
+        stop_stream: :none
+      )
+    end
+
     def create_run(_) do
       {:ok, run} =
         BlocksTestRunner.start_run(%{

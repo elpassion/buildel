@@ -24,8 +24,8 @@ defmodule Buildel.Blocks.NewMap do
 
   def handle_input(:input, %Message{} = message, state) do
     with {:ok, state} <- save_input_message(state, message),
-         {:ok, filter, state} <- fill_filter_template(state),
          {:ok, latest_messages_json} <- build_latest_messages_json(state),
+         {:ok, filter, state} <- fill_filter_template(state),
          {:ok, %Message{} = new_message, state} <-
            filter_messages(state, latest_messages_json, filter) do
       output(
@@ -67,8 +67,12 @@ defmodule Buildel.Blocks.NewMap do
 
   defp fill_filter_template(state) do
     case fill_filter_template_with_messages(state.latest_messages, option(state, :template)) do
-      :error -> {:error, :template_not_filled, state}
-      template -> {:ok, template, state}
+      :error ->
+        {:error, :template_not_filled, state}
+
+      template ->
+        state = Map.put(state, :latest_messages, initial_latest_messages(state))
+        {:ok, template, state}
     end
   end
 
