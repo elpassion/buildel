@@ -15,8 +15,8 @@ importers:
   .:
     dependencies:
       '@buildel/buildel':
-        specifier: 0.3.2
-        version: 0.3.2
+        specifier: 0.3.3
+        version: 0.3.3
       '@codemirror/autocomplete':
         specifier: ^6.15.0
         version: 6.17.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.29.1)(@lezer/common@1.2.1)
@@ -626,8 +626,8 @@ packages:
   '@braintree/sanitize-url@6.0.4':
     resolution: {integrity: sha512-s3jaWicZd0pkP0jf5ysyHUI/RE7MHos6qlToFcGWXVp+ykHOy77OUMrfbgJ9it2C5bow7OIQwYYaHjk9XlBQ2A==}
 
-  '@buildel/buildel@0.3.2':
-    resolution: {integrity: sha512-LmWMKpmWbQC10WjxxA+bp/mAhvQ/fAQbD5x5/FAFm/QId+Flut4EOSWCB/Tc2AgfzFVLDzh6cOCo7mt6WPSw8A==}
+  '@buildel/buildel@0.3.3':
+    resolution: {integrity: sha512-KTTzs02sg3ZQ8Hix6/diRJgQrDIO07LYSDhE8to3VUxYaFgCnvNwi3LTmU56l+kv4oerR3i8BpiRAiRbDawUJw==}
 
   '@bundled-es-modules/cookie@2.0.0':
     resolution: {integrity: sha512-Or6YHg/kamKHpxULAdSqhGqnWFneIXu1NKvvfBBzKGwpVsYuFIQ5aBPHDnnoR3ghW1nvSkALd+EF9iMtY7Vjxw==}
@@ -7226,7 +7226,7 @@ snapshots:
 
   '@braintree/sanitize-url@6.0.4': {}
 
-  '@buildel/buildel@0.3.2':
+  '@buildel/buildel@0.3.3':
     dependencies:
       phoenix: 1.7.14
       uuid: 9.0.1
