@@ -20,9 +20,10 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const blockTypesPromise = blockTypeApi.getBlockTypes();
 
-    const pipelinePromise = pipelineApi.getPipeline(
+    const pipelinePromise = pipelineApi.getAliasedPipeline(
       params.organizationId,
       params.pipelineId,
+      pipelineApi.getAliasFromUrl(request.url),
     );
 
     const pipelineRunPromise = pipelineApi.getPipelineRun(
@@ -49,7 +50,7 @@ export async function loader(args: LoaderFunctionArgs) {
     return json(
       {
         toasts,
-        pipeline: pipeline.data,
+        pipeline,
         pipelineRun: {
           ...pipelineRun.data,
           config: { ...pipelineRun.data.config, blocks },

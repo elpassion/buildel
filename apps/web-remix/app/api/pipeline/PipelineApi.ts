@@ -172,6 +172,7 @@ export class PipelineApi {
 
       return {
         ...pipeline.data,
+        name: alias.data.name,
         config: alias.data.config,
         interface_config: alias.data.interface_config,
       };

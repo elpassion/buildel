@@ -17,9 +17,10 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const blockTypesPromise = blockTypeApi.getBlockTypes();
 
-    const pipelinePromise = pipelineApi.getPipeline(
+    const pipelinePromise = pipelineApi.getAliasedPipeline(
       params.organizationId,
       params.pipelineId,
+      pipelineApi.getAliasFromUrl(request.url),
     );
 
     const [pipeline, blockTypes] = await Promise.all([
@@ -28,7 +29,7 @@ export async function loader(args: LoaderFunctionArgs) {
     ]);
 
     return json({
-      pipeline: pipeline.data,
+      pipeline,
       blockTypes: blockTypes.data,
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,
