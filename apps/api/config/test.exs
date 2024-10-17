@@ -40,7 +40,6 @@ config :buildel, :secret_key_base, "secret_key_base"
 config :buildel, :deepgram, Buildel.ClientMocks.Deepgram
 config :buildel, :elevenlabs, Buildel.ClientMocks.Elevenlabs
 config :buildel, :webhook, Buildel.ClientMocks.Webhook
-config :buildel, :chat, Buildel.ClientMocks.Chat
 config :buildel, :stream_timeout, 10
 config :buildel, :file_loader, Buildel.FileLoaderRawAdapter
 config :buildel, :search_db, Buildel.ClientMocks.SearchDB.LNXAdapter

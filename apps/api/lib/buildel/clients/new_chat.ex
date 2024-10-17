@@ -319,8 +319,4 @@ defmodule Buildel.Clients.NewChat do
       callbacks: callbacks
     })
   end
-
-  defmodule Message do
-    defstruct [:role, :content, :tool_results, :tool_calls]
-  end
 end

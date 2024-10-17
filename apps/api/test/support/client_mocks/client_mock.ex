@@ -3,12 +3,12 @@ defmodule Buildel.ClientMocks.ClientMock do
     quote do
       use GenServer
 
-      def set_mock(name, fun) do
-        GenServer.call(__MODULE__, {:set_mock, self(), name, fun})
+      def set_mock(name, fun, pid \\ self()) do
+        GenServer.call(__MODULE__, {:set_mock, pid, name, fun})
       end
 
       def get_mock(name) do
-        pid = Process.get() |> Keyword.get(:"$ancestors") |> Enum.at(-1)
+        pid = Process.get() |> Keyword.get(:"$ancestors", [self()]) |> Enum.at(-1)
 
         mock =
           GenServer.call(

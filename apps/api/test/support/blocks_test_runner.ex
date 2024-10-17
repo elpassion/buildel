@@ -154,6 +154,23 @@ defmodule Buildel.BlocksTestRunner do
     run
   end
 
+  def with_chat(run, mock) do
+    Buildel.ClientMocks.Chat.set_mock(:stream_chat, mock)
+    run
+  end
+
+  def stream_through_chat(run, type, args \\ []) do
+    Buildel.ClientMocks.Chat.get_mock(:"on_#{type}")
+    |> apply(args)
+
+    run
+  end
+
+  def wait(run) do
+    Process.sleep(50)
+    run
+  end
+
   @impl true
   def init(config) do
     context_id = context_id(self())

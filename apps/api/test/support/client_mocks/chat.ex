@@ -1,23 +1,16 @@
 defmodule Buildel.ClientMocks.Chat do
-  alias Buildel.Clients.ChatBehaviour
-  @behaviour ChatBehaviour
+  alias Buildel.ClientMocks
+  use ClientMocks.ClientMock
 
-  @impl ChatBehaviour
-  def stream_chat(%{
-        context: _,
-        on_content: on_content,
-        on_tool_content: _on_tool_content,
-        on_end: on_end,
-        on_error: _on_error,
-        api_key: _,
-        model: _,
-        temperature: _,
-        tools: _,
-        on_cost: _
-      }) do
-    on_content.("Hell")
-    on_content.("o!")
-    on_content.(" How are you?")
-    on_end.()
+  def stream_chat(opts) do
+    pid =
+      Process.get()
+      |> Keyword.get(:"$ancestors")
+      |> Enum.at(-1)
+
+    set_mock(:on_content, opts[:on_content], pid)
+    set_mock(:on_end, opts[:on_end], pid)
+    set_mock(:on_error, opts[:on_error], pid)
+    get_mock(:stream_chat).(opts)
   end
 end
