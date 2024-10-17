@@ -61,29 +61,17 @@ COPY ./priv priv
 COPY ./lib lib
 
 # Compile the release
-RUN --mount=type=cache,id=hex,target=/root/.hex \
-  --mount=type=cache,id=mix,target=/root/.mix \
-  --mount=type=cache,id=xla,target=/root/.cache/xla \
-  --mount=type=cache,id=rustler,target=/root/.cache/rustler_precompiled \
-  mix compile
+RUN mix compile
 
 # Changes to config/runtime.exs don't require recompiling the code
 COPY ./config/runtime.exs config/
 
 COPY ./rel rel
-RUN --mount=type=cache,id=hex,target=/root/.hex \
-  --mount=type=cache,id=mix,target=/root/.mix \
-  --mount=type=cache,id=xla,target=/root/.cache/xla \
-  --mount=type=cache,id=rustler,target=/root/.cache/rustler_precompiled \
-  mix release
+RUN mix release
 
-RUN --mount=type=cache,id=hex,target=/root/.hex \
-  --mount=type=cache,id=mix,target=/root/.mix \
-  DATABASE_URL="ecto://USER:PASS@HOST/DATABASE" SECRET_KEY_BASE="doesnotmatter" ENCRYPTION_KEY="ZG9lc25vdG1hdTEstg==" SKIP_DB="true" mix run -e 'Buildel.Application.load_servings()'
+RUN DATABASE_URL="ecto://USER:PASS@HOST/DATABASE" SECRET_KEY_BASE="doesnotmatter" ENCRYPTION_KEY="ZG9lc25vdG1hdTEstg==" SKIP_DB="true" mix run -e 'Buildel.Application.load_servings()'
 
-RUN --mount=type=cache,id=hex,target=/root/.hex \
-  --mount=type=cache,id=mix,target=/root/.mix \
-  mix sentry.package_source_code
+RUN mix sentry.package_source_code
 
 RUN mkdir -p /app/.bumblebee
 
