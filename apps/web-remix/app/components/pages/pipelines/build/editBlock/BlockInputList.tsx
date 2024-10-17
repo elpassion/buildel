@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 import { ItemList } from '~/components/list/ItemList';
@@ -33,18 +33,30 @@ export const BlockInputList: React.FC<BlockInputListProps> = ({
 
   return (
     <div>
-      <div className="flex gap-2 items-center mb-2">
+      <div className="grid grid-cols-[120px_60px_70px] text-xs text-muted-foreground mb-1">
         <h4 className="font-medium text-muted-foreground text-xs">Inputs</h4>
-        <HelpfulIcon
-          id={`inputs-helpful-icon`}
-          text="Check if the input must be resubmitted for each workflow execution."
-          size="sm"
-          place="top"
-        />
-      </div>
+        <p className="col-start-2 flex gap-1 items-center">
+          <span>Reset</span>
+          <HelpfulIcon
+            id={`inputs-reset-helpful-icon`}
+            text="Check if the input must be resubmitted for each workflow execution."
+            size="xs"
+            place="top"
+          />
+        </p>
 
+        <p className="flex gap-1 items-center">
+          <span>Optional</span>
+          <HelpfulIcon
+            id={`inputs-optional-helpful-icon`}
+            text="Check if the input is optional. If the input is optional, blocks will not wait for the input message."
+            size="xs"
+            place="top"
+          />
+        </p>
+      </div>
       <ItemList
-        className="flex flex-wrap gap-2"
+        className="flex flex-col gap-y-1"
         items={formattedConnections}
         renderItem={(item) => <BlockInputItem {...item} disabled={disabled} />}
       />
@@ -59,35 +71,42 @@ interface IItem {
 }
 
 function BlockInputItem({ data, disabled }: IItem) {
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const [resettable, setResettable] = useState(data.opts.reset);
-  const { updateInputReset } = useInputs();
+  const [optional, setOptional] = useState(data.opts.optional);
+  const { updateInputReset, updateInputOptional } = useInputs();
 
-  const onCheckedChange = (checked: boolean) => {
+  const onResetChange = (checked: boolean) => {
     updateInputReset(data, checked);
     setResettable(checked);
   };
 
+  const onOptionalChange = (checked: boolean) => {
+    updateInputOptional(data, checked);
+    setOptional(checked);
+  };
+
   return (
-    <div className="relative" ref={wrapperRef}>
-      <Badge className="cursor-pointer">
+    <div className="relative grid grid-cols-[120px_60px_70px]">
+      <p className="text-sm">{data.from.block_name}</p>
+      <div className="flex items-center text-sm">
         <CheckboxInput
           size="sm"
           disabled={disabled}
           checked={resettable}
-          onCheckedChange={onCheckedChange}
+          onCheckedChange={onResetChange}
           id={`${data.from.block_name}-resettable`}
         />
+      </div>
 
-        <label
-          htmlFor={`${data.from.block_name}-resettable`}
-          className="cursor-pointer ml-1"
-        >
-          <BadgeText variant={resettable ? 'primary' : 'secondary'}>
-            {data.from.block_name}
-          </BadgeText>
-        </label>
-      </Badge>
+      <div className="flex items-center text-sm">
+        <CheckboxInput
+          size="sm"
+          disabled={disabled}
+          checked={optional}
+          onCheckedChange={onOptionalChange}
+          id={`${data.from.block_name}-optional`}
+        />
+      </div>
     </div>
   );
 }

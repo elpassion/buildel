@@ -95,6 +95,7 @@ export function toPipelineConfig(
           },
           opts: {
             reset: edge.data?.opts?.reset ?? true,
+            optional: edge.data?.opts?.optional ?? false,
           },
         };
       }),

@@ -222,6 +222,7 @@ const BuilderInstance = ({
             },
             opts: {
               reset: true,
+              optional: false,
             },
           },
           id: `${params.source}:${params.sourceHandle}-${params.target}:${params.targetHandle}`,

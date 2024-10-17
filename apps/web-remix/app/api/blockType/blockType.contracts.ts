@@ -38,9 +38,11 @@ export const ConfigConnection = z.object({
   opts: z
     .object({
       reset: z.boolean().default(true),
+      optional: z.boolean().optional().default(false),
     })
     .default({
       reset: true,
+      optional: false,
     }),
 });
 
@@ -79,10 +81,12 @@ export const UpdateBlockConfig = z.object({
       }),
       opts: z
         .object({
-          reset: z.boolean().optional().default(true),
+          reset: z.boolean().default(true),
+          optional: z.boolean().optional().default(false),
         })
         .default({
           reset: true,
+          optional: false,
         }),
     }),
   ),
