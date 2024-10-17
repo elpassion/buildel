@@ -32,7 +32,10 @@ defmodule Buildel.Blocks.NewBlock do
       end
 
       defp secret(state, secret_id) do
-        Buildel.BlockContext.get_secret_from_context(state.block.context.context_id, secret_id)
+        Application.get_env(:buildel, :secret).secret_from_context(
+          state.block.context.context,
+          secret_id
+        )
       end
 
       @before_compile Buildel.Blocks.NewBlock
@@ -614,7 +617,7 @@ end
 defmodule Buildel.Blocks.NewBlock.Image do
   defmacro __using__(_opts) do
     quote do
-      def document_workflow() do
+      def image() do
         Application.fetch_env!(:buildel, :image)
       end
     end

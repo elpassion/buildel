@@ -3,14 +3,16 @@ defmodule Buildel.ClientMocks do
     Image,
     HttpApi,
     Clock,
-    DocumentWorkflow
+    DocumentWorkflow,
+    Secret
   }
 
   @mocks [
     image: Image,
     http_api: HttpApi,
     clock: Clock,
-    document_workflow: DocumentWorkflow
+    document_workflow: DocumentWorkflow,
+    secret: Secret
   ]
 
   def mocks() do

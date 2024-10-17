@@ -1,7 +1,7 @@
 defmodule Buildel.BlockContextBehaviour do
   @type costs_data :: %{amount: integer(), input_tokens: integer(), output_tokens: integer()}
 
-  @callback context_from_context_id(String.t()) :: map()
+  @callback context_from_context_id(map()) :: map()
   @callback block_pid(String.t(), String.t()) :: pid()
   @callback create_run_auth_token(String.t(), String.t()) :: {:ok, String.t()}
   @callback create_run_cost(String.t(), String.t(), costs_data()) ::
@@ -172,9 +172,8 @@ defmodule Buildel.BlockContext do
   end
 
   @impl true
-  def get_secret_from_context(context_id, secret_name) do
-    with %{global: organization_id} <- context_from_context_id(context_id),
-         %Buildel.Organizations.Organization{} = organization <-
+  def get_secret_from_context(%{global: organization_id}, secret_name) do
+    with %Buildel.Organizations.Organization{} = organization <-
            Buildel.Organizations.get_organization!(organization_id),
          {:ok, secret} <- Buildel.Organizations.get_organization_secret(organization, secret_name) do
       secret.value

@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.NewImage do
   use Buildel.Blocks.NewBlock
+  use Buildel.Blocks.NewBlock.Image
 
   defblock(:image,
     description: "Block used to generate images. Can be used as a tool for chat",
@@ -118,7 +119,7 @@ defmodule Buildel.Blocks.NewImage do
   end
 
   defp generate_image(state, %Message{message: message}) do
-    case Buildel.Clients.Image.generate_image(%{
+    case image().generate_image(%{
            prompt: message,
            model: option(state, :model),
            api_type: option(state, :api_type),

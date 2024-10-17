@@ -2,7 +2,8 @@ defmodule Buildel.Clients do
   alias Buildel.Clients.{
     Image,
     HttpApi,
-    Clock
+    Clock,
+    Secret
   }
 
   alias Buildel.DocumentWorkflow
@@ -11,7 +12,8 @@ defmodule Buildel.Clients do
     image: Image,
     http_api: HttpApi,
     clock: Clock,
-    document_workflow: DocumentWorkflow
+    document_workflow: DocumentWorkflow,
+    secret: Secret
   ]
 
   def clients() do

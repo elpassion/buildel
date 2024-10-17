@@ -141,6 +141,19 @@ defmodule Buildel.BlocksTestRunner do
     run
   end
 
+  def with_image_returning(run, mock) do
+    Buildel.ClientMocks.Image.set_mock(:generate_image, mock)
+    run
+  end
+
+  def with_secret(run, mock) do
+    Buildel.ClientMocks.Secret.set_mock(:secret_from_context, fn _, name ->
+      mock.(name)
+    end)
+
+    run
+  end
+
   @impl true
   def init(config) do
     context_id = context_id(self())
