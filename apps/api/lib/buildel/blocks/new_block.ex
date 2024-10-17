@@ -610,3 +610,13 @@ defmodule Buildel.Blocks.NewBlock.DocumentWorkflow do
     end
   end
 end
+
+defmodule Buildel.Blocks.NewBlock.Image do
+  defmacro __using__(_opts) do
+    quote do
+      def document_workflow() do
+        Application.fetch_env!(:buildel, :image)
+      end
+    end
+  end
+end

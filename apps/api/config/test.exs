@@ -47,9 +47,6 @@ config :buildel, :search_db, Buildel.ClientMocks.SearchDB.LNXAdapter
 config :buildel, :block_context_resolver, Buildel.BlockContext.Mock
 config :langchain, openai_key: fn -> System.get_env("OPENAI_API_KEY") end
 config :buildel, :pipeline_logger, Buildel.ClientMocks.DBPipelineLogger
-config :buildel, :http_api, Buildel.ClientMocks.HttpApi
-config :buildel, :clock, Buildel.ClientMocks.Clock
-config :buildel, :document_workflow, Buildel.ClientMocks.DocumentWorkflow
 config :buildel, :start_test_mocks, true
 
 config :buildel, :nlm_api_url, System.get_env("NLM_API_URL")

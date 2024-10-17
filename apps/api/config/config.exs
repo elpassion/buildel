@@ -67,9 +67,6 @@ config :buildel, :block_context_resolver, Buildel.BlockContext
 config :buildel, :document_loader, Buildel.DocumentWorkflow.DocumentLoaderAdapter
 config :buildel, :secure_cookie, false
 config :buildel, :pipeline_logger, Buildel.Logs.DBPipelineLogger
-config :buildel, :http_api, Buildel.Clients.HttpApi
-config :buildel, :clock, Buildel.Clients.Clock
-config :buildel, :document_workflow, Buildel.DocumentWorkflow
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

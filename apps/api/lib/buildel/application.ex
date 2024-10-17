@@ -136,16 +136,7 @@ defmodule Buildel.Application do
   end
 
   defp maybe_add_test_mocks(children) do
-    if Application.get_env(:buildel, :start_test_mocks) do
-      children ++
-        [
-          Buildel.ClientMocks.HttpApi,
-          Buildel.ClientMocks.Clock,
-          Buildel.ClientMocks.DocumentWorkflow
-        ]
-    else
-      children
-    end
+    children ++ Application.get_env(:buildel, :test_mocks, [])
   end
 
   defp should_add_bumblebee_embedding?() do

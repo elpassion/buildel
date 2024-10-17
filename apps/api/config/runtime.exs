@@ -8,6 +8,20 @@ if log_level = System.get_env("LOG_LEVEL", "warning") do
   config :logger, level: String.to_atom(log_level)
 end
 
+if config_env() == :test do
+  config :buildel, :test_mocks, Buildel.ClientMocks.mocks() |> Enum.map(&elem(&1, 1))
+
+  Buildel.ClientMocks.mocks()
+  |> Enum.each(fn {key, value} ->
+    config :buildel, key, value
+  end)
+else
+  Buildel.Clients.clients()
+  |> Enum.each(fn {key, value} ->
+    config :buildel, key, value
+  end)
+end
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
