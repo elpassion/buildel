@@ -21,16 +21,16 @@ defmodule Buildel.Blocks.NewBrowserTool do
     send_stream_start(state, :output, message)
 
     %{state: state, pages: pages} =
-      Enum.reduce(message_message, %{state: state, pages: []}, fn url,
-                                                                  %{state: state, pages: pages} ->
-        with {:ok, response, state} <- visit_url(state, url) do
-          pages = [{:ok, response} | pages]
-          %{state: state, pages: pages}
-        else
-          {:error, reason, state} ->
-            pages = [{:error, reason} | pages]
+      Enum.reduce(message_message, %{state: state, pages: []}, fn
+        url, %{state: state, pages: pages} ->
+          with {:ok, response, state} <- visit_url(state, url) do
+            pages = [{:ok, response} | pages]
             %{state: state, pages: pages}
-        end
+          else
+            {:error, reason, state} ->
+              pages = [{:error, reason} | pages]
+              %{state: state, pages: pages}
+          end
       end)
 
     output(

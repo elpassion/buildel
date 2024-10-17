@@ -1,5 +1,5 @@
 defmodule Buildel.Blocks.NewBrowserTest do
-  use Buildel.BlockCase
+  use Buildel.BlockCase, async: true
   alias Blocks.NewBrowserTool
 
   test "exposes options" do

@@ -150,6 +150,7 @@ defmodule BuildelWeb.PipelineChannel do
         _ ->
           Message.new(:text, data)
       end
+      |> Message.set_sent()
 
     Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{})
   end

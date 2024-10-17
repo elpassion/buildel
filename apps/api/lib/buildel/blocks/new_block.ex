@@ -118,6 +118,8 @@ defmodule Buildel.Blocks.NewBlock.Definput do
 
   defmacro definput(name, options) do
     quote do
+      require Logger
+
       {:ok, options} =
         unquote(options) |> Keyword.validate(public: false, type: :text, schema: %{})
 
@@ -146,6 +148,11 @@ defmodule Buildel.Blocks.NewBlock.Definput do
             send_error(state, :invalid_input)
             {:error, :invalid_input, state}
         end
+      rescue
+        error ->
+          Logger.error(Exception.format(:error, error, __STACKTRACE__))
+          send_error(state, :something_went_wrong)
+          {:error, :something_went_wrong, state}
       end
 
       @spec validate_input(unquote(name), Message.t()) :: :ok | {:error, :invalid_input}
@@ -560,7 +567,8 @@ defmodule Buildel.Blocks.NewBlock.StreamState do
           streams -> streams
         end
         |> Enum.map(fn {key, value} ->
-          if value == false || key.id == message.id || key.parents |> Enum.member?(message.id) do
+          if value == false || key.id == message.id || key.parents |> Enum.member?(message.id) ||
+               message.parents |> Enum.member?(key.id) do
             {key, false}
           else
             {key, true}

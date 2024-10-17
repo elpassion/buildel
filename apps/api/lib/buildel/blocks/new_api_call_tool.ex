@@ -9,7 +9,7 @@ defmodule Buildel.Blocks.NewApiCallTool do
     groups: ["tools", "text"]
   )
 
-  definput(:args, schema: %{"type" => "object"})
+  definput(:args, schema: %{})
   defoutput(:output, schema: %{})
 
   defoption(:method, %{
@@ -60,6 +60,38 @@ defmodule Buildel.Blocks.NewApiCallTool do
       ]
     })
   )
+
+  def handle_input(:args, %Message{type: :json, message: message_message} = message, state)
+      when is_list(message_message) do
+    send_stream_start(state, :output, message)
+
+    %{state: state, responses: responses} =
+      Enum.reduce(message_message, %{state: state, responses: []}, fn
+        args, %{state: state, responses: responses} ->
+          with {:ok, response} <- call_api(state, args) do
+            responses = [%{status: "ok", response: response} | responses]
+            %{state: state, responses: responses}
+          else
+            {:error, reason, state} ->
+              responses = [%{status: "error", response: reason} | responses]
+              %{state: state, responses: responses}
+          end
+      end)
+
+    output(
+      state,
+      :output,
+      message
+      |> Message.from_message()
+      |> Message.set_type(:json)
+      |> Message.set_message(
+        responses
+        |> Enum.reverse()
+      )
+    )
+
+    {:ok, state}
+  end
 
   def handle_input(:args, %Message{} = message, state) do
     send_stream_start(state, :output, message)

@@ -61,6 +61,16 @@ defmodule Buildel.BlocksTestRunner do
         "text"
       )
 
+  def test_file_input_connection(input_name) when is_atom(input_name),
+    do: test_file_input_connection(input_name |> to_string())
+
+  def test_file_input_connection(input_name),
+    do:
+      Buildel.Blocks.Connection.from_connection_string(
+        "TEST_INPUT:output->#{input_name}",
+        "file"
+      )
+
   def test_text_input_2_connection(input_name) when is_atom(input_name),
     do: test_text_input_2_connection(input_name |> to_string())
 
