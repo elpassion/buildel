@@ -123,7 +123,7 @@ function NameFormStep() {
 
 function TemplatesStep() {
   const { templates, organizationId } = useLoaderData<typeof loader>();
-  console.log(templates);
+
   return (
     <>
       <div className="flex justify-between gap-2 items-center mb-2">
