@@ -443,7 +443,12 @@ export class BuildelRun {
         socket_id: this.id,
         channel_name: `pipelines:${this.organizationId}:${this.pipelineId}${runId ? `:${runId}` : ""}`,
       }),
-    }).then((response) => response.json());
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      return {};
+    });
   }
 
   private decodeBinaryMessage(buffer: ArrayBuffer) {
