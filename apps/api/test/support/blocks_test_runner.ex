@@ -127,12 +127,16 @@ defmodule Buildel.BlocksTestRunner do
   end
 
   def with_api_responding(run, mock) do
-    Buildel.ClientMocks.HttpApi.set_mock(mock)
+    Buildel.ClientMocks.HttpApi.set_mock(:request, mock)
     run
   end
 
   def with_datetime_set_to(run, datetime) do
-    Buildel.ClientMocks.Clock.set_mock(fn _ -> datetime end)
+    Buildel.ClientMocks.Clock.set_mock(:utc_now, fn _ -> datetime end)
+    run
+  end
+
+  def with_document_workflow_returning(run, _method, _mock) do
     run
   end
 
