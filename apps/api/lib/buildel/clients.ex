@@ -17,13 +17,4 @@ defmodule Buildel.Clients do
   def clients() do
     @clients
   end
-
-  defmacro __before_compile__(_) do
-    quote do
-      @clients
-      |> Enum.map(fn {key, module} ->
-        IO.inspect(module)
-      end)
-    end
-  end
 end
