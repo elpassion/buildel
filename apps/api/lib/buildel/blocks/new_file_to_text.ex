@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.NewFileToText do
   use Buildel.Blocks.NewBlock
+  use Buildel.Blocks.NewBlock.DocumentWorkflow
 
   defblock(:file_to_text,
     description: "Used for reading a content of a file and outputting it as text.",
@@ -13,7 +14,7 @@ defmodule Buildel.Blocks.NewFileToText do
     send_stream_start(state, :output, message)
 
     with {:ok, content} <-
-           Buildel.DocumentWorkflow.get_content(message.message.path, message.message) do
+           document_workflow().get_content(message.message.path, message.message) do
       output(
         state,
         :output,

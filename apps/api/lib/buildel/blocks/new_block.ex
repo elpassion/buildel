@@ -600,3 +600,13 @@ defmodule Buildel.Blocks.NewBlock.Clock do
     end
   end
 end
+
+defmodule Buildel.Blocks.NewBlock.DocumentWorkflow do
+  defmacro __using__(_opts) do
+    quote do
+      def document_workflow() do
+        Application.fetch_env!(:buildel, :document_workflow)
+      end
+    end
+  end
+end

@@ -136,7 +136,8 @@ defmodule Buildel.BlocksTestRunner do
     run
   end
 
-  def with_document_workflow_returning(run, _method, _mock) do
+  def with_document_workflow_returning(run, method, mock) do
+    Buildel.ClientMocks.DocumentWorkflow.set_mock(method, mock)
     run
   end
 
