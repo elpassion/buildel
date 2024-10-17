@@ -86,8 +86,8 @@ function BlockInputItem({ data, disabled }: IItem) {
   };
 
   return (
-    <div className="relative grid grid-cols-[120px_60px_70px]">
-      <p className="text-sm line-clamp-1" title={data.from.block_name}>
+    <div className="relative grid grid-cols-[120px_60px_70px] gap-x-1">
+      <p className="text-sm truncate" title={data.from.block_name}>
         {data.from.block_name}
       </p>
       <div className="flex items-center text-sm">
