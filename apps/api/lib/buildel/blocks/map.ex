@@ -70,7 +70,13 @@ defmodule Buildel.Blocks.MapInputs do
             {field, nil} ->
               {field, nil}
 
-            {field, value} ->
+            {field, %{value: nil, optional: true}} ->
+              {field, ""}
+
+            {field, %{value: nil, optional: false}} ->
+              {field, nil}
+
+            {field, %{value: value}} ->
               case Jason.decode(value) do
                 {:ok, value} -> {field, value}
                 _ -> {field, value}

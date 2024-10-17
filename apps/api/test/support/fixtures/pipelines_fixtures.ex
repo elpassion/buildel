@@ -194,7 +194,8 @@ defmodule Buildel.PipelinesFixtures do
                 "input_name" => "input"
               },
               "opts" => %{
-                "reset" => false
+                "reset" => false,
+                "optional" => false
               }
             },
             %{
@@ -207,7 +208,8 @@ defmodule Buildel.PipelinesFixtures do
                 "input_name" => "input"
               },
               "opts" => %{
-                "reset" => true
+                "reset" => true,
+                "optional" => false
               }
             },
             %{
@@ -220,7 +222,8 @@ defmodule Buildel.PipelinesFixtures do
                 "input_name" => "input"
               },
               "opts" => %{
-                "reset" => true
+                "reset" => true,
+                "optional" => false
               }
             }
           ]
@@ -264,7 +267,8 @@ defmodule Buildel.PipelinesFixtures do
                 "input_name" => "input"
               },
               "opts" => %{
-                "reset" => true
+                "reset" => true,
+                "optional" => false
               }
             }
           ]
@@ -316,7 +320,8 @@ defmodule Buildel.PipelinesFixtures do
                 "input_name" => "input"
               },
               "opts" => %{
-                "reset" => true
+                "reset" => true,
+                "optional" => false
               }
             },
             %{
@@ -329,7 +334,8 @@ defmodule Buildel.PipelinesFixtures do
                 "input_name" => "text_input_10:input"
               },
               "opts" => %{
-                "reset" => true
+                "reset" => true,
+                "optional" => false
               }
             }
           ]

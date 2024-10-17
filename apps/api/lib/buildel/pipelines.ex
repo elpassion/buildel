@@ -318,7 +318,8 @@ defmodule Buildel.Pipelines do
             type: input_type
           },
           opts: %{
-            reset: connection["opts"]["reset"]
+            reset: connection["opts"]["reset"],
+            optional: connection["opts"]["optional"]
           }
         }
 
@@ -438,7 +439,8 @@ defmodule Buildel.Pipelines do
              type: input_type
            },
            opts: %{
-             reset: true
+             reset: true,
+             optional: false
            }
          },
          {:ok, true} <- connection_valid?(pipeline.config, connection) do
@@ -452,7 +454,7 @@ defmodule Buildel.Pipelines do
                   "block_name" => connection.from.block_name,
                   "output_name" => connection.from.name
                 },
-                "opts" => %{"reset" => connection.opts.reset},
+                "opts" => %{"reset" => connection.opts.reset, "optional" => connection.opts.optional},
                 "to" => %{
                   "block_name" => connection.to.block_name,
                   "input_name" => connection.to.name

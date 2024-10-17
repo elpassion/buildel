@@ -406,7 +406,7 @@ defmodule Buildel.PipelinesTest do
                        block_name: "workflow_call_1",
                        type: "text"
                      },
-                     opts: %{reset: true}
+                     opts: %{reset: true, optional: false}
                    }
                  ]
                }),
@@ -425,7 +425,7 @@ defmodule Buildel.PipelinesTest do
                        block_name: "text_output_1",
                        type: "text"
                      },
-                     opts: %{reset: true}
+                     opts: %{reset: true, optional: false}
                    }
                  ]
                })

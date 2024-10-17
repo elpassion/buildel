@@ -18,7 +18,7 @@ defmodule Buildel.Blocks.Connection do
     %Buildel.Blocks.Connection{
       from: %Buildel.Blocks.Output{name: output_name, block_name: block_name, type: from_type},
       to: %Buildel.Blocks.Input{name: input_name, block_name: to_block_name, type: to_type},
-      opts: %{reset: reset}
+      opts: %{reset: reset, optional: false}
     }
   end
 
@@ -27,6 +27,8 @@ defmodule Buildel.Blocks.Connection do
       if is_boolean(connection["opts"]["reset"]),
         do: connection["opts"]["reset"],
         else: true
+
+    optional = connection["opts"]["optional"] || false
 
     %Buildel.Blocks.Connection{
       from: %Buildel.Blocks.Output{
@@ -39,7 +41,7 @@ defmodule Buildel.Blocks.Connection do
         block_name: connection["to"]["block_name"],
         type: to_type
       },
-      opts: %{reset: reset}
+      opts: %{reset: reset, optional: optional}
     }
   end
 
@@ -90,7 +92,7 @@ defmodule Buildel.Blocks.Connection do
           block_name: from_block_name
         },
         to: %Buildel.Blocks.Input{name: to.name, type: to.type, block_name: to_block_name},
-        opts: %{reset: reset}
+        opts: %{reset: reset, optional: false}
       }
     end)
   end

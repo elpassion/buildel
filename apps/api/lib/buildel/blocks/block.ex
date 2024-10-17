@@ -561,7 +561,7 @@ defmodule Buildel.Blocks.Block do
               block_name: block_name,
               type: input.type
             },
-            opts: %{reset: true}
+            opts: %{reset: true, optional: false}
           }
         end)
       end
