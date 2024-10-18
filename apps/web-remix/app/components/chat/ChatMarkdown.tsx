@@ -55,7 +55,7 @@ export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
 const DETAILS_PATTERN =
   /<details>\s*<summary>(.*?)<\/summary>\s*([\s\S]*?)<\/details>/g;
 
-function mergeAdjacentDetailsWithSameSummary(markdown: string): string {
+export function mergeAdjacentDetailsWithSameSummary(markdown: string): string {
   let result = '';
   let lastIndex = 0;
   const contentMap = new Map<string, string[]>();
@@ -63,7 +63,7 @@ function mergeAdjacentDetailsWithSameSummary(markdown: string): string {
   markdown.replace(
     DETAILS_PATTERN,
     (match: string, summary: string, content: string, offset: number) => {
-      if (hasTextBetween(lastIndex, offset)) {
+      if (hasTextBetween(markdown, lastIndex, offset)) {
         result += createDetailsElementsFromMap(contentMap);
         contentMap.clear();
       }
@@ -117,8 +117,10 @@ function createListItem(content: string) {
   return `<li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">${content}</span></li>`;
 }
 
-function hasTextBetween(lastIndex: number, offset: number) {
-  return lastIndex !== offset;
+function hasTextBetween(markdown: string, lastIndex: number, offset: number) {
+  return (
+    lastIndex !== offset && markdown.slice(lastIndex, offset).trim().length > 0
+  );
 }
 function Strong({
   children,
