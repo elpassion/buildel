@@ -47,11 +47,79 @@ export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
       }}
       {...rest}
     >
-      {children}
+      {mergeAdjacentDetailsWithSameSummary(children)}
     </Markdown>
   );
 };
 
+const DETAILS_PATTERN =
+  /<details>\s*<summary>(.*?)<\/summary>\s*([\s\S]*?)<\/details>/g;
+
+function mergeAdjacentDetailsWithSameSummary(markdown: string): string {
+  let result = '';
+  let lastIndex = 0;
+  const contentMap = new Map<string, string[]>();
+
+  markdown.replace(
+    DETAILS_PATTERN,
+    (match: string, summary: string, content: string, offset: number) => {
+      if (hasTextBetween(lastIndex, offset)) {
+        result += createDetailsElementsFromMap(contentMap);
+        contentMap.clear();
+      }
+
+      result += markdown.slice(lastIndex, offset);
+      lastIndex = offset + match.length;
+
+      summary = summary.trim();
+      content = content.trim();
+
+      if (contentMap.has(summary)) {
+        contentMap.set(summary, [...contentMap.get(summary)!, content]);
+      } else {
+        contentMap.set(summary, [content]);
+      }
+
+      return '';
+    },
+  );
+
+  if (contentMap.size > 0) {
+    result += createDetailsElementsFromMap(contentMap);
+    contentMap.clear();
+  }
+
+  result += markdown.slice(lastIndex);
+
+  return result;
+}
+
+function createDetailsElementsFromMap(map: Map<string, string[]>) {
+  return [...map.keys()]
+    .map((summary) => {
+      return createDetailsElement(summary, map.get(summary));
+    })
+    .join('');
+}
+
+function createDetailsElement(summary: string, contents: string[] = []) {
+  return `<details class="text-sm border border-input rounded-md w-fit py-2 my-2">
+<summary class="cursor-pointer list-none -ml-1 px-4">${summary}</summary>
+${createMergedContent(contents)}
+</details>`;
+}
+
+function createMergedContent(contents: string[]) {
+  return `<ul class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5">${contents.map(createListItem).join('')}</ul>`;
+}
+
+function createListItem(content: string) {
+  return `<li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">${content}</span></li>`;
+}
+
+function hasTextBetween(lastIndex: number, offset: number) {
+  return lastIndex !== offset;
+}
 function Strong({
   children,
   className,
