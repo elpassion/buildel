@@ -11,6 +11,7 @@ import { logout } from '~/session.server';
 
 import { getCurrentUserOrNull } from './utils/currentUser.server';
 import {
+  BillingError,
   NotFoundError,
   UnauthorizedError,
   UnknownAPIError,
@@ -43,6 +44,8 @@ export const loaderBuilder =
         );
       } else if (e instanceof NotFoundError) {
         throw notFound();
+      } else if (e instanceof BillingError) {
+        console.log('Billing Error', e);
       } else if (e instanceof UnauthorizedError) {
         const request = args.request;
 
@@ -136,6 +139,14 @@ export const actionBuilder =
         });
       } else if (e instanceof NotFoundError) {
         throw notFound();
+      } else if (e instanceof BillingError) {
+        throw redirect(actionArgs.request.url, {
+          headers: {
+            'Set-Cookie': await setServerToast(actionArgs.request, {
+              error: e.message,
+            }),
+          },
+        });
       } else if (e instanceof UnknownAPIError) {
         return json(
           { error: 'Unknown API error' },
