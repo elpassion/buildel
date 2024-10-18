@@ -39,49 +39,69 @@ defmodule Buildel.Blocks.NewChatTest do
   end
 
   describe "Chat Run" do
-    setup [:create_run]
+    test "outputs chat response" do
+      %{run: test_run} = create_run()
 
-    test "outputs chat response", %{run: test_run} do
       message = Message.new(:text, "test")
 
       test_run
       |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
-      |> BlocksTestRunner.with_chat(fn _opts ->
+      |> BlocksTestRunner.with_chat(fn opts ->
+        IO.inspect(opts)
         nil
       end)
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.test_input(message)
-      |> BlocksTestRunner.wait()
-      |> BlocksTestRunner.stream_through_chat(:content, ["Hello!"])
-      |> BlocksTestRunner.stream_through_chat(:end)
+      |> BlocksTestRunner.wait(50)
+      |> BlocksTestRunner.stream_through_chat(:content, ["H"])
+      |> BlocksTestRunner.stream_through_chat(:content, ["ello!"])
       |> assert_receive_message(
         "test",
         :output,
         message
         |> Message.from_message()
         |> Message.set_type(:text)
-        |> Message.set_message("Hello!")
+        |> Message.set_message("H"),
+        stop_stream: :none
       )
+      |> assert_receive_message(
+        "test",
+        :output,
+        message
+        |> Message.from_message()
+        |> Message.set_type(:text)
+        |> Message.set_message("ello!"),
+        start_stream: :none,
+        stop_stream: :none
+      )
+      |> BlocksTestRunner.stream_through_chat(:end)
+      |> assert_receive_stop_stream("test", :output)
     end
 
-    def create_run(_) do
+    def create_run(opts \\ %{}) do
+      opts =
+        Map.merge(
+          %{
+            api_type: "openai",
+            api_key: "key",
+            endpoint: "http://example.com",
+            model: "gpt-4o-mini",
+            temperature: 0.1,
+            max_tokens: 0,
+            response_format: "text",
+            system_message: "hello",
+            messages: [%{role: "user", content: "hello world"}],
+            prompt_template: "{{TEST_INPUT:output}}"
+          },
+          opts
+        )
+
       {:ok, run} =
         BlocksTestRunner.start_run(%{
           blocks: [
             NewChat.create(%{
               name: "test",
-              opts: %{
-                api_type: "openai",
-                api_key: "key",
-                endpoint: "http://example.com",
-                model: "gpt-4o-mini",
-                temperature: 0.1,
-                max_tokens: 0,
-                response_format: "text",
-                system_message: "hello",
-                messages: [%{role: "user", content: "hello world"}],
-                prompt_template: "{{TEST_INPUT:output}}"
-              },
+              opts: opts,
               connections: [
                 BlocksTestRunner.test_text_input_connection(:input)
               ]

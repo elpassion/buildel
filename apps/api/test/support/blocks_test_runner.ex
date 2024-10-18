@@ -167,8 +167,8 @@ defmodule Buildel.BlocksTestRunner do
     run
   end
 
-  def wait(run) do
-    Process.sleep(50)
+  def wait(run, time \\ 50) do
+    Process.sleep(time)
     run
   end
 
