@@ -1,6 +1,12 @@
 defmodule Buildel.BlocksTestRunner.Run do
   defstruct [:pid, :config, subscriptions: %{}]
 
+  @type t :: %__MODULE__{
+          pid: pid(),
+          config: map(),
+          subscriptions: map()
+        }
+
   def add_subscriptions(run, subscriptions) do
     %{run | subscriptions: Map.merge(run.subscriptions, subscriptions)}
   end

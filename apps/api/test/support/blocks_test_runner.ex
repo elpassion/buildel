@@ -159,6 +159,7 @@ defmodule Buildel.BlocksTestRunner do
     run
   end
 
+  @spec stream_through_chat(Run.t(), :content | :end, list(any())) :: Run.t()
   def stream_through_chat(run, type, args \\ []) do
     Buildel.ClientMocks.Chat.get_mock(:"on_#{type}")
     |> apply(args)
