@@ -85,6 +85,17 @@ defmodule Buildel.BlockCase do
         assert_receive {^topic, :error, [^error], %{}}, 1000
       end
 
+      def refute_receive_error(%Run{} = run, block_name, error) do
+        topic = run.subscriptions[block_name]
+        refute_receive_error(topic, error)
+
+        run
+      end
+
+      def refute_receive_error(topic, error) do
+        refute_receive {^topic, :error, [^error], %{}}, 1000
+      end
+
       def assert_receive_start_stream(
             %Run{} = run,
             block_name,
@@ -99,6 +110,20 @@ defmodule Buildel.BlockCase do
         assert_receive({^topic, :start_stream, %Message{}, _}, 1000)
       end
 
+      def refute_receive_start_stream(
+            %Run{} = run,
+            block_name,
+            output_name
+          ) do
+        topic = run.subscriptions["#{block_name}_#{output_name |> to_string()}"]
+        refute_receive_start_stream(topic)
+        run
+      end
+
+      def refute_receive_start_stream(topic) do
+        refute_receive({^topic, :start_stream, %Message{}, _}, 1000)
+      end
+
       def assert_receive_stop_stream(
             %Run{} = run,
             block_name,
@@ -111,6 +136,20 @@ defmodule Buildel.BlockCase do
 
       def assert_receive_stop_stream(topic) do
         assert_receive({^topic, :stop_stream, %Message{}, _}, 1000)
+      end
+
+      def refute_receive_stop_stream(
+            %Run{} = run,
+            block_name,
+            output_name
+          ) do
+        topic = run.subscriptions["#{block_name}_#{output_name |> to_string()}"]
+        refute_receive_stop_stream(topic)
+        run
+      end
+
+      def refute_receive_stop_stream(topic) do
+        refute_receive({^topic, :stop_stream, %Message{}, _}, 1000)
       end
     end
   end

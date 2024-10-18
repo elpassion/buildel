@@ -75,7 +75,6 @@ defmodule Buildel.Clients.NewChat do
     else
       {:error, _chain, reason} ->
         if String.contains?(reason, "maximum context length") do
-          opts[:on_error].(:context_length_exceeded)
           {:error, :context_length_exceeded}
         else
           opts[:on_error].(reason)

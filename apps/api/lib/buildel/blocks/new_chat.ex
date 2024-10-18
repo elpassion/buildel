@@ -238,38 +238,53 @@ defmodule Buildel.Blocks.NewChat do
     fn ->
       send_stream_start(state, :output, message)
 
-      {:ok, chat_messages, state} =
-        fill_chat_messages(state)
+      with {:ok, chat_messages, state} <- fill_chat_messages(state),
+           {:ok, _, _} <-
+             chat().stream_chat(
+               messages: chat_messages,
+               model: option(state, :model),
+               api_key: secret(state, option(state, :api_key)),
+               temperature: option(state, :temperature),
+               endpoint: option(state, :endpoint),
+               api_type: option(state, :api_type),
+               response_format: option(state, :response_format),
+               max_tokens: option(state, :max_tokens),
+               on_content: fn text_chunk ->
+                 send(pid, {:save_chat_chunk, text_chunk})
 
-      chat().stream_chat(
-        messages: chat_messages,
-        model: option(state, :model),
-        api_key: secret(state, option(state, :api_key)),
-        temperature: option(state, :temperature),
-        endpoint: option(state, :endpoint),
-        api_type: option(state, :api_type),
-        response_format: option(state, :response_format),
-        max_tokens: option(state, :max_tokens),
-        on_content: fn text_chunk ->
-          send(pid, {:save_chat_chunk, text_chunk})
+                 output(
+                   state,
+                   :output,
+                   Message.from_message(message)
+                   |> Message.set_type(:text)
+                   |> Message.set_message(text_chunk),
+                   stream_stop: :none
+                 )
+               end,
+               on_end: fn ->
+                 send_stream_stop(state, :output, message)
+               end,
+               on_error: fn
+                 error ->
+                   send_error(state, error)
+                   send_stream_stop(state, :output, message)
+               end
+             ) do
+        nil
+      else
+        {:error, :context_length_exceeded} ->
+          case state.memory do
+            %{type: :full} ->
+              send_error(state, :context_length_exceeded)
+              send_stream_stop(state, :output, message)
 
-          output(
-            state,
-            :output,
-            Message.from_message(message)
-            |> Message.set_type(:text)
-            |> Message.set_message(text_chunk),
-            stream_stop: :none
-          )
-        end,
-        on_end: fn ->
-          send_stream_stop(state, :output, message)
-        end,
-        on_error: fn error ->
-          send_error(state, error)
-          send_stream_stop(state, :output, message)
-        end
-      )
+            %{type: :rolling} ->
+              send(pid, {:remove_latest_message_and_start_chat_completion, message})
+          end
+
+        error ->
+          error
+      end
     end
   end
 
@@ -358,5 +373,18 @@ defmodule Buildel.Blocks.NewChat do
   def handle_info({:save_chat_chunk, chat_message}, state) do
     {:ok, state} = save_chat_chunk(state, chat_message)
     {:noreply, state}
+  end
+
+  def handle_info({:remove_latest_message_and_start_chat_completion, message}, state) do
+    with {:ok, memory} <- ChatMemory.drop_first_non_initial_message(state.memory),
+         state <- put_in(state.memory, memory),
+         {:ok, state} <- start_chat_completion(state, message) do
+      {:noreply, state}
+    else
+      {:error, :full_chat_memory} ->
+        send_error(state, :full_chat_memory)
+        send_stream_stop(state, :output, message)
+        {:noreply, state}
+    end
   end
 end

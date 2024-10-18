@@ -48,7 +48,7 @@ defmodule Buildel.Blocks.NewChatTest do
       test_run
       |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
       |> BlocksTestRunner.with_chat(fn _opts ->
-        nil
+        {:ok, :doesnotmatter, :doesnotmatter}
       end)
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.test_input(message)
@@ -100,7 +100,7 @@ defmodule Buildel.Blocks.NewChatTest do
                  %{role: "user", content: "test test_2"}
                ] = opts[:messages]
 
-        nil
+        {:ok, :doesnotmatter, :doesnotmatter}
       end)
       |> BlocksTestRunner.test_input_2(message_2)
       |> BlocksTestRunner.wait()
@@ -121,6 +121,8 @@ defmodule Buildel.Blocks.NewChatTest do
                  %{role: "user", content: "hello world"},
                  %{role: "user", content: "test test_2"}
                ] = opts[:messages]
+
+        {:ok, :doesnotmatter, :doesnotmatter}
       end)
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.test_input(message)
@@ -144,11 +146,12 @@ defmodule Buildel.Blocks.NewChatTest do
 
       message = Message.new(:text, "test")
       message_2 = Message.new(:text, "test_2")
+      message_3 = Message.new(:text, "test_3")
 
       test_run
       |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
       |> BlocksTestRunner.with_chat(fn _opts ->
-        nil
+        {:ok, :doesnotmatter, :doesnotmatter}
       end)
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.test_input(message)
@@ -165,10 +168,37 @@ defmodule Buildel.Blocks.NewChatTest do
                  %{role: "user", content: "test_2"}
                ] = opts[:messages]
 
-        nil
+        {:ok, :doesnotmatter, :doesnotmatter}
       end)
       |> BlocksTestRunner.test_input(message_2)
       |> BlocksTestRunner.wait()
+      |> BlocksTestRunner.with_chat(fn _opts ->
+        {:error, :context_length_exceeded}
+      end)
+      |> BlocksTestRunner.test_input(message_3)
+      |> BlocksTestRunner.wait()
+      |> assert_receive_stop_stream("test", :output)
+      |> assert_receive_error("test", :context_length_exceeded)
+    end
+
+    test "works with rolling memory" do
+      %{run: test_run} =
+        create_run(%{
+          chat_memory_type: "rolling"
+        })
+
+      message = Message.new(:text, "test")
+
+      test_run
+      |> BlocksTestRunner.subscribe_to_block("test")
+      |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
+      |> BlocksTestRunner.with_chat(fn opts ->
+        {:error, :context_length_exceeded}
+      end)
+      |> BlocksTestRunner.test_input(message)
+      |> BlocksTestRunner.wait()
+      |> refute_receive_stop_stream("test", :output)
+      |> refute_receive_error("test", :context_length_exceeded)
     end
 
     def create_run(opts \\ %{}) do
