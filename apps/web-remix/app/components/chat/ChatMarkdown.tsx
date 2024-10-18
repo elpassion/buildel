@@ -394,7 +394,7 @@ function Code({
     });
   }
 
-  if (className?.includes('lang-buildel_message_attachments')) {
+  if (className?.includes('language-buildel_message_attachments')) {
     try {
       const attachments = MessageAttachments.parse(
         JSON.parse((children || '').toString()),
