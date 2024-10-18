@@ -82,6 +82,7 @@ defmodule Buildel.Blocks.NewChatTest do
         create_run(%{prompt_template: "{{TEST_INPUT:output}} {{TEST_INPUT_2:output}}"})
 
       message = Message.new(:text, "test")
+      message_2 = Message.new(:text, "test_2")
 
       test_run
       |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
@@ -91,6 +92,43 @@ defmodule Buildel.Blocks.NewChatTest do
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.test_input(message)
       |> assert_receive_start_stream("test", :output)
+      |> BlocksTestRunner.with_chat(fn opts ->
+        assert [
+                 %{role: "system", content: "hello"},
+                 %{role: "user", content: "hello world"},
+                 %{role: "user", content: "test test_2"}
+               ] = opts[:messages]
+
+        nil
+      end)
+      |> BlocksTestRunner.test_input_2(message_2)
+      |> BlocksTestRunner.wait()
+    end
+
+    test "resets messages" do
+      %{run: test_run} =
+        create_run(%{prompt_template: "{{TEST_INPUT:output}} {{TEST_INPUT_2:output}}"})
+
+      message = Message.new(:text, "test")
+      message_2 = Message.new(:text, "test_2")
+
+      test_run
+      |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
+      |> BlocksTestRunner.with_chat(fn _opts ->
+        nil
+      end)
+      |> BlocksTestRunner.subscribe_to_block("test")
+      |> BlocksTestRunner.test_input(message)
+      |> BlocksTestRunner.test_input_2(message_2)
+      |> BlocksTestRunner.wait()
+      |> BlocksTestRunner.stream_through_chat(:content, ["H"])
+      |> BlocksTestRunner.stream_through_chat(:end)
+      |> assert_receive_stop_stream("test", :output)
+      |> BlocksTestRunner.with_chat(fn _opts ->
+        raise "Should not run"
+      end)
+      |> BlocksTestRunner.test_input(message)
+      |> BlocksTestRunner.wait()
     end
 
     def create_run(opts \\ %{}) do
