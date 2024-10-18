@@ -20,6 +20,12 @@ export class UnauthorizedError extends Error {
   }
 }
 
+export class BillingError extends Error {
+  constructor(msg: string) {
+    super(msg);
+  }
+}
+
 export class NotFoundError extends Error {
   constructor() {
     super('Not found');

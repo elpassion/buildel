@@ -3,6 +3,7 @@ import { LRUCache } from 'lru-cache';
 import type { z, ZodType } from 'zod';
 
 import {
+  BillingError,
   NotFoundError,
   UnauthorizedError,
   UnknownAPIError,
@@ -58,6 +59,12 @@ export async function fetchTyped<T extends ZodType>(
       throw new ValidationError(deepMergeAPIErrors(jsonResponse.errors));
     } else if (response.status === 401) {
       throw new UnauthorizedError();
+    } else if (response.status === 403) {
+      const jsonResponse = await response.json();
+
+      if (jsonResponse.errorCode === 'BILLING_LIMIT_EXCEEDED') {
+        throw new BillingError(jsonResponse.message);
+      }
     } else if (response.status === 404) {
       throw new NotFoundError();
     } else {
