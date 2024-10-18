@@ -13,32 +13,33 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
     chat_memory.messages |> Enum.reverse()
   end
 
-  def add_message(%__MODULE__{messages: existing_messages} = chat_memory, new_message) do
-    %__MODULE__{chat_memory | messages: [new_message | existing_messages]}
-  end
+  def add_message(module, %{role: "user"} = message), do: add_user_message(module, message)
+
+  def add_message(module, %{role: "assistant"} = message),
+    do: add_assistant_chunk(module, message)
 
   def add_user_message(%__MODULE__{messages: [%{role: "user"} | _]} = chat_memory, %{
         content: content
       }) do
     if Enum.count(chat_memory.messages) == Enum.count(chat_memory.initial_messages) do
-      add_message(chat_memory, %{role: "user", content: content})
+      do_add_message(chat_memory, %{role: "user", content: content})
     else
       chat_memory
     end
   end
 
   def add_user_message(%__MODULE__{} = chat_memory, %{content: content}) do
-    add_message(chat_memory, %{role: "user", content: content})
+    do_add_message(chat_memory, %{role: "user", content: content})
   end
 
   def add_assistant_message(%__MODULE__{} = chat_memory, %{content: content}) do
-    add_message(chat_memory, %{role: "assistant", content: content})
+    do_add_message(chat_memory, %{role: "assistant", content: content})
   end
 
   def add_tool_calls_message(%__MODULE__{} = chat_memory, %{
         tool_calls: tool_calls
       }) do
-    add_message(chat_memory, %{
+    do_add_message(chat_memory, %{
       role: "tool_call",
       content: nil,
       tool_calls:
@@ -57,7 +58,7 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
   def add_tool_results_message(%__MODULE__{} = chat_memory, %{
         tool_results: tool_results
       }) do
-    add_message(chat_memory, %{
+    do_add_message(chat_memory, %{
       role: "tool",
       content: nil,
       tool_results:
@@ -113,5 +114,9 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
 
   def drop_first_non_initial_message(%__MODULE__{}) do
     {:error, :full_chat_memory}
+  end
+
+  defp do_add_message(%__MODULE__{messages: existing_messages} = chat_memory, new_message) do
+    %__MODULE__{chat_memory | messages: [new_message | existing_messages]}
   end
 end

@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.NewChat do
+  alias Buildel.Blocks.Utils.ChatMemory
   alias Buildel.Blocks.Fields.EditorField
   alias EditorField.Suggestion
   use Buildel.Blocks.NewBlock
@@ -78,6 +79,16 @@ defmodule Buildel.Blocks.NewChat do
     "presentAs" => "async-select",
     "minLength" => 1,
     "readonly" => true
+  })
+
+  defoption(:chat_memory_type, %{
+    "type" => "string",
+    "title" => "Chat memory type",
+    "description" => "The chat memory type to use for the chat.",
+    "enum" => ["off", "full", "rolling"],
+    "enumPresentAs" => "radio",
+    "default" => "full",
+    "minLength" => 1
   })
 
   defoption(:temperature, %{
@@ -184,9 +195,10 @@ defmodule Buildel.Blocks.NewChat do
     send_stream_start(state, :output, message)
 
     with {:ok, state} <- save_input_message(state, message),
-         {:ok, _chat_messages, state} <- fill_chat_messages(state),
-         {:ok, state} <- start_chat_completion(state, message) do
-      state = reset_latest_messages(state)
+         {:ok, chat_messages, state} <- fill_chat_messages(state),
+         {:ok, state} <- start_chat_completion(state, message),
+         {:ok, state} <- save_chat_message(state, chat_messages |> Enum.at(-1)),
+         state <- reset_latest_messages(state) do
       {:ok, state}
     else
       {:error, :not_all_chat_messages_filled, state} ->
@@ -221,10 +233,13 @@ defmodule Buildel.Blocks.NewChat do
   end
 
   defp chat_completion_task(state, message) do
+    pid = self()
+
     fn ->
       send_stream_start(state, :output, message)
 
-      {:ok, chat_messages, state} = fill_chat_messages(state)
+      {:ok, chat_messages, state} =
+        fill_chat_messages(state)
 
       chat().stream_chat(
         messages: chat_messages,
@@ -236,6 +251,8 @@ defmodule Buildel.Blocks.NewChat do
         response_format: option(state, :response_format),
         max_tokens: option(state, :max_tokens),
         on_content: fn text_chunk ->
+          send(pid, {:save_chat_chunk, text_chunk})
+
           output(
             state,
             :output,
@@ -262,13 +279,22 @@ defmodule Buildel.Blocks.NewChat do
 
   defp initial_messages(state) do
     [%{role: "system", content: option(state, :system_message)}] ++
-      option(state, :messages) ++
-      [%{role: "user", content: option(state, :prompt_template)}]
+      option(state, :messages)
   end
 
   defp fill_chat_messages(state) do
+    state =
+      Map.put_new_lazy(state, :memory, fn ->
+        ChatMemory.new(%{
+          initial_messages: initial_messages(state),
+          type: option(state, :chat_memory_type)
+        })
+      end)
+
     with filled_chat_messages <-
-           initial_messages(state)
+           state.memory
+           |> ChatMemory.get_messages()
+           |> Kernel.++([%{role: "user", content: option(state, :prompt_template)}])
            |> Enum.map(&fill_chat_message(latest_messages_to_inputs(state.latest_messages), &1)) do
       if(Enum.member?(filled_chat_messages, :error)) do
         {:error, :not_all_chat_messages_filled, state}
@@ -317,5 +343,40 @@ defmodule Buildel.Blocks.NewChat do
   defp fill_chat_message(inputs, chat_message) do
     inputs
     |> Enum.reduce(chat_message, &fill_chat_message/2)
+  end
+
+  defp save_chat_message(state, new_chat_message) do
+    case option(state, :chat_memory_type) do
+      "off" ->
+        {:ok, state}
+
+      _ ->
+        state =
+          update_in(state.memory, fn memory ->
+            memory |> ChatMemory.add_user_message(new_chat_message)
+          end)
+
+        {:ok, state}
+    end
+  end
+
+  defp save_chat_chunk(state, chunk) do
+    case option(state, :chat_memory_type) do
+      "off" ->
+        {:ok, state}
+
+      _ ->
+        state =
+          update_in(state.memory, fn memory ->
+            memory |> ChatMemory.add_assistant_chunk(chunk)
+          end)
+
+        {:ok, state}
+    end
+  end
+
+  def handle_info({:save_chat_chunk, chat_message}, state) do
+    {:ok, state} = save_chat_chunk(state, chat_message)
+    {:noreply, state}
   end
 end

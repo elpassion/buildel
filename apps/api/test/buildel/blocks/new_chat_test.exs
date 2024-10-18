@@ -30,7 +30,8 @@ defmodule Buildel.Blocks.NewChatTest do
                    response_format: "text",
                    system_message: "hello",
                    messages: [%{role: "user", content: "hello world"}],
-                   prompt_template: "{{TEST_INPUT:output}}"
+                   prompt_template: "{{TEST_INPUT:output}}",
+                   chat_memory_type: "full"
                  }
                })
 
@@ -114,8 +115,12 @@ defmodule Buildel.Blocks.NewChatTest do
 
       test_run
       |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
-      |> BlocksTestRunner.with_chat(fn _opts ->
-        nil
+      |> BlocksTestRunner.with_chat(fn opts ->
+        assert [
+                 %{role: "system", content: "hello"},
+                 %{role: "user", content: "hello world"},
+                 %{role: "user", content: "test test_2"}
+               ] = opts[:messages]
       end)
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.test_input(message)
@@ -128,6 +133,41 @@ defmodule Buildel.Blocks.NewChatTest do
         raise "Should not run"
       end)
       |> BlocksTestRunner.test_input(message)
+      |> BlocksTestRunner.wait()
+    end
+
+    test "works with full memory" do
+      %{run: test_run} =
+        create_run(%{
+          chat_memory_type: "full"
+        })
+
+      message = Message.new(:text, "test")
+      message_2 = Message.new(:text, "test_2")
+
+      test_run
+      |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
+      |> BlocksTestRunner.with_chat(fn _opts ->
+        nil
+      end)
+      |> BlocksTestRunner.subscribe_to_block("test")
+      |> BlocksTestRunner.test_input(message)
+      |> BlocksTestRunner.wait()
+      |> BlocksTestRunner.stream_through_chat(:content, ["H"])
+      |> BlocksTestRunner.stream_through_chat(:end)
+      |> assert_receive_stop_stream("test", :output)
+      |> BlocksTestRunner.with_chat(fn opts ->
+        assert [
+                 %{role: "system", content: "hello"},
+                 %{role: "user", content: "hello world"},
+                 %{role: "user", content: "test"},
+                 %{role: "assistant", content: "H"},
+                 %{role: "user", content: "test_2"}
+               ] = opts[:messages]
+
+        nil
+      end)
+      |> BlocksTestRunner.test_input(message_2)
       |> BlocksTestRunner.wait()
     end
 
@@ -144,7 +184,8 @@ defmodule Buildel.Blocks.NewChatTest do
             response_format: "text",
             system_message: "hello",
             messages: [%{role: "user", content: "hello world"}],
-            prompt_template: "{{TEST_INPUT:output}}"
+            prompt_template: "{{TEST_INPUT:output}}",
+            chat_memory_type: "off"
           },
           opts
         )
