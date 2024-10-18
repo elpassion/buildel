@@ -181,6 +181,8 @@ defmodule Buildel.Blocks.NewChat do
   )
 
   def handle_input(:input, %Message{} = message, state) do
+    send_stream_start(state, :output, message)
+
     with {:ok, state} <- save_input_message(state, message),
          {:ok, _chat_messages, state} <- fill_chat_messages(state),
          {:ok, state} <- start_chat_completion(state, message) do

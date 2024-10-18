@@ -46,8 +46,7 @@ defmodule Buildel.Blocks.NewChatTest do
 
       test_run
       |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
-      |> BlocksTestRunner.with_chat(fn opts ->
-        IO.inspect(opts)
+      |> BlocksTestRunner.with_chat(fn _opts ->
         nil
       end)
       |> BlocksTestRunner.subscribe_to_block("test")
@@ -78,6 +77,22 @@ defmodule Buildel.Blocks.NewChatTest do
       |> assert_receive_stop_stream("test", :output)
     end
 
+    test "collects messages" do
+      %{run: test_run} =
+        create_run(%{prompt_template: "{{TEST_INPUT:output}} {{TEST_INPUT_2:output}}"})
+
+      message = Message.new(:text, "test")
+
+      test_run
+      |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
+      |> BlocksTestRunner.with_chat(fn _opts ->
+        raise "Should not be called"
+      end)
+      |> BlocksTestRunner.subscribe_to_block("test")
+      |> BlocksTestRunner.test_input(message)
+      |> assert_receive_start_stream("test", :output)
+    end
+
     def create_run(opts \\ %{}) do
       opts =
         Map.merge(
@@ -103,7 +118,8 @@ defmodule Buildel.Blocks.NewChatTest do
               name: "test",
               opts: opts,
               connections: [
-                BlocksTestRunner.test_text_input_connection(:input)
+                BlocksTestRunner.test_text_input_connection(:input),
+                BlocksTestRunner.test_text_input_2_connection(:input)
               ]
             })
           ]
