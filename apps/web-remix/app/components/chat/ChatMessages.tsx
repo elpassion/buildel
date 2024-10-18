@@ -50,6 +50,20 @@ export function ChatMessages({
     }
   }, [messages, inView]);
 
+  const renderItem = useCallback(
+    (msg: IMessage) => {
+      const { message, links } = addReferenceToLinks(msg.message);
+      return (
+        <ChatMessage message={msg} size={size}>
+          <ChatMarkdown>{message}</ChatMarkdown>
+
+          <EmbedLinksList links={links} />
+        </ChatMessage>
+      );
+    },
+    [size],
+  );
+
   return (
     <ItemList
       ref={listRef}
@@ -58,16 +72,7 @@ export function ChatMessages({
       )}
       itemClassName="w-full pl-3 pr-1"
       items={reversed}
-      renderItem={(msg) => {
-        const { message, links } = addReferenceToLinks(msg.message);
-        return (
-          <ChatMessage message={msg} size={size}>
-            <ChatMarkdown>{message}</ChatMarkdown>
-
-            <EmbedLinksList links={links} />
-          </ChatMessage>
-        );
-      }}
+      renderItem={renderItem}
     >
       {children}
 

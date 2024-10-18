@@ -1,9 +1,10 @@
 import type { AnchorHTMLAttributes } from 'react';
 import React, { useEffect, useMemo, useRef } from 'react';
+import type { Options } from 'react-markdown';
+import Markdown from 'react-markdown';
 import { Check, Copy } from 'lucide-react';
-import Markdown from 'markdown-to-jsx';
-import type { MarkdownToJSX } from 'markdown-to-jsx';
 import mermaid from 'mermaid';
+import rehypeRaw from 'rehype-raw';
 import { z } from 'zod';
 
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
@@ -12,7 +13,7 @@ import { cn } from '~/utils/cn';
 interface ChatMarkdownProps {
   [key: string]: any;
   children: string;
-  options?: MarkdownToJSX.Options;
+  options?: Options;
 }
 
 export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
@@ -22,62 +23,27 @@ export const ChatMarkdown: React.FC<ChatMarkdownProps> = ({
 }) => {
   return (
     <Markdown
-      options={{
-        overrides: {
-          style: {
-            component: Span,
-          },
-          script: {
-            component: Span,
-          },
-          p: {
-            component: Paragraph,
-          },
-          span: {
-            component: Span,
-          },
-          pre: {
-            component: Pre,
-          },
-          code: {
-            component: Code,
-          },
-          div: {
-            component: Div,
-          },
-          h6: {
-            component: H6,
-          },
-          h5: {
-            component: H5,
-          },
-          h4: {
-            component: H4,
-          },
-          h3: {
-            component: H3,
-          },
-          h2: {
-            component: H2,
-          },
-          h1: {
-            component: H1,
-          },
-
-          li: {
-            component: Li,
-          },
-          a: {
-            component: Link,
-          },
-          img: {
-            component: Image,
-          },
-          strong: {
-            component: Strong,
-          },
-        },
-        ...options,
+      rehypePlugins={[rehypeRaw]}
+      {...options}
+      components={{
+        style: Span,
+        script: Span,
+        p: Paragraph,
+        span: Span,
+        pre: Pre,
+        code: Code,
+        div: Div,
+        h6: H6,
+        h5: H5,
+        h4: H4,
+        h3: H3,
+        h2: H2,
+        h1: H1,
+        li: Li,
+        a: Link,
+        img: Image,
+        strong: Strong,
+        ...options?.components,
       }}
       {...rest}
     >
@@ -345,9 +311,10 @@ function Code({
   children,
   className,
   ...rest
-}: React.ParamHTMLAttributes<HTMLPreElement>) {
+}: React.ParamHTMLAttributes<HTMLElement>) {
   const codeRef = useRef<HTMLElement>(null);
-  const isMermaidCode = className?.includes('lang-mermaid');
+  const isMermaidCode = className?.includes('language-mermaid');
+
   if (isMermaidCode) {
     mermaid.initialize({
       theme: 'default',
@@ -356,18 +323,23 @@ function Code({
       nodes: [codeRef.current!],
     });
   }
+
   if (className?.includes('lang-buildel_message_attachments')) {
     try {
       const attachments = MessageAttachments.parse(
         JSON.parse((children || '').toString()),
       );
-      return attachments.map((attachment) => {
-        return <div key={attachment.id}>{attachment.file_name}</div>;
-      });
+      return (
+        <>
+          {attachments.map((attachment) => {
+            return <div key={attachment.id}>{attachment.file_name}</div>;
+          })}
+        </>
+      );
     } catch (e) {
       console.error(e);
     }
-    return 'Uploaded files';
+    return <>Uploaded files</>;
   }
 
   return (
@@ -462,7 +434,7 @@ function shouldBeTruncated(child: { props: Record<string, unknown> }) {
 }
 
 function getLanguage(className?: string) {
-  return className?.match(/lang-(\w+)/)?.[1];
+  return className?.match(/language-(\w+)/)?.[1];
 }
 
 function truncateString(str: string, maxLength: number) {
