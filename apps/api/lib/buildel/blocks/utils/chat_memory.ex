@@ -13,10 +13,14 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
     chat_memory.messages |> Enum.reverse()
   end
 
+  def add_message(%__MODULE__{type: :off} = chat_memory, _message), do: chat_memory
+
   def add_message(module, %{role: "user"} = message), do: add_user_message(module, message)
 
   def add_message(module, %{role: "assistant"} = message),
     do: add_assistant_chunk(module, message)
+
+  def add_user_message(%__MODULE__{type: :off} = chat_memory, _message), do: chat_memory
 
   def add_user_message(%__MODULE__{messages: [%{role: "user"} | _]} = chat_memory, %{
         content: content
@@ -35,6 +39,8 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
   def add_assistant_message(%__MODULE__{} = chat_memory, %{content: content}) do
     do_add_message(chat_memory, %{role: "assistant", content: content})
   end
+
+  def add_tool_calls_message(%__MODULE__{type: :off} = chat_memory, _calls), do: chat_memory
 
   def add_tool_calls_message(%__MODULE__{} = chat_memory, %{
         tool_calls: tool_calls
@@ -55,6 +61,8 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
     })
   end
 
+  def add_tool_results_message(%__MODULE__{type: :off} = chat_memory, _results), do: chat_memory
+
   def add_tool_results_message(%__MODULE__{} = chat_memory, %{
         tool_results: tool_results
       }) do
@@ -72,6 +80,8 @@ defmodule Buildel.Blocks.Utils.ChatMemory do
         end)
     })
   end
+
+  def add_assistant_chunk(%__MODULE__{type: :off} = chat_memory, _chunk), do: chat_memory
 
   def add_assistant_chunk(
         %__MODULE__{messages: [%{role: "assistant", content: content} | other_messages]} =

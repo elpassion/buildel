@@ -287,7 +287,7 @@ defmodule Buildel.Blocks.NewChat do
       Map.put_new_lazy(state, :memory, fn ->
         ChatMemory.new(%{
           initial_messages: initial_messages(state),
-          type: option(state, :chat_memory_type)
+          type: option(state, :chat_memory_type) |> String.to_existing_atom()
         })
       end)
 
@@ -346,33 +346,13 @@ defmodule Buildel.Blocks.NewChat do
   end
 
   defp save_chat_message(state, new_chat_message) do
-    case option(state, :chat_memory_type) do
-      "off" ->
-        {:ok, state}
-
-      _ ->
-        state =
-          update_in(state.memory, fn memory ->
-            memory |> ChatMemory.add_user_message(new_chat_message)
-          end)
-
-        {:ok, state}
-    end
+    state = update_in(state.memory, &ChatMemory.add_user_message(&1, new_chat_message))
+    {:ok, state}
   end
 
   defp save_chat_chunk(state, chunk) do
-    case option(state, :chat_memory_type) do
-      "off" ->
-        {:ok, state}
-
-      _ ->
-        state =
-          update_in(state.memory, fn memory ->
-            memory |> ChatMemory.add_assistant_chunk(chunk)
-          end)
-
-        {:ok, state}
-    end
+    state = update_in(state.memory, &ChatMemory.add_assistant_chunk(&1, chunk))
+    {:ok, state}
   end
 
   def handle_info({:save_chat_chunk, chat_message}, state) do
