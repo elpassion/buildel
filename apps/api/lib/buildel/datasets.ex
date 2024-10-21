@@ -31,6 +31,11 @@ defmodule Buildel.Datasets do
     end)
   end
 
+  def count_organization_datasets(organization_id) do
+    from(d in Dataset, where: d.organization_id == ^organization_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
   def list_datasets do
     Repo.all(Dataset)
   end

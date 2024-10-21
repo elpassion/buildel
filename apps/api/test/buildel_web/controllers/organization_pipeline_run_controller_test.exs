@@ -270,6 +270,26 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       assert_schema(response, "RunShowResponse", api_spec)
     end
 
+    test "increments runs count for subscription", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      api_spec: api_spec
+    } do
+      assert {:ok, 1} = Buildel.Subscriptions.get_feature_usage(organization.id, "runs_limit")
+      conn = post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
+
+      response = json_response(conn, 200)
+
+      assert %{
+               "status" => "created"
+             } = response["data"]
+
+      assert_schema(response, "RunShowResponse", api_spec)
+
+      assert {:ok, 2} = Buildel.Subscriptions.get_feature_usage(organization.id, "runs_limit")
+    end
+
     test "saves metadata", %{
       conn: conn,
       organization: organization,

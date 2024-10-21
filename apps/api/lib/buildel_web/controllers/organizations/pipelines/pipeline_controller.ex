@@ -16,6 +16,8 @@ defmodule BuildelWeb.OrganizationPipelineController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
+  plug BuildelWeb.Subscriptions.CheckFeature, :workflows_limit when action in [:create]
+
   plug OpenApiSpex.Plug.CastAndValidate,
     json_render_error_v2: true,
     render_error: BuildelWeb.ErrorRendererPlug,

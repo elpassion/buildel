@@ -43,17 +43,7 @@ defmodule BuildelWeb.OrganizationSubscriptionWebhookController do
   end
 
   defp process_webhook(%{"type" => "checkout.session.completed", "data" => %{"object" => data}}) do
-    case Subscriptions.get_subscription_by_subscription_id(data["subscription"]) do
-      nil ->
-        Subscriptions.create_subscription(data, data["client_reference_id"])
-
-      _ ->
-        Logger.debug(
-          "Subscription already exists for checkout.session.completed event, subscription_id: #{data["subscription"]}"
-        )
-
-        nil
-    end
+    Subscriptions.update_subscription(data, data["client_reference_id"])
   end
 
   defp process_webhook(%{"type" => "invoice.paid", "data" => %{"object" => data}}) do

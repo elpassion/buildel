@@ -12,6 +12,7 @@ defmodule Buildel.Subscriptions.Subscription do
     field(:type, :string)
     field(:interval, :string)
     field(:features, :map)
+    field(:usage, :map, default: %{})
 
     belongs_to(:organization, Buildel.Organizations.Organization)
 
@@ -29,10 +30,10 @@ defmodule Buildel.Subscriptions.Subscription do
       :cancel_at_period_end,
       :type,
       :interval,
-      :features
+      :features,
+      :usage
     ])
     |> validate_required([
-      :subscription_id,
       :organization_id,
       :start_date,
       :end_date,

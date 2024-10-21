@@ -22,15 +22,32 @@ defmodule Buildel.Pipelines.Run do
     |> cast(attrs, [:pipeline_id, :config, :interface_config])
     |> validate_required([:pipeline_id, :config])
     |> assoc_constraint(:pipeline)
+    |> prepare_changes(fn changeset ->
+      if pipeline_id = get_change(changeset, :pipeline_id) do
+        query = from Pipeline, where: [id: ^pipeline_id]
+        changeset.repo.update_all(query, inc: [runs_count: 1])
 
-    # |> prepare_changes(fn changeset ->
-    #   if pipeline_id = get_change(changeset, :pipeline_id) do
-    #     query = from Pipeline, where: [id: ^pipeline_id]
-    #     changeset.repo.update_all(query, inc: [runs_count: 1])
-    #   end
+        pipeline = query |> Buildel.Repo.one!()
+        organization_id = pipeline.organization_id
 
-    #   changeset
-    # end)
+        from(s in Buildel.Subscriptions.Subscription,
+          where: s.organization_id == ^organization_id,
+          update: [
+            set: [
+              usage:
+                fragment(
+                  "jsonb_set(?, '{runs_limit}', ((COALESCE((?->>'runs_limit')::int, 0) + 1)::text)::jsonb)",
+                  s.usage,
+                  s.usage
+                )
+            ]
+          ]
+        )
+        |> changeset.repo.update_all([])
+      end
+
+      changeset
+    end)
   end
 
   def start(run) do

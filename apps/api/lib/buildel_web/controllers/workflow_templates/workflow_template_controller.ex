@@ -11,6 +11,8 @@ defmodule BuildelWeb.WorkflowTemplateController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
+  plug BuildelWeb.Subscriptions.CheckFeature, :workflows_limit when action in [:create]
+
   plug OpenApiSpex.Plug.CastAndValidate,
     json_render_error_v2: true,
     render_error: BuildelWeb.ErrorRendererPlug
@@ -40,8 +42,7 @@ defmodule BuildelWeb.WorkflowTemplateController do
            Buildel.Organizations.get_user_organization(user, organization_id),
          {:ok, templates} <-
            Buildel.WorkflowTemplates.get_workflow_template_names(organization.id) do
-
-        render(conn, :index, workflow_templates: templates)
+      render(conn, :index, workflow_templates: templates)
     end
   end
 

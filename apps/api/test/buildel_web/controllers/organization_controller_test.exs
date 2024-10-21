@@ -82,6 +82,35 @@ defmodule BuildelWeb.OrganizationControllerTest do
       assert %{"id" => _id, "name" => "some name", "el_id" => nil} =
                json_response(conn, 201)["data"]
     end
+
+    test "initializes free subscription for organization", %{conn: conn, api_spec: api_spec} do
+      conn =
+        post(conn, ~p"/api/organizations", organization: %{name: "some name"})
+
+      assert %{"id" => id, "name" => "some name", "el_id" => nil} =
+               json_response(conn, 201)["data"]
+
+      conn = get(conn, ~p"/api/organizations/#{id}/subscriptions")
+
+      response = json_response(conn, 200)
+
+      assert_schema response, "SubscriptionShowPlanResponse", api_spec
+
+      {:ok, features} = Buildel.Subscriptions.Plan.get_features("free")
+
+      assert %{
+               "type" => "free",
+               "status" => "active",
+               "interval" => "month",
+               "end_date" => _,
+               "customer_id" => nil,
+               "features" => db_features
+             } = response["data"]
+
+      Enum.each(features, fn {key, value} ->
+        assert db_features[to_string(key)] == value
+      end)
+    end
   end
 
   describe "update" do

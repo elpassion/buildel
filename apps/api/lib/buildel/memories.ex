@@ -22,6 +22,11 @@ defmodule Buildel.Memories do
     end
   end
 
+  def count_organization_collections(organization_id) do
+    from(c in Buildel.Memories.MemoryCollection, where: c.organization_id == ^organization_id)
+    |> Buildel.Repo.aggregate(:count, :id)
+  end
+
   def list_organization_collection_memories(
         %Buildel.Organizations.Organization{} = organization,
         %Buildel.Memories.MemoryCollection{} = collection
