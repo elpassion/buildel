@@ -76,6 +76,7 @@ defmodule Buildel.Blocks.Browser do
   end
 
   defp url(url, state) do
+    url = url |> String.trim()
     state = send_stream_start(state)
 
     uri = URI.parse(url)

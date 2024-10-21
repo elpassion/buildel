@@ -320,6 +320,8 @@ defmodule Buildel.Blocks.DocumentSearch do
     result
     |> Enum.map(&DocumentSearchJSON.show(&1))
     |> Jason.encode!()
+  rescue
+    _ -> "Could not return record"
   end
 
   defp do_parent(state, chunk_id) do
