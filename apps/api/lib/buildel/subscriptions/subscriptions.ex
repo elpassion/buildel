@@ -6,6 +6,17 @@ defmodule Buildel.Subscriptions do
   alias Buildel.Clients.Stripe
   alias Buildel.Subscriptions.Subscription
 
+  def get_organization_subscription(organization_id) do
+    subscription = Repo.one(from s in Subscription, where: s.organization_id == ^organization_id)
+
+    {:ok, Plan.from_db(subscription)}
+  end
+
+  def get_subscription_by_organization_id!(id),
+    do: Repo.get_by!(Subscription, organization_id: id)
+
+  def get_subscription_by_organization_id(id), do: Repo.get_by(Subscription, organization_id: id)
+
   def get_subscription_by_subscription_id!(id),
     do: Repo.get_by!(Subscription, subscription_id: id)
 
@@ -17,16 +28,24 @@ defmodule Buildel.Subscriptions do
     {:ok, Plan.from_db(subscription)}
   end
 
-  def create_subscription(attrs, organization_id) do
-    with {:ok, %{body: body}} <- Stripe.get_subscription(attrs["subscription"]),
+  def get_feature_usage(organization_id, feature) do
+    subscription =
+      Repo.one(from s in Subscription, where: s.organization_id == ^organization_id)
+      |> Plan.from_db()
+
+    case Map.get(subscription.usage, feature) do
+      nil -> {:error, :feature_usage_not_found}
+      value -> {:ok, value}
+    end
+  end
+
+  def update_subscription(attrs, organization_id) do
+    with {:ok, subscription} <- get_subscription_by_organization_id!(organization_id),
+         {:ok, %{body: body}} <- Stripe.get_subscription(attrs["subscription"]),
          product = List.first(body["items"]["data"]),
          {:ok, %{body: %{"name" => product_name}}} <-
            product["price"]["product"] |> Stripe.get_product(),
-         {:ok, %{body: %{"data" => features}}} <-
-           product["price"]["product"] |> Stripe.list_product_features() do
-      features =
-        Plan.map_to_application_features(features, String.downcase(product_name))
-
+         {:ok, features} <- Plan.get_features(String.downcase(product_name)) do
       attrs = %{
         subscription_id: attrs["subscription"],
         customer_id: attrs["customer"],
@@ -38,7 +57,7 @@ defmodule Buildel.Subscriptions do
         organization_id: organization_id
       }
 
-      %Subscription{} |> Subscription.changeset(attrs) |> Repo.insert()
+      subscription |> Subscription.changeset(attrs) |> Repo.update()
     end
   end
 

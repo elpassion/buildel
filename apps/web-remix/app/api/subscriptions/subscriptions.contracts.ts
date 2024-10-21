@@ -61,8 +61,8 @@ export const PortalResponse = z.object({ data: Portal }).transform((res) => ({
 
 export const Subscription = z
   .object({
-    customer_id: z.string(),
-    end_date: z.string(),
+    customer_id: z.string().nullable(),
+    end_date: z.string().nullable(),
     features: z.object({
       runs_limit: z.union([z.number(), z.string()]),
       seats_limit: z.union([z.number(), z.string()]),

@@ -1,162 +1,101 @@
 defmodule Buildel.Subscriptions.Plan do
   require Logger
 
-  @application_features [
-    runs_limit: 1000,
-    workflows_limit: 5,
-    knowledge_bases_limit: 3,
-    datasets_limit: 3,
-    experiments_limit: 1,
-    seats_limit: 1,
-    el_included: false,
-    dedicated_support: false
+  defstruct [
+    :type,
+    :status,
+    :interval,
+    :end_date,
+    :customer_id,
+    :features,
+    :usage
   ]
 
-  def from_db(%Buildel.Subscriptions.Subscription{} = subscription) do
+  @plan_features %{
+    "free" => %{
+      runs_limit: 1000,
+      workflows_limit: 5,
+      knowledge_bases_limit: 3,
+      datasets_limit: 3,
+      experiments_limit: 1,
+      seats_limit: 1,
+      el_included: false,
+      dedicated_support: false
+    },
+    "starter" => %{
+      runs_limit: 20000,
+      workflows_limit: 10,
+      knowledge_bases_limit: 5,
+      datasets_limit: 5,
+      experiments_limit: 3,
+      seats_limit: 3,
+      el_included: true,
+      dedicated_support: false
+    },
+    "team" => %{
+      runs_limit: 50000,
+      workflows_limit: 30,
+      knowledge_bases_limit: 15,
+      datasets_limit: 15,
+      experiments_limit: 10,
+      seats_limit: 5,
+      el_included: true,
+      dedicated_support: true
+    }
+  }
+
+  def get_features("free"), do: {:ok, @plan_features["free"]}
+  def get_features("starter"), do: {:ok, @plan_features["starter"]}
+  def get_features("team"), do: {:ok, @plan_features["team"]}
+  def get_features(_), do: {:error, "Unknown plan"}
+
+  def to_db(type, organization_id) do
+    {:ok, features} = get_features(type)
+
     %{
+      subscription_id: nil,
+      customer_id: nil,
+      organization_id: organization_id,
+      start_date: NaiveDateTime.utc_now(),
+      end_date:
+        NaiveDateTime.utc_now()
+        |> NaiveDateTime.add(31, :day),
+      type: type,
+      interval: "month",
+      features: features,
+      usage: %{
+        runs_limit: 0
+      }
+    }
+  end
+
+  def from_db(%Buildel.Subscriptions.Subscription{} = subscription) do
+    %__MODULE__{
       type: subscription.type,
       status: subscription |> Buildel.Subscriptions.Subscription.status(),
       interval: subscription.interval,
       end_date: subscription.end_date,
       customer_id: subscription.customer_id,
-      features:
-        Enum.reduce(@application_features, %{}, fn {feature, _}, acc ->
-          acc |> Map.put(feature, subscription.features[to_string(feature)])
-        end)
+      features: subscription.features,
+      usage: subscription.usage
     }
   end
 
-  def from_db(nil) do
-    %{
-      type: :free,
-      status: :active,
-      interval: :month,
-      end_date: nil,
-      customer_id: nil,
-      features:
-        Enum.reduce(@application_features, %{}, fn {feature, value}, acc ->
-          acc |> Map.put(feature, value)
-        end)
-    }
-  end
+  def get_feature_usage(organization_id, :runs_limit),
+    do: Buildel.Subscriptions.get_feature_usage(organization_id, :runs_limit)
 
-  def map_to_application_features(features, plan) do
-    Enum.reduce(@application_features, %{}, fn {app_feature, _}, acc ->
-      feature =
-        Enum.find(features, fn feature ->
-          feature["entitlement_feature"]["lookup_key"] == to_string(app_feature)
-        end)
+  def get_feature_usage(organization_id, :workflows_limit),
+    do: {:ok, Buildel.Pipelines.count_organization_pipelines(organization_id)}
 
-      map_feature(acc, feature, plan)
-    end)
-  end
+  def get_feature_usage(organization_id, :knowledge_bases_limit),
+    do: {:ok, Buildel.Memories.count_organization_collections(organization_id)}
 
-  defp map_feature(
-         acc,
-         %{
-           "entitlement_feature" => %{
-             "lookup_key" => "runs_limit",
-             "metadata" => metadata
-           }
-         },
-         plan
-       ) do
-    acc |> Map.put("runs_limit", Map.get(metadata, plan, nil))
-  end
+  def get_feature_usage(organization_id, :datasets_limit),
+    do: {:ok, Buildel.Datasets.count_organization_datasets(organization_id)}
 
-  defp map_feature(
-         acc,
-         %{
-           "entitlement_feature" => %{
-             "lookup_key" => "workflows_limit",
-             "metadata" => metadata
-           }
-         },
-         plan
-       ) do
-    acc |> Map.put("workflows_limit", Map.get(metadata, plan, nil))
-  end
+  def get_feature_usage(organization_id, :experiments_limit),
+    do: {:ok, Buildel.Experiments.count_organization_experiments(organization_id)}
 
-  defp map_feature(
-         acc,
-         %{
-           "entitlement_feature" => %{
-             "lookup_key" => "knowledge_bases_limit",
-             "metadata" => metadata
-           }
-         },
-         plan
-       ) do
-    acc |> Map.put("knowledge_bases_limit", Map.get(metadata, plan, nil))
-  end
-
-  defp map_feature(
-         acc,
-         %{
-           "entitlement_feature" => %{
-             "lookup_key" => "datasets_limit",
-             "metadata" => metadata
-           }
-         },
-         plan
-       ) do
-    acc |> Map.put("datasets_limit", Map.get(metadata, plan, nil))
-  end
-
-  defp map_feature(
-         acc,
-         %{
-           "entitlement_feature" => %{
-             "lookup_key" => "experiments_limit",
-             "metadata" => metadata
-           }
-         },
-         plan
-       ) do
-    acc |> Map.put("experiments_limit", Map.get(metadata, plan, nil))
-  end
-
-  defp map_feature(
-         acc,
-         %{
-           "entitlement_feature" => %{
-             "lookup_key" => "seats_limit",
-             "metadata" => metadata
-           }
-         },
-         plan
-       ) do
-    acc |> Map.put("seats_limit", Map.get(metadata, plan, nil))
-  end
-
-  defp map_feature(
-         acc,
-         %{
-           "entitlement_feature" => %{
-             "lookup_key" => "el_included",
-             "metadata" => metadata
-           }
-         },
-         plan
-       ) do
-    acc |> Map.put("el_included", Map.get(metadata, plan, "false") == "true")
-  end
-
-  defp map_feature(
-         acc,
-         %{
-           "entitlement_feature" => %{
-             "lookup_key" => "dedicated_support",
-             "metadata" => metadata
-           }
-         },
-         plan
-       ) do
-    acc |> Map.put("dedicated_support", Map.get(metadata, plan, "false") == "true")
-  end
-
-  defp map_feature(acc, _, plan) do
-    Logger.debug("Unhandled feature #{inspect(plan)}")
-    acc
-  end
+  def get_feature_usage(organization_id, :seats_limit),
+    do: {:ok, Buildel.Organizations.count_organization_memberships(organization_id)}
 end

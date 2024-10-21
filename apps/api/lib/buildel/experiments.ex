@@ -4,6 +4,11 @@ defmodule Buildel.Experiments do
   alias Buildel.Organizations.Organization
   alias Buildel.Repo
 
+  def count_organization_experiments(organization_id) do
+    from(d in Experiment, where: d.organization_id == ^organization_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
   def list_experiments do
     Repo.all(Experiment)
     |> Repo.preload([:pipeline, :dataset])

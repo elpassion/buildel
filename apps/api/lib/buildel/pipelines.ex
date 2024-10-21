@@ -71,6 +71,11 @@ defmodule Buildel.Pipelines do
     |> Repo.all()
   end
 
+  def count_organization_pipelines(organization_id) do
+    from(p in Pipeline, where: p.organization_id == ^organization_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
   def list_organization_pipelines(
         %Organization{} = organization,
         %ListParams{} = params

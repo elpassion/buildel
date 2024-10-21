@@ -60,6 +60,12 @@ defmodule Buildel.Organizations do
            ApiKey.with_random_key()
            |> ApiKey.changeset(%{organization_id: organization_id})
          end)
+         |> Ecto.Multi.insert(:subscription, fn %{organization: %{id: organization_id}} ->
+           %Buildel.Subscriptions.Subscription{}
+           |> Buildel.Subscriptions.Subscription.changeset(
+             Buildel.Subscriptions.Plan.to_db("free", organization_id)
+           )
+         end)
          |> Repo.transaction() do
       {:ok, %{organization: organization}} ->
         {:ok, organization}
@@ -104,6 +110,11 @@ defmodule Buildel.Organizations do
       nil -> {:error, :not_found}
       %Membership{} = membership -> {:ok, membership |> Repo.preload(:user) |> Map.get(:user)}
     end
+  end
+
+  def count_organization_memberships(organization_id) do
+    from(m in Membership, where: m.organization_id == ^organization_id)
+    |> Repo.aggregate(:count, :id)
   end
 
   def list_memberships do
@@ -183,7 +194,7 @@ defmodule Buildel.Organizations do
 
   def list_organization_secrets(%Organization{} = organization) do
     organization
-    |> Repo.preload([secrets: (from s in Secret, order_by: [desc: s.inserted_at])])
+    |> Repo.preload(secrets: from(s in Secret, order_by: [desc: s.inserted_at]))
     |> Map.get(:secrets)
   end
 

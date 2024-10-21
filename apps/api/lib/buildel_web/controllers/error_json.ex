@@ -10,6 +10,11 @@ defmodule BuildelWeb.ErrorJSON do
   # the template name. For example, "404.json" becomes
   # "Not Found".
 
+  def render("billing_error.json", assigns) do
+    message = Map.get(assigns, :custom_message, "Billing error")
+    %{errors: %{detail: message, error_code: :BILLING_LIMIT_EXCEEDED}}
+  end
+
   def render(template, assigns) do
     message =
       Map.get(assigns, :custom_message, Phoenix.Controller.status_message_from_template(template))

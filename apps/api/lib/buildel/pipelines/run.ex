@@ -26,6 +26,24 @@ defmodule Buildel.Pipelines.Run do
       if pipeline_id = get_change(changeset, :pipeline_id) do
         query = from Pipeline, where: [id: ^pipeline_id]
         changeset.repo.update_all(query, inc: [runs_count: 1])
+
+        pipeline = query |> Buildel.Repo.one!()
+        organization_id = pipeline.organization_id
+
+        from(s in Buildel.Subscriptions.Subscription,
+          where: s.organization_id == ^organization_id,
+          update: [
+            set: [
+              usage:
+                fragment(
+                  "jsonb_set(?, '{runs_limit}', ((COALESCE((?->>'runs_limit')::int, 0) + 1)::text)::jsonb)",
+                  s.usage,
+                  s.usage
+                )
+            ]
+          ]
+        )
+        |> changeset.repo.update_all([])
       end
 
       changeset

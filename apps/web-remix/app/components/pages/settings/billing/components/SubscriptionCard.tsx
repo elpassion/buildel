@@ -46,11 +46,11 @@ export function ManageSubscriptionButton({
   className,
   customerId,
   ...rest
-}: ButtonProps & { customerId: string }) {
+}: ButtonProps & { customerId: string | null }) {
   const validator = useMemo(() => withZod(portalSchema), []);
   return (
     <ValidatedForm method="POST" validator={validator} noValidate>
-      <HiddenField name="customerId" value={customerId} />
+      <HiddenField name="customerId" value={customerId || ""} />
       <HiddenField name="intent" value="PORTAL" />
 
       <SubmitButton

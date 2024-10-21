@@ -40,6 +40,7 @@ export async function fetchTyped<T extends ZodType>(
     throw new UnknownAPIError();
   });
 
+
   if (
     (!options?.method || options.method === 'GET') &&
     response.status === 200 &&
@@ -61,9 +62,11 @@ export async function fetchTyped<T extends ZodType>(
       throw new UnauthorizedError();
     } else if (response.status === 403) {
       const jsonResponse = await response.json();
-
-      if (jsonResponse.errorCode === 'BILLING_LIMIT_EXCEEDED') {
-        throw new BillingError(jsonResponse.message);
+      if (jsonResponse.errors.error_code === 'BILLING_LIMIT_EXCEEDED') {
+        console.log(jsonResponse);
+        throw new BillingError(jsonResponse.detail);
+      } else {
+        throw new UnauthorizedError();
       }
     } else if (response.status === 404) {
       throw new NotFoundError();
