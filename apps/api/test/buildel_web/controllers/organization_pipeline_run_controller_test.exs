@@ -262,8 +262,7 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
         0
       )
 
-      conn =
-        conn = post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
+      conn = post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
 
       assert json_response(conn, 403)["errors"] != %{}
     end

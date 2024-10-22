@@ -49,6 +49,39 @@ defmodule BuildelWeb.PipelineChannelTest do
                )
     end
 
+    test "fails when runs_limit feature reached", %{
+      socket: socket,
+      organization: organization,
+      user: user
+    } do
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+
+      Buildel.SubscriptionsFixtures.change_subscription_feature_limit(
+        organization.id,
+        "runs_limit",
+        0
+      )
+
+      user_data = Jason.encode!(%{user_id: user.id})
+
+      assert {:error, %{reason: "Limit reached for runs_limit"}} =
+               socket
+               |> subscribe_and_join(
+                 BuildelWeb.PipelineChannel,
+                 "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                 %{
+                   auth:
+                     BuildelWeb.ChannelAuth.create_auth_token(
+                       "socket_id",
+                       "pipelines:#{pipeline.organization_id}:#{pipeline.id}",
+                       user_data,
+                       organization.api_key
+                     ),
+                   user_data: user_data
+                 }
+               )
+    end
+
     test "fails when trying to join a run for pipeline with exceeded budged", %{
       socket: socket,
       organization: organization,
@@ -156,6 +189,44 @@ defmodule BuildelWeb.PipelineChannelTest do
 
       {:ok, run} =
         run_fixture(%{pipeline_id: pipeline.id}) |> Buildel.Pipelines.Runner.start_run()
+
+      user_data = Jason.encode!(%{user_id: user.id})
+
+      {:ok, %{run: joined_run}, _socket} =
+        socket
+        |> subscribe_and_join(
+          BuildelWeb.PipelineChannel,
+          "pipelines:#{pipeline.organization_id}:#{pipeline.id}:#{run.id}",
+          %{
+            auth:
+              BuildelWeb.ChannelAuth.create_auth_token(
+                "socket_id",
+                "pipelines:#{pipeline.organization_id}:#{pipeline.id}:#{run.id}",
+                user_data,
+                organization.api_key
+              ),
+            user_data: user_data
+          }
+        )
+
+      assert %{id: run.id} == %{id: joined_run.id}
+    end
+
+    test "succeeds when trying to join a run that is already started even if limit reached", %{
+      socket: socket,
+      organization: organization,
+      user: user
+    } do
+      pipeline = pipeline_fixture(%{organization_id: organization.id})
+
+      {:ok, run} =
+        run_fixture(%{pipeline_id: pipeline.id}) |> Buildel.Pipelines.Runner.start_run()
+
+      Buildel.SubscriptionsFixtures.change_subscription_feature_limit(
+        organization.id,
+        "runs_limit",
+        0
+      )
 
       user_data = Jason.encode!(%{user_id: user.id})
 

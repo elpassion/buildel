@@ -39,11 +39,10 @@ defmodule Buildel.SubscriptionsTest do
       organization = organization_fixture()
       old_date = DateTime.utc_now() |> DateTime.add(1, :day)
 
-      subscription =
-        change_subscription_expiration_date(
-          organization.id,
-          old_date
-        )
+      change_subscription_expiration_date(
+        organization.id,
+        old_date
+      )
 
       assert {:ok, plan} =
                Subscriptions.get_and_renew_organization_subscription_plan(organization.id)
@@ -57,11 +56,10 @@ defmodule Buildel.SubscriptionsTest do
 
       upgrade_subscription_to_plan(organization.id, "starter")
 
-      subscription =
-        change_subscription_expiration_date(
-          organization.id,
-          old_date
-        )
+      change_subscription_expiration_date(
+        organization.id,
+        old_date
+      )
 
       assert {:ok, plan} =
                Subscriptions.get_and_renew_organization_subscription_plan(organization.id)
