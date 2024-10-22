@@ -121,6 +121,30 @@ defmodule BuildelWeb.MemoryCollectionControllerTest do
       assert json_response(conn, 422)["errors"] != %{}
     end
 
+    test "checks subscription feature limit", %{
+      conn: conn,
+      organization: organization
+    } do
+      Buildel.SubscriptionsFixtures.change_subscription_feature_limit(
+        organization.id,
+        "knowledge_bases_limit",
+        0
+      )
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization.id}/memory_collections", %{
+          collection_name: "topic",
+          embeddings: %{
+            api_type: "openai",
+            model: "text-embedding-ada-002",
+            secret_name: "some name",
+            endpoint: "some endpoint"
+          }
+        })
+
+      assert json_response(conn, 403)["errors"] != %{}
+    end
+
     test "does not create in other org", %{conn: conn} do
       organization = organization_fixture()
 

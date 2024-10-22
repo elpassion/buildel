@@ -389,6 +389,22 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
       post(conn, ~p"/api/organizations/#{organization.id}/pipelines", pipeline: @create_attrs)
     end
 
+    test "checks subscription feature limit", %{
+      conn: conn,
+      organization: organization
+    } do
+      Buildel.SubscriptionsFixtures.change_subscription_feature_limit(
+        organization.id,
+        "workflows_limit",
+        0
+      )
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization.id}/pipelines", pipeline: @create_attrs)
+
+      assert json_response(conn, 403)["errors"] != %{}
+    end
+
     test "renders pipeline when data is valid", %{
       conn: conn,
       organization: organization,

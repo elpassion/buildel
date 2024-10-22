@@ -8,7 +8,7 @@ defmodule Buildel.OrganizationsFixtures do
       })
       |> Buildel.Organizations.create_organization()
 
-    organization |> Buildel.Repo.preload(:api_keys)
+    organization |> Buildel.Repo.preload(:api_keys) |> Buildel.Repo.preload(:subscription)
   end
 
   def valid_membership_attributes(attrs \\ %{}) do

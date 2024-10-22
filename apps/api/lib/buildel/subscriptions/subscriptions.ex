@@ -6,10 +6,13 @@ defmodule Buildel.Subscriptions do
   alias Buildel.Clients.Stripe
   alias Buildel.Subscriptions.Subscription
 
-  def get_organization_subscription(organization_id) do
+  def get_organization_subscription_plan(organization_id) do
     subscription = Repo.one(from s in Subscription, where: s.organization_id == ^organization_id)
 
-    {:ok, Plan.from_db(subscription)}
+    case subscription do
+      nil -> {:error, :not_found}
+      _ -> {:ok, Plan.from_db(subscription)}
+    end
   end
 
   def get_subscription_by_organization_id!(id),
@@ -21,12 +24,6 @@ defmodule Buildel.Subscriptions do
     do: Repo.get_by!(Subscription, subscription_id: id)
 
   def get_subscription_by_subscription_id(id), do: Repo.get_by(Subscription, subscription_id: id)
-
-  def get_subscription_plan(organization_id) do
-    subscription = Repo.one(from s in Subscription, where: s.organization_id == ^organization_id)
-
-    {:ok, Plan.from_db(subscription)}
-  end
 
   def get_feature_usage(organization_id, feature) do
     subscription =
@@ -65,7 +62,8 @@ defmodule Buildel.Subscriptions do
     subscription
     |> Subscription.changeset(%{
       cancel_at_period_end: false,
-      end_date: attrs["period_end"] |> DateTime.from_unix!()
+      end_date: attrs["period_end"] |> DateTime.from_unix!(),
+      usage: Plan.get_default_usage()
     })
     |> Repo.update()
   end

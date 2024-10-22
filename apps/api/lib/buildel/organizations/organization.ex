@@ -15,6 +15,7 @@ defmodule Buildel.Organizations.Organization do
     has_many(:api_keys, Buildel.ApiKeys.ApiKey)
     has_many(:secrets, Buildel.Secrets.Secret)
     has_many(:memories, Buildel.Memories.Memory)
+    has_one(:subscription, Buildel.Subscriptions.Subscription)
     many_to_many(:members, Buildel.Accounts.User, join_through: Buildel.Organizations.Membership)
     timestamps()
   end
