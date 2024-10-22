@@ -351,7 +351,8 @@ function SectionFieldPreview({ field, name }: SectionFieldPreviewProps) {
         const fieldKey =
           name === null || name === '' ? propertyKey : `${name}.${propertyKey}`;
 
-        if (property.type === 'string') {
+        // Only show string and number properties for now
+        if (property.type === 'string' || property.type === 'number') {
           const propertyValue = values.get(fieldKey)?.toString() ?? '';
 
           if (!propertyValue) return null;

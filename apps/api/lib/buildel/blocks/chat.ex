@@ -45,7 +45,6 @@ defmodule Buildel.Blocks.Chat do
               "description",
               "model_section",
               "chat_memory_type",
-              "temperature",
               "system_message",
               "messages",
               "prompt_template"
@@ -69,7 +68,7 @@ defmodule Buildel.Blocks.Chat do
                   "type" => "section",
                   "title" => "Model",
                   "description" => "The model to use for the chat.",
-                  "required" => ["api_type", "api_key", "endpoint", "model"],
+                  "required" => ["api_type", "api_key", "endpoint", "model", "temperature"],
                   "properties" =>
                     Jason.OrderedObject.new(
                       api_type: %{
@@ -132,7 +131,17 @@ defmodule Buildel.Blocks.Chat do
                         "presentAs" => "async-select",
                         "minLength" => 1,
                         "readonly" => true
-                      }
+                      },
+                      temperature: %{
+                        "type" => "number",
+                        "title" => "Temperature",
+                        "description" => "The temperature of the chat.",
+                        "default" => 0.7,
+                        "minimum" => 0.0,
+                        "maximum" => 2.0,
+                        "step" => 0.1,
+                        "readonly" => true
+                      },
                     ),
                 },
                 chat_memory_type: %{
@@ -143,16 +152,6 @@ defmodule Buildel.Blocks.Chat do
                   "enumPresentAs" => "radio",
                   "default" => "full",
                   "minLength" => 1
-                },
-                temperature: %{
-                  "type" => "number",
-                  "title" => "Temperature",
-                  "description" => "The temperature of the chat.",
-                  "default" => 0.7,
-                  "minimum" => 0.0,
-                  "maximum" => 2.0,
-                  "step" => 0.1,
-                  "readonly" => true
                 },
                 max_tokens: %{
                   "type" => "number",
