@@ -1,77 +1,416 @@
-import { mergeAdjacentDetailsWithSameSummary } from '~/components/chat/ChatMarkdown';
+import { describe } from 'vitest';
 
-describe(mergeAdjacentDetailsWithSameSummary.name, () => {
-  it('should merge adjacent details with the same summary', () => {
-    const markdown = `<details><summary>Summary 1</summary>Child 1</details><details><summary>Summary 1</summary>Child 2</details> hello world`;
+import {
+  ChatMarkdown,
+  mergeAdjacentDetailsWithSameSummary,
+} from '~/components/chat/ChatMarkdown';
+import { render } from '~/tests/render';
 
-    expect(mergeAdjacentDetailsWithSameSummary(markdown)).toMatchInlineSnapshot(
-      `
-      "<details class="text-sm border border-input rounded-md w-fit py-2 my-2">
-      <summary class="cursor-pointer list-none -ml-1 px-4">Summary 1</summary>
-      <ul class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 1</span></li><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 2</span></li></ul>
-      </details> hello world"
-    `,
-    );
-  });
+describe(ChatMarkdown.name, () => {
+  describe(mergeAdjacentDetailsWithSameSummary.name, () => {
+    it('should merge adjacent details with the same summary', () => {
+      const { container } = render(
+        <ChatMarkdown>{`<details><summary>Summary 1</summary>Child 1</details><details><summary>Summary 1</summary>Child 2</details> hello world`}</ChatMarkdown>,
+      );
 
-  it('should group and merge different adjacent details with the same summary', () => {
-    const markdown = `<details><summary>Summary 1</summary>Child 1</details><details><summary>Summary 2</summary>Child 1</details><details><summary>Summary 1</summary>Child 2</details> hello world`;
+      expect(container).toMatchInlineSnapshot(
+        `
+        <div>
+          <div
+            id="_root"
+          >
+            <details
+              class="text-sm border border-input rounded-md w-fit py-2 my-2"
+            >
+              
 
-    expect(mergeAdjacentDetailsWithSameSummary(markdown)).toMatchInlineSnapshot(
-      `
-      "<details class="text-sm border border-input rounded-md w-fit py-2 my-2">
-      <summary class="cursor-pointer list-none -ml-1 px-4">Summary 1</summary>
-      <ul class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 1</span></li><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 2</span></li></ul>
-      </details><details class="text-sm border border-input rounded-md w-fit py-2 my-2">
-      <summary class="cursor-pointer list-none -ml-1 px-4">Summary 2</summary>
-      <ul class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 1</span></li></ul>
-      </details> hello world"
-    `,
-    );
-  });
+              <summary
+                class="cursor-pointer list-none -ml-1 px-4"
+              >
+                Summary 1
+              </summary>
+              
 
-  it('should do not merge details divided by text', () => {
-    const markdown = `<details><summary>Summary 1</summary>Child 1</details> <p>SOME STRANGE TEXT</p> <details><summary>Summary 1</summary>Child 2</details> `;
+              <ul
+                class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
+              >
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 1
+                  </span>
+                </li>
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 2
+                  </span>
+                </li>
+              </ul>
+              
 
-    expect(mergeAdjacentDetailsWithSameSummary(markdown)).toMatchInlineSnapshot(
-      `
-      "<details class="text-sm border border-input rounded-md w-fit py-2 my-2">
-      <summary class="cursor-pointer list-none -ml-1 px-4">Summary 1</summary>
-      <ul class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 1</span></li></ul>
-      </details> <p>SOME STRANGE TEXT</p> <details class="text-sm border border-input rounded-md w-fit py-2 my-2">
-      <summary class="cursor-pointer list-none -ml-1 px-4">Summary 1</summary>
-      <ul class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 2</span></li></ul>
-      </details> "
-    `,
-    );
-  });
+            </details>
+             hello world
+          </div>
+        </div>
+      `,
+      );
+    });
 
-  it('should merge details at the end of the markdown', () => {
-    const markdown = `<p>SOME STRANGE TEXT</p><details><summary>Summary 1</summary>Child 1</details><details><summary>Summary 1</summary>Child 2</details> `;
+    it('should group and merge different adjacent details with the same summary', () => {
+      const { container } = render(
+        <ChatMarkdown>{`<details><summary>Summary 1</summary>Child 1</details><details><summary>Summary 2</summary>Child 1</details><details><summary>Summary 1</summary>Child 2</details> hello world`}</ChatMarkdown>,
+      );
+      expect(container).toMatchInlineSnapshot(
+        `
+        <div>
+          <div
+            id="_root"
+          >
+            <details
+              class="text-sm border border-input rounded-md w-fit py-2 my-2"
+            >
+              
 
-    expect(mergeAdjacentDetailsWithSameSummary(markdown)).toMatchInlineSnapshot(
-      `
-      "<p>SOME STRANGE TEXT</p><details class="text-sm border border-input rounded-md w-fit py-2 my-2">
-      <summary class="cursor-pointer list-none -ml-1 px-4">Summary 1</summary>
-      <ul class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 1</span></li><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 2</span></li></ul>
-      </details> "
-    `,
-    );
-  });
+              <summary
+                class="cursor-pointer list-none -ml-1 px-4"
+              >
+                Summary 1
+              </summary>
+              
 
-  it('should merge details divided by space', () => {
-    const markdown = `<details><summary>Summary 1</summary>Child 1</details> <details><summary>Summary 1</summary>Child 2</details><p>SOME STRANGE TEXT</p><details><summary>Summary 1</summary>Child 1</details>      <details><summary>Summary 1</summary>Child 2</details>`;
+              <ul
+                class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
+              >
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 1
+                  </span>
+                </li>
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 2
+                  </span>
+                </li>
+              </ul>
+              
 
-    expect(mergeAdjacentDetailsWithSameSummary(markdown)).toMatchInlineSnapshot(
-      `
-      " <details class="text-sm border border-input rounded-md w-fit py-2 my-2">
-      <summary class="cursor-pointer list-none -ml-1 px-4">Summary 1</summary>
-      <ul class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 1</span></li><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 2</span></li></ul>
-      </details><p>SOME STRANGE TEXT</p>      <details class="text-sm border border-input rounded-md w-fit py-2 my-2">
-      <summary class="cursor-pointer list-none -ml-1 px-4">Summary 1</summary>
-      <ul class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 1</span></li><li class="list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"><span class="left-2 relative -top-1.5">Child 2</span></li></ul>
-      </details>"
-    `,
-    );
+            </details>
+            <details
+              class="text-sm border border-input rounded-md w-fit py-2 my-2"
+            >
+              
+
+              <summary
+                class="cursor-pointer list-none -ml-1 px-4"
+              >
+                Summary 2
+              </summary>
+              
+
+              <ul
+                class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
+              >
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 1
+                  </span>
+                </li>
+              </ul>
+              
+
+            </details>
+             hello world
+          </div>
+        </div>
+      `,
+      );
+    });
+
+    it('should do not merge details divided by text', () => {
+      const { container } = render(
+        <ChatMarkdown>{`<details><summary>Summary 1</summary>Child 1</details> <p>SOME STRANGE TEXT</p> <details><summary>Summary 1</summary>Child 2</details> `}</ChatMarkdown>,
+      );
+
+      expect(container).toMatchInlineSnapshot(
+        `
+        <div>
+          <div
+            id="_root"
+          >
+            <details
+              class="text-sm border border-input rounded-md w-fit py-2 my-2"
+            >
+              
+
+              <summary
+                class="cursor-pointer list-none -ml-1 px-4"
+              >
+                Summary 1
+              </summary>
+              
+
+              <ul
+                class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
+              >
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 1
+                  </span>
+                </li>
+              </ul>
+              
+
+            </details>
+             
+            <p
+              class="my-2 break-words whitespace-pre-wrap text-sm"
+              node="[object Object]"
+            >
+              SOME STRANGE TEXT
+            </p>
+             
+            <details
+              class="text-sm border border-input rounded-md w-fit py-2 my-2"
+            >
+              
+
+              <summary
+                class="cursor-pointer list-none -ml-1 px-4"
+              >
+                Summary 1
+              </summary>
+              
+
+              <ul
+                class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
+              >
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 2
+                  </span>
+                </li>
+              </ul>
+              
+
+            </details>
+             
+          </div>
+        </div>
+      `,
+      );
+    });
+
+    it('should merge details at the end of the markdown', () => {
+      const { container } = render(
+        <ChatMarkdown>{`<p>SOME STRANGE TEXT</p><details><summary>Summary 1</summary>Child 1</details><details><summary>Summary 1</summary>Child 2</details> `}</ChatMarkdown>,
+      );
+
+      expect(container).toMatchInlineSnapshot(
+        `
+        <div>
+          <div
+            id="_root"
+          >
+            <p
+              class="my-2 break-words whitespace-pre-wrap text-sm"
+              node="[object Object]"
+            >
+              SOME STRANGE TEXT
+            </p>
+            <details
+              class="text-sm border border-input rounded-md w-fit py-2 my-2"
+            >
+              
+
+              <summary
+                class="cursor-pointer list-none -ml-1 px-4"
+              >
+                Summary 1
+              </summary>
+              
+
+              <ul
+                class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
+              >
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 1
+                  </span>
+                </li>
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 2
+                  </span>
+                </li>
+              </ul>
+              
+
+            </details>
+             
+          </div>
+        </div>
+      `,
+      );
+    });
+
+    it('should merge details divided by space', () => {
+      const { container } = render(
+        <ChatMarkdown>{`<details><summary>Summary 1</summary>Child 1</details> <details><summary>Summary 1</summary>Child 2</details><p>SOME STRANGE TEXT</p><details><summary>Summary 1</summary>Child 1</details>      <details><summary>Summary 1</summary>Child 2</details>`}</ChatMarkdown>,
+      );
+
+      expect(container).toMatchInlineSnapshot(
+        `
+        <div>
+          <div
+            id="_root"
+          >
+             
+            <details
+              class="text-sm border border-input rounded-md w-fit py-2 my-2"
+            >
+              
+
+              <summary
+                class="cursor-pointer list-none -ml-1 px-4"
+              >
+                Summary 1
+              </summary>
+              
+
+              <ul
+                class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
+              >
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 1
+                  </span>
+                </li>
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 2
+                  </span>
+                </li>
+              </ul>
+              
+
+            </details>
+            <p
+              class="my-2 break-words whitespace-pre-wrap text-sm"
+              node="[object Object]"
+            >
+              SOME STRANGE TEXT
+            </p>
+                  
+            <details
+              class="text-sm border border-input rounded-md w-fit py-2 my-2"
+            >
+              
+
+              <summary
+                class="cursor-pointer list-none -ml-1 px-4"
+              >
+                Summary 1
+              </summary>
+              
+
+              <ul
+                class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
+              >
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 1
+                  </span>
+                </li>
+                <li
+                  class="!m-0 marker:text-muted-foreground text-sm list-none [&:not(:last-child)]:pb-6 pl-0 pr-1 [&:not(:last-child)]:border-l border-input before:relative before:content-[''] before:bg-foreground before:-top-1.5 before:-left-1 before:w-2 before:h-2 before:inline-block before:rounded-full"
+                  node="[object Object]"
+                >
+                  <span
+                    class="text-sm break-words whitespace-pre-wrap left-2 relative -top-1.5"
+                    node="[object Object]"
+                  >
+                    Child 2
+                  </span>
+                </li>
+              </ul>
+              
+
+            </details>
+          </div>
+        </div>
+      `,
+      );
+    });
   });
 });
