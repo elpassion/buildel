@@ -434,7 +434,7 @@ function Image({
   return <img alt={alt} className={cn(className)} {...rest} />;
 }
 
-function truncateChildrenContent(
+export function truncateChildrenContent(
   children: React.ReactNode,
   maxLength: number = 300,
 ): React.ReactNode {

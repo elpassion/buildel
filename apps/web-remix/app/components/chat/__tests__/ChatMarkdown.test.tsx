@@ -3,6 +3,7 @@ import { describe, expect } from 'vitest';
 import {
   ChatMarkdown,
   mergeAdjacentDetailsWithSameSummary,
+  truncateChildrenContent,
 } from '~/components/chat/ChatMarkdown';
 import { addReferenceToLinks } from '~/components/chat/ChatMessages';
 import { render } from '~/tests/render';
@@ -448,20 +449,95 @@ describe(ChatMarkdown.name, () => {
         new URL('http://www.text.com/'),
       ]);
     });
-  });
 
-  it('should ignore links when incorrect', () => {
-    const markdown = `
+    it('should ignore links when incorrect', () => {
+      const markdown = `
 (https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607)
 `;
 
-    const result = addReferenceToLinks(markdown);
+      const result = addReferenceToLinks(markdown);
 
-    expect(result.links).toEqual([]);
-    expect(result.message).toMatchInlineSnapshot(`
+      expect(result.links).toEqual([]);
+      expect(result.message).toMatchInlineSnapshot(`
       "
       (https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607)
       "
     `);
+    });
+  });
+
+  describe(truncateChildrenContent.name, () => {
+    it('should truncate too long code blocks', () => {
+      const markdown = `
+\`\`\`python
+class ToDoList:
+    def __init__(self):
+        self.tasks = []
+
+    def add_task(self, task):
+        self.tasks.append(task)
+        print(f'Added task: "{task}"')
+
+    def remove_task(self, task_number):
+        if 0 <= task_number < len(self.tasks):
+            removed_task = self.tasks.pop(task_number)
+            print(f'Removed task: "{removed_task}"')
+        else:
+            print("Invalid task number.")
+
+    def view_tasks(self):
+        if not self.tasks:
+            print("No tasks in the list.")
+        else:
+            print("Your tasks:")
+            for index, task in enumerate(self.tasks):
+                print(f"{index}. {task}")
+\`\`\`
+`;
+
+      expect(truncateChildrenContent(markdown, 100)).toMatchInlineSnapshot(`
+        [
+          "
+        \`\`\`python
+        class ToDoList:
+            def __init__(self):
+                self.ta
+
+        ... rest of code",
+        ]
+      `);
+    });
+
+    it('shouldnt truncate code blocks', () => {
+      const markdown = `
+\`\`\`python
+class ToDoList:
+    def __init__(self):
+        self.tasks = []
+
+    def add_task(self, task):
+        self.tasks.append(task)
+        print(f'Added task: "{task}"')
+
+\`\`\`
+`;
+
+      expect(truncateChildrenContent(markdown, 10000)).toMatchInlineSnapshot(`
+        [
+          "
+        \`\`\`python
+        class ToDoList:
+            def __init__(self):
+                self.tasks = []
+
+            def add_task(self, task):
+                self.tasks.append(task)
+                print(f'Added task: "{task}"')
+
+        \`\`\`
+        ",
+        ]
+      `);
+    });
   });
 });
