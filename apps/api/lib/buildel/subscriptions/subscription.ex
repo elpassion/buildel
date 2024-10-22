@@ -45,17 +45,18 @@ defmodule Buildel.Subscriptions.Subscription do
   end
 
   def status(%Subscription{} = subscription) do
-    now = NaiveDateTime.utc_now()
+    now = DateTime.utc_now() |> DateTime.to_unix()
+    end_date = subscription.end_date |> DateTime.to_unix()
 
     case subscription do
-      %Subscription{end_date: end_date} when end_date < now ->
+      %Subscription{} when end_date < now ->
         :expired
 
-      %Subscription{end_date: end_date, cancel_at_period_end: canceled}
+      %Subscription{cancel_at_period_end: canceled}
       when end_date > now and canceled ->
         :canceled
 
-      %Subscription{end_date: end_date} when end_date > now ->
+      %Subscription{} when end_date > now ->
         :active
     end
   end

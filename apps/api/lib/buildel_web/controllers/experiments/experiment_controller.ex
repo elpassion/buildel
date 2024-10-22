@@ -8,6 +8,8 @@ defmodule BuildelWeb.ExperimentController do
   plug(:fetch_current_user)
   plug(:require_authenticated_user)
 
+  plug BuildelWeb.Subscriptions.CheckFeature, :experiments_limit when action in [:create]
+
   plug OpenApiSpex.Plug.CastAndValidate,
     json_render_error_v2: true,
     render_error: BuildelWeb.ErrorRendererPlug
@@ -103,7 +105,7 @@ defmodule BuildelWeb.ExperimentController do
              conn.body_params.experiment.dataset_id
            ),
          {:ok, experiment} <-
-           Buildel.Experiments.create_experiment(experiment_attrs)  do
+           Buildel.Experiments.create_experiment(experiment_attrs) do
       conn
       |> put_status(:created)
       |> render(:show, experiment: experiment)

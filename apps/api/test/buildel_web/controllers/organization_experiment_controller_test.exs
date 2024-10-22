@@ -122,6 +122,32 @@ defmodule BuildelWeb.OrganizationExperimentControllerTest do
       assert json_response(conn, 404)["errors"] != %{}
     end
 
+    test "checks subscription feature limit", %{
+      conn: conn,
+      organization: organization,
+      dataset: %{id: dataset_id},
+      pipeline: %{id: pipeline_id}
+    } do
+      Buildel.SubscriptionsFixtures.change_subscription_feature_limit(
+        organization.id,
+        "experiments_limit",
+        0
+      )
+
+      experiment_name = "some name"
+
+      conn =
+        post(conn, ~p"/api/organizations/#{organization.id}/experiments", %{
+          experiment: %{
+            name: experiment_name,
+            pipeline_id: pipeline_id,
+            dataset_id: dataset_id
+          }
+        })
+
+      assert json_response(conn, 403)["errors"] != %{}
+    end
+
     test "creates an experiment", %{
       conn: conn,
       pipeline: %{id: pipeline_id},
@@ -146,8 +172,8 @@ defmodule BuildelWeb.OrganizationExperimentControllerTest do
                "data" => %{
                  "name" => ^experiment_name,
                  "id" => _,
-                 "pipeline" => %{ "id" => ^pipeline_id, "name" => _},
-                 "dataset" => %{ "id" => ^dataset_id, "name" => _},
+                 "pipeline" => %{"id" => ^pipeline_id, "name" => _},
+                 "dataset" => %{"id" => ^dataset_id, "name" => _}
                }
              } = response
 

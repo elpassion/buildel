@@ -251,6 +251,23 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       assert json_response(conn, 404)
     end
 
+    test "checks subscription feature limit", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline
+    } do
+      Buildel.SubscriptionsFixtures.change_subscription_feature_limit(
+        organization.id,
+        "runs_limit",
+        0
+      )
+
+      conn =
+        conn = post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
+
+      assert json_response(conn, 403)["errors"] != %{}
+    end
+
     test "creates run with latest alias by default", %{
       conn: conn,
       organization: organization,

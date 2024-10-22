@@ -17,6 +17,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
   plug(:require_authenticated_user)
   plug BuildelWeb.FormDataArrayParserPlug
 
+  plug BuildelWeb.Subscriptions.CheckFeature, :runs_limit when action in [:create]
+
   plug OpenApiSpex.Plug.CastAndValidate,
     json_render_error_v2: true,
     render_error: BuildelWeb.ErrorRendererPlug
