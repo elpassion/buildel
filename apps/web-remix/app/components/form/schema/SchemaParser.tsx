@@ -332,3 +332,7 @@ export function fillSchemaDefaults<T>(
 
   return validateSchema.parse(data) as T;
 }
+
+export function isEditorField(schema: JSONSchemaField): boolean {
+  return 'presentAs' in schema && schema.presentAs === 'editor';
+}
