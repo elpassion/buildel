@@ -23,7 +23,7 @@ defmodule Buildel.SubscriptionsFixtures do
           |> DateTime.truncate(:second),
         end_date:
           NaiveDateTime.utc_now()
-          |> NaiveDateTime.add(31, :day)
+          |> NaiveDateTime.add(30, :day)
           |> DateTime.from_naive!("Etc/UTC")
           |> DateTime.truncate(:second),
         type: "free",
@@ -62,6 +62,16 @@ defmodule Buildel.SubscriptionsFixtures do
     subscription
     |> Subscriptions.Subscription.changeset(%{
       features: features
+    })
+    |> Buildel.Repo.update!()
+  end
+
+  def change_subscription_expiration_date(organization_id, date) do
+    subscription = Subscriptions.get_subscription_by_organization_id(organization_id)
+
+    subscription
+    |> Subscriptions.Subscription.changeset(%{
+      end_date: date
     })
     |> Buildel.Repo.update!()
   end

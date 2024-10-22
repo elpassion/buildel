@@ -1,6 +1,7 @@
 defmodule BuildelWeb.OrganizationSubscriptionsControllerTest do
   use BuildelWeb.ConnCase, async: true
   import Buildel.OrganizationsFixtures
+  import Buildel.SubscriptionsFixtures
 
   alias Buildel.Organizations
 
@@ -41,6 +42,34 @@ defmodule BuildelWeb.OrganizationSubscriptionsControllerTest do
         get(conn, ~p"/api/organizations/#{organization}/subscriptions")
 
       response = json_response(conn, 200)
+
+      assert_schema(response, "SubscriptionShowPlanResponse", api_spec)
+    end
+
+    test "shows and renews free local subscription if it's expired", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      old_date = DateTime.utc_now() |> DateTime.add(-1, :day)
+
+      subscription =
+        change_subscription_expiration_date(
+          organization.id,
+          old_date
+        )
+
+      conn =
+        get(conn, ~p"/api/organizations/#{organization}/subscriptions")
+
+      response = json_response(conn, 200)
+
+      {:ok, new_date, _} = DateTime.from_iso8601(response["data"]["end_date"])
+
+      assert DateTime.after?(
+               new_date,
+               DateTime.utc_now()
+             )
 
       assert_schema(response, "SubscriptionShowPlanResponse", api_spec)
     end

@@ -10,25 +10,63 @@ defmodule Buildel.SubscriptionsTest do
     import Buildel.OrganizationsFixtures
     import Buildel.SubscriptionsFixtures
 
-    # def get_organization_subscription(organization_id) do
-    #   subscription = Repo.one(from s in Subscription, where: s.organization_id == ^organization_id)
-
-    #   case subscription do
-    #     nil -> {:error, :not_found}
-    #     _ -> {:ok, Plan.from_db(subscription)}
-    #   end
-    # end
-
-    test "get_organization_subscription_plan/1 returns the organization subscription" do
+    test "get_and_renew_organization_subscription_plan/1 returns the organization subscription plan" do
       organization = organization_fixture()
 
-      assert {:ok, %Plan{} = _subscription} =
-               Subscriptions.get_organization_subscription_plan(organization.id)
+      assert {:ok, %Plan{} = _plan} =
+               Subscriptions.get_and_renew_organization_subscription_plan(organization.id)
     end
 
-    test "get_organization_subscription_plan/1 returns error when no subscription found" do
-      assert {:error, :not_found} =
-               Subscriptions.get_organization_subscription_plan(1)
+    test "get_and_renew_organization_subscription_plan/1 renews local free subscription if it's expired" do
+      organization = organization_fixture()
+      old_date = DateTime.utc_now() |> DateTime.add(-1, :day)
+
+      subscription =
+        change_subscription_expiration_date(
+          organization.id,
+          old_date
+        )
+
+      assert subscription.end_date < DateTime.utc_now()
+
+      assert {:ok, plan} =
+               Subscriptions.get_and_renew_organization_subscription_plan(organization.id)
+
+      assert DateTime.after?(plan.end_date, DateTime.utc_now())
+    end
+
+    test "get_and_renew_organization_subscription_plan/1 does not renew subscription if it's not expired" do
+      organization = organization_fixture()
+      old_date = DateTime.utc_now() |> DateTime.add(1, :day)
+
+      subscription =
+        change_subscription_expiration_date(
+          organization.id,
+          old_date
+        )
+
+      assert {:ok, plan} =
+               Subscriptions.get_and_renew_organization_subscription_plan(organization.id)
+
+      assert DateTime.to_unix(plan.end_date) == DateTime.to_unix(old_date)
+    end
+
+    test "get_and_renew_organization_subscription_plan/1 does not renew subscription if it's not free plan" do
+      organization = organization_fixture()
+      old_date = DateTime.utc_now() |> DateTime.add(-1, :day)
+
+      upgrade_subscription_to_plan(organization.id, "starter")
+
+      subscription =
+        change_subscription_expiration_date(
+          organization.id,
+          old_date
+        )
+
+      assert {:ok, plan} =
+               Subscriptions.get_and_renew_organization_subscription_plan(organization.id)
+
+      assert DateTime.to_unix(plan.end_date) == DateTime.to_unix(old_date)
     end
 
     test "get_subscription_by_organization_id!/1 returns the subscription with given organization id" do
