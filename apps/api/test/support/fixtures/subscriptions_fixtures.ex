@@ -1,6 +1,5 @@
 defmodule Buildel.SubscriptionsFixtures do
   import Buildel.OrganizationsFixtures
-  alias Buildel.Repo
   alias Buildel.Subscriptions
 
   def subscription_fixture(attrs \\ %{}) do

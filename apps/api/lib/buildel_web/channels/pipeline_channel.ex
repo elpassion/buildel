@@ -78,6 +78,7 @@ defmodule BuildelWeb.PipelineChannel do
          {:ok, organization_id} <- Buildel.Utils.parse_id(organization_id),
          {:ok, run_id} <- Buildel.Utils.parse_id(run_id),
          organization <- Buildel.Organizations.get_organization!(organization_id),
+         {:ok, _} <- check_feature(run_id, organization_id, :runs_limit),
          {:ok, %Pipelines.Pipeline{id: pipeline_id} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
          {:ok, _} <- Pipelines.verify_pipeline_budget_limit(pipeline),
@@ -138,11 +139,20 @@ defmodule BuildelWeb.PipelineChannel do
       {:error, {:shutdown, {:failed_to_start_child, _, {:error, block_name, reason}}}} ->
         {:error, %{errors: %{[block_name] => [reason]}}}
 
+      {:error, reason} ->
+        {:error, %{reason: reason}}
+
       err ->
         Logger.error("Unhandled error: #{inspect(err)}")
         {:error, %{reason: "unknown"}}
     end
   end
+
+  defp check_feature(nil, organization_id, feature) do
+    BuildelWeb.Subscriptions.CheckFeature.call(organization_id, feature)
+  end
+
+  defp check_feature(_, _, _), do: {:ok, nil}
 
   def get_interface_config(%Pipeline{} = pipeline, metadata) do
     case pipeline.interface_config do

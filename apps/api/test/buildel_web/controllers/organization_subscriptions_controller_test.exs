@@ -53,11 +53,10 @@ defmodule BuildelWeb.OrganizationSubscriptionsControllerTest do
     } do
       old_date = DateTime.utc_now() |> DateTime.add(-1, :day)
 
-      subscription =
-        change_subscription_expiration_date(
-          organization.id,
-          old_date
-        )
+      change_subscription_expiration_date(
+        organization.id,
+        old_date
+      )
 
       conn =
         get(conn, ~p"/api/organizations/#{organization}/subscriptions")
