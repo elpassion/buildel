@@ -1,9 +1,10 @@
-import { describe } from 'vitest';
+import { describe, expect } from 'vitest';
 
 import {
   ChatMarkdown,
   mergeAdjacentDetailsWithSameSummary,
 } from '~/components/chat/ChatMarkdown';
+import { addReferenceToLinks } from '~/components/chat/ChatMessages';
 import { render } from '~/tests/render';
 
 describe(ChatMarkdown.name, () => {
@@ -412,5 +413,55 @@ describe(ChatMarkdown.name, () => {
       `,
       );
     });
+  });
+  describe(addReferenceToLinks.name, () => {
+    it('should add link reference at the bottom of the markdown', () => {
+      const markdown = `
+### **Grilled Lemon Herb Chicken**
+
+**Ingredients:**
+- 4 boneless, skinless chicken breasts
+- 1/4 cup olive oil
+
+[Grilled Lemon Herb Chicken Recipe](https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607)
+[Some other Chicken Recipe](http://www.text.com)
+`;
+
+      const result = addReferenceToLinks(markdown);
+
+      expect(result.message).toMatchInlineSnapshot(`
+        "
+        ### **Grilled Lemon Herb Chicken**
+
+        **Ingredients:**
+        - 4 boneless, skinless chicken breasts
+        - 1/4 cup olive oil
+
+        [Grilled Lemon Herb Chicken Recipe](https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607) <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">1</span>
+        [Some other Chicken Recipe](http://www.text.com) <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">2</span>
+        "
+      `);
+      expect(result.links).toEqual([
+        new URL(
+          'https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607',
+        ),
+        new URL('http://www.text.com/'),
+      ]);
+    });
+  });
+
+  it('should ignore links when incorrect', () => {
+    const markdown = `
+(https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607)
+`;
+
+    const result = addReferenceToLinks(markdown);
+
+    expect(result.links).toEqual([]);
+    expect(result.message).toMatchInlineSnapshot(`
+      "
+      (https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607)
+      "
+    `);
   });
 });
