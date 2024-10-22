@@ -126,7 +126,7 @@ export function generateZODSchema(
     return zfd.json(nestedSchema);
   }
 
-  if (schema.type === 'object') {
+  if (schema.type === 'object' || schema.type === 'section') {
     const propertySchemas: z.ZodRawShape = Object.entries(
       schema.properties,
     ).reduce((acc, [key, value]) => {
@@ -172,7 +172,15 @@ export function generateZODSchema(
 }
 
 export type JSONSchemaObjectField = {
+  title?: string;
   type: 'object';
+  properties: { [key: string]: JSONSchemaField };
+  required?: string[];
+};
+
+export type JSONSchemaSectionField = {
+  title?: string;
+  type: 'section';
   properties: { [key: string]: JSONSchemaField };
   required?: string[];
 };
@@ -187,6 +195,7 @@ export type DisplayWhen = {
 
 export type JSONSchemaField =
   | JSONSchemaObjectField
+  | JSONSchemaSectionField
   | {
       type: 'string';
       title: string;

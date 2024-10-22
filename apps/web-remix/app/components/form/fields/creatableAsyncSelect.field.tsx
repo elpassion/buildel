@@ -12,7 +12,10 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
-import type { AsyncSelectInputProps } from '~/components/form/inputs/select/select.input';
+import type {
+  AsyncSelectInputFetchingState,
+  AsyncSelectInputProps,
+} from '~/components/form/inputs/select/select.input';
 import { AsyncSelectInput } from '~/components/form/inputs/select/select.input';
 import type { FieldProps } from '~/components/form/schema/Schema';
 import { Schema } from '~/components/form/schema/Schema';
@@ -80,6 +83,8 @@ export const CreatableAsyncSelectField = forwardRef<
     });
     const { isModalOpen, openModal, closeModal, changeOpen } = useModal();
 
+    const [state, setState] =
+      useState<AsyncSelectInputFetchingState>('loading');
     const [options, setOptions] = useState<{ value: string; label: string }[]>(
       [],
     );
@@ -88,6 +93,7 @@ export const CreatableAsyncSelectField = forwardRef<
     );
 
     useEffect(() => {
+      if (state === 'loading') return;
       const doesSelectedIdExist = options.some(
         (opt) => opt.value === selectedId,
       );
@@ -96,7 +102,7 @@ export const CreatableAsyncSelectField = forwardRef<
         setSelectedId(undefined);
         validate();
       }
-    }, [options, selectedId]);
+    }, [options, selectedId, state]);
 
     useEffect(() => {
       if (
@@ -111,6 +117,12 @@ export const CreatableAsyncSelectField = forwardRef<
 
     const onOptionsFetch = (options: { value: string; label: string }[]) => {
       setOptions(options);
+    };
+
+    const onOptionsFetchStateChange = (
+      state: AsyncSelectInputFetchingState,
+    ) => {
+      setState(state);
     };
 
     const onChange = (id: string) => {
@@ -164,6 +176,7 @@ export const CreatableAsyncSelectField = forwardRef<
         <AsyncSelectInput
           placeholder="Select..."
           onOptionsFetch={onOptionsFetch}
+          onOptionsFetchStateChange={onOptionsFetchStateChange}
           fetchOptions={fetcher}
           defaultValue={defaultValue}
           onChange={onChange}
@@ -238,6 +251,7 @@ export function CreatableAsyncForm({
         schema={JSONSchema}
         name={null}
         fields={{
+          section: () => <></>,
           editor: () => <></>,
           string: StringField,
           number: NumberField,

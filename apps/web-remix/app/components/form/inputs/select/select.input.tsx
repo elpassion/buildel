@@ -18,6 +18,8 @@ export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
   );
 };
 
+export type AsyncSelectInputFetchingState = 'idle' | 'loading';
+
 export interface AsyncSelectInputProps<T = {}>
   extends Omit<
     SelectInputProps,
@@ -27,15 +29,17 @@ export interface AsyncSelectInputProps<T = {}>
     search: string,
   ) => Promise<({ value: string; label: string } & T)[]>;
   onOptionsFetch?: (options: ({ value: string; label: string } & T)[]) => void;
+  onOptionsFetchStateChange?: (state: AsyncSelectInputFetchingState) => void;
 }
 
 export const AsyncSelectInput = <T = {},>({
   fetchOptions,
   onOptionsFetch,
+  onOptionsFetchStateChange,
   ...props
 }: AsyncSelectInputProps<T>) => {
   const isMounted = useIsMounted();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchValue, setSearchValue] = useState('');
   const debouncedSearch = useDebounce(searchValue, 500);
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
@@ -55,6 +59,10 @@ export const AsyncSelectInput = <T = {},>({
   useEffect(() => {
     loadOptions();
   }, [debouncedSearch, loadOptions]);
+
+  useEffect(() => {
+    onOptionsFetchStateChange?.(loading ? 'loading' : 'idle');
+  }, [loading]);
 
   return (
     <SelectInput

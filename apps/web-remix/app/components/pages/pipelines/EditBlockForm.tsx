@@ -28,6 +28,7 @@ import {
   ArrayField,
   BooleanField,
   NumberField,
+  SectionField,
   StringField,
 } from '~/components/form/schema/SchemaFields';
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
@@ -445,6 +446,7 @@ export function EditBlockForm({
               editor: CustomEditorField,
               asyncSelect: SelectField,
               asyncCreatableSelect: AsyncCreatableField,
+              section: SectionField,
             }}
           />
 

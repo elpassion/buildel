@@ -356,6 +356,7 @@ defmodule Buildel.Pipelines do
         opts:
           block["opts"]
           |> keys_to_atoms()
+          |> flatten_map()
           |> Map.put(:metadata, config["metadata"] || %{})
       }
     end)
@@ -404,6 +405,20 @@ defmodule Buildel.Pipelines do
       Repo.update(pipeline)
     end
   end
+
+  defp flatten_map(map), do: flatten_map(map, %{})
+
+  defp flatten_map(%{} = map, acc) do
+    map
+    |> Enum.reduce(acc, fn {key, value}, acc ->
+      case value do
+        %{} -> flatten_map(value, acc)
+        _ -> Map.put(acc, key, value)
+      end
+    end)
+  end
+
+  defp flatten_map(_value, acc), do: acc
 
   defp block_valid?(config, block_config) do
     cond do
