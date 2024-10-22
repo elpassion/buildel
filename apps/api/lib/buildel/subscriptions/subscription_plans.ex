@@ -8,7 +8,9 @@ defmodule Buildel.Subscriptions.Plan do
     :end_date,
     :customer_id,
     :features,
-    :usage
+    :usage,
+    :id,
+    :organization_id
   ]
 
   @plan_features %{
@@ -64,7 +66,7 @@ defmodule Buildel.Subscriptions.Plan do
       start_date: NaiveDateTime.utc_now(),
       end_date:
         NaiveDateTime.utc_now()
-        |> NaiveDateTime.add(31, :day),
+        |> NaiveDateTime.add(30, :day),
       type: type,
       interval: "month",
       features: features,
@@ -74,6 +76,8 @@ defmodule Buildel.Subscriptions.Plan do
 
   def from_db(%Buildel.Subscriptions.Subscription{} = subscription) do
     %__MODULE__{
+      id: subscription.id,
+      organization_id: subscription.organization_id,
       type: subscription.type,
       status: subscription |> Buildel.Subscriptions.Subscription.status(),
       interval: subscription.interval,

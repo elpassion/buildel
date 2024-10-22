@@ -7,7 +7,7 @@ defmodule BuildelWeb.Subscriptions.CheckFeature do
   def init(default), do: default
 
   def call(%{params: %{"organization_id" => organization_id}} = conn, feature) do
-    {:ok, plan} = Subscriptions.get_organization_subscription_plan(organization_id)
+    {:ok, plan} = Subscriptions.get_and_renew_organization_subscription_plan(organization_id)
 
     case Map.get(plan.features, to_string(feature)) do
       nil ->

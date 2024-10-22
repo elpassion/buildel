@@ -19,7 +19,7 @@ defmodule Buildel.Repo.Migrations.CreateSubscriptionsForOrganizations do
             |> DateTime.truncate(:second),
           end_date:
             NaiveDateTime.utc_now()
-            |> NaiveDateTime.add(31, :day)
+            |> NaiveDateTime.add(30, :day)
             |> DateTime.from_naive!("Etc/UTC")
             |> DateTime.truncate(:second),
           type: "free",

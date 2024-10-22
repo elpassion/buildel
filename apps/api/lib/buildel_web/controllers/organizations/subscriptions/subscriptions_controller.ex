@@ -49,7 +49,8 @@ defmodule BuildelWeb.OrganizationSubscriptionController do
     user = conn.assigns.current_user
 
     with {:ok, _organization} <- Organizations.get_user_organization(user, organization_id),
-         {:ok, plan} <- Subscriptions.get_organization_subscription_plan(organization_id) do
+         {:ok, plan} <-
+           Subscriptions.get_and_renew_organization_subscription_plan(organization_id) do
       render(conn, :show, plan: plan)
     end
   end

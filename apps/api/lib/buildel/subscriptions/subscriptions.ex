@@ -6,12 +6,23 @@ defmodule Buildel.Subscriptions do
   alias Buildel.Clients.Stripe
   alias Buildel.Subscriptions.Subscription
 
-  def get_organization_subscription_plan(organization_id) do
-    subscription = Repo.one(from s in Subscription, where: s.organization_id == ^organization_id)
+  def get_and_renew_organization_subscription_plan(organization_id) do
+    subscription = get_subscription_by_organization_id!(organization_id)
 
-    case subscription do
-      nil -> {:error, :not_found}
-      _ -> {:ok, Plan.from_db(subscription)}
+    case {subscription |> Subscription.status(), subscription.subscription_id, subscription.type} do
+      {:expired, nil, "free"} ->
+        {:ok, subscription} =
+          renew_subscription(subscription, %{
+            "period_end" =>
+              subscription.end_date
+              |> DateTime.add(30, :day)
+              |> DateTime.to_unix()
+          })
+
+        {:ok, subscription |> Plan.from_db()}
+
+      _ ->
+        {:ok, Plan.from_db(subscription)}
     end
   end
 
