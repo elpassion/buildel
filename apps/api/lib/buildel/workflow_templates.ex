@@ -787,6 +787,16 @@ defmodule Buildel.WorkflowTemplates do
             connections: [
               create_connection("text_input_1", "chat_1")
             ],
+            opts: %{
+              system_message: "You are a helpful assistant",
+              prompt_template: "{{text_input_1:output}}",
+              model_section: %{
+                api_type: "openai",
+                endpoint: "https://api.openai.com/v1",
+                model: "gpt-4o-mini",
+                api_key: "__openai"
+              }
+            },
             inputs: ["text_input_1:output->input?reset=true"],
             position: %{x: 400, y: -500}
           }),
