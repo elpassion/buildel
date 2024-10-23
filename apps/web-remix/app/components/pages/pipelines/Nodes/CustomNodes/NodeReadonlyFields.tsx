@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import debounce from 'lodash.debounce';
 import startCase from 'lodash.startcase';
 
 import { asyncSelectApi } from '~/api/AsyncSelectApi';
@@ -173,18 +180,20 @@ function NodeReadonlyAsyncItem({
 
   const [finalValue, setFinalValue] = useState(value);
 
-  const readyUrl = url
-    .replace('{{organization_id}}', organizationId.toString())
-    .replace('{{pipeline_id}}', pipelineId.toString())
-    .replace(/{{([\w.]+)}}/g, (_fullMatch, key) => {
-      const cleanedKey = (key as string).split('.').at(-1);
+  const readyUrl = useMemo(() => {
+    return url
+      .replace('{{organization_id}}', organizationId.toString())
+      .replace('{{pipeline_id}}', pipelineId.toString())
+      .replace(/{{([\w.]+)}}/g, (_fullMatch, key) => {
+        const cleanedKey = (key as string).split('.').at(-1);
 
-      const replacedValue = cleanedKey ? context[cleanedKey] : key;
+        const replacedValue = cleanedKey ? context[cleanedKey] : key;
 
-      return replacedValue ?? cleanedKey;
-    });
+        return replacedValue ?? cleanedKey;
+      });
+  }, [pipelineId, organizationId, url, context]);
 
-  const fetchOptions = async () => {
+  const fetchOptions = useCallback(async () => {
     if (abortController.current) {
       abortController.current.abort();
     }
@@ -198,14 +207,22 @@ function NodeReadonlyAsyncItem({
     } finally {
       abortController.current = null;
     }
-  };
+  }, [readyUrl]);
 
-  useEffect(() => {
+  const debouncedFetchOptions = debounce(() => {
     fetchOptions().then((options) => {
       setFinalValue(
         options.find((option) => option.value === value)?.label ?? value,
       );
     });
+  }, 300);
+
+  useEffect(() => {
+    debouncedFetchOptions();
+
+    return () => {
+      debouncedFetchOptions.cancel();
+    };
   }, [url, value]);
 
   return (
