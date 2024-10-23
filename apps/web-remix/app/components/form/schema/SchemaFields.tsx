@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import startCase from 'lodash.startcase';
 import { ChevronDown, Trash } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'remix-validated-form';
@@ -86,7 +86,8 @@ export function StringField({
         />
       );
     }
-
+    //eslint-disable-next-line
+    //@ts-ignore
     let defaultValue = field.default;
 
     if ('defaultWhen' in field && field.defaultWhen) {
@@ -515,6 +516,7 @@ function SectionFieldPreviewAsyncItem({
   value,
   label,
 }: SectionFieldPreviewAsyncItemProps) {
+  const abortController = useRef<AbortController | null>(null);
   const organizationId = useOrganizationId();
   const pipelineId = usePipelineId();
 
@@ -535,15 +537,26 @@ function SectionFieldPreviewAsyncItem({
     });
 
   const fetchOptions = async () => {
-    return asyncSelectApi
-      .getData(readyUrl)
-      .then((opts) => opts.map(toSelectOption));
+    if (abortController.current) {
+      abortController.current.abort();
+    }
+    abortController.current = new AbortController();
+
+    try {
+      return await asyncSelectApi
+        .getData(readyUrl, { signal: abortController.current.signal })
+        .then((opts) => opts.map(toSelectOption));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      abortController.current = null;
+    }
   };
 
   useEffect(() => {
     fetchOptions().then((options) => {
       setFinalValue(
-        options.find((option) => option.value === value)?.label ?? value,
+        options?.find((option) => option.value === value)?.label ?? value,
       );
     });
   }, [url, value]);
