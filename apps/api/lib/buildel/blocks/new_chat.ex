@@ -15,26 +15,6 @@ defmodule Buildel.Blocks.NewChat do
 
   defoutput(:output, schema: %{})
 
-  deftool(:query,
-    default_description: fn _state ->
-      "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.
-            CALL IT WITH FORMAT `{ \"query\": \"example query\" }`
-            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries.
-            You can use `document_id` property to narrow the search to the specific document.
-            DO NOT SET MORE THAN 2 KEYWORDS"
-    end,
-    schema: %{
-      type: "object",
-      properties: %{
-        message: %{
-          type: "string",
-          description: "Message to send to the agent."
-        }
-      },
-      required: ["message"]
-    }
-  )
-
   defoption(:api_type, %{
     "type" => "string",
     "title" => "Model API type",
