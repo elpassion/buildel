@@ -107,6 +107,9 @@ defmodule Buildel.Blocks.Chat do
                           }
                         }),
                       endpoint: %{
+                        "errorMessages" => %{
+                          "minLength" => "Endpoint is required."
+                        },
                         "type" => "string",
                         "title" => "Endpoint",
                         "description" => "The endpoint to use for the chat.",

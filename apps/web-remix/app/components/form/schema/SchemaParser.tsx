@@ -52,7 +52,10 @@ export function generateZODSchema(
       schema.minLength !== undefined &&
       'min' in nestedSchema
     ) {
-      nestedSchema = nestedSchema?.min(schema.minLength);
+      nestedSchema = nestedSchema?.min(
+        schema.minLength,
+        schema.errorMessages?.minLength,
+      );
     }
     if (
       'maxLength' in schema &&
@@ -211,6 +214,7 @@ export type JSONSchemaField =
       readonly?: boolean;
       defaultWhen?: Record<string, Record<string, string>>;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -220,6 +224,7 @@ export type JSONSchemaField =
       maxLength?: number;
       presentAs: 'password';
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -227,6 +232,7 @@ export type JSONSchemaField =
       description: string;
       presentAs: 'wysiwyg';
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -240,6 +246,7 @@ export type JSONSchemaField =
       default?: string;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -252,6 +259,7 @@ export type JSONSchemaField =
       default?: string;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -261,6 +269,7 @@ export type JSONSchemaField =
       url: string;
       default?: string;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -272,6 +281,7 @@ export type JSONSchemaField =
       schema: JSONSchemaField;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'number' | 'integer';
@@ -283,6 +293,7 @@ export type JSONSchemaField =
       default?: number;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'array';
@@ -292,6 +303,7 @@ export type JSONSchemaField =
       minItems: number;
       default?: unknown[];
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'boolean';
@@ -299,6 +311,7 @@ export type JSONSchemaField =
       description: string;
       default?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     };
 
 export function checkDisplayWhenConditions(
