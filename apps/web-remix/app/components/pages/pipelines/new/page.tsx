@@ -1,9 +1,15 @@
 import React, { useMemo, useRef, useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { useLoaderData, useMatch, useNavigate } from '@remix-run/react';
+import {
+  useFetcher,
+  useLoaderData,
+  useMatch,
+  useNavigate,
+} from '@remix-run/react';
 import { withZod } from '@remix-validated-form/with-zod';
 import startCase from 'lodash.startcase';
 import { ValidatedForm } from 'remix-validated-form';
+import type { z } from 'zod';
 
 import type { IWorkflowTemplate } from '~/api/organization/organization.contracts';
 import { CreateFromTemplateSchema } from '~/api/organization/organization.contracts';
@@ -34,6 +40,7 @@ import {
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
 import { RadioGroup, RadioTabGroupItem } from '~/components/ui/radio-group';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
@@ -137,12 +144,7 @@ function TemplatesStep() {
       </div>
 
       <TemplateTabs templates={templates}>
-        {({ templates: filtered }) => (
-          <TemplateList
-            items={filtered}
-            action={`/${organizationId}/pipelines`}
-          />
-        )}
+        {({ templates: filtered }) => <TemplateList items={filtered} />}
       </TemplateTabs>
     </>
   );
@@ -214,10 +216,9 @@ function TemplateTabs({ templates, children }: TemplateTabsProps) {
 
 interface TemplateListProps {
   items: IWorkflowTemplate[];
-  action?: string;
   children?: React.ReactNode;
 }
-export function TemplateList({ items, action, children }: TemplateListProps) {
+export function TemplateList({ items, children }: TemplateListProps) {
   const formattedTemplates = useMemo(
     () => items.map((template) => ({ ...template, id: template.name })),
     [items],
@@ -227,7 +228,7 @@ export function TemplateList({ items, action, children }: TemplateListProps) {
       <ItemList
         className="grid grid-cols-1 md:grid-cols-2 gap-3"
         items={formattedTemplates}
-        renderItem={(item) => <TemplateListItem action={action} item={item} />}
+        renderItem={(item) => <TemplateListItem item={item} />}
       >
         {children}
       </ItemList>
@@ -237,21 +238,36 @@ export function TemplateList({ items, action, children }: TemplateListProps) {
 
 interface ITemplateItem {
   item: IWorkflowTemplate;
-  action?: string;
 }
-function TemplateListItem({ item, action }: ITemplateItem) {
-  const ref = useRef<HTMLFormElement>(null);
+function TemplateListItem({ item }: ITemplateItem) {
+  const organizationId = useOrganizationId();
+  const ref = useRef<HTMLButtonElement>(null);
   const validator = useMemo(() => withZod(CreateFromTemplateSchema), []);
+  const fetcher = useFetcher();
+
+  const onSubmit = async (
+    data: z.TypeOf<typeof CreateFromTemplateSchema>,
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.set('template_name', data.template_name);
+
+    fetcher.submit(formData, {
+      action: routes.pipelines(organizationId),
+      method: 'POST',
+    });
+  };
 
   return (
     <ValidatedForm
-      //@ts-ignore
-      formRef={ref}
-      action={action}
       method="POST"
       validator={validator}
-      onClick={() => ref.current?.submit()}
+      onSubmit={onSubmit}
+      onClick={() => ref.current?.click()}
       className="group p-2 bg-white border border-neutral-100 min-h-[90px] rounded-xl transition hover:border-blue-200 cursor-pointer md:p-3 md:min-h-[98px] h-full"
+      noValidate
     >
       <div className="flex flex-col gap-2">
         <div className="flex gap-2 items-center">
@@ -290,6 +306,12 @@ function TemplateListItem({ item, action }: ITemplateItem) {
       </div>
 
       <HiddenField name="template_name" value={item.template_name} />
+
+      <button
+        className="pointer-events-none opacity-0"
+        ref={ref}
+        type="submit"
+      />
     </ValidatedForm>
   );
 }
