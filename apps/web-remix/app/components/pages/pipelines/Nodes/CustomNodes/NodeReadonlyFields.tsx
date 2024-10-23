@@ -15,7 +15,11 @@ import type {
   JSONSchemaObjectField,
   JSONSchemaSectionField,
 } from '~/components/form/schema/SchemaParser';
-import { isEditorField } from '~/components/form/schema/SchemaParser';
+import {
+  isEditorField,
+  isObjectField,
+  isSectionField,
+} from '~/components/form/schema/SchemaParser';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
 import { cn } from '~/utils/cn';
@@ -232,18 +236,6 @@ function NodeReadonlyAsyncItem({
     </NodeReadonlyItemWrapper>
   );
 }
-
-const isObjectField = (
-  schema?: JSONSchemaField,
-): schema is JSONSchemaObjectField => {
-  return (schema as JSONSchemaObjectField)?.type === 'object';
-};
-
-const isSectionField = (
-  schema?: JSONSchemaField,
-): schema is JSONSchemaSectionField => {
-  return (schema as JSONSchemaSectionField)?.type === 'section';
-};
 
 function showValue(value: unknown) {
   if (typeof value === 'boolean' || typeof value === 'number') {
