@@ -63,7 +63,7 @@ export function NewKnowledgeBasePage() {
         <div>
           <Field name="embeddings.endpoint">
             <FieldLabel>Endpoint</FieldLabel>
-            <TextInputField type="text" name="endpoint" />
+            <TextInputField type="text" />
             <FieldMessage>
               API endpoint used for retrieving embeddings
             </FieldMessage>

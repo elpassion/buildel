@@ -229,8 +229,13 @@ defmodule Buildel.Clients.Chat do
   def get_models(%{api_type: "anthropic"}) do
     [
       %{
+        id: "claude-3-5-sonnet-20241022",
+        name: "claude-3-5-sonnet-20241022",
+        api_type: "anthropic"
+      },
+      %{
         id: "claude-3-5-sonnet-20240620",
-        name: "anthropic.claude-3-5-sonnet-20240620-v1:0",
+        name: "claude-3-5-sonnet-20240620",
         api_type: "anthropic"
       },
       %{

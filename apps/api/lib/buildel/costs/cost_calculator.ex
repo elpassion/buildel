@@ -130,6 +130,10 @@ defmodule Buildel.Costs.CostCalculator do
       {"https://api.anthropic.com/v1", "claude-3-haiku-20240307"} => %{
         input_token_price: Decimal.new("0.00025") |> Decimal.div(1000),
         output_token_price: Decimal.new("0.00125") |> Decimal.div(1000)
+      },
+      {"https://api.anthropic.com/v1", "claude-3-5-sonnet-20241022"} => %{
+        input_token_price: Decimal.new("0.003") |> Decimal.div(1000),
+        output_token_price: Decimal.new("0.015") |> Decimal.div(1000)
       }
     }
     |> Map.get_lazy(api_model, fn ->
