@@ -1,7 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import startCase from 'lodash.startcase';
 import { ChevronDown, Trash } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'remix-validated-form';
 
+import { asyncSelectApi } from '~/api/AsyncSelectApi';
+import { toSelectOption } from '~/components/form/fields/asyncSelect.field';
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field as FormField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
@@ -21,6 +24,8 @@ import { IconButton } from '~/components/iconButton';
 import { Button } from '~/components/ui/button';
 import { Collapsible, CollapsibleTrigger } from '~/components/ui/collapsible';
 import { Label } from '~/components/ui/label';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { usePipelineId } from '~/hooks/usePipelineId';
 import { assert } from '~/utils/assert';
 import { cn } from '~/utils/cn';
 
@@ -312,7 +317,7 @@ export function SectionField({ field, name, ...rest }: FieldProps) {
         )}
       >
         <CollapsibleTrigger className="relative w-full flex justify-between items-center h-10 text-sm">
-          <SectionFieldPreview field={field} name={name} />
+          <SectionFieldPreview field={field} keyPrefix={name} />
 
           <div className="w-14 h-10 absolute top-1/2 right-7 -translate-y-1/2 bg-gradient-to-r from-transparent to-white pointer-events-none" />
 
@@ -336,41 +341,90 @@ export function SectionField({ field, name, ...rest }: FieldProps) {
 }
 
 interface SectionFieldPreviewProps {
-  name: string | null;
+  keyPrefix: string | null;
   field: JSONSchemaField;
 }
-function SectionFieldPreview({ field, name }: SectionFieldPreviewProps) {
+function SectionFieldPreview({ field, keyPrefix }: SectionFieldPreviewProps) {
   assert(field.type === 'object');
-
-  const { getValues } = useFormContext();
-  const values = getValues();
 
   return (
     <div className="flex items-center divide-x overflow-hidden">
-      {Object.entries(field.properties).map(([propertyKey, property]) => {
+      {Object.entries(field.properties).map(([propertyKey, schema]) => {
         const fieldKey =
-          name === null || name === '' ? propertyKey : `${name}.${propertyKey}`;
+          keyPrefix === null || keyPrefix === ''
+            ? propertyKey
+            : `${keyPrefix}.${propertyKey}`;
 
-        // Only show string and number properties for now
-        if (property.type === 'string' || property.type === 'number') {
-          const propertyValue = values.get(fieldKey)?.toString() ?? '';
-
-          if (!propertyValue) return null;
-          return (
-            <p
-              key={fieldKey + '_preview'}
-              className="flex gap-1 items-center [&:not(:first-child)]:pl-3 pr-3"
-              title={propertyValue}
-            >
-              <span className="text-[#999]">{propertyKey}</span>{' '}
-              <span className="max-w-[100px] truncate">{propertyValue}</span>
-            </p>
-          );
-        }
-        return null;
+        return (
+          <SectionFieldPreviewItem
+            key={fieldKey + '_preview'}
+            fullKey={fieldKey}
+            name={propertyKey}
+            schema={schema}
+          />
+        );
       })}
     </div>
   );
+}
+
+interface SectionFieldPreviewItemProps {
+  schema: JSONSchemaField;
+  fullKey: string;
+  name: string;
+}
+function SectionFieldPreviewItem({
+  schema,
+  fullKey,
+  name,
+}: SectionFieldPreviewItemProps) {
+  const { getValues } = useFormContext();
+  const values = getValues();
+
+  const propertyValue = values.get(fullKey)?.toString() ?? '';
+
+  if (!propertyValue) return null;
+
+  if (schema.type === 'number') {
+    return (
+      <SectionFieldPreviewItemWrapper title={propertyValue}>
+        <SectionFieldPreviewItemTitle>
+          {startCase(name)}
+        </SectionFieldPreviewItemTitle>
+        <SectionFieldPreviewItemValue>
+          {propertyValue}
+        </SectionFieldPreviewItemValue>
+      </SectionFieldPreviewItemWrapper>
+    );
+  }
+
+  if (schema.type === 'string') {
+    if (
+      'presentAs' in schema &&
+      (schema.presentAs === 'async-creatable-select' ||
+        schema.presentAs === 'async-select')
+    ) {
+      return (
+        <SectionFieldPreviewAsyncItem
+          url={schema.url}
+          value={propertyValue}
+          label={name}
+        />
+      );
+    }
+
+    return (
+      <SectionFieldPreviewItemWrapper title={propertyValue}>
+        <SectionFieldPreviewItemTitle>
+          {startCase(name)}
+        </SectionFieldPreviewItemTitle>
+        <SectionFieldPreviewItemValue>
+          {propertyValue}
+        </SectionFieldPreviewItemValue>
+      </SectionFieldPreviewItemWrapper>
+    );
+  }
+  return null;
 }
 
 interface SectionFieldErrorsProps {
@@ -405,5 +459,101 @@ function SectionFieldErrors({ name }: SectionFieldErrorsProps) {
         <p key={key + '_preview_error'}>{value}</p>
       ))}
     </div>
+  );
+}
+
+function SectionFieldPreviewItemWrapper({
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      className={cn(
+        'flex gap-1 items-center [&:not(:first-child)]:pl-3 pr-3',
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SectionFieldPreviewItemTitle({
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLSpanElement>) {
+  return (
+    <span className={cn('text-[#999] whitespace-nowrap', className)} {...rest}>
+      {children}
+    </span>
+  );
+}
+
+function SectionFieldPreviewItemValue({
+  className,
+  children,
+  ...rest
+}: React.HTMLAttributes<HTMLParagraphElement>) {
+  return (
+    <p className={cn('max-w-[100px] truncate', className)} {...rest}>
+      {children}
+    </p>
+  );
+}
+
+interface SectionFieldPreviewAsyncItemProps {
+  url: string;
+  value: string;
+  label: string;
+}
+
+function SectionFieldPreviewAsyncItem({
+  url,
+  value,
+  label,
+}: SectionFieldPreviewAsyncItemProps) {
+  const organizationId = useOrganizationId();
+  const pipelineId = usePipelineId();
+
+  const { getValues } = useFormContext();
+  const context = getValues();
+
+  const [finalValue, setFinalValue] = useState(value);
+
+  const readyUrl = url
+    .replace('{{organization_id}}', organizationId.toString())
+    .replace('{{pipeline_id}}', pipelineId.toString())
+    .replace(/{{([\w.]+)}}/g, (_fullMatch, key) => {
+      const cleanedKey = key.replace(/^[^.]+\./, '');
+
+      const replacedValue = context.get(key)?.toString();
+
+      return replacedValue ?? cleanedKey;
+    });
+
+  const fetchOptions = async () => {
+    return asyncSelectApi
+      .getData(readyUrl)
+      .then((opts) => opts.map(toSelectOption));
+  };
+
+  useEffect(() => {
+    fetchOptions().then((options) => {
+      setFinalValue(
+        options.find((option) => option.value === value)?.label ?? value,
+      );
+    });
+  }, [url, value]);
+
+  return (
+    <SectionFieldPreviewItemWrapper title={finalValue}>
+      <SectionFieldPreviewItemTitle>
+        {startCase(label)}
+      </SectionFieldPreviewItemTitle>
+      <SectionFieldPreviewItemValue>{finalValue}</SectionFieldPreviewItemValue>
+    </SectionFieldPreviewItemWrapper>
   );
 }
