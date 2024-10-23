@@ -706,7 +706,7 @@ defmodule Buildel.WorkflowTemplates do
           })
         ],
         connections: [
-          create_connection("text_input_1", "document_search_1"),
+          create_connection(%{block_name: "text_input_1", output_name: "output"}, %{block_name: "document_search_1", input_name: "query"}),
           create_connection("document_search_1", "text_output_1")
         ],
         version: "1"
