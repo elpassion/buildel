@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import debounce from 'lodash.debounce';
 import startCase from 'lodash.startcase';
 import { ChevronDown, Trash } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'remix-validated-form';
@@ -525,18 +532,20 @@ function SectionFieldPreviewAsyncItem({
 
   const [finalValue, setFinalValue] = useState(value);
 
-  const readyUrl = url
-    .replace('{{organization_id}}', organizationId.toString())
-    .replace('{{pipeline_id}}', pipelineId.toString())
-    .replace(/{{([\w.]+)}}/g, (_fullMatch, key) => {
-      const cleanedKey = key.replace(/^[^.]+\./, '');
+  const readyUrl = useMemo(() => {
+    return url
+      .replace('{{organization_id}}', organizationId.toString())
+      .replace('{{pipeline_id}}', pipelineId.toString())
+      .replace(/{{([\w.]+)}}/g, (_fullMatch, key) => {
+        const cleanedKey = key.replace(/^[^.]+\./, '');
 
-      const replacedValue = context.get(key)?.toString();
+        const replacedValue = context.get(key)?.toString();
 
-      return replacedValue ?? cleanedKey;
-    });
+        return replacedValue ?? cleanedKey;
+      });
+  }, [url, organizationId, pipelineId, context]);
 
-  const fetchOptions = async () => {
+  const fetchOptions = useCallback(async () => {
     if (abortController.current) {
       abortController.current.abort();
     }
@@ -551,14 +560,22 @@ function SectionFieldPreviewAsyncItem({
     } finally {
       abortController.current = null;
     }
-  };
+  }, [readyUrl]);
 
-  useEffect(() => {
+  const debouncedFetchOptions = debounce(() => {
     fetchOptions().then((options) => {
       setFinalValue(
         options?.find((option) => option.value === value)?.label ?? value,
       );
     });
+  }, 200);
+
+  useEffect(() => {
+    debouncedFetchOptions();
+
+    return () => {
+      debouncedFetchOptions.cancel();
+    };
   }, [url, value]);
 
   return (

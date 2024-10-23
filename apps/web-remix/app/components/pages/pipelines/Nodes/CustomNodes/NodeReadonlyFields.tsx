@@ -215,7 +215,7 @@ function NodeReadonlyAsyncItem({
         options.find((option) => option.value === value)?.label ?? value,
       );
     });
-  }, 300);
+  }, 100);
 
   useEffect(() => {
     debouncedFetchOptions();

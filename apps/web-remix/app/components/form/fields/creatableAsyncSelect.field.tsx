@@ -149,11 +149,14 @@ export const CreatableAsyncSelectField = forwardRef<
       }
     };
 
-    const fetcher = useCallback(async () => {
-      return asyncSelectApi.getData(url).then((opts) => {
-        return opts.map(toSelectOption);
-      });
-    }, [url, isModalOpen]);
+    const fetcher = useCallback(
+      async (_search: string, args?: RequestInit) => {
+        return asyncSelectApi.getData(url, args).then((opts) => {
+          return opts.map(toSelectOption);
+        });
+      },
+      [url, isModalOpen],
+    );
 
     return (
       <>
