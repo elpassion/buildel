@@ -46,7 +46,7 @@ import { useDraggableNodes } from './useDraggableNodes';
 import '@xyflow/react/dist/style.css';
 
 import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
-import { fillSchemaDefaults } from '~/components/form/schema/SchemaParser';
+import { fillSchemaWithDefaults } from '~/components/form/schema/SchemaParser';
 import { BuilderControls } from '~/components/pages/pipelines/BuilderControls';
 import { useLayoutNodes } from '~/components/pages/pipelines/useLayoutNodes';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
@@ -260,7 +260,7 @@ const BuilderInstance = ({
         position: created.position ?? { x: 100, y: 100 },
         data: {
           ...created,
-          ...fillSchemaDefaults(
+          ...fillSchemaWithDefaults(
             created.block_type!.schema as JSONSchemaField,
             { ...created, name },
             {

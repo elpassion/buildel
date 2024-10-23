@@ -52,7 +52,10 @@ export function generateZODSchema(
       schema.minLength !== undefined &&
       'min' in nestedSchema
     ) {
-      nestedSchema = nestedSchema?.min(schema.minLength);
+      nestedSchema = nestedSchema?.min(
+        schema.minLength,
+        schema.errorMessages?.minLength,
+      );
     }
     if (
       'maxLength' in schema &&
@@ -126,7 +129,7 @@ export function generateZODSchema(
     return zfd.json(nestedSchema);
   }
 
-  if (schema.type === 'object') {
+  if (schema.type === 'object' || schema.type === 'section') {
     const propertySchemas: z.ZodRawShape = Object.entries(
       schema.properties,
     ).reduce((acc, [key, value]) => {
@@ -172,7 +175,15 @@ export function generateZODSchema(
 }
 
 export type JSONSchemaObjectField = {
+  title?: string;
   type: 'object';
+  properties: { [key: string]: JSONSchemaField };
+  required?: string[];
+};
+
+export type JSONSchemaSectionField = {
+  title?: string;
+  type: 'section';
   properties: { [key: string]: JSONSchemaField };
   required?: string[];
 };
@@ -187,6 +198,7 @@ export type DisplayWhen = {
 
 export type JSONSchemaField =
   | JSONSchemaObjectField
+  | JSONSchemaSectionField
   | {
       type: 'string';
       title: string;
@@ -202,6 +214,7 @@ export type JSONSchemaField =
       readonly?: boolean;
       defaultWhen?: Record<string, Record<string, string>>;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -211,6 +224,7 @@ export type JSONSchemaField =
       maxLength?: number;
       presentAs: 'password';
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -218,6 +232,7 @@ export type JSONSchemaField =
       description: string;
       presentAs: 'wysiwyg';
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -231,6 +246,7 @@ export type JSONSchemaField =
       default?: string;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -243,6 +259,7 @@ export type JSONSchemaField =
       default?: string;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -252,6 +269,7 @@ export type JSONSchemaField =
       url: string;
       default?: string;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'string';
@@ -263,6 +281,7 @@ export type JSONSchemaField =
       schema: JSONSchemaField;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'number' | 'integer';
@@ -274,6 +293,7 @@ export type JSONSchemaField =
       default?: number;
       readonly?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'array';
@@ -283,6 +303,7 @@ export type JSONSchemaField =
       minItems: number;
       default?: unknown[];
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     }
   | {
       type: 'boolean';
@@ -290,7 +311,20 @@ export type JSONSchemaField =
       description: string;
       default?: boolean;
       displayWhen?: DisplayWhen;
+      errorMessages?: Record<string, string>;
     };
+
+export const isObjectField = (
+  schema?: JSONSchemaField,
+): schema is JSONSchemaObjectField => {
+  return (schema as JSONSchemaObjectField)?.type === 'object';
+};
+
+export const isSectionField = (
+  schema?: JSONSchemaField,
+): schema is JSONSchemaSectionField => {
+  return (schema as JSONSchemaSectionField)?.type === 'section';
+};
 
 export function checkDisplayWhenConditions(
   conditions: DisplayWhen,
@@ -314,12 +348,39 @@ export function checkDisplayWhenConditions(
   return true;
 }
 
-export function fillSchemaDefaults<T>(
+export function fillSchemaWithDefaults<T>(
   schema: JSONSchemaField,
   data: Record<string, any>,
   ctx: Record<string, string> = {},
 ): T {
   const validateSchema = generateZODSchema(schema, true, ctx);
 
-  return validateSchema.parse(data) as T;
+  function parseNestedSchemaObjects(
+    schema: JSONSchemaField,
+    data: Record<string, any>,
+  ): Record<string, any> {
+    let parsedData = { ...data };
+
+    if (isObjectField(schema) || isSectionField(schema)) {
+      for (const [key, propertySchema] of Object.entries(schema.properties)) {
+        if (isObjectField(propertySchema) || isSectionField(propertySchema)) {
+          parsedData[key] = parseNestedSchemaObjects(
+            propertySchema,
+            parsedData[key] || {},
+          );
+        }
+      }
+      parsedData = generateZODSchema(schema, true, ctx).parse(
+        parsedData,
+      ) as Record<string, any>;
+    }
+
+    return parsedData;
+  }
+
+  return validateSchema.parse(parseNestedSchemaObjects(schema, data)) as T;
+}
+
+export function isEditorField(schema: JSONSchemaField): boolean {
+  return 'presentAs' in schema && schema.presentAs === 'editor';
 }

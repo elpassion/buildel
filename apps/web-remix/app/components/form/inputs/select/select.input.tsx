@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import debounce from 'lodash.debounce';
 import { Option } from 'rc-select';
 import { ClientOnly } from 'remix-utils/client-only';
 import { useDebounce, useIsMounted } from 'usehooks-ts';
@@ -18,6 +19,8 @@ export const SelectInput: React.FC<SelectInputProps> = ({ ...props }) => {
   );
 };
 
+export type AsyncSelectInputFetchingState = 'idle' | 'loading';
+
 export interface AsyncSelectInputProps<T = {}>
   extends Omit<
     SelectInputProps,
@@ -25,17 +28,21 @@ export interface AsyncSelectInputProps<T = {}>
   > {
   fetchOptions: (
     search: string,
+    args?: RequestInit,
   ) => Promise<({ value: string; label: string } & T)[]>;
   onOptionsFetch?: (options: ({ value: string; label: string } & T)[]) => void;
+  onOptionsFetchStateChange?: (state: AsyncSelectInputFetchingState) => void;
 }
 
 export const AsyncSelectInput = <T = {},>({
   fetchOptions,
   onOptionsFetch,
+  onOptionsFetchStateChange,
   ...props
 }: AsyncSelectInputProps<T>) => {
   const isMounted = useIsMounted();
-  const [loading, setLoading] = useState(false);
+  const abortController = useRef<AbortController | null>(null);
+  const [loading, setLoading] = useState(true);
   const [searchValue, setSearchValue] = useState('');
   const debouncedSearch = useDebounce(searchValue, 500);
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
@@ -43,18 +50,40 @@ export const AsyncSelectInput = <T = {},>({
   );
 
   const loadOptions = useCallback(() => {
+    if (abortController.current) {
+      abortController.current.abort();
+    }
+
+    abortController.current = new AbortController();
+
     setLoading(true);
-    fetchOptions(debouncedSearch)
+    fetchOptions(debouncedSearch, { signal: abortController.current.signal })
       .then((options) => {
         setOptions(options);
         onOptionsFetch?.(options);
       })
-      .finally(() => isMounted() && setLoading(false));
+      .finally(() => {
+        if (isMounted()) setLoading(false);
+
+        abortController.current = null;
+      });
   }, [fetchOptions, debouncedSearch]);
 
-  useEffect(() => {
+  const debouncedLoadOptions = debounce(() => {
     loadOptions();
+  }, 200);
+
+  useEffect(() => {
+    debouncedLoadOptions();
+
+    return () => {
+      debouncedLoadOptions.cancel();
+    };
   }, [debouncedSearch, loadOptions]);
+
+  useEffect(() => {
+    onOptionsFetchStateChange?.(loading ? 'loading' : 'idle');
+  }, [loading]);
 
   return (
     <SelectInput

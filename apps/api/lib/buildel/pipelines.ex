@@ -356,6 +356,7 @@ defmodule Buildel.Pipelines do
         opts:
           block["opts"]
           |> keys_to_atoms()
+          |> flatten_map()
           |> Map.put(:metadata, config["metadata"] || %{})
       }
     end)
@@ -404,6 +405,20 @@ defmodule Buildel.Pipelines do
       Repo.update(pipeline)
     end
   end
+
+  defp flatten_map(map), do: flatten_map(map, %{})
+
+  defp flatten_map(%{} = map, acc) do
+    map
+    |> Enum.reduce(acc, fn {key, value}, acc ->
+      case value do
+        %{} -> flatten_map(value, acc)
+        _ -> Map.put(acc, key, value)
+      end
+    end)
+  end
+
+  defp flatten_map(_value, acc), do: acc
 
   defp block_valid?(config, block_config) do
     cond do
@@ -454,7 +469,10 @@ defmodule Buildel.Pipelines do
                   "block_name" => connection.from.block_name,
                   "output_name" => connection.from.name
                 },
-                "opts" => %{"reset" => connection.opts.reset, "optional" => connection.opts.optional},
+                "opts" => %{
+                  "reset" => connection.opts.reset,
+                  "optional" => connection.opts.optional
+                },
                 "to" => %{
                   "block_name" => connection.to.block_name,
                   "input_name" => connection.to.name
@@ -562,6 +580,10 @@ defmodule Buildel.Pipelines do
 
   def delete_alias(%Alias{} = alias) do
     Repo.delete(alias)
+  end
+
+  def list_aliases() do
+    Repo.all(Alias)
   end
 
   defp keys_to_atoms(string_key_map) when is_map(string_key_map) do

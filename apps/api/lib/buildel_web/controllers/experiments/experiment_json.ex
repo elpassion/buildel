@@ -27,7 +27,7 @@ defmodule BuildelWeb.ExperimentJSON do
     nil
   end
 
-  defp map_pipeline(%{"id": id, "name": name}) do
+  defp map_pipeline(%{"id" => id, "name" => name}) do
     %{
       id: id,
       name: name

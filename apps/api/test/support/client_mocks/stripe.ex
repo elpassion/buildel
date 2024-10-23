@@ -2,7 +2,7 @@ defmodule Buildel.ClientMocks.Stripe do
   @behaviour Buildel.Clients.StripeBehaviour
 
   @impl Buildel.Clients.StripeBehaviour
-  def list_products(attrs \\ %{}) do
+  def list_products(_attrs \\ %{}) do
     {:ok,
      [
        %Buildel.Clients.Stripe.Product{
