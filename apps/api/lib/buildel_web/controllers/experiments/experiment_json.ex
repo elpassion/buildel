@@ -33,4 +33,11 @@ defmodule BuildelWeb.ExperimentJSON do
       name: name
     }
   end
+
+  defp map_pipeline(%{id: id, name: name}) do
+    %{
+      id: id,
+      name: name
+    }
+  end
 end
