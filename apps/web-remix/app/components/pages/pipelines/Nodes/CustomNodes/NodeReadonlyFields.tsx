@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import startCase from 'lodash.startcase';
 
 import { asyncSelectApi } from '~/api/AsyncSelectApi';
@@ -167,6 +167,7 @@ function NodeReadonlyAsyncItem({
   context,
   label,
 }: NodeReadonlyAsyncItemProps) {
+  const abortController = useRef<AbortController | null>(null);
   const organizationId = useOrganizationId();
   const pipelineId = usePipelineId();
 
@@ -176,17 +177,27 @@ function NodeReadonlyAsyncItem({
     .replace('{{organization_id}}', organizationId.toString())
     .replace('{{pipeline_id}}', pipelineId.toString())
     .replace(/{{([\w.]+)}}/g, (_fullMatch, key) => {
-      const cleanedKey = key.replace(/^[^.]+\./, '');
+      const cleanedKey = (key as string).split('.').at(-1);
 
-      const replacedValue = context[cleanedKey];
+      const replacedValue = cleanedKey ? context[cleanedKey] : key;
 
       return replacedValue ?? cleanedKey;
     });
 
   const fetchOptions = async () => {
-    return asyncSelectApi
-      .getData(readyUrl)
-      .then((opts) => opts.map(toSelectOption));
+    if (abortController.current) {
+      abortController.current.abort();
+    }
+
+    abortController.current = new AbortController();
+
+    try {
+      return await asyncSelectApi
+        .getData(readyUrl, { signal: abortController.current.signal })
+        .then((opts) => opts.map(toSelectOption));
+    } finally {
+      abortController.current = null;
+    }
   };
 
   useEffect(() => {
