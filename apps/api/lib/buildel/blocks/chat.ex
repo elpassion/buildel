@@ -144,8 +144,8 @@ defmodule Buildel.Blocks.Chat do
                         "maximum" => 2.0,
                         "step" => 0.1,
                         "readonly" => true
-                      },
-                    ),
+                      }
+                    )
                 },
                 chat_memory_type: %{
                   "type" => "string",

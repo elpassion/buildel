@@ -68,7 +68,7 @@ defmodule Buildel.RunLogs do
       limit: attrs.limit,
       include_total_count: true,
       cursor_fields: [{:inserted_at, :desc}, {:id, :asc}],
-      after: attrs.after,
+      after: attrs.after
     )
   end
 

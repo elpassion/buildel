@@ -469,7 +469,10 @@ defmodule Buildel.Pipelines do
                   "block_name" => connection.from.block_name,
                   "output_name" => connection.from.name
                 },
-                "opts" => %{"reset" => connection.opts.reset, "optional" => connection.opts.optional},
+                "opts" => %{
+                  "reset" => connection.opts.reset,
+                  "optional" => connection.opts.optional
+                },
                 "to" => %{
                   "block_name" => connection.to.block_name,
                   "input_name" => connection.to.name
@@ -577,6 +580,10 @@ defmodule Buildel.Pipelines do
 
   def delete_alias(%Alias{} = alias) do
     Repo.delete(alias)
+  end
+
+  def list_aliases() do
+    Repo.all(Alias)
   end
 
   defp keys_to_atoms(string_key_map) when is_map(string_key_map) do
