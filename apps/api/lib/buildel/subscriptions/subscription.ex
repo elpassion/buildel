@@ -6,6 +6,7 @@ defmodule Buildel.Subscriptions.Subscription do
   schema "subscriptions" do
     field(:subscription_id, :string)
     field(:customer_id, :string)
+    field(:plan_id, :string)
     field(:start_date, :utc_datetime)
     field(:end_date, :utc_datetime)
     field(:cancel_at_period_end, :boolean, default: false)
@@ -13,6 +14,7 @@ defmodule Buildel.Subscriptions.Subscription do
     field(:interval, :string)
     field(:features, :map)
     field(:usage, :map, default: %{})
+    field(:split, :integer, default: 1)
 
     belongs_to(:organization, Buildel.Organizations.Organization)
 
@@ -24,6 +26,7 @@ defmodule Buildel.Subscriptions.Subscription do
     |> cast(attrs, [
       :subscription_id,
       :customer_id,
+      :plan_id,
       :organization_id,
       :start_date,
       :end_date,
@@ -31,7 +34,8 @@ defmodule Buildel.Subscriptions.Subscription do
       :type,
       :interval,
       :features,
-      :usage
+      :usage,
+      :split
     ])
     |> validate_required([
       :organization_id,

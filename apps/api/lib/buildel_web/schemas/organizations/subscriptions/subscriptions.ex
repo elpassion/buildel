@@ -111,6 +111,8 @@ defmodule BuildelWeb.Schemas.Subscriptions do
         interval: %Schema{type: :string, description: "Plan interval"},
         end_date: %Schema{type: :string, description: "Plan end date", nullable: true},
         customer_id: %Schema{type: :string, description: "Customer ID", nullable: true},
+        subscription_id: %Schema{type: :string, description: "Subscription ID", nullable: true},
+        plan_id: %Schema{type: :string, description: "Plan ID", nullable: true},
         features: %Schema{
           type: :object,
           properties: %{
@@ -132,6 +134,15 @@ defmodule BuildelWeb.Schemas.Subscriptions do
             :seats_limit,
             :el_included,
             :dedicated_support
+          ]
+        },
+        usage: %Schema{
+          type: :object,
+          properties: %{
+            runs_limit: %Schema{type: :integer, description: "Runs limit"}
+          },
+          required: [
+            :runs_limit
           ]
         }
       },
