@@ -34,7 +34,10 @@ defmodule BuildelWeb.OrganizationSubscriptionJSON do
       interval: plan.interval,
       end_date: plan.end_date,
       customer_id: plan.customer_id,
-      features: plan.features
+      subscription_id: plan.subscription_id,
+      plan_id: plan.plan_id,
+      features: plan.features,
+      usage: plan.usage
     }
   end
 

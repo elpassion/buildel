@@ -9,7 +9,7 @@ defmodule BuildelWeb.OrganizationSubscriptionWebhookController do
 
   action_fallback(BuildelWeb.FallbackController)
 
-  # plug(:verify_stripe_webhook)
+  plug(:verify_stripe_webhook)
 
   plug OpenApiSpex.Plug.CastAndValidate,
     json_render_error_v2: true,
@@ -56,7 +56,9 @@ defmodule BuildelWeb.OrganizationSubscriptionWebhookController do
         nil
 
       subscription ->
-        Subscriptions.renew_subscription(subscription, data)
+        Subscriptions.renew_subscription(subscription, %{
+          "period_end" => data["period"]["end"]
+        })
     end
   end
 

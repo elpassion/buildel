@@ -9,8 +9,9 @@ defmodule Buildel.Subscriptions do
   def get_and_renew_organization_subscription_plan(organization_id) do
     subscription = get_subscription_by_organization_id!(organization_id)
 
-    case {subscription |> Subscription.status(), subscription.subscription_id, subscription.type} do
-      {:expired, nil, "free"} ->
+    case {subscription |> Subscription.status(), subscription.subscription_id, subscription.type,
+          subscription.interval, subscription.split} do
+      {:expired, nil, "free", _, _} ->
         {:ok, subscription} =
           renew_subscription(subscription, %{
             "period_end" =>
@@ -21,9 +22,48 @@ defmodule Buildel.Subscriptions do
 
         {:ok, subscription |> Plan.from_db()}
 
+      {:active, _, _, "year", split} ->
+        start_date = subscription.start_date
+        end_date = subscription.end_date
+        splits = calculate_monthly_splits(start_date, end_date)
+        current_date = DateTime.utc_now()
+
+        current_split =
+          Enum.find_index(splits, fn {start, end_date} ->
+            DateTime.after?(current_date, start) && DateTime.before?(current_date, end_date)
+          end) + 1
+
+        case current_split > split or current_split < split do
+          true ->
+            next_split =
+              case current_split do
+                12 -> 1
+                _ -> current_split
+              end
+
+            {:ok, subscription} = update_split(subscription, next_split)
+
+            {:ok, Plan.from_db(subscription)}
+
+          false ->
+            {:ok, Plan.from_db(subscription)}
+        end
+
       _ ->
         {:ok, Plan.from_db(subscription)}
     end
+  end
+
+  def calculate_monthly_splits(start_date, end_date) do
+    Stream.unfold(start_date, fn date ->
+      if DateTime.before?(date, end_date) do
+        next_date = Timex.shift(date, months: 1)
+        {{date, Timex.shift(next_date, days: -1)}, next_date}
+      else
+        nil
+      end
+    end)
+    |> Enum.take_while(fn {_, date} -> date <= end_date end)
   end
 
   def get_subscription_by_organization_id!(id),
@@ -48,7 +88,8 @@ defmodule Buildel.Subscriptions do
   end
 
   def update_subscription(attrs, organization_id) do
-    with {:ok, subscription} <- get_subscription_by_organization_id!(organization_id),
+    with subscription <-
+           get_subscription_by_organization_id!(organization_id),
          {:ok, %{body: body}} <- Stripe.get_subscription(attrs["subscription"]),
          product = List.first(body["items"]["data"]),
          {:ok, %{body: %{"name" => product_name}}} <-
@@ -57,8 +98,10 @@ defmodule Buildel.Subscriptions do
       attrs = %{
         subscription_id: attrs["subscription"],
         customer_id: attrs["customer"],
+        product_id: product["price"]["product"],
         start_date: body["current_period_start"] |> DateTime.from_unix!(),
-        end_date: body["current_period_end"] |> DateTime.from_unix!(),
+        end_date:
+          body["current_period_end"] |> DateTime.from_unix!() |> IO.inspect(label: "update"),
         type: String.downcase(product_name),
         interval: product["plan"]["interval"],
         features: features,
@@ -76,6 +119,12 @@ defmodule Buildel.Subscriptions do
       end_date: attrs["period_end"] |> DateTime.from_unix!(),
       usage: Plan.get_default_usage()
     })
+    |> Repo.update()
+  end
+
+  defp update_split(subscription, split) do
+    subscription
+    |> Subscription.changeset(%{usage: Plan.get_default_usage(), split: split})
     |> Repo.update()
   end
 

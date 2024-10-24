@@ -7,6 +7,8 @@ defmodule Buildel.Subscriptions.Plan do
     :interval,
     :end_date,
     :customer_id,
+    :subscription_id,
+    :plan_id,
     :features,
     :usage,
     :id,
@@ -83,6 +85,8 @@ defmodule Buildel.Subscriptions.Plan do
       interval: subscription.interval,
       end_date: subscription.end_date,
       customer_id: subscription.customer_id,
+      subscription_id: subscription.subscription_id,
+      plan_id: subscription.plan_id,
       features: subscription.features,
       usage: subscription.usage
     }
