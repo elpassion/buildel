@@ -563,8 +563,6 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       @impl true
       def handle_info(%Message{topic: topic} = message, state) do
-        IO.inspect(message)
-
         state =
           if external_message?(message, state) do
             do_handle_info(message, state, external: true)
@@ -577,8 +575,6 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       @impl true
       def handle_info({topic, :start_stream, message, _metadata} = payload, state) do
-        IO.inspect(message)
-
         state =
           if external_message?(message, state) do
             do_handle_input_start_stream(payload, state, external: true)
@@ -591,8 +587,6 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       @impl true
       def handle_info({topic, :stop_stream, message, _metadata} = payload, state) do
-        IO.inspect(message)
-
         state =
           if external_message?(message, state) do
             do_handle_input_stop_stream(payload, state, external: true)
