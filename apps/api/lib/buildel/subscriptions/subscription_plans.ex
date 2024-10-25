@@ -109,4 +109,6 @@ defmodule Buildel.Subscriptions.Plan do
 
   def get_feature_usage(organization_id, :seats_limit),
     do: {:ok, Buildel.Organizations.count_organization_memberships(organization_id)}
+
+  def get_feature_usage(_organization_id, _), do: {:error, :unknown_feature}
 end

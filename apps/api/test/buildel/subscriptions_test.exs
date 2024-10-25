@@ -67,6 +67,75 @@ defmodule Buildel.SubscriptionsTest do
       assert DateTime.to_unix(plan.end_date) == DateTime.to_unix(old_date)
     end
 
+    test "get_and_renew_organization_subscription_plan/1 does not reset usage if it's yearly plan and date is NOT past current split" do
+      organization = organization_fixture()
+      end_date = DateTime.utc_now() |> DateTime.add(365, :day)
+
+      upgrade_subscription_to_plan(organization.id, "starter", %{
+        interval: "year",
+        end_date: end_date,
+        usage: %{
+          runs_limit: 100
+        }
+      })
+
+      assert {:ok, _plan} =
+               Subscriptions.get_and_renew_organization_subscription_plan(organization.id)
+
+      subscription = Subscriptions.get_subscription_by_organization_id!(organization.id)
+
+      assert subscription.split == 1
+      assert subscription.usage["runs_limit"] == 100
+    end
+
+    test "get_and_renew_organization_subscription_plan/1 resets usage if it's yearly plan and date is past current split" do
+      organization = organization_fixture()
+      start_date = DateTime.utc_now() |> DateTime.add(-35, :day)
+      end_date = DateTime.utc_now() |> DateTime.add(330, :day)
+
+      upgrade_subscription_to_plan(organization.id, "starter", %{
+        interval: "year",
+        start_date: start_date,
+        end_date: end_date,
+        usage: %{
+          runs_limit: 100
+        },
+        split: 1
+      })
+
+      assert {:ok, _plan} =
+               Subscriptions.get_and_renew_organization_subscription_plan(organization.id)
+
+      subscription = Subscriptions.get_subscription_by_organization_id!(organization.id)
+
+      assert subscription.split == 2
+      assert subscription.usage["runs_limit"] == 0
+    end
+
+    test "get_and_renew_organization_subscription_plan/1 resets splits count" do
+      organization = organization_fixture()
+      start_date = DateTime.utc_now() |> DateTime.add(0, :day)
+      end_date = DateTime.utc_now() |> DateTime.add(365, :day)
+
+      upgrade_subscription_to_plan(organization.id, "starter", %{
+        interval: "year",
+        start_date: start_date,
+        end_date: end_date,
+        usage: %{
+          runs_limit: 100
+        },
+        split: 12
+      })
+
+      assert {:ok, _plan} =
+               Subscriptions.get_and_renew_organization_subscription_plan(organization.id)
+
+      subscription = Subscriptions.get_subscription_by_organization_id!(organization.id)
+
+      assert subscription.split == 1
+      assert subscription.usage["runs_limit"] == 0
+    end
+
     test "get_subscription_by_organization_id!/1 returns the subscription with given organization id" do
       organization = organization_fixture()
 

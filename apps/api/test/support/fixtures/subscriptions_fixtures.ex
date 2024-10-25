@@ -38,19 +38,25 @@ defmodule Buildel.SubscriptionsFixtures do
     |> Buildel.Repo.insert!()
   end
 
-  def upgrade_subscription_to_plan(organization_id, plan) do
+  def upgrade_subscription_to_plan(organization_id, plan, attrs \\ %{}) do
     {:ok, features} = Subscriptions.Plan.get_features(plan)
 
     subscription =
       Subscriptions.get_subscription_by_organization_id!(organization_id)
 
+    attrs =
+      Map.merge(
+        %{
+          subscription_id: UUID.uuid4(),
+          customer_id: UUID.uuid4(),
+          type: plan,
+          features: features
+        },
+        attrs
+      )
+
     subscription
-    |> Subscriptions.Subscription.changeset(%{
-      subscription_id: UUID.uuid4(),
-      customer_id: UUID.uuid4(),
-      type: plan,
-      features: features
-    })
+    |> Subscriptions.Subscription.changeset(attrs)
     |> Buildel.Repo.update!()
   end
 
