@@ -268,7 +268,7 @@ defmodule Buildel.Blocks.NewChat do
 
   defp start_chat_completion(state, message, async: false) do
     task = Task.async(chat_completion_task(state, message))
-    {:chat_completion, _message, last_message} = Task.await(task, 5 * 60_000) |> IO.inspect()
+    {:chat_completion, _message, last_message} = Task.await(task, 5 * 60_000)
     {:ok, last_message.content, state}
   end
 

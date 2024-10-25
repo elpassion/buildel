@@ -1,4 +1,5 @@
 defmodule Buildel.Blocks.NewBlock do
+  alias Buildel.Blocks.Utils.Message
   defstruct [:name, :type, connections: [], opts: %{}, context: %{}, state: %{}]
 
   @doc false
@@ -148,6 +149,39 @@ defmodule Buildel.Blocks.NewBlock do
         |> Options.set_dynamic_ios(@dynamic_ios)
         |> Options.set_schema(@schema_opts |> Enum.reverse())
       end
+
+      @spec external_input(any(), String.t(), Message.t()) ::
+              {:ok, any()} | {:error, :invalid_input, any()}
+      def external_input(state, input_name, %Message{} = message) do
+        handle_external_input(input_name, message, state)
+      rescue
+        error ->
+          Logger.error(Exception.format(:error, error, __STACKTRACE__))
+          send_error(state, :something_went_wrong)
+          {:error, :something_went_wrong, state}
+      end
+
+      @spec external_input_stream_start(any(), String.t(), Message.t()) ::
+              {:ok, any()} | {:error, :invalid_input, any()}
+      def external_input_stream_start(state, input_name, %Message{} = message) do
+        handle_external_input_stream_start(input_name, message, state)
+      rescue
+        error ->
+          Logger.error(Exception.format(:error, error, __STACKTRACE__))
+          send_error(state, :something_went_wrong)
+          {:error, :something_went_wrong, state}
+      end
+
+      @spec external_input_stream_stop(any(), String.t(), Message.t()) ::
+              {:ok, any()} | {:error, :invalid_input, any()}
+      def external_input_stream_stop(state, input_name, %Message{} = message) do
+        handle_external_input_stream_stop(input_name, message, state)
+      rescue
+        error ->
+          Logger.error(Exception.format(:error, error, __STACKTRACE__))
+          send_error(state, :something_went_wrong)
+          {:error, :something_went_wrong, state}
+      end
     end
   end
 end
@@ -246,6 +280,24 @@ defmodule Buildel.Blocks.NewBlock.Definput do
               {:ok, any()} | {:error, :invalid_input, any()}
       def input(state, dynamic_name, %Message{} = message) do
         handle_input(dynamic_name, message, state)
+      rescue
+        error ->
+          Logger.error(Exception.format(:error, error, __STACKTRACE__))
+          send_error(state, :something_went_wrong)
+          {:error, :something_went_wrong, state}
+      end
+
+      def output(state, dynamic_name, %Message{sent?: true} = message, options) do
+        message = message |> Message.from_message()
+        output(state, dynamic_name, message, options)
+      end
+
+      def output(state, dynamic_name, %Message{} = message, options) do
+        {:ok, options} = Keyword.validate(options, stream_stop: :send, stream_start: :send)
+
+        message = message |> Message.set_sent()
+
+        handle_output(dynamic_name, message, options, state)
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
@@ -419,6 +471,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
     quote do
       use GenServer
       alias Buildel.Blocks.NewBlock.StreamState
+      alias Buildel.BlockPubSub
 
       def start_link(%{block: block, context: context}) do
         GenServer.start_link(
@@ -450,90 +503,150 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       @impl true
       def handle_info(%Message{topic: topic} = message, state) do
-        context_id =
-          BlockPubSub.io_from_topic(topic)
-
         state =
-          inputs_subscribed_to_topic(all_connections(state.block), topic)
-          |> Enum.map(fn
-            %{name: input_name} = input when is_binary(input_name) ->
-              %{input | name: String.to_existing_atom(input_name)}
-
-            input ->
-              input
-          end)
-          |> Enum.reduce(
-            state,
-            fn
-              %{name: input_name}, state ->
-                case input(state, input_name, message) do
-                  {:ok, state} ->
-                    state
-
-                  {:error, _reason, state} ->
-                    state
-                end
-            end
-          )
+          if external_message?(message, state) do
+            do_handle_info(message, state, external: true)
+          else
+            do_handle_info(message, state, external: false)
+          end
 
         {:noreply, state}
       end
 
       @impl true
-      def handle_info({topic, :start_stream, message, _metadata}, state) do
-        context_id =
-          BlockPubSub.io_from_topic(topic)
-
+      def handle_info({topic, :start_stream, message, _metadata} = payload, state) do
         state =
-          inputs_subscribed_to_topic(all_connections(state.block), topic)
-          |> Enum.map(fn
-            %{name: input_name} = input when is_binary(input_name) ->
-              %{input | name: String.to_existing_atom(input_name)}
-
-            input ->
-              input
-          end)
-          |> Enum.reduce(
-            state,
-            fn
-              %{name: input_name}, state ->
-                {:ok, state} = handle_input_stream_start(input_name, message, state)
-                state
-            end
-          )
+          if external_message?(message, state) do
+            do_handle_input_start_stream(payload, state, external: true)
+          else
+            do_handle_input_start_stream(payload, state, external: false)
+          end
 
         {:noreply, state}
       end
 
       @impl true
-      def handle_info({topic, :stop_stream, message, _metadata}, state) do
-        context_id =
-          BlockPubSub.io_from_topic(topic)
-
+      def handle_info({topic, :stop_stream, message, _metadata} = payload, state) do
         state =
-          inputs_subscribed_to_topic(all_connections(state.block), topic)
-          |> Enum.map(fn
-            %{name: input_name} = input when is_binary(input_name) ->
-              %{input | name: String.to_existing_atom(input_name)}
-
-            input ->
-              input
-          end)
-          |> Enum.reduce(
-            state,
-            fn
-              %{name: input_name}, state ->
-                {:ok, state} = handle_input_stream_stop(input_name, message, state)
-                state
-            end
-          )
+          if external_message?(message, state) do
+            do_handle_input_stop_stream(payload, state, external: true)
+          else
+            do_handle_input_stop_stream(payload, state, external: false)
+          end
 
         {:noreply, state}
+      end
+
+      defp do_handle_info(%Message{topic: topic} = message, state, external: false) do
+        inputs_subscribed_to_topic(all_connections(state.block), topic)
+        |> Enum.reduce(
+          state,
+          fn
+            %{name: input_name}, state ->
+              case input(state, input_name, message) do
+                {:ok, state} ->
+                  state
+
+                {:error, _reason, state} ->
+                  state
+              end
+          end
+        )
+      end
+
+      defp do_handle_info(%Message{topic: topic} = message, state, external: true) do
+        context_id = BlockPubSub.io_from_topic(topic)
+
+        case external_input(state, context_id.block <> ":" <> context_id.io, message) do
+          {:ok, state} ->
+            state
+
+          {:error, _reason, state} ->
+            state
+        end
+      end
+
+      defp do_handle_input_start_stream({topic, :start_stream, message, _metadata}, state,
+             external: false
+           ) do
+        inputs_subscribed_to_topic(all_connections(state.block), topic)
+        |> Enum.reduce(
+          state,
+          fn
+            %{name: input_name}, state ->
+              {:ok, state} = handle_input_stream_start(input_name, message, state)
+              state
+          end
+        )
+      end
+
+      defp do_handle_input_start_stream({topic, :start_stream, message, _metadata}, state,
+             external: true
+           ) do
+        context_id = BlockPubSub.io_from_topic(topic)
+
+        case handle_external_input_stream_start(
+               context_id.block <> ":" <> context_id.io,
+               message,
+               state
+             ) do
+          {:ok, state} ->
+            state
+
+          {:error, _reason, state} ->
+            state
+        end
+      end
+
+      defp do_handle_input_stop_stream({topic, :stop_stream, message, _metadata}, state,
+             external: false
+           ) do
+        inputs_subscribed_to_topic(all_connections(state.block), topic)
+        |> Enum.reduce(
+          state,
+          fn
+            %{name: input_name}, state ->
+              {:ok, state} = handle_input_stream_stop(input_name, message, state)
+              state
+          end
+        )
+      end
+
+      defp do_handle_input_stop_stream({topic, :stop_stream, message, _metadata}, state,
+             external: true
+           ) do
+        context_id = BlockPubSub.io_from_topic(topic)
+
+        case handle_external_input_stream_stop(
+               context_id.block <> ":" <> context_id.io,
+               message,
+               state
+             ) do
+          {:ok, state} ->
+            state
+
+          {:error, _reason, state} ->
+            state
+        end
       end
 
       def handle_external_input(_name, _payload, state) do
-        state
+        {:ok, state}
       end
+
+      def handle_external_input_stream_start(dynamic_input, message, state) do
+        send_stream_start(state, dynamic_input, message)
+        {:ok, state}
+      end
+
+      def handle_external_input_stream_stop(dynamic_input, message, state) do
+        send_stream_stop(state, dynamic_input, message)
+        {:ok, state}
+      end
+
+      defoverridable handle_external_input: 3
+      defoverridable handle_external_input_stream_start: 3
+      defoverridable handle_external_input_stream_stop: 3
 
       defp handle_output(name, message, options, state) do
         case options[:stream_start] do
@@ -648,6 +761,27 @@ defmodule Buildel.Blocks.NewBlock.Server do
             connection.from.name |> to_string() == output_name |> to_string()
         end)
         |> Enum.map(& &1.to)
+        |> Enum.map(fn
+          %{name: input_name} = input when is_binary(input_name) ->
+            input_name =
+              case String.split(input_name, ":") do
+                [input_name] ->
+                  String.to_existing_atom(input_name)
+
+                [_, _] ->
+                  input_name
+              end
+
+            %{input | name: input_name}
+
+          input ->
+            input
+        end)
+      end
+
+      defp external_message?(%Message{topic: topic}, state) do
+        context_id = BlockPubSub.io_from_topic(topic)
+        context_id.context != state.block.context.context_id
       end
     end
   end
@@ -660,7 +794,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
       end
 
       @spec handle_input_stream_stop(term(), any(), any()) :: {:ok, any()}
-      def handle_input_stream_stop(input_name, _message, state) do
+      def handle_input_stream_stop(input_name, message, state) do
         {:ok, state}
       end
     end
@@ -712,7 +846,7 @@ defmodule Buildel.Blocks.NewBlock.StreamState do
     end
 
     def output_streaming?(state, output_id) do
-      get_in(state.output_states, [output_id])
+      get_in(state.output_states, [Access.key(output_id, %{})])
       |> Enum.any?(fn {_, output_streaming?} -> output_streaming? end)
     end
 

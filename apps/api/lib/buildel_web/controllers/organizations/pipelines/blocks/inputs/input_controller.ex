@@ -51,7 +51,7 @@ defmodule BuildelWeb.OrganizationPipelineBlockInputController do
            pipeline.config["blocks"] |> Enum.find(&(&1["name"] == block_name)),
          block_module <- Buildel.Blocks.type(block["type"]) do
       response =
-        block_module.handle_dynamic_inputs(%{
+        block_module.handle_dynamic_ios(%{
           organization: organization,
           pipeline: pipeline,
           block: block

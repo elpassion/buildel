@@ -58,6 +58,8 @@ defmodule Buildel.BlockPubSub do
   end
 
   defp broadcast(topic, %Message{} = message, metadata) do
+    message = message |> Message.set_topic(topic)
+
     Logger.debug(
       "Broadcasting to topic: #{topic}, message: #{inspect(message)}, metadata: #{inspect(metadata)})"
     )
@@ -65,11 +67,13 @@ defmodule Buildel.BlockPubSub do
     Buildel.PubSub
     |> PubSub.broadcast!(
       topic,
-      message |> Message.set_topic(topic)
+      message
     )
   end
 
   defp broadcast(topic, {message_type, content} = message, metadata) do
+    content = if content, do: content |> Message.set_topic(topic), else: content
+
     Logger.debug(
       "Broadcasting to topic: #{topic}, message: #{inspect(message)}, metadata: #{inspect(metadata)})"
     )
