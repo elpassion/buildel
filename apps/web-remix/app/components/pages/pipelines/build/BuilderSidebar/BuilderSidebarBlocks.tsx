@@ -318,7 +318,6 @@ function SearchInput({ value, onClear, onChange }: SearchInputProps) {
 
     if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
       inputRef.current?.focus();
-      console.log('SEARCH');
     }
   });
 

@@ -98,8 +98,6 @@ export class EnrichedPipelineApi {
     if (!blockType) return block;
 
     if (blockType.dynamic_ios) {
-      console.log(blockType.dynamic_ios);
-
       const url = this.prepareIOsUrl(blockType.dynamic_ios, {
         block_name: block.name,
         ...ctx,
@@ -160,8 +158,6 @@ export class EnrichedPipelineApi {
 
   private prepareIOsUrl(url: string, context: Record<string, string>) {
     let allReplaced = true;
-
-    console.log(context);
 
     const readyUrl = url.replace('/api', '').replace(/{{(.*?)}}/g, (_, key) => {
       const replaced = context[key];

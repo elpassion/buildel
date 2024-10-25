@@ -160,7 +160,6 @@ export function BulkPage() {
       ...test.inputs,
       ...test.outputs,
     }));
-    console.log(testsWithFields);
     const csv = Papa.unparse(testsWithFields, {});
     download(`${organizationId}-${pipelineId}-runs.csv`, csv);
   };
