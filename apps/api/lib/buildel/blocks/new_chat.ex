@@ -228,19 +228,20 @@ defmodule Buildel.Blocks.NewChat do
 
   def handle_tool_call(:query, %Message{} = message, state) do
     send_stream_start(state, :output, message)
+    response = Message.from_message(message) |> Message.set_type(:tool_response)
 
     with {:ok, state} <- save_input_message(state, message),
          {:ok, chat_messages, state} <- fill_chat_messages(state),
          {:ok, result, state} <- start_chat_completion(state, message, async: false),
          {:ok, state} <- save_chat_message(state, chat_messages |> Enum.at(-1)),
          state <- reset_latest_messages(state) do
-      {:ok, result, state}
+      {:ok, response |> Message.set_message(result), state}
     else
       {:error, :not_all_chat_messages_filled, state} ->
-        {:ok, "Fill all messages before sending result", state}
+        {:ok, response |> Message.set_message("Fill all messages before sending result"), state}
 
       {:error, e, state} ->
-        {:ok, to_string(e), state}
+        {:ok, response |> Message.set_message(to_string(e)), state}
     end
   end
 
@@ -440,8 +441,8 @@ defmodule Buildel.Blocks.NewChat do
       description: tool.description,
       parameters_schema: tool.schema,
       function: fn args, _context ->
-        result = tool.call.(args)
-        {:ok, result}
+        %Message{message: message} = tool.call.(args)
+        {:ok, message}
       end
     })
   end

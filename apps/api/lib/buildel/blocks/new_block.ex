@@ -362,14 +362,24 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
 
       def handle_call({:call_tool, %Message{} = message}, _from, state) do
         case handle_tool_call(message.message.name, message, state) do
-          {:ok, response, state} -> {:reply, response, state}
-          _ -> {:reply, "Something went wrong.", state}
+          {:ok, response, state} ->
+            {:reply, response, state}
+
+          _ ->
+            {:reply,
+             Message.from_message(message)
+             |> Message.set_type(:tool_response)
+             |> Message.set_message("Something went wrong"), state}
         end
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
           send_error(state, :something_went_wrong)
-          {:error, :something_went_wrong, state}
+
+          {:reply,
+           Message.from_message(message)
+           |> Message.set_type(:tool_response)
+           |> Message.set_message("Something went wrong"), state}
       end
     end
   end
