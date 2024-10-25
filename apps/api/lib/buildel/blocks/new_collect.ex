@@ -13,6 +13,8 @@ defmodule Buildel.Blocks.NewCollect do
   def handle_input(:input, %Message{type: :text} = message, state) do
     send_stream_start(state, :output, message)
 
+    IO.inspect("hello")
+
     state =
       state
       |> Map.update(:acc, message, fn %Message{message: message_message} ->

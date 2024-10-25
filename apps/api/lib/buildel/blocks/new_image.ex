@@ -113,7 +113,13 @@ defmodule Buildel.Blocks.NewImage do
       {:ok, state}
     else
       {:error, error, state} ->
-        send_error(state, error)
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message(error)
+        )
+
         {:ok, state}
     end
   end

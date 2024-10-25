@@ -38,23 +38,23 @@ defmodule Buildel.BlocksTestRunner.Run do
     run
   end
 
-  def stop_stream(run, block_name, output_name) do
+  def stop_stream(run, block_name, output_name, message) do
     Buildel.BlockPubSub.broadcast_to_io(
       Buildel.BlocksTestRunner.context_id(run.pid),
       block_name,
       output_name,
-      {:stop_stream, nil}
+      {:stop_stream, message}
     )
 
     run
   end
 
-  def start_stream(run, block_name, output_name) do
+  def start_stream(run, block_name, output_name, message) do
     Buildel.BlockPubSub.broadcast_to_io(
       Buildel.BlocksTestRunner.context_id(run.pid),
       block_name,
       output_name,
-      {:start_stream, nil}
+      {:start_stream, message}
     )
 
     run

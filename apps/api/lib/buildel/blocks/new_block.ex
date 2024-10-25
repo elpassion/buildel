@@ -157,7 +157,14 @@ defmodule Buildel.Blocks.NewBlock do
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
-          send_error(state, :something_went_wrong)
+
+          send_error(
+            state,
+            Message.from_message(message)
+            |> Message.set_type(:text)
+            |> Message.set_message(:something_went_wrong)
+          )
+
           {:error, :something_went_wrong, state}
       end
 
@@ -168,7 +175,14 @@ defmodule Buildel.Blocks.NewBlock do
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
-          send_error(state, :something_went_wrong)
+
+          send_error(
+            state,
+            Message.from_message(message)
+            |> Message.set_type(:text)
+            |> Message.set_message(:something_went_wrong)
+          )
+
           {:error, :something_went_wrong, state}
       end
 
@@ -179,7 +193,14 @@ defmodule Buildel.Blocks.NewBlock do
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
-          send_error(state, :something_went_wrong)
+
+          send_error(
+            state,
+            Message.from_message(message)
+            |> Message.set_type(:text)
+            |> Message.set_message(:something_went_wrong)
+          )
+
           {:error, :something_went_wrong, state}
       end
     end
@@ -245,13 +266,26 @@ defmodule Buildel.Blocks.NewBlock.Definput do
             handle_input(unquote(name), message, state)
 
           {:error, :invalid_input} ->
-            send_error(state, :invalid_input)
+            send_error(
+              state,
+              Message.from_message(message)
+              |> Message.set_type(:text)
+              |> Message.set_message(:invalid_input)
+            )
+
             {:error, :invalid_input, state}
         end
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
-          send_error(state, :something_went_wrong)
+
+          send_error(
+            state,
+            Message.from_message(message)
+            |> Message.set_type(:text)
+            |> Message.set_message(:something_went_wrong)
+          )
+
           {:error, :something_went_wrong, state}
       end
 
@@ -283,7 +317,14 @@ defmodule Buildel.Blocks.NewBlock.Definput do
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
-          send_error(state, :something_went_wrong)
+
+          send_error(
+            state,
+            Message.from_message(message)
+            |> Message.set_type(:text)
+            |> Message.set_message(:something_went_wrong)
+          )
+
           {:error, :something_went_wrong, state}
       end
 
@@ -301,7 +342,14 @@ defmodule Buildel.Blocks.NewBlock.Definput do
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
-          send_error(state, :something_went_wrong)
+
+          send_error(
+            state,
+            Message.from_message(message)
+            |> Message.set_type(:text)
+            |> Message.set_message(:something_went_wrong)
+          )
+
           {:error, :something_went_wrong, state}
       end
     end
@@ -349,7 +397,13 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
             handle_output(unquote(name), message, options, state)
 
           {:error, :invalid_output} ->
-            send_error(state, :invalid_output)
+            send_error(
+              state,
+              Message.from_message(message)
+              |> Message.set_type(:text)
+              |> Message.set_message(:invalid_output)
+            )
+
             {:error, :invalid_output, state}
         end
       end
@@ -451,7 +505,13 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
-          send_error(state, :something_went_wrong)
+
+          send_error(
+            state,
+            Message.from_message(message)
+            |> Message.set_type(:text)
+            |> Message.set_message(:something_went_wrong)
+          )
 
           {:reply,
            Message.from_message(message)
@@ -503,6 +563,8 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       @impl true
       def handle_info(%Message{topic: topic} = message, state) do
+        IO.inspect(message)
+
         state =
           if external_message?(message, state) do
             do_handle_info(message, state, external: true)
@@ -515,6 +577,8 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       @impl true
       def handle_info({topic, :start_stream, message, _metadata} = payload, state) do
+        IO.inspect(message)
+
         state =
           if external_message?(message, state) do
             do_handle_input_start_stream(payload, state, external: true)
@@ -527,6 +591,8 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       @impl true
       def handle_info({topic, :stop_stream, message, _metadata} = payload, state) do
+        IO.inspect(message)
+
         state =
           if external_message?(message, state) do
             do_handle_input_stop_stream(payload, state, external: true)
@@ -717,7 +783,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
         BlockPubSub.broadcast_to_block(
           state.block.context.context_id,
           state.block.name,
-          {:error, [error_message]}
+          {:error, error_message}
         )
       end
 

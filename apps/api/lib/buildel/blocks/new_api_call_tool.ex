@@ -109,7 +109,11 @@ defmodule Buildel.Blocks.NewApiCallTool do
       {:ok, state}
     else
       {:error, reason} ->
-        send_error(state, reason)
+        send_error(
+          state,
+          Message.from_message(message) |> Message.set_type(:text) |> Message.set_message(reason)
+        )
+
         {:error, reason, state}
     end
   end

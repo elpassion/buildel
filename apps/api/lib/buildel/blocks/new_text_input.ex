@@ -29,7 +29,13 @@ defmodule Buildel.Blocks.NewTextInput do
         {:ok, state}
 
       {:error, :invalid_input} ->
-        send_error(state, :invalid_input)
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message(:invalid_input)
+        )
+
         {:ok, state}
     end
   end
@@ -41,7 +47,13 @@ defmodule Buildel.Blocks.NewTextInput do
         {:ok, state}
 
       {:error, :invalid_input} ->
-        send_error(state, :invalid_input)
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message(:invalid_input)
+        )
+
         {:ok, state}
     end
   end

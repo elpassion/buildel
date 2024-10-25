@@ -32,10 +32,10 @@ defmodule Buildel.Blocks.NewCollectTest do
 
       test_run
       |> BlocksTestRunner.subscribe_to_block("test_collect")
-      |> BlocksTestRunner.Run.start_stream("TEST_INPUT", :output)
+      |> BlocksTestRunner.Run.start_stream("TEST_INPUT", :output, message1)
       |> BlocksTestRunner.Run.input("TEST_INPUT", :output, message1)
       |> BlocksTestRunner.Run.input("TEST_INPUT", :output, message2)
-      |> BlocksTestRunner.Run.stop_stream("TEST_INPUT", :output)
+      |> BlocksTestRunner.Run.stop_stream("TEST_INPUT", :output, message1)
       |> assert_receive_message("test_collect", :output, Message.new(:text, "Hello World"))
     end
 

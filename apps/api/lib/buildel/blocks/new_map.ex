@@ -43,7 +43,13 @@ defmodule Buildel.Blocks.NewMap do
         {:ok, state}
 
       {:error, reason, state} ->
-        send_error(state, reason)
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message(reason)
+        )
+
         {:ok, state}
     end
   end

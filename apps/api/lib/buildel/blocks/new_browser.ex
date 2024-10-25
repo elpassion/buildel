@@ -65,7 +65,13 @@ defmodule Buildel.Blocks.NewBrowserTool do
       {:ok, state}
     else
       {:error, reason, state} ->
-        send_error(state, reason)
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message(reason)
+        )
+
         send_stream_stop(state, :output, message)
         {:error, reason, state}
     end

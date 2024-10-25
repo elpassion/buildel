@@ -314,7 +314,13 @@ defmodule Buildel.Blocks.NewChat do
                end,
                on_error: fn
                  error ->
-                   send_error(state, error)
+                   send_error(
+                     state,
+                     Message.from_message(message)
+                     |> Message.set_type(:text)
+                     |> Message.set_message(error)
+                   )
+
                    send_stream_stop(state, :output, message)
                end
              ) do
@@ -323,7 +329,13 @@ defmodule Buildel.Blocks.NewChat do
         {:error, :context_length_exceeded} ->
           case state.memory do
             %{type: :full} ->
-              send_error(state, :context_length_exceeded)
+              send_error(
+                state,
+                Message.from_message(message)
+                |> Message.set_type(:text)
+                |> Message.set_message(:context_length_exceeded)
+              )
+
               send_stream_stop(state, :output, message)
 
             %{type: :rolling} ->
@@ -469,7 +481,13 @@ defmodule Buildel.Blocks.NewChat do
       {:noreply, state}
     else
       {:error, :full_chat_memory} ->
-        send_error(state, :full_chat_memory)
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message(:full_chat_memory)
+        )
+
         send_stream_stop(state, :output, message)
         {:noreply, state}
     end

@@ -26,11 +26,23 @@ defmodule Buildel.Blocks.NewFileToText do
       {:ok, state}
     else
       {:error, "Error reading file"} ->
-        send_error(state, "Error reading file")
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message("Error reading file")
+        )
+
         {:ok, state}
 
       _ ->
-        send_error(state, "Unknown error")
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message("Unknown error")
+        )
+
         {:ok, state}
     end
   end

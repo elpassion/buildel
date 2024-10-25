@@ -82,7 +82,7 @@ defmodule Buildel.BlockCase do
       end
 
       def assert_receive_error(topic, error) do
-        assert_receive {^topic, :error, [^error], %{}}, 1000
+        assert_receive {^topic, :error, %Message{message: ^error}, %{}}, 1000
       end
 
       def refute_receive_error(%Run{} = run, block_name, error) do
