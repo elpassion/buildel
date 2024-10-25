@@ -41,7 +41,8 @@ defmodule Buildel.Blocks do
     NewFileToText,
     NewImage,
     ImageOutput,
-    Knowledge
+    Knowledge,
+    NewWorkflowCall
   }
 
   @names_to_blocks_map %{
@@ -72,7 +73,7 @@ defmodule Buildel.Blocks do
     "file_output" => FileOutput,
     "date" => NewDate,
     "comment" => Comment,
-    "workflow_call" => WorkflowCall,
+    "workflow_call" => NewWorkflowCall,
     "dataset_output" => DatasetOutput,
     "image_input" => ImageInput,
     "hf_image_classification" => HuggingFaceImageClassification,

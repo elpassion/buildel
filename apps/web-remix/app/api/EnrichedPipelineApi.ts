@@ -34,7 +34,7 @@ export class EnrichedPipelineApi {
     const blocks = await this.enrichConfigWithDynamicIOs(
       pipeline.config.blocks,
       blockTypes.data,
-      { organization_id: organizationId },
+      { organization_id: organizationId, pipeline_id: pipelineId },
     );
 
     return {
@@ -63,7 +63,7 @@ export class EnrichedPipelineApi {
     const blocks = await this.enrichConfigWithDynamicIOs(
       pipelineRun.data.config.blocks,
       blockTypes.data,
-      { organization_id: organizationId },
+      { organization_id: organizationId, pipeline_id: pipelineId },
     );
 
     return {
@@ -98,7 +98,10 @@ export class EnrichedPipelineApi {
     if (!blockType) return block;
 
     if (blockType.dynamic_ios) {
+      console.log(blockType.dynamic_ios);
+
       const url = this.prepareIOsUrl(blockType.dynamic_ios, {
+        block_name: block.name,
         ...ctx,
         ...this.mapOpts(block.opts),
       });
@@ -157,6 +160,8 @@ export class EnrichedPipelineApi {
 
   private prepareIOsUrl(url: string, context: Record<string, string>) {
     let allReplaced = true;
+
+    console.log(context);
 
     const readyUrl = url.replace('/api', '').replace(/{{(.*?)}}/g, (_, key) => {
       const replaced = context[key];

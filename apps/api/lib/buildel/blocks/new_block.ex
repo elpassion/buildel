@@ -22,6 +22,7 @@ defmodule Buildel.Blocks.NewBlock do
 
       @inputs []
       @outputs []
+      @dynamic_ios nil
       @tools []
 
       @schema_opts []
@@ -144,7 +145,7 @@ defmodule Buildel.Blocks.NewBlock do
         |> Options.set_inputs(@inputs)
         |> Options.set_outputs(@outputs)
         |> Options.set_tools(@tools, @tool_controller)
-        |> Options.set_dynamic_ios(nil)
+        |> Options.set_dynamic_ios(@dynamic_ios)
         |> Options.set_schema(@schema_opts |> Enum.reverse())
       end
     end
@@ -226,6 +227,30 @@ defmodule Buildel.Blocks.NewBlock.Definput do
           true -> :ok
           false -> {:error, :invalid_input}
         end
+      end
+    end
+  end
+
+  defmacro defdynamicios(options \\ []) do
+    quote do
+      require Logger
+
+      @dynamic_ios "/api/organizations/{{organization_id}}/pipelines/{{pipeline_id}}/blocks/{{block_name}}/inputs"
+
+      {:ok, options} =
+        unquote(options) |> Keyword.validate([])
+
+      @callback handle_input(String.t(), Message.t(), any()) :: {:ok, any()}
+
+      @spec input(any(), String.t(), Message.t()) ::
+              {:ok, any()} | {:error, :invalid_input, any()}
+      def input(state, dynamic_name, %Message{} = message) do
+        handle_input(dynamic_name, message, state)
+      rescue
+        error ->
+          Logger.error(Exception.format(:error, error, __STACKTRACE__))
+          send_error(state, :something_went_wrong)
+          {:error, :something_went_wrong, state}
       end
     end
   end

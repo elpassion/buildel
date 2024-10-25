@@ -45,7 +45,7 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
 
   defp concat_block_name(block_types, block_name) do
     Enum.map(block_types, fn block_type ->
-      Map.update!(block_type, :name, fn name -> block_name <> ":" <> name end)
+      Map.update!(block_type, :name, fn name -> block_name <> ":" <> to_string(name) end)
     end)
   end
 

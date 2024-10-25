@@ -200,6 +200,19 @@ defmodule BuildelWeb.Router do
       only: [:create]
     )
 
+    resources(
+      "/organizations/:organization_id/pipelines/:pipeline_id/blocks/:block_name/options",
+      OrganizationPipelineBlockOptionController,
+      only: [:show],
+      param: "option"
+    )
+
+    resources(
+      "/organizations/:organization_id/pipelines/:pipeline_id/blocks/:block_name/inputs",
+      OrganizationPipelineBlockInputController,
+      only: [:index]
+    )
+
     resources("/organizations/:organization_id/memory_collections", CollectionController,
       only: [:index, :create, :show, :delete, :update]
     )

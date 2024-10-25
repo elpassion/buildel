@@ -217,6 +217,7 @@ export function EditBlockForm({
       const replacedUrl = props.field.url
         .replace('{{organization_id}}', organizationId.toString())
         .replace('{{pipeline_id}}', pipelineId.toString())
+        .replace('{{block_name}}', blockConfig.name)
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
           const replacedValue = values.get(optKey);
@@ -283,6 +284,8 @@ export function EditBlockForm({
 
       const replacedUrl = props.field.url
         .replace('{{organization_id}}', organizationId.toString())
+        .replace('{{pipeline_id}}', pipelineId.toString())
+        .replace('{{block_name}}', blockConfig.name)
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const replacedValue = values.get(optKey);
           return replacedValue || optKey;
