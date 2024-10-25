@@ -112,7 +112,7 @@ function NodeReadonlyItem({
         url={properties.url}
         value={data[id]}
         label={id}
-        context={data}
+        context={{ ...data, block_name: blockName }}
       />
     );
   }

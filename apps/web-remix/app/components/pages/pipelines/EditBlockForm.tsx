@@ -226,6 +226,7 @@ export function EditBlockForm({
         });
 
       let defaultValue = props.field.default
+        ?.replace('{{organization_id}}', organizationId.toString())
         ?.replace('{{pipeline_id}}', pipelineId.toString())
         ?.replace('{{block_name}}', blockConfig.name)
         ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
@@ -306,6 +307,7 @@ export function EditBlockForm({
       }
 
       let defaultValue = props.field.default
+        ?.replace('{{organization_id}}', organizationId.toString())
         ?.replace('{{pipeline_id}}', pipelineId.toString())
         ?.replace('{{block_name}}', blockConfig.name)
         ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
