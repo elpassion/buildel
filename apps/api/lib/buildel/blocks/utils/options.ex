@@ -17,6 +17,19 @@ defmodule Buildel.Blocks.Utils.Options do
     %{options | outputs: outputs}
   end
 
+  def set_tools(options, tools, tool_controller?) do
+    ios =
+      tools
+      |> Enum.map(&%{name: &1.name, type: :worker, public: false})
+
+    ios =
+      if tool_controller?,
+        do: ios ++ [%{name: :tools, type: :controller, public: false}],
+        else: ios
+
+    %{options | ios: ios}
+  end
+
   def set_ios(options, ios) do
     %{options | ios: ios}
   end

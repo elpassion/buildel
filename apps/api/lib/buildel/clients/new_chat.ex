@@ -47,7 +47,7 @@ defmodule Buildel.Clients.NewChat do
              llm: llm,
              custom_context: %{}
            })
-           |> LLMChain.add_tools(opts[:tools] |> Enum.map(& &1.function))
+           |> LLMChain.add_tools(opts[:tools])
            |> LLMChain.add_messages(messages)
            |> LLMChain.add_callback(%{
              on_retries_exceeded: fn _chain ->

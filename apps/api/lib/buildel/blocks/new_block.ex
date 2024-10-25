@@ -2,21 +2,27 @@ defmodule Buildel.Blocks.NewBlock do
   defstruct [:name, :type, connections: [], opts: %{}, context: %{}, state: %{}]
 
   @doc false
-  defmacro __using__(_opts) do
+  defmacro __using__(opts \\ []) do
     quote do
       alias Buildel.Blocks.Utils.Message
       alias Buildel.Blocks.Utils.Schemas
       alias Buildel.Blocks.Utils.Options
 
+      @tool_controller unquote(opts[:tool_controller]) || false
+
+      def tool_contoller?, do: @tool_controller
+
       import Buildel.Blocks.NewBlock.Definput
       import Buildel.Blocks.NewBlock.Defoutput
       import Buildel.Blocks.NewBlock.Defblock
       import Buildel.Blocks.NewBlock.Defoption
+      import Buildel.Blocks.NewBlock.Deftool
 
-      use Buildel.Blocks.NewBlock.Server
+      use Buildel.Blocks.NewBlock.Server, tool_controller: @tool_controller
 
       @inputs []
       @outputs []
+      @tools []
 
       @schema_opts []
 
@@ -59,7 +65,12 @@ defmodule Buildel.Blocks.NewBlock do
 
       @spec get_input(term()) :: %Buildel.Blocks.NewBlock.Input{}
       def get_input(input_name) do
-        @inputs
+        inputs =
+          if @tool_controller,
+            do: @inputs ++ [%{name: :tools, type: :controller, public: false}],
+            else: @inputs
+
+        inputs
         |> Enum.find(fn input -> input.name == input_name end)
         |> then(&{:ok, &1})
       end
@@ -76,9 +87,55 @@ defmodule Buildel.Blocks.NewBlock do
 
       @spec get_output(term()) :: %Buildel.Blocks.NewBlock.Output{}
       def get_output(output_name) do
-        @outputs
+        (@outputs ++ @tools)
         |> Enum.find(fn output -> output.name == output_name end)
         |> then(&{:ok, &1})
+      end
+
+      @spec tools :: [%Buildel.Blocks.NewBlock.Tool{}]
+      def tools do
+        @tools
+      end
+
+      @spec get_tool(String.t()) :: %Buildel.Blocks.NewBlock.Tool{}
+      def get_tool(tool_name) when is_binary(tool_name) do
+        get_tool(tool_name |> String.to_existing_atom())
+      end
+
+      @spec get_tool(term()) :: %Buildel.Blocks.NewBlock.Tool{}
+      def get_tool(tool_name) do
+        @tools
+        |> Enum.find(fn tool -> tool.name == tool_name end)
+        |> then(&{:ok, &1})
+      end
+
+      @spec get_connected_tool(any(), any()) :: %Buildel.Blocks.NewBlock.Tool{}
+      defp get_connected_tool(state, connection) do
+        Buildel.Pipelines.Worker.block_id(state.context.context_id, %{
+          name: connection.from.block_name
+        })
+        |> String.to_existing_atom()
+        |> Process.whereis()
+        |> GenServer.call(
+          {:get_tool, connection.from.name |> String.to_existing_atom(),
+           Buildel.BlockPubSub.io_topic(
+             state.block.context.context_id,
+             state.block.name,
+             connection.to.name
+           )}
+        )
+      end
+
+      @spec get_connected_tools(any()) :: list(%Buildel.Blocks.NewBlock.Tool{})
+      defp get_connected_tools(state) do
+        state.block.connections
+        |> Enum.filter(fn
+          %{to: %{type: :controller}} -> true
+          _ -> false
+        end)
+        |> Enum.map(fn connection ->
+          get_connected_tool(state, connection)
+        end)
       end
 
       @spec options :: %Buildel.Blocks.Utils.Options{}
@@ -86,7 +143,7 @@ defmodule Buildel.Blocks.NewBlock do
         @options
         |> Options.set_inputs(@inputs)
         |> Options.set_outputs(@outputs)
-        |> Options.set_ios([])
+        |> Options.set_tools(@tools, @tool_controller)
         |> Options.set_dynamic_ios(nil)
         |> Options.set_schema(@schema_opts |> Enum.reverse())
       end
@@ -102,6 +159,11 @@ end
 defmodule Buildel.Blocks.NewBlock.Output do
   @derive Jason.Encoder
   defstruct [:name, :schema, type: :text, public: false]
+end
+
+defmodule Buildel.Blocks.NewBlock.Tool do
+  @derive Jason.Encoder
+  defstruct [:name, :schema, :description, :call, type: :worker]
 end
 
 defmodule Buildel.Blocks.NewBlock.Defblock do
@@ -246,12 +308,79 @@ defmodule Buildel.Blocks.NewBlock.Defoption do
   end
 end
 
+defmodule Buildel.Blocks.NewBlock.Deftool do
+  require Logger
+  alias Buildel.Blocks.Utils.Message
+
+  defmacro deftool(name, options) do
+    quote do
+      require Logger
+
+      {:ok, options} =
+        unquote(options)
+        |> Keyword.validate([:description, schema: %{}])
+
+      ExJsonSchema.Schema.resolve(options[:schema])
+
+      @tools [
+        %Buildel.Blocks.NewBlock.Tool{
+          name: unquote(name),
+          schema: unquote(options[:schema]),
+          description: unquote(options[:description])
+        }
+        | @tools
+      ]
+
+      def call_tool(state, %Message{} = message, opts \\ []) do
+        pid =
+          state.block.context.block_id
+          |> String.to_existing_atom()
+          |> Process.whereis()
+
+        GenServer.call(pid, {:call_tool, message}, 5 * 60_000)
+      end
+
+      @impl true
+      def handle_call({:get_tool, tool_name, topic}, from, state) do
+        {:reply,
+         @tools
+         |> Enum.find(&(&1.name == tool_name))
+         |> then(
+           &%{
+             &1
+             | name: "#{state.block.name}__#{&1.name}",
+               call: fn args ->
+                 call_tool(
+                   state,
+                   Message.new(:tool_call, %{name: tool_name, args: args})
+                   |> Message.set_topic(topic)
+                 )
+               end
+           }
+         ), state}
+      end
+
+      def handle_call({:call_tool, %Message{} = message}, _from, state) do
+        case handle_tool_call(message.message.name, message, state) do
+          {:ok, response, state} -> {:reply, response, state}
+          _ -> {:reply, "Something went wrong.", state}
+        end
+      rescue
+        error ->
+          Logger.error(Exception.format(:error, error, __STACKTRACE__))
+          send_error(state, :something_went_wrong)
+          {:error, :something_went_wrong, state}
+      end
+    end
+  end
+end
+
 defmodule Buildel.Blocks.NewBlock.Server do
   alias Buildel.BlockPubSub
   alias Buildel.Blocks.Utils.Message
   alias Buildel.Blocks.NewBlock.StreamState
 
-  defmacro __using__(_opts) do
+  defmacro __using__(_opts \\ []) do
     quote do
       use GenServer
       alias Buildel.Blocks.NewBlock.StreamState

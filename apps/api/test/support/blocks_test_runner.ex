@@ -12,7 +12,7 @@ defmodule Buildel.BlocksTestRunner do
   end
 
   def block_id(context, block) do
-    "#{context}::#{block.name}"
+    Buildel.Pipelines.Worker.block_id(context, block)
   end
 
   def context_id(pid) do
@@ -167,7 +167,7 @@ defmodule Buildel.BlocksTestRunner do
     run
   end
 
-  def wait(run, time \\ 50) do
+  def wait(run, time \\ 100) do
     Process.sleep(time)
     run
   end

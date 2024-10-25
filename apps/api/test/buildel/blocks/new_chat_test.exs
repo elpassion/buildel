@@ -11,7 +11,7 @@ defmodule Buildel.Blocks.NewChatTest do
                inputs: [_],
                outputs: [_],
                groups: ["llms", "text"],
-               ios: [],
+               ios: [_, _],
                dynamic_ios: nil
              } = NewChat.options()
     end
@@ -52,7 +52,7 @@ defmodule Buildel.Blocks.NewChatTest do
       end)
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.test_input(message)
-      |> BlocksTestRunner.wait(50)
+      |> BlocksTestRunner.wait()
       |> BlocksTestRunner.stream_through_chat(:content, ["H"])
       |> BlocksTestRunner.stream_through_chat(:content, ["ello!"])
       |> assert_receive_message(
@@ -192,7 +192,7 @@ defmodule Buildel.Blocks.NewChatTest do
       test_run
       |> BlocksTestRunner.subscribe_to_block("test")
       |> BlocksTestRunner.with_secret(fn "key" -> "api_key" end)
-      |> BlocksTestRunner.with_chat(fn opts ->
+      |> BlocksTestRunner.with_chat(fn _opts ->
         {:error, :context_length_exceeded}
       end)
       |> BlocksTestRunner.test_input(message)

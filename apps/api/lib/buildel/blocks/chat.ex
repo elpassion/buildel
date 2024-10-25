@@ -544,18 +544,17 @@ defmodule Buildel.Blocks.Chat do
         Buildel.Blocks.Tool.get_tools(pid)
         |> Enum.map(fn tool_definition ->
           function =
-            Function.new!(
-              tool_definition.function
-              |> Map.put(:function, fn args, _context ->
-                {_, {:text, response}} =
-                  output_and_wait_for_response(state, "tool", {:text, Jason.encode!(args)}, %{
-                    metadata: %{tool_name: tool_definition.function.name},
-                    stream_stop: :none
-                  })
+            tool_definition.function
+            |> Map.put(:function, fn args, _context ->
+              {_, {:text, response}} =
+                output_and_wait_for_response(state, "tool", {:text, Jason.encode!(args)}, %{
+                  metadata: %{tool_name: tool_definition.function.name},
+                  stream_stop: :none
+                })
 
-                response
-              end)
-            )
+              response
+            end)
+            |> Function.new!()
 
           %{tool_definition | function: function}
         end)

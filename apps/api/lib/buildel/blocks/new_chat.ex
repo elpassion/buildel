@@ -1,8 +1,9 @@
 defmodule Buildel.Blocks.NewChat do
+  alias LangChain.Function
   alias Buildel.Blocks.Utils.ChatMemory
   alias Buildel.Blocks.Fields.EditorField
   alias EditorField.Suggestion
-  use Buildel.Blocks.NewBlock
+  use Buildel.Blocks.NewBlock, tool_controller: true
   import Buildel.Blocks.Utils.Schemas
 
   defblock(:chat,
@@ -14,6 +15,25 @@ defmodule Buildel.Blocks.NewChat do
   definput(:input, schema: %{})
 
   defoutput(:output, schema: %{})
+
+  deftool(:query,
+    description:
+      "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.
+            CALL IT WITH FORMAT `{ \"query\": \"example query\" }`
+            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries.
+            You can use `document_id` property to narrow the search to the specific document.
+            DO NOT SET MORE THAN 2 KEYWORDS",
+    schema: %{
+      "type" => "object",
+      "properties" => %{
+        "message" => %{
+          "type" => "string",
+          "description" => "Message to send to the agent."
+        }
+      },
+      "required" => ["message"]
+    }
+  )
 
   defoption(:api_type, %{
     "type" => "string",
@@ -196,13 +216,29 @@ defmodule Buildel.Blocks.NewChat do
 
     with {:ok, state} <- save_input_message(state, message),
          {:ok, chat_messages, state} <- fill_chat_messages(state),
-         {:ok, state} <- start_chat_completion(state, message),
+         {:ok, state} <- start_chat_completion(state, message, async: true),
          {:ok, state} <- save_chat_message(state, chat_messages |> Enum.at(-1)),
          state <- reset_latest_messages(state) do
       {:ok, state}
     else
       {:error, :not_all_chat_messages_filled, state} ->
         {:ok, state}
+    end
+  end
+
+  def handle_tool_call(:query, %Message{} = message, state) do
+    send_stream_start(state, :output, message)
+
+    with {:ok, state} <- save_input_message(state, message),
+         {:ok, chat_messages, state} <- fill_chat_messages(state),
+         {:ok, result, state} <- start_chat_completion(state, message, async: false),
+         {:ok, state} <- save_chat_message(state, chat_messages |> Enum.at(-1)),
+         state <- reset_latest_messages(state) do
+      IO.inspect(result)
+      {:ok, result, state}
+    else
+      {:error, :not_all_chat_messages_filled, state} ->
+        {:ok, "42", state}
     end
   end
 
@@ -227,7 +263,13 @@ defmodule Buildel.Blocks.NewChat do
     |> Enum.into(%{})
   end
 
-  defp start_chat_completion(state, message) do
+  defp start_chat_completion(state, message, async: false) do
+    task = Task.async(chat_completion_task(state, message))
+    {:chat_completion, _message, last_message} = Task.await(task, 5 * 60_000) |> IO.inspect()
+    {:ok, last_message.content, state}
+  end
+
+  defp start_chat_completion(state, message, async: true) do
     Task.start(chat_completion_task(state, message))
     {:ok, state}
   end
@@ -238,8 +280,10 @@ defmodule Buildel.Blocks.NewChat do
     fn ->
       send_stream_start(state, :output, message)
 
+      tools = get_connected_tools(state) |> then(&chat_tool(state, &1))
+
       with {:ok, chat_messages, state} <- fill_chat_messages(state),
-           {:ok, _, _} <-
+           {:ok, _, last_message} <-
              chat().stream_chat(
                messages: chat_messages,
                model: option(state, :model),
@@ -249,6 +293,7 @@ defmodule Buildel.Blocks.NewChat do
                api_type: option(state, :api_type),
                response_format: option(state, :response_format),
                max_tokens: option(state, :max_tokens),
+               tools: tools,
                on_content: fn text_chunk ->
                  send(pid, {:save_chat_chunk, text_chunk})
 
@@ -270,7 +315,7 @@ defmodule Buildel.Blocks.NewChat do
                    send_stream_stop(state, :output, message)
                end
              ) do
-        nil
+        {:chat_completion, message, last_message}
       else
         {:error, :context_length_exceeded} ->
           case state.memory do
@@ -355,7 +400,19 @@ defmodule Buildel.Blocks.NewChat do
     }
   end
 
-  defp fill_chat_message(inputs, chat_message) do
+  defp fill_chat_message({input, %Message{type: :tool_call} = message}, chat_message) do
+    %{
+      chat_message
+      | content:
+          String.replace(
+            chat_message.content,
+            "{{#{input}}}",
+            message.message.args |> Jason.encode!()
+          )
+    }
+  end
+
+  defp fill_chat_message(inputs, chat_message) when is_map(inputs) do
     inputs
     |> Enum.reduce(chat_message, &fill_chat_message/2)
   end
@@ -370,15 +427,42 @@ defmodule Buildel.Blocks.NewChat do
     {:ok, state}
   end
 
+  defp chat_tool(state, tools) when is_list(tools) do
+    tools
+    |> Enum.map(&chat_tool(state, &1))
+  end
+
+  defp chat_tool(_state, tool) do
+    Function.new!(%{
+      name: to_string(tool.name),
+      description: tool.description,
+      parameters_schema: tool.schema,
+      function: fn args, _context ->
+        result = tool.call.(args)
+        {:ok, result}
+      end
+    })
+  end
+
   def handle_info({:save_chat_chunk, chat_message}, state) do
     {:ok, state} = save_chat_chunk(state, chat_message)
+    {:noreply, state}
+  end
+
+  def handle_info({_, {:chat_completion, _, _}}, state) do
+    IO.inspect("COMPLETE")
+    {:noreply, state}
+  end
+
+  def handle_info({:DOWN, _, _, _, _}, state) do
+    IO.inspect("DOWN")
     {:noreply, state}
   end
 
   def handle_info({:remove_latest_message_and_start_chat_completion, message}, state) do
     with {:ok, memory} <- ChatMemory.drop_first_non_initial_message(state.memory),
          state <- put_in(state.memory, memory),
-         {:ok, state} <- start_chat_completion(state, message) do
+         {:ok, state} <- start_chat_completion(state, message, async: true) do
       {:noreply, state}
     else
       {:error, :full_chat_memory} ->

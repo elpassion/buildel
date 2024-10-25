@@ -32,6 +32,10 @@ defmodule Buildel.Pipelines.Worker do
     "#{context_id(run)}.#{name}"
   end
 
+  def block_id(context_id, %{name: name}) do
+    "#{context_id}.#{name}"
+  end
+
   # Server
 
   @impl true
