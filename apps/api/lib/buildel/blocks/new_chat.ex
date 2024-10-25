@@ -234,11 +234,13 @@ defmodule Buildel.Blocks.NewChat do
          {:ok, result, state} <- start_chat_completion(state, message, async: false),
          {:ok, state} <- save_chat_message(state, chat_messages |> Enum.at(-1)),
          state <- reset_latest_messages(state) do
-      IO.inspect(result)
       {:ok, result, state}
     else
       {:error, :not_all_chat_messages_filled, state} ->
-        {:ok, "42", state}
+        {:ok, "Fill all messages before sending result", state}
+
+      {:error, e, state} ->
+        {:ok, to_string(e), state}
     end
   end
 
