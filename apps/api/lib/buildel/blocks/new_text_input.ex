@@ -22,25 +22,43 @@ defmodule Buildel.Blocks.NewTextInput do
     readonly: true
   })
 
+  defoption(
+    :default,
+    %{
+      type: "string",
+      title: "Default Value",
+      description: "Default Value to output at start of run",
+      readonly: true
+    },
+    required: false
+  )
+
   def handle_input(:input, %Message{} = message, state) do
-    case parse_message(message, option(state, :output_as)) do
-      %Message{} = message ->
-        output(state, :output, message)
-        {:ok, state}
-
-      {:error, :invalid_input} ->
-        send_error(
-          state,
-          Message.from_message(message)
-          |> Message.set_type(:text)
-          |> Message.set_message(:invalid_input)
-        )
-
-        {:ok, state}
-    end
+    handle_message(message, state)
   end
 
   def handle_input(:forward, %Message{} = message, state) do
+    handle_message(message, state)
+  end
+
+  def handle_start(state) do
+    default = option(state, :default)
+
+    case default do
+      nil ->
+        {:ok, state}
+
+      "" ->
+        {:ok, state}
+
+      content ->
+        IO.inspect(content)
+        message = Message.new(:text, content)
+        handle_message(message, state)
+    end
+  end
+
+  defp handle_message(message, state) do
     case parse_message(message, option(state, :output_as)) do
       %Message{} = message ->
         output(state, :output, message)
@@ -59,6 +77,14 @@ defmodule Buildel.Blocks.NewTextInput do
   end
 
   defp parse_message(message, "String"), do: message |> Message.set_type(:text)
+
+  defp parse_message(%Message{message: nil}, "JSON") do
+    {:error, :invalid_input}
+  end
+
+  defp parse_message(%Message{message: ""}, "JSON") do
+    {:error, :invalid_input}
+  end
 
   defp parse_message(message, "JSON") do
     case Jason.decode(message.message) do

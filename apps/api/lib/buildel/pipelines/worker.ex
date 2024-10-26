@@ -7,7 +7,12 @@ defmodule Buildel.Pipelines.Worker do
   # Client
 
   def start_link([%Run{} = run]) do
-    Supervisor.start_link(__MODULE__, run, name: context_id(run) |> String.to_atom())
+    result = Supervisor.start_link(__MODULE__, run, name: context_id(run) |> String.to_atom())
+
+    context_id = context_id(run)
+
+    Buildel.BlockPubSub.broadcast_started(context_id)
+    result
   end
 
   def context_id(%Run{} = run) do
@@ -45,10 +50,11 @@ defmodule Buildel.Pipelines.Worker do
 
     blocks = Pipelines.blocks_for_run(run)
 
+    context_id = context_id(run)
+
     children =
       for %Blocks.Block{type: type} = block <- blocks do
         block_id = block_id(run, block)
-        context_id = context_id(run)
 
         context = %{
           block_id: block_id,

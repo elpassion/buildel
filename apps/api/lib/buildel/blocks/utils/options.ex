@@ -48,8 +48,14 @@ defmodule Buildel.Blocks.Utils.Options do
             name: Schemas.name_schema(),
             opts:
               Schemas.options_schema(%{
-                required: options_schema_properties |> Keyword.keys(),
-                properties: options_schema_properties |> Jason.OrderedObject.new()
+                required:
+                  options_schema_properties
+                  |> Enum.filter(&elem(&1, 1).required)
+                  |> Keyword.keys(),
+                properties:
+                  options_schema_properties
+                  |> Enum.map(&{elem(&1, 0), elem(&1, 1).schema})
+                  |> Jason.OrderedObject.new()
               })
           }
         }

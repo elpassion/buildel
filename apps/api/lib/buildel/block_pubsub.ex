@@ -8,6 +8,14 @@ defmodule Buildel.BlockPubSub do
     broadcast(topic, message, metadata)
   end
 
+  def broadcast_started(context_id) do
+    broadcast(context_id, :started)
+  end
+
+  def subscribe_to_meta_events(context_id) do
+    subscribe(context_id)
+  end
+
   def subscribe_to_io(context_id, block_name, io_name) do
     topic = io_topic(context_id, block_name, io_name)
     subscribe(topic)
@@ -55,6 +63,14 @@ defmodule Buildel.BlockPubSub do
 
   def io_topic(context_id, block_name, io_name) do
     block_topic(context_id, block_name) <> "::io::#{io_name}"
+  end
+
+  defp broadcast(topic, :started) do
+    Buildel.PubSub
+    |> PubSub.broadcast!(
+      topic,
+      :started
+    )
   end
 
   defp broadcast(topic, %Message{} = message, metadata) do

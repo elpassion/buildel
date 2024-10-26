@@ -419,8 +419,11 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
 end
 
 defmodule Buildel.Blocks.NewBlock.Defoption do
-  defmacro defoption(name, schema) do
+  defmacro defoption(name, schema, options \\ []) do
     quote do
+      {:ok, options} =
+        unquote(options) |> Keyword.validate(required: true)
+
       case unquote(schema) do
         %{} ->
           ExJsonSchema.Schema.resolve(unquote(schema))
@@ -429,7 +432,10 @@ defmodule Buildel.Blocks.NewBlock.Defoption do
           throw("Invalid schema")
       end
 
-      @schema_opts Keyword.put(@schema_opts, unquote(name), unquote(schema))
+      @schema_opts Keyword.put(@schema_opts, unquote(name), %{
+                     schema: unquote(schema),
+                     required: options[:required]
+                   })
 
       def option(state, unquote(name)) do
         state.block.opts[unquote(name)] ||
@@ -556,6 +562,8 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
       @impl true
       def init(%{block: block} = server_state) do
+        subscribe_to_meta_events(block.context.context_id)
+
         subscribe_to_connections(
           block.context.context_id,
           all_connections(block)
@@ -572,6 +580,11 @@ defmodule Buildel.Blocks.NewBlock.Server do
           StreamState.start_link(block.context.block_id, stream_state_state)
 
         {:ok, server_state |> Map.put(:stream_state_pid, stream_state_pid)}
+      end
+
+      def handle_info(:started, state) do
+        {:ok, state} = handle_start(state)
+        {:noreply, state}
       end
 
       @impl true
@@ -703,6 +716,10 @@ defmodule Buildel.Blocks.NewBlock.Server do
         end
       end
 
+      def handle_start(state) do
+        {:ok, state}
+      end
+
       def handle_external_input(_name, _payload, state) do
         {:ok, state}
       end
@@ -720,6 +737,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
       defoverridable handle_external_input: 3
       defoverridable handle_external_input_stream_start: 3
       defoverridable handle_external_input_stream_stop: 3
+      defoverridable handle_start: 1
 
       defp handle_output(name, message, options, state) do
         case options[:stream_start] do
@@ -816,6 +834,10 @@ defmodule Buildel.Blocks.NewBlock.Server do
             opts: %{reset: true}
           }
         end)
+      end
+
+      defp subscribe_to_meta_events(context_id) do
+        BlockPubSub.subscribe_to_meta_events(context_id)
       end
 
       defp subscribe_to_connections(context_id, connections) do
