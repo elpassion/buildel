@@ -6,6 +6,8 @@ defmodule Buildel.Blocks.NewWorkflowCall do
 
   defblock(:workflow_call, description: "", groups: [])
 
+  defdynamicios()
+
   defoption(:workflow, %{
     "type" => "string",
     "title" => "Workflow",
@@ -17,7 +19,106 @@ defmodule Buildel.Blocks.NewWorkflowCall do
     "readonly" => true
   })
 
-  defdynamicios()
+  defoption(:inputs, %{
+    "type" => "array",
+    "title" => "Wait for Outputs",
+    "description" => "Which outputs should be waited for when calling as tool",
+    "minItems" => 0,
+    "items" => %{
+      "type" => "object",
+      "required" => ["input_name", "required"],
+      "properties" => %{
+        "input_name" => %{
+          "type" => "string",
+          "title" => "Input",
+          "url" =>
+            "/api/organizations/{{organization_id}}/pipelines/{{pipeline_id}}/blocks/{{block_name}}/options/inputs",
+          "presentAs" => "async-select",
+          "minLength" => 1
+        },
+        "required" => %{
+          "type" => "boolean",
+          "title" => "Required"
+        }
+      }
+    },
+    "default" => [],
+    "displayWhen" => %{
+      "connections" => %{
+        "call_worker" => %{
+          "min" => 1
+        }
+      }
+    }
+  })
+
+  defoption(:wait_for_outputs, %{
+    "type" => "array",
+    "title" => "Wait for Outputs",
+    "description" => "Which outputs should be waited for when calling as tool",
+    "minItems" => 1,
+    "items" => %{
+      "type" => "object",
+      "required" => ["output_name"],
+      "properties" => %{
+        "output_name" => %{
+          "type" => "string",
+          "title" => "Output",
+          "url" =>
+            "/api/organizations/{{organization_id}}/pipelines/{{pipeline_id}}/blocks/{{block_name}}/options/outputs",
+          "presentAs" => "async-select",
+          "minLength" => 1
+        }
+      }
+    },
+    "default" => [],
+    "displayWhen" => %{
+      "connections" => %{
+        "call_worker" => %{
+          "min" => 1
+        }
+      }
+    }
+  })
+
+  deftool(:call, description: "hello world", schema: %{})
+
+  def handle_get_tool(:call, state) do
+    tool = @tools |> Enum.find(&(&1.name == :call))
+
+    inputs =
+      with dynamic_pipeline_id <- option(state, :workflow),
+           organization <-
+             Buildel.Organizations.get_organization!(state.block.context.context.global),
+           {:ok, dynamic_pipeline} <-
+             Buildel.Pipelines.get_organization_pipeline(organization, dynamic_pipeline_id) do
+        BuildelWeb.OrganizationPipelineJSON.ios(%{pipeline: dynamic_pipeline}).data.inputs
+      else
+        _ -> []
+      end
+
+    schema =
+      option(state, :inputs)
+      |> Enum.map(
+        &%{
+          required: &1.required,
+          input: Enum.find(inputs, fn io_input -> io_input.name == &1.input_name end)
+        }
+      )
+      |> Enum.reduce(%{"properties" => %{}, "required" => [], "type" => "object"}, fn
+        %{required: false, input: input}, schema ->
+          name = String.replace(input.name, ":", ".")
+          update_in(schema["properties"], &Map.put(&1, name, input.schema))
+
+        %{required: true, input: input}, schema ->
+          name = String.replace(input.name, ":", ".")
+
+          update_in(schema["properties"], &Map.put(&1, name, input.schema))
+          |> Map.update!("required", &(&1 ++ [name]))
+      end)
+
+    %{tool | schema: schema}
+  end
 
   def handle_dynamic_ios(%{organization: organization, pipeline: _pipeline, block: block}) do
     with dynamic_pipeline_id <- block["opts"]["workflow"],
@@ -32,6 +133,32 @@ defmodule Buildel.Blocks.NewWorkflowCall do
   def handle_option(:workflow, %{organization: organization, pipeline: pipeline}) do
     pipelines = Pipelines.list_organization_pipelines(organization) |> List.delete(pipeline)
     BuildelWeb.OrganizationPipelineJSON.index(%{pipelines: pipelines})
+  end
+
+  def handle_option(:outputs, %{organization: organization, pipeline: _pipeline, block: block}) do
+    with dynamic_pipeline_id <- block["opts"]["workflow"],
+         {:ok, dynamic_pipeline} <-
+           Buildel.Pipelines.get_organization_pipeline(organization, dynamic_pipeline_id) do
+      BuildelWeb.OrganizationPipelineJSON.ios(%{pipeline: dynamic_pipeline}).data.outputs
+      |> Enum.filter(&(&1.public == true && &1.type == :text))
+      |> Enum.map(&%{name: &1.name, id: &1.name})
+      |> then(&%{data: &1})
+    else
+      _ -> []
+    end
+  end
+
+  def handle_option(:inputs, %{organization: organization, pipeline: _pipeline, block: block}) do
+    with dynamic_pipeline_id <- block["opts"]["workflow"],
+         {:ok, dynamic_pipeline} <-
+           Buildel.Pipelines.get_organization_pipeline(organization, dynamic_pipeline_id) do
+      BuildelWeb.OrganizationPipelineJSON.ios(%{pipeline: dynamic_pipeline}).data.inputs
+      |> Enum.filter(&(&1.public == true))
+      |> Enum.map(&%{name: &1.name, id: &1.name})
+      |> then(&%{data: &1})
+    else
+      _ -> []
+    end
   end
 
   def handle_input(dynamic_input, message, state) do
@@ -78,6 +205,51 @@ defmodule Buildel.Blocks.NewWorkflowCall do
     send_stream_stop(state, dynamic_input, message)
 
     {:ok, state}
+  end
+
+  def handle_tool_call(:call, message, state) do
+    response =
+      fn ->
+        send_stream_start(state, :call, message)
+
+        result =
+          Task.async(fn ->
+            result =
+              Buildel.Pipelines.Runner.build_complete_run(
+                state.block.context.context.global,
+                option(state, :workflow),
+                option(state, :wait_for_outputs)
+                |> Enum.map(fn output ->
+                  [block_name, output_name] = output.output_name |> String.split(":")
+                  %{block_name: block_name, output_name: output_name}
+                end),
+                message.message.args
+                |> Enum.map(fn {input_name, data} ->
+                  [block_name, input_name] = String.split(input_name, ".")
+
+                  %{
+                    block_name: block_name,
+                    input_name: input_name,
+                    message:
+                      Message.from_message(message)
+                      |> Message.set_type(:text)
+                      |> Message.set_message(data)
+                  }
+                end)
+              ).()
+
+            Message.from_message(message)
+            |> Message.set_type(:json)
+            |> Message.set_message(result)
+          end)
+          |> Task.await(5 * 60_000)
+
+        send_stream_stop(state, :call, message)
+
+        result
+      end
+
+    {:ok, response, state}
   end
 
   defp create_and_start_run(organization_id, pipeline_id, metadata) do

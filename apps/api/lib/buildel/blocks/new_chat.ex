@@ -454,7 +454,7 @@ defmodule Buildel.Blocks.NewChat do
       parameters_schema: tool.schema,
       function: fn args, _context ->
         %Message{message: message} = tool.call.(args)
-        {:ok, message}
+        {:ok, Jason.encode!(message)}
       end
     })
   end

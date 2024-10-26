@@ -472,24 +472,37 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
       end
 
       @impl true
-      def handle_call({:get_tool, tool_name, topic}, from, state) do
+      def handle_call({:get_tool, unquote(name) = tool_name, topic}, from, state) do
         {:reply,
-         @tools
-         |> Enum.find(&(&1.name == tool_name))
+         handle_get_tool(unquote(name), state)
          |> then(
            &%{
              &1
              | name: "#{state.block.name}__#{&1.name}",
                call: fn args ->
-                 call_tool(
-                   state,
-                   Message.new(:tool_call, %{name: tool_name, args: args})
-                   |> Message.set_topic(topic)
-                 )
+                 case call_tool(
+                        state,
+                        Message.new(:tool_call, %{name: tool_name, args: args})
+                        |> Message.set_topic(topic)
+                      ) do
+                   fun when is_function(fun) ->
+                     Task.async(fun)
+                     |> Task.await(5 * 60_000)
+
+                   other ->
+                     other
+                 end
                end
            }
          ), state}
       end
+
+      def handle_get_tool(unquote(name), state) do
+        @tools
+        |> Enum.find(&(&1.name == unquote(name)))
+      end
+
+      defoverridable handle_get_tool: 2
 
       def handle_call({:call_tool, %Message{} = message}, _from, state) do
         case handle_tool_call(message.message.name, message, state) do

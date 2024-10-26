@@ -4,7 +4,7 @@ if System.get_env("PHX_SERVER") do
   config :buildel, BuildelWeb.Endpoint, server: true
 end
 
-if log_level = System.get_env("LOG_LEVEL", "warn") do
+if log_level = System.get_env("LOG_LEVEL", "warning") do
   config :logger, level: String.to_atom(log_level)
 end
 
