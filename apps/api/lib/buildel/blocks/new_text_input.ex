@@ -52,7 +52,6 @@ defmodule Buildel.Blocks.NewTextInput do
         {:ok, state}
 
       content ->
-        IO.inspect(content)
         message = Message.new(:text, content)
         handle_message(message, state)
     end
