@@ -122,15 +122,18 @@ defmodule Buildel.Blocks.NewChat do
     "readonly" => true
   })
 
-  defoption(:max_tokens, %{
-    "type" => "number",
-    "title" => "Maximum tokens",
-    "description" => "Maximum amount of tokens that can be generated in the chat completion.",
-    "minimum" => 0.0,
-    "step" => 1,
-    "readonly" => true,
-    "default" => 10_000
-  })
+  defoption(
+    :max_tokens,
+    %{
+      "type" => "number",
+      "title" => "Maximum tokens",
+      "description" => "Maximum amount of tokens that can be generated in the chat completion.",
+      "minimum" => 0.0,
+      "step" => 1,
+      "readonly" => true
+    },
+    required: false
+  )
 
   defoption(:response_format, %{
     "type" => "string",
