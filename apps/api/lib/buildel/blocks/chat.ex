@@ -12,7 +12,6 @@ defmodule Buildel.Blocks.Chat do
   alias Buildel.FlattenMap
 
   # Config
-
   @impl true
   def options() do
     %{
