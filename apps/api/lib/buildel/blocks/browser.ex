@@ -3,6 +3,7 @@ defmodule Buildel.Blocks.Browser do
   use Buildel.Blocks.Tool, parallel: ["url"]
 
   alias Buildel.Crawler
+  alias Buildel.Blocks.Fields.EditorField.Suggestion
   alias Buildel.Blocks.Fields.EditorField
 
   # Config
@@ -49,6 +50,17 @@ defmodule Buildel.Blocks.Browser do
                     },
                     minLength: 1
                   }),
+                headers:
+                  EditorField.new(%{
+                    title: "Headers",
+                    description:
+                      "Valid JSON object of the headers to be sent with the request. i.e. `{\"Content-Type\": \"application/json\"}`.",
+                    editorLanguage: "json",
+                    default:
+                      "{}",
+                    minLength: 1,
+                    suggestions: []
+                  }),
                 host: %{
                   "type" => "string",
                   "title" => "Host",
@@ -81,10 +93,13 @@ defmodule Buildel.Blocks.Browser do
 
     uri = URI.parse(url)
 
+    headers = build_headers(state.opts.headers, %{})
+
     with {:ok, crawl} when length(crawl.pages) != 0 <-
            Crawler.crawl(url,
              max_depth: 1,
-             url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end
+             url_filter: fn inc_url -> inc_url |> String.contains?(uri.host) end,
+             headers: headers
            ),
          {:ok, path} <- Temp.path(%{suffix: ".md"}),
          :ok <-
@@ -233,5 +248,22 @@ defmodule Buildel.Blocks.Browser do
 
   defp does_url_match_host(_, _) do
     {:ok, false}
+  end
+
+
+  defp build_headers(headers_string, args) do
+    args
+    |> Enum.reduce(headers_string, fn
+      {key, value}, acc when is_number(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string())
+
+      {key, value}, acc when is_binary(value) ->
+        String.replace(acc, "{{#{key}}}", value |> to_string())
+
+      _, acc ->
+        acc
+    end)
+    |> Jason.decode!()
+    |> Enum.to_list()
   end
 end
