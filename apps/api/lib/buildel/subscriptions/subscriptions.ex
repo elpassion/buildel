@@ -98,10 +98,9 @@ defmodule Buildel.Subscriptions do
       attrs = %{
         subscription_id: attrs["subscription"],
         customer_id: attrs["customer"],
-        product_id: product["price"]["product"],
+        plan_id: product["price"]["product"],
         start_date: body["current_period_start"] |> DateTime.from_unix!(),
-        end_date:
-          body["current_period_end"] |> DateTime.from_unix!() |> IO.inspect(label: "update"),
+        end_date: body["current_period_end"] |> DateTime.from_unix!(),
         type: String.downcase(product_name),
         interval: product["plan"]["interval"],
         features: features,

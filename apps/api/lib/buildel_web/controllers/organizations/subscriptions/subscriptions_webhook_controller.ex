@@ -56,8 +56,10 @@ defmodule BuildelWeb.OrganizationSubscriptionWebhookController do
         nil
 
       subscription ->
+        period_end = List.first(data["lines"]["data"])["period"]["end"]
+
         Subscriptions.renew_subscription(subscription, %{
-          "period_end" => data["period"]["end"]
+          "period_end" => period_end
         })
     end
   end
