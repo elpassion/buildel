@@ -4,6 +4,7 @@ import invariant from 'tiny-invariant';
 
 import { BlockTypeApi } from '~/api/blockType/BlockTypeApi';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
+import { SubscriptionsApi } from '~/api/subscriptions/SubscriptionsApi';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
 import { getServerToast } from '~/utils/toast.server';
@@ -17,7 +18,11 @@ export async function loader(args: LoaderFunctionArgs) {
     const pipelineApi = new PipelineApi(fetch);
     const aliasId = pipelineApi.getAliasFromUrl(request.url);
     const blockTypeApi = new BlockTypeApi(fetch);
+    const subscriptionsApi = new SubscriptionsApi(fetch);
 
+    const subscriptionPromise = subscriptionsApi.subscription(
+      params.organizationId,
+    );
     const blockTypesPromise = blockTypeApi.getBlockTypes();
 
     const aliasesPromise = pipelineApi.getAliases(
@@ -31,10 +36,11 @@ export async function loader(args: LoaderFunctionArgs) {
       aliasId,
     );
 
-    const [pipeline, aliases, blockTypes] = await Promise.all([
+    const [pipeline, aliases, blockTypes, subscription] = await Promise.all([
       pipelinePromise,
       aliasesPromise,
       blockTypesPromise,
+      subscriptionPromise,
     ]);
 
     const blocks = pipeline.config.blocks.map((block) => ({
@@ -50,6 +56,7 @@ export async function loader(args: LoaderFunctionArgs) {
       {
         toasts,
         aliasId,
+        subscription: subscription.data.data,
         pipeline: {
           ...pipeline,
           config: { ...pipeline.config, blocks },

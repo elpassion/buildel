@@ -12,6 +12,7 @@ import { SubmitButton } from '~/components/form/submit';
 import { IconButton } from '~/components/iconButton';
 import { BasicLink } from '~/components/link/BasicLink';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
+import { useCurrentPlan } from '~/components/subscription/useCurrentPlan';
 import {
   DialogDrawer,
   DialogDrawerBody,
@@ -38,28 +39,46 @@ export const ELSettings: React.FC<ELSettingsProps> = ({
   pipelines,
 }) => {
   const elWorkflow = pipelines.find((p) => p.id === organization.el_id);
-
+  const { plan } = useCurrentPlan();
   return (
     <Section>
       <SectionHeading className="mb-1">EL</SectionHeading>
 
       <div className="flex gap-2 items-center">
-        <p className="text-sm text-muted-foreground">
-          Selected workflow:{' '}
-          {elWorkflow ? (
+        {!plan.features.el_included ? (
+          <p className="text-xs text-muted-foreground">
+            EL is not included in your current plan. Please{' '}
             <BasicLink
-              to={routes.pipelineBuild(organization.id, elWorkflow.id)}
-              className="text-foreground hover:underline"
               target="_blank"
+              className="mx-0.5 font-bold hover:underline"
+              to={routes.billing(organization.id)}
             >
-              {elWorkflow.name}
-            </BasicLink>
-          ) : (
-            <span className="text-yellow-500">Not set</span>
-          )}
-        </p>
+              upgrade
+            </BasicLink>{' '}
+            to use this feature.
+          </p>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground">
+              Selected workflow:{' '}
+              {elWorkflow ? (
+                <BasicLink
+                  to={routes.pipelineBuild(organization.id, elWorkflow.id)}
+                  className="text-foreground hover:underline"
+                >
+                  {elWorkflow.name}
+                </BasicLink>
+              ) : (
+                <span className="text-yellow-500">Not set</span>
+              )}
+            </p>
 
-        <EditELSettingsForm organization={organization} pipelines={pipelines} />
+            <EditELSettingsForm
+              organization={organization}
+              pipelines={pipelines}
+            />
+          </>
+        )}
       </div>
     </Section>
   );

@@ -40,6 +40,7 @@ import {
   NavSidebarContext,
   SidebarLink,
 } from '~/components/sidebar/NavSidebar';
+import { CurrentSubscriptionPlanContext } from '~/components/subscription/useCurrentPlan';
 import { Avatar, AvatarFallback } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import {
@@ -126,47 +127,49 @@ export default function Layout() {
   }, []);
 
   return (
-    <div id="_root" className="grid h-screen grid-cols-[auto_1fr] ">
-      <NavSidebarContext.Provider
-        value={{
-          collapsed,
-          toggleCollapse,
-          isOpen,
-          openSidebar,
-          closeSidebar,
-        }}
-      >
-        <NavSidebar
-          topContent={<SidebarTopContent isCollapsed={collapsed} />}
-          bottomContent={<SidebarBottomContent isCollapsed={collapsed} />}
+    <div id="_root" className="grid h-screen grid-cols-[auto_1fr]">
+      <CurrentSubscriptionPlanContext.Provider value={{ plan: subscription }}>
+        <NavSidebarContext.Provider
+          value={{
+            collapsed,
+            toggleCollapse,
+            isOpen,
+            openSidebar,
+            closeSidebar,
+          }}
         >
-          <SidebarMainContent
-            isCollapsed={collapsed}
-            subscription={subscription}
-          />
-        </NavSidebar>
-
-        <NavMobileSidebar
-          topContent={<SidebarTopContent />}
-          bottomContent={<SidebarBottomContent />}
-        >
-          <SidebarMainContent subscription={subscription} />
-        </NavMobileSidebar>
-
-        <main className="col-span-2 lg:col-start-2 w-full">
-          <div className="bg-blue-500 z-0 h-[170px] absolute top-0 left-0 right-0 overflow-hidden">
-            <img
-              src="/bacgkround-blur.png"
-              alt="background"
-              className="object-cover bg-no-repeat h-full w-full"
+          <NavSidebar
+            topContent={<SidebarTopContent isCollapsed={collapsed} />}
+            bottomContent={<SidebarBottomContent isCollapsed={collapsed} />}
+          >
+            <SidebarMainContent
+              isCollapsed={collapsed}
+              subscription={subscription}
             />
-          </div>
+          </NavSidebar>
 
-          <div className="relative pb-5 flex min-h-screen flex-col max-w-full w-full">
-            <Outlet />
-          </div>
-        </main>
-      </NavSidebarContext.Provider>
+          <NavMobileSidebar
+            topContent={<SidebarTopContent />}
+            bottomContent={<SidebarBottomContent />}
+          >
+            <SidebarMainContent subscription={subscription} />
+          </NavMobileSidebar>
+
+          <main className="col-span-2 lg:col-start-2 w-full">
+            <div className="bg-blue-500 z-0 h-[170px] absolute top-0 left-0 right-0 overflow-hidden">
+              <img
+                src="/bacgkround-blur.png"
+                alt="background"
+                className="object-cover bg-no-repeat h-full w-full"
+              />
+            </div>
+
+            <div className="relative pb-5 flex min-h-screen flex-col max-w-full w-full">
+              <Outlet />
+            </div>
+          </main>
+        </NavSidebarContext.Provider>
+      </CurrentSubscriptionPlanContext.Provider>
     </div>
   );
 }

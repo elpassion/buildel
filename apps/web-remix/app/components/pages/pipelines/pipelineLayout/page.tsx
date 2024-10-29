@@ -5,6 +5,7 @@ import { ChevronLeft } from 'lucide-react';
 import { BasicLink } from '~/components/link/BasicLink';
 import { PipelineName } from '~/components/pages/pipelines/pipelineLayout/PipelineName';
 import { PipelineLayoutHeader } from '~/components/pages/pipelines/PipelineLayoutHeader';
+import { CurrentSubscriptionPlanContext } from '~/components/subscription/useCurrentPlan';
 import { FilledTabLink } from '~/components/tabs/FilledTabLink';
 import { FilledTabsWrapper } from '~/components/tabs/FilledTabsWrapper';
 import { TabGroup } from '~/components/tabs/TabGroup';
@@ -16,14 +17,14 @@ import { AliasSelect, CreateAliasForm, RestoreWorkflow } from './Aliases';
 import type { loader } from './loader.server';
 
 export function PipelineLayout() {
-  const { toasts, pipeline, organizationId, aliases, aliasId } =
+  const { toasts, pipeline, organizationId, aliases, aliasId, subscription } =
     useLoaderData<typeof loader>();
   const [searchParams] = useSearchParams();
 
   useServerToasts(toasts);
 
   return (
-    <>
+    <CurrentSubscriptionPlanContext.Provider value={{ plan: subscription }}>
       <TabGroup>
         <PipelineLayoutHeader className="lg:grid lg:grid-cols-[360px_1fr_360px]">
           <div className="flex gap-2 items-center">
@@ -91,6 +92,6 @@ export function PipelineLayout() {
 
         <Outlet />
       </TabGroup>
-    </>
+    </CurrentSubscriptionPlanContext.Provider>
   );
 }
