@@ -147,7 +147,7 @@ defmodule Buildel.Blocks.NewBlock do
         |> Options.set_outputs(@outputs)
         |> Options.set_tools(@tools, @tool_controller)
         |> Options.set_dynamic_ios(@dynamic_ios)
-        |> Options.set_schema(@schema_opts |> Enum.reverse())
+        |> Options.set_schema(@schema_opts |> Enum.reverse(), @tools)
       end
 
       @spec external_input(any(), String.t(), Message.t()) ::
@@ -536,6 +536,39 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
            Message.from_message(message)
            |> Message.set_type(:tool_response)
            |> Message.set_message("Something went wrong"), state}
+      end
+
+      def tool_call_formatter(state, unquote(name) = tool_name) do
+        pattern = state.block.opts[:"#{tool_name}_call_formatter"]
+
+        fn args ->
+          format_tool_message(pattern, args)
+        end
+      end
+
+      def tool_response_formatter(state, unquote(name) = tool_name) do
+        pattern = state.block.opts[:"#{tool_name}_response_formatter"]
+
+        fn args ->
+          format_tool_message(pattern, args)
+        end
+      end
+
+      defp format_tool_message(value, args) do
+        args
+        |> Enum.reduce(value, fn
+          {key, value}, acc when is_number(value) ->
+            String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+          {key, value}, acc when is_binary(value) ->
+            String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+
+          {key, value}, acc when is_map(value) ->
+            String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+
+          _, acc ->
+            acc
+        end)
       end
     end
   end

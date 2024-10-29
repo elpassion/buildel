@@ -81,7 +81,7 @@ defmodule Buildel.Blocks.NewWorkflowCall do
     }
   })
 
-  deftool(:call, description: "hello world", schema: %{})
+  deftool(:call, description: "Call another workflow", schema: %{})
 
   def handle_get_tool(:call, state) do
     tool = @tools |> Enum.find(&(&1.name == :call))

@@ -312,6 +312,42 @@ defmodule Buildel.Blocks.NewChat do
                    stream_stop: :none
                  )
                end,
+               on_tool_call: fn tool_calls ->
+                 tool_calls
+                 |> Enum.map(fn tool_call ->
+                   [_block_name, tool_name] = tool_call.name |> String.split("__")
+
+                   call_formatter =
+                     tool_call_formatter(state, tool_name |> String.to_existing_atom())
+
+                   output(
+                     state,
+                     :output,
+                     Message.from_message(message)
+                     |> Message.set_type(:text)
+                     |> Message.set_message(call_formatter.(tool_call.arguments)),
+                     stream_stop: :none
+                   )
+                 end)
+               end,
+               on_tool_content: fn tool_results ->
+                 tool_results
+                 |> Enum.map(fn tool_result ->
+                   [_block_name, tool_name] = tool_result.name |> String.split("__")
+
+                   response_formatter =
+                     tool_response_formatter(state, tool_name |> String.to_existing_atom())
+
+                   output(
+                     state,
+                     :output,
+                     Message.from_message(message)
+                     |> Message.set_type(:text)
+                     |> Message.set_message(response_formatter.(%{content: tool_result.content})),
+                     stream_stop: :none
+                   )
+                 end)
+               end,
                on_end: fn ->
                  send_stream_stop(state, :output, message)
                end,

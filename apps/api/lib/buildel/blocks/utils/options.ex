@@ -1,5 +1,6 @@
 defmodule Buildel.Blocks.Utils.Options do
   alias Buildel.Blocks.Utils.Schemas
+  alias Buildel.Blocks.Fields.EditorField
 
   @enforce_keys [:type, :description, :groups]
   @derive Jason.Encoder
@@ -38,7 +39,62 @@ defmodule Buildel.Blocks.Utils.Options do
     %{options | dynamic_ios: dynamic_ios}
   end
 
-  def set_schema(options, options_schema_properties) do
+  def set_schema(options, options_schema_properties, tools) do
+    tools_options_schema_properties =
+      tools
+      |> Enum.flat_map(
+        &[
+          {
+            :"#{&1.name}_call_formatter",
+            %{
+              required: true,
+              schema:
+                EditorField.new(%{
+                  readonly: true,
+                  title: "#{to_string(&1.name) |> String.capitalize()} Call Formatter",
+                  description: "Prompt to display when calling tool",
+                  minLength: 1,
+                  default: "abc",
+                  suggestions: [],
+                  displayWhen: %{
+                    connections: %{
+                      :"#{&1.name}_worker" => %{
+                        min: 1
+                      }
+                    }
+                  }
+                })
+            }
+          },
+          {
+            :"#{&1.name}_response_formatter",
+            %{
+              required: true,
+              schema:
+                EditorField.new(%{
+                  readonly: true,
+                  title: "#{to_string(&1.name) |> String.capitalize()} Response Formatter",
+                  description: "Prompt to display when tool has responded",
+                  minLength: 1,
+                  default: "abc",
+                  suggestions: [],
+                  displayWhen: %{
+                    connections: %{
+                      :"#{&1.name}_worker" => %{
+                        min: 1
+                      }
+                    }
+                  }
+                })
+            }
+          }
+        ]
+      )
+
+    options_schema_properties =
+      options_schema_properties
+      |> Keyword.merge(tools_options_schema_properties)
+
     %{
       options
       | schema: %{
