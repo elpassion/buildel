@@ -93,7 +93,7 @@ defmodule Buildel.Blocks.Browser do
 
     uri = URI.parse(url)
 
-    headers = build_headers(state.opts.headers, %{})
+    headers = build_headers(Map.get(state.opts, :headers, "{}"), %{})
 
     with {:ok, crawl} when length(crawl.pages) != 0 <-
            Crawler.crawl(url,
