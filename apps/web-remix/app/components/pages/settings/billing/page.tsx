@@ -66,10 +66,10 @@ export function BillingPage() {
         </SubscriptionHeader>
 
         <SubscriptionContent>
-          <SubscriptionCurrentPlan />
+          <SubscriptionCurrentPlan plan={subscription} />
 
           <UsageProgress
-            usage={199}
+            usage={subscription.usage.runs_limit}
             maxUsage={subscription.features.runs_limit}
           />
         </SubscriptionContent>
@@ -77,7 +77,9 @@ export function BillingPage() {
 
       <section className="mt-20">
         <BillingPlanFilters plans={plans}>
-          {(filteredPlans) => <BillingPlanList plans={filteredPlans} />}
+          {(filteredPlans) => (
+            <BillingPlanList plans={filteredPlans} currentPlan={subscription} />
+          )}
         </BillingPlanFilters>
 
         <p className="text-xs mt-6 text-muted-foreground">

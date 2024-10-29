@@ -5,6 +5,7 @@ import { ValidatedForm } from 'remix-validated-form';
 
 import { stripePrice } from '~/api/subscriptions/subscriptions.contracts';
 import type {
+  ISubscription,
   ISubscriptionFeature,
   ISubscriptionPrice,
   ISubscriptionProduct,
@@ -79,14 +80,24 @@ export function BillingPlanFilters({
 
 interface BillingPlanListProps {
   plans: BillingPlan[];
+  currentPlan: ISubscription;
 }
 
-export function BillingPlanList({ plans }: BillingPlanListProps) {
+export function BillingPlanList({ plans, currentPlan }: BillingPlanListProps) {
+  const isPlanActive = (plan: BillingPlan) => {
+    if (currentPlan.plan_id === null) {
+      if (plan.name.toLowerCase() === 'free') return true;
+    }
+
+    return currentPlan.plan_id === plan.id;
+  };
   return (
     <ItemList
       className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
       items={plans}
-      renderItem={(item) => <BillingPlanListItem data={item} />}
+      renderItem={(item) => (
+        <BillingPlanListItem data={item} active={isPlanActive(item)} />
+      )}
     />
   );
 }
@@ -96,11 +107,13 @@ type BillingPlanListItemProps = Omit<
   'children'
 > & {
   data: BillingPlan;
+  active?: boolean;
 };
 
 function BillingPlanListItem({
   data,
   className,
+  active,
   ...rest
 }: BillingPlanListItemProps) {
   const validator = useMemo(() => withZod(checkoutSchema), []);
@@ -154,6 +167,7 @@ function BillingPlanListItem({
         <HiddenField name="intent" value="CHECKOUT" />
 
         <SubmitButton
+          disabled={active}
           isFluid
           size="sm"
           variant={recommended ? 'default' : 'outline'}

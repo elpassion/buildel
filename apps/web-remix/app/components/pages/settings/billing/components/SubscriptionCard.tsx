@@ -1,8 +1,11 @@
+import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
+import startCase from 'lodash.startcase';
 import { Sparkles } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
+import type { ISubscription } from '~/api/subscriptions/subscriptions.types';
 import { HiddenField } from '~/components/form/fields/field.context';
 import { SubmitButton } from '~/components/form/submit';
 import { portalSchema } from '~/components/pages/settings/billing/schema';
@@ -16,11 +19,6 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { cn } from '~/utils/cn';
-
-export interface SubscriptionCardProps {
-  usage: number;
-  maxUsage: number;
-}
 
 export function SubscriptionCard({
   className,
@@ -50,7 +48,7 @@ export function ManageSubscriptionButton({
   const validator = useMemo(() => withZod(portalSchema), []);
   return (
     <ValidatedForm method="POST" validator={validator} noValidate>
-      <HiddenField name="customerId" value={customerId || ""} />
+      <HiddenField name="customerId" value={customerId || ''} />
       <HiddenField name="intent" value="PORTAL" />
 
       <SubmitButton
@@ -60,6 +58,7 @@ export function ManageSubscriptionButton({
           'gap-2 items-center bg-green-500/5 text-green-500 border-green-500/10 hover:text-green-500 hover:bg-green-500/10',
           className,
         )}
+        disabled={customerId === null}
         {...rest}
       >
         <span>Manage Subscription</span>
@@ -103,15 +102,15 @@ export function PlanDescription() {
   return <CardDescription>Current Plan</CardDescription>;
 }
 
-export function PlanType() {
-  return <Badge variant="secondary">Free</Badge>;
+export function PlanType({ children }: PropsWithChildren) {
+  return <Badge variant="secondary">{children}</Badge>;
 }
 
-export function SubscriptionCurrentPlan() {
+export function SubscriptionCurrentPlan({ plan }: { plan: ISubscription }) {
   return (
     <div className="flex gap-2 items-center mb-2">
       <PlanDescription />
-      <PlanType />
+      <PlanType>{startCase(plan.type)}</PlanType>
     </div>
   );
 }

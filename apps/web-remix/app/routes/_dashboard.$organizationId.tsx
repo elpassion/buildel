@@ -288,15 +288,20 @@ function SidebarUsageProgress({
         <div className="text-xs grow flex flex-col gap-1">
           <p className="flex gap-1 justify-between items-center">
             <span>Total</span>
-            <span>1000</span>
+            <span>{subscription.features.runs_limit}</span>
           </p>
           <p className="flex gap-1 justify-between items-center">
             <span>Remaining</span>
-            <span>{1000 - 321}</span>
+            <span>
+              {subscription.features.runs_limit - subscription.usage.runs_limit}
+            </span>
           </p>
         </div>
 
-        <UsageCircleProgress usage={321} maxUsage={1000} />
+        <UsageCircleProgress
+          usage={subscription.usage.runs_limit}
+          maxUsage={subscription.features.runs_limit}
+        />
       </div>
     </div>
   );

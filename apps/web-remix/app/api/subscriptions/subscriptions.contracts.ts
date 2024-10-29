@@ -76,6 +76,11 @@ export const Subscription = z
     interval: z.string(),
     status: z.string(),
     type: z.string(),
+    plan_id: z.string().nullable(),
+    subscription_id: z.string().nullable(),
+    usage: z.object({
+      runs_limit: z.union([z.number(), z.string()]),
+    }),
   })
   .transform((sub) => ({
     ...sub,
@@ -87,6 +92,10 @@ export const Subscription = z
       workflows_limit: Number(sub.features.workflows_limit),
       experiments_limit: Number(sub.features.experiments_limit),
       knowledge_bases_limit: Number(sub.features.knowledge_bases_limit),
+    },
+    usage: {
+      ...sub.usage,
+      runs_limit: Number(sub.usage.runs_limit),
     },
   }));
 
