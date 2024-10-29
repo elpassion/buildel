@@ -19,6 +19,7 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { cn } from '~/utils/cn';
+import { dayjs } from '~/utils/Dayjs';
 
 export function SubscriptionCard({
   className,
@@ -108,9 +109,17 @@ export function PlanType({ children }: PropsWithChildren) {
 
 export function SubscriptionCurrentPlan({ plan }: { plan: ISubscription }) {
   return (
-    <div className="flex gap-2 items-center mb-2">
-      <PlanDescription />
-      <PlanType>{startCase(plan.type)}</PlanType>
+    <div className="flex gap-3 justify-between items-center mb-2 flex-wrap">
+      <div className="flex gap-2 items-center ">
+        <PlanDescription />
+        <PlanType>{startCase(plan.type)}</PlanType>
+      </div>
+
+      {plan.status === 'canceled' ? (
+        <Badge variant="destructive">
+          Will be canceled {dayjs().to(plan.end_date)}
+        </Badge>
+      ) : null}
     </div>
   );
 }

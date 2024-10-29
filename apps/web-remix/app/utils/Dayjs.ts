@@ -1,14 +1,16 @@
 import originalDayjs from 'dayjs';
 import type { Dayjs as OriginalDayjs } from 'dayjs';
 import localeData from 'dayjs/plugin/localeData';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
+originalDayjs.extend(relativeTime);
 originalDayjs.extend(localeData);
 
 export class Dayjs {
   private instance: OriginalDayjs;
   private defaultFormat = 'DD/MM/YYYY HH:mm';
 
-  constructor(date: originalDayjs.ConfigType) {
+  constructor(date?: originalDayjs.ConfigType) {
     // if (typeof date === 'string' && !date.endsWith('Z')) {
     //   date += 'Z'; // adding "Z" at the end of the date lets dayjs know that this date should be treated as UTC date and format date in the LOCAL timezone
     // }
@@ -62,6 +64,14 @@ export class Dayjs {
     return this.subtract(value, 'month');
   }
 
+  from(date: originalDayjs.ConfigType) {
+    return this.instance.from(date);
+  }
+
+  to(date: originalDayjs.ConfigType) {
+    return this.instance.to(date);
+  }
+
   get startOfMonth() {
     return this.startOf('month');
   }
@@ -71,4 +81,4 @@ export class Dayjs {
   }
 }
 
-export const dayjs = (date: originalDayjs.ConfigType) => new Dayjs(date);
+export const dayjs = (date?: originalDayjs.ConfigType) => new Dayjs(date);
