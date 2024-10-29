@@ -96,7 +96,11 @@ export function BillingPlanList({ plans, currentPlan }: BillingPlanListProps) {
       className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4"
       items={plans}
       renderItem={(item) => (
-        <BillingPlanListItem data={item} active={isPlanActive(item)} />
+        <BillingPlanListItem
+          data={item}
+          active={isPlanActive(item)}
+          canceled={currentPlan.plan_id === item.id && currentPlan.isCanceled}
+        />
       )}
     />
   );
@@ -108,12 +112,14 @@ type BillingPlanListItemProps = Omit<
 > & {
   data: BillingPlan;
   active?: boolean;
+  canceled?: boolean;
 };
 
 function BillingPlanListItem({
   data,
   className,
   active,
+  canceled,
   ...rest
 }: BillingPlanListItemProps) {
   const validator = useMemo(() => withZod(checkoutSchema), []);
@@ -129,12 +135,12 @@ function BillingPlanListItem({
       {...rest}
     >
       {recommended ? (
-        <div className="absolute top-0 right-0 bg-primary text-white text-sm px-3 py-1 rounded-bl-lg">
+        <div className="absolute top-0 right-1/2 translate-x-1/2 bg-primary text-white text-sm px-3 py-1 rounded-bl-lg rounded-br-lg">
           Most popular
         </div>
       ) : null}
 
-      <div className="h-[100px]">
+      <div className="h-[100px] flex justify-between gap-2">
         <h3
           className={cn('text-base', {
             'font-semibold': recommended,
@@ -143,6 +149,12 @@ function BillingPlanListItem({
         >
           {data.name}
         </h3>
+
+        {canceled ? (
+          <p className="text-muted-foreground text-xs mt-0.5">
+            Will be canceled
+          </p>
+        ) : null}
       </div>
 
       <p>
@@ -173,7 +185,7 @@ function BillingPlanListItem({
           variant={recommended ? 'default' : 'outline'}
           className="mb-10"
         >
-          Subscribe
+          {active ? 'Current plan' : 'Subscribe'}
         </SubmitButton>
       </ValidatedForm>
 

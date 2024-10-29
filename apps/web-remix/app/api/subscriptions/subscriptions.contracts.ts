@@ -93,6 +93,7 @@ export const Subscription = z
       experiments_limit: Number(sub.features.experiments_limit),
       knowledge_bases_limit: Number(sub.features.knowledge_bases_limit),
     },
+    isCanceled: sub.status === 'canceled',
     usage: {
       ...sub.usage,
       runs_limit: Number(sub.usage.runs_limit),
