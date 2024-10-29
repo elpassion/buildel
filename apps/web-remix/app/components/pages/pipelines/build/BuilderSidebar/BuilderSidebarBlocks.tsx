@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import { useReactFlow } from '@xyflow/react';
+import startCase from 'lodash.startcase';
 import { ChevronUp, X } from 'lucide-react';
 import { useBoolean, useDebounce, useEventListener } from 'usehooks-ts';
 import { z } from 'zod';
@@ -153,7 +154,7 @@ function BlockGroupItem({ data, onCreate }: BlockGroupItemProps) {
   const { value: isCollapsed, toggle } = useBoolean(false);
 
   return (
-    <div className="border border-input rounded-md flex flex-col gap-1 overflow-hidden">
+    <div className="rounded-md flex flex-col gap-1 overflow-hidden">
       <Button
         isFluid
         size="xxs"
@@ -265,12 +266,12 @@ function BlockItem({ data, onCreate }: BlockItemProps) {
               onError={onImageError}
             />
             <h3 className="text-xs truncate text-foreground">
-              {data.block.type}
+              {startCase(data.block.type)}
             </h3>
           </div>
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-[200px] text-sm">
-          <p className="mb-1 font-semibold">{data.block.type}</p>
+          <p className="mb-1 font-semibold">{startCase(data.block.type)}</p>
           <span>{data.block.description}</span>
 
           <Button
