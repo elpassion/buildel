@@ -6,6 +6,7 @@ import {
   DropdownPopup,
   DropdownTrigger,
 } from '~/components/dropdown/Dropdown';
+import { useDropdown } from '~/components/dropdown/DropdownContext';
 import {
   Tooltip,
   TooltipContent,
@@ -18,16 +19,27 @@ interface ELProps {}
 
 export const EL = ({ children }: PropsWithChildren<ELProps>) => {
   const { isDesktop } = useBreakpoints();
+
   return (
     <Dropdown placement={isDesktop ? 'bottom' : 'bottom-start'}>
       <ELTrigger />
 
-      <DropdownPopup className="min-w-[100%] z-[11] bg-secondary border border-input rounded-lg overflow-hidden h-[500px] px-1 pb-1 md:min-w-[450px] lg:min-w-[650px]">
-        {children}
-      </DropdownPopup>
+      <ElContent>{children}</ElContent>
     </Dropdown>
   );
 };
+
+function ElContent({ children }: PropsWithChildren<ELProps>) {
+  const { isShown } = useDropdown();
+
+  if (!isShown) return null;
+
+  return (
+    <DropdownPopup className="min-w-[100%] z-[11] bg-secondary border border-input rounded-lg overflow-hidden h-[500px] px-1 pb-1 md:min-w-[450px] lg:min-w-[650px]">
+      {children}
+    </DropdownPopup>
+  );
+}
 
 function ELTrigger() {
   return (
