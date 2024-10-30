@@ -179,11 +179,11 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     with {:ok, organization} <- Organizations.get_user_organization(user, organization_id),
          {:ok, %Pipeline{} = pipeline} <-
            Pipelines.get_organization_pipeline(organization, pipeline_id),
-         {:ok, config} <- Pipelines.get_pipeline_config(pipeline, alias),
+         #  {:ok, config} <- Pipelines.get_pipeline_config(pipeline, alias),
          {:ok, run} <-
            Pipelines.create_run(%{
              pipeline_id: pipeline_id,
-             config: config |> Map.put(:metadata, metadata)
+             config: %{} |> Map.put(:metadata, metadata)
            }) do
       render(conn, :show, run: run)
     end
