@@ -142,6 +142,7 @@ export const routes = {
       `${routes.pipelineInterface(organizationId, pipelineId)}/website-chatbot`,
       params,
     ),
+
   pipelineForm: (
     organizationId: OrganizationId,
     pipelineId: PipelineId,
@@ -285,6 +286,16 @@ export const routes = {
   ) =>
     buildUrlWithParams(
       `/webchats${routes.pipeline(organizationId, pipelineId)}`,
+      params,
+    ),
+  chatPreviewRun: (
+    organizationId: OrganizationId,
+    pipelineId: PipelineId,
+    runId: RunId,
+    params: RouteParam = {},
+  ) =>
+    buildUrlWithParams(
+      `${routes.chatPreview(organizationId, pipelineId)}/${runId}`,
       params,
     ),
   formPreview: (

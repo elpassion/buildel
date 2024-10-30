@@ -8,6 +8,29 @@ defmodule Buildel.Pipelines do
   alias Buildel.Pipelines.Pipeline
   alias Buildel.Organizations.Organization
 
+  defmodule ListParams do
+    defstruct [:page, :per_page, :favorites]
+
+    def from_map(params) do
+      %__MODULE__{}
+      |> struct(%{
+        page:
+          Map.get(params, "page", nil)
+          |> then(fn
+            nil -> nil
+            page -> String.to_integer(page)
+          end),
+        per_page:
+          Map.get(params, "per_page", nil)
+          |> then(fn
+            nil -> nil
+            per_page -> String.to_integer(per_page)
+          end),
+        favorites: Map.get(params, "favorites", nil) == "true"
+      })
+    end
+  end
+
   def list_pipelines do
     Repo.all(Pipeline)
   end
@@ -27,6 +50,18 @@ defmodule Buildel.Pipelines do
     |> Repo.update()
   end
 
+  def toggle_pipeline_favorite(%Pipeline{} = pipeline) do
+    from(p in Pipeline,
+      where: p.id == ^pipeline.id,
+      update: [set: [favorite: fragment("NOT favorite")]]
+    )
+    |> Repo.update_all([])
+    |> case do
+      {1, _} -> {:ok, pipeline |> Map.update!(:favorite, &(!&1))}
+      _ -> {:error, :not_found}
+    end
+  end
+
   def delete_pipeline(%Pipeline{} = pipeline) do
     Repo.delete(pipeline, allow_stale: true)
   end
@@ -34,6 +69,34 @@ defmodule Buildel.Pipelines do
   def list_organization_pipelines(%Organization{} = organization) do
     from(p in Pipeline, where: p.organization_id == ^organization.id, order_by: [desc: p.id])
     |> Repo.all()
+  end
+
+  def list_organization_pipelines(
+        %Organization{} = organization,
+        %ListParams{} = params
+      ) do
+    query =
+      from(p in Pipeline, where: p.organization_id == ^organization.id, order_by: [desc: p.id])
+      |> then(fn q ->
+        case params.favorites do
+          true -> q |> where([p], p.favorite == true)
+          _ -> q
+        end
+      end)
+
+    items =
+      case params do
+        %{page: nil, per_page: nil} ->
+          query |> Repo.all()
+
+        %{page: page, per_page: per_page} ->
+          offset = page * per_page
+          query |> limit(^per_page) |> offset(^offset) |> Repo.all()
+      end
+
+    count = query |> Repo.aggregate(:count, :id)
+
+    {:ok, items, count}
   end
 
   def get_organization_pipeline(%Organization{} = organization, id) do
@@ -255,7 +318,8 @@ defmodule Buildel.Pipelines do
             type: input_type
           },
           opts: %{
-            reset: connection["opts"]["reset"]
+            reset: connection["opts"]["reset"],
+            optional: connection["opts"]["optional"]
           }
         }
 
@@ -292,6 +356,7 @@ defmodule Buildel.Pipelines do
         opts:
           block["opts"]
           |> keys_to_atoms()
+          |> flatten_map()
           |> Map.put(:metadata, config["metadata"] || %{})
       }
     end)
@@ -341,6 +406,20 @@ defmodule Buildel.Pipelines do
     end
   end
 
+  defp flatten_map(map), do: flatten_map(map, %{})
+
+  defp flatten_map(%{} = map, acc) do
+    map
+    |> Enum.reduce(acc, fn {key, value}, acc ->
+      case value do
+        %{} -> flatten_map(value, acc)
+        _ -> Map.put(acc, key, value)
+      end
+    end)
+  end
+
+  defp flatten_map(_value, acc), do: acc
+
   defp block_valid?(config, block_config) do
     cond do
       config["blocks"] |> Enum.any?(&(&1["name"] == block_config.name)) ->
@@ -375,7 +454,8 @@ defmodule Buildel.Pipelines do
              type: input_type
            },
            opts: %{
-             reset: true
+             reset: true,
+             optional: false
            }
          },
          {:ok, true} <- connection_valid?(pipeline.config, connection) do
@@ -389,7 +469,10 @@ defmodule Buildel.Pipelines do
                   "block_name" => connection.from.block_name,
                   "output_name" => connection.from.name
                 },
-                "opts" => %{"reset" => connection.opts.reset},
+                "opts" => %{
+                  "reset" => connection.opts.reset,
+                  "optional" => connection.opts.optional
+                },
                 "to" => %{
                   "block_name" => connection.to.block_name,
                   "input_name" => connection.to.name
@@ -408,6 +491,12 @@ defmodule Buildel.Pipelines do
       e ->
         e
     end
+  end
+
+  def get_pipeline_run_logs(run) do
+    from(l in Buildel.Pipelines.Log, where: l.run_id == ^run.id, order_by: [asc: l.inserted_at])
+    |> Repo.all()
+    |> Repo.preload(run: :pipeline)
   end
 
   defp connection_valid?(config, %Buildel.Blocks.Connection{} = connection) do
@@ -491,6 +580,10 @@ defmodule Buildel.Pipelines do
 
   def delete_alias(%Alias{} = alias) do
     Repo.delete(alias)
+  end
+
+  def list_aliases() do
+    Repo.all(Alias)
   end
 
   defp keys_to_atoms(string_key_map) when is_map(string_key_map) do

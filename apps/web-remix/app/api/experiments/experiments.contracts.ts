@@ -9,10 +9,12 @@ export const Experiment = z.object({
     id: z.union([z.number(), z.string()]),
     name: z.string(),
   }),
-  pipeline: z.object({
-    id: z.union([z.number(), z.string()]),
-    name: z.string(),
-  }),
+  pipeline: z
+    .object({
+      id: z.union([z.number(), z.string()]),
+      name: z.string(),
+    })
+    .nullable(),
   created_at: z.string(),
   name: z.string(),
 });

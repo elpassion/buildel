@@ -17,7 +17,6 @@ defmodule BuildelWeb.CollectionGraphJSON do
       }
     }
   end
-
   def state(%{state: state}) do
     %{
       data: %{

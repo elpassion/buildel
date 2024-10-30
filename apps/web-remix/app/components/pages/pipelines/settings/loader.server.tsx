@@ -21,9 +21,10 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const blockTypesPromise = blockTypeApi.getBlockTypes();
 
-    const pipelinePromise = pipelineApi.getPipeline(
+    const pipelinePromise = pipelineApi.getAliasedPipeline(
       params.organizationId,
       params.pipelineId,
+      pipelineApi.getAliasFromUrl(request.url),
     );
 
     const detailsPromise = pipelineApi.getPipelineDetails(
@@ -38,7 +39,7 @@ export async function loader(args: LoaderFunctionArgs) {
       detailsPromise,
     ]);
 
-    const blocks = pipeline.data.config.blocks.map((block) => ({
+    const blocks = pipeline.config.blocks.map((block) => ({
       ...block,
       block_type: blockTypes.data.find(
         (blockType) => blockType.type === block.type,
@@ -47,8 +48,8 @@ export async function loader(args: LoaderFunctionArgs) {
 
     return json({
       pipeline: {
-        ...pipeline.data,
-        config: { ...pipeline.data.config, blocks },
+        ...pipeline,
+        config: { ...pipeline.config, blocks },
       },
       organizationId: params.organizationId,
       pipelineId: params.pipelineId,

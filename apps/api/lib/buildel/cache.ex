@@ -9,13 +9,17 @@ defmodule Buildel.Cache do
   def lookup(key, f) when is_binary(key) do
     case :ets.lookup(:buildel_cache, key) do
       [] ->
-        result = f.()
+        case f.() do
+          {:error, error} ->
+            {:error, error}
 
-        if result |> :erlang.term_to_binary() |> :erlang.byte_size() < 1000 * 1024 do
-          :ets.insert(:buildel_cache, {key, result})
+          result ->
+            if result |> :erlang.term_to_binary() |> :erlang.byte_size() < 1000 * 1024 do
+              :ets.insert(:buildel_cache, {key, result})
+            end
+
+            result
         end
-
-        result
 
       [{_key, value}] ->
         value

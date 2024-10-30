@@ -1,4 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import debounce from 'lodash.debounce';
 import startCase from 'lodash.startcase';
 
 import { asyncSelectApi } from '~/api/AsyncSelectApi';
@@ -6,6 +13,12 @@ import { toSelectOption } from '~/components/form/fields/asyncSelect.field';
 import type {
   JSONSchemaField,
   JSONSchemaObjectField,
+  JSONSchemaSectionField,
+} from '~/components/form/schema/SchemaParser';
+import {
+  isEditorField,
+  isObjectField,
+  isSectionField,
 } from '~/components/form/schema/SchemaParser';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
@@ -22,43 +35,41 @@ import {
 
 interface NodeReadonlyFieldsProps {
   schema?: JSONSchemaField;
-  data: Record<string, unknown>;
+  ctx: Record<string, unknown>;
   blockName: string;
 }
+
+type JSONSchemaFlattenedFields = Exclude<
+  JSONSchemaField,
+  JSONSchemaObjectField | JSONSchemaSectionField
+>;
 
 //@todo fixed JSONSchemaField typing in app
 export const NodeReadonlyFields = ({
   schema,
-  data,
+  ctx,
   blockName,
 }: NodeReadonlyFieldsProps) => {
-  const properties = useMemo(() => {
-    //@ts-ignore
-    if (isObjectField(schema?.properties?.opts)) {
-      //@ts-ignore
-      const properties = (schema?.properties?.opts?.properties ??
-        {}) as JSONSchemaObjectField;
-      return Object.entries(properties).reduce(
-        (acc, [key, value]) => {
-          //@ts-ignore
-          if (value?.readonly) return { ...acc, [key]: value };
-
-          return acc;
-        },
-        {} as Record<string, any>,
-      );
+  const flattenedProperties = useMemo(() => {
+    if (
+      schema &&
+      'properties' in schema &&
+      isObjectField(schema.properties.opts)
+    ) {
+      return flattenProperties(schema.properties.opts);
     }
-
     return {};
   }, [schema]);
 
+  const flattenedCtx = useMemo(() => flattenObject(ctx), [ctx]);
+
   const renderProperties = useMemo(() => {
-    return Object.keys(properties).map((key) => {
+    return Object.keys(flattenedProperties).map((key) => {
       // only string/number/boolean types right now
       if (
-        properties[key].type !== 'string' &&
-        properties[key].type !== 'number' &&
-        properties[key].type !== 'boolean'
+        flattenedProperties[key].type !== 'string' &&
+        flattenedProperties[key].type !== 'number' &&
+        flattenedProperties[key].type !== 'boolean'
       ) {
         return null;
       }
@@ -68,20 +79,20 @@ export const NodeReadonlyFields = ({
           key={key}
           className={cn('pt-1 [&:not(:last-child)]:pb-3', {
             'basis-full [&:not(:first-child)]:border-t border-input':
-              properties[key].presentAs === 'editor',
-            hidden: !showValue(data[key]),
+              isEditorField(flattenedProperties[key]),
+            hidden: !showValue(flattenedCtx[key]),
           })}
         >
           <NodeReadonlyItem
-            properties={properties[key]}
+            properties={flattenedProperties[key]}
             blockName={blockName}
-            data={data}
+            ctx={flattenedCtx}
             id={key}
           />
         </li>
       );
     });
-  }, [properties]);
+  }, [flattenedProperties, flattenedCtx]);
 
   return (
     <ul className="flex gap-x-4 flex-wrap max-w-[350px] w-full">
@@ -92,7 +103,7 @@ export const NodeReadonlyFields = ({
 
 interface NodeReadonlyItemProps {
   properties: Record<string, any>;
-  data: Record<string, any>;
+  ctx: Record<string, any>;
   id: string;
   blockName: string;
 }
@@ -100,7 +111,7 @@ interface NodeReadonlyItemProps {
 function NodeReadonlyItem({
   properties,
   id,
-  data,
+  ctx,
   blockName,
 }: NodeReadonlyItemProps) {
   if (
@@ -110,9 +121,9 @@ function NodeReadonlyItem({
     return (
       <NodeReadonlyAsyncItem
         url={properties.url}
-        value={data[id]}
+        value={ctx[id]}
         label={id}
-        context={{ ...data, block_name: blockName }}
+        context={{ ...ctx, block_name: blockName }}
       />
     );
   }
@@ -121,15 +132,15 @@ function NodeReadonlyItem({
 
   if (isEditor) {
     return (
-      <NodeReadonlyItemWrapper className="pt-1" show={showValue(data[id])}>
+      <NodeReadonlyItemWrapper className="pt-1" show={showValue(ctx[id])}>
         <NodeReadonlyItemTitle className="mb-1">
           {startCase(id)}
         </NodeReadonlyItemTitle>
 
-        <NodeReadonlyItemTextarea value={data[id]} />
+        <NodeReadonlyItemTextarea value={ctx[id]} />
 
         <NodePromptInputs
-          template={data[id]}
+          template={ctx[id]}
           className="mt-1"
           blockName={blockName}
         />
@@ -139,17 +150,17 @@ function NodeReadonlyItem({
 
   if (properties.type === 'boolean') {
     return (
-      <NodeReadonlyItemWrapper show={showValue(data[id])}>
+      <NodeReadonlyItemWrapper show={showValue(ctx[id])}>
         <NodeReadonlyItemTitle>{startCase(id)}</NodeReadonlyItemTitle>
-        <NodeReadonlyBooleanValue value={data[id]} />
+        <NodeReadonlyBooleanValue value={ctx[id]} />
       </NodeReadonlyItemWrapper>
     );
   }
 
   return (
-    <NodeReadonlyItemWrapper show={showValue(data[id])}>
+    <NodeReadonlyItemWrapper show={showValue(ctx[id])}>
       <NodeReadonlyItemTitle>{startCase(id)}</NodeReadonlyItemTitle>
-      <NodeReadonlyItemValue>{data[id]}</NodeReadonlyItemValue>
+      <NodeReadonlyItemValue>{ctx[id]}</NodeReadonlyItemValue>
     </NodeReadonlyItemWrapper>
   );
 }
@@ -167,34 +178,55 @@ function NodeReadonlyAsyncItem({
   context,
   label,
 }: NodeReadonlyAsyncItemProps) {
+  const abortController = useRef<AbortController | null>(null);
   const organizationId = useOrganizationId();
   const pipelineId = usePipelineId();
 
   const [finalValue, setFinalValue] = useState(value);
 
-  const readyUrl = url
-    .replace('{{organization_id}}', organizationId.toString())
-    .replace('{{pipeline_id}}', pipelineId.toString())
-    .replace(/{{([\w.]+)}}/g, (_fullMatch, key) => {
-      const cleanedKey = key.replace(/^[^.]+\./, '');
+  const readyUrl = useMemo(() => {
+    return url
+      .replace('{{organization_id}}', organizationId.toString())
+      .replace('{{pipeline_id}}', pipelineId.toString())
+      .replace(/{{([\w.]+)}}/g, (_fullMatch, key) => {
+        const cleanedKey = (key as string).split('.').at(-1);
 
-      const replacedValue = context[cleanedKey];
+        const replacedValue = cleanedKey ? context[cleanedKey] : key;
 
-      return replacedValue ?? cleanedKey;
-    });
+        return replacedValue ?? cleanedKey;
+      });
+  }, [pipelineId, organizationId, url, context]);
 
-  const fetchOptions = async () => {
-    return asyncSelectApi
-      .getData(readyUrl)
-      .then((opts) => opts.map(toSelectOption));
-  };
+  const fetchOptions = useCallback(async () => {
+    if (abortController.current) {
+      abortController.current.abort();
+    }
 
-  useEffect(() => {
+    abortController.current = new AbortController();
+
+    try {
+      return await asyncSelectApi
+        .getData(readyUrl, { signal: abortController.current.signal })
+        .then((opts) => opts.map(toSelectOption));
+    } finally {
+      abortController.current = null;
+    }
+  }, [readyUrl]);
+
+  const debouncedFetchOptions = debounce(() => {
     fetchOptions().then((options) => {
       setFinalValue(
         options.find((option) => option.value === value)?.label ?? value,
       );
     });
+  }, 100);
+
+  useEffect(() => {
+    debouncedFetchOptions();
+
+    return () => {
+      debouncedFetchOptions.cancel();
+    };
   }, [url, value]);
 
   return (
@@ -205,16 +237,46 @@ function NodeReadonlyAsyncItem({
   );
 }
 
-const isObjectField = (
-  schema?: JSONSchemaField,
-): schema is JSONSchemaObjectField => {
-  return (schema as JSONSchemaObjectField)?.type === 'object';
-};
-
 function showValue(value: unknown) {
   if (typeof value === 'boolean' || typeof value === 'number') {
     return true;
   }
 
   return !!value;
+}
+
+function flattenProperties(
+  schema: JSONSchemaObjectField | JSONSchemaSectionField,
+): Record<string, JSONSchemaFlattenedFields> {
+  return Object.entries(schema.properties).reduce((acc, [key, value]) => {
+    if (isObjectField(value) || isSectionField(value)) {
+      return {
+        ...acc,
+        ...flattenProperties(value),
+      };
+    }
+
+    if (!('readonly' in value) || value.readonly === false) return acc;
+
+    return {
+      ...acc,
+      [key]: value,
+    };
+  }, {});
+}
+
+function flattenObject(obj: Record<string, unknown>): Record<string, unknown> {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      return {
+        ...acc,
+        ...flattenObject(value as Record<string, unknown>),
+      };
+    }
+
+    return {
+      ...acc,
+      [key]: value,
+    };
+  }, {});
 }

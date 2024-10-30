@@ -33,9 +33,15 @@ defmodule BuildelWeb.WorkflowTemplateController do
     security: [%{"authorization" => []}]
 
   def index(conn, _params) do
-    with workflow_templates <-
-           Buildel.WorkflowTemplates.get_workflow_template_names() do
-      render(conn, :index, workflow_templates: workflow_templates)
+    %{organization_id: organization_id} = conn.params
+    user = conn.assigns.current_user
+
+    with {:ok, organization} <-
+           Buildel.Organizations.get_user_organization(user, organization_id),
+         {:ok, templates} <-
+           Buildel.WorkflowTemplates.get_workflow_template_names(organization.id) do
+
+        render(conn, :index, workflow_templates: templates)
     end
   end
 

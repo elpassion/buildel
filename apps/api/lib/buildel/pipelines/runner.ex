@@ -15,6 +15,13 @@ defmodule Buildel.Pipelines.Runner do
     spec = {Buildel.Pipelines.Worker, [run]}
 
     with {:ok, _pid} <- DynamicSupervisor.start_child(__MODULE__, spec) do
+      Buildel.BlockPubSub.broadcast_to_io(
+        Buildel.Pipelines.Worker.context_id(run),
+        "supervisor",
+        "output",
+        {:workflow_started, %{}}
+      )
+
       {:ok,
        run
        |> Buildel.Pipelines.Run.changeset(%{

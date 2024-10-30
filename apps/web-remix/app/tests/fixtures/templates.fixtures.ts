@@ -7,6 +7,7 @@ export const templateFixture = (
     name: 'Speech To Text',
     template_name: 'speech_to_text',
     template_description: 'Sample',
+    groups: ['popular'],
     ...override,
   };
 };

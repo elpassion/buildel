@@ -1,14 +1,18 @@
 import { Channel, ConnectionState, Socket } from "phoenix";
 import { v4 } from "uuid";
 import { assert } from "./utils/assert.ts";
+import type {
+  BuildelRunStatus,
+  BuildelRunStartArgs,
+  BuildelRunLogsConnectionStatus,
+  BuildelRunLogsJoinArgs,
+  BuildelRunJoinArgs,
+  BuildelSocketOptions,
+  BuildelRunHistoryEvent,
+  BuildelRunHandlers,
+  BuildelRunLogsHandlers,
+} from "./buildel.types.ts";
 
-export interface BuildelSocketOptions {
-  socketUrl?: string;
-  authUrl?: string;
-  headers?: Record<string, string>;
-  useAuth?: boolean;
-  onStatusChange?: (status: ConnectionState) => void;
-}
 export class BuildelSocket {
   private readonly socket: Socket;
   private readonly id: string;
@@ -67,25 +71,14 @@ export class BuildelSocket {
     return this.socket.connectionState();
   }
 
-  public run(
-    pipelineId: number,
-    handlers?: {
-      onBlockOutput?: (
-        blockId: string,
-        outputName: string,
-        payload: unknown,
-      ) => void;
-      onError: (error: string) => void;
-      onBlockError?: (blockId: string, errors: string[]) => void;
-      onBlockStatusChange?: (blockId: string, isWorking: boolean) => void;
-      onStatusChange?: (status: BuildelRunStatus) => void;
-    },
-  ) {
+  public run(pipelineId: number, handlers?: Partial<BuildelRunHandlers>) {
+    const onConnect = handlers?.onConnect ?? (() => {});
     const onBlockOutput = handlers?.onBlockOutput ?? (() => {});
     const onBlockStatusChange = handlers?.onBlockStatusChange ?? (() => {});
     const onStatusChange = handlers?.onStatusChange ?? (() => {});
     const onBlockError = handlers?.onBlockError ?? (() => {});
     const onError = handlers?.onError ?? (() => {});
+    const onHistory = handlers?.onHistory ?? (() => {});
 
     return new BuildelRun(
       this.socket,
@@ -96,11 +89,13 @@ export class BuildelSocket {
       this.headers,
       this.useAuth,
       {
+        onConnect,
         onBlockOutput,
         onBlockStatusChange,
         onStatusChange,
         onBlockError,
         onError,
+        onHistory,
       },
     );
   }
@@ -108,12 +103,7 @@ export class BuildelSocket {
   public logs(
     pipelineId: number,
     runId: number,
-    handlers?: {
-      onMessage: (payload: unknown) => void;
-      onLogMessage: (payload: unknown) => void;
-      onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
-      onError: (error: string) => void;
-    },
+    handlers?: Partial<BuildelRunLogsHandlers>,
   ) {
     const onMessage = handlers?.onMessage ?? (() => {});
     const onLogMessage = handlers?.onLogMessage ?? (() => {});
@@ -151,12 +141,7 @@ export class BuildelRunLogs {
     private readonly authUrl: string,
     private readonly headers: Record<string, string>,
     private readonly useAuth: boolean,
-    private readonly handlers: {
-      onMessage: (payload: unknown) => void;
-      onLogMessage: (payload: unknown) => void;
-      onStatusChange: (status: BuildelRunLogsConnectionStatus) => void;
-      onError: (error: string) => void;
-    },
+    private readonly handlers: BuildelRunLogsHandlers,
   ) {}
 
   public async join(args: BuildelRunLogsJoinArgs) {
@@ -257,17 +242,7 @@ export class BuildelRun {
     private readonly authUrl: string,
     private readonly headers: Record<string, string>,
     private readonly useAuth: boolean,
-    private readonly handlers: {
-      onBlockOutput: (
-        blockId: string,
-        outputName: string,
-        payload: unknown,
-      ) => void;
-      onBlockStatusChange: (blockId: string, isWorking: boolean) => void;
-      onStatusChange: (status: BuildelRunStatus) => void;
-      onBlockError: (blockId: string, errors: string[]) => void;
-      onError: (error: string) => void;
-    },
+    private readonly handlers: BuildelRunHandlers,
   ) {}
 
   public async start(args: BuildelRunStartArgs = { initial_inputs: [] }) {
@@ -342,6 +317,13 @@ export class BuildelRun {
     }
   }
 
+  public async loadHistory() {
+    if (this.status !== "running") return;
+    assert(this.channel);
+
+    this.channel.push("history", {});
+  }
+
   public get status(): BuildelRunStatus {
     if (this.socket.connectionState() !== "open" || this.channel === null)
       return "idle";
@@ -381,9 +363,21 @@ export class BuildelRun {
 
         return this.stop();
       }
+
       if (event.startsWith("output:")) {
         const [_, blockId, outputName] = event.split(":");
-        this.handlers.onBlockOutput(blockId, outputName, payload);
+
+        if (typeof payload === "object" && payload instanceof ArrayBuffer) {
+          const { metadata, chunk } = this.decodeBinaryMessage(payload);
+          this.handlers.onBlockOutput(blockId, outputName, chunk, metadata);
+        } else {
+          this.handlers.onBlockOutput(
+            blockId,
+            outputName,
+            { message: payload.message },
+            { ...payload.metadata, created_at: payload.created_at },
+          );
+        }
       }
       if (event.startsWith("start:")) {
         const [_, blockId] = event.split(":");
@@ -396,6 +390,40 @@ export class BuildelRun {
       if (event.startsWith("error:")) {
         const [_, blockId] = event.split(":");
         this.handlers.onBlockError(blockId, payload.errors);
+      }
+      if (event === "phx_reply" && payload.response) {
+        this.handlers.onConnect(
+          payload.response.run,
+          payload.response.pipeline,
+        );
+      }
+      if (event === "history") {
+        this.handlers.onHistory(payload.events);
+
+        payload.events.forEach((event: BuildelRunHistoryEvent) => {
+          switch (event.type) {
+            case "start_stream":
+              return this.handlers.onBlockStatusChange(event.block, true);
+            case "stop_stream":
+              return this.handlers.onBlockStatusChange(event.block, false);
+            case "text":
+              return this.handlers.onBlockOutput(
+                event.block,
+                event.io,
+                {
+                  message: event.message,
+                },
+                { created_at: event.created_at },
+              );
+            case "binary":
+              return this.handlers.onBlockOutput(
+                event.block,
+                event.io,
+                event.message,
+                { created_at: event.created_at },
+              );
+          }
+        });
       }
       return payload;
     };
@@ -415,24 +443,33 @@ export class BuildelRun {
         socket_id: this.id,
         channel_name: `pipelines:${this.organizationId}:${this.pipelineId}${runId ? `:${runId}` : ""}`,
       }),
-    }).then((response) => response.json());
+    }).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      return {};
+    });
+  }
+
+  private decodeBinaryMessage(buffer: ArrayBuffer) {
+    const view = new DataView(buffer);
+
+    const metadataSize = view.getUint32(0, false);
+
+    const metadataStart = 4;
+    const metadataEnd = metadataStart + metadataSize;
+    const metadataBytes = new Uint8Array(
+      buffer.slice(metadataStart, metadataEnd),
+    );
+
+    const payload = JSON.parse(new TextDecoder().decode(metadataBytes));
+
+    const chunk = new Uint8Array(buffer.slice(metadataEnd));
+
+    return {
+      metadataSize,
+      metadata: { ...payload?.metadata, created_at: payload?.created_at },
+      chunk,
+    };
   }
 }
-
-export type BuildelRunStatus = "idle" | "starting" | "running";
-
-export type BuildelRunStartArgs = {
-  initial_inputs?: { name: string; value: string }[];
-  alias?: string;
-  metadata?: Record<string, any>;
-};
-
-export type BuildelRunJoinArgs = BuildelRunStartArgs & {
-  runId: number;
-};
-
-export type BuildelRunLogsConnectionStatus = "idle" | "joining" | "joined";
-
-export type BuildelRunLogsJoinArgs = {
-  block_name?: string;
-};

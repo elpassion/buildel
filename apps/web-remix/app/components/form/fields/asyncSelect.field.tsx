@@ -50,26 +50,29 @@ export const AsyncSelectField = forwardRef<
       } catch (error) {}
     };
 
-    const fetcher = useCallback(async () => {
-      return asyncSelectApi
-        .getData(url)
-        .catch((e) => {
-          setApiError(e);
-          validate();
-          return [];
-        })
-        .then((opts) => opts.map(toSelectOption))
-        .then((opts) => {
-          const curr = opts.find((o) => o.value === selectedId);
-          if (!curr && isMounted()) {
-            setSelectedId(undefined);
+    const fetcher = useCallback(
+      async (_search: string, args?: RequestInit) => {
+        return asyncSelectApi
+          .getData(url, args)
+          .catch((e) => {
+            setApiError(e);
             validate();
-          }
-          if (opts.length > 0) setApiError(undefined);
+            return [];
+          })
+          .then((opts) => opts.map(toSelectOption))
+          .then((opts) => {
+            const curr = opts.find((o) => o.value === selectedId);
+            if (!curr && isMounted()) {
+              setSelectedId(undefined);
+              validate();
+            }
+            if (opts.length > 0) setApiError(undefined);
 
-          return opts;
-        });
-    }, [url, selectedId]);
+            return opts;
+          });
+      },
+      [url, selectedId],
+    );
 
     return (
       <>

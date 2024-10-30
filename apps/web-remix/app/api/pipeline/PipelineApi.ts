@@ -172,6 +172,7 @@ export class PipelineApi {
 
       return {
         ...pipeline.data,
+        name: alias.data.name,
         config: alias.data.config,
         interface_config: alias.data.interface_config,
       };
@@ -180,11 +181,16 @@ export class PipelineApi {
     return pipeline.data;
   }
 
-  getPipelines(organizationId: string | number) {
-    return this.client(
-      PipelinesResponse,
+  getPipelines(
+    organizationId: string | number,
+    queryParams?: Partial<PaginationQueryParams> & { favorites?: boolean },
+  ) {
+    const url = buildUrlWithParams(
       `/organizations/${organizationId}/pipelines`,
+      { ...queryParams },
     );
+
+    return this.client(PipelinesResponse, url);
   }
 
   deletePipeline(organizationId: string | number, pipelineId: string | number) {
@@ -262,6 +268,16 @@ export class PipelineApi {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ alias: data }),
+      },
+    );
+  }
+
+  toggleFavorite(organizationId: string | number, pipelineId: string | number) {
+    return this.client(
+      PipelineResponse,
+      `/organizations/${organizationId}/pipelines/${pipelineId}/favorite`,
+      {
+        method: 'POST',
       },
     );
   }

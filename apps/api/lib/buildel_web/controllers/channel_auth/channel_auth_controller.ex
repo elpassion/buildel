@@ -18,6 +18,14 @@ defmodule BuildelWeb.ChannelAuthController do
     required(:socket_id, :string)
   end
 
+  defp parse_ids([organization_id, pipeline_id]) do
+    {organization_id, pipeline_id, nil}
+  end
+
+  defp parse_ids([organization_id, pipeline_id, run_id]) do
+    {organization_id, pipeline_id, run_id}
+  end
+
   def create(
         conn,
         %{"channel_name" => "pipelines:" <> _organization_pipeline_id = _channel_name} = params

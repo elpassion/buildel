@@ -37,6 +37,8 @@ export function ExperimentRunPage() {
     enabled: experimentRun.status === 'running',
   });
 
+  if (!experiment.pipeline) return null;
+
   return (
     <>
       <AppNavbar

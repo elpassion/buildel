@@ -32,9 +32,9 @@ export type IAsyncSelectItem = z.TypeOf<typeof AsyncSelectItem>;
 export type IAsyncSelectItemList = z.TypeOf<typeof AsyncSelectItemList>;
 
 export class AsyncSelectApi {
-  async getData(url: string) {
+  async getData(url: string, args?: RequestInit) {
     try {
-      const response = await fetch(url.replace('/api', '/super-api'));
+      const response = await fetch(url.replace('/api', '/super-api'), args);
       const json = await response.json();
       if (!response.ok)
         return Promise.reject(AsyncSelectListErrorResponse.parse(json));

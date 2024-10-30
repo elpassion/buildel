@@ -16,7 +16,7 @@ import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { EmptyMessage } from '~/components/list/ItemList';
 import type { loader } from '~/components/pages/knowledgeBase/newCollectionFiles/loader.server';
-import { errorToast } from '~/components/toasts/errorToast';
+import { useCrawlUrls } from '~/components/pages/knowledgeBase/newCollectionFiles/useCrawlUrls';
 import { loadingToast } from '~/components/toasts/loadingToast';
 import { CheckboxTree } from '~/components/treeSelect/CheckboxTree';
 import type { TreeNodeType } from '~/components/treeSelect/Tree.types';
@@ -51,11 +51,6 @@ interface DiscoverPagesTreeProps {
   nodes: TreeNodeType[];
 }
 
-interface CrawlBulkData {
-  urls: string[];
-  memory_collection_id: string;
-}
-
 function DiscoverPagesTree({ nodes }: DiscoverPagesTreeProps) {
   const { organizationId, collectionId, collectionName } =
     useLoaderData<typeof loader>();
@@ -64,61 +59,7 @@ function DiscoverPagesTree({ nodes }: DiscoverPagesTreeProps) {
   const [checkedNodes, setCheckedNodes] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const expandedNode = nodes[0].children?.length ? [nodes[0].value] : [];
-
-  const crawlUrls = async (data: CrawlBulkData) => {
-    async function crawl(data: CrawlBulkData) {
-      const res = await fetch(
-        `/super-api/organizations/${organizationId}/tools/crawls/bulk`,
-        {
-          headers: {
-            'content-type': 'application/json',
-          },
-          body: JSON.stringify(data),
-          method: 'POST',
-        },
-      );
-
-      if (!res.ok) {
-        const body = await res.json();
-        throw new Error(body?.errors?.detail ?? 'Something went wrong!');
-      }
-
-      return res.json();
-    }
-
-    async function refreshCrawlState(memoryCollectionId: string) {
-      const res = await fetch(
-        `/super-api/organizations/${organizationId}/tools/crawls?memory_collection_id=${memoryCollectionId}`,
-      );
-
-      if (!res.ok) {
-        const body = await res.json();
-        errorToast('Something went wrong!');
-        throw new Error(body?.errors?.detail ?? 'Something went wrong!');
-      }
-
-      const data = await res.json();
-
-      if (data.data.length > 0) {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            refreshCrawlState(memoryCollectionId).then(resolve).catch(reject);
-          }, 1000);
-        });
-      } else {
-        return data;
-      }
-    }
-
-    try {
-      await crawl(data);
-      await refreshCrawlState(data.memory_collection_id);
-      revalidate.revalidate();
-      navigate(routes.collectionFiles(organizationId, collectionName));
-    } catch (e) {
-      throw e;
-    }
-  };
+  const { crawl } = useCrawlUrls(organizationId);
 
   const submit = async () => {
     setIsSubmitting(true);
@@ -126,10 +67,13 @@ function DiscoverPagesTree({ nodes }: DiscoverPagesTreeProps) {
     loadingToast(
       async () => {
         try {
-          await crawlUrls({
+          await crawl({
             memory_collection_id: collectionId.toString(),
             urls: checkedNodes,
           });
+
+          revalidate.revalidate();
+          navigate(routes.collectionFiles(organizationId, collectionName));
 
           return Promise.resolve({
             title: 'Website(s) were crawled successfully.',

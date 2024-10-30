@@ -51,6 +51,13 @@ export async function loader(args: LoaderFunctionArgs) {
     const totalPages = Math.ceil(totalItems / per_page);
     const pagination = { page, per_page, search, totalItems, totalPages };
 
+    if (!experiment.data.pipeline) {
+      throw new Response(null, {
+        status: 404,
+        statusText: 'Not Found',
+      });
+    }
+
     return json({
       organizationId: params.organizationId,
       experimentId: params.experimentId,

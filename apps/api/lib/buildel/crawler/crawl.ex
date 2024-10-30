@@ -10,6 +10,7 @@ defmodule Buildel.Crawler.Crawl do
     :error,
     :url_filter,
     :client,
+    :headers,
     pages: [],
     pending_pages: [],
     processed_urls: [],
@@ -21,6 +22,7 @@ defmodule Buildel.Crawler.Crawl do
     max_depth = Keyword.get(opts, :max_depth)
     url_filter = Keyword.get(opts, :url_filter)
     client = Keyword.get(opts, :client)
+    headers = Keyword.get(opts, :headers, [])
 
     case URI.parse(start_url) do
       %URI{scheme: nil} ->
@@ -31,7 +33,8 @@ defmodule Buildel.Crawler.Crawl do
           start_url: start_url,
           max_depth: max_depth,
           url_filter: url_filter,
-          client: client
+          client: client,
+          headers: headers
         }
 
       _ ->
@@ -41,7 +44,8 @@ defmodule Buildel.Crawler.Crawl do
           start_url: start_url,
           max_depth: max_depth,
           url_filter: url_filter,
-          client: client
+          client: client,
+          headers: headers
         }
     end
   end
@@ -106,12 +110,13 @@ defmodule Buildel.Crawler.Crawl do
 
   defp request(%Crawl{pending_pages: []} = crawl), do: crawl
 
-  defp request(crawl) do
+  defp request(%Crawl{headers: headers} = crawl) do
     %{url: url, depth: depth} = crawl.pending_pages |> List.first()
 
     request = %Req.Request{
       url: URI.parse(url),
-      method: "GET"
+      method: "GET",
+      headers: headers
     }
 
     case crawl.client.request(request) do

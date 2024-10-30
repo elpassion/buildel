@@ -1,8 +1,11 @@
 import React from 'react';
+import { Pin, X } from 'lucide-react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { useEventListener, useLocalStorage } from 'usehooks-ts';
 
+import { IconButton } from '~/components/iconButton';
 import { IBlockConfig } from '~/components/pages/pipelines/pipeline.types';
+import { useBreakpoints } from '~/hooks/useBreakpoints';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
 import { hashString } from '~/utils/stringHash';
@@ -16,6 +19,7 @@ import { BuilderSidebarBlocks } from './BuilderSidebarBlocks';
 
 interface BuilderSidebarProps {
   onBlockCreate: (created: IBlockConfig) => Promise<unknown>;
+  contentClassName?: string;
 }
 
 // Bypass for getting rid of the hydration error when using the LS
@@ -27,7 +31,10 @@ export const BuilderSidebar = (props: BuilderSidebarProps) => {
   );
 };
 
-const BuilderSidebarClient = ({ onBlockCreate }: BuilderSidebarProps) => {
+const BuilderSidebarClient = ({
+  onBlockCreate,
+  contentClassName,
+}: BuilderSidebarProps) => {
   const organizationId = useOrganizationId();
 
   const [state, setState] = useLocalStorage<BuilderSidebarState>(
@@ -91,8 +98,10 @@ const BuilderSidebarClient = ({ onBlockCreate }: BuilderSidebarProps) => {
         <HoverableLine />
 
         <div
+          id="builder-sidebar-content"
           className={cn(
             'absolute top-0 left-0 z-[11] h-full w-[320px] border-r border-input py-4 px-2 bg-white transition-transform ease-in-out',
+            contentClassName,
             {
               '-translate-x-full': !isOpen,
               'translate-x-0': isOpen,
@@ -106,6 +115,37 @@ const BuilderSidebarClient = ({ onBlockCreate }: BuilderSidebarProps) => {
   );
 };
 
+export function PinButton() {
+  const { state, isOpen, onPinClick, onClose } = useBuilderSidebar();
+  const { isDesktop } = useBreakpoints();
+
+  if (!isDesktop) {
+    return (
+      <IconButton
+        icon={<X />}
+        size="sm"
+        variant="secondary"
+        onClick={onClose}
+        title="Close"
+        aria-label="Close"
+      />
+    );
+  }
+
+  return (
+    <IconButton
+      icon={<Pin />}
+      size="sm"
+      variant="ghost"
+      onClick={onPinClick}
+      title="Auto close"
+      aria-label="Auto close"
+      data-checked={isOpen}
+      className={cn({ '!text-blue-500': state === 'keepOpen' })}
+    />
+  );
+}
+
 function HoverableLine() {
   const { isOpen } = useBuilderSidebar();
 
@@ -116,7 +156,7 @@ function HoverableLine() {
           'h-6 w-2 bg-primary rounded-full transition-opacity delay-300',
           {
             'opacity-0': isOpen,
-            'opacity-100': !isOpen,
+            'opacity-20': !isOpen,
           },
         )}
       />

@@ -3,17 +3,25 @@ defmodule Buildel.ClientMocks.Elevenlabs do
   @behaviour ElevenlabsBehaviour
 
   @impl ElevenlabsBehaviour
-  def synthesize(_text, _api_key) do
-    response = %HTTPoison.AsyncResponse{id: make_ref()}
-    send(self(), %HTTPoison.AsyncStatus{id: response.id})
-    send(self(), %HTTPoison.AsyncHeaders{})
+  def speak!(_api_key, _state) do
+    {:ok, self()}
+  end
 
-    send(self(), %HTTPoison.AsyncChunk{
-      id: response.id,
-      chunk: File.read!("test/support/fixtures/real.mp3")
-    })
+  @impl ElevenlabsBehaviour
+  def generate_speech(_pid, _text) do
+    send(
+      self(),
+      {:audio_chunk, File.read!("test/support/fixtures/real.mp3")}
+    )
 
-    send(self(), %HTTPoison.AsyncEnd{id: response.id})
-    response
+    :ok
+  end
+
+  def disconnect(_pid) do
+    :ok
+  end
+
+  def flush(_pid) do
+    :ok
   end
 end

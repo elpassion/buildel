@@ -10,13 +10,15 @@ import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
 import { IconButton } from '~/components/iconButton';
+import { BasicLink } from '~/components/link/BasicLink';
+import { toSelectOption } from '~/components/pages/pipelines/interface/interface.utils';
 import type {
-  IBlockConfig,
   IInterfaceConfig,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
+import { routes } from '~/utils/routes.utils';
 
 import { schema } from './schema';
 
@@ -36,6 +38,13 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   );
   const outputs = pipeline.config.blocks.filter(
     (block) => block.type === 'text_output',
+  );
+
+  const audioInputs = pipeline.config.blocks.filter((block) =>
+    ['audio_input'].includes(block.type),
+  );
+  const audioOutputs = pipeline.config.blocks.filter((block) =>
+    ['audio_output'].includes(block.type),
   );
 
   const handleOnSubmit = (
@@ -58,11 +67,29 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
       };
     });
 
+    const audio_inputs = data.webchat.audio_inputs.map((input) => {
+      const parsed = JSON.parse(input as unknown as string);
+      return {
+        name: parsed.name as string,
+        type: parsed.type as string,
+      };
+    });
+
+    const audio_outputs = data.webchat.audio_outputs.map((output) => {
+      const parsed = JSON.parse(output as unknown as string);
+      return {
+        name: parsed.name as string,
+        type: parsed.type as string,
+      };
+    });
+
     const body: IInterfaceConfig = {
       ...pipeline.interface_config,
       webchat: {
         inputs,
         outputs,
+        audio_inputs,
+        audio_outputs,
         description: data.webchat.description,
         suggested_messages: data.webchat.suggested_messages.filter(
           (msg) => !!msg,
@@ -108,12 +135,42 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
           </Field>
         </div>
 
+        <div className="w-full grid gap-3 grid-cols-1 sm:grid-cols-2  md:grid-cols-3 items-center">
+          <Field name="webchat.audio_inputs">
+            <SelectField
+              options={audioInputs.map(toSelectOption)}
+              mode="multiple"
+              label="Audio Inputs"
+            />
+          </Field>
+
+          <Field name="webchat.audio_outputs">
+            <SelectField
+              options={audioOutputs.map(toSelectOption)}
+              mode="multiple"
+              label="Audio Outputs"
+              className="!min-w-full"
+            />
+          </Field>
+        </div>
+
         <div className="w-full max-w-[805px]">
           <Field name="webchat.description">
             <FieldLabel>Description</FieldLabel>
             <TextInputField />
           </Field>
         </div>
+
+        <p className="text-sm">
+          <BasicLink
+            target="_blank"
+            className="font-semibold hover:underline"
+            to={routes.pipelineSettings(pipeline.organization_id, pipeline.id)}
+          >
+            Enable logs
+          </BasicLink>{' '}
+          to view the chatbot's history.
+        </p>
 
         <FieldArray<string> name="webchat.suggested_messages">
           {(items, { push, remove }) => (
@@ -173,14 +230,6 @@ function SuggestedMessages({ items, onAdd, onRemove }: SuggestedMessageProps) {
   );
 }
 
-function toSelectOption(item: IBlockConfig) {
-  return {
-    id: item.name.toString(),
-    value: JSON.stringify({ name: item.name, type: item.type }),
-    label: item.name,
-  };
-}
-
 function toSelectDefaults(data: IInterfaceConfig) {
   return {
     webchat: {
@@ -188,6 +237,12 @@ function toSelectDefaults(data: IInterfaceConfig) {
         JSON.stringify({ name: item.name, type: item.type }),
       ),
       outputs: data.webchat.outputs.map((item) =>
+        JSON.stringify({ name: item.name, type: item.type }),
+      ),
+      audio_inputs: data.webchat.audio_inputs.map((item) =>
+        JSON.stringify({ name: item.name, type: item.type }),
+      ),
+      audio_outputs: data.webchat.audio_outputs.map((item) =>
         JSON.stringify({ name: item.name, type: item.type }),
       ),
       description: data.webchat.description,

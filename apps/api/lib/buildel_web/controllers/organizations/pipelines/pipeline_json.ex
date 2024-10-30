@@ -1,8 +1,28 @@
 defmodule BuildelWeb.OrganizationPipelineJSON do
   alias Buildel.Pipelines.Pipeline
 
-  def index(%{pipelines: pipelines}) do
-    %{data: for(pipeline <- pipelines, do: data(pipeline))}
+  def index(%{
+        pipelines: pipelines,
+        params: %Buildel.Pipelines.ListParams{} = params,
+        total: total
+      }) do
+    params =
+      case params do
+        %{page: nil, per_page: nil} ->
+          %Buildel.Pipelines.ListParams{page: 1, per_page: total}
+
+        params ->
+          params
+      end
+
+    %{
+      data: for(pipeline <- pipelines, do: data(pipeline)),
+      meta: %{
+        total: total,
+        page: params.page,
+        per_page: params.per_page
+      }
+    }
   end
 
   def show(%{pipeline: pipeline}) do
@@ -55,6 +75,7 @@ defmodule BuildelWeb.OrganizationPipelineJSON do
       name: pipeline.name,
       budget_limit: pipeline.budget_limit,
       logs_enabled: pipeline.logs_enabled,
+      favorite: pipeline.favorite,
       organization_id: pipeline.organization_id,
       interface_config: pipeline.interface_config,
       runs_count: pipeline.runs_count,

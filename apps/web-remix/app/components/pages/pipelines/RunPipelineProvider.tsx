@@ -20,6 +20,7 @@ export interface IEvent {
   block: string;
   output: string;
   payload: any;
+  metadata: any;
 }
 interface IRunPipelineContext {
   events: IEvent[];
@@ -65,8 +66,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   );
 
   const onMessage = useCallback(
-    (block: string, output: string, payload: any) =>
-      setEvents((events) => [...events, { block, output, payload }]),
+    (block: string, output: string, payload: any, metadata: any) => setEvents((events) => [...events, { block, output, payload, metadata }]),
     [],
   );
 
@@ -95,7 +95,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     });
   }, []);
 
-  const onStatusChange = useCallback((block: string, status: boolean) => {
+  const onBlockStatusChange = useCallback((block: string, status: boolean) => {
     setBlockStatuses((prev) => ({ ...prev, [block]: status }));
   }, []);
 
@@ -106,14 +106,14 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
     joinRun,
     push,
     id: runId,
-  } = usePipelineRun(
-    pipeline.organization_id,
-    pipeline.id,
-    onMessage,
-    onStatusChange,
+  } = usePipelineRun({
+    organizationId: pipeline.organization_id,
+    pipelineId: pipeline.id,
+    onBlockOutput: onMessage,
+    onBlockStatusChange,
     onBlockError,
     onError,
-  );
+  });
 
   const handleStartRun = useCallback(async () => {
     setErrors({});

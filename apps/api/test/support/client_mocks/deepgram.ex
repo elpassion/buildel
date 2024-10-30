@@ -3,11 +3,6 @@ defmodule Buildel.ClientMocks.Deepgram do
   @behaviour DeepgramBehaviour
 
   @impl DeepgramBehaviour
-  def connect!(_token, state \\ %{}) do
-    GenServer.start_link(__MODULE__, state, [])
-  end
-
-  @impl DeepgramBehaviour
   def disconnect(pid) do
     GenServer.stop(pid)
   end
@@ -23,6 +18,11 @@ defmodule Buildel.ClientMocks.Deepgram do
       self(),
       {:transcript, %{message: "Hello", is_final: true}}
     )
+  end
+
+  @impl DeepgramBehaviour
+  def listen!(_, state) do
+    GenServer.start_link(__MODULE__, state, [])
   end
 
   def init(state) do

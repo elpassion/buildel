@@ -29,10 +29,10 @@ defmodule Buildel.Blocks.TextToSpeech do
           options_schema(%{
             "required" => ["api_key"],
             "properties" => %{
-              api_key:
+              "api_key" =>
                 secret_schema(%{
                   "title" => "API key",
-                  "description" => "ElevenLabs API Key."
+                  "description" => "Elevenlabs API key"
                 })
             }
           })
@@ -40,92 +40,71 @@ defmodule Buildel.Blocks.TextToSpeech do
     }
   end
 
-  # Server
-
   @impl true
-  def init(%{context_id: context_id, type: __MODULE__, opts: opts} = state) do
-    subscribe_to_connections(context_id, state.connections)
+  def setup(
+        %{
+          block_name: block_name,
+          context_id: context_id,
+          type: __MODULE__,
+          opts: opts
+        } = state
+      ) do
+    api_key = block_context().get_secret_from_context(context_id, opts.api_key)
+    state = state |> Map.put(:stream_to, self())
 
-    {:ok,
-     state
-     |> Map.put(
-       :api_key,
-       block_context().get_secret_from_context(context_id, opts |> Map.get(:api_key))
-     )
-     |> Map.put(:clips, %{})
-     |> assign_stream_state()}
+    case elevenlabs().speak!(api_key, %{stream_to: self()}) do
+      {:ok, elevenlabs_pid} ->
+        {:ok, state |> Map.put(:elevenlabs_pid, elevenlabs_pid)}
+
+      {:error, _reason} ->
+        {:stop, {:error, block_name, :incorrect_api_key}}
+    end
   end
 
-  defp synthesize(text, state) do
-    state = state |> send_stream_start()
-    elevenlabs().synthesize(text, state[:api_key])
+  @impl true
+  def terminate(_reason, state) do
+    state[:elevenlabs_pid] |> elevenlabs().disconnect()
     state
   end
 
-  @impl true
-  def handle_input("input", {_name, :text, text, _metadata}, state) do
-    synthesize(text, state)
+  defp speak(chunk, state) do
+    state = state |> send_stream_start()
+
+    state |> Map.get(:elevenlabs_pid) |> elevenlabs().generate_speech(chunk)
+
+    state
   end
 
-  def handle_info(%HTTPoison.AsyncStatus{id: ref}, state) do
-    id = ref_to_atom(ref)
-    state = put_in(state[:clips][id], %{id: id, chunks: [], finished: false})
-    {:noreply, state}
-  end
+  def handle_info({:reconnect}, state) do
+    state[:elevenlabs_pid] |> elevenlabs().disconnect()
 
-  def handle_info(%HTTPoison.AsyncHeaders{}, state), do: {:noreply, state}
+    api_key = block_context().get_secret_from_context(state.context_id, state.opts.api_key)
 
-  def handle_info(%HTTPoison.AsyncChunk{id: ref, chunk: chunk}, state) do
-    id = ref_to_atom(ref)
-    state = put_in(state[:clips][id][:chunks], state[:clips][id][:chunks] ++ [chunk])
-    {:noreply, state}
-  end
+    state =
+      case elevenlabs().speak!(api_key, %{stream_to: self()}) do
+        {:ok, elevenlabs_pid} ->
+          state |> Map.put(:elevenlabs_pid, elevenlabs_pid)
 
-  def handle_info(%HTTPoison.AsyncEnd{id: ref}, state) do
-    id = ref_to_atom(ref)
-    state = put_in(state[:clips][id][:finished], true)
-    state = drain_oldest_clip(state)
-    {:noreply, state}
-  end
-
-  defp ref_to_atom(ref) do
-    ref |> :erlang.ref_to_list() |> List.to_string() |> String.to_atom()
-  end
-
-  defp drain_oldest_clip(state) do
-    oldest_clip_id = state[:clips] |> Map.keys() |> List.first()
-
-    if oldest_clip_id == nil do
-      state
-    else
-      file =
-        state[:clips][oldest_clip_id][:chunks]
-        |> Enum.reduce(<<>>, fn chunk, acc -> acc <> chunk end)
-
-      if file == <<>> do
-        if state[:clips][oldest_clip_id][:finished],
-          do:
-            update_in(state[:clips], fn clips -> clips |> Map.delete(oldest_clip_id) end)
-            |> drain_oldest_clip,
-          else: state
-      else
-        Buildel.BlockPubSub.broadcast_to_io(
-          state[:context_id],
-          state[:block_name],
-          "output",
-          {:binary, file}
-        )
-
-        state = put_in(state[:clips][oldest_clip_id][:chunks], [])
-
-        if state[:clips][oldest_clip_id][:finished],
-          do:
-            update_in(state[:clips], fn clips -> clips |> Map.delete(oldest_clip_id) end)
-            |> drain_oldest_clip,
-          else: state
+        {:error, _reason} ->
+          state |> send_error(:incorrect_api_key)
+          state
       end
-    end
-    |> send_stream_stop()
+
+    {:noreply, state}
+  end
+
+  def handle_info({:audio_chunk, binary}, state) do
+    state = state |> output("output", {:binary, binary}, %{metadata: %{}, stream_stop: :schedule})
+    {:noreply, state}
+  end
+
+  def handle_input("input", {_name, :text, chunk, _metadata}, state) do
+    speak(chunk, state)
+  end
+
+  def handle_stream_stop({_name, :stop_stream, _output, _metadata}, state) do
+    state |> Map.get(:elevenlabs_pid) |> elevenlabs().flush()
+    {:noreply, state}
   end
 
   defp elevenlabs() do

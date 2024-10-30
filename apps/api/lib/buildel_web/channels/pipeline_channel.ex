@@ -7,6 +7,38 @@ defmodule BuildelWeb.PipelineChannel do
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
 
+  defmodule BinaryMessage do
+    alias Buildel.Encrypted.Binary
+
+    defmodule Binary do
+      def new(chunk, metadata) do
+        {:binary, combine_binary_metadata(chunk, metadata)}
+      end
+
+      defp combine_binary_metadata(chunk, metadata) do
+        metadata_json =
+          Jason.encode!(%{
+            metadata: metadata,
+            created_at: Map.get(metadata, "_broadcast_date")
+          })
+
+        metadata_size = byte_size(metadata_json)
+        size_bin = <<metadata_size::32>>
+        size_bin <> metadata_json <> chunk
+      end
+    end
+
+    defmodule Text do
+      def new(message, metadata) do
+        %{
+          message: message,
+          metadata: metadata,
+          created_at: Map.get(metadata, "_broadcast_date")
+        }
+      end
+    end
+  end
+
   defparams :join do
     required(:auth, :string)
     required(:user_data, :string)
@@ -71,8 +103,18 @@ defmodule BuildelWeb.PipelineChannel do
 
       listen_to_outputs(run)
 
-      {:ok, %{run: %{id: run.id}},
-       socket |> assign(:run, run) |> assign(:joined_existing, run_id != nil)}
+      {:ok,
+       %{
+         run: %{
+           id: run.id,
+           interface_config: run_interface
+         },
+         pipeline: %{
+           id: pipeline.id,
+           organization_id: pipeline.organization_id,
+           name: pipeline.name
+         }
+       }, socket |> assign(:run, run) |> assign(:joined_existing, run_id != nil)}
     else
       {:error, :invalid_id} ->
         {:error, %{reason: "not_found"}}
@@ -117,6 +159,10 @@ defmodule BuildelWeb.PipelineChannel do
     :ok
   end
 
+  def handle_in("history", _data, socket) do
+    send_previous_events(socket)
+  end
+
   def handle_in("input:" <> input, data, socket) do
     process_input(input, data, socket.assigns.run)
 
@@ -126,6 +172,39 @@ defmodule BuildelWeb.PipelineChannel do
   def handle_in(event, data, socket) do
     Logger.warning("Unhandled message #{inspect(event)}: #{inspect(data)}")
     {:noreply, socket}
+  end
+
+  defp send_previous_events(socket) do
+    public_outputs =
+      socket.assigns.run
+      |> Pipelines.blocks_for_run()
+      |> Enum.map(fn block ->
+        public_outputs =
+          block.type.options().outputs |> Enum.filter(fn output -> output.public end)
+
+        Enum.map(public_outputs, fn output -> {block.name, output.name} end)
+      end)
+      |> List.flatten()
+
+    events =
+      socket.assigns.run
+      |> Pipelines.get_pipeline_run_logs()
+      |> Enum.map(&log_to_history_event/1)
+      |> Enum.filter(fn event -> {event.block, event.io} in public_outputs end)
+
+    socket |> Phoenix.Channel.push("history", %{events: events})
+
+    {:noreply, socket}
+  end
+
+  defp log_to_history_event(%Pipelines.Log{} = log) do
+    %{
+      message: log.message,
+      type: log.message_type,
+      block: log.block_name,
+      io: log.output_name,
+      created_at: log.inserted_at
+    }
   end
 
   defp process_input(input, data, run) do
@@ -162,7 +241,7 @@ defmodule BuildelWeb.PipelineChannel do
     {:noreply, socket}
   end
 
-  def handle_info({output_name, :binary, chunk, _metadata}, socket) do
+  def handle_info({output_name, :binary, chunk, metadata}, socket) do
     Logger.debug("Channel Sending binary chunk to #{output_name}")
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
@@ -170,16 +249,26 @@ defmodule BuildelWeb.PipelineChannel do
     run = socket.assigns.run
 
     interface_output_block_names =
-      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
+      (Map.get(run.interface_config, "outputs", []) ++
+         Map.get(run.interface_config, "inputs", []) ++
+         Map.get(run.interface_config, "audio_outputs", []) ++
+         Map.get(run.interface_config, "audio_inputs", []))
+      |> Enum.map(&Map.get(&1, "name"))
+
+    message = BinaryMessage.Binary.new(chunk, metadata)
 
     case interface_output_block_names do
       [] ->
-        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+        socket
+        |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+
         {:noreply, socket}
 
       block_names ->
         if Enum.member?(block_names, block_name) do
-          socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", {:binary, chunk})
+          socket
+          |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
+
           {:noreply, socket}
         else
           {:noreply, socket}
@@ -187,25 +276,31 @@ defmodule BuildelWeb.PipelineChannel do
     end
   end
 
-  def handle_info({output_name, :text, message, _metadata}, socket) do
+  def handle_info({output_name, :text, message, metadata}, socket) do
     Logger.debug("Channel Sending text chunk to #{output_name}")
 
     %{block: block_name, io: output_name} = parse_topic(output_name)
 
+    message = BinaryMessage.Text.new(message, metadata)
+
     run = socket.assigns.run
 
     interface_output_block_names =
-      Map.get(run.interface_config, "outputs", []) |> Enum.map(&Map.get(&1, "name"))
+      (Map.get(run.interface_config, "outputs", []) ++
+         Map.get(run.interface_config, "inputs", []) ++
+         Map.get(run.interface_config, "audio_outputs", []) ++
+         Map.get(run.interface_config, "audio_inputs", []))
+      |> Enum.map(&Map.get(&1, "name"))
 
     case interface_output_block_names do
       [] ->
-        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
+        socket |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
         {:noreply, socket}
 
       block_names ->
         if Enum.member?(block_names, block_name) do
           socket
-          |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", %{message: message})
+          |> Phoenix.Channel.push("output:#{block_name}:#{output_name}", message)
 
           {:noreply, socket}
         else

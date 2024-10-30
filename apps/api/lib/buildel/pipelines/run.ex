@@ -22,14 +22,15 @@ defmodule Buildel.Pipelines.Run do
     |> cast(attrs, [:pipeline_id, :config, :interface_config])
     |> validate_required([:pipeline_id, :config])
     |> assoc_constraint(:pipeline)
-    |> prepare_changes(fn changeset ->
-      if pipeline_id = get_change(changeset, :pipeline_id) do
-        query = from Pipeline, where: [id: ^pipeline_id]
-        changeset.repo.update_all(query, inc: [runs_count: 1])
-      end
 
-      changeset
-    end)
+    # |> prepare_changes(fn changeset ->
+    #   if pipeline_id = get_change(changeset, :pipeline_id) do
+    #     query = from Pipeline, where: [id: ^pipeline_id]
+    #     changeset.repo.update_all(query, inc: [runs_count: 1])
+    #   end
+
+    #   changeset
+    # end)
   end
 
   def start(run) do

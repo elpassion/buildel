@@ -42,14 +42,21 @@ defmodule BuildelWeb.Schemas.Pagination do
     ]
   end
 
-  def default_params do
+  def default_params(defaults \\ %{}) do
+    page = Map.get(defaults, :page, 0)
+    per_page = Map.get(defaults, :per_page, 10)
+
     [
       search: [in: :query, type: :string, description: "Search text", required: false],
-      page: [in: :query, description: "Page number", schema: %Schema{type: :integer, default: 0}],
+      page: [
+        in: :query,
+        description: "Page number",
+        schema: %Schema{type: :integer, default: page}
+      ],
       per_page: [
         in: :query,
         description: "Items per page",
-        schema: %Schema{type: :integer, default: 10}
+        schema: %Schema{type: :integer, default: per_page}
       ]
     ]
   end

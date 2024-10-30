@@ -1,5 +1,5 @@
 defmodule Buildel.Clients.DeepgramBehaviour do
-  @callback connect!(String.t(), %{stream_to: pid}) :: {:ok, pid} | {:error, term}
+  @callback listen!(String.t(), %{stream_to: pid}) :: {:ok, pid} | {:error, term}
   @callback disconnect(pid) :: :ok
   @callback transcribe_audio(pid, {:binary, binary}) :: :ok
   @callback transcribe_file(String.t(), any(), map()) :: :ok
@@ -13,8 +13,8 @@ defmodule Buildel.Clients.Deepgram do
   use WebSockex
 
   @impl DeepgramBehaviour
-  def connect!(token, state \\ %{}) do
-    start_link(state, extra_headers: [{"Authorization", "token #{token}"}], debug: [:trace])
+  def listen!(token, state \\ %{}) do
+    listen(state, extra_headers: [{"Authorization", "token #{token}"}], debug: [:trace])
   end
 
   @impl DeepgramBehaviour
@@ -27,8 +27,16 @@ defmodule Buildel.Clients.Deepgram do
     WebSockex.send_frame(pid, {:binary, audio})
   end
 
+  def keep_alive(pid) do
+    WebSockex.send_frame(pid, {:text, Jason.encode!(%{type: "KeepAlive"})})
+  end
+
+  def flush(pid) do
+    WebSockex.send_frame(pid, {:text, Jason.encode!(%{type: "Flush"})})
+  end
+
   @wss_url "wss://api.deepgram.com/v1/listen?smart_format=true&punctuate=true&diarize=true"
-  def start_link(state \\ %{language: "en", model: "base"}, opts \\ []) do
+  def listen(state \\ %{language: "en", model: "base"}, opts \\ []) do
     %{language: lang, model: model} = state
 
     url = build_url(@wss_url, [{:language, lang}, {:model, model}])
@@ -43,6 +51,11 @@ defmodule Buildel.Clients.Deepgram do
 
     alternatives = message |> get_in(["channel", "alternatives"])
     is_final = message |> get_in(["is_final"])
+    # speech_final = message |> get_in(["speech_final"])
+
+    is_final = is_final
+
+    if is_final, do: send(state.stream_to, {:end})
 
     message =
       case alternatives do

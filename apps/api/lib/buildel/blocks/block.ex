@@ -11,35 +11,35 @@ defmodule Buildel.Blocks.Block do
     %{block | context: context}
   end
 
-  def audio_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "audio", public: public}
+  def audio_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "audio", public: public, visible: visible}
 
-  def audio_output(name \\ "output", public \\ false),
-    do: %{name: name, type: "audio", public: public}
+  def audio_output(name \\ "output", public \\ false, visible \\ true),
+    do: %{name: name, type: "audio", public: public, visible: visible}
 
-  def text_output(name \\ "output", public \\ false),
-    do: %{name: name, type: "text", public: public}
+  def text_output(name \\ "output", public \\ false, visible \\ true),
+    do: %{name: name, type: "text", public: public, visible: visible}
 
-  def text_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "text", public: public}
+  def text_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "text", public: public, visible: visible}
 
-  def file_output(name \\ "output", public \\ false),
-    do: %{name: name, type: "file", public: public}
+  def file_output(name \\ "output", public \\ false, visible \\ true),
+    do: %{name: name, type: "file", public: public, visible: visible}
 
-  def file_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "file", public: public}
+  def file_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "file", public: public, visible: visible}
 
-  def file_temporary_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "file_temporary", public: public}
+  def file_temporary_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "file_temporary", public: public, visible: visible}
 
-  def image_input(name \\ "input", public \\ false),
-    do: %{name: name, type: "image", public: public}
+  def image_input(name \\ "input", public \\ false, visible \\ true),
+    do: %{name: name, type: "image", public: public, visible: visible}
 
-  def image_output(name \\ "output", public \\ false),
-    do: %{name: name, type: "image", public: public}
+  def image_output(name \\ "output", public \\ false, visible \\ true),
+    do: %{name: name, type: "image", public: public, visible: visible}
 
-  def io(name \\ "tool", role \\ "controller"),
-    do: %{name: name, type: role, public: false}
+  def io(name \\ "tool", role \\ "controller", visible \\ true),
+    do: %{name: name, type: role, public: false, visible: visible}
 
   def name(pid) do
     GenServer.call(pid, :name)
@@ -74,6 +74,12 @@ defmodule Buildel.Blocks.Block do
           all_connections(block)
         )
 
+        BlockPubSub.subscribe_to_io(
+          block.context.context_id,
+          "supervisor",
+          "output"
+        )
+
         state |> assign_stream_state(block.opts) |> setup()
       end
 
@@ -99,6 +105,13 @@ defmodule Buildel.Blocks.Block do
       end
 
       defoverridable handle_input: 3
+
+      @impl true
+      def handle_on_workflow_started(_payload, state) do
+        state
+      end
+
+      defoverridable handle_on_workflow_started: 2
 
       def handle_external_input(_name, _payload, state) do
         state
@@ -561,7 +574,7 @@ defmodule Buildel.Blocks.Block do
               block_name: block_name,
               type: input.type
             },
-            opts: %{reset: true}
+            opts: %{reset: true, optional: false}
           }
         end)
       end
@@ -592,4 +605,5 @@ defmodule Buildel.Blocks.BlockBehaviour do
   @callback cast(pid, any()) :: :ok
   @callback setup(any()) :: {:ok, any()} | {:error, any()}
   @callback handle_input(String.t(), {String.t(), atom(), any(), map()}, map()) :: map()
+  @callback handle_on_workflow_started({String.t(), atom(), any(), map()}, map()) :: map()
 end

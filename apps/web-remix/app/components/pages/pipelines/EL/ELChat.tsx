@@ -24,6 +24,7 @@ export const ELChat = ({
   onBlockStatusChange,
 }: ELChatProps) => {
   const { status } = useRunPipeline();
+
   return (
     <Webchat
       disabled={status !== 'idle'}
@@ -32,11 +33,10 @@ export const ELChat = ({
       onBlockStatusChange={onBlockStatusChange}
       onBlockOutput={onBlockOutput}
       pipelineId={el.id.toString()}
-      pipeline={el}
       size="sm"
       className="!py-2"
-      metadata={{
-        pipeline_id: pipelineId,
+      runArgs={{
+        metadata: { pipeline_id: pipelineId },
       }}
     />
   );

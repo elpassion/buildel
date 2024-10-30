@@ -1,6 +1,8 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
+import { cn } from '~/utils/cn';
+
 export const PreviewSection: React.FC<PropsWithChildren> = ({ children }) => {
   return <section className="relative py-4">{children}</section>;
 };
@@ -47,8 +49,38 @@ export const PreviewSectionContent: React.FC<PropsWithChildren> = ({
   );
 };
 
-export const PreviewSectionText: React.FC<PropsWithChildren> = ({
-  children,
-}) => {
-  return <p className="text-foreground text-sm pl-[37px]">{children}</p>;
+export const PreviewSectionText: React.FC<
+  React.HTMLAttributes<HTMLParagraphElement>
+> = ({ children, className, ...rest }) => {
+  return (
+    <p className={cn('text-foreground text-sm pl-[37px]', className)} {...rest}>
+      {children}
+    </p>
+  );
+};
+
+export const PreviewSectionContentWrapper: React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+> = ({ children, className, ...rest }) => {
+  return (
+    <div className={cn('flex flex-col gap-4 pl-[37px]', className)} {...rest}>
+      {children}
+    </div>
+  );
+};
+
+export const PreviewSectionContentTip: React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+> = ({ children, className, ...rest }) => {
+  return (
+    <div
+      className={cn(
+        'bg-blue-500/5 border-l-[5px] border-blue-400 pl-4 py-2 rounded-tr rounded-br text-sm',
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
 };

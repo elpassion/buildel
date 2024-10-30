@@ -23,7 +23,7 @@ export const FieldMessage = React.forwardRef<
   }
 
   return (
-    <p
+    <div
       ref={ref}
       id={name}
       className={cn(
@@ -34,7 +34,7 @@ export const FieldMessage = React.forwardRef<
       {...props}
     >
       {body}
-    </p>
+    </div>
   );
 });
 FieldMessage.displayName = 'FieldMessage';

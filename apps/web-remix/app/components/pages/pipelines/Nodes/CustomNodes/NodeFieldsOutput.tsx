@@ -9,7 +9,7 @@ import {
 import { ToggleInput } from '~/components/form/inputs/toggle.input';
 
 import type { IBlockConfig, IField } from '../../pipeline.types';
-import { useRunPipelineNode } from '../../RunPipelineProvider';
+import { useRunPipeline, useRunPipelineNode } from '../../RunPipelineProvider';
 import type { IEvent } from '../../RunPipelineProvider';
 import { AudioOutput } from './AudioOutput';
 import { FileOutput } from './FileOutput';
@@ -25,14 +25,15 @@ interface NodeFieldsOutputProps {
 }
 
 export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
-  const { events, clearBlockEvents } = useRunPipelineNode(block);
+  const { events, clearBlockEvents, status } = useRunPipelineNode(block);
 
   const renderOutput = useCallback(
     (field: IField) => {
-      const { type } = field.data;
+      const { type, visible } = field.data;
 
       const fieldEvents = getFieldEvents(events, field.data.name);
 
+      if (visible === false) return null;
       if (type === 'text') {
         const text = checkIfStringPayloads(fieldEvents)
           ? concatStringFieldsOutputs(fieldEvents)
@@ -46,10 +47,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
           />
         );
       } else if (type === 'audio') {
-        const audio =
-          fieldEvents.length > 0 ? getAudioOutput(fieldEvents) : null;
-
-        return <AudioOutput audio={audio} />;
+        return <AudioStreamOutput events={events} status={status} />;
       } else if (type === 'file' || type === 'image') {
         const files =
           fieldEvents.length > 0 ? fieldEvents.map(getFileOutput) : [];
@@ -59,7 +57,7 @@ export function NodeFieldsOutput({ fields, block }: NodeFieldsOutputProps) {
 
       return <span>Unsupported output type - {type}</span>;
     },
-    [events],
+    [events.length],
   );
 
   return (
@@ -93,15 +91,18 @@ function checkIfStringPayloads(events: IEvent[]) {
   return events.every((ev) => typeof ev.payload.message === 'string');
 }
 
-function getAudioOutput(events: IEvent[]) {
-  return new Blob(
-    events.map((event) => event.payload),
-    { type: 'audio/mp3' },
-  );
-}
+// function getAudioOutput(events: IEvent[]) {
+//   return new Blob(
+//     events.map((event) => event.payload),
+//     { type: 'audio/mp3' },
+//   );
+// }
 
 function getFileOutput(event: IEvent) {
-  return new Blob([event.payload], { type: 'file' });
+  return {
+    content: new Blob([event.payload], { type: event.metadata.file_type }),
+    name: event.metadata.file_name,
+  };
 }
 
 interface TextOutputProps {
@@ -145,4 +146,15 @@ function TextOutput({ content, blockName, onClear }: TextOutputProps) {
       </div>
     </>
   );
+}
+
+interface AudioStreamOutputProps {
+  events: IEvent[];
+  status: boolean;
+}
+
+function AudioStreamOutput({ events }: AudioStreamOutputProps) {
+  const { status } = useRunPipeline();
+
+  return <AudioOutput events={events} disabled={status !== 'running'} />;
 }

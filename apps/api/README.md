@@ -1,8 +1,6 @@
 # Buildel
 
-
 To start your Phoenix server:
-
 
 - Run `mix dependencies.up` to start dependencies.
 - Run `mix setup` to install and setup dependencies

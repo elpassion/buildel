@@ -7,7 +7,8 @@ import React, {
 } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import { useReactFlow } from '@xyflow/react';
-import { ChevronUp, Pin, X } from 'lucide-react';
+import startCase from 'lodash.startcase';
+import { ChevronUp, X } from 'lucide-react';
 import { useBoolean, useDebounce, useEventListener } from 'usehooks-ts';
 import { z } from 'zod';
 
@@ -16,7 +17,7 @@ import { TextInput } from '~/components/form/inputs/text.input';
 import { IconButton } from '~/components/iconButton';
 import { EmptyMessage, ItemList } from '~/components/list/ItemList';
 import { resolveBlockTypeIconPath } from '~/components/pages/pipelines/blockTypes.utils';
-import { useBuilderSidebar } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderSidebar.context';
+import { PinButton } from '~/components/pages/pipelines/build/BuilderSidebar/BuilderSidebar';
 import { leaveOneGroup } from '~/components/pages/pipelines/NodeDropdown/nodeDropdownt.utils';
 import {
   IBlockConfig,
@@ -31,7 +32,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { useBreakpoints } from '~/hooks/useBreakpoints';
 import { cn } from '~/utils/cn';
 import { buildDocsUrl } from '~/utils/docs';
 import { getRandomNumber } from '~/utils/numbers';
@@ -154,7 +154,7 @@ function BlockGroupItem({ data, onCreate }: BlockGroupItemProps) {
   const { value: isCollapsed, toggle } = useBoolean(false);
 
   return (
-    <div className="border border-input rounded-md flex flex-col gap-1 overflow-hidden">
+    <div className="rounded-md flex flex-col gap-1 overflow-hidden">
       <Button
         isFluid
         size="xxs"
@@ -187,11 +187,16 @@ interface BlockItemProps {
   onCreate: (created: IBlockConfig) => Promise<unknown>;
 }
 function BlockItem({ data, onCreate }: BlockItemProps) {
-  const [urlSrc, setUrlSrc] = useState(
-    resolveBlockTypeIconPath(`type/${data.block.type}`),
-  );
   const reactFlowInstance = useReactFlow();
   const { status: runStatus } = useRunPipeline();
+
+  const imageRef = React.useRef<HTMLImageElement>(null);
+
+  const onImageError = () => {
+    if (!imageRef.current) return;
+
+    imageRef.current.src = resolveBlockTypeIconPath('default');
+  };
 
   const onDragStart = (
     event: DragEvent<HTMLDivElement>,
@@ -234,10 +239,6 @@ function BlockItem({ data, onCreate }: BlockItemProps) {
     });
   }, [onCreate, reactFlowInstance, isRunning]);
 
-  const onImageError = () => {
-    setUrlSrc(resolveBlockTypeIconPath('default'));
-  };
-
   return (
     <TooltipProvider>
       <Tooltip>
@@ -258,18 +259,19 @@ function BlockItem({ data, onCreate }: BlockItemProps) {
             onClick={onClickAdd}
           >
             <img
+              ref={imageRef}
               className="w-3.5 h-3.5 shrink-0"
-              src={urlSrc}
+              src={resolveBlockTypeIconPath(`type/${data.block.type}`)}
               alt={data.block.type}
               onError={onImageError}
             />
             <h3 className="text-xs truncate text-foreground">
-              {data.block.type}
+              {startCase(data.block.type)}
             </h3>
           </div>
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-[200px] text-sm">
-          <p className="mb-1 font-semibold">{data.block.type}</p>
+          <p className="mb-1 font-semibold">{startCase(data.block.type)}</p>
           <span>{data.block.description}</span>
 
           <Button
@@ -343,36 +345,5 @@ function SearchInput({ value, onClear, onChange }: SearchInputProps) {
         })}
       />
     </div>
-  );
-}
-
-function PinButton() {
-  const { state, isOpen, onPinClick, onClose } = useBuilderSidebar();
-  const { isDesktop } = useBreakpoints();
-
-  if (!isDesktop) {
-    return (
-      <IconButton
-        icon={<X />}
-        size="sm"
-        variant="secondary"
-        onClick={onClose}
-        title="Close"
-        aria-label="Close"
-      />
-    );
-  }
-
-  return (
-    <IconButton
-      icon={<Pin />}
-      size="sm"
-      variant="ghost"
-      onClick={onPinClick}
-      title="Auto close"
-      aria-label="Auto close"
-      data-checked={isOpen}
-      className={cn({ '!text-blue-500': state === 'keepOpen' })}
-    />
   );
 }

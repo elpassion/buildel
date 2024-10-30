@@ -56,7 +56,7 @@ export const usePagination = (initialPagination?: Partial<Pagination>) => {
     goToNext,
     goToPrev,
     goToPage,
-    hasNextPage: pagination.totalPages > pagination.page,
+    hasNextPage: pagination.totalPages - 1 > pagination.page,
   };
 };
 

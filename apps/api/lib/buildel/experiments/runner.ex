@@ -244,6 +244,7 @@ defmodule Buildel.Experiments.Runner do
     end
 
     defp calculate_evaluation("true"), do: {:ok, 100}
+
     defp calculate_evaluation("false"), do: {:ok, 0}
 
     defp calculate_evaluation(number) when is_integer(number), do: {:ok, number}

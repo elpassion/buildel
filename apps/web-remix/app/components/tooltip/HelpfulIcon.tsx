@@ -10,7 +10,7 @@ interface HelpfulIconProps {
   id: string;
   className?: string;
   place?: ITooltip['place'];
-  size?: 'md' | 'xl' | 'sm';
+  size?: 'md' | 'xl' | 'sm' | 'xs';
 }
 
 export function HelpfulIcon({
@@ -37,6 +37,7 @@ export function HelpfulIcon({
             'w-6 h-6': size === 'xl',
             'w-5 h-5': size === 'md',
             'w-3.5 h-3.5': size === 'sm',
+            'w-3 h-3': size === 'xs',
           },
           className,
         )}

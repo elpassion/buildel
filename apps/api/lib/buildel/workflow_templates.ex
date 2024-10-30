@@ -69,44 +69,63 @@ defmodule Buildel.WorkflowTemplates do
     }
   ]
 
-  def get_workflow_template_names() do
-    @available_templates
+  def get_workflow_template_names(organization_id) do
+    templates = @available_templates |> Enum.map(fn template ->
+       case get_template_config(template[:template_name], organization_id) do
+         nil ->
+           nil
+         template_config ->
+          template |> Map.put(:template_config, template_config)
+       end
+    end)
+
+    {:ok, templates |> Enum.filter(& &1 != nil)}
   end
 
   def create_pipeline_config_from_template(organization_id, template_name) do
+    case get_template_config(template_name, organization_id) do
+      nil ->
+        {:error, :not_found}
+
+      template_config ->
+        {:ok, template_config}
+    end
+  end
+
+  def get_template_config(template_name, organization_id) do
     case template_name do
       "ai_chat" ->
-        {:ok, generate_ai_chat_template_config(organization_id)}
+        generate_ai_chat_template_config(organization_id)
 
       "speech_to_text" ->
-        {:ok, generate_speech_to_text_template_config(organization_id)}
+        generate_speech_to_text_template_config(organization_id)
 
       "text_to_speech" ->
-        {:ok, generate_text_to_speech_template_config(organization_id)}
+        generate_text_to_speech_template_config(organization_id)
 
       "knowledge_search_to_text" ->
-        {:ok, generate_document_search_template_config(organization_id)}
+        generate_document_search_template_config(organization_id)
 
       "spreadsheet_ai_assistant" ->
-        {:ok, generate_spreadsheet_ai_assistant_config(organization_id)}
+        generate_spreadsheet_ai_assistant_config(organization_id)
 
       "text_classification_assistant" ->
-        {:ok, generate_text_classification_assistant(organization_id)}
+        generate_text_classification_assistant(organization_id)
 
       "text_feedback_assistant" ->
-        {:ok, generate_text_feedback_assistant(organization_id)}
+        generate_text_feedback_assistant(organization_id)
 
       "seo_image_for_article" ->
-        {:ok, generate_seo_image_for_article_template_config(organization_id)}
+        generate_seo_image_for_article_template_config(organization_id)
 
       "blog_post_generator" ->
-        {:ok, generate_blog_post_generator_template_config(organization_id)}
+        generate_blog_post_generator_template_config(organization_id)
 
       "search_and_scrape" ->
-        {:ok, generate_search_and_scrape_template_config(organization_id)}
+        generate_search_and_scrape_template_config(organization_id)
 
       _ ->
-        {:error, :not_found}
+        nil
     end
   end
 
@@ -274,10 +293,12 @@ defmodule Buildel.WorkflowTemplates do
             name: "blog_post_generator",
             position: %{x: 724, y: 377},
             opts: %{
-              api_type: "openai",
-              endpoint: "https://api.openai.com/v1",
-              model: "gpt-4o-mini",
-              api_key: "__openai",
+              model_section: %{
+                api_type: "openai",
+                endpoint: "https://api.openai.com/v1",
+                model: "gpt-4o-mini",
+                api_key: "__openai",
+              },
               system_message:
                 "You are a blog post generator. Create a well-researched and engaging blog post on the given topic. \n\nUse available tools for research and ensure the content is accurate and easy to read. \n\nStructure the post with an introduction, body, and conclusion.\n\nAt the end, generate table of contents.",
               prompt_template: "---Topic---\n{{blog_post_topic:output}}",
@@ -378,10 +399,12 @@ defmodule Buildel.WorkflowTemplates do
             name: "article_summarizer",
             position: %{x: 722, y: 315},
             opts: %{
-              api_type: "openai",
-              endpoint: "https://api.openai.com/v1",
-              model: "gpt-4o-mini",
-              api_key: "__openai",
+              model_section: %{
+                api_type: "openai",
+                endpoint: "https://api.openai.com/v1",
+                model: "gpt-4o-mini",
+                api_key: "__openai",
+              },
               system_message:
                 "You are a helpful assistant specializing in creating SEO-friendly content. \n\nI will provide you with an article, and your task is to summarize it and create an optimized image suitable for SEO purposes using available tools.\n\nMake sure that summarization used for generating image is no longer than 1 sentence.\n\nPlease return only the image, ensuring it visually represents the key elements of the article.",
               prompt_template: "{{article_input:output}}",
@@ -481,10 +504,12 @@ defmodule Buildel.WorkflowTemplates do
           generate_chat_block(%{
             position: %{x: 363, y: -500},
             opts: %{
-              api_type: "openai",
-              endpoint: "https://api.openai.com/v1",
-              model: "gpt-4o-mini",
-              api_key: "__openai",
+              model_section: %{
+                api_type: "openai",
+                endpoint: "https://api.openai.com/v1",
+                model: "gpt-4o-mini",
+                api_key: "__openai",
+              },
               system_message:
                 "You are a Feedback Assistant.\n\nI will send you an essay, and your job is to prepare feedback for it.\n\nRemember to:\n\n- Be conversational.\n- Be brief.\n- Evaluate on multiple criteria.\n- Respond in bullet points and markdown.\n- Prepare an overall summary at the end.",
               prompt_template: "{{file_to_text_1:output}}",
@@ -536,9 +561,12 @@ defmodule Buildel.WorkflowTemplates do
           generate_chat_block(%{
             position: %{x: 363, y: -500},
             opts: %{
-              api_type: "openai",
-              endpoint: "https://api.openai.com/v1",
-              model: "gpt-4o-mini",
+              model_section: %{
+                api_type: "openai",
+                endpoint: "https://api.openai.com/v1",
+                model: "gpt-4o-mini",
+                api_key: "__openai",
+              },
               system_message:
                 "You are a text classification assistant.\n\nYour task is to assign one or more categories to the input text and output in json. \n\nAdditionally, you need to extract the keywords from the text that are related to the classification.",
               prompt_template: "--- Text Data\n\n{{text_input_1:output}}\n\n---",
@@ -615,9 +643,11 @@ defmodule Buildel.WorkflowTemplates do
           generate_chat_block(%{
             position: %{x: 97.85012452954305, y: 12.316129078621316},
             opts: %{
-              api_type: "openai",
-              endpoint: "https://api.openai.com/v1",
-              model: "gpt-4o-mini",
+              model_section: %{
+                api_type: "openai",
+                endpoint: "https://api.openai.com/v1",
+                model: "gpt-4o-mini",
+              },
               system_message:
                 "You are a helpful assistant.\n\nI will ask you some questions, and your task is to answer them using the available tools.\n\nUse only the columns and tables that are available to you in the csv_search_1 tool.\n"
             }
@@ -676,7 +706,7 @@ defmodule Buildel.WorkflowTemplates do
           })
         ],
         connections: [
-          create_connection("text_input_1", "document_search_1"),
+          create_connection(%{block_name: "text_input_1", output_name: "output"}, %{block_name: "document_search_1", input_name: "query"}),
           create_connection("document_search_1", "text_output_1")
         ],
         version: "1"
@@ -757,6 +787,16 @@ defmodule Buildel.WorkflowTemplates do
             connections: [
               create_connection("text_input_1", "chat_1")
             ],
+            opts: %{
+              system_message: "You are a helpful assistant",
+              prompt_template: "{{text_input_1:output}}",
+              model_section: %{
+                api_type: "openai",
+                endpoint: "https://api.openai.com/v1",
+                model: "gpt-4o-mini",
+                api_key: "__openai"
+              }
+            },
             inputs: ["text_input_1:output->input?reset=true"],
             position: %{x: 400, y: -500}
           }),

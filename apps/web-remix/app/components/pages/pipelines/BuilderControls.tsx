@@ -27,7 +27,11 @@ export const BuilderControls = ({
   const { layout } = useLayoutNodes({ setFlowData, fitView });
 
   return (
-    <Controls showInteractive={false}>
+    <Controls
+      showInteractive={false}
+      position="bottom-right"
+      className="rounded overflow-hidden !shadow-none !drop-shadow-none border border-input"
+    >
       <ControlButton
         id="layout-left-right"
         onClick={() => layout({ nodes, edges }, 'LR')}

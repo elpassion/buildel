@@ -1,22 +1,24 @@
 import type { PropsWithChildren } from 'react';
-import React, { useMemo, useState } from 'react';
-import { useFetcher } from '@remix-run/react';
+import React, { useMemo } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
 import {
+  Bookmark,
+  BookmarkCheck,
   CircleCheck,
   CircleX,
   EllipsisVertical,
   LockOpen,
   Trash,
 } from 'lucide-react';
-import { ClientOnly } from 'remix-utils/client-only';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
 import { HiddenField } from '~/components/form/fields/field.context';
 import { IconButton } from '~/components/iconButton';
-import { confirm } from '~/components/modal/confirm';
-import { resolveBlockTypeIconPath } from '~/components/pages/pipelines/blockTypes.utils';
+import {
+  WorkflowBlockList,
+  WorkflowBlockListOverflow,
+} from '~/components/pages/pipelines/components/WorkflowBlockList';
 import type { BadgeProps } from '~/components/ui/badge';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -47,11 +49,7 @@ import { cn } from '~/utils/cn';
 import { MonetaryValue } from '~/utils/MonetaryValue';
 import { routes } from '~/utils/routes.utils';
 
-import type {
-  IBlockConfig,
-  IInterfaceConfigForm,
-  IPipeline,
-} from '../pipeline.types';
+import type { IInterfaceConfigForm, IPipeline } from '../pipeline.types';
 
 interface PipelinesListItemProps extends PropsWithChildren {
   className?: string;
@@ -65,25 +63,23 @@ export const PipelinesListItem = ({
 
 interface PipelineListItemHeaderProps {
   pipeline: IPipeline;
+  onDelete?: (pipeline: IPipeline, e: React.MouseEvent<HTMLDivElement>) => void;
+  onToggleFavorite?: (
+    pipeline: IPipeline,
+    e: React.MouseEvent<HTMLDivElement>,
+  ) => void;
 }
 export const PipelineListItemHeader = ({
   pipeline,
+  onDelete,
+  onToggleFavorite,
 }: PipelineListItemHeaderProps) => {
-  const fetcher = useFetcher();
-
   const handleDelete = async (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    confirm({
-      onConfirm: async () =>
-        fetcher.submit({ pipelineId: pipeline.id }, { method: 'delete' }),
-      confirmText: 'Delete workflow',
-      children: (
-        <p className="text-sm">
-          You are about to delete the "{pipeline.name}” workflow from your
-          organisation. This action is irreversible.
-        </p>
-      ),
-    });
+    onDelete?.(pipeline, e);
+  };
+
+  const handleToggleFavorite = async (e: React.MouseEvent<HTMLDivElement>) => {
+    onToggleFavorite?.(pipeline, e);
   };
 
   return (
@@ -123,6 +119,20 @@ export const PipelineListItemHeader = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DuplicateForm pipeline={pipeline} />
+
+            <DropdownMenuItem
+              className="w-full flex gap-1 items-center cursor-pointer text-muted-foreground font-medium"
+              onClick={handleToggleFavorite}
+            >
+              {pipeline.favorite ? (
+                <BookmarkCheck className="w-4 h-4" />
+              ) : (
+                <Bookmark className="w-4 h-4" />
+              )}
+
+              <span>{pipeline.favorite ? 'Unpin' : 'Pin'}</span>
+            </DropdownMenuItem>
+
             <DropdownMenuItem
               className="w-full flex gap-1 items-center text-red-500"
               onClick={handleDelete}
@@ -183,14 +193,14 @@ export const PipelineListItemContent = ({
           <CardContentColumnTitle>Blocks</CardContentColumnTitle>
 
           {pipeline.config.blocks.length > 0 ? (
-            <PipelineItemBlockList pipeline={pipeline} />
+            <WorkflowBlockList blocks={pipeline.config.blocks} />
           ) : (
             <CardContentBooleanValue value={false}>
               None
             </CardContentBooleanValue>
           )}
 
-          <div className="absolute h-6 w-8 right-0 bottom-2 bg-gradient-to-r from-transparent to-white pointer-events-none xl:bottom-0" />
+          <WorkflowBlockListOverflow />
         </CardContentColumnWrapper>
       </div>
     </CardContent>
@@ -211,9 +221,11 @@ function DuplicateForm({ pipeline }: DuplicateFormProps) {
       action={routes.pipelinesNew(pipeline.organization_id)}
     >
       <HiddenField name="pipeline.name" value={pipeline.name + ' copy'} />
-
       <HiddenField name="pipeline.config.version" value="1" />
-
+      <HiddenField
+        name="pipeline.config.connections"
+        value={JSON.stringify(pipeline.config.connections)}
+      />
       <HiddenField
         name="pipeline.config.blocks"
         value={JSON.stringify(pipeline.config.blocks)}
@@ -276,63 +288,6 @@ function PipelineItemInterfaceBadge({
             </span>
             {interfaceConfig.public ? 'public' : 'private'}
           </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}
-
-interface PipelineItemBlockListProps {
-  pipeline: IPipeline;
-}
-
-function PipelineItemBlockList({ pipeline }: PipelineItemBlockListProps) {
-  return (
-    <ul className="flex -space-x-2">
-      {pipeline.config.blocks.map((block) => (
-        <PipelineItemBlockListBlock block={block} key={block.name} />
-      ))}
-    </ul>
-  );
-}
-interface PipelineItemBlockListBlockProps {
-  block: IBlockConfig;
-}
-function PipelineItemBlockListBlock({
-  block,
-}: PipelineItemBlockListBlockProps) {
-  const [urlSrc, setUrlSrc] = useState(
-    resolveBlockTypeIconPath(`type/${block.type}`),
-  );
-
-  const onImageError = () => {
-    setUrlSrc(resolveBlockTypeIconPath('default'));
-  };
-
-  return (
-    <TooltipProvider>
-      <Tooltip delayDuration={500}>
-        <TooltipTrigger asChild>
-          <li className="w-6 h-6 rounded-full bg-white border border-input flex justify-center items-center">
-            <ClientOnly
-              fallback={
-                <div className="w-3.5 h-3.5 bg-secondary rounded-full" />
-              }
-            >
-              {() => (
-                <img
-                  src={urlSrc}
-                  alt={block.type}
-                  onError={onImageError}
-                  className="w-3.5 h-3.5"
-                />
-              )}
-            </ClientOnly>
-          </li>
-        </TooltipTrigger>
-
-        <TooltipContent side="top" className="text-xs">
-          {block.type}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

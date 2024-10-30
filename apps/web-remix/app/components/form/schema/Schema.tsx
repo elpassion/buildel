@@ -21,6 +21,7 @@ export function Schema({
     editor: React.FC<FieldProps>;
     asyncSelect: React.FC<FieldProps>;
     asyncCreatableSelect: React.FC<FieldProps>;
+    section: React.FC<FieldProps>;
   };
 }) {
   assert(schema.type === 'object');
@@ -108,6 +109,17 @@ export function Field({
         shouldDisplay={shouldDisplay}
       />
     );
+  } else if (field.type === 'section') {
+    return (
+      <fields.section
+        field={{ ...field, type: 'object' }}
+        schema={{ ...field, type: 'object' }}
+        name={name}
+        disabled={disabled}
+        fields={fields}
+        shouldDisplay={shouldDisplay}
+      />
+    );
   }
   console.warn('Unknown field type', field);
   return null;
@@ -127,5 +139,6 @@ export interface FieldProps {
     editor: React.FC<FieldProps>;
     asyncSelect: React.FC<FieldProps>;
     asyncCreatableSelect: React.FC<FieldProps>;
+    section: React.FC<FieldProps>;
   };
 }

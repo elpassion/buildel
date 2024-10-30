@@ -261,7 +261,6 @@ export function NodeFieldsForm({
   const renderInput = useCallback(
     (field: IField) => {
       const { type, name } = field.data;
-
       if (type === 'text') {
         return (
           <div>
@@ -299,7 +298,7 @@ export function NodeFieldsForm({
             )}
           />
         );
-      } else if (type === 'file_temporary' || 'image') {
+      } else if (type === ('file_temporary' || 'image')) {
         return (
           <FileUpload
             multiple
@@ -322,7 +321,7 @@ export function NodeFieldsForm({
         return (
           <AudioFieldTabs
             disabled={isDisabled}
-            name={`${blockName}-${field.data.name}`}
+            name={`${field.data.name}`}
             onUpload={convertToBlobAndUpload}
             onChunk={uploadAudioChunk}
           />

@@ -66,6 +66,7 @@ defmodule Buildel.RunLogs do
 
     Repo.paginate(query,
       limit: attrs.limit,
+      include_total_count: true,
       cursor_fields: [{:inserted_at, :desc}, {:id, :asc}],
       after: attrs.after
     )

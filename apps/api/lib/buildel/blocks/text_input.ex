@@ -9,8 +9,8 @@ defmodule Buildel.Blocks.TextInput do
       description:
         "This module is crafted for the seamless intake and transmission of textual data.",
       groups: ["text", "inputs / outputs"],
-      inputs: [Block.text_input("input", true), Block.text_output("forward")],
-      outputs: [Block.text_output()],
+      inputs: [Block.text_input("input", true), Block.text_input("forward")],
+      outputs: [Block.text_output("output", false), Block.text_output("forward", true, false)],
       ios: [],
       dynamic_ios: nil,
       schema: schema()
@@ -40,11 +40,15 @@ defmodule Buildel.Blocks.TextInput do
   end
 
   def handle_input("forward", {_topic, :text, text, _metadata}, state) do
-    output(state, "output", {:text, text})
+    state = state |> output("output", {:text, text})
+
+    state |> output("forward", {:text, text})
   end
 
   @impl true
   def handle_input("input", {_topic, :text, text, _metadata}, state) do
-    output(state, "output", {:text, text})
+    state = state |> output("output", {:text, text})
+
+    state |> output("forward", {:text, text})
   end
 end

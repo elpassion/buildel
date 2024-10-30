@@ -218,16 +218,26 @@ defmodule BuildelWeb.PipelineChannelTest do
 
       assert_receive %Phoenix.Socket.Message{
         event: ^event,
-        payload: ^payload
+        payload: {:binary, binary_payload}
       }
 
+      {chunk, metadata} = extract_binary_metadata(binary_payload)
+
+      assert %{
+               "metadata" => _,
+               "created_at" => _
+             } = metadata
+
+      assert chunk == File.read!("test/support/fixtures/real.mp3")
+
       event = "output:random_block_3:output"
-      payload = %{message: "Hello"}
 
       assert_receive %Phoenix.Socket.Message{
         event: ^event,
-        payload: ^payload
+        payload: text_payload
       }
+
+      assert %{message: "Hello", created_at: _, metadata: _} = text_payload
     end
 
     test "outputs only outputs allowed in the interface", %{
@@ -271,8 +281,17 @@ defmodule BuildelWeb.PipelineChannelTest do
 
       assert_receive %Phoenix.Socket.Message{
         event: ^event,
-        payload: ^payload
+        payload: {:binary, binary_payload}
       }
+
+      {chunk, metadata} = extract_binary_metadata(binary_payload)
+
+      assert %{
+               "metadata" => _,
+               "created_at" => _
+             } = metadata
+
+      assert chunk == File.read!("test/support/fixtures/real.mp3")
 
       event = "output:random_block_3:output"
       payload = %{message: "Hello"}
@@ -315,6 +334,13 @@ defmodule BuildelWeb.PipelineChannelTest do
     socket = BuildelWeb.PipelineSocket |> socket("socket_id", %{})
 
     %{socket: socket, user: user, organization: organization}
+  end
+
+  defp extract_binary_metadata(binary) do
+    <<metadata_size::32, rest::binary>> = binary
+    <<metadata_json::binary-size(metadata_size), chunk::binary>> = rest
+    metadata = Jason.decode!(metadata_json)
+    {chunk, metadata}
   end
 
   defp create_cost(%{organization: organization, run: run}) do

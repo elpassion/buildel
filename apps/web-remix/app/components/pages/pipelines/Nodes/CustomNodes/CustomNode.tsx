@@ -198,7 +198,7 @@ export function CustomNodeBody({
     <div className="p-2 nodrag">
       <NodeReadonlyFields
         schema={data.block_type?.schema as JSONSchemaField}
-        data={data.opts}
+        ctx={data.opts}
         blockName={data.name}
       />
 

@@ -42,7 +42,9 @@ defmodule Buildel.Blocks do
     NewImage,
     ImageOutput,
     Knowledge,
-    NewWorkflowCall
+    NewWorkflowCall,
+    CollectAllAudio,
+    SharepointClient
   }
 
   @names_to_blocks_map %{
@@ -81,7 +83,9 @@ defmodule Buildel.Blocks do
     "file_to_text" => NewFileToText,
     "image" => NewImage,
     "image_output" => ImageOutput,
-    "knowledge" => Knowledge
+    "knowledge" => Knowledge,
+    "collect_all_audio" => CollectAllAudio,
+    "sharepoint_client" => SharepointClient
   }
 
   @blocks_to_names_map %{
@@ -120,7 +124,9 @@ defmodule Buildel.Blocks do
     NewFileToText => "file_to_text",
     NewImage => "image",
     ImageOutput => "image_output",
-    Knowledge => "knowledge"
+    Knowledge => "knowledge",
+    CollectAllAudio => "collect_all_audio",
+    SharepointClient => "sharepoint_client"
   }
 
   def list_types() do

@@ -16,6 +16,10 @@ import { SubmitButton } from '~/components/form/submit';
 import { BasicLink } from '~/components/link/BasicLink';
 import { ItemList } from '~/components/list/ItemList';
 import {
+  WorkflowBlockList,
+  WorkflowBlockListOverflow,
+} from '~/components/pages/pipelines/components/WorkflowBlockList';
+import {
   getTemplateImageColor,
   resolveTemplateImageUrl,
 } from '~/components/pages/pipelines/list/WorkflowTemplates';
@@ -219,13 +223,15 @@ export function TemplateList({ items, action, children }: TemplateListProps) {
     [items],
   );
   return (
-    <ItemList
-      className="grid grid-cols-1 md:grid-cols-2 gap-3"
-      items={formattedTemplates}
-      renderItem={(item) => <TemplateListItem action={action} item={item} />}
-    >
-      {children}
-    </ItemList>
+    <div className="max-h-[600px] overflow-y-auto">
+      <ItemList
+        className="grid grid-cols-1 md:grid-cols-2 gap-3"
+        items={formattedTemplates}
+        renderItem={(item) => <TemplateListItem action={action} item={item} />}
+      >
+        {children}
+      </ItemList>
+    </div>
   );
 }
 
@@ -236,6 +242,7 @@ interface ITemplateItem {
 function TemplateListItem({ item, action }: ITemplateItem) {
   const ref = useRef<HTMLFormElement>(null);
   const validator = useMemo(() => withZod(CreateFromTemplateSchema), []);
+
   return (
     <ValidatedForm
       formRef={ref}
@@ -243,7 +250,7 @@ function TemplateListItem({ item, action }: ITemplateItem) {
       method="POST"
       validator={validator}
       onClick={() => ref.current?.submit()}
-      className="group p-2 bg-white border border-neutral-100 min-h-[90px] rounded-xl transition hover:border-blue-200 cursor-pointer md:p-3 md:min-h-[98px]"
+      className="group p-2 bg-white border border-neutral-100 min-h-[90px] rounded-xl transition hover:border-blue-200 cursor-pointer md:p-3 md:min-h-[98px] h-full"
     >
       <div className="flex flex-col gap-2">
         <div className="flex gap-2 items-center">
@@ -265,10 +272,19 @@ function TemplateListItem({ item, action }: ITemplateItem) {
           </h4>
         </div>
 
-        <div className="grow">
-          <p className="text-xs text-muted-foreground line-clamp-2">
+        <div className="grow min-h-[32px]">
+          <p
+            className="text-xs text-muted-foreground line-clamp-2"
+            title={item.template_description}
+          >
             {item.template_description}
           </p>
+        </div>
+
+        <div className="relative overflow-x-hidden w-full flex">
+          <WorkflowBlockList blocks={item.template_config.config.blocks} />
+
+          <WorkflowBlockListOverflow className="bottom-0" />
         </div>
       </div>
 

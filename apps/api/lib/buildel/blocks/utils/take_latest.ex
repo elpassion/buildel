@@ -22,7 +22,7 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
           nil ->
             {:error, "Input #{input_name} is not connected."}
 
-          value ->
+          %{value: value} ->
             {:ok, value}
         end
       end
@@ -36,7 +36,9 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
         %{block: block, io: output} = Buildel.BlockPubSub.io_from_topic(topic)
         [output | _] = output |> String.split("->")
 
-        put_in(state, [tl_keyword(), "#{block}:#{output}"], text)
+        update_in(state, [tl_keyword(), "#{block}:#{output}"], fn input_value ->
+          %{input_value | value: text}
+        end)
       end
 
       defp replace_input_strings_with_latest_inputs_values(state, template) do
@@ -46,7 +48,13 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
           {_input, nil}, template ->
             template
 
-          {input, text}, template ->
+          {input, %{value: nil, optional: true}}, template ->
+            String.replace(template, "{{#{input}}}", "")
+
+          {input, %{value: nil, optional: false}}, template ->
+            template
+
+          {input, %{value: text}}, template ->
             text_string =
               if is_map(text) do
                 Jason.encode!(text)
@@ -63,6 +71,12 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
         |> input_values()
         |> Enum.reduce(template, fn
           {_input, nil}, template ->
+            template
+
+          {input, %{value: nil, optional: true}}, template ->
+            String.replace(template, "{{#{input}}}", "")
+
+          {input, %{value: nil, optional: false}}, template ->
             template
 
           {input, _text}, template ->
@@ -106,9 +120,9 @@ defmodule Buildel.Blocks.Utils.TakeLatest do
         state |> Map.put(tl_keyword(), new_messages)
       end
 
-      def empty_inputs(state) do
+      defp empty_inputs(state) do
         Enum.into(state.connections, %{}, fn connection ->
-          {Connection.block_output_string(connection), nil}
+          {Connection.block_output_string(connection), %{ value: nil, optional: connection.opts.optional }}
         end)
       end
     end

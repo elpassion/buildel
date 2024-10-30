@@ -27,8 +27,8 @@ export function ChatMessages({
   children,
   size,
 }: PropsWithChildren<ChatMessagesProps>) {
+  const listRef = useRef<HTMLUListElement | null>(null);
   const { ref: inViewRef, inView } = useInView({});
-  const bottomRef = useRef<HTMLDivElement>(null);
 
   const reversed = useMemo(() => {
     if (!messages.length) return initialMessages ?? [];
@@ -37,37 +37,42 @@ export function ChatMessages({
 
   const setRefs = useCallback(
     (node: HTMLDivElement | null) => {
-      //eslint-disable-next-line
-      //@ts-ignore
-      bottomRef.current = node;
       inViewRef(node);
     },
     [inViewRef],
   );
 
   useEffect(() => {
-    if (!bottomRef.current || !inView) return;
+    if (!inView) return;
 
-    bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
   }, [messages, inView]);
+
+  const renderItem = useCallback(
+    (msg: IMessage) => {
+      const { message, links } = addReferenceToLinks(msg.message);
+      return (
+        <ChatMessage message={msg} size={size}>
+          <ChatMarkdown>{message}</ChatMarkdown>
+
+          <EmbedLinksList links={links} />
+        </ChatMessage>
+      );
+    },
+    [size],
+  );
 
   return (
     <ItemList
+      ref={listRef}
       className={cn(
         'relative flex flex-col-reverse gap-2 min-w-full w-full h-fit max-h-[97%] pr-1 prose overflow-y-auto',
       )}
       itemClassName="w-full pl-3 pr-1"
       items={reversed}
-      renderItem={(msg) => {
-        const { message, links } = addReferenceToLinks(msg.message);
-        return (
-          <ChatMessage message={msg} size={size}>
-            <ChatMarkdown>{message}</ChatMarkdown>
-
-            <EmbedLinksList links={links} />
-          </ChatMessage>
-        );
-      }}
+      renderItem={renderItem}
     >
       {children}
 

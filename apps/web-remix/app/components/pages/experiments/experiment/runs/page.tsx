@@ -37,6 +37,8 @@ export function ExperimentPage() {
 
   useRevalidateOnInterval({ enabled: isRunning });
 
+  if (!experiment.pipeline) return null;
+
   return (
     <>
       <AppNavbar

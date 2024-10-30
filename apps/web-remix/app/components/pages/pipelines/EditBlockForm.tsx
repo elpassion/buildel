@@ -28,12 +28,13 @@ import {
   ArrayField,
   BooleanField,
   NumberField,
+  SectionField,
   StringField,
 } from '~/components/form/schema/SchemaFields';
+import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
 import {
   checkDisplayWhenConditions,
   generateZODSchema,
-  JSONSchemaField,
 } from '~/components/form/schema/SchemaParser';
 import { SubmitButton } from '~/components/form/submit';
 import { ConfirmationModal } from '~/components/modal/ConfirmationModal';
@@ -112,6 +113,26 @@ export function EditBlockForm({
           return {
             ...existingConnection,
             opts: { ...existingConnection.opts, reset },
+          };
+        }
+
+        return existingConnection;
+      });
+      setConnections(newConnections);
+    },
+    [connections],
+  );
+
+  const updateInputOptional = useCallback(
+    (connection: IConfigConnection, optional: boolean) => {
+      const newConnections = connections.map((existingConnection) => {
+        if (
+          existingConnection.from.block_name === connection.from.block_name &&
+          existingConnection.to.block_name === connection.to.block_name
+        ) {
+          return {
+            ...existingConnection,
+            opts: { ...existingConnection.opts, optional },
           };
         }
 
@@ -385,6 +406,7 @@ export function EditBlockForm({
       <InputsProvider
         connections={connections}
         updateInputReset={updateInputReset}
+        updateInputOptional={updateInputOptional}
       >
         <div className="space-y-5 grow">
           <div className="flex justify-end">
@@ -429,6 +451,7 @@ export function EditBlockForm({
               editor: CustomEditorField,
               asyncSelect: SelectField,
               asyncCreatableSelect: AsyncCreatableField,
+              section: SectionField,
             }}
           />
 
@@ -478,16 +501,24 @@ function generateSuggestions(connections: IConfigConnection[]): Suggestion[] {
 const InputsContext = React.createContext<{
   connections: IConfigConnection[];
   updateInputReset: (connection: IConfigConnection, value: boolean) => void;
-}>({ connections: [], updateInputReset: () => {} });
+  updateInputOptional: (connection: IConfigConnection, value: boolean) => void;
+}>({
+  connections: [],
+  updateInputReset: () => {},
+  updateInputOptional: () => {},
+});
 
 const InputsProvider: React.FC<{
   connections: IConfigConnection[];
   updateInputReset: (connection: IConfigConnection, value: boolean) => void;
+  updateInputOptional: (connection: IConfigConnection, value: boolean) => void;
   children: ReactNode;
-}> = ({ connections, updateInputReset, children }) => {
+}> = ({ connections, updateInputReset, updateInputOptional, children }) => {
   return (
     <>
-      <InputsContext.Provider value={{ connections, updateInputReset }}>
+      <InputsContext.Provider
+        value={{ connections, updateInputReset, updateInputOptional }}
+      >
         {children}
       </InputsContext.Provider>
     </>

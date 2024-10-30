@@ -7,8 +7,8 @@ import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field } from '~/components/form/fields/field.context';
 import { SelectField } from '~/components/form/fields/select.field';
 import { SubmitButton } from '~/components/form/submit';
+import { toSelectOption } from '~/components/pages/pipelines/interface/interface.utils';
 import type {
-  IBlockConfig,
   IInterfaceConfig,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
@@ -102,14 +102,6 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     </ValidatedForm>
   );
 };
-
-function toSelectOption(item: IBlockConfig) {
-  return {
-    id: item.name.toString(),
-    value: JSON.stringify({ name: item.name, type: item.type }),
-    label: item.name,
-  };
-}
 
 function toSelectDefaults(data: IInterfaceConfig) {
   return {

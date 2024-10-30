@@ -15,11 +15,20 @@ import {
 interface PipelinesListProps {
   pipelines: IPipeline[];
   className?: string;
+  'aria-label'?: string;
+  onDelete?: (pipeline: IPipeline, e: React.MouseEvent<HTMLDivElement>) => void;
+  onToggleFavorite?: (
+    pipeline: IPipeline,
+    e: React.MouseEvent<HTMLDivElement>,
+  ) => void;
 }
 
 export const PipelinesList: React.FC<PipelinesListProps> = ({
   pipelines,
   className,
+  onDelete,
+  onToggleFavorite,
+  ...rest
 }) => {
   return (
     <ItemList
@@ -27,13 +36,18 @@ export const PipelinesList: React.FC<PipelinesListProps> = ({
       items={pipelines}
       renderItem={(item) => (
         <BasicLink to={routes.pipelineBuild(item.organization_id, item.id)}>
-          <PipelinesListItem className="flex flex-col">
-            <PipelineListItemHeader pipeline={item} />
+          <PipelinesListItem className="flex flex-col relative group">
+            <PipelineListItemHeader
+              pipeline={item}
+              onDelete={onDelete}
+              onToggleFavorite={onToggleFavorite}
+            />
             <PipelineListItemContent pipeline={item} />
           </PipelinesListItem>
         </BasicLink>
       )}
       className={cn('grid gap-4 grid-cols-1 sm:grid-cols-2', className)}
+      {...rest}
     />
   );
 };

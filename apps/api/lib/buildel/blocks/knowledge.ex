@@ -104,15 +104,20 @@ defmodule Buildel.Blocks.Knowledge do
       |> Enum.map(fn memory ->
         %{
           file_name: memory.file_name,
-          id: memory.file_uuid
+          id: memory.id
         }
       end)
 
-    if opts[:output_on_start] == "on" do
-      GenServer.cast(self(), {:output_on_start, Jason.encode!(collection_files)})
+    {:ok, state |> Map.put(:collection_files, collection_files)}
+  end
+
+  @impl true
+  def handle_on_workflow_started(_tuple, state) do
+    if state.opts[:output_on_start] do
+      GenServer.cast(self(), {:output_on_start, Jason.encode!(state.collection_files)})
     end
 
-    {:ok, state |> Map.put(:collection_files, collection_files)}
+    state
   end
 
   def handle_cast({:output_on_start, collection_files}, state) do

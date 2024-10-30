@@ -12,7 +12,6 @@ defmodule Buildel.Blocks.Chat do
   alias Buildel.FlattenMap
 
   # Config
-
   @impl true
   def options() do
     %{
@@ -43,12 +42,8 @@ defmodule Buildel.Blocks.Chat do
           options_schema(%{
             "required" => [
               "description",
-              "api_key",
-              "api_type",
-              "model",
-              "endpoint",
+              "model_section",
               "chat_memory_type",
-              "temperature",
               "system_message",
               "messages",
               "prompt_template"
@@ -68,66 +63,88 @@ defmodule Buildel.Blocks.Chat do
                     }
                   }
                 },
-                api_type: %{
-                  "type" => "string",
-                  "title" => "Model API type",
-                  "description" => "The API type to use for the chat.",
-                  "enum" => ["openai", "azure", "google", "mistral", "anthropic"],
-                  "enumPresentAs" => "radio",
-                  "default" => "openai",
-                  "readonly" => true
-                },
-                api_key:
-                  secret_schema(%{
-                    "title" => "API key",
-                    "description" => "API key to use for the chat.",
-                    "descriptionWhen" => %{
-                      "opts.api_type" => %{
-                        "openai" =>
-                          "[OpenAI API key](https://platform.openai.com/api-keys) to use for the chat.",
-                        "azure" => "Azure API key to use for the chat.",
-                        "google" => "Google API key to use for the chat.",
-                        "mistral" =>
-                          "[Mistral API key](https://console.mistral.ai/api-keys/) to use for the chat.",
-                        "anthropic" =>
-                          "[Anthropic API key](https://www.anthropic.com/api) to use for the chat."
-                      }
-                    },
-                    "defaultWhen" => %{
-                      "opts.api_type" => %{
-                        "openai" => "__openai",
-                        "azure" => "__azure",
-                        "google" => "__google",
-                        "mistral" => "__mistral",
-                        "anthropic" => "__anthropic"
-                      }
-                    }
-                  }),
-                endpoint: %{
-                  "type" => "string",
-                  "title" => "Endpoint",
-                  "description" => "The endpoint to use for the chat.",
-                  "defaultWhen" => %{
-                    "opts.api_type" => %{
-                      "openai" => "https://api.openai.com/v1",
-                      "azure" =>
-                        "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}",
-                      "google" => "https://generativelanguage.googleapis.com/v1beta/models",
-                      "mistral" => "https://api.mistral.ai/v1",
-                      "anthropic" => "https://api.anthropic.com/v1"
-                    }
-                  },
-                  "minLength" => 1
-                },
-                model: %{
-                  "type" => "string",
+                model_section: %{
+                  "type" => "section",
                   "title" => "Model",
                   "description" => "The model to use for the chat.",
-                  "url" =>
-                    "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
-                  "presentAs" => "async-select",
-                  "minLength" => 1,
-                  "readonly" => true
+                  "required" => ["api_type", "api_key", "endpoint", "model", "temperature"],
+                  "properties" =>
+                    Jason.OrderedObject.new(
+                      api_type: %{
+                        "type" => "string",
+                        "title" => "Model API type",
+                        "description" => "The API type to use for the chat.",
+                        "enum" => ["openai", "azure", "google", "mistral", "anthropic"],
+                        "enumPresentAs" => "radio",
+                        "default" => "openai",
+                        "readonly" => true
+                      },
+                      api_key:
+                        secret_schema(%{
+                          "title" => "API key",
+                          "description" => "API key to use for the chat.",
+                          "descriptionWhen" => %{
+                            "opts.model_section.api_type" => %{
+                              "openai" =>
+                                "[OpenAI API key](https://platform.openai.com/api-keys) to use for the chat.",
+                              "azure" => "Azure API key to use for the chat.",
+                              "google" => "Google API key to use for the chat.",
+                              "mistral" =>
+                                "[Mistral API key](https://console.mistral.ai/api-keys/) to use for the chat.",
+                              "anthropic" =>
+                                "[Anthropic API key](https://www.anthropic.com/api) to use for the chat."
+                            }
+                          },
+                          "defaultWhen" => %{
+                            "opts.model_section.api_type" => %{
+                              "openai" => "__openai",
+                              "azure" => "__azure",
+                              "google" => "__google",
+                              "mistral" => "__mistral",
+                              "anthropic" => "__anthropic"
+                            }
+                          }
+                        }),
+                      endpoint: %{
+                        "errorMessages" => %{
+                          "minLength" => "Endpoint is required."
+                        },
+                        "type" => "string",
+                        "title" => "Endpoint",
+                        "description" => "The endpoint to use for the chat.",
+                        "defaultWhen" => %{
+                          "opts.model_section.api_type" => %{
+                            "openai" => "https://api.openai.com/v1",
+                            "azure" =>
+                              "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}",
+                            "google" => "https://generativelanguage.googleapis.com/v1beta/models",
+                            "mistral" => "https://api.mistral.ai/v1",
+                            "anthropic" => "https://api.anthropic.com/v1"
+                          }
+                        },
+                        "minLength" => 1
+                      },
+                      model: %{
+                        "type" => "string",
+                        "title" => "Model",
+                        "description" => "The model to use for the chat.",
+                        "url" =>
+                          "/api/organizations/{{organization_id}}/models?api_type={{opts.model_section.api_type}}&endpoint={{opts.model_section.endpoint}}&api_key={{opts.model_section.api_key}}",
+                        "presentAs" => "async-select",
+                        "minLength" => 1,
+                        "readonly" => true
+                      },
+                      temperature: %{
+                        "type" => "number",
+                        "title" => "Temperature",
+                        "description" => "The temperature of the chat.",
+                        "default" => 0.7,
+                        "minimum" => 0.0,
+                        "maximum" => 2.0,
+                        "step" => 0.1,
+                        "readonly" => true
+                      }
+                    )
                 },
                 chat_memory_type: %{
                   "type" => "string",
@@ -137,16 +154,6 @@ defmodule Buildel.Blocks.Chat do
                   "enumPresentAs" => "radio",
                   "default" => "full",
                   "minLength" => 1
-                },
-                temperature: %{
-                  "type" => "number",
-                  "title" => "Temperature",
-                  "description" => "The temperature of the chat.",
-                  "default" => 0.7,
-                  "minimum" => 0.0,
-                  "maximum" => 2.0,
-                  "step" => 0.1,
-                  "readonly" => true
                 },
                 max_tokens: %{
                   "type" => "number",

@@ -129,19 +129,93 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
 
       assert %{
                "inputs" => [
-                 %{"name" => "random_block:input", "public" => true, "type" => "audio"},
-                 %{"name" => "random_block_2:input", "public" => false, "type" => "audio"},
-                 %{"name" => "random_block_3:input", "public" => false, "type" => "text"},
-                 %{"name" => "random_block_4:input", "public" => false, "type" => "audio"}
+                 %{
+                   "name" => "random_block:input",
+                   "public" => true,
+                   "type" => "audio",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block:mute",
+                   "public" => false,
+                   "type" => "text",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block:unmute",
+                   "public" => false,
+                   "type" => "audio",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block_2:input",
+                   "public" => false,
+                   "type" => "audio",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block_3:input",
+                   "public" => false,
+                   "type" => "text",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block_4:input",
+                   "public" => false,
+                   "type" => "audio",
+                   "visible" => true
+                 }
                ],
                "ios" => [],
                "outputs" => [
-                 %{"name" => "random_block:output", "public" => false, "type" => "audio"},
-                 %{"name" => "random_block_2:output", "public" => false, "type" => "text"},
-                 %{"name" => "random_block_2:json_output", "public" => false, "type" => "text"},
-                 %{"name" => "random_block_3:output", "public" => true, "type" => "text"},
-                 %{"name" => "random_block_3:forward", "public" => false, "type" => "text"},
-                 %{"name" => "random_block_4:output", "public" => true, "type" => "audio"}
+                 %{
+                   "name" => "random_block:output",
+                   "public" => false,
+                   "type" => "audio",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block:status",
+                   "public" => true,
+                   "type" => "text",
+                   "visible" => false
+                 },
+                 %{
+                   "name" => "random_block_2:output",
+                   "public" => false,
+                   "type" => "text",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block_2:json_output",
+                   "public" => false,
+                   "type" => "text",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block_2:end",
+                   "public" => false,
+                   "type" => "text",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block_3:output",
+                   "public" => true,
+                   "type" => "text",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block_3:forward",
+                   "public" => false,
+                   "type" => "text",
+                   "visible" => true
+                 },
+                 %{
+                   "name" => "random_block_4:output",
+                   "public" => true,
+                   "type" => "audio",
+                   "visible" => true
+                 }
                ]
              } = response["data"]
 
@@ -166,16 +240,117 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
       assert json_response(conn, 200)["data"] == []
     end
 
-    test "lists all organization pipelines", %{
+    test "lists all organization pipelines if no pagination params provided", %{
       conn: conn,
       organization: organization,
       api_spec: api_spec
     } do
       organization_id = organization.id
       pipeline_fixture(%{organization_id: organization_id})
+      pipeline_fixture(%{organization_id: organization_id, favorite: true})
       conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines")
       response = json_response(conn, 200)
+
+      %{
+        "meta" => %{
+          "total" => 2,
+          "page" => 1,
+          "per_page" => 2
+        }
+      } = response
+
       assert_schema(response, "PipelineIndexResponse", api_spec)
+    end
+
+    test "lists paginated organization pipelines", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      pipeline_fixture(%{organization_id: organization_id})
+      pipeline_fixture(%{organization_id: organization_id, favorite: true})
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines?page=1&per_page=1")
+      response = json_response(conn, 200)
+
+      %{
+        "meta" => %{
+          "total" => 2,
+          "page" => 1,
+          "per_page" => 1
+        }
+      } = response
+
+      assert_schema(response, "PipelineIndexResponse", api_spec)
+    end
+
+    test "lists organization favorite pipelines", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      pipeline_fixture(%{organization_id: organization_id})
+      fixture = pipeline_fixture(%{organization_id: organization_id, favorite: true})
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines?favorites=true")
+      response = json_response(conn, 200)
+
+      fixture_id = fixture.id
+
+      %{
+        "data" => [%{"id" => ^fixture_id}],
+        "meta" => %{
+          "total" => 1,
+          "page" => 1,
+          "per_page" => 1
+        }
+      } = response
+
+      assert_schema(response, "PipelineIndexResponse", api_spec)
+    end
+  end
+
+  describe "favorite" do
+    setup [:create_pipeline]
+
+    test_requires_authentication %{conn: conn, organization: organization, pipeline: pipeline} do
+      post(conn, ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/favorite")
+    end
+
+    test "requires organization membership", %{conn: conn} do
+      another_organization = organization_fixture()
+
+      another_pipeline = pipeline_fixture(%{organization_id: another_organization.id})
+
+      conn =
+        get(
+          conn,
+          ~p"/api/organizations/#{another_organization.id}/pipelines/#{another_pipeline.id}/favorite"
+        )
+
+      assert json_response(conn, 404)
+    end
+
+    test "toggles pipeline favorite status", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline
+    } do
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/favorite"
+        )
+
+      assert json_response(conn, 200)["data"]["favorite"] == true
+
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization.id}/pipelines/#{pipeline.id}/favorite"
+        )
+
+      assert json_response(conn, 200)["data"]["favorite"] == false
     end
   end
 

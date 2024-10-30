@@ -64,9 +64,13 @@ export const loaderBuilder =
     }
   };
 
+export type ActionFunctionHelpers = {
+  fetch: typeof fetchTyped;
+};
+
 type ActionHandler<T> = (
   args: ActionFunctionArgs,
-  helpers: { fetch: typeof fetchTyped },
+  helpers: ActionFunctionHelpers,
 ) => Promise<T>;
 
 export const actionBuilder =

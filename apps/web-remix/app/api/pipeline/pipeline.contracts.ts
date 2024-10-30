@@ -47,12 +47,34 @@ export const InterfaceWebchatConfigForm = InterfaceConfigForm.extend({
     .optional()
     .default('Hello. How can I help you today?'),
   suggested_messages: z.array(z.string()).optional().default([]),
+  audio_inputs: z
+    .union([
+      z
+        .string()
+        .transform(
+          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[],
+        ),
+      z.array(InterfaceConfigFormProperty),
+    ])
+    .default([]),
+  audio_outputs: z
+    .union([
+      z
+        .string()
+        .transform(
+          (value) => JSON.parse(value) as IInterfaceConfigFormProperty[],
+        ),
+      z.array(InterfaceConfigFormProperty),
+    ])
+    .default([]),
 });
 
 export const InterfaceConfig = z.object({
   webchat: InterfaceWebchatConfigForm.optional().default({
     inputs: [] as IInterfaceConfigFormProperty[],
     outputs: [] as IInterfaceConfigFormProperty[],
+    audio_inputs: [] as IInterfaceConfigFormProperty[],
+    audio_outputs: [] as IInterfaceConfigFormProperty[],
     description: 'Hello. How can I help you today?',
     suggested_messages: [] as string[],
     public: false,
@@ -73,6 +95,8 @@ export const SafeInterfaceConfig = z
           webchat: {
             inputs: [] as IInterfaceConfigFormProperty[],
             outputs: [] as IInterfaceConfigFormProperty[],
+            audio_outputs: [] as IInterfaceConfigFormProperty[],
+            audio_inputs: [] as IInterfaceConfigFormProperty[],
             description: 'Hello. How can I help you today?',
             suggested_messages: [] as string[],
             public: false,
@@ -88,6 +112,8 @@ export const SafeInterfaceConfig = z
     webchat: {
       inputs: [] as IInterfaceConfigFormProperty[],
       outputs: [] as IInterfaceConfigFormProperty[],
+      audio_outputs: [] as IInterfaceConfigFormProperty[],
+      audio_inputs: [] as IInterfaceConfigFormProperty[],
       description: 'Hello. How can I help you today?',
       suggested_messages: [] as string[],
       public: false,
@@ -106,6 +132,7 @@ export const Pipeline = z.object({
   runs_count: z.number(),
   budget_limit: z.union([zfd.numeric(), z.null()]),
   logs_enabled: z.boolean(),
+  favorite: z.boolean().optional(),
   interface_config: SafeInterfaceConfig,
   config: z.object({
     version: z.string(),
@@ -220,7 +247,10 @@ export const PipelineResponse = z
     return response.data;
   });
 
-export const PipelinesResponse = z.object({ data: z.array(Pipeline) });
+export const PipelinesResponse = z.object({
+  data: z.array(Pipeline),
+  meta: PaginationMeta,
+});
 
 export type IPipelinesResponse = z.TypeOf<typeof PipelinesResponse>;
 
@@ -316,7 +346,7 @@ export const PipelineRunLogsResponse = z.object({
   data: z.array(PipelineRunLog),
   meta: z.object({
     after: z.string().nullish(),
-    totalItems: z.number().nullish(),
+    total: z.number().nullish(),
   }),
 });
 

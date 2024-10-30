@@ -22,6 +22,7 @@ import {
   CardTitle,
 } from '~/components/ui/card';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
 import { routes } from '~/utils/routes.utils';
 
@@ -57,15 +58,24 @@ export const ExperimentsList: React.FC<ExperimentsListProps> = ({ items }) => {
           There are no Experiments yet...
         </EmptyMessage>
       }
-      renderItem={(item) => (
-        <BasicLink to={routes.experiment(organizationId, item.id)}>
-          <ExperimentsListItem
-            data={item}
-            organizationId={organizationId}
-            onDelete={handleDelete}
-          />
-        </BasicLink>
-      )}
+      renderItem={(item) => {
+        const disabled = !item.pipeline;
+
+        return (
+          <BasicLink
+            to={!disabled ? routes.experiment(organizationId, item.id) : ''}
+            className={cn({ 'cursor-not-allowed opacity-50': disabled })}
+            aria-disabled={disabled}
+          >
+            <ExperimentsListItem
+              data={item}
+              organizationId={organizationId}
+              onDelete={handleDelete}
+              disabled={disabled}
+            />
+          </BasicLink>
+        );
+      }}
     />
   );
 };
@@ -74,11 +84,13 @@ interface ExperimentsListItemProps {
   data: IExperiment;
   organizationId: string;
   onDelete: (experiment: IExperiment) => void;
+  disabled?: boolean;
 }
 
 export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
   data,
   onDelete,
+  disabled,
 }) => {
   const deleteDataset = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -88,9 +100,15 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
   };
 
   return (
-    <Card>
+    <Card className={cn({ 'hover:border-input': disabled })}>
       <CardHeader className="max-w-full flex-row gap-2 items-center justify-between space-y-0">
-        <CardTitle className="line-clamp-2">{data.name}</CardTitle>
+        <CardTitle
+          className={cn('line-clamp-2', {
+            'group-hover:text-foreground': disabled,
+          })}
+        >
+          {data.name}
+        </CardTitle>
 
         <MenuDropdown>
           <MenuDropdownTrigger
@@ -121,9 +139,9 @@ export const ExperimentsListItem: React.FC<ExperimentsListItemProps> = ({
             <CardContentColumnTitle>Workflow</CardContentColumnTitle>
             <CardContentColumnValue
               className="line-clamp-1"
-              title={data.pipeline.name}
+              title={data.pipeline?.name}
             >
-              {data.pipeline.name}
+              {data.pipeline?.name ? data.pipeline.name : 'N/A'}
             </CardContentColumnValue>
           </CardContentColumnWrapper>
 

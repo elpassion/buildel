@@ -2,26 +2,29 @@ import { useEffect, useRef, useState } from 'react';
 import { BuildelSocket } from '@buildel/buildel';
 import type {
   BuildelRun,
+  BuildelRunHandlers,
   BuildelRunJoinArgs,
   BuildelRunStartArgs,
   BuildelRunStatus,
+  BuildelSocketOptions,
 } from '@buildel/buildel';
 
 import { assert } from '~/utils/assert';
 
-export function usePipelineRun(
-  organizationId: number,
-  pipelineId: number,
-  onBlockOutput: (
-    blockId: string,
-    outputName: string,
-    payload: unknown,
-  ) => void = () => {},
-  onBlockStatusChange: (blockId: string, isWorking: boolean) => void = () => {},
-  onBlockError: (blockId: string, errors: string[]) => void,
-  onError: (error: string) => void,
-  useAuth: boolean = true,
-) {
+export type UsePipelineRunSocketArgs = BuildelSocketOptions;
+
+export type UsePipelineRunArgs = Partial<BuildelRunHandlers> & {
+  organizationId: number;
+  pipelineId: number;
+  socketArgs?: UsePipelineRunSocketArgs;
+};
+
+export function usePipelineRun({
+  organizationId,
+  pipelineId,
+  socketArgs = { useAuth: true },
+  ...rest
+}: UsePipelineRunArgs) {
   const buildel = useRef<BuildelSocket>();
   const run = useRef<BuildelRun>();
 
@@ -43,19 +46,20 @@ export function usePipelineRun(
     assert(run.current);
     run.current.push(topic, payload);
   };
+  const loadHistory = () => {
+    assert(run.current);
+    return run.current.loadHistory();
+  };
 
   useEffect(() => {
     buildel.current = new BuildelSocket(organizationId, {
       socketUrl: '/super-api/socket',
-      useAuth,
+      ...socketArgs,
     });
     buildel.current.connect().then((buildel) => {
       run.current = buildel.run(pipelineId, {
-        onBlockOutput,
-        onBlockStatusChange,
         onStatusChange: setStatus,
-        onBlockError: onBlockError,
-        onError: onError,
+        ...rest,
       });
     });
     return () => {
@@ -70,6 +74,7 @@ export function usePipelineRun(
     joinRun,
     stopRun,
     push,
+    loadHistory,
     id: run.current?.runId,
   };
 }
