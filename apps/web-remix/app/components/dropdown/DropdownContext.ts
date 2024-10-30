@@ -20,7 +20,7 @@ export const DropdownContext = React.createContext<
 >(undefined);
 
 export const useDropdown = () => {
-  const ctx = React.useContext(DropdownContext);
+  const ctx = React.use(DropdownContext);
 
   if (!ctx)
     throw new Error('useDropdown can be used only inside Dropdown component');

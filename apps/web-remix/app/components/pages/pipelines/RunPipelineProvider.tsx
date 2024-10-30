@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import React, {
   useCallback,
-  useContext,
+  use,
   useEffect,
   useMemo,
   useState,
@@ -220,7 +220,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
 };
 
 export const useRunPipeline = () => {
-  const ctx = useContext(RunPipelineContext);
+  const ctx = use(RunPipelineContext);
 
   if (!ctx) {
     throw new Error('useRunPipeline must be used within RunPipelineProvider');
@@ -230,7 +230,7 @@ export const useRunPipeline = () => {
 };
 
 export const useRunPipelineEdge = () => {
-  const ctx = useContext(RunPipelineContext);
+  const ctx = use(RunPipelineContext);
 
   if (!ctx) {
     throw new Error('useRunPipeline must be used within RunPipelineProvider');
@@ -245,7 +245,7 @@ export const useRunPipelineEdge = () => {
 
 export const useRunPipelineNode = (block: IBlockConfig) => {
   const blockName = block.name;
-  const ctx = useContext(RunPipelineContext);
+  const ctx = use(RunPipelineContext);
 
   if (!ctx) {
     throw new Error(

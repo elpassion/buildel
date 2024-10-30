@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, use } from 'react';
 
 import type { IKnowledgeBaseSearchChunk } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import type { IPrevNextNode } from '~/components/pages/knowledgeBase/collectionGraph/collectionGraph.types';
@@ -15,7 +15,7 @@ interface IActiveNodeContext {
 export const ActiveNodeContext = createContext<IActiveNodeContext | null>(null);
 export const ActiveNodeProvider = ActiveNodeContext.Provider;
 export const useActiveNode = () => {
-  const context = useContext(ActiveNodeContext);
+  const context = use(ActiveNodeContext);
   if (!context) {
     throw new Error('useActiveNode must be used within a ActiveNodeProvider');
   }

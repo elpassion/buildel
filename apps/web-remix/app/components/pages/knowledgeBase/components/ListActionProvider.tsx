@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, use, useEffect, useState } from 'react';
 import type { FetcherWithComponents } from '@remix-run/react';
 import { useFetcher } from '@remix-run/react';
 
@@ -73,7 +73,7 @@ export const ListActionProvider = ({
 };
 
 export const useListAction = () => {
-  const context = useContext(ListActionContext);
+  const context = use(ListActionContext);
   if (context === undefined) {
     throw new Error('useListAction must be used within a ListActionProvider');
   }

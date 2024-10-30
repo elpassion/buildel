@@ -521,7 +521,7 @@ const InputsProvider: React.FC<{
 };
 
 export function useInputs() {
-  return React.useContext(InputsContext);
+  return React.use(InputsContext);
 }
 
 interface CopyConfigurationButtonProps {

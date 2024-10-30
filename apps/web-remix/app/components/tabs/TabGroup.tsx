@@ -36,7 +36,7 @@ export const TabGroup: React.FC<TabGroupProps> = ({
 };
 
 export const useTabsContext = () => {
-  const ctx = React.useContext(TabsContext);
+  const ctx = React.use(TabsContext);
 
   if (!ctx) {
     throw new Error(

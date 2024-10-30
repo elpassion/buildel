@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import React, { createContext, useContext } from 'react';
+import React, { createContext, use } from 'react';
 import { X } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
@@ -75,7 +75,7 @@ const NodePreviewSidebarContext =
   createContext<INodePreviewSidebarContext | null>(null);
 
 function useNodePreviewSidebar() {
-  const context = useContext(NodePreviewSidebarContext);
+  const context = use(NodePreviewSidebarContext);
   if (!context) {
     throw new Error(
       'useNodePreviewSidebar must be used within a NodePreviewSidebarProvider',
