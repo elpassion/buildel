@@ -16,6 +16,12 @@ defmodule Buildel.Blocks.NewChat do
 
   defoutput(:output, schema: %{})
 
+  # defsection(:model,
+  #   title: "Model",
+  #   description: "Model parameters",
+  #   properties: [:query, :api_type, :api_key, :endpoint, :model]
+  # )
+
   deftool(:query,
     description:
       "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.
@@ -35,15 +41,18 @@ defmodule Buildel.Blocks.NewChat do
     }
   )
 
-  defoption(:api_type, %{
-    "type" => "string",
-    "title" => "Model API type",
-    "description" => "The API type to use for the chat.",
-    "enum" => ["openai", "azure", "google", "mistral", "anthropic"],
-    "enumPresentAs" => "radio",
-    "default" => "openai",
-    "readonly" => true
-  })
+  defoption(
+    :api_type,
+    %{
+      "type" => "string",
+      "title" => "Model API type",
+      "description" => "The API type to use for the chat.",
+      "enum" => ["openai", "azure", "google", "mistral", "anthropic"],
+      "enumPresentAs" => "radio",
+      "default" => "openai",
+      "readonly" => true
+    }
+  )
 
   defoption(
     :api_key,
@@ -101,16 +110,6 @@ defmodule Buildel.Blocks.NewChat do
     "readonly" => true
   })
 
-  defoption(:chat_memory_type, %{
-    "type" => "string",
-    "title" => "Chat memory type",
-    "description" => "The chat memory type to use for the chat.",
-    "enum" => ["off", "full", "rolling"],
-    "enumPresentAs" => "radio",
-    "default" => "full",
-    "minLength" => 1
-  })
-
   defoption(:temperature, %{
     "type" => "number",
     "title" => "Temperature",
@@ -120,6 +119,16 @@ defmodule Buildel.Blocks.NewChat do
     "maximum" => 2.0,
     "step" => 0.1,
     "readonly" => true
+  })
+
+  defoption(:chat_memory_type, %{
+    "type" => "string",
+    "title" => "Chat memory type",
+    "description" => "The chat memory type to use for the chat.",
+    "enum" => ["off", "full", "rolling"],
+    "enumPresentAs" => "radio",
+    "default" => "full",
+    "minLength" => 1
   })
 
   defoption(

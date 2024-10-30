@@ -209,12 +209,12 @@ end
 
 defmodule Buildel.Blocks.NewBlock.Input do
   @derive Jason.Encoder
-  defstruct [:name, :schema, type: :text, public: false]
+  defstruct [:name, :schema, type: :text, public: false, visible: true]
 end
 
 defmodule Buildel.Blocks.NewBlock.Output do
   @derive Jason.Encoder
-  defstruct [:name, :schema, type: :text, public: false]
+  defstruct [:name, :schema, type: :text, public: false, visible: true]
 end
 
 defmodule Buildel.Blocks.NewBlock.Tool do
@@ -242,7 +242,8 @@ defmodule Buildel.Blocks.NewBlock.Definput do
       require Logger
 
       {:ok, options} =
-        unquote(options) |> Keyword.validate(public: false, type: :text, schema: %{})
+        unquote(options)
+        |> Keyword.validate(public: false, type: :text, schema: %{}, visible: true)
 
       ExJsonSchema.Schema.resolve(options[:schema])
 
@@ -251,7 +252,8 @@ defmodule Buildel.Blocks.NewBlock.Definput do
           name: unquote(name),
           schema: unquote(options[:schema]),
           public: options[:public],
-          type: options[:type]
+          type: options[:type],
+          visible: options[:visible]
         }
         | @inputs
       ]
@@ -362,7 +364,8 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
   defmacro defoutput(name, options \\ []) do
     quote do
       {:ok, options} =
-        unquote(options) |> Keyword.validate(public: false, type: :text, schema: %{})
+        unquote(options)
+        |> Keyword.validate(public: false, type: :text, schema: %{}, visible: true)
 
       ExJsonSchema.Schema.resolve(options[:schema])
 
@@ -373,7 +376,8 @@ defmodule Buildel.Blocks.NewBlock.Defoutput do
           name: unquote(name),
           schema: unquote(options[:schema]),
           public: options[:public],
-          type: options[:type]
+          type: options[:type],
+          visible: options[:visible]
         }
         | @outputs
       ]

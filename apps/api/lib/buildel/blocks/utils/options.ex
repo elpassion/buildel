@@ -21,11 +21,11 @@ defmodule Buildel.Blocks.Utils.Options do
   def set_tools(options, tools, tool_controller?) do
     ios =
       tools
-      |> Enum.map(&%{name: &1.name, type: :worker, public: false})
+      |> Enum.map(&%{name: &1.name, type: :worker, public: false, visible: true})
 
     ios =
       if tool_controller?,
-        do: ios ++ [%{name: :tools, type: :controller, public: false}],
+        do: ios ++ [%{name: :tools, type: :controller, public: false, visible: true}],
         else: ios
 
     %{options | ios: ios}
