@@ -1,3 +1,4 @@
+import startCase from 'lodash.startcase';
 import { z } from 'zod';
 
 import { MonetaryValue } from '~/utils/MonetaryValue';
@@ -94,6 +95,7 @@ export const Subscription = z
       knowledge_bases_limit: Number(sub.features.knowledge_bases_limit),
     },
     isCanceled: sub.status === 'canceled',
+    name: startCase(sub.type),
     usage: {
       ...sub.usage,
       runs_limit: Number(sub.usage.runs_limit),

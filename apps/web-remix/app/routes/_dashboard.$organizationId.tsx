@@ -274,14 +274,14 @@ function SidebarUsageProgress({
         })}
       >
         <UsageCircleProgress
-          usage={321}
+          usage={subscription.usage.runs_limit}
           maxUsage={subscription.features.runs_limit}
         />
       </div>
 
       <div
         className={cn(
-          'transition-opacity bg-muted rounded-lg col-start-1 row-start-1 p-2 flex gap-2 justify-between items-end',
+          'transition-opacity bg-muted/70 rounded-lg col-start-1 row-start-1 p-2 flex gap-2 justify-between items-end',
           {
             'opacity-100': !isCollapsed,
             'opacity-0 pointer-events-none': isCollapsed,
@@ -289,6 +289,7 @@ function SidebarUsageProgress({
         )}
       >
         <div className="text-xs grow flex flex-col gap-1">
+          <p className="font-medium mb-1">{subscription.name}</p>
           <p className="flex gap-1 justify-between items-center">
             <span>Total</span>
             <span>{subscription.features.runs_limit}</span>

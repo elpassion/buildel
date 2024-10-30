@@ -23,7 +23,6 @@ export function UsageText({
       <span className="text-foreground">
         {usage}/{maxUsage}
       </span>
-      <span className="text-muted-foreground">runs used</span>
     </p>
   );
 }

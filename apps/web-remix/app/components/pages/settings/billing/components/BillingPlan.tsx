@@ -135,7 +135,7 @@ function BillingPlanListItem({
       {...rest}
     >
       {recommended ? (
-        <div className="absolute top-0 right-1/2 translate-x-1/2 bg-primary text-white text-sm px-3 py-1 rounded-bl-lg rounded-br-lg">
+        <div className="absolute top-0 right-0 bg-primary text-white text-sm px-3 py-1 rounded-bl-lg">
           Most popular
         </div>
       ) : null}
@@ -149,12 +149,6 @@ function BillingPlanListItem({
         >
           {data.name}
         </h3>
-
-        {canceled ? (
-          <p className="text-muted-foreground text-xs mt-0.5">
-            Will be canceled
-          </p>
-        ) : null}
       </div>
 
       <p>
@@ -186,6 +180,7 @@ function BillingPlanListItem({
           className="mb-10"
         >
           {active ? 'Current plan' : 'Subscribe'}
+          {canceled ? ' (canceled)' : ''}
         </SubmitButton>
       </ValidatedForm>
 
