@@ -511,11 +511,11 @@ const InputsProvider: React.FC<{
 }> = ({ connections, updateInputReset, updateInputOptional, children }) => {
   return (
     <>
-      <InputsContext.Provider
+      <InputsContext
         value={{ connections, updateInputReset, updateInputOptional }}
       >
         {children}
-      </InputsContext.Provider>
+      </InputsContext>
     </>
   );
 };

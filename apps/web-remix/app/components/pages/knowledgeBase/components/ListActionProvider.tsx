@@ -56,7 +56,7 @@ export const ListActionProvider = ({
   const isSelected = (id: string) => selectedItems.includes(id);
 
   return (
-    <ListActionContext.Provider
+    <ListActionContext
       value={{
         toggleSelection,
         isSelected,
@@ -68,7 +68,7 @@ export const ListActionProvider = ({
       }}
     >
       {children}
-    </ListActionContext.Provider>
+    </ListActionContext>
   );
 };
 

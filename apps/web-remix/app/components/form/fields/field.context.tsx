@@ -9,9 +9,7 @@ export function Field({
   children: React.ReactNode;
   name: string;
 }) {
-  return (
-    <FieldContext.Provider value={{ name }}>{children}</FieldContext.Provider>
-  );
+  return <FieldContext value={{ name }}>{children}</FieldContext>;
 }
 
 export function HiddenField({

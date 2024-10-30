@@ -1,7 +1,7 @@
 import {
   createContext,
-  useCallback,
   use,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -140,7 +140,7 @@ export const Sidebar = (props: SidebarProps) => {
   );
 
   return (
-    <SidebarContext.Provider value={contextValue}>
+    <SidebarContext value={contextValue}>
       <div
         className={cn(sidebarStyles(), className)}
         tabIndex={tabIndex}
@@ -166,7 +166,7 @@ export const Sidebar = (props: SidebarProps) => {
           </aside>
         </div>
       </div>
-    </SidebarContext.Provider>
+    </SidebarContext>
   );
 };
 
