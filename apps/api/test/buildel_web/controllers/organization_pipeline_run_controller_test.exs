@@ -251,24 +251,24 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       assert json_response(conn, 404)
     end
 
-    # test "creates run with latest alias by default", %{
-    #   conn: conn,
-    #   organization: organization,
-    #   pipeline: pipeline,
-    #   api_spec: api_spec
-    # } do
-    #   conn = post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
-    #   blocks = pipeline.config["blocks"]
+    test "creates run with latest alias by default", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      api_spec: api_spec
+    } do
+      conn = post(conn, ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs")
+      blocks = pipeline.config["blocks"]
 
-    #   response = json_response(conn, 200)
+      response = json_response(conn, 200)
 
-    #   assert %{
-    #            "status" => "created",
-    #            "config" => %{"metadata" => %{}, "blocks" => ^blocks}
-    #          } = response["data"]
+      assert %{
+               "status" => "created",
+               "config" => %{"metadata" => %{}, "blocks" => ^blocks}
+             } = response["data"]
 
-    #   assert_schema(response, "RunShowResponse", api_spec)
-    # end
+      assert_schema(response, "RunShowResponse", api_spec)
+    end
 
     test "saves metadata", %{
       conn: conn,
@@ -293,31 +293,31 @@ defmodule BuildelWeb.OrganizationPipelineRunControllerTest do
       assert_schema(response, "RunShowResponse", api_spec)
     end
 
-    # test "creates run with specific alias", %{
-    #   conn: conn,
-    #   organization: organization,
-    #   pipeline: pipeline,
-    #   alias: %{config: config, id: id},
-    #   api_spec: api_spec
-    # } do
-    #   conn =
-    #     post(
-    #       conn,
-    #       ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs",
-    #       %{"alias" => id}
-    #     )
+    test "creates run with specific alias", %{
+      conn: conn,
+      organization: organization,
+      pipeline: pipeline,
+      alias: %{config: config, id: id},
+      api_spec: api_spec
+    } do
+      conn =
+        post(
+          conn,
+          ~p"/api/organizations/#{organization}/pipelines/#{pipeline}/runs",
+          %{"alias" => id}
+        )
 
-    #   blocks = config["blocks"]
+      blocks = config["blocks"]
 
-    #   response = json_response(conn, 200)
+      response = json_response(conn, 200)
 
-    #   assert %{
-    #            "status" => "created",
-    #            "config" => %{"metadata" => %{}, "blocks" => ^blocks}
-    #          } = response["data"]
+      assert %{
+               "status" => "created",
+               "config" => %{"metadata" => %{}, "blocks" => ^blocks}
+             } = response["data"]
 
-    #   assert_schema(response, "RunShowResponse", api_spec)
-    # end
+      assert_schema(response, "RunShowResponse", api_spec)
+    end
   end
 
   describe "start" do
