@@ -27,10 +27,10 @@ export function SettingsLayout() {
         <TabGroup>
           <FilledTabsWrapper>
             <FilledTabLink to={routes.organizationSettings(organizationId)}>
-              Your Organization
+              Organization
             </FilledTabLink>
             <FilledTabLink to={routes.profileSettings(organizationId)}>
-              Your Profile
+              Profile
             </FilledTabLink>
             <FilledTabLink to={routes.billing(organizationId)}>
               Billing

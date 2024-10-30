@@ -33,6 +33,7 @@ import {
   DropdownTrigger,
 } from '~/components/dropdown/Dropdown';
 import { IconButton } from '~/components/iconButton';
+import { BasicLink } from '~/components/link/BasicLink';
 import { UsageCircleProgress } from '~/components/pages/settings/billing/components/BillingProgress';
 import {
   NavMobileSidebar,
@@ -47,6 +48,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '~/components/ui/dropdown-menu';
+import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { useServerToasts } from '~/hooks/useServerToasts';
 import { requireLogin } from '~/session.server';
 import { loaderBuilder } from '~/utils.server';
@@ -265,6 +267,8 @@ function SidebarUsageProgress({
   isCollapsed?: boolean;
   subscription: ISubscription;
 }) {
+  const organizationId = useOrganizationId();
+
   return (
     <div className="grid grid-cols-1 grid-rows-1 items-end">
       <div
@@ -289,7 +293,15 @@ function SidebarUsageProgress({
         )}
       >
         <div className="text-xs grow flex flex-col gap-1">
-          <p className="font-medium mb-1">{subscription.name}</p>
+          <div className="flex justify-between gap-1">
+            <p className="font-medium mb-1">{subscription.name}</p>
+            <BasicLink
+              className="text-xs hover:underline"
+              to={routes.billing(organizationId)}
+            >
+              Upgrade
+            </BasicLink>
+          </div>
           <p className="flex gap-1 justify-between items-center">
             <span>Total</span>
             <span>{subscription.features.runs_limit}</span>
