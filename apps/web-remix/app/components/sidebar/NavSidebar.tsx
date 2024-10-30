@@ -8,12 +8,16 @@ import { PageOverlay } from '~/components/overlay/PageOverlay';
 import type { SidebarProps } from '~/components/sidebar/sidebar.types';
 import { Sidebar } from '~/components/sidebar/siebar';
 import { Tooltip } from '~/components/tooltip/Tooltip';
+import { useBreakpoints } from '~/hooks/useBreakpoints';
 import { cn } from '~/utils/cn';
 
 export const NavSidebar: React.FC<
   Omit<SidebarProps, 'collapsed' | 'onCollapse'>
 > = ({ children, ...props }) => {
   const { collapsed, toggleCollapse } = useNavSidebarContext();
+  const { isLarge } = useBreakpoints();
+
+  if (!isLarge) return null;
   return (
     <div className="hidden lg:block md:p-4">
       <Sidebar
@@ -34,11 +38,14 @@ export const NavMobileSidebar: React.FC<
   Omit<SidebarProps, 'collapsed' | 'onCollapse'>
 > = ({ children, ...props }) => {
   const { isOpen, closeSidebar } = useNavSidebarContext();
+  const { isLarge } = useBreakpoints();
   const location = useLocation();
 
   useEffect(() => {
     closeSidebar();
   }, [location.pathname]);
+
+  if (isLarge) return null;
   return (
     <>
       <PageOverlay

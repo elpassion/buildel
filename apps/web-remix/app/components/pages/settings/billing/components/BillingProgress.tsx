@@ -82,10 +82,7 @@ export function UsageCircleProgress({
   } satisfies ChartConfig;
 
   return (
-    <ChartContainer
-      config={chartConfig}
-      className="aspect-square h-[36px] w-[36px]"
-    >
+    <ChartContainer config={chartConfig} className="h-[36px] w-[36px]">
       <RadialBarChart
         data={chartData}
         startAngle={0}
