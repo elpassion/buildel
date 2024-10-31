@@ -32,11 +32,11 @@ export const TabGroup: React.FC<TabGroupProps> = ({
     };
   }, [activeTab, activeTabId, handleSetTabId, setActiveTab]);
 
-  return <TabsContext.Provider value={value}>{children}</TabsContext.Provider>;
+  return <TabsContext value={value}>{children}</TabsContext>;
 };
 
 export const useTabsContext = () => {
-  const ctx = React.useContext(TabsContext);
+  const ctx = React.use(TabsContext);
 
   if (!ctx) {
     throw new Error(

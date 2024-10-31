@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { use } from 'react';
 import { useField } from 'remix-validated-form';
 import type { ValidationBehaviorOptions } from 'remix-validated-form/browser/internal/getInputProps';
 
@@ -9,9 +9,7 @@ export function Field({
   children: React.ReactNode;
   name: string;
 }) {
-  return (
-    <FieldContext.Provider value={{ name }}>{children}</FieldContext.Provider>
-  );
+  return <FieldContext value={{ name }}>{children}</FieldContext>;
 }
 
 export function HiddenField({
@@ -34,7 +32,7 @@ export interface UseFieldContextProps {
 }
 
 export const useFieldContext = (args?: UseFieldContextProps) => {
-  const context = useContext(FieldContext);
+  const context = use(FieldContext);
   if (!context)
     throw new Error('You tried to use a field without using <Field />');
 

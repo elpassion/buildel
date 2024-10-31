@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import type * as RadioGroupPrimitive from '@radix-ui/react-radio-group';
 import { useControlField } from 'remix-validated-form';
 
@@ -11,24 +11,36 @@ import {
 import type { RadioGroupProps } from '~/components/ui/radio-group';
 import { RadioGroup } from '~/components/ui/radio-group';
 
-export const RadioField = forwardRef<HTMLButtonElement, RadioInputProps>(
-  ({ ...props }, ref) => {
-    return <RadioInput {...props} ref={ref} />;
-  },
-);
+export const RadioField = ({
+  ref,
+  ...props
+}: RadioInputProps & {
+  ref?: React.RefObject<HTMLButtonElement | null>;
+}) => {
+  return <RadioInput {...props} ref={ref} />;
+};
 RadioField.displayName = 'RadioField';
 
-export const RadioTabField = forwardRef<HTMLButtonElement, RadioInputProps>(
-  ({ ...props }, ref) => {
-    return <RadioTabInput {...props} ref={ref} />;
-  },
-);
+export const RadioTabField = ({
+  ref,
+  ...props
+}: RadioInputProps & {
+  ref?: React.RefObject<HTMLButtonElement | null>;
+}) => {
+  return <RadioTabInput {...props} ref={ref} />;
+};
 RadioTabField.displayName = 'RadioTabField';
 
-export const RadioGroupField = forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Root>,
-  RadioGroupProps
->(({ defaultValue, onChange, ...props }, ref) => {
+export const RadioGroupField = ({
+  ref,
+  defaultValue,
+  onChange,
+  ...props
+}: RadioGroupProps & {
+  ref?: React.RefObject<React.ElementRef<
+    typeof RadioGroupPrimitive.Root
+  > | null>;
+}) => {
   const { name, getInputProps, validate } = useFieldContext();
   const [formValue, setFormValue] = useControlField<string>(name);
   useEffect(() => {
@@ -61,5 +73,5 @@ export const RadioGroupField = forwardRef<
       value={props.value ?? formValue}
     />
   );
-});
+};
 RadioGroupField.displayName = 'RadioGroupField';

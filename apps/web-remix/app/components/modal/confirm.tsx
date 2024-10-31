@@ -36,6 +36,8 @@ function domRender(
 ) {
   const root = ReactDom.createRoot(container);
 
+  // eslint-disable-next-line
+  // @ts-ignore
   root.render(element);
 
   return root;

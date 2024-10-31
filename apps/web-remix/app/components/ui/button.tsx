@@ -44,34 +44,34 @@ export interface ButtonProps
   isFluid?: boolean;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
-      className,
-      variant,
-      disabled,
-      isFluid,
-      isLoading,
-      size,
-      asChild = false,
-      ...props
-    },
-    ref,
-  ) => {
-    const Comp = asChild ? Slot : 'button';
-    return (
-      <Comp
-        disabled={disabled ?? isLoading}
-        className={cn(buttonVariants({ variant, size, className }), {
-          'animate-pulse': isLoading,
-          'w-full': isFluid,
-        })}
-        ref={ref}
-        {...props}
-      />
-    );
-  },
-);
+const Button = ({
+  ref,
+  className,
+  variant,
+  disabled,
+  isFluid,
+  isLoading,
+  size,
+  asChild = false,
+  ...props
+}: ButtonProps & {
+  ref?:
+    | React.RefObject<HTMLButtonElement>
+    | ((instance: HTMLButtonElement | null) => void);
+}) => {
+  const Comp = asChild ? Slot : 'button';
+  return (
+    <Comp
+      disabled={disabled ?? isLoading}
+      className={cn(buttonVariants({ variant, size, className }), {
+        'animate-pulse': isLoading,
+        'w-full': isFluid,
+      })}
+      ref={ref}
+      {...props}
+    />
+  );
+};
 Button.displayName = 'Button';
 
 export { Button, buttonVariants };

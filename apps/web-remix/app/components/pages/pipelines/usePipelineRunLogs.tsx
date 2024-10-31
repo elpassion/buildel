@@ -17,8 +17,8 @@ export function usePipelineRunLogs(
   onError: (error: string) => void = () => {},
   useAuth: boolean = true,
 ) {
-  const buildel = useRef<BuildelSocket>();
-  const run = useRef<BuildelRunLogs>();
+  const buildel = useRef<BuildelSocket>(null);
+  const run = useRef<BuildelRunLogs>(null);
 
   const [status, setStatus] = useState<ConnectionState>('closed');
 

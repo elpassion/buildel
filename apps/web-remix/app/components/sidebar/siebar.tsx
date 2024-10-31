@@ -1,7 +1,7 @@
 import {
   createContext,
+  use,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -29,7 +29,7 @@ interface ISidebarContext {
 export const SidebarContext = createContext<ISidebarContext>(undefined!);
 
 export const useSidebar = () => {
-  const context = useContext(SidebarContext);
+  const context = use(SidebarContext);
 
   if (!context) {
     throw new Error('useSidebar must be used within SidebarContext');
@@ -140,7 +140,7 @@ export const Sidebar = (props: SidebarProps) => {
   );
 
   return (
-    <SidebarContext.Provider value={contextValue}>
+    <SidebarContext value={contextValue}>
       <div
         className={cn(sidebarStyles(), className)}
         tabIndex={tabIndex}
@@ -166,7 +166,7 @@ export const Sidebar = (props: SidebarProps) => {
           </aside>
         </div>
       </div>
-    </SidebarContext.Provider>
+    </SidebarContext>
   );
 };
 

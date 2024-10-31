@@ -85,7 +85,7 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
   };
 
   return (
-    <DropdownContext.Provider
+    <DropdownContext
       value={{
         isShown: isShown,
         hide,
@@ -97,7 +97,7 @@ export const Dropdown: React.FC<PropsWithChildren<DropdownProps>> = ({
       }}
     >
       {children}
-    </DropdownContext.Provider>
+    </DropdownContext>
   );
 };
 

@@ -12,10 +12,14 @@ export type CheckboxProps = React.ComponentPropsWithoutRef<
   size?: CheckboxSize;
 };
 
-const Checkbox = React.forwardRef<
-  React.ElementRef<typeof CheckboxPrimitive.Root>,
-  CheckboxProps
->(({ className, size, ...props }, ref) => (
+const Checkbox = ({
+  ref,
+  className,
+  size,
+  ...props
+}: CheckboxProps & {
+  ref?: React.RefObject<React.ElementRef<typeof CheckboxPrimitive.Root>>;
+}) => (
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
@@ -31,7 +35,7 @@ const Checkbox = React.forwardRef<
       <Check className={cn(getSize(size))} />
     </CheckboxPrimitive.Indicator>
   </CheckboxPrimitive.Root>
-));
+);
 Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
 export { Checkbox };

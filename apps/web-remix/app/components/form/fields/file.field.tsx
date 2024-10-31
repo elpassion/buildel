@@ -1,14 +1,13 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
 
 import { SmallFileInput } from '../inputs/file.input';
 import type { SmallFileInputProps } from '../inputs/file.input';
 
-export const SmallFileInputField = forwardRef<
-  HTMLInputElement,
-  SmallFileInputProps
->(({ ...props }) => {
+export const SmallFileInputField = ({
+  ...props
+}: SmallFileInputProps & { ref?: React.RefObject<HTMLInputElement> }) => {
   const { name, getInputProps, error } = useFieldContext();
 
   return (
@@ -23,5 +22,5 @@ export const SmallFileInputField = forwardRef<
       {...props}
     />
   );
-});
+};
 SmallFileInputField.displayName = 'SmallFileInputField';

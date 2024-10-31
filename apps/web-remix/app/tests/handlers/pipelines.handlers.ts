@@ -30,6 +30,11 @@ export class PipelineHandlers {
         return HttpResponse.json<IPipelinesResponse>(
           {
             data: [...this.pipelines.values()],
+            meta: {
+              total: this.pipelines.size,
+              page: 1,
+              per_page: 10,
+            },
           },
           { status: 200 },
         );

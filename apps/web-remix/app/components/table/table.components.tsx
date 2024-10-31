@@ -1,10 +1,5 @@
 import type { ReactElement, ReactNode } from 'react';
-import React, {
-  cloneElement,
-  forwardRef,
-  isValidElement,
-  useMemo,
-} from 'react';
+import React, { cloneElement, isValidElement, useMemo } from 'react';
 
 import type { BasicLinkProps } from '~/components/link/BasicLink';
 import { BasicLink } from '~/components/link/BasicLink';
@@ -131,12 +126,15 @@ export const TableBodyCell = ({
 
 type ExternalLinkCellProps = Omit<BasicLinkProps, 'children'> & {
   icon: ReactNode;
+  ref?: React.RefObject<HTMLButtonElement>;
 };
 
-export const ExternalLinkCell = forwardRef<
-  HTMLButtonElement,
-  ExternalLinkCellProps
->(({ className, icon, ...rest }, ref) => {
+export const ExternalLinkCell = ({
+  ref,
+  className,
+  icon,
+  ...rest
+}: ExternalLinkCellProps) => {
   const modifiedIcon = isValidElement(icon)
     ? cloneElement(icon, {
         // @ts-ignore
@@ -151,7 +149,7 @@ export const ExternalLinkCell = forwardRef<
       </BasicLink>
     </Button>
   );
-});
+};
 
 ExternalLinkCell.displayName = 'ExternalLinkCell';
 

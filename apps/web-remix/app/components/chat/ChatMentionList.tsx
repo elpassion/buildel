@@ -17,10 +17,14 @@ interface ChatMentionListActions {
   onKeyDown: (props: SuggestionKeyDownProps) => void;
 }
 
-export const ChatMentionList = React.forwardRef<
-  ChatMentionListActions,
-  ChatMentionListProps
->(({ clientRect, command, items }, ref) => {
+export const ChatMentionList = ({
+  ref,
+  clientRect,
+  command,
+  items,
+}: ChatMentionListProps & {
+  ref?: React.RefObject<ChatMentionListActions>;
+}) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const selectItem = (index: number) => {
@@ -114,4 +118,4 @@ export const ChatMentionList = React.forwardRef<
       </div>
     </FloatingPortal>
   );
-});
+};
