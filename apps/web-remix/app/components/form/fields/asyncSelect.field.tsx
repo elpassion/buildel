@@ -71,7 +71,7 @@ export const AsyncSelectField = forwardRef<
             return opts;
           });
       },
-      [url, selectedId],
+      [url],
     );
 
     return (

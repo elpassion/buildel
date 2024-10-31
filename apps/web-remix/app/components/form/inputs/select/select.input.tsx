@@ -67,7 +67,7 @@ export const AsyncSelectInput = <T = {},>({
 
         abortController.current = null;
       });
-  }, [fetchOptions, debouncedSearch]);
+  }, [fetchOptions]);
 
   const debouncedLoadOptions = debounce(() => {
     loadOptions();
@@ -79,7 +79,9 @@ export const AsyncSelectInput = <T = {},>({
     return () => {
       debouncedLoadOptions.cancel();
     };
-  }, [debouncedSearch, loadOptions]);
+
+    // do not refresh options when searchValue changes for now. API is not ready for it yet. Search value is used for client side filtering only.
+  }, [loadOptions]);
 
   useEffect(() => {
     onOptionsFetchStateChange?.(loading ? 'loading' : 'idle');
