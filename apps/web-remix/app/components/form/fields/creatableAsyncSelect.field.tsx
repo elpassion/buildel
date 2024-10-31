@@ -1,5 +1,5 @@
 import type { FormEvent, PropsWithChildren, ReactNode } from 'react';
-import React, { forwardRef, useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
 import { useControlField, ValidatedForm } from 'remix-validated-form';
 
@@ -58,162 +58,147 @@ export interface CreatableAsyncSelectFieldProps
   }) => ReactNode;
 }
 
-export const CreatableAsyncSelectField = forwardRef<
-  HTMLSelectElement,
-  CreatableAsyncSelectFieldProps
->(
-  (
-    {
-      label,
-      supportingText,
-      url,
-      errorMessage,
-      defaultValue,
-      renderForm,
-      ...props
+export const CreatableAsyncSelectField = ({
+  label,
+  supportingText,
+  url,
+  errorMessage,
+  defaultValue,
+  renderForm,
+  ...props
+}: CreatableAsyncSelectFieldProps & {
+  ref?: React.RefObject<HTMLSelectElement>;
+}) => {
+  const { name, getInputProps, validate } = useFieldContext({
+    validationBehavior: {
+      initial: 'onBlur',
+      whenTouched: 'onBlur',
+      whenSubmitted: 'onBlur',
     },
-    _ref,
+  });
+  const { isModalOpen, openModal, closeModal, changeOpen } = useModal();
+
+  const [state, setState] = useState<AsyncSelectInputFetchingState>('loading');
+  const [options, setOptions] = useState<{ value: string; label: string }[]>(
+    [],
+  );
+  const [selectedId, setSelectedId] = useControlField<string | undefined>(name);
+
+  useEffect(() => {
+    if (state === 'loading') return;
+    const doesSelectedIdExist = options.some((opt) => opt.value === selectedId);
+
+    if (!doesSelectedIdExist) {
+      setSelectedId(undefined);
+      validate();
+    }
+  }, [options, selectedId, state]);
+
+  useEffect(() => {
+    if (
+      defaultValue &&
+      options.some((opt) => opt.value === defaultValue) &&
+      !selectedId
+    ) {
+      setSelectedId(defaultValue);
+      validate();
+    }
+  }, [defaultValue, options, selectedId]);
+
+  const onOptionsFetch = (options: { value: string; label: string }[]) => {
+    setOptions(options);
+  };
+
+  const onOptionsFetchStateChange = (state: AsyncSelectInputFetchingState) => {
+    setState(state);
+  };
+
+  const onChange = (id: string) => {
+    setSelectedId(id);
+    validate();
+  };
+
+  const handleCreate = async (
+    data: Record<string, any>,
+    e: FormEvent<HTMLFormElement>,
   ) => {
-    const { name, getInputProps, validate } = useFieldContext({
-      validationBehavior: {
-        initial: 'onBlur',
-        whenTouched: 'onBlur',
-        whenSubmitted: 'onBlur',
-      },
-    });
-    const { isModalOpen, openModal, closeModal, changeOpen } = useModal();
-
-    const [state, setState] =
-      useState<AsyncSelectInputFetchingState>('loading');
-    const [options, setOptions] = useState<{ value: string; label: string }[]>(
-      [],
-    );
-    const [selectedId, setSelectedId] = useControlField<string | undefined>(
-      name,
-    );
-
-    useEffect(() => {
-      if (state === 'loading') return;
-      const doesSelectedIdExist = options.some(
-        (opt) => opt.value === selectedId,
+    e.preventDefault();
+    try {
+      const newItem = await asyncSelectApi.createData(
+        url,
+        data as IAsyncSelectItem,
       );
 
-      if (!doesSelectedIdExist) {
-        setSelectedId(undefined);
-        validate();
-      }
-    }, [options, selectedId, state]);
+      onChange(newItem.id.toString());
+      successToast({ title: 'Success', description: 'Item created!' });
+      closeModal();
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
-    useEffect(() => {
-      if (
-        defaultValue &&
-        options.some((opt) => opt.value === defaultValue) &&
-        !selectedId
-      ) {
-        setSelectedId(defaultValue);
-        validate();
-      }
-    }, [defaultValue, options, selectedId]);
+  const fetcher = useCallback(
+    async (_search: string, args?: RequestInit) => {
+      return asyncSelectApi.getData(url, args).then((opts) => {
+        return opts.map(toSelectOption);
+      });
+    },
+    [url, isModalOpen],
+  );
 
-    const onOptionsFetch = (options: { value: string; label: string }[]) => {
-      setOptions(options);
-    };
+  return (
+    <>
+      <HiddenField value={selectedId ?? ''} {...getInputProps()} />
 
-    const onOptionsFetchStateChange = (
-      state: AsyncSelectInputFetchingState,
-    ) => {
-      setState(state);
-    };
+      <div className="flex justify-between items-end">
+        <FieldLabel>{label}</FieldLabel>
 
-    const onChange = (id: string) => {
-      setSelectedId(id);
-      validate();
-    };
+        <button
+          disabled={props.disabled}
+          className="text-foreground text-sm mb-[6px] bg-transparent disabled:text-muted-foreground"
+          onClick={openModal}
+          type="button"
+          data-testid={`${props.id}-create-button`}
+        >
+          Add new
+        </button>
+      </div>
 
-    const handleCreate = async (
-      data: Record<string, any>,
-      e: FormEvent<HTMLFormElement>,
-    ) => {
-      e.preventDefault();
-      try {
-        const newItem = await asyncSelectApi.createData(
-          url,
-          data as IAsyncSelectItem,
-        );
+      <AsyncSelectInput
+        placeholder="Select..."
+        onOptionsFetch={onOptionsFetch}
+        onOptionsFetchStateChange={onOptionsFetchStateChange}
+        fetchOptions={fetcher}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        value={selectedId}
+        onBlur={getInputProps().onBlur}
+        {...props}
+      />
+      <FieldMessage error={errorMessage}>{supportingText}</FieldMessage>
 
-        onChange(newItem.id.toString());
-        successToast({ title: 'Success', description: 'Item created!' });
-        closeModal();
-      } catch (e) {
-        console.error(e);
-      }
-    };
+      <DialogDrawer open={isModalOpen} onOpenChange={changeOpen}>
+        <DialogDrawerContent data-testid={`${name}-modal`}>
+          <DialogDrawerHeader>
+            <DialogDrawerTitle>{label}</DialogDrawerTitle>
 
-    const fetcher = useCallback(
-      async (_search: string, args?: RequestInit) => {
-        return asyncSelectApi.getData(url, args).then((opts) => {
-          return opts.map(toSelectOption);
-        });
-      },
-      [url, isModalOpen],
-    );
-
-    return (
-      <>
-        <HiddenField value={selectedId ?? ''} {...getInputProps()} />
-
-        <div className="flex justify-between items-end">
-          <FieldLabel>{label}</FieldLabel>
-
-          <button
-            disabled={props.disabled}
-            className="text-foreground text-sm mb-[6px] bg-transparent disabled:text-muted-foreground"
-            onClick={openModal}
-            type="button"
-            data-testid={`${props.id}-create-button`}
+            <DialogDrawerDescription>{supportingText}</DialogDrawerDescription>
+          </DialogDrawerHeader>
+          <DialogDrawerBody
+            onSubmit={(e) => {
+              e.stopPropagation();
+            }}
+            onChange={(e) => {
+              e.stopPropagation();
+            }}
           >
-            Add new
-          </button>
-        </div>
-
-        <AsyncSelectInput
-          placeholder="Select..."
-          onOptionsFetch={onOptionsFetch}
-          onOptionsFetchStateChange={onOptionsFetchStateChange}
-          fetchOptions={fetcher}
-          defaultValue={defaultValue}
-          onChange={onChange}
-          value={selectedId}
-          onBlur={getInputProps().onBlur}
-          {...props}
-        />
-        <FieldMessage error={errorMessage}>{supportingText}</FieldMessage>
-
-        <DialogDrawer open={isModalOpen} onOpenChange={changeOpen}>
-          <DialogDrawerContent data-testid={`${name}-modal`}>
-            <DialogDrawerHeader>
-              <DialogDrawerTitle>{label}</DialogDrawerTitle>
-
-              <DialogDrawerDescription>
-                {supportingText}
-              </DialogDrawerDescription>
-            </DialogDrawerHeader>
-            <DialogDrawerBody
-              onSubmit={(e) => {
-                e.stopPropagation();
-              }}
-              onChange={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              {renderForm({ onCreate: handleCreate })}
-            </DialogDrawerBody>
-          </DialogDrawerContent>
-        </DialogDrawer>
-      </>
-    );
-  },
-);
+            {renderForm({ onCreate: handleCreate })}
+          </DialogDrawerBody>
+        </DialogDrawerContent>
+      </DialogDrawer>
+    </>
+  );
+};
 
 interface CreatableAsyncFormProps {
   onCreate: (data: Record<string, any>, e: FormEvent<HTMLFormElement>) => void;

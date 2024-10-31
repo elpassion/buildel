@@ -1,5 +1,5 @@
 import type { PropsWithChildren, ReactNode } from 'react';
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { Maximize2 } from 'lucide-react';
 import { useControlField } from 'remix-validated-form';
 import { useBoolean } from 'usehooks-ts';
@@ -31,82 +31,76 @@ type EditorFieldProps = Partial<
   }
 >;
 
-export const EditorField = forwardRef<HTMLInputElement, EditorFieldProps>(
-  ({
-    label,
-    defaultValue,
-    error: propsError,
-    supportingText,
-    onChange,
-    ...props
-  }) => {
-    const { name, getInputProps, validate, error } = useFieldContext();
-    const {
-      value: isShown,
-      setTrue: show,
-      setValue: toggle,
-    } = useBoolean(false);
-    const [value, setValue] = useControlField<string | undefined>(name);
+export const EditorField = ({
+  label,
+  defaultValue,
+  error: propsError,
+  supportingText,
+  onChange,
+  ...props
+}: EditorFieldProps & { ref?: React.RefObject<HTMLInputElement> }) => {
+  const { name, getInputProps, validate, error } = useFieldContext();
+  const { value: isShown, setTrue: show, setValue: toggle } = useBoolean(false);
+  const [value, setValue] = useControlField<string | undefined>(name);
 
-    const handleOnChange = (v: string | undefined) => {
-      setValue(v);
-      validate();
-      onChange?.(v);
-    };
+  const handleOnChange = (v: string | undefined) => {
+    setValue(v);
+    validate();
+    onChange?.(v);
+  };
 
-    const currentValue = value ?? defaultValue ?? '';
+  const currentValue = value ?? defaultValue ?? '';
 
-    const currentError = propsError ?? error;
+  const currentError = propsError ?? error;
 
-    return (
-      <>
-        <HiddenField value={currentValue} {...getInputProps()} />
-        <div className="flex justify-between items-center">
-          <FieldLabel>{label}</FieldLabel>
+  return (
+    <>
+      <HiddenField value={currentValue} {...getInputProps()} />
+      <div className="flex justify-between items-center">
+        <FieldLabel>{label}</FieldLabel>
 
-          <IconButton
-            size="xxs"
-            variant="ghost"
-            icon={<Maximize2 />}
-            type="button"
-            onClick={show}
-          />
-        </div>
-        <EditorInput
+        <IconButton
+          size="xxs"
+          variant="ghost"
+          icon={<Maximize2 />}
+          type="button"
+          onClick={show}
+        />
+      </div>
+      <EditorInput
+        value={currentValue}
+        onChange={handleOnChange}
+        height="130px"
+        id={`${name}-editor`}
+        {...props}
+      />
+
+      <FieldMessage error={currentError}>{supportingText}</FieldMessage>
+
+      <div
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <MaximizedEditor
+          label={label}
+          supportingText={supportingText}
           value={currentValue}
+          isOpen={isShown}
+          onOpenChange={toggle}
+          error={currentError}
           onChange={handleOnChange}
-          height="130px"
-          id={`${name}-editor`}
           {...props}
         />
-
-        <FieldMessage error={currentError}>{supportingText}</FieldMessage>
-
-        <div
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          onMouseDown={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-        >
-          <MaximizedEditor
-            label={label}
-            supportingText={supportingText}
-            value={currentValue}
-            isOpen={isShown}
-            onOpenChange={toggle}
-            error={currentError}
-            onChange={handleOnChange}
-            {...props}
-          />
-        </div>
-      </>
-    );
-  },
-);
+      </div>
+    </>
+  );
+};
 EditorField.displayName = 'EditorField';
 interface MaximizedEditorProps extends Omit<EditorFieldProps, 'onChange'> {
   value?: string;

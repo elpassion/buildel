@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { useControlField, useFormContext } from 'remix-validated-form';
 
 import {
@@ -17,42 +17,42 @@ interface SelectFieldProps extends SelectInputProps {
   errorMessage?: ReactNode;
 }
 
-export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
-  (
-    { defaultValue: _, options, label, supportingText, errorMessage, ...props },
-    _ref,
-  ) => {
-    const { name, getInputProps } = useFieldContext();
-    const [selectedId, setSelectedId] = useControlField<string | string[]>(
-      name,
-    );
+export const SelectField = ({
+  defaultValue: _,
+  options,
+  label,
+  supportingText,
+  errorMessage,
+  ...props
+}: SelectFieldProps & { ref?: React.RefObject<HTMLSelectElement> }) => {
+  const { name, getInputProps } = useFieldContext();
+  const [selectedId, setSelectedId] = useControlField<string | string[]>(name);
 
-    const { fieldErrors } = useFormContext();
+  const { fieldErrors } = useFormContext();
 
-    return (
-      <div>
-        <HiddenField
-          value={
-            Array.isArray(selectedId)
-              ? JSON.stringify(selectedId)
-              : selectedId ?? ''
-          }
-          {...getInputProps()}
-        />
-        <FieldLabel>{label}</FieldLabel>
-        <SelectInput
-          id={name}
-          options={options}
-          value={selectedId}
-          placeholder="Select..."
-          onChange={setSelectedId}
-          {...props}
-        />
-        <FieldMessage error={errorMessage || fieldErrors[name]}>
-          {supportingText}
-        </FieldMessage>
-      </div>
-    );
-  },
-);
+  return (
+    <div>
+      <HiddenField
+        value={
+          Array.isArray(selectedId)
+            ? JSON.stringify(selectedId)
+            : (selectedId ?? '')
+        }
+        {...getInputProps()}
+      />
+      <FieldLabel>{label}</FieldLabel>
+      <SelectInput
+        id={name}
+        options={options}
+        value={selectedId}
+        placeholder="Select..."
+        onChange={setSelectedId}
+        {...props}
+      />
+      <FieldMessage error={errorMessage || fieldErrors[name]}>
+        {supportingText}
+      </FieldMessage>
+    </div>
+  );
+};
 SelectField.displayName = 'SelectField';
