@@ -207,8 +207,8 @@ const VoicechateModal = ({
 };
 
 interface VoicechatDotProps {
-  audioRef: React.RefObject<HTMLAudioElement>;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  audioRef: React.RefObject<HTMLAudioElement | null>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
   transcription?: React.ReactNode;
 }
 
@@ -264,7 +264,7 @@ interface SpeakingRowProps {
   onStop?: () => Promise<void>;
   onStart?: () => Promise<void>;
   disabled?: boolean;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
 }
 
 export function SpeakingRow({
@@ -398,9 +398,16 @@ export function useVoicechat({
     (input) => input.type === 'audio_output',
   );
 
-  const onBlockOutput = (blockId: string, outputName: string, payload: any) => {
+  const onBlockOutput = (
+    blockId: string,
+    outputName: string,
+    payload: any,
+    metadata: any,
+  ) => {
     if (blockId === output?.name) {
-      processAudioEvents([{ block: blockId, output: outputName, payload }]);
+      processAudioEvents([
+        { block: blockId, output: outputName, payload, metadata },
+      ]);
     }
     if (blockId === input?.name) {
       if (payload.message === 'muted') {

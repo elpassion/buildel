@@ -17,7 +17,6 @@ import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
 import { routes } from '~/utils/routes.utils';
 
-import type { SearchSchema } from '../../../knowledgeBaseSearch/schema';
 import type { IMemoryNodeDetails } from '../../collectionGraph.types';
 
 interface NodePreviewProps {

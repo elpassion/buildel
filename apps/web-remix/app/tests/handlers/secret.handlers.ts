@@ -29,6 +29,7 @@ export class SecretsHandlers {
           created_at: '07/02/2024 11:35',
           updated_at: '07/02/2024 11:35',
           alias: null,
+          hidden_value: '********',
         };
 
         this.secrets.set(data.value, transformed);

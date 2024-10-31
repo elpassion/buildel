@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { RefreshCcw } from 'lucide-react';
 import { useControlField } from 'remix-validated-form';
 import type { ValidationBehaviorOptions } from 'remix-validated-form/browser/internal/getInputProps';
@@ -11,12 +11,14 @@ import { IconButton } from '~/components/iconButton';
 
 export interface TextInputFieldProps extends TextInputProps {}
 
-export const TextInputField = forwardRef<
-  HTMLInputElement,
-  Partial<TextInputFieldProps> & {
-    validationBehavior?: Partial<ValidationBehaviorOptions>;
-  }
->(({ validationBehavior, ...props }, ref) => {
+export const TextInputField = ({
+  ref,
+  validationBehavior,
+  ...props
+}: Partial<TextInputFieldProps> & {
+  validationBehavior?: Partial<ValidationBehaviorOptions>;
+  ref?: React.RefObject<HTMLInputElement | null>;
+}) => {
   const { name, getInputProps, error } = useFieldContext({
     validationBehavior,
   });
@@ -25,6 +27,7 @@ export const TextInputField = forwardRef<
     <TextInput
       id={name}
       name={name}
+      // @ts-ignore
       ref={ref}
       aria-invalid={error ? true : undefined}
       aria-describedby={`${name}-error`}
@@ -35,15 +38,17 @@ export const TextInputField = forwardRef<
       {...props}
     />
   );
-});
+};
 TextInputField.displayName = 'TextInputField';
 
-export const PasswordInputField = forwardRef<
-  HTMLInputElement,
-  Partial<TextInputFieldProps>
->((props, ref) => {
+export const PasswordInputField = ({
+  ref,
+  ...props
+}: Partial<TextInputFieldProps> & {
+  ref?: React.RefObject<HTMLInputElement>;
+}) => {
   return <TextInputField ref={ref} type={'password'} {...props} />;
-});
+};
 
 PasswordInputField.displayName = 'PasswordInputField';
 

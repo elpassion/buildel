@@ -9,7 +9,7 @@ import { assert } from '~/utils/assert';
 import type { IBlockConfig, IEdge, INode } from './pipeline.types';
 
 interface IUseDraggableNodes {
-  wrapper: RefObject<HTMLDivElement>;
+  wrapper: RefObject<HTMLDivElement | null>;
   onDrop: (node: IBlockConfig) => void;
 }
 export function useDraggableNodes({ wrapper, onDrop }: IUseDraggableNodes) {

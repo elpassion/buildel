@@ -334,7 +334,7 @@ function Pre({
 
   const language = useMemo(() => {
     if (children && typeof children === 'object' && 'props' in children) {
-      return getLanguage(children.props.className);
+      return getLanguage((children.props as any).className);
     }
 
     return null;
@@ -444,12 +444,15 @@ export function truncateChildrenContent(
     }
 
     if (child && typeof child === 'object') {
-      if ('props' in child && shouldBeTruncated(child)) {
+      if ('props' in child && shouldBeTruncated(child as any)) {
         return {
           ...child,
           props: {
-            ...child.props,
-            children: truncateChildrenContent(child.props.children, maxLength),
+            ...(child.props as any),
+            children: truncateChildrenContent(
+              (child.props as any).children,
+              maxLength,
+            ),
           },
         };
       }
@@ -466,8 +469,8 @@ function getStringContent(children: React.ReactNode): string {
       }
 
       if (child && typeof child === 'object') {
-        if ('props' in child && shouldBeTruncated(child)) {
-          return getStringContent(child.props.children);
+        if ('props' in child && shouldBeTruncated(child as any)) {
+          return getStringContent((child.props as any).children);
         }
       }
       return '';

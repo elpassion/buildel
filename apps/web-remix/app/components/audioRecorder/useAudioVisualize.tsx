@@ -25,7 +25,7 @@ const BASE_OPTIONS: OptionsType = {
 };
 
 export const useAudioVisualize = (
-  canvas: RefObject<HTMLCanvasElement>,
+  canvas: RefObject<HTMLCanvasElement | null>,
   args?: Partial<OptionsType>,
 ) => {
   const {

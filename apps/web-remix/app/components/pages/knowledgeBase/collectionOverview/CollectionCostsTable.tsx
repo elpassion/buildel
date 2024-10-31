@@ -60,7 +60,7 @@ export const CollectionCostsTable: React.FC<CollectionCostsTableProps> = ({
         cell: (info) => {
           const value = info.getValue();
 
-          return value.length > 20 ? (
+          return value && value.length > 20 ? (
             <>
               {`${value.slice(0, 17)}... `}
               <HelpfulIcon

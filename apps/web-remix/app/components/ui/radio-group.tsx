@@ -8,10 +8,15 @@ export type RadioGroupProps = React.ComponentPropsWithoutRef<
   typeof RadioGroupPrimitive.Root
 >;
 
-const RadioGroup = React.forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Root>,
-  RadioGroupProps
->(({ className, ...props }, ref) => {
+const RadioGroup = ({
+  ref,
+  className,
+  ...props
+}: RadioGroupProps & {
+  ref?: React.RefObject<React.ElementRef<
+    typeof RadioGroupPrimitive.Root
+  > | null>;
+}) => {
   return (
     <RadioGroupPrimitive.Root
       className={cn('grid gap-2', className)}
@@ -19,17 +24,22 @@ const RadioGroup = React.forwardRef<
       ref={ref}
     />
   );
-});
+};
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
 
 export type RadioGroupItemProps = React.ComponentPropsWithoutRef<
   typeof RadioGroupPrimitive.Item
 >;
 
-const RadioGroupItem = React.forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Item>,
-  RadioGroupItemProps
->(({ className, ...props }, ref) => {
+const RadioGroupItem = ({
+  ref,
+  className,
+  ...props
+}: RadioGroupItemProps & {
+  ref?: React.RefObject<React.ElementRef<
+    typeof RadioGroupPrimitive.Item
+  > | null>;
+}) => {
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
@@ -44,13 +54,18 @@ const RadioGroupItem = React.forwardRef<
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   );
-});
+};
 RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
 
-const RadioTabGroupItem = React.forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Item>,
-  RadioGroupItemProps
->(({ className, ...props }, ref) => {
+const RadioTabGroupItem = ({
+  ref,
+  className,
+  ...props
+}: RadioGroupItemProps & {
+  ref?: React.RefObject<React.ElementRef<
+    typeof RadioGroupPrimitive.Item
+  > | null>;
+}) => {
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
@@ -63,7 +78,7 @@ const RadioTabGroupItem = React.forwardRef<
       {props.value}
     </RadioGroupPrimitive.Item>
   );
-});
+};
 RadioTabGroupItem.displayName = 'RadioTabGroupItem';
 
 export { RadioGroup, RadioGroupItem, RadioTabGroupItem };

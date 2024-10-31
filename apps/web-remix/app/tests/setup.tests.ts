@@ -31,7 +31,10 @@ export const getSessionCookie = async (
   let sessionCookie = '';
 
   if (args?.user !== null) {
-    sessionCookie = await setCurrentUser(request, args?.user ?? { id: 1 });
+    sessionCookie = await setCurrentUser(
+      request,
+      args?.user ?? { id: 1, marketing_agreement: false },
+    );
   }
   if (args?.organizationId) {
     sessionCookie = await setOrganizationId(sessionCookie, args.organizationId);
