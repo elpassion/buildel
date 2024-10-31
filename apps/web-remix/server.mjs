@@ -76,6 +76,13 @@ await app.register(fastifyHttpProxy, {
   rewritePrefix: '',
 });
 
+await app.register(fastifyHttpProxy, {
+  upstream: 'https://www.youtube.com',
+  prefix: '/youtube',
+  rewritePrefix: '',
+});
+
+
 await app.register(fastifyStatic, {
   root: path.join(__dirname, 'build', 'client'),
   prefix: '/',
@@ -163,14 +170,14 @@ console.log(`✅ metrics ready: ${metricsAddrers}`);
 
 function createCSP(nonce, isIframeAllowed) {
   let csp = `
-    script-src 'self' 'nonce-${nonce}';
+    script-src 'self' 'nonce-${nonce}' https://www.youtube.com;
     img-src 'self' data: https://oaidalleapiprodscus.blob.core.windows.net;
     font-src 'self' https://fonts.gstatic.com https://elpassion-design-system.s3.eu-west-1.amazonaws.com https://cdnjs.cloudflare.com;
     connect-src 'self' ${process.env.NODE_ENV === 'development' ? 'ws:' : ''} ${process.env.API_URL} https://plausible.io;
     style-src 'unsafe-inline' 'self' https://fonts.googleapis.com;
     style-src-elem 'unsafe-inline' 'self' https://fonts.googleapis.com;
     object-src 'none';
-    frame-src 'self';
+    frame-src 'self' https://www.youtube.com;
     base-uri 'self';
     form-action 'self' https://www.googleapis.com https://accounts.google.com https://github.com;
     upgrade-insecure-requests;

@@ -1,12 +1,11 @@
 import * as React from 'react';
 
+import type { BaseSize } from '~/components/ui/ui.types';
 import { cn } from '~/utils/cn';
-
-type InputSize = 'sm';
 
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  size?: InputSize;
+  size?: BaseSize;
 }
 
 const Input = ({
@@ -35,7 +34,7 @@ Input.displayName = 'Input';
 
 export { Input };
 
-export function getInputSize(size?: InputSize) {
+export function getInputSize(size?: BaseSize) {
   switch (size) {
     case 'sm':
       return 'h-9';

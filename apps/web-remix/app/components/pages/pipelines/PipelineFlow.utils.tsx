@@ -228,6 +228,12 @@ function reverseConnection(connection: IConfigConnection) {
 }
 
 export function getNodeType(blockType: string) {
-  if (blockType === 'comment') return 'comment';
-  return 'custom';
+  switch (blockType) {
+    case 'comment':
+      return 'comment';
+    case 'video':
+      return 'video';
+    default:
+      return 'custom';
+  }
 }

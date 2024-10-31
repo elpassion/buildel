@@ -1,3 +1,4 @@
+import { BaseSize } from '~/components/ui/ui.types';
 import { assert } from '~/utils/assert';
 
 import type { JSONSchemaField } from './SchemaParser';
@@ -8,11 +9,13 @@ export function Schema({
   fields,
   disabled,
   shouldDisplay,
+  size,
 }: {
   disabled?: boolean;
   schema: JSONSchemaField;
   shouldDisplay?: (schema: JSONSchemaField) => boolean;
   name: string | null;
+  size?: BaseSize;
   fields: {
     string: React.FC<FieldProps>;
     number: React.FC<FieldProps>;
@@ -34,6 +37,7 @@ export function Schema({
       fields={fields}
       disabled={disabled}
       shouldDisplay={shouldDisplay}
+      size={size}
     />
   );
 }
@@ -45,6 +49,7 @@ export function Field({
   fields,
   disabled,
   shouldDisplay,
+  size,
 }: FieldProps) {
   if (field.type === 'string') {
     return (
@@ -55,6 +60,7 @@ export function Field({
         fields={fields}
         disabled={disabled}
         shouldDisplay={shouldDisplay}
+        size={size}
       />
     );
   }
@@ -67,6 +73,7 @@ export function Field({
         fields={fields}
         disabled={disabled}
         shouldDisplay={shouldDisplay}
+        size={size}
       />
     );
   } else if (field.type === 'object') {
@@ -83,6 +90,7 @@ export function Field({
             fields={fields}
             disabled={disabled}
             shouldDisplay={shouldDisplay}
+            size={size}
           />
         </div>
       );
@@ -96,6 +104,7 @@ export function Field({
         fields={fields}
         disabled={disabled}
         shouldDisplay={shouldDisplay}
+        size={size}
       />
     );
   } else if (field.type === 'array') {
@@ -107,6 +116,7 @@ export function Field({
         fields={fields}
         disabled={disabled}
         shouldDisplay={shouldDisplay}
+        size={size}
       />
     );
   } else if (field.type === 'section') {
@@ -118,6 +128,7 @@ export function Field({
         disabled={disabled}
         fields={fields}
         shouldDisplay={shouldDisplay}
+        size={size}
       />
     );
   }
@@ -130,6 +141,7 @@ export interface FieldProps {
   name: string | null;
   schema: JSONSchemaField;
   disabled?: boolean;
+  size?: BaseSize;
   shouldDisplay?: (schema: JSONSchemaField) => boolean;
   fields: {
     string: React.FC<FieldProps>;

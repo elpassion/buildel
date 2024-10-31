@@ -36,6 +36,8 @@ export function Document({
           href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap"
         />
 
+        <script src="/youtube/iframe_api" nonce={nonce} defer></script>
+
         <script
           nonce={nonce}
           defer

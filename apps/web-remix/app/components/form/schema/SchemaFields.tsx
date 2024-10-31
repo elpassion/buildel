@@ -44,6 +44,7 @@ export function StringField({
   shouldDisplay,
   name,
   fields,
+  size,
   ...rest
 }: FieldProps) {
   assert(name);
@@ -59,9 +60,11 @@ export function StringField({
     if ('presentAs' in field && field.presentAs === 'password') {
       return (
         <FormField name={name}>
-          <FieldLabel>{field.title}</FieldLabel>
-          <PasswordInputField id={name} {...rest} />
-          <FieldMessage error={error}>{field.description}</FieldMessage>
+          <FieldLabel size={size}>{field.title}</FieldLabel>
+          <PasswordInputField size={size} id={name} {...rest} />
+          <FieldMessage size={size} error={error}>
+            {field.description}
+          </FieldMessage>
         </FormField>
       );
     }
@@ -113,9 +116,13 @@ export function StringField({
           id={name}
           defaultValue={defaultValue}
           label={field.title}
+          size={size}
           readOnly={rest.disabled}
         />
-        <FieldMessage error={error}>{field.description}</FieldMessage>
+
+        <FieldMessage size={size} error={error}>
+          {field.description}
+        </FieldMessage>
       </FormField>
     );
   }

@@ -55,6 +55,7 @@ PasswordInputField.displayName = 'PasswordInputField';
 export function ResettableTextInputField({
   label,
   defaultValue,
+  size,
   ...props
 }: Partial<TextInputFieldProps> & { label: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -92,17 +93,19 @@ export function ResettableTextInputField({
 
   return (
     <>
-      <FieldLabel>
+      <FieldLabel size={size}>
         <div className="flex gap-2 justify-between items-center">
           <span>{label}</span>
 
           {canReset ? <ResettableFieldResetButton onClick={onReset} /> : null}
         </div>
       </FieldLabel>
+
       <TextInputField
         ref={inputRef}
         onChange={onChange}
         value={value}
+        size={size}
         {...props}
       />
     </>
