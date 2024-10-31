@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { forwardRef, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useControlField } from 'remix-validated-form';
 import { useIsMounted } from 'usehooks-ts';
 
@@ -67,11 +67,11 @@ export const AsyncSelectField = ({
           }
           if (opts.length > 0) setApiError(undefined);
 
-            return opts;
-          });
-      },
-      [url],
-    );
+          return opts;
+        });
+    },
+    [url],
+  );
 
   return (
     <>
