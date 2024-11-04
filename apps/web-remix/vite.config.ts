@@ -7,7 +7,6 @@ installGlobals();
 
 export default defineConfig({
   ssr: {
-    noExternal: ['@elpassion/taco'],
   },
   server: {
     port: 3000,
