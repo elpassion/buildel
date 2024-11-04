@@ -8,6 +8,7 @@ import {
   nestedObjectSchemaFixture,
   numberSchemaFixture,
   objectSchemaFixture,
+  sectionSchemaFixture,
   stringSchemaFixture,
 } from '~/tests/fixtures/schema.fixtures';
 
@@ -37,6 +38,35 @@ describe('GenerateZodSchema', () => {
       const result = schema.safeParse('Hello<>');
 
       expect(result.success).toBe(false);
+    });
+
+    describe('with default value', () => {
+      const schema = generateZODSchema(
+        stringSchemaFixture({ default: 'hello_world' }) as any,
+      );
+
+      test('should fill with default', async () => {
+        const result = schema.safeParse(undefined);
+
+        expect(result.success).toBe(true);
+        expect(result.data).toBe('hello_world');
+      });
+    });
+
+    describe('with custom errors', () => {
+      const schema = generateZODSchema(
+        stringSchemaFixture({
+          minLength: 30,
+          errorMessages: { minLength: 'Nah... To short...' },
+        }) as any,
+      );
+
+      test('should display custom minLength error', async () => {
+        const result = schema.safeParse('Is it ok?');
+
+        expect(result.success).toBe(false);
+        expect(result.error?.errors[1].message).toBe('Nah... To short...');
+      });
     });
 
     describe('with enum', () => {
@@ -149,6 +179,22 @@ describe('GenerateZodSchema', () => {
 
     test('should validate nested object', async () => {
       const result = schema.safeParse({ nested_object: { api_type: '' } });
+
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('for section type', () => {
+    const schema = generateZODSchema(sectionSchemaFixture() as any);
+
+    test('should correctly validate zod schema', async () => {
+      const result = schema.safeParse({ model: 'oepnai' });
+
+      expect(result.success).toBe(true);
+    });
+
+    test('should validate empty object', async () => {
+      const result = schema.safeParse({});
 
       expect(result.success).toBe(false);
     });

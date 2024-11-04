@@ -188,6 +188,25 @@ export type JSONSchemaSectionField = {
   required?: string[];
 };
 
+export type JSONSchemaStringField = {
+  type: 'string';
+  title: string;
+  description: string;
+  descriptionWhen?: Record<string, Record<string, string>>;
+  minLength?: number;
+  maxLength?: number;
+  default?: string;
+  pattern?: string;
+  regex?: {
+    pattern: string;
+    errorMessage: string;
+  };
+  readonly?: boolean;
+  defaultWhen?: Record<string, Record<string, string>>;
+  displayWhen?: DisplayWhen;
+  errorMessages?: Record<string, string>;
+};
+
 export type Condition = {
   min?: number;
 };
@@ -199,23 +218,7 @@ export type DisplayWhen = {
 export type JSONSchemaField =
   | JSONSchemaObjectField
   | JSONSchemaSectionField
-  | {
-      type: 'string';
-      title: string;
-      description: string;
-      descriptionWhen?: Record<string, Record<string, string>>;
-      minLength?: number;
-      maxLength?: number;
-      default?: string;
-      regex?: {
-        pattern: string;
-        errorMessage: string;
-      };
-      readonly?: boolean;
-      defaultWhen?: Record<string, Record<string, string>>;
-      displayWhen?: DisplayWhen;
-      errorMessages?: Record<string, string>;
-    }
+  | JSONSchemaStringField
   | {
       type: 'string';
       title: string;
