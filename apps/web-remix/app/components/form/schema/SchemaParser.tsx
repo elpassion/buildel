@@ -209,6 +209,7 @@ export type JSONSchemaStringField = {
 
 export type Condition = {
   min?: number;
+  max?: number;
 };
 
 export type DisplayWhen = {
@@ -343,6 +344,11 @@ export function checkDisplayWhenConditions(
     } else {
       if (key === 'min') {
         if (ctx < condition) {
+          return false;
+        }
+      }
+      if (key === 'max') {
+        if (ctx > condition) {
           return false;
         }
       }

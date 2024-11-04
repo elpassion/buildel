@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
-import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import {
+  checkDisplayWhenConditions,
+  generateZODSchema,
+} from '~/components/form/schema/SchemaParser';
 import {
   arraySchemaFixture,
   booleanSchemaFixture,
@@ -197,6 +200,86 @@ describe('GenerateZodSchema', () => {
       const result = schema.safeParse({});
 
       expect(result.success).toBe(false);
+    });
+  });
+});
+
+describe('DisplayWhen', () => {
+  describe('for min value', () => {
+    test('should return false if the condition is not met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { min: 3 } },
+        { tool_worker: 0 },
+      );
+
+      expect(result).toBe(false);
+    });
+
+    test('should return true if the condition is met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { min: 3 } },
+        { tool_worker: 3 },
+      );
+
+      expect(result).toBe(true);
+    });
+
+    test('should return true if key not found in ctx', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { min: 3 } },
+        { tool_controller: 3 },
+      );
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('for max value', () => {
+    test('should return false if the condition is not met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { max: 3 } },
+        { tool_worker: 10 },
+      );
+
+      expect(result).toBe(false);
+    });
+
+    test('should return true if the condition is met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { max: 3 } },
+        { tool_worker: 2 },
+      );
+
+      expect(result).toBe(true);
+    });
+
+    test('should return true if key not found in ctx', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { min: 3 } },
+        { tool_controller: 34 },
+      );
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('for min and max values', () => {
+    test('should return false if the condition is not met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { max: 3, min: 1 } },
+        { tool_worker: 4 },
+      );
+
+      expect(result).toBe(false);
+    });
+
+    test('should return true if the condition is met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { max: 3, min: 2 } },
+        { tool_worker: 2 },
+      );
+
+      expect(result).toBe(true);
     });
   });
 });
