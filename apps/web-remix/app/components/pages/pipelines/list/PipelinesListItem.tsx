@@ -134,7 +134,7 @@ export const PipelineListItemHeader = ({
             </DropdownMenuItem>
 
             <DropdownMenuItem
-              className="w-full flex gap-1 items-center text-red-500"
+              className="w-full flex gap-1 items-center text-red-500 cursor-pointer"
               onClick={handleDelete}
               aria-label={`Remove workflow: ${pipeline.name}`}
               title={`Remove workflow: ${pipeline.name}`}
