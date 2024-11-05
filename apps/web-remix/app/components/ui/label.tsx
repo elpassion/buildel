@@ -33,8 +33,39 @@ const Label = ({
   );
 };
 Label.displayName = LabelPrimitive.Root.displayName;
-
 export { Label };
+
+export interface InputMessageProps
+  extends React.HTMLAttributes<HTMLParagraphElement> {
+  isError?: boolean;
+  size?: BaseSize;
+  ref?: React.RefObject<HTMLDivElement>;
+}
+
+export const InputMessage = ({
+  children,
+  size,
+  isError,
+  className,
+  ref,
+  ...rest
+}: InputMessageProps) => {
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'font-medium mt-1',
+        getLabelSize(size),
+        { 'text-red-500': isError, 'text-muted-foreground': !isError },
+        className,
+      )}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+};
+InputMessage.displayName = InputMessage.name;
 
 export function getLabelSize(size?: BaseSize) {
   switch (size) {
