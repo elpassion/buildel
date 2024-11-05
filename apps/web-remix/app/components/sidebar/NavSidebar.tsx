@@ -15,9 +15,7 @@ export const NavSidebar: React.FC<
   Omit<SidebarProps, 'collapsed' | 'onCollapse'>
 > = ({ children, ...props }) => {
   const { collapsed, toggleCollapse } = useNavSidebarContext();
-  const { isLarge } = useBreakpoints();
 
-  if (!isLarge) return null;
   return (
     <div className="hidden lg:block md:p-4">
       <Sidebar
