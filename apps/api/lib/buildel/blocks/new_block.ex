@@ -245,7 +245,7 @@ defmodule Buildel.Blocks.NewBlock.Defsection do
     quote do
       {:ok, options} =
         unquote(options)
-        |> Keyword.validate([:title, :description])
+        |> Keyword.validate([:title, :description, displayWhen: nil])
 
       @section unquote(name)
       @sections [{unquote(name), unquote(options)}] ++ @sections

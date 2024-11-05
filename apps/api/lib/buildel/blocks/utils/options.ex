@@ -61,7 +61,7 @@ defmodule Buildel.Blocks.Utils.Options do
           {
             :"#{&1.name}_call_formatter",
             %{
-              required: true,
+              required: false,
               section: &1.name,
               schema:
                 EditorField.new(%{
@@ -84,7 +84,7 @@ defmodule Buildel.Blocks.Utils.Options do
           {
             :"#{&1.name}_response_formatter",
             %{
-              required: true,
+              required: false,
               section: &1.name,
               schema:
                 EditorField.new(%{
@@ -115,7 +115,14 @@ defmodule Buildel.Blocks.Utils.Options do
             &{&1.name,
              [
                title: "#{to_string(&1.name) |> String.capitalize()} Tool Settings",
-               description: ""
+               description: "",
+               displayWhen: %{
+                 connections: %{
+                   :"#{&1.name}_worker" => %{
+                     min: 1
+                   }
+                 }
+               }
              ]}
           )
       end)
@@ -138,7 +145,8 @@ defmodule Buildel.Blocks.Utils.Options do
               title: section_info |> Keyword.get(:title),
               description: section_info |> Keyword.get(:description),
               required: [],
-              properties: Jason.OrderedObject.new([])
+              properties: Jason.OrderedObject.new([]),
+              displayWhen: section_info |> Keyword.get(:displayWhen)
             })
             |> Schemas.push_property(
               field_name,
@@ -154,7 +162,7 @@ defmodule Buildel.Blocks.Utils.Options do
             section: nil,
             properties:
               properties ++
-                [{section.name, %{schema: section.schema, required: true, section: nil}}] ++
+                [{section.name, %{schema: section.schema, required: false, section: nil}}] ++
                 [{field_name, field_properties}]
           }
 
@@ -184,7 +192,8 @@ defmodule Buildel.Blocks.Utils.Options do
               title: section_info |> Keyword.get(:title),
               description: section_info |> Keyword.get(:description),
               required: [],
-              properties: Jason.OrderedObject.new([])
+              properties: Jason.OrderedObject.new([]),
+              displayWhen: section_info |> Keyword.get(:displayWhen)
             })
             |> Schemas.push_property(
               field_name,
@@ -196,7 +205,7 @@ defmodule Buildel.Blocks.Utils.Options do
             section: %{name: field_section, schema: section_schema},
             properties:
               properties ++
-                [{section.name, %{schema: section.schema, required: true, section: nil}}]
+                [{section.name, %{schema: section.schema, required: false, section: nil}}]
           }
       end)
       |> then(fn
@@ -208,7 +217,7 @@ defmodule Buildel.Blocks.Utils.Options do
             section: nil,
             properties:
               properties ++
-                [{section.name, %{schema: section.schema, required: true, section: nil}}]
+                [{section.name, %{schema: section.schema, required: false, section: nil}}]
           }
       end)
       |> then(& &1.properties)
