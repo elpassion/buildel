@@ -542,32 +542,34 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
 
       defoverridable handle_get_tool: 2
 
-      def handle_call({:call_tool, %Message{} = message}, _from, state) do
-        case handle_tool_call(message.message.name, message, state) do
-          {:ok, response, state} ->
-            {:reply, response, state}
+      if existing_tools |> Enum.count() == 0 do
+        def handle_call({:call_tool, %Message{} = message}, _from, state) do
+          case handle_tool_call(message.message.name, message, state) do
+            {:ok, response, state} ->
+              {:reply, response, state}
 
-          _ ->
+            _ ->
+              {:reply,
+               Message.from_message(message)
+               |> Message.set_type(:tool_response)
+               |> Message.set_message("Something went wrong"), state}
+          end
+        rescue
+          error ->
+            Logger.error(Exception.format(:error, error, __STACKTRACE__))
+
+            send_error(
+              state,
+              Message.from_message(message)
+              |> Message.set_type(:text)
+              |> Message.set_message(:something_went_wrong)
+            )
+
             {:reply,
              Message.from_message(message)
              |> Message.set_type(:tool_response)
              |> Message.set_message("Something went wrong"), state}
         end
-      rescue
-        error ->
-          Logger.error(Exception.format(:error, error, __STACKTRACE__))
-
-          send_error(
-            state,
-            Message.from_message(message)
-            |> Message.set_type(:text)
-            |> Message.set_message(:something_went_wrong)
-          )
-
-          {:reply,
-           Message.from_message(message)
-           |> Message.set_type(:tool_response)
-           |> Message.set_message("Something went wrong"), state}
       end
 
       def tool_call_formatter(state, unquote(name) = tool_name) do
@@ -586,21 +588,23 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
         end
       end
 
-      defp format_tool_message(value, args) do
-        args
-        |> Enum.reduce(value, fn
-          {key, value}, acc when is_number(value) ->
-            String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+      if existing_tools |> Enum.count() == 0 do
+        defp format_tool_message(value, args) do
+          args
+          |> Enum.reduce(value, fn
+            {key, value}, acc when is_number(value) ->
+              String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
 
-          {key, value}, acc when is_binary(value) ->
-            String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
+            {key, value}, acc when is_binary(value) ->
+              String.replace(acc, "{{#{key}}}", value |> to_string() |> URI.encode())
 
-          {key, value}, acc when is_map(value) ->
-            String.replace(acc, "{{#{key}}}", Jason.encode!(value))
+            {key, value}, acc when is_map(value) ->
+              String.replace(acc, "{{#{key}}}", Jason.encode!(value))
 
-          _, acc ->
-            acc
-        end)
+            _, acc ->
+              acc
+          end)
+        end
       end
     end
   end
