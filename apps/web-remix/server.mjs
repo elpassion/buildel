@@ -171,7 +171,7 @@ console.log(`✅ metrics ready: ${metricsAddrers}`);
 function createCSP(nonce, isIframeAllowed) {
   let csp = `
     script-src 'self' 'nonce-${nonce}' https://www.youtube.com;
-    img-src 'self' data: https://oaidalleapiprodscus.blob.core.windows.net;
+    img-src *;
     font-src 'self' https://fonts.gstatic.com https://elpassion-design-system.s3.eu-west-1.amazonaws.com https://cdnjs.cloudflare.com;
     connect-src 'self' ${process.env.NODE_ENV === 'development' ? 'ws:' : ''} ${process.env.API_URL} https://plausible.io;
     style-src 'unsafe-inline' 'self' https://fonts.googleapis.com;
