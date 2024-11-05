@@ -10,18 +10,24 @@ import {
 import type { ChartConfig } from '~/components/ui/chart';
 import { ChartContainer } from '~/components/ui/chart';
 import { cn } from '~/utils/cn';
+import { dayjs } from '~/utils/Dayjs';
 
 export function UsageText({
   usage,
   maxUsage,
+  endDate,
 }: {
   usage: number;
   maxUsage: number;
+  endDate: string;
 }) {
   return (
     <p className={cn('text-xs flex gap-1 items-center')}>
       <span className="text-foreground">
         {usage}/{maxUsage}
+      </span>
+      <span className="text-muted-foreground italic">
+        (resets {dayjs(endDate).format('DD MMMM')})
       </span>
     </p>
   );
@@ -48,16 +54,19 @@ function UsageBar({ usagePercentage }: { usagePercentage: number }) {
 export function UsageProgress({
   usage,
   maxUsage,
+  endDate,
 }: {
   usage: number;
   maxUsage: number;
+  endDate: string;
 }) {
   const usagePercentage = (usage / maxUsage) * 100;
 
   return (
     <div>
-      <div className="flex justify-end mb-1">
-        <UsageText usage={usage} maxUsage={maxUsage} />
+      <div className="flex justify-between gap-2 mb-1">
+        <p className="text-sm text-muted-foreground">Usage</p>
+        <UsageText usage={usage} maxUsage={maxUsage} endDate={endDate} />
       </div>
 
       <UsageBar usagePercentage={usagePercentage} />

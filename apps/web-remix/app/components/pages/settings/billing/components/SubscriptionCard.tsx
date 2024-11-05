@@ -93,7 +93,7 @@ export function SubscriptionContent({
   ...rest
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <CardContent className={cn('p-5', className)} {...rest}>
+    <CardContent className={cn('px-0 py-2 divide-y', className)} {...rest}>
       {children}
     </CardContent>
   );
@@ -109,15 +109,34 @@ export function PlanType({ children }: PropsWithChildren) {
 
 export function SubscriptionCurrentPlan({ plan }: { plan: ISubscription }) {
   return (
-    <div className="flex gap-3 justify-between items-center mb-2 flex-wrap">
+    <div className="flex gap-3 justify-between items-center flex-wrap">
       <div className="flex gap-2 items-center ">
         <PlanDescription />
         <PlanType>{startCase(plan.type)}</PlanType>
       </div>
+    </div>
+  );
+}
+
+export function SubscriptionStatus({ plan }: { plan: ISubscription }) {
+  return (
+    <div className="flex gap-3 items-center flex-wrap">
+      <CardDescription className="whitespace-nowrap">
+        Subscription Status
+      </CardDescription>
+
+      {plan.status === 'active' ? (
+        <div className="flex gap-1 items-center">
+          <Badge variant="success">Active</Badge>
+          <p className="text-xs italic text-muted-foreground whitespace-nowrap">
+            Next payment {dayjs(plan.end_date).format('DD MMMM')}
+          </p>
+        </div>
+      ) : null}
 
       {plan.status === 'canceled' ? (
         <Badge variant="destructive">
-          Will be canceled {dayjs().to(plan.end_date)}
+          Will be canceled {dayjs(plan.end_date).format('DD MMMM')}
         </Badge>
       ) : null}
     </div>

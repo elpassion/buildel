@@ -15,6 +15,7 @@ import {
   SubscriptionContent,
   SubscriptionCurrentPlan,
   SubscriptionHeader,
+  SubscriptionStatus,
   SubscriptionTitle,
 } from './components/SubscriptionCard';
 import type { loader } from './loader.server';
@@ -66,12 +67,21 @@ export function BillingPage() {
         </SubscriptionHeader>
 
         <SubscriptionContent>
-          <SubscriptionCurrentPlan plan={subscription} />
+          <div className="px-5 py-3">
+            <SubscriptionCurrentPlan plan={subscription} />
+          </div>
 
-          <UsageProgress
-            usage={subscription.usage.runs_limit}
-            maxUsage={subscription.features.runs_limit}
-          />
+          <div className="px-5 py-3">
+            <SubscriptionStatus plan={subscription} />
+          </div>
+
+          <div className="px-5 py-3">
+            <UsageProgress
+              usage={subscription.usage.runs_limit}
+              maxUsage={subscription.features.runs_limit}
+              endDate={subscription.end_date}
+            />
+          </div>
         </SubscriptionContent>
       </SubscriptionCard>
 
