@@ -19,16 +19,19 @@ export function UsageText({
 }: {
   usage: number;
   maxUsage: number;
-  endDate: string;
+  endDate: string | null;
 }) {
   return (
     <p className={cn('text-xs flex gap-1 items-center')}>
       <span className="text-foreground">
         {usage}/{maxUsage}
       </span>
-      <span className="text-muted-foreground italic">
-        (resets {dayjs(endDate).format('DD MMMM')})
-      </span>
+
+      {endDate ? (
+        <span className="text-muted-foreground italic">
+          (resets {dayjs(endDate).format('DD MMMM')})
+        </span>
+      ) : null}
     </p>
   );
 }
@@ -58,7 +61,7 @@ export function UsageProgress({
 }: {
   usage: number;
   maxUsage: number;
-  endDate: string;
+  endDate: string | null;
 }) {
   const usagePercentage = (usage / maxUsage) * 100;
 
