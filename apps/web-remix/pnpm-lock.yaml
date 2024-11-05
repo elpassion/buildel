@@ -9423,7 +9423,7 @@ snapshots:
 
   '@types/lodash.groupby@4.6.9':
     dependencies:
-      '@types/lodash': 4.17.7
+      '@types/lodash': 4.17.13
 
   '@types/lodash.isequal@4.5.8':
     dependencies:

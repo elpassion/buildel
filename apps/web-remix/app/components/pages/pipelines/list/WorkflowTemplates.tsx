@@ -66,6 +66,7 @@ function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
   const validator = useMemo(() => withZod(CreateFromTemplateSchema), []);
   return (
     <ValidatedForm
+      //@ts-ignore
       formRef={ref}
       action={action}
       method="POST"

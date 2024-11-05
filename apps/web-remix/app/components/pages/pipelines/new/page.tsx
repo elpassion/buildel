@@ -266,7 +266,7 @@ function TemplateListItem({ item }: ITemplateItem) {
       validator={validator}
       onSubmit={onSubmit}
       onClick={() => ref.current?.click()}
-      className="group p-2 bg-white border border-neutral-100 min-h-[90px] rounded-xl transition hover:border-blue-200 cursor-pointer md:p-3 md:min-h-[98px] h-full"
+      className="relative group p-2 bg-white border border-neutral-100 min-h-[90px] rounded-xl transition hover:border-blue-200 cursor-pointer md:p-3 md:min-h-[98px] h-full"
       noValidate
     >
       <div className="flex flex-col gap-2">
@@ -308,7 +308,7 @@ function TemplateListItem({ item }: ITemplateItem) {
       <HiddenField name="template_name" value={item.template_name} />
 
       <button
-        className="pointer-events-none opacity-0"
+        className="pointer-events-none opacity-0 absolute top-0 left-0"
         ref={ref}
         type="submit"
       />
