@@ -21,7 +21,7 @@ defmodule Buildel.Subscriptions.Plan do
       workflows_limit: 5,
       knowledge_bases_limit: 3,
       datasets_limit: 3,
-      experiments_limit: 3,
+      experiments_limit: 1,
       seats_limit: 1,
       el_included: false,
       dedicated_support: false
@@ -31,7 +31,7 @@ defmodule Buildel.Subscriptions.Plan do
       workflows_limit: 10,
       knowledge_bases_limit: 5,
       datasets_limit: 5,
-      experiments_limit: 5,
+      experiments_limit: 3,
       seats_limit: 3,
       el_included: true,
       dedicated_support: false
@@ -41,7 +41,7 @@ defmodule Buildel.Subscriptions.Plan do
       workflows_limit: 30,
       knowledge_bases_limit: 15,
       datasets_limit: 15,
-      experiments_limit: 15,
+      experiments_limit: 10,
       seats_limit: 5,
       el_included: true,
       dedicated_support: true
