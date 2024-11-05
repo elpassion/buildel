@@ -272,8 +272,12 @@ export function addReferenceToLinks(message: string) {
       return match;
     }
 
+    if (isImage(link)) {
+      return match;
+    }
+
     links.push(new URL(link));
-    const numberedLink = `${match} <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">${linkIndex}</span>`;
+    const numberedLink = withLinkIndex(match, linkIndex);
 
     linkIndex++;
     return numberedLink;
@@ -289,4 +293,12 @@ function isValidUrl(string: string) {
   } catch (_) {
     return false;
   }
+}
+
+function isImage(url: string) {
+  return /\.(jpeg|jpg|gif|png|webp|bmp|svg)(\?.*)?$/i.test(url);
+}
+
+function withLinkIndex(link: string, index: number) {
+  return `${link} <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">${index}</span>`;
 }

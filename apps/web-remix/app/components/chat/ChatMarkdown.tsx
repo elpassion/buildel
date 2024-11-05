@@ -432,14 +432,24 @@ function Image({
   ...rest
 }: React.ImgHTMLAttributes<HTMLImageElement>) {
   return (
-    <img
-      alt={alt}
-      className={cn(
-        'h-[200px] w-[250px] object-cover bg-primary/10 rounded-md bg-no-repeat object-center',
-        className,
-      )}
-      {...rest}
-    />
+    <a
+      href={rest.src}
+      target="_blank"
+      className="relative w-fit inline-block my-1 group overflow-hidden rounded-md bg-primary/10"
+    >
+      <img
+        alt={alt}
+        className={cn(
+          'h-[200px] w-[250px] object-cover bg-no-repeat object-center my-0 group-hover:scale-[102%] transition',
+          className,
+        )}
+        {...rest}
+      />
+
+      <span className="block max-w-[105px] truncate absolute top-2 right-2 text-xs px-2 py-[2px] rounded-full bg-black/50 text-[#c4c7c5] transition group-hover:text-white">
+        {removeUrlProtocol(rest.src)}
+      </span>
+    </a>
   );
 }
 
@@ -523,4 +533,9 @@ function truncateString(str: string, maxLength: number) {
   return str.length > maxLength
     ? `${str.slice(0, maxLength / 1.5)}\n\n... rest of code`
     : str;
+}
+
+function removeUrlProtocol(url?: string) {
+  if (!url) return;
+  return url.replace(/(^\w+:|^)\/\//, '');
 }
