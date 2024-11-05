@@ -56,8 +56,8 @@ export const EditorField = ({
   return (
     <>
       <HiddenField value={currentValue} {...getInputProps()} />
-      <div className="flex justify-between items-center">
-        <FieldLabel>{label}</FieldLabel>
+      <div className="flex justify-between items-center mb-1">
+        <FieldLabel className="mb-0">{label}</FieldLabel>
 
         <IconButton
           size="xxs"

@@ -213,15 +213,15 @@ defmodule Buildel.Blocks.Chat do
                     "properties" => %{
                       "role" => %{
                         "type" => "string",
-                        "title" => "Role",
+                        "title" => "",
                         "enum" => ["user", "assistant"],
                         "enumPresentAs" => "radio",
                         "default" => "user"
                       },
                       "content" =>
                         EditorField.new(%{
-                          title: "Content",
-                          description: "The content of the message.",
+                          title: "",
+                          description: "",
                           suggestions: [
                             Suggestion.inputs(),
                             Suggestion.metadata(),
