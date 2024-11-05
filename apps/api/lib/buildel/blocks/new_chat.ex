@@ -16,11 +16,88 @@ defmodule Buildel.Blocks.NewChat do
 
   defoutput(:output, schema: %{})
 
-  # defsection(:model,
-  #   title: "Model",
-  #   description: "Model parameters",
-  #   properties: [:query, :api_type, :api_key, :endpoint, :model]
-  # )
+  defsection(:model, title: "Title", description: "Description") do
+    defoption(
+      :api_type,
+      %{
+        "type" => "string",
+        "title" => "Model API type",
+        "description" => "The API type to use for the chat.",
+        "enum" => ["openai", "azure", "google", "mistral", "anthropic"],
+        "enumPresentAs" => "radio",
+        "default" => "openai",
+        "readonly" => true
+      }
+    )
+
+    defoption(
+      :api_key,
+      secret_schema(%{
+        "title" => "API key",
+        "description" => "API key to use for the chat.",
+        "descriptionWhen" => %{
+          "opts.model.api_type" => %{
+            "openai" =>
+              "[OpenAI API key](https://platform.openai.com/api-keys) to use for the chat.",
+            "azure" => "Azure API key to use for the chat.",
+            "google" => "Google API key to use for the chat.",
+            "mistral" =>
+              "[Mistral API key](https://console.mistral.ai/api-keys/) to use for the chat.",
+            "anthropic" =>
+              "[Anthropic API key](https://www.anthropic.com/api) to use for the chat."
+          }
+        },
+        "defaultWhen" => %{
+          "opts.model.api_type" => %{
+            "openai" => "__openai",
+            "azure" => "__azure",
+            "google" => "__google",
+            "mistral" => "__mistral",
+            "anthropic" => "__anthropic"
+          }
+        }
+      })
+    )
+
+    defoption(:endpoint, %{
+      "type" => "string",
+      "title" => "Endpoint",
+      "description" => "The endpoint to use for the chat.",
+      "defaultWhen" => %{
+        "opts.model.api_type" => %{
+          "openai" => "https://api.openai.com/v1",
+          "azure" =>
+            "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}",
+          "google" => "https://generativelanguage.googleapis.com/v1beta/models",
+          "mistral" => "https://api.mistral.ai/v1",
+          "anthropic" => "https://api.anthropic.com/v1"
+        }
+      },
+      "minLength" => 1
+    })
+
+    defoption(:model, %{
+      "type" => "string",
+      "title" => "Model",
+      "description" => "The model to use for the chat.",
+      "url" =>
+        "/api/organizations/{{organization_id}}/models?api_type={{opts.model.api_type}}&endpoint={{opts.model.endpoint}}&api_key={{opts.model.api_key}}",
+      "presentAs" => "async-select",
+      "minLength" => 1,
+      "readonly" => true
+    })
+
+    defoption(:temperature, %{
+      "type" => "number",
+      "title" => "Temperature",
+      "description" => "The temperature of the chat.",
+      "default" => 0.7,
+      "minimum" => 0.0,
+      "maximum" => 2.0,
+      "step" => 0.1,
+      "readonly" => true
+    })
+  end
 
   deftool(:query,
     description:
@@ -41,85 +118,24 @@ defmodule Buildel.Blocks.NewChat do
     }
   )
 
-  defoption(
-    :api_type,
-    %{
-      "type" => "string",
-      "title" => "Model API type",
-      "description" => "The API type to use for the chat.",
-      "enum" => ["openai", "azure", "google", "mistral", "anthropic"],
-      "enumPresentAs" => "radio",
-      "default" => "openai",
-      "readonly" => true
-    }
-  )
-
-  defoption(
-    :api_key,
-    secret_schema(%{
-      "title" => "API key",
-      "description" => "API key to use for the chat.",
-      "descriptionWhen" => %{
-        "opts.api_type" => %{
-          "openai" =>
-            "[OpenAI API key](https://platform.openai.com/api-keys) to use for the chat.",
-          "azure" => "Azure API key to use for the chat.",
-          "google" => "Google API key to use for the chat.",
-          "mistral" =>
-            "[Mistral API key](https://console.mistral.ai/api-keys/) to use for the chat.",
-          "anthropic" => "[Anthropic API key](https://www.anthropic.com/api) to use for the chat."
+  deftool(:klops,
+    description:
+      "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.
+            CALL IT WITH FORMAT `{ \"query\": \"example query\" }`
+            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries.
+            You can use `document_id` property to narrow the search to the specific document.
+            DO NOT SET MORE THAN 2 KEYWORDS",
+    schema: %{
+      "type" => "object",
+      "properties" => %{
+        "message" => %{
+          "type" => "string",
+          "description" => "Message to send to the agent."
         }
       },
-      "defaultWhen" => %{
-        "opts.api_type" => %{
-          "openai" => "__openai",
-          "azure" => "__azure",
-          "google" => "__google",
-          "mistral" => "__mistral",
-          "anthropic" => "__anthropic"
-        }
-      }
-    })
+      "required" => ["message"]
+    }
   )
-
-  defoption(:endpoint, %{
-    "type" => "string",
-    "title" => "Endpoint",
-    "description" => "The endpoint to use for the chat.",
-    "defaultWhen" => %{
-      "opts.api_type" => %{
-        "openai" => "https://api.openai.com/v1",
-        "azure" =>
-          "https://{resource_name}.openai.azure.com/openai/deployments/{deployment_name}",
-        "google" => "https://generativelanguage.googleapis.com/v1beta/models",
-        "mistral" => "https://api.mistral.ai/v1",
-        "anthropic" => "https://api.anthropic.com/v1"
-      }
-    },
-    "minLength" => 1
-  })
-
-  defoption(:model, %{
-    "type" => "string",
-    "title" => "Model",
-    "description" => "The model to use for the chat.",
-    "url" =>
-      "/api/organizations/{{organization_id}}/models?api_type={{opts.api_type}}&endpoint={{opts.endpoint}}&api_key={{opts.api_key}}",
-    "presentAs" => "async-select",
-    "minLength" => 1,
-    "readonly" => true
-  })
-
-  defoption(:temperature, %{
-    "type" => "number",
-    "title" => "Temperature",
-    "description" => "The temperature of the chat.",
-    "default" => 0.7,
-    "minimum" => 0.0,
-    "maximum" => 2.0,
-    "step" => 0.1,
-    "readonly" => true
-  })
 
   defoption(:chat_memory_type, %{
     "type" => "string",

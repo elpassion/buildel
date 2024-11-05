@@ -18,6 +18,7 @@ defmodule Buildel.Blocks.NewBlock do
       import Buildel.Blocks.NewBlock.Defblock
       import Buildel.Blocks.NewBlock.Defoption
       import Buildel.Blocks.NewBlock.Deftool
+      import Buildel.Blocks.NewBlock.Defsection
 
       use Buildel.Blocks.NewBlock.Server, tool_controller: @tool_controller
 
@@ -25,6 +26,8 @@ defmodule Buildel.Blocks.NewBlock do
       @outputs []
       @dynamic_ios nil
       @tools []
+      @sections []
+      @section nil
 
       @schema_opts []
 
@@ -143,6 +146,7 @@ defmodule Buildel.Blocks.NewBlock do
       @spec options :: %Buildel.Blocks.Utils.Options{}
       def options do
         @options
+        |> Options.set_sections(@sections)
         |> Options.set_inputs(@inputs)
         |> Options.set_outputs(@outputs)
         |> Options.set_tools(@tools, @tool_controller)
@@ -230,6 +234,23 @@ defmodule Buildel.Blocks.NewBlock.Defblock do
                  description: unquote(options_list)[:description],
                  groups: unquote(options_list)[:groups]
                })
+    end
+  end
+end
+
+defmodule Buildel.Blocks.NewBlock.Defsection do
+  defmacro defsection(name, options, do: block) do
+    quoted_block = quote do: unquote(block)
+
+    quote do
+      {:ok, options} =
+        unquote(options)
+        |> Keyword.validate([:title, :description])
+
+      @section unquote(name)
+      @sections [{unquote(name), unquote(options)}] ++ @sections
+      Code.eval_quoted(unquote(quoted_block), [], __ENV__)
+      @section nil
     end
   end
 end
@@ -438,7 +459,8 @@ defmodule Buildel.Blocks.NewBlock.Defoption do
 
       @schema_opts Keyword.put(@schema_opts, unquote(name), %{
                      schema: unquote(schema),
-                     required: options[:required]
+                     required: options[:required],
+                     section: @section
                    })
 
       def option(state, unquote(name)) do
@@ -463,6 +485,8 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
 
       ExJsonSchema.Schema.resolve(options[:schema])
 
+      existing_tools = @tools
+
       @tools [
         %Buildel.Blocks.NewBlock.Tool{
           name: unquote(name),
@@ -472,7 +496,11 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
         | @tools
       ]
 
-      def call_tool(state, %Message{} = message, opts \\ []) do
+      if existing_tools |> Enum.count() == 0 do
+        def call_tool(state, message, options \\ [])
+      end
+
+      def call_tool(state, %Message{} = message, opts) do
         pid =
           state.block.context.block_id
           |> String.to_existing_atom()

@@ -3,7 +3,6 @@ defmodule Buildel.Blocks.Browser do
   use Buildel.Blocks.Tool, parallel: ["url"]
 
   alias Buildel.Crawler
-  alias Buildel.Blocks.Fields.EditorField.Suggestion
   alias Buildel.Blocks.Fields.EditorField
 
   # Config
@@ -56,8 +55,7 @@ defmodule Buildel.Blocks.Browser do
                     description:
                       "Valid JSON object of the headers to be sent with the request. i.e. `{\"Content-Type\": \"application/json\"}`.",
                     editorLanguage: "json",
-                    default:
-                      "{}",
+                    default: "{}",
                     minLength: 1,
                     suggestions: []
                   }),
@@ -249,7 +247,6 @@ defmodule Buildel.Blocks.Browser do
   defp does_url_match_host(_, _) do
     {:ok, false}
   end
-
 
   defp build_headers(headers_string, args) do
     args

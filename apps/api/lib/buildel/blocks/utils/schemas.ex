@@ -65,4 +65,16 @@ defmodule Buildel.Blocks.Utils.Schemas do
       attrs
     )
   end
+
+  def push_property(schema, name, property_schema, required) do
+    required_keys =
+      case required do
+        true -> schema.required ++ [name]
+        false -> schema.required
+      end
+
+    properties = Jason.OrderedObject.new(schema.properties.values ++ [{name, property_schema}])
+
+    %{schema | required: required_keys, properties: properties}
+  end
 end

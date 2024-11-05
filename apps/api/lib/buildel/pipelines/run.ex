@@ -1,7 +1,6 @@
 defmodule Buildel.Pipelines.Run do
   use Ecto.Schema
   import Ecto.Changeset
-  import Ecto.Query
   alias Buildel.Pipelines.Pipeline
 
   schema "runs" do

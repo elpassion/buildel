@@ -3,11 +3,25 @@ defmodule Buildel.Blocks.Utils.Options do
   alias Buildel.Blocks.Fields.EditorField
 
   @enforce_keys [:type, :description, :groups]
-  @derive Jason.Encoder
-  defstruct [:type, :description, :groups, :inputs, :outputs, :ios, :dynamic_ios, :schema]
+  @derive {Jason.Encoder, except: [:sections]}
+  defstruct [
+    :type,
+    :description,
+    :groups,
+    :sections,
+    :inputs,
+    :outputs,
+    :ios,
+    :dynamic_ios,
+    :schema
+  ]
 
   def new(%{type: type, description: description, groups: groups}) do
     %__MODULE__{type: type, description: description, groups: groups}
+  end
+
+  def set_sections(options, sections) do
+    %{options | sections: sections}
   end
 
   def set_inputs(options, inputs) do
@@ -48,10 +62,11 @@ defmodule Buildel.Blocks.Utils.Options do
             :"#{&1.name}_call_formatter",
             %{
               required: true,
+              section: &1.name,
               schema:
                 EditorField.new(%{
-                  readonly: true,
-                  title: "#{to_string(&1.name) |> String.capitalize()} Call Formatter",
+                  readonly: false,
+                  title: "Call Formatter",
                   description: "Prompt to display when calling tool",
                   minLength: 1,
                   default: "abc",
@@ -70,10 +85,11 @@ defmodule Buildel.Blocks.Utils.Options do
             :"#{&1.name}_response_formatter",
             %{
               required: true,
+              section: &1.name,
               schema:
                 EditorField.new(%{
-                  readonly: true,
-                  title: "#{to_string(&1.name) |> String.capitalize()} Response Formatter",
+                  readonly: false,
+                  title: "Response Formatter",
                   description: "Prompt to display when tool has responded",
                   minLength: 1,
                   default: "abc",
@@ -91,9 +107,111 @@ defmodule Buildel.Blocks.Utils.Options do
         ]
       )
 
+    options =
+      update_in(options.sections, fn existing_sections ->
+        existing_sections ++
+          Enum.map(
+            tools,
+            &{&1.name,
+             [
+               title: "#{to_string(&1.name) |> String.capitalize()} Tool Settings",
+               description: ""
+             ]}
+          )
+      end)
+
     options_schema_properties =
       options_schema_properties
       |> Keyword.merge(tools_options_schema_properties)
+      |> Enum.reduce(%{section: nil, properties: []}, fn
+        {field_name, %{section: nil} = field_properties},
+        %{properties: properties, section: nil} ->
+          %{section: nil, properties: properties ++ [{field_name, field_properties}]}
+
+        {field_name, %{section: field_section} = field_properties},
+        %{properties: properties, section: nil} ->
+          section_info = options.sections |> Keyword.get(field_section)
+
+          section_schema =
+            Schemas.options_schema(%{
+              type: "section",
+              title: section_info |> Keyword.get(:title),
+              description: section_info |> Keyword.get(:description),
+              required: [],
+              properties: Jason.OrderedObject.new([])
+            })
+            |> Schemas.push_property(
+              field_name,
+              field_properties.schema,
+              field_properties.required
+            )
+
+          %{section: %{name: field_section, schema: section_schema}, properties: properties}
+
+        {field_name, %{section: nil} = field_properties},
+        %{properties: properties, section: section} ->
+          %{
+            section: nil,
+            properties:
+              properties ++
+                [{section.name, %{schema: section.schema, required: true, section: nil}}] ++
+                [{field_name, field_properties}]
+          }
+
+        {field_name, %{section: field_section} = field_properties},
+        %{properties: properties, section: %{name: section_name} = section}
+        when field_section == section_name ->
+          section = %{
+            section
+            | schema:
+                section.schema
+                |> Schemas.push_property(
+                  field_name,
+                  field_properties.schema,
+                  field_properties.required
+                )
+          }
+
+          %{section: section, properties: properties}
+
+        {field_name, %{section: field_section} = field_properties},
+        %{properties: properties, section: %{name: _section_name} = section} ->
+          section_info = options.sections |> Keyword.get(field_section)
+
+          section_schema =
+            Schemas.options_schema(%{
+              type: "section",
+              title: section_info |> Keyword.get(:title),
+              description: section_info |> Keyword.get(:description),
+              required: [],
+              properties: Jason.OrderedObject.new([])
+            })
+            |> Schemas.push_property(
+              field_name,
+              field_properties.schema,
+              field_properties.required
+            )
+
+          %{
+            section: %{name: field_section, schema: section_schema},
+            properties:
+              properties ++
+                [{section.name, %{schema: section.schema, required: true, section: nil}}]
+          }
+      end)
+      |> then(fn
+        %{section: nil} = result ->
+          result
+
+        %{properties: properties, section: section} ->
+          %{
+            section: nil,
+            properties:
+              properties ++
+                [{section.name, %{schema: section.schema, required: true, section: nil}}]
+          }
+      end)
+      |> then(& &1.properties)
 
     %{
       options
