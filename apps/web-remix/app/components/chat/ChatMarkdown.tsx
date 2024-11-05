@@ -431,7 +431,16 @@ function Image({
   className,
   ...rest
 }: React.ImgHTMLAttributes<HTMLImageElement>) {
-  return <img alt={alt} className={cn(className)} {...rest} />;
+  return (
+    <img
+      alt={alt}
+      className={cn(
+        'h-[200px] w-[250px] object-cover bg-primary/10 rounded-md bg-no-repeat object-center',
+        className,
+      )}
+      {...rest}
+    />
+  );
 }
 
 export function truncateChildrenContent(
