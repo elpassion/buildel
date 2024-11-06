@@ -116,53 +116,108 @@ export function OutputHandle({
   );
 }
 
-export function ToolHandle({
+interface IOHandleProps extends HandleProps {
+  totalSize: number;
+}
+
+export function WorkerHandle({
   handle,
   isConnectable = true,
   blockName,
-}: HandleProps) {
-  const isWorker = handle.data.type === 'worker';
-  const handleTypeClassName = useMemo(() => {
-    switch (handle.data.type) {
-      case 'worker':
-        return '!rounded-[1px] !bg-blue-500 !border-blue-500 -translate-y-[3px]';
-
-      case 'controller':
-        return '!rounded-[1px] !bg-orange-500 !border-orange-500 translate-y-[3px]';
-    }
-  }, [handle.data.type]);
-
+  index,
+  totalSize,
+}: IOHandleProps) {
   return (
     <>
       <span
-        className={cn(
-          'absolute text-[10px] -translate-x-1/2 text-muted-foreground left-1/2',
-        )}
+        className={cn('absolute text-[10px] text-muted-foreground left-1/2')}
         style={{
-          top: isWorker ? -26 : 'auto',
-          bottom: !isWorker ? -26 : 'auto',
+          top: -26,
+          bottom: 'auto',
+          transform: `translateX(calc(-50% + ${getIoXPosition(index, totalSize)}px))`,
         }}
       >
-        I/O
+        {startCase(handle.data.name)}
       </span>
       <Handle
         key={handle.id}
         type={handle.type}
-        position={isWorker ? Position.Top : Position.Bottom}
+        position={Position.Top}
         isConnectable={isConnectable}
         id={handle.id}
         data-testid={`${blockName}-${handle.data.name}-handle`}
         className={cn(
           '!bg-transparent !w-[30px] !h-[30px] !border-none !rounded flex justify-center items-center group',
         )}
+        style={{
+          transform: `translate(calc(-50% - ${getIoXPosition(index, totalSize)}px) , -50%)`,
+        }}
       >
         <div
           className={cn(
             '!border-1 !w-[10px] !h-[10px] !rotate-45 pointer-events-none group-hover:scale-125 transition-transform duration-100 ease-in-out',
-            handleTypeClassName,
+            '!rounded-[1px] !bg-blue-500 !border-blue-500 -translate-y-[3px]',
           )}
         />
       </Handle>
     </>
   );
+}
+
+export function ControllerHandle({
+  handle,
+  isConnectable = true,
+  blockName,
+  index,
+  totalSize,
+}: IOHandleProps) {
+  return (
+    <>
+      <span
+        className={cn('absolute text-[10px] text-muted-foreground left-1/2')}
+        style={{
+          top: 'auto',
+          bottom: -26,
+          transform: `translateX(calc(-50% + ${getIoXPosition(index, totalSize)}px))`,
+        }}
+      >
+        {startCase(handle.data.name)}
+      </span>
+      <Handle
+        key={handle.id}
+        type={handle.type}
+        position={Position.Bottom}
+        isConnectable={isConnectable}
+        id={handle.id}
+        data-testid={`${blockName}-${handle.data.name}-handle`}
+        className={cn(
+          '!bg-transparent !w-[30px] !h-[30px] !border-none !rounded flex justify-center items-center group',
+        )}
+        style={{
+          transform: `translate(calc(-50% - ${getIoXPosition(index, totalSize)}px), 50%)`,
+        }}
+      >
+        <div
+          className={cn(
+            '!border-1 !w-[10px] !h-[10px] !rotate-45 pointer-events-none group-hover:scale-125 transition-transform duration-100 ease-in-out',
+            '!rounded-[1px] !bg-orange-500 !border-orange-500 translate-y-[3px]',
+          )}
+        />
+      </Handle>
+    </>
+  );
+}
+
+function getIoXPosition(index: number, size: number) {
+  if (size === 1) {
+    return 0;
+  }
+
+  const offset = 45;
+
+  if (size % 2 === 1) {
+    return (index - Math.floor(size / 2)) * offset;
+  } else {
+    return (index - (size / 2 - 0.5)) * offset;
+  }
 }

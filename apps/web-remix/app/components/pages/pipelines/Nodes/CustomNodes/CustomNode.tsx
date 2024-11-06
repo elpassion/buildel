@@ -13,7 +13,12 @@ import { getBlockFields, getBlockHandles } from '../../PipelineFlow.utils';
 import { useRunPipelineNode } from '../../RunPipelineProvider';
 import { NodeFieldsForm } from './NodeFieldsForm';
 import { NodeFieldsOutput } from './NodeFieldsOutput';
-import { InputHandle, OutputHandle, ToolHandle } from './NodeHandles';
+import {
+  ControllerHandle,
+  InputHandle,
+  OutputHandle,
+  WorkerHandle,
+} from './NodeHandles';
 import { NodeReadonlyFields } from './NodeReadonlyFields';
 
 export interface CustomNodeProps extends PropsWithChildren {
@@ -176,11 +181,14 @@ export function CustomNodeBody({
         .filter((h) => h.type === 'source'),
     [handles],
   );
-  const ioHandles = useMemo(
-    () =>
-      handles.filter(
-        (h) => h.data.type === 'controller' || h.data.type === 'worker',
-      ),
+
+  const workerHandles = useMemo(
+    () => handles.filter((h) => h.data.type === 'worker'),
+    [handles],
+  );
+
+  const controllerHandles = useMemo(
+    () => handles.filter((h) => h.data.type === 'controller'),
     [handles],
   );
 
@@ -233,13 +241,25 @@ export function CustomNodeBody({
         />
       ))}
 
-      {ioHandles.map((handle, index) => (
-        <ToolHandle
+      {workerHandles.map((handle, index) => (
+        <WorkerHandle
           key={handle.id}
           handle={handle}
           index={index}
           isConnectable={isConnectable}
           blockName={data.name}
+          totalSize={workerHandles.length}
+        />
+      ))}
+
+      {controllerHandles.map((handle, index) => (
+        <ControllerHandle
+          key={handle.id}
+          handle={handle}
+          index={index}
+          isConnectable={isConnectable}
+          blockName={data.name}
+          totalSize={controllerHandles.length}
         />
       ))}
     </div>
