@@ -446,7 +446,7 @@ function Image({
         {...rest}
       />
 
-      <div className="max-w-[115px] absolute top-2 right-2 text-xs pl-1 pr-2 py-[2px] rounded-full bg-black/50 text-[#c4c7c5] transition group-hover:text-white flex items-center gap-1">
+      <span className="max-w-[115px] absolute top-2 right-2 text-xs pl-1 pr-2 py-[2px] rounded-full bg-black/50 text-[#c4c7c5] transition group-hover:text-white flex items-center gap-1">
         {isValidUrl(rest.src) ? (
           <img
             src={getFaviconFromDomain(new URL(rest.src as string))}
@@ -454,7 +454,7 @@ function Image({
           />
         ) : null}
         <span className="truncate">{removeUrlProtocol(rest.src)}</span>
-      </div>
+      </span>
     </a>
   );
 }
