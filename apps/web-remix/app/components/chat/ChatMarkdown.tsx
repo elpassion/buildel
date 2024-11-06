@@ -446,9 +446,15 @@ function Image({
         {...rest}
       />
 
-      <span className="block max-w-[105px] truncate absolute top-2 right-2 text-xs px-2 py-[2px] rounded-full bg-black/50 text-[#c4c7c5] transition group-hover:text-white">
-        {removeUrlProtocol(rest.src)}
-      </span>
+      <div className="max-w-[115px] absolute top-2 right-2 text-xs pl-1 pr-2 py-[2px] rounded-full bg-black/50 text-[#c4c7c5] transition group-hover:text-white flex items-center gap-1">
+        {isValidUrl(rest.src) ? (
+          <img
+            src={getFaviconFromDomain(new URL(rest.src as string))}
+            className="w-4 h-4 object-contain object-center m-0"
+          />
+        ) : null}
+        <span className="truncate">{removeUrlProtocol(rest.src)}</span>
+      </div>
     </a>
   );
 }
@@ -538,4 +544,54 @@ function truncateString(str: string, maxLength: number) {
 function removeUrlProtocol(url?: string) {
   if (!url) return;
   return url.replace(/(^\w+:|^)\/\//, '');
+}
+
+function getFaviconFromDomain(url: URL) {
+  //remove subdomain
+  return `https://www.google.com/s2/favicons?sz=32&domain_url=${url.hostname.split('.').slice(-2).join('.')}`;
+}
+
+const LINK_REGEX = /\[.*?]\((https?:\/\/[^)]+)\)/g;
+
+export function addReferenceToLinks(message: string) {
+  let linkIndex = 1;
+  const links: URL[] = [];
+
+  const msg = message.replace(LINK_REGEX, (match) => {
+    const link = match.match(/\((https?:\/\/[^)]+)\)/)?.[1] ?? '';
+
+    if (!isValidUrl(link)) {
+      return match;
+    }
+
+    if (isImage(link)) {
+      return match;
+    }
+
+    links.push(new URL(link));
+    const numberedLink = withLinkIndex(match, linkIndex);
+
+    linkIndex++;
+    return numberedLink;
+  });
+
+  return { message: msg, links };
+}
+
+export function isValidUrl(string?: string) {
+  if (!string) return false;
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+export function isImage(url: string) {
+  return /\.(jpeg|jpg|gif|png|webp|bmp|svg)(\?.*)?$/i.test(url);
+}
+
+export function withLinkIndex(link: string, index: number) {
+  return `${link} <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">${index}</span>`;
 }

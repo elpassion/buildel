@@ -4,7 +4,10 @@ import { useInView } from 'react-intersection-observer';
 import { Check, Copy, Download, UserRound } from 'lucide-react';
 import { ClientOnly } from 'remix-utils/client-only';
 
-import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
+import {
+  addReferenceToLinks,
+  ChatMarkdown,
+} from '~/components/chat/ChatMarkdown';
 import { useTruncatedList } from '~/components/chat/useTruncatedList';
 import { IconButton } from '~/components/iconButton';
 import { ItemList } from '~/components/list/ItemList';
@@ -257,48 +260,4 @@ function EmbedLink({ link, idx }: EmbedLinkProps) {
       </a>
     </li>
   );
-}
-
-const LINK_REGEX = /\[.*?]\((https?:\/\/[^)]+)\)/g;
-
-export function addReferenceToLinks(message: string) {
-  let linkIndex = 1;
-  const links: URL[] = [];
-
-  const msg = message.replace(LINK_REGEX, (match) => {
-    const link = match.match(/\((https?:\/\/[^)]+)\)/)?.[1] ?? '';
-
-    if (!isValidUrl(link)) {
-      return match;
-    }
-
-    if (isImage(link)) {
-      return match;
-    }
-
-    links.push(new URL(link));
-    const numberedLink = withLinkIndex(match, linkIndex);
-
-    linkIndex++;
-    return numberedLink;
-  });
-
-  return { message: msg, links };
-}
-
-function isValidUrl(string: string) {
-  try {
-    new URL(string);
-    return true;
-  } catch (_) {
-    return false;
-  }
-}
-
-function isImage(url: string) {
-  return /\.(jpeg|jpg|gif|png|webp|bmp|svg)(\?.*)?$/i.test(url);
-}
-
-function withLinkIndex(link: string, index: number) {
-  return `${link} <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">${index}</span>`;
 }
