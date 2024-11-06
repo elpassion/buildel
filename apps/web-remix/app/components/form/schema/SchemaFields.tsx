@@ -397,7 +397,7 @@ function SectionFieldPreviewItem({
     return (
       <SectionFieldPreviewItemWrapper title={propertyValue}>
         <SectionFieldPreviewItemTitle>
-          {startCase(name)}
+          {schema.title ?? startCase(name)}
         </SectionFieldPreviewItemTitle>
         <SectionFieldPreviewItemValue>
           {propertyValue}
@@ -416,7 +416,7 @@ function SectionFieldPreviewItem({
         <SectionFieldPreviewAsyncItem
           url={schema.url}
           value={propertyValue}
-          label={name}
+          label={schema.title ?? name}
         />
       );
     }
@@ -424,7 +424,7 @@ function SectionFieldPreviewItem({
     return (
       <SectionFieldPreviewItemWrapper title={propertyValue}>
         <SectionFieldPreviewItemTitle>
-          {startCase(name)}
+          {schema.title ?? startCase(name)}
         </SectionFieldPreviewItemTitle>
         <SectionFieldPreviewItemValue>
           {propertyValue}
