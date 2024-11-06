@@ -546,9 +546,17 @@ function removeUrlProtocol(url?: string) {
   return url.replace(/(^\w+:|^)\/\//, '');
 }
 
-function getFaviconFromDomain(url: URL) {
-  //remove subdomain
-  return `https://www.google.com/s2/favicons?sz=32&domain_url=${url.hostname.split('.').slice(-2).join('.')}`;
+export function getFaviconFromDomain(url: URL) {
+  const hostnameParts = url.hostname.split('.');
+
+  const isRegionalDomain =
+    hostnameParts.length > 2 && hostnameParts.slice(-2).join('.').length <= 6;
+
+  const domain = isRegionalDomain
+    ? hostnameParts.slice(-3).join('.')
+    : hostnameParts.slice(-2).join('.');
+
+  return `https://www.google.com/s2/favicons?sz=64&domain_url=${domain}`;
 }
 
 const LINK_REGEX = /\[.*?]\((https?:\/\/[^)]+)\)/g;

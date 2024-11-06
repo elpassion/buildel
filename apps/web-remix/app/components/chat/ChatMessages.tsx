@@ -1,18 +1,27 @@
 import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useFetcher } from '@remix-run/react';
 import { Check, Copy, Download, UserRound } from 'lucide-react';
 import { ClientOnly } from 'remix-utils/client-only';
 
 import {
   addReferenceToLinks,
   ChatMarkdown,
+  getFaviconFromDomain,
 } from '~/components/chat/ChatMarkdown';
 import { useTruncatedList } from '~/components/chat/useTruncatedList';
 import { IconButton } from '~/components/iconButton';
 import { ItemList } from '~/components/list/ItemList';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { useDownloadFile } from '~/hooks/useDownloadFile';
+import type { WebsiteMeta } from '~/routes/fetch-meta';
 import { cn } from '~/utils/cn';
 import { dayjs } from '~/utils/Dayjs';
 
@@ -218,7 +227,7 @@ export function EmbedLinksList({ links }: EmbedLinksListProps) {
         className="grow list-none p-0 flex gap-1 flex-wrap mt-0.5"
       >
         {links.map((link, idx) => (
-          <EmbedLink key={idx} link={link} idx={idx} />
+          <EmbedLinkItem key={idx} link={link} idx={idx} />
         ))}
 
         {(hiddenElements > 0 || showAll) && (
@@ -239,11 +248,68 @@ interface EmbedLinkProps {
   link: URL;
   idx: number;
 }
-function EmbedLink({ link, idx }: EmbedLinkProps) {
+function EmbedLinkItem({ link, idx }: EmbedLinkProps) {
+  const metaFetcher = useFetcher<WebsiteMeta | null>();
+
+  useEffect(() => {
+    if (metaFetcher.data) return;
+    metaFetcher.load(`/fetch-meta?url=${link.toString()}`);
+  }, []);
+
+  if (
+    !metaFetcher.data ||
+    !metaFetcher.data.title ||
+    !metaFetcher.data.description
+  ) {
+    return <EmbedLink link={link} idx={idx} />;
+  }
+
+  return (
+    <TooltipProvider delayDuration={100}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <EmbedLink link={link} idx={idx} />
+        </TooltipTrigger>
+
+        <TooltipContent>
+          <div className="text-xs flex flex-col gap-1 max-w-[250px]">
+            <div className="flex gap-2 items-center">
+              <img
+                alt={decodeHtml(metaFetcher.data.title)}
+                src={getFaviconFromDomain(link)}
+                className="w-3.5 h-3.5 object-contain object-center m-0"
+              />
+              <h4 className="text-foreground line-clamp-1 m-0 font-normal">
+                {getDomainName(link)}
+              </h4>
+            </div>
+            <div className="flex flex-col">
+              <h5 className="font-bold m-0 text-foreground line-clamp-2">
+                {decodeHtml(metaFetcher.data.title)}
+              </h5>
+              <p className="m-0 text-muted-foreground line-clamp-2">
+                {decodeHtml(metaFetcher.data.description)}
+              </p>
+            </div>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function EmbedLink({
+  link,
+  idx,
+  ref,
+  ...rest
+}: EmbedLinkProps & { ref?: React.Ref<HTMLLIElement> }) {
   return (
     <li
+      ref={ref}
       key={idx}
       className="m-0 rounded border border-input text-xs p-0 overflow-hidden group"
+      {...rest}
     >
       <a
         href={link.toString()}
@@ -260,4 +326,22 @@ function EmbedLink({ link, idx }: EmbedLinkProps) {
       </a>
     </li>
   );
+}
+
+function decodeHtml(value: string) {
+  const txt = document.createElement('textarea');
+  txt.innerHTML = value;
+  return txt.value;
+}
+
+function getDomainName(url: URL) {
+  const hostname = new URL(url).hostname;
+
+  const parts = hostname.split('.');
+
+  if (parts.length > 2) {
+    return parts[parts.length - 2];
+  }
+
+  return parts[0];
 }
