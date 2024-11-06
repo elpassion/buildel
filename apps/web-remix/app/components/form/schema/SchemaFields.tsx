@@ -313,8 +313,15 @@ function RealArrayField({
   );
 }
 
-export function SectionField({ field, name, ...rest }: FieldProps) {
+export function SectionField({
+  field,
+  name,
+  shouldDisplay,
+  ...rest
+}: FieldProps) {
   assert(field.type === 'object');
+
+  if (shouldDisplay && !shouldDisplay(field)) return null;
 
   return (
     <div>
