@@ -26,9 +26,11 @@ export const NodePromptInputs = ({
   }, [edges]);
 
   const inputs = useMemo(() => {
-    return removeDuplicates(getInputsFromTemplate(promptTemplate)).map(
+    const inputs = removeDuplicates(getInputsFromTemplate(promptTemplate)).map(
       splitInput,
     );
+
+    return removeControllerInput(inputs, connections, blockName);
   }, [promptTemplate]);
 
   const notConnectedInputs = useMemo(() => {
@@ -107,6 +109,22 @@ function removeDuplicates(arr: string[]) {
   return [...new Set(arr)];
 }
 
+function removeControllerInput(
+  inputs: [string, string][],
+  connections: IConfigConnection[],
+  blockName: string,
+) {
+  return inputs.filter((input) => {
+    const handle = findHandleInConnection(input, connections, blockName);
+
+    if (handle) {
+      return handle.to.type !== 'controller';
+    }
+
+    return true;
+  });
+}
+
 function splitInput(input: string): [string, string] {
   const index = input.indexOf(':');
   if (index === -1) {
@@ -152,6 +170,20 @@ function checkInputConnection(
       (connection.to.block_name === input[0] &&
         connection.to.input_name === input[1] &&
         connection.from.block_name === blockName)
+    );
+  });
+}
+
+function findHandleInConnection(
+  input: [string, string],
+  connections: IConfigConnection[],
+  blockName: string,
+) {
+  return connections.find((connection) => {
+    return (
+      connection.from.block_name === input[0] &&
+      connection.from.output_name === input[1] &&
+      connection.to.block_name === blockName
     );
   });
 }

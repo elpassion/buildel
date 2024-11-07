@@ -25,8 +25,10 @@ export function getNodes(pipeline: IPipelineConfig): INode[] {
 }
 
 export function getEdges(pipeline: IPipelineConfig): IEdge[] {
-  const edges = pipeline.connections.map((connection) => {
-    return {
+  const nodes = getNodes(pipeline);
+
+  return pipeline.connections.reduce((acc, connection) => {
+    const edge = {
       id: `${connection.from.block_name}:${connection.from.output_name}-${connection.to.block_name}:${connection.to.input_name}`,
       source: connection.from.block_name,
       sourceHandle: connection.from.output_name,
@@ -35,11 +37,20 @@ export function getEdges(pipeline: IPipelineConfig): IEdge[] {
       type: 'default',
       data: connection,
     };
-  });
 
-  const nodes = getNodes(pipeline);
+    const sourceNode = findSourceNode(edge, nodes);
+    const targetNode = findTargetNode(edge, nodes);
 
-  return edges.filter((edge) => checkIfEdgeExist(edge, nodes));
+    if (!sourceNode || !targetNode) return acc;
+
+    return [
+      ...acc,
+      {
+        ...edge,
+        data: extendConnectionWithHandleType(edge.data, sourceNode, targetNode),
+      },
+    ];
+  }, [] as IEdge[]);
 }
 
 export function isValidConnection(
@@ -102,18 +113,8 @@ export function toPipelineConfig(
   };
 }
 
-function checkIfEdgeExist(edge: IEdge, nodes: INode[]) {
-  const sourceNode = nodes.find((node) => {
-    return (
-      node.id === edge.source &&
-      (!!node.data.block_type?.outputs.find(
-        (output) => output.name === edge.sourceHandle,
-      ) ||
-        !!node.data.block_type?.ios.find((io) => io.name === edge.sourceHandle))
-    );
-  });
-
-  const targetNode = nodes.find((node) => {
+function findTargetNode(edge: IEdge, nodes: INode[]) {
+  return nodes.find((node) => {
     return (
       node.id === edge.target &&
       (!!node.data.block_type?.inputs.find(
@@ -122,8 +123,22 @@ function checkIfEdgeExist(edge: IEdge, nodes: INode[]) {
         !!node.data.block_type?.ios.find((io) => io.name === edge.targetHandle))
     );
   });
+}
 
-  return !!targetNode && !!sourceNode;
+function findSourceNode(edge: IEdge, nodes: INode[]) {
+  return nodes.find((node) => {
+    return (
+      node.id === edge.source &&
+      (!!node.data.block_type?.outputs.find(
+        (output) => output.name === edge.sourceHandle,
+      ) ||
+        !!node.data.block_type?.ios.find((io) => io.name === edge.sourceHandle))
+    );
+  });
+}
+
+function checkIfEdgeExist(edge: IEdge, nodes: INode[]) {
+  return !!findSourceNode(edge, nodes) && !!findTargetNode(edge, nodes);
 }
 
 export function getBlockHandles(block: IBlockConfig): IHandle[] {
@@ -200,15 +215,25 @@ export function getLastBlockNumber(blocks: IBlockConfig[]) {
 
 export function reverseToolConnections(
   connections: IConfigConnection[],
-  blockName: string,
+  blockConfig: IBlockConfig,
 ) {
   return connections
     .filter(
       (connection) =>
-        connection.from.block_name === blockName &&
-        connection.to.input_name === 'tool',
+        connection.from.block_name === blockConfig.name &&
+        connection.to.type === 'controller',
     )
     .map(reverseConnection);
+}
+
+export function filterBlockConnections(
+  connections: IConfigConnection[],
+  blockConfig: IBlockConfig,
+) {
+  return connections.filter(
+    (conn) =>
+      conn.to.block_name === blockConfig.name && conn.to.type !== 'controller',
+  );
 }
 
 function reverseConnection(connection: IConfigConnection) {
@@ -218,11 +243,13 @@ function reverseConnection(connection: IConfigConnection) {
       ...connection.to,
       block_name: connection.from.block_name,
       input_name: connection.from.output_name,
+      type: connection.from.type,
     },
     from: {
       ...connection.from,
       block_name: connection.to.block_name,
       output_name: connection.to.input_name,
+      type: connection.to.type,
     },
   };
 }
@@ -236,4 +263,37 @@ export function getNodeType(blockType: string) {
     default:
       return 'custom';
   }
+}
+
+function extendConnectionWithHandleType(
+  connection: IConfigConnection,
+  sourceNode: INode,
+  targetNode: INode,
+): IConfigConnection {
+  const result = { ...connection };
+
+  const sourceHandle = sourceNode.data.block_type?.outputs.find(
+    (output) => output.name === result.from.output_name,
+  );
+  const targetHandle = targetNode.data.block_type?.inputs.find(
+    (input) => input.name === result.to.input_name,
+  );
+  const ioHandle = sourceNode.data.block_type?.ios.find(
+    (io) => io.name === result.from.output_name,
+  );
+
+  if (sourceHandle) {
+    result.from.type = sourceHandle.type;
+  }
+
+  if (targetHandle) {
+    result.to.type = targetHandle.type;
+  }
+
+  if (ioHandle) {
+    result.from.type = 'worker';
+    result.to.type = 'controller';
+  }
+
+  return result;
 }

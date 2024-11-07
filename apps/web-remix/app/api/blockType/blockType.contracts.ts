@@ -30,10 +30,12 @@ export const ConfigConnection = z.object({
   from: z.object({
     block_name: z.string(),
     output_name: z.string(),
+    type: z.string().optional(),
   }),
   to: z.object({
     block_name: z.string(),
     input_name: z.string(),
+    type: z.string().optional(),
   }),
   opts: z
     .object({

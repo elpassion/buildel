@@ -43,7 +43,10 @@ import type {
   IConfigConnection,
   IIOType,
 } from '~/components/pages/pipelines/pipeline.types';
-import { reverseToolConnections } from '~/components/pages/pipelines/PipelineFlow.utils';
+import {
+  filterBlockConnections,
+  reverseToolConnections,
+} from '~/components/pages/pipelines/PipelineFlow.utils';
 import { successToast } from '~/components/toasts/successToast';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { assert } from '~/utils/assert';
@@ -174,7 +177,7 @@ export function EditBlockForm({
           if (suggestion.value === 'inputs.*') {
             return generateSuggestions([
               ...filterBlockConnections(connections, blockConfig),
-              ...reverseToolConnections(connections, blockConfig.name),
+              ...reverseToolConnections(connections, blockConfig),
             ]);
           }
           if (suggestion.value === 'metadata.*') {
@@ -206,7 +209,6 @@ export function EditBlockForm({
           ];
         },
       );
-
       return (
         <FormField name={props.name!}>
           <EditorField
@@ -489,6 +491,7 @@ function TriggerValidation() {
 }
 
 function generateSuggestions(connections: IConfigConnection[]): Suggestion[] {
+  console.log('CONN', connections);
   return connections.map((connection) => {
     return {
       label: `${connection.from.block_name}:${connection.from.output_name}`,
@@ -602,13 +605,6 @@ function buildConnectionsForCtx(connections: IIOType[], ctx: DisplayWhenCtx) {
     },
     {} as Record<string, number>,
   );
-}
-
-function filterBlockConnections(
-  connections: IConfigConnection[],
-  blockConfig: IBlockConfig,
-) {
-  return connections.filter((conn) => conn.to.block_name === blockConfig.name);
 }
 
 interface PageLeaveBlockerProps {

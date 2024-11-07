@@ -18,6 +18,7 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
 import {
+  filterBlockConnections,
   getEdges,
   getNodes,
   reverseToolConnections,
@@ -133,13 +134,8 @@ export function EditBlockPage() {
           >
             <BlockInputList
               connections={[
-                ...pipeline.config.connections.filter(
-                  (connection) => connection.to.block_name === block.name,
-                ),
-                ...reverseToolConnections(
-                  pipeline.config.connections,
-                  block.name,
-                ),
+                ...filterBlockConnections(pipeline.config.connections, block),
+                ...reverseToolConnections(pipeline.config.connections, block),
               ]}
             />
           </EditBlockForm>
