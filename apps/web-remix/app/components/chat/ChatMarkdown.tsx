@@ -385,14 +385,35 @@ function Code({
   const codeRef = useRef<HTMLElement>(null);
   const isMermaidCode = className?.includes('language-mermaid');
 
-  if (isMermaidCode) {
-    mermaid.initialize({
-      theme: 'default',
-    });
-    mermaid.run({
-      nodes: [codeRef.current!],
-    });
-  }
+  const isMermaidCompleted = async (value: unknown) => {
+    if (typeof value !== 'string') return false;
+
+    try {
+      return await mermaid.parse(value);
+    } catch {
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    if (!isMermaidCode) return;
+
+    const renderMermaid = async () => {
+      if (await isMermaidCompleted(children)) {
+        mermaid.initialize({
+          theme: 'default',
+          startOnLoad: false,
+        });
+
+        setTimeout(() => {
+          mermaid.run({
+            nodes: [codeRef.current!],
+          });
+        }, 1000);
+      }
+    };
+    renderMermaid();
+  }, [children, isMermaidCompleted]);
 
   if (className?.includes('language-buildel_message_attachments')) {
     try {
