@@ -25,14 +25,14 @@ describe(ChatMarkdown.name, () => {
             <details
               class="text-sm border border-input rounded-md w-fit py-2 my-2"
             >
-
+              
 
               <summary
                 class="cursor-pointer list-none -ml-1 px-4"
               >
                 Summary 1
               </summary>
-
+              
 
               <ul
                 class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
@@ -60,7 +60,7 @@ describe(ChatMarkdown.name, () => {
                   </span>
                 </li>
               </ul>
-
+              
 
             </details>
              hello world
@@ -83,14 +83,14 @@ describe(ChatMarkdown.name, () => {
             <details
               class="text-sm border border-input rounded-md w-fit py-2 my-2"
             >
-
+              
 
               <summary
                 class="cursor-pointer list-none -ml-1 px-4"
               >
                 Summary 1
               </summary>
-
+              
 
               <ul
                 class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
@@ -118,20 +118,20 @@ describe(ChatMarkdown.name, () => {
                   </span>
                 </li>
               </ul>
-
+              
 
             </details>
             <details
               class="text-sm border border-input rounded-md w-fit py-2 my-2"
             >
-
+              
 
               <summary
                 class="cursor-pointer list-none -ml-1 px-4"
               >
                 Summary 2
               </summary>
-
+              
 
               <ul
                 class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
@@ -148,7 +148,7 @@ describe(ChatMarkdown.name, () => {
                   </span>
                 </li>
               </ul>
-
+              
 
             </details>
              hello world
@@ -172,14 +172,14 @@ describe(ChatMarkdown.name, () => {
             <details
               class="text-sm border border-input rounded-md w-fit py-2 my-2"
             >
-
+              
 
               <summary
                 class="cursor-pointer list-none -ml-1 px-4"
               >
                 Summary 1
               </summary>
-
+              
 
               <ul
                 class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
@@ -196,28 +196,28 @@ describe(ChatMarkdown.name, () => {
                   </span>
                 </li>
               </ul>
-
+              
 
             </details>
-
+             
             <p
               class="my-2 break-words whitespace-pre-wrap text-sm"
               node="[object Object]"
             >
               SOME STRANGE TEXT
             </p>
-
+             
             <details
               class="text-sm border border-input rounded-md w-fit py-2 my-2"
             >
-
+              
 
               <summary
                 class="cursor-pointer list-none -ml-1 px-4"
               >
                 Summary 1
               </summary>
-
+              
 
               <ul
                 class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
@@ -234,10 +234,10 @@ describe(ChatMarkdown.name, () => {
                   </span>
                 </li>
               </ul>
-
+              
 
             </details>
-
+             
           </div>
         </div>
       `,
@@ -264,14 +264,14 @@ describe(ChatMarkdown.name, () => {
             <details
               class="text-sm border border-input rounded-md w-fit py-2 my-2"
             >
-
+              
 
               <summary
                 class="cursor-pointer list-none -ml-1 px-4"
               >
                 Summary 1
               </summary>
-
+              
 
               <ul
                 class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
@@ -299,10 +299,10 @@ describe(ChatMarkdown.name, () => {
                   </span>
                 </li>
               </ul>
-
+              
 
             </details>
-
+             
           </div>
         </div>
       `,
@@ -320,18 +320,18 @@ describe(ChatMarkdown.name, () => {
           <div
             id="_root"
           >
-
+             
             <details
               class="text-sm border border-input rounded-md w-fit py-2 my-2"
             >
-
+              
 
               <summary
                 class="cursor-pointer list-none -ml-1 px-4"
               >
                 Summary 1
               </summary>
-
+              
 
               <ul
                 class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
@@ -359,7 +359,7 @@ describe(ChatMarkdown.name, () => {
                   </span>
                 </li>
               </ul>
-
+              
 
             </details>
             <p
@@ -368,18 +368,18 @@ describe(ChatMarkdown.name, () => {
             >
               SOME STRANGE TEXT
             </p>
-
+                  
             <details
               class="text-sm border border-input rounded-md w-fit py-2 my-2"
             >
-
+              
 
               <summary
                 class="cursor-pointer list-none -ml-1 px-4"
               >
                 Summary 1
               </summary>
-
+              
 
               <ul
                 class="p-0 pb-0 pt-4 mt-2 mb-0 border-t border-input pl-4 pr-5"
@@ -407,7 +407,7 @@ describe(ChatMarkdown.name, () => {
                   </span>
                 </li>
               </ul>
-
+              
 
             </details>
           </div>
