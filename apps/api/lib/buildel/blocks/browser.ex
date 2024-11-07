@@ -39,7 +39,12 @@ defmodule Buildel.Blocks.Browser do
               Jason.OrderedObject.new(
                 call_formatter:
                   EditorField.call_formatter(%{
-                    default: "{{config.block_name}} Browse 📑: \"{{config.args}}\"\n",
+                    default: """
+                    <details>
+                      <summary>Website scrape...</summary>
+                      "{{config.args}}"
+                    </details>
+                    """,
                     description: "How to format calling of api call through tool interface.",
                     displayWhen: %{
                       connections: %{

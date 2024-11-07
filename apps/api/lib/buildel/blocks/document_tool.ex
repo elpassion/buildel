@@ -52,7 +52,12 @@ defmodule Buildel.Blocks.DocumentTool do
                 call_formatter:
                   EditorField.call_formatter(%{
                     description: "The formatter to use when retrieving data from DB.",
-                    default: "Database 📑: Document {{config.args}}\n",
+                    default: """
+                    <details>
+                      <summary>Database</summary>
+                      Document "{{config.args}}"
+                    </details>
+                    """,
                     displayWhen: %{
                       connections: %{
                         tool_worker: %{

@@ -61,7 +61,12 @@ defmodule Buildel.Blocks.BraveSearch do
                   }),
                 call_formatter:
                   EditorField.call_formatter(%{
-                    default: "{{config.block_name}} Search 📑: \"{{config.args}}\"\n",
+                    default: """
+                    <details>
+                      <summary>Web search...</summary>
+                      "{{config.args}}"
+                    </details>
+                    """,
                     description: "How to format calling of api call through tool interface.",
                     displayWhen: %{
                       connections: %{
