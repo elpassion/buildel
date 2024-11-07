@@ -1,44 +1,16 @@
 defmodule Buildel.Blocks.Video do
-  use Buildel.Blocks.Block
+  use Buildel.Blocks.NewBlock
 
-  @impl true
-  def options() do
-    %{
-      type: "video",
-      description: "",
-      groups: ["utils"],
-      inputs: [],
-      outputs: [],
-      ios: [],
-      dynamic_ios: nil,
-      schema: schema()
-    }
-  end
+  defblock(:video,
+    description: "",
+    groups: ["utils"]
+  )
 
-  @impl true
-  def schema() do
-    %{
-      "type" => "object",
-      "required" => ["name"],
-      "properties" => %{
-        "name" => name_schema(),
-        "opts" =>
-          options_schema(%{
-            "required" => ["url"],
-            "properties" =>
-              Jason.OrderedObject.new(
-                url: %{
-                  "type" => "string",
-                  "title" => "URL",
-                  "description" => "YouTube video URL",
-                  "regex" => %{
-                    "pattern" => "^(https:\\/\\/(?:www\\.)?youtube\\.com\\/watch\\?v=|https:\\/\\/youtu\\.be\\/)([A-Za-z0-9_-]{11})$",
-                    "errorMessage" => "Invalid YouTube URL format."
-                  }
-                }
-              )
-          })
-      }
-    }
-  end
+  defoption(:url, %{ "type" => "string",
+    "title" => "URL",
+    "description" => "YouTube video URL",
+    "regex" => %{
+      "pattern" => "^(https:\\/\\/(?:www\\.)?youtube\\.com\\/watch\\?v=|https:\\/\\/youtu\\.be\\/)([A-Za-z0-9_-]{11})$",
+      "errorMessage" => "Invalid YouTube URL format."
+    } })
 end
