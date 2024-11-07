@@ -21,7 +21,7 @@ defmodule Buildel.Blocks.NewWorkflowCall do
 
   defoption(:inputs, %{
     "type" => "array",
-    "title" => "Wait for Outputs",
+    "title" => "Inputs",
     "description" => "Which outputs should be waited for when calling as tool",
     "minItems" => 0,
     "items" => %{
@@ -32,7 +32,7 @@ defmodule Buildel.Blocks.NewWorkflowCall do
           "type" => "string",
           "title" => "Input",
           "url" =>
-            "/api/organizations/{{organization_id}}/pipelines/{{pipeline_id}}/blocks/{{block_name}}/options/inputs",
+            "/api/organizations/{{organization_id}}/pipelines/{{pipeline_id}}/blocks/{{block_name}}/options/inputs?workflow={{opts.workflow}}",
           "presentAs" => "async-select",
           "minLength" => 1
         },
@@ -43,13 +43,6 @@ defmodule Buildel.Blocks.NewWorkflowCall do
       }
     },
     "default" => [],
-    "displayWhen" => %{
-      "connections" => %{
-        "call_worker" => %{
-          "min" => 1
-        }
-      }
-    }
   })
 
   defoption(:wait_for_outputs, %{
@@ -65,7 +58,7 @@ defmodule Buildel.Blocks.NewWorkflowCall do
           "type" => "string",
           "title" => "Output",
           "url" =>
-            "/api/organizations/{{organization_id}}/pipelines/{{pipeline_id}}/blocks/{{block_name}}/options/outputs",
+            "/api/organizations/{{organization_id}}/pipelines/{{pipeline_id}}/blocks/{{block_name}}/options/outputs?workflow={{opts.workflow}}",
           "presentAs" => "async-select",
           "minLength" => 1
         }
@@ -136,8 +129,8 @@ defmodule Buildel.Blocks.NewWorkflowCall do
     BuildelWeb.OrganizationPipelineJSON.index(%{pipelines: pipelines, params: %Buildel.Pipelines.ListParams{}, total: 0})
   end
 
-  def handle_option(:outputs, %{organization: organization, pipeline: _pipeline, block: block}) do
-    with dynamic_pipeline_id <- block["opts"]["workflow"],
+  def handle_option(:outputs, %{organization: organization, pipeline: _pipeline, block: block, params: params}) do
+    with dynamic_pipeline_id <- Map.merge(block["opts"], params)["workflow"],
          {:ok, dynamic_pipeline} <-
            Buildel.Pipelines.get_organization_pipeline(organization, dynamic_pipeline_id) do
       BuildelWeb.OrganizationPipelineJSON.ios(%{pipeline: dynamic_pipeline}).data.outputs
@@ -149,8 +142,8 @@ defmodule Buildel.Blocks.NewWorkflowCall do
     end
   end
 
-  def handle_option(:inputs, %{organization: organization, pipeline: _pipeline, block: block}) do
-    with dynamic_pipeline_id <- block["opts"]["workflow"],
+  def handle_option(:inputs, %{organization: organization, pipeline: _pipeline, block: block, params: params}) do
+    with dynamic_pipeline_id <- Map.merge(block["opts"], params)["workflow"],
          {:ok, dynamic_pipeline} <-
            Buildel.Pipelines.get_organization_pipeline(organization, dynamic_pipeline_id) do
       BuildelWeb.OrganizationPipelineJSON.ios(%{pipeline: dynamic_pipeline}).data.inputs

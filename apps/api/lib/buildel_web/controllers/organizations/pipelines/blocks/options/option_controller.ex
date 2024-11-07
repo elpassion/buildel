@@ -56,7 +56,8 @@ defmodule BuildelWeb.OrganizationPipelineBlockOptionController do
         block_module.handle_option(option |> String.to_existing_atom(), %{
           organization: organization,
           pipeline: pipeline,
-          block: block
+          block: block,
+          params: conn.query_params
         })
 
       conn
