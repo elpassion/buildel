@@ -22,7 +22,7 @@ defmodule Buildel.Blocks.NewWorkflowCall do
   defoption(:inputs, %{
     "type" => "array",
     "title" => "Inputs",
-    "description" => "Which outputs should be waited for when calling as tool",
+    "description" => "Which inputs should be filled while calling workflow (by default no inputs are sent)",
     "minItems" => 0,
     "items" => %{
       "type" => "object",

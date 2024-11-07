@@ -1,45 +1,11 @@
 defmodule Buildel.Blocks.Comment do
-  use Buildel.Blocks.Block
+  use Buildel.Blocks.NewBlock
 
-  @impl true
-  def options() do
-    %{
-      type: "comment",
-      description: "",
-      groups: ["utils"],
-      inputs: [],
-      outputs: [],
-      ios: [],
-      dynamic_ios: nil,
-      schema: schema()
-    }
-  end
+  defblock(:comment,
+    description: "",
+    groups: ["utils"]
+  )
 
-  @impl true
-  def schema() do
-    %{
-      "type" => "object",
-      "required" => ["name"],
-      "properties" => %{
-        "name" => name_schema(),
-        "opts" =>
-          options_schema(%{
-            "required" => [],
-            "properties" =>
-              Jason.OrderedObject.new(
-                content: %{
-                  "type" => "string",
-                  "title" => "",
-                  "description" => ""
-                },
-                color: %{
-                  "type" => "string",
-                  "title" => "",
-                  "description" => ""
-                }
-              )
-          })
-      }
-    }
-  end
+  defoption(:content, %{ "type" => "string", "title" => "", "description" => "" })
+  defoption(:color, %{ "type" => "string", "title" => "", "description" => ""  })
 end

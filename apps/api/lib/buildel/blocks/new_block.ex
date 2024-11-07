@@ -5,11 +5,21 @@ defmodule Buildel.Blocks.NewBlock do
   @doc false
   defmacro __using__(opts \\ []) do
     quote do
+      require Logger
       alias Buildel.Blocks.Utils.Message
       alias Buildel.Blocks.Utils.Schemas
       alias Buildel.Blocks.Utils.Options
 
       @tool_controller unquote(opts[:tool_controller]) || false
+
+      @inputs []
+      @outputs []
+      @dynamic_ios nil
+      @tools []
+      @sections []
+      @section nil
+
+      @schema_opts []
 
       def tool_contoller?, do: @tool_controller
 
@@ -22,14 +32,6 @@ defmodule Buildel.Blocks.NewBlock do
 
       use Buildel.Blocks.NewBlock.Server, tool_controller: @tool_controller
 
-      @inputs []
-      @outputs []
-      @dynamic_ios nil
-      @tools []
-      @sections []
-      @section nil
-
-      @schema_opts []
 
       @spec create(map) :: %Buildel.Blocks.Block{}
       def create(%{name: name, opts: opts, connections: connections}) do
@@ -260,7 +262,6 @@ defmodule Buildel.Blocks.NewBlock.Definput do
 
   defmacro definput(name, options) do
     quote do
-      require Logger
 
       {:ok, options} =
         unquote(options)
@@ -694,22 +695,6 @@ defmodule Buildel.Blocks.NewBlock.Server do
         {:noreply, state}
       end
 
-      defp do_handle_info(%Message{topic: topic} = message, state, external: false) do
-        inputs_subscribed_to_topic(all_connections(state.block), topic)
-        |> Enum.reduce(
-          state,
-          fn
-            %{name: input_name}, state ->
-              case input(state, input_name, message) do
-                {:ok, state} ->
-                  state
-
-                {:error, _reason, state} ->
-                  state
-              end
-          end
-        )
-      end
 
       defp do_handle_info(%Message{topic: topic} = message, state, external: true) do
         context_id = BlockPubSub.io_from_topic(topic)
@@ -954,6 +939,25 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
   defmacro __before_compile__(_) do
     quote do
+      if ((@inputs |> length()) > 0) do
+        defp do_handle_info(%Message{topic: topic} = message, state, external: false) do
+          inputs_subscribed_to_topic(all_connections(state.block), topic)
+          |> Enum.reduce(
+            state,
+            fn
+              %{name: input_name}, state ->
+                case input(state, input_name, message) do
+                  {:ok, state} ->
+                    state
+
+                  {:error, _reason, state} ->
+                    state
+                end
+            end
+          )
+        end
+      end
+
       @spec handle_input_stream_start(term(), any(), any()) :: {:ok, any()}
       def handle_input_stream_start(input_name, _message, state) do
         {:ok, state}
