@@ -2,17 +2,21 @@ import type { ReactNode } from 'react';
 import React from 'react';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
-import { cn } from '~/utils/cn';
+import type { InputMessageProps } from '~/components/ui/label';
+import { InputMessage } from '~/components/ui/label';
 
-interface FieldMessageProps extends React.HTMLAttributes<HTMLParagraphElement> {
+interface FieldMessageProps extends Omit<InputMessageProps, 'isError'> {
   error?: ReactNode;
 }
 
-export const FieldMessage = React.forwardRef<
-  HTMLParagraphElement,
-  FieldMessageProps
->(({ className, error: propsError, children, ...props }, ref) => {
-  const { name, error } = useFieldContext();
+export const FieldMessage = ({
+  className,
+  size,
+  error: propsError,
+  children,
+  ...rest
+}: FieldMessageProps) => {
+  const { error } = useFieldContext();
 
   const body = propsError ? propsError : error ? error : children;
 
@@ -23,18 +27,9 @@ export const FieldMessage = React.forwardRef<
   }
 
   return (
-    <div
-      ref={ref}
-      id={name}
-      className={cn(
-        'text-sm font-medium mt-1',
-        { 'text-red-500': isError, 'text-muted-foreground': !isError },
-        className,
-      )}
-      {...props}
-    >
+    <InputMessage className={className} size={size} {...rest} isError={isError}>
       {body}
-    </div>
+    </InputMessage>
   );
-});
+};
 FieldMessage.displayName = 'FieldMessage';

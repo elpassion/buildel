@@ -91,7 +91,12 @@ defmodule Buildel.Blocks.ApiCallTool do
                   }),
                 call_formatter:
                   EditorField.call_formatter(%{
-                    default: "{{config.block_name}} API 🖥️: {{config.args}}\n",
+                    default: """
+                    <details>
+                      <summary>API Request</summary>
+                      "{{config.args}}"
+                    </details>
+                    """,
                     description: "How to format calling of api call through tool interface.",
                     displayWhen: %{
                       connections: %{

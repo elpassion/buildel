@@ -1,11 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { use, useCallback, useEffect, useMemo, useState } from 'react';
 import type { SafeParseReturnType, ZodError } from 'zod';
 
 import { generateZODSchema } from '~/components/form/schema/SchemaParser';
@@ -66,7 +60,8 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
   );
 
   const onMessage = useCallback(
-    (block: string, output: string, payload: any, metadata: any) => setEvents((events) => [...events, { block, output, payload, metadata }]),
+    (block: string, output: string, payload: any, metadata: any) =>
+      setEvents((events) => [...events, { block, output, payload, metadata }]),
     [],
   );
 
@@ -212,15 +207,11 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
       setMetadata,
     ],
   );
-  return (
-    <RunPipelineContext.Provider value={value}>
-      {children}
-    </RunPipelineContext.Provider>
-  );
+  return <RunPipelineContext value={value}>{children}</RunPipelineContext>;
 };
 
 export const useRunPipeline = () => {
-  const ctx = useContext(RunPipelineContext);
+  const ctx = use(RunPipelineContext);
 
   if (!ctx) {
     throw new Error('useRunPipeline must be used within RunPipelineProvider');
@@ -230,7 +221,7 @@ export const useRunPipeline = () => {
 };
 
 export const useRunPipelineEdge = () => {
-  const ctx = useContext(RunPipelineContext);
+  const ctx = use(RunPipelineContext);
 
   if (!ctx) {
     throw new Error('useRunPipeline must be used within RunPipelineProvider');
@@ -245,7 +236,7 @@ export const useRunPipelineEdge = () => {
 
 export const useRunPipelineNode = (block: IBlockConfig) => {
   const blockName = block.name;
-  const ctx = useContext(RunPipelineContext);
+  const ctx = use(RunPipelineContext);
 
   if (!ctx) {
     throw new Error(

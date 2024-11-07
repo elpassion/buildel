@@ -97,7 +97,12 @@ defmodule Buildel.Blocks.DocumentSearch do
                 },
                 call_formatter:
                   EditorField.call_formatter(%{
-                    default: "Database 📑: Search \"{{config.args}}\"\n",
+                    default: """
+                    <details>
+                      <summary>Database search...</summary>
+                      "{{config.args}}"
+                    </details>
+                    """,
                     displayWhen: %{
                       connections: %{
                         tool_worker: %{

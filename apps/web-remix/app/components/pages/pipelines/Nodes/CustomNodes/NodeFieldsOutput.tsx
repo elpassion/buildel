@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import { useBoolean } from 'usehooks-ts';
 
-import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import {
   addReferenceToLinks,
-  EmbedLinksList,
-} from '~/components/chat/ChatMessages';
+  ChatMarkdown,
+} from '~/components/chat/ChatMarkdown';
+import { EmbedLinksList } from '~/components/chat/ChatMessages';
 import { ToggleInput } from '~/components/form/inputs/toggle.input';
 
 import type { IBlockConfig, IField } from '../../pipeline.types';

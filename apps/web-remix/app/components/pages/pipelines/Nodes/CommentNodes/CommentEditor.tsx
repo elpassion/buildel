@@ -62,14 +62,13 @@ export const CommentEditor = ({
   }, [disabled]);
 
   return (
-    <WysiwygContext.Provider value={editor}>
+    <WysiwygContext value={editor}>
       {children}
-
       <EditorContent
         editor={editor}
         disabled={disabled}
         className={cn('w-full h-full')}
       />
-    </WysiwygContext.Provider>
+    </WysiwygContext>
   );
 };

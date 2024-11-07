@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest';
 
-import { generateZODSchema } from '~/components/form/schema/SchemaParser';
+import {
+  checkDisplayWhenConditions,
+  generateZODSchema,
+} from '~/components/form/schema/SchemaParser';
 import {
   arraySchemaFixture,
   booleanSchemaFixture,
@@ -8,6 +11,7 @@ import {
   nestedObjectSchemaFixture,
   numberSchemaFixture,
   objectSchemaFixture,
+  sectionSchemaFixture,
   stringSchemaFixture,
 } from '~/tests/fixtures/schema.fixtures';
 
@@ -37,6 +41,35 @@ describe('GenerateZodSchema', () => {
       const result = schema.safeParse('Hello<>');
 
       expect(result.success).toBe(false);
+    });
+
+    describe('with default value', () => {
+      const schema = generateZODSchema(
+        stringSchemaFixture({ default: 'hello_world' }) as any,
+      );
+
+      test('should fill with default', async () => {
+        const result = schema.safeParse(undefined);
+
+        expect(result.success).toBe(true);
+        expect(result.data).toBe('hello_world');
+      });
+    });
+
+    describe('with custom errors', () => {
+      const schema = generateZODSchema(
+        stringSchemaFixture({
+          minLength: 30,
+          errorMessages: { minLength: 'Nah... To short...' },
+        }) as any,
+      );
+
+      test('should display custom minLength error', async () => {
+        const result = schema.safeParse('Is it ok?');
+
+        expect(result.success).toBe(false);
+        expect(result.error?.errors[1].message).toBe('Nah... To short...');
+      });
     });
 
     describe('with enum', () => {
@@ -151,6 +184,102 @@ describe('GenerateZodSchema', () => {
       const result = schema.safeParse({ nested_object: { api_type: '' } });
 
       expect(result.success).toBe(false);
+    });
+  });
+
+  describe('for section type', () => {
+    const schema = generateZODSchema(sectionSchemaFixture() as any);
+
+    test('should correctly validate zod schema', async () => {
+      const result = schema.safeParse({ model: 'oepnai' });
+
+      expect(result.success).toBe(true);
+    });
+
+    test('should validate empty object', async () => {
+      const result = schema.safeParse({});
+
+      expect(result.success).toBe(false);
+    });
+  });
+});
+
+describe('DisplayWhen', () => {
+  describe('for min value', () => {
+    test('should return false if the condition is not met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { min: 3 } },
+        { tool_worker: 0 },
+      );
+
+      expect(result).toBe(false);
+    });
+
+    test('should return true if the condition is met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { min: 3 } },
+        { tool_worker: 3 },
+      );
+
+      expect(result).toBe(true);
+    });
+
+    test('should return true if key not found in ctx', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { min: 3 } },
+        { tool_controller: 3 },
+      );
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('for max value', () => {
+    test('should return false if the condition is not met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { max: 3 } },
+        { tool_worker: 10 },
+      );
+
+      expect(result).toBe(false);
+    });
+
+    test('should return true if the condition is met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { max: 3 } },
+        { tool_worker: 2 },
+      );
+
+      expect(result).toBe(true);
+    });
+
+    test('should return true if key not found in ctx', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { min: 3 } },
+        { tool_controller: 34 },
+      );
+
+      expect(result).toBe(true);
+    });
+  });
+
+  describe('for min and max values', () => {
+    test('should return false if the condition is not met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { max: 3, min: 1 } },
+        { tool_worker: 4 },
+      );
+
+      expect(result).toBe(false);
+    });
+
+    test('should return true if the condition is met', () => {
+      const result = checkDisplayWhenConditions(
+        { tool_worker: { max: 3, min: 2 } },
+        { tool_worker: 2 },
+      );
+
+      expect(result).toBe(true);
     });
   });
 });

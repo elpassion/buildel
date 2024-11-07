@@ -65,11 +65,11 @@ jobs:
       - name: Set up tags
         id: set-tags
         run: |
-          
+
           if [ "${{ github.event_name }}" == "push" ]; then
           echo "tags=ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }},ghcr.io/${{ github.repository }}/web-remix:alpha" >> $GITHUB_ENV
           fi
-        
+
           if [ "${{ github.event_name }}" == "release" ]; then
             is_latest=$(gh api repos/${{ github.repository }}/releases/latest | jq -r '.tag_name == "${{ github.event.release.tag_name }}"')
             if [ "$is_latest" == "true" ]; then
@@ -78,7 +78,7 @@ jobs:
               echo "tags=ghcr.io/${{ github.repository }}/web-remix:${{ github.sha }},ghcr.io/${{ github.repository }}/web-remix:${{ github.event.release.tag_name }}" >> $GITHUB_ENV
             fi
           fi
-    
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:

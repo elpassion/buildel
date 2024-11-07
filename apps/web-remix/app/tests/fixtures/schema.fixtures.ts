@@ -1,4 +1,8 @@
-export const stringSchemaFixture = () => {
+import type { JSONSchemaStringField } from '~/components/form/schema/SchemaParser';
+
+export const stringSchemaFixture = (
+  args?: Partial<JSONSchemaStringField>,
+): JSONSchemaStringField => {
   return {
     type: 'string',
     description:
@@ -11,6 +15,7 @@ export const stringSchemaFixture = () => {
       pattern: '^[^<>: ?-]*$',
       errorMessage: "Invalid string. Characters '< > : - ? ' are not allowed.",
     },
+    ...args,
   };
 };
 
@@ -70,6 +75,18 @@ export const objectSchemaFixture = () => {
     required: ['api_type'],
     title: 'Embeddings',
     type: 'object',
+  };
+};
+
+export const sectionSchemaFixture = () => {
+  return {
+    description: 'The embeddings to use for the collection.',
+    properties: {
+      model: stringSchemaFixture(),
+    },
+    required: ['model'],
+    title: 'Model',
+    type: 'section',
   };
 };
 

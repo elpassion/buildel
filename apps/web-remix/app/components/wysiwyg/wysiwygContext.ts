@@ -5,5 +5,5 @@ export const WysiwygContext =
   React.createContext<ReturnType<typeof useEditor>>(null);
 
 export const useWysiwygContext = () => {
-  return React.useContext(WysiwygContext);
+  return React.use(WysiwygContext);
 };

@@ -30,7 +30,7 @@ import type { JSONSchemaField } from '~/components/form/schema/SchemaParser';
 import { IconButton } from '~/components/iconButton';
 import { Button } from '~/components/ui/button';
 import { Collapsible, CollapsibleTrigger } from '~/components/ui/collapsible';
-import { Label } from '~/components/ui/label';
+import { InputMessage, Label } from '~/components/ui/label';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
 import { assert } from '~/utils/assert';
@@ -44,6 +44,7 @@ export function StringField({
   shouldDisplay,
   name,
   fields,
+  size,
   ...rest
 }: FieldProps) {
   assert(name);
@@ -59,9 +60,11 @@ export function StringField({
     if ('presentAs' in field && field.presentAs === 'password') {
       return (
         <FormField name={name}>
-          <FieldLabel>{field.title}</FieldLabel>
-          <PasswordInputField id={name} {...rest} />
-          <FieldMessage error={error}>{field.description}</FieldMessage>
+          <FieldLabel size={size}>{field.title}</FieldLabel>
+          <PasswordInputField size={size} id={name} {...rest} />
+          <FieldMessage size={size} error={error}>
+            {field.description}
+          </FieldMessage>
         </FormField>
       );
     }
@@ -113,9 +116,13 @@ export function StringField({
           id={name}
           defaultValue={defaultValue}
           label={field.title}
+          size={size}
           readOnly={rest.disabled}
         />
-        <FieldMessage error={error}>{field.description}</FieldMessage>
+
+        <FieldMessage size={size} error={error}>
+          {field.description}
+        </FieldMessage>
       </FormField>
     );
   }
@@ -276,36 +283,45 @@ function RealArrayField({
 
   return (
     <div>
-      {rhfFields.map((item, index) => (
-        <div key={item.key} className="mt-2 flex flex-col gap-2">
-          <Field
-            key={item.key}
-            field={field.items}
-            name={`${name}[${index}]`}
-            fields={fields}
-            schema={schema}
-            {...rest}
-          />
-          <IconButton
-            size="xxs"
-            variant="ghost"
-            aria-label="Remove field"
-            icon={<Trash />}
-            disabled={rhfFields.length <= field.minItems || rest.disabled}
-            onClick={(e) => {
-              e.preventDefault();
-              remove(index);
-            }}
-          />
-        </div>
-      ))}
+      <Label>{field.title}</Label>
+      <InputMessage className="mt-0">{field.description}</InputMessage>
+      <div
+        className={cn('flex flex-col gap-4', { 'mt-2': rhfFields.length > 0 })}
+      >
+        {rhfFields.map((item, index) => (
+          <div key={item.key} className="relative flex flex-col gap-1">
+            <IconButton
+              size="xxs"
+              variant="ghost"
+              className="absolute top-0 left-0"
+              aria-label="Remove field"
+              icon={<Trash />}
+              disabled={rhfFields.length <= field.minItems || rest.disabled}
+              onClick={(e) => {
+                e.preventDefault();
+                remove(index);
+              }}
+            />
+
+            <Field
+              key={item.key}
+              field={field.items}
+              name={`${name}[${index}]`}
+              fields={fields}
+              schema={schema}
+              {...rest}
+            />
+          </div>
+        ))}
+      </div>
       <Button
         type="button"
-        size="xxs"
-        variant="secondary"
+        size="xs"
+        variant="outline"
         onClick={() => push({})}
-        className="mt-2"
+        className="mt-4"
         disabled={rest.disabled}
+        isFluid
       >
         Add item
       </Button>

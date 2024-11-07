@@ -159,7 +159,7 @@ export const NavSidebarContext = React.createContext<
 >(undefined);
 
 export const useNavSidebarContext = () => {
-  const ctx = React.useContext(NavSidebarContext);
+  const ctx = React.use(NavSidebarContext);
 
   if (!ctx) {
     throw new Error(

@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import React, { createContext, useContext } from 'react';
+import React, { createContext, use } from 'react';
 import { X } from 'lucide-react';
 
 import { IconButton } from '~/components/iconButton';
@@ -16,7 +16,7 @@ export const NodePreviewSidebar = ({
   onOpenChange,
 }: PropsWithChildren<NodePreviewSidebarProps>) => {
   return (
-    <NodePreviewSidebarContext.Provider value={{ isOpen, onOpenChange }}>
+    <NodePreviewSidebarContext value={{ isOpen, onOpenChange }}>
       <aside
         className={cn(
           'w-[250px] h-[calc(100%_-_16px)] lg:min-w-[400px] absolute top-4 right-0 z-[12] bg-white rounded-tl-2xl rounded-bl-2xl border border-input transition-transform overflow-y-auto',
@@ -28,7 +28,7 @@ export const NodePreviewSidebar = ({
       >
         {children}
       </aside>
-    </NodePreviewSidebarContext.Provider>
+    </NodePreviewSidebarContext>
   );
 };
 
@@ -75,7 +75,7 @@ const NodePreviewSidebarContext =
   createContext<INodePreviewSidebarContext | null>(null);
 
 function useNodePreviewSidebar() {
-  const context = useContext(NodePreviewSidebarContext);
+  const context = use(NodePreviewSidebarContext);
   if (!context) {
     throw new Error(
       'useNodePreviewSidebar must be used within a NodePreviewSidebarProvider',

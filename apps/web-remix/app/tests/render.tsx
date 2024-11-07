@@ -10,6 +10,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <div id="_root">
       <Toaster />
+
       <NavSidebarContext.Provider
         value={{
           isOpen: false,

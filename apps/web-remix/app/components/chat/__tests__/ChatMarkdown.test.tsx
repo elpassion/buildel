@@ -1,11 +1,12 @@
 import { describe, expect } from 'vitest';
 
 import {
+  addReferenceToLinks,
   ChatMarkdown,
+  getFaviconFromDomain,
   mergeAdjacentDetailsWithSameSummary,
   truncateChildrenContent,
 } from '~/components/chat/ChatMarkdown';
-import { addReferenceToLinks } from '~/components/chat/ChatMessages';
 import { render } from '~/tests/render';
 
 describe(ChatMarkdown.name, () => {
@@ -415,42 +416,60 @@ describe(ChatMarkdown.name, () => {
       );
     });
   });
+  describe(getFaviconFromDomain.name, () => {
+    it('should return favicon url when regional domain', () => {
+      expect(getFaviconFromDomain(new URL('https://www.bbc.co.uk'))).toBe(
+        `https://www.google.com/s2/favicons?sz=64&domain_url=bbc.co.uk`,
+      );
+    });
+
+    it('should return favicon url when basic domain', () => {
+      expect(getFaviconFromDomain(new URL('https://www.bbc.com'))).toBe(
+        `https://www.google.com/s2/favicons?sz=64&domain_url=bbc.com`,
+      );
+    });
+
+    it('should return favicon url when path domain', () => {
+      expect(getFaviconFromDomain(new URL('https://www.bbc.co.uk/news'))).toBe(
+        `https://www.google.com/s2/favicons?sz=64&domain_url=bbc.co.uk`,
+      );
+    });
+  });
+
   describe(addReferenceToLinks.name, () => {
     it('should add link reference at the bottom of the markdown', () => {
       const markdown = `
-### **Grilled Lemon Herb Chicken**
-
-**Ingredients:**
-- 4 boneless, skinless chicken breasts
-- 1/4 cup olive oil
-
-[Grilled Lemon Herb Chicken Recipe](https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607)
-[Some other Chicken Recipe](http://www.text.com)
+### Landscape
+![Landscape](https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260)
 `;
 
       const result = addReferenceToLinks(markdown);
 
       expect(result.message).toMatchInlineSnapshot(`
         "
-        ### **Grilled Lemon Herb Chicken**
-
-        **Ingredients:**
-        - 4 boneless, skinless chicken breasts
-        - 1/4 cup olive oil
-
-        [Grilled Lemon Herb Chicken Recipe](https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607) <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">1</span>
-        [Some other Chicken Recipe](http://www.text.com) <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">2</span>
+        ### Landscape
+        ![Landscape](https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260)
         "
       `);
-      expect(result.links).toEqual([
-        new URL(
-          'https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607',
-        ),
-        new URL('http://www.text.com/'),
-      ]);
+      expect(result.links).toEqual([]);
     });
 
     it('should ignore links when incorrect', () => {
+      const markdown = `
+(https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607)
+`;
+
+      const result = addReferenceToLinks(markdown);
+
+      expect(result.links).toEqual([]);
+      expect(result.message).toMatchInlineSnapshot(`
+      "
+      (https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607)
+      "
+    `);
+    });
+
+    it('should ignore links when image links', () => {
       const markdown = `
 (https://www.foodnetwork.com/recipes/food-network-kitchen/grilled-lemon-herb-chicken-recipe-2103607)
 `;

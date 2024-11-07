@@ -88,7 +88,7 @@ defmodule Buildel.Blocks.Fields.EditorField do
   @type t :: %EditorField{}
 
   @create_fields ~w(title description default min_length editor_language suggestions displayWhen readonly)a
-  @required_fields ~w(title description)a
+  @required_fields ~w()a
 
   @spec new(attrs :: map()) :: t
   def new(%{} = attrs \\ %{}) do

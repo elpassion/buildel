@@ -245,6 +245,7 @@ function TemplateListItem({ item, action }: ITemplateItem) {
 
   return (
     <ValidatedForm
+      //@ts-ignore
       formRef={ref}
       action={action}
       method="POST"

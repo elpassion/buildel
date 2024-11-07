@@ -334,7 +334,7 @@ function Pre({
 
   const language = useMemo(() => {
     if (children && typeof children === 'object' && 'props' in children) {
-      return getLanguage(children.props.className);
+      return getLanguage((children.props as any).className);
     }
 
     return null;
@@ -385,14 +385,35 @@ function Code({
   const codeRef = useRef<HTMLElement>(null);
   const isMermaidCode = className?.includes('language-mermaid');
 
-  if (isMermaidCode) {
-    mermaid.initialize({
-      theme: 'default',
-    });
-    mermaid.run({
-      nodes: [codeRef.current!],
-    });
-  }
+  const isMermaidCompleted = async (value: unknown) => {
+    if (typeof value !== 'string') return false;
+
+    try {
+      return await mermaid.parse(value);
+    } catch {
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    if (!isMermaidCode) return;
+
+    const renderMermaid = async () => {
+      if (await isMermaidCompleted(children)) {
+        mermaid.initialize({
+          theme: 'default',
+          startOnLoad: false,
+        });
+
+        setTimeout(() => {
+          mermaid.run({
+            nodes: [codeRef.current!],
+          });
+        }, 1000);
+      }
+    };
+    renderMermaid();
+  }, [children, isMermaidCompleted]);
 
   if (className?.includes('language-buildel_message_attachments')) {
     try {
@@ -431,7 +452,32 @@ function Image({
   className,
   ...rest
 }: React.ImgHTMLAttributes<HTMLImageElement>) {
-  return <img alt={alt} className={cn(className)} {...rest} />;
+  return (
+    <a
+      href={rest.src}
+      target="_blank"
+      className="relative w-fit inline-block my-1 group overflow-hidden rounded-md bg-primary/10"
+    >
+      <img
+        alt={alt}
+        className={cn(
+          'h-[200px] w-[250px] object-cover bg-no-repeat object-center my-0 group-hover:scale-[102%] transition',
+          className,
+        )}
+        {...rest}
+      />
+
+      <span className="max-w-[115px] absolute top-2 right-2 text-xs pl-1 pr-2 py-[2px] rounded-full bg-black/50 text-[#c4c7c5] transition group-hover:text-white flex items-center gap-1">
+        {isValidUrl(rest.src) ? (
+          <img
+            src={getFaviconFromDomain(new URL(rest.src as string))}
+            className="w-4 h-4 object-contain object-center m-0"
+          />
+        ) : null}
+        <span className="truncate">{removeUrlProtocol(rest.src)}</span>
+      </span>
+    </a>
+  );
 }
 
 export function truncateChildrenContent(
@@ -444,12 +490,15 @@ export function truncateChildrenContent(
     }
 
     if (child && typeof child === 'object') {
-      if ('props' in child && shouldBeTruncated(child)) {
+      if ('props' in child && shouldBeTruncated(child as any)) {
         return {
           ...child,
           props: {
-            ...child.props,
-            children: truncateChildrenContent(child.props.children, maxLength),
+            ...(child.props as any),
+            children: truncateChildrenContent(
+              (child.props as any).children,
+              maxLength,
+            ),
           },
         };
       }
@@ -466,8 +515,8 @@ function getStringContent(children: React.ReactNode): string {
       }
 
       if (child && typeof child === 'object') {
-        if ('props' in child && shouldBeTruncated(child)) {
-          return getStringContent(child.props.children);
+        if ('props' in child && shouldBeTruncated(child as any)) {
+          return getStringContent((child.props as any).children);
         }
       }
       return '';
@@ -511,4 +560,67 @@ function truncateString(str: string, maxLength: number) {
   return str.length > maxLength
     ? `${str.slice(0, maxLength / 1.5)}\n\n... rest of code`
     : str;
+}
+
+function removeUrlProtocol(url?: string) {
+  if (!url) return;
+  return url.replace(/(^\w+:|^)\/\//, '');
+}
+
+export function getFaviconFromDomain(url: URL) {
+  const hostnameParts = url.hostname.split('.');
+
+  const isRegionalDomain =
+    hostnameParts.length > 2 && hostnameParts.slice(-2).join('.').length <= 6;
+
+  const domain = isRegionalDomain
+    ? hostnameParts.slice(-3).join('.')
+    : hostnameParts.slice(-2).join('.');
+
+  return `https://www.google.com/s2/favicons?sz=64&domain_url=${domain}`;
+}
+
+const LINK_REGEX = /\[.*?]\((https?:\/\/[^)]+)\)/g;
+
+export function addReferenceToLinks(message: string) {
+  let linkIndex = 1;
+  const links: URL[] = [];
+
+  const msg = message.replace(LINK_REGEX, (match) => {
+    const link = match.match(/\((https?:\/\/[^)]+)\)/)?.[1] ?? '';
+
+    if (!isValidUrl(link)) {
+      return match;
+    }
+
+    if (isImage(link)) {
+      return match;
+    }
+
+    links.push(new URL(link));
+    const numberedLink = withLinkIndex(match, linkIndex);
+
+    linkIndex++;
+    return numberedLink;
+  });
+
+  return { message: msg, links };
+}
+
+export function isValidUrl(string?: string) {
+  if (!string) return false;
+  try {
+    new URL(string);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+export function isImage(url: string) {
+  return /\.(jpeg|jpg|gif|png|webp|bmp|svg)(\?.*)?$/i.test(url);
+}
+
+export function withLinkIndex(link: string, index: number) {
+  return `${link} <span style="width: 18px; height: 18px; border-radius: 4px; background-color: #fcfcfc; display: inline-flex; justify-content: center; align-items: center; margin-left: 4px; font-size: 12px; color: #61616A; font-weight: 400;">${index}</span>`;
 }

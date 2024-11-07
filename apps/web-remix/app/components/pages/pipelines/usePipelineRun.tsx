@@ -25,8 +25,8 @@ export function usePipelineRun({
   socketArgs = { useAuth: true },
   ...rest
 }: UsePipelineRunArgs) {
-  const buildel = useRef<BuildelSocket>();
-  const run = useRef<BuildelRun>();
+  const buildel = useRef<BuildelSocket>(null);
+  const run = useRef<BuildelRun>(null);
 
   const [status, setStatus] = useState<BuildelRunStatus>('idle');
 

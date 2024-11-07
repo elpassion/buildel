@@ -516,17 +516,17 @@ const InputsProvider: React.FC<{
 }> = ({ connections, updateInputReset, updateInputOptional, children }) => {
   return (
     <>
-      <InputsContext.Provider
+      <InputsContext
         value={{ connections, updateInputReset, updateInputOptional }}
       >
         {children}
-      </InputsContext.Provider>
+      </InputsContext>
     </>
   );
 };
 
 export function useInputs() {
-  return React.useContext(InputsContext);
+  return React.use(InputsContext);
 }
 
 interface CopyConfigurationButtonProps {

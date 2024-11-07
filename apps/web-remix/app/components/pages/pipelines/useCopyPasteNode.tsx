@@ -10,7 +10,7 @@ import type { IBlockConfig, IEdge, INode } from './pipeline.types';
 interface UseCopyPasteNodeArgs {
   onPaste: (config: IBlockConfig) => Promise<unknown>;
   nodes: INode[];
-  wrapper: RefObject<HTMLElement>;
+  wrapper: RefObject<HTMLElement | null>;
   allowCopyPaste?: (e: KeyboardEvent) => boolean;
 }
 

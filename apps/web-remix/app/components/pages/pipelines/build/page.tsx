@@ -12,6 +12,8 @@ import { BuilderCommentNode } from '~/components/pages/pipelines/Nodes/CommentNo
 import { ReadonlyCommentNode } from '~/components/pages/pipelines/Nodes/CommentNodes/ReadonlyCommentNode';
 import { AliasCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/AliasCustomNode';
 import { BuilderCustomNode } from '~/components/pages/pipelines/Nodes/CustomNodes/BuilderCustomNode';
+import { BuilderVideoNode } from '~/components/pages/pipelines/Nodes/VideoNodes/BuilderVideoNode';
+import { ReadonlyVideoNode } from '~/components/pages/pipelines/Nodes/VideoNodes/ReadonlyVideoNode';
 import { useRunPipeline } from '~/components/pages/pipelines/RunPipelineProvider';
 import { metaWithDefaults } from '~/utils/metadata';
 
@@ -53,7 +55,11 @@ export function PipelineBuilder() {
         type="readOnly"
         className="h-[calc(100vh_-_64px)] pt-0"
         pipeline={pipeline}
-        CustomNodes={{ custom: AliasCustomNode, comment: ReadonlyCommentNode }}
+        CustomNodes={{
+          custom: AliasCustomNode,
+          comment: ReadonlyCommentNode,
+          video: ReadonlyVideoNode,
+        }}
         CustomEdges={{ default: CustomEdge }}
       >
         {() => <BuilderHeader organization={organization} />}
@@ -67,7 +73,11 @@ export function PipelineBuilder() {
         alias={aliasId}
         key="flow-editable"
         pipeline={pipeline}
-        CustomNodes={{ custom: BuilderCustomNode, comment: BuilderCommentNode }}
+        CustomNodes={{
+          custom: BuilderCustomNode,
+          comment: BuilderCommentNode,
+          video: BuilderVideoNode,
+        }}
         CustomEdges={{ default: CustomEdge }}
         className="h-[calc(100vh_-_64px)] pt-0"
         sidebar={BuilderSidebar}
