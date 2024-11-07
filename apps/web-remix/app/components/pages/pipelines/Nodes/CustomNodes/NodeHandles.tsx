@@ -49,6 +49,7 @@ export function InputHandle({
         isConnectable={isConnectable}
         style={{ top: (index + 1) * 35 }}
         data-testid={`${blockName}-${handle.data.name}-handle`}
+        data-type={handle.data.type}
         className={cn(
           '!bg-transparent !w-[30px] !h-[30px] !border-none !rounded flex justify-center items-center group',
         )}
@@ -101,6 +102,7 @@ export function OutputHandle({
         id={handle.id}
         data-testid={`${blockName}-${handle.data.name}-handle`}
         data-name={handle.data.name}
+        data-type={handle.data.type}
         className={cn(
           '!bg-transparent !w-[30px] !h-[30px] !border-none !rounded flex justify-center items-center group',
         )}
@@ -146,6 +148,7 @@ export function WorkerHandle({
         isConnectable={isConnectable}
         id={handle.id}
         data-testid={`${blockName}-${handle.data.name}-handle`}
+        data-type={handle.data.type}
         className={cn(
           '!bg-transparent !w-[30px] !h-[30px] !border-none !rounded flex justify-center items-center group',
         )}
@@ -190,6 +193,7 @@ export function ControllerHandle({
         isConnectable={isConnectable}
         id={handle.id}
         data-testid={`${blockName}-${handle.data.name}-handle`}
+        data-type={handle.data.type}
         className={cn(
           '!bg-transparent !w-[30px] !h-[30px] !border-none !rounded flex justify-center items-center group',
         )}

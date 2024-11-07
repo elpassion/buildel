@@ -38,6 +38,10 @@ interface UseNodeDropdownArgs {
 
 type NodeDropdownActionOption = { type: string };
 
+type ExtendedOnConnectStartParams = OnConnectStartParams & {
+  type: string;
+};
+
 export type NodeDropdownOption = IBlockType | NodeDropdownActionOption;
 
 export const useNodeDropdown = ({
@@ -45,7 +49,7 @@ export const useNodeDropdown = ({
   onConnect,
   disabled,
 }: UseNodeDropdownArgs) => {
-  const connectParamsRef = useRef<OnConnectStartParams | null>(null);
+  const connectParamsRef = useRef<ExtendedOnConnectStartParams | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { value: isOpen, setTrue: open, setFalse: close } = useBoolean(false);
@@ -63,12 +67,19 @@ export const useNodeDropdown = ({
     connectParamsRef.current = null;
   };
 
+  //@ts-ignore
   useOnClickOutside(dropdownRef, onClose);
 
-  const onConnectStart = (_: unknown, params: OnConnectStartParams) => {
+  const onConnectStart = (
+    e: MouseEvent | TouchEvent,
+    params: OnConnectStartParams,
+  ) => {
     if (disabled) return;
 
-    connectParamsRef.current = params;
+    const handleType = getHandleTypeFromEvent(e);
+    if (handleType) {
+      connectParamsRef.current = { ...params, type: handleType };
+    }
 
     if (params.nodeId) {
       setNode(flowInstance.getNode(params.nodeId) ?? null);
@@ -180,8 +191,8 @@ export const useNodeDropdown = ({
     if (!node || !connectParamsRef.current) return;
 
     if (
-      connectParamsRef.current.handleId === 'tool' ||
-      connectParamsRef.current.handleId === 'chat'
+      connectParamsRef.current.type === 'worker' ||
+      connectParamsRef.current.type === 'controller'
     ) {
       return node.data.block_type?.ios.find(
         (handle) =>
@@ -426,6 +437,14 @@ function getParentWithClass(
     return element.parentElement;
 
   return element.closest(`.${className}`);
+}
+
+function getHandleTypeFromEvent(e: MouseEvent | TouchEvent) {
+  if (e.target instanceof HTMLElement) {
+    return e.target.dataset.type ?? null;
+  }
+
+  return null;
 }
 
 export function isBlockTypeOption(
