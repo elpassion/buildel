@@ -93,6 +93,7 @@
     "next-themes": "^0.3.0",
     "nprogress": "^0.2.0",
     "papaparse": "^5.4.1",
+    "parse-domain": "^8.2.2",
     "phoenix": "^1.7.7",
     "rc-select": "14.11.0",
     "react": "19.0.0-rc-eb3ad065-20240822",

@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useFetcher } from '@remix-run/react';
 import { Check, Copy, Download, UserRound } from 'lucide-react';
+import { parseDomain, ParseResultType } from 'parse-domain';
 import { ClientOnly } from 'remix-utils/client-only';
 import { useBoolean } from 'usehooks-ts';
 
@@ -351,20 +352,18 @@ function EmbedLink({
   );
 }
 
+export function getDomainName(url: URL) {
+  const result = parseDomain(new URL(url).hostname);
+
+  if (result.type === ParseResultType.Listed) {
+    return result.domain;
+  } else {
+    return url.hostname;
+  }
+}
+
 function decodeHtml(value: string) {
   const txt = document.createElement('textarea');
   txt.innerHTML = value;
   return txt.value;
-}
-
-function getDomainName(url: URL) {
-  const hostname = new URL(url).hostname;
-
-  const parts = hostname.split('.');
-
-  if (parts.length > 2) {
-    return parts[parts.length - 2];
-  }
-
-  return parts[0];
 }
