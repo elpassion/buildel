@@ -4,6 +4,7 @@ import { useInView } from 'react-intersection-observer';
 import { useFetcher } from '@remix-run/react';
 import { Check, Copy, Download, UserRound } from 'lucide-react';
 import { ClientOnly } from 'remix-utils/client-only';
+import { useBoolean } from 'usehooks-ts';
 
 import {
   addReferenceToLinks,
@@ -249,52 +250,74 @@ interface EmbedLinkProps {
   idx: number;
 }
 function EmbedLinkItem({ link, idx }: EmbedLinkProps) {
+  const { value, setValue } = useBoolean(false);
+  const { value: alreadyFetched, setValue: setFetched } = useBoolean(false);
   const metaFetcher = useFetcher<WebsiteMeta | null>();
 
-  useEffect(() => {
-    if (metaFetcher.data) return;
-    metaFetcher.load(`/fetch-meta?url=${link.toString()}`);
-  }, []);
+  const onOpenChange = useCallback(
+    (open: boolean) => {
+      setValue(open);
+
+      if (alreadyFetched) return;
+      metaFetcher.load(`/fetch-meta?url=${link.toString()}`);
+      setFetched(true);
+    },
+    [metaFetcher.data, alreadyFetched],
+  );
 
   if (
-    !metaFetcher.data ||
-    !metaFetcher.data.title ||
-    !metaFetcher.data.description
+    alreadyFetched &&
+    (!metaFetcher.data?.title || !metaFetcher.data?.description)
   ) {
     return <EmbedLink link={link} idx={idx} />;
   }
 
   return (
     <TooltipProvider delayDuration={100}>
-      <Tooltip>
+      <Tooltip onOpenChange={onOpenChange} open={value}>
         <TooltipTrigger asChild>
           <EmbedLink link={link} idx={idx} />
         </TooltipTrigger>
 
         <TooltipContent>
-          <div className="text-xs flex flex-col gap-1 max-w-[250px]">
-            <div className="flex gap-2 items-center">
-              <img
-                alt={decodeHtml(metaFetcher.data.title)}
-                src={getFaviconFromDomain(link)}
-                className="w-3.5 h-3.5 object-contain object-center m-0"
-              />
-              <h4 className="text-foreground line-clamp-1 m-0 font-normal">
-                {getDomainName(link)}
-              </h4>
-            </div>
-            <div className="flex flex-col">
-              <h5 className="font-bold m-0 text-foreground line-clamp-2">
-                {decodeHtml(metaFetcher.data.title)}
-              </h5>
-              <p className="m-0 text-muted-foreground line-clamp-2">
-                {decodeHtml(metaFetcher.data.description)}
-              </p>
-            </div>
-          </div>
+          {metaFetcher.data ? (
+            <EmbedLinkTooltipContent data={metaFetcher.data} link={link} />
+          ) : null}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+}
+
+function EmbedLinkTooltipContent({
+  link,
+  data,
+}: {
+  link: URL;
+  data: WebsiteMeta;
+}) {
+  if (!data.title || !data.description) return null;
+  return (
+    <div className="text-xs flex flex-col gap-1 max-w-[250px]">
+      <div className="flex gap-2 items-center">
+        <img
+          alt={decodeHtml(data.title)}
+          src={getFaviconFromDomain(link)}
+          className="w-3.5 h-3.5 object-contain object-center m-0"
+        />
+        <h4 className="text-foreground line-clamp-1 m-0 font-normal">
+          {getDomainName(link)}
+        </h4>
+      </div>
+      <div className="flex flex-col">
+        <h5 className="font-bold m-0 text-foreground line-clamp-2">
+          {decodeHtml(data.title)}
+        </h5>
+        <p className="m-0 text-muted-foreground line-clamp-2">
+          {decodeHtml(data.description)}
+        </p>
+      </div>
+    </div>
   );
 }
 
