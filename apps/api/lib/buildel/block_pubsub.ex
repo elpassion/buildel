@@ -87,7 +87,7 @@ defmodule Buildel.BlockPubSub do
     )
   end
 
-  defp broadcast(_topic, {_message_type, %{}}, _metadata), do: :ok
+  defp broadcast(_topic, {:workflow_started, _content}, _metadata), do: :ok
 
   defp broadcast(topic, {message_type, content} = message, metadata) do
     content = if content, do: content |> Message.set_topic(topic), else: content
