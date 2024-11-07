@@ -223,7 +223,7 @@ end
 
 defmodule Buildel.Blocks.NewBlock.Tool do
   @derive Jason.Encoder
-  defstruct [:name, :schema, :description, :call, type: :worker]
+  defstruct [:name, :schema, :description, :call, :call_formatter, :response_formatter, type: :worker]
 end
 
 defmodule Buildel.Blocks.NewBlock.Defblock do
@@ -530,7 +530,9 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
                    other ->
                      other
                  end
-               end
+               end,
+               call_formatter: tool_call_formatter(state, tool_name),
+               response_formatter: tool_response_formatter(state, tool_name)
            }
          ), state}
       end

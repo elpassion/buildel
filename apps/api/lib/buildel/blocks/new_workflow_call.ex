@@ -79,7 +79,7 @@ defmodule Buildel.Blocks.NewWorkflowCall do
         }
       }
     }
-  })
+  }, required: false)
 
   deftool(:call, description: "Call another workflow", schema: %{})
 
@@ -117,11 +117,12 @@ defmodule Buildel.Blocks.NewWorkflowCall do
           |> Map.update!("required", &(&1 ++ [name]))
       end)
 
+
     %{tool | schema: schema}
   end
 
   def handle_dynamic_ios(%{organization: organization, pipeline: _pipeline, block: block}) do
-    with dynamic_pipeline_id <- block["opts"]["workflow"],
+    with dynamic_pipeline_id when not is_nil(dynamic_pipeline_id) <- block["opts"]["workflow"],
          {:ok, dynamic_pipeline} <-
            Buildel.Pipelines.get_organization_pipeline(organization, dynamic_pipeline_id) do
       BuildelWeb.OrganizationPipelineJSON.ios(%{pipeline: dynamic_pipeline})
@@ -132,7 +133,7 @@ defmodule Buildel.Blocks.NewWorkflowCall do
 
   def handle_option(:workflow, %{organization: organization, pipeline: pipeline}) do
     pipelines = Pipelines.list_organization_pipelines(organization) |> List.delete(pipeline)
-    BuildelWeb.OrganizationPipelineJSON.index(%{pipelines: pipelines})
+    BuildelWeb.OrganizationPipelineJSON.index(%{pipelines: pipelines, params: %Buildel.Pipelines.ListParams{}, total: 0})
   end
 
   def handle_option(:outputs, %{organization: organization, pipeline: _pipeline, block: block}) do

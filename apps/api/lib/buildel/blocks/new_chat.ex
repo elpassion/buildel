@@ -118,25 +118,6 @@ defmodule Buildel.Blocks.NewChat do
     }
   )
 
-  deftool(:klops,
-    description:
-      "Search through documents and find text chunks related to the query. If you want to read the whole document a chunk comes from, use the `documents` function.
-            CALL IT WITH FORMAT `{ \"query\": \"example query\" }`
-            You can also use filters to narrow down the search results. Filters are optional. Apply filters based on the metadata of the documents from previous queries.
-            You can use `document_id` property to narrow the search to the specific document.
-            DO NOT SET MORE THAN 2 KEYWORDS",
-    schema: %{
-      "type" => "object",
-      "properties" => %{
-        "message" => %{
-          "type" => "string",
-          "description" => "Message to send to the agent."
-        }
-      },
-      "required" => ["message"]
-    }
-  )
-
   defoption(:chat_memory_type, %{
     "type" => "string",
     "title" => "Chat memory type",
@@ -311,7 +292,8 @@ defmodule Buildel.Blocks.NewChat do
     fn ->
       send_stream_start(state, :output, message)
 
-      tools = get_connected_tools(state) |> then(&chat_tool(state, &1))
+      tools = get_connected_tools(state)
+      chat_tools = tools |> then(&chat_tool(state, &1))
 
       with {:ok, chat_messages, state} <- fill_chat_messages(state),
            {:ok, _, last_message} <-
@@ -324,7 +306,7 @@ defmodule Buildel.Blocks.NewChat do
                api_type: option(state, :api_type),
                response_format: option(state, :response_format),
                max_tokens: option(state, :max_tokens),
-               tools: tools,
+               tools: chat_tools,
                on_content: fn text_chunk ->
                  send(pid, {:save_chat_chunk, text_chunk})
 
@@ -340,17 +322,14 @@ defmodule Buildel.Blocks.NewChat do
                on_tool_call: fn tool_calls ->
                  tool_calls
                  |> Enum.map(fn tool_call ->
-                   [_block_name, tool_name] = tool_call.name |> String.split("__")
-
-                   call_formatter =
-                     tool_call_formatter(state, tool_name |> String.to_existing_atom())
+                   tool = tools |> Enum.find(&(Map.get(&1, :name) == tool_call.name))
 
                    output(
                      state,
                      :output,
                      Message.from_message(message)
                      |> Message.set_type(:text)
-                     |> Message.set_message(call_formatter.(tool_call.arguments)),
+                     |> Message.set_message(tool.call_formatter.(tool_call.arguments)),
                      stream_stop: :none
                    )
                  end)
@@ -358,17 +337,14 @@ defmodule Buildel.Blocks.NewChat do
                on_tool_content: fn tool_results ->
                  tool_results
                  |> Enum.map(fn tool_result ->
-                   [_block_name, tool_name] = tool_result.name |> String.split("__")
-
-                   response_formatter =
-                     tool_response_formatter(state, tool_name |> String.to_existing_atom())
+                  tool = tools |> Enum.find(&(Map.get(&1, :name) == tool_result.name))
 
                    output(
                      state,
                      :output,
                      Message.from_message(message)
                      |> Message.set_type(:text)
-                     |> Message.set_message(response_formatter.(%{content: tool_result.content})),
+                     |> Message.set_message(tool.response_formatter.(%{content: tool_result.content})),
                      stream_stop: :none
                    )
                  end)
