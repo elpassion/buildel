@@ -53,24 +53,7 @@ defmodule Buildel.Blocks.NewDatasetOutput do
       nil ->
         output(state, :output, message)
         {:ok, state}
-      {:error, %Ecto.Changeset{} = changeset} ->
-          send_error(
-            state,
-            Message.from_message(message)
-            |> Message.set_type(:text)
-            |> Message.set_message("Error saving data in dataset")
-          )
-
-          {:ok, state}
-      {:error, error} ->
-        send_error(
-          state,
-          Message.from_message(message)
-          |> Message.set_type(:text)
-          |> Message.set_message(error)
-        )
-
-        {:ok, state}
+      e -> e
     end
   end
 

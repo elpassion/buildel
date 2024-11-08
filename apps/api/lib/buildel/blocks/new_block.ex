@@ -285,10 +285,10 @@ defmodule Buildel.Blocks.NewBlock.Definput do
       @spec input(any(), unquote(name), Message.t()) ::
               {:ok, any()} | {:error, :invalid_input, any()}
       def input(state, unquote(name), %Message{} = message) do
-        case validate_input(unquote(name), message) do
-          :ok ->
-            handle_input(unquote(name), message, state)
-
+        with :ok <- validate_input(unquote(name), message),
+             {:ok, state} <- handle_input(unquote(name), message, state) do
+          {:ok, state}
+        else
           {:error, :invalid_input} ->
             send_error(
               state,
@@ -298,11 +298,37 @@ defmodule Buildel.Blocks.NewBlock.Definput do
             )
 
             {:error, :invalid_input, state}
+          {:error, %Ecto.Changeset{} = changeset} ->
+            send_error(
+              state,
+              Message.from_message(message)
+              |> Message.set_type(:text)
+              |> Message.set_message("Error saving data to database")
+            )
+
+            {:error, :error_saving_data_to_database, state}
+          {:error, %Jason.DecodeError{data: data} = error} ->
+            send_error(
+              state,
+              Message.from_message(message)
+              |> Message.set_type(:text)
+              |> Message.set_message("Error decoding JSON: #{inspect(data)}")
+            )
+
+            {:error, :json_decode_error, state}
+          {:error, error} ->
+            send_error(
+              state,
+              Message.from_message(message)
+              |> Message.set_type(:text)
+              |> Message.set_message(error)
+            )
+
+            {:error, to_string(error), state}
         end
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
-
           send_error(
             state,
             Message.from_message(message)
