@@ -112,6 +112,7 @@ export const RunPipelineProvider: React.FC<RunPipelineProviderProps> = ({
 
   const handleStartRun = useCallback(async () => {
     setErrors({});
+    setEvents([]);
     await startRun({ initial_inputs: [], alias, metadata });
   }, [startRun, alias]);
 
