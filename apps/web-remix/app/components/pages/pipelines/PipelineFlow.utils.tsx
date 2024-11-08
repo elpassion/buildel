@@ -228,12 +228,25 @@ export function reverseToolConnections(
 
 export function filterBlockConnections(
   connections: IConfigConnection[],
-  blockConfig: IBlockConfig,
+  block: IBlockConfig,
 ) {
+  return connections.filter((conn) => conn.to.block_name === block.name);
+}
+
+export function withoutToolConnections(connections: IConfigConnection[]) {
   return connections.filter(
-    (conn) =>
-      conn.to.block_name === blockConfig.name && conn.to.type !== 'controller',
+    (connection) => connection.to.type !== 'controller',
   );
+}
+
+export function prepareBlockConnections(
+  connections: IConfigConnection[],
+  block: IBlockConfig,
+) {
+  return [
+    ...withoutToolConnections(filterBlockConnections(connections, block)),
+    ...reverseToolConnections(connections, block),
+  ];
 }
 
 function reverseConnection(connection: IConfigConnection) {

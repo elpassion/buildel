@@ -18,10 +18,9 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
 import {
-  filterBlockConnections,
   getEdges,
   getNodes,
-  reverseToolConnections,
+  prepareBlockConnections,
   toPipelineConfig,
 } from '~/components/pages/pipelines/PipelineFlow.utils';
 import {
@@ -133,10 +132,10 @@ export function EditBlockPage() {
             connections={pipeline.config.connections}
           >
             <BlockInputList
-              connections={[
-                ...filterBlockConnections(pipeline.config.connections, block),
-                ...reverseToolConnections(pipeline.config.connections, block),
-              ]}
+              connections={prepareBlockConnections(
+                pipeline.config.connections,
+                block,
+              )}
             />
           </EditBlockForm>
         </DialogDrawerBody>

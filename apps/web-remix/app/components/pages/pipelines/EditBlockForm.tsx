@@ -43,10 +43,7 @@ import type {
   IConfigConnection,
   IIOType,
 } from '~/components/pages/pipelines/pipeline.types';
-import {
-  filterBlockConnections,
-  reverseToolConnections,
-} from '~/components/pages/pipelines/PipelineFlow.utils';
+import { prepareBlockConnections } from '~/components/pages/pipelines/PipelineFlow.utils';
 import { successToast } from '~/components/toasts/successToast';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { assert } from '~/utils/assert';
@@ -175,10 +172,9 @@ export function EditBlockForm({
       const suggestions: Suggestion[] = (props.field.suggestions || []).flatMap(
         (suggestion) => {
           if (suggestion.value === 'inputs.*') {
-            return generateSuggestions([
-              ...filterBlockConnections(connections, blockConfig),
-              ...reverseToolConnections(connections, blockConfig),
-            ]);
+            return generateSuggestions(
+              prepareBlockConnections(connections, blockConfig),
+            );
           }
           if (suggestion.value === 'metadata.*') {
             return [
@@ -491,7 +487,6 @@ function TriggerValidation() {
 }
 
 function generateSuggestions(connections: IConfigConnection[]): Suggestion[] {
-  console.log('CONN', connections);
   return connections.map((connection) => {
     return {
       label: `${connection.from.block_name}:${connection.from.output_name}`,
