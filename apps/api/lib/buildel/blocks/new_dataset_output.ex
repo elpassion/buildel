@@ -40,29 +40,37 @@ defmodule Buildel.Blocks.NewDatasetOutput do
     }
   })
 
-  def handle_input(:input, %Message{type: :json} = message, state) do
-    send_stream_start(state, :output, message)
-
-    case get_dataset_from_context(state.context.context_id, state.block.opts.dataset) do
-      %Buildel.Datasets.Dataset{} = dataset ->
-        Buildel.Datasets.Rows.create_row(dataset, %{data: message.message})
-        output(state, :output, message)
-
-      nil ->
-        output(state, :output, message)
-    end
-  end
-
   def handle_input(:input, %Message{} = message, state) do
     send_stream_start(state, :output, message)
 
-    case get_dataset_from_context(state.context.context_id, state.block.opts.dataset) do
-      %Buildel.Datasets.Dataset{} = dataset ->
-        Buildel.Datasets.Rows.create_row(dataset, %{data: Jason.decode!(message.message)})
-        output(state, :output, message)
+    with %Buildel.Datasets.Dataset{} = dataset <- get_dataset_from_context(state.context.context_id, option(state, :dataset)),
+         {:ok, content} <- Message.to_map(message),
+         {:ok, _row } <- Buildel.Datasets.Rows.create_row(dataset, %{data: content}) do
+          output(state, :output, message)
 
+          {:ok, state}
+    else
       nil ->
         output(state, :output, message)
+        {:ok, state}
+      {:error, %Ecto.Changeset{} = changeset} ->
+          send_error(
+            state,
+            Message.from_message(message)
+            |> Message.set_type(:text)
+            |> Message.set_message("Error saving data in dataset")
+          )
+
+          {:ok, state}
+      {:error, error} ->
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message(error)
+        )
+
+        {:ok, state}
     end
   end
 
