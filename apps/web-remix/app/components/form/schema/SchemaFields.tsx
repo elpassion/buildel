@@ -293,7 +293,7 @@ function RealArrayField({
             <IconButton
               size="xxs"
               variant="ghost"
-              className="absolute top-0 left-0"
+              className="absolute bottom-14 right-0"
               aria-label="Remove field"
               icon={<Trash />}
               disabled={rhfFields.length <= field.minItems || rest.disabled}
