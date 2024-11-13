@@ -136,7 +136,7 @@ export function WorkerHandle({
         style={{
           top: -26,
           bottom: 'auto',
-          transform: `translateX(calc(-50% + ${getIoXPosition(index, totalSize)}px))`,
+          transform: `translateX(calc(-50% - ${getIoXPosition(index, totalSize)}px))`,
         }}
       >
         {startCase(handle.data.name)}

@@ -66,6 +66,70 @@ defmodule Buildel.Blocks.Utils.Schemas do
     )
   end
 
+  def memory_schema(
+         %{
+           "default" => default,
+           "title" => title,
+           "description" => description,
+           "readonly" => readonly
+         } \\ %{
+           "default" => "{{pipeline_id}}_{{block_name}}",
+           "title" => "Persist in",
+           "description" => "Memory collection to use.",
+           "readonly" => false
+         }
+       ) do
+    %{
+      "type" => "string",
+      "title" => title,
+      "description" => description,
+      "readonly" => readonly,
+      "url" => "/api/organizations/{{organization_id}}/memory_collections",
+      "presentAs" => "async-creatable-select",
+      "schema" => %{
+        "type" => "object",
+        "required" => ["collection_name"],
+        "properties" => %{
+          "collection_name" => %{
+            "type" => "string",
+            "title" => "Name",
+            "description" => "The name for collection.",
+            "minLength" => 1
+          },
+          "embeddings" => %{
+            "type" => "object",
+            "title" => "Embeddings",
+            "description" => "The embeddings to use for the collection.",
+            "required" => ["api_type", "model", "secret_name"],
+            "properties" => %{
+              "api_type" => %{
+                "type" => "string",
+                "title" => "API Type",
+                "description" => "The type of the embeddings API.",
+                "enum" => ["openai"],
+                "default" => "openai",
+                "enumPresentAs" => "radio"
+              },
+              "model" => %{
+                "type" => "string",
+                "title" => "Model",
+                "description" => "The model to use for the embeddings.",
+                "url" =>
+                  "/api/organizations/{{organization_id}}/models/embeddings?api_type={{embeddings.api_type}}",
+                "presentAs" => "async-select"
+              },
+              "secret_name" =>
+                secret_schema(%{
+                  "title" => "Embeddings Secret",
+                  "description" => "The secret to use for the embeddings."
+                })
+            }
+          }
+        }
+      }
+    }
+  end
+
   def push_property(schema, name, property_schema, required) do
     required_keys =
       case required do
