@@ -237,7 +237,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
     {:ok, collection, _} =
       memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
-
     try do
       with {:ok, memory} <-
              memory().create(

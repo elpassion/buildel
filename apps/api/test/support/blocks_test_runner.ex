@@ -141,6 +141,11 @@ defmodule Buildel.BlocksTestRunner do
     run
   end
 
+  def with_memory_returning(run, method, mock) do
+    Buildel.ClientMocks.Memory.set_mock(method, mock)
+    run
+  end
+
   def with_image_returning(run, mock) do
     Buildel.ClientMocks.Image.set_mock(:generate_image, mock)
     run

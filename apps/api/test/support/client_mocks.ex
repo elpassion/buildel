@@ -5,7 +5,8 @@ defmodule Buildel.ClientMocks do
     Clock,
     DocumentWorkflow,
     Secret,
-    Chat
+    Chat,
+    Memory
   }
 
   @mocks [
@@ -14,7 +15,8 @@ defmodule Buildel.ClientMocks do
     clock: Clock,
     document_workflow: DocumentWorkflow,
     secret: Secret,
-    chat: Chat
+    chat: Chat,
+    memory: Memory
   ]
 
   def mocks() do
