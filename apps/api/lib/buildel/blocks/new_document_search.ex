@@ -2,6 +2,8 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   alias Buildel.Blocks.Fields.EditorField
   alias Buildel.Memories.MemoryCollectionSearch
   alias Buildel.Blocks.DocumentSearch.DocumentSearchJSON
+  alias Buildel.Clients.Utils.Context
+  use Buildel.Blocks.NewBlock.Memory
   use Buildel.Blocks.NewBlock
 
   import Buildel.Blocks.Utils.Schemas
@@ -208,10 +210,10 @@ defmodule Buildel.Blocks.NewDocumentSearch do
       send_stream_start(state, :output, message)
 
       {:ok, collection, _} =
-        get_global_collection(state.context.context_id, option(state, :knowledge))
+        memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
       try do
-          {:ok, _} = delete_file(state.context.context_id, collection, message_message.file_id)
+          {:ok, _} = memory().delete(state.context.context_id, collection, message_message.file_id)
 
           send_stream_stop(state, :output, Message.from_message(message) |> Message.set_type(:text) |> Message.set_message("File deleted"))
 
@@ -233,12 +235,12 @@ defmodule Buildel.Blocks.NewDocumentSearch do
     send_stream_start(state, :output, message)
 
     {:ok, collection, _} =
-      get_global_collection(state.context.context_id, option(state, :knowledge))
+      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
 
     try do
       with {:ok, memory} <-
-             create_memory(
+             memory().create(
                state.context.context_id,
                collection,
                %{
@@ -310,9 +312,9 @@ defmodule Buildel.Blocks.NewDocumentSearch do
       })
 
     {:ok, collection, collection_name} =
-      get_global_collection(state.context.context_id, option(state, :knowledge))
+      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
-    {:ok, vector_db} = get_vector_db(state.context.context_id, option(state, :knowledge))
+    {:ok, vector_db} = memory().get_vector_db(state.context.context_id, option(state, :knowledge))
 
     {result, _total_tokens, embeddings_tokens} =
       MemoryCollectionSearch.new(%{
@@ -338,9 +340,9 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   defp do_parent(state, chunk_id) do
 
     {:ok, collection, collection_name} =
-      get_global_collection(state.context.context_id, option(state, :knowledge))
+      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
-    {:ok, vector_db} = get_vector_db(state.context.context_id, option(state, :knowledge))
+    {:ok, vector_db} =  memory().get_vector_db(state.context.context_id, option(state, :knowledge))
 
 
     MemoryCollectionSearch.new(%{
@@ -354,9 +356,9 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
   defp do_related(state, chunk_id) do
     {:ok, collection, collection_name} =
-      get_global_collection(state.context.context_id, option(state, :knowledge))
+      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
-    {:ok, vector_db} = get_vector_db(state.context.context_id, option(state, :knowledge))
+    {:ok, vector_db} = memory().get_vector_db(state.context.context_id, option(state, :knowledge))
 
     chunk = Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id)
 
@@ -453,102 +455,9 @@ defmodule Buildel.Blocks.NewDocumentSearch do
     }
   end
 
-  ## -------
-
-  ## -- Copied --
-
-  def delete_file(context_id, collection, file_id) do
-    %{global: organization_id} = context_from_context_id(context_id)
-    organization = Buildel.Organizations.get_organization!(organization_id)
-
-    memory =
-      Buildel.Memories.get_collection_memory_by_file_uuid!(organization, collection.id, file_id)
-
-    Buildel.Memories.delete_organization_memory(organization, collection.id, memory.id)
-  end
-
-  defp create_memory(context_id, collection, file, metadata) do
-    %{global: organization_id} = context_from_context_id(context_id)
-    organization = Buildel.Organizations.get_organization!(organization_id)
-
-    Buildel.Memories.create_organization_memory(
-      organization,
-      collection,
-      file,
-      metadata
-    )
-  end
-
-
-  defp get_vector_db(context_id, collection_name) do
-    %{global: organization_id} = context_from_context_id(context_id)
-    organization = Buildel.Organizations.get_organization!(organization_id)
-
-    {:ok, collection} =
-      Buildel.Memories.get_organization_collection(organization, collection_name)
-
-    api_key = get_secret_from_context(context_from_context_id(context_id), collection.embeddings_secret_name)
-
-    vector_db =
-      Buildel.VectorDB.new(%{
-        adapter: Buildel.VectorDB.EctoAdapter,
-        embeddings:
-          Buildel.Clients.Embeddings.new(%{
-            api_type: collection.embeddings_api_type,
-            model: collection.embeddings_model,
-            api_key: api_key,
-            endpoint: collection.embeddings_endpoint
-          })
-      })
-
-    {:ok, vector_db}
-  end
-
-  defp get_secret_from_context(%{global: organization_id}, secret_name) do
-    with %Buildel.Organizations.Organization{} = organization <-
-           Buildel.Organizations.get_organization!(organization_id),
-         {:ok, secret} <- Buildel.Organizations.get_organization_secret(organization, secret_name) do
-      secret.value
-    else
-      err -> nil
-    end
-  end
-
-  defp get_dataset_from_context(context_id, dataset_id) do
-    with %{global: organization_id} = context_from_context_id(context_id),
-         %Buildel.Organizations.Organization{} = organization <-
-           Buildel.Organizations.get_organization!(organization_id),
-         {:ok, dataset} <- Buildel.Datasets.get_organization_dataset(organization, dataset_id) do
-      dataset
-    else
-      _ -> nil
-    end
-  end
-
-  defp get_global_collection(context_id, collection_name) do
-    %{global: organization_id} = context_from_context_id(context_id)
-    organization = Buildel.Organizations.get_organization!(organization_id)
-
-    {:ok, collection} =
-      Buildel.Memories.get_organization_collection(organization, collection_name)
-
-    {:ok, collection, Buildel.Memories.organization_collection_name(organization, collection)}
-  end
-
-  defp context_from_context_id(context_id) do
-    ["organizations", organization_id, "pipelines", pipeline_id, "runs", run_id] =
-      String.split(context_id, ":")
-
-    %{
-      global: organization_id,
-      parent: pipeline_id,
-      local: run_id
-    }
-  end
-
   defp create_run_and_collection_cost(context_id, block_name, tokens, collection_id) do
     %{global: organization_id, parent: pipeline_id, local: run_id} =
-      context_from_context_id(context_id)
+      Context.context_from_context_id(context_id)
 
     with organization <-
            Buildel.Organizations.get_organization!(organization_id),

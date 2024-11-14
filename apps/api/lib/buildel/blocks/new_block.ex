@@ -1098,6 +1098,17 @@ defmodule Buildel.Blocks.NewBlock.Clock do
   end
 end
 
+defmodule Buildel.Blocks.NewBlock.Memory do
+  defmacro __using__(_opts) do
+    quote do
+      def memory() do
+        Application.fetch_env!(:buildel, :memory)
+      end
+    end
+  end
+end
+
+
 defmodule Buildel.Blocks.NewBlock.DocumentWorkflow do
   defmacro __using__(_opts) do
     quote do

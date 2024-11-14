@@ -4,7 +4,8 @@ defmodule Buildel.Clients do
     HttpApi,
     Clock,
     Secret,
-    NewChat
+    NewChat,
+    Memory
   }
 
   alias Buildel.DocumentWorkflow
@@ -15,7 +16,8 @@ defmodule Buildel.Clients do
     clock: Clock,
     document_workflow: DocumentWorkflow,
     secret: Secret,
-    chat: NewChat
+    chat: NewChat,
+    memory: Memory
   ]
 
   def clients() do
