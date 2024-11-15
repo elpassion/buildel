@@ -8,10 +8,11 @@ export class OAuth2Client {
     this.client = new AuthClient(clientId, clientSecret, redirectUri);
   }
 
-  generateAuthUrl() {
+  generateAuthUrl(state?: string) {
     return this.client.generateAuthUrl({
       prompt: 'select_account',
       redirect_uri: this.redirectUri,
+      state,
       scope: [
         'https://www.googleapis.com/auth/userinfo.profile',
         'https://www.googleapis.com/auth/userinfo.email',

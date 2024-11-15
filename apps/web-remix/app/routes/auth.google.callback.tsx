@@ -59,6 +59,14 @@ export async function loader(args: LoaderFunctionArgs) {
     headers.append('Set-Cookie', authCookie);
     headers.append('Set-Cookie', sessionCookie);
 
+    const redirectTo = url.searchParams.get('state');
+
+    if (redirectTo) {
+      return redirect(redirectTo, {
+        headers,
+      });
+    }
+
     return redirect(routes.dashboard, {
       headers,
     });

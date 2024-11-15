@@ -7,6 +7,8 @@ export const routes = {
   agreements: '/agreements',
   login: '/login',
   register: '/register',
+  invitationAccept: (params: RouteParam = {}) =>
+    buildUrlWithParams('/invitation/accept', params),
   resetPassowrd: () => '/reset-password',
   resetPasswordSent: () => '/reset-password/sent',
   organizations: '/organizations',

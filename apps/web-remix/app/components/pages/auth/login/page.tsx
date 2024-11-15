@@ -83,7 +83,14 @@ export function LoginPage() {
       {googleLoginEnabled && (
         <>
           <span className="my-3 text-muted-foreground text-sm">Or</span>
-          <SocialSignInForm action="/auth/google" className="max-w-md mb-4">
+          <SocialSignInForm
+            action={
+              redirectTo
+                ? `/auth/google?redirectTo=${redirectTo}`
+                : '/auth/google'
+            }
+            className="max-w-md mb-4"
+          >
             <GoogleButton />
           </SocialSignInForm>
           <SocialSignInForm action="/auth/github" className="max-w-md">
