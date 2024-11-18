@@ -9,7 +9,7 @@ defmodule Buildel.Pipelines do
   alias Buildel.Organizations.Organization
 
   defmodule ListParams do
-    defstruct [:page, :per_page, :favorites]
+    defstruct [:page, :per_page, :favorites, :search]
 
     def from_map(params) do
       %__MODULE__{}
@@ -26,7 +26,8 @@ defmodule Buildel.Pipelines do
             nil -> nil
             per_page -> String.to_integer(per_page)
           end),
-        favorites: Map.get(params, "favorites", nil) == "true"
+        favorites: Map.get(params, "favorites", nil) == "true",
+        search: Map.get(params, "search", nil)
       })
     end
   end
@@ -81,6 +82,13 @@ defmodule Buildel.Pipelines do
         case params.favorites do
           true -> q |> where([p], p.favorite == true)
           _ -> q
+        end
+      end)
+      |> then(fn q ->
+        case params.search do
+          nil -> q
+          "" -> q
+          search_query -> q |> where([p], ilike(p.name, ^"%#{search_query}%"))
         end
       end)
 
