@@ -32,7 +32,7 @@ export async function loader(args: LoaderFunctionArgs) {
 
     const favoritesPipelinesPromise = pipelineApi.getPipelines(
       params.organizationId,
-      { favorites: true },
+      { favorites: true, search },
     );
 
     const templatesPromise = organizationApi.getTemplates(

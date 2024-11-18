@@ -1,9 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
-import { Outlet, useFetcher, useLoaderData } from '@remix-run/react';
-import { BookmarkCheck } from 'lucide-react';
+import {
+  Outlet,
+  useFetcher,
+  useLoaderData,
+  useNavigate,
+} from '@remix-run/react';
+import debounce from 'lodash.debounce';
+import { BookmarkCheck, Search, X } from 'lucide-react';
 
+import { TextInput } from '~/components/form/inputs/text.input';
+import { IconButton } from '~/components/iconButton';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { confirm } from '~/components/modal/confirm';
@@ -13,6 +21,7 @@ import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
 import { Button } from '~/components/ui/button';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
+import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -28,29 +37,29 @@ import {
 export function PipelinesPage() {
   const { pagination, organizationId } = useLoaderData<typeof loader>();
 
+  const pipelinesContent = useMemo(() => {
+    if (pagination.search || pagination.totalItems > 0) {
+      return (
+        <ContentWithFilters
+          search={pagination.search}
+          key={routes.pipelines(organizationId, {
+            search: pagination.search,
+          })}
+        />
+      );
+    }
+
+    return <TemplatesWithoutPipelines organizationId={organizationId} />;
+  }, [organizationId, pagination.search, pagination.totalItems]);
+
   return (
     <>
-      <PipelinesNavbar>
-        <Button asChild className="hidden w-fit ml-auto mr-0 lg:flex">
-          <BasicLink
-            to={routes.pipelinesNew(organizationId)}
-            aria-label="Create new workflow"
-          >
-            New Workflow
-          </BasicLink>
-        </Button>
-      </PipelinesNavbar>
+      <PipelinesNavbar />
 
       <Outlet />
 
       <PageContentWrapper className="grid grid-cols-1 gap-8 mt-6 lg:grid-cols-1">
-        {pagination.totalItems > 0 ? (
-          <ContentWithPipelines key={routes.pipelines(organizationId)} />
-        ) : null}
-
-        {pagination.totalItems === 0 ? (
-          <TemplatesWithoutPipelines organizationId={organizationId} />
-        ) : null}
+        {pipelinesContent}
       </PageContentWrapper>
     </>
   );
@@ -121,6 +130,24 @@ function TemplatesWithoutPipelines({
   );
 }
 
+interface ContentWithFiltersProps {
+  search: string;
+}
+
+function ContentWithFilters({ search }: ContentWithFiltersProps) {
+  const organizationId = useOrganizationId();
+  return (
+    <>
+      <PipelinesFilter search={search} className="-mt-1 mb-10" />
+      <ContentWithPipelines
+        key={routes.pipelines(organizationId, {
+          search,
+        })}
+      />
+    </>
+  );
+}
+
 function ContentWithPipelines() {
   const { ref: fetchNextRef, inView } = useInView();
   const { pipelines, pagination, favorites } = useLoaderData<typeof loader>();
@@ -168,22 +195,9 @@ function ContentWithPipelines() {
   return (
     <>
       <div className="flex-grow order-2 lg:order-1">
-        <Button
-          asChild
-          size="sm"
-          className="mb-3 w-fit ml-auto mr-0 flex lg:hidden"
-        >
-          <BasicLink
-            to={routes.pipelinesNew(organizationId)}
-            aria-label="Create new workflow"
-          >
-            New Workflow
-          </BasicLink>
-        </Button>
-
         {favorites.length > 0 ? (
-          <div className="-mt-11 lg:mt-auto">
-            <h2 className="text-white mb-3 text-base flex gap-1 items-center capitalize">
+          <div>
+            <h2 className="text-foreground mb-3 text-base flex gap-1 items-center capitalize">
               <BookmarkCheck className="w-5 h-5" />{' '}
               <span>Pinned workflows</span>
             </h2>
@@ -285,4 +299,81 @@ function useToggleWorkflow({
   }, [toggleFavoriteFetcher]);
 
   return { action };
+}
+
+type PipelinesFilterProps = React.HTMLAttributes<HTMLDivElement> & {
+  search: string;
+};
+
+function PipelinesFilter({
+  search,
+  className,
+  children,
+  ...rest
+}: PipelinesFilterProps) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const navigate = useNavigate();
+  const organizationId = useOrganizationId();
+
+  const onChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    navigate(
+      routes.pipelines(organizationId, {
+        search: e.target.value,
+      }),
+    );
+  }, 500);
+
+  const onClear = () => {
+    navigate(routes.pipelines(organizationId));
+  };
+
+  const onIconClick = () => {
+    inputRef.current?.focus();
+  };
+
+  return (
+    <div
+      className={cn('w-full flex gap-2 items-center justify-end', className)}
+      {...rest}
+    >
+      <div className="relative w-fit max-w-[350px]">
+        <Search
+          className="absolute top-1/2 -translate-y-1/2 left-2.5 w-3.5 h-3.5"
+          onClick={onIconClick}
+        />
+
+        <TextInput
+          size="sm"
+          ref={inputRef}
+          autoFocus
+          placeholder="Search Workflows"
+          className={cn('px-8 peer')}
+          onChange={onChange}
+          defaultValue={search}
+        />
+
+        <IconButton
+          onlyIcon
+          size="xs"
+          className={cn(
+            'absolute top-1/2 -translate-y-1/2 right-2.5 w-3.5 h-3.5 text-muted-foreground opacity-0 peer-hover:opacity-100 cursor-pointer hover:opacity-100',
+            { hidden: !search },
+          )}
+          onClick={onClear}
+          icon={<X />}
+        />
+      </div>
+
+      <Button size="sm" asChild>
+        <BasicLink
+          to={routes.pipelinesNew(organizationId)}
+          aria-label="Create new workflow"
+        >
+          New Workflow
+        </BasicLink>
+      </Button>
+
+      {children}
+    </div>
+  );
 }

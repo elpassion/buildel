@@ -32,8 +32,11 @@ export const routes = {
     `${routes.settings(organizationId)}/profile`,
   profileSettingsChangePassword: (organizationId: OrganizationId) =>
     `${routes.profileSettings(organizationId)}/change-password`,
-  pipelines: (organizationId: OrganizationId) =>
-    `${routes.organization(organizationId)}/pipelines`,
+  pipelines: (organizationId: OrganizationId, params: RouteParam = {}) =>
+    buildUrlWithParams(
+      `${routes.organization(organizationId)}/pipelines`,
+      params,
+    ),
   pipeline: (organizationId: OrganizationId, pipelineId: PipelineId) =>
     `${routes.pipelines(organizationId)}/${pipelineId}`,
   pipelineBuild: (
