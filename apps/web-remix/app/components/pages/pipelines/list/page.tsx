@@ -345,7 +345,7 @@ function PipelinesFilter({
         <TextInput
           size="sm"
           ref={inputRef}
-          autoFocus
+          autoFocus={!!search}
           placeholder="Search Workflows"
           className={cn('px-8 peer')}
           onChange={onChange}
