@@ -284,6 +284,72 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
       assert_schema(response, "PipelineIndexResponse", api_spec)
     end
 
+    test "lists filtered organization pipelines", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      pipeline_fixture(%{organization_id: organization_id, name: "EXTRA NAME"})
+      pipeline_fixture(%{organization_id: organization_id, name: "other name"})
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines?page=1&per_page=20&search=EXTRA")
+      response = json_response(conn, 200)
+
+      %{
+        "meta" => %{
+          "total" => 1,
+          "page" => 1,
+          "per_page" => 20
+        }
+      } = response
+
+      assert_schema(response, "PipelineIndexResponse", api_spec)
+    end
+
+    test "lists all organization pipelines when search empty", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      pipeline_fixture(%{organization_id: organization_id, name: "EXTRA NAME"})
+      pipeline_fixture(%{organization_id: organization_id, name: "other name"})
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines?page=1&per_page=20&search=")
+      response = json_response(conn, 200)
+
+      %{
+        "meta" => %{
+          "total" => 2,
+          "page" => 1,
+          "per_page" => 20
+        }
+      } = response
+
+      assert_schema(response, "PipelineIndexResponse", api_spec)
+    end
+
+    test "lists none organization pipelines when do not match to search", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      pipeline_fixture(%{organization_id: organization_id, name: "EXTRA NAME"})
+      pipeline_fixture(%{organization_id: organization_id, name: "other name"})
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines?page=1&per_page=20&search=test")
+      response = json_response(conn, 200)
+
+      %{
+        "meta" => %{
+          "total" => 0,
+          "page" => 1,
+          "per_page" => 20
+        }
+      } = response
+
+      assert_schema(response, "PipelineIndexResponse", api_spec)
+    end
+
     test "lists organization favorite pipelines", %{
       conn: conn,
       organization: organization,
