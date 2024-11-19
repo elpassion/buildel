@@ -1,6 +1,6 @@
 import { buildUrlWithParams } from '~/utils/url';
 
-type RouteParam = Record<string, string | number | boolean>;
+type RouteParam = Record<string, string | number | boolean | undefined>;
 
 export const routes = {
   dashboard: '/',

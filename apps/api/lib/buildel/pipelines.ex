@@ -9,7 +9,7 @@ defmodule Buildel.Pipelines do
   alias Buildel.Organizations.Organization
 
   defmodule ListParams do
-    defstruct [:page, :per_page, :favorites, :search]
+    defstruct [:page, :per_page, :favorites, :search, :sort]
 
     def from_map(params) do
       %__MODULE__{}
@@ -27,7 +27,8 @@ defmodule Buildel.Pipelines do
             per_page -> String.to_integer(per_page)
           end),
         favorites: Map.get(params, "favorites", nil) == "true",
-        search: Map.get(params, "search", nil)
+        search: Map.get(params, "search", nil),
+        sort: Map.get(params, "sort", nil)
       })
     end
   end
@@ -77,7 +78,7 @@ defmodule Buildel.Pipelines do
         %ListParams{} = params
       ) do
     query =
-      from(p in Pipeline, where: p.organization_id == ^organization.id, order_by: [desc: p.id])
+      from(p in Pipeline, where: p.organization_id == ^organization.id)
       |> then(fn q ->
         case params.favorites do
           true -> q |> where([p], p.favorite == true)
@@ -91,6 +92,15 @@ defmodule Buildel.Pipelines do
           search_query -> q |> where([p], ilike(p.name, ^"%#{search_query}%"))
         end
       end)
+      |> then(fn q ->
+        case params.sort do
+          "inserted_at" -> q |> order_by([p], desc: p.inserted_at)
+          "updated_at" -> q |> order_by([p], desc: p.updated_at)
+          "name" -> q |> order_by([p], asc: p.name)
+          _ -> q |> order_by([p], desc: p.inserted_at)
+        end
+      end)
+
 
     items =
       case params do

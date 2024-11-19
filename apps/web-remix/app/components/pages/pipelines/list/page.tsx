@@ -5,7 +5,7 @@ import {
   Outlet,
   useFetcher,
   useLoaderData,
-  useNavigate,
+  useSearchParams,
 } from '@remix-run/react';
 import debounce from 'lodash.debounce';
 import { BookmarkCheck, Search, X } from 'lucide-react';
@@ -20,6 +20,12 @@ import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { LoadMoreButton } from '~/components/pagination/LoadMoreButton';
 import { useInfiniteFetch } from '~/components/pagination/useInfiniteFetch';
 import { Button } from '~/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from '~/components/ui/select';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { cn } from '~/utils/cn';
 import { metaWithDefaults } from '~/utils/metadata';
@@ -40,17 +46,17 @@ export function PipelinesPage() {
   const pipelinesContent = useMemo(() => {
     if (pagination.search || pagination.totalItems > 0) {
       return (
-        <ContentWithFilters
-          search={pagination.search}
-          key={routes.pipelines(organizationId, {
-            search: pagination.search,
-          })}
-        />
+        <ContentWithFilters search={pagination.search} sort={pagination.sort} />
       );
     }
 
     return <TemplatesWithoutPipelines organizationId={organizationId} />;
-  }, [organizationId, pagination.search, pagination.totalItems]);
+  }, [
+    organizationId,
+    pagination.search,
+    pagination.totalItems,
+    pagination.sort,
+  ]);
 
   return (
     <>
@@ -59,7 +65,14 @@ export function PipelinesPage() {
       <Outlet />
 
       <PageContentWrapper className="grid grid-cols-1 gap-8 mt-6 lg:grid-cols-1">
-        {pipelinesContent}
+        <React.Fragment
+          key={routes.pipelines(organizationId, {
+            search: pagination.search,
+            sort: pagination.sort,
+          })}
+        >
+          {pipelinesContent}
+        </React.Fragment>
       </PageContentWrapper>
     </>
   );
@@ -132,13 +145,17 @@ function TemplatesWithoutPipelines({
 
 interface ContentWithFiltersProps {
   search: string;
+  sort?: string;
 }
 
-function ContentWithFilters({ search }: ContentWithFiltersProps) {
+function ContentWithFilters({ search, sort }: ContentWithFiltersProps) {
   const organizationId = useOrganizationId();
   return (
     <>
-      <PipelinesFilter search={search} className="-mt-1 mb-10" />
+      <PipelinesFilter
+        defaultValues={{ search, sort }}
+        className="-mt-1 mb-10"
+      />
       <ContentWithPipelines
         key={routes.pipelines(organizationId, {
           search,
@@ -302,33 +319,47 @@ function useToggleWorkflow({
 }
 
 type PipelinesFilterProps = React.HTMLAttributes<HTMLDivElement> & {
-  search: string;
+  defaultValues?: {
+    search?: string;
+    sort?: string;
+  };
 };
 
 function PipelinesFilter({
-  search,
+  defaultValues,
   className,
   children,
   ...rest
 }: PipelinesFilterProps) {
+  const [_, setSearchParams] = useSearchParams();
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const navigate = useNavigate();
   const organizationId = useOrganizationId();
 
-  const onChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-    navigate(
-      routes.pipelines(organizationId, {
-        search: e.target.value,
-      }),
-    );
+  const onSearchChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchParams((prev) => {
+      prev.set('search', e.target.value);
+
+      return prev;
+    });
   }, 500);
 
-  const onClear = () => {
-    navigate(routes.pipelines(organizationId));
+  const onSearchClear = () => {
+    setSearchParams((prev) => {
+      prev.set('search', '');
+
+      return prev;
+    });
   };
 
   const onIconClick = () => {
     inputRef.current?.focus();
+  };
+
+  const onSortChange = (value: string) => {
+    setSearchParams((prev) => {
+      prev.set('sort', value);
+      return prev;
+    });
   };
 
   return (
@@ -345,11 +376,11 @@ function PipelinesFilter({
         <TextInput
           size="sm"
           ref={inputRef}
-          autoFocus={!!search}
+          autoFocus={!!defaultValues?.search}
           placeholder="Search Workflows"
           className={cn('px-8 peer')}
-          onChange={onChange}
-          defaultValue={search}
+          onChange={onSearchChange}
+          defaultValue={defaultValues?.search}
         />
 
         <IconButton
@@ -357,12 +388,26 @@ function PipelinesFilter({
           size="xs"
           className={cn(
             'absolute top-1/2 -translate-y-1/2 right-2.5 w-3.5 h-3.5 text-muted-foreground opacity-0 peer-hover:opacity-100 cursor-pointer hover:opacity-100',
-            { hidden: !search },
+            { hidden: !defaultValues?.search },
           )}
-          onClick={onClear}
+          onClick={onSearchClear}
           icon={<X />}
         />
       </div>
+
+      <Select
+        onValueChange={onSortChange}
+        defaultValue={defaultValues?.sort ?? 'inserted_at'}
+      >
+        <SelectTrigger className="w-[80px]" size="sm">
+          Sort
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="inserted_at">Created At</SelectItem>
+          <SelectItem value="updated_at">Updated At</SelectItem>
+          <SelectItem value="name">Name</SelectItem>
+        </SelectContent>
+      </Select>
 
       <Button size="sm" asChild>
         <BasicLink

@@ -165,6 +165,12 @@ defmodule BuildelWeb.OrganizationPipelineController do
           schema: %Schema{type: :string},
           required: false
         ],
+        sort: [
+          in: :query,
+          description: "Sort query",
+          schema: %Schema{type: :string},
+          required: false
+        ]
       ] ++
         BuildelWeb.Schemas.Pagination.default_params(%{
           page: nil,

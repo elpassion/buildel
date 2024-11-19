@@ -22,17 +22,17 @@ export async function loader(args: LoaderFunctionArgs) {
       searchParams.set('per_page', '30');
     }
 
-    const { page, per_page, search } = getParamsPagination(searchParams);
-
+    const { page, per_page, search, sort } = getParamsPagination(searchParams);
     const pipelinesPromise = pipelineApi.getPipelines(params.organizationId, {
       page,
       per_page,
       search,
+      sort,
     });
 
     const favoritesPipelinesPromise = pipelineApi.getPipelines(
       params.organizationId,
-      { favorites: true, search },
+      { favorites: true, search, sort },
     );
 
     const templatesPromise = organizationApi.getTemplates(
@@ -54,7 +54,7 @@ export async function loader(args: LoaderFunctionArgs) {
       pipelines: pipelines.data,
       favorites: favorites.data,
       organizationId: params.organizationId,
-      pagination: { page, per_page, search, totalItems, totalPages },
+      pagination: { page, per_page, search, totalItems, totalPages, sort },
     });
   })(args);
 }
