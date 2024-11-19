@@ -362,6 +362,7 @@ function PipelinesFilter({
       {...rest}
     >
       <SearchInput
+        placeholder="Search Workflows"
         onClear={onSearchClear}
         onChange={onSearchChange}
         autoFocus={!!defaultValues?.search}

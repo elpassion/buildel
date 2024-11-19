@@ -44,6 +44,7 @@ defmodule Buildel.Memories do
       m.organization_id == ^organization.id
     )
     |> where([m], ^collection_filters(params))
+    |> maybe_add_search_query(params)
     |> Buildel.Repo.all()
   end
 
@@ -53,6 +54,14 @@ defmodule Buildel.Memories do
     Enum.reduce(params, [], fn {key, _value} = field, acc ->
       if Enum.member?(filterable_fields, key), do: acc ++ [field], else: acc
     end)
+  end
+
+  defp maybe_add_search_query(query, %{"search": search_query}) when is_binary(search_query) and search_query != "" do
+    query |> where([m], ilike(m.collection_name, ^"%#{search_query}%"))
+  end
+
+  defp maybe_add_search_query(query, _params) do
+    query
   end
 
   def get_organization_collection(
