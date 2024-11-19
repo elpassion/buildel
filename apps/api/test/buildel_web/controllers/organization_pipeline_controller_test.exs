@@ -350,6 +350,26 @@ defmodule BuildelWeb.OrganizationPipelineControllerTest do
       assert_schema(response, "PipelineIndexResponse", api_spec)
     end
 
+    test "lists sorted organization pipelines", %{
+      conn: conn,
+      organization: organization,
+      api_spec: api_spec
+    } do
+      organization_id = organization.id
+      pipeline_fixture(%{organization_id: organization_id, name: "BBB"})
+      fixture = pipeline_fixture(%{organization_id: organization_id, name: "AAA"})
+      conn = get(conn, ~p"/api/organizations/#{organization_id}/pipelines?sort=name")
+      response = json_response(conn, 200)
+
+      fixture_name = fixture.name
+
+      %{
+        "data" => [%{"name" => ^fixture_name}, _],
+      } = response
+
+      assert_schema(response, "PipelineIndexResponse", api_spec)
+    end
+
     test "lists organization favorite pipelines", %{
       conn: conn,
       organization: organization,
