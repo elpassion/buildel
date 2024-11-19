@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useInView } from 'react-intersection-observer';
 import type { MetaFunction } from '@remix-run/node';
 import {
@@ -8,10 +8,9 @@ import {
   useSearchParams,
 } from '@remix-run/react';
 import debounce from 'lodash.debounce';
-import { BookmarkCheck, Search, X } from 'lucide-react';
+import { BookmarkCheck } from 'lucide-react';
 
-import { TextInput } from '~/components/form/inputs/text.input';
-import { IconButton } from '~/components/iconButton';
+import { SearchInput } from '~/components/form/inputs/search.input.tsx';
 import { PageContentWrapper } from '~/components/layout/PageContentWrapper';
 import { BasicLink } from '~/components/link/BasicLink';
 import { confirm } from '~/components/modal/confirm';
@@ -332,7 +331,6 @@ function PipelinesFilter({
   ...rest
 }: PipelinesFilterProps) {
   const [_, setSearchParams] = useSearchParams();
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const organizationId = useOrganizationId();
 
   const onSearchChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -351,10 +349,6 @@ function PipelinesFilter({
     });
   };
 
-  const onIconClick = () => {
-    inputRef.current?.focus();
-  };
-
   const onSortChange = (value: string) => {
     setSearchParams((prev) => {
       prev.set('sort', value);
@@ -367,33 +361,12 @@ function PipelinesFilter({
       className={cn('w-full flex gap-2 items-center justify-end', className)}
       {...rest}
     >
-      <div className="relative w-fit max-w-[350px]">
-        <Search
-          className="absolute top-1/2 -translate-y-1/2 left-2.5 w-3.5 h-3.5"
-          onClick={onIconClick}
-        />
-
-        <TextInput
-          size="sm"
-          ref={inputRef}
-          autoFocus={!!defaultValues?.search}
-          placeholder="Search Workflows"
-          className={cn('px-8 peer')}
-          onChange={onSearchChange}
-          defaultValue={defaultValues?.search}
-        />
-
-        <IconButton
-          onlyIcon
-          size="xs"
-          className={cn(
-            'absolute top-1/2 -translate-y-1/2 right-2.5 w-3.5 h-3.5 text-muted-foreground opacity-0 peer-hover:opacity-100 cursor-pointer hover:opacity-100',
-            { hidden: !defaultValues?.search },
-          )}
-          onClick={onSearchClear}
-          icon={<X />}
-        />
-      </div>
+      <SearchInput
+        onClear={onSearchClear}
+        onChange={onSearchChange}
+        autoFocus={!!defaultValues?.search}
+        defaultValue={defaultValues?.search}
+      />
 
       <Select
         onValueChange={onSortChange}
