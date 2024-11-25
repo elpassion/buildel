@@ -4,7 +4,7 @@ defmodule Buildel.Sitemaps do
   import SweetXml
 
   def get_sitemaps(url) do
-    with {:ok, sitemaps} <- fetch_robots_sitemaps(url) do
+    with {:ok, sitemaps} <- fetch_sitemaps(url) do
       fetch_sitemaps_recursive(sitemaps)
     else
       _ ->
@@ -12,6 +12,14 @@ defmodule Buildel.Sitemaps do
           {:ok, sitemap} -> {:ok, sitemap}
           error -> error
         end
+    end
+  end
+
+  defp fetch_sitemaps(url) do
+    if url |> String.ends_with?("sitemap.xml") do
+      {:ok, [url]}
+    else
+      fetch_robots_sitemaps(url)
     end
   end
 
