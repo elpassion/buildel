@@ -233,7 +233,7 @@ defmodule BuildelWeb.PipelineChannel do
             |> Enum.find(%{}, fn input -> Map.get(input, "name") == block_name end)
             |> Map.get("type")
 
-          if block_type == "file_input" do
+          if block_type == "file_input" or block_type == "image_input" do
             %{metadata: metadata, message: file} = Text.from_binary(content)
             {:ok, path} = Temp.path(suffix: metadata |> Map.get("file_name"))
             File.write!(path, file)

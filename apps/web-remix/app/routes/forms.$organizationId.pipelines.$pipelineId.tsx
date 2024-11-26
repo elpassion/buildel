@@ -7,7 +7,7 @@ import type {
   OnBlockStatusChange,
   OnError,
 } from '@buildel/buildel';
-import { FileDown, FileText, FileUp, X } from 'lucide-react';
+import { FileDown, FileText, FileUp, ImageDown, X } from 'lucide-react';
 import invariant from 'tiny-invariant';
 
 import { ChatHeader, ChatStatus } from '~/components/chat/Chat.components';
@@ -36,7 +36,6 @@ import {
 } from '~/components/pages/interfaces/form/formInterface.reducer';
 import { publicInterfaceLoader } from '~/components/pages/pipelines/interface/interface.loader.server';
 import {
-  NodeClearButton,
   NodeCopyButton,
   NodeDownloadButton,
 } from '~/components/pages/pipelines/Nodes/CustomNodes/NodeActionButtons';
@@ -108,11 +107,11 @@ export default function WebsiteForm() {
   };
 
   const onBlockError: OnBlockError = (block, error) => {
-    console.log(block, error);
+    console.error(block, error);
   };
 
   const onError: OnError = (error) => {
-    console.log(error);
+    console.error(error);
   };
 
   const doesOutputExist = (block: string) => {
@@ -454,9 +453,18 @@ export function FormInterfaceOutput({ data }: FormInterfaceOutputProps) {
   } else if (
     (data.type === 'file_output' || data.type === 'image_output') &&
     data.value &&
-    data.metadata
+    data.metadata &&
+    !data.metadata.file_type.includes('image')
   ) {
     return <FormInterfaceFileOutput data={data as Required<FileOutput>} />;
+  } else if (
+    data.type === 'image_output' &&
+    data.value &&
+    data.metadata &&
+    data.metadata.file_type.includes('image')
+  ) {
+    console.log(data.metadata);
+    return <FormInterfaceImageOutput data={data as Required<FileOutput>} />;
   }
 
   return null;
@@ -477,8 +485,6 @@ export function FormInterfaceTextOutput({
           <NodeCopyButton text={data.value ?? ''} />
 
           <NodeDownloadButton blockName={data.name} text={data.value ?? ''} />
-
-          <NodeClearButton onClear={() => {}} />
         </div>
       </div>
       <div className="bg-white w-full prose min-w-[280px] max-w-full px-3 py-1 overflow-y-auto resize min-h-[100px] max-h-[500px] border border-input rounded-md">
@@ -515,6 +521,37 @@ export function FormInterfaceFileOutput({
               variant="ghost"
               onlyIcon
               aria-label="Download file"
+              onClick={download}
+            />
+          }
+        />
+      ) : null}
+    </div>
+  );
+}
+
+export function FormInterfaceImageOutput({
+  data,
+}: FormInterfaceFileOutputProps) {
+  const fileName = data.metadata?.file_name ?? 'image';
+
+  const download = () => {
+    downloadFile(data.value, fileName);
+  };
+
+  return (
+    <div className="flex flex-col gap-1">
+      <Label>{data.name}</Label>
+
+      {data.value ? (
+        <FormInterfaceImagePreviewItem
+          file={new File([data.value], fileName)}
+          action={
+            <IconButton
+              icon={<ImageDown />}
+              size="xxxs"
+              variant="secondary"
+              aria-label="Download image"
               onClick={download}
             />
           }
