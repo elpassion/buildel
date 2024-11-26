@@ -3,6 +3,7 @@ defmodule BuildelWeb.PipelineChannel do
   use BuildelWeb.Validator
 
   require Logger
+  alias BuildelWeb.PipelineChannel.Message.Text
   alias EarmarkParser.Message
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
@@ -34,6 +35,18 @@ defmodule BuildelWeb.PipelineChannel do
           message: message,
           metadata: metadata,
           created_at: Map.get(metadata, "_broadcast_date")
+        }
+      end
+
+      def from_binary(
+            <<metadata_size::32, metadata_json::bytes-size(metadata_size), content::binary>>
+          ) do
+        metadata = Jason.decode!(metadata_json)
+
+        %{
+          metadata: metadata,
+          message: content,
+          created_at: nil
         }
       end
     end
@@ -221,8 +234,10 @@ defmodule BuildelWeb.PipelineChannel do
             |> Map.get("type")
 
           if block_type == "file_input" do
+            %{metadata: metadata, message: file} = Text.from_binary(content)
+            IO.inspect(metadata)
             {:ok, path} = Temp.path()
-            File.write!(path, content)
+            File.write!(path, file)
 
             {:binary, path}
           else
