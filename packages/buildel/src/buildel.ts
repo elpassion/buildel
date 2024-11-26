@@ -305,6 +305,8 @@ export class BuildelRun {
     if (this.status !== "running") return;
 
     if (payload instanceof File) {
+      assert(this.channel);
+      this.channel.push(`input:${topic}`,  await this.encodeBinaryMessage(payload));
       throw new Error("Please send files through REST API");
     } else if (payload instanceof FileList) {
       throw new Error("Please send files through REST API");
@@ -471,5 +473,49 @@ export class BuildelRun {
       metadata: { ...payload?.metadata, created_at: payload?.created_at },
       chunk,
     };
+  }
+
+  private async encodeBinaryMessage(file: File): Promise<ArrayBuffer> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const fileBuffer = event.target?.result as ArrayBuffer;
+
+        const metadata = {
+          name: file.name,
+          size: file.size,
+          type: file.type,
+        };
+
+        // Convert metadata to a JSON string and then to a Uint8Array
+        const metadataJSON = JSON.stringify(metadata);
+        const metadataBytes = new TextEncoder().encode(metadataJSON);
+
+        // Create a buffer for the final output
+        const metadataSize = metadataBytes.length;
+        const chunk = new Uint8Array(fileBuffer);
+        const totalSize = 4 + metadataSize + chunk.length;
+        const buffer = new ArrayBuffer(totalSize);
+        const view = new DataView(buffer);
+
+        // Write the metadata size as the first 4 bytes
+        view.setUint32(0, metadataSize, false);
+
+        // Write the metadata bytes immediately after the size
+        new Uint8Array(buffer, 4, metadataSize).set(metadataBytes);
+
+        // Write the chunk bytes after the metadata
+        new Uint8Array(buffer, 4 + metadataSize).set(chunk);
+
+        resolve(buffer);
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsArrayBuffer(file);
+    });
   }
 }

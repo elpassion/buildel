@@ -112,6 +112,10 @@ defmodule BuildelWeb.PipelineChannel do
            }),
          run_interface <- get_interface_config(pipeline, metadata),
          {:ok, run} <- Pipelines.Runner.start_run(run, run_interface) do
+      run = %{
+        run | interface_config: run_interface
+      }
+      IO.inspect(run.interface_config, label: "RUN RUN")
       initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
 
       listen_to_outputs(run)
@@ -228,11 +232,13 @@ defmodule BuildelWeb.PipelineChannel do
       case data do
         {:binary, content} ->
           block_type =
-            run.interface_config
+            run.config.interface_config
             |> Map.get("inputs", [])
             |> Enum.find(%{}, fn input -> Map.get(input, "name") == block_name end)
             |> Map.get("type")
-
+#          IO.inspect(run, label: "DUPA RUN")
+            IO.inspect(run.interface_config, label: "DUPA CONFIG")
+IO.inspect(block_type,label: "DUPA")
           if block_type == "file_input" do
             %{metadata: metadata, message: file} = Text.from_binary(content)
             IO.inspect(metadata)

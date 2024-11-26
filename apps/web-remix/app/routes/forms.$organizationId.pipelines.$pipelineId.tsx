@@ -158,6 +158,7 @@ export default function WebsiteForm() {
       }));
 
     inputs.forEach((input) => {
+      console.log(`${input.name}:${input.input}`);
       push(`${input.name}:${input.input}`, input.value);
     });
   };
