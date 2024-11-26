@@ -7,7 +7,7 @@ import type {
   OnBlockStatusChange,
   OnError,
 } from '@buildel/buildel';
-import { FileText, FileUp, X } from 'lucide-react';
+import { FileDown, FileText, FileUp, X } from 'lucide-react';
 import invariant from 'tiny-invariant';
 
 import { ChatHeader, ChatStatus } from '~/components/chat/Chat.components';
@@ -23,8 +23,11 @@ import {
   useFormField,
 } from '~/components/pages/interfaces/form/formInterface.form';
 import type {
+  FileOutput,
   FormInterfaceAction,
   FormInterfaceState,
+  Output,
+  TextOutput,
 } from '~/components/pages/interfaces/form/formInterface.reducer';
 import {
   formInterfaceReducer,
@@ -42,6 +45,7 @@ import type { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/
 import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
+import { downloadFile } from '~/hooks/useDownloadFile';
 import { loaderBuilder } from '~/utils.server';
 import { metaWithDefaults } from '~/utils/metadata';
 
@@ -53,22 +57,6 @@ export async function loader(args: LoaderFunctionArgs) {
     return publicInterfaceLoader({ params, ...rest }, helpers);
   })(args);
 }
-
-type BaseOutput = {
-  isCompleted: boolean;
-  type: string;
-  name: string;
-};
-
-type TextOutput = BaseOutput & {
-  value?: string | null;
-};
-
-type FileOutput = BaseOutput & {
-  value?: File | null;
-};
-
-type Output = TextOutput | FileOutput;
 
 export default function WebsiteForm() {
   const { pipelineId, organizationId, pipeline } =
@@ -98,9 +86,19 @@ export default function WebsiteForm() {
     isWaitingForOutputs: false,
   });
 
-  const onBlockOutput: OnBlockOutput = (block, output, payload, metadata) => {
+  const onBlockOutput: OnBlockOutput = (block, _output, payload, metadata) => {
     if (doesOutputExist(block)) {
-      dispatch(setOutput(block, (payload as any)?.message));
+      if (payload instanceof Uint8Array && 'file_type' in metadata) {
+        dispatch(
+          setOutput(
+            block,
+            new Blob([payload], { type: metadata.file_type as string }),
+            metadata,
+          ),
+        );
+      } else {
+        dispatch(setOutput(block, (payload as any)?.message, metadata));
+      }
     }
   };
 
@@ -133,7 +131,7 @@ export default function WebsiteForm() {
 
   useEffect(() => {
     const id = setTimeout(() => {
-      startRun({ initial_inputs: [], metadata: { interface: "form" } });
+      startRun({ initial_inputs: [], metadata: { interface: 'form' } });
     }, 500);
 
     return () => {
@@ -183,7 +181,7 @@ export default function WebsiteForm() {
       <div className="flex flex-col max-w-3xl w-full rounded-lg p-2 md:p-4">
         <FormContext value={formProps}>
           <form onSubmit={onSubmit} className="w-full border-b mb-6">
-            <div className="flex flex-col items-start w-full gap-5">
+            <div className="flex flex-col items-start w-full gap-2">
               {pipeline.interface_config.form.inputs.map((input) => {
                 return <FormInterfaceInput data={input} key={input.name} />;
               })}
@@ -200,9 +198,18 @@ export default function WebsiteForm() {
             </Button>
           </form>
 
-          {Object.entries(state.outputs).map(([key, output]) => (
-            <FormInterfaceOutput key={key} data={output} />
-          ))}
+          <div className="flex flex-col gap-3">
+            {Object.entries(state.outputs).map(([key, output]) => (
+              <FormInterfaceOutput
+                key={key}
+                data={
+                  state.isWaitingForOutputs
+                    ? { ...output, value: undefined }
+                    : output
+                }
+              />
+            ))}
+          </div>
         </FormContext>
       </div>
     </div>
@@ -301,22 +308,45 @@ export function FormInterfaceFilePreview({ data }: FormInterfaceInputProps) {
           <FormInterfaceFilePreviewItem
             key={file.name}
             file={file}
-            onRemove={clear}
+            action={
+              <IconButton
+                icon={<X />}
+                size="xxxs"
+                variant="ghost"
+                onlyIcon
+                aria-label="Delete file"
+                onClick={clear}
+              />
+            }
           />
         ))}
       </div>
     );
   }
 
-  return <FormInterfaceFilePreviewItem file={value} onRemove={clear} />;
+  return (
+    <FormInterfaceFilePreviewItem
+      file={value}
+      action={
+        <IconButton
+          icon={<X />}
+          size="xxxs"
+          variant="ghost"
+          onlyIcon
+          aria-label="Delete file"
+          onClick={clear}
+        />
+      }
+    />
+  );
 }
 
 export function FormInterfaceFilePreviewItem({
   file,
-  onRemove,
+  action,
 }: {
   file: File;
-  onRemove?: () => void;
+  action?: React.ReactNode;
 }) {
   return (
     <div className="flex gap-1 items-start justify-between border px-2 py-1 bg-white rounded-lg w-fit min-w-[200px]">
@@ -332,16 +362,7 @@ export function FormInterfaceFilePreviewItem({
         </div>
       </div>
 
-      {onRemove ? (
-        <IconButton
-          icon={<X />}
-          size="xxxs"
-          variant="ghost"
-          onlyIcon
-          aria-label="Delete file"
-          onClick={onRemove}
-        />
-      ) : null}
+      {action}
     </div>
   );
 }
@@ -360,8 +381,8 @@ interface FormInterfaceOutputProps {
 export function FormInterfaceOutput({ data }: FormInterfaceOutputProps) {
   if (data.type === 'text_output') {
     return <FormInterfaceTextOutput data={data as TextOutput} />;
-  } else if (data.type === 'file_output') {
-    return <FormInterfaceFileOutput data={data as FileOutput} />;
+  } else if (data.type === 'file_output' && data.value && data.metadata) {
+    return <FormInterfaceFileOutput data={data as Required<FileOutput>} />;
   }
 
   return null;
@@ -394,15 +415,37 @@ export function FormInterfaceTextOutput({
 }
 
 interface FormInterfaceFileOutputProps {
-  data: FileOutput;
+  data: Required<FileOutput>;
 }
 
 export function FormInterfaceFileOutput({
   data,
 }: FormInterfaceFileOutputProps) {
+  const fileName = data.metadata?.file_name ?? 'file';
+
+  const download = () => {
+    downloadFile(data.value, fileName);
+  };
+
   return (
-    <div>
-      <p>FIle</p>
+    <div className="flex flex-col gap-1">
+      <Label>{data.name}</Label>
+
+      {data.value ? (
+        <FormInterfaceFilePreviewItem
+          file={new File([data.value], fileName)}
+          action={
+            <IconButton
+              icon={<FileDown />}
+              size="xxxs"
+              variant="ghost"
+              onlyIcon
+              aria-label="Download file"
+              onClick={download}
+            />
+          }
+        />
+      ) : null}
     </div>
   );
 }

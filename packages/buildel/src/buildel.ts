@@ -24,7 +24,7 @@ export class BuildelSocket {
 
   constructor(
     private readonly organizationId: number,
-    options: BuildelSocketOptions = {}
+    options: BuildelSocketOptions = {},
   ) {
     this.authUrl = options.authUrl ?? "/super-api/channel_auth";
     this.socketUrl = options.socketUrl ?? "wss://api.buildel.ai/socket";
@@ -96,14 +96,14 @@ export class BuildelSocket {
         onBlockError,
         onError,
         onHistory,
-      }
+      },
     );
   }
 
   public logs(
     pipelineId: number,
     runId: number,
-    handlers?: Partial<BuildelRunLogsHandlers>
+    handlers?: Partial<BuildelRunLogsHandlers>,
   ) {
     const onMessage = handlers?.onMessage ?? (() => {});
     const onLogMessage = handlers?.onLogMessage ?? (() => {});
@@ -124,7 +124,7 @@ export class BuildelSocket {
         onLogMessage,
         onStatusChange,
         onError,
-      }
+      },
     );
   }
 }
@@ -141,7 +141,7 @@ export class BuildelRunLogs {
     private readonly authUrl: string,
     private readonly headers: Record<string, string>,
     private readonly useAuth: boolean,
-    private readonly handlers: BuildelRunLogsHandlers
+    private readonly handlers: BuildelRunLogsHandlers,
   ) {}
 
   public async join(args: BuildelRunLogsJoinArgs) {
@@ -154,7 +154,7 @@ export class BuildelRunLogs {
       {
         ...token,
         block_name: args.block_name,
-      }
+      },
     );
 
     this.channel.onMessage = (event: string, payload: any) => {
@@ -242,7 +242,7 @@ export class BuildelRun {
     private readonly authUrl: string,
     private readonly headers: Record<string, string>,
     private readonly useAuth: boolean,
-    private readonly handlers: BuildelRunHandlers
+    private readonly handlers: BuildelRunHandlers,
   ) {}
 
   public async start(args: BuildelRunStartArgs = { initial_inputs: [] }) {
@@ -257,7 +257,7 @@ export class BuildelRun {
         initial_inputs: args.initial_inputs,
         alias: args.alias,
         metadata: args.metadata,
-      }
+      },
     );
 
     this.channel.onMessage = this.onMessage();
@@ -277,7 +277,7 @@ export class BuildelRun {
         initial_inputs: args.initial_inputs ?? [],
         alias: args.alias,
         metadata: args.metadata,
-      }
+      },
     );
 
     this.channel.onMessage = this.onMessage();
@@ -306,11 +306,11 @@ export class BuildelRun {
 
     if (payload instanceof File) {
       assert(this.channel);
+
       this.channel.push(
         `input:${topic}`,
-        await this.encodeBinaryMessage(payload)
+        await this.encodeBinaryMessage(payload),
       );
-      throw new Error("Please send files through REST API");
     } else if (payload instanceof FileList) {
       throw new Error("Please send files through REST API");
     } else if (payload instanceof Blob) {
@@ -357,7 +357,7 @@ export class BuildelRun {
           Object.keys(payload.response.errors).forEach((blockId) => {
             this.handlers.onBlockError(
               blockId,
-              payload.response.errors[blockId]
+              payload.response.errors[blockId],
             );
           });
         }
@@ -380,7 +380,7 @@ export class BuildelRun {
             blockId,
             outputName,
             { message: payload.message },
-            { ...payload.metadata, created_at: payload.created_at }
+            { ...payload.metadata, created_at: payload.created_at },
           );
         }
       }
@@ -399,7 +399,7 @@ export class BuildelRun {
       if (event === "phx_reply" && payload.response) {
         this.handlers.onConnect(
           payload.response.run,
-          payload.response.pipeline
+          payload.response.pipeline,
         );
       }
       if (event === "history") {
@@ -418,14 +418,14 @@ export class BuildelRun {
                 {
                   message: event.message,
                 },
-                { created_at: event.created_at }
+                { created_at: event.created_at },
               );
             case "binary":
               return this.handlers.onBlockOutput(
                 event.block,
                 event.io,
                 event.message,
-                { created_at: event.created_at }
+                { created_at: event.created_at },
               );
           }
         });
@@ -466,7 +466,7 @@ export class BuildelRun {
     const metadataStart = 4;
     const metadataEnd = metadataStart + metadataSize;
     const metadataBytes = new Uint8Array(
-      buffer.slice(metadataStart, metadataEnd)
+      buffer.slice(metadataStart, metadataEnd),
     );
 
     const payload = JSON.parse(new TextDecoder().decode(metadataBytes));
@@ -493,24 +493,19 @@ export class BuildelRun {
           file_type: file.type,
         };
 
-        // Convert metadata to a JSON string and then to a Uint8Array
         const metadataJSON = JSON.stringify(metadata);
         const metadataBytes = new TextEncoder().encode(metadataJSON);
 
-        // Create a buffer for the final output
         const metadataSize = metadataBytes.length;
         const chunk = new Uint8Array(fileBuffer);
         const totalSize = 4 + metadataSize + chunk.length;
         const buffer = new ArrayBuffer(totalSize);
         const view = new DataView(buffer);
 
-        // Write the metadata size as the first 4 bytes
         view.setUint32(0, metadataSize, false);
 
-        // Write the metadata bytes immediately after the size
         new Uint8Array(buffer, 4, metadataSize).set(metadataBytes);
 
-        // Write the chunk bytes after the metadata
         new Uint8Array(buffer, 4 + metadataSize).set(chunk);
 
         resolve(buffer);

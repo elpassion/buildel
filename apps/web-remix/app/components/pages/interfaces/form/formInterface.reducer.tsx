@@ -4,12 +4,18 @@ type BaseOutput = {
   name: string;
 };
 
-type TextOutput = BaseOutput & {
-  value?: string | null;
+export type TextOutput = BaseOutput & {
+  value?: string;
+  metadata?: Record<string, any>;
 };
 
-type FileOutput = BaseOutput & {
-  value?: File | null;
+export type FileOutput = BaseOutput & {
+  value?: Blob;
+  metadata?: {
+    file_name?: string;
+    file_type?: string;
+    file_size?: number;
+  };
 };
 
 export type Output = TextOutput | FileOutput;
@@ -22,7 +28,7 @@ export type FormInterfaceState = {
 export type FormInterfaceAction =
   | {
       type: 'SET_OUTPUT';
-      payload: { name: string; value: any };
+      payload: { name: string; value: any; metadata?: Record<string, any> };
     }
   | {
       type: 'SET_STATUS';
@@ -48,6 +54,7 @@ export function formInterfaceReducer(
           [action.payload.name]: {
             ...state.outputs[action.payload.name],
             value: action.payload.value,
+            metadata: action.payload.metadata,
           },
         },
       };
@@ -95,10 +102,14 @@ export function formInterfaceReducer(
   }
 }
 
-export function setOutput(name: string, value: Output['value']) {
+export function setOutput(
+  name: string,
+  value: Output['value'],
+  metadata?: Record<string, any>,
+) {
   return {
     type: 'SET_OUTPUT' as const,
-    payload: { name, value },
+    payload: { name, value, metadata },
   };
 }
 
