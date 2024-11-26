@@ -112,10 +112,6 @@ defmodule BuildelWeb.PipelineChannel do
            }),
          run_interface <- get_interface_config(pipeline, metadata),
          {:ok, run} <- Pipelines.Runner.start_run(run, run_interface) do
-      run = %{
-        run | interface_config: run_interface
-      }
-      IO.inspect(run.interface_config, label: "RUN RUN")
       initial_inputs |> Enum.each(&process_input(&1.name, &1.value, run))
 
       listen_to_outputs(run)
@@ -228,33 +224,30 @@ defmodule BuildelWeb.PipelineChannel do
     [block_name, input_name] = input |> String.split(":")
     context_id = Pipelines.Worker.context_id(run)
 
-    data =
+    %{data: data, metadata: metadata} =
       case data do
         {:binary, content} ->
           block_type =
-            run.config.interface_config
+            run.interface_config
             |> Map.get("inputs", [])
             |> Enum.find(%{}, fn input -> Map.get(input, "name") == block_name end)
             |> Map.get("type")
-#          IO.inspect(run, label: "DUPA RUN")
-            IO.inspect(run.interface_config, label: "DUPA CONFIG")
-IO.inspect(block_type,label: "DUPA")
+
           if block_type == "file_input" do
             %{metadata: metadata, message: file} = Text.from_binary(content)
-            IO.inspect(metadata)
-            {:ok, path} = Temp.path()
+            {:ok, path} = Temp.path(suffix: metadata |> Map.get("file_name"))
             File.write!(path, file)
 
-            {:binary, path}
+            %{data: {:binary, path}, metadata: metadata}
           else
-            data
+            %{data: data, metadata: %{}}
           end
 
         _ ->
-          {:text, data}
+          %{data: {:text, data}, metadata: %{}}
       end
 
-    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{})
+    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, metadata)
   end
 
   def handle_info({output_name, :binary, chunk, metadata}, socket) do

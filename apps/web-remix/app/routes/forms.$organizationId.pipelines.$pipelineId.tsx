@@ -98,7 +98,6 @@ export default function WebsiteForm() {
     isWaitingForOutputs: false,
   });
 
-  console.log(state);
   const onBlockOutput: OnBlockOutput = (block, output, payload, metadata) => {
     if (doesOutputExist(block)) {
       dispatch(setOutput(block, (payload as any)?.message));
@@ -134,7 +133,7 @@ export default function WebsiteForm() {
 
   useEffect(() => {
     const id = setTimeout(() => {
-      startRun({ initial_inputs: [] });
+      startRun({ initial_inputs: [], metadata: { interface: "form" } });
     }, 500);
 
     return () => {
@@ -158,7 +157,6 @@ export default function WebsiteForm() {
       }));
 
     inputs.forEach((input) => {
-      console.log(`${input.name}:${input.input}`);
       push(`${input.name}:${input.input}`, input.value);
     });
   };
