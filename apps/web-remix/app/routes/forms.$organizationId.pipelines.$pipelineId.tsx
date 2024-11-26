@@ -14,9 +14,6 @@ import { ChatHeader, ChatStatus } from '~/components/chat/Chat.components';
 import { ChatHeading } from '~/components/chat/ChatHeading';
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { SmallFileUpload } from '~/components/fileUpload/SmallFileUpload';
-import { useFieldContext } from '~/components/form/fields/field.context';
-import { FieldLabel } from '~/components/form/fields/field.label';
-import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInput } from '~/components/form/inputs/text.input';
 import { IconButton } from '~/components/iconButton';
 import {
@@ -247,15 +244,58 @@ export function FormInterfaceInput({ data }: FormInterfaceInputProps) {
         </div>
 
         <div>
-          <FormInterfaceFilePreview data={data} />
+          <FormInterfaceFilePreview
+            data={data}
+            renderItem={(file, { clear }) => (
+              <FormInterfaceFilePreviewItem
+                key={file.name}
+                file={file}
+                action={
+                  <IconButton
+                    icon={<X />}
+                    size="xxxs"
+                    variant="ghost"
+                    onlyIcon
+                    aria-label="Delete file"
+                    onClick={clear}
+                  />
+                }
+              />
+            )}
+          />
         </div>
       </>
     );
   } else if (data.type === 'image_input') {
     return (
       <>
-        <FieldLabel>{data.name}</FieldLabel>
-        <FormInterfaceFileInput data={data} />
+        <Label>{data.name}</Label>
+
+        <div>
+          <FormInterfaceFileInput data={data} accept="image/*" />
+          <FormInterfaceFieldMessage data={data} />
+        </div>
+
+        <div>
+          <FormInterfaceFilePreview
+            data={data}
+            renderItem={(file, { clear }) => (
+              <FormInterfaceImagePreviewItem
+                key={file.name}
+                file={file}
+                action={
+                  <IconButton
+                    icon={<X />}
+                    size="xxxs"
+                    variant="secondary"
+                    aria-label="Delete file"
+                    onClick={clear}
+                  />
+                }
+              />
+            )}
+          />
+        </div>
       </>
     );
   }
@@ -299,30 +339,40 @@ function FormInterfaceFieldMessage({ data }: FormInterfaceInputProps) {
   );
 }
 
-function FormInterfaceFileInput({ data }: FormInterfaceInputProps) {
+function FormInterfaceFileInput({
+  data,
+  accept,
+}: FormInterfaceInputProps & { accept?: string }) {
   const { setValue } = useFormField<File | null>(data.name);
 
   const onChange = (
-    _: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>,
     file: File | null,
   ) => {
     setValue(file);
+    e.target.value = '';
   };
 
   return (
     <SmallFileUpload
       size="xxs"
+      accept={accept}
       className="gap-2"
       name={data.name}
       onChange={onChange}
     >
       <FileUp className="w-3.5 h-3.5" />
-      <span>Upload file</span>
+      <span>Upload</span>
     </SmallFileUpload>
   );
 }
 
-export function FormInterfaceFilePreview({ data }: FormInterfaceInputProps) {
+export function FormInterfaceFilePreview({
+  data,
+  renderItem,
+}: FormInterfaceInputProps & {
+  renderItem: (file: File, args: { clear: () => void }) => React.ReactNode;
+}) {
   const { value, clear } = useFormField<File | File[] | null>(data.name);
 
   if (!value) return null;
@@ -331,40 +381,15 @@ export function FormInterfaceFilePreview({ data }: FormInterfaceInputProps) {
     return (
       <div className="flex flex-col gap-1">
         {value.map((file) => (
-          <FormInterfaceFilePreviewItem
-            key={file.name}
-            file={file}
-            action={
-              <IconButton
-                icon={<X />}
-                size="xxxs"
-                variant="ghost"
-                onlyIcon
-                aria-label="Delete file"
-                onClick={clear}
-              />
-            }
-          />
+          <React.Fragment key={file.name}>
+            {renderItem(file, { clear })}
+          </React.Fragment>
         ))}
       </div>
     );
   }
 
-  return (
-    <FormInterfaceFilePreviewItem
-      file={value}
-      action={
-        <IconButton
-          icon={<X />}
-          size="xxxs"
-          variant="ghost"
-          onlyIcon
-          aria-label="Delete file"
-          onClick={clear}
-        />
-      }
-    />
-  );
+  return renderItem(value, { clear });
 }
 
 export function FormInterfaceFilePreviewItem({
@@ -393,6 +418,25 @@ export function FormInterfaceFilePreviewItem({
   );
 }
 
+export function FormInterfaceImagePreviewItem({
+  file,
+  action,
+}: {
+  file: File;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="relative max-w-[150px] max-h-[150px] rounded-lg overflow-hidden group">
+      <img
+        src={URL.createObjectURL(file)}
+        alt={file.name}
+        className="group-hover:scale-105 transition object-cover object-center"
+      />
+      {action ? <div className="absolute top-0.5 right-1">{action}</div> : null}
+    </div>
+  );
+}
+
 function renderSize(size: number) {
   if (size < 1000) return `${size.toFixed(0)} B`;
   else if (size < 1000 * 1000) {
@@ -407,7 +451,11 @@ interface FormInterfaceOutputProps {
 export function FormInterfaceOutput({ data }: FormInterfaceOutputProps) {
   if (data.type === 'text_output') {
     return <FormInterfaceTextOutput data={data as TextOutput} />;
-  } else if (data.type === 'file_output' && data.value && data.metadata) {
+  } else if (
+    (data.type === 'file_output' || data.type === 'image_output') &&
+    data.value &&
+    data.metadata
+  ) {
     return <FormInterfaceFileOutput data={data as Required<FileOutput>} />;
   }
 

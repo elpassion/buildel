@@ -16,6 +16,7 @@ export interface SmallFileUploadProps
   wrapperClassName?: string;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  accept?: string;
 }
 
 export const SmallFileUpload = ({
@@ -29,6 +30,7 @@ export const SmallFileUpload = ({
   onFocus,
   name,
   ref,
+  accept,
   value,
   defaultValue,
   ...rest
@@ -54,6 +56,7 @@ export const SmallFileUpload = ({
     <div className={cn('w-fit', wrapperClassName)}>
       <input
         hidden
+        accept={accept}
         name={name}
         type="file"
         multiple={false}
