@@ -224,7 +224,7 @@ export function BulkPage() {
 
         <div className="flex ml-auto gap-2">
           <SmallFileUpload
-            onChange={async (file) => {
+            onChange={async (_: unknown, file) => {
               if (!file) return;
               Papa.parse(file, {
                 header: true,

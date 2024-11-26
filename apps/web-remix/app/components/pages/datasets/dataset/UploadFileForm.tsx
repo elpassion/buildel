@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useFetcher } from '@remix-run/react';
 
+import type { SmallFileUploadProps } from '~/components/fileUpload/SmallFileUpload';
 import { SmallFileUpload } from '~/components/fileUpload/SmallFileUpload';
 import { confirm } from '~/components/modal/confirm';
 import { useUploadDatasetFile } from '~/components/pages/datasets/useUploadDatasetFile';
 import { errorToast } from '~/components/toasts/errorToast';
-import type { ButtonProps } from '~/components/ui/button';
 import { useOrganizationId } from '~/hooks/useOrganizationId';
 
-export const UploadFileForm = (props: Omit<ButtonProps, 'onChange'>) => {
+export const UploadFileForm = (
+  props: Omit<SmallFileUploadProps, 'onChange'>,
+) => {
   const [file, setFile] = useState<File | null>(null);
   const fetcher = useFetcher();
   const organizationId = useOrganizationId();
@@ -16,8 +18,8 @@ export const UploadFileForm = (props: Omit<ButtonProps, 'onChange'>) => {
   const { uploadFile } = useUploadDatasetFile({ organizationId });
 
   const onChange = async (
-    file: File | null,
     e: React.ChangeEvent<HTMLInputElement>,
+    file: File | null,
   ) => {
     if (!file) return;
 

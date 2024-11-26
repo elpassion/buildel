@@ -259,7 +259,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
             output.block_name,
             output.output_name
           )
-
+IO.inspect(output, label: "DUPA output")
           %{
             block_name: output.block_name,
             output_name: output.output_name,
@@ -272,6 +272,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
 
       outputs =
         Enum.reduce_while(Stream.repeatedly(fn -> nil end), outputs, fn _, outputs ->
+        IO.inspect(outputs, label: "DUPA")
           outputs = receive_output(outputs)
 
           if Enum.any?(outputs, &(&1.data == nil)) do
@@ -294,7 +295,8 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
     topics = outputs |> Enum.map(& &1[:topic])
 
     receive do
-      {topic, type, data, _metadata} when type != :start_stream and type != :stop_stream ->
+      {topic, type, data, metadata} when type != :start_stream and type != :stop_stream ->
+      IO.inspect(metadata)
         if topic in topics do
           outputs
           |> update_in(

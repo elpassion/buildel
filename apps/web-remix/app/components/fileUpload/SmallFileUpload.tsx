@@ -2,22 +2,35 @@ import React, { useRef } from 'react';
 
 import type { ButtonProps } from '~/components/ui/button';
 import { Button } from '~/components/ui/button';
+import { useMergedRefs } from '~/hooks/useMergeRefs';
 import { cn } from '~/utils/cn';
 
-interface SmallFileUploadProps extends Omit<ButtonProps, 'onChange'> {
+export interface SmallFileUploadProps
+  extends Omit<ButtonProps, 'onChange' | 'onBlur' | 'onFocus'> {
   disabled?: boolean;
   onChange?: (
-    file: File | null,
     e: React.ChangeEvent<HTMLInputElement>,
+    file: File | null,
   ) => void;
+  ref?: React.Ref<HTMLInputElement> | null;
+  wrapperClassName?: string;
+  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
+  onFocus?: (e: React.FocusEvent<HTMLInputElement>) => void;
 }
 
 export const SmallFileUpload = ({
   className,
+  wrapperClassName,
   children,
   disabled,
   onClick,
   onChange,
+  onBlur,
+  onFocus,
+  name,
+  ref,
+  value,
+  defaultValue,
   ...rest
 }: SmallFileUploadProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -32,24 +45,34 @@ export const SmallFileUpload = ({
 
     const file = files?.[0] ?? null;
 
-    onChange?.(file, e);
+    onChange?.(e, file);
   };
 
+  const refs = useMergedRefs(inputRef, ref);
+
   return (
-    <div className={cn('', className)}>
+    <div className={cn('w-fit', wrapperClassName)}>
       <input
+        hidden
+        name={name}
         type="file"
         multiple={false}
-        ref={inputRef}
+        defaultValue={defaultValue}
+        value={value}
+        //@ts-ignore
+        ref={refs}
         disabled={disabled}
-        hidden
         onChange={onFileChange}
+        onBlur={onBlur}
+        onFocus={onFocus}
       />
       <Button
         onClick={selectFiles}
         variant="outline"
         disabled={disabled}
         isFluid
+        className={className}
+        type="button"
         {...rest}
       >
         {children}

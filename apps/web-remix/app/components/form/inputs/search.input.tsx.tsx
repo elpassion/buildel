@@ -1,10 +1,10 @@
-import type { RefObject } from 'react';
-import { useCallback, useRef } from 'react';
+import { useRef } from 'react';
 import { Search, X } from 'lucide-react';
 
 import { TextInput } from '~/components/form/inputs/text.input';
 import { IconButton } from '~/components/iconButton';
 import type { InputProps } from '~/components/ui/input';
+import { useMergedRefs } from '~/hooks/useMergeRefs';
 import { cn } from '~/utils/cn';
 
 export type SearchInputProps = InputProps & {
@@ -57,18 +57,3 @@ export const SearchInput = ({
     </div>
   );
 };
-
-function useMergedRefs(...refs: Array<React.Ref<any> | undefined | null>) {
-  return useCallback(
-    (node: RefObject<any> | null) => {
-      refs.forEach((ref) => {
-        if (typeof ref === 'function') {
-          ref(node);
-        } else if (ref) {
-          ref.current = node;
-        }
-      });
-    },
-    [refs],
-  );
-}
