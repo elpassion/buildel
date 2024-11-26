@@ -14,7 +14,9 @@ import { ChatHeader, ChatStatus } from '~/components/chat/Chat.components';
 import { ChatHeading } from '~/components/chat/ChatHeading';
 import { ChatMarkdown } from '~/components/chat/ChatMarkdown';
 import { SmallFileUpload } from '~/components/fileUpload/SmallFileUpload';
+import { useFieldContext } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInput } from '~/components/form/inputs/text.input';
 import { IconButton } from '~/components/iconButton';
 import {
@@ -44,7 +46,7 @@ import {
 import type { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
 import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
 import { Button } from '~/components/ui/button';
-import { Label } from '~/components/ui/label';
+import { InputMessage, Label } from '~/components/ui/label';
 import { downloadFile } from '~/hooks/useDownloadFile';
 import { loaderBuilder } from '~/utils.server';
 import { metaWithDefaults } from '~/utils/metadata';
@@ -229,15 +231,21 @@ export function FormInterfaceInput({ data }: FormInterfaceInputProps) {
     return (
       <>
         <Label>{data.name}</Label>
-        <FormInterfaceTextInput data={data} />
-        {/*<FieldMessage />*/}
+        <div>
+          <FormInterfaceTextInput data={data} />
+          <FormInterfaceFieldMessage data={data} />
+        </div>
       </>
     );
   } else if (data.type === 'file_input') {
     return (
       <>
         <Label>{data.name}</Label>
-        <FormInterfaceFileInput data={data} />
+        <div>
+          <FormInterfaceFileInput data={data} />
+          <FormInterfaceFieldMessage data={data} />
+        </div>
+
         <div>
           <FormInterfaceFilePreview data={data} />
         </div>
@@ -264,13 +272,30 @@ function FormInterfaceTextInput({ data }: FormInterfaceInputProps) {
 
   return (
     <TextInput
-      required
       placeholder="Fill input..."
       name={data.name}
       onChange={onChange}
       value={value ?? ''}
       className="w-full"
     />
+  );
+}
+
+function FormInterfaceFieldMessage({ data }: FormInterfaceInputProps) {
+  const { errors } = useFormField(data.name);
+
+  const isError = errors && errors.length > 0;
+
+  const body = isError ? errors.join(', ') : null;
+
+  if (!body) {
+    return null;
+  }
+
+  return (
+    <InputMessage size="sm" isError={isError}>
+      {body}
+    </InputMessage>
   );
 }
 

@@ -13,7 +13,7 @@ type State = {
   formValues: {
     [key: string]: PropertyValue;
   };
-
+  formErrors: Record<string, string[]>;
   isSubmitting?: boolean;
 };
 
@@ -29,6 +29,10 @@ type Action =
       type: 'FINISH';
     }
   | {
+      type: 'SET_ERRORS';
+      payload: Record<string, string[]>;
+    }
+  | {
       type: 'CLEAR_PROPERTY';
       payload: {
         name: string;
@@ -41,8 +45,12 @@ type Action =
 function formReducer(state: State, action: Action) {
   switch (action.type) {
     case 'SET_PROPERTY':
+      const errors = { ...state.formErrors };
+      delete errors[action.payload.name];
+
       return {
         ...state,
+        formErrors: errors,
         formValues: {
           ...state.formValues,
           [action.payload.name]: action.payload.value,
@@ -57,6 +65,11 @@ function formReducer(state: State, action: Action) {
           ...state.formValues,
           [action.payload.name]: undefined,
         },
+      };
+    case 'SET_ERRORS':
+      return {
+        ...state,
+        formErrors: action.payload,
       };
     case 'SUBMIT':
       return {
@@ -86,10 +99,28 @@ export function useForm({
   const [state, dispatch] = useReducer<State, [Action]>(formReducer, {
     isSubmitting: false,
     formValues: defaultValues ?? {},
+    formErrors: {},
   });
+
+  const validate = () => {
+    const errors: Record<string, string[]> = {};
+    Object.entries(state.formValues).forEach(([key, value]) => {
+      if (!value) {
+        errors[key] = ['This field is required'];
+      }
+    });
+
+    dispatch({ type: 'SET_ERRORS', payload: errors });
+
+    return errors;
+  };
 
   const handleOnSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (Object.keys(validate()).length > 0) {
+      return;
+    }
 
     dispatch({ type: 'SUBMIT' });
 
@@ -116,6 +147,7 @@ export function useFormField<T extends PropertyValue = string>(name: string) {
 
   return useMemo(() => {
     return {
+      errors: state.formErrors[name],
       value: state.formValues[name] as T,
       setValue: (value: T) => {
         dispatch({
@@ -135,5 +167,5 @@ export function useFormField<T extends PropertyValue = string>(name: string) {
         });
       },
     };
-  }, [state.formValues[name], dispatch]);
+  }, [state.formValues[name], state.formErrors[name], dispatch]);
 }
