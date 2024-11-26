@@ -103,8 +103,8 @@ export default function WebsiteForm() {
   };
 
   const onBlockStatusChange: OnBlockStatusChange = (block, status) => {
-    if (doesOutputExist(block)) {
-      dispatch(setStatus(block, status));
+    if (doesOutputExist(block) && !status) {
+      dispatch(setStatus(block, true));
     }
   };
 
@@ -183,7 +183,11 @@ export default function WebsiteForm() {
           <form onSubmit={onSubmit} className="w-full border-b mb-6">
             <div className="flex flex-col items-start w-full gap-2">
               {pipeline.interface_config.form.inputs.map((input) => {
-                return <FormInterfaceInput data={input} key={input.name} />;
+                return (
+                  <div key={input.name} className="flex flex-col gap-1 w-full">
+                    <FormInterfaceInput data={input} />
+                  </div>
+                );
               })}
             </div>
 
@@ -223,31 +227,28 @@ interface FormInterfaceInputProps {
 export function FormInterfaceInput({ data }: FormInterfaceInputProps) {
   if (data.type === 'text_input') {
     return (
-      <div className="w-full">
+      <>
         <Label>{data.name}</Label>
         <FormInterfaceTextInput data={data} />
         {/*<FieldMessage />*/}
-      </div>
+      </>
     );
   } else if (data.type === 'file_input') {
     return (
-      <div className="w-full">
+      <>
         <Label>{data.name}</Label>
         <FormInterfaceFileInput data={data} />
-        <div className="mt-2">
+        <div>
           <FormInterfaceFilePreview data={data} />
         </div>
-        {/*<FormInterfaceFilePreview />*/}
-
-        {/*<p>{files[input.name]?.name}</p>*/}
-      </div>
+      </>
     );
   } else if (data.type === 'image_input') {
     return (
-      <div className="w-full">
+      <>
         <FieldLabel>{data.name}</FieldLabel>
         <FormInterfaceFileInput data={data} />
-      </div>
+      </>
     );
   }
 
@@ -397,7 +398,7 @@ export function FormInterfaceTextOutput({
 }: FormInterfaceTextOutputProps) {
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between gap-2 flex-wrap">
+      <div className="flex items-center justify-between gap-1 flex-wrap">
         <Label>{data.name}</Label>
         <div className="mb-1 flex gap-1">
           <NodeCopyButton text={data.value ?? ''} />

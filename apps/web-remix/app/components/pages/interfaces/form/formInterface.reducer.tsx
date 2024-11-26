@@ -70,7 +70,7 @@ export function formInterfaceReducer(
         ...state,
         outputs: result,
         isWaitingForOutputs: Object.values(result).some(
-          (value) => value.isCompleted,
+          (value) => !value.isCompleted,
         ),
       };
 

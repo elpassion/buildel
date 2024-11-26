@@ -26,7 +26,7 @@ type Action =
       };
     }
   | {
-      type: 'CLEAR_FORM';
+      type: 'FINISH';
     }
   | {
       type: 'CLEAR_PROPERTY';
@@ -48,8 +48,8 @@ function formReducer(state: State, action: Action) {
           [action.payload.name]: action.payload.value,
         },
       };
-    case 'CLEAR_FORM':
-      return { ...state, isSubmitting: false, formValues: {} };
+    case 'FINISH':
+      return { ...state, isSubmitting: false };
     case 'CLEAR_PROPERTY':
       return {
         ...state,
@@ -95,7 +95,7 @@ export function useForm({
 
     await onSubmit?.(state.formValues, e);
 
-    dispatch({ type: 'CLEAR_FORM' });
+    dispatch({ type: 'FINISH' });
   };
 
   return {
