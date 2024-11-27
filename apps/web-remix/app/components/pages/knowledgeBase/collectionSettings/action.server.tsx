@@ -1,12 +1,11 @@
 import { redirect } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
 import { withZod } from '@remix-validated-form/with-zod';
-import { validationError } from 'remix-validated-form';
 import invariant from 'tiny-invariant';
 
 import { UpdateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { KnowledgeBaseApi } from '~/api/knowledgeBase/KnowledgeBaseApi';
-import { actionBuilder } from '~/utils.server';
+import { actionBuilder, validationError } from '~/utils.server';
 import { routes } from '~/utils/routes.utils';
 import { setServerToast } from '~/utils/toast.server';
 

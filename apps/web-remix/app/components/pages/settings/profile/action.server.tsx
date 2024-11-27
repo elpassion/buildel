@@ -1,11 +1,10 @@
 import { json } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
 import { withZod } from '@remix-validated-form/with-zod';
-import { validationError } from 'remix-validated-form';
 
 import { CurrentUserApi, UpdateUserSchema } from '~/api/CurrentUserApi';
 import { commitSession, getSession } from '~/session.server';
-import { actionBuilder } from '~/utils.server';
+import { actionBuilder, validationError } from '~/utils.server';
 import { setServerToast } from '~/utils/toast.server';
 
 export async function action(actionArgs: ActionFunctionArgs) {

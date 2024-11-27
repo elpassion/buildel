@@ -5,7 +5,7 @@ import type {
   TypedResponse,
 } from '@remix-run/node';
 import merge from 'lodash.merge';
-import { validationError } from 'remix-validated-form';
+import { validationError as valError } from 'remix-validated-form';
 
 import { logout } from '~/session.server';
 
@@ -18,6 +18,8 @@ import {
 } from './utils/errors';
 import { fetchTyped } from './utils/fetch.server';
 import { setServerToast } from './utils/toast.server';
+
+export const validationError = valError;
 
 export const loaderBuilder =
   <T>(
