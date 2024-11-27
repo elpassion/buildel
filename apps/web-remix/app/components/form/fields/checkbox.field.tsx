@@ -13,13 +13,13 @@ export const CheckboxInputField = ({
   ref?: React.RefObject<React.ElementRef<typeof CheckboxPrimitive.Root>>;
 }) => {
   const { name, getInputProps, validate } = useFieldContext();
-  const [formValue, setFormValue] = useControlField<boolean>(name);
+  const [formValue, setFormValue] = useControlField<boolean>(name());
 
   return (
     <CheckboxInput
       ref={ref}
-      name={name}
-      id={name}
+      name={name()}
+      id={name()}
       {...props}
       onBlur={getInputProps({ type: 'checkbox' }).onBlur}
       checked={formValue}

@@ -4,8 +4,8 @@ import type {
   LoaderFunctionArgs,
   TypedResponse,
 } from '@remix-run/node';
+import { validationError as valError } from '@rvf/remix';
 import merge from 'lodash.merge';
-import { validationError as valError } from 'remix-validated-form';
 
 import { logout } from '~/session.server';
 

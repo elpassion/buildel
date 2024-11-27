@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
 import type { Blocker, Location } from '@remix-run/react';
 import { useBlocker } from '@remix-run/react';
+import get from 'lodash.get';
 import type { z } from 'zod';
 
 import type { ExtendedBlockConfig } from '~/api/blockType/blockType.contracts';
@@ -142,15 +143,9 @@ export function EditBlockForm({
     [connections],
   );
 
-  const handleUpdate = (
-    data: Record<string, any>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleUpdate = (data: Record<string, any>) => {
     clearFieldsErrors();
-
     if (blocker.state === 'blocked') blocker.reset();
-
     const newConfig = { oldName: blockConfig.name, ...blockConfig, ...data };
     if (
       newConfig.oldName !== newConfig.name &&
@@ -232,14 +227,27 @@ export function EditBlockForm({
         return;
       }
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { fieldErrors, getValues } = useFormContext();
+      const {
+        formState: { fieldErrors },
+        subscribe,
+      } = useFormContext();
+
+      const [values, setValues] = useState<any>({});
+
+      const getValues = () => {
+        return values;
+      };
+
+      useEffect(() => {
+        subscribe.value((values) => setValues(values));
+      }, []);
 
       const replacedUrl = props.field.url
         .replace('{{organization_id}}', organizationId.toString())
         .replace('{{pipeline_id}}', pipelineId.toString())
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
-          const replacedValue = values.get(optKey);
+          const replacedValue = get(values, optKey);
 
           return replacedValue || optKey;
         });
@@ -249,7 +257,7 @@ export function EditBlockForm({
         ?.replace('{{block_name}}', blockConfig.name)
         ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
-          const replacedValue = values.get(optKey);
+          const replacedValue = get(values, optKey);
 
           return replacedValue || optKey;
         });
@@ -257,7 +265,7 @@ export function EditBlockForm({
       if ('defaultWhen' in props.field && props.field.defaultWhen) {
         const formValues = getValues();
         const defaultKey = Object.keys(props.field.defaultWhen)[0];
-        const defaultFieldValue = formValues.get(defaultKey);
+        const defaultFieldValue = get(formValues, defaultKey);
 
         if (typeof defaultFieldValue === 'string') {
           defaultValue = (props.field.defaultWhen as any)[defaultKey][
@@ -297,14 +305,25 @@ export function EditBlockForm({
         return;
       }
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const { fieldErrors, getValues } = useFormContext();
+      const {
+        formState: { fieldErrors },
+        subscribe,
+      } = useFormContext();
 
-      const values = getValues();
+      const [values, setValues] = useState<any>({});
+
+      const getValues = () => {
+        return values;
+      };
+
+      useEffect(() => {
+        subscribe.value((values) => setValues(values));
+      }, []);
 
       const replacedUrl = props.field.url
         .replace('{{organization_id}}', organizationId.toString())
         .replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
-          const replacedValue = values.get(optKey);
+          const replacedValue = get(values, optKey);
           return replacedValue || optKey;
         });
 
@@ -312,7 +331,7 @@ export function EditBlockForm({
 
       if ('descriptionWhen' in props.field && props.field.descriptionWhen) {
         const defaultKey = Object.keys(props.field.descriptionWhen)[0];
-        const defaultFieldDescription = values.get(defaultKey);
+        const defaultFieldDescription = get(values, defaultKey);
 
         if (typeof defaultFieldDescription === 'string') {
           description =
@@ -327,7 +346,7 @@ export function EditBlockForm({
         ?.replace('{{block_name}}', blockConfig.name)
         ?.replace(/{{([\w.]+)}}/g, (_fullMatch, optKey) => {
           const values = getValues();
-          const replacedValue = values.get(optKey);
+          const replacedValue = get(values, optKey);
 
           return replacedValue || optKey;
         });
@@ -335,7 +354,7 @@ export function EditBlockForm({
       if ('defaultWhen' in props.field && props.field.defaultWhen) {
         const formValues = getValues();
         const defaultKey = Object.keys(props.field.defaultWhen)[0];
-        const defaultFieldValue = formValues.get(defaultKey);
+        const defaultFieldValue = get(formValues, defaultKey);
 
         if (typeof defaultFieldValue === 'string') {
           defaultValue = (props.field.defaultWhen as any)[defaultKey][
@@ -388,11 +407,13 @@ export function EditBlockForm({
       // @ts-ignore
       validator={validator}
       defaultValues={blockConfig}
-      onSubmit={handleUpdate}
+      submitSource="state"
+      handleSubmit={handleUpdate}
       className="w-full grow flex flex-col"
-      onChange={(e: any) => {
-        setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));
-      }}
+      // onChange={(e: any) => {
+      //   console.log('TEST');
+      //   setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+      // }}
       noValidate
     >
       <PageLeaveBlocker blocker={blocker} />

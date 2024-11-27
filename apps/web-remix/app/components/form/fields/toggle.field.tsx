@@ -11,11 +11,11 @@ export const ToggleInputField = ({
   ref?: React.RefObject<HTMLButtonElement>;
 }) => {
   const { name } = useFieldContext();
-  const [value, setValue] = useControlField<boolean | undefined>(name);
+  const [value, setValue] = useControlField<boolean | undefined>(name());
   const currentVal = value ?? false;
   return (
     <ToggleInput
-      name={name}
+      name={name()}
       onCheckedChange={setValue}
       checked={currentVal}
       value={currentVal.toString()}

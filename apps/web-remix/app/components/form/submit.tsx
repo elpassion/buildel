@@ -5,7 +5,9 @@ import { Button } from '~/components/ui/button';
 import { useFormContext } from '~/utils/form';
 
 export function SubmitButton(props: ButtonProps) {
-  const { isSubmitting } = useFormContext();
+  const {
+    formState: { isSubmitting },
+  } = useFormContext();
   const { state } = useNavigation();
 
   const disabled = props.disabled || isSubmitting || state !== 'idle';

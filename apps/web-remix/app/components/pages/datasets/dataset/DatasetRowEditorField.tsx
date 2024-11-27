@@ -9,7 +9,7 @@ import { EditorInput } from '~/components/form/inputs/editor.input';
 
 export function DatasetRowEditorField() {
   const { name, getInputProps, validate } = useFieldContext();
-  const [value, setValue] = useControlField<string | undefined>(name);
+  const [value, setValue] = useControlField<string | undefined>(name());
 
   const handleOnChange = (v: string | undefined) => {
     setValue(v);

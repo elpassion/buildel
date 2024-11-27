@@ -26,8 +26,10 @@ export const BudgetLimitField: React.FC<BudgetLimitFieldProps> = ({
   const { details } = useLoaderData<typeof loader>();
 
   const { name } = useFieldContext();
-  const { fieldErrors } = useFormContext();
-  const [value, setValue] = useControlField<number | null>(name);
+  const {
+    formState: { fieldErrors },
+  } = useFormContext();
+  const [value, setValue] = useControlField<number | null>(name());
 
   const onCheck = (bool: boolean) => {
     if (bool) {
@@ -63,8 +65,8 @@ export const BudgetLimitField: React.FC<BudgetLimitFieldProps> = ({
       </div>
 
       <NumberInput
-        id={name}
-        name={name}
+        id={name()}
+        name={name()}
         value={value ?? 0}
         onChange={onChange}
         min={0}
@@ -73,7 +75,7 @@ export const BudgetLimitField: React.FC<BudgetLimitFieldProps> = ({
         disabled={value === null}
       />
 
-      <FieldMessage error={fieldErrors[name]}>{supportingText}</FieldMessage>
+      <FieldMessage error={fieldErrors[name()]}>{supportingText}</FieldMessage>
     </div>
   );
 };

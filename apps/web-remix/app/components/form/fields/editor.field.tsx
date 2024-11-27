@@ -41,7 +41,7 @@ export const EditorField = ({
 }: EditorFieldProps & { ref?: React.RefObject<HTMLInputElement> }) => {
   const { name, getInputProps, validate, error } = useFieldContext();
   const { value: isShown, setTrue: show, setValue: toggle } = useBoolean(false);
-  const [value, setValue] = useControlField<string | undefined>(name);
+  const [value, setValue] = useControlField<string | undefined>(name());
 
   const handleOnChange = (v: string | undefined) => {
     setValue(v);
@@ -51,7 +51,7 @@ export const EditorField = ({
 
   const currentValue = value ?? defaultValue ?? '';
 
-  const currentError = propsError ?? error;
+  const currentError = propsError ?? error();
 
   return (
     <>

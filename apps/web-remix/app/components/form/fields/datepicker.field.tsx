@@ -9,7 +9,7 @@ export const DatepickerField: React.FC<
   Omit<DatepickerInputProps, 'onChange' | 'selected'>
 > = (props) => {
   const { name } = useFieldContext();
-  const [value, setValue] = useControlField<Date | undefined>(name);
+  const [value, setValue] = useControlField<Date | undefined>(name());
 
   const handleOnChange = (date: Date | null) => {
     setValue(date ?? undefined);

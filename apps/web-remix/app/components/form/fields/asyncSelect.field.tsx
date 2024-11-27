@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useField } from '@rvf/remix';
 import { useIsMounted } from 'usehooks-ts';
 
 import type { IAsyncSelectItem } from '~/api/AsyncSelectApi';
@@ -11,7 +12,10 @@ import {
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { useControlField } from '~/components/form/fields/form.field';
-import type { AsyncSelectInputProps } from '~/components/form/inputs/select/select.input';
+import type {
+  AsyncSelectInputFetchingState,
+  AsyncSelectInputProps,
+} from '~/components/form/inputs/select/select.input';
 import { AsyncSelectInput } from '~/components/form/inputs/select/select.input';
 
 export interface AsyncSelectFieldProps extends Partial<AsyncSelectInputProps> {
@@ -32,6 +36,10 @@ export const AsyncSelectField = ({
   ...props
 }: AsyncSelectFieldProps & { ref?: React.RefObject<HTMLSelectElement> }) => {
   const isMounted = useIsMounted();
+  const [state, setState] = useState<AsyncSelectInputFetchingState>('loading');
+  const [options, setOptions] = useState<{ value: string; label: string }[]>(
+    [],
+  );
   const { name, getInputProps, validate } = useFieldContext({
     validationBehavior: {
       initial: 'onBlur',
@@ -40,15 +48,31 @@ export const AsyncSelectField = ({
     },
   });
 
-  const [selectedId, setSelectedId] = useControlField<string | undefined>(name);
-  const [apiError, setApiError] = useState<string | undefined>();
+  const { getControlProps, onChange } = useField<string | undefined>(name());
+  console.log(name(), getControlProps(), url);
 
-  const onChange = (id: string) => {
-    setSelectedId(id);
-    try {
+  const selectedId = getControlProps().value;
+
+  useEffect(() => {
+    if (state === 'loading') return;
+    const doesSelectedIdExist = options.some((opt) => opt.value === selectedId);
+
+    if (!doesSelectedIdExist) {
+      onChange(undefined);
       validate();
-    } catch (error) {}
-  };
+    }
+  }, [options, selectedId, state]);
+
+  useEffect(() => {
+    if (
+      defaultValue &&
+      options.some((opt) => opt.value === defaultValue) &&
+      !selectedId
+    ) {
+      onChange(defaultValue);
+    }
+  }, [defaultValue, options, selectedId]);
+  const [apiError, setApiError] = useState<string | undefined>();
 
   const fetcher = useCallback(
     async (_search: string, args?: RequestInit) => {
@@ -63,7 +87,7 @@ export const AsyncSelectField = ({
         .then((opts) => {
           const curr = opts.find((o) => o.value === selectedId);
           if (!curr && isMounted()) {
-            setSelectedId(undefined);
+            onChange(undefined);
             validate();
           }
           if (opts.length > 0) setApiError(undefined);
@@ -79,7 +103,7 @@ export const AsyncSelectField = ({
       <HiddenField value={selectedId ?? ''} {...getInputProps()} />
       <FieldLabel>{label}</FieldLabel>
       <AsyncSelectInput
-        id={id ?? name}
+        id={id ?? name()}
         onBlur={getInputProps().onBlur}
         placeholder="Select..."
         fetchOptions={fetcher}

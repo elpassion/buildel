@@ -1,5 +1,6 @@
 import type { FormEvent, PropsWithChildren, ReactNode } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useField } from '@rvf/remix';
 
 import { asyncSelectApi } from '~/api/AsyncSelectApi';
 import type { IAsyncSelectItem } from '~/api/AsyncSelectApi';
@@ -10,7 +11,6 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
-import { useControlField } from '~/components/form/fields/form.field';
 import type {
   AsyncSelectInputFetchingState,
   AsyncSelectInputProps,
@@ -82,14 +82,17 @@ export const CreatableAsyncSelectField = ({
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
     [],
   );
-  const [selectedId, setSelectedId] = useControlField<string | undefined>(name);
+  const { getControlProps, onChange } = useField<string | undefined>(name());
+
+  const selectedId = getControlProps().value;
+  console.log(name(), getControlProps());
 
   useEffect(() => {
     if (state === 'loading') return;
     const doesSelectedIdExist = options.some((opt) => opt.value === selectedId);
 
     if (!doesSelectedIdExist) {
-      setSelectedId(undefined);
+      onChange(undefined);
       validate();
     }
   }, [options, selectedId, state]);
@@ -100,8 +103,7 @@ export const CreatableAsyncSelectField = ({
       options.some((opt) => opt.value === defaultValue) &&
       !selectedId
     ) {
-      setSelectedId(defaultValue);
-      validate();
+      onChange(defaultValue);
     }
   }, [defaultValue, options, selectedId]);
 
@@ -111,11 +113,6 @@ export const CreatableAsyncSelectField = ({
 
   const onOptionsFetchStateChange = (state: AsyncSelectInputFetchingState) => {
     setState(state);
-  };
-
-  const onChange = (id: string) => {
-    setSelectedId(id);
-    validate();
   };
 
   const handleCreate = async (
