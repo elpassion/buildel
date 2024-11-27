@@ -1,7 +1,7 @@
 import type { FormEvent, PropsWithChildren, ReactNode } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { withZod } from '@remix-validated-form/with-zod';
-import { useControlField, ValidatedForm } from 'remix-validated-form';
+import { ValidatedForm } from 'remix-validated-form';
 
 import { asyncSelectApi } from '~/api/AsyncSelectApi';
 import type { IAsyncSelectItem } from '~/api/AsyncSelectApi';
@@ -12,6 +12,7 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useControlField } from '~/components/form/fields/form.field';
 import type {
   AsyncSelectInputFetchingState,
   AsyncSelectInputProps,

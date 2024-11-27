@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
 import React from 'react';
 import { useLoaderData } from '@remix-run/react';
-import { useControlField, useFormContext } from 'remix-validated-form';
+import { useFormContext } from 'remix-validated-form';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useControlField } from '~/components/form/fields/form.field';
 import type { NumberInputProps } from '~/components/form/inputs/number.input';
 import { NumberInput } from '~/components/form/inputs/number.input';
 import { ToggleInput } from '~/components/form/inputs/toggle.input';

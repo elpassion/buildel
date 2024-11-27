@@ -1,7 +1,7 @@
 import React from 'react';
-import { useControlField } from 'remix-validated-form';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
+import { useControlField } from '~/components/form/fields/form.field';
 import type { ToggleInputProps } from '~/components/form/inputs/toggle.input';
 import { ToggleInput } from '~/components/form/inputs/toggle.input';
 

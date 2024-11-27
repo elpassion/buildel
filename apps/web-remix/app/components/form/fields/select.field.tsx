@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import React from 'react';
-import { useControlField, useFormContext } from 'remix-validated-form';
+import { useFormContext } from 'remix-validated-form';
 
 import {
   HiddenField,
@@ -8,6 +8,7 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useControlField } from '~/components/form/fields/form.field';
 import { SelectInput } from '~/components/form/inputs/select/select.input';
 import type { SelectInputProps } from '~/components/form/inputs/select/select.input-impl.client';
 

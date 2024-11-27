@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { RefreshCcw } from 'lucide-react';
-import { useControlField } from 'remix-validated-form';
 import type { ValidationBehaviorOptions } from 'remix-validated-form/browser/internal/getInputProps';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
+import { useControlField } from '~/components/form/fields/form.field';
 import type { TextInputProps } from '~/components/form/inputs/text.input';
 import { TextInput } from '~/components/form/inputs/text.input';
 import { IconButton } from '~/components/iconButton';

@@ -1,7 +1,7 @@
 import React from 'react';
-import { useControlField } from 'remix-validated-form';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
+import { useControlField } from '~/components/form/fields/form.field';
 import type { DatepickerInputProps } from '~/components/form/inputs/datepicker.input';
 import { DatepickerInput } from '~/components/form/inputs/datepicker.input';
 

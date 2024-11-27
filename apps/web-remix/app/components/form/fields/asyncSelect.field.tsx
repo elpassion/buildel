@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
-import { useControlField } from 'remix-validated-form';
 import { useIsMounted } from 'usehooks-ts';
 
 import type { IAsyncSelectItem } from '~/api/AsyncSelectApi';
@@ -11,6 +10,7 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useControlField } from '~/components/form/fields/form.field';
 import type { AsyncSelectInputProps } from '~/components/form/inputs/select/select.input';
 import { AsyncSelectInput } from '~/components/form/inputs/select/select.input';
 
