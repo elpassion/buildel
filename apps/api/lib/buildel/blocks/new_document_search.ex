@@ -1,5 +1,4 @@
 defmodule Buildel.Blocks.NewDocumentSearch do
-  alias Buildel.Blocks.Fields.EditorField
   alias Buildel.Memories.MemoryCollectionSearch
   alias Buildel.Blocks.DocumentSearch.DocumentSearchJSON
   alias Buildel.Clients.Utils.Context
@@ -9,12 +8,10 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   import Buildel.Blocks.Utils.Schemas
 
   @impl true
-  defdelegate cast(pid, chunk), to: __MODULE__, as: :query
-
 
   defblock(:document_search,
     description:
-    "Used for efficient searching and retrieval of information from a collection of documents inside Buildel Knowledge Base.",
+      "Used for efficient searching and retrieval of information from a collection of documents inside Buildel Knowledge Base.",
     groups: ["file", "memory"]
   )
 
@@ -23,7 +20,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   definput(:query, schema: %{}, public: false)
 
   defoutput(:output, schema: %{})
-
 
   defoption(
     :knowledge,
@@ -51,8 +47,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
     %{
       "type" => "number",
       "title" => "Token limit",
-      "description" =>
-        "The maximum number of tokens in result. Set to 0 for no limit.",
+      "description" => "The maximum number of tokens in result. Set to 0 for no limit.",
       "default" => 0,
       "minimum" => 0
     }
@@ -88,8 +83,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
       "readonly" => true,
       "type" => "boolean",
       "title" => "Extend parents",
-      "description" =>
-        "Extend the search to include the whole context of the parent chunk",
+      "description" => "Extend the search to include the whole context of the parent chunk",
       "default" => false
     }
   )
@@ -100,8 +94,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
       "readonly" => true,
       "type" => "boolean",
       "title" => "Extend parents",
-      "description" =>
-        "Extend the search to include the whole context of the parent chunk",
+      "description" => "Extend the search to include the whole context of the parent chunk",
       "default" => false
     }
   )
@@ -160,15 +153,13 @@ defmodule Buildel.Blocks.NewDocumentSearch do
             # }
           }
         }
-
       },
       "required" => ["message"]
     }
   )
 
   deftool(:parent,
-    description:
-      "Retrieve the parent context of a specified chunk",
+    description: "Retrieve the parent context of a specified chunk",
     schema: %{
       type: "object",
       properties: %{
@@ -182,8 +173,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   )
 
   deftool(:related,
-    description:
-      "Retrieve the related context of a specified chunk",
+    description: "Retrieve the related context of a specified chunk",
     schema: %{
       type: "object",
       properties: %{
@@ -196,7 +186,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
     }
   )
 
-
   def handle_input(:query, %Message{type: :text, message: message_query} = message, state) do
     send_stream_start(state, :output, message)
 
@@ -206,29 +195,39 @@ defmodule Buildel.Blocks.NewDocumentSearch do
     {:ok, state}
   end
 
-  def handle_input(:input, %Message{type: :file, metadata: %{method: :delete}, message: message_message} = message, state) do
-      send_stream_start(state, :output, message)
+  def handle_input(
+        :input,
+        %Message{type: :file, metadata: %{method: :delete}, message: message_message} = message,
+        state
+      ) do
+    send_stream_start(state, :output, message)
 
-      {:ok, collection, _} =
-        memory().get_global_collection(state.context.context_id, option(state, :knowledge))
+    {:ok, collection, _} =
+      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
-      try do
-          {:ok, _} = memory().delete(state.context.context_id, collection, message_message.file_id)
+    try do
+      {:ok, _} = memory().delete(state.context.context_id, collection, message_message.file_id)
 
-          send_stream_stop(state, :output, Message.from_message(message) |> Message.set_type(:text) |> Message.set_message("File deleted"))
+      send_stream_stop(
+        state,
+        :output,
+        Message.from_message(message)
+        |> Message.set_type(:text)
+        |> Message.set_message("File deleted")
+      )
 
-          {:ok, state}
-        rescue
-          _ ->
-            send_error(
-              state,
-              Message.from_message(message)
-              |> Message.set_type(:text)
-              |> Message.set_message("Failed to delete the file")
-            )
+      {:ok, state}
+    rescue
+      _ ->
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message("Failed to delete the file")
+        )
 
-            {:ok, state}
-        end
+        {:ok, state}
+    end
   end
 
   def handle_input(:input, %Message{type: :file, message: message_message} = message, state) do
@@ -251,8 +250,11 @@ defmodule Buildel.Blocks.NewDocumentSearch do
                  file_uuid: message_message |> Map.get(:file_id)
                }
              ) do
-
-        output(state, :output, message |> Message.set_message(memory.content) |> Message.set_type(:text))
+        output(
+          state,
+          :output,
+          message |> Message.set_message(memory.content) |> Message.set_type(:text)
+        )
 
         {:ok, state}
       else
@@ -263,6 +265,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
             |> Message.set_type(:text)
             |> Message.set_message(reason)
           )
+
           {:ok, state}
 
         err ->
@@ -272,6 +275,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
             |> Message.set_type(:text)
             |> Message.set_message("Failed to add the file")
           )
+
           {:ok, state}
       end
     rescue
@@ -287,7 +291,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
     end
   end
 
-
   defp do_query(state, query, tool_filters \\ %{}) do
     token_limit = option(state, :token_limit)
 
@@ -299,7 +302,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
             if set_value, do: set_value, else: bot_value
           end),
         limit: option(state, :limit),
-        similarity_threshhold:  option(state, :similarity_threshhold),
+        similarity_threshhold: option(state, :similarity_threshhold),
         extend_neighbors: option(state, :extend_neighbors) != false,
         extend_parents: option(state, :extend_parents) != false,
         token_limit:
@@ -337,12 +340,10 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   end
 
   defp do_parent(state, chunk_id) do
-
     {:ok, collection, collection_name} =
       memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
-    {:ok, vector_db} =  memory().get_vector_db(state.context.context_id, option(state, :knowledge))
-
+    {:ok, vector_db} = memory().get_vector_db(state.context.context_id, option(state, :knowledge))
 
     MemoryCollectionSearch.new(%{
       vector_db: vector_db,
@@ -402,7 +403,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
     result = do_query(state, args["message"])
 
-    message =  message |> Message.set_message(result) |> Message.set_type(:text)
+    message = message |> Message.set_message(result) |> Message.set_type(:text)
 
     output(state, :output, message)
 
@@ -415,7 +416,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
     result = do_parent(state, args["chunk_id"])
 
-    message =  message |> Message.set_message(result) |> Message.set_type(:text)
+    message = message |> Message.set_message(result) |> Message.set_type(:text)
 
     output(state, :output, message)
 
@@ -428,7 +429,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
     result = do_parent(state, args["chunk_id"])
 
-    message =  message |> Message.set_message(result) |> Message.set_type(:text)
+    message = message |> Message.set_message(result) |> Message.set_type(:text)
 
     output(state, :output, message)
 
@@ -438,7 +439,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   ## --- Added ---
 
   defp with_where(state) do
-     %{
+    %{
       "memory_id" =>
         case option(state, :document_id) do
           nil -> nil
