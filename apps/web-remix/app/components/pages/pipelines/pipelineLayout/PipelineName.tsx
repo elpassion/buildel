@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { ValidatedForm } from 'remix-validated-form';
 import { useBoolean } from 'usehooks-ts';
 
 import { Field, useFieldContext } from '~/components/form/fields/field.context';
 import { TextInputField } from '~/components/form/fields/text.field';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { cn } from '~/utils/cn';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 import { updatePipelineNameSchema } from '../schema';

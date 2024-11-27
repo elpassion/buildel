@@ -1,5 +1,4 @@
 import React from 'react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { HiddenField } from '~/components/form/fields/field.context';
 import { Schema } from '~/components/form/schema/Schema';
@@ -7,7 +6,7 @@ import { StringField } from '~/components/form/schema/SchemaFields';
 import { generateZODSchema } from '~/components/form/schema/SchemaParser';
 import { SubmitButton } from '~/components/form/submit';
 import type { IBlockConfig } from '~/components/pages/pipelines/pipeline.types';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 interface VideoNodeBodyProps {
   data: IBlockConfig;

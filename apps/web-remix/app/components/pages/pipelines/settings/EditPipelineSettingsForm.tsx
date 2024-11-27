@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { Field } from '~/components/form/fields/field.context';
 import { SubmitButton } from '~/components/form/submit';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { successToast } from '~/components/toasts/successToast';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 import { BudgetLimitField } from './BudgetLimitField';

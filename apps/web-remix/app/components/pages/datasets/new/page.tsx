@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useFetcher, useLoaderData, useNavigate } from '@remix-run/react';
 import { CircleHelp } from 'lucide-react';
-import { ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
 import { CreateDatasetFileUpload } from '~/api/datasets/datasets.contracts';
@@ -28,7 +27,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 

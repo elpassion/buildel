@@ -1,7 +1,6 @@
 import * as React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { Link, useLoaderData, useSearchParams } from '@remix-run/react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
@@ -14,7 +13,7 @@ import { SubmitButton } from '~/components/form/submit';
 import { GithubButton } from '~/components/githubAuth/GithubButton';
 import { GoogleButton } from '~/components/googleAuth/GoogleButton';
 import { SocialSignInForm } from '~/components/socialAuth/SocialSignInForm';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 

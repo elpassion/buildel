@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateInvitationSchema } from '~/api/organization/organization.contracts';
 import { Field } from '~/components/form/fields/field.context';
@@ -8,7 +7,7 @@ import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 
 export function NewMembershipPage() {

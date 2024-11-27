@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { UpdateAliasSchema } from '~/api/pipeline/pipeline.contracts';
 import { Field, HiddenField } from '~/components/form/fields/field.context';
@@ -17,7 +16,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 interface EditAliasNameModalProps {
   isOpen: boolean;

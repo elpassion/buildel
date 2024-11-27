@@ -1,7 +1,6 @@
 import React, { useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
 import { Edit, EllipsisVertical, Trash } from 'lucide-react';
-import { ValidatedForm } from 'remix-validated-form';
 import { useBoolean } from 'usehooks-ts';
 
 import { UpdateDatasetSchema } from '~/api/datasets/datasets.contracts';
@@ -39,7 +38,7 @@ import {
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
 import { dayjs } from '~/utils/Dayjs';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 interface DatasetsListProps {

@@ -9,7 +9,6 @@ import {
   LockOpen,
   Trash,
 } from 'lucide-react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { CreatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
 import { HiddenField } from '~/components/form/fields/field.context';
@@ -45,7 +44,7 @@ import {
 } from '~/components/ui/tooltip';
 import { Duplicate } from '~/icons/Duplicate';
 import { cn } from '~/utils/cn';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { MonetaryValue } from '~/utils/MonetaryValue';
 import { routes } from '~/utils/routes.utils';
 

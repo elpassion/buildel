@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import type { ICurrentUser } from '~/api/CurrentUserApi';
 import { UpdateUserSchema } from '~/api/CurrentUserApi';
@@ -8,7 +7,7 @@ import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { SubmitButton } from '~/components/form/submit';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 interface PreferencesFormProps {
   defaultValues?: Partial<ICurrentUser>;

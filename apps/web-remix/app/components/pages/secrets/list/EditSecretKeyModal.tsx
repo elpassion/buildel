@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useLoaderData } from '@remix-run/react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { UpdateSecretSchema } from '~/api/secrets/secrets.contracts';
 import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
@@ -21,7 +20,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 import type { ISecretKey } from '../variables.types';
 import { loader } from './loader.server';

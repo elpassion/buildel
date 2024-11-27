@@ -1,7 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { useMemo, useRef } from 'react';
 import { PlusCircle } from 'lucide-react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import type { IWorkflowTemplate } from '~/api/organization/organization.contracts';
 import { CreateFromTemplateSchema } from '~/api/organization/organization.contracts';
@@ -12,7 +11,7 @@ import {
   WorkflowBlockListOverflow,
 } from '~/components/pages/pipelines/components/WorkflowBlockList';
 import { cn } from '~/utils/cn';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 interface WorkflowTemplatesProps extends PropsWithChildren {
   className?: string;

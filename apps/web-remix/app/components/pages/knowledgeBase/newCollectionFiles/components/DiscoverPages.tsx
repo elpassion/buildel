@@ -5,7 +5,6 @@ import {
   useNavigate,
   useRevalidator,
 } from '@remix-run/react';
-import { ValidatedForm } from 'remix-validated-form';
 import { z } from 'zod';
 
 import { Field } from '~/components/form/fields/field.context';
@@ -20,7 +19,7 @@ import { loadingToast } from '~/components/toasts/loadingToast';
 import { CheckboxTree } from '~/components/treeSelect/CheckboxTree';
 import type { TreeNodeType } from '~/components/treeSelect/Tree.types';
 import { Button } from '~/components/ui/button';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 export const DiscoverPages = () => {

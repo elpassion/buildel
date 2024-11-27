@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { UpdateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { Field, HiddenField } from '~/components/form/fields/field.context';
@@ -15,7 +14,7 @@ import {
   ModelSelectField,
   SecretSelectField,
 } from '~/components/pages/knowledgeBase/KnowledgeBaseFields';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 
 import type { loader } from './loader.server';

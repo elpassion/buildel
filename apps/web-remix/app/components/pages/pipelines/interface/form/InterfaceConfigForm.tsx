@@ -30,7 +30,7 @@ import { errorToast } from '~/components/toasts/errorToast';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 import { cn } from '~/utils/cn';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;
