@@ -7,8 +7,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
   import Buildel.Blocks.Utils.Schemas
 
-  @impl true
-
   defblock(:document_search,
     description:
       "Used for efficient searching and retrieval of information from a collection of documents inside Buildel Knowledge Base.",
@@ -73,17 +71,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
       "type" => "boolean",
       "title" => "Extend neighbors",
       "description" => "Extend the search to include neighbor chunks",
-      "default" => false
-    }
-  )
-
-  defoption(
-    :extend_parents,
-    %{
-      "readonly" => true,
-      "type" => "boolean",
-      "title" => "Extend parents",
-      "description" => "Extend the search to include the whole context of the parent chunk",
       "default" => false
     }
   )
@@ -268,7 +255,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
           {:ok, state}
 
-        err ->
+        _err ->
           send_error(
             state,
             Message.from_message(message)
@@ -340,7 +327,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   end
 
   defp do_parent(state, chunk_id) do
-    {:ok, collection, collection_name} =
+    {:ok, _collection, collection_name} =
       memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
     {:ok, vector_db} = memory().get_vector_db(state.context.context_id, option(state, :knowledge))
@@ -354,49 +341,37 @@ defmodule Buildel.Blocks.NewDocumentSearch do
     |> Jason.encode!()
   end
 
-  defp do_related(state, chunk_id) do
-    {:ok, collection, collection_name} =
-      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
+  # defp do_related(state, chunk_id) do
+  #   {:ok, _collection, collection_name} =
+  #     memory().get_global_collection(state.context.context_id, option(state, :knowledge))
 
-    {:ok, vector_db} = memory().get_vector_db(state.context.context_id, option(state, :knowledge))
+  #   {:ok, vector_db} = memory().get_vector_db(state.context.context_id, option(state, :knowledge))
 
-    chunk = Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id)
+  #   chunk = Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id)
 
-    params =
-      MemoryCollectionSearch.Params.from_map(%{
-        search_query: Map.get(chunk, "embedding"),
-        where: with_where(state),
-        limit: 2,
-        similarity_threshhold: option(state, :similarity_threshhold),
-        extend_neighbors: false,
-        extend_parents: false,
-        token_limit: nil
-      })
+  #   params =
+  #     MemoryCollectionSearch.Params.from_map(%{
+  #       search_query: Map.get(chunk, "embedding"),
+  #       where: with_where(state),
+  #       limit: 2,
+  #       similarity_threshhold: option(state, :similarity_threshhold),
+  #       extend_neighbors: false,
+  #       extend_parents: false,
+  #       token_limit: nil
+  #     })
 
-    {result, _total_tokens, _embeddings_tokens} =
-      MemoryCollectionSearch.new(%{
-        vector_db: vector_db,
-        organization_collection_name: collection_name
-      })
-      |> MemoryCollectionSearch.search(params)
+  #   {result, _total_tokens, _embeddings_tokens} =
+  #     MemoryCollectionSearch.new(%{
+  #       vector_db: vector_db,
+  #       organization_collection_name: collection_name
+  #     })
+  #     |> MemoryCollectionSearch.search(params)
 
-    result
-    |> Enum.at(1)
-    |> then(&DocumentSearchJSON.show(&1))
-    |> Jason.encode!()
-  end
-
-  def handle_get_tool(:query, state) do
-    tool = @tools |> Enum.find(&(&1.name == :query))
-  end
-
-  def handle_get_tool(:related, state) do
-    tool = @tools |> Enum.find(&(&1.name == :related))
-  end
-
-  def handle_get_tool(:parent, state) do
-    tool = @tools |> Enum.find(&(&1.name == :parent))
-  end
+  #   result
+  #   |> Enum.at(1)
+  #   |> then(&DocumentSearchJSON.show(&1))
+  #   |> Jason.encode!()
+  # end
 
   def handle_tool_call(:query, %Message{message: %{args: args}} = message, state) do
     send_stream_start(state, :output, message)
@@ -499,7 +474,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   ## ----
 end
 
-defmodule Buildel.Blocks.DocumentSearch.DocumentSearchJSON do
+defmodule Buildel.Blocks.NewDocumentSearch.DocumentSearchJSON do
   def show(%{
         "chunk_id" => chunk_id,
         "document" => document,

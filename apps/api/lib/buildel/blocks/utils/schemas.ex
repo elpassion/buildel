@@ -67,18 +67,18 @@ defmodule Buildel.Blocks.Utils.Schemas do
   end
 
   def memory_schema(
-         %{
-           "default" => default,
-           "title" => title,
-           "description" => description,
-           "readonly" => readonly
-         } \\ %{
-           "default" => "{{pipeline_id}}_{{block_name}}",
-           "title" => "Persist in",
-           "description" => "Memory collection to use.",
-           "readonly" => false
-         }
-       ) do
+        %{
+          "default" => _default,
+          "title" => title,
+          "description" => description,
+          "readonly" => readonly
+        } \\ %{
+          "default" => "{{pipeline_id}}_{{block_name}}",
+          "title" => "Persist in",
+          "description" => "Memory collection to use.",
+          "readonly" => false
+        }
+      ) do
     %{
       "type" => "string",
       "title" => title,

@@ -144,7 +144,7 @@ defmodule BuildelWeb.PipelineChannel do
     end
   end
 
-  def get_interface_config(%Pipeline{} = pipeline, metadata) do
+  defp get_interface_config(%Pipeline{} = pipeline, metadata) do
     case pipeline.interface_config do
       nil -> %{}
       interface_config -> Map.get(interface_config, Map.get(metadata, "interface"), %{})

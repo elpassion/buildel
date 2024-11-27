@@ -22,7 +22,8 @@ defmodule Buildel.Blocks.NewWorkflowCall do
   defoption(:inputs, %{
     "type" => "array",
     "title" => "Inputs",
-    "description" => "Which inputs should be filled while calling workflow (by default no inputs are sent)",
+    "description" =>
+      "Which inputs should be filled while calling workflow (by default no inputs are sent)",
     "minItems" => 0,
     "items" => %{
       "type" => "object",
@@ -42,37 +43,41 @@ defmodule Buildel.Blocks.NewWorkflowCall do
         }
       }
     },
-    "default" => [],
+    "default" => []
   })
 
-  defoption(:wait_for_outputs, %{
-    "type" => "array",
-    "title" => "Wait for Outputs",
-    "description" => "Which outputs should be waited for when calling as tool",
-    "minItems" => 1,
-    "items" => %{
-      "type" => "object",
-      "required" => ["output_name"],
-      "properties" => %{
-        "output_name" => %{
-          "type" => "string",
-          "title" => "Output",
-          "url" =>
-            "/api/organizations/{{organization_id}}/pipelines/{{pipeline_id}}/blocks/{{block_name}}/options/outputs?workflow={{opts.workflow}}",
-          "presentAs" => "async-select",
-          "minLength" => 1
+  defoption(
+    :wait_for_outputs,
+    %{
+      "type" => "array",
+      "title" => "Wait for Outputs",
+      "description" => "Which outputs should be waited for when calling as tool",
+      "minItems" => 1,
+      "items" => %{
+        "type" => "object",
+        "required" => ["output_name"],
+        "properties" => %{
+          "output_name" => %{
+            "type" => "string",
+            "title" => "Output",
+            "url" =>
+              "/api/organizations/{{organization_id}}/pipelines/{{pipeline_id}}/blocks/{{block_name}}/options/outputs?workflow={{opts.workflow}}",
+            "presentAs" => "async-select",
+            "minLength" => 1
+          }
+        }
+      },
+      "default" => [],
+      "displayWhen" => %{
+        "connections" => %{
+          "call_worker" => %{
+            "min" => 1
+          }
         }
       }
     },
-    "default" => [],
-    "displayWhen" => %{
-      "connections" => %{
-        "call_worker" => %{
-          "min" => 1
-        }
-      }
-    }
-  }, required: false)
+    required: false
+  )
 
   deftool(:call, description: "Call another workflow", schema: %{})
 
@@ -110,7 +115,6 @@ defmodule Buildel.Blocks.NewWorkflowCall do
           |> Map.update!("required", &(&1 ++ [name]))
       end)
 
-
     %{tool | schema: schema}
   end
 
@@ -126,10 +130,20 @@ defmodule Buildel.Blocks.NewWorkflowCall do
 
   def handle_option(:workflow, %{organization: organization, pipeline: pipeline}) do
     pipelines = Pipelines.list_organization_pipelines(organization) |> List.delete(pipeline)
-    BuildelWeb.OrganizationPipelineJSON.index(%{pipelines: pipelines, params: %Buildel.Pipelines.ListParams{}, total: 0})
+
+    BuildelWeb.OrganizationPipelineJSON.index(%{
+      pipelines: pipelines,
+      params: %Buildel.Pipelines.ListParams{},
+      total: 0
+    })
   end
 
-  def handle_option(:outputs, %{organization: organization, pipeline: _pipeline, block: block, params: params}) do
+  def handle_option(:outputs, %{
+        organization: organization,
+        pipeline: _pipeline,
+        block: block,
+        params: params
+      }) do
     with dynamic_pipeline_id <- Map.merge(block["opts"], params)["workflow"],
          {:ok, dynamic_pipeline} <-
            Buildel.Pipelines.get_organization_pipeline(organization, dynamic_pipeline_id) do
@@ -142,7 +156,12 @@ defmodule Buildel.Blocks.NewWorkflowCall do
     end
   end
 
-  def handle_option(:inputs, %{organization: organization, pipeline: _pipeline, block: block, params: params}) do
+  def handle_option(:inputs, %{
+        organization: organization,
+        pipeline: _pipeline,
+        block: block,
+        params: params
+      }) do
     with dynamic_pipeline_id <- Map.merge(block["opts"], params)["workflow"],
          {:ok, dynamic_pipeline} <-
            Buildel.Pipelines.get_organization_pipeline(organization, dynamic_pipeline_id) do

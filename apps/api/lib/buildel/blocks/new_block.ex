@@ -32,7 +32,6 @@ defmodule Buildel.Blocks.NewBlock do
 
       use Buildel.Blocks.NewBlock.Server, tool_controller: @tool_controller
 
-
       @spec create(map) :: %Buildel.Blocks.Block{}
       def create(%{name: name, opts: opts, connections: connections}) do
         %Buildel.Blocks.Block{
@@ -209,6 +208,11 @@ defmodule Buildel.Blocks.NewBlock do
 
           {:error, :something_went_wrong, state}
       end
+
+      def handle_get_tool(name, state) do
+        @tools
+        |> Enum.find(&(&1.name == name))
+      end
     end
   end
 end
@@ -225,7 +229,15 @@ end
 
 defmodule Buildel.Blocks.NewBlock.Tool do
   @derive Jason.Encoder
-  defstruct [:name, :schema, :description, :call, :call_formatter, :response_formatter, type: :worker]
+  defstruct [
+    :name,
+    :schema,
+    :description,
+    :call,
+    :call_formatter,
+    :response_formatter,
+    type: :worker
+  ]
 end
 
 defmodule Buildel.Blocks.NewBlock.Defblock do
@@ -262,7 +274,6 @@ defmodule Buildel.Blocks.NewBlock.Definput do
 
   defmacro definput(name, options) do
     quote do
-
       {:ok, options} =
         unquote(options)
         |> Keyword.validate(public: false, type: :text, schema: %{}, visible: true)
@@ -298,6 +309,7 @@ defmodule Buildel.Blocks.NewBlock.Definput do
             )
 
             {:error, :invalid_input, state}
+
           {:error, %Ecto.Changeset{} = changeset} ->
             send_error(
               state,
@@ -307,6 +319,7 @@ defmodule Buildel.Blocks.NewBlock.Definput do
             )
 
             {:error, :error_saving_data_to_database, state}
+
           {:error, %Jason.DecodeError{data: data} = error} ->
             send_error(
               state,
@@ -316,6 +329,7 @@ defmodule Buildel.Blocks.NewBlock.Definput do
             )
 
             {:error, :json_decode_error, state}
+
           {:error, error} ->
             send_error(
               state,
@@ -329,6 +343,7 @@ defmodule Buildel.Blocks.NewBlock.Definput do
       rescue
         error ->
           Logger.error(Exception.format(:error, error, __STACKTRACE__))
+
           send_error(
             state,
             Message.from_message(message)
@@ -525,15 +540,15 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
 
       if existing_tools |> Enum.count() == 0 do
         def call_tool(state, message, options \\ [])
-      end
 
-      def call_tool(state, %Message{} = message, opts) do
-        pid =
-          state.block.context.block_id
-          |> String.to_existing_atom()
-          |> Process.whereis()
+        def call_tool(state, %Message{} = message, opts) do
+          pid =
+            state.block.context.block_id
+            |> String.to_existing_atom()
+            |> Process.whereis()
 
-        GenServer.call(pid, {:call_tool, message}, 5 * 60_000)
+          GenServer.call(pid, {:call_tool, message}, 5 * 60_000)
+        end
       end
 
       @impl true
@@ -563,13 +578,6 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
            }
          ), state}
       end
-
-      def handle_get_tool(unquote(name), state) do
-        @tools
-        |> Enum.find(&(&1.name == unquote(name)))
-      end
-
-      defoverridable handle_get_tool: 2
 
       if existing_tools |> Enum.count() == 0 do
         def handle_call({:call_tool, %Message{} = message}, _from, state) do
@@ -720,7 +728,6 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
         {:noreply, state}
       end
-
 
       defp do_handle_info(%Message{topic: topic} = message, state, external: true) do
         context_id = BlockPubSub.io_from_topic(topic)
@@ -965,7 +972,7 @@ defmodule Buildel.Blocks.NewBlock.Server do
 
   defmacro __before_compile__(_) do
     quote do
-      if ((@inputs |> length()) > 0) do
+      if @inputs |> length() > 0 do
         defp do_handle_info(%Message{topic: topic} = message, state, external: false) do
           inputs_subscribed_to_topic(all_connections(state.block), topic)
           |> Enum.reduce(
@@ -1107,7 +1114,6 @@ defmodule Buildel.Blocks.NewBlock.Memory do
     end
   end
 end
-
 
 defmodule Buildel.Blocks.NewBlock.DocumentWorkflow do
   defmacro __using__(_opts) do
