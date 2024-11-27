@@ -3,6 +3,7 @@ defmodule BuildelWeb.PipelineChannel do
   use BuildelWeb.Validator
 
   require Logger
+  alias BuildelWeb.PipelineChannel.Message.Text
   alias EarmarkParser.Message
   alias Buildel.Pipelines
   alias Buildel.Pipelines.Pipeline
@@ -34,6 +35,18 @@ defmodule BuildelWeb.PipelineChannel do
           message: message,
           metadata: metadata,
           created_at: Map.get(metadata, "_broadcast_date")
+        }
+      end
+
+      def from_binary(
+            <<metadata_size::32, metadata_json::bytes-size(metadata_size), content::binary>>
+          ) do
+        metadata = Jason.decode!(metadata_json)
+
+        %{
+          metadata: metadata,
+          message: content,
+          created_at: nil
         }
       end
     end
@@ -211,7 +224,7 @@ defmodule BuildelWeb.PipelineChannel do
     [block_name, input_name] = input |> String.split(":")
     context_id = Pipelines.Worker.context_id(run)
 
-    data =
+    %{data: data, metadata: metadata} =
       case data do
         {:binary, content} ->
           block_type =
@@ -220,20 +233,21 @@ defmodule BuildelWeb.PipelineChannel do
             |> Enum.find(%{}, fn input -> Map.get(input, "name") == block_name end)
             |> Map.get("type")
 
-          if block_type == "file_input" do
-            {:ok, path} = Temp.path()
-            File.write!(path, content)
+          if block_type == "file_input" or block_type == "image_input" do
+            %{metadata: metadata, message: file} = Text.from_binary(content)
+            {:ok, path} = Temp.path(suffix: metadata |> Map.get("file_name"))
+            File.write!(path, file)
 
-            {:binary, path}
+            %{data: {:binary, path}, metadata: metadata}
           else
-            data
+            %{data: data, metadata: %{}}
           end
 
         _ ->
-          {:text, data}
+          %{data: {:text, data}, metadata: %{}}
       end
 
-    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, %{})
+    Buildel.BlockPubSub.broadcast_to_io(context_id, block_name, input_name, data, metadata)
   end
 
   def handle_info({output_name, :binary, chunk, metadata}, socket) do

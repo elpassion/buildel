@@ -26,10 +26,10 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
   const validator = useMemo(() => withZod(InterfaceConfig), []);
 
   const inputs = pipeline.config.blocks.filter((block) =>
-    ['text_input', 'file_input'].includes(block.type),
+    ['text_input', 'file_input', 'image_input'].includes(block.type),
   );
-  const outputs = pipeline.config.blocks.filter(
-    (block) => block.type === 'text_output',
+  const outputs = pipeline.config.blocks.filter((block) =>
+    ['text_output', 'file_output', 'image_output'].includes(block.type),
   );
 
   const handleOnSubmit = (
