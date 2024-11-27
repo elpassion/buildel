@@ -1,8 +1,18 @@
-import type { PropsWithChildren } from 'react';
 import React from 'react';
 
-export const ChatHeading: React.FC<PropsWithChildren> = ({ children }) => {
+import { cn } from '~/utils/cn';
+
+export const ChatHeading = ({
+  children,
+  className,
+  ...rest
+}: React.HTMLAttributes<HTMLHeadingElement>) => {
   return (
-    <h3 className="flex gap-2 items-center text-foreground">{children}</h3>
+    <h3
+      className={cn('flex gap-2 items-center text-foreground', className)}
+      {...rest}
+    >
+      {children}
+    </h3>
   );
 };

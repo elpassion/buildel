@@ -179,10 +179,10 @@ export default function WebsiteForm() {
       <div className="flex flex-col max-w-3xl w-full rounded-lg p-2 md:p-4">
         <FormContext value={formProps}>
           <form onSubmit={onSubmit} className="w-full border-b mb-6">
-            <div className="flex flex-col items-start w-full gap-2">
+            <div className="flex flex-col items-start w-full gap-4">
               {pipeline.interface_config.form.inputs.map((input) => {
                 return (
-                  <div key={input.name} className="flex flex-col gap-1 w-full">
+                  <div key={input.name} className="flex flex-col gap-2 w-full">
                     <FormInterfaceInput data={input} />
                   </div>
                 );
@@ -200,7 +200,7 @@ export default function WebsiteForm() {
             </Button>
           </form>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {Object.entries(state.outputs).map(([key, output]) => (
               <FormInterfaceOutput
                 key={key}
@@ -479,7 +479,7 @@ export function FormInterfaceTextOutput({
 }: FormInterfaceTextOutputProps) {
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between gap-1 flex-wrap">
+      <div className="flex items-center justify-between gap2 flex-wrap mb-2">
         <Label>{data.name}</Label>
         <div className="mb-1 flex gap-1">
           <NodeCopyButton text={data.value ?? ''} />
@@ -508,7 +508,7 @@ export function FormInterfaceFileOutput({
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       <Label>{data.name}</Label>
 
       {data.value ? (
@@ -540,7 +540,7 @@ export function FormInterfaceImageOutput({
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       <Label>{data.name}</Label>
 
       {data.value ? (
