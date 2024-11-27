@@ -1,7 +1,6 @@
 import React from 'react';
 import { useLoaderData } from '@remix-run/react';
 import type { RenderDOMFunc } from 'rc-select/es/interface';
-import { useFormContext } from 'remix-validated-form';
 
 import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
 import {
@@ -16,6 +15,7 @@ import {
 } from '~/components/form/fields/radio.field';
 import type { loader } from '~/components/pages/knowledgeBase/newKnowledgeBase/loader.server';
 import { Label } from '~/components/ui/label';
+import { useFormContext } from '~/utils/form';
 
 interface ApiTypesRadioGroupFieldProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

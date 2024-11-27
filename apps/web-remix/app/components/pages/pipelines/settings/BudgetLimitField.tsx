@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import React from 'react';
 import { useLoaderData } from '@remix-run/react';
-import { useFormContext } from 'remix-validated-form';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
@@ -11,6 +10,7 @@ import type { NumberInputProps } from '~/components/form/inputs/number.input';
 import { NumberInput } from '~/components/form/inputs/number.input';
 import { ToggleInput } from '~/components/form/inputs/toggle.input';
 import type { loader } from '~/components/pages/pipelines/settings/loader.server';
+import { useFormContext } from '~/utils/form';
 
 interface BudgetLimitFieldProps extends Partial<NumberInputProps> {
   supportingText: ReactNode;

@@ -1,6 +1,7 @@
 import React, { use } from 'react';
-import { useField } from 'remix-validated-form';
-import type { ValidationBehaviorOptions } from 'remix-validated-form/browser/internal/getInputProps';
+
+import type { ValidationBehaviorOptions } from '~/components/form/fields/form.field';
+import { useField } from '~/components/form/fields/form.field';
 
 export function Field({
   children,

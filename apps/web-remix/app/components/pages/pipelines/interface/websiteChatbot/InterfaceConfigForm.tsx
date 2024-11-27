@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { Trash } from 'lucide-react';
-import { FieldArray, ValidatedForm } from 'remix-validated-form';
 
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
+import { FieldArray } from '~/components/form/fields/form.field';
 import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
@@ -17,7 +17,7 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
-import { withZod } from '~/utils/form';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 import { schema } from './schema';

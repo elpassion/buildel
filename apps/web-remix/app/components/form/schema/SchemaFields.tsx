@@ -8,7 +8,6 @@ import React, {
 import debounce from 'lodash.debounce';
 import startCase from 'lodash.startcase';
 import { ChevronDown, Trash } from 'lucide-react';
-import { useFieldArray, useFormContext } from 'remix-validated-form';
 
 import { asyncSelectApi } from '~/api/AsyncSelectApi';
 import { toSelectOption } from '~/components/form/fields/asyncSelect.field';
@@ -16,6 +15,7 @@ import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field as FormField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useFieldArray } from '~/components/form/fields/form.field';
 import { QuantityInputField } from '~/components/form/fields/quantity.field';
 import {
   RadioGroupField,
@@ -35,6 +35,7 @@ import { useOrganizationId } from '~/hooks/useOrganizationId';
 import { usePipelineId } from '~/hooks/usePipelineId';
 import { assert } from '~/utils/assert';
 import { cn } from '~/utils/cn';
+import { useFormContext } from '~/utils/form';
 
 import { Field, Schema } from './Schema';
 import type { FieldProps } from './Schema';

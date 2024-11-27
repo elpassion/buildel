@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import React from 'react';
-import { useFormContext } from 'remix-validated-form';
 
 import {
   HiddenField,
@@ -11,6 +10,7 @@ import { FieldMessage } from '~/components/form/fields/field.message';
 import { useControlField } from '~/components/form/fields/form.field';
 import { SelectInput } from '~/components/form/inputs/select/select.input';
 import type { SelectInputProps } from '~/components/form/inputs/select/select.input-impl.client';
+import { useFormContext } from '~/utils/form';
 
 interface SelectFieldProps extends SelectInputProps {
   label?: ReactNode;

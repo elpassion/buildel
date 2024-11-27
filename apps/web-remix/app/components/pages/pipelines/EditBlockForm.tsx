@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
 import type { Blocker, Location } from '@remix-run/react';
 import { useBlocker } from '@remix-run/react';
-import { useFormContext, ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
 
 import type { ExtendedBlockConfig } from '~/api/blockType/blockType.contracts';
@@ -46,7 +45,7 @@ import { reverseToolConnections } from '~/components/pages/pipelines/PipelineFlo
 import { successToast } from '~/components/toasts/successToast';
 import { useCopyToClipboard } from '~/hooks/useCopyToClipboard';
 import { assert } from '~/utils/assert';
-import { withZod } from '~/utils/form';
+import { useFormContext, ValidatedForm, withZod } from '~/utils/form';
 
 export function EditBlockForm({
   onSubmit,
