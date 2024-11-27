@@ -1,6 +1,5 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import React, { useMemo, useRef } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { PlusCircle } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
@@ -13,6 +12,7 @@ import {
   WorkflowBlockListOverflow,
 } from '~/components/pages/pipelines/components/WorkflowBlockList';
 import { cn } from '~/utils/cn';
+import { withZod } from '~/utils/form';
 
 interface WorkflowTemplatesProps extends PropsWithChildren {
   className?: string;

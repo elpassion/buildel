@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { useLoaderData, useNavigate, useRevalidator } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 import { z } from 'zod';
 
@@ -12,6 +11,7 @@ import type { loader } from '~/components/pages/knowledgeBase/newCollectionFiles
 import { useCrawlUrls } from '~/components/pages/knowledgeBase/newCollectionFiles/useCrawlUrls';
 import { loadingToast } from '~/components/toasts/loadingToast';
 import { Button } from '~/components/ui/button';
+import { withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 const ScrapeSchema = z.object({

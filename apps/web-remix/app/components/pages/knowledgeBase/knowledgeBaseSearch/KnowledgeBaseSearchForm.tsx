@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { Loader, Search } from 'lucide-react';
 import { useFormContext, ValidatedForm } from 'remix-validated-form';
 import type { z } from 'zod';
@@ -13,6 +12,7 @@ import { SelectField } from '~/components/form/fields/select.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { IconButton } from '~/components/iconButton';
 import { cn } from '~/utils/cn';
+import { withZod } from '~/utils/form';
 
 import { ExtendChunksField } from '../components/ExtendChunksToggleField';
 import { SearchParams } from '../components/SearchParams';

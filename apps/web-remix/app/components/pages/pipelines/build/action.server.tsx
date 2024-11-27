@@ -1,6 +1,5 @@
 import { json } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
-import { withZod } from '@remix-validated-form/with-zod';
 import invariant from 'tiny-invariant';
 
 import { UpdatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
@@ -14,6 +13,7 @@ import {
 } from '~/components/pages/pipelines/pipeline.types';
 import { requireLogin } from '~/session.server';
 import { actionBuilder, validationError } from '~/utils.server';
+import { withZod } from '~/utils/form';
 
 export async function action(actionArgs: ActionFunctionArgs) {
   return actionBuilder({

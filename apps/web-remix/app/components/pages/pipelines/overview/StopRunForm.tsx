@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { CircleStop } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
@@ -7,6 +6,7 @@ import { HiddenField } from '~/components/form/fields/field.context';
 import { IconButton } from '~/components/iconButton';
 import { StopRunSchema } from '~/components/pages/pipelines/overview/schema';
 import { Tooltip } from '~/components/tooltip/Tooltip';
+import { withZod } from '~/utils/form';
 
 interface StopRunFormProps {
   id: number;

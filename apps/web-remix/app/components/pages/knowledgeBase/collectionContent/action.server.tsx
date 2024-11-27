@@ -1,6 +1,5 @@
 import { json } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
-import { withZod } from '@remix-validated-form/with-zod';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
@@ -8,6 +7,7 @@ import { KnowledgeBaseApi } from '~/api/knowledgeBase/KnowledgeBaseApi';
 import { requireLogin } from '~/session.server';
 import { actionBuilder } from '~/utils.server';
 import type { fetchTyped } from '~/utils/fetch.server';
+import { withZod } from '~/utils/form';
 import { setServerToast } from '~/utils/toast.server';
 
 export async function action(actionArgs: ActionFunctionArgs) {
@@ -105,7 +105,7 @@ async function deleteMany(
   await knowledgeBaseApi.bulkDeleteCollectionMemories(
     params.organizationId as string,
     collectionId,
-    ids
+    ids,
   );
 
   return json(

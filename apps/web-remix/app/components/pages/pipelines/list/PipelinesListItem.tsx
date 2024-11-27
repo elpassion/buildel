@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from 'react';
 import React, { useMemo } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import {
   Bookmark,
   BookmarkCheck,
@@ -46,6 +45,7 @@ import {
 } from '~/components/ui/tooltip';
 import { Duplicate } from '~/icons/Duplicate';
 import { cn } from '~/utils/cn';
+import { withZod } from '~/utils/form';
 import { MonetaryValue } from '~/utils/MonetaryValue';
 import { routes } from '~/utils/routes.utils';
 

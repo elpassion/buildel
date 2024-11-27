@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { Edit } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 
@@ -22,6 +21,7 @@ import {
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
 import { useModal } from '~/hooks/useModal';
+import { withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 import { updatePipelineNameSchema } from '../schema';

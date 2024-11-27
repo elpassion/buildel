@@ -1,6 +1,5 @@
 import type { FormEvent, PropsWithChildren, ReactNode } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 
 import { asyncSelectApi } from '~/api/AsyncSelectApi';
@@ -38,6 +37,7 @@ import {
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
 import { useModal } from '~/hooks/useModal';
+import { withZod } from '~/utils/form';
 
 import { SubmitButton } from '../submit';
 

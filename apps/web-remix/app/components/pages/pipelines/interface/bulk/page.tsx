@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useLoaderData } from '@remix-run/react';
 import type { MetaFunction } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { Plus } from 'lucide-react';
 import Papa from 'papaparse';
 import { ValidatedForm } from 'remix-validated-form';
@@ -19,6 +18,7 @@ import {
   InterfaceSectionWrapper,
 } from '~/components/interfaces/InterfaceSection';
 import { Button } from '~/components/ui/button';
+import { withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 
 import type { IBlockConfig } from '../../pipeline.types';

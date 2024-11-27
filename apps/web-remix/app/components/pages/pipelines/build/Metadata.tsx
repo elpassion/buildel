@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { FileText } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 import { z } from 'zod';
@@ -23,6 +22,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { useBreakpoints } from '~/hooks/useBreakpoints';
+import { withZod } from '~/utils/form';
 
 export const Metadata = () => {
   const { isDesktop } = useBreakpoints();

@@ -1,6 +1,5 @@
 import { json } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
-import { withZod } from '@remix-validated-form/with-zod';
 import invariant from 'tiny-invariant';
 
 import { DatasetApi } from '~/api/datasets/DatasetApi';
@@ -8,6 +7,7 @@ import { UpdateDatasetSchema } from '~/api/datasets/datasets.contracts';
 import { requireLogin } from '~/session.server';
 import { actionBuilder, validationError } from '~/utils.server';
 import { assert } from '~/utils/assert';
+import { withZod } from '~/utils/form';
 import { setServerToast } from '~/utils/toast.server';
 
 export async function action(actionArgs: ActionFunctionArgs) {

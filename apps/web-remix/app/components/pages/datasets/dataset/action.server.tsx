@@ -1,6 +1,5 @@
 import { json, redirect } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
-import { withZod } from '@remix-validated-form/with-zod';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
@@ -10,6 +9,7 @@ import { requireLogin } from '~/session.server';
 import { actionBuilder, validationError } from '~/utils.server';
 import { assert } from '~/utils/assert';
 import type { fetchTyped } from '~/utils/fetch.server';
+import { withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 import { setServerToast } from '~/utils/toast.server';
 

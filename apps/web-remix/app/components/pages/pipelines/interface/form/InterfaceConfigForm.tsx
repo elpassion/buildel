@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import startCase from 'lodash.startcase';
 import { Trash } from 'lucide-react';
 import {
@@ -31,6 +30,7 @@ import { errorToast } from '~/components/toasts/errorToast';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 import { cn } from '~/utils/cn';
+import { withZod } from '~/utils/form';
 
 interface InterfaceConfigFormProps {
   pipeline: IPipeline;

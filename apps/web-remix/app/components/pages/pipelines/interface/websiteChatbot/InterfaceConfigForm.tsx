@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { Trash } from 'lucide-react';
 import { FieldArray, ValidatedForm } from 'remix-validated-form';
 
@@ -18,6 +17,7 @@ import type {
 } from '~/components/pages/pipelines/pipeline.types';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
+import { withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 import { schema } from './schema';

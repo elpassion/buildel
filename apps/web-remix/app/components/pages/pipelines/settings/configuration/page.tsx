@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useFetcher, useLoaderData } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { ValidatedForm } from 'remix-validated-form';
 import z from 'zod';
 
@@ -14,6 +13,7 @@ import { generateZODSchema } from '~/components/form/schema/SchemaParser';
 import { SubmitButton } from '~/components/form/submit';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { successToast } from '~/components/toasts/successToast';
+import { withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 

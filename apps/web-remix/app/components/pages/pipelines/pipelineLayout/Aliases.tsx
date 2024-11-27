@@ -6,7 +6,6 @@ import {
   useNavigate,
   useSearchParams,
 } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { ChevronDown, ChevronUp, FilePenLine, Trash } from 'lucide-react';
 import { ValidatedForm } from 'remix-validated-form';
 import z from 'zod';
@@ -29,6 +28,7 @@ import type {
 import { EditAliasNameModal } from '~/components/pages/pipelines/pipelineLayout/EditAliasNameModal';
 import { Button } from '~/components/ui/button';
 import { cn } from '~/utils/cn';
+import { withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 interface AliasSelectProps {
