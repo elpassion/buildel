@@ -170,7 +170,7 @@ export default function WebsiteForm() {
 
   return (
     <div className="flex flex-col justify-center items-center h-screen w-full text-foreground bg-secondary">
-      <ChatHeader className="mb-4 max-w-3xl w-full p-2 md:p-4">
+      <ChatHeader className="mb-4 w-full py-6 px-2 md:px-4 absolute top-0 left-0 right-0">
         <ChatHeading>{pipeline.name}</ChatHeading>
 
         <ChatStatus connectionStatus={status} />
