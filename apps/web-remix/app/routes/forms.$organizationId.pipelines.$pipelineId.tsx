@@ -30,7 +30,6 @@ import type {
   TextOutput,
 } from '~/components/pages/interfaces/form/formInterface.reducer';
 import {
-  done,
   formInterfaceReducer,
   generate,
   setOutput,
@@ -88,18 +87,6 @@ export default function WebsiteForm() {
     outputs: defaultOutputs(),
     isWaitingForOutputs: false,
   });
-
-  useEffect(() => {
-    if (!state.isWaitingForOutputs) return;
-
-    const id = setTimeout(() => {
-      dispatch(done());
-    }, 7500);
-
-    return () => {
-      clearTimeout(id);
-    };
-  }, [state.isWaitingForOutputs]);
 
   const onBlockOutput: OnBlockOutput = (block, _output, payload, metadata) => {
     if (doesOutputExist(block)) {
