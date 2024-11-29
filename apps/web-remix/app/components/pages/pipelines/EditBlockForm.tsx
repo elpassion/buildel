@@ -20,6 +20,7 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useCurrentFormState } from '~/components/form/fields/form.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import type { FieldProps } from '~/components/form/schema/Schema';
 import { Schema } from '~/components/form/schema/Schema';
@@ -227,20 +228,11 @@ export function EditBlockForm({
         return;
       }
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const {
-        formState: { fieldErrors },
-        subscribe,
-      } = useFormContext();
-
-      const [values, setValues] = useState<any>({});
+      const { values, fieldErrors } = useCurrentFormState();
 
       const getValues = () => {
         return values;
       };
-
-      useEffect(() => {
-        subscribe.value((values) => setValues(values));
-      }, []);
 
       const replacedUrl = props.field.url
         .replace('{{organization_id}}', organizationId.toString())
@@ -305,20 +297,11 @@ export function EditBlockForm({
         return;
       }
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      const {
-        formState: { fieldErrors },
-        subscribe,
-      } = useFormContext();
-
-      const [values, setValues] = useState<any>({});
+      const { values, fieldErrors } = useCurrentFormState();
 
       const getValues = () => {
         return values;
       };
-
-      useEffect(() => {
-        subscribe.value((values) => setValues(values));
-      }, []);
 
       const replacedUrl = props.field.url
         .replace('{{organization_id}}', organizationId.toString())
@@ -410,10 +393,9 @@ export function EditBlockForm({
       submitSource="state"
       handleSubmit={handleUpdate}
       className="w-full grow flex flex-col"
-      // onChange={(e: any) => {
-      //   console.log('TEST');
-      //   setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));
-      // }}
+      onChange={(e: any) => {
+        setLatestValues((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+      }}
       noValidate
     >
       <PageLeaveBlocker blocker={blocker} />

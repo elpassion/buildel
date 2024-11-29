@@ -1,4 +1,4 @@
-import type { FormEvent, PropsWithChildren, ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useField } from '@rvf/remix';
 
@@ -51,10 +51,7 @@ export interface CreatableAsyncSelectFieldProps
   renderForm: ({
     onCreate,
   }: {
-    onCreate: (
-      data: Record<string, any>,
-      e: FormEvent<HTMLFormElement>,
-    ) => void;
+    onCreate: (data: Record<string, any>) => void;
   }) => ReactNode;
 }
 
@@ -85,7 +82,6 @@ export const CreatableAsyncSelectField = ({
   const { getControlProps, onChange } = useField<string | undefined>(name());
 
   const selectedId = getControlProps().value;
-  console.log(name(), getControlProps());
 
   useEffect(() => {
     if (state === 'loading') return;
@@ -115,11 +111,7 @@ export const CreatableAsyncSelectField = ({
     setState(state);
   };
 
-  const handleCreate = async (
-    data: Record<string, any>,
-    e: FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleCreate = async (data: Record<string, any>) => {
     try {
       const newItem = await asyncSelectApi.createData(
         url,
@@ -198,7 +190,7 @@ export const CreatableAsyncSelectField = ({
 };
 
 interface CreatableAsyncFormProps {
-  onCreate: (data: Record<string, any>, e: FormEvent<HTMLFormElement>) => void;
+  onCreate: (data: Record<string, any>) => void;
   schema: JSONSchemaField;
   asyncSelect: React.FC<FieldProps>;
   asyncCreatableSelect: React.FC<FieldProps>;

@@ -16,7 +16,10 @@ import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field as FormField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
-import { useFieldArray } from '~/components/form/fields/form.field';
+import {
+  useCurrentFormState,
+  useFieldArray,
+} from '~/components/form/fields/form.field';
 import { QuantityInputField } from '~/components/form/fields/quantity.field';
 import {
   RadioGroupField,
@@ -52,20 +55,11 @@ export function StringField({
   assert(name);
   assert(field.type === 'string');
 
-  const {
-    formState: { fieldErrors },
-    subscribe,
-  } = useFormContext();
-
-  const [values, setValues] = useState<any>({});
+  const { values, fieldErrors } = useCurrentFormState();
 
   const getValues = () => {
     return values;
   };
-
-  useEffect(() => {
-    subscribe.value((values) => setValues(values));
-  }, []);
 
   const error = fieldErrors[name] ?? undefined;
 
@@ -421,13 +415,8 @@ function SectionFieldPreviewItem({
   fullKey,
   name,
 }: SectionFieldPreviewItemProps) {
-  const { subscribe } = useFormContext();
+  const { values } = useCurrentFormState();
 
-  const [values, setValues] = useState<any>({});
-
-  useEffect(() => {
-    subscribe.value((values) => setValues(values));
-  }, []);
   const propertyValue = get(values, fullKey)?.toString() ?? '';
 
   if (!propertyValue) return null;
@@ -568,17 +557,12 @@ function SectionFieldPreviewAsyncItem({
   const organizationId = useOrganizationId();
   const pipelineId = usePipelineId();
 
-  const { subscribe } = useFormContext();
-
-  const [values, setValues] = useState<any>({});
+  const { values } = useCurrentFormState();
 
   const getValues = () => {
     return values;
   };
 
-  useEffect(() => {
-    subscribe.value((values) => setValues(values));
-  }, []);
   const context = getValues();
 
   const [finalValue, setFinalValue] = useState(value);
@@ -627,7 +611,7 @@ function SectionFieldPreviewAsyncItem({
     return () => {
       debouncedFetchOptions.cancel();
     };
-  }, [url, value]);
+  }, [url]);
 
   return (
     <SectionFieldPreviewItemWrapper title={finalValue}>
