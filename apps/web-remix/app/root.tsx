@@ -9,7 +9,6 @@ import './tailwind.css';
 
 function App() {
   const nonce = useNonce();
-
   return (
     <Document nonce={nonce}>
       <Outlet />
