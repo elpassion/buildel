@@ -94,7 +94,7 @@ export default function WebsiteForm() {
 
     const id = setTimeout(() => {
       dispatch(done());
-    }, 10000);
+    }, 7500);
 
     return () => {
       clearTimeout(id);
@@ -118,8 +118,8 @@ export default function WebsiteForm() {
   };
 
   const onBlockStatusChange: OnBlockStatusChange = (block, status) => {
-    if (doesOutputExist(block) && !status) {
-      dispatch(setStatus(block, true));
+    if (doesOutputExist(block)) {
+      dispatch(setStatus(block, !status));
     }
   };
 
@@ -217,7 +217,7 @@ export default function WebsiteForm() {
 
             <Button
               size="sm"
-              className="my-6"
+              className="mt-4 mb-6"
               disabled={
                 formProps.state.isSubmitting || state.isWaitingForOutputs
               }
