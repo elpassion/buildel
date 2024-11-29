@@ -40,8 +40,7 @@ defmodule Buildel.Memories.Memory do
       :file_type,
       :collection_name,
       :memory_collection_id,
-      :content,
-      :file_uuid
+      :content
     ])
     |> assoc_constraint(:organization)
     |> assoc_constraint(:memory_collection)

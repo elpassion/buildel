@@ -13,7 +13,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
     groups: ["file", "memory"]
   )
 
-  definput(:input, schema: %{"type" => "object"}, type: :file, public: false)
   definput(:files, schema: %{"type" => "object"}, type: :file, public: true)
   definput(:query, schema: %{}, public: false)
 
@@ -176,105 +175,78 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
       output(state, :output, response)
       {:ok, state}
-    end
-  end
-
-  def handle_input(
-        :input,
-        %Message{type: :file, metadata: %{method: :delete}, message: message_message} = message,
-        state
-      ) do
-    send_stream_start(state, :output, message)
-
-    {:ok, collection, _} =
-      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
-
-    IO.inspect(collection)
-    IO.inspect(message_message)
-
-    try do
-      {:ok, _} = memory().delete(state.context.context_id, collection, message_message.file_id)
-
-      send_stream_stop(
-        state,
-        :output,
-        Message.from_message(message)
-        |> Message.set_type(:text)
-        |> Message.set_message("File deleted")
-      )
-
-      {:ok, state}
-    rescue
-      _ ->
+    else
+      {:error, reason, state} ->
         send_error(
           state,
           Message.from_message(message)
           |> Message.set_type(:text)
-          |> Message.set_message("Failed to delete file")
+          |> Message.set_message(reason)
         )
 
-        {:ok, state}
+        send_stream_stop(state, :output, message)
+
+        {:error, reason, state}
     end
   end
 
-  def handle_input(:input, %Message{type: :file, message: message_message} = message, state) do
+  def handle_tool_call(:query, %Message{message: %{args: args}} = message, state) do
     send_stream_start(state, :output, message)
 
-    {:ok, collection, _} =
-      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
+    with {:ok, result} <- do_query(state, args["message"]) do
+      response = message |> Message.from_message() |> Message.set_message(result)
 
-    try do
-      with {:ok, memory} <-
-             memory().create(
-               state.context.context_id,
-               collection,
-               %{
-                 path: message_message |> Map.get(:path),
-                 type: message_message |> Map.get(:file_type),
-                 name: message_message |> Map.get(:file_name)
-               },
-               %{
-                 file_uuid: message_message |> Map.get(:file_id)
-               }
-             ) do
-        output(
-          state,
-          :output,
-          message |> Message.set_message(memory.content) |> Message.set_type(:text)
-        )
+      output(state, :output, response)
 
-        {:ok, state}
-      else
-        {:error, _, reason} ->
-          send_error(
-            state,
-            Message.from_message(message)
-            |> Message.set_type(:text)
-            |> Message.set_message(reason)
-          )
-
-          {:ok, state}
-
-        _err ->
-          send_error(
-            state,
-            Message.from_message(message)
-            |> Message.set_type(:text)
-            |> Message.set_message("Failed to add the file")
-          )
-
-          {:ok, state}
-      end
-    rescue
-      _ ->
+      {:ok, response, state}
+    else
+      {:error, reason, state} ->
         send_error(
           state,
           Message.from_message(message)
           |> Message.set_type(:text)
-          |> Message.set_message("Failed to add the file")
+          |> Message.set_message(reason)
         )
 
-        {:ok, state}
+        send_stream_stop(state, :output, message)
+
+        {:error, reason, state}
+    end
+  end
+
+  def handle_tool_call(:parent, %Message{message: %{args: args}} = message, state) do
+    send_stream_start(state, :output, message)
+
+    with {:ok, result} <- do_parent(state, args["chunk_id"]) do
+      response = message |> Message.from_message() |> Message.set_message(result)
+
+      output(state, :output, response)
+
+      {:ok, response, state}
+    else
+      {:error, reason, state} ->
+        send_error(
+          state,
+          Message.from_message(message)
+          |> Message.set_type(:text)
+          |> Message.set_message(reason)
+        )
+
+        send_stream_stop(state, :output, message)
+
+        {:error, reason, state}
+    end
+  end
+
+  def handle_tool_call(:related, %Message{message: %{args: args}} = message, state) do
+    send_stream_start(state, :output, message)
+
+    with {:ok, result} <- do_related(state, args["chunk_id"]) do
+      response = message |> Message.from_message() |> Message.set_message(result)
+
+      output(state, :output, response)
+
+      {:ok, response, state}
     end
   end
 
@@ -316,92 +288,68 @@ defmodule Buildel.Blocks.NewDocumentSearch do
       {:ok,
        result
        |> Enum.map(&DocumentSearchJSON.show(&1))}
+    else
+      {:error, reason} -> {:error, reason, state}
     end
   rescue
-    _ -> {:error, :failed_to_search}
+    _ -> {:error, :failed_to_search, state}
   end
+
+  defp do_parent(state, nil), do: {:error, :not_found, state}
 
   defp do_parent(state, chunk_id) do
-    {:ok, _collection, collection_name} =
-      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
+    IO.inspect(chunk_id)
 
-    {:ok, vector_db} = memory().get_vector_db(state.context.context_id, option(state, :knowledge))
-
-    MemoryCollectionSearch.new(%{
-      vector_db: vector_db,
-      organization_collection_name: collection_name
-    })
-    |> MemoryCollectionSearch.parent(chunk_id)
-    |> then(&DocumentSearchJSON.show(&1))
-    |> Jason.encode!()
-  end
-
-  # defp do_related(state, chunk_id) do
-  #   {:ok, _collection, collection_name} =
-  #     memory().get_global_collection(state.context.context_id, option(state, :knowledge))
-
-  #   {:ok, vector_db} = memory().get_vector_db(state.context.context_id, option(state, :knowledge))
-
-  #   chunk = Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id)
-
-  #   params =
-  #     MemoryCollectionSearch.Params.from_map(%{
-  #       search_query: Map.get(chunk, "embedding"),
-  #       where: with_where(state),
-  #       limit: 2,
-  #       similarity_threshhold: option(state, :similarity_threshhold),
-  #       extend_neighbors: false,
-  #       extend_parents: false,
-  #       token_limit: nil
-  #     })
-
-  #   {result, _total_tokens, _embeddings_tokens} =
-  #     MemoryCollectionSearch.new(%{
-  #       vector_db: vector_db,
-  #       organization_collection_name: collection_name
-  #     })
-  #     |> MemoryCollectionSearch.search(params)
-
-  #   result
-  #   |> Enum.at(1)
-  #   |> then(&DocumentSearchJSON.show(&1))
-  #   |> Jason.encode!()
-  # end
-
-  def handle_tool_call(:query, %Message{message: %{args: args}} = message, state) do
-    send_stream_start(state, :output, message)
-
-    with {:ok, result} <- do_query(state, args["message"]) do
-      response = message |> Message.from_message() |> Message.set_message(result)
-
-      output(state, :output, response)
-
-      {:ok, response, state}
+    with {:ok, _collection, collection_name} <-
+           memory().get_global_collection(state.context.context_id, option(state, :knowledge)),
+         {:ok, vector_db} <-
+           memory().get_vector_db(state.context.context_id, option(state, :knowledge)) do
+      MemoryCollectionSearch.new(%{
+        vector_db: vector_db,
+        organization_collection_name: collection_name
+      })
+      |> MemoryCollectionSearch.parent(chunk_id)
+      |> then(&DocumentSearchJSON.show(&1))
+      |> then(&{:ok, &1})
+    else
+      {:error, reason} -> {:error, reason, state}
     end
+  rescue
+    _ -> {:error, :failed_to_retrieve_parent, state}
   end
 
-  def handle_tool_call(:parent, %Message{message: %{args: args}} = message, state) do
-    send_stream_start(state, :output, message)
+  defp do_related(state, chunk_id) do
+    with {:ok, _collection, collection_name} <-
+           memory().get_global_collection(state.context.context_id, option(state, :knowledge)),
+         {:ok, vector_db} <-
+           memory().get_vector_db(state.context.context_id, option(state, :knowledge)),
+         chunk when is_map(chunk) <-
+           Buildel.VectorDB.get_by_id(vector_db, collection_name, chunk_id) do
+      params =
+        MemoryCollectionSearch.Params.from_map(%{
+          search_query: Map.get(chunk, "embedding"),
+          where: with_where(state),
+          limit: 2,
+          similarity_threshhold: option(state, :similarity_threshhold),
+          extend_neighbors: false,
+          extend_parents: false,
+          token_limit: nil
+        })
 
-    result = do_parent(state, args["chunk_id"])
+      {result, _total_tokens, _embeddings_tokens} =
+        MemoryCollectionSearch.new(%{
+          vector_db: vector_db,
+          organization_collection_name: collection_name
+        })
+        |> MemoryCollectionSearch.search(params)
 
-    message = message |> Message.set_message(result) |> Message.set_type(:text)
-
-    output(state, :output, message)
-
-    {:ok, message, state}
-  end
-
-  def handle_tool_call(:related, %Message{message: %{args: args}} = message, state) do
-    send_stream_start(state, :output, message)
-
-    result = do_parent(state, args["chunk_id"])
-
-    message = message |> Message.set_message(result) |> Message.set_type(:text)
-
-    output(state, :output, message)
-
-    {:ok, message, state}
+      {:ok,
+       result
+       |> Enum.at(1)
+       |> then(&DocumentSearchJSON.show(&1))}
+    end
+  rescue
+    _ -> {:error, :failed_to_retrieve_related, state}
   end
 
   defp with_where(state) do

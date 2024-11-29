@@ -310,6 +310,16 @@ defmodule Buildel.Blocks.NewBlock.Definput do
 
             {:error, :invalid_input, state}
 
+          {:error, :not_found} ->
+            send_error(
+              state,
+              Message.from_message(message)
+              |> Message.set_type(:text)
+              |> Message.set_message(:record_not_found)
+            )
+
+            {:error, :record_not_found, state}
+
           {:error, %Ecto.Changeset{} = changeset} ->
             send_error(
               state,
@@ -626,6 +636,8 @@ defmodule Buildel.Blocks.NewBlock.Deftool do
       end
 
       if existing_tools |> Enum.count() == 0 do
+        defp format_tool_message(nil, _args), do: ""
+
         defp format_tool_message(value, args) do
           args
           |> Enum.reduce(value, fn
