@@ -23,7 +23,6 @@ defmodule Buildel.Clients.Memory do
     )
   end
 
-
   def get_vector_db(context_id, collection_name) do
     %{global: organization_id} = Context.context_from_context_id(context_id)
     organization = Buildel.Organizations.get_organization!(organization_id)

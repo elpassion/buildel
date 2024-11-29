@@ -131,13 +131,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
               "type" => "number",
               "description" => "The ID of a document to search in."
             }
-            # keywords: %{
-            #   type: "array",
-            #   items: %{
-            #     type: "string"
-            #   },
-            #   description: "The keywords to search for. Max 2 keywords"
-            # }
           }
         }
       },
@@ -176,10 +169,14 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   def handle_input(:query, %Message{type: :text, message: message_query} = message, state) do
     send_stream_start(state, :output, message)
 
-    result = do_query(state, message_query)
+    response = message |> Message.from_message()
 
-    output(state, :output, message |> Message.set_message(result))
-    {:ok, state}
+    with {:ok, result} <- do_query(state, message_query) do
+      response = response |> Message.set_message(result)
+
+      output(state, :output, response)
+      {:ok, state}
+    end
   end
 
   def handle_input(
@@ -191,6 +188,9 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
     {:ok, collection, _} =
       memory().get_global_collection(state.context.context_id, option(state, :knowledge))
+
+    IO.inspect(collection)
+    IO.inspect(message_message)
 
     try do
       {:ok, _} = memory().delete(state.context.context_id, collection, message_message.file_id)
@@ -210,7 +210,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
           state,
           Message.from_message(message)
           |> Message.set_type(:text)
-          |> Message.set_message("Failed to delete the file")
+          |> Message.set_message("Failed to delete file")
         )
 
         {:ok, state}
@@ -280,6 +280,7 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
   defp do_query(state, query, tool_filters \\ %{}) do
     token_limit = option(state, :token_limit)
+    token_limit = if token_limit == 0, do: nil, else: token_limit
 
     params =
       MemoryCollectionSearch.Params.from_map(%{
@@ -290,40 +291,34 @@ defmodule Buildel.Blocks.NewDocumentSearch do
           end),
         limit: option(state, :limit),
         similarity_threshhold: option(state, :similarity_threshhold),
-        extend_neighbors: option(state, :extend_neighbors) != false,
-        extend_parents: option(state, :extend_parents) != false,
-        token_limit:
-          if token_limit == 0 do
-            nil
-          else
-            token_limit
-          end
+        extend_neighbors: option(state, :extend_neighbors),
+        extend_parents: option(state, :extend_parents),
+        token_limit: token_limit
       })
 
-    {:ok, collection, collection_name} =
-      memory().get_global_collection(state.context.context_id, option(state, :knowledge))
-
-    {:ok, vector_db} = memory().get_vector_db(state.context.context_id, option(state, :knowledge))
-
-    {result, _total_tokens, embeddings_tokens} =
-      MemoryCollectionSearch.new(%{
-        vector_db: vector_db,
-        organization_collection_name: collection_name
-      })
-      |> MemoryCollectionSearch.search(params)
-
-    create_run_and_collection_cost(
-      state.context.context_id,
-      state[:block_name],
-      embeddings_tokens,
-      collection.id
-    )
-
-    result
-    |> Enum.map(&DocumentSearchJSON.show(&1))
-    |> Jason.encode!()
+    with {:ok, collection, collection_name} <-
+           memory().get_global_collection(state.context.context_id, option(state, :knowledge)),
+         {:ok, vector_db} <-
+           memory().get_vector_db(state.context.context_id, option(state, :knowledge)),
+         {result, _total_tokens, embeddings_tokens} <-
+           MemoryCollectionSearch.new(%{
+             vector_db: vector_db,
+             organization_collection_name: collection_name
+           })
+           |> MemoryCollectionSearch.search(params),
+         _ <-
+           create_run_and_collection_cost(
+             state.context.context_id,
+             state[:block_name],
+             embeddings_tokens,
+             collection.id
+           ) do
+      {:ok,
+       result
+       |> Enum.map(&DocumentSearchJSON.show(&1))}
+    end
   rescue
-    _ -> "Could not return record"
+    _ -> {:error, :failed_to_search}
   end
 
   defp do_parent(state, chunk_id) do
@@ -376,17 +371,16 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   def handle_tool_call(:query, %Message{message: %{args: args}} = message, state) do
     send_stream_start(state, :output, message)
 
-    result = do_query(state, args["message"])
+    with {:ok, result} <- do_query(state, args["message"]) do
+      response = message |> Message.from_message() |> Message.set_message(result)
 
-    message = message |> Message.set_message(result) |> Message.set_type(:text)
+      output(state, :output, response)
 
-    output(state, :output, message)
-
-    {:ok, message, state}
+      {:ok, response, state}
+    end
   end
 
   def handle_tool_call(:parent, %Message{message: %{args: args}} = message, state) do
-    IO.inspect(args, label: "parent")
     send_stream_start(state, :output, message)
 
     result = do_parent(state, args["chunk_id"])
@@ -399,7 +393,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
   end
 
   def handle_tool_call(:related, %Message{message: %{args: args}} = message, state) do
-    IO.inspect(args, label: "related")
     send_stream_start(state, :output, message)
 
     result = do_parent(state, args["chunk_id"])
@@ -410,8 +403,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
 
     {:ok, message, state}
   end
-
-  ## --- Added ---
 
   defp with_where(state) do
     %{
@@ -470,8 +461,6 @@ defmodule Buildel.Blocks.NewDocumentSearch do
         {:error, :not_found}
     end
   end
-
-  ## ----
 end
 
 defmodule Buildel.Blocks.NewDocumentSearch.DocumentSearchJSON do

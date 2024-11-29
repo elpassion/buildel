@@ -86,6 +86,7 @@ defmodule Buildel.Blocks.Utils.Schemas do
       "readonly" => readonly,
       "url" => "/api/organizations/{{organization_id}}/memory_collections",
       "presentAs" => "async-creatable-select",
+      "minLength" => 1,
       "schema" => %{
         "type" => "object",
         "required" => ["collection_name"],

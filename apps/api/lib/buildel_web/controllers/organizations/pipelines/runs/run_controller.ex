@@ -502,7 +502,7 @@ defmodule BuildelWeb.OrganizationPipelineRunController do
              input_name,
              Message.new(:file, %{
                path: file |> Map.get(:path),
-               file_id: UUID.uuid4(),
+               file_id: file_id,
                file_name: file |> Map.get(:filename),
                file_type: file |> Map.get(:content_type)
              })

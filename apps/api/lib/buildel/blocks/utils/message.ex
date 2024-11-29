@@ -47,6 +47,11 @@ defmodule Buildel.Blocks.Utils.Message do
   end
 
   @spec set_message(t(), any()) :: t()
+  def set_message(message, message_message)
+      when is_map(message_message) or is_list(message_message) do
+    %__MODULE__{message | message: message_message, type: :json}
+  end
+
   def set_message(message, message_message) do
     %__MODULE__{message | message: message_message}
   end
@@ -93,8 +98,8 @@ defmodule Buildel.Blocks.Utils.Message do
   def to_string(%__MODULE__{type: :text, message: message}), do: {:ok, message}
   def to_string(%__MODULE__{type: :json, message: message}), do: Jason.encode(message)
 
-  def to_map(%__MODULE__{type: :json, message: message}), do:  {:ok, message}
-  def to_map(%__MODULE__{type: :text, message: message}), do:  Jason.decode(message)
+  def to_map(%__MODULE__{type: :json, message: message}), do: {:ok, message}
+  def to_map(%__MODULE__{type: :text, message: message}), do: Jason.decode(message)
 
   defimpl Jason.Encoder, for: [__MODULE__] do
     alias Buildel.Blocks.Utils.Message
