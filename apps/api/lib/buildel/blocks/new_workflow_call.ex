@@ -43,7 +43,14 @@ defmodule Buildel.Blocks.NewWorkflowCall do
         }
       }
     },
-    "default" => []
+    "default" => [],
+    "displayWhen" => %{
+      "connections" => %{
+        "call_worker" => %{
+          "min" => 1
+        }
+      }
+    }
   })
 
   defoption(
