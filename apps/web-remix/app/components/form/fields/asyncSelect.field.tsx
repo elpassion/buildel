@@ -39,6 +39,7 @@ export const AsyncSelectField = ({
       whenSubmitted: 'onBlur',
     },
   });
+
   const [selectedId, setSelectedId] = useControlField<string | undefined>(name);
   const [apiError, setApiError] = useState<string | undefined>();
 
