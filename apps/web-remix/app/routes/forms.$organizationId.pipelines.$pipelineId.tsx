@@ -195,14 +195,14 @@ export default function WebsiteForm() {
   });
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen w-full text-foreground bg-secondary">
+    <div className="flex flex-col justify-center items-center h-screen w-full text-foreground bg-secondary overflow-y-auto pt-20">
       <ChatHeader className="mb-4 w-full py-6 px-2 md:px-4 absolute top-0 left-0 right-0">
         <ChatHeading>{pipeline.name}</ChatHeading>
 
         <ChatStatus connectionStatus={status} />
       </ChatHeader>
 
-      <div className="flex flex-col max-w-3xl w-full rounded-lg p-2 md:p-4">
+      <div className="flex flex-col max-w-3xl w-full rounded-lg pb-6 px-2 md:px-4">
         <FormContext value={formProps}>
           <form onSubmit={onSubmit} className="w-full border-b mb-6">
             <div className="flex flex-col items-start w-full gap-4">
