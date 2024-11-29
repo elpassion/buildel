@@ -9,11 +9,14 @@ type PropertyValue =
   | null
   | undefined;
 
+// todo refactor this form after bum to rmv
+
 type State = {
   formValues: {
     [key: string]: PropertyValue;
   };
   formErrors: Record<string, string[]>;
+
   isSubmitting?: boolean;
 };
 
@@ -89,8 +92,10 @@ export const FormContext = React.createContext<{
 export function useForm({
   defaultValues,
   onSubmit,
+  requiredFields,
 }: {
   defaultValues?: State['formValues'];
+  requiredFields?: string[];
   onSubmit?: (
     data: State['formValues'],
     e: React.FormEvent<HTMLFormElement>,
@@ -104,11 +109,14 @@ export function useForm({
 
   const validate = () => {
     const errors: Record<string, string[]> = {};
-    Object.entries(state.formValues).forEach(([key, value]) => {
-      if (!value) {
-        errors[key] = ['This field is required'];
-      }
-    });
+
+    if (requiredFields) {
+      requiredFields.forEach((field) => {
+        if (!state.formValues[field]) {
+          errors[field] = ['This field is required'];
+        }
+      });
+    }
 
     dispatch({ type: 'SET_ERRORS', payload: errors });
 

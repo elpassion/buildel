@@ -11,7 +11,7 @@
 }
 
 .rc-select .rc-select-selector .rc-select-selection-search-input {
-  @apply !bg-white !shadow-none !ring-0 !text-foreground !text-sm !h-[40px] !outline-none;
+  @apply !bg-white !shadow-none !ring-0 !text-foreground !text-sm !h-[36px] !outline-none;
 }
 
 .rc-select .rc-select-selection-placeholder {

@@ -77,6 +77,16 @@ export function formInterfaceReducer(
     case 'DONE':
       return {
         ...state,
+        outputs: Object.keys(state.outputs).reduce(
+          (acc, key) => {
+            acc[key] = {
+              ...state.outputs[key],
+              isCompleted: true,
+            };
+            return acc;
+          },
+          {} as Record<string, Output>,
+        ),
         isWaitingForOutputs: false,
       };
 

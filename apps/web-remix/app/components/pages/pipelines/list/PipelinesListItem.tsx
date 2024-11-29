@@ -49,7 +49,11 @@ import { cn } from '~/utils/cn';
 import { MonetaryValue } from '~/utils/MonetaryValue';
 import { routes } from '~/utils/routes.utils';
 
-import type { IInterfaceConfigForm, IPipeline } from '../pipeline.types';
+import type {
+  IInterfaceFormConfigForm,
+  IInterfaceWebchatConfigForm,
+  IPipeline,
+} from '../pipeline.types';
 
 interface PipelinesListItemProps extends PropsWithChildren {
   className?: string;
@@ -250,7 +254,9 @@ function PipelineItemInterfaceBadge({
   className,
   interfaceConfig,
   ...rest
-}: BadgeProps & { interfaceConfig: IInterfaceConfigForm }) {
+}: BadgeProps & {
+  interfaceConfig: IInterfaceFormConfigForm | IInterfaceWebchatConfigForm;
+}) {
   return (
     <TooltipProvider>
       <Tooltip delayDuration={500}>
@@ -294,6 +300,8 @@ function PipelineItemInterfaceBadge({
   );
 }
 
-function isInterfaceInitialized(config: IInterfaceConfigForm) {
+function isInterfaceInitialized(
+  config: IInterfaceFormConfigForm | IInterfaceWebchatConfigForm,
+) {
   return config.outputs.length > 0 && config.inputs.length > 0;
 }

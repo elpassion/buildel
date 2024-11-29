@@ -13,10 +13,10 @@ import type {
   IBlockConfig,
   IConfigConnection,
   IInterfaceConfig,
+  IInterfaceConfigProperty,
   INode,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
-import { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
 import {
   getEdges,
   getNodes,
@@ -211,8 +211,8 @@ function validateInterfaceConfigs(
 }
 
 function validateInterfaceProperty(updated: IExtendedBlockConfig) {
-  return (property: IInterfaceConfigFormProperty) => {
-    const updatedProperty: IInterfaceConfigFormProperty = { ...property };
+  return (property: IInterfaceConfigProperty) => {
+    const updatedProperty: IInterfaceConfigProperty = { ...property };
 
     if (property.name === updated.oldName) {
       updatedProperty.name = updated.name;

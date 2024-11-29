@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from 'react';
 import React, { useCallback, useEffect, useReducer } from 'react';
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
@@ -29,6 +30,7 @@ import type {
   TextOutput,
 } from '~/components/pages/interfaces/form/formInterface.reducer';
 import {
+  done,
   formInterfaceReducer,
   generate,
   setOutput,
@@ -39,7 +41,10 @@ import {
   NodeCopyButton,
   NodeDownloadButton,
 } from '~/components/pages/pipelines/Nodes/CustomNodes/NodeActionButtons';
-import type { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
+import type {
+  IInterfaceConfigFormOutputProperty,
+  IInterfaceConfigFormProperty,
+} from '~/components/pages/pipelines/pipeline.types';
 import { usePipelineRun } from '~/components/pages/pipelines/usePipelineRun';
 import { Button } from '~/components/ui/button';
 import { InputMessage, Label } from '~/components/ui/label';
@@ -83,6 +88,18 @@ export default function WebsiteForm() {
     outputs: defaultOutputs(),
     isWaitingForOutputs: false,
   });
+
+  useEffect(() => {
+    if (!state.isWaitingForOutputs) return;
+
+    const id = setTimeout(() => {
+      dispatch(done());
+    }, 10000);
+
+    return () => {
+      clearTimeout(id);
+    };
+  }, [state.isWaitingForOutputs]);
 
   const onBlockOutput: OnBlockOutput = (block, _output, payload, metadata) => {
     if (doesOutputExist(block)) {
@@ -159,6 +176,15 @@ export default function WebsiteForm() {
 
   const { onSubmit, ...formProps } = useForm({
     onSubmit: handleOnSubmit,
+    requiredFields: pipeline.interface_config.form.inputs.reduce(
+      (acc, curr) => {
+        if (curr.required) {
+          return [...acc, curr.name];
+        }
+        return acc;
+      },
+      [] as string[],
+    ),
     defaultValues: pipeline.interface_config.form.inputs.reduce(
       (acc, curr) => ({
         ...acc,
@@ -201,13 +227,14 @@ export default function WebsiteForm() {
           </form>
 
           <div className="flex flex-col gap-4">
-            {Object.entries(state.outputs).map(([key, output]) => (
+            {pipeline.interface_config.form.outputs.map((output) => (
               <FormInterfaceOutput
-                key={key}
-                data={
+                key={output.name}
+                data={output}
+                result={
                   state.isWaitingForOutputs
-                    ? { ...output, value: undefined }
-                    : output
+                    ? { ...state.outputs[output.name], value: undefined }
+                    : state.outputs[output.name]
                 }
               />
             ))}
@@ -226,20 +253,24 @@ export function FormInterfaceInput({ data }: FormInterfaceInputProps) {
   if (data.type === 'text_input') {
     return (
       <>
-        <Label>{data.name}</Label>
+        <Label>{data.label || data.name}</Label>
         <div>
           <FormInterfaceTextInput data={data} />
-          <FormInterfaceFieldMessage data={data} />
+          <FormInterfaceFieldMessage data={data}>
+            {data.description}
+          </FormInterfaceFieldMessage>
         </div>
       </>
     );
   } else if (data.type === 'file_input') {
     return (
       <>
-        <Label>{data.name}</Label>
+        <Label>{data.label || data.name}</Label>
         <div>
           <FormInterfaceFileInput data={data} />
-          <FormInterfaceFieldMessage data={data} />
+          <FormInterfaceFieldMessage data={data}>
+            {data.description}
+          </FormInterfaceFieldMessage>
         </div>
 
         <div>
@@ -268,11 +299,13 @@ export function FormInterfaceInput({ data }: FormInterfaceInputProps) {
   } else if (data.type === 'image_input') {
     return (
       <>
-        <Label>{data.name}</Label>
+        <Label>{data.label || data.name}</Label>
 
         <div>
           <FormInterfaceFileInput data={data} accept="image/*" />
-          <FormInterfaceFieldMessage data={data} />
+          <FormInterfaceFieldMessage data={data}>
+            {data.description}
+          </FormInterfaceFieldMessage>
         </div>
 
         <div>
@@ -320,12 +353,15 @@ function FormInterfaceTextInput({ data }: FormInterfaceInputProps) {
   );
 }
 
-function FormInterfaceFieldMessage({ data }: FormInterfaceInputProps) {
+function FormInterfaceFieldMessage({
+  data,
+  children,
+}: PropsWithChildren<FormInterfaceInputProps>) {
   const { errors } = useFormField(data.name);
 
   const isError = errors && errors.length > 0;
 
-  const body = isError ? errors.join(', ') : null;
+  const body = isError ? errors.join(', ') : children;
 
   if (!body) {
     return null;
@@ -444,76 +480,100 @@ function renderSize(size: number) {
 }
 
 interface FormInterfaceOutputProps {
-  data: Output;
+  result: Output;
+  data: IInterfaceConfigFormOutputProperty;
 }
 
-export function FormInterfaceOutput({ data }: FormInterfaceOutputProps) {
-  if (data.type === 'text_output') {
-    return <FormInterfaceTextOutput data={data as TextOutput} />;
+export function FormInterfaceOutput({
+  data,
+  result,
+}: FormInterfaceOutputProps) {
+  if (result.type === 'text_output') {
+    return (
+      <FormInterfaceTextOutput result={result as TextOutput} data={data} />
+    );
   } else if (
-    (data.type === 'file_output' || data.type === 'image_output') &&
-    data.value &&
-    data.metadata &&
-    !data.metadata.file_type.includes('image')
+    (result.type === 'file_output' || result.type === 'image_output') &&
+    result.value &&
+    result.metadata &&
+    !result.metadata.file_type.includes('image')
   ) {
-    return <FormInterfaceFileOutput data={data as Required<FileOutput>} />;
+    return (
+      <FormInterfaceFileOutput
+        result={result as Required<FileOutput>}
+        data={data}
+      />
+    );
   } else if (
-    data.type === 'image_output' &&
-    data.value &&
-    data.metadata &&
-    data.metadata.file_type.includes('image')
+    result.type === 'image_output' &&
+    result.value &&
+    result.metadata &&
+    result.metadata.file_type.includes('image')
   ) {
-    console.log(data.metadata);
-    return <FormInterfaceImageOutput data={data as Required<FileOutput>} />;
+    return (
+      <FormInterfaceImageOutput
+        result={result as Required<FileOutput>}
+        data={data}
+      />
+    );
   }
 
   return null;
 }
 
 interface FormInterfaceTextOutputProps {
-  data: TextOutput;
+  result: TextOutput;
+  data: IInterfaceConfigFormOutputProperty;
 }
 
 export function FormInterfaceTextOutput({
   data,
+  result,
 }: FormInterfaceTextOutputProps) {
   return (
     <div className="w-full">
       <div className="flex items-center justify-between gap2 flex-wrap mb-2">
-        <Label>{data.name}</Label>
+        <Label>{data.label || data.name}</Label>
         <div className="mb-1 flex gap-1">
-          <NodeCopyButton text={data.value ?? ''} />
+          <NodeCopyButton text={result.value ?? ''} />
 
-          <NodeDownloadButton blockName={data.name} text={data.value ?? ''} />
+          <NodeDownloadButton blockName={data.name} text={result.value ?? ''} />
         </div>
       </div>
+
       <div className="bg-white w-full prose min-w-[280px] max-w-full px-3 py-1 overflow-y-auto resize min-h-[100px] max-h-[500px] border border-input rounded-md">
-        <ChatMarkdown>{data.value ?? ''}</ChatMarkdown>
+        <ChatMarkdown>{result.value ?? ''}</ChatMarkdown>
       </div>
+
+      {data.description ? (
+        <InputMessage size="sm">{data.description}</InputMessage>
+      ) : null}
     </div>
   );
 }
 
 interface FormInterfaceFileOutputProps {
-  data: Required<FileOutput>;
+  result: Required<FileOutput>;
+  data: IInterfaceConfigFormOutputProperty;
 }
 
 export function FormInterfaceFileOutput({
   data,
+  result,
 }: FormInterfaceFileOutputProps) {
-  const fileName = data.metadata?.file_name ?? 'file';
+  const fileName = result.metadata?.file_name ?? 'file';
 
   const download = () => {
-    downloadFile(data.value, fileName);
+    downloadFile(result.value, fileName);
   };
 
   return (
     <div className="flex flex-col gap-2">
-      <Label>{data.name}</Label>
+      <Label>{data.label || data.name}</Label>
 
-      {data.value ? (
+      {result.value ? (
         <FormInterfaceFilePreviewItem
-          file={new File([data.value], fileName)}
+          file={new File([result.value], fileName)}
           action={
             <IconButton
               icon={<FileDown />}
@@ -526,26 +586,31 @@ export function FormInterfaceFileOutput({
           }
         />
       ) : null}
+
+      {data.description ? (
+        <InputMessage size="sm">{data.description}</InputMessage>
+      ) : null}
     </div>
   );
 }
 
 export function FormInterfaceImageOutput({
   data,
+  result,
 }: FormInterfaceFileOutputProps) {
-  const fileName = data.metadata?.file_name ?? 'image';
+  const fileName = result.metadata?.file_name ?? 'image';
 
   const download = () => {
-    downloadFile(data.value, fileName);
+    downloadFile(result.value, fileName);
   };
 
   return (
     <div className="flex flex-col gap-2">
-      <Label>{data.name}</Label>
+      <Label>{data.label || data.name}</Label>
 
-      {data.value ? (
+      {result.value ? (
         <FormInterfaceImagePreviewItem
-          file={new File([data.value], fileName)}
+          file={new File([result.value], fileName)}
           action={
             <IconButton
               icon={<ImageDown />}
@@ -556,6 +621,10 @@ export function FormInterfaceImageOutput({
             />
           }
         />
+      ) : null}
+
+      {data.description ? (
+        <InputMessage size="sm">{data.description}</InputMessage>
       ) : null}
     </div>
   );

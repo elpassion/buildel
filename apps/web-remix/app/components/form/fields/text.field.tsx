@@ -17,7 +17,7 @@ export const TextInputField = ({
   ...props
 }: Partial<TextInputFieldProps> & {
   validationBehavior?: Partial<ValidationBehaviorOptions>;
-  ref?: React.RefObject<HTMLInputElement | null>;
+  ref?: React.RefObject<HTMLInputElement | null> | null;
 }) => {
   const { name, getInputProps, error } = useFieldContext({
     validationBehavior,
@@ -58,7 +58,7 @@ export function ResettableTextInputField({
   size,
   ...props
 }: Partial<TextInputFieldProps> & { label: string }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const { name } = useFieldContext({
     validationBehavior: {
       initial: 'onChange',

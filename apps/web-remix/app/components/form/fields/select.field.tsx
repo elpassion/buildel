@@ -40,7 +40,7 @@ export const SelectField = ({
         }
         {...getInputProps()}
       />
-      <FieldLabel>{label}</FieldLabel>
+      {label ? <FieldLabel>{label}</FieldLabel> : null}
       <SelectInput
         id={name}
         options={options}
