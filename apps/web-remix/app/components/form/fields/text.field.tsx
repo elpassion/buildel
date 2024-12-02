@@ -22,7 +22,7 @@ export const TextInputField = ({
     validationBehavior: {
       whenSubmitted: 'onSubmit',
       whenTouched: 'onSubmit',
-      initial: 'onSubmit',
+      initial: 'onChange',
       ...validationBehavior,
     },
   });
