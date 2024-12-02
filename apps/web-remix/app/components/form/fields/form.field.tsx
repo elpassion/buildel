@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  FieldArray as FA,
+import type {
   FieldArrayApi as FAI,
   FieldApi as FApi,
   FormApi as FoApi,
+  FormScope as FS,
+  ValidationBehaviorConfig,
+} from '@rvf/remix';
+import {
+  FieldArray as FA,
   useControlField as ucf,
   useField as uf,
   useFieldArray as ufa,
@@ -18,10 +22,11 @@ export const useField = uf;
 export const useFormScopeOrContext = ufsc;
 export const FieldArray = FA;
 export const useFieldArray = ufa;
-export type ValidationBehaviorOptions = any; // Define your validation behavior options here
+export type ValidationBehaviorOptions = ValidationBehaviorConfig; // Define your validation behavior options here
 export type FieldArrayApi<T extends any[]> = FAI<T>;
 export type FieldApi<T> = FApi<T>;
 export type FormApi<T> = FoApi<T>;
+export type FormScope<T> = FS<T>;
 
 export const useCurrentFormState = () => {
   const {

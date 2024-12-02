@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 
-import { ICurrentUser } from '~/api/CurrentUserApi';
+import type { ICurrentUser } from '~/api/CurrentUserApi';
 
 export const handlers = [
   http.post('/super-api/users/log_in', () => {

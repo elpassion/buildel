@@ -2,12 +2,11 @@ import type { LoaderFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
 import invariant from 'tiny-invariant';
 
-import { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
+import type { IPipelinePublicResponse } from '~/api/pipeline/pipeline.contracts';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
 import { chatSize } from '~/components/chat/chat.types';
 import { UnauthorizedError } from '~/utils/errors';
-import type { fetchTyped } from '~/utils/fetch.server';
-import { ParsedResponse } from '~/utils/fetch.server';
+import type { fetchTyped, ParsedResponse } from '~/utils/fetch.server';
 
 export const interfaceLoader = async (
   { request, params }: LoaderFunctionArgs,

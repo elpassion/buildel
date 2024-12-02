@@ -29,7 +29,7 @@ export const FieldContext = React.createContext<{
 } | null>(null);
 
 export interface UseFieldContextProps {
-  validationBehavior?: Partial<ValidationBehaviorOptions>;
+  validationBehavior?: ValidationBehaviorOptions;
 }
 
 export const useFieldContext = (args?: UseFieldContextProps) => {
@@ -37,7 +37,7 @@ export const useFieldContext = (args?: UseFieldContextProps) => {
   if (!context)
     throw new Error('You tried to use a field without using <Field />');
   const fieldProps = useField(context.name, {
-    validationBehavior: args?.validationBehavior ?? { initial: 'onSubmit' },
+    validationBehavior: args?.validationBehavior,
   });
 
   return useMemo(

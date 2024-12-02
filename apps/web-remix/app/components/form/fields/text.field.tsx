@@ -16,8 +16,7 @@ export const TextInputField = ({
   validationBehavior,
   ...props
 }: Partial<TextInputFieldProps> & {
-  validationBehavior?: Partial<ValidationBehaviorOptions>;
-  ref?: React.RefObject<HTMLInputElement | null> | null;
+  validationBehavior?: ValidationBehaviorOptions;
 }) => {
   const { name, getInputProps, error } = useFieldContext({
     validationBehavior,
@@ -27,7 +26,6 @@ export const TextInputField = ({
     <TextInput
       id={name}
       name={name}
-      // @ts-ignore
       ref={ref}
       aria-invalid={error ? true : undefined}
       aria-describedby={`${name}-error`}

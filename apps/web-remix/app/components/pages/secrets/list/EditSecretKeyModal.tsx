@@ -23,7 +23,7 @@ import {
 import { ValidatedForm, withZod } from '~/utils/form';
 
 import type { ISecretKey } from '../variables.types';
-import { loader } from './loader.server';
+import type { loader } from './loader.server';
 
 interface EditSecretModalProps {
   isOpen: boolean;

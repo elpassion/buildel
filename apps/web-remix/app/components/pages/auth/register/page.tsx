@@ -101,6 +101,7 @@ export function RegisterPage() {
           href="https://buildel.ai/terms-and-conditions"
           target="_blank"
           className="font-semibold hover:underline"
+          rel="noreferrer"
         >
           terms of service
         </a>{' '}
@@ -109,6 +110,7 @@ export function RegisterPage() {
           href="https://buildel.ai/privacy-policy"
           target="_blank"
           className="font-semibold hover:underline"
+          rel="noreferrer"
         >
           privacy policy
         </a>
