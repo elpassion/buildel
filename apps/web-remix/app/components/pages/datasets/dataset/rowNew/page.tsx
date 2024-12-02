@@ -34,12 +34,7 @@ export function DatasetRowNew() {
     navigate(routes.dataset(organizationId, datasetId, pagination));
   };
 
-  const onCreate = (
-    { data }: z.TypeOf<typeof CreateDatasetRowSchema>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const onCreate = ({ data }: z.TypeOf<typeof CreateDatasetRowSchema>) => {
     fetcher.submit({ data }, { method: 'POST' });
   };
 
@@ -59,7 +54,7 @@ export function DatasetRowNew() {
                 id="new-dataset-row-form"
                 noValidate
                 validator={validator}
-                onSubmit={onCreate}
+                handleSubmit={onCreate}
                 defaultValues={{ data: '{}' }}
               >
                 <Field name="data">

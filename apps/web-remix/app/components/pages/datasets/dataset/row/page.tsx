@@ -35,12 +35,7 @@ export function DatasetRowPage() {
     navigate(routes.dataset(organizationId, datasetId, pagination));
   };
 
-  const onEdit = (
-    { data }: z.TypeOf<typeof UpdateDatasetRowSchema>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const onEdit = ({ data }: z.TypeOf<typeof UpdateDatasetRowSchema>) => {
     fetcher.submit({ data }, { method: 'PUT' });
   };
 
@@ -63,7 +58,7 @@ export function DatasetRowPage() {
                 id="dataset-row-form"
                 noValidate
                 validator={validator}
-                onSubmit={onEdit}
+                handleSubmit={onEdit}
                 defaultValues={{ data: JSON.stringify(row.data) }}
               >
                 <Field name="data">
