@@ -19,7 +19,12 @@ export const TextInputField = ({
   validationBehavior?: ValidationBehaviorOptions;
 }) => {
   const { name, getInputProps, error } = useFieldContext({
-    validationBehavior,
+    validationBehavior: {
+      whenSubmitted: 'onSubmit',
+      whenTouched: 'onSubmit',
+      initial: 'onSubmit',
+      ...validationBehavior,
+    },
   });
 
   return (
