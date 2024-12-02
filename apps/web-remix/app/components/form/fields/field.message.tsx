@@ -18,7 +18,7 @@ export const FieldMessage = ({
 }: FieldMessageProps) => {
   const { error } = useFieldContext();
 
-  const body = propsError ? propsError : error() ? error() : children;
+  const body = propsError ? propsError : error ? error : children;
 
   const isError = !!error || !!propsError;
 

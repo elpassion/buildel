@@ -79,7 +79,7 @@ export const CreatableAsyncSelectField = ({
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
     [],
   );
-  const { getControlProps, onChange } = useField<string | undefined>(name());
+  const { getControlProps, onChange } = useField<string | undefined>(name);
 
   const selectedId = getControlProps().value;
 

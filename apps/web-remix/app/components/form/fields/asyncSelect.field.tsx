@@ -40,7 +40,7 @@ export const AsyncSelectField = ({
     },
   });
 
-  const { getControlProps, onChange } = useField<string | undefined>(name());
+  const { getControlProps, onChange } = useField<string | undefined>(name);
 
   const selectedId = getControlProps().value;
 
@@ -82,7 +82,7 @@ export const AsyncSelectField = ({
       <HiddenField value={selectedId ?? ''} {...getInputProps()} />
       <FieldLabel>{label}</FieldLabel>
       <AsyncSelectInput
-        id={id ?? name()}
+        id={id ?? name}
         onBlur={getInputProps().onBlur}
         placeholder="Select..."
         fetchOptions={fetcher}

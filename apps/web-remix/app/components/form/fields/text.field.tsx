@@ -25,15 +25,15 @@ export const TextInputField = ({
 
   return (
     <TextInput
-      id={name()}
-      name={name()}
+      id={name}
+      name={name}
       // @ts-ignore
       ref={ref}
-      aria-invalid={error() ? true : undefined}
+      aria-invalid={error ? true : undefined}
       aria-describedby={`${name}-error`}
-      aria-errormessage={error() ? `${name()}-error` : undefined}
-      aria-label={name()}
-      autoComplete={name()}
+      aria-errormessage={error ? `${name}-error` : undefined}
+      aria-label={name}
+      autoComplete={name}
       {...getInputProps()}
       {...props}
     />
@@ -67,7 +67,7 @@ export function ResettableTextInputField({
     },
   });
 
-  const [value, setValue] = useControlField<string | undefined>(name());
+  const [value, setValue] = useControlField<string | undefined>(name);
 
   useEffect(() => {
     if (typeof defaultValue === 'string') {

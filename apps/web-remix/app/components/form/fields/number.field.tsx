@@ -13,12 +13,12 @@ export const NumberInputField = ({
   const { name, getInputProps, error } = useFieldContext();
   return (
     <NumberInput
-      name={name()}
+      name={name}
       ref={ref}
-      aria-invalid={error() ? true : undefined}
-      aria-describedby={`${name()}-error`}
-      aria-errormessage={error() ? `${name()}-error` : undefined}
-      autoComplete={name()}
+      aria-invalid={error ? true : undefined}
+      aria-describedby={`${name}-error`}
+      aria-errormessage={error ? `${name}-error` : undefined}
+      autoComplete={name}
       {...getInputProps()}
       {...props}
     />

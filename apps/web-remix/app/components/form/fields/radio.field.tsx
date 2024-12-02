@@ -42,7 +42,7 @@ export const RadioGroupField = ({
   > | null>;
 }) => {
   const { name, getInputProps, validate } = useFieldContext();
-  const [formValue, setFormValue] = useControlField<string>(name());
+  const [formValue, setFormValue] = useControlField<string>(name);
   useEffect(() => {
     if (!formValue && defaultValue) {
       setFormValue(defaultValue as string);
@@ -61,7 +61,7 @@ export const RadioGroupField = ({
   return (
     <RadioGroup
       ref={ref}
-      name={name()}
+      name={name}
       onChange={onChange}
       onBlur={getInputProps({ type: 'radio' }).onBlur}
       onValueChange={(value) => {

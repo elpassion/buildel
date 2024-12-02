@@ -21,11 +21,7 @@ export const VideoNodeBody = ({
 }: VideoNodeBodyProps) => {
   const schema = generateZODSchema(data.block_type?.schema as any);
   const validator = React.useMemo(() => withZod(schema), []);
-  const handleSubmit = (
-    data: Record<string, any>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleSubmit = (data: Record<string, any>) => {
     onSubmit?.(data.opts);
   };
 
@@ -33,7 +29,7 @@ export const VideoNodeBody = ({
     <ValidatedForm
       // @ts-ignore
       validator={validator}
-      onSubmit={handleSubmit}
+      handleSubmit={handleSubmit}
       className="min-w-[300px]"
       noValidate
     >

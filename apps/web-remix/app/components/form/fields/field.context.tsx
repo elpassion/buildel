@@ -1,4 +1,4 @@
-import React, { use } from 'react';
+import React, { use, useMemo } from 'react';
 
 import type { ValidationBehaviorOptions } from '~/components/form/fields/form.field';
 import { useField } from '~/components/form/fields/form.field';
@@ -40,5 +40,13 @@ export const useFieldContext = (args?: UseFieldContextProps) => {
     validationBehavior: args?.validationBehavior ?? { initial: 'onSubmit' },
   });
 
-  return { ...context, ...fieldProps };
+  return useMemo(
+    () => ({
+      ...context,
+      ...fieldProps,
+      name: fieldProps.name(),
+      error: fieldProps.error(),
+    }),
+    [context, fieldProps],
+  );
 };

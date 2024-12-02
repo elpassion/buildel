@@ -27,9 +27,7 @@ export const SelectField = ({
   ...props
 }: SelectFieldProps & { ref?: React.RefObject<HTMLSelectElement> }) => {
   const { name, getInputProps } = useFieldContext();
-  const [selectedId, setSelectedId] = useControlField<string | string[]>(
-    name(),
-  );
+  const [selectedId, setSelectedId] = useControlField<string | string[]>(name);
 
   const {
     formState: { fieldErrors },
@@ -47,14 +45,14 @@ export const SelectField = ({
       />
       {label ? <FieldLabel>{label}</FieldLabel> : null}
       <SelectInput
-        id={name()}
+        id={name}
         options={options}
         value={selectedId}
         placeholder="Select..."
         onChange={setSelectedId}
         {...props}
       />
-      <FieldMessage error={errorMessage || fieldErrors[name()]}>
+      <FieldMessage error={errorMessage || fieldErrors[name]}>
         {supportingText}
       </FieldMessage>
     </div>

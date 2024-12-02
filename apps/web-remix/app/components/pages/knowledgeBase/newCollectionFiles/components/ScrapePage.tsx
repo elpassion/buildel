@@ -27,12 +27,7 @@ export function ScrapePage() {
 
   const { crawl } = useCrawlUrls(organizationId);
 
-  const submit = async (
-    data: z.TypeOf<typeof ScrapeSchema>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const submit = async (data: z.TypeOf<typeof ScrapeSchema>) => {
     setIsSubmitting(true);
 
     loadingToast(
@@ -69,7 +64,7 @@ export function ScrapePage() {
   };
 
   return (
-    <ValidatedForm validator={validator} onSubmit={submit} noValidate>
+    <ValidatedForm validator={validator} handleSubmit={submit} noValidate>
       <Field name="url">
         <FieldLabel>Website</FieldLabel>
         <TextInputField className="w-full pr-[78px]" />

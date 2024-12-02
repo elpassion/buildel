@@ -86,12 +86,7 @@ function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
   const [key, setKey] = useState(new Date().getTime());
   const validator = React.useMemo(() => withZod(metadataSchema), []);
 
-  const handleOnSubmit = (
-    data: MetadataSchema,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const handleOnSubmit = (data: MetadataSchema) => {
     if (!data.value) return onSubmit({});
     onSubmit(data.value);
 
@@ -109,7 +104,7 @@ function MetadataForm({ defaultValue, onSubmit }: MetadataFormProps) {
     <ValidatedForm
       key={key}
       defaultValues={{ value: defaultValue }}
-      onSubmit={handleOnSubmit}
+      handleSubmit={handleOnSubmit}
       validator={validator}
       noValidate
     >

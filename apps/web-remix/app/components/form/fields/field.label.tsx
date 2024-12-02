@@ -18,7 +18,7 @@ export const FieldLabel = ({
   return (
     <Label
       ref={ref}
-      htmlFor={name()}
+      htmlFor={name}
       className={cn('block mb-2', className)}
       {...props}
     >
