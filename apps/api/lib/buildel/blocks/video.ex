@@ -5,7 +5,7 @@ defmodule Buildel.Blocks.Video do
   def options() do
     %{
       type: "video",
-      description: "",
+      description: "Block for adding YouTube videos to the workflow",
       groups: ["utils"],
       inputs: [],
       outputs: [],

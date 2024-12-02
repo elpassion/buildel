@@ -5,7 +5,7 @@ defmodule Buildel.Blocks.Comment do
   def options() do
     %{
       type: "comment",
-      description: "",
+      description: "Block for adding comments to the workflow",
       groups: ["utils"],
       inputs: [],
       outputs: [],
