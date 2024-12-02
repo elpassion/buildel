@@ -15,12 +15,12 @@ export const SmallFileInputField = ({
 
   return (
     <SmallFileInput
-      name={name}
-      aria-invalid={error ? true : undefined}
-      aria-describedby={`${name}-error`}
-      aria-errormessage={error ? `${name}-error` : undefined}
-      aria-label={name}
-      autoComplete={name}
+      name={name()}
+      aria-invalid={error() ? true : undefined}
+      aria-describedby={`${name()}-error`}
+      aria-errormessage={error() ? `${name()}-error` : undefined}
+      aria-label={name()}
+      autoComplete={name()}
       {...getInputProps()}
       {...props}
     />
@@ -41,11 +41,11 @@ export const SmallUploadInputField = ({
 
   return (
     <SmallFileUpload
-      name={name}
-      aria-invalid={error ? true : undefined}
-      aria-describedby={`${name}-error`}
-      aria-errormessage={error ? `${name}-error` : undefined}
-      aria-label={name}
+      name={name()}
+      aria-invalid={error() ? true : undefined}
+      aria-describedby={`${name()}-error`}
+      aria-errormessage={error() ? `${name()}-error` : undefined}
+      aria-label={name()}
       {...getInputProps()}
       {...props}
     />

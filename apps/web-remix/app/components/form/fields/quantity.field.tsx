@@ -13,12 +13,12 @@ export const QuantityInputField = ({
   const { name, getInputProps, error } = useFieldContext();
   return (
     <QuantityInput
-      name={name}
+      name={name()}
       ref={ref}
-      aria-invalid={error ? true : undefined}
-      aria-describedby={`${name}-error`}
-      aria-errormessage={error ? `${name}-error` : undefined}
-      autoComplete={name}
+      aria-invalid={error() ? true : undefined}
+      aria-describedby={`${name()}-error`}
+      aria-errormessage={error() ? `${name()}-error` : undefined}
+      autoComplete={name()}
       {...props}
       {...getInputProps()}
     />

@@ -71,7 +71,7 @@ export const EditorField = ({
         value={currentValue}
         onChange={handleOnChange}
         height="130px"
-        id={`${name}-editor`}
+        id={`${name()}-editor`}
         {...props}
       />
 
