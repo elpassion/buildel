@@ -13,10 +13,12 @@ import type {
   IBlockConfig,
   IConfigConnection,
   IInterfaceConfig,
+  IInterfaceConfigFormOutputProperty,
   IInterfaceConfigProperty,
   INode,
   IPipeline,
 } from '~/components/pages/pipelines/pipeline.types';
+import { IInterfaceConfigFormProperty } from '~/components/pages/pipelines/pipeline.types';
 import {
   getEdges,
   getNodes,
@@ -204,8 +206,12 @@ function validateInterfaceConfigs(
     },
     form: {
       ...interfaces.form,
-      inputs: interfaces.form.inputs.map(validate),
-      outputs: interfaces.form.outputs.map(validate),
+      inputs: interfaces.form.inputs.map(
+        validate,
+      ) as IInterfaceConfigFormProperty[],
+      outputs: interfaces.form.outputs.map(
+        validate,
+      ) as IInterfaceConfigFormOutputProperty[],
     },
   };
 }
