@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   FieldArray as FA,
+  FieldArrayApi as FAI,
+  FieldApi as FApi,
+  FormApi as FoApi,
   useControlField as ucf,
   useField as uf,
   useFieldArray as ufa,
@@ -16,6 +19,9 @@ export const useFormScopeOrContext = ufsc;
 export const FieldArray = FA;
 export const useFieldArray = ufa;
 export type ValidationBehaviorOptions = any; // Define your validation behavior options here
+export type FieldArrayApi<T extends any[]> = FAI<T>;
+export type FieldApi<T> = FApi<T>;
+export type FormApi<T> = FoApi<T>;
 
 export const useCurrentFormState = () => {
   const {

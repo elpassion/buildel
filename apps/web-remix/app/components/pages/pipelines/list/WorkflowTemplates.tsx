@@ -1,4 +1,4 @@
-import type { PropsWithChildren, ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode, RefObject } from 'react';
 import React, { useMemo, useRef } from 'react';
 import { PlusCircle } from 'lucide-react';
 
@@ -65,7 +65,7 @@ function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
   const validator = useMemo(() => withZod(CreateFromTemplateSchema), []);
   return (
     <ValidatedForm
-      formRef={ref}
+      formRef={ref as RefObject<HTMLFormElement>}
       action={action}
       method="POST"
       validator={validator}

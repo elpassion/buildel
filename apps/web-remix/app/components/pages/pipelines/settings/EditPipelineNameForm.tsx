@@ -37,8 +37,7 @@ export function EditPipelineNameForm({
   const updateFetcher = useFetcher<IPipeline>();
 
   const handleOnSubmit = useCallback(
-    (data: { name: string }, e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+    (data: { name: string }) => {
       const pipeline = { ...defaultValues, name: data.name };
 
       updateFetcher.submit(pipeline, {
@@ -83,7 +82,7 @@ export function EditPipelineNameForm({
               method="put"
               noValidate
               validator={validator}
-              onSubmit={handleOnSubmit}
+              handleSubmit={handleOnSubmit}
               defaultValues={{ name: defaultValues.name }}
             >
               <Field name="name">

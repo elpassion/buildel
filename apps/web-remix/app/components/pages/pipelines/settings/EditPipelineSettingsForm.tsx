@@ -23,12 +23,7 @@ export function EditPipelineSettingsForm({
 
   const updateFetcher = useFetcher<IPipeline>();
   const handleOnSubmit = useCallback(
-    (
-      data: UpdatePipelineSettingsSchema,
-      e: React.FormEvent<HTMLFormElement>,
-    ) => {
-      e.preventDefault();
-
+    (data: UpdatePipelineSettingsSchema) => {
       const pipeline = {
         ...defaultValues,
         budget_limit: data.budget_limit ?? null,
@@ -57,7 +52,7 @@ export function EditPipelineSettingsForm({
       method="put"
       noValidate
       validator={validator}
-      onSubmit={handleOnSubmit}
+      handleSubmit={handleOnSubmit}
       defaultValues={{
         budget_limit: defaultValues.budget_limit,
         logs_enabled: defaultValues.logs_enabled,

@@ -40,11 +40,7 @@ export function SettingsConfigurationPage() {
     [updateFetcher],
   );
 
-  const handleOnSubmit = async (
-    data: { configuration: string },
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleOnSubmit = async (data: { configuration: string }) => {
     setErrors({});
     try {
       const config = JSON.parse(data.configuration);
@@ -100,7 +96,7 @@ export function SettingsConfigurationPage() {
       validator={validator}
       className="flex flex-col h-[95%]"
       defaultValues={{ configuration: JSON.stringify(pipeline) }}
-      onSubmit={handleOnSubmit}
+      handleSubmit={handleOnSubmit}
       noValidate
     >
       <div className="grow">

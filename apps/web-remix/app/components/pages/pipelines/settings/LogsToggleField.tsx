@@ -28,7 +28,7 @@ export const LogsToggleField = forwardRef<
         <ToggleInputField size="sm" {...props} />
       </div>
 
-      <FieldMessage className="!mt-0" error={error}>
+      <FieldMessage className="!mt-0" error={error()}>
         {supportingText}
       </FieldMessage>
     </div>

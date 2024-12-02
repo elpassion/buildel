@@ -210,7 +210,7 @@ function validateInterfaceConfigs(
   };
 }
 
-function validateInterfaceProperty(updated: IExtendedBlockConfig) {
+function validateInterfaceProperty<T>(updated: IExtendedBlockConfig) {
   return (property: IInterfaceConfigProperty) => {
     const updatedProperty: IInterfaceConfigProperty = { ...property };
 

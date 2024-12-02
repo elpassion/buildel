@@ -1,11 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import startCase from 'lodash.startcase';
 import { Trash } from 'lucide-react';
-import {
-  useControlField,
-  useFieldArray,
-  ValidatedForm,
-} from 'remix-validated-form';
 
 import {
   InterfaceConfig,
@@ -13,6 +7,11 @@ import {
 } from '~/api/pipeline/pipeline.contracts';
 import { CheckboxInputField } from '~/components/form/fields/checkbox.field';
 import { Field, HiddenField } from '~/components/form/fields/field.context';
+import type { FormApi } from '~/components/form/fields/form.field';
+import {
+  useControlField,
+  useFieldArray,
+} from '~/components/form/fields/form.field';
 import { TextInputField } from '~/components/form/fields/text.field';
 import { SelectInput } from '~/components/form/inputs/select/select.input';
 import { SubmitButton } from '~/components/form/submit';
@@ -50,12 +49,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
     ['text_output', 'file_output', 'image_output'].includes(block.type),
   );
 
-  const handleOnSubmit = (
-    data: IInterfaceConfig,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const handleOnSubmit = (data: IInterfaceConfig) => {
     const inputs = data.form.inputs.map((input) => {
       return {
         ...input,
@@ -81,10 +75,10 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 
   return (
     <ValidatedForm
-      defaultValues={toSelectDefaults(pipeline.interface_config) as any}
-      validator={validator}
       noValidate
-      onSubmit={handleOnSubmit}
+      defaultValues={toSelectDefaults(pipeline.interface_config)}
+      validator={validator}
+      handleSubmit={handleOnSubmit}
     >
       <div className="flex flex-col gap-4 max-w-screen-2xl">
         <div>
@@ -95,6 +89,7 @@ export const InterfaceConfigForm: React.FC<InterfaceConfigFormProps> = ({
 
         <div>
           <Label className="mb-2 block">Outputs</Label>
+
           <Outputs blocks={outputs} />
         </div>
 
@@ -118,15 +113,12 @@ interface IOProps {
   blocks: IBlockConfig[];
 }
 function Inputs({ blocks }: IOProps) {
-  const [items, { push, remove }] = useFieldArray<IInterfaceConfigFormProperty>(
-    'form.inputs',
-    {},
-  );
+  const items = useFieldArray<IInterfaceConfigFormProperty[]>('form.inputs');
 
   const [availableBlocks, setAvailableBlocks] = useState(
     blocks.filter(
       (block) =>
-        !items.map((item) => item.defaultValue.name).includes(block.name),
+        !items.map((_, item) => item.value().name).includes(block.name),
     ),
   );
 
@@ -134,7 +126,7 @@ function Inputs({ blocks }: IOProps) {
     if (availableBlocks.length === 0) return;
 
     try {
-      push(
+      items.push(
         InterfaceConfigFormProperty.parse({
           name: availableBlocks[0].name,
           type: availableBlocks[0].type,
@@ -160,14 +152,14 @@ function Inputs({ blocks }: IOProps) {
   };
 
   const onRemove = (index: number) => {
-    remove(index);
+    const names = items.map((_, item) => item.value().name);
 
     setAvailableBlocks((prev) => [
       ...prev,
-      blocks.find(
-        (block) => block.name === items[index].defaultValue.name,
-      ) as IBlockConfig,
+      blocks.find((block) => block.name === names[index]) as IBlockConfig,
     ]);
+
+    items.remove(index);
   };
 
   const hasInputs = availableBlocks.length !== blocks.length;
@@ -188,16 +180,18 @@ function Inputs({ blocks }: IOProps) {
               <IOHeaderCell>Required</IOHeaderCell>
             </IOHeader>
 
-            {items.map((input, index) => (
-              <Input
-                key={input.key}
-                input={input}
-                index={index}
-                onRemove={onRemove}
-                onGlobalChange={onGlobalChange}
-                options={availableBlocks}
-              />
-            ))}
+            {items.map((key, input, index) => {
+              return (
+                <Input
+                  key={key}
+                  input={input}
+                  index={index}
+                  onRemove={onRemove}
+                  onGlobalChange={onGlobalChange}
+                  options={availableBlocks}
+                />
+              );
+            })}
           </IOBody>
         ) : null}
 
@@ -223,7 +217,7 @@ function Input({
   options,
 }: {
   index: number;
-  input: { defaultValue: IInterfaceConfigFormProperty; key: string };
+  input: FormApi<IInterfaceConfigFormProperty>;
   onRemove: (index: number) => void;
   onGlobalChange: (prev: string, next: string) => void;
   options: IBlockConfig[];
@@ -244,6 +238,7 @@ function Input({
       console.error(err);
     }
   };
+
   return (
     <IOItemWrapper>
       <HiddenField name={`form.inputs[${index}].type`} value={type} />
@@ -257,21 +252,16 @@ function Input({
       />
 
       <Field name={`form.inputs[${index}].label`}>
-        <TextInputField
-          placeholder="Label"
-          defaultValue={
-            input.defaultValue.label || startCase(input.defaultValue.name)
-          }
-        />
+        <TextInputField defaultValue={input.defaultValue()?.label} />
       </Field>
 
       <Field name={`form.inputs[${index}].description`}>
-        <TextInputField defaultValue={input.defaultValue.description} />
+        <TextInputField defaultValue={input.defaultValue()?.description} />
       </Field>
 
       <Field name={`form.inputs[${index}].required`}>
         <div className="md:h-10 flex items-center">
-          <CheckboxInputField defaultChecked={input.defaultValue.required} />
+          <CheckboxInputField defaultChecked={input.defaultValue()?.required} />
         </div>
       </Field>
 
@@ -289,15 +279,12 @@ function Input({
 }
 
 function Outputs({ blocks }: IOProps) {
-  const [items, { push, remove }] = useFieldArray<IInterfaceConfigFormProperty>(
-    'form.outputs',
-    {},
-  );
+  const items = useFieldArray<IInterfaceConfigFormProperty[]>('form.outputs');
 
   const [availableBlocks, setAvailableBlocks] = useState(
     blocks.filter(
       (block) =>
-        !items.map((item) => item.defaultValue.name).includes(block.name),
+        !items.map((_, item) => item.value().name).includes(block.name),
     ),
   );
 
@@ -305,7 +292,7 @@ function Outputs({ blocks }: IOProps) {
     if (availableBlocks.length === 0) return;
 
     try {
-      push(
+      items.push(
         InterfaceConfigFormProperty.parse({
           name: availableBlocks[0].name,
           type: availableBlocks[0].type,
@@ -331,14 +318,14 @@ function Outputs({ blocks }: IOProps) {
   };
 
   const onRemove = (index: number) => {
-    remove(index);
+    const names = items.map((_, item) => item.value().name);
 
     setAvailableBlocks((prev) => [
       ...prev,
-      blocks.find(
-        (block) => block.name === items[index].defaultValue.name,
-      ) as IBlockConfig,
+      blocks.find((block) => block.name === names[index]) as IBlockConfig,
     ]);
+
+    items.remove(index);
   };
 
   const hasOutputs = availableBlocks.length !== blocks.length;
@@ -359,9 +346,11 @@ function Outputs({ blocks }: IOProps) {
               <span />
             </IOHeader>
 
-            {items.map((output, index) => (
+            {items.map((key, output, index) => (
               <Output
-                key={output.key}
+                key={key}
+                //eslint-disable-next-line
+                //@ts-ignore
                 output={output}
                 index={index}
                 onRemove={onRemove}
@@ -394,7 +383,7 @@ function Output({
   options,
 }: {
   index: number;
-  output: { defaultValue: IInterfaceConfigFormOutputProperty; key: string };
+  output: FormApi<IInterfaceConfigFormOutputProperty>;
   onRemove: (index: number) => void;
   onGlobalChange: (prev: string, next: string) => void;
   options: IBlockConfig[];
@@ -432,16 +421,11 @@ function Output({
       />
 
       <Field name={`form.outputs[${index}].label`}>
-        <TextInputField
-          placeholder="Label"
-          defaultValue={
-            output.defaultValue.label || startCase(output.defaultValue.name)
-          }
-        />
+        <TextInputField defaultValue={output.defaultValue()?.label} />
       </Field>
 
       <Field name={`form.outputs[${index}].description`}>
-        <TextInputField defaultValue={output.defaultValue.description} />
+        <TextInputField defaultValue={output.defaultValue()?.description} />
       </Field>
 
       <span />
