@@ -111,7 +111,9 @@ export const KnowledgeBaseSearchForm: React.FC<
 };
 
 function SearchButton() {
-  const { isSubmitting } = useFormContext();
+  const {
+    formState: { isSubmitting },
+  } = useFormContext();
 
   return (
     <IconButton

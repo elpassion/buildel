@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   FieldArray as FA,
   useControlField as ucf,
@@ -29,5 +29,7 @@ export const useCurrentFormState = () => {
     subscribe.value((values) => setValues(values));
   }, []);
 
-  return { values, subscribe, fieldErrors };
+  return useMemo(() => {
+    return { values, subscribe, fieldErrors, getValues: () => values };
+  }, [values, subscribe, fieldErrors]);
 };

@@ -19,7 +19,7 @@ export const ExtendChunksField = forwardRef<
         <FieldLabel className="mb-0">{label}</FieldLabel>
       </div>
 
-      <FieldMessage className="!mt-0" error={error}>
+      <FieldMessage className="!mt-0" error={error()}>
         {supportingText}
       </FieldMessage>
     </div>

@@ -136,17 +136,12 @@ interface DiscoverPagesFormProps {
 function DiscoverPagesForm({ onSubmit, loading }: DiscoverPagesFormProps) {
   const validator = useMemo(() => withZod(DiscoverSchema), []);
 
-  const submit = (
-    data: z.TypeOf<typeof DiscoverSchema>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const submit = (data: z.TypeOf<typeof DiscoverSchema>) => {
     onSubmit(data);
   };
 
   return (
-    <ValidatedForm validator={validator} onSubmit={submit} noValidate>
+    <ValidatedForm validator={validator} handleSubmit={submit} noValidate>
       <Field name="url">
         <FieldLabel>Website</FieldLabel>
         <div className="relative w-full">

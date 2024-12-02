@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLoaderData } from '@remix-run/react';
+import get from 'lodash.get';
 import type { RenderDOMFunc } from 'rc-select/es/interface';
 
 import { AsyncSelectField } from '~/components/form/fields/asyncSelect.field';
@@ -9,6 +10,7 @@ import {
 } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
+import { useCurrentFormState } from '~/components/form/fields/form.field';
 import {
   RadioField,
   RadioGroupField,
@@ -52,9 +54,9 @@ export function ModelSelectField({
   getPopupContainer,
 }: ModelSelectFieldProps) {
   const { organizationId } = useLoaderData<typeof loader>();
-  const { fieldErrors, getValues } = useFormContext();
+  const { values, fieldErrors } = useCurrentFormState();
 
-  const api_type = getValues().get('embeddings.api_type');
+  const api_type = get(values, 'embeddings.api_type');
 
   return (
     <FormField name="embeddings.model">
@@ -77,7 +79,9 @@ export function SecretSelectField({
   getPopupContainer?: RenderDOMFunc;
 }) {
   const { organizationId } = useLoaderData<typeof loader>();
-  const { fieldErrors } = useFormContext();
+  const {
+    formState: { fieldErrors },
+  } = useFormContext();
 
   return (
     <FormField name="embeddings.secret_name">
