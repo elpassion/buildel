@@ -1,7 +1,5 @@
 import React, { useMemo } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { Edit } from 'lucide-react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { toSelectOption } from '~/components/form/fields/asyncSelect.field';
 import { Field, HiddenField } from '~/components/form/fields/field.context';
@@ -22,6 +20,7 @@ import {
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
 import { useModal } from '~/hooks/useModal';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 import { Section, SectionHeading } from '../settingsLayout/PageLayout';

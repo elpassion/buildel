@@ -104,6 +104,12 @@ importers:
       '@remix-validated-form/with-zod':
         specifier: ^2.0.6
         version: 2.0.7(remix-validated-form@5.1.5(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(react@19.0.0-rc-eb3ad065-20240822)(types-react@19.0.0-rc.0))(zod@3.23.8)
+      '@rvf/remix':
+        specifier: ^6.3.0
+        version: 6.3.0(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)
+      '@rvf/zod':
+        specifier: ^6.0.3
+        version: 6.0.3(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(zod@3.23.8)
       '@sentry/remix':
         specifier: ^7.74.1
         version: 7.119.2(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(react@19.0.0-rc-eb3ad065-20240822)
@@ -2030,6 +2036,38 @@ packages:
 
   '@rushstack/eslint-patch@1.10.4':
     resolution: {integrity: sha512-WJgX9nzTqknM393q1QJDJmoW28kUfEnybeTfVNcNAPnIx210RXm2DiXiHzfNPJNIUUb1tJnz/l4QGtJ30PgWmA==}
+
+  '@rvf/core@6.3.0':
+    resolution: {integrity: sha512-RgZFRlB7dqnu4pi2CcYIQyFjRRSR9h/UyAUahQhDXlcmVqtm7QNTwZOv/i7Thbj3MSh3jQZMrdly3X/+tDqtGQ==}
+    peerDependencies:
+      '@rvf/set-get': '>= 6.0.3 < 7.0.0'
+      react: 19.0.0-rc-eb3ad065-20240822
+
+  '@rvf/react@6.3.0':
+    resolution: {integrity: sha512-cDvm4bK2kKPCq6CjgsaIqjentmhXSSJ7VL8zg6LrfBYHw/seRd3ykE+Z5J9Np+PfUF3VmZTOGzOzD8/ijwt2GA==}
+    peerDependencies:
+      '@rvf/core': '>= 6.1.2 < 7.0.0'
+      '@rvf/set-get': '>= 6.0.3 < 7.0.0'
+      react: 19.0.0-rc-eb3ad065-20240822
+      react-dom: 19.0.0-rc-eb3ad065-20240822
+
+  '@rvf/remix@6.3.0':
+    resolution: {integrity: sha512-65/3RlxSqVUuBr2nDczlIkkvbSvEb0yXTesnq5t4Ncjcy96BSZhxTDmugrHOUKSxDtU6+rVGboksohryG2H+5Q==}
+    peerDependencies:
+      '@remix-run/node': '>= 1.16.1 <3.0.0'
+      '@remix-run/react': '>= 1.15.0 <3.0.0'
+      '@remix-run/server-runtime': '>= 1.16.1 <3.0.0'
+      react: 19.0.0-rc-eb3ad065-20240822
+
+  '@rvf/set-get@6.0.3':
+    resolution: {integrity: sha512-nv9r1Kr+eRaE9+e50atTqbNmobY7EiTGfh7OlDXyWe71nFK9XsQ3K4Tq1J/FsjrzhBGzGUGwLRxGd8/mxv+i6Q==}
+
+  '@rvf/zod@6.0.3':
+    resolution: {integrity: sha512-TiFbH6X5ru6ZJfip4oIT5MNlBO2trqZR9UqbkAAGDIzU+saw3A8C9yc/aAI9MdgEvQoerPRC68Tsze77cvdZHw==}
+    peerDependencies:
+      '@rvf/core': '>= 0.0.0 < 7.0.0'
+      '@rvf/set-get': '>= 6.0.3 < 7.0.0'
+      zod: '>= 3.11.0'
 
   '@sentry-internal/feedback@7.119.2':
     resolution: {integrity: sha512-bnR1yJWVBZfXGx675nMXE8hCXsxluCBfIFy9GQT8PTN/urxpoS9cGz+5F7MA7Xe3Q06/7TT0Mz3fcDvjkqTu3Q==}
@@ -4340,6 +4378,9 @@ packages:
 
   immediate@3.0.6:
     resolution: {integrity: sha512-XXOFtyqDjNDAQxVfYxuF7g9Il/IbWmmlQg2MYKOH8ExIT1qg6xc4zyS3HaEEATgs1btfzxq15ciUiY7gjSXRGQ==}
+
+  immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
 
   immer@9.0.21:
     resolution: {integrity: sha512-bc4NBHqOqSfRW7POMkHd51LvClaeMXpm8dx0e8oE2GORbq5aRK7Bxl4FyzVLdGtLmvLKL7BTDBG5ACQm4HWjTA==}
@@ -8966,6 +9007,39 @@ snapshots:
 
   '@rushstack/eslint-patch@1.10.4': {}
 
+  '@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822)':
+    dependencies:
+      '@rvf/set-get': 6.0.3
+      immer: 10.1.1
+      react: 19.0.0-rc-eb3ad065-20240822
+
+  '@rvf/react@6.3.0(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)':
+    dependencies:
+      '@rvf/core': 6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822)
+      '@rvf/set-get': 6.0.3
+      react: 19.0.0-rc-eb3ad065-20240822
+      react-dom: 19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822)
+
+  '@rvf/remix@6.3.0(@remix-run/node@2.13.1(typescript@5.6.3))(@remix-run/react@2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3))(@remix-run/server-runtime@2.13.1(typescript@5.6.3))(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)':
+    dependencies:
+      '@remix-run/node': 2.13.1(typescript@5.6.3)
+      '@remix-run/react': 2.13.1(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)(typescript@5.6.3)
+      '@remix-run/server-runtime': 2.13.1(typescript@5.6.3)
+      '@rvf/react': 6.3.0(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(react-dom@19.0.0-rc-eb3ad065-20240822(react@19.0.0-rc-eb3ad065-20240822))(react@19.0.0-rc-eb3ad065-20240822)
+      react: 19.0.0-rc-eb3ad065-20240822
+    transitivePeerDependencies:
+      - '@rvf/core'
+      - '@rvf/set-get'
+      - react-dom
+
+  '@rvf/set-get@6.0.3': {}
+
+  '@rvf/zod@6.0.3(@rvf/core@6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822))(@rvf/set-get@6.0.3)(zod@3.23.8)':
+    dependencies:
+      '@rvf/core': 6.3.0(@rvf/set-get@6.0.3)(react@19.0.0-rc-eb3ad065-20240822)
+      '@rvf/set-get': 6.0.3
+      zod: 3.23.8
+
   '@sentry-internal/feedback@7.119.2':
     dependencies:
       '@sentry/core': 7.119.2
@@ -12096,6 +12170,8 @@ snapshots:
   ignore@5.3.2: {}
 
   immediate@3.0.6: {}
+
+  immer@10.1.1: {}
 
   immer@9.0.21: {}
 

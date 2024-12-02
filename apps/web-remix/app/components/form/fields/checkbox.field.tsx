@@ -1,8 +1,8 @@
 import React from 'react';
 import type * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import { useControlField } from 'remix-validated-form';
 
 import { useFieldContext } from '~/components/form/fields/field.context';
+import { useControlField } from '~/components/form/fields/form.field';
 import type { CheckboxInputProps } from '~/components/form/inputs/checkbox.input';
 import { CheckboxInput } from '~/components/form/inputs/checkbox.input';
 

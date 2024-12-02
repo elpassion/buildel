@@ -1,12 +1,12 @@
 import type { ActionFunctionArgs } from '@remix-run/node';
 import { json } from '@remix-run/node';
-import { withZod } from '@remix-validated-form/with-zod';
-import { validationError } from 'remix-validated-form';
 import invariant from 'tiny-invariant';
 
 import { InterfaceConfig } from '~/api/pipeline/pipeline.contracts';
 import { PipelineApi } from '~/api/pipeline/PipelineApi';
+import { validationError } from '~/utils.server';
 import type { fetchTyped } from '~/utils/fetch.server';
+import { withZod } from '~/utils/form';
 import { setServerToast } from '~/utils/toast.server';
 
 export const interfacePatchAction = async (

@@ -1,14 +1,13 @@
 import * as React from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { Field, HiddenField } from '~/components/form/fields/field.context';
 import { FieldLabel } from '~/components/form/fields/field.label';
 import { FieldMessage } from '~/components/form/fields/field.message';
 import { PasswordInputField } from '~/components/form/fields/text.field';
 import { SubmitButton } from '~/components/form/submit';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 import type { loader } from './loader.server';
 import { schema } from './schema';

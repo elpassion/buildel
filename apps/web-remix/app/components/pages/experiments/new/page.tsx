@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useLoaderData, useMatch, useNavigate } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateExperimentSchema } from '~/api/experiments/experiments.contracts';
 import { toSelectOption } from '~/components/form/fields/asyncSelect.field';
@@ -20,6 +18,7 @@ import {
   DialogDrawerHeader,
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 

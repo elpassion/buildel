@@ -1,8 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
 import { useFetcher, useLoaderData } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 import z from 'zod';
 
 import { UpdatePipelineSchema } from '~/api/pipeline/pipeline.contracts';
@@ -14,6 +12,7 @@ import { generateZODSchema } from '~/components/form/schema/SchemaParser';
 import { SubmitButton } from '~/components/form/submit';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { successToast } from '~/components/toasts/successToast';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 import { routes } from '~/utils/routes.utils';
 
@@ -41,11 +40,7 @@ export function SettingsConfigurationPage() {
     [updateFetcher],
   );
 
-  const handleOnSubmit = async (
-    data: { configuration: string },
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleOnSubmit = async (data: { configuration: string }) => {
     setErrors({});
     try {
       const config = JSON.parse(data.configuration);
@@ -101,7 +96,7 @@ export function SettingsConfigurationPage() {
       validator={validator}
       className="flex flex-col h-[95%]"
       defaultValues={{ configuration: JSON.stringify(pipeline) }}
-      onSubmit={handleOnSubmit}
+      handleSubmit={handleOnSubmit}
       noValidate
     >
       <div className="grow">

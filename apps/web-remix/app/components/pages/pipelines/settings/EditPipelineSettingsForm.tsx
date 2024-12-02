@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { Field } from '~/components/form/fields/field.context';
 import { SubmitButton } from '~/components/form/submit';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { successToast } from '~/components/toasts/successToast';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 import { BudgetLimitField } from './BudgetLimitField';
@@ -24,12 +23,7 @@ export function EditPipelineSettingsForm({
 
   const updateFetcher = useFetcher<IPipeline>();
   const handleOnSubmit = useCallback(
-    (
-      data: UpdatePipelineSettingsSchema,
-      e: React.FormEvent<HTMLFormElement>,
-    ) => {
-      e.preventDefault();
-
+    (data: UpdatePipelineSettingsSchema) => {
       const pipeline = {
         ...defaultValues,
         budget_limit: data.budget_limit ?? null,
@@ -58,7 +52,7 @@ export function EditPipelineSettingsForm({
       method="put"
       noValidate
       validator={validator}
-      onSubmit={handleOnSubmit}
+      handleSubmit={handleOnSubmit}
       defaultValues={{
         budget_limit: defaultValues.budget_limit,
         logs_enabled: defaultValues.logs_enabled,

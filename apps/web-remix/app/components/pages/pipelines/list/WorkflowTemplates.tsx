@@ -1,8 +1,6 @@
-import type { PropsWithChildren, ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode, RefObject } from 'react';
 import React, { useMemo, useRef } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
 import { PlusCircle } from 'lucide-react';
-import { ValidatedForm } from 'remix-validated-form';
 
 import type { IWorkflowTemplate } from '~/api/organization/organization.contracts';
 import { CreateFromTemplateSchema } from '~/api/organization/organization.contracts';
@@ -13,6 +11,7 @@ import {
   WorkflowBlockListOverflow,
 } from '~/components/pages/pipelines/components/WorkflowBlockList';
 import { cn } from '~/utils/cn';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 interface WorkflowTemplatesProps extends PropsWithChildren {
   className?: string;
@@ -66,7 +65,7 @@ function WorkflowTemplatesListItem({ item, action }: ITemplateItem) {
   const validator = useMemo(() => withZod(CreateFromTemplateSchema), []);
   return (
     <ValidatedForm
-      formRef={ref}
+      formRef={ref as RefObject<HTMLFormElement>}
       action={action}
       method="POST"
       validator={validator}

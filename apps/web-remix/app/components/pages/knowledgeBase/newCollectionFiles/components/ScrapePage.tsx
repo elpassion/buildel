@@ -1,7 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { useLoaderData, useNavigate, useRevalidator } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 import { z } from 'zod';
 
 import { Field } from '~/components/form/fields/field.context';
@@ -12,6 +10,7 @@ import type { loader } from '~/components/pages/knowledgeBase/newCollectionFiles
 import { useCrawlUrls } from '~/components/pages/knowledgeBase/newCollectionFiles/useCrawlUrls';
 import { loadingToast } from '~/components/toasts/loadingToast';
 import { Button } from '~/components/ui/button';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 const ScrapeSchema = z.object({
@@ -28,12 +27,7 @@ export function ScrapePage() {
 
   const { crawl } = useCrawlUrls(organizationId);
 
-  const submit = async (
-    data: z.TypeOf<typeof ScrapeSchema>,
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
-
+  const submit = async (data: z.TypeOf<typeof ScrapeSchema>) => {
     setIsSubmitting(true);
 
     loadingToast(
@@ -70,7 +64,7 @@ export function ScrapePage() {
   };
 
   return (
-    <ValidatedForm validator={validator} onSubmit={submit} noValidate>
+    <ValidatedForm validator={validator} handleSubmit={submit} noValidate>
       <Field name="url">
         <FieldLabel>Website</FieldLabel>
         <TextInputField className="w-full pr-[78px]" />

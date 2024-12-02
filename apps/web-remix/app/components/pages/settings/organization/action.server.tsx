@@ -1,12 +1,12 @@
 import { json } from '@remix-run/node';
 import type { ActionFunctionArgs } from '@remix-run/node';
-import { withZod } from '@remix-validated-form/with-zod';
 import invariant from 'tiny-invariant';
 import { z } from 'zod';
 
 import { OrganizationResponse } from '~/api/organization/organization.contracts';
 import { requireLogin } from '~/session.server';
 import { actionBuilder } from '~/utils.server';
+import { withZod } from '~/utils/form';
 import { setServerToast } from '~/utils/toast.server';
 
 import { schema } from './schema';

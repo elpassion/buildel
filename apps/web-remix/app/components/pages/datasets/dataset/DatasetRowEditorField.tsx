@@ -1,10 +1,10 @@
 import React from 'react';
-import { useControlField } from 'remix-validated-form';
 
 import {
   HiddenField,
   useFieldContext,
 } from '~/components/form/fields/field.context';
+import { useControlField } from '~/components/form/fields/form.field';
 import { EditorInput } from '~/components/form/inputs/editor.input';
 
 export function DatasetRowEditorField() {

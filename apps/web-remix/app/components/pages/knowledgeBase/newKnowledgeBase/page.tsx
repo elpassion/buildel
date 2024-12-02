@@ -1,7 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import type { MetaFunction } from '@remix-run/node';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 
 import { CreateCollectionSchema } from '~/api/knowledgeBase/knowledgeApi.contracts';
 import { Field } from '~/components/form/fields/field.context';
@@ -15,6 +13,7 @@ import {
   ModelSelectField,
   SecretSelectField,
 } from '~/components/pages/knowledgeBase/KnowledgeBaseFields';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { metaWithDefaults } from '~/utils/metadata';
 
 export function NewKnowledgeBasePage() {

@@ -1,7 +1,6 @@
-import type { FormEvent, PropsWithChildren, ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 import React, { useCallback, useEffect, useState } from 'react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { useControlField, ValidatedForm } from 'remix-validated-form';
+import { useField } from '@rvf/remix';
 
 import { asyncSelectApi } from '~/api/AsyncSelectApi';
 import type { IAsyncSelectItem } from '~/api/AsyncSelectApi';
@@ -37,6 +36,7 @@ import {
   DialogDrawerTitle,
 } from '~/components/ui/dialog-drawer';
 import { useModal } from '~/hooks/useModal';
+import { ValidatedForm, withZod } from '~/utils/form';
 
 import { SubmitButton } from '../submit';
 
@@ -51,10 +51,7 @@ export interface CreatableAsyncSelectFieldProps
   renderForm: ({
     onCreate,
   }: {
-    onCreate: (
-      data: Record<string, any>,
-      e: FormEvent<HTMLFormElement>,
-    ) => void;
+    onCreate: (data: Record<string, any>) => void;
   }) => ReactNode;
 }
 
@@ -82,14 +79,16 @@ export const CreatableAsyncSelectField = ({
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
     [],
   );
-  const [selectedId, setSelectedId] = useControlField<string | undefined>(name);
+  const { getControlProps, onChange } = useField<string | undefined>(name);
+
+  const selectedId = getControlProps().value;
 
   useEffect(() => {
     if (state === 'loading') return;
     const doesSelectedIdExist = options.some((opt) => opt.value === selectedId);
 
     if (!doesSelectedIdExist) {
-      setSelectedId(undefined);
+      onChange(undefined);
       validate();
     }
   }, [options, selectedId, state]);
@@ -100,8 +99,7 @@ export const CreatableAsyncSelectField = ({
       options.some((opt) => opt.value === defaultValue) &&
       !selectedId
     ) {
-      setSelectedId(defaultValue);
-      validate();
+      onChange(defaultValue);
     }
   }, [defaultValue, options, selectedId]);
 
@@ -113,16 +111,7 @@ export const CreatableAsyncSelectField = ({
     setState(state);
   };
 
-  const onChange = (id: string) => {
-    setSelectedId(id);
-    validate();
-  };
-
-  const handleCreate = async (
-    data: Record<string, any>,
-    e: FormEvent<HTMLFormElement>,
-  ) => {
-    e.preventDefault();
+  const handleCreate = async (data: Record<string, any>) => {
     try {
       const newItem = await asyncSelectApi.createData(
         url,
@@ -201,7 +190,7 @@ export const CreatableAsyncSelectField = ({
 };
 
 interface CreatableAsyncFormProps {
-  onCreate: (data: Record<string, any>, e: FormEvent<HTMLFormElement>) => void;
+  onCreate: (data: Record<string, any>) => void;
   schema: JSONSchemaField;
   asyncSelect: React.FC<FieldProps>;
   asyncCreatableSelect: React.FC<FieldProps>;

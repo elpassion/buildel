@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo } from 'react';
 import { useFetcher } from '@remix-run/react';
-import { withZod } from '@remix-validated-form/with-zod';
-import { ValidatedForm } from 'remix-validated-form';
 import { useBoolean } from 'usehooks-ts';
 
 import { Field, useFieldContext } from '~/components/form/fields/field.context';
 import { TextInputField } from '~/components/form/fields/text.field';
 import type { IPipeline } from '~/components/pages/pipelines/pipeline.types';
 import { cn } from '~/utils/cn';
+import { ValidatedForm, withZod } from '~/utils/form';
 import { routes } from '~/utils/routes.utils';
 
 import { updatePipelineNameSchema } from '../schema';
@@ -25,9 +24,7 @@ export const PipelineName = ({ pipeline }: PipelineNameProps) => {
   const updateFetcher = useFetcher<IPipeline>();
 
   const submit = useCallback(
-    (data: { name: string }, e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
+    (data: { name: string }) => {
       const updated = { ...pipeline, name: data.name };
 
       updateFetcher.submit(updated, {
@@ -69,10 +66,7 @@ interface PipelineNameFormProps {
     data: { name: string },
     e: React.FocusEvent<HTMLFormElement>,
   ) => void;
-  onSubmit: (
-    data: { name: string },
-    e: React.FormEvent<HTMLFormElement>,
-  ) => void;
+  onSubmit: (data: { name: string }) => void;
 }
 
 function PipelineNameForm({
@@ -98,7 +92,7 @@ function PipelineNameForm({
       method="PUT"
       onBlur={blur}
       validator={validator}
-      onSubmit={onSubmit}
+      handleSubmit={onSubmit}
       defaultValues={defaultValues}
     >
       <Field name="name">
